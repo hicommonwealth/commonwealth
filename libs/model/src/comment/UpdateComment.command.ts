@@ -1,15 +1,16 @@
-import { InvalidInput, type Command } from '@hicommonwealth/core';
+import { type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../database';
 import { isAuthorized, type AuthContext } from '../middleware';
-import { mustBeAuthorized } from '../middleware/guards';
+import { mustBeAuthorizedComment } from '../middleware/guards';
+import { getCommentSearchVector } from '../models';
 import {
+  decodeContent,
   emitMentions,
   findMentionDiff,
   parseUserMentions,
-  quillToPlain,
-  sanitizeQuillText,
   uniqueMentions,
+  uploadIfLarge,
 } from '../utils';
 
 export function UpdateComment(): Command<
@@ -18,17 +19,9 @@ export function UpdateComment(): Command<
 > {
   return {
     ...schemas.UpdateComment,
-    auth: [isAuthorized({})],
+    auth: [isAuthorized({ author: true })],
     body: async ({ actor, payload, auth }) => {
-      const { address } = mustBeAuthorized(actor, auth);
-      const { comment_id, discord_meta } = payload;
-
-      // find by comment_id or discord_meta
-      const comment = await models.Comment.findOne({
-        where: comment_id ? { id: comment_id } : { discord_meta },
-        include: [{ model: models.Thread, required: true }],
-      });
-      if (!comment) throw new InvalidInput('Comment not found');
+      const { address, comment } = mustBeAuthorizedComment(actor, auth);
 
       const thread = comment.Thread!;
       const currentVersion = await models.CommentVersionHistory.findOne({
@@ -37,31 +30,39 @@ export function UpdateComment(): Command<
       });
 
       if (currentVersion?.text !== payload.text) {
-        const text = sanitizeQuillText(payload.text);
-        const plaintext = quillToPlain(text);
+        const text = decodeContent(payload.text);
         const mentions = findMentionDiff(
           parseUserMentions(currentVersion?.text),
           uniqueMentions(parseUserMentions(text)),
         );
 
+        const { contentUrl } = await uploadIfLarge('comments', text);
+
         // == mutation transaction boundary ==
         await models.sequelize.transaction(async (transaction) => {
           await models.Comment.update(
-            { text, plaintext },
+            // TODO: text should be set to truncatedBody once client renders content_url
+            {
+              text,
+              search: getCommentSearchVector(text),
+              content_url: contentUrl,
+            },
             { where: { id: comment.id }, transaction },
           );
 
           await models.CommentVersionHistory.create(
-            { comment_id: comment.id!, text, timestamp: new Date() },
+            {
+              comment_id: comment.id!,
+              // TODO: text should be set to truncatedBody once client renders content_url
+              text,
+              timestamp: new Date(),
+              content_url: contentUrl,
+            },
             { transaction },
           );
 
-          // update timestamps
-          address.last_active = new Date();
-          await address.save({ transaction });
-
           mentions.length &&
-            (await emitMentions(models, transaction, {
+            (await emitMentions(transaction, {
               authorAddressId: address.id!,
               authorUserId: actor.user.id!,
               authorAddress: address.address,

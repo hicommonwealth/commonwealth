@@ -4,10 +4,12 @@ import BN from 'bn.js';
 import moment from 'moment';
 import type { IApp } from 'state';
 import { ApiStatus } from 'state';
-import type ChainInfo from '../../../models/ChainInfo';
 import type { IChainModule, ITXModalData } from '../../../models/interfaces';
 import type SolanaAccount from './account';
 
+import { ExtendedCommunity } from '@hicommonwealth/schemas';
+import { z } from 'zod';
+import { getChainDecimals } from '../../app/webWallets/utils';
 import { SolanaToken } from './types';
 
 export default class SolanaChain
@@ -35,18 +37,20 @@ export default class SolanaChain
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public async init(chain: ChainInfo, reset = false) {
+  public async init(chain: z.infer<typeof ExtendedCommunity>, reset = false) {
     // default to 9 decimals
-    this._decimals = new BN(10).pow(new BN(chain.decimals || 9));
+    const decimals = getChainDecimals(chain.id || '', chain.base);
+
+    this._decimals = new BN(10).pow(new BN(decimals || 9));
     this._denom = chain.default_symbol;
 
     let url: string;
 
     const solw3 = await import('@solana/web3.js');
     try {
-      url = solw3.clusterApiUrl(chain?.node?.url as solw3.Cluster);
+      url = solw3.clusterApiUrl(chain?.ChainNode?.url as solw3.Cluster);
     } catch (e) {
-      url = chain?.node?.url;
+      url = chain?.ChainNode?.url || '';
       // TODO: test if custom url is valid
     }
     // TODO: validate config here -- maybe we want ws?

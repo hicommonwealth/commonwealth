@@ -1,10 +1,17 @@
-const KEY_VERSION = 'v2'; // update this for breaking changes
-const PREFIX = `cw-draft-${KEY_VERSION}`;
-
 const MAX_DRAFT_SIZE = 1024 * 1024 * 4;
 
-export function useDraft<T>(key: string) {
-  const fullKey = `${PREFIX}-${key}`;
+type DraftOpts = {
+  keyVersion: string;
+};
+
+export function useDraft<T>(
+  key: string,
+  opts: DraftOpts = { keyVersion: 'v2' },
+) {
+  const keyVersion = opts.keyVersion;
+  const prefix = `cw-draft-${keyVersion}`;
+
+  const fullKey = `${prefix}-${key}`;
 
   const saveDraft = (data: T) => {
     const draft = JSON.stringify(data);

@@ -16,14 +16,20 @@ import {
   logger,
   stats,
 } from '@hicommonwealth/core';
-import { Contest, ContestWorker } from '@hicommonwealth/model';
+import {
+  Contest,
+  ContestWorker,
+  DiscordBotPolicy,
+} from '@hicommonwealth/model';
 import { fileURLToPath } from 'url';
 import { config } from '../../config';
 import { ChainEventPolicy } from './policies/chainEventCreated/chainEventCreatedPolicy';
 
 const log = logger(import.meta);
 
-stats(HotShotsStats());
+stats({
+  adapter: HotShotsStats(),
+});
 
 let isServiceHealthy = false;
 
@@ -55,7 +61,9 @@ export async function setupCommonwealthConsumer(): Promise<void> {
       ),
     );
     await rmqAdapter.init();
-    broker(rmqAdapter);
+    broker({
+      adapter: rmqAdapter,
+    });
     brokerInstance = rmqAdapter;
   } catch (e) {
     log.error(
@@ -89,6 +97,21 @@ export async function setupCommonwealthConsumer(): Promise<void> {
     BrokerSubscriptions.ContestProjection,
     Contest.Contests(),
   );
+
+  const discordBotSubRes = await brokerInstance.subscribe(
+    BrokerSubscriptions.DiscordBotPolicy,
+    DiscordBotPolicy(),
+  );
+
+  if (!discordBotSubRes) {
+    log.fatal(
+      'Failed to subscribe to discord bot policy. Requires restart!',
+      undefined,
+      {
+        topic: BrokerSubscriptions.DiscordBotPolicy,
+      },
+    );
+  }
 
   if (!chainEventSubRes) {
     log.fatal(

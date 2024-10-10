@@ -1,0 +1,16 @@
+@import '../../../../../styles/shared';
+
+.ToolbarForMobile {
+  display: flex;
+  flex-grow: 1;
+
+  .end {
+    justify-content: flex-end;
+    flex-grow: 1;
+    display: flex;
+  }
+
+  .mdxeditor-toolbar {
+    height: inherit !important;
+  }
+}

@@ -80,10 +80,11 @@ const CommunityMembersPage = () => {
       onAction: true,
     });
 
+  const communityId = app.activeChainId() || '';
   const { data: memberships = null } = useRefreshMembershipQuery({
-    communityId: app.activeChainId(),
+    communityId,
     address: user?.activeAccount?.address || '',
-    apiEnabled: !!user?.activeAccount?.address,
+    apiEnabled: !!user?.activeAccount?.address && !!communityId,
   });
 
   const debouncedSearchTerm = useDebounce<string | undefined>(
@@ -92,8 +93,8 @@ const CommunityMembersPage = () => {
   );
 
   const { data: community } = useGetCommunityByIdQuery({
-    id: app.activeChainId(),
-    enabled: !!app.activeChainId(),
+    id: communityId,
+    enabled: !!communityId,
   });
   const isStakedCommunity = !!community?.namespace;
 
@@ -160,7 +161,7 @@ const CommunityMembersPage = () => {
       ...(debouncedSearchTerm && {
         search: debouncedSearchTerm,
       }),
-      community_id: app.activeChainId(),
+      community_id: communityId,
       include_roles: true,
       ...(membershipsFilter && {
         memberships: membershipsFilter,
@@ -183,9 +184,10 @@ const CommunityMembersPage = () => {
   );
 
   const { data: groups, refetch } = useFetchGroupsQuery({
-    communityId: app.activeChainId(),
+    communityId,
     includeTopics: true,
-    enabled: user.activeAccount?.address ? !!memberships : true,
+    enabled:
+      (user.activeAccount?.address ? !!memberships : true) && !!communityId,
   });
 
   const filterOptions = useMemo(
@@ -216,9 +218,12 @@ const CommunityMembersPage = () => {
     const clonedMembersPages = [...members.pages];
 
     const results = clonedMembersPages
-      .reduce((acc, page) => {
-        return [...acc, ...page.results];
-      }, [] as SearchProfilesResponse['results'])
+      .reduce(
+        (acc, page) => {
+          return [...acc, ...page.results];
+        },
+        [] as SearchProfilesResponse['results'],
+      )
       .map((p) => ({
         userId: p.user_id,
         avatarUrl: p.avatar_url,
@@ -349,9 +354,7 @@ const CommunityMembersPage = () => {
         </CWTabsRow>
 
         {/* Gating group post-mutation banner */}
-        {shouldShowGroupMutationBannerForCommunities.includes(
-          app.activeChainId(),
-        ) &&
+        {shouldShowGroupMutationBannerForCommunities.includes(communityId) &&
           selectedTab === TABS[0].value && (
             <section>
               <CWBanner
@@ -363,7 +366,7 @@ const CommunityMembersPage = () => {
           `}
                 onClose={() =>
                   setShouldShowGroupMutationBannerForCommunity(
-                    app.activeChainId(),
+                    communityId,
                     false,
                   )
                 }

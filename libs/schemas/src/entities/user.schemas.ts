@@ -2,6 +2,14 @@ import { Roles, WalletId } from '@hicommonwealth/shared';
 import { z } from 'zod';
 import { PG_INT } from '../utils';
 
+export const ApiKey = z.object({
+  user_id: PG_INT.optional(),
+  hashed_api_key: z.string(),
+  salt: z.string(),
+  created_at: z.coerce.date().optional(),
+  updated_at: z.coerce.date().optional(),
+});
+
 export const Image = z.object({
   url: z.string().nullish(),
   imageBehavior: z.string().nullish(),
@@ -39,9 +47,12 @@ export const User = z.object({
     .optional(),
   promotional_emails_enabled: z.boolean().nullish(),
   is_welcome_onboard_flow_complete: z.boolean().default(false).optional(),
+
   profile: UserProfile,
+  xp_points: PG_INT.default(0).nullish(),
 
   ProfileTags: z.array(ProfileTags).optional(),
+  ApiKey: ApiKey.optional(),
 
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional(),
@@ -95,4 +106,11 @@ export const CommunityMember = z.object({
   ),
   group_ids: z.array(PG_INT),
   last_active: z.any().nullish().describe('string or date'),
+});
+
+export const XpLog = z.object({
+  user_id: PG_INT,
+  created_at: z.coerce.date(),
+  event_name: z.string(),
+  xp_points: PG_INT,
 });

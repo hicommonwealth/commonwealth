@@ -64,7 +64,7 @@ export const FullUser = ({
     userCommunityId,
     true,
     undefined,
-    app.chain?.meta?.bech32Prefix,
+    app.chain?.meta?.bech32_prefix || '',
   );
   const showAvatar = profile ? !shouldHideAvatar : false;
   const loggedInUserIsAdmin =

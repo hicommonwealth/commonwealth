@@ -9,6 +9,7 @@ const COMMENTS_STALE_TIME = 30 * 1_000; // 30 s
 interface FetchCommentsProps {
   threadId: number;
   communityId: string;
+  apiEnabled?: boolean;
 }
 
 const fetchComments = async ({ communityId, threadId }: FetchCommentsProps) => {
@@ -31,11 +32,13 @@ const fetchComments = async ({ communityId, threadId }: FetchCommentsProps) => {
 const useFetchCommentsQuery = ({
   communityId,
   threadId,
+  apiEnabled = true,
 }: FetchCommentsProps) => {
   return useQuery({
     queryKey: [ApiEndpoints.FETCH_COMMENTS, communityId, threadId],
     queryFn: () => fetchComments({ communityId, threadId }),
     staleTime: COMMENTS_STALE_TIME,
+    enabled: apiEnabled,
   });
 };
 

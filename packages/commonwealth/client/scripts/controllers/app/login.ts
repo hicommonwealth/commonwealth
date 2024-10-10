@@ -37,26 +37,12 @@ import { z } from 'zod';
 import Account from '../../models/Account';
 import AddressInfo from '../../models/AddressInfo';
 import type BlockInfo from '../../models/BlockInfo';
-import ChainInfo from '../../models/ChainInfo';
 
 function storeActiveAccount(account: Account) {
   const user = userStore.getState();
   user.setData({ activeAccount: account });
   !user.accounts.some((a) => isSameAccount(a, account)) &&
     user.setData({ accounts: [...user.accounts, account] });
-}
-
-export function linkExistingAddressToChainOrCommunity(
-  address: string,
-  community: string,
-  originChain: string,
-) {
-  return axios.post(`${SERVER_URL}/linkExistingAddressToCommunity`, {
-    address,
-    community_id: community,
-    originChain, // not used
-    jwt: userStore.getState().jwt,
-  });
 }
 
 export async function setActiveAccount(account: Account): Promise<void> {
@@ -278,17 +264,14 @@ export async function createUserWithAddress(
     chain || '',
     true,
   );
-  const chainInfo = ChainInfo.fromTRPCResponse(
-    communityInfo as z.infer<typeof ExtendedCommunity>,
-  );
 
   const account = new Account({
     addressId: id,
     address,
     community: {
-      id: chainInfo.id,
-      base: chainInfo.base,
-      ss58Prefix: chainInfo.ss58Prefix,
+      id: communityInfo?.id || '',
+      base: communityInfo?.base,
+      ss58Prefix: communityInfo?.ss58_prefix || 0,
     },
     validationToken: response.data.result.verification_token,
     walletId,
@@ -308,6 +291,9 @@ async function constructMagic(isCosmos: boolean, chain?: string) {
     throw new Error('Must be in a community to sign in with Cosmos magic link');
   }
 
+  if (process.env.MAGIC_PUBLISHABLE_KEY === undefined) {
+    throw new Error('Missing magic key');
+  }
   return new Magic(process.env.MAGIC_PUBLISHABLE_KEY, {
     extensions: !isCosmos
       ? [new OAuthExtension()]
@@ -414,9 +400,7 @@ export async function handleSocialLoginCallback({
       chain || '',
       true,
     );
-    desiredChain = ChainInfo.fromTRPCResponse(
-      communityInfo as z.infer<typeof ExtendedCommunity>,
-    );
+    desiredChain = communityInfo as z.infer<typeof ExtendedCommunity>;
   }
   const isCosmos = desiredChain?.base === ChainBase.CosmosSDK;
   const magic = await constructMagic(isCosmos, desiredChain?.id);
@@ -433,6 +417,9 @@ export async function handleSocialLoginCallback({
       magicAddress = metadata.publicAddress;
     } else {
       const { utils } = await import('ethers');
+      if (metadata.publicAddress === null) {
+        throw new Error('Expected magic to return publicAddress');
+      }
       magicAddress = utils.getAddress(metadata.publicAddress);
     }
   } else {
@@ -458,7 +445,7 @@ export async function handleSocialLoginCallback({
     // Sign a session
     if (isCosmos && desiredChain) {
       const signer = { signMessage: magic.cosmos.sign };
-      const prefix = app.chain?.meta?.bech32Prefix || 'cosmos';
+      const prefix = app.chain?.meta?.bech32_prefix || 'cosmos';
       const canvasChainId = chainBaseToCanvasChainId(
         ChainBase.CosmosSDK,
         prefix,
@@ -488,7 +475,7 @@ export async function handleSocialLoginCallback({
 
       const sessionSigner = new SIWESigner({
         signer,
-        chainId: app.chain?.meta?.node?.ethChainId || 1,
+        chainId: app.chain?.meta?.ChainNode?.eth_chain_id || 1,
       });
       let sessionObject = await sessionSigner.getSession(CANVAS_TOPIC);
       if (!sessionObject) {
@@ -539,12 +526,10 @@ export async function handleSocialLoginCallback({
           chain || '',
           true,
         );
-        chainInfo = ChainInfo.fromTRPCResponse(
-          communityInfo as z.infer<typeof ExtendedCommunity>,
-        );
+        chainInfo = communityInfo as z.infer<typeof ExtendedCommunity>;
       }
 
-      chainInfo && (await updateActiveAddresses(chainInfo.id));
+      chainInfo && (await updateActiveAddresses(chainInfo.id || ''));
     }
 
     const { Profiles: profiles, email: ssoEmail } = response.data.result;

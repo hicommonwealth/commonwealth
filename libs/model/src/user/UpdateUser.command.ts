@@ -3,7 +3,7 @@ import * as schemas from '@hicommonwealth/schemas';
 import { DEFAULT_NAME } from '@hicommonwealth/shared';
 import { models } from '../database';
 import { mustExist } from '../middleware/guards';
-import { getDelta, sanitizeQuillText, updateTags } from '../utils';
+import { decodeContent, getDelta, updateTags } from '../utils';
 
 export function UpdateUser(): Command<typeof schemas.UpdateUser> {
   return {
@@ -36,10 +36,10 @@ export function UpdateUser(): Command<typeof schemas.UpdateUser> {
       )?.toJSON();
       mustExist('User', user);
 
-      const is_welcome_onboard_flow_complete =
-        user.is_welcome_onboard_flow_complete || (name && name !== DEFAULT_NAME)
-          ? true
-          : false;
+      const is_welcome_onboard_flow_complete = !!(
+        user.is_welcome_onboard_flow_complete ||
+        (name && name !== DEFAULT_NAME)
+      );
 
       const promotional_emails_enabled =
         payload.promotional_emails_enabled ??
@@ -53,7 +53,7 @@ export function UpdateUser(): Command<typeof schemas.UpdateUser> {
           email,
           slug,
           name,
-          bio: rawBio && sanitizeQuillText(rawBio).toString(),
+          bio: rawBio && decodeContent(rawBio),
           website,
           avatar_url,
           socials,
@@ -74,13 +74,7 @@ export function UpdateUser(): Command<typeof schemas.UpdateUser> {
         const updated = await models.sequelize.transaction(
           async (transaction) => {
             if (update_tags)
-              await updateTags(
-                tag_ids!,
-                models,
-                user.id!,
-                'user_id',
-                transaction,
-              );
+              await updateTags(tag_ids!, user.id!, 'user_id', transaction);
             if (update_user) {
               // TODO: utility to deep merge deltas
               const updates = {
@@ -94,6 +88,9 @@ export function UpdateUser(): Command<typeof schemas.UpdateUser> {
                   },
                 },
               };
+              if (updates.profile.bio === '') {
+                updates.profile.bio = null;
+              }
               const [, rows] = await models.User.update(updates, {
                 where: { id: user.id },
                 returning: true,

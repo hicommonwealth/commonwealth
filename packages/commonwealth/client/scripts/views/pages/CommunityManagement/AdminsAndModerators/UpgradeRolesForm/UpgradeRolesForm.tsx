@@ -92,8 +92,8 @@ export const UpgradeRolesForm = ({
       selectedRole === 'Admin'
         ? 'admin'
         : selectedRole === 'Moderator'
-        ? 'moderator'
-        : '';
+          ? 'moderator'
+          : '';
 
     try {
       const response = await axios.post(`${SERVER_URL}/upgradeMember`, {
@@ -130,7 +130,7 @@ export const UpgradeRolesForm = ({
       <MembersSearchBar
         searchTerm={searchTerm}
         setSearchTerm={setSearchTerm}
-        communityName={app.activeChainId()}
+        communityName={app.activeChainId() || ''}
       />
       <div className="members-container">
         <CWRadioGroup

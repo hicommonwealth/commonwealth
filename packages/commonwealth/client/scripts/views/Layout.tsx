@@ -2,7 +2,7 @@ import { ExtendedCommunity } from '@hicommonwealth/schemas';
 import 'Layout.scss';
 import { deinitChainOrCommunity, loadCommunityChainInfo } from 'helpers/chain';
 import withRouter, { useCommonNavigate } from 'navigation/helpers';
-import React, { ReactNode, Suspense, useState } from 'react';
+import React, { ReactNode, Suspense, useEffect, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { useParams } from 'react-router-dom';
 import app from 'state';
@@ -15,8 +15,8 @@ import useUserStore from 'state/ui/user';
 import { PageNotFound } from 'views/pages/404';
 import ErrorPage from 'views/pages/error';
 import { z } from 'zod';
+import useAppStatus from '../hooks/useAppStatus';
 import useNecessaryEffect from '../hooks/useNecessaryEffect';
-import ChainInfo from '../models/ChainInfo';
 import { useGetCommunityByIdQuery } from '../state/api/communities';
 import { useUpdateUserActiveCommunityMutation } from '../state/api/user';
 import SubLayout from './Sublayout';
@@ -59,6 +59,15 @@ const LayoutComponent = ({
     useUpdateUserActiveCommunityMutation();
   const { data: configurationData } = useFetchConfigurationQuery();
 
+  const { isAddedToHomeScreen } = useAppStatus();
+
+  //this prevents rerender when user is updated
+  useEffect(() => {
+    if (user.isOnPWA !== isAddedToHomeScreen) {
+      user.setData({ isOnPWA: isAddedToHomeScreen });
+    }
+  }, [isAddedToHomeScreen, user.isOnPWA, user]);
+
   // If community id was updated ex: `commonwealth.im/{community-id}/**/*`
   // redirect to new community id ex: `commonwealth.im/{new-community-id}/**/*`
   useNecessaryEffect(() => {
@@ -95,9 +104,9 @@ const LayoutComponent = ({
       if (shouldSelectChain) {
         setIsLoading(true);
         setCommunityToLoad(providedCommunityScope);
-        const communityFromTRPCResponse = ChainInfo.fromTRPCResponse(
-          community as z.infer<typeof ExtendedCommunity>,
-        );
+        const communityFromTRPCResponse = community as z.infer<
+          typeof ExtendedCommunity
+        >;
         if (await loadCommunityChainInfo(communityFromTRPCResponse)) {
           // Update default community on server and app, if logged in
           if (user.isLoggedIn) {

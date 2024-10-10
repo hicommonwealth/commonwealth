@@ -8,6 +8,7 @@ import UpdateCustomDomainTask from 'views/pages/AdminPanel/UpdateCustomDomainTas
 import { CWDivider } from '../../components/component_kit/cw_divider';
 import { CWText } from '../../components/component_kit/cw_text';
 import Analytics from './Analytics';
+import ConnectChainToCommunity from './ConnectChainToCommunityTask';
 import DeleteChainTask from './DeleteChainTask';
 import DownloadMembersListTask from './DownloadMembersListTask';
 import MakeSiteAdminTask from './MakeSiteAdminTask';
@@ -39,6 +40,7 @@ const AdminPanelPage = () => {
         <UpdateCommunityIdTask />
         <DownloadMembersListTask />
         <RPCEndpointTask />
+        <ConnectChainToCommunity />
         <MakeSiteAdminTask />
         <TopUsers />
         <TriggerNotificationsWorkflow />

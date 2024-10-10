@@ -124,10 +124,11 @@ export const CWContentPage = ({
   const user = useUserStore();
   const [isUpvoteDrawerOpen, setIsUpvoteDrawerOpen] = useState<boolean>(false);
 
+  const communityId = app.activeChainId() || '';
   const { data: memberships = [] } = useRefreshMembershipQuery({
-    communityId: app.activeChainId(),
+    communityId,
     address: user.activeAccount?.address || '',
-    apiEnabled: !!user.activeAccount?.address,
+    apiEnabled: !!user.activeAccount?.address && !!communityId,
   });
 
   const isTopicGated = !!(memberships || []).find((membership) =>

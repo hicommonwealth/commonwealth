@@ -11,13 +11,14 @@ import { useSidebarTreeToggle } from '../useSidebarTreeToggle';
 
 const AdminSection = () => {
   const contestsEnabled = useFlag('contest');
+  const communityId = app.activeChainId() || '';
 
   const navigate = useCommonNavigate();
   const location = useLocation();
   const { resetSidebarState, setToggleTree, toggledTreeState } =
     useSidebarTreeToggle({
       treeName: 'admin',
-      localStorageKey: `${app.activeChainId()}-admin-toggle-tree`,
+      localStorageKey: `${communityId}-admin-toggle-tree`,
     });
 
   const matchesCommunityProfileRoute = matchRoutes(
@@ -65,7 +66,7 @@ const AdminSection = () => {
           navigate,
           e,
           `/manage/profile`,
-          app.activeChainId(),
+          communityId,
           () => {
             setToggleTree(`children.communityProfile.toggledState`, toggle);
           },
@@ -87,7 +88,7 @@ const AdminSection = () => {
           navigate,
           e,
           `/manage/integrations`,
-          app.activeChainId(),
+          communityId,
           () => {
             setToggleTree(`children.integrations.toggledState`, toggle);
           },
@@ -105,15 +106,9 @@ const AdminSection = () => {
       onClick: (e, toggle: boolean) => {
         e.preventDefault();
         resetSidebarState();
-        handleRedirectClicks(
-          navigate,
-          e,
-          `/manage/topics`,
-          app.activeChainId(),
-          () => {
-            setToggleTree(`children.topics.toggledState`, toggle);
-          },
-        );
+        handleRedirectClicks(navigate, e, `/manage/topics`, communityId, () => {
+          setToggleTree(`children.topics.toggledState`, toggle);
+        });
       },
     },
     {
@@ -131,7 +126,7 @@ const AdminSection = () => {
           navigate,
           e,
           `/manage/moderators`,
-          app.activeChainId(),
+          communityId,
           () => {
             setToggleTree(`children.adminsAndModerators.toggledState`, toggle);
           },
@@ -149,15 +144,9 @@ const AdminSection = () => {
       onClick: (e, toggle: boolean) => {
         e.preventDefault();
         resetSidebarState();
-        handleRedirectClicks(
-          navigate,
-          e,
-          `/members`,
-          app.activeChainId(),
-          () => {
-            setToggleTree(`children.membersAndGroups.toggledState`, toggle);
-          },
-        );
+        handleRedirectClicks(navigate, e, `/members`, communityId, () => {
+          setToggleTree(`children.membersAndGroups.toggledState`, toggle);
+        });
       },
     },
     ...(contestsEnabled
@@ -177,7 +166,7 @@ const AdminSection = () => {
                 navigate,
                 e,
                 `/manage/contests`,
-                app.activeChainId(),
+                communityId,
                 () => {
                   setToggleTree(`children.contests.toggledState`, toggle);
                 },
@@ -197,15 +186,9 @@ const AdminSection = () => {
       onClick: (e, toggle: boolean) => {
         e.preventDefault();
         resetSidebarState();
-        handleRedirectClicks(
-          navigate,
-          e,
-          `/analytics`,
-          app.activeChainId(),
-          () => {
-            setToggleTree(`children.analytics.toggledState`, toggle);
-          },
-        );
+        handleRedirectClicks(navigate, e, `/analytics`, communityId, () => {
+          setToggleTree(`children.analytics.toggledState`, toggle);
+        });
       },
     },
   ];

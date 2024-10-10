@@ -14,7 +14,6 @@ import {
   CWModalFooter,
   CWModalHeader,
 } from 'views/components/component_kit/new_designs/CWModal';
-import useAppStatus from '../../hooks/useAppStatus';
 import type Thread from '../../models/Thread';
 import { UrlSelector } from '../components/UrlLinkSelector/UrlSelector';
 import { CWText } from '../components/component_kit/cw_text';
@@ -40,17 +39,16 @@ export const LinkedUrlModal = ({
   const [tempLinkedUrls, setTempLinkedUrls] =
     useState<Array<Link>>(initialUrlLinks);
 
+  const communityId = app.activeChainId() || '';
   const { mutateAsync: addThreadLinks } = useAddThreadLinksMutation({
-    communityId: app.activeChainId(),
+    communityId,
     threadId: thread.id,
   });
 
   const { mutateAsync: deleteThreadLinks } = useDeleteThreadLinksMutation({
-    communityId: app.activeChainId(),
+    communityId,
     threadId: thread.id,
   });
-
-  const { isAddedToHomeScreen } = useAppStatus();
 
   const handleSaveChanges = async () => {
     const { toAdd, toDelete } = getAddedAndDeleted(
@@ -63,21 +61,20 @@ export const LinkedUrlModal = ({
     try {
       if (toAdd.length) {
         const updatedThread = await addThreadLinks({
-          communityId: app.activeChainId(),
+          communityId,
           threadId: thread.id,
           links: toAdd.map((el) => ({
             source: LinkSource.Web,
             identifier: String(el.identifier),
             title: el.title,
           })),
-          isPWA: isAddedToHomeScreen,
         });
 
         links = updatedThread.links;
       }
       if (toDelete.length) {
         const updatedThread = await deleteThreadLinks({
-          communityId: app.activeChainId(),
+          communityId,
           threadId: thread.id,
           links: toDelete.map((el) => ({
             source: LinkSource.Web,

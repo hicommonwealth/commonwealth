@@ -11,10 +11,16 @@ export const trpcClient = trpc.createClient({
   links: [
     httpBatchLink({
       url: BASE_API_PATH,
+
       async headers() {
+        const user = userStore.getState();
         return {
-          authorization: userStore.getState().jwt || '',
-          address: userStore.getState().activeAccount?.address,
+          authorization: user.jwt || '',
+          isPWA: user.isOnPWA?.toString(),
+          address:
+            user.addressSelectorSelectedAddress ??
+            user.activeAccount?.address ??
+            user.addresses?.at(0)?.address,
         };
       },
     }),

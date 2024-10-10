@@ -10,16 +10,23 @@ import {
   type GenerateOpenApiDocumentOptions,
   type OpenApiRouter,
 } from 'trpc-swagger';
+import { config } from '../config';
 
 const log = logger(import.meta);
 
 const logError = (path: string | undefined, error: TRPCError) => {
-  const msg = `${error.code}: [${error.cause?.name ?? error.name}] ${path}: ${
-    error.cause?.message ?? error.message
-  }`;
+  const errorName = error.cause?.name ?? error.name;
+  const errorMessage = error.cause?.message ?? error.message;
+  const msg = `${error.code}: [${errorName}] ${path}: ${errorMessage}`;
+  const issues =
+    error.cause && 'issues' in error.cause && Array.isArray(error.cause.issues)
+      ? error.cause.issues.map((i) => i.code)
+      : [];
+  const fingerprint = [error.code, errorName, path, ...issues].join('-');
+
   error.code === 'INTERNAL_SERVER_ERROR'
-    ? log.error(msg, error.cause)
-    : log.warn(msg);
+    ? log.error(msg, error.cause, { fingerprint })
+    : log.warn(msg, { fingerprint });
 };
 
 // used for TRPC like routes (Internal)
@@ -64,23 +71,25 @@ export function useOAS(
   { title, path, version }: Options,
 ) {
   router.get('/openapi.json', (req, res) => {
-    const baseUrl = req.protocol + '://' + req.get('host') + path;
+    let baseUrl = req.protocol + '://' + req.get('host') + path;
+
+    // Used in CI to generate an SDK where the default environment is the production
+    // API url so the user does not need to hardcode it when using the client
+    if (config.GENERATE_PRODUCTION_SDK) {
+      baseUrl = `https://commonwealth.im${path}`;
+    }
+
     return res.json(
       toOpenApiDocument(trpcRouter, {
         title,
         version,
         baseUrl,
         securitySchemes: {
-          oauth2: {
-            type: 'oauth2',
-            flows: {
-              authorizationCode: {
-                authorizationUrl: 'https://example.com/oauth/authorize',
-                tokenUrl: 'https://example.com/oauth/token',
-                refreshUrl: 'https://example.com/oauth/refresh',
-                scopes: {},
-              },
-            },
+          apiKey: {
+            type: 'apiKey',
+            description: 'Create an API key on Common to use the Common API',
+            name: 'x-api-key',
+            in: 'header',
           },
         },
       }),

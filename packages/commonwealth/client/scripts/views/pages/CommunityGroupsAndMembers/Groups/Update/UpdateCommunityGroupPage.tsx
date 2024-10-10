@@ -1,3 +1,4 @@
+import { buildUpdateGroupInput } from 'client/scripts/state/api/groups/editGroup';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import Group from 'models/Group';
@@ -28,12 +29,15 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
   const user = useUserStore();
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+
+  const communityId = app.activeChainId() || '';
   const { mutateAsync: editGroup } = useEditGroupMutation({
-    communityId: app.activeChainId(),
+    communityId,
   });
   const { data: groups = [], isLoading } = useFetchGroupsQuery({
-    communityId: app.activeChainId(),
+    communityId,
     includeTopics: true,
+    enabled: !!communityId,
   });
   // @ts-expect-error <StrictNullChecks/>
   const foundGroup: Group = groups.find(
@@ -130,17 +134,13 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
           })),
         }}
         onSubmit={(values) => {
-          const payload = makeGroupDataBaseAPIPayload(
-            values,
-            isAddedToHomeScreen,
-            allowedAddresses,
-          );
-          const finalPayload = {
+          const payload = makeGroupDataBaseAPIPayload(values, allowedAddresses);
+          const input = buildUpdateGroupInput({
             ...payload,
             groupId: groupId,
-          };
+          });
 
-          editGroup(finalPayload)
+          editGroup(input)
             .then(() => {
               notifySuccess('Group Updated');
               navigate(`/members?tab=groups`);

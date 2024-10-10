@@ -31,7 +31,15 @@ export default class EthereumAccount extends Account {
     address: string,
     ignoreProfile = true,
   ) {
-    super({ community: app.chain.meta, address, ignoreProfile });
+    super({
+      community: {
+        id: app.chain.meta.id || '',
+        base: app.chain.meta.base,
+        ss58Prefix: app.chain.meta.ss58_prefix || 0,
+      },
+      address,
+      ignoreProfile,
+    });
     if (!app.isModuleReady) {
       // defer chain initialization
       app.chainModuleReady.once('ready', () => {

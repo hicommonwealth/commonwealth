@@ -3,6 +3,7 @@ import * as schemas from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
 import { z } from 'zod';
 import { models } from '../database';
+import { buildChainNodeUrl } from '../utils/utils';
 
 export function GetCommunities(): Query<typeof schemas.GetCommunities> {
   return {
@@ -86,6 +87,17 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
                   }
           FROM    "Communities" AS "Community"
           WHERE  "Community"."active" = true
+                      ${
+                        relevance_by === 'membership'
+                          ? `
+                        AND name NOT LIKE '%<%'
+                        AND name NOT LIKE '%>%'
+                        AND name NOT LIKE '%\`%'
+                        AND name NOT LIKE '%"%'
+                        AND name NOT LIKE '%''%'
+                        `
+                          : ''
+                      }
                         ${
                           base
                             ? `
@@ -283,6 +295,15 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
         type: QueryTypes.SELECT,
         nest: true,
       });
+
+      if (include_node_info) {
+        for (const community of communities) {
+          community.ChainNode!.url = buildChainNodeUrl(
+            community.ChainNode!.url!,
+            'public',
+          );
+        }
+      }
 
       return schemas.buildPaginatedResponse(
         communities,

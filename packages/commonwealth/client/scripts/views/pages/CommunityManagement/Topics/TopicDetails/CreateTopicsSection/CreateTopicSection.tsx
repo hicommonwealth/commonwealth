@@ -13,28 +13,37 @@ import { MessageRow } from 'views/components/component_kit/new_designs/CWTextInp
 import {
   ReactQuillEditor,
   createDeltaFromText,
+  getTextFromDelta,
 } from 'views/components/react_quill_editor';
+import { TopicForm } from 'views/pages/CommunityManagement/Topics/Topics';
+import z from 'zod';
 import { CreateTopicStep } from '../../utils';
 import './CreateTopicSection.scss';
 import { topicCreationValidationSchema } from './validation';
 
 interface CreateTopicSectionProps {
-  onStepChange?: (step: CreateTopicStep) => void;
+  onStepChange: (step: CreateTopicStep) => void;
+  onSetTopicFormData: (data: Partial<TopicForm>) => void;
+  topicFormData: TopicForm | null;
 }
 
 export const CreateTopicSection = ({
   onStepChange,
+  onSetTopicFormData,
+  topicFormData,
 }: CreateTopicSectionProps) => {
   const { data: topics } = useFetchTopicsQuery({
-    communityId: app.activeChainId(),
+    communityId: app.activeChainId() || '',
   });
 
   const [nameErrorMsg, setNameErrorMsg] = useState<string | null>(null);
   const [descErrorMsg, setDescErrorMsg] = useState<string | null>(null);
-  const [featuredInSidebar, setFeaturedInSidebar] = useState<boolean>(false);
-  const [name, setName] = useState<string>('');
+  const [featuredInSidebar, setFeaturedInSidebar] = useState<boolean>(
+    topicFormData?.featuredInSidebar || false,
+  );
+  const [name, setName] = useState<string>(topicFormData?.name || '');
   const [descriptionDelta, setDescriptionDelta] = useState<DeltaStatic>(
-    createDeltaFromText(''),
+    createDeltaFromText(topicFormData?.description || ''),
   );
   const [characterCount, setCharacterCount] = useState(0);
 
@@ -81,8 +90,15 @@ export const CreateTopicSection = ({
     }
   }, [descriptionDelta]);
 
-  const handleSubmit = () => {
-    onStepChange?.(CreateTopicStep.WVConsent);
+  const handleSubmit = (
+    values: z.infer<typeof topicCreationValidationSchema>,
+  ) => {
+    onSetTopicFormData({
+      name: values.topicName,
+      description: getTextFromDelta(descriptionDelta),
+      featuredInSidebar,
+    });
+    onStepChange(CreateTopicStep.WVConsent);
   };
 
   return (
@@ -153,7 +169,6 @@ export const CreateTopicSection = ({
             buttonWidth={isWindowExtraSmall ? 'full' : 'wide'}
             disabled={!!nameErrorMsg || !!descErrorMsg}
             type="submit"
-            onClick={handleSubmit}
           />
         </div>
       </CWForm>

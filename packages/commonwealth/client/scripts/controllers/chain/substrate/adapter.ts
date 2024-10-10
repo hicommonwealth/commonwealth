@@ -1,8 +1,9 @@
+import { ExtendedCommunity } from '@hicommonwealth/schemas';
 import { ChainBase } from '@hicommonwealth/shared';
 import type { SubstrateAccount } from 'controllers/chain/substrate/account';
 import SubstrateAccounts from 'controllers/chain/substrate/account';
 import type { IApp } from 'state';
-import type ChainInfo from '../../../models/ChainInfo';
+import { z } from 'zod';
 import IChainAdapter from '../../../models/IChainAdapter';
 
 // The 'any' type here is only used as type for the Coin on the chain property in IChainAdapter.
@@ -16,7 +17,7 @@ class Substrate extends IChainAdapter<any, SubstrateAccount> {
     throw new Error('Substrate chain not supported');
   }
 
-  constructor(meta: ChainInfo, app: IApp) {
+  constructor(meta: z.infer<typeof ExtendedCommunity>, app: IApp) {
     super(meta, app);
     this.accounts = new SubstrateAccounts(this.app);
   }

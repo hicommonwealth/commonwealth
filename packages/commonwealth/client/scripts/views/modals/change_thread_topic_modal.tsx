@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 
+import { buildUpdateThreadInput } from 'client/scripts/state/api/threads/editThread';
 import useUserStore from 'state/ui/user';
 import type Thread from '../../models/Thread';
 import type Topic from '../../models/Topic';
@@ -25,7 +26,8 @@ export const ChangeThreadTopicModal = ({
 }: ChangeThreadTopicModalProps) => {
   const [activeTopic, setActiveTopic] = useState<Topic>(thread.topic);
   const { data: topics } = useFetchTopicsQuery({
-    communityId: app.activeChainId(),
+    communityId: app.activeChainId() || '',
+    apiEnabled: !!app.activeChainId(),
   });
   const user = useUserStore();
 
@@ -39,21 +41,23 @@ export const ChangeThreadTopicModal = ({
   );
 
   const { mutateAsync: editThread } = useEditThreadMutation({
-    communityId: app.activeChainId(),
+    communityId: app.activeChainId() || '',
     threadId: thread.id,
+    threadMsgId: thread.canvasMsgId,
     currentStage: thread.stage,
-    currentTopicId: thread.topic.id,
+    currentTopicId: thread.topic.id!,
   });
 
   const handleSaveChanges = async () => {
     try {
-      await editThread({
-        communityId: app.activeChainId(),
+      const input = await buildUpdateThreadInput({
+        communityId: app.activeChainId() || '',
         address: user.activeAccount?.address || '',
+        threadMsgId: thread.canvasMsgId,
         threadId: thread.id,
         topicId: activeTopic.id,
       });
-
+      await editThread(input);
       onModalClose && onModalClose();
     } catch (err) {
       const error =

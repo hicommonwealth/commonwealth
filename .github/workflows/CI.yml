@@ -12,9 +12,11 @@ env:
   USES_DOCKER_PGSQL: true
   PORT: 8080
   REDIS_URL: redis://localhost:6379
-  ETH_ALCHEMY_API_KEY: ${{ secrets.ETH_ALCHEMY_API_KEY }}
   ENTITIES_URL: ${{ secrets.ENTITIES_URL }}
   GITHUB_BASE_REF: ${{ github.base_ref }}
+  FEDERATION_POSTGRES_DB_URL: postgresql://commonwealth:edgeware@localhost/common_test
+  ALCHEMY_PRIVATE_APP_KEY: ${{ secrets.ALCHEMY_PRIVATE_APP_KEY }}
+  ALCHEMY_PUBLIC_APP_KEY: ${{ secrets.ALCHEMY_PUBLIC_APP_KEY }}
 
 on:
   pull_request:
@@ -186,7 +188,7 @@ jobs:
       - name: Run serial e2e tests
         run: |
           pnpm -F commonwealth bootstrap-test-db &&
-          (cd packages/commonwealth && NODE_OPTIONS=--max-old-space-size=$(../../scripts/get-max-old-space-size.sh) node --import=extensionless/register --enable-source-maps ./build/server.js) &
+          (cd packages/commonwealth && node --import=extensionless/register --enable-source-maps ./build/server.js) &
           (pnpm -F commonwealth wait-server && pnpm -F commonwealth test-e2e-serial --forbid-only)
 
       - name: Archive code coverage results
@@ -334,9 +336,6 @@ jobs:
       - name: Build
         run: pnpm -r build
 
-      - name: build
-        run: pnpm -r lint
-
       - name: Run unit tests
         run: pnpm -r test -- --allowOnly=false
 
@@ -347,16 +346,14 @@ jobs:
           chmod -R 755 ./libs/model/coverage/lcov.info
           chmod -R 755 ./libs/sitemaps/coverage/lcov.info
           chmod -R 755 ./packages/commonwealth/coverage/lcov.info
-          chmod -R 755 ./packages/discord-bot/coverage/lcov.info
           chmod -R 755 ./packages/scripts/coverage/lcov.info
-          chmod -R 755 ./packages/snapshot-listener/coverage/lcov.info
 
       - name: Coveralls parallel
         uses: coverallsapp/github-action@v2
         with:
           flag-name: unit-test-coverage
           parallel: true
-          files: libs/adapters/coverage/lcov.info libs/core/coverage/lcov.info libs/model/coverage/lcov.info libs/sitemaps/coverage/lcov.info packages/commonwealth/coverage/lcov.info packages/discord-bot/coverage/lcov.info packages/scripts/coverage/lcov.info packages/snapshot-listener/coverage/lcov.info
+          files: libs/adapters/coverage/lcov.info libs/core/coverage/lcov.info libs/model/coverage/lcov.info libs/sitemaps/coverage/lcov.info packages/commonwealth/coverage/lcov.info packages/scripts/coverage/lcov.info
 
       - name: Run integration tests
         run: pnpm -F commonwealth test-integration --allowOnly=false
@@ -514,5 +511,3 @@ jobs:
         with:
           parallel-finished: true
           carryforward: "cosmos-devnet-test-coverage"
-
-

@@ -7,12 +7,13 @@ import SignStakeTransactions from './SignStakeTransactions';
 
 interface CommunityStakeStepProps {
   goToSuccessStep: () => void;
-  createdCommunityName: string;
+  createdCommunityName?: string;
   createdCommunityId: string;
   selectedAddress: AddressInfo;
   chainId: string;
   isTopicFlow?: boolean;
   onTopicFlowStepChange?: (step: CreateTopicStep) => void;
+  refetchStakeQuery?: () => void;
 }
 
 const CommunityStakeStep = ({
@@ -23,11 +24,12 @@ const CommunityStakeStep = ({
   chainId,
   isTopicFlow,
   onTopicFlowStepChange,
+  refetchStakeQuery,
 }: CommunityStakeStepProps) => {
   const [enableStakePage, setEnableStakePage] = useState(true);
   const [communityStakeData, setCommunityStakeData] = useState({
-    namespace: createdCommunityName,
-    symbol: createdCommunityName.toUpperCase().slice(0, 4),
+    namespace: createdCommunityName || '',
+    symbol: (createdCommunityName || '').toUpperCase().slice(0, 4),
   });
 
   const handleOptInEnablingStake = ({ namespace, symbol }) => {
@@ -41,7 +43,11 @@ const CommunityStakeStep = ({
       : goToSuccessStep();
   };
 
-  const signStakeHandler = () => {
+  const onSuccessSignTransactions = () => {
+    isTopicFlow ? refetchStakeQuery?.() : goToSuccessStep();
+  };
+
+  const onCancelSignTransactions = () => {
     isTopicFlow ? setEnableStakePage(true) : goToSuccessStep();
   };
 
@@ -57,7 +63,8 @@ const CommunityStakeStep = ({
         />
       ) : (
         <SignStakeTransactions
-          goToSuccessStep={signStakeHandler}
+          onSuccess={onSuccessSignTransactions}
+          onCancel={onCancelSignTransactions}
           communityStakeData={communityStakeData}
           selectedAddress={selectedAddress}
           createdCommunityId={createdCommunityId}

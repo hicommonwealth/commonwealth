@@ -1,100 +1,76 @@
-import { SIWESigner } from '@canvas-js/chain-ethereum';
-import { SolanaSigner } from '@canvas-js/chain-solana';
-import type {
-  Action,
-  Message,
-  Session,
-  Signature,
-} from '@canvas-js/interfaces';
+import type { Session } from '@canvas-js/interfaces';
 import { ed25519 } from '@canvas-js/signatures';
 
 import assert from 'assert';
 
-import { CosmosSignerCW, SubstrateSignerCW } from './sessionSigners';
-import { CanvasSignedData } from './types';
-import { CANVAS_TOPIC, assertMatches, caip2AddressEquals } from './utils';
-
-export const getSessionSigners = () => {
-  return [
-    new SIWESigner(),
-    new CosmosSignerCW(),
-    new SubstrateSignerCW(),
-    new SolanaSigner(),
-  ];
-};
-
-export const getSessionSignerForAddress = (address: string) => {
-  const sessionSigners = getSessionSigners();
-  for (const signer of sessionSigners) {
-    if (signer.match(address)) {
-      return signer;
-    }
-  }
-};
+import { contractTopic } from './runtime/contract';
+import { getSessionSignerForDid } from './signers';
+import { CanvasSignedData, CanvasSignedDataOption } from './types';
+import { assertMatches } from './utils';
 
 export const verifySession = async (session: Session) => {
-  const signer = getSessionSignerForAddress(session.address);
-
+  const signer = getSessionSignerForDid(session.did);
   if (!signer) {
-    throw new Error(
-      `No signer found for session with address ${session.address}`,
-    );
+    throw new Error(`No signer for session ${session.did}`);
   }
-
-  await signer.verifySession(CANVAS_TOPIC, session);
+  await signer.verifySession(contractTopic, session);
 };
 
-type VerifyArgs = {
-  actionMessage: Message<Action>;
-  actionMessageSignature: Signature;
-  sessionMessage: Message<Session>;
-  sessionMessageSignature: Signature;
+const isSigned = (data: CanvasSignedDataOption): data is CanvasSignedData => {
+  return data !== undefined;
 };
-export const verify = async ({
-  actionMessage,
-  actionMessageSignature,
-  sessionMessage,
-  sessionMessageSignature,
-}: VerifyArgs) => {
+
+export const verify = async (canvasSignedData: CanvasSignedDataOption) => {
+  if (!canvasSignedData) throw new Error('No signed data provided');
+
+  const {
+    actionMessage,
+    actionMessageSignature,
+    sessionMessage,
+    sessionMessageSignature,
+  } = canvasSignedData;
+
   // verify the session
   await verifySession(sessionMessage.payload);
 
-  // assert address matches
   assert(
-    caip2AddressEquals(
-      actionMessage.payload.address,
-      sessionMessage.payload.address,
-    ),
+    actionMessage.payload.did === sessionMessage.payload.did,
     'Action message must be signed by wallet address',
   );
 
-  // verify the action message and session message
   ed25519.verify(actionMessageSignature, actionMessage);
   ed25519.verify(sessionMessageSignature, sessionMessage);
 
-  if (sessionMessage.payload.duration !== null) {
-    // if the session has an expiry, assert that the session is not expired
+  // if the session has an expiry, assert that the session is not expired
+  if (sessionMessage.payload.context.duration !== undefined) {
     const sessionExpirationTime =
-      sessionMessage.payload.timestamp + sessionMessage.payload.duration;
+      sessionMessage.payload.context.timestamp +
+      sessionMessage.payload.context.duration;
     assert(
-      actionMessage.payload.timestamp < sessionExpirationTime,
+      actionMessage.payload.context.timestamp <= sessionExpirationTime,
       'Invalid action: Signed by a session that was expired at the time of action',
     );
   }
   assert(
-    actionMessage.payload.timestamp >= sessionMessage.payload.timestamp,
+    actionMessage.payload.context.timestamp >=
+      sessionMessage.payload.context.timestamp,
     'Invalid action: Signed by a session after the action',
   );
 };
 
 export const verifyComment = async (
-  canvasSignedData: CanvasSignedData,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  fields: any,
+  canvasSignedData: CanvasSignedDataOption,
+  fields: {
+    thread_id: string | null;
+    text: string;
+    address: string;
+    parent_comment_id: string | null;
+  },
 ) => {
   const { thread_id, text, address, parent_comment_id } = fields;
 
   await verify(canvasSignedData);
+  assert(isSigned(canvasSignedData));
 
   const { actionMessage } = canvasSignedData;
   assertMatches(actionMessage.payload.name, 'comment', 'comment', 'call');
@@ -102,33 +78,64 @@ export const verifyComment = async (
     thread_id,
     actionMessage.payload.args.thread_id,
     'comment',
-    'identifier',
+    'thread_id',
   );
   assertMatches(text, actionMessage.payload.args.body, 'comment', 'text');
   assertMatches(
     parent_comment_id ?? null,
     actionMessage.payload.args.parent_comment_id ?? null,
     'comment',
-    'parent',
+    'parent_comment_id',
   );
 
   assertMatches(
     address,
-    actionMessage.payload.address.split(':')[2],
+    actionMessage.payload.did.split(':')[4],
     'comment',
     'origin',
   );
   // assertMatches(chainBaseToCanvasChain(chain), action.payload.chain)
 };
 
-export const verifyThread = async (
-  canvasSignedData: CanvasSignedData,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  fields: any,
+export const verifyDeleteComment = async (
+  canvasSignedData: CanvasSignedDataOption,
+  fields: {
+    comment_id: string;
+  },
 ) => {
-  const { title, body, address, community, link, topic } = fields;
+  const { comment_id } = fields;
 
   await verify(canvasSignedData);
+  assert(isSigned(canvasSignedData));
+
+  const { actionMessage } = canvasSignedData;
+  assert(isSigned(canvasSignedData));
+  assertMatches(actionMessage.payload.name, 'deleteComment', 'comment', 'call');
+  assertMatches(
+    actionMessage.payload.args.comment_id,
+    comment_id,
+    'comment',
+    'msgid',
+  );
+
+  // assertMatches(chainBaseToCanvasChain(chain), action.payload.chain)
+};
+
+export const verifyThread = async (
+  canvasSignedData: CanvasSignedDataOption,
+  fields: {
+    title: string;
+    body: string;
+    address: string;
+    community: string;
+    topic: number | null;
+  },
+) => {
+  const { title, body, address, community } = fields;
+  const topic = fields.topic ?? '';
+
+  await verify(canvasSignedData);
+  assert(isSigned(canvasSignedData));
 
   const { actionMessage } = canvasSignedData;
   assertMatches(actionMessage.payload.name, 'thread', 'thread', 'call');
@@ -140,51 +147,128 @@ export const verifyThread = async (
   );
   assertMatches(title, actionMessage.payload.args.title, 'thread', 'title');
   assertMatches(body, actionMessage.payload.args.body, 'thread', 'body');
-  assertMatches(link ?? '', actionMessage.payload.args.link, 'thread', 'link');
-  assertMatches(
-    topic ?? '',
-    actionMessage.payload.args.topic,
-    'thread',
-    'topic',
-  );
-
+  assertMatches(topic, actionMessage.payload.args.topic, 'thread', 'topic');
   assertMatches(
     address,
-    actionMessage.payload.address.split(':')[2],
+    actionMessage.payload.did.split(':')[4],
     'thread',
     'origin',
   );
   // assertMatches(chainBaseToCanvasChain(chain), action.payload.chain)
 };
 
-export const verifyReaction = async (
-  canvasSignedData: CanvasSignedData,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  fields: any,
+export const verifyDeleteThread = async (
+  canvasSignedData: CanvasSignedDataOption,
+  fields: {
+    thread_id: string;
+  },
 ) => {
-  const { thread_id, comment_id, proposal_id, address, value } = fields;
-
   await verify(canvasSignedData);
+  assert(isSigned(canvasSignedData));
+
+  const { actionMessage } = canvasSignedData;
+  assertMatches(actionMessage.payload.name, 'deleteThread', 'thread', 'call');
+  assertMatches(
+    actionMessage.payload.args.thread_id,
+    fields.thread_id,
+    'thread',
+    'id',
+  );
+
+  // assertMatches(chainBaseToCanvasChain(chain), action.payload.chain)
+};
+
+export const verifyReaction = async (
+  canvasSignedData: CanvasSignedDataOption,
+  fields:
+    | { comment_id: string | null; value: string; address: string }
+    | { thread_id: string | null; value: string; address: string },
+) => {
+  await verify(canvasSignedData);
+
+  const isComment = (
+    f:
+      | { comment_id: string | null; value: string; address: string }
+      | { thread_id: string | null; value: string; address: string },
+  ): f is { comment_id: string | null; value: string; address: string } => {
+    return 'comment_id' in f && !('thread_id' in f) && !('proposal_id' in f);
+  };
+  const isThread = (
+    f:
+      | { comment_id: string | null; value: string; address: string }
+      | { thread_id: string | null; value: string; address: string },
+  ): f is { thread_id: string | null; value: string; address: string } => {
+    return 'thread_id' in f && !('comment_id' in f) && !('proposal_id' in f);
+  };
+  assert(isSigned(canvasSignedData));
 
   const { actionMessage } = canvasSignedData;
   assert(
-    (actionMessage.payload.name === 'reactThread' &&
-      thread_id === actionMessage.payload.args.thread_id &&
-      comment_id === undefined &&
-      proposal_id === undefined) ||
-      (actionMessage.payload.name === 'reactComment' &&
-        comment_id === actionMessage.payload.args.comment_id &&
-        thread_id === undefined &&
-        proposal_id === undefined),
+    (isThread(fields) &&
+      actionMessage.payload.name === 'reactThread' &&
+      fields.thread_id === actionMessage.payload.args.thread_id) ||
+      (isComment(fields) &&
+        actionMessage.payload.name === 'reactComment' &&
+        fields.comment_id === actionMessage.payload.args.comment_id),
     'Invalid signed reaction (identifier)',
   );
-  assertMatches(value, actionMessage.payload.args.value, 'reaction', 'value');
+  assertMatches(
+    fields.value,
+    actionMessage.payload.args.value,
+    'reaction',
+    'value',
+  );
 
   assertMatches(
-    address,
-    actionMessage.payload.address.split(':')[2],
+    fields.address,
+    actionMessage.payload.did.split(':')[4],
     'reaction',
     'origin',
   );
+  // assertMatches(chainBaseToCanvasChain(chain), action.payload.chain)
+};
+
+export const verifyDeleteReaction = async (
+  canvasSignedData: CanvasSignedDataOption,
+  fields: { comment_id: string } | { thread_id: string },
+) => {
+  await verify(canvasSignedData);
+  assert(isSigned(canvasSignedData));
+
+  const isComment = (
+    f: { comment_id: string } | { thread_id: string },
+  ): f is { comment_id: string } => {
+    return 'comment_id' in f;
+  };
+  const isThread = (
+    f: { comment_id: string } | { thread_id: string },
+  ): f is { thread_id: string } => {
+    return 'thread_id' in f;
+  };
+
+  const { actionMessage } = canvasSignedData;
+  if (actionMessage.payload.name === 'unreactThread' && isThread(fields)) {
+    assertMatches(
+      actionMessage.payload.args.thread_id,
+      fields.thread_id,
+      'reactThread',
+      'thread_id',
+    );
+  } else if (
+    actionMessage.payload.name === 'unreactComment' &&
+    isComment(fields)
+  ) {
+    assertMatches(
+      actionMessage.payload.args.comment_id,
+      fields.comment_id,
+      'reactComment',
+      'comment_id',
+    );
+  } else {
+    throw new Error(
+      `Invalid delete reaction action name: ${actionMessage.payload.name}`,
+    );
+  }
+
   // assertMatches(chainBaseToCanvasChain(chain), action.payload.chain)
 };

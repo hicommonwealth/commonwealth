@@ -1,5 +1,6 @@
 import { ContentType } from '@hicommonwealth/shared';
 import { buildCreateCommentInput } from 'client/scripts/state/api/comments/createComment';
+import { useAuthModalStore } from 'client/scripts/state/ui/modals';
 import { notifyError } from 'controllers/app/notifications';
 import { SessionKeyError } from 'controllers/server/sessions';
 import { useDraft } from 'hooks/useDraft';
@@ -9,7 +10,6 @@ import React, { useEffect, useMemo, useState } from 'react';
 import app from 'state';
 import { useCreateCommentMutation } from 'state/api/comments';
 import useUserStore from 'state/ui/user';
-import useAppStatus from '../../../hooks/useAppStatus';
 import Thread from '../../../models/Thread';
 import { useFetchProfilesByAddressesQuery } from '../../../state/api/profiles/index';
 import { jumpHighlightComment } from '../../pages/discussions/CommentTree/helpers';
@@ -21,6 +21,7 @@ import { CommentEditor } from './CommentEditor';
 type CreateCommentProps = {
   handleIsReplying?: (isReplying: boolean, id?: number) => void;
   parentCommentId?: number;
+  parentCommentMsgId?: string | null;
   rootThread: Thread;
   canComment: boolean;
   tooltipText?: string;
@@ -29,6 +30,7 @@ type CreateCommentProps = {
 export const CreateComment = ({
   handleIsReplying,
   parentCommentId,
+  parentCommentMsgId,
   rootThread,
   canComment,
   tooltipText = '',
@@ -39,8 +41,8 @@ export const CreateComment = ({
       : `new-comment-reply-${parentCommentId}`,
   );
 
-  const { isAddedToHomeScreen } = useAppStatus();
   const user = useUserStore();
+  const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
 
   // get restored draft on init
   const restoredDraft = useMemo(() => {
@@ -64,7 +66,7 @@ export const CreateComment = ({
     profileAddresses: user.activeAccount?.address
       ? [user.activeAccount?.address]
       : [],
-    currentChainId: app.activeChainId(),
+    currentChainId: app.activeChainId() || '',
     apiCallEnabled: !!user.activeAccount?.profile,
   });
   if (user.activeAccount) {
@@ -84,17 +86,18 @@ export const CreateComment = ({
     setErrorMsg(null);
     setSendingComment(true);
 
-    const communityId = app.activeChainId();
+    const communityId = app.activeChainId() || '';
     const asyncHandle = async () => {
       try {
         const input = await buildCreateCommentInput({
           communityId,
-          profile: user.activeAccount!.profile!.toUserProfile(),
+          address: user.activeAccount!.address,
           threadId: rootThread.id,
+          threadMsgId: rootThread.canvasMsgId,
           unescapedText: serializeDelta(contentDelta),
           parentCommentId: parentCommentId ?? null,
+          parentCommentMsgId: parentCommentMsgId ?? null,
           existingNumberOfComments: rootThread.numberOfComments || 0,
-          isPWA: isAddedToHomeScreen,
         });
         const newComment = await createComment(input);
 
@@ -108,6 +111,7 @@ export const CreateComment = ({
         }, 100);
       } catch (err) {
         if (err instanceof SessionKeyError) {
+          checkForSessionKeyRevalidationErrors(err);
           return;
         }
         const errMsg = err?.responseJSON?.error || err?.message;

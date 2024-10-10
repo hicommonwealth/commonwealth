@@ -1,0 +1,18 @@
+.ContestPage {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  .leaderboard-list {
+    max-width: 598px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    .filter-section {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+  }
+}

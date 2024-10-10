@@ -1,6 +1,6 @@
 import { pluralizeWithoutNumberPrefix } from 'helpers';
 import React, { useState } from 'react';
-import Topic, { TopicAttributes } from '../../models/Topic';
+import Topic from '../../models/Topic';
 import { useCommonNavigate } from '../../navigation/helpers';
 import app from '../../state';
 import {
@@ -19,8 +19,10 @@ import {
 import { openConfirmation } from './confirmation_modal';
 
 import { notifySuccess } from 'controllers/app/notifications';
+import { DeltaStatic } from 'quill';
 import '../../../styles/modals/edit_topic_modal.scss';
-import useAppStatus from '../../hooks/useAppStatus';
+import { ReactQuillEditor } from '../components/react_quill_editor';
+import { createDeltaFromText } from '../components/react_quill_editor/utils';
 
 type EditTopicModalProps = {
   onModalClose: () => void;
@@ -45,35 +47,27 @@ export const EditTopicModal = ({
   const { mutateAsync: deleteTopic } = useDeleteTopicMutation();
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState<boolean>(false);
-  const [description, setDescription] = useState<string>(descriptionProp);
+  const [description, setDescription] = useState<DeltaStatic>(
+    createDeltaFromText(descriptionProp),
+  );
   const [featuredInSidebar, setFeaturedInSidebar] = useState<boolean>(
-    // @ts-expect-error <StrictNullChecks/>
     featuredInSidebarProp,
   );
   const [name, setName] = useState<string>(nameProp);
 
-  const { isAddedToHomeScreen } = useAppStatus();
-
   const handleSaveChanges = async () => {
     setIsSaving(true);
 
-    const topicInfo: TopicAttributes = {
-      id,
-      description: description,
-      name: name,
-      community_id: app.activeChainId(),
-      // @ts-expect-error <StrictNullChecks/>
-      telegram: null,
-      featured_in_sidebar: featuredInSidebar,
-      featured_in_new_post: false,
-      default_offchain_template: '',
-      total_threads: topic.totalThreads || 0,
-    };
-
     try {
       await editTopic({
-        topic: new Topic(topicInfo),
-        isPWA: isAddedToHomeScreen,
+        topic_id: id!,
+        description: JSON.stringify(description),
+        name: name,
+        community_id: app.activeChainId()!,
+        telegram: null,
+        featured_in_sidebar: featuredInSidebar,
+        featured_in_new_post: false,
+        default_offchain_template: '',
       });
       if (noRedirect) {
         onModalClose();
@@ -104,9 +98,8 @@ export const EditTopicModal = ({
           buttonHeight: 'sm',
           onClick: async () => {
             await deleteTopic({
-              topicId: id,
-              topicName: name,
-              communityId: app.activeChainId(),
+              community_id: app.activeChainId() || '',
+              topic_id: id!,
             });
             if (noRedirect) {
               onModalClose();
@@ -150,14 +143,12 @@ export const EditTopicModal = ({
             return ['success', 'Valid topic name'];
           }}
         />
-        <CWTextInput
-          label="Description"
-          name="description"
-          tabIndex={2}
-          value={description}
-          onInput={(e) => {
-            setDescription(e.target.value);
-          }}
+        <ReactQuillEditor
+          className="editor"
+          placeholder="Enter a description (Limit of 250 characters)"
+          contentDelta={description}
+          setContentDelta={setDescription}
+          fromManageTopic
         />
         <CWCheckbox
           label="Featured in Sidebar"
