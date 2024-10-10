@@ -9,6 +9,7 @@ export type QuillRendererProps = {
   hideFormatting?: boolean;
   openLinksInNewTab?: boolean;
   searchTerm?: string;
+  cutoffLines?: number;
   containerClass?: string;
   markdownCutoffLength?: number; // Sometimes necessary to prevent large markdown docs from slowing down pages
   customClass?: string;
@@ -31,6 +32,7 @@ export const QuillRenderer = ({
   customClass,
   customShowMoreButton = null,
   maxChars,
+  cutoffLines,
 }: QuillRendererProps) => {
   const docInfo: DocInfo = useMemo(() => {
     let decodedText: string;
