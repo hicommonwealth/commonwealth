@@ -1,6 +1,6 @@
 import { AppError, query } from '@hicommonwealth/core';
-import { Feed, Thread } from '@hicommonwealth/model';
-import { GetUserFeedOrderBy, GetUserFeedStatus } from '@hicommonwealth/schemas';
+import { Thread } from '@hicommonwealth/model';
+import { GetThreadsOrderBy, GetThreadsStatus } from '@hicommonwealth/schemas';
 import { z } from 'zod';
 import { ALL_COMMUNITIES } from '../../middleware/databaseValidationService';
 import { ServerControllers } from '../../routing/router';
@@ -118,7 +118,7 @@ export const getThreadsHandler = async (
       withXRecentComments,
     } = bulkQueryValidationResult.data;
 
-    const bulkThreads = await query(Feed.GetUserFeed(), {
+    const bulkThreads = await query(Thread.GetThreads(), {
       actor: {
         user: { email: '' },
       },
@@ -129,12 +129,12 @@ export const getThreadsHandler = async (
         stage,
         topic_id,
         includePinnedThreads,
-        order_by: orderBy as z.infer<typeof GetUserFeedOrderBy>,
+        order_by: orderBy as z.infer<typeof GetThreadsOrderBy>,
         from_date,
         to_date,
         archived: archived,
         contestAddress,
-        status: status as z.infer<typeof GetUserFeedStatus>,
+        status: status as z.infer<typeof GetThreadsStatus>,
         withXRecentComments,
       },
     });

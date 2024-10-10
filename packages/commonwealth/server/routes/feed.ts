@@ -1,9 +1,9 @@
 import { AppError, query } from '@hicommonwealth/core';
-import { Feed as FeedQueries, Thread, type DB } from '@hicommonwealth/model';
+import { Thread, type DB } from '@hicommonwealth/model';
 import {
-  GetUserFeed,
-  GetUserFeedOrderBy,
-  GetUserFeedStatus,
+  GetThreads,
+  GetThreadsOrderBy,
+  GetThreadsStatus,
   Thread as ThreadSchema,
 } from '@hicommonwealth/schemas';
 import { getDecodedString, slugify } from '@hicommonwealth/shared';
@@ -31,7 +31,7 @@ function sortByDateDesc(
   return toDate(b).getTime() - toDate(a).getTime();
 }
 
-function computeUpdated(bulkThreads: z.infer<typeof GetUserFeed.output>) {
+function computeUpdated(bulkThreads: z.infer<typeof GetThreads.output>) {
   if (bulkThreads.threads.length === 0) {
     // there are no threads
     return new Date();
@@ -94,7 +94,7 @@ export const getFeedHandler = async (
       status,
     } = bulkQueryValidationResult.data;
 
-    const bulkThreads = await query(FeedQueries.GetUserFeed(), {
+    const bulkThreads = await query(Thread.GetThreads(), {
       actor: { user: { email: '' } },
       payload: {
         page,
@@ -103,12 +103,12 @@ export const getFeedHandler = async (
         stage,
         topic_id,
         includePinnedThreads,
-        order_by: orderBy as z.infer<typeof GetUserFeedOrderBy>,
+        order_by: orderBy as z.infer<typeof GetThreadsOrderBy>,
         from_date,
         to_date,
         archived,
         contestAddress,
-        status: status as z.infer<typeof GetUserFeedStatus>,
+        status: status as z.infer<typeof GetThreadsStatus>,
       },
     });
 

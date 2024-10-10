@@ -191,7 +191,7 @@ export type AssociatedContest = {
   contest_interval: number;
 };
 
-type RecentComment = {
+export type RecentComment = {
   id: number;
   address: string;
   text: string;

@@ -1,13 +1,13 @@
-import { InvalidInput, Query, ServerError } from '@hicommonwealth/core';
+import { InvalidInput, Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import moment from 'moment';
 import { QueryTypes } from 'sequelize';
 import { z } from 'zod';
 import { models } from '../database';
 
-export function GetUserFeed(): Query<typeof schemas.GetUserFeed> {
+export function GetThreads(): Query<typeof schemas.GetThreads> {
   return {
-    ...schemas.GetUserFeed,
+    ...schemas.GetThreads,
     auth: [],
     secure: false,
     body: async ({ payload }) => {
@@ -250,23 +250,17 @@ export function GetUserFeed(): Query<typeof schemas.GetUserFeed> {
         },
       });
 
-      try {
-        const [threads, numVotingThreads] = await Promise.all([
-          responseThreadsQuery,
-          numVotingThreadsQuery,
-        ]);
-        console.log(threads);
+      const [threads, numVotingThreads] = await Promise.all([
+        responseThreadsQuery,
+        numVotingThreadsQuery,
+      ]);
 
-        return {
-          limit: replacements.limit,
-          page: replacements.page,
-          // data params
-          threads,
-          numVotingThreads,
-        };
-      } catch (e) {
-        throw new ServerError('Could not fetch threads', e as Error);
-      }
+      return {
+        limit: replacements.limit,
+        page: replacements.page,
+        threads,
+        numVotingThreads,
+      };
     },
   };
 }
