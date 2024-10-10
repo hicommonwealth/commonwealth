@@ -135,7 +135,9 @@ const DetailsFormStep = ({
   const getInitialValues = () => {
     return {
       contestName: contestFormData?.contestName,
-      contestTopic: contestFormData?.contestTopic,
+      contestTopic: weightedTopics.find(
+        (t) => t.value === contestFormData?.contestTopic?.value,
+      ),
       contestDescription: contestFormData?.contestDescription,
       contestImage: contestFormData?.contestImage,
       feeType:
@@ -192,13 +194,30 @@ const DetailsFormStep = ({
       return;
     }
 
+    const selectedTopic = (weightedTopics || []).find(
+      (t) => t.value === values?.contestTopic?.value,
+    );
+
+    const feeType = weightedTopicsEnabled
+      ? selectedTopic?.weightedVoting === TopicWeightedVoting.ERC20
+        ? ContestFeeType.DirectDeposit
+        : ContestFeeType.CommunityStake
+      : values.feeType;
+
+    const contestRecurring = weightedTopicsEnabled
+      ? selectedTopic?.weightedVoting === TopicWeightedVoting.ERC20
+        ? ContestRecurringType.No
+        : ContestRecurringType.Yes
+      : values.contestRecurring;
+
     const formData: ContestFormData = {
       contestName: values.contestName,
       contestDescription: values.contestDescription,
       contestImage: values.contestImage,
-      feeType: values.feeType,
       fundingTokenAddress: values.fundingTokenAddress,
-      contestRecurring: values.contestRecurring,
+      contestTopic: selectedTopic,
+      contestRecurring,
+      feeType,
       prizePercentage,
       payoutStructure,
       toggledTopicList,
@@ -289,6 +308,7 @@ const DetailsFormStep = ({
                     isClearable={false}
                     isSearchable={false}
                     options={weightedTopics}
+                    isDisabled={editMode}
                   />
                 </div>
               )}
@@ -385,13 +405,15 @@ const DetailsFormStep = ({
                         onChange={(newValue) => {
                           setContestDuration(newValue?.value);
                         }}
+                        isDisabled={editMode}
                       />
                     </div>
                   </>
                 ) : (
                   <>
-                    {watch('contestTopic')?.weightedVoting ===
-                    TopicWeightedVoting.ERC20 ? (
+                    {weightedTopics.find(
+                      (t) => t.value === watch('contestTopic')?.value,
+                    )?.weightedVoting === TopicWeightedVoting.ERC20 ? (
                       <>
                         <div className="contest-section contest-section-funding">
                           <CWText type="h4">Contest Funding</CWText>
@@ -419,8 +441,9 @@ const DetailsFormStep = ({
                           disabled={editMode}
                         />
                       </>
-                    ) : watch('contestTopic')?.weightedVoting ===
-                      TopicWeightedVoting.Stake ? (
+                    ) : weightedTopics.find(
+                        (t) => t.value === watch('contestTopic')?.value,
+                      )?.weightedVoting === TopicWeightedVoting.Stake ? (
                       <>
                         <div className="contest-section contest-section-funding">
                           <CWText type="h4">Contest Funding</CWText>
@@ -483,6 +506,7 @@ const DetailsFormStep = ({
                         onChange={(newValue) => {
                           setContestDuration(newValue?.value);
                         }}
+                        isDisabled={editMode}
                       />
                     </div>
 

@@ -170,5 +170,3 @@ const AdminContestsPage = () => {
 };
 
 export default AdminContestsPage;
-
-// fix breadcrumbs

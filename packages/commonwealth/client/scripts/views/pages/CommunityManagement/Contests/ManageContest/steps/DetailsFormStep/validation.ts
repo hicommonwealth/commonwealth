@@ -1,3 +1,4 @@
+import { TopicWeightedVoting } from '@hicommonwealth/schemas';
 import { OpenFeature } from '@openfeature/web-sdk';
 import { VALIDATION_MESSAGES } from 'helpers/formValidations/messages';
 import { ContestFeeType } from 'views/pages/CommunityManagement/Contests/ManageContest/types';
@@ -15,8 +16,10 @@ export const detailsFormValidationSchema = z.object({
   contestImage: z.string().optional(),
   contestTopic: z
     .object({
-      value: z.number(),
+      value: z.number().optional(),
       label: z.string(),
+      helpText: z.string().optional(),
+      weightedVoting: z.nativeEnum(TopicWeightedVoting).optional().nullish(),
     })
     .optional()
     .refine((value) => (weightedTopicsEnabled ? !!value : true), {

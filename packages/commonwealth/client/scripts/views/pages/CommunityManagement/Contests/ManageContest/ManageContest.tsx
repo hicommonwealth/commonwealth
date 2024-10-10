@@ -83,7 +83,7 @@ const ManageContest = ({ contestAddress }: ManageContestProps) => {
         return (
           <ContestLiveStep
             createdContestAddress={createdContestAddress}
-            isFarcasterContest={!!contestFormData?.contestDuration}
+            isFarcasterContest={false}
             fundingTokenTicker={fundingTokenTicker}
             fundingTokenAddress={contestFormData?.fundingTokenAddress || ''}
           />
