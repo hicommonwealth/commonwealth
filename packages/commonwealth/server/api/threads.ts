@@ -1,10 +1,5 @@
 import { trpc } from '@hicommonwealth/adapters';
-import {
-  GlobalActivityCache,
-  Reaction,
-  Thread,
-  models,
-} from '@hicommonwealth/model';
+import { GlobalActivityCache, Reaction, Thread } from '@hicommonwealth/model';
 import { MixpanelCommunityInteractionEvent } from '../../shared/analytics/types';
 import { applyCanvasSignedDataMiddleware } from '../federation';
 
@@ -44,7 +39,7 @@ export const trpcRouter = trpc.router({
     async (_, output) => {
       // Using track output middleware to invalidate gac
       // TODO: Generalize output middleware to cover (analytics, gac invalidation, canvas, etc)
-      const gac = GlobalActivityCache.getInstance(models);
+      const gac = GlobalActivityCache.getInstance();
       gac && (await gac.deleteActivityFromCache(output.thread_id));
       return undefined;
     },

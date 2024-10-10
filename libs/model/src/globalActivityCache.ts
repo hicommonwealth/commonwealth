@@ -1,20 +1,22 @@
 import { CacheNamespaces, cache, logger } from '@hicommonwealth/core';
+import { ActivityFeedRecord } from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
 import { v4 as uuidv4 } from 'uuid';
-import { DB } from './models/index';
+import { z } from 'zod';
+import { models } from './database';
 
-export async function getActivityFeed(models: DB, id = 0) {
+export async function getUserActivityFeed(user_id?: number) {
   /**
    * Last 50 updated threads and their comments
    */
   const query = `
       WITH 
-      user_communities AS (SELECT DISTINCT community_id FROM "Addresses" WHERE user_id = :id),
+      user_communities AS (SELECT DISTINCT community_id FROM "Addresses" WHERE user_id = :user_id),
       top_threads AS (
           SELECT T.*
           FROM "Threads" T
                    ${
-                     id > 0
+                     user_id
                        ? 'JOIN user_communities UC ON UC.community_id = T.community_id'
                        : ''
                    }
@@ -54,7 +56,7 @@ export async function getActivityFeed(models: DB, id = 0) {
           JOIN "Addresses" A ON A.id = T.address_id AND A.community_id = T.community_id
           JOIN "Users" U ON U.id = A.user_id
           JOIN "Topics" Tp ON Tp.id = T.topic_id
-        ${id > 0 ? 'WHERE U.id != :id' : ''}),
+        ${user_id ? 'WHERE U.id != :user_id' : ''}),
       recent_comments AS ( -- get the recent comments data associated with the thread
         SELECT 
           C.thread_id as thread_id,
@@ -70,7 +72,7 @@ export async function getActivityFeed(models: DB, id = 0) {
             'profile_name', U.profile->>'name',
             'profile_avatar_url', U.profile->>'avatar_url',
             'user_id', U.id
-          ))) as "recentComments"
+          ))) as recent_comments
         FROM (
           Select tempC.*
           FROM "Comments" tempC 
@@ -84,8 +86,8 @@ export async function getActivityFeed(models: DB, id = 0) {
           GROUP BY C.thread_id
       )
       SELECT 
-        RTS."thread" as thread,
-        RC."recentComments" as recentComments
+        RTS.thread,
+        RC.recent_comments
       FROM
         ranked_threads RTS
         LEFT JOIN recent_comments RC ON RTS.thread_id = RC.thread_id
@@ -93,14 +95,14 @@ export async function getActivityFeed(models: DB, id = 0) {
         RTS.activity_rank_date DESC NULLS LAST;
   `;
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const threads: any = await models.sequelize.query(query, {
-    type: QueryTypes.SELECT,
-    raw: true,
-    replacements: { id },
-  });
-
-  return threads;
+  return await models.sequelize.query<z.infer<typeof ActivityFeedRecord>>(
+    query,
+    {
+      type: QueryTypes.SELECT,
+      raw: true,
+      replacements: { user_id },
+    },
+  );
 }
 
 const log = logger(import.meta);
@@ -111,13 +113,12 @@ export class GlobalActivityCache {
   private static _instance: GlobalActivityCache;
 
   constructor(
-    private _models: DB,
     private _cacheTTL: number = 60 * 5, // cache TTL in seconds
   ) {}
 
-  static getInstance(models: DB, cacheTTL?: number): GlobalActivityCache {
+  static getInstance(cacheTTL?: number): GlobalActivityCache {
     if (!GlobalActivityCache._instance) {
-      GlobalActivityCache._instance = new GlobalActivityCache(models, cacheTTL);
+      GlobalActivityCache._instance = new GlobalActivityCache(cacheTTL);
     }
     return GlobalActivityCache._instance;
   }
@@ -139,7 +140,7 @@ export class GlobalActivityCache {
         const msg = 'Failed to fetch global activity from Redis';
         log.error(msg);
       }
-      return await getActivityFeed(this._models);
+      return await getUserActivityFeed();
     }
     return JSON.parse(activity);
   }
@@ -193,7 +194,7 @@ export class GlobalActivityCache {
         return;
       }
 
-      const activity = await getActivityFeed(this._models);
+      const activity = await getUserActivityFeed();
       const result = await cache().setKey(
         CacheNamespaces.Activity_Cache,
         this._cacheKey,

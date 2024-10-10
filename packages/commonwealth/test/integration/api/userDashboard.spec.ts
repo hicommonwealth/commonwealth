@@ -161,11 +161,13 @@ describe('User Dashboard API', () => {
     await dispose()();
   });
 
-  describe('/viewUserActivity', () => {
+  describe('/GetUserActivity', () => {
+    const apiUrl = '/api/internal/feed.GetUserActivity';
+
     test('should fail without JWT', async () => {
       const res = await chai.request
         .agent(server.app)
-        .post('/api/viewUserActivity')
+        .get(apiUrl)
         .set('Accept', 'application/json')
         .send({ chain });
       expect(res).to.not.be.null;
@@ -175,7 +177,7 @@ describe('User Dashboard API', () => {
     test('should return user activity for joined communities only', async () => {
       const res = await chai.request
         .agent(server.app)
-        .post('/api/viewUserActivity')
+        .get(apiUrl)
         .set('Accept', 'application/json')
         .send({ chain, jwt: userJWT });
 
@@ -209,7 +211,7 @@ describe('User Dashboard API', () => {
 
       const res = await chai.request
         .agent(server.app)
-        .post('/api/viewUserActivity')
+        .get(apiUrl)
         .set('Accept', 'application/json')
         .send({ chain, jwt: userJWT });
 
@@ -257,7 +259,7 @@ describe('User Dashboard API', () => {
 
       const res = await chai.request
         .agent(server.app)
-        .post('/api/viewUserActivity')
+        .get(apiUrl)
         .set('Accept', 'application/json')
         .send({ chain, jwt: userJWT });
 
@@ -282,5 +284,5 @@ describe('User Dashboard API', () => {
     });
   });
 
-  describe.todo('/viewGlobalActivity', () => {});
+  describe.todo('/GetGlobalActivity', () => {});
 });

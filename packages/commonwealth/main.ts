@@ -154,7 +154,7 @@ export async function main(
   setupPassport(db);
 
   // TODO: decouple as global singleton
-  const globalActivityCache = GlobalActivityCache.getInstance(db);
+  const globalActivityCache = GlobalActivityCache.getInstance();
   // initialize async to avoid blocking startup
   if (!noGlobalActivityCache) globalActivityCache.start();
 
