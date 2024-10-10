@@ -1,5 +1,9 @@
 import { BrowserType } from 'helpers/browser';
 
+/**
+ * Compute the channel for Knock notifications.  Firebase cloud messaging or
+ * Apple.
+ */
 export function computeChannelTypeFromBrowserType(
   browserType: BrowserType | undefined,
 ): 'FCM' | 'APNS' | undefined {

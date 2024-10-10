@@ -5,11 +5,13 @@ import { useUnregisterClientRegistrationTokenMutation } from 'state/api/trpc/sub
 // eslint-disable-next-line max-len
 import { computeChannelTypeFromBrowserType } from 'views/pages/NotificationSettings/computeChannelTypeFromBrowserType';
 // eslint-disable-next-line max-len
+import useUserStore from 'state/ui/user';
 import { getFirebaseMessagingToken } from 'views/pages/NotificationSettings/getFirebaseMessagingToken';
 
 export function useUnregisterPushNotificationSubscriptionCallback() {
   const unregisterClientRegistrationToken =
     useUnregisterClientRegistrationTokenMutation();
+  const user = useUserStore();
 
   return useCallback(async () => {
     const browserType = getBrowserType();
@@ -22,11 +24,11 @@ export function useUnregisterPushNotificationSubscriptionCallback() {
       console.log('Notification permission granted.');
       const token = await getFirebaseMessagingToken();
       await unregisterClientRegistrationToken.mutateAsync({
-        id: 0, // this should be the aggregate id (user?)
+        id: user.id,
         token,
         channelType,
       });
       console.log('Push notifications unregistered.');
     }
-  }, [unregisterClientRegistrationToken]);
+  }, [unregisterClientRegistrationToken, user.id]);
 }
