@@ -209,6 +209,15 @@ const GroupForm = ({
         `${initialValues.requirementsToFulfill}`,
       );
     }
+
+    if (initialValues.topics) {
+      setTopicPermissionsSubForms(
+        initialValues.topics.map((t) => ({
+          permission: TOPIC_PERMISSIONS[t.permission],
+          topic: { id: parseInt(`${t.value}`), name: t.label },
+        })),
+      );
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

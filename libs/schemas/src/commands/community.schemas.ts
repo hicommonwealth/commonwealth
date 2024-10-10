@@ -247,7 +247,14 @@ export const UpdateGroup = {
     group_id: PG_INT,
     metadata: GroupMetadata.optional(),
     requirements: z.array(Requirement).optional(),
-    topics: z.array(PG_INT).optional(),
+    topics: z
+      .array(
+        z.object({
+          id: PG_INT,
+          permission: z.nativeEnum(GroupTopicPermissionEnum),
+        }),
+      )
+      .optional(),
   }),
   output: Group.partial(),
 };

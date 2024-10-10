@@ -131,6 +131,7 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
           topics: (foundGroup.topics || []).map((topic) => ({
             label: topic.name,
             value: topic.id,
+            permission: topic.permission,
           })),
         }}
         onSubmit={(values) => {
