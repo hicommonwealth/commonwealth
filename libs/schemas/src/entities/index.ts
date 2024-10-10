@@ -5,6 +5,7 @@ export * from './contract.schemas';
 export * from './discordBotConfig.schemas';
 export * from './group-permission.schemas';
 export * from './group.schemas';
+export * from './groupTopicPermission.schemas';
 export * from './notification.schemas';
 export * from './reaction.schemas';
 export * from './snapshot.schemas';

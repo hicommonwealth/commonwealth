@@ -25,7 +25,7 @@ export function CreateGroup(): Command<
 
       const topics = await models.Topic.findAll({
         where: {
-          id: { [Op.in]: payload.topics || [] },
+          id: { [Op.in]: payload.topics?.map((t) => t.id) || [] },
           community_id,
         },
       });
@@ -69,6 +69,22 @@ export function CreateGroup(): Command<
                 where: { id: { [Op.in]: topics.map(({ id }) => id!) } },
                 transaction,
               },
+            );
+
+            // add topic level interaction permissions for current group
+            await Promise.all(
+              (payload.topics || [])?.map(async (t) => {
+                if (group.id) {
+                  await models.GroupTopicPermission.create(
+                    {
+                      group_id: group.id,
+                      topic_id: t.id,
+                      allowed_actions: t.permission,
+                    },
+                    { transaction },
+                  );
+                }
+              }),
             );
           }
           return group.toJSON();

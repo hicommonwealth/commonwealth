@@ -4,9 +4,11 @@ import {
   MembershipRejectReason,
   UserInstance,
 } from '@hicommonwealth/model';
+import { GroupTopicPermissionEnum } from '@hicommonwealth/schemas';
 import { Op } from 'sequelize';
 import { refreshMembershipsForAddress } from '../../util/requirementsModule/refreshMembershipsForAddress';
 import { ServerGroupsController } from '../server_groups_controller';
+import { GroupInstanceWithTopicPermissions } from './get_groups';
 
 const Errors = {
   TopicNotFound: 'Topic not found',
@@ -32,6 +34,12 @@ export async function __refreshMembership(
     where: {
       community_id: address.community_id,
     },
+    include: [
+      {
+        model: this.models.GroupTopicPermission,
+        attributes: ['topic_id', 'allowed_actions'],
+      },
+    ],
   });
 
   // optionally filter to only groups associated with topic
@@ -63,9 +71,18 @@ export async function __refreshMembership(
   // transform memberships to result shape
   const results = memberships.map((membership) => ({
     groupId: membership.group_id,
-    topicIds: topics
+    topics: topics
       .filter((t) => t.group_ids!.includes(membership.group_id))
-      .map((t) => t.id),
+      .map((t) => ({
+        id: t.id,
+        permission:
+          (groups as GroupInstanceWithTopicPermissions[])
+            .find((g) => g.id === membership.group_id)
+            ?.GroupTopicPermissions?.find((gtp) => gtp.topic_id === t.id)
+            ?.allowed_actions ||
+          // TODO: this fallback should be via a migration for existing communities
+          GroupTopicPermissionEnum.UPVOTE_AND_COMMENT_AND_POST,
+      })),
     allowed: !membership.reject_reason,
     rejectReason: membership.reject_reason,
   }));
