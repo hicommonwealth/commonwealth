@@ -5,6 +5,7 @@ import * as core from '../../../../core';
 import { CreateCommentResponseReactionAddressRole } from './CreateCommentResponseReactionAddressRole';
 import { CreateCommentResponseReactionAddressUser } from './CreateCommentResponseReactionAddressUser';
 import { CreateCommentResponseReactionAddressWalletId } from './CreateCommentResponseReactionAddressWalletId';
+
 export const CreateCommentResponseReactionAddress = core.serialization.object({
   id: core.serialization.number().optional(),
   address: core.serialization.string(),

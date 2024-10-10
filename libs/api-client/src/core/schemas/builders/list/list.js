@@ -2,6 +2,7 @@ import { SchemaType } from '../../Schema';
 import { getErrorMessageForIncorrectType } from '../../utils/getErrorMessageForIncorrectType';
 import { maybeSkipValidation } from '../../utils/maybeSkipValidation';
 import { getSchemaUtils } from '../schema-utils';
+
 export function list(schema) {
   const baseSchema = {
     parse: (raw, opts) =>
@@ -47,6 +48,7 @@ export function list(schema) {
     getSchemaUtils(baseSchema),
   );
 }
+
 function validateAndTransformArray(value, transformItem) {
   if (!Array.isArray(value)) {
     return {

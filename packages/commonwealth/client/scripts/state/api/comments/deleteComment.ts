@@ -35,7 +35,6 @@ const useDeleteCommentMutation = ({
         id: response.comment_id,
         deleted: true,
         text: '[deleted]',
-        plaintext: '[deleted]',
         versionHistory: [],
         canvas_signed_data: response.canvas_signed_data,
         canvas_msg_id: response.canvas_msg_id,

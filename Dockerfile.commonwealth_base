@@ -12,14 +12,6 @@ WORKDIR /usr/src/app
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 RUN pnpm run build
 
-RUN pnpm -F discord-bot run build
-RUN pnpm deploy -F discord-bot --prod /prod/discord-bot
-RUN mv /usr/src/app/packages/discord-bot/build /prod/discord-bot/build
-
-RUN pnpm -F snapshot-listener run build
-RUN pnpm deploy -F snapshot-listener --prod /prod/snapshot-listener
-RUN mv /usr/src/app/packages/snapshot-listener/build /prod/snapshot-listener/build
-
 RUN pnpm deploy -F commonwealth --prod /prod/commonwealth
 RUN mv /usr/src/app/packages/commonwealth/build /prod/commonwealth/build
 
@@ -31,24 +23,4 @@ COPY ./scripts/datadog-entrypoint.sh /prod/commonwealth
 RUN chmod +x /prod/commonwealth/datadog-entrypoint.sh
 COPY ./scripts/get-max-old-space-size.sh /prod/commonwealth/scripts
 RUN chmod +x /prod/commonwealth/scripts/get-max-old-space-size.sh
-ENV PORT=$PORT
-
-FROM base AS snapshot-listener
-ENV NODE_ENV=production
-COPY --from=build /prod/snapshot-listener /prod/snapshot-listener
-WORKDIR /prod/snapshot-listener
-COPY ./scripts/datadog-entrypoint.sh /prod/snapshot-listener
-RUN chmod +x /prod/snapshot-listener/datadog-entrypoint.sh
-COPY ./scripts/get-max-old-space-size.sh /prod/snapshot-listener/scripts
-RUN chmod +x /prod/snapshot-listener/scripts/get-max-old-space-size.sh
-ENV PORT=$PORT
-
-FROM base AS discord-bot
-ENV NODE_ENV=production
-COPY --from=build /prod/discord-bot /prod/discord-bot
-WORKDIR /prod/discord-bot
-COPY ./scripts/datadog-entrypoint.sh /prod/discord-bot
-RUN chmod +x /prod/discord-bot/datadog-entrypoint.sh
-COPY ./scripts/get-max-old-space-size.sh /prod/discord-bot/scripts
-RUN chmod +x /prod/discord-bot/scripts/get-max-old-space-size.sh
 ENV PORT=$PORT

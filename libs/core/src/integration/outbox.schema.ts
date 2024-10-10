@@ -107,4 +107,46 @@ export const Outbox = z.union([
       event_payload: events.CommentUpvoted,
     })
     .merge(BaseOutboxProperties),
+  z
+    .object({
+      event_name: z.literal(EventNames.DiscordThreadCreated),
+      event_payload: events.DiscordThreadCreated,
+    })
+    .merge(BaseOutboxProperties),
+  z
+    .object({
+      event_name: z.literal(EventNames.DiscordThreadBodyUpdated),
+      event_payload: events.DiscordThreadBodyUpdated,
+    })
+    .merge(BaseOutboxProperties),
+  z
+    .object({
+      event_name: z.literal(EventNames.DiscordThreadTitleUpdated),
+      event_payload: events.DiscordThreadTitleUpdated,
+    })
+    .merge(BaseOutboxProperties),
+  z
+    .object({
+      event_name: z.literal(EventNames.DiscordThreadDeleted),
+      event_payload: events.DiscordThreadDeleted,
+    })
+    .merge(BaseOutboxProperties),
+  z
+    .object({
+      event_name: z.literal(EventNames.DiscordThreadCommentCreated),
+      event_payload: events.DiscordThreadCommentCreated,
+    })
+    .merge(BaseOutboxProperties),
+  z
+    .object({
+      event_name: z.literal(EventNames.DiscordThreadCommentUpdated),
+      event_payload: events.DiscordThreadCommentUpdated,
+    })
+    .merge(BaseOutboxProperties),
+  z
+    .object({
+      event_name: z.literal(EventNames.DiscordThreadCommentDeleted),
+      event_payload: events.DiscordThreadCommentDeleted,
+    })
+    .merge(BaseOutboxProperties),
 ]);

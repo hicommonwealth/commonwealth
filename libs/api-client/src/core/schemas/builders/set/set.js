@@ -3,6 +3,7 @@ import { getErrorMessageForIncorrectType } from '../../utils/getErrorMessageForI
 import { maybeSkipValidation } from '../../utils/maybeSkipValidation';
 import { list } from '../list';
 import { getSchemaUtils } from '../schema-utils';
+
 export function set(schema) {
   const listSchema = list(schema);
   const baseSchema = {

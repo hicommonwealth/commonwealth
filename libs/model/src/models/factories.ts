@@ -38,6 +38,7 @@ import Tags from './tags';
 import Thread from './thread';
 import ThreadSubscription from './thread_subscriptions';
 import ThreadVersionHistory from './thread_version_history';
+import Token from './token';
 import Topic from './topic';
 import User from './user';
 import Vote from './vote';
@@ -88,6 +89,7 @@ export const Factories = {
   Vote,
   Webhook,
   Wallets,
+  Token,
   XpLog,
 };
 

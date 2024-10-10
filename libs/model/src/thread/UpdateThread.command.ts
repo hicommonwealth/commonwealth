@@ -20,8 +20,6 @@ import {
   emitMentions,
   findMentionDiff,
   parseUserMentions,
-  quillToPlain,
-  sanitizeQuillText,
   uploadIfLarge,
 } from '../utils';
 
@@ -50,7 +48,6 @@ function getContentPatch(
 
   if (typeof body !== 'undefined' && thread.kind === 'discussion') {
     patch.body = decodeContent(body);
-    patch.plaintext = quillToPlain(sanitizeQuillText(body));
   }
 
   typeof url !== 'undefined' && thread.kind === 'link' && (patch.url = url);
@@ -355,7 +352,6 @@ export function UpdateThread(): Command<
                 'id',
                 'address_id',
                 'text',
-                ['plaintext', 'plainText'],
                 'created_at',
                 'updated_at',
                 'deleted_at',
