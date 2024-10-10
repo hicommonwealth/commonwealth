@@ -6,7 +6,6 @@ import * as core from '../../../../../core';
 import * as serializers from '../../../../index';
 import { UpdateGroupRequestMetadata } from '../../types/UpdateGroupRequestMetadata';
 import { UpdateGroupRequestRequirementsItem } from '../../types/UpdateGroupRequestRequirementsItem';
-
 export declare const UpdateGroupRequest: core.serialization.Schema<
   serializers.UpdateGroupRequest.Raw,
   CommonApi.UpdateGroupRequest

@@ -4,7 +4,6 @@
 import * as core from '../../../../core';
 import * as environments from '../../../../environments';
 import * as CommonApi from '../../../index';
-
 export declare namespace Reaction {
   interface Options {
     environment?: core.Supplier<environments.CommonApiEnvironment | string>;
@@ -12,7 +11,6 @@ export declare namespace Reaction {
     /** Override the address header */
     address?: core.Supplier<string | undefined>;
   }
-
   interface RequestOptions {
     /** The maximum time to wait for a response in seconds. */
     timeoutInSeconds?: number;
@@ -24,12 +22,9 @@ export declare namespace Reaction {
     address?: string | undefined;
   }
 }
-
 export declare class Reaction {
   protected readonly _options: Reaction.Options;
-
   constructor(_options: Reaction.Options);
-
   /**
    * @param {CommonApi.CreateThreadReactionRequest} request
    * @param {Reaction.RequestOptions} requestOptions - Request-specific configuration.
@@ -43,7 +38,6 @@ export declare class Reaction {
     request: CommonApi.CreateThreadReactionRequest,
     requestOptions?: Reaction.RequestOptions,
   ): Promise<CommonApi.CreateThreadReactionResponse>;
-
   /**
    * @param {CommonApi.CreateCommentReactionRequest} request
    * @param {Reaction.RequestOptions} requestOptions - Request-specific configuration.
@@ -57,7 +51,6 @@ export declare class Reaction {
     request: CommonApi.CreateCommentReactionRequest,
     requestOptions?: Reaction.RequestOptions,
   ): Promise<CommonApi.CreateCommentReactionResponse>;
-
   /**
    * @param {CommonApi.DeleteReactionRequest} request
    * @param {Reaction.RequestOptions} requestOptions - Request-specific configuration.
@@ -72,7 +65,6 @@ export declare class Reaction {
     request: CommonApi.DeleteReactionRequest,
     requestOptions?: Reaction.RequestOptions,
   ): Promise<CommonApi.DeleteReactionResponse>;
-
   protected _getCustomAuthorizationHeaders(): Promise<{
     'x-api-key': string;
   }>;

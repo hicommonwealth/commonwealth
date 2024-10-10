@@ -1,5 +1,4 @@
 import { APIResponse } from './APIResponse';
-
 export declare type FetchFunction = <R = unknown>(
   args: Fetcher.Args,
 ) => Promise<APIResponse<R, Fetcher.Error>>;
@@ -19,37 +18,30 @@ export declare namespace Fetcher {
     responseType?: 'json' | 'blob' | 'sse' | 'streaming' | 'text';
     duplex?: 'half';
   }
-
   type Error =
     | FailedStatusCodeError
     | NonJsonError
     | TimeoutError
     | UnknownError;
-
   interface FailedStatusCodeError {
     reason: 'status-code';
     statusCode: number;
     body: unknown;
   }
-
   interface NonJsonError {
     reason: 'non-json';
     statusCode: number;
     rawBody: string;
   }
-
   interface TimeoutError {
     reason: 'timeout';
   }
-
   interface UnknownError {
     reason: 'unknown';
     errorMessage: string;
   }
 }
-
 export declare function fetcherImpl<R = unknown>(
   args: Fetcher.Args,
 ): Promise<APIResponse<R, Fetcher.Error>>;
-
 export declare const fetcher: FetchFunction;

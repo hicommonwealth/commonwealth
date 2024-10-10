@@ -15,7 +15,6 @@ import { GetCommunitiesResponseResultsItemSocialLinksItem } from './GetCommuniti
 import { GetCommunitiesResponseResultsItemTerms } from './GetCommunitiesResponseResultsItemTerms';
 import { GetCommunitiesResponseResultsItemTopicsItem } from './GetCommunitiesResponseResultsItemTopicsItem';
 import { GetCommunitiesResponseResultsItemType } from './GetCommunitiesResponseResultsItemType';
-
 export const GetCommunitiesResponseResultsItem = core.serialization.object({
   id: core.serialization.string(),
   name: core.serialization.string(),

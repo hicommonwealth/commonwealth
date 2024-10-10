@@ -4,7 +4,6 @@
 import * as CommonApi from '../../../../api/index';
 import * as core from '../../../../core';
 import * as serializers from '../../../index';
-
 export declare const GetCommunityResponseAddressesHasHomepage: core.serialization.Schema<
   serializers.GetCommunityResponseAddressesHasHomepage.Raw,
   CommonApi.GetCommunityResponseAddressesHasHomepage

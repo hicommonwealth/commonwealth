@@ -4,12 +4,10 @@ import {
   ObjectSchema,
   PropertySchemas,
 } from './types';
-
 export declare function objectWithoutOptionalProperties<
   ParsedKeys extends string,
   T extends PropertySchemas<ParsedKeys>,
 >(schemas: T): inferObjectWithoutOptionalPropertiesSchemaFromPropertySchemas<T>;
-
 export declare type inferObjectWithoutOptionalPropertiesSchemaFromPropertySchemas<
   T extends PropertySchemas<keyof T>,
 > = ObjectSchema<

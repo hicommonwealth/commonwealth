@@ -5,7 +5,6 @@ import * as CommonApi from '../../../../api/index';
 import * as core from '../../../../core';
 import * as serializers from '../../../index';
 import { GetCommentsResponseResultsItemDiscordMetaUser } from './GetCommentsResponseResultsItemDiscordMetaUser';
-
 export declare const GetCommentsResponseResultsItemDiscordMeta: core.serialization.ObjectSchema<
   serializers.GetCommentsResponseResultsItemDiscordMeta.Raw,
   CommonApi.GetCommentsResponseResultsItemDiscordMeta

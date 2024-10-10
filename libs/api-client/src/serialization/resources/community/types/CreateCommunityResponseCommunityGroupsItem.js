@@ -4,7 +4,6 @@
 import * as core from '../../../../core';
 import { CreateCommunityResponseCommunityGroupsItemMetadata } from './CreateCommunityResponseCommunityGroupsItemMetadata';
 import { CreateCommunityResponseCommunityGroupsItemRequirementsItem } from './CreateCommunityResponseCommunityGroupsItemRequirementsItem';
-
 export const CreateCommunityResponseCommunityGroupsItem =
   core.serialization.object({
     id: core.serialization.number().optional(),

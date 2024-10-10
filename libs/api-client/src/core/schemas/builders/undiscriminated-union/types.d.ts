@@ -1,5 +1,4 @@
 import { inferParsed, inferRaw, Schema } from '../../Schema';
-
 export declare type UndiscriminatedUnionSchema<Schemas extends [...Schema[]]> =
   Schema<
     inferRawUnidiscriminatedUnionSchema<Schemas>,

@@ -4,7 +4,6 @@
 import * as CommonApi from '../../../../api/index';
 import * as core from '../../../../core';
 import * as serializers from '../../../index';
-
 export declare const UpdateGroupRequestRequirementsItemThresholdDataSourceTokenSymbol: core.serialization.ObjectSchema<
   serializers.UpdateGroupRequestRequirementsItemThresholdDataSourceTokenSymbol.Raw,
   CommonApi.UpdateGroupRequestRequirementsItemThresholdDataSourceTokenSymbol

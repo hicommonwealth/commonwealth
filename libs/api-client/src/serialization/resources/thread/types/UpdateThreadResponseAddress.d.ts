@@ -7,7 +7,6 @@ import * as serializers from '../../../index';
 import { UpdateThreadResponseAddressRole } from './UpdateThreadResponseAddressRole';
 import { UpdateThreadResponseAddressUser } from './UpdateThreadResponseAddressUser';
 import { UpdateThreadResponseAddressWalletId } from './UpdateThreadResponseAddressWalletId';
-
 export declare const UpdateThreadResponseAddress: core.serialization.ObjectSchema<
   serializers.UpdateThreadResponseAddress.Raw,
   CommonApi.UpdateThreadResponseAddress

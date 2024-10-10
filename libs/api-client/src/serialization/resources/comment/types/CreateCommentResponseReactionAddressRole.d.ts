@@ -4,7 +4,6 @@
 import * as CommonApi from '../../../../api/index';
 import * as core from '../../../../core';
 import * as serializers from '../../../index';
-
 export declare const CreateCommentResponseReactionAddressRole: core.serialization.Schema<
   serializers.CreateCommentResponseReactionAddressRole.Raw,
   CommonApi.CreateCommentResponseReactionAddressRole

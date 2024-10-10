@@ -5,7 +5,6 @@ import * as CommonApi from '../../../../api/index';
 import * as core from '../../../../core';
 import * as serializers from '../../../index';
 import { UpdateCommentResponseThreadReactionsItemAddress } from './UpdateCommentResponseThreadReactionsItemAddress';
-
 export declare const UpdateCommentResponseThreadReactionsItem: core.serialization.ObjectSchema<
   serializers.UpdateCommentResponseThreadReactionsItem.Raw,
   CommonApi.UpdateCommentResponseThreadReactionsItem

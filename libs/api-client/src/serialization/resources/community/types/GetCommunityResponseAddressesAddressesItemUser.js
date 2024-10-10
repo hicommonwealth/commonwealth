@@ -6,7 +6,6 @@ import { GetCommunityResponseAddressesAddressesItemUserApiKey } from './GetCommu
 import { GetCommunityResponseAddressesAddressesItemUserEmailNotificationInterval } from './GetCommunityResponseAddressesAddressesItemUserEmailNotificationInterval';
 import { GetCommunityResponseAddressesAddressesItemUserProfile } from './GetCommunityResponseAddressesAddressesItemUserProfile';
 import { GetCommunityResponseAddressesAddressesItemUserProfileTagsItem } from './GetCommunityResponseAddressesAddressesItemUserProfileTagsItem';
-
 export const GetCommunityResponseAddressesAddressesItemUser =
   core.serialization.object({
     id: core.serialization.number().optional(),

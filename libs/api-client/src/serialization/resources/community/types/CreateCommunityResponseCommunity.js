@@ -15,7 +15,6 @@ import { CreateCommunityResponseCommunitySocialLinksItem } from './CreateCommuni
 import { CreateCommunityResponseCommunityTerms } from './CreateCommunityResponseCommunityTerms';
 import { CreateCommunityResponseCommunityTopicsItem } from './CreateCommunityResponseCommunityTopicsItem';
 import { CreateCommunityResponseCommunityType } from './CreateCommunityResponseCommunityType';
-
 export const CreateCommunityResponseCommunity = core.serialization.object({
   id: core.serialization.string(),
   name: core.serialization.string(),

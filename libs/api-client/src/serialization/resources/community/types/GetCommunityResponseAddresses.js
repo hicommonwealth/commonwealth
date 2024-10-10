@@ -16,7 +16,6 @@ import { GetCommunityResponseAddressesSocialLinksItem } from './GetCommunityResp
 import { GetCommunityResponseAddressesTerms } from './GetCommunityResponseAddressesTerms';
 import { GetCommunityResponseAddressesTopicsItem } from './GetCommunityResponseAddressesTopicsItem';
 import { GetCommunityResponseAddressesType } from './GetCommunityResponseAddressesType';
-
 export const GetCommunityResponseAddresses = core.serialization.object({
   id: core.serialization.string(),
   name: core.serialization.string(),

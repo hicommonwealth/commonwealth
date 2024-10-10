@@ -7,7 +7,6 @@ import * as serializers from '../../../index';
 import { CreateCommentResponseAddressRole } from './CreateCommentResponseAddressRole';
 import { CreateCommentResponseAddressUser } from './CreateCommentResponseAddressUser';
 import { CreateCommentResponseAddressWalletId } from './CreateCommentResponseAddressWalletId';
-
 export declare const CreateCommentResponseAddress: core.serialization.ObjectSchema<
   serializers.CreateCommentResponseAddress.Raw,
   CommonApi.CreateCommentResponseAddress

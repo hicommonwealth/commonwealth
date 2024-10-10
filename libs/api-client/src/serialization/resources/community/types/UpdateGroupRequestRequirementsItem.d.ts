@@ -6,7 +6,6 @@ import * as core from '../../../../core';
 import * as serializers from '../../../index';
 import { UpdateGroupRequestRequirementsItemAllow } from './UpdateGroupRequestRequirementsItemAllow';
 import { UpdateGroupRequestRequirementsItemThreshold } from './UpdateGroupRequestRequirementsItemThreshold';
-
 export declare const UpdateGroupRequestRequirementsItem: core.serialization.Schema<
   serializers.UpdateGroupRequestRequirementsItem.Raw,
   CommonApi.UpdateGroupRequestRequirementsItem
@@ -15,11 +14,9 @@ export declare namespace UpdateGroupRequestRequirementsItem {
   type Raw =
     | UpdateGroupRequestRequirementsItem.Threshold
     | UpdateGroupRequestRequirementsItem.Allow;
-
   interface Threshold extends UpdateGroupRequestRequirementsItemThreshold.Raw {
     rule: 'threshold';
   }
-
   interface Allow extends UpdateGroupRequestRequirementsItemAllow.Raw {
     rule: 'allow';
   }

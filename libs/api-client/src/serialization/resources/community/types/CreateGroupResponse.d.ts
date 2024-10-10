@@ -17,7 +17,6 @@ import { CreateGroupResponseSocialLinksItem } from './CreateGroupResponseSocialL
 import { CreateGroupResponseTerms } from './CreateGroupResponseTerms';
 import { CreateGroupResponseTopicsItem } from './CreateGroupResponseTopicsItem';
 import { CreateGroupResponseType } from './CreateGroupResponseType';
-
 export declare const CreateGroupResponse: core.serialization.ObjectSchema<
   serializers.CreateGroupResponse.Raw,
   CommonApi.CreateGroupResponse

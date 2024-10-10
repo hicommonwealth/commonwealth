@@ -3,7 +3,6 @@
  */
 import * as core from '../../../../core';
 import { GetCommentsResponseResultsItem } from './GetCommentsResponseResultsItem';
-
 export const GetCommentsResponse = core.serialization.object({
   limit: core.serialization.number(),
   page: core.serialization.number(),

@@ -15,7 +15,6 @@ import { CreateGroupResponseSocialLinksItem } from './CreateGroupResponseSocialL
 import { CreateGroupResponseTerms } from './CreateGroupResponseTerms';
 import { CreateGroupResponseTopicsItem } from './CreateGroupResponseTopicsItem';
 import { CreateGroupResponseType } from './CreateGroupResponseType';
-
 export const CreateGroupResponse = core.serialization.object({
   id: core.serialization.string().optional(),
   name: core.serialization.string().optional(),

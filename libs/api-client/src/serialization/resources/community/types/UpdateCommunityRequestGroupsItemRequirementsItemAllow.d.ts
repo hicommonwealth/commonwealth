@@ -5,7 +5,6 @@ import * as CommonApi from '../../../../api/index';
 import * as core from '../../../../core';
 import * as serializers from '../../../index';
 import { UpdateCommunityRequestGroupsItemRequirementsItemAllowData } from './UpdateCommunityRequestGroupsItemRequirementsItemAllowData';
-
 export declare const UpdateCommunityRequestGroupsItemRequirementsItemAllow: core.serialization.ObjectSchema<
   serializers.UpdateCommunityRequestGroupsItemRequirementsItemAllow.Raw,
   CommonApi.UpdateCommunityRequestGroupsItemRequirementsItemAllow

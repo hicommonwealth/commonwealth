@@ -10,7 +10,6 @@ import { CreateCommentResponseDiscordMeta } from './CreateCommentResponseDiscord
 import { CreateCommentResponseReaction } from './CreateCommentResponseReaction';
 import { CreateCommentResponseSearch } from './CreateCommentResponseSearch';
 import { CreateCommentResponseThread } from './CreateCommentResponseThread';
-
 export declare const CreateCommentResponse: core.serialization.ObjectSchema<
   serializers.CreateCommentResponse.Raw,
   CommonApi.CreateCommentResponse
@@ -21,7 +20,6 @@ export declare namespace CreateCommentResponse {
     thread_id: number;
     address_id: number;
     text: string;
-    plaintext: string;
     parent_id?: string | null;
     content_url?: string | null;
     canvas_signed_data?: string | null;

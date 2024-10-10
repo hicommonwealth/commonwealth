@@ -7,7 +7,6 @@ import * as serializers from '../../../index';
 import { CreateCommunityResponseCommunityAddressesItemRole } from './CreateCommunityResponseCommunityAddressesItemRole';
 import { CreateCommunityResponseCommunityAddressesItemUser } from './CreateCommunityResponseCommunityAddressesItemUser';
 import { CreateCommunityResponseCommunityAddressesItemWalletId } from './CreateCommunityResponseCommunityAddressesItemWalletId';
-
 export declare const CreateCommunityResponseCommunityAddressesItem: core.serialization.ObjectSchema<
   serializers.CreateCommunityResponseCommunityAddressesItem.Raw,
   CommonApi.CreateCommunityResponseCommunityAddressesItem

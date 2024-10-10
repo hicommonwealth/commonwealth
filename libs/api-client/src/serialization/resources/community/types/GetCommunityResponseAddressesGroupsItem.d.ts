@@ -6,7 +6,6 @@ import * as core from '../../../../core';
 import * as serializers from '../../../index';
 import { GetCommunityResponseAddressesGroupsItemMetadata } from './GetCommunityResponseAddressesGroupsItemMetadata';
 import { GetCommunityResponseAddressesGroupsItemRequirementsItem } from './GetCommunityResponseAddressesGroupsItemRequirementsItem';
-
 export declare const GetCommunityResponseAddressesGroupsItem: core.serialization.ObjectSchema<
   serializers.GetCommunityResponseAddressesGroupsItem.Raw,
   CommonApi.GetCommunityResponseAddressesGroupsItem

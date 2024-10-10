@@ -5,7 +5,6 @@ import * as CommonApi from '../../../../../api/index';
 import * as core from '../../../../../core';
 import * as serializers from '../../../../index';
 import { UpdateThreadRequestCollaborators } from '../../types/UpdateThreadRequestCollaborators';
-
 export declare const UpdateThreadRequest: core.serialization.Schema<
   serializers.UpdateThreadRequest.Raw,
   CommonApi.UpdateThreadRequest

@@ -8,7 +8,6 @@ import { UpdateThreadResponseCollaboratorsItemUserApiKey } from './UpdateThreadR
 import { UpdateThreadResponseCollaboratorsItemUserEmailNotificationInterval } from './UpdateThreadResponseCollaboratorsItemUserEmailNotificationInterval';
 import { UpdateThreadResponseCollaboratorsItemUserProfile } from './UpdateThreadResponseCollaboratorsItemUserProfile';
 import { UpdateThreadResponseCollaboratorsItemUserProfileTagsItem } from './UpdateThreadResponseCollaboratorsItemUserProfileTagsItem';
-
 export declare const UpdateThreadResponseCollaboratorsItemUser: core.serialization.ObjectSchema<
   serializers.UpdateThreadResponseCollaboratorsItemUser.Raw,
   CommonApi.UpdateThreadResponseCollaboratorsItemUser

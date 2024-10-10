@@ -8,7 +8,6 @@ import { CreateCommentResponseThreadCollaboratorsItemUserApiKey } from './Create
 import { CreateCommentResponseThreadCollaboratorsItemUserEmailNotificationInterval } from './CreateCommentResponseThreadCollaboratorsItemUserEmailNotificationInterval';
 import { CreateCommentResponseThreadCollaboratorsItemUserProfile } from './CreateCommentResponseThreadCollaboratorsItemUserProfile';
 import { CreateCommentResponseThreadCollaboratorsItemUserProfileTagsItem } from './CreateCommentResponseThreadCollaboratorsItemUserProfileTagsItem';
-
 export declare const CreateCommentResponseThreadCollaboratorsItemUser: core.serialization.ObjectSchema<
   serializers.CreateCommentResponseThreadCollaboratorsItemUser.Raw,
   CommonApi.CreateCommentResponseThreadCollaboratorsItemUser

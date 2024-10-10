@@ -16,7 +16,6 @@ import { UpdateCommunityRequestSocialLinksItem } from '../../types/UpdateCommuni
 import { UpdateCommunityRequestTerms } from '../../types/UpdateCommunityRequestTerms';
 import { UpdateCommunityRequestTopicsItem } from '../../types/UpdateCommunityRequestTopicsItem';
 import { UpdateCommunityRequestType } from '../../types/UpdateCommunityRequestType';
-
 export const UpdateCommunityRequest = core.serialization.object({
   id: core.serialization.string(),
   name: core.serialization.string().optional(),

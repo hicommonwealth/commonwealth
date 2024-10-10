@@ -5,7 +5,6 @@ import * as CommonApi from '../../../../api/index';
 import * as core from '../../../../core';
 import * as serializers from '../../../index';
 import { CreateGroupResponseAddressesItemUserProfileBackgroundImage } from './CreateGroupResponseAddressesItemUserProfileBackgroundImage';
-
 export declare const CreateGroupResponseAddressesItemUserProfile: core.serialization.ObjectSchema<
   serializers.CreateGroupResponseAddressesItemUserProfile.Raw,
   CommonApi.CreateGroupResponseAddressesItemUserProfile

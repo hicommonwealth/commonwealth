@@ -6,7 +6,6 @@ import * as core from '../../../../core';
 import * as serializers from '../../../index';
 import { GetCommunitiesResponseResultsItemContestManagersItemTopicsItemContestTopicsItem } from './GetCommunitiesResponseResultsItemContestManagersItemTopicsItemContestTopicsItem';
 import { GetCommunitiesResponseResultsItemContestManagersItemTopicsItemWeightedVoting } from './GetCommunitiesResponseResultsItemContestManagersItemTopicsItemWeightedVoting';
-
 export declare const GetCommunitiesResponseResultsItemContestManagersItemTopicsItem: core.serialization.ObjectSchema<
   serializers.GetCommunitiesResponseResultsItemContestManagersItemTopicsItem.Raw,
   CommonApi.GetCommunitiesResponseResultsItemContestManagersItemTopicsItem

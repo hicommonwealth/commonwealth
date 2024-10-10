@@ -8,7 +8,6 @@ import { GetCommentsResponseResultsItemReactionAddressUserApiKey } from './GetCo
 import { GetCommentsResponseResultsItemReactionAddressUserEmailNotificationInterval } from './GetCommentsResponseResultsItemReactionAddressUserEmailNotificationInterval';
 import { GetCommentsResponseResultsItemReactionAddressUserProfile } from './GetCommentsResponseResultsItemReactionAddressUserProfile';
 import { GetCommentsResponseResultsItemReactionAddressUserProfileTagsItem } from './GetCommentsResponseResultsItemReactionAddressUserProfileTagsItem';
-
 export declare const GetCommentsResponseResultsItemReactionAddressUser: core.serialization.ObjectSchema<
   serializers.GetCommentsResponseResultsItemReactionAddressUser.Raw,
   CommonApi.GetCommentsResponseResultsItemReactionAddressUser

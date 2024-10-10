@@ -6,7 +6,6 @@ import * as core from '../../../../core';
 import * as serializers from '../../../index';
 import { UpdateTopicResponseTopicContestTopicsItem } from './UpdateTopicResponseTopicContestTopicsItem';
 import { UpdateTopicResponseTopicWeightedVoting } from './UpdateTopicResponseTopicWeightedVoting';
-
 export declare const UpdateTopicResponseTopic: core.serialization.ObjectSchema<
   serializers.UpdateTopicResponseTopic.Raw,
   CommonApi.UpdateTopicResponseTopic

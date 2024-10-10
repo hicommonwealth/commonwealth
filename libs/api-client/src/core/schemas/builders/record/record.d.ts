@@ -1,6 +1,5 @@
 import { Schema } from '../../Schema';
 import { RecordSchema } from './types';
-
 export declare function record<
   RawKey extends string | number,
   RawValue,

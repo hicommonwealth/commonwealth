@@ -6,7 +6,6 @@ import * as core from '../../../../core';
 import * as serializers from '../../../index';
 import { CreateThreadResponseTopicContestTopicsItem } from './CreateThreadResponseTopicContestTopicsItem';
 import { CreateThreadResponseTopicWeightedVoting } from './CreateThreadResponseTopicWeightedVoting';
-
 export declare const CreateThreadResponseTopic: core.serialization.ObjectSchema<
   serializers.CreateThreadResponseTopic.Raw,
   CommonApi.CreateThreadResponseTopic

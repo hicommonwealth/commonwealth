@@ -6,7 +6,6 @@ import * as core from '../../../../../core';
 import * as serializers from '../../../../index';
 import { CreateThreadRequestDiscordMeta } from '../../types/CreateThreadRequestDiscordMeta';
 import { CreateThreadRequestKind } from '../../types/CreateThreadRequestKind';
-
 export declare const CreateThreadRequest: core.serialization.Schema<
   serializers.CreateThreadRequest.Raw,
   CommonApi.CreateThreadRequest

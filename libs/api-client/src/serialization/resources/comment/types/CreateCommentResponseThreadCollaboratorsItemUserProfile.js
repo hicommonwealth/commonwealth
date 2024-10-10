@@ -3,7 +3,6 @@
  */
 import * as core from '../../../../core';
 import { CreateCommentResponseThreadCollaboratorsItemUserProfileBackgroundImage } from './CreateCommentResponseThreadCollaboratorsItemUserProfileBackgroundImage';
-
 export const CreateCommentResponseThreadCollaboratorsItemUserProfile =
   core.serialization.object({
     name: core.serialization.string().optional(),

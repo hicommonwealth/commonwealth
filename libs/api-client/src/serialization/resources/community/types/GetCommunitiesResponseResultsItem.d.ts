@@ -17,7 +17,6 @@ import { GetCommunitiesResponseResultsItemSocialLinksItem } from './GetCommuniti
 import { GetCommunitiesResponseResultsItemTerms } from './GetCommunitiesResponseResultsItemTerms';
 import { GetCommunitiesResponseResultsItemTopicsItem } from './GetCommunitiesResponseResultsItemTopicsItem';
 import { GetCommunitiesResponseResultsItemType } from './GetCommunitiesResponseResultsItemType';
-
 export declare const GetCommunitiesResponseResultsItem: core.serialization.ObjectSchema<
   serializers.GetCommunitiesResponseResultsItem.Raw,
   CommonApi.GetCommunitiesResponseResultsItem

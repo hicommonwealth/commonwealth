@@ -17,7 +17,6 @@ import { CreateCommunityResponseCommunitySocialLinksItem } from './CreateCommuni
 import { CreateCommunityResponseCommunityTerms } from './CreateCommunityResponseCommunityTerms';
 import { CreateCommunityResponseCommunityTopicsItem } from './CreateCommunityResponseCommunityTopicsItem';
 import { CreateCommunityResponseCommunityType } from './CreateCommunityResponseCommunityType';
-
 export declare const CreateCommunityResponseCommunity: core.serialization.ObjectSchema<
   serializers.CreateCommunityResponseCommunity.Raw,
   CommonApi.CreateCommunityResponseCommunity

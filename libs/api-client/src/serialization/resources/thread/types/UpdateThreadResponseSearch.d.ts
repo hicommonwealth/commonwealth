@@ -4,7 +4,6 @@
 import * as CommonApi from '../../../../api/index';
 import * as core from '../../../../core';
 import * as serializers from '../../../index';
-
 export declare const UpdateThreadResponseSearch: core.serialization.Schema<
   serializers.UpdateThreadResponseSearch.Raw,
   CommonApi.UpdateThreadResponseSearch

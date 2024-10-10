@@ -5,7 +5,6 @@ import * as CommonApi from '../../../../api/index';
 import * as core from '../../../../core';
 import * as serializers from '../../../index';
 import { GetMembersResponseResultsItem } from './GetMembersResponseResultsItem';
-
 export declare const GetMembersResponse: core.serialization.ObjectSchema<
   serializers.GetMembersResponse.Raw,
   CommonApi.GetMembersResponse

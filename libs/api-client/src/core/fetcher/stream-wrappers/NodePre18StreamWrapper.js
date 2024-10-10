@@ -8,7 +8,6 @@ var __awaiter =
             resolve(value);
           });
     }
-
     return new (P || (P = Promise))(function (resolve, reject) {
       function fulfilled(value) {
         try {
@@ -17,7 +16,6 @@ var __awaiter =
           reject(e);
         }
       }
-
       function rejected(value) {
         try {
           step(generator['throw'](value));
@@ -25,13 +23,11 @@ var __awaiter =
           reject(e);
         }
       }
-
       function step(result) {
         result.done
           ? resolve(result.value)
           : adopt(result.value).then(fulfilled, rejected);
       }
-
       step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
   };
@@ -54,7 +50,6 @@ var __asyncValues =
           return this;
         }),
         i);
-
     function verb(n) {
       i[n] =
         o[n] &&
@@ -64,36 +59,29 @@ var __asyncValues =
           });
         };
     }
-
     function settle(resolve, reject, d, v) {
       Promise.resolve(v).then(function (v) {
         resolve({ value: v, done: d });
       }, reject);
     }
   };
-
 export class NodePre18StreamWrapper {
   constructor(readableStream) {
     this.readableStream = readableStream;
   }
-
   on(event, callback) {
     this.readableStream.on(event, callback);
   }
-
   off(event, callback) {
     this.readableStream.off(event, callback);
   }
-
   pipe(dest) {
     this.readableStream.pipe(dest);
     return dest;
   }
-
   pipeTo(dest) {
     return this.pipe(dest);
   }
-
   unpipe(dest) {
     if (dest) {
       this.readableStream.unpipe(dest);
@@ -101,23 +89,18 @@ export class NodePre18StreamWrapper {
       this.readableStream.unpipe();
     }
   }
-
   destroy(error) {
     this.readableStream.destroy(error);
   }
-
   pause() {
     this.readableStream.pause();
   }
-
   resume() {
     this.readableStream.resume();
   }
-
   get isPaused() {
     return this.readableStream.isPaused();
   }
-
   read() {
     return __awaiter(this, void 0, void 0, function* () {
       return new Promise((resolve, reject) => {
@@ -134,12 +117,10 @@ export class NodePre18StreamWrapper {
       });
     });
   }
-
   setEncoding(encoding) {
     this.readableStream.setEncoding(encoding);
     this.encoding = encoding;
   }
-
   text() {
     var e_1, _a;
     return __awaiter(this, void 0, void 0, function* () {
@@ -168,14 +149,12 @@ export class NodePre18StreamWrapper {
       return decoder.decode(Buffer.concat(chunks));
     });
   }
-
   json() {
     return __awaiter(this, void 0, void 0, function* () {
       const text = yield this.text();
       return JSON.parse(text);
     });
   }
-
   [Symbol.asyncIterator]() {
     const readableStream = this.readableStream;
     const iterator = readableStream[Symbol.asyncIterator]();

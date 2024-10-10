@@ -6,7 +6,6 @@ import * as core from '../../../../core';
 import * as serializers from '../../../index';
 import { GetCommunityResponseAddressesGroupsItemRequirementsItemAllow } from './GetCommunityResponseAddressesGroupsItemRequirementsItemAllow';
 import { GetCommunityResponseAddressesGroupsItemRequirementsItemThreshold } from './GetCommunityResponseAddressesGroupsItemRequirementsItemThreshold';
-
 export declare const GetCommunityResponseAddressesGroupsItemRequirementsItem: core.serialization.Schema<
   serializers.GetCommunityResponseAddressesGroupsItemRequirementsItem.Raw,
   CommonApi.GetCommunityResponseAddressesGroupsItemRequirementsItem
@@ -15,12 +14,10 @@ export declare namespace GetCommunityResponseAddressesGroupsItemRequirementsItem
   type Raw =
     | GetCommunityResponseAddressesGroupsItemRequirementsItem.Threshold
     | GetCommunityResponseAddressesGroupsItemRequirementsItem.Allow;
-
   interface Threshold
     extends GetCommunityResponseAddressesGroupsItemRequirementsItemThreshold.Raw {
     rule: 'threshold';
   }
-
   interface Allow
     extends GetCommunityResponseAddressesGroupsItemRequirementsItemAllow.Raw {
     rule: 'allow';

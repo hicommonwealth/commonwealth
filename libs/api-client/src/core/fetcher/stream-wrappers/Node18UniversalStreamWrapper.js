@@ -8,7 +8,6 @@ var __awaiter =
             resolve(value);
           });
     }
-
     return new (P || (P = Promise))(function (resolve, reject) {
       function fulfilled(value) {
         try {
@@ -17,7 +16,6 @@ var __awaiter =
           reject(e);
         }
       }
-
       function rejected(value) {
         try {
           step(generator['throw'](value));
@@ -25,17 +23,14 @@ var __awaiter =
           reject(e);
         }
       }
-
       function step(result) {
         result.done
           ? resolve(result.value)
           : adopt(result.value).then(fulfilled, rejected);
       }
-
       step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
   };
-
 export class Node18UniversalStreamWrapper {
   constructor(readableStream) {
     this.readableStream = readableStream;
@@ -53,14 +48,12 @@ export class Node18UniversalStreamWrapper {
     this.resumeCallback = null;
     this.encoding = null;
   }
-
   on(event, callback) {
     var _a;
     (_a = this.events[event]) === null || _a === void 0
       ? void 0
       : _a.push(callback);
   }
-
   off(event, callback) {
     var _a;
     this.events[event] =
@@ -68,7 +61,6 @@ export class Node18UniversalStreamWrapper {
         ? void 0
         : _a.filter((cb) => cb !== callback);
   }
-
   pipe(dest) {
     this.on('data', (chunk) =>
       __awaiter(this, void 0, void 0, function* () {
@@ -109,11 +101,9 @@ export class Node18UniversalStreamWrapper {
     this._startReading();
     return dest;
   }
-
   pipeTo(dest) {
     return this.pipe(dest);
   }
-
   unpipe(dest) {
     this.off('data', (chunk) =>
       __awaiter(this, void 0, void 0, function* () {
@@ -152,7 +142,6 @@ export class Node18UniversalStreamWrapper {
       }),
     );
   }
-
   destroy(error) {
     this.reader
       .cancel(error)
@@ -163,12 +152,10 @@ export class Node18UniversalStreamWrapper {
         this._emit('error', err);
       });
   }
-
   pause() {
     this.paused = true;
     this._emit('pause');
   }
-
   resume() {
     if (this.paused) {
       this.paused = false;
@@ -179,11 +166,9 @@ export class Node18UniversalStreamWrapper {
       }
     }
   }
-
   get isPaused() {
     return this.paused;
   }
-
   read() {
     return __awaiter(this, void 0, void 0, function* () {
       if (this.paused) {
@@ -198,11 +183,9 @@ export class Node18UniversalStreamWrapper {
       return value;
     });
   }
-
   setEncoding(encoding) {
     this.encoding = encoding;
   }
-
   text() {
     return __awaiter(this, void 0, void 0, function* () {
       const chunks = [];
@@ -215,26 +198,21 @@ export class Node18UniversalStreamWrapper {
       return decoder.decode(yield new Blob(chunks).arrayBuffer());
     });
   }
-
   json() {
     return __awaiter(this, void 0, void 0, function* () {
       const text = yield this.text();
       return JSON.parse(text);
     });
   }
-
   _write(chunk) {
     this._emit('data', chunk);
   }
-
   _end() {
     this._emit('end');
   }
-
   _error(error) {
     this._emit('error', error);
   }
-
   _emit(event, data) {
     if (this.events[event]) {
       for (const callback of this.events[event] || []) {
@@ -242,7 +220,6 @@ export class Node18UniversalStreamWrapper {
       }
     }
   }
-
   _startReading() {
     return __awaiter(this, void 0, void 0, function* () {
       try {
@@ -268,7 +245,6 @@ export class Node18UniversalStreamWrapper {
       }
     });
   }
-
   [Symbol.asyncIterator]() {
     return {
       next: () =>

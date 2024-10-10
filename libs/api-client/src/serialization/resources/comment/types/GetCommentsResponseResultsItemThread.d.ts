@@ -12,7 +12,6 @@ import { GetCommentsResponseResultsItemThreadReactionsItem } from './GetComments
 import { GetCommentsResponseResultsItemThreadSearch } from './GetCommentsResponseResultsItemThreadSearch';
 import { GetCommentsResponseResultsItemThreadThreadVersionHistoriesItem } from './GetCommentsResponseResultsItemThreadThreadVersionHistoriesItem';
 import { GetCommentsResponseResultsItemThreadTopic } from './GetCommentsResponseResultsItemThreadTopic';
-
 export declare const GetCommentsResponseResultsItemThread: core.serialization.ObjectSchema<
   serializers.GetCommentsResponseResultsItemThread.Raw,
   CommonApi.GetCommentsResponseResultsItemThread
@@ -23,14 +22,13 @@ export declare namespace GetCommentsResponseResultsItemThread {
     address_id: number;
     title: string;
     kind: string;
-    stage: string;
+    stage?: string | null;
     body?: string | null;
-    plaintext?: string | null;
     url?: string | null;
     topic_id?: number | null;
     pinned?: boolean | null;
     community_id: string;
-    view_count: number;
+    view_count?: number | null;
     links?: GetCommentsResponseResultsItemThreadLinksItem.Raw[] | null;
     content_url?: string | null;
     read_only?: boolean | null;
@@ -46,9 +44,9 @@ export declare namespace GetCommentsResponseResultsItemThread {
     archived_at?: string | null;
     locked_at?: string | null;
     discord_meta?: GetCommentsResponseResultsItemThreadDiscordMeta.Raw | null;
-    reaction_count: number;
-    reaction_weights_sum: number;
-    comment_count: number;
+    reaction_count?: number | null;
+    reaction_weights_sum?: number | null;
+    comment_count?: number | null;
     activity_rank_date?: string | null;
     created_by?: string | null;
     profile_name?: string | null;

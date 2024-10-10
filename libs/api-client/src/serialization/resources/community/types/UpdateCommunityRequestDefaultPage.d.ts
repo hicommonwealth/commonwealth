@@ -4,7 +4,6 @@
 import * as CommonApi from '../../../../api/index';
 import * as core from '../../../../core';
 import * as serializers from '../../../index';
-
 export declare const UpdateCommunityRequestDefaultPage: core.serialization.Schema<
   serializers.UpdateCommunityRequestDefaultPage.Raw,
   CommonApi.UpdateCommunityRequestDefaultPage

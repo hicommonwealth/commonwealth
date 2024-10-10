@@ -4,7 +4,6 @@
 import * as CommonApi from '../../../../../api/index';
 import * as core from '../../../../../core';
 import * as serializers from '../../../../index';
-
 export declare const UpdateTopicRequest: core.serialization.Schema<
   serializers.UpdateTopicRequest.Raw,
   CommonApi.UpdateTopicRequest

@@ -7,7 +7,6 @@ import * as serializers from '../../../index';
 import { GetCommunitiesResponseResultsItemAddressesItemRole } from './GetCommunitiesResponseResultsItemAddressesItemRole';
 import { GetCommunitiesResponseResultsItemAddressesItemUser } from './GetCommunitiesResponseResultsItemAddressesItemUser';
 import { GetCommunitiesResponseResultsItemAddressesItemWalletId } from './GetCommunitiesResponseResultsItemAddressesItemWalletId';
-
 export declare const GetCommunitiesResponseResultsItemAddressesItem: core.serialization.ObjectSchema<
   serializers.GetCommunitiesResponseResultsItemAddressesItem.Raw,
   CommonApi.GetCommunitiesResponseResultsItemAddressesItem

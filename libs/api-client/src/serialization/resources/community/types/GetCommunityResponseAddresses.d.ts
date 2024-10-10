@@ -18,7 +18,6 @@ import { GetCommunityResponseAddressesSocialLinksItem } from './GetCommunityResp
 import { GetCommunityResponseAddressesTerms } from './GetCommunityResponseAddressesTerms';
 import { GetCommunityResponseAddressesTopicsItem } from './GetCommunityResponseAddressesTopicsItem';
 import { GetCommunityResponseAddressesType } from './GetCommunityResponseAddressesType';
-
 export declare const GetCommunityResponseAddresses: core.serialization.ObjectSchema<
   serializers.GetCommunityResponseAddresses.Raw,
   CommonApi.GetCommunityResponseAddresses

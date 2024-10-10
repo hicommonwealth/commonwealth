@@ -4,7 +4,6 @@
 import * as core from '../../../../core';
 import { UpdateCommunityRequestGroupsItemMetadata } from './UpdateCommunityRequestGroupsItemMetadata';
 import { UpdateCommunityRequestGroupsItemRequirementsItem } from './UpdateCommunityRequestGroupsItemRequirementsItem';
-
 export const UpdateCommunityRequestGroupsItem = core.serialization.object({
   id: core.serialization.number().optional(),
   communityId: core.serialization.property(

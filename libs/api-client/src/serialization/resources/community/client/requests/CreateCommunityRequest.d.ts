@@ -6,7 +6,6 @@ import * as core from '../../../../../core';
 import * as serializers from '../../../../index';
 import { CreateCommunityRequestBase } from '../../types/CreateCommunityRequestBase';
 import { CreateCommunityRequestType } from '../../types/CreateCommunityRequestType';
-
 export declare const CreateCommunityRequest: core.serialization.Schema<
   serializers.CreateCommunityRequest.Raw,
   CommonApi.CreateCommunityRequest

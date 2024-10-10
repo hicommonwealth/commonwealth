@@ -17,7 +17,6 @@ import { UpdateCommunityResponseSocialLinksItem } from './UpdateCommunityRespons
 import { UpdateCommunityResponseTerms } from './UpdateCommunityResponseTerms';
 import { UpdateCommunityResponseTopicsItem } from './UpdateCommunityResponseTopicsItem';
 import { UpdateCommunityResponseType } from './UpdateCommunityResponseType';
-
 export declare const UpdateCommunityResponse: core.serialization.ObjectSchema<
   serializers.UpdateCommunityResponse.Raw,
   CommonApi.UpdateCommunityResponse

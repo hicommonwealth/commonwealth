@@ -4,7 +4,6 @@
 export declare class CommonApiError extends Error {
   readonly statusCode?: number;
   readonly body?: unknown;
-
   constructor({
     message,
     statusCode,

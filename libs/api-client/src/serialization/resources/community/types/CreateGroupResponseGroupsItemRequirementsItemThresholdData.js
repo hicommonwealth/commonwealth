@@ -3,7 +3,6 @@
  */
 import * as core from '../../../../core';
 import { CreateGroupResponseGroupsItemRequirementsItemThresholdDataSource } from './CreateGroupResponseGroupsItemRequirementsItemThresholdDataSource';
-
 export const CreateGroupResponseGroupsItemRequirementsItemThresholdData =
   core.serialization.object({
     threshold: core.serialization.string(),

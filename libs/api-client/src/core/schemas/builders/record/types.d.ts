@@ -1,6 +1,5 @@
 import { BaseSchema } from '../../Schema';
 import { SchemaUtils } from '../schema-utils';
-
 export declare type RecordSchema<
   RawKey extends string | number,
   RawValue,

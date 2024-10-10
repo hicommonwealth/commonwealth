@@ -8,7 +8,6 @@ import { UpdateCommunityRequestChainNodeBalanceType } from './UpdateCommunityReq
 import { UpdateCommunityRequestChainNodeContractsItem } from './UpdateCommunityRequestChainNodeContractsItem';
 import { UpdateCommunityRequestChainNodeCosmosGovVersion } from './UpdateCommunityRequestChainNodeCosmosGovVersion';
 import { UpdateCommunityRequestChainNodeHealth } from './UpdateCommunityRequestChainNodeHealth';
-
 export declare const UpdateCommunityRequestChainNode: core.serialization.ObjectSchema<
   serializers.UpdateCommunityRequestChainNode.Raw,
   CommonApi.UpdateCommunityRequestChainNode

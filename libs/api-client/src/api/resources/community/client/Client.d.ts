@@ -4,7 +4,6 @@
 import * as core from '../../../../core';
 import * as environments from '../../../../environments';
 import * as CommonApi from '../../../index';
-
 export declare namespace Community {
   interface Options {
     environment?: core.Supplier<environments.CommonApiEnvironment | string>;
@@ -12,7 +11,6 @@ export declare namespace Community {
     /** Override the address header */
     address?: core.Supplier<string | undefined>;
   }
-
   interface RequestOptions {
     /** The maximum time to wait for a response in seconds. */
     timeoutInSeconds?: number;
@@ -24,12 +22,9 @@ export declare namespace Community {
     address?: string | undefined;
   }
 }
-
 export declare class Community {
   protected readonly _options: Community.Options;
-
   constructor(_options: Community.Options);
-
   /**
    * @param {CommonApi.GetCommunitiesRequest} request
    * @param {Community.RequestOptions} requestOptions - Request-specific configuration.
@@ -41,7 +36,6 @@ export declare class Community {
     request?: CommonApi.GetCommunitiesRequest,
     requestOptions?: Community.RequestOptions,
   ): Promise<CommonApi.GetCommunitiesResponse>;
-
   /**
    * @param {CommonApi.GetCommunityRequest} request
    * @param {Community.RequestOptions} requestOptions - Request-specific configuration.
@@ -55,7 +49,6 @@ export declare class Community {
     request: CommonApi.GetCommunityRequest,
     requestOptions?: Community.RequestOptions,
   ): Promise<CommonApi.GetCommunityResponse>;
-
   /**
    * @param {CommonApi.GetMembersRequest} request
    * @param {Community.RequestOptions} requestOptions - Request-specific configuration.
@@ -69,7 +62,6 @@ export declare class Community {
     request: CommonApi.GetMembersRequest,
     requestOptions?: Community.RequestOptions,
   ): Promise<CommonApi.GetMembersResponse>;
-
   /**
    * @param {CommonApi.CreateCommunityRequest} request
    * @param {Community.RequestOptions} requestOptions - Request-specific configuration.
@@ -87,7 +79,6 @@ export declare class Community {
     request: CommonApi.CreateCommunityRequest,
     requestOptions?: Community.RequestOptions,
   ): Promise<CommonApi.CreateCommunityResponse>;
-
   /**
    * @param {CommonApi.UpdateCommunityRequest} request
    * @param {Community.RequestOptions} requestOptions - Request-specific configuration.
@@ -101,7 +92,6 @@ export declare class Community {
     request: CommonApi.UpdateCommunityRequest,
     requestOptions?: Community.RequestOptions,
   ): Promise<CommonApi.UpdateCommunityResponse>;
-
   /**
    * @param {CommonApi.CreateTopicRequest} request
    * @param {Community.RequestOptions} requestOptions - Request-specific configuration.
@@ -115,7 +105,6 @@ export declare class Community {
     request: CommonApi.CreateTopicRequest,
     requestOptions?: Community.RequestOptions,
   ): Promise<CommonApi.CreateTopicResponse>;
-
   /**
    * @param {CommonApi.UpdateTopicRequest} request
    * @param {Community.RequestOptions} requestOptions - Request-specific configuration.
@@ -130,7 +119,6 @@ export declare class Community {
     request: CommonApi.UpdateTopicRequest,
     requestOptions?: Community.RequestOptions,
   ): Promise<CommonApi.UpdateTopicResponse>;
-
   /**
    * @param {CommonApi.DeleteTopicRequest} request
    * @param {Community.RequestOptions} requestOptions - Request-specific configuration.
@@ -145,7 +133,6 @@ export declare class Community {
     request: CommonApi.DeleteTopicRequest,
     requestOptions?: Community.RequestOptions,
   ): Promise<CommonApi.DeleteTopicResponse>;
-
   /**
    * @param {CommonApi.CreateGroupRequest} request
    * @param {Community.RequestOptions} requestOptions - Request-specific configuration.
@@ -163,7 +150,6 @@ export declare class Community {
     request: CommonApi.CreateGroupRequest,
     requestOptions?: Community.RequestOptions,
   ): Promise<CommonApi.CreateGroupResponse>;
-
   /**
    * @param {CommonApi.UpdateGroupRequest} request
    * @param {Community.RequestOptions} requestOptions - Request-specific configuration.
@@ -178,7 +164,6 @@ export declare class Community {
     request: CommonApi.UpdateGroupRequest,
     requestOptions?: Community.RequestOptions,
   ): Promise<CommonApi.UpdateGroupResponse>;
-
   /**
    * @param {CommonApi.DeleteGroupRequest} request
    * @param {Community.RequestOptions} requestOptions - Request-specific configuration.
@@ -193,7 +178,6 @@ export declare class Community {
     request: CommonApi.DeleteGroupRequest,
     requestOptions?: Community.RequestOptions,
   ): Promise<CommonApi.DeleteGroupResponse>;
-
   /**
    * @param {CommonApi.JoinCommunityRequest} request
    * @param {Community.RequestOptions} requestOptions - Request-specific configuration.
@@ -207,7 +191,6 @@ export declare class Community {
     request: CommonApi.JoinCommunityRequest,
     requestOptions?: Community.RequestOptions,
   ): Promise<CommonApi.JoinCommunityResponse>;
-
   protected _getCustomAuthorizationHeaders(): Promise<{
     'x-api-key': string;
   }>;

@@ -7,7 +7,6 @@ import * as serializers from '../../../index';
 import { UpdateCommentResponseThreadCollaboratorsItemRole } from './UpdateCommentResponseThreadCollaboratorsItemRole';
 import { UpdateCommentResponseThreadCollaboratorsItemUser } from './UpdateCommentResponseThreadCollaboratorsItemUser';
 import { UpdateCommentResponseThreadCollaboratorsItemWalletId } from './UpdateCommentResponseThreadCollaboratorsItemWalletId';
-
 export declare const UpdateCommentResponseThreadCollaboratorsItem: core.serialization.ObjectSchema<
   serializers.UpdateCommentResponseThreadCollaboratorsItem.Raw,
   CommonApi.UpdateCommentResponseThreadCollaboratorsItem

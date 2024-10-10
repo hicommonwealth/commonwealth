@@ -8,7 +8,6 @@ import { UpdateCommentResponseDiscordMeta } from './UpdateCommentResponseDiscord
 import { UpdateCommentResponseReaction } from './UpdateCommentResponseReaction';
 import { UpdateCommentResponseSearch } from './UpdateCommentResponseSearch';
 import { UpdateCommentResponseThread } from './UpdateCommentResponseThread';
-
 export const UpdateCommentResponse = core.serialization.object({
   id: core.serialization.number().optional(),
   threadId: core.serialization.property(
@@ -20,7 +19,6 @@ export const UpdateCommentResponse = core.serialization.object({
     core.serialization.number(),
   ),
   text: core.serialization.string(),
-  plaintext: core.serialization.string(),
   parentId: core.serialization.property(
     'parent_id',
     core.serialization.string().optional(),

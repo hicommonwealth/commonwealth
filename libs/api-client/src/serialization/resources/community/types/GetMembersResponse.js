@@ -3,7 +3,6 @@
  */
 import * as core from '../../../../core';
 import { GetMembersResponseResultsItem } from './GetMembersResponseResultsItem';
-
 export const GetMembersResponse = core.serialization.object({
   limit: core.serialization.number(),
   page: core.serialization.number(),
