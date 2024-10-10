@@ -13,7 +13,7 @@ const useCreateCommunity = () => {
     { type: null, chainBase: null },
   );
 
-  const weightedVotingEnabled = useFlag('farcasterContest');
+  const weightedTopicsEnabled = useFlag('weightedTopics');
 
   // @ts-expect-error StrictNullChecks
   const [selectedAddress, setSelectedAddress] = useState<AddressInfo>(null);
@@ -49,7 +49,7 @@ const useCreateCommunity = () => {
   );
 
   const showCommunityStakeStep =
-    !weightedVotingEnabled &&
+    !weightedTopicsEnabled &&
     isValidStepToShowCommunityStakeFormStep &&
     isSupportedChainSelected;
 

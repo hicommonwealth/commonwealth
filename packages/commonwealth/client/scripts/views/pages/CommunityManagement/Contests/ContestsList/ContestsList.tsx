@@ -1,6 +1,7 @@
 import moment from 'moment';
 import React, { useState } from 'react';
 
+import { useFlag } from 'hooks/useFlag';
 import { Skeleton } from 'views/components/Skeleton';
 
 import EmptyContestsList from '../EmptyContestsList';
@@ -42,21 +43,25 @@ interface ContestsListProps {
   contests: Contest[];
   isAdmin: boolean;
   isLoading: boolean;
+  hasWeightedTopic: boolean;
   stakeEnabled: boolean;
   isContestAvailable: boolean;
   feeManagerBalance?: string;
   onSetContestSelectionView?: () => void;
 }
+
 const ContestsList = ({
   contests,
   isAdmin,
   isLoading,
+  hasWeightedTopic,
   stakeEnabled,
   isContestAvailable,
   feeManagerBalance,
   onSetContestSelectionView,
 }: ContestsListProps) => {
   const [fundDrawerContest, setFundDrawerContest] = useState<Contest>();
+  const weightedTopicsEnabled = useFlag('weightedTopics');
 
   if (isLoading) {
     return (
@@ -71,8 +76,11 @@ const ContestsList = ({
   return (
     <>
       <div className="ContestsList">
-        {isAdmin && (!stakeEnabled || !isContestAvailable) ? (
+        {isAdmin &&
+        ((weightedTopicsEnabled ? !hasWeightedTopic : !stakeEnabled) ||
+          !isContestAvailable) ? (
           <EmptyContestsList
+            hasWeightedTopic={hasWeightedTopic}
             isStakeEnabled={stakeEnabled}
             isContestAvailable={isContestAvailable}
             onSetContestSelectionView={onSetContestSelectionView}

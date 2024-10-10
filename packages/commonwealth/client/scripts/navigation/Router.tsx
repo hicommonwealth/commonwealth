@@ -14,7 +14,7 @@ import GeneralRoutes from './GeneralRoutes';
 
 export type RouteFeatureFlags = {
   contestEnabled: boolean;
-  farcasterContestEnabled: boolean;
+  weightedTopicsEnabled: boolean;
   tokenizedCommunityEnabled: boolean;
 };
 
@@ -22,10 +22,7 @@ const Router = () => {
   const client = OpenFeature.getClient();
   const contestEnabled = client.getBooleanValue('contest', false);
 
-  const farcasterContestEnabled = client.getBooleanValue(
-    'farcasterContest',
-    false,
-  );
+  const weightedTopicsEnabled = client.getBooleanValue('weightedTopics', false);
 
   const tokenizedCommunityEnabled = client.getBooleanValue(
     'tokenizedCommunity',
@@ -34,7 +31,7 @@ const Router = () => {
 
   const flags = {
     contestEnabled,
-    farcasterContestEnabled,
+    weightedTopicsEnabled,
     tokenizedCommunityEnabled,
   };
 
