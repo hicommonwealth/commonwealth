@@ -15,7 +15,11 @@ type CustomCWSelectListProps = {
   label?: string;
   hookToForm?: boolean;
   customError?: string;
-  saveToClipboard?: (id: string, successNotification?: boolean) => void;
+  // eslint-disable-next-line prettier/prettier
+  saveToClipboard?: (
+    id: string,
+    successNotification?: boolean,
+  ) => Promise<void>;
   showCopyIcon?: boolean;
 };
 

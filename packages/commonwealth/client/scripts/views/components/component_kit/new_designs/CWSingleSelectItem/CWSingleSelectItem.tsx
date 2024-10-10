@@ -6,7 +6,11 @@ import { CWIcon } from '../../cw_icons/cw_icon';
 import './CWSingleSelectItem.scss';
 type CustomSingleValueProps = {
   showCopyIcon?: boolean;
-  saveToClipboard?: (id: string, successNotification?: boolean) => void;
+  // eslint-disable-next-line prettier/prettier
+  saveToClipboard?: (
+    id: string,
+    successNotification?: boolean,
+  ) => Promise<void>;
 };
 
 type OptionProps = {
@@ -18,10 +22,10 @@ export const CWSingleSelectItem = (
   props: SingleValueProps<OptionProps> & CustomSingleValueProps,
 ) => {
   const { data, showCopyIcon = false, saveToClipboard } = props;
-  const handleClickToCopy = (event: React.MouseEvent) => {
+  const handleClickToCopy = async (event: React.MouseEvent) => {
     event.stopPropagation();
     if (saveToClipboard) {
-      saveToClipboard(data.value, true);
+      await saveToClipboard(data.value, true);
     }
   };
 
