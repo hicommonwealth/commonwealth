@@ -162,7 +162,7 @@ describe('User Dashboard API', () => {
   });
 
   describe('/GetUserActivity', () => {
-    const apiUrl = '/api/internal/feed.GetUserActivity';
+    const apiUrl = '/api/internal/trpc/feed.GetUserActivity';
 
     test('should fail without JWT', async () => {
       const res = await chai.request

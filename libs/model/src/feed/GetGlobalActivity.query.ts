@@ -7,8 +7,7 @@ export function GetGlobalActivity(): Query<typeof schemas.ActivityFeed> {
     ...schemas.ActivityFeed,
     auth: [],
     secure: false,
-    body: async () => {
-      return await GlobalActivityCache.getInstance().getGlobalActivity();
-    },
+    body: async () =>
+      await GlobalActivityCache.getInstance().getGlobalActivity(),
   };
 }
