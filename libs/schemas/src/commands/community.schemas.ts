@@ -12,6 +12,7 @@ import { z } from 'zod';
 import {
   Community,
   Group,
+  GroupTopicPermissionEnum,
   Requirement,
   StakeTransaction,
   Topic,
@@ -228,7 +229,14 @@ export const CreateGroup = {
     community_id: z.string(),
     metadata: GroupMetadata,
     requirements: z.array(Requirement).optional(),
-    topics: z.array(PG_INT).optional(),
+    topics: z
+      .array(
+        z.object({
+          id: PG_INT,
+          permission: z.nativeEnum(GroupTopicPermissionEnum),
+        }),
+      )
+      .optional(),
   }),
   output: Community.extend({ groups: z.array(Group).optional() }).partial(),
 };

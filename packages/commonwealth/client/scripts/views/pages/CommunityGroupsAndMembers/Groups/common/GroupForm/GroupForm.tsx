@@ -25,22 +25,25 @@ import {
 import Allowlist from './Allowlist';
 import './GroupForm.scss';
 import RequirementSubForm from './RequirementSubForm';
+import TopicPermissionsSubForm from './TopicPermissionsSubForm';
+import {
+  REQUIREMENTS_TO_FULFILL,
+  REVERSED_TOPIC_PERMISSIONS,
+  TOPIC_PERMISSIONS,
+} from './constants';
 import {
   FormSubmitValues,
   GroupFormProps,
   RequirementSubFormsState,
   RequirementSubType,
+  TopicPermissions,
+  TopicPermissionsSubFormsState,
 } from './index.types';
 import {
   VALIDATION_MESSAGES,
   groupValidationSchema,
   requirementSubFormValidationSchema,
 } from './validations';
-
-const REQUIREMENTS_TO_FULFILL = {
-  ALL_REQUIREMENTS: 'ALL',
-  N_REQUIREMENTS: 'N',
-};
 
 type CWRequirementsRadioButtonProps = {
   maxRequirements: number;
@@ -169,6 +172,9 @@ const GroupForm = ({
     useState('1');
   const [requirementSubForms, setRequirementSubForms] = useState<
     RequirementSubFormsState[]
+  >([]);
+  const [topicPermissionsSubForms, setTopicPermissionsSubForms] = useState<
+    TopicPermissionsSubFormsState[]
   >([]);
 
   useEffect(() => {
@@ -371,11 +377,40 @@ const GroupForm = ({
 
     const formValues = {
       ...values,
+      topics: topicPermissionsSubForms.map((t) => ({
+        id: t.topic.id,
+        permission: REVERSED_TOPIC_PERMISSIONS[t.permission],
+      })),
       requirementsToFulfill,
       requirements: requirementSubForms.map((x) => x.values),
     };
 
     await onSubmit(formValues);
+  };
+
+  const handleWatchForm = (values: FormSubmitValues) => {
+    if (values?.topics?.length > 0) {
+      setTopicPermissionsSubForms(
+        values.topics.map((topic) => ({
+          topic: {
+            id: parseInt(`${topic.value}`),
+            name: topic.label,
+          },
+          permission: TOPIC_PERMISSIONS.UPVOTE_AND_COMMENT_AND_POST,
+        })),
+      );
+    } else {
+      setTopicPermissionsSubForms([]);
+    }
+  };
+
+  const updateTopicPermissionByIndex = (
+    index: number,
+    newPermission: TopicPermissions,
+  ) => {
+    const updatedTopicPermissionsSubForms = [...topicPermissionsSubForms];
+    updatedTopicPermissionsSubForms[index].permission = newPermission;
+    setTopicPermissionsSubForms([...updatedTopicPermissionsSubForms]);
   };
 
   // + 1 for allowlists
@@ -394,11 +429,16 @@ const GroupForm = ({
               ? REQUIREMENTS_TO_FULFILL.ALL_REQUIREMENTS
               : REQUIREMENTS_TO_FULFILL.N_REQUIREMENTS
             : '',
-          topics: initialValues.topics || '',
+          topics:
+            initialValues?.topics?.map((t) => ({
+              label: t.label,
+              value: t.value,
+            })) || '',
         }}
         validationSchema={groupValidationSchema}
         onSubmit={handleSubmit}
         onErrors={validateSubForms}
+        onWatch={handleWatchForm}
       >
         {({ formState }) => (
           <>
@@ -567,6 +607,46 @@ const GroupForm = ({
                   }))}
                 />
               </section>
+
+              {/* Sub-section: Gated topic permissions */}
+              {topicPermissionsSubForms?.length > 0 && (
+                <section className="form-section">
+                  <div className="header-row">
+                    <CWText
+                      type="h4"
+                      fontWeight="semiBold"
+                      className="header-text"
+                    >
+                      Topic Permissions
+                    </CWText>
+                    <CWText type="b2">
+                      Select which topics this group can create threads and
+                      within.
+                    </CWText>
+                  </div>
+
+                  <CWText type="b2" className="topic-permission-header">
+                    Topic
+                  </CWText>
+
+                  {topicPermissionsSubForms.map((topicPermission, index) => (
+                    <>
+                      <CWDivider className="divider-spacing" />
+                      <TopicPermissionsSubForm
+                        key={topicPermission.topic.id}
+                        topic={topicPermission.topic}
+                        defaultPermission={topicPermission.permission}
+                        onPermissionChange={(newPermission) =>
+                          updateTopicPermissionByIndex(index, newPermission)
+                        }
+                      />
+                      {index === topicPermissionsSubForms.length - 1 && (
+                        <CWDivider className="divider-spacing" />
+                      )}
+                    </>
+                  ))}
+                </section>
+              )}
             </section>
 
             <Allowlist

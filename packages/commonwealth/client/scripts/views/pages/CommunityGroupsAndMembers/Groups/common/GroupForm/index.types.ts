@@ -1,3 +1,6 @@
+import { GroupTopicPermissionEnum } from '@hicommonwealth/schemas';
+import { TOPIC_PERMISSIONS } from './constants';
+
 export type RequirementSubFormsState = {
   defaultValues?: RequirementSubTypeWithLabel;
   values: RequirementSubType;
@@ -11,6 +14,20 @@ export type RequirementSubType = {
   requirementCondition?: string;
   requirementAmount?: string;
   requirementTokenId?: string;
+};
+
+export type TopicPermissions =
+  (typeof TOPIC_PERMISSIONS)[keyof typeof TOPIC_PERMISSIONS];
+
+export type TopicPermissionsSubFormsState = {
+  topic: TopicPermissionsSubFormType['topic'];
+  permission: TopicPermissions;
+};
+
+export type TopicPermissionsSubFormType = {
+  topic: { id: number; name: string };
+  defaultPermission?: TopicPermissions;
+  onPermissionChange: (permission: string) => void;
 };
 
 export type LabelType = {
@@ -35,12 +52,17 @@ export type RequirementSubFormType = {
   onChange: (values: RequirementSubType) => any;
 };
 
+export type GroupFormTopicSubmitValues = {
+  id: number;
+  permission: GroupTopicPermissionEnum;
+};
+
 export type GroupResponseValuesType = {
   groupName: string;
   groupDescription?: string;
   requirementsToFulfill: 'ALL' | number;
   requirements?: RequirementSubType[];
-  topics: LabelType[];
+  topics: GroupFormTopicSubmitValues[];
   allowlist?: number[];
 };
 
@@ -49,7 +71,7 @@ export type GroupInitialValuesTypeWithLabel = {
   groupDescription?: string;
   requirements?: RequirementSubTypeWithLabel[];
   requirementsToFulfill?: 'ALL' | number;
-  topics: LabelType[];
+  topics: (LabelType & { permission: GroupTopicPermissionEnum })[];
 };
 
 export type FormSubmitValues = {
