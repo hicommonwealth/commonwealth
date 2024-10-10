@@ -2,6 +2,7 @@ import { logger } from '@hicommonwealth/core';
 import { TRPCError } from '@trpc/server';
 import { createExpressMiddleware } from '@trpc/server/adapters/express';
 import { Request, Response, Router } from 'express';
+import { OpenAPIV3 } from 'openapi-types';
 import swaggerUi from 'swagger-ui-express';
 import {
   createOpenApiExpressMiddleware,
@@ -63,7 +64,7 @@ export function toOpenApiDocument(
   router: OpenApiRouter,
   host: string,
   options: OasOptions,
-) {
+): OpenAPIV3.Document {
   const securitySchemes: GenerateOpenApiDocumentOptions['securitySchemes'] =
     options.securityScheme === 'apiKey'
       ? {

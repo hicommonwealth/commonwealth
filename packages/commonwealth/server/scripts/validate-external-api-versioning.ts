@@ -1,8 +1,8 @@
+import { trpc } from '@hicommonwealth/adapters';
 import { readFile, writeFile } from 'fs/promises';
-import pkg from 'openapi-diff';
+import { diffSpecs } from 'openapi-diff';
 import path from 'path';
-
-const { diffSpecs } = pkg;
+import { oasOptions, trpcRouter } from '../api/external-router';
 
 const versioningPath = path.resolve(
   'packages/commonwealth/server/api/external-router.ts',
@@ -49,20 +49,38 @@ async function downloadFile(url, outputFileName) {
   console.log('Downloaded openapi spec successfully');
 }
 
+function readableVersion(version: {
+  major: number;
+  minor: number;
+  patch: number;
+}) {
+  return `${version.major}.${version.minor}.${version.patch}`;
+}
+
 async function validateExternalApiVersioning() {
+  // TODO: potentially fetch from github (libs/api-client/openapi.json) after #9526 is merged
   await downloadFile('https://commonwealth.im/api/v1/openapi.json', sourcePath);
-  await downloadFile(
-    'http://localhost:8080/api/v1/openapi.json',
-    destinationPath,
+
+  const newOas = trpc.toOpenApiDocument(
+    trpcRouter,
+    'http://commonwealth.im',
+    oasOptions,
   );
+  await writeFile(destinationPath, JSON.stringify(newOas, null, 2), 'utf8');
 
   const sourceContent = await readFile(sourcePath, 'utf8');
-  const destinationContent = await readFile(destinationPath, 'utf8');
 
   const oldVersion = parseSemVer(JSON.parse(sourceContent).info.version);
-  const newVersion = parseSemVer(JSON.parse(destinationContent).info.version);
+  const newVersion = parseSemVer(newOas.info.version);
 
   if (oldVersion.major !== newVersion.major) {
+    if (newVersion.minor !== 0 || newVersion.patch !== 0) {
+      const newMajorVersion = `${newVersion.major}.0.0`;
+      await updateVersionInFile(versioningPath, newMajorVersion);
+      console.log(
+        `Bumped OAS version from ${readableVersion(oldVersion)} to ${newMajorVersion}`,
+      );
+    }
     return; // Breaking change, this is valid regardless of schema changes
   }
 
@@ -73,7 +91,7 @@ async function validateExternalApiVersioning() {
       format: 'openapi3',
     },
     destinationSpec: {
-      content: destinationContent,
+      content: JSON.stringify(newOas),
       location: path.basename(destinationPath),
       format: 'openapi3',
     },
@@ -87,12 +105,12 @@ async function validateExternalApiVersioning() {
     oldVersion.minor === newVersion.minor &&
     result.nonBreakingDifferences.filter((c) => c.action === 'add').length > 0
   ) {
-    await updateVersionInFile(
-      versioningPath,
-      `${oldVersion.major}.${oldVersion.minor + 1}.${oldVersion.patch}`,
-    );
+    const newVersionMinor = `${oldVersion.major}.${oldVersion.minor + 1}.0`;
+    await updateVersionInFile(versioningPath, newVersionMinor);
 
-    console.log('Updated minor version');
+    console.log(
+      `Bumped minor version from ${readableVersion(oldVersion)} to ${newVersionMinor}`,
+    );
     return;
   }
 
@@ -100,16 +118,14 @@ async function validateExternalApiVersioning() {
     oldVersion.patch === newVersion.patch &&
     result.nonBreakingDifferences.length > 0
   ) {
-    await updateVersionInFile(
-      versioningPath,
-      `${oldVersion.major}.${oldVersion.minor}.${oldVersion.patch + 1}`,
-    );
+    const newVersionPatch = `${oldVersion.major}.${oldVersion.minor}.${oldVersion.patch + 1}`;
+    await updateVersionInFile(versioningPath, newVersionPatch);
 
-    console.log('Updated oatch version');
+    console.log(
+      `Bumped patch version from ${readableVersion(oldVersion)} to ${newVersionPatch}`,
+    );
     return;
   }
-
-  throw Error('Should not have reached here');
 }
 
 validateExternalApiVersioning()

@@ -1,8 +1,8 @@
 #!/bin/bash
 
-RED='\033[31m' 
+RED='\033[31m'
 YELLOW='\033[33m'
-NC='\033[0m' 
+NC='\033[0m'
 
 FILES=$(git diff origin/master...HEAD --name-only --diff-filter=d | grep -E '\.ts$|\.tsx$|\.scss$')
 
@@ -22,3 +22,6 @@ then
         echo -e "[eslint] 🚀🚀🚀"
     fi
 fi
+
+# Update the openAPI spec version if needed
+pnpm -F commonwealth ts-exec server/scripts/validate-external-api-versioning.ts
