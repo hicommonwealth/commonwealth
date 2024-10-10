@@ -1,3 +1,4 @@
+import { GroupTopicPermissionEnum } from '@hicommonwealth/schemas';
 import { buildCreateThreadInput } from 'client/scripts/state/api/threads/createThread';
 import { useAuthModalStore } from 'client/scripts/state/ui/modals';
 import { notifyError } from 'controllers/app/notifications';
@@ -29,6 +30,7 @@ import useAppStatus from '../../../hooks/useAppStatus';
 import { ThreadKind, ThreadStage } from '../../../models/types';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWGatedTopicBanner } from '../component_kit/CWGatedTopicBanner';
+import { CWGatedTopicPermissionLevelBanner } from '../component_kit/CWGatedTopicPermissionLevelBanner';
 import { CWSelectList } from '../component_kit/new_designs/CWSelectList';
 import { ReactQuillEditor } from '../react_quill_editor';
 import {
@@ -80,6 +82,8 @@ export const NewThreadForm = () => {
     clearDraft,
     canShowGatingBanner,
     setCanShowGatingBanner,
+    canShowTopicPermissionBanner,
+    setCanShowTopicPermissionBanner,
   } = useNewThreadForm(communityId, topicsForSelector);
 
   const hasTopicOngoingContest = threadTopic?.activeContestManagers?.length > 0;
@@ -106,7 +110,7 @@ export const NewThreadForm = () => {
     includeTopics: true,
     enabled: !!communityId,
   });
-  const { isRestrictedMembership } = useTopicGating({
+  const { isRestrictedMembership, foundTopicPermissions } = useTopicGating({
     communityId,
     userAddress: user.activeAccount?.address || '',
     apiEnabled: !!user.activeAccount?.address && !!communityId,
@@ -215,6 +219,12 @@ export const NewThreadForm = () => {
   const disabledActionsTooltipText = getThreadActionTooltipText({
     isCommunityMember: !!user.activeAccount,
     isThreadTopicGated: isRestrictedMembership,
+    threadTopicInteractionRestriction:
+      !foundTopicPermissions?.permission?.includes(
+        GroupTopicPermissionEnum.UPVOTE_AND_COMMENT_AND_POST,
+      )
+        ? foundTopicPermissions?.permission
+        : undefined,
   });
 
   const contestThreadBannerVisible =
@@ -297,6 +307,7 @@ export const NewThreadForm = () => {
                   }
                   onChange={(topic) => {
                     setCanShowGatingBanner(true);
+                    setCanShowTopicPermissionBanner(true);
                     setThreadTopic(
                       // @ts-expect-error <StrictNullChecks/>
                       topicsForSelector.find((t) => `${t.id}` === topic.value),
@@ -333,7 +344,11 @@ export const NewThreadForm = () => {
               <ReactQuillEditor
                 contentDelta={threadContentDelta}
                 setContentDelta={setThreadContentDelta}
-                isDisabled={isRestrictedMembership || !user.activeAccount}
+                isDisabled={
+                  isRestrictedMembership ||
+                  !!disabledActionsTooltipText ||
+                  !user.activeAccount
+                }
                 tooltipLabel={
                   typeof disabledActionsTooltipText === 'function'
                     ? disabledActionsTooltipText?.('submit')
@@ -373,7 +388,8 @@ export const NewThreadForm = () => {
                     !user.activeAccount ||
                     isDisabledBecauseOfContestsConsent ||
                     walletBalanceError ||
-                    contestTopicError
+                    contestTopicError ||
+                    !!disabledActionsTooltipText
                   }
                   // eslint-disable-next-line @typescript-eslint/no-misused-promises
                   onClick={handleNewThreadCreation}
@@ -398,6 +414,19 @@ export const NewThreadForm = () => {
                   />
                 </div>
               )}
+
+              {canShowTopicPermissionBanner &&
+                foundTopicPermissions &&
+                !foundTopicPermissions?.permission?.includes(
+                  GroupTopicPermissionEnum.UPVOTE_AND_COMMENT_AND_POST,
+                ) && (
+                  <CWGatedTopicPermissionLevelBanner
+                    topicPermission={
+                      foundTopicPermissions?.permission as GroupTopicPermissionEnum
+                    }
+                    onClose={() => setCanShowTopicPermissionBanner(false)}
+                  />
+                )}
             </div>
           </div>
         </div>

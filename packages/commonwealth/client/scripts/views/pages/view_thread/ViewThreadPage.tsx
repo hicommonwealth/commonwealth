@@ -1,3 +1,4 @@
+import { GroupTopicPermissionEnum } from '@hicommonwealth/schemas';
 import { ContentType, getThreadUrl } from '@hicommonwealth/shared';
 import { notifyError } from 'controllers/app/notifications';
 import { extractDomain, isDefaultStage } from 'helpers';
@@ -140,7 +141,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     threadId: parseInt(threadId),
   });
 
-  const { isRestrictedMembership } = useTopicGating({
+  const { isRestrictedMembership, foundTopicPermissions } = useTopicGating({
     communityId,
     apiEnabled: !!user?.activeAccount?.address && !!communityId,
     userAddress: user?.activeAccount?.address || '',
@@ -256,8 +257,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   // @ts-expect-error <StrictNullChecks/>
   const hasWebLinks = thread.links.find((x) => x.source === 'web');
 
-  const canComment = !!user.activeAccount && !isRestrictedMembership;
-
   const handleNewSnapshotChange = async ({
     id,
     snapshot_title,
@@ -332,7 +331,18 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     isThreadArchived: !!thread?.archivedAt,
     isThreadLocked: !!thread?.lockedAt,
     isThreadTopicGated: isRestrictedMembership,
+    threadTopicInteractionRestriction:
+      !foundTopicPermissions?.permission?.includes(
+        GroupTopicPermissionEnum.UPVOTE_AND_COMMENT,
+      )
+        ? foundTopicPermissions?.permission
+        : undefined,
   });
+
+  const canComment =
+    !!user.activeAccount &&
+    !isRestrictedMembership &&
+    !disabledActionsTooltipText;
 
   const getMetaDescription = (meta: string) => {
     try {

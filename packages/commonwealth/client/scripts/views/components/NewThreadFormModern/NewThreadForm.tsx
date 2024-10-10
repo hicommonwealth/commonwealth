@@ -1,3 +1,4 @@
+import { GroupTopicPermissionEnum } from '@hicommonwealth/schemas';
 import { buildCreateThreadInput } from 'client/scripts/state/api/threads/createThread';
 import { useAuthModalStore } from 'client/scripts/state/ui/modals';
 import { notifyError } from 'controllers/app/notifications';
@@ -31,6 +32,7 @@ import useAppStatus from '../../../hooks/useAppStatus';
 import { ThreadKind, ThreadStage } from '../../../models/types';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWGatedTopicBanner } from '../component_kit/CWGatedTopicBanner';
+import { CWGatedTopicPermissionLevelBanner } from '../component_kit/CWGatedTopicPermissionLevelBanner';
 import { CWSelectList } from '../component_kit/new_designs/CWSelectList';
 import ContestThreadBanner from './ContestThreadBanner';
 import ContestTopicBanner from './ContestTopicBanner';
@@ -77,6 +79,8 @@ export const NewThreadForm = () => {
     clearDraft,
     canShowGatingBanner,
     setCanShowGatingBanner,
+    canShowTopicPermissionBanner,
+    setCanShowTopicPermissionBanner,
   } = useNewThreadForm(communityId, topicsForSelector);
 
   const hasTopicOngoingContest = threadTopic?.activeContestManagers?.length > 0;
@@ -103,7 +107,7 @@ export const NewThreadForm = () => {
     includeTopics: true,
     enabled: !!communityId,
   });
-  const { isRestrictedMembership } = useTopicGating({
+  const { isRestrictedMembership, foundTopicPermissions } = useTopicGating({
     communityId,
     userAddress: user.activeAccount?.address || '',
     apiEnabled: !!user.activeAccount?.address && !!communityId,
@@ -199,6 +203,12 @@ export const NewThreadForm = () => {
   const disabledActionsTooltipText = getThreadActionTooltipText({
     isCommunityMember: !!user.activeAccount,
     isThreadTopicGated: isRestrictedMembership,
+    threadTopicInteractionRestriction:
+      !foundTopicPermissions?.permission?.includes(
+        GroupTopicPermissionEnum.UPVOTE_AND_COMMENT_AND_POST,
+      )
+        ? foundTopicPermissions?.permission
+        : undefined,
   });
 
   const contestThreadBannerVisible =
@@ -319,7 +329,11 @@ export const NewThreadForm = () => {
                   (markdownEditorMethodsRef.current = methods)
                 }
                 onChange={(markdown) => setEditorText(markdown)}
-                disabled={isRestrictedMembership || !user.activeAccount}
+                disabled={
+                  isRestrictedMembership ||
+                  !!disabledActionsTooltipText ||
+                  !user.activeAccount
+                }
                 tooltip={
                   typeof disabledActionsTooltipText === 'function'
                     ? disabledActionsTooltipText?.('submit')
@@ -332,6 +346,7 @@ export const NewThreadForm = () => {
                     disabled={
                       isDisabled ||
                       !user.activeAccount ||
+                      !!disabledActionsTooltipText ||
                       isDisabledBecauseOfContestsConsent ||
                       walletBalanceError ||
                       contestTopicError
@@ -373,6 +388,19 @@ export const NewThreadForm = () => {
                   />
                 </div>
               )}
+
+              {canShowTopicPermissionBanner &&
+                foundTopicPermissions &&
+                !foundTopicPermissions?.permission?.includes(
+                  GroupTopicPermissionEnum.UPVOTE_AND_COMMENT_AND_POST,
+                ) && (
+                  <CWGatedTopicPermissionLevelBanner
+                    topicPermission={
+                      foundTopicPermissions?.permission as GroupTopicPermissionEnum
+                    }
+                    onClose={() => setCanShowTopicPermissionBanner(false)}
+                  />
+                )}
             </div>
           </div>
         </div>

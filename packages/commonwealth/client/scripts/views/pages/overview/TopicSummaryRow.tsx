@@ -1,3 +1,4 @@
+import { GroupTopicPermissionEnum } from '@hicommonwealth/schemas';
 import { slugify } from '@hicommonwealth/shared';
 import { getThreadActionTooltipText } from 'helpers/threads';
 import useTopicGating from 'hooks/useTopicGating';
@@ -32,7 +33,7 @@ export const TopicSummaryRow = ({
 
   const communityId = app.activeChainId() || '';
 
-  const { memberships } = useTopicGating({
+  const { memberships, topicPermissions } = useTopicGating({
     communityId,
     userAddress: user.activeAccount?.address || '',
     apiEnabled: !!user.activeAccount?.address || !!communityId,
@@ -106,6 +107,10 @@ export const TopicSummaryRow = ({
           const isRestrictedMembership =
             !isAdmin && isTopicGated && !isActionAllowedInGatedTopic;
 
+          const foundTopicPermissions = topicPermissions.find(
+            (tp) => tp.id === thread.topic.id,
+          );
+
           const disabledActionsTooltipText = getThreadActionTooltipText({
             isCommunityMember: Permissions.isCommunityMember(
               thread.communityId,
@@ -113,6 +118,12 @@ export const TopicSummaryRow = ({
             isThreadArchived: !!thread?.archivedAt,
             isThreadLocked: !!thread?.lockedAt,
             isThreadTopicGated: isRestrictedMembership,
+            threadTopicInteractionRestriction:
+              !foundTopicPermissions?.permission?.includes(
+                GroupTopicPermissionEnum.UPVOTE_AND_COMMENT, // on this page we only show comment option
+              )
+                ? foundTopicPermissions?.permission
+                : undefined,
           });
 
           return (

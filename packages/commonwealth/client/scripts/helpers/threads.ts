@@ -1,5 +1,7 @@
+import { GroupTopicPermissionEnum } from '@hicommonwealth/schemas';
 import { re_weburl } from 'lib/url-validation';
 import { Link, LinkSource } from 'models/Thread';
+import { TOPIC_PERMISSIONS } from '../views/pages/CommunityGroupsAndMembers/Groups/common/GroupForm/constants';
 
 export function detectURL(str: string) {
   if (str.slice(0, 4) !== 'http') str = `http://${str}`; // no https required because this is only used for regex match
@@ -55,11 +57,13 @@ export const getThreadActionTooltipText = ({
   isThreadArchived = false,
   isThreadLocked = false,
   isThreadTopicGated = false,
+  threadTopicInteractionRestriction,
 }: {
   isCommunityMember?: boolean;
   isThreadArchived?: boolean;
   isThreadLocked?: boolean;
   isThreadTopicGated?: boolean;
+  threadTopicInteractionRestriction?: GroupTopicPermissionEnum;
 }): GetThreadActionTooltipTextResponse => {
   if (!isCommunityMember) {
     return getActionTooltipForNonCommunityMember;
@@ -67,5 +71,8 @@ export const getThreadActionTooltipText = ({
   if (isThreadArchived) return 'Thread is archived';
   if (isThreadLocked) return 'Thread is locked';
   if (isThreadTopicGated) return 'Topic is gated';
+  if (threadTopicInteractionRestriction) {
+    return `Topic members are only allowed to ${TOPIC_PERMISSIONS[threadTopicInteractionRestriction]}`;
+  }
   return '';
 };

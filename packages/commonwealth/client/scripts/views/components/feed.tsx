@@ -6,6 +6,7 @@ import 'components/feed.scss';
 import { PageNotFound } from '../pages/404';
 import { UserDashboardRowSkeleton } from '../pages/user_dashboard/user_dashboard_row';
 
+import { GroupTopicPermissionEnum } from '@hicommonwealth/schemas';
 import { slugify } from '@hicommonwealth/shared';
 import { getThreadActionTooltipText } from 'helpers/threads';
 import useTopicGating from 'hooks/useTopicGating';
@@ -54,7 +55,7 @@ const FeedThread = ({ thread }: { thread: Thread }) => {
     (a) => a?.community?.id === thread?.communityId,
   );
 
-  const { isRestrictedMembership } = useTopicGating({
+  const { isRestrictedMembership, foundTopicPermissions } = useTopicGating({
     communityId: thread.communityId,
     userAddress: account?.address || '',
     apiEnabled: !!account?.address && !!thread.communityId,
@@ -66,6 +67,12 @@ const FeedThread = ({ thread }: { thread: Thread }) => {
     isThreadArchived: !!thread?.archivedAt,
     isThreadLocked: !!thread?.lockedAt,
     isThreadTopicGated: isRestrictedMembership,
+    threadTopicInteractionRestriction:
+      !foundTopicPermissions?.permission?.includes(
+        GroupTopicPermissionEnum.UPVOTE_AND_COMMENT, // on this page we only show comment option
+      )
+        ? foundTopicPermissions?.permission
+        : undefined,
   });
 
   // edge case for deleted communities with orphaned posts

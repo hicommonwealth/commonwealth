@@ -1,4 +1,7 @@
-import { TopicWeightedVoting } from '@hicommonwealth/schemas';
+import {
+  GroupTopicPermissionEnum,
+  TopicWeightedVoting,
+} from '@hicommonwealth/schemas';
 import { getProposalUrlPath } from 'identifiers';
 import { getScopePrefix, useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useRef, useState } from 'react';
@@ -91,7 +94,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
 
   const user = useUserStore();
 
-  const { memberships } = useTopicGating({
+  const { memberships, topicPermissions } = useTopicGating({
     communityId: communityId,
     userAddress: user.activeAccount?.address || '',
     apiEnabled: !!user.activeAccount?.address && !!communityId,
@@ -222,12 +225,45 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
           const isRestrictedMembership =
             !isAdmin && isTopicGated && !isActionAllowedInGatedTopic;
 
+          const foundTopicPermissions = topicPermissions.find(
+            (tp) => tp.id === thread.topic.id,
+          );
+
           const disabledActionsTooltipText = getThreadActionTooltipText({
             isCommunityMember: !!user.activeAccount,
             isThreadArchived: !!thread?.archivedAt,
             isThreadLocked: !!thread?.lockedAt,
             isThreadTopicGated: isRestrictedMembership,
+            threadTopicInteractionRestriction:
+              !foundTopicPermissions?.permission?.includes(
+                GroupTopicPermissionEnum.UPVOTE,
+              )
+                ? foundTopicPermissions?.permission
+                : undefined,
           });
+
+          const disabledReactPermissionTooltipText = getThreadActionTooltipText(
+            {
+              isCommunityMember: !!user.activeAccount,
+              threadTopicInteractionRestriction:
+                !foundTopicPermissions?.permission?.includes(
+                  GroupTopicPermissionEnum.UPVOTE,
+                )
+                  ? foundTopicPermissions?.permission
+                  : undefined,
+            },
+          );
+
+          const disabledCommentPermissionTooltipText =
+            getThreadActionTooltipText({
+              isCommunityMember: !!user.activeAccount,
+              threadTopicInteractionRestriction:
+                !foundTopicPermissions?.permission?.includes(
+                  GroupTopicPermissionEnum.UPVOTE_AND_COMMENT,
+                )
+                  ? foundTopicPermissions?.permission
+                  : undefined,
+            });
 
           const isThreadTopicInContest = checkIsTopicInContest(
             contestsData,
@@ -238,8 +274,16 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
             <ThreadCard
               key={thread?.id + '-' + thread.readOnly}
               thread={thread}
-              canReact={!disabledActionsTooltipText}
-              canComment={!disabledActionsTooltipText}
+              canReact={
+                disabledReactPermissionTooltipText
+                  ? !disabledReactPermissionTooltipText
+                  : !disabledActionsTooltipText
+              }
+              canComment={
+                disabledCommentPermissionTooltipText
+                  ? !disabledCommentPermissionTooltipText
+                  : !disabledActionsTooltipText
+              }
               onEditStart={() => navigate(`${discussionLink}`)}
               onStageTagClick={() => {
                 navigate(`/discussions?stage=${thread.stage}`);
@@ -254,7 +298,11 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
               onCommentBtnClick={() =>
                 navigate(`${discussionLink}?focusComments=true`)
               }
-              disabledActionsTooltipText={disabledActionsTooltipText}
+              disabledActionsTooltipText={
+                disabledCommentPermissionTooltipText ||
+                disabledReactPermissionTooltipText ||
+                disabledActionsTooltipText
+              }
               hideRecentComments
               editingDisabled={isThreadTopicInContest}
             />

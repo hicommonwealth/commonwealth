@@ -1,3 +1,4 @@
+import { GroupTopicPermissionEnum } from '@hicommonwealth/schemas';
 import { getThreadActionTooltipText } from 'helpers/threads';
 import { truncate } from 'helpers/truncate';
 import useTopicGating from 'hooks/useTopicGating';
@@ -125,7 +126,7 @@ export const CWContentPage = ({
 
   const communityId = app.activeChainId() || '';
 
-  const { isRestrictedMembership } = useTopicGating({
+  const { isRestrictedMembership, foundTopicPermissions } = useTopicGating({
     communityId,
     userAddress: user.activeAccount?.address || '',
     apiEnabled: !!user.activeAccount?.address && !!communityId,
@@ -209,6 +210,27 @@ export const CWContentPage = ({
     isThreadTopicGated: isRestrictedMembership,
   });
 
+  const disabledReactPermissionTooltipText = getThreadActionTooltipText({
+    isCommunityMember: !!user.activeAccount,
+    threadTopicInteractionRestriction:
+      !foundTopicPermissions?.permission?.includes(
+        GroupTopicPermissionEnum.UPVOTE,
+      )
+        ? foundTopicPermissions?.permission
+        : undefined,
+  });
+
+  const disabledCommentPermissionTooltipText = getThreadActionTooltipText({
+    isCommunityMember: !!user.activeAccount,
+    threadTopicInteractionRestriction:
+      !foundTopicPermissions?.permission?.includes(
+        GroupTopicPermissionEnum.UPVOTE_AND_COMMENT,
+      )
+        ? foundTopicPermissions?.permission
+        : undefined,
+  });
+  console.log('disabledActionsTooltipText => ', disabledActionsTooltipText);
+
   const mainBody = (
     <div className="main-body-container">
       <div className="header">
@@ -245,10 +267,22 @@ export const CWContentPage = ({
             onEditStart={onEditStart}
             canUpdateThread={canUpdateThread}
             hasPendingEdits={hasPendingEdits}
-            canReact={!disabledActionsTooltipText}
-            canComment={!disabledActionsTooltipText}
+            canReact={
+              disabledReactPermissionTooltipText
+                ? !disabledReactPermissionTooltipText
+                : !disabledActionsTooltipText
+            }
+            canComment={
+              disabledCommentPermissionTooltipText
+                ? !disabledCommentPermissionTooltipText
+                : !disabledActionsTooltipText
+            }
             onProposalStageChange={onProposalStageChange}
-            disabledActionsTooltipText={disabledActionsTooltipText}
+            disabledActionsTooltipText={
+              disabledReactPermissionTooltipText ||
+              disabledCommentPermissionTooltipText ||
+              disabledActionsTooltipText
+            }
             onSnapshotProposalFromThread={onSnapshotProposalFromThread}
             setIsUpvoteDrawerOpen={setIsUpvoteDrawerOpen}
             shareEndpoint={`${window.location.origin}${window.location.pathname}`}
