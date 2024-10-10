@@ -40,8 +40,6 @@ const GroupsSection = ({
     profiles?.map((p) => [p.address, p]),
   );
 
-  console.log('filteredGroups => ', filteredGroups);
-
   return (
     <section className="GroupsSection">
       {hasNoGroups && <TopicGatingHelpMessage />}

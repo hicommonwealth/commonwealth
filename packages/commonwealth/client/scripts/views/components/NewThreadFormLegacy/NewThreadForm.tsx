@@ -141,13 +141,13 @@ export const NewThreadForm = () => {
 
   const isTopicGated = !!(memberships || []).find(
     (membership) =>
-      threadTopic?.id && membership.topicIds.includes(threadTopic.id),
+      threadTopic?.id && membership.topics.find((t) => t.id === threadTopic.id),
   );
   const isActionAllowedInGatedTopic = !!(memberships || []).find(
     (membership) =>
-      threadTopic.id &&
+      threadTopic &&
       threadTopic?.id &&
-      membership.topicIds.includes(threadTopic?.id) &&
+      membership.topics.find((t) => t.id === threadTopic?.id) &&
       membership.isAllowed,
   );
   const gatedGroupNames = groups

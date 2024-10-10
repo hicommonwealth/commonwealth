@@ -155,14 +155,13 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   });
 
   const isTopicGated = !!(memberships || []).find((membership) =>
-    // @ts-expect-error <StrictNullChecks/>
-    membership.topicIds.includes(thread?.topic?.id),
+    membership.topics.find((t) => t.id === thread?.topic?.id),
   );
 
   const isActionAllowedInGatedTopic = !!(memberships || []).find(
     (membership) =>
-      // @ts-expect-error <StrictNullChecks/>
-      membership.topicIds.includes(thread?.topic?.id) && membership.isAllowed,
+      membership.topics.find((t) => t.id === thread?.topic?.id) &&
+      membership.isAllowed,
   );
 
   const isRestrictedMembership =

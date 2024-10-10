@@ -92,13 +92,13 @@ export const TopicSummaryRow = ({
           const isTopicGated = !!(memberships || []).find(
             (membership) =>
               thread?.topic?.id &&
-              membership.topicIds.includes(thread.topic.id),
+              membership.topics.find((t) => t.id === thread.topic.id),
           );
 
           const isActionAllowedInGatedTopic = !!(memberships || []).find(
             (membership) =>
               thread?.topic?.id &&
-              membership.topicIds.includes(thread.topic.id) &&
+              membership.topics.find((t) => t.id === thread.topic.id) &&
               membership.isAllowed,
           );
 

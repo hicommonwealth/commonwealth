@@ -1,5 +1,6 @@
 import {
   GroupAttributes,
+  GroupInstance,
   MembershipAttributes,
   TopicAttributes,
 } from '@hicommonwealth/model';
@@ -22,6 +23,13 @@ type GroupWithExtras = GroupAttributes & {
   topics?: TopicAttributesWithPermission[];
 };
 export type GetGroupsResult = GroupWithExtras[];
+
+export type GroupInstanceWithTopicPermissions = GroupInstance & {
+  GroupTopicPermissions: {
+    topic_id: number;
+    allowed_actions: GroupTopicPermissionEnum;
+  }[];
+};
 
 export async function __getGroups(
   this: ServerGroupsController,
@@ -87,9 +95,10 @@ export async function __getGroups(
         .map((t) => {
           const temp: TopicAttributesWithPermission = { ...t.toJSON() };
           temp.permission =
-            ((group as any).GroupTopicPermissions || []).find(
-              (gtp) => gtp.topic_id === t.id,
-            )?.allowed_actions ||
+            (
+              (group as GroupInstanceWithTopicPermissions)
+                .GroupTopicPermissions || []
+            ).find((gtp) => gtp.topic_id === t.id)?.allowed_actions ||
             // TODO: this fallback should be via a migration for existing communities
             GroupTopicPermissionEnum.UPVOTE_AND_COMMENT_AND_POST;
           return temp;
