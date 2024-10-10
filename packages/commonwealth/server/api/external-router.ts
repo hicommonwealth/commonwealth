@@ -84,12 +84,15 @@ if (config.NODE_ENV !== 'test' && config.CACHE.REDIS_URL) {
   addRateLimiterMiddleware();
 }
 
-// IMPORTANT NOTE: If you move this file, you will need to update validate-external-api-versioning.js
-const trpcRouter = trpc.router(api);
-trpc.useOAS(router, trpcRouter, {
+const oasOptions: trpc.OasOptions = {
   title: 'Common API',
   path: PATH,
   version: '0.0.1',
-});
+  securityScheme: 'apiKey',
+};
 
-export { PATH, router };
+// IMPORTANT NOTE: If you move this file, you will need to update validate-external-api-versioning.js
+const trpcRouter = trpc.router(api);
+trpc.useOAS(router, trpcRouter, oasOptions);
+
+export { PATH, oasOptions, router };
