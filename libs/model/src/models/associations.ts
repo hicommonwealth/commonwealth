@@ -86,7 +86,13 @@ export const buildAssociations = (db: DB) => {
     asMany: 'threads',
     onUpdate: 'CASCADE',
     onDelete: 'SET NULL',
-  }).withMany(db.ContestTopic, { asMany: 'contest_topics' });
+  })
+    .withMany(db.ContestTopic, { asMany: 'contest_topics' })
+    .withMany(db.GroupTopicPermission, {
+      foreignKey: 'topic_id',
+      onUpdate: 'CASCADE',
+      onDelete: 'CASCADE',
+    });
 
   db.Thread.withMany(db.Poll)
     .withMany(db.ContestAction, {
@@ -127,7 +133,11 @@ export const buildAssociations = (db: DB) => {
     onDelete: 'CASCADE',
   });
 
-  db.Group.withMany(db.GroupPermission);
+  db.Group.withMany(db.GroupPermission).withMany(db.GroupTopicPermission, {
+    foreignKey: 'group_id',
+    onUpdate: 'CASCADE',
+    onDelete: 'CASCADE',
+  });
 
   // Many-to-many associations (cross-references)
   db.Membership.withManyToMany(
