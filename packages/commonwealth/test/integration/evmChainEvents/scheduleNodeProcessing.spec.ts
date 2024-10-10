@@ -1,6 +1,5 @@
 import { dispose } from '@hicommonwealth/core';
-import { DB, tester } from '@hicommonwealth/model';
-import { expect } from 'chai';
+import { ContractAbiInstance, models, tester } from '@hicommonwealth/model';
 import sinon from 'sinon';
 import {
   afterAll,
@@ -8,27 +7,22 @@ import {
   beforeAll,
   beforeEach,
   describe,
+  expect,
   test,
 } from 'vitest';
 import { scheduleNodeProcessing } from '../../../server/workers/evmChainEvents/nodeProcessing';
-import {
-  getTestAbi,
-  getTestCommunityContract,
-  getTestContract,
-  getTestSignatures,
-} from './util';
+import { createAdditionalEventSources, createEventSources } from './util';
 
 describe('scheduleNodeProcessing', () => {
   const sandbox = sinon.createSandbox();
   let processChainStub: sinon.SinonSpy;
   let clock: sinon.SinonFakeTimers;
   let singleSourceSuccess = false;
-  let models: DB;
+  let namespaceAbiInstance: ContractAbiInstance;
+  let stakesAbiInstance: ContractAbiInstance;
 
   beforeAll(async () => {
-    await tester.seedDb();
-    const res = await import('@hicommonwealth/model');
-    models = res['models'];
+    await tester.bootstrap_testing(true);
   });
 
   afterAll(async () => {
@@ -51,11 +45,9 @@ describe('scheduleNodeProcessing', () => {
   });
 
   test('should schedule processing for a single source', async () => {
-    await getTestCommunityContract();
-    const abi = await getTestAbi();
-    const contract = await getTestContract();
-    await contract.update({ abi_id: abi.id });
-    await getTestSignatures();
+    const res = await createEventSources();
+    namespaceAbiInstance = res.namespaceAbiInstance;
+    stakesAbiInstance = res.stakesAbiInstance;
 
     const interval = 10_000;
     await scheduleNodeProcessing(models, interval, processChainStub);
@@ -69,11 +61,10 @@ describe('scheduleNodeProcessing', () => {
 
   test('should evenly schedule 2 sources per interval', async () => {
     expect(singleSourceSuccess).to.be.true;
-    await getTestCommunityContract('v2');
-    const abi = await getTestAbi('v2');
-    const contract = await getTestContract('v2');
-    await contract.update({ abi_id: abi.id });
-    await getTestSignatures('v2');
+    expect(namespaceAbiInstance).toBeTruthy();
+    expect(stakesAbiInstance).toBeTruthy();
+
+    await createAdditionalEventSources(namespaceAbiInstance, stakesAbiInstance);
 
     const interval = 10_000;
     await scheduleNodeProcessing(models, interval, processChainStub);
