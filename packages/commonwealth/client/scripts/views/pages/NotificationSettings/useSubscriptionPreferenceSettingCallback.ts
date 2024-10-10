@@ -32,14 +32,26 @@ export function useSubscriptionPreferenceSettingCallback(
   const toggle = useCallback(
     (activate: boolean) => {
       async function doAsync() {
-        await pushNotificationToggleCallback(activate);
-
+        // ** first we set the subscription preference
         await updateSubscriptionPreferences({
           id: user.id,
           ...subscriptionPreferences.data,
           [pref]: activate,
         });
-        togglePushNotificationActivated(true);
+
+        //** now we have to determine how to set push notifications.
+
+        const pushNotificationsActive =
+          subscriptionPreferences.data['mobile_push_notifications_enabled'] ||
+          subscriptionPreferences.data[
+            'mobile_push_discussion_activity_enabled'
+          ] ||
+          subscriptionPreferences.data['mobile_push_admin_alerts_enabled'];
+
+        await pushNotificationToggleCallback(pushNotificationsActive);
+
+        togglePushNotificationActivated(pushNotificationsActive);
+        await subscriptionPreferences.refetch();
       }
 
       doAsync().catch(console.error);
