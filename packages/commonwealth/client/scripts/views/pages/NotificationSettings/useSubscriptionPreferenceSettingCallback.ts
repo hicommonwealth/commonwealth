@@ -1,8 +1,12 @@
 import { useCallback } from 'react';
+// eslint-disable-next-line max-len
 import { useSubscriptionPreferences } from 'state/api/trpc/subscription/useSubscriptionPreferences';
+// eslint-disable-next-line max-len
 import { useUpdateSubscriptionPreferencesMutation } from 'state/api/trpc/subscription/useUpdateSubscriptionPreferencesMutation';
-import useUserStore from 'state/ui/user';
+// eslint-disable-next-line max-len
 import { usePushNotificationActivated } from 'views/pages/NotificationSettings/usePushNotificationActivated';
+// eslint-disable-next-line max-len
+import useUserStore from 'state/ui/user';
 import { usePushNotificationToggleCallback } from 'views/pages/NotificationSettings/usePushNotificationToggleCallback';
 
 /**
