@@ -113,6 +113,7 @@ export async function refreshMembershipsForAddress(
 
   await models.Membership.bulkCreate(toBulkCreate, {
     updateOnDuplicate: ['reject_reason', 'last_checked'],
+    logging: true,
   });
 
   // must query again to get newly created values after bulkCreate
