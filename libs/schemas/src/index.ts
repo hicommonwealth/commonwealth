@@ -24,6 +24,7 @@ export type Aggregates = Extract<
   | 'GroupPermission'
   | 'Tags'
   | 'CommunityTags'
+  | 'GroupTopicPermission'
 >;
 
 export * from './commands';
