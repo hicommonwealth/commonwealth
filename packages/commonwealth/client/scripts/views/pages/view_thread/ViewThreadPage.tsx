@@ -332,6 +332,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     isThreadLocked: !!thread?.lockedAt,
     isThreadTopicGated: isRestrictedMembership,
     threadTopicInteractionRestriction:
+      !isAdmin &&
       !foundTopicPermissions?.permission?.includes(
         GroupTopicPermissionEnum.UPVOTE_AND_COMMENT,
       )

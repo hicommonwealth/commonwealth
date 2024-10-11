@@ -62,12 +62,20 @@ const FeedThread = ({ thread }: { thread: Thread }) => {
     topicId: thread?.topic?.id || 0,
   });
 
+  const isAdmin =
+    Permissions.isSiteAdmin() ||
+    Permissions.isCommunityAdmin({
+      id: community?.id || '',
+      adminsAndMods: community?.adminsAndMods || [],
+    });
+
   const disabledActionsTooltipText = getThreadActionTooltipText({
     isCommunityMember: Permissions.isCommunityMember(thread.communityId),
     isThreadArchived: !!thread?.archivedAt,
     isThreadLocked: !!thread?.lockedAt,
     isThreadTopicGated: isRestrictedMembership,
     threadTopicInteractionRestriction:
+      !isAdmin &&
       !foundTopicPermissions?.permission?.includes(
         GroupTopicPermissionEnum.UPVOTE_AND_COMMENT, // on this page we only show comment option
       )

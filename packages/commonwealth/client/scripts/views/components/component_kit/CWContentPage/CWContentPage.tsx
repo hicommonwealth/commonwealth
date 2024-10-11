@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router';
 import { useSearchParams } from 'react-router-dom';
 import app from 'state';
 import useUserStore from 'state/ui/user';
+import Permissions from 'utils/Permissions';
 import { ThreadContestTagContainer } from 'views/components/ThreadContestTag';
 import { isHot } from 'views/pages/discussions/helpers';
 import Account from '../../../../models/Account';
@@ -133,6 +134,8 @@ export const CWContentPage = ({
     topicId: thread?.topic?.id || 0,
   });
 
+  const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
+
   const tabSelected = useMemo(() => {
     const tab = Object.fromEntries(urlQueryParams.entries())?.tab;
     if (!tab) {
@@ -213,6 +216,7 @@ export const CWContentPage = ({
   const disabledReactPermissionTooltipText = getThreadActionTooltipText({
     isCommunityMember: !!user.activeAccount,
     threadTopicInteractionRestriction:
+      !isAdmin &&
       !foundTopicPermissions?.permission?.includes(
         GroupTopicPermissionEnum.UPVOTE,
       )
@@ -223,6 +227,7 @@ export const CWContentPage = ({
   const disabledCommentPermissionTooltipText = getThreadActionTooltipText({
     isCommunityMember: !!user.activeAccount,
     threadTopicInteractionRestriction:
+      !isAdmin &&
       !foundTopicPermissions?.permission?.includes(
         GroupTopicPermissionEnum.UPVOTE_AND_COMMENT,
       )

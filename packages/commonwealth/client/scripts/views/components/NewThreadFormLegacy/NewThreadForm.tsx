@@ -1,6 +1,4 @@
 import { GroupTopicPermissionEnum } from '@hicommonwealth/schemas';
-import { buildCreateThreadInput } from 'client/scripts/state/api/threads/createThread';
-import { useAuthModalStore } from 'client/scripts/state/ui/modals';
 import { notifyError } from 'controllers/app/notifications';
 import { SessionKeyError } from 'controllers/server/sessions';
 import { parseCustomStages } from 'helpers';
@@ -15,8 +13,11 @@ import app from 'state';
 import { useGetUserEthBalanceQuery } from 'state/api/communityStake';
 import { useFetchGroupsQuery } from 'state/api/groups';
 import { useCreateThreadMutation } from 'state/api/threads';
+import { buildCreateThreadInput } from 'state/api/threads/createThread';
 import { useFetchTopicsQuery } from 'state/api/topics';
+import { useAuthModalStore } from 'state/ui/modals';
 import useUserStore from 'state/ui/user';
+import Permissions from 'utils/Permissions';
 import JoinCommunityBanner from 'views/components/JoinCommunityBanner';
 import CustomTopicOption from 'views/components/NewThreadFormLegacy/CustomTopicOption';
 import useJoinCommunity from 'views/components/SublayoutHeader/useJoinCommunity';
@@ -116,6 +117,8 @@ export const NewThreadForm = () => {
     apiEnabled: !!user.activeAccount?.address && !!communityId,
     topicId: threadTopic?.id || 0,
   });
+
+  const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
 
   const { mutateAsync: createThread } = useCreateThreadMutation({
     communityId,
@@ -220,6 +223,7 @@ export const NewThreadForm = () => {
     isCommunityMember: !!user.activeAccount,
     isThreadTopicGated: isRestrictedMembership,
     threadTopicInteractionRestriction:
+      !isAdmin &&
       !foundTopicPermissions?.permission?.includes(
         GroupTopicPermissionEnum.UPVOTE_AND_COMMENT_AND_POST,
       )
@@ -417,6 +421,7 @@ export const NewThreadForm = () => {
 
               {canShowTopicPermissionBanner &&
                 foundTopicPermissions &&
+                !isAdmin &&
                 !foundTopicPermissions?.permission?.includes(
                   GroupTopicPermissionEnum.UPVOTE_AND_COMMENT_AND_POST,
                 ) && (

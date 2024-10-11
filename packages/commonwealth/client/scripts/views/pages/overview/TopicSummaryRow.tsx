@@ -119,6 +119,7 @@ export const TopicSummaryRow = ({
             isThreadLocked: !!thread?.lockedAt,
             isThreadTopicGated: isRestrictedMembership,
             threadTopicInteractionRestriction:
+              !isAdmin &&
               !foundTopicPermissions?.permission?.includes(
                 GroupTopicPermissionEnum.UPVOTE_AND_COMMENT, // on this page we only show comment option
               )

@@ -235,6 +235,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
             isThreadLocked: !!thread?.lockedAt,
             isThreadTopicGated: isRestrictedMembership,
             threadTopicInteractionRestriction:
+              !isAdmin &&
               !foundTopicPermissions?.permission?.includes(
                 GroupTopicPermissionEnum.UPVOTE,
               )
@@ -246,6 +247,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
             {
               isCommunityMember: !!user.activeAccount,
               threadTopicInteractionRestriction:
+                !isAdmin &&
                 !foundTopicPermissions?.permission?.includes(
                   GroupTopicPermissionEnum.UPVOTE,
                 )
@@ -258,6 +260,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
             getThreadActionTooltipText({
               isCommunityMember: !!user.activeAccount,
               threadTopicInteractionRestriction:
+                !isAdmin &&
                 !foundTopicPermissions?.permission?.includes(
                   GroupTopicPermissionEnum.UPVOTE_AND_COMMENT,
                 )
