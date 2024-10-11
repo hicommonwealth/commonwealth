@@ -5,6 +5,7 @@ import * as core from '../../../../core';
 import { UpdateThreadResponseCollaboratorsItemRole } from './UpdateThreadResponseCollaboratorsItemRole';
 import { UpdateThreadResponseCollaboratorsItemUser } from './UpdateThreadResponseCollaboratorsItemUser';
 import { UpdateThreadResponseCollaboratorsItemWalletId } from './UpdateThreadResponseCollaboratorsItemWalletId';
+
 export const UpdateThreadResponseCollaboratorsItem = core.serialization.object({
   id: core.serialization.number().optional(),
   address: core.serialization.string(),

@@ -18,7 +18,6 @@ interface IUseCreateThreadReactionMutation {
 interface CreateReactionProps extends IUseCreateThreadReactionMutation {
   address: string;
   reactionType?: 'like';
-  isPWA?: boolean;
 }
 
 export const buildCreateThreadReactionInput = async ({

@@ -60,7 +60,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   // @ts-expect-error <StrictNullChecks/>
   const stageName: string = searchParams.get('stage');
 
-  const weightedVotingEnabled = useFlag('farcasterContest');
+  const weightedTopicsEnabled = useFlag('weightedTopics');
 
   const featuredFilter: ThreadFeaturedFilterTypes = searchParams.get(
     'featured',
@@ -178,7 +178,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   useManageDocumentTitle('Discussions');
 
   const isTopicWeighted =
-    weightedVotingEnabled &&
+    weightedTopicsEnabled &&
     topicId &&
     topicObj.weightedVoting === TopicWeightedVoting.ERC20;
 

@@ -9,13 +9,13 @@
  *     }
  */
 export interface UpdateTopicRequest {
-    topicId: number;
-    communityId: string;
-    name?: string;
-    description?: string;
-    groupIds?: number[];
-    telegram?: string;
-    featuredInSidebar?: boolean;
-    featuredInNewPost?: boolean;
-    defaultOffchainTemplate?: string;
+  topicId: number;
+  communityId: string;
+  name?: string;
+  description?: string;
+  groupIds?: number[];
+  telegram?: string;
+  featuredInSidebar?: boolean;
+  featuredInNewPost?: boolean;
+  defaultOffchainTemplate?: string;
 }

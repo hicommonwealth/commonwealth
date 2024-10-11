@@ -2,6 +2,7 @@ import { getObjectUtils } from '../object';
 import { getObjectLikeUtils } from '../object-like';
 import { getSchemaUtils } from '../schema-utils';
 import { constructLazyBaseSchema, getMemoizedSchema } from './lazy';
+
 export function lazyObject(getter) {
   const baseSchema = Object.assign(
     Object.assign({}, constructLazyBaseSchema(getter)),

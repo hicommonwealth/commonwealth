@@ -9,8 +9,8 @@
  *     }
  */
 export interface DeleteReactionRequest {
-    communityId: string;
-    reactionId: number;
-    canvasSignedData?: string;
-    canvasMsgId?: string;
+  communityId: string;
+  reactionId: number;
+  canvasSignedData?: string;
+  canvasMsgId?: string;
 }

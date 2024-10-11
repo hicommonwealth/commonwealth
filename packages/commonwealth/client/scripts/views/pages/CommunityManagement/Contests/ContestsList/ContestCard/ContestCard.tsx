@@ -192,7 +192,7 @@ const ContestCard = ({
           )}
         </div>
         <CWText className="topics">
-          Topics: {topics.map(({ name: topicName }) => topicName).join(', ')}
+          Topic: {topics.map(({ name: topicName }) => topicName).join(', ')}
         </CWText>
 
         <>

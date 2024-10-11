@@ -6,6 +6,7 @@ import { CreateGroupResponseGroupsItemRequirementsItemThresholdDataSourceOne } f
 import { CreateGroupResponseGroupsItemRequirementsItemThresholdDataSourceThree } from './CreateGroupResponseGroupsItemRequirementsItemThresholdDataSourceThree';
 import { CreateGroupResponseGroupsItemRequirementsItemThresholdDataSourceTokenId } from './CreateGroupResponseGroupsItemRequirementsItemThresholdDataSourceTokenId';
 import { CreateGroupResponseGroupsItemRequirementsItemThresholdDataSourceTokenSymbol } from './CreateGroupResponseGroupsItemRequirementsItemThresholdDataSourceTokenSymbol';
+
 export const CreateGroupResponseGroupsItemRequirementsItemThresholdDataSource =
   core.serialization.undiscriminatedUnion([
     CreateGroupResponseGroupsItemRequirementsItemThresholdDataSourceTokenId,

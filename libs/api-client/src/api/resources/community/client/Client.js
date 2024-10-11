@@ -11,6 +11,7 @@ var __awaiter =
             resolve(value);
           });
     }
+
     return new (P || (P = Promise))(function (resolve, reject) {
       function fulfilled(value) {
         try {
@@ -19,6 +20,7 @@ var __awaiter =
           reject(e);
         }
       }
+
       function rejected(value) {
         try {
           step(generator['throw'](value));
@@ -26,11 +28,13 @@ var __awaiter =
           reject(e);
         }
       }
+
       function step(result) {
         result.done
           ? resolve(result.value)
           : adopt(result.value).then(fulfilled, rejected);
       }
+
       step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
   };
@@ -39,10 +43,12 @@ import * as core from '../../../../core';
 import * as environments from '../../../../environments';
 import * as errors from '../../../../errors/index';
 import * as serializers from '../../../../serialization/index';
+
 export class Community {
-  constructor(_options = {}) {
+  constructor(_options) {
     this._options = _options;
   }
+
   /**
    * @param {CommonApi.GetCommunitiesRequest} request
    * @param {Community.RequestOptions} requestOptions - Request-specific configuration.
@@ -177,6 +183,7 @@ export class Community {
       }
     });
   }
+
   /**
    * @param {CommonApi.GetCommunityRequest} request
    * @param {Community.RequestOptions} requestOptions - Request-specific configuration.
@@ -263,6 +270,7 @@ export class Community {
       }
     });
   }
+
   /**
    * @param {CommonApi.GetMembersRequest} request
    * @param {Community.RequestOptions} requestOptions - Request-specific configuration.
@@ -389,6 +397,7 @@ export class Community {
       }
     });
   }
+
   /**
    * @param {CommonApi.CreateCommunityRequest} request
    * @param {Community.RequestOptions} requestOptions - Request-specific configuration.
@@ -399,7 +408,6 @@ export class Community {
    *         name: "name",
    *         chainNodeId: 1,
    *         base: CommonApi.CreateCommunityRequestBase.Cosmos,
-   *         userAddress: "user_address",
    *         defaultSymbol: "default_symbol"
    *     })
    */
@@ -479,6 +487,7 @@ export class Community {
       }
     });
   }
+
   /**
    * @param {CommonApi.UpdateCommunityRequest} request
    * @param {Community.RequestOptions} requestOptions - Request-specific configuration.
@@ -564,6 +573,7 @@ export class Community {
       }
     });
   }
+
   /**
    * @param {CommonApi.CreateTopicRequest} request
    * @param {Community.RequestOptions} requestOptions - Request-specific configuration.
@@ -646,6 +656,7 @@ export class Community {
       }
     });
   }
+
   /**
    * @param {CommonApi.UpdateTopicRequest} request
    * @param {Community.RequestOptions} requestOptions - Request-specific configuration.
@@ -729,6 +740,7 @@ export class Community {
       }
     });
   }
+
   /**
    * @param {CommonApi.DeleteTopicRequest} request
    * @param {Community.RequestOptions} requestOptions - Request-specific configuration.
@@ -812,6 +824,7 @@ export class Community {
       }
     });
   }
+
   /**
    * @param {CommonApi.CreateGroupRequest} request
    * @param {Community.RequestOptions} requestOptions - Request-specific configuration.
@@ -898,6 +911,7 @@ export class Community {
       }
     });
   }
+
   /**
    * @param {CommonApi.UpdateGroupRequest} request
    * @param {Community.RequestOptions} requestOptions - Request-specific configuration.
@@ -981,6 +995,7 @@ export class Community {
       }
     });
   }
+
   /**
    * @param {CommonApi.DeleteGroupRequest} request
    * @param {Community.RequestOptions} requestOptions - Request-specific configuration.
@@ -1064,6 +1079,90 @@ export class Community {
       }
     });
   }
+
+  /**
+   * @param {CommonApi.JoinCommunityRequest} request
+   * @param {Community.RequestOptions} requestOptions - Request-specific configuration.
+   *
+   * @example
+   *     await client.community.joinCommunity({
+   *         communityId: "community_id"
+   *     })
+   */
+  joinCommunity(request, requestOptions) {
+    var _a;
+    return __awaiter(this, void 0, void 0, function* () {
+      const _response = yield core.fetcher({
+        url: urlJoin(
+          (_a = yield core.Supplier.get(this._options.environment)) !== null &&
+            _a !== void 0
+            ? _a
+            : environments.CommonApiEnvironment.Default,
+          'JoinCommunity',
+        ),
+        method: 'POST',
+        headers: Object.assign(
+          {
+            address:
+              (yield core.Supplier.get(this._options.address)) != null
+                ? yield core.Supplier.get(this._options.address)
+                : undefined,
+            'X-Fern-Language': 'JavaScript',
+            'X-Fern-Runtime': core.RUNTIME.type,
+            'X-Fern-Runtime-Version': core.RUNTIME.version,
+          },
+          yield this._getCustomAuthorizationHeaders(),
+        ),
+        contentType: 'application/json',
+        requestType: 'json',
+        body: serializers.JoinCommunityRequest.jsonOrThrow(request, {
+          unrecognizedObjectKeys: 'strip',
+        }),
+        timeoutMs:
+          (requestOptions === null || requestOptions === void 0
+            ? void 0
+            : requestOptions.timeoutInSeconds) != null
+            ? requestOptions.timeoutInSeconds * 1000
+            : 60000,
+        maxRetries:
+          requestOptions === null || requestOptions === void 0
+            ? void 0
+            : requestOptions.maxRetries,
+        abortSignal:
+          requestOptions === null || requestOptions === void 0
+            ? void 0
+            : requestOptions.abortSignal,
+      });
+      if (_response.ok) {
+        return serializers.JoinCommunityResponse.parseOrThrow(_response.body, {
+          unrecognizedObjectKeys: 'passthrough',
+          allowUnrecognizedUnionMembers: true,
+          allowUnrecognizedEnumValues: true,
+          breadcrumbsPrefix: ['response'],
+        });
+      }
+      if (_response.error.reason === 'status-code') {
+        throw new errors.CommonApiError({
+          statusCode: _response.error.statusCode,
+          body: _response.error.body,
+        });
+      }
+      switch (_response.error.reason) {
+        case 'non-json':
+          throw new errors.CommonApiError({
+            statusCode: _response.error.statusCode,
+            body: _response.error.rawBody,
+          });
+        case 'timeout':
+          throw new errors.CommonApiTimeoutError();
+        case 'unknown':
+          throw new errors.CommonApiError({
+            message: _response.error.errorMessage,
+          });
+      }
+    });
+  }
+
   _getCustomAuthorizationHeaders() {
     return __awaiter(this, void 0, void 0, function* () {
       const apiKeyValue = yield core.Supplier.get(this._options.apiKey);

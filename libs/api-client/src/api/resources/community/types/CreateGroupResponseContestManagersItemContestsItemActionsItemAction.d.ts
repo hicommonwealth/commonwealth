@@ -4,8 +4,9 @@
 /**
  * Type of content action
  */
-export declare type CreateGroupResponseContestManagersItemContestsItemActionsItemAction = "added" | "upvoted";
+export declare type CreateGroupResponseContestManagersItemContestsItemActionsItemAction =
+  'added' | 'upvoted';
 export declare const CreateGroupResponseContestManagersItemContestsItemActionsItemAction: {
-    readonly Added: "added";
-    readonly Upvoted: "upvoted";
+  readonly Added: 'added';
+  readonly Upvoted: 'upvoted';
 };
