@@ -5,5 +5,5 @@ export const getCommunityCountsString = (totalCommunities: number) => {
     totalCommunities >= 1000
       ? numeral(totalCommunities).format('0.0a')
       : totalCommunities
-  } communities`;
+  } ${totalCommunities === 1 ? 'community' : 'communities'}`;
 };
