@@ -7,7 +7,10 @@ import {
   dispose,
   query,
 } from '@hicommonwealth/core';
-import { TopicWeightedVoting } from '@hicommonwealth/schemas';
+import {
+  GroupTopicPermissionEnum,
+  TopicWeightedVoting,
+} from '@hicommonwealth/schemas';
 import { ChainBase, ChainType } from '@hicommonwealth/shared';
 import { Chance } from 'chance';
 import { CreateTopic } from 'model/src/community/CreateTopic.command';
@@ -38,7 +41,10 @@ import { seed } from '../../src/tester';
 
 const chance = Chance();
 
-function buildCreateGroupPayload(community_id: string, topics: number[] = []) {
+function buildCreateGroupPayload(
+  community_id: string,
+  topics: { id: number; permission: GroupTopicPermissionEnum }[] = [],
+) {
   return {
     community_id,
     metadata: {
@@ -355,7 +361,20 @@ describe('Community lifecycle', () => {
       await expect(
         command(CreateGroup(), {
           actor: ethAdminActor,
-          payload: buildCreateGroupPayload(community.id, [1, 2, 3]),
+          payload: buildCreateGroupPayload(community.id, [
+            {
+              id: 1,
+              permission: GroupTopicPermissionEnum.UPVOTE_AND_COMMENT_AND_POST,
+            },
+            {
+              id: 2,
+              permission: GroupTopicPermissionEnum.UPVOTE_AND_COMMENT_AND_POST,
+            },
+            {
+              id: 3,
+              permission: GroupTopicPermissionEnum.UPVOTE_AND_COMMENT_AND_POST,
+            },
+          ]),
         }),
       ).rejects.toThrow(CreateGroupErrors.InvalidTopics);
     });

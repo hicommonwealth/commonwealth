@@ -229,7 +229,6 @@ export const CWContentPage = ({
         ? foundTopicPermissions?.permission
         : undefined,
   });
-  console.log('disabledActionsTooltipText => ', disabledActionsTooltipText);
 
   const mainBody = (
     <div className="main-body-container">
