@@ -52,10 +52,15 @@
       padding: 8px 0;
       width: 100%;
       display: grid;
+      align-items: center;
       grid-template-columns: 1fr 1fr;
 
       .Tag {
         height: auto;
+
+        .Text {
+          height: fit-content;
+        }
 
         @include extraSmall {
           .Text {
