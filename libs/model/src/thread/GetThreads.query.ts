@@ -206,7 +206,7 @@ export function GetThreads(): Query<typeof schemas.GetThreads> {
                   'marked_as_spam_at', COM.marked_as_spam_at::text,
                   'discord_meta', COM.discord_meta,
                   'profile_name', U.profile->>'name',
-                  'profile_avatar_url', U.profile->>'avatar_url',
+                  'profile_avatar', U.profile->>'avatar_url',
                   'user_id', U.id
               ))) as "recentComments"
               FROM (

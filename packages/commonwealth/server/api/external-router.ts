@@ -36,7 +36,6 @@ const { createComment, updateComment, deleteComment, createCommentReaction } =
 const { getNewContent } = user.trpcRouter;
 
 const api = {
-  getGlobalActivity: trpc.query(Feed.GetGlobalActivity, trpc.Tag.User, true),
   getUserActivity: trpc.query(Feed.GetUserActivity, trpc.Tag.User, true),
   getNewContent,
   getCommunities: trpc.query(
@@ -69,7 +68,14 @@ const api = {
 
 const PATH = '/api/v1';
 const router = Router();
-router.use(cors(), express.statsMiddleware);
+router.use(
+  cors({
+    origin: '*',
+    methods: ['GET', 'POST'],
+    allowedHeaders: ['Content-Type', 'api-key', 'address'],
+  }),
+  express.statsMiddleware,
+);
 
 // ===============================================================================
 /**

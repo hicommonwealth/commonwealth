@@ -1,108 +1,118 @@
 import { CacheNamespaces, cache, logger } from '@hicommonwealth/core';
-import { ActivityFeedRecord } from '@hicommonwealth/schemas';
+import { ActivityFeed, ActivityThread } from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
 import { v4 as uuidv4 } from 'uuid';
 import { z } from 'zod';
 import { models } from './database';
 
-export async function getUserActivityFeed(user_id?: number) {
-  /**
-   * Last 50 updated threads and their comments
-   */
+/**
+ * Gets last updated threads and their recent comments
+ * @param user_id by user id communities, 0 for global
+ * @param thread_limit thread limit
+ * @param comment_limit comment limit
+ */
+export async function getUserActivityFeed({
+  user_id = 0,
+  thread_limit = 50,
+  comment_limit = 3,
+}: Omit<z.infer<typeof ActivityFeed.input>, 'is_global'> & {
+  user_id?: number;
+}) {
   const query = `
-      WITH 
-      user_communities AS (SELECT DISTINCT community_id FROM "Addresses" WHERE user_id = :user_id),
-      top_threads AS (
-          SELECT T.*
-          FROM "Threads" T
-                   ${
-                     user_id
-                       ? 'JOIN user_communities UC ON UC.community_id = T.community_id'
-                       : ''
-                   }
-          WHERE T.deleted_at IS NULL
-          ORDER BY T.activity_rank_date DESC NULLS LAST
-          LIMIT 50
-      ),
-      ranked_threads AS (
-        SELECT 
-          T.id AS thread_id,
-          T.activity_rank_date,
-          json_build_object(
-            'id', T.id,
-            'body', T.body,
-            'title', T.title,
-            'numberOfComments', T.comment_count,
-            'created_at', T.created_at,
-            'updated_at', T.updated_at,
-            'deleted_at', T.deleted_at,
-            'locked_at', T.locked_at,
-            'kind', T.kind,
-            'stage', T.stage,
-            'archived_at', T.archived_at,
-            'read_only', T.read_only,
-            'has_poll', T.has_poll,
-            'marked_as_spam_at', T.marked_as_spam_at::text,
-            'discord_meta', T.discord_meta,
-            'profile_name', U.profile->>'name',
-            'profile_avatar_url', U.profile->>'avatar_url',
-            'user_id', U.id,
-            'user_address', A.address,
-            'topic', Tp,
-            'community_id', T.community_id
-          ) as thread
-        FROM
-          top_threads T
-          JOIN "Addresses" A ON A.id = T.address_id AND A.community_id = T.community_id
-          JOIN "Users" U ON U.id = A.user_id
-          JOIN "Topics" Tp ON Tp.id = T.topic_id
-        ${user_id ? 'WHERE U.id != :user_id' : ''}),
-      recent_comments AS ( -- get the recent comments data associated with the thread
-        SELECT 
-          C.thread_id as thread_id,
-          json_agg(json_strip_nulls(json_build_object(
-            'id', C.id,
-            'address', A.address,
-            'text', C.text,
-            'created_at', C.created_at::text,
-            'updated_at', C.updated_at::text,
-            'deleted_at', C.deleted_at::text,
-            'marked_as_spam_at', C.marked_as_spam_at::text,
-            'discord_meta', C.discord_meta,
-            'profile_name', U.profile->>'name',
-            'profile_avatar_url', U.profile->>'avatar_url',
-            'user_id', U.id
-          ))) as recent_comments
-        FROM (
-          Select tempC.*
-          FROM "Comments" tempC 
-          JOIN top_threads tt ON tt.id = tempC.thread_id
-            WHERE tempC.deleted_at IS NULL
-            ORDER BY tempC.created_at DESC
-            LIMIT 3 -- Optionally a prop can be added for this
-          ) C
-          JOIN "Addresses" A ON A.id = C.address_id
-          JOIN "Users" U ON U.id = A.user_id
-          GROUP BY C.thread_id
+WITH 
+user_communities AS (
+    SELECT DISTINCT community_id 
+    FROM "Addresses" 
+    WHERE user_id = :user_id
+),
+top_threads AS (
+    SELECT T.*
+    FROM "Threads" T
+    ${user_id ? 'JOIN user_communities UC ON UC.community_id = T.community_id' : ''}
+    WHERE T.deleted_at IS NULL
+    ORDER BY T.activity_rank_date DESC NULLS LAST
+    LIMIT :thread_limit
+)
+SELECT 
+  jsonb_set(
+    jsonb_build_object(
+      'community_id', C.id,
+      'community_icon', C.icon_url,
+      'id', T.id,
+      'user_id', U.id,
+      'user_address', A.address,
+      'profile_name', U.profile->>'name',
+      'profile_avatar', U.profile->>'avatar_url',
+      'body', T.body,
+      'title', T.title,
+      'kind', T.kind,
+      'stage', T.stage,
+      'number_of_comments', coalesce(T.comment_count, 0),
+      'created_at', T.created_at::text,
+      'updated_at', T.updated_at::text,
+      'deleted_at', T.deleted_at::text,
+      'locked_at', T.locked_at::text,
+      'archived_at', T.archived_at::text,
+      'marked_as_spam_at', T.marked_as_spam_at::text,
+      'read_only', T.read_only,
+      'has_poll', T.has_poll,
+      'discord_meta', T.discord_meta,
+      'topic', jsonb_build_object(
+        'id', T.topic_id,
+        'name', Tp.name,
+        'description', Tp.description
       )
-      SELECT 
-        RTS.thread,
-        RC.recent_comments
-      FROM
-        ranked_threads RTS
-        LEFT JOIN recent_comments RC ON RTS.thread_id = RC.thread_id
-      ORDER BY
-        RTS.activity_rank_date DESC NULLS LAST;
+    ),
+    '{recent_comments}', 
+    COALESCE(
+      (SELECT jsonb_agg(jsonb_strip_nulls(jsonb_build_object(
+        'id', C.id,
+        'address', C.address,
+        'user_id', C.user_id,
+        'profile_name', C.profile_name,
+        'profile_avatar', C.profile_avatar,
+        'text', C.text,
+        'created_at', C.created_at::text,
+        'updated_at', C.updated_at::text,
+        'deleted_at', C.deleted_at::text,
+        'marked_as_spam_at', C.marked_as_spam_at::text,
+        'discord_meta', C.discord_meta
+      )) ORDER BY C.created_at DESC)
+      FROM (
+          SELECT 
+            C.*,
+            A.address,
+            U.id as user_id,
+            U.profile->>'name' as profile_name, 
+            U.profile->>'avatar_url' as profile_avatar, 
+            ROW_NUMBER() OVER (PARTITION BY C.thread_id ORDER BY C.created_at DESC) AS rn
+          FROM "Comments" C
+            JOIN "Addresses" A on C.address_id = A.id
+            JOIN "Users" U on A.user_id = U.id
+          WHERE 
+            C.thread_id = T.id 
+            AND C.deleted_at IS NULL
+      ) C WHERE C.rn <= :comment_limit), '[]')
+  ) AS thread
+FROM
+  top_threads T
+  JOIN "Communities" C ON T.community_id = C.id
+  JOIN "Addresses" A ON A.id = T.address_id AND A.community_id = T.community_id
+  JOIN "Users" U ON U.id = A.user_id
+  JOIN "Topics" Tp ON Tp.id = T.topic_id
+ORDER BY
+  T.activity_rank_date DESC NULLS LAST;
   `;
 
-  return await models.sequelize.query<z.infer<typeof ActivityFeedRecord>>(
-    query,
-    {
-      type: QueryTypes.SELECT,
-      raw: true,
-      replacements: { user_id },
-    },
-  );
+  const threads = await models.sequelize.query<{
+    thread: z.infer<typeof ActivityThread>;
+  }>(query, {
+    type: QueryTypes.SELECT,
+    raw: true,
+    replacements: { user_id, thread_limit, comment_limit },
+  });
+
+  return threads.map((t) => t.thread);
 }
 
 const log = logger(import.meta);
@@ -134,13 +144,12 @@ export class GlobalActivityCache {
       CacheNamespaces.Activity_Cache,
       this._cacheKey,
     );
-
     if (!activity) {
       if (GlobalActivityCache._instance) {
         const msg = 'Failed to fetch global activity from Redis';
         log.error(msg);
       }
-      return await getUserActivityFeed();
+      return await getUserActivityFeed({});
     }
     return JSON.parse(activity);
   }
@@ -194,7 +203,7 @@ export class GlobalActivityCache {
         return;
       }
 
-      const activity = await getUserActivityFeed();
+      const activity = await getUserActivityFeed({});
       const result = await cache().setKey(
         CacheNamespaces.Activity_Cache,
         this._cacheKey,

@@ -3,20 +3,20 @@ import { Virtuoso } from 'react-virtuoso';
 
 import 'components/feed.scss';
 
-import { ActivityComment, ActivityFeedRecord } from '@hicommonwealth/schemas';
+import { ActivityComment, ActivityThread } from '@hicommonwealth/schemas';
 import { slugify } from '@hicommonwealth/shared';
 import { Thread, type RecentComment } from 'client/scripts/models/Thread';
 import Topic from 'client/scripts/models/Topic';
 import { ThreadKind, ThreadStage } from 'client/scripts/models/types';
+import {
+  useFetchGlobalActivityQuery,
+  useFetchUserActivityQuery,
+} from 'client/scripts/state/api/feeds/fetchUserActivity';
 import { getThreadActionTooltipText } from 'helpers/threads';
 import { getProposalUrlPath } from 'identifiers';
 import { useCommonNavigate } from 'navigation/helpers';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { useFetchCustomDomainQuery } from 'state/api/configuration';
-import {
-  useFetchGlobalActivityQuery,
-  useFetchUserActivityQuery,
-} from 'state/api/feeds';
 import { useRefreshMembershipQuery } from 'state/api/groups';
 import useUserStore from 'state/ui/user';
 import Permissions from 'utils/Permissions';
@@ -120,10 +120,8 @@ const FeedThread = ({ thread }: { thread: Thread }) => {
   );
 };
 
-function mapThread({
-  thread,
-  recent_comments,
-}: z.infer<typeof ActivityFeedRecord>): Thread {
+// TODO: Reconcile client state with query schemas
+function mapThread(thread: z.infer<typeof ActivityThread>): Thread {
   return new Thread({
     Address: {
       address: thread.user_address,
@@ -164,9 +162,9 @@ function mapThread({
     reaction_weights_sum: 0,
     address_last_active: '',
     ContestActions: [],
-    numberOfComments: thread.numberOfComments,
+    numberOfComments: thread.number_of_comments,
     recentComments:
-      recent_comments?.map(
+      thread.recent_comments?.map(
         (c: z.infer<typeof ActivityComment>) =>
           ({
             id: c.id,
@@ -174,7 +172,7 @@ function mapThread({
             user_id: c.user_id ?? '',
             created_at: c.created_at,
             updated_at: c.updated_at,
-            profile_avatar_url: c.profile_avatar_url,
+            profile_avatar: c.profile_avatar,
             profile_name: c.profile_name,
             text: c.text,
           }) as RecentComment,
@@ -188,18 +186,10 @@ export const Feed = ({
   noFeedMessage,
   customScrollParent,
 }: FeedProps) => {
-  const userActivityRes = useFetchUserActivityQuery({
-    apiEnabled: DashboardViews.ForYou === dashboardView,
-  });
+  const userFeed = useFetchUserActivityQuery();
+  const globalFeed = useFetchGlobalActivityQuery();
 
-  const globalActivityRes = useFetchGlobalActivityQuery({
-    apiEnabled: DashboardViews.Global === dashboardView,
-  });
-
-  const feed =
-    DashboardViews.Global === dashboardView
-      ? globalActivityRes
-      : userActivityRes;
+  const feed = dashboardView === DashboardViews.Global ? globalFeed : userFeed;
 
   if (feed.isLoading) {
     return (

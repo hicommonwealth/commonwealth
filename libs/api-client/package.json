@@ -36,5 +36,9 @@
     "community"
   ],
   "author": "common.xyz",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "node-fetch": "^3.3.2",
+    "url-join": "^5.0.0"
+  }
 }

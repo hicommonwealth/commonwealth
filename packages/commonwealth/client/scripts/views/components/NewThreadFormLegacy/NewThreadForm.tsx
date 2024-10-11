@@ -145,7 +145,6 @@ export const NewThreadForm = () => {
   );
   const isActionAllowedInGatedTopic = !!(memberships || []).find(
     (membership) =>
-      threadTopic.id &&
       threadTopic?.id &&
       membership.topicIds.includes(threadTopic?.id) &&
       membership.isAllowed,

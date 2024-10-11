@@ -1,56 +1,57 @@
 import { z } from 'zod';
 import { DiscordMetaSchema, PG_INT } from '../utils';
 
-export const ActivityThread = z.object({
-  id: PG_INT,
-  community_id: z.string(),
-  body: z.string(),
-  title: z.string(),
-  numberOfComments: PG_INT,
-  created_at: z.string().nullish(),
-  updated_at: z.string().nullish(),
-  deleted_at: z.string().nullish(),
-  locked_at: z.string().nullish(),
-  kind: z.string(),
-  stage: z.string(),
-  archived_at: z.string().nullish(),
-  read_only: z.boolean(),
-  has_poll: z.boolean().nullish(),
-  marked_as_spam_at: z.string().nullish(),
-  discord_meta: DiscordMetaSchema.nullish(),
-  profile_name: z.string().nullish(),
-  profile_avatar: z.string().nullish(),
-  user_id: PG_INT,
-  user_address: z.string(),
-  topic: z.object({
-    id: PG_INT,
-    name: z.string(),
-    description: z.string(),
-  }),
-});
-
 export const ActivityComment = z.object({
   id: PG_INT,
   address: z.string(),
+  user_id: z.number().nullish(),
+  profile_name: z.string().nullish(),
+  profile_avatar: z.string().nullish(),
   text: z.string(),
   created_at: z.string(),
   updated_at: z.string().nullish(),
   deleted_at: z.string().nullish(),
   marked_as_spam_at: z.string().nullish(),
   discord_meta: DiscordMetaSchema.nullish(),
-  profile_name: z.string().nullish(),
-  profile_avatar_url: z.string().nullish(),
-  user_id: z.number().nullish(),
 });
 
-export const ActivityFeedRecord = z.object({
-  thread: ActivityThread,
+export const ActivityThread = z.object({
+  community_id: z.string(),
+  community_icon: z.string().nullish(),
+  id: PG_INT,
+  user_id: PG_INT,
+  user_address: z.string(),
+  profile_name: z.string().nullish(),
+  profile_avatar: z.string().nullish(),
+  body: z.string(),
+  title: z.string(),
+  kind: z.string(),
+  stage: z.string(),
+  number_of_comments: z.number(),
+  created_at: z.string().nullish(),
+  updated_at: z.string().nullish(),
+  deleted_at: z.string().nullish(),
+  locked_at: z.string().nullish(),
+  archived_at: z.string().nullish(),
+  marked_as_spam_at: z.string().nullish(),
+  read_only: z.boolean(),
+  has_poll: z.boolean().nullish(),
+  discord_meta: DiscordMetaSchema.nullish(),
+  topic: z.object({
+    id: PG_INT,
+    name: z.string(),
+    description: z.string(),
+  }),
   recent_comments: z.array(ActivityComment).nullish(),
 });
 
 export const ActivityFeed = {
-  input: z.object({}),
-  output: z.array(ActivityFeedRecord),
+  input: z.object({
+    is_global: z.boolean(),
+    thread_limit: z.number().optional(),
+    comment_limit: z.number().optional(),
+  }),
+  output: z.array(ActivityThread),
 };
 
 export const ChainFeedRecord = z.object({
