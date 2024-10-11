@@ -71,6 +71,14 @@ function readableVersion(version: {
 }
 
 async function validateExternalApiVersioning() {
+  // verify matching version numbers
+  if (externalApiConfig.version !== apiClientPackageJson.version) {
+    throw new Error(
+      `Mismatching version from external api config (${externalApiConfig.version}) ` +
+        `and api-client/package.json (${apiClientPackageJson.version})`,
+    );
+  }
+
   // TODO: potentially fetch from github (libs/api-client/openapi.json) after #9526 is merged
   await downloadFile(
     'https://commonwealth.im/api/v1/openapi.json',
