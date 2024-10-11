@@ -19,6 +19,6 @@ export type GroupCardProps = {
   allowLists?: string[];
   topics: { id: number; name: string; permission?: TopicPermissions }[];
   canEdit?: boolean;
-  onEditClick?: () => any;
+  onEditClick?: () => void;
   profiles?: Map<string, MinimumProfile>;
 };
