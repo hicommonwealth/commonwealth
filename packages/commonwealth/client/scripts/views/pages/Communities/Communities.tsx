@@ -33,6 +33,8 @@ type ExtendedCommunitySliceType = [
 ];
 
 const CommunitiesPage = () => {
+  const containerRef = useRef();
+
   const {
     setModeOfManageCommunityStakeModal,
     modeOfManageCommunityStakeModal,
@@ -135,7 +137,8 @@ const CommunitiesPage = () => {
   };
 
   return (
-    <CWPageLayout className="CommunitiesPageLayout">
+    // @ts-expect-error <StrictNullChecks/>
+    <CWPageLayout ref={containerRef} className="CommunitiesPageLayout">
       <div className="CommunitiesPage">
         <div className="header-section">
           <div className="description">
@@ -203,6 +206,7 @@ const CommunitiesPage = () => {
             className="communities-list"
             style={{ height: '100%', width: '100%' }}
             data={isInitialCommunitiesLoading ? [] : communitiesList}
+            customScrollParent={containerRef.current}
             itemContent={(listIndex, slicedCommunities) => {
               return slicedCommunities.map((community, sliceIndex) => {
                 const canBuyStake = !!user.addresses.find?.(
