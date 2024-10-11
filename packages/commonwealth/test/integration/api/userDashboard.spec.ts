@@ -162,13 +162,17 @@ describe('User Dashboard API', () => {
   });
 
   describe('/GetUserActivity', () => {
-    const apiUrl = '/api/internal/trpc/feed.getUserActivity';
+    const queryArgs = { is_global: false };
+    const apiUrl =
+      '/api/internal/trpc/feed.getUserActivity?input=' +
+      encodeURIComponent(JSON.stringify(queryArgs));
 
     test('should fail without JWT', async () => {
       const res = await chai.request
         .agent(server.app)
         .get(apiUrl)
         .set('Accept', 'application/json')
+        .set('address', userAddress)
         .send({ chain });
       expect(res).to.not.be.null;
       expect(res.error).to.not.be.null;
@@ -179,14 +183,14 @@ describe('User Dashboard API', () => {
         .agent(server.app)
         .get(apiUrl)
         .set('Accept', 'application/json')
+        .set('address', userAddress)
         .send({ chain, jwt: userJWT });
 
       expect(res.status).to.be.equal(200);
-      expect(res.body.status).to.be.equal('Success');
-      expect(res.body).to.not.be.null;
-      expect(res.body.result).to.not.be.null;
+      expect(res.text).to.not.be.null;
 
-      const threadIds = res.body.result.map((a) => a.thread.id);
+      const resBody = JSON.parse(res.text);
+      const threadIds = resBody.result.data.map((a) => a.id);
       const chains = await server.models.Thread.findAll({
         attributes: attributesOf<ThreadAttributes>('community_id'),
         where: {
@@ -213,14 +217,14 @@ describe('User Dashboard API', () => {
         .agent(server.app)
         .get(apiUrl)
         .set('Accept', 'application/json')
+        .set('address', userAddress)
         .send({ chain, jwt: userJWT });
 
       expect(res.status).to.be.equal(200);
-      expect(res.body.status).to.be.equal('Success');
-      expect(res.body).to.not.be.null;
-      expect(res.body.result).to.not.be.null;
+      expect(res.text).to.not.be.null;
 
-      const threadIds = res.body.result.map((a) => a.thread.id);
+      const resBody = JSON.parse(res.text);
+      const threadIds = resBody.result.data.map((a) => a.id);
       const chains = await server.models.Thread.findAll({
         attributes: attributesOf<ThreadAttributes>('community_id'),
         where: {
@@ -261,14 +265,14 @@ describe('User Dashboard API', () => {
         .agent(server.app)
         .get(apiUrl)
         .set('Accept', 'application/json')
+        .set('address', userAddress)
         .send({ chain, jwt: userJWT });
 
       expect(res.status).to.be.equal(200);
-      expect(res.body.status).to.be.equal('Success');
-      expect(res.body).to.not.be.null;
-      expect(res.body.result).to.not.be.null;
+      expect(res.text).to.not.be.null;
 
-      const threadIds = res.body.result.map((a) => a.thread_id);
+      const resBody = JSON.parse(res.text);
+      const threadIds = resBody.result.data.map((a) => a.id);
       const chains = (
         await server.models.Thread.findAll({
           attributes: attributesOf<ThreadAttributes>('community_id'),

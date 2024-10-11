@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { DiscordMetaSchema, PG_INT } from '../utils';
 
 export const ActivityComment = z.object({
-  id: PG_INT,
+  id: z.number(),
   address: z.string(),
   user_id: z.number().nullish(),
   profile_name: z.string().nullish(),
@@ -18,8 +18,8 @@ export const ActivityComment = z.object({
 export const ActivityThread = z.object({
   community_id: z.string(),
   community_icon: z.string().nullish(),
-  id: PG_INT,
-  user_id: PG_INT,
+  id: z.number(),
+  user_id: z.number(),
   user_address: z.string(),
   profile_name: z.string().nullish(),
   profile_avatar: z.string().nullish(),
@@ -38,7 +38,7 @@ export const ActivityThread = z.object({
   has_poll: z.boolean().nullish(),
   discord_meta: DiscordMetaSchema.nullish(),
   topic: z.object({
-    id: PG_INT,
+    id: z.number(),
     name: z.string(),
     description: z.string(),
   }),
