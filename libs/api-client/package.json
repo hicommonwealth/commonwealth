@@ -1,6 +1,6 @@
 {
   "name": "@commonxyz/api-client",
-  "version": "0.0.1",
+  "version": "0.0.7",
   "type": "module",
   "description": "Common Client Proxy",
   "repository": {
@@ -15,20 +15,19 @@
     "access": "public"
   },
   "files": [
-    "build"
+    "src"
   ],
   "exports": {
     ".": {
-      "default": "./build/index.js",
-      "devmode": "./src/index.ts"
+      "default": "./src/index.js"
     }
   },
   "scripts": {
     "build": "echo Generated SDK is prebuilt",
     "clean": "rm -rf build && rm -rf coverage",
-    "publish": "npm publish",
     "run-test": "tsx ./test/index.ts",
-    "check-types": "tsc --noEmit",
+    "publish": "chmod u+x scripts/publish.sh && ./scripts/publish.sh.sh",
+    "check-types": "echo No types to check",
     "generate-client": "pnpm -F commonwealth generate-oas production \"$(pwd)/openapi.json\" && fern generate",
     "generate-client-dev": "pnpm -F commonwealth generate-oas local \"$(pwd)/openapi.json\" && fern generate"
   },

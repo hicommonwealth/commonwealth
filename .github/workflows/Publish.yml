@@ -1,0 +1,21 @@
+name: Publish Client SDK
+
+on:
+  pull_request:
+    types:
+      - closed
+    branches:
+      - production
+
+jobs:
+  publish_if_merged:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+        with:
+          node-version: ${{ matrix.node }}
+      - run: pnpm -F @commonxyz/api-client run publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
