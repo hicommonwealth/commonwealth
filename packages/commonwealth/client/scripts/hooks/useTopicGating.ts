@@ -4,7 +4,7 @@ import Permissions from '../utils/Permissions';
 
 type TopicPermission = { id: number; permission: GroupTopicPermissionEnum };
 
-type IuseTopicGating = {
+type UseTopicGatingProps = {
   communityId: string;
   apiEnabled: boolean;
   userAddress: string;
@@ -16,7 +16,7 @@ const useTopicGating = ({
   communityId,
   userAddress,
   topicId,
-}: IuseTopicGating) => {
+}: UseTopicGatingProps) => {
   const { data: memberships = [], isLoading: isLoadingMemberships } =
     useRefreshMembershipQuery({
       communityId,
