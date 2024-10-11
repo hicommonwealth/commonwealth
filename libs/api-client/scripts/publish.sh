@@ -11,5 +11,5 @@ if [ "$CURRENT_VERSION" != "$LOCAL_VERSION" ]; then
   pnpm install -g fern-api@latest
   pnpm generate-client
   # without --no-git-checks pnpm doesn't want to publish the uncommited/generated src/ files
-  pnpm publish --dry-run --no-git-checks
+  pnpm publish --no-git-checks
 fi
