@@ -29,7 +29,8 @@
     "publish": "npm publish",
     "run-test": "tsx ./test/index.ts",
     "check-types": "tsc --noEmit",
-    "generate-client": "chmod u+x scripts/fern-init.sh && ./scripts/fern-init.sh && fern generate"
+    "generate-client": "pnpm -F commonwealth generate-oas production \"$(pwd)/openapi.json\" && fern generate",
+    "generate-client-dev": "pnpm -F commonwealth generate-oas local \"$(pwd)/openapi.json\" && fern generate"
   },
   "keywords": [
     "commonwealth",
