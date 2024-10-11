@@ -44,93 +44,26 @@ export class User {
     this._options = _options;
   }
   /**
-   * @param {User.RequestOptions} requestOptions - Request-specific configuration.
-   *
-   * @example
-   *     await client.user.getGlobalActivity()
-   */
-  getGlobalActivity(requestOptions) {
-    var _a;
-    return __awaiter(this, void 0, void 0, function* () {
-      const _response = yield core.fetcher({
-        url: urlJoin(
-          (_a = yield core.Supplier.get(this._options.environment)) !== null &&
-            _a !== void 0
-            ? _a
-            : environments.CommonApiEnvironment.Default,
-          'GetGlobalActivity',
-        ),
-        method: 'GET',
-        headers: Object.assign(
-          {
-            address:
-              (yield core.Supplier.get(this._options.address)) != null
-                ? yield core.Supplier.get(this._options.address)
-                : undefined,
-            'X-Fern-Language': 'JavaScript',
-            'X-Fern-Runtime': core.RUNTIME.type,
-            'X-Fern-Runtime-Version': core.RUNTIME.version,
-          },
-          yield this._getCustomAuthorizationHeaders(),
-        ),
-        contentType: 'application/json',
-        requestType: 'json',
-        timeoutMs:
-          (requestOptions === null || requestOptions === void 0
-            ? void 0
-            : requestOptions.timeoutInSeconds) != null
-            ? requestOptions.timeoutInSeconds * 1000
-            : 60000,
-        maxRetries:
-          requestOptions === null || requestOptions === void 0
-            ? void 0
-            : requestOptions.maxRetries,
-        abortSignal:
-          requestOptions === null || requestOptions === void 0
-            ? void 0
-            : requestOptions.abortSignal,
-      });
-      if (_response.ok) {
-        return serializers.user.getGlobalActivity.Response.parseOrThrow(
-          _response.body,
-          {
-            unrecognizedObjectKeys: 'passthrough',
-            allowUnrecognizedUnionMembers: true,
-            allowUnrecognizedEnumValues: true,
-            breadcrumbsPrefix: ['response'],
-          },
-        );
-      }
-      if (_response.error.reason === 'status-code') {
-        throw new errors.CommonApiError({
-          statusCode: _response.error.statusCode,
-          body: _response.error.body,
-        });
-      }
-      switch (_response.error.reason) {
-        case 'non-json':
-          throw new errors.CommonApiError({
-            statusCode: _response.error.statusCode,
-            body: _response.error.rawBody,
-          });
-        case 'timeout':
-          throw new errors.CommonApiTimeoutError();
-        case 'unknown':
-          throw new errors.CommonApiError({
-            message: _response.error.errorMessage,
-          });
-      }
-    });
-  }
-  /**
+   * @param {CommonApi.GetUserActivityRequest} request
    * @param {User.RequestOptions} requestOptions - Request-specific configuration.
    *
    * @example
    *     await client.user.getUserActivity()
    */
-  getUserActivity(requestOptions) {
+  getUserActivity(request = {}, requestOptions) {
     var _a;
     return __awaiter(this, void 0, void 0, function* () {
+      const { isGlobal, threadLimit, commentLimit } = request;
+      const _queryParams = {};
+      if (isGlobal != null) {
+        _queryParams['is_global'] = isGlobal.toString();
+      }
+      if (threadLimit != null) {
+        _queryParams['thread_limit'] = threadLimit.toString();
+      }
+      if (commentLimit != null) {
+        _queryParams['comment_limit'] = commentLimit.toString();
+      }
       const _response = yield core.fetcher({
         url: urlJoin(
           (_a = yield core.Supplier.get(this._options.environment)) !== null &&
@@ -153,6 +86,7 @@ export class User {
           yield this._getCustomAuthorizationHeaders(),
         ),
         contentType: 'application/json',
+        queryParameters: _queryParams,
         requestType: 'json',
         timeoutMs:
           (requestOptions === null || requestOptions === void 0

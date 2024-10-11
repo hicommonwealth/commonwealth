@@ -1,211 +1,10 @@
 openapi: 3.0.3
 info:
   title: Common API
-  version: 0.0.4
+  version: 0.0.1
 servers:
   - url: http://localhost:3000/api/v1
 paths:
-  /GetGlobalActivity:
-    get:
-      operationId: getGlobalActivity
-      tags:
-        - User
-      security:
-        - apiKey: []
-      parameters:
-        - in: header
-          name: address
-          required: false
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    thread:
-                      type: object
-                      properties:
-                        id:
-                          type: integer
-                          minimum: 0
-                          maximum: 2147483647
-                        community_id:
-                          type: string
-                        body:
-                          type: string
-                        title:
-                          type: string
-                        numberOfComments:
-                          type: integer
-                          minimum: 0
-                          maximum: 2147483647
-                        created_at:
-                          type: string
-                          nullable: true
-                        updated_at:
-                          type: string
-                          nullable: true
-                        deleted_at:
-                          type: string
-                          nullable: true
-                        locked_at:
-                          type: string
-                          nullable: true
-                        kind:
-                          type: string
-                        stage:
-                          type: string
-                        archived_at:
-                          type: string
-                          nullable: true
-                        read_only:
-                          type: boolean
-                        has_poll:
-                          type: boolean
-                          nullable: true
-                        marked_as_spam_at:
-                          type: string
-                          nullable: true
-                        discord_meta:
-                          type: object
-                          properties:
-                            user:
-                              type: object
-                              properties:
-                                id:
-                                  type: string
-                                username:
-                                  type: string
-                              required:
-                                - id
-                                - username
-                              additionalProperties: false
-                            channel_id:
-                              type: string
-                            message_id:
-                              type: string
-                          required:
-                            - user
-                            - channel_id
-                            - message_id
-                          additionalProperties: false
-                          nullable: true
-                        profile_name:
-                          type: string
-                          nullable: true
-                        profile_avatar:
-                          type: string
-                          nullable: true
-                        user_id:
-                          type: integer
-                          minimum: 0
-                          maximum: 2147483647
-                        user_address:
-                          type: string
-                        topic:
-                          type: object
-                          properties:
-                            id:
-                              type: integer
-                              minimum: 0
-                              maximum: 2147483647
-                            name:
-                              type: string
-                            description:
-                              type: string
-                          required:
-                            - id
-                            - name
-                            - description
-                          additionalProperties: false
-                      required:
-                        - id
-                        - community_id
-                        - body
-                        - title
-                        - numberOfComments
-                        - kind
-                        - stage
-                        - read_only
-                        - user_id
-                        - user_address
-                        - topic
-                      additionalProperties: false
-                    recent_comments:
-                      type: array
-                      items:
-                        type: object
-                        properties:
-                          id:
-                            type: integer
-                            minimum: 0
-                            maximum: 2147483647
-                          address:
-                            type: string
-                          text:
-                            type: string
-                          created_at:
-                            type: string
-                          updated_at:
-                            type: string
-                            nullable: true
-                          deleted_at:
-                            type: string
-                            nullable: true
-                          marked_as_spam_at:
-                            type: string
-                            nullable: true
-                          discord_meta:
-                            type: object
-                            properties:
-                              user:
-                                type: object
-                                properties:
-                                  id:
-                                    type: string
-                                  username:
-                                    type: string
-                                required:
-                                  - id
-                                  - username
-                                additionalProperties: false
-                              channel_id:
-                                type: string
-                              message_id:
-                                type: string
-                            required:
-                              - user
-                              - channel_id
-                              - message_id
-                            additionalProperties: false
-                            nullable: true
-                          profile_name:
-                            type: string
-                            nullable: true
-                          profile_avatar_url:
-                            type: string
-                            nullable: true
-                          user_id:
-                            type: number
-                            nullable: true
-                        required:
-                          - id
-                          - address
-                          - text
-                          - created_at
-                        additionalProperties: false
-                      nullable: true
-                  required:
-                    - thread
-                  additionalProperties: false
-        default:
-          $ref: '#/components/responses/error'
   /GetUserActivity:
     get:
       operationId: getUserActivity
@@ -219,6 +18,21 @@ paths:
           required: false
           schema:
             type: string
+        - name: is_global
+          in: query
+          required: false
+          schema:
+            type: boolean
+        - name: thread_limit
+          in: query
+          required: false
+          schema:
+            type: number
+        - name: comment_limit
+          in: query
+          required: false
+          schema:
+            type: number
       responses:
         '200':
           description: Successful response
@@ -229,114 +43,99 @@ paths:
                 items:
                   type: object
                   properties:
-                    thread:
+                    community_id:
+                      type: string
+                    community_icon:
+                      type: string
+                      nullable: true
+                    id:
+                      type: integer
+                      minimum: 0
+                      maximum: 2147483647
+                    user_id:
+                      type: integer
+                      minimum: 0
+                      maximum: 2147483647
+                    user_address:
+                      type: string
+                    profile_name:
+                      type: string
+                      nullable: true
+                    profile_avatar:
+                      type: string
+                      nullable: true
+                    body:
+                      type: string
+                    title:
+                      type: string
+                    kind:
+                      type: string
+                    stage:
+                      type: string
+                    number_of_comments:
+                      type: number
+                    created_at:
+                      type: string
+                      nullable: true
+                    updated_at:
+                      type: string
+                      nullable: true
+                    deleted_at:
+                      type: string
+                      nullable: true
+                    locked_at:
+                      type: string
+                      nullable: true
+                    archived_at:
+                      type: string
+                      nullable: true
+                    marked_as_spam_at:
+                      type: string
+                      nullable: true
+                    read_only:
+                      type: boolean
+                    has_poll:
+                      type: boolean
+                      nullable: true
+                    discord_meta:
+                      type: object
+                      properties:
+                        user:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                            username:
+                              type: string
+                          required:
+                            - id
+                            - username
+                          additionalProperties: false
+                        channel_id:
+                          type: string
+                        message_id:
+                          type: string
+                      required:
+                        - user
+                        - channel_id
+                        - message_id
+                      additionalProperties: false
+                      nullable: true
+                    topic:
                       type: object
                       properties:
                         id:
                           type: integer
                           minimum: 0
                           maximum: 2147483647
-                        community_id:
+                        name:
                           type: string
-                        body:
+                        description:
                           type: string
-                        title:
-                          type: string
-                        numberOfComments:
-                          type: integer
-                          minimum: 0
-                          maximum: 2147483647
-                        created_at:
-                          type: string
-                          nullable: true
-                        updated_at:
-                          type: string
-                          nullable: true
-                        deleted_at:
-                          type: string
-                          nullable: true
-                        locked_at:
-                          type: string
-                          nullable: true
-                        kind:
-                          type: string
-                        stage:
-                          type: string
-                        archived_at:
-                          type: string
-                          nullable: true
-                        read_only:
-                          type: boolean
-                        has_poll:
-                          type: boolean
-                          nullable: true
-                        marked_as_spam_at:
-                          type: string
-                          nullable: true
-                        discord_meta:
-                          type: object
-                          properties:
-                            user:
-                              type: object
-                              properties:
-                                id:
-                                  type: string
-                                username:
-                                  type: string
-                              required:
-                                - id
-                                - username
-                              additionalProperties: false
-                            channel_id:
-                              type: string
-                            message_id:
-                              type: string
-                          required:
-                            - user
-                            - channel_id
-                            - message_id
-                          additionalProperties: false
-                          nullable: true
-                        profile_name:
-                          type: string
-                          nullable: true
-                        profile_avatar:
-                          type: string
-                          nullable: true
-                        user_id:
-                          type: integer
-                          minimum: 0
-                          maximum: 2147483647
-                        user_address:
-                          type: string
-                        topic:
-                          type: object
-                          properties:
-                            id:
-                              type: integer
-                              minimum: 0
-                              maximum: 2147483647
-                            name:
-                              type: string
-                            description:
-                              type: string
-                          required:
-                            - id
-                            - name
-                            - description
-                          additionalProperties: false
                       required:
                         - id
-                        - community_id
-                        - body
-                        - title
-                        - numberOfComments
-                        - kind
-                        - stage
-                        - read_only
-                        - user_id
-                        - user_address
-                        - topic
+                        - name
+                        - description
                       additionalProperties: false
                     recent_comments:
                       type: array
@@ -349,6 +148,15 @@ paths:
                             maximum: 2147483647
                           address:
                             type: string
+                          user_id:
+                            type: number
+                            nullable: true
+                          profile_name:
+                            type: string
+                            nullable: true
+                          profile_avatar:
+                            type: string
+                            nullable: true
                           text:
                             type: string
                           created_at:
@@ -386,15 +194,6 @@ paths:
                               - message_id
                             additionalProperties: false
                             nullable: true
-                          profile_name:
-                            type: string
-                            nullable: true
-                          profile_avatar_url:
-                            type: string
-                            nullable: true
-                          user_id:
-                            type: number
-                            nullable: true
                         required:
                           - id
                           - address
@@ -403,7 +202,17 @@ paths:
                         additionalProperties: false
                       nullable: true
                   required:
-                    - thread
+                    - community_id
+                    - id
+                    - user_id
+                    - user_address
+                    - body
+                    - title
+                    - kind
+                    - stage
+                    - number_of_comments
+                    - read_only
+                    - topic
                   additionalProperties: false
         default:
           $ref: '#/components/responses/error'

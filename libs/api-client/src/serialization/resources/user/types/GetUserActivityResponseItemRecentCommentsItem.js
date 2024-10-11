@@ -7,6 +7,18 @@ export const GetUserActivityResponseItemRecentCommentsItem =
   core.serialization.object({
     id: core.serialization.number(),
     address: core.serialization.string(),
+    userId: core.serialization.property(
+      'user_id',
+      core.serialization.number().optional(),
+    ),
+    profileName: core.serialization.property(
+      'profile_name',
+      core.serialization.string().optional(),
+    ),
+    profileAvatar: core.serialization.property(
+      'profile_avatar',
+      core.serialization.string().optional(),
+    ),
     text: core.serialization.string(),
     createdAt: core.serialization.property(
       'created_at',
@@ -27,17 +39,5 @@ export const GetUserActivityResponseItemRecentCommentsItem =
     discordMeta: core.serialization.property(
       'discord_meta',
       GetUserActivityResponseItemRecentCommentsItemDiscordMeta.optional(),
-    ),
-    profileName: core.serialization.property(
-      'profile_name',
-      core.serialization.string().optional(),
-    ),
-    profileAvatarUrl: core.serialization.property(
-      'profile_avatar_url',
-      core.serialization.string().optional(),
-    ),
-    userId: core.serialization.property(
-      'user_id',
-      core.serialization.number().optional(),
     ),
   });

@@ -4,11 +4,11 @@
 import * as CommonApi from '../../../../api/index';
 import * as core from '../../../../core';
 import * as serializers from '../../../index';
-export declare const GetUserActivityResponseItemThreadTopic: core.serialization.ObjectSchema<
-  serializers.GetUserActivityResponseItemThreadTopic.Raw,
-  CommonApi.GetUserActivityResponseItemThreadTopic
+export declare const GetUserActivityResponseItemTopic: core.serialization.ObjectSchema<
+  serializers.GetUserActivityResponseItemTopic.Raw,
+  CommonApi.GetUserActivityResponseItemTopic
 >;
-export declare namespace GetUserActivityResponseItemThreadTopic {
+export declare namespace GetUserActivityResponseItemTopic {
   interface Raw {
     id: number;
     name: string;

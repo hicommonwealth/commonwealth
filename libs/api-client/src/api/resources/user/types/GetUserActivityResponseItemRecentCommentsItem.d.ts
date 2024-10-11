@@ -5,13 +5,13 @@ import * as CommonApi from '../../../index';
 export interface GetUserActivityResponseItemRecentCommentsItem {
   id: number;
   address: string;
+  userId?: number;
+  profileName?: string;
+  profileAvatar?: string;
   text: string;
   createdAt: string;
   updatedAt?: string;
   deletedAt?: string;
   markedAsSpamAt?: string;
   discordMeta?: CommonApi.GetUserActivityResponseItemRecentCommentsItemDiscordMeta;
-  profileName?: string;
-  profileAvatarUrl?: string;
-  userId?: number;
 }

@@ -26,21 +26,14 @@ export declare class User {
   protected readonly _options: User.Options;
   constructor(_options: User.Options);
   /**
-   * @param {User.RequestOptions} requestOptions - Request-specific configuration.
-   *
-   * @example
-   *     await client.user.getGlobalActivity()
-   */
-  getGlobalActivity(
-    requestOptions?: User.RequestOptions,
-  ): Promise<CommonApi.GetGlobalActivityResponseItem[]>;
-  /**
+   * @param {CommonApi.GetUserActivityRequest} request
    * @param {User.RequestOptions} requestOptions - Request-specific configuration.
    *
    * @example
    *     await client.user.getUserActivity()
    */
   getUserActivity(
+    request?: CommonApi.GetUserActivityRequest,
     requestOptions?: User.RequestOptions,
   ): Promise<CommonApi.GetUserActivityResponseItem[]>;
   /**
