@@ -1,4 +1,5 @@
 import { stringifyValidationError } from './stringifyValidationErrors';
+
 export class JsonError extends Error {
   constructor(errors) {
     super(errors.map(stringifyValidationError).join('; '));

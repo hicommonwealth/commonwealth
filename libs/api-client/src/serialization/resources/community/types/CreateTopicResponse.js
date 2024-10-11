@@ -3,6 +3,7 @@
  */
 import * as core from '../../../../core';
 import { CreateTopicResponseTopic } from './CreateTopicResponseTopic';
+
 export const CreateTopicResponse = core.serialization.object({
   topic: CreateTopicResponseTopic,
   userId: core.serialization.property('user_id', core.serialization.number()),

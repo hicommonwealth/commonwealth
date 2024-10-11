@@ -4,6 +4,7 @@
 import * as core from '../../../../core';
 import { CreateThreadResponseTopicContestTopicsItem } from './CreateThreadResponseTopicContestTopicsItem';
 import { CreateThreadResponseTopicWeightedVoting } from './CreateThreadResponseTopicWeightedVoting';
+
 export const CreateThreadResponseTopic = core.serialization.object({
   id: core.serialization.number().optional(),
   name: core.serialization.string().optional(),

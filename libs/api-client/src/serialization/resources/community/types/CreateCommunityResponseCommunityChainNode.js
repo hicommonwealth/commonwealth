@@ -6,6 +6,7 @@ import { CreateCommunityResponseCommunityChainNodeBalanceType } from './CreateCo
 import { CreateCommunityResponseCommunityChainNodeContractsItem } from './CreateCommunityResponseCommunityChainNodeContractsItem';
 import { CreateCommunityResponseCommunityChainNodeCosmosGovVersion } from './CreateCommunityResponseCommunityChainNodeCosmosGovVersion';
 import { CreateCommunityResponseCommunityChainNodeHealth } from './CreateCommunityResponseCommunityChainNodeHealth';
+
 export const CreateCommunityResponseCommunityChainNode =
   core.serialization.object({
     id: core.serialization.number().optional(),

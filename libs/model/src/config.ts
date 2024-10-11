@@ -30,7 +30,7 @@ const {
   ETH_RPC,
   COSMOS_REGISTRY_API,
   REACTION_WEIGHT_OVERRIDE,
-  FLAG_FARCASTER_CONTEST,
+  FLAG_WEIGHTED_TOPICS,
   ALCHEMY_PRIVATE_APP_KEY,
   ALCHEMY_PUBLIC_APP_KEY,
   MEMBERSHIP_REFRESH_BATCH_SIZE,
@@ -85,7 +85,7 @@ export const config = configure(
       MAX_USER_POSTS_PER_CONTEST: MAX_USER_POSTS_PER_CONTEST
         ? parseInt(MAX_USER_POSTS_PER_CONTEST, 10)
         : 2,
-      FLAG_FARCASTER_CONTEST: FLAG_FARCASTER_CONTEST === 'true',
+      FLAG_WEIGHTED_TOPICS: FLAG_WEIGHTED_TOPICS === 'true',
     },
     AUTH: {
       JWT_SECRET: JWT_SECRET || DEFAULTS.JWT_SECRET,
@@ -183,7 +183,7 @@ export const config = configure(
     CONTESTS: z.object({
       MIN_USER_ETH: z.number(),
       MAX_USER_POSTS_PER_CONTEST: z.number().int(),
-      FLAG_FARCASTER_CONTEST: z.boolean(),
+      FLAG_WEIGHTED_TOPICS: z.boolean(),
     }),
     AUTH: z
       .object({
@@ -258,11 +258,11 @@ export const config = configure(
         .refine(
           (data) =>
             !(
-              ['production', 'frick', 'beta', 'demo'].includes(
+              ['production', 'frick', 'frack', 'beta', 'demo'].includes(
                 target.APP_ENV,
               ) && !data
             ),
-          'DISCORD_TOKEN is required in production, frick, beta (QA), and demo',
+          'DISCORD_TOKEN is required in production, frick, frack, beta (QA), and demo',
         ),
     }),
   }),

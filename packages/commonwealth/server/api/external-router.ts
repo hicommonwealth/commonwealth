@@ -1,4 +1,5 @@
 import { express, trpc } from '@hicommonwealth/adapters';
+import { Comment, Community } from '@hicommonwealth/model';
 import cors from 'cors';
 import { Router } from 'express';
 import passport from 'passport';
@@ -12,9 +13,6 @@ import {
 import * as thread from './threads';
 
 const {
-  getCommunities,
-  getCommunity,
-  getMembers,
   createCommunity,
   updateCommunity,
   createTopic,
@@ -32,19 +30,18 @@ const {
   createThreadReaction,
   deleteReaction,
 } = thread.trpcRouter;
-const {
-  getComments,
-  createComment,
-  updateComment,
-  deleteComment,
-  createCommentReaction,
-} = comment.trpcRouter;
+const { createComment, updateComment, deleteComment, createCommentReaction } =
+  comment.trpcRouter;
 
 const api = {
-  getCommunities,
-  getCommunity,
-  getMembers,
-  getComments,
+  getCommunities: trpc.query(
+    Community.GetCommunities,
+    trpc.Tag.Community,
+    true,
+  ),
+  getCommunity: trpc.query(Community.GetCommunity, trpc.Tag.Community, true),
+  getMembers: trpc.query(Community.GetMembers, trpc.Tag.Community, true),
+  getComments: trpc.query(Comment.GetComments, trpc.Tag.Comment, true),
   createCommunity,
   updateCommunity,
   createTopic,

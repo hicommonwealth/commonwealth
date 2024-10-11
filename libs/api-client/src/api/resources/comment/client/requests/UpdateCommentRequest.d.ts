@@ -9,6 +9,6 @@
  *     }
  */
 export interface UpdateCommentRequest {
-    commentId: number;
-    text: string;
+  commentId: number;
+  text: string;
 }

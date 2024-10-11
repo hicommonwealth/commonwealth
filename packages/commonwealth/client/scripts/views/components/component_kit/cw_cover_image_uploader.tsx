@@ -412,6 +412,7 @@ export const CWCoverImageUploader = ({
             ) : (
               <>
                 <CWTextInput
+                  autoFocus={true}
                   label="Prompt"
                   size="small"
                   value={prompt}

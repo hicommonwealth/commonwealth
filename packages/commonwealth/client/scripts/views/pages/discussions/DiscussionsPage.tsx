@@ -30,7 +30,7 @@ import { useFetchCustomDomainQuery } from 'state/api/configuration';
 import { useRefreshMembershipQuery } from 'state/api/groups';
 import useUserStore from 'state/ui/user';
 import Permissions from 'utils/Permissions';
-import { checkIsTopicInContest } from 'views/components/NewThreadForm/helpers';
+import { checkIsTopicInContest } from 'views/components/NewThreadFormLegacy/helpers';
 import TokenBanner from 'views/components/TokenBanner';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
@@ -57,7 +57,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   // @ts-expect-error <StrictNullChecks/>
   const stageName: string = searchParams.get('stage');
 
-  const weightedVotingEnabled = useFlag('farcasterContest');
+  const weightedTopicsEnabled = useFlag('weightedTopics');
 
   const featuredFilter: ThreadFeaturedFilterTypes = searchParams.get(
     'featured',
@@ -175,7 +175,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   useManageDocumentTitle('Discussions');
 
   const isTopicWeighted =
-    weightedVotingEnabled &&
+    weightedTopicsEnabled &&
     topicId &&
     topicObj.weightedVoting === TopicWeightedVoting.ERC20;
 

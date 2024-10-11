@@ -49,6 +49,7 @@ export enum Tag {
   Webhook = 'Webhook',
   SuperAdmin = 'SuperAdmin',
   DiscordBot = 'DiscordBot',
+  Token = 'Token',
 }
 
 export type Commit<Input extends ZodSchema, Output extends ZodSchema> = (
@@ -135,18 +136,32 @@ async function trackAnalytics<
   }
 }
 
+export type BuildProcOptions<
+  Input extends ZodSchema,
+  Output extends ZodSchema,
+> = {
+  method: 'GET' | 'POST';
+  name: string;
+  md: Metadata<Input, Output>;
+  tag: Tag;
+  track?: Track<Input, Output>;
+  commit?: Commit<Input, Output>;
+  forceSecure?: boolean;
+};
+
 /**
  * tRPC procedure factory with authentication, traffic stats, and analytics middleware
  */
-export const buildproc = <Input extends ZodSchema, Output extends ZodSchema>(
-  method: 'GET' | 'POST',
-  name: string,
-  md: Metadata<Input, Output>,
-  tag: Tag,
-  track?: Track<Input, Output>,
-  commit?: Commit<Input, Output>,
-) => {
-  const secure = isSecure(md);
+export const buildproc = <Input extends ZodSchema, Output extends ZodSchema>({
+  method,
+  name,
+  md,
+  tag,
+  track,
+  commit,
+  forceSecure,
+}: BuildProcOptions<Input, Output>) => {
+  const secure = forceSecure ?? isSecure(md);
   return trpc.procedure
     .use(async ({ ctx, next }) => {
       if (secure) await authenticate(ctx.req, md.authStrategy);

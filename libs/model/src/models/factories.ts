@@ -38,11 +38,13 @@ import Tags from './tags';
 import Thread from './thread';
 import ThreadSubscription from './thread_subscriptions';
 import ThreadVersionHistory from './thread_version_history';
+import Token from './token';
 import Topic from './topic';
 import User from './user';
 import Vote from './vote';
 import Wallets from './wallets';
 import Webhook from './webhook';
+import XpLog from './xp_log';
 
 export const Factories = {
   Address,
@@ -87,6 +89,8 @@ export const Factories = {
   Vote,
   Webhook,
   Wallets,
+  Token,
+  XpLog,
 };
 
 export type DB = {
