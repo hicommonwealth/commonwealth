@@ -94,13 +94,11 @@ export async function __getGroups(
         .filter((t) => t.group_ids!.includes(group.id!))
         .map((t) => {
           const temp: TopicAttributesWithPermission = { ...t.toJSON() };
-          temp.permission =
-            (
-              (group as GroupInstanceWithTopicPermissions)
-                .GroupTopicPermissions || []
-            ).find((gtp) => gtp.topic_id === t.id)?.allowed_actions ||
-            // TODO: this fallback should be via a migration for existing communities
-            GroupTopicPermissionEnum.UPVOTE_AND_COMMENT_AND_POST;
+          temp.permission = (
+            (group as GroupInstanceWithTopicPermissions)
+              .GroupTopicPermissions || []
+          ).find((gtp) => gtp.topic_id === t.id)
+            ?.allowed_actions as GroupTopicPermissionEnum;
           return temp;
         }),
     }));

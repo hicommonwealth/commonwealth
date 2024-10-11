@@ -11,7 +11,7 @@ module.exports = {
           SELECT 
             unnest(t.group_ids) AS group_id, 
             t.id AS topic_id, 
-            'UPVOTE_AND_COMMENT_POST' AS allowed_actions, 
+            'UPVOTE_AND_COMMENT_AND_POST' AS allowed_actions, 
             NOW() AS created_at, 
             NOW() AS updated_at
           FROM "Topics" t

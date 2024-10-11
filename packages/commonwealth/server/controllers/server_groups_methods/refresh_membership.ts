@@ -75,13 +75,10 @@ export async function __refreshMembership(
       .filter((t) => t.group_ids!.includes(membership.group_id))
       .map((t) => ({
         id: t.id,
-        permission:
-          (groups as GroupInstanceWithTopicPermissions[])
-            .find((g) => g.id === membership.group_id)
-            ?.GroupTopicPermissions?.find((gtp) => gtp.topic_id === t.id)
-            ?.allowed_actions ||
-          // TODO: this fallback should be via a migration for existing communities
-          GroupTopicPermissionEnum.UPVOTE_AND_COMMENT_AND_POST,
+        permission: (groups as GroupInstanceWithTopicPermissions[])
+          .find((g) => g.id === membership.group_id)
+          ?.GroupTopicPermissions?.find((gtp) => gtp.topic_id === t.id)
+          ?.allowed_actions as GroupTopicPermissionEnum,
       })),
     allowed: !membership.reject_reason,
     rejectReason: membership.reject_reason,
