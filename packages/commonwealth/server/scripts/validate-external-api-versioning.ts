@@ -3,12 +3,13 @@ import { dispose } from '@hicommonwealth/core';
 import { readFile, unlink, writeFile } from 'fs/promises';
 import pkg from 'openapi-diff';
 import path from 'path';
+import apiClientPackageJson from '../../../../libs/api-client/package.json';
 import externalApiConfig from '../../external-api-config.json';
 import { oasOptions, trpcRouter } from '../api/external-router';
 
 const { diffSpecs } = pkg;
 
-const EXTERNAL_API_CONFIG_PATH = '../../external-api-config.json';
+const EXTERNAL_API_CONFIG_PATH = 'external-api-config.json';
 
 const productionOasPath = 'external-production-openapi.json';
 const localOasPath = 'external-openapi.json';
@@ -21,6 +22,15 @@ async function updateVersionInFile(newVersion: string) {
   await writeFile(
     EXTERNAL_API_CONFIG_PATH,
     JSON.stringify(updatedApiConfig),
+    'utf8',
+  );
+  const updatedPackageJson = {
+    ...apiClientPackageJson,
+    version: newVersion,
+  };
+  await writeFile(
+    '../../libs/api-client/package.json',
+    JSON.stringify(updatedPackageJson),
     'utf8',
   );
 }
@@ -130,11 +140,11 @@ async function validateExternalApiVersioning() {
     console.log(
       `Bumped patch version from ${readableVersion(oldVersion)} to ${newVersionPatch}`,
     );
-
-    // remove generated files
-    await Promise.all([unlink(productionOasPath), unlink(localOasPath)]);
     return;
   }
+
+  await Promise.all([unlink(productionOasPath), unlink(localOasPath)]);
+  console.log(`No version updated: ${readableVersion(oldVersion)}`);
 }
 
 if (import.meta.url.endsWith(process.argv[1])) {
