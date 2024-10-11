@@ -1,30 +1,31 @@
 import { trpc } from '@hicommonwealth/adapters';
-import { readFile, writeFile } from 'fs/promises';
+import { dispose } from '@hicommonwealth/core';
+import { readFile, unlink, writeFile } from 'fs/promises';
 import pkg from 'openapi-diff';
 import path from 'path';
+import externalApiConfig from '../../external-api-config.json';
 import { oasOptions, trpcRouter } from '../api/external-router';
 
 const { diffSpecs } = pkg;
 
-const versioningPath = path.resolve(
-  'packages/commonwealth/server/api/external-router.ts',
-);
-const sourcePath = 'external-production-openapi.json';
-const destinationPath = 'external-openapi.json';
+const EXTERNAL_API_CONFIG_PATH = '../../external-api-config.json';
 
-async function updateVersionInFile(filePath, newVersion) {
-  let fileContent = await readFile(filePath, 'utf8');
+const productionOasPath = 'external-production-openapi.json';
+const localOasPath = 'external-openapi.json';
 
-  const versionPattern = /version:\s*'(\d+\.\d+\.\d+)'/g;
-  const updatedContent = fileContent.replace(
-    versionPattern,
-    `version: '${newVersion}'`,
+async function updateVersionInFile(newVersion: string) {
+  const updatedApiConfig = {
+    ...externalApiConfig,
+    version: newVersion,
+  };
+  await writeFile(
+    EXTERNAL_API_CONFIG_PATH,
+    JSON.stringify(updatedApiConfig),
+    'utf8',
   );
-
-  await writeFile(filePath, updatedContent, 'utf8');
 }
 
-function parseSemVer(version) {
+function parseSemVer(version: string) {
   const regex = /^(\d+)\.(\d+)\.(\d+)$/;
   const match = version.match(regex);
 
@@ -39,7 +40,7 @@ function parseSemVer(version) {
   }
 }
 
-async function downloadFile(url, outputFileName) {
+async function downloadFile(url: string, outputFileName: string) {
   const response = await fetch(url);
   if (!response.ok) {
     throw new Error(`Failed to fetch ${url}: ${response.statusText}`);
@@ -61,16 +62,19 @@ function readableVersion(version: {
 
 async function validateExternalApiVersioning() {
   // TODO: potentially fetch from github (libs/api-client/openapi.json) after #9526 is merged
-  await downloadFile('https://commonwealth.im/api/v1/openapi.json', sourcePath);
+  await downloadFile(
+    'https://commonwealth.im/api/v1/openapi.json',
+    productionOasPath,
+  );
 
   const newOas = trpc.toOpenApiDocument(
     trpcRouter,
-    'http://commonwealth.im',
+    'http://commonwealth.im', // host must be the same as production
     oasOptions,
   );
-  await writeFile(destinationPath, JSON.stringify(newOas, null, 2), 'utf8');
+  await writeFile(localOasPath, JSON.stringify(newOas, null, 2), 'utf8');
 
-  const sourceContent = await readFile(sourcePath, 'utf8');
+  const sourceContent = await readFile(productionOasPath, 'utf8');
 
   const oldVersion = parseSemVer(JSON.parse(sourceContent).info.version);
   const newVersion = parseSemVer(newOas.info.version);
@@ -78,7 +82,7 @@ async function validateExternalApiVersioning() {
   if (oldVersion.major !== newVersion.major) {
     if (newVersion.minor !== 0 || newVersion.patch !== 0) {
       const newMajorVersion = `${newVersion.major}.0.0`;
-      await updateVersionInFile(versioningPath, newMajorVersion);
+      await updateVersionInFile(newMajorVersion);
       console.log(
         `Bumped OAS version from ${readableVersion(oldVersion)} to ${newMajorVersion}`,
       );
@@ -89,12 +93,12 @@ async function validateExternalApiVersioning() {
   const result = await diffSpecs({
     sourceSpec: {
       content: sourceContent,
-      location: path.basename(sourcePath),
+      location: path.basename(productionOasPath),
       format: 'openapi3',
     },
     destinationSpec: {
       content: JSON.stringify(newOas),
-      location: path.basename(destinationPath),
+      location: path.basename(localOasPath),
       format: 'openapi3',
     },
   });
@@ -108,7 +112,7 @@ async function validateExternalApiVersioning() {
     result.nonBreakingDifferences.filter((c) => c.action === 'add').length > 0
   ) {
     const newVersionMinor = `${oldVersion.major}.${oldVersion.minor + 1}.0`;
-    await updateVersionInFile(versioningPath, newVersionMinor);
+    await updateVersionInFile(newVersionMinor);
 
     console.log(
       `Bumped minor version from ${readableVersion(oldVersion)} to ${newVersionMinor}`,
@@ -121,20 +125,27 @@ async function validateExternalApiVersioning() {
     result.nonBreakingDifferences.length > 0
   ) {
     const newVersionPatch = `${oldVersion.major}.${oldVersion.minor}.${oldVersion.patch + 1}`;
-    await updateVersionInFile(versioningPath, newVersionPatch);
+    await updateVersionInFile(newVersionPatch);
 
     console.log(
       `Bumped patch version from ${readableVersion(oldVersion)} to ${newVersionPatch}`,
     );
+
+    // remove generated files
+    await Promise.all([unlink(productionOasPath), unlink(localOasPath)]);
     return;
   }
 }
 
-validateExternalApiVersioning()
-  .then(() => {
-    console.log('Finished openapi versioning');
-  })
-  .catch((error) => {
-    console.error('Failed to validate openapi versioning', error);
-    throw error;
-  });
+if (import.meta.url.endsWith(process.argv[1])) {
+  validateExternalApiVersioning()
+    .then(() => {
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      dispose()('EXIT', true);
+    })
+    .catch((err) => {
+      console.error(err);
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      dispose()('ERROR', true);
+    });
+}

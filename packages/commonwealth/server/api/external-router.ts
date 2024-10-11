@@ -3,6 +3,7 @@ import { Comment, Community } from '@hicommonwealth/model';
 import cors from 'cors';
 import { Router } from 'express';
 import passport from 'passport';
+import externalApiConfig from '../../external-api-config.json';
 import { config } from '../config';
 import * as comment from './comment';
 import * as community from './community';
@@ -87,11 +88,10 @@ if (config.NODE_ENV !== 'test' && config.CACHE.REDIS_URL) {
 const oasOptions: trpc.OasOptions = {
   title: 'Common API',
   path: PATH,
-  version: '0.0.1',
+  version: externalApiConfig.version,
   securityScheme: 'apiKey',
 };
 
-// IMPORTANT NOTE: If you move this file, you will need to update validate-external-api-versioning.js
 const trpcRouter = trpc.router(api);
 trpc.useOAS(router, trpcRouter, oasOptions);
 
