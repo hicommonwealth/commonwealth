@@ -16,6 +16,6 @@ jobs:
       - uses: ./.github/actions/setup
         with:
           node-version: ${{ matrix.node }}
-      - run: pnpm -F @commonxyz/api-client run publish
+      - run: pnpm -F @commonxyz/api-client publish-pkg
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
