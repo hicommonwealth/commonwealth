@@ -1,7 +1,7 @@
 import { trpc } from '@hicommonwealth/adapters';
 import { dispose, logger } from '@hicommonwealth/core';
 import { promises as fs } from 'fs';
-import { join } from 'path';
+import { isAbsolute } from 'path';
 import { oasOptions, trpcRouter } from '../api/external-router';
 
 const log = logger(import.meta);
@@ -13,6 +13,14 @@ async function main() {
     return;
   }
 
+  // Check if the second argument is provided and is an absolute filepath
+  if (process.argv.length < 4 || !isAbsolute(process.argv[3])) {
+    log.error('The second argument must be an absolute filepath.');
+    return;
+  }
+
+  const filePath = process.argv[3];
+
   let host =
     process.argv[2] === 'production'
       ? 'https://commonwealth.im'
@@ -20,7 +28,6 @@ async function main() {
 
   const oas = trpc.toOpenApiDocument(trpcRouter, host, oasOptions);
 
-  const filePath = join(__dirname, '../../../../libs/api-client/openapi.json');
   await fs.writeFile(filePath, JSON.stringify(oas, null, 2), 'utf-8');
   log.info(`OpenAPI document saved to ${filePath}`);
 }
