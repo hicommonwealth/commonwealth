@@ -15,7 +15,7 @@ const useWindowResize = ({ setMenu }) => {
   );
 
   const onWindowResize = useCallback(() => {
-    if (isMobile && window.innerWidth < 425) {
+    if (isMobile && isWindowSmallInclusive) {
       setMenu({ name: 'default', isVisible: !isWindowSmallInclusive });
     }
     setToggleMobileView(

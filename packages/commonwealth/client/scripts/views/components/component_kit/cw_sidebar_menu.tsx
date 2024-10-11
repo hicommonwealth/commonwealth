@@ -3,6 +3,7 @@ import { isMobile } from 'react-device-detect';
 
 import 'components/component_kit/cw_sidebar_menu.scss';
 
+import useBrowserWindow from 'client/scripts/hooks/useBrowserWindow';
 import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
 import app from 'state';
 import { useToggleCommunityStarMutation } from 'state/api/communities';
@@ -152,7 +153,7 @@ export const CWSidebarMenu = (props: SidebarMenuProps) => {
   const { className, menuHeader, menuItems } = props;
   const navigate = useCommonNavigate();
   const { setMenu, menuName, menuVisible } = useSidebarStore();
-
+  const { isWindowSmallInclusive: isWindowSmall } = useBrowserWindow({});
   return (
     <div
       className={getClasses<{ className: string }>(
@@ -203,7 +204,7 @@ export const CWSidebarMenu = (props: SidebarMenuProps) => {
             label: 'Explore communities',
             iconLeft: 'compassPhosphor',
             onClick: () => {
-              if (isMobile && window.innerWidth < 425) {
+              if (isMobile && isWindowSmall) {
                 setMenu({ name: 'default', isVisible: menuVisible });
               } else {
                 setMenu({ name: menuName, isVisible: menuVisible });
@@ -216,7 +217,7 @@ export const CWSidebarMenu = (props: SidebarMenuProps) => {
             label: 'Notification settings',
             iconLeft: 'person',
             onClick: () => {
-              if (isMobile && window.innerWidth < 425) {
+              if (isMobile && isWindowSmall) {
                 setMenu({ name: 'default', isVisible: menuVisible });
               } else {
                 setMenu({ name: menuName, isVisible: menuVisible });
