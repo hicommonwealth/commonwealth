@@ -24,9 +24,9 @@
   },
   "scripts": {
     "build": "echo Generated SDK is prebuilt",
-    "clean": "rm -rf build && rm -rf coverage",
+    "clean": "rm -rf src/ && rm -f openapi.json",
     "run-test": "tsx ./test/index.ts",
-    "publish": "chmod u+x scripts/publish.sh && ./scripts/publish.sh.sh",
+    "publish": "chmod u+x scripts/publish.sh && ./scripts/publish.sh",
     "check-types": "echo No types to check",
     "generate-client": "pnpm -F commonwealth generate-oas production \"$(pwd)/openapi.json\" && fern generate",
     "generate-client-dev": "pnpm -F commonwealth generate-oas local \"$(pwd)/openapi.json\" && fern generate"
