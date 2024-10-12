@@ -1,6 +1,7 @@
 {
   "extends": "./tsconfig.json",
   "include": ["globals.d.ts", "server", "server.ts", "scripts", "shared"],
+  "exclude": ["server/scripts/validate-external-api-versioning.ts"],
   "references": [
     { "path": "../../libs/adapters/tsconfig.build.json" },
     { "path": "../../libs/chains/tsconfig.build.json" },
