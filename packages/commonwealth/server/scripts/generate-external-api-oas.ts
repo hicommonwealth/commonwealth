@@ -21,7 +21,7 @@ async function main() {
 
   const filePath = process.argv[3];
 
-  let host =
+  const host =
     process.argv[2] === 'production'
       ? 'https://commonwealth.im'
       : 'http://localhost:8080';
