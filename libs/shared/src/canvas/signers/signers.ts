@@ -8,6 +8,7 @@ import {
   DidIdentifier,
   Session,
   Signer,
+  Snapshot,
 } from '@canvas-js/interfaces';
 import { fromBech32, toBech32 } from '@cosmjs/encoding';
 import { addressSwapper } from '@hicommonwealth/shared';
@@ -168,7 +169,7 @@ export class SubstrateSignerCW extends SubstrateSigner {
     options: { did?: string; address?: string } = {},
   ): Promise<{
     payload: Session<SubstrateSessionData>;
-    signer: Signer<Action | Session<SubstrateSessionData>>;
+    signer: Signer<Action | Snapshot | Session<SubstrateSessionData>>;
   } | null> {
     let did;
     if (options.address) {
