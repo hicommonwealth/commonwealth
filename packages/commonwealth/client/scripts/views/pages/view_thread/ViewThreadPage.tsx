@@ -139,7 +139,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   //TODO:
   useEffect(() => {
-    if (thread && isEdit) {
+    if (isEdit === 'true') {
       setShouldRestoreEdits(true);
       setIsGloballyEditing(true);
       setIsEditingBody(true);
