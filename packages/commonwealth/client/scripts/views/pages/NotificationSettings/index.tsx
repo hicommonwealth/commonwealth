@@ -115,19 +115,46 @@ const NotificationSettings = () => {
           <>
             {enableKnockPushNotifications && supportsPushNotifications && (
               <div className="mt-1">
-                <CWText type="h4" className="section-header">
-                  Push Notifications
-                </CWText>
-
                 <div className="setting-container">
                   <div className="setting-container-left">
+                    <CWText type="h4">Turn push notifications on/off</CWText>
+
                     <CWText className="text-muted">
-                      Turn on notifications to receive alerts on your device.
+                      Turn off notifications to stop receiving any alerts on
+                      your device.
                     </CWText>
                   </div>
 
                   <div className="setting-container-right">
-                    <PushNotificationsToggle />
+                    <PushNotificationsToggle pref="mobile_push_notifications_enabled" />
+                  </div>
+                </div>
+
+                <div className="setting-container">
+                  <div className="setting-container-left">
+                    <CWText type="h4">Discussion Activity</CWText>
+
+                    <CWText className="text-muted">
+                      Get notified when someone mentions you
+                    </CWText>
+                  </div>
+
+                  <div className="setting-container-right">
+                    <PushNotificationsToggle pref="mobile_push_discussion_activity_enabled" />
+                  </div>
+                </div>
+
+                <div className="setting-container">
+                  <div className="setting-container-left">
+                    <CWText type="h4">Admin Alerts</CWText>
+
+                    <CWText className="text-muted">
+                      Notifications for communities you are an admin for
+                    </CWText>
+                  </div>
+
+                  <div className="setting-container-right">
+                    <PushNotificationsToggle pref="mobile_push_admin_alerts_enabled" />
                   </div>
                 </div>
               </div>

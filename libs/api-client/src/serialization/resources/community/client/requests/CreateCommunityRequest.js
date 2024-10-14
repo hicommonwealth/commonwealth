@@ -4,6 +4,7 @@
 import * as core from '../../../../../core';
 import { CreateCommunityRequestBase } from '../../types/CreateCommunityRequestBase';
 import { CreateCommunityRequestType } from '../../types/CreateCommunityRequestType';
+
 export const CreateCommunityRequest = core.serialization.object({
   id: core.serialization.string(),
   name: core.serialization.string(),
@@ -27,10 +28,6 @@ export const CreateCommunityRequest = core.serialization.object({
   ),
   type: CreateCommunityRequestType.optional(),
   base: CreateCommunityRequestBase,
-  userAddress: core.serialization.property(
-    'user_address',
-    core.serialization.string(),
-  ),
   tokenName: core.serialization.property(
     'token_name',
     core.serialization.string().optional(),

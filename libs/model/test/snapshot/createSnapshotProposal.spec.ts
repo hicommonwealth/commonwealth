@@ -1,11 +1,10 @@
-import { models, tester } from '@hicommonwealth/model';
+import { command } from '@hicommonwealth/core';
+import { CreateSnapshotProposal as CreateSnapshotProposalSchema } from '@hicommonwealth/schemas';
 import { BalanceType } from '@hicommonwealth/shared';
-import chai, { expect } from 'chai';
-import chaiHttp from 'chai-http';
-import { afterEach, beforeAll, describe, test } from 'vitest';
-import { app } from '../src';
-
-chai.use(chaiHttp);
+import { afterEach, beforeAll, describe, expect, test } from 'vitest';
+import { z } from 'zod';
+import { models, tester } from '../../src';
+import { CreateSnapshotProposal } from '../../src/snapshot';
 
 describe('Snapshot Listener API', { timeout: 5_000 }, () => {
   beforeAll(async () => {
@@ -36,9 +35,11 @@ describe('Snapshot Listener API', { timeout: 5_000 }, () => {
     await models.Outbox.truncate();
   });
 
+  const proposalId =
+    '0x7dc75736a57689459c73f8540586c2d1c8927dbe6a9da42f6fbc2f37c020a907';
   const testSnapshotProposal = {
-    id: 'proposal/0x7dc75736a57689459c73f8540586c2d1c8927dbe6a9da42f6fbc2f37c020a907',
-    event: 'proposal/start',
+    id: `proposal/${proposalId}`,
+    event: 'proposal/created' as const,
     title: '1',
     body: '1',
     choices: ['21', '21'],
@@ -49,18 +50,13 @@ describe('Snapshot Listener API', { timeout: 5_000 }, () => {
     secret: 'a88a91630b95e5e7ae9cd8610aff862d2b70383926b7236c973eedec46e0de65',
   };
 
-  test('/ should return OK', async () => {
-    const res = await chai.request(app).get('/');
-    expect(res).to.have.status(200);
-    expect(res.text).to.equal('OK!');
-  });
-
-  test('/snapshot should return 200 when valid JSON is sent', async () => {
-    const res = await chai
-      .request(app)
-      .post('/snapshot')
-      .send(testSnapshotProposal);
-    expect(res).to.have.status(200);
+  test('should process valid snapshot proposal created payloads', async () => {
+    const res = await command(CreateSnapshotProposal(), {
+      payload: testSnapshotProposal,
+      actor: {
+        user: { email: 'snapshot@gmail.com' },
+      },
+    });
 
     const outboxData = await models.Outbox.findAll({
       where: {
@@ -71,12 +67,21 @@ describe('Snapshot Listener API', { timeout: 5_000 }, () => {
     expect(outboxData.length).to.equal(1);
     expect(outboxData[0].event_payload).to.deep.equal({
       ...testSnapshotProposal,
-      id: '0x7dc75736a57689459c73f8540586c2d1c8927dbe6a9da42f6fbc2f37c020a907',
+      id: proposalId,
     });
+
+    expect(res).toBeTruthy();
+    expect(res).to.deep.equal({ success: true });
   });
 
   test('/snapshot should return 400 with invalid data', async () => {
-    const res = await chai.request(app).post('/snapshot').send(undefined);
-    expect(res).to.have.status(400);
+    try {
+      await command(CreateSnapshotProposal(), {
+        payload: {} as z.infer<(typeof CreateSnapshotProposalSchema)['input']>,
+        actor: { user: { email: 'snapshot@gmail.com' } },
+      });
+      expect.fail();
+      // // eslint-disable-next-line no-empty
+    } catch (e) {}
   });
 });

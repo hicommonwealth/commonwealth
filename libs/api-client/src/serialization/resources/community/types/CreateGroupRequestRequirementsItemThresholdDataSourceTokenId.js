@@ -3,6 +3,7 @@
  */
 import * as core from '../../../../core';
 import { CreateGroupRequestRequirementsItemThresholdDataSourceTokenIdSourceType } from './CreateGroupRequestRequirementsItemThresholdDataSourceTokenIdSourceType';
+
 export const CreateGroupRequestRequirementsItemThresholdDataSourceTokenId =
   core.serialization.object({
     sourceType: core.serialization.property(

@@ -89,7 +89,6 @@ export default (sequelize: Sequelize.Sequelize): UserModelStatic =>
             'isAdmin',
             'created_at',
             'updated_at',
-            'hashed_api_key',
           ],
         },
       },

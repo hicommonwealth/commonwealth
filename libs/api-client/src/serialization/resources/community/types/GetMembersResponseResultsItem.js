@@ -3,6 +3,7 @@
  */
 import * as core from '../../../../core';
 import { GetMembersResponseResultsItemAddressesItem } from './GetMembersResponseResultsItemAddressesItem';
+
 export const GetMembersResponseResultsItem = core.serialization.object({
   userId: core.serialization.property('user_id', core.serialization.number()),
   profileName: core.serialization.property(

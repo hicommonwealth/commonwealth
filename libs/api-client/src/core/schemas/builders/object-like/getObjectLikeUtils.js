@@ -2,12 +2,14 @@ import { filterObject } from '../../utils/filterObject';
 import { getErrorMessageForIncorrectType } from '../../utils/getErrorMessageForIncorrectType';
 import { isPlainObject } from '../../utils/isPlainObject';
 import { getSchemaUtils } from '../schema-utils';
+
 export function getObjectLikeUtils(schema) {
   return {
     withParsedProperties: (properties) =>
       withParsedProperties(schema, properties),
   };
 }
+
 /**
  * object-like utils are defined in one file to resolve issues with circular imports
  */

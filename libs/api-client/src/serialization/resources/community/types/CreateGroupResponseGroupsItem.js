@@ -4,6 +4,7 @@
 import * as core from '../../../../core';
 import { CreateGroupResponseGroupsItemMetadata } from './CreateGroupResponseGroupsItemMetadata';
 import { CreateGroupResponseGroupsItemRequirementsItem } from './CreateGroupResponseGroupsItemRequirementsItem';
+
 export const CreateGroupResponseGroupsItem = core.serialization.object({
   id: core.serialization.number().optional(),
   communityId: core.serialization.property(

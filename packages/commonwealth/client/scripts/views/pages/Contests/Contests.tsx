@@ -7,9 +7,12 @@ import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayou
 import ContestsList from 'views/pages/CommunityManagement/Contests/ContestsList';
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
 
+import { useFlag } from 'hooks/useFlag';
 import './Contests.scss';
 
 const Contests = () => {
+  const weightedTopicsEnabled = useFlag('weightedTopics');
+
   const {
     stakeEnabled,
     contestsData,
@@ -17,7 +20,10 @@ const Contests = () => {
     isContestDataLoading,
   } = useCommunityContests();
 
-  if (!isContestDataLoading && (!stakeEnabled || !isContestAvailable)) {
+  if (
+    !isContestDataLoading &&
+    ((weightedTopicsEnabled ? false : !stakeEnabled) || !isContestAvailable)
+  ) {
     return <Navigate replace to={`/${app.activeChainId()}`} />;
   }
 
@@ -34,8 +40,9 @@ const Contests = () => {
         <ContestsList
           contests={contestsData}
           isAdmin={false}
-          isLoading={isContestDataLoading}
+          hasWeightedTopic={false}
           stakeEnabled={stakeEnabled}
+          isLoading={isContestDataLoading}
           isContestAvailable={isContestAvailable}
         />
       </div>

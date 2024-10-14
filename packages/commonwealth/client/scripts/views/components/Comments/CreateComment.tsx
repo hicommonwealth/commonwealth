@@ -10,7 +10,6 @@ import React, { useEffect, useMemo, useState } from 'react';
 import app from 'state';
 import { useCreateCommentMutation } from 'state/api/comments';
 import useUserStore from 'state/ui/user';
-import useAppStatus from '../../../hooks/useAppStatus';
 import Thread from '../../../models/Thread';
 import { useFetchProfilesByAddressesQuery } from '../../../state/api/profiles/index';
 import { jumpHighlightComment } from '../../pages/discussions/CommentTree/helpers';
@@ -42,7 +41,6 @@ export const CreateComment = ({
       : `new-comment-reply-${parentCommentId}`,
   );
 
-  const { isAddedToHomeScreen } = useAppStatus();
   const user = useUserStore();
   const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
 
@@ -100,7 +98,6 @@ export const CreateComment = ({
           parentCommentId: parentCommentId ?? null,
           parentCommentMsgId: parentCommentMsgId ?? null,
           existingNumberOfComments: rootThread.numberOfComments || 0,
-          isPWA: isAddedToHomeScreen,
         });
         const newComment = await createComment(input);
 
