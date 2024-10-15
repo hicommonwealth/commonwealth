@@ -1,7 +1,9 @@
 import { ZERO_ADDRESS } from '@hicommonwealth/shared';
+import { getTotalContestBalance } from 'node_modules/@hicommonwealth/shared/src/commonProtocol';
 import { AbiItem, TransactionReceipt } from 'web3';
 import { ContestAbi } from './Abi/ContestAbi';
 import { Erc20Abi } from './Abi/ERC20Abi';
+import { feeManagerABI } from './Abi/feeManagerAbi';
 import ContractBase from './ContractBase';
 import NamespaceFactory from './NamespaceFactory';
 
@@ -230,27 +232,20 @@ class Contest extends ContractBase {
     }
   }
 
-  async getContestBalance(): Promise<number> {
+  //Indicate if contest is not recurring
+  async getContestBalance(oneOff: boolean): Promise<number> {
     if (!this.initialized || !this.walletEnabled) {
       await this.initialize(false);
     }
     this.reInitContract();
-    const tokenAddress = await this.contract.methods.contestToken().call();
-    if (tokenAddress === ZERO_ADDRESS) {
-      const balance = await this.web3.eth.getBalance(this.contractAddress);
-      return parseFloat(this.web3.utils.fromWei(balance, 'ether'));
-    } else {
-      const calldata =
-        '0x70a08231' +
-        this.web3.eth.abi
-          .encodeParameters(['address'], [this.contractAddress])
-          .substring(2);
-      const returnData = await this.web3.eth.call({
-        to: tokenAddress,
-        data: calldata,
-      });
-      return Number(this.web3.eth.abi.decodeParameter('uint256', returnData));
-    }
+    const contestBalance = await getTotalContestBalance(
+      this.contract,
+      this.contractAddress,
+      this.web3,
+      feeManagerABI,
+      oneOff,
+    );
+    return contestBalance;
   }
 }
 
