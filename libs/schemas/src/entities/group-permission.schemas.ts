@@ -6,6 +6,7 @@ export enum PermissionEnum {
   CREATE_COMMENT = 'CREATE_COMMENT',
   CREATE_THREAD_REACTION = 'CREATE_THREAD_REACTION',
   CREATE_COMMENT_REACTION = 'CREATE_COMMENT_REACTION',
+  UPDATE_POLL = 'UPDATE_POLL'
 }
 
 export type GroupPermissionAction = keyof typeof PermissionEnum;
