@@ -162,10 +162,7 @@ describe('User Dashboard API', () => {
   });
 
   describe('/GetUserActivity', () => {
-    const queryArgs = { is_global: false };
-    const apiUrl =
-      '/api/internal/trpc/feed.getUserActivity?input=' +
-      encodeURIComponent(JSON.stringify(queryArgs));
+    const apiUrl = '/api/v1/GetUserActivity';
 
     test('should fail without JWT', async () => {
       const res = await chai.request
@@ -185,12 +182,13 @@ describe('User Dashboard API', () => {
         .set('Accept', 'application/json')
         .set('address', userAddress)
         .send({ chain, jwt: userJWT });
+      console.log(res);
 
       expect(res.status).to.be.equal(200);
       expect(res.text).to.not.be.null;
 
       const resBody = JSON.parse(res.text);
-      const threadIds = resBody.result.data.map((a) => a.id);
+      const threadIds = resBody.map((a) => a.id);
       const chains = await server.models.Thread.findAll({
         attributes: attributesOf<ThreadAttributes>('community_id'),
         where: {
@@ -224,7 +222,7 @@ describe('User Dashboard API', () => {
       expect(res.text).to.not.be.null;
 
       const resBody = JSON.parse(res.text);
-      const threadIds = resBody.result.data.map((a) => a.id);
+      const threadIds = resBody.map((a) => a.id);
       const chains = await server.models.Thread.findAll({
         attributes: attributesOf<ThreadAttributes>('community_id'),
         where: {
@@ -272,7 +270,7 @@ describe('User Dashboard API', () => {
       expect(res.text).to.not.be.null;
 
       const resBody = JSON.parse(res.text);
-      const threadIds = resBody.result.data.map((a) => a.id);
+      const threadIds = resBody.map((a) => a.id);
       const chains = (
         await server.models.Thread.findAll({
           attributes: attributesOf<ThreadAttributes>('community_id'),
