@@ -1,7 +1,6 @@
 import React from 'react';
 
 import 'components/sidebar/index.scss';
-import { useFlag } from 'hooks/useFlag';
 import { useCommonNavigate } from 'navigation/helpers';
 import { matchRoutes, useLocation } from 'react-router-dom';
 import app from 'state';
@@ -55,8 +54,6 @@ export const DiscussionSection = ({
 }: DiscussionSectionProps) => {
   const navigate = useCommonNavigate();
   const location = useLocation();
-
-  const contestsEnabled = useFlag('contest');
 
   const matchesDiscussionsRoute = matchRoutes(
     [{ path: '/discussions' }, { path: ':scope/discussions' }],
@@ -145,7 +142,7 @@ export const DiscussionSection = ({
       },
       displayData: null,
     },
-    ...(contestsEnabled && isContestAvailable
+    ...(isContestAvailable
       ? [
           {
             title: 'Contests',
@@ -195,9 +192,7 @@ export const DiscussionSection = ({
   for (const topic of topics) {
     if (topic.featuredInSidebar) {
       const topicInvolvedInActiveContest =
-        contestsEnabled &&
-        topic?.id &&
-        topicIdsIncludedInContest.includes(topic.id);
+        topic?.id && topicIdsIncludedInContest.includes(topic.id);
 
       const discussionSectionGroup: SectionGroupAttrs = {
         title: topic.name,
