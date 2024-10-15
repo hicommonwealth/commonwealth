@@ -19,6 +19,7 @@ export interface SignStakeTransactionsProps {
   createdCommunityId: string;
   chainId: string;
   isTopicFlow?: boolean;
+  onlyNamespace?: boolean;
 }
 
 export interface EnableStakeProps {
@@ -27,6 +28,7 @@ export interface EnableStakeProps {
   communityStakeData: StakeData;
   chainId: string;
   isTopicFlow?: boolean;
+  onlyNamespace?: boolean;
 }
 
 export const defaultActionState: ActionState = {

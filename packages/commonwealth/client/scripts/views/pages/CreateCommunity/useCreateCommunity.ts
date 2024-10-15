@@ -49,9 +49,7 @@ const useCreateCommunity = () => {
   );
 
   const showCommunityStakeStep =
-    !weightedTopicsEnabled &&
-    isValidStepToShowCommunityStakeFormStep &&
-    isSupportedChainSelected;
+    isValidStepToShowCommunityStakeFormStep && isSupportedChainSelected;
 
   return {
     createCommunityStep,

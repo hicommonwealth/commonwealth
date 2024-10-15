@@ -14,6 +14,7 @@ interface CommunityStakeStepProps {
   isTopicFlow?: boolean;
   onTopicFlowStepChange?: (step: CreateTopicStep) => void;
   refetchStakeQuery?: () => void;
+  onlyNamespace?: boolean;
 }
 
 const CommunityStakeStep = ({
@@ -25,6 +26,7 @@ const CommunityStakeStep = ({
   isTopicFlow,
   onTopicFlowStepChange,
   refetchStakeQuery,
+  onlyNamespace,
 }: CommunityStakeStepProps) => {
   const [enableStakePage, setEnableStakePage] = useState(true);
   const [communityStakeData, setCommunityStakeData] = useState({
@@ -60,6 +62,7 @@ const CommunityStakeStep = ({
           communityStakeData={communityStakeData}
           chainId={chainId}
           isTopicFlow={isTopicFlow}
+          onlyNamespace={onlyNamespace}
         />
       ) : (
         <SignStakeTransactions
@@ -70,6 +73,7 @@ const CommunityStakeStep = ({
           createdCommunityId={createdCommunityId}
           chainId={chainId}
           isTopicFlow={isTopicFlow}
+          onlyNamespace={onlyNamespace}
         />
       )}
     </div>
