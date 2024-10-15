@@ -531,7 +531,7 @@ export const CommentTree = ({
                 rootThread={thread}
                 canComment={canComment}
                 tooltipText={
-                  !canComment && disabledActionsTooltipText
+                  !canComment && typeof disabledActionsTooltipText === 'string'
                     ? disabledActionsTooltipText
                     : ''
                 }
