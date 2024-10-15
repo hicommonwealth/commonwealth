@@ -34,23 +34,31 @@ export async function __refreshMembership(
     },
   });
 
+  console.log('groups are', groups);
+
   // optionally filter to only groups associated with topic
   if (topicId) {
+    console.log('topicId found');
     const topic = await this.models.Topic.findByPk(topicId);
+    console.log('topic found', topicId, topic);
     if (!topic) {
       throw new AppError(Errors.TopicNotFound);
     }
     // @ts-expect-error StrictNullChecks
     groups = groups.filter((g) => topic.group_ids.includes(g.id));
+    console.log('groups found', groups);
   }
 
+  console.log('memberships start');
   const memberships = await refreshMembershipsForAddress(
     this.models,
     address,
     groups,
     true, // use fresh balances
   );
+  console.log('memberships found', memberships);
 
+  console.log('topic start');
   const topics = await this.models.Topic.findAll({
     where: {
       group_ids: {
@@ -59,6 +67,7 @@ export async function __refreshMembership(
     },
     attributes: ['id', 'group_ids'],
   });
+  console.log('topic found2', topics);
 
   // transform memberships to result shape
   const results = memberships.map((membership) => ({
@@ -69,6 +78,7 @@ export async function __refreshMembership(
     allowed: !membership.reject_reason,
     rejectReason: membership.reject_reason,
   }));
+  console.log('results found2', results);
 
   return results;
 }

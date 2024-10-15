@@ -21,8 +21,11 @@ export const refreshMembershipHandler = async (
       topic_id: z.coerce.number().optional(),
     }),
   });
+
+  console.log(req);
   const validationResult = schema.safeParse(req);
   if (validationResult.success === false) {
+    console.log('Failed to validate');
     throw new AppError(JSON.stringify(validationResult.error));
   }
 

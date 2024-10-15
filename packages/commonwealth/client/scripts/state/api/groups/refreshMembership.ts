@@ -24,6 +24,10 @@ const refreshMembership = async ({
   address,
   topicId,
 }: RefreshMembershipProps): Promise<Memberships[]> => {
+  console.log('refreshing membership');
+  console.log('1', communityId);
+  console.log('2', address);
+  console.log('3', topicId);
   const response = await axios.put(`${SERVER_URL}/refresh-membership`, {
     jwt: userStore.getState().jwt,
     community_id: communityId,
