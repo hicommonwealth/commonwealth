@@ -38,7 +38,7 @@ const { getNewContent } = user.trpcRouter;
 const api = {
   getGlobalActivity: trpc.query(Feed.GetGlobalActivity, trpc.Tag.User, {
     forceSecure: true,
-    ttlSecs: 60 * 5,
+    ttlSecs: config.NO_GLOBAL_ACTIVITY_CACHE ? undefined : 60 * 5,
   }),
   getUserActivity: trpc.query(Feed.GetUserActivity, trpc.Tag.User, {
     forceSecure: true,
