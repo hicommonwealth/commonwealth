@@ -2,8 +2,10 @@ import { express, trpc } from '@hicommonwealth/adapters';
 import { Comment, Community } from '@hicommonwealth/model';
 import cors from 'cors';
 import { Router } from 'express';
+import { readFileSync } from 'fs';
 import passport from 'passport';
-import externalApiConfig from '../../external-api-config.json';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import { config } from '../config';
 import * as comment from './comment';
 import * as community from './community';
@@ -12,6 +14,9 @@ import {
   apiKeyAuthMiddleware,
 } from './external-router-middleware';
 import * as thread from './threads';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const {
   createCommunity,
@@ -84,6 +89,10 @@ if (config.NODE_ENV !== 'test') router.use(apiKeyAuthMiddleware);
 if (config.NODE_ENV !== 'test' && config.CACHE.REDIS_URL) {
   addRateLimiterMiddleware();
 }
+
+const externalApiConfig = JSON.parse(
+  readFileSync(path.join(__dirname, '../external-api-config.json'), 'utf8'),
+);
 
 const oasOptions: trpc.OasOptions = {
   title: 'Common API',

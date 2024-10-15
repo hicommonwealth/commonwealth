@@ -1,13 +1,27 @@
 import { trpc } from '@hicommonwealth/adapters';
 import { dispose } from '@hicommonwealth/core';
+import { readFileSync } from 'fs';
 import { readFile, unlink, writeFile } from 'fs/promises';
 import pkg from 'openapi-diff';
 import path from 'path';
-import apiClientPackageJson from '../../../../libs/api-client/package.json';
-import externalApiConfig from '../../external-api-config.json';
+import { fileURLToPath } from 'url';
 import { oasOptions, trpcRouter } from '../api/external-router';
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 const { diffSpecs } = pkg;
+
+const externalApiConfig = JSON.parse(
+  readFileSync(path.join(__dirname, '../external-api-config.json'), 'utf8'),
+);
+
+const apiClientPackageJson = JSON.parse(
+  readFileSync(
+    path.join(__dirname, '../../../../libs/api-client/package.json'),
+    'utf8',
+  ),
+);
 
 const EXTERNAL_API_CONFIG_PATH = 'external-api-config.json';
 
