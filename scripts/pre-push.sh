@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 RED='\033[31m'
 YELLOW='\033[33m'
 NC='\033[0m'
