@@ -171,13 +171,8 @@ describe('Thread lifecycle', () => {
     });
     await seed('GroupPermission', {
       group_id: commentGroupId,
-      allowed_actions: [schemas.PermissionEnum.CREATE_COMMENT],
-    });
-    await seed('GroupTopicPermission', {
-      group_id: threadGroupId,
       topic_id: _community?.topics?.[0]?.id || 0,
-      allowed_actions:
-        schemas.GroupTopicPermissionEnum.UPVOTE_AND_COMMENT_AND_POST,
+      allowed_actions: [schemas.PermissionEnum.CREATE_COMMENT],
     });
 
     community = _community!;
