@@ -29,12 +29,12 @@ set -e
 pnpm -F commonwealth ts-exec server/scripts/validate-external-api-versioning.ts
 
 # Run prettier on JSON files to maintain formatting after updating version
-prettier --write ../libs/api-client/package.json ../packages/commonwealth/server/external-api-config.json
+pnpm dlx prettier --write ./libs/api-client/package.json ./packages/commonwealth/server/external-api-config.json
 
 # Check for changes in package.json or external-api-config.json files and commit the changes if any
-changed_files=$(git diff --name-only ../libs/api-client/package.json ../packages/commonwealth/server/external-api-config.json)
+changed_files=$(git diff --name-only ./libs/api-client/package.json ./packages/commonwealth/server/external-api-config.json)
 if [ -n "$changed_files" ]; then
     echo "Committing auto-updated files"
-    git add ../libs/api-client/package.json ../packages/commonwealth/external-api-config.json
-    git commit -m "automated (pre-push): update api-client package.json and external api config"
+    git add ./libs/api-client/package.json ./packages/commonwealth/external-api-config.json
+    git commit --amend --no-edit
 fi
