@@ -42,9 +42,9 @@ export const trpcRouter = trpc.router({
       // TODO: Generalize output middleware to cover (analytics, gac invalidation, canvas, etc)
       void cache().deleteKey(
         CacheNamespaces.Query_Response,
-        'GetGlobalActivity',
+        'GetGlobalActivity_{}', // this is the global activity cache key
       );
-      return undefined;
+      return Promise.resolve(undefined);
     },
     applyCanvasSignedDataMiddleware,
   ),

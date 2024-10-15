@@ -40,12 +40,10 @@ export async function main(
   db: DB,
   {
     port,
-    noGlobalActivityCache = true,
     withLoggingMiddleware = false,
     withPrerender = false,
   }: {
     port: number;
-    noGlobalActivityCache?: boolean;
     withLoggingMiddleware?: boolean;
     withPrerender?: boolean;
   },
