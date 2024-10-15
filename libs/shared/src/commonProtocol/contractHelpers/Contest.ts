@@ -1,5 +1,4 @@
 import { ZERO_ADDRESS } from '@hicommonwealth/shared';
-import { AbiItem } from 'web3-utils';
 
 export const getTotalContestBalance = async (
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -7,7 +6,8 @@ export const getTotalContestBalance = async (
   contestAddress: string,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   web3: any,
-  feeManagerAbi: AbiItem[],
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  feeManagerAbi: any[],
   oneOff?: boolean,
 ): Promise<number> => {
   const promises = [contestContract.methods.contestToken().call()];
