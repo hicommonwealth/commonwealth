@@ -1,7 +1,5 @@
 #!/bin/bash
 
-set -e
-
 RED='\033[31m'
 YELLOW='\033[33m'
 NC='\033[0m'
@@ -24,6 +22,8 @@ then
         echo -e "[eslint] 🚀🚀🚀"
     fi
 fi
+
+set -e
 
 # Update the openAPI spec and api-client package.json version if needed
 pnpm -F commonwealth ts-exec server/scripts/validate-external-api-versioning.ts
