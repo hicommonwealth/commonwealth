@@ -195,7 +195,7 @@ export const NewThreadForm = () => {
       setThreadContentDelta(createDeltaFromText(''));
       clearDraft();
 
-      navigate(`/discussion/${thread.id}`);
+      navigate(`/discussion/${thread.id}-${thread.title}`);
     } catch (err) {
       if (err instanceof SessionKeyError) {
         checkForSessionKeyRevalidationErrors(err);
