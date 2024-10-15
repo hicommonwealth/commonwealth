@@ -44,7 +44,7 @@ export const getTotalContestBalance = async (
           to: String(results[0]),
           data: calldata,
         })
-        .then((v: bigint) => {
+        .then((v: string) => {
           return Number(web3.eth.abi.decodeParameter('uint256', v));
         }),
     );
