@@ -163,6 +163,7 @@ describe('Thread lifecycle', () => {
     });
     await seed('GroupPermission', {
       group_id: threadGroupId,
+      topic_id: _community?.topics?.[0]?.id || 0,
       allowed_actions: [
         schemas.PermissionEnum.CREATE_THREAD,
         schemas.PermissionEnum.CREATE_THREAD_REACTION,
