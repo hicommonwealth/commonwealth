@@ -4,7 +4,6 @@
 import * as CommonApi from '../../../../api/index';
 import * as core from '../../../../core';
 import * as serializers from '../../../index';
-
 export declare const CreateCommentResponseThreadAddressUserEmailNotificationInterval: core.serialization.Schema<
   serializers.CreateCommentResponseThreadAddressUserEmailNotificationInterval.Raw,
   CommonApi.CreateCommentResponseThreadAddressUserEmailNotificationInterval

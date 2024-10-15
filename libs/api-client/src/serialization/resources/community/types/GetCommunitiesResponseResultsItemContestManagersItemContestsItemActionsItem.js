@@ -3,7 +3,6 @@
  */
 import * as core from '../../../../core';
 import { GetCommunitiesResponseResultsItemContestManagersItemContestsItemActionsItemAction } from './GetCommunitiesResponseResultsItemContestManagersItemContestsItemActionsItemAction';
-
 export const GetCommunitiesResponseResultsItemContestManagersItemContestsItemActionsItem =
   core.serialization.object({
     contestAddress: core.serialization.property(

@@ -8,7 +8,6 @@ import { CreateGroupRequestRequirementsItemThresholdDataSourceOne } from './Crea
 import { CreateGroupRequestRequirementsItemThresholdDataSourceThree } from './CreateGroupRequestRequirementsItemThresholdDataSourceThree';
 import { CreateGroupRequestRequirementsItemThresholdDataSourceTokenId } from './CreateGroupRequestRequirementsItemThresholdDataSourceTokenId';
 import { CreateGroupRequestRequirementsItemThresholdDataSourceTokenSymbol } from './CreateGroupRequestRequirementsItemThresholdDataSourceTokenSymbol';
-
 export declare const CreateGroupRequestRequirementsItemThresholdDataSource: core.serialization.Schema<
   serializers.CreateGroupRequestRequirementsItemThresholdDataSource.Raw,
   CommonApi.CreateGroupRequestRequirementsItemThresholdDataSource

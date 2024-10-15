@@ -191,7 +191,7 @@ export type AssociatedContest = {
   contest_interval: number;
 };
 
-type RecentComment = {
+export type RecentComment = {
   id: number;
   address: string;
   text: string;
@@ -201,7 +201,7 @@ type RecentComment = {
   deleted_at?: string;
   discord_meta?: string;
   profile_name?: string;
-  profile_avatar_url?: string;
+  profile_avatar?: string;
   user_id: string;
 };
 
@@ -445,7 +445,7 @@ export class Thread implements IUniqueId {
             User: {
               profile: {
                 name: rc?.profile_name,
-                avatar_url: rc?.profile_avatar_url,
+                avatar_url: rc?.profile_avatar,
               },
             },
           },

@@ -4,7 +4,6 @@
 import * as core from '../../../../core';
 import { CreateGroupResponseContestManagersItemTopicsItemContestTopicsItem } from './CreateGroupResponseContestManagersItemTopicsItemContestTopicsItem';
 import { CreateGroupResponseContestManagersItemTopicsItemWeightedVoting } from './CreateGroupResponseContestManagersItemTopicsItemWeightedVoting';
-
 export const CreateGroupResponseContestManagersItemTopicsItem =
   core.serialization.object({
     id: core.serialization.number().optional(),

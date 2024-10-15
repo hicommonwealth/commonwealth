@@ -23,7 +23,6 @@ import { maybeSkipValidation } from '../../utils/maybeSkipValidation';
 import { enum_ } from '../enum';
 import { getObjectLikeUtils } from '../object-like';
 import { getSchemaUtils } from '../schema-utils';
-
 export function union(discriminant, union) {
   const rawDiscriminant =
     typeof discriminant === 'string'
@@ -119,7 +118,6 @@ export function union(discriminant, union) {
     getObjectLikeUtils(baseSchema),
   );
 }
-
 function transformAndValidateUnion({
   value,
   discriminant,

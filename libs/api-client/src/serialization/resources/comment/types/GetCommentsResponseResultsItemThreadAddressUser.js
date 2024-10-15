@@ -6,7 +6,6 @@ import { GetCommentsResponseResultsItemThreadAddressUserApiKey } from './GetComm
 import { GetCommentsResponseResultsItemThreadAddressUserEmailNotificationInterval } from './GetCommentsResponseResultsItemThreadAddressUserEmailNotificationInterval';
 import { GetCommentsResponseResultsItemThreadAddressUserProfile } from './GetCommentsResponseResultsItemThreadAddressUserProfile';
 import { GetCommentsResponseResultsItemThreadAddressUserProfileTagsItem } from './GetCommentsResponseResultsItemThreadAddressUserProfileTagsItem';
-
 export const GetCommentsResponseResultsItemThreadAddressUser =
   core.serialization.object({
     id: core.serialization.number().optional(),

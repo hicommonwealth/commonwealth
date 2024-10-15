@@ -5,7 +5,6 @@ import * as CommonApi from '../../../../../api/index';
 import * as core from '../../../../../core';
 import * as serializers from '../../../../index';
 import { CreateTopicRequestWeightedVoting } from '../../types/CreateTopicRequestWeightedVoting';
-
 export declare const CreateTopicRequest: core.serialization.Schema<
   serializers.CreateTopicRequest.Raw,
   CommonApi.CreateTopicRequest

@@ -7,7 +7,6 @@ import * as serializers from '../../../index';
 import { CreateThreadReactionResponseAddressRole } from './CreateThreadReactionResponseAddressRole';
 import { CreateThreadReactionResponseAddressUser } from './CreateThreadReactionResponseAddressUser';
 import { CreateThreadReactionResponseAddressWalletId } from './CreateThreadReactionResponseAddressWalletId';
-
 export declare const CreateThreadReactionResponseAddress: core.serialization.ObjectSchema<
   serializers.CreateThreadReactionResponseAddress.Raw,
   CommonApi.CreateThreadReactionResponseAddress
