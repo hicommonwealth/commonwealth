@@ -4,7 +4,6 @@ import { notifyError } from 'controllers/app/notifications';
 import { SessionKeyError } from 'controllers/server/sessions';
 import { parseCustomStages } from 'helpers';
 import { detectURL, getThreadActionTooltipText } from 'helpers/threads';
-import { useFlag } from 'hooks/useFlag';
 import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useMemo, useState } from 'react';
@@ -49,7 +48,6 @@ const MIN_ETH_FOR_CONTEST_THREAD = 0.0005;
 export const NewThreadForm = () => {
   const navigate = useCommonNavigate();
   const location = useLocation();
-  const contestsEnabled = useFlag('contest');
 
   const [submitEntryChecked, setSubmitEntryChecked] = useState(false);
 
@@ -58,7 +56,7 @@ export const NewThreadForm = () => {
   const communityId = app.activeChainId() || '';
   const { data: topics = [], refetch: refreshTopics } = useFetchTopicsQuery({
     communityId,
-    includeContestData: contestsEnabled,
+    includeContestData: true,
     apiEnabled: !!communityId,
   });
 
@@ -233,12 +231,12 @@ export const NewThreadForm = () => {
   });
 
   const contestThreadBannerVisible =
-    contestsEnabled && isContestAvailable && hasTopicOngoingContest;
+    isContestAvailable && hasTopicOngoingContest;
   const isDisabledBecauseOfContestsConsent =
     contestThreadBannerVisible && !submitEntryChecked;
 
   const contestTopicAffordanceVisible =
-    contestsEnabled && isContestAvailable && hasTopicOngoingContest;
+    isContestAvailable && hasTopicOngoingContest;
 
   const walletBalanceError =
     isContestAvailable &&
