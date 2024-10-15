@@ -1,7 +1,4 @@
-import {
-  GroupTopicPermissionEnum,
-  TopicWeightedVoting,
-} from '@hicommonwealth/schemas';
+import { PermissionEnum, TopicWeightedVoting } from '@hicommonwealth/schemas';
 import { getProposalUrlPath } from 'identifiers';
 import { getScopePrefix, useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useRef, useState } from 'react';
@@ -234,24 +231,18 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
             isThreadArchived: !!thread?.archivedAt,
             isThreadLocked: !!thread?.lockedAt,
             isThreadTopicGated: isRestrictedMembership,
-            threadTopicInteractionRestriction:
-              !isAdmin &&
-              !foundTopicPermissions?.permission?.includes(
-                GroupTopicPermissionEnum.UPVOTE,
-              )
-                ? foundTopicPermissions?.permission
-                : undefined,
           });
 
           const disabledReactPermissionTooltipText = getThreadActionTooltipText(
             {
               isCommunityMember: !!user.activeAccount,
-              threadTopicInteractionRestriction:
+              threadTopicInteractionRestrictions:
                 !isAdmin &&
-                !foundTopicPermissions?.permission?.includes(
-                  GroupTopicPermissionEnum.UPVOTE,
+                !foundTopicPermissions?.permissions?.includes(
+                  // this should be updated if we start displaying recent comments on this page
+                  PermissionEnum.CREATE_THREAD_REACTION,
                 )
-                  ? foundTopicPermissions?.permission
+                  ? foundTopicPermissions?.permissions
                   : undefined,
             },
           );
@@ -259,12 +250,12 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
           const disabledCommentPermissionTooltipText =
             getThreadActionTooltipText({
               isCommunityMember: !!user.activeAccount,
-              threadTopicInteractionRestriction:
+              threadTopicInteractionRestrictions:
                 !isAdmin &&
-                !foundTopicPermissions?.permission?.includes(
-                  GroupTopicPermissionEnum.UPVOTE_AND_COMMENT,
+                !foundTopicPermissions?.permissions?.includes(
+                  PermissionEnum.CREATE_COMMENT,
                 )
-                  ? foundTopicPermissions?.permission
+                  ? foundTopicPermissions?.permissions
                   : undefined,
             });
 

@@ -1,4 +1,4 @@
-import { GroupTopicPermissionEnum } from '@hicommonwealth/schemas';
+import { GroupTopicPermissionEnum } from './index.types';
 
 export const REQUIREMENTS_TO_FULFILL = {
   ALL_REQUIREMENTS: 'ALL',
@@ -11,6 +11,9 @@ export const TOPIC_PERMISSIONS = {
   [GroupTopicPermissionEnum.UPVOTE_AND_COMMENT_AND_POST]:
     'Upvote & Comment & Post',
 };
+
+export type TopicPermissions =
+  (typeof TOPIC_PERMISSIONS)[keyof typeof TOPIC_PERMISSIONS];
 
 type ReversedTopicPermissions = {
   [K in keyof typeof TOPIC_PERMISSIONS as (typeof TOPIC_PERMISSIONS)[K]]: K;

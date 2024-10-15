@@ -1,4 +1,4 @@
-import { GroupTopicPermissionEnum } from '@hicommonwealth/schemas';
+import { PermissionEnum } from '@hicommonwealth/schemas';
 import { ContentType, getThreadUrl } from '@hicommonwealth/shared';
 import { notifyError } from 'controllers/app/notifications';
 import { extractDomain, isDefaultStage } from 'helpers';
@@ -331,12 +331,12 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     isThreadArchived: !!thread?.archivedAt,
     isThreadLocked: !!thread?.lockedAt,
     isThreadTopicGated: isRestrictedMembership,
-    threadTopicInteractionRestriction:
+    threadTopicInteractionRestrictions:
       !isAdmin &&
-      !foundTopicPermissions?.permission?.includes(
-        GroupTopicPermissionEnum.UPVOTE_AND_COMMENT,
+      !foundTopicPermissions?.permissions?.includes(
+        PermissionEnum.CREATE_COMMENT,
       )
-        ? foundTopicPermissions?.permission
+        ? foundTopicPermissions?.permissions
         : undefined,
   });
 

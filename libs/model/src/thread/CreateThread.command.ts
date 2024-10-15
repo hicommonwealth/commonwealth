@@ -89,9 +89,7 @@ export function CreateThread(): Command<
     ...schemas.CreateThread,
     auth: [
       isAuthorized({
-        action: schemas.PermissionEnum.CREATE_THREAD,
-        topicPermission:
-          schemas.GroupTopicPermissionEnum.UPVOTE_AND_COMMENT_AND_POST,
+        action: schemas.PermissionEnum.CREATE_THREAD
       }),
       verifyThreadSignature,
     ],

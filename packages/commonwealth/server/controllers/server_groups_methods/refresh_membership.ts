@@ -4,7 +4,7 @@ import {
   MembershipRejectReason,
   UserInstance,
 } from '@hicommonwealth/model';
-import { GroupTopicPermissionEnum } from '@hicommonwealth/schemas';
+import { PermissionEnum } from '@hicommonwealth/schemas';
 import { Op } from 'sequelize';
 import { refreshMembershipsForAddress } from '../../util/requirementsModule/refreshMembershipsForAddress';
 import { ServerGroupsController } from '../server_groups_controller';
@@ -36,7 +36,7 @@ export async function __refreshMembership(
     },
     include: [
       {
-        model: this.models.GroupTopicPermission,
+        model: this.models.GroupPermission,
         attributes: ['topic_id', 'allowed_actions'],
       },
     ],
@@ -75,10 +75,10 @@ export async function __refreshMembership(
       .filter((t) => t.group_ids!.includes(membership.group_id))
       .map((t) => ({
         id: t.id,
-        permission: (groups as GroupInstanceWithTopicPermissions[])
+        permissions: (groups as GroupInstanceWithTopicPermissions[])
           .find((g) => g.id === membership.group_id)
-          ?.GroupTopicPermissions?.find((gtp) => gtp.topic_id === t.id)
-          ?.allowed_actions as GroupTopicPermissionEnum,
+          ?.GroupPermissions?.find((gtp) => gtp.topic_id === t.id)
+          ?.allowed_actions as PermissionEnum[],
       })),
     allowed: !membership.reject_reason,
     rejectReason: membership.reject_reason,

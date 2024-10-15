@@ -95,7 +95,7 @@ export const buildAssociations = (db: DB) => {
     onDelete: 'SET NULL',
   })
     .withMany(db.ContestTopic, { asMany: 'contest_topics' })
-    .withMany(db.GroupTopicPermission, {
+    .withMany(db.GroupPermission, {
       foreignKey: 'topic_id',
       onUpdate: 'CASCADE',
       onDelete: 'CASCADE',
@@ -140,7 +140,7 @@ export const buildAssociations = (db: DB) => {
     onDelete: 'CASCADE',
   });
 
-  db.Group.withMany(db.GroupPermission).withMany(db.GroupTopicPermission, {
+  db.Group.withMany(db.GroupPermission, {
     foreignKey: 'group_id',
     onUpdate: 'CASCADE',
     onDelete: 'CASCADE',

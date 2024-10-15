@@ -95,9 +95,9 @@ export function UpdateGroup(): Command<
           await Promise.all(
             (payload.topics || [])?.map(async (t) => {
               if (group.id) {
-                await models.GroupTopicPermission.update(
+                await models.GroupPermission.update(
                   {
-                    allowed_actions: t.permission,
+                    allowed_actions: t.permissions,
                   },
                   {
                     where: {

@@ -1,5 +1,5 @@
+import { PermissionEnum } from '@hicommonwealth/schemas';
 import MinimumProfile from 'models/MinimumProfile';
-import { TopicPermissions } from '../../../Groups/common/GroupForm/index.types';
 
 export type RequirementCardProps = {
   requirementType: string;
@@ -17,7 +17,7 @@ export type GroupCardProps = {
   requirements?: RequirementCardProps[]; // This represents erc requirements
   requirementsToFulfill: 'ALL' | number;
   allowLists?: string[];
-  topics: { id: number; name: string; permission?: TopicPermissions }[];
+  topics: { id: number; name: string; permissions?: PermissionEnum[] }[];
   canEdit?: boolean;
   onEditClick?: () => void;
   profiles?: Map<string, MinimumProfile>;

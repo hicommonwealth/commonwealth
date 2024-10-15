@@ -8,7 +8,7 @@ import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import { formatAddressShort } from '../../../../../../helpers';
 import CWPagination from '../../../../../components/component_kit/new_designs/CWPagination/CWPagination';
-import { TOPIC_PERMISSIONS } from '../../../Groups/common/GroupForm/constants';
+import { convertGranularPermissionsToAccumulatedPermissions } from '../../../Groups/common/GroupForm/helpers';
 import './GroupCard.scss';
 import RequirementCard from './RequirementCard/RequirementCard';
 import { GroupCardProps } from './types';
@@ -155,7 +155,9 @@ const GroupCard = ({
                   <CWText type="b2">{t.name}</CWText>
 
                   <CWTag
-                    label={TOPIC_PERMISSIONS[t.permission || ''] || ''}
+                    label={convertGranularPermissionsToAccumulatedPermissions(
+                      t.permissions || [],
+                    )}
                     type="referendum"
                   />
                 </div>

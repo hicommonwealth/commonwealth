@@ -1,4 +1,4 @@
-import { GroupTopicPermissionEnum } from '@hicommonwealth/schemas';
+import { PermissionEnum } from '@hicommonwealth/schemas';
 import { getThreadActionTooltipText } from 'helpers/threads';
 import { truncate } from 'helpers/truncate';
 import useTopicGating from 'hooks/useTopicGating';
@@ -215,23 +215,26 @@ export const CWContentPage = ({
 
   const disabledReactPermissionTooltipText = getThreadActionTooltipText({
     isCommunityMember: !!user.activeAccount,
-    threadTopicInteractionRestriction:
+    threadTopicInteractionRestrictions:
       !isAdmin &&
-      !foundTopicPermissions?.permission?.includes(
-        GroupTopicPermissionEnum.UPVOTE,
+      !foundTopicPermissions?.permissions?.includes(
+        PermissionEnum.CREATE_COMMENT_REACTION,
+      ) &&
+      !foundTopicPermissions?.permissions?.includes(
+        PermissionEnum.CREATE_THREAD_REACTION,
       )
-        ? foundTopicPermissions?.permission
+        ? foundTopicPermissions?.permissions
         : undefined,
   });
 
   const disabledCommentPermissionTooltipText = getThreadActionTooltipText({
     isCommunityMember: !!user.activeAccount,
-    threadTopicInteractionRestriction:
+    threadTopicInteractionRestrictions:
       !isAdmin &&
-      !foundTopicPermissions?.permission?.includes(
-        GroupTopicPermissionEnum.UPVOTE_AND_COMMENT,
+      !foundTopicPermissions?.permissions?.includes(
+        PermissionEnum.CREATE_COMMENT,
       )
-        ? foundTopicPermissions?.permission
+        ? foundTopicPermissions?.permissions
         : undefined,
   });
 

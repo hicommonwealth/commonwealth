@@ -530,6 +530,11 @@ export const CommentTree = ({
                 parentCommentId={parentCommentId}
                 rootThread={thread}
                 canComment={canComment}
+                tooltipText={
+                  !canComment && disabledActionsTooltipText
+                    ? disabledActionsTooltipText
+                    : ''
+                }
               />
             )}
           </React.Fragment>

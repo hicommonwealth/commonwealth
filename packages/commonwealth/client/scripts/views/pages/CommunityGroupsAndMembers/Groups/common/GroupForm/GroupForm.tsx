@@ -31,6 +31,7 @@ import {
   REVERSED_TOPIC_PERMISSIONS,
   TOPIC_PERMISSIONS,
 } from './constants';
+import { convertAccumulatedPermissionsToGranularPermissions } from './helpers';
 import {
   FormSubmitValues,
   GroupFormProps,
@@ -213,7 +214,7 @@ const GroupForm = ({
     if (initialValues.topics) {
       setTopicPermissionsSubForms(
         initialValues.topics.map((t) => ({
-          permission: TOPIC_PERMISSIONS[t.permission],
+          permission: t.permission,
           topic: { id: parseInt(`${t.value}`), name: t.label },
         })),
       );
@@ -388,7 +389,9 @@ const GroupForm = ({
       ...values,
       topics: topicPermissionsSubForms.map((t) => ({
         id: t.topic.id,
-        permission: REVERSED_TOPIC_PERMISSIONS[t.permission],
+        permissions: convertAccumulatedPermissionsToGranularPermissions(
+          REVERSED_TOPIC_PERMISSIONS[t.permission],
+        ),
       })),
       requirementsToFulfill,
       requirements: requirementSubForms.map((x) => x.values),

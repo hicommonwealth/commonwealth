@@ -6,7 +6,7 @@ import 'components/feed.scss';
 import { PageNotFound } from '../pages/404';
 import { UserDashboardRowSkeleton } from '../pages/user_dashboard/user_dashboard_row';
 
-import { GroupTopicPermissionEnum } from '@hicommonwealth/schemas';
+import { PermissionEnum } from '@hicommonwealth/schemas';
 import { slugify } from '@hicommonwealth/shared';
 import { getThreadActionTooltipText } from 'helpers/threads';
 import useTopicGating from 'hooks/useTopicGating';
@@ -74,12 +74,16 @@ const FeedThread = ({ thread }: { thread: Thread }) => {
     isThreadArchived: !!thread?.archivedAt,
     isThreadLocked: !!thread?.lockedAt,
     isThreadTopicGated: isRestrictedMembership,
-    threadTopicInteractionRestriction:
+  });
+
+  const disabledCommentActionTooltipText = getThreadActionTooltipText({
+    isCommunityMember: Permissions.isCommunityMember(thread.communityId),
+    threadTopicInteractionRestrictions:
       !isAdmin &&
-      !foundTopicPermissions?.permission?.includes(
-        GroupTopicPermissionEnum.UPVOTE_AND_COMMENT, // on this page we only show comment option
+      !foundTopicPermissions?.permissions?.includes(
+        PermissionEnum.CREATE_COMMENT, // on this page we only show comment option
       )
-        ? foundTopicPermissions?.permission
+        ? foundTopicPermissions?.permissions
         : undefined,
   });
 
@@ -94,7 +98,7 @@ const FeedThread = ({ thread }: { thread: Thread }) => {
     <ThreadCard
       thread={thread}
       canReact={!disabledActionsTooltipText}
-      canComment={!disabledActionsTooltipText}
+      canComment={!disabledCommentActionTooltipText}
       canUpdateThread={false} // we dont want user to update thread from here, even if they have permissions
       onStageTagClick={() => {
         navigate(
@@ -105,7 +109,11 @@ const FeedThread = ({ thread }: { thread: Thread }) => {
       }}
       threadHref={discussionLink}
       onCommentBtnClick={() => navigate(`${discussionLink}?focusComments=true`)}
-      disabledActionsTooltipText={disabledActionsTooltipText}
+      disabledActionsTooltipText={
+        disabledCommentActionTooltipText
+          ? disabledCommentActionTooltipText
+          : disabledActionsTooltipText
+      }
       customStages={community.custom_stages}
       hideReactionButton
       hideUpvotesDrawer

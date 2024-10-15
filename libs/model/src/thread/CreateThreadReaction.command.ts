@@ -19,7 +19,6 @@ export function CreateThreadReaction(): Command<
     auth: [
       isAuthorized({
         action: schemas.PermissionEnum.CREATE_THREAD_REACTION,
-        topicPermission: schemas.GroupTopicPermissionEnum.UPVOTE,
       }),
       verifyReactionSignature,
     ],

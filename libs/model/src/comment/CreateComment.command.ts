@@ -34,7 +34,6 @@ export function CreateComment(): Command<
     auth: [
       isAuthorized({
         action: schemas.PermissionEnum.CREATE_COMMENT,
-        topicPermission: schemas.GroupTopicPermissionEnum.UPVOTE_AND_COMMENT,
       }),
       verifyCommentSignature,
     ],

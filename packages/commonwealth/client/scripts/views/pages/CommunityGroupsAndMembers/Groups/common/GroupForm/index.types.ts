@@ -1,5 +1,11 @@
-import { GroupTopicPermissionEnum } from '@hicommonwealth/schemas';
+import { PermissionEnum } from '@hicommonwealth/schemas';
 import { TOPIC_PERMISSIONS } from './constants';
+
+export enum GroupTopicPermissionEnum {
+  UPVOTE = 'UPVOTE',
+  UPVOTE_AND_COMMENT = 'UPVOTE_AND_COMMENT',
+  UPVOTE_AND_COMMENT_AND_POST = 'UPVOTE_AND_COMMENT_AND_POST',
+}
 
 export type RequirementSubFormsState = {
   defaultValues?: RequirementSubTypeWithLabel;
@@ -54,7 +60,7 @@ export type RequirementSubFormType = {
 
 export type GroupFormTopicSubmitValues = {
   id: number;
-  permission: GroupTopicPermissionEnum;
+  permissions: PermissionEnum[];
 };
 
 export type GroupResponseValuesType = {
@@ -71,7 +77,7 @@ export type GroupInitialValuesTypeWithLabel = {
   groupDescription?: string;
   requirements?: RequirementSubTypeWithLabel[];
   requirementsToFulfill?: 'ALL' | number;
-  topics: (LabelType & { permission: GroupTopicPermissionEnum })[];
+  topics: (LabelType & { permission: TopicPermissions })[];
 };
 
 export type FormSubmitValues = {

@@ -1,8 +1,9 @@
-import { GroupTopicPermissionEnum } from '@hicommonwealth/schemas';
+import { PermissionEnum } from '@hicommonwealth/schemas';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
-import { TOPIC_PERMISSIONS } from 'views/pages/CommunityGroupsAndMembers/Groups/common/GroupForm/constants';
+// eslint-disable-next-line max-len
+import { convertGranularPermissionsToAccumulatedPermissions } from 'views/pages/CommunityGroupsAndMembers/Groups/common/GroupForm/helpers';
 import {
   MixpanelClickthroughEvent,
   MixpanelClickthroughPayload,
@@ -12,12 +13,12 @@ import CWBanner from '../new_designs/CWBanner';
 
 interface CWGatedTopicPermissionLevelBannerProps {
   onClose: () => void;
-  topicPermission: GroupTopicPermissionEnum;
+  topicPermissions: PermissionEnum[];
 }
 
 const CWGatedTopicPermissionLevelBanner = ({
   onClose = () => {},
-  topicPermission,
+  topicPermissions,
 }: CWGatedTopicPermissionLevelBannerProps) => {
   const navigate = useCommonNavigate();
 
@@ -31,7 +32,7 @@ const CWGatedTopicPermissionLevelBanner = ({
   return (
     <CWBanner
       title="This topic has granular permissioning enabled"
-      body={`Topic members are only allowed to ${TOPIC_PERMISSIONS[topicPermission]}`}
+      body={`Topic members are only allowed to ${convertGranularPermissionsToAccumulatedPermissions(topicPermissions)}`}
       type="info"
       buttons={[
         {

@@ -9,7 +9,6 @@ import {
 import {
   Group,
   GroupPermissionAction,
-  GroupTopicPermissionEnum,
 } from '@hicommonwealth/schemas';
 import { Role } from '@hicommonwealth/shared';
 import { Op, QueryTypes } from 'sequelize';
@@ -53,7 +52,7 @@ export class NonMember extends InvalidActor {
   constructor(
     public actor: Actor,
     public topic: string,
-    public action: GroupPermissionAction | GroupTopicPermissionEnum,
+    public action: GroupPermissionAction,
   ) {
     super(
       actor,
@@ -190,7 +189,6 @@ async function hasTopicInteractionPermissions(
   actor: Actor,
   auth: AuthContext,
   action: GroupPermissionAction,
-  topicPermission: GroupTopicPermissionEnum,
 ): Promise<void> {
   if (!auth.topic_id) throw new InvalidInput('Must provide a topic id');
 
@@ -199,28 +197,27 @@ async function hasTopicInteractionPermissions(
 
   if (auth.topic.group_ids?.length === 0) return;
 
+  // check if user has permission to perform "action" in 'topic_id'
+  // the 'topic_id' can belong to any group where user has membership
+  // the group with 'topic_id' having higher permissions will take precedence
   const groups = await models.sequelize.query<
     z.infer<typeof Group> & {
-      group_allowed_actions?: GroupPermissionAction[];
-      topic_allowed_actions?: GroupTopicPermissionEnum;
+      allowed_actions?: GroupPermissionAction[];
     }
   >(
     `
     SELECT 
       g.*, 
-      gp.allowed_actions as group_allowed_actions,
-      gtp.allowed_actions as topic_allowed_actions
+      gp.allowed_actions as allowed_actions
     FROM "Groups" as g 
-    LEFT JOIN "GroupPermissions" gp ON g.id = gp.group_id
-    LEFT JOIN "GroupTopicPermissions" gtp ON g.id = gtp.group_id AND gtp.topic_id = :topic_id
-    WHERE g.community_id = :community_id AND g.id IN (:group_ids);
+    LEFT JOIN "GroupPermissions" gp ON g.id = gp.group_id AND gp.topic_id = :topic_id
+    WHERE g.community_id = :community_id
     `,
     {
       type: QueryTypes.SELECT,
       raw: true,
       replacements: {
         community_id: auth.topic.community_id,
-        group_ids: auth.topic.group_ids,
         topic_id: auth.topic.id,
       },
     },
@@ -230,17 +227,10 @@ async function hasTopicInteractionPermissions(
   // any group_allowed_actions, or we have the new fine-grained permission system where the action must be in
   // the group_allowed_actions list.
   const allowedGroupActions = groups.filter(
-    (g) => !g.group_allowed_actions || g.group_allowed_actions.includes(action),
+    (g) => !g.allowed_actions || g.allowed_actions.includes(action),
   );
   if (!allowedGroupActions.length!)
     throw new NonMember(actor, auth.topic.name, action);
-
-  // The user must have `topicPermission` matching `topic_allowed_actions` for this topic
-  const allowedTopicActions = groups.filter((g) =>
-    g.topic_allowed_actions?.includes(topicPermission),
-  );
-  if (!allowedTopicActions.length!)
-    throw new NonMember(actor, auth.topic.name, topicPermission);
 
   // check membership for all groups of topic
   const memberships = await models.Membership.findAll({
@@ -291,13 +281,11 @@ export const isSuperAdmin: AuthHandler = async (ctx) => {
 export function isAuthorized({
   roles = ['admin', 'moderator', 'member'],
   action,
-  topicPermission,
   author = false,
   collaborators = false,
 }: {
   roles?: Role[];
   action?: GroupPermissionAction;
-  topicPermission?: GroupTopicPermissionEnum;
   author?: boolean;
   collaborators?: boolean;
 }): AuthHandler {
@@ -314,13 +302,12 @@ export function isAuthorized({
 
     if (auth.address!.is_banned) throw new BannedActor(ctx.actor);
 
-    if (action && topicPermission) {
+    if (action) {
       // waterfall stops here after validating the action
       await hasTopicInteractionPermissions(
         ctx.actor,
         auth,
         action,
-        topicPermission,
       );
       return;
     }

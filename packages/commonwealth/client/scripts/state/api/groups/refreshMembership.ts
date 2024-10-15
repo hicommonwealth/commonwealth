@@ -1,4 +1,4 @@
-import { GroupTopicPermissionEnum } from '@hicommonwealth/schemas';
+import { PermissionEnum } from '@hicommonwealth/schemas';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { ApiEndpoints, SERVER_URL } from 'state/api/config';
@@ -15,7 +15,7 @@ interface RefreshMembershipProps {
 
 export interface Memberships {
   groupId: number;
-  topics: { id: number; permission: GroupTopicPermissionEnum }[];
+  topics: { id: number; permissions: PermissionEnum[] }[];
   isAllowed: boolean;
   rejectReason?: string;
 }

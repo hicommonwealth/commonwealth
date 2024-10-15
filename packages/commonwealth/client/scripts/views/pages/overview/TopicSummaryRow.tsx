@@ -1,4 +1,4 @@
-import { GroupTopicPermissionEnum } from '@hicommonwealth/schemas';
+import { PermissionEnum } from '@hicommonwealth/schemas';
 import { slugify } from '@hicommonwealth/shared';
 import { getThreadActionTooltipText } from 'helpers/threads';
 import useTopicGating from 'hooks/useTopicGating';
@@ -118,12 +118,12 @@ export const TopicSummaryRow = ({
             isThreadArchived: !!thread?.archivedAt,
             isThreadLocked: !!thread?.lockedAt,
             isThreadTopicGated: isRestrictedMembership,
-            threadTopicInteractionRestriction:
+            threadTopicInteractionRestrictions:
               !isAdmin &&
-              !foundTopicPermissions?.permission?.includes(
-                GroupTopicPermissionEnum.UPVOTE_AND_COMMENT, // on this page we only show comment option
+              !foundTopicPermissions?.permissions?.includes(
+                PermissionEnum.CREATE_COMMENT, // on this page we only show comment option
               )
-                ? foundTopicPermissions?.permission
+                ? foundTopicPermissions?.permissions
                 : undefined,
           });
 

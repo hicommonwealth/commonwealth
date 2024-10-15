@@ -4,7 +4,7 @@ import {
   MembershipAttributes,
   TopicAttributes,
 } from '@hicommonwealth/model';
-import { GroupTopicPermissionEnum } from '@hicommonwealth/schemas';
+import { PermissionEnum } from '@hicommonwealth/schemas';
 import { Op, WhereOptions } from 'sequelize';
 import { ServerGroupsController } from '../server_groups_controller';
 
@@ -15,7 +15,7 @@ export type GetGroupsOptions = {
 };
 
 export type TopicAttributesWithPermission = TopicAttributes & {
-  permission: GroupTopicPermissionEnum;
+  permissions: PermissionEnum[];
 };
 
 type GroupWithExtras = GroupAttributes & {
@@ -25,9 +25,9 @@ type GroupWithExtras = GroupAttributes & {
 export type GetGroupsResult = GroupWithExtras[];
 
 export type GroupInstanceWithTopicPermissions = GroupInstance & {
-  GroupTopicPermissions: {
+  GroupPermissions: {
     topic_id: number;
-    allowed_actions: GroupTopicPermissionEnum;
+    allowed_actions: PermissionEnum[];
   }[];
 };
 
@@ -41,7 +41,7 @@ export async function __getGroups(
     },
     include: [
       {
-        model: this.models.GroupTopicPermission,
+        model: this.models.GroupPermission,
         attributes: ['topic_id', 'allowed_actions'],
       },
     ],
@@ -94,11 +94,10 @@ export async function __getGroups(
         .filter((t) => t.group_ids!.includes(group.id!))
         .map((t) => {
           const temp: TopicAttributesWithPermission = { ...t.toJSON() };
-          temp.permission = (
-            (group as GroupInstanceWithTopicPermissions)
-              .GroupTopicPermissions || []
+          temp.permissions = (
+            (group as GroupInstanceWithTopicPermissions).GroupPermissions || []
           ).find((gtp) => gtp.topic_id === t.id)
-            ?.allowed_actions as GroupTopicPermissionEnum;
+            ?.allowed_actions as PermissionEnum[];
           return temp;
         }),
     }));

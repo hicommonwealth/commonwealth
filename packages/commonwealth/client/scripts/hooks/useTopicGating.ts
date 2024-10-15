@@ -1,8 +1,8 @@
-import { GroupTopicPermissionEnum } from '@hicommonwealth/schemas';
+import { PermissionEnum } from '@hicommonwealth/schemas';
 import { useRefreshMembershipQuery } from 'state/api/groups';
 import Permissions from '../utils/Permissions';
 
-type TopicPermission = { id: number; permission: GroupTopicPermissionEnum };
+type TopicPermission = { id: number; permissions: PermissionEnum[] };
 
 type UseTopicGatingProps = {
   communityId: string;
@@ -31,7 +31,9 @@ const useTopicGating = ({
       const existing = acc.find((item) => item.id === current.id);
       if (!existing) {
         acc.push(current);
-      } else if (current.permission.length > existing.permission.length) {
+        // IMP: this logic can break if `PermissionEnum` or the `GroupPermissions`
+        // schema is changed substantially and might not give off a ts issue.
+      } else if (current.permissions.length > existing.permissions.length) {
         // Replace with the current item if it has a longer permission string
         const index = acc.indexOf(existing);
         acc[index] = current;

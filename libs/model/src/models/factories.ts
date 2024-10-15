@@ -24,7 +24,6 @@ import EmailUpdateToken from './email_update_token';
 import EvmEventSource from './evmEventSource';
 import Group from './group';
 import GroupPermission from './groupPermission';
-import GroupTopicPermission from './groupTopicPermission';
 import LastProcessedEvmBlock from './lastProcessedEvmBlock';
 import Membership from './membership';
 import Outbox from './outbox';
@@ -92,7 +91,6 @@ export const Factories = {
   Wallets,
   Token,
   XpLog,
-  GroupTopicPermission,
 };
 
 export type DB = {

@@ -12,7 +12,7 @@ import { z } from 'zod';
 import {
   Community,
   Group,
-  GroupTopicPermissionEnum,
+  PermissionEnum,
   Requirement,
   StakeTransaction,
   Topic,
@@ -233,7 +233,7 @@ export const CreateGroup = {
       .array(
         z.object({
           id: PG_INT,
-          permission: z.nativeEnum(GroupTopicPermissionEnum),
+          permissions: z.array(z.nativeEnum(PermissionEnum)),
         }),
       )
       .optional(),
@@ -251,7 +251,7 @@ export const UpdateGroup = {
       .array(
         z.object({
           id: PG_INT,
-          permission: z.nativeEnum(GroupTopicPermissionEnum),
+          permissions: z.array(z.nativeEnum(PermissionEnum)),
         }),
       )
       .optional(),

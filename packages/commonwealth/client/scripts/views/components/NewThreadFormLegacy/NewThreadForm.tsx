@@ -1,4 +1,4 @@
-import { GroupTopicPermissionEnum } from '@hicommonwealth/schemas';
+import { PermissionEnum } from '@hicommonwealth/schemas';
 import { notifyError } from 'controllers/app/notifications';
 import { SessionKeyError } from 'controllers/server/sessions';
 import { parseCustomStages } from 'helpers';
@@ -222,12 +222,12 @@ export const NewThreadForm = () => {
   const disabledActionsTooltipText = getThreadActionTooltipText({
     isCommunityMember: !!user.activeAccount,
     isThreadTopicGated: isRestrictedMembership,
-    threadTopicInteractionRestriction:
+    threadTopicInteractionRestrictions:
       !isAdmin &&
-      !foundTopicPermissions?.permission?.includes(
-        GroupTopicPermissionEnum.UPVOTE_AND_COMMENT_AND_POST,
+      !foundTopicPermissions?.permissions?.includes(
+        PermissionEnum.CREATE_THREAD,
       )
-        ? foundTopicPermissions?.permission
+        ? foundTopicPermissions?.permissions
         : undefined,
   });
 
@@ -422,12 +422,12 @@ export const NewThreadForm = () => {
               {canShowTopicPermissionBanner &&
                 foundTopicPermissions &&
                 !isAdmin &&
-                !foundTopicPermissions?.permission?.includes(
-                  GroupTopicPermissionEnum.UPVOTE_AND_COMMENT_AND_POST,
+                !foundTopicPermissions?.permissions?.includes(
+                  PermissionEnum.CREATE_THREAD,
                 ) && (
                   <CWGatedTopicPermissionLevelBanner
-                    topicPermission={
-                      foundTopicPermissions?.permission as GroupTopicPermissionEnum
+                    topicPermissions={
+                      foundTopicPermissions?.permissions as PermissionEnum[]
                     }
                     onClose={() => setCanShowTopicPermissionBanner(false)}
                   />
