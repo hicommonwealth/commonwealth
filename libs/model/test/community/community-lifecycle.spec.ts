@@ -8,7 +8,7 @@ import {
   query,
 } from '@hicommonwealth/core';
 import {
-  GroupTopicPermissionEnum,
+  PermissionEnum,
   TopicWeightedVoting,
 } from '@hicommonwealth/schemas';
 import { ChainBase, ChainType } from '@hicommonwealth/shared';
@@ -43,7 +43,7 @@ const chance = Chance();
 
 function buildCreateGroupPayload(
   community_id: string,
-  topics: { id: number; permission: GroupTopicPermissionEnum }[] = [],
+  topics: { id: number; permissions: PermissionEnum[] }[] = [],
 ) {
   return {
     community_id,
@@ -364,15 +364,15 @@ describe('Community lifecycle', () => {
           payload: buildCreateGroupPayload(community.id, [
             {
               id: 1,
-              permission: GroupTopicPermissionEnum.UPVOTE_AND_COMMENT_AND_POST,
+              permissions: [PermissionEnum.CREATE_COMMENT, PermissionEnum.CREATE_THREAD, PermissionEnum.CREATE_COMMENT_REACTION,PermissionEnum.CREATE_THREAD_REACTION],
             },
             {
               id: 2,
-              permission: GroupTopicPermissionEnum.UPVOTE_AND_COMMENT_AND_POST,
+              permissions: [PermissionEnum.CREATE_COMMENT, PermissionEnum.CREATE_THREAD, PermissionEnum.CREATE_COMMENT_REACTION,PermissionEnum.CREATE_THREAD_REACTION],
             },
             {
               id: 3,
-              permission: GroupTopicPermissionEnum.UPVOTE_AND_COMMENT_AND_POST,
+              permissions: [PermissionEnum.CREATE_COMMENT, PermissionEnum.CREATE_THREAD, PermissionEnum.CREATE_COMMENT_REACTION,PermissionEnum.CREATE_THREAD_REACTION],
             },
           ]),
         }),
