@@ -1,7 +1,6 @@
 import { CacheDecorator, setupErrorHandlers } from '@hicommonwealth/adapters';
 import { logger } from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
-import { GlobalActivityCache } from '@hicommonwealth/model';
 import sgMail from '@sendgrid/mail';
 import compression from 'compression';
 import SessionSequelizeStore from 'connect-session-sequelize';
@@ -153,11 +152,6 @@ export async function main(
   setupMiddleware();
   setupPassport(db);
 
-  // TODO: decouple as global singleton
-  const globalActivityCache = GlobalActivityCache.getInstance();
-  // initialize async to avoid blocking startup
-  if (!noGlobalActivityCache) globalActivityCache.start();
-
   // Declare Validation Middleware Service
   // middleware to use for all requests
   const dbValidationService: DatabaseValidationService =
@@ -168,7 +162,6 @@ export async function main(
     app,
     db,
     viewCountCache,
-    globalActivityCache,
     dbValidationService,
     cacheDecorator,
   );
