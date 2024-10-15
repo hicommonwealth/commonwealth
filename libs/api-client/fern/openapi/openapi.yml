@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: Common API
-  version: 0.0.6
+  version: 1.0.0
 servers:
   - url: http://localhost:3000/api/v1
 paths:
@@ -49,13 +49,9 @@ paths:
                       type: string
                       nullable: true
                     id:
-                      type: integer
-                      minimum: 0
-                      maximum: 2147483647
+                      type: number
                     user_id:
-                      type: integer
-                      minimum: 0
-                      maximum: 2147483647
+                      type: number
                     user_address:
                       type: string
                     profile_name:
@@ -125,9 +121,7 @@ paths:
                       type: object
                       properties:
                         id:
-                          type: integer
-                          minimum: 0
-                          maximum: 2147483647
+                          type: number
                         name:
                           type: string
                         description:
@@ -143,9 +137,7 @@ paths:
                         type: object
                         properties:
                           id:
-                            type: integer
-                            minimum: 0
-                            maximum: 2147483647
+                            type: number
                           address:
                             type: string
                           user_id:

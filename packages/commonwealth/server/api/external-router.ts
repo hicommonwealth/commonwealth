@@ -99,7 +99,7 @@ const trpcRouter = trpc.router(api);
 trpc.useOAS(router, trpcRouter, {
   title: 'Common API',
   path: PATH,
-  version: '0.0.6',
+  version: '1.0.0',
 });
 
 export { PATH, router };
