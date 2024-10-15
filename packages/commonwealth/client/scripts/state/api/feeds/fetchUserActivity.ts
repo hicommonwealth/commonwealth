@@ -5,9 +5,8 @@ const USER_ACTIVITY_CACHE_TIME = 5 * 60 * 1_000; // 5 minutes
 const GLOBAL_ACTIVITY_STALE_TIME = 5 * 60 * 1_000; // 5 minutes (backend caches for 5 minutes as well)
 
 export const useFetchGlobalActivityQuery = () => {
-  return trpc.feed.getUserActivity.useQuery(
+  return trpc.feed.getGlobalActivity.useQuery(
     {
-      is_global: true,
       thread_limit: 50,
       comment_limit: 3,
     },
@@ -21,7 +20,6 @@ export const useFetchGlobalActivityQuery = () => {
 export const useFetchUserActivityQuery = () => {
   return trpc.feed.getUserActivity.useQuery(
     {
-      is_global: false,
       thread_limit: 50,
       comment_limit: 3,
     },

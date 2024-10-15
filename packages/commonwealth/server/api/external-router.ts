@@ -36,6 +36,7 @@ const { createComment, updateComment, deleteComment, createCommentReaction } =
 const { getNewContent } = user.trpcRouter;
 
 const api = {
+  getGlobalActivity: trpc.query(Feed.GetGlobalActivity, trpc.Tag.User, true),
   getUserActivity: trpc.query(Feed.GetUserActivity, trpc.Tag.User, true),
   getNewContent,
   getCommunities: trpc.query(

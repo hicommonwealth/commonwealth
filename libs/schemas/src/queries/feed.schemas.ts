@@ -47,7 +47,6 @@ export const ActivityThread = z.object({
 
 export const ActivityFeed = {
   input: z.object({
-    is_global: z.boolean().optional(),
     thread_limit: z.number().optional(),
     comment_limit: z.number().optional(),
   }),
