@@ -4,7 +4,6 @@
 import * as CommonApi from '../../../../api/index';
 import * as core from '../../../../core';
 import * as serializers from '../../../index';
-
 export declare const GetCommunityResponseAddressesGroupsItemRequirementsItemThresholdDataSourceOne: core.serialization.ObjectSchema<
   serializers.GetCommunityResponseAddressesGroupsItemRequirementsItemThresholdDataSourceOne.Raw,
   CommonApi.GetCommunityResponseAddressesGroupsItemRequirementsItemThresholdDataSourceOne

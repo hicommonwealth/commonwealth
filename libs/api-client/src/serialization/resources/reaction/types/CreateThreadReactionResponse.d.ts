@@ -5,7 +5,6 @@ import * as CommonApi from '../../../../api/index';
 import * as core from '../../../../core';
 import * as serializers from '../../../index';
 import { CreateThreadReactionResponseAddress } from './CreateThreadReactionResponseAddress';
-
 export declare const CreateThreadReactionResponse: core.serialization.ObjectSchema<
   serializers.CreateThreadReactionResponse.Raw,
   CommonApi.CreateThreadReactionResponse

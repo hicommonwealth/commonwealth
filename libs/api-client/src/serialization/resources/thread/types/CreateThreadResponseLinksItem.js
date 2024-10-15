@@ -3,7 +3,6 @@
  */
 import * as core from '../../../../core';
 import { CreateThreadResponseLinksItemSource } from './CreateThreadResponseLinksItemSource';
-
 export const CreateThreadResponseLinksItem = core.serialization.object({
   source: CreateThreadResponseLinksItemSource,
   identifier: core.serialization.string(),

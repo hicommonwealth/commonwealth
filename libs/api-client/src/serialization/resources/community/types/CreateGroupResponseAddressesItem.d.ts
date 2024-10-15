@@ -7,7 +7,6 @@ import * as serializers from '../../../index';
 import { CreateGroupResponseAddressesItemRole } from './CreateGroupResponseAddressesItemRole';
 import { CreateGroupResponseAddressesItemUser } from './CreateGroupResponseAddressesItemUser';
 import { CreateGroupResponseAddressesItemWalletId } from './CreateGroupResponseAddressesItemWalletId';
-
 export declare const CreateGroupResponseAddressesItem: core.serialization.ObjectSchema<
   serializers.CreateGroupResponseAddressesItem.Raw,
   CommonApi.CreateGroupResponseAddressesItem

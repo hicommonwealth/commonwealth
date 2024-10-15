@@ -6,7 +6,6 @@ import { UpdateCommunityRequestAddressesItemUserApiKey } from './UpdateCommunity
 import { UpdateCommunityRequestAddressesItemUserEmailNotificationInterval } from './UpdateCommunityRequestAddressesItemUserEmailNotificationInterval';
 import { UpdateCommunityRequestAddressesItemUserProfile } from './UpdateCommunityRequestAddressesItemUserProfile';
 import { UpdateCommunityRequestAddressesItemUserProfileTagsItem } from './UpdateCommunityRequestAddressesItemUserProfileTagsItem';
-
 export const UpdateCommunityRequestAddressesItemUser =
   core.serialization.object({
     id: core.serialization.number().optional(),

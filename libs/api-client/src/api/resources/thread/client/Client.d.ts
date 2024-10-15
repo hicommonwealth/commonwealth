@@ -4,7 +4,6 @@
 import * as core from '../../../../core';
 import * as environments from '../../../../environments';
 import * as CommonApi from '../../../index';
-
 export declare namespace Thread {
   interface Options {
     environment?: core.Supplier<environments.CommonApiEnvironment | string>;
@@ -12,7 +11,6 @@ export declare namespace Thread {
     /** Override the address header */
     address?: core.Supplier<string | undefined>;
   }
-
   interface RequestOptions {
     /** The maximum time to wait for a response in seconds. */
     timeoutInSeconds?: number;
@@ -24,12 +22,9 @@ export declare namespace Thread {
     address?: string | undefined;
   }
 }
-
 export declare class Thread {
   protected readonly _options: Thread.Options;
-
   constructor(_options: Thread.Options);
-
   /**
    * @param {CommonApi.CreateThreadRequest} request
    * @param {Thread.RequestOptions} requestOptions - Request-specific configuration.
@@ -49,7 +44,6 @@ export declare class Thread {
     request: CommonApi.CreateThreadRequest,
     requestOptions?: Thread.RequestOptions,
   ): Promise<CommonApi.CreateThreadResponse>;
-
   /**
    * @param {CommonApi.UpdateThreadRequest} request
    * @param {Thread.RequestOptions} requestOptions - Request-specific configuration.
@@ -63,7 +57,6 @@ export declare class Thread {
     request: CommonApi.UpdateThreadRequest,
     requestOptions?: Thread.RequestOptions,
   ): Promise<CommonApi.UpdateThreadResponse>;
-
   /**
    * @param {CommonApi.DeleteThreadRequest} request
    * @param {Thread.RequestOptions} requestOptions - Request-specific configuration.
@@ -77,7 +70,6 @@ export declare class Thread {
     request: CommonApi.DeleteThreadRequest,
     requestOptions?: Thread.RequestOptions,
   ): Promise<CommonApi.DeleteThreadResponse>;
-
   protected _getCustomAuthorizationHeaders(): Promise<{
     'x-api-key': string;
   }>;

@@ -3,7 +3,6 @@
  */
 import * as core from '../../../../core';
 import { UpdateCommunityRequestGroupsItemRequirementsItemAllowData } from './UpdateCommunityRequestGroupsItemRequirementsItemAllowData';
-
 export const UpdateCommunityRequestGroupsItemRequirementsItemAllow =
   core.serialization.object({
     data: UpdateCommunityRequestGroupsItemRequirementsItemAllowData,
