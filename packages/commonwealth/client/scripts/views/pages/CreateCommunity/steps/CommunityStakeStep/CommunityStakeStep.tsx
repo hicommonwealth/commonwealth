@@ -15,6 +15,8 @@ interface CommunityStakeStepProps {
   onTopicFlowStepChange?: (step: CreateTopicStep) => void;
   refetchStakeQuery?: () => void;
   onlyNamespace?: boolean;
+  namespace?: string | null;
+  symbol?: string;
 }
 
 const CommunityStakeStep = ({
@@ -27,11 +29,16 @@ const CommunityStakeStep = ({
   onTopicFlowStepChange,
   refetchStakeQuery,
   onlyNamespace,
+  namespace,
+  symbol,
 }: CommunityStakeStepProps) => {
-  const [enableStakePage, setEnableStakePage] = useState(true);
+  const hasNamespaceReserved = !!namespace;
+  const [enableStakePage, setEnableStakePage] = useState(
+    hasNamespaceReserved ? false : true,
+  );
   const [communityStakeData, setCommunityStakeData] = useState({
-    namespace: createdCommunityName || '',
-    symbol: (createdCommunityName || '').toUpperCase().slice(0, 4),
+    namespace: namespace || createdCommunityName || '',
+    symbol: symbol || (createdCommunityName || '').toUpperCase().slice(0, 4),
   });
 
   const handleOptInEnablingStake = ({ namespace, symbol }) => {
@@ -74,6 +81,7 @@ const CommunityStakeStep = ({
           chainId={chainId}
           isTopicFlow={isTopicFlow}
           onlyNamespace={onlyNamespace}
+          hasNamespaceReserved={hasNamespaceReserved}
         />
       )}
     </div>

@@ -20,6 +20,7 @@ export interface SignStakeTransactionsProps {
   chainId: string;
   isTopicFlow?: boolean;
   onlyNamespace?: boolean;
+  hasNamespaceReserved?: boolean;
 }
 
 export interface EnableStakeProps {

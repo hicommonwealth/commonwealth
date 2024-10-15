@@ -24,6 +24,7 @@ const SignStakeTransactions = ({
   onSuccess,
   onCancel,
   onlyNamespace,
+  hasNamespaceReserved,
 }: SignStakeTransactionsProps) => {
   const { handleReserveCommunityNamespace, reserveNamespaceData } =
     useReserveCommunityNamespace({
@@ -33,6 +34,7 @@ const SignStakeTransactions = ({
       userAddress: selectedAddress.address,
       chainId,
       onSuccess: onlyNamespace ? onSuccess : undefined,
+      hasNamespaceReserved,
     });
 
   const { handleLaunchCommunityStake, launchStakeData } =
