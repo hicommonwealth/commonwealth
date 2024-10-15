@@ -31,8 +31,8 @@ importers:
         specifier: ^0.1.3
         version: 0.1.3(source-map-support@0.5.21)(ts-node@10.9.2(@swc/core@1.5.25(@swc/helpers@0.5.12))(@types/node@20.12.10)(typescript@5.4.5))
       '@knocklabs/node':
-        specifier: ^0.6.10
-        version: 0.6.11
+        specifier: ^0.6.13
+        version: 0.6.13
       '@openfeature/web-sdk':
         specifier: ^1.0.2
         version: 1.0.3(@openfeature/core@1.1.0)
@@ -322,8 +322,8 @@ importers:
         specifier: workspace:*
         version: link:../shared
       '@knocklabs/node':
-        specifier: ^0.6.10
-        version: 0.6.11
+        specifier: ^0.6.13
+        version: 0.6.13
       '@trpc/server':
         specifier: ^10.45.1
         version: 10.45.2
@@ -905,8 +905,8 @@ importers:
         specifier: ^0.12.23
         version: 0.12.86
       '@knocklabs/node':
-        specifier: ^0.6.11
-        version: 0.6.11
+        specifier: ^0.6.13
+        version: 0.6.13
       '@knocklabs/react':
         specifier: ^0.2.15
         version: 0.2.17(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -3882,8 +3882,8 @@ packages:
   '@knocklabs/client@0.8.21':
     resolution: {integrity: sha512-uPaUAwbg9Bi0UIPIYOE4v4GiasKezZNQ/ge9KST2wlSHAfpKWrHf7s85H4mD7IGkVc0xkokF4RZ4lqr7cy48wg==}
 
-  '@knocklabs/node@0.6.11':
-    resolution: {integrity: sha512-eCln5vHE/QTonDAK13ci5RCJ9el5snq/NQeAAmbVyZI7CsrHPUGW2sEOH6D9z/HyEKYki2sUHbTC0xG383EMhg==}
+  '@knocklabs/node@0.6.13':
+    resolution: {integrity: sha512-XA6HWxIvLiCpRt5GisTFYDZuTuyrRR34XnFwPFPXPNTO1cKQOHLkQvyy7FzAOTD6/PVj1DM2Ge9HHij+Z64Rtg==}
     engines: {node: '>=17.5.0'}
 
   '@knocklabs/react-core@0.2.15':
@@ -20044,7 +20044,7 @@ snapshots:
       - debug
       - react
 
-  '@knocklabs/node@0.6.11':
+  '@knocklabs/node@0.6.13':
     dependencies:
       jose: 5.3.0
 

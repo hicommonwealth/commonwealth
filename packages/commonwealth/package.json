@@ -115,7 +115,7 @@
     "@ipld/dag-json": "^10.2.0",
     "@keplr-wallet/types": "^0.12.23",
     "@keplr-wallet/unit": "^0.12.23",
-    "@knocklabs/node": "^0.6.11",
+    "@knocklabs/node": "^0.6.13",
     "@knocklabs/react": "^0.2.15",
     "@knocklabs/react-notification-feed": "^0.8.15",
     "@lexical/rich-text": "^0.17.0",
