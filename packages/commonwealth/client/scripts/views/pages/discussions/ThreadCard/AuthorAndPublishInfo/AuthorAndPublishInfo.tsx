@@ -55,7 +55,7 @@ export type AuthorAndPublishInfoProps = {
   popoverPlacement?: PopperPlacementType;
   profile?: UserProfile;
   versionHistory?: ThreadVersionHistory[] | CommentVersionHistory[];
-  changeContentText?: (text: string) => void;
+  onChangeVersionHistoryNumber?: (id: number) => void;
 };
 
 export const AuthorAndPublishInfo = ({
@@ -81,7 +81,7 @@ export const AuthorAndPublishInfo = ({
   popoverPlacement,
   profile,
   versionHistory,
-  changeContentText,
+  onChangeVersionHistoryNumber,
 }: AuthorAndPublishInfoProps) => {
   const popoverProps = usePopover();
   const containerRef = useRef(null);
@@ -100,7 +100,7 @@ export const AuthorAndPublishInfo = ({
 
   const fromDiscordBot = discord_meta !== null && discord_meta !== undefined;
   const versionHistoryOptions = versionHistory?.map((v) => ({
-    value: v.body || v.text,
+    value: v.id as number,
     label: formatVersionText(
       moment(v.timestamp),
       v.address,
@@ -219,10 +219,8 @@ export const AuthorAndPublishInfo = ({
                   ?.utc?.()
                   ?.local?.()
                   ?.format('DD/MM/YYYY')}`}
-                // @ts-expect-error <StrictNullChecks>
-                onChange={({ value }) => {
-                  // @ts-expect-error <StrictNullChecks>
-                  changeContentText(value);
+                onChange={({ value }: { value: number; label: string }) => {
+                  onChangeVersionHistoryNumber?.(value);
                 }}
                 formatOptionLabel={(option) => {
                   return option.label.split('\n')[0];
