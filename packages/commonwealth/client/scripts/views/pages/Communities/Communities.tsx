@@ -13,6 +13,7 @@ import { z } from 'zod';
 import { useFetchTokenUsdRateQuery } from '../../../state/api/communityStake/index';
 import { trpc } from '../../../utils/trpcClient';
 import { NewCommunityCard } from '../../components/CommunityCard';
+import LaunchIdeaCard from '../../components/LaunchIdeaCard';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWButton } from '../../components/component_kit/new_designs/CWButton';
 import CWCircleMultiplySpinner from '../../components/component_kit/new_designs/CWCircleMultiplySpinner';
@@ -84,6 +85,7 @@ const CommunitiesPage = () => {
   const ethUsdRate = ethUsdRateData?.data?.data?.amount;
 
   const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
+  const [isTokenLaunchDrawerOpen, setIsTokenLaunchDrawerOpen] = useState(false);
 
   const isLoading =
     isLoadingTags ||
@@ -197,6 +199,9 @@ const CommunitiesPage = () => {
               onFiltersChange={(newFilters) => setFilters(newFilters)}
             />
           </div>
+          <LaunchIdeaCard
+            onTokenLaunchClick={() => setIsTokenLaunchDrawerOpen(true)}
+          />
         </div>
         {isLoading && communitiesList.length === 0 ? (
           <CWCircleMultiplySpinner />
