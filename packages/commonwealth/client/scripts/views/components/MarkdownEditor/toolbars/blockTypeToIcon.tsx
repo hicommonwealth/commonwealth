@@ -2,12 +2,12 @@ import { BlockType } from 'commonwealth-mdxeditor';
 import React, { ReactNode } from 'react';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 
-export function blockTypeToIconName(blockType: BlockType): ReactNode {
+export function blockTypeToIcon(blockType: BlockType): ReactNode {
   switch (blockType) {
     case 'paragraph':
-      return 'P';
+      return <CWIcon iconName="p" />;
     case 'quote':
-      return 'Q';
+      return <CWIcon iconName="q" />;
     case 'h1':
       return <CWIcon iconName="h1" />;
     case 'h2':
@@ -18,6 +18,6 @@ export function blockTypeToIconName(blockType: BlockType): ReactNode {
     case 'h5':
     case 'h6':
     case '':
-      return '';
+      return null;
   }
 }

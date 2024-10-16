@@ -1,7 +1,7 @@
 import { currentBlockType$, useCellValue } from 'commonwealth-mdxeditor';
 import React, { useCallback } from 'react';
 import { CWHeadingButton } from 'views/components/MarkdownEditor/toolbars/CWHeadingButton';
-import { blockTypeToIconName } from 'views/components/MarkdownEditor/toolbars/blockTypeToIconName';
+import { blockTypeToIcon } from 'views/components/MarkdownEditor/toolbars/blockTypeToIcon';
 import CWPopover, {
   usePopover,
 } from 'views/components/component_kit/new_designs/CWPopover';
@@ -35,9 +35,7 @@ export const BlockSelectorButton = (props: BlockSelectorButtonProps) => {
 
   return (
     <div className="BlockSelectorButton">
-      <button onClick={handleClick}>
-        {blockTypeToIconName(currentBlockType)}
-      </button>
+      <button onClick={handleClick}>{blockTypeToIcon(currentBlockType)}</button>
 
       <CWPopover
         className="FormattingPopover"
