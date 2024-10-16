@@ -47,7 +47,7 @@ export const CWHeadingButton = (props: HeadingButtonProps) => {
 
   // TODO: there's a bug in handleInteraction here where it's not going away
   // TODO: same thing with onMouseLeave. It doesn't reliably seem to nuke
-  // the tooltipl
+  // the tooltip
 
   return (
     <CWTooltip

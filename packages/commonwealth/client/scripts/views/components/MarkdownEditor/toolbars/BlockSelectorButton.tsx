@@ -1,32 +1,11 @@
-import {
-  BlockType,
-  currentBlockType$,
-  useCellValue,
-} from 'commonwealth-mdxeditor';
+import { currentBlockType$, useCellValue } from 'commonwealth-mdxeditor';
 import React, { useCallback } from 'react';
 import { CWHeadingButton } from 'views/components/MarkdownEditor/toolbars/CWHeadingButton';
+import { blockTypeToIconName } from 'views/components/MarkdownEditor/toolbars/blockTypeToIconName';
 import CWPopover, {
   usePopover,
 } from 'views/components/component_kit/new_designs/CWPopover';
-
 import './BlockSelectorButton.scss';
-
-function blockTypeToIconName(blockType: BlockType) {
-  switch (blockType) {
-    case 'paragraph':
-      return 'p';
-    case 'quote':
-      return 'q';
-    case 'h1':
-    case 'h2':
-    case 'h3':
-    case 'h4':
-    case 'h5':
-    case 'h6':
-    case '':
-      return blockType;
-  }
-}
 
 export const BlockSelectorButton = () => {
   const formattingPopoverProps = usePopover();
