@@ -5,6 +5,12 @@ module.exports = {
     return queryInterface.sequelize.transaction(async (t) => {
       await queryInterface.removeConstraint(
         'GroupPermissions',
+        'GroupPermissions_pkey',
+        { transaction: t },
+      );
+
+      await queryInterface.removeConstraint(
+        'GroupPermissions',
         'GroupPermissions_group_id_fkey',
         { transaction: t },
       );
@@ -38,9 +44,9 @@ module.exports = {
       );
 
       await queryInterface.addConstraint('GroupPermissions', {
-        type: 'unique',
+        type: 'primary key',
         fields: ['group_id', 'topic_id'],
-        name: 'GroupPermissions_unique_composite_constraint',
+        name: 'GroupPermissions_pkey',
         transaction: t,
       });
     });
