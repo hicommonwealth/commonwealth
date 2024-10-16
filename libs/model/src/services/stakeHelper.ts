@@ -48,15 +48,15 @@ export async function getVotingWeight(
   mustExist('Topic', topic);
 
   const { community } = topic;
-
   mustExist('Community', community);
+
+  const chain_node = community.ChainNode;
+  mustExist('Chain Node Eth Chain Id', chain_node?.eth_chain_id);
 
   if (topic.weighted_voting === TopicWeightedVoting.Stake) {
     mustExist('Community Namespace Address', community.namespace_address);
     const stake = topic.community?.CommunityStakes?.at(0);
     mustExist('Community Stake', stake);
-    const chain_node = community.ChainNode;
-    mustExist('Chain Node Eth Chain Id', chain_node?.eth_chain_id);
 
     const stakeBalances = await contractHelpers.getNamespaceBalance(
       community.namespace_address,
@@ -70,18 +70,14 @@ export async function getVotingWeight(
 
     return commonProtocol.calculateVoteWeight(stakeBalance, stake.vote_weight);
   } else if (topic.weighted_voting === TopicWeightedVoting.ERC20) {
-    const {
-      ChainNode: chain_node,
-      token_address,
-      vote_weight_multiplier,
-    } = topic;
+    const { token_address, vote_weight_multiplier } = topic;
     mustExist('Topic Chain Node Eth Chain Id', chain_node?.eth_chain_id);
 
     const balances = await tokenBalanceCache.getBalances({
       balanceSourceType: BalanceSourceType.ERC20,
       addresses: [address],
       sourceOptions: {
-        evmChainId: chain_node?.eth_chain_id,
+        evmChainId: chain_node.eth_chain_id,
         contractAddress: token_address!,
       },
       cacheRefresh: true,
