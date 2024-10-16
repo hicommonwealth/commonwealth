@@ -13,7 +13,7 @@ export function blockTypeToIcon(blockType: BlockType): ReactNode {
     case 'h2':
       return <CWIcon iconName="h2" />;
     case 'h3':
-      return <CWIcon iconName="h3" weight="fill" />;
+      return <CWIcon iconName="h3" />;
     case 'h4':
     case 'h5':
     case 'h6':

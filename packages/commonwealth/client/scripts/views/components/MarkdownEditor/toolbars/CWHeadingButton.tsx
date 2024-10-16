@@ -11,7 +11,7 @@ import CWIconButton from 'views/components/component_kit/new_designs/CWIconButto
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 
 export type HeadingButtonProps = Readonly<{
-  blockType: 'h1' | 'h2' | 'h3' | 'quote';
+  blockType: 'h1' | 'h2' | 'h3' | 'quote' | 'p';
   onClick?: (event: React.MouseEvent<HTMLElement, MouseEvent>) => void;
 }>;
 

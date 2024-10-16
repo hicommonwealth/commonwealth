@@ -41,6 +41,7 @@ export const BlockSelectorButton = (props: BlockSelectorButtonProps) => {
         className="FormattingPopover"
         body={
           <div onMouseLeave={formattingPopoverProps.handleInteraction}>
+            <CWHeadingButton blockType="p" onClick={handleFormatButtonClick} />
             <CWHeadingButton blockType="h1" onClick={handleFormatButtonClick} />
             <CWHeadingButton blockType="h2" onClick={handleFormatButtonClick} />
             <CWHeadingButton blockType="h3" onClick={handleFormatButtonClick} />
