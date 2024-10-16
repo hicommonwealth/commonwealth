@@ -12,7 +12,7 @@ type ButtonSize = 'lg' | 'med' | 'sm';
 type ButtonStyleProps = {
   buttonSize?: ButtonSize;
   iconName: IconName;
-  type: 'submit' | 'reset' | 'button';
+  type?: 'submit' | 'reset' | 'button';
 } & BaseStyleProps;
 
 type ButtonProps = ButtonStyleProps & React.HTMLAttributes<HTMLButtonElement>;
