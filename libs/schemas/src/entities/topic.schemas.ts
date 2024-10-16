@@ -39,9 +39,6 @@ export const Topic = z.object({
   group_ids: z.array(PG_INT).default([]),
   default_offchain_template_backup: z.string().nullish(),
   weighted_voting: z.nativeEnum(TopicWeightedVoting).nullish(),
-  chain_node_id: PG_INT.nullish().describe(
-    'token chain node ID, used for ERC20 topics',
-  ),
   token_address: z
     .string()
     .nullish()

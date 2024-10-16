@@ -38,10 +38,6 @@ export async function getVotingWeight(
           },
         ],
       },
-      {
-        model: models.ChainNode,
-        required: false,
-      },
     ],
   });
 
