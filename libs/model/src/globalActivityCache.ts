@@ -3,7 +3,13 @@ import { QueryTypes } from 'sequelize';
 import { v4 as uuidv4 } from 'uuid';
 import { DB } from './models/index';
 
-export async function getActivityFeed(models: DB, id = 0) {
+export async function getActivityFeed(
+  models: DB,
+  id = 0,
+  page = 1,
+  limit = 20,
+) {
+  const offset = (page - 1) * limit;
   /**
    * Last 50 updated threads and their comments
    */
@@ -20,7 +26,7 @@ export async function getActivityFeed(models: DB, id = 0) {
                    }
           WHERE T.deleted_at IS NULL
           ORDER BY T.activity_rank_date DESC NULLS LAST
-          LIMIT 50
+          LIMIT :limit OFFSET :offset -- Added pagination here
       ),
       ranked_threads AS (
         SELECT 
@@ -97,7 +103,7 @@ export async function getActivityFeed(models: DB, id = 0) {
   const threads: any = await models.sequelize.query(query, {
     type: QueryTypes.SELECT,
     raw: true,
-    replacements: { id },
+    replacements: { id, limit, offset },
   });
 
   return threads;
@@ -128,18 +134,17 @@ export class GlobalActivityCache {
     setInterval(this.refreshGlobalActivity.bind(this), this._cacheTTL * 1000);
   }
 
-  public async getGlobalActivity() {
+  public async getGlobalActivity(page = 1, limit = 20) {
     const activity = await cache().getKey(
       CacheNamespaces.Activity_Cache,
       this._cacheKey,
     );
-
     if (!activity) {
       if (GlobalActivityCache._instance) {
         const msg = 'Failed to fetch global activity from Redis';
         log.error(msg);
       }
-      return await getActivityFeed(this._models);
+      return await getActivityFeed(this._models, 0, page, limit);
     }
     return JSON.parse(activity);
   }

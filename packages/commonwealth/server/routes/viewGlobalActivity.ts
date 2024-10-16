@@ -9,7 +9,9 @@ const viewGlobalActivity = async (
   req: TypedRequestBody<Record<string, never>>,
   res,
 ) => {
-  const activity = await globalActivityCache.getGlobalActivity();
+  const page = parseInt(req.body.page as string, 10) || 1;
+  const limit = parseInt(req.body.limit as string, 10) || 20;
+  const activity = await globalActivityCache.getGlobalActivity(page, limit);
   return success(res, activity);
 };
 

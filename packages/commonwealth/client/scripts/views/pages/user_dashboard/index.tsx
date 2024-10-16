@@ -2,7 +2,6 @@ import { notifyInfo } from 'controllers/app/notifications';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import { useFlag } from 'hooks/useFlag';
-import useStickyHeader from 'hooks/useStickyHeader';
 import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/user_dashboard/index.scss';
 import React, { useEffect, useRef } from 'react';
@@ -34,13 +33,7 @@ type UserDashboardProps = {
 const UserDashboard = ({ type }: UserDashboardProps) => {
   const user = useUserStore();
   const { isWindowExtraSmall } = useBrowserWindow({});
-  useStickyHeader({
-    elementId: 'dashboard-header',
-    zIndex: 70,
-    // To account for new authentication buttons, shown in small screen sizes
-    top: !user.isLoggedIn ? 68 : 0,
-    stickyBehaviourEnabled: isWindowExtraSmall,
-  });
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const [activePage, setActivePage] = React.useState<DashboardViews>(
     DashboardViews.Global,
@@ -58,11 +51,6 @@ const UserDashboard = ({ type }: UserDashboardProps) => {
   });
 
   const navigate = useCommonNavigate();
-
-  const [scrollElement, setScrollElement] = React.useState(null);
-
-  const containerRef = useRef<HTMLDivElement>(null);
-
   useBrowserAnalyticsTrack({
     payload: {
       event: isAddedToHomeScreen
@@ -96,8 +84,8 @@ const UserDashboard = ({ type }: UserDashboardProps) => {
         <CWText type="h2" fontWeight="medium" className="page-header">
           Home
         </CWText>
-        {/*@ts-expect-error StrictNullChecks*/}
-        <div ref={setScrollElement} className="content">
+
+        <div className="content">
           <div className="user-dashboard-activity">
             <div className="dashboard-header" id="dashboard-header">
               <CWTabsRow>
@@ -129,7 +117,7 @@ const UserDashboard = ({ type }: UserDashboardProps) => {
                   dashboardView={DashboardViews.ForYou}
                   noFeedMessage="Join some communities to see Activity!"
                   // @ts-expect-error <StrictNullChecks/>
-                  customScrollParent={scrollElement}
+                  customScrollParent={containerRef.current}
                 />
               )}
               {activePage === DashboardViews.Global && (
@@ -137,7 +125,7 @@ const UserDashboard = ({ type }: UserDashboardProps) => {
                   dashboardView={DashboardViews.Global}
                   noFeedMessage="No Activity"
                   // @ts-expect-error <StrictNullChecks/>
-                  customScrollParent={scrollElement}
+                  customScrollParent={containerRef.current}
                 />
               )}
             </>

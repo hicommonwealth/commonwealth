@@ -30,19 +30,16 @@ type FeedProps = {
   customScrollParent?: HTMLElement;
 };
 
-const DEFAULT_COUNT = 10;
-
 const FeedThread = ({ thread }: { thread: Thread }) => {
   const navigate = useCommonNavigate();
   const user = useUserStore();
-
   const { data: domain } = useFetchCustomDomainQuery();
 
   const discussionLink = getProposalUrlPath(
-    thread.slug,
-    `${thread.identifier}-${slugify(thread.title)}`,
+    thread?.slug,
+    `${thread?.identifier}-${slugify(thread.title)}`,
     false,
-    thread.communityId,
+    thread?.communityId,
   );
 
   const { data: community } = useGetCommunityByIdQuery({
@@ -125,12 +122,15 @@ export const Feed = ({
 }: FeedProps) => {
   const userActivityRes = useFetchUserActivityQuery({
     apiEnabled: DashboardViews.ForYou === dashboardView,
+    page: 1,
+    limit: 20,
   });
 
   const globalActivityRes = useFetchGlobalActivityQuery({
     apiEnabled: DashboardViews.Global === dashboardView,
+    page: 1,
+    limit: 20,
   });
-
   const queryData = (() => {
     if (DashboardViews.Global === dashboardView) return globalActivityRes;
     else return userActivityRes;
@@ -148,7 +148,6 @@ export const Feed = ({
       </div>
     );
   }
-
   if (queryData?.isError) {
     return <PageNotFound message="There was an error rendering the feed." />;
   }
@@ -160,16 +159,19 @@ export const Feed = ({
       </div>
     );
   }
-
   return (
     <div className="Feed">
       <Virtuoso
         customScrollParent={customScrollParent}
-        totalCount={queryData?.data?.length || DEFAULT_COUNT}
+        data={queryData?.data}
+        overscan={50}
         style={{ height: '100%' }}
-        itemContent={(i) => (
-          <FeedThread key={i} thread={queryData.data[i] as Thread} />
+        itemContent={(i, thread) => (
+          <FeedThread key={i} thread={thread as Thread} />
         )}
+        endReached={() => {
+          queryData?.hasNextPage && queryData?.fetchNextPage();
+        }}
       />
     </div>
   );

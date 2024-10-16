@@ -17,6 +17,13 @@ export default async (
     return next(new AppError(Errors.NotLoggedIn));
   }
   const { id } = req.user;
-  const notificationsWithActivity = await getActivityFeed(models, id);
+  const page = parseInt(req.body.page as string, 10) || 1;
+  const limit = parseInt(req.body.limit as string, 10) || 20;
+  const notificationsWithActivity = await getActivityFeed(
+    models,
+    id,
+    page,
+    limit,
+  );
   return res.json({ status: 'Success', result: notificationsWithActivity });
 };
