@@ -1,5 +1,7 @@
 #!/bin/sh
 
+export DD_HOSTNAME=$(hostname)
+
 if [ "$APP_ENV" = "production" ]; then
   datadog-agent run &
   /opt/datadog-agent/embedded/bin/trace-agent --config=/etc/datadog-agent/datadog.yaml &
