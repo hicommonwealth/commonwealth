@@ -42,7 +42,7 @@ export const CreateComment = ({
       ? `new-thread-comment-${rootThread.id}`
       : `new-comment-reply-${parentCommentId}`,
   );
-  console.log('isReplying from CreateComment', isReplying);
+
   const user = useUserStore();
   const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
 
