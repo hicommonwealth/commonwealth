@@ -66,7 +66,16 @@ const WVMethodSelection = ({
             onSelect={setSelectedWVMethod}
             label="Connect ERC20 token"
             description="Only ERC20s"
-            popover={{ title: 'Example', body: <>lorem ipsum</> }}
+            popover={{
+              title: 'ERC20',
+              body: (
+                <CWText type="b2">
+                  Use any ERC 20 token that is on the same chain as your
+                  community. ERC20s can be used for weighted voting and running
+                  contests
+                </CWText>
+              ),
+            }}
             isSelected={selectedWVMethod === WVMethod.ERC20}
           />
 
@@ -77,7 +86,16 @@ const WVMethodSelection = ({
             description="Use non-transferable tokens"
             popover={
               canEnableStake
-                ? { title: 'Example', body: <>lorem ipsum</> }
+                ? {
+                    title: 'Stake',
+                    body: (
+                      <CWText type="b2">
+                        Community Stake lets you buy a stake in your community
+                        using a fungible non transferable token. This token can
+                        be used for weighted voting and running contests
+                      </CWText>
+                    ),
+                  }
                 : {
                     title: 'Disabled',
                     body: 'Stake is not supported on your network',
