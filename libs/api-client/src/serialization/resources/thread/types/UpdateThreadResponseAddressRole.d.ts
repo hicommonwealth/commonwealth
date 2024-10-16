@@ -4,7 +4,6 @@
 import * as CommonApi from '../../../../api/index';
 import * as core from '../../../../core';
 import * as serializers from '../../../index';
-
 export declare const UpdateThreadResponseAddressRole: core.serialization.Schema<
   serializers.UpdateThreadResponseAddressRole.Raw,
   CommonApi.UpdateThreadResponseAddressRole

@@ -5,7 +5,6 @@ import * as CommonApi from '../../../../api/index';
 import * as core from '../../../../core';
 import * as serializers from '../../../index';
 import { UpdateCommunityRequestGroupsItemRequirementsItemThresholdDataSource } from './UpdateCommunityRequestGroupsItemRequirementsItemThresholdDataSource';
-
 export declare const UpdateCommunityRequestGroupsItemRequirementsItemThresholdData: core.serialization.ObjectSchema<
   serializers.UpdateCommunityRequestGroupsItemRequirementsItemThresholdData.Raw,
   CommonApi.UpdateCommunityRequestGroupsItemRequirementsItemThresholdData

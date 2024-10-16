@@ -79,7 +79,7 @@ const StakeIntegration = ({
       <section className="StakeIntegration">
         <CWText type="h2">Stake</CWText>
         <Status
-          communityName={app.activeChainId() || ''}
+          communityName={app.chain.meta.name || ''}
           isEnabled={stakeEnabled}
         />
         <CWDivider />

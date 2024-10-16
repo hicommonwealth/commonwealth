@@ -40,8 +40,8 @@ _"There are only two hard things in Computer Science: cache invalidation and nam
 - Choosing a right TTL could be very important, as app data is highly transactional
 
 - **Caching Namespace:**
-  - Global - eg. /api/viewGlobalActivity
-  - User Specific - eg. /api/viewUserActivity or /api/status
+  - Global - eg. /api/internal/trpc/feed.GetGlobalActivity
+  - User Specific - eg. /api/internal/trpc/feed.GetUserActivity or /api/status
 
 - **Hybrid Request Handler** -> Fetch followed by tracking of user activity
   eg. get chain data & record current chain selected by user  - these kind of request handler can only utilize sequelize result caching

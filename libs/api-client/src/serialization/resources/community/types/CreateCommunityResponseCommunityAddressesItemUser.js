@@ -6,7 +6,6 @@ import { CreateCommunityResponseCommunityAddressesItemUserApiKey } from './Creat
 import { CreateCommunityResponseCommunityAddressesItemUserEmailNotificationInterval } from './CreateCommunityResponseCommunityAddressesItemUserEmailNotificationInterval';
 import { CreateCommunityResponseCommunityAddressesItemUserProfile } from './CreateCommunityResponseCommunityAddressesItemUserProfile';
 import { CreateCommunityResponseCommunityAddressesItemUserProfileTagsItem } from './CreateCommunityResponseCommunityAddressesItemUserProfileTagsItem';
-
 export const CreateCommunityResponseCommunityAddressesItemUser =
   core.serialization.object({
     id: core.serialization.number().optional(),

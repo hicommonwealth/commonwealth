@@ -40,7 +40,6 @@ import upgradeMember, {
   upgradeMemberValidation,
 } from '../routes/upgradeMember';
 import viewGlobalActivity from '../routes/viewGlobalActivity';
-import viewUserActivity from '../routes/viewUserActivity';
 
 import getUploadSignature from '../routes/getUploadSignature';
 
@@ -492,13 +491,6 @@ function setupRouter(
     getUploadSignature.bind(this, models),
   );
 
-  registerRoute(
-    router,
-    'post',
-    '/viewUserActivity',
-    passport.authenticate('jwt', { session: false }),
-    viewUserActivity.bind(this, models),
-  );
   registerRoute(
     router,
     'post',

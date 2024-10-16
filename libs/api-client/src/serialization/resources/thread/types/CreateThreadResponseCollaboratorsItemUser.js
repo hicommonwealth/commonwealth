@@ -6,7 +6,6 @@ import { CreateThreadResponseCollaboratorsItemUserApiKey } from './CreateThreadR
 import { CreateThreadResponseCollaboratorsItemUserEmailNotificationInterval } from './CreateThreadResponseCollaboratorsItemUserEmailNotificationInterval';
 import { CreateThreadResponseCollaboratorsItemUserProfile } from './CreateThreadResponseCollaboratorsItemUserProfile';
 import { CreateThreadResponseCollaboratorsItemUserProfileTagsItem } from './CreateThreadResponseCollaboratorsItemUserProfileTagsItem';
-
 export const CreateThreadResponseCollaboratorsItemUser =
   core.serialization.object({
     id: core.serialization.number().optional(),

@@ -1,7 +1,6 @@
 import { SchemaType } from '../../Schema';
 import { createIdentitySchemaCreator } from '../../utils/createIdentitySchemaCreator';
 import { getErrorMessageForIncorrectType } from '../../utils/getErrorMessageForIncorrectType';
-
 export function enum_(values) {
   const validValues = new Set(values);
   const schemaCreator = createIdentitySchemaCreator(
