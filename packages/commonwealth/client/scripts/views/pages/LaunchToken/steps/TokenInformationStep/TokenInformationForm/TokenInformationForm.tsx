@@ -1,5 +1,4 @@
-import { ChainBase, commonProtocol } from '@hicommonwealth/shared';
-import { notifyError } from 'controllers/app/notifications';
+import { ChainBase } from '@hicommonwealth/shared';
 import useAppStatus from 'hooks/useAppStatus';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
@@ -9,9 +8,9 @@ import {
   MixpanelCommunityCreationEvent,
   MixpanelLoginPayload,
 } from 'shared/analytics/types';
-import { useLaunchTokenMutation } from 'state/api/launchPad';
-import { fetchCachedNodes } from 'state/api/nodes';
+import { useFetchTokensQuery } from 'state/api/token';
 import useUserStore from 'state/ui/user';
+import { useDebounce } from 'usehooks-ts';
 import {
   CWCoverImageUploader,
   ImageBehavior,
@@ -54,16 +53,33 @@ const TokenInformationForm = ({
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isProcessingProfileImage, setIsProcessingProfileImage] =
     useState(false);
+  const [tokenName, setTokenName] = useState<string>();
 
   const { isAddedToHomeScreen } = useAppStatus();
+
+  const debouncedSearchTerm = useDebounce<string | undefined>(tokenName, 500);
+
+  const { data: tokensList } = useFetchTokensQuery({
+    cursor: 1,
+    limit: 50,
+    search: debouncedSearchTerm,
+    enabled: !!debouncedSearchTerm,
+  });
+
+  const isTokenNameTaken =
+    tokensList && debouncedSearchTerm
+      ? !!tokensList.pages[0].results.find(
+          ({ name }) =>
+            name.toLowerCase().trim() ===
+            debouncedSearchTerm.toLowerCase().trim(),
+        )
+      : false;
 
   const { trackAnalytics } = useBrowserAnalyticsTrack<
     MixpanelLoginPayload | BaseMixpanelPayload
   >({
     onAction: true,
   });
-
-  const { mutateAsync: launchToken } = useLaunchTokenMutation();
 
   const openAddressSelectionModal = useCallback(() => {
     if (selectedAddress) {
@@ -81,7 +97,9 @@ const TokenInformationForm = ({
   });
 
   const handleSubmit = useCallback(
-    async (values: FormSubmitValues) => {
+    (values: FormSubmitValues) => {
+      if (isTokenNameTaken) return;
+
       // get address from user
       if (!selectedAddress) {
         openAddressSelectionModal();
@@ -89,30 +107,9 @@ const TokenInformationForm = ({
         return;
       }
 
-      // get base chain node info
-      const nodes = fetchCachedNodes();
-      const baseNode = nodes?.find(
-        (n) => n.ethChainId === commonProtocol.ValidChains.Base,
-      );
-      if (!baseNode || !baseNode.ethChainId) {
-        notifyError('Could not find base chain node');
-        return;
-      }
-
-      // call endpoint
-      const payload = {
-        chainRpc: baseNode.url,
-        ethChainId: baseNode.ethChainId,
-        name: values.tokenName.trim(),
-        symbol: values.tokenTicker.trim(),
-        walletAddress: selectedAddress.address,
-        // TODO 9207: where to store values.tokenDescription and values.tokenImageURL
-      };
-      await launchToken(payload).catch(console.error);
-
-      onSubmit(values);
+      onSubmit(values); // token gets created with signature step, this info is only used to generate community details
     },
-    [openAddressSelectionModal, selectedAddress, onSubmit, launchToken],
+    [isTokenNameTaken, openAddressSelectionModal, selectedAddress, onSubmit],
   );
 
   useEffect(() => {
@@ -198,6 +195,8 @@ const TokenInformationForm = ({
         label="Token name"
         placeholder="Name your token"
         fullWidth
+        onInput={(e) => setTokenName(e.target.value?.trim())}
+        customError={isTokenNameTaken ? 'Token name is already taken' : ''}
       />
 
       <CWTextInput

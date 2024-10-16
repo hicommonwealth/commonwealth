@@ -52,6 +52,10 @@
       margin-bottom: 64px;
     }
 
+    .contest-section-topic {
+      margin-bottom: 64px;
+    }
+
     .contest-section-description {
       margin-bottom: 64px;
 
@@ -83,7 +87,7 @@
     }
 
     .contest-section-funding {
-      margin-bottom: 64px;
+      margin-bottom: 32px;
     }
 
     .contest-section-duration {
@@ -97,28 +101,26 @@
       }
     }
 
-    .contest-section-recurring {
-      .prize-subsection {
-        margin-top: 24px;
+    .prize-subsection {
+      margin-top: 24px;
 
-        .percentage-buttons {
-          margin-top: 8px;
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          gap: 16px;
-          flex-wrap: wrap;
+      .percentage-buttons {
+        margin-top: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        flex-wrap: wrap;
+
+        @include extraSmall {
+          gap: unset;
+        }
+
+        .Button {
+          padding-inline: 36px;
 
           @include extraSmall {
-            gap: unset;
-          }
-
-          .Button {
-            padding-inline: 36px;
-
-            @include extraSmall {
-              padding-inline: 10px;
-            }
+            padding-inline: 10px;
           }
         }
       }
@@ -252,6 +254,8 @@
 
     .contest-name-input,
     .funding-token-address-input {
+      margin-bottom: 32px;
+
       .MessageRow:first-child {
         display: none; // hide input label
       }

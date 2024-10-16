@@ -3,6 +3,7 @@
  */
 import * as core from '../../../../core';
 import { CreateCommunityResponseCommunityTermsZero } from './CreateCommunityResponseCommunityTermsZero';
+
 export const CreateCommunityResponseCommunityTerms =
   core.serialization.undiscriminatedUnion([
     CreateCommunityResponseCommunityTermsZero,

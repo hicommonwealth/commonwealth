@@ -9,6 +9,6 @@
  *     }
  */
 export interface DeleteGroupRequest {
-    communityId: string;
-    groupId: number;
+  communityId: string;
+  groupId: number;
 }

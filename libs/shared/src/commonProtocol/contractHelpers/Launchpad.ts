@@ -1,5 +1,3 @@
-const lpHook = '';
-
 export const launchToken = async (
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   contract: any,
@@ -7,10 +5,10 @@ export const launchToken = async (
   symbol: string,
   shares: number[],
   holders: string[],
-  totalSupply: number,
+  totalSupply: string,
   walletAddress: string,
 ) => {
-  const txReceipt = await contract.mehtods
+  const txReceipt = await contract.methods
     .launchTokenWithLiquidity(
       name,
       symbol,
@@ -19,10 +17,10 @@ export const launchToken = async (
       totalSupply,
       0,
       0,
-      lpHook,
-      '',
+      '0x0000000000000000000000000000000000000000',
+      '0x0000000000000000000000000000000000000000',
     )
-    .send({ from: walletAddress });
+    .send({ from: walletAddress, value: 0.00011e18 });
   return txReceipt;
 };
 
@@ -33,7 +31,7 @@ export const buyToken = async (
   walletAddress: string,
   value: number,
 ) => {
-  const txReceipt = await contract.methods.buyToken(tokenAddress).send({
+  const txReceipt = await contract.methods.buyToken(tokenAddress, 0).send({
     from: walletAddress,
     value,
   });
@@ -47,8 +45,8 @@ export const sellToken = async (
   amount: number,
   walletAddress: string,
 ) => {
-  const txReceipt = await contract.mehthods
-    .sellToken(tokenAddress, amount)
+  const txReceipt = await contract.methods
+    .sellToken(tokenAddress, amount, 0)
     .send({ from: walletAddress });
   return txReceipt;
 };
@@ -87,8 +85,7 @@ export const transferLiquidity = async (
   tokenAddress: string,
   walletAddress: string,
 ) => {
-  const remainingTokens =
-    await contract.methods._launchpadLiquidity(tokenAddress);
+  const remainingTokens = await contract.methods._poolLiquidity(tokenAddress);
   const amountIn = await getAmountIn(
     contract,
     tokenAddress,
@@ -97,7 +94,7 @@ export const transferLiquidity = async (
   );
 
   const txReceipt = await contract.methods
-    .transferLiquidity(tokenAddress)
+    .transferLiquidity(tokenAddress, remainingTokens)
     .send({ value: amountIn, from: walletAddress });
   return txReceipt;
 };

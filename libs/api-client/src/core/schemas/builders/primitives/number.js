@@ -1,6 +1,7 @@
 import { SchemaType } from '../../Schema';
 import { createIdentitySchemaCreator } from '../../utils/createIdentitySchemaCreator';
 import { getErrorMessageForIncorrectType } from '../../utils/getErrorMessageForIncorrectType';
+
 export const number = createIdentitySchemaCreator(
   SchemaType.NUMBER,
   (value, { breadcrumbsPrefix = [] } = {}) => {

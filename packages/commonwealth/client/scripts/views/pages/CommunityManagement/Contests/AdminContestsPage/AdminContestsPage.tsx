@@ -12,6 +12,7 @@ import {
 } from 'shared/analytics/types';
 import app from 'state';
 import useGetFeeManagerBalanceQuery from 'state/api/communityStake/getFeeManagerBalance';
+import { useFetchTopicsQuery } from 'state/api/topics';
 import useUserStore from 'state/ui/user';
 import Permissions from 'utils/Permissions';
 import { useCommunityStake } from 'views/components/CommunityStake';
@@ -30,6 +31,7 @@ import './AdminContestsPage.scss';
 
 const AdminContestsPage = () => {
   const farcasterContestEnabled = useFlag('farcasterContest');
+  const weightedTopicsEnabled = useFlag('weightedTopics');
   const [contestView, setContestView] = useState<ContestView>(ContestView.List);
 
   const navigate = useCommonNavigate();
@@ -41,6 +43,7 @@ const AdminContestsPage = () => {
   const ethChainId = app?.chain?.meta?.ChainNode?.eth_chain_id || 0;
   const { stakeData } = useCommunityStake();
   const namespace = stakeData?.Community?.namespace;
+  const communityId = app.activeChainId() || '';
 
   const { trackAnalytics } = useBrowserAnalyticsTrack<BaseMixpanelPayload>({
     onAction: true,
@@ -53,11 +56,23 @@ const AdminContestsPage = () => {
     isContestDataLoading,
   } = useCommunityContests();
 
+  const { data: topicData } = useFetchTopicsQuery({
+    communityId,
+    apiEnabled: !!communityId,
+  });
+
+  const hasAtLeastOneWeightedVotingTopic = topicData?.some(
+    (t) => t.weightedVoting,
+  );
+
   const { data: feeManagerBalance, isLoading: isFeeManagerBalanceLoading } =
     useGetFeeManagerBalanceQuery({
       ethChainId: ethChainId!,
       namespace,
-      apiEnabled: !!ethChainId && !!namespace && stakeEnabled,
+      apiEnabled:
+        !!ethChainId && !!namespace && weightedTopicsEnabled
+          ? true
+          : stakeEnabled,
     });
 
   const handleCreateContestClicked = () => {
@@ -76,7 +91,10 @@ const AdminContestsPage = () => {
   }
 
   const showBanner =
-    stakeEnabled && isContestAvailable && ethChainId && namespace;
+    (weightedTopicsEnabled ? hasAtLeastOneWeightedVotingTopic : stakeEnabled) &&
+    isContestAvailable &&
+    ethChainId &&
+    namespace;
 
   return (
     <CWPageLayout>
@@ -84,13 +102,16 @@ const AdminContestsPage = () => {
         <div className="admin-header-row">
           <CWText type="h2">Contests</CWText>
 
-          {stakeEnabled && contestView !== ContestView.TypeSelection && (
-            <CWButton
-              iconLeft="plusPhosphor"
-              label="Create contest"
-              onClick={handleCreateContestClicked}
-            />
-          )}
+          {(farcasterContestEnabled
+            ? hasAtLeastOneWeightedVotingTopic
+            : stakeEnabled) &&
+            contestView !== ContestView.TypeSelection && (
+              <CWButton
+                iconLeft="plusPhosphor"
+                label="Create contest"
+                onClick={handleCreateContestClicked}
+              />
+            )}
         </div>
 
         {contestView === ContestView.List ? (
@@ -106,6 +127,7 @@ const AdminContestsPage = () => {
               contests={contestsData}
               isLoading={isContestDataLoading}
               isAdmin={isAdmin}
+              hasWeightedTopic={!!hasAtLeastOneWeightedVotingTopic}
               isContestAvailable={isContestAvailable}
               stakeEnabled={stakeEnabled}
               feeManagerBalance={feeManagerBalance}

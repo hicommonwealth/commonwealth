@@ -59,7 +59,7 @@ export const getFeedHandler = async (
     queryValidationResult.data;
 
   if (active || search || thread_ids) {
-    throw new Error('Not implemented');
+    throw new AppError('Not implemented');
   }
 
   // get bulk threads
@@ -145,10 +145,7 @@ export const getFeedHandler = async (
         id: thread.url,
         link: `https://common.xyz/${community_id}/discussions/${thread.id}-${slug}`,
         date: toDate(thread),
-        // @ts-expect-error StrictNullChecks
-        content: thread.body,
-        // @ts-expect-error StrictNullChecks
-        description: thread.plaintext,
+        content: thread.body || '',
         author: [
           {
             // @ts-expect-error StrictNullChecks
@@ -163,6 +160,6 @@ export const getFeedHandler = async (
     res.setHeader('content-type', 'application/atom+xml.');
 
     res.write(feed.atom1());
-    res.end();
   }
+  res.end();
 };

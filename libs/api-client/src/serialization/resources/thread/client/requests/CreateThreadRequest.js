@@ -4,6 +4,7 @@
 import * as core from '../../../../../core';
 import { CreateThreadRequestDiscordMeta } from '../../types/CreateThreadRequestDiscordMeta';
 import { CreateThreadRequestKind } from '../../types/CreateThreadRequestKind';
+
 export const CreateThreadRequest = core.serialization.object({
   communityId: core.serialization.property(
     'community_id',
