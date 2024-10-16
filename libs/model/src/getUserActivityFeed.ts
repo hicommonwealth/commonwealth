@@ -1,7 +1,5 @@
-import { CacheNamespaces, cache, logger } from '@hicommonwealth/core';
 import { ActivityFeed, ActivityThread } from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
-import { v4 as uuidv4 } from 'uuid';
 import { z } from 'zod';
 import { models } from './database';
 
@@ -15,9 +13,7 @@ export async function getUserActivityFeed({
   user_id = 0,
   thread_limit = 50,
   comment_limit = 3,
-}: Omit<z.infer<typeof ActivityFeed.input>, 'is_global'> & {
-  user_id?: number;
-}) {
+}: z.infer<typeof ActivityFeed.input> & { user_id?: number }) {
   const query = `
 WITH 
 user_communities AS (
@@ -113,125 +109,4 @@ ORDER BY
   });
 
   return threads.map((t) => t.thread);
-}
-
-const log = logger(import.meta);
-
-export class GlobalActivityCache {
-  private _cacheKey = 'global_activity';
-  private _lockName = 'global_activity_cache_locker';
-  private static _instance: GlobalActivityCache;
-
-  constructor(
-    private _cacheTTL: number = 60 * 5, // cache TTL in seconds
-  ) {}
-
-  static getInstance(cacheTTL?: number): GlobalActivityCache {
-    if (!GlobalActivityCache._instance) {
-      GlobalActivityCache._instance = new GlobalActivityCache(cacheTTL);
-    }
-    return GlobalActivityCache._instance;
-  }
-
-  public async start() {
-    await this.refreshGlobalActivity();
-    // eslint-disable-next-line @typescript-eslint/no-misused-promises
-    setInterval(this.refreshGlobalActivity.bind(this), this._cacheTTL * 1000);
-  }
-
-  public async getGlobalActivity() {
-    const activity = await cache().getKey(
-      CacheNamespaces.Activity_Cache,
-      this._cacheKey,
-    );
-    if (!activity) {
-      if (GlobalActivityCache._instance) {
-        const msg = 'Failed to fetch global activity from Redis';
-        log.error(msg);
-      }
-      return await getUserActivityFeed({});
-    }
-    return JSON.parse(activity);
-  }
-
-  public async deleteActivityFromCache(threadId: number): Promise<void> {
-    const errorMsg = 'Failed to update global activity in Redis';
-
-    try {
-      const res = await cache().getKey(
-        CacheNamespaces.Activity_Cache,
-        this._cacheKey,
-      );
-
-      if (!res) {
-        log.info('Global Activity Cache is empty');
-        return;
-      }
-
-      let activity = JSON.parse(res);
-      let updated = false;
-      activity = activity.filter((a: any) => {
-        let shouldKeep = true;
-        if (a.thread_id === threadId) {
-          updated = true;
-          shouldKeep = false;
-        }
-        return shouldKeep;
-      });
-
-      if (!updated) return;
-
-      const result = await cache().setKey(
-        CacheNamespaces.Activity_Cache,
-        this._cacheKey,
-        JSON.stringify(activity),
-      );
-      if (!result) {
-        log.error(errorMsg);
-      }
-    } catch (e: any) {
-      log.error(errorMsg, e);
-    }
-  }
-
-  private async refreshGlobalActivity(): Promise<void> {
-    try {
-      const lockAcquired = await this.acquireLock();
-
-      if (lockAcquired === false) {
-        log.info('Unable to acquire lock. Skipping refresh...');
-        return;
-      }
-
-      const activity = await getUserActivityFeed({});
-      const result = await cache().setKey(
-        CacheNamespaces.Activity_Cache,
-        this._cacheKey,
-        JSON.stringify(activity),
-      );
-
-      if (!result) {
-        const msg = 'Failed to save global activity in Redis';
-        log.error(msg);
-        return;
-      }
-
-      log.info('Activity cache successfully refreshed');
-    } catch (e: any) {
-      const msg = 'Failed to refresh the global cache';
-      log.error(msg, e);
-    }
-  }
-
-  private async acquireLock() {
-    return await cache().setKey(
-      CacheNamespaces.Activity_Cache,
-      this._lockName,
-      uuidv4(),
-      // shorten by 5 seconds to eliminate any discrepancies
-      // between setInterval delay and Redis TTL
-      this._cacheTTL - 5,
-      true,
-    );
-  }
 }

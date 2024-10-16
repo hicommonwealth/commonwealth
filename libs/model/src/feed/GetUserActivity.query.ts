@@ -1,6 +1,6 @@
 import { Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
-import { getUserActivityFeed } from '../globalActivityCache';
+import { getUserActivityFeed } from '../getUserActivityFeed';
 
 export function GetUserActivity(): Query<typeof schemas.ActivityFeed> {
   return {
