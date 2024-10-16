@@ -120,4 +120,13 @@
   display: flex;
   flex-direction: column;
   gap: 4px;
+
+  .collaborator-user-name {
+    color: $neutral-600;
+  }
+
+  .collaborator-user-name:hover {
+    text-decoration: underline;
+    text-decoration-color: $neutral-600;
+  }
 }
