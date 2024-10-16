@@ -25,6 +25,7 @@ import ManageCommunityStakeModal from '../../modals/ManageCommunityStakeModal/Ma
 import './Communities.scss';
 import { FiltersDrawer } from './FiltersDrawer/FiltersDrawer';
 import { CommunityFilters } from './FiltersDrawer/types';
+import TokenLaunchDrawer from './TokenLaunchDrawer';
 import { getCommunityCountsString } from './helpers';
 
 type ExtendedCommunityType = z.infer<typeof ExtendedCommunity>;
@@ -201,6 +202,10 @@ const CommunitiesPage = () => {
           </div>
           <LaunchIdeaCard
             onTokenLaunchClick={() => setIsTokenLaunchDrawerOpen(true)}
+          />
+          <TokenLaunchDrawer
+            isOpen={isTokenLaunchDrawerOpen}
+            onClose={() => setIsTokenLaunchDrawerOpen(false)}
           />
         </div>
         {isLoading && communitiesList.length === 0 ? (
