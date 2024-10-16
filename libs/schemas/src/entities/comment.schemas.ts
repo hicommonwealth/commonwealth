@@ -41,7 +41,7 @@ export const Comment = z.object({
     .nullish(),
 
   reaction_count: PG_INT,
-  reaction_weights_sum: PG_INT.optional(),
+  reaction_weights_sum: z.string().nullish(),
 
   search: z.union([z.string(), z.record(z.any())]),
 

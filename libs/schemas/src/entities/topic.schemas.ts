@@ -47,9 +47,10 @@ export const Topic = z.object({
     .string()
     .nullish()
     .describe('token symbol, used for ERC20 topics'),
-  vote_weight_multiplier: PG_INT.nullish().describe(
-    'vote weight multiplier, used for ERC20 topics',
-  ),
+  vote_weight_multiplier: z
+    .number()
+    .nullish()
+    .describe('vote weight multiplier, used for ERC20 topics'),
 
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional(),

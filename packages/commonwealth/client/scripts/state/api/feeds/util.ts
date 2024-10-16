@@ -67,7 +67,7 @@ export function formatActivityResponse(response: AxiosResponse<any, any>) {
         version_history: null,
         last_commented_on: '',
         address_last_active: '',
-        reaction_weights_sum: 0,
+        reaction_weights_sum: '0',
       }),
   );
 }

@@ -1,3 +1,4 @@
+import BigNumber from 'bignumber.js';
 import { buildCreateCommentReactionInput } from 'client/scripts/state/api/comments/createReaction';
 import { buildDeleteCommentReactionInput } from 'client/scripts/state/api/comments/deleteReaction';
 import { useAuthModalStore } from 'client/scripts/state/ui/modals';
@@ -52,8 +53,8 @@ export const CommentReactionButton = ({
     (x) => x?.author === activeAddress,
   );
   const reactionWeightsSum = comment.reactions.reduce(
-    (acc, curr) => acc + (curr.calculatedVotingWeight || 1),
-    0,
+    (acc, curr) => BigNumber.sum(acc, curr.calculatedVotingWeight || 1),
+    BigNumber(0),
   );
 
   const handleVoteClick = async (e) => {
@@ -117,7 +118,7 @@ export const CommentReactionButton = ({
         isOpen={isAuthModalOpen}
       />
       <CWUpvoteSmall
-        voteCount={reactionWeightsSum}
+        voteCount={reactionWeightsSum.toString()}
         disabled={!user.activeAccount || disabled}
         selected={hasReacted}
         onClick={handleVoteClick}

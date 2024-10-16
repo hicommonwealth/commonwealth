@@ -16,7 +16,7 @@ const UpvotesShowcase = () => {
       <CWText type="h5">Small</CWText>
       <div className="flex-row">
         <CWUpvoteSmall
-          voteCount={87}
+          voteCount={'87'}
           disabled={false}
           selected={false}
           // @ts-expect-error <StrictNullChecks/>
@@ -24,7 +24,7 @@ const UpvotesShowcase = () => {
           popoverContent={<div>Upvoters List</div>}
         />
         <CWUpvoteSmall
-          voteCount={8887}
+          voteCount={'8887'}
           disabled={false}
           selected={true}
           // @ts-expect-error <StrictNullChecks/>
@@ -32,7 +32,7 @@ const UpvotesShowcase = () => {
           popoverContent={<div>Upvoters List</div>}
         />
         <CWUpvoteSmall
-          voteCount={99999}
+          voteCount={'99999'}
           disabled={true}
           selected={false}
           // @ts-expect-error <StrictNullChecks/>

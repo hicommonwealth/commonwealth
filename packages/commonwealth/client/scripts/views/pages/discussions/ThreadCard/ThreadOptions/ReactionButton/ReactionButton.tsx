@@ -1,3 +1,4 @@
+import BigNumber from 'bignumber.js';
 import { buildCreateThreadReactionInput } from 'client/scripts/state/api/threads/createReaction';
 import { buildDeleteThreadReactionInput } from 'client/scripts/state/api/threads/deleteReaction';
 import { useAuthModalStore } from 'client/scripts/state/ui/modals';
@@ -20,6 +21,8 @@ import { TooltipWrapper } from 'views/components/component_kit/new_designs/cw_th
 import { CWUpvote } from 'views/components/component_kit/new_designs/cw_upvote';
 import { AuthModal } from 'views/modals/AuthModal';
 import { ReactionButtonSkeleton } from './ReactionButtonSkeleton';
+
+BigNumber.config({ EXPONENTIAL_AT: 100 });
 
 type ReactionButtonProps = {
   thread: Thread;
@@ -46,9 +49,10 @@ export const ReactionButton = ({
 
   const reactionWeightsSum =
     thread?.associatedReactions?.reduce(
-      (acc, curr) => acc + (curr.voting_weight || 1),
-      0,
-    ) || 0;
+      (acc, curr) => BigNumber.sum(acc, curr.voting_weight || 1),
+      BigNumber(0),
+    ) || BigNumber(0);
+
   const activeAddress = user.activeAccount?.address;
   const thisUserReaction = thread?.associatedReactions?.filter(
     (r) => r.address === activeAddress,
@@ -129,7 +133,7 @@ export const ReactionButton = ({
     <>
       {size === 'small' ? (
         <CWUpvoteSmall
-          voteCount={reactionWeightsSum}
+          voteCount={reactionWeightsSum.toString()}
           disabled={disabled}
           isThreadArchived={!!thread.archivedAt}
           selected={hasReacted}
@@ -143,7 +147,7 @@ export const ReactionButton = ({
         <TooltipWrapper disabled={disabled} text={tooltipText}>
           <CWUpvote
             onClick={handleVoteClick}
-            voteCount={reactionWeightsSum}
+            voteCount={reactionWeightsSum.toString()}
             disabled={disabled}
             active={hasReacted}
           />
@@ -155,7 +159,7 @@ export const ReactionButton = ({
         >
           <CWUpvote
             onClick={handleVoteClick}
-            voteCount={reactionWeightsSum}
+            voteCount={reactionWeightsSum.toString()}
             disabled={disabled}
             active={hasReacted}
           />

@@ -7,7 +7,7 @@ import CWPopover, {
 } from 'views/components/component_kit/new_designs/CWPopover';
 
 interface CWUpvoteSmallProps {
-  voteCount: number;
+  voteCount: string;
   disabled: boolean;
   selected: boolean;
   onClick: (e: React.MouseEvent<HTMLDivElement>) => void;
@@ -41,13 +41,13 @@ const CWUpvoteSmall = ({
         onMouseEnter={popoverProps.handleInteraction}
         onMouseLeave={popoverProps.handleInteraction}
       >
-        {voteCount > 0 && !disabled ? (
+        {voteCount && !disabled ? (
           <>
             <CWThreadAction
               action="upvote"
               isThreadArchived={isThreadArchived}
               selected={selected}
-              label={String(voteCount)}
+              label={voteCount}
               disabled={disabled}
               onClick={handleClick}
             />

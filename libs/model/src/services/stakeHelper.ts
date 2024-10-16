@@ -1,7 +1,7 @@
 import { InvalidState } from '@hicommonwealth/core';
 import { TopicWeightedVoting } from '@hicommonwealth/schemas';
 import { BalanceSourceType, commonProtocol } from '@hicommonwealth/shared';
-import { BigNumber } from 'ethers';
+import { BigNumber, utils } from 'ethers';
 import { tokenBalanceCache } from '.';
 import { config } from '../config';
 import { models } from '../database';
@@ -40,17 +40,17 @@ export async function getVotingWeight(
       },
     ],
   });
-
   mustExist('Topic', topic);
 
   const { community } = topic;
   mustExist('Community', community);
 
   const chain_node = community.ChainNode;
-  mustExist('Chain Node Eth Chain Id', chain_node?.eth_chain_id);
 
   if (topic.weighted_voting === TopicWeightedVoting.Stake) {
+    mustExist('Chain Node Eth Chain Id', chain_node?.eth_chain_id);
     mustExist('Community Namespace Address', community.namespace_address);
+
     const stake = topic.community?.CommunityStakes?.at(0);
     mustExist('Community Stake', stake);
 
@@ -66,20 +66,22 @@ export async function getVotingWeight(
 
     return commonProtocol.calculateVoteWeight(stakeBalance, stake.vote_weight);
   } else if (topic.weighted_voting === TopicWeightedVoting.ERC20) {
-    const { token_address, vote_weight_multiplier } = topic;
-    mustExist('Topic Chain Node Eth Chain Id', chain_node?.eth_chain_id);
+    mustExist('Chain Node Eth Chain Id', chain_node?.eth_chain_id);
 
     const balances = await tokenBalanceCache.getBalances({
       balanceSourceType: BalanceSourceType.ERC20,
       addresses: [address],
       sourceOptions: {
         evmChainId: chain_node.eth_chain_id,
-        contractAddress: token_address!,
+        contractAddress: topic.token_address!,
       },
       cacheRefresh: true,
     });
-    const balance = balances[address];
-    return commonProtocol.calculateVoteWeight(balance, vote_weight_multiplier!);
+    const balance = utils.formatUnits(balances[address], 18);
+    return commonProtocol.calculateVoteWeight(
+      balance,
+      topic.vote_weight_multiplier!,
+    );
   }
 
   // no weighted voting

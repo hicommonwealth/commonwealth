@@ -1,4 +1,5 @@
 import BN from 'bn.js';
+import { BigNumber } from 'ethers';
 
 // duplicated in helpers.ts
 export function formatNumberShort(num: number) {
@@ -16,18 +17,54 @@ export function formatNumberShort(num: number) {
   return num > 1_000_000_000_000
     ? `${round(num / 1_000_000_000_000)}t`
     : num > 1_000_000_000
-    ? `${round(num / 1_000_000_000)}b`
-    : num > 1_000_000
-    ? `${round(num / 1_000_000)}m`
-    : num > 1_000
-    ? `${round(num / 1_000)}k`
-    : num > 0.1
-    ? round(num)
-    : num > 0.01
-    ? precise(num, 2)
-    : num > 0.001
-    ? precise(num, 1)
-    : num.toString();
+      ? `${round(num / 1_000_000_000)}b`
+      : num > 1_000_000
+        ? `${round(num / 1_000_000)}m`
+        : num > 1_000
+          ? `${round(num / 1_000)}k`
+          : num > 0.1
+            ? round(num)
+            : num > 0.01
+              ? precise(num, 2)
+              : num > 0.001
+                ? precise(num, 1)
+                : num.toString();
+}
+
+export function formatBigNumberShort(num: BigNumber) {
+  const thousand = BigNumber.from(1_000);
+  const million = BigNumber.from(1_000_000);
+  const billion = BigNumber.from(1_000_000_000);
+  const trillion = BigNumber.from(1_000_000_000_000);
+
+  const round = (n: BigNumber, divisor: BigNumber, digits = 2) => {
+    const divided = n.div(divisor);
+    const factor = BigNumber.from(10).pow(digits);
+    return divided.mul(factor).div(factor).toString();
+  };
+
+  const precise = (n: BigNumber, digits = 3) => {
+    // We need to use floating point for precise formatting
+    const preciseNum = parseFloat(n.toString());
+    return preciseNum.toPrecision(digits);
+  };
+
+  // Compare BigNumber values and format accordingly
+  return num.gt(trillion)
+    ? `${round(num, trillion)}t`
+    : num.gt(billion)
+      ? `${round(num, billion)}b`
+      : num.gt(million)
+        ? `${round(num, million)}m`
+        : num.gt(thousand)
+          ? `${round(num, thousand)}k`
+          : num.gt(BigNumber.from(10).pow(1))
+            ? round(num, BigNumber.from(1))
+            : num.gt(BigNumber.from(10).pow(-1))
+              ? precise(num, 2)
+              : num.gt(BigNumber.from(10).pow(-2))
+                ? precise(num, 1)
+                : num.toString();
 }
 
 const nf = new Intl.NumberFormat();
