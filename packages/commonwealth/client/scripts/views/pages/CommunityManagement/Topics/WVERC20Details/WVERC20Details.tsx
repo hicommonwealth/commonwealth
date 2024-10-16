@@ -73,7 +73,8 @@ const WVERC20Details = ({ onStepChange, onCreateTopic }: WVConsentProps) => {
 
       <CWText type="h5">Your community chain</CWText>
       <CWText type="b1" className="description">
-        All token features will be interacting with following chain.
+        All onchain features will be interacting with the following chain. Chain
+        selection is only available when the community is created
       </CWText>
       <CWSelectList
         isDisabled
@@ -85,7 +86,7 @@ const WVERC20Details = ({ onStepChange, onCreateTopic }: WVConsentProps) => {
 
       <CWText type="h5">Primary token</CWText>
       <CWText type="b1" className="description">
-        Any token features such as voting or tipping require your community to
+        Any onchain features such as voting or tipping require your community to
         connect a primary token.
       </CWText>
       <TokenFinder
