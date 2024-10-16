@@ -143,7 +143,6 @@ export const NewThreadForm = () => {
   );
   const isActionAllowedInGatedTopic = !!(memberships || []).find(
     (membership) =>
-      threadTopic &&
       threadTopic?.id &&
       membership.topicIds.includes(threadTopic?.id) &&
       membership.isAllowed,
@@ -195,7 +194,7 @@ export const NewThreadForm = () => {
       setThreadContentDelta(createDeltaFromText(''));
       clearDraft();
 
-      navigate(`/discussion/${thread.id}`);
+      navigate(`/discussion/${thread.id}-${thread.title}`);
     } catch (err) {
       if (err instanceof SessionKeyError) {
         checkForSessionKeyRevalidationErrors(err);

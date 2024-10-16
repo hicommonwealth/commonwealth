@@ -9,7 +9,6 @@ import { partition } from '../../utils/partition';
 import { getObjectLikeUtils } from '../object-like';
 import { getSchemaUtils } from '../schema-utils';
 import { isProperty } from './property';
-
 export function object(schemas) {
   const baseSchema = {
     _getRawProperties: () =>
@@ -166,7 +165,6 @@ export function object(schemas) {
     getObjectUtils(baseSchema),
   );
 }
-
 function validateAndTransformObject({
   value,
   requiredKeys,
@@ -238,7 +236,6 @@ function validateAndTransformObject({
     };
   }
 }
-
 export function getObjectUtils(schema) {
   return {
     extend: (extension) => {
@@ -284,7 +281,6 @@ export function getObjectUtils(schema) {
     },
   };
 }
-
 function validateAndTransformExtendedObject({
   extensionKeys,
   value,
@@ -317,11 +313,9 @@ function validateAndTransformExtendedObject({
     };
   }
 }
-
 function isSchemaRequired(schema) {
   return !isSchemaOptional(schema);
 }
-
 function isSchemaOptional(schema) {
   switch (schema.getType()) {
     case SchemaType.ANY:

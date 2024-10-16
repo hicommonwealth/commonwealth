@@ -5,7 +5,6 @@ import * as CommonApi from '../../../../api/index';
 import * as core from '../../../../core';
 import * as serializers from '../../../index';
 import { CreateThreadResponseCollaboratorsItemUserProfileBackgroundImage } from './CreateThreadResponseCollaboratorsItemUserProfileBackgroundImage';
-
 export declare const CreateThreadResponseCollaboratorsItemUserProfile: core.serialization.ObjectSchema<
   serializers.CreateThreadResponseCollaboratorsItemUserProfile.Raw,
   CommonApi.CreateThreadResponseCollaboratorsItemUserProfile

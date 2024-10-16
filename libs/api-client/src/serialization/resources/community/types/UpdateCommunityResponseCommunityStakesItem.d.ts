@@ -5,7 +5,6 @@ import * as CommonApi from '../../../../api/index';
 import * as core from '../../../../core';
 import * as serializers from '../../../index';
 import { UpdateCommunityResponseCommunityStakesItemStakeTransactionsItem } from './UpdateCommunityResponseCommunityStakesItemStakeTransactionsItem';
-
 export declare const UpdateCommunityResponseCommunityStakesItem: core.serialization.ObjectSchema<
   serializers.UpdateCommunityResponseCommunityStakesItem.Raw,
   CommonApi.UpdateCommunityResponseCommunityStakesItem

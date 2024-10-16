@@ -5,7 +5,6 @@ import * as CommonApi from '../../../../api/index';
 import * as core from '../../../../core';
 import * as serializers from '../../../index';
 import { CreateCommentResponseThreadAddressUserProfileBackgroundImage } from './CreateCommentResponseThreadAddressUserProfileBackgroundImage';
-
 export declare const CreateCommentResponseThreadAddressUserProfile: core.serialization.ObjectSchema<
   serializers.CreateCommentResponseThreadAddressUserProfile.Raw,
   CommonApi.CreateCommentResponseThreadAddressUserProfile
