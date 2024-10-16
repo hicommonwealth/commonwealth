@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 DD_CONF_DIR="/etc/datadog-agent"
 
