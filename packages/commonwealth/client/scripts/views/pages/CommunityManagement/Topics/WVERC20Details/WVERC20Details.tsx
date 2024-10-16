@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { commonProtocol } from '@hicommonwealth/shared';
+import app from 'state';
 import { alphabeticallySortedChains } from 'views/components/CommunityInformationForm/constants';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -16,8 +16,6 @@ import TokenFinder, { useTokenFinder } from 'views/components/TokenFinder';
 import { HandleCreateTopicProps } from 'views/pages/CommunityManagement/Topics/Topics';
 import './WVERC20Details.scss';
 
-const ETH_CHAIN_NODE_ID = 37;
-
 interface WVConsentProps {
   onStepChange: (step: CreateTopicStep) => void;
   onCreateTopic: (props: HandleCreateTopicProps) => Promise<void>;
@@ -25,8 +23,9 @@ interface WVConsentProps {
 
 const WVERC20Details = ({ onStepChange, onCreateTopic }: WVConsentProps) => {
   const options = alphabeticallySortedChains.filter((c) => c.hasStakeEnabled);
+
   const defaultChain = options.find(
-    (o) => o.value === commonProtocol.ValidChains.Base,
+    (o) => o.value === app.chain.meta.ChainNode?.eth_chain_id,
   );
 
   const [selectedChain, setSelectedChain] = useState(defaultChain);
@@ -39,7 +38,7 @@ const WVERC20Details = ({ onStepChange, onCreateTopic }: WVConsentProps) => {
     tokenMetadataLoading,
     tokenValue,
   } = useTokenFinder({
-    chainId: ETH_CHAIN_NODE_ID,
+    nodeEthChainId: app.chain.meta.ChainNode?.eth_chain_id || 0,
   });
 
   const editMode = false;
@@ -72,13 +71,12 @@ const WVERC20Details = ({ onStepChange, onCreateTopic }: WVConsentProps) => {
 
       <CWText type="h4">Connect ERC20 token</CWText>
 
-      <CWText type="h5">Supported chains</CWText>
+      <CWText type="h5">Your community chain</CWText>
       <CWText type="b1" className="description">
-        The following are the pre-selected chain(s) all token features will be
-        interacting with.
+        All token features will be interacting with following chain.
       </CWText>
       <CWSelectList
-        isDisabled={editMode}
+        isDisabled
         options={options}
         value={selectedChain}
         onChange={setSelectedChain}
