@@ -1,5 +1,4 @@
 import {
-  BlockTypeSelect,
   BoldItalicUnderlineToggles,
   CreateLink,
   ListsToggle,
@@ -7,6 +6,7 @@ import {
 } from 'commonwealth-mdxeditor';
 import React, { ReactNode, useCallback, useEffect } from 'react';
 
+import { BlockSelectorButton } from 'views/components/MarkdownEditor/toolbars/BlockSelectorButton';
 import { ImageButton } from 'views/components/MarkdownEditor/toolbars/ImageButton';
 import CWPopover, {
   usePopover,
@@ -91,21 +91,8 @@ export const ToolbarForMobile = (props: ToolbarForMobileProps) => {
       onPointerDown={preventKeyboardDeactivation}
       onMouseDownCapture={preventKeyboardDeactivation}
     >
-      {/*<Select*/}
-      {/*  selected="asdf"*/}
-      {/*  options={[*/}
-      {/*    {*/}
-      {/*      id: '1',*/}
-      {/*      label: '1',*/}
-      {/*    },*/}
-      {/*  ]}*/}
-      {/*></Select>*/}
-
-      <div
-        className="mdxeditor-block-type-select"
-        onClick={() => console.log('click')}
-      >
-        <BlockTypeSelect />
+      <div className="mdxeditor-block-type-select">
+        <BlockSelectorButton focus={focus} />
       </div>
 
       <button onClick={headingsPopoverProps.handleInteraction}>headings</button>

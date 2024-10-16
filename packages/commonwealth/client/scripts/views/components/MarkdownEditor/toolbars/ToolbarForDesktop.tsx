@@ -1,5 +1,4 @@
 import {
-  BoldItalicUnderlineToggles,
   ChangeCodeMirrorLanguage,
   ConditionalContents,
   CreateLink,
@@ -12,7 +11,6 @@ import {
 import React from 'react';
 import { CWHeadingButton } from 'views/components/MarkdownEditor/toolbars/CWHeadingButton';
 import { ImageButton } from 'views/components/MarkdownEditor/toolbars/ImageButton';
-import { NewDesktopToolbar } from 'views/components/MarkdownEditor/toolbars/NewDesktopToolbar';
 import { QuoteButton } from 'views/components/MarkdownEditor/toolbars/QuoteButton';
 import './ToolbarForDesktop.scss';
 
@@ -26,7 +24,6 @@ export const ToolbarForDesktop = (props: ToolbarForDesktopProps) => {
 
   return (
     <>
-      <NewDesktopToolbar focus={focus} />
       <div className="ToolbarForDesktop">
         <ConditionalContents
           options={[
@@ -47,7 +44,6 @@ export const ToolbarForDesktop = (props: ToolbarForDesktopProps) => {
                   <CWHeadingButton blockType="bold" />
                   <CWHeadingButton blockType="underline" />
                   <CWHeadingButton blockType="italic" />
-                  <BoldItalicUnderlineToggles />
                   <Separator />
 
                   <StrikeThroughSupSubToggles />
