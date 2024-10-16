@@ -1,6 +1,6 @@
 #!/bin/sh
 
-if [ "$APP_ENV" = "production" ]; then
+if [ "$APP_ENV" = "production" ] || [ "$APP_ENV" = "frick" ]; then
   datadog-agent run &
   /opt/datadog-agent/embedded/bin/trace-agent --config=/etc/datadog-agent/datadog.yaml &
   /opt/datadog-agent/embedded/bin/process-agent --config=/etc/datadog-agent/datadog.yaml &
