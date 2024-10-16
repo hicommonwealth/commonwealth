@@ -38,10 +38,25 @@
       rgba(0, 121, 204, 0.3) 100%
     );
 
-    .cta-elements {
+    .cta-elements,
+    .buttons {
       display: flex;
       align-items: center;
       gap: 12px;
+    }
+
+    @include extraSmall {
+      .buttons {
+        flex-direction: column;
+        align-items: flex-end;
+        width: 100%;
+      }
+    }
+
+    .cta-elements {
+      @include mediumSmallMid {
+        flex-direction: column;
+      }
 
       .randomize-cta-text {
         color: $neutral-700;

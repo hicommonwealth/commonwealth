@@ -27,12 +27,17 @@ const LaunchIdeaCard = ({
             Try our randomizer button to launch tokens fast!
           </CWText>
           <span className="ml-auto" />
-          <CWButton
-            iconLeft="brain"
-            label="Randomize"
-            onClick={onRandomizeClick}
-          />
-          <TokenLaunchButton buttonWidth="wide" onClick={onTokenLaunchClick} />
+          <div className="buttons">
+            <CWButton
+              iconLeft="brain"
+              label="Randomize"
+              onClick={onRandomizeClick}
+            />
+            <TokenLaunchButton
+              buttonWidth="wide"
+              onClick={onTokenLaunchClick}
+            />
+          </div>
         </div>
       </div>
     </section>
