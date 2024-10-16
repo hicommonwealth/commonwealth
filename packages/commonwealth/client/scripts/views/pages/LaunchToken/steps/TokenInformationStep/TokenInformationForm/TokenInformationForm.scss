@@ -7,6 +7,21 @@
   width: 100%;
   max-width: 596px;
 
+  @include extraSmall {
+    gap: 16px;
+  }
+
+  .grid-row {
+    display: grid;
+    align-items: flex-start;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+
+    @include extraSmall {
+      grid-template-columns: 1fr;
+    }
+  }
+
   .optional-label {
     font-family: $font-family-silka;
     color: $neutral-500;
