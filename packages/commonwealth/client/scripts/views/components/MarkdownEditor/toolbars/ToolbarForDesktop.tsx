@@ -10,7 +10,7 @@ import {
   StrikeThroughSupSubToggles,
 } from 'commonwealth-mdxeditor';
 import React from 'react';
-import { HeadingButton } from 'views/components/MarkdownEditor/toolbars/HeadingButton';
+import { CWHeadingButton } from 'views/components/MarkdownEditor/toolbars/CWHeadingButton';
 import { ImageButton } from 'views/components/MarkdownEditor/toolbars/ImageButton';
 import { NewDesktopToolbar } from 'views/components/MarkdownEditor/toolbars/NewDesktopToolbar';
 import { QuoteButton } from 'views/components/MarkdownEditor/toolbars/QuoteButton';
@@ -37,9 +37,9 @@ export const ToolbarForDesktop = (props: ToolbarForDesktopProps) => {
               fallback: () => (
                 <>
                   <div className="button-container">
-                    <HeadingButton headingTag="h1" />
-                    <HeadingButton headingTag="h2" />
-                    <HeadingButton headingTag="h3" />
+                    <CWHeadingButton blockType="h1" />
+                    <CWHeadingButton blockType="h2" />
+                    <CWHeadingButton blockType="h3" />
                   </div>
 
                   <Separator />

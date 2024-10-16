@@ -12,36 +12,46 @@ import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip'
 
 export type HeadingButtonProps = Readonly<{
   blockType: 'h1' | 'h2' | 'h3' | 'quote';
+  onClick?: (event: React.MouseEvent<HTMLElement, MouseEvent>) => void;
 }>;
 
 export const CWHeadingButton = (props: HeadingButtonProps) => {
-  const { blockType } = props;
+  const { blockType, onClick } = props;
 
   const currentBlockType = useCellValue(currentBlockType$);
   const convertSelectionToNode = usePublisher(convertSelectionToNode$);
 
   const active = currentBlockType === blockType;
 
-  const toggleFormat = useCallback(() => {
-    if (!active) {
-      switch (blockType) {
-        case 'h1':
-        case 'h2':
-        case 'h3':
-          convertSelectionToNode(() => $createHeadingNode(blockType));
-          break;
-        case 'quote':
-          convertSelectionToNode(() => $createQuoteNode());
-          break;
+  const toggleFormat = useCallback(
+    (event: React.MouseEvent<HTMLElement, MouseEvent>) => {
+      if (!active) {
+        switch (blockType) {
+          case 'h1':
+          case 'h2':
+          case 'h3':
+            convertSelectionToNode(() => $createHeadingNode(blockType));
+            break;
+          case 'quote':
+            convertSelectionToNode(() => $createQuoteNode());
+            break;
+        }
+      } else {
+        convertSelectionToNode(() => $createParagraphNode());
       }
-    } else {
-      convertSelectionToNode(() => $createParagraphNode());
-    }
-  }, [active, blockType, convertSelectionToNode]);
+
+      onClick?.(event);
+    },
+    [active, blockType, convertSelectionToNode, onClick],
+  );
+
+  // TODO: there's a bug in handleInteraction here where it's not going away
+  // TODO: same thing with onMouseLeave. It doesn't reliably seem to nuke
+  // the tooltipl
 
   return (
     <CWTooltip
-      content={blockType}
+      content={`Change to ${blockType.toUpperCase()}`}
       renderTrigger={(handleInteraction) => (
         <CWIconButton
           className={active ? 'CWHeadingButtonActive' : ''}
