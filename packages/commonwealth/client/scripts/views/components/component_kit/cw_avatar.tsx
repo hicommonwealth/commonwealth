@@ -1,3 +1,4 @@
+import { getRandomAvatar } from 'client/scripts/utils/avatarUtils';
 import 'components/component_kit/cw_avatar.scss';
 import React from 'react';
 import Jdenticon from 'react-jdenticon';
@@ -24,13 +25,15 @@ export const CWAvatarSkeleton = ({ size }: BaseAvatarProps) => {
 export const CWAvatar = (props: AvatarProps) => {
   const { avatarUrl, size } = props;
 
+  const avatarToUse = avatarUrl || getRandomAvatar();
+
   return (
     <div
       className={ComponentType.Avatar}
       style={{
         width: `${size}px`,
         height: `${size}px`,
-        backgroundImage: `url("${avatarUrl}")`,
+        backgroundImage: `url("${avatarToUse}")`,
       }}
     />
   );
