@@ -365,6 +365,7 @@ export const MarkdownEditor = memo(function MarkdownEditor(
                       />
                     ) : (
                       <ToolbarForDesktop
+                        focus={doFocus}
                         onImage={imageUploadHandlerWithMarkdownInsertion}
                       />
                     ),

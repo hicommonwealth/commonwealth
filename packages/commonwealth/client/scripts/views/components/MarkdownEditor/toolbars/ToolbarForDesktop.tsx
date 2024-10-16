@@ -18,14 +18,15 @@ import './ToolbarForDesktop.scss';
 
 type ToolbarForDesktopProps = Readonly<{
   onImage?: (file: File) => void;
+  focus: () => void;
 }>;
 
 export const ToolbarForDesktop = (props: ToolbarForDesktopProps) => {
-  const { onImage } = props;
+  const { onImage, focus } = props;
 
   return (
     <>
-      <NewDesktopToolbar />
+      <NewDesktopToolbar focus={focus} />
       <div className="ToolbarForDesktop">
         <ConditionalContents
           options={[

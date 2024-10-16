@@ -2,10 +2,15 @@ import React from 'react';
 import { BlockSelectorButton } from 'views/components/MarkdownEditor/toolbars/BlockSelectorButton';
 import './NewToolbar.scss';
 
-export const NewDesktopToolbar = () => {
+type NewDesktopToolbarProps = Readonly<{
+  focus: () => void;
+}>;
+
+export const NewDesktopToolbar = (props: NewDesktopToolbarProps) => {
+  const { focus } = props;
   return (
     <div className="NewToolbar">
-      <BlockSelectorButton />
+      <BlockSelectorButton focus={focus} />
     </div>
   );
 };

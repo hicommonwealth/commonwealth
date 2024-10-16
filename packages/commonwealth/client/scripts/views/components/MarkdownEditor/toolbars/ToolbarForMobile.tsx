@@ -15,12 +15,7 @@ import './ToolbarForMobile.scss';
 
 type ToolbarForMobileProps = Readonly<{
   SubmitButton?: () => ReactNode;
-
-  /**
-   * Focus the toolbar so that it is not blurred when clicking buttons in the
-   * toolbar.
-   */
-  focus?: () => void;
+  focus: () => void;
 
   onImage?: (file: File) => void;
 }>;

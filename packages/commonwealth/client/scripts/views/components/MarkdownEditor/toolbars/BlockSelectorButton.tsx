@@ -7,12 +7,26 @@ import CWPopover, {
 } from 'views/components/component_kit/new_designs/CWPopover';
 import './BlockSelectorButton.scss';
 
-export const BlockSelectorButton = () => {
+type BlockSelectorButtonProps = Readonly<{
+  focus: () => void;
+}>;
+
+export const BlockSelectorButton = (props: BlockSelectorButtonProps) => {
+  const { focus } = props;
+
   const formattingPopoverProps = usePopover();
 
   const currentBlockType = useCellValue(currentBlockType$);
 
   const handleClick = useCallback(
+    (event: React.MouseEvent<HTMLElement, MouseEvent>) => {
+      formattingPopoverProps.handleInteraction(event);
+      focus();
+    },
+    [focus, formattingPopoverProps],
+  );
+
+  const handleFormatButtonClick = useCallback(
     (event: React.MouseEvent<HTMLElement, MouseEvent>) => {
       formattingPopoverProps.handleInteraction(event);
     },
@@ -21,7 +35,7 @@ export const BlockSelectorButton = () => {
 
   return (
     <div className="BlockSelectorButton">
-      <button onClick={formattingPopoverProps.handleInteraction}>
+      <button onClick={handleClick}>
         {blockTypeToIconName(currentBlockType)}
       </button>
 
@@ -29,10 +43,13 @@ export const BlockSelectorButton = () => {
         className="FormattingPopover"
         body={
           <div onMouseLeave={formattingPopoverProps.handleInteraction}>
-            <CWHeadingButton blockType="h1" onClick={handleClick} />
-            <CWHeadingButton blockType="h2" onClick={handleClick} />
-            <CWHeadingButton blockType="h3" onClick={handleClick} />
-            <CWHeadingButton blockType="quote" onClick={handleClick} />
+            <CWHeadingButton blockType="h1" onClick={handleFormatButtonClick} />
+            <CWHeadingButton blockType="h2" onClick={handleFormatButtonClick} />
+            <CWHeadingButton blockType="h3" onClick={handleFormatButtonClick} />
+            <CWHeadingButton
+              blockType="quote"
+              onClick={handleFormatButtonClick}
+            />
           </div>
         }
         {...formattingPopoverProps}
