@@ -1,5 +1,6 @@
 import { $createHeadingNode, $createQuoteNode } from '@lexical/rich-text';
 import {
+  applyFormat$,
   convertSelectionToNode$,
   currentBlockType$,
   useCellValue,
@@ -9,9 +10,18 @@ import { $createParagraphNode } from 'lexical';
 import React, { useCallback } from 'react';
 import CWIconButton from 'views/components/component_kit/new_designs/CWIconButton';
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
+import './CWHeadingButton.scss';
 
 export type HeadingButtonProps = Readonly<{
-  blockType: 'h1' | 'h2' | 'h3' | 'quote' | 'p';
+  blockType:
+    | 'h1'
+    | 'h2'
+    | 'h3'
+    | 'quote'
+    | 'p'
+    | 'bold'
+    | 'underline'
+    | 'italic';
   onClick?: (event: React.MouseEvent<HTMLElement, MouseEvent>) => void;
 }>;
 
@@ -20,6 +30,7 @@ export const CWHeadingButton = (props: HeadingButtonProps) => {
 
   const currentBlockType = useCellValue(currentBlockType$);
   const convertSelectionToNode = usePublisher(convertSelectionToNode$);
+  const applyFormat = usePublisher(applyFormat$);
 
   const active = currentBlockType === blockType;
 
@@ -35,6 +46,11 @@ export const CWHeadingButton = (props: HeadingButtonProps) => {
           case 'quote':
             convertSelectionToNode(() => $createQuoteNode());
             break;
+          case 'bold':
+          case 'underline':
+          case 'italic':
+            applyFormat(blockType);
+            break;
         }
       } else {
         convertSelectionToNode(() => $createParagraphNode());
@@ -42,7 +58,7 @@ export const CWHeadingButton = (props: HeadingButtonProps) => {
 
       onClick?.(event);
     },
-    [active, blockType, convertSelectionToNode, onClick],
+    [active, applyFormat, blockType, convertSelectionToNode, onClick],
   );
 
   // TODO: there's a bug in handleInteraction here where it's not going away

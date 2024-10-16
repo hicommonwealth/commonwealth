@@ -44,6 +44,9 @@ export const ToolbarForDesktop = (props: ToolbarForDesktopProps) => {
                   </div>
 
                   <Separator />
+                  <CWHeadingButton blockType="bold" />
+                  <CWHeadingButton blockType="underline" />
+                  <CWHeadingButton blockType="italic" />
                   <BoldItalicUnderlineToggles />
                   <Separator />
 
