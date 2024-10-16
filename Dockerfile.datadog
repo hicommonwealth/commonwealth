@@ -27,4 +27,5 @@ EXPOSE 8125/udp 8126/tcp
 
 RUN mkdir -p /var/run/datadog
 
+# output dir MUST match directory set to DD_CONF_DIR in datadog-entrypoint.sh
 COPY datadog-config/ /etc/datadog-agent/
