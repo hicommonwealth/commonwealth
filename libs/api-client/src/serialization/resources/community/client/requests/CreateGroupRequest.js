@@ -4,7 +4,6 @@
 import * as core from '../../../../../core';
 import { CreateGroupRequestMetadata } from '../../types/CreateGroupRequestMetadata';
 import { CreateGroupRequestRequirementsItem } from '../../types/CreateGroupRequestRequirementsItem';
-
 export const CreateGroupRequest = core.serialization.object({
   communityId: core.serialization.property(
     'community_id',

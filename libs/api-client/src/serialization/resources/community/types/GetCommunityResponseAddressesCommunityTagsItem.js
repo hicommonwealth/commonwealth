@@ -3,7 +3,6 @@
  */
 import * as core from '../../../../core';
 import { GetCommunityResponseAddressesCommunityTagsItemTag } from './GetCommunityResponseAddressesCommunityTagsItemTag';
-
 export const GetCommunityResponseAddressesCommunityTagsItem =
   core.serialization.object({
     communityId: core.serialization.property(

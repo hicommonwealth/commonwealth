@@ -1,5 +1,5 @@
 import { express, trpc } from '@hicommonwealth/adapters';
-import { Comment, Community } from '@hicommonwealth/model';
+import { Comment, Community, Feed } from '@hicommonwealth/model';
 import cors from 'cors';
 import { Router } from 'express';
 import passport from 'passport';
@@ -11,6 +11,7 @@ import {
   apiKeyAuthMiddleware,
 } from './external-router-middleware';
 import * as thread from './threads';
+import * as user from './user';
 
 const {
   createCommunity,
@@ -32,8 +33,12 @@ const {
 } = thread.trpcRouter;
 const { createComment, updateComment, deleteComment, createCommentReaction } =
   comment.trpcRouter;
+const { getNewContent } = user.trpcRouter;
 
 const api = {
+  getGlobalActivity: trpc.query(Feed.GetGlobalActivity, trpc.Tag.User, true),
+  getUserActivity: trpc.query(Feed.GetUserActivity, trpc.Tag.User, true),
+  getNewContent,
   getCommunities: trpc.query(
     Community.GetCommunities,
     trpc.Tag.Community,
@@ -64,7 +69,14 @@ const api = {
 
 const PATH = '/api/v1';
 const router = Router();
-router.use(cors(), express.statsMiddleware);
+router.use(
+  cors({
+    origin: '*',
+    methods: ['GET', 'POST'],
+    allowedHeaders: ['Content-Type', 'api-key', 'address'],
+  }),
+  express.statsMiddleware,
+);
 
 // ===============================================================================
 /**
@@ -88,7 +100,7 @@ const trpcRouter = trpc.router(api);
 trpc.useOAS(router, trpcRouter, {
   title: 'Common API',
   path: PATH,
-  version: '0.0.1',
+  version: '1.0.0',
 });
 
 export { PATH, router };

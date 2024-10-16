@@ -3,7 +3,6 @@
  */
 import * as core from '../../../../core';
 import { GetCommentsResponseResultsItemReactionAddress } from './GetCommentsResponseResultsItemReactionAddress';
-
 export const GetCommentsResponseResultsItemReaction = core.serialization.object(
   {
     id: core.serialization.number().optional(),
