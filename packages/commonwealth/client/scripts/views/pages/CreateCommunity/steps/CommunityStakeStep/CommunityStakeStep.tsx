@@ -53,7 +53,15 @@ const CommunityStakeStep = ({
   };
 
   const onSuccessSignTransactions = () => {
-    isTopicFlow ? refetchStakeQuery?.() : goToSuccessStep();
+    if (isTopicFlow) {
+      if (onlyNamespace) {
+        return goToSuccessStep();
+      } else {
+        return refetchStakeQuery?.();
+      }
+    }
+
+    goToSuccessStep();
   };
 
   const onCancelSignTransactions = () => {
