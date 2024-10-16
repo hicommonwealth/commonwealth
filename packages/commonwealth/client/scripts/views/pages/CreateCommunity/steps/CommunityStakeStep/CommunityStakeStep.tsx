@@ -41,8 +41,11 @@ const CommunityStakeStep = ({
     symbol: symbol || (createdCommunityName || '').toUpperCase().slice(0, 4),
   });
 
-  const handleOptInEnablingStake = ({ namespace, symbol }) => {
-    setCommunityStakeData({ namespace, symbol });
+  const handleOptInEnablingStake = (stakeData: {
+    namespace: string;
+    symbol: string;
+  }) => {
+    setCommunityStakeData(stakeData);
     setEnableStakePage(false);
   };
 

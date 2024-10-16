@@ -1,4 +1,3 @@
-import { useFlag } from 'hooks/useFlag';
 import AddressInfo from 'models/AddressInfo';
 import { useState } from 'react';
 import { chainIdsWithStakeEnabled } from 'views/components/CommunityInformationForm/constants';
@@ -12,8 +11,6 @@ const useCreateCommunity = () => {
     // @ts-expect-error StrictNullChecks
     { type: null, chainBase: null },
   );
-
-  const weightedTopicsEnabled = useFlag('weightedTopics');
 
   // @ts-expect-error StrictNullChecks
   const [selectedAddress, setSelectedAddress] = useState<AddressInfo>(null);
