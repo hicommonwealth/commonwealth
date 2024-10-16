@@ -1,6 +1,7 @@
 import { ExtendedCommunity } from '@hicommonwealth/schemas';
 import { ChainBase, ChainNetwork } from '@hicommonwealth/shared';
 import { findDenominationString } from 'helpers/findDenomination';
+import { useFlag } from 'hooks/useFlag';
 import React, { Fragment, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Virtuoso } from 'react-virtuoso';
@@ -36,6 +37,8 @@ type ExtendedCommunitySliceType = [
 
 const CommunitiesPage = () => {
   const containerRef = useRef();
+
+  const tokenizedCommunityEnabled = useFlag('tokenizedCommunity');
 
   const {
     setModeOfManageCommunityStakeModal,
@@ -200,13 +203,17 @@ const CommunitiesPage = () => {
               onFiltersChange={(newFilters) => setFilters(newFilters)}
             />
           </div>
-          <LaunchIdeaCard
-            onTokenLaunchClick={() => setIsTokenLaunchDrawerOpen(true)}
-          />
-          <TokenLaunchDrawer
-            isOpen={isTokenLaunchDrawerOpen}
-            onClose={() => setIsTokenLaunchDrawerOpen(false)}
-          />
+          {tokenizedCommunityEnabled && (
+            <>
+              <LaunchIdeaCard
+                onTokenLaunchClick={() => setIsTokenLaunchDrawerOpen(true)}
+              />
+              <TokenLaunchDrawer
+                isOpen={isTokenLaunchDrawerOpen}
+                onClose={() => setIsTokenLaunchDrawerOpen(false)}
+              />
+            </>
+          )}
         </div>
         {isLoading && communitiesList.length === 0 ? (
           <CWCircleMultiplySpinner />
