@@ -5,7 +5,7 @@ const useCreateTokenMutation = () => {
   const user = useUserStore();
 
   return trpc.token.createToken.useMutation({
-    onSuccess: async () => {
+    onSuccess: () => {
       user.setData({ addressSelectorSelectedAddress: undefined });
     },
   });
