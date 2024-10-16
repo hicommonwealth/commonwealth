@@ -1,0 +1,48 @@
+@import '../../../../../../styles/shared.scss';
+
+.QuickTokenLaunchForm {
+  div.h3 {
+    margin-bottom: 16px;
+  }
+
+  .display-none {
+    display: none !important;
+  }
+
+  .CircleMultiplySpinner {
+    > .container {
+      display: flex;
+      height: 70vh;
+    }
+  }
+
+  .shortened-token-information-form {
+    max-width: unset;
+
+    .CommunitySelector {
+      max-width: unset;
+      padding: 16px !important;
+    }
+
+    .cta-elements {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+
+      > .TokenLaunchButton {
+        padding: 0;
+      }
+
+      @include mediumSmallMid {
+        gap: 12px;
+        flex-direction: column;
+
+        > .TokenLaunchButton {
+          margin-left: auto;
+        }
+      }
+    }
+  }
+}

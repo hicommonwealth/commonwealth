@@ -38,6 +38,7 @@ export const ApiEndpoints = {
   VIEW_COUNT: '/viewCount',
   FETCH_USER_ACTIVITY: '/viewUserActivity',
   FETCH_GLOBAL_ACTIVITY: '/viewGlobalActivity',
+  GENERATE_IMAGE: '/generateImage',
 };
 
 export const ContractMethods = {
