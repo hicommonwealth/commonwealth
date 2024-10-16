@@ -1,6 +1,6 @@
 #!/bin/sh
 
-export DD_HOSTNAME=$(hostname)
+export DD_HOSTNAME=$HEROKU_APP_NAME.$DYNO
 
 if [ "$APP_ENV" = "production" ]; then
   datadog-agent run &
