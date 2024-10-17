@@ -27,16 +27,8 @@ import {
 } from 'state/api/feeds/fetchUserActivity';
 import useUserStore from 'state/ui/user';
 import Permissions from 'utils/Permissions';
-import { DashboardViews } from 'views/pages/user_dashboard';
 import { z } from 'zod';
 import { ThreadCard } from '../pages/discussions/ThreadCard';
-
-type FeedProps = {
-  dashboardView: DashboardViews;
-  noFeedMessage: string;
-  defaultCount?: number;
-  customScrollParent?: HTMLElement;
-};
 
 const DEFAULT_COUNT = 10;
 
@@ -189,16 +181,15 @@ function mapThread(thread: z.infer<typeof ActivityThread>): Thread {
   });
 }
 
-// eslint-disable-next-line react/no-multi-comp
-export const Feed = ({
-  dashboardView,
-  noFeedMessage,
-  customScrollParent,
-}: FeedProps) => {
-  const userFeed = useFetchUserActivityQuery();
-  const globalFeed = useFetchGlobalActivityQuery();
+type FeedProps = {
+  query: typeof useFetchGlobalActivityQuery | typeof useFetchUserActivityQuery;
+  defaultCount?: number;
+  customScrollParent?: HTMLElement;
+};
 
-  const feed = dashboardView === DashboardViews.Global ? globalFeed : userFeed;
+// eslint-disable-next-line react/no-multi-comp
+export const Feed = ({ query, customScrollParent }: FeedProps) => {
+  const feed = query();
 
   if (feed.isLoading) {
     return (
@@ -220,7 +211,9 @@ export const Feed = ({
   if (feed.data.length === 0) {
     return (
       <div className="Feed">
-        <div className="no-feed-message">{noFeedMessage}</div>
+        <div className="no-feed-message">
+          Join some communities to see Activity!
+        </div>
       </div>
     );
   }
