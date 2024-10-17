@@ -6,7 +6,7 @@ import { fetchCachedNodes } from 'state/api/nodes';
 import { TokenInfo } from './types';
 import { CreateTokenCommunityStep, handleChangeStep } from './utils';
 
-const useCreateCommunity = () => {
+const useCreateTokenCommunity = () => {
   // get base chain node info
   const nodes = fetchCachedNodes();
   const baseNode = nodes?.find(
@@ -45,4 +45,4 @@ const useCreateCommunity = () => {
   };
 };
 
-export default useCreateCommunity;
+export default useCreateTokenCommunity;
