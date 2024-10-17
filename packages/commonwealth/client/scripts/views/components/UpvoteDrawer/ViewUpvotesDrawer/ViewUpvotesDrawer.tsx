@@ -1,3 +1,4 @@
+import { MAIDEN_CHARS_TO_SHOW_MORE } from '@hicommonwealth/shared';
 import { APIOrderDirection } from 'helpers/constants';
 import Account from 'models/Account';
 import AddressInfo from 'models/AddressInfo';
@@ -145,6 +146,7 @@ export const ViewUpvotesDrawer = ({
               <MarkdownViewerWithFallback
                 markdown={contentBody}
                 cutoffLines={10}
+                maxChars={MAIDEN_CHARS_TO_SHOW_MORE}
               />
             </div>
           </div>
