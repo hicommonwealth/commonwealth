@@ -19,6 +19,7 @@ module.exports = {
         {
           type: Sequelize.NUMERIC(78, 0), // up to 78 digits with no decimal places
           allowNull: false,
+          defaultValue: 0,
         },
         { transaction },
       );
@@ -28,6 +29,7 @@ module.exports = {
         {
           type: Sequelize.NUMERIC(78, 0), // up to 78 digits with no decimal places
           allowNull: false,
+          defaultValue: 0,
         },
         { transaction },
       );
