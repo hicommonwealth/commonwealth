@@ -376,7 +376,7 @@ export class Thread implements IUniqueId {
     this.createdAt = moment(created_at);
     this.updatedAt = moment(updated_at);
     // @ts-expect-error StrictNullChecks
-    this.topic = topic?.id ? new Topic({ ...(topic || {}) } as any) : null;
+    this.topic = topic?.id ? mapTopic({ ...(topic || {}) } as any) : null;
     this.kind = kind;
     this.stage = stage;
     this.authorCommunity = Address?.community_id;

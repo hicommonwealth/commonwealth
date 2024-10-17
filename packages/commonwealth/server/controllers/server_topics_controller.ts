@@ -1,10 +1,5 @@
 import { DB } from '@hicommonwealth/model';
 import {
-  GetTopicsOptions,
-  GetTopicsResult,
-  __getTopics,
-} from './server_topics_methods/get_topics';
-import {
   UpdateTopicChannelOptions,
   UpdateTopicChannelResult,
   __updateTopicChannel,
@@ -20,10 +15,6 @@ import {
  */
 export class ServerTopicsController {
   constructor(public models: DB) {}
-
-  async getTopics(options: GetTopicsOptions): Promise<GetTopicsResult> {
-    return __getTopics.call(this, options);
-  }
 
   async updateTopicsOrder(
     options: UpdateTopicsOrderOptions,

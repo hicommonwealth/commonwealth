@@ -12,11 +12,11 @@ import {
   PermissionEnum,
 } from '@hicommonwealth/schemas';
 import { slugify } from '@hicommonwealth/shared';
+import { mapTopic } from 'client/scripts/models/Topic';
 import { getThreadActionTooltipText } from 'helpers/threads';
 import useTopicGating from 'hooks/useTopicGating';
 import { getProposalUrlPath } from 'identifiers';
 import { Thread, type RecentComment } from 'models/Thread';
-import Topic from 'models/Topic';
 import { ThreadKind, ThreadStage } from 'models/types';
 import { useCommonNavigate } from 'navigation/helpers';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
@@ -132,7 +132,7 @@ function mapThread(thread: z.infer<typeof ActivityThread>): Thread {
     id: thread.id,
     created_at: thread.created_at ?? '',
     updated_at: thread.updated_at ?? thread.created_at ?? '',
-    topic: new Topic({
+    topic: mapTopic({
       community_id: thread.community_id,
       id: thread.topic.id,
       name: thread.topic.name,
