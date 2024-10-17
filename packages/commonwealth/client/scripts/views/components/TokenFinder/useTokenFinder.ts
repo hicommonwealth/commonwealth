@@ -4,10 +4,14 @@ import { useDebounce } from 'usehooks-ts';
 
 type UseTokenFinderProps = {
   nodeEthChainId: number;
+  initialTokenValue?: string | null;
 };
 
-const useTokenFinder = ({ nodeEthChainId }: UseTokenFinderProps) => {
-  const [tokenValue, setTokenValue] = useState('');
+const useTokenFinder = ({
+  nodeEthChainId,
+  initialTokenValue,
+}: UseTokenFinderProps) => {
+  const [tokenValue, setTokenValue] = useState(initialTokenValue || '');
   const debouncedTokenValue = useDebounce<string>(tokenValue, 500);
 
   const { data: tokenMetadata, isLoading: tokenMetadataLoading } =
