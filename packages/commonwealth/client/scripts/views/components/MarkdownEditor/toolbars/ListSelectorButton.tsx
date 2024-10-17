@@ -1,22 +1,17 @@
-import { currentBlockType$, useCellValue } from 'commonwealth-mdxeditor';
 import React, { useCallback } from 'react';
 import { CWHeadingButton } from 'views/components/MarkdownEditor/toolbars/CWHeadingButton';
 import { blockTypeToIcon } from 'views/components/MarkdownEditor/toolbars/blockTypeToIcon';
 import CWPopover, {
   usePopover,
 } from 'views/components/component_kit/new_designs/CWPopover';
-import './BlockSelectorButton.scss';
 
-type BlockSelectorButtonProps = Readonly<{
+type ListSelectorButtonProps = Readonly<{
   focus: () => void;
 }>;
 
-export const BlockSelectorButton = (props: BlockSelectorButtonProps) => {
+export const ListSelectorButton = (props: ListSelectorButtonProps) => {
   const { focus } = props;
-
   const popoverProps = usePopover();
-
-  const currentBlockType = useCellValue(currentBlockType$);
 
   const handleClick = useCallback(
     (event: React.MouseEvent<HTMLElement, MouseEvent>) => {

@@ -12,12 +12,12 @@ import CWIconButton from 'views/components/component_kit/new_designs/CWIconButto
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import './CWHeadingButton.scss';
 
-export type HeadingButtonProps = Readonly<{
+export type CWHeadingButtonProps = Readonly<{
   blockType: 'h1' | 'h2' | 'h3' | 'quote' | 'p';
   onClick?: (event: React.MouseEvent<HTMLElement, MouseEvent>) => void;
 }>;
 
-export const CWHeadingButton = (props: HeadingButtonProps) => {
+export const CWHeadingButton = (props: CWHeadingButtonProps) => {
   const { blockType, onClick } = props;
 
   const currentBlockType = useCellValue(currentBlockType$);
