@@ -1,16 +1,9 @@
-import {
-  BoldItalicUnderlineToggles,
-  CreateLink,
-  ListsToggle,
-  Separator,
-} from 'commonwealth-mdxeditor';
+import { CreateLink, ListsToggle, Separator } from 'commonwealth-mdxeditor';
 import React, { ReactNode, useCallback, useEffect } from 'react';
 
 import { BlockSelectorButton } from 'views/components/MarkdownEditor/toolbars/BlockSelectorButton';
+import { CWHeadingButton } from 'views/components/MarkdownEditor/toolbars/CWHeadingButton';
 import { ImageButton } from 'views/components/MarkdownEditor/toolbars/ImageButton';
-import CWPopover, {
-  usePopover,
-} from 'views/components/component_kit/new_designs/CWPopover';
 import './ToolbarForMobile.scss';
 
 type ToolbarForMobileProps = Readonly<{
@@ -22,8 +15,6 @@ type ToolbarForMobileProps = Readonly<{
 
 export const ToolbarForMobile = (props: ToolbarForMobileProps) => {
   const { SubmitButton, focus, onImage } = props;
-
-  const headingsPopoverProps = usePopover();
 
   const adjustForKeyboard = useCallback(() => {
     if (!window.visualViewport) {
@@ -74,17 +65,9 @@ export const ToolbarForMobile = (props: ToolbarForMobileProps) => {
         <BlockSelectorButton focus={focus} />
       </div>
 
-      <CWPopover
-        body={
-          <div>
-            <BoldItalicUnderlineToggles />
-          </div>
-        }
-        {...headingsPopoverProps}
-      />
+      <CWHeadingButton blockType="bold" />
+      <CWHeadingButton blockType="italic" />
 
-      {/*<UndoRedo />*/}
-      <BoldItalicUnderlineToggles />
       <CreateLink />
       <ListsToggle />
       <Separator />
