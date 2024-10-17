@@ -40,10 +40,6 @@ export const BlockSelectorButton = (props: BlockSelectorButtonProps) => {
     popoverProps.dispose();
   }, [popoverProps]);
 
-  // FIXME what about list items that don't have an icon when you place the
-  // cursor in the wrong block. No icon will be picked.  This happens for list
-  // items.
-
   const iconName = blockTypeToIconName(currentBlockType);
 
   return (
