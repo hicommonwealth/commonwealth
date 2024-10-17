@@ -25,4 +25,6 @@ RUN apt-get update && apt-get -y install --reinstall datadog-agent
 # Expose DogStatsD and trace-agent ports
 EXPOSE 8125/udp 8126/tcp
 
+RUN mkdir -p /var/run/datadog
+
 COPY datadog-config/ /etc/datadog-agent/

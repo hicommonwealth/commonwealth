@@ -49,6 +49,8 @@ const SignTransactionsStep = ({
   onSetCreatedContestAddress,
   fundingTokenTicker,
 }: SignTransactionsStepProps) => {
+  const weightedTopicsEnabled = useFlag('weightedTopics');
+
   const [launchContestData, setLaunchContestData] = useState({
     state: 'not-started' as ActionStepProps['state'],
     errorText: '',
@@ -81,14 +83,18 @@ const SignTransactionsStep = ({
     const namespaceName = app?.chain?.meta?.namespace;
     const contestLength = devContest
       ? ONE_HOUR_IN_SECONDS
-      : SEVEN_DAYS_IN_SECONDS;
+      : weightedTopicsEnabled
+        ? contestFormData?.contestDuration
+        : SEVEN_DAYS_IN_SECONDS;
     const stakeId = stakeData?.stake_id;
     const voterShare = commonProtocol.CONTEST_VOTER_SHARE;
     const feeShare = commonProtocol.CONTEST_FEE_SHARE;
     const weight = stakeData?.vote_weight;
     const contestInterval = devContest
       ? ONE_HOUR_IN_SECONDS
-      : SEVEN_DAYS_IN_SECONDS;
+      : weightedTopicsEnabled
+        ? contestFormData?.contestDuration
+        : SEVEN_DAYS_IN_SECONDS;
     const prizeShare = contestFormData?.prizePercentage;
     const walletAddress = user.activeAccount?.address;
     const exchangeToken = isDirectDepositSelected
@@ -149,10 +155,12 @@ const SignTransactionsStep = ({
           ? contestFormData?.prizePercentage
           : 0,
         payout_structure: contestFormData?.payoutStructure,
-        interval: isContestRecurring ? contestInterval : 0,
-        topic_ids: contestFormData?.toggledTopicList
-          .filter((t) => t.checked)
-          .map((t) => t.id!),
+        interval: isContestRecurring ? contestInterval! : 0,
+        topic_ids: weightedTopicsEnabled
+          ? [contestFormData?.contestTopic?.value as number]
+          : contestFormData?.toggledTopicList
+              .filter((t) => t.checked)
+              .map((t) => t.id!),
         ticker: fundingTokenTicker,
       });
 

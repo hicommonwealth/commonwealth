@@ -1,5 +1,5 @@
 import { express, trpc } from '@hicommonwealth/adapters';
-import { Comment, Community } from '@hicommonwealth/model';
+import { Comment, Community, Feed } from '@hicommonwealth/model';
 import cors from 'cors';
 import { Router } from 'express';
 import { readFileSync } from 'fs';
@@ -14,6 +14,7 @@ import {
   apiKeyAuthMiddleware,
 } from './external-router-middleware';
 import * as thread from './threads';
+import * as user from './user';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -38,16 +39,29 @@ const {
 } = thread.trpcRouter;
 const { createComment, updateComment, deleteComment, createCommentReaction } =
   comment.trpcRouter;
+const { getNewContent } = user.trpcRouter;
 
 const api = {
-  getCommunities: trpc.query(
-    Community.GetCommunities,
-    trpc.Tag.Community,
-    true,
-  ),
-  getCommunity: trpc.query(Community.GetCommunity, trpc.Tag.Community, true),
-  getMembers: trpc.query(Community.GetMembers, trpc.Tag.Community, true),
-  getComments: trpc.query(Comment.GetComments, trpc.Tag.Comment, true),
+  getGlobalActivity: trpc.query(Feed.GetGlobalActivity, trpc.Tag.User, {
+    forceSecure: true,
+    ttlSecs: config.NO_GLOBAL_ACTIVITY_CACHE ? undefined : 60 * 5,
+  }),
+  getUserActivity: trpc.query(Feed.GetUserActivity, trpc.Tag.User, {
+    forceSecure: true,
+  }),
+  getNewContent,
+  getCommunities: trpc.query(Community.GetCommunities, trpc.Tag.Community, {
+    forceSecure: true,
+  }),
+  getCommunity: trpc.query(Community.GetCommunity, trpc.Tag.Community, {
+    forceSecure: true,
+  }),
+  getMembers: trpc.query(Community.GetMembers, trpc.Tag.Community, {
+    forceSecure: true,
+  }),
+  getComments: trpc.query(Comment.GetComments, trpc.Tag.Comment, {
+    forceSecure: true,
+  }),
   createCommunity,
   updateCommunity,
   createTopic,
@@ -70,7 +84,14 @@ const api = {
 
 const PATH = '/api/v1';
 const router = Router();
-router.use(cors(), express.statsMiddleware);
+router.use(
+  cors({
+    origin: '*',
+    methods: ['GET', 'POST'],
+    allowedHeaders: ['Content-Type', 'api-key', 'address'],
+  }),
+  express.statsMiddleware,
+);
 
 // ===============================================================================
 /**

@@ -1,6 +1,6 @@
 {
   "name": "@commonxyz/api-client",
-  "version": "0.0.7",
+  "version": "1.0.0",
   "type": "module",
   "description": "Common Client Proxy",
   "repository": {
@@ -39,12 +39,7 @@
   "author": "common.xyz",
   "license": "MIT",
   "dependencies": {
-    "moment": "^2.23.0",
-    "qs": "^6.13.0",
+    "node-fetch": "^3.3.2",
     "url-join": "^5.0.0"
-  },
-  "devDependencies": {
-    "@types/moment": "^2.13.0",
-    "tsx": "^4.7.2"
   }
 }
