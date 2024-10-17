@@ -1,7 +1,6 @@
 import {
   ChangeCodeMirrorLanguage,
   ConditionalContents,
-  CreateLink,
   InsertCodeBlock,
   InsertTable,
   IS_BOLD,
@@ -14,6 +13,7 @@ import {
   Separator,
 } from 'commonwealth-mdxeditor';
 import React from 'react';
+import { CWCreateLinkButton } from 'views/components/MarkdownEditor/toolbars/CWCreateLinkButton';
 import { CWFormatButton } from 'views/components/MarkdownEditor/toolbars/CWFormatButton';
 import { CWHeadingButton } from 'views/components/MarkdownEditor/toolbars/CWHeadingButton';
 import { ImageButton } from 'views/components/MarkdownEditor/toolbars/ImageButton';
@@ -77,7 +77,7 @@ export const ToolbarForDesktop = (props: ToolbarForDesktopProps) => {
                   <Separator />
 
                   <div className="button-container">
-                    <CreateLink />
+                    <CWCreateLinkButton />
                     <ImageButton onImage={onImage} />
                     <InsertCodeBlock />
                     <QuoteButton />

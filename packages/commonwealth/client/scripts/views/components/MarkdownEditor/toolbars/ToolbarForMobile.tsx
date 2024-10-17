@@ -1,9 +1,4 @@
-import {
-  CreateLink,
-  IS_BOLD,
-  IS_ITALIC,
-  Separator,
-} from 'commonwealth-mdxeditor';
+import { IS_BOLD, IS_ITALIC, Separator } from 'commonwealth-mdxeditor';
 import React, { ReactNode, useCallback, useEffect } from 'react';
 
 import { BlockSelectorButton } from 'views/components/MarkdownEditor/toolbars/BlockSelectorButton';
@@ -79,7 +74,6 @@ export const ToolbarForMobile = (props: ToolbarForMobileProps) => {
       <CWListButton listType="bullet" />
       <CWListButton listType="number" />
 
-      <CreateLink />
       <Separator />
       <ImageButton onImage={onImage} />
       <MobileOverflowButton focus={focus} />
