@@ -1,6 +1,36 @@
 import BN from 'bn.js';
 import { BigNumber } from 'ethers';
 
+// duplicated in helpers.ts
+export function formatNumberShort(num: number) {
+  const round = (n, digits?) => {
+    if (digits === undefined) digits = 2;
+    return Math.round(n * 10 ** digits) / 10 ** digits;
+  };
+
+  const precise = (n, digits?) => {
+    if (digits === undefined) digits = 3;
+    return n.toPrecision(digits);
+  };
+
+  // TODO: Clean this up
+  return num > 1_000_000_000_000
+    ? `${round(num / 1_000_000_000_000)}t`
+    : num > 1_000_000_000
+      ? `${round(num / 1_000_000_000)}b`
+      : num > 1_000_000
+        ? `${round(num / 1_000_000)}m`
+        : num > 1_000
+          ? `${round(num / 1_000)}k`
+          : num > 0.1
+            ? round(num)
+            : num > 0.01
+              ? precise(num, 2)
+              : num > 0.001
+                ? precise(num, 1)
+                : num.toString();
+}
+
 export function formatBigNumberShort(num: BigNumber): string {
   if (num.isZero()) {
     return '0';
