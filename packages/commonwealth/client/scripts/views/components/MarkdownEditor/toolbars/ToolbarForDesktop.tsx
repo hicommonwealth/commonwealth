@@ -25,7 +25,7 @@ type ToolbarForDesktopProps = Readonly<{
 }>;
 
 export const ToolbarForDesktop = (props: ToolbarForDesktopProps) => {
-  const { onImage, focus } = props;
+  const { onImage } = props;
 
   return (
     <>
