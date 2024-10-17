@@ -57,7 +57,6 @@ export const TokenLaunchDrawer = ({
         onClose={handleDrawerCloseTrigger}
       >
         <div className="gradiant-container">
-          {/* TODO: fix this icon overlapping other elements on scroll */}
           <CWDrawerTopBar onClose={handleDrawerCloseTrigger} />
 
           {isOpen && (

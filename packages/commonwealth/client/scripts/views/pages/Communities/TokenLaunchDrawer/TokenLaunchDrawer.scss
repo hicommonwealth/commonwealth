@@ -10,6 +10,11 @@
 
     .DrawerTopBar {
       padding: 0;
+      margin-left: -36px;
+
+      @include mediumSmallMid {
+        margin-left: -26px;
+      }
     }
 
     @include mediumSmall {
@@ -25,7 +30,7 @@
       padding-bottom: 60px !important;
 
       @include mediumSmallMid {
-        padding: 24px;
+        padding: 20px 32px;
         padding-bottom: 60px !important;
       }
 
