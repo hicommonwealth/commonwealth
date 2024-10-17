@@ -127,6 +127,8 @@ const StakeIntegration = ({
             onTopicFlowStepChange={onTopicFlowStepChange}
             createdCommunityName={community?.name}
             createdCommunityId={community?.id || ''}
+            namespace={community?.namespace}
+            symbol={community?.default_symbol}
             // @ts-expect-error <StrictNullChecks/>
             selectedAddress={selectedAddress}
             chainId={communityChainId}

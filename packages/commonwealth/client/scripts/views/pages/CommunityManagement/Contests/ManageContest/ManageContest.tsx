@@ -37,10 +37,10 @@ const ManageContest = ({ contestAddress }: ManageContestProps) => {
     contestAddress,
   });
 
-  const chainId = app.chain.meta.ChainNode?.id || 0;
+  const nodeEthChainId = app.chain.meta.ChainNode?.eth_chain_id || 0;
   const { data: tokenMetadata } = useTokenMetadataQuery({
     tokenId: contestFormData?.fundingTokenAddress || '',
-    chainId,
+    nodeEthChainId,
     apiEnabled: !!contestFormData?.fundingTokenAddress,
   });
 
