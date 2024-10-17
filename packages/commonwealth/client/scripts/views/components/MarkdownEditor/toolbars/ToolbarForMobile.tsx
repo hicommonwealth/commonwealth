@@ -4,6 +4,7 @@ import React, { ReactNode, useCallback, useEffect } from 'react';
 import { BlockSelectorButton } from 'views/components/MarkdownEditor/toolbars/BlockSelectorButton';
 import { CWCreateLinkButton } from 'views/components/MarkdownEditor/toolbars/CWCreateLinkButton';
 import { CWFormatButton } from 'views/components/MarkdownEditor/toolbars/CWFormatButton';
+import { CWHeadingButton } from 'views/components/MarkdownEditor/toolbars/CWHeadingButton';
 import { CWListButton } from 'views/components/MarkdownEditor/toolbars/CWListButton';
 import { ImageButton } from 'views/components/MarkdownEditor/toolbars/ImageButton';
 import { MobileOverflowButton } from 'views/components/MarkdownEditor/toolbars/MobileOverflowButton';
@@ -71,6 +72,7 @@ export const ToolbarForMobile = (props: ToolbarForMobileProps) => {
       <CWFormatButton format={IS_BOLD} formatName="bold" />
       <CWFormatButton format={IS_ITALIC} formatName="italic" />
       <CWCreateLinkButton />
+      <CWHeadingButton blockType="quote" />
       <CWListButton listType="bullet" />
       <CWListButton listType="number" />
 
