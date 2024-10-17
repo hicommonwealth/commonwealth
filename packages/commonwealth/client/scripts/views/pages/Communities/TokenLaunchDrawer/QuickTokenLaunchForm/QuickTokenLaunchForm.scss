@@ -26,8 +26,9 @@
 
     .cta-elements {
       display: flex;
+      flex-wrap: wrap;
       flex-direction: row;
-      justify-content: space-between;
+      justify-content: end;
       align-items: center;
       gap: 16px;
 
