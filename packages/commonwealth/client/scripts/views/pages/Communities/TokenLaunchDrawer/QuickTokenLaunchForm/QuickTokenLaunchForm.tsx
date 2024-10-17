@@ -217,7 +217,7 @@ export const QuickTokenLaunchForm = ({
           ...(sanitizedTokenInfo.imageURL && {
             icon_url: sanitizedTokenInfo.imageURL,
           }),
-        });
+        }).catch(() => undefined); // failure of this call shouldn't break this handler
 
         setCreatedCommunityId(communityId);
         onCommunityCreated(communityId);
