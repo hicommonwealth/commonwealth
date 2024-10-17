@@ -22,6 +22,7 @@ export const CWAvatarSkeleton = ({ size }: BaseAvatarProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWAvatar = (props: AvatarProps) => {
   const { avatarUrl, size } = props;
 
@@ -41,6 +42,7 @@ export const CWAvatar = (props: AvatarProps) => {
 
 type JdenticonProps = BaseAvatarProps & { address?: string };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWJdenticon = (props: JdenticonProps) => {
   const { address, size } = props;
 
