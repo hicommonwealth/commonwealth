@@ -41,6 +41,7 @@ export const UrlSelector = ({ onSelect, urlsToSet }: UrlSelectorProps) => {
     return;
   }
 
+  // eslint-disable-next-line react/no-multi-comp
   const EmptyComponent = () => (
     <div className="empty-component">{getEmptyContentMessage()}</div>
   );
