@@ -55,6 +55,10 @@ else
   fi
 fi
 
+if [ "$DD_LOG_LEVEL_LOWER" == "debug" ]; then
+  echo "[DEBUG] DD_HOSTNAME: $DD_HOSTNAME"
+fi
+
 # TODO: does this apply in Docker containers?
 # Disable core checks (these read the host, not the dyno).
 #if [ "$DD_DISABLE_HOST_METRICS" == "true" ]; then
@@ -62,6 +66,9 @@ fi
 #fi
 
 # Update the Postgres configuration from above using the Heroku application environment variable
+if [ "$DD_LOG_LEVEL_LOWER" == "debug" ]; then
+  echo "[DEBUG] DD_ENABLE_HEROKU_POSTGRES: $DD_ENABLE_HEROKU_POSTGRES"
+fi
 if [ "$DD_ENABLE_HEROKU_POSTGRES" == "true" ]; then
     # The default connection URL is set in DATABASE_URL, but can be configured by the user
     if [[ -z ${DD_POSTGRES_URL_VAR} ]]; then
@@ -96,6 +103,9 @@ if [ "$DD_ENABLE_HEROKU_POSTGRES" == "true" ]; then
 fi
 
 # Update the Redis configuration from above using the Heroku application environment variable
+if [ "$DD_LOG_LEVEL_LOWER" == "debug" ]; then
+  echo "[DEBUG] DD_ENABLE_HEROKU_REDIS: $DD_ENABLE_HEROKU_REDIS"
+fi
 if [ "$DD_ENABLE_HEROKU_REDIS" == "true" ]; then
 
   # The default connection URL is set in REDIS_URL, but can be configured by the user
