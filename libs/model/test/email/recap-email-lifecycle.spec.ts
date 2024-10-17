@@ -72,11 +72,13 @@ describe('Recap email lifecycle', () => {
       topic_id: community?.topics?.at(0)?.id,
       pinned: false,
       read_only: false,
+      reaction_weights_sum: '0',
     });
 
     [comment] = await seed('Comment', {
       address_id: community?.Addresses?.at(0)?.id,
       thread_id: thread!.id!,
+      reaction_weights_sum: '0',
     });
   });
 

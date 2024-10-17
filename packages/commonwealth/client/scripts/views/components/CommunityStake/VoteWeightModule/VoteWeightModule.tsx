@@ -17,7 +17,7 @@ import { CWTooltip } from '../../component_kit/new_designs/CWTooltip';
 import './VoteWeightModule.scss';
 
 type VoteWeightModuleProps = {
-  voteWeight: number;
+  voteWeight: string;
   stakeNumber: number;
   stakeValue: number;
   denomination: string;
@@ -72,7 +72,7 @@ export const VoteWeightModule = ({
           />
         </div>
         <CWText className="vote-weight" type="h3" fontWeight="bold">
-          {isNaN(voteWeight) ? 0 : voteWeight}
+          {voteWeight}
         </CWText>
         <div className="info-and-actions">
           <div className="info">

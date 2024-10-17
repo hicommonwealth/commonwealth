@@ -324,6 +324,7 @@ export async function generateThreads(
     topic_id: communityThree?.topics?.at(0)?.id,
     pinned: false,
     read_only: false,
+    reaction_weights_sum: '0',
   });
 
   // 3 threads for communityOne and 1 thread for communityTwo
@@ -334,6 +335,7 @@ export async function generateThreads(
     pinned: false,
     read_only: false,
     view_count: 10,
+    reaction_weights_sum: '0',
   });
   const [threadTwo] = await seed('Thread', {
     address_id: communityOne?.Addresses?.at(0)?.id,
@@ -342,6 +344,7 @@ export async function generateThreads(
     pinned: false,
     read_only: false,
     view_count: 5,
+    reaction_weights_sum: '0',
   });
 
   const [threadThree] = await seed('Thread', {
@@ -351,6 +354,7 @@ export async function generateThreads(
     pinned: false,
     read_only: false,
     view_count: 1,
+    reaction_weights_sum: '0',
   });
 
   const [threadFour] = await seed('Thread', {
@@ -360,6 +364,7 @@ export async function generateThreads(
     pinned: false,
     read_only: false,
     view_count: 10,
+    reaction_weights_sum: '0',
   });
 
   return {

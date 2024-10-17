@@ -364,7 +364,7 @@ const StakeExchangeForm = ({
             </CWText>
           </div>
           <CWText type="caption" className="vote-weight">
-            Current vote weight {currentVoteWeight}
+            Current vote weight {currentVoteWeight?.toString()}
           </CWText>
         </div>
 
@@ -419,7 +419,7 @@ const StakeExchangeForm = ({
             Total weight
           </CWText>
           <CWText type="h3" fontWeight="bold" className="number">
-            {expectedVoteWeight}
+            {expectedVoteWeight?.toString()}
           </CWText>
         </div>
 

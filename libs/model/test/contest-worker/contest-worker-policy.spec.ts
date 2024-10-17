@@ -99,7 +99,7 @@ describe('Contest Worker Policy', () => {
             stage: '',
             view_count: 0,
             reaction_count: 0,
-            reaction_weights_sum: 0,
+            reaction_weights_sum: '0',
             comment_count: 0,
             deleted_at: undefined,
             pinned: false,

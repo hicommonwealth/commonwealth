@@ -162,7 +162,7 @@ describe('Contests projection lifecycle', () => {
           topic_id: undefined,
           view_count: 1,
           reaction_count: 1,
-          reaction_weights_sum: 1,
+          reaction_weights_sum: '1',
           comment_count: 1,
           discord_meta: undefined,
           deleted_at: undefined, // so we can find it!

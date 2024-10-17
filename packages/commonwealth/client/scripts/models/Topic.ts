@@ -28,7 +28,6 @@ class Topic {
   public readonly defaultOffchainTemplate: TopicAttributes['default_offchain_template'];
   public totalThreads: TopicAttributes['total_threads'];
   public readonly activeContestManagers: TopicAttributes['active_contest_managers'];
-  public readonly chainNodeId: TopicAttributes['chain_node_id'];
   public readonly groupIds: TopicAttributes['group_ids'];
   public readonly defaultOffchainTemplateBackup: TopicAttributes['default_offchain_template_backup'];
   public readonly weightedVoting: TopicAttributes['weighted_voting'];
@@ -49,7 +48,6 @@ class Topic {
     total_threads,
     channel_id,
     active_contest_managers,
-    chain_node_id,
     group_ids,
     default_offchain_template_backup,
     weighted_voting,
@@ -69,7 +67,6 @@ class Topic {
     this.totalThreads = total_threads || 0;
     this.channelId = channel_id;
     this.activeContestManagers = active_contest_managers || [];
-    this.chainNodeId = chain_node_id;
     this.groupIds = group_ids;
     this.defaultOffchainTemplateBackup = default_offchain_template_backup;
     this.weightedVoting = weighted_voting;

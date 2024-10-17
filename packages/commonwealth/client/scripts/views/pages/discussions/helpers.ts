@@ -1,3 +1,4 @@
+import { BigNumber } from 'ethers';
 import moment from 'moment';
 import type Thread from '../../../models/Thread';
 import { ThreadFeaturedFilterTypes } from '../../../models/types';
@@ -45,7 +46,18 @@ export const sortByFeaturedFilter = (t: Thread[], featuredFilter) => {
   }
 
   if (featuredFilter === ThreadFeaturedFilterTypes.MostLikes) {
-    return [...t].sort((a, b) => b.reactionWeightsSum - a.reactionWeightsSum);
+    return [...t].sort((a, b) => {
+      const aWeight = BigNumber.from(a.reactionWeightsSum);
+      const bWeight = BigNumber.from(b.reactionWeightsSum);
+
+      if (aWeight.lt(bWeight)) {
+        return 1;
+      } else if (aWeight.gt(bWeight)) {
+        return -1;
+      } else {
+        return 0;
+      }
+    });
   }
 
   if (featuredFilter === ThreadFeaturedFilterTypes.LatestActivity) {
