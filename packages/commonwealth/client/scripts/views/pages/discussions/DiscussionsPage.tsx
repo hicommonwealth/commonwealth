@@ -41,8 +41,6 @@ import { UserTrainingSlider } from '../../components/UserTrainingSlider';
 import { DiscussionsFeedDiscovery } from './DiscussionsFeedDiscovery';
 import { EmptyThreadsPlaceholder } from './EmptyThreadsPlaceholder';
 
-const ETH_CHAIN_NODE_ID = 37;
-
 type DiscussionsPageProps = {
   topicName?: string;
 };
@@ -111,7 +109,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
 
   const { data: tokenMetadata } = useTokenMetadataQuery({
     tokenId: topicObj?.tokenAddress || '',
-    chainId: ETH_CHAIN_NODE_ID,
+    nodeEthChainId: app?.chain.meta?.ChainNode?.eth_chain_id || 0,
   });
 
   const { fetchNextPage, data, isInitialLoading, hasNextPage } =
