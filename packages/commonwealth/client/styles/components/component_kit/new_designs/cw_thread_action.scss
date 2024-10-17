@@ -63,14 +63,14 @@
     }
 
     &.selected {
-      color: $blue-500;
+      color: $primary-500;
 
       &:hover {
-        color: $blue-500;
+        color: $primary-500;
       }
 
       .Text {
-        color: $blue-500 !important;
+        color: $primary-500 !important;
       }
     }
 

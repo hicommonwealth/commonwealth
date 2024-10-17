@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import Thread from 'models/Thread';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useCreateThreadSubscriptionMutation } from 'state/api/trpc/subscription/useCreateThreadSubscriptionMutation';
@@ -76,7 +77,7 @@ export const ToggleThreadSubscribe = (props: ToggleThreadSubscribeProps) => {
     <CWThreadAction
       action="subscribe"
       label={hasThreadSubscription ? 'Subscribed' : 'Subscribe'}
-      className={`subscribe ${hasThreadSubscription ? 'selected' : ''}`}
+      className={clsx('subscribe', { selected: hasThreadSubscription })}
       onClick={handleToggleSubscribe}
       selected={!hasThreadSubscription}
       disabled={!isCommunityMember}
