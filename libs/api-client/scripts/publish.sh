@@ -12,4 +12,5 @@ if [ "$CURRENT_VERSION" != "$LOCAL_VERSION" ]; then
   pnpm generate-client
   # without --no-git-checks pnpm doesn't want to publish the uncommited/generated src/ files
   pnpm publish --no-git-checks
+  fern generate --docs
 fi
