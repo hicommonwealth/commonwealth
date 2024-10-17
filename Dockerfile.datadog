@@ -26,4 +26,4 @@ RUN apt-get update && apt-get -y install --reinstall datadog-agent
 EXPOSE 8125/udp 8126/tcp
 
 # output dir MUST match directory set to DD_CONF_DIR in datadog-entrypoint.sh
-COPY datadog-config/ /etc/datadog-agent/
+# COPY datadog-config/ /etc/datadog-agent/
