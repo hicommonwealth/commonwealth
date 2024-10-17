@@ -71,21 +71,19 @@ export function CreateGroup(): Command<
               },
             );
 
-            // add topic level interaction permissions for current group
-            await Promise.all(
-              (payload.topics || [])?.map(async (t) => {
-                if (group.id) {
-                  await models.GroupPermission.create(
-                    {
-                      group_id: group.id,
-                      topic_id: t.id,
-                      allowed_actions: t.permissions,
-                    },
-                    { transaction },
-                  );
-                }
-              }),
-            );
+            if (group.id) {
+              // add topic level interaction permissions for current group
+              const groupPermissions = (payload.topics || []).map((t) => ({
+                group_id: group.id!,
+                topic_id: t.id,
+                allowed_actions: sequelize.literal(
+                  `ARRAY[${t.permissions.map((p) => `'${p}'`).join(', ')}]::"enum_GroupPermissions_allowed_actions"[]`,
+                ) as unknown as schemas.PermissionEnum[],
+              }));
+              await models.GroupPermission.bulkCreate(groupPermissions, {
+                transaction,
+              });
+            }
           }
           return group.toJSON();
         },
