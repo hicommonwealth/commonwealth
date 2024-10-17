@@ -188,8 +188,7 @@ export const AuthorAndPublishInfo = ({
             <CWPopover
               content={
                 <div className="collaborators">
-                  {/*@ts-expect-error <StrictNullChecks>*/}
-                  {collaboratorsInfo.map(
+                  {collaboratorsInfo?.map(
                     ({
                       User,
                     }: {
