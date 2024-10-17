@@ -18,7 +18,7 @@ module.exports = {
         'reaction_weights_sum',
         {
           type: Sequelize.NUMERIC(78, 0), // up to 78 digits with no decimal places
-          allowNull: true,
+          allowNull: false,
         },
         { transaction },
       );
@@ -27,7 +27,7 @@ module.exports = {
         'reaction_weights_sum',
         {
           type: Sequelize.NUMERIC(78, 0), // up to 78 digits with no decimal places
-          allowNull: true,
+          allowNull: false,
         },
         { transaction },
       );

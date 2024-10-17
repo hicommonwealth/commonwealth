@@ -49,7 +49,9 @@ export const Thread = z.object({
 
   //counts
   reaction_count: PG_INT.optional(),
-  reaction_weights_sum: z.string().nullish(),
+  reaction_weights_sum: z.string().refine((str) => {
+    return /^[0-9]+$/.test(str); // only numbers
+  }),
   comment_count: PG_INT.optional().optional(),
 
   activity_rank_date: z.coerce.date().nullish(),
