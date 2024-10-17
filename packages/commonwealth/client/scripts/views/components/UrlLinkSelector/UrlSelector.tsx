@@ -1,10 +1,9 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback } from 'react';
 
 import 'components/UrlLinkSelector.scss';
-import app from 'state';
-import { CWTextInput } from 'views/components/component_kit/cw_text_input';
-import { QueryList } from 'views/components/component_kit/cw_query_list';
 import { Link } from 'models/Thread';
+import app from 'state';
+import { QueryList } from 'views/components/component_kit/cw_query_list';
 import { UrlSelectorItem } from './UrlSelectorItem';
 
 type UrlSelectorProps = {
@@ -22,18 +21,20 @@ export const UrlSelector = ({ onSelect, urlsToSet }: UrlSelectorProps) => {
   const renderItem = useCallback(
     (i: number, url: Link) => {
       const isSelected = !!urlsToSet.find(
-        ({ identifier }) => identifier === url.identifier
+        ({ identifier }) => identifier === url.identifier,
       );
 
       return (
-        <UrlSelectorItem
-          link={url}
-          onClick={() => onSelect(url)}
-          isSelected={isSelected}
-        />
+        <div className="linked-url-item">
+          <UrlSelectorItem
+            link={url}
+            onClick={() => onSelect(url)}
+            isSelected={isSelected}
+          />
+        </div>
       );
     },
-    [onSelect, urlsToSet]
+    [onSelect, urlsToSet],
   );
 
   if (!app.chain || !app.activeChainId()) {
