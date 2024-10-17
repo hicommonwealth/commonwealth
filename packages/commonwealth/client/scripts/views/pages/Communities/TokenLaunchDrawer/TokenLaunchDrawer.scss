@@ -13,8 +13,6 @@
     }
 
     @include mediumSmall {
-      top: 48px !important;
-
       > .QuickTokenLaunchForm {
         padding: 0 16px;
       }
