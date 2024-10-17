@@ -1,4 +1,4 @@
-import { TopicWeightedVoting } from '@hicommonwealth/schemas';
+import { PermissionEnum, TopicWeightedVoting } from '@hicommonwealth/schemas';
 import { getProposalUrlPath } from 'identifiers';
 import { getScopePrefix, useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useRef, useState } from 'react';
@@ -24,10 +24,10 @@ import { getThreadActionTooltipText } from 'helpers/threads';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import { useFlag } from 'hooks/useFlag';
 import useManageDocumentTitle from 'hooks/useManageDocumentTitle';
+import useTopicGating from 'hooks/useTopicGating';
 import 'pages/discussions/index.scss';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { useFetchCustomDomainQuery } from 'state/api/configuration';
-import { useRefreshMembershipQuery } from 'state/api/groups';
 import useUserStore from 'state/ui/user';
 import Permissions from 'utils/Permissions';
 import { checkIsTopicInContest } from 'views/components/NewThreadFormLegacy/helpers';
@@ -40,8 +40,6 @@ import { AdminOnboardingSlider } from '../../components/AdminOnboardingSlider';
 import { UserTrainingSlider } from '../../components/UserTrainingSlider';
 import { DiscussionsFeedDiscovery } from './DiscussionsFeedDiscovery';
 import { EmptyThreadsPlaceholder } from './EmptyThreadsPlaceholder';
-
-const ETH_CHAIN_NODE_ID = 37;
 
 type DiscussionsPageProps = {
   topicName?: string;
@@ -91,9 +89,9 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
 
   const user = useUserStore();
 
-  const { data: memberships = [] } = useRefreshMembershipQuery({
+  const { memberships, topicPermissions } = useTopicGating({
     communityId: communityId,
-    address: user.activeAccount?.address || '',
+    userAddress: user.activeAccount?.address || '',
     apiEnabled: !!user.activeAccount?.address && !!communityId,
   });
 
@@ -111,7 +109,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
 
   const { data: tokenMetadata } = useTokenMetadataQuery({
     tokenId: topicObj?.tokenAddress || '',
-    chainId: ETH_CHAIN_NODE_ID,
+    nodeEthChainId: app?.chain.meta?.ChainNode?.eth_chain_id || 0,
   });
 
   const { fetchNextPage, data, isInitialLoading, hasNextPage } =
@@ -209,18 +207,22 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
           const isTopicGated = !!(memberships || []).find(
             (membership) =>
               thread?.topic?.id &&
-              membership.topicIds.includes(thread.topic.id),
+              membership.topics.find((t) => t.id === thread.topic.id),
           );
 
           const isActionAllowedInGatedTopic = !!(memberships || []).find(
             (membership) =>
               thread?.topic?.id &&
-              membership.topicIds.includes(thread.topic.id) &&
+              membership.topics.find((t) => t.id === thread.topic.id) &&
               membership.isAllowed,
           );
 
           const isRestrictedMembership =
             !isAdmin && isTopicGated && !isActionAllowedInGatedTopic;
+
+          const foundTopicPermissions = topicPermissions.find(
+            (tp) => tp.id === thread.topic.id,
+          );
 
           const disabledActionsTooltipText = getThreadActionTooltipText({
             isCommunityMember: !!user.activeAccount,
@@ -228,6 +230,32 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
             isThreadLocked: !!thread?.lockedAt,
             isThreadTopicGated: isRestrictedMembership,
           });
+
+          const disabledReactPermissionTooltipText = getThreadActionTooltipText(
+            {
+              isCommunityMember: !!user.activeAccount,
+              threadTopicInteractionRestrictions:
+                !isAdmin &&
+                !foundTopicPermissions?.permissions?.includes(
+                  // this should be updated if we start displaying recent comments on this page
+                  PermissionEnum.CREATE_THREAD_REACTION,
+                )
+                  ? foundTopicPermissions?.permissions
+                  : undefined,
+            },
+          );
+
+          const disabledCommentPermissionTooltipText =
+            getThreadActionTooltipText({
+              isCommunityMember: !!user.activeAccount,
+              threadTopicInteractionRestrictions:
+                !isAdmin &&
+                !foundTopicPermissions?.permissions?.includes(
+                  PermissionEnum.CREATE_COMMENT,
+                )
+                  ? foundTopicPermissions?.permissions
+                  : undefined,
+            });
 
           const isThreadTopicInContest = checkIsTopicInContest(
             contestsData,
@@ -238,8 +266,16 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
             <ThreadCard
               key={thread?.id + '-' + thread.readOnly}
               thread={thread}
-              canReact={!disabledActionsTooltipText}
-              canComment={!disabledActionsTooltipText}
+              canReact={
+                disabledReactPermissionTooltipText
+                  ? !disabledReactPermissionTooltipText
+                  : !disabledActionsTooltipText
+              }
+              canComment={
+                disabledCommentPermissionTooltipText
+                  ? !disabledCommentPermissionTooltipText
+                  : !disabledActionsTooltipText
+              }
               onEditStart={() => navigate(`${discussionLink}`)}
               onStageTagClick={() => {
                 navigate(`/discussions?stage=${thread.stage}`);
@@ -254,7 +290,11 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
               onCommentBtnClick={() =>
                 navigate(`${discussionLink}?focusComments=true`)
               }
-              disabledActionsTooltipText={disabledActionsTooltipText}
+              disabledActionsTooltipText={
+                disabledCommentPermissionTooltipText ||
+                disabledReactPermissionTooltipText ||
+                disabledActionsTooltipText
+              }
               hideRecentComments
               editingDisabled={isThreadTopicInContest}
             />

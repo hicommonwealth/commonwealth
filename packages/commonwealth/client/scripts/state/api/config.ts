@@ -36,6 +36,7 @@ export const ApiEndpoints = {
   searchProfiles: (searchTerm: string) => `/profiles?search=${searchTerm}`,
   searchChains: (searchTerm: string) => `/communities?search=${searchTerm}`,
   VIEW_COUNT: '/viewCount',
+  GENERATE_IMAGE: '/generateImage',
 };
 
 export const ContractMethods = {

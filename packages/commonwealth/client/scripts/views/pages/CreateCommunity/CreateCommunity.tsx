@@ -10,12 +10,15 @@ import SuccessStep from './steps/SuccessStep';
 import useCreateCommunity from './useCreateCommunity';
 import { CreateCommunityStep, getFormSteps } from './utils';
 
+import { useFlag } from 'hooks/useFlag';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import useAppStatus from '../../../hooks/useAppStatus';
 import './CreateCommunity.scss';
 import CommunityInformationStep from './steps/CommunityInformationStep';
 
 const CreateCommunity = () => {
+  const weightedTopicsEnabled = useFlag('weightedTopics');
+
   const {
     createCommunityStep,
     selectedCommunity,
@@ -73,6 +76,7 @@ const CreateCommunity = () => {
             selectedAddress={selectedAddress}
             // @ts-expect-error <StrictNullChecks/>
             chainId={selectedChainId}
+            onlyNamespace={weightedTopicsEnabled}
           />
         );
 
@@ -86,7 +90,11 @@ const CreateCommunity = () => {
       <div className="CreateCommunity">
         {!isSuccessStep && (
           <CWFormSteps
-            steps={getFormSteps(createCommunityStep, showCommunityStakeStep)}
+            steps={getFormSteps(
+              createCommunityStep,
+              showCommunityStakeStep,
+              weightedTopicsEnabled,
+            )}
           />
         )}
 

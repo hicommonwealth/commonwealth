@@ -7,7 +7,7 @@ import {
   dispose,
   query,
 } from '@hicommonwealth/core';
-import { TopicWeightedVoting } from '@hicommonwealth/schemas';
+import { PermissionEnum, TopicWeightedVoting } from '@hicommonwealth/schemas';
 import { ChainBase, ChainType } from '@hicommonwealth/shared';
 import { Chance } from 'chance';
 import { CreateTopic } from 'model/src/community/CreateTopic.command';
@@ -38,7 +38,10 @@ import { seed } from '../../src/tester';
 
 const chance = Chance();
 
-function buildCreateGroupPayload(community_id: string, topics: number[] = []) {
+function buildCreateGroupPayload(
+  community_id: string,
+  topics: { id: number; permissions: PermissionEnum[] }[] = [],
+) {
   return {
     community_id,
     metadata: {
@@ -355,7 +358,35 @@ describe('Community lifecycle', () => {
       await expect(
         command(CreateGroup(), {
           actor: ethAdminActor,
-          payload: buildCreateGroupPayload(community.id, [1, 2, 3]),
+          payload: buildCreateGroupPayload(community.id, [
+            {
+              id: 1,
+              permissions: [
+                PermissionEnum.CREATE_COMMENT,
+                PermissionEnum.CREATE_THREAD,
+                PermissionEnum.CREATE_COMMENT_REACTION,
+                PermissionEnum.CREATE_THREAD_REACTION,
+              ],
+            },
+            {
+              id: 2,
+              permissions: [
+                PermissionEnum.CREATE_COMMENT,
+                PermissionEnum.CREATE_THREAD,
+                PermissionEnum.CREATE_COMMENT_REACTION,
+                PermissionEnum.CREATE_THREAD_REACTION,
+              ],
+            },
+            {
+              id: 3,
+              permissions: [
+                PermissionEnum.CREATE_COMMENT,
+                PermissionEnum.CREATE_THREAD,
+                PermissionEnum.CREATE_COMMENT_REACTION,
+                PermissionEnum.CREATE_THREAD_REACTION,
+              ],
+            },
+          ]),
         }),
       ).rejects.toThrow(CreateGroupErrors.InvalidTopics);
     });
