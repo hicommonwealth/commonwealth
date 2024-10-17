@@ -88,11 +88,9 @@ if [ "$DD_ENABLE_HEROKU_POSTGRES" == "true" ]; then
   touch "$POSTGRES_CONF/conf.yaml"
   echo -e "init_config: \ninstances: \n" > "$POSTGRES_CONF/conf.yaml"
 
-  echo "[DEBUG] Creating Datadog Postgres integration config (DD_POSTGRES_URL_VAR: $DD_POSTGRES_URL_VAR)..."
   for PG_URL in $DD_POSTGRES_URL_VAR
   do
     if [ -n "${!PG_URL}" ]; then
-      echo "DB_URL: ${!PG_URL}"
       POSTGREGEX='^postgres://([^:]+):([^@]+)@([^:]+):([^/]+)/(.*)$'
       if [[ ${!PG_URL} =~ $POSTGREGEX ]]; then
         echo -e "  - host: ${BASH_REMATCH[3]}" >>  "$POSTGRES_CONF/conf.yaml"
@@ -174,9 +172,9 @@ if [ -n "$DISABLE_DATADOG_AGENT" ]; then
   echo "The Datadog Agent has been disabled. Unset the DISABLE_DATADOG_AGENT or set missing environment variables."
 else
   if [ "$APP_ENV" = "production" ] || [ "$ENABLE_DATADOG_AGENT" = "true" ]; then
-    datadog-agent run -c $DATADOG_CONF &
-    /opt/datadog-agent/embedded/bin/trace-agent -c $DATADOG_CONF  &
-    /opt/datadog-agent/embedded/bin/process-agent -c $DATADOG_CONF &
+    datadog-agent run -C $DATADOG_CONF &
+    /opt/datadog-agent/embedded/bin/trace-agent -C $DATADOG_CONF  &
+    /opt/datadog-agent/embedded/bin/process-agent --cfgpath $DATADOG_CONF &
   fi
 fi
 
