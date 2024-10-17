@@ -1,10 +1,11 @@
 import { z } from 'zod';
-import { Thread } from '../entities';
+import { ContestManager, Thread, Topic } from '../entities';
+import * as projections from '../projections';
 import {
   DiscordMetaSchema,
+  PG_INT,
   linksSchema,
   paginationSchema,
-  PG_INT,
 } from '../utils';
 
 export const OrderByQueriesKeys = z.enum([
@@ -138,4 +139,21 @@ export const GetThreads = {
     numVotingThreads: z.number(),
     threads: z.array(MappedThread),
   }),
+};
+
+export const ActiveContestManager = ContestManager.extend({
+  content: z.array(projections.ContestAction),
+});
+
+export const ExtendedTopic = Topic.extend({
+  total_threads: z.number(),
+  active_contest_managers: z.array(ActiveContestManager),
+});
+
+export const GetTopics = {
+  input: z.object({
+    community_id: z.string(),
+    with_contest_managers: z.boolean().optional(),
+  }),
+  output: z.array(ExtendedTopic),
 };

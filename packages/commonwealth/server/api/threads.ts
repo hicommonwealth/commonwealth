@@ -5,6 +5,7 @@ import { MixpanelCommunityInteractionEvent } from '../../shared/analytics/types'
 import { applyCanvasSignedDataMiddleware } from '../federation';
 
 export const trpcRouter = trpc.router({
+  getTopics: trpc.query(Thread.GetTopics, trpc.Tag.Thread),
   createThread: trpc.command(
     Thread.CreateThread,
     trpc.Tag.Thread,
