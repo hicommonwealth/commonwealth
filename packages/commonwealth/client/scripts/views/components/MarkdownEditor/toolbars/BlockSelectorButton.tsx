@@ -1,7 +1,8 @@
 import { currentBlockType$, useCellValue } from 'commonwealth-mdxeditor';
 import React, { useCallback } from 'react';
 import { CWHeadingButton } from 'views/components/MarkdownEditor/toolbars/CWHeadingButton';
-import { blockTypeToIcon } from 'views/components/MarkdownEditor/toolbars/blockTypeToIcon';
+import { blockTypeToIconName } from 'views/components/MarkdownEditor/toolbars/blockTypeToIconName';
+import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import CWPopover, {
   usePopover,
 } from 'views/components/component_kit/new_designs/CWPopover';
@@ -33,9 +34,19 @@ export const BlockSelectorButton = (props: BlockSelectorButtonProps) => {
     [popoverProps],
   );
 
+  // FIXME use click away listener...
+  // FIXME what about list items that don't have an icon when you place the
+  // cursor in the wrong block. No icon will be picked.
+  // FIXME: the spacing for the P icon is wrong
+  //
+
+  const iconName = blockTypeToIconName(currentBlockType);
+
   return (
     <div className="BlockSelectorButton">
-      <button onClick={handleClick}>{blockTypeToIcon(currentBlockType)}</button>
+      <button onClick={handleClick}>
+        {iconName && <CWIcon iconName={iconName} />}
+      </button>
 
       <CWPopover
         className="FormattingPopover"

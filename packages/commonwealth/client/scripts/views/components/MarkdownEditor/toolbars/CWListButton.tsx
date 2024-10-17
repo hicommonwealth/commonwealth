@@ -13,6 +13,7 @@ export type ListType = 'number' | 'bullet' | 'check';
 
 export type CWListButtonProps = Readonly<{
   listType: ListType;
+  onClick?: (event: React.MouseEvent<HTMLElement, MouseEvent>) => void;
 }>;
 
 function listTypeToIconName(listType: ListType) {
@@ -27,7 +28,7 @@ function listTypeToIconName(listType: ListType) {
 }
 
 export const CWListButton = (props: CWListButtonProps) => {
-  const { listType } = props;
+  const { listType, onClick } = props;
 
   const [currentListType] = useCellValues(currentListType$);
 
@@ -35,13 +36,17 @@ export const CWListButton = (props: CWListButtonProps) => {
 
   const active = listType === currentListType;
 
-  const handleClick = useCallback(() => {
-    if (active) {
-      applyListType('');
-    } else {
-      applyListType(listType);
-    }
-  }, [active, applyListType, listType]);
+  const handleClick = useCallback(
+    (event: React.MouseEvent<HTMLElement, MouseEvent>) => {
+      if (active) {
+        applyListType('');
+      } else {
+        applyListType(listType);
+      }
+      onClick?.(event);
+    },
+    [active, applyListType, listType, onClick],
+  );
 
   return (
     <CWTooltip

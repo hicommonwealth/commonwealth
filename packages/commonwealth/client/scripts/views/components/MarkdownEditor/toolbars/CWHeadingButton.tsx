@@ -1,6 +1,5 @@
 import { $createHeadingNode, $createQuoteNode } from '@lexical/rich-text';
 import {
-  applyFormat$,
   convertSelectionToNode$,
   currentBlockType$,
   useCellValue,
@@ -22,7 +21,6 @@ export const CWHeadingButton = (props: CWHeadingButtonProps) => {
 
   const currentBlockType = useCellValue(currentBlockType$);
   const convertSelectionToNode = usePublisher(convertSelectionToNode$);
-  const applyFormat = usePublisher(applyFormat$);
 
   const active = currentBlockType === blockType;
 
@@ -45,12 +43,10 @@ export const CWHeadingButton = (props: CWHeadingButtonProps) => {
 
       onClick?.(event);
     },
-    [active, applyFormat, blockType, convertSelectionToNode, onClick],
+    [active, blockType, convertSelectionToNode, onClick],
   );
 
   // TODO: there's a bug in handleInteraction here where it's not going away
-  // TODO: same thing with onMouseLeave. It doesn't reliably seem to nuke
-  // the tooltip
 
   return (
     <CWTooltip

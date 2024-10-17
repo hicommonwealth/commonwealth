@@ -45,7 +45,7 @@ export const MobileOverflowButton = (props: MobileOverflowButtonProps) => {
                 format={IS_STRIKETHROUGH}
                 formatName="strikethrough"
               />
-              <CWListButton listType="check" />
+              <CWListButton listType="check" onClick={handleClick} />
             </div>
           }
           {...popoverProps}
