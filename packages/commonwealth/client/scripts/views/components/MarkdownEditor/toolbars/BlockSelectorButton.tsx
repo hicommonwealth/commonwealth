@@ -41,7 +41,6 @@ export const BlockSelectorButton = (props: BlockSelectorButtonProps) => {
 
   // FIXME what about list items that don't have an icon when you place the
   // cursor in the wrong block. No icon will be picked.
-  // FIXME: the spacing for the P icon is wrong
 
   const iconName = blockTypeToIconName(currentBlockType);
 

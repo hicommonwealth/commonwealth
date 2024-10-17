@@ -50,7 +50,7 @@ export const CWHeadingButton = (props: CWHeadingButtonProps) => {
 
   return (
     <CWTooltip
-      content={`Change to ${blockType.toUpperCase()}`}
+      content={`Change to ${blockType}`}
       renderTrigger={(handleInteraction) => (
         <CWIconButton
           className={active ? 'CWHeadingButtonActive' : ''}

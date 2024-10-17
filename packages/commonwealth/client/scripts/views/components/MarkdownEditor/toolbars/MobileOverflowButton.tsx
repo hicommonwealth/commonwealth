@@ -1,5 +1,9 @@
 import ClickAwayListener from '@mui/base/ClickAwayListener';
-import { IS_STRIKETHROUGH } from 'commonwealth-mdxeditor';
+import {
+  IS_STRIKETHROUGH,
+  InsertCodeBlock,
+  InsertTable,
+} from 'commonwealth-mdxeditor';
 import React, { useCallback } from 'react';
 import { CWFormatButton } from 'views/components/MarkdownEditor/toolbars/CWFormatButton';
 import { CWListButton } from 'views/components/MarkdownEditor/toolbars/CWListButton';
@@ -45,7 +49,9 @@ export const MobileOverflowButton = (props: MobileOverflowButtonProps) => {
                 format={IS_STRIKETHROUGH}
                 formatName="strikethrough"
               />
+              <InsertCodeBlock />
               <CWListButton listType="check" onClick={handleClick} />
+              <InsertTable />
             </div>
           }
           {...popoverProps}
