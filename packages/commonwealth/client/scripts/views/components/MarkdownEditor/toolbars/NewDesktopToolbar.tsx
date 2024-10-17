@@ -5,7 +5,7 @@ import './NewToolbar.scss';
 type NewDesktopToolbarProps = Readonly<{
   focus: () => void;
 }>;
-
+//FIXME remove
 export const NewDesktopToolbar = (props: NewDesktopToolbarProps) => {
   const { focus } = props;
   return (

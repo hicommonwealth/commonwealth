@@ -13,15 +13,7 @@ import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip'
 import './CWHeadingButton.scss';
 
 export type HeadingButtonProps = Readonly<{
-  blockType:
-    | 'h1'
-    | 'h2'
-    | 'h3'
-    | 'quote'
-    | 'p'
-    | 'bold'
-    | 'underline'
-    | 'italic';
+  blockType: 'h1' | 'h2' | 'h3' | 'quote' | 'p';
   onClick?: (event: React.MouseEvent<HTMLElement, MouseEvent>) => void;
 }>;
 
@@ -45,11 +37,6 @@ export const CWHeadingButton = (props: HeadingButtonProps) => {
             break;
           case 'quote':
             convertSelectionToNode(() => $createQuoteNode());
-            break;
-          case 'bold':
-          case 'underline':
-          case 'italic':
-            applyFormat(blockType);
             break;
         }
       } else {

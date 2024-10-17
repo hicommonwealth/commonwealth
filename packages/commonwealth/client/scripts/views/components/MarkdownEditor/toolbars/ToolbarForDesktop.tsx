@@ -4,11 +4,17 @@ import {
   CreateLink,
   InsertCodeBlock,
   InsertTable,
+  IS_BOLD,
+  IS_ITALIC,
+  IS_STRIKETHROUGH,
+  IS_SUBSCRIPT,
+  IS_SUPERSCRIPT,
+  IS_UNDERLINE,
   ListsToggle,
   Separator,
-  StrikeThroughSupSubToggles,
 } from 'commonwealth-mdxeditor';
 import React from 'react';
+import { CWFormatButton } from 'views/components/MarkdownEditor/toolbars/CWFormatButton';
 import { CWHeadingButton } from 'views/components/MarkdownEditor/toolbars/CWHeadingButton';
 import { ImageButton } from 'views/components/MarkdownEditor/toolbars/ImageButton';
 import { QuoteButton } from 'views/components/MarkdownEditor/toolbars/QuoteButton';
@@ -41,12 +47,28 @@ export const ToolbarForDesktop = (props: ToolbarForDesktopProps) => {
                   </div>
 
                   <Separator />
-                  <CWHeadingButton blockType="bold" />
-                  <CWHeadingButton blockType="underline" />
-                  <CWHeadingButton blockType="italic" />
+                  <CWFormatButton format={IS_BOLD} formatName="bold" />
+                  <CWFormatButton
+                    format={IS_UNDERLINE}
+                    formatName="underline"
+                  />
+                  <CWFormatButton format={IS_ITALIC} formatName="italic" />
                   <Separator />
 
-                  <StrikeThroughSupSubToggles />
+                  <CWFormatButton
+                    format={IS_STRIKETHROUGH}
+                    formatName="strikethrough"
+                  />
+
+                  <CWFormatButton
+                    format={IS_SUPERSCRIPT}
+                    formatName="superscript"
+                  />
+
+                  <CWFormatButton
+                    format={IS_SUBSCRIPT}
+                    formatName="subscript"
+                  />
 
                   <Separator />
 
