@@ -1,6 +1,7 @@
 import { DEFAULT_NAME } from '@hicommonwealth/shared';
 import { APIOrderDirection } from 'helpers/constants';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
+import useTopicGating from 'hooks/useTopicGating';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useMemo, useState } from 'react';
@@ -12,10 +13,7 @@ import {
 import app from 'state';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { ApiEndpoints, queryClient } from 'state/api/config';
-import {
-  useFetchGroupsQuery,
-  useRefreshMembershipQuery,
-} from 'state/api/groups';
+import { useFetchGroupsQuery } from 'state/api/groups';
 import { SearchProfilesResponse } from 'state/api/profiles/searchProfiles';
 import useGroupMutationBannerStore from 'state/ui/group';
 import useUserStore from 'state/ui/user';
@@ -81,9 +79,9 @@ const CommunityMembersPage = () => {
     });
 
   const communityId = app.activeChainId() || '';
-  const { data: memberships = null } = useRefreshMembershipQuery({
+  const { memberships } = useTopicGating({
     communityId,
-    address: user?.activeAccount?.address || '',
+    userAddress: user?.activeAccount?.address || '',
     apiEnabled: !!user?.activeAccount?.address && !!communityId,
   });
 

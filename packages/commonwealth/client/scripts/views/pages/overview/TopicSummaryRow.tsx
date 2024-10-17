@@ -1,11 +1,12 @@
+import { PermissionEnum } from '@hicommonwealth/schemas';
 import { slugify } from '@hicommonwealth/shared';
 import { getThreadActionTooltipText } from 'helpers/threads';
+import useTopicGating from 'hooks/useTopicGating';
 import { getProposalUrlPath } from 'identifiers';
 import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/overview/TopicSummaryRow.scss';
 import React from 'react';
 import app from 'state';
-import { useRefreshMembershipQuery } from 'state/api/groups';
 import useUserStore from 'state/ui/user';
 import Permissions from 'utils/Permissions';
 import type Thread from '../../../models/Thread';
@@ -31,9 +32,10 @@ export const TopicSummaryRow = ({
   const user = useUserStore();
 
   const communityId = app.activeChainId() || '';
-  const { data: memberships = [] } = useRefreshMembershipQuery({
+
+  const { memberships, topicPermissions } = useTopicGating({
     communityId,
-    address: user.activeAccount?.address || '',
+    userAddress: user.activeAccount?.address || '',
     apiEnabled: !!user.activeAccount?.address || !!communityId,
   });
 
@@ -92,18 +94,22 @@ export const TopicSummaryRow = ({
           const isTopicGated = !!(memberships || []).find(
             (membership) =>
               thread?.topic?.id &&
-              membership.topicIds.includes(thread.topic.id),
+              membership.topics.find((t) => t.id === thread.topic.id),
           );
 
           const isActionAllowedInGatedTopic = !!(memberships || []).find(
             (membership) =>
               thread?.topic?.id &&
-              membership.topicIds.includes(thread.topic.id) &&
+              membership.topics.find((t) => t.id === thread.topic.id) &&
               membership.isAllowed,
           );
 
           const isRestrictedMembership =
             !isAdmin && isTopicGated && !isActionAllowedInGatedTopic;
+
+          const foundTopicPermissions = topicPermissions.find(
+            (tp) => tp.id === thread.topic.id,
+          );
 
           const disabledActionsTooltipText = getThreadActionTooltipText({
             isCommunityMember: Permissions.isCommunityMember(
@@ -112,6 +118,13 @@ export const TopicSummaryRow = ({
             isThreadArchived: !!thread?.archivedAt,
             isThreadLocked: !!thread?.lockedAt,
             isThreadTopicGated: isRestrictedMembership,
+            threadTopicInteractionRestrictions:
+              !isAdmin &&
+              !foundTopicPermissions?.permissions?.includes(
+                PermissionEnum.CREATE_COMMENT, // on this page we only show comment option
+              )
+                ? foundTopicPermissions?.permissions
+                : undefined,
           });
 
           return (

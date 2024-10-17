@@ -6,7 +6,10 @@ import {
   type Context,
   type Handler,
 } from '@hicommonwealth/core';
-import { Group, GroupPermissionAction } from '@hicommonwealth/schemas';
+import {
+  Group,
+  GroupPermissionAction,
+} from '@hicommonwealth/schemas';
 import { Role } from '@hicommonwealth/shared';
 import { Op, QueryTypes } from 'sequelize';
 import { ZodSchema, z } from 'zod';
@@ -182,7 +185,7 @@ async function buildAuth(
 /**
  * Checks if actor passes a set of requirements and grants access for all groups of the given topic
  */
-async function isTopicMember(
+async function hasTopicInteractionPermissions(
   actor: Actor,
   auth: AuthContext,
   action: GroupPermissionAction,
@@ -194,39 +197,45 @@ async function isTopicMember(
 
   if (auth.topic.group_ids?.length === 0) return;
 
+  // check if user has permission to perform "action" in 'topic_id'
+  // the 'topic_id' can belong to any group where user has membership
+  // the group with 'topic_id' having higher permissions will take precedence
   const groups = await models.sequelize.query<
     z.infer<typeof Group> & {
       allowed_actions?: GroupPermissionAction[];
     }
   >(
     `
-    SELECT g.*, gp.allowed_actions
+    SELECT 
+      g.*, 
+      gp.allowed_actions as allowed_actions
     FROM "Groups" as g 
-    LEFT JOIN "GroupPermissions" gp ON g.id = gp.group_id
-    WHERE g.community_id = :community_id AND g.id IN (:group_ids);
+    LEFT JOIN "GroupPermissions" gp ON g.id = gp.group_id AND gp.topic_id = :topic_id
+    WHERE g.community_id = :community_id
     `,
     {
       type: QueryTypes.SELECT,
       raw: true,
       replacements: {
         community_id: auth.topic.community_id,
-        group_ids: auth.topic.group_ids,
+        topic_id: auth.topic.id,
       },
     },
   );
 
   // There are 2 cases here. We either have the old group permission system where the group doesn't have
-  // any allowed_actions, or we have the new fine-grained permission system where the action must be in
-  // the allowed_actions list.
-  const allowed = groups.filter(
+  // any group_allowed_actions, or we have the new fine-grained permission system where the action must be in
+  // the group_allowed_actions list.
+  const allowedGroupActions = groups.filter(
     (g) => !g.allowed_actions || g.allowed_actions.includes(action),
   );
-  if (!allowed.length!) throw new NonMember(actor, auth.topic.name, action);
+  if (!allowedGroupActions.length!)
+    throw new NonMember(actor, auth.topic.name, action);
 
   // check membership for all groups of topic
   const memberships = await models.Membership.findAll({
     where: {
-      group_id: { [Op.in]: allowed.map((g) => g.id!) },
+      group_id: { [Op.in]: allowedGroupActions.map((g) => g.id!) },
       address_id: auth.address!.id,
     },
     include: [
@@ -295,7 +304,11 @@ export function isAuthorized({
 
     if (action) {
       // waterfall stops here after validating the action
-      await isTopicMember(ctx.actor, auth, action);
+      await hasTopicInteractionPermissions(
+        ctx.actor,
+        auth,
+        action,
+      );
       return;
     }
 
