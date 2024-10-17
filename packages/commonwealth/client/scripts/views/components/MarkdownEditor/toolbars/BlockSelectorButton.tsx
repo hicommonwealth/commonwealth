@@ -2,6 +2,7 @@ import ClickAwayListener from '@mui/base/ClickAwayListener';
 import { currentBlockType$, useCellValue } from 'commonwealth-mdxeditor';
 import React, { useCallback } from 'react';
 import { CWHeadingButton } from 'views/components/MarkdownEditor/toolbars/CWHeadingButton';
+import { PlaceholderIcon } from 'views/components/MarkdownEditor/toolbars/PlaceholderIcon';
 import { blockTypeToIconName } from 'views/components/MarkdownEditor/toolbars/blockTypeToIconName';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import CWPopover, {
@@ -40,7 +41,8 @@ export const BlockSelectorButton = (props: BlockSelectorButtonProps) => {
   }, [popoverProps]);
 
   // FIXME what about list items that don't have an icon when you place the
-  // cursor in the wrong block. No icon will be picked.
+  // cursor in the wrong block. No icon will be picked.  This happens for list
+  // items.
 
   const iconName = blockTypeToIconName(currentBlockType);
 
@@ -48,7 +50,11 @@ export const BlockSelectorButton = (props: BlockSelectorButtonProps) => {
     <ClickAwayListener onClickAway={handleClickAway}>
       <div className="BlockSelectorButton">
         <button onClick={handleClick}>
-          {iconName && <CWIcon iconName={iconName} />}
+          <div style={{ display: 'flex' }}>
+            {iconName && <CWIcon iconName={iconName} />}
+            {!iconName && <PlaceholderIcon />}
+            <CWIcon iconName="caretDown" iconSize="xs" />
+          </div>
         </button>
 
         <CWPopover
