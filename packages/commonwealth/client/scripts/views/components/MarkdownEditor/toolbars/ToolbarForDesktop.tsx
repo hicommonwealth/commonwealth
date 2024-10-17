@@ -2,7 +2,6 @@ import {
   ChangeCodeMirrorLanguage,
   ConditionalContents,
   InsertCodeBlock,
-  InsertTable,
   IS_BOLD,
   IS_ITALIC,
   IS_STRIKETHROUGH,
@@ -16,6 +15,7 @@ import React from 'react';
 import { CWCreateLinkButton } from 'views/components/MarkdownEditor/toolbars/CWCreateLinkButton';
 import { CWFormatButton } from 'views/components/MarkdownEditor/toolbars/CWFormatButton';
 import { CWHeadingButton } from 'views/components/MarkdownEditor/toolbars/CWHeadingButton';
+import { CWTableButton } from 'views/components/MarkdownEditor/toolbars/CWTableButton';
 import { ImageButton } from 'views/components/MarkdownEditor/toolbars/ImageButton';
 import { QuoteButton } from 'views/components/MarkdownEditor/toolbars/QuoteButton';
 import './ToolbarForDesktop.scss';
@@ -81,7 +81,7 @@ export const ToolbarForDesktop = (props: ToolbarForDesktopProps) => {
                     <ImageButton onImage={onImage} />
                     <InsertCodeBlock />
                     <QuoteButton />
-                    <InsertTable />
+                    <CWTableButton />
                   </div>
                 </>
               ),

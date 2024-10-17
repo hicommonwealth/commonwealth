@@ -8,7 +8,7 @@ import CWPopover, {
   usePopover,
 } from 'views/components/component_kit/new_designs/CWPopover';
 
-import { CWCreateLinkButton } from 'views/components/MarkdownEditor/toolbars/CWTableButton';
+import { CWTableButton } from 'views/components/MarkdownEditor/toolbars/CWTableButton';
 import './MobileOverflowButton.scss';
 
 type MobileOverflowButtonProps = Readonly<{
@@ -48,7 +48,7 @@ export const MobileOverflowButton = (props: MobileOverflowButtonProps) => {
               />
               <InsertCodeBlock />
               <CWListButton listType="check" onClick={handleClick} />
-              <CWCreateLinkButton />
+              <CWTableButton />
             </div>
           }
           {...popoverProps}
