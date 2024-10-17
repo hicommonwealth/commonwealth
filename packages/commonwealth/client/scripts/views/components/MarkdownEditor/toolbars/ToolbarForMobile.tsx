@@ -54,10 +54,7 @@ export const ToolbarForMobile = (props: ToolbarForMobileProps) => {
     (event: React.MouseEvent) => {
       event.stopPropagation();
 
-      console.log('FIXME 101: preventKeyboardDeactivation');
-
       if (focus) {
-        console.log('FIXME: calling focus');
         focus?.();
       } else {
         console.warn('No focus');
@@ -65,28 +62,10 @@ export const ToolbarForMobile = (props: ToolbarForMobileProps) => {
     },
     [focus],
   );
-  //
-  // const handleKeyboardFocusForBody = useCallback(() => {
-  //   console.log('FIXME102: handleKeyboardFocusForBody');
-  //
-  //   setTimeout(() => {
-  //     console.log('FIXME103: handleKeyboardFocusForBody');
-  //   }, 0);
-  //
-  // }, []);
-  //
-  // useEffect(() => {
-  //   window.addEventListener('mousedown', handleKeyboardFocusForBody, {capture: true});
-  //
-  //   return () => {
-  //     window.removeEventListener('mousedown', handleKeyboardFocusForBody, {capture: true});
-  //   };
-  // }, [handleKeyboardFocusForBody]);
 
   return (
     <div
       className="ToolbarForMobile"
-      // onClick={preventKeyboardDeactivation}
       onMouseDown={preventKeyboardDeactivation}
       onPointerDown={preventKeyboardDeactivation}
       onMouseDownCapture={preventKeyboardDeactivation}
@@ -94,8 +73,6 @@ export const ToolbarForMobile = (props: ToolbarForMobileProps) => {
       <div className="mdxeditor-block-type-select">
         <BlockSelectorButton focus={focus} />
       </div>
-
-      <button onClick={headingsPopoverProps.handleInteraction}>headings</button>
 
       <CWPopover
         body={
