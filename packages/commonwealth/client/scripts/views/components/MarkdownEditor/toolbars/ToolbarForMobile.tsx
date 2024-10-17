@@ -10,6 +10,7 @@ import { BlockSelectorButton } from 'views/components/MarkdownEditor/toolbars/Bl
 import { CWFormatButton } from 'views/components/MarkdownEditor/toolbars/CWFormatButton';
 import { CWListButton } from 'views/components/MarkdownEditor/toolbars/CWListButton';
 import { ImageButton } from 'views/components/MarkdownEditor/toolbars/ImageButton';
+import { MobileOverflowButton } from 'views/components/MarkdownEditor/toolbars/MobileOverflowButton';
 import './ToolbarForMobile.scss';
 
 type ToolbarForMobileProps = Readonly<{
@@ -80,6 +81,8 @@ export const ToolbarForMobile = (props: ToolbarForMobileProps) => {
       <CreateLink />
       <Separator />
       <ImageButton onImage={onImage} />
+      <MobileOverflowButton focus={focus} />
+
       <div className="end">{SubmitButton && <SubmitButton />}</div>
     </div>
   );
