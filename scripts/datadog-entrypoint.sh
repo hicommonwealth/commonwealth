@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 DD_CONF_DIR="/etc/datadog-agent"
+DD_RUN_DIR="/var/run/datadog"
 
 # START OF CODE EXTRACTED FROM https://github.com/DataDog/heroku-buildpack-datadog/blob/master/extra/datadog.sh
 # This code was extracted in order to maintain functionality when switching from
@@ -12,6 +13,9 @@ export REDIS_CONF="$INTEGRATIONS_CONF/redisdb.d"
 
 # Get the lower case for the log level
 DD_LOG_LEVEL_LOWER=$(echo "$DD_LOG_LEVEL" | tr '[:upper:]' '[:lower:]')
+
+# Move Datadog config files into place
+cp "$DATADOG_CONF.example" "$DATADOG_CONF"
 
 # Update the Datadog conf yaml to disable cloud provider metadata
 sed -i -e"s|^.*cloud_provider_metadata:.*$|cloud_provider_metadata: []|" "$DATADOG_CONF"
@@ -84,10 +88,11 @@ if [ "$DD_ENABLE_HEROKU_POSTGRES" == "true" ]; then
   touch "$POSTGRES_CONF/conf.yaml"
   echo -e "init_config: \ninstances: \n" > "$POSTGRES_CONF/conf.yaml"
 
-  echo "[DEBUG] Creating Datadog Postgres integration config..."
+  echo "[DEBUG] Creating Datadog Postgres integration config (DD_POSTGRES_URL_VAR: $DD_POSTGRES_URL_VAR)..."
   for PG_URL in $DD_POSTGRES_URL_VAR
   do
     if [ -n "${!PG_URL}" ]; then
+      echo "DB_URL: ${!PG_URL}"
       POSTGREGEX='^postgres://([^:]+):([^@]+)@([^:]+):([^/]+)/(.*)$'
       if [[ ${!PG_URL} =~ $POSTGREGEX ]]; then
         echo -e "  - host: ${BASH_REMATCH[3]}" >>  "$POSTGRES_CONF/conf.yaml"
@@ -169,9 +174,9 @@ if [ -n "$DISABLE_DATADOG_AGENT" ]; then
   echo "The Datadog Agent has been disabled. Unset the DISABLE_DATADOG_AGENT or set missing environment variables."
 else
   if [ "$APP_ENV" = "production" ] || [ "$ENABLE_DATADOG_AGENT" = "true" ]; then
-    datadog-agent run &
-    /opt/datadog-agent/embedded/bin/trace-agent --config=/etc/datadog-agent/datadog.yaml &
-    /opt/datadog-agent/embedded/bin/process-agent --config=/etc/datadog-agent/datadog.yaml &
+    datadog-agent run -c $DATADOG_CONF &
+    /opt/datadog-agent/embedded/bin/trace-agent -c $DATADOG_CONF  &
+    /opt/datadog-agent/embedded/bin/process-agent -c $DATADOG_CONF &
   fi
 fi
 
