@@ -13,7 +13,9 @@ import {
   useCreateContestMutation,
   useDeployRecurringContestOnchainMutation,
   useDeploySingleContestOnchainMutation,
+  useDeploySingleERC20ContestOnchainMutation,
 } from 'state/api/contests';
+import { DeploySingleERC20ContestOnchainProps } from 'state/api/contests/deploySingleERC20ContestOnchain';
 import useUserStore from 'state/ui/user';
 import { useCommunityStake } from 'views/components/CommunityStake';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
@@ -61,6 +63,9 @@ const SignTransactionsStep = ({
     useDeploySingleContestOnchainMutation();
   const { mutateAsync: deployRecurringContestOnchainMutation } =
     useDeployRecurringContestOnchainMutation();
+  const { mutateAsync: deploySingleERC20ContestOnchainMutation } =
+    useDeploySingleERC20ContestOnchainMutation();
+
   const { mutateAsync: createContestMutation } = useCreateContestMutation();
   const user = useUserStore();
 
@@ -115,6 +120,18 @@ const SignTransactionsStep = ({
       exchangeToken,
     };
 
+    const singleERC20 = {
+      ethChainId,
+      chainRpc,
+      namespaceName,
+      contestInterval: contestLength,
+      winnerShares,
+      voteToken: exchangeToken,
+      voterShare,
+      walletAddress,
+      exchangeToken,
+    } as DeploySingleERC20ContestOnchainProps;
+
     const recurring = {
       ethChainId,
       chainRpc,
@@ -142,8 +159,11 @@ const SignTransactionsStep = ({
             // @ts-expect-error <StrictNullChecks/>
             recurring,
           ))
-        : // @ts-expect-error <StrictNullChecks/>
-          (contestAddress = await deploySingleContestOnchainMutation(single));
+        : weightedTopicsEnabled
+          ? (contestAddress =
+              await deploySingleERC20ContestOnchainMutation(singleERC20))
+          : // @ts-expect-error <StrictNullChecks/>
+            (contestAddress = await deploySingleContestOnchainMutation(single));
 
       await createContestMutation({
         contest_address: contestAddress,
