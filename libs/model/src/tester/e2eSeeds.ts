@@ -276,6 +276,7 @@ export const e2eTestEntities = async function (
                   text: '',
                   thread_id: -1,
                   reaction_count: 0,
+                  reaction_weights_sum: '0',
                   search: getCommentSearchVector(''),
                 },
               })
@@ -298,6 +299,7 @@ export const e2eTestEntities = async function (
                   text: '',
                   thread_id: -2,
                   reaction_count: 0,
+                  reaction_weights_sum: '0',
                   search: getCommentSearchVector(''),
                 },
               })

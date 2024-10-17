@@ -228,6 +228,7 @@ describe('Thread lifecycle', () => {
       archived_at: new Date(),
       pinned: false,
       read_only: false,
+      reaction_weights_sum: '0',
     });
     archived = archived_thread;
 
@@ -237,6 +238,7 @@ describe('Thread lifecycle', () => {
       topic_id: community?.topics?.at(0)?.id,
       pinned: false,
       read_only: true,
+      reaction_weights_sum: '0',
     });
     read_only = read_only_thread;
 
@@ -896,9 +898,11 @@ describe('Thread lifecycle', () => {
         },
       });
       const expectedWeight = 50 * vote_weight;
-      expect(reaction?.calculated_voting_weight).to.eq(expectedWeight);
+      expect(`${reaction?.calculated_voting_weight}`).to.eq(
+        `${expectedWeight}`,
+      );
       const t = await models.Thread.findByPk(thread!.id);
-      expect(t!.reaction_weights_sum).to.eq(expectedWeight);
+      expect(`${t!.reaction_weights_sum}`).to.eq(`${expectedWeight}`);
     });
 
     test('should delete a reaction', async () => {
@@ -966,9 +970,11 @@ describe('Thread lifecycle', () => {
         },
       });
       const expectedWeight = 50 * vote_weight;
-      expect(reaction?.calculated_voting_weight).to.eq(expectedWeight);
+      expect(`${reaction?.calculated_voting_weight}`).to.eq(
+        `${expectedWeight}`,
+      );
       const c = await models.Comment.findByPk(comment!.id);
-      expect(c!.reaction_weights_sum).to.eq(expectedWeight * 2); // *2 to account for first member reaction
+      expect(`${c!.reaction_weights_sum}`).to.eq(`${expectedWeight * 2}`); // *2 to account for first member reaction
     });
 
     test('should throw error when comment not found', async () => {

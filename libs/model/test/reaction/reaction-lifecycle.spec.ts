@@ -53,6 +53,7 @@ describe('Reactions lifecycle', () => {
         deleted_at: undefined, // so we can find it!
         pinned: false,
         read_only: false,
+        reaction_weights_sum: '0',
       },
       //{ mock: true, log: true },
     );
