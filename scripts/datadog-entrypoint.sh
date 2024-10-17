@@ -72,7 +72,6 @@ fi
 #  find "$DD_CONF_DIR"/conf.d -name "conf.yaml.default" -exec mv {} {}_disabled \;
 #fi
 
-# Update the Postgres configuration from above using the Heroku application environment variable
 if [ "$DD_LOG_LEVEL_LOWER" == "debug" ]; then
   echo "[DEBUG] DD_ENABLE_HEROKU_POSTGRES: $DD_ENABLE_HEROKU_POSTGRES"
 fi
@@ -109,7 +108,6 @@ if [ "$DD_ENABLE_HEROKU_POSTGRES" == "true" ]; then
   unset IFS
 fi
 
-# Update the Redis configuration from above using the Heroku application environment variable
 if [ "$DD_LOG_LEVEL_LOWER" == "debug" ]; then
   echo "[DEBUG] DD_ENABLE_HEROKU_REDIS: $DD_ENABLE_HEROKU_REDIS"
 fi
@@ -172,8 +170,8 @@ if [ -n "$DISABLE_DATADOG_AGENT" ]; then
   echo "The Datadog Agent has been disabled. Unset the DISABLE_DATADOG_AGENT or set missing environment variables."
 else
   if [ "$APP_ENV" = "production" ] || [ "$ENABLE_DATADOG_AGENT" = "true" ]; then
-    datadog-agent run -C $DATADOG_CONF &
-    /opt/datadog-agent/embedded/bin/trace-agent -C $DATADOG_CONF  &
+    datadog-agent run -c $DATADOG_CONF &
+    /opt/datadog-agent/embedded/bin/trace-agent -c $DATADOG_CONF  &
     /opt/datadog-agent/embedded/bin/process-agent --cfgpath $DATADOG_CONF &
   fi
 fi
