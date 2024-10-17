@@ -31,7 +31,10 @@ export function formatNumberShort(num: number) {
                 : num.toString();
 }
 
-export function formatBigNumberShort(num: BigNumber) {
+export function formatBigNumberShort(num: BigNumber): string {
+  if (num.isZero()) {
+    return '0';
+  }
   const thousand = BigNumber.from(1_000);
   const million = BigNumber.from(1_000_000);
   const billion = BigNumber.from(1_000_000_000);
@@ -58,13 +61,7 @@ export function formatBigNumberShort(num: BigNumber) {
         ? `${round(num, million)}m`
         : num.gt(thousand)
           ? `${round(num, thousand)}k`
-          : num.gt(BigNumber.from(10).pow(1))
-            ? round(num, BigNumber.from(1))
-            : num.gt(BigNumber.from(10).pow(-1))
-              ? precise(num, 2)
-              : num.gt(BigNumber.from(10).pow(-2))
-                ? precise(num, 1)
-                : num.toString();
+          : num.toString();
 }
 
 const nf = new Intl.NumberFormat();

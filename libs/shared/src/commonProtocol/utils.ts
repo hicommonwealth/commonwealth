@@ -1,15 +1,14 @@
 import { BigNumber } from '@ethersproject/bignumber';
 
 export const calculateVoteWeight = (
-  balance: string,
+  balance: string, // should be in wei
   voteWeight: number,
-): BigNumber => {
-  // since BigNumber doesn't support float,
-  // must multiply by scale factor and divide
-  const balanceBN = BigNumber.from(balance);
-  const scaleFactor = BigNumber.from(10 ** 18);
-  const voteWeightBN = BigNumber.from(Math.floor(voteWeight * 10 ** 18));
-  const result = balanceBN.mul(voteWeightBN).div(scaleFactor);
+): BigNumber | null => {
+  if (!balance || voteWeight <= 0) return null;
+  const bigBalance = BigNumber.from(balance);
+  const precision = 1e6;
+  const scaledVoteWeight = Math.floor(voteWeight * precision);
+  const result = bigBalance.mul(scaledVoteWeight).div(precision);
   return result;
 };
 

@@ -1,7 +1,7 @@
 import { InvalidState } from '@hicommonwealth/core';
 import { TopicWeightedVoting } from '@hicommonwealth/schemas';
 import { BalanceSourceType, commonProtocol } from '@hicommonwealth/shared';
-import { BigNumber, utils } from 'ethers';
+import { BigNumber } from 'ethers';
 import { tokenBalanceCache } from '.';
 import { config } from '../config';
 import { models } from '../database';
@@ -77,11 +77,12 @@ export async function getVotingWeight(
       },
       cacheRefresh: true,
     });
-    const balance = utils.formatUnits(balances[address], 18);
-    return commonProtocol.calculateVoteWeight(
-      balance,
+    const result = commonProtocol.calculateVoteWeight(
+      balances[address],
       topic.vote_weight_multiplier!,
     );
+    // only count full ERC20 tokens
+    return result?.div(BigNumber.from(10).pow(18)) || null;
   }
 
   // no weighted voting

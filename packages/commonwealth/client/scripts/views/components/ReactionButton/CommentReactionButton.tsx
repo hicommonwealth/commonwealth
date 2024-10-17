@@ -53,7 +53,7 @@ export const CommentReactionButton = ({
     (x) => x?.author === activeAddress,
   );
   const reactionWeightsSum = comment.reactions.reduce(
-    (acc, curr) => BigNumber.from(acc).mul(curr.calculatedVotingWeight || 1),
+    (acc, reaction) => acc.add(reaction.calculatedVotingWeight || 1),
     BigNumber.from(0),
   );
 

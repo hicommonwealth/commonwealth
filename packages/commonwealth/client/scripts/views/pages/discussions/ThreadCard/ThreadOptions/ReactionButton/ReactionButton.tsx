@@ -47,7 +47,7 @@ export const ReactionButton = ({
 
   const reactionWeightsSum =
     thread?.associatedReactions?.reduce(
-      (acc, curr) => BigNumber.from(acc).mul(curr.voting_weight || 1),
+      (acc, reaction) => acc.add(reaction.voting_weight || 1),
       BigNumber.from(0),
     ) || BigNumber.from(0);
 

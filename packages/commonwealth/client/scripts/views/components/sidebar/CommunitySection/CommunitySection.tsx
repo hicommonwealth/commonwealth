@@ -81,7 +81,7 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
 
             {stakeEnabled && (
               <VoteWeightModule
-                voteWeight={currentVoteWeight}
+                voteWeight={currentVoteWeight?.toString() || '0'}
                 stakeNumber={stakeBalance}
                 stakeValue={stakeValue}
                 denomination={findDenominationString(activeChainId) || 'ETH'}
