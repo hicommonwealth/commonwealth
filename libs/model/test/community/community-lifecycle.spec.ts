@@ -7,10 +7,7 @@ import {
   dispose,
   query,
 } from '@hicommonwealth/core';
-import {
-  PermissionEnum,
-  TopicWeightedVoting,
-} from '@hicommonwealth/schemas';
+import { PermissionEnum, TopicWeightedVoting } from '@hicommonwealth/schemas';
 import { ChainBase, ChainType } from '@hicommonwealth/shared';
 import { Chance } from 'chance';
 import { CreateTopic } from 'model/src/community/CreateTopic.command';
@@ -364,15 +361,30 @@ describe('Community lifecycle', () => {
           payload: buildCreateGroupPayload(community.id, [
             {
               id: 1,
-              permissions: [PermissionEnum.CREATE_COMMENT, PermissionEnum.CREATE_THREAD, PermissionEnum.CREATE_COMMENT_REACTION,PermissionEnum.CREATE_THREAD_REACTION],
+              permissions: [
+                PermissionEnum.CREATE_COMMENT,
+                PermissionEnum.CREATE_THREAD,
+                PermissionEnum.CREATE_COMMENT_REACTION,
+                PermissionEnum.CREATE_THREAD_REACTION,
+              ],
             },
             {
               id: 2,
-              permissions: [PermissionEnum.CREATE_COMMENT, PermissionEnum.CREATE_THREAD, PermissionEnum.CREATE_COMMENT_REACTION,PermissionEnum.CREATE_THREAD_REACTION],
+              permissions: [
+                PermissionEnum.CREATE_COMMENT,
+                PermissionEnum.CREATE_THREAD,
+                PermissionEnum.CREATE_COMMENT_REACTION,
+                PermissionEnum.CREATE_THREAD_REACTION,
+              ],
             },
             {
               id: 3,
-              permissions: [PermissionEnum.CREATE_COMMENT, PermissionEnum.CREATE_THREAD, PermissionEnum.CREATE_COMMENT_REACTION,PermissionEnum.CREATE_THREAD_REACTION],
+              permissions: [
+                PermissionEnum.CREATE_COMMENT,
+                PermissionEnum.CREATE_THREAD,
+                PermissionEnum.CREATE_COMMENT_REACTION,
+                PermissionEnum.CREATE_THREAD_REACTION,
+              ],
             },
           ]),
         }),

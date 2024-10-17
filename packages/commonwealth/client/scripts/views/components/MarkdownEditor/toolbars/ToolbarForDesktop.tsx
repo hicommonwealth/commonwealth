@@ -1,68 +1,95 @@
 import {
-  BoldItalicUnderlineToggles,
   ChangeCodeMirrorLanguage,
   ConditionalContents,
-  CreateLink,
-  InsertCodeBlock,
-  InsertTable,
-  ListsToggle,
+  IS_BOLD,
+  IS_ITALIC,
+  IS_STRIKETHROUGH,
+  IS_SUBSCRIPT,
+  IS_SUPERSCRIPT,
+  IS_UNDERLINE,
   Separator,
-  StrikeThroughSupSubToggles,
 } from 'commonwealth-mdxeditor';
 import React from 'react';
-import { HeadingButton } from 'views/components/MarkdownEditor/toolbars/HeadingButton';
+import { CWCreateLinkButton } from 'views/components/MarkdownEditor/toolbars/CWCreateLinkButton';
+import { CWFormatButton } from 'views/components/MarkdownEditor/toolbars/CWFormatButton';
+import { CWHeadingButton } from 'views/components/MarkdownEditor/toolbars/CWHeadingButton';
+import { CWInsertCodeBlockButton } from 'views/components/MarkdownEditor/toolbars/CWInsertCodeBlockButton';
+import { CWListButton } from 'views/components/MarkdownEditor/toolbars/CWListButton';
+import { CWTableButton } from 'views/components/MarkdownEditor/toolbars/CWTableButton';
 import { ImageButton } from 'views/components/MarkdownEditor/toolbars/ImageButton';
-import { QuoteButton } from 'views/components/MarkdownEditor/toolbars/QuoteButton';
 import './ToolbarForDesktop.scss';
 
 type ToolbarForDesktopProps = Readonly<{
   onImage?: (file: File) => void;
+  focus: () => void;
 }>;
 
 export const ToolbarForDesktop = (props: ToolbarForDesktopProps) => {
   const { onImage } = props;
 
   return (
-    <div className="ToolbarForDesktop">
-      <ConditionalContents
-        options={[
-          {
-            when: (editor) => editor?.editorType === 'codeblock',
-            contents: () => <ChangeCodeMirrorLanguage />,
-          },
-          {
-            fallback: () => (
-              <>
-                <div className="button-container">
-                  <HeadingButton headingTag="h1" />
-                  <HeadingButton headingTag="h2" />
-                  <HeadingButton headingTag="h3" />
-                </div>
+    <>
+      <div className="ToolbarForDesktop">
+        <ConditionalContents
+          options={[
+            {
+              when: (editor) => editor?.editorType === 'codeblock',
+              contents: () => <ChangeCodeMirrorLanguage />,
+            },
+            {
+              fallback: () => (
+                <>
+                  <div className="button-container">
+                    <CWHeadingButton blockType="h1" />
+                    <CWHeadingButton blockType="h2" />
+                    <CWHeadingButton blockType="h3" />
+                  </div>
 
-                <Separator />
-                <BoldItalicUnderlineToggles />
-                <Separator />
+                  <Separator />
+                  <CWFormatButton format={IS_BOLD} formatName="bold" />
+                  <CWFormatButton
+                    format={IS_UNDERLINE}
+                    formatName="underline"
+                  />
+                  <CWFormatButton format={IS_ITALIC} formatName="italic" />
+                  <Separator />
 
-                <StrikeThroughSupSubToggles />
+                  <CWFormatButton
+                    format={IS_STRIKETHROUGH}
+                    formatName="strikethrough"
+                  />
 
-                <Separator />
+                  <CWFormatButton
+                    format={IS_SUPERSCRIPT}
+                    formatName="superscript"
+                  />
 
-                <ListsToggle />
+                  <CWFormatButton
+                    format={IS_SUBSCRIPT}
+                    formatName="subscript"
+                  />
 
-                <Separator />
+                  <Separator />
 
-                <div className="button-container">
-                  <CreateLink />
-                  <ImageButton onImage={onImage} />
-                  <InsertCodeBlock />
-                  <QuoteButton />
-                  <InsertTable />
-                </div>
-              </>
-            ),
-          },
-        ]}
-      />
-    </div>
+                  <CWListButton listType="bullet" />
+                  <CWListButton listType="number" />
+                  <CWListButton listType="check" />
+
+                  <Separator />
+
+                  <div className="button-container">
+                    <CWCreateLinkButton />
+                    <ImageButton onImage={onImage} />
+                    <CWInsertCodeBlockButton />
+                    <CWHeadingButton blockType="quote" />
+                    <CWTableButton />
+                  </div>
+                </>
+              ),
+            },
+          ]}
+        />
+      </div>
+    </>
   );
 };

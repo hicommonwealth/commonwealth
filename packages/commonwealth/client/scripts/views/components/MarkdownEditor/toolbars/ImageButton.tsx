@@ -1,5 +1,6 @@
 import React from 'react';
 import { FileUploadButton } from 'views/components/MarkdownEditor/toolbars/FileUploadButton';
+import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 
 export const IMAGE_ACCEPT =
   '.jpg, .jpeg, .png, .gif, .webp, .svg, .apng, .avif';
@@ -13,6 +14,17 @@ export const ImageButton = (props: ImageButtonProps) => {
   const { onImage } = props;
 
   return (
-    <FileUploadButton accept={IMAGE_ACCEPT} iconName="image" onFile={onImage} />
+    <CWTooltip
+      content="Upload image"
+      renderTrigger={(handleInteraction) => (
+        <FileUploadButton
+          onMouseEnter={handleInteraction}
+          onMouseLeave={handleInteraction}
+          accept={IMAGE_ACCEPT}
+          iconName="image"
+          onFile={onImage}
+        />
+      )}
+    />
   );
 };

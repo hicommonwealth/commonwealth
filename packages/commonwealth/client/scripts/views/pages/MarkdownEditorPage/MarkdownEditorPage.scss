@@ -1,8 +1,12 @@
 .MarkdownEditorPage {
   display: flex;
   flex-grow: 1;
-  .desktop {
+  .DesktopInner {
     flex-grow: 1;
     margin: 16px;
   }
+}
+
+.MarkdownEditorPageDesktop {
+  overflow: auto;
 }
