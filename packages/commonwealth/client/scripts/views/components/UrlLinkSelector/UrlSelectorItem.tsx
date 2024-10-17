@@ -26,12 +26,14 @@ const UrlSelectorItem = ({
           {link.identifier}
         </CWText>
       </div>
-      <CWIconButton
-        iconButtonTheme="neutral"
-        iconName="trash"
-        iconSize="medium"
-        onClick={() => onClick(link)}
-      />
+      <div className="trash-icon">
+        <CWIconButton
+          iconButtonTheme="neutral"
+          iconName="trash"
+          iconSize="medium"
+          onClick={() => onClick(link)}
+        />
+      </div>
     </div>
   );
 };
