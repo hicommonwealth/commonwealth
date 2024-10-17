@@ -39,7 +39,6 @@ import setDefaultRole from '../routes/setDefaultRole';
 import upgradeMember, {
   upgradeMemberValidation,
 } from '../routes/upgradeMember';
-import viewGlobalActivity from '../routes/viewGlobalActivity';
 
 import getUploadSignature from '../routes/getUploadSignature';
 
@@ -51,7 +50,7 @@ import updateCommunityCustomDomain from '../routes/updateCommunityCustomDomain';
 import updateCommunityPriority from '../routes/updateCommunityPriority';
 import type ViewCountCache from '../util/viewCountCache';
 
-import { type DB, type GlobalActivityCache } from '@hicommonwealth/model';
+import { type DB } from '@hicommonwealth/model';
 import banAddress from '../routes/banAddress';
 import setAddressWallet from '../routes/setAddressWallet';
 
@@ -125,14 +124,13 @@ function setupRouter(
   app: Express,
   models: DB,
   viewCountCache: ViewCountCache,
-  globalActivityCache: GlobalActivityCache,
   databaseValidationService: DatabaseValidationService,
   cacheDecorator: CacheDecorator,
 ) {
   // controllers
   const serverControllers: ServerControllers = {
-    threads: new ServerThreadsController(models, globalActivityCache),
-    comments: new ServerCommentsController(models, globalActivityCache),
+    threads: new ServerThreadsController(models),
+    comments: new ServerCommentsController(models),
     analytics: new ServerAnalyticsController(),
     profiles: new ServerProfilesController(models),
     communities: new ServerCommunitiesController(models),
@@ -489,13 +487,6 @@ function setupRouter(
     '/getUploadSignature',
     passport.authenticate('jwt', { session: false }),
     getUploadSignature.bind(this, models),
-  );
-
-  registerRoute(
-    router,
-    'post',
-    '/viewGlobalActivity',
-    viewGlobalActivity.bind(this, models, globalActivityCache),
   );
 
   registerRoute(

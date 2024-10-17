@@ -36,17 +36,26 @@ const { createComment, updateComment, deleteComment, createCommentReaction } =
 const { getNewContent } = user.trpcRouter;
 
 const api = {
-  getGlobalActivity: trpc.query(Feed.GetGlobalActivity, trpc.Tag.User, true),
-  getUserActivity: trpc.query(Feed.GetUserActivity, trpc.Tag.User, true),
+  getGlobalActivity: trpc.query(Feed.GetGlobalActivity, trpc.Tag.User, {
+    forceSecure: true,
+    ttlSecs: config.NO_GLOBAL_ACTIVITY_CACHE ? undefined : 60 * 5,
+  }),
+  getUserActivity: trpc.query(Feed.GetUserActivity, trpc.Tag.User, {
+    forceSecure: true,
+  }),
   getNewContent,
-  getCommunities: trpc.query(
-    Community.GetCommunities,
-    trpc.Tag.Community,
-    true,
-  ),
-  getCommunity: trpc.query(Community.GetCommunity, trpc.Tag.Community, true),
-  getMembers: trpc.query(Community.GetMembers, trpc.Tag.Community, true),
-  getComments: trpc.query(Comment.GetComments, trpc.Tag.Comment, true),
+  getCommunities: trpc.query(Community.GetCommunities, trpc.Tag.Community, {
+    forceSecure: true,
+  }),
+  getCommunity: trpc.query(Community.GetCommunity, trpc.Tag.Community, {
+    forceSecure: true,
+  }),
+  getMembers: trpc.query(Community.GetMembers, trpc.Tag.Community, {
+    forceSecure: true,
+  }),
+  getComments: trpc.query(Comment.GetComments, trpc.Tag.Comment, {
+    forceSecure: true,
+  }),
   createCommunity,
   updateCommunity,
   createTopic,

@@ -97,7 +97,6 @@ const DetailsFormStep = ({
 
   const { mutateAsync: updateContest } = useUpdateContestMutation();
 
-  const chainId = app.chain.meta.ChainNode?.id || 0;
   const {
     tokenValue,
     setTokenValue,
@@ -106,7 +105,7 @@ const DetailsFormStep = ({
     tokenMetadata,
     tokenMetadataLoading,
   } = useTokenFinder({
-    chainId: chainId,
+    nodeEthChainId: app.chain.meta.ChainNode?.eth_chain_id || 0,
   });
 
   const communityId = app.activeChainId() || '';
