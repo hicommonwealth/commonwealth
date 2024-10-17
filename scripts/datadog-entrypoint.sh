@@ -57,6 +57,9 @@ fi
 
 if [ "$DD_LOG_LEVEL_LOWER" == "debug" ]; then
   echo "[DEBUG] DD_HOSTNAME: $DD_HOSTNAME"
+  echo "[DEBUG] DATADOG_CONF: $DATADOG_CONF"
+  echo "[DEBUG] POSTGRES_CONF: $POSTGRES_CONF"
+  echo "[DEBUG] REDIS_CONF: REDIS_CONF"
 fi
 
 # TODO: does this apply in Docker containers?
