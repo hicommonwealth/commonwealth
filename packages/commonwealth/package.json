@@ -71,6 +71,7 @@
     "test-select": "INIT_TEST_DB=true NODE_ENV=test vitest --config ../../vite.config.ts --fileParallelism=false run",
     "test-select:watch": "INIT_TEST_DB=true NODE_ENV=test vitest --config ../../vite.config.ts --fileParallelism=false",
     "ts-exec": "tsx ",
+    "validate-external-api-version": "pnpm -F commonwealth ts-exec server/scripts/validate-external-api-versioning.ts $(pnpm info @commonxyz/api-client version)",
     "vite": "wait-on http://localhost:3000/api/health && vite -c ./client/vite.config.ts --host",
     "wait-server": "chmod +x ./scripts/wait-server.sh && ./scripts/wait-server.sh"
   },

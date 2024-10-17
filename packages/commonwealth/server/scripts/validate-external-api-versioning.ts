@@ -23,8 +23,6 @@ const apiClientPackageJson = JSON.parse(
   ),
 );
 
-const EXTERNAL_API_CONFIG_PATH = 'external-api-config.json';
-
 const productionOasPath = 'external-production-openapi.json';
 const localOasPath = 'external-openapi.json';
 
@@ -34,7 +32,7 @@ async function updateVersionInFile(newVersion: string) {
     version: newVersion,
   };
   await writeFile(
-    EXTERNAL_API_CONFIG_PATH,
+    path.join(__dirname, '../external-api-config.json'),
     JSON.stringify(updatedApiConfig),
     'utf8',
   );
@@ -43,7 +41,7 @@ async function updateVersionInFile(newVersion: string) {
     version: newVersion,
   };
   await writeFile(
-    '../../libs/api-client/package.json',
+    path.join(__dirname, '../../libs/api-client/package.json'),
     JSON.stringify(updatedPackageJson),
     'utf8',
   );
@@ -60,7 +58,7 @@ function parseSemVer(version: string) {
       patch: parseInt(match[3]),
     };
   } else {
-    throw new Error('Invalid SemVer string');
+    throw new Error(`Invalid SemVer string: ${version}`);
   }
 }
 
@@ -84,6 +82,24 @@ function readableVersion(version: {
   return `${version.major}.${version.minor}.${version.patch}`;
 }
 
+// Returns true if versionOne is greater than versionTwo
+function compareSemVersions(versionOne: string, versionTwo: string) {
+  const oneRes = parseSemVer(versionOne);
+  const twoRes = parseSemVer(versionTwo);
+
+  if (oneRes.major > twoRes.major) return true;
+  else if (oneRes.major === twoRes.major && oneRes.minor > twoRes.minor)
+    return true;
+  else if (
+    oneRes.major === twoRes.major &&
+    oneRes.minor === twoRes.minor &&
+    oneRes.patch > twoRes.patch
+  )
+    return true;
+
+  return false;
+}
+
 async function validateExternalApiVersioning() {
   // verify matching version numbers
   if (externalApiConfig.version !== apiClientPackageJson.version) {
@@ -93,7 +109,11 @@ async function validateExternalApiVersioning() {
     );
   }
 
-  // TODO: potentially fetch from github (libs/api-client/openapi.json) after #9526 is merged
+  // NPM version must be provided since the version on master is never updated
+  if (!process.argv[2] || typeof process.argv[2] !== 'string') {
+    throw new Error('Must provide @commonxyz/api-client package version');
+  }
+
   await downloadFile(
     'https://commonwealth.im/api/v1/openapi.json',
     productionOasPath,
@@ -109,9 +129,15 @@ async function validateExternalApiVersioning() {
   const sourceContent = await readFile(productionOasPath, 'utf8');
 
   const oldVersion = parseSemVer(JSON.parse(sourceContent).info.version);
-  const newVersion = parseSemVer(newOas.info.version);
 
-  if (oldVersion.major !== newVersion.major) {
+  // Use the local version only if it is greater than the npm version.
+  // If local version > npm version that means CI already bumped versions
+  // after a push to a PR to be merged into production branch
+  const newVersion = compareSemVersions(newOas.info.version, process.argv[3])
+    ? parseSemVer(newOas.info.version)
+    : parseSemVer(process.argv[3]);
+
+  if (oldVersion.major < newVersion.major) {
     if (newVersion.minor !== 0 || newVersion.patch !== 0) {
       const newMajorVersion = `${newVersion.major}.0.0`;
       await updateVersionInFile(newMajorVersion);
