@@ -1,8 +1,14 @@
-import { CreateLink, ListsToggle, Separator } from 'commonwealth-mdxeditor';
+import {
+  CreateLink,
+  IS_BOLD,
+  IS_ITALIC,
+  Separator,
+} from 'commonwealth-mdxeditor';
 import React, { ReactNode, useCallback, useEffect } from 'react';
 
 import { BlockSelectorButton } from 'views/components/MarkdownEditor/toolbars/BlockSelectorButton';
-import { CWHeadingButton } from 'views/components/MarkdownEditor/toolbars/CWHeadingButton';
+import { CWFormatButton } from 'views/components/MarkdownEditor/toolbars/CWFormatButton';
+import { CWListButton } from 'views/components/MarkdownEditor/toolbars/CWListButton';
 import { ImageButton } from 'views/components/MarkdownEditor/toolbars/ImageButton';
 import './ToolbarForMobile.scss';
 
@@ -65,11 +71,13 @@ export const ToolbarForMobile = (props: ToolbarForMobileProps) => {
         <BlockSelectorButton focus={focus} />
       </div>
 
-      <CWHeadingButton blockType="bold" />
-      <CWHeadingButton blockType="italic" />
+      <CWFormatButton format={IS_BOLD} formatName="bold" />
+      <CWFormatButton format={IS_ITALIC} formatName="italic" />
+
+      <CWListButton listType="bullet" />
+      <CWListButton listType="number" />
 
       <CreateLink />
-      <ListsToggle />
       <Separator />
       <ImageButton onImage={onImage} />
       <div className="end">{SubmitButton && <SubmitButton />}</div>

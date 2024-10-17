@@ -36,8 +36,12 @@ export const CWListButton = (props: CWListButtonProps) => {
   const active = listType === currentListType;
 
   const handleClick = useCallback(() => {
-    applyListType(listType);
-  }, [applyListType, listType]);
+    if (active) {
+      applyListType('');
+    } else {
+      applyListType(listType);
+    }
+  }, [active, applyListType, listType]);
 
   return (
     <CWTooltip
