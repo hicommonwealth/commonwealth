@@ -238,7 +238,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
               thread={thread}
               canReact={!disabledActionsTooltipText}
               canComment={!disabledActionsTooltipText}
-              onEditStart={() => navigate(`${discussionLink}`)}
+              onEditStart={() => navigate(`${discussionLink}?isEdit=true`)}
               onStageTagClick={() => {
                 navigate(`/discussions?stage=${thread.stage}`);
               }}
