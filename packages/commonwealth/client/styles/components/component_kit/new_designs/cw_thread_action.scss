@@ -53,4 +53,29 @@
       color: $neutral-400;
     }
   }
+
+  &.subscribe {
+    color: $neutral-500;
+
+    &:hover {
+      background-color: $neutral-100;
+      color: $neutral-600;
+    }
+
+    &.selected {
+      color: $blue-500;
+
+      &:hover {
+        color: $blue-500;
+      }
+
+      .Text {
+        color: $blue-500 !important;
+      }
+    }
+
+    .Text {
+      color: $neutral-500;
+    }
+  }
 }

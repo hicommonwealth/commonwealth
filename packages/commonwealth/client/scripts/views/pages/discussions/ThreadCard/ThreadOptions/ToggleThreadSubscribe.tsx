@@ -75,7 +75,8 @@ export const ToggleThreadSubscribe = (props: ToggleThreadSubscribeProps) => {
   return (
     <CWThreadAction
       action="subscribe"
-      label="Subscribe"
+      label={hasThreadSubscription ? 'Subscribed' : 'Subscribe'}
+      className={`subscribe ${hasThreadSubscription ? 'selected' : ''}`}
       onClick={handleToggleSubscribe}
       selected={!hasThreadSubscription}
       disabled={!isCommunityMember}
