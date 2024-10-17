@@ -1,23 +1,22 @@
 import {
   ChangeCodeMirrorLanguage,
   ConditionalContents,
-  InsertCodeBlock,
   IS_BOLD,
   IS_ITALIC,
   IS_STRIKETHROUGH,
   IS_SUBSCRIPT,
   IS_SUPERSCRIPT,
   IS_UNDERLINE,
-  ListsToggle,
   Separator,
 } from 'commonwealth-mdxeditor';
 import React from 'react';
 import { CWCreateLinkButton } from 'views/components/MarkdownEditor/toolbars/CWCreateLinkButton';
 import { CWFormatButton } from 'views/components/MarkdownEditor/toolbars/CWFormatButton';
 import { CWHeadingButton } from 'views/components/MarkdownEditor/toolbars/CWHeadingButton';
+import { CWInsertCodeBlockButton } from 'views/components/MarkdownEditor/toolbars/CWInsertCodeBlockButton';
+import { CWListButton } from 'views/components/MarkdownEditor/toolbars/CWListButton';
 import { CWTableButton } from 'views/components/MarkdownEditor/toolbars/CWTableButton';
 import { ImageButton } from 'views/components/MarkdownEditor/toolbars/ImageButton';
-import { QuoteButton } from 'views/components/MarkdownEditor/toolbars/QuoteButton';
 import './ToolbarForDesktop.scss';
 
 type ToolbarForDesktopProps = Readonly<{
@@ -72,15 +71,17 @@ export const ToolbarForDesktop = (props: ToolbarForDesktopProps) => {
 
                   <Separator />
 
-                  <ListsToggle />
+                  <CWListButton listType="bullet" />
+                  <CWListButton listType="number" />
+                  <CWListButton listType="check" />
 
                   <Separator />
 
                   <div className="button-container">
                     <CWCreateLinkButton />
                     <ImageButton onImage={onImage} />
-                    <InsertCodeBlock />
-                    <QuoteButton />
+                    <CWInsertCodeBlockButton />
+                    <CWHeadingButton blockType="quote" />
                     <CWTableButton />
                   </div>
                 </>
