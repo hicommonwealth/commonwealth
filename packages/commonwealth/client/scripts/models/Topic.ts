@@ -1,9 +1,9 @@
 import * as schemas from '@hicommonwealth/schemas';
 import { z } from 'zod';
 
-export type TopicAttributes = z.infer<typeof schemas.ExtendedTopic>;
+export type Topic = z.infer<typeof schemas.ExtendedTopic>;
 
-function Topic({
+export function mapTopic({
   name,
   id,
   description,
@@ -23,16 +23,22 @@ function Topic({
   token_address,
   token_symbol,
   vote_weight_multiplier,
-}: TopicAttributes) {
+}: Topic) {
   return {
-    name,
+    community_id,
     id,
+    name,
     description,
     telegram,
+    featured_in_sidebar,
+    featured_in_new_post,
+    order,
+    group_ids,
+    total_threads,
+    active_contest_managers,
     communityId: community_id,
     featuredInSidebar: featured_in_sidebar,
     featuredInNewPost: featured_in_new_post,
-    order,
     defaultOffchainTemplate: default_offchain_template,
     totalThreads: total_threads || 0,
     channelId: channel_id,
