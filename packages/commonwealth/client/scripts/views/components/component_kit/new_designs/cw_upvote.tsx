@@ -48,7 +48,7 @@ export const CWUpvote: FC<CWUpvoteProps> = ({
         weight={active ? 'fill' : 'regular'}
       />
       <CWText className={getClasses({ ...getParameters() })} type="caption">
-        {formatBigNumberShort(BigNumber.from(voteCount))}
+        {formatBigNumberShort(BigNumber.from(voteCount || 0))}
       </CWText>
     </button>
   );

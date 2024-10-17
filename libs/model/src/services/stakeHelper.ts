@@ -17,9 +17,9 @@ import { contractHelpers } from '../services/commonProtocol';
 export async function getVotingWeight(
   topic_id: number,
   address: string,
-): Promise<number | null> {
+): Promise<BigNumber | null> {
   if (config.STAKE.REACTION_WEIGHT_OVERRIDE)
-    return config.STAKE.REACTION_WEIGHT_OVERRIDE;
+    return BigNumber.from(config.STAKE.REACTION_WEIGHT_OVERRIDE);
 
   const topic = await models.Topic.findByPk(topic_id, {
     include: [

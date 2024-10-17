@@ -1,9 +1,9 @@
-import BigNumber from 'bignumber.js';
 import { buildCreateCommentReactionInput } from 'client/scripts/state/api/comments/createReaction';
 import { buildDeleteCommentReactionInput } from 'client/scripts/state/api/comments/deleteReaction';
 import { useAuthModalStore } from 'client/scripts/state/ui/modals';
 import { notifyError } from 'controllers/app/notifications';
 import { SessionKeyError } from 'controllers/server/sessions';
+import { BigNumber } from 'ethers';
 import React, { useState } from 'react';
 import app from 'state';
 import useUserStore from 'state/ui/user';
@@ -53,8 +53,8 @@ export const CommentReactionButton = ({
     (x) => x?.author === activeAddress,
   );
   const reactionWeightsSum = comment.reactions.reduce(
-    (acc, curr) => BigNumber.sum(acc, curr.calculatedVotingWeight || 1),
-    BigNumber(0),
+    (acc, curr) => BigNumber.from(acc).mul(curr.calculatedVotingWeight || 1),
+    BigNumber.from(0),
   );
 
   const handleVoteClick = async (e) => {

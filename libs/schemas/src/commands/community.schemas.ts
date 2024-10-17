@@ -170,7 +170,6 @@ export const CreateTopic = {
         featured_in_new_post: true,
         default_offchain_template: true,
         weighted_voting: true,
-        chain_node_id: true,
         token_address: true,
         token_symbol: true,
         vote_weight_multiplier: true,
