@@ -52,7 +52,7 @@ export const HeadingButton = (props: HeadingButtonProps) => {
       content={`Change to ${blockType}`}
       renderTrigger={(handleInteraction) => (
         <CWIconButton
-          className={clsx({ CWHeadingButtonActive: active })}
+          className={clsx({ HeadingButtonActive: active })}
           buttonSize="lg"
           iconName={blockType}
           onMouseEnter={handleInteraction}
