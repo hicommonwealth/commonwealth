@@ -57,6 +57,9 @@ const api = {
   getComments: trpc.query(Comment.GetComments, trpc.Tag.Comment, {
     forceSecure: true,
   }),
+  getTopics: trpc.query(Community.GetTopics, trpc.Tag.Community, {
+    forceSecure: true,
+  }),
   createCommunity,
   updateCommunity,
   createTopic,

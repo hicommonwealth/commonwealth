@@ -24,6 +24,7 @@ import {
   DeleteTopic,
   GetCommunities,
   GetMembers,
+  GetTopics,
   JoinCommunity,
   JoinCommunityErrors,
   MAX_GROUPS_PER_COMMUNITY,
@@ -579,6 +580,14 @@ describe('Community lifecycle', () => {
           payload: { community_id: community.id, topic_id: topic!.id! },
         }),
       ).rejects.toThrow(InvalidActor);
+    });
+
+    test('should get topics', async () => {
+      const topics = await query(GetTopics(), {
+        actor: superAdminActor,
+        payload: { community_id: community.id, with_contest_managers: false },
+      });
+      expect(topics?.length).toBe(4);
     });
   });
 

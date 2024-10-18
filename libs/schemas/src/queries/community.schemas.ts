@@ -9,8 +9,11 @@ import {
   Community,
   CommunityMember,
   CommunityStake,
+  ContestManager,
   ExtendedCommunity,
+  Topic,
 } from '../entities';
+import * as projections from '../projections';
 import { PG_INT } from '../utils';
 import { PaginatedResultSchema, PaginationParamsSchema } from './pagination';
 
@@ -158,4 +161,32 @@ export const GetStakeHistoricalPrice = {
       old_price: z.string().nullish(),
     })
     .array(),
+};
+
+export const ConstestManagerView = ContestManager.extend({
+  created_at: z.string(),
+  topics: z.undefined(),
+  contests: z.undefined(),
+  content: z.array(
+    projections.ContestAction.extend({
+      created_at: z.string(),
+    }),
+  ),
+});
+
+export const TopicView = Topic.extend({
+  created_at: z.string(),
+  updated_at: z.string().nullish(),
+  deleted_at: z.string().nullish(),
+  contest_topics: z.undefined(),
+  total_threads: z.number(),
+  active_contest_managers: z.array(ConstestManagerView),
+});
+
+export const GetTopics = {
+  input: z.object({
+    community_id: z.string(),
+    with_contest_managers: z.boolean().optional(),
+  }),
+  output: z.array(TopicView),
 };

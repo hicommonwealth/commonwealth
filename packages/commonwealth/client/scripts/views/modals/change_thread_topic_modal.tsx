@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { buildUpdateThreadInput } from 'client/scripts/state/api/threads/editThread';
 import useUserStore from 'state/ui/user';
 import type Thread from '../../models/Thread';
-import type Topic from '../../models/Topic';
+import type { Topic } from '../../models/Topic';
 import app from '../../state';
 import { useEditThreadMutation } from '../../state/api/threads';
 import { useFetchTopicsQuery } from '../../state/api/topics';

@@ -62,7 +62,7 @@ const AdminContestsPage = () => {
   });
 
   const hasAtLeastOneWeightedVotingTopic = topicData?.some(
-    (t) => t.weightedVoting,
+    (t) => t.weighted_voting,
   );
 
   const { data: feeManagerBalance, isLoading: isFeeManagerBalanceLoading } =

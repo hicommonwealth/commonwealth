@@ -1,6 +1,6 @@
 import { AxiosResponse } from 'axios';
 import Thread from 'models/Thread';
-import Topic from 'models/Topic';
+import type { Topic } from 'models/Topic';
 import { ThreadKind, ThreadStage } from 'models/types';
 
 type ActivityResponse = {

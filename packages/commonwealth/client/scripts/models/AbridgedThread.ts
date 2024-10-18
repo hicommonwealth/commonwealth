@@ -1,6 +1,6 @@
 import { ProposalType } from '@hicommonwealth/shared';
 import type moment from 'moment';
-import type Topic from './Topic';
+import type { Topic } from './Topic';
 import type { IUniqueId } from './interfaces';
 
 class AbridgedThread implements IUniqueId {
