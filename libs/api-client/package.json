@@ -24,11 +24,12 @@
   },
   "scripts": {
     "build": "echo Generated SDK is prebuilt",
-    "clean": "echo Generated SDK is prebuilt",
-    "check-types": "echo Generated SDK is prebuilt",
-    "publish": "npm publish",
-    "format": "npx prettier --write 'src/**/*.{js,d.ts}'",
-    "generate-client": "chmod u+x scripts/fern-init.sh && ./scripts/fern-init.sh && fern generate && pnpm format"
+    "clean": "rm -rf src/ && rm -f openapi.json",
+    "run-test": "tsx ./test/index.ts",
+    "publish-pkg": "chmod u+x scripts/publish.sh && ./scripts/publish.sh",
+    "check-types": "echo No types to check",
+    "generate-client": "pnpm -F commonwealth generate-oas production \"$(pwd)/openapi.json\" && fern generate",
+    "generate-client-dev": "pnpm -F commonwealth generate-oas local \"$(pwd)/openapi.json\" && fern generate"
   },
   "keywords": [
     "commonwealth",
