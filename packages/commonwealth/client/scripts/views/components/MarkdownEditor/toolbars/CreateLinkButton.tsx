@@ -8,7 +8,7 @@ export type CWCreateLinkButtonProps = Readonly<{
   onClick?: (event: React.MouseEvent<HTMLElement, MouseEvent>) => void;
 }>;
 
-export const CWCreateLinkButton = (props: CWCreateLinkButtonProps) => {
+export const CreateLinkButton = (props: CWCreateLinkButtonProps) => {
   const { onClick } = props;
   const openLinkDialog = usePublisher(openLinkEditDialog$);
 

@@ -10,12 +10,12 @@ import {
   Separator,
 } from 'commonwealth-mdxeditor';
 import React from 'react';
-import { CWCreateLinkButton } from 'views/components/MarkdownEditor/toolbars/CWCreateLinkButton';
 import { CWFormatButton } from 'views/components/MarkdownEditor/toolbars/CWFormatButton';
 import { CWHeadingButton } from 'views/components/MarkdownEditor/toolbars/CWHeadingButton';
 import { CWInsertCodeBlockButton } from 'views/components/MarkdownEditor/toolbars/CWInsertCodeBlockButton';
 import { CWListButton } from 'views/components/MarkdownEditor/toolbars/CWListButton';
 import { CWTableButton } from 'views/components/MarkdownEditor/toolbars/CWTableButton';
+import { CreateLinkButton } from 'views/components/MarkdownEditor/toolbars/CreateLinkButton';
 import { ImageButton } from 'views/components/MarkdownEditor/toolbars/ImageButton';
 import './ToolbarForDesktop.scss';
 
@@ -78,7 +78,7 @@ export const ToolbarForDesktop = (props: ToolbarForDesktopProps) => {
                   <Separator />
 
                   <div className="button-container">
-                    <CWCreateLinkButton />
+                    <CreateLinkButton />
                     <ImageButton onImage={onImage} />
                     <CWInsertCodeBlockButton />
                     <CWHeadingButton blockType="quote" />
