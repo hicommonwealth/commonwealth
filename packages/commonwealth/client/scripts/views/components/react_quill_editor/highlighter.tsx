@@ -2,13 +2,19 @@ import { findAll } from 'highlight-words-core';
 import React from 'react';
 import smartTruncate from 'smart-truncate';
 
+const escapeRegExp = (string: string) => {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // Escaping special characters
+};
+
 export const renderTruncatedHighlights = (
   searchTerm: string,
   docText: string,
 ) => {
-  // extract highlighted text
+  const words = searchTerm.split(/\s+/); // Split on whitespace
+  // Escape each word in the search term
+  const escapedWords = words.map((word) => escapeRegExp(word));
   const chunks = findAll({
-    searchWords: [searchTerm.trim()],
+    searchWords: escapedWords,
     textToHighlight: docText,
   });
 
