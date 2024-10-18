@@ -149,6 +149,7 @@ function mapThread(thread: z.infer<typeof ActivityThread>): Thread {
     community_id: thread.community_id,
     read_only: thread.read_only,
     body: thread.body,
+    content_url: thread.content_url || null,
     locked_at: thread.locked_at ?? '',
     archived_at: thread.archived_at ?? '',
     has_poll: thread.has_poll ?? false,
@@ -176,6 +177,7 @@ function mapThread(thread: z.infer<typeof ActivityThread>): Thread {
             profile_avatar: c.profile_avatar,
             profile_name: c.profile_name,
             text: c.text,
+            content_url: c.content_url || null,
           }) as RecentComment,
       ) ?? [],
   });

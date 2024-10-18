@@ -56,7 +56,8 @@ export type AuthorAndPublishInfoProps = {
   popoverPlacement?: PopperPlacementType;
   profile?: UserProfile;
   versionHistory?: ThreadVersionHistory[] | CommentVersionHistory[];
-  changeContentText?: (text: string) => void;
+  activeThreadVersionId?: number;
+  onChangeVersionHistoryNumber?: (id: number) => void;
 };
 
 export const AuthorAndPublishInfo = ({
@@ -82,7 +83,8 @@ export const AuthorAndPublishInfo = ({
   popoverPlacement,
   profile,
   versionHistory,
-  changeContentText,
+  activeThreadVersionId,
+  onChangeVersionHistoryNumber,
 }: AuthorAndPublishInfoProps) => {
   const popoverProps = usePopover();
   const containerRef = useRef(null);
@@ -100,15 +102,20 @@ export const AuthorAndPublishInfo = ({
     }, {}) ?? {};
 
   const fromDiscordBot = discord_meta !== null && discord_meta !== undefined;
-  const versionHistoryOptions = versionHistory?.map((v) => ({
-    value: v.body || v.text,
-    label: formatVersionText(
-      moment(v.timestamp),
-      v.address,
-      collaboratorLookupInfo,
-      profile?.name,
-    ),
-  }));
+  const versionHistoryOptions = versionHistory
+    ?.map((v) => ({
+      value: v.id as number,
+      label: formatVersionText(
+        moment(v.timestamp),
+        v.address,
+        collaboratorLookupInfo,
+        profile?.name,
+      ),
+    }))
+    .sort((a, b) => b.value - a.value);
+  const versionHistorySelectedValue = (versionHistoryOptions || [])?.find(
+    (option) => option.value === activeThreadVersionId,
+  );
 
   const isCommunityFirstLayout = layoutType === 'community-first';
   const { data: communtyInfo, isLoading: isLoadingCommunity } =
@@ -225,15 +232,16 @@ export const AuthorAndPublishInfo = ({
                   ?.utc?.()
                   ?.local?.()
                   ?.format('DD/MM/YYYY')}`}
-                // @ts-expect-error <StrictNullChecks>
-                onChange={({ value }) => {
-                  // @ts-expect-error <StrictNullChecks>
-                  changeContentText(value);
+                onChange={({ value }: { value: number; label: string }) => {
+                  onChangeVersionHistoryNumber?.(value);
                 }}
                 formatOptionLabel={(option) => {
                   return option.label.split('\n')[0];
                 }}
                 isSearchable={false}
+                {...(versionHistorySelectedValue && {
+                  value: versionHistorySelectedValue,
+                })}
               />
             </div>
           ) : (
