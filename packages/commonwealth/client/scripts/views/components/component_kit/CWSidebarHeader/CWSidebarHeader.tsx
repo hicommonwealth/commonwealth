@@ -26,7 +26,7 @@ const SidebarHeader = ({
     id: communityId,
     enabled: !!communityId,
   });
-  console.log('community', community?.name);
+
   return (
     <div className="SidebarHeader">
       <CWCommunityAvatar
