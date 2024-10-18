@@ -291,8 +291,8 @@ jobs:
         run: cd packages/commonwealth && ./scripts/detect-broken-ts-expect-error.sh
 
   # These tests run quickly, so run them in a separate job
-  commonwealth-integration:
-    name: Commonwealth Unit And Integration Tests
+  commonwealth-integration-test:
+    name: Commonwealth Integration Tests
     runs-on: ubuntu-latest
     timeout-minutes: 20
     strategy:
