@@ -8,9 +8,7 @@ export type CWInsertCodeBlockButtonProps = Readonly<{
   onClick?: (event: React.MouseEvent<HTMLElement, MouseEvent>) => void;
 }>;
 
-export const CWInsertCodeBlockButton = (
-  props: CWInsertCodeBlockButtonProps,
-) => {
+export const InsertCodeBlockButton = (props: CWInsertCodeBlockButtonProps) => {
   const { onClick } = props;
   const insertCodeBlock = usePublisher(insertCodeBlock$);
 
