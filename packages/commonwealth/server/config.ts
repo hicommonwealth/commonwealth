@@ -156,5 +156,12 @@ export const config = configure(
       EVM_CE_POLL_INTERVAL_MS: z.number().int().positive(),
     }),
     PEER_ID: z.string().optional(),
+    SNAPSHOT_WEBHOOK_SECRET: z
+      .string()
+      .optional()
+      .refine(
+        (data) => !(!['local', 'CI'].includes(model_config.APP_ENV) && !data),
+        'SNAPSHOT_WEBHOOK_SECRET is required in public environments',
+      ),
   }),
 );
