@@ -138,7 +138,8 @@ async function validateExternalApiVersioning() {
     : parseSemVer(process.argv[2]);
 
   console.log(
-    `Files downloaded and versions parsed. \nNew Version: ${JSON.stringify(newVersion)}\nOld Version: ${JSON.stringify(oldVersion)}`,
+    `Files downloaded and versions parsed. \nNew Version: ${JSON.stringify(newVersion)}` +
+      `\nOld Version: ${JSON.stringify(oldVersion)}`,
   );
 
   if (oldVersion.major < newVersion.major) {
