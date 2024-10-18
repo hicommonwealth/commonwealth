@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import {
   applyFormat$,
   currentFormat$,
@@ -42,7 +43,7 @@ export const CWFormatButton = (props: HeadingButtonProps) => {
       content={`Change to ${formatName}`}
       renderTrigger={(handleInteraction) => (
         <CWIconButton
-          className={active ? 'CWHeadingButtonActive' : ''}
+          className={clsx({ CWHeadingButtonActive: active })}
           buttonSize="lg"
           iconName={formatToIconName(format)}
           onMouseEnter={handleInteraction}

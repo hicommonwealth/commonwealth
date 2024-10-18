@@ -1,4 +1,5 @@
 import { $createHeadingNode, $createQuoteNode } from '@lexical/rich-text';
+import clsx from 'clsx';
 import {
   convertSelectionToNode$,
   currentBlockType$,
@@ -46,14 +47,12 @@ export const CWHeadingButton = (props: CWHeadingButtonProps) => {
     [active, blockType, convertSelectionToNode, onClick],
   );
 
-  // TODO: there's a bug in handleInteraction here where it's not going away
-
   return (
     <CWTooltip
       content={`Change to ${blockType}`}
       renderTrigger={(handleInteraction) => (
         <CWIconButton
-          className={active ? 'CWHeadingButtonActive' : ''}
+          className={clsx({ CWHeadingButtonActive: active })}
           buttonSize="lg"
           iconName={blockType}
           onMouseEnter={handleInteraction}
