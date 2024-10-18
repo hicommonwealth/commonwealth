@@ -66,7 +66,6 @@ export function GetTopics(): Query<typeof schemas.GetTopics> {
         channel_id,
         group_ids,
         weighted_voting,
-        chain_node_id,
         token_symbol,
         vote_weight_multiplier,
         created_at::text as created_at,
