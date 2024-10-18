@@ -3,7 +3,7 @@ import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../database';
 import { AuthContext, isAuthorized } from '../middleware';
 
-const Errors = {
+export const BanAddressErrors = {
   NotFound: 'Address not found',
   AlreadyExists: 'Ban for this address already exists',
 };
@@ -21,10 +21,10 @@ export function BanAddress(): Command<typeof schemas.BanAddress, AuthContext> {
         },
       });
       if (!addressInstance) {
-        throw new InvalidState(Errors.NotFound);
+        throw new InvalidState(BanAddressErrors.NotFound);
       }
       if (addressInstance.is_banned) {
-        throw new InvalidState(Errors.AlreadyExists);
+        throw new InvalidState(BanAddressErrors.AlreadyExists);
       }
       addressInstance.is_banned = true;
       await addressInstance.save();

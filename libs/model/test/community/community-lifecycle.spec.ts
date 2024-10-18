@@ -7,16 +7,15 @@ import {
   dispose,
   query,
 } from '@hicommonwealth/core';
-import {
-  PermissionEnum,
-  TopicWeightedVoting,
-} from '@hicommonwealth/schemas';
+import { PermissionEnum, TopicWeightedVoting } from '@hicommonwealth/schemas';
 import { ChainBase, ChainType } from '@hicommonwealth/shared';
 import { Chance } from 'chance';
 import { CreateTopic } from 'model/src/community/CreateTopic.command';
 import { UpdateTopic } from 'model/src/community/UpdateTopic.command';
 import { afterAll, assert, beforeAll, describe, expect, test } from 'vitest';
 import {
+  BanAddress,
+  BanAddressErrors,
   CreateCommunity,
   CreateGroup,
   CreateGroupErrors,
@@ -364,15 +363,30 @@ describe('Community lifecycle', () => {
           payload: buildCreateGroupPayload(community.id, [
             {
               id: 1,
-              permissions: [PermissionEnum.CREATE_COMMENT, PermissionEnum.CREATE_THREAD, PermissionEnum.CREATE_COMMENT_REACTION,PermissionEnum.CREATE_THREAD_REACTION],
+              permissions: [
+                PermissionEnum.CREATE_COMMENT,
+                PermissionEnum.CREATE_THREAD,
+                PermissionEnum.CREATE_COMMENT_REACTION,
+                PermissionEnum.CREATE_THREAD_REACTION,
+              ],
             },
             {
               id: 2,
-              permissions: [PermissionEnum.CREATE_COMMENT, PermissionEnum.CREATE_THREAD, PermissionEnum.CREATE_COMMENT_REACTION,PermissionEnum.CREATE_THREAD_REACTION],
+              permissions: [
+                PermissionEnum.CREATE_COMMENT,
+                PermissionEnum.CREATE_THREAD,
+                PermissionEnum.CREATE_COMMENT_REACTION,
+                PermissionEnum.CREATE_THREAD_REACTION,
+              ],
             },
             {
               id: 3,
-              permissions: [PermissionEnum.CREATE_COMMENT, PermissionEnum.CREATE_THREAD, PermissionEnum.CREATE_COMMENT_REACTION,PermissionEnum.CREATE_THREAD_REACTION],
+              permissions: [
+                PermissionEnum.CREATE_COMMENT,
+                PermissionEnum.CREATE_THREAD,
+                PermissionEnum.CREATE_COMMENT_REACTION,
+                PermissionEnum.CREATE_THREAD_REACTION,
+              ],
             },
           ]),
         }),
@@ -782,6 +796,53 @@ describe('Community lifecycle', () => {
           payload: { community_id: substrate_community.id },
         }),
       ).rejects.toThrow(JoinCommunityErrors.NotVerifiedAddressOrUser);
+    });
+  });
+
+  describe('ban address', () => {
+    test('should fail if actor is not admin', async () => {
+      await expect(() =>
+        command(BanAddress(), {
+          actor: ethActor,
+          payload: {
+            community_id: community.id!,
+            address: '',
+          },
+        }),
+      ).rejects.toThrow(InvalidActor);
+    });
+    test('should fail to ban an address of a different community', async () => {
+      await expect(() =>
+        command(BanAddress(), {
+          actor: ethAdminActor,
+          payload: {
+            address: substrateActor.address!,
+            community_id: substrate_community.id!,
+          },
+        }),
+      ).rejects.toThrow(InvalidActor);
+    });
+    test('should fail if address is not found in community', async () => {
+      await expect(() =>
+        command(BanAddress(), {
+          actor: ethAdminActor,
+          payload: { address: '0xrandom', community_id: community.id! },
+        }),
+      ).rejects.toThrow(BanAddressErrors.NotFound);
+    });
+    test('should allow an admin to ban an address', async () => {
+      await command(BanAddress(), {
+        actor: ethAdminActor,
+        payload: { address: ethActor.address!, community_id: community.id! },
+      });
+    });
+    test('should fail if address is already banned', async () => {
+      await expect(() =>
+        command(BanAddress(), {
+          actor: ethAdminActor,
+          payload: { address: ethActor.address!, community_id: community.id! },
+        }),
+      ).rejects.toThrow(BanAddressErrors.AlreadyExists);
     });
   });
 });
