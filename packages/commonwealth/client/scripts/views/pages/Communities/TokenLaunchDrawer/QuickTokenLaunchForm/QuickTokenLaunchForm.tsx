@@ -17,6 +17,7 @@ import { CWText } from 'views/components/component_kit/cw_text';
 import CWBanner from 'views/components/component_kit/new_designs/CWBanner';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
+import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import TokenLaunchButton from 'views/components/sidebar/TokenLaunchButton';
 import { generateCommunityNameFromToken } from '../../../LaunchToken/steps/CommunityInformationStep/utils';
 import SuccessStep from '../../../LaunchToken/steps/SuccessStep';
@@ -24,17 +25,30 @@ import TokenInformationForm from '../../../LaunchToken/steps/TokenInformationSte
 import { FormSubmitValues } from '../../../LaunchToken/steps/TokenInformationStep/TokenInformationForm/types';
 import useCreateTokenCommunity from '../../../LaunchToken/useCreateTokenCommunity';
 import './QuickTokenLaunchForm.scss';
+import { useGenerateTokenIdea } from './useGenerateTokenIdea';
 
 type QuickTokenLaunchFormProps = {
   onCancel: () => void;
   onCommunityCreated: (communityId: string) => void;
 };
 
+const MAX_IDEAS_LIMIT = 5;
+
 export const QuickTokenLaunchForm = ({
   onCancel,
   onCommunityCreated,
 }: QuickTokenLaunchFormProps) => {
-  const [randomizeAttempts] = useState<{ data: Object }[]>([]);
+  const {
+    generateIdea,
+    tokenIdeas,
+    activeTokenIdeaIndex,
+    setActiveTokenIdeaIndex,
+  } = useGenerateTokenIdea({
+    maxIdeasLimit: MAX_IDEAS_LIMIT,
+  });
+  const generatedTokenIdea = tokenIdeas[activeTokenIdeaIndex];
+  const isMaxTokenIdeaLimitReached =
+    MAX_IDEAS_LIMIT === Math.max(tokenIdeas.length, activeTokenIdeaIndex + 1);
   const [isCreatingQuickToken, setIsCreatingQuickToken] = useState(false);
   const [
     createdCommunityIdsToTokenInfoMap,
@@ -83,10 +97,10 @@ export const QuickTokenLaunchForm = ({
         }
 
         const sanitizedTokenInfo = {
-          name: tokenInfo.tokenName.trim(),
-          symbol: tokenInfo.tokenTicker.trim(),
-          description: tokenInfo.tokenDescription.trim() || '',
-          imageURL: tokenInfo.tokenImageURL.trim() || '',
+          name: tokenInfo.name.trim(),
+          symbol: tokenInfo.symbol.trim(),
+          description: tokenInfo.description.trim() || '',
+          imageURL: tokenInfo.imageURL.trim() || '',
         };
 
         // 1. check if this same token info was submitted before and a community per that info was created
@@ -257,10 +271,19 @@ export const QuickTokenLaunchForm = ({
         <SuccessStep communityId={createdCommunityId} withToken />
       ) : (
         <TokenInformationForm
+          // TODO: changing image url is not correctly updating cw_cover_image in the token form
+          // need to fix that or this key also works, but ideally fixing that is happy path
+          key={`${activeTokenIdeaIndex}-${generatedTokenIdea?.token?.imageURL}`}
           selectedAddress={selectedAddress}
           onAddressSelected={setSelectedAddress}
           onCancel={onCancel}
           onSubmit={handleSubmit}
+          {...(generatedTokenIdea?.chunkingField && {
+            focusField: generatedTokenIdea.chunkingField,
+          })}
+          {...(generatedTokenIdea?.token && {
+            forceFormValues: generatedTokenIdea?.token,
+          })}
           containerClassName={clsx('shortened-token-information-form', {
             'display-none': isCreatingQuickToken,
           })}
@@ -272,25 +295,62 @@ export const QuickTokenLaunchForm = ({
                         You can edit your community post launch.`}
               />
               <div className="cta-elements">
-                {/* TODO: https://github.com/hicommonwealth/commonwealth/issues/8863 */}
+                {/* allows to switch b/w generated ideas */}
                 <PageCounter
-                  activePage={randomizeAttempts.length + 2}
-                  totalPages={randomizeAttempts.length + 3}
-                  onPageChange={() => {}}
-                />
-
-                {/* TODO: https://github.com/hicommonwealth/commonwealth/issues/8863 */}
-                <CWButton
-                  iconLeft="brain"
-                  label="Randomize"
-                  containerClassName="ml-auto"
+                  activePage={activeTokenIdeaIndex + 1}
+                  totalPages={
+                    tokenIdeas.length == 0
+                      ? 1
+                      : Math.max(tokenIdeas.length, activeTokenIdeaIndex + 1)
+                  }
+                  onPageChange={(index) => setActiveTokenIdeaIndex(index - 1)}
                   disabled={isProcessingProfileImage || isCreatingQuickToken}
                 />
+
+                {isMaxTokenIdeaLimitReached ? (
+                  <CWTooltip
+                    placement="bottom"
+                    content={`You can only generate a max of ${MAX_IDEAS_LIMIT} ideas.`}
+                    renderTrigger={(handleInteraction) => (
+                      <CWButton
+                        iconLeft="brain"
+                        label="Randomize"
+                        containerClassName="ml-auto"
+                        type="button"
+                        disabled={
+                          isProcessingProfileImage ||
+                          isCreatingQuickToken ||
+                          isMaxTokenIdeaLimitReached
+                        }
+                        onClick={generateIdea}
+                        onMouseEnter={handleInteraction}
+                        onMouseLeave={handleInteraction}
+                      />
+                    )}
+                  />
+                ) : (
+                  <CWButton
+                    iconLeft="brain"
+                    label="Randomize"
+                    containerClassName="ml-auto"
+                    type="button"
+                    disabled={
+                      isProcessingProfileImage ||
+                      isCreatingQuickToken ||
+                      isMaxTokenIdeaLimitReached
+                    }
+                    onClick={generateIdea}
+                  />
+                )}
 
                 <TokenLaunchButton
                   buttonWidth="wide"
                   buttonType="submit"
-                  disabled={isProcessingProfileImage || isCreatingQuickToken}
+                  disabled={
+                    isProcessingProfileImage ||
+                    isCreatingQuickToken ||
+                    generatedTokenIdea?.isGeneratingTokenIdea
+                  }
                 />
               </div>
             </>
