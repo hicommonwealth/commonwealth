@@ -100,15 +100,17 @@ export const AuthorAndPublishInfo = ({
     }, {}) ?? {};
 
   const fromDiscordBot = discord_meta !== null && discord_meta !== undefined;
-  const versionHistoryOptions = versionHistory?.map((v) => ({
-    value: v.id as number,
-    label: formatVersionText(
-      moment(v.timestamp),
-      v.address,
-      collaboratorLookupInfo,
-      profile?.name,
-    ),
-  }));
+  const versionHistoryOptions = versionHistory
+    ?.map((v) => ({
+      value: v.id as number,
+      label: formatVersionText(
+        moment(v.timestamp),
+        v.address,
+        collaboratorLookupInfo,
+        profile?.name,
+      ),
+    }))
+    .sort((a, b) => b.value - a.value);
 
   const isCommunityFirstLayout = layoutType === 'community-first';
   const { data: communtyInfo, isLoading: isLoadingCommunity } =
