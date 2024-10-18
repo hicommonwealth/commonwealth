@@ -56,6 +56,7 @@ export type AuthorAndPublishInfoProps = {
   popoverPlacement?: PopperPlacementType;
   profile?: UserProfile;
   versionHistory?: ThreadVersionHistory[] | CommentVersionHistory[];
+  activeThreadVersionId?: number;
   onChangeVersionHistoryNumber?: (id: number) => void;
 };
 
@@ -82,6 +83,7 @@ export const AuthorAndPublishInfo = ({
   popoverPlacement,
   profile,
   versionHistory,
+  activeThreadVersionId,
   onChangeVersionHistoryNumber,
 }: AuthorAndPublishInfoProps) => {
   const popoverProps = usePopover();
@@ -111,6 +113,9 @@ export const AuthorAndPublishInfo = ({
       ),
     }))
     .sort((a, b) => b.value - a.value);
+  const versionHistorySelectedValue = (versionHistoryOptions || [])?.find(
+    (option) => option.value === activeThreadVersionId,
+  );
 
   const isCommunityFirstLayout = layoutType === 'community-first';
   const { data: communtyInfo, isLoading: isLoadingCommunity } =
@@ -234,6 +239,9 @@ export const AuthorAndPublishInfo = ({
                   return option.label.split('\n')[0];
                 }}
                 isSearchable={false}
+                {...(versionHistorySelectedValue && {
+                  value: versionHistorySelectedValue,
+                })}
               />
             </div>
           ) : (

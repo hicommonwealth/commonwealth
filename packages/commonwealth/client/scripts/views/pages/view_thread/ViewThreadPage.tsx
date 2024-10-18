@@ -139,6 +139,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
       enabled: !!contentUrlBodyToFetch,
     });
 
+  const [activeThreadVersionId, setActiveThreadVersionId] = useState<number>();
   const [threadBody, setThreadBody] = useState(thread?.body);
 
   const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
@@ -240,6 +241,15 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
       setThreadBody(contentUrlBody);
     }
   }, [contentUrlBody]);
+
+  // Imp: this is expected to "not-interfere" with version history selector
+  useEffect(() => {
+    if (thread?.versionHistory) {
+      setActiveThreadVersionId(
+        Math.max(...thread.versionHistory.map(({ id }) => id)),
+      );
+    }
+  }, [thread?.versionHistory]);
 
   if (typeof identifier !== 'string') {
     return <PageNotFound />;
@@ -393,6 +403,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     const foundVersion = (thread?.versionHistory || []).find(
       (version) => version.id === versionId,
     );
+    foundVersion && setActiveThreadVersionId(foundVersion?.id);
     if (!foundVersion?.content_url) {
       setThreadBody(foundVersion?.body || '');
       setContentUrlBodyToFetch('');
@@ -596,6 +607,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
             setIsEditingBody(false);
           }}
           hasPendingEdits={!!editsToSave}
+          activeThreadVersionId={activeThreadVersionId}
           onChangeVersionHistoryNumber={handleVersionHistoryChange}
           body={(threadOptionsComp) => (
             <div className="thread-content">
