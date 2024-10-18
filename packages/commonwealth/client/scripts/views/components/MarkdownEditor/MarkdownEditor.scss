@@ -105,11 +105,6 @@ body,
   }
 
   div[data-editor-block-type='image'] {
-    // this can be used to get rid of all button options.
-    //div:has(button) {
-    //  display: none;
-    //}
-
     // this selects and hides the settings button
     button:nth-of-type(2) {
       display: none;
