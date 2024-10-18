@@ -56,6 +56,7 @@ import setAddressWallet from '../routes/setAddressWallet';
 
 import type DatabaseValidationService from '../middleware/databaseValidationService';
 import generateImage from '../routes/generateImage';
+import generateTokenIdea from '../routes/generateTokenIdea';
 
 import * as controllers from '../controller';
 import addThreadLink from '../routes/linking/addThreadLinks';
@@ -551,6 +552,18 @@ function setupRouter(
     }),
     passport.authenticate('jwt', { session: false }),
     generateImage.bind(this, models),
+  );
+
+  registerRoute(
+    router,
+    'post',
+    '/generateTokenIdea',
+    rateLimiterMiddleware({
+      routerNamespace: 'generateTokenIdea',
+      requestsPerMinute: config.GENERATE_IMAGE_RATE_LIMIT,
+    }),
+    passport.authenticate('jwt', { session: false }),
+    generateTokenIdea.bind(this, models),
   );
 
   // linking
