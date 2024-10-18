@@ -678,18 +678,18 @@ describe('Community lifecycle', () => {
           id: community.id,
           chain_node_id: edgewareNode!.id!,
         },
-      }),
-        await expect(() =>
-          command(UpdateCommunity(), {
-            actor: superAdminActor,
-            payload: {
-              ...baseRequest,
-              id: community.id,
-              namespace: 'tempNamespace',
-              transactionHash: '0x1234',
-            },
-          }),
-        ).rejects.toThrow('Namespace not supported on selected chain');
+      });
+      await expect(() =>
+        command(UpdateCommunity(), {
+          actor: superAdminActor,
+          payload: {
+            ...baseRequest,
+            id: community.id,
+            namespace: 'tempNamespace',
+            transactionHash: '0x1234',
+          },
+        }),
+      ).rejects.toThrow('Namespace not supported on selected chain');
     });
   });
 
