@@ -304,3 +304,11 @@ export const JoinCommunity = {
     ss58Prefix: z.number().optional(),
   }),
 };
+
+export const BanAddress = {
+  input: z.object({
+    community_id: z.string(),
+    address: z.string(),
+  }),
+  output: z.object({}),
+};
