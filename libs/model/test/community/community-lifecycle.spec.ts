@@ -492,7 +492,6 @@ describe('Community lifecycle', () => {
     });
 
     test('should create topic (stake weighted)', async () => {
-      // when community is staked, topic will automatically be staked
       await models.CommunityStake.create({
         community_id: community.id,
         stake_id: 1,
@@ -508,6 +507,7 @@ describe('Community lifecycle', () => {
           description: 'boohoo',
           featured_in_sidebar: false,
           featured_in_new_post: false,
+          weighted_voting: TopicWeightedVoting.Stake,
         },
       });
       const { topic } = result!;

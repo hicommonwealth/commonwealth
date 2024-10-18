@@ -46,7 +46,6 @@ interface ContestsListProps {
   hasWeightedTopic: boolean;
   stakeEnabled: boolean;
   isContestAvailable: boolean;
-  feeManagerBalance?: string;
   onSetContestSelectionView?: () => void;
 }
 
@@ -57,7 +56,6 @@ const ContestsList = ({
   hasWeightedTopic,
   stakeEnabled,
   isContestAvailable,
-  feeManagerBalance,
   onSetContestSelectionView,
 }: ContestsListProps) => {
   const [fundDrawerContest, setFundDrawerContest] = useState<Contest>();
@@ -92,7 +90,7 @@ const ContestsList = ({
               moment(a.end_time).isBefore(b.end_time) ? -1 : 1,
             );
 
-            const { end_time, score } =
+            const { end_time } =
               sortedContests[sortedContests.length - 1] || {};
 
             return (
@@ -106,14 +104,13 @@ const ContestsList = ({
                 imageUrl={contest.image_url}
                 // @ts-expect-error <StrictNullChecks/>
                 topics={contest.topics}
-                score={score}
                 decimals={contest.decimals}
                 ticker={contest.ticker}
                 finishDate={end_time ? moment(end_time).toISOString() : ''}
                 isCancelled={contest.cancelled}
                 onFund={() => setFundDrawerContest(contest)}
-                feeManagerBalance={feeManagerBalance}
                 isRecurring={!contest.funding_token_address}
+                payoutStructure={contest.payout_structure}
               />
             );
           })
