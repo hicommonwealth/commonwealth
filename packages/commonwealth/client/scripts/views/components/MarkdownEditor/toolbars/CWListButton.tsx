@@ -5,6 +5,7 @@ import {
   usePublisher,
 } from 'commonwealth-mdxeditor';
 import React, { useCallback } from 'react';
+import { listTypeToIconName } from 'views/components/MarkdownEditor/toolbars/listTypeToIconName';
 import CWIconButton from 'views/components/component_kit/new_designs/CWIconButton';
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import './CWListButton.scss';
@@ -15,17 +16,6 @@ export type CWListButtonProps = Readonly<{
   listType: ListType;
   onClick?: (event: React.MouseEvent<HTMLElement, MouseEvent>) => void;
 }>;
-
-function listTypeToIconName(listType: ListType) {
-  switch (listType) {
-    case 'number':
-      return 'listNumbers';
-    case 'bullet':
-      return 'listDashes';
-    case 'check':
-      return 'listChecks';
-  }
-}
 
 export const CWListButton = (props: CWListButtonProps) => {
   const { listType, onClick } = props;
