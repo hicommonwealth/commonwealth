@@ -375,7 +375,7 @@ export class Thread implements IUniqueId {
     this.identifier = `${id}`;
     this.createdAt = moment(created_at);
     this.updatedAt = moment(updated_at);
-    this.topic = topic?.id ? ({ ...(topic || {}) } as any) : null;
+    this.topic = { ...topic };
     this.kind = kind;
     this.stage = stage;
     this.authorCommunity = Address?.community_id;
