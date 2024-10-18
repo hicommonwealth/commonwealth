@@ -1,5 +1,8 @@
 name: Update Client SDK Version
 
+env:
+  APP_ENV: CI
+
 on:
   pull_request:
     branches:
