@@ -171,7 +171,6 @@ export const CreateTopic = {
         featured_in_new_post: true,
         default_offchain_template: true,
         weighted_voting: true,
-        chain_node_id: true,
         token_address: true,
         token_symbol: true,
         vote_weight_multiplier: true,
@@ -303,4 +302,12 @@ export const JoinCommunity = {
     wallet_id: z.nativeEnum(WalletId).optional(),
     ss58Prefix: z.number().optional(),
   }),
+};
+
+export const BanAddress = {
+  input: z.object({
+    community_id: z.string(),
+    address: z.string(),
+  }),
+  output: z.object({}),
 };

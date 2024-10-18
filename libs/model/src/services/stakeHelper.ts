@@ -17,9 +17,9 @@ import { contractHelpers } from '../services/commonProtocol';
 export async function getVotingWeight(
   topic_id: number,
   address: string,
-): Promise<number | null> {
+): Promise<BigNumber | null> {
   if (config.STAKE.REACTION_WEIGHT_OVERRIDE)
-    return config.STAKE.REACTION_WEIGHT_OVERRIDE;
+    return BigNumber.from(config.STAKE.REACTION_WEIGHT_OVERRIDE);
 
   const topic = await models.Topic.findByPk(topic_id, {
     include: [
@@ -38,25 +38,21 @@ export async function getVotingWeight(
           },
         ],
       },
-      {
-        model: models.ChainNode,
-        required: false,
-      },
     ],
   });
-
   mustExist('Topic', topic);
 
   const { community } = topic;
-
   mustExist('Community', community);
 
+  const chain_node = community.ChainNode;
+
   if (topic.weighted_voting === TopicWeightedVoting.Stake) {
+    mustExist('Chain Node Eth Chain Id', chain_node?.eth_chain_id);
     mustExist('Community Namespace Address', community.namespace_address);
+
     const stake = topic.community?.CommunityStakes?.at(0);
     mustExist('Community Stake', stake);
-    const chain_node = community.ChainNode;
-    mustExist('Chain Node Eth Chain Id', chain_node?.eth_chain_id);
 
     const stakeBalances = await contractHelpers.getNamespaceBalance(
       community.namespace_address,
@@ -70,24 +66,23 @@ export async function getVotingWeight(
 
     return commonProtocol.calculateVoteWeight(stakeBalance, stake.vote_weight);
   } else if (topic.weighted_voting === TopicWeightedVoting.ERC20) {
-    const {
-      ChainNode: chain_node,
-      token_address,
-      vote_weight_multiplier,
-    } = topic;
-    mustExist('Topic Chain Node Eth Chain Id', chain_node?.eth_chain_id);
+    mustExist('Chain Node Eth Chain Id', chain_node?.eth_chain_id);
 
     const balances = await tokenBalanceCache.getBalances({
       balanceSourceType: BalanceSourceType.ERC20,
       addresses: [address],
       sourceOptions: {
-        evmChainId: chain_node?.eth_chain_id,
-        contractAddress: token_address!,
+        evmChainId: chain_node.eth_chain_id,
+        contractAddress: topic.token_address!,
       },
       cacheRefresh: true,
     });
-    const balance = balances[address];
-    return commonProtocol.calculateVoteWeight(balance, vote_weight_multiplier!);
+    const result = commonProtocol.calculateVoteWeight(
+      balances[address],
+      topic.vote_weight_multiplier!,
+    );
+    // only count full ERC20 tokens
+    return result?.div(BigNumber.from(10).pow(18)) || null;
   }
 
   // no weighted voting
