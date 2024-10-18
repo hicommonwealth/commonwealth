@@ -7,6 +7,7 @@ import { CWIconButton } from './cw_icon_button';
 import { CWButton } from './new_designs/CWButton';
 
 import axios from 'axios';
+import clsx from 'clsx';
 import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import { useFormContext } from 'react-hook-form';
 import useUserStore from 'state/ui/user';
@@ -39,6 +40,7 @@ type CoverImageUploaderProps = CoverImageUploaderFormValidationProps & {
   showUploadAndGenerateText?: boolean;
   onImageBehaviourChange?: (behaviour: ImageBehavior) => void;
   onImageProcessStatusChange?: (isProcessing: boolean) => any;
+  disabled?: boolean;
 };
 
 export enum ImageAs {
@@ -67,6 +69,7 @@ export const CWCoverImageUploader = ({
   defaultImageBehaviour,
   onImageBehaviourChange,
   onImageProcessStatusChange = () => {},
+  disabled,
 }: CoverImageUploaderProps) => {
   const user = useUserStore();
   const [imageURL, setImageURL] = React.useState<string>();
@@ -168,6 +171,8 @@ export const CWCoverImageUploader = ({
   };
 
   const generateImage = async () => {
+    if (disabled) return;
+
     try {
       setImageURL('');
       const res = await axios.post(`${SERVER_URL}/generateImage`, {
@@ -214,6 +219,8 @@ export const CWCoverImageUploader = ({
 
   // Drag'n'Drop helper function
   const handleDragEvent = (event, hoverAttachZone?: boolean) => {
+    if (disabled) return;
+
     event.preventDefault();
     event.stopPropagation();
 
@@ -224,6 +231,8 @@ export const CWCoverImageUploader = ({
   };
 
   const handleUpload = async (file: File) => {
+    if (disabled) return;
+
     if (!file) return;
 
     setIsUploading(true);
@@ -266,6 +275,8 @@ export const CWCoverImageUploader = ({
   };
 
   const dropHandler = (dropEvent: DragEvent) => {
+    if (disabled) return;
+
     handleDragEvent(dropEvent, false);
 
     if (isUploading) return;
@@ -279,11 +290,14 @@ export const CWCoverImageUploader = ({
 
   // On-click support
   const pseudoInputHandler = (inputEvent: InputEvent) => {
+    if (disabled) return;
     // @ts-expect-error <StrictNullChecks/>
     handleUpload((inputEvent.target as HTMLInputElement).files[0]);
   };
 
   const clickHandler = (e) => {
+    if (disabled) return;
+
     e?.stopImmediatePropagation?.();
     if (isUploading) return;
     pseudoInput.current?.click();
@@ -339,7 +353,7 @@ export const CWCoverImageUploader = ({
   );
 
   return (
-    <div className="CoverImageUploader">
+    <div className={clsx('CoverImageUploader', disabled)}>
       {headerText && (
         <CWText type="caption" fontWeight="medium">
           {headerText}
@@ -363,6 +377,7 @@ export const CWCoverImageUploader = ({
           isUploading: boolean;
           uploadStatus: ValidationStatus;
           validationStatus: 'failure' | undefined;
+          disabled?: boolean;
         }>(
           {
             // @ts-expect-error <StrictNullChecks/>
@@ -370,6 +385,7 @@ export const CWCoverImageUploader = ({
             // @ts-expect-error <StrictNullChecks/>
             uploadStatus,
             validationStatus: formFieldErrorMessage ? 'failure' : undefined,
+            disabled: disabled,
           },
           'attach-zone',
         )}
@@ -388,6 +404,7 @@ export const CWCoverImageUploader = ({
                 setPrompt('');
                 setIsPrompting(true);
               }}
+              disabled={disabled}
             />
           )}
 
@@ -405,6 +422,7 @@ export const CWCoverImageUploader = ({
                 }}
                 iconName="close"
                 iconSize="small"
+                disabled={disabled}
               />
             </div>
             {isGenerating ? (
@@ -425,6 +443,7 @@ export const CWCoverImageUploader = ({
                     setPrompt('');
                   }}
                   containerClassName="prompt-input"
+                  disabled={disabled}
                 />
                 <CWButton
                   label="Generate"
@@ -440,6 +459,7 @@ export const CWCoverImageUploader = ({
                       console.error(e);
                     }
                   }}
+                  disabled={disabled}
                 />
               </>
             )}
@@ -450,6 +470,7 @@ export const CWCoverImageUploader = ({
           accept="image/jpeg, image/jpg, image/png"
           className="pseudo-input"
           ref={pseudoInput}
+          disabled={disabled}
         />
         {isUploading && <CWCircleMultiplySpinner />}
         <div className="attach-btn" ref={attachButton}>
@@ -486,6 +507,7 @@ export const CWCoverImageUploader = ({
                 setPrompt('');
                 setIsPrompting(true);
               }}
+              disabled={disabled}
             />
           )}
         </div>
@@ -518,6 +540,7 @@ export const CWCoverImageUploader = ({
                   onImageBehaviourChange?.(ImageBehavior[option]);
                 }
               }}
+              disabled={disabled}
             />
           ))}
         </div>
