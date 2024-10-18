@@ -1,5 +1,5 @@
 import { express, trpc } from '@hicommonwealth/adapters';
-import { Comment, Community, Feed, Thread } from '@hicommonwealth/model';
+import { Comment, Community, Feed } from '@hicommonwealth/model';
 import cors from 'cors';
 import { Router } from 'express';
 import passport from 'passport';
@@ -56,7 +56,7 @@ const api = {
   getComments: trpc.query(Comment.GetComments, trpc.Tag.Comment, {
     forceSecure: true,
   }),
-  getTopics: trpc.query(Thread.GetTopics, trpc.Tag.Thread, {
+  getTopics: trpc.query(Community.GetTopics, trpc.Tag.Community, {
     forceSecure: true,
   }),
   createCommunity,

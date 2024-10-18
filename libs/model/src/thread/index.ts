@@ -3,5 +3,4 @@ export * from './CreateThreadReaction.command';
 export * from './DeleteThread.command';
 export * from './GetThread.query';
 export * from './GetThreads.query';
-export * from './GetTopics.query';
 export * from './UpdateThread.command';

@@ -7,10 +7,7 @@ import {
   dispose,
   query,
 } from '@hicommonwealth/core';
-import {
-  PermissionEnum,
-  TopicWeightedVoting,
-} from '@hicommonwealth/schemas';
+import { PermissionEnum, TopicWeightedVoting } from '@hicommonwealth/schemas';
 import { ChainBase, ChainType } from '@hicommonwealth/shared';
 import { Chance } from 'chance';
 import { CreateTopic } from 'model/src/community/CreateTopic.command';
@@ -25,6 +22,7 @@ import {
   DeleteTopic,
   GetCommunities,
   GetMembers,
+  GetTopics,
   JoinCommunity,
   JoinCommunityErrors,
   MAX_GROUPS_PER_COMMUNITY,
@@ -364,15 +362,30 @@ describe('Community lifecycle', () => {
           payload: buildCreateGroupPayload(community.id, [
             {
               id: 1,
-              permissions: [PermissionEnum.CREATE_COMMENT, PermissionEnum.CREATE_THREAD, PermissionEnum.CREATE_COMMENT_REACTION,PermissionEnum.CREATE_THREAD_REACTION],
+              permissions: [
+                PermissionEnum.CREATE_COMMENT,
+                PermissionEnum.CREATE_THREAD,
+                PermissionEnum.CREATE_COMMENT_REACTION,
+                PermissionEnum.CREATE_THREAD_REACTION,
+              ],
             },
             {
               id: 2,
-              permissions: [PermissionEnum.CREATE_COMMENT, PermissionEnum.CREATE_THREAD, PermissionEnum.CREATE_COMMENT_REACTION,PermissionEnum.CREATE_THREAD_REACTION],
+              permissions: [
+                PermissionEnum.CREATE_COMMENT,
+                PermissionEnum.CREATE_THREAD,
+                PermissionEnum.CREATE_COMMENT_REACTION,
+                PermissionEnum.CREATE_THREAD_REACTION,
+              ],
             },
             {
               id: 3,
-              permissions: [PermissionEnum.CREATE_COMMENT, PermissionEnum.CREATE_THREAD, PermissionEnum.CREATE_COMMENT_REACTION,PermissionEnum.CREATE_THREAD_REACTION],
+              permissions: [
+                PermissionEnum.CREATE_COMMENT,
+                PermissionEnum.CREATE_THREAD,
+                PermissionEnum.CREATE_COMMENT_REACTION,
+                PermissionEnum.CREATE_THREAD_REACTION,
+              ],
             },
           ]),
         }),
@@ -565,6 +578,14 @@ describe('Community lifecycle', () => {
           payload: { community_id: community.id, topic_id: topic!.id! },
         }),
       ).rejects.toThrow(InvalidActor);
+    });
+
+    test('should get topics', async () => {
+      const topics = await query(GetTopics(), {
+        actor: superAdminActor,
+        payload: { community_id: community.id, with_contest_managers: false },
+      });
+      expect(topics?.length).toBe(4);
     });
   });
 

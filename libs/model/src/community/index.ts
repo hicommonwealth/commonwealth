@@ -12,6 +12,7 @@ export * from './GetCommunityStake.query';
 export * from './GetMembers.query';
 export * from './GetStakeHistoricalPrice.query';
 export * from './GetStakeTransaction.query';
+export * from './GetTopics.query';
 export * from './JoinCommunity.command';
 export * from './RefreshCommunityMemberships.command';
 export * from './RefreshCustomDomain.query';
