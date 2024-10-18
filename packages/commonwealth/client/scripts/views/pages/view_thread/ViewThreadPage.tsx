@@ -1,3 +1,4 @@
+import { PermissionEnum } from '@hicommonwealth/schemas';
 import { ContentType, getThreadUrl } from '@hicommonwealth/shared';
 import { notifyError } from 'controllers/app/notifications';
 import { extractDomain, isDefaultStage } from 'helpers';
@@ -7,6 +8,7 @@ import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
+import useTopicGating from 'hooks/useTopicGating';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/view_thread/index.scss';
@@ -16,10 +18,7 @@ import app from 'state';
 import { useFetchCommentsQuery } from 'state/api/comments';
 import useGetContentByUrlQuery from 'state/api/general/getContentByUrl';
 import useGetViewCountByObjectIdQuery from 'state/api/general/getViewCountByObjectId';
-import {
-  useFetchGroupsQuery,
-  useRefreshMembershipQuery,
-} from 'state/api/groups';
+import { useFetchGroupsQuery } from 'state/api/groups';
 import {
   useAddThreadLinksMutation,
   useGetThreadPollsQuery,
@@ -186,10 +185,11 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     threadId: parseInt(threadId),
   });
 
-  const { data: memberships = [] } = useRefreshMembershipQuery({
+  const { isRestrictedMembership, foundTopicPermissions } = useTopicGating({
     communityId,
-    address: user?.activeAccount?.address || '',
     apiEnabled: !!user?.activeAccount?.address && !!communityId,
+    userAddress: user?.activeAccount?.address || '',
+    topicId: thread?.topic?.id || 0,
   });
 
   const { data: viewCount = 0 } = useGetViewCountByObjectIdQuery({
@@ -197,20 +197,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     objectId: thread?.id || '',
     apiCallEnabled: !!thread?.id && !!communityId,
   });
-
-  const isTopicGated = !!(memberships || []).find((membership) =>
-    // @ts-expect-error <StrictNullChecks/>
-    membership.topicIds.includes(thread?.topic?.id),
-  );
-
-  const isActionAllowedInGatedTopic = !!(memberships || []).find(
-    (membership) =>
-      // @ts-expect-error <StrictNullChecks/>
-      membership.topicIds.includes(thread?.topic?.id) && membership.isAllowed,
-  );
-
-  const isRestrictedMembership =
-    !isAdmin && isTopicGated && !isActionAllowedInGatedTopic;
 
   useEffect(() => {
     if (fetchCommentsError) notifyError('Failed to load comments');
@@ -319,26 +305,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   // @ts-expect-error <StrictNullChecks/>
   const hasWebLinks = thread.links.find((x) => x.source === 'web');
 
-  const canComment = !!user.activeAccount && !isRestrictedMembership;
-
-  const handleVersionHistoryChange = (versionId: number) => {
-    const foundVersion = (thread?.versionHistory || []).find(
-      (version) => version.id === versionId,
-    );
-
-    if (!foundVersion?.content_url) {
-      setThreadBody(foundVersion?.body || '');
-      return;
-    }
-
-    if (contentUrlBodyToFetch === foundVersion.content_url && contentUrlBody) {
-      setThreadBody(contentUrlBody);
-      return;
-    }
-
-    setContentUrlBodyToFetch(foundVersion.content_url);
-  };
-
   const handleNewSnapshotChange = async ({
     id,
     snapshot_title,
@@ -413,7 +379,37 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     isThreadArchived: !!thread?.archivedAt,
     isThreadLocked: !!thread?.lockedAt,
     isThreadTopicGated: isRestrictedMembership,
+    threadTopicInteractionRestrictions:
+      !isAdmin &&
+      !foundTopicPermissions?.permissions?.includes(
+        PermissionEnum.CREATE_COMMENT,
+      )
+        ? foundTopicPermissions?.permissions
+        : undefined,
   });
+
+  const canComment =
+    !!user.activeAccount &&
+    !isRestrictedMembership &&
+    !disabledActionsTooltipText;
+
+  const handleVersionHistoryChange = (versionId: number) => {
+    const foundVersion = (thread?.versionHistory || []).find(
+      (version) => version.id === versionId,
+    );
+
+    if (!foundVersion?.content_url) {
+      setThreadBody(foundVersion?.body || '');
+      return;
+    }
+
+    if (contentUrlBodyToFetch === foundVersion.content_url && contentUrlBody) {
+      setThreadBody(contentUrlBody);
+      return;
+    }
+
+    setContentUrlBodyToFetch(foundVersion.content_url);
+  };
 
   const getMetaDescription = (meta: string) => {
     try {

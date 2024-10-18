@@ -192,18 +192,17 @@ export type AssociatedContest = {
   contest_interval: number;
 };
 
-type RecentComment = {
+export type RecentComment = {
   id: number;
   address: string;
   text: string;
-  plainText: string;
   created_at: string;
   updated_at: string;
   marked_as_spam_at?: string;
   deleted_at?: string;
   discord_meta?: string;
   profile_name?: string;
-  profile_avatar_url?: string;
+  profile_avatar?: string;
   user_id: string;
   content_url?: string | null;
 };
@@ -235,7 +234,6 @@ export class Thread implements IUniqueId {
   public readonly authorCommunity: string;
   public readonly title: string;
   public readonly body: string;
-  public readonly plaintext: string;
   public pinned: boolean;
   public readonly kind: ThreadKind;
   public stage: ThreadStage;
@@ -292,7 +290,6 @@ export class Thread implements IUniqueId {
     community_id,
     read_only,
     body,
-    plaintext,
     url,
     pinned,
     collaborators,
@@ -340,7 +337,6 @@ export class Thread implements IUniqueId {
     links?: Link[];
     canvas_signed_data?: string;
     canvas_msg_id?: string;
-    plaintext?: string;
     collaborators?: any[];
     last_edited: string;
     locked_at: string;
@@ -380,8 +376,6 @@ export class Thread implements IUniqueId {
     this.title = getDecodedString(title);
     // @ts-expect-error StrictNullChecks
     this.body = getDecodedString(body);
-    // @ts-expect-error StrictNullChecks
-    this.plaintext = plaintext;
     this.id = id;
     this.identifier = `${id}`;
     this.createdAt = moment(created_at);
@@ -450,7 +444,6 @@ export class Thread implements IUniqueId {
           author: rc?.address,
           last_edited: rc?.updated_at ? moment(rc.updated_at) : null,
           created_at: rc?.created_at ? moment(rc?.created_at) : null,
-          plaintext: rc?.plainText,
           text: rc?.text,
           Address: {
             user_id: rc?.user_id,
@@ -458,7 +451,7 @@ export class Thread implements IUniqueId {
             User: {
               profile: {
                 name: rc?.profile_name,
-                avatar_url: rc?.profile_avatar_url,
+                avatar_url: rc?.profile_avatar,
               },
             },
           },

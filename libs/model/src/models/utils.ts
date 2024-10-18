@@ -62,9 +62,10 @@ export function oneToOne<Source extends State, Target extends State>(
     onDelete: options?.onDelete ?? 'NO ACTION',
   });
 
-  options?.targeyKey &&
+  // TODO: why belongsTo iff targetKey is defined + why not hasOne() instead?
+  options?.targetKey &&
     this.belongsTo(target, {
-      foreignKey: options?.targeyKey,
+      foreignKey: options?.targetKey,
       onUpdate: 'NO ACTION',
       onDelete: 'NO ACTION',
     });
@@ -249,8 +250,8 @@ export const createFk = (
     ALTER TABLE "${source}" ADD CONSTRAINT "${name}"
     FOREIGN KEY (${fk.join(',')}) REFERENCES "${target}"(${pk.join(',')})
     ON UPDATE ${rules?.onUpdate ?? 'NO ACTION'} ON DELETE ${
-    rules?.onDelete ?? 'NO ACTION'
-  };`);
+      rules?.onDelete ?? 'NO ACTION'
+    };`);
 
 /**
  * Drops composite FK constraints (not supported by sequelize)

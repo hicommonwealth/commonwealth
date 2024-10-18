@@ -10,14 +10,12 @@ import CommentSubscription from './comment_subscriptions';
 import CommentVersionHistory from './comment_version_history';
 import Community from './community';
 import CommunityAlert from './community_alerts';
-import CommunityContract from './community_contract';
 import CommunityStake from './community_stake';
 import CommunityTags from './community_tags';
 import Contest from './contest';
 import ContestAction from './contest_action';
 import ContestManager from './contest_manager';
 import ContestTopic from './contest_topic';
-import Contract from './contract';
 import ContractAbi from './contract_abi';
 import DiscordBotConfig from './discord_bot_config';
 import EmailUpdateToken from './email_update_token';
@@ -38,6 +36,7 @@ import Tags from './tags';
 import Thread from './thread';
 import ThreadSubscription from './thread_subscriptions';
 import ThreadVersionHistory from './thread_version_history';
+import Token from './token';
 import Topic from './topic';
 import User from './user';
 import Vote from './vote';
@@ -55,14 +54,12 @@ export const Factories = {
   CommentSubscription,
   Community,
   CommunityAlert,
-  CommunityContract,
   CommunityStake,
   CommunityTags,
   Contest,
   ContestAction,
   ContestManager,
   ContestTopic,
-  Contract,
   ContractAbi,
   DiscordBotConfig,
   EmailUpdateToken,
@@ -88,6 +85,7 @@ export const Factories = {
   Vote,
   Webhook,
   Wallets,
+  Token,
   XpLog,
 };
 

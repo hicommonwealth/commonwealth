@@ -4,7 +4,7 @@ import { fetchCachedNodes } from 'state/api/nodes';
 
 interface UseTokenMetadataQueryProps {
   tokenId: string;
-  chainId: number;
+  nodeEthChainId: number;
   apiEnabled?: boolean;
 }
 
@@ -17,15 +17,17 @@ export type GetTokenMetadataResponse = {
 
 const getTokenMetadata = async ({
   tokenId,
-  chainId,
+  nodeEthChainId,
 }: UseTokenMetadataQueryProps): Promise<GetTokenMetadataResponse> => {
-  const ethereumNode = fetchCachedNodes()?.find((n) => n?.id === chainId);
+  const node = fetchCachedNodes()?.find(
+    (n) => n?.ethChainId === nodeEthChainId,
+  );
 
-  if (!ethereumNode) {
-    throw new Error('Ethereum node not found');
+  if (!node) {
+    throw new Error('Node not found');
   }
 
-  const response = await axios.post(ethereumNode.url, {
+  const response = await axios.post(node.url, {
     params: [tokenId],
     method: 'alchemy_getTokenMetadata',
   });
@@ -35,12 +37,12 @@ const getTokenMetadata = async ({
 
 const useTokenMetadataQuery = ({
   tokenId,
-  chainId,
+  nodeEthChainId,
   apiEnabled = true,
 }: UseTokenMetadataQueryProps) => {
   return useQuery({
-    queryKey: [tokenId, chainId],
-    queryFn: () => getTokenMetadata({ tokenId, chainId }),
+    queryKey: [tokenId, nodeEthChainId],
+    queryFn: () => getTokenMetadata({ tokenId, nodeEthChainId }),
     enabled: !!tokenId && apiEnabled,
     retry: false,
   });

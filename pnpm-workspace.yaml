@@ -1,6 +1,5 @@
 packages:
   - 'libs/**'
   - 'packages/commonwealth'
-  - 'packages/snapshot-listener'
   - 'packages/scripts'
   - 'packages/load-testing'

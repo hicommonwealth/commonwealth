@@ -52,11 +52,7 @@ const CreateCommunityGroupPage = () => {
       onSubmit={async (values) => {
         try {
           const payload = buildCreateGroupInput(
-            makeGroupDataBaseAPIPayload(
-              values,
-              isAddedToHomeScreen,
-              allowedAddresses,
-            ),
+            makeGroupDataBaseAPIPayload(values, allowedAddresses),
           );
           await createGroup(payload);
           notifySuccess('Group Created');

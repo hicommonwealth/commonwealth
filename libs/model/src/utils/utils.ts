@@ -245,3 +245,7 @@ export function getSaltedApiKeyHash(apiKey: string, salt: string): string {
     .update(apiKey + salt)
     .digest('hex');
 }
+
+export function buildApiKeySaltCacheKey(address: string) {
+  return `salt_${address.toLowerCase()}`;
+}
