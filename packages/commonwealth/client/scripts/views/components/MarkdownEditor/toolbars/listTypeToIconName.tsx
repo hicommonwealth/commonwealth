@@ -1,4 +1,4 @@
-import { ListType } from 'views/components/MarkdownEditor/toolbars/CWListButton';
+import { ListType } from 'views/components/MarkdownEditor/toolbars/ListButton';
 
 export function listTypeToIconName(listType: ListType) {
   switch (listType) {

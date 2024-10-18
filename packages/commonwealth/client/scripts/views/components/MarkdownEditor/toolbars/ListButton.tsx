@@ -8,16 +8,16 @@ import React, { useCallback } from 'react';
 import { listTypeToIconName } from 'views/components/MarkdownEditor/toolbars/listTypeToIconName';
 import CWIconButton from 'views/components/component_kit/new_designs/CWIconButton';
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
-import './CWListButton.scss';
+import './ListButton.scss';
 
 export type ListType = 'number' | 'bullet' | 'check';
 
-export type CWListButtonProps = Readonly<{
+export type ListButtonProps = Readonly<{
   listType: ListType;
   onClick?: (event: React.MouseEvent<HTMLElement, MouseEvent>) => void;
 }>;
 
-export const CWListButton = (props: CWListButtonProps) => {
+export const ListButton = (props: ListButtonProps) => {
   const { listType, onClick } = props;
 
   const [currentListType] = useCellValues(currentListType$);

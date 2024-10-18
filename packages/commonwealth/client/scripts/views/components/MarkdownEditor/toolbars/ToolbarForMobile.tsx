@@ -2,11 +2,11 @@ import { IS_BOLD, IS_ITALIC, Separator } from 'commonwealth-mdxeditor';
 import React, { ReactNode, useCallback, useEffect } from 'react';
 
 import { BlockSelectorButton } from 'views/components/MarkdownEditor/toolbars/BlockSelectorButton';
-import { CWListButton } from 'views/components/MarkdownEditor/toolbars/CWListButton';
 import { CreateLinkButton } from 'views/components/MarkdownEditor/toolbars/CreateLinkButton';
 import { FormatButton } from 'views/components/MarkdownEditor/toolbars/FormatButton';
 import { HeadingButton } from 'views/components/MarkdownEditor/toolbars/HeadingButton';
 import { ImageButton } from 'views/components/MarkdownEditor/toolbars/ImageButton';
+import { ListButton } from 'views/components/MarkdownEditor/toolbars/ListButton';
 import { MobileOverflowButton } from 'views/components/MarkdownEditor/toolbars/MobileOverflowButton';
 import './ToolbarForMobile.scss';
 
@@ -73,8 +73,8 @@ export const ToolbarForMobile = (props: ToolbarForMobileProps) => {
       <FormatButton format={IS_ITALIC} formatName="italic" />
       <CreateLinkButton />
       <HeadingButton blockType="quote" />
-      <CWListButton listType="bullet" />
-      <CWListButton listType="number" />
+      <ListButton listType="bullet" />
+      <ListButton listType="number" />
 
       <Separator />
       <ImageButton onImage={onImage} />
