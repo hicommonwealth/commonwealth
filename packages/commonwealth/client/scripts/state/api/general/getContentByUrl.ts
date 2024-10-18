@@ -11,7 +11,7 @@ const getContentByUrl = async ({
   contentUrl,
 }: GetContentByUrlProps): Promise<string> => {
   const response = await axios.get(contentUrl || '');
-  return response?.data[0]?.result?.data || '';
+  return response?.data || '';
 };
 
 type GetContentByUrlQueryProps = {

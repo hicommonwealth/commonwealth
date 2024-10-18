@@ -141,30 +141,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   const [threadBody, setThreadBody] = useState(thread?.body);
 
-  useEffect(() => {
-    if (
-      contentUrlBodyToFetch &&
-      contentUrlBodyToFetch !== thread?.contentUrl &&
-      contentUrlBody
-    ) {
-      setThreadBody(contentUrlBody);
-    }
-  }, [contentUrlBody, contentUrlBodyToFetch, thread?.contentUrl]);
-
-  useRunOnceOnCondition({
-    callback: () => {
-      thread?.body && setThreadBody(thread?.body);
-    },
-    shouldRun: !!thread?.body,
-  });
-
-  useRunOnceOnCondition({
-    callback: () => {
-      contentUrlBody && setThreadBody(contentUrlBody);
-    },
-    shouldRun: !isLoadingContentBody && !!thread?.contentUrl,
-  });
-
   const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
 
   const { contestsData } = useCommunityContests();
@@ -245,6 +221,26 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   useManageDocumentTitle('View thread', thread?.title);
 
+  // Imp: this correctly sets the thread body
+  // 1. if content_url is provided it will fetch body from there
+  // 2. else it will use available body
+  // 3. it won't interfere with version history selection, unless thread body or content_url changes
+  useEffect(() => {
+    if (thread?.contentUrl) {
+      setContentUrlBodyToFetch(thread.contentUrl);
+    } else {
+      setThreadBody(thread?.body || '');
+      setContentUrlBodyToFetch('');
+    }
+  }, [thread?.body, thread?.contentUrl]);
+
+  // Imp: this is expected to override version history selection
+  useEffect(() => {
+    if (contentUrlBody) {
+      setThreadBody(contentUrlBody);
+    }
+  }, [contentUrlBody]);
+
   if (typeof identifier !== 'string') {
     return <PageNotFound />;
   }
@@ -252,7 +248,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   if (
     !app.chain?.meta ||
     isLoading ||
-    (isLoadingContentBody && thread?.contentUrl)
+    (isLoadingContentBody && contentUrlBodyToFetch)
   ) {
     return (
       <CWPageLayout>
@@ -397,17 +393,16 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     const foundVersion = (thread?.versionHistory || []).find(
       (version) => version.id === versionId,
     );
-
     if (!foundVersion?.content_url) {
       setThreadBody(foundVersion?.body || '');
+      setContentUrlBodyToFetch('');
       return;
     }
-
     if (contentUrlBodyToFetch === foundVersion.content_url && contentUrlBody) {
       setThreadBody(contentUrlBody);
+      setContentUrlBodyToFetch('');
       return;
     }
-
     setContentUrlBodyToFetch(foundVersion.content_url);
   };
 
@@ -604,13 +599,14 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           onChangeVersionHistoryNumber={handleVersionHistoryChange}
           body={(threadOptionsComp) => (
             <div className="thread-content">
-              {isEditingBody ? (
+              {isEditingBody && threadBody ? (
                 <>
                   {/*// TODO editing thread */}
                   <EditBody
                     title={draftTitle}
                     // @ts-expect-error <StrictNullChecks/>
                     thread={thread}
+                    activeThreadBody={threadBody}
                     savedEdits={savedEdits}
                     shouldRestoreEdits={shouldRestoreEdits}
                     cancelEditing={() => {
