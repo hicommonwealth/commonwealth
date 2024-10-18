@@ -40,7 +40,7 @@ export function CreateCommentReaction(): Command<
               address_id: address.id!,
               comment_id: comment.id,
               reaction: payload.reaction,
-              calculated_voting_weight,
+              calculated_voting_weight: calculated_voting_weight?.toString(),
               canvas_msg_id: payload.canvas_msg_id,
               canvas_signed_data: payload.canvas_signed_data,
             },

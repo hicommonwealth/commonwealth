@@ -63,7 +63,6 @@ export function CreateTopic(): Command<
           options = {
             ...options,
             weighted_voting: payload.weighted_voting,
-            chain_node_id: payload.chain_node_id || undefined,
             token_address: payload.token_address || undefined,
             token_symbol: payload.token_symbol || undefined,
             vote_weight_multiplier: payload.vote_weight_multiplier || undefined,
