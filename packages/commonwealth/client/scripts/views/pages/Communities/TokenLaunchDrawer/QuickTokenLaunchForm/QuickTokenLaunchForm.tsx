@@ -322,7 +322,7 @@ export const QuickTokenLaunchForm = ({
                           isCreatingQuickToken ||
                           isMaxTokenIdeaLimitReached
                         }
-                        onClick={generateIdea}
+                        onClick={() => generateIdea().catch(console.error)}
                         onMouseEnter={handleInteraction}
                         onMouseLeave={handleInteraction}
                       />
@@ -339,7 +339,7 @@ export const QuickTokenLaunchForm = ({
                       isCreatingQuickToken ||
                       isMaxTokenIdeaLimitReached
                     }
-                    onClick={generateIdea}
+                    onClick={() => generateIdea().catch(console.error)}
                   />
                 )}
 
