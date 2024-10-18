@@ -44,7 +44,7 @@ export const ListButton = (props: ListButtonProps) => {
       content={`Change to ${listType} list`}
       renderTrigger={(handleInteraction) => (
         <CWIconButton
-          className={clsx({ CWListButtonActive: active })}
+          className={clsx({ ListButtonActive: active })}
           buttonSize="lg"
           iconName={listTypeToIconName(listType)}
           onMouseEnter={handleInteraction}
