@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import {
   applyListType$,
   currentListType$,
@@ -43,7 +44,7 @@ export const ListButton = (props: ListButtonProps) => {
       content={`Change to ${listType} list`}
       renderTrigger={(handleInteraction) => (
         <CWIconButton
-          className={active ? 'CWListButtonActive' : ''}
+          className={clsx({ CWListButtonActive: active })}
           buttonSize="lg"
           iconName={listTypeToIconName(listType)}
           onMouseEnter={handleInteraction}
