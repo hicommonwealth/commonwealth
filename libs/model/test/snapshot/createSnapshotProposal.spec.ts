@@ -82,6 +82,8 @@ describe('Snapshot Listener API', { timeout: 5_000 }, () => {
       });
       expect.fail();
       // // eslint-disable-next-line no-empty
-    } catch (e) {}
+    } catch (e) {
+      return;
+    }
   });
 });

@@ -2,6 +2,7 @@ import { PopperPlacementType } from '@mui/base/Popper';
 import { threadStageToLabel } from 'helpers';
 import moment from 'moment';
 import React, { useRef } from 'react';
+import { Link } from 'react-router-dom';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { ArchiveTrayWithTooltip } from 'views/components/ArchiveTrayWithTooltip';
 import { LockWithTooltip } from 'views/components/LockWithTooltip';
@@ -187,18 +188,23 @@ export const AuthorAndPublishInfo = ({
             <CWPopover
               content={
                 <div className="collaborators">
-                  {/*@ts-expect-error <StrictNullChecks>*/}
-                  {collaboratorsInfo.map(({ address, community_id, User }) => {
-                    return (
-                      <FullUser
-                        shouldLinkProfile
-                        key={address}
-                        userAddress={address}
-                        userCommunityId={community_id}
-                        profile={User.profile}
-                      />
-                    );
-                  })}
+                  {collaboratorsInfo?.map(
+                    ({
+                      User,
+                    }: {
+                      address: string;
+                      community_id: string;
+                      User: { id: number; profile: UserProfile };
+                    }) => {
+                      return (
+                        <Link key={User.id} to={`/profile/id/${User.id}`}>
+                          <CWText className="collaborator-user-name">
+                            {User.profile.name}
+                          </CWText>
+                        </Link>
+                      );
+                    },
+                  )}
                 </div>
               }
               {...popoverProps}
