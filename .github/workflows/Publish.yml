@@ -1,0 +1,6 @@
+name: Publish Client SDK
+
+on:
+  deployment_status:
+    branches:
+      - production
