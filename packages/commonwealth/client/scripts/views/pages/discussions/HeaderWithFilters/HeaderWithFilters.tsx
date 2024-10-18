@@ -22,7 +22,7 @@ import { EditTopicModal } from 'views/modals/edit_topic_modal';
 import { Contest } from 'views/pages/CommunityManagement/Contests/ContestsList';
 import ContestCard from 'views/pages/CommunityManagement/Contests/ContestsList/ContestCard';
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
-import type Topic from '../../../../models/Topic';
+import type { Topic } from '../../../../models/Topic';
 import {
   ThreadFeaturedFilterTypes,
   ThreadStage,
@@ -119,13 +119,13 @@ export const HeaderWithFilters = ({
   );
 
   const featuredTopics = (topics || [])
-    .filter((t) => t.featuredInSidebar)
+    .filter((t) => t.featured_in_sidebar)
     .sort((a, b) => a.name.localeCompare(b.name))
     // @ts-expect-error <StrictNullChecks/>
     .sort((a, b) => a.order - b.order);
 
   const otherTopics = (topics || [])
-    .filter((t) => !t.featuredInSidebar)
+    .filter((t) => !t.featured_in_sidebar)
     .sort((a, b) => a.name.localeCompare(b.name));
 
   const selectedTopic = (topics || []).find((t) => topic && topic === t.name);

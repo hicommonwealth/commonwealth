@@ -12,7 +12,6 @@ import {
   PermissionEnum,
 } from '@hicommonwealth/schemas';
 import { slugify } from '@hicommonwealth/shared';
-import { mapTopic } from 'client/scripts/models/Topic';
 import { getThreadActionTooltipText } from 'helpers/threads';
 import useTopicGating from 'hooks/useTopicGating';
 import { getProposalUrlPath } from 'identifiers';
@@ -132,17 +131,18 @@ function mapThread(thread: z.infer<typeof ActivityThread>): Thread {
     id: thread.id,
     created_at: thread.created_at ?? '',
     updated_at: thread.updated_at ?? thread.created_at ?? '',
-    topic: mapTopic({
+    topic: {
       community_id: thread.community_id,
       id: thread.topic.id,
       name: thread.topic.name,
       description: thread.topic.description,
+      created_at: '',
       featured_in_sidebar: false,
       featured_in_new_post: false,
       group_ids: [],
       active_contest_managers: [],
       total_threads: 0,
-    }),
+    },
     kind: thread.kind as ThreadKind,
     stage: thread.stage as ThreadStage,
     ThreadVersionHistories: [],

@@ -108,7 +108,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     (domain?.isCustomDomain ? `/archived` : `/${app.activeChainId()}/archived`);
 
   const { data: tokenMetadata } = useTokenMetadataQuery({
-    tokenId: topicObj?.tokenAddress || '',
+    tokenId: topicObj?.token_address || '',
     nodeEthChainId: app?.chain.meta?.ChainNode?.eth_chain_id || 0,
   });
 
@@ -175,7 +175,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const isTopicWeighted =
     weightedTopicsEnabled &&
     topicId &&
-    topicObj.weightedVoting === TopicWeightedVoting.ERC20;
+    topicObj.weighted_voting === TopicWeightedVoting.ERC20;
 
   const activeContestsInTopic = contestsData?.filter((contest) => {
     const isContestInTopic = (contest.topics || []).find(
@@ -321,11 +321,11 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
               {isTopicWeighted && (
                 <TokenBanner
                   name={tokenMetadata?.name}
-                  ticker={topicObj?.tokenSymbol}
+                  ticker={topicObj?.token_symbol}
                   avatarUrl={tokenMetadata?.logo}
                   popover={{
                     title: tokenMetadata?.name,
-                    body: formatAddressShort(topicObj.tokenAddress!, 6, 6),
+                    body: formatAddressShort(topicObj.token_address!, 6, 6),
                   }}
                 />
               )}

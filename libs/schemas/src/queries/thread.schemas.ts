@@ -141,13 +141,24 @@ export const GetThreads = {
   }),
 };
 
-export const ActiveContestManager = ContestManager.extend({
-  content: z.array(projections.ContestAction),
+export const ConstestManagerView = ContestManager.extend({
+  created_at: z.string(),
+  topics: z.undefined(),
+  contests: z.undefined(),
+  content: z.array(
+    projections.ContestAction.extend({
+      created_at: z.string(),
+    }),
+  ),
 });
 
-export const ExtendedTopic = Topic.extend({
+export const TopicView = Topic.extend({
+  created_at: z.string(),
+  updated_at: z.string().nullish(),
+  deleted_at: z.string().nullish(),
+  contest_topics: z.undefined(),
   total_threads: z.number(),
-  active_contest_managers: z.array(ActiveContestManager),
+  active_contest_managers: z.array(ConstestManagerView),
 });
 
 export const GetTopics = {
@@ -155,5 +166,5 @@ export const GetTopics = {
     community_id: z.string(),
     with_contest_managers: z.boolean().optional(),
   }),
-  output: z.array(ExtendedTopic),
+  output: z.array(TopicView),
 };

@@ -53,24 +53,44 @@ export function GetTopics(): Query<typeof schemas.GetTopics> {
 
       const sql = `
     WITH topic_data AS (
-      SELECT t.*, (
-        SELECT COUNT(*)::int
-        FROM "Threads"
-        WHERE community_id = :community_id AND topic_id = t.id AND deleted_at IS NULL
-      ) as total_threads
+      SELECT 
+        id,
+        name,
+        community_id,
+        description,
+        telegram,
+        featured_in_sidebar,
+        featured_in_new_post,
+        default_offchain_template,
+        "order",
+        channel_id,
+        group_ids,
+        weighted_voting,
+        chain_node_id,
+        token_symbol,
+        vote_weight_multiplier,
+        created_at::text as created_at,
+        updated_at::text as updated_at,
+        deleted_at::text as deleted_at,
+        (
+          SELECT COUNT(*)::int
+          FROM "Threads"
+          WHERE community_id = :community_id AND topic_id = t.id AND deleted_at IS NULL
+        ) as total_threads
       FROM "Topics" t
       WHERE t.community_id = :community_id AND t.deleted_at IS NULL
     )
     ${base}
   `;
 
-      return await models.sequelize.query<
-        z.infer<typeof schemas.ExtendedTopic>
-      >(sql, {
-        replacements: { community_id },
-        type: QueryTypes.SELECT,
-        raw: true,
-      });
+      return await models.sequelize.query<z.infer<typeof schemas.TopicView>>(
+        sql,
+        {
+          replacements: { community_id },
+          type: QueryTypes.SELECT,
+          raw: true,
+        },
+      );
     },
   };
 }

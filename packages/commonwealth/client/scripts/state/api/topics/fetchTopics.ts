@@ -1,5 +1,4 @@
 import { trpc } from 'client/scripts/utils/trpcClient';
-import { mapTopic } from 'models/Topic';
 
 const TOPICS_STALE_TIME = 30 * 1_000; // 30 s
 
@@ -22,8 +21,6 @@ const useFetchTopicsQuery = ({
     {
       staleTime: TOPICS_STALE_TIME,
       enabled: apiEnabled,
-      // @ts-expect-error <StrictNullChecks/>
-      select: (data) => data.map((topic) => mapTopic(topic)),
     },
   );
 };

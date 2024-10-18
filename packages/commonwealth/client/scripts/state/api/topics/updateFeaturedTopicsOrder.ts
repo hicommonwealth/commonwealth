@@ -1,6 +1,6 @@
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
-import Topic from 'models/Topic';
+import type { Topic } from 'models/Topic';
 import app from 'state';
 import { ApiEndpoints, SERVER_URL, queryClient } from 'state/api/config';
 import { userStore } from '../../ui/user';
@@ -28,7 +28,7 @@ const useUpdateFeaturedTopicsOrderMutation = () => {
   return useMutation({
     mutationFn: updateFeaturedTopicsOrder,
     onSuccess: async (data, variables) => {
-      const communityId = variables.featuredTopics[0].communityId;
+      const communityId = variables.featuredTopics[0].community_id;
       await queryClient.invalidateQueries({
         queryKey: [ApiEndpoints.BULK_TOPICS, communityId],
       });
