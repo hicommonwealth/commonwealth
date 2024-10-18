@@ -160,6 +160,7 @@ async function validateExternalApiVersioning() {
       format: 'openapi3',
     },
   });
+  await Promise.all([unlink(productionOasPath), unlink(localOasPath)]);
 
   if (result.breakingDifferencesFound) {
     throw Error('External API has breaking changes, update the Major version');
@@ -191,7 +192,6 @@ async function validateExternalApiVersioning() {
     return;
   }
 
-  await Promise.all([unlink(productionOasPath), unlink(localOasPath)]);
   console.log(`No version updated: ${readableVersion(oldVersion)}`);
 }
 
