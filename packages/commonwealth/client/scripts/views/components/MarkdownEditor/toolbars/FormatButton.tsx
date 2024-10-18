@@ -12,7 +12,7 @@ import React, { useCallback } from 'react';
 import CWIconButton from 'views/components/component_kit/new_designs/CWIconButton';
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import { formatToIconName } from 'views/components/MarkdownEditor/toolbars/formatToIconName';
-import './HeadingButton.scss';
+import './FormatButton.scss';
 
 export type HeadingButtonProps = Readonly<{
   format: FORMAT;
@@ -43,7 +43,7 @@ export const FormatButton = (props: HeadingButtonProps) => {
       content={`Change to ${formatName}`}
       renderTrigger={(handleInteraction) => (
         <CWIconButton
-          className={clsx({ CWHeadingButtonActive: active })}
+          className={clsx({ FormatButtonActive: active })}
           buttonSize="lg"
           iconName={formatToIconName(format)}
           onMouseEnter={handleInteraction}
