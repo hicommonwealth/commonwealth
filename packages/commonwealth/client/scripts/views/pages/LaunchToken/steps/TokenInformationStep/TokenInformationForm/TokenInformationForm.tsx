@@ -43,6 +43,9 @@ const TokenInformationForm = ({
   selectedAddress,
   containerClassName,
   customFooter,
+  forceFormValues,
+  focusField,
+  formDisabled,
 }: TokenInformationFormProps) => {
   const user = useUserStore();
   const [baseOption] = communityTypeOptions;
@@ -125,6 +128,23 @@ const TokenInformationForm = ({
     }
   }, [selectedAddress, handleSubmit]);
 
+  useEffect(() => {
+    if (forceFormValues && formMethodsRef.current) {
+      for (const [key, value] of Object.entries(forceFormValues)) {
+        if (value) {
+          value &&
+            formMethodsRef.current.setValue(key, value, { shouldDirty: true });
+        }
+      }
+    }
+  }, [forceFormValues]);
+
+  useEffect(() => {
+    if (focusField && formMethodsRef.current) {
+      formMethodsRef.current.setFocus(focusField);
+    }
+  }, [focusField]);
+
   const handleCancel = () => {
     triggerTokenLaunchFormAbort(() => {
       trackAnalytics({
@@ -154,8 +174,8 @@ const TokenInformationForm = ({
     <CWForm
       // @ts-expect-error <StrictNullChecks/>
       ref={formMethodsRef}
-      validationSchema={tokenInformationFormValidationSchema}
       onSubmit={handleSubmit}
+      validationSchema={tokenInformationFormValidationSchema}
       className={clsx('TokenInformationForm', containerClassName)}
     >
       <div>
@@ -170,48 +190,56 @@ const TokenInformationForm = ({
             checked: true,
             hideLabels: true,
             hookToForm: true,
-            name: 'tokenChain',
+            name: 'chain',
           }}
         />
       </div>
 
       <div className="grid-row">
         <CWTextInput
-          name="tokenName"
+          name="name"
           hookToForm
           label="Token name"
           placeholder="Name your token"
           fullWidth
           onInput={(e) => setTokenName(e.target.value?.trim())}
           customError={isTokenNameTaken ? 'Token name is already taken' : ''}
+          disabled={formDisabled}
         />
 
         <CWTextInput
-          name="tokenTicker"
+          name="symbol"
           hookToForm
           label="Ticker"
           placeholder="ABCD"
           fullWidth
+          disabled={formDisabled}
         />
       </div>
 
       <CWTextArea
-        name="tokenDescription"
+        name="description"
         hookToForm
         label="Description (Optional)"
         placeholder="Describe your token"
         charCount={180}
+        disabled={formDisabled}
       />
 
       <CWCoverImageUploader
+        key={forceFormValues?.imageURL}
+        {...(forceFormValues?.imageURL && {
+          defaultImageUrl: forceFormValues?.imageURL,
+        })}
         subheaderText="Image (Optional - Accepts JPG and PNG files)"
         canSelectImageBehaviour={false}
         showUploadAndGenerateText
         onImageProcessStatusChange={setIsProcessingProfileImage}
-        name="tokenImageURL"
+        name="imageURL"
         hookToForm
-        defaultImageBehaviour={ImageBehavior.Fill}
+        defaultImageBehaviour={ImageBehavior.Circle}
         enableGenerativeAI
+        disabled={formDisabled}
       />
 
       {/* Action buttons */}
