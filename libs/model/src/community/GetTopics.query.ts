@@ -44,9 +44,9 @@ SELECT
 		GROUP BY
 			contest_address) co ON cm.contest_address = co.contest_address
 		WHERE
-			ct.topic_id = td.id -- Filtering by topic_id
-			AND cm.community_id = :community_id -- Filter by community
-			AND cm.cancelled = FALSE -- Exclude cancelled managers
+			ct.topic_id = td.id
+			AND cm.community_id = :community_id
+			AND COALESCE(cm.cancelled, FALSE) = FALSE -- Exclude cancelled managers
 			AND (cm.interval = 0
 				AND now() < co.end_time -- Check if the interval is 0 and the contest is ongoing
 			OR cm.interval > 0 -- Or if there is a valid interval
