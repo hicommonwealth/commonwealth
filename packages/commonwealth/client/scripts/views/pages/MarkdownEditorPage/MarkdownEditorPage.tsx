@@ -8,9 +8,9 @@ import {
 
 import './MarkdownEditorPage.scss';
 
+import { MarkdownSubmitButton } from 'views/components/MarkdownEditor/MarkdownSubmitButton';
 import overview from 'views/components/MarkdownEditor/markdown/editor_overview.md?raw';
 import supported from 'views/components/MarkdownEditor/markdown/supported.md?raw';
-import { MarkdownSubmitButton } from 'views/components/MarkdownEditor/MarkdownSubmitButton';
 import { useMarkdownEditorMethods } from 'views/components/MarkdownEditor/useMarkdownEditorMethods';
 
 function useParams() {
@@ -29,8 +29,8 @@ export const MarkdownEditorPage = () => {
 
   if (mode === 'desktop') {
     return (
-      <div className="MarkdownEditorPage">
-        <div className="desktop">
+      <div className="MarkdownEditorPage MarkdownEditorPageDesktop">
+        <div className="DesktopInner">
           <Inner mode={mode} />
         </div>
       </div>
@@ -54,11 +54,13 @@ const SubmitButton = () => {
 // eslint-disable-next-line react/no-multi-comp
 const Inner = (props: Pick<MarkdownEditorProps, 'mode'>) => {
   return (
-    <MarkdownEditor
-      {...props}
-      markdown={`${overview}\n${supported}`}
-      imageHandler="local"
-      SubmitButton={SubmitButton}
-    />
+    <>
+      <MarkdownEditor
+        {...props}
+        markdown={`${overview}\n${supported}`}
+        imageHandler="local"
+        SubmitButton={SubmitButton}
+      />
+    </>
   );
 };

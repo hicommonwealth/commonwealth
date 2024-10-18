@@ -19,6 +19,11 @@ export type UsePopoverProps = {
   open: boolean;
   setAnchorEl: React.Dispatch<React.SetStateAction<AnchorType>>;
   handleInteraction: (e: React.MouseEvent<AnchorType>) => void;
+
+  /**
+   * Force the popup to vanish.  Can be used for click-away listeners, etc.
+   */
+  dispose: () => void;
 };
 
 // Developer can pass either:
@@ -59,6 +64,10 @@ export const usePopover = (): UsePopoverProps => {
     setAnchorEl(anchorEl ? null : e.currentTarget);
   };
 
+  const dispose = () => {
+    setAnchorEl(null);
+  };
+
   const open = !!anchorEl;
   const id = open ? `popover-${uuidv4()}` : undefined;
 
@@ -70,6 +79,7 @@ export const usePopover = (): UsePopoverProps => {
     open,
     setAnchorEl,
     handleInteraction,
+    dispose,
   };
 };
 

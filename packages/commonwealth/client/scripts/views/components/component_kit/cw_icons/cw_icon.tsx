@@ -14,6 +14,7 @@ export const CWIcon = (props: IconComponentProps) => {
     iconSize = 'medium',
     onClick,
     selected,
+    weight,
     ...otherProps
   } = props;
 
@@ -27,6 +28,7 @@ export const CWIcon = (props: IconComponentProps) => {
       iconSize={iconSize}
       onClick={onClick}
       selected={selected}
+      weight={weight}
       {...otherProps}
     />
   );

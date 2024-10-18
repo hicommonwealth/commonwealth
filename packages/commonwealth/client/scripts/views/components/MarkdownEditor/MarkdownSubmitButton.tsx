@@ -1,6 +1,7 @@
 import clsx from 'clsx';
 import React from 'react';
 import { useMarkdownEditorMode } from 'views/components/MarkdownEditor/useMarkdownEditorMode';
+import './MarkdownSubmitButton.scss';
 
 export type MarkdownSubmitButtonProps = Readonly<{
   label: string;
