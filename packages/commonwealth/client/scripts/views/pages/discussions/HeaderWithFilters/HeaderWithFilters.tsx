@@ -7,11 +7,9 @@ import React, { useEffect, useRef, useState } from 'react';
 import { matchRoutes, useLocation } from 'react-router-dom';
 import app from 'state';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
-import useGetFeeManagerBalanceQuery from 'state/api/communityStake/getFeeManagerBalance';
 import { useFetchTopicsQuery } from 'state/api/topics';
 import useUserStore from 'state/ui/user';
 import Permissions from 'utils/Permissions';
-import { useCommunityStake } from 'views/components/CommunityStake';
 import MarkdownViewerUsingQuillOrNewEditor from 'views/components/MarkdownViewerWithFallback';
 import { Select } from 'views/components/Select';
 import { CWCheckbox } from 'views/components/component_kit/cw_checkbox';
@@ -67,22 +65,12 @@ export const HeaderWithFilters = ({
   const [rightFiltersDropdownPosition, setRightFiltersDropdownPosition] =
     useState<'bottom-end' | 'bottom-start'>('bottom-end');
 
-  const ethChainId = app?.chain?.meta?.ChainNode?.eth_chain_id || 0;
-  const { stakeData } = useCommunityStake();
-  const namespace = stakeData?.Community?.namespace;
-  const { isContestAvailable, contestsData, stakeEnabled } =
-    useCommunityContests();
+  const { isContestAvailable, contestsData } = useCommunityContests();
 
   const { data: community } = useGetCommunityByIdQuery({
     id: app.activeChainId() || '',
     enabled: !!app.activeChainId(),
     includeNodeInfo: true,
-  });
-
-  const { data: feeManagerBalance } = useGetFeeManagerBalanceQuery({
-    ethChainId: ethChainId!,
-    namespace,
-    apiEnabled: !!ethChainId && !!namespace && stakeEnabled,
   });
 
   const user = useUserStore();
@@ -486,7 +474,7 @@ export const HeaderWithFilters = ({
       </div>
 
       {(activeContests || []).map((contest) => {
-        const { end_time, score } =
+        const { end_time } =
           // @ts-expect-error <StrictNullChecks/>
           contest?.contests[0] || {};
 
@@ -501,7 +489,6 @@ export const HeaderWithFilters = ({
             imageUrl={contest.image_url}
             // @ts-expect-error <StrictNullChecks/>
             topics={contest.topics}
-            score={score}
             decimals={contest.decimals}
             ticker={contest.ticker}
             finishDate={end_time ? moment(end_time).toISOString() : ''}
@@ -509,7 +496,7 @@ export const HeaderWithFilters = ({
             isRecurring={!contest.funding_token_address}
             isHorizontal
             showShareButton={false}
-            feeManagerBalance={feeManagerBalance}
+            payoutStructure={contest.payout_structure}
           />
         );
       })}
