@@ -21,7 +21,7 @@ export type HeadingButtonProps = Readonly<{
   onClick?: (event: React.MouseEvent<HTMLElement, MouseEvent>) => void;
 }>;
 
-export const CWFormatButton = (props: HeadingButtonProps) => {
+export const FormatButton = (props: HeadingButtonProps) => {
   const { format, onClick, formatName } = props;
 
   const applyFormat = usePublisher(applyFormat$);

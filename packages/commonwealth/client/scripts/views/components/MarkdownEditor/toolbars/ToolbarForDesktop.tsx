@@ -10,12 +10,12 @@ import {
   Separator,
 } from 'commonwealth-mdxeditor';
 import React from 'react';
-import { CWFormatButton } from 'views/components/MarkdownEditor/toolbars/CWFormatButton';
 import { CWHeadingButton } from 'views/components/MarkdownEditor/toolbars/CWHeadingButton';
 import { CWInsertCodeBlockButton } from 'views/components/MarkdownEditor/toolbars/CWInsertCodeBlockButton';
 import { CWListButton } from 'views/components/MarkdownEditor/toolbars/CWListButton';
 import { CWTableButton } from 'views/components/MarkdownEditor/toolbars/CWTableButton';
 import { CreateLinkButton } from 'views/components/MarkdownEditor/toolbars/CreateLinkButton';
+import { FormatButton } from 'views/components/MarkdownEditor/toolbars/FormatButton';
 import { ImageButton } from 'views/components/MarkdownEditor/toolbars/ImageButton';
 import './ToolbarForDesktop.scss';
 
@@ -46,28 +46,22 @@ export const ToolbarForDesktop = (props: ToolbarForDesktopProps) => {
                   </div>
 
                   <Separator />
-                  <CWFormatButton format={IS_BOLD} formatName="bold" />
-                  <CWFormatButton
-                    format={IS_UNDERLINE}
-                    formatName="underline"
-                  />
-                  <CWFormatButton format={IS_ITALIC} formatName="italic" />
+                  <FormatButton format={IS_BOLD} formatName="bold" />
+                  <FormatButton format={IS_UNDERLINE} formatName="underline" />
+                  <FormatButton format={IS_ITALIC} formatName="italic" />
                   <Separator />
 
-                  <CWFormatButton
+                  <FormatButton
                     format={IS_STRIKETHROUGH}
                     formatName="strikethrough"
                   />
 
-                  <CWFormatButton
+                  <FormatButton
                     format={IS_SUPERSCRIPT}
                     formatName="superscript"
                   />
 
-                  <CWFormatButton
-                    format={IS_SUBSCRIPT}
-                    formatName="subscript"
-                  />
+                  <FormatButton format={IS_SUBSCRIPT} formatName="subscript" />
 
                   <Separator />
 
