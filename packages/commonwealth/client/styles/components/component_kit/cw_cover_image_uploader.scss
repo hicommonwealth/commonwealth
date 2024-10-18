@@ -3,11 +3,19 @@
 .CoverImageUploader {
   width: 100%;
 
+  &.disabled {
+    cursor: not-allowed;
+  }
+
   display: flex;
   flex-direction: column;
 
   .attach-zone {
     cursor: pointer;
+
+    &.disabled {
+      cursor: not-allowed;
+    }
 
     min-height: 175px;
     height: 100%;

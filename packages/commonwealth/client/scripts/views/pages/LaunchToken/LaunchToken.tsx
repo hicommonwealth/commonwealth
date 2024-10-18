@@ -51,12 +51,7 @@ const LaunchToken = () => {
           <TokenInformationStep
             handleGoBack={() => navigate('/')} // redirect to home
             handleContinue={(tokenInfo) => {
-              setDraftTokenInfo({
-                name: tokenInfo.tokenName,
-                symbol: tokenInfo.tokenTicker,
-                description: tokenInfo.tokenDescription,
-                imageURL: tokenInfo.tokenImageURL,
-              });
+              setDraftTokenInfo(tokenInfo);
 
               onChangeStep(true);
             }}

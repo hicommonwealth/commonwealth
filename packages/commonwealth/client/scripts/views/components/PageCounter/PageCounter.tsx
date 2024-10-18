@@ -7,12 +7,14 @@ type PageCounterProps = {
   totalPages: number;
   activePage?: number;
   onPageChange?: (pageNumber: number) => void;
+  disabled?: boolean;
 };
 
 const PageCounter = ({
   activePage = 1,
   totalPages,
   onPageChange,
+  disabled,
 }: PageCounterProps) => {
   return (
     <div className="PageCounter">
@@ -21,7 +23,7 @@ const PageCounter = ({
           type="button"
           buttonSize="sm"
           iconName="chevronLeft"
-          disabled={activePage === 1}
+          disabled={activePage === 1 || disabled}
           onClick={() => onPageChange?.(activePage - 1)}
         />
       )}
@@ -35,7 +37,7 @@ const PageCounter = ({
           type="button"
           buttonSize="sm"
           iconName="chevronRight"
-          disabled={activePage === totalPages}
+          disabled={activePage === totalPages || disabled}
           onClick={() => onPageChange?.(activePage + 1)}
         />
       )}
