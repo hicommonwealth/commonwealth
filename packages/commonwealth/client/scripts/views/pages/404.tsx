@@ -22,7 +22,7 @@ export const PageNotFound = (props: PageNotFoundProps) => {
         content={
           message ||
           `
-            This page is private.
+            This page is private or doesn't exist.
             Please Sign in to view or join the conversation.
             `
         }
