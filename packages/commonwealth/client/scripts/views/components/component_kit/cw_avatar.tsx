@@ -1,3 +1,4 @@
+import { getRandomAvatar } from 'client/scripts/utils/avatarUtils';
 import 'components/component_kit/cw_avatar.scss';
 import React from 'react';
 import Jdenticon from 'react-jdenticon';
@@ -21,8 +22,11 @@ export const CWAvatarSkeleton = ({ size }: BaseAvatarProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWAvatar = (props: AvatarProps) => {
   const { avatarUrl, size } = props;
+
+  const avatarToUse = avatarUrl || getRandomAvatar();
 
   return (
     <div
@@ -30,7 +34,7 @@ export const CWAvatar = (props: AvatarProps) => {
       style={{
         width: `${size}px`,
         height: `${size}px`,
-        backgroundImage: `url("${avatarUrl}")`,
+        backgroundImage: `url("${avatarToUse}")`,
       }}
     />
   );
@@ -38,6 +42,7 @@ export const CWAvatar = (props: AvatarProps) => {
 
 type JdenticonProps = BaseAvatarProps & { address?: string };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWJdenticon = (props: JdenticonProps) => {
   const { address, size } = props;
 
