@@ -133,9 +133,9 @@ async function validateExternalApiVersioning() {
   // Use the local version only if it is greater than the npm version.
   // If local version > npm version that means CI already bumped versions
   // after a push to a PR to be merged into production branch
-  const newVersion = compareSemVersions(newOas.info.version, process.argv[3])
+  const newVersion = compareSemVersions(newOas.info.version, process.argv[2])
     ? parseSemVer(newOas.info.version)
-    : parseSemVer(process.argv[3]);
+    : parseSemVer(process.argv[2]);
 
   if (oldVersion.major < newVersion.major) {
     if (newVersion.minor !== 0 || newVersion.patch !== 0) {
