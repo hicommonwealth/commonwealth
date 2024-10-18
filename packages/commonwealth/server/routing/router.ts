@@ -51,7 +51,6 @@ import updateCommunityPriority from '../routes/updateCommunityPriority';
 import type ViewCountCache from '../util/viewCountCache';
 
 import { type DB } from '@hicommonwealth/model';
-import banAddress from '../routes/banAddress';
 import setAddressWallet from '../routes/setAddressWallet';
 
 import type DatabaseValidationService from '../middleware/databaseValidationService';
@@ -514,16 +513,6 @@ function setupRouter(
     '/writeUserSetting',
     passport.authenticate('jwt', { session: false }),
     writeUserSetting.bind(this, models),
-  );
-
-  // bans
-  registerRoute(
-    router,
-    'post',
-    '/banAddress',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateCommunity,
-    banAddress.bind(this, models),
   );
 
   // Custom domain update route
