@@ -4,11 +4,11 @@ import CWIconButton from 'views/components/component_kit/new_designs/CWIconButto
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import './HeadingButton.scss';
 
-export type CWTableButtonProps = Readonly<{
+export type TableButtonProps = Readonly<{
   onClick?: (event: React.MouseEvent<HTMLElement, MouseEvent>) => void;
 }>;
 
-export const CWTableButton = (props: CWTableButtonProps) => {
+export const TableButton = (props: TableButtonProps) => {
   const { onClick } = props;
   const insertTable = usePublisher(insertTable$);
 

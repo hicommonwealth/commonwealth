@@ -10,13 +10,13 @@ import {
   Separator,
 } from 'commonwealth-mdxeditor';
 import React from 'react';
-import { CWTableButton } from 'views/components/MarkdownEditor/toolbars/CWTableButton';
 import { CreateLinkButton } from 'views/components/MarkdownEditor/toolbars/CreateLinkButton';
 import { FormatButton } from 'views/components/MarkdownEditor/toolbars/FormatButton';
 import { HeadingButton } from 'views/components/MarkdownEditor/toolbars/HeadingButton';
 import { ImageButton } from 'views/components/MarkdownEditor/toolbars/ImageButton';
 import { InsertCodeBlockButton } from 'views/components/MarkdownEditor/toolbars/InsertCodeBlockButton';
 import { ListButton } from 'views/components/MarkdownEditor/toolbars/ListButton';
+import { TableButton } from 'views/components/MarkdownEditor/toolbars/TableButton';
 import './ToolbarForDesktop.scss';
 
 type ToolbarForDesktopProps = Readonly<{
@@ -76,7 +76,7 @@ export const ToolbarForDesktop = (props: ToolbarForDesktopProps) => {
                     <ImageButton onImage={onImage} />
                     <InsertCodeBlockButton />
                     <HeadingButton blockType="quote" />
-                    <CWTableButton />
+                    <TableButton />
                   </div>
                 </>
               ),
