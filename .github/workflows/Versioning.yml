@@ -58,7 +58,7 @@ jobs:
         run: |
           git config --global user.name "timolegros"
           git config --global user.email "timothee@ualberta.ca"
-          git add ./libs/api-client/package.json ./packages/commonwealth/server/external-api-config.json
+          git add libs/api-client/package.json packages/commonwealth/server/external-api-config.json
           git commit -m "chore: update client SDK version"
           git push origin HEAD
       # May need to add a `repo` scoped personal access token

@@ -137,6 +137,10 @@ async function validateExternalApiVersioning() {
     ? parseSemVer(newOas.info.version)
     : parseSemVer(process.argv[2]);
 
+  console.log(
+    `Files downloaded and versions parsed. \nNew Version: ${newVersion}\nOld Version: ${oldVersion}`,
+  );
+
   if (oldVersion.major < newVersion.major) {
     if (newVersion.minor !== 0 || newVersion.patch !== 0) {
       const newMajorVersion = `${newVersion.major}.0.0`;
@@ -145,6 +149,7 @@ async function validateExternalApiVersioning() {
         `Bumped OAS version from ${readableVersion(oldVersion)} to ${newMajorVersion}`,
       );
     }
+    console.log('Major version already bumped.');
     return; // Breaking change, this is valid regardless of schema changes
   }
 
@@ -160,6 +165,8 @@ async function validateExternalApiVersioning() {
       format: 'openapi3',
     },
   });
+  await Promise.all([unlink(productionOasPath), unlink(localOasPath)]);
+  console.log('OpenAPI spec diff:', result);
 
   if (result.breakingDifferencesFound) {
     throw Error('External API has breaking changes, update the Major version');
@@ -191,7 +198,6 @@ async function validateExternalApiVersioning() {
     return;
   }
 
-  await Promise.all([unlink(productionOasPath), unlink(localOasPath)]);
   console.log(`No version updated: ${readableVersion(oldVersion)}`);
 }
 
