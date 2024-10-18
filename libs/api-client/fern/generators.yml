@@ -10,4 +10,4 @@ groups:
         config:
           outputEsm: true
 api:
-  path: openapi/openapi.yml
+  path: ../openapi.json

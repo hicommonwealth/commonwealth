@@ -39,7 +39,7 @@ _See also full [Datadog](./Datadog.md) entry._
 
 We've implemented two new performance dashboards to monitor and track improvements in latency and call volume over time.
 
-These dashboards serve a key role in prioritizing improvements by highlighting high call volume and slow endpoints. They are instrumental in monitoring the effect of improvements over time, as shown by specific examples corresponding to PRs like `getAddressProfile` larger batches and performance enhancements in backend API calls such as `/viewUserActivity` and `/status`. Additionally, they can effectively detect abnormal spikes in latency and call volume through real-time metrics reported to Datadog.
+These dashboards serve a key role in prioritizing improvements by highlighting high call volume and slow endpoints. They are instrumental in monitoring the effect of improvements over time, as shown by specific examples corresponding to PRs like `getAddressProfile` larger batches and performance enhancements in backend API calls such as `/feed.GetUserActivity` and `/status`. Additionally, they can effectively detect abnormal spikes in latency and call volume through real-time metrics reported to Datadog.
 
 ## Change Log
 

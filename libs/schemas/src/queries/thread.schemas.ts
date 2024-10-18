@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { Thread } from '../entities';
 import {
   DiscordMetaSchema,
   linksSchema,
@@ -88,5 +89,53 @@ export const GetBulkThreads = {
     numVotingThreads: PG_INT,
     cursor: PG_INT,
     threads: z.array(BulkThread),
+  }),
+};
+
+export const MappedReaction = z.object({
+  id: z.number(),
+  type: z.literal('like'),
+  address: z.string(),
+  updated_at: z.date(),
+  voting_weight: z.number(),
+  profile_name: z.string().optional(),
+  avatar_url: z.string().optional(),
+  last_active: z.date().optional(),
+});
+
+export const MappedThread = Thread.extend({
+  associatedReactions: z.array(MappedReaction),
+});
+
+export const GetThreadsStatus = z.enum(['active', 'pastWinners', 'all']);
+export const GetThreadsOrderBy = z.enum([
+  'newest',
+  'oldest',
+  'mostLikes',
+  'mostComments',
+  'latestActivity',
+]);
+
+export const GetThreads = {
+  input: z.object({
+    community_id: z.string(),
+    page: z.number().optional(),
+    limit: z.number().optional(),
+    stage: z.string().optional(),
+    topic_id: PG_INT.optional(),
+    includePinnedThreads: z.boolean().optional(),
+    order_by: GetThreadsOrderBy.optional(),
+    from_date: z.string().optional(),
+    to_date: z.string().optional(),
+    archived: z.boolean().optional(),
+    contestAddress: z.string().optional(),
+    status: GetThreadsStatus.optional(),
+    withXRecentComments: z.number().optional(),
+  }),
+  output: z.object({
+    page: z.number(),
+    limit: z.number(),
+    numVotingThreads: z.number(),
+    threads: z.array(MappedThread),
   }),
 };

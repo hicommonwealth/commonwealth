@@ -218,6 +218,42 @@ class NamespaceFactory extends ContractBase {
     return txReceipt;
   }
 
+  async newERC20Contest(
+    namespaceName: string,
+    contestInterval: number,
+    winnerShares: number[],
+    voteToken: string,
+    voterShare: number,
+    walletAddress: string,
+    exchangeToken: string,
+  ): Promise<TransactionReceipt> {
+    if (!this.initialized || !this.walletEnabled) {
+      await this.initialize(true);
+    }
+    const maxFeePerGasEst = await this.estimateGas();
+    let txReceipt;
+    try {
+      txReceipt = await this.contract.methods
+        .newSingleERC20Contest(
+          namespaceName,
+          contestInterval,
+          winnerShares,
+          voteToken,
+          voterShare,
+          exchangeToken,
+        )
+        .send({
+          from: walletAddress,
+          type: '0x2',
+          maxFeePerGas: maxFeePerGasEst?.toString(),
+          maxPriorityFeePerGas: this.web3.utils.toWei('0.001', 'gwei'),
+        });
+    } catch {
+      throw new Error('Transaction failed');
+    }
+    return txReceipt;
+  }
+
   async getFeeManagerBalance(
     namespace: string,
     token?: string,

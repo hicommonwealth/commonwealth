@@ -1,11 +1,14 @@
 import {
+  CacheNamespaces,
   Events,
   INVALID_ACTOR_ERROR,
   INVALID_INPUT_ERROR,
   INVALID_STATE_ERROR,
+  cache,
   command as coreCommand,
   query as coreQuery,
   handleEvent,
+  logger,
   type EventSchemas,
   type EventsHandlerMetadata,
   type Metadata,
@@ -13,6 +16,8 @@ import {
 import { TRPCError } from '@trpc/server';
 import { ZodSchema, ZodUndefined, z } from 'zod';
 import { Commit, Tag, Track, buildproc, procedure } from './middleware';
+
+const log = logger(import.meta);
 
 const trpcerror = (error: unknown): TRPCError => {
   if (error instanceof Error) {
@@ -89,6 +94,7 @@ export const command = <
  * @param factory query factory
  * @param tag query tag used for OpenAPI spec grouping
  * @param forceSecure whether to force secure requests for rate-limited external-router
+ * @param ttlSecs cache response ttl in seconds
  * @returns tRPC query procedure
  */
 export const query = <
@@ -98,7 +104,10 @@ export const query = <
 >(
   factory: () => Metadata<Input, Output, AuthContext>,
   tag: Tag,
-  forceSecure?: boolean,
+  options?: {
+    forceSecure?: boolean;
+    ttlSecs?: number;
+  },
 ) => {
   const md = factory();
   return buildproc({
@@ -106,10 +115,23 @@ export const query = <
     name: factory.name,
     md,
     tag,
-    forceSecure,
+    forceSecure: options?.forceSecure,
   }).query(async ({ ctx, input }) => {
     try {
-      return await coreQuery(
+      const cacheKey = options?.ttlSecs
+        ? `${factory.name}_${JSON.stringify(input)}`
+        : undefined;
+      if (cacheKey) {
+        const cachedReponse = await cache().getKey(
+          CacheNamespaces.Query_Response,
+          cacheKey,
+        );
+        if (cachedReponse) {
+          log.info(`Returning cached response for ${cacheKey}`);
+          return JSON.parse(cachedReponse);
+        }
+      }
+      const response = await coreQuery(
         md,
         {
           actor: ctx.actor,
@@ -117,6 +139,17 @@ export const query = <
         },
         false,
       );
+      if (cacheKey) {
+        void cache()
+          .setKey(
+            CacheNamespaces.Query_Response,
+            cacheKey,
+            JSON.stringify(response),
+            options?.ttlSecs,
+          )
+          .then(() => log.info(`Cached response for ${cacheKey}`));
+      }
+      return response;
     } catch (error) {
       throw trpcerror(error);
     }

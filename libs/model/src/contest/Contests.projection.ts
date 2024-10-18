@@ -148,7 +148,7 @@ async function updateOrCreateWithAlert(
           contract_address: contest_address,
           event_signature: eventSignature,
           kind: signatureToKind[eventSignature],
-          abi_id: contestAbi.id,
+          abi_id: contestAbi.id!,
         };
       },
     );

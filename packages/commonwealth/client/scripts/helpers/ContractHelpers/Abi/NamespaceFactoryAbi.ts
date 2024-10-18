@@ -1,5 +1,19 @@
 export const namespaceFactoryAbi = [
   {
+    type: 'function',
+    name: 'newSingleERC20Contest',
+    inputs: [
+      { name: 'name', type: 'string', internalType: 'string' },
+      { name: 'length', type: 'uint256', internalType: 'uint256' },
+      { name: 'winnerShares', type: 'uint256[]', internalType: 'uint256[]' },
+      { name: 'token', type: 'address', internalType: 'address' },
+      { name: 'voterShare', type: 'uint256', internalType: 'uint256' },
+      { name: 'exhangeToken', type: 'address', internalType: 'address' },
+    ],
+    outputs: [{ name: '', type: 'address', internalType: 'address' }],
+    stateMutability: 'nonpayable',
+  },
+  {
     inputs: [],
     stateMutability: 'view',
     type: 'function',

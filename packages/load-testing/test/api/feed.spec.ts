@@ -1,9 +1,9 @@
 import {
-  viewGlobalActivity,
-  viewUserActivity,
+  getGlobalActivity,
+  getUserActivity,
 } from '../util/apiRequests/feed.ts';
 import { createJwts } from '../util/apiRequests/utility.ts';
-import { LEGACY_API_URL, TRPC_API_URL } from '../util/config.ts';
+import { TRPC_API_URL } from '../util/config.ts';
 import { createScenario } from '../util/scenarios.ts';
 import { IgnoreLifecycleMetrics } from '../util/utils.ts';
 
@@ -35,10 +35,10 @@ export function setup(): string[] {
 }
 
 export async function globalActivity() {
-  viewGlobalActivity(LEGACY_API_URL);
+  getGlobalActivity(TRPC_API_URL);
 }
 
 export async function userActivity(jwts: string) {
   const jwt = jwts[Math.floor(Math.random() * jwts.length)];
-  viewUserActivity(LEGACY_API_URL, jwt);
+  getUserActivity(TRPC_API_URL, jwt);
 }

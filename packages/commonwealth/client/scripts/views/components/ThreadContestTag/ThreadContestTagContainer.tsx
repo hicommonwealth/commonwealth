@@ -1,6 +1,5 @@
 import React from 'react';
 
-import { useFlag } from 'hooks/useFlag';
 import { AssociatedContest } from 'models/Thread';
 
 import ThreadContestTag from './ThreadContestTag';
@@ -13,11 +12,9 @@ interface ThreadContestTagContainerProps {
 const ThreadContestTagContainer = ({
   associatedContests,
 }: ThreadContestTagContainerProps) => {
-  const contestsEnabled = useFlag('contest');
-
   const contestWinners = getWinnersFromAssociatedContests(associatedContests);
 
-  const showContestWinnerTag = contestsEnabled && contestWinners.length > 0;
+  const showContestWinnerTag = contestWinners.length > 0;
 
   return (
     <>
