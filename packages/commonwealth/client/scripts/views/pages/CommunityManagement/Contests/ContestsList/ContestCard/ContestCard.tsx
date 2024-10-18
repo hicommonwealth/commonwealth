@@ -107,6 +107,7 @@ const ContestCard = ({
     chainRpc: app.chain.meta?.ChainNode?.url || '',
     ethChainId: app.chain.meta?.ChainNode?.eth_chain_id || 0,
     apiEnabled: !isRecurring,
+    isOneOff: !isRecurring,
   });
 
   const handleCancel = () => {

@@ -1,5 +1,4 @@
-import { ZERO_ADDRESS } from '@hicommonwealth/shared';
-import { getTotalContestBalance } from 'node_modules/@hicommonwealth/shared/src/commonProtocol';
+import { ZERO_ADDRESS, commonProtocol } from '@hicommonwealth/shared';
 import { AbiItem, TransactionReceipt } from 'web3';
 import { ContestAbi } from './Abi/ContestAbi';
 import { Erc20Abi } from './Abi/ERC20Abi';
@@ -238,7 +237,7 @@ class Contest extends ContractBase {
       await this.initialize(false);
     }
     this.reInitContract();
-    const contestBalance = await getTotalContestBalance(
+    const contestBalance = await commonProtocol.getTotalContestBalance(
       this.contract,
       this.contractAddress,
       this.web3,

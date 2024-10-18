@@ -64,6 +64,7 @@ const useFundContestForm = ({
     contestAddress,
     chainRpc,
     ethChainId,
+    isOneOff: !!fundingTokenAddress,
   });
 
   const contestTokenBalance =
