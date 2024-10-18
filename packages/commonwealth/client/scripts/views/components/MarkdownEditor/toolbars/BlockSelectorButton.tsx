@@ -1,7 +1,7 @@
 import ClickAwayListener from '@mui/base/ClickAwayListener';
 import { currentBlockType$, useCellValue } from 'commonwealth-mdxeditor';
 import React, { useCallback } from 'react';
-import { CWHeadingButton } from 'views/components/MarkdownEditor/toolbars/CWHeadingButton';
+import { HeadingButton } from 'views/components/MarkdownEditor/toolbars/HeadingButton';
 import { PlaceholderIcon } from 'views/components/MarkdownEditor/toolbars/PlaceholderIcon';
 import { blockTypeToIconName } from 'views/components/MarkdownEditor/toolbars/blockTypeToIconName';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
@@ -57,23 +57,11 @@ export const BlockSelectorButton = (props: BlockSelectorButtonProps) => {
           className="FormattingPopover"
           body={
             <div onMouseLeave={popoverProps.handleInteraction}>
-              <CWHeadingButton
-                blockType="p"
-                onClick={handleFormatButtonClick}
-              />
-              <CWHeadingButton
-                blockType="h1"
-                onClick={handleFormatButtonClick}
-              />
-              <CWHeadingButton
-                blockType="h2"
-                onClick={handleFormatButtonClick}
-              />
-              <CWHeadingButton
-                blockType="h3"
-                onClick={handleFormatButtonClick}
-              />
-              <CWHeadingButton
+              <HeadingButton blockType="p" onClick={handleFormatButtonClick} />
+              <HeadingButton blockType="h1" onClick={handleFormatButtonClick} />
+              <HeadingButton blockType="h2" onClick={handleFormatButtonClick} />
+              <HeadingButton blockType="h3" onClick={handleFormatButtonClick} />
+              <HeadingButton
                 blockType="quote"
                 onClick={handleFormatButtonClick}
               />

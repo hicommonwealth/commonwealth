@@ -2,7 +2,7 @@ import { openLinkEditDialog$, usePublisher } from 'commonwealth-mdxeditor';
 import React, { useCallback } from 'react';
 import CWIconButton from 'views/components/component_kit/new_designs/CWIconButton';
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
-import './CWHeadingButton.scss';
+import './HeadingButton.scss';
 
 export type CWCreateLinkButtonProps = Readonly<{
   onClick?: (event: React.MouseEvent<HTMLElement, MouseEvent>) => void;

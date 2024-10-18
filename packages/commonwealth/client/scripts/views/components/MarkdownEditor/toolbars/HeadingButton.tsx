@@ -10,14 +10,14 @@ import { $createParagraphNode } from 'lexical';
 import React, { useCallback } from 'react';
 import CWIconButton from 'views/components/component_kit/new_designs/CWIconButton';
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
-import './CWHeadingButton.scss';
+import './HeadingButton.scss';
 
-export type CWHeadingButtonProps = Readonly<{
+export type HeadingButtonProps = Readonly<{
   blockType: 'h1' | 'h2' | 'h3' | 'quote' | 'p';
   onClick?: (event: React.MouseEvent<HTMLElement, MouseEvent>) => void;
 }>;
 
-export const CWHeadingButton = (props: CWHeadingButtonProps) => {
+export const HeadingButton = (props: HeadingButtonProps) => {
   const { blockType, onClick } = props;
 
   const currentBlockType = useCellValue(currentBlockType$);

@@ -10,12 +10,12 @@ import {
   Separator,
 } from 'commonwealth-mdxeditor';
 import React from 'react';
-import { CWHeadingButton } from 'views/components/MarkdownEditor/toolbars/CWHeadingButton';
 import { CWInsertCodeBlockButton } from 'views/components/MarkdownEditor/toolbars/CWInsertCodeBlockButton';
 import { CWListButton } from 'views/components/MarkdownEditor/toolbars/CWListButton';
 import { CWTableButton } from 'views/components/MarkdownEditor/toolbars/CWTableButton';
 import { CreateLinkButton } from 'views/components/MarkdownEditor/toolbars/CreateLinkButton';
 import { FormatButton } from 'views/components/MarkdownEditor/toolbars/FormatButton';
+import { HeadingButton } from 'views/components/MarkdownEditor/toolbars/HeadingButton';
 import { ImageButton } from 'views/components/MarkdownEditor/toolbars/ImageButton';
 import './ToolbarForDesktop.scss';
 
@@ -40,9 +40,9 @@ export const ToolbarForDesktop = (props: ToolbarForDesktopProps) => {
               fallback: () => (
                 <>
                   <div className="button-container">
-                    <CWHeadingButton blockType="h1" />
-                    <CWHeadingButton blockType="h2" />
-                    <CWHeadingButton blockType="h3" />
+                    <HeadingButton blockType="h1" />
+                    <HeadingButton blockType="h2" />
+                    <HeadingButton blockType="h3" />
                   </div>
 
                   <Separator />
@@ -75,7 +75,7 @@ export const ToolbarForDesktop = (props: ToolbarForDesktopProps) => {
                     <CreateLinkButton />
                     <ImageButton onImage={onImage} />
                     <CWInsertCodeBlockButton />
-                    <CWHeadingButton blockType="quote" />
+                    <HeadingButton blockType="quote" />
                     <CWTableButton />
                   </div>
                 </>

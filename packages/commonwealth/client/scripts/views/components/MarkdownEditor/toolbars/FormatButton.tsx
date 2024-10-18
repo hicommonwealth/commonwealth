@@ -12,7 +12,7 @@ import React, { useCallback } from 'react';
 import CWIconButton from 'views/components/component_kit/new_designs/CWIconButton';
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import { formatToIconName } from 'views/components/MarkdownEditor/toolbars/formatToIconName';
-import './CWHeadingButton.scss';
+import './HeadingButton.scss';
 
 export type HeadingButtonProps = Readonly<{
   format: FORMAT;
