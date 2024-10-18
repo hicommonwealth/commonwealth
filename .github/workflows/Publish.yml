@@ -2,6 +2,8 @@ name: Publish Client SDK
 
 env:
   APP_ENV: CI
+  ALCHEMY_PRIVATE_APP_KEY: ${{ secrets.ALCHEMY_PRIVATE_APP_KEY }}
+  ALCHEMY_PUBLIC_APP_KEY: ${{ secrets.ALCHEMY_PUBLIC_APP_KEY }}
 
 on:
   pull_request:
