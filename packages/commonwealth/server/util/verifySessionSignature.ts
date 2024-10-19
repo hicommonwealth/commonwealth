@@ -13,6 +13,7 @@ import {
   type AddressInstance,
   type DB,
 } from '@hicommonwealth/model';
+import { getRandomAvatar } from './defaultAvatar';
 
 /**
  * Verify the session signature is valid for the address model,
@@ -72,11 +73,14 @@ const verifySessionSignature = async (
       if (existingAddress) {
         addressModel.user_id = existingAddress.user_id;
       } else {
+        const default_avatar_url = getRandomAvatar();
         const user = await models.sequelize.transaction(async (transaction) => {
           const userEntity = await models.User.create(
             {
               email: null,
-              profile: {},
+              profile: {
+                avatar_url: default_avatar_url,
+              },
             },
             { transaction },
           );

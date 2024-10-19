@@ -12,6 +12,7 @@ import {
 } from '@hicommonwealth/shared';
 import sgMail from '@sendgrid/mail';
 import type { NextFunction, Request, Response } from 'express';
+import { getRandomAvatar } from 'server/util/defaultAvatar';
 import { MixpanelLoginEvent } from '../../shared/analytics/types';
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
 import assertAddressOwnership from '../util/assertAddressOwnership';
@@ -84,10 +85,13 @@ const processAddress = async (
     addressInstance.verification_token_expires = null;
     addressInstance.verified = new Date();
     if (!addressInstance.user_id) {
+      const default_avatar_url = getRandomAvatar();
       // address is not yet verified => create a new user
       const newUser = await models.User.create({
         email: null,
-        profile: {},
+        profile: {
+          avatar_url: default_avatar_url,
+        },
       });
       addressInstance.user_id = newUser.id;
     }

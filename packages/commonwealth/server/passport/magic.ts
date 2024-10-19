@@ -22,6 +22,7 @@ import jsonwebtoken from 'jsonwebtoken';
 import passport from 'passport';
 import { DoneFunc, Strategy as MagicStrategy, MagicUser } from 'passport-magic';
 import { Op, Transaction, WhereOptions } from 'sequelize';
+import { getRandomAvatar } from 'server/util/defaultAvatar';
 import { config } from '../config';
 import { validateCommunity } from '../middleware/validateCommunity';
 import { TypedRequestBody } from '../types';
@@ -103,6 +104,8 @@ async function createNewMagicUser({
   generatedAddresses,
   profileMetadata,
 }: MagicLoginContext): Promise<UserInstance> {
+  const default_avatar_url = getRandomAvatar();
+
   // completely new user: create user, profile, addresses
   return sequelize.transaction(async (transaction) => {
     const newUser = await models.User.create(
@@ -116,7 +119,9 @@ async function createNewMagicUser({
         // just because an email comes from magic doesn't mean it's legitimately owned by the signing-in
         // user, unless it's via the email flow (e.g. you can spoof an email on Discord)
         emailVerified: !!magicUserMetadata.email,
-        profile: {},
+        profile: {
+          avatar_url: default_avatar_url,
+        },
       },
       { transaction },
     );
