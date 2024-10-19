@@ -105,7 +105,6 @@ async function createNewMagicUser({
   profileMetadata,
 }: MagicLoginContext): Promise<UserInstance> {
   const default_avatar_url = getRandomAvatar();
-
   // completely new user: create user, profile, addresses
   return sequelize.transaction(async (transaction) => {
     const newUser = await models.User.create(

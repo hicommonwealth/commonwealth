@@ -1,3 +1,4 @@
+import jdenticon from 'jdenticon';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -8,7 +9,6 @@ import {
   getDecodedString,
   renderQuillDeltaToText,
 } from '@hicommonwealth/shared';
-import { getRandomAvatar } from 'client/scripts/utils/avatarUtils';
 import useUserStore from 'state/ui/user';
 import { MarkdownViewerWithFallback } from 'views/components/MarkdownViewerWithFallback/MarkdownViewerWithFallback';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
@@ -38,8 +38,6 @@ const ProfileHeader = ({ profile, isOwner }: ProfileHeaderProps) => {
     }
   };
 
-  const avatarToUse = profile?.avatarUrl || getRandomAvatar();
-
   return (
     <div className="ProfileHeader">
       <div className="edit">
@@ -54,7 +52,15 @@ const ProfileHeader = ({ profile, isOwner }: ProfileHeaderProps) => {
         )}
       </div>
       <div className="profile-image">
-        <img src={avatarToUse} />
+        {profile?.avatarUrl ? (
+          <img src={profile.avatarUrl} />
+        ) : (
+          <img
+            src={`data:image/svg+xml;utf8,${encodeURIComponent(
+              jdenticon.toSvg(profile.userId, 90),
+            )}`}
+          />
+        )}
       </div>
       <div className="profile-name-and-bio">
         <CWText type="h3" className={name ? 'name hasMargin' : 'name'}>
