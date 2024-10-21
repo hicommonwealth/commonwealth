@@ -1,3 +1,4 @@
+import { VALIDATION_MESSAGES } from 'helpers/formValidations/messages';
 import React, { useState } from 'react';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from '../component_kit/new_designs/CWButton';
@@ -8,13 +9,16 @@ import './LaunchIdeaCard.scss';
 type LaunchIdeaCardProps = {
   onTokenLaunchClick?: () => void;
   onRandomizeClick?: (ideaPrompt?: string) => void;
+  maxPromptLength?: number;
 };
 
 const LaunchIdeaCard = ({
   onTokenLaunchClick,
   onRandomizeClick,
+  maxPromptLength = 80,
 }: LaunchIdeaCardProps) => {
   const [ideaPrompt, setIdeaPrompt] = useState<string>();
+  const maxCharLimitReached = maxPromptLength === (ideaPrompt || '').length;
 
   return (
     <section className="LaunchIdeaCard">
@@ -23,7 +27,14 @@ const LaunchIdeaCard = ({
         <CWTextInput
           placeholder="Type your idea or select randomize to launch a token...."
           fullWidth
-          onInput={(e) => setIdeaPrompt(e.target.value.trim())}
+          onInput={(e) =>
+            !maxCharLimitReached && setIdeaPrompt(e.target.value.trim())
+          }
+          customError={
+            maxCharLimitReached
+              ? VALIDATION_MESSAGES.MAX_CHAR_LIMIT_REACHED
+              : ''
+          }
         />
         <div className="cta-elements">
           <CWText className="randomize-cta-text">
