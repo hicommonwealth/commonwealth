@@ -97,7 +97,6 @@ const DetailsFormStep = ({
 
   const { mutateAsync: updateContest } = useUpdateContestMutation();
 
-  const chainId = app.chain.meta.ChainNode?.id || 0;
   const {
     tokenValue,
     setTokenValue,
@@ -106,7 +105,8 @@ const DetailsFormStep = ({
     tokenMetadata,
     tokenMetadataLoading,
   } = useTokenFinder({
-    chainId: chainId,
+    nodeEthChainId: app.chain.meta.ChainNode?.eth_chain_id || 0,
+    initialTokenValue: contestFormData?.fundingTokenAddress,
   });
 
   const communityId = app.activeChainId() || '';
@@ -309,6 +309,14 @@ const DetailsFormStep = ({
                     isSearchable={false}
                     options={weightedTopics}
                     isDisabled={editMode}
+                    onChange={(t) => {
+                      if (t?.weightedVoting === TopicWeightedVoting.ERC20) {
+                        const token = topicsData?.find(
+                          (topic) => topic.id === t.value,
+                        )?.tokenAddress;
+                        setTokenValue(token || '');
+                      }
+                    }}
                   />
                 </div>
               )}
@@ -429,7 +437,11 @@ const DetailsFormStep = ({
                           debouncedTokenValue={debouncedTokenValue}
                           tokenMetadataLoading={tokenMetadataLoading}
                           tokenMetadata={tokenMetadata}
-                          tokenValue={tokenValue}
+                          tokenValue={
+                            editMode
+                              ? contestFormData?.fundingTokenAddress || ''
+                              : tokenValue
+                          }
                           setTokenValue={setTokenValue}
                           tokenError={getTokenError()}
                           containerClassName="funding-token-address-input"
@@ -775,7 +787,7 @@ const DetailsFormStep = ({
                 <CWButton
                   label={editMode ? 'Save changes' : 'Save & continue'}
                   type="submit"
-                  disabled={isProcessingProfileImage}
+                  disabled={isProcessingProfileImage || !!getTokenError()}
                 />
               </div>
             </>

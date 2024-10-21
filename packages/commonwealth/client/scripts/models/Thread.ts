@@ -191,7 +191,7 @@ export type AssociatedContest = {
   contest_interval: number;
 };
 
-type RecentComment = {
+export type RecentComment = {
   id: number;
   address: string;
   text: string;
@@ -201,7 +201,7 @@ type RecentComment = {
   deleted_at?: string;
   discord_meta?: string;
   profile_name?: string;
-  profile_avatar_url?: string;
+  profile_avatar?: string;
   user_id: string;
 };
 
@@ -263,7 +263,7 @@ export class Thread implements IUniqueId {
   public associatedReactions: AssociatedReaction[];
   public associatedContests?: AssociatedContest[];
   public recentComments?: Comment<IUniqueId>[];
-  public reactionWeightsSum: number;
+  public reactionWeightsSum: string;
   public links: Link[];
   public readonly discord_meta: any;
   public readonly latestActivity: Moment;
@@ -353,7 +353,7 @@ export class Thread implements IUniqueId {
     reactionType?: any[]; // TODO: fix type
     reactionTimestamps?: string[];
     reactionWeights?: number[];
-    reaction_weights_sum: number;
+    reaction_weights_sum: string;
     ThreadVersionHistories: ThreadVersionHistory[];
     Address: any; // TODO: fix type
     discord_meta?: any;
@@ -445,7 +445,7 @@ export class Thread implements IUniqueId {
             User: {
               profile: {
                 name: rc?.profile_name,
-                avatar_url: rc?.profile_avatar_url,
+                avatar_url: rc?.profile_avatar,
               },
             },
           },
@@ -457,7 +457,7 @@ export class Thread implements IUniqueId {
           parent_id: null,
           reactions: [],
           CommentVersionHistories: [],
-          reaction_weights_sum: 0,
+          reaction_weights_sum: '0',
           canvas_signed_data: null,
           canvas_msg_id: null,
         }),

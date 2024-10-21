@@ -5,7 +5,6 @@ import * as CommonApi from '../../../../api/index';
 import * as core from '../../../../core';
 import * as serializers from '../../../index';
 import { UpdateThreadResponseLinksItemSource } from './UpdateThreadResponseLinksItemSource';
-
 export declare const UpdateThreadResponseLinksItem: core.serialization.ObjectSchema<
   serializers.UpdateThreadResponseLinksItem.Raw,
   CommonApi.UpdateThreadResponseLinksItem

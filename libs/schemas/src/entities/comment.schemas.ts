@@ -41,8 +41,12 @@ export const Comment = z.object({
     .nullish(),
 
   reaction_count: PG_INT,
-  reaction_weights_sum: PG_INT.optional(),
-
+  reaction_weights_sum: z
+    .string()
+    .refine((str) => {
+      return /^[0-9]+$/.test(str); // only numbers
+    })
+    .nullish(),
   search: z.union([z.string(), z.record(z.any())]),
 
   Address: Address.nullish(),

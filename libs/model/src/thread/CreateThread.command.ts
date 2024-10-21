@@ -88,7 +88,9 @@ export function CreateThread(): Command<
   return {
     ...schemas.CreateThread,
     auth: [
-      isAuthorized({ action: schemas.PermissionEnum.CREATE_THREAD }),
+      isAuthorized({
+        action: schemas.PermissionEnum.CREATE_THREAD,
+      }),
       verifyThreadSignature,
     ],
     body: async ({ actor, payload, auth }) => {
@@ -131,7 +133,7 @@ export function CreateThread(): Command<
               view_count: 0,
               comment_count: 0,
               reaction_count: 0,
-              reaction_weights_sum: 0,
+              reaction_weights_sum: '0',
               search: getThreadSearchVector(rest.title, body),
               content_url: contentUrl,
             },

@@ -21,7 +21,7 @@ type ActivityResponse = {
     marked_as_spam_at?: string;
     discord_meta?: string;
     profile_name: string;
-    profile_avatar_url?: string;
+    profile_avatar?: string;
     user_id: number;
     user_address: string;
     topic: Topic;
@@ -37,7 +37,7 @@ export function formatActivityResponse(response: AxiosResponse<any, any>) {
       new Thread({
         id: x.thread.id,
         // @ts-expect-error <StrictNullChecks/>
-        avatar_url: x.thread.profile_avatar_url,
+        avatar_url: x.thread.profile_avatar,
         profile_name: x.thread.profile_name,
         community_id: x.thread.community_id,
         kind: x.thread.kind,
@@ -67,7 +67,7 @@ export function formatActivityResponse(response: AxiosResponse<any, any>) {
         version_history: null,
         last_commented_on: '',
         address_last_active: '',
-        reaction_weights_sum: 0,
+        reaction_weights_sum: '0',
       }),
   );
 }

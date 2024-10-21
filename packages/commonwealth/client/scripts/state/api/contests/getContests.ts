@@ -3,9 +3,7 @@ import { z } from 'zod';
 import { GetAllContests } from '@hicommonwealth/schemas';
 import { trpc } from 'utils/trpcClient';
 
-type UseGetContestsQueryProps = z.infer<typeof GetAllContests.input> & {
-  enabled: boolean;
-};
+type UseGetContestsQueryProps = z.infer<typeof GetAllContests.input>;
 
 const CONTESTS_STALE_TIME = 10 * 1_000; // 10 s
 
@@ -13,7 +11,6 @@ const useGetContestsQuery = ({
   contest_id,
   community_id,
   running,
-  enabled,
 }: UseGetContestsQueryProps) => {
   return trpc.contest.getAllContests.useQuery(
     {
@@ -21,7 +18,7 @@ const useGetContestsQuery = ({
       community_id,
       running,
     },
-    { enabled: enabled && !!community_id, staleTime: CONTESTS_STALE_TIME },
+    { enabled: !!community_id, staleTime: CONTESTS_STALE_TIME },
   );
 };
 

@@ -18,8 +18,6 @@ const AppEnvironments = [
   'beta',
   'demo',
   'production',
-  'discobot',
-  'snapshot',
 ] as const;
 type Environment = (typeof Environments)[number];
 type AppEnvironment = (typeof AppEnvironments)[number];

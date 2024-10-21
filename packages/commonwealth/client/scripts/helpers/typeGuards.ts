@@ -41,12 +41,6 @@ export const isBoolean = (x: unknown): x is boolean =>
   x === true || x === false;
 
 /**
- * Type guard for the `false` literal of the `boolean` primitive
- */
-export const isFalse = (x: unknown): x is false =>
-  typeof x === 'boolean' && x === false;
-
-/**
  * Type guard for the `true` literal of the `boolean` primitive
  */
 export const isTrue = (x: unknown): x is true =>
@@ -77,21 +71,3 @@ export const isEmptyString = (x: unknown): x is '' => isString(x) && x === '';
  */
 export const isNonEmptyString = (x: unknown): x is string =>
   isString(x) && !isEmptyString(x);
-
-/**
- * Type guard for the `Function` type
- */
-// eslint-disable-next-line @typescript-eslint/ban-types
-export const isFunction = (x: unknown): x is Function => x instanceof Function;
-
-/**
- * Typeguard for making sure a key is in an object when the object has no index signature
- */
-export function hasKey<O, K extends string | number | symbol>(
-  obj: O,
-  key: K,
-): obj is O & { [k in K]: unknown } {
-  // @ts-expect-error StrictNullChecks
-  if (typeof obj === 'object') return key in obj;
-  else return false;
-}

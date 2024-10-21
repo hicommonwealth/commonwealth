@@ -12,7 +12,6 @@ import { UpdateThreadResponseReactionsItem } from './UpdateThreadResponseReactio
 import { UpdateThreadResponseSearch } from './UpdateThreadResponseSearch';
 import { UpdateThreadResponseThreadVersionHistoriesItem } from './UpdateThreadResponseThreadVersionHistoriesItem';
 import { UpdateThreadResponseTopic } from './UpdateThreadResponseTopic';
-
 export declare const UpdateThreadResponse: core.serialization.ObjectSchema<
   serializers.UpdateThreadResponse.Raw,
   CommonApi.UpdateThreadResponse
@@ -23,14 +22,13 @@ export declare namespace UpdateThreadResponse {
     address_id: number;
     title: string;
     kind: string;
-    stage: string;
+    stage?: string | null;
     body?: string | null;
-    plaintext?: string | null;
     url?: string | null;
     topic_id?: number | null;
     pinned?: boolean | null;
     community_id: string;
-    view_count: number;
+    view_count?: number | null;
     links?: UpdateThreadResponseLinksItem.Raw[] | null;
     content_url?: string | null;
     read_only?: boolean | null;
@@ -46,9 +44,9 @@ export declare namespace UpdateThreadResponse {
     archived_at?: string | null;
     locked_at?: string | null;
     discord_meta?: UpdateThreadResponseDiscordMeta.Raw | null;
-    reaction_count: number;
-    reaction_weights_sum: number;
-    comment_count: number;
+    reaction_count?: number | null;
+    reaction_weights_sum?: number | null;
+    comment_count?: number | null;
     activity_rank_date?: string | null;
     created_by?: string | null;
     profile_name?: string | null;

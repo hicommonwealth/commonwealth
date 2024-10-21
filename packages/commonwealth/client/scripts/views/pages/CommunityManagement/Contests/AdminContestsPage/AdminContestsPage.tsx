@@ -130,7 +130,6 @@ const AdminContestsPage = () => {
               hasWeightedTopic={!!hasAtLeastOneWeightedVotingTopic}
               isContestAvailable={isContestAvailable}
               stakeEnabled={stakeEnabled}
-              feeManagerBalance={feeManagerBalance}
               onSetContestSelectionView={() =>
                 setContestView(ContestView.TypeSelection)
               }

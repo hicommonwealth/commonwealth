@@ -3,7 +3,6 @@
  */
 import * as core from '../../../../core';
 import { GetCommunityResponseAddresses } from './GetCommunityResponseAddresses';
-
 export const GetCommunityResponse = core.serialization.undiscriminatedUnion([
   GetCommunityResponseAddresses,
   core.serialization.unknown(),

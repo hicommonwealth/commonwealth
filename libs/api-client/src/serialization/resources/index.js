@@ -10,3 +10,5 @@ export * from './reaction/types';
 export * as thread from './thread';
 export * from './thread/client/requests';
 export * from './thread/types';
+export * as user from './user';
+export * from './user/types';

@@ -4,6 +4,7 @@ export enum CreateTopicStep {
   TopicDetails = 'TopicDetails',
   WVMethodSelection = 'WVMethodSelection',
   WVConsent = 'WVConsent',
+  WVNamespaceEnablement = 'WVNamespaceEnablement',
   WVERC20Details = 'WVERC20Details',
   WVStake = 'WVStake',
 }

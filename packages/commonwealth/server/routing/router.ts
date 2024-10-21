@@ -39,8 +39,6 @@ import setDefaultRole from '../routes/setDefaultRole';
 import upgradeMember, {
   upgradeMemberValidation,
 } from '../routes/upgradeMember';
-import viewGlobalActivity from '../routes/viewGlobalActivity';
-import viewUserActivity from '../routes/viewUserActivity';
 
 import getUploadSignature from '../routes/getUploadSignature';
 
@@ -52,8 +50,7 @@ import updateCommunityCustomDomain from '../routes/updateCommunityCustomDomain';
 import updateCommunityPriority from '../routes/updateCommunityPriority';
 import type ViewCountCache from '../util/viewCountCache';
 
-import { type DB, type GlobalActivityCache } from '@hicommonwealth/model';
-import banAddress from '../routes/banAddress';
+import { type DB } from '@hicommonwealth/model';
 import setAddressWallet from '../routes/setAddressWallet';
 
 import type DatabaseValidationService from '../middleware/databaseValidationService';
@@ -126,14 +123,13 @@ function setupRouter(
   app: Express,
   models: DB,
   viewCountCache: ViewCountCache,
-  globalActivityCache: GlobalActivityCache,
   databaseValidationService: DatabaseValidationService,
   cacheDecorator: CacheDecorator,
 ) {
   // controllers
   const serverControllers: ServerControllers = {
-    threads: new ServerThreadsController(models, globalActivityCache),
-    comments: new ServerCommentsController(models, globalActivityCache),
+    threads: new ServerThreadsController(models),
+    comments: new ServerCommentsController(models),
     analytics: new ServerAnalyticsController(),
     profiles: new ServerProfilesController(models),
     communities: new ServerCommunitiesController(models),
@@ -495,20 +491,6 @@ function setupRouter(
   registerRoute(
     router,
     'post',
-    '/viewUserActivity',
-    passport.authenticate('jwt', { session: false }),
-    viewUserActivity.bind(this, models),
-  );
-  registerRoute(
-    router,
-    'post',
-    '/viewGlobalActivity',
-    viewGlobalActivity.bind(this, models, globalActivityCache),
-  );
-
-  registerRoute(
-    router,
-    'post',
     '/setAddressWallet',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,
@@ -531,16 +513,6 @@ function setupRouter(
     '/writeUserSetting',
     passport.authenticate('jwt', { session: false }),
     writeUserSetting.bind(this, models),
-  );
-
-  // bans
-  registerRoute(
-    router,
-    'post',
-    '/banAddress',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateCommunity,
-    banAddress.bind(this, models),
   );
 
   // Custom domain update route

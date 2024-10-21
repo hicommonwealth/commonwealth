@@ -5,7 +5,6 @@ import * as CommonApi from '../../../../api/index';
 import * as core from '../../../../core';
 import * as serializers from '../../../index';
 import { GetCommunityResponseAddressesAdminsAndModsItemRole } from './GetCommunityResponseAddressesAdminsAndModsItemRole';
-
 export declare const GetCommunityResponseAddressesAdminsAndModsItem: core.serialization.ObjectSchema<
   serializers.GetCommunityResponseAddressesAdminsAndModsItem.Raw,
   CommonApi.GetCommunityResponseAddressesAdminsAndModsItem

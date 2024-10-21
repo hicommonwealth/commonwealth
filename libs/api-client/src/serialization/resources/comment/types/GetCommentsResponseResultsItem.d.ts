@@ -10,7 +10,6 @@ import { GetCommentsResponseResultsItemDiscordMeta } from './GetCommentsResponse
 import { GetCommentsResponseResultsItemReaction } from './GetCommentsResponseResultsItemReaction';
 import { GetCommentsResponseResultsItemSearch } from './GetCommentsResponseResultsItemSearch';
 import { GetCommentsResponseResultsItemThread } from './GetCommentsResponseResultsItemThread';
-
 export declare const GetCommentsResponseResultsItem: core.serialization.ObjectSchema<
   serializers.GetCommentsResponseResultsItem.Raw,
   CommonApi.GetCommentsResponseResultsItem
@@ -21,7 +20,6 @@ export declare namespace GetCommentsResponseResultsItem {
     thread_id: number;
     address_id: number;
     text: string;
-    plaintext: string;
     parent_id?: string | null;
     content_url?: string | null;
     canvas_signed_data?: string | null;

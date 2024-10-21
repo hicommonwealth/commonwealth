@@ -5,7 +5,6 @@ import * as CommonApi from '../../../../api/index';
 import * as core from '../../../../core';
 import * as serializers from '../../../index';
 import { CreateGroupRequestRequirementsItemAllowData } from './CreateGroupRequestRequirementsItemAllowData';
-
 export declare const CreateGroupRequestRequirementsItemAllow: core.serialization.ObjectSchema<
   serializers.CreateGroupRequestRequirementsItemAllow.Raw,
   CommonApi.CreateGroupRequestRequirementsItemAllow

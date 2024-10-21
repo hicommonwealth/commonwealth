@@ -22,7 +22,7 @@ export const makeGroupDataBaseAPIPayload = (
     address: userStore.getState().activeAccount?.address || '',
     groupName: formSubmitValues.groupName.trim(),
     groupDescription: (formSubmitValues.groupDescription || '').trim(),
-    topicIds: formSubmitValues.topics.map((x) => parseInt(x.value)),
+    topics: formSubmitValues.topics,
     requirementsToFulfill:
       formSubmitValues.requirementsToFulfill === 'ALL'
         ? // @ts-expect-error StrictNullChecks
