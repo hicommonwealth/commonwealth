@@ -35,7 +35,7 @@ export const KnockNotifications = () => {
     }
 
     if (!user.knockJWT) {
-      console.warn('user knockJWT not set!');
+      console.warn('user knockJWT not set!  Will not attempt to identify.');
       return;
     }
 
