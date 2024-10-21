@@ -81,6 +81,7 @@ type ContentPageProps = {
   sidebarComponentsSkeletonCount?: number;
   setThreadBody?: (body: string) => void;
   editingDisabled?: boolean;
+  onCommentClick?: () => void;
 };
 
 export const CWContentPage = ({
@@ -119,6 +120,7 @@ export const CWContentPage = ({
   sidebarComponentsSkeletonCount = 2,
   setThreadBody,
   editingDisabled,
+  onCommentClick,
 }: ContentPageProps) => {
   const navigate = useNavigate();
   const [urlQueryParams] = useSearchParams();
@@ -261,6 +263,7 @@ export const CWContentPage = ({
             upvoteBtnVisible={!thread?.readOnly}
             upvoteDrawerBtnBelow={true}
             commentBtnVisible={!thread?.readOnly}
+            onCommentClick={onCommentClick}
             // @ts-expect-error <StrictNullChecks/>
             thread={thread}
             totalComments={thread?.numberOfComments}

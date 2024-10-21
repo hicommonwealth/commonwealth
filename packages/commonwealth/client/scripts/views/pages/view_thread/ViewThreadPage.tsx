@@ -11,7 +11,7 @@ import useTopicGating from 'hooks/useTopicGating';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/view_thread/index.scss';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import app from 'state';
 import { useFetchCommentsQuery } from 'state/api/comments';
@@ -92,6 +92,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const { handleJoinCommunity, JoinCommunityModals } = useJoinCommunity();
 
   const user = useUserStore();
+  const commentsRef = useRef<HTMLDivElement | null>(null);
 
   const { isAddedToHomeScreen } = useAppStatus();
 
@@ -370,6 +371,14 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
       : getMetaDescription(thread?.body || '');
   const ogImageUrl = app?.chain?.meta?.icon_url || '';
 
+  const ScrollToLastComment = () => {
+    if (commentsRef?.current) {
+      commentsRef.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+      });
+    }
+  };
   return (
     // TODO: the editing experience can be improved (we can remove a stale code and make it smooth) - create a ticket
     <>
@@ -459,6 +468,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
             isAuthor ||
             !!hasWebLinks
           }
+          onCommentClick={ScrollToLastComment}
           // @ts-expect-error <StrictNullChecks/>
           isSpamThread={!!thread.markedAsSpamAt}
           title={
@@ -665,6 +675,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                 </div>
               )}
               <CommentTree
+                commentsRef={commentsRef}
                 comments={sortedComments}
                 includeSpams={includeSpamThreads}
                 // @ts-expect-error <StrictNullChecks/>
