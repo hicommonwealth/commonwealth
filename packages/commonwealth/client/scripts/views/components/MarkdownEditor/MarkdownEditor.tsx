@@ -374,7 +374,11 @@ export const MarkdownEditor = memo(function MarkdownEditor(
                 quotePlugin(),
                 headingsPlugin(),
                 linkPlugin(),
+                // FIXME: this one will be when I click an *existing* link.
+                // this one DOES anchor itself
+
                 linkDialogPlugin(),
+                // {LinkDialog: CustomLinkDialog}
                 codeBlockPlugin({ defaultCodeBlockLanguage: 'js' }),
                 codeMirrorPlugin({
                   codeBlockLanguages,
