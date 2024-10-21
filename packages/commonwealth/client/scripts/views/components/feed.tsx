@@ -132,7 +132,7 @@ function mapThread(thread: z.infer<typeof ActivityThread>): Thread {
     id: thread.id,
     created_at: thread.created_at ?? '',
     updated_at: thread.updated_at ?? thread.created_at ?? '',
-    topic: new Topic({
+    topic: {
       community_id: thread.community_id,
       id: thread.topic.id,
       name: thread.topic.name,
@@ -142,7 +142,7 @@ function mapThread(thread: z.infer<typeof ActivityThread>): Thread {
       group_ids: [],
       active_contest_managers: [],
       total_threads: 0,
-    }),
+    } as Topic,
     kind: thread.kind as ThreadKind,
     stage: thread.stage as ThreadStage,
     ThreadVersionHistories: [],

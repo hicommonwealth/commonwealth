@@ -475,9 +475,7 @@ export const HeaderWithFilters = ({
 
       {(activeContests || []).map((contest) => {
         if (!contest) return;
-        const { end_time } =
-          // @ts-expect-error <StrictNullChecks/>
-          contest?.contests?.[0] || {};
+        const { end_time } = contest?.contests?.[0] || {};
 
         return (
           <ContestCard

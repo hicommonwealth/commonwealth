@@ -1,5 +1,6 @@
 import { AppError, query } from '@hicommonwealth/core';
 import { Thread } from '@hicommonwealth/model';
+import * as schemas from '@hicommonwealth/schemas';
 import { GetThreadsOrderBy, GetThreadsStatus } from '@hicommonwealth/schemas';
 import { z } from 'zod';
 import { ALL_COMMUNITIES } from '../../middleware/databaseValidationService';
@@ -168,10 +169,8 @@ export const getThreadsHandler = async (
       communityId: community_id,
       searchTerm: search,
       threadTitleOnly: thread_title_only === 'true',
-      // @ts-expect-error StrictNullChecks
-      limit: parseInt(limit, 10) || 0,
-      // @ts-expect-error StrictNullChecks
-      page: parseInt(page, 10) || 0,
+      limit: parseInt(limit!, 10) || 0,
+      page: parseInt(page!, 10) || 0,
       orderBy: order_by,
       orderDirection: order_direction as any,
       includeCount: include_count,
