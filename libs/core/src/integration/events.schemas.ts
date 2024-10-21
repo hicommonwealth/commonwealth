@@ -220,3 +220,8 @@ export const SubscriptionPreferencesUpdated = SubscriptionPreference.partial({
   created_at: true,
   updated_at: true,
 }).merge(SubscriptionPreference.pick({ user_id: true }));
+
+export const LaunchpadTrade = z.object({
+  transactionHash: z.string(),
+  isBuy: z.boolean(),
+});
