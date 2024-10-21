@@ -271,8 +271,9 @@ export const QuickTokenLaunchForm = ({
         <SuccessStep communityId={createdCommunityId} withToken />
       ) : (
         <TokenInformationForm
-          // TODO: changing image url is not correctly updating cw_cover_image in the token form
-          // need to fix that or this key also works, but ideally fixing that is happy path
+          // Note: changing image url is not correctly updating cw_cover_image in the token form
+          // this key fixes that, but ideally fixing the cluttered logic in cw_cover_image is the
+          // happy path: TODO in https://github.com/hicommonwealth/commonwealth/issues/9606
           key={`${activeTokenIdeaIndex}-${generatedTokenIdea?.token?.imageURL}`}
           selectedAddress={selectedAddress}
           onAddressSelected={setSelectedAddress}
