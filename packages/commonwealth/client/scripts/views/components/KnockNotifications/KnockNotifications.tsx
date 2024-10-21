@@ -34,6 +34,11 @@ export const KnockNotifications = () => {
       return;
     }
 
+    if (!user.knockJWT) {
+      console.warn('user knockJWT not set!');
+      return;
+    }
+
     const timezone = getBrowserTimezone();
     async function doAsync() {
       knock.authenticate(`${user.id}`, user.knockJWT);
