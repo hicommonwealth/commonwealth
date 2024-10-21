@@ -1,13 +1,11 @@
 import { z } from 'zod';
-import { Comment, Thread } from '../entities';
+import { Thread } from '../entities';
 import {
   DiscordMetaSchema,
   PG_INT,
   linksSchema,
   paginationSchema,
-  zBoolean,
 } from '../utils';
-import { PaginatedResultSchema, PaginationParamsSchema } from './pagination';
 
 export const OrderByQueriesKeys = z.enum([
   'createdAt:asc',
@@ -37,7 +35,6 @@ export const BulkThread = z.object({
   collaborators: z.any().array(),
   has_poll: z.boolean().nullable().optional(),
   last_commented_on: z.date().nullable().optional(),
-  plaintext: z.string().nullable().optional(),
   Address: z.object({
     id: PG_INT,
     address: z.string(),
@@ -95,17 +92,51 @@ export const GetBulkThreads = {
   }),
 };
 
+export const MappedReaction = z.object({
+  id: z.number(),
+  type: z.literal('like'),
+  address: z.string(),
+  updated_at: z.date(),
+  voting_weight: z.number(),
+  profile_name: z.string().optional(),
+  avatar_url: z.string().optional(),
+  last_active: z.date().optional(),
+});
+
+export const MappedThread = Thread.extend({
+  associatedReactions: z.array(MappedReaction),
+});
+
+export const GetThreadsStatus = z.enum(['active', 'pastWinners', 'all']);
+export const GetThreadsOrderBy = z.enum([
+  'newest',
+  'oldest',
+  'mostLikes',
+  'mostComments',
+  'latestActivity',
+]);
+
 export const GetThreads = {
-  input: PaginationParamsSchema.extend({
+  input: z.object({
     community_id: z.string(),
+    page: z.number().optional(),
+    limit: z.number().optional(),
+    stage: z.string().optional(),
     topic_id: PG_INT.optional(),
-    thread_id: PG_INT.optional(),
-    include_comments: zBoolean.default(false),
-    include_user: zBoolean.default(false),
-    include_reactions: zBoolean.default(false),
+    includePinnedThreads: z.boolean().optional(),
+    order_by: GetThreadsOrderBy.optional(),
+    from_date: z.string().optional(),
+    to_date: z.string().optional(),
+    archived: z.boolean().optional(),
+    contestAddress: z.string().optional(),
+    status: GetThreadsStatus.optional(),
+    withXRecentComments: z.number().optional(),
   }),
-  output: PaginatedResultSchema.extend({
-    results: Thread.extend({ Comment: Comment.nullish() }).array(),
+  output: z.object({
+    page: z.number(),
+    limit: z.number(),
+    numVotingThreads: z.number(),
+    threads: z.array(MappedThread),
   }),
 };
 

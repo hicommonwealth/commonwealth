@@ -184,7 +184,7 @@ describe('DatabaseCleaner Tests', async () => {
         title: 'Testing',
         community_id: 'ethereum',
         reaction_count: 0,
-        reaction_weights_sum: 0,
+        reaction_weights_sum: '0',
         kind: 'discussion',
         stage: 'discussion',
         view_count: 0,
@@ -197,8 +197,7 @@ describe('DatabaseCleaner Tests', async () => {
         address_id: address.id!,
         text: 'Testing',
         reaction_count: 0,
-        reaction_weights_sum: 0,
-        plaintext: 'Testing',
+        reaction_weights_sum: '0',
         search: getCommentSearchVector('Testing'),
       });
 

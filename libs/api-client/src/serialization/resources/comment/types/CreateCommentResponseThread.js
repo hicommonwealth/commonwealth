@@ -18,9 +18,8 @@ export const CreateCommentResponseThread = core.serialization.object({
   ),
   title: core.serialization.string(),
   kind: core.serialization.string(),
-  stage: core.serialization.string(),
+  stage: core.serialization.string().optional(),
   body: core.serialization.string().optional(),
-  plaintext: core.serialization.string().optional(),
   url: core.serialization.string().optional(),
   topicId: core.serialization.property(
     'topic_id',
@@ -33,7 +32,7 @@ export const CreateCommentResponseThread = core.serialization.object({
   ),
   viewCount: core.serialization.property(
     'view_count',
-    core.serialization.number(),
+    core.serialization.number().optional(),
   ),
   links: core.serialization
     .list(CreateCommentResponseThreadLinksItem)
@@ -96,15 +95,15 @@ export const CreateCommentResponseThread = core.serialization.object({
   ),
   reactionCount: core.serialization.property(
     'reaction_count',
-    core.serialization.number(),
+    core.serialization.number().optional(),
   ),
   reactionWeightsSum: core.serialization.property(
     'reaction_weights_sum',
-    core.serialization.number(),
+    core.serialization.number().optional(),
   ),
   commentCount: core.serialization.property(
     'comment_count',
-    core.serialization.number(),
+    core.serialization.number().optional(),
   ),
   activityRankDate: core.serialization.property(
     'activity_rank_date',

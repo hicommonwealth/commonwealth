@@ -40,7 +40,7 @@ import * as environments from '../../../../environments';
 import * as errors from '../../../../errors/index';
 import * as serializers from '../../../../serialization/index';
 export class Community {
-  constructor(_options = {}) {
+  constructor(_options) {
     this._options = _options;
   }
   /**
@@ -399,7 +399,6 @@ export class Community {
    *         name: "name",
    *         chainNodeId: 1,
    *         base: CommonApi.CreateCommunityRequestBase.Cosmos,
-   *         userAddress: "user_address",
    *         defaultSymbol: "default_symbol"
    *     })
    */
@@ -1037,6 +1036,88 @@ export class Community {
       });
       if (_response.ok) {
         return serializers.DeleteGroupResponse.parseOrThrow(_response.body, {
+          unrecognizedObjectKeys: 'passthrough',
+          allowUnrecognizedUnionMembers: true,
+          allowUnrecognizedEnumValues: true,
+          breadcrumbsPrefix: ['response'],
+        });
+      }
+      if (_response.error.reason === 'status-code') {
+        throw new errors.CommonApiError({
+          statusCode: _response.error.statusCode,
+          body: _response.error.body,
+        });
+      }
+      switch (_response.error.reason) {
+        case 'non-json':
+          throw new errors.CommonApiError({
+            statusCode: _response.error.statusCode,
+            body: _response.error.rawBody,
+          });
+        case 'timeout':
+          throw new errors.CommonApiTimeoutError();
+        case 'unknown':
+          throw new errors.CommonApiError({
+            message: _response.error.errorMessage,
+          });
+      }
+    });
+  }
+  /**
+   * @param {CommonApi.JoinCommunityRequest} request
+   * @param {Community.RequestOptions} requestOptions - Request-specific configuration.
+   *
+   * @example
+   *     await client.community.joinCommunity({
+   *         communityId: "community_id"
+   *     })
+   */
+  joinCommunity(request, requestOptions) {
+    var _a;
+    return __awaiter(this, void 0, void 0, function* () {
+      const _response = yield core.fetcher({
+        url: urlJoin(
+          (_a = yield core.Supplier.get(this._options.environment)) !== null &&
+            _a !== void 0
+            ? _a
+            : environments.CommonApiEnvironment.Default,
+          'JoinCommunity',
+        ),
+        method: 'POST',
+        headers: Object.assign(
+          {
+            address:
+              (yield core.Supplier.get(this._options.address)) != null
+                ? yield core.Supplier.get(this._options.address)
+                : undefined,
+            'X-Fern-Language': 'JavaScript',
+            'X-Fern-Runtime': core.RUNTIME.type,
+            'X-Fern-Runtime-Version': core.RUNTIME.version,
+          },
+          yield this._getCustomAuthorizationHeaders(),
+        ),
+        contentType: 'application/json',
+        requestType: 'json',
+        body: serializers.JoinCommunityRequest.jsonOrThrow(request, {
+          unrecognizedObjectKeys: 'strip',
+        }),
+        timeoutMs:
+          (requestOptions === null || requestOptions === void 0
+            ? void 0
+            : requestOptions.timeoutInSeconds) != null
+            ? requestOptions.timeoutInSeconds * 1000
+            : 60000,
+        maxRetries:
+          requestOptions === null || requestOptions === void 0
+            ? void 0
+            : requestOptions.maxRetries,
+        abortSignal:
+          requestOptions === null || requestOptions === void 0
+            ? void 0
+            : requestOptions.abortSignal,
+      });
+      if (_response.ok) {
+        return serializers.JoinCommunityResponse.parseOrThrow(_response.body, {
           unrecognizedObjectKeys: 'passthrough',
           allowUnrecognizedUnionMembers: true,
           allowUnrecognizedEnumValues: true,

@@ -1,6 +1,8 @@
+import { ChainBase, commonProtocol } from '@hicommonwealth/shared';
 import React from 'react';
 import { useUpdateCommunityMutation } from 'state/api/communities';
 import { useLaunchTokenMutation } from 'state/api/launchPad';
+import { useCreateTokenMutation } from 'state/api/token';
 import useUserStore from 'state/ui/user';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -28,13 +30,14 @@ const SignTokenTransactions = ({
     data: createdToken,
   } = useLaunchTokenMutation();
 
+  const { mutateAsync: createToken } = useCreateTokenMutation();
+
   const { mutateAsync: updateCommunity } = useUpdateCommunityMutation({
     communityId: createdCommunityId,
   });
 
   const handleSign = async () => {
     try {
-      // this condition will never be triggered, adding this to avoid typescript errors
       if (selectedAddress?.address) {
         user.setData({
           addressSelectorSelectedAddress: selectedAddress.address,
@@ -51,16 +54,24 @@ const SignTokenTransactions = ({
       };
       await launchToken(payload);
 
-      // 2. TODO: Store `tokenInfo` on db - needs api
+      // 2. store `tokenInfo` on db
+      await createToken({
+        base: ChainBase.Ethereum,
+        chain_node_id: baseNode.id,
+        name: payload.name,
+        symbol: payload.symbol,
+        icon_url: tokenInfo?.imageURL?.trim() || '',
+        description: tokenInfo?.description?.trim() || '',
+        community_id: createdCommunityId,
+        launchpad_contract_address:
+          // this will always exist, adding 0 to avoid typescript issues
+          commonProtocol.factoryContracts[baseNode.ethChainId || 0].launchpad,
+      });
 
-      // update community to reference the created token
+      // 3. update community to reference the created token
       await updateCommunity({
         id: createdCommunityId,
         token_name: payload.name,
-      });
-
-      user.setData({
-        addressSelectorSelectedAddress: undefined,
       });
 
       onSuccess();

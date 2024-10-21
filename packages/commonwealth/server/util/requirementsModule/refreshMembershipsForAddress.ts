@@ -11,7 +11,7 @@ import {
 } from '@hicommonwealth/model';
 import type { Requirement } from '@hicommonwealth/shared';
 import moment from 'moment';
-import { FindOptions, Op, Sequelize } from 'sequelize';
+import { FindOptions, Op } from 'sequelize';
 import { config } from '../../config';
 
 /**
@@ -58,8 +58,7 @@ export async function refreshMembershipsForAddress(
       membershipsToCreate.push({
         group_id: group.id!,
         address_id: address.id!,
-        // @ts-expect-error StrictNullChecks
-        last_checked: null,
+        last_checked: new Date(),
       });
       continue;
     }
@@ -143,6 +142,6 @@ function computeMembership(
     group_id: group.id!,
     address_id: address.id!,
     reject_reason: isValid ? null : messages,
-    last_checked: Sequelize.literal('CURRENT_TIMESTAMP') as any,
+    last_checked: new Date(),
   };
 }

@@ -1,7 +1,7 @@
 /// <reference types="node" />
 export declare function getTimeoutSignal(timeoutMs: number): {
-    signal: AbortSignal;
-    abortId: NodeJS.Timeout;
+  signal: AbortSignal;
+  abortId: NodeJS.Timeout;
 };
 /**
  * Returns an abort signal that is getting aborted when
@@ -9,4 +9,6 @@ export declare function getTimeoutSignal(timeoutMs: number): {
  *
  * Requires at least node.js 18.
  */
-export declare function anySignal(...args: AbortSignal[] | [AbortSignal[]]): AbortSignal;
+export declare function anySignal(
+  ...args: AbortSignal[] | [AbortSignal[]]
+): AbortSignal;

@@ -86,30 +86,31 @@ describe('CommentCreated Event Handler', () => {
       deleted_at: null,
       read_only: false,
       pinned: false,
+      reaction_weights_sum: '0',
     });
     [rootComment] = await tester.seed('Comment', {
       parent_id: null,
       thread_id: thread!.id!,
       address_id: community!.Addresses![0].id,
       deleted_at: null,
+      reaction_weights_sum: '0',
     });
     [replyComment] = await tester.seed('Comment', {
       parent_id: String(rootComment!.id),
       thread_id: thread!.id!,
       address_id: community!.Addresses![0].id,
       deleted_at: null,
+      reaction_weights_sum: '0',
     });
     [mentionedComment] = await tester.seed('Comment', {
       text: `Hi [@${mentionedUser!.profile.name}](/profile/id/${
-        mentionedUser!.id
-      }).`,
-      plaintext: `Hi [@${mentionedUser!.profile.name}](/profile/id/${
         mentionedUser!.id
       }).`,
       parent_id: String(rootComment!.id),
       thread_id: thread!.id!,
       address_id: community!.Addresses![0].id,
       deleted_at: null,
+      reaction_weights_sum: '0',
     });
   });
 

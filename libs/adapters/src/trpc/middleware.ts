@@ -50,6 +50,7 @@ export enum Tag {
   Webhook = 'Webhook',
   SuperAdmin = 'SuperAdmin',
   DiscordBot = 'DiscordBot',
+  Token = 'Token',
 }
 
 export type Commit<Input extends ZodSchema, Output extends ZodSchema> = (

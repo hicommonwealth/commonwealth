@@ -30,7 +30,7 @@ import {
 import chai from 'chai';
 import type { Application } from 'express';
 import { z } from 'zod';
-import { TEST_BLOCK_INFO_STRING } from '../../shared/adapters/chain/ethereum/keys';
+import { TEST_BLOCK_INFO_STRING } from './keys';
 
 function createCanvasSignResult({ session, sign, action }): CanvasSignResult {
   const sessionMessage = {

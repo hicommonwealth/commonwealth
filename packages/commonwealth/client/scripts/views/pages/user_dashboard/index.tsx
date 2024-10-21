@@ -1,6 +1,11 @@
+import {
+  useFetchGlobalActivityQuery,
+  useFetchUserActivityQuery,
+} from 'client/scripts/state/api/feeds/fetchUserActivity';
 import { notifyInfo } from 'controllers/app/notifications';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import useBrowserWindow from 'hooks/useBrowserWindow';
+import { useFlag } from 'hooks/useFlag';
 import useStickyHeader from 'hooks/useStickyHeader';
 import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/user_dashboard/index.scss';
@@ -46,6 +51,8 @@ const UserDashboard = ({ type }: UserDashboardProps) => {
   );
 
   const { isAddedToHomeScreen } = useAppStatus();
+
+  const tokenizedCommunityEnabled = useFlag('tokenizedCommunity');
 
   useBrowserAnalyticsTrack({
     payload: {
@@ -120,33 +127,26 @@ const UserDashboard = ({ type }: UserDashboardProps) => {
                 />
               </CWTabsRow>
             </div>
-            <>
-              {activePage === DashboardViews.ForYou && (
-                <Feed
-                  dashboardView={DashboardViews.ForYou}
-                  noFeedMessage="Join some communities to see Activity!"
-                  // @ts-expect-error <StrictNullChecks/>
-                  customScrollParent={scrollElement}
-                />
-              )}
-              {activePage === DashboardViews.Global && (
-                <Feed
-                  dashboardView={DashboardViews.Global}
-                  noFeedMessage="No Activity"
-                  // @ts-expect-error <StrictNullChecks/>
-                  customScrollParent={scrollElement}
-                />
-              )}
-            </>
+            {activePage === DashboardViews.Global ? (
+              <Feed
+                query={useFetchGlobalActivityQuery}
+                customScrollParent={scrollElement!}
+              />
+            ) : (
+              <Feed
+                query={useFetchUserActivityQuery}
+                customScrollParent={scrollElement!}
+              />
+            )}
           </div>
           {isWindowExtraSmall ? (
             <>
-              <LaunchTokenCard />
+              {tokenizedCommunityEnabled && <LaunchTokenCard />}
               <TrendingCommunitiesPreview />
             </>
           ) : (
             <div className="featured-cards">
-              <LaunchTokenCard />
+              {tokenizedCommunityEnabled && <LaunchTokenCard />}
               <TrendingCommunitiesPreview />
             </div>
           )}

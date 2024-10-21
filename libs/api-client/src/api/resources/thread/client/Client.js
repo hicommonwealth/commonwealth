@@ -40,7 +40,7 @@ import * as environments from '../../../../environments';
 import * as errors from '../../../../errors/index';
 import * as serializers from '../../../../serialization/index';
 export class Thread {
-  constructor(_options = {}) {
+  constructor(_options) {
     this._options = _options;
   }
   /**

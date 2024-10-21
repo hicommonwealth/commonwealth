@@ -20,6 +20,8 @@ const useNewThreadForm = (communityId: string, topicsForSelector: Topic[]) => {
     { keyVersion: 'v3' },
   );
   const [canShowGatingBanner, setCanShowGatingBanner] = useState(true);
+  const [canShowTopicPermissionBanner, setCanShowTopicPermissionBanner] =
+    useState(true);
 
   // get restored draft on init
   const restoredDraft: NewThreadDraft | null = useMemo(() => {
@@ -113,6 +115,8 @@ const useNewThreadForm = (communityId: string, topicsForSelector: Topic[]) => {
     clearDraft,
     canShowGatingBanner,
     setCanShowGatingBanner,
+    canShowTopicPermissionBanner,
+    setCanShowTopicPermissionBanner,
   };
 };
 

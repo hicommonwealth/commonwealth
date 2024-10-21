@@ -67,6 +67,7 @@ describe('userMentioned Event Handler', () => {
       pinned: false,
       read_only: false,
       body: 'some body',
+      reaction_weights_sum: '0',
     });
   });
 

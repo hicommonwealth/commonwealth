@@ -1,6 +1,8 @@
 import { express } from '@hicommonwealth/adapters';
-import { ChainEvents } from '@hicommonwealth/model';
+import { AppError } from '@hicommonwealth/core';
+import { ChainEvents, Snapshot } from '@hicommonwealth/model';
 import { Router, raw } from 'express';
+import { config } from '../config';
 
 const PATH = '/api/integration';
 
@@ -22,6 +24,21 @@ function build() {
       next();
     },
     express.command(ChainEvents.ChainEventCreated()),
+  );
+
+  router.post(
+    '/snapshot/webhook',
+    (req, _, next) => {
+      const headerSecret = req.headers['authentication'];
+      if (
+        config.SNAPSHOT_WEBHOOK_SECRET &&
+        headerSecret !== config.SNAPSHOT_WEBHOOK_SECRET
+      ) {
+        throw new AppError('Unauthorized', 401);
+      }
+      return next();
+    },
+    express.command(Snapshot.CreateSnapshotProposal()),
   );
 
   return router;

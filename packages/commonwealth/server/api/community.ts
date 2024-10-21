@@ -126,4 +126,5 @@ export const trpcRouter = trpc.router({
       community: result.community_id,
     }),
   ]),
+  banAddress: trpc.command(Community.BanAddress, trpc.Tag.Community),
 });

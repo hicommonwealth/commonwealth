@@ -13,7 +13,6 @@ import {
   emitEvent,
   emitMentions,
   parseUserMentions,
-  quillToPlain,
   uniqueMentions,
 } from '../utils';
 import { getCommentDepth } from '../utils/getCommentDepth';
@@ -33,7 +32,9 @@ export function CreateComment(): Command<
   return {
     ...schemas.CreateComment,
     auth: [
-      isAuthorized({ action: schemas.PermissionEnum.CREATE_COMMENT }),
+      isAuthorized({
+        action: schemas.PermissionEnum.CREATE_COMMENT,
+      }),
       verifyCommentSignature,
     ],
     body: async ({ actor, payload, auth }) => {
@@ -57,7 +58,6 @@ export function CreateComment(): Command<
       }
 
       const text = decodeContent(payload.text);
-      const plaintext = quillToPlain(text);
       const mentions = uniqueMentions(parseUserMentions(text));
 
       const { contentUrl } = await uploadIfLarge('comments', text);
@@ -71,10 +71,9 @@ export function CreateComment(): Command<
               thread_id,
               parent_id: parent_id ? parent_id.toString() : null, // TODO: change parent_id from string to number
               text,
-              plaintext,
               address_id: address.id!,
               reaction_count: 0,
-              reaction_weights_sum: 0,
+              reaction_weights_sum: '0',
               created_by: '',
               search: getCommentSearchVector(text),
               content_url: contentUrl,

@@ -13,7 +13,9 @@ import {
   useCreateContestMutation,
   useDeployRecurringContestOnchainMutation,
   useDeploySingleContestOnchainMutation,
+  useDeploySingleERC20ContestOnchainMutation,
 } from 'state/api/contests';
+import { DeploySingleERC20ContestOnchainProps } from 'state/api/contests/deploySingleERC20ContestOnchain';
 import useUserStore from 'state/ui/user';
 import { useCommunityStake } from 'views/components/CommunityStake';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
@@ -49,6 +51,8 @@ const SignTransactionsStep = ({
   onSetCreatedContestAddress,
   fundingTokenTicker,
 }: SignTransactionsStepProps) => {
+  const weightedTopicsEnabled = useFlag('weightedTopics');
+
   const [launchContestData, setLaunchContestData] = useState({
     state: 'not-started' as ActionStepProps['state'],
     errorText: '',
@@ -59,6 +63,9 @@ const SignTransactionsStep = ({
     useDeploySingleContestOnchainMutation();
   const { mutateAsync: deployRecurringContestOnchainMutation } =
     useDeployRecurringContestOnchainMutation();
+  const { mutateAsync: deploySingleERC20ContestOnchainMutation } =
+    useDeploySingleERC20ContestOnchainMutation();
+
   const { mutateAsync: createContestMutation } = useCreateContestMutation();
   const user = useUserStore();
 
@@ -81,14 +88,18 @@ const SignTransactionsStep = ({
     const namespaceName = app?.chain?.meta?.namespace;
     const contestLength = devContest
       ? ONE_HOUR_IN_SECONDS
-      : SEVEN_DAYS_IN_SECONDS;
+      : weightedTopicsEnabled
+        ? contestFormData?.contestDuration
+        : SEVEN_DAYS_IN_SECONDS;
     const stakeId = stakeData?.stake_id;
     const voterShare = commonProtocol.CONTEST_VOTER_SHARE;
     const feeShare = commonProtocol.CONTEST_FEE_SHARE;
     const weight = stakeData?.vote_weight;
     const contestInterval = devContest
       ? ONE_HOUR_IN_SECONDS
-      : SEVEN_DAYS_IN_SECONDS;
+      : weightedTopicsEnabled
+        ? contestFormData?.contestDuration
+        : SEVEN_DAYS_IN_SECONDS;
     const prizeShare = contestFormData?.prizePercentage;
     const walletAddress = user.activeAccount?.address;
     const exchangeToken = isDirectDepositSelected
@@ -108,6 +119,18 @@ const SignTransactionsStep = ({
       walletAddress,
       exchangeToken,
     };
+
+    const singleERC20 = {
+      ethChainId,
+      chainRpc,
+      namespaceName,
+      contestInterval: contestLength,
+      winnerShares,
+      voteToken: exchangeToken,
+      voterShare,
+      walletAddress,
+      exchangeToken,
+    } as DeploySingleERC20ContestOnchainProps;
 
     const recurring = {
       ethChainId,
@@ -136,8 +159,11 @@ const SignTransactionsStep = ({
             // @ts-expect-error <StrictNullChecks/>
             recurring,
           ))
-        : // @ts-expect-error <StrictNullChecks/>
-          (contestAddress = await deploySingleContestOnchainMutation(single));
+        : weightedTopicsEnabled
+          ? (contestAddress =
+              await deploySingleERC20ContestOnchainMutation(singleERC20))
+          : // @ts-expect-error <StrictNullChecks/>
+            (contestAddress = await deploySingleContestOnchainMutation(single));
 
       await createContestMutation({
         contest_address: contestAddress,
@@ -149,10 +175,12 @@ const SignTransactionsStep = ({
           ? contestFormData?.prizePercentage
           : 0,
         payout_structure: contestFormData?.payoutStructure,
-        interval: isContestRecurring ? contestInterval : 0,
-        topic_ids: contestFormData?.toggledTopicList
-          .filter((t) => t.checked)
-          .map((t) => t.id!),
+        interval: isContestRecurring ? contestInterval! : 0,
+        topic_ids: weightedTopicsEnabled
+          ? [contestFormData?.contestTopic?.value as number]
+          : contestFormData?.toggledTopicList
+              .filter((t) => t.checked)
+              .map((t) => t.id!),
         ticker: fundingTokenTicker,
       });
 

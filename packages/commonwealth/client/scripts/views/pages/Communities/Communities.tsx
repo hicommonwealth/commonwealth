@@ -1,6 +1,7 @@
 import { ExtendedCommunity } from '@hicommonwealth/schemas';
 import { ChainBase, ChainNetwork } from '@hicommonwealth/shared';
 import { findDenominationString } from 'helpers/findDenomination';
+import { useFlag } from 'hooks/useFlag';
 import React, { Fragment, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Virtuoso } from 'react-virtuoso';
@@ -13,6 +14,7 @@ import { z } from 'zod';
 import { useFetchTokenUsdRateQuery } from '../../../state/api/communityStake/index';
 import { trpc } from '../../../utils/trpcClient';
 import { NewCommunityCard } from '../../components/CommunityCard';
+import LaunchIdeaCard from '../../components/LaunchIdeaCard';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWButton } from '../../components/component_kit/new_designs/CWButton';
 import CWCircleMultiplySpinner from '../../components/component_kit/new_designs/CWCircleMultiplySpinner';
@@ -24,6 +26,7 @@ import ManageCommunityStakeModal from '../../modals/ManageCommunityStakeModal/Ma
 import './Communities.scss';
 import { FiltersDrawer } from './FiltersDrawer/FiltersDrawer';
 import { CommunityFilters } from './FiltersDrawer/types';
+import TokenLaunchDrawer from './TokenLaunchDrawer';
 import { getCommunityCountsString } from './helpers';
 
 type ExtendedCommunityType = z.infer<typeof ExtendedCommunity>;
@@ -34,6 +37,8 @@ type ExtendedCommunitySliceType = [
 
 const CommunitiesPage = () => {
   const containerRef = useRef();
+
+  const tokenizedCommunityEnabled = useFlag('tokenizedCommunity');
 
   const {
     setModeOfManageCommunityStakeModal,
@@ -84,6 +89,7 @@ const CommunitiesPage = () => {
   const ethUsdRate = ethUsdRateData?.data?.data?.amount;
 
   const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
+  const [isTokenLaunchDrawerOpen, setIsTokenLaunchDrawerOpen] = useState(false);
 
   const isLoading =
     isLoadingTags ||
@@ -197,6 +203,17 @@ const CommunitiesPage = () => {
               onFiltersChange={(newFilters) => setFilters(newFilters)}
             />
           </div>
+          {tokenizedCommunityEnabled && (
+            <>
+              <LaunchIdeaCard
+                onTokenLaunchClick={() => setIsTokenLaunchDrawerOpen(true)}
+              />
+              <TokenLaunchDrawer
+                isOpen={isTokenLaunchDrawerOpen}
+                onClose={() => setIsTokenLaunchDrawerOpen(false)}
+              />
+            </>
+          )}
         </div>
         {isLoading && communitiesList.length === 0 ? (
           <CWCircleMultiplySpinner />

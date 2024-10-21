@@ -69,8 +69,6 @@ If you add a new environment variable, you must add documentation here. Please d
 - [SENDGRID_API_KEY](#sendgrid_api_key)
 - [SERVER_URL](#server_url)
 - [SESSION_SECRET](#session_secret)
-- [SL_BUILD](#sl_build)
-- [SL_PORT](#sl_port)
 - [SLACK_WEBHOOK_URL_DEV](#slack_webhook_url_dev)
 - [SNAPSHOT_HUB_URL](#snapshot_hub_url)
 - [SUPER_ADMIN_EMAIL](#super_admin_email)
@@ -336,13 +334,6 @@ By default, this is set in our `commonwealth/server/config` file to `https://com
 
 Equivalent to JWT Secret, but used in testing.
 
-## SL_BUILD
-
-Boolean triggering our `snapshot-listener` package to build.
-
-## SL_PORT
-
-Port used for the `snapshot-listener` package. We use the default value `8001`.
 
 ## SLACK_WEBHOOK_URL_DEV
 

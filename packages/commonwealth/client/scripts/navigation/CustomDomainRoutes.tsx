@@ -103,8 +103,7 @@ const EditNewProfilePage = lazy(() => import('views/pages/edit_new_profile'));
 const ProfilePageRedirect = lazy(() => import('views/pages/profile_redirect'));
 
 const CustomDomainRoutes = ({
-  contestEnabled,
-  farcasterContestEnabled,
+  weightedTopicsEnabled,
   tokenizedCommunityEnabled,
 }: RouteFeatureFlags) => {
   return [
@@ -307,7 +306,7 @@ const CustomDomainRoutes = ({
       key="/manage/topics"
       path="/manage/topics"
       element={withLayout(
-        farcasterContestEnabled ? CommunityTopics : CommunityTopicsOld,
+        weightedTopicsEnabled ? CommunityTopics : CommunityTopicsOld,
         {
           scoped: true,
         },
@@ -320,45 +319,41 @@ const CustomDomainRoutes = ({
         scoped: true,
       })}
     />,
-    ...(contestEnabled
-      ? [
-          <Route
-            key="/manage/contests"
-            path="/manage/contests"
-            element={withLayout(AdminContestsPage, {
-              scoped: true,
-            })}
-          />,
-          <Route
-            key="/manage/contests/launch"
-            path="/manage/contests/launch"
-            element={withLayout(ManageContest, {
-              scoped: true,
-            })}
-          />,
-          <Route
-            key="/manage/contests/:contestAddress"
-            path="/manage/contests/:contestAddress"
-            element={withLayout(ManageContest, {
-              scoped: true,
-            })}
-          />,
-          <Route
-            key="/contests"
-            path="/contests"
-            element={withLayout(Contests, {
-              scoped: true,
-            })}
-          />,
-          <Route
-            key="/:scope/contests/:contestAddress"
-            path="/:scope/contests/:contestAddress"
-            element={withLayout(ContestPage, {
-              scoped: true,
-            })}
-          />,
-        ]
-      : []),
+    <Route
+      key="/manage/contests"
+      path="/manage/contests"
+      element={withLayout(AdminContestsPage, {
+        scoped: true,
+      })}
+    />,
+    <Route
+      key="/manage/contests/launch"
+      path="/manage/contests/launch"
+      element={withLayout(ManageContest, {
+        scoped: true,
+      })}
+    />,
+    <Route
+      key="/manage/contests/:contestAddress"
+      path="/manage/contests/:contestAddress"
+      element={withLayout(ManageContest, {
+        scoped: true,
+      })}
+    />,
+    <Route
+      key="/contests"
+      path="/contests"
+      element={withLayout(Contests, {
+        scoped: true,
+      })}
+    />,
+    <Route
+      key="/:scope/contests/:contestAddress"
+      path="/:scope/contests/:contestAddress"
+      element={withLayout(ContestPage, {
+        scoped: true,
+      })}
+    />,
     <Route
       key="/discord-callback"
       path="/discord-callback"
