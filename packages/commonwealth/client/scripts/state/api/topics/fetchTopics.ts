@@ -13,7 +13,7 @@ const useFetchTopicsQuery = ({
   apiEnabled = true,
   includeContestData,
 }: FetchTopicsProps) => {
-  return trpc.thread.getTopics.useQuery(
+  return trpc.community.getTopics.useQuery(
     {
       community_id: communityId,
       with_contest_managers: includeContestData,
