@@ -1,12 +1,12 @@
 import { AppError, ServerError, blobStorage } from '@hicommonwealth/core';
 import { DB } from '@hicommonwealth/model';
-import { uuidv4 } from 'lib/util';
 import fetch from 'node-fetch';
 import { OpenAI } from 'openai';
 import {
   ChatCompletionMessage,
   ChatCompletionUserMessageParam,
 } from 'openai/resources/index.mjs';
+import { v4 as uuidv4 } from 'uuid';
 import { type TypedRequestBody, type TypedResponse } from '../types';
 
 const TOKEN_AI_PROMPTS_CONFIG = {
