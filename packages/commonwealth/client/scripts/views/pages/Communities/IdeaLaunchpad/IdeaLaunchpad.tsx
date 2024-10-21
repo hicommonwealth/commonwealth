@@ -6,6 +6,8 @@ import TokenLaunchDrawer from './TokenLaunchDrawer';
 const IdeaLaunchpad = () => {
   const tokenizedCommunityEnabled = useFlag('tokenizedCommunity');
 
+  const [shouldGenerateIdeaOnDrawerOpen, setShouldGenerateIdeaOnDrawerOpen] =
+    useState(false);
   const [isTokenLaunchDrawerOpen, setIsTokenLaunchDrawerOpen] = useState(false);
 
   if (!tokenizedCommunityEnabled) return <></>;
@@ -13,12 +15,16 @@ const IdeaLaunchpad = () => {
   return (
     <>
       <LaunchIdeaCard
-        onRandomizeClick={() => setIsTokenLaunchDrawerOpen(true)}
+        onRandomizeClick={() => {
+          setShouldGenerateIdeaOnDrawerOpen(true);
+          setIsTokenLaunchDrawerOpen(true);
+        }}
         onTokenLaunchClick={() => setIsTokenLaunchDrawerOpen(true)}
       />
       <TokenLaunchDrawer
         isOpen={isTokenLaunchDrawerOpen}
         onClose={() => setIsTokenLaunchDrawerOpen(false)}
+        generateIdeaOnMount={shouldGenerateIdeaOnDrawerOpen}
       />
     </>
   );

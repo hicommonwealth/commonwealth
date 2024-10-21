@@ -19,4 +19,5 @@ export type TokenInformationFormProps = {
   forceFormValues?: Partial<FormSubmitValues>;
   focusField?: keyof FormSubmitValues;
   formDisabled?: boolean;
+  openAddressSelectorOnMount?: boolean;
 };

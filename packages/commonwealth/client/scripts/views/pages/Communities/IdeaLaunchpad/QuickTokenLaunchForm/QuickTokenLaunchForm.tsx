@@ -2,6 +2,7 @@ import { ChainBase, commonProtocol } from '@hicommonwealth/shared';
 import clsx from 'clsx';
 import { notifyError } from 'controllers/app/notifications';
 import useBeforeUnload from 'hooks/useBeforeUnload';
+import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import React, { useState } from 'react';
 import { slugifyPreserveDashes } from 'shared/utils';
 import { useUpdateCommunityMutation } from 'state/api/communities';
@@ -30,6 +31,7 @@ import { useGenerateTokenIdea } from './useGenerateTokenIdea';
 type QuickTokenLaunchFormProps = {
   onCancel: () => void;
   onCommunityCreated: (communityId: string) => void;
+  generateIdeaOnMount?: boolean;
 };
 
 const MAX_IDEAS_LIMIT = 5;
@@ -37,6 +39,7 @@ const MAX_IDEAS_LIMIT = 5;
 export const QuickTokenLaunchForm = ({
   onCancel,
   onCommunityCreated,
+  generateIdeaOnMount = false,
 }: QuickTokenLaunchFormProps) => {
   const {
     generateIdea,
@@ -54,6 +57,13 @@ export const QuickTokenLaunchForm = ({
     createdCommunityIdsToTokenInfoMap,
     setCreatedCommunityIdsToTokenInfoMap,
   ] = useState({});
+
+  useRunOnceOnCondition({
+    callback: () => {
+      generateIdea().catch(console.error);
+    },
+    shouldRun: generateIdeaOnMount,
+  });
 
   const {
     selectedAddress,
@@ -277,6 +287,7 @@ export const QuickTokenLaunchForm = ({
           key={`${activeTokenIdeaIndex}-${generatedTokenIdea?.token?.imageURL}`}
           selectedAddress={selectedAddress}
           onAddressSelected={setSelectedAddress}
+          openAddressSelectorOnMount={!generateIdeaOnMount}
           onCancel={onCancel}
           onSubmit={handleSubmit}
           {...(generatedTokenIdea?.chunkingField && {

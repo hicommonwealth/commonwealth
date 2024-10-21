@@ -46,6 +46,7 @@ const TokenInformationForm = ({
   forceFormValues,
   focusField,
   formDisabled,
+  openAddressSelectorOnMount = true,
 }: TokenInformationFormProps) => {
   const user = useUserStore();
   const [baseOption] = communityTypeOptions;
@@ -99,7 +100,7 @@ const TokenInformationForm = ({
 
   useRunOnceOnCondition({
     callback: openAddressSelectionModal,
-    shouldRun: true,
+    shouldRun: openAddressSelectorOnMount,
   });
 
   const handleSubmit = useCallback(

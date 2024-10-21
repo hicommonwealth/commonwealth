@@ -17,11 +17,13 @@ import './TokenLaunchDrawer.scss';
 type TokenLaunchDrawerProps = {
   isOpen: boolean;
   onClose: () => void;
+  generateIdeaOnMount?: boolean;
 };
 
 export const TokenLaunchDrawer = ({
   isOpen,
   onClose,
+  generateIdeaOnMount = false,
 }: TokenLaunchDrawerProps) => {
   const { isAddedToHomeScreen } = useAppStatus();
 
@@ -64,6 +66,7 @@ export const TokenLaunchDrawer = ({
             <QuickTokenLaunchForm
               onCancel={handleDrawerCloseTrigger}
               onCommunityCreated={setCreatedCommunityId}
+              generateIdeaOnMount={generateIdeaOnMount}
             />
           )}
         </div>
