@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { SERVER_URL } from 'state/api/config';
+import { ApiEndpoints, SERVER_URL } from 'state/api/config';
 import { userStore } from 'state/ui/user';
 
 type TokenIdea = {
@@ -51,16 +51,19 @@ export const useGenerateTokenIdea = ({
 
       // Special case for `fetch` API usage:
       // streaming responses doesn't work with axios POST method: https://github.com/axios/axios/issues/5806
-      const response = await fetch(`${SERVER_URL}/generateTokenIdea`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      const response = await fetch(
+        `${SERVER_URL}/${ApiEndpoints.GENERATE_TOKEN_IDEA}`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            jwt: userStore.getState().jwt,
+            auth: true,
+          }),
         },
-        body: JSON.stringify({
-          jwt: userStore.getState().jwt,
-          auth: true,
-        }),
-      });
+      );
 
       const reader = response?.body?.getReader();
       const decoder = new TextDecoder('utf-8');
@@ -142,6 +145,7 @@ export const useGenerateTokenIdea = ({
         };
         return temp;
       });
+      // handle this case properly
       console.error('Error fetching token idea:', error);
     } finally {
       setTokenIdeas((ti) => {

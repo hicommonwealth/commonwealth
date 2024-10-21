@@ -37,6 +37,7 @@ export const ApiEndpoints = {
   searchChains: (searchTerm: string) => `/communities?search=${searchTerm}`,
   VIEW_COUNT: '/viewCount',
   GENERATE_IMAGE: '/generateImage',
+  GENERATE_TOKEN_IDEA: '/generateTokenIdea',
 };
 
 export const ContractMethods = {
