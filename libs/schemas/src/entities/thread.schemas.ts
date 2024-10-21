@@ -66,6 +66,7 @@ export const Thread = z.object({
 
   // associations
   Address: Address.nullish(),
+  Reaction: Reaction.nullish(),
   topic: Topic.nullish(),
   collaborators: Address.array().nullish(),
   reactions: Reaction.array().nullish(),
