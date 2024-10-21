@@ -60,7 +60,7 @@ const api = {
   getTopics: trpc.query(Community.GetTopics, trpc.Tag.Community, {
     forceSecure: true,
   }),
-  getThreads: trpc.query(Thread.GetThreads, trpc.Tag.Topic, {
+  getThreads: trpc.query(Thread.GetThreads, trpc.Tag.Thread, {
     forceSecure: true,
   }),
   createCommunity,
