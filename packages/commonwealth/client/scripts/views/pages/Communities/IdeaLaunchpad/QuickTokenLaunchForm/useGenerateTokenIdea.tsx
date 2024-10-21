@@ -27,10 +27,14 @@ export const useGenerateTokenIdea = ({
     {
       chunkingField?: keyof TokenIdea;
       token?: TokenIdea;
-      isGeneratingTokenIdea?: boolean;
+      isChunking?: boolean;
       tokenIdeaGenerationError?: Error;
     }[]
   >([]);
+
+  const generatedTokenIdea = tokenIdeas[activeTokenIdeaIndex];
+  const isMaxTokenIdeaLimitReached =
+    maxIdeasLimit === Math.max(tokenIdeas.length, activeTokenIdeaIndex + 1);
 
   const generateIdea = async (ideaPrompt?: string) => {
     if (maxIdeasLimit === totalIdeasGenerated.current) return;
@@ -43,7 +47,7 @@ export const useGenerateTokenIdea = ({
         const temp = [...ti];
         temp[ideaIndex] = {
           ...(temp[ideaIndex] || {}),
-          isGeneratingTokenIdea: true,
+          isChunking: true,
           tokenIdeaGenerationError: undefined,
         };
         return temp;
@@ -153,7 +157,7 @@ export const useGenerateTokenIdea = ({
         const temp = [...ti];
         temp[ideaIndex] = {
           ...(temp[ideaIndex] || {}),
-          isGeneratingTokenIdea: false,
+          isChunking: false,
         };
         return temp;
       });
@@ -165,5 +169,7 @@ export const useGenerateTokenIdea = ({
     setActiveTokenIdeaIndex,
     tokenIdeas,
     generateIdea,
+    generatedTokenIdea,
+    isMaxTokenIdeaLimitReached,
   };
 };

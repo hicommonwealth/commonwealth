@@ -47,13 +47,12 @@ export const QuickTokenLaunchForm = ({
     generateIdea,
     tokenIdeas,
     activeTokenIdeaIndex,
+    generatedTokenIdea,
+    isMaxTokenIdeaLimitReached,
     setActiveTokenIdeaIndex,
   } = useGenerateTokenIdea({
     maxIdeasLimit: MAX_IDEAS_LIMIT,
   });
-  const generatedTokenIdea = tokenIdeas[activeTokenIdeaIndex];
-  const isMaxTokenIdeaLimitReached =
-    MAX_IDEAS_LIMIT === Math.max(tokenIdeas.length, activeTokenIdeaIndex + 1);
   const [isCreatingQuickToken, setIsCreatingQuickToken] = useState(false);
   const [
     createdCommunityIdsToTokenInfoMap,
@@ -289,7 +288,8 @@ export const QuickTokenLaunchForm = ({
           key={`${activeTokenIdeaIndex}-${generatedTokenIdea?.token?.imageURL}`}
           selectedAddress={selectedAddress}
           onAddressSelected={setSelectedAddress}
-          openAddressSelectorOnMount={!generateIdeaOnMount}
+          openAddressSelectorOnMount={false}
+          formDisabled={generatedTokenIdea?.isChunking}
           onCancel={onCancel}
           onSubmit={handleSubmit}
           {...(generatedTokenIdea?.chunkingField && {
@@ -367,7 +367,7 @@ export const QuickTokenLaunchForm = ({
                   disabled={
                     isProcessingProfileImage ||
                     isCreatingQuickToken ||
-                    generatedTokenIdea?.isGeneratingTokenIdea
+                    generatedTokenIdea?.isChunking
                   }
                 />
               </div>
