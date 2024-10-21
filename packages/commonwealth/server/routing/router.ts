@@ -54,9 +54,9 @@ import { type DB } from '@hicommonwealth/model';
 import banAddress from '../routes/banAddress';
 import setAddressWallet from '../routes/setAddressWallet';
 
+import { generateTokenIdea } from '@hicommonwealth/model';
 import type DatabaseValidationService from '../middleware/databaseValidationService';
 import generateImage from '../routes/generateImage';
-import generateTokenIdea from '../routes/generateTokenIdea';
 
 import * as controllers from '../controller';
 import addThreadLink from '../routes/linking/addThreadLinks';
@@ -563,7 +563,35 @@ function setupRouter(
       requestsPerMinute: config.GENERATE_IMAGE_RATE_LIMIT,
     }),
     passport.authenticate('jwt', { session: false }),
-    generateTokenIdea.bind(this, models),
+    async (req, res) => {
+      // required for streaming
+      res.setHeader('Content-Type', 'text/plain');
+      res.setHeader('Transfer-Encoding', 'chunked');
+
+      const ideaPrompt =
+        typeof req.body?.ideaPrompt === 'string'
+          ? req.body?.ideaPrompt
+          : undefined;
+
+      const ideaGenerator = generateTokenIdea({ ideaPrompt });
+
+      for await (const chunk of ideaGenerator) {
+        // generation error
+        if (chunk.error) {
+          return res.end(
+            JSON.stringify({ status: 'failure', message: chunk.error }) + '\n',
+          );
+        }
+
+        // stream chunks as they are generated
+        res.write(JSON.stringify(chunk.tokenIdea) + '\n');
+        res.flush();
+      }
+
+      return res.end(
+        JSON.stringify({ status: 'success', message: 'stream ended' }) + '\n',
+      );
+    },
   );
 
   // linking
