@@ -1,3 +1,4 @@
+import { notifyError } from 'controllers/app/notifications';
 import { useRef, useState } from 'react';
 import { ApiEndpoints, SERVER_URL } from 'state/api/config';
 import { userStore } from 'state/ui/user';
@@ -89,11 +90,10 @@ export const useGenerateTokenIdea = ({
           if (done) break;
 
           const chunk = decoder.decode(value || '', { stream: true });
-          const chunkJSON: StreamEnd | TokenIdea = JSON.parse(chunk);
+          const chunkJSON = JSON.parse(chunk);
 
           if ((chunkJSON as StreamEnd).status === 'failure') {
-            // if this happens, usually image generation has
-            // failed, we ignore that for now as its optional.
+            throw new Error((chunkJSON as StreamEnd).message);
           }
 
           if (!(chunkJSON as StreamEnd)?.status) {
@@ -146,12 +146,12 @@ export const useGenerateTokenIdea = ({
         const temp = [...ti];
         temp[ideaIndex] = {
           ...(temp[ideaIndex] || {}),
-          tokenIdeaGenerationError: error,
+          tokenIdeaGenerationError: error.message,
         };
         return temp;
       });
-      // handle this case properly
-      console.error('Error fetching token idea:', error);
+      notifyError(error.message);
+      console.error('Error fetching token idea:', error.message);
     } finally {
       setTokenIdeas((ti) => {
         const temp = [...ti];
