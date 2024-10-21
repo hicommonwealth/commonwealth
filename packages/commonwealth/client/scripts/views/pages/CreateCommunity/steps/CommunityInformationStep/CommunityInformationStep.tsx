@@ -120,7 +120,7 @@ const CommunityInformationStep = ({
           weightedTopicsEnabled
             ? `
               Choose the chain that your Ethereum project is built on. Chain selection 
-              determines availability of features such as Contestes, Stakes, and Weighted Voting.
+              determines availability of features such as Contests, Stakes, and Weighted Voting.
             `
             : `
               Choose the chain that your Ethereum project is built on. If you’re
