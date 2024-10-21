@@ -82,13 +82,14 @@ export const NewThreadForm = () => {
     setCanShowTopicPermissionBanner,
   } = useNewThreadForm(communityId, topicsForSelector);
 
-  const hasTopicOngoingContest = threadTopic?.activeContestManagers?.length > 0;
+  const hasTopicOngoingContest =
+    threadTopic?.active_contest_managers?.length > 0;
 
   const user = useUserStore();
   const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
 
-  const contestTopicError = threadTopic?.activeContestManagers?.length
-    ? threadTopic?.activeContestManagers
+  const contestTopicError = threadTopic?.active_contest_managers?.length
+    ? threadTopic?.active_contest_managers
         ?.map(
           (acm) =>
             acm?.content?.filter(
@@ -303,10 +304,10 @@ export const NewThreadForm = () => {
 
               {contestTopicAffordanceVisible && (
                 <ContestTopicBanner
-                  contests={threadTopic?.activeContestManagers.map((acm) => {
+                  contests={threadTopic?.active_contest_managers.map((acm) => {
                     return {
-                      name: acm?.contest_manager?.name,
-                      address: acm?.contest_manager?.contest_address,
+                      name: acm?.name,
+                      address: acm?.contest_address,
                       submittedEntries:
                         acm?.content?.filter(
                           (c) =>
