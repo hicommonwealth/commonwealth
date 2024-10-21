@@ -8,7 +8,7 @@ import {
 import React from 'react';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 
-export const CustomLinkPreviewCreate = () => {
+export const CustomLinkEdit = () => {
   const [linkDialogState] = useCellValues(linkDialogState$);
   const removeLink = usePublisher(removeLink$);
   const switchFromPreviewToLinkEdit = usePublisher(

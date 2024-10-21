@@ -28,9 +28,9 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { CustomLinkDialog } from 'views/components/MarkdownEditor/CustomLinkDialog';
 import { TooltipIndicator } from 'views/components/MarkdownEditor/indicators/TooltipIndicator';
 import { MarkdownEditorModeContext } from 'views/components/MarkdownEditor/MarkdownEditorModeContext';
+import { NullComponent } from 'views/components/MarkdownEditor/NullComponent';
 import { useDeviceProfile } from 'views/components/MarkdownEditor/useDeviceProfile';
 import { MarkdownEditorMethods } from 'views/components/MarkdownEditor/useMarkdownEditorMethods';
 import { DragIndicator } from './indicators/DragIndicator';
@@ -375,10 +375,9 @@ export const MarkdownEditor = memo(function MarkdownEditor(
                 quotePlugin(),
                 headingsPlugin(),
                 linkPlugin(),
-                // FIXME: this one will be when I click an *existing* link.
-                // this one DOES anchor itself
-
-                linkDialogPlugin({ LinkDialog: CustomLinkDialog }),
+                // disable the link dialog and use our own. We have a different
+                // type of dialog based on device type.
+                linkDialogPlugin({ LinkDialog: NullComponent }),
                 codeBlockPlugin({ defaultCodeBlockLanguage: 'js' }),
                 codeMirrorPlugin({
                   codeBlockLanguages,
