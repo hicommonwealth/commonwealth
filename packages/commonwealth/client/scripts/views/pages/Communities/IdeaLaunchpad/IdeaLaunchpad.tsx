@@ -6,6 +6,7 @@ import TokenLaunchDrawer from './TokenLaunchDrawer';
 const IdeaLaunchpad = () => {
   const tokenizedCommunityEnabled = useFlag('tokenizedCommunity');
 
+  const [initialIdeaPrompt, setInitialIdeaPrompt] = useState<string>();
   const [shouldGenerateIdeaOnDrawerOpen, setShouldGenerateIdeaOnDrawerOpen] =
     useState(false);
   const [isTokenLaunchDrawerOpen, setIsTokenLaunchDrawerOpen] = useState(false);
@@ -15,7 +16,8 @@ const IdeaLaunchpad = () => {
   return (
     <>
       <LaunchIdeaCard
-        onRandomizeClick={() => {
+        onRandomizeClick={(ideaPrompt) => {
+          setInitialIdeaPrompt(ideaPrompt);
           setShouldGenerateIdeaOnDrawerOpen(true);
           setIsTokenLaunchDrawerOpen(true);
         }}
@@ -24,6 +26,7 @@ const IdeaLaunchpad = () => {
       <TokenLaunchDrawer
         isOpen={isTokenLaunchDrawerOpen}
         onClose={() => setIsTokenLaunchDrawerOpen(false)}
+        initialIdeaPrompt={initialIdeaPrompt}
         generateIdeaOnMount={shouldGenerateIdeaOnDrawerOpen}
       />
     </>

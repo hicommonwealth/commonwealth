@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from '../component_kit/new_designs/CWButton';
 import { CWTextInput } from '../component_kit/new_designs/CWTextInput';
@@ -7,13 +7,15 @@ import './LaunchIdeaCard.scss';
 
 type LaunchIdeaCardProps = {
   onTokenLaunchClick?: () => void;
-  onRandomizeClick?: () => void;
+  onRandomizeClick?: (ideaPrompt?: string) => void;
 };
 
 const LaunchIdeaCard = ({
   onTokenLaunchClick,
   onRandomizeClick,
 }: LaunchIdeaCardProps) => {
+  const [ideaPrompt, setIdeaPrompt] = useState<string>();
+
   return (
     <section className="LaunchIdeaCard">
       <div className="gradiant-container">
@@ -21,6 +23,7 @@ const LaunchIdeaCard = ({
         <CWTextInput
           placeholder="Type your idea or select randomize to launch a token...."
           fullWidth
+          onInput={(e) => setIdeaPrompt(e.target.value.trim())}
         />
         <div className="cta-elements">
           <CWText className="randomize-cta-text">
@@ -31,7 +34,7 @@ const LaunchIdeaCard = ({
             <CWButton
               iconLeft="brain"
               label="Randomize"
-              onClick={onRandomizeClick}
+              onClick={() => onRandomizeClick?.(ideaPrompt)}
             />
             <TokenLaunchButton
               buttonWidth="wide"

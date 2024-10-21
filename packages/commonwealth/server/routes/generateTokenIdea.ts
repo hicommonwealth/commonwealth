@@ -10,8 +10,9 @@ import {
 import { type TypedRequestBody, type TypedResponse } from '../types';
 
 const TOKEN_AI_PROMPTS_CONFIG = {
-  name: `
-    Please create a random idea for a memecoin cryptocurrency, have the token name informed by current events, 
+  name: (ideaPrompt?: string) => `
+    Please ${ideaPrompt ? `use this prompt in quotation "${ideaPrompt}" to ` : ''}
+    create a random idea for a memecoin cryptocurrency, have the token name informed by current events, 
     and historical internet based humor. Make it hyper opinionated and subversive or topical. Provide just the 
     token name without any acronym or symbol. Make it either cringe or amazing. Restrict your answer to between 
     6 and 25 characters.
@@ -33,6 +34,8 @@ const TokenErrors = {
   OpenAINotConfigured: 'OpenAI key not configured',
   OpenAIInitFailed: 'OpenAI initialization failed',
   RequestFailed: 'failed to generate complete token idea generation',
+  IdeaPromptVoilatesSecurityPolicy:
+    'provide `ideaPrompt` voilates content security policy',
   ImageGenerationFailure: 'failed to generate image for token idea',
 };
 
@@ -55,16 +58,25 @@ const chatWithOpenAI = async (prompt = '', openai: OpenAI) => {
   );
 };
 
-type generateTokenIdeaResp = {
-  tokenIdea: any;
+type TokenIdea = {
+  name: string;
+  symbol: string;
+  description: string;
+  imageURL: string;
 };
 
-// TODO: add option to provide a prompt payload which can be used to generate an idea (optional)
+type GenerateTokenIdeaReq = {
+  ideaPrompt?: string;
+};
+
+type GenerateTokenIdeaRes = {
+  tokenIdea: TokenIdea;
+};
 
 const generateTokenIdea = async (
   models: DB,
-  req: TypedRequestBody<{}>,
-  res: TypedResponse<generateTokenIdeaResp>,
+  req: TypedRequestBody<GenerateTokenIdeaReq>,
+  res: TypedResponse<GenerateTokenIdeaRes>,
 ) => {
   if (!process.env.OPENAI_API_KEY) {
     throw new AppError(TokenErrors.OpenAINotConfigured);
@@ -80,28 +92,31 @@ const generateTokenIdea = async (
     throw new ServerError(TokenErrors.OpenAIInitFailed);
   }
 
+  const ideaPrompt =
+    typeof req.body?.ideaPrompt === 'string' ? req.body?.ideaPrompt : undefined;
+
+  const tokenIdea = {
+    name: '',
+    symbol: '',
+    description: '',
+    imageURL: '',
+  };
+
   try {
     // required for streaming
     res.setHeader('Content-Type', 'text/plain');
     res.setHeader('Transfer-Encoding', 'chunked');
 
-    const tokenIdea = {
-      name: '',
-      symbol: '',
-      description: '',
-      imageURL: '',
-    };
-
     // Note: name/symbol/description were generated very fast by OpenAI and streaming chunks of text for individual
-    // name/symbol/description wasn't proving to be ideal, the FE was receiving chunks way faster, sometimes all
-    // chunks in a single buffer. Adjusting buffer size was also not ideal, as the chunks from OpenAI response would
+    // chars of name/symbol/description wasn't proving to be ideal, the FE was receiving chunks way faster, sometimes
+    // all chunks in a single buffer. Adjusting buffer size was also not ideal, as the chunks from OpenAI response would
     // contain 2-5 chars max for name/symbol, so we stream full text for name/symbol/description as 3 seperate chunks
-    // and them stream the final image matching token info.
+    // and them stream the final image matching token info in 2 steps for the client to handle UI updates faster.
 
     // generate a unique token name
     while (true) {
       tokenIdea.name = await chatWithOpenAI(
-        TOKEN_AI_PROMPTS_CONFIG.name,
+        TOKEN_AI_PROMPTS_CONFIG.name(ideaPrompt),
         openai,
       );
 
@@ -159,9 +174,13 @@ const generateTokenIdea = async (
   } catch (e) {
     let error = TokenErrors.RequestFailed;
 
-    // this usually happens in the image generation calls
     if (e?.code === 'content_policy_violation') {
-      error = TokenErrors.ImageGenerationFailure;
+      if (ideaPrompt && !tokenIdea.name) {
+        error = TokenErrors.IdeaPromptVoilatesSecurityPolicy;
+      } else {
+        // this usually happens in the image generation calls
+        error = TokenErrors.ImageGenerationFailure;
+      }
     }
 
     return res.end(

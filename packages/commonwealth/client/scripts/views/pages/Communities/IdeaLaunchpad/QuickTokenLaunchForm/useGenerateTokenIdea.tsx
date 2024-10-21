@@ -32,7 +32,7 @@ export const useGenerateTokenIdea = ({
     }[]
   >([]);
 
-  const generateIdea = async () => {
+  const generateIdea = async (ideaPrompt?: string) => {
     if (maxIdeasLimit === totalIdeasGenerated.current) return;
     const ideaIndex = totalIdeasGenerated.current;
     totalIdeasGenerated.current = totalIdeasGenerated.current + 1;
@@ -60,6 +60,7 @@ export const useGenerateTokenIdea = ({
           },
           body: JSON.stringify({
             jwt: userStore.getState().jwt,
+            ideaPrompt,
             auth: true,
           }),
         },

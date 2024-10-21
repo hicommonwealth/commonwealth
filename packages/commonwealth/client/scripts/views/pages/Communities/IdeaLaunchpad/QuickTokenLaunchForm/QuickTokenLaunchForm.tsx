@@ -31,6 +31,7 @@ import { useGenerateTokenIdea } from './useGenerateTokenIdea';
 type QuickTokenLaunchFormProps = {
   onCancel: () => void;
   onCommunityCreated: (communityId: string) => void;
+  initialIdeaPrompt?: string;
   generateIdeaOnMount?: boolean;
 };
 
@@ -39,6 +40,7 @@ const MAX_IDEAS_LIMIT = 5;
 export const QuickTokenLaunchForm = ({
   onCancel,
   onCommunityCreated,
+  initialIdeaPrompt,
   generateIdeaOnMount = false,
 }: QuickTokenLaunchFormProps) => {
   const {
@@ -60,7 +62,7 @@ export const QuickTokenLaunchForm = ({
 
   useRunOnceOnCondition({
     callback: () => {
-      generateIdea().catch(console.error);
+      generateIdea(initialIdeaPrompt).catch(console.error);
     },
     shouldRun: generateIdeaOnMount,
   });
