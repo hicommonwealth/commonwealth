@@ -102,7 +102,7 @@ const AdminContestsPage = () => {
         <div className="admin-header-row">
           <CWText type="h2">Contests</CWText>
 
-          {(farcasterContestEnabled
+          {(weightedTopicsEnabled
             ? hasAtLeastOneWeightedVotingTopic
             : stakeEnabled) &&
             contestView !== ContestView.TypeSelection && (
