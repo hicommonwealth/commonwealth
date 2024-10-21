@@ -28,6 +28,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
+import { CustomLinkDialog } from 'views/components/MarkdownEditor/CustomLinkDialog';
 import { TooltipIndicator } from 'views/components/MarkdownEditor/indicators/TooltipIndicator';
 import { MarkdownEditorModeContext } from 'views/components/MarkdownEditor/MarkdownEditorModeContext';
 import { useDeviceProfile } from 'views/components/MarkdownEditor/useDeviceProfile';
@@ -377,8 +378,7 @@ export const MarkdownEditor = memo(function MarkdownEditor(
                 // FIXME: this one will be when I click an *existing* link.
                 // this one DOES anchor itself
 
-                linkDialogPlugin(),
-                // {LinkDialog: CustomLinkDialog}
+                linkDialogPlugin({ LinkDialog: CustomLinkDialog }),
                 codeBlockPlugin({ defaultCodeBlockLanguage: 'js' }),
                 codeMirrorPlugin({
                   codeBlockLanguages,

@@ -1,9 +1,17 @@
-import { linkDialogState$, useCellValues } from 'commonwealth-mdxeditor';
+import {
+  cancelLinkEdit$,
+  linkDialogState$,
+  useCellValues,
+  usePublisher,
+} from 'commonwealth-mdxeditor';
 import React from 'react';
 import { createPortal } from 'react-dom';
+import { CustomLinkPreview } from 'views/components/MarkdownEditor/CustomLinkPreview';
 
 export const CustomLinkDialog = () => {
   const [linkDialogState] = useCellValues(linkDialogState$);
+  const cancelLinkEdit = usePublisher(cancelLinkEdit$);
+  // switchFromPreviewToLinkEdit$
 
   // {
   //   "type": "edit",
@@ -52,7 +60,7 @@ export const CustomLinkDialog = () => {
           backgroundColor: 'red',
         }}
       >
-        hello world
+        {linkDialogState.type === 'preview' && <CustomLinkPreview />}
       </div>
       );
     </>,
