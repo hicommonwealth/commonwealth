@@ -16,7 +16,6 @@ import { getThreadActionTooltipText } from 'helpers/threads';
 import useTopicGating from 'hooks/useTopicGating';
 import { getProposalUrlPath } from 'identifiers';
 import { Thread, type RecentComment } from 'models/Thread';
-import Topic from 'models/Topic';
 import { ThreadKind, ThreadStage } from 'models/types';
 import { useCommonNavigate } from 'navigation/helpers';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
@@ -143,7 +142,7 @@ function mapThread(thread: z.infer<typeof ActivityThread>): Thread {
       group_ids: [],
       active_contest_managers: [],
       total_threads: 0,
-    } as Topic,
+    },
     kind: thread.kind as ThreadKind,
     stage: thread.stage as ThreadStage,
     ThreadVersionHistories: [],

@@ -1,6 +1,6 @@
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
-import Topic from 'models/Topic';
+import type { Topic } from 'models/Topic';
 import app from 'state';
 import { SERVER_URL } from 'state/api/config';
 import { trpc } from 'utils/trpcClient';

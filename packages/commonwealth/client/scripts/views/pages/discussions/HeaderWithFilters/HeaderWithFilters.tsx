@@ -351,7 +351,7 @@ export const HeaderWithFilters = ({
                     setTopicSelectedToEdit(
                       [...featuredTopics, ...otherTopics].find(
                         (x) => x.id === item.id,
-                      ) as unknown as Topic,
+                      ),
                     )
                   }
                 />
@@ -474,15 +474,18 @@ export const HeaderWithFilters = ({
       </div>
 
       {(activeContests || []).map((contest) => {
-        if (!contest) return;
-        const { end_time } = contest?.contests?.[0] || {};
+        const { end_time } =
+          // @ts-expect-error <StrictNullChecks/>
+          contest?.contests[0] || {};
 
         return (
           <ContestCard
             key={contest.contest_address}
             isAdmin={false}
-            address={contest!.contest_address!}
-            name={contest!.name!}
+            // @ts-expect-error <StrictNullChecks/>
+            address={contest.contest_address}
+            // @ts-expect-error <StrictNullChecks/>
+            name={contest.name}
             imageUrl={contest.image_url}
             // @ts-expect-error <StrictNullChecks/>
             topics={contest.topics}

@@ -29,7 +29,6 @@ import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextIn
 import { MessageRow } from 'views/components/component_kit/new_designs/CWTextInput/MessageRow';
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
 import useAppStatus from '../../../hooks/useAppStatus';
-import Topic from '../../../models/Topic';
 import { ThreadKind, ThreadStage } from '../../../models/types';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWGatedTopicBanner } from '../component_kit/CWGatedTopicBanner';
@@ -81,7 +80,7 @@ export const NewThreadForm = () => {
     setCanShowGatingBanner,
     canShowTopicPermissionBanner,
     setCanShowTopicPermissionBanner,
-  } = useNewThreadForm(communityId, topicsForSelector as unknown as Topic[]);
+  } = useNewThreadForm(communityId, topicsForSelector);
 
   const hasTopicOngoingContest =
     threadTopic?.active_contest_managers?.length > 0;
@@ -260,7 +259,7 @@ export const NewThreadForm = () => {
                         originalProps,
                         topic: topicsForSelector.find(
                           (t) => String(t.id) === originalProps.data.value,
-                        ) as unknown as Topic,
+                        ),
                       }),
                   }}
                   formatOptionLabel={(option) => (

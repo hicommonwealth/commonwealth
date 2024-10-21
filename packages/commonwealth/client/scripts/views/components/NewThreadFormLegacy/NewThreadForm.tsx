@@ -86,7 +86,7 @@ export const NewThreadForm = () => {
     setCanShowGatingBanner,
     canShowTopicPermissionBanner,
     setCanShowTopicPermissionBanner,
-  } = useNewThreadForm(communityId, topicsForSelector as unknown as Topic[]);
+  } = useNewThreadForm(communityId, topicsForSelector);
 
   const hasTopicOngoingContest =
     threadTopic?.active_contest_managers?.length > 0;
@@ -275,7 +275,7 @@ export const NewThreadForm = () => {
                         originalProps,
                         topic: topicsForSelector.find(
                           (t) => String(t.id) === originalProps.data.value,
-                        ) as unknown as Topic,
+                        ),
                       }),
                   }}
                   formatOptionLabel={(option) => (

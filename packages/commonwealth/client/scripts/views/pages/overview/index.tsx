@@ -63,7 +63,7 @@ const OverviewPage = () => {
     return {
       monthlyThreads,
       pinnedThreads: [], // TODO: ask for a pinned thread prop in /threads?active=true api to show pinned threads
-      topic: topic as unknown as Topic,
+      topic,
     };
   });
 

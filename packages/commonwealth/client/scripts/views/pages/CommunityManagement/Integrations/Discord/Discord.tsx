@@ -225,6 +225,7 @@ const Discord = () => {
                       };
                     },
                   )}
+                  // @ts-expect-error <StrictNullChecks/>
                   topics={topics.map((topic) => ({
                     name: topic.name,
                     id: `${topic.id}`,

@@ -1,5 +1,5 @@
 import { express, trpc } from '@hicommonwealth/adapters';
-import { Comment, Community, Feed } from '@hicommonwealth/model';
+import { Comment, Community, Feed, Thread } from '@hicommonwealth/model';
 import cors from 'cors';
 import { Router } from 'express';
 import passport from 'passport';
@@ -11,7 +11,6 @@ import {
   apiKeyAuthMiddleware,
 } from './external-router-middleware';
 import * as thread from './thread';
-import * as topic from './topic';
 import * as user from './user';
 
 const {
@@ -27,7 +26,6 @@ const {
   banAddress,
 } = community.trpcRouter;
 const {
-  getThreads,
   createThread,
   updateThread,
   createThreadReaction,
@@ -37,7 +35,6 @@ const {
 const { createComment, updateComment, deleteComment, createCommentReaction } =
   comment.trpcRouter;
 const { getNewContent } = user.trpcRouter;
-const { getTopics } = topic.trpcRouter;
 
 const api = {
   getGlobalActivity: trpc.query(Feed.GetGlobalActivity, trpc.Tag.User, {
@@ -63,6 +60,9 @@ const api = {
   getTopics: trpc.query(Community.GetTopics, trpc.Tag.Community, {
     forceSecure: true,
   }),
+  getThreads: trpc.query(Thread.GetThreads, trpc.Tag.Topic, {
+    forceSecure: true,
+  }),
   createCommunity,
   updateCommunity,
   createTopic,
@@ -73,9 +73,7 @@ const api = {
   deleteGroup,
   createThread,
   updateThread,
-  getThreads,
   deleteThread,
-  getTopics,
   createComment,
   updateComment,
   deleteComment,

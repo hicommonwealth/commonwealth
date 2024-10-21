@@ -17,7 +17,7 @@ export const DiscordConnections = ({
   refetchTopics,
 }: {
   channels: DiscordChannels[];
-  topics: { id: string; name: string; channelId: string | null | undefined }[];
+  topics: { id: string; name: string; channelId: string | null }[];
   refetchTopics: () => Promise<void>;
 }) => {
   const { mutateAsync: setForumChannelConnection } =
