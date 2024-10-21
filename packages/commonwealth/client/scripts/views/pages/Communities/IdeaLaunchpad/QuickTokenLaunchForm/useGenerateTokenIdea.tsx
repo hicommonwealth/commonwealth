@@ -173,7 +173,7 @@ export const useGenerateTokenIdea = ({
       const temp = [...ti];
       temp[ideaIndex] = {
         ...(temp[ideaIndex] || {}),
-        token,
+        token: { ...(temp[ideaIndex]?.token || {}), ...token },
       };
       return temp;
     });
