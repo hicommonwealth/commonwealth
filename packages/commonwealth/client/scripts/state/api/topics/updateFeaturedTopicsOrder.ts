@@ -2,7 +2,8 @@ import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import Topic from 'models/Topic';
 import app from 'state';
-import { ApiEndpoints, SERVER_URL, queryClient } from 'state/api/config';
+import { SERVER_URL } from 'state/api/config';
+import { trpc } from 'utils/trpcClient';
 import { userStore } from '../../ui/user';
 
 interface UpdateFeaturedTopicsOrderProps {
@@ -25,12 +26,12 @@ const updateFeaturedTopicsOrder = async ({
 };
 
 const useUpdateFeaturedTopicsOrderMutation = () => {
+  const utils = trpc.useUtils();
   return useMutation({
     mutationFn: updateFeaturedTopicsOrder,
-    onSuccess: async (data, variables) => {
-      const communityId = variables.featuredTopics[0].community_id;
-      await queryClient.invalidateQueries({
-        queryKey: [ApiEndpoints.BULK_TOPICS, communityId],
+    onSuccess: async (_, variables) => {
+      await utils.community.getTopics.invalidate({
+        community_id: variables.featuredTopics[0].community_id,
       });
     },
   });

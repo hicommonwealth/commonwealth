@@ -20,7 +20,7 @@ import { EditTopicModal } from 'views/modals/edit_topic_modal';
 import { Contest } from 'views/pages/CommunityManagement/Contests/ContestsList';
 import ContestCard from 'views/pages/CommunityManagement/Contests/ContestsList/ContestCard';
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
-import type Topic from '../../../../models/Topic';
+import type { Topic } from '../../../../models/Topic';
 import {
   ThreadFeaturedFilterTypes,
   ThreadStage,

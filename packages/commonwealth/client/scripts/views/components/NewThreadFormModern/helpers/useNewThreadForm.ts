@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 
 import { useDraft } from 'hooks/useDraft';
 import { useSearchParams } from 'react-router-dom';
-import type Topic from '../../../../models/Topic';
+import type { Topic } from '../../../../models/Topic';
 import { ThreadKind } from '../../../../models/types';
 
 type NewThreadDraft = {

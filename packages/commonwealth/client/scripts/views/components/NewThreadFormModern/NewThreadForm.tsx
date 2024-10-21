@@ -307,8 +307,8 @@ export const NewThreadForm = () => {
                 <ContestTopicBanner
                   contests={threadTopic?.active_contest_managers.map((acm) => {
                     return {
-                      name: acm?.contest_manager?.name,
-                      address: acm?.contest_manager?.contest_address,
+                      name: acm?.name,
+                      address: acm?.contest_address,
                       submittedEntries:
                         acm?.content?.filter(
                           (c) =>

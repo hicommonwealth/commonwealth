@@ -1,5 +1,6 @@
-import app from 'state';
-import { trpc } from '../../../utils/trpcClient';
+import { trpc } from 'client/scripts/utils/trpcClient';
+
+const TOPICS_STALE_TIME = 30 * 1_000; // 30 s
 
 interface FetchTopicsProps {
   communityId: string;
@@ -12,13 +13,14 @@ const useFetchTopicsQuery = ({
   apiEnabled = true,
   includeContestData,
 }: FetchTopicsProps) => {
-  return trpc.topic.getTopics.useQuery(
+  return trpc.community.getTopics.useQuery(
     {
-      community_id: communityId || app.activeChainId()!,
-      include_contest_managers: includeContestData,
+      community_id: communityId,
+      with_contest_managers: includeContestData,
     },
     {
-      enabled: apiEnabled ?? true,
+      staleTime: TOPICS_STALE_TIME,
+      enabled: apiEnabled,
     },
   );
 };

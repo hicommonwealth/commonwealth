@@ -5,6 +5,7 @@ import { parseCustomStages } from 'helpers';
 import { detectURL, getThreadActionTooltipText } from 'helpers/threads';
 import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
 import useTopicGating from 'hooks/useTopicGating';
+import type { Topic } from 'models/Topic';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useLocation } from 'react-router-dom';
@@ -27,7 +28,6 @@ import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextIn
 import { MessageRow } from 'views/components/component_kit/new_designs/CWTextInput/MessageRow';
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
 import useAppStatus from '../../../hooks/useAppStatus';
-import Topic from '../../../models/Topic';
 import { ThreadKind, ThreadStage } from '../../../models/types';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWGatedTopicBanner } from '../component_kit/CWGatedTopicBanner';
@@ -63,7 +63,9 @@ export const NewThreadForm = () => {
 
   const { isContestAvailable } = useCommunityContests();
 
-  const sortedTopics = [...topics].sort((a, b) => a.name.localeCompare(b.name));
+  const sortedTopics: Topic[] = [...topics].sort((a, b) =>
+    a.name.localeCompare(b.name),
+  );
   const hasTopics = sortedTopics?.length;
   const topicsForSelector = hasTopics ? sortedTopics : [];
 
@@ -211,10 +213,7 @@ export const NewThreadForm = () => {
 
   const handleCancel = () => {
     setThreadTitle('');
-    setThreadTopic(
-      // @ts-expect-error <StrictNullChecks/>
-      topicsForSelector?.find((t) => t?.name?.includes('General')) || null,
-    );
+    setThreadTopic(topicsForSelector.find((t) => t.name.includes('General'))!);
     setThreadContentDelta(createDeltaFromText(''));
   };
 
@@ -324,8 +323,8 @@ export const NewThreadForm = () => {
                 <ContestTopicBanner
                   contests={threadTopic?.active_contest_managers.map((acm) => {
                     return {
-                      name: acm?.contest_manager?.name,
-                      address: acm?.contest_manager?.contest_address,
+                      name: acm?.name,
+                      address: acm?.contest_address,
                       submittedEntries:
                         acm?.content?.filter(
                           (c) =>

@@ -1,4 +1,4 @@
-import Topic from 'models/Topic';
+import type { Topic } from 'models/Topic';
 import React from 'react';
 import { components, OptionProps } from 'react-select';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';

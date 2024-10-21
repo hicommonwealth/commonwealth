@@ -137,6 +137,7 @@ function mapThread(thread: z.infer<typeof ActivityThread>): Thread {
       id: thread.topic.id,
       name: thread.topic.name,
       description: thread.topic.description,
+      created_at: '',
       featured_in_sidebar: false,
       featured_in_new_post: false,
       group_ids: [],
