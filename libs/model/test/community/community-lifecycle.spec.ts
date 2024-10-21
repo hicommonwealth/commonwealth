@@ -14,6 +14,8 @@ import { CreateTopic } from 'model/src/community/CreateTopic.command';
 import { UpdateTopic } from 'model/src/community/UpdateTopic.command';
 import { afterAll, assert, beforeAll, describe, expect, test } from 'vitest';
 import {
+  BanAddress,
+  BanAddressErrors,
   CreateCommunity,
   CreateGroup,
   CreateGroupErrors,
@@ -685,18 +687,18 @@ describe('Community lifecycle', () => {
           id: community.id,
           chain_node_id: edgewareNode!.id!,
         },
-      }),
-        await expect(() =>
-          command(UpdateCommunity(), {
-            actor: superAdminActor,
-            payload: {
-              ...baseRequest,
-              id: community.id,
-              namespace: 'tempNamespace',
-              transactionHash: '0x1234',
-            },
-          }),
-        ).rejects.toThrow('Namespace not supported on selected chain');
+      });
+      await expect(() =>
+        command(UpdateCommunity(), {
+          actor: superAdminActor,
+          payload: {
+            ...baseRequest,
+            id: community.id,
+            namespace: 'tempNamespace',
+            transactionHash: '0x1234',
+          },
+        }),
+      ).rejects.toThrow('Namespace not supported on selected chain');
     });
   });
 
@@ -803,6 +805,53 @@ describe('Community lifecycle', () => {
           payload: { community_id: substrate_community.id },
         }),
       ).rejects.toThrow(JoinCommunityErrors.NotVerifiedAddressOrUser);
+    });
+  });
+
+  describe('ban address', () => {
+    test('should fail if actor is not admin', async () => {
+      await expect(() =>
+        command(BanAddress(), {
+          actor: ethActor,
+          payload: {
+            community_id: community.id!,
+            address: '',
+          },
+        }),
+      ).rejects.toThrow(InvalidActor);
+    });
+    test('should fail to ban an address of a different community', async () => {
+      await expect(() =>
+        command(BanAddress(), {
+          actor: ethAdminActor,
+          payload: {
+            address: substrateActor.address!,
+            community_id: substrate_community.id!,
+          },
+        }),
+      ).rejects.toThrow(InvalidActor);
+    });
+    test('should fail if address is not found in community', async () => {
+      await expect(() =>
+        command(BanAddress(), {
+          actor: ethAdminActor,
+          payload: { address: '0xrandom', community_id: community.id! },
+        }),
+      ).rejects.toThrow(BanAddressErrors.NotFound);
+    });
+    test('should allow an admin to ban an address', async () => {
+      await command(BanAddress(), {
+        actor: ethAdminActor,
+        payload: { address: ethActor.address!, community_id: community.id! },
+      });
+    });
+    test('should fail if address is already banned', async () => {
+      await expect(() =>
+        command(BanAddress(), {
+          actor: ethAdminActor,
+          payload: { address: ethActor.address!, community_id: community.id! },
+        }),
+      ).rejects.toThrow(BanAddressErrors.AlreadyExists);
     });
   });
 });

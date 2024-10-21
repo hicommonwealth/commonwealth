@@ -23,6 +23,7 @@ const {
   updateGroup,
   deleteGroup,
   joinCommunity,
+  banAddress,
 } = community.trpcRouter;
 const {
   createThread,
@@ -77,6 +78,7 @@ const api = {
   createCommentReaction,
   deleteReaction,
   joinCommunity,
+  banAddress,
 };
 
 const PATH = '/api/v1';
