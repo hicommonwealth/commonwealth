@@ -530,6 +530,11 @@ export const CommentTree = ({
                 rootThread={thread}
                 canComment={canComment}
                 isReplying={isReplying}
+                tooltipText={
+                  !canComment && typeof disabledActionsTooltipText === 'string'
+                    ? disabledActionsTooltipText
+                    : ''
+                }
               />
             )}
           </React.Fragment>

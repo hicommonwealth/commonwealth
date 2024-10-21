@@ -62,7 +62,7 @@ const AdminContestsPage = () => {
   });
 
   const hasAtLeastOneWeightedVotingTopic = topicData?.some(
-    (t) => t.weightedVoting,
+    (t) => t.weighted_voting,
   );
 
   const { data: feeManagerBalance, isLoading: isFeeManagerBalanceLoading } =
@@ -130,7 +130,6 @@ const AdminContestsPage = () => {
               hasWeightedTopic={!!hasAtLeastOneWeightedVotingTopic}
               isContestAvailable={isContestAvailable}
               stakeEnabled={stakeEnabled}
-              feeManagerBalance={feeManagerBalance}
               onSetContestSelectionView={() =>
                 setContestView(ContestView.TypeSelection)
               }

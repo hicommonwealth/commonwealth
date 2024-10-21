@@ -1,4 +1,5 @@
 import { ChainBase } from '@hicommonwealth/shared';
+import clsx from 'clsx';
 import useAppStatus from 'hooks/useAppStatus';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
@@ -29,9 +30,9 @@ import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import { AuthModal } from 'views/modals/AuthModal';
 import NewCommunityAdminModal from 'views/modals/NewCommunityAdminModal';
-import { openConfirmation } from 'views/modals/confirmation_modal';
 import { communityTypeOptions } from 'views/pages/CreateCommunity/steps/CommunityTypeStep/helpers';
 import './TokenInformationForm.scss';
+import { triggerTokenLaunchFormAbort } from './helpers';
 import { FormSubmitValues, TokenInformationFormProps } from './types';
 import { tokenInformationFormValidationSchema } from './validation';
 
@@ -40,6 +41,8 @@ const TokenInformationForm = ({
   onCancel,
   onAddressSelected,
   selectedAddress,
+  containerClassName,
+  customFooter,
 }: TokenInformationFormProps) => {
   const user = useUserStore();
   const [baseOption] = communityTypeOptions;
@@ -123,30 +126,13 @@ const TokenInformationForm = ({
   }, [selectedAddress, handleSubmit]);
 
   const handleCancel = () => {
-    openConfirmation({
-      title: 'Are you sure you want to cancel?',
-      description: 'Your details will not be saved. Cancel create token flow?',
-      buttons: [
-        {
-          label: 'Yes, cancel',
-          buttonType: 'destructive',
-          buttonHeight: 'sm',
-          onClick: () => {
-            trackAnalytics({
-              event:
-                MixpanelCommunityCreationEvent.CREATE_TOKEN_COMMUNITY_CANCELLED,
-              isPWA: isAddedToHomeScreen,
-            });
+    triggerTokenLaunchFormAbort(() => {
+      trackAnalytics({
+        event: MixpanelCommunityCreationEvent.CREATE_TOKEN_COMMUNITY_CANCELLED,
+        isPWA: isAddedToHomeScreen,
+      });
 
-            onCancel();
-          },
-        },
-        {
-          label: 'No, continue',
-          buttonType: 'primary',
-          buttonHeight: 'sm',
-        },
-      ],
+      onCancel();
     });
   };
 
@@ -170,7 +156,7 @@ const TokenInformationForm = ({
       ref={formMethodsRef}
       validationSchema={tokenInformationFormValidationSchema}
       onSubmit={handleSubmit}
-      className="TokenInformationForm"
+      className={clsx('TokenInformationForm', containerClassName)}
     >
       <div>
         <CWLabel label="Launching On" />
@@ -189,23 +175,25 @@ const TokenInformationForm = ({
         />
       </div>
 
-      <CWTextInput
-        name="tokenName"
-        hookToForm
-        label="Token name"
-        placeholder="Name your token"
-        fullWidth
-        onInput={(e) => setTokenName(e.target.value?.trim())}
-        customError={isTokenNameTaken ? 'Token name is already taken' : ''}
-      />
+      <div className="grid-row">
+        <CWTextInput
+          name="tokenName"
+          hookToForm
+          label="Token name"
+          placeholder="Name your token"
+          fullWidth
+          onInput={(e) => setTokenName(e.target.value?.trim())}
+          customError={isTokenNameTaken ? 'Token name is already taken' : ''}
+        />
 
-      <CWTextInput
-        name="tokenTicker"
-        hookToForm
-        label="Ticker"
-        placeholder="ABCD"
-        fullWidth
-      />
+        <CWTextInput
+          name="tokenTicker"
+          hookToForm
+          label="Ticker"
+          placeholder="ABCD"
+          fullWidth
+        />
+      </div>
 
       <CWTextArea
         name="tokenDescription"
@@ -227,21 +215,25 @@ const TokenInformationForm = ({
       />
 
       {/* Action buttons */}
-      <section className="action-buttons">
-        <CWButton
-          type="button"
-          label="Cancel"
-          buttonWidth="wide"
-          buttonType="secondary"
-          onClick={handleCancel}
-        />
-        <CWButton
-          type="submit"
-          buttonWidth="wide"
-          label="Next"
-          disabled={isProcessingProfileImage}
-        />
-      </section>
+      {customFooter ? (
+        customFooter({ isProcessingProfileImage })
+      ) : (
+        <section className="action-buttons">
+          <CWButton
+            type="button"
+            label="Cancel"
+            buttonWidth="wide"
+            buttonType="secondary"
+            onClick={handleCancel}
+          />
+          <CWButton
+            type="submit"
+            buttonWidth="wide"
+            label="Next"
+            disabled={isProcessingProfileImage}
+          />
+        </section>
+      )}
 
       <CWModal
         size="small"

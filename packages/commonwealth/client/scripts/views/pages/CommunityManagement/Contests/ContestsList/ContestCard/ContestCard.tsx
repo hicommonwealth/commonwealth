@@ -33,38 +33,23 @@ const noFundsProps = {
   iconName: 'coins' as IconName,
 };
 
-const noUpvotesProps = {
-  title: 'There are no upvotes on this contest',
-  description: 'Upvote contest entries to display prizes',
-  iconName: 'upvote' as IconName,
-};
-
 interface ContestCardProps {
   address: string;
   name: string;
   imageUrl?: string;
   finishDate: string;
   topics: { id?: number; name?: string }[];
-  score?:
-    | {
-        creator_address?: string;
-        content_id?: string;
-        votes?: number;
-        prize?: string;
-        tickerPrize?: number;
-      }[]
-    | null;
   decimals?: number;
   ticker?: string;
   isAdmin: boolean;
   isCancelled?: boolean;
   onFund?: () => void;
-  feeManagerBalance?: string;
   isRecurring: boolean;
   showShareButton?: boolean;
   showLeaderboardButton?: boolean;
   isHorizontal?: boolean;
   isFarcaster?: boolean;
+  payoutStructure?: number[];
 }
 
 const ContestCard = ({
@@ -73,18 +58,17 @@ const ContestCard = ({
   imageUrl,
   finishDate,
   topics,
-  score,
   decimals,
   ticker,
   isAdmin,
   isCancelled,
   onFund,
-  feeManagerBalance,
   isRecurring,
   showShareButton = true,
   showLeaderboardButton = true,
   isHorizontal = false,
   isFarcaster = false,
+  payoutStructure,
 }: ContestCardProps) => {
   const navigate = useCommonNavigate();
   const user = useUserStore();
@@ -102,12 +86,21 @@ const ContestCard = ({
 
   const { isWindowMediumSmallInclusive } = useBrowserWindow({});
 
-  const { data: oneOffContestBalance } = useGetContestBalanceQuery({
+  const { data: contestBalance } = useGetContestBalanceQuery({
     contestAddress: address,
     chainRpc: app.chain.meta?.ChainNode?.url || '',
     ethChainId: app.chain.meta?.ChainNode?.eth_chain_id || 0,
-    apiEnabled: !isRecurring,
+    isOneOff: !isRecurring,
   });
+
+  const prizes =
+    contestBalance && payoutStructure
+      ? payoutStructure.map(
+          (percentage) =>
+            (contestBalance * (percentage / 100)) /
+            Math.pow(10, decimals || 18),
+        )
+      : [];
 
   const handleCancel = () => {
     cancelContest({
@@ -157,12 +150,7 @@ const ContestCard = ({
     console.log('Frame copied!');
   };
 
-  const balance = isRecurring
-    ? feeManagerBalance
-    : String(oneOffContestBalance);
-
-  const showNoFundsInfo = isActive && parseFloat(balance!) <= 0;
-  const showNoUpvotesInfo = isActive && (!score || score.length === 0);
+  const showNoFundsInfo = isActive && (contestBalance || 0) <= 0;
 
   return (
     <CWCard
@@ -205,27 +193,20 @@ const ContestCard = ({
                   : 'Fund this contest to display prizes'
               }
             />
-          ) : showNoUpvotesInfo ? (
-            <ContestAlert {...noUpvotesProps} />
           ) : (
             <>
               <CWText className="prizes-header" fontWeight="bold">
                 Current Prizes
               </CWText>
               <div className="prizes">
-                {score ? (
-                  score?.map((s, index) => (
-                    <div className="prize-row" key={s.content_id}>
+                {prizes ? (
+                  prizes?.map((prize, index) => (
+                    <div className="prize-row" key={index}>
                       <CWText className="label">
                         {moment.localeData().ordinal(index + 1)} Prize
                       </CWText>
                       <CWText fontWeight="bold">
-                        {capDecimals(
-                          s.tickerPrize
-                            ? s.tickerPrize?.toFixed(decimals || 18)
-                            : '',
-                        )}
-                        {ticker}
+                        {capDecimals(String(prize))} {ticker}
                       </CWText>
                     </div>
                   ))

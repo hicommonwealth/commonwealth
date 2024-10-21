@@ -23,6 +23,8 @@ const SignStakeTransactions = ({
   isTopicFlow,
   onSuccess,
   onCancel,
+  onlyNamespace,
+  hasNamespaceReserved,
 }: SignStakeTransactionsProps) => {
   const { handleReserveCommunityNamespace, reserveNamespaceData } =
     useReserveCommunityNamespace({
@@ -31,6 +33,8 @@ const SignStakeTransactions = ({
       symbol: communityStakeData.symbol,
       userAddress: selectedAddress.address,
       chainId,
+      onSuccess: onlyNamespace ? onSuccess : undefined,
+      hasNamespaceReserved,
     });
 
   const { handleLaunchCommunityStake, launchStakeData } =
@@ -59,22 +63,26 @@ const SignStakeTransactions = ({
           onClick: handleReserveCommunityNamespace,
         },
       },
-      {
-        label: 'Launch community stake',
-        state: launchStakeData.state,
-        errorText: launchStakeData.errorText,
-        ...(reserveNamespaceData.state === 'completed'
-          ? {
-              actionButton: {
-                label: 'Sign',
-                disabled:
-                  launchStakeData.state === 'loading' ||
-                  launchStakeData.state === 'completed',
-                onClick: handleLaunchCommunityStake,
-              },
-            }
-          : {}),
-      },
+      ...(onlyNamespace
+        ? []
+        : [
+            {
+              label: 'Launch community stake',
+              state: launchStakeData.state,
+              errorText: launchStakeData.errorText,
+              ...(reserveNamespaceData.state === 'completed'
+                ? {
+                    actionButton: {
+                      label: 'Sign',
+                      disabled:
+                        launchStakeData.state === 'loading' ||
+                        launchStakeData.state === 'completed',
+                      onClick: handleLaunchCommunityStake,
+                    },
+                  }
+                : {}),
+            },
+          ]),
     ];
   };
 
@@ -83,8 +91,9 @@ const SignStakeTransactions = ({
       ? onCancel()
       : openConfirmation({
           title: 'Are you sure you want to cancel?',
-          description:
-            'Community Stake has not been enabled for your community yet',
+          description: onlyNamespace
+            ? 'Namespace has not been enabled for your community yet'
+            : 'Community Stake has not been enabled for your community yet',
           buttons: [
             {
               label: 'Cancel',
@@ -108,12 +117,22 @@ const SignStakeTransactions = ({
   return (
     <div className="SignStakeTransactions">
       <section className="header">
-        <CWText type="h2">Sign transactions to launch stake?</CWText>
+        <CWText type="h2">
+          {onlyNamespace
+            ? 'Sign transactions to reserve namespace'
+            : 'Sign transactions to launch stake?'}
+        </CWText>
         <CWText type="b1" className="description">
-          In order to launch community stake you will need to sign two
-          transactions. The first launches your community namespace on the
-          blockchain, and the second launches your community stake. Both
-          transactions have associated gas fees.
+          {onlyNamespace ? (
+            'In order to reserve namespace you will need to sign one transaction.'
+          ) : (
+            <>
+              In order to launch community stake you will need to sign two
+              transactions. The first launches your community namespace on the
+              blockchain, and the second launches your community stake. Both
+              transactions have associated gas fees.
+            </>
+          )}
         </CWText>
 
         <Hint className="mobile" />

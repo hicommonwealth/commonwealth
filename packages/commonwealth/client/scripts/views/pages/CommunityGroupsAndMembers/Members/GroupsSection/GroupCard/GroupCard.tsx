@@ -1,5 +1,4 @@
 import useBrowserWindow from 'hooks/useBrowserWindow';
-import MinimumProfile from 'models/MinimumProfile';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Avatar } from 'views/components/Avatar';
@@ -9,32 +8,13 @@ import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import { formatAddressShort } from '../../../../../../helpers';
 import CWPagination from '../../../../../components/component_kit/new_designs/CWPagination/CWPagination';
+import { convertGranularPermissionsToAccumulatedPermissions } from '../../../Groups/common/GroupForm/helpers';
 import './GroupCard.scss';
 import RequirementCard from './RequirementCard/RequirementCard';
-
-type RequirementCardProps = {
-  requirementType: string;
-  requirementChain: string;
-  requirementContractAddress?: string;
-  requirementCondition: string;
-  requirementAmount: string;
-  requirementTokenId?: string;
-};
-
-type GroupCardProps = {
-  isJoined?: boolean;
-  groupName: string;
-  groupDescription?: string;
-  requirements?: RequirementCardProps[]; // This represents erc requirements
-  requirementsToFulfill: 'ALL' | number;
-  allowLists?: string[];
-  topics: { id: number; name: string }[];
-  canEdit?: boolean;
-  onEditClick?: () => any;
-  profiles?: Map<string, MinimumProfile>;
-};
+import { GroupCardProps } from './types';
 
 const ALLOWLIST_MEMBERS_PER_PAGE = 7;
+
 const GroupCard = ({
   isJoined,
   groupName,
@@ -163,9 +143,26 @@ const GroupCard = ({
       {topics.length > 0 && (
         <>
           <CWText type="h5">Gated Topics</CWText>
-          <div className="gating-tags">
+          <div className="gating-topics">
+            <div className="row">
+              <CWText type="b2">Topic</CWText>
+              <CWText type="b2">Permission</CWText>
+            </div>
             {topics.map((t, index) => (
-              <CWTag key={index} label={t.name} type="referendum" />
+              <div key={index}>
+                <CWDivider className="divider-spacing" />
+                <div className="row">
+                  <CWText type="b2">{t.name}</CWText>
+
+                  <CWTag
+                    label={convertGranularPermissionsToAccumulatedPermissions(
+                      t.permissions || [],
+                    )}
+                    type="referendum"
+                  />
+                </div>
+                <CWDivider className="divider-spacing" />
+              </div>
             ))}
           </div>
         </>

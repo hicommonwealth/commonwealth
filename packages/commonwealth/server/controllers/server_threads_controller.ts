@@ -1,4 +1,4 @@
-import { DB, GlobalActivityCache } from '@hicommonwealth/model';
+import { DB } from '@hicommonwealth/model';
 import {
   CountThreadsOptions,
   CountThreadsResult,
@@ -34,10 +34,7 @@ import {
  * Implements methods related to threads
  */
 export class ServerThreadsController {
-  constructor(
-    public models: DB,
-    public globalActivityCache?: GlobalActivityCache,
-  ) {}
+  constructor(public models: DB) {}
 
   async getThreadsByIds(
     this: ServerThreadsController,

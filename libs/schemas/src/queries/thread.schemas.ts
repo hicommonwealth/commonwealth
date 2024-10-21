@@ -2,9 +2,9 @@ import { z } from 'zod';
 import { Thread } from '../entities';
 import {
   DiscordMetaSchema,
+  PG_INT,
   linksSchema,
   paginationSchema,
-  PG_INT,
 } from '../utils';
 
 export const OrderByQueriesKeys = z.enum([
