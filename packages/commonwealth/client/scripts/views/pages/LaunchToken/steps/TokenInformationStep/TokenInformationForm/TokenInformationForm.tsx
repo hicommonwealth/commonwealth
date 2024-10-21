@@ -39,6 +39,7 @@ import { tokenInformationFormValidationSchema } from './validation';
 const TokenInformationForm = ({
   onSubmit,
   onCancel,
+  onFormUpdate,
   onAddressSelected,
   selectedAddress,
   containerClassName,
@@ -176,6 +177,7 @@ const TokenInformationForm = ({
       // @ts-expect-error <StrictNullChecks/>
       ref={formMethodsRef}
       onSubmit={handleSubmit}
+      onWatch={onFormUpdate}
       validationSchema={tokenInformationFormValidationSchema}
       className={clsx('TokenInformationForm', containerClassName)}
     >

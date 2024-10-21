@@ -12,6 +12,7 @@ export type FormSubmitValues = {
 export type TokenInformationFormProps = {
   onSubmit: (values: FormSubmitValues) => void;
   onCancel: () => void;
+  onFormUpdate?: (values: FormSubmitValues) => void;
   selectedAddress?: AddressInfo;
   onAddressSelected: (address: AddressInfo) => void;
   containerClassName?: string;

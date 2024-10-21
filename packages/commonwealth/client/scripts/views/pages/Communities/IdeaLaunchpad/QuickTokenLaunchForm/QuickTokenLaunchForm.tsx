@@ -3,7 +3,7 @@ import clsx from 'clsx';
 import { notifyError } from 'controllers/app/notifications';
 import useBeforeUnload from 'hooks/useBeforeUnload';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { slugifyPreserveDashes } from 'shared/utils';
 import { useUpdateCommunityMutation } from 'state/api/communities';
 import useCreateCommunityMutation, {
@@ -43,6 +43,7 @@ export const QuickTokenLaunchForm = ({
   initialIdeaPrompt,
   generateIdeaOnMount = false,
 }: QuickTokenLaunchFormProps) => {
+  const timeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
   const {
     generateIdea,
     tokenIdeas,
@@ -50,6 +51,7 @@ export const QuickTokenLaunchForm = ({
     generatedTokenIdea,
     isMaxTokenIdeaLimitReached,
     setActiveTokenIdeaIndex,
+    updateTokenIdeaByIndex,
   } = useGenerateTokenIdea({
     maxIdeasLimit: MAX_IDEAS_LIMIT,
   });
@@ -268,6 +270,34 @@ export const QuickTokenLaunchForm = ({
     handleAsync().catch(console.error);
   };
 
+  const handleFormUpdates = (values: FormSubmitValues) => {
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+
+    const timeout = setTimeout(() => {
+      const isSameValues =
+        values.name === generatedTokenIdea?.token?.name &&
+        values.symbol === generatedTokenIdea?.token?.symbol &&
+        values.description === generatedTokenIdea?.token?.description;
+      if (generatedTokenIdea?.isChunking || isSameValues) {
+        timeoutRef.current = undefined;
+        return;
+      }
+
+      updateTokenIdeaByIndex(
+        {
+          description: values.description,
+          imageURL: values.imageURL,
+          name: values.name,
+          symbol: values.symbol,
+        },
+        activeTokenIdeaIndex,
+      );
+
+      timeoutRef.current = undefined;
+    }, 1000);
+    timeoutRef.current = timeout;
+  };
+
   return (
     <div className="QuickTokenLaunchForm">
       {!createdCommunityId && (
@@ -291,6 +321,7 @@ export const QuickTokenLaunchForm = ({
           openAddressSelectorOnMount={false}
           formDisabled={generatedTokenIdea?.isChunking}
           onCancel={onCancel}
+          onFormUpdate={handleFormUpdates}
           onSubmit={handleSubmit}
           {...(generatedTokenIdea?.chunkingField && {
             focusField: generatedTokenIdea.chunkingField,

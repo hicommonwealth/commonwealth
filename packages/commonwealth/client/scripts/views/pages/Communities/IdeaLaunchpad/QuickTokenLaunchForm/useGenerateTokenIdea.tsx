@@ -164,6 +164,21 @@ export const useGenerateTokenIdea = ({
     }
   };
 
+  const updateTokenIdeaByIndex = (token: TokenIdea, ideaIndex: number) => {
+    // if this is the first idea/draft, count should be updated for adding
+    // randomized idea generation in the next index when that is generated
+    if (totalIdeasGenerated.current === 0) totalIdeasGenerated.current += 1;
+
+    setTokenIdeas((ti) => {
+      const temp = [...ti];
+      temp[ideaIndex] = {
+        ...(temp[ideaIndex] || {}),
+        token,
+      };
+      return temp;
+    });
+  };
+
   return {
     activeTokenIdeaIndex,
     setActiveTokenIdeaIndex,
@@ -171,5 +186,6 @@ export const useGenerateTokenIdea = ({
     generateIdea,
     generatedTokenIdea,
     isMaxTokenIdeaLimitReached,
+    updateTokenIdeaByIndex,
   };
 };
