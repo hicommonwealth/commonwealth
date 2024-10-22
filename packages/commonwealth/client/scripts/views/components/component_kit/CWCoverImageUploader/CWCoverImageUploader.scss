@@ -77,6 +77,20 @@
       }
     }
 
+    .switch-left-btn,
+    .switch-right-btn {
+      position: absolute;
+      z-index: 1;
+      top: calc(50% - 16px);
+    }
+
+    .switch-left-btn {
+      left: 12px;
+    }
+    .switch-right-btn {
+      right: 12px;
+    }
+
     .generate-img-btn {
       z-index: 1;
 

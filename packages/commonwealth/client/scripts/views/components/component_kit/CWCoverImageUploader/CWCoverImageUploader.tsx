@@ -24,6 +24,8 @@ export const CWCoverImageUploader = ({
   onImageGenerated,
   onImageUploaded,
   onImageProcessingChange,
+  onProcessedImagesListChange,
+  canSwitchBetweenProcessedImages,
   // image behavior props
   canSelectImageBehavior = false,
   onImageBehaviorChange,
@@ -44,9 +46,11 @@ export const CWCoverImageUploader = ({
         disabled={disabled}
         imageBehavior={imageBehavior}
         uploadControlClassName={uploadControlClassName}
+        canSwitchBetweenProcessedImages={canSwitchBetweenProcessedImages}
         onImageGenerated={onImageGenerated}
         onImageUploaded={onImageUploaded}
         onImageProcessingChange={onImageProcessingChange}
+        onProcessedImagesListChange={onProcessedImagesListChange}
       />
       <ImageBehaviorSelector
         imageBehavior={imageBehavior}

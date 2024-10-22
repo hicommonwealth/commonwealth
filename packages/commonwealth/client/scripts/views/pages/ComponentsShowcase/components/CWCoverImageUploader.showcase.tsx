@@ -56,9 +56,6 @@ const CWCoverImageUploaderShowCase = () => {
                 hookToForm
                 imageBehavior={imageBehavior}
                 onImageBehaviorChange={setImageBehavior}
-                onImageGenerated={console.log}
-                onImageUploaded={console.log}
-                onImageProcessingChange={console.log}
               />
               <CWButton
                 label="Trigger manual image update"
@@ -78,6 +75,20 @@ const CWCoverImageUploaderShowCase = () => {
             </>
           )}
         </CWForm>
+      </div>
+      <CWText type="h5">Switch b/w processed images</CWText>
+      <div className="flex-row">
+        <CWCoverImageUploader
+          withAIImageGeneration
+          canSelectImageBehavior
+          imageURL={sampleImageUrl}
+          imageBehavior={imageBehavior}
+          onImageBehaviorChange={setImageBehavior}
+          onProcessedImagesListChange={(processedImages) =>
+            console.log('processedImages => ', processedImages)
+          }
+          canSwitchBetweenProcessedImages={true}
+        />
       </div>
       <CWText type="h5">Disabled</CWText>
       <div className="flex-row">

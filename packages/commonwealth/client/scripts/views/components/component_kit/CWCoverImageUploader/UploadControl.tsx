@@ -1,6 +1,7 @@
 import clsx from 'clsx';
 import { notifyError } from 'controllers/app/notifications';
 import useBrowserWindow from 'hooks/useBrowserWindow';
+import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import useGenerateImageMutation from 'state/api/general/generateImage';
@@ -14,6 +15,15 @@ import { CWTextInput } from '../new_designs/CWTextInput';
 import { MessageRow } from '../new_designs/CWTextInput/MessageRow';
 import { ImageBehavior } from './types';
 
+type ImageProcessed = {
+  url: string;
+  isGenerated: boolean;
+  isUploaded: boolean;
+  isProvidedViaProps: boolean;
+  isProvidedViaFormState: boolean;
+  unixTimestamp: number;
+};
+
 type ImageProcessingProps = {
   isGenerating: boolean;
   isUploading: boolean;
@@ -22,8 +32,11 @@ type ImageProcessingProps = {
 export type UploadControlProps = {
   imageURL?: string;
   onImageProcessingChange?: (process: ImageProcessingProps) => void;
+  onProcessedImagesListChange?: (processedImages: ImageProcessed[]) => void;
   onImageGenerated?: (generatedImageUrl: string) => void;
   onImageUploaded?: (uploadedImageURL: string) => void;
+  canSwitchBetweenProcessedImages?: boolean;
+  processedImages?: ImageProcessed[];
   withAIImageGeneration?: boolean;
   disabled?: boolean;
   name?: string;
@@ -40,9 +53,12 @@ export const UploadControl = ({
   disabled,
   imageBehavior = ImageBehavior.Circle,
   uploadControlClassName,
+  canSwitchBetweenProcessedImages,
+  processedImages: providedProcessedImages,
   onImageProcessingChange,
   onImageGenerated,
   onImageUploaded,
+  onProcessedImagesListChange,
 }: UploadControlProps) => {
   const imageInputRef = useRef<HTMLInputElement>(null);
   const dropzoneRef = useRef<HTMLDivElement>(null);
@@ -51,6 +67,9 @@ export const UploadControl = ({
   const [imagePrompt, setImagePrompt] = useState('');
   const [isImageGenerationSectionOpen, setIsImageGenerationSectionOpen] =
     useState(false);
+  const [processedImages, setProcessedImages] = useState<ImageProcessed[]>([]);
+  const [activeImageIndex, setActiveImageIndex] = useState(-1);
+  const processedImagesRef = useRef(processedImages);
 
   const formContext = useFormContext();
   const isHookedToForm = name && hookToForm;
@@ -71,10 +90,38 @@ export const UploadControl = ({
     formContextRef.current = isHookedToForm ? { formContext, name } : null;
   }, [isHookedToForm, formContext, name]);
 
+  // use this hook for any props that can rapidly change but have the same value as last time
+  useNecessaryEffect(() => {
+    // this will override any current processing of images in local state
+    if (providedProcessedImages) {
+      setProcessedImages(providedProcessedImages);
+      setActiveImageIndex(providedProcessedImages.length - 1);
+    }
+  }, [providedProcessedImages]);
+
   // update `imageToRender` from formContext whenever it changes (if component is hooked to form)
   useEffect(() => {
     if (formFieldValue !== imageToRender && formFieldValue !== null) {
       setImageToRender(formFieldValue);
+      if (formFieldValue) {
+        const shouldUpdate =
+          processedImagesRef.current.findIndex(
+            (i) => i.url === formFieldValue.trim(),
+          ) === -1;
+        if (shouldUpdate) {
+          setProcessedImages((images) => [
+            ...images,
+            {
+              url: formFieldValue,
+              isGenerated: false,
+              isUploaded: false,
+              isProvidedViaProps: false,
+              isProvidedViaFormState: true,
+              unixTimestamp: new Date().getTime(),
+            },
+          ]);
+        }
+      }
 
       // reset errors if there are any
       if ((formFieldValue || imageToRender) && formContextRef.current) {
@@ -105,7 +152,8 @@ export const UploadControl = ({
     onSuccess: onImageGenerated,
   });
 
-  useEffect(() => {
+  // use this hook for any props that can rapidly change but have the same value as last time
+  useNecessaryEffect(() => {
     // this will override any image that is shown, if an image is being uploaded or generated
     // then that generated/uploaded image will override this one, once that is finished
     if (imageURL) {
@@ -117,6 +165,23 @@ export const UploadControl = ({
         );
       }
       setImageToRender(imageURL);
+      const shouldUpdate =
+        processedImagesRef.current.findIndex(
+          (i) => i.url === imageURL.trim(),
+        ) === -1;
+      if (shouldUpdate) {
+        setProcessedImages((images) => [
+          ...images,
+          {
+            url: imageURL,
+            isGenerated: false,
+            isUploaded: false,
+            isProvidedViaProps: true,
+            isProvidedViaFormState: false,
+            unixTimestamp: new Date().getTime(),
+          },
+        ]);
+      }
     }
   }, [imageURL]);
 
@@ -130,6 +195,23 @@ export const UploadControl = ({
         );
       }
       setImageToRender(uploadedImageURL);
+      const shouldUpdate =
+        processedImagesRef.current.findIndex(
+          (i) => i.url === uploadedImageURL.trim(),
+        ) === -1;
+      if (shouldUpdate) {
+        setProcessedImages((images) => [
+          ...images,
+          {
+            url: uploadedImageURL,
+            isGenerated: false,
+            isUploaded: true,
+            isProvidedViaProps: false,
+            isProvidedViaFormState: false,
+            unixTimestamp: new Date().getTime(),
+          },
+        ]);
+      }
     }
   }, [uploadedImageURL]);
 
@@ -150,6 +232,23 @@ export const UploadControl = ({
         );
       }
       setImageToRender(generatedImageURL);
+      const shouldUpdate =
+        processedImagesRef.current.findIndex(
+          (i) => i.url === generatedImageURL.trim(),
+        ) === -1;
+      if (shouldUpdate) {
+        setProcessedImages((images) => [
+          ...images,
+          {
+            url: generatedImageURL,
+            isGenerated: true,
+            isUploaded: false,
+            isProvidedViaProps: false,
+            isProvidedViaFormState: false,
+            unixTimestamp: new Date().getTime(),
+          },
+        ]);
+      }
     }
   }, [generatedImageURL]);
 
@@ -165,6 +264,20 @@ export const UploadControl = ({
         isUploading: isUploadingImage,
       });
   }, [onImageProcessingChange, isGeneratingImage, isUploadingImage]);
+
+  const onProcessedImagesListChangeRef = useRef(onProcessedImagesListChange);
+
+  useEffect(() => {
+    onProcessedImagesListChangeRef.current = onProcessedImagesListChange;
+  }, [onProcessedImagesListChange]);
+
+  useEffect(() => {
+    processedImagesRef.current = processedImages;
+    setActiveImageIndex(processedImages.length - 1);
+
+    processedImages.length > 0 &&
+      onProcessedImagesListChangeRef.current?.(processedImages);
+  }, [processedImages]);
 
   const isLoading = isUploadingImage || isGeneratingImage;
   const areActionsDisabled = disabled || !imageInputRef.current || isLoading;
@@ -251,6 +364,18 @@ export const UploadControl = ({
     };
   }, [handleFileDrag]);
 
+  const updateActiveImageIndex = (index: number) => {
+    if (formContextRef.current?.formContext && formContextRef.current?.name) {
+      formContextRef.current.formContext.setValue(
+        formContextRef.current?.name,
+        processedImages[index].url,
+        { shouldDirty: true },
+      );
+    }
+
+    setActiveImageIndex(index);
+  };
+
   return (
     <div
       role="button"
@@ -289,10 +414,10 @@ export const UploadControl = ({
         </div>
       ) : (
         <>
-          {imageToRender ? (
+          {processedImages?.[activeImageIndex]?.url ? (
             <img
-              key={imageToRender}
-              src={imageToRender}
+              key={processedImages?.[activeImageIndex]?.url}
+              src={processedImages?.[activeImageIndex]?.url}
               className={`img-${imageBehavior}`}
             />
           ) : (
@@ -310,6 +435,36 @@ export const UploadControl = ({
               >
                 {placeholder}
               </CWText>
+            </>
+          )}
+
+          {canSwitchBetweenProcessedImages && activeImageIndex >= 0 && (
+            <>
+              <CWIconButton
+                iconName="caretLeft"
+                disabled={areActionsDisabled || activeImageIndex === 0}
+                className="switch-left-btn"
+                buttonSize="lg"
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  updateActiveImageIndex(activeImageIndex - 1);
+                }}
+              />
+              <CWIconButton
+                iconName="caretRight"
+                disabled={
+                  areActionsDisabled ||
+                  activeImageIndex === processedImages.length - 1
+                }
+                className="switch-right-btn"
+                buttonSize="lg"
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  updateActiveImageIndex(activeImageIndex + 1);
+                }}
+              />
             </>
           )}
 
@@ -349,6 +504,7 @@ export const UploadControl = ({
             buttonSize="sm"
             className="close-btn"
             disabled={areActionsDisabled}
+            type="button"
           />
           <CWTextInput
             autoFocus={true}
