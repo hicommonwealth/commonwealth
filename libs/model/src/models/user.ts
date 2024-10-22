@@ -1,4 +1,5 @@
-import { User } from '@hicommonwealth/schemas';
+import { getRandomAvatar } from '@hicommonwealth/model';
+import { User, UserProfile } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize';
 import { z } from 'zod';
 import type { AddressAttributes, AddressInstance } from './address';
@@ -94,6 +95,20 @@ export default (sequelize: Sequelize.Sequelize): UserModelStatic =>
       },
       scopes: {
         withPrivateData: {},
+      },
+      validate: {
+        definedAvatarUrl() {
+          if (!(this.profile as z.infer<typeof UserProfile>)?.avatar_url) {
+            throw new Error('profile.avatar_url must be defined');
+          }
+        },
+      },
+      hooks: {
+        beforeValidate(instance: UserInstance) {
+          if (!instance.profile.avatar_url) {
+            instance.profile.avatar_url = getRandomAvatar();
+          }
+        },
       },
     },
   );
