@@ -154,6 +154,7 @@ export interface ThreadVersionHistory {
   address: string;
   body: string;
   timestamp: string;
+  content_url: string;
 }
 
 export interface IThreadCollaborator {
@@ -203,6 +204,7 @@ export type RecentComment = {
   profile_name?: string;
   profile_avatar?: string;
   user_id: string;
+  content_url?: string | null;
 };
 
 export enum LinkSource {
@@ -267,6 +269,7 @@ export class Thread implements IUniqueId {
   public links: Link[];
   public readonly discord_meta: any;
   public readonly latestActivity: Moment;
+  public contentUrl: string | null;
 
   public readonly profile: UserProfile;
 
@@ -320,6 +323,7 @@ export class Thread implements IUniqueId {
     associatedContests,
     recentComments,
     ContestActions,
+    content_url,
   }: {
     marked_as_spam_at: string;
     title: string;
@@ -366,6 +370,7 @@ export class Thread implements IUniqueId {
     associatedContests?: AssociatedContest[];
     recentComments: RecentComment[];
     ContestActions: ContestActionT[];
+    content_url: string | null;
   }) {
     this.author = Address?.address;
     this.title = getDecodedString(title);
@@ -427,6 +432,7 @@ export class Thread implements IUniqueId {
       associatedContests,
       ContestActions,
     );
+    this.contentUrl = content_url;
     this.recentComments = (recentComments || []).map(
       (rc) =>
         new Comment({
@@ -459,6 +465,7 @@ export class Thread implements IUniqueId {
           reaction_weights_sum: '0',
           canvas_signed_data: null,
           canvas_msg_id: null,
+          content_url: rc.content_url || null,
         }),
     );
     this.latestActivity = last_commented_on
