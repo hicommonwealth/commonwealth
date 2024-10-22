@@ -35,6 +35,7 @@ export const UploadControl = ({
     registeredFormContext,
     dropzoneRef,
     imageInputRef,
+    setImageInputRefUpdated,
     processedImages,
     activeImageIndex,
     isWindowExtraSmall,
@@ -88,7 +89,12 @@ export const UploadControl = ({
         type="file"
         accept="image/jpeg, image/jpg, image/png"
         className="file-input"
-        ref={imageInputRef}
+        ref={(el) => {
+          if (!imageInputRef.current) {
+            imageInputRef.current = el;
+            setImageInputRefUpdated(true);
+          }
+        }}
         disabled={areActionsDisabled}
       />
       {isHookedToForm && registeredFormContext && (

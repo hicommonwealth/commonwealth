@@ -19,7 +19,8 @@ export const useUploadControl = ({
   onImageUploaded,
   onProcessedImagesListChange,
 }: UploadControlProps) => {
-  const imageInputRef = useRef<HTMLInputElement>(null);
+  const imageInputRef = useRef<HTMLInputElement | null>(null);
+  const [, setImageInputRefUpdated] = useState<boolean>(false); // sometimes the input ref doesnt get set in time
   const dropzoneRef = useRef<HTMLDivElement>(null);
   const [isDraggingFile, setIsDraggingFile] = useState(false);
   const [imagePrompt, setImagePrompt] = useState('');
@@ -368,5 +369,6 @@ export const useUploadControl = ({
     isImageGenerationSectionOpen,
     imagePrompt,
     generateImage,
+    setImageInputRefUpdated,
   };
 };
