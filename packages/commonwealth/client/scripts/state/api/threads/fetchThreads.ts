@@ -51,7 +51,6 @@ interface FetchBulkThreadsProps extends CommonProps {
 
 interface FetchThreadCountProps extends CommonProps {
   queryType: typeof QueryTypes.COUNT;
-  limit?: number;
 }
 
 interface FetchActiveThreadsProps extends CommonProps {
@@ -135,7 +134,7 @@ const getFetchThreadsQueryKey = (props) => {
     ];
   }
   if (isFetchThreadCountProps(props)) {
-    return [ApiEndpoints.FETCH_THREADS, props.communityId, props.limit];
+    return [ApiEndpoints.FETCH_THREADS, props.communityId];
   }
 };
 
@@ -219,7 +218,6 @@ const fetchThreadCount = (props) => {
       {
         params: {
           community_id: props.communityId,
-          limit: props.limit,
           count: true,
         },
       },

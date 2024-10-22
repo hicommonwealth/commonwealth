@@ -164,3 +164,10 @@ export const DEPRECATED_GetBulkThreads = z.object({
   status: z.string().optional(),
   withXRecentComments: z.coerce.number().optional(),
 });
+
+export const GetThreadCount = {
+  input: z.object({
+    community_id: z.string(),
+  }),
+  output: z.number(),
+};

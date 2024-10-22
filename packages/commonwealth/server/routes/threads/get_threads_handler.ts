@@ -180,10 +180,13 @@ export const getThreadsHandler = async (
 
   // count threads
   if (count) {
-    const { limit } = req.query as CountThreadsRequestQuery;
-    const countResult = await controllers.threads.countThreads({
-      communityId: community_id,
-      limit,
+    const countResult = await query(Thread.GetThreadCount(), {
+      actor: {
+        user: { email: '' },
+      },
+      payload: {
+        community_id,
+      },
     });
     return success(res, { count: countResult });
   }

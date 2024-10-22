@@ -94,7 +94,7 @@ export const AdminOnboardingSlider = () => {
       enabled: !!communityId,
     });
 
-  const { data: threadCount = [], isLoading: isLoadingThreads = false } =
+  const { data: threadCount = 0, isLoading: isLoadingThreads = false } =
     useFetchThreadsQuery({
       communityId,
       queryType: 'count',
