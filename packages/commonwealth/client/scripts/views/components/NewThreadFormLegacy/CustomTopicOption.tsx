@@ -6,11 +6,13 @@ import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 interface CustomTopicOptionProps {
   originalProps: OptionProps<{ value: string; label: string }>;
   topic?: Topic;
+  helpText?: string;
 }
 
 const CustomTopicOption = ({
   originalProps,
   topic,
+  helpText,
 }: CustomTopicOptionProps) => {
   return (
     // @ts-expect-error <StrictNullChecks/>
@@ -19,6 +21,7 @@ const CustomTopicOption = ({
         <CWIcon iconName="trophy" iconSize="small" />
       )}
       {originalProps.label}
+      {helpText && <span className="help-text-container">{helpText}</span>}
     </components.Option>
   );
 };
