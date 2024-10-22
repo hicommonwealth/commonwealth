@@ -7,9 +7,12 @@ import {
   IS_SUBSCRIPT,
   IS_SUPERSCRIPT,
   IS_UNDERLINE,
+  linkDialogState$,
   Separator,
+  useCellValues,
 } from 'commonwealth-mdxeditor';
 import React from 'react';
+import { CustomLinkDialogForDesktop } from 'views/components/MarkdownEditor/CustomLinkDialogForDesktop';
 import { CreateLinkButton } from 'views/components/MarkdownEditor/toolbars/CreateLinkButton';
 import { FormatButton } from 'views/components/MarkdownEditor/toolbars/FormatButton';
 import { HeadingButton } from 'views/components/MarkdownEditor/toolbars/HeadingButton';
@@ -26,6 +29,13 @@ type ToolbarForDesktopProps = Readonly<{
 
 export const ToolbarForDesktop = (props: ToolbarForDesktopProps) => {
   const { onImage } = props;
+
+  const [linkDialogState] = useCellValues(linkDialogState$);
+
+  if (linkDialogState.type !== 'inactive') {
+    // do not use a toolbar when the link dialog is active.
+    return <CustomLinkDialogForDesktop />;
+  }
 
   return (
     <>

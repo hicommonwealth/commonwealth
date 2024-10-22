@@ -17,7 +17,7 @@ export type UsePopoverProps = {
   anchorEl: AnchorType;
   id: string;
   open: boolean;
-  setAnchorEl: React.Dispatch<React.SetStateAction<AnchorType>>;
+  setAnchorEl: React.Dispatch<React.SetStateAction<AnchorType>> | DOMRect;
   handleInteraction: (e: React.MouseEvent<AnchorType>) => void;
 
   /**
