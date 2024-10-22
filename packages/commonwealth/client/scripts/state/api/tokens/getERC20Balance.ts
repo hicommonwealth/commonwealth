@@ -16,7 +16,7 @@ const getERC20Balance = async ({
 }: UseGetERC20BalanceQueryProps) => {
   const helper = new ERC20Helper(tokenAddress, nodeRpc);
 
-  return helper.getBalance(userAddress);
+  return await helper.getBalance(userAddress);
 };
 
 const useGetERC20BalanceQuery = ({
@@ -27,7 +27,7 @@ const useGetERC20BalanceQuery = ({
   return useQuery({
     queryKey: [userAddress, tokenAddress, nodeRpc],
     queryFn: () => getERC20Balance({ userAddress, tokenAddress, nodeRpc }),
-    enabled: !!tokenAddress && userAddress && !!nodeRpc,
+    enabled: !!tokenAddress && !!userAddress && !!nodeRpc,
     staleTime: GET_ERC20_BALANCE_STALE_TIME,
     retry: false,
   });

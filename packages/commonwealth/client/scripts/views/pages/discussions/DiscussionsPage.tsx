@@ -195,7 +195,11 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
 
   const voteWeight =
     isTopicWeighted && erc20Balance
-      ? String((topicObj?.vote_weight_multiplier * erc20Balance).toFixed(0))
+      ? String(
+          (
+            (topicObj?.vote_weight_multiplier || 1) * Number(erc20Balance)
+          ).toFixed(0),
+        )
       : '';
 
   return (
