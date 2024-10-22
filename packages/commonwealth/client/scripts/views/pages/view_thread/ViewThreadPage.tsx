@@ -371,11 +371,11 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
       : getMetaDescription(thread?.body || '');
   const ogImageUrl = app?.chain?.meta?.icon_url || '';
 
-  const ScrollToLastComment = () => {
+  const scrollToFirstComment = () => {
     if (commentsRef?.current) {
       commentsRef.current.scrollIntoView({
         behavior: 'smooth',
-        block: 'center',
+        block: 'start',
       });
     }
   };
@@ -468,7 +468,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
             isAuthor ||
             !!hasWebLinks
           }
-          onCommentClick={ScrollToLastComment}
+          onCommentClick={scrollToFirstComment}
           // @ts-expect-error <StrictNullChecks/>
           isSpamThread={!!thread.markedAsSpamAt}
           title={
@@ -643,7 +643,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           comments={
             <>
               {comments.length > 0 && (
-                <div className="comments-filter-row">
+                <div className="comments-filter-row" ref={commentsRef}>
                   <Select
                     key={commentSortType}
                     size="compact"

@@ -6,7 +6,7 @@ import { SessionKeyError } from 'controllers/server/sessions';
 import { GetThreadActionTooltipTextResponse } from 'helpers/threads';
 import { CommentsFeaturedFilterTypes } from 'models/types';
 import type { DeltaStatic } from 'quill';
-import React, { MutableRefObject, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import app from 'state';
 import {
   useDeleteCommentMutation,
@@ -46,7 +46,6 @@ type CommentsTreeAttrs = {
   canComment: boolean;
   commentSortType: CommentsFeaturedFilterTypes;
   disabledActionsTooltipText?: GetThreadActionTooltipTextResponse;
-  commentsRef?: MutableRefObject<HTMLDivElement | null>;
 };
 
 export const CommentTree = ({
@@ -64,7 +63,6 @@ export const CommentTree = ({
   canComment,
   commentSortType,
   disabledActionsTooltipText,
-  commentsRef,
 }: CommentsTreeAttrs) => {
   const urlParams = new URLSearchParams(location.search);
   const focusCommentsParam = urlParams.get('focusComments') === 'true';
@@ -458,10 +456,7 @@ export const CommentTree = ({
 
         return (
           <React.Fragment key={comment.id + '' + comment.markedAsSpamAt}>
-            <div
-              className={`Comment comment-${comment.id}`}
-              ref={index === commentsList.length - 1 ? commentsRef : null}
-            >
+            <div className={`Comment comment-${comment.id}`}>
               {comment.threadLevel > 0 && (
                 <div className="thread-connectors-container">
                   {Array(comment.threadLevel)
