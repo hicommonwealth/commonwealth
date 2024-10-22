@@ -25,7 +25,9 @@ export const GetComments = {
     include_reactions: zBoolean.default(false),
   }),
   output: PaginatedResultSchema.extend({
-    results: Comment.array(),
+    results: Comment.extend({
+      last_edited: z.coerce.date().optional(),
+    }).array(),
   }),
 };
 
