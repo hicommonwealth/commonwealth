@@ -1,7 +1,7 @@
 import { AppError } from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
+import { sanitizeDeletedComment } from '@hicommonwealth/model';
 import type { NextFunction, Request, Response } from 'express';
-import { sanitizeDeletedComment } from 'server/util/sanitizeDeletedComment';
 
 export const Errors = {
   NoRootId: 'Must provide thread_id',
