@@ -58,9 +58,9 @@ export const UploadControl = ({
   const registeredFormContext = isHookedToForm
     ? formContext.register(name)
     : null;
-  const formFieldValue: string = isHookedToForm
+  const formFieldValue: string | null = isHookedToForm
     ? formContext?.watch?.(name)
-    : '';
+    : null;
   const formFieldErrorMessage =
     hookToForm &&
     name &&
@@ -73,7 +73,7 @@ export const UploadControl = ({
 
   // update `imageToRender` from formContext whenever it changes (if component is hooked to form)
   useEffect(() => {
-    if (formFieldValue !== imageToRender) {
+    if (formFieldValue !== imageToRender && formFieldValue !== null) {
       setImageToRender(formFieldValue);
 
       // reset errors if there are any
