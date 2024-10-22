@@ -4,5 +4,10 @@
   flex-grow: 1;
   .MainLink {
     flex-grow: 1;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    // For some reason, width must be set for CSS text-overflow to work
+    width: 50px;
   }
 }
