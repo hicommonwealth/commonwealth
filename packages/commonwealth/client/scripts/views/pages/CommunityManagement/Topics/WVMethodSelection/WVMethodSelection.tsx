@@ -15,6 +15,7 @@ import './WVMethodSelection.scss';
 
 interface WVMethodSelectionProps {
   onStepChange: (step: CreateTopicStep) => void;
+  hasNamespace: boolean;
 }
 
 enum WVMethod {
@@ -22,18 +23,24 @@ enum WVMethod {
   Stake = 'Stake',
 }
 
-const WVMethodSelection = ({ onStepChange }: WVMethodSelectionProps) => {
+const WVMethodSelection = ({
+  onStepChange,
+  hasNamespace,
+}: WVMethodSelectionProps) => {
   const [selectedWVMethod, setSelectedWVMethod] = useState<WVMethod | null>(
     null,
   );
 
   const handleContinue = () => {
-    if (selectedWVMethod === WVMethod.ERC20) {
-      onStepChange(CreateTopicStep.WVERC20Details);
-      return;
+    if (selectedWVMethod === WVMethod.Stake) {
+      return onStepChange(CreateTopicStep.WVStake);
     }
 
-    onStepChange(CreateTopicStep.WVStake);
+    onStepChange(
+      hasNamespace
+        ? CreateTopicStep.WVERC20Details
+        : CreateTopicStep.WVNamespaceEnablement,
+    );
   };
 
   const canEnableStake = chainIdsWithStakeEnabled.includes(
@@ -59,7 +66,16 @@ const WVMethodSelection = ({ onStepChange }: WVMethodSelectionProps) => {
             onSelect={setSelectedWVMethod}
             label="Connect ERC20 token"
             description="Only ERC20s"
-            popover={{ title: 'Example', body: <>lorem ipsum</> }}
+            popover={{
+              title: 'ERC20',
+              body: (
+                <CWText type="b2">
+                  Use any ERC 20 token that is on the same chain as your
+                  community. ERC20s can be used for weighted voting and running
+                  contests
+                </CWText>
+              ),
+            }}
             isSelected={selectedWVMethod === WVMethod.ERC20}
           />
 
@@ -70,7 +86,16 @@ const WVMethodSelection = ({ onStepChange }: WVMethodSelectionProps) => {
             description="Use non-transferable tokens"
             popover={
               canEnableStake
-                ? { title: 'Example', body: <>lorem ipsum</> }
+                ? {
+                    title: 'Stake',
+                    body: (
+                      <CWText type="b2">
+                        Community Stake lets you buy a stake in your community
+                        using a fungible non transferable token. This token can
+                        be used for weighted voting and running contests
+                      </CWText>
+                    ),
+                  }
                 : {
                     title: 'Disabled',
                     body: 'Stake is not supported on your network',

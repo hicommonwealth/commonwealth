@@ -31,7 +31,7 @@ const useFundContestForm = ({
 }: UseFundContestFormProps) => {
   const [tokenAmount, setTokenAmount] = useState(INITIAL_AMOUNT);
   const { data: tokenMetadata } = useTokenMetadataQuery({
-    chainId: chainNodeId,
+    nodeEthChainId: ethChainId,
     tokenId: fundingTokenAddress || '',
   });
   const { data: tokenUsdRateData } = useFetchTokenUsdRateQuery({
@@ -64,6 +64,7 @@ const useFundContestForm = ({
     contestAddress,
     chainRpc,
     ethChainId,
+    isOneOff: !!fundingTokenAddress,
   });
 
   const contestTokenBalance =

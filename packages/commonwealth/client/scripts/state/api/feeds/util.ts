@@ -1,6 +1,6 @@
 import { AxiosResponse } from 'axios';
 import Thread from 'models/Thread';
-import Topic from 'models/Topic';
+import type { Topic } from 'models/Topic';
 import { ThreadKind, ThreadStage } from 'models/types';
 
 type ActivityResponse = {
@@ -67,7 +67,7 @@ export function formatActivityResponse(response: AxiosResponse<any, any>) {
         version_history: null,
         last_commented_on: '',
         address_last_active: '',
-        reaction_weights_sum: 0,
+        reaction_weights_sum: '0',
       }),
   );
 }

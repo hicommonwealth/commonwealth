@@ -28,6 +28,7 @@ describe('getCommentDepth', () => {
       title: 'Testing',
       kind: 'discussion',
       search: getThreadSearchVector('Testing', ''),
+      reaction_weights_sum: '0',
     });
     let comment: CommentInstance;
     for (let i = 0; i < maxDepth; i++) {

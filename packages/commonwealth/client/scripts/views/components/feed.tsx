@@ -3,35 +3,31 @@ import { Virtuoso } from 'react-virtuoso';
 
 import 'components/feed.scss';
 
-import { ActivityComment, ActivityThread } from '@hicommonwealth/schemas';
-import { slugify } from '@hicommonwealth/shared';
-import { Thread, type RecentComment } from 'client/scripts/models/Thread';
-import Topic from 'client/scripts/models/Topic';
-import { ThreadKind, ThreadStage } from 'client/scripts/models/types';
+import { PageNotFound } from '../pages/404';
+import { UserDashboardRowSkeleton } from '../pages/user_dashboard/user_dashboard_row';
+
 import {
-  useFetchGlobalActivityQuery,
-  useFetchUserActivityQuery,
-} from 'client/scripts/state/api/feeds/fetchUserActivity';
+  ActivityComment,
+  ActivityThread,
+  PermissionEnum,
+} from '@hicommonwealth/schemas';
+import { slugify } from '@hicommonwealth/shared';
 import { getThreadActionTooltipText } from 'helpers/threads';
+import useTopicGating from 'hooks/useTopicGating';
 import { getProposalUrlPath } from 'identifiers';
+import { Thread, type RecentComment } from 'models/Thread';
+import { ThreadKind, ThreadStage } from 'models/types';
 import { useCommonNavigate } from 'navigation/helpers';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { useFetchCustomDomainQuery } from 'state/api/configuration';
-import { useRefreshMembershipQuery } from 'state/api/groups';
+import {
+  useFetchGlobalActivityQuery,
+  useFetchUserActivityQuery,
+} from 'state/api/feeds/fetchUserActivity';
 import useUserStore from 'state/ui/user';
 import Permissions from 'utils/Permissions';
-import { DashboardViews } from 'views/pages/user_dashboard';
 import { z } from 'zod';
-import { PageNotFound } from '../pages/404';
 import { ThreadCard } from '../pages/discussions/ThreadCard';
-import { UserDashboardRowSkeleton } from '../pages/user_dashboard/user_dashboard_row';
-
-type FeedProps = {
-  dashboardView: DashboardViews;
-  noFeedMessage: string;
-  defaultCount?: number;
-  customScrollParent?: HTMLElement;
-};
 
 const DEFAULT_COUNT = 10;
 
@@ -53,40 +49,40 @@ const FeedThread = ({ thread }: { thread: Thread }) => {
     enabled: !!thread.communityId,
   });
 
-  const isAdmin =
-    Permissions.isSiteAdmin() || Permissions.isCommunityAdmin(community);
-
   const account = user.addresses?.find(
     (a) => a?.community?.id === thread?.communityId,
   );
 
-  const { data: memberships = [] } = useRefreshMembershipQuery({
+  const { isRestrictedMembership, foundTopicPermissions } = useTopicGating({
     communityId: thread.communityId,
-    // @ts-expect-error <StrictNullChecks/>
-    address: account?.address,
+    userAddress: account?.address || '',
     apiEnabled: !!account?.address && !!thread.communityId,
+    topicId: thread?.topic?.id || 0,
   });
 
-  const isTopicGated = !!(memberships || []).find(
-    (membership) =>
-      thread?.topic?.id && membership.topicIds.includes(thread.topic.id),
-  );
-
-  const isActionAllowedInGatedTopic = !!(memberships || []).find(
-    (membership) =>
-      thread?.topic?.id &&
-      membership.topicIds.includes(thread.topic.id) &&
-      membership.isAllowed,
-  );
-
-  const isRestrictedMembership =
-    !isAdmin && isTopicGated && !isActionAllowedInGatedTopic;
+  const isAdmin =
+    Permissions.isSiteAdmin() ||
+    Permissions.isCommunityAdmin({
+      id: community?.id || '',
+      adminsAndMods: community?.adminsAndMods || [],
+    });
 
   const disabledActionsTooltipText = getThreadActionTooltipText({
     isCommunityMember: Permissions.isCommunityMember(thread.communityId),
     isThreadArchived: !!thread?.archivedAt,
     isThreadLocked: !!thread?.lockedAt,
     isThreadTopicGated: isRestrictedMembership,
+  });
+
+  const disabledCommentActionTooltipText = getThreadActionTooltipText({
+    isCommunityMember: Permissions.isCommunityMember(thread.communityId),
+    threadTopicInteractionRestrictions:
+      !isAdmin &&
+      !foundTopicPermissions?.permissions?.includes(
+        PermissionEnum.CREATE_COMMENT, // on this page we only show comment option
+      )
+        ? foundTopicPermissions?.permissions
+        : undefined,
   });
 
   // edge case for deleted communities with orphaned posts
@@ -100,7 +96,7 @@ const FeedThread = ({ thread }: { thread: Thread }) => {
     <ThreadCard
       thread={thread}
       canReact={!disabledActionsTooltipText}
-      canComment={!disabledActionsTooltipText}
+      canComment={!disabledCommentActionTooltipText}
       canUpdateThread={false} // we dont want user to update thread from here, even if they have permissions
       onStageTagClick={() => {
         navigate(
@@ -111,7 +107,11 @@ const FeedThread = ({ thread }: { thread: Thread }) => {
       }}
       threadHref={discussionLink}
       onCommentBtnClick={() => navigate(`${discussionLink}?focusComments=true`)}
-      disabledActionsTooltipText={disabledActionsTooltipText}
+      disabledActionsTooltipText={
+        disabledCommentActionTooltipText
+          ? disabledCommentActionTooltipText
+          : disabledActionsTooltipText
+      }
       customStages={community.custom_stages}
       hideReactionButton
       hideUpvotesDrawer
@@ -131,17 +131,18 @@ function mapThread(thread: z.infer<typeof ActivityThread>): Thread {
     id: thread.id,
     created_at: thread.created_at ?? '',
     updated_at: thread.updated_at ?? thread.created_at ?? '',
-    topic: new Topic({
+    topic: {
       community_id: thread.community_id,
       id: thread.topic.id,
       name: thread.topic.name,
       description: thread.topic.description,
+      created_at: '',
       featured_in_sidebar: false,
       featured_in_new_post: false,
       group_ids: [],
       active_contest_managers: [],
       total_threads: 0,
-    }),
+    },
     kind: thread.kind as ThreadKind,
     stage: thread.stage as ThreadStage,
     ThreadVersionHistories: [],
@@ -159,7 +160,7 @@ function mapThread(thread: z.infer<typeof ActivityThread>): Thread {
     userId: thread.user_id,
     last_edited: thread.updated_at ?? '',
     last_commented_on: '',
-    reaction_weights_sum: 0,
+    reaction_weights_sum: '0',
     address_last_active: '',
     ContestActions: [],
     numberOfComments: thread.number_of_comments,
@@ -180,16 +181,15 @@ function mapThread(thread: z.infer<typeof ActivityThread>): Thread {
   });
 }
 
-// eslint-disable-next-line react/no-multi-comp
-export const Feed = ({
-  dashboardView,
-  noFeedMessage,
-  customScrollParent,
-}: FeedProps) => {
-  const userFeed = useFetchUserActivityQuery();
-  const globalFeed = useFetchGlobalActivityQuery();
+type FeedProps = {
+  query: typeof useFetchGlobalActivityQuery | typeof useFetchUserActivityQuery;
+  defaultCount?: number;
+  customScrollParent?: HTMLElement;
+};
 
-  const feed = dashboardView === DashboardViews.Global ? globalFeed : userFeed;
+// eslint-disable-next-line react/no-multi-comp
+export const Feed = ({ query, customScrollParent }: FeedProps) => {
+  const feed = query();
 
   if (feed.isLoading) {
     return (
@@ -211,7 +211,9 @@ export const Feed = ({
   if (feed.data.length === 0) {
     return (
       <div className="Feed">
-        <div className="no-feed-message">{noFeedMessage}</div>
+        <div className="no-feed-message">
+          Join some communities to see Activity!
+        </div>
       </div>
     );
   }
