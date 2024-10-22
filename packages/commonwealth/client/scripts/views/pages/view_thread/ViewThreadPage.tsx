@@ -675,7 +675,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                 </div>
               )}
               <CommentTree
-                commentsRef={commentsRef}
                 comments={sortedComments}
                 includeSpams={includeSpamThreads}
                 // @ts-expect-error <StrictNullChecks/>
