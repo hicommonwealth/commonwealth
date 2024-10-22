@@ -5,7 +5,7 @@ import {
   useCellValues,
   usePublisher,
 } from 'commonwealth-mdxeditor';
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { IconButtonWithTooltip } from 'views/components/MarkdownEditor/customLinkDialog/IconButtonWithTooltip';
 import './CustomLinkEdit.scss';
 
@@ -18,10 +18,25 @@ export const CustomLinkEdit = () => {
   );
 
   const cancelLinkEdit = usePublisher(cancelLinkEdit$);
+  const handleSave = useCallback(() => {
+    updateLink({ url: link, title: link });
+  }, [link, updateLink]);
+
+  const handleKeyDown = useCallback(
+    (event: React.KeyboardEvent) => {
+      if (event.key === 'Enter') {
+        handleSave();
+        event.stopPropagation();
+        event.preventDefault();
+      }
+    },
+    [handleSave],
+  );
 
   if (linkDialogState.type !== 'edit') {
     return null;
   }
+
   return (
     <div className="CustomLinkEdit">
       <input
@@ -30,15 +45,14 @@ export const CustomLinkEdit = () => {
         style={{ flexGrow: 1 }}
         autoFocus={true}
         placeholder="Enter link"
+        onKeyDown={handleKeyDown}
         onChange={(event) => setLink(event.currentTarget.value)}
       />
 
       <IconButtonWithTooltip
         iconName="check"
         tooltip="Save"
-        onClick={() => {
-          updateLink({ url: link, title: link });
-        }}
+        onClick={handleSave}
       />
 
       <IconButtonWithTooltip
