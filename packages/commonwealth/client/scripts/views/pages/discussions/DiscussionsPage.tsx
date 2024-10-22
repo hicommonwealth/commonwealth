@@ -39,6 +39,7 @@ import { isContestActive } from 'views/pages/CommunityManagement/Contests/utils'
 import useTokenMetadataQuery from '../../../state/api/tokens/getTokenMetadata';
 import { AdminOnboardingSlider } from '../../components/AdminOnboardingSlider';
 import { UserTrainingSlider } from '../../components/UserTrainingSlider';
+import { CWText } from '../../components/component_kit/cw_text';
 import { DiscussionsFeedDiscovery } from './DiscussionsFeedDiscovery';
 import { EmptyThreadsPlaceholder } from './EmptyThreadsPlaceholder';
 
@@ -338,7 +339,12 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
                   voteWeight={voteWeight}
                   popover={{
                     title: tokenMetadata?.name,
-                    body: formatAddressShort(topicObj.token_address!, 6, 6),
+                    body: (
+                      <CWText type="b2">
+                        This topic has weighted voting enabled using{' '}
+                        {formatAddressShort(topicObj.token_address!, 6, 6)}
+                      </CWText>
+                    ),
                   }}
                 />
               )}
