@@ -1,5 +1,5 @@
 import { express, trpc } from '@hicommonwealth/adapters';
-import { Comment, Community, Feed } from '@hicommonwealth/model';
+import { Comment, Community, Feed, Thread } from '@hicommonwealth/model';
 import cors from 'cors';
 import { Router } from 'express';
 import passport from 'passport';
@@ -10,7 +10,7 @@ import {
   addRateLimiterMiddleware,
   apiKeyAuthMiddleware,
 } from './external-router-middleware';
-import * as thread from './threads';
+import * as thread from './thread';
 import * as user from './user';
 
 const {
@@ -23,13 +23,14 @@ const {
   updateGroup,
   deleteGroup,
   joinCommunity,
+  banAddress,
 } = community.trpcRouter;
 const {
   createThread,
   updateThread,
-  deleteThread,
   createThreadReaction,
   deleteReaction,
+  deleteThread,
 } = thread.trpcRouter;
 const { createComment, updateComment, deleteComment, createCommentReaction } =
   comment.trpcRouter;
@@ -56,6 +57,12 @@ const api = {
   getComments: trpc.query(Comment.GetComments, trpc.Tag.Comment, {
     forceSecure: true,
   }),
+  getTopics: trpc.query(Community.GetTopics, trpc.Tag.Community, {
+    forceSecure: true,
+  }),
+  getThreads: trpc.query(Thread.GetThreads, trpc.Tag.Thread, {
+    forceSecure: true,
+  }),
   createCommunity,
   updateCommunity,
   createTopic,
@@ -74,6 +81,7 @@ const api = {
   createCommentReaction,
   deleteReaction,
   joinCommunity,
+  banAddress,
 };
 
 const PATH = '/api/v1';

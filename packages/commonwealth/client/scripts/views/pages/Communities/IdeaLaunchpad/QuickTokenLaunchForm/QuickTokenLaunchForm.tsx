@@ -11,7 +11,7 @@ import useCreateCommunityMutation, {
 } from 'state/api/communities/createCommunity';
 import { generateImage } from 'state/api/general/generateImage';
 import { useLaunchTokenMutation } from 'state/api/launchPad';
-import { useCreateTokenMutation } from 'state/api/token';
+import { useCreateTokenMutation } from 'state/api/tokens';
 import useUserStore from 'state/ui/user';
 import PageCounter from 'views/components/PageCounter';
 import { CWText } from 'views/components/component_kit/cw_text';

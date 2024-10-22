@@ -6,10 +6,7 @@ import {
   type Context,
   type Handler,
 } from '@hicommonwealth/core';
-import {
-  Group,
-  GroupPermissionAction,
-} from '@hicommonwealth/schemas';
+import { Group, GroupPermissionAction } from '@hicommonwealth/schemas';
 import { Role } from '@hicommonwealth/shared';
 import { Op, QueryTypes } from 'sequelize';
 import { ZodSchema, z } from 'zod';
@@ -304,11 +301,7 @@ export function isAuthorized({
 
     if (action) {
       // waterfall stops here after validating the action
-      await hasTopicInteractionPermissions(
-        ctx.actor,
-        auth,
-        action,
-      );
+      await hasTopicInteractionPermissions(ctx.actor, auth, action);
       return;
     }
 

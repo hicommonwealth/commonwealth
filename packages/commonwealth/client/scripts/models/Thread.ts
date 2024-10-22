@@ -10,7 +10,7 @@ import moment, { Moment } from 'moment';
 import { z } from 'zod';
 import Comment from './Comment';
 import type { ReactionType } from './Reaction';
-import Topic from './Topic';
+import type { Topic } from './Topic';
 import type { IUniqueId } from './interfaces';
 import type { ThreadKind, ThreadStage } from './types';
 
@@ -154,6 +154,7 @@ export interface ThreadVersionHistory {
   address: string;
   body: string;
   timestamp: string;
+  content_url: string;
 }
 
 export interface IThreadCollaborator {
@@ -203,6 +204,7 @@ export type RecentComment = {
   profile_name?: string;
   profile_avatar?: string;
   user_id: string;
+  content_url?: string | null;
 };
 
 export enum LinkSource {
@@ -263,10 +265,11 @@ export class Thread implements IUniqueId {
   public associatedReactions: AssociatedReaction[];
   public associatedContests?: AssociatedContest[];
   public recentComments?: Comment<IUniqueId>[];
-  public reactionWeightsSum: number;
+  public reactionWeightsSum: string;
   public links: Link[];
   public readonly discord_meta: any;
   public readonly latestActivity: Moment;
+  public contentUrl: string | null;
 
   public readonly profile: UserProfile;
 
@@ -320,6 +323,7 @@ export class Thread implements IUniqueId {
     associatedContests,
     recentComments,
     ContestActions,
+    content_url,
   }: {
     marked_as_spam_at: string;
     title: string;
@@ -353,7 +357,7 @@ export class Thread implements IUniqueId {
     reactionType?: any[]; // TODO: fix type
     reactionTimestamps?: string[];
     reactionWeights?: number[];
-    reaction_weights_sum: number;
+    reaction_weights_sum: string;
     ThreadVersionHistories: ThreadVersionHistory[];
     Address: any; // TODO: fix type
     discord_meta?: any;
@@ -366,6 +370,7 @@ export class Thread implements IUniqueId {
     associatedContests?: AssociatedContest[];
     recentComments: RecentComment[];
     ContestActions: ContestActionT[];
+    content_url: string | null;
   }) {
     this.author = Address?.address;
     this.title = getDecodedString(title);
@@ -375,8 +380,7 @@ export class Thread implements IUniqueId {
     this.identifier = `${id}`;
     this.createdAt = moment(created_at);
     this.updatedAt = moment(updated_at);
-    // @ts-expect-error StrictNullChecks
-    this.topic = topic?.id ? new Topic({ ...(topic || {}) } as any) : null;
+    this.topic = { ...topic };
     this.kind = kind;
     this.stage = stage;
     this.authorCommunity = Address?.community_id;
@@ -428,6 +432,7 @@ export class Thread implements IUniqueId {
       associatedContests,
       ContestActions,
     );
+    this.contentUrl = content_url;
     this.recentComments = (recentComments || []).map(
       (rc) =>
         new Comment({
@@ -457,9 +462,10 @@ export class Thread implements IUniqueId {
           parent_id: null,
           reactions: [],
           CommentVersionHistories: [],
-          reaction_weights_sum: 0,
+          reaction_weights_sum: '0',
           canvas_signed_data: null,
           canvas_msg_id: null,
+          content_url: rc.content_url || null,
         }),
     );
     this.latestActivity = last_commented_on

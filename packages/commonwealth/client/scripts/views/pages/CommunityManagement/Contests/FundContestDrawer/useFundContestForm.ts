@@ -5,8 +5,7 @@ import {
   useGetUserEthBalanceQuery,
 } from 'state/api/communityStake';
 import { useGetContestBalanceQuery } from 'state/api/contests';
-import { useTokenMetadataQuery } from 'state/api/tokens';
-import useTokenBalanceQuery from 'state/api/tokens/getTokenBalance';
+import { useTokenBalanceQuery, useTokenMetadataQuery } from 'state/api/tokens';
 import { convertTokenAmountToUsd } from 'views/modals/ManageCommunityStakeModal/utils';
 import { calculateNewContractBalance, getAmountError } from './utils';
 
@@ -64,6 +63,7 @@ const useFundContestForm = ({
     contestAddress,
     chainRpc,
     ethChainId,
+    isOneOff: !!fundingTokenAddress,
   });
 
   const contestTokenBalance =

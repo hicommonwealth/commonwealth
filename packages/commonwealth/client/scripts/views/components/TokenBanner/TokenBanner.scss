@@ -52,8 +52,10 @@
       }
     }
   }
-
-  .vote-weight-label {
-    color: $neutral-500;
+  .vote-weight {
+    margin-left: 8px;
+    .vote-weight-label {
+      color: $neutral-500;
+    }
   }
 }

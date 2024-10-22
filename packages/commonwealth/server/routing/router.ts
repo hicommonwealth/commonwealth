@@ -51,7 +51,6 @@ import updateCommunityPriority from '../routes/updateCommunityPriority';
 import type ViewCountCache from '../util/viewCountCache';
 
 import { type DB } from '@hicommonwealth/model';
-import banAddress from '../routes/banAddress';
 import setAddressWallet from '../routes/setAddressWallet';
 
 import { generateTokenIdea } from '@hicommonwealth/model';
@@ -100,7 +99,6 @@ import { getTagsHandler } from '../routes/tags/get_tags_handler';
 import { createThreadPollHandler } from '../routes/threads/create_thread_poll_handler';
 import { getThreadPollsHandler } from '../routes/threads/get_thread_polls_handler';
 import { getThreadsHandler } from '../routes/threads/get_threads_handler';
-import { getTopicsHandler } from '../routes/topics/get_topics_handler';
 import { updateTopicChannelHandler } from '../routes/topics/update_topic_channel_handler';
 import { updateTopicsOrderHandler } from '../routes/topics/update_topics_order_handler';
 import { failure } from '../types';
@@ -390,13 +388,6 @@ function setupRouter(
     databaseValidationService.validateCommunity,
     updateTopicsOrderHandler.bind(this, serverControllers),
   );
-  registerRoute(
-    router,
-    'get',
-    '/topics' /* OLD: /bulkTopics */,
-    databaseValidationService.validateCommunity,
-    getTopicsHandler.bind(this, serverControllers),
-  );
 
   // reactions
   registerRoute(
@@ -515,16 +506,6 @@ function setupRouter(
     '/writeUserSetting',
     passport.authenticate('jwt', { session: false }),
     writeUserSetting.bind(this, models),
-  );
-
-  // bans
-  registerRoute(
-    router,
-    'post',
-    '/banAddress',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateCommunity,
-    banAddress.bind(this, models),
   );
 
   // Custom domain update route

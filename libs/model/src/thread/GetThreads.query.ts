@@ -83,7 +83,7 @@ export function GetThreads(): Query<typeof schemas.GetThreads> {
                 ${contestAddress ? contestStatus[status!] || contestStatus.all : ''}
             ),
             top_threads AS (
-            SELECT id, title, url, body, kind, stage, read_only, discord_meta,
+            SELECT id, title, url, body, kind, stage, read_only, discord_meta, content_url,
                 pinned, community_id, T.created_at, updated_at, locked_at as thread_locked, links,
                 has_poll, last_commented_on, comment_count as "numberOfComments",
                 marked_as_spam_at, archived_at, topic_id, reaction_weights_sum, canvas_signed_data,
@@ -207,7 +207,8 @@ export function GetThreads(): Query<typeof schemas.GetThreads> {
                   'discord_meta', COM.discord_meta,
                   'profile_name', U.profile->>'name',
                   'profile_avatar', U.profile->>'avatar_url',
-                  'user_id', U.id
+                  'user_id', U.id,
+                  'content_url', COM.content_url
               ))) as "recentComments"
               FROM (
                 Select tempC.* FROM "Comments" tempC
