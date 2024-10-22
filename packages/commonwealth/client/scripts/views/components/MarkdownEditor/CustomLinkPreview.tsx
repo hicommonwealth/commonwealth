@@ -5,7 +5,7 @@ import {
   usePublisher,
 } from 'commonwealth-mdxeditor';
 import React from 'react';
-import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
+import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 
 export const CustomLinkPreview = () => {
   const [linkDialogState] = useCellValues(linkDialogState$);
@@ -17,16 +17,19 @@ export const CustomLinkPreview = () => {
 
   // FIXME use SCSS
   return (
-    <div style={{ display: 'flex', gap: 4 }}>
-      <a href={linkDialogState.url}>{linkDialogState.url}</a>
+    <div style={{ display: 'flex', gap: 4, flexGrow: 1 }}>
+      <a
+        href={linkDialogState.url}
+        target="_blank"
+        style={{ flexGrow: 1 }}
+        rel="noreferrer"
+      >
+        {linkDialogState.url}
+      </a>
 
-      <CWIconButton
-        iconName="linkBreak"
-        onClick={() => {
-          console.log('FIXME: removing link');
-          removeLink();
-        }}
-      />
+      <a href={linkDialogState.url} target="_blank" rel="noreferrer">
+        <CWIcon iconName="arrowSquareOut" />
+      </a>
     </div>
   );
 };

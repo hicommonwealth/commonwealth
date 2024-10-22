@@ -2,6 +2,7 @@ import {
   linkDialogState$,
   removeLink$,
   switchFromPreviewToLinkEdit$,
+  updateLink$,
   useCellValues,
   usePublisher,
 } from 'commonwealth-mdxeditor';
@@ -11,6 +12,8 @@ import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 export const CustomLinkEdit = () => {
   const [linkDialogState] = useCellValues(linkDialogState$);
   const removeLink = usePublisher(removeLink$);
+  const updateLink = usePublisher(updateLink$);
+
   const switchFromPreviewToLinkEdit = usePublisher(
     switchFromPreviewToLinkEdit$,
   );
@@ -22,7 +25,7 @@ export const CustomLinkEdit = () => {
   // FIXME use SCSS
   return (
     <div style={{ display: 'flex', gap: 4 }}>
-      <input type="text" value={linkDialogState.url} />
+      <input type="text" value={linkDialogState.url} style={{ flexGrow: 1 }} />
 
       <CWIconButton
         iconName="linkBreak"
