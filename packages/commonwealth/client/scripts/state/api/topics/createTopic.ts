@@ -1,11 +1,11 @@
-import { trpc } from 'client/scripts/utils/trpcClient';
-import { ApiEndpoints, queryClient } from 'state/api/config';
+import { trpc } from 'utils/trpcClient';
 
 const useCreateTopicMutation = () => {
+  const utils = trpc.useUtils();
   return trpc.community.createTopic.useMutation({
     onSuccess: async (response) => {
-      await queryClient.invalidateQueries({
-        queryKey: [ApiEndpoints.BULK_TOPICS, response.topic.community_id],
+      await utils.community.getTopics.invalidate({
+        community_id: response.topic.community_id,
       });
     },
   });

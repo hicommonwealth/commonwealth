@@ -3,17 +3,21 @@ import { useTokenMetadataQuery } from 'state/api/tokens';
 import { useDebounce } from 'usehooks-ts';
 
 type UseTokenFinderProps = {
-  chainId: number;
+  nodeEthChainId: number;
+  initialTokenValue?: string | null;
 };
 
-const useTokenFinder = ({ chainId }: UseTokenFinderProps) => {
-  const [tokenValue, setTokenValue] = useState('');
+const useTokenFinder = ({
+  nodeEthChainId,
+  initialTokenValue,
+}: UseTokenFinderProps) => {
+  const [tokenValue, setTokenValue] = useState(initialTokenValue || '');
   const debouncedTokenValue = useDebounce<string>(tokenValue, 500);
 
   const { data: tokenMetadata, isLoading: tokenMetadataLoading } =
     useTokenMetadataQuery({
       tokenId: debouncedTokenValue,
-      chainId,
+      nodeEthChainId,
     });
 
   const getTokenError = () => {

@@ -12,6 +12,7 @@ import {
   BellSimpleRinging,
   BellSimpleSlash,
   BookOpenText,
+  Brain,
   CaretDoubleLeft,
   CaretDoubleRight,
   CaretDown,
@@ -93,6 +94,7 @@ import { withPhosphorIcon } from './cw_phosphor_icons';
 
 export const iconLookup = {
   bold: withPhosphorIcon(TextB),
+  brain: withPhosphorIcon(Brain),
   italic: withPhosphorIcon(TextItalic),
   underline: withPhosphorIcon(TextUnderline),
   strikethrough: withPhosphorIcon(TextStrikethrough),

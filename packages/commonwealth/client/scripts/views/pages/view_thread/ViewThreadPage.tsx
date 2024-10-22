@@ -1,3 +1,4 @@
+import { PermissionEnum } from '@hicommonwealth/schemas';
 import { ContentType, getThreadUrl } from '@hicommonwealth/shared';
 import { notifyError } from 'controllers/app/notifications';
 import { extractDomain, isDefaultStage } from 'helpers';
@@ -6,6 +7,8 @@ import { filterLinks, getThreadActionTooltipText } from 'helpers/threads';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
+import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
+import useTopicGating from 'hooks/useTopicGating';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/view_thread/index.scss';
@@ -13,11 +16,9 @@ import React, { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import app from 'state';
 import { useFetchCommentsQuery } from 'state/api/comments';
+import useGetContentByUrlQuery from 'state/api/general/getContentByUrl';
 import useGetViewCountByObjectIdQuery from 'state/api/general/getViewCountByObjectId';
-import {
-  useFetchGroupsQuery,
-  useRefreshMembershipQuery,
-} from 'state/api/groups';
+import { useFetchGroupsQuery } from 'state/api/groups';
 import {
   useAddThreadLinksMutation,
   useGetThreadPollsQuery,
@@ -120,6 +121,25 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   });
 
   const thread = data?.[0];
+
+  const [contentUrlBodyToFetch, setContentUrlBodyToFetch] = useState<
+    string | null
+  >(null);
+
+  useRunOnceOnCondition({
+    callback: () => {
+      thread?.contentUrl && setContentUrlBodyToFetch(thread?.contentUrl);
+    },
+    shouldRun: !!thread?.contentUrl,
+  });
+
+  const { data: contentUrlBody, isLoading: isLoadingContentBody } =
+    useGetContentByUrlQuery({
+      contentUrl: contentUrlBodyToFetch || '',
+      enabled: !!contentUrlBodyToFetch,
+    });
+
+  const [activeThreadVersionId, setActiveThreadVersionId] = useState<number>();
   const [threadBody, setThreadBody] = useState(thread?.body);
 
   const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
@@ -142,10 +162,11 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     threadId: parseInt(threadId),
   });
 
-  const { data: memberships = [] } = useRefreshMembershipQuery({
+  const { isRestrictedMembership, foundTopicPermissions } = useTopicGating({
     communityId,
-    address: user?.activeAccount?.address || '',
     apiEnabled: !!user?.activeAccount?.address && !!communityId,
+    userAddress: user?.activeAccount?.address || '',
+    topicId: thread?.topic?.id || 0,
   });
 
   const { data: viewCount = 0 } = useGetViewCountByObjectIdQuery({
@@ -153,20 +174,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     objectId: thread?.id || '',
     apiCallEnabled: !!thread?.id && !!communityId,
   });
-
-  const isTopicGated = !!(memberships || []).find((membership) =>
-    // @ts-expect-error <StrictNullChecks/>
-    membership.topicIds.includes(thread?.topic?.id),
-  );
-
-  const isActionAllowedInGatedTopic = !!(memberships || []).find(
-    (membership) =>
-      // @ts-expect-error <StrictNullChecks/>
-      membership.topicIds.includes(thread?.topic?.id) && membership.isAllowed,
-  );
-
-  const isRestrictedMembership =
-    !isAdmin && isTopicGated && !isActionAllowedInGatedTopic;
 
   useEffect(() => {
     if (fetchCommentsError) notifyError('Failed to load comments');
@@ -215,11 +222,44 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   useManageDocumentTitle('View thread', thread?.title);
 
+  // Imp: this correctly sets the thread body
+  // 1. if content_url is provided it will fetch body from there
+  // 2. else it will use available body
+  // 3. it won't interfere with version history selection, unless thread body or content_url changes
+  useEffect(() => {
+    if (thread?.contentUrl) {
+      setContentUrlBodyToFetch(thread.contentUrl);
+    } else {
+      setThreadBody(thread?.body || '');
+      setContentUrlBodyToFetch('');
+    }
+  }, [thread?.body, thread?.contentUrl]);
+
+  // Imp: this is expected to override version history selection
+  useEffect(() => {
+    if (contentUrlBody) {
+      setThreadBody(contentUrlBody);
+    }
+  }, [contentUrlBody]);
+
+  // Imp: this is expected to "not-interfere" with version history selector
+  useEffect(() => {
+    if (thread?.versionHistory) {
+      setActiveThreadVersionId(
+        Math.max(...thread.versionHistory.map(({ id }) => id)),
+      );
+    }
+  }, [thread?.versionHistory]);
+
   if (typeof identifier !== 'string') {
     return <PageNotFound />;
   }
 
-  if (!app.chain?.meta || isLoading) {
+  if (
+    !app.chain?.meta ||
+    isLoading ||
+    (isLoadingContentBody && contentUrlBodyToFetch)
+  ) {
     return (
       <CWPageLayout>
         <CWContentPage
@@ -270,8 +310,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   // @ts-expect-error <StrictNullChecks/>
   const hasWebLinks = thread.links.find((x) => x.source === 'web');
-
-  const canComment = !!user.activeAccount && !isRestrictedMembership;
 
   const handleNewSnapshotChange = async ({
     id,
@@ -347,7 +385,37 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     isThreadArchived: !!thread?.archivedAt,
     isThreadLocked: !!thread?.lockedAt,
     isThreadTopicGated: isRestrictedMembership,
+    threadTopicInteractionRestrictions:
+      !isAdmin &&
+      !foundTopicPermissions?.permissions?.includes(
+        PermissionEnum.CREATE_COMMENT,
+      )
+        ? foundTopicPermissions?.permissions
+        : undefined,
   });
+
+  const canComment =
+    !!user.activeAccount &&
+    !isRestrictedMembership &&
+    !disabledActionsTooltipText;
+
+  const handleVersionHistoryChange = (versionId: number) => {
+    const foundVersion = (thread?.versionHistory || []).find(
+      (version) => version.id === versionId,
+    );
+    foundVersion && setActiveThreadVersionId(foundVersion?.id);
+    if (!foundVersion?.content_url) {
+      setThreadBody(foundVersion?.body || '');
+      setContentUrlBodyToFetch('');
+      return;
+    }
+    if (contentUrlBodyToFetch === foundVersion.content_url && contentUrlBody) {
+      setThreadBody(contentUrlBody);
+      setContentUrlBodyToFetch('');
+      return;
+    }
+    setContentUrlBodyToFetch(foundVersion.content_url);
+  };
 
   const getMetaDescription = (meta: string) => {
     try {
@@ -369,9 +437,9 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
       : thread?.title;
   const ogDescription =
     // @ts-expect-error <StrictNullChecks/>
-    getMetaDescription(thread?.body || '')?.length > 155
-      ? `${getMetaDescription(thread?.body || '')?.slice?.(0, 152)}...`
-      : getMetaDescription(thread?.body || '');
+    getMetaDescription(threadBody || '')?.length > 155
+      ? `${getMetaDescription(threadBody || '')?.slice?.(0, 152)}...`
+      : getMetaDescription(threadBody || '');
   const ogImageUrl = app?.chain?.meta?.icon_url || '';
 
   return (
@@ -539,16 +607,18 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
             setIsEditingBody(false);
           }}
           hasPendingEdits={!!editsToSave}
-          setThreadBody={setThreadBody}
+          activeThreadVersionId={activeThreadVersionId}
+          onChangeVersionHistoryNumber={handleVersionHistoryChange}
           body={(threadOptionsComp) => (
             <div className="thread-content">
-              {isEditingBody ? (
+              {isEditingBody && threadBody ? (
                 <>
                   {/*// TODO editing thread */}
                   <EditBody
                     title={draftTitle}
                     // @ts-expect-error <StrictNullChecks/>
                     thread={thread}
+                    activeThreadBody={threadBody}
                     savedEdits={savedEdits}
                     shouldRestoreEdits={shouldRestoreEdits}
                     cancelEditing={() => {
@@ -565,7 +635,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
               ) : (
                 <>
                   <MarkdownViewerUsingQuillOrNewEditor
-                    markdown={threadBody ?? thread?.body}
+                    key={threadBody}
+                    markdown={threadBody || ''}
                     cutoffLines={50}
                   />
 

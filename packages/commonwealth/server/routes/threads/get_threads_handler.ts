@@ -1,5 +1,8 @@
-import { AppError } from '@hicommonwealth/core';
+import { AppError, query } from '@hicommonwealth/core';
 import { Thread } from '@hicommonwealth/model';
+import * as schemas from '@hicommonwealth/schemas';
+import { GetThreadsOrderBy, GetThreadsStatus } from '@hicommonwealth/schemas';
+import { z } from 'zod';
 import { ALL_COMMUNITIES } from '../../middleware/databaseValidationService';
 import { ServerControllers } from '../../routing/router';
 import {
@@ -66,7 +69,7 @@ export const getThreadsHandler = async (
   >,
   res: TypedResponse<GetThreadsResponse>,
 ) => {
-  const queryValidationResult = Thread.GetThreadsParamsSchema.safeParse(
+  const queryValidationResult = schemas.DEPRECATED_GetThreads.safeParse(
     req.query,
   );
 
@@ -95,7 +98,7 @@ export const getThreadsHandler = async (
   // get bulk threads
   if (bulk) {
     const bulkQueryValidationResult =
-      Thread.GetBulkThreadsParamsSchema.safeParse(req.query);
+      schemas.DEPRECATED_GetBulkThreads.safeParse(req.query);
 
     if (bulkQueryValidationResult.success === false) {
       throw new AppError(formatErrorPretty(bulkQueryValidationResult));
@@ -116,31 +119,25 @@ export const getThreadsHandler = async (
       withXRecentComments,
     } = bulkQueryValidationResult.data;
 
-    const bulkThreads = await controllers.threads.getBulkThreads({
-      communityId: community_id,
-      // @ts-expect-error StrictNullChecks
-      stage,
-      // @ts-expect-error StrictNullChecks
-      topicId: topic_id,
-      // @ts-expect-error StrictNullChecks
-      includePinnedThreads,
-      // @ts-expect-error StrictNullChecks
-      page,
-      // @ts-expect-error StrictNullChecks
-      limit,
-      // @ts-expect-error StrictNullChecks
-      orderBy,
-      // @ts-expect-error StrictNullChecks
-      fromDate: from_date,
-      // @ts-expect-error StrictNullChecks
-      toDate: to_date,
-      // @ts-expect-error StrictNullChecks
-      archived: archived,
-      // @ts-expect-error StrictNullChecks
-      contestAddress,
-      // @ts-expect-error StrictNullChecks
-      status,
-      withXRecentComments,
+    const bulkThreads = await query(Thread.GetThreads(), {
+      actor: {
+        user: { email: '' },
+      },
+      payload: {
+        page,
+        limit,
+        community_id,
+        stage,
+        topic_id,
+        includePinnedThreads,
+        order_by: orderBy as z.infer<typeof GetThreadsOrderBy>,
+        from_date,
+        to_date,
+        archived: archived,
+        contestAddress,
+        status: status as z.infer<typeof GetThreadsStatus>,
+        withXRecentComments,
+      },
     });
     return success(res, bulkThreads);
   }
@@ -172,10 +169,8 @@ export const getThreadsHandler = async (
       communityId: community_id,
       searchTerm: search,
       threadTitleOnly: thread_title_only === 'true',
-      // @ts-expect-error StrictNullChecks
-      limit: parseInt(limit, 10) || 0,
-      // @ts-expect-error StrictNullChecks
-      page: parseInt(page, 10) || 0,
+      limit: parseInt(limit!, 10) || 0,
+      page: parseInt(page!, 10) || 0,
       orderBy: order_by,
       orderDirection: order_direction as any,
       includeCount: include_count,

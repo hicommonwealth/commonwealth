@@ -3,7 +3,6 @@
  */
 import * as core from '../../../../../core';
 import { UpdateThreadRequestCollaborators } from '../../types/UpdateThreadRequestCollaborators';
-
 export const UpdateThreadRequest = core.serialization.object({
   threadId: core.serialization.property(
     'thread_id',

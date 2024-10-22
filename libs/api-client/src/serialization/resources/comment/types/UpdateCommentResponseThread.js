@@ -10,7 +10,6 @@ import { UpdateCommentResponseThreadReactionsItem } from './UpdateCommentRespons
 import { UpdateCommentResponseThreadSearch } from './UpdateCommentResponseThreadSearch';
 import { UpdateCommentResponseThreadThreadVersionHistoriesItem } from './UpdateCommentResponseThreadThreadVersionHistoriesItem';
 import { UpdateCommentResponseThreadTopic } from './UpdateCommentResponseThreadTopic';
-
 export const UpdateCommentResponseThread = core.serialization.object({
   id: core.serialization.number().optional(),
   addressId: core.serialization.property(
@@ -19,9 +18,8 @@ export const UpdateCommentResponseThread = core.serialization.object({
   ),
   title: core.serialization.string(),
   kind: core.serialization.string(),
-  stage: core.serialization.string(),
+  stage: core.serialization.string().optional(),
   body: core.serialization.string().optional(),
-  plaintext: core.serialization.string().optional(),
   url: core.serialization.string().optional(),
   topicId: core.serialization.property(
     'topic_id',
@@ -34,7 +32,7 @@ export const UpdateCommentResponseThread = core.serialization.object({
   ),
   viewCount: core.serialization.property(
     'view_count',
-    core.serialization.number(),
+    core.serialization.number().optional(),
   ),
   links: core.serialization
     .list(UpdateCommentResponseThreadLinksItem)
@@ -97,15 +95,15 @@ export const UpdateCommentResponseThread = core.serialization.object({
   ),
   reactionCount: core.serialization.property(
     'reaction_count',
-    core.serialization.number(),
+    core.serialization.number().optional(),
   ),
   reactionWeightsSum: core.serialization.property(
     'reaction_weights_sum',
-    core.serialization.number(),
+    core.serialization.number().optional(),
   ),
   commentCount: core.serialization.property(
     'comment_count',
-    core.serialization.number(),
+    core.serialization.number().optional(),
   ),
   activityRankDate: core.serialization.property(
     'activity_rank_date',

@@ -8,7 +8,6 @@ import { GetCommunityResponseAddressesChainNodeBalanceType } from './GetCommunit
 import { GetCommunityResponseAddressesChainNodeContractsItem } from './GetCommunityResponseAddressesChainNodeContractsItem';
 import { GetCommunityResponseAddressesChainNodeCosmosGovVersion } from './GetCommunityResponseAddressesChainNodeCosmosGovVersion';
 import { GetCommunityResponseAddressesChainNodeHealth } from './GetCommunityResponseAddressesChainNodeHealth';
-
 export declare const GetCommunityResponseAddressesChainNode: core.serialization.ObjectSchema<
   serializers.GetCommunityResponseAddressesChainNode.Raw,
   CommonApi.GetCommunityResponseAddressesChainNode

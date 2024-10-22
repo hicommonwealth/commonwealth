@@ -4,7 +4,6 @@
 import * as core from '../../../../core';
 import * as environments from '../../../../environments';
 import * as CommonApi from '../../../index';
-
 export declare namespace Comment {
   interface Options {
     environment?: core.Supplier<environments.CommonApiEnvironment | string>;
@@ -12,7 +11,6 @@ export declare namespace Comment {
     /** Override the address header */
     address?: core.Supplier<string | undefined>;
   }
-
   interface RequestOptions {
     /** The maximum time to wait for a response in seconds. */
     timeoutInSeconds?: number;
@@ -24,12 +22,9 @@ export declare namespace Comment {
     address?: string | undefined;
   }
 }
-
 export declare class Comment {
   protected readonly _options: Comment.Options;
-
   constructor(_options: Comment.Options);
-
   /**
    * @param {CommonApi.GetCommentsRequest} request
    * @param {Comment.RequestOptions} requestOptions - Request-specific configuration.
@@ -43,7 +38,6 @@ export declare class Comment {
     request: CommonApi.GetCommentsRequest,
     requestOptions?: Comment.RequestOptions,
   ): Promise<CommonApi.GetCommentsResponse>;
-
   /**
    * @param {CommonApi.CreateCommentRequest} request
    * @param {Comment.RequestOptions} requestOptions - Request-specific configuration.
@@ -58,7 +52,6 @@ export declare class Comment {
     request: CommonApi.CreateCommentRequest,
     requestOptions?: Comment.RequestOptions,
   ): Promise<CommonApi.CreateCommentResponse>;
-
   /**
    * @param {CommonApi.UpdateCommentRequest} request
    * @param {Comment.RequestOptions} requestOptions - Request-specific configuration.
@@ -73,7 +66,6 @@ export declare class Comment {
     request: CommonApi.UpdateCommentRequest,
     requestOptions?: Comment.RequestOptions,
   ): Promise<CommonApi.UpdateCommentResponse>;
-
   /**
    * @param {CommonApi.DeleteCommentRequest} request
    * @param {Comment.RequestOptions} requestOptions - Request-specific configuration.
@@ -87,7 +79,6 @@ export declare class Comment {
     request: CommonApi.DeleteCommentRequest,
     requestOptions?: Comment.RequestOptions,
   ): Promise<CommonApi.DeleteCommentResponse>;
-
   protected _getCustomAuthorizationHeaders(): Promise<{
     'x-api-key': string;
   }>;
