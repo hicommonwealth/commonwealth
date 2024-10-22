@@ -19,6 +19,7 @@ import { ThreadCard } from './ThreadCard';
 import { sortByFeaturedFilter, sortPinned } from './helpers';
 
 import { slugify, splitAndDecodeURL } from '@hicommonwealth/shared';
+import { useGetERC20BalanceQuery } from 'client/scripts/state/api/tokens';
 import { formatAddressShort } from 'helpers';
 import { getThreadActionTooltipText } from 'helpers/threads';
 import useBrowserWindow from 'hooks/useBrowserWindow';
@@ -98,6 +99,12 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const { data: domain } = useFetchCustomDomainQuery();
 
   const { contestsData } = useCommunityContests();
+
+  const { data: erc20Balance } = useGetERC20BalanceQuery({
+    tokenAddress: topicObj?.token_address || '',
+    userAddress: user.activeAccount?.address || '',
+    nodeRpc: app?.chain.meta?.ChainNode?.url || '',
+  });
 
   const { dateCursor } = useDateCursor({
     dateRange: searchParams.get('dateRange') as ThreadTimelineFilterTypes,
@@ -184,6 +191,11 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     const isActive = isContestActive({ contest });
     return isContestInTopic && isActive;
   });
+
+  const voteWeight =
+    isTopicWeighted && erc20Balance
+      ? String((topicObj?.vote_weight_multiplier * erc20Balance).toFixed(0))
+      : '';
 
   return (
     // @ts-expect-error <StrictNullChecks/>
@@ -323,6 +335,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
                   name={tokenMetadata?.name}
                   ticker={topicObj?.token_symbol}
                   avatarUrl={tokenMetadata?.logo}
+                  voteWeight={voteWeight}
                   popover={{
                     title: tokenMetadata?.name,
                     body: formatAddressShort(topicObj.token_address!, 6, 6),
