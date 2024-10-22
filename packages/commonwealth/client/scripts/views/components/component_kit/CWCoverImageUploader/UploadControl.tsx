@@ -181,7 +181,7 @@ export const UploadControl = ({
 
       if (areActionsDisabled || !file) return;
 
-      uploadPickedImage({ file });
+      uploadPickedImage({ file }).catch(console.error);
     },
     [areActionsDisabled, uploadPickedImage],
   );
@@ -203,7 +203,7 @@ export const UploadControl = ({
 
         if (areActionsDisabled || !file) return;
 
-        uploadPickedImage({ file });
+        uploadPickedImage({ file }).catch(console.error);
       }
     },
     [areActionsDisabled, uploadPickedImage],
