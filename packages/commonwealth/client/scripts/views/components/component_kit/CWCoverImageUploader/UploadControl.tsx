@@ -55,23 +55,35 @@ export const UploadControl = ({
   const formContext = useFormContext();
   const isHookedToForm = name && hookToForm;
   const formContextRef = useRef(isHookedToForm ? { formContext, name } : null);
-  isHookedToForm && formContext.register(name);
+  const registeredFormContext = isHookedToForm
+    ? formContext.register(name)
+    : null;
   const formFieldValue: string = isHookedToForm
-    ? formContext?.getValues?.(name)
+    ? formContext?.watch?.(name)
     : '';
   const formFieldErrorMessage =
     hookToForm &&
     name &&
     (formContext?.formState?.errors?.[name]?.message as string);
 
+  // update formContextRef whenever formContext changes
   useEffect(() => {
     formContextRef.current = isHookedToForm ? { formContext, name } : null;
   }, [isHookedToForm, formContext, name]);
 
+  // update `imageToRender` from formContext whenever it changes (if component is hooked to form)
   useEffect(() => {
-    console.log('formFieldValue => ', formFieldValue);
-    setImageToRender(formFieldValue);
-  }, [formFieldValue]);
+    if (formFieldValue !== imageToRender) {
+      setImageToRender(formFieldValue);
+
+      // reset errors if there are any
+      if ((formFieldValue || imageToRender) && formContextRef.current) {
+        formContextRef.current.formContext
+          .trigger(formContextRef.current?.name)
+          .catch(console.error);
+      }
+    }
+  }, [formFieldValue, imageToRender]);
 
   const { isWindowExtraSmall } = useBrowserWindow({});
 
@@ -103,24 +115,21 @@ export const UploadControl = ({
           imageURL,
           { shouldDirty: true },
         );
-      } else {
-        setImageToRender(imageURL);
       }
+      setImageToRender(imageURL);
     }
   }, [imageURL]);
 
   useEffect(() => {
     if (uploadedImageURL) {
       if (formContextRef.current?.formContext && formContextRef.current?.name) {
-        console.log('uploadedImageURL => ', uploadedImageURL);
         formContextRef.current.formContext.setValue(
           formContextRef.current?.name,
           uploadedImageURL,
           { shouldDirty: true },
         );
-      } else {
-        setImageToRender(uploadedImageURL);
       }
+      setImageToRender(uploadedImageURL);
     }
   }, [uploadedImageURL]);
 
@@ -134,15 +143,13 @@ export const UploadControl = ({
       setImagePrompt('');
       setIsImageGenerationSectionOpen(false);
       if (formContextRef.current?.formContext && formContextRef.current?.name) {
-        console.log('generatedImageURL => ', generatedImageURL);
         formContextRef.current.formContext.setValue(
           formContextRef.current?.name,
           generatedImageURL,
           { shouldDirty: true },
         );
-      } else {
-        setImageToRender(generatedImageURL);
       }
+      setImageToRender(generatedImageURL);
     }
   }, [generatedImageURL]);
 
@@ -272,6 +279,9 @@ export const UploadControl = ({
         ref={imageInputRef}
         disabled={areActionsDisabled}
       />
+      {isHookedToForm && registeredFormContext && (
+        <input type="text" {...registeredFormContext} hidden />
+      )}
       {isLoading ? (
         <div className="loading-container">
           <CWCircleMultiplySpinner />
@@ -279,7 +289,11 @@ export const UploadControl = ({
       ) : (
         <>
           {imageToRender ? (
-            <img src={imageToRender} className={`img-${imageBehavior}`} />
+            <img
+              key={imageToRender}
+              src={imageToRender}
+              className={`img-${imageBehavior}`}
+            />
           ) : (
             <>
               <CWIcon
