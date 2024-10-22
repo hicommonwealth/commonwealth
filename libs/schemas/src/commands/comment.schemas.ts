@@ -50,3 +50,11 @@ export const DeleteComment = {
     canvas_msg_id: z.string().nullish(),
   }),
 };
+
+export const SetCommentSpam = {
+  input: z.object({
+    comment_id: PG_INT,
+    spam: z.boolean(),
+  }),
+  output: Comment,
+};
