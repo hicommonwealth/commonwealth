@@ -7,17 +7,18 @@ import React from 'react';
 import { uuidv4 } from 'lib/util';
 import { ComponentType } from 'views/components/component_kit/types';
 
+import { VirtualElement } from '@popperjs/core';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { getClasses } from '../../helpers';
 import './CWPopover.scss';
 
-export type AnchorType = HTMLElement | SVGSVGElement;
+export type AnchorType = HTMLElement | SVGSVGElement | VirtualElement;
 
 export type UsePopoverProps = {
   anchorEl: AnchorType;
   id: string;
   open: boolean;
-  setAnchorEl: React.Dispatch<React.SetStateAction<AnchorType>> | DOMRect;
+  setAnchorEl: React.Dispatch<React.SetStateAction<AnchorType>>;
   handleInteraction: (e: React.MouseEvent<AnchorType>) => void;
 
   /**

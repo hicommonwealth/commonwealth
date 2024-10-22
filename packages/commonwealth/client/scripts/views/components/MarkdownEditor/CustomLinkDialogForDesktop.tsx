@@ -1,24 +1,27 @@
-import PopperUnstyled from '@mui/base/Popper';
 import { linkDialogState$, useCellValues } from 'commonwealth-mdxeditor';
-import React from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import { CustomLinkEdit } from 'views/components/MarkdownEditor/CustomLinkEdit';
 import { CustomLinkPreview } from 'views/components/MarkdownEditor/CustomLinkPreview';
+import CWPopover, {
+  usePopover,
+} from 'views/components/component_kit/new_designs/CWPopover';
+import './CustomLinkDialogForDesktop.scss';
 
 /**
  * We need to use a popover on desktop and no container no mobile.
  */
 export const CustomLinkDialogForDesktop = () => {
+  const popoverProps = usePopover();
+
   const [linkDialogState] = useCellValues(linkDialogState$);
 
-  if (linkDialogState.type === 'inactive') {
-    return null;
-  }
-
-  const getBoundingClientRect = (): DOMRect => {
-    const x = linkDialogState.rectangle.left;
-    const y = linkDialogState.rectangle.top;
-    const height = linkDialogState.rectangle.height;
-    const width = linkDialogState.rectangle.width;
+  // this is needed because we have to dispatch popover base on its position on
+  // the screen.
+  const getBoundingClientRect = useCallback((): DOMRect => {
+    const x = linkDialogState.rectangle!.left;
+    const y = linkDialogState.rectangle!.top;
+    const height = linkDialogState.rectangle!.height;
+    const width = linkDialogState.rectangle!.width;
 
     const rect = {
       x,
@@ -33,23 +36,35 @@ export const CustomLinkDialogForDesktop = () => {
 
     const toJSON = () => JSON.stringify(rect);
     return { ...rect, toJSON };
-  };
+  }, [linkDialogState.rectangle]);
+
+  const anchorEl = useMemo(() => {
+    return { getBoundingClientRect };
+  }, [getBoundingClientRect]);
+
+  useEffect(() => {
+    if (linkDialogState.type === 'inactive') {
+      popoverProps.dispose();
+      return;
+    }
+
+    popoverProps.setAnchorEl(anchorEl);
+  }, [anchorEl, getBoundingClientRect, linkDialogState.type, popoverProps]);
+
+  if (linkDialogState.type === 'inactive') {
+    return null;
+  }
 
   return (
-    <PopperUnstyled
-      open={true}
-      anchorEl={{ getBoundingClientRect }}
-      modifiers={[
-        {
-          name: 'preventOverflow',
-          options: {
-            padding: 16,
-          },
-        },
-      ]}
-    >
-      {linkDialogState.type === 'preview' && <CustomLinkPreview />}
-      {linkDialogState.type === 'edit' && <CustomLinkEdit />}
-    </PopperUnstyled>
+    <CWPopover
+      {...popoverProps}
+      className="CustomLinkDialogForDesktopPopover"
+      body={
+        <div className="CustomLinkDialogForDesktop">
+          {linkDialogState.type === 'preview' && <CustomLinkPreview />}
+          {linkDialogState.type === 'edit' && <CustomLinkEdit />}
+        </div>
+      }
+    />
   );
 };
