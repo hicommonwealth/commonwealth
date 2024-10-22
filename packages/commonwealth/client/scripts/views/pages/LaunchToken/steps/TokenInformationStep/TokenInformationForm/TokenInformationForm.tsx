@@ -9,7 +9,7 @@ import {
   MixpanelCommunityCreationEvent,
   MixpanelLoginPayload,
 } from 'shared/analytics/types';
-import { useFetchTokensQuery } from 'state/api/token';
+import { useFetchTokensQuery } from 'state/api/tokens';
 import useUserStore from 'state/ui/user';
 import { useDebounce } from 'usehooks-ts';
 import {
