@@ -264,7 +264,6 @@ export const CommentTree = ({
       setIsGloballyEditing(false);
     }
   };
-
   const handleEditStart = (comment: CommentType<any>) => {
     const editDraft = localStorage.getItem(
       `${app.activeChainId()}-edit-comment-${comment.id}-storedText`,
@@ -530,6 +529,12 @@ export const CommentTree = ({
                 parentCommentId={parentCommentId}
                 rootThread={thread}
                 canComment={canComment}
+                isReplying={isReplying}
+                tooltipText={
+                  !canComment && typeof disabledActionsTooltipText === 'string'
+                    ? disabledActionsTooltipText
+                    : ''
+                }
               />
             )}
           </React.Fragment>

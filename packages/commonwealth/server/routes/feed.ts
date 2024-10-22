@@ -1,5 +1,6 @@
 import { AppError, query } from '@hicommonwealth/core';
 import { Thread, type DB } from '@hicommonwealth/model';
+import * as schemas from '@hicommonwealth/schemas';
 import {
   GetThreads,
   GetThreadsOrderBy,
@@ -56,7 +57,7 @@ export const getFeedHandler = async (
   >,
   res: TypedResponse<GetThreadsResponse>,
 ) => {
-  const queryValidationResult = Thread.GetThreadsParamsSchema.safeParse(
+  const queryValidationResult = schemas.DEPRECATED_GetThreads.safeParse(
     req.query,
   );
 
@@ -74,7 +75,7 @@ export const getFeedHandler = async (
   // get bulk threads
   if (bulk) {
     const bulkQueryValidationResult =
-      Thread.GetBulkThreadsParamsSchema.safeParse(req.query);
+      schemas.DEPRECATED_GetBulkThreads.safeParse(req.query);
 
     if (bulkQueryValidationResult.success === false) {
       throw new AppError(formatErrorPretty(bulkQueryValidationResult));

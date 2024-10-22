@@ -3,6 +3,7 @@ import { buildDeleteCommentReactionInput } from 'client/scripts/state/api/commen
 import { useAuthModalStore } from 'client/scripts/state/ui/modals';
 import { notifyError } from 'controllers/app/notifications';
 import { SessionKeyError } from 'controllers/server/sessions';
+import { BigNumber } from 'ethers';
 import React, { useState } from 'react';
 import app from 'state';
 import useUserStore from 'state/ui/user';
@@ -52,8 +53,8 @@ export const CommentReactionButton = ({
     (x) => x?.author === activeAddress,
   );
   const reactionWeightsSum = comment.reactions.reduce(
-    (acc, curr) => acc + (curr.calculatedVotingWeight || 1),
-    0,
+    (acc, reaction) => acc.add(reaction.calculatedVotingWeight || 1),
+    BigNumber.from(0),
   );
 
   const handleVoteClick = async (e) => {
@@ -117,7 +118,7 @@ export const CommentReactionButton = ({
         isOpen={isAuthModalOpen}
       />
       <CWUpvoteSmall
-        voteCount={reactionWeightsSum}
+        voteCount={reactionWeightsSum.toString()}
         disabled={!user.activeAccount || disabled}
         selected={hasReacted}
         onClick={handleVoteClick}

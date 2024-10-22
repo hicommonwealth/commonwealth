@@ -1,3 +1,7 @@
+import {
+  useFetchGlobalActivityQuery,
+  useFetchUserActivityQuery,
+} from 'client/scripts/state/api/feeds/fetchUserActivity';
 import { notifyInfo } from 'controllers/app/notifications';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import useBrowserWindow from 'hooks/useBrowserWindow';
@@ -123,11 +127,17 @@ const UserDashboard = ({ type }: UserDashboardProps) => {
                 />
               </CWTabsRow>
             </div>
-            <Feed
-              dashboardView={activePage}
-              noFeedMessage="Join some communities to see Activity!"
-              customScrollParent={scrollElement!}
-            />
+            {activePage === DashboardViews.Global ? (
+              <Feed
+                query={useFetchGlobalActivityQuery}
+                customScrollParent={scrollElement!}
+              />
+            ) : (
+              <Feed
+                query={useFetchUserActivityQuery}
+                customScrollParent={scrollElement!}
+              />
+            )}
           </div>
           {isWindowExtraSmall ? (
             <>

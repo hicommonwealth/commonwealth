@@ -10,7 +10,7 @@ import moment, { Moment } from 'moment';
 import { z } from 'zod';
 import Comment from './Comment';
 import type { ReactionType } from './Reaction';
-import Topic from './Topic';
+import type { Topic } from './Topic';
 import type { IUniqueId } from './interfaces';
 import type { ThreadKind, ThreadStage } from './types';
 
@@ -263,7 +263,7 @@ export class Thread implements IUniqueId {
   public associatedReactions: AssociatedReaction[];
   public associatedContests?: AssociatedContest[];
   public recentComments?: Comment<IUniqueId>[];
-  public reactionWeightsSum: number;
+  public reactionWeightsSum: string;
   public links: Link[];
   public readonly discord_meta: any;
   public readonly latestActivity: Moment;
@@ -353,7 +353,7 @@ export class Thread implements IUniqueId {
     reactionType?: any[]; // TODO: fix type
     reactionTimestamps?: string[];
     reactionWeights?: number[];
-    reaction_weights_sum: number;
+    reaction_weights_sum: string;
     ThreadVersionHistories: ThreadVersionHistory[];
     Address: any; // TODO: fix type
     discord_meta?: any;
@@ -375,8 +375,7 @@ export class Thread implements IUniqueId {
     this.identifier = `${id}`;
     this.createdAt = moment(created_at);
     this.updatedAt = moment(updated_at);
-    // @ts-expect-error StrictNullChecks
-    this.topic = topic?.id ? new Topic({ ...(topic || {}) } as any) : null;
+    this.topic = { ...topic };
     this.kind = kind;
     this.stage = stage;
     this.authorCommunity = Address?.community_id;
@@ -457,7 +456,7 @@ export class Thread implements IUniqueId {
           parent_id: null,
           reactions: [],
           CommentVersionHistories: [],
-          reaction_weights_sum: 0,
+          reaction_weights_sum: '0',
           canvas_signed_data: null,
           canvas_msg_id: null,
         }),

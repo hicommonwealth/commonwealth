@@ -1,4 +1,5 @@
-import { trpc } from 'client/scripts/utils/trpcClient';
+import { trpc } from 'utils/trpcClient';
+import { GroupFormTopicSubmitValues } from 'views/pages/CommunityGroupsAndMembers/Groups/common/GroupForm/index.types';
 import { userStore } from '../../ui/user';
 import { ApiEndpoints, queryClient } from '../config';
 
@@ -8,7 +9,7 @@ interface EditGroupProps {
   address: string;
   groupName: string;
   groupDescription?: string;
-  topicIds: number[];
+  topics: GroupFormTopicSubmitValues[];
   requirementsToFulfill: number | undefined;
   requirements?: any[];
 }
@@ -19,7 +20,7 @@ export const buildUpdateGroupInput = ({
   address,
   groupName,
   groupDescription,
-  topicIds,
+  topics,
   requirementsToFulfill,
   requirements,
 }: EditGroupProps) => {
@@ -37,7 +38,7 @@ export const buildUpdateGroupInput = ({
       }),
     },
     ...(requirements && { requirements }),
-    topics: topicIds,
+    topics,
   };
 };
 

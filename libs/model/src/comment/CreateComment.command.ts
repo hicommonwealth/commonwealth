@@ -32,7 +32,9 @@ export function CreateComment(): Command<
   return {
     ...schemas.CreateComment,
     auth: [
-      isAuthorized({ action: schemas.PermissionEnum.CREATE_COMMENT }),
+      isAuthorized({
+        action: schemas.PermissionEnum.CREATE_COMMENT,
+      }),
       verifyCommentSignature,
     ],
     body: async ({ actor, payload, auth }) => {
@@ -71,7 +73,7 @@ export function CreateComment(): Command<
               text,
               address_id: address.id!,
               reaction_count: 0,
-              reaction_weights_sum: 0,
+              reaction_weights_sum: '0',
               created_by: '',
               search: getCommentSearchVector(text),
               content_url: contentUrl,

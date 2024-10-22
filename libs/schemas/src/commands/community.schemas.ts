@@ -12,6 +12,7 @@ import { z } from 'zod';
 import {
   Community,
   Group,
+  PermissionEnum,
   Requirement,
   StakeTransaction,
   Topic,
@@ -170,7 +171,6 @@ export const CreateTopic = {
         featured_in_new_post: true,
         default_offchain_template: true,
         weighted_voting: true,
-        chain_node_id: true,
         token_address: true,
         token_symbol: true,
         vote_weight_multiplier: true,
@@ -228,7 +228,14 @@ export const CreateGroup = {
     community_id: z.string(),
     metadata: GroupMetadata,
     requirements: z.array(Requirement).optional(),
-    topics: z.array(PG_INT).optional(),
+    topics: z
+      .array(
+        z.object({
+          id: PG_INT,
+          permissions: z.array(z.nativeEnum(PermissionEnum)),
+        }),
+      )
+      .optional(),
   }),
   output: Community.extend({ groups: z.array(Group).optional() }).partial(),
 };
@@ -239,7 +246,14 @@ export const UpdateGroup = {
     group_id: PG_INT,
     metadata: GroupMetadata.optional(),
     requirements: z.array(Requirement).optional(),
-    topics: z.array(PG_INT).optional(),
+    topics: z
+      .array(
+        z.object({
+          id: PG_INT,
+          permissions: z.array(z.nativeEnum(PermissionEnum)),
+        }),
+      )
+      .optional(),
   }),
   output: Group.partial(),
 };
@@ -288,4 +302,12 @@ export const JoinCommunity = {
     wallet_id: z.nativeEnum(WalletId).optional(),
     ss58Prefix: z.number().optional(),
   }),
+};
+
+export const BanAddress = {
+  input: z.object({
+    community_id: z.string(),
+    address: z.string(),
+  }),
+  output: z.object({}),
 };

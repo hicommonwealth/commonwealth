@@ -5,7 +5,7 @@ import { DragDropContext, Draggable } from 'react-beautiful-dnd';
 import { Virtuoso } from 'react-virtuoso';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
-import type Topic from '../../../models/Topic';
+import type { Topic } from '../../../models/Topic';
 import CWIconButton from '../../components/component_kit/new_designs/CWIconButton';
 
 const reorder = (list: Topic[], startIndex, endIndex): Topic[] => {
@@ -17,8 +17,10 @@ const reorder = (list: Topic[], startIndex, endIndex): Topic[] => {
 };
 
 // This component handles fixed size of the item in the list
+// eslint-disable-next-line react/prop-types
 const HeightPreservingItem = ({ children, ...props }) => {
   const [size, setSize] = useState(0);
+  // eslint-disable-next-line react/prop-types
   const knownSize = props['data-known-size'];
 
   useEffect(() => {
@@ -43,6 +45,7 @@ interface TopicRowProps {
   onEdit?: React.Dispatch<React.SetStateAction<Topic>>;
 }
 
+// eslint-disable-next-line react/no-multi-comp
 const TopicRow = ({ provided, item, isDragging, onEdit }: TopicRowProps) => {
   return (
     <div
@@ -79,6 +82,7 @@ interface DraggableTopicsListProps {
   onEdit?: React.Dispatch<React.SetStateAction<Topic>>;
 }
 
+// eslint-disable-next-line react/no-multi-comp
 const DraggableTopicsList = ({
   topics,
   setTopics,
