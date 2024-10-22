@@ -6,8 +6,8 @@ import {
   ImageBehaviorSelector,
   ImageBehaviorSelectorProps,
 } from './ImageBehaviorSelector';
-import { UploadControl, UploadControlProps } from './UploadControl';
-import { ImageBehavior } from './types';
+import { UploadControl } from './UploadControl';
+import { ImageBehavior, UploadControlProps } from './types';
 
 type CWCoverImageUploaderProps = UploadControlProps &
   ImageBehaviorSelectorProps & {
