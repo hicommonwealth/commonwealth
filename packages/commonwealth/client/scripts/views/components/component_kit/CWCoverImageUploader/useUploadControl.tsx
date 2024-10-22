@@ -21,7 +21,6 @@ export const useUploadControl = ({
 }: UploadControlProps) => {
   const imageInputRef = useRef<HTMLInputElement>(null);
   const dropzoneRef = useRef<HTMLDivElement>(null);
-  const [imageToRender, setImageToRender] = useState('');
   const [isDraggingFile, setIsDraggingFile] = useState(false);
   const [imagePrompt, setImagePrompt] = useState('');
   const [isImageGenerationSectionOpen, setIsImageGenerationSectionOpen] =
@@ -29,6 +28,8 @@ export const useUploadControl = ({
   const [processedImages, setProcessedImages] = useState<ImageProcessed[]>([]);
   const [activeImageIndex, setActiveImageIndex] = useState(-1);
   const processedImagesRef = useRef(processedImages);
+
+  const imageToRender = processedImages?.[activeImageIndex]?.url;
 
   const { isWindowExtraSmall } = useBrowserWindow({});
 
@@ -132,19 +133,22 @@ export const useUploadControl = ({
     // this will override any image that is shown, if an image is being uploaded or generated
     // then that generated/uploaded image will override this one, once that is finished
     if (imageURL) {
-      if (formContextRef.current?.formContext && formContextRef.current?.name) {
-        formContextRef.current.formContext.setValue(
-          formContextRef.current?.name,
-          imageURL,
-          { shouldDirty: true },
-        );
-      }
-      setImageToRender(imageURL);
       const shouldUpdate =
         processedImagesRef.current.findIndex(
           (i) => i.url === imageURL.trim(),
         ) === -1;
       if (shouldUpdate) {
+        if (
+          formContextRef.current?.formContext &&
+          formContextRef.current?.name
+        ) {
+          formContextRef.current.formContext.setValue(
+            formContextRef.current?.name,
+            imageURL,
+            { shouldDirty: true },
+          );
+        }
+
         setProcessedImages((images) => [
           ...images,
           {
@@ -162,19 +166,22 @@ export const useUploadControl = ({
 
   useEffect(() => {
     if (uploadedImageURL) {
-      if (formContextRef.current?.formContext && formContextRef.current?.name) {
-        formContextRef.current.formContext.setValue(
-          formContextRef.current?.name,
-          uploadedImageURL,
-          { shouldDirty: true },
-        );
-      }
-      setImageToRender(uploadedImageURL);
       const shouldUpdate =
         processedImagesRef.current.findIndex(
           (i) => i.url === uploadedImageURL.trim(),
         ) === -1;
       if (shouldUpdate) {
+        if (
+          formContextRef.current?.formContext &&
+          formContextRef.current?.name
+        ) {
+          formContextRef.current.formContext.setValue(
+            formContextRef.current?.name,
+            uploadedImageURL,
+            { shouldDirty: true },
+          );
+        }
+
         setProcessedImages((images) => [
           ...images,
           {
@@ -199,19 +206,22 @@ export const useUploadControl = ({
     if (generatedImageURL) {
       setImagePrompt('');
       setIsImageGenerationSectionOpen(false);
-      if (formContextRef.current?.formContext && formContextRef.current?.name) {
-        formContextRef.current.formContext.setValue(
-          formContextRef.current?.name,
-          generatedImageURL,
-          { shouldDirty: true },
-        );
-      }
-      setImageToRender(generatedImageURL);
       const shouldUpdate =
         processedImagesRef.current.findIndex(
           (i) => i.url === generatedImageURL.trim(),
         ) === -1;
       if (shouldUpdate) {
+        if (
+          formContextRef.current?.formContext &&
+          formContextRef.current?.name
+        ) {
+          formContextRef.current.formContext.setValue(
+            formContextRef.current?.name,
+            generatedImageURL,
+            { shouldDirty: true },
+          );
+        }
+
         setProcessedImages((images) => [
           ...images,
           {
@@ -306,7 +316,6 @@ export const useUploadControl = ({
   // update `imageToRender` from formContext whenever it changes (if component is hooked to form)
   useEffect(() => {
     if (formFieldValue !== imageToRender && formFieldValue !== null) {
-      setImageToRender(formFieldValue);
       if (formFieldValue) {
         const shouldUpdate =
           processedImagesRef.current.findIndex(

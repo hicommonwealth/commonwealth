@@ -100,10 +100,10 @@ export const UploadControl = ({
         </div>
       ) : (
         <>
-          {processedImages?.[activeImageIndex]?.url ? (
+          {imageToRender ? (
             <img
-              key={processedImages?.[activeImageIndex]?.url}
-              src={processedImages?.[activeImageIndex]?.url}
+              key={imageToRender}
+              src={imageToRender}
               className={`img-${imageBehavior}`}
             />
           ) : (
