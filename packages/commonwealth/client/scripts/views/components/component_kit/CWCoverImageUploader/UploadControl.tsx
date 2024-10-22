@@ -261,6 +261,7 @@ export const UploadControl = ({
         { isLoading },
         { hovered: isDraggingFile },
         { formError: !!formFieldErrorMessage },
+        { hasImageURL: !!imageToRender },
         uploadControlClassName,
       )}
       onClick={() => openFilePicker()}
