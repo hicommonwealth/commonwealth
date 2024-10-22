@@ -66,11 +66,7 @@ export function GetComments(): Query<typeof schemas.GetComments> {
         };
       });
 
-      return schemas.buildPaginatedResponse(
-        sanitizedComments,
-        count as number,
-        payload,
-      );
+      return schemas.buildPaginatedResponse(sanitizedComments, count, payload);
     },
   };
 }
