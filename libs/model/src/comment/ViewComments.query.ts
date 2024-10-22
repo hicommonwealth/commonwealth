@@ -60,6 +60,7 @@ export function ViewComments(): Query<typeof schemas.ViewComments> {
         return {
           ...sanitizeDeletedComment(data),
           last_edited: data.updated_at,
+          community_id: data.Thread!.community_id!,
         };
       });
 

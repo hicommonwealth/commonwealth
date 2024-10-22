@@ -37,6 +37,8 @@ export const ViewComments = {
     thread_id: PG_INT,
   }),
   output: z.object({
-    comments: Comment.array(),
+    comments: Comment.extend({
+      community_id: z.string(),
+    }).array(),
   }),
 };
