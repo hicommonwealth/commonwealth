@@ -1,0 +1,8 @@
+.CustomLinkPreview {
+  display: flex;
+  gap: 4px;
+  flex-grow: 1;
+  .MainLink {
+    flex-grow: 1;
+  }
+}

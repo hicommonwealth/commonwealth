@@ -1,27 +1,21 @@
-import {
-  linkDialogState$,
-  removeLink$,
-  useCellValues,
-  usePublisher,
-} from 'commonwealth-mdxeditor';
+import { linkDialogState$, useCellValues } from 'commonwealth-mdxeditor';
 import React from 'react';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
+import './CustomLinkPreview.scss';
 
 export const CustomLinkPreview = () => {
   const [linkDialogState] = useCellValues(linkDialogState$);
-  const removeLink = usePublisher(removeLink$);
 
   if (linkDialogState.type !== 'preview') {
     return null;
   }
 
-  // FIXME use SCSS
   return (
-    <div style={{ display: 'flex', gap: 4, flexGrow: 1 }}>
+    <div className="CustomLinkPreview">
       <a
         href={linkDialogState.url}
         target="_blank"
-        style={{ flexGrow: 1 }}
+        className="MainLink"
         rel="noreferrer"
       >
         {linkDialogState.url}
