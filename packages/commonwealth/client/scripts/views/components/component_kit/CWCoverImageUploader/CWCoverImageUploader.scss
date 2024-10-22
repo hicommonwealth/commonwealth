@@ -77,6 +77,14 @@
       }
     }
 
+    .generate-img-btn {
+      z-index: 1;
+
+      &.isFillImageBehaviour {
+        margin-top: auto !important;
+      }
+    }
+
     .loading-container,
     .generate-image-section {
       position: absolute;
@@ -95,11 +103,11 @@
     }
 
     .loading-container {
-      z-index: 2;
+      z-index: 3;
     }
 
     .generate-image-section {
-      z-index: 1;
+      z-index: 2;
 
       .close-btn {
         position: absolute;

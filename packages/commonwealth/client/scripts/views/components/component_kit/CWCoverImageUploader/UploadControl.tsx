@@ -319,11 +319,16 @@ export const UploadControl = ({
               type="button"
               buttonType="secondary"
               label="Generate Image"
-              containerClassName="btn-focus-styles"
+              containerClassName={clsx('btn-focus-styles generate-img-btn', {
+                isFillImageBehaviour: imageBehavior === ImageBehavior.Fill,
+              })}
               onClick={(e) => {
                 e.stopPropagation();
                 setIsImageGenerationSectionOpen(true);
               }}
+              buttonWidth={
+                imageBehavior === ImageBehavior.Fill ? 'full' : 'narrow'
+              }
               disabled={areActionsDisabled}
             />
           )}
