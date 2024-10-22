@@ -77,8 +77,14 @@ export async function getVotingWeight(
       },
       cacheRefresh: true,
     });
+
+    const tokenBalance = balances[address];
+
+    if (BigNumber.from(tokenBalance).lte(0))
+      throw new InvalidState('Insufficient token balance');
+
     const result = commonProtocol.calculateVoteWeight(
-      balances[address],
+      tokenBalance,
       topic.vote_weight_multiplier!,
     );
     // only count full ERC20 tokens
