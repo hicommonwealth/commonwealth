@@ -7,7 +7,7 @@ import {
 } from 'commonwealth-mdxeditor';
 import React, { ReactNode, useCallback, useEffect } from 'react';
 
-import { CustomLinkDialogForMobile } from 'views/components/MarkdownEditor/CustomLinkDialogForMobile';
+import { CustomLinkDialogForMobile } from 'views/components/MarkdownEditor/customLinkDialog/CustomLinkDialogForMobile';
 import { BlockSelectorButton } from 'views/components/MarkdownEditor/toolbars/BlockSelectorButton';
 import { CreateLinkButton } from 'views/components/MarkdownEditor/toolbars/CreateLinkButton';
 import { FormatButton } from 'views/components/MarkdownEditor/toolbars/FormatButton';

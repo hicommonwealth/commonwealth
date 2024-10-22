@@ -12,7 +12,7 @@ import {
   useCellValues,
 } from 'commonwealth-mdxeditor';
 import React from 'react';
-import { CustomLinkDialogForDesktop } from 'views/components/MarkdownEditor/CustomLinkDialogForDesktop';
+import { CustomLinkDialogForDesktop } from 'views/components/MarkdownEditor/customLinkDialog/CustomLinkDialogForDesktop';
 import { CreateLinkButton } from 'views/components/MarkdownEditor/toolbars/CreateLinkButton';
 import { FormatButton } from 'views/components/MarkdownEditor/toolbars/FormatButton';
 import { HeadingButton } from 'views/components/MarkdownEditor/toolbars/HeadingButton';
