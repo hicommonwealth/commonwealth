@@ -1,6 +1,7 @@
 import { type Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../database';
+import { sanitizeDeletedComment } from '../utils/sanitizeDeletedComment';
 
 export function ViewComments(): Query<typeof schemas.ViewComments> {
   return {
