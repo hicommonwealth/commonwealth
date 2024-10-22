@@ -28,3 +28,13 @@ export const GetComments = {
     results: Comment.array(),
   }),
 };
+
+// Similar to GetComments but used exclusively in our client (LEGACY)
+export const ViewComments = {
+  input: z.object({
+    thread_id: PG_INT,
+  }),
+  output: z.object({
+    comments: Comment.array(),
+  }),
+};
