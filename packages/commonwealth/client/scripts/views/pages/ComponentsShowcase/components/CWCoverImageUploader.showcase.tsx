@@ -2,8 +2,10 @@ import { VALIDATION_MESSAGES } from 'client/scripts/helpers/formValidations/mess
 import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/CWButton';
 import { CWForm } from 'client/scripts/views/components/component_kit/new_designs/CWForm';
 import React, { useState } from 'react';
-import { CWCoverImageUploader } from 'views/components/component_kit/CWCoverImageUploader';
-import { ImageBehavior } from 'views/components/component_kit/cw_cover_image_uploader';
+import {
+  CWCoverImageUploader,
+  ImageBehavior,
+} from 'views/components/component_kit/CWCoverImageUploader';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { z } from 'zod';
 

@@ -1,6 +1,5 @@
 import clsx from 'clsx';
 import React from 'react';
-import { ImageBehavior } from '../cw_cover_image_uploader';
 import { MessageRow } from '../cw_text_input';
 import './CWCoverImageUploader.scss';
 import {
@@ -8,6 +7,7 @@ import {
   ImageBehaviorSelectorProps,
 } from './ImageBehaviorSelector';
 import { UploadControl, UploadControlProps } from './UploadControl';
+import { ImageBehavior } from './types';
 
 type CWCoverImageUploaderProps = UploadControlProps &
   ImageBehaviorSelectorProps & {

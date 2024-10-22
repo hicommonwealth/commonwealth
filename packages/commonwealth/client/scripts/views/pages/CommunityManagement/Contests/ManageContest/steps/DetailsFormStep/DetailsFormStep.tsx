@@ -12,7 +12,7 @@ import TokenFinder, { useTokenFinder } from 'views/components/TokenFinder';
 import {
   CWCoverImageUploader,
   ImageBehavior,
-} from 'views/components/component_kit/cw_cover_image_uploader';
+} from 'views/components/component_kit/CWCoverImageUploader';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { SelectList } from 'views/components/component_kit/cw_select_list';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -363,13 +363,14 @@ const DetailsFormStep = ({
                   png)
                 </CWText>
                 <CWCoverImageUploader
-                  canSelectImageBehaviour={false}
-                  showUploadAndGenerateText
-                  onImageProcessStatusChange={setIsProcessingProfileImage}
+                  canSelectImageBehavior={false}
+                  onImageProcessingChange={({ isGenerating, isUploading }) =>
+                    setIsProcessingProfileImage(isGenerating || isUploading)
+                  }
                   name="contestImage"
                   hookToForm
-                  defaultImageBehaviour={ImageBehavior.Fill}
-                  enableGenerativeAI
+                  imageBehavior={ImageBehavior.Fill}
+                  withAIImageGeneration
                 />
               </div>
 

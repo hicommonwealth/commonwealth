@@ -21,7 +21,7 @@ import {
 import {
   CWCoverImageUploader,
   ImageBehavior,
-} from 'views/components/component_kit/cw_cover_image_uploader';
+} from 'views/components/component_kit/CWCoverImageUploader';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTextArea } from 'views/components/component_kit/cw_text_area';
@@ -292,13 +292,14 @@ const CommunityProfileForm = () => {
             />
             <CWCoverImageUploader
               hookToForm
-              enableGenerativeAI
-              showUploadAndGenerateText
+              withAIImageGeneration
               name="communityProfileImageURL"
-              canSelectImageBehaviour={false}
-              defaultImageBehaviour={ImageBehavior.Circle}
-              onImageProcessStatusChange={setIsProcessingProfileImage}
-              subheaderText="Community Profile Image (Accepts JPG and PNG files)"
+              canSelectImageBehavior={false}
+              imageBehavior={ImageBehavior.Circle}
+              onImageProcessingChange={({ isGenerating, isUploading }) =>
+                setIsProcessingProfileImage(isGenerating || isUploading)
+              }
+              label="Community Profile Image (Accepts JPG and PNG files)"
             />
           </section>
 

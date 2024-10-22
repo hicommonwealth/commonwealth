@@ -5,7 +5,6 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import useGenerateImageMutation from 'state/api/general/generateImage';
 import useUploadFileMutation from 'state/api/general/uploadFile';
-import { ImageBehavior } from '../cw_cover_image_uploader';
 import { CWIcon } from '../cw_icons/cw_icon';
 import { CWText } from '../cw_text';
 import { CWButton } from '../new_designs/CWButton';
@@ -13,6 +12,7 @@ import CWCircleMultiplySpinner from '../new_designs/CWCircleMultiplySpinner';
 import CWIconButton from '../new_designs/CWIconButton';
 import { CWTextInput } from '../new_designs/CWTextInput';
 import { MessageRow } from '../new_designs/CWTextInput/MessageRow';
+import { ImageBehavior } from './types';
 
 type ImageProcessingProps = {
   isGenerating: boolean;

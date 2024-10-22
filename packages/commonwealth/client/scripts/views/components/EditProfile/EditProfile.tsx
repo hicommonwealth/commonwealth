@@ -21,7 +21,7 @@ import { UserTrainingCardTypes } from '../UserTrainingSlider/types';
 import {
   CWCoverImageUploader,
   ImageBehavior,
-} from '../component_kit/cw_cover_image_uploader';
+} from '../component_kit/CWCoverImageUploader';
 import { CWDivider } from '../component_kit/cw_divider';
 import { CWText } from '../component_kit/cw_text';
 import { CWButton } from '../component_kit/new_designs/CWButton';
@@ -341,18 +341,19 @@ const EditProfile = () => {
               description="Express yourself through imagery."
             >
               <CWText fontWeight="medium">Add a background image </CWText>
-              {/* TODO: add option to remove existing image */}
+              {/* can add option to remove existing image if needed */}
               <CWCoverImageUploader
                 name="backgroundImg"
                 hookToForm
-                enableGenerativeAI
-                showUploadAndGenerateText
-                defaultImageBehaviour={
+                withAIImageGeneration
+                imageBehavior={
                   (data?.profile?.background_image
                     ?.imageBehavior as ImageBehavior) || ImageBehavior.Fill
                 }
-                onImageProcessStatusChange={setIsUploadingCoverImage}
-                onImageBehaviourChange={setBackgroundImageBehaviour}
+                onImageProcessingChange={({ isGenerating, isUploading }) =>
+                  setIsUploadingCoverImage(isGenerating || isUploading)
+                }
+                onImageBehaviorChange={setBackgroundImageBehaviour}
               />
             </ProfileSection>
             <ProfileSection

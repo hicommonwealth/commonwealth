@@ -1,8 +1,8 @@
 import clsx from 'clsx';
 import React from 'react';
-import { ImageBehavior } from '../cw_cover_image_uploader';
 import { CWText } from '../cw_text';
 import { CWRadioButton } from '../new_designs/cw_radio_button';
+import { ImageBehavior } from './types';
 
 export type ImageBehaviorSelectorProps = {
   canSelectImageBehavior?: boolean;
