@@ -1,19 +1,16 @@
 import {
   cancelLinkEdit$,
   linkDialogState$,
-  removeLink$,
   updateLink$,
   useCellValues,
   usePublisher,
 } from 'commonwealth-mdxeditor';
 import React, { useState } from 'react';
-import { SaveButton } from 'views/components/MarkdownEditor/customLinkDialog/SaveButton';
-import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
+import { IconButtonWithTooltip } from 'views/components/MarkdownEditor/customLinkDialog/IconButtonWithTooltip';
 import './CustomLinkEdit.scss';
 
 export const CustomLinkEdit = () => {
   const [linkDialogState] = useCellValues(linkDialogState$);
-  const removeLink = usePublisher(removeLink$);
   const updateLink = usePublisher(updateLink$);
 
   const [link, setLink] = useState(
@@ -36,14 +33,17 @@ export const CustomLinkEdit = () => {
         onChange={(event) => setLink(event.currentTarget.value)}
       />
 
-      <SaveButton
+      <IconButtonWithTooltip
+        iconName="check"
+        tooltip="Save"
         onClick={() => {
           updateLink({ url: link, title: link });
         }}
       />
 
-      <CWIconButton
+      <IconButtonWithTooltip
         iconName="close"
+        tooltip="Cancel"
         onClick={() => {
           cancelLinkEdit();
         }}
