@@ -7,16 +7,15 @@ import {
   dispose,
   query,
 } from '@hicommonwealth/core';
-import {
-  PermissionEnum,
-  TopicWeightedVoting,
-} from '@hicommonwealth/schemas';
+import { PermissionEnum, TopicWeightedVoting } from '@hicommonwealth/schemas';
 import { ChainBase, ChainType } from '@hicommonwealth/shared';
 import { Chance } from 'chance';
 import { CreateTopic } from 'model/src/community/CreateTopic.command';
 import { UpdateTopic } from 'model/src/community/UpdateTopic.command';
 import { afterAll, assert, beforeAll, describe, expect, test } from 'vitest';
 import {
+  BanAddress,
+  BanAddressErrors,
   CreateCommunity,
   CreateGroup,
   CreateGroupErrors,
@@ -25,6 +24,7 @@ import {
   DeleteTopic,
   GetCommunities,
   GetMembers,
+  GetTopics,
   JoinCommunity,
   JoinCommunityErrors,
   MAX_GROUPS_PER_COMMUNITY,
@@ -364,15 +364,30 @@ describe('Community lifecycle', () => {
           payload: buildCreateGroupPayload(community.id, [
             {
               id: 1,
-              permissions: [PermissionEnum.CREATE_COMMENT, PermissionEnum.CREATE_THREAD, PermissionEnum.CREATE_COMMENT_REACTION,PermissionEnum.CREATE_THREAD_REACTION],
+              permissions: [
+                PermissionEnum.CREATE_COMMENT,
+                PermissionEnum.CREATE_THREAD,
+                PermissionEnum.CREATE_COMMENT_REACTION,
+                PermissionEnum.CREATE_THREAD_REACTION,
+              ],
             },
             {
               id: 2,
-              permissions: [PermissionEnum.CREATE_COMMENT, PermissionEnum.CREATE_THREAD, PermissionEnum.CREATE_COMMENT_REACTION,PermissionEnum.CREATE_THREAD_REACTION],
+              permissions: [
+                PermissionEnum.CREATE_COMMENT,
+                PermissionEnum.CREATE_THREAD,
+                PermissionEnum.CREATE_COMMENT_REACTION,
+                PermissionEnum.CREATE_THREAD_REACTION,
+              ],
             },
             {
               id: 3,
-              permissions: [PermissionEnum.CREATE_COMMENT, PermissionEnum.CREATE_THREAD, PermissionEnum.CREATE_COMMENT_REACTION,PermissionEnum.CREATE_THREAD_REACTION],
+              permissions: [
+                PermissionEnum.CREATE_COMMENT,
+                PermissionEnum.CREATE_THREAD,
+                PermissionEnum.CREATE_COMMENT_REACTION,
+                PermissionEnum.CREATE_THREAD_REACTION,
+              ],
             },
           ]),
         }),
@@ -479,7 +494,6 @@ describe('Community lifecycle', () => {
     });
 
     test('should create topic (stake weighted)', async () => {
-      // when community is staked, topic will automatically be staked
       await models.CommunityStake.create({
         community_id: community.id,
         stake_id: 1,
@@ -495,6 +509,7 @@ describe('Community lifecycle', () => {
           description: 'boohoo',
           featured_in_sidebar: false,
           featured_in_new_post: false,
+          weighted_voting: TopicWeightedVoting.Stake,
         },
       });
       const { topic } = result!;
@@ -565,6 +580,14 @@ describe('Community lifecycle', () => {
           payload: { community_id: community.id, topic_id: topic!.id! },
         }),
       ).rejects.toThrow(InvalidActor);
+    });
+
+    test('should get topics', async () => {
+      const topics = await query(GetTopics(), {
+        actor: superAdminActor,
+        payload: { community_id: community.id, with_contest_managers: false },
+      });
+      expect(topics?.length).toBe(4);
     });
   });
 
@@ -664,18 +687,18 @@ describe('Community lifecycle', () => {
           id: community.id,
           chain_node_id: edgewareNode!.id!,
         },
-      }),
-        await expect(() =>
-          command(UpdateCommunity(), {
-            actor: superAdminActor,
-            payload: {
-              ...baseRequest,
-              id: community.id,
-              namespace: 'tempNamespace',
-              transactionHash: '0x1234',
-            },
-          }),
-        ).rejects.toThrow('Namespace not supported on selected chain');
+      });
+      await expect(() =>
+        command(UpdateCommunity(), {
+          actor: superAdminActor,
+          payload: {
+            ...baseRequest,
+            id: community.id,
+            namespace: 'tempNamespace',
+            transactionHash: '0x1234',
+          },
+        }),
+      ).rejects.toThrow('Namespace not supported on selected chain');
     });
   });
 
@@ -782,6 +805,53 @@ describe('Community lifecycle', () => {
           payload: { community_id: substrate_community.id },
         }),
       ).rejects.toThrow(JoinCommunityErrors.NotVerifiedAddressOrUser);
+    });
+  });
+
+  describe('ban address', () => {
+    test('should fail if actor is not admin', async () => {
+      await expect(() =>
+        command(BanAddress(), {
+          actor: ethActor,
+          payload: {
+            community_id: community.id!,
+            address: '',
+          },
+        }),
+      ).rejects.toThrow(InvalidActor);
+    });
+    test('should fail to ban an address of a different community', async () => {
+      await expect(() =>
+        command(BanAddress(), {
+          actor: ethAdminActor,
+          payload: {
+            address: substrateActor.address!,
+            community_id: substrate_community.id!,
+          },
+        }),
+      ).rejects.toThrow(InvalidActor);
+    });
+    test('should fail if address is not found in community', async () => {
+      await expect(() =>
+        command(BanAddress(), {
+          actor: ethAdminActor,
+          payload: { address: '0xrandom', community_id: community.id! },
+        }),
+      ).rejects.toThrow(BanAddressErrors.NotFound);
+    });
+    test('should allow an admin to ban an address', async () => {
+      await command(BanAddress(), {
+        actor: ethAdminActor,
+        payload: { address: ethActor.address!, community_id: community.id! },
+      });
+    });
+    test('should fail if address is already banned', async () => {
+      await expect(() =>
+        command(BanAddress(), {
+          actor: ethAdminActor,
+          payload: { address: ethActor.address!, community_id: community.id! },
+        }),
+      ).rejects.toThrow(BanAddressErrors.AlreadyExists);
     });
   });
 });

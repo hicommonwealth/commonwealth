@@ -11,7 +11,7 @@ import { config } from '../config';
 import * as comment from './comment';
 import * as community from './community';
 import { router } from './external-router';
-import * as thread from './threads';
+import * as thread from './thread';
 
 const log = logger(import.meta);
 

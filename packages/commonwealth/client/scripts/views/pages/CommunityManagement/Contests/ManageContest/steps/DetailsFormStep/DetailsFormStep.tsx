@@ -124,12 +124,12 @@ const DetailsFormStep = ({
   const totalPayoutPercentageError = totalPayoutPercentage !== 100;
 
   const weightedTopics = (topicsData || [])
-    .filter((t) => t?.weightedVoting)
+    .filter((t) => t?.weighted_voting)
     .map((t) => ({
       value: t.id,
       label: t.name,
-      weightedVoting: t.weightedVoting,
-      helpText: weightedVotingValueToLabel(t.weightedVoting!),
+      weightedVoting: t.weighted_voting,
+      helpText: weightedVotingValueToLabel(t.weighted_voting!),
     }));
 
   const getInitialValues = () => {
@@ -313,7 +313,7 @@ const DetailsFormStep = ({
                       if (t?.weightedVoting === TopicWeightedVoting.ERC20) {
                         const token = topicsData?.find(
                           (topic) => topic.id === t.value,
-                        )?.tokenAddress;
+                        )?.token_address;
                         setTokenValue(token || '');
                       }
                     }}

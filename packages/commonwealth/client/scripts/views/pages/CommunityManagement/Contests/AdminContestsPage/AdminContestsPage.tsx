@@ -62,7 +62,7 @@ const AdminContestsPage = () => {
   });
 
   const hasAtLeastOneWeightedVotingTopic = topicData?.some(
-    (t) => t.weightedVoting,
+    (t) => t.weighted_voting,
   );
 
   const { data: feeManagerBalance, isLoading: isFeeManagerBalanceLoading } =
@@ -102,7 +102,7 @@ const AdminContestsPage = () => {
         <div className="admin-header-row">
           <CWText type="h2">Contests</CWText>
 
-          {(farcasterContestEnabled
+          {(weightedTopicsEnabled
             ? hasAtLeastOneWeightedVotingTopic
             : stakeEnabled) &&
             contestView !== ContestView.TypeSelection && (
@@ -130,7 +130,6 @@ const AdminContestsPage = () => {
               hasWeightedTopic={!!hasAtLeastOneWeightedVotingTopic}
               isContestAvailable={isContestAvailable}
               stakeEnabled={stakeEnabled}
-              feeManagerBalance={feeManagerBalance}
               onSetContestSelectionView={() =>
                 setContestView(ContestView.TypeSelection)
               }

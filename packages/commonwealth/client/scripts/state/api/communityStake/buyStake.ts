@@ -62,6 +62,14 @@ const useBuyStakeMutation = ({
         queryKey: [ContractMethods.GET_FEE_MANAGER_BALANCE],
       });
 
+      await queryClient.invalidateQueries({
+        queryKey: [ContractMethods.GET_CONTEST_BALANCE],
+      });
+
+      await queryClient.invalidateQueries({
+        queryKey: [ContractMethods.GET_CONTEST_BALANCE],
+      });
+
       if (shouldUpdateActiveAddress) {
         await setActiveAccountOnTransactionSuccess(variables.walletAddress);
       }
