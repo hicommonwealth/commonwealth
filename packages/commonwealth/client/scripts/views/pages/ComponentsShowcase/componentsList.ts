@@ -5,6 +5,7 @@ import BreadcrumbsShowcase from 'views/pages/ComponentsShowcase/components/Bread
 import ButtonsShowcase from 'views/pages/ComponentsShowcase/components/Buttons.showcase';
 import ButtonsCircleShowcase from 'views/pages/ComponentsShowcase/components/ButtonsCircle.showcase';
 import ButtonsIconShowcase from 'views/pages/ComponentsShowcase/components/ButtonsIcon.showcase';
+import CWCoverImageUploaderShowCase from 'views/pages/ComponentsShowcase/components/CWCoverImageUploader.showcase';
 import CardsShowcase from 'views/pages/ComponentsShowcase/components/Cards.showcase';
 import CheckboxesShowcase from 'views/pages/ComponentsShowcase/components/Checkboxes.showcase';
 import CollapsiblesShowcase from 'views/pages/ComponentsShowcase/components/Collapsibles.showcase';
@@ -64,6 +65,7 @@ export const ComponentPageName = {
   Dropdowns: 'Dropdowns',
   Inputs: 'Inputs',
   Paginations: 'Paginations',
+  CoverImageUploader: 'CoverImageUploader',
 };
 
 export const ComponentType = {
@@ -120,6 +122,11 @@ export const componentItems = [
   {
     ComponentPage: ButtonsCircleShowcase,
     displayName: ComponentPageName.ButtonsCircle,
+    type: ComponentType.Components,
+  },
+  {
+    ComponentPage: CWCoverImageUploaderShowCase,
+    displayName: ComponentPageName.CoverImageUploader,
     type: ComponentType.Components,
   },
   {
