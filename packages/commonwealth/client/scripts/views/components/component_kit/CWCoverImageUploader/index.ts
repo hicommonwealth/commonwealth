@@ -1,0 +1,1 @@
+export { CWCoverImageUploader } from './CWCoverImageUploader';
