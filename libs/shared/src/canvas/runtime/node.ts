@@ -20,8 +20,8 @@ export const startCanvasNode = async (config: {
   const listen =
     process.env.FEDERATION_LISTEN_ADDRESS ?? '/ip4/127.0.0.1/tcp/8090/ws';
 
-  const privateKey = config.PEER_ID
-    ? privateKeyFromProtobuf(Buffer.from(config.PEER_ID, 'base64'))
+  const privateKey = config.LIBP2P_PRIVATE_KEY
+    ? privateKeyFromProtobuf(Buffer.from(config.LIBP2P_PRIVATE_KEY, 'base64'))
     : await generateKeyPair('Ed25519');
 
   let pgConnectionConfig: ConnectionConfig | undefined = undefined;
