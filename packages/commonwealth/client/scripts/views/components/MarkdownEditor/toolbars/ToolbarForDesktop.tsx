@@ -12,6 +12,7 @@ import {
   useCellValues,
 } from 'commonwealth-mdxeditor';
 import React from 'react';
+// eslint-disable-next-line max-len
 import { CustomLinkDialogForDesktop } from 'views/components/MarkdownEditor/customLinkDialog/CustomLinkDialogForDesktop';
 import { CreateLinkButton } from 'views/components/MarkdownEditor/toolbars/CreateLinkButton';
 import { FormatButton } from 'views/components/MarkdownEditor/toolbars/FormatButton';

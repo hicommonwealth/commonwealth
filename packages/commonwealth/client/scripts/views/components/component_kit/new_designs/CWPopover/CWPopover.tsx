@@ -12,13 +12,15 @@ import { CWText } from 'views/components/component_kit/cw_text';
 import { getClasses } from '../../helpers';
 import './CWPopover.scss';
 
-export type AnchorType = HTMLElement | SVGSVGElement | VirtualElement;
+export type AnchorType = HTMLElement | SVGSVGElement;
 
 export type UsePopoverProps = {
-  anchorEl: AnchorType;
+  anchorEl: AnchorType | VirtualElement;
   id: string;
   open: boolean;
-  setAnchorEl: React.Dispatch<React.SetStateAction<AnchorType>>;
+  setAnchorEl: React.Dispatch<
+    React.SetStateAction<AnchorType | VirtualElement>
+  >;
   handleInteraction: (e: React.MouseEvent<AnchorType>) => void;
 
   /**
@@ -59,7 +61,9 @@ export type PopoverTriggerProps = {
 };
 
 export const usePopover = (): UsePopoverProps => {
-  const [anchorEl, setAnchorEl] = React.useState<null | AnchorType>(null);
+  const [anchorEl, setAnchorEl] = React.useState<
+    null | AnchorType | VirtualElement
+  >(null);
 
   const handleInteraction = (e: React.MouseEvent<AnchorType>) => {
     setAnchorEl(anchorEl ? null : e.currentTarget);
