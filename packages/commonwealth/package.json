@@ -111,6 +111,7 @@
     "@hicommonwealth/model": "workspace:*",
     "@hicommonwealth/schemas": "workspace:*",
     "@hicommonwealth/shared": "workspace:*",
+    "@hicommonwealth/sitemaps": "workspace:*",
     "@hookform/resolvers": "^3.3.1",
     "@ipld/dag-json": "^10.2.0",
     "@keplr-wallet/types": "^0.12.23",
