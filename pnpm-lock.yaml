@@ -971,6 +971,9 @@ importers:
       '@hicommonwealth/shared':
         specifier: workspace:*
         version: link:../../libs/shared
+      '@hicommonwealth/sitemaps':
+        specifier: workspace:*
+        version: link:../../libs/sitemaps
       '@hookform/resolvers':
         specifier: ^3.3.1
         version: 3.3.4(react-hook-form@7.51.4(react@18.3.1))
@@ -1489,30 +1492,6 @@ importers:
       '@types/k6':
         specifier: ^0.52.0
         version: 0.52.0
-
-  packages/scripts:
-    dependencies:
-      '@hicommonwealth/adapters':
-        specifier: workspace:*
-        version: link:../../libs/adapters
-      '@hicommonwealth/core':
-        specifier: workspace:*
-        version: link:../../libs/core
-      '@hicommonwealth/model':
-        specifier: workspace:*
-        version: link:../../libs/model
-      '@hicommonwealth/sitemaps':
-        specifier: workspace:*
-        version: link:../../libs/sitemaps
-      moment:
-        specifier: ^2.23.0
-        version: 2.30.1
-      sequelize:
-        specifier: ^6.32.1
-        version: 6.37.3(pg@8.11.5)
-      tsx:
-        specifier: ^4.7.2
-        version: 4.9.3
 
 packages:
 
