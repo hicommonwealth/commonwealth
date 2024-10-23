@@ -23,6 +23,7 @@ type CommentEditorProps = {
   editorValue: string;
   shouldFocus: boolean;
   tooltipText?: string;
+  isReplying?: boolean;
 };
 
 export const CommentEditor = ({
@@ -38,6 +39,7 @@ export const CommentEditor = ({
   editorValue,
   shouldFocus,
   tooltipText,
+  isReplying,
 }: CommentEditorProps) => {
   return (
     <div className="CommentEditor">
@@ -72,7 +74,7 @@ export const CommentEditor = ({
       />
       <div className="form-bottom">
         <div className="form-buttons">
-          {editorValue.length > 0 && (
+          {(editorValue.length > 0 || isReplying) && (
             <CWButton buttonType="tertiary" onClick={onCancel} label="Cancel" />
           )}
           <CWButton

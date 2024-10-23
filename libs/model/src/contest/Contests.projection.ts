@@ -62,10 +62,10 @@ async function updateOrCreateWithAlert(
     },
   });
   const url = community?.ChainNode?.private_url;
-  if (!url)
-    throw new InvalidState(
-      `Chain node url not found on namespace ${namespace}`,
-    );
+  if (!url) {
+    log.warn(`Chain node url not found on namespace ${namespace}`);
+    return;
+  }
 
   const { ticker, decimals } =
     await protocol.contractHelpers.getTokenAttributes(contest_address, url);

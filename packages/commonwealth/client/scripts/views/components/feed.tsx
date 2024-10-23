@@ -16,7 +16,6 @@ import { getThreadActionTooltipText } from 'helpers/threads';
 import useTopicGating from 'hooks/useTopicGating';
 import { getProposalUrlPath } from 'identifiers';
 import { Thread, type RecentComment } from 'models/Thread';
-import Topic from 'models/Topic';
 import { ThreadKind, ThreadStage } from 'models/types';
 import { useCommonNavigate } from 'navigation/helpers';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
@@ -132,23 +131,25 @@ function mapThread(thread: z.infer<typeof ActivityThread>): Thread {
     id: thread.id,
     created_at: thread.created_at ?? '',
     updated_at: thread.updated_at ?? thread.created_at ?? '',
-    topic: new Topic({
+    topic: {
       community_id: thread.community_id,
       id: thread.topic.id,
       name: thread.topic.name,
       description: thread.topic.description,
+      created_at: '',
       featured_in_sidebar: false,
       featured_in_new_post: false,
       group_ids: [],
       active_contest_managers: [],
       total_threads: 0,
-    }),
+    },
     kind: thread.kind as ThreadKind,
     stage: thread.stage as ThreadStage,
     ThreadVersionHistories: [],
     community_id: thread.community_id,
     read_only: thread.read_only,
     body: thread.body,
+    content_url: thread.content_url || null,
     locked_at: thread.locked_at ?? '',
     archived_at: thread.archived_at ?? '',
     has_poll: thread.has_poll ?? false,
@@ -160,7 +161,7 @@ function mapThread(thread: z.infer<typeof ActivityThread>): Thread {
     userId: thread.user_id,
     last_edited: thread.updated_at ?? '',
     last_commented_on: '',
-    reaction_weights_sum: 0,
+    reaction_weights_sum: '0',
     address_last_active: '',
     ContestActions: [],
     numberOfComments: thread.number_of_comments,
@@ -176,6 +177,7 @@ function mapThread(thread: z.infer<typeof ActivityThread>): Thread {
             profile_avatar: c.profile_avatar,
             profile_name: c.profile_name,
             text: c.text,
+            content_url: c.content_url || null,
           }) as RecentComment,
       ) ?? [],
   });

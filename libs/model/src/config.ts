@@ -35,6 +35,8 @@ const {
   ALCHEMY_PUBLIC_APP_KEY,
   MEMBERSHIP_REFRESH_BATCH_SIZE,
   MEMBERSHIP_REFRESH_TTL_SECONDS,
+  OPENAI_API_KEY,
+  OPENAI_ORGANIZATION,
 } = process.env;
 
 const NAME =
@@ -141,6 +143,10 @@ export const config = configure(
     DISCORD: {
       CLIENT_ID: DISCORD_CLIENT_ID,
       BOT_TOKEN: DISCORD_TOKEN,
+    },
+    OPENAI: {
+      API_KEY: OPENAI_API_KEY,
+      ORGANIZATION: OPENAI_ORGANIZATION || 'org-D0ty00TJDApqHYlrn1gge2Ql',
     },
   },
   z.object({
@@ -264,6 +270,10 @@ export const config = configure(
             ),
           'DISCORD_TOKEN is required in production, frick, frack, beta (QA), and demo',
         ),
+    }),
+    OPENAI: z.object({
+      API_KEY: z.string().optional(),
+      ORGANIZATION: z.string().optional(),
     }),
   }),
 );

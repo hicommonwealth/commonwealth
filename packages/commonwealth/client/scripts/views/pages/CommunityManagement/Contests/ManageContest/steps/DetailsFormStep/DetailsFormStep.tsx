@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 
 import { TopicWeightedVoting } from '@hicommonwealth/schemas';
 import { notifyError } from 'controllers/app/notifications';
+import { weightedVotingValueToLabel } from 'helpers';
 import { useFlag } from 'hooks/useFlag';
 import { useCommonNavigate } from 'navigation/helpers';
 import app from 'state';
@@ -10,9 +11,9 @@ import useUpdateContestMutation from 'state/api/contests/updateContest';
 import { useFetchTopicsQuery } from 'state/api/topics';
 import TokenFinder, { useTokenFinder } from 'views/components/TokenFinder';
 import {
-  CWCoverImageUploader,
+  CWImageInput,
   ImageBehavior,
-} from 'views/components/component_kit/cw_cover_image_uploader';
+} from 'views/components/component_kit/CWImageInput';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { SelectList } from 'views/components/component_kit/cw_select_list';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -47,7 +48,6 @@ import {
   initialContestDuration,
   initialPayoutStructure,
   prizePercentageOptions,
-  weightedVotingValueToLabel,
 } from './utils';
 import { detailsFormValidationSchema } from './validation';
 
@@ -124,12 +124,12 @@ const DetailsFormStep = ({
   const totalPayoutPercentageError = totalPayoutPercentage !== 100;
 
   const weightedTopics = (topicsData || [])
-    .filter((t) => t?.weightedVoting)
+    .filter((t) => t?.weighted_voting)
     .map((t) => ({
       value: t.id,
       label: t.name,
-      weightedVoting: t.weightedVoting,
-      helpText: weightedVotingValueToLabel(t.weightedVoting!),
+      weightedVoting: t.weighted_voting,
+      helpText: weightedVotingValueToLabel(t.weighted_voting!),
     }));
 
   const getInitialValues = () => {
@@ -313,7 +313,7 @@ const DetailsFormStep = ({
                       if (t?.weightedVoting === TopicWeightedVoting.ERC20) {
                         const token = topicsData?.find(
                           (topic) => topic.id === t.value,
-                        )?.tokenAddress;
+                        )?.token_address;
                         setTokenValue(token || '');
                       }
                     }}
@@ -362,14 +362,15 @@ const DetailsFormStep = ({
                   Set an image to entice users to your contest (1920x1080 jpg or
                   png)
                 </CWText>
-                <CWCoverImageUploader
-                  canSelectImageBehaviour={false}
-                  showUploadAndGenerateText
-                  onImageProcessStatusChange={setIsProcessingProfileImage}
+                <CWImageInput
+                  canSelectImageBehavior={false}
+                  onImageProcessingChange={({ isGenerating, isUploading }) =>
+                    setIsProcessingProfileImage(isGenerating || isUploading)
+                  }
                   name="contestImage"
                   hookToForm
-                  defaultImageBehaviour={ImageBehavior.Fill}
-                  enableGenerativeAI
+                  imageBehavior={ImageBehavior.Fill}
+                  withAIImageGeneration
                 />
               </div>
 

@@ -3,6 +3,7 @@ import { buildDeleteThreadReactionInput } from 'client/scripts/state/api/threads
 import { useAuthModalStore } from 'client/scripts/state/ui/modals';
 import { notifyError } from 'controllers/app/notifications';
 import { SessionKeyError } from 'controllers/server/sessions';
+import { BigNumber } from 'ethers';
 import type Thread from 'models/Thread';
 import React, { useState } from 'react';
 import app from 'state';
@@ -46,9 +47,10 @@ export const ReactionButton = ({
 
   const reactionWeightsSum =
     thread?.associatedReactions?.reduce(
-      (acc, curr) => acc + (curr.voting_weight || 1),
-      0,
-    ) || 0;
+      (acc, reaction) => acc.add(reaction.voting_weight || 1),
+      BigNumber.from(0),
+    ) || BigNumber.from(0);
+
   const activeAddress = user.activeAccount?.address;
   const thisUserReaction = thread?.associatedReactions?.filter(
     (r) => r.address === activeAddress,
@@ -119,7 +121,13 @@ export const ReactionButton = ({
           checkForSessionKeyRevalidationErrors(e);
           return;
         }
-        notifyError('Failed to upvote');
+        if ((e.message as string)?.includes('Insufficient token balance')) {
+          notifyError(
+            'You must have the requisite tokens to upvote in this topic',
+          );
+        } else {
+          notifyError('Failed to upvote');
+        }
         console.error(e?.response?.data?.error || e?.message);
       });
     }
@@ -129,7 +137,7 @@ export const ReactionButton = ({
     <>
       {size === 'small' ? (
         <CWUpvoteSmall
-          voteCount={reactionWeightsSum}
+          voteCount={reactionWeightsSum.toString()}
           disabled={disabled}
           isThreadArchived={!!thread.archivedAt}
           selected={hasReacted}
@@ -143,7 +151,7 @@ export const ReactionButton = ({
         <TooltipWrapper disabled={disabled} text={tooltipText}>
           <CWUpvote
             onClick={handleVoteClick}
-            voteCount={reactionWeightsSum}
+            voteCount={reactionWeightsSum.toString()}
             disabled={disabled}
             active={hasReacted}
           />
@@ -155,7 +163,7 @@ export const ReactionButton = ({
         >
           <CWUpvote
             onClick={handleVoteClick}
-            voteCount={reactionWeightsSum}
+            voteCount={reactionWeightsSum.toString()}
             disabled={disabled}
             active={hasReacted}
           />

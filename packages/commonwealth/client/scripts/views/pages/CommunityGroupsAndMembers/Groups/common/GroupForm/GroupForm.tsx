@@ -1,4 +1,5 @@
 /* eslint-disable react/no-multi-comp */
+import { weightedVotingValueToLabel } from 'helpers';
 import { isValidEthAddress } from 'helpers/validateTypes';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useMemo, useState } from 'react';
@@ -616,6 +617,9 @@ const GroupForm = ({
                   options={sortedTopics.map((topic) => ({
                     label: topic.name,
                     value: topic.id,
+                    helpText: weightedVotingValueToLabel(
+                      topic.weighted_voting!,
+                    ),
                   }))}
                 />
               </section>

@@ -232,9 +232,10 @@ const SignTransactionsStep = ({
       <div className="SignTransactionsStep">
         <CWText type="h2">Sign transactions to launch contest</CWText>
         <CWText type="b1" className="description">
-          You must sign two (2) transactions to launch your community contest.
-          The first is to route the fees generated from stake to the contest
-          address. The second is to launch the contest contract onchain.
+          You must sign this transaction to deploy the contest.{' '}
+          {isContestRecurring
+            ? 'It routes the fees generated from stake to the contest address and launchs the contest contract onchain.'
+            : 'It launchs the contest contract onchain.'}
         </CWText>
 
         <CWText fontWeight="medium" type="b1" className="description">
