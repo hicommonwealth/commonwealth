@@ -33,6 +33,7 @@ const CWImageInputShowCase = () => {
           imageURL={sampleImageUrl}
           imageBehavior={imageBehavior}
           onImageBehaviorChange={setImageBehavior}
+          allowedImageBehaviours={['Circle', 'Fill', 'Tiled']}
         />
       </div>
       <CWText type="h5">Form validation</CWText>
