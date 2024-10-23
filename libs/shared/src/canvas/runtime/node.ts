@@ -61,6 +61,7 @@ export const startCanvasNode = async (config: {
     announce: [announce],
     listen: [listen],
     bootstrapList: [explorerNode],
+    denyDialMultiaddr: (multiaddr) => multiaddr.toString() !== explorerNode,
     privateKey,
     start: true,
   });
