@@ -100,6 +100,7 @@ order by
         r.contests.forEach((c) => {
           c.score?.forEach((w) => {
             w.tickerPrize = Number(w.prize) / 10 ** r.decimals;
+            console.log(w.votes, typeof w.votes);
           });
           c.start_time = new Date(c.start_time);
           c.end_time = new Date(c.end_time);

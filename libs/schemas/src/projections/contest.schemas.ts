@@ -25,7 +25,7 @@ export const ContestScore = z
     z.object({
       creator_address: z.string(),
       content_id: z.string(),
-      votes: PG_INT,
+      votes: z.string(),
       prize: z.string(),
       tickerPrize: z.number().optional(),
     }),

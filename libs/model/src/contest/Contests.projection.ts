@@ -1,3 +1,4 @@
+import { BigNumber } from '@ethersproject/bignumber';
 import {
   EvmEventSignatures,
   InvalidState,
@@ -221,22 +222,22 @@ export async function updateScore(contest_address: string, contest_id: number) {
         oneOff,
       );
 
-    const prizePool =
-      (Number(contestBalance) *
-        Number(oneOff ? 100 : details.prize_percentage)) /
-      100;
+    const prizePool = BigNumber.from(contestBalance)
+      .mul(oneOff ? 100 : details.prize_percentage)
+      .div(100);
     const score: z.infer<typeof ContestScore> = scores.map((s, i) => ({
       content_id: s.winningContent.toString(),
       creator_address: s.winningAddress,
-      votes: Number(s.voteCount),
+      votes: BigNumber.from(s.voteCount).toString(),
       prize:
         i < Number(details.payout_structure.length)
-          ? (
-              (Number(prizePool) * Number(details.payout_structure[i])) /
-              100
-            ).toString()
+          ? BigNumber.from(prizePool)
+              .mul(details.payout_structure[i])
+              .div(100)
+              .toString()
           : '0',
     }));
+    console.log('SCORE: ', score);
     await models.Contest.update(
       {
         score,
