@@ -3,12 +3,13 @@ import { generateKeyPair, privateKeyFromProtobuf } from '@libp2p/crypto/keys';
 import { Libp2p } from 'libp2p';
 import { ConnectionConfig } from 'pg';
 
+import { getSessionSigners } from '../signers';
 import { contract, contractTopic } from './contract';
 
 export const CANVAS_TOPIC = contractTopic;
 
 export const startCanvasNode = async (config: {
-  PEER_ID?: string;
+  LIBP2P_PRIVATE_KEY?: string;
 }): Promise<{ app: Canvas; libp2p: Libp2p }> => {
   const path =
     process.env.FEDERATION_POSTGRES_DB_URL ??
@@ -45,16 +46,21 @@ export const startCanvasNode = async (config: {
     };
   }
 
+  const explorerNode =
+    process.env.LIBP2P_NODE ??
+    '/dns4/common-explorer-libp2p.canvas.xyz/tcp/443/wss/p2p/12D3KooWFgHkuVBH5UNrMQ4rAM5cQUrNH4BLtkubE3DjWQVepN79';
+
   const app = await Canvas.initialize({
     topic: contractTopic,
     path: pgConnectionConfig!,
     contract,
+    signers: getSessionSigners(),
   });
 
   const libp2p = await app.startLibp2p({
     announce: [announce],
     listen: [listen],
-    bootstrapList: [],
+    bootstrapList: [explorerNode],
     privateKey,
     start: true,
   });
