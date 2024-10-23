@@ -373,9 +373,10 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   const scrollToFirstComment = () => {
     if (commentsRef?.current) {
-      commentsRef.current.scrollIntoView({
+      const ref = document.getElementsByClassName('Body')[0];
+      ref.scrollTo({
+        top: commentsRef?.current.offsetTop - 105,
         behavior: 'smooth',
-        block: 'start',
       });
     }
   };
