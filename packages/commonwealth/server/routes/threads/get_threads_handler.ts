@@ -2,7 +2,6 @@ import { AppError, query } from '@hicommonwealth/core';
 import { Thread } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import { GetThreadsOrderBy, GetThreadsStatus } from '@hicommonwealth/schemas';
-import { SearchThreads } from 'node_modules/@hicommonwealth/model/src/thread';
 import { z } from 'zod';
 import { ALL_COMMUNITIES } from '../../middleware/databaseValidationService';
 import { ServerControllers } from '../../routing/router';
@@ -167,7 +166,7 @@ export const getThreadsHandler = async (
       throw new AppError(Errors.NoCommunity);
     }
 
-    const searchResults = await query(SearchThreads(), {
+    const searchResults = await query(Thread.SearchThreads(), {
       actor: { user: { email: '' } },
       payload: {
         communityId: community_id,
