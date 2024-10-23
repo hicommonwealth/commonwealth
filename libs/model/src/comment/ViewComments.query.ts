@@ -55,7 +55,7 @@ export function ViewComments(): Query<typeof schemas.ViewComments> {
         paranoid: false,
       });
 
-      const sanitizedComments = comments.map((c) => {
+      return comments.map((c) => {
         const data = c.toJSON();
         return {
           ...sanitizeDeletedComment(data),
@@ -63,8 +63,6 @@ export function ViewComments(): Query<typeof schemas.ViewComments> {
           community_id: data.Thread!.community_id!,
         };
       });
-
-      return { comments: sanitizedComments };
     },
   };
 }
