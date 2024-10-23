@@ -1,27 +1,52 @@
+import { ChainBase, commonProtocol } from '@hicommonwealth/shared';
+import { notifyError } from 'controllers/app/notifications';
 import useAppStatus from 'hooks/useAppStatus';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
+import AddressInfo from 'models/AddressInfo';
 import React from 'react';
 import {
   BaseMixpanelPayload,
   MixpanelCommunityCreationEvent,
   MixpanelLoginPayload,
 } from 'shared/analytics/types';
+import useCreateCommunityMutation, {
+  buildCreateCommunityInput,
+} from 'state/api/communities/createCommunity';
+import { fetchCachedNodes } from 'state/api/nodes';
+import useUserStore from 'state/ui/user';
 import CommunityInformationForm from 'views/components/CommunityInformationForm/CommunityInformationForm';
+import { CommunityInformationFormSubmitValues } from 'views/components/CommunityInformationForm/types';
 import { CWText } from 'views/components/component_kit/cw_text';
 import CWBanner from 'views/components/component_kit/new_designs/CWBanner';
 import { openConfirmation } from 'views/modals/confirmation_modal';
+import { TokenInfo } from '../../types';
 import './CommunityInformationStep.scss';
+import { generateCommunityNameFromToken } from './utils';
 
 interface CommunityInformationStepProps {
   handleGoBack: () => void;
-  handleContinue: () => void;
+  handleContinue: (communityId: string) => void;
+  tokenInfo?: TokenInfo;
+  selectedAddress?: AddressInfo;
 }
 
 const CommunityInformationStep = ({
   handleGoBack,
   handleContinue,
+  tokenInfo,
+  selectedAddress,
 }: CommunityInformationStepProps) => {
+  const user = useUserStore();
   const { isAddedToHomeScreen } = useAppStatus();
+
+  const initialValues = {
+    communityName: generateCommunityNameFromToken({
+      tokenName: tokenInfo?.name || '',
+      tokenSymbol: tokenInfo?.symbol || '',
+    }),
+    communityDescription: tokenInfo?.description || '',
+    communityProfileImageURL: tokenInfo?.imageURL || '',
+  };
 
   const { trackAnalytics } = useBrowserAnalyticsTrack<
     MixpanelLoginPayload | BaseMixpanelPayload
@@ -29,11 +54,46 @@ const CommunityInformationStep = ({
     onAction: true,
   });
 
-  const handleSubmit = async (values: unknown) => {
-    // TODO 8706: integrate endpoint
-    console.log('values => ', values);
-    await new Promise((r) => setTimeout(r, 10));
-    handleContinue();
+  const {
+    mutateAsync: createCommunityMutation,
+    isLoading: createCommunityLoading,
+  } = useCreateCommunityMutation();
+
+  const handleSubmit = async (
+    values: CommunityInformationFormSubmitValues & { communityId: string },
+  ) => {
+    const nodes = fetchCachedNodes();
+    const baseNode = nodes?.find(
+      (n) => n.ethChainId === commonProtocol.ValidChains.SepoliaBase,
+    );
+
+    // this condition will never be triggered, adding this to avoid typescript errors
+    if (!baseNode || !baseNode.ethChainId) {
+      notifyError('Could not find base chain node');
+      return;
+    }
+
+    try {
+      if (selectedAddress?.address) {
+        user.setData({
+          addressSelectorSelectedAddress: selectedAddress.address,
+        });
+      }
+
+      const input = buildCreateCommunityInput({
+        id: values.communityId,
+        name: values.communityName,
+        chainBase: ChainBase.Ethereum,
+        description: values.communityDescription,
+        iconUrl: values.communityProfileImageURL,
+        socialLinks: values.links ?? [],
+        chainNodeId: baseNode.id,
+      });
+      await createCommunityMutation(input);
+      handleContinue(values.communityId);
+    } catch (err) {
+      notifyError(err.message);
+    }
   };
 
   const handleCancel = () => {
@@ -79,9 +139,10 @@ const CommunityInformationStep = ({
       <CommunityInformationForm
         onSubmit={handleSubmit}
         onCancel={handleCancel}
-        isCreatingCommunity={false}
+        isCreatingCommunity={createCommunityLoading}
         submitBtnLabel="Next"
         withSocialLinks={true}
+        initialValues={initialValues}
       />
     </div>
   );

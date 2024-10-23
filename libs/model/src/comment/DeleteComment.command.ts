@@ -1,8 +1,8 @@
-import { InvalidActor, type Command } from '@hicommonwealth/core';
+import { type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../database';
 import { isAuthorized, type AuthContext } from '../middleware';
-import { mustBeAuthorized, mustExist } from '../middleware/guards';
+import { mustBeAuthorizedComment } from '../middleware/guards';
 
 export function DeleteComment(): Command<
   typeof schemas.DeleteComment,
@@ -10,27 +10,9 @@ export function DeleteComment(): Command<
 > {
   return {
     ...schemas.DeleteComment,
-    auth: [isAuthorized({})],
-    body: async ({ actor, payload, auth }) => {
-      const { address } = mustBeAuthorized(actor, auth);
-      const { comment_id, message_id } = payload;
-
-      const comment = await models.Comment.findOne({
-        where: message_id
-          ? { discord_meta: { message_id } }
-          : { id: comment_id },
-        include: [
-          {
-            model: models.Thread,
-            attributes: ['community_id'],
-            required: true,
-          },
-        ],
-      });
-      mustExist('Comment', comment);
-
-      if (comment.address_id !== address!.id && address.role === 'member')
-        throw new InvalidActor(actor, 'Not authorized author');
+    auth: [isAuthorized({ author: true })],
+    body: async ({ actor, auth }) => {
+      const { comment } = mustBeAuthorizedComment(actor, auth);
 
       // == mutation transaction boundary ==
       await models.sequelize.transaction(async (transaction) => {

@@ -21,8 +21,9 @@
   .proposal-item {
     padding-block: 6px;
     display: flex;
+    align-items: center;
+    padding-right: 10px;
     font-size: 14px;
-    cursor: pointer;
 
     .text {
       width: calc(100% - 15%);
@@ -44,6 +45,9 @@
       svg {
         fill: $black;
         width: 18px;
+      }
+      .trash-icon {
+        cursor: pointer;
       }
     }
   }

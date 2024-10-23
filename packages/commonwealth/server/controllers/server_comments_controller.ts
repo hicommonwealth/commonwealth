@@ -1,4 +1,4 @@
-import { DB, GlobalActivityCache } from '@hicommonwealth/model';
+import { DB } from '@hicommonwealth/model';
 import {
   SearchCommentsOptions,
   SearchCommentsResult,
@@ -10,10 +10,7 @@ import {
  *
  */
 export class ServerCommentsController {
-  constructor(
-    public models: DB,
-    public globalActivityCache?: GlobalActivityCache,
-  ) {}
+  constructor(public models: DB) {}
 
   /**
    * Returns comment search results.

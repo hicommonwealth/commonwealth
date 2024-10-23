@@ -3,7 +3,7 @@ import { Reaction } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize';
 import { z } from 'zod';
 import type { CommentInstance, ModelInstance, ThreadInstance } from '.';
-import { emitEvent, getThreadContestManagers } from '../utils';
+import { emitEvent, getThreadContestManagers } from '../utils/utils';
 
 export type ReactionAttributes = z.infer<typeof Reaction>;
 export type ReactionInstance = ModelInstance<ReactionAttributes>;
@@ -20,7 +20,10 @@ export default (
       comment_id: { type: Sequelize.INTEGER, allowNull: true },
       address_id: { type: Sequelize.INTEGER, allowNull: false },
       reaction: { type: Sequelize.ENUM('like'), allowNull: false },
-      calculated_voting_weight: { type: Sequelize.INTEGER, allowNull: true },
+      calculated_voting_weight: {
+        type: Sequelize.DECIMAL(78, 0),
+        allowNull: true,
+      },
       // canvas-related columns
       canvas_signed_data: { type: Sequelize.JSONB, allowNull: true },
       canvas_msg_id: { type: Sequelize.STRING, allowNull: true },

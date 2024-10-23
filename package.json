@@ -6,10 +6,10 @@
     "url": "git+https://github.com/hicommonwealth/commonwealth.git"
   },
   "type": "module",
-  "packageManager": "pnpm@9.1.1",
+  "packageManager": "pnpm@9.10.0",
   "scripts": {
     "build": "chmod u+x scripts/build.sh && ./scripts/build.sh",
-    "docker-build-commonwealth": "docker build . --target commonwealth --tag commonwealth:latest",
+    "docker-build-commonwealth": "docker build -f Dockerfile.commonwealth_base --tag commonwealth:latest .",
     "chromatic": "chromatic --exit-zero-on-changes",
     "clean": "chmod u+x scripts/clean-modules.sh && ./scripts/clean-modules.sh",
     "db-all": "pnpm -F commonwealth db-all",
@@ -46,14 +46,11 @@
     "extensionless": "^1.9.6"
   },
   "devDependencies": {
-    "@aave/aave-token": "^1.0.4",
     "@cosmjs/encoding": "0.32.3",
     "@hicommonwealth/eslint-plugin": "workspace:*",
     "@istanbuljs/nyc-config-typescript": "^0.1.3",
-    "@knocklabs/node": "^0.6.10",
+    "@knocklabs/node": "^0.6.13",
     "@openfeature/web-sdk": "^1.0.2",
-    "@openzeppelin/contracts": "^2.4.0",
-    "@openzeppelin/contracts-governance": "npm:@openzeppelin/contracts@^4.3.2",
     "@osmonauts/lcd": "^0.10.0",
     "@playwright/test": "^1.43.1",
     "@polkadot/util": "12.6.2",
@@ -125,7 +122,6 @@
     "prettier-plugin-organize-imports": "^4.0.0",
     "process": "^0.11.10",
     "readline-sync": "^1.4.10",
-    "sequelize-cli": "^6.2.0",
     "sharp": "^0.31.2",
     "sinon": "^15.0.4",
     "source-map-support": "^0.5.21",

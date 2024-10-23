@@ -15,6 +15,7 @@ import type {
   DB,
   ThreadAttributes,
 } from '@hicommonwealth/model';
+import * as schemas from '@hicommonwealth/schemas';
 import {
   CANVAS_TOPIC,
   CanvasSignResult,
@@ -28,7 +29,8 @@ import {
 } from '@hicommonwealth/shared';
 import chai from 'chai';
 import type { Application } from 'express';
-import { TEST_BLOCK_INFO_STRING } from '../../shared/adapters/chain/ethereum/keys';
+import { z } from 'zod';
+import { TEST_BLOCK_INFO_STRING } from './keys';
 
 function createCanvasSignResult({ session, sign, action }): CanvasSignResult {
   const sessionMessage = {
@@ -176,24 +178,10 @@ export interface SubscriptionArgs {
   community_id: string;
 }
 
-export interface CommunityArgs {
-  jwt: any;
-  id: string;
-  name: string;
-  creator_address: string;
-  creator_chain: string;
-  description: string;
-  default_chain: string;
-  isAuthenticatedForum: string;
-  privacyEnabled: string;
-}
-
 export interface JoinCommunityArgs {
   jwt: string;
-  address_id: number;
   address: string;
   chain: string;
-  originChain: string;
 }
 
 export interface SetSiteAdminArgs {
@@ -241,7 +229,12 @@ export type ModelSeeder = {
   updateRole: (args: AssignRoleArgs) => Promise<any>;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   createSubscription: (args: SubscriptionArgs) => Promise<any>;
-  createCommunity: (args: CommunityArgs) => Promise<CommunityAttributes>;
+  createCommunity: (
+    args: z.infer<(typeof schemas.CreateCommunity)['input']> & {
+      address: string;
+    },
+    jwt: string,
+  ) => Promise<CommunityAttributes>;
   joinCommunity: (args: JoinCommunityArgs) => Promise<boolean>;
   setSiteAdmin: (args: SetSiteAdminArgs) => Promise<boolean>;
 };
@@ -638,36 +631,30 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
     return subscription;
   },
 
-  createCommunity: async (args: CommunityArgs) => {
+  createCommunity: async (args, jwt: string) => {
     const res = await chai
       .request(app)
       .post(`/api/v1/CreateCommunity`)
       .set('Accept', 'application/json')
-      .set('address', args.creator_address)
+      .set('address', args.address)
       .send({
+        jwt,
         ...args,
-        type: 'offchain',
-        base: 'ethereum',
-        eth_chain_id: 2,
-        user_address: args.creator_address,
-        node_url: 'http://chain.url',
-        network: 'network',
-        default_symbol: 'test',
       });
     return res.body.community;
   },
 
   joinCommunity: async (args: JoinCommunityArgs) => {
-    const { jwt, address, chain, originChain } = args;
+    const { jwt, address, chain } = args;
     try {
       await chai.request
         .agent(app)
-        .post('/api/linkExistingAddressToCommunity')
+        .post('/api/v1/JoinCommunity')
         .set('Accept', 'application/json')
+        .set('address', address)
         .send({
-          address,
           community_id: chain,
-          originChain,
+          address,
           jwt,
         });
     } catch (e) {

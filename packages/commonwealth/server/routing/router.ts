@@ -22,7 +22,6 @@ import getAddressProfile, {
 } from '../routes/getAddressProfile';
 import getAddressStatus from '../routes/getAddressStatus';
 import { healthHandler } from '../routes/health';
-import linkExistingAddressToCommunity from '../routes/linkExistingAddressToCommunity';
 import reactionsCounts from '../routes/reactionsCounts';
 import selectCommunity from '../routes/selectCommunity';
 import starCommunity from '../routes/starCommunity';
@@ -40,8 +39,6 @@ import setDefaultRole from '../routes/setDefaultRole';
 import upgradeMember, {
   upgradeMemberValidation,
 } from '../routes/upgradeMember';
-import viewGlobalActivity from '../routes/viewGlobalActivity';
-import viewUserActivity from '../routes/viewUserActivity';
 
 import getUploadSignature from '../routes/getUploadSignature';
 
@@ -53,15 +50,11 @@ import updateCommunityCustomDomain from '../routes/updateCommunityCustomDomain';
 import updateCommunityPriority from '../routes/updateCommunityPriority';
 import type ViewCountCache from '../util/viewCountCache';
 
-import { type DB, type GlobalActivityCache } from '@hicommonwealth/model';
-import banAddress from '../routes/banAddress';
+import { type DB } from '@hicommonwealth/model';
 import setAddressWallet from '../routes/setAddressWallet';
 
+import { generateTokenIdea } from '@hicommonwealth/model';
 import type DatabaseValidationService from '../middleware/databaseValidationService';
-import createDiscordBotConfig from '../routes/discord/createDiscordBotConfig';
-import getDiscordChannels from '../routes/discord/getDiscordChannels';
-import removeDiscordBotConfig from '../routes/discord/removeDiscordBotConfig';
-import setDiscordBotConfig from '../routes/discord/setDiscordBotConfig';
 import generateImage from '../routes/generateImage';
 
 import * as controllers from '../controller';
@@ -78,7 +71,6 @@ import { ServerCommunitiesController } from '../controllers/server_communities_c
 import { ServerGroupsController } from '../controllers/server_groups_controller';
 import { ServerPollsController } from '../controllers/server_polls_controller';
 import { ServerProfilesController } from '../controllers/server_profiles_controller';
-import { ServerReactionsController } from '../controllers/server_reactions_controller';
 import { ServerThreadsController } from '../controllers/server_threads_controller';
 import { ServerTopicsController } from '../controllers/server_topics_controller';
 
@@ -92,32 +84,22 @@ import { getStatsHandler } from '../routes/admin/get_stats_handler';
 import { getCanvasClockHandler } from '../routes/canvas/get_canvas_clock_handler';
 import { searchCommentsHandler } from '../routes/comments/search_comments_handler';
 import { createChainNodeHandler } from '../routes/communities/create_chain_node_handler';
-import { deleteCommunityHandler } from '../routes/communities/delete_community_handler';
 import { getChainNodesHandler } from '../routes/communities/get_chain_nodes_handler';
 import { getCommunitiesHandler } from '../routes/communities/get_communities_handler';
 import { updateCommunityIdHandler } from '../routes/communities/update_community_id_handler';
 import exportMembersList from '../routes/exportMembersList';
 import { getFeedHandler } from '../routes/feed';
-import { createGroupHandler } from '../routes/groups/create_group_handler';
-import { deleteGroupHandler } from '../routes/groups/delete_group_handler';
 import { getGroupsHandler } from '../routes/groups/get_groups_handler';
 import { refreshMembershipHandler } from '../routes/groups/refresh_membership_handler';
-import { updateGroupHandler } from '../routes/groups/update_group_handler';
 import { deletePollHandler } from '../routes/polls/delete_poll_handler';
 import { getPollVotesHandler } from '../routes/polls/get_poll_votes_handler';
 import { updatePollVoteHandler } from '../routes/polls/update_poll_vote_handler';
 import { searchProfilesHandler } from '../routes/profiles/search_profiles_handler';
-import { deleteReactionHandler } from '../routes/reactions/delete_reaction_handler';
 import { getTagsHandler } from '../routes/tags/get_tags_handler';
 import { createThreadPollHandler } from '../routes/threads/create_thread_poll_handler';
-import { deleteThreadHandler } from '../routes/threads/delete_thread_handler';
 import { getThreadPollsHandler } from '../routes/threads/get_thread_polls_handler';
 import { getThreadsHandler } from '../routes/threads/get_threads_handler';
-import { createTopicHandler } from '../routes/topics/create_topic_handler';
-import { deleteTopicHandler } from '../routes/topics/delete_topic_handler';
-import { getTopicsHandler } from '../routes/topics/get_topics_handler';
 import { updateTopicChannelHandler } from '../routes/topics/update_topic_channel_handler';
-import { updateTopicHandler } from '../routes/topics/update_topic_handler';
 import { updateTopicsOrderHandler } from '../routes/topics/update_topics_order_handler';
 import { failure } from '../types';
 import { setupCosmosProxy } from '../util/comsosProxy/setupCosmosProxy';
@@ -126,7 +108,6 @@ import setupIpfsProxy from '../util/ipfsProxy';
 export type ServerControllers = {
   threads: ServerThreadsController;
   comments: ServerCommentsController;
-  reactions: ServerReactionsController;
   analytics: ServerAnalyticsController;
   profiles: ServerProfilesController;
   communities: ServerCommunitiesController;
@@ -142,15 +123,13 @@ function setupRouter(
   app: Express,
   models: DB,
   viewCountCache: ViewCountCache,
-  globalActivityCache: GlobalActivityCache,
   databaseValidationService: DatabaseValidationService,
   cacheDecorator: CacheDecorator,
 ) {
   // controllers
   const serverControllers: ServerControllers = {
-    threads: new ServerThreadsController(models, globalActivityCache),
-    comments: new ServerCommentsController(models, globalActivityCache),
-    reactions: new ServerReactionsController(models),
+    threads: new ServerThreadsController(models),
+    comments: new ServerCommentsController(models),
     analytics: new ServerAnalyticsController(),
     profiles: new ServerProfilesController(models),
     communities: new ServerCommunitiesController(models),
@@ -169,10 +148,7 @@ function setupRouter(
   // API routes
   app.use(api.internal.PATH, useragent.express(), api.internal.router);
   app.use(api.external.PATH, useragent.express(), api.external.router);
-  app.use(
-    api.integration.PATH,
-    api.integration.build(serverControllers, databaseValidationService),
-  );
+  app.use(api.integration.PATH, api.integration.build());
 
   registerRoute(
     router,
@@ -215,14 +191,6 @@ function setupRouter(
   registerRoute(
     router,
     'post',
-    '/linkExistingAddressToCommunity',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateCommunity,
-    linkExistingAddressToCommunity.bind(this, models),
-  );
-  registerRoute(
-    router,
-    'post',
     '/getAddressStatus',
     passport.authenticate('jwt', { session: false }),
     getAddressStatus.bind(this, models),
@@ -243,14 +211,6 @@ function setupRouter(
   );
 
   // communities
-  registerRoute(
-    router,
-    'delete',
-    '/communities/:communityId',
-    passport.authenticate('jwt', { session: false }),
-    deleteCommunityHandler.bind(this, serverControllers),
-  );
-
   registerRoute(
     router,
     'patch',
@@ -373,14 +333,6 @@ function setupRouter(
 
   registerRoute(
     router,
-    'delete',
-    '/threads/:id',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateAuthor,
-    deleteThreadHandler.bind(this, serverControllers),
-  );
-  registerRoute(
-    router,
     'get',
     '/threads',
     databaseValidationService.validateCommunity,
@@ -423,14 +375,6 @@ function setupRouter(
   // topics
   registerRoute(
     router,
-    'post',
-    '/topics' /* OLD: /createTopic */,
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateCommunity,
-    createTopicHandler.bind(this, serverControllers),
-  );
-  registerRoute(
-    router,
     'patch',
     '/topics/:topicId/channels/:channelId' /* OLD: /updateTopic */,
     passport.authenticate('jwt', { session: false }),
@@ -444,38 +388,8 @@ function setupRouter(
     databaseValidationService.validateCommunity,
     updateTopicsOrderHandler.bind(this, serverControllers),
   );
-  registerRoute(
-    router,
-    'patch',
-    '/topics/:topicId' /* OLD: /editTopic */,
-    passport.authenticate('jwt', { session: false }),
-    updateTopicHandler.bind(this, serverControllers),
-  );
-  registerRoute(
-    router,
-    'delete',
-    '/topics/:topicId' /* OLD: /deleteTopic */,
-    passport.authenticate('jwt', { session: false }),
-    deleteTopicHandler.bind(this, serverControllers),
-  );
-  registerRoute(
-    router,
-    'get',
-    '/topics' /* OLD: /bulkTopics */,
-    databaseValidationService.validateCommunity,
-    getTopicsHandler.bind(this, serverControllers),
-  );
 
   // reactions
-  registerRoute(
-    router,
-    'delete',
-    '/reactions/:id',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateAuthor,
-    databaseValidationService.validateCommunity,
-    deleteReactionHandler.bind(this, serverControllers),
-  );
   registerRoute(
     router,
     'post',
@@ -570,20 +484,6 @@ function setupRouter(
   registerRoute(
     router,
     'post',
-    '/viewUserActivity',
-    passport.authenticate('jwt', { session: false }),
-    viewUserActivity.bind(this, models),
-  );
-  registerRoute(
-    router,
-    'post',
-    '/viewGlobalActivity',
-    viewGlobalActivity.bind(this, models, globalActivityCache),
-  );
-
-  registerRoute(
-    router,
-    'post',
     '/setAddressWallet',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,
@@ -608,54 +508,12 @@ function setupRouter(
     writeUserSetting.bind(this, models),
   );
 
-  // bans
-  registerRoute(
-    router,
-    'post',
-    '/banAddress',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateCommunity,
-    banAddress.bind(this, models),
-  );
-
   // Custom domain update route
   registerRoute(
     router,
     'post',
     '/updateCommunityCustomDomain',
     updateCommunityCustomDomain.bind(this, models),
-  );
-
-  // Discord Bot
-  registerRoute(
-    router,
-    'post',
-    '/createDiscordBotConfig',
-    passport.authenticate('jwt', { session: false }),
-    createDiscordBotConfig.bind(this, models),
-  );
-  registerRoute(
-    router,
-    'post',
-    '/setDiscordBotConfig',
-    passport.authenticate('jwt', { session: false }),
-    setDiscordBotConfig.bind(this, models),
-  );
-  registerRoute(
-    router,
-    'post',
-    '/getDiscordChannels',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateCommunity,
-    getDiscordChannels.bind(this, models),
-  );
-  registerRoute(
-    router,
-    'post',
-    '/removeDiscordBotConfig',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateCommunity,
-    removeDiscordBotConfig.bind(this, models),
   );
 
   registerRoute(
@@ -675,6 +533,46 @@ function setupRouter(
     }),
     passport.authenticate('jwt', { session: false }),
     generateImage.bind(this, models),
+  );
+
+  registerRoute(
+    router,
+    'post',
+    '/generateTokenIdea',
+    rateLimiterMiddleware({
+      routerNamespace: 'generateTokenIdea',
+      requestsPerMinute: config.GENERATE_IMAGE_RATE_LIMIT,
+    }),
+    passport.authenticate('jwt', { session: false }),
+    async (req, res) => {
+      // required for streaming
+      res.setHeader('Content-Type', 'text/plain');
+      res.setHeader('Transfer-Encoding', 'chunked');
+
+      const ideaPrompt =
+        typeof req.body?.ideaPrompt === 'string'
+          ? req.body?.ideaPrompt
+          : undefined;
+
+      const ideaGenerator = generateTokenIdea({ ideaPrompt });
+
+      for await (const chunk of ideaGenerator) {
+        // generation error
+        if (chunk.error) {
+          return res.end(
+            JSON.stringify({ status: 'failure', message: chunk.error }) + '\n',
+          );
+        }
+
+        // stream chunks as they are generated
+        res.write(JSON.stringify(chunk.tokenIdea) + '\n');
+        res.flush();
+      }
+
+      return res.end(
+        JSON.stringify({ status: 'success', message: 'stream ended' }) + '\n',
+      );
+    },
   );
 
   // linking
@@ -754,34 +652,6 @@ function setupRouter(
     '/groups',
     databaseValidationService.validateCommunity,
     getGroupsHandler.bind(this, serverControllers),
-  );
-
-  registerRoute(
-    router,
-    'post',
-    '/groups',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateAuthor,
-    databaseValidationService.validateCommunity,
-    createGroupHandler.bind(this, serverControllers),
-  );
-
-  registerRoute(
-    router,
-    'put',
-    '/groups/:id',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateAuthor,
-    updateGroupHandler.bind(this, serverControllers),
-  );
-
-  registerRoute(
-    router,
-    'delete',
-    '/groups/:id',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateAuthor,
-    deleteGroupHandler.bind(this, serverControllers),
   );
 
   registerRoute(

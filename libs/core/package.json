@@ -23,11 +23,11 @@
   },
   "dependencies": {
     "@hicommonwealth/schemas": "workspace:*",
-    "@hicommonwealth/shared": "workspace:*",
     "dotenv": "^16.0.3",
     "ethers": "5.7.2",
     "lodash": "^4.17.21",
     "moment": "^2.23.0",
+    "node-object-hash": "^3.0.0",
     "pino": "^8.19.0",
     "pino-http": "^9.0.0",
     "pino-http-print": "^3.1.0",

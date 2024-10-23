@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import React from 'react';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../..//component_kit/cw_text';
@@ -14,6 +15,7 @@ type ActionCardProps = {
   onClose?: () => void;
   ctaText: string;
   onCTAClick: () => void;
+  className?: string;
 };
 
 export const ActionCard = ({
@@ -26,9 +28,10 @@ export const ActionCard = ({
   onClose,
   ctaText,
   onCTAClick,
+  className,
 }: ActionCardProps) => {
   return (
-    <section className="ActionCard">
+    <section className={clsx('ActionCard', className)}>
       <div className="header">
         {isActionCompleted ? (
           <CWIcon iconName="checkNew" className="check-icon" weight="bold" />

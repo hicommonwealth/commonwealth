@@ -10,8 +10,8 @@ import { ComponentType } from '../../types';
 import './CWButton.scss';
 
 export type ButtonType = 'primary' | 'secondary' | 'tertiary' | 'destructive';
-type ButtonHeight = 'lg' | 'med' | 'sm';
-type ButtonWidth = 'narrow' | 'wide' | 'full';
+export type ButtonHeight = 'lg' | 'med' | 'sm';
+export type ButtonWidth = 'narrow' | 'wide' | 'full';
 type ButtonAlt = 'green' | 'rorange';
 
 type ButtonStyleProps = {

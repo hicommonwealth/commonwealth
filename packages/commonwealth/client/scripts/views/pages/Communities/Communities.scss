@@ -5,9 +5,9 @@
 }
 
 .CommunitiesPageLayout {
-  overflow: auto;
   padding-top: 0;
   height: 100%;
+  overflow-y: auto;
 
   .layout-container {
     height: 100%;

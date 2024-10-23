@@ -1,21 +1,26 @@
 import React, { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
+import { TopicWeightedVoting } from '@hicommonwealth/schemas';
 import { notifyError } from 'controllers/app/notifications';
+import { weightedVotingValueToLabel } from 'helpers';
 import { useFlag } from 'hooks/useFlag';
 import { useCommonNavigate } from 'navigation/helpers';
 import app from 'state';
 import useUpdateContestMutation from 'state/api/contests/updateContest';
+import { useFetchTopicsQuery } from 'state/api/topics';
+import TokenFinder, { useTokenFinder } from 'views/components/TokenFinder';
 import {
-  CWCoverImageUploader,
+  CWImageInput,
   ImageBehavior,
-} from 'views/components/component_kit/cw_cover_image_uploader';
+} from 'views/components/component_kit/CWImageInput';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { SelectList } from 'views/components/component_kit/cw_select_list';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTextArea } from 'views/components/component_kit/cw_text_area';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWForm } from 'views/components/component_kit/new_designs/CWForm';
+import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import { MessageRow } from 'views/components/component_kit/new_designs/CWTextInput/MessageRow';
 import { CWRadioButton } from 'views/components/component_kit/new_designs/cw_radio_button';
@@ -32,20 +37,19 @@ import {
   ContestRecurringType,
   LaunchContestStep,
 } from '../../types';
+import './DetailsFormStep.scss';
 import PayoutRow from './PayoutRow';
 import useContestTopics from './useContestTopics';
 import {
   INITIAL_PERCENTAGE_VALUE,
   MAX_WINNERS,
   MIN_WINNERS,
-  farcasterDurationOptions,
-  initialFarcasterDuration,
+  contestDurationOptions,
+  initialContestDuration,
   initialPayoutStructure,
   prizePercentageOptions,
 } from './utils';
 import { detailsFormValidationSchema } from './validation';
-
-import './DetailsFormStep.scss';
 
 interface DetailsFormStepProps {
   contestAddress?: string;
@@ -62,6 +66,7 @@ const DetailsFormStep = ({
 }: DetailsFormStepProps) => {
   const navigate = useCommonNavigate();
   const farcasterContestEnabled = useFlag('farcasterContest');
+  const weightedTopicsEnabled = useFlag('weightedTopics');
   const [searchParams] = useSearchParams();
   const contestType = searchParams.get('type');
   const isFarcasterContest = contestType === ContestType.Farcaster;
@@ -72,11 +77,9 @@ const DetailsFormStep = ({
   const [prizePercentage, setPrizePercentage] = useState<
     ContestFormData['prizePercentage']
   >(contestFormData?.prizePercentage || INITIAL_PERCENTAGE_VALUE);
-  const [farcasterContestDuration, setFarcasterContestDuration] = useState<
-    number | undefined
-  >(
-    isFarcasterContest
-      ? contestFormData?.farcasterContestDuration || initialFarcasterDuration
+  const [contestDuration, setContestDuration] = useState<number | undefined>(
+    weightedTopicsEnabled
+      ? contestFormData?.contestDuration || initialContestDuration
       : undefined,
   );
 
@@ -94,6 +97,24 @@ const DetailsFormStep = ({
 
   const { mutateAsync: updateContest } = useUpdateContestMutation();
 
+  const {
+    tokenValue,
+    setTokenValue,
+    getTokenError,
+    debouncedTokenValue,
+    tokenMetadata,
+    tokenMetadataLoading,
+  } = useTokenFinder({
+    nodeEthChainId: app.chain.meta.ChainNode?.eth_chain_id || 0,
+    initialTokenValue: contestFormData?.fundingTokenAddress,
+  });
+
+  const communityId = app.activeChainId() || '';
+  const { data: topicsData } = useFetchTopicsQuery({
+    communityId,
+    apiEnabled: !!communityId,
+  });
+
   const editMode = !!contestAddress;
   const payoutRowError = payoutStructure.some((payout) => payout < 1);
   const totalPayoutPercentage = payoutStructure.reduce(
@@ -102,9 +123,21 @@ const DetailsFormStep = ({
   );
   const totalPayoutPercentageError = totalPayoutPercentage !== 100;
 
+  const weightedTopics = (topicsData || [])
+    .filter((t) => t?.weighted_voting)
+    .map((t) => ({
+      value: t.id,
+      label: t.name,
+      weightedVoting: t.weighted_voting,
+      helpText: weightedVotingValueToLabel(t.weighted_voting!),
+    }));
+
   const getInitialValues = () => {
     return {
       contestName: contestFormData?.contestName,
+      contestTopic: weightedTopics.find(
+        (t) => t.value === contestFormData?.contestTopic?.value,
+      ),
       contestDescription: contestFormData?.contestDescription,
       contestImage: contestFormData?.contestImage,
       feeType:
@@ -155,23 +188,40 @@ const DetailsFormStep = ({
   };
 
   const handleSubmit = async (values: ContestFormValidationSubmitValues) => {
-    const topicsError = !isFarcasterContest && topicsEnabledError;
+    const topicsError = !weightedTopicsEnabled && topicsEnabledError;
 
     if (totalPayoutPercentageError || payoutRowError || topicsError) {
       return;
     }
 
+    const selectedTopic = (weightedTopics || []).find(
+      (t) => t.value === values?.contestTopic?.value,
+    );
+
+    const feeType = weightedTopicsEnabled
+      ? selectedTopic?.weightedVoting === TopicWeightedVoting.ERC20
+        ? ContestFeeType.DirectDeposit
+        : ContestFeeType.CommunityStake
+      : values.feeType;
+
+    const contestRecurring = weightedTopicsEnabled
+      ? selectedTopic?.weightedVoting === TopicWeightedVoting.ERC20
+        ? ContestRecurringType.No
+        : ContestRecurringType.Yes
+      : values.contestRecurring;
+
     const formData: ContestFormData = {
       contestName: values.contestName,
       contestDescription: values.contestDescription,
       contestImage: values.contestImage,
-      feeType: values.feeType,
       fundingTokenAddress: values.fundingTokenAddress,
-      contestRecurring: values.contestRecurring,
+      contestTopic: selectedTopic,
+      contestRecurring,
+      feeType,
       prizePercentage,
       payoutStructure,
       toggledTopicList,
-      farcasterContestDuration,
+      contestDuration,
     };
 
     if (editMode) {
@@ -181,7 +231,9 @@ const DetailsFormStep = ({
           contest_address: contestAddress,
           name: values.contestName,
           image_url: values.contestImage,
-          topic_ids: toggledTopicList.filter((t) => t.checked).map((t) => t.id),
+          topic_ids: toggledTopicList
+            .filter((t) => t.checked)
+            .map((t) => t.id!),
         });
 
         goBack();
@@ -236,9 +288,39 @@ const DetailsFormStep = ({
           validationSchema={detailsFormValidationSchema}
           onSubmit={handleSubmit}
           initialValues={getInitialValues()}
+          onErrors={console.error}
         >
           {({ watch, setValue }) => (
             <>
+              {weightedTopicsEnabled && !isFarcasterContest && (
+                <div className="contest-section contest-section-topic">
+                  <CWText type="h4">Choose a topic</CWText>
+                  <CWText type="b1">
+                    Select which topic you would like to include in this
+                    contest. Only threads posted to this topic will be eligible
+                    for the contest prizes.
+                  </CWText>
+
+                  <CWSelectList
+                    hookToForm
+                    name="contestTopic"
+                    placeholder="Select topic"
+                    isClearable={false}
+                    isSearchable={false}
+                    options={weightedTopics}
+                    isDisabled={editMode}
+                    onChange={(t) => {
+                      if (t?.weightedVoting === TopicWeightedVoting.ERC20) {
+                        const token = topicsData?.find(
+                          (topic) => topic.id === t.value,
+                        )?.token_address;
+                        setTokenValue(token || '');
+                      }
+                    }}
+                  />
+                </div>
+              )}
+
               <div className="contest-section contest-section-name">
                 <CWText type="h4">Name your contest</CWText>
                 <CWText type="b1">
@@ -280,59 +362,170 @@ const DetailsFormStep = ({
                   Set an image to entice users to your contest (1920x1080 jpg or
                   png)
                 </CWText>
-                <CWCoverImageUploader
-                  canSelectImageBehaviour={false}
-                  showUploadAndGenerateText
-                  onImageProcessStatusChange={setIsProcessingProfileImage}
+                <CWImageInput
+                  canSelectImageBehavior={false}
+                  onImageProcessingChange={({ isGenerating, isUploading }) =>
+                    setIsProcessingProfileImage(isGenerating || isUploading)
+                  }
                   name="contestImage"
                   hookToForm
-                  defaultImageBehaviour={ImageBehavior.Fill}
-                  enableGenerativeAI
+                  imageBehavior={ImageBehavior.Fill}
+                  withAIImageGeneration
                 />
               </div>
 
               <CWDivider />
 
-              {farcasterContestEnabled && isFarcasterContest ? (
-                <>
-                  <div className="contest-section contest-section-funding">
-                    <CWText type="h4">Fund your contest</CWText>
-                    <CWText type="b1">
-                      Enter the address of the token you would like to use to
-                      fund your contest
-                    </CWText>
-
-                    <CWTextInput
-                      containerClassName="funding-token-address-input"
-                      name="fundingTokenAddress"
-                      hookToForm
-                      placeholder="Enter funding token address"
-                      fullWidth
-                      label="Token Address"
-                      disabled={editMode}
-                    />
-                  </div>
-
-                  <div className="contest-section contest-section-duration">
-                    <div>
-                      <CWText type="h4">Contest duration</CWText>
+              {weightedTopicsEnabled ? (
+                isFarcasterContest ? (
+                  <>
+                    <div className="contest-section contest-section-funding">
+                      <CWText type="h4">Fund your contest</CWText>
                       <CWText type="b1">
-                        How long would you like your contest to run?
+                        Enter the address of the token you would like to use to
+                        fund your contest
                       </CWText>
+
+                      <CWTextInput
+                        containerClassName="funding-token-address-input"
+                        name="fundingTokenAddress"
+                        hookToForm
+                        placeholder="Enter funding token address"
+                        fullWidth
+                        label="Token Address"
+                        disabled={editMode}
+                      />
                     </div>
 
-                    <SelectList
-                      isSearchable={false}
-                      options={farcasterDurationOptions}
-                      defaultValue={farcasterDurationOptions.find(
-                        (o) => o.value === farcasterContestDuration,
-                      )}
-                      onChange={(newValue) => {
-                        setFarcasterContestDuration(newValue?.value);
-                      }}
-                    />
-                  </div>
-                </>
+                    <div className="contest-section contest-section-duration">
+                      <div>
+                        <CWText type="h4">Contest duration</CWText>
+                        <CWText type="b1">
+                          How long would you like your contest to run?
+                        </CWText>
+                      </div>
+
+                      <SelectList
+                        isSearchable={false}
+                        options={contestDurationOptions}
+                        defaultValue={contestDurationOptions.find(
+                          (o) => o.value === contestDuration,
+                        )}
+                        onChange={(newValue) => {
+                          setContestDuration(newValue?.value);
+                        }}
+                        isDisabled={editMode}
+                      />
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    {weightedTopics.find(
+                      (t) => t.value === watch('contestTopic')?.value,
+                    )?.weightedVoting === TopicWeightedVoting.ERC20 ? (
+                      <>
+                        <div className="contest-section contest-section-funding">
+                          <CWText type="h4">Contest Funding</CWText>
+                          <CWText type="b1">
+                            Enter the token address to set as your funding
+                            method.
+                          </CWText>
+                        </div>
+
+                        <CWText type="h4">Token address</CWText>
+
+                        <TokenFinder
+                          debouncedTokenValue={debouncedTokenValue}
+                          tokenMetadataLoading={tokenMetadataLoading}
+                          tokenMetadata={tokenMetadata}
+                          tokenValue={
+                            editMode
+                              ? contestFormData?.fundingTokenAddress || ''
+                              : tokenValue
+                          }
+                          setTokenValue={setTokenValue}
+                          tokenError={getTokenError()}
+                          containerClassName="funding-token-address-input"
+                          name="fundingTokenAddress"
+                          hookToForm
+                          placeholder="Enter funding token address"
+                          fullWidth
+                          label="Token Address"
+                          disabled={editMode}
+                        />
+                      </>
+                    ) : weightedTopics.find(
+                        (t) => t.value === watch('contestTopic')?.value,
+                      )?.weightedVoting === TopicWeightedVoting.Stake ? (
+                      <>
+                        <div className="contest-section contest-section-funding">
+                          <CWText type="h4">Contest Funding</CWText>
+                          <CWText type="b1">
+                            Set the amount of community stake you want to
+                            allocate for your contest.
+                          </CWText>
+
+                          <div className="prize-subsection">
+                            <CWText type="h5">
+                              How much of the funds would you like to use
+                              weekly?
+                            </CWText>
+                            <CWText type="b1">
+                              All community stake funded contests are recurring
+                              weekly.
+                              <br />
+                              Tip: smaller prizes makes the contest run longer
+                            </CWText>
+                            <div className="percentage-buttons">
+                              {prizePercentageOptions.map(
+                                ({ value, label }) => (
+                                  <CWButton
+                                    disabled={editMode}
+                                    type="button"
+                                    key={value}
+                                    label={label}
+                                    buttonHeight="sm"
+                                    onClick={() => setPrizePercentage(value)}
+                                    buttonType={
+                                      prizePercentage === value
+                                        ? 'primary'
+                                        : 'secondary'
+                                    }
+                                  />
+                                ),
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </>
+                    ) : (
+                      <></>
+                    )}
+
+                    <div className="contest-section contest-section-duration">
+                      <div>
+                        <CWText type="h4">Contest duration</CWText>
+                        <CWText type="b1">
+                          How long would you like your contest to run?
+                        </CWText>
+                      </div>
+
+                      <SelectList
+                        isSearchable={false}
+                        options={contestDurationOptions}
+                        defaultValue={contestDurationOptions.find(
+                          (o) => o.value === contestDuration,
+                        )}
+                        onChange={(newValue) => {
+                          setContestDuration(newValue?.value);
+                        }}
+                        isDisabled={editMode}
+                      />
+                    </div>
+
+                    <CWDivider />
+                  </>
+                )
               ) : (
                 <>
                   <div className="contest-section contest-section-fee">
@@ -374,7 +567,17 @@ const DetailsFormStep = ({
                           to fund your contest (eg: USDT, $degen etc). Leave
                           blank if using a native token
                         </CWText>
-                        <CWTextInput
+                        <TokenFinder
+                          debouncedTokenValue={debouncedTokenValue}
+                          tokenMetadataLoading={tokenMetadataLoading}
+                          tokenMetadata={tokenMetadata}
+                          tokenValue={
+                            editMode
+                              ? contestFormData?.fundingTokenAddress || ''
+                              : tokenValue
+                          }
+                          setTokenValue={setTokenValue}
+                          tokenError={getTokenError()}
                           containerClassName="funding-token-address-input"
                           name="fundingTokenAddress"
                           hookToForm
@@ -526,7 +729,7 @@ const DetailsFormStep = ({
                 </div>
               </div>
 
-              {farcasterContestEnabled && isFarcasterContest ? (
+              {weightedTopicsEnabled ? (
                 <></>
               ) : (
                 <>
@@ -585,7 +788,7 @@ const DetailsFormStep = ({
                 <CWButton
                   label={editMode ? 'Save changes' : 'Save & continue'}
                   type="submit"
-                  disabled={isProcessingProfileImage}
+                  disabled={isProcessingProfileImage || !!getTokenError()}
                 />
               </div>
             </>

@@ -10,7 +10,7 @@ import moment, { Moment } from 'moment';
 import { z } from 'zod';
 import Comment from './Comment';
 import type { ReactionType } from './Reaction';
-import Topic from './Topic';
+import type { Topic } from './Topic';
 import type { IUniqueId } from './interfaces';
 import type { ThreadKind, ThreadStage } from './types';
 
@@ -154,6 +154,7 @@ export interface ThreadVersionHistory {
   address: string;
   body: string;
   timestamp: string;
+  content_url: string;
 }
 
 export interface IThreadCollaborator {
@@ -191,19 +192,19 @@ export type AssociatedContest = {
   contest_interval: number;
 };
 
-type RecentComment = {
+export type RecentComment = {
   id: number;
   address: string;
   text: string;
-  plainText: string;
   created_at: string;
   updated_at: string;
   marked_as_spam_at?: string;
   deleted_at?: string;
   discord_meta?: string;
   profile_name?: string;
-  profile_avatar_url?: string;
+  profile_avatar?: string;
   user_id: string;
+  content_url?: string | null;
 };
 
 export enum LinkSource {
@@ -233,7 +234,6 @@ export class Thread implements IUniqueId {
   public readonly authorCommunity: string;
   public readonly title: string;
   public readonly body: string;
-  public readonly plaintext: string;
   public pinned: boolean;
   public readonly kind: ThreadKind;
   public stage: ThreadStage;
@@ -265,10 +265,11 @@ export class Thread implements IUniqueId {
   public associatedReactions: AssociatedReaction[];
   public associatedContests?: AssociatedContest[];
   public recentComments?: Comment<IUniqueId>[];
-  public reactionWeightsSum: number;
+  public reactionWeightsSum: string;
   public links: Link[];
   public readonly discord_meta: any;
   public readonly latestActivity: Moment;
+  public contentUrl: string | null;
 
   public readonly profile: UserProfile;
 
@@ -289,7 +290,6 @@ export class Thread implements IUniqueId {
     community_id,
     read_only,
     body,
-    plaintext,
     url,
     pinned,
     collaborators,
@@ -323,6 +323,7 @@ export class Thread implements IUniqueId {
     associatedContests,
     recentComments,
     ContestActions,
+    content_url,
   }: {
     marked_as_spam_at: string;
     title: string;
@@ -336,7 +337,6 @@ export class Thread implements IUniqueId {
     links?: Link[];
     canvas_signed_data?: string;
     canvas_msg_id?: string;
-    plaintext?: string;
     collaborators?: any[];
     last_edited: string;
     locked_at: string;
@@ -357,7 +357,7 @@ export class Thread implements IUniqueId {
     reactionType?: any[]; // TODO: fix type
     reactionTimestamps?: string[];
     reactionWeights?: number[];
-    reaction_weights_sum: number;
+    reaction_weights_sum: string;
     ThreadVersionHistories: ThreadVersionHistory[];
     Address: any; // TODO: fix type
     discord_meta?: any;
@@ -370,19 +370,17 @@ export class Thread implements IUniqueId {
     associatedContests?: AssociatedContest[];
     recentComments: RecentComment[];
     ContestActions: ContestActionT[];
+    content_url: string | null;
   }) {
     this.author = Address?.address;
     this.title = getDecodedString(title);
     // @ts-expect-error StrictNullChecks
     this.body = getDecodedString(body);
-    // @ts-expect-error StrictNullChecks
-    this.plaintext = plaintext;
     this.id = id;
     this.identifier = `${id}`;
     this.createdAt = moment(created_at);
     this.updatedAt = moment(updated_at);
-    // @ts-expect-error StrictNullChecks
-    this.topic = topic?.id ? new Topic({ ...(topic || {}) } as any) : null;
+    this.topic = { ...topic };
     this.kind = kind;
     this.stage = stage;
     this.authorCommunity = Address?.community_id;
@@ -434,6 +432,7 @@ export class Thread implements IUniqueId {
       associatedContests,
       ContestActions,
     );
+    this.contentUrl = content_url;
     this.recentComments = (recentComments || []).map(
       (rc) =>
         new Comment({
@@ -444,7 +443,6 @@ export class Thread implements IUniqueId {
           author: rc?.address,
           last_edited: rc?.updated_at ? moment(rc.updated_at) : null,
           created_at: rc?.created_at ? moment(rc?.created_at) : null,
-          plaintext: rc?.plainText,
           text: rc?.text,
           Address: {
             user_id: rc?.user_id,
@@ -452,7 +450,7 @@ export class Thread implements IUniqueId {
             User: {
               profile: {
                 name: rc?.profile_name,
-                avatar_url: rc?.profile_avatar_url,
+                avatar_url: rc?.profile_avatar,
               },
             },
           },
@@ -464,9 +462,10 @@ export class Thread implements IUniqueId {
           parent_id: null,
           reactions: [],
           CommentVersionHistories: [],
-          reaction_weights_sum: 0,
+          reaction_weights_sum: '0',
           canvas_signed_data: null,
           canvas_msg_id: null,
+          content_url: rc.content_url || null,
         }),
     );
     this.latestActivity = last_commented_on

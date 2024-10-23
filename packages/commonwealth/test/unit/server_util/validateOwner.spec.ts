@@ -105,7 +105,7 @@ describe('validateOwner', () => {
           {
             id: 5,
             address: '0x567',
-            verified: true,
+            verified: new Date(),
           },
         ],
       };
@@ -141,7 +141,7 @@ describe('validateOwner', () => {
           {
             id: 2,
             address: '0x234',
-            verified: true,
+            verified: new Date(),
           },
         ],
       };

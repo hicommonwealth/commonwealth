@@ -1,0 +1,17 @@
+@import '../../../../styles/shared';
+
+.PageCounter {
+  display: flex;
+  flex-direction: row;
+  width: fit-content;
+  align-items: center;
+  gap: 12px;
+
+  .counter {
+    display: flex;
+
+    .Text {
+      color: $neutral-500;
+    }
+  }
+}

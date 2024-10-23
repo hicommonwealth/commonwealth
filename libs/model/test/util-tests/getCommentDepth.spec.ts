@@ -24,12 +24,11 @@ describe('getCommentDepth', () => {
     });
     const thread = await models.Thread.create({
       community_id,
-      // @ts-expect-error StrictNullChecks
-      address_id: address.id,
+      address_id: address!.id!,
       title: 'Testing',
-      plaintext: '',
       kind: 'discussion',
       search: getThreadSearchVector('Testing', ''),
+      reaction_weights_sum: '0',
     });
     let comment: CommentInstance;
     for (let i = 0; i < maxDepth; i++) {

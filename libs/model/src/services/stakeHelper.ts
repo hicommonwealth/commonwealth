@@ -1,46 +1,96 @@
 import { InvalidState } from '@hicommonwealth/core';
-import { commonProtocol } from '@hicommonwealth/shared';
+import { TopicWeightedVoting } from '@hicommonwealth/schemas';
+import { BalanceSourceType, commonProtocol } from '@hicommonwealth/shared';
 import { BigNumber } from 'ethers';
+import { tokenBalanceCache } from '.';
 import { config } from '../config';
 import { models } from '../database';
 import { mustExist } from '../middleware/guards';
 import { contractHelpers } from '../services/commonProtocol';
 
 /**
- * Calculates voting weight of address on a community with stake
- * @param community_id community id
+ * Calculates voting weight of address based on the topic
+ * @param topic_id topic id
  * @param address user's address
  * @returns voting weight or null if no stake if found
  */
 export async function getVotingWeight(
-  community_id: string,
+  topic_id: number,
   address: string,
-): Promise<number | null> {
+): Promise<BigNumber | null> {
   if (config.STAKE.REACTION_WEIGHT_OVERRIDE)
-    return config.STAKE.REACTION_WEIGHT_OVERRIDE;
+    return BigNumber.from(config.STAKE.REACTION_WEIGHT_OVERRIDE);
 
-  const stake = await models.CommunityStake.findOne({
-    where: { community_id },
+  const topic = await models.Topic.findByPk(topic_id, {
+    include: [
+      {
+        model: models.Community,
+        as: 'community',
+        required: true,
+        include: [
+          {
+            model: models.ChainNode,
+            required: false,
+          },
+          {
+            model: models.CommunityStake,
+            required: false,
+          },
+        ],
+      },
+    ],
   });
-  if (!stake) return null;
+  mustExist('Topic', topic);
 
-  const community = await models.Community.findByPk(community_id);
+  const { community } = topic;
   mustExist('Community', community);
-  mustExist('Chain Node Id', community.chain_node_id);
 
-  const node = await models.ChainNode.findByPk(community.chain_node_id!);
-  mustExist('Chain Node', node);
-  mustExist('Eth Chain Id', node.eth_chain_id);
+  const chain_node = community.ChainNode;
 
-  const stakeBalances = await contractHelpers.getNamespaceBalance(
-    community.namespace_address!,
-    stake.stake_id,
-    node.eth_chain_id,
-    [address],
-  );
-  const stakeBalance = stakeBalances[address];
-  if (BigNumber.from(stakeBalance).lte(0))
-    throw new InvalidState('Must have stake to upvote');
+  if (topic.weighted_voting === TopicWeightedVoting.Stake) {
+    mustExist('Chain Node Eth Chain Id', chain_node?.eth_chain_id);
+    mustExist('Community Namespace Address', community.namespace_address);
 
-  return commonProtocol.calculateVoteWeight(stakeBalance, stake.vote_weight);
+    const stake = topic.community?.CommunityStakes?.at(0);
+    mustExist('Community Stake', stake);
+
+    const stakeBalances = await contractHelpers.getNamespaceBalance(
+      community.namespace_address,
+      stake.stake_id,
+      chain_node.eth_chain_id,
+      [address],
+    );
+    const stakeBalance = stakeBalances[address];
+    if (BigNumber.from(stakeBalance).lte(0))
+      throw new InvalidState('Must have stake to upvote');
+
+    return commonProtocol.calculateVoteWeight(stakeBalance, stake.vote_weight);
+  } else if (topic.weighted_voting === TopicWeightedVoting.ERC20) {
+    mustExist('Chain Node Eth Chain Id', chain_node?.eth_chain_id);
+
+    const balances = await tokenBalanceCache.getBalances({
+      balanceSourceType: BalanceSourceType.ERC20,
+      addresses: [address],
+      sourceOptions: {
+        evmChainId: chain_node.eth_chain_id,
+        contractAddress: topic.token_address!,
+      },
+      cacheRefresh: true,
+    });
+
+    const tokenBalance = balances[address];
+
+    if (BigNumber.from(tokenBalance).lte(0))
+      throw new InvalidState('Insufficient token balance');
+
+    const result = commonProtocol.calculateVoteWeight(
+      tokenBalance,
+      topic.vote_weight_multiplier!,
+    );
+    // only count full ERC20 tokens
+    return result?.div(BigNumber.from(10).pow(18)) || null;
+  }
+
+  // no weighted voting
+  return null;
 }

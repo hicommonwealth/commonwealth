@@ -1,6 +1,6 @@
 import { toCanvasSignedDataApiArgs } from '@hicommonwealth/shared';
 import { signThread } from 'controllers/server/sessions';
-import Topic from 'models/Topic';
+import type { Topic } from 'models/Topic';
 import { ThreadStage } from 'models/types';
 import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
 import { trpc } from 'utils/trpcClient';
@@ -40,7 +40,7 @@ export const buildCreateThreadInput = async ({
   });
   return {
     community_id: communityId,
-    topic_id: topic.id,
+    topic_id: topic.id!,
     title: title,
     body: body ?? '',
     kind,

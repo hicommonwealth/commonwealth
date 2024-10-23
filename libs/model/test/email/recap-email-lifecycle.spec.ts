@@ -72,11 +72,13 @@ describe('Recap email lifecycle', () => {
       topic_id: community?.topics?.at(0)?.id,
       pinned: false,
       read_only: false,
+      reaction_weights_sum: '0',
     });
 
     [comment] = await seed('Comment', {
       address_id: community?.Addresses?.at(0)?.id,
       thread_id: thread!.id!,
+      reaction_weights_sum: '0',
     });
   });
 
@@ -104,8 +106,8 @@ describe('Recap email lifecycle', () => {
     );
 
     sandbox = sinon.createSandbox();
-    notificationsProvider(
-      SpyNotificationsProvider(sandbox, {
+    notificationsProvider({
+      adapter: SpyNotificationsProvider(sandbox, {
         getMessagesStub: sandbox
           .stub()
           .onFirstCall()
@@ -113,7 +115,7 @@ describe('Recap email lifecycle', () => {
           .onSecondCall()
           .returns(Promise.resolve([])),
       }),
-    );
+    });
 
     const res = await query(GetRecapEmailDataQuery(), {
       actor: {
@@ -141,8 +143,8 @@ describe('Recap email lifecycle', () => {
     );
 
     sandbox = sinon.createSandbox();
-    notificationsProvider(
-      SpyNotificationsProvider(sandbox, {
+    notificationsProvider({
+      adapter: SpyNotificationsProvider(sandbox, {
         getMessagesStub: sandbox
           .stub()
           .onFirstCall()
@@ -150,7 +152,7 @@ describe('Recap email lifecycle', () => {
           .onSecondCall()
           .returns(Promise.resolve([])),
       }),
-    );
+    });
 
     const res = await query(GetRecapEmailDataQuery(), {
       actor: {
@@ -178,8 +180,8 @@ describe('Recap email lifecycle', () => {
     );
 
     sandbox = sinon.createSandbox();
-    notificationsProvider(
-      SpyNotificationsProvider(sandbox, {
+    notificationsProvider({
+      adapter: SpyNotificationsProvider(sandbox, {
         getMessagesStub: sandbox
           .stub()
           .onFirstCall()
@@ -187,7 +189,7 @@ describe('Recap email lifecycle', () => {
           .onSecondCall()
           .returns(Promise.resolve([])),
       }),
-    );
+    });
 
     const res = await query(GetRecapEmailDataQuery(), {
       actor: {
@@ -206,7 +208,9 @@ describe('Recap email lifecycle', () => {
 
   test.skip('should throw if the notifications provider fails', async () => {
     sandbox = sinon.createSandbox();
-    notificationsProvider(ThrowingSpyNotificationsProvider(sandbox));
+    notificationsProvider({
+      adapter: ThrowingSpyNotificationsProvider(sandbox),
+    });
 
     await expect(
       await query(GetRecapEmailDataQuery(), {

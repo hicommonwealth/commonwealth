@@ -23,6 +23,6 @@ export type ContestFormValidationSubmitValues = z.infer<
 export type ContestFormData = ContestFormValidationSubmitValues & {
   prizePercentage: number;
   payoutStructure: number[];
-  farcasterContestDuration?: number;
-  toggledTopicList: { name: string; id: number; checked: boolean }[];
+  contestDuration?: number;
+  toggledTopicList: { name: string; id?: number; checked: boolean }[];
 };

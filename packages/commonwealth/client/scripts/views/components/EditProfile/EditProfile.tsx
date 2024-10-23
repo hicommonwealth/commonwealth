@@ -2,6 +2,7 @@ import { useUpdateUserMutation } from 'client/scripts/state/api/user';
 import { notifyError } from 'controllers/app/notifications';
 import { linkValidationSchema } from 'helpers/formValidations/common';
 import { getLinkType, isLinkValid } from 'helpers/link';
+import { useFlag } from 'hooks/useFlag';
 import AddressInfo from 'models/AddressInfo';
 import NewProfile from 'models/NewProfile';
 import { useCommonNavigate } from 'navigation/helpers';
@@ -9,6 +10,7 @@ import React, { useEffect, useState } from 'react';
 import { useFetchProfileByIdQuery } from 'state/api/profiles';
 import useUserStore from 'state/ui/user';
 import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
+import ManageApiKey from 'views/components/EditProfile/ManageAPIKeys';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { z } from 'zod';
 import { PageNotFound } from '../../pages/404';
@@ -16,10 +18,7 @@ import { AvatarUpload } from '../Avatar';
 import { LinksArray, useLinksArray } from '../LinksArray';
 import { PreferenceTags, usePreferenceTags } from '../PreferenceTags';
 import { UserTrainingCardTypes } from '../UserTrainingSlider/types';
-import {
-  CWCoverImageUploader,
-  ImageBehavior,
-} from '../component_kit/cw_cover_image_uploader';
+import { CWImageInput, ImageBehavior } from '../component_kit/CWImageInput';
 import { CWDivider } from '../component_kit/cw_divider';
 import { CWText } from '../component_kit/cw_text';
 import { CWButton } from '../component_kit/new_designs/CWButton';
@@ -48,8 +47,7 @@ const EditProfile = () => {
   const [addresses, setAddresses] = useState<AddressInfo[]>();
   const [isUploadingProfileImage, setIsUploadingProfileImage] = useState(false);
   const [isUploadingCoverImage, setIsUploadingCoverImage] = useState(false);
-  const [backgroundImageBehaviour, setBackgroundImageBehaviour] =
-    useState<ImageBehavior>();
+  const [imageBehavior, setImageBehavior] = useState<ImageBehavior>();
 
   const {
     areLinksValid,
@@ -62,6 +60,8 @@ const EditProfile = () => {
     initialLinks: [],
     linkValidation: linkValidationSchema.optional,
   });
+
+  const enableApiKeyManagement = useFlag('manageApiKeys');
 
   const { preferenceTags, setPreferenceTags, toggleTagFromSelection } =
     usePreferenceTags();
@@ -121,6 +121,10 @@ const EditProfile = () => {
           canDelete: true,
         })),
       );
+      setImageBehavior(
+        (data?.profile?.background_image?.imageBehavior as ImageBehavior) ||
+          ImageBehavior.Fill,
+      );
       setAddresses(
         // @ts-expect-error <StrictNullChecks/>
         data.addresses.map((a) => {
@@ -170,7 +174,7 @@ const EditProfile = () => {
       const backgroundImage = values.backgroundImg.trim()
         ? JSON.stringify({
             url: values.backgroundImg.trim(),
-            imageBehavior: backgroundImageBehaviour,
+            imageBehavior: imageBehavior,
           })
         : null;
 
@@ -337,18 +341,20 @@ const EditProfile = () => {
               description="Express yourself through imagery."
             >
               <CWText fontWeight="medium">Add a background image </CWText>
-              {/* TODO: add option to remove existing image */}
-              <CWCoverImageUploader
+              {/* can add option to remove existing image if needed */}
+              <CWImageInput
                 name="backgroundImg"
                 hookToForm
-                enableGenerativeAI
-                showUploadAndGenerateText
-                defaultImageBehaviour={
-                  (data?.profile?.background_image
-                    ?.imageBehavior as ImageBehavior) || ImageBehavior.Fill
+                withAIImageGeneration
+                imageBehavior={imageBehavior}
+                onImageProcessingChange={({ isGenerating, isUploading }) =>
+                  setIsUploadingCoverImage(isGenerating || isUploading)
                 }
-                onImageProcessStatusChange={setIsUploadingCoverImage}
-                onImageBehaviourChange={setBackgroundImageBehaviour}
+                onImageUploaded={console.log}
+                onImageBehaviorChange={setImageBehavior}
+                allowedImageBehaviours={['Fill', 'Tiled']}
+                canSelectImageBehavior
+                containerClassname="background-img-field"
               />
             </ProfileSection>
             <ProfileSection
@@ -390,6 +396,7 @@ const EditProfile = () => {
                 onTagClick={toggleTagFromSelection}
               />
             </ProfileSection>
+            {enableApiKeyManagement ? <ManageApiKey /> : <></>}
             {actionButtons}
           </CWForm>
         </div>

@@ -1,8 +1,9 @@
 import { EventNames } from '@hicommonwealth/core';
 import { Thread } from '@hicommonwealth/schemas';
+import { getDecodedString } from '@hicommonwealth/shared';
 import Sequelize from 'sequelize';
 import { z } from 'zod';
-import { emitEvent, getThreadContestManagers } from '../utils';
+import { emitEvent, getThreadContestManagers } from '../utils/utils';
 import type { CommunityAttributes } from './community';
 import type { ThreadSubscriptionAttributes } from './thread_subscriptions';
 import type { ModelInstance } from './types';
@@ -12,10 +13,7 @@ export type ThreadAttributes = z.infer<typeof Thread> & {
   Community?: CommunityAttributes;
   subscriptions?: ThreadSubscriptionAttributes[];
 };
-
-export type ThreadInstance = ModelInstance<ThreadAttributes> & {
-  // no mixins used
-};
+export type ThreadInstance = ModelInstance<ThreadAttributes>;
 
 export default (
   sequelize: Sequelize.Sequelize,
@@ -28,7 +26,6 @@ export default (
       created_by: { type: Sequelize.STRING, allowNull: true },
       title: { type: Sequelize.TEXT, allowNull: false },
       body: { type: Sequelize.TEXT, allowNull: true },
-      plaintext: { type: Sequelize.TEXT, allowNull: true },
       kind: { type: Sequelize.STRING, allowNull: false },
       stage: {
         type: Sequelize.TEXT,
@@ -80,7 +77,7 @@ export default (
         defaultValue: 0,
       },
       reaction_weights_sum: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.DECIMAL(78, 0),
         allowNull: false,
         defaultValue: 0,
       },
@@ -98,6 +95,7 @@ export default (
         type: Sequelize.TSVECTOR,
         allowNull: false,
       },
+      content_url: { type: Sequelize.STRING, allowNull: true },
     },
     {
       timestamps: true,
@@ -166,20 +164,9 @@ export default (
   );
 
 export function getThreadSearchVector(title: string, body: string) {
-  let decodedTitle = title;
-  let decodedBody = body;
-  try {
-    decodedTitle = decodeURIComponent(title);
-    // eslint-disable-next-line no-empty
-  } catch {}
-
-  try {
-    decodedBody = decodeURIComponent(body);
-    // eslint-disable-next-line no-empty
-  } catch {}
   return Sequelize.fn(
     'to_tsvector',
     'english',
-    decodedTitle + ' ' + decodedBody,
+    getDecodedString(title) + ' ' + getDecodedString(body),
   );
 }

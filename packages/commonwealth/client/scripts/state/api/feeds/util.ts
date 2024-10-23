@@ -1,13 +1,12 @@
 import { AxiosResponse } from 'axios';
 import Thread from 'models/Thread';
-import Topic from 'models/Topic';
+import type { Topic } from 'models/Topic';
 import { ThreadKind, ThreadStage } from 'models/types';
 
 type ActivityResponse = {
   thread: {
     id: number;
     body: string;
-    plaintext: string;
     title: string;
     numberOfComments: number;
     created_at: string;
@@ -22,7 +21,7 @@ type ActivityResponse = {
     marked_as_spam_at?: string;
     discord_meta?: string;
     profile_name: string;
-    profile_avatar_url?: string;
+    profile_avatar?: string;
     user_id: number;
     user_address: string;
     topic: Topic;
@@ -38,7 +37,7 @@ export function formatActivityResponse(response: AxiosResponse<any, any>) {
       new Thread({
         id: x.thread.id,
         // @ts-expect-error <StrictNullChecks/>
-        avatar_url: x.thread.profile_avatar_url,
+        avatar_url: x.thread.profile_avatar,
         profile_name: x.thread.profile_name,
         community_id: x.thread.community_id,
         kind: x.thread.kind,
@@ -54,7 +53,6 @@ export function formatActivityResponse(response: AxiosResponse<any, any>) {
         body: x.thread.body,
         discord_meta: x.thread.discord_meta,
         numberOfComments: x.thread.numberOfComments,
-        plaintext: x.thread.plaintext,
         read_only: x.thread.read_only,
         archived_at: x.thread.archived_at,
         // @ts-expect-error <StrictNullChecks/>
@@ -69,7 +67,7 @@ export function formatActivityResponse(response: AxiosResponse<any, any>) {
         version_history: null,
         last_commented_on: '',
         address_last_active: '',
-        reaction_weights_sum: 0,
+        reaction_weights_sum: '0',
       }),
   );
 }

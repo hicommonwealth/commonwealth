@@ -12,9 +12,9 @@ export class ServerError extends Error {
 
 export class AppError extends Error {
   status: number;
-  constructor(message: string) {
+  constructor(message: string, status?: number) {
     super(message);
-    this.status = 400;
+    this.status = status || 400;
     this.name = 'AppError';
   }
 }

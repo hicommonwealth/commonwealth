@@ -54,12 +54,7 @@ const deleteAddress = async (
         transaction,
       },
     );
-    await decrementProfileCount(
-      models,
-      community.id!,
-      req!.user!.id!,
-      transaction,
-    );
+    await decrementProfileCount(community.id!, req!.user!.id!, transaction);
   });
 
   return res.json({ status: 'Success', response: 'Deleted address' });

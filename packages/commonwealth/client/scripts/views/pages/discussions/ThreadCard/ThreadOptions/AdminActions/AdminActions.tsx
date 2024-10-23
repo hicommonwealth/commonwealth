@@ -1,3 +1,4 @@
+import { buildDeleteThreadInput } from 'client/scripts/state/api/threads/deleteThread';
 import { buildUpdateThreadInput } from 'client/scripts/state/api/threads/editThread';
 import { useAuthModalStore } from 'client/scripts/state/ui/modals';
 import { SessionKeyError } from 'controllers/server/sessions';
@@ -80,19 +81,14 @@ export const AdminActions = ({
   const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
   const user = useUserStore();
 
-  const { mutateAsync: deleteThread } = useDeleteThreadMutation({
-    communityId: app.activeChainId() || '',
-    threadId: thread.id,
-    threadMsgId: thread.canvasMsgId,
-    currentStage: thread.stage,
-  });
+  const { mutateAsync: deleteThread } = useDeleteThreadMutation(thread);
 
   const { mutateAsync: editThread } = useEditThreadMutation({
     communityId: app.activeChainId() || '',
     threadId: thread.id,
     threadMsgId: thread.canvasMsgId,
     currentStage: thread.stage,
-    currentTopicId: thread.topic?.id,
+    currentTopicId: thread.topic.id!,
   });
 
   const handleDeleteThread = () => {
@@ -106,19 +102,18 @@ export const AdminActions = ({
           buttonHeight: 'sm',
           onClick: async () => {
             try {
-              await deleteThread({
-                threadId: thread.id,
-                threadMsgId: thread.canvasMsgId,
-                communityId: app.activeChainId() || '',
-                address: user.activeAccount?.address || '',
-              });
+              const input = await buildDeleteThreadInput(
+                user.activeAccount?.address || '',
+                thread,
+              );
+              await deleteThread(input);
               onDelete?.();
             } catch (err) {
               if (err instanceof SessionKeyError) {
                 checkForSessionKeyRevalidationErrors(err);
                 return;
               }
-              console.error(err?.responseJSON?.error || err?.message);
+              console.error(err.message);
               notifyError('Failed to delete thread');
             }
           },

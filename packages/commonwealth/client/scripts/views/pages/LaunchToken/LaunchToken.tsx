@@ -1,3 +1,4 @@
+import useBeforeUnload from 'hooks/useBeforeUnload';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 import CWFormSteps from 'views/components/component_kit/new_designs/CWFormSteps';
@@ -7,15 +8,31 @@ import useAppStatus from '../../../hooks/useAppStatus';
 import { useBrowserAnalyticsTrack } from '../../../hooks/useBrowserAnalyticsTrack';
 import './LaunchToken.scss';
 import CommunityInformationStep from './steps/CommunityInformationStep';
+import SignatureStep from './steps/SignatureStep';
+import SuccessStep from './steps/SuccessStep';
 import TokenInformationStep from './steps/TokenInformationStep';
-import useCreateCommunity from './useCreateCommunity';
+import useCreateTokenCommunity from './useCreateTokenCommunity';
 import { CreateTokenCommunityStep, getFormSteps } from './utils';
 
 const LaunchToken = () => {
   const navigate = useCommonNavigate();
-  const { createTokenCommunityStep, onChangeStep } = useCreateCommunity();
+  const {
+    baseNode,
+    createTokenCommunityStep,
+    onChangeStep,
+    draftTokenInfo,
+    selectedAddress,
+    setSelectedAddress,
+    setDraftTokenInfo,
+    createdCommunityId,
+    setCreatedCommunityId,
+    isTokenLaunched,
+    setIsTokenLaunched,
+  } = useCreateTokenCommunity();
 
   const { isAddedToHomeScreen } = useAppStatus();
+
+  useBeforeUnload(!!draftTokenInfo && !isTokenLaunched);
 
   useBrowserAnalyticsTrack({
     payload: {
@@ -33,19 +50,56 @@ const LaunchToken = () => {
         return (
           <TokenInformationStep
             handleGoBack={() => navigate('/')} // redirect to home
-            handleContinue={() => onChangeStep(true)}
+            handleContinue={(tokenInfo) => {
+              setDraftTokenInfo(tokenInfo);
+
+              onChangeStep(true);
+            }}
+            onAddressSelected={(address) => setSelectedAddress(address)}
+            selectedAddress={selectedAddress}
           />
         );
       case CreateTokenCommunityStep.CommunityInformation:
         return (
           <CommunityInformationStep
             handleGoBack={() => onChangeStep(false)}
-            handleContinue={() => onChangeStep(true)}
+            handleContinue={(communityId) => {
+              setCreatedCommunityId(communityId);
+
+              onChangeStep(true);
+            }}
+            tokenInfo={draftTokenInfo}
+            selectedAddress={selectedAddress}
           />
         );
       case CreateTokenCommunityStep.SignatureLaunch:
-        // TODO: https://github.com/hicommonwealth/commonwealth/issues/8707
-        return <>Not Implemented</>;
+        // this condition will never be triggered, adding this to avoid typescript errors
+        if (!createdCommunityId || !selectedAddress || !draftTokenInfo)
+          return <></>;
+
+        return (
+          <SignatureStep
+            createdCommunityId={createdCommunityId}
+            baseNode={baseNode}
+            tokenInfo={draftTokenInfo}
+            goToSuccessStep={(isLaunched) => {
+              setIsTokenLaunched(isLaunched);
+
+              onChangeStep(true);
+            }}
+            selectedAddress={selectedAddress}
+          />
+        );
+      case CreateTokenCommunityStep.Success:
+        // this condition will never be triggered, adding this to avoid typescript errors
+        if (!createdCommunityId) return <></>;
+
+        return (
+          <SuccessStep
+            communityId={createdCommunityId}
+            withToken={isTokenLaunched}
+          />
+        );
     }
   };
 

@@ -1,8 +1,7 @@
-import { ChainBase } from '@hicommonwealth/shared';
 import { notifyError } from 'controllers/app/notifications';
 import useAppStatus from 'hooks/useAppStatus';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
-import AddressInfo from 'models/AddressInfo';
+import { useFlag } from 'hooks/useFlag';
 import React from 'react';
 import {
   BaseMixpanelPayload,
@@ -23,7 +22,6 @@ import { openConfirmation } from 'views/modals/confirmation_modal';
 import './CommunityInformationStep.scss';
 
 interface CommunityInformationStepProps {
-  selectedAddress: AddressInfo;
   selectedCommunity: SelectedCommunity;
   handleGoBack: () => void;
   handleContinue: (communityId: string, communityName: string) => void;
@@ -31,13 +29,13 @@ interface CommunityInformationStepProps {
 }
 
 const CommunityInformationStep = ({
-  selectedAddress,
   selectedCommunity,
   handleGoBack,
   handleContinue,
   handleSelectedChainId,
 }: CommunityInformationStepProps) => {
   const { isAddedToHomeScreen } = useAppStatus();
+  const weightedTopicsEnabled = useFlag('weightedTopics');
 
   const { trackAnalytics } = useBrowserAnalyticsTrack<
     MixpanelLoginPayload | BaseMixpanelPayload
@@ -65,17 +63,7 @@ const CommunityInformationStep = ({
         description: values.communityDescription,
         iconUrl: values.communityProfileImageURL,
         socialLinks: values.links ?? [],
-        nodeUrl: selectedChainNode!.nodeUrl!,
-        altWalletUrl: selectedChainNode!.altWalletUrl!,
-        userAddress: selectedAddress.address,
-        ...(selectedCommunity.chainBase === ChainBase.Ethereum && {
-          ethChainId: values?.chain?.value,
-        }),
-        ...(selectedCommunity.chainBase === ChainBase.CosmosSDK && {
-          cosmosChainId: values?.chain?.value,
-          bech32Prefix: selectedChainNode?.bech32Prefix,
-        }),
-        isPWA: isAddedToHomeScreen,
+        chainNodeId: selectedChainNode!.id!,
       });
       await createCommunityMutation(input);
       handleContinue(values.communityId, values.communityName);
@@ -123,9 +111,22 @@ const CommunityInformationStep = ({
       </section>
 
       <FeatureHint
-        title="Selecting your chain"
-        hint="Choose the chain that your Ethereum project is built on.
-        If you’re not sure what to choose you can select the Ethereum Mainnet."
+        title={
+          weightedTopicsEnabled
+            ? 'Chain selection cannot be changed'
+            : 'Selecting your chain'
+        }
+        hint={
+          weightedTopicsEnabled
+            ? `
+              Choose the chain that your Ethereum project is built on. Chain selection 
+              determines availability of features such as Contests, Stakes, and Weighted Voting.
+            `
+            : `
+              Choose the chain that your Ethereum project is built on. If you’re
+              not sure what to choose you can select the Ethereum Mainnet.
+            `
+        }
       />
 
       <CommunityInformationForm

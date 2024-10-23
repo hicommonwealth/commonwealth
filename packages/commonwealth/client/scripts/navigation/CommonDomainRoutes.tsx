@@ -4,7 +4,12 @@ import { Route } from 'react-router-dom';
 import { withLayout } from 'views/Layout';
 import { RouteFeatureFlags } from './Router';
 
-const EditorPage = lazy(() => import('views/pages/EditorPage'));
+const QuillPage = lazy(() => import('views/pages/QuillPage'));
+const MarkdownEditorPage = lazy(() => import('views/pages/MarkdownEditorPage'));
+const MarkdownViewerPage = lazy(() => import('views/pages/MarkdownViewerPage'));
+const MarkdownHitHighlighterPage = lazy(
+  () => import('views/pages/MarkdownHitHighlighterPage'),
+);
 
 const DashboardPage = lazy(() => import('views/pages/user_dashboard'));
 const CommunitiesPage = lazy(() => import('views/pages/Communities'));
@@ -86,6 +91,7 @@ const ManageContest = lazy(
   () => import('views/pages/CommunityManagement/Contests/ManageContest'),
 );
 const Contests = lazy(() => import('views/pages/Contests'));
+const ContestPage = lazy(() => import('views/pages/ContestPage'));
 
 const MyCommunityStake = lazy(() => import('views/pages/MyCommunityStake'));
 
@@ -111,11 +117,32 @@ const CommunityNotFoundPage = lazy(
 );
 
 const CommonDomainRoutes = ({
-  contestEnabled,
-  farcasterContestEnabled,
+  weightedTopicsEnabled,
   tokenizedCommunityEnabled,
 }: RouteFeatureFlags) => [
-  <Route key="/editor" path="/editor" element={<EditorPage />} />,
+  <Route
+    key="/_internal/quill"
+    path="/_internal/quill"
+    element={<QuillPage />}
+  />,
+
+  <Route
+    key="/_internal/markdown-editor"
+    path="/_internal/markdown-editor"
+    element={<MarkdownEditorPage />}
+  />,
+
+  <Route
+    key="/_internal/markdown-hit-highlighter"
+    path="/_internal/markdown-hit-highlighter"
+    element={<MarkdownHitHighlighterPage />}
+  />,
+
+  <Route
+    key="/_internal/markdown-viewer"
+    path="/_internal/markdown-viewer"
+    element={<MarkdownViewerPage />}
+  />,
 
   <Route
     key="/"
@@ -379,7 +406,7 @@ const CommonDomainRoutes = ({
     key="/:scope/manage/topics"
     path="/:scope/manage/topics"
     element={withLayout(
-      farcasterContestEnabled ? CommunityTopics : CommunityTopicsOld,
+      weightedTopicsEnabled ? CommunityTopics : CommunityTopicsOld,
       {
         scoped: true,
       },
@@ -392,38 +419,41 @@ const CommonDomainRoutes = ({
       scoped: true,
     })}
   />,
-  ...(contestEnabled
-    ? [
-        <Route
-          key="/:scope/manage/contests"
-          path="/:scope/manage/contests"
-          element={withLayout(AdminContestsPage, {
-            scoped: true,
-          })}
-        />,
-        <Route
-          key="/:scope/manage/contests/launch"
-          path="/:scope/manage/contests/launch"
-          element={withLayout(ManageContest, {
-            scoped: true,
-          })}
-        />,
-        <Route
-          key="/:scope/manage/contests/:contestAddress"
-          path="/:scope/manage/contests/:contestAddress"
-          element={withLayout(ManageContest, {
-            scoped: true,
-          })}
-        />,
-        <Route
-          key="/:scope/contests"
-          path="/:scope/contests"
-          element={withLayout(Contests, {
-            scoped: true,
-          })}
-        />,
-      ]
-    : []),
+  <Route
+    key="/:scope/manage/contests"
+    path="/:scope/manage/contests"
+    element={withLayout(AdminContestsPage, {
+      scoped: true,
+    })}
+  />,
+  <Route
+    key="/:scope/manage/contests/launch"
+    path="/:scope/manage/contests/launch"
+    element={withLayout(ManageContest, {
+      scoped: true,
+    })}
+  />,
+  <Route
+    key="/:scope/manage/contests/:contestAddress"
+    path="/:scope/manage/contests/:contestAddress"
+    element={withLayout(ManageContest, {
+      scoped: true,
+    })}
+  />,
+  <Route
+    key="/:scope/contests"
+    path="/:scope/contests"
+    element={withLayout(Contests, {
+      scoped: true,
+    })}
+  />,
+  <Route
+    key="/:scope/contests/:contestAddress"
+    path="/:scope/contests/:contestAddress"
+    element={withLayout(ContestPage, {
+      scoped: true,
+    })}
+  />,
   <Route
     key="/:scope/analytics"
     path="/:scope/analytics"

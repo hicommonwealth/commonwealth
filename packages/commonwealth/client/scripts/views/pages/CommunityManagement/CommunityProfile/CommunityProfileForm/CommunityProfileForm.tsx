@@ -19,9 +19,9 @@ import {
   usePreferenceTags,
 } from 'views/components/PreferenceTags';
 import {
-  CWCoverImageUploader,
+  CWImageInput,
   ImageBehavior,
-} from 'views/components/component_kit/cw_cover_image_uploader';
+} from 'views/components/component_kit/CWImageInput';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTextArea } from 'views/components/component_kit/cw_text_area';
@@ -182,7 +182,6 @@ const CommunityProfileForm = () => {
       setFormKey((key) => key + 1);
 
       notifySuccess('Community updated!');
-      app.sidebarRedraw.emit('redraw');
     } catch {
       notifyError('Failed to update community!');
     } finally {
@@ -291,15 +290,16 @@ const CommunityProfileForm = () => {
               label="Community Description"
               placeholder="Enter a description of your community or project"
             />
-            <CWCoverImageUploader
+            <CWImageInput
               hookToForm
-              enableGenerativeAI
-              showUploadAndGenerateText
+              withAIImageGeneration
               name="communityProfileImageURL"
-              canSelectImageBehaviour={false}
-              defaultImageBehaviour={ImageBehavior.Circle}
-              onImageProcessStatusChange={setIsProcessingProfileImage}
-              subheaderText="Community Profile Image (Accepts JPG and PNG files)"
+              canSelectImageBehavior={false}
+              imageBehavior={ImageBehavior.Circle}
+              onImageProcessingChange={({ isGenerating, isUploading }) =>
+                setIsProcessingProfileImage(isGenerating || isUploading)
+              }
+              label="Community Profile Image (Accepts JPG and PNG files)"
             />
           </section>
 

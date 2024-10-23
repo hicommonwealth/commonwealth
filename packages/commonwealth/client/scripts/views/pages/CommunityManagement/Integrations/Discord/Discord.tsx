@@ -9,8 +9,10 @@ import {
 } from 'state/api/communities';
 import { useFetchCustomDomainQuery } from 'state/api/configuration';
 import {
+  useCreateDiscordBotConfigMutation,
   useFetchDiscordChannelsQuery,
   useRemoveDiscordBotConfigMutation,
+  useSetForumChannelConnectionMutation,
 } from 'state/api/discord';
 import { useFetchTopicsQuery } from 'state/api/topics';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -39,6 +41,12 @@ const Discord = () => {
     community?.discord_config_id ? 'connected' : 'none',
   );
 
+  const { mutateAsync: createDiscordBotConfig } =
+    useCreateDiscordBotConfigMutation();
+
+  const { mutateAsync: setForumChannelConnection } =
+    useSetForumChannelConnectionMutation();
+
   const { data: domain } = useFetchCustomDomainQuery();
 
   const queryParams = useMemo(() => {
@@ -53,7 +61,7 @@ const Discord = () => {
     community?.discord_bot_webhooks_enabled,
   );
   const { data: discordChannels } = useFetchDiscordChannelsQuery({
-    chainId: communityId,
+    community_id: communityId,
     apiEnabled: !!communityId,
   });
   const { data: topics = [], refetch: refetchTopics } = useFetchTopicsQuery({
@@ -79,7 +87,10 @@ const Discord = () => {
 
     try {
       const verificationToken = uuidv4();
-      await app.discord.createConfig(verificationToken);
+      await createDiscordBotConfig({
+        verification_token: verificationToken,
+        community_id: communityId,
+      });
 
       const redirectURL = encodeURI(
         !domain?.isCustomDomain
@@ -106,14 +117,15 @@ const Discord = () => {
       notifyError('Failed to connect Discord!');
       setConnectionStatus('none');
     }
-  }, [connectionStatus, domain?.isCustomDomain]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [connectionStatus, createDiscordBotConfig, domain?.isCustomDomain]);
 
   const onDisconnect = useCallback(async () => {
     if (connectionStatus === 'connecting' || connectionStatus === 'none')
       return;
     try {
       await removeDiscordBotConfig({
-        communityId,
+        community_id: communityId,
       });
 
       if (queryParams.has('discordConfigId')) {
@@ -155,7 +167,7 @@ const Discord = () => {
     topicId: string,
   ) => {
     try {
-      await app.discord.setForumChannelConnection(topicId, channelId);
+      await setForumChannelConnection({ topicId, channelId });
       await refetchTopics();
       const topicName = topics.find(
         (topic) => topic.id === Number(topicId),
@@ -217,7 +229,7 @@ const Discord = () => {
                   topics={topics.map((topic) => ({
                     name: topic.name,
                     id: `${topic.id}`,
-                    channelId: topic.channelId,
+                    channelId: topic.channel_id,
                   }))}
                   refetchTopics={async () => {
                     await refetchTopics();

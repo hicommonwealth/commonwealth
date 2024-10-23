@@ -44,17 +44,16 @@ export const buildDb = (sequelize: Sequelize): DB => {
 
 // TODO: avoid legacy exports to /packages/commonwealth/server (keep db models encapsulated behind DB)
 export * from './address';
+export * from './api_key';
 export * from './chain_node';
 export * from './collaboration';
 export * from './comment';
 export * from './comment_subscriptions';
 export * from './comment_version_history';
 export * from './community';
-export * from './community_contract';
 export * from './community_role';
 export * from './community_stake';
 export * from './community_tags';
-export * from './contract';
 export * from './contract_abi';
 export * from './discord_bot_config';
 export * from './email_update_token';

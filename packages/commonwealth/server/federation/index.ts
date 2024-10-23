@@ -1,9 +1,10 @@
 import { logger } from '@hicommonwealth/core';
 import { CanvasSignedData, startCanvasNode } from '@hicommonwealth/shared';
 import { parse } from '@ipld/dag-json';
+import { config } from '../config';
 
 const log = logger(import.meta);
-export const canvas = await startCanvasNode();
+export const canvas = await startCanvasNode(config);
 
 log.info(
   'canvas: started libp2p with multiaddrs: ' +
@@ -17,7 +18,8 @@ export const applyCanvasSignedDataMiddleware: (
   input,
   output,
 ) => Promise<undefined> = async (input, output) => {
-  await applyCanvasSignedData(parse(output.canvas_signed_data));
+  if (output.canvas_signed_data)
+    await applyCanvasSignedData(parse(output.canvas_signed_data));
 };
 
 export const applyCanvasSignedData = async (data: CanvasSignedData) => {

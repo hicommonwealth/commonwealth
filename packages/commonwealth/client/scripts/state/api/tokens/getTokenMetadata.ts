@@ -2,13 +2,13 @@ import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { fetchCachedNodes } from 'state/api/nodes';
 
-const ETH_CHAIN_ID = 37;
-
 interface UseTokenMetadataQueryProps {
   tokenId: string;
+  nodeEthChainId: number;
+  apiEnabled?: boolean;
 }
 
-type GetTokenMetadataResponse = {
+export type GetTokenMetadataResponse = {
   decimals: number;
   logo: string;
   name: string;
@@ -17,14 +17,17 @@ type GetTokenMetadataResponse = {
 
 const getTokenMetadata = async ({
   tokenId,
+  nodeEthChainId,
 }: UseTokenMetadataQueryProps): Promise<GetTokenMetadataResponse> => {
-  const ethereumNode = fetchCachedNodes()?.find((n) => n?.id === ETH_CHAIN_ID);
+  const node = fetchCachedNodes()?.find(
+    (n) => n?.ethChainId === nodeEthChainId,
+  );
 
-  if (!ethereumNode) {
-    throw new Error('Ethereum node not found');
+  if (!node) {
+    throw new Error('Node not found');
   }
 
-  const response = await axios.post(ethereumNode.url, {
+  const response = await axios.post(node.url, {
     params: [tokenId],
     method: 'alchemy_getTokenMetadata',
   });
@@ -32,11 +35,15 @@ const getTokenMetadata = async ({
   return response.data.result;
 };
 
-const useTokenMetadataQuery = ({ tokenId }: UseTokenMetadataQueryProps) => {
+const useTokenMetadataQuery = ({
+  tokenId,
+  nodeEthChainId,
+  apiEnabled = true,
+}: UseTokenMetadataQueryProps) => {
   return useQuery({
-    queryKey: [tokenId],
-    queryFn: () => getTokenMetadata({ tokenId }),
-    enabled: !!tokenId,
+    queryKey: [tokenId, nodeEthChainId],
+    queryFn: () => getTokenMetadata({ tokenId, nodeEthChainId }),
+    enabled: !!tokenId && apiEnabled,
     retry: false,
   });
 };

@@ -10,7 +10,7 @@ import { useManageCommunityStakeModalStore } from 'state/ui/modals';
 import useUserStore from 'state/ui/user';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { z } from 'zod';
-import { useFetchEthUsdRateQuery } from '../../../state/api/communityStake/index';
+import { useFetchTokenUsdRateQuery } from '../../../state/api/communityStake/index';
 import { trpc } from '../../../utils/trpcClient';
 import { NewCommunityCard } from '../../components/CommunityCard';
 import { CWText } from '../../components/component_kit/cw_text';
@@ -24,6 +24,7 @@ import ManageCommunityStakeModal from '../../modals/ManageCommunityStakeModal/Ma
 import './Communities.scss';
 import { FiltersDrawer } from './FiltersDrawer/FiltersDrawer';
 import { CommunityFilters } from './FiltersDrawer/types';
+import IdeaLaunchpad from './IdeaLaunchpad';
 import { getCommunityCountsString } from './helpers';
 
 type ExtendedCommunityType = z.infer<typeof ExtendedCommunity>;
@@ -78,7 +79,9 @@ const CommunitiesPage = () => {
     });
 
   const { data: ethUsdRateData, isLoading: isLoadingEthUsdRate } =
-    useFetchEthUsdRateQuery();
+    useFetchTokenUsdRateQuery({
+      tokenSymbol: 'ETH',
+    });
   const ethUsdRate = ethUsdRateData?.data?.data?.amount;
 
   const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
@@ -195,6 +198,7 @@ const CommunitiesPage = () => {
               onFiltersChange={(newFilters) => setFilters(newFilters)}
             />
           </div>
+          <IdeaLaunchpad />
         </div>
         {isLoading && communitiesList.length === 0 ? (
           <CWCircleMultiplySpinner />

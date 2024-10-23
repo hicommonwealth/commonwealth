@@ -7,16 +7,19 @@ import {
   deserializeCanvas,
   verify,
 } from '@hicommonwealth/shared';
-import { GetThreadActionTooltipTextResponse } from 'client/scripts/helpers/threads';
-import { SharePopover } from 'client/scripts/views/components/SharePopover';
+import clsx from 'clsx';
+import { GetThreadActionTooltipTextResponse } from 'helpers/threads';
+import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
+import type Comment from 'models/Comment';
+import useGetContentByUrlQuery from 'state/api/general/getContentByUrl';
+import useUserStore from 'state/ui/user';
+import { MarkdownViewerWithFallback } from 'views/components/MarkdownViewerWithFallback/MarkdownViewerWithFallback';
+import { CommentReactionButton } from 'views/components/ReactionButton/CommentReactionButton';
+import { SharePopover } from 'views/components/SharePopover';
 import {
   ViewCommentUpvotesDrawer,
   ViewUpvotesDrawerTrigger,
-} from 'client/scripts/views/components/UpvoteDrawer';
-import clsx from 'clsx';
-import type Comment from 'models/Comment';
-import useUserStore from 'state/ui/user';
-import { CommentReactionButton } from 'views/components/ReactionButton/CommentReactionButton';
+} from 'views/components/UpvoteDrawer';
 import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -25,7 +28,6 @@ import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
 import { ReactQuillEditor } from 'views/components/react_quill_editor';
-import { QuillRenderer } from 'views/components/react_quill_editor/quill_renderer';
 import { deserializeDelta } from 'views/components/react_quill_editor/utils';
 import { ToggleCommentSubscribe } from 'views/pages/discussions/CommentCard/ToggleCommentSubscribe';
 import { AuthorAndPublishInfo } from '../ThreadCard/AuthorAndPublishInfo';
@@ -116,6 +118,45 @@ export const CommentCard = ({
   const [, setOnReaction] = useState<boolean>(false);
   const [isUpvoteDrawerOpen, setIsUpvoteDrawerOpen] = useState<boolean>(false);
 
+  const [contentUrlBodyToFetch, setContentUrlBodyToFetch] = useState<
+    string | null
+  >(null);
+
+  useRunOnceOnCondition({
+    callback: () => {
+      comment.contentUrl && setContentUrlBodyToFetch(comment.contentUrl);
+    },
+    shouldRun: !!comment.contentUrl,
+  });
+
+  const { data: contentUrlBody, isLoading: isLoadingContentBody } =
+    useGetContentByUrlQuery({
+      contentUrl: contentUrlBodyToFetch || '',
+      enabled: !!contentUrlBodyToFetch,
+    });
+
+  useEffect(() => {
+    if (
+      contentUrlBodyToFetch &&
+      contentUrlBodyToFetch !== comment.contentUrl &&
+      contentUrlBody
+    ) {
+      setCommentText(contentUrlBody);
+      setCommentDelta(contentUrlBody);
+    }
+  }, [contentUrlBody, contentUrlBodyToFetch, comment.contentUrl]);
+
+  useRunOnceOnCondition({
+    callback: () => {
+      if (contentUrlBody) {
+        setCommentText(contentUrlBody);
+        setCommentDelta(contentUrlBody);
+      }
+    },
+    shouldRun:
+      !isLoadingContentBody && !!comment.contentUrl && !!contentUrlBody,
+  });
+
   useEffect(() => {
     try {
       const canvasSignedData: CanvasSignedData = deserializeCanvas(
@@ -134,6 +175,26 @@ export const CommentCard = ({
 
   const handleReaction = () => {
     setOnReaction((prevOnReaction) => !prevOnReaction);
+  };
+
+  const handleVersionHistoryChange = (versionId: number) => {
+    const foundVersion = (comment?.versionHistory || []).find(
+      (version) => version.id === versionId,
+    );
+
+    if (!foundVersion?.content_url) {
+      setCommentText(foundVersion?.text || '');
+      setCommentDelta(foundVersion?.text || '');
+      return;
+    }
+
+    if (contentUrlBodyToFetch === foundVersion.content_url && contentUrlBody) {
+      setCommentText(contentUrlBody);
+      setCommentDelta(contentUrlBody);
+      return;
+    }
+
+    setContentUrlBodyToFetch(foundVersion.content_url);
   };
 
   return (
@@ -158,7 +219,7 @@ export const CommentCard = ({
             showUserAddressWithInfo={false}
             profile={comment.profile}
             versionHistory={comment.versionHistory}
-            changeContentText={setCommentText}
+            onChangeVersionHistoryNumber={handleVersionHistoryChange}
           />
         )}
       </div>
@@ -199,7 +260,7 @@ export const CommentCard = ({
         <div className="comment-content">
           {isSpam && <CWTag label="SPAM" type="spam" />}
           <CWText className="comment-text">
-            <QuillRenderer doc={commentText} />
+            <MarkdownViewerWithFallback markdown={commentText} />
           </CWText>
           {!comment.deleted && (
             <div className="comment-footer">

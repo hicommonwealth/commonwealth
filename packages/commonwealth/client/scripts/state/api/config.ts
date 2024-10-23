@@ -12,7 +12,6 @@ export const queryClient = new QueryClient({
 export const ApiEndpoints = {
   // endpoint builder functions like getEndpoint(id) => /endpoint/:id should have camel cased keys
   // stand alone endpoints should be have upper snake case keys so we can easily tell them apart in code
-  BULK_TOPICS: '/topics',
   FETCH_ADMIN: '/roles',
   FETCH_COMMUNITY_STAKES: '/communityStakes',
   FETCH_COMMENTS: '/viewComments',
@@ -22,8 +21,6 @@ export const ApiEndpoints = {
   FETCH_PROFILES_BY_ID: '/profile/v2',
   FETCH_NODES: '/nodes',
   FETCH_DOMAIN: '/domain',
-  DISCORD_CHANNELS: '/getDiscordChannels',
-  SET_DISCORD_CONFIG: '/setDiscordBotConfig',
   FETCH_PROPOSALS: '/proposals',
   FETCH_PROPOSAL_VOTES: '/proposalVotes',
   FETCH_GROUPS: '/groups',
@@ -37,10 +34,10 @@ export const ApiEndpoints = {
   searchComments: (searchTerm: string) => `/comments?search=${searchTerm}`,
   searchProfiles: (searchTerm: string) => `/profiles?search=${searchTerm}`,
   searchChains: (searchTerm: string) => `/communities?search=${searchTerm}`,
-  REMOVE_DISCORD_BOT_CONFIG: '/removeDiscordBotConfig',
   VIEW_COUNT: '/viewCount',
-  FETCH_USER_ACTIVITY: '/viewUserActivity',
-  FETCH_GLOBAL_ACTIVITY: '/viewGlobalActivity',
+  GENERATE_IMAGE: '/generateImage',
+  GENERATE_TOKEN_IDEA: '/generateTokenIdea',
+  UPLOAD_FILE: '/getUploadSignature',
 };
 
 export const ContractMethods = {
@@ -59,7 +56,8 @@ export const QueryKeys = {
 
 export const ExternalEndpoints = {
   coinbase: {
-    ethToUsdRate: 'https://api.coinbase.com/v2/prices/ETH-USD/sell',
+    tokenToUsdRate: (tokenSymbol: string) =>
+      `https://api.coinbase.com/v2/prices/${tokenSymbol}-USD/sell`,
   },
   snapshotHub: {
     url: process.env.SNAPSHOT_HUB_URL || 'https://hub.snapshot.org',

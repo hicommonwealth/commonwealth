@@ -23,10 +23,6 @@ export const UpdateComment = {
   input: z.object({
     comment_id: PG_INT,
     text: z.string().min(1),
-
-    // discord integration
-    thread_id: PG_INT.optional(),
-    discord_meta: DiscordMetaSchema.optional(),
   }),
   output: Comment.extend({ community_id: z.string() }),
 };
@@ -47,10 +43,6 @@ export const CreateCommentReaction = {
 export const DeleteComment = {
   input: z.object({
     comment_id: PG_INT,
-
-    // discord integration
-    thread_id: PG_INT.optional(),
-    message_id: z.string().optional(),
   }),
   output: z.object({
     comment_id: PG_INT,

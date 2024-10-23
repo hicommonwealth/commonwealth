@@ -1,8 +1,9 @@
 import { buildCreateThreadReactionInput } from 'client/scripts/state/api/threads/createReaction';
+import { buildDeleteThreadReactionInput } from 'client/scripts/state/api/threads/deleteReaction';
 import { useAuthModalStore } from 'client/scripts/state/ui/modals';
 import { notifyError } from 'controllers/app/notifications';
 import { SessionKeyError } from 'controllers/server/sessions';
-import useAppStatus from 'hooks/useAppStatus';
+import { BigNumber } from 'ethers';
 import type Thread from 'models/Thread';
 import React, { useState } from 'react';
 import app from 'state';
@@ -41,15 +42,15 @@ export const ReactionButton = ({
   const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
   const reactors = thread?.associatedReactions?.map((t) => t.address);
 
-  const { isAddedToHomeScreen } = useAppStatus();
   const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
   const user = useUserStore();
 
   const reactionWeightsSum =
     thread?.associatedReactions?.reduce(
-      (acc, curr) => acc + (curr.voting_weight || 1),
-      0,
-    ) || 0;
+      (acc, reaction) => acc.add(reaction.voting_weight || 1),
+      BigNumber.from(0),
+    ) || BigNumber.from(0);
+
   const activeAddress = user.activeAccount?.address;
   const thisUserReaction = thread?.associatedReactions?.filter(
     (r) => r.address === activeAddress,
@@ -92,18 +93,20 @@ export const ReactionButton = ({
         return notifyError('Upvotes on contest entries cannot be removed');
       }
 
-      deleteThreadReaction({
+      const input = await buildDeleteThreadReactionInput({
         communityId,
         address: user.activeAccount?.address,
-        threadId: thread.id,
+        threadId: thread.id!,
         threadMsgId: thread.canvasMsgId,
-        reactionId: reactedId as number,
-      }).catch((e) => {
+        reactionId: +reactedId,
+      });
+      deleteThreadReaction(input).catch((e) => {
         if (e instanceof SessionKeyError) {
           checkForSessionKeyRevalidationErrors(e);
           return;
         }
-        console.error(e.response.data.error || e?.message);
+        notifyError('Failed to unvote');
+        console.error(e?.response?.data?.error || e?.message);
       });
     } else {
       const input = await buildCreateThreadReactionInput({
@@ -112,14 +115,20 @@ export const ReactionButton = ({
         threadId: thread.id,
         threadMsgId: thread.canvasMsgId,
         reactionType: 'like',
-        isPWA: isAddedToHomeScreen,
       });
       createThreadReaction(input).catch((e) => {
         if (e instanceof SessionKeyError) {
           checkForSessionKeyRevalidationErrors(e);
           return;
         }
-        console.error(e.response.data.error || e?.message);
+        if ((e.message as string)?.includes('Insufficient token balance')) {
+          notifyError(
+            'You must have the requisite tokens to upvote in this topic',
+          );
+        } else {
+          notifyError('Failed to upvote');
+        }
+        console.error(e?.response?.data?.error || e?.message);
       });
     }
   };
@@ -128,7 +137,7 @@ export const ReactionButton = ({
     <>
       {size === 'small' ? (
         <CWUpvoteSmall
-          voteCount={reactionWeightsSum}
+          voteCount={reactionWeightsSum.toString()}
           disabled={disabled}
           isThreadArchived={!!thread.archivedAt}
           selected={hasReacted}
@@ -142,7 +151,7 @@ export const ReactionButton = ({
         <TooltipWrapper disabled={disabled} text={tooltipText}>
           <CWUpvote
             onClick={handleVoteClick}
-            voteCount={reactionWeightsSum}
+            voteCount={reactionWeightsSum.toString()}
             disabled={disabled}
             active={hasReacted}
           />
@@ -154,7 +163,7 @@ export const ReactionButton = ({
         >
           <CWUpvote
             onClick={handleVoteClick}
-            voteCount={reactionWeightsSum}
+            voteCount={reactionWeightsSum.toString()}
             disabled={disabled}
             active={hasReacted}
           />

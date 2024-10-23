@@ -63,12 +63,12 @@ export async function __getActiveThreads(
         'id',
         'address_id',
         'text',
-        ['plaintext', 'plainText'],
         'created_at',
         'updated_at',
         'deleted_at',
         'marked_as_spam_at',
         'discord_meta',
+        'content_url',
       ],
       include: [
         {
@@ -126,7 +126,7 @@ export async function __getActiveThreads(
         if (temp.Address) {
           temp.user_id = temp.Address.User?.id;
           temp.profile_name = temp.Address.User?.profile.name;
-          temp.profile_avatar_url = temp.Address.User?.profile.avatar_url;
+          temp.profile_avatar = temp.Address.User?.profile.avatar_url;
           delete temp.Address;
         }
         return temp;

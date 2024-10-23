@@ -5,7 +5,6 @@ import Comment from 'models/Comment';
 import { ApiEndpoints } from 'state/api/config';
 import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
 import { UserTrainingCardTypes } from 'views/components/UserTrainingSlider/types';
-import { UserProfile } from '../../../models/MinimumProfile';
 import { trpc } from '../../../utils/trpcClient';
 import { useAuthModalStore } from '../../ui/modals';
 import useUserStore from '../../ui/user';
@@ -14,25 +13,24 @@ import useFetchCommentsQuery from './fetchComments';
 
 interface CreateCommentProps {
   communityId: string;
-  profile: UserProfile;
+  address: string;
   threadId: number;
   threadMsgId: string;
   unescapedText: string;
   parentCommentId: number | null;
   parentCommentMsgId: string | null;
   existingNumberOfComments: number;
-  isPWA?: boolean;
 }
 
 export const buildCreateCommentInput = async ({
-  profile,
+  address,
   threadId,
   threadMsgId,
   unescapedText,
   parentCommentId = null,
   parentCommentMsgId = null,
 }: CreateCommentProps) => {
-  const canvasSignedData = await signComment(profile.address, {
+  const canvasSignedData = await signComment(address, {
     thread_id: threadMsgId,
     body: unescapedText,
     parent_comment_id: parentCommentMsgId,

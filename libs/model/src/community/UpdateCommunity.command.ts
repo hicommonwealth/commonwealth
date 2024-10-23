@@ -7,7 +7,6 @@ import { mustExist } from '../middleware/guards';
 import { checkSnapshotObjectExists, commonProtocol } from '../services';
 
 export const UpdateCommunityErrors = {
-  NotAdmin: 'Not an admin',
   SnapshotOnlyOnEthereum:
     'Snapshot data may only be added to chains with Ethereum base',
   InvalidDefaultPage: 'Default page does not exist',
@@ -91,10 +90,6 @@ export function UpdateCommunity(): Command<
       if (namespace) {
         if (!transactionHash)
           throw new InvalidInput(UpdateCommunityErrors.InvalidTransactionHash);
-
-        // we only permit the community admin and not the site admin to create namespace
-        if (actor.user.isAdmin)
-          throw new InvalidInput(UpdateCommunityErrors.NotAdmin);
 
         community.namespace = namespace;
         community.namespace_address =

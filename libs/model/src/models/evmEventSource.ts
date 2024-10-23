@@ -1,6 +1,5 @@
 import Sequelize from 'sequelize';
 import { ChainNodeAttributes } from './chain_node';
-import { ContractAttributes } from './contract';
 import { ContractAbiAttributes } from './contract_abi';
 import { ModelInstance } from './types';
 
@@ -16,7 +15,6 @@ export type EvmEventSourceAttributes = {
   abi_id: number;
 
   ContractAbi?: ContractAbiAttributes;
-  Contract?: ContractAttributes;
   ChainNode?: ChainNodeAttributes;
 };
 

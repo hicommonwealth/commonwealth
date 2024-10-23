@@ -92,7 +92,7 @@ export const UpdateProposalStatusModal = ({
     threadId: thread.id,
     threadMsgId: thread.canvasMsgId,
     currentStage: thread.stage,
-    currentTopicId: thread.topic.id,
+    currentTopicId: thread.topic.id!,
   });
 
   const { mutateAsync: addThreadLinks } = useAddThreadLinksMutation({
@@ -144,7 +144,6 @@ export const UpdateProposalStatusModal = ({
                       title: enrichedSnapshot.title,
                     },
                   ],
-                  isPWA: isAddedToHomeScreen,
                 }).then((updatedThread) => {
                   links = updatedThread.links;
                   return { toDelete, links };
@@ -175,7 +174,6 @@ export const UpdateProposalStatusModal = ({
                           title: enrichedSnapshot.title,
                         },
                       ],
-                      isPWA: isAddedToHomeScreen,
                     });
                   })
                   .then((updatedThread) => {
@@ -228,7 +226,6 @@ export const UpdateProposalStatusModal = ({
                   identifier: identifier,
                   title: title,
                 })),
-                isPWA: isAddedToHomeScreen,
               }).then((updatedThread) => {
                 // eslint-disable-next-line no-param-reassign
                 links = updatedThread.links;

@@ -4,20 +4,31 @@ import { Reaction } from './reaction.schemas';
 import { Topic } from './topic.schemas';
 import { Address } from './user.schemas';
 
+export const ThreadVersionHistory = z.object({
+  id: PG_INT.optional(),
+  thread_id: PG_INT,
+  address: z
+    .string()
+    .describe('Address of the creator of the post or the collaborator'),
+  body: z.string(),
+  timestamp: z.date(),
+  content_url: z.string().nullish(),
+});
+
 export const Thread = z.object({
   id: PG_INT.optional(),
   address_id: PG_INT,
   title: z.string(),
   kind: z.string(),
-  stage: z.string(),
+  stage: z.string().optional(),
   body: z.string().nullish(),
-  plaintext: z.string().nullish(),
   url: z.string().nullish(),
   topic_id: PG_INT.nullish(),
   pinned: z.boolean().nullish(),
   community_id: z.string(),
-  view_count: PG_INT,
+  view_count: PG_INT.optional(),
   links: z.object(linksSchema).array().nullish(),
+  content_url: z.string().nullish(),
 
   read_only: z.boolean().nullish(),
 
@@ -37,9 +48,14 @@ export const Thread = z.object({
   discord_meta: DiscordMetaSchema.nullish(),
 
   //counts
-  reaction_count: PG_INT,
-  reaction_weights_sum: PG_INT,
-  comment_count: PG_INT,
+  reaction_count: PG_INT.optional(),
+  reaction_weights_sum: z
+    .string()
+    .refine((str) => {
+      return /^[0-9]+$/.test(str); // only numbers
+    })
+    .nullish(),
+  comment_count: PG_INT.optional().optional(),
 
   activity_rank_date: z.coerce.date().nullish(),
 
@@ -50,17 +66,9 @@ export const Thread = z.object({
 
   // associations
   Address: Address.nullish(),
+  Reaction: Reaction.nullish(),
   topic: Topic.nullish(),
   collaborators: Address.array().nullish(),
   reactions: Reaction.array().nullish(),
-});
-
-export const ThreadVersionHistory = z.object({
-  id: PG_INT.optional(),
-  thread_id: PG_INT,
-  address: z
-    .string()
-    .describe('Address of the creator of the post or the collaborator'),
-  body: z.string(),
-  timestamp: z.date(),
+  ThreadVersionHistories: z.array(ThreadVersionHistory).nullish(),
 });

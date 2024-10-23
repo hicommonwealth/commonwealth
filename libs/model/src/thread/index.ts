@@ -1,4 +1,5 @@
 export * from './CreateThread.command';
 export * from './CreateThreadReaction.command';
-export * from './GetThread.query';
+export * from './DeleteThread.command';
+export * from './GetThreads.query';
 export * from './UpdateThread.command';

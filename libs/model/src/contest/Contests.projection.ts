@@ -12,7 +12,7 @@ import { models } from '../database';
 import { mustExist } from '../middleware/guards';
 import { EvmEventSourceAttributes } from '../models';
 import * as protocol from '../services/commonProtocol';
-import { decodeThreadContentUrl } from '../utils';
+import { decodeThreadContentUrl, getChainNodeUrl } from '../utils';
 
 const log = logger(import.meta);
 
@@ -62,10 +62,10 @@ async function updateOrCreateWithAlert(
     },
   });
   const url = community?.ChainNode?.private_url;
-  if (!url)
-    throw new InvalidState(
-      `Chain node url not found on namespace ${namespace}`,
-    );
+  if (!url) {
+    log.warn(`Chain node url not found on namespace ${namespace}`);
+    return;
+  }
 
   const { ticker, decimals } =
     await protocol.contractHelpers.getTokenAttributes(contest_address, url);
@@ -148,7 +148,7 @@ async function updateOrCreateWithAlert(
           contract_address: contest_address,
           event_signature: eventSignature,
           kind: signatureToKind[eventSignature],
-          abi_id: contestAbi.id,
+          abi_id: contestAbi.id!,
         };
       },
     );
@@ -168,9 +168,12 @@ type ContestDetails = {
 async function getContestDetails(
   contest_address: string,
 ): Promise<ContestDetails | undefined> {
-  const [result] = await models.sequelize.query<ContestDetails>(
+  const [result] = await models.sequelize.query<
+    ContestDetails & { private_url: string }
+  >(
     `
-        select coalesce(cn.private_url, cn.url) as url,
+        select cn.private_url,
+               cn.url,
                cm.prize_percentage,
                cm.payout_structure
         from "ContestManagers" cm
@@ -184,7 +187,12 @@ async function getContestDetails(
       replacements: { contest_address },
     },
   );
-  return result;
+
+  return {
+    url: getChainNodeUrl(result),
+    prize_percentage: result.prize_percentage,
+    payout_structure: result.payout_structure,
+  };
 }
 
 /**
