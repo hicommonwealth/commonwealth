@@ -50,7 +50,26 @@ export const CWTextArea = (props: TextAreaProps) => {
     instructionalMessage,
   } = props;
 
+  const formContext = useFormContext();
+  const formFieldContext = hookToForm
+    ? // @ts-expect-error <StrictNullChecks/>
+      formContext.register(name)
+    : ({} as any);
+  const isHookedToForm = hookToForm && name;
+  const formFieldValue: string | null = isHookedToForm
+    ? formContext?.watch?.(name)
+    : null;
+  const formFieldErrorMessage =
+    // @ts-expect-error <StrictNullChecks/>
+    hookToForm && (formContext?.formState?.errors?.[name]?.message as string);
+
   const [characterCount, setCharacterCount] = useState(0);
+
+  useEffect(() => {
+    if (typeof formFieldValue == 'string') {
+      setCharacterCount(formFieldValue.length);
+    }
+  }, [formFieldValue]);
 
   useEffect(() => {
     if (resizeWithText) {
@@ -64,15 +83,6 @@ export const CWTextArea = (props: TextAreaProps) => {
       textareaRef.current.style.maxHeight = '512px';
     }
   }, [value, resizeWithText]);
-
-  const formContext = useFormContext();
-  const formFieldContext = hookToForm
-    ? // @ts-expect-error <StrictNullChecks/>
-      formContext.register(name)
-    : ({} as any);
-  const formFieldErrorMessage =
-    // @ts-expect-error <StrictNullChecks/>
-    hookToForm && (formContext?.formState?.errors?.[name]?.message as string);
 
   return (
     <div className={ComponentType.TextArea}>
