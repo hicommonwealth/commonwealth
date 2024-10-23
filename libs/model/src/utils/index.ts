@@ -1,4 +1,5 @@
 export * from './decodeContent';
+export * from './defaultAvatar';
 export * from './denormalizedCountUtils';
 export * from './getDelta';
 export * from './makeGetBalancesOptions';
