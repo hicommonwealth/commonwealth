@@ -1,7 +1,7 @@
-import { PermissionEnum } from '@hicommonwealth/schemas';
+import { PermissionEnum, TopicWeightedVoting } from '@hicommonwealth/schemas';
 import { notifyError } from 'controllers/app/notifications';
 import { SessionKeyError } from 'controllers/server/sessions';
-import { parseCustomStages } from 'helpers';
+import { parseCustomStages, weightedVotingValueToLabel } from 'helpers';
 import { detectURL, getThreadActionTooltipText } from 'helpers/threads';
 import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
 import useTopicGating from 'hooks/useTopicGating';
@@ -259,6 +259,11 @@ export const NewThreadForm = () => {
                         originalProps,
                         topic: topicsForSelector.find(
                           (t) => String(t.id) === originalProps.data.value,
+                        ),
+                        helpText: weightedVotingValueToLabel(
+                          topicsForSelector.find(
+                            (t) => String(t.id) === originalProps.data.value,
+                          )?.weighted_voting as TopicWeightedVoting,
                         ),
                       }),
                   }}

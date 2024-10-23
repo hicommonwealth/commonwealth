@@ -11,7 +11,7 @@ export enum ValidChains {
 }
 
 export const STAKE_ID = 2;
-export const CONTEST_VOTER_SHARE = 20;
+export const CONTEST_VOTER_SHARE = 0;
 export const CONTEST_FEE_SHARE = 100;
 
 // Requires a live contract for each enum chain. Add address of factory here on new deploy.
@@ -33,8 +33,8 @@ export const factoryContracts: {
   [ValidChains.SepoliaBase]: {
     factory: '0xD8a357847cABA76133D5f2cB51317D3C74609710',
     communityStake: '0xd097926d8765A7717206559E7d19EECCbBa68c18',
-    launchpad: '0x6b118c6efa258903939ed981e6f644330effebab',
-    lpBondingCurve: '0x24634Cc9A0606b7927B3Fb44b782003B604dDDC4',
+    launchpad: '0xe1aa28e217a6a6bf39f74455ddd4d24aa4fa0aec',
+    lpBondingCurve: '0xaEA78B289A769DA4dde967262b5076ea8FE56607',
     chainId: 84532,
   },
   [ValidChains.Blast]: {
