@@ -51,11 +51,8 @@ export const CWTextArea = (props: TextAreaProps) => {
   } = props;
 
   const formContext = useFormContext();
-  const formFieldContext = hookToForm
-    ? // @ts-expect-error <StrictNullChecks/>
-      formContext.register(name)
-    : ({} as any);
   const isHookedToForm = hookToForm && name;
+  const formFieldContext = isHookedToForm ? formContext.register(name) : null;
   const formFieldValue: string | null = isHookedToForm
     ? formContext?.watch?.(name)
     : null;
@@ -107,11 +104,14 @@ export const CWTextArea = (props: TextAreaProps) => {
         disabled={disabled}
         tabIndex={tabIndex}
         maxLength={maxLength}
-        name={name}
         placeholder={placeholder}
-        ref={textareaRef}
         value={value}
-        {...formFieldContext}
+        {...(formFieldContext
+          ? formFieldContext
+          : {
+              name: name,
+              ref: textareaRef,
+            })}
         onInput={(e) => {
           if (onInput) onInput(e);
 
