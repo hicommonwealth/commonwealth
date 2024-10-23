@@ -13,9 +13,9 @@ export const ContestAction = z
     content_url: z.string().describe('Content url').nullish(),
     thread_id: PG_INT.nullish().describe('Thread id mapped from content url'),
     thread_title: z.string().nullish(),
-    voting_power: PG_INT.gte(0).describe(
-      'Voting power of address when action was recorded',
-    ),
+    voting_power: z
+      .string()
+      .describe('Voting power of address when action was recorded'),
     created_at: z.coerce.date().describe('Date-time when action was recorded'),
   })
   .describe('On-Chain content related actions on contest instance');

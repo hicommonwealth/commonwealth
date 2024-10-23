@@ -298,7 +298,7 @@ export function Contests(): Projection<typeof inputs> {
           action: 'added',
           content_url: payload.content_url,
           thread_id: threadId,
-          voting_power: 0,
+          voting_power: '0',
           created_at: new Date(),
         });
       },

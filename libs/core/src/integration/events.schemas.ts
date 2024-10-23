@@ -205,8 +205,7 @@ export const ContestContentUpvoted = ContestManagerEvent.extend({
   content_id: z.number().int().gte(0).describe('Content id'),
   voter_address: z.string().describe('Address upvoting on content'),
   voting_power: z
-    .number()
-    .int()
+    .string()
     .describe('Voting power of address upvoting on content'),
 }).describe('When users upvote content on running contest');
 
