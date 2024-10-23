@@ -14,8 +14,6 @@
     .MarkdownPreview {
       min-height: 255px;
       padding: 16px;
-      white-space: pre-wrap; /* This will render single newlines as line breaks */
-      word-wrap: break-word;
     }
 
     .CustomQuillToolbar {
