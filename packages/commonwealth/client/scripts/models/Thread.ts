@@ -1,8 +1,11 @@
 import {
+  Address,
   Contest,
   ContestAction,
   ContestManager,
   ContestScore,
+  DiscordMetaSchema,
+  Reaction,
 } from '@hicommonwealth/schemas';
 import { ProposalType, getDecodedString } from '@hicommonwealth/shared';
 import { UserProfile, addressToUserProfile } from 'models/MinimumProfile';
@@ -60,12 +63,14 @@ function emptyStringToNull(input: string) {
 }
 
 function processAssociatedReactions(
-  reactions: any[],
-  reactionIds: any[],
-  reactionType: any[],
+  reactions: Array<
+    z.infer<typeof Reaction> & { type?: string; address?: string }
+  >,
+  reactionIds: number[],
+  reactionType: string[],
   reactionTimestamps: string[],
   reactionWeights: number[],
-  addressesReacted: any[],
+  addressesReacted: z.infer<typeof Address>[],
   reactedProfileName: string[],
   reactedProfileAvatarUrl: string[],
   reactedAddressLastActive: string[],
@@ -160,7 +165,7 @@ export interface ThreadVersionHistory {
 export interface IThreadCollaborator {
   address: string;
   community_id: string;
-  User: { profile: UserProfile };
+  User?: { profile: UserProfile };
 }
 
 export type AssociatedReaction = {
@@ -267,7 +272,7 @@ export class Thread implements IUniqueId {
   public recentComments?: Comment<IUniqueId>[];
   public reactionWeightsSum: string;
   public links: Link[];
-  public readonly discord_meta: any;
+  public readonly discord_meta?: z.infer<typeof DiscordMetaSchema>;
   public readonly latestActivity?: Moment;
   public contentUrl: string | null;
 
@@ -290,7 +295,7 @@ export class Thread implements IUniqueId {
     links?: Link[] | null;
     canvas_signed_data?: string | null;
     canvas_msg_id?: string | null;
-    collaborators?: any[] | null;
+    collaborators?: z.infer<typeof Address>[] | null;
     last_edited?: string | null;
     locked_at?: string | null;
     last_commented_on?: string | null;
@@ -302,19 +307,19 @@ export class Thread implements IUniqueId {
     numberOfComments?: number;
     number_of_comments?: number;
     topic?: Topic | null;
-    reactions?: any[]; // TODO: fix type
-    reactionIds?: any[]; // TODO: fix type
-    addressesReacted?: any[]; //TODO: fix type,
+    reactions?: z.infer<typeof Reaction>[];
+    reactionIds?: number[];
+    addressesReacted?: z.infer<typeof Address>[];
     reactedProfileName?: string[];
     reactedProfileAvatarUrl?: string[];
     reactedAddressLastActive?: string[];
-    reactionType?: any[]; // TODO: fix type
+    reactionType?: string[];
     reactionTimestamps?: string[];
     reactionWeights?: number[];
     reaction_weights_sum: string;
     ThreadVersionHistories: ThreadVersionHistory[];
-    Address?: any; // TODO: fix type
-    discord_meta?: any;
+    Address?: z.infer<typeof Address>;
+    discord_meta?: z.infer<typeof DiscordMetaSchema>;
     userId?: number;
     user_id?: number;
     profile_name: string;
@@ -326,7 +331,7 @@ export class Thread implements IUniqueId {
     ContestActions?: ContestActionT[];
     content_url: string | null;
   }) {
-    this.author = t.Address?.address;
+    this.author = t.Address?.address ?? '';
     this.title = getDecodedString(t.title!);
     this.body = getDecodedString(t.body!);
     this.id = t.id!;
@@ -336,12 +341,27 @@ export class Thread implements IUniqueId {
     this.topic = { ...t.topic! };
     this.kind = t.kind as ThreadKind;
     this.stage = t.stage! as ThreadStage;
-    this.authorCommunity = t.Address?.community_id;
+    this.authorCommunity = t.Address?.community_id ?? '';
     this.pinned = t.pinned!;
     this.url = t.url!;
     this.communityId = t.community_id;
     this.readOnly = t.read_only ?? false;
-    this.collaborators = t.collaborators || [];
+    this.collaborators =
+      t.collaborators?.map((c) => ({
+        address: c.address,
+        community_id: c.community_id,
+        User: c.User
+          ? {
+              profile: {
+                userId: c.User.id!,
+                name: c.User.profile.name ?? '',
+                address: c.address,
+                lastActive: c.last_active?.toISOString() ?? '',
+                avatarUrl: c.User.profile.avatar_url ?? '',
+              },
+            }
+          : undefined,
+      })) ?? [];
     this.lastCommentedOn = t.last_commented_on
       ? moment(t.last_commented_on)
       : undefined;
@@ -426,7 +446,7 @@ export class Thread implements IUniqueId {
       this.profile = {
         userId: t.userId ?? t.user_id ?? 0,
         name: t.profile_name,
-        address: t.Address?.address,
+        address: t.Address?.address ?? '',
         lastActive: t.address_last_active ?? '',
         avatarUrl: t.avatar_url ?? '',
       };

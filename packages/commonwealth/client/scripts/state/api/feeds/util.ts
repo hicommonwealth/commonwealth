@@ -1,7 +1,9 @@
+import { DiscordMetaSchema } from '@hicommonwealth/schemas';
 import { AxiosResponse } from 'axios';
 import Thread from 'models/Thread';
 import type { Topic } from 'models/Topic';
 import { ThreadKind, ThreadStage } from 'models/types';
+import { z } from 'zod';
 
 type ActivityResponse = {
   thread: {
@@ -19,7 +21,7 @@ type ActivityResponse = {
     kind: ThreadKind;
     stage: ThreadStage;
     marked_as_spam_at?: string;
-    discord_meta?: string;
+    discord_meta?: z.infer<typeof DiscordMetaSchema>;
     profile_name: string;
     profile_avatar?: string;
     user_id: number;
@@ -57,6 +59,10 @@ export function formatActivityResponse(response: AxiosResponse<any, any>) {
         Address: {
           address: x.thread.user_address,
           community_id: x.thread.community_id,
+          ghost_address: false,
+          is_banned: false,
+          is_user_default: false,
+          role: 'member',
         },
         topic: x?.thread?.topic,
         // filler values
