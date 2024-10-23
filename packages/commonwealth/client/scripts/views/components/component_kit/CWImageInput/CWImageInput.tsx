@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import React from 'react';
 import { MessageRow } from '../cw_text_input';
-import './CWCoverImageUploader.scss';
+import './CWImageInput.scss';
 import {
   ImageBehaviorSelector,
   ImageBehaviorSelectorProps,
@@ -9,15 +9,15 @@ import {
 import { UploadControl } from './UploadControl';
 import { ImageBehavior, UploadControlProps } from './types';
 
-type CWCoverImageUploaderProps = UploadControlProps &
+type CWImageInputProps = UploadControlProps &
   ImageBehaviorSelectorProps & {
     label?: string;
     containerClassname?: string;
   };
 
-export const CWCoverImageUploader = ({
+export const CWImageInput = ({
   // upload control props
-  name = `CWCoverImageUploader-${Math.random()}`,
+  name = `CWImageInput-${Math.random()}`,
   hookToForm,
   imageURL,
   withAIImageGeneration,
@@ -38,9 +38,9 @@ export const CWCoverImageUploader = ({
   label = 'Accepts JPG and PNG files.',
   disabled,
   containerClassname,
-}: CWCoverImageUploaderProps) => {
+}: CWImageInputProps) => {
   return (
-    <div className={clsx('CWCoverImageUploader', containerClassname)}>
+    <div className={clsx('CWImageInput', containerClassname)}>
       <MessageRow label={label} hasFeedback={true} />
       <UploadControl
         name={name}

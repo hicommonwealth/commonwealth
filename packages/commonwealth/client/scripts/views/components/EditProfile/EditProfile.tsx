@@ -18,10 +18,7 @@ import { AvatarUpload } from '../Avatar';
 import { LinksArray, useLinksArray } from '../LinksArray';
 import { PreferenceTags, usePreferenceTags } from '../PreferenceTags';
 import { UserTrainingCardTypes } from '../UserTrainingSlider/types';
-import {
-  CWCoverImageUploader,
-  ImageBehavior,
-} from '../component_kit/CWCoverImageUploader';
+import { CWImageInput, ImageBehavior } from '../component_kit/CWImageInput';
 import { CWDivider } from '../component_kit/cw_divider';
 import { CWText } from '../component_kit/cw_text';
 import { CWButton } from '../component_kit/new_designs/CWButton';
@@ -345,7 +342,7 @@ const EditProfile = () => {
             >
               <CWText fontWeight="medium">Add a background image </CWText>
               {/* can add option to remove existing image if needed */}
-              <CWCoverImageUploader
+              <CWImageInput
                 name="backgroundImg"
                 hookToForm
                 withAIImageGeneration

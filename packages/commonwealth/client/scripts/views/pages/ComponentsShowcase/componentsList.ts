@@ -5,7 +5,6 @@ import BreadcrumbsShowcase from 'views/pages/ComponentsShowcase/components/Bread
 import ButtonsShowcase from 'views/pages/ComponentsShowcase/components/Buttons.showcase';
 import ButtonsCircleShowcase from 'views/pages/ComponentsShowcase/components/ButtonsCircle.showcase';
 import ButtonsIconShowcase from 'views/pages/ComponentsShowcase/components/ButtonsIcon.showcase';
-import CWCoverImageUploaderShowCase from 'views/pages/ComponentsShowcase/components/CWCoverImageUploader.showcase';
 import CardsShowcase from 'views/pages/ComponentsShowcase/components/Cards.showcase';
 import CheckboxesShowcase from 'views/pages/ComponentsShowcase/components/Checkboxes.showcase';
 import CollapsiblesShowcase from 'views/pages/ComponentsShowcase/components/Collapsibles.showcase';
@@ -15,6 +14,7 @@ import DrawersShowcase from 'views/pages/ComponentsShowcase/components/Drawers.s
 import DropdownsShowcase from 'views/pages/ComponentsShowcase/components/Dropdowns.showcase';
 import ElevationsShowcase from 'views/pages/ComponentsShowcase/components/Elevations.showcase';
 import FormStepsShowcase from 'views/pages/ComponentsShowcase/components/FormSteps.showcase';
+import ImageInputShowCase from 'views/pages/ComponentsShowcase/components/ImageInput.showcase';
 import InputsShowcase from 'views/pages/ComponentsShowcase/components/Inputs.showcase';
 import LoadersShowcase from 'views/pages/ComponentsShowcase/components/Loaders.showcase';
 import ModalsShowcase from 'views/pages/ComponentsShowcase/components/Modals.showcase';
@@ -65,7 +65,7 @@ export const ComponentPageName = {
   Dropdowns: 'Dropdowns',
   Inputs: 'Inputs',
   Paginations: 'Paginations',
-  CoverImageUploader: 'CoverImageUploader',
+  ImageInput: 'ImageInput',
 };
 
 export const ComponentType = {
@@ -125,8 +125,8 @@ export const componentItems = [
     type: ComponentType.Components,
   },
   {
-    ComponentPage: CWCoverImageUploaderShowCase,
-    displayName: ComponentPageName.CoverImageUploader,
+    ComponentPage: ImageInputShowCase,
+    displayName: ComponentPageName.ImageInput,
     type: ComponentType.Components,
   },
   {

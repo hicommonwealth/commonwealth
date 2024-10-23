@@ -3,9 +3,9 @@ import { slugifyPreserveDashes } from 'utils';
 
 import { useFetchConfigurationQuery } from 'state/api/configuration';
 import {
-  CWCoverImageUploader,
+  CWImageInput,
   ImageBehavior,
-} from 'views/components/component_kit/CWCoverImageUploader';
+} from 'views/components/component_kit/CWImageInput';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTextArea } from 'views/components/component_kit/cw_text_area';
@@ -187,7 +187,7 @@ const CommunityInformationForm = ({
         charCount={250}
       />
 
-      <CWCoverImageUploader
+      <CWImageInput
         label="Community Profile Image (Accepts JPG and PNG files)"
         canSelectImageBehavior={false}
         onImageProcessingChange={({ isGenerating, isUploading }) =>

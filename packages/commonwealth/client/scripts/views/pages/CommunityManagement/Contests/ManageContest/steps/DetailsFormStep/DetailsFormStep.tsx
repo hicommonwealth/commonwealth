@@ -10,9 +10,9 @@ import useUpdateContestMutation from 'state/api/contests/updateContest';
 import { useFetchTopicsQuery } from 'state/api/topics';
 import TokenFinder, { useTokenFinder } from 'views/components/TokenFinder';
 import {
-  CWCoverImageUploader,
+  CWImageInput,
   ImageBehavior,
-} from 'views/components/component_kit/CWCoverImageUploader';
+} from 'views/components/component_kit/CWImageInput';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { SelectList } from 'views/components/component_kit/cw_select_list';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -362,7 +362,7 @@ const DetailsFormStep = ({
                   Set an image to entice users to your contest (1920x1080 jpg or
                   png)
                 </CWText>
-                <CWCoverImageUploader
+                <CWImageInput
                   canSelectImageBehavior={false}
                   onImageProcessingChange={({ isGenerating, isUploading }) =>
                     setIsProcessingProfileImage(isGenerating || isUploading)

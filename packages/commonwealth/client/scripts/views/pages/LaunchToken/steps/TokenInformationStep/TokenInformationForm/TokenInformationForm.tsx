@@ -13,9 +13,9 @@ import { useFetchTokensQuery } from 'state/api/token';
 import useUserStore from 'state/ui/user';
 import { useDebounce } from 'usehooks-ts';
 import {
-  CWCoverImageUploader,
+  CWImageInput,
   ImageBehavior,
-} from 'views/components/component_kit/CWCoverImageUploader';
+} from 'views/components/component_kit/CWImageInput';
 import { CWLabel } from 'views/components/component_kit/cw_label';
 import { CWTextArea } from 'views/components/component_kit/cw_text_area';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
@@ -203,7 +203,7 @@ const TokenInformationForm = ({
         charCount={180}
       />
 
-      <CWCoverImageUploader
+      <CWImageInput
         label="Image (Optional - Accepts JPG and PNG files)"
         canSelectImageBehavior={false}
         onImageProcessingChange={({ isGenerating, isUploading }) =>

@@ -1,7 +1,7 @@
 import { ArrowCircleRight, MagnifyingGlass } from '@phosphor-icons/react';
 import { notifySuccess } from 'controllers/app/notifications';
 import React from 'react';
-import { CWCoverImageUploader } from 'views/components/component_kit/CWCoverImageUploader';
+import { CWImageInput } from 'views/components/component_kit/CWImageInput';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTextArea } from 'views/components/component_kit/cw_text_area';
 import { ValidationStatus } from 'views/components/component_kit/cw_validation_text';
@@ -178,7 +178,7 @@ const InputsShowcase = () => {
 
       <CWText type="h5">Image upload</CWText>
 
-      <CWCoverImageUploader
+      <CWImageInput
         onImageUploaded={(url: string) => {
           notifySuccess(`Image uploaded to ${url.slice(0, 18)}...`);
         }}

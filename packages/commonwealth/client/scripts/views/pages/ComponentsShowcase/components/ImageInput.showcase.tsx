@@ -3,13 +3,13 @@ import { CWButton } from 'client/scripts/views/components/component_kit/new_desi
 import { CWForm } from 'client/scripts/views/components/component_kit/new_designs/CWForm';
 import React, { useState } from 'react';
 import {
-  CWCoverImageUploader,
+  CWImageInput,
   ImageBehavior,
-} from 'views/components/component_kit/CWCoverImageUploader';
+} from 'views/components/component_kit/CWImageInput';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { z } from 'zod';
 
-const CWCoverImageUploaderShowCase = () => {
+const CWImageInputShowCase = () => {
   const sampleImageUrl =
     'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRDn-lJCm6BAMW7tP9breo15R6FVpUaU6KrKg&s';
 
@@ -19,15 +19,15 @@ const CWCoverImageUploaderShowCase = () => {
     <>
       <CWText type="h5">Image upload (default)</CWText>
       <div className="flex-row">
-        <CWCoverImageUploader />
+        <CWImageInput />
       </div>
       <CWText type="h5">Image upload and image generation</CWText>
       <div className="flex-row">
-        <CWCoverImageUploader withAIImageGeneration />
+        <CWImageInput withAIImageGeneration />
       </div>
       <CWText type="h5">Image Behavior</CWText>
       <div className="flex-row">
-        <CWCoverImageUploader
+        <CWImageInput
           withAIImageGeneration
           canSelectImageBehavior
           imageURL={sampleImageUrl}
@@ -49,7 +49,7 @@ const CWCoverImageUploaderShowCase = () => {
         >
           {({ setValue }) => (
             <>
-              <CWCoverImageUploader
+              <CWImageInput
                 withAIImageGeneration
                 canSelectImageBehavior
                 name="imageURL"
@@ -78,7 +78,7 @@ const CWCoverImageUploaderShowCase = () => {
       </div>
       <CWText type="h5">Switch b/w processed images</CWText>
       <div className="flex-row">
-        <CWCoverImageUploader
+        <CWImageInput
           withAIImageGeneration
           canSelectImageBehavior
           imageURL={sampleImageUrl}
@@ -92,11 +92,11 @@ const CWCoverImageUploaderShowCase = () => {
       </div>
       <CWText type="h5">Disabled</CWText>
       <div className="flex-row">
-        <CWCoverImageUploader disabled />
-        <CWCoverImageUploader disabled withAIImageGeneration />
+        <CWImageInput disabled />
+        <CWImageInput disabled withAIImageGeneration />
       </div>
     </>
   );
 };
 
-export default CWCoverImageUploaderShowCase;
+export default CWImageInputShowCase;
