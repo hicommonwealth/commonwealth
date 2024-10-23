@@ -1,6 +1,7 @@
 import { ChainBase, commonProtocol } from '@hicommonwealth/shared';
 import clsx from 'clsx';
 import { notifyError } from 'controllers/app/notifications';
+import { isS3URL } from 'helpers/awsHelpers';
 import useBeforeUnload from 'hooks/useBeforeUnload';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import React, { useRef, useState } from 'react';
@@ -317,8 +318,17 @@ export const QuickTokenLaunchForm = ({
       );
 
       if (activeIdeaImages) {
-        // update existing record
-        activeIdeaImages.imagesProcessed = [...processedImages];
+        // update existing record and remove non-s3 url if present, that one came from
+        // chunk 4 (non s3 url) of token generation response and is not the url we
+        // want to use for api payload
+        const shouldRemove0IndexURL =
+          processedImages.length === 2 &&
+          isS3URL(processedImages.at(-1)?.url || '') &&
+          !isS3URL(processedImages.at(-2)?.url || '');
+        const newProcessedImages = shouldRemove0IndexURL
+          ? [{ ...processedImages[1] }]
+          : processedImages;
+        activeIdeaImages.imagesProcessed = [...newProcessedImages];
       } else {
         // add new record
         temp.push({
