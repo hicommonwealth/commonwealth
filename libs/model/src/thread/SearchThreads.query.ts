@@ -1,13 +1,13 @@
 import { Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import {
-  PaginationSqlBind,
   PaginationSqlOptions,
   buildPaginatedResponse,
   buildPaginationSql,
 } from '@hicommonwealth/schemas';
 import { ALL_COMMUNITIES } from '@hicommonwealth/shared';
 import { QueryTypes } from 'sequelize';
+import { z } from 'zod';
 import { models } from '../database';
 
 export function SearchThreads(): Query<typeof schemas.SearchThreads> {
@@ -52,75 +52,53 @@ export function SearchThreads(): Query<typeof schemas.SearchThreads> {
       const { sql: paginationSort, bind: paginationBind } =
         buildPaginationSql(sortOptions);
 
-      const bind: PaginationSqlBind & {
-        community?: string;
-        searchTerm?: string;
-      } = {
+      const bind = {
+        community:
+          communityId && communityId !== ALL_COMMUNITIES
+            ? communityId
+            : undefined,
         searchTerm: searchTerm,
         ...paginationBind,
       };
-      if (communityId && communityId !== ALL_COMMUNITIES) {
-        bind.community = communityId;
-      }
 
-      const communityWhere = bind.community
-        ? '"Threads".community_id = $community AND'
-        : '';
+      const sql = `
+SELECT 
+  "Threads".id,
+  "Threads".title,
+  ${threadTitleOnly ? '' : `"Threads".body,`}
+  'thread' as type,
+  "Addresses".id as address_id,
+  "Addresses".user_id as address_user_id,
+  "Addresses".address,
+  "Addresses".community_id as address_community_id,
+  "Threads".created_at,
+  "Threads".community_id as community_id,
+  COUNT(*) OVER() AS total_count, 
+  ts_rank_cd("Threads".search, tsquery) as rank
+FROM 
+  "Threads"
+  JOIN "Addresses" ON "Threads".address_id = "Addresses".id,
+  websearch_to_tsquery('english', $searchTerm) as tsquery
+WHERE
+  "Threads".deleted_at IS NULL
+  ${bind.community ? 'AND "Threads".community_id = $community"' : ''} 
+  AND ("Threads".title ILIKE '%' || $searchTerm || '%' 
+  ${!threadTitleOnly ? 'OR tsquery @@ "Threads".search' : ''})
+${paginationSort}`;
 
-      let searchWhere = `"Threads".title ILIKE '%' || $searchTerm || '%'`;
-      if (!threadTitleOnly) {
-        searchWhere = `("Threads".title ILIKE '%' || $searchTerm || '%' OR query @@ "Threads".search)`;
-      }
+      const results = await models.sequelize.query<
+        z.infer<typeof schemas.Thread> & { total_count: number }
+      >(sql, {
+        bind,
+        type: QueryTypes.SELECT,
+        raw: true,
+      });
 
-      const sqlBaseQuery = `
-    SELECT
-      "Threads".id,
-      "Threads".title,
-      ${threadTitleOnly ? '' : `"Threads".body,`}
-      'thread' as type,
-      "Addresses".id as address_id,
-      "Addresses".user_id as address_user_id,
-      "Addresses".address,
-      "Addresses".community_id as address_community_id,
-      "Threads".created_at,
-      "Threads".community_id as community_id,
-      ts_rank_cd("Threads".search, query) as rank
-    FROM "Threads"
-    JOIN "Addresses" ON "Threads".address_id = "Addresses".id,
-    websearch_to_tsquery('english', $searchTerm) as query
-    WHERE
-      ${communityWhere}
-      "Threads".deleted_at IS NULL AND
-      (${searchWhere})
-    ${paginationSort}
-  `;
-
-      const sqlCountQuery = `
-    SELECT
-      COUNT (*) as count
-    FROM "Threads"
-    JOIN "Addresses" ON "Threads".address_id = "Addresses".id,
-    websearch_to_tsquery('english', $searchTerm) as query
-    WHERE
-      ${communityWhere}
-      "Threads".deleted_at IS NULL AND
-      ${searchWhere}
-  `;
-
-      const [results, [{ count }]]: [any[], any[]] = await Promise.all([
-        await models.sequelize.query(sqlBaseQuery, {
-          bind,
-          type: QueryTypes.SELECT,
-        }),
-        !includeCount
-          ? [{ count: 0 }]
-          : await models.sequelize.query(sqlCountQuery, {
-              bind,
-              type: QueryTypes.SELECT,
-            }),
-      ]);
-
-      const totalResults = parseInt(count, 10);
+      const totalResults = includeCount
+        ? results.length > 0
+          ? results[0].total_count
+          : 0
+        : results.length;
 
       return buildPaginatedResponse(results, totalResults, bind);
     },
