@@ -2,7 +2,8 @@ import { ChainBase, commonProtocol } from '@hicommonwealth/shared';
 import clsx from 'clsx';
 import { notifyError } from 'controllers/app/notifications';
 import useBeforeUnload from 'hooks/useBeforeUnload';
-import React, { useState } from 'react';
+import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
+import React, { useRef, useState } from 'react';
 import { slugifyPreserveDashes } from 'shared/utils';
 import { useUpdateCommunityMutation } from 'state/api/communities';
 import useCreateCommunityMutation, {
@@ -17,6 +18,7 @@ import { CWText } from 'views/components/component_kit/cw_text';
 import CWBanner from 'views/components/component_kit/new_designs/CWBanner';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
+import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import TokenLaunchButton from 'views/components/sidebar/TokenLaunchButton';
 import { generateCommunityNameFromToken } from '../../../LaunchToken/steps/CommunityInformationStep/utils';
 import SuccessStep from '../../../LaunchToken/steps/SuccessStep';
@@ -24,22 +26,47 @@ import TokenInformationForm from '../../../LaunchToken/steps/TokenInformationSte
 import { FormSubmitValues } from '../../../LaunchToken/steps/TokenInformationStep/TokenInformationForm/types';
 import useCreateTokenCommunity from '../../../LaunchToken/useCreateTokenCommunity';
 import './QuickTokenLaunchForm.scss';
+import { useGenerateTokenIdea } from './useGenerateTokenIdea';
 
 type QuickTokenLaunchFormProps = {
   onCancel: () => void;
   onCommunityCreated: (communityId: string) => void;
+  initialIdeaPrompt?: string;
+  generateIdeaOnMount?: boolean;
 };
+
+const MAX_IDEAS_LIMIT = 5;
 
 export const QuickTokenLaunchForm = ({
   onCancel,
   onCommunityCreated,
+  initialIdeaPrompt,
+  generateIdeaOnMount = false,
 }: QuickTokenLaunchFormProps) => {
-  const [randomizeAttempts] = useState<{ data: Object }[]>([]);
+  const timeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
+  const {
+    generateIdea,
+    tokenIdeas,
+    activeTokenIdeaIndex,
+    generatedTokenIdea,
+    isMaxTokenIdeaLimitReached,
+    setActiveTokenIdeaIndex,
+    updateTokenIdeaByIndex,
+  } = useGenerateTokenIdea({
+    maxIdeasLimit: MAX_IDEAS_LIMIT,
+  });
   const [isCreatingQuickToken, setIsCreatingQuickToken] = useState(false);
   const [
     createdCommunityIdsToTokenInfoMap,
     setCreatedCommunityIdsToTokenInfoMap,
   ] = useState({});
+
+  useRunOnceOnCondition({
+    callback: () => {
+      generateIdea(initialIdeaPrompt).catch(console.error);
+    },
+    shouldRun: generateIdeaOnMount,
+  });
 
   const {
     selectedAddress,
@@ -83,10 +110,10 @@ export const QuickTokenLaunchForm = ({
         }
 
         const sanitizedTokenInfo = {
-          name: tokenInfo.tokenName.trim(),
-          symbol: tokenInfo.tokenTicker.trim(),
-          description: tokenInfo.tokenDescription.trim() || '',
-          imageURL: tokenInfo.tokenImageURL.trim() || '',
+          name: tokenInfo.name.trim(),
+          symbol: tokenInfo.symbol.trim(),
+          description: tokenInfo.description.trim() || '',
+          imageURL: tokenInfo.imageURL.trim() || '',
         };
 
         // 1. check if this same token info was submitted before and a community per that info was created
@@ -243,6 +270,34 @@ export const QuickTokenLaunchForm = ({
     handleAsync().catch(console.error);
   };
 
+  const handleFormUpdates = (values: FormSubmitValues) => {
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+
+    const timeout = setTimeout(() => {
+      const isSameValues =
+        values.name === generatedTokenIdea?.token?.name &&
+        values.symbol === generatedTokenIdea?.token?.symbol &&
+        values.description === generatedTokenIdea?.token?.description;
+      if (generatedTokenIdea?.isChunking || isSameValues) {
+        timeoutRef.current = undefined;
+        return;
+      }
+
+      updateTokenIdeaByIndex(
+        {
+          description: values.description,
+          imageURL: values.imageURL,
+          name: values.name,
+          symbol: values.symbol,
+        },
+        activeTokenIdeaIndex,
+      );
+
+      timeoutRef.current = undefined;
+    }, 1000);
+    timeoutRef.current = timeout;
+  };
+
   return (
     <div className="QuickTokenLaunchForm">
       {!createdCommunityId && (
@@ -257,10 +312,20 @@ export const QuickTokenLaunchForm = ({
         <SuccessStep communityId={createdCommunityId} withToken />
       ) : (
         <TokenInformationForm
+          key={activeTokenIdeaIndex}
           selectedAddress={selectedAddress}
           onAddressSelected={setSelectedAddress}
+          openAddressSelectorOnMount={false}
+          formDisabled={generatedTokenIdea?.isChunking}
           onCancel={onCancel}
+          onFormUpdate={handleFormUpdates}
           onSubmit={handleSubmit}
+          {...(generatedTokenIdea?.chunkingField && {
+            focusField: generatedTokenIdea.chunkingField,
+          })}
+          {...(generatedTokenIdea?.token && {
+            forceFormValues: generatedTokenIdea?.token,
+          })}
           containerClassName={clsx('shortened-token-information-form', {
             'display-none': isCreatingQuickToken,
           })}
@@ -272,25 +337,66 @@ export const QuickTokenLaunchForm = ({
                         You can edit your community post launch.`}
               />
               <div className="cta-elements">
-                {/* TODO: https://github.com/hicommonwealth/commonwealth/issues/8863 */}
+                {/* allows to switch b/w generated ideas */}
                 <PageCounter
-                  activePage={randomizeAttempts.length + 2}
-                  totalPages={randomizeAttempts.length + 3}
-                  onPageChange={() => {}}
-                />
-
-                {/* TODO: https://github.com/hicommonwealth/commonwealth/issues/8863 */}
-                <CWButton
-                  iconLeft="brain"
-                  label="Randomize"
-                  containerClassName="ml-auto"
+                  activePage={activeTokenIdeaIndex + 1}
+                  totalPages={
+                    tokenIdeas.length == 0
+                      ? 1
+                      : Math.max(tokenIdeas.length, activeTokenIdeaIndex + 1)
+                  }
+                  onPageChange={(index) => setActiveTokenIdeaIndex(index - 1)}
                   disabled={isProcessingProfileImage || isCreatingQuickToken}
                 />
+
+                {isMaxTokenIdeaLimitReached ? (
+                  <CWTooltip
+                    placement="bottom"
+                    content={`You can only generate a max of ${MAX_IDEAS_LIMIT} ideas.`}
+                    renderTrigger={(handleInteraction) => (
+                      <CWButton
+                        iconLeft="brain"
+                        label="Randomize"
+                        containerClassName="ml-auto"
+                        type="button"
+                        disabled={
+                          isProcessingProfileImage ||
+                          isCreatingQuickToken ||
+                          isMaxTokenIdeaLimitReached
+                        }
+                        onClick={() => {
+                          generateIdea().catch(console.error);
+                        }}
+                        onMouseEnter={handleInteraction}
+                        onMouseLeave={handleInteraction}
+                      />
+                    )}
+                  />
+                ) : (
+                  <CWButton
+                    iconLeft="brain"
+                    label="Randomize"
+                    containerClassName="ml-auto"
+                    type="button"
+                    disabled={
+                      isProcessingProfileImage ||
+                      isCreatingQuickToken ||
+                      isMaxTokenIdeaLimitReached
+                    }
+                    onClick={() => {
+                      generateIdea().catch(console.error);
+                    }}
+                  />
+                )}
 
                 <TokenLaunchButton
                   buttonWidth="wide"
                   buttonType="submit"
-                  disabled={isProcessingProfileImage || isCreatingQuickToken}
+                  disabled={
+                    isProcessingProfileImage ||
+                    isCreatingQuickToken ||
+                    generatedTokenIdea?.isChunking
+                  }
                 />
               </div>
             </>
