@@ -14,6 +14,7 @@ import { useLaunchTokenMutation } from 'state/api/launchPad';
 import { useCreateTokenMutation } from 'state/api/tokens';
 import useUserStore from 'state/ui/user';
 import PageCounter from 'views/components/PageCounter';
+import { ImageProcessed } from 'views/components/component_kit/CWImageInput';
 import { CWText } from 'views/components/component_kit/cw_text';
 import CWBanner from 'views/components/component_kit/new_designs/CWBanner';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
@@ -60,6 +61,12 @@ export const QuickTokenLaunchForm = ({
     createdCommunityIdsToTokenInfoMap,
     setCreatedCommunityIdsToTokenInfoMap,
   ] = useState({});
+  const [processedImagesPerIdea, setProcessedImagesPerIdea] = useState<
+    {
+      ideaIndex: number;
+      imagesProcessed: ImageProcessed[];
+    }[]
+  >([]);
 
   useRunOnceOnCondition({
     callback: () => {
@@ -298,6 +305,31 @@ export const QuickTokenLaunchForm = ({
     timeoutRef.current = timeout;
   };
 
+  const handleProcessedImagesListChange = (
+    processedImages: ImageProcessed[],
+  ) => {
+    setProcessedImagesPerIdea((ideas) => {
+      const temp = [...ideas];
+
+      const activeIdeaImages = temp.find(
+        (i) => i.ideaIndex === activeTokenIdeaIndex,
+      );
+
+      if (activeIdeaImages) {
+        // update existing record
+        activeIdeaImages.imagesProcessed = [...processedImages];
+      } else {
+        // add new record
+        temp.push({
+          ideaIndex: activeTokenIdeaIndex,
+          imagesProcessed: [...processedImages],
+        });
+      }
+
+      return temp;
+    });
+  };
+
   return (
     <div className="QuickTokenLaunchForm">
       {!createdCommunityId && (
@@ -329,6 +361,14 @@ export const QuickTokenLaunchForm = ({
           containerClassName={clsx('shortened-token-information-form', {
             'display-none': isCreatingQuickToken,
           })}
+          imageControlProps={{
+            canSwitchBetweenProcessedImages: true,
+            onProcessedImagesListChange: handleProcessedImagesListChange,
+            processedImages:
+              processedImagesPerIdea.find(
+                (pi) => pi.ideaIndex === activeTokenIdeaIndex,
+              )?.imagesProcessed || undefined,
+          }}
           customFooter={({ isProcessingProfileImage }) => (
             <>
               <CWBanner

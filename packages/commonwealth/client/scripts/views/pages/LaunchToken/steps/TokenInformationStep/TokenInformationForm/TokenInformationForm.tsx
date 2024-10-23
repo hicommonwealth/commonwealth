@@ -48,6 +48,7 @@ const TokenInformationForm = ({
   focusField,
   formDisabled,
   openAddressSelectorOnMount = true,
+  imageControlProps = {},
 }: TokenInformationFormProps) => {
   const user = useUserStore();
   const [baseOption] = communityTypeOptions;
@@ -240,7 +241,7 @@ const TokenInformationForm = ({
         imageBehavior={ImageBehavior.Circle}
         withAIImageGeneration
         disabled={formDisabled}
-        onProcessedImagesListChange={console.log}
+        {...imageControlProps}
       />
 
       {/* Action buttons */}
