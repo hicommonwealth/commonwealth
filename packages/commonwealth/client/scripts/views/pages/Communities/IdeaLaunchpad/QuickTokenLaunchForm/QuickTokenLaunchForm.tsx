@@ -284,7 +284,8 @@ export const QuickTokenLaunchForm = ({
       const isSameValues =
         values.name === generatedTokenIdea?.token?.name &&
         values.symbol === generatedTokenIdea?.token?.symbol &&
-        values.description === generatedTokenIdea?.token?.description;
+        values.description === generatedTokenIdea?.token?.description &&
+        values.imageURL === generatedTokenIdea?.token?.imageURL;
       if (generatedTokenIdea?.isChunking || isSameValues) {
         timeoutRef.current = undefined;
         return;
