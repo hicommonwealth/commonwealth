@@ -13,7 +13,9 @@ const CWImageInputShowCase = () => {
   const sampleImageUrl =
     'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRDn-lJCm6BAMW7tP9breo15R6FVpUaU6KrKg&s';
 
-  const [imageBehavior, setImageBehavior] = useState(ImageBehavior.Circle);
+  const [imageBehavior1, setImageBehavior1] = useState(ImageBehavior.Circle);
+  const [imageBehavior2, setImageBehavior2] = useState(ImageBehavior.Circle);
+  const [imageBehavior3, setImageBehavior3] = useState(ImageBehavior.Circle);
 
   return (
     <>
@@ -31,8 +33,8 @@ const CWImageInputShowCase = () => {
           withAIImageGeneration
           canSelectImageBehavior
           imageURL={sampleImageUrl}
-          imageBehavior={imageBehavior}
-          onImageBehaviorChange={setImageBehavior}
+          imageBehavior={imageBehavior1}
+          onImageBehaviorChange={setImageBehavior1}
           allowedImageBehaviours={['Circle', 'Fill', 'Tiled']}
         />
       </div>
@@ -55,8 +57,8 @@ const CWImageInputShowCase = () => {
                 canSelectImageBehavior
                 name="imageURL"
                 hookToForm
-                imageBehavior={imageBehavior}
-                onImageBehaviorChange={setImageBehavior}
+                imageBehavior={imageBehavior2}
+                onImageBehaviorChange={setImageBehavior2}
               />
               <CWButton
                 label="Trigger manual image update"
@@ -83,8 +85,8 @@ const CWImageInputShowCase = () => {
           withAIImageGeneration
           canSelectImageBehavior
           imageURL={sampleImageUrl}
-          imageBehavior={imageBehavior}
-          onImageBehaviorChange={setImageBehavior}
+          imageBehavior={imageBehavior3}
+          onImageBehaviorChange={setImageBehavior3}
           onProcessedImagesListChange={(processedImages) =>
             console.log('processedImages => ', processedImages)
           }

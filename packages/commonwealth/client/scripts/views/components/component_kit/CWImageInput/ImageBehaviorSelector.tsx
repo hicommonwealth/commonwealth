@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import React from 'react';
+import React, { useState } from 'react';
 import { CWText } from '../cw_text';
 import { CWRadioButton } from '../new_designs/cw_radio_button';
 import { ImageBehavior } from './types';
@@ -21,6 +21,7 @@ export const ImageBehaviorSelector = ({
   imageBehaviorSelectorClassName,
   allowedImageBehaviours = ['Fill', 'Circle'],
 }: ImageBehaviorSelectorProps) => {
+  const [groupName] = useState(`image-behavior-${Math.random()}`);
   if (!canSelectImageBehavior) return;
 
   return (
@@ -35,7 +36,7 @@ export const ImageBehaviorSelector = ({
           key={option}
           value={ImageBehavior[option]}
           label={option}
-          groupName="image-behavior"
+          groupName={groupName}
           checked={imageBehavior === ImageBehavior[option]}
           onChange={(e) => {
             if (e.target.checked && !disabled) {
