@@ -15,8 +15,8 @@ export const CustomLinkDialogForDesktop = () => {
 
   const [linkDialogState] = useCellValues(linkDialogState$);
 
-  // this is needed because we have to dispatch popover base on its position on
-  // the screen.
+  // this is needed because we have to dispatch the popover base on its position
+  // on the screen and this encodes that position.
   const getBoundingClientRect = useCallback((): DOMRect => {
     const x = linkDialogState.rectangle!.left;
     const y = linkDialogState.rectangle!.top;
