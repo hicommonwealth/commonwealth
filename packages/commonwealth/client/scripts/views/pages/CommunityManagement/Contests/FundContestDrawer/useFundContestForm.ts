@@ -55,7 +55,7 @@ const useFundContestForm = ({
 
   const userTokenBalance = fundingTokenAddress
     ? tokenBalances?.tokenBalances?.find(
-        (token) => token.contractAddress === fundingTokenAddress,
+        (token) => +token.contractAddress === +fundingTokenAddress,
       )?.tokenBalance
     : userEthBalance;
 
