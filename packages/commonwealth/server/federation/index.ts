@@ -39,7 +39,7 @@ export const applyCanvasSignedData = async (data: CanvasSignedData) => {
       appliedSessionId = idSession;
     }
   } catch (err) {
-    log.warn('could not apply canvas session:', err);
+    log.warn(`could not apply canvas session: ${err.stack}`);
   }
 
   try {
@@ -55,7 +55,7 @@ export const applyCanvasSignedData = async (data: CanvasSignedData) => {
       appliedActionId = idAction;
     }
   } catch (err) {
-    log.warn('could not apply canvas action:', err);
+    log.warn(`could not apply canvas action: ${err.stack}`);
   }
 
   return { session: appliedSessionId, action: appliedActionId };
