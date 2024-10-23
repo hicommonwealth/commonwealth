@@ -1,3 +1,4 @@
+import { BigNumber } from '@ethersproject/bignumber';
 import {
   Actor,
   DeepPartial,
@@ -361,6 +362,7 @@ describe('Contests projection lifecycle', () => {
             score: score.map((s) => ({
               ...s,
               tickerPrize: Number(BigInt(s.prize)) / 10 ** decimals,
+              votes: BigNumber.from(s.votes).toString(),
             })),
             // actions: [
             //   {
