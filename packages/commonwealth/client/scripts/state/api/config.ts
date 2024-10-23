@@ -37,6 +37,7 @@ export const ApiEndpoints = {
   VIEW_COUNT: '/viewCount',
   GENERATE_IMAGE: '/generateImage',
   GENERATE_TOKEN_IDEA: '/generateTokenIdea',
+  UPLOAD_FILE: '/getUploadSignature',
 };
 
 export const ContractMethods = {

@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import { ApiEndpoints, SERVER_URL } from 'state/api/config';
 import { userStore } from '../../ui/user';
@@ -18,21 +18,19 @@ export const generateImage = async ({
   return res.data.result.imageUrl;
 };
 
-type GenerateImageQueryProps = {
-  apiCallEnabled?: boolean;
-} & GenerateImageProps;
+type UseGenerateImageMutationProps = {
+  onSuccess?: (generatedImageURL: string) => void;
+};
 
-const useGenerateImageQuery = ({
-  prompt,
-  apiCallEnabled,
-}: GenerateImageQueryProps) => {
-  return useQuery({
-    // eslint-disable-next-line @tanstack/query/exhaustive-deps
-    queryKey: [ApiEndpoints.GENERATE_IMAGE, prompt],
-    queryFn: () => generateImage({ prompt }),
-    staleTime: Infinity,
-    enabled: apiCallEnabled,
+const useGenerateImageMutation = ({
+  onSuccess,
+}: UseGenerateImageMutationProps = {}) => {
+  return useMutation({
+    mutationFn: generateImage,
+    onSuccess: (generatedImageURL) => {
+      onSuccess?.(generatedImageURL);
+    },
   });
 };
 
-export default useGenerateImageQuery;
+export default useGenerateImageMutation;
