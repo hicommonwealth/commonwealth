@@ -224,7 +224,7 @@ export enum LinkDisplay {
 export type Link = {
   source: LinkSource;
   identifier: string;
-  title?: string;
+  title?: string | null;
   display?: LinkDisplay;
 };
 
@@ -239,26 +239,26 @@ export class Thread implements IUniqueId {
   public stage: ThreadStage;
   public readOnly: boolean;
 
-  public readonly canvasSignedData: string;
-  public readonly canvasMsgId: string;
+  public readonly canvasSignedData?: string;
+  public readonly canvasMsgId?: string;
 
   // TODO: it is a bit clunky to have a numeric id and a string identifier here
   //  we should remove the number to allow the store to work.
   public readonly identifier: string;
   public readonly id: number;
   public readonly createdAt: Moment;
-  public readonly updatedAt: Moment;
-  public readonly lastCommentedOn: Moment;
-  public archivedAt: Moment | null;
+  public readonly updatedAt?: Moment;
+  public readonly lastCommentedOn?: Moment;
+  public archivedAt?: Moment | null;
   public topic: Topic;
   public readonly slug = ProposalType.Thread;
   public readonly url: string;
   public readonly versionHistory: ThreadVersionHistory[];
   public readonly communityId: string;
-  public readonly lastEdited: Moment;
+  public readonly lastEdited?: Moment;
 
-  public markedAsSpamAt: Moment;
-  public readonly lockedAt: Moment;
+  public markedAsSpamAt?: Moment;
+  public readonly lockedAt?: Moment;
 
   public readonly hasPoll: boolean;
   public numberOfComments: number;
@@ -268,7 +268,7 @@ export class Thread implements IUniqueId {
   public reactionWeightsSum: string;
   public links: Link[];
   public readonly discord_meta: any;
-  public readonly latestActivity: Moment;
+  public readonly latestActivity?: Moment;
   public contentUrl: string | null;
 
   public readonly profile: UserProfile;
@@ -277,77 +277,31 @@ export class Thread implements IUniqueId {
     return `${this.slug}_${this.identifier}`;
   }
 
-  constructor({
-    Address,
-    title,
-    id,
-    created_at,
-    updated_at,
-    topic,
-    kind,
-    stage,
-    ThreadVersionHistories,
-    community_id,
-    read_only,
-    body,
-    url,
-    pinned,
-    collaborators,
-    last_edited,
-    marked_as_spam_at,
-    locked_at,
-    archived_at,
-    has_poll,
-    last_commented_on,
-    numberOfComments,
-    reactions,
-    reactionIds,
-    reactionType,
-    reactionTimestamps,
-    reactionWeights,
-    reaction_weights_sum,
-    addressesReacted,
-    reactedProfileName,
-    reactedProfileAvatarUrl,
-    reactedAddressLastActive,
-    canvas_signed_data,
-    canvas_msg_id,
-    links,
-    discord_meta,
-    userId,
-    user_id,
-    profile_name,
-    avatar_url,
-    address_last_active,
-    associatedReactions,
-    associatedContests,
-    recentComments,
-    ContestActions,
-    content_url,
-  }: {
-    marked_as_spam_at: string;
-    title: string;
-    body?: string;
-    id: number;
-    kind: ThreadKind;
-    stage: ThreadStage;
+  constructor(t: {
+    marked_as_spam_at?: string | null;
+    title?: string | null;
+    body?: string | null;
+    id?: number;
+    kind: ThreadKind | string;
+    stage?: ThreadStage | string;
     community_id: string;
-    url?: string;
-    pinned?: boolean;
-    links?: Link[];
-    canvas_signed_data?: string;
-    canvas_msg_id?: string;
-    collaborators?: any[];
-    last_edited: string;
-    locked_at: string;
-    last_commented_on: string;
-    created_at: string;
-    updated_at: string;
-    archived_at?: string;
-    read_only: boolean;
-    has_poll: boolean;
+    url?: string | null;
+    pinned?: boolean | null;
+    links?: Link[] | null;
+    canvas_signed_data?: string | null;
+    canvas_msg_id?: string | null;
+    collaborators?: any[] | null;
+    last_edited?: string | null;
+    locked_at?: string | null;
+    last_commented_on?: string | null;
+    created_at?: string | null;
+    updated_at?: string | null;
+    archived_at?: string | null;
+    read_only?: boolean | null;
+    has_poll?: boolean | null;
     numberOfComments?: number;
-    topic: Topic;
+    number_of_comments?: number;
+    topic?: Topic | null;
     reactions?: any[]; // TODO: fix type
     reactionIds?: any[]; // TODO: fix type
     addressesReacted?: any[]; //TODO: fix type,
@@ -359,87 +313,81 @@ export class Thread implements IUniqueId {
     reactionWeights?: number[];
     reaction_weights_sum: string;
     ThreadVersionHistories: ThreadVersionHistory[];
-    Address: any; // TODO: fix type
+    Address?: any; // TODO: fix type
     discord_meta?: any;
-    userId: number;
-    user_id: number;
+    userId?: number;
+    user_id?: number;
     profile_name: string;
-    avatar_url: string;
-    address_last_active: string;
+    avatar_url?: string | null;
+    address_last_active?: string;
     associatedReactions?: AssociatedReaction[];
     associatedContests?: AssociatedContest[];
-    recentComments: RecentComment[];
-    ContestActions: ContestActionT[];
+    recentComments?: RecentComment[];
+    ContestActions?: ContestActionT[];
     content_url: string | null;
   }) {
-    this.author = Address?.address;
-    this.title = getDecodedString(title);
-    // @ts-expect-error StrictNullChecks
-    this.body = getDecodedString(body);
-    this.id = id;
-    this.identifier = `${id}`;
-    this.createdAt = moment(created_at);
-    this.updatedAt = moment(updated_at);
-    this.topic = { ...topic };
-    this.kind = kind;
-    this.stage = stage;
-    this.authorCommunity = Address?.community_id;
-    // @ts-expect-error StrictNullChecks
-    this.pinned = pinned;
-    // @ts-expect-error StrictNullChecks
-    this.url = url;
-    this.communityId = community_id;
-    this.readOnly = read_only;
-    this.collaborators = collaborators || [];
-    // @ts-expect-error StrictNullChecks
-    this.lastCommentedOn = last_commented_on ? moment(last_commented_on) : null;
-    this.hasPoll = has_poll;
-    // @ts-expect-error StrictNullChecks
-    this.lastEdited = last_edited
-      ? moment(last_edited)
+    this.author = t.Address?.address;
+    this.title = getDecodedString(t.title!);
+    this.body = getDecodedString(t.body!);
+    this.id = t.id!;
+    this.identifier = `${t.id}`;
+    this.createdAt = moment(t.created_at);
+    this.updatedAt = moment(t.updated_at);
+    this.topic = { ...t.topic! };
+    this.kind = t.kind as ThreadKind;
+    this.stage = t.stage! as ThreadStage;
+    this.authorCommunity = t.Address?.community_id;
+    this.pinned = t.pinned!;
+    this.url = t.url!;
+    this.communityId = t.community_id;
+    this.readOnly = t.read_only ?? false;
+    this.collaborators = t.collaborators || [];
+    this.lastCommentedOn = t.last_commented_on
+      ? moment(t.last_commented_on)
+      : undefined;
+    this.hasPoll = t.has_poll ?? false;
+    this.lastEdited = t.last_edited
+      ? moment(t.last_edited)
       : this.versionHistory && this.versionHistory?.length > 1
-        ? this.versionHistory[0].timestamp
-        : null;
-    // @ts-expect-error StrictNullChecks
-    this.markedAsSpamAt = marked_as_spam_at ? moment(marked_as_spam_at) : null;
-    this.archivedAt = archived_at ? moment(archived_at) : null;
-    // @ts-expect-error StrictNullChecks
-    this.lockedAt = locked_at ? moment(locked_at) : null;
-    this.numberOfComments = numberOfComments || 0;
-    // @ts-expect-error StrictNullChecks
-    this.canvasSignedData = canvas_signed_data;
-    // @ts-expect-error <StrictNullChecks>
-    this.canvasMsgId = canvas_msg_id;
-    this.links = links || [];
-    this.discord_meta = discord_meta;
-    this.versionHistory = ThreadVersionHistories;
-    this.reactionWeightsSum = reaction_weights_sum;
+        ? moment(this.versionHistory[0].timestamp)
+        : undefined;
+    this.markedAsSpamAt = t.marked_as_spam_at
+      ? moment(t.marked_as_spam_at)
+      : undefined;
+    this.archivedAt = t.archived_at ? moment(t.archived_at) : undefined;
+    this.lockedAt = t.locked_at ? moment(t.locked_at) : undefined;
+    this.numberOfComments = t.numberOfComments ?? t.number_of_comments ?? 0;
+    this.canvasSignedData = t.canvas_signed_data ?? undefined;
+    this.canvasMsgId = t.canvas_msg_id ?? undefined;
+    this.links = t.links || [];
+    this.discord_meta = t.discord_meta;
+    this.versionHistory = t.ThreadVersionHistories;
+    this.reactionWeightsSum = t.reaction_weights_sum;
     this.associatedReactions =
-      associatedReactions ??
+      t.associatedReactions ??
       processAssociatedReactions(
-        // @ts-expect-error StrictNullChecks
-        reactions,
-        reactionIds,
-        reactionType,
-        reactionTimestamps,
-        reactionWeights,
-        addressesReacted,
-        reactedProfileName,
-        reactedProfileAvatarUrl,
-        reactedAddressLastActive,
+        t.reactions!,
+        t.reactionIds!,
+        t.reactionType!,
+        t.reactionTimestamps!,
+        t.reactionWeights!,
+        t.addressesReacted!,
+        t.reactedProfileName!,
+        t.reactedProfileAvatarUrl!,
+        t.reactedAddressLastActive!,
       );
     this.associatedContests = processAssociatedContests(
-      associatedContests,
-      ContestActions,
+      t.associatedContests,
+      t.ContestActions,
     );
-    this.contentUrl = content_url;
-    this.recentComments = (recentComments || []).map(
+    this.contentUrl = t.content_url;
+    this.recentComments = (t.recentComments || []).map(
       (rc) =>
         new Comment({
           authorChain: this.authorCommunity,
           community_id: this.authorCommunity,
           id: rc?.id,
-          thread_id: id,
+          thread_id: t.id,
           author: rc?.address,
           last_edited: rc?.updated_at ? moment(rc.updated_at) : null,
           created_at: rc?.created_at ? moment(rc?.created_at) : null,
@@ -468,19 +416,19 @@ export class Thread implements IUniqueId {
           content_url: rc.content_url || null,
         }),
     );
-    this.latestActivity = last_commented_on
-      ? moment(last_commented_on)
-      : moment(created_at);
+    this.latestActivity = t.last_commented_on
+      ? moment(t.last_commented_on)
+      : moment(t.created_at);
 
-    if (Address?.User) {
-      this.profile = addressToUserProfile(Address);
+    if (t.Address?.User) {
+      this.profile = addressToUserProfile(t.Address);
     } else {
       this.profile = {
-        userId: userId ?? user_id,
-        name: profile_name,
-        address: Address?.address,
-        lastActive: address_last_active,
-        avatarUrl: avatar_url ?? undefined,
+        userId: t.userId ?? t.user_id ?? 0,
+        name: t.profile_name,
+        address: t.Address?.address,
+        lastActive: t.address_last_active ?? '',
+        avatarUrl: t.avatar_url ?? '',
       };
     }
   }
