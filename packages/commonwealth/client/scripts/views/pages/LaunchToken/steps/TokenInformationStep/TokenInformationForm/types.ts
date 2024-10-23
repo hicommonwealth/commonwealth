@@ -24,6 +24,7 @@ export type TokenInformationFormProps = {
   openAddressSelectorOnMount?: boolean;
   // image control specific props
   imageControlProps?: {
+    loading?: UploadControlProps['loading'];
     canSwitchBetweenProcessedImages?: UploadControlProps['canSwitchBetweenProcessedImages'];
     processedImages?: UploadControlProps['processedImages'];
     onProcessedImagesListChange?: UploadControlProps['onProcessedImagesListChange'];

@@ -14,6 +14,7 @@ export const useUploadControl = ({
   imageURL,
   withAIImageGeneration,
   disabled,
+  loading,
   processedImages: providedProcessedImages,
   onImageProcessingChange,
   onImageGenerated,
@@ -73,7 +74,7 @@ export const useUploadControl = ({
     onSuccess: onImageGenerated,
   });
 
-  const isLoading = isUploadingImage || isGeneratingImage;
+  const isLoading = isUploadingImage || isGeneratingImage || loading;
   const areActionsDisabled = disabled || !imageInputRef.current || isLoading;
 
   const openFilePicker = () => {

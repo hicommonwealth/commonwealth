@@ -373,6 +373,10 @@ export const QuickTokenLaunchForm = ({
             'display-none': isCreatingQuickToken,
           })}
           imageControlProps={{
+            loading:
+              generatedTokenIdea?.isChunking &&
+              !generatedTokenIdea?.chunkingField &&
+              !generatedTokenIdea?.token?.imageURL,
             canSwitchBetweenProcessedImages: true,
             onProcessedImagesListChange: handleProcessedImagesListChange,
             processedImages:
