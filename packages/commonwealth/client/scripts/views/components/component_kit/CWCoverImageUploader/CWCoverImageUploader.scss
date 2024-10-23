@@ -60,9 +60,18 @@
       border-radius: $border-radius-corners;
     }
 
-    // implement this when/if needed
-    // .img-repeat {
-    // }
+    .img-repeat {
+      width: 100%;
+      max-height: 100%;
+      min-height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      border-radius: $border-radius-corners;
+      background-repeat: repeat;
+      background-position: 0px 0px;
+      background-size: 150px 100px;
+    }
 
     .gray {
       color: $neutral-500;
@@ -94,7 +103,7 @@
     .generate-img-btn {
       z-index: 1;
 
-      &.isFillImageBehaviour {
+      &.autoMarginTop {
         margin-top: auto !important;
       }
     }

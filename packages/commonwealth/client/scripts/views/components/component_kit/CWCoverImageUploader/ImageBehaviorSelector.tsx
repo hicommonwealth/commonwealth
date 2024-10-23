@@ -10,6 +10,7 @@ export type ImageBehaviorSelectorProps = {
   imageBehavior?: ImageBehavior;
   disabled?: boolean;
   imageBehaviorSelectorClassName?: string;
+  allowedImageBehaviours?: (keyof typeof ImageBehavior)[];
 };
 
 export const ImageBehaviorSelector = ({
@@ -18,6 +19,7 @@ export const ImageBehaviorSelector = ({
   imageBehavior,
   disabled,
   imageBehaviorSelectorClassName,
+  allowedImageBehaviours = ['Fill', 'Circle'],
 }: ImageBehaviorSelectorProps) => {
   if (!canSelectImageBehavior) return;
 
@@ -28,7 +30,7 @@ export const ImageBehaviorSelector = ({
       <CWText type="caption" fontWeight="medium" className="cover-image-title">
         Choose image behavior
       </CWText>
-      {['Fill', 'Circle'].map((option) => (
+      {allowedImageBehaviours.map((option) => (
         <CWRadioButton
           key={option}
           value={ImageBehavior[option]}

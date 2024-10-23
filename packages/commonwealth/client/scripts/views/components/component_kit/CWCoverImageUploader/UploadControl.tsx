@@ -107,11 +107,22 @@ export const UploadControl = ({
       ) : (
         <>
           {imageToRender ? (
-            <img
-              key={imageToRender}
-              src={imageToRender}
-              className={`img-${imageBehavior}`}
-            />
+            <>
+              {imageBehavior === ImageBehavior.Tiled ? (
+                <div
+                  style={{
+                    backgroundImage: `url(${imageToRender})`,
+                  }}
+                  className={`img-${imageBehavior}`}
+                />
+              ) : (
+                <img
+                  key={imageToRender}
+                  src={imageToRender}
+                  className={`img-${imageBehavior}`}
+                />
+              )}
+            </>
           ) : (
             <>
               <CWIcon
@@ -167,14 +178,19 @@ export const UploadControl = ({
               buttonType="secondary"
               label="Generate Image"
               containerClassName={clsx('btn-focus-styles generate-img-btn', {
-                isFillImageBehaviour: imageBehavior === ImageBehavior.Fill,
+                autoMarginTop:
+                  imageToRender &&
+                  (imageBehavior === ImageBehavior.Fill ||
+                    imageBehavior === ImageBehavior.Tiled),
               })}
               onClick={(e) => {
                 e.stopPropagation();
                 setIsImageGenerationSectionOpen(true);
               }}
               buttonWidth={
-                imageBehavior === ImageBehavior.Fill ? 'full' : 'narrow'
+                !imageToRender || imageBehavior === ImageBehavior.Circle
+                  ? 'narrow'
+                  : 'full'
               }
               disabled={areActionsDisabled}
             />

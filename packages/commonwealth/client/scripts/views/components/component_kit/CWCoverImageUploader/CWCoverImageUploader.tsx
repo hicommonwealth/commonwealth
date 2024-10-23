@@ -26,10 +26,12 @@ export const CWCoverImageUploader = ({
   onImageProcessingChange,
   onProcessedImagesListChange,
   canSwitchBetweenProcessedImages,
+  processedImages,
   // image behavior props
   canSelectImageBehavior = false,
   onImageBehaviorChange,
   imageBehaviorSelectorClassName,
+  allowedImageBehaviours,
   // common props
   imageBehavior = ImageBehavior.Circle,
   label = 'Accepts JPG and PNG files.',
@@ -51,6 +53,7 @@ export const CWCoverImageUploader = ({
         onImageUploaded={onImageUploaded}
         onImageProcessingChange={onImageProcessingChange}
         onProcessedImagesListChange={onProcessedImagesListChange}
+        processedImages={processedImages}
       />
       <ImageBehaviorSelector
         imageBehavior={imageBehavior}
@@ -58,6 +61,7 @@ export const CWCoverImageUploader = ({
         onImageBehaviorChange={onImageBehaviorChange}
         imageBehaviorSelectorClassName={imageBehaviorSelectorClassName}
         disabled={disabled}
+        allowedImageBehaviours={allowedImageBehaviours}
       />
     </div>
   );
