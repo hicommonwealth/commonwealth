@@ -712,29 +712,29 @@ importers:
   libs/shared:
     dependencies:
       '@canvas-js/chain-cosmos':
-        specifier: ^0.10.10
-        version: 0.10.10(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        specifier: ^0.11.0
+        version: 0.11.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@canvas-js/chain-ethereum':
-        specifier: ^0.10.10
-        version: 0.10.10(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        specifier: ^0.11.0
+        version: 0.11.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@canvas-js/chain-solana':
-        specifier: ^0.10.10
-        version: 0.10.10(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        specifier: ^0.11.0
+        version: 0.11.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@canvas-js/chain-substrate':
-        specifier: ^0.10.10
-        version: 0.10.10(@polkadot/api@6.0.5)(@polkadot/util@12.6.2)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        specifier: ^0.11.0
+        version: 0.11.0(@polkadot/api@6.0.5)(@polkadot/util@12.6.2)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@canvas-js/core':
-        specifier: ^0.10.10
-        version: 0.10.10(@types/react@18.3.3)(bufferutil@4.0.8)(react-native@0.75.1(@babel/core@7.25.7)(@babel/preset-env@7.25.3(@babel/core@7.25.7))(@types/react@18.3.3)(bufferutil@4.0.8)(react@18.3.1)(typescript@5.4.5)(utf-8-validate@5.0.10))(react@18.3.1)(utf-8-validate@5.0.10)
+        specifier: ^0.11.0
+        version: 0.11.0(@types/react@18.3.3)(bufferutil@4.0.8)(react@18.3.1)(utf-8-validate@5.0.10)
       '@canvas-js/gossiplog':
-        specifier: ^0.10.10
-        version: 0.10.10(@types/react@18.3.3)(bufferutil@4.0.8)(react-native@0.75.1(@babel/core@7.25.7)(@babel/preset-env@7.25.3(@babel/core@7.25.7))(@types/react@18.3.3)(bufferutil@4.0.8)(react@18.3.1)(typescript@5.4.5)(utf-8-validate@5.0.10))(react@18.3.1)(utf-8-validate@5.0.10)
+        specifier: ^0.11.0
+        version: 0.11.0(@types/react@18.3.3)(bufferutil@4.0.8)(react@18.3.1)(utf-8-validate@5.0.10)
       '@canvas-js/interfaces':
-        specifier: ^0.10.10
-        version: 0.10.10
+        specifier: ^0.11.0
+        version: 0.11.0
       '@canvas-js/signatures':
-        specifier: ^0.10.10
-        version: 0.10.10
+        specifier: ^0.11.0
+        version: 0.11.0
       '@cosmjs/encoding':
         specifier: 0.32.3
         version: 0.32.3
@@ -744,12 +744,21 @@ importers:
       '@ipld/dag-json':
         specifier: ^10.2.0
         version: 10.2.0
-      '@libp2p/peer-id-factory':
-        specifier: ^4.2.4
-        version: 4.2.4
+      '@libp2p/crypto':
+        specifier: ^5.0.4
+        version: 5.0.4
+      '@libp2p/peer-id':
+        specifier: ^5.0.4
+        version: 5.0.4
       '@polkadot/util':
         specifier: 12.6.2
         version: 12.6.2
+      ethers:
+        specifier: ^6.13.2
+        version: 6.13.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      libp2p:
+        specifier: ^2.1.3
+        version: 2.1.7
       moment:
         specifier: ^2.23.0
         version: 2.30.1
@@ -791,29 +800,29 @@ importers:
         specifier: ^0.2.2
         version: 0.2.3
       '@canvas-js/chain-cosmos':
-        specifier: ^0.10.10
-        version: 0.10.10(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        specifier: ^0.11.0
+        version: 0.11.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@canvas-js/chain-ethereum':
-        specifier: ^0.10.10
-        version: 0.10.10(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        specifier: ^0.11.0
+        version: 0.11.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@canvas-js/chain-solana':
-        specifier: ^0.10.10
-        version: 0.10.10(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        specifier: ^0.11.0
+        version: 0.11.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@canvas-js/chain-substrate':
-        specifier: ^0.10.10
-        version: 0.10.10(@polkadot/api@6.0.5)(@polkadot/util@12.6.2)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        specifier: ^0.11.0
+        version: 0.11.0(@polkadot/api@6.0.5)(@polkadot/util@12.6.2)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@canvas-js/core':
-        specifier: ^0.10.10
-        version: 0.10.10(@types/react@18.3.3)(bufferutil@4.0.8)(react-native@0.75.1(@babel/core@7.25.7)(@babel/preset-env@7.25.3(@babel/core@7.25.7))(@types/react@18.3.3)(bufferutil@4.0.8)(react@18.3.1)(typescript@5.4.5)(utf-8-validate@5.0.10))(react@18.3.1)(utf-8-validate@5.0.10)
+        specifier: ^0.11.0
+        version: 0.11.0(@types/react@18.3.3)(bufferutil@4.0.8)(react@18.3.1)(utf-8-validate@5.0.10)
       '@canvas-js/gossiplog':
-        specifier: ^0.10.10
-        version: 0.10.10(@types/react@18.3.3)(bufferutil@4.0.8)(react-native@0.75.1(@babel/core@7.25.7)(@babel/preset-env@7.25.3(@babel/core@7.25.7))(@types/react@18.3.3)(bufferutil@4.0.8)(react@18.3.1)(typescript@5.4.5)(utf-8-validate@5.0.10))(react@18.3.1)(utf-8-validate@5.0.10)
+        specifier: ^0.11.0
+        version: 0.11.0(@types/react@18.3.3)(bufferutil@4.0.8)(react@18.3.1)(utf-8-validate@5.0.10)
       '@canvas-js/interfaces':
-        specifier: ^0.10.10
-        version: 0.10.10
+        specifier: ^0.11.0
+        version: 0.11.0
       '@canvas-js/signatures':
-        specifier: ^0.10.10
-        version: 0.10.10
+        specifier: ^0.11.0
+        version: 0.11.0
       '@cosmjs/amino':
         specifier: ^0.31.3
         version: 0.31.3
@@ -925,9 +934,12 @@ importers:
       '@lexical/rich-text':
         specifier: ^0.17.0
         version: 0.17.1
-      '@libp2p/peer-id-factory':
-        specifier: ^4.2.4
-        version: 4.2.4
+      '@libp2p/crypto':
+        specifier: ^5.0.4
+        version: 5.0.4
+      '@libp2p/peer-id':
+        specifier: ^5.0.4
+        version: 5.0.4
       '@magic-ext/cosmos':
         specifier: ^12.1.3
         version: 12.4.0
@@ -2728,75 +2740,71 @@ packages:
   '@brillout/import@0.2.3':
     resolution: {integrity: sha512-1T8WlD75eeFSMrptGy8jiLHmfHgMmSjWvLOIUvHmSVZt+6k0eQqYUoK4KbmE4T9pVLIfxvZSOm2D68VEqKRHRw==}
 
-  '@canvas-js/chain-cosmos@0.10.10':
-    resolution: {integrity: sha512-SHmAOATxqNlXImB3KBLKGoYge1uWTj1stfVBu5vCOqJQzINnhUFdwtNBpKhUI2Mm6vpEmiprJdFyXE3ECrYHyQ==}
+  '@canvas-js/chain-cosmos@0.11.0':
+    resolution: {integrity: sha512-6Epmh2s4ivpUp2f0PSNq7D2Kz31HXqIynWiVyM3oK2RpvyDJxc7wP1itBEzBhpgD54FLVVn/PMRWdQ1CKOttTg==}
 
-  '@canvas-js/chain-ethereum@0.10.10':
-    resolution: {integrity: sha512-r6h24aCTYT9us2DkyxlQ8HuixBPCzwIim4T9gf3sPDBfXJsjS71aEOaNJSk/YMyUDMQvCGlcqUxFsWYpOf7Onw==}
+  '@canvas-js/chain-ethereum@0.11.0':
+    resolution: {integrity: sha512-tjpqus/qkTI335IqUmd6VqSwRbJiLo5oLtKSO/gb9P7BRpASQHQ7GbOVn8dNwHohbP3sGHzLihFnbVj/9KrKog==}
 
-  '@canvas-js/chain-solana@0.10.10':
-    resolution: {integrity: sha512-es1NfrMYvVRmVIzz0d/EWSCT9gYEte65j0rdv2Fn4BLFRORFpyroOyBy82Eg2wVtnkCnQ23byYnXokNIW7Ua4g==}
+  '@canvas-js/chain-solana@0.11.0':
+    resolution: {integrity: sha512-zYDjR+klZkA+EFqvLv6vH2mM8VPjuIU+jP87qbTcDrdlK5O9yye5ikemIBMlmh09A5Vdlwr5rBxHDV9OVHMD+g==}
 
-  '@canvas-js/chain-substrate@0.10.10':
-    resolution: {integrity: sha512-KzXZzJXeGhHovdmIHQSHb41/a/dYLE6Qb+7ajZ4kO3+d8BosOdjofAvLpINma0Yno0Vl2ztzu5JfSM2cDMnwwQ==}
+  '@canvas-js/chain-substrate@0.11.0':
+    resolution: {integrity: sha512-b47HXrT++5dyXIXZ6+1Otq22QnlwCHzUwxhMUIagQTP12bLp/Fr2SBsgy0xRY8R9awHV0nBErQq07lvP6PfmLw==}
 
-  '@canvas-js/core@0.10.10':
-    resolution: {integrity: sha512-g7rVWipcBBHJ3E+BlM6cnW47URlhB9pXnwWhxaUi6az3QAfZULtfHdcD6VPZvUyz7EdgPl4agp6tHB9QDqJjZQ==}
+  '@canvas-js/core@0.11.0':
+    resolution: {integrity: sha512-hYuP7QDeewVZY1/NzhoVhYNhRo6iyb3vEApIvMJfzNSj/JMSt+vG/xuVVZV3oU56f8VoO/VQu4hFQRt8/ZK2dQ==}
     engines: {node: '>=20.0.0'}
 
-  '@canvas-js/discovery@0.10.10':
-    resolution: {integrity: sha512-rDBs7r2qd35A4k7bKib/gT4p9z5m/lClrgaXrlGndJD/Xq/x0wXX/t3ISTgPiTd+fNVeeFfTYWFb1U4RpLPOMA==}
-
-  '@canvas-js/gossiplog@0.10.10':
-    resolution: {integrity: sha512-cTEGZCeGZ3RPIIg79evJQIWWVxO0/NK/uUUvPwy05Ybfqhw/UWdw+bHF2X3Fc/SN9PzqaMhuIvSrbtFI2uypUg==}
+  '@canvas-js/gossiplog@0.11.0':
+    resolution: {integrity: sha512-n+k8vYM6B3CZilbDObQgSO3ugFsILqPazVAkboJ1QpPB0v7YSTCNzf1MznO4NaYOWvP7K3x/BbrnGcTSOXnZug==}
     engines: {node: '>=20.0.0'}
 
-  '@canvas-js/interfaces@0.10.10':
-    resolution: {integrity: sha512-O+DKtxTwi3ol9+5ECIStA2Tflaaz5yALc/DjOpg56HEB9LqJUMS8Q/w+K2Tdie5f2r6nMcxLf4NYonqyXwKkCg==}
+  '@canvas-js/interfaces@0.11.0':
+    resolution: {integrity: sha512-rP9SY4iPbJacn4aCYNsJi/7alCsJDWcjfVxHU7GhslSLKMmpZnAQsiQSCyOmg794Cpkqv5ibh9JFyXZnSkFiMg==}
 
-  '@canvas-js/modeldb-idb@0.10.10':
-    resolution: {integrity: sha512-AP89sX3Ma9EoPzhBat4kU3nUzVh2PtOF6+qNAlG8IAQsxLkFNpXpnwINwLS+zZEpvExIF1DhZFx1DlGRlQ773w==}
+  '@canvas-js/libp2p-rendezvous@0.2.0':
+    resolution: {integrity: sha512-V3F8De7K9LC1G64GCODojsyiMk106bgZgl7AV5k7615zfa9JSWWbgNxCAD5Y05JnuCYhxu90Vhw3jkWsAtD9qA==}
+
+  '@canvas-js/modeldb-idb@0.11.0':
+    resolution: {integrity: sha512-NkDYVaf4aO43tRsIvp75y4AdONNur1GCVE+l/Vr3Vp5UK7+5B5jWAod02Q1qC6bbObhJZ9W8GMKDn9n22Z7VZQ==}
     engines: {node: '>=20.0.0'}
     peerDependencies:
-      '@types/react': ^18.3.3
+      '@types/react': ^18.3.9
       react: ^18.3.1
 
-  '@canvas-js/modeldb-pg@0.10.10':
-    resolution: {integrity: sha512-VPj0HUu0SpZRNAEV7gBcecVHtmMePS3CjzeXnyc09yAFEVUFtcLTm/j5cv1onNb6pJpKLlJKZxLeEcx2UoWZww==}
+  '@canvas-js/modeldb-pg@0.11.0':
+    resolution: {integrity: sha512-w9+ph3N9DZm8dCswXNOp9rpgZsTOm2D6U0U9jtRASZiSf0sBwQ37Pcfead6HF6O5LMpbg6J1f+WmhhdOjfKMyg==}
     engines: {node: '>=20.0.0'}
 
-  '@canvas-js/modeldb-sqlite-wasm@0.10.10':
-    resolution: {integrity: sha512-8OxmwBIZ66HNDq9jjdgXth8p+xIMsZ2djBPV6tmWQONs6QuIE5jKKBPH39+FYoHZ2x6QBJqG0YLGBsX35aCQow==}
+  '@canvas-js/modeldb-sqlite@0.11.0':
+    resolution: {integrity: sha512-vcL/bbH4Ze+NA38sGkbssh/ZsLkt4AlF3ePRWfAseVjwSab+AJe90U7557jQQiCUpVm7wkwgZGOv6MLCyI+YGA==}
     engines: {node: '>=20.0.0'}
 
-  '@canvas-js/modeldb-sqlite@0.10.10':
-    resolution: {integrity: sha512-nC+5I7YuxpkLReSWlkvAzYqBPwQIpeda467R94O2kgH+y6SwdbTR1UOm27ECtcXExwa11fJRYI3+3BanGqZH0g==}
+  '@canvas-js/modeldb@0.11.0':
+    resolution: {integrity: sha512-dD5eAJ92ZneQIqTnXxjo8MwXB1pc/IcwmnskjTvsWG1mTDKhThWhQNegAxqnaNEruuxNND3l13kjpcHLg4yerg==}
     engines: {node: '>=20.0.0'}
 
-  '@canvas-js/modeldb@0.10.10':
-    resolution: {integrity: sha512-5TC/kFm5XE89Olo6AsKpzpjXgmaogmH/yt6RYbmLqk218A0iZ3ASBERWONSkTiz+5eVggG9nsczB8AIYHz2f/g==}
-    engines: {node: '>=20.0.0'}
-
-  '@canvas-js/okra-lmdb@0.1.3':
-    resolution: {integrity: sha512-kWLfXEPFj65oa23MdU2UbWgLdV1NehMdWfGaHDrg+EpjrhBgziG7TEVwe8QddtnauedJx5Z5tTbHOtUlxe6B4w==}
+  '@canvas-js/okra-lmdb@0.2.0':
+    resolution: {integrity: sha512-nSBW8860EQV3IjR4K3n3zIrpFdIRZausMnVK8ZMHK9uAbf9cjJpwASogBYYI2BMdJ1FqODHZZQbFxgDFLnwxzw==}
     engines: {node: '>=18'}
 
-  '@canvas-js/okra-memory@0.4.4':
-    resolution: {integrity: sha512-p/HnIabk+lnSn4IJHGYcDhIyHwWZuGc+t+IX6BofGRI2iknEgNQ3vFphSkhzwijs0VvS19d9r4CIOI704o7pBg==}
+  '@canvas-js/okra-memory@0.4.5':
+    resolution: {integrity: sha512-RGLUvCzZh9ejWl2uxFHtrkceAs1mGOq52b7U/Wzbmhp8lxr4L8gKldwoGIcps9J//9afUD7/vFj/jLnrHXz59A==}
 
-  '@canvas-js/okra@0.4.4':
-    resolution: {integrity: sha512-YNCeU86KIUIBqJX1Ncs26dSHg3997uptLSBIJbDxAbY6+U2bhdcH+ic4+CS0PYlt72oV5Y1Z9cQFiEYAfvRGNg==}
+  '@canvas-js/okra@0.4.5':
+    resolution: {integrity: sha512-5c74kB/skTF+JGo/H49Eej/lu/bg98Q3M5uoRhJYbzRJxLwJ31sYsc4E0k75n1XUtv85Wrgtf4Zn+3D9J3iDhA==}
 
-  '@canvas-js/signatures@0.10.10':
-    resolution: {integrity: sha512-33CSYR6D8KZWS9goPGG9mvX5vvFQHHzQdlqAIKWGbqP930Qj06wubjhI2WHFThWbNcJdlQSuSA5beXIaxSJxAg==}
+  '@canvas-js/signatures@0.11.0':
+    resolution: {integrity: sha512-vHZWiW9Q8WHTu3Xq3XTNuOfx3QEg615H5XC/ckzbqIpOp5cPyDbH2Z5tJ4Vduh+7bAGs019SxpSQr/3qYX05IA==}
     engines: {node: '>=20.0.0'}
 
-  '@canvas-js/utils@0.10.10':
-    resolution: {integrity: sha512-xAdP32wRserIFUR5G04njE8IzvNRnYeCYq3br6KAysr2wG//pcmBgyBTqBk8tU4b/0xpDqc9yCQaK0ZrMhmG0g==}
+  '@canvas-js/utils@0.11.0':
+    resolution: {integrity: sha512-sAGjluiIlWbCG8t9F7bTVoNlxI3OcL7uXsLXEPJJGC+ThFfdnvH/deWfn5RljTyeXPFX6ArdxMDiRq+J4brUrQ==}
     engines: {node: '>=20.0.0'}
 
-  '@canvas-js/vm@0.10.10':
-    resolution: {integrity: sha512-hinXOzPngpzcvWr18YXMm2qj8BVW2DOBJQoYXjxqbOzAtxkckaZjgz2gwlrRuVpK8sSyP6HRjN12vkCtFgimCA==}
+  '@canvas-js/vm@0.11.0':
+    resolution: {integrity: sha512-B5ORGMTFiUGGoYYoSyytvPtgJrkfEwJT8d+AJcOYAnlTIKD6Vv2YWTtKVVKF8APg77x27/ZrrGpebCT4k8i79g==}
     engines: {node: '>=20.0.0'}
 
   '@chainsafe/as-chacha20poly1305@0.1.0':
@@ -2808,16 +2816,15 @@ packages:
   '@chainsafe/is-ip@2.0.2':
     resolution: {integrity: sha512-ndGqEMG1W5WkGagaqOZHpPU172AGdxr+LD15sv3WIUvT5oCFUrG1Y0CW/v2Egwj4JXEvSibaIIIqImsm98y1nA==}
 
-  '@chainsafe/libp2p-gossipsub@13.2.0':
-    resolution: {integrity: sha512-yKGXIJMLeNLa/XeI57HvQKhf1f4LRgBuV1Lrzv9Vo685Szr+qaBATUbMk/aLxpN2rMgibDIS5F8yaeuIUVPh8Q==}
+  '@chainsafe/libp2p-gossipsub@14.1.0':
+    resolution: {integrity: sha512-nzFBbHOoRFa/bXUSzmJaXOgHI+EttTldhLJ33yWcM0DxnWhLKychHkCDLoJO3THa1+dnzrDJoxj3N3/V0WoPVw==}
     engines: {npm: '>=8.7.0'}
 
-  '@chainsafe/libp2p-noise@15.1.1':
-    resolution: {integrity: sha512-66EPS8gFTkb1jVCiJoY3+ulG/ZTef7kiNZZZvUOUzsLIZYQTi+7pIDBpgmolzSXdsFb8I2hl5mZsvcbzVZB5gg==}
-    engines: {node: '>=16.0.0', npm: '>=7.0.0'}
+  '@chainsafe/libp2p-noise@16.0.0':
+    resolution: {integrity: sha512-8rqr8V1RD2/lVbfL0Bb//N8iPOFof11cUe8v8z8xJT7fUhCAbtCCSM4jbwI4HCnw0MvHLmcpmAfDCFRwcWzoeA==}
 
-  '@chainsafe/libp2p-yamux@6.0.2':
-    resolution: {integrity: sha512-S5OkLHqYhEVMQQ4BTgnRANEIbGTQhaC23glCgBwGdeoTRtMpIozwDiPfljFLCm0RYWdCRJw9oFztO95KUHjptA==}
+  '@chainsafe/libp2p-yamux@7.0.1':
+    resolution: {integrity: sha512-949MI0Ll0AsYq1gUETZmL/MijwX0jilOQ1i4s8wDEXGiMhuPWWiMsPgEnX6n+VzFmTrfNYyGaaJj5/MqxV9y/g==}
 
   '@chainsafe/netmask@2.0.0':
     resolution: {integrity: sha512-I3Z+6SWUoaljh3TBzCnCxjlUyN8tA+NAk5L6m9IxvCf1BENQTePzPMis97CoN/iMW1St3WN+AWCCRp+TTBRiDg==}
@@ -4008,71 +4015,62 @@ packages:
   '@lezer/yaml@1.0.3':
     resolution: {integrity: sha512-GuBLekbw9jDBDhGur82nuwkxKQ+a3W5H0GfaAthDXcAu+XdpS43VlnxA9E9hllkpSP5ellRDKjLLj7Lu9Wr6xA==}
 
-  '@libp2p/bootstrap@10.1.5':
-    resolution: {integrity: sha512-cXn/Wl7X4uaVGRyh/uSU/crRbhsPkyzH59hzoLP3727f7w82o+sIHVr4SkJcJewt+LZELBLgkJTibZxAntA1dA==}
+  '@libp2p/bootstrap@11.0.7':
+    resolution: {integrity: sha512-PRDMVXf67+ASYTco6APqPy4HF03mQ8UX+BbBZcMAMpnlPsetYfWgQg3YiBe56J+PVQLs0FPsGpfLmAg7PUguQA==}
 
-  '@libp2p/circuit-relay-v2@1.1.5':
-    resolution: {integrity: sha512-WVIHaj61LJd2JB6vvPikd049NhC2R3vrkuu4T00WJSMNWobmhrKPvFyQMN+1miL6KmdL8Yt1AjK0gog2oT4vDw==}
+  '@libp2p/crypto@5.0.4':
+    resolution: {integrity: sha512-v5xsngOlDu8JP3GQDvK+2YYzTELl7/aPfXPbIzKEcy7ON2hu79t1BZMuavjPsr+WWIPNg5yKst6IJfRilzwXRQ==}
 
-  '@libp2p/crypto@4.1.9':
-    resolution: {integrity: sha512-8Cf2VKh0uC/rQLvTLSloIOMqUvf4jsSTHXgjWQRf47lDNJlNNI0wSv2S6gakT72GZsRV/jCjYwKPqRlsa5S0iA==}
+  '@libp2p/identify@3.0.7':
+    resolution: {integrity: sha512-4Ns/0HN9lvQAox8eaJruKXakOtikduk6kPlz+KYmFMgVE5/kRBRf7h0aK/8cyU9sQPbSZLCaJ3gBWoDrfMIu2w==}
 
-  '@libp2p/fetch@1.1.5':
-    resolution: {integrity: sha512-sIy+eArSaka2mwkTJArZVYjva4UgXZgHUrcIzygM3EQ3iFxdj79zIXzWM9v6HoIFPHrxZMWqwj+VEft/U6Bl0A==}
-
-  '@libp2p/identify@2.1.5':
-    resolution: {integrity: sha512-uVghY2KfZ3ffDkPmcivfiRDlq1h5rCcoHAW+Kb7JF2qrDfg6BgHAn6IRN4pe/DnYXOuJXIIm6+jjcReTPGBKBQ==}
-
-  '@libp2p/interface-internal@1.3.4':
-    resolution: {integrity: sha512-8x/0sdeH8T16yZ9t/Cfja0ms6Ho9fF3riX56WhQrNxMU6C1sIgAFmzUNzHLxxOR+rkKyL9cyXIyB+RcBf4gzjA==}
+  '@libp2p/interface-internal@2.0.7':
+    resolution: {integrity: sha512-numJBYHajL7W1BuURkQ4tlZ4sUGNGI3GWkhTmL2fS+LxYS2hUVTxcemHtUZGpcJQ17GiCqq+j4GE3bkBagOb0g==}
 
   '@libp2p/interface@1.7.0':
     resolution: {integrity: sha512-/zFyaIaIGW0aihhsH7/93vQdpWInUzFocxF11RO/029Y6h0SVjs24HHbils+DqaFDTqN+L7oNlBx2rM2MnmTjA==}
 
-  '@libp2p/kad-dht@12.1.5':
-    resolution: {integrity: sha512-n/Tdd3zVa2p1S4L6wRIBUAo3ctCbiEkp1aewpOUthL6rOwBh6U/RQ+dssiZNEDHCsF1ta/mZkREuXqxOPpplFQ==}
+  '@libp2p/interface@2.1.2':
+    resolution: {integrity: sha512-uD4NapC+1qGX7RmgC1aehQm3pMs1MpO1DwuhUlAo1M6CyNxfs1Ha9jhg2T+G4u4CAJM6wffZTyPGnKnrR+M8Fw==}
 
-  '@libp2p/logger@4.0.20':
-    resolution: {integrity: sha512-TTh2dhHsOTAlMPxSa9ncFPHa/0jTt+0AQxwHdlxg/OGLAgc9VRhnrhHUbJZp07Crcw4T/MOfS4KhjlxgqYgJRw==}
+  '@libp2p/kad-dht@13.1.2':
+    resolution: {integrity: sha512-9p3SIa1Ab8s2xkEnFZ0m/Cdl0Npqfn+QdfU/jRPrYGEQz6K+qX1e1W4Yx5zGbFvBw9tDLFUSJJ4c/qcbzVnrxg==}
 
-  '@libp2p/multistream-select@5.1.17':
-    resolution: {integrity: sha512-QOMGjCzKGf/W+qzWw5OxaqLEYhK45XjMCxGJYQ7L5eUkcwAv6rlPZAYw6YslaMLpJTa61/yfh8D4u7EuoMFsUw==}
+  '@libp2p/logger@5.1.0':
+    resolution: {integrity: sha512-hmkk1TONYRe+kKs5QTxkayIfj9qicp8hcrJ1Ac9QfTW/jdaUlnqd1uop4QcOD5GV6qNMq+v1qaMFWFYSN9RcPA==}
 
-  '@libp2p/peer-collections@5.2.9':
-    resolution: {integrity: sha512-8gBmzQlCWjjb+FSQBKK33T25Y5Df/8FWCXFtJDsprVxVUzDOQoibQJ5Tb4Y+mb96HUhNzoaRWVEamB78MMB3DA==}
+  '@libp2p/multistream-select@6.0.5':
+    resolution: {integrity: sha512-iOMHcF/NzeShmnRLf9KI39bgfxptklbf6Tv9NvBbICfYO/IJB6KDI6bOif5eXXqUqZjHrQJ3jrRppOEwk2HV4g==}
 
-  '@libp2p/peer-id-factory@4.2.4':
-    resolution: {integrity: sha512-NDQ/qIWpcAG/6xQjyut6xCkrYYAoCaI/33Z+7yzo5qFODwLfNonLzSTasnA6jhuvHn33aHnD1qhdpFkmstxtNQ==}
+  '@libp2p/peer-collections@6.0.7':
+    resolution: {integrity: sha512-e3o994iEUvPR58x8Y5iE6lvrkv48oJXp/A1XIxMB4D/kA4OlY5BjDpHpR4nE4+EkzhIbslbMLAfip2FStyjtHg==}
 
-  '@libp2p/peer-id@4.2.4':
-    resolution: {integrity: sha512-mvvsVxt4HkF14BrTNKbqr14VObW+KBJBWu1Oe6BFCoDttGMQLaI+PdduE1r6Tquntv5IONBqoITgD7ow5dQ+vQ==}
+  '@libp2p/peer-id@5.0.4':
+    resolution: {integrity: sha512-CHNbQ4Odlc+YDTtv6BzWdGSaJ1I3Wb6iHNV7YB59v0ivSsd0NzlR31qWpK/ByUAMT+hfzQzR1dK9s3e7zS4/zQ==}
 
-  '@libp2p/peer-record@7.0.25':
-    resolution: {integrity: sha512-b54P3cSeQniW/HPJjBVbeF3KaVUQkWa431gotuIFUS1PYgtz69uzkRrVY6Qt+RBb4R4fcmH4K4jWyZi3xyLGfQ==}
+  '@libp2p/peer-record@8.0.7':
+    resolution: {integrity: sha512-YsN8R+5O0MQwYQ0UGqERJJVRx7hAU4/nxiby91wzbgdfuL4qVPXHG4k0OAAtxVGLYa0q7KeXBpBG8qoaKhOXMQ==}
 
-  '@libp2p/peer-store@10.1.5':
-    resolution: {integrity: sha512-JqQcIcxZS7kicCPabGRyrKD+qZlOdaooL00hdHogVb4MIMqfjiQMmOEpzIvTQLCKHKM2mmfnV3P7kc6hYzPq8g==}
+  '@libp2p/peer-store@11.0.7':
+    resolution: {integrity: sha512-h8W/XVYfKTmJhhnh2Mdub23CzPv24l5g1RRwFsEKCkWAe95M/fvDMPTM2ahRUB64qfnFT5X4XNFFyJFMsVtjLA==}
 
-  '@libp2p/ping@1.1.5':
-    resolution: {integrity: sha512-CeRpXdtljyWr/UNmrojnZbyI/oDkdu6duCGtWnnDFmPS2tR4Rxr2C8sKA1iAvhgvRFhh5vrTmlB1QUbUWHHRCg==}
+  '@libp2p/ping@2.0.7':
+    resolution: {integrity: sha512-qxHvWCzYocZIG5J8/+4Gfyf8qTrhrYIshhEq6pmozPIBxrSpzRs96X1gpEjG0D65iBHavvjB1IBx8wZbyNdRIg==}
 
-  '@libp2p/prometheus-metrics@3.1.5':
-    resolution: {integrity: sha512-IN4XTIVb7XUUlnPdrZzFtWKV6k2iUOfCBFGsBaTwJ2tgXsEtlK+wajibh8KeC+FmoC9/fx8N2dV3vTv7UCrbtQ==}
+  '@libp2p/prometheus-metrics@4.2.1':
+    resolution: {integrity: sha512-Mt93FWjP1Jz5G/FsG7cf0J4Y1nYs4eQvx1RjtuEghoQcSzD8nSupeMt67YRQG87R/qrs0jdiGtYxmoCoagsIDw==}
 
-  '@libp2p/pubsub@9.0.26':
-    resolution: {integrity: sha512-69sFv5DAHSXrQdu4THX9WSZuEfCjEbbk6bKiTtbNGpq1Vaf57rjsTWk/EXMS/veeMl95xJs3/BR7dQal2PtJmw==}
+  '@libp2p/pubsub@10.0.7':
+    resolution: {integrity: sha512-XYAYaASilesqxonjhiEENF/jXoT3jcftNYySkiyajrw3rZnLVkfJMRese3lkFqkIZqy7K/7aAtYEDJLeSrJDiQ==}
 
   '@libp2p/record@4.0.4':
     resolution: {integrity: sha512-wEEeHXGNIcc8HtGbgGMuSHbboUWMxKG7OxALFwkE+KACgfRJZTESOp6XIdZnyC0r9lfEFsjF01pFKBTzoBmWEQ==}
 
-  '@libp2p/utils@5.4.9':
-    resolution: {integrity: sha512-0fRdX98WqhTmXU2WEVLegLFxs/kKTtUHanHk5Lzs4oGsIzlPHR7zE6lj/U1WfsFA+Xo1eYQpNLiXEL29hG+Nyw==}
+  '@libp2p/utils@6.1.0':
+    resolution: {integrity: sha512-pxuUI8QgeS06bMZRpy0JnACPhrrCJS5/rVNTcnQK8lV1ag2bjwkGG/359AwjeEolzYQeLrmmqnZyawd1Y74wpw==}
 
-  '@libp2p/webrtc@4.1.7':
-    resolution: {integrity: sha512-8iXs5m0DyfLKqOJAV/nZrtQz6ryrr5iv8fp6ArbWLm/NOwqHkbXwO30ZpRNRm1qmDvKVQilGpNFEC1z1mgheRg==}
-
-  '@libp2p/websockets@8.2.0':
-    resolution: {integrity: sha512-UNjqkQ8/emnYswp1ohIIuZCnhI5DlvWF9IaIND2MoTCDavi7yubWfMp8jSWBsAqPnMeLMO8MQ6YlOo4FFC104Q==}
+  '@libp2p/websockets@9.0.7':
+    resolution: {integrity: sha512-2h0y68Sa6T9j2umtQqfpfmBU3RZZw+4IUMko4hN5vCsCa/Tn0h0uDO+2JLu7iTaezfHDhtQoTdY2Uw96WCbS7A==}
 
   '@lit-labs/ssr-dom-shim@1.2.0':
     resolution: {integrity: sha512-yWJKmpGE6lUURKAaIltoPIE/wrbY3TEkqQt+X0m+7fQNnAv0keydnYvbiJFP1PnMhizmIWRWOG5KLhYyc/xl+g==}
@@ -4335,8 +4333,8 @@ packages:
   '@multiformats/multiaddr@12.2.1':
     resolution: {integrity: sha512-UwjoArBbv64FlaetV4DDwh+PUMfzXUBltxQwdh+uTYnGFzVa8ZfJsn1vt1RJlJ6+Xtrm3RMekF/B+K338i2L5Q==}
 
-  '@multiformats/multiaddr@12.3.0':
-    resolution: {integrity: sha512-JQ8Gc/jgucqqvEaDTFN/AvxlYDHEE7lgEWLMYW7hKZkWggER+GvG/tVxUgUxIP8M0vFpvEHKKHE0lKzyMsgi8Q==}
+  '@multiformats/multiaddr@12.3.1':
+    resolution: {integrity: sha512-yoGODQY4nIj41ENJClucS8FtBoe8w682bzbKldEQr9lSlfdHqAsRC+vpJAOBpiMwPps1tHua4kxrDmvprdhoDQ==}
 
   '@noble/ciphers@0.5.3':
     resolution: {integrity: sha512-B0+6IIHiqEs3BPMT0hcRmHvEj2QHOLu+uwt+tqDDeVd0oyVzh7BPrDcPjRnV1PV/5LaknXJJQvOuRGR0zQJz+w==}
@@ -4359,6 +4357,10 @@ packages:
   '@noble/curves@1.5.0':
     resolution: {integrity: sha512-J5EKamIHnKPyClwVrzmaf5wSdQXgdHcPZIZLu3bwnbeCx8/7NPK5q2ZBWF+5FvYGByjiQQsJYX6jfgB2wDPn3A==}
 
+  '@noble/curves@1.6.0':
+    resolution: {integrity: sha512-TlaHRXDehJuRNR9TfZDNQ45mMEd5dwUwmicsafcIX4SsNiqnCHKjE/1alYPd/lDRVhxdhUAlv8uEhMCI5zjIJQ==}
+    engines: {node: ^14.21.3 || >=16}
+
   '@noble/hashes@1.2.0':
     resolution: {integrity: sha512-FZfhjEDbT5GRswV3C6uvLPHMiVD6lQBmpoX5+eSiPaMTXte/IKqI5dykDxzZB/WBeK/CDuQRBWarPdi3FNY2zQ==}
 
@@ -4373,6 +4375,10 @@ packages:
   '@noble/hashes@1.4.0':
     resolution: {integrity: sha512-V1JJ1WTRUqHHrOSh597hURcMqVKVGL/ea3kv0gSnEdsEZ0/+VyPghM1lMNGc00z7CIQorSvbKpuJkxvuHbvdbg==}
     engines: {node: '>= 16'}
+
+  '@noble/hashes@1.5.0':
+    resolution: {integrity: sha512-1j6kQFb7QRru7eKN3ZDvRcP13rugwdxZqCjbiAVZfIJwgj2A65UmT4TgARXGlXgnRkORLTDTrO19ZErt7+QXgA==}
+    engines: {node: ^14.21.3 || >=16}
 
   '@noble/secp256k1@1.7.1':
     resolution: {integrity: sha512-hOUk6AyBFmqVrv7k5WAw/LpszxVbj9gGN4JRkIX52fdFAj1UA61KXmZDvqVEm+pOyec3+fIeZB02LYa/pWOArw==}
@@ -6174,10 +6180,6 @@ packages:
   '@spruceid/siwe-parser@2.1.2':
     resolution: {integrity: sha512-d/r3S1LwJyMaRAKQ0awmo9whfXeE88Qt00vRj91q5uv5ATtWIQEGJ67Yr5eSZw5zp1/fZCXZYuEckt8lSkereQ==}
 
-  '@sqlite.org/sqlite-wasm@3.46.0-build2':
-    resolution: {integrity: sha512-10s/u/Main1RGO+jjzK+mgC/zh1ls1CEnq3Dujr03TwvzLg+j4FAohOmlYkQj8KQOj1vGR9cuB9F8tVBTwVGVA==}
-    hasBin: true
-
   '@stablelib/aead@1.0.1':
     resolution: {integrity: sha512-q39ik6sxGHewqtO0nP4BuSe3db5G1fEJE8ukvngS2gLkBXyy6E7pLubhbYgnkDFv6V8cWaxcE4Xn0t6LWcJkyg==}
 
@@ -6247,7 +6249,6 @@ packages:
 
   '@substrate/connect@0.8.8':
     resolution: {integrity: sha512-zwaxuNEVI9bGt0rT8PEJiXOyebLIo6QN1SyiAHRPBOl6g3Sy0KKdSN8Jmyn++oXhVRD8aIe75/V8ZkS81T+BPQ==}
-    deprecated: versions below 1.x are no longer maintained
 
   '@substrate/light-client-extension-helpers@0.0.4':
     resolution: {integrity: sha512-vfKcigzL0SpiK+u9sX6dq2lQSDtuFLOxIJx2CKPouPEHIs8C+fpsufn52r19GQn+qDhU8POMPHOVoqLktj8UEA==}
@@ -6729,6 +6730,9 @@ packages:
   '@types/pg-format@1.0.5':
     resolution: {integrity: sha512-i+oEEJEC+1I3XAhgqtVp45Faj8MBbV0Aoq4rHsHD7avgLjyDkaWKObd514g0Q/DOUkdxU0P4CQ0iq2KR4SoJcw==}
 
+  '@types/pg@8.11.10':
+    resolution: {integrity: sha512-LczQUW4dbOQzsH2RQ5qoeJ6qJPdrcM/DcMLoqWQkMLMsq83J5lAX3LXjdkWdpscFy67JSOWDnh7Ny/sPFykmkg==}
+
   '@types/pg@8.11.6':
     resolution: {integrity: sha512-/2WmmBXHLsfRqzfHW7BNZ8SbYzE8OSk7i3WjFYvfgRHj7S1xj+16Je5fUKv3lVdVzk/zn9TXOqf+avFCFIE0yQ==}
 
@@ -6783,6 +6787,9 @@ packages:
 
   '@types/request@2.48.12':
     resolution: {integrity: sha512-G3sY+NpsA9jnwm0ixhAFQSJ3Q9JkpLZpJbI3GMv0mIAT0y3mRabYeINzal5WOChIiaTEGQYlHOKgkaM9EisWHw==}
+
+  '@types/retry@0.12.2':
+    resolution: {integrity: sha512-XISRgDJ2Tc5q4TRqvgJtzsRkFYNJzZrhTdtMoGVBttwzzQJkPnS3WWTFc7kuDRoPtPakl+T+OfdEUjYJj7Jbow==}
 
   '@types/secp256k1@4.0.6':
     resolution: {integrity: sha512-hHxJU6PAEUn0TP4S/ZOzuTUvJWuZ6eIKeNKb5RBpODvSl6hp1Wrw4s7ATY50rklRCScUDpHzVA/DQdSjJ3UoYQ==}
@@ -7677,6 +7684,10 @@ packages:
     resolution: {integrity: sha512-ml9pReCu3M61kGlqoTm2umSXTlRTuGTx0bfYj+uIUKKYycG5NtSbeetV3faSU6R7ajOPw0g/J1PvK4qNy7s5bA==}
     engines: {node: '>= 0.8', npm: 1.2.8000 || >= 1.4.16}
 
+  body-parser@1.20.3:
+    resolution: {integrity: sha512-7rAxByjUMqQ3/bHJy7D6OGXvx/MMc4IqBn/X0fcM1QUcAItpZrBEYhWGem+tzXH90c+G01ypMcYJBO9Y30203g==}
+    engines: {node: '>= 0.8', npm: 1.2.8000 || >= 1.4.16}
+
   boolbase@1.0.0:
     resolution: {integrity: sha512-JZOSA7Mo9sNGB8+UjSgzdLtokWAky1zbztM3WRLCbZ70/3cTANmQmOdR7y2g+J0e2WXywy1yS468tY+IruqEww==}
 
@@ -8080,9 +8091,6 @@ packages:
     resolution: {integrity: sha512-FQN4MRfuJeHf7cBbBMJFXhKSDq+2kAArBlmRBvcvFE5BB1HZKXtSFASDhdlz9zOYwxh8lDdnvmMOe/+5cdoEdg==}
     engines: {node: '>= 0.8'}
 
-  comlink@4.4.1:
-    resolution: {integrity: sha512-+1dlx0aY5Jo1vHy/tSsIGpSkN4tS9rZSW8FIhG0JH/crs9wwweswIo/POr451r7bZww3hFbPAKnTpimzL/mm4Q==}
-
   command-exists@1.2.9:
     resolution: {integrity: sha512-LTQ/SGc+s0Xc0Fu5WaKnR0YiygZkm9eKFvyS+fRsU7/ZWFF8ykFM6Pc9aCVf1+xasOOZpO3BAVgVrKvsqKHV7w==}
 
@@ -8210,6 +8218,10 @@ packages:
 
   cookie@0.6.0:
     resolution: {integrity: sha512-U71cyTamuh1CRNCfpGY6to28lxvNwPG4Guz/EVjgf3Jmzv0vlDp1atT9eS5dDjMYHucpHbWns6Lwf3BKz6svdw==}
+    engines: {node: '>= 0.6'}
+
+  cookie@0.7.1:
+    resolution: {integrity: sha512-6DnInpx7SJ2AK3+CTUE/ZM0vWTUboZCegxhC2xiIydHR9jNuTAASBrfEpHhiGOZw/nX51bHt6YQl8jsGo4y/0w==}
     engines: {node: '>= 0.6'}
 
   cookiejar@2.1.4:
@@ -8388,8 +8400,8 @@ packages:
     resolution: {integrity: sha512-t/Ygsytq+R995EJ5PZlD4Cu56sWa8InXySaViRzw9apusqsOO2bQP+SbYzAhR0pFKoB+43lYy8rWban9JSuXnA==}
     engines: {node: '>= 0.4'}
 
-  datastore-core@9.2.9:
-    resolution: {integrity: sha512-wraWTPsbtdE7FFaVo3pwPuTB/zXsgwGGAm8BgBYwYAuzZCTS0MfXmd/HH1vR9s0/NFFjOVmBkGiWCvKxZ+QjVw==}
+  datastore-core@10.0.2:
+    resolution: {integrity: sha512-B3WXxI54VxJkpXxnYibiF17si3bLXE1XOjrJB7wM5co9fx2KOEkiePDGiCCEtnapFHTnmAnYCPdA7WZTIpdn/A==}
 
   date-fns@2.30.0:
     resolution: {integrity: sha512-fnULvOpxnC5/Vg3NCiWelDsLiUc9bRwAPs/+LfTLNvetFCtCTN+yQz15C/fs4AwX1R9K5GLtLfn8QW+dWisaAw==}
@@ -8821,9 +8833,6 @@ packages:
     engines: {node: '>=4'}
     hasBin: true
 
-  err-code@3.0.1:
-    resolution: {integrity: sha512-GiaH0KJUewYok+eeY05IIgjtAe4Yltygk9Wqp1V5yVWLdhf0hYZchRjNIT9bb0mSwRcIusT3cx7PJUf3zEIfUA==}
-
   error-ex@1.3.2:
     resolution: {integrity: sha512-7dFHNmqeFSEt2ZBsCriorKnn3Z2pj+fd9kmI6QoWw4//DL+icEBfc0U7qJCisqrTsKTjw4fNFy2pW9OqStD84g==}
 
@@ -9137,10 +9146,6 @@ packages:
   ethers@5.7.2:
     resolution: {integrity: sha512-wswUsmWo1aOK8rR7DIKiWSw9DbLWe6x98Jrn8wcTflTVvaXhAMaB5zGAXy0GYQEQp9iO1iSHWVyARQm11zUtyg==}
 
-  ethers@6.12.1:
-    resolution: {integrity: sha512-j6wcVoZf06nqEcBbDWkKg8Fp895SS96dSnTCjiXT+8vt2o02raTn4Lo9ERUuIVU5bAjoPYeA+7ytQFexFmLuVw==}
-    engines: {node: '>=14.0.0'}
-
   ethers@6.13.2:
     resolution: {integrity: sha512-9VkriTTed+/27BGuY1s0hf441kqwHJ1wtN2edksEtiRvXx+soxRX3iSXTfFqq2+YwrOqbDoTHjIhQnjJRlzKmg==}
     engines: {node: '>=14.0.0'}
@@ -9162,10 +9167,6 @@ packages:
   event-target-shim@5.0.1:
     resolution: {integrity: sha512-i/2XbnSz/uxRCU6+NdVJgKWDTM427+MqYbkQzD321DuCQJUqOuJKIA0IM2+W2xtYHdKOmZ4dR6fExsd4SXL+WQ==}
     engines: {node: '>=6'}
-
-  event-target-shim@6.0.2:
-    resolution: {integrity: sha512-8q3LsZjRezbFZ2PN+uP+Q7pnHUMmAOziU2vA2OwoFaKIXxlxl38IylhSSgUorWu/rf4er67w0ikBqjBFk/pomA==}
-    engines: {node: '>=10.13.0'}
 
   eventemitter2@6.4.9:
     resolution: {integrity: sha512-JEPTiaOt9f04oa6NOkc4aH+nVp5I3wEjpHbIPqfgCdD5v5bUzy7xQqwcVO2aDQgOWhI28da57HksMrzK9HlRxg==}
@@ -9245,6 +9246,10 @@ packages:
 
   express@4.19.2:
     resolution: {integrity: sha512-5T6nhjsT+EOMzuck8JjBHARTHfMht0POzlA60WV2pMD3gyXw2LZnZ+ueGdNxG+0calOJcWKbpFcuzLZ91YWq9Q==}
+    engines: {node: '>= 0.10.0'}
+
+  express@4.21.1:
+    resolution: {integrity: sha512-YSFlK1Ee0/GC8QaO91tHcDxJiE/X4FbpAyQWkxAvG6AXCuR65YzK8ua6D9hvi/TzUfZMpc+BwuM1IPw8fmQBiQ==}
     engines: {node: '>= 0.10.0'}
 
   ext@1.7.0:
@@ -9390,6 +9395,10 @@ packages:
 
   finalhandler@1.2.0:
     resolution: {integrity: sha512-5uXcUVftlQMFnWC9qu/svkWv3GTd2PfUhK/3PLkYNAe7FbqJMt3515HaxE6eRL74GdsriiwujiawdaB1BpEISg==}
+    engines: {node: '>= 0.8'}
+
+  finalhandler@1.3.1:
+    resolution: {integrity: sha512-6BN9trH7bp3qvnrRyzsBz+g3lZxTNZTbVO2EV1CS0WIcDbawYVdYvGflME/9QP0h0pYlCDBCTjYa9nZzMDpyxQ==}
     engines: {node: '>= 0.8'}
 
   find-cache-dir@2.1.0:
@@ -10068,11 +10077,11 @@ packages:
     resolution: {integrity: sha512-QQnnxNyfvmHFIsj7gkPcYymR8Jdw/o7mp5ZFihxn6h8Ci6fh3Dx4E1gPjpQEpIuPo9XVNY/ZUwh4BPMjGyL01g==}
     engines: {node: ^14.17.0 || ^16.13.0 || >=18.0.0}
 
-  interface-datastore@8.2.11:
-    resolution: {integrity: sha512-9E0iXehfp/j0UbZ2mvlYB4K9pP7uQBCppfuy8WHs1EHF6wLQrM9+zwyX+8Qt6HnH4GKZRyXX/CNXm6oD4+QYgA==}
+  interface-datastore@8.3.1:
+    resolution: {integrity: sha512-3r0ETmHIi6HmvM5sc09QQiCD3gUfwtEM/AAChOyAd/UAKT69uk8LXfTSUBufbUIO/dU65Vj8nb9O6QjwW8vDSQ==}
 
-  interface-store@5.1.8:
-    resolution: {integrity: sha512-7na81Uxkl0vqk0CBPO5PvyTkdaJBaezwUJGsMOz7riPOq0rJt+7W31iaopaMICWea/iykUsvNlPx/Tc+MxC3/w==}
+  interface-store@6.0.2:
+    resolution: {integrity: sha512-KSFCXtBlNoG0hzwNa0RmhHtrdhzexp+S+UY2s0rWTBJyfdEIgn6i6Zl9otVqrcFYbYrneBT7hbmHQ8gE0C3umA==}
 
   internal-slot@1.0.7:
     resolution: {integrity: sha512-NGnrKwXzSms2qUUih/ILZ5JBqNTSa1+ZmP6flaIp6KmSElgE9qdndzS3cqjrDovwFdmwsGsLdeFgB6suw+1e9g==}
@@ -10261,6 +10270,10 @@ packages:
   is-negative-zero@2.0.3:
     resolution: {integrity: sha512-5KoIu2Ngpyek75jXodFvnafB6DJgr3u8uuK0LEZJjrU19DrMD3EVERaR8sjz8CCGgpZvxPl9SuE1GMVPFHx1mw==}
     engines: {node: '>= 0.4'}
+
+  is-network-error@1.1.0:
+    resolution: {integrity: sha512-tUdRRAnhT+OtCZR/LxZelH/C7QtjtFrTu5tXCA8pl55eTUElUHT+GPYV8MBMBvea/j+NxQqVt3LbWMRir7Gx9g==}
+    engines: {node: '>=16'}
 
   is-number-object@1.0.7:
     resolution: {integrity: sha512-k1U0IRzLMo7ZlYIfzRu23Oh6MiIFasgpb9X76eqfFZAqwH44UI4KTBvBYIZ1dSL9ZzChTB9ShHfLkR4pdW5krQ==}
@@ -10489,9 +10502,6 @@ packages:
 
   it-filter@3.1.1:
     resolution: {integrity: sha512-TOXmVuaSkxlLp2hXKoMTra0WMZMKVFxE3vSsbIA+PbADNCBAHhjJ/lM31vBOUTddHMO34Ku++vU8T9PLlBxQtg==}
-
-  it-first@3.0.6:
-    resolution: {integrity: sha512-ExIewyK9kXKNAplg2GMeWfgjUcfC1FnUXz/RPfAvIXby+w7U4b3//5Lic0NV03gXT8O/isj5Nmp6KiY0d45pIQ==}
 
   it-foreach@2.1.1:
     resolution: {integrity: sha512-ID4Gxnavk/LVQLQESAQ9hR6dR63Ih6X+8VdxEktX8rpz2dCGAbZpey/eljTNbMfV2UKXHiu6UsneoNBZuac97g==}
@@ -10840,8 +10850,8 @@ packages:
     engines: {node: '>=16'}
     hasBin: true
 
-  libp2p@1.9.2:
-    resolution: {integrity: sha512-cvzSC3UM9A1w6kb3GO9+iqRwCg/c/4hF6RZTF0SyY5U3xVawXSQPMcB5td9d+20HcNrYm2uWKjlexORllAT2hA==}
+  libp2p@2.1.7:
+    resolution: {integrity: sha512-nUxws8eHeI4jREZJFNdif20c8jYnqPkmvioI3y/hICgXchkhcKzgT1E3jEd2CVT+isskr5LnJ1n70aw6bt0m6w==}
 
   libsodium-sumo@0.7.13:
     resolution: {integrity: sha512-zTGdLu4b9zSNLfovImpBCbdAA4xkpkZbMnSQjP8HShyOutnGjRHmSOKlsylh1okao6QhLiz7nG98EGn+04cZjQ==}
@@ -11615,8 +11625,8 @@ packages:
   multiformats@13.1.0:
     resolution: {integrity: sha512-HzdtdBwxsIkzpeXzhQ5mAhhuxcHbjEHH+JQoxt7hG/2HGFjjwyolLo7hbaexcnhoEuV4e0TNJ8kkpMjiEYY4VQ==}
 
-  multiformats@13.2.2:
-    resolution: {integrity: sha512-RWI+nyf0q64vyOxL8LbKtjJMki0sogRL/8axvklNtiTM0iFCVtHwME9w6+0P1/v4dQvsIg8A45oT3ka1t/M/+A==}
+  multiformats@13.3.0:
+    resolution: {integrity: sha512-CBiqvsufgmpo01VT5ze94O+uc+Pbf6f/sThlvWss0sBZmAOu6GQn5usrYV2sf2mr17FWYc0rO8c/CNe2T90QAA==}
 
   multiformats@9.9.0:
     resolution: {integrity: sha512-HoMUjhH9T8DDBNT+6xzkrd9ga/XiBI4xLr58LJACwK6G3HTOPeMz4nB4KJs33L2BelrIJa7P0VuNaVF3hMYfjg==}
@@ -11709,10 +11719,6 @@ packages:
     resolution: {integrity: sha512-mNcltoe1R8o7STTegSOHdnJNN7s5EUvhoS7ShnTHDyOSd+8H+UdWODq6qSv67PjC8Zc5JRT8+oLAMCr0SIXw7g==}
     engines: {node: ^16 || ^18 || >= 20}
 
-  node-datachannel@0.11.0:
-    resolution: {integrity: sha512-8/vAMms32XxgJ9FIRDXbfmmH1ROm0HBdsa/XteIcUWN4VTQN38UITTkuu6YsfQzN/CQp8YhhnfAEzEadQJ2c6Q==}
-    engines: {node: '>=16.0.0'}
-
   node-dir@0.1.17:
     resolution: {integrity: sha512-tmPX422rYgofd4epzrNoOXiE8XFZYOcCq1vD7MAXCDO+O+zndlA2ztdKKMa+EeuBG5tHETpr4ml4RGgpqDCCAg==}
     engines: {node: '>= 0.10.5'}
@@ -11720,10 +11726,6 @@ packages:
   node-domexception@1.0.0:
     resolution: {integrity: sha512-/jKZoMpw0F8GRwl4/eLROPA3cfcXtLApP0QzLmUT/HuPCZWyB7IY9ZrMeKw2O/nFIqPQB3PVM9aYm0F312AXDQ==}
     engines: {node: '>=10.5.0'}
-
-  node-domexception@2.0.1:
-    resolution: {integrity: sha512-M85rnSC7WQ7wnfQTARPT4LrK7nwCHLdDFOCcItZMhTQjyCebJH8GciKqYJNgaOFZs9nFmTmd/VMyi3OW5jA47w==}
-    engines: {node: '>=16'}
 
   node-fetch-native@1.6.4:
     resolution: {integrity: sha512-IhOigYzAKHd244OC0JIMIUrjzctirCmPkaIfhDeGcEETWof5zKYUW7e7MYvChGWh/4CJeXEgsRyGzuF334rOOQ==}
@@ -12022,6 +12024,10 @@ packages:
     resolution: {integrity: sha512-NXzu9aQJTAzbBqOt2hwsR63ea7yvxJc0PwN/zobNAudYfb1B7R08SzB4TsLeSbUCuG467NhnoT0oO6w1qRO+BA==}
     engines: {node: '>=18'}
 
+  p-retry@6.2.0:
+    resolution: {integrity: sha512-JA6nkq6hKyWLLasXQXUrO4z8BUZGUt/LjlJxx8Gb2+2ntodU/SS63YZ8b0LUTbQ8ZB9iwOfhEPhg4ykKnn2KsA==}
+    engines: {node: '>=16.17'}
+
   p-timeout@3.2.0:
     resolution: {integrity: sha512-rhIwUycgwwKcP9yTOOFK/AKsAopjjCakVqLHePO3CC6Mir1Z99xT+R63jZxAT5lFZLa2inS5h+ZS2GvR99/FBg==}
     engines: {node: '>=8'}
@@ -12152,6 +12158,9 @@ packages:
     resolution: {integrity: sha512-7xTavNy5RQXnsjANvVvMkEjvloOinkAjv/Z6Ildz9v2RinZ4SBKTWFOVRbaF8p0vpHnyjV/UwNDdKuUv6M5qcA==}
     engines: {node: '>=16 || 14 >=14.17'}
 
+  path-to-regexp@0.1.10:
+    resolution: {integrity: sha512-7lf7qcQidTku0Gu3YDPc8DJ1q7OOucfa/BSsIwjuh56VU7katFvuM8hULfkwB3Fns/rsVF7PwPKVw1sl5KQS9w==}
+
   path-to-regexp@0.1.7:
     resolution: {integrity: sha512-5DFkuoqlv1uYQKxy8omFBeJPQcdoE07Kv2sferDCrAq1ohOU+MSDswDIbnx3YAM60qIOnYa53wBhXW0EbMonrQ==}
 
@@ -12191,8 +12200,11 @@ packages:
   pg-connection-string@2.6.4:
     resolution: {integrity: sha512-v+Z7W/0EO707aNMaAEfiGnGL9sxxumwLl2fJvCQtMn9Fxsg+lPpPkdcyBSv/KFgpGdYkMfn+EI1Or2EHjpgLCA==}
 
-  pg-cursor@2.11.0:
-    resolution: {integrity: sha512-TLCOCtu+rqMarzjUi+/Ffc2DV5ZqO/27y5GqnK9Z3w51rWXMwC8FcO96Uf9/ORo5o+qRXEVJxM9Ts3K2K31MLg==}
+  pg-connection-string@2.7.0:
+    resolution: {integrity: sha512-PI2W9mv53rXJQEOb8xNR8lH7Hr+EKa6oJa38zsK0S/ky2er16ios1wLKhZyxzD7jUReiWokc9WK5nxSnC7W1TA==}
+
+  pg-cursor@2.12.0:
+    resolution: {integrity: sha512-rppw54OnuYZfMUjiJI2zJMwAjjt2V9EtLUb+t7V5tqwSE5Jxod+7vA7Y0FI6Nq976jNLciA0hoVkwvjjB8qzEw==}
     peerDependencies:
       pg: ^8
 
@@ -12209,8 +12221,16 @@ packages:
     peerDependencies:
       pg: '>=8.0'
 
+  pg-pool@3.7.0:
+    resolution: {integrity: sha512-ZOBQForurqh4zZWjrgSwwAtzJ7QiRX0ovFkZr2klsen3Nm0aoh33Ls0fzfv3imeH/nw/O27cjdz5kzYJfeGp/g==}
+    peerDependencies:
+      pg: '>=8.0'
+
   pg-protocol@1.6.1:
     resolution: {integrity: sha512-jPIlvgoD63hrEuihvIg+tJhoGjUsLPn6poJY9N5CnlPd91c2T18T/9zBtLxZSb1EhYxBRoZJtzScCaWlYLtktg==}
+
+  pg-protocol@1.7.0:
+    resolution: {integrity: sha512-hTK/mE36i8fDDhgDFjy6xNOG+LCorxLG3WO17tku+ij6sVHXh1jQUJ8hYAnRhNla4QVD2H8er/FOjc/+EgC6yQ==}
 
   pg-types@2.2.0:
     resolution: {integrity: sha512-qTAAlrEsl8s4OiEQY69wDvcMIdQN6wdz5ojQiOy6YRMuynxenON0O5oCpJI6lshc6scgAY8qvJ2On/p+CXY0GA==}
@@ -12229,8 +12249,8 @@ packages:
       pg-native:
         optional: true
 
-  pg@8.12.0:
-    resolution: {integrity: sha512-A+LHUSnwnxrnL/tZ+OLfqR1SxLN3c/pgDztZ47Rpbsd4jUytsTtwQo/TLPRzPJMp/1pbhYVhH9cuSZLAajNfjQ==}
+  pg@8.13.0:
+    resolution: {integrity: sha512-34wkUTh3SxTClfoHB3pQ7bIMvw9dpFU1audQQeZG837fmHfHpr14n/AELVDoOYVDW2h5RDWU78tFjkD+erSBsw==}
     engines: {node: '>= 8.0.0'}
     peerDependencies:
       pg-native: '>=3.0.1'
@@ -12549,9 +12569,6 @@ packages:
     resolution: {integrity: sha512-YWD03n3shzV9ImZRX3ccbjqLxj7NokGN0V/ESiBV5xWqrommYHYiihuIyavq03pWSGqlyvYUFmfoMKd+1rPA/g==}
     engines: {node: '>=12.0.0'}
 
-  protons-runtime@5.4.0:
-    resolution: {integrity: sha512-XfA++W/WlQOSyjUyuF5lgYBfXZUEMP01Oh1C2dSwZAlF2e/ZrMRPfWonXj6BGM+o8Xciv7w0tsRMKYwYEuQvaw==}
-
   protons-runtime@5.5.0:
     resolution: {integrity: sha512-EsALjF9QsrEk6gbCx3lmfHxVN0ah7nG3cY7GySD4xf4g8cr7g543zB88Foh897Sr1RQJ9yDCUsoT1i1H/cVUFA==}
 
@@ -12612,6 +12629,10 @@ packages:
 
   qs@6.12.1:
     resolution: {integrity: sha512-zWmv4RSuB9r2mYQw3zxQuHWeU+42aKi1wWig/j4ele4ygELZ7PEO6MM7rim9oAQH2A5MWfsAVf/jPvTPgCbvUQ==}
+    engines: {node: '>=0.6'}
+
+  qs@6.13.0:
+    resolution: {integrity: sha512-+38qI9SOr8tfZ4QmJNplMUxqjbe7LKvvZgWdExBOmd+egZTtjLB67Gu0HRX3u/XOq7UU2Nx6nsjvS16Z9uwfpg==}
     engines: {node: '>=0.6'}
 
   qs@6.5.3:
@@ -12866,11 +12887,6 @@ packages:
     peerDependencies:
       react: '*'
       react-native: '*'
-
-  react-native-webrtc@118.0.7:
-    resolution: {integrity: sha512-odgd4CNSGQmI8n/pEbxlUtJBTJ8uqE51B1/NUEAvO1AQbeXsyFNHEG0H2T27eMefo5u0GKcRpNkZpXi6fctTkQ==}
-    peerDependencies:
-      react-native: '>=0.60.0'
 
   react-native-webview@11.26.1:
     resolution: {integrity: sha512-hC7BkxOpf+z0UKhxFSFTPAM4shQzYmZHoELa6/8a/MspcjEP7ukYKpuSUTLDywQditT8yI9idfcKvfZDKQExGw==}
@@ -13232,6 +13248,10 @@ packages:
 
   retry-as-promised@7.0.4:
     resolution: {integrity: sha512-XgmCoxKWkDofwH8WddD0w85ZfqYz+ZHlr5yo+3YUCfycWawU56T5ckWXsScsj5B8tqUcIG67DxXByo3VUgiAdA==}
+
+  retry@0.13.1:
+    resolution: {integrity: sha512-XQBQ3I8W1Cge0Seh+6gjj03LbmRFWuoszgK9ooCpwYIrhhoO80pfq4cUkU5DkknwfOfFteRwlZ56PYOGYyFWdg==}
+    engines: {node: '>= 4'}
 
   reusify@1.0.4:
     resolution: {integrity: sha512-U9nH88a3fc/ekCF1l0/UP1IosiuIjyTh7hBvXVMHYgVcfGvt897Xguj2UOLDeI5BG2m7/uwyaLVT6fbtCwTyzw==}
@@ -15218,18 +15238,6 @@ packages:
       utf-8-validate:
         optional: true
 
-  ws@8.5.0:
-    resolution: {integrity: sha512-BWX0SWVgLPzYwF8lTzEy1egjhS4S4OEAHfsO8o65WOVsrnSRGaSiUaa9e0ggGlkMTtBlmOpEXiie9RUcBO86qg==}
-    engines: {node: '>=10.0.0'}
-    peerDependencies:
-      bufferutil: ^4.0.1
-      utf-8-validate: ^5.0.2
-    peerDependenciesMeta:
-      bufferutil:
-        optional: true
-      utf-8-validate:
-        optional: true
-
   xhr-request-promise@0.1.3:
     resolution: {integrity: sha512-YUBytBsuwgitWtdRzXDDkWAXzhdGB8bYm0sSzMPZT7Z2MBjMSTHFsyCT1yCRATY+XC69DUrQraRAEgcoCRaIPg==}
 
@@ -15659,7 +15667,7 @@ snapshots:
       '@smithy/util-middleware': 3.0.0
       '@smithy/util-retry': 3.0.0
       '@smithy/util-utf8': 3.0.0
-      tslib: 2.6.2
+      tslib: 2.7.0
     transitivePeerDependencies:
       - '@aws-sdk/client-sts'
       - aws-crt
@@ -15748,7 +15756,7 @@ snapshots:
       '@smithy/util-middleware': 3.0.0
       '@smithy/util-retry': 3.0.0
       '@smithy/util-utf8': 3.0.0
-      tslib: 2.6.2
+      tslib: 2.7.0
     transitivePeerDependencies:
       - aws-crt
 
@@ -15760,7 +15768,7 @@ snapshots:
       '@smithy/smithy-client': 3.0.1
       '@smithy/types': 3.0.0
       fast-xml-parser: 4.2.5
-      tslib: 2.6.2
+      tslib: 2.7.0
 
   '@aws-sdk/credential-provider-env@3.577.0':
     dependencies:
@@ -15811,7 +15819,7 @@ snapshots:
       '@smithy/property-provider': 3.0.0
       '@smithy/shared-ini-file-loader': 3.0.0
       '@smithy/types': 3.0.0
-      tslib: 2.6.2
+      tslib: 2.7.0
     transitivePeerDependencies:
       - '@aws-sdk/client-sso-oidc'
       - '@aws-sdk/client-sts'
@@ -15865,14 +15873,14 @@ snapshots:
       '@smithy/protocol-http': 4.0.0
       '@smithy/types': 3.0.0
       '@smithy/util-config-provider': 3.0.0
-      tslib: 2.6.2
+      tslib: 2.7.0
 
   '@aws-sdk/middleware-expect-continue@3.577.0':
     dependencies:
       '@aws-sdk/types': 3.577.0
       '@smithy/protocol-http': 4.0.0
       '@smithy/types': 3.0.0
-      tslib: 2.6.2
+      tslib: 2.7.0
 
   '@aws-sdk/middleware-flexible-checksums@3.577.0':
     dependencies:
@@ -15883,33 +15891,33 @@ snapshots:
       '@smithy/protocol-http': 4.0.0
       '@smithy/types': 3.0.0
       '@smithy/util-utf8': 3.0.0
-      tslib: 2.6.2
+      tslib: 2.7.0
 
   '@aws-sdk/middleware-host-header@3.577.0':
     dependencies:
       '@aws-sdk/types': 3.577.0
       '@smithy/protocol-http': 4.0.0
       '@smithy/types': 3.0.0
-      tslib: 2.6.2
+      tslib: 2.7.0
 
   '@aws-sdk/middleware-location-constraint@3.577.0':
     dependencies:
       '@aws-sdk/types': 3.577.0
       '@smithy/types': 3.0.0
-      tslib: 2.6.2
+      tslib: 2.7.0
 
   '@aws-sdk/middleware-logger@3.577.0':
     dependencies:
       '@aws-sdk/types': 3.577.0
       '@smithy/types': 3.0.0
-      tslib: 2.6.2
+      tslib: 2.7.0
 
   '@aws-sdk/middleware-recursion-detection@3.577.0':
     dependencies:
       '@aws-sdk/types': 3.577.0
       '@smithy/protocol-http': 4.0.0
       '@smithy/types': 3.0.0
-      tslib: 2.6.2
+      tslib: 2.7.0
 
   '@aws-sdk/middleware-sdk-s3@3.577.0':
     dependencies:
@@ -15921,7 +15929,7 @@ snapshots:
       '@smithy/smithy-client': 3.0.1
       '@smithy/types': 3.0.0
       '@smithy/util-config-provider': 3.0.0
-      tslib: 2.6.2
+      tslib: 2.7.0
 
   '@aws-sdk/middleware-signing@3.577.0':
     dependencies:
@@ -15931,13 +15939,13 @@ snapshots:
       '@smithy/signature-v4': 3.0.0
       '@smithy/types': 3.0.0
       '@smithy/util-middleware': 3.0.0
-      tslib: 2.6.2
+      tslib: 2.7.0
 
   '@aws-sdk/middleware-ssec@3.577.0':
     dependencies:
       '@aws-sdk/types': 3.577.0
       '@smithy/types': 3.0.0
-      tslib: 2.6.2
+      tslib: 2.7.0
 
   '@aws-sdk/middleware-user-agent@3.577.0':
     dependencies:
@@ -15945,7 +15953,7 @@ snapshots:
       '@aws-sdk/util-endpoints': 3.577.0
       '@smithy/protocol-http': 4.0.0
       '@smithy/types': 3.0.0
-      tslib: 2.6.2
+      tslib: 2.7.0
 
   '@aws-sdk/region-config-resolver@3.577.0':
     dependencies:
@@ -15954,7 +15962,7 @@ snapshots:
       '@smithy/types': 3.0.0
       '@smithy/util-config-provider': 3.0.0
       '@smithy/util-middleware': 3.0.0
-      tslib: 2.6.2
+      tslib: 2.7.0
 
   '@aws-sdk/s3-request-presigner@3.577.0':
     dependencies:
@@ -15974,7 +15982,7 @@ snapshots:
       '@smithy/protocol-http': 4.0.0
       '@smithy/signature-v4': 3.0.0
       '@smithy/types': 3.0.0
-      tslib: 2.6.2
+      tslib: 2.7.0
 
   '@aws-sdk/token-providers@3.577.0(@aws-sdk/client-sso-oidc@3.577.0)':
     dependencies:
@@ -15988,7 +15996,7 @@ snapshots:
   '@aws-sdk/types@3.577.0':
     dependencies:
       '@smithy/types': 3.0.0
-      tslib: 2.6.2
+      tslib: 2.7.0
 
   '@aws-sdk/util-arn-parser@3.568.0':
     dependencies:
@@ -15999,14 +16007,14 @@ snapshots:
       '@aws-sdk/types': 3.577.0
       '@smithy/types': 3.0.0
       '@smithy/util-endpoints': 2.0.0
-      tslib: 2.6.2
+      tslib: 2.7.0
 
   '@aws-sdk/util-format-url@3.577.0':
     dependencies:
       '@aws-sdk/types': 3.577.0
       '@smithy/querystring-builder': 3.0.0
       '@smithy/types': 3.0.0
-      tslib: 2.6.2
+      tslib: 2.7.0
 
   '@aws-sdk/util-locate-window@3.568.0':
     dependencies:
@@ -16017,14 +16025,14 @@ snapshots:
       '@aws-sdk/types': 3.577.0
       '@smithy/types': 3.0.0
       bowser: 2.11.0
-      tslib: 2.6.2
+      tslib: 2.7.0
 
   '@aws-sdk/util-user-agent-node@3.577.0':
     dependencies:
       '@aws-sdk/types': 3.577.0
       '@smithy/node-config-provider': 3.0.0
       '@smithy/types': 3.0.0
-      tslib: 2.6.2
+      tslib: 2.7.0
 
   '@aws-sdk/util-utf8-browser@3.259.0':
     dependencies:
@@ -16033,7 +16041,7 @@ snapshots:
   '@aws-sdk/xml-builder@3.575.0':
     dependencies:
       '@smithy/types': 3.0.0
-      tslib: 2.6.2
+      tslib: 2.7.0
 
   '@babel/code-frame@7.24.2':
     dependencies:
@@ -16093,6 +16101,7 @@ snapshots:
       semver: 6.3.1
     transitivePeerDependencies:
       - supports-color
+    optional: true
 
   '@babel/generator@7.25.6':
     dependencies:
@@ -16177,6 +16186,7 @@ snapshots:
       semver: 6.3.1
     transitivePeerDependencies:
       - supports-color
+    optional: true
 
   '@babel/helper-create-regexp-features-plugin@7.25.2(@babel/core@7.24.5)':
     dependencies:
@@ -16198,6 +16208,7 @@ snapshots:
       '@babel/helper-annotate-as-pure': 7.25.7
       regexpu-core: 6.1.1
       semver: 6.3.1
+    optional: true
 
   '@babel/helper-define-polyfill-provider@0.6.2(@babel/core@7.24.5)':
     dependencies:
@@ -16220,6 +16231,7 @@ snapshots:
       resolve: 1.22.8
     transitivePeerDependencies:
       - supports-color
+    optional: true
 
   '@babel/helper-environment-visitor@7.22.20': {}
 
@@ -16284,6 +16296,7 @@ snapshots:
       '@babel/traverse': 7.25.7
     transitivePeerDependencies:
       - supports-color
+    optional: true
 
   '@babel/helper-optimise-call-expression@7.24.7':
     dependencies:
@@ -16323,6 +16336,7 @@ snapshots:
       '@babel/traverse': 7.25.7
     transitivePeerDependencies:
       - supports-color
+    optional: true
 
   '@babel/helper-replace-supers@7.25.0(@babel/core@7.24.5)':
     dependencies:
@@ -16350,6 +16364,7 @@ snapshots:
       '@babel/traverse': 7.25.7
     transitivePeerDependencies:
       - supports-color
+    optional: true
 
   '@babel/helper-simple-access@7.24.7':
     dependencies:
@@ -16423,6 +16438,7 @@ snapshots:
     dependencies:
       '@babel/template': 7.25.7
       '@babel/types': 7.25.7
+    optional: true
 
   '@babel/highlight@7.24.5':
     dependencies:
@@ -16476,6 +16492,7 @@ snapshots:
       '@babel/traverse': 7.25.7
     transitivePeerDependencies:
       - supports-color
+    optional: true
 
   '@babel/plugin-bugfix-safari-class-field-initializer-scope@7.25.7(@babel/core@7.24.5)':
     dependencies:
@@ -16486,6 +16503,7 @@ snapshots:
     dependencies:
       '@babel/core': 7.25.7
       '@babel/helper-plugin-utils': 7.25.7
+    optional: true
 
   '@babel/plugin-bugfix-safari-id-destructuring-collision-in-function-expression@7.25.7(@babel/core@7.24.5)':
     dependencies:
@@ -16496,6 +16514,7 @@ snapshots:
     dependencies:
       '@babel/core': 7.25.7
       '@babel/helper-plugin-utils': 7.25.7
+    optional: true
 
   '@babel/plugin-bugfix-v8-spread-parameters-in-optional-chaining@7.25.7(@babel/core@7.24.5)':
     dependencies:
@@ -16514,6 +16533,7 @@ snapshots:
       '@babel/plugin-transform-optional-chaining': 7.25.7(@babel/core@7.25.7)
     transitivePeerDependencies:
       - supports-color
+    optional: true
 
   '@babel/plugin-bugfix-v8-static-class-fields-redefine-readonly@7.25.7(@babel/core@7.24.5)':
     dependencies:
@@ -16530,6 +16550,7 @@ snapshots:
       '@babel/traverse': 7.25.7
     transitivePeerDependencies:
       - supports-color
+    optional: true
 
   '@babel/plugin-proposal-async-generator-functions@7.20.7(@babel/core@7.24.5)':
     dependencies:
@@ -16560,6 +16581,7 @@ snapshots:
       '@babel/core': 7.25.7
       '@babel/helper-plugin-utils': 7.25.7
       '@babel/plugin-syntax-export-default-from': 7.25.7(@babel/core@7.25.7)
+    optional: true
 
   '@babel/plugin-proposal-logical-assignment-operators@7.20.7(@babel/core@7.24.5)':
     dependencies:
@@ -16610,6 +16632,7 @@ snapshots:
   '@babel/plugin-proposal-private-property-in-object@7.21.0-placeholder-for-preset-env.2(@babel/core@7.25.7)':
     dependencies:
       '@babel/core': 7.25.7
+    optional: true
 
   '@babel/plugin-syntax-async-generators@7.8.4(@babel/core@7.24.5)':
     dependencies:
@@ -16620,6 +16643,7 @@ snapshots:
     dependencies:
       '@babel/core': 7.25.7
       '@babel/helper-plugin-utils': 7.24.8
+    optional: true
 
   '@babel/plugin-syntax-class-properties@7.12.13(@babel/core@7.24.5)':
     dependencies:
@@ -16630,6 +16654,7 @@ snapshots:
     dependencies:
       '@babel/core': 7.25.7
       '@babel/helper-plugin-utils': 7.25.7
+    optional: true
 
   '@babel/plugin-syntax-class-static-block@7.14.5(@babel/core@7.24.5)':
     dependencies:
@@ -16640,6 +16665,7 @@ snapshots:
     dependencies:
       '@babel/core': 7.25.7
       '@babel/helper-plugin-utils': 7.25.7
+    optional: true
 
   '@babel/plugin-syntax-dynamic-import@7.8.3(@babel/core@7.24.5)':
     dependencies:
@@ -16650,6 +16676,7 @@ snapshots:
     dependencies:
       '@babel/core': 7.25.7
       '@babel/helper-plugin-utils': 7.24.8
+    optional: true
 
   '@babel/plugin-syntax-export-default-from@7.24.7(@babel/core@7.24.5)':
     dependencies:
@@ -16660,6 +16687,7 @@ snapshots:
     dependencies:
       '@babel/core': 7.25.7
       '@babel/helper-plugin-utils': 7.25.7
+    optional: true
 
   '@babel/plugin-syntax-export-namespace-from@7.8.3(@babel/core@7.24.5)':
     dependencies:
@@ -16670,6 +16698,7 @@ snapshots:
     dependencies:
       '@babel/core': 7.25.7
       '@babel/helper-plugin-utils': 7.25.7
+    optional: true
 
   '@babel/plugin-syntax-flow@7.24.7(@babel/core@7.24.5)':
     dependencies:
@@ -16680,11 +16709,13 @@ snapshots:
     dependencies:
       '@babel/core': 7.25.7
       '@babel/helper-plugin-utils': 7.24.8
+    optional: true
 
   '@babel/plugin-syntax-flow@7.25.7(@babel/core@7.25.7)':
     dependencies:
       '@babel/core': 7.25.7
       '@babel/helper-plugin-utils': 7.25.7
+    optional: true
 
   '@babel/plugin-syntax-import-assertions@7.25.7(@babel/core@7.24.5)':
     dependencies:
@@ -16695,6 +16726,7 @@ snapshots:
     dependencies:
       '@babel/core': 7.25.7
       '@babel/helper-plugin-utils': 7.25.7
+    optional: true
 
   '@babel/plugin-syntax-import-attributes@7.25.7(@babel/core@7.24.5)':
     dependencies:
@@ -16705,6 +16737,7 @@ snapshots:
     dependencies:
       '@babel/core': 7.25.7
       '@babel/helper-plugin-utils': 7.25.7
+    optional: true
 
   '@babel/plugin-syntax-import-meta@7.10.4(@babel/core@7.24.5)':
     dependencies:
@@ -16715,6 +16748,7 @@ snapshots:
     dependencies:
       '@babel/core': 7.25.7
       '@babel/helper-plugin-utils': 7.25.7
+    optional: true
 
   '@babel/plugin-syntax-json-strings@7.8.3(@babel/core@7.24.5)':
     dependencies:
@@ -16725,6 +16759,7 @@ snapshots:
     dependencies:
       '@babel/core': 7.25.7
       '@babel/helper-plugin-utils': 7.25.7
+    optional: true
 
   '@babel/plugin-syntax-jsx@7.24.7(@babel/core@7.24.5)':
     dependencies:
@@ -16735,6 +16770,7 @@ snapshots:
     dependencies:
       '@babel/core': 7.25.7
       '@babel/helper-plugin-utils': 7.25.7
+    optional: true
 
   '@babel/plugin-syntax-logical-assignment-operators@7.10.4(@babel/core@7.24.5)':
     dependencies:
@@ -16745,6 +16781,7 @@ snapshots:
     dependencies:
       '@babel/core': 7.25.7
       '@babel/helper-plugin-utils': 7.24.8
+    optional: true
 
   '@babel/plugin-syntax-nullish-coalescing-operator@7.8.3(@babel/core@7.24.5)':
     dependencies:
@@ -16755,6 +16792,7 @@ snapshots:
     dependencies:
       '@babel/core': 7.25.7
       '@babel/helper-plugin-utils': 7.24.8
+    optional: true
 
   '@babel/plugin-syntax-numeric-separator@7.10.4(@babel/core@7.24.5)':
     dependencies:
@@ -16765,6 +16803,7 @@ snapshots:
     dependencies:
       '@babel/core': 7.25.7
       '@babel/helper-plugin-utils': 7.24.8
+    optional: true
 
   '@babel/plugin-syntax-object-rest-spread@7.8.3(@babel/core@7.24.5)':
     dependencies:
@@ -16775,6 +16814,7 @@ snapshots:
     dependencies:
       '@babel/core': 7.25.7
       '@babel/helper-plugin-utils': 7.24.8
+    optional: true
 
   '@babel/plugin-syntax-optional-catch-binding@7.8.3(@babel/core@7.24.5)':
     dependencies:
@@ -16785,6 +16825,7 @@ snapshots:
     dependencies:
       '@babel/core': 7.25.7
       '@babel/helper-plugin-utils': 7.24.8
+    optional: true
 
   '@babel/plugin-syntax-optional-chaining@7.8.3(@babel/core@7.24.5)':
     dependencies:
@@ -16795,6 +16836,7 @@ snapshots:
     dependencies:
       '@babel/core': 7.25.7
       '@babel/helper-plugin-utils': 7.24.8
+    optional: true
 
   '@babel/plugin-syntax-private-property-in-object@7.14.5(@babel/core@7.24.5)':
     dependencies:
@@ -16805,6 +16847,7 @@ snapshots:
     dependencies:
       '@babel/core': 7.25.7
       '@babel/helper-plugin-utils': 7.24.8
+    optional: true
 
   '@babel/plugin-syntax-top-level-await@7.14.5(@babel/core@7.24.5)':
     dependencies:
@@ -16815,6 +16858,7 @@ snapshots:
     dependencies:
       '@babel/core': 7.25.7
       '@babel/helper-plugin-utils': 7.25.7
+    optional: true
 
   '@babel/plugin-syntax-typescript@7.24.7(@babel/core@7.24.5)':
     dependencies:
@@ -16825,6 +16869,7 @@ snapshots:
     dependencies:
       '@babel/core': 7.25.7
       '@babel/helper-plugin-utils': 7.25.7
+    optional: true
 
   '@babel/plugin-syntax-unicode-sets-regex@7.18.6(@babel/core@7.24.5)':
     dependencies:
@@ -16837,6 +16882,7 @@ snapshots:
       '@babel/core': 7.25.7
       '@babel/helper-create-regexp-features-plugin': 7.25.7(@babel/core@7.25.7)
       '@babel/helper-plugin-utils': 7.25.7
+    optional: true
 
   '@babel/plugin-transform-arrow-functions@7.24.7(@babel/core@7.24.5)':
     dependencies:
@@ -16852,6 +16898,7 @@ snapshots:
     dependencies:
       '@babel/core': 7.25.7
       '@babel/helper-plugin-utils': 7.25.7
+    optional: true
 
   '@babel/plugin-transform-async-generator-functions@7.25.7(@babel/core@7.24.5)':
     dependencies:
@@ -16872,6 +16919,7 @@ snapshots:
       '@babel/traverse': 7.25.7
     transitivePeerDependencies:
       - supports-color
+    optional: true
 
   '@babel/plugin-transform-async-to-generator@7.24.7(@babel/core@7.24.5)':
     dependencies:
@@ -16899,6 +16947,7 @@ snapshots:
       '@babel/helper-remap-async-to-generator': 7.25.7(@babel/core@7.25.7)
     transitivePeerDependencies:
       - supports-color
+    optional: true
 
   '@babel/plugin-transform-block-scoped-functions@7.25.7(@babel/core@7.24.5)':
     dependencies:
@@ -16909,6 +16958,7 @@ snapshots:
     dependencies:
       '@babel/core': 7.25.7
       '@babel/helper-plugin-utils': 7.25.7
+    optional: true
 
   '@babel/plugin-transform-block-scoping@7.25.0(@babel/core@7.24.5)':
     dependencies:
@@ -16924,6 +16974,7 @@ snapshots:
     dependencies:
       '@babel/core': 7.25.7
       '@babel/helper-plugin-utils': 7.25.7
+    optional: true
 
   '@babel/plugin-transform-class-properties@7.25.7(@babel/core@7.24.5)':
     dependencies:
@@ -16940,6 +16991,7 @@ snapshots:
       '@babel/helper-plugin-utils': 7.25.7
     transitivePeerDependencies:
       - supports-color
+    optional: true
 
   '@babel/plugin-transform-class-static-block@7.25.7(@babel/core@7.24.5)':
     dependencies:
@@ -16958,6 +17010,7 @@ snapshots:
       '@babel/plugin-syntax-class-static-block': 7.14.5(@babel/core@7.25.7)
     transitivePeerDependencies:
       - supports-color
+    optional: true
 
   '@babel/plugin-transform-classes@7.25.0(@babel/core@7.24.5)':
     dependencies:
@@ -16994,6 +17047,7 @@ snapshots:
       globals: 11.12.0
     transitivePeerDependencies:
       - supports-color
+    optional: true
 
   '@babel/plugin-transform-computed-properties@7.24.7(@babel/core@7.24.5)':
     dependencies:
@@ -17012,6 +17066,7 @@ snapshots:
       '@babel/core': 7.25.7
       '@babel/helper-plugin-utils': 7.25.7
       '@babel/template': 7.25.7
+    optional: true
 
   '@babel/plugin-transform-destructuring@7.24.8(@babel/core@7.24.5)':
     dependencies:
@@ -17027,6 +17082,7 @@ snapshots:
     dependencies:
       '@babel/core': 7.25.7
       '@babel/helper-plugin-utils': 7.25.7
+    optional: true
 
   '@babel/plugin-transform-dotall-regex@7.25.7(@babel/core@7.24.5)':
     dependencies:
@@ -17039,6 +17095,7 @@ snapshots:
       '@babel/core': 7.25.7
       '@babel/helper-create-regexp-features-plugin': 7.25.7(@babel/core@7.25.7)
       '@babel/helper-plugin-utils': 7.25.7
+    optional: true
 
   '@babel/plugin-transform-duplicate-keys@7.25.7(@babel/core@7.24.5)':
     dependencies:
@@ -17049,6 +17106,7 @@ snapshots:
     dependencies:
       '@babel/core': 7.25.7
       '@babel/helper-plugin-utils': 7.25.7
+    optional: true
 
   '@babel/plugin-transform-duplicate-named-capturing-groups-regex@7.25.7(@babel/core@7.24.5)':
     dependencies:
@@ -17061,6 +17119,7 @@ snapshots:
       '@babel/core': 7.25.7
       '@babel/helper-create-regexp-features-plugin': 7.25.7(@babel/core@7.25.7)
       '@babel/helper-plugin-utils': 7.25.7
+    optional: true
 
   '@babel/plugin-transform-dynamic-import@7.25.7(@babel/core@7.24.5)':
     dependencies:
@@ -17073,6 +17132,7 @@ snapshots:
       '@babel/core': 7.25.7
       '@babel/helper-plugin-utils': 7.25.7
       '@babel/plugin-syntax-dynamic-import': 7.8.3(@babel/core@7.25.7)
+    optional: true
 
   '@babel/plugin-transform-exponentiation-operator@7.25.7(@babel/core@7.24.5)':
     dependencies:
@@ -17089,6 +17149,7 @@ snapshots:
       '@babel/helper-plugin-utils': 7.25.7
     transitivePeerDependencies:
       - supports-color
+    optional: true
 
   '@babel/plugin-transform-export-namespace-from@7.25.7(@babel/core@7.24.5)':
     dependencies:
@@ -17101,6 +17162,7 @@ snapshots:
       '@babel/core': 7.25.7
       '@babel/helper-plugin-utils': 7.25.7
       '@babel/plugin-syntax-export-namespace-from': 7.8.3(@babel/core@7.25.7)
+    optional: true
 
   '@babel/plugin-transform-flow-strip-types@7.25.2(@babel/core@7.24.5)':
     dependencies:
@@ -17113,6 +17175,7 @@ snapshots:
       '@babel/core': 7.25.7
       '@babel/helper-plugin-utils': 7.25.7
       '@babel/plugin-syntax-flow': 7.25.7(@babel/core@7.25.7)
+    optional: true
 
   '@babel/plugin-transform-for-of@7.25.7(@babel/core@7.24.5)':
     dependencies:
@@ -17129,6 +17192,7 @@ snapshots:
       '@babel/helper-skip-transparent-expression-wrappers': 7.25.7
     transitivePeerDependencies:
       - supports-color
+    optional: true
 
   '@babel/plugin-transform-function-name@7.25.1(@babel/core@7.24.5)':
     dependencies:
@@ -17156,6 +17220,7 @@ snapshots:
       '@babel/traverse': 7.25.7
     transitivePeerDependencies:
       - supports-color
+    optional: true
 
   '@babel/plugin-transform-json-strings@7.25.7(@babel/core@7.24.5)':
     dependencies:
@@ -17168,6 +17233,7 @@ snapshots:
       '@babel/core': 7.25.7
       '@babel/helper-plugin-utils': 7.25.7
       '@babel/plugin-syntax-json-strings': 7.8.3(@babel/core@7.25.7)
+    optional: true
 
   '@babel/plugin-transform-literals@7.25.2(@babel/core@7.24.5)':
     dependencies:
@@ -17183,6 +17249,7 @@ snapshots:
     dependencies:
       '@babel/core': 7.25.7
       '@babel/helper-plugin-utils': 7.25.7
+    optional: true
 
   '@babel/plugin-transform-logical-assignment-operators@7.25.7(@babel/core@7.24.5)':
     dependencies:
@@ -17195,6 +17262,7 @@ snapshots:
       '@babel/core': 7.25.7
       '@babel/helper-plugin-utils': 7.25.7
       '@babel/plugin-syntax-logical-assignment-operators': 7.10.4(@babel/core@7.25.7)
+    optional: true
 
   '@babel/plugin-transform-member-expression-literals@7.25.7(@babel/core@7.24.5)':
     dependencies:
@@ -17205,6 +17273,7 @@ snapshots:
     dependencies:
       '@babel/core': 7.25.7
       '@babel/helper-plugin-utils': 7.25.7
+    optional: true
 
   '@babel/plugin-transform-modules-amd@7.25.7(@babel/core@7.24.5)':
     dependencies:
@@ -17221,6 +17290,7 @@ snapshots:
       '@babel/helper-plugin-utils': 7.25.7
     transitivePeerDependencies:
       - supports-color
+    optional: true
 
   '@babel/plugin-transform-modules-commonjs@7.24.8(@babel/core@7.24.5)':
     dependencies:
@@ -17248,6 +17318,7 @@ snapshots:
       '@babel/helper-simple-access': 7.25.7
     transitivePeerDependencies:
       - supports-color
+    optional: true
 
   '@babel/plugin-transform-modules-systemjs@7.25.7(@babel/core@7.24.5)':
     dependencies:
@@ -17268,6 +17339,7 @@ snapshots:
       '@babel/traverse': 7.25.7
     transitivePeerDependencies:
       - supports-color
+    optional: true
 
   '@babel/plugin-transform-modules-umd@7.25.7(@babel/core@7.24.5)':
     dependencies:
@@ -17284,6 +17356,7 @@ snapshots:
       '@babel/helper-plugin-utils': 7.25.7
     transitivePeerDependencies:
       - supports-color
+    optional: true
 
   '@babel/plugin-transform-named-capturing-groups-regex@7.24.7(@babel/core@7.24.5)':
     dependencies:
@@ -17302,6 +17375,7 @@ snapshots:
       '@babel/core': 7.25.7
       '@babel/helper-create-regexp-features-plugin': 7.25.7(@babel/core@7.25.7)
       '@babel/helper-plugin-utils': 7.25.7
+    optional: true
 
   '@babel/plugin-transform-new-target@7.25.7(@babel/core@7.24.5)':
     dependencies:
@@ -17312,6 +17386,7 @@ snapshots:
     dependencies:
       '@babel/core': 7.25.7
       '@babel/helper-plugin-utils': 7.25.7
+    optional: true
 
   '@babel/plugin-transform-nullish-coalescing-operator@7.25.7(@babel/core@7.24.5)':
     dependencies:
@@ -17324,6 +17399,7 @@ snapshots:
       '@babel/core': 7.25.7
       '@babel/helper-plugin-utils': 7.25.7
       '@babel/plugin-syntax-nullish-coalescing-operator': 7.8.3(@babel/core@7.25.7)
+    optional: true
 
   '@babel/plugin-transform-numeric-separator@7.25.7(@babel/core@7.24.5)':
     dependencies:
@@ -17336,6 +17412,7 @@ snapshots:
       '@babel/core': 7.25.7
       '@babel/helper-plugin-utils': 7.25.7
       '@babel/plugin-syntax-numeric-separator': 7.10.4(@babel/core@7.25.7)
+    optional: true
 
   '@babel/plugin-transform-object-rest-spread@7.25.7(@babel/core@7.24.5)':
     dependencies:
@@ -17352,6 +17429,7 @@ snapshots:
       '@babel/helper-plugin-utils': 7.25.7
       '@babel/plugin-syntax-object-rest-spread': 7.8.3(@babel/core@7.25.7)
       '@babel/plugin-transform-parameters': 7.25.7(@babel/core@7.25.7)
+    optional: true
 
   '@babel/plugin-transform-object-super@7.25.7(@babel/core@7.24.5)':
     dependencies:
@@ -17368,6 +17446,7 @@ snapshots:
       '@babel/helper-replace-supers': 7.25.7(@babel/core@7.25.7)
     transitivePeerDependencies:
       - supports-color
+    optional: true
 
   '@babel/plugin-transform-optional-catch-binding@7.25.7(@babel/core@7.24.5)':
     dependencies:
@@ -17380,6 +17459,7 @@ snapshots:
       '@babel/core': 7.25.7
       '@babel/helper-plugin-utils': 7.25.7
       '@babel/plugin-syntax-optional-catch-binding': 7.8.3(@babel/core@7.25.7)
+    optional: true
 
   '@babel/plugin-transform-optional-chaining@7.25.7(@babel/core@7.24.5)':
     dependencies:
@@ -17398,6 +17478,7 @@ snapshots:
       '@babel/plugin-syntax-optional-chaining': 7.8.3(@babel/core@7.25.7)
     transitivePeerDependencies:
       - supports-color
+    optional: true
 
   '@babel/plugin-transform-parameters@7.24.7(@babel/core@7.24.5)':
     dependencies:
@@ -17413,6 +17494,7 @@ snapshots:
     dependencies:
       '@babel/core': 7.25.7
       '@babel/helper-plugin-utils': 7.25.7
+    optional: true
 
   '@babel/plugin-transform-private-methods@7.24.7(@babel/core@7.24.5)':
     dependencies:
@@ -17437,6 +17519,7 @@ snapshots:
       '@babel/helper-plugin-utils': 7.25.7
     transitivePeerDependencies:
       - supports-color
+    optional: true
 
   '@babel/plugin-transform-private-property-in-object@7.24.7(@babel/core@7.24.5)':
     dependencies:
@@ -17467,6 +17550,7 @@ snapshots:
       '@babel/plugin-syntax-private-property-in-object': 7.14.5(@babel/core@7.25.7)
     transitivePeerDependencies:
       - supports-color
+    optional: true
 
   '@babel/plugin-transform-property-literals@7.25.7(@babel/core@7.24.5)':
     dependencies:
@@ -17477,6 +17561,7 @@ snapshots:
     dependencies:
       '@babel/core': 7.25.7
       '@babel/helper-plugin-utils': 7.25.7
+    optional: true
 
   '@babel/plugin-transform-react-display-name@7.24.7(@babel/core@7.24.5)':
     dependencies:
@@ -17487,6 +17572,7 @@ snapshots:
     dependencies:
       '@babel/core': 7.25.7
       '@babel/helper-plugin-utils': 7.25.7
+    optional: true
 
   '@babel/plugin-transform-react-jsx-self@7.24.7(@babel/core@7.24.5)':
     dependencies:
@@ -17497,6 +17583,7 @@ snapshots:
     dependencies:
       '@babel/core': 7.25.7
       '@babel/helper-plugin-utils': 7.25.7
+    optional: true
 
   '@babel/plugin-transform-react-jsx-source@7.24.7(@babel/core@7.24.5)':
     dependencies:
@@ -17507,6 +17594,7 @@ snapshots:
     dependencies:
       '@babel/core': 7.25.7
       '@babel/helper-plugin-utils': 7.25.7
+    optional: true
 
   '@babel/plugin-transform-react-jsx@7.25.2(@babel/core@7.24.5)':
     dependencies:
@@ -17529,6 +17617,7 @@ snapshots:
       '@babel/types': 7.25.7
     transitivePeerDependencies:
       - supports-color
+    optional: true
 
   '@babel/plugin-transform-regenerator@7.25.7(@babel/core@7.24.5)':
     dependencies:
@@ -17541,6 +17630,7 @@ snapshots:
       '@babel/core': 7.25.7
       '@babel/helper-plugin-utils': 7.25.7
       regenerator-transform: 0.15.2
+    optional: true
 
   '@babel/plugin-transform-reserved-words@7.25.7(@babel/core@7.24.5)':
     dependencies:
@@ -17551,6 +17641,7 @@ snapshots:
     dependencies:
       '@babel/core': 7.25.7
       '@babel/helper-plugin-utils': 7.25.7
+    optional: true
 
   '@babel/plugin-transform-runtime@7.24.7(@babel/core@7.24.5)':
     dependencies:
@@ -17575,6 +17666,7 @@ snapshots:
       semver: 6.3.1
     transitivePeerDependencies:
       - supports-color
+    optional: true
 
   '@babel/plugin-transform-shorthand-properties@7.24.7(@babel/core@7.24.5)':
     dependencies:
@@ -17590,6 +17682,7 @@ snapshots:
     dependencies:
       '@babel/core': 7.25.7
       '@babel/helper-plugin-utils': 7.25.7
+    optional: true
 
   '@babel/plugin-transform-spread@7.24.7(@babel/core@7.24.5)':
     dependencies:
@@ -17614,6 +17707,7 @@ snapshots:
       '@babel/helper-skip-transparent-expression-wrappers': 7.25.7
     transitivePeerDependencies:
       - supports-color
+    optional: true
 
   '@babel/plugin-transform-sticky-regex@7.24.7(@babel/core@7.24.5)':
     dependencies:
@@ -17629,6 +17723,7 @@ snapshots:
     dependencies:
       '@babel/core': 7.25.7
       '@babel/helper-plugin-utils': 7.25.7
+    optional: true
 
   '@babel/plugin-transform-template-literals@7.25.7(@babel/core@7.24.5)':
     dependencies:
@@ -17639,6 +17734,7 @@ snapshots:
     dependencies:
       '@babel/core': 7.25.7
       '@babel/helper-plugin-utils': 7.25.7
+    optional: true
 
   '@babel/plugin-transform-typeof-symbol@7.25.7(@babel/core@7.24.5)':
     dependencies:
@@ -17649,6 +17745,7 @@ snapshots:
     dependencies:
       '@babel/core': 7.25.7
       '@babel/helper-plugin-utils': 7.25.7
+    optional: true
 
   '@babel/plugin-transform-typescript@7.25.2(@babel/core@7.24.5)':
     dependencies:
@@ -17671,6 +17768,7 @@ snapshots:
       '@babel/plugin-syntax-typescript': 7.25.7(@babel/core@7.25.7)
     transitivePeerDependencies:
       - supports-color
+    optional: true
 
   '@babel/plugin-transform-unicode-escapes@7.25.7(@babel/core@7.24.5)':
     dependencies:
@@ -17681,6 +17779,7 @@ snapshots:
     dependencies:
       '@babel/core': 7.25.7
       '@babel/helper-plugin-utils': 7.25.7
+    optional: true
 
   '@babel/plugin-transform-unicode-property-regex@7.25.7(@babel/core@7.24.5)':
     dependencies:
@@ -17693,6 +17792,7 @@ snapshots:
       '@babel/core': 7.25.7
       '@babel/helper-create-regexp-features-plugin': 7.25.7(@babel/core@7.25.7)
       '@babel/helper-plugin-utils': 7.25.7
+    optional: true
 
   '@babel/plugin-transform-unicode-regex@7.24.7(@babel/core@7.24.5)':
     dependencies:
@@ -17711,6 +17811,7 @@ snapshots:
       '@babel/core': 7.25.7
       '@babel/helper-create-regexp-features-plugin': 7.25.7(@babel/core@7.25.7)
       '@babel/helper-plugin-utils': 7.25.7
+    optional: true
 
   '@babel/plugin-transform-unicode-sets-regex@7.25.7(@babel/core@7.24.5)':
     dependencies:
@@ -17723,6 +17824,7 @@ snapshots:
       '@babel/core': 7.25.7
       '@babel/helper-create-regexp-features-plugin': 7.25.7(@babel/core@7.25.7)
       '@babel/helper-plugin-utils': 7.25.7
+    optional: true
 
   '@babel/preset-env@7.25.3(@babel/core@7.24.5)':
     dependencies:
@@ -17901,6 +18003,7 @@ snapshots:
       semver: 6.3.1
     transitivePeerDependencies:
       - supports-color
+    optional: true
 
   '@babel/preset-flow@7.24.7(@babel/core@7.24.5)':
     dependencies:
@@ -17922,6 +18025,7 @@ snapshots:
       '@babel/helper-plugin-utils': 7.25.7
       '@babel/types': 7.25.7
       esutils: 2.0.3
+    optional: true
 
   '@babel/preset-typescript@7.24.7(@babel/core@7.24.5)':
     dependencies:
@@ -18032,68 +18136,68 @@ snapshots:
 
   '@brillout/import@0.2.3': {}
 
-  '@canvas-js/chain-cosmos@0.10.10(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
+  '@canvas-js/chain-cosmos@0.11.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
     dependencies:
-      '@canvas-js/interfaces': 0.10.10
-      '@canvas-js/signatures': 0.10.10
-      '@canvas-js/utils': 0.10.10
+      '@canvas-js/interfaces': 0.11.0
+      '@canvas-js/signatures': 0.11.0
+      '@canvas-js/utils': 0.11.0
       '@cosmjs/amino': 0.32.3
       '@cosmjs/crypto': 0.32.3
       '@cosmjs/encoding': 0.32.3
       '@ipld/dag-cbor': 9.2.1
       '@ipld/dag-json': 10.2.2
       '@keplr-wallet/types': 0.11.64
-      '@libp2p/logger': 4.0.20
-      '@noble/curves': 1.5.0
-      '@noble/hashes': 1.4.0
+      '@libp2p/logger': 5.1.0
+      '@noble/curves': 1.6.0
+      '@noble/hashes': 1.5.0
       ethers: 6.13.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      multiformats: 13.2.2
+      multiformats: 13.3.0
     transitivePeerDependencies:
       - bufferutil
       - debug
       - utf-8-validate
 
-  '@canvas-js/chain-ethereum@0.10.10(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
+  '@canvas-js/chain-ethereum@0.11.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
     dependencies:
-      '@canvas-js/interfaces': 0.10.10
-      '@canvas-js/signatures': 0.10.10
-      '@canvas-js/utils': 0.10.10
+      '@canvas-js/interfaces': 0.11.0
+      '@canvas-js/signatures': 0.11.0
+      '@canvas-js/utils': 0.11.0
       '@ipld/dag-json': 10.2.2
-      '@libp2p/logger': 4.0.20
+      '@libp2p/logger': 5.1.0
       ethers: 6.13.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      multiformats: 13.2.2
+      multiformats: 13.3.0
       siwe: 2.3.2(ethers@6.13.2(bufferutil@4.0.8)(utf-8-validate@5.0.10))
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
 
-  '@canvas-js/chain-solana@0.10.10(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
+  '@canvas-js/chain-solana@0.11.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
     dependencies:
-      '@canvas-js/interfaces': 0.10.10
-      '@canvas-js/signatures': 0.10.10
-      '@canvas-js/utils': 0.10.10
+      '@canvas-js/interfaces': 0.11.0
+      '@canvas-js/signatures': 0.11.0
+      '@canvas-js/utils': 0.11.0
       '@ipld/dag-json': 10.2.2
-      '@libp2p/logger': 4.0.20
-      '@noble/curves': 1.5.0
+      '@libp2p/logger': 5.1.0
+      '@noble/curves': 1.6.0
       '@solana/web3.js': 1.95.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      multiformats: 13.2.2
+      multiformats: 13.3.0
     transitivePeerDependencies:
       - bufferutil
       - encoding
       - utf-8-validate
 
-  '@canvas-js/chain-substrate@0.10.10(@polkadot/api@6.0.5)(@polkadot/util@12.6.2)(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
+  '@canvas-js/chain-substrate@0.11.0(@polkadot/api@6.0.5)(@polkadot/util@12.6.2)(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
     dependencies:
-      '@canvas-js/interfaces': 0.10.10
-      '@canvas-js/signatures': 0.10.10
-      '@canvas-js/utils': 0.10.10
+      '@canvas-js/interfaces': 0.11.0
+      '@canvas-js/signatures': 0.11.0
+      '@canvas-js/utils': 0.11.0
       '@ipld/dag-json': 10.2.2
-      '@libp2p/logger': 4.0.20
-      '@noble/hashes': 1.4.0
+      '@libp2p/logger': 5.1.0
+      '@noble/hashes': 1.5.0
       '@polkadot/extension-inject': 0.46.9(@polkadot/api@6.0.5)(@polkadot/util@12.6.2)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@polkadot/keyring': 12.6.2(@polkadot/util-crypto@12.6.2(@polkadot/util@12.6.2))(@polkadot/util@12.6.2)
       '@polkadot/util-crypto': 12.6.2(@polkadot/util@12.6.2)
-      multiformats: 13.2.2
+      multiformats: 13.3.0
     transitivePeerDependencies:
       - '@polkadot/api'
       - '@polkadot/util'
@@ -18101,40 +18205,42 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@canvas-js/core@0.10.10(@types/react@18.3.3)(bufferutil@4.0.8)(react-native@0.75.1(@babel/core@7.25.7)(@babel/preset-env@7.25.3(@babel/core@7.25.7))(@types/react@18.3.3)(bufferutil@4.0.8)(react@18.3.1)(typescript@5.4.5)(utf-8-validate@5.0.10))(react@18.3.1)(utf-8-validate@5.0.10)':
+  '@canvas-js/core@0.11.0(@types/react@18.3.3)(bufferutil@4.0.8)(react@18.3.1)(utf-8-validate@5.0.10)':
     dependencies:
-      '@canvas-js/chain-ethereum': 0.10.10(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      '@canvas-js/gossiplog': 0.10.10(@types/react@18.3.3)(bufferutil@4.0.8)(react-native@0.75.1(@babel/core@7.25.7)(@babel/preset-env@7.25.3(@babel/core@7.25.7))(@types/react@18.3.3)(bufferutil@4.0.8)(react@18.3.1)(typescript@5.4.5)(utf-8-validate@5.0.10))(react@18.3.1)(utf-8-validate@5.0.10)
-      '@canvas-js/interfaces': 0.10.10
-      '@canvas-js/modeldb': 0.10.10
-      '@canvas-js/modeldb-idb': 0.10.10(@types/react@18.3.3)(react@18.3.1)
-      '@canvas-js/modeldb-pg': 0.10.10
-      '@canvas-js/modeldb-sqlite': 0.10.10
-      '@canvas-js/signatures': 0.10.10
-      '@canvas-js/utils': 0.10.10
-      '@canvas-js/vm': 0.10.10
+      '@canvas-js/chain-ethereum': 0.11.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      '@canvas-js/gossiplog': 0.11.0(@types/react@18.3.3)(bufferutil@4.0.8)(react@18.3.1)(utf-8-validate@5.0.10)
+      '@canvas-js/interfaces': 0.11.0
+      '@canvas-js/modeldb': 0.11.0
+      '@canvas-js/modeldb-idb': 0.11.0(@types/react@18.3.3)(react@18.3.1)
+      '@canvas-js/modeldb-pg': 0.11.0
+      '@canvas-js/modeldb-sqlite': 0.11.0
+      '@canvas-js/signatures': 0.11.0
+      '@canvas-js/utils': 0.11.0
+      '@canvas-js/vm': 0.11.0
       '@ipld/dag-cbor': 9.2.1
       '@ipld/dag-json': 10.2.2
       '@ipld/schema': 5.0.0
-      '@libp2p/interface': 1.7.0
-      '@libp2p/logger': 4.0.20
-      '@libp2p/peer-id': 4.2.4
-      '@multiformats/multiaddr': 12.3.0
-      '@noble/hashes': 1.4.0
+      '@libp2p/interface': 2.1.2
+      '@libp2p/logger': 5.1.0
+      '@libp2p/peer-id': 5.0.4
+      '@multiformats/multiaddr': 12.3.1
+      '@noble/hashes': 1.5.0
+      '@types/cors': 2.8.17
       '@types/express': 4.17.21
       '@types/ws': 8.5.12
       abortable-iterator: 5.1.0
       aggregate-error: 5.0.0
       any-signal: 4.1.1
       chalk: 5.3.0
+      cors: 2.8.5
       ethers: 6.13.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      express: 4.19.2
-      express-ipld: 0.0.1(express@4.19.2)
+      express: 4.21.1
+      express-ipld: 0.0.1(express@4.21.1)
       http-status-codes: 2.3.0
       it-length-prefixed: 9.1.0
-      multiformats: 13.2.2
+      multiformats: 13.3.0
       p-queue: 8.0.1
-      pg: 8.12.0
+      pg: 8.13.0
       prom-client: 15.1.3
       quickjs-emscripten: 0.29.2
       uint8arraylist: 2.4.8
@@ -18144,180 +18250,173 @@ snapshots:
       - bufferutil
       - pg-native
       - react
-      - react-native
       - supports-color
       - utf-8-validate
 
-  '@canvas-js/discovery@0.10.10':
+  '@canvas-js/gossiplog@0.11.0(@types/react@18.3.3)(bufferutil@4.0.8)(react@18.3.1)(utf-8-validate@5.0.10)':
     dependencies:
+      '@canvas-js/interfaces': 0.11.0
+      '@canvas-js/libp2p-rendezvous': 0.2.0
+      '@canvas-js/modeldb': 0.11.0
+      '@canvas-js/modeldb-idb': 0.11.0(@types/react@18.3.3)(react@18.3.1)
+      '@canvas-js/modeldb-pg': 0.11.0
+      '@canvas-js/modeldb-sqlite': 0.11.0
+      '@canvas-js/okra': 0.4.5
+      '@canvas-js/okra-lmdb': 0.2.0
+      '@canvas-js/okra-memory': 0.4.5
+      '@canvas-js/signatures': 0.11.0
+      '@canvas-js/utils': 0.11.0
+      '@chainsafe/libp2p-gossipsub': 14.1.0
+      '@chainsafe/libp2p-noise': 16.0.0
+      '@chainsafe/libp2p-yamux': 7.0.1
       '@ipld/dag-cbor': 9.2.1
-      '@libp2p/fetch': 1.1.5
-      '@libp2p/interface': 1.7.0
-      '@libp2p/logger': 4.0.20
-      '@libp2p/peer-id': 4.2.4
-      '@multiformats/multiaddr': 12.3.0
-
-  '@canvas-js/gossiplog@0.10.10(@types/react@18.3.3)(bufferutil@4.0.8)(react-native@0.75.1(@babel/core@7.25.7)(@babel/preset-env@7.25.3(@babel/core@7.25.7))(@types/react@18.3.3)(bufferutil@4.0.8)(react@18.3.1)(typescript@5.4.5)(utf-8-validate@5.0.10))(react@18.3.1)(utf-8-validate@5.0.10)':
-    dependencies:
-      '@canvas-js/discovery': 0.10.10
-      '@canvas-js/interfaces': 0.10.10
-      '@canvas-js/modeldb': 0.10.10
-      '@canvas-js/modeldb-idb': 0.10.10(@types/react@18.3.3)(react@18.3.1)
-      '@canvas-js/modeldb-pg': 0.10.10
-      '@canvas-js/modeldb-sqlite': 0.10.10
-      '@canvas-js/modeldb-sqlite-wasm': 0.10.10
-      '@canvas-js/okra': 0.4.4
-      '@canvas-js/okra-lmdb': 0.1.3
-      '@canvas-js/okra-memory': 0.4.4
-      '@canvas-js/signatures': 0.10.10
-      '@canvas-js/utils': 0.10.10
-      '@chainsafe/libp2p-gossipsub': 13.2.0
-      '@chainsafe/libp2p-noise': 15.1.1
-      '@chainsafe/libp2p-yamux': 6.0.2
-      '@ipld/dag-cbor': 9.2.1
-      '@libp2p/bootstrap': 10.1.5
-      '@libp2p/circuit-relay-v2': 1.1.5
-      '@libp2p/fetch': 1.1.5
-      '@libp2p/identify': 2.1.5
-      '@libp2p/interface': 1.7.0
-      '@libp2p/interface-internal': 1.3.4
-      '@libp2p/kad-dht': 12.1.5
-      '@libp2p/logger': 4.0.20
-      '@libp2p/peer-id': 4.2.4
-      '@libp2p/peer-id-factory': 4.2.4
-      '@libp2p/ping': 1.1.5
-      '@libp2p/prometheus-metrics': 3.1.5
-      '@libp2p/webrtc': 4.1.7(react-native@0.75.1(@babel/core@7.25.7)(@babel/preset-env@7.25.3(@babel/core@7.25.7))(@types/react@18.3.3)(bufferutil@4.0.8)(react@18.3.1)(typescript@5.4.5)(utf-8-validate@5.0.10))
-      '@libp2p/websockets': 8.2.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      '@multiformats/multiaddr': 12.3.0
-      '@noble/hashes': 1.4.0
+      '@ipld/dag-json': 10.2.2
+      '@libp2p/bootstrap': 11.0.7
+      '@libp2p/crypto': 5.0.4
+      '@libp2p/identify': 3.0.7
+      '@libp2p/interface': 2.1.2
+      '@libp2p/interface-internal': 2.0.7
+      '@libp2p/kad-dht': 13.1.2
+      '@libp2p/logger': 5.1.0
+      '@libp2p/multistream-select': 6.0.5
+      '@libp2p/peer-id': 5.0.4
+      '@libp2p/ping': 2.0.7
+      '@libp2p/prometheus-metrics': 4.2.1
+      '@libp2p/websockets': 9.0.7(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      '@multiformats/multiaddr': 12.3.1
+      '@noble/hashes': 1.5.0
+      '@types/cors': 2.8.17
+      '@types/express': 4.17.21
+      '@types/ws': 8.5.12
+      abortable-iterator: 5.1.0
       any-signal: 4.1.1
+      cors: 2.8.5
+      event-iterator: 2.0.0
+      express: 4.21.1
+      express-ipld: 0.0.1(express@4.21.1)
+      http-status-codes: 2.3.0
       idb: 8.0.0
       it-length-prefixed: 9.1.0
       it-pipe: 3.0.1
       it-pushable: 3.2.3
       it-stream-types: 2.0.1
-      libp2p: 1.9.2
-      multiformats: 13.2.2
+      it-ws: 6.1.5(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      libp2p: 2.1.7
+      multiformats: 13.3.0
       nanoid: 5.0.7
       p-queue: 8.0.1
-      pg: 8.12.0
-      pg-cursor: 2.11.0(pg@8.12.0)
+      pg: 8.13.0
+      pg-cursor: 2.12.0(pg@8.13.0)
       prom-client: 15.1.3
       protons-runtime: 5.5.0
       uint8arraylist: 2.4.8
       uint8arrays: 5.1.0
+      ws: 8.18.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
     transitivePeerDependencies:
       - '@types/react'
       - bufferutil
       - pg-native
       - react
-      - react-native
       - supports-color
       - utf-8-validate
 
-  '@canvas-js/interfaces@0.10.10': {}
+  '@canvas-js/interfaces@0.11.0': {}
 
-  '@canvas-js/modeldb-idb@0.10.10(@types/react@18.3.3)(react@18.3.1)':
+  '@canvas-js/libp2p-rendezvous@0.2.0':
     dependencies:
-      '@canvas-js/modeldb': 0.10.10
-      '@canvas-js/utils': 0.10.10
+      '@libp2p/interface': 2.1.2
+      '@libp2p/interface-internal': 2.0.7
+      '@libp2p/logger': 5.1.0
+      '@libp2p/peer-id': 5.0.4
+      '@libp2p/peer-record': 8.0.7
+      '@multiformats/multiaddr': 12.3.1
+      '@types/better-sqlite3': 7.6.11
+      better-sqlite3: 11.1.2
+      it-length-prefixed: 9.1.0
+      it-pipe: 3.0.1
+      it-pushable: 3.2.3
+      protons-runtime: 5.5.0
+      uint8arraylist: 2.4.8
+      uint8arrays: 5.1.0
+
+  '@canvas-js/modeldb-idb@0.11.0(@types/react@18.3.3)(react@18.3.1)':
+    dependencies:
+      '@canvas-js/modeldb': 0.11.0
+      '@canvas-js/utils': 0.11.0
       '@ipld/dag-json': 10.2.2
-      '@libp2p/logger': 4.0.20
+      '@libp2p/logger': 5.1.0
       '@types/react': 18.3.3
       fast-deep-equal: 3.1.3
       idb: 8.0.0
       react: 18.3.1
 
-  '@canvas-js/modeldb-pg@0.10.10':
+  '@canvas-js/modeldb-pg@0.11.0':
     dependencies:
-      '@canvas-js/modeldb': 0.10.10
-      '@canvas-js/utils': 0.10.10
+      '@canvas-js/modeldb': 0.11.0
+      '@canvas-js/utils': 0.11.0
       '@ipld/dag-json': 10.2.2
-      '@types/pg': 8.11.6
+      '@types/pg': 8.11.10
       '@types/pg-cursor': 2.7.2
-      pg: 8.12.0
-      pg-cursor: 2.11.0(pg@8.12.0)
+      pg: 8.13.0
+      pg-cursor: 2.12.0(pg@8.13.0)
     transitivePeerDependencies:
       - pg-native
 
-  '@canvas-js/modeldb-sqlite-wasm@0.10.10':
+  '@canvas-js/modeldb-sqlite@0.11.0':
     dependencies:
-      '@canvas-js/interfaces': 0.10.10
-      '@canvas-js/modeldb': 0.10.10
-      '@canvas-js/utils': 0.10.10
-      '@ipld/dag-json': 10.2.2
-      '@libp2p/logger': 4.0.20
-      '@sqlite.org/sqlite-wasm': 3.46.0-build2
-      comlink: 4.4.1
-
-  '@canvas-js/modeldb-sqlite@0.10.10':
-    dependencies:
-      '@canvas-js/modeldb': 0.10.10
-      '@canvas-js/utils': 0.10.10
+      '@canvas-js/modeldb': 0.11.0
+      '@canvas-js/utils': 0.11.0
       '@ipld/dag-json': 10.2.2
       '@types/better-sqlite3': 7.6.11
       better-sqlite3: 11.1.2
 
-  '@canvas-js/modeldb@0.10.10':
+  '@canvas-js/modeldb@0.11.0':
     dependencies:
-      '@canvas-js/utils': 0.10.10
+      '@canvas-js/utils': 0.11.0
       '@ipld/dag-json': 10.2.2
-      '@libp2p/logger': 4.0.20
+      '@libp2p/logger': 5.1.0
       uint8arrays: 5.1.0
 
-  '@canvas-js/okra-lmdb@0.1.3':
+  '@canvas-js/okra-lmdb@0.2.0':
     dependencies:
-      '@canvas-js/okra': 0.4.4
-      '@noble/hashes': 1.4.0
-      '@types/debug': 4.1.12
-      debug: 4.3.5
+      '@canvas-js/okra': 0.4.5
       detect-libc: 2.0.3
       p-queue: 8.0.1
       uint8arrays: 5.1.0
-    transitivePeerDependencies:
-      - supports-color
 
-  '@canvas-js/okra-memory@0.4.4':
+  '@canvas-js/okra-memory@0.4.5':
     dependencies:
-      '@canvas-js/okra': 0.4.4
-      '@types/debug': 4.1.12
-      debug: 4.3.5
+      '@canvas-js/okra': 0.4.5
       functional-red-black-tree: 1.0.1
       p-queue: 8.0.1
       uint8arrays: 5.1.0
-    transitivePeerDependencies:
-      - supports-color
 
-  '@canvas-js/okra@0.4.4':
+  '@canvas-js/okra@0.4.5':
     dependencies:
-      '@noble/hashes': 1.4.0
-      '@types/debug': 4.1.12
-      debug: 4.3.5
+      '@noble/hashes': 1.5.0
       uint8arrays: 5.1.0
-    transitivePeerDependencies:
-      - supports-color
+      weald: 1.0.2
 
-  '@canvas-js/signatures@0.10.10':
+  '@canvas-js/signatures@0.11.0':
     dependencies:
-      '@canvas-js/interfaces': 0.10.10
-      '@canvas-js/utils': 0.10.10
+      '@canvas-js/interfaces': 0.11.0
+      '@canvas-js/utils': 0.11.0
       '@ipld/dag-cbor': 9.2.1
       '@ipld/dag-json': 10.2.2
-      '@libp2p/logger': 4.0.20
-      '@noble/curves': 1.5.0
-      '@noble/hashes': 1.4.0
-      multiformats: 13.2.2
+      '@libp2p/logger': 5.1.0
+      '@noble/curves': 1.6.0
+      '@noble/hashes': 1.5.0
+      multiformats: 13.3.0
 
-  '@canvas-js/utils@0.10.10':
+  '@canvas-js/utils@0.11.0':
     dependencies:
-      '@canvas-js/interfaces': 0.10.10
+      '@canvas-js/interfaces': 0.11.0
 
-  '@canvas-js/vm@0.10.10':
+  '@canvas-js/vm@0.11.0':
     dependencies:
-      '@canvas-js/utils': 0.10.10
-      '@libp2p/logger': 4.0.20
-      '@noble/hashes': 1.4.0
+      '@canvas-js/utils': 0.11.0
+      '@libp2p/logger': 5.1.0
+      '@noble/hashes': 1.5.0
       quickjs-emscripten: 0.29.2
 
   '@chainsafe/as-chacha20poly1305@0.1.0': {}
@@ -18326,33 +18425,33 @@ snapshots:
 
   '@chainsafe/is-ip@2.0.2': {}
 
-  '@chainsafe/libp2p-gossipsub@13.2.0':
+  '@chainsafe/libp2p-gossipsub@14.1.0':
     dependencies:
-      '@libp2p/crypto': 4.1.9
-      '@libp2p/interface': 1.7.0
-      '@libp2p/interface-internal': 1.3.4
-      '@libp2p/peer-id': 4.2.4
-      '@libp2p/pubsub': 9.0.26
-      '@multiformats/multiaddr': 12.3.0
+      '@libp2p/crypto': 5.0.4
+      '@libp2p/interface': 2.1.2
+      '@libp2p/interface-internal': 2.0.7
+      '@libp2p/peer-id': 5.0.4
+      '@libp2p/pubsub': 10.0.7
+      '@multiformats/multiaddr': 12.3.1
       denque: 2.1.0
       it-length-prefixed: 9.1.0
       it-pipe: 3.0.1
       it-pushable: 3.2.3
-      multiformats: 13.2.2
-      protons-runtime: 5.4.0
+      multiformats: 13.3.0
+      protons-runtime: 5.5.0
       uint8arraylist: 2.4.8
       uint8arrays: 5.1.0
 
-  '@chainsafe/libp2p-noise@15.1.1':
+  '@chainsafe/libp2p-noise@16.0.0':
     dependencies:
       '@chainsafe/as-chacha20poly1305': 0.1.0
       '@chainsafe/as-sha256': 0.4.2
-      '@libp2p/crypto': 4.1.9
-      '@libp2p/interface': 1.7.0
-      '@libp2p/peer-id': 4.2.4
+      '@libp2p/crypto': 5.0.4
+      '@libp2p/interface': 2.1.2
+      '@libp2p/peer-id': 5.0.4
       '@noble/ciphers': 0.6.0
-      '@noble/curves': 1.5.0
-      '@noble/hashes': 1.4.0
+      '@noble/curves': 1.6.0
+      '@noble/hashes': 1.5.0
       it-length-prefixed: 9.1.0
       it-length-prefixed-stream: 1.2.0
       it-pair: 2.0.6
@@ -18363,14 +18462,14 @@ snapshots:
       uint8arrays: 5.1.0
       wherearewe: 2.0.1
 
-  '@chainsafe/libp2p-yamux@6.0.2':
+  '@chainsafe/libp2p-yamux@7.0.1':
     dependencies:
-      '@libp2p/interface': 1.7.0
-      '@libp2p/utils': 5.4.9
+      '@libp2p/interface': 2.1.2
+      '@libp2p/utils': 6.1.0
       get-iterator: 2.0.1
       it-foreach: 2.1.1
-      it-pipe: 3.0.1
       it-pushable: 3.2.3
+      it-stream-types: 2.0.1
       uint8arraylist: 2.4.8
 
   '@chainsafe/netmask@2.0.0':
@@ -18722,7 +18821,7 @@ snapshots:
 
   '@confio/ics23@0.6.8':
     dependencies:
-      '@noble/hashes': 1.4.0
+      '@noble/hashes': 1.5.0
       protobufjs: 6.11.4
 
   '@cosmjs/amino@0.31.3':
@@ -18772,9 +18871,9 @@ snapshots:
       '@cosmjs/encoding': 0.32.3
       '@cosmjs/math': 0.32.4
       '@cosmjs/utils': 0.32.3
-      '@noble/hashes': 1.4.0
+      '@noble/hashes': 1.5.0
       bn.js: 5.2.1
-      elliptic: 6.5.5
+      elliptic: 6.5.7
       libsodium-wrappers-sumo: 0.7.13
 
   '@cosmjs/encoding@0.31.3':
@@ -18815,8 +18914,8 @@ snapshots:
   '@cosmjs/socket@0.31.3(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
     dependencies:
       '@cosmjs/stream': 0.31.3
-      isomorphic-ws: 4.0.1(ws@7.5.9(bufferutil@4.0.8)(utf-8-validate@5.0.10))
-      ws: 7.5.9(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      isomorphic-ws: 4.0.1(ws@7.5.10(bufferutil@4.0.8)(utf-8-validate@5.0.10))
+      ws: 7.5.10(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       xstream: 11.14.0
     transitivePeerDependencies:
       - bufferutil
@@ -19833,7 +19932,7 @@ snapshots:
   '@ipld/dag-cbor@9.2.1':
     dependencies:
       cborg: 4.2.0
-      multiformats: 13.2.2
+      multiformats: 13.3.0
 
   '@ipld/dag-json@10.2.0':
     dependencies:
@@ -19843,7 +19942,7 @@ snapshots:
   '@ipld/dag-json@10.2.2':
     dependencies:
       cborg: 4.2.0
-      multiformats: 13.2.2
+      multiformats: 13.3.0
 
   '@ipld/schema@5.0.0':
     dependencies:
@@ -20300,61 +20399,34 @@ snapshots:
       '@lezer/highlight': 1.2.1
       '@lezer/lr': 1.4.2
 
-  '@libp2p/bootstrap@10.1.5':
+  '@libp2p/bootstrap@11.0.7':
     dependencies:
-      '@libp2p/interface': 1.7.0
-      '@libp2p/peer-id': 4.2.4
+      '@libp2p/interface': 2.1.2
+      '@libp2p/interface-internal': 2.0.7
+      '@libp2p/peer-id': 5.0.4
       '@multiformats/mafmt': 12.1.6
-      '@multiformats/multiaddr': 12.3.0
+      '@multiformats/multiaddr': 12.3.1
 
-  '@libp2p/circuit-relay-v2@1.1.5':
+  '@libp2p/crypto@5.0.4':
     dependencies:
-      '@libp2p/interface': 1.7.0
-      '@libp2p/interface-internal': 1.3.4
-      '@libp2p/peer-collections': 5.2.9
-      '@libp2p/peer-id': 4.2.4
-      '@libp2p/peer-record': 7.0.25
-      '@libp2p/utils': 5.4.9
-      '@multiformats/mafmt': 12.1.6
-      '@multiformats/multiaddr': 12.3.0
-      any-signal: 4.1.1
-      it-protobuf-stream: 1.1.5
-      it-stream-types: 2.0.1
-      multiformats: 13.2.2
-      p-defer: 4.0.1
-      progress-events: 1.0.0
-      protons-runtime: 5.5.0
-      race-signal: 1.1.0
-      uint8arraylist: 2.4.8
-      uint8arrays: 5.1.0
-
-  '@libp2p/crypto@4.1.9':
-    dependencies:
-      '@libp2p/interface': 1.7.0
-      '@noble/curves': 1.5.0
-      '@noble/hashes': 1.4.0
+      '@libp2p/interface': 2.1.2
+      '@noble/curves': 1.6.0
+      '@noble/hashes': 1.5.0
       asn1js: 3.0.5
-      multiformats: 13.2.2
+      multiformats: 13.3.0
       protons-runtime: 5.5.0
       uint8arraylist: 2.4.8
       uint8arrays: 5.1.0
 
-  '@libp2p/fetch@1.1.5':
+  '@libp2p/identify@3.0.7':
     dependencies:
-      '@libp2p/interface': 1.7.0
-      '@libp2p/interface-internal': 1.3.4
-      it-protobuf-stream: 1.1.5
-      protons-runtime: 5.5.0
-      uint8arraylist: 2.4.8
-      uint8arrays: 5.1.0
-
-  '@libp2p/identify@2.1.5':
-    dependencies:
-      '@libp2p/interface': 1.7.0
-      '@libp2p/interface-internal': 1.3.4
-      '@libp2p/peer-id': 4.2.4
-      '@libp2p/peer-record': 7.0.25
-      '@multiformats/multiaddr': 12.3.0
+      '@libp2p/crypto': 5.0.4
+      '@libp2p/interface': 2.1.2
+      '@libp2p/interface-internal': 2.0.7
+      '@libp2p/peer-id': 5.0.4
+      '@libp2p/peer-record': 8.0.7
+      '@libp2p/utils': 6.1.0
+      '@multiformats/multiaddr': 12.3.1
       '@multiformats/multiaddr-matcher': 1.2.4
       it-drain: 3.0.7
       it-parallel: 3.0.8
@@ -20364,36 +20436,45 @@ snapshots:
       uint8arrays: 5.1.0
       wherearewe: 2.0.1
 
-  '@libp2p/interface-internal@1.3.4':
+  '@libp2p/interface-internal@2.0.7':
     dependencies:
-      '@libp2p/interface': 1.7.0
-      '@libp2p/peer-collections': 5.2.9
-      '@multiformats/multiaddr': 12.3.0
+      '@libp2p/interface': 2.1.2
+      '@libp2p/peer-collections': 6.0.7
+      '@multiformats/multiaddr': 12.3.1
       progress-events: 1.0.0
       uint8arraylist: 2.4.8
 
   '@libp2p/interface@1.7.0':
     dependencies:
-      '@multiformats/multiaddr': 12.3.0
+      '@multiformats/multiaddr': 12.3.1
       it-pushable: 3.2.3
       it-stream-types: 2.0.1
-      multiformats: 13.2.2
+      multiformats: 13.3.0
       progress-events: 1.0.0
       uint8arraylist: 2.4.8
 
-  '@libp2p/kad-dht@12.1.5':
+  '@libp2p/interface@2.1.2':
     dependencies:
-      '@libp2p/crypto': 4.1.9
-      '@libp2p/interface': 1.7.0
-      '@libp2p/interface-internal': 1.3.4
-      '@libp2p/peer-collections': 5.2.9
-      '@libp2p/peer-id': 4.2.4
+      '@multiformats/multiaddr': 12.3.1
+      it-pushable: 3.2.3
+      it-stream-types: 2.0.1
+      multiformats: 13.3.0
+      progress-events: 1.0.0
+      uint8arraylist: 2.4.8
+
+  '@libp2p/kad-dht@13.1.2':
+    dependencies:
+      '@libp2p/crypto': 5.0.4
+      '@libp2p/interface': 2.1.2
+      '@libp2p/interface-internal': 2.0.7
+      '@libp2p/peer-collections': 6.0.7
+      '@libp2p/peer-id': 5.0.4
       '@libp2p/record': 4.0.4
-      '@libp2p/utils': 5.4.9
-      '@multiformats/multiaddr': 12.3.0
+      '@libp2p/utils': 6.1.0
+      '@multiformats/multiaddr': 12.3.1
       any-signal: 4.1.1
       hashlru: 2.3.0
-      interface-datastore: 8.2.11
+      interface-datastore: 8.3.1
       it-drain: 3.0.7
       it-length: 3.0.6
       it-length-prefixed: 9.1.0
@@ -20403,7 +20484,7 @@ snapshots:
       it-pipe: 3.0.1
       it-protobuf-stream: 1.1.5
       it-take: 3.0.6
-      multiformats: 13.2.2
+      multiformats: 13.3.0
       p-defer: 4.0.1
       p-event: 6.0.1
       p-queue: 8.0.1
@@ -20414,17 +20495,17 @@ snapshots:
       uint8arraylist: 2.4.8
       uint8arrays: 5.1.0
 
-  '@libp2p/logger@4.0.20':
+  '@libp2p/logger@5.1.0':
     dependencies:
-      '@libp2p/interface': 1.7.0
-      '@multiformats/multiaddr': 12.3.0
-      interface-datastore: 8.2.11
-      multiformats: 13.2.2
+      '@libp2p/interface': 2.1.2
+      '@multiformats/multiaddr': 12.3.1
+      interface-datastore: 8.3.1
+      multiformats: 13.3.0
       weald: 1.0.2
 
-  '@libp2p/multistream-select@5.1.17':
+  '@libp2p/multistream-select@6.0.5':
     dependencies:
-      '@libp2p/interface': 1.7.0
+      '@libp2p/interface': 2.1.2
       it-length-prefixed: 9.1.0
       it-length-prefixed-stream: 1.2.0
       it-stream-types: 2.0.1
@@ -20434,84 +20515,78 @@ snapshots:
       uint8arraylist: 2.4.8
       uint8arrays: 5.1.0
 
-  '@libp2p/peer-collections@5.2.9':
+  '@libp2p/peer-collections@6.0.7':
     dependencies:
-      '@libp2p/interface': 1.7.0
-      '@libp2p/peer-id': 4.2.4
-      '@libp2p/utils': 5.4.9
+      '@libp2p/interface': 2.1.2
+      '@libp2p/peer-id': 5.0.4
+      '@libp2p/utils': 6.1.0
+      multiformats: 13.3.0
 
-  '@libp2p/peer-id-factory@4.2.4':
+  '@libp2p/peer-id@5.0.4':
     dependencies:
-      '@libp2p/crypto': 4.1.9
-      '@libp2p/interface': 1.7.0
-      '@libp2p/peer-id': 4.2.4
-      protons-runtime: 5.5.0
-      uint8arraylist: 2.4.8
+      '@libp2p/crypto': 5.0.4
+      '@libp2p/interface': 2.1.2
+      multiformats: 13.3.0
       uint8arrays: 5.1.0
 
-  '@libp2p/peer-id@4.2.4':
+  '@libp2p/peer-record@8.0.7':
     dependencies:
-      '@libp2p/interface': 1.7.0
-      multiformats: 13.2.2
-      uint8arrays: 5.1.0
-
-  '@libp2p/peer-record@7.0.25':
-    dependencies:
-      '@libp2p/crypto': 4.1.9
-      '@libp2p/interface': 1.7.0
-      '@libp2p/peer-id': 4.2.4
-      '@libp2p/utils': 5.4.9
-      '@multiformats/multiaddr': 12.3.0
+      '@libp2p/crypto': 5.0.4
+      '@libp2p/interface': 2.1.2
+      '@libp2p/peer-id': 5.0.4
+      '@libp2p/utils': 6.1.0
+      '@multiformats/multiaddr': 12.3.1
+      multiformats: 13.3.0
       protons-runtime: 5.5.0
       uint8-varint: 2.0.4
       uint8arraylist: 2.4.8
       uint8arrays: 5.1.0
 
-  '@libp2p/peer-store@10.1.5':
+  '@libp2p/peer-store@11.0.7':
     dependencies:
-      '@libp2p/interface': 1.7.0
-      '@libp2p/peer-collections': 5.2.9
-      '@libp2p/peer-id': 4.2.4
-      '@libp2p/peer-record': 7.0.25
-      '@multiformats/multiaddr': 12.3.0
-      interface-datastore: 8.2.11
+      '@libp2p/crypto': 5.0.4
+      '@libp2p/interface': 2.1.2
+      '@libp2p/peer-collections': 6.0.7
+      '@libp2p/peer-id': 5.0.4
+      '@libp2p/peer-record': 8.0.7
+      '@multiformats/multiaddr': 12.3.1
+      interface-datastore: 8.3.1
       it-all: 3.0.6
       mortice: 3.0.4
-      multiformats: 13.2.2
+      multiformats: 13.3.0
       protons-runtime: 5.5.0
       uint8arraylist: 2.4.8
       uint8arrays: 5.1.0
 
-  '@libp2p/ping@1.1.5':
+  '@libp2p/ping@2.0.7':
     dependencies:
-      '@libp2p/crypto': 4.1.9
-      '@libp2p/interface': 1.7.0
-      '@libp2p/interface-internal': 1.3.4
-      '@multiformats/multiaddr': 12.3.0
-      it-first: 3.0.6
-      it-pipe: 3.0.1
+      '@libp2p/crypto': 5.0.4
+      '@libp2p/interface': 2.1.2
+      '@libp2p/interface-internal': 2.0.7
+      '@multiformats/multiaddr': 12.3.1
+      it-byte-stream: 1.1.0
       uint8arrays: 5.1.0
 
-  '@libp2p/prometheus-metrics@3.1.5':
+  '@libp2p/prometheus-metrics@4.2.1':
     dependencies:
-      '@libp2p/interface': 1.7.0
+      '@libp2p/interface': 2.1.2
       it-foreach: 2.1.1
       it-stream-types: 2.0.1
       prom-client: 15.1.3
       uint8arraylist: 2.4.8
 
-  '@libp2p/pubsub@9.0.26':
+  '@libp2p/pubsub@10.0.7':
     dependencies:
-      '@libp2p/crypto': 4.1.9
-      '@libp2p/interface': 1.7.0
-      '@libp2p/interface-internal': 1.3.4
-      '@libp2p/peer-collections': 5.2.9
-      '@libp2p/peer-id': 4.2.4
-      '@libp2p/utils': 5.4.9
+      '@libp2p/crypto': 5.0.4
+      '@libp2p/interface': 2.1.2
+      '@libp2p/interface-internal': 2.0.7
+      '@libp2p/peer-collections': 6.0.7
+      '@libp2p/peer-id': 5.0.4
+      '@libp2p/utils': 6.1.0
       it-length-prefixed: 9.1.0
       it-pipe: 3.0.1
       it-pushable: 3.2.3
-      multiformats: 13.2.2
+      multiformats: 13.3.0
       p-queue: 8.0.1
       uint8arraylist: 2.4.8
       uint8arrays: 5.1.0
@@ -20522,20 +20597,21 @@ snapshots:
       uint8arraylist: 2.4.8
       uint8arrays: 5.1.0
 
-  '@libp2p/utils@5.4.9':
+  '@libp2p/utils@6.1.0':
     dependencies:
       '@chainsafe/is-ip': 2.0.2
-      '@libp2p/crypto': 4.1.9
-      '@libp2p/interface': 1.7.0
-      '@libp2p/logger': 4.0.20
-      '@multiformats/multiaddr': 12.3.0
-      '@multiformats/multiaddr-matcher': 1.2.4
+      '@libp2p/crypto': 5.0.4
+      '@libp2p/interface': 2.1.2
+      '@libp2p/logger': 5.1.0
+      '@multiformats/multiaddr': 12.3.1
       '@sindresorhus/fnv1a': 3.1.0
       '@types/murmurhash3js-revisited': 3.0.3
       any-signal: 4.1.1
       delay: 6.0.0
       get-iterator: 2.0.1
       is-loopback-addr: 2.0.2
+      it-foreach: 2.1.1
+      it-pipe: 3.0.1
       it-pushable: 3.2.3
       it-stream-types: 2.0.1
       murmurhash3js-revisited: 3.0.0
@@ -20546,42 +20622,12 @@ snapshots:
       uint8arraylist: 2.4.8
       uint8arrays: 5.1.0
 
-  '@libp2p/webrtc@4.1.7(react-native@0.75.1(@babel/core@7.25.7)(@babel/preset-env@7.25.3(@babel/core@7.25.7))(@types/react@18.3.3)(bufferutil@4.0.8)(react@18.3.1)(typescript@5.4.5)(utf-8-validate@5.0.10))':
+  '@libp2p/websockets@9.0.7(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
     dependencies:
-      '@chainsafe/libp2p-noise': 15.1.1
-      '@libp2p/interface': 1.7.0
-      '@libp2p/interface-internal': 1.3.4
-      '@libp2p/peer-id': 4.2.4
-      '@libp2p/utils': 5.4.9
+      '@libp2p/interface': 2.1.2
+      '@libp2p/utils': 6.1.0
       '@multiformats/mafmt': 12.1.6
-      '@multiformats/multiaddr': 12.3.0
-      '@multiformats/multiaddr-matcher': 1.2.4
-      detect-browser: 5.3.0
-      it-length-prefixed: 9.1.0
-      it-protobuf-stream: 1.1.5
-      it-pushable: 3.2.3
-      it-stream-types: 2.0.1
-      multiformats: 13.2.2
-      node-datachannel: 0.11.0
-      p-defer: 4.0.1
-      p-event: 6.0.1
-      p-timeout: 6.1.2
-      progress-events: 1.0.0
-      protons-runtime: 5.5.0
-      race-signal: 1.1.0
-      react-native-webrtc: 118.0.7(react-native@0.75.1(@babel/core@7.25.7)(@babel/preset-env@7.25.3(@babel/core@7.25.7))(@types/react@18.3.3)(bufferutil@4.0.8)(react@18.3.1)(typescript@5.4.5)(utf-8-validate@5.0.10))
-      uint8arraylist: 2.4.8
-      uint8arrays: 5.1.0
-    transitivePeerDependencies:
-      - react-native
-      - supports-color
-
-  '@libp2p/websockets@8.2.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
-    dependencies:
-      '@libp2p/interface': 1.7.0
-      '@libp2p/utils': 5.4.9
-      '@multiformats/mafmt': 12.1.6
-      '@multiformats/multiaddr': 12.3.0
+      '@multiformats/multiaddr': 12.3.1
       '@multiformats/multiaddr-to-uri': 10.1.0
       '@types/ws': 8.5.12
       it-ws: 6.1.5(bufferutil@4.0.8)(utf-8-validate@5.0.10)
@@ -20628,7 +20674,7 @@ snapshots:
   '@magic-sdk/admin@2.4.1(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
     dependencies:
       ethereum-cryptography: 1.2.0
-      ethers: 6.12.1(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      ethers: 6.13.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       node-fetch: 2.7.0
     transitivePeerDependencies:
       - bufferutil
@@ -20898,7 +20944,7 @@ snapshots:
     dependencies:
       '@ethereumjs/tx': 4.2.0
       '@metamask/superstruct': 3.1.0
-      '@noble/hashes': 1.4.0
+      '@noble/hashes': 1.5.0
       '@scure/base': 1.1.6
       '@types/debug': 4.1.12
       debug: 4.3.5
@@ -20912,7 +20958,7 @@ snapshots:
     dependencies:
       '@ethereumjs/tx': 4.2.0
       '@metamask/superstruct': 3.1.0
-      '@noble/hashes': 1.4.0
+      '@noble/hashes': 1.5.0
       '@scure/base': 1.1.6
       '@types/debug': 4.1.12
       debug: 4.3.7
@@ -21026,17 +21072,17 @@ snapshots:
 
   '@multiformats/mafmt@12.1.6':
     dependencies:
-      '@multiformats/multiaddr': 12.2.1
+      '@multiformats/multiaddr': 12.3.1
 
   '@multiformats/multiaddr-matcher@1.2.4':
     dependencies:
       '@chainsafe/is-ip': 2.0.2
-      '@multiformats/multiaddr': 12.3.0
-      multiformats: 13.2.2
+      '@multiformats/multiaddr': 12.3.1
+      multiformats: 13.3.0
 
   '@multiformats/multiaddr-to-uri@10.1.0':
     dependencies:
-      '@multiformats/multiaddr': 12.3.0
+      '@multiformats/multiaddr': 12.3.1
 
   '@multiformats/multiaddr@12.2.1':
     dependencies:
@@ -21044,17 +21090,16 @@ snapshots:
       '@chainsafe/netmask': 2.0.0
       '@libp2p/interface': 1.7.0
       '@multiformats/dns': 1.0.6
-      multiformats: 13.1.0
+      multiformats: 13.3.0
       uint8-varint: 2.0.4
       uint8arrays: 5.1.0
 
-  '@multiformats/multiaddr@12.3.0':
+  '@multiformats/multiaddr@12.3.1':
     dependencies:
       '@chainsafe/is-ip': 2.0.2
       '@chainsafe/netmask': 2.0.0
-      '@libp2p/interface': 1.7.0
       '@multiformats/dns': 1.0.6
-      multiformats: 13.2.2
+      multiformats: 13.3.0
       uint8-varint: 2.0.4
       uint8arrays: 5.1.0
 
@@ -21082,6 +21127,10 @@ snapshots:
     dependencies:
       '@noble/hashes': 1.4.0
 
+  '@noble/curves@1.6.0':
+    dependencies:
+      '@noble/hashes': 1.5.0
+
   '@noble/hashes@1.2.0': {}
 
   '@noble/hashes@1.3.2': {}
@@ -21089,6 +21138,8 @@ snapshots:
   '@noble/hashes@1.3.3': {}
 
   '@noble/hashes@1.4.0': {}
+
+  '@noble/hashes@1.5.0': {}
 
   '@noble/secp256k1@1.7.1': {}
 
@@ -21255,7 +21306,7 @@ snapshots:
 
   '@polkadot-api/substrate-bindings@0.0.1':
     dependencies:
-      '@noble/hashes': 1.4.0
+      '@noble/hashes': 1.5.0
       '@polkadot-api/utils': 0.0.1
       '@scure/base': 1.1.6
       scale-ts: 1.6.0
@@ -21263,7 +21314,7 @@ snapshots:
 
   '@polkadot-api/substrate-bindings@0.0.1-492c132563ea6b40ae1fc5470dec4cd18768d182.1.0':
     dependencies:
-      '@noble/hashes': 1.4.0
+      '@noble/hashes': 1.5.0
       '@polkadot-api/utils': 0.0.1-492c132563ea6b40ae1fc5470dec4cd18768d182.1.0
       '@scure/base': 1.1.6
       scale-ts: 1.6.0
@@ -21332,7 +21383,7 @@ snapshots:
       '@polkadot/util': 12.6.2
       '@polkadot/util-crypto': 12.6.2(@polkadot/util@12.6.2)
       '@polkadot/x-global': 12.6.2
-      tslib: 2.6.2
+      tslib: 2.7.0
     transitivePeerDependencies:
       - bufferutil
       - supports-color
@@ -21356,7 +21407,7 @@ snapshots:
     dependencies:
       '@polkadot/util': 12.6.2
       '@polkadot/util-crypto': 12.6.2(@polkadot/util@12.6.2)
-      tslib: 2.6.2
+      tslib: 2.7.0
 
   '@polkadot/keyring@7.9.2(@polkadot/util-crypto@7.9.2(@polkadot/util@7.9.2))(@polkadot/util@7.9.2)':
     dependencies:
@@ -21419,7 +21470,7 @@ snapshots:
       eventemitter3: 5.0.1
       mock-socket: 9.3.1
       nock: 13.5.4
-      tslib: 2.6.2
+      tslib: 2.7.0
     optionalDependencies:
       '@substrate/connect': 0.8.10(bufferutil@4.0.8)(utf-8-validate@5.0.10)
     transitivePeerDependencies:
@@ -21516,7 +21567,7 @@ snapshots:
       '@polkadot/util': 12.6.2
       '@polkadot/util-crypto': 12.6.2(@polkadot/util@12.6.2)
       rxjs: 7.8.1
-      tslib: 2.6.2
+      tslib: 2.7.0
 
   '@polkadot/types@6.0.5':
     dependencies:
@@ -22313,6 +22364,7 @@ snapshots:
       chalk: 4.1.2
       execa: 5.1.1
       fast-glob: 3.3.2
+    optional: true
 
   '@react-native-community/cli-config@13.6.4':
     dependencies:
@@ -22335,10 +22387,11 @@ snapshots:
       joi: 17.13.3
     transitivePeerDependencies:
       - typescript
+    optional: true
 
   '@react-native-community/cli-debugger-ui@13.6.4':
     dependencies:
-      serve-static: 1.15.0
+      serve-static: 1.16.2
     transitivePeerDependencies:
       - supports-color
 
@@ -22347,12 +22400,14 @@ snapshots:
       serve-static: 1.16.2
     transitivePeerDependencies:
       - supports-color
+    optional: true
 
   '@react-native-community/cli-debugger-ui@14.0.0-alpha.11':
     dependencies:
       serve-static: 1.16.2
     transitivePeerDependencies:
       - supports-color
+    optional: true
 
   '@react-native-community/cli-doctor@13.6.4':
     dependencies:
@@ -22396,6 +22451,7 @@ snapshots:
       yaml: 2.5.1
     transitivePeerDependencies:
       - typescript
+    optional: true
 
   '@react-native-community/cli-hermes@13.6.4':
     dependencies:
@@ -22425,6 +22481,7 @@ snapshots:
       fast-glob: 3.3.2
       fast-xml-parser: 4.5.0
       logkitty: 0.7.1
+    optional: true
 
   '@react-native-community/cli-platform-apple@13.6.4':
     dependencies:
@@ -22445,6 +22502,7 @@ snapshots:
       fast-glob: 3.3.2
       fast-xml-parser: 4.5.0
       ora: 5.4.1
+    optional: true
 
   '@react-native-community/cli-platform-ios@13.6.4':
     dependencies:
@@ -22455,6 +22513,7 @@ snapshots:
   '@react-native-community/cli-platform-ios@14.0.0':
     dependencies:
       '@react-native-community/cli-platform-apple': 14.0.0
+    optional: true
 
   '@react-native-community/cli-server-api@13.6.4(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
     dependencies:
@@ -22465,7 +22524,7 @@ snapshots:
       errorhandler: 1.5.1
       nocache: 3.0.4
       pretty-format: 26.6.2
-      serve-static: 1.15.0
+      serve-static: 1.16.2
       ws: 7.5.10(bufferutil@4.0.8)(utf-8-validate@5.0.10)
     transitivePeerDependencies:
       - bufferutil
@@ -22488,6 +22547,7 @@ snapshots:
       - bufferutil
       - supports-color
       - utf-8-validate
+    optional: true
 
   '@react-native-community/cli-server-api@14.0.0-alpha.11(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
     dependencies:
@@ -22504,6 +22564,7 @@ snapshots:
       - bufferutil
       - supports-color
       - utf-8-validate
+    optional: true
 
   '@react-native-community/cli-tools@13.6.4':
     dependencies:
@@ -22533,6 +22594,7 @@ snapshots:
       semver: 7.6.3
       shell-quote: 1.8.1
       sudo-prompt: 9.2.1
+    optional: true
 
   '@react-native-community/cli-tools@14.0.0-alpha.11':
     dependencies:
@@ -22546,6 +22608,7 @@ snapshots:
       semver: 7.6.3
       shell-quote: 1.8.1
       sudo-prompt: 9.2.1
+    optional: true
 
   '@react-native-community/cli-types@13.6.4':
     dependencies:
@@ -22554,6 +22617,7 @@ snapshots:
   '@react-native-community/cli-types@14.0.0':
     dependencies:
       joi: 17.13.3
+    optional: true
 
   '@react-native-community/cli@13.6.4(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
     dependencies:
@@ -22603,10 +22667,12 @@ snapshots:
       - supports-color
       - typescript
       - utf-8-validate
+    optional: true
 
   '@react-native/assets-registry@0.74.81': {}
 
-  '@react-native/assets-registry@0.75.1': {}
+  '@react-native/assets-registry@0.75.1':
+    optional: true
 
   '@react-native/babel-plugin-codegen@0.74.81(@babel/preset-env@7.25.3(@babel/core@7.24.5))':
     dependencies:
@@ -22621,6 +22687,7 @@ snapshots:
     transitivePeerDependencies:
       - '@babel/preset-env'
       - supports-color
+    optional: true
 
   '@react-native/babel-preset@0.74.81(@babel/core@7.24.5)(@babel/preset-env@7.25.3(@babel/core@7.24.5))':
     dependencies:
@@ -22721,6 +22788,7 @@ snapshots:
     transitivePeerDependencies:
       - '@babel/preset-env'
       - supports-color
+    optional: true
 
   '@react-native/codegen@0.74.81(@babel/preset-env@7.25.3(@babel/core@7.24.5))':
     dependencies:
@@ -22747,6 +22815,7 @@ snapshots:
       nullthrows: 1.1.1
     transitivePeerDependencies:
       - supports-color
+    optional: true
 
   '@react-native/community-cli-plugin@0.74.81(@babel/core@7.24.5)(@babel/preset-env@7.25.3(@babel/core@7.24.5))(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
     dependencies:
@@ -22791,10 +22860,12 @@ snapshots:
       - encoding
       - supports-color
       - utf-8-validate
+    optional: true
 
   '@react-native/debugger-frontend@0.74.81': {}
 
-  '@react-native/debugger-frontend@0.75.1': {}
+  '@react-native/debugger-frontend@0.75.1':
+    optional: true
 
   '@react-native/dev-middleware@0.74.81(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
     dependencies:
@@ -22808,7 +22879,7 @@ snapshots:
       nullthrows: 1.1.1
       open: 7.4.2
       selfsigned: 2.4.1
-      serve-static: 1.15.0
+      serve-static: 1.16.2
       temp-dir: 2.0.0
       ws: 6.2.3(bufferutil@4.0.8)(utf-8-validate@5.0.10)
     transitivePeerDependencies:
@@ -22836,14 +22907,17 @@ snapshots:
       - encoding
       - supports-color
       - utf-8-validate
+    optional: true
 
   '@react-native/gradle-plugin@0.74.81': {}
 
-  '@react-native/gradle-plugin@0.75.1': {}
+  '@react-native/gradle-plugin@0.75.1':
+    optional: true
 
   '@react-native/js-polyfills@0.74.81': {}
 
-  '@react-native/js-polyfills@0.75.1': {}
+  '@react-native/js-polyfills@0.75.1':
+    optional: true
 
   '@react-native/metro-babel-transformer@0.74.81(@babel/core@7.24.5)(@babel/preset-env@7.25.3(@babel/core@7.24.5))':
     dependencies:
@@ -22864,10 +22938,12 @@ snapshots:
     transitivePeerDependencies:
       - '@babel/preset-env'
       - supports-color
+    optional: true
 
   '@react-native/normalize-colors@0.74.81': {}
 
-  '@react-native/normalize-colors@0.75.1': {}
+  '@react-native/normalize-colors@0.75.1':
+    optional: true
 
   '@react-native/virtualized-lists@0.74.81(@types/react@18.3.3)(react-native@0.74.0(@babel/core@7.24.5)(@babel/preset-env@7.25.3(@babel/core@7.24.5))(@types/react@18.3.3)(bufferutil@4.0.8)(react@18.3.1)(utf-8-validate@5.0.10))(react@18.3.1)':
     dependencies:
@@ -22886,6 +22962,7 @@ snapshots:
       react-native: 0.75.1(@babel/core@7.25.7)(@babel/preset-env@7.25.3(@babel/core@7.25.7))(@types/react@18.3.3)(bufferutil@4.0.8)(react@18.3.1)(typescript@5.4.5)(utf-8-validate@5.0.10)
     optionalDependencies:
       '@types/react': 18.3.3
+    optional: true
 
   '@redis/bloom@1.0.2(@redis/client@1.2.0)':
     dependencies:
@@ -23099,7 +23176,7 @@ snapshots:
 
   '@scure/bip32@1.4.0':
     dependencies:
-      '@noble/curves': 1.4.0
+      '@noble/curves': 1.4.2
       '@noble/hashes': 1.4.0
       '@scure/base': 1.1.6
 
@@ -23178,7 +23255,7 @@ snapshots:
   '@smithy/abort-controller@3.0.0':
     dependencies:
       '@smithy/types': 3.0.0
-      tslib: 2.6.2
+      tslib: 2.7.0
 
   '@smithy/chunked-blob-reader-native@3.0.0':
     dependencies:
@@ -23195,7 +23272,7 @@ snapshots:
       '@smithy/types': 3.0.0
       '@smithy/util-config-provider': 3.0.0
       '@smithy/util-middleware': 3.0.0
-      tslib: 2.6.2
+      tslib: 2.7.0
 
   '@smithy/core@2.0.1':
     dependencies:
@@ -23206,7 +23283,7 @@ snapshots:
       '@smithy/smithy-client': 3.0.1
       '@smithy/types': 3.0.0
       '@smithy/util-middleware': 3.0.0
-      tslib: 2.6.2
+      tslib: 2.7.0
 
   '@smithy/credential-provider-imds@3.0.0':
     dependencies:
@@ -23227,18 +23304,18 @@ snapshots:
     dependencies:
       '@smithy/eventstream-serde-universal': 3.0.0
       '@smithy/types': 3.0.0
-      tslib: 2.6.2
+      tslib: 2.7.0
 
   '@smithy/eventstream-serde-config-resolver@3.0.0':
     dependencies:
       '@smithy/types': 3.0.0
-      tslib: 2.6.2
+      tslib: 2.7.0
 
   '@smithy/eventstream-serde-node@3.0.0':
     dependencies:
       '@smithy/eventstream-serde-universal': 3.0.0
       '@smithy/types': 3.0.0
-      tslib: 2.6.2
+      tslib: 2.7.0
 
   '@smithy/eventstream-serde-universal@3.0.0':
     dependencies:
@@ -23252,32 +23329,32 @@ snapshots:
       '@smithy/querystring-builder': 3.0.0
       '@smithy/types': 3.0.0
       '@smithy/util-base64': 3.0.0
-      tslib: 2.6.2
+      tslib: 2.7.0
 
   '@smithy/hash-blob-browser@3.0.0':
     dependencies:
       '@smithy/chunked-blob-reader': 3.0.0
       '@smithy/chunked-blob-reader-native': 3.0.0
       '@smithy/types': 3.0.0
-      tslib: 2.6.2
+      tslib: 2.7.0
 
   '@smithy/hash-node@3.0.0':
     dependencies:
       '@smithy/types': 3.0.0
       '@smithy/util-buffer-from': 3.0.0
       '@smithy/util-utf8': 3.0.0
-      tslib: 2.6.2
+      tslib: 2.7.0
 
   '@smithy/hash-stream-node@3.0.0':
     dependencies:
       '@smithy/types': 3.0.0
       '@smithy/util-utf8': 3.0.0
-      tslib: 2.6.2
+      tslib: 2.7.0
 
   '@smithy/invalid-dependency@3.0.0':
     dependencies:
       '@smithy/types': 3.0.0
-      tslib: 2.6.2
+      tslib: 2.7.0
 
   '@smithy/is-array-buffer@3.0.0':
     dependencies:
@@ -23287,13 +23364,13 @@ snapshots:
     dependencies:
       '@smithy/types': 3.0.0
       '@smithy/util-utf8': 3.0.0
-      tslib: 2.6.2
+      tslib: 2.7.0
 
   '@smithy/middleware-content-length@3.0.0':
     dependencies:
       '@smithy/protocol-http': 4.0.0
       '@smithy/types': 3.0.0
-      tslib: 2.6.2
+      tslib: 2.7.0
 
   '@smithy/middleware-endpoint@3.0.0':
     dependencies:
@@ -23303,7 +23380,7 @@ snapshots:
       '@smithy/types': 3.0.0
       '@smithy/url-parser': 3.0.0
       '@smithy/util-middleware': 3.0.0
-      tslib: 2.6.2
+      tslib: 2.7.0
 
   '@smithy/middleware-retry@3.0.1':
     dependencies:
@@ -23314,25 +23391,25 @@ snapshots:
       '@smithy/types': 3.0.0
       '@smithy/util-middleware': 3.0.0
       '@smithy/util-retry': 3.0.0
-      tslib: 2.6.2
+      tslib: 2.7.0
       uuid: 9.0.1
 
   '@smithy/middleware-serde@3.0.0':
     dependencies:
       '@smithy/types': 3.0.0
-      tslib: 2.6.2
+      tslib: 2.7.0
 
   '@smithy/middleware-stack@3.0.0':
     dependencies:
       '@smithy/types': 3.0.0
-      tslib: 2.6.2
+      tslib: 2.7.0
 
   '@smithy/node-config-provider@3.0.0':
     dependencies:
       '@smithy/property-provider': 3.0.0
       '@smithy/shared-ini-file-loader': 3.0.0
       '@smithy/types': 3.0.0
-      tslib: 2.6.2
+      tslib: 2.7.0
 
   '@smithy/node-http-handler@3.0.0':
     dependencies:
@@ -23340,7 +23417,7 @@ snapshots:
       '@smithy/protocol-http': 4.0.0
       '@smithy/querystring-builder': 3.0.0
       '@smithy/types': 3.0.0
-      tslib: 2.6.2
+      tslib: 2.7.0
 
   '@smithy/property-provider@3.0.0':
     dependencies:
@@ -23350,7 +23427,7 @@ snapshots:
   '@smithy/protocol-http@4.0.0':
     dependencies:
       '@smithy/types': 3.0.0
-      tslib: 2.6.2
+      tslib: 2.7.0
 
   '@smithy/querystring-builder@3.0.0':
     dependencies:
@@ -23389,31 +23466,31 @@ snapshots:
       '@smithy/protocol-http': 4.0.0
       '@smithy/types': 3.0.0
       '@smithy/util-stream': 3.0.1
-      tslib: 2.6.2
+      tslib: 2.7.0
 
   '@smithy/types@3.0.0':
     dependencies:
-      tslib: 2.6.2
+      tslib: 2.7.0
 
   '@smithy/url-parser@3.0.0':
     dependencies:
       '@smithy/querystring-parser': 3.0.0
       '@smithy/types': 3.0.0
-      tslib: 2.6.2
+      tslib: 2.7.0
 
   '@smithy/util-base64@3.0.0':
     dependencies:
       '@smithy/util-buffer-from': 3.0.0
       '@smithy/util-utf8': 3.0.0
-      tslib: 2.6.2
+      tslib: 2.7.0
 
   '@smithy/util-body-length-browser@3.0.0':
     dependencies:
-      tslib: 2.6.2
+      tslib: 2.7.0
 
   '@smithy/util-body-length-node@3.0.0':
     dependencies:
-      tslib: 2.6.2
+      tslib: 2.7.0
 
   '@smithy/util-buffer-from@3.0.0':
     dependencies:
@@ -23430,7 +23507,7 @@ snapshots:
       '@smithy/smithy-client': 3.0.1
       '@smithy/types': 3.0.0
       bowser: 2.11.0
-      tslib: 2.6.2
+      tslib: 2.7.0
 
   '@smithy/util-defaults-mode-node@3.0.1':
     dependencies:
@@ -23440,13 +23517,13 @@ snapshots:
       '@smithy/property-provider': 3.0.0
       '@smithy/smithy-client': 3.0.1
       '@smithy/types': 3.0.0
-      tslib: 2.6.2
+      tslib: 2.7.0
 
   '@smithy/util-endpoints@2.0.0':
     dependencies:
       '@smithy/node-config-provider': 3.0.0
       '@smithy/types': 3.0.0
-      tslib: 2.6.2
+      tslib: 2.7.0
 
   '@smithy/util-hex-encoding@3.0.0':
     dependencies:
@@ -23461,7 +23538,7 @@ snapshots:
     dependencies:
       '@smithy/service-error-classification': 3.0.0
       '@smithy/types': 3.0.0
-      tslib: 2.6.2
+      tslib: 2.7.0
 
   '@smithy/util-stream@3.0.1':
     dependencies:
@@ -23472,7 +23549,7 @@ snapshots:
       '@smithy/util-buffer-from': 3.0.0
       '@smithy/util-hex-encoding': 3.0.0
       '@smithy/util-utf8': 3.0.0
-      tslib: 2.6.2
+      tslib: 2.7.0
 
   '@smithy/util-uri-escape@3.0.0':
     dependencies:
@@ -23481,13 +23558,13 @@ snapshots:
   '@smithy/util-utf8@3.0.0':
     dependencies:
       '@smithy/util-buffer-from': 3.0.0
-      tslib: 2.6.2
+      tslib: 2.7.0
 
   '@smithy/util-waiter@3.0.0':
     dependencies:
       '@smithy/abort-controller': 3.0.0
       '@smithy/types': 3.0.0
-      tslib: 2.6.2
+      tslib: 2.7.0
 
   '@snapshot-labs/snapshot.js@0.4.110(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
     dependencies:
@@ -23628,8 +23705,8 @@ snapshots:
   '@solana/web3.js@1.95.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
     dependencies:
       '@babel/runtime': 7.25.7
-      '@noble/curves': 1.5.0
-      '@noble/hashes': 1.4.0
+      '@noble/curves': 1.6.0
+      '@noble/hashes': 1.5.0
       '@solana/buffer-layout': 4.0.1
       agentkeepalive: 4.5.0
       bigint-buffer: 1.1.5
@@ -23649,12 +23726,10 @@ snapshots:
 
   '@spruceid/siwe-parser@2.1.2':
     dependencies:
-      '@noble/hashes': 1.4.0
+      '@noble/hashes': 1.5.0
       apg-js: 4.4.0
       uri-js: 4.4.1
       valid-url: 1.0.9
-
-  '@sqlite.org/sqlite-wasm@3.46.0-build2': {}
 
   '@stablelib/aead@1.0.1': {}
 
@@ -24027,7 +24102,7 @@ snapshots:
 
   '@turnkey/api-key-stamper@0.4.1':
     dependencies:
-      '@noble/curves': 1.5.0
+      '@noble/curves': 1.6.0
       '@turnkey/encoding': 0.2.1
       sha256-uint8array: 0.10.7
 
@@ -24121,7 +24196,7 @@ snapshots:
 
   '@turnkey/webauthn-stamper@0.4.3':
     dependencies:
-      '@noble/hashes': 1.4.0
+      '@noble/hashes': 1.5.0
       buffer: 6.0.3
 
   '@turnkey/webauthn-stamper@0.5.0':
@@ -24357,9 +24432,15 @@ snapshots:
   '@types/pg-cursor@2.7.2':
     dependencies:
       '@types/node': 20.12.10
-      '@types/pg': 8.11.6
+      '@types/pg': 8.11.10
 
   '@types/pg-format@1.0.5': {}
+
+  '@types/pg@8.11.10':
+    dependencies:
+      '@types/node': 20.12.10
+      pg-protocol: 1.7.0
+      pg-types: 4.0.2
 
   '@types/pg@8.11.6':
     dependencies:
@@ -24438,6 +24519,8 @@ snapshots:
       '@types/node': 20.12.10
       '@types/tough-cookie': 4.0.5
       form-data: 2.5.1
+
+  '@types/retry@0.12.2': {}
 
   '@types/secp256k1@4.0.6':
     dependencies:
@@ -26041,6 +26124,7 @@ snapshots:
       semver: 6.3.1
     transitivePeerDependencies:
       - supports-color
+    optional: true
 
   babel-plugin-polyfill-corejs3@0.10.6(@babel/core@7.24.5):
     dependencies:
@@ -26057,6 +26141,7 @@ snapshots:
       core-js-compat: 3.38.0
     transitivePeerDependencies:
       - supports-color
+    optional: true
 
   babel-plugin-polyfill-regenerator@0.6.2(@babel/core@7.24.5):
     dependencies:
@@ -26071,6 +26156,7 @@ snapshots:
       '@babel/helper-define-polyfill-provider': 0.6.2(@babel/core@7.25.7)
     transitivePeerDependencies:
       - supports-color
+    optional: true
 
   babel-plugin-transform-flow-enums@0.0.2(@babel/core@7.24.5):
     dependencies:
@@ -26083,6 +26169,7 @@ snapshots:
       '@babel/plugin-syntax-flow': 7.24.7(@babel/core@7.25.7)
     transitivePeerDependencies:
       - '@babel/core'
+    optional: true
 
   balanced-match@1.0.2: {}
 
@@ -26149,7 +26236,7 @@ snapshots:
 
   bip39@3.1.0:
     dependencies:
-      '@noble/hashes': 1.4.0
+      '@noble/hashes': 1.5.0
 
   bl@4.1.0:
     dependencies:
@@ -26192,6 +26279,23 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+  body-parser@1.20.3:
+    dependencies:
+      bytes: 3.1.2
+      content-type: 1.0.5
+      debug: 2.6.9
+      depd: 2.0.0
+      destroy: 1.2.0
+      http-errors: 2.0.0
+      iconv-lite: 0.4.24
+      on-finished: 2.4.1
+      qs: 6.13.0
+      raw-body: 2.5.2
+      type-is: 1.6.18
+      unpipe: 1.0.0
+    transitivePeerDependencies:
+      - supports-color
+
   boolbase@1.0.0: {}
 
   borsh@0.7.0:
@@ -26218,6 +26322,7 @@ snapshots:
   braces@3.0.3:
     dependencies:
       fill-range: 7.1.1
+    optional: true
 
   brorand@1.1.0: {}
 
@@ -26305,7 +26410,7 @@ snapshots:
 
   bs58check@3.0.1:
     dependencies:
-      '@noble/hashes': 1.4.0
+      '@noble/hashes': 1.5.0
       bs58: 5.0.0
 
   bser@2.1.1:
@@ -26520,6 +26625,7 @@ snapshots:
       rimraf: 3.0.2
     transitivePeerDependencies:
       - supports-color
+    optional: true
 
   ci-info@2.0.0: {}
 
@@ -26667,8 +26773,6 @@ snapshots:
   combined-stream@1.0.8:
     dependencies:
       delayed-stream: 1.0.0
-
-  comlink@4.4.1: {}
 
   command-exists@1.2.9: {}
 
@@ -26850,6 +26954,8 @@ snapshots:
 
   cookie@0.6.0: {}
 
+  cookie@0.7.1: {}
+
   cookiejar@2.1.4: {}
 
   copy-anything@3.0.5:
@@ -26900,6 +27006,7 @@ snapshots:
       parse-json: 5.2.0
     optionalDependencies:
       typescript: 5.4.5
+    optional: true
 
   cosmjs-types@0.8.0:
     dependencies:
@@ -27081,12 +27188,11 @@ snapshots:
       es-errors: 1.3.0
       is-data-view: 1.0.1
 
-  datastore-core@9.2.9:
+  datastore-core@10.0.2:
     dependencies:
-      '@libp2p/logger': 4.0.20
-      err-code: 3.0.1
-      interface-datastore: 8.2.11
-      interface-store: 5.1.8
+      '@libp2p/logger': 5.1.0
+      interface-datastore: 8.3.1
+      interface-store: 6.0.2
       it-drain: 3.0.7
       it-filter: 3.1.1
       it-map: 3.1.1
@@ -27550,13 +27656,13 @@ snapshots:
 
   entities@4.5.0: {}
 
-  env-paths@2.2.1: {}
+  env-paths@2.2.1:
+    optional: true
 
   envinfo@7.13.0: {}
 
-  envinfo@7.14.0: {}
-
-  err-code@3.0.1: {}
+  envinfo@7.14.0:
+    optional: true
 
   error-ex@1.3.2:
     dependencies:
@@ -28009,7 +28115,7 @@ snapshots:
 
   ethereum-bloom-filters@1.1.0:
     dependencies:
-      '@noble/hashes': 1.4.0
+      '@noble/hashes': 1.5.0
 
   ethereum-cryptography@0.1.3:
     dependencies:
@@ -28181,19 +28287,6 @@ snapshots:
       - bufferutil
       - utf-8-validate
 
-  ethers@6.12.1(bufferutil@4.0.8)(utf-8-validate@5.0.10):
-    dependencies:
-      '@adraffy/ens-normalize': 1.10.1
-      '@noble/curves': 1.2.0
-      '@noble/hashes': 1.3.2
-      '@types/node': 18.15.13
-      aes-js: 4.0.0-beta.5
-      tslib: 2.4.0
-      ws: 8.5.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-    transitivePeerDependencies:
-      - bufferutil
-      - utf-8-validate
-
   ethers@6.13.2(bufferutil@4.0.8)(utf-8-validate@5.0.10):
     dependencies:
       '@adraffy/ens-normalize': 1.10.1
@@ -28225,8 +28318,6 @@ snapshots:
   event-iterator@2.0.0: {}
 
   event-target-shim@5.0.1: {}
-
-  event-target-shim@6.0.2: {}
 
   eventemitter2@6.4.9: {}
 
@@ -28303,11 +28394,11 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  express-ipld@0.0.1(express@4.19.2):
+  express-ipld@0.0.1(express@4.21.1):
     dependencies:
       '@ipld/dag-cbor': 9.2.1
       '@ipld/dag-json': 10.2.2
-      express: 4.19.2
+      express: 4.21.1
 
   express-rate-limit@7.4.0(express@4.19.2):
     dependencies:
@@ -28361,6 +28452,42 @@ snapshots:
       safe-buffer: 5.2.1
       send: 0.18.0
       serve-static: 1.15.0
+      setprototypeof: 1.2.0
+      statuses: 2.0.1
+      type-is: 1.6.18
+      utils-merge: 1.0.1
+      vary: 1.1.2
+    transitivePeerDependencies:
+      - supports-color
+
+  express@4.21.1:
+    dependencies:
+      accepts: 1.3.8
+      array-flatten: 1.1.1
+      body-parser: 1.20.3
+      content-disposition: 0.5.4
+      content-type: 1.0.5
+      cookie: 0.7.1
+      cookie-signature: 1.0.6
+      debug: 2.6.9
+      depd: 2.0.0
+      encodeurl: 2.0.0
+      escape-html: 1.0.3
+      etag: 1.8.1
+      finalhandler: 1.3.1
+      fresh: 0.5.2
+      http-errors: 2.0.0
+      merge-descriptors: 1.0.3
+      methods: 1.1.2
+      on-finished: 2.4.1
+      parseurl: 1.3.3
+      path-to-regexp: 0.1.10
+      proxy-addr: 2.0.7
+      qs: 6.13.0
+      range-parser: 1.2.1
+      safe-buffer: 5.2.1
+      send: 0.19.0
+      serve-static: 1.16.2
       setprototypeof: 1.2.0
       statuses: 2.0.1
       type-is: 1.6.18
@@ -28423,6 +28550,7 @@ snapshots:
   fast-xml-parser@4.5.0:
     dependencies:
       strnum: 1.0.5
+    optional: true
 
   fastest-levenshtein@1.0.16: {}
 
@@ -28500,6 +28628,7 @@ snapshots:
   fill-range@7.1.1:
     dependencies:
       to-regex-range: 5.0.1
+    optional: true
 
   filter-obj@1.1.0: {}
 
@@ -28519,6 +28648,18 @@ snapshots:
     dependencies:
       debug: 2.6.9
       encodeurl: 1.0.2
+      escape-html: 1.0.3
+      on-finished: 2.4.1
+      parseurl: 1.3.3
+      statuses: 2.0.1
+      unpipe: 1.0.0
+    transitivePeerDependencies:
+      - supports-color
+
+  finalhandler@1.3.1:
+    dependencies:
+      debug: 2.6.9
+      encodeurl: 2.0.0
       escape-html: 1.0.3
       on-finished: 2.4.1
       parseurl: 1.3.3
@@ -28979,11 +29120,13 @@ snapshots:
 
   hermes-estree@0.19.1: {}
 
-  hermes-estree@0.22.0: {}
+  hermes-estree@0.22.0:
+    optional: true
 
   hermes-estree@0.23.0: {}
 
-  hermes-estree@0.23.1: {}
+  hermes-estree@0.23.1:
+    optional: true
 
   hermes-parser@0.19.1:
     dependencies:
@@ -28992,6 +29135,7 @@ snapshots:
   hermes-parser@0.22.0:
     dependencies:
       hermes-estree: 0.22.0
+    optional: true
 
   hermes-parser@0.23.0:
     dependencies:
@@ -29000,6 +29144,7 @@ snapshots:
   hermes-parser@0.23.1:
     dependencies:
       hermes-estree: 0.23.1
+    optional: true
 
   hermes-profile-transformer@0.0.6:
     dependencies:
@@ -29228,12 +29373,12 @@ snapshots:
 
   ini@4.1.1: {}
 
-  interface-datastore@8.2.11:
+  interface-datastore@8.3.1:
     dependencies:
-      interface-store: 5.1.8
+      interface-store: 6.0.2
       uint8arrays: 5.1.0
 
-  interface-store@5.1.8: {}
+  interface-store@6.0.2: {}
 
   internal-slot@1.0.7:
     dependencies:
@@ -29401,6 +29546,8 @@ snapshots:
 
   is-negative-zero@2.0.3: {}
 
+  is-network-error@1.1.0: {}
+
   is-number-object@1.0.7:
     dependencies:
       has-tostringtag: 1.0.2
@@ -29518,17 +29665,13 @@ snapshots:
     dependencies:
       ws: 7.5.10(bufferutil@4.0.8)(utf-8-validate@5.0.10)
 
-  isomorphic-ws@4.0.1(ws@7.5.9(bufferutil@4.0.8)(utf-8-validate@5.0.10)):
+  isomorphic-ws@5.0.0(ws@8.18.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)):
     dependencies:
-      ws: 7.5.9(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      ws: 8.18.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
 
-  isomorphic-ws@5.0.0(ws@8.17.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)):
+  isomorphic-ws@5.0.0(ws@8.18.0(bufferutil@4.0.8)(utf-8-validate@6.0.3)):
     dependencies:
-      ws: 8.17.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-
-  isomorphic-ws@5.0.0(ws@8.17.0(bufferutil@4.0.8)(utf-8-validate@6.0.3)):
-    dependencies:
-      ws: 8.17.0(bufferutil@4.0.8)(utf-8-validate@6.0.3)
+      ws: 8.18.0(bufferutil@4.0.8)(utf-8-validate@6.0.3)
 
   isomorphic.js@0.2.5: {}
 
@@ -29616,8 +29759,6 @@ snapshots:
   it-filter@3.1.1:
     dependencies:
       it-peekable: 3.0.5
-
-  it-first@3.0.6: {}
 
   it-foreach@2.1.1:
     dependencies:
@@ -29857,6 +29998,7 @@ snapshots:
       '@sideway/address': 4.1.5
       '@sideway/formula': 3.0.1
       '@sideway/pinpoint': 2.0.0
+    optional: true
 
   jose@5.3.0: {}
 
@@ -29942,6 +30084,7 @@ snapshots:
       write-file-atomic: 2.4.3
     transitivePeerDependencies:
       - supports-color
+    optional: true
 
   jscrypto@1.0.3: {}
 
@@ -30132,30 +30275,30 @@ snapshots:
     dependencies:
       isomorphic.js: 0.2.5
 
-  libp2p@1.9.2:
+  libp2p@2.1.7:
     dependencies:
-      '@libp2p/crypto': 4.1.9
-      '@libp2p/interface': 1.7.0
-      '@libp2p/interface-internal': 1.3.4
-      '@libp2p/logger': 4.0.20
-      '@libp2p/multistream-select': 5.1.17
-      '@libp2p/peer-collections': 5.2.9
-      '@libp2p/peer-id': 4.2.4
-      '@libp2p/peer-id-factory': 4.2.4
-      '@libp2p/peer-store': 10.1.5
-      '@libp2p/utils': 5.4.9
+      '@libp2p/crypto': 5.0.4
+      '@libp2p/interface': 2.1.2
+      '@libp2p/interface-internal': 2.0.7
+      '@libp2p/logger': 5.1.0
+      '@libp2p/multistream-select': 6.0.5
+      '@libp2p/peer-collections': 6.0.7
+      '@libp2p/peer-id': 5.0.4
+      '@libp2p/peer-store': 11.0.7
+      '@libp2p/utils': 6.1.0
       '@multiformats/dns': 1.0.6
-      '@multiformats/multiaddr': 12.3.0
+      '@multiformats/multiaddr': 12.3.1
       '@multiformats/multiaddr-matcher': 1.2.4
       any-signal: 4.1.1
-      datastore-core: 9.2.9
-      interface-datastore: 8.2.11
+      datastore-core: 10.0.2
+      interface-datastore: 8.3.1
       it-byte-stream: 1.1.0
       it-merge: 3.0.5
       it-parallel: 3.0.8
       merge-options: 3.0.4
-      multiformats: 13.2.2
+      multiformats: 13.3.0
       p-defer: 4.0.1
+      p-retry: 6.2.0
       progress-events: 1.0.0
       race-event: 1.3.0
       race-signal: 1.1.0
@@ -30640,6 +30783,7 @@ snapshots:
       nullthrows: 1.1.1
     transitivePeerDependencies:
       - supports-color
+    optional: true
 
   metro-cache-key@0.80.10:
     dependencies:
@@ -30648,6 +30792,7 @@ snapshots:
   metro-cache-key@0.80.12:
     dependencies:
       flow-enums-runtime: 0.0.6
+    optional: true
 
   metro-cache@0.80.10:
     dependencies:
@@ -30660,6 +30805,7 @@ snapshots:
       exponential-backoff: 3.1.1
       flow-enums-runtime: 0.0.6
       metro-core: 0.80.12
+    optional: true
 
   metro-config@0.80.10(bufferutil@4.0.8)(utf-8-validate@5.0.10):
     dependencies:
@@ -30691,6 +30837,7 @@ snapshots:
       - bufferutil
       - supports-color
       - utf-8-validate
+    optional: true
 
   metro-core@0.80.10:
     dependencies:
@@ -30703,6 +30850,7 @@ snapshots:
       flow-enums-runtime: 0.0.6
       lodash.throttle: 4.1.1
       metro-resolver: 0.80.12
+    optional: true
 
   metro-file-map@0.80.10:
     dependencies:
@@ -30739,6 +30887,7 @@ snapshots:
       fsevents: 2.3.3
     transitivePeerDependencies:
       - supports-color
+    optional: true
 
   metro-minify-terser@0.80.10:
     dependencies:
@@ -30749,6 +30898,7 @@ snapshots:
     dependencies:
       flow-enums-runtime: 0.0.6
       terser: 5.34.1
+    optional: true
 
   metro-resolver@0.80.10:
     dependencies:
@@ -30757,6 +30907,7 @@ snapshots:
   metro-resolver@0.80.12:
     dependencies:
       flow-enums-runtime: 0.0.6
+    optional: true
 
   metro-runtime@0.80.10:
     dependencies:
@@ -30767,6 +30918,7 @@ snapshots:
     dependencies:
       '@babel/runtime': 7.25.7
       flow-enums-runtime: 0.0.6
+    optional: true
 
   metro-source-map@0.80.10:
     dependencies:
@@ -30795,6 +30947,7 @@ snapshots:
       vlq: 1.0.1
     transitivePeerDependencies:
       - supports-color
+    optional: true
 
   metro-symbolicate@0.80.10:
     dependencies:
@@ -30819,6 +30972,7 @@ snapshots:
       vlq: 1.0.1
     transitivePeerDependencies:
       - supports-color
+    optional: true
 
   metro-transform-plugins@0.80.10:
     dependencies:
@@ -30841,6 +30995,7 @@ snapshots:
       nullthrows: 1.1.1
     transitivePeerDependencies:
       - supports-color
+    optional: true
 
   metro-transform-worker@0.80.10(bufferutil@4.0.8)(utf-8-validate@5.0.10):
     dependencies:
@@ -30882,6 +31037,7 @@ snapshots:
       - bufferutil
       - supports-color
       - utf-8-validate
+    optional: true
 
   metro@0.80.10(bufferutil@4.0.8)(utf-8-validate@5.0.10):
     dependencies:
@@ -30982,6 +31138,7 @@ snapshots:
       - bufferutil
       - supports-color
       - utf-8-validate
+    optional: true
 
   micro-base@0.9.0: {}
 
@@ -31246,6 +31403,7 @@ snapshots:
     dependencies:
       braces: 3.0.3
       picomatch: 2.3.1
+    optional: true
 
   miller-rabin@4.0.1:
     dependencies:
@@ -31425,7 +31583,7 @@ snapshots:
 
   multiformats@13.1.0: {}
 
-  multiformats@13.2.2: {}
+  multiformats@13.3.0: {}
 
   multiformats@9.9.0: {}
 
@@ -31500,18 +31658,11 @@ snapshots:
 
   node-addon-api@7.1.0: {}
 
-  node-datachannel@0.11.0:
-    dependencies:
-      node-domexception: 2.0.1
-      prebuild-install: 7.1.2
-
   node-dir@0.1.17:
     dependencies:
       minimatch: 3.1.2
 
   node-domexception@1.0.0: {}
-
-  node-domexception@2.0.1: {}
 
   node-fetch-native@1.6.4: {}
 
@@ -31705,6 +31856,7 @@ snapshots:
   ob1@0.80.12:
     dependencies:
       flow-enums-runtime: 0.0.6
+    optional: true
 
   obj-multiplex@1.0.0:
     dependencies:
@@ -31911,6 +32063,12 @@ snapshots:
       eventemitter3: 5.0.1
       p-timeout: 6.1.2
 
+  p-retry@6.2.0:
+    dependencies:
+      '@types/retry': 0.12.2
+      is-network-error: 1.1.0
+      retry: 0.13.1
+
   p-timeout@3.2.0:
     dependencies:
       p-finally: 1.0.0
@@ -32052,6 +32210,8 @@ snapshots:
       lru-cache: 10.2.2
       minipass: 7.1.0
 
+  path-to-regexp@0.1.10: {}
+
   path-to-regexp@0.1.7: {}
 
   path-to-regexp@6.2.2: {}
@@ -32085,9 +32245,11 @@ snapshots:
 
   pg-connection-string@2.6.4: {}
 
-  pg-cursor@2.11.0(pg@8.12.0):
+  pg-connection-string@2.7.0: {}
+
+  pg-cursor@2.12.0(pg@8.13.0):
     dependencies:
-      pg: 8.12.0
+      pg: 8.13.0
 
   pg-int8@1.0.1: {}
 
@@ -32097,11 +32259,13 @@ snapshots:
     dependencies:
       pg: 8.11.5
 
-  pg-pool@3.6.2(pg@8.12.0):
+  pg-pool@3.7.0(pg@8.13.0):
     dependencies:
-      pg: 8.12.0
+      pg: 8.13.0
 
   pg-protocol@1.6.1: {}
+
+  pg-protocol@1.7.0: {}
 
   pg-types@2.2.0:
     dependencies:
@@ -32131,11 +32295,11 @@ snapshots:
     optionalDependencies:
       pg-cloudflare: 1.1.1
 
-  pg@8.12.0:
+  pg@8.13.0:
     dependencies:
-      pg-connection-string: 2.6.4
-      pg-pool: 3.6.2(pg@8.12.0)
-      pg-protocol: 1.6.1
+      pg-connection-string: 2.7.0
+      pg-pool: 3.7.0(pg@8.13.0)
+      pg-protocol: 1.7.0
       pg-types: 2.2.0
       pgpass: 1.0.5
     optionalDependencies:
@@ -32511,12 +32675,6 @@ snapshots:
       '@types/node': 20.12.10
       long: 5.2.3
 
-  protons-runtime@5.4.0:
-    dependencies:
-      uint8-varint: 2.0.4
-      uint8arraylist: 2.4.8
-      uint8arrays: 5.1.0
-
   protons-runtime@5.5.0:
     dependencies:
       uint8-varint: 2.0.4
@@ -32580,6 +32738,10 @@ snapshots:
       side-channel: 1.0.6
 
   qs@6.12.1:
+    dependencies:
+      side-channel: 1.0.6
+
+  qs@6.13.0:
     dependencies:
       side-channel: 1.0.6
 
@@ -32774,6 +32936,7 @@ snapshots:
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
+    optional: true
 
   react-devtools-inline@4.4.0:
     dependencies:
@@ -32878,15 +33041,6 @@ snapshots:
       base64-js: 1.5.1
       react: 18.3.1
       react-native: 0.74.0(@babel/core@7.24.5)(@babel/preset-env@7.25.3(@babel/core@7.24.5))(@types/react@18.3.3)(bufferutil@4.0.8)(react@18.3.1)(utf-8-validate@5.0.10)
-
-  react-native-webrtc@118.0.7(react-native@0.75.1(@babel/core@7.25.7)(@babel/preset-env@7.25.3(@babel/core@7.25.7))(@types/react@18.3.3)(bufferutil@4.0.8)(react@18.3.1)(typescript@5.4.5)(utf-8-validate@5.0.10)):
-    dependencies:
-      base64-js: 1.5.1
-      debug: 4.3.4
-      event-target-shim: 6.0.2
-      react-native: 0.75.1(@babel/core@7.25.7)(@babel/preset-env@7.25.3(@babel/core@7.25.7))(@types/react@18.3.3)(bufferutil@4.0.8)(react@18.3.1)(typescript@5.4.5)(utf-8-validate@5.0.10)
-    transitivePeerDependencies:
-      - supports-color
 
   react-native-webview@11.26.1(react-native@0.74.0(@babel/core@7.24.5)(@babel/preset-env@7.25.3(@babel/core@7.24.5))(@types/react@18.3.3)(bufferutil@4.0.8)(react@18.3.1)(utf-8-validate@5.0.10))(react@18.3.1):
     dependencies:
@@ -32996,6 +33150,7 @@ snapshots:
       - supports-color
       - typescript
       - utf-8-validate
+    optional: true
 
   react-popper-tooltip@4.4.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
@@ -33382,6 +33537,8 @@ snapshots:
 
   retry-as-promised@7.0.4: {}
 
+  retry@0.13.1: {}
+
   reusify@1.0.4: {}
 
   rfdc@1.3.1: {}
@@ -33452,7 +33609,7 @@ snapshots:
     dependencies:
       eventemitter3: 4.0.7
       uuid: 8.3.2
-      ws: 8.17.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      ws: 8.18.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
     optionalDependencies:
       bufferutil: 4.0.8
       utf-8-validate: 5.0.10
@@ -33503,7 +33660,7 @@ snapshots:
 
   rxjs@7.8.1:
     dependencies:
-      tslib: 2.6.2
+      tslib: 2.7.0
 
   sade@1.8.1:
     dependencies:
@@ -33600,7 +33757,8 @@ snapshots:
     dependencies:
       lru-cache: 6.0.0
 
-  semver@7.6.3: {}
+  semver@7.6.3:
+    optional: true
 
   send@0.18.0:
     dependencies:
@@ -34337,7 +34495,7 @@ snapshots:
   synckit@0.9.1:
     dependencies:
       '@pkgr/core': 0.1.1
-      tslib: 2.6.2
+      tslib: 2.7.0
 
   system-architecture@0.1.0: {}
 
@@ -34425,6 +34583,7 @@ snapshots:
       acorn: 8.12.1
       commander: 2.20.3
       source-map-support: 0.5.21
+    optional: true
 
   test-exclude@6.0.0:
     dependencies:
@@ -34768,11 +34927,11 @@ snapshots:
 
   uint8arrays@5.0.3:
     dependencies:
-      multiformats: 13.1.0
+      multiformats: 13.3.0
 
   uint8arrays@5.1.0:
     dependencies:
-      multiformats: 13.2.2
+      multiformats: 13.3.0
 
   umzug@2.3.0:
     dependencies:
@@ -35595,11 +35754,11 @@ snapshots:
   web3-providers-ws@4.0.7(bufferutil@4.0.8)(utf-8-validate@5.0.10):
     dependencies:
       '@types/ws': 8.5.3
-      isomorphic-ws: 5.0.0(ws@8.17.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))
+      isomorphic-ws: 5.0.0(ws@8.18.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))
       web3-errors: 1.1.4
       web3-types: 1.6.0
       web3-utils: 4.2.3
-      ws: 8.17.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      ws: 8.18.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
@@ -35607,11 +35766,11 @@ snapshots:
   web3-providers-ws@4.0.7(bufferutil@4.0.8)(utf-8-validate@6.0.3):
     dependencies:
       '@types/ws': 8.5.3
-      isomorphic-ws: 5.0.0(ws@8.17.0(bufferutil@4.0.8)(utf-8-validate@6.0.3))
+      isomorphic-ws: 5.0.0(ws@8.18.0(bufferutil@4.0.8)(utf-8-validate@6.0.3))
       web3-errors: 1.1.4
       web3-types: 1.6.0
       web3-utils: 4.2.3
-      ws: 8.17.0(bufferutil@4.0.8)(utf-8-validate@6.0.3)
+      ws: 8.18.0(bufferutil@4.0.8)(utf-8-validate@6.0.3)
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
@@ -35716,8 +35875,8 @@ snapshots:
 
   webauthn-p256@0.0.5:
     dependencies:
-      '@noble/curves': 1.5.0
-      '@noble/hashes': 1.4.0
+      '@noble/curves': 1.6.0
+      '@noble/hashes': 1.5.0
 
   webextension-polyfill@0.10.0: {}
 
@@ -35945,12 +36104,6 @@ snapshots:
     optionalDependencies:
       bufferutil: 4.0.8
       utf-8-validate: 6.0.3
-    optional: true
-
-  ws@8.5.0(bufferutil@4.0.8)(utf-8-validate@5.0.10):
-    optionalDependencies:
-      bufferutil: 4.0.8
-      utf-8-validate: 5.0.10
 
   xhr-request-promise@0.1.3:
     dependencies:
@@ -36016,7 +36169,8 @@ snapshots:
 
   yaml@2.5.0: {}
 
-  yaml@2.5.1: {}
+  yaml@2.5.1:
+    optional: true
 
   yargs-parser@18.1.3:
     dependencies:
