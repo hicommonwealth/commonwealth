@@ -357,6 +357,7 @@ const EditProfile = () => {
                 onImageBehaviorChange={setImageBehavior}
                 allowedImageBehaviours={['Fill', 'Tiled']}
                 canSelectImageBehavior
+                containerClassname="background-img-field"
               />
             </ProfileSection>
             <ProfileSection

@@ -12,6 +12,7 @@ import { ImageBehavior, UploadControlProps } from './types';
 type CWCoverImageUploaderProps = UploadControlProps &
   ImageBehaviorSelectorProps & {
     label?: string;
+    containerClassname?: string;
   };
 
 export const CWCoverImageUploader = ({
@@ -36,9 +37,10 @@ export const CWCoverImageUploader = ({
   imageBehavior = ImageBehavior.Circle,
   label = 'Accepts JPG and PNG files.',
   disabled,
+  containerClassname,
 }: CWCoverImageUploaderProps) => {
   return (
-    <div className={clsx('CWCoverImageUploader')}>
+    <div className={clsx('CWCoverImageUploader', containerClassname)}>
       <MessageRow label={label} hasFeedback={true} />
       <UploadControl
         name={name}
