@@ -16,7 +16,7 @@ const useGetThreadsByIdQuery = ({
   return trpc.thread.getThreadsById.useQuery(
     {
       community_id,
-      thread_ids: thread_ids.join(','),
+      thread_ids: thread_ids.sort().join(','),
     },
     {
       staleTime: THREAD_STALE_TIME,

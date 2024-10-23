@@ -53,7 +53,7 @@ export const LinkedThreadsCard = ({
             <div className="LinkedThreadsCard">
               {linkedThreadIds.length > 0 ? (
                 <div className="links-container">
-                  {linkedThreads.map((t) => {
+                  {linkedThreads!.map((t) => {
                     // @ts-expect-error SkipNullChecks
                     const tt = new Thread(t);
                     const discussionLink = getProposalUrlPath(

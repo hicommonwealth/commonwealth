@@ -65,14 +65,14 @@ export const ReactionButton = ({
     useCreateThreadReactionMutation({
       communityId,
       threadId: thread.id,
-      threadMsgId: thread.canvasMsgId,
+      threadMsgId: thread.canvasMsgId!,
     });
   const { mutateAsync: deleteThreadReaction, isLoading: isDeletingReaction } =
     useDeleteThreadReactionMutation({
       communityId,
       address: user.activeAccount?.address || '',
       threadId: thread.id,
-      threadMsgId: thread.canvasMsgId,
+      threadMsgId: thread.canvasMsgId!,
     });
 
   if (showSkeleton) return <ReactionButtonSkeleton />;
@@ -97,7 +97,7 @@ export const ReactionButton = ({
         communityId,
         address: user.activeAccount?.address,
         threadId: thread.id!,
-        threadMsgId: thread.canvasMsgId,
+        threadMsgId: thread.canvasMsgId!,
         reactionId: +reactedId,
       });
       deleteThreadReaction(input).catch((e) => {
@@ -113,7 +113,7 @@ export const ReactionButton = ({
         communityId,
         address: activeAddress || '',
         threadId: thread.id,
-        threadMsgId: thread.canvasMsgId,
+        threadMsgId: thread.canvasMsgId!,
         reactionType: 'like',
       });
       createThreadReaction(input).catch((e) => {

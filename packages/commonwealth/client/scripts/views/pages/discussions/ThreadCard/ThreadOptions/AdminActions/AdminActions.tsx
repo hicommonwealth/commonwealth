@@ -86,7 +86,7 @@ export const AdminActions = ({
   const { mutateAsync: editThread } = useEditThreadMutation({
     communityId: app.activeChainId() || '',
     threadId: thread.id,
-    threadMsgId: thread.canvasMsgId,
+    threadMsgId: thread.canvasMsgId!,
     currentStage: thread.stage,
     currentTopicId: thread.topic.id!,
   });
@@ -176,7 +176,7 @@ export const AdminActions = ({
               const input = await buildUpdateThreadInput({
                 communityId: app.activeChainId() || '',
                 threadId: thread.id,
-                threadMsgId: thread.canvasMsgId,
+                threadMsgId: thread.canvasMsgId!,
                 spam: isSpam,
                 address: user.activeAccount?.address || '',
               });
@@ -200,7 +200,7 @@ export const AdminActions = ({
     const input = await buildUpdateThreadInput({
       address: user.activeAccount?.address || '',
       threadId: thread.id,
-      threadMsgId: thread.canvasMsgId,
+      threadMsgId: thread.canvasMsgId!,
       readOnly: !thread.readOnly,
       communityId: app.activeChainId() || '',
     });
@@ -219,7 +219,7 @@ export const AdminActions = ({
     const input = await buildUpdateThreadInput({
       address: user.activeAccount?.address || '',
       threadId: thread.id,
-      threadMsgId: thread.canvasMsgId,
+      threadMsgId: thread.canvasMsgId!,
       communityId: app.activeChainId() || '',
       pinned: !thread.pinned,
     });
@@ -278,7 +278,7 @@ export const AdminActions = ({
     } else {
       const input = await buildUpdateThreadInput({
         threadId: thread.id,
-        threadMsgId: thread.canvasMsgId,
+        threadMsgId: thread.canvasMsgId!,
         communityId: app.activeChainId() || '',
         archived: !thread.archivedAt,
         address: user.activeAccount?.address || '',

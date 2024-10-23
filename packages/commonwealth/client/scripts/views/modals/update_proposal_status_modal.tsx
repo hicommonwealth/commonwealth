@@ -90,7 +90,7 @@ export const UpdateProposalStatusModal = ({
   const { mutateAsync: editThread } = useEditThreadMutation({
     communityId: app.activeChainId() || '',
     threadId: thread.id,
-    threadMsgId: thread.canvasMsgId,
+    threadMsgId: thread.canvasMsgId!,
     currentStage: thread.stage,
     currentTopicId: thread.topic.id!,
   });
@@ -116,7 +116,7 @@ export const UpdateProposalStatusModal = ({
       address: user.activeAccount?.address || '',
       communityId: app.activeChainId() || '',
       threadId: thread.id,
-      threadMsgId: thread.canvasMsgId,
+      threadMsgId: thread.canvasMsgId!,
       stage: tempStage!,
     })
       .then((input) => {
