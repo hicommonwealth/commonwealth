@@ -1,5 +1,5 @@
 import z from 'zod';
-import { Comment } from '../entities';
+import { Address, Comment, Thread, User } from '../entities';
 import { PG_INT, zBoolean } from '../utils';
 import { PaginatedResultSchema, PaginationParamsSchema } from './pagination';
 
@@ -37,6 +37,11 @@ export const ViewComments = {
     thread_id: PG_INT,
   }),
   output: Comment.extend({
+    last_edited: z.string().nullish(),
     community_id: z.string(),
+    Address: Address.extend({
+      User: User,
+    }),
+    Thread: Thread,
   }).array(),
 };

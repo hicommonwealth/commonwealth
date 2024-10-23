@@ -12,6 +12,7 @@ export function ViewComments(): Query<typeof schemas.ViewComments> {
         include: [
           {
             model: models.Address,
+            required: true,
             include: [
               {
                 model: models.User,
@@ -59,8 +60,13 @@ export function ViewComments(): Query<typeof schemas.ViewComments> {
         const data = c.toJSON();
         return {
           ...sanitizeDeletedComment(data),
-          last_edited: data.updated_at,
+          last_edited: data.updated_at?.toISOString(),
           community_id: data.Thread!.community_id!,
+          Address: {
+            ...data.Address!,
+            User: data.Address!.User!,
+          },
+          Thread: data.Thread!,
         };
       });
     },
