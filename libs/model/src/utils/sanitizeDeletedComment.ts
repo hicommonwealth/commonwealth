@@ -1,4 +1,4 @@
-import { CommentAttributes } from '@hicommonwealth/model';
+import { CommentAttributes } from '../models/comment';
 
 export function sanitizeDeletedComment(
   comment: CommentAttributes,
