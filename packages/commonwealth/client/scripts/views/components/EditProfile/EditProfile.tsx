@@ -50,8 +50,7 @@ const EditProfile = () => {
   const [addresses, setAddresses] = useState<AddressInfo[]>();
   const [isUploadingProfileImage, setIsUploadingProfileImage] = useState(false);
   const [isUploadingCoverImage, setIsUploadingCoverImage] = useState(false);
-  const [backgroundImageBehaviour, setBackgroundImageBehaviour] =
-    useState<ImageBehavior>();
+  const [imageBehavior, setImageBehavior] = useState<ImageBehavior>();
 
   const {
     areLinksValid,
@@ -125,6 +124,10 @@ const EditProfile = () => {
           canDelete: true,
         })),
       );
+      setImageBehavior(
+        (data?.profile?.background_image?.imageBehavior as ImageBehavior) ||
+          ImageBehavior.Fill,
+      );
       setAddresses(
         // @ts-expect-error <StrictNullChecks/>
         data.addresses.map((a) => {
@@ -174,7 +177,7 @@ const EditProfile = () => {
       const backgroundImage = values.backgroundImg.trim()
         ? JSON.stringify({
             url: values.backgroundImg.trim(),
-            imageBehavior: backgroundImageBehaviour,
+            imageBehavior: imageBehavior,
           })
         : null;
 
@@ -346,14 +349,14 @@ const EditProfile = () => {
                 name="backgroundImg"
                 hookToForm
                 withAIImageGeneration
-                imageBehavior={
-                  (data?.profile?.background_image
-                    ?.imageBehavior as ImageBehavior) || ImageBehavior.Fill
-                }
+                imageBehavior={imageBehavior}
                 onImageProcessingChange={({ isGenerating, isUploading }) =>
                   setIsUploadingCoverImage(isGenerating || isUploading)
                 }
-                onImageBehaviorChange={setBackgroundImageBehaviour}
+                onImageUploaded={console.log}
+                onImageBehaviorChange={setImageBehavior}
+                allowedImageBehaviours={['Fill', 'Tiled']}
+                canSelectImageBehavior
               />
             </ProfileSection>
             <ProfileSection
