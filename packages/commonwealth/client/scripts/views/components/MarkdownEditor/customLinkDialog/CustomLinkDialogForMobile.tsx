@@ -4,7 +4,7 @@ import { CustomLinkEdit } from 'views/components/MarkdownEditor/customLinkDialog
 import { CustomLinkPreview } from 'views/components/MarkdownEditor/customLinkDialog/CustomLinkPreview';
 
 /**
- * We need to use a popover on desktop and no container no mobile.
+ * We don't use any type of container on mobile.
  */
 export const CustomLinkDialogForMobile = () => {
   const [linkDialogState] = useCellValues(linkDialogState$);
