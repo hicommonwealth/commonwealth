@@ -75,5 +75,6 @@
 
   &.scaled-down {
     transform: scale(0.85);
+    transform-origin: left;
   }
 }
