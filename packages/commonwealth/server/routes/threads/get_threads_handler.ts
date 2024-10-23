@@ -176,7 +176,7 @@ export const getThreadsHandler = async (
         limit: parseInt(limit!, 10) || 0,
         page: parseInt(page!, 10) || 0,
         orderBy: order_by,
-        orderDirection: order_direction as any,
+        orderDirection: order_direction,
         includeCount: include_count,
       },
     });
