@@ -13,9 +13,9 @@ import { useFetchTokensQuery } from 'state/api/tokens';
 import useUserStore from 'state/ui/user';
 import { useDebounce } from 'usehooks-ts';
 import {
-  CWCoverImageUploader,
+  CWImageInput,
   ImageBehavior,
-} from 'views/components/component_kit/cw_cover_image_uploader';
+} from 'views/components/component_kit/CWImageInput';
 import { CWLabel } from 'views/components/component_kit/cw_label';
 import { CWTextArea } from 'views/components/component_kit/cw_text_area';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
@@ -203,15 +203,16 @@ const TokenInformationForm = ({
         charCount={180}
       />
 
-      <CWCoverImageUploader
-        subheaderText="Image (Optional - Accepts JPG and PNG files)"
-        canSelectImageBehaviour={false}
-        showUploadAndGenerateText
-        onImageProcessStatusChange={setIsProcessingProfileImage}
+      <CWImageInput
+        label="Image (Optional - Accepts JPG and PNG files)"
+        canSelectImageBehavior={false}
+        onImageProcessingChange={({ isGenerating, isUploading }) =>
+          setIsProcessingProfileImage(isGenerating || isUploading)
+        }
         name="tokenImageURL"
         hookToForm
-        defaultImageBehaviour={ImageBehavior.Fill}
-        enableGenerativeAI
+        imageBehavior={ImageBehavior.Fill}
+        withAIImageGeneration
       />
 
       {/* Action buttons */}
