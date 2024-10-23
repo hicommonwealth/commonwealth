@@ -4,6 +4,17 @@
   display: flex;
   flex-grow: 1;
 
+  * {
+    margin-top: auto;
+    margin-bottom: auto;
+  }
+
+  select {
+    outline: none;
+    border: none;
+    color: #c6c6c6;
+  }
+
   .end {
     justify-content: flex-end;
     flex-grow: 1;
