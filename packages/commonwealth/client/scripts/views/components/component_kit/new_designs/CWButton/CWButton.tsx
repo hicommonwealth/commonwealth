@@ -11,7 +11,7 @@ import './CWButton.scss';
 
 export type ButtonType = 'primary' | 'secondary' | 'tertiary' | 'destructive';
 export type ButtonHeight = 'lg' | 'med' | 'sm';
-type ButtonWidth = 'narrow' | 'wide' | 'full';
+export type ButtonWidth = 'narrow' | 'wide' | 'full';
 type ButtonAlt = 'green' | 'rorange';
 
 type ButtonStyleProps = {

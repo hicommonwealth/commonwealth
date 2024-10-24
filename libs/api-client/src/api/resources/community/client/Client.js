@@ -11,7 +11,6 @@ var __awaiter =
             resolve(value);
           });
     }
-
     return new (P || (P = Promise))(function (resolve, reject) {
       function fulfilled(value) {
         try {
@@ -20,7 +19,6 @@ var __awaiter =
           reject(e);
         }
       }
-
       function rejected(value) {
         try {
           step(generator['throw'](value));
@@ -28,13 +26,11 @@ var __awaiter =
           reject(e);
         }
       }
-
       function step(result) {
         result.done
           ? resolve(result.value)
           : adopt(result.value).then(fulfilled, rejected);
       }
-
       step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
   };
@@ -43,12 +39,10 @@ import * as core from '../../../../core';
 import * as environments from '../../../../environments';
 import * as errors from '../../../../errors/index';
 import * as serializers from '../../../../serialization/index';
-
 export class Community {
   constructor(_options) {
     this._options = _options;
   }
-
   /**
    * @param {CommonApi.GetCommunitiesRequest} request
    * @param {Community.RequestOptions} requestOptions - Request-specific configuration.
@@ -183,7 +177,6 @@ export class Community {
       }
     });
   }
-
   /**
    * @param {CommonApi.GetCommunityRequest} request
    * @param {Community.RequestOptions} requestOptions - Request-specific configuration.
@@ -270,7 +263,6 @@ export class Community {
       }
     });
   }
-
   /**
    * @param {CommonApi.GetMembersRequest} request
    * @param {Community.RequestOptions} requestOptions - Request-specific configuration.
@@ -397,7 +389,6 @@ export class Community {
       }
     });
   }
-
   /**
    * @param {CommonApi.CreateCommunityRequest} request
    * @param {Community.RequestOptions} requestOptions - Request-specific configuration.
@@ -487,7 +478,6 @@ export class Community {
       }
     });
   }
-
   /**
    * @param {CommonApi.UpdateCommunityRequest} request
    * @param {Community.RequestOptions} requestOptions - Request-specific configuration.
@@ -573,7 +563,6 @@ export class Community {
       }
     });
   }
-
   /**
    * @param {CommonApi.CreateTopicRequest} request
    * @param {Community.RequestOptions} requestOptions - Request-specific configuration.
@@ -656,7 +645,6 @@ export class Community {
       }
     });
   }
-
   /**
    * @param {CommonApi.UpdateTopicRequest} request
    * @param {Community.RequestOptions} requestOptions - Request-specific configuration.
@@ -740,7 +728,6 @@ export class Community {
       }
     });
   }
-
   /**
    * @param {CommonApi.DeleteTopicRequest} request
    * @param {Community.RequestOptions} requestOptions - Request-specific configuration.
@@ -824,7 +811,6 @@ export class Community {
       }
     });
   }
-
   /**
    * @param {CommonApi.CreateGroupRequest} request
    * @param {Community.RequestOptions} requestOptions - Request-specific configuration.
@@ -911,7 +897,6 @@ export class Community {
       }
     });
   }
-
   /**
    * @param {CommonApi.UpdateGroupRequest} request
    * @param {Community.RequestOptions} requestOptions - Request-specific configuration.
@@ -995,7 +980,6 @@ export class Community {
       }
     });
   }
-
   /**
    * @param {CommonApi.DeleteGroupRequest} request
    * @param {Community.RequestOptions} requestOptions - Request-specific configuration.
@@ -1079,7 +1063,6 @@ export class Community {
       }
     });
   }
-
   /**
    * @param {CommonApi.JoinCommunityRequest} request
    * @param {Community.RequestOptions} requestOptions - Request-specific configuration.
@@ -1162,7 +1145,6 @@ export class Community {
       }
     });
   }
-
   _getCustomAuthorizationHeaders() {
     return __awaiter(this, void 0, void 0, function* () {
       const apiKeyValue = yield core.Supplier.get(this._options.apiKey);

@@ -14,6 +14,9 @@ interface CommunityStakeStepProps {
   isTopicFlow?: boolean;
   onTopicFlowStepChange?: (step: CreateTopicStep) => void;
   refetchStakeQuery?: () => void;
+  onlyNamespace?: boolean;
+  namespace?: string | null;
+  symbol?: string;
 }
 
 const CommunityStakeStep = ({
@@ -25,15 +28,24 @@ const CommunityStakeStep = ({
   isTopicFlow,
   onTopicFlowStepChange,
   refetchStakeQuery,
+  onlyNamespace,
+  namespace,
+  symbol,
 }: CommunityStakeStepProps) => {
-  const [enableStakePage, setEnableStakePage] = useState(true);
+  const hasNamespaceReserved = !!namespace;
+  const [enableStakePage, setEnableStakePage] = useState(
+    hasNamespaceReserved ? false : true,
+  );
   const [communityStakeData, setCommunityStakeData] = useState({
-    namespace: createdCommunityName || '',
-    symbol: (createdCommunityName || '').toUpperCase().slice(0, 4),
+    namespace: namespace || createdCommunityName || '',
+    symbol: symbol || (createdCommunityName || '').toUpperCase().slice(0, 4),
   });
 
-  const handleOptInEnablingStake = ({ namespace, symbol }) => {
-    setCommunityStakeData({ namespace, symbol });
+  const handleOptInEnablingStake = (stakeData: {
+    namespace: string;
+    symbol: string;
+  }) => {
+    setCommunityStakeData(stakeData);
     setEnableStakePage(false);
   };
 
@@ -44,7 +56,15 @@ const CommunityStakeStep = ({
   };
 
   const onSuccessSignTransactions = () => {
-    isTopicFlow ? refetchStakeQuery?.() : goToSuccessStep();
+    if (isTopicFlow) {
+      if (onlyNamespace) {
+        return goToSuccessStep();
+      } else {
+        return refetchStakeQuery?.();
+      }
+    }
+
+    goToSuccessStep();
   };
 
   const onCancelSignTransactions = () => {
@@ -60,6 +80,7 @@ const CommunityStakeStep = ({
           communityStakeData={communityStakeData}
           chainId={chainId}
           isTopicFlow={isTopicFlow}
+          onlyNamespace={onlyNamespace}
         />
       ) : (
         <SignStakeTransactions
@@ -70,6 +91,8 @@ const CommunityStakeStep = ({
           createdCommunityId={createdCommunityId}
           chainId={chainId}
           isTopicFlow={isTopicFlow}
+          onlyNamespace={onlyNamespace}
+          hasNamespaceReserved={hasNamespaceReserved}
         />
       )}
     </div>

@@ -18,10 +18,7 @@ import { AvatarUpload } from '../Avatar';
 import { LinksArray, useLinksArray } from '../LinksArray';
 import { PreferenceTags, usePreferenceTags } from '../PreferenceTags';
 import { UserTrainingCardTypes } from '../UserTrainingSlider/types';
-import {
-  CWCoverImageUploader,
-  ImageBehavior,
-} from '../component_kit/cw_cover_image_uploader';
+import { CWImageInput, ImageBehavior } from '../component_kit/CWImageInput';
 import { CWDivider } from '../component_kit/cw_divider';
 import { CWText } from '../component_kit/cw_text';
 import { CWButton } from '../component_kit/new_designs/CWButton';
@@ -50,8 +47,7 @@ const EditProfile = () => {
   const [addresses, setAddresses] = useState<AddressInfo[]>();
   const [isUploadingProfileImage, setIsUploadingProfileImage] = useState(false);
   const [isUploadingCoverImage, setIsUploadingCoverImage] = useState(false);
-  const [backgroundImageBehaviour, setBackgroundImageBehaviour] =
-    useState<ImageBehavior>();
+  const [imageBehavior, setImageBehavior] = useState<ImageBehavior>();
 
   const {
     areLinksValid,
@@ -125,6 +121,10 @@ const EditProfile = () => {
           canDelete: true,
         })),
       );
+      setImageBehavior(
+        (data?.profile?.background_image?.imageBehavior as ImageBehavior) ||
+          ImageBehavior.Fill,
+      );
       setAddresses(
         // @ts-expect-error <StrictNullChecks/>
         data.addresses.map((a) => {
@@ -174,7 +174,7 @@ const EditProfile = () => {
       const backgroundImage = values.backgroundImg.trim()
         ? JSON.stringify({
             url: values.backgroundImg.trim(),
-            imageBehavior: backgroundImageBehaviour,
+            imageBehavior: imageBehavior,
           })
         : null;
 
@@ -341,18 +341,20 @@ const EditProfile = () => {
               description="Express yourself through imagery."
             >
               <CWText fontWeight="medium">Add a background image </CWText>
-              {/* TODO: add option to remove existing image */}
-              <CWCoverImageUploader
+              {/* can add option to remove existing image if needed */}
+              <CWImageInput
                 name="backgroundImg"
                 hookToForm
-                enableGenerativeAI
-                showUploadAndGenerateText
-                defaultImageBehaviour={
-                  (data?.profile?.background_image
-                    ?.imageBehavior as ImageBehavior) || ImageBehavior.Fill
+                withAIImageGeneration
+                imageBehavior={imageBehavior}
+                onImageProcessingChange={({ isGenerating, isUploading }) =>
+                  setIsUploadingCoverImage(isGenerating || isUploading)
                 }
-                onImageProcessStatusChange={setIsUploadingCoverImage}
-                onImageBehaviourChange={setBackgroundImageBehaviour}
+                onImageUploaded={console.log}
+                onImageBehaviorChange={setImageBehavior}
+                allowedImageBehaviours={['Fill', 'Tiled']}
+                canSelectImageBehavior
+                containerClassname="background-img-field"
               />
             </ProfileSection>
             <ProfileSection

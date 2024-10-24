@@ -21,7 +21,7 @@ interface TokenBannerProps {
   change?: number;
   isLoading?: boolean;
   popover?: Pick<CWPopoverProps, 'title' | 'body'>;
-  voteWeight?: number;
+  voteWeight?: string;
 }
 
 const TokenBanner = ({
@@ -76,7 +76,7 @@ const TokenBanner = ({
       )}
 
       {voteWeight && (
-        <div>
+        <div className="vote-weight">
           <CWText className="vote-weight-label" type="caption">
             Your vote weight
           </CWText>

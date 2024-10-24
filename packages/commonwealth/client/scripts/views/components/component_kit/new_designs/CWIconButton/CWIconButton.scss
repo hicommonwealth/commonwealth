@@ -26,6 +26,8 @@
   }
 
   &.disabled {
+    cursor: not-allowed;
+
     svg {
       color: $neutral-400;
     }

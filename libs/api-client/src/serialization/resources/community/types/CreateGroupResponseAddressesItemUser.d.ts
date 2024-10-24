@@ -8,7 +8,6 @@ import { CreateGroupResponseAddressesItemUserApiKey } from './CreateGroupRespons
 import { CreateGroupResponseAddressesItemUserEmailNotificationInterval } from './CreateGroupResponseAddressesItemUserEmailNotificationInterval';
 import { CreateGroupResponseAddressesItemUserProfile } from './CreateGroupResponseAddressesItemUserProfile';
 import { CreateGroupResponseAddressesItemUserProfileTagsItem } from './CreateGroupResponseAddressesItemUserProfileTagsItem';
-
 export declare const CreateGroupResponseAddressesItemUser: core.serialization.ObjectSchema<
   serializers.CreateGroupResponseAddressesItemUser.Raw,
   CommonApi.CreateGroupResponseAddressesItemUser

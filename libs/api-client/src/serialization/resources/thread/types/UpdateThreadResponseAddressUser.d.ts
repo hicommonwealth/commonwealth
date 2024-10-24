@@ -8,7 +8,6 @@ import { UpdateThreadResponseAddressUserApiKey } from './UpdateThreadResponseAdd
 import { UpdateThreadResponseAddressUserEmailNotificationInterval } from './UpdateThreadResponseAddressUserEmailNotificationInterval';
 import { UpdateThreadResponseAddressUserProfile } from './UpdateThreadResponseAddressUserProfile';
 import { UpdateThreadResponseAddressUserProfileTagsItem } from './UpdateThreadResponseAddressUserProfileTagsItem';
-
 export declare const UpdateThreadResponseAddressUser: core.serialization.ObjectSchema<
   serializers.UpdateThreadResponseAddressUser.Raw,
   CommonApi.UpdateThreadResponseAddressUser

@@ -18,8 +18,6 @@ export type Aggregates = Extract<
   | 'Topic'
   | 'CommentSubscription'
   | 'ThreadSubscription'
-  | 'Contract'
-  | 'CommunityContract'
   | 'Wallets'
   | 'GroupPermission'
   | 'Tags'

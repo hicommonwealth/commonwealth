@@ -1,0 +1,23 @@
+.BlockSelectorButton {
+  button {
+    outline: none;
+    border: none;
+    cursor: pointer;
+  }
+  .DropdownIndicator {
+    display: flex;
+    gap: 2px;
+  }
+}
+
+.FormattingPopover {
+  padding: 4px;
+
+  margin-bottom: 8px;
+  margin-top: 8px;
+
+  button {
+    outline: none;
+    border: none;
+  }
+}

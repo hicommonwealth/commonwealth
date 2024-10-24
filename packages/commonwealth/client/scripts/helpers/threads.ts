@@ -1,5 +1,8 @@
+import { PermissionEnum } from '@hicommonwealth/schemas';
 import { re_weburl } from 'lib/url-validation';
 import { Link, LinkSource } from 'models/Thread';
+// eslint-disable-next-line max-len
+import { convertGranularPermissionsToAccumulatedPermissions } from '../views/pages/CommunityGroupsAndMembers/Groups/common/GroupForm/helpers';
 
 export function detectURL(str: string) {
   if (str.slice(0, 4) !== 'http') str = `http://${str}`; // no https required because this is only used for regex match
@@ -55,11 +58,13 @@ export const getThreadActionTooltipText = ({
   isThreadArchived = false,
   isThreadLocked = false,
   isThreadTopicGated = false,
+  threadTopicInteractionRestrictions,
 }: {
   isCommunityMember?: boolean;
   isThreadArchived?: boolean;
   isThreadLocked?: boolean;
   isThreadTopicGated?: boolean;
+  threadTopicInteractionRestrictions?: PermissionEnum[];
 }): GetThreadActionTooltipTextResponse => {
   if (!isCommunityMember) {
     return getActionTooltipForNonCommunityMember;
@@ -67,5 +72,10 @@ export const getThreadActionTooltipText = ({
   if (isThreadArchived) return 'Thread is archived';
   if (isThreadLocked) return 'Thread is locked';
   if (isThreadTopicGated) return 'Topic is gated';
+  if (threadTopicInteractionRestrictions) {
+    return `Topic members are only allowed to ${convertGranularPermissionsToAccumulatedPermissions(
+      threadTopicInteractionRestrictions,
+    )}`;
+  }
   return '';
 };
