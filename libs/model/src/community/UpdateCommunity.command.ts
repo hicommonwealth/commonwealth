@@ -57,22 +57,32 @@ export function UpdateCommunity(): Command<
       mustExist('Community', community); // if authorized as admin, community is always found
 
       // Handle single string case and undefined case
-      const snapshots = !snapshot
-        ? []
-        : typeof snapshot === 'string'
-          ? [snapshot]
-          : snapshot;
-      if (snapshots.length > 0 && community.base !== ChainBase.Ethereum)
-        throw new InvalidInput(UpdateCommunityErrors.SnapshotOnlyOnEthereum);
+      if (snapshot !== undefined) {
+        const snapshots = typeof snapshot === 'string' ? [snapshot] : snapshot;
 
-      const newSpaces = snapshots.filter(
-        (s) => !community.snapshot_spaces.includes(s),
-      );
-      for (const space of newSpaces) {
-        if (!(await checkSnapshotObjectExists('space', space)))
-          throw new InvalidInput(UpdateCommunityErrors.SnapshotNotFound);
+        if (snapshots.length > 0 && community.base !== ChainBase.Ethereum) {
+          throw new InvalidInput(UpdateCommunityErrors.SnapshotOnlyOnEthereum);
+        }
+
+        if (snapshots.length) {
+          const newSpaces = snapshots.filter(
+            (s) => !community.snapshot_spaces.includes(s),
+          );
+
+          for (const space of newSpaces) {
+            if (!(await checkSnapshotObjectExists('space', space))) {
+              throw new InvalidInput(UpdateCommunityErrors.SnapshotNotFound);
+            }
+          }
+
+          community.snapshot_spaces = [
+            ...community.snapshot_spaces,
+            ...newSpaces,
+          ];
+        } else {
+          community.snapshot_spaces = [];
+        }
       }
-
       if (default_page && !has_homepage)
         throw new InvalidInput(UpdateCommunityErrors.InvalidDefaultPage);
 
@@ -91,7 +101,6 @@ export function UpdateCommunity(): Command<
       }
 
       default_page && (community.default_page = default_page);
-      community.snapshot_spaces = snapshots;
       name && (community.name = name);
       description && (community.description = description);
       default_symbol && (community.default_symbol = default_symbol);
