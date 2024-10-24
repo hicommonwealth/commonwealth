@@ -2,7 +2,7 @@ import { BigNumber } from '@ethersproject/bignumber';
 
 export const calculateVoteWeight = (
   balance: string, // should be in wei
-  voteWeight: number,
+  voteWeight: number = 0,
 ): BigNumber | null => {
   if (!balance || voteWeight <= 0) return null;
   const bigBalance = BigNumber.from(balance);

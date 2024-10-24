@@ -28,6 +28,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
+import { TooltipIndicator } from 'views/components/MarkdownEditor/indicators/TooltipIndicator';
 import { MarkdownEditorModeContext } from 'views/components/MarkdownEditor/MarkdownEditorModeContext';
 import { useDeviceProfile } from 'views/components/MarkdownEditor/useDeviceProfile';
 import { MarkdownEditorMethods } from 'views/components/MarkdownEditor/useMarkdownEditorMethods';
@@ -82,19 +83,28 @@ export type MarkdownEditorProps = Readonly<{
   placeholder?: string;
   imageHandler?: ImageHandler;
   SubmitButton?: () => ReactNode;
-  tooltip?: ReactNode;
+  tooltip?: string;
   onMarkdownEditorMethods?: (methods: MarkdownEditorMethods) => void;
   onChange?: (markdown: MarkdownStr) => void;
+  autoFocus?: boolean;
 }>;
 
 export const MarkdownEditor = memo(function MarkdownEditor(
   props: MarkdownEditorProps,
 ) {
-  const { SubmitButton, onMarkdownEditorMethods, disabled, onChange } = props;
+  const {
+    SubmitButton,
+    onMarkdownEditorMethods,
+    disabled,
+    onChange,
+    autoFocus,
+    tooltip,
+  } = props;
   const errorHandler = useMarkdownEditorErrorHandler();
   const [dragging, setDragging] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [active, setActive] = useState(false);
+  const [hovering, setHovering] = useState(false);
 
   const dragCounterRef = useRef(0);
 
@@ -274,11 +284,19 @@ export const MarkdownEditor = memo(function MarkdownEditor(
   const doFocus = useCallback(() => {
     if (mdxEditorRef.current) {
       mdxEditorRef.current.focus();
+    } else {
+      console.warn('No markdown editor ref');
     }
   }, []);
 
   const handleRef = useCallback(
     (methods: MDXEditorMethods) => {
+      if (methods && mdxEditorRef.current === null) {
+        // on startup, the mdx editor places the cursor at the END of the
+        // document when loading content but this doesn't make a ton of sense.
+        methods.focus(undefined, { defaultSelection: 'rootStart' });
+      }
+
       mdxEditorRef.current = methods;
       onMarkdownEditorMethods?.(methods);
     },
@@ -290,6 +308,17 @@ export const MarkdownEditor = memo(function MarkdownEditor(
       getMarkdown: () => mdxEditorRef.current!.getMarkdown(),
     };
   }, []);
+
+  const handleKeyDown = useCallback(
+    (event: React.KeyboardEvent) => {
+      if (disabled) {
+        // needed to prevent the user from typing into the contenteditable
+        event.preventDefault();
+        event.stopPropagation();
+      }
+    },
+    [disabled],
+  );
 
   return (
     <MarkdownEditorModeContext.Provider value={mode}>
@@ -304,6 +333,7 @@ export const MarkdownEditor = memo(function MarkdownEditor(
               active ? 'mdxeditor-container-active' : null,
               disabled ? 'mdxeditor-container-disabled' : null,
             )}
+            onKeyDownCapture={handleKeyDown}
             onDrop={handleDrop}
             onDragEnter={handleDragEnter}
             onDragOver={handleDragOver}
@@ -311,6 +341,9 @@ export const MarkdownEditor = memo(function MarkdownEditor(
             onPaste={(event) => handlePaste(event)}
             onFocus={() => setActive(true)}
             onBlur={() => setActive(false)}
+            onMouseEnter={() => setHovering(true)}
+            onMouseLeave={() => setHovering(false)}
+            autoFocus={autoFocus}
           >
             <MDXEditor
               onError={errorHandler}
@@ -327,10 +360,12 @@ export const MarkdownEditor = memo(function MarkdownEditor(
                     mode === 'mobile' ? (
                       <ToolbarForMobile
                         SubmitButton={SubmitButton}
+                        onImage={imageUploadHandlerWithMarkdownInsertion}
                         focus={doFocus}
                       />
                     ) : (
                       <ToolbarForDesktop
+                        focus={doFocus}
                         onImage={imageUploadHandlerWithMarkdownInsertion}
                       />
                     ),
@@ -364,6 +399,9 @@ export const MarkdownEditor = memo(function MarkdownEditor(
               />
             )}
 
+            {disabled && hovering && tooltip && (
+              <TooltipIndicator label={tooltip} />
+            )}
             {dragging && <DragIndicator />}
             {uploading && <UploadIndicator />}
           </div>
