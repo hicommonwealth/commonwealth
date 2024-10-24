@@ -72,4 +72,9 @@
       padding-left: 0 !important;
     }
   }
+
+  &.scaled-down {
+    transform: scale(0.85);
+    transform-origin: left;
+  }
 }

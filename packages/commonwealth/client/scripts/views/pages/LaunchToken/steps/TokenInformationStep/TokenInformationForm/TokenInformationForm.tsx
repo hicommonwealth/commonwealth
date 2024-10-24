@@ -13,9 +13,9 @@ import { useFetchTokensQuery } from 'state/api/tokens';
 import useUserStore from 'state/ui/user';
 import { useDebounce } from 'usehooks-ts';
 import {
-  CWCoverImageUploader,
+  CWImageInput,
   ImageBehavior,
-} from 'views/components/component_kit/cw_cover_image_uploader';
+} from 'views/components/component_kit/CWImageInput';
 import { CWLabel } from 'views/components/component_kit/cw_label';
 import { CWTextArea } from 'views/components/component_kit/cw_text_area';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
@@ -39,10 +39,15 @@ import { tokenInformationFormValidationSchema } from './validation';
 const TokenInformationForm = ({
   onSubmit,
   onCancel,
+  onFormUpdate,
   onAddressSelected,
   selectedAddress,
   containerClassName,
   customFooter,
+  forceFormValues,
+  focusField,
+  formDisabled,
+  openAddressSelectorOnMount = true,
 }: TokenInformationFormProps) => {
   const user = useUserStore();
   const [baseOption] = communityTypeOptions;
@@ -96,7 +101,7 @@ const TokenInformationForm = ({
 
   useRunOnceOnCondition({
     callback: openAddressSelectionModal,
-    shouldRun: true,
+    shouldRun: openAddressSelectorOnMount,
   });
 
   const handleSubmit = useCallback(
@@ -124,6 +129,23 @@ const TokenInformationForm = ({
       shouldSubmitOnAddressSelection.current = false;
     }
   }, [selectedAddress, handleSubmit]);
+
+  useEffect(() => {
+    if (forceFormValues && formMethodsRef.current) {
+      for (const [key, value] of Object.entries(forceFormValues)) {
+        if (value) {
+          value &&
+            formMethodsRef.current.setValue(key, value, { shouldDirty: true });
+        }
+      }
+    }
+  }, [forceFormValues]);
+
+  useEffect(() => {
+    if (focusField && formMethodsRef.current) {
+      formMethodsRef.current.setFocus(focusField);
+    }
+  }, [focusField]);
 
   const handleCancel = () => {
     triggerTokenLaunchFormAbort(() => {
@@ -154,8 +176,9 @@ const TokenInformationForm = ({
     <CWForm
       // @ts-expect-error <StrictNullChecks/>
       ref={formMethodsRef}
-      validationSchema={tokenInformationFormValidationSchema}
       onSubmit={handleSubmit}
+      onWatch={onFormUpdate}
+      validationSchema={tokenInformationFormValidationSchema}
       className={clsx('TokenInformationForm', containerClassName)}
     >
       <div>
@@ -170,48 +193,54 @@ const TokenInformationForm = ({
             checked: true,
             hideLabels: true,
             hookToForm: true,
-            name: 'tokenChain',
+            name: 'chain',
           }}
         />
       </div>
 
       <div className="grid-row">
         <CWTextInput
-          name="tokenName"
+          name="name"
           hookToForm
           label="Token name"
           placeholder="Name your token"
           fullWidth
           onInput={(e) => setTokenName(e.target.value?.trim())}
           customError={isTokenNameTaken ? 'Token name is already taken' : ''}
+          disabled={formDisabled}
         />
 
         <CWTextInput
-          name="tokenTicker"
+          name="symbol"
           hookToForm
           label="Ticker"
           placeholder="ABCD"
           fullWidth
+          disabled={formDisabled}
         />
       </div>
 
       <CWTextArea
-        name="tokenDescription"
+        name="description"
         hookToForm
         label="Description (Optional)"
         placeholder="Describe your token"
         charCount={180}
+        disabled={formDisabled}
       />
 
-      <CWCoverImageUploader
-        subheaderText="Image (Optional - Accepts JPG and PNG files)"
-        canSelectImageBehaviour={false}
-        showUploadAndGenerateText
-        onImageProcessStatusChange={setIsProcessingProfileImage}
-        name="tokenImageURL"
+      <CWImageInput
+        label="Image (Optional - Accepts JPG and PNG files)"
+        canSelectImageBehavior={false}
+        onImageProcessingChange={({ isGenerating, isUploading }) =>
+          setIsProcessingProfileImage(isGenerating || isUploading)
+        }
+        name="imageURL"
         hookToForm
-        defaultImageBehaviour={ImageBehavior.Fill}
-        enableGenerativeAI
+        imageBehavior={ImageBehavior.Circle}
+        withAIImageGeneration
+        disabled={formDisabled}
+        onProcessedImagesListChange={console.log}
       />
 
       {/* Action buttons */}

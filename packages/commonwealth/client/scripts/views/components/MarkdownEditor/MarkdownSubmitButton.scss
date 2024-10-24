@@ -1,8 +1,12 @@
-.mdxeditor-container-mode-desktop .MarkdownSubmitButton button {
+.MarkdownSubmitButton {
   border: none;
+  outline: none;
+  cursor: pointer;
+}
+
+.mdxeditor-container-mode-desktop .MarkdownSubmitButton {
   font-size: 1.2em;
   padding: 8px 16px;
-  cursor: pointer;
   border-radius: 8px;
   display: inline-block;
 }
