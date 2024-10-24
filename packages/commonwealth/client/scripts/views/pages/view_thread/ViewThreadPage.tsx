@@ -13,7 +13,7 @@ import useTopicGating from 'hooks/useTopicGating';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/view_thread/index.scss';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import app from 'state';
 import { useFetchCommentsQuery } from 'state/api/comments';
@@ -95,6 +95,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const { handleJoinCommunity, JoinCommunityModals } = useJoinCommunity();
 
   const user = useUserStore();
+  const commentsRef = useRef<HTMLDivElement | null>(null);
 
   const { isAddedToHomeScreen } = useAppStatus();
 
@@ -432,6 +433,15 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
       : getMetaDescription(threadBody || '');
   const ogImageUrl = app?.chain?.meta?.icon_url || '';
 
+  const scrollToFirstComment = () => {
+    if (commentsRef?.current) {
+      const ref = document.getElementsByClassName('Body')[0];
+      ref.scrollTo({
+        top: commentsRef?.current.offsetTop - 105,
+        behavior: 'smooth',
+      });
+    }
+  };
   return (
     // TODO: the editing experience can be improved (we can remove a stale code and make it smooth) - create a ticket
     <>
@@ -514,6 +524,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
             isAuthor ||
             !!hasWebLinks
           }
+          onCommentClick={scrollToFirstComment}
           isSpamThread={!!thread?.markedAsSpamAt}
           title={
             isEditingBody ? (
@@ -671,7 +682,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           comments={
             <>
               {comments.length > 0 && (
-                <div className="comments-filter-row">
+                <div className="comments-filter-row" ref={commentsRef}>
                   <Select
                     key={commentSortType}
                     size="compact"

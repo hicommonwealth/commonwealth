@@ -19,11 +19,6 @@ import {
   GetThreadPollsResult,
   __getThreadPolls,
 } from './server_threads_methods/get_thread_polls';
-import {
-  SearchThreadsOptions,
-  SearchThreadsResult,
-  __searchThreads,
-} from './server_threads_methods/search_threads';
 
 /**
  * Implements methods related to threads
@@ -36,13 +31,6 @@ export class ServerThreadsController {
     options: GetActiveThreadsOptions,
   ): Promise<GetActiveThreadsResult> {
     return __getActiveThreads.call(this, options);
-  }
-
-  async searchThreads(
-    this: ServerThreadsController,
-    options: SearchThreadsOptions,
-  ): Promise<SearchThreadsResult> {
-    return __searchThreads.call(this, options);
   }
 
   async countThreads(
