@@ -9,11 +9,11 @@ export type QuillRendererProps = {
   hideFormatting?: boolean;
   openLinksInNewTab?: boolean;
   searchTerm?: string;
-  cutoffLines?: number;
   containerClass?: string;
   markdownCutoffLength?: number; // Sometimes necessary to prevent large markdown docs from slowing down pages
   customClass?: string;
   customShowMoreButton?: ReactNode;
+  maxChars?: number;
 };
 
 type RichTextDocInfo = { format: 'richtext'; content: DeltaStatic };
@@ -26,11 +26,11 @@ export const QuillRenderer = ({
   doc,
   searchTerm,
   hideFormatting,
-  cutoffLines,
   containerClass,
   markdownCutoffLength,
   customClass,
   customShowMoreButton = null,
+  maxChars,
 }: QuillRendererProps) => {
   const docInfo: DocInfo = useMemo(() => {
     let decodedText: string;
@@ -85,8 +85,8 @@ export const QuillRenderer = ({
             hideFormatting={hideFormatting}
             doc={docInfo.content}
             searchTerm={searchTerm}
-            cutoffLines={cutoffLines}
             customShowMoreButton={customShowMoreButton}
+            maxChars={maxChars}
           />
         );
       case 'markdown':
@@ -99,16 +99,15 @@ export const QuillRenderer = ({
                 : docInfo.content
             }
             searchTerm={searchTerm}
-            cutoffLines={cutoffLines}
             customClass={customClass}
             customShowMoreButton={customShowMoreButton}
+            maxChars={maxChars}
           />
         );
       default:
         return <>N/A</>;
     }
   }, [
-    cutoffLines,
     hideFormatting,
     searchTerm,
     docInfo.content,
@@ -116,6 +115,7 @@ export const QuillRenderer = ({
     markdownCutoffLength,
     customClass,
     customShowMoreButton,
+    maxChars,
   ]);
 
   if (containerClass) {

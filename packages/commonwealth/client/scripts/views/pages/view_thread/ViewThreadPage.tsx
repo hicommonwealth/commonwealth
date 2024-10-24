@@ -1,5 +1,9 @@
 import { PermissionEnum } from '@hicommonwealth/schemas';
-import { ContentType, getThreadUrl } from '@hicommonwealth/shared';
+import {
+  ContentType,
+  MAX_CHARS_TO_SHOW_MORE,
+  getThreadUrl,
+} from '@hicommonwealth/shared';
 import { notifyError } from 'controllers/app/notifications';
 import { extractDomain, isDefaultStage } from 'helpers';
 import { commentsByDate } from 'helpers/dates';
@@ -661,6 +665,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                     key={threadBody}
                     markdown={threadBody || ''}
                     cutoffLines={50}
+                    maxChars={MAX_CHARS_TO_SHOW_MORE}
                   />
 
                   {/* @ts-expect-error StrictNullChecks*/}
