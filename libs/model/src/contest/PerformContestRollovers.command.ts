@@ -41,7 +41,7 @@ export function PerformContestRollovers(): Command<
                                  cm.interval > 0
                                  )
                               AND NOW() > co.end_time
-                              AND cm.cancelled = false
+                              AND cm.cancelled IS NOT TRUE
                      JOIN "Communities" cu ON cm.community_id = cu.id
                      JOIN "ChainNodes" cn ON cu.chain_node_id = cn.id;
         `,
