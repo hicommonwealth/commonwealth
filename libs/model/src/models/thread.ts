@@ -1,12 +1,13 @@
 import { EventNames } from '@hicommonwealth/core';
 import { Thread } from '@hicommonwealth/schemas';
-import { getDecodedString, safeTruncateBody } from '@hicommonwealth/shared';
+import { getDecodedString } from '@hicommonwealth/shared';
 import Sequelize from 'sequelize';
 import { z } from 'zod';
 import { emitEvent, getThreadContestManagers } from '../utils/utils';
 import type { CommunityAttributes } from './community';
 import type { ThreadSubscriptionAttributes } from './thread_subscriptions';
 import type { ModelInstance } from './types';
+import { beforeValidateThreadsHook } from './utils';
 
 export type ThreadAttributes = z.infer<typeof Thread> & {
   // associations
@@ -25,7 +26,7 @@ export default (
       address_id: { type: Sequelize.INTEGER, allowNull: true },
       created_by: { type: Sequelize.STRING, allowNull: true },
       title: { type: Sequelize.TEXT, allowNull: false },
-      body: { type: Sequelize.TEXT, allowNull: true },
+      body: { type: Sequelize.TEXT, allowNull: false },
       kind: { type: Sequelize.STRING, allowNull: false },
       stage: {
         type: Sequelize.TEXT,
@@ -116,13 +117,7 @@ export default (
       ],
       hooks: {
         beforeValidate(instance: ThreadInstance) {
-          if (!instance.body || instance.body.length <= 2_000) return;
-
-          if (!instance.content_url) {
-            throw new Error(
-              `content_url must be defined if body length is greater than ${2_000}`,
-            );
-          } else instance.body = safeTruncateBody(instance.body, 2_000);
+          beforeValidateThreadsHook(instance);
         },
         afterCreate: async (
           thread: ThreadInstance,
