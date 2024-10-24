@@ -374,7 +374,7 @@ export class Thread implements IUniqueId {
     this.markedAsSpamAt = t.marked_as_spam_at
       ? moment(t.marked_as_spam_at)
       : undefined;
-    this.archivedAt = t.archived_at ? moment(t.archived_at) : undefined;
+    this.archivedAt = t.archived_at ? moment(t.archived_at) : null;
     this.lockedAt = t.locked_at ? moment(t.locked_at) : undefined;
     this.numberOfComments = t.numberOfComments ?? t.number_of_comments ?? 0;
     this.canvasSignedData = t.canvas_signed_data ?? undefined;

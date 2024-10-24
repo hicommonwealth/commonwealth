@@ -231,6 +231,26 @@ const cacheUpdater = ({
   method,
   arrayManipulationMode = 'replaceArray',
 }: CacheUpdater) => {
+  // TODO: research a simpler cache invalidation strategy for tRPC queries
+  queryClient.invalidateQueries({
+    predicate: (query) => {
+      const [path, args] = query.queryKey;
+      if (Array.isArray(path) && path.length === 2) {
+        const [entity, name] = path;
+        if (entity === 'thread' && name === 'getThreadsByIds') {
+          const { input } = args as {
+            input: { community_id: string; thread_ids: string };
+          };
+          return (
+            input.community_id === communityId &&
+            input.thread_ids?.split(',').includes(threadId.toString())
+          );
+        }
+      }
+      return false;
+    },
+  });
+
   const queryCache = queryClient.getQueryCache();
   const queryKeys = queryCache.getAll().map((cache) => cache.queryKey);
 

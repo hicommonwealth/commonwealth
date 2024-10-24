@@ -13,7 +13,7 @@ const useGetThreadsByIdQuery = ({
   thread_ids = [],
   apiCallEnabled,
 }: GetThreadsByIdProps) => {
-  return trpc.thread.getThreadsById.useQuery(
+  return trpc.thread.getThreadsByIds.useQuery(
     {
       community_id,
       thread_ids: thread_ids.sort().join(','),
