@@ -36,6 +36,7 @@ export type ActiveThreadsRequestQuery = {
 export type SearchThreadsRequestQuery = {
   search: string;
   thread_title_only?: string;
+  order_by?: 'last_active' | 'rank' | 'created_at' | 'profile_name';
 } & PaginationQueryParams;
 export type BulkThreadsRequestQuery = {
   topic_id: string;
@@ -168,15 +169,18 @@ export const getThreadsHandler = async (
       throw new AppError(Errors.NoCommunity);
     }
 
-    const searchResults = await controllers.threads.searchThreads({
-      communityId: community_id,
-      searchTerm: search,
-      threadTitleOnly: thread_title_only === 'true',
-      limit: parseInt(limit!, 10) || 0,
-      page: parseInt(page!, 10) || 0,
-      orderBy: order_by,
-      orderDirection: order_direction as any,
-      includeCount: include_count,
+    const searchResults = await query(Thread.SearchThreads(), {
+      actor: { user: { email: '' } },
+      payload: {
+        communityId: community_id,
+        searchTerm: search,
+        threadTitleOnly: thread_title_only === 'true',
+        limit: parseInt(limit!, 10) || 0,
+        page: parseInt(page!, 10) || 0,
+        orderBy: order_by,
+        orderDirection: order_direction,
+        includeCount: include_count,
+      },
     });
     return success(res, searchResults);
   }

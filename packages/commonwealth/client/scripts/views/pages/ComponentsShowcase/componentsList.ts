@@ -14,6 +14,7 @@ import DrawersShowcase from 'views/pages/ComponentsShowcase/components/Drawers.s
 import DropdownsShowcase from 'views/pages/ComponentsShowcase/components/Dropdowns.showcase';
 import ElevationsShowcase from 'views/pages/ComponentsShowcase/components/Elevations.showcase';
 import FormStepsShowcase from 'views/pages/ComponentsShowcase/components/FormSteps.showcase';
+import ImageInputShowCase from 'views/pages/ComponentsShowcase/components/ImageInput.showcase';
 import InputsShowcase from 'views/pages/ComponentsShowcase/components/Inputs.showcase';
 import LoadersShowcase from 'views/pages/ComponentsShowcase/components/Loaders.showcase';
 import ModalsShowcase from 'views/pages/ComponentsShowcase/components/Modals.showcase';
@@ -64,6 +65,7 @@ export const ComponentPageName = {
   Dropdowns: 'Dropdowns',
   Inputs: 'Inputs',
   Paginations: 'Paginations',
+  ImageInput: 'ImageInput',
 };
 
 export const ComponentType = {
@@ -120,6 +122,11 @@ export const componentItems = [
   {
     ComponentPage: ButtonsCircleShowcase,
     displayName: ComponentPageName.ButtonsCircle,
+    type: ComponentType.Components,
+  },
+  {
+    ComponentPage: ImageInputShowCase,
+    displayName: ComponentPageName.ImageInput,
     type: ComponentType.Components,
   },
   {

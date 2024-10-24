@@ -52,9 +52,9 @@ class LaunchpadBondingCurve extends ContractBase {
       this.launchpadFactory,
       name,
       symbol,
-      [7000, 1250, 1000, 750], // 9181 parameters
+      [], // 9181 parameters
       // should include at community treasury at [0] and contest creation util at [1] curr tbd
-      [walletAddress, walletAddress],
+      [],
       this.web3.utils.toWei(1e9, 'ether'), // Default 1B tokens
       walletAddress,
     );

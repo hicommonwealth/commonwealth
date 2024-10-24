@@ -41,6 +41,17 @@ body,
 }
 
 .mdxeditor-container-disabled {
+  background-color: $neutral-50;
+  cursor: not-allowed !important;
+
+  .DesktopEditorFooter {
+    background-color: $neutral-50;
+  }
+
+  * {
+    pointer-events: none;
+  }
+
   .mdxeditor-root-contenteditable {
     // TODO: disable editing here...
   }
@@ -51,7 +62,7 @@ body,
     border-top: 1px solid $neutral-200;
 
     min-height: 150px;
-    max-height: 450px;
+    //max-height: 450px;
   }
 
   .mdxeditor-toolbar {
@@ -91,6 +102,13 @@ body,
   .cm-gutters {
     // necessary because otherwise code mirror line numbers are too small.
     font-size: inherit !important;
+  }
+
+  div[data-editor-block-type='image'] {
+    // this selects and hides the settings button
+    button:nth-of-type(2) {
+      display: none;
+    }
   }
 
   button {

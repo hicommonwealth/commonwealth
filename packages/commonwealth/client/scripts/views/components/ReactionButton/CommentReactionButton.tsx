@@ -105,8 +105,14 @@ export const CommentReactionButton = ({
           checkForSessionKeyRevalidationErrors(err);
           return;
         }
+        if ((err.message as string)?.includes('Insufficient token balance')) {
+          notifyError(
+            'You must have the requisite tokens to upvote in this topic',
+          );
+        } else {
+          notifyError('Failed to save reaction');
+        }
         console.error(err?.message);
-        notifyError('Failed to save reaction');
       });
     }
   };
