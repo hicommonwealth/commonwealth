@@ -32,8 +32,13 @@ const {
   deleteReaction,
   deleteThread,
 } = thread.trpcRouter;
-const { createComment, updateComment, deleteComment, createCommentReaction } =
-  comment.trpcRouter;
+const {
+  createComment,
+  updateComment,
+  deleteComment,
+  createCommentReaction,
+  setCommentSpam,
+} = comment.trpcRouter;
 const { getNewContent } = user.trpcRouter;
 
 const api = {
@@ -82,6 +87,7 @@ const api = {
   deleteReaction,
   joinCommunity,
   banAddress,
+  setCommentSpam,
 };
 
 const PATH = '/api/v1';
