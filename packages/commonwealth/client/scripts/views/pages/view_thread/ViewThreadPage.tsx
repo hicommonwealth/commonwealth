@@ -152,12 +152,16 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   );
 
   useEffect(() => {
-    if (isEdit === 'true') {
+    if (
+      isEdit === 'true' &&
+      thread &&
+      (isAdmin || Permissions.isThreadAuthor(thread))
+    ) {
       setShouldRestoreEdits(true);
       setIsGloballyEditing(true);
       setIsEditingBody(true);
     }
-  }, [isEdit]);
+  }, [isEdit, thread, isAdmin]);
 
   const { data: comments = [], error: fetchCommentsError } =
     useFetchCommentsQuery({
