@@ -232,7 +232,7 @@ const cacheUpdater = ({
   arrayManipulationMode = 'replaceArray',
 }: CacheUpdater) => {
   // TODO: research a simpler cache invalidation strategy for tRPC queries
-  queryClient.invalidateQueries({
+  void queryClient.invalidateQueries({
     predicate: (query) => {
       const [path, args] = query.queryKey;
       if (Array.isArray(path) && path.length === 2) {
