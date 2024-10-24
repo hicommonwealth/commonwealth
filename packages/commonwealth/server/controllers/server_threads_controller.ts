@@ -1,10 +1,5 @@
 import { DB } from '@hicommonwealth/model';
 import {
-  CountThreadsOptions,
-  CountThreadsResult,
-  __countThreads,
-} from './server_threads_methods/count_threads';
-import {
   CreateThreadPollOptions,
   CreateThreadPollResult,
   __createThreadPoll,
@@ -31,12 +26,6 @@ export class ServerThreadsController {
     options: GetThreadsByIdOptions,
   ): Promise<GetThreadsByIdResult> {
     return __getThreadsById.call(this, options);
-  }
-
-  async countThreads(
-    options: CountThreadsOptions,
-  ): Promise<CountThreadsResult> {
-    return __countThreads.call(this, options);
   }
 
   async createThreadPoll(
