@@ -47,7 +47,7 @@ export function GetActiveContestManagers(): Query<
                 )
             WHERE ct.topic_id = :topic_id
               AND cm.community_id = :community_id
-              AND cm.cancelled = false
+              AND cm.cancelled IS NOT TRUE
               AND (
                 cm.interval = 0 AND NOW() < co.end_time
                     OR

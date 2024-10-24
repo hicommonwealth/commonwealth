@@ -12,8 +12,9 @@ import useTopicGating from 'hooks/useTopicGating';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/view_thread/index.scss';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
+import { useSearchParams } from 'react-router-dom';
 import app from 'state';
 import { useFetchCommentsQuery } from 'state/api/comments';
 import useGetContentByUrlQuery from 'state/api/general/getContentByUrl';
@@ -69,12 +70,11 @@ import { SnapshotCreationCard } from './snapshot_creation_card';
 type ViewThreadPageProps = {
   identifier: string;
 };
-
 const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const threadId = identifier.split('-')[0];
-
+  const [searchParams] = useSearchParams();
+  const isEdit = searchParams.get('isEdit') ?? undefined;
   const navigate = useCommonNavigate();
-
   const [isEditingBody, setIsEditingBody] = useState(false);
   const [isGloballyEditing, setIsGloballyEditing] = useState(false);
   const [savedEdits, setSavedEdits] = useState('');
@@ -94,6 +94,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const { handleJoinCommunity, JoinCommunityModals } = useJoinCommunity();
 
   const user = useUserStore();
+  const commentsRef = useRef<HTMLDivElement | null>(null);
 
   const { isAddedToHomeScreen } = useAppStatus();
 
@@ -149,6 +150,18 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     contestsData,
     thread?.topic?.id,
   );
+
+  useEffect(() => {
+    if (
+      isEdit === 'true' &&
+      thread &&
+      (isAdmin || Permissions.isThreadAuthor(thread))
+    ) {
+      setShouldRestoreEdits(true);
+      setIsGloballyEditing(true);
+      setIsEditingBody(true);
+    }
+  }, [isEdit, thread, isAdmin]);
 
   const { data: comments = [], error: fetchCommentsError } =
     useFetchCommentsQuery({
@@ -442,6 +455,15 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
       : getMetaDescription(threadBody || '');
   const ogImageUrl = app?.chain?.meta?.icon_url || '';
 
+  const scrollToFirstComment = () => {
+    if (commentsRef?.current) {
+      const ref = document.getElementsByClassName('Body')[0];
+      ref.scrollTo({
+        top: commentsRef?.current.offsetTop - 105,
+        behavior: 'smooth',
+      });
+    }
+  };
   return (
     // TODO: the editing experience can be improved (we can remove a stale code and make it smooth) - create a ticket
     <>
@@ -531,6 +553,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
             isAuthor ||
             !!hasWebLinks
           }
+          onCommentClick={scrollToFirstComment}
           // @ts-expect-error <StrictNullChecks/>
           isSpamThread={!!thread.markedAsSpamAt}
           title={
@@ -708,7 +731,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           comments={
             <>
               {comments.length > 0 && (
-                <div className="comments-filter-row">
+                <div className="comments-filter-row" ref={commentsRef}>
                   <Select
                     key={commentSortType}
                     size="compact"

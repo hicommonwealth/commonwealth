@@ -36,6 +36,7 @@
     "@hicommonwealth/core": "workspace:*",
     "@hicommonwealth/schemas": "workspace:*",
     "@hicommonwealth/shared": "workspace:*",
+    "@neynar/nodejs-sdk": "^1.55.0",
     "@solana/spl-token": "^0.4.6",
     "@solana/web3.js": "^1.91.6",
     "async-mutex": "^0.5.0",

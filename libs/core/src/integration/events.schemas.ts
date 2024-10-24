@@ -1,5 +1,7 @@
 import {
   Comment,
+  FarcasterAction,
+  FarcasterCast,
   PG_INT,
   Reaction,
   SubscriptionPreference,
@@ -9,12 +11,19 @@ import { z } from 'zod';
 import { CommunityStakeTrade, NamespaceDeployed } from './chain-event.schemas';
 import { EventMetadata } from './util.schemas';
 
-export const ThreadCreated = Thread.omit({ search: true }).extend({
+export const ThreadCreated = Thread.omit({
+  search: true,
+}).extend({
+  address: z.string().nullish(),
   contestManagers: z.array(z.object({ contest_address: z.string() })).nullish(),
 });
-export const ThreadUpvoted = Reaction.omit({ comment_id: true }).extend({
+export const ThreadUpvoted = Reaction.omit({
+  comment_id: true,
+}).extend({
+  address: z.string().nullish(),
   thread_id: PG_INT,
   community_id: z.string(),
+  topic_id: z.number().optional(),
   contestManagers: z.array(z.object({ contest_address: z.string() })).nullish(),
 });
 export const CommentCreated = Comment.omit({ search: true }).extend({
@@ -219,3 +228,15 @@ export const SubscriptionPreferencesUpdated = SubscriptionPreference.partial({
   created_at: true,
   updated_at: true,
 }).merge(SubscriptionPreference.pick({ user_id: true }));
+
+export const FarcasterCastCreated = FarcasterCast.describe(
+  'When a farcaster contest cast has been posted',
+);
+
+export const FarcasterReplyCastCreated = FarcasterCast.describe(
+  'When a reply is posted to a farcaster contest cast',
+);
+
+export const FarcasterVoteCreated = FarcasterAction.extend({
+  contest_address: z.string(),
+}).describe('When a farcaster action is initiated on a cast reply');
