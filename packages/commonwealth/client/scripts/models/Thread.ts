@@ -1,12 +1,4 @@
-import {
-  Address,
-  Contest,
-  ContestAction,
-  ContestManager,
-  ContestScore,
-  DiscordMetaSchema,
-  Reaction,
-} from '@hicommonwealth/schemas';
+import * as schemas from '@hicommonwealth/schemas';
 import { ProposalType, getDecodedString } from '@hicommonwealth/shared';
 import { UserProfile, addressToUserProfile } from 'models/MinimumProfile';
 import moment, { Moment } from 'moment';
@@ -64,13 +56,13 @@ function emptyStringToNull(input: string) {
 
 function processAssociatedReactions(
   reactions: Array<
-    z.infer<typeof Reaction> & { type?: string; address?: string }
+    z.infer<typeof schemas.Reaction> & { type?: string; address?: string }
   >,
   reactionIds: number[],
   reactionType: string[],
   reactionTimestamps: string[],
   reactionWeights: number[],
-  addressesReacted: z.infer<typeof Address>[],
+  addressesReacted: z.infer<typeof schemas.Address>[],
   reactedProfileName: string[],
   reactedProfileAvatarUrl: string[],
   reactedAddressLastActive: string[],
@@ -122,17 +114,17 @@ function processAssociatedReactions(
   return temp;
 }
 
-const ScoreZ = ContestScore.element.omit({
+const ScoreZ = schemas.ContestScore.element.omit({
   tickerPrize: true,
 });
 
-const ContestManagerZ = ContestManager.pick({
+const ContestManagerZ = schemas.ContestManager.pick({
   name: true,
   cancelled: true,
   interval: true,
 });
 
-const ContestZ = Contest.pick({
+const ContestZ = schemas.Contest.pick({
   contest_id: true,
   contest_address: true,
   end_time: true,
@@ -144,7 +136,7 @@ const ContestZ = Contest.pick({
 });
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const ContestActionZ = ContestAction.pick({
+const ContestActionZ = schemas.ContestAction.pick({
   content_id: true,
   thread_id: true,
 }).extend({
@@ -255,7 +247,7 @@ export class Thread implements IUniqueId {
   public readonly updatedAt?: Moment;
   public readonly lastCommentedOn?: Moment;
   public archivedAt?: Moment | null;
-  public topic: Topic;
+  public topic?: Topic;
   public readonly slug = ProposalType.Thread;
   public readonly url: string;
   public readonly versionHistory: ThreadVersionHistory[];
@@ -272,9 +264,11 @@ export class Thread implements IUniqueId {
   public recentComments?: Comment<IUniqueId>[];
   public reactionWeightsSum: string;
   public links: Link[];
-  public readonly discord_meta?: z.infer<typeof DiscordMetaSchema>;
+  public readonly discord_meta?: z.infer<
+    typeof schemas.DiscordMetaSchema
+  > | null;
   public readonly latestActivity?: Moment;
-  public contentUrl: string | null;
+  public contentUrl?: string | null;
 
   public readonly profile: UserProfile;
 
@@ -282,55 +276,31 @@ export class Thread implements IUniqueId {
     return `${this.slug}_${this.identifier}`;
   }
 
-  constructor(t: {
-    marked_as_spam_at?: string | null;
-    title?: string | null;
-    body?: string | null;
-    id?: number;
-    kind: ThreadKind | string;
-    stage?: ThreadStage | string;
-    community_id: string;
-    url?: string | null;
-    pinned?: boolean | null;
-    links?: Link[] | null;
-    canvas_signed_data?: string | null;
-    canvas_msg_id?: string | null;
-    collaborators?: z.infer<typeof Address>[] | null;
-    last_edited?: string | null;
-    locked_at?: string | null;
-    last_commented_on?: string | null;
-    created_at?: string | null;
-    updated_at?: string | null;
-    archived_at?: string | null;
-    read_only?: boolean | null;
-    has_poll?: boolean | null;
-    numberOfComments?: number;
-    number_of_comments?: number;
-    topic?: Topic | null;
-    reactions?: z.infer<typeof Reaction>[];
-    reactionIds?: number[];
-    addressesReacted?: z.infer<typeof Address>[];
-    reactedProfileName?: string[];
-    reactedProfileAvatarUrl?: string[];
-    reactedAddressLastActive?: string[];
-    reactionType?: string[];
-    reactionTimestamps?: string[];
-    reactionWeights?: number[];
-    reaction_weights_sum: string;
-    ThreadVersionHistories: ThreadVersionHistory[];
-    Address?: z.infer<typeof Address>;
-    discord_meta?: z.infer<typeof DiscordMetaSchema>;
-    userId?: number;
-    user_id?: number;
-    profile_name: string;
-    avatar_url?: string | null;
-    address_last_active?: string;
-    associatedReactions?: AssociatedReaction[];
-    associatedContests?: AssociatedContest[];
-    recentComments?: RecentComment[];
-    ContestActions?: ContestActionT[];
-    content_url: string | null;
-  }) {
+  constructor(
+    t: z.infer<typeof schemas.Thread> & {
+      // TODO: extended ThreadView schema
+      numberOfComments?: number;
+      number_of_comments?: number;
+      reactionIds?: number[];
+      addressesReacted?: z.infer<typeof schemas.Address>[];
+      reactedProfileName?: string[];
+      reactedProfileAvatarUrl?: string[];
+      reactedAddressLastActive?: string[];
+      reactionType?: string[];
+      reactionTimestamps?: string[];
+      reactionWeights?: number[];
+      reaction_weights_sum: string;
+      ThreadVersionHistories: ThreadVersionHistory[];
+      userId?: number;
+      user_id?: number;
+      avatar_url?: string | null;
+      address_last_active?: string;
+      associatedReactions?: AssociatedReaction[];
+      associatedContests?: AssociatedContest[];
+      recentComments?: RecentComment[];
+      ContestActions?: ContestActionT[];
+    },
+  ) {
     this.author = t.Address?.address ?? '';
     this.title = getDecodedString(t.title!);
     this.body = getDecodedString(t.body!);
@@ -338,7 +308,7 @@ export class Thread implements IUniqueId {
     this.identifier = `${t.id}`;
     this.createdAt = moment(t.created_at);
     this.updatedAt = moment(t.updated_at);
-    this.topic = { ...t.topic! };
+    this.topic = t.topic ? ({ ...t.topic } as unknown as Topic) : undefined;
     this.kind = t.kind as ThreadKind;
     this.stage = t.stage! as ThreadStage;
     this.authorCommunity = t.Address?.community_id ?? '';
@@ -376,7 +346,8 @@ export class Thread implements IUniqueId {
       : undefined;
     this.archivedAt = t.archived_at ? moment(t.archived_at) : null;
     this.lockedAt = t.locked_at ? moment(t.locked_at) : undefined;
-    this.numberOfComments = t.numberOfComments ?? t.number_of_comments ?? 0;
+    this.numberOfComments =
+      t.numberOfComments ?? t.number_of_comments ?? t.comment_count ?? 0;
     this.canvasSignedData = t.canvas_signed_data ?? undefined;
     this.canvasMsgId = t.canvas_msg_id ?? undefined;
     this.links = t.links || [];
@@ -445,7 +416,7 @@ export class Thread implements IUniqueId {
     } else {
       this.profile = {
         userId: t.userId ?? t.user_id ?? 0,
-        name: t.profile_name,
+        name: t.profile_name ?? '',
         address: t.Address?.address ?? '',
         lastActive: t.address_last_active ?? '',
         avatarUrl: t.avatar_url ?? '',
