@@ -55,6 +55,7 @@ if (config.NODE_ENV !== 'production') {
     title: 'Internal API',
     path: PATH,
     version: '0.0.1',
+    securityScheme: 'jwt',
   });
 }
 
