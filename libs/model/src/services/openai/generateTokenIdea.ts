@@ -50,7 +50,7 @@ const TOKEN_AI_PROMPTS_CONFIG = {
 const TokenErrors = {
   OpenAINotConfigured: 'OpenAI key not configured',
   OpenAIInitFailed: 'OpenAI initialization failed',
-  RequestFailed: 'failed to generate complete token idea generation',
+  RequestFailed: 'failed to generate complete token idea',
   IdeaPromptVoilatesSecurityPolicy:
     'provided `ideaPrompt` voilates content security policy',
   ImageGenerationFailure: 'failed to generate image for token idea',
