@@ -1,6 +1,6 @@
 import { EventNames } from '@hicommonwealth/core';
 import { Thread } from '@hicommonwealth/schemas';
-import { getDecodedString } from '@hicommonwealth/shared';
+import { getDecodedString, safeTruncateBody } from '@hicommonwealth/shared';
 import Sequelize from 'sequelize';
 import { z } from 'zod';
 import { emitEvent, getThreadContestManagers } from '../utils/utils';
@@ -115,6 +115,15 @@ export default (
         { fields: ['canvas_msg_id'] },
       ],
       hooks: {
+        beforeValidate(instance: ThreadInstance) {
+          if (!instance.body || instance.body.length <= 2_000) return;
+
+          if (!instance.content_url) {
+            throw new Error(
+              `content_url must be defined if body length is greater than ${2_000}`,
+            );
+          } else instance.body = safeTruncateBody(instance.body, 2_000);
+        },
         afterCreate: async (
           thread: ThreadInstance,
           options: Sequelize.CreateOptions<ThreadAttributes>,
