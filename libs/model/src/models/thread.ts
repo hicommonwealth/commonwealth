@@ -78,7 +78,7 @@ export default (
         defaultValue: 0,
       },
       reaction_weights_sum: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.DECIMAL(78, 0),
         allowNull: false,
         defaultValue: 0,
       },

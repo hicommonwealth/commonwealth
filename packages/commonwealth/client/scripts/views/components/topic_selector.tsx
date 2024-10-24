@@ -1,5 +1,5 @@
 import React from 'react';
-import Topic from '../../models/Topic';
+import type { Topic } from '../../models/Topic';
 
 import 'components/topic_selector.scss';
 import { SelectList } from 'views/components/component_kit/cw_select_list';

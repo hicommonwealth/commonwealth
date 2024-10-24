@@ -49,7 +49,12 @@ export const Thread = z.object({
 
   //counts
   reaction_count: PG_INT.optional(),
-  reaction_weights_sum: PG_INT.optional(),
+  reaction_weights_sum: z
+    .string()
+    .refine((str) => {
+      return /^[0-9]+$/.test(str); // only numbers
+    })
+    .nullish(),
   comment_count: PG_INT.optional().optional(),
 
   activity_rank_date: z.coerce.date().nullish(),
@@ -61,6 +66,7 @@ export const Thread = z.object({
 
   // associations
   Address: Address.nullish(),
+  Reaction: Reaction.nullish(),
   topic: Topic.nullish(),
   collaborators: Address.array().nullish(),
   reactions: Reaction.array().nullish(),

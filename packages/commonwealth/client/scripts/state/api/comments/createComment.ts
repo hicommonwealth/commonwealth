@@ -20,7 +20,6 @@ interface CreateCommentProps {
   parentCommentId: number | null;
   parentCommentMsgId: string | null;
   existingNumberOfComments: number;
-  isPWA?: boolean;
 }
 
 export const buildCreateCommentInput = async ({

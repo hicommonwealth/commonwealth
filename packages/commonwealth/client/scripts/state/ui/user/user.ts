@@ -27,6 +27,7 @@ type CommonProps = {
   // contains accounts specific to that community
   activeAccount: Account | null;
   jwt: string | null;
+  isOnPWA: boolean;
   isSiteAdmin: boolean;
   isEmailVerified: boolean;
   isPromotionalEmailEnabled: boolean;
@@ -52,6 +53,7 @@ export const userStore = createStore<UserStoreProps>()(
     accounts: [],
     activeAccount: null,
     jwt: null,
+    isOnPWA: false,
     isSiteAdmin: false,
     isEmailVerified: false,
     isPromotionalEmailEnabled: false,

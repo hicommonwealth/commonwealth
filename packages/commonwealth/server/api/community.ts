@@ -99,6 +99,7 @@ export const trpcRouter = trpc.router({
     Community.UpdateCustomDomain,
     trpc.Tag.Community,
   ),
+  getTopics: trpc.query(Community.GetTopics, trpc.Tag.Community),
   createTopic: trpc.command(Community.CreateTopic, trpc.Tag.Community, [
     MixpanelCommunityInteractionEvent.CREATE_TOPIC,
     (result) => ({
@@ -126,4 +127,5 @@ export const trpcRouter = trpc.router({
       community: result.community_id,
     }),
   ]),
+  banAddress: trpc.command(Community.BanAddress, trpc.Tag.Community),
 });

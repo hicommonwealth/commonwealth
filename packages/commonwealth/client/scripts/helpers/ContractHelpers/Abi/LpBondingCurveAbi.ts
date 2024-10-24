@@ -2,6 +2,7 @@ export const LpBondingCurve = [
   {
     inputs: [
       { internalType: 'address', name: 'tokenAddress', type: 'address' },
+      { internalType: 'uint256', name: 'minAmountOut', type: 'uint256' },
     ],
     stateMutability: 'payable',
     type: 'function',
@@ -12,6 +13,7 @@ export const LpBondingCurve = [
     inputs: [
       { internalType: 'address', name: 'tokenAddress', type: 'address' },
       { internalType: 'uint256', name: 'amount', type: 'uint256' },
+      { internalType: 'uint256', name: 'minAmountOut', type: 'uint256' },
     ],
     stateMutability: 'payable',
     type: 'function',
@@ -58,8 +60,18 @@ export const LpBondingCurve = [
     name: 'transferLiquidity',
     inputs: [
       { name: 'tokenAddress', type: 'address', internalType: 'address' },
+      { name: 'minAmountOut', type: 'uint256', internalType: 'uint256' },
     ],
     outputs: [],
     stateMutability: 'payable',
+  },
+  {
+    inputs: [
+      { internalType: 'address', name: 'tokenAddress', type: 'address' },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+    name: '_poolLiquidity',
+    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
   },
 ];

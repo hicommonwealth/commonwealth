@@ -1,6 +1,6 @@
 import { pluralizeWithoutNumberPrefix } from 'helpers';
 import React, { useState } from 'react';
-import Topic from '../../models/Topic';
+import type { Topic } from '../../models/Topic';
 import { useCommonNavigate } from '../../navigation/helpers';
 import app from '../../state';
 import {
@@ -37,7 +37,7 @@ export const EditTopicModal = ({
 }: EditTopicModalProps) => {
   const {
     description: descriptionProp,
-    featuredInSidebar: featuredInSidebarProp,
+    featured_in_sidebar: featuredInSidebarProp,
     id,
     name: nameProp,
   } = topic;

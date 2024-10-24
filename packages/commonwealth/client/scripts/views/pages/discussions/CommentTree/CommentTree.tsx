@@ -160,6 +160,7 @@ export const CommentTree = ({
   });
 
   const scrollToRef = useRef(null);
+  const scrollToEditorRef = useRef(null);
 
   const scrollToElement = () => {
     if (scrollToRef.current) {
@@ -170,6 +171,17 @@ export const CommentTree = ({
       });
     }
   };
+
+  const scrollToEditor = () => {
+    // @ts-expect-error <StrictNullChecks/>
+    scrollToEditorRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  useEffect(() => {
+    if (isReplying) {
+      scrollToEditor();
+    }
+  }, [isReplying]);
 
   // eslint-disable-next-line @typescript-eslint/no-shadow
   const handleIsReplying = (isReplying: boolean, id?: number) => {
@@ -264,7 +276,6 @@ export const CommentTree = ({
       setIsGloballyEditing(false);
     }
   };
-
   const handleEditStart = (comment: CommentType<any>) => {
     const editDraft = localStorage.getItem(
       `${app.activeChainId()}-edit-comment-${comment.id}-storedText`,
@@ -530,6 +541,12 @@ export const CommentTree = ({
                 parentCommentId={parentCommentId}
                 rootThread={thread}
                 canComment={canComment}
+                isReplying={isReplying}
+                tooltipText={
+                  !canComment && typeof disabledActionsTooltipText === 'string'
+                    ? disabledActionsTooltipText
+                    : ''
+                }
               />
             )}
           </React.Fragment>

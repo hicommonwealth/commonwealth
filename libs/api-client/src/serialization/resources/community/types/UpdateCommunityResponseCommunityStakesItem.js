@@ -3,7 +3,6 @@
  */
 import * as core from '../../../../core';
 import { UpdateCommunityResponseCommunityStakesItemStakeTransactionsItem } from './UpdateCommunityResponseCommunityStakesItemStakeTransactionsItem';
-
 export const UpdateCommunityResponseCommunityStakesItem =
   core.serialization.object({
     id: core.serialization.number().optional(),

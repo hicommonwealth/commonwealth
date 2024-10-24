@@ -66,13 +66,14 @@ const CommunityInformationStep = ({
     const baseNode = nodes?.find(
       (n) => n.ethChainId === commonProtocol.ValidChains.SepoliaBase,
     );
+
+    // this condition will never be triggered, adding this to avoid typescript errors
     if (!baseNode || !baseNode.ethChainId) {
       notifyError('Could not find base chain node');
       return;
     }
 
     try {
-      // this condition will never be triggered, adding this to avoid typescript errors
       if (selectedAddress?.address) {
         user.setData({
           addressSelectorSelectedAddress: selectedAddress.address,

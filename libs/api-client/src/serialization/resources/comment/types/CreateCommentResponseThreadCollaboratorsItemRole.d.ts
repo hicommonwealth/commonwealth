@@ -4,7 +4,6 @@
 import * as CommonApi from '../../../../api/index';
 import * as core from '../../../../core';
 import * as serializers from '../../../index';
-
 export declare const CreateCommentResponseThreadCollaboratorsItemRole: core.serialization.Schema<
   serializers.CreateCommentResponseThreadCollaboratorsItemRole.Raw,
   CommonApi.CreateCommentResponseThreadCollaboratorsItemRole

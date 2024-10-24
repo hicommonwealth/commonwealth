@@ -43,6 +43,18 @@
         color: $neutral-500;
       }
     }
+
+    .topic-permission-header {
+      padding: 0 12px;
+
+      @include extraSmall {
+        padding: 0 8px;
+      }
+    }
+
+    .divider-spacing {
+      margin: -10px 0px;
+    }
   }
 
   .action-buttons {

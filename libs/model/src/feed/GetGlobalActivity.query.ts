@@ -1,15 +1,12 @@
 import { Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
-import { models } from '../database';
-import { GlobalActivityCache } from '../globalActivityCache';
+import { getUserActivityFeed } from '../getUserActivityFeed';
 
-export function GetGlobalActivity(): Query<typeof schemas.ThreadFeed> {
+export function GetGlobalActivity(): Query<typeof schemas.ActivityFeed> {
   return {
-    ...schemas.ThreadFeed,
+    ...schemas.ActivityFeed,
     auth: [],
     secure: false,
-    body: async () => {
-      return await GlobalActivityCache.getInstance(models).getGlobalActivity();
-    },
+    body: async () => await getUserActivityFeed({}),
   };
 }

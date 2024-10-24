@@ -4,7 +4,6 @@
 import * as CommonApi from '../../../../api/index';
 import * as core from '../../../../core';
 import * as serializers from '../../../index';
-
 export declare const CreateGroupResponseTermsZero: core.serialization.Schema<
   serializers.CreateGroupResponseTermsZero.Raw,
   CommonApi.CreateGroupResponseTermsZero
