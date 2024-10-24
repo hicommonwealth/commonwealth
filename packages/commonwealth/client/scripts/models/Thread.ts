@@ -277,8 +277,29 @@ export class Thread implements IUniqueId {
   }
 
   constructor(
-    t: z.infer<typeof schemas.Thread> & {
+    t: Omit<
+      z.infer<typeof schemas.Thread>,
+      | 'created_at'
+      | 'updated_at'
+      | 'deleted_at'
+      | 'last_edited'
+      | 'last_commented_on'
+      | 'marked_as_spam_at'
+      | 'archived_at'
+      | 'locked_at'
+      | 'topic'
+    > & {
       // TODO: extended ThreadView schema
+      created_at?: Date | string | null;
+      updated_at?: Date | string | null;
+      deleted_at?: Date | string | null;
+      last_edited?: Date | string | null;
+      last_commented_on?: Date | string | null;
+      marked_as_spam_at?: Date | string | null;
+      archived_at?: Date | string | null;
+      locked_at?: Date | string | null;
+      topic?: z.infer<typeof schemas.Topic> | Topic | null;
+
       numberOfComments?: number;
       number_of_comments?: number;
       reactionIds?: number[];
@@ -340,7 +361,9 @@ export class Thread implements IUniqueId {
       ? moment(t.last_edited)
       : this.versionHistory && this.versionHistory?.length > 1
         ? moment(this.versionHistory[0].timestamp)
-        : undefined;
+        : t.updated_at
+          ? moment(t.updated_at)
+          : undefined;
     this.markedAsSpamAt = t.marked_as_spam_at
       ? moment(t.marked_as_spam_at)
       : undefined;

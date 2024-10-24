@@ -167,6 +167,8 @@ function mapThread(thread: z.infer<typeof ActivityThread>): Thread {
     last_commented_on: '',
     reaction_weights_sum: '0',
     address_last_active: '',
+    address_id: 0,
+    search: '',
     ContestActions: [],
     numberOfComments: thread.number_of_comments,
     recentComments:

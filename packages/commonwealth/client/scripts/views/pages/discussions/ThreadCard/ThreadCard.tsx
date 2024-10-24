@@ -160,7 +160,7 @@ export const ThreadCard = ({
                   thread.updatedAt
                 ).toISOString(),
               })}
-              discord_meta={thread.discord_meta}
+              discord_meta={thread.discord_meta!}
               // @ts-expect-error <StrictNullChecks/>
               archivedAt={thread.archivedAt}
               profile={thread?.profile}

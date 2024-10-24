@@ -426,7 +426,7 @@ const addThreadInAllCaches = (communityId: string, newThread: Thread) => {
     // position the thread in cache
     if (
       (k[2] === cacheTypes.BULK_THREADS &&
-        (k[3] === newThread.topic.id || k[3] === undefined)) ||
+        (k[3] === newThread.topic?.id || k[3] === undefined)) ||
       k[2] === cacheTypes.ACTIVE_THREADS
     ) {
       queryClient.cancelQueries(k);

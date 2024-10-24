@@ -224,13 +224,13 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
           const isTopicGated = !!(memberships || []).find(
             (membership) =>
               thread?.topic?.id &&
-              membership.topics.find((t) => t.id === thread.topic.id),
+              membership.topics.find((t) => t.id === thread.topic!.id),
           );
 
           const isActionAllowedInGatedTopic = !!(memberships || []).find(
             (membership) =>
               thread?.topic?.id &&
-              membership.topics.find((t) => t.id === thread.topic.id) &&
+              membership.topics.find((t) => t.id === thread.topic!.id) &&
               membership.isAllowed,
           );
 
@@ -238,7 +238,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
             !isAdmin && isTopicGated && !isActionAllowedInGatedTopic;
 
           const foundTopicPermissions = topicPermissions.find(
-            (tp) => tp.id === thread.topic.id,
+            (tp) => tp.id === thread.topic!.id,
           );
 
           const disabledActionsTooltipText = getThreadActionTooltipText({

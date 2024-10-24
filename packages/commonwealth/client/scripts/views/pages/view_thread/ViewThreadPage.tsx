@@ -211,7 +211,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     if (thread?.topic) {
       return (
         Array.isArray(x.topics) &&
-        x?.topics?.find((y) => y.id === thread.topic.id)
+        x?.topics?.find((y) => y.id === thread.topic!.id)
       );
     }
   });
@@ -543,7 +543,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           author={
             thread?.author ? app.chain.accounts.get(thread?.author) : null
           }
-          discord_meta={thread?.discord_meta}
+          discord_meta={thread!.discord_meta!}
           collaborators={thread?.collaborators}
           createdAt={thread?.createdAt}
           updatedAt={thread?.updatedAt}

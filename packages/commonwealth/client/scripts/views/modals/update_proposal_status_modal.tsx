@@ -92,7 +92,7 @@ export const UpdateProposalStatusModal = ({
     threadId: thread.id,
     threadMsgId: thread.canvasMsgId!,
     currentStage: thread.stage,
-    currentTopicId: thread.topic.id!,
+    currentTopicId: thread.topic!.id!,
   });
 
   const { mutateAsync: addThreadLinks } = useAddThreadLinksMutation({

@@ -42,7 +42,6 @@ export function formatActivityResponse(response: AxiosResponse<any, any>) {
         profile_name: x.thread.profile_name,
         community_id: x.thread.community_id,
         kind: x.thread.kind,
-        last_edited: x.thread.updated_at,
         marked_as_spam_at: x.thread.marked_as_spam_at,
         recentComments: x.recentcomments,
         stage: x.thread.stage,
@@ -64,13 +63,15 @@ export function formatActivityResponse(response: AxiosResponse<any, any>) {
           is_user_default: false,
           role: 'member',
         },
-        topic: x?.thread?.topic,
+        topic: x.thread.topic,
+
         // filler values
         ThreadVersionHistories: [],
-        last_commented_on: '',
         address_last_active: '',
         reaction_weights_sum: '0',
         content_url: '',
+        address_id: 0,
+        search: '',
       }),
   );
 }

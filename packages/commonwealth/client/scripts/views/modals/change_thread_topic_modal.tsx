@@ -24,7 +24,7 @@ export const ChangeThreadTopicModal = ({
   onModalClose,
   thread,
 }: ChangeThreadTopicModalProps) => {
-  const [activeTopic, setActiveTopic] = useState<Topic>(thread.topic);
+  const [activeTopic, setActiveTopic] = useState<Topic>(thread.topic!);
   const { data: topics } = useFetchTopicsQuery({
     communityId: app.activeChainId() || '',
     apiEnabled: !!app.activeChainId(),
@@ -45,7 +45,7 @@ export const ChangeThreadTopicModal = ({
     threadId: thread.id,
     threadMsgId: thread.canvasMsgId!,
     currentStage: thread.stage,
-    currentTopicId: thread.topic.id!,
+    currentTopicId: thread.topic!.id!,
   });
 
   const handleSaveChanges = async () => {
