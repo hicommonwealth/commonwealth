@@ -117,7 +117,6 @@ const CommunityNotFoundPage = lazy(
 );
 
 const CommonDomainRoutes = ({
-  contestEnabled,
   weightedTopicsEnabled,
   tokenizedCommunityEnabled,
 }: RouteFeatureFlags) => [
@@ -420,45 +419,41 @@ const CommonDomainRoutes = ({
       scoped: true,
     })}
   />,
-  ...(contestEnabled
-    ? [
-        <Route
-          key="/:scope/manage/contests"
-          path="/:scope/manage/contests"
-          element={withLayout(AdminContestsPage, {
-            scoped: true,
-          })}
-        />,
-        <Route
-          key="/:scope/manage/contests/launch"
-          path="/:scope/manage/contests/launch"
-          element={withLayout(ManageContest, {
-            scoped: true,
-          })}
-        />,
-        <Route
-          key="/:scope/manage/contests/:contestAddress"
-          path="/:scope/manage/contests/:contestAddress"
-          element={withLayout(ManageContest, {
-            scoped: true,
-          })}
-        />,
-        <Route
-          key="/:scope/contests"
-          path="/:scope/contests"
-          element={withLayout(Contests, {
-            scoped: true,
-          })}
-        />,
-        <Route
-          key="/:scope/contests/:contestAddress"
-          path="/:scope/contests/:contestAddress"
-          element={withLayout(ContestPage, {
-            scoped: true,
-          })}
-        />,
-      ]
-    : []),
+  <Route
+    key="/:scope/manage/contests"
+    path="/:scope/manage/contests"
+    element={withLayout(AdminContestsPage, {
+      scoped: true,
+    })}
+  />,
+  <Route
+    key="/:scope/manage/contests/launch"
+    path="/:scope/manage/contests/launch"
+    element={withLayout(ManageContest, {
+      scoped: true,
+    })}
+  />,
+  <Route
+    key="/:scope/manage/contests/:contestAddress"
+    path="/:scope/manage/contests/:contestAddress"
+    element={withLayout(ManageContest, {
+      scoped: true,
+    })}
+  />,
+  <Route
+    key="/:scope/contests"
+    path="/:scope/contests"
+    element={withLayout(Contests, {
+      scoped: true,
+    })}
+  />,
+  <Route
+    key="/:scope/contests/:contestAddress"
+    path="/:scope/contests/:contestAddress"
+    element={withLayout(ContestPage, {
+      scoped: true,
+    })}
+  />,
   <Route
     key="/:scope/analytics"
     path="/:scope/analytics"

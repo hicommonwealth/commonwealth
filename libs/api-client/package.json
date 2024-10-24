@@ -1,6 +1,6 @@
 {
   "name": "@commonxyz/api-client",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "type": "module",
   "description": "Common Client Proxy",
   "repository": {
@@ -15,21 +15,21 @@
     "access": "public"
   },
   "files": [
-    "build"
+    "src"
   ],
   "exports": {
     ".": {
-      "default": "./build/index.js",
-      "devmode": "./src/index.ts"
+      "default": "./src/index.js"
     }
   },
   "scripts": {
     "build": "echo Generated SDK is prebuilt",
-    "clean": "rm -rf build && rm -rf coverage",
-    "publish": "npm publish",
+    "clean": "rm -rf src/ && rm -f openapi.json",
     "run-test": "tsx ./test/index.ts",
-    "check-types": "tsc --noEmit",
-    "generate-client": "chmod u+x scripts/fern-init.sh && ./scripts/fern-init.sh && fern generate"
+    "publish-pkg": "chmod u+x scripts/publish.sh && ./scripts/publish.sh",
+    "check-types": "echo No types to check",
+    "generate-client": "pnpm -F commonwealth generate-oas production \"$(pwd)/openapi.json\" && fern generate",
+    "generate-client-dev": "pnpm -F commonwealth generate-oas local \"$(pwd)/openapi.json\" && fern generate"
   },
   "keywords": [
     "commonwealth",
@@ -39,12 +39,7 @@
   "author": "common.xyz",
   "license": "MIT",
   "dependencies": {
-    "moment": "^2.23.0",
-    "qs": "^6.13.0",
+    "node-fetch": "^3.3.2",
     "url-join": "^5.0.0"
-  },
-  "devDependencies": {
-    "@types/moment": "^2.13.0",
-    "tsx": "^4.7.2"
   }
 }

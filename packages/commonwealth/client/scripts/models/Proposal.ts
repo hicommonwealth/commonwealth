@@ -5,7 +5,6 @@ import { EventEmitter } from 'events';
 import type moment from 'moment';
 import type { ProposalStore } from '../stores';
 import type Account from './Account';
-import type ChainEvent from './ChainEvent';
 import type { ITXModalData, IUniqueId, IVote } from './interfaces';
 import type {
   ProposalEndTime,
@@ -85,8 +84,6 @@ abstract class Proposal<
     this._data = data;
     this.identifier = data.identifier;
   }
-
-  public abstract update(e: ChainEvent): any;
 
   public updateVoters?: () => Promise<void>;
 

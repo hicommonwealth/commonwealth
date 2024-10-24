@@ -78,11 +78,7 @@ export const enum MixpanelSnapshotEvents {
 }
 
 export const enum MixpanelGovernanceEvents {
-  AAVE_PROPOSAL_CREATED = 'Aave Proposal Created',
-  COMPOUND_PROPOSAL_CREATED = 'Compound Proposal Created',
   COSMOS_PROPOSAL_CREATED = 'Cosmos Proposal Created',
-  AAVE_VOTE_OCCURRED = 'Aave Vote Occurred',
-  COMPOUND_VOTE_OCCURRED = 'Compund Vote Occurred',
   COSMOS_VOTE_OCCURRED = 'Cosmos Vote Occurred',
 }
 

@@ -76,7 +76,6 @@ const start = async () => {
 
   main(app, models, {
     port: config.PORT,
-    noGlobalActivityCache: config.NO_GLOBAL_ACTIVITY_CACHE,
     withLoggingMiddleware: true,
     withPrerender: config.APP_ENV === 'production' && !config.NO_PRERENDER,
   })

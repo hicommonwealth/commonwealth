@@ -31,6 +31,5 @@ export type { E2E_TestEntities } from './tester';
 export * from './chainEventSignatures';
 export * from './config';
 export * from './database';
-export * from './globalActivityCache';
 export * from './models';
 export * from './utils';
