@@ -2,7 +2,12 @@ import { EventNames, stats } from '@hicommonwealth/core';
 import { Reaction } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize';
 import { z } from 'zod';
-import type { CommentInstance, ModelInstance, ThreadInstance } from '.';
+import type {
+  AddressAttributes,
+  CommentInstance,
+  ModelInstance,
+  ThreadInstance,
+} from '.';
 import { emitEvent, getThreadContestManagers } from '../utils/utils';
 
 export type ReactionAttributes = z.infer<typeof Reaction>;
@@ -31,6 +36,7 @@ export default (
     {
       hooks: {
         afterCreate: async (reaction, options) => {
+          const { Outbox, Address } = sequelize.models;
           const { thread_id, comment_id } = reaction;
           if (thread_id) {
             const [, threads] = await (
@@ -59,13 +65,20 @@ export default (
                     thread.topic_id,
                     thread.community_id,
                   );
+
+              const address = (await Address.findByPk(
+                reaction.address_id,
+              )) as AddressAttributes | null;
+
               await emitEvent(
-                sequelize.models.Outbox,
+                Outbox,
                 [
                   {
                     event_name: EventNames.ThreadUpvoted,
                     event_payload: {
                       ...reaction.toJSON(),
+                      topic_id: thread.topic_id!,
+                      address: address?.address,
                       community_id: thread.community_id,
                       contestManagers,
                     },

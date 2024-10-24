@@ -28,6 +28,7 @@ export const CWImageInput = ({
   onProcessedImagesListChange,
   canSwitchBetweenProcessedImages,
   processedImages,
+  loading,
   // image behavior props
   canSelectImageBehavior = false,
   onImageBehaviorChange,
@@ -48,6 +49,7 @@ export const CWImageInput = ({
         imageURL={imageURL}
         withAIImageGeneration={withAIImageGeneration}
         disabled={disabled}
+        loading={loading}
         imageBehavior={imageBehavior}
         uploadControlClassName={uploadControlClassName}
         canSwitchBetweenProcessedImages={canSwitchBetweenProcessedImages}

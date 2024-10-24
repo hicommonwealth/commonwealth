@@ -135,6 +135,20 @@ export const useGenerateTokenIdea = ({
                 // we want to render description chunks faster as trhey have more text
                 timeoutSec += fieldName === 'description' ? 15 : 30;
               }
+
+              // reset chunking state after `description` is chunked
+              if (fieldName === 'description') {
+                setTimeout(() => {
+                  setTokenIdeas((ti) => {
+                    const temp = [...ti];
+                    temp[ideaIndex] = {
+                      ...(temp[ideaIndex] || {}),
+                      chunkingField: undefined,
+                    };
+                    return temp;
+                  });
+                }, timeoutSec);
+              }
             }
 
             chunkIndex += 1;
