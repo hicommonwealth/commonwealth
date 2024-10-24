@@ -31,7 +31,7 @@ export const getTotalContestBalance = async (
   }
   if (String(results[0]) === ZERO_ADDRESS) {
     balancePromises.push(
-      web3.eth.getBalance(contestAddress).then((v: any) => {
+      web3.eth.getBalance(contestAddress).then((v: string) => {
         return v.toString();
       }),
     );
