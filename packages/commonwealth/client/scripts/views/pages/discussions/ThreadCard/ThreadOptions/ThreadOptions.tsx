@@ -36,6 +36,7 @@ type OptionsProps = AdminActionsProps & {
   hideUpvoteDrawerButton?: boolean;
   setIsUpvoteDrawerOpen?: Dispatch<SetStateAction<boolean>>;
   editingDisabled?: boolean;
+  onCommentClick?: () => void;
 };
 
 export const ThreadOptions = ({
@@ -64,12 +65,13 @@ export const ThreadOptions = ({
   hideUpvoteDrawerButton = false,
   setIsUpvoteDrawerOpen,
   editingDisabled,
+  onCommentClick,
 }: OptionsProps) => {
   const isCommunityMember = Permissions.isCommunityMember(thread.communityId);
   const userStore = useUserStore();
 
   const handleDownloadMarkdown = () => {
-    downloadDataAsFile(thread.plaintext, 'text/markdown', thread.title + '.md');
+    downloadDataAsFile(thread.body, 'text/markdown', thread.title + '.md');
   };
 
   const [verifiedCanvasSignedData, setVerifiedCanvasSignedData] =
@@ -128,6 +130,7 @@ export const ThreadOptions = ({
               onClick={(e) => {
                 e.preventDefault();
                 onCommentBtnClick();
+                onCommentClick && onCommentClick();
               }}
               tooltipText={
                 typeof disabledActionsTooltipText === 'function'

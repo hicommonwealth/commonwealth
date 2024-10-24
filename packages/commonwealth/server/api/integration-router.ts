@@ -1,52 +1,14 @@
 import { express } from '@hicommonwealth/adapters';
-import { ChainEvents, Comment, Thread, models } from '@hicommonwealth/model';
-import { RequestHandler, Router, raw } from 'express';
-import DatabaseValidationService from 'server/middleware/databaseValidationService';
+import { AppError } from '@hicommonwealth/core';
+import { ChainEvents, Contest, Snapshot, config } from '@hicommonwealth/model';
+import { Router, raw } from 'express';
+import farcasterRouter from 'server/farcaster/router';
+import { validateNeynarWebhook } from 'server/middleware/validateNeynarWebhook';
+import { config as serverConfig } from '../config';
 
 const PATH = '/api/integration';
 
-function withThreadId(req, _, next) {
-  const message_id = req.params.message_id;
-  void models.Thread.findOne({
-    where: {
-      discord_meta: { message_id },
-      deleted_at: null,
-    },
-    attributes: ['id'],
-  })
-    .then((thread) => {
-      if (!thread)
-        throw new Error(`Thread not found for message ${message_id}`);
-      req.body.thread_id = thread.id;
-      next();
-    })
-    .catch(next);
-}
-
-function withCommentId(req, _, next) {
-  const message_id = req.params.message_id;
-  void models.Comment.findOne({
-    where: {
-      discord_meta: { message_id },
-      deleted_at: null,
-    },
-    attributes: ['id'],
-  })
-    .then((comment) => {
-      if (!comment)
-        throw new Error(`Comment not found for message ${message_id}`);
-      req.body.comment_id = comment.id;
-      next();
-    })
-    .catch(next);
-}
-
-function build(validator: DatabaseValidationService) {
-  // Async middleware wrappers
-  const isBotUser: RequestHandler = (req, res, next) => {
-    validator.validateBotUser(req, res, next).catch(next);
-  };
-
+function build() {
   const router = Router();
   router.use(express.statsMiddleware);
 
@@ -66,46 +28,48 @@ function build(validator: DatabaseValidationService) {
     express.command(ChainEvents.ChainEventCreated()),
   );
 
-  // Discord BOT integration
+  if (config.CONTESTS.FLAG_FARCASTER_CONTEST) {
+    // Farcaster frames
+    router.use('/farcaster/contests', farcasterRouter);
+
+    // Farcaster webhooks/actions
+    router.post(
+      '/farcaster/CastCreated',
+      validateNeynarWebhook(config.CONTESTS.NEYNAR_CAST_CREATED_WEBHOOK_SECRET),
+      express.command(Contest.FarcasterCastCreatedWebhook()),
+    );
+
+    router.post(
+      '/farcaster/ReplyCastCreated',
+      validateNeynarWebhook(config.CONTESTS.NEYNAR_CAST_CREATED_WEBHOOK_SECRET),
+      express.command(Contest.FarcasterReplyCastCreatedWebhook()),
+    );
+
+    router.get(
+      '/farcaster/CastUpvoteAction',
+      express.query(Contest.GetFarcasterUpvoteActionMetadata()),
+    );
+
+    router.post(
+      '/farcaster/CastUpvoteAction',
+      validateNeynarWebhook(config.CONTESTS.NEYNAR_CAST_CREATED_WEBHOOK_SECRET),
+      express.command(Contest.FarcasterUpvoteAction()),
+    );
+  }
+
   router.post(
-    '/bot/threads',
-    isBotUser,
-    express.command(Thread.CreateThread()),
-  );
-
-  router.patch(
-    '/bot/threads/:message_id',
-    isBotUser,
-    withThreadId,
-    express.command(Thread.UpdateThread()),
-  );
-
-  router.delete(
-    '/bot/threads/:message_id',
-    isBotUser,
-    withThreadId,
-    express.command(Thread.DeleteThread()),
-  );
-
-  router.post(
-    '/bot/threads/:message_id/comments',
-    isBotUser,
-    withThreadId,
-    express.command(Comment.CreateComment()),
-  );
-
-  router.patch(
-    '/bot/comments/:message_id',
-    isBotUser,
-    withCommentId,
-    express.command(Comment.UpdateComment()),
-  );
-
-  router.delete(
-    '/bot/comments/:message_id',
-    isBotUser,
-    withCommentId,
-    express.command(Comment.DeleteComment()),
+    '/snapshot/webhook',
+    (req, _, next) => {
+      const headerSecret = req.headers['authentication'];
+      if (
+        serverConfig.SNAPSHOT_WEBHOOK_SECRET &&
+        headerSecret !== serverConfig.SNAPSHOT_WEBHOOK_SECRET
+      ) {
+        throw new AppError('Unauthorized', 401);
+      }
+      return next();
+    },
+    express.command(Snapshot.CreateSnapshotProposal()),
   );
 
   return router;

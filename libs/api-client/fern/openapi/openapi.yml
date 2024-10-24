@@ -1,15 +1,250 @@
 openapi: 3.0.3
 info:
   title: Common API
-  version: 0.0.1
+  version: 1.0.0
 servers:
-  - url: https://commonwealth.im/api/v1
+  - url: http://localhost:3000/api/v1
 paths:
+  /GetUserActivity:
+    get:
+      operationId: getUserActivity
+      tags:
+        - User
+      security:
+        - apiKey: []
+      parameters:
+        - in: header
+          name: address
+          required: false
+          schema:
+            type: string
+        - name: is_global
+          in: query
+          required: false
+          schema:
+            type: boolean
+        - name: thread_limit
+          in: query
+          required: false
+          schema:
+            type: number
+        - name: comment_limit
+          in: query
+          required: false
+          schema:
+            type: number
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    community_id:
+                      type: string
+                    community_icon:
+                      type: string
+                      nullable: true
+                    id:
+                      type: number
+                    user_id:
+                      type: number
+                    user_address:
+                      type: string
+                    profile_name:
+                      type: string
+                      nullable: true
+                    profile_avatar:
+                      type: string
+                      nullable: true
+                    body:
+                      type: string
+                    title:
+                      type: string
+                    kind:
+                      type: string
+                    stage:
+                      type: string
+                    number_of_comments:
+                      type: number
+                    created_at:
+                      type: string
+                      nullable: true
+                    updated_at:
+                      type: string
+                      nullable: true
+                    deleted_at:
+                      type: string
+                      nullable: true
+                    locked_at:
+                      type: string
+                      nullable: true
+                    archived_at:
+                      type: string
+                      nullable: true
+                    marked_as_spam_at:
+                      type: string
+                      nullable: true
+                    read_only:
+                      type: boolean
+                    has_poll:
+                      type: boolean
+                      nullable: true
+                    discord_meta:
+                      type: object
+                      properties:
+                        user:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                            username:
+                              type: string
+                          required:
+                            - id
+                            - username
+                          additionalProperties: false
+                        channel_id:
+                          type: string
+                        message_id:
+                          type: string
+                      required:
+                        - user
+                        - channel_id
+                        - message_id
+                      additionalProperties: false
+                      nullable: true
+                    topic:
+                      type: object
+                      properties:
+                        id:
+                          type: number
+                        name:
+                          type: string
+                        description:
+                          type: string
+                      required:
+                        - id
+                        - name
+                        - description
+                      additionalProperties: false
+                    recent_comments:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          id:
+                            type: number
+                          address:
+                            type: string
+                          user_id:
+                            type: number
+                            nullable: true
+                          profile_name:
+                            type: string
+                            nullable: true
+                          profile_avatar:
+                            type: string
+                            nullable: true
+                          text:
+                            type: string
+                          created_at:
+                            type: string
+                          updated_at:
+                            type: string
+                            nullable: true
+                          deleted_at:
+                            type: string
+                            nullable: true
+                          marked_as_spam_at:
+                            type: string
+                            nullable: true
+                          discord_meta:
+                            type: object
+                            properties:
+                              user:
+                                type: object
+                                properties:
+                                  id:
+                                    type: string
+                                  username:
+                                    type: string
+                                required:
+                                  - id
+                                  - username
+                                additionalProperties: false
+                              channel_id:
+                                type: string
+                              message_id:
+                                type: string
+                            required:
+                              - user
+                              - channel_id
+                              - message_id
+                            additionalProperties: false
+                            nullable: true
+                        required:
+                          - id
+                          - address
+                          - text
+                          - created_at
+                        additionalProperties: false
+                      nullable: true
+                  required:
+                    - community_id
+                    - id
+                    - user_id
+                    - user_address
+                    - body
+                    - title
+                    - kind
+                    - stage
+                    - number_of_comments
+                    - read_only
+                    - topic
+                  additionalProperties: false
+        default:
+          $ref: '#/components/responses/error'
+  /GetNewContent:
+    get:
+      operationId: getNewContent
+      tags:
+        - User
+      security:
+        - apiKey: []
+      parameters:
+        - in: header
+          name: address
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  joinedCommunityIdsWithNewContent:
+                    type: array
+                    items:
+                      type: string
+                required:
+                  - joinedCommunityIdsWithNewContent
+                additionalProperties: false
+        default:
+          $ref: '#/components/responses/error'
   /GetCommunities:
     get:
       operationId: getCommunities
       tags:
         - Community
+      security:
+        - apiKey: []
       parameters:
         - in: header
           name: address
@@ -475,6 +710,12 @@ paths:
                                         additionalProperties: false
                                         nullable: true
                                     additionalProperties: false
+                                  xp_points:
+                                    type: integer
+                                    minimum: 0
+                                    maximum: 2147483647
+                                    default: 0
+                                    nullable: true
                                   ProfileTags:
                                     type: array
                                     items:
@@ -494,6 +735,27 @@ paths:
                                         - user_id
                                         - tag_id
                                       additionalProperties: false
+                                  ApiKey:
+                                    type: object
+                                    properties:
+                                      user_id:
+                                        type: integer
+                                        minimum: 0
+                                        maximum: 2147483647
+                                      hashed_api_key:
+                                        type: string
+                                      salt:
+                                        type: string
+                                      created_at:
+                                        type: string
+                                        format: date-time
+                                      updated_at:
+                                        type: string
+                                        format: date-time
+                                    required:
+                                      - hashed_api_key
+                                      - salt
+                                    additionalProperties: false
                                   created_at:
                                     type: string
                                     format: date-time
@@ -1374,6 +1636,8 @@ paths:
       operationId: getCommunity
       tags:
         - Community
+      security:
+        - apiKey: []
       parameters:
         - in: header
           name: address
@@ -1723,6 +1987,12 @@ paths:
                                       additionalProperties: false
                                       nullable: true
                                   additionalProperties: false
+                                xp_points:
+                                  type: integer
+                                  minimum: 0
+                                  maximum: 2147483647
+                                  default: 0
+                                  nullable: true
                                 ProfileTags:
                                   type: array
                                   items:
@@ -1742,6 +2012,27 @@ paths:
                                       - user_id
                                       - tag_id
                                     additionalProperties: false
+                                ApiKey:
+                                  type: object
+                                  properties:
+                                    user_id:
+                                      type: integer
+                                      minimum: 0
+                                      maximum: 2147483647
+                                    hashed_api_key:
+                                      type: string
+                                    salt:
+                                      type: string
+                                    created_at:
+                                      type: string
+                                      format: date-time
+                                    updated_at:
+                                      type: string
+                                      format: date-time
+                                  required:
+                                    - hashed_api_key
+                                    - salt
+                                  additionalProperties: false
                                 created_at:
                                   type: string
                                   format: date-time
@@ -2632,6 +2923,8 @@ paths:
       operationId: getMembers
       tags:
         - Community
+      security:
+        - apiKey: []
       parameters:
         - in: header
           name: address
@@ -2814,6 +3107,8 @@ paths:
       operationId: getComments
       tags:
         - Comment
+      security:
+        - apiKey: []
       parameters:
         - in: header
           name: address
@@ -2919,8 +3214,6 @@ paths:
                           minimum: 0
                           maximum: 2147483647
                         text:
-                          type: string
-                        plaintext:
                           type: string
                         parent_id:
                           type: string
@@ -3144,6 +3437,12 @@ paths:
                                       additionalProperties: false
                                       nullable: true
                                   additionalProperties: false
+                                xp_points:
+                                  type: integer
+                                  minimum: 0
+                                  maximum: 2147483647
+                                  default: 0
+                                  nullable: true
                                 ProfileTags:
                                   type: array
                                   items:
@@ -3163,6 +3462,27 @@ paths:
                                       - user_id
                                       - tag_id
                                     additionalProperties: false
+                                ApiKey:
+                                  type: object
+                                  properties:
+                                    user_id:
+                                      type: integer
+                                      minimum: 0
+                                      maximum: 2147483647
+                                    hashed_api_key:
+                                      type: string
+                                    salt:
+                                      type: string
+                                    created_at:
+                                      type: string
+                                      format: date-time
+                                    updated_at:
+                                      type: string
+                                      format: date-time
+                                  required:
+                                    - hashed_api_key
+                                    - salt
+                                  additionalProperties: false
                                 created_at:
                                   type: string
                                   format: date-time
@@ -3201,9 +3521,6 @@ paths:
                             stage:
                               type: string
                             body:
-                              type: string
-                              nullable: true
-                            plaintext:
                               type: string
                               nullable: true
                             url:
@@ -3498,6 +3815,12 @@ paths:
                                           additionalProperties: false
                                           nullable: true
                                       additionalProperties: false
+                                    xp_points:
+                                      type: integer
+                                      minimum: 0
+                                      maximum: 2147483647
+                                      default: 0
+                                      nullable: true
                                     ProfileTags:
                                       type: array
                                       items:
@@ -3517,6 +3840,27 @@ paths:
                                           - user_id
                                           - tag_id
                                         additionalProperties: false
+                                    ApiKey:
+                                      type: object
+                                      properties:
+                                        user_id:
+                                          type: integer
+                                          minimum: 0
+                                          maximum: 2147483647
+                                        hashed_api_key:
+                                          type: string
+                                        salt:
+                                          type: string
+                                        created_at:
+                                          type: string
+                                          format: date-time
+                                        updated_at:
+                                          type: string
+                                          format: date-time
+                                      required:
+                                        - hashed_api_key
+                                        - salt
+                                      additionalProperties: false
                                     created_at:
                                       type: string
                                       format: date-time
@@ -3808,6 +4152,12 @@ paths:
                                             additionalProperties: false
                                             nullable: true
                                         additionalProperties: false
+                                      xp_points:
+                                        type: integer
+                                        minimum: 0
+                                        maximum: 2147483647
+                                        default: 0
+                                        nullable: true
                                       ProfileTags:
                                         type: array
                                         items:
@@ -3827,6 +4177,27 @@ paths:
                                             - user_id
                                             - tag_id
                                           additionalProperties: false
+                                      ApiKey:
+                                        type: object
+                                        properties:
+                                          user_id:
+                                            type: integer
+                                            minimum: 0
+                                            maximum: 2147483647
+                                          hashed_api_key:
+                                            type: string
+                                          salt:
+                                            type: string
+                                          created_at:
+                                            type: string
+                                            format: date-time
+                                          updated_at:
+                                            type: string
+                                            format: date-time
+                                        required:
+                                          - hashed_api_key
+                                          - salt
+                                        additionalProperties: false
                                       created_at:
                                         type: string
                                         format: date-time
@@ -4050,6 +4421,12 @@ paths:
                                                 additionalProperties: false
                                                 nullable: true
                                             additionalProperties: false
+                                          xp_points:
+                                            type: integer
+                                            minimum: 0
+                                            maximum: 2147483647
+                                            default: 0
+                                            nullable: true
                                           ProfileTags:
                                             type: array
                                             items:
@@ -4069,6 +4446,27 @@ paths:
                                                 - user_id
                                                 - tag_id
                                               additionalProperties: false
+                                          ApiKey:
+                                            type: object
+                                            properties:
+                                              user_id:
+                                                type: integer
+                                                minimum: 0
+                                                maximum: 2147483647
+                                              hashed_api_key:
+                                                type: string
+                                              salt:
+                                                type: string
+                                              created_at:
+                                                type: string
+                                                format: date-time
+                                              updated_at:
+                                                type: string
+                                                format: date-time
+                                            required:
+                                              - hashed_api_key
+                                              - salt
+                                            additionalProperties: false
                                           created_at:
                                             type: string
                                             format: date-time
@@ -4130,12 +4528,7 @@ paths:
                             - address_id
                             - title
                             - kind
-                            - stage
                             - community_id
-                            - view_count
-                            - reaction_count
-                            - reaction_weights_sum
-                            - comment_count
                             - search
                           additionalProperties: false
                           nullable: true
@@ -4340,6 +4733,12 @@ paths:
                                           additionalProperties: false
                                           nullable: true
                                       additionalProperties: false
+                                    xp_points:
+                                      type: integer
+                                      minimum: 0
+                                      maximum: 2147483647
+                                      default: 0
+                                      nullable: true
                                     ProfileTags:
                                       type: array
                                       items:
@@ -4359,6 +4758,27 @@ paths:
                                           - user_id
                                           - tag_id
                                         additionalProperties: false
+                                    ApiKey:
+                                      type: object
+                                      properties:
+                                        user_id:
+                                          type: integer
+                                          minimum: 0
+                                          maximum: 2147483647
+                                        hashed_api_key:
+                                          type: string
+                                        salt:
+                                          type: string
+                                        created_at:
+                                          type: string
+                                          format: date-time
+                                        updated_at:
+                                          type: string
+                                          format: date-time
+                                      required:
+                                        - hashed_api_key
+                                        - salt
+                                      additionalProperties: false
                                     created_at:
                                       type: string
                                       format: date-time
@@ -4414,7 +4834,6 @@ paths:
                         - thread_id
                         - address_id
                         - text
-                        - plaintext
                         - reaction_count
                         - search
                       additionalProperties: false
@@ -4488,8 +4907,6 @@ paths:
                     - ethereum
                     - near
                     - solana
-                user_address:
-                  type: string
                 token_name:
                   type: string
                 default_symbol:
@@ -4519,7 +4936,6 @@ paths:
                 - name
                 - chain_node_id
                 - base
-                - user_address
                 - default_symbol
               additionalProperties: false
       parameters:
@@ -4863,6 +5279,12 @@ paths:
                                       additionalProperties: false
                                       nullable: true
                                   additionalProperties: false
+                                xp_points:
+                                  type: integer
+                                  minimum: 0
+                                  maximum: 2147483647
+                                  default: 0
+                                  nullable: true
                                 ProfileTags:
                                   type: array
                                   items:
@@ -4882,6 +5304,27 @@ paths:
                                       - user_id
                                       - tag_id
                                     additionalProperties: false
+                                ApiKey:
+                                  type: object
+                                  properties:
+                                    user_id:
+                                      type: integer
+                                      minimum: 0
+                                      maximum: 2147483647
+                                    hashed_api_key:
+                                      type: string
+                                    salt:
+                                      type: string
+                                    created_at:
+                                      type: string
+                                      format: date-time
+                                    updated_at:
+                                      type: string
+                                      format: date-time
+                                  required:
+                                    - hashed_api_key
+                                    - salt
+                                  additionalProperties: false
                                 created_at:
                                   type: string
                                   format: date-time
@@ -6082,6 +6525,12 @@ paths:
                                 additionalProperties: false
                                 nullable: true
                             additionalProperties: false
+                          xp_points:
+                            type: integer
+                            minimum: 0
+                            maximum: 2147483647
+                            default: 0
+                            nullable: true
                           ProfileTags:
                             type: array
                             items:
@@ -6101,6 +6550,27 @@ paths:
                                 - user_id
                                 - tag_id
                               additionalProperties: false
+                          ApiKey:
+                            type: object
+                            properties:
+                              user_id:
+                                type: integer
+                                minimum: 0
+                                maximum: 2147483647
+                              hashed_api_key:
+                                type: string
+                              salt:
+                                type: string
+                              created_at:
+                                type: string
+                                format: date-time
+                              updated_at:
+                                type: string
+                                format: date-time
+                            required:
+                              - hashed_api_key
+                              - salt
+                            additionalProperties: false
                           created_at:
                             type: string
                             format: date-time
@@ -7305,6 +7775,12 @@ paths:
                                   additionalProperties: false
                                   nullable: true
                               additionalProperties: false
+                            xp_points:
+                              type: integer
+                              minimum: 0
+                              maximum: 2147483647
+                              default: 0
+                              nullable: true
                             ProfileTags:
                               type: array
                               items:
@@ -7324,6 +7800,27 @@ paths:
                                   - user_id
                                   - tag_id
                                 additionalProperties: false
+                            ApiKey:
+                              type: object
+                              properties:
+                                user_id:
+                                  type: integer
+                                  minimum: 0
+                                  maximum: 2147483647
+                                hashed_api_key:
+                                  type: string
+                                salt:
+                                  type: string
+                                created_at:
+                                  type: string
+                                  format: date-time
+                                updated_at:
+                                  type: string
+                                  format: date-time
+                              required:
+                                - hashed_api_key
+                                - salt
+                              additionalProperties: false
                             created_at:
                               type: string
                               format: date-time
@@ -9104,6 +9601,12 @@ paths:
                                   additionalProperties: false
                                   nullable: true
                               additionalProperties: false
+                            xp_points:
+                              type: integer
+                              minimum: 0
+                              maximum: 2147483647
+                              default: 0
+                              nullable: true
                             ProfileTags:
                               type: array
                               items:
@@ -9123,6 +9626,27 @@ paths:
                                   - user_id
                                   - tag_id
                                 additionalProperties: false
+                            ApiKey:
+                              type: object
+                              properties:
+                                user_id:
+                                  type: integer
+                                  minimum: 0
+                                  maximum: 2147483647
+                                hashed_api_key:
+                                  type: string
+                                salt:
+                                  type: string
+                                created_at:
+                                  type: string
+                                  format: date-time
+                                updated_at:
+                                  type: string
+                                  format: date-time
+                              required:
+                                - hashed_api_key
+                                - salt
+                              additionalProperties: false
                             created_at:
                               type: string
                               format: date-time
@@ -10461,9 +10985,6 @@ paths:
                   body:
                     type: string
                     nullable: true
-                  plaintext:
-                    type: string
-                    nullable: true
                   url:
                     type: string
                     nullable: true
@@ -10756,6 +11277,12 @@ paths:
                                 additionalProperties: false
                                 nullable: true
                             additionalProperties: false
+                          xp_points:
+                            type: integer
+                            minimum: 0
+                            maximum: 2147483647
+                            default: 0
+                            nullable: true
                           ProfileTags:
                             type: array
                             items:
@@ -10775,6 +11302,27 @@ paths:
                                 - user_id
                                 - tag_id
                               additionalProperties: false
+                          ApiKey:
+                            type: object
+                            properties:
+                              user_id:
+                                type: integer
+                                minimum: 0
+                                maximum: 2147483647
+                              hashed_api_key:
+                                type: string
+                              salt:
+                                type: string
+                              created_at:
+                                type: string
+                                format: date-time
+                              updated_at:
+                                type: string
+                                format: date-time
+                            required:
+                              - hashed_api_key
+                              - salt
+                            additionalProperties: false
                           created_at:
                             type: string
                             format: date-time
@@ -11064,6 +11612,12 @@ paths:
                                   additionalProperties: false
                                   nullable: true
                               additionalProperties: false
+                            xp_points:
+                              type: integer
+                              minimum: 0
+                              maximum: 2147483647
+                              default: 0
+                              nullable: true
                             ProfileTags:
                               type: array
                               items:
@@ -11083,6 +11637,27 @@ paths:
                                   - user_id
                                   - tag_id
                                 additionalProperties: false
+                            ApiKey:
+                              type: object
+                              properties:
+                                user_id:
+                                  type: integer
+                                  minimum: 0
+                                  maximum: 2147483647
+                                hashed_api_key:
+                                  type: string
+                                salt:
+                                  type: string
+                                created_at:
+                                  type: string
+                                  format: date-time
+                                updated_at:
+                                  type: string
+                                  format: date-time
+                              required:
+                                - hashed_api_key
+                                - salt
+                              additionalProperties: false
                             created_at:
                               type: string
                               format: date-time
@@ -11306,6 +11881,12 @@ paths:
                                       additionalProperties: false
                                       nullable: true
                                   additionalProperties: false
+                                xp_points:
+                                  type: integer
+                                  minimum: 0
+                                  maximum: 2147483647
+                                  default: 0
+                                  nullable: true
                                 ProfileTags:
                                   type: array
                                   items:
@@ -11325,6 +11906,27 @@ paths:
                                       - user_id
                                       - tag_id
                                     additionalProperties: false
+                                ApiKey:
+                                  type: object
+                                  properties:
+                                    user_id:
+                                      type: integer
+                                      minimum: 0
+                                      maximum: 2147483647
+                                    hashed_api_key:
+                                      type: string
+                                    salt:
+                                      type: string
+                                    created_at:
+                                      type: string
+                                      format: date-time
+                                    updated_at:
+                                      type: string
+                                      format: date-time
+                                  required:
+                                    - hashed_api_key
+                                    - salt
+                                  additionalProperties: false
                                 created_at:
                                   type: string
                                   format: date-time
@@ -11386,12 +11988,7 @@ paths:
                   - address_id
                   - title
                   - kind
-                  - stage
                   - community_id
-                  - view_count
-                  - reaction_count
-                  - reaction_weights_sum
-                  - comment_count
                   - search
                 additionalProperties: false
         default:
@@ -11489,9 +12086,6 @@ paths:
                   body:
                     type: string
                     nullable: true
-                  plaintext:
-                    type: string
-                    nullable: true
                   url:
                     type: string
                     nullable: true
@@ -11784,6 +12378,12 @@ paths:
                                 additionalProperties: false
                                 nullable: true
                             additionalProperties: false
+                          xp_points:
+                            type: integer
+                            minimum: 0
+                            maximum: 2147483647
+                            default: 0
+                            nullable: true
                           ProfileTags:
                             type: array
                             items:
@@ -11803,6 +12403,27 @@ paths:
                                 - user_id
                                 - tag_id
                               additionalProperties: false
+                          ApiKey:
+                            type: object
+                            properties:
+                              user_id:
+                                type: integer
+                                minimum: 0
+                                maximum: 2147483647
+                              hashed_api_key:
+                                type: string
+                              salt:
+                                type: string
+                              created_at:
+                                type: string
+                                format: date-time
+                              updated_at:
+                                type: string
+                                format: date-time
+                            required:
+                              - hashed_api_key
+                              - salt
+                            additionalProperties: false
                           created_at:
                             type: string
                             format: date-time
@@ -12092,6 +12713,12 @@ paths:
                                   additionalProperties: false
                                   nullable: true
                               additionalProperties: false
+                            xp_points:
+                              type: integer
+                              minimum: 0
+                              maximum: 2147483647
+                              default: 0
+                              nullable: true
                             ProfileTags:
                               type: array
                               items:
@@ -12111,6 +12738,27 @@ paths:
                                   - user_id
                                   - tag_id
                                 additionalProperties: false
+                            ApiKey:
+                              type: object
+                              properties:
+                                user_id:
+                                  type: integer
+                                  minimum: 0
+                                  maximum: 2147483647
+                                hashed_api_key:
+                                  type: string
+                                salt:
+                                  type: string
+                                created_at:
+                                  type: string
+                                  format: date-time
+                                updated_at:
+                                  type: string
+                                  format: date-time
+                              required:
+                                - hashed_api_key
+                                - salt
+                              additionalProperties: false
                             created_at:
                               type: string
                               format: date-time
@@ -12334,6 +12982,12 @@ paths:
                                       additionalProperties: false
                                       nullable: true
                                   additionalProperties: false
+                                xp_points:
+                                  type: integer
+                                  minimum: 0
+                                  maximum: 2147483647
+                                  default: 0
+                                  nullable: true
                                 ProfileTags:
                                   type: array
                                   items:
@@ -12353,6 +13007,27 @@ paths:
                                       - user_id
                                       - tag_id
                                     additionalProperties: false
+                                ApiKey:
+                                  type: object
+                                  properties:
+                                    user_id:
+                                      type: integer
+                                      minimum: 0
+                                      maximum: 2147483647
+                                    hashed_api_key:
+                                      type: string
+                                    salt:
+                                      type: string
+                                    created_at:
+                                      type: string
+                                      format: date-time
+                                    updated_at:
+                                      type: string
+                                      format: date-time
+                                  required:
+                                    - hashed_api_key
+                                    - salt
+                                  additionalProperties: false
                                 created_at:
                                   type: string
                                   format: date-time
@@ -12414,12 +13089,7 @@ paths:
                   - address_id
                   - title
                   - kind
-                  - stage
                   - community_id
-                  - view_count
-                  - reaction_count
-                  - reaction_weights_sum
-                  - comment_count
                   - search
                 additionalProperties: false
         default:
@@ -12568,8 +13238,6 @@ paths:
                     maximum: 2147483647
                   text:
                     type: string
-                  plaintext:
-                    type: string
                   parent_id:
                     type: string
                     nullable: true
@@ -12792,6 +13460,12 @@ paths:
                                 additionalProperties: false
                                 nullable: true
                             additionalProperties: false
+                          xp_points:
+                            type: integer
+                            minimum: 0
+                            maximum: 2147483647
+                            default: 0
+                            nullable: true
                           ProfileTags:
                             type: array
                             items:
@@ -12811,6 +13485,27 @@ paths:
                                 - user_id
                                 - tag_id
                               additionalProperties: false
+                          ApiKey:
+                            type: object
+                            properties:
+                              user_id:
+                                type: integer
+                                minimum: 0
+                                maximum: 2147483647
+                              hashed_api_key:
+                                type: string
+                              salt:
+                                type: string
+                              created_at:
+                                type: string
+                                format: date-time
+                              updated_at:
+                                type: string
+                                format: date-time
+                            required:
+                              - hashed_api_key
+                              - salt
+                            additionalProperties: false
                           created_at:
                             type: string
                             format: date-time
@@ -12849,9 +13544,6 @@ paths:
                       stage:
                         type: string
                       body:
-                        type: string
-                        nullable: true
-                      plaintext:
                         type: string
                         nullable: true
                       url:
@@ -13146,6 +13838,12 @@ paths:
                                     additionalProperties: false
                                     nullable: true
                                 additionalProperties: false
+                              xp_points:
+                                type: integer
+                                minimum: 0
+                                maximum: 2147483647
+                                default: 0
+                                nullable: true
                               ProfileTags:
                                 type: array
                                 items:
@@ -13165,6 +13863,27 @@ paths:
                                     - user_id
                                     - tag_id
                                   additionalProperties: false
+                              ApiKey:
+                                type: object
+                                properties:
+                                  user_id:
+                                    type: integer
+                                    minimum: 0
+                                    maximum: 2147483647
+                                  hashed_api_key:
+                                    type: string
+                                  salt:
+                                    type: string
+                                  created_at:
+                                    type: string
+                                    format: date-time
+                                  updated_at:
+                                    type: string
+                                    format: date-time
+                                required:
+                                  - hashed_api_key
+                                  - salt
+                                additionalProperties: false
                               created_at:
                                 type: string
                                 format: date-time
@@ -13454,6 +14173,12 @@ paths:
                                       additionalProperties: false
                                       nullable: true
                                   additionalProperties: false
+                                xp_points:
+                                  type: integer
+                                  minimum: 0
+                                  maximum: 2147483647
+                                  default: 0
+                                  nullable: true
                                 ProfileTags:
                                   type: array
                                   items:
@@ -13473,6 +14198,27 @@ paths:
                                       - user_id
                                       - tag_id
                                     additionalProperties: false
+                                ApiKey:
+                                  type: object
+                                  properties:
+                                    user_id:
+                                      type: integer
+                                      minimum: 0
+                                      maximum: 2147483647
+                                    hashed_api_key:
+                                      type: string
+                                    salt:
+                                      type: string
+                                    created_at:
+                                      type: string
+                                      format: date-time
+                                    updated_at:
+                                      type: string
+                                      format: date-time
+                                  required:
+                                    - hashed_api_key
+                                    - salt
+                                  additionalProperties: false
                                 created_at:
                                   type: string
                                   format: date-time
@@ -13696,6 +14442,12 @@ paths:
                                           additionalProperties: false
                                           nullable: true
                                       additionalProperties: false
+                                    xp_points:
+                                      type: integer
+                                      minimum: 0
+                                      maximum: 2147483647
+                                      default: 0
+                                      nullable: true
                                     ProfileTags:
                                       type: array
                                       items:
@@ -13715,6 +14467,27 @@ paths:
                                           - user_id
                                           - tag_id
                                         additionalProperties: false
+                                    ApiKey:
+                                      type: object
+                                      properties:
+                                        user_id:
+                                          type: integer
+                                          minimum: 0
+                                          maximum: 2147483647
+                                        hashed_api_key:
+                                          type: string
+                                        salt:
+                                          type: string
+                                        created_at:
+                                          type: string
+                                          format: date-time
+                                        updated_at:
+                                          type: string
+                                          format: date-time
+                                      required:
+                                        - hashed_api_key
+                                        - salt
+                                      additionalProperties: false
                                     created_at:
                                       type: string
                                       format: date-time
@@ -13776,12 +14549,7 @@ paths:
                       - address_id
                       - title
                       - kind
-                      - stage
                       - community_id
-                      - view_count
-                      - reaction_count
-                      - reaction_weights_sum
-                      - comment_count
                       - search
                     additionalProperties: false
                     nullable: true
@@ -13986,6 +14754,12 @@ paths:
                                     additionalProperties: false
                                     nullable: true
                                 additionalProperties: false
+                              xp_points:
+                                type: integer
+                                minimum: 0
+                                maximum: 2147483647
+                                default: 0
+                                nullable: true
                               ProfileTags:
                                 type: array
                                 items:
@@ -14005,6 +14779,27 @@ paths:
                                     - user_id
                                     - tag_id
                                   additionalProperties: false
+                              ApiKey:
+                                type: object
+                                properties:
+                                  user_id:
+                                    type: integer
+                                    minimum: 0
+                                    maximum: 2147483647
+                                  hashed_api_key:
+                                    type: string
+                                  salt:
+                                    type: string
+                                  created_at:
+                                    type: string
+                                    format: date-time
+                                  updated_at:
+                                    type: string
+                                    format: date-time
+                                required:
+                                  - hashed_api_key
+                                  - salt
+                                additionalProperties: false
                               created_at:
                                 type: string
                                 format: date-time
@@ -14062,7 +14857,6 @@ paths:
                   - thread_id
                   - address_id
                   - text
-                  - plaintext
                   - reaction_count
                   - search
                   - community_id
@@ -14122,8 +14916,6 @@ paths:
                     maximum: 2147483647
                   text:
                     type: string
-                  plaintext:
-                    type: string
                   parent_id:
                     type: string
                     nullable: true
@@ -14346,6 +15138,12 @@ paths:
                                 additionalProperties: false
                                 nullable: true
                             additionalProperties: false
+                          xp_points:
+                            type: integer
+                            minimum: 0
+                            maximum: 2147483647
+                            default: 0
+                            nullable: true
                           ProfileTags:
                             type: array
                             items:
@@ -14365,6 +15163,27 @@ paths:
                                 - user_id
                                 - tag_id
                               additionalProperties: false
+                          ApiKey:
+                            type: object
+                            properties:
+                              user_id:
+                                type: integer
+                                minimum: 0
+                                maximum: 2147483647
+                              hashed_api_key:
+                                type: string
+                              salt:
+                                type: string
+                              created_at:
+                                type: string
+                                format: date-time
+                              updated_at:
+                                type: string
+                                format: date-time
+                            required:
+                              - hashed_api_key
+                              - salt
+                            additionalProperties: false
                           created_at:
                             type: string
                             format: date-time
@@ -14403,9 +15222,6 @@ paths:
                       stage:
                         type: string
                       body:
-                        type: string
-                        nullable: true
-                      plaintext:
                         type: string
                         nullable: true
                       url:
@@ -14700,6 +15516,12 @@ paths:
                                     additionalProperties: false
                                     nullable: true
                                 additionalProperties: false
+                              xp_points:
+                                type: integer
+                                minimum: 0
+                                maximum: 2147483647
+                                default: 0
+                                nullable: true
                               ProfileTags:
                                 type: array
                                 items:
@@ -14719,6 +15541,27 @@ paths:
                                     - user_id
                                     - tag_id
                                   additionalProperties: false
+                              ApiKey:
+                                type: object
+                                properties:
+                                  user_id:
+                                    type: integer
+                                    minimum: 0
+                                    maximum: 2147483647
+                                  hashed_api_key:
+                                    type: string
+                                  salt:
+                                    type: string
+                                  created_at:
+                                    type: string
+                                    format: date-time
+                                  updated_at:
+                                    type: string
+                                    format: date-time
+                                required:
+                                  - hashed_api_key
+                                  - salt
+                                additionalProperties: false
                               created_at:
                                 type: string
                                 format: date-time
@@ -15008,6 +15851,12 @@ paths:
                                       additionalProperties: false
                                       nullable: true
                                   additionalProperties: false
+                                xp_points:
+                                  type: integer
+                                  minimum: 0
+                                  maximum: 2147483647
+                                  default: 0
+                                  nullable: true
                                 ProfileTags:
                                   type: array
                                   items:
@@ -15027,6 +15876,27 @@ paths:
                                       - user_id
                                       - tag_id
                                     additionalProperties: false
+                                ApiKey:
+                                  type: object
+                                  properties:
+                                    user_id:
+                                      type: integer
+                                      minimum: 0
+                                      maximum: 2147483647
+                                    hashed_api_key:
+                                      type: string
+                                    salt:
+                                      type: string
+                                    created_at:
+                                      type: string
+                                      format: date-time
+                                    updated_at:
+                                      type: string
+                                      format: date-time
+                                  required:
+                                    - hashed_api_key
+                                    - salt
+                                  additionalProperties: false
                                 created_at:
                                   type: string
                                   format: date-time
@@ -15250,6 +16120,12 @@ paths:
                                           additionalProperties: false
                                           nullable: true
                                       additionalProperties: false
+                                    xp_points:
+                                      type: integer
+                                      minimum: 0
+                                      maximum: 2147483647
+                                      default: 0
+                                      nullable: true
                                     ProfileTags:
                                       type: array
                                       items:
@@ -15269,6 +16145,27 @@ paths:
                                           - user_id
                                           - tag_id
                                         additionalProperties: false
+                                    ApiKey:
+                                      type: object
+                                      properties:
+                                        user_id:
+                                          type: integer
+                                          minimum: 0
+                                          maximum: 2147483647
+                                        hashed_api_key:
+                                          type: string
+                                        salt:
+                                          type: string
+                                        created_at:
+                                          type: string
+                                          format: date-time
+                                        updated_at:
+                                          type: string
+                                          format: date-time
+                                      required:
+                                        - hashed_api_key
+                                        - salt
+                                      additionalProperties: false
                                     created_at:
                                       type: string
                                       format: date-time
@@ -15330,12 +16227,7 @@ paths:
                       - address_id
                       - title
                       - kind
-                      - stage
                       - community_id
-                      - view_count
-                      - reaction_count
-                      - reaction_weights_sum
-                      - comment_count
                       - search
                     additionalProperties: false
                     nullable: true
@@ -15540,6 +16432,12 @@ paths:
                                     additionalProperties: false
                                     nullable: true
                                 additionalProperties: false
+                              xp_points:
+                                type: integer
+                                minimum: 0
+                                maximum: 2147483647
+                                default: 0
+                                nullable: true
                               ProfileTags:
                                 type: array
                                 items:
@@ -15559,6 +16457,27 @@ paths:
                                     - user_id
                                     - tag_id
                                   additionalProperties: false
+                              ApiKey:
+                                type: object
+                                properties:
+                                  user_id:
+                                    type: integer
+                                    minimum: 0
+                                    maximum: 2147483647
+                                  hashed_api_key:
+                                    type: string
+                                  salt:
+                                    type: string
+                                  created_at:
+                                    type: string
+                                    format: date-time
+                                  updated_at:
+                                    type: string
+                                    format: date-time
+                                required:
+                                  - hashed_api_key
+                                  - salt
+                                additionalProperties: false
                               created_at:
                                 type: string
                                 format: date-time
@@ -15616,7 +16535,6 @@ paths:
                   - thread_id
                   - address_id
                   - text
-                  - plaintext
                   - reaction_count
                   - search
                   - community_id
@@ -15918,6 +16836,12 @@ paths:
                                 additionalProperties: false
                                 nullable: true
                             additionalProperties: false
+                          xp_points:
+                            type: integer
+                            minimum: 0
+                            maximum: 2147483647
+                            default: 0
+                            nullable: true
                           ProfileTags:
                             type: array
                             items:
@@ -15937,6 +16861,27 @@ paths:
                                 - user_id
                                 - tag_id
                               additionalProperties: false
+                          ApiKey:
+                            type: object
+                            properties:
+                              user_id:
+                                type: integer
+                                minimum: 0
+                                maximum: 2147483647
+                              hashed_api_key:
+                                type: string
+                              salt:
+                                type: string
+                              created_at:
+                                type: string
+                                format: date-time
+                              updated_at:
+                                type: string
+                                format: date-time
+                            required:
+                              - hashed_api_key
+                              - salt
+                            additionalProperties: false
                           created_at:
                             type: string
                             format: date-time
@@ -16210,6 +17155,12 @@ paths:
                                 additionalProperties: false
                                 nullable: true
                             additionalProperties: false
+                          xp_points:
+                            type: integer
+                            minimum: 0
+                            maximum: 2147483647
+                            default: 0
+                            nullable: true
                           ProfileTags:
                             type: array
                             items:
@@ -16229,6 +17180,27 @@ paths:
                                 - user_id
                                 - tag_id
                               additionalProperties: false
+                          ApiKey:
+                            type: object
+                            properties:
+                              user_id:
+                                type: integer
+                                minimum: 0
+                                maximum: 2147483647
+                              hashed_api_key:
+                                type: string
+                              salt:
+                                type: string
+                              created_at:
+                                type: string
+                                format: date-time
+                              updated_at:
+                                type: string
+                                format: date-time
+                            required:
+                              - hashed_api_key
+                              - salt
+                            additionalProperties: false
                           created_at:
                             type: string
                             format: date-time
@@ -16311,6 +17283,79 @@ paths:
                     nullable: true
                 required:
                   - reaction_id
+                additionalProperties: false
+        default:
+          $ref: '#/components/responses/error'
+  /JoinCommunity:
+    post:
+      operationId: joinCommunity
+      tags:
+        - Community
+      security:
+        - apiKey: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                community_id:
+                  type: string
+              required:
+                - community_id
+              additionalProperties: false
+      parameters:
+        - in: header
+          name: address
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  community_id:
+                    type: string
+                  base:
+                    type: string
+                    enum:
+                      - cosmos
+                      - substrate
+                      - ethereum
+                      - near
+                      - solana
+                  address_id:
+                    type: number
+                  address:
+                    type: string
+                  wallet_id:
+                    type: string
+                    enum:
+                      - magic
+                      - polkadot
+                      - metamask
+                      - walletconnect
+                      - keplr-ethereum
+                      - keplr
+                      - leap
+                      - near
+                      - terrastation
+                      - terra-walletconnect
+                      - cosm-metamask
+                      - phantom
+                      - coinbase
+                  ss58Prefix:
+                    type: number
+                required:
+                  - community_id
+                  - base
+                  - address_id
+                  - address
                 additionalProperties: false
         default:
           $ref: '#/components/responses/error'

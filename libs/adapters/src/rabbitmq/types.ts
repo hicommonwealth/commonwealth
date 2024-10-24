@@ -6,44 +6,45 @@ import {
 } from '@hicommonwealth/core';
 
 export enum RascalPublications {
-  DiscordListener = BrokerPublications.DiscordListener,
   MessageRelayer = BrokerPublications.MessageRelayer,
 }
 
 // SnapshotListener and ChainEvent subscriptions will eventually be replaced by NotificationsProvider
 export enum RascalSubscriptions {
-  DiscordListener = BrokerSubscriptions.DiscordListener,
+  DiscordBotPolicy = BrokerSubscriptions.DiscordBotPolicy,
   ChainEvent = BrokerSubscriptions.ChainEvent,
   NotificationsProvider = BrokerSubscriptions.NotificationsProvider,
   NotificationsSettings = BrokerSubscriptions.NotificationsSettings,
   ContestWorkerPolicy = BrokerSubscriptions.ContestWorkerPolicy,
   ContestProjection = BrokerSubscriptions.ContestProjection,
+  FarcasterWorkerPolicy = BrokerSubscriptions.FarcasterWorkerPolicy,
 }
 
 export enum RascalExchanges {
   DeadLetter = 'DeadLetterExchange',
-  Discobot = 'DiscobotExchange',
   MessageRelayer = 'MessageRelayerExchange',
 }
 
 export enum RascalQueues {
   DeadLetter = 'DeadLetterQueue',
-  DiscordListener = 'DiscordMessageQueueV2',
+  DiscordBotPolicy = 'DiscordBotPolicy',
   ChainEvent = 'ChainEventQueue',
   NotificationsProvider = 'NotificationsProviderQueue',
   NotificationsSettings = 'NotificationsSettingsQueue',
   ContestWorkerPolicy = 'ContestWorkerPolicyQueue',
   ContestProjection = 'ContestProjection',
+  FarcasterWorkerPolicy = 'FarcasterWorkerPolicyQueue',
 }
 
 export enum RascalBindings {
   NotificationsProvider = 'NotificationsProvider',
   NotificationsSettings = 'NotificationsSettings',
   DeadLetter = 'DeadLetterBinding',
-  DiscordListener = 'DiscordMessageBinding',
+  DiscordBotPolicy = 'DiscordBotPolicy',
   ChainEvent = 'ChainEventBinding',
   ContestWorkerPolicy = 'ContestWorkerPolicy',
   ContestProjection = 'ContestProjection',
+  FarcasterWorkerPolicy = 'FarcasterWorkerPolicy',
 }
 
 export enum RascalRoutingKeys {
@@ -56,8 +57,15 @@ export enum RascalRoutingKeys {
 
   NotificationsSettingsPreferencesUpdated = EventNames.SubscriptionPreferencesUpdated,
 
+  DiscordThreadCreated = EventNames.DiscordThreadCreated,
+  DiscordThreadBodyUpdated = EventNames.DiscordThreadBodyUpdated,
+  DiscordThreadTitleUpdated = EventNames.DiscordThreadTitleUpdated,
+  DiscordThreadDeleted = EventNames.DiscordThreadDeleted,
+  DiscordThreadCommentCreated = EventNames.DiscordThreadCommentCreated,
+  DiscordThreadCommentUpdated = EventNames.DiscordThreadCommentUpdated,
+  DiscordThreadCommentDeleted = EventNames.DiscordThreadCommentDeleted,
+
   DeadLetter = 'DeadLetter',
-  DiscordListener = EventNames.DiscordMessageCreated,
   ChainEvent = EventNames.ChainEventCreated,
 
   ContestWorkerPolicyThreadCreated = `${EventNames.ThreadCreated}.${RoutingKeyTags.Contest}.#`,
@@ -68,4 +76,8 @@ export enum RascalRoutingKeys {
   ContestProjectionContestStarted = EventNames.ContestStarted,
   ContestProjectionContestContentAdded = EventNames.ContestContentAdded,
   ContestProjectionContestContentUpvoted = EventNames.ContestContentUpvoted,
+
+  FarcasterWorkerPolicyCastCreated = EventNames.FarcasterCastCreated,
+  FarcasterWorkerPolicyReplyCastCreated = EventNames.FarcasterReplyCastCreated,
+  FarcasterWorkerPolicyVoteCreated = EventNames.FarcasterVoteCreated,
 }

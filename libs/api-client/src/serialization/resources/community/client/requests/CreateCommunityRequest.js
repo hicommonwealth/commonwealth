@@ -27,10 +27,6 @@ export const CreateCommunityRequest = core.serialization.object({
   ),
   type: CreateCommunityRequestType.optional(),
   base: CreateCommunityRequestBase,
-  userAddress: core.serialization.property(
-    'user_address',
-    core.serialization.string(),
-  ),
   tokenName: core.serialization.property(
     'token_name',
     core.serialization.string().optional(),

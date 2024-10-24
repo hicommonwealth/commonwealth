@@ -19,7 +19,6 @@ export const CreateCommentResponse = core.serialization.object({
     core.serialization.number(),
   ),
   text: core.serialization.string(),
-  plaintext: core.serialization.string(),
   parentId: core.serialization.property(
     'parent_id',
     core.serialization.string().optional(),

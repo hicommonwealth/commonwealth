@@ -12,6 +12,7 @@ import {
   BellSimpleRinging,
   BellSimpleSlash,
   BookOpenText,
+  Brain,
   CaretDoubleLeft,
   CaretDoubleRight,
   CaretDown,
@@ -88,11 +89,13 @@ import {
   Warning,
 } from '@phosphor-icons/react';
 import * as CustomIcons from './cw_custom_icons';
+import { CWPara } from './cw_custom_icons';
 import * as Icons from './cw_icons';
 import { withPhosphorIcon } from './cw_phosphor_icons';
 
 export const iconLookup = {
   bold: withPhosphorIcon(TextB),
+  brain: withPhosphorIcon(Brain),
   italic: withPhosphorIcon(TextItalic),
   underline: withPhosphorIcon(TextUnderline),
   strikethrough: withPhosphorIcon(TextStrikethrough),
@@ -104,6 +107,9 @@ export const iconLookup = {
   h1: withPhosphorIcon(TextHOne),
   h2: withPhosphorIcon(TextHTwo),
   h3: withPhosphorIcon(TextHThree),
+  q: withPhosphorIcon(Quotes),
+  p: CWPara,
+  quote: withPhosphorIcon(Quotes),
   quotes: withPhosphorIcon(Quotes),
   table: withPhosphorIcon(Table),
   image: withPhosphorIcon(Image),

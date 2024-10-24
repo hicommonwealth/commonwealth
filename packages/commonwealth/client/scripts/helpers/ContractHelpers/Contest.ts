@@ -1,7 +1,8 @@
-import { ZERO_ADDRESS } from '@hicommonwealth/shared';
+import { ZERO_ADDRESS, commonProtocol } from '@hicommonwealth/shared';
 import { AbiItem, TransactionReceipt } from 'web3';
 import { ContestAbi } from './Abi/ContestAbi';
 import { Erc20Abi } from './Abi/ERC20Abi';
+import { feeManagerABI } from './Abi/feeManagerAbi';
 import ContractBase from './ContractBase';
 import NamespaceFactory from './NamespaceFactory';
 
@@ -130,6 +131,43 @@ class Contest extends ContractBase {
     }
   }
 
+  async newSingleERC20Contest(
+    namespaceName: string,
+    contestInterval: number,
+    winnerShares: number[],
+    voteToken: string,
+    voterShare: number,
+    walletAddress: string,
+    exchangeToken: string,
+  ): Promise<string> {
+    if (!this.initialized || !this.walletEnabled) {
+      await this.initialize(true);
+    }
+
+    try {
+      const txReceipt = await this.namespaceFactory.newERC20Contest(
+        namespaceName,
+        contestInterval,
+        winnerShares,
+        voteToken,
+        voterShare,
+        walletAddress,
+        exchangeToken,
+      );
+      // @ts-expect-error StrictNullChecks
+      const eventLog = txReceipt.logs.find((log) => log.topics[0] == TOPIC_LOG);
+      const newContestAddress = this.web3.eth.abi.decodeParameters(
+        ['address', 'address', 'uint256', 'bool'],
+        // @ts-expect-error StrictNullChecks
+        eventLog.data.toString(),
+      )['0'] as string;
+      this.contractAddress = newContestAddress;
+      return newContestAddress;
+    } catch (error) {
+      throw new Error('Failed to initialize contest ' + error);
+    }
+  }
+
   /**
    * Allows for deposit of contest token(ETH or ERC20) to contest
    * @param amount amount in ether to send to contest
@@ -193,27 +231,20 @@ class Contest extends ContractBase {
     }
   }
 
-  async getContestBalance(): Promise<number> {
+  //Indicate if contest is not recurring
+  async getContestBalance(oneOff: boolean): Promise<number> {
     if (!this.initialized || !this.walletEnabled) {
       await this.initialize(false);
     }
     this.reInitContract();
-    const tokenAddress = await this.contract.methods.contestToken().call();
-    if (tokenAddress === ZERO_ADDRESS) {
-      const balance = await this.web3.eth.getBalance(this.contractAddress);
-      return parseFloat(this.web3.utils.fromWei(balance, 'ether'));
-    } else {
-      const calldata =
-        '0x70a08231' +
-        this.web3.eth.abi
-          .encodeParameters(['address'], [this.contractAddress])
-          .substring(2);
-      const returnData = await this.web3.eth.call({
-        to: tokenAddress,
-        data: calldata,
-      });
-      return Number(this.web3.eth.abi.decodeParameter('uint256', returnData));
-    }
+    const contestBalance = await commonProtocol.getTotalContestBalance(
+      this.contract,
+      this.contractAddress,
+      this.web3,
+      feeManagerABI,
+      oneOff,
+    );
+    return contestBalance;
   }
 }
 

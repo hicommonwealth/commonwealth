@@ -9,13 +9,13 @@ const {
   TELEGRAM_BOT_TOKEN,
   TELEGRAM_BOT_TOKEN_DEV,
   SESSION_SECRET,
+  SNAPSHOT_WEBHOOK_SECRET,
   NO_PRERENDER: _NO_PRERENDER,
   NO_GLOBAL_ACTIVITY_CACHE,
   PRERENDER_TOKEN,
   GENERATE_IMAGE_RATE_LIMIT,
   MAGIC_SUPPORTED_BASES,
   MAGIC_DEFAULT_CHAIN,
-  CW_BOT_KEY,
   ACTIVE_COMMUNITIES_CACHE_TTL_SECONDS,
   MESSAGE_RELAYER_TIMEOUT_MS,
   MESSAGE_RELAYER_PREFETCH,
@@ -48,7 +48,6 @@ export const config = configure(
       GENERATE_IMAGE_RATE_LIMIT ?? DEFAULTS.GENERATE_IMAGE_RATE_LIMIT,
       10,
     ),
-    CW_BOT_KEY,
     ACTIVE_COMMUNITIES_CACHE_TTL_SECONDS: parseInt(
       ACTIVE_COMMUNITIES_CACHE_TTL_SECONDS ??
         DEFAULTS.ACTIVE_COMMUNITIES_CACHE_TTL_SECONDS,
@@ -97,24 +96,13 @@ export const config = configure(
       ),
     },
     PEER_ID,
+    SNAPSHOT_WEBHOOK_SECRET,
   },
   z.object({
     NO_PRERENDER: z.boolean(),
     NO_GLOBAL_ACTIVITY_CACHE: z.boolean(),
     PRERENDER_TOKEN: z.string().optional(),
     GENERATE_IMAGE_RATE_LIMIT: z.number().int().positive(),
-    CW_BOT_KEY: z
-      .string()
-      .optional()
-      .refine(
-        (data) =>
-          !(
-            ['frick', 'production', 'beta', 'demo'].includes(
-              model_config.APP_ENV,
-            ) && !data
-          ),
-        'CW_BOT_KEY is required in frick, production, beta (QA), and demo',
-      ),
     ACTIVE_COMMUNITIES_CACHE_TTL_SECONDS: z.number().int().positive(),
     AUTH: z.object({
       SESSION_SECRET: z
@@ -170,5 +158,12 @@ export const config = configure(
       EVM_CE_POLL_INTERVAL_MS: z.number().int().positive(),
     }),
     PEER_ID: z.string().optional(),
+    SNAPSHOT_WEBHOOK_SECRET: z
+      .string()
+      .optional()
+      .refine(
+        (data) => !(!['local', 'CI'].includes(model_config.APP_ENV) && !data),
+        'SNAPSHOT_WEBHOOK_SECRET is required in public environments',
+      ),
   }),
 );

@@ -9,7 +9,6 @@ import {
   emitMentions,
   findMentionDiff,
   parseUserMentions,
-  quillToPlain,
   uniqueMentions,
   uploadIfLarge,
 } from '../utils';
@@ -32,7 +31,6 @@ export function UpdateComment(): Command<
 
       if (currentVersion?.text !== payload.text) {
         const text = decodeContent(payload.text);
-        const plaintext = quillToPlain(text);
         const mentions = findMentionDiff(
           parseUserMentions(currentVersion?.text),
           uniqueMentions(parseUserMentions(text)),
@@ -46,7 +44,6 @@ export function UpdateComment(): Command<
             // TODO: text should be set to truncatedBody once client renders content_url
             {
               text,
-              plaintext,
               search: getCommentSearchVector(text),
               content_url: contentUrl,
             },

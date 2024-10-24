@@ -1,6 +1,6 @@
 import z from 'zod';
 import { Comment } from '../entities';
-import { PG_INT } from '../utils';
+import { PG_INT, zBoolean } from '../utils';
 import { PaginatedResultSchema, PaginationParamsSchema } from './pagination';
 
 export const SearchComments = {
@@ -21,10 +21,12 @@ export const GetComments = {
   input: PaginationParamsSchema.extend({
     thread_id: PG_INT,
     comment_id: PG_INT.optional(),
-    include_user: z.coerce.boolean(),
-    include_reactions: z.coerce.boolean(),
+    include_user: zBoolean.default(false),
+    include_reactions: zBoolean.default(false),
   }),
   output: PaginatedResultSchema.extend({
-    results: Comment.array(),
+    results: Comment.extend({
+      last_edited: z.coerce.date().optional(),
+    }).array(),
   }),
 };

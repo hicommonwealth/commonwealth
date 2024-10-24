@@ -1,4 +1,4 @@
-import { DB, GlobalActivityCache } from '@hicommonwealth/model';
+import { DB } from '@hicommonwealth/model';
 import {
   CountThreadsOptions,
   CountThreadsResult,
@@ -15,11 +15,6 @@ import {
   __getActiveThreads,
 } from './server_threads_methods/get_active_threads';
 import {
-  GetBulkThreadsOptions,
-  GetBulkThreadsResult,
-  __getBulkThreads,
-} from './server_threads_methods/get_bulk_threads';
-import {
   GetThreadPollsOptions,
   GetThreadPollsResult,
   __getThreadPolls,
@@ -29,20 +24,12 @@ import {
   GetThreadsByIdResult,
   __getThreadsById,
 } from './server_threads_methods/get_threads_by_id';
-import {
-  SearchThreadsOptions,
-  SearchThreadsResult,
-  __searchThreads,
-} from './server_threads_methods/search_threads';
 
 /**
  * Implements methods related to threads
  */
 export class ServerThreadsController {
-  constructor(
-    public models: DB,
-    public globalActivityCache?: GlobalActivityCache,
-  ) {}
+  constructor(public models: DB) {}
 
   async getThreadsByIds(
     this: ServerThreadsController,
@@ -56,19 +43,6 @@ export class ServerThreadsController {
     options: GetActiveThreadsOptions,
   ): Promise<GetActiveThreadsResult> {
     return __getActiveThreads.call(this, options);
-  }
-
-  async searchThreads(
-    this: ServerThreadsController,
-    options: SearchThreadsOptions,
-  ): Promise<SearchThreadsResult> {
-    return __searchThreads.call(this, options);
-  }
-
-  async getBulkThreads(
-    options: GetBulkThreadsOptions,
-  ): Promise<GetBulkThreadsResult> {
-    return __getBulkThreads.call(this, options);
   }
 
   async countThreads(

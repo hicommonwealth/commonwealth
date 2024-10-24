@@ -7,7 +7,6 @@
 
   position: relative;
   word-break: break-word;
-
   @include formatted-text();
   @include collapsible();
   @include hidden-formatting();

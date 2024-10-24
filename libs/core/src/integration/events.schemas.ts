@@ -1,30 +1,29 @@
 import {
   Comment,
+  FarcasterAction,
+  FarcasterCast,
   PG_INT,
   Reaction,
   SubscriptionPreference,
   Thread,
 } from '@hicommonwealth/schemas';
 import { z } from 'zod';
-import {
-  AaveV2ProposalCreated,
-  AaveV2ProposalExecuted,
-  AaveV2ProposalQueued,
-  CommunityStakeTrade,
-  GenericProposalCanceled,
-  GovBravoProposalCreated,
-  GovBravoProposalExecuted,
-  GovBravoProposalQueued,
-  NamespaceDeployed,
-} from './chain-event.schemas';
+import { CommunityStakeTrade, NamespaceDeployed } from './chain-event.schemas';
 import { EventMetadata } from './util.schemas';
 
-export const ThreadCreated = Thread.omit({ search: true }).extend({
+export const ThreadCreated = Thread.omit({
+  search: true,
+}).extend({
+  address: z.string().nullish(),
   contestManagers: z.array(z.object({ contest_address: z.string() })).nullish(),
 });
-export const ThreadUpvoted = Reaction.omit({ comment_id: true }).extend({
+export const ThreadUpvoted = Reaction.omit({
+  comment_id: true,
+}).extend({
+  address: z.string().nullish(),
   thread_id: PG_INT,
   community_id: z.string(),
+  topic_id: z.number().optional(),
   contestManagers: z.array(z.object({ contest_address: z.string() })).nullish(),
 });
 export const CommentCreated = Comment.omit({ search: true }).extend({
@@ -69,16 +68,16 @@ export const SnapshotProposalCreated = z.object({
 export const DiscordMessageCreated = z.object({
   user: z
     .object({
-      id: z.string(),
-      username: z.string(),
+      id: z.string().nullish(),
+      username: z.string().nullish(),
     })
     .optional(),
   title: z.string().optional(),
-  content: z.string().optional(),
+  content: z.string().nullish(),
   message_id: z.string(),
   channel_id: z.string().optional(),
-  parent_channel_id: z.string().optional(),
-  guild_id: z.string().optional(),
+  parent_channel_id: z.string().nullish(),
+  guild_id: z.string().nullish(),
   imageUrls: z.array(z.string()).optional(),
   action: z.union([
     z.literal('thread-delete'),
@@ -89,6 +88,51 @@ export const DiscordMessageCreated = z.object({
     z.literal('comment-update'),
     z.literal('comment-create'),
   ]),
+});
+
+const DiscordEventBase = z.object({
+  user: z.object({
+    id: z.string(),
+    username: z.string(),
+  }),
+  title: z.string(),
+  content: z.string(),
+  message_id: z.string(),
+  channel_id: z.string(),
+  parent_channel_id: z.string(),
+  guild_id: z.string(),
+  imageUrls: z.array(z.string()),
+});
+
+export const DiscordThreadCreated = DiscordEventBase;
+
+export const DiscordThreadBodyUpdated = DiscordEventBase;
+
+export const DiscordThreadTitleUpdated = DiscordEventBase.pick({
+  user: true,
+  title: true,
+  message_id: true,
+  parent_channel_id: true,
+});
+
+export const DiscordThreadCommentCreated = DiscordEventBase.omit({
+  title: true,
+});
+
+export const DiscordThreadCommentUpdated = DiscordEventBase.omit({
+  title: true,
+});
+
+// TODO: Discord differentiates Thread body from the thread itself
+//  currently deleting a thread body is treated as deleting a comment
+//  which will lead to errors
+export const DiscordThreadCommentDeleted = DiscordEventBase.omit({
+  title: true,
+});
+
+export const DiscordThreadDeleted = DiscordEventBase.pick({
+  message_id: true,
+  parent_channel_id: true,
 });
 
 const ChainEventCreatedBase = z.object({
@@ -113,62 +157,6 @@ const ChainEventCreatedBase = z.object({
  * Zod schema for EvmEvent type defined in workers/evmChainEvents/types.ts
  */
 export const ChainEventCreated = z.union([
-  ChainEventCreatedBase.extend({
-    eventSource: ChainEventCreatedBase.shape.eventSource.extend({
-      eventSignature: z.literal(
-        '0x7d84a6263ae0d98d3329bd7b46bb4e8d6f98cd35a7adb45c274c8b7fd5ebd5e0',
-      ),
-    }),
-    parsedArgs: GovBravoProposalCreated,
-  }),
-  ChainEventCreatedBase.extend({
-    eventSource: ChainEventCreatedBase.shape.eventSource.extend({
-      eventSignature: z.literal(
-        '0xd272d67d2c8c66de43c1d2515abb064978a5020c173e15903b6a2ab3bf7440ec',
-      ),
-    }),
-    parsedArgs: AaveV2ProposalCreated,
-  }),
-  ChainEventCreatedBase.extend({
-    eventSource: ChainEventCreatedBase.shape.eventSource.extend({
-      eventSignature: z.literal(
-        '0x11a0b38e70585e4b09b794bd1d9f9b1a51a802eb8ee2101eeee178d0349e73fe',
-      ),
-    }),
-    parsedArgs: AaveV2ProposalQueued,
-  }),
-  ChainEventCreatedBase.extend({
-    eventSource: ChainEventCreatedBase.shape.eventSource.extend({
-      eventSignature: z.literal(
-        '0x9a2e42fd6722813d69113e7d0079d3d940171428df7373df9c7f7617cfda2892',
-      ),
-    }),
-    parsedArgs: GovBravoProposalQueued,
-  }),
-  ChainEventCreatedBase.extend({
-    eventSource: ChainEventCreatedBase.shape.eventSource.extend({
-      eventSignature: z.literal(
-        '0x712ae1383f79ac853f8d882153778e0260ef8f03b504e2866e0593e04d2b291f',
-      ),
-    }),
-    parsedArgs: GovBravoProposalExecuted,
-  }),
-  ChainEventCreatedBase.extend({
-    eventSource: ChainEventCreatedBase.shape.eventSource.extend({
-      eventSignature: z.literal(
-        '0x9c85b616f29fca57a17eafe71cf9ff82ffef41766e2cf01ea7f8f7878dd3ec24',
-      ),
-    }),
-    parsedArgs: AaveV2ProposalExecuted,
-  }),
-  ChainEventCreatedBase.extend({
-    eventSource: ChainEventCreatedBase.shape.eventSource.extend({
-      eventSignature: z.literal(
-        '0x789cf55be980739dad1d0699b93b58e806b51c9d96619bfa8fe0a28abaa7b30c',
-      ),
-    }),
-    parsedArgs: GenericProposalCanceled,
-  }),
   ChainEventCreatedBase.extend({
     eventSource: ChainEventCreatedBase.shape.eventSource.extend({
       eventSignature: z.literal(
@@ -241,3 +229,15 @@ export const SubscriptionPreferencesUpdated = SubscriptionPreference.partial({
   created_at: true,
   updated_at: true,
 }).merge(SubscriptionPreference.pick({ user_id: true }));
+
+export const FarcasterCastCreated = FarcasterCast.describe(
+  'When a farcaster contest cast has been posted',
+);
+
+export const FarcasterReplyCastCreated = FarcasterCast.describe(
+  'When a reply is posted to a farcaster contest cast',
+);
+
+export const FarcasterVoteCreated = FarcasterAction.extend({
+  contest_address: z.string(),
+}).describe('When a farcaster action is initiated on a cast reply');

@@ -75,9 +75,15 @@ export function buildThreadContentUrl(communityId: string, threadId: number) {
 
 // returns community ID and thread ID from content url
 export function decodeThreadContentUrl(contentUrl: string): {
-  communityId: string;
-  threadId: number;
+  communityId: string | null;
+  threadId: number | null;
 } {
+  if (contentUrl.startsWith('/farcaster/')) {
+    return {
+      communityId: null,
+      threadId: null,
+    };
+  }
   if (!contentUrl.includes('/discussion/')) {
     throw new Error(`invalid content url: ${contentUrl}`);
   }
@@ -138,14 +144,14 @@ export async function getThreadContestManagers(
     contest_address: string;
   }>(
     `
-        SELECT cm.contest_address
+        SELECT cm.contest_address, cm.cancelled, cm.ended
         FROM "Communities" c
                  JOIN "ContestManagers" cm ON cm.community_id = c.id
                  JOIN "ContestTopics" ct ON cm.contest_address = ct.contest_address
         WHERE ct.topic_id = :topic_id
           AND cm.community_id = :community_id
-          AND cm.cancelled = false
-          AND (cm.ended IS NULL OR cm.ended = false)
+          AND cm.cancelled IS NOT TRUE
+          AND cm.ended IS NOT TRUE
     `,
     {
       type: QueryTypes.SELECT,
@@ -244,4 +250,8 @@ export function getSaltedApiKeyHash(apiKey: string, salt: string): string {
   return createHash('sha256')
     .update(apiKey + salt)
     .digest('hex');
+}
+
+export function buildApiKeySaltCacheKey(address: string) {
+  return `salt_${address.toLowerCase()}`;
 }

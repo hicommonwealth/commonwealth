@@ -48,7 +48,7 @@ const viewCount = async (
   // add one to view count if not in cache and not newly created
   if (isNewView) {
     count = await count.update({
-      view_count: count.view_count + 1,
+      view_count: count.view_count! + 1,
     });
   }
 

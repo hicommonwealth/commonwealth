@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 
+import { useFlag } from 'hooks/useFlag';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
@@ -19,10 +20,12 @@ const EnableStake = ({
   communityStakeData,
   chainId,
   isTopicFlow,
+  onlyNamespace,
 }: EnableStakeProps) => {
   const [namespaceError, setNamespaceError] = useState('');
 
   const { namespaceFactory } = useNamespaceFactory(parseInt(chainId));
+  const weightedTopicsEnabled = useFlag('weightedTopics');
 
   const clearNamespaceError = () => {
     setNamespaceError('');
@@ -58,14 +61,27 @@ const EnableStake = ({
   return (
     <div className="EnableStake">
       <section className="header">
-        <CWText type="h2">Do you want to enable community stake?</CWText>
+        <CWText type="h2">
+          {onlyNamespace && weightedTopicsEnabled
+            ? 'Register a Namespace for your community'
+            : 'Do you want to enable community stake?'}
+        </CWText>
         <CWText type="b1" className="description">
-          Community stake allows your community to fundraise via member
-          contributions. Community members can make financial contributions in
-          exchange for more voting power within the community. The more stake a
-          member has, the stronger their vote becomes. The funds are stored in a
-          secure community wallet on-chain and can be redistributed if members
-          decide to burn their stake.
+          {onlyNamespace && weightedTopicsEnabled ? (
+            <>
+              Registering your Namespace onchain will enable you to utilize
+              onchain features on Common such as contests and weighted voting
+            </>
+          ) : (
+            <>
+              Community stake allows your community to fundraise via member
+              contributions. Community members can make financial contributions
+              in exchange for more voting power within the community. The more
+              stake a member has, the stronger their vote becomes. The funds are
+              stored in a secure community wallet on-chain and can be
+              redistributed if members decide to burn their stake.
+            </>
+          )}
         </CWText>
 
         <Hint className="mobile" />
@@ -101,16 +117,18 @@ const EnableStake = ({
           />
         </CWForm>
 
-        <CWText className="info" fontWeight="medium">
-          Not sure?
-          <a
-            target="_blank"
-            rel="noopener noreferrer"
-            href="https://docs.commonwealth.im/commonwealth/community-overview/community-stake"
-          >
-            Learn more about community stake
-          </a>
-        </CWText>
+        {!onlyNamespace && !weightedTopicsEnabled && (
+          <CWText className="info" fontWeight="medium">
+            Not sure?
+            <a
+              target="_blank"
+              rel="noopener noreferrer"
+              href="https://docs.commonwealth.im/commonwealth/community-overview/community-stake"
+            >
+              Learn more about community stake
+            </a>
+          </CWText>
+        )}
 
         <CWDivider />
 

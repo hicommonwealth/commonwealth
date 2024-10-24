@@ -7,6 +7,7 @@ import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import CWIconButton from 'views/components/component_kit/new_designs/CWIconButton';
 
+import { useFlag } from 'hooks/useFlag';
 import useUserStore from 'state/ui/user';
 import './CreateContentDrawer.scss';
 
@@ -18,6 +19,8 @@ const CreateContentDrawer = ({ onClose }: CreateContentDrawerProps) => {
   const navigate = useCommonNavigate();
   const user = useUserStore();
   const scopedPage = app.activeChainId();
+
+  const tokenizedCommunityEnabled = useFlag('tokenizedCommunity');
 
   const handleCreateThread = () => {
     navigate('/new/discussion');
@@ -55,10 +58,12 @@ const CreateContentDrawer = ({ onClose }: CreateContentDrawerProps) => {
           <CWIcon iconName="peopleNew" />
           <CWText>Create community</CWText>
         </div>
-        <div className="item" onClick={handleCreateTokenCommunity}>
-          <CWIcon iconName="rocketLaunch" />
-          <CWText>Launch Token</CWText>
-        </div>
+        {tokenizedCommunityEnabled && (
+          <div className="item" onClick={handleCreateTokenCommunity}>
+            <CWIcon iconName="rocketLaunch" />
+            <CWText>Launch Token</CWText>
+          </div>
+        )}
       </div>
       <CWIconButton iconName="close" onClick={onClose} />
     </div>

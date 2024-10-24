@@ -39,8 +39,6 @@ import setDefaultRole from '../routes/setDefaultRole';
 import upgradeMember, {
   upgradeMemberValidation,
 } from '../routes/upgradeMember';
-import viewGlobalActivity from '../routes/viewGlobalActivity';
-import viewUserActivity from '../routes/viewUserActivity';
 
 import getUploadSignature from '../routes/getUploadSignature';
 
@@ -52,10 +50,10 @@ import updateCommunityCustomDomain from '../routes/updateCommunityCustomDomain';
 import updateCommunityPriority from '../routes/updateCommunityPriority';
 import type ViewCountCache from '../util/viewCountCache';
 
-import { type DB, type GlobalActivityCache } from '@hicommonwealth/model';
-import banAddress from '../routes/banAddress';
+import { type DB } from '@hicommonwealth/model';
 import setAddressWallet from '../routes/setAddressWallet';
 
+import { generateTokenIdea } from '@hicommonwealth/model';
 import type DatabaseValidationService from '../middleware/databaseValidationService';
 import generateImage from '../routes/generateImage';
 
@@ -101,7 +99,6 @@ import { getTagsHandler } from '../routes/tags/get_tags_handler';
 import { createThreadPollHandler } from '../routes/threads/create_thread_poll_handler';
 import { getThreadPollsHandler } from '../routes/threads/get_thread_polls_handler';
 import { getThreadsHandler } from '../routes/threads/get_threads_handler';
-import { getTopicsHandler } from '../routes/topics/get_topics_handler';
 import { updateTopicChannelHandler } from '../routes/topics/update_topic_channel_handler';
 import { updateTopicsOrderHandler } from '../routes/topics/update_topics_order_handler';
 import { failure } from '../types';
@@ -126,14 +123,13 @@ function setupRouter(
   app: Express,
   models: DB,
   viewCountCache: ViewCountCache,
-  globalActivityCache: GlobalActivityCache,
   databaseValidationService: DatabaseValidationService,
   cacheDecorator: CacheDecorator,
 ) {
   // controllers
   const serverControllers: ServerControllers = {
-    threads: new ServerThreadsController(models, globalActivityCache),
-    comments: new ServerCommentsController(models, globalActivityCache),
+    threads: new ServerThreadsController(models),
+    comments: new ServerCommentsController(models),
     analytics: new ServerAnalyticsController(),
     profiles: new ServerProfilesController(models),
     communities: new ServerCommunitiesController(models),
@@ -152,10 +148,7 @@ function setupRouter(
   // API routes
   app.use(api.internal.PATH, useragent.express(), api.internal.router);
   app.use(api.external.PATH, useragent.express(), api.external.router);
-  app.use(
-    api.integration.PATH,
-    api.integration.build(databaseValidationService),
-  );
+  app.use(api.integration.PATH, api.integration.build());
 
   registerRoute(
     router,
@@ -395,13 +388,6 @@ function setupRouter(
     databaseValidationService.validateCommunity,
     updateTopicsOrderHandler.bind(this, serverControllers),
   );
-  registerRoute(
-    router,
-    'get',
-    '/topics' /* OLD: /bulkTopics */,
-    databaseValidationService.validateCommunity,
-    getTopicsHandler.bind(this, serverControllers),
-  );
 
   // reactions
   registerRoute(
@@ -498,20 +484,6 @@ function setupRouter(
   registerRoute(
     router,
     'post',
-    '/viewUserActivity',
-    passport.authenticate('jwt', { session: false }),
-    viewUserActivity.bind(this, models),
-  );
-  registerRoute(
-    router,
-    'post',
-    '/viewGlobalActivity',
-    viewGlobalActivity.bind(this, models, globalActivityCache),
-  );
-
-  registerRoute(
-    router,
-    'post',
     '/setAddressWallet',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,
@@ -534,16 +506,6 @@ function setupRouter(
     '/writeUserSetting',
     passport.authenticate('jwt', { session: false }),
     writeUserSetting.bind(this, models),
-  );
-
-  // bans
-  registerRoute(
-    router,
-    'post',
-    '/banAddress',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateCommunity,
-    banAddress.bind(this, models),
   );
 
   // Custom domain update route
@@ -571,6 +533,46 @@ function setupRouter(
     }),
     passport.authenticate('jwt', { session: false }),
     generateImage.bind(this, models),
+  );
+
+  registerRoute(
+    router,
+    'post',
+    '/generateTokenIdea',
+    rateLimiterMiddleware({
+      routerNamespace: 'generateTokenIdea',
+      requestsPerMinute: config.GENERATE_IMAGE_RATE_LIMIT,
+    }),
+    passport.authenticate('jwt', { session: false }),
+    async (req, res) => {
+      // required for streaming
+      res.setHeader('Content-Type', 'text/plain');
+      res.setHeader('Transfer-Encoding', 'chunked');
+
+      const ideaPrompt =
+        typeof req.body?.ideaPrompt === 'string'
+          ? req.body?.ideaPrompt
+          : undefined;
+
+      const ideaGenerator = generateTokenIdea({ ideaPrompt });
+
+      for await (const chunk of ideaGenerator) {
+        // generation error
+        if (chunk.error) {
+          return res.end(
+            JSON.stringify({ status: 'failure', message: chunk.error }) + '\n',
+          );
+        }
+
+        // stream chunks as they are generated
+        res.write(JSON.stringify(chunk.tokenIdea) + '\n');
+        res.flush();
+      }
+
+      return res.end(
+        JSON.stringify({ status: 'success', message: 'stream ended' }) + '\n',
+      );
+    },
   );
 
   // linking

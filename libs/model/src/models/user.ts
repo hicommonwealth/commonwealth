@@ -1,6 +1,7 @@
-import { User } from '@hicommonwealth/schemas';
+import { User, UserProfile } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize';
 import { z } from 'zod';
+import { getRandomAvatar } from '../utils/defaultAvatar';
 import type { AddressAttributes, AddressInstance } from './address';
 import type { CommentSubscriptionAttributes } from './comment_subscriptions';
 import type { CommunityAttributes, CommunityInstance } from './community';
@@ -89,12 +90,25 @@ export default (sequelize: Sequelize.Sequelize): UserModelStatic =>
             'isAdmin',
             'created_at',
             'updated_at',
-            'hashed_api_key',
           ],
         },
       },
       scopes: {
         withPrivateData: {},
+      },
+      validate: {
+        definedAvatarUrl() {
+          if (!(this.profile as z.infer<typeof UserProfile>)?.avatar_url) {
+            throw new Error('profile.avatar_url must be defined');
+          }
+        },
+      },
+      hooks: {
+        beforeValidate(instance: UserInstance) {
+          if (!instance.profile.avatar_url) {
+            instance.profile.avatar_url = getRandomAvatar();
+          }
+        },
       },
     },
   );
