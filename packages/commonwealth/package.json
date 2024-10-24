@@ -12,7 +12,6 @@
     "async-migrate-comment-version-history": "tsx ./scripts/async-migrate-comment-version-history.ts",
     "async-migrate-thread-version-history": "tsx ./scripts/async-migrate-thread-version-history.ts",
     "add-component-showcase": "tsx ./scripts/add-component-showcase.ts",
-    "temp": "tsx ./scripts/temp.ts",
     "archive-outbox": "node --import=extensionless/register build/scripts/archive-outbox.js",
     "build": "tsc -b ./tsconfig.build.json && tsc-alias -p ./tsconfig.build.json",
     "build-contracts": "npx hardhat compile",
