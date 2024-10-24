@@ -69,17 +69,10 @@ import { SnapshotCreationCard } from './snapshot_creation_card';
 type ViewThreadPageProps = {
   identifier: string;
 };
-function useParams() {
-  const [searchParams] = useSearchParams();
-  const isEdit = searchParams.get('isEdit') ?? undefined;
-
-  return {
-    isEdit,
-  };
-}
 const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const threadId = identifier.split('-')[0];
-  const { isEdit } = useParams();
+  const [searchParams] = useSearchParams();
+  const isEdit = searchParams.get('isEdit') ?? undefined;
   const navigate = useCommonNavigate();
   const [isEditingBody, setIsEditingBody] = useState(false);
   const [isGloballyEditing, setIsGloballyEditing] = useState(false);
@@ -137,7 +130,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     thread?.topic?.id,
   );
 
-  //TODO:
   useEffect(() => {
     if (isEdit === 'true') {
       setShouldRestoreEdits(true);
