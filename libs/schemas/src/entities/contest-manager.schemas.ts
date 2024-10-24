@@ -2,64 +2,7 @@ import { MAX_SCHEMA_INT, commonProtocol } from '@hicommonwealth/shared';
 import { z } from 'zod';
 import { Contest } from '../projections';
 import { PG_INT } from '../utils';
-
-export enum TopicWeightedVoting {
-  Stake = 'stake',
-  ERC20 = 'erc20',
-}
-
-export const ContestTopic = z
-  .object({
-    contest_address: z.string(),
-    topic_id: PG_INT,
-    created_at: z.coerce.date(),
-  })
-  .describe('X-Ref to topics in contest');
-
-export const Topic = z.object({
-  id: PG_INT.optional(),
-  name: z
-    .string()
-    .trim()
-    .min(1)
-    .max(255)
-    .default('General')
-    .refine(
-      (v) => !v.match(/["<>%{}|\\/^`]/g),
-      'Name must not contain special characters',
-    ),
-  community_id: z.string().max(255),
-  description: z.string().default(''),
-  telegram: z.string().max(255).nullish(),
-  featured_in_sidebar: z.boolean().default(false),
-  featured_in_new_post: z.boolean().default(false),
-  default_offchain_template: z.string().nullish(),
-  order: PG_INT.nullish(),
-  channel_id: z.string().max(255).nullish(),
-  group_ids: z.array(PG_INT).default([]),
-  default_offchain_template_backup: z.string().nullish(),
-  weighted_voting: z.nativeEnum(TopicWeightedVoting).nullish(),
-  token_address: z
-    .string()
-    .nullish()
-    .describe('token address, used for ERC20 topics'),
-  token_symbol: z
-    .string()
-    .nullish()
-    .describe('token symbol, used for ERC20 topics'),
-  vote_weight_multiplier: z
-    .number()
-    .gt(0)
-    .nullish()
-    .describe('vote weight multiplier, used for ERC20 topics'),
-
-  created_at: z.coerce.date().optional(),
-  updated_at: z.coerce.date().optional(),
-  deleted_at: z.coerce.date().nullish(),
-
-  // associations
-  contest_topics: z.array(ContestTopic).nullish(),
-});
+import { Topic } from './topic.schemas';
 
 export const ContestManager = z
   .object({
@@ -106,6 +49,13 @@ export const ContestManager = z
     contests: z.array(Contest).nullish(),
     farcaster_frame_url: z.string().nullish(),
     farcaster_frame_hashes: z.array(z.string()).nullish(),
-    neynar_webhook_id: z.string().nullish(),
   })
   .describe('On-Chain Contest Manager');
+
+export const ContestTopic = z
+  .object({
+    contest_address: z.string(),
+    topic_id: PG_INT,
+    created_at: z.coerce.date(),
+  })
+  .describe('X-Ref to topics in contest');
