@@ -15,7 +15,7 @@ async function truncateText(
   }:
     | {
         tableName: 'Threads' | 'ThreadVersionHistories';
-        columnName: 'bodies';
+        columnName: 'body';
       }
     | {
         tableName: 'Comments' | 'CommentVersionHistories';
@@ -114,17 +114,14 @@ async function main() {
 
   switch (process.argv[2]) {
     case 'threads':
-      await truncateText(
-        { tableName: 'Threads', columnName: 'bodies' },
-        lastId,
-      );
+      await truncateText({ tableName: 'Threads', columnName: 'body' }, lastId);
       break;
     case 'comments':
       await truncateText({ tableName: 'Comments', columnName: 'text' }, lastId);
       break;
     case 'thread-versions':
       await truncateText(
-        { tableName: 'ThreadVersionHistories', columnName: 'bodies' },
+        { tableName: 'ThreadVersionHistories', columnName: 'body' },
         lastId,
       );
       break;
