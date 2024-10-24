@@ -1,4 +1,8 @@
-import { decamelize } from '@hicommonwealth/shared';
+import {
+  decamelize,
+  MAX_TRUNCATED_CONTENT_LENGTH,
+  safeTruncateBody,
+} from '@hicommonwealth/shared';
 import {
   Model,
   Sequelize,
@@ -277,4 +281,46 @@ export const syncHooks = {
   afterSync(options: SyncOptions) {
     options.logging = false;
   },
+};
+
+export const beforeValidateThreadsHook = (instance: {
+  body: string;
+  content_url?: string | null | undefined;
+}) => {
+  if (!instance.body || instance.body.length <= MAX_TRUNCATED_CONTENT_LENGTH)
+    return;
+
+  if (!instance.content_url) {
+    throw new Error(
+      'content_url must be defined if body ' +
+        `length is greater than ${MAX_TRUNCATED_CONTENT_LENGTH}`,
+    );
+  } else
+    instance.body = safeTruncateBody(
+      instance.body,
+      MAX_TRUNCATED_CONTENT_LENGTH,
+    );
+  return instance;
+};
+
+// TODO: merge with beforeValidateThreadsHook after
+//  https://github.com/hicommonwealth/commonwealth/issues/9673
+export const beforeValidateCommentsHook = (instance: {
+  text: string;
+  content_url?: string | null | undefined;
+}) => {
+  if (!instance.text || instance.text.length <= MAX_TRUNCATED_CONTENT_LENGTH)
+    return;
+
+  if (!instance.content_url) {
+    throw new Error(
+      'content_url must be defined if body ' +
+        `length is greater than ${MAX_TRUNCATED_CONTENT_LENGTH}`,
+    );
+  } else
+    instance.text = safeTruncateBody(
+      instance.text,
+      MAX_TRUNCATED_CONTENT_LENGTH,
+    );
+  return instance;
 };

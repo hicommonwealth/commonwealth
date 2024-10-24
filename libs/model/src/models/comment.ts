@@ -9,6 +9,7 @@ import type {
   ReactionAttributes,
   ThreadInstance,
 } from '.';
+import { beforeValidateCommentsHook } from './utils';
 
 export type CommentAttributes = z.infer<typeof Comment> & {
   // associations
@@ -68,6 +69,9 @@ export default (
     },
     {
       hooks: {
+        beforeValidate(instance: CommentInstance) {
+          beforeValidateCommentsHook(instance);
+        },
         afterCreate: async (comment, options) => {
           await (
             sequelize.models.Thread as Sequelize.ModelStatic<ThreadInstance>
@@ -85,7 +89,6 @@ export default (
             thread_id: String(comment.thread_id),
           });
         },
-
         afterDestroy: async ({ thread_id }, options) => {
           await (
             sequelize.models.Thread as Sequelize.ModelStatic<ThreadInstance>
