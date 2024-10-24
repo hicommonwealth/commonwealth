@@ -159,29 +159,22 @@ export const CommentTree = ({
     isLoggedIn: user.isLoggedIn,
   });
 
-  const scrollToRef = useRef(null);
-  const scrollToEditorRef = useRef(null);
+  const commentRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const [expandedComment, setExpandedComment] = useState<number | null>(null);
 
-  const scrollToElement = () => {
-    if (scrollToRef.current) {
-      // @ts-expect-error <StrictNullChecks/>
-      scrollToRef.current.scrollIntoView({
-        behavior: 'smooth',
-        block: 'center',
-      });
-    }
-  };
-
-  const scrollToEditor = () => {
-    // @ts-expect-error <StrictNullChecks/>
-    scrollToEditorRef.current?.scrollIntoView({ behavior: 'smooth' });
+  const handleScrollToComment = (index: number) => {
+    setExpandedComment(index);
   };
 
   useEffect(() => {
-    if (isReplying) {
-      scrollToEditor();
+    if (expandedComment !== null && commentRefs.current[expandedComment]) {
+      commentRefs.current[expandedComment]?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+        inline: 'nearest',
+      });
     }
-  }, [isReplying]);
+  }, [expandedComment]);
 
   // eslint-disable-next-line @typescript-eslint/no-shadow
   const handleIsReplying = (isReplying: boolean, id?: number) => {
@@ -467,7 +460,12 @@ export const CommentTree = ({
         const nextCommentThreadLevel = nextComment?.threadLevel;
 
         return (
-          <React.Fragment key={comment.id + '' + comment.markedAsSpamAt}>
+          <div
+            key={comment.id + '' + comment.markedAsSpamAt}
+            ref={(el) => {
+              commentRefs.current[index] = el;
+            }}
+          >
             <div className={`Comment comment-${comment.id}`}>
               {comment.threadLevel > 0 && (
                 <div className="thread-connectors-container">
@@ -522,7 +520,7 @@ export const CommentTree = ({
                 onReply={() => {
                   setParentCommentId(comment.id);
                   setIsReplying(true);
-                  scrollToElement();
+                  handleScrollToComment(index);
                 }}
                 onDelete={() => handleDeleteComment(comment)}
                 isSpam={!!comment.markedAsSpamAt}
@@ -534,7 +532,6 @@ export const CommentTree = ({
                 shareURL={`${window.location.origin}${window.location.pathname}?comment=${comment.id}`}
               />
             </div>
-            <div ref={scrollToRef}></div>
             {isReplying && parentCommentId === comment.id && (
               <CreateComment
                 handleIsReplying={handleIsReplying}
@@ -549,7 +546,7 @@ export const CommentTree = ({
                 }
               />
             )}
-          </React.Fragment>
+          </div>
         );
       })}
     </div>

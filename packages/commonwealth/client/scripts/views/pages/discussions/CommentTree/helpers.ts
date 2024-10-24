@@ -10,7 +10,11 @@ export const jumpHighlightComment = (commentId: number) => {
     commentEle.classList.remove('highlighted');
     commentEle.classList.remove('highlightAnimationComplete');
     // scroll to comment
-    commentEle.scrollIntoView();
+    commentEle.scrollIntoView({
+      behavior: 'smooth',
+      block: 'center',
+      inline: 'nearest',
+    });
     // add new highlight classes
     commentEle.classList.add('highlighted');
     setTimeout(() => {
