@@ -6,7 +6,6 @@ import { UpdateCommentResponseThreadReactionsItemAddressUserApiKey } from './Upd
 import { UpdateCommentResponseThreadReactionsItemAddressUserEmailNotificationInterval } from './UpdateCommentResponseThreadReactionsItemAddressUserEmailNotificationInterval';
 import { UpdateCommentResponseThreadReactionsItemAddressUserProfile } from './UpdateCommentResponseThreadReactionsItemAddressUserProfile';
 import { UpdateCommentResponseThreadReactionsItemAddressUserProfileTagsItem } from './UpdateCommentResponseThreadReactionsItemAddressUserProfileTagsItem';
-
 export const UpdateCommentResponseThreadReactionsItemAddressUser =
   core.serialization.object({
     id: core.serialization.number().optional(),

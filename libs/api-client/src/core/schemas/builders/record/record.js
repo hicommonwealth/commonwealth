@@ -4,7 +4,6 @@ import { getErrorMessageForIncorrectType } from '../../utils/getErrorMessageForI
 import { isPlainObject } from '../../utils/isPlainObject';
 import { maybeSkipValidation } from '../../utils/maybeSkipValidation';
 import { getSchemaUtils } from '../schema-utils';
-
 export function record(keySchema, valueSchema) {
   const baseSchema = {
     parse: (raw, opts) => {
@@ -98,7 +97,6 @@ export function record(keySchema, valueSchema) {
     getSchemaUtils(baseSchema),
   );
 }
-
 function validateAndTransformRecord({
   value,
   isKeyNumeric,

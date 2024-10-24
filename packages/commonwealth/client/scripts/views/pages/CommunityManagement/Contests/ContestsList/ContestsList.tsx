@@ -1,6 +1,7 @@
 import moment from 'moment';
 import React, { useState } from 'react';
 
+import { useFlag } from 'hooks/useFlag';
 import { Skeleton } from 'views/components/Skeleton';
 
 import EmptyContestsList from '../EmptyContestsList';
@@ -42,21 +43,23 @@ interface ContestsListProps {
   contests: Contest[];
   isAdmin: boolean;
   isLoading: boolean;
+  hasWeightedTopic: boolean;
   stakeEnabled: boolean;
   isContestAvailable: boolean;
-  feeManagerBalance?: string;
   onSetContestSelectionView?: () => void;
 }
+
 const ContestsList = ({
   contests,
   isAdmin,
   isLoading,
+  hasWeightedTopic,
   stakeEnabled,
   isContestAvailable,
-  feeManagerBalance,
   onSetContestSelectionView,
 }: ContestsListProps) => {
   const [fundDrawerContest, setFundDrawerContest] = useState<Contest>();
+  const weightedTopicsEnabled = useFlag('weightedTopics');
 
   if (isLoading) {
     return (
@@ -71,8 +74,11 @@ const ContestsList = ({
   return (
     <>
       <div className="ContestsList">
-        {isAdmin && (!stakeEnabled || !isContestAvailable) ? (
+        {isAdmin &&
+        ((weightedTopicsEnabled ? !hasWeightedTopic : !stakeEnabled) ||
+          !isContestAvailable) ? (
           <EmptyContestsList
+            hasWeightedTopic={hasWeightedTopic}
             isStakeEnabled={stakeEnabled}
             isContestAvailable={isContestAvailable}
             onSetContestSelectionView={onSetContestSelectionView}
@@ -84,7 +90,7 @@ const ContestsList = ({
               moment(a.end_time).isBefore(b.end_time) ? -1 : 1,
             );
 
-            const { end_time, score } =
+            const { end_time } =
               sortedContests[sortedContests.length - 1] || {};
 
             return (
@@ -98,14 +104,13 @@ const ContestsList = ({
                 imageUrl={contest.image_url}
                 // @ts-expect-error <StrictNullChecks/>
                 topics={contest.topics}
-                score={score}
                 decimals={contest.decimals}
                 ticker={contest.ticker}
                 finishDate={end_time ? moment(end_time).toISOString() : ''}
                 isCancelled={contest.cancelled}
                 onFund={() => setFundDrawerContest(contest)}
-                feeManagerBalance={feeManagerBalance}
                 isRecurring={!contest.funding_token_address}
+                payoutStructure={contest.payout_structure}
               />
             );
           })

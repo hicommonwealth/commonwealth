@@ -33,7 +33,7 @@ export function UpdateGroup(): Command<
 
       const topics = await models.Topic.findAll({
         where: {
-          id: { [Op.in]: payload.topics || [] },
+          id: { [Op.in]: payload.topics?.map((t) => t.id) || [] },
           community_id,
         },
       });
@@ -89,6 +89,26 @@ export function UpdateGroup(): Command<
               },
               transaction,
             },
+          );
+
+          // update topic level interaction permissions for current group
+          await Promise.all(
+            (payload.topics || [])?.map(async (t) => {
+              if (group.id) {
+                await models.GroupPermission.update(
+                  {
+                    allowed_actions: t.permissions,
+                  },
+                  {
+                    where: {
+                      group_id: group_id,
+                      topic_id: t.id,
+                    },
+                    transaction,
+                  },
+                );
+              }
+            }),
           );
         }
 

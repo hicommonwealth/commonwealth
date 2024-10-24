@@ -2,6 +2,7 @@ import React from 'react';
 
 import './CWIconButton.scss';
 
+import { IconComponentProps } from 'views/components/component_kit/cw_icons/types';
 import { CWIcon } from '../../cw_icons/cw_icon';
 import { IconName } from '../../cw_icons/cw_icon_lookup';
 import { getClasses } from '../../helpers';
@@ -12,7 +13,9 @@ type ButtonSize = 'lg' | 'med' | 'sm';
 type ButtonStyleProps = {
   buttonSize?: ButtonSize;
   iconName: IconName;
-} & BaseStyleProps;
+  type?: 'submit' | 'reset' | 'button';
+} & BaseStyleProps &
+  Pick<IconComponentProps, 'weight'>;
 
 type ButtonProps = ButtonStyleProps & React.HTMLAttributes<HTMLButtonElement>;
 
@@ -22,6 +25,7 @@ export const CWIconButton = ({
   iconName,
   disabled = false,
   onClick,
+  weight,
   ...otherProps
 }: ButtonProps) => {
   return (
@@ -38,7 +42,7 @@ export const CWIconButton = ({
       disabled={disabled}
       {...otherProps}
     >
-      <CWIcon iconName={iconName} />
+      <CWIcon iconName={iconName} weight={weight} />
     </button>
   );
 };

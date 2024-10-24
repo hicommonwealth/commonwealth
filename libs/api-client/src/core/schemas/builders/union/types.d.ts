@@ -1,6 +1,5 @@
 import { inferParsedObject, inferRawObject, ObjectSchema } from '../object';
 import { Discriminant } from './discriminant';
-
 export declare type UnionSubtypes<
   DiscriminantValues extends string | number | symbol,
 > = {

@@ -21,6 +21,7 @@ import {
 import { convertRequirementAmountFromWeiToTokens } from '../../common/helpers';
 import { DeleteGroupModal } from '../DeleteGroupModal';
 import { GroupForm } from '../common/GroupForm';
+import { convertGranularPermissionsToAccumulatedPermissions } from '../common/GroupForm/helpers';
 import { makeGroupDataBaseAPIPayload } from '../common/helpers';
 import './UpdateCommunityGroupPage.scss';
 
@@ -131,14 +132,13 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
           topics: (foundGroup.topics || []).map((topic) => ({
             label: topic.name,
             value: topic.id,
+            permission: convertGranularPermissionsToAccumulatedPermissions(
+              topic.permissions || [],
+            ),
           })),
         }}
         onSubmit={(values) => {
-          const payload = makeGroupDataBaseAPIPayload(
-            values,
-            isAddedToHomeScreen,
-            allowedAddresses,
-          );
+          const payload = makeGroupDataBaseAPIPayload(values, allowedAddresses);
           const input = buildUpdateGroupInput({
             ...payload,
             groupId: groupId,

@@ -18,7 +18,6 @@ import { UpdateCommunityRequestSocialLinksItem } from '../../types/UpdateCommuni
 import { UpdateCommunityRequestTerms } from '../../types/UpdateCommunityRequestTerms';
 import { UpdateCommunityRequestTopicsItem } from '../../types/UpdateCommunityRequestTopicsItem';
 import { UpdateCommunityRequestType } from '../../types/UpdateCommunityRequestType';
-
 export declare const UpdateCommunityRequest: core.serialization.Schema<
   serializers.UpdateCommunityRequest.Raw,
   CommonApi.UpdateCommunityRequest
