@@ -592,6 +592,9 @@ importers:
       '@cosmjs/tendermint-rpc':
         specifier: ^0.31.3
         version: 0.31.3(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      '@ethersproject/bignumber':
+        specifier: ^5.7.0
+        version: 5.7.0
       '@faker-js/faker':
         specifier: ^8.4.1
         version: 8.4.1

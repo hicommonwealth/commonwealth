@@ -41,7 +41,7 @@ export function PerformContestRollovers(): Command<
                                  cm.interval > 0
                                  )
                               AND NOW() > co.end_time
-                              AND cm.cancelled = false
+                              AND cm.cancelled IS NOT TRUE
                      JOIN "Communities" cu ON cm.community_id = cu.id
                      JOIN "ChainNodes" cn ON cu.chain_node_id = cn.id;
         `,
@@ -53,7 +53,7 @@ export function PerformContestRollovers(): Command<
 
       const contestRolloverPromises = contestManagersWithEndedContest.map(
         async ({ url, private_url, contest_address, interval, ended }) => {
-          log.debug(`ROLLOVER: ${contest_address}`);
+          log.info(`ROLLOVER: ${contest_address}`);
 
           if (interval === 0 && !ended) {
             // preemptively mark as ended so that rollover
