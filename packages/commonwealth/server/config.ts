@@ -22,7 +22,7 @@ const {
   EVM_CE_POLL_INTERVAL,
   CF_ZONE_ID,
   CF_API_KEY,
-  PEER_ID,
+  LIBP2P_PRIVATE_KEY,
 } = process.env;
 
 const NO_PRERENDER = _NO_PRERENDER;
@@ -95,7 +95,7 @@ export const config = configure(
         10,
       ),
     },
-    PEER_ID,
+    LIBP2P_PRIVATE_KEY,
     SNAPSHOT_WEBHOOK_SECRET,
   },
   z.object({
@@ -157,7 +157,7 @@ export const config = configure(
       MESSAGE_RELAYER_PREFETCH: z.number().int().positive(),
       EVM_CE_POLL_INTERVAL_MS: z.number().int().positive(),
     }),
-    PEER_ID: z.string().optional(),
+    LIBP2P_PRIVATE_KEY: z.string().optional(),
     SNAPSHOT_WEBHOOK_SECRET: z
       .string()
       .optional()
