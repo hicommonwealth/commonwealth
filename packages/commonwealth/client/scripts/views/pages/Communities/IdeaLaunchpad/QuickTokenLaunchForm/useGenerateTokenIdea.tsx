@@ -138,7 +138,6 @@ export const useGenerateTokenIdea = ({
 
               // reset chunking state after `description` is chunked
               if (fieldName === 'description') {
-                console.log('running');
                 setTimeout(() => {
                   setTokenIdeas((ti) => {
                     const temp = [...ti];
