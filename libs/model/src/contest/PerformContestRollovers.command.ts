@@ -53,7 +53,7 @@ export function PerformContestRollovers(): Command<
 
       const contestRolloverPromises = contestManagersWithEndedContest.map(
         async ({ url, private_url, contest_address, interval, ended }) => {
-          log.debug(`ROLLOVER: ${contest_address}`);
+          log.info(`ROLLOVER: ${contest_address}`);
 
           if (interval === 0 && !ended) {
             // preemptively mark as ended so that rollover
