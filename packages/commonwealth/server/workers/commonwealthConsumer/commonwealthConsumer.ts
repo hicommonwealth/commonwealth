@@ -20,6 +20,7 @@ import {
   Contest,
   ContestWorker,
   DiscordBotPolicy,
+  LaunchpadPolicy,
 } from '@hicommonwealth/model';
 import { fileURLToPath } from 'url';
 import { config } from '../../config';
@@ -101,6 +102,11 @@ export async function setupCommonwealthConsumer(): Promise<void> {
   const discordBotSubRes = await brokerInstance.subscribe(
     BrokerSubscriptions.DiscordBotPolicy,
     DiscordBotPolicy(),
+  );
+
+  const launchpadSubRes = await brokerInstance.subscribe(
+    BrokerSubscriptions.LaunchpadPolicy,
+    LaunchpadPolicy(),
   );
 
   if (!discordBotSubRes) {

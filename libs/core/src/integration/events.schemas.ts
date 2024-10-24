@@ -220,3 +220,11 @@ export const SubscriptionPreferencesUpdated = SubscriptionPreference.partial({
   created_at: true,
   updated_at: true,
 }).merge(SubscriptionPreference.pick({ user_id: true }));
+
+export const TokenLaunched = EventMetadata.extend({
+  tokenAddress: z.string().describe('Token address'),
+  eventSource: z.object({
+    kind: z.string(),
+    chainNodeId: z.number(),
+  }),
+}).describe('When a launchpad token is created');

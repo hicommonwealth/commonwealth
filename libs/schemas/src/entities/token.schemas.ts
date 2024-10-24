@@ -1,21 +1,20 @@
-import { ChainBase } from '@hicommonwealth/shared';
 import { z } from 'zod';
 import { PG_INT } from '../utils';
 
 export const Token = z.object({
-  // 1. Regular fields are nullish when nullable instead of optional
+  // derivable from creation event
+  token_address: z.string(),
+  namespace: z.string(),
   name: z.string(),
+  symbol: z.string(),
+  initial_supply: z.number(),
+  is_locked: z.boolean().default(false),
+  chain_node_id: PG_INT,
+
+  // use specified
   icon_url: z.string().nullish(),
   description: z.string().nullish(),
-  symbol: z.string(),
-  chain_node_id: PG_INT,
-  base: z.nativeEnum(ChainBase),
-  author_address: z.string(),
-  community_id: z.string(),
-  launchpad_contract_address: z.string(),
-  uniswap_pool_address: z.string().optional().nullish(),
 
-  // 2. Timestamps are managed by sequelize, thus optional
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional(),
 });

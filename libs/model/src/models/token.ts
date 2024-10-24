@@ -20,16 +20,30 @@ export default (
   sequelize.define<TokenInstance>(
     'Token',
     {
-      name: { type: Sequelize.STRING, primaryKey: true },
-      icon_url: { type: Sequelize.STRING, allowNull: true },
-      description: { type: Sequelize.STRING, allowNull: true },
+      // derivable when event received
+      token_address: { type: Sequelize.STRING, primaryKey: true },
+      namespace: {
+        type: Sequelize.STRING,
+        references: {
+          model: 'Communities',
+          key: 'namespace',
+        },
+      },
+      name: { type: Sequelize.STRING },
       symbol: { type: Sequelize.STRING },
+      initial_supply: { type: Sequelize.INTEGER },
+      is_locked: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
       chain_node_id: { type: Sequelize.INTEGER },
-      base: { type: Sequelize.STRING, allowNull: false },
-      author_address: { type: Sequelize.STRING, allowNull: false },
-      community_id: { type: Sequelize.STRING, allowNull: false },
-      launchpad_contract_address: { type: Sequelize.STRING, allowNull: false },
-      uniswap_pool_address: { type: Sequelize.STRING, allowNull: true },
+      created_at: { type: Sequelize.DATE, allowNull: false },
+      updated_at: { type: Sequelize.DATE, allowNull: false },
+
+      // optional after token linked
+      description: { type: Sequelize.STRING, allowNull: true },
+      icon_url: { type: Sequelize.STRING, allowNull: true },
     },
     {
       tableName: 'Tokens',
