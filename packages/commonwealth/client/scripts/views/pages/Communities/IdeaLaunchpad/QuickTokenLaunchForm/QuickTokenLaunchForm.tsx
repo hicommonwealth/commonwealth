@@ -22,6 +22,7 @@ import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import TokenLaunchButton from 'views/components/sidebar/TokenLaunchButton';
+import { openConfirmation } from 'views/modals/confirmation_modal';
 import { generateCommunityNameFromToken } from '../../../LaunchToken/steps/CommunityInformationStep/utils';
 import SuccessStep from '../../../LaunchToken/steps/SuccessStep';
 import TokenInformationForm from '../../../LaunchToken/steps/TokenInformationStep/TokenInformationForm';
@@ -98,7 +99,35 @@ export const QuickTokenLaunchForm = ({
 
   useBeforeUnload(isCreatingQuickToken);
 
-  const handleSubmit = (tokenInfo: FormSubmitValues) => {
+  const triggerDiscardExtraTokenDraftsConfirmation = (
+    onConfirm: () => void,
+  ) => {
+    openConfirmation({
+      title: `Proceed with active token form?`,
+      description: (
+        <CWText>
+          You currently have {tokenIdeas.length} token form drafts. Only the
+          active form will be used to create the token and the other drafts will
+          be discarded.
+        </CWText>
+      ),
+      buttons: [
+        {
+          label: 'Cancel',
+          buttonType: 'secondary',
+          buttonHeight: 'sm',
+        },
+        {
+          label: 'Proceed',
+          buttonType: 'primary',
+          buttonHeight: 'sm',
+          onClick: onConfirm,
+        },
+      ],
+    });
+  };
+
+  const handleTokenLaunch = (tokenInfo: FormSubmitValues) => {
     if (isCreatingQuickToken) return;
 
     const handleAsync = async () => {
@@ -276,6 +305,18 @@ export const QuickTokenLaunchForm = ({
     };
 
     handleAsync().catch(console.error);
+  };
+
+  const handleSubmit = (tokenInfo: FormSubmitValues) => {
+    if (tokenIdeas.length > 0) {
+      // if there are multiple drafts, then confirm from user if they want to proceed with
+      // active draft and discard the others
+      triggerDiscardExtraTokenDraftsConfirmation(() =>
+        handleTokenLaunch(tokenInfo),
+      );
+    } else {
+      handleTokenLaunch(tokenInfo);
+    }
   };
 
   const handleFormUpdates = (values: FormSubmitValues) => {
