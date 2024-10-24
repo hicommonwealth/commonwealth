@@ -17,6 +17,7 @@ export enum RascalSubscriptions {
   NotificationsSettings = BrokerSubscriptions.NotificationsSettings,
   ContestWorkerPolicy = BrokerSubscriptions.ContestWorkerPolicy,
   ContestProjection = BrokerSubscriptions.ContestProjection,
+  LaunchpadPolicy = BrokerSubscriptions.LaunchpadPolicy,
 }
 
 export enum RascalExchanges {
