@@ -4,6 +4,7 @@ import { getDecodedString } from '@hicommonwealth/shared';
 import Sequelize from 'sequelize';
 import { z } from 'zod';
 import { emitEvent, getThreadContestManagers } from '../utils/utils';
+import { AddressAttributes } from './address';
 import type { CommunityAttributes } from './community';
 import type { ThreadSubscriptionAttributes } from './thread_subscriptions';
 import type { ModelInstance } from './types';
@@ -119,7 +120,7 @@ export default (
           thread: ThreadInstance,
           options: Sequelize.CreateOptions<ThreadAttributes>,
         ) => {
-          const { Community, Outbox } = sequelize.models;
+          const { Community, Outbox, Address } = sequelize.models;
 
           await Community.increment('lifetime_thread_count', {
             by: 1,
@@ -134,6 +135,10 @@ export default (
             ? []
             : await getThreadContestManagers(sequelize, topic_id, community_id);
 
+          const address = (await Address.findByPk(
+            thread.address_id,
+          )) as AddressAttributes | null;
+
           await emitEvent(
             Outbox,
             [
@@ -141,6 +146,7 @@ export default (
                 event_name: EventNames.ThreadCreated,
                 event_payload: {
                   ...thread.get({ plain: true }),
+                  address: address!.address,
                   contestManagers,
                 },
               },

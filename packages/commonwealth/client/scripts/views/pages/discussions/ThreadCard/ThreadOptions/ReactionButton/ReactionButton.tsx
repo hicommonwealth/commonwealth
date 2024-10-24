@@ -146,6 +146,7 @@ export const ReactionButton = ({
             reactors,
           })}
           tooltipText={tooltipText}
+          reactors={reactors}
         />
       ) : tooltipText ? (
         <TooltipWrapper disabled={disabled} text={tooltipText}>
