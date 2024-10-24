@@ -4,6 +4,7 @@ import { ChainEvents, Contest, Snapshot, config } from '@hicommonwealth/model';
 import { Router, raw } from 'express';
 import farcasterRouter from 'server/farcaster/router';
 import { validateNeynarWebhook } from 'server/middleware/validateNeynarWebhook';
+import { config as serverConfig } from '../config';
 
 const PATH = '/api/integration';
 
@@ -61,8 +62,8 @@ function build() {
     (req, _, next) => {
       const headerSecret = req.headers['authentication'];
       if (
-        config.SNAPSHOT_WEBHOOK_SECRET &&
-        headerSecret !== config.SNAPSHOT_WEBHOOK_SECRET
+        serverConfig.SNAPSHOT_WEBHOOK_SECRET &&
+        headerSecret !== serverConfig.SNAPSHOT_WEBHOOK_SECRET
       ) {
         throw new AppError('Unauthorized', 401);
       }
