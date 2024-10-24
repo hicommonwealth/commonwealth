@@ -21,9 +21,8 @@ export const Breadcrumbs = () => {
 
   const communityId = app.activeChainId() || '';
   const { data: linkedThreads } = useGetThreadsByIdQuery({
-    communityId,
-    // @ts-expect-error StrictNullChecks
-    ids: [getThreadId && Number(getThreadId[1])],
+    community_id: communityId,
+    thread_ids: getThreadId ? [Number(getThreadId[1])] : [],
     apiCallEnabled:
       // Only call when in discussion pages prevents unnecessary calls.
       location.pathname.split('/')[1].toLowerCase() === 'discussion' &&

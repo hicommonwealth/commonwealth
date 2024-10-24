@@ -49,7 +49,6 @@ const Profile = ({ userId }: ProfileProps) => {
       setProfile(
         new NewProfile({ ...data.profile, userId, isOwner: isOwner ?? false }),
       );
-      // @ts-expect-error <StrictNullChecks/>
       setThreads(data.threads.map((t) => new Thread(t)));
 
       // @ts-expect-error <StrictNullChecks/>
@@ -59,7 +58,7 @@ const Profile = ({ userId }: ProfileProps) => {
           // @ts-expect-error <StrictNullChecks/>
           (t) => t.id === parseInt(c.threadId, 10),
         );
-        return { ...c, thread };
+        return { ...c, thread, communityId: thread?.community_id };
       });
       // @ts-expect-error <StrictNullChecks/>
       setComments(commentsWithAssociatedThread);

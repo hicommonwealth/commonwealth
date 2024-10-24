@@ -139,11 +139,11 @@ const useEditThreadMutation = ({
       }
 
       // add/remove thread from different caches if the topic id was changed
-      if (updatedThread.topic.id !== currentTopicId) {
+      if (updatedThread.topic?.id !== currentTopicId) {
         updateThreadTopicInAllCaches(
           communityId,
           threadId,
-          updatedThread.topic,
+          updatedThread.topic!,
           currentTopicId,
         );
       }

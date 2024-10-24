@@ -19,7 +19,7 @@ const UrlSelectorItem = ({
     <div className="proposal-item">
       <div className="selected">{isSelected && <CWCheck />}</div>
       <div className="text">
-        <CWText fontWeight="medium" truncate title={link.title}>
+        <CWText fontWeight="medium" truncate title={link.title!}>
           {link.title}
         </CWText>
         <CWText type="caption" title={link.identifier}>

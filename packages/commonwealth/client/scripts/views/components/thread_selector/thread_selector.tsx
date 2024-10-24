@@ -47,6 +47,7 @@ export const ThreadSelector = ({
     const threads = threadsData?.pages?.[0]?.results || [];
     return threads.map(
       (t) =>
+        // @ts-expect-error <StrictNullChecks/>
         new Thread({
           id: t.id,
           title: t.title,
