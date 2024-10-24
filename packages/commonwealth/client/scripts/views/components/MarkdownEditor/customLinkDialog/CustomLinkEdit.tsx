@@ -40,7 +40,7 @@ export const CustomLinkEdit = () => {
   return (
     <div className="CustomLinkEdit">
       <input
-        type="text"
+        type="url"
         value={link}
         style={{ flexGrow: 1 }}
         autoFocus={true}
