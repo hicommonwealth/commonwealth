@@ -10,7 +10,6 @@ import { UpdateCommentResponseDiscordMeta } from './UpdateCommentResponseDiscord
 import { UpdateCommentResponseReaction } from './UpdateCommentResponseReaction';
 import { UpdateCommentResponseSearch } from './UpdateCommentResponseSearch';
 import { UpdateCommentResponseThread } from './UpdateCommentResponseThread';
-
 export declare const UpdateCommentResponse: core.serialization.ObjectSchema<
   serializers.UpdateCommentResponse.Raw,
   CommonApi.UpdateCommentResponse
@@ -21,7 +20,6 @@ export declare namespace UpdateCommentResponse {
     thread_id: number;
     address_id: number;
     text: string;
-    plaintext: string;
     parent_id?: string | null;
     content_url?: string | null;
     canvas_signed_data?: string | null;

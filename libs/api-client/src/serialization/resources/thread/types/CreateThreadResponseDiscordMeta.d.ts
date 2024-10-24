@@ -5,7 +5,6 @@ import * as CommonApi from '../../../../api/index';
 import * as core from '../../../../core';
 import * as serializers from '../../../index';
 import { CreateThreadResponseDiscordMetaUser } from './CreateThreadResponseDiscordMetaUser';
-
 export declare const CreateThreadResponseDiscordMeta: core.serialization.ObjectSchema<
   serializers.CreateThreadResponseDiscordMeta.Raw,
   CommonApi.CreateThreadResponseDiscordMeta

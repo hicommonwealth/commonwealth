@@ -67,7 +67,7 @@ describe('createSitemapGenerator', { timeout: 10_000 }, function () {
         canvas_signed_data: '',
         canvas_msg_id: '',
         reaction_count: 0,
-        reaction_weights_sum: 0,
+        reaction_weights_sum: '0',
         comment_count: 0,
         profile_name: 'foobar',
         topic_id: topic.id,

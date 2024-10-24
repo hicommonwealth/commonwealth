@@ -4,7 +4,6 @@
 import * as CommonApi from '../../../../api/index';
 import * as core from '../../../../core';
 import * as serializers from '../../../index';
-
 export declare const UpdateCommunityRequestChainNodeHealth: core.serialization.Schema<
   serializers.UpdateCommunityRequestChainNodeHealth.Raw,
   CommonApi.UpdateCommunityRequestChainNodeHealth

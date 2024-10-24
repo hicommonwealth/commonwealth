@@ -20,6 +20,21 @@ type BreadcrumbsProps = {
   tooltipStr?: string;
 };
 
+const handleNavigation = (label, navigate, isParent) => {
+  if (label === 'Discussions' && isParent) {
+    navigate(`/discussions`);
+  }
+};
+const handleMouseInteraction = (
+  label: string,
+  handleInteraction: (event: React.MouseEvent<HTMLSpanElement>) => void,
+  event: React.MouseEvent<HTMLSpanElement>,
+) => {
+  if (label !== 'Discussions') {
+    handleInteraction(event);
+  }
+};
+
 export const CWBreadcrumbs = ({
   breadcrumbs,
   tooltipStr,
@@ -36,14 +51,19 @@ export const CWBreadcrumbs = ({
                 placement="bottom"
                 renderTrigger={(handleInteraction) => (
                   <CWText
-                    onMouseEnter={handleInteraction}
-                    onMouseLeave={handleInteraction}
+                    onMouseEnter={(event) =>
+                      handleMouseInteraction(label, handleInteraction, event)
+                    }
+                    onMouseLeave={(event) =>
+                      handleMouseInteraction(label, handleInteraction, event)
+                    }
                     type="caption"
                     className={clsx({
                       'disable-active-cursor': index === 0,
                       'current-text': isCurrent,
                       'parent-text': !isCurrent,
                     })}
+                    onClick={() => handleNavigation(label, navigate, isParent)}
                   >
                     {truncateText(label)}
                   </CWText>

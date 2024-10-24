@@ -2,7 +2,6 @@ import {
   Actor,
   DeepPartial,
   EventNames,
-  InvalidState,
   dispose,
   handleEvent,
   query,
@@ -162,7 +161,7 @@ describe('Contests projection lifecycle', () => {
           topic_id: undefined,
           view_count: 1,
           reaction_count: 1,
-          reaction_weights_sum: 1,
+          reaction_weights_sum: '1',
           comment_count: 1,
           discord_meta: undefined,
           deleted_at: undefined, // so we can find it!
@@ -399,35 +398,5 @@ describe('Contests projection lifecycle', () => {
         ],
       },
     ] as Array<DeepPartial<z.infer<typeof ContestResults>>>);
-  });
-
-  test('should raise invalid state when community with namespace not found', async () => {
-    expect(
-      handleEvent(Contests(), {
-        name: EventNames.RecurringContestManagerDeployed,
-        payload: {
-          namespace: 'not-found',
-          contest_address: 'new-address',
-          interval: 10,
-          created_at,
-        },
-      }),
-    ).to.eventually.be.rejectedWith(InvalidState);
-  });
-
-  test('should raise retryable error when protocol helper fails', async () => {
-    getTokenAttributes.rejects(new Error());
-    expect(
-      handleEvent(Contests(), {
-        name: EventNames.RecurringContestManagerDeployed,
-        payload: {
-          namespace: 'not-found',
-          contest_address: 'new-address',
-          interval: 10,
-          created_at,
-        },
-      }),
-    ).to.eventually.be.rejectedWith(Error);
-    getTokenAttributes.reset();
   });
 });

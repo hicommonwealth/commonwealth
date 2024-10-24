@@ -7,7 +7,6 @@ import * as serializers from '../../../index';
 import { UpdateCommentResponseReactionAddressRole } from './UpdateCommentResponseReactionAddressRole';
 import { UpdateCommentResponseReactionAddressUser } from './UpdateCommentResponseReactionAddressUser';
 import { UpdateCommentResponseReactionAddressWalletId } from './UpdateCommentResponseReactionAddressWalletId';
-
 export declare const UpdateCommentResponseReactionAddress: core.serialization.ObjectSchema<
   serializers.UpdateCommentResponseReactionAddress.Raw,
   CommonApi.UpdateCommentResponseReactionAddress

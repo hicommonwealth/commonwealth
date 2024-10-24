@@ -12,7 +12,6 @@ export const queryClient = new QueryClient({
 export const ApiEndpoints = {
   // endpoint builder functions like getEndpoint(id) => /endpoint/:id should have camel cased keys
   // stand alone endpoints should be have upper snake case keys so we can easily tell them apart in code
-  BULK_TOPICS: '/topics',
   FETCH_ADMIN: '/roles',
   FETCH_COMMUNITY_STAKES: '/communityStakes',
   FETCH_COMMENTS: '/viewComments',
@@ -36,8 +35,9 @@ export const ApiEndpoints = {
   searchProfiles: (searchTerm: string) => `/profiles?search=${searchTerm}`,
   searchChains: (searchTerm: string) => `/communities?search=${searchTerm}`,
   VIEW_COUNT: '/viewCount',
-  FETCH_USER_ACTIVITY: '/viewUserActivity',
-  FETCH_GLOBAL_ACTIVITY: '/viewGlobalActivity',
+  GENERATE_IMAGE: '/generateImage',
+  GENERATE_TOKEN_IDEA: '/generateTokenIdea',
+  UPLOAD_FILE: '/getUploadSignature',
 };
 
 export const ContractMethods = {

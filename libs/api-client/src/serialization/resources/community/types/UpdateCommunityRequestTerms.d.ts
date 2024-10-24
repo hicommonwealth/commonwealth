@@ -5,7 +5,6 @@ import * as CommonApi from '../../../../api/index';
 import * as core from '../../../../core';
 import * as serializers from '../../../index';
 import { UpdateCommunityRequestTermsZero } from './UpdateCommunityRequestTermsZero';
-
 export declare const UpdateCommunityRequestTerms: core.serialization.Schema<
   serializers.UpdateCommunityRequestTerms.Raw,
   CommonApi.UpdateCommunityRequestTerms

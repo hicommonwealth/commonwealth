@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 
 import { useDraft } from 'hooks/useDraft';
 import { useSearchParams } from 'react-router-dom';
-import type Topic from '../../../../models/Topic';
+import type { Topic } from '../../../../models/Topic';
 import { ThreadKind } from '../../../../models/types';
 
 type NewThreadDraft = {
@@ -20,6 +20,8 @@ const useNewThreadForm = (communityId: string, topicsForSelector: Topic[]) => {
     { keyVersion: 'v3' },
   );
   const [canShowGatingBanner, setCanShowGatingBanner] = useState(true);
+  const [canShowTopicPermissionBanner, setCanShowTopicPermissionBanner] =
+    useState(true);
 
   // get restored draft on init
   const restoredDraft: NewThreadDraft | null = useMemo(() => {
@@ -80,10 +82,10 @@ const useNewThreadForm = (communityId: string, topicsForSelector: Topic[]) => {
     }
     saveDraft(draft);
 
-    if (!editorText && threadTopic?.defaultOffchainTemplate) {
+    if (!editorText && threadTopic?.default_offchain_template) {
       try {
         const template = JSON.parse(
-          threadTopic.defaultOffchainTemplate,
+          threadTopic.default_offchain_template,
         ) as string;
         setEditorText(template);
       } catch (e) {
@@ -113,6 +115,8 @@ const useNewThreadForm = (communityId: string, topicsForSelector: Topic[]) => {
     clearDraft,
     canShowGatingBanner,
     setCanShowGatingBanner,
+    canShowTopicPermissionBanner,
+    setCanShowTopicPermissionBanner,
   };
 };
 

@@ -1,6 +1,5 @@
 import { buildUpdateCommunityInput } from 'client/scripts/state/api/communities/updateCommunity';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import useAppStatus from 'hooks/useAppStatus';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useCallback, useState } from 'react';
@@ -54,8 +53,6 @@ const Directory = () => {
     shouldRun: !isLoadingCommunity && !!community,
   });
 
-  const { isAddedToHomeScreen } = useAppStatus();
-
   const defaultChainNodeId = chainNodeId ?? communityDefaultChainNodeId;
   const defaultOption = chainNodeOptionsSorted?.find(
     (option) => option.value === String(defaultChainNodeId),
@@ -78,7 +75,6 @@ const Directory = () => {
           communityId: community?.id,
           directoryPageChainNodeId: chainNodeId || undefined,
           directoryPageEnabled: isEnabled,
-          isPWA: isAddedToHomeScreen,
         }),
       );
 
@@ -95,7 +91,6 @@ const Directory = () => {
     community?.directory_page_enabled,
     community?.directory_page_chain_node_id,
     isEnabled,
-    isAddedToHomeScreen,
     updateCommunity,
   ]);
 

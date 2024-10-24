@@ -6,7 +6,6 @@ import { UpdateGroupRequestRequirementsItemThresholdDataSourceOne } from './Upda
 import { UpdateGroupRequestRequirementsItemThresholdDataSourceThree } from './UpdateGroupRequestRequirementsItemThresholdDataSourceThree';
 import { UpdateGroupRequestRequirementsItemThresholdDataSourceTokenId } from './UpdateGroupRequestRequirementsItemThresholdDataSourceTokenId';
 import { UpdateGroupRequestRequirementsItemThresholdDataSourceTokenSymbol } from './UpdateGroupRequestRequirementsItemThresholdDataSourceTokenSymbol';
-
 export const UpdateGroupRequestRequirementsItemThresholdDataSource =
   core.serialization.undiscriminatedUnion([
     UpdateGroupRequestRequirementsItemThresholdDataSourceTokenId,

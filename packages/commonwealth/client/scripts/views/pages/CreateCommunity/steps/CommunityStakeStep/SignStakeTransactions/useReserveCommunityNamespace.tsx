@@ -20,6 +20,8 @@ interface UseReserveCommunityNamespaceProps {
   symbol: string;
   userAddress: string;
   chainId: string;
+  onSuccess?: () => void;
+  hasNamespaceReserved?: boolean;
 }
 
 const useReserveCommunityNamespace = ({
@@ -28,9 +30,14 @@ const useReserveCommunityNamespace = ({
   symbol,
   userAddress,
   chainId,
+  onSuccess,
+  hasNamespaceReserved,
 }: UseReserveCommunityNamespaceProps) => {
-  const [reserveNamespaceData, setReserveNamespaceData] =
-    useState<ActionState>(defaultActionState);
+  const [reserveNamespaceData, setReserveNamespaceData] = useState<ActionState>(
+    hasNamespaceReserved
+      ? { state: 'completed', errorText: '' }
+      : defaultActionState,
+  );
 
   const { namespaceFactory } = useNamespaceFactory(parseInt(chainId));
   const { mutateAsync: updateCommunity } = useUpdateCommunityMutation({
@@ -83,6 +90,8 @@ const useReserveCommunityNamespace = ({
         state: 'completed',
         errorText: '',
       });
+
+      onSuccess?.();
 
       trackAnalytics({
         event: MixpanelCommunityStakeEvent.RESERVED_COMMUNITY_NAMESPACE,

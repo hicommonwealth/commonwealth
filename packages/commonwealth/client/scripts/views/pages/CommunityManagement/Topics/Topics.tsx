@@ -6,6 +6,7 @@ import CWFormSteps from 'views/components/component_kit/new_designs/CWFormSteps'
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import StakeIntegration from 'views/pages/CommunityManagement/StakeIntegration';
 
+import CommunityStakeStep from '../../CreateCommunity/steps/CommunityStakeStep';
 import TopicDetails from './TopicDetails';
 import WVConsent from './WVConsent';
 import WVERC20Details from './WVERC20Details';
@@ -14,7 +15,9 @@ import { CreateTopicStep, getCreateTopicSteps } from './utils';
 
 import { notifyError } from 'controllers/app/notifications';
 import { useCommonNavigate } from 'navigation/helpers';
+import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { useCreateTopicMutation } from 'state/api/topics';
+import useUserStore from 'state/ui/user';
 
 import './Topics.scss';
 
@@ -51,6 +54,19 @@ export const Topics = () => {
 
   const navigate = useCommonNavigate();
   const { mutateAsync: createTopic } = useCreateTopicMutation();
+
+  const { data: community } = useGetCommunityByIdQuery({
+    id: app.activeChainId() || '',
+    includeNodeInfo: true,
+  });
+
+  const user = useUserStore();
+
+  const selectedAddress = user.addresses.find(
+    (x) =>
+      x.address === user.activeAccount?.address &&
+      x.community?.id === community?.id,
+  );
 
   const handleSetTopicFormData = (data: Partial<TopicForm>) => {
     setTopicFormData((prevState) => ({ ...prevState, ...data }));
@@ -113,7 +129,27 @@ export const Topics = () => {
           />
         );
       case CreateTopicStep.WVMethodSelection:
-        return <WVMethodSelection onStepChange={setCreateCommunityStep} />;
+        return (
+          <WVMethodSelection
+            onStepChange={setCreateCommunityStep}
+            hasNamespace={!!community?.namespace}
+          />
+        );
+      case CreateTopicStep.WVNamespaceEnablement:
+        return (
+          <CommunityStakeStep
+            goToSuccessStep={() =>
+              setCreateCommunityStep(CreateTopicStep.WVERC20Details)
+            }
+            createdCommunityName={community?.name}
+            createdCommunityId={community?.id || ''}
+            onTopicFlowStepChange={setCreateCommunityStep}
+            selectedAddress={selectedAddress!}
+            chainId={String(community?.ChainNode?.eth_chain_id)}
+            onlyNamespace
+            isTopicFlow
+          />
+        );
       case CreateTopicStep.WVERC20Details:
         return (
           <WVERC20Details

@@ -30,6 +30,7 @@
     { "path": "../../libs/model/tsconfig.build.json" },
     { "path": "../../libs/schemas/tsconfig.build.json" },
     { "path": "../../libs/shared/tsconfig.build.json" },
-    { "path": "../../libs/evm-testing/tsconfig.build.json" }
+    { "path": "../../libs/evm-testing/tsconfig.build.json" },
+    { "path": "../../libs/sitemaps/tsconfig.build.json" }
   ]
 }

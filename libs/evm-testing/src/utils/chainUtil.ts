@@ -3,6 +3,8 @@ import { Anvil, createAnvil, CreateAnvilOptions } from '@viem/anvil';
 import Web3 from 'web3';
 import getProvider from './getProvider';
 
+export const localRpc = 'http://localhost:8545';
+
 export async function advanceTime(seconds: number, blocks = 1) {
   const provider = new Web3.providers.HttpProvider(
     config.TEST_EVM.PROVIDER_URL,
@@ -54,13 +56,14 @@ export async function mineBlocks(blocks: number) {
 }
 
 export async function getAnvil(
+  forkEthChainId: 84532 | 1,
   options: CreateAnvilOptions = {},
-  protocolFork?: boolean,
 ): Promise<Anvil> {
   const anvil = createAnvil({
-    forkUrl: protocolFork
-      ? `https://base-sepolia.g.alchemy.com/v2/${config.ALCHEMY.APP_KEYS.PRIVATE}`
-      : `https://eth-mainnet.g.alchemy.com/v2/${config.ALCHEMY.APP_KEYS.PRIVATE}`,
+    forkUrl:
+      forkEthChainId === 84532
+        ? `https://base-sepolia.g.alchemy.com/v2/${config.ALCHEMY.APP_KEYS.PRIVATE}`
+        : `https://eth-mainnet.g.alchemy.com/v2/${config.ALCHEMY.APP_KEYS.PRIVATE}`,
     silent: false,
     port: 8545,
     autoImpersonate: true,

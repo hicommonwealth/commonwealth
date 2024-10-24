@@ -1,7 +1,6 @@
 import { SchemaType } from '../../Schema';
 import { createIdentitySchemaCreator } from '../../utils/createIdentitySchemaCreator';
 import { getErrorMessageForIncorrectType } from '../../utils/getErrorMessageForIncorrectType';
-
 export function stringLiteral(literal) {
   const schemaCreator = createIdentitySchemaCreator(
     SchemaType.STRING_LITERAL,

@@ -12,7 +12,6 @@ import { CreateCommentResponseThreadReactionsItem } from './CreateCommentRespons
 import { CreateCommentResponseThreadSearch } from './CreateCommentResponseThreadSearch';
 import { CreateCommentResponseThreadThreadVersionHistoriesItem } from './CreateCommentResponseThreadThreadVersionHistoriesItem';
 import { CreateCommentResponseThreadTopic } from './CreateCommentResponseThreadTopic';
-
 export declare const CreateCommentResponseThread: core.serialization.ObjectSchema<
   serializers.CreateCommentResponseThread.Raw,
   CommonApi.CreateCommentResponseThread
@@ -23,14 +22,13 @@ export declare namespace CreateCommentResponseThread {
     address_id: number;
     title: string;
     kind: string;
-    stage: string;
+    stage?: string | null;
     body?: string | null;
-    plaintext?: string | null;
     url?: string | null;
     topic_id?: number | null;
     pinned?: boolean | null;
     community_id: string;
-    view_count: number;
+    view_count?: number | null;
     links?: CreateCommentResponseThreadLinksItem.Raw[] | null;
     content_url?: string | null;
     read_only?: boolean | null;
@@ -46,9 +44,9 @@ export declare namespace CreateCommentResponseThread {
     archived_at?: string | null;
     locked_at?: string | null;
     discord_meta?: CreateCommentResponseThreadDiscordMeta.Raw | null;
-    reaction_count: number;
-    reaction_weights_sum: number;
-    comment_count: number;
+    reaction_count?: number | null;
+    reaction_weights_sum?: number | null;
+    comment_count?: number | null;
     activity_rank_date?: string | null;
     created_by?: string | null;
     profile_name?: string | null;

@@ -1,7 +1,6 @@
 import { CacheDecorator, setupErrorHandlers } from '@hicommonwealth/adapters';
 import { logger } from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
-import { GlobalActivityCache } from '@hicommonwealth/model';
 import sgMail from '@sendgrid/mail';
 import compression from 'compression';
 import SessionSequelizeStore from 'connect-session-sequelize';
@@ -41,12 +40,10 @@ export async function main(
   db: DB,
   {
     port,
-    noGlobalActivityCache = true,
     withLoggingMiddleware = false,
     withPrerender = false,
   }: {
     port: number;
-    noGlobalActivityCache?: boolean;
     withLoggingMiddleware?: boolean;
     withPrerender?: boolean;
   },
@@ -82,6 +79,7 @@ export async function main(
     saveUninitialized: false,
     cookie: {
       maxAge: config.AUTH.SESSION_EXPIRY_MILLIS,
+      sameSite: 'lax',
     },
   });
 
@@ -153,11 +151,6 @@ export async function main(
   setupMiddleware();
   setupPassport(db);
 
-  // TODO: decouple as global singleton
-  const globalActivityCache = GlobalActivityCache.getInstance(db);
-  // initialize async to avoid blocking startup
-  if (!noGlobalActivityCache) globalActivityCache.start();
-
   // Declare Validation Middleware Service
   // middleware to use for all requests
   const dbValidationService: DatabaseValidationService =
@@ -168,7 +161,6 @@ export async function main(
     app,
     db,
     viewCountCache,
-    globalActivityCache,
     dbValidationService,
     cacheDecorator,
   );
