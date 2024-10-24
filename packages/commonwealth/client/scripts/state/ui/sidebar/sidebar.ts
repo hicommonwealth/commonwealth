@@ -34,8 +34,8 @@ export const sidebarStore = createStore<SidebarStore>()(
               state.userToggledVisibility === 'closed'
                 ? false
                 : state.userToggledVisibility === 'open'
-                ? true
-                : !isWindowSmallInclusive(window.innerWidth),
+                  ? true
+                  : !isWindowSmallInclusive(window.innerWidth),
           }));
         },
         recentlyUpdatedVisibility: false,
@@ -53,6 +53,7 @@ export const sidebarStore = createStore<SidebarStore>()(
         partialize: (state) => ({
           userToggledVisibility: state.userToggledVisibility,
           menuVisible: state.menuVisible,
+          menuName: state.menuName,
         }), // persist only userToggledVisibility and menuVisible
       },
     ),
