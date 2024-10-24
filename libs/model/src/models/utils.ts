@@ -302,3 +302,25 @@ export const beforeValidateThreadsHook = (instance: {
     );
   return instance;
 };
+
+// TODO: merge with beforeValidateThreadsHook after
+//  https://github.com/hicommonwealth/commonwealth/issues/9673
+export const beforeValidateCommentsHook = (instance: {
+  text: string;
+  content_url?: string | null | undefined;
+}) => {
+  if (!instance.text || instance.text.length <= MAX_TRUNCATED_CONTENT_LENGTH)
+    return;
+
+  if (!instance.content_url) {
+    throw new Error(
+      'content_url must be defined if body ' +
+        `length is greater than ${MAX_TRUNCATED_CONTENT_LENGTH}`,
+    );
+  } else
+    instance.text = safeTruncateBody(
+      instance.text,
+      MAX_TRUNCATED_CONTENT_LENGTH,
+    );
+  return instance;
+};
