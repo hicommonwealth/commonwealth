@@ -14,6 +14,7 @@ interface CWUpvoteSmallProps {
   popoverContent: JSX.Element;
   isThreadArchived?: boolean;
   tooltipText?: string;
+  reactors?: string[];
 }
 
 const CWUpvoteSmall = ({
@@ -24,6 +25,7 @@ const CWUpvoteSmall = ({
   popoverContent,
   tooltipText = '',
   isThreadArchived,
+  reactors = [],
 }: CWUpvoteSmallProps) => {
   const popoverProps = usePopover();
   const handleClick = (e) => {
@@ -51,7 +53,9 @@ const CWUpvoteSmall = ({
               disabled={disabled}
               onClick={handleClick}
             />
-            <CWPopover body={popoverContent} {...popoverProps} />
+            {reactors.length > 0 && (
+              <CWPopover body={popoverContent} {...popoverProps} />
+            )}
           </>
         ) : (
           <CWThreadAction
