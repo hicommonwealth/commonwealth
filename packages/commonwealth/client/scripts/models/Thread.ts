@@ -225,6 +225,29 @@ export type Link = {
   display?: LinkDisplay;
 };
 
+export type ThreadView = Omit<
+  z.infer<typeof schemas.Thread>,
+  | 'created_at'
+  | 'updated_at'
+  | 'deleted_at'
+  | 'last_edited'
+  | 'last_commented_on'
+  | 'marked_as_spam_at'
+  | 'archived_at'
+  | 'locked_at'
+  | 'topic'
+> & {
+  created_at?: Date | string | null;
+  updated_at?: Date | string | null;
+  deleted_at?: Date | string | null;
+  last_edited?: Date | string | null;
+  last_commented_on?: Date | string | null;
+  marked_as_spam_at?: Date | string | null;
+  archived_at?: Date | string | null;
+  locked_at?: Date | string | null;
+  topic?: z.infer<typeof schemas.Topic> | Topic | null;
+};
+
 export class Thread implements IUniqueId {
   public readonly author: string;
   public collaborators?: IThreadCollaborator[];
@@ -250,7 +273,7 @@ export class Thread implements IUniqueId {
   public topic?: Topic;
   public readonly slug = ProposalType.Thread;
   public readonly url: string;
-  public readonly versionHistory: ThreadVersionHistory[];
+  public readonly versionHistory?: ThreadVersionHistory[] | null;
   public readonly communityId: string;
   public readonly lastEdited?: Moment;
 
@@ -277,29 +300,8 @@ export class Thread implements IUniqueId {
   }
 
   constructor(
-    t: Omit<
-      z.infer<typeof schemas.Thread>,
-      | 'created_at'
-      | 'updated_at'
-      | 'deleted_at'
-      | 'last_edited'
-      | 'last_commented_on'
-      | 'marked_as_spam_at'
-      | 'archived_at'
-      | 'locked_at'
-      | 'topic'
-    > & {
-      // TODO: extended ThreadView schema
-      created_at?: Date | string | null;
-      updated_at?: Date | string | null;
-      deleted_at?: Date | string | null;
-      last_edited?: Date | string | null;
-      last_commented_on?: Date | string | null;
-      marked_as_spam_at?: Date | string | null;
-      archived_at?: Date | string | null;
-      locked_at?: Date | string | null;
-      topic?: z.infer<typeof schemas.Topic> | Topic | null;
-
+    t: ThreadView & {
+      // TODO: fix other type variants
       numberOfComments?: number;
       number_of_comments?: number;
       reactionIds?: number[];
@@ -310,8 +312,6 @@ export class Thread implements IUniqueId {
       reactionType?: string[];
       reactionTimestamps?: string[];
       reactionWeights?: number[];
-      reaction_weights_sum: string;
-      ThreadVersionHistories: ThreadVersionHistory[];
       userId?: number;
       user_id?: number;
       avatar_url?: string | null;
@@ -375,8 +375,10 @@ export class Thread implements IUniqueId {
     this.canvasMsgId = t.canvas_msg_id ?? undefined;
     this.links = t.links || [];
     this.discord_meta = t.discord_meta;
-    this.versionHistory = t.ThreadVersionHistories;
-    this.reactionWeightsSum = t.reaction_weights_sum;
+    this.versionHistory = t.ThreadVersionHistories
+      ? (t.ThreadVersionHistories as unknown as ThreadVersionHistory[])
+      : null;
+    this.reactionWeightsSum = t.reaction_weights_sum ?? '';
     this.associatedReactions =
       t.associatedReactions ??
       processAssociatedReactions(

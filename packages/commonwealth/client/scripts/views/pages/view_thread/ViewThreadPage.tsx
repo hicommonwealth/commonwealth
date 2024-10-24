@@ -1,6 +1,6 @@
 import { PermissionEnum } from '@hicommonwealth/schemas';
 import { ContentType, getThreadUrl } from '@hicommonwealth/shared';
-import { Thread } from 'client/scripts/models/Thread';
+import { Thread, ThreadView } from 'client/scripts/models/Thread';
 import { notifyError } from 'controllers/app/notifications';
 import { extractDomain, isDefaultStage } from 'helpers';
 import { commentsByDate } from 'helpers/dates';
@@ -13,7 +13,7 @@ import useTopicGating from 'hooks/useTopicGating';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/view_thread/index.scss';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import app from 'state';
 import { useFetchCommentsQuery } from 'state/api/comments';
@@ -122,8 +122,10 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     apiCallEnabled: !!threadId && !!communityId,
   });
 
-  // @ts-expect-error SkipNullChecks
-  const thread = data ? new Thread(data[0]) : undefined;
+  const thread = useMemo(() => {
+    const t = data?.at(0);
+    return t ? new Thread(t as ThreadView) : undefined;
+  }, [data]);
 
   const [contentUrlBodyToFetch, setContentUrlBodyToFetch] = useState<
     string | null
