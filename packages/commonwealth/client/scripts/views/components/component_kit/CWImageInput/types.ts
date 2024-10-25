@@ -28,6 +28,7 @@ export type UploadControlProps = {
   processedImages?: ImageProcessed[];
   withAIImageGeneration?: boolean;
   disabled?: boolean;
+  loading?: boolean;
   name?: string;
   hookToForm?: boolean;
   imageBehavior?: ImageBehavior;

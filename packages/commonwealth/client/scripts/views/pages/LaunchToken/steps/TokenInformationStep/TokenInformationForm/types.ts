@@ -1,5 +1,6 @@
 import AddressInfo from 'models/AddressInfo';
 import { ReactNode } from 'react';
+import { UploadControlProps } from 'views/components/component_kit/CWImageInput';
 
 export type FormSubmitValues = {
   chain: string;
@@ -21,4 +22,11 @@ export type TokenInformationFormProps = {
   focusField?: keyof FormSubmitValues;
   formDisabled?: boolean;
   openAddressSelectorOnMount?: boolean;
+  // image control specific props
+  imageControlProps?: {
+    loading?: UploadControlProps['loading'];
+    canSwitchBetweenProcessedImages?: UploadControlProps['canSwitchBetweenProcessedImages'];
+    processedImages?: UploadControlProps['processedImages'];
+    onProcessedImagesListChange?: UploadControlProps['onProcessedImagesListChange'];
+  };
 };

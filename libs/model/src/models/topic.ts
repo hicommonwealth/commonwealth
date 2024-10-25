@@ -8,7 +8,7 @@ import type { ModelInstance } from './types';
 export type TopicAttributes = z.infer<typeof Topic> & {
   // associations
   community?: CommunityAttributes;
-  threads?: ThreadAttributes[] | TopicAttributes['id'][];
+  threads?: ThreadAttributes[];
 };
 export type TopicInstance = ModelInstance<TopicAttributes>;
 

@@ -14,6 +14,7 @@ import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/view_thread/index.scss';
 import React, { useEffect, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
+import { useSearchParams } from 'react-router-dom';
 import app from 'state';
 import { useFetchCommentsQuery } from 'state/api/comments';
 import useGetContentByUrlQuery from 'state/api/general/getContentByUrl';
@@ -69,12 +70,11 @@ import { SnapshotCreationCard } from './snapshot_creation_card';
 type ViewThreadPageProps = {
   identifier: string;
 };
-
 const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const threadId = identifier.split('-')[0];
-
+  const [searchParams] = useSearchParams();
+  const isEdit = searchParams.get('isEdit') ?? undefined;
   const navigate = useCommonNavigate();
-
   const [isEditingBody, setIsEditingBody] = useState(false);
   const [isGloballyEditing, setIsGloballyEditing] = useState(false);
   const [savedEdits, setSavedEdits] = useState('');
@@ -150,6 +150,18 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     contestsData,
     thread?.topic?.id,
   );
+
+  useEffect(() => {
+    if (
+      isEdit === 'true' &&
+      thread &&
+      (isAdmin || Permissions.isThreadAuthor(thread))
+    ) {
+      setShouldRestoreEdits(true);
+      setIsGloballyEditing(true);
+      setIsEditingBody(true);
+    }
+  }, [isEdit, thread, isAdmin]);
 
   const { data: comments = [], error: fetchCommentsError } =
     useFetchCommentsQuery({
