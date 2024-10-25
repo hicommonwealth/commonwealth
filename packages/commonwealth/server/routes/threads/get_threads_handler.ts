@@ -77,7 +77,7 @@ export const getThreadsHandler = async (
     throw new AppError(formatErrorPretty(queryValidationResult));
   }
 
-  const { bulk, active, search, count, community_id, include_count } =
+  const { bulk, active, search, community_id, include_count } =
     queryValidationResult.data;
 
   // get bulk threads
