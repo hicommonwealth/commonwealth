@@ -8,6 +8,7 @@ import {
   GetNewProfileReq,
   GetNewProfileResp,
   ProfileTags,
+  ThreadView,
 } from '@hicommonwealth/schemas';
 import { ChainBase } from '@hicommonwealth/shared';
 import type { NextFunction } from 'express';
@@ -113,9 +114,11 @@ const getNewProfile = async (
     profile: user.profile,
     totalUpvotes,
     addresses: addresses.map((a) => a.toJSON() as ExtendedAddessInstance),
-    threads: threads.map((t) => t.toJSON()),
+    threads: threads.map((t) => t.toJSON() as z.infer<typeof ThreadView>),
     comments: comments.map((c) => c.toJSON()),
-    commentThreads: commentThreads.map((c) => c.toJSON()),
+    commentThreads: commentThreads.map(
+      (c) => c.toJSON() as z.infer<typeof ThreadView>,
+    ),
     isOwner: req.user?.id === user_id,
     tags: profileTags
       .map((t) => t.toJSON())

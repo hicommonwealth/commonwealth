@@ -87,7 +87,7 @@ WHERE
 ${paginationSort}`;
 
       const results = await models.sequelize.query<
-        z.infer<typeof schemas.Thread> & { total_count: number }
+        z.infer<typeof schemas.ThreadView> & { total_count: number }
       >(sql, {
         bind,
         type: QueryTypes.SELECT,

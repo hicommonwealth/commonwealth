@@ -1,6 +1,7 @@
 import { Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { Op } from 'sequelize';
+import { z } from 'zod';
 import { models, sequelize } from '../database';
 
 export function GetThreadsByIds(): Query<typeof schemas.GetThreadsByIds> {
@@ -108,7 +109,9 @@ export function GetThreadsByIds(): Query<typeof schemas.GetThreadsByIds> {
         ],
       });
 
-      return threads.map((t) => t.toJSON());
+      return threads.map(
+        (t) => t.toJSON() as z.infer<typeof schemas.ThreadView>,
+      );
     },
   };
 }

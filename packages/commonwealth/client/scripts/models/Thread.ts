@@ -4,7 +4,6 @@ import { UserProfile, addressToUserProfile } from 'models/MinimumProfile';
 import moment, { Moment } from 'moment';
 import { z } from 'zod';
 import Comment from './Comment';
-import type { ReactionType } from './Reaction';
 import type { Topic } from './Topic';
 import type { IUniqueId } from './interfaces';
 import type { ThreadKind, ThreadStage } from './types';
@@ -160,16 +159,7 @@ export interface IThreadCollaborator {
   User?: { profile: UserProfile };
 }
 
-export type AssociatedReaction = {
-  id: number | string;
-  type: ReactionType;
-  address: string;
-  updated_at: string;
-  voting_weight: number;
-  profile_name?: string;
-  avatar_url?: string;
-  last_active?: string;
-};
+export type AssociatedReaction = z.infer<typeof schemas.ReactionView>;
 
 export type AssociatedContest = {
   contest_id: number;
@@ -225,28 +215,7 @@ export type Link = {
   display?: LinkDisplay;
 };
 
-export type ThreadView = Omit<
-  z.infer<typeof schemas.Thread>,
-  | 'created_at'
-  | 'updated_at'
-  | 'deleted_at'
-  | 'last_edited'
-  | 'last_commented_on'
-  | 'marked_as_spam_at'
-  | 'archived_at'
-  | 'locked_at'
-  | 'topic'
-> & {
-  created_at?: Date | string | null;
-  updated_at?: Date | string | null;
-  deleted_at?: Date | string | null;
-  last_edited?: Date | string | null;
-  last_commented_on?: Date | string | null;
-  marked_as_spam_at?: Date | string | null;
-  archived_at?: Date | string | null;
-  locked_at?: Date | string | null;
-  topic?: z.infer<typeof schemas.Topic> | Topic | null;
-};
+export type ThreadView = z.infer<typeof schemas.ThreadView>;
 
 export class Thread implements IUniqueId {
   public readonly author: string;
