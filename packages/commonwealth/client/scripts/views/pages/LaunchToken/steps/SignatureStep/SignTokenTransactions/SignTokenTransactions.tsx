@@ -1,4 +1,3 @@
-import { ChainBase, commonProtocol } from '@hicommonwealth/shared';
 import React from 'react';
 import { useUpdateCommunityMutation } from 'state/api/communities';
 import { useLaunchTokenMutation } from 'state/api/launchPad';
@@ -52,20 +51,15 @@ const SignTokenTransactions = ({
         symbol: tokenInfo.symbol.trim(),
         walletAddress: selectedAddress.address,
       };
-      await launchToken(payload);
+
+      const txReceipt = await launchToken(payload);
 
       // 2. store `tokenInfo` on db
       await createToken({
-        base: ChainBase.Ethereum,
+        transaction_hash: txReceipt,
         chain_node_id: baseNode.id,
-        name: payload.name,
-        symbol: payload.symbol,
         icon_url: tokenInfo?.imageURL?.trim() || '',
         description: tokenInfo?.description?.trim() || '',
-        community_id: createdCommunityId,
-        launchpad_contract_address:
-          // this will always exist, adding 0 to avoid typescript issues
-          commonProtocol.factoryContracts[baseNode.ethChainId || 0].launchpad,
       });
 
       // 3. update community to reference the created token

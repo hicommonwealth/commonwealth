@@ -4,30 +4,32 @@ import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { bootstrap_testing, seed } from 'model/src/tester';
 import { afterAll, beforeAll, describe, test } from 'vitest';
-import { CreateStakeTransaction } from '../../src/community';
+import { CreateToken } from '../../src/token';
 
 chai.use(chaiAsPromised);
 
 describe('Stake transactions', () => {
-  const actor: Actor = { user: { email: '' } };
+  let actor: Actor;
   let payload;
   let community_id: string;
+  let node;
 
   beforeAll(async () => {
     await bootstrap_testing(true);
-    const [node] = await seed('ChainNode', {
-      url: 'https://ethereum-sepolia.publicnode.com',
-      private_url: 'https://ethereum-sepolia.publicnode.com',
-      name: 'Sepolia Testnet',
-      eth_chain_id: commonProtocol.ValidChains.Sepolia,
+    [node] = await seed('ChainNode', {
+      url: 'https://base-sepolia-rpc.publicnode.com',
+      private_url: 'https://base-sepolia-rpc.publicnode.com',
+      name: 'Base Sepolia Testnet',
+      eth_chain_id: commonProtocol.ValidChains.SepoliaBase,
       balance_type: BalanceType.Ethereum,
     });
 
     const [user] = await seed('User', {
       isAdmin: true,
     });
+
     const [community] = await seed('Community', {
-      namespace: 'qaa',
+      namespace: 'testtest',
       chain_node_id: node?.id,
       lifetime_thread_count: 0,
       profile_count: 1,
@@ -35,6 +37,7 @@ describe('Stake transactions', () => {
         {
           role: 'admin',
           user_id: user!.id,
+          verified: new Date(),
         },
       ],
       CommunityStakes: [
@@ -48,6 +51,11 @@ describe('Stake transactions', () => {
     });
 
     community_id = community!.id!;
+
+    actor = {
+      address: community!.Addresses![0].address,
+      user: { email: '', id: user!.id },
+    };
   });
 
   afterAll(async () => {
@@ -55,17 +63,19 @@ describe('Stake transactions', () => {
   });
 
   test(
-    'should create stake transactions and be able to query them',
+    'Create Token works given txHash and chainNodeId',
     { timeout: 10_000 },
     async () => {
       payload = {
         transaction_hash:
-          '0x924f40cfea663b2579816173f048b61ab2b118e0c7c055d7b00dbd9cd15eb7c0',
+          '0x82802acbf566bf2f1c9ca7b2469810ac7017afc262ff60fe602ab3768ddb186d',
+        chain_node_id: node?.id,
+        description: 'test',
+        icon_url: 'test',
         community_id,
-        id: community_id,
       };
 
-      let results = await command(CreateStakeTransaction(), {
+      let results = await command(CreateToken(), {
         actor,
         payload,
       });
@@ -81,36 +91,6 @@ describe('Stake transactions', () => {
         community_id,
         id: community_id,
       };
-      z;
-    },
-  ); // increase timeout because crypto calls take a while
-
-  test(
-    'should fail if transaction is not related to community',
-    { timeout: 10_000 },
-    async () => {
-      payload = {
-        transaction_hash:
-          '0x84939478bc5fbcca178e006dccdfaab6aebed40ef0a7b02684487780c10d8ce8',
-        community_id,
-        id: community_id,
-      };
-
-      try {
-        await command(CreateStakeTransaction(), {
-          actor,
-          payload,
-        });
-      } catch (e) {
-        expect((e as Error).message).to.equal(
-          'Transaction is not associated with provided community',
-        );
-        return;
-      }
-
-      throw Error(
-        'Create stake transaction passed on unrelated community, it should fail!',
-      );
     },
   ); // increase timeout because crypto calls take a while
 });

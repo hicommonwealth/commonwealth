@@ -27,6 +27,7 @@ export const command = async <
       payload: validate ? input.parse(payload) : payload,
     };
     for (const fn of auth) {
+      console.log(context);
       await fn(context);
     }
     return (await body(context)) ?? undefined;

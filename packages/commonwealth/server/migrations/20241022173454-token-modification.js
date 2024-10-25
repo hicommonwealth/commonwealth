@@ -5,6 +5,16 @@ module.exports = {
   async up(queryInterface, Sequelize) {
     return queryInterface.sequelize.transaction(async (t) => {
       await queryInterface.dropTable('Tokens', { transaction: t });
+      await queryInterface.changeColumn(
+        'Communities',
+        'namespace',
+        {
+          type: Sequelize.STRING, // up to 78 digits with no decimal places
+          allowNull: true,
+          unique: true,
+        },
+        { transaction: t },
+      );
       await queryInterface.createTable(
         'Tokens',
         {

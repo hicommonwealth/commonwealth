@@ -148,6 +148,16 @@ export async function setupCommonwealthConsumer(): Promise<void> {
       },
     );
   }
+
+  if (!launchpadSubRes) {
+    log.fatal(
+      'Failed to subscribe to launchpad worker events. Requires restart!',
+      undefined,
+      {
+        topic: BrokerSubscriptions.LaunchpadPolicy,
+      },
+    );
+  }
 }
 
 function startRolloverLoop() {
