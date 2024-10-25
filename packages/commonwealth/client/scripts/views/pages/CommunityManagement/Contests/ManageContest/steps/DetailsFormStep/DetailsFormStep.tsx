@@ -187,8 +187,13 @@ const DetailsFormStep = ({
     });
   };
 
+  const schema = detailsFormValidationSchema(isFarcasterContest);
+
   const handleSubmit = async (values: ContestFormValidationSubmitValues) => {
-    const topicsError = !weightedTopicsEnabled && topicsEnabledError;
+    const topicsError =
+      farcasterContestEnabled && isFarcasterContest
+        ? false
+        : !weightedTopicsEnabled && topicsEnabledError;
 
     if (totalPayoutPercentageError || payoutRowError || topicsError) {
       return;
@@ -285,7 +290,7 @@ const DetailsFormStep = ({
     >
       <div className="DetailsFormStep">
         <CWForm
-          validationSchema={detailsFormValidationSchema}
+          validationSchema={schema}
           onSubmit={handleSubmit}
           initialValues={getInitialValues()}
           onErrors={console.error}
