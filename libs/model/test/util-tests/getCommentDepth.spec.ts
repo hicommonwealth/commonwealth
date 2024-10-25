@@ -24,6 +24,7 @@ describe('getCommentDepth', () => {
     });
     const thread = await models.Thread.create({
       community_id,
+      body: 'test',
       address_id: address!.id!,
       title: 'Testing',
       kind: 'discussion',
