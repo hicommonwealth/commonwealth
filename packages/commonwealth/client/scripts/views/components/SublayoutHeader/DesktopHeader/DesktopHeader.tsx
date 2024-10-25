@@ -99,7 +99,7 @@ const DesktopHeader = ({ onMobile, onAuthModalOpen }: DesktopHeaderProps) => {
 
             <HelpMenuPopover />
           </div>
-          <KnockNotifications />
+          {user.isLoggedIn && <KnockNotifications />}
         </div>
 
         {user.isLoggedIn && (

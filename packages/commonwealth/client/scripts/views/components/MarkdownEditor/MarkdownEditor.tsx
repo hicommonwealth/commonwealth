@@ -30,6 +30,7 @@ import React, {
 } from 'react';
 import { TooltipIndicator } from 'views/components/MarkdownEditor/indicators/TooltipIndicator';
 import { MarkdownEditorModeContext } from 'views/components/MarkdownEditor/MarkdownEditorModeContext';
+import { NullComponent } from 'views/components/MarkdownEditor/NullComponent';
 import { useDeviceProfile } from 'views/components/MarkdownEditor/useDeviceProfile';
 import { MarkdownEditorMethods } from 'views/components/MarkdownEditor/useMarkdownEditorMethods';
 import { DragIndicator } from './indicators/DragIndicator';
@@ -374,7 +375,9 @@ export const MarkdownEditor = memo(function MarkdownEditor(
                 quotePlugin(),
                 headingsPlugin(),
                 linkPlugin(),
-                linkDialogPlugin(),
+                // disable the link dialog and use our own. We have a different
+                // type of dialog based on device type.
+                linkDialogPlugin({ LinkDialog: NullComponent }),
                 codeBlockPlugin({ defaultCodeBlockLanguage: 'js' }),
                 codeMirrorPlugin({
                   codeBlockLanguages,

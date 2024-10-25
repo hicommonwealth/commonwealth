@@ -33,6 +33,14 @@
 
     &.disabled {
       cursor: not-allowed;
+
+      .Text {
+        color: $neutral-400;
+      }
+
+      .Icon {
+        color: $neutral-300;
+      }
     }
 
     &.hovered {
@@ -96,6 +104,7 @@
     .switch-left-btn {
       left: 12px;
     }
+
     .switch-right-btn {
       right: 12px;
     }
