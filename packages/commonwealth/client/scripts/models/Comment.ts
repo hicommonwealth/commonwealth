@@ -66,7 +66,7 @@ export class Comment<T extends IUniqueId> {
     content_url,
   }) {
     const versionHistory = CommentVersionHistories;
-    this.communityId = community_id;
+    this.communityId = Address?.community_id;
     this.author = Address?.address || author;
     this.text = deleted_at?.length > 0 ? '[deleted]' : getDecodedString(text);
     this.versionHistory = versionHistory;
