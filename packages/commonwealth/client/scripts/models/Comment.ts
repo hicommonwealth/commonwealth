@@ -48,7 +48,6 @@ export class Comment<T extends IUniqueId> {
     id,
     text,
     author,
-    community_id,
     Address,
     thread_id,
     parent_id,
