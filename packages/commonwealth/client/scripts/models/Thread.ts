@@ -9,9 +9,9 @@ import type { IUniqueId } from './interfaces';
 import type { ThreadKind, ThreadStage } from './types';
 
 function processAssociatedContests(
-  associatedContests?: AssociatedContest[] | null,
-  contestActions?: ContestActionT[] | null,
-): AssociatedContest[] | [] {
+  associatedContests?: ContestView[] | null,
+  contestActions?: ContestActionView[] | null,
+): ContestView[] {
   if (associatedContests) {
     /**
      * TODO: Ticket 8423, When we fix the content_id issue for 'added' contests, we should remove this deduplication
@@ -31,8 +31,9 @@ function processAssociatedContests(
     return deduplicatedContests;
   }
 
-  if (contestActions) {
-    return contestActions.map((action) => ({
+  return (
+    contestActions?.map((action) => ({
+      ContestManager: action.Contest.ContestManager,
       contest_id: action.Contest.contest_id,
       contest_name: action.Contest.ContestManager.name,
       contest_address: action.Contest.contest_address,
@@ -43,10 +44,8 @@ function processAssociatedContests(
       start_time: action.Contest.start_time,
       end_time: action.Contest.end_time,
       contest_interval: action.Contest.ContestManager.interval,
-    }));
-  }
-
-  return [];
+    })) ?? []
+  );
 }
 
 function emptyStringToNull(input: string) {
@@ -113,37 +112,6 @@ function processAssociatedReactions(
   return temp;
 }
 
-const ScoreZ = schemas.ContestScore.element.omit({
-  tickerPrize: true,
-});
-
-const ContestManagerZ = schemas.ContestManager.pick({
-  name: true,
-  cancelled: true,
-  interval: true,
-});
-
-const ContestZ = schemas.Contest.pick({
-  contest_id: true,
-  contest_address: true,
-  end_time: true,
-}).extend({
-  score: ScoreZ.array(),
-  ContestManager: ContestManagerZ,
-  start_time: z.string(),
-  end_time: z.string(),
-});
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const ContestActionZ = schemas.ContestAction.pick({
-  content_id: true,
-  thread_id: true,
-}).extend({
-  Contest: ContestZ,
-});
-
-type ContestActionT = z.infer<typeof ContestActionZ>;
-
 export interface ThreadVersionHistory {
   id: number;
   thread_id: number;
@@ -159,8 +127,9 @@ export interface IThreadCollaborator {
   User?: { profile: UserProfile };
 }
 
-export type AssociatedReaction = z.infer<typeof schemas.ReactionView>;
-export type AssociatedContest = z.infer<typeof schemas.ContestView>;
+export type ReactionView = z.infer<typeof schemas.ReactionView>;
+export type ContestView = z.infer<typeof schemas.ContestView>;
+export type ContestActionView = z.infer<typeof schemas.ContestActionView>;
 
 export type RecentComment = {
   id: number;
@@ -234,8 +203,8 @@ export class Thread implements IUniqueId {
 
   public readonly hasPoll: boolean;
   public numberOfComments: number;
-  public associatedReactions: AssociatedReaction[];
-  public associatedContests?: AssociatedContest[];
+  public associatedReactions: ReactionView[];
+  public associatedContests?: ContestView[];
   public recentComments?: Comment<IUniqueId>[];
   public reactionWeightsSum: string;
   public links: Link[];
@@ -268,10 +237,10 @@ export class Thread implements IUniqueId {
       user_id?: number;
       avatar_url?: string | null;
       address_last_active?: string;
-      associatedReactions?: AssociatedReaction[];
-      associatedContests?: AssociatedContest[];
+      associatedReactions?: ReactionView[];
+      associatedContests?: ContestView[];
       recentComments?: RecentComment[];
-      ContestActions?: ContestActionT[];
+      ContestActions?: ContestActionView[];
     },
   ) {
     this.author = t.Address?.address ?? '';

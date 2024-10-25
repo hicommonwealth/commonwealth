@@ -1,8 +1,43 @@
 import { z } from 'zod';
-import { Thread } from '../entities';
+import { ContestManager, Thread } from '../entities';
+import { ContestAction } from '../projections';
 import { PG_INT, paginationSchema } from '../utils';
 import { TopicView } from './community.schemas';
 import { PaginatedResultSchema } from './pagination';
+
+export const ContestManagerView = ContestManager.pick({
+  name: true,
+  cancelled: true,
+  interval: true,
+});
+
+export const ContestView = z.object({
+  ContestManager: ContestManagerView,
+  contest_id: z.number(),
+  contest_address: z.string(),
+  start_time: z.date().or(z.string()),
+  end_time: z.date().or(z.string()),
+  score: z.array(
+    z.object({
+      prize: z.string(),
+      votes: z.number(),
+      content_id: z.string(),
+      creator_address: z.string(),
+    }),
+  ),
+  contest_name: z.string().nullish(),
+  contest_interval: z.number().nullish(),
+  content_id: z.number().nullish(),
+  contest_cancelled: z.boolean().nullish(),
+  thread_id: z.number().nullish(),
+});
+
+export const ContestActionView = ContestAction.pick({
+  content_id: true,
+  thread_id: true,
+}).extend({
+  Contest: ContestView,
+});
 
 export const ReactionView = z.object({
   id: PG_INT,
@@ -13,26 +48,6 @@ export const ReactionView = z.object({
   avatar_url: z.string().optional(),
   updated_at: z.date().or(z.string()).nullish(),
   last_active: z.date().or(z.string()).nullish(),
-});
-
-export const ContestView = z.object({
-  contest_id: z.number(),
-  contest_name: z.string(),
-  contest_address: z.string(),
-  contest_interval: z.number(),
-  content_id: z.number(),
-  start_time: z.string(),
-  end_time: z.string(),
-  score: z.array(
-    z.object({
-      prize: z.string(),
-      votes: z.number(),
-      content_id: z.string(),
-      creator_address: z.string(),
-    }),
-  ),
-  contest_cancelled: z.boolean().nullish(),
-  thread_id: z.number().nullish(),
 });
 
 export const ThreadView = Thread.extend({
@@ -49,6 +64,7 @@ export const ThreadView = Thread.extend({
   associatedReactions: z.array(ReactionView).optional(),
   associatedContests: z.array(ContestView).optional(),
   topic: TopicView.optional(),
+  ContestActions: z.array(ContestActionView).optional(),
 });
 
 export const OrderByQueriesKeys = z.enum([
