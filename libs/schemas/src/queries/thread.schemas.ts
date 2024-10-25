@@ -152,6 +152,13 @@ export const GetThreadsByIds = {
   output: z.array(ThreadView),
 };
 
+export const GetThreadCount = {
+  input: z.object({
+    community_id: z.string(),
+  }),
+  output: z.number(),
+};
+
 export const GetActiveThreads = {
   input: z.object({
     community_id: z.string(),

@@ -169,15 +169,5 @@ export const getThreadsHandler = async (
     return success(res, searchResults);
   }
 
-  // count threads
-  if (count) {
-    const { limit } = req.query as CountThreadsRequestQuery;
-    const countResult = await controllers.threads.countThreads({
-      communityId: community_id,
-      limit,
-    });
-    return success(res, { count: countResult });
-  }
-
   throw new AppError(Errors.InvalidRequest);
 };
