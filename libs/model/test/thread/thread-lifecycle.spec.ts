@@ -722,7 +722,7 @@ describe('Thread lifecycle', () => {
       });
       expect(updated).to.include({
         thread_id: thread!.id,
-        text,
+        text: text.slice(0, MAX_TRUNCATED_CONTENT_LENGTH),
         community_id: thread!.community_id,
       });
       expect(updated?.content_url).toBeTruthy();
