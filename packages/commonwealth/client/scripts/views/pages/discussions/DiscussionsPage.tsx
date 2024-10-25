@@ -293,7 +293,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
                   ? !disabledCommentPermissionTooltipText
                   : !disabledActionsTooltipText
               }
-              onEditStart={() => navigate(`${discussionLink}`)}
+              onEditStart={() => navigate(`${discussionLink}?isEdit=true`)}
               onStageTagClick={() => {
                 navigate(`/discussions?stage=${thread.stage}`);
               }}

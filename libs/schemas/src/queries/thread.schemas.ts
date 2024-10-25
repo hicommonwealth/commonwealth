@@ -174,6 +174,15 @@ export const GetThreadsByIds = {
   output: z.array(Thread),
 };
 
+export const GetActiveThreads = {
+  input: z.object({
+    community_id: z.string(),
+    threads_per_topic: z.coerce.number().min(0).max(10).optional(),
+    withXRecentComments: z.coerce.number().optional(),
+  }),
+  output: z.array(Thread),
+};
+
 export const SearchThreads = {
   input: z.object({
     communityId: z.string(),

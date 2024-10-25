@@ -10,11 +10,6 @@ import {
   __createThreadPoll,
 } from './server_threads_methods/create_thread_poll';
 import {
-  GetActiveThreadsOptions,
-  GetActiveThreadsResult,
-  __getActiveThreads,
-} from './server_threads_methods/get_active_threads';
-import {
   GetThreadPollsOptions,
   GetThreadPollsResult,
   __getThreadPolls,
@@ -25,13 +20,6 @@ import {
  */
 export class ServerThreadsController {
   constructor(public models: DB) {}
-
-  async getActiveThreads(
-    this: ServerThreadsController,
-    options: GetActiveThreadsOptions,
-  ): Promise<GetActiveThreadsResult> {
-    return __getActiveThreads.call(this, options);
-  }
 
   async countThreads(
     options: CountThreadsOptions,
