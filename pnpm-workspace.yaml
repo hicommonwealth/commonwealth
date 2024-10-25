@@ -1,5 +1,4 @@
 packages:
   - 'libs/**'
   - 'packages/commonwealth'
-  - 'packages/scripts'
   - 'packages/load-testing'

@@ -73,6 +73,7 @@ WITH topic_data AS (
 		weighted_voting,
 		token_symbol,
 		vote_weight_multiplier,
+		token_address,
 		created_at::text AS created_at,
 		updated_at::text AS updated_at,
 		deleted_at::text AS deleted_at,

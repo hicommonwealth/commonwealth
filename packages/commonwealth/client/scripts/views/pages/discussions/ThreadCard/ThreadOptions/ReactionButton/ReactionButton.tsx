@@ -121,7 +121,13 @@ export const ReactionButton = ({
           checkForSessionKeyRevalidationErrors(e);
           return;
         }
-        notifyError('Failed to upvote');
+        if ((e.message as string)?.includes('Insufficient token balance')) {
+          notifyError(
+            'You must have the requisite tokens to upvote in this topic',
+          );
+        } else {
+          notifyError('Failed to upvote');
+        }
         console.error(e?.response?.data?.error || e?.message);
       });
     }
@@ -140,6 +146,7 @@ export const ReactionButton = ({
             reactors,
           })}
           tooltipText={tooltipText}
+          reactors={reactors}
         />
       ) : tooltipText ? (
         <TooltipWrapper disabled={disabled} text={tooltipText}>

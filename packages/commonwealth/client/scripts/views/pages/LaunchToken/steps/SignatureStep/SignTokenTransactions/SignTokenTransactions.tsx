@@ -2,7 +2,7 @@ import { ChainBase, commonProtocol } from '@hicommonwealth/shared';
 import React from 'react';
 import { useUpdateCommunityMutation } from 'state/api/communities';
 import { useLaunchTokenMutation } from 'state/api/launchPad';
-import { useCreateTokenMutation } from 'state/api/token';
+import { useCreateTokenMutation } from 'state/api/tokens';
 import useUserStore from 'state/ui/user';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWText } from 'views/components/component_kit/cw_text';

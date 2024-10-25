@@ -11,7 +11,9 @@ export interface CommentVersionHistory {
   thread_id: number;
   address: string;
   body: string;
+  text?: string;
   timestamp: Moment;
+  content_url: string;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -40,6 +42,8 @@ export class Comment<T extends IUniqueId> {
 
   public readonly profile: UserProfile;
 
+  public contentUrl: string | null;
+
   constructor({
     id,
     text,
@@ -59,6 +63,7 @@ export class Comment<T extends IUniqueId> {
     CommentVersionHistories,
     marked_as_spam_at,
     discord_meta,
+    content_url,
   }) {
     const versionHistory = CommentVersionHistories;
     this.communityId = community_id;
@@ -85,6 +90,7 @@ export class Comment<T extends IUniqueId> {
     this.reactionWeightsSum = reaction_weights_sum;
     this.rootThread = thread_id;
     this.discord_meta = discord_meta;
+    this.contentUrl = content_url;
 
     this.profile = addressToUserProfile(Address);
   }

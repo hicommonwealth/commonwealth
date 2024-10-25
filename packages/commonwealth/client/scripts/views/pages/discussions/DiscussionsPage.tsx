@@ -19,6 +19,7 @@ import { ThreadCard } from './ThreadCard';
 import { sortByFeaturedFilter, sortPinned } from './helpers';
 
 import { slugify, splitAndDecodeURL } from '@hicommonwealth/shared';
+import { useGetERC20BalanceQuery } from 'client/scripts/state/api/tokens';
 import { formatAddressShort } from 'helpers';
 import { getThreadActionTooltipText } from 'helpers/threads';
 import useBrowserWindow from 'hooks/useBrowserWindow';
@@ -38,6 +39,7 @@ import { isContestActive } from 'views/pages/CommunityManagement/Contests/utils'
 import useTokenMetadataQuery from '../../../state/api/tokens/getTokenMetadata';
 import { AdminOnboardingSlider } from '../../components/AdminOnboardingSlider';
 import { UserTrainingSlider } from '../../components/UserTrainingSlider';
+import { CWText } from '../../components/component_kit/cw_text';
 import { DiscussionsFeedDiscovery } from './DiscussionsFeedDiscovery';
 import { EmptyThreadsPlaceholder } from './EmptyThreadsPlaceholder';
 
@@ -98,6 +100,12 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const { data: domain } = useFetchCustomDomainQuery();
 
   const { contestsData } = useCommunityContests();
+
+  const { data: erc20Balance } = useGetERC20BalanceQuery({
+    tokenAddress: topicObj?.token_address || '',
+    userAddress: user.activeAccount?.address || '',
+    nodeRpc: app?.chain.meta?.ChainNode?.url || '',
+  });
 
   const { dateCursor } = useDateCursor({
     dateRange: searchParams.get('dateRange') as ThreadTimelineFilterTypes,
@@ -184,6 +192,15 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     const isActive = isContestActive({ contest });
     return isContestInTopic && isActive;
   });
+
+  const voteWeight =
+    isTopicWeighted && erc20Balance
+      ? String(
+          (
+            (topicObj?.vote_weight_multiplier || 1) * Number(erc20Balance)
+          ).toFixed(0),
+        )
+      : '';
 
   return (
     // @ts-expect-error <StrictNullChecks/>
@@ -276,7 +293,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
                   ? !disabledCommentPermissionTooltipText
                   : !disabledActionsTooltipText
               }
-              onEditStart={() => navigate(`${discussionLink}`)}
+              onEditStart={() => navigate(`${discussionLink}?isEdit=true`)}
               onStageTagClick={() => {
                 navigate(`/discussions?stage=${thread.stage}`);
               }}
@@ -323,9 +340,15 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
                   name={tokenMetadata?.name}
                   ticker={topicObj?.token_symbol}
                   avatarUrl={tokenMetadata?.logo}
+                  voteWeight={voteWeight}
                   popover={{
                     title: tokenMetadata?.name,
-                    body: formatAddressShort(topicObj.token_address!, 6, 6),
+                    body: (
+                      <CWText type="b2">
+                        This topic has weighted voting enabled using{' '}
+                        {formatAddressShort(topicObj.token_address!, 6, 6)}
+                      </CWText>
+                    ),
                   }}
                 />
               )}

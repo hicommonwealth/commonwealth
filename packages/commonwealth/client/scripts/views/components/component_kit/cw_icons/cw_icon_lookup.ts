@@ -46,6 +46,7 @@ import {
   ImageSquare,
   Lightbulb,
   Link,
+  LinkBreak,
   ListChecks,
   ListDashes,
   ListNumbers,
@@ -89,6 +90,7 @@ import {
   Warning,
 } from '@phosphor-icons/react';
 import * as CustomIcons from './cw_custom_icons';
+import { CWPara } from './cw_custom_icons';
 import * as Icons from './cw_icons';
 import { withPhosphorIcon } from './cw_phosphor_icons';
 
@@ -106,6 +108,9 @@ export const iconLookup = {
   h1: withPhosphorIcon(TextHOne),
   h2: withPhosphorIcon(TextHTwo),
   h3: withPhosphorIcon(TextHThree),
+  q: withPhosphorIcon(Quotes),
+  p: CWPara,
+  quote: withPhosphorIcon(Quotes),
   quotes: withPhosphorIcon(Quotes),
   table: withPhosphorIcon(Table),
   image: withPhosphorIcon(Image),
@@ -219,6 +224,7 @@ export const iconLookup = {
   link: Icons.CWLink,
   lightbulb: withPhosphorIcon(Lightbulb),
   linkPhosphor: withPhosphorIcon(Link),
+  linkBreak: withPhosphorIcon(LinkBreak),
   lock: Icons.CWLock,
   lockedNew: withPhosphorIcon(Lock),
   lockOpenNew: withPhosphorIcon(LockOpen),
