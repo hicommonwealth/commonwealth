@@ -237,7 +237,6 @@ export async function updateScore(contest_address: string, contest_id: number) {
               .toString()
           : '0',
     }));
-    console.log('SCORE: ', score);
     await models.Contest.update(
       {
         score,
