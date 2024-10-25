@@ -49,18 +49,19 @@ const Profile = ({ userId }: ProfileProps) => {
       setProfile(
         new NewProfile({ ...data.profile, userId, isOwner: isOwner ?? false }),
       );
-
+      // @ts-expect-error <StrictNullChecks/>
       setThreads(data.threads.map((t) => new Thread(t)));
-
+      // @ts-expect-error <StrictNullChecks/>
       const responseComments = data.comments.map((c) => new Comment(c));
 
       const commentsWithAssociatedThread = responseComments.map((c) => {
         const thread = data.commentThreads.find(
+          // @ts-expect-error <StrictNullChecks/>
           (t) => t.id === parseInt(c.threadId, 10),
         );
         return { ...c, thread };
       });
-
+      // @ts-expect-error <StrictNullChecks/>
       setComments(commentsWithAssociatedThread);
       setIsOwner(data.isOwner);
       setErrorCode(ProfileError.None);
