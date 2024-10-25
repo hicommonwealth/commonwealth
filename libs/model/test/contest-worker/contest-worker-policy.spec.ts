@@ -97,6 +97,7 @@ describe('Contest Worker Policy', () => {
             canvas_msg_id: '',
             kind: '',
             stage: '',
+            body: '',
             view_count: 0,
             reaction_count: 0,
             reaction_weights_sum: '0',

@@ -21,6 +21,7 @@ import * as schemas from '@hicommonwealth/schemas';
 import { TopicWeightedVoting } from '@hicommonwealth/schemas';
 import {
   CANVAS_TOPIC,
+  MAX_TRUNCATED_CONTENT_LENGTH,
   getTestSigner,
   sign,
   toCanvasSignedDataApiArgs,
@@ -296,7 +297,9 @@ describe('Thread lifecycle', () => {
               }),
             ).toBeTruthy();
 
-            expect(_thread?.body).to.equal(instancePayload.body.slice(0, 2000));
+            expect(_thread?.body).to.equal(
+              instancePayload.body.slice(0, MAX_TRUNCATED_CONTENT_LENGTH),
+            );
           } else {
             expect(_thread?.body).to.equal(instancePayload.body);
           }
@@ -331,7 +334,7 @@ describe('Thread lifecycle', () => {
       });
       expect(updated).to.contain({
         ...payloadContent,
-        body: payloadContent.body.slice(0, 2000),
+        body: payloadContent.body.slice(0, MAX_TRUNCATED_CONTENT_LENGTH),
       });
       expect(updated?.content_url).toBeTruthy();
       expect(
@@ -578,7 +581,7 @@ describe('Thread lifecycle', () => {
       });
       expect(firstComment).to.include({
         thread_id: thread!.id,
-        text,
+        text: text.slice(0, MAX_TRUNCATED_CONTENT_LENGTH),
         community_id: thread!.community_id,
       });
       expect(firstComment?.content_url).toBeTruthy();
