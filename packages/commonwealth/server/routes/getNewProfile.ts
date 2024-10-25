@@ -114,10 +114,12 @@ const getNewProfile = async (
     profile: user.profile,
     totalUpvotes,
     addresses: addresses.map((a) => a.toJSON() as ExtendedAddessInstance),
-    threads: threads.map((t) => t.toJSON() as z.infer<typeof ThreadView>),
+    threads: threads.map(
+      (t) => t.toJSON() as unknown as z.infer<typeof ThreadView>,
+    ),
     comments: comments.map((c) => c.toJSON()),
     commentThreads: commentThreads.map(
-      (c) => c.toJSON() as z.infer<typeof ThreadView>,
+      (c) => c.toJSON() as unknown as z.infer<typeof ThreadView>,
     ),
     isOwner: req.user?.id === user_id,
     tags: profileTags
