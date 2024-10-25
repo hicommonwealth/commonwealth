@@ -81,7 +81,7 @@ FROM
   websearch_to_tsquery('english', $searchTerm) as tsquery
 WHERE
   "Threads".deleted_at IS NULL
-  ${bind.community ? 'AND "Threads".community_id = $community"' : ''} 
+  ${bind.community ? 'AND "Threads".community_id = $community' : ''} 
   AND ("Threads".title ILIKE '%' || $searchTerm || '%' 
   ${!threadTitleOnly ? 'OR tsquery @@ "Threads".search' : ''})
 ${paginationSort}`;

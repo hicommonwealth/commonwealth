@@ -299,7 +299,7 @@ export class Thread implements IUniqueId {
                 userId: c.User.id!,
                 name: c.User.profile.name ?? '',
                 address: c.address,
-                lastActive: c.last_active?.toISOString() ?? '',
+                lastActive: moment(c.last_active).toISOString(),
                 avatarUrl: c.User.profile.avatar_url ?? '',
               },
             }
