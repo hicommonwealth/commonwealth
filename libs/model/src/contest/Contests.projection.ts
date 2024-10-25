@@ -312,7 +312,6 @@ export function Contests(): Projection<typeof inputs> {
             content_id: payload.content_id,
             action: 'added',
           },
-          attributes: ['thread_id'],
           raw: true,
         });
         await models.ContestAction.upsert({
@@ -321,6 +320,7 @@ export function Contests(): Projection<typeof inputs> {
           actor_address: payload.voter_address,
           action: 'upvoted',
           thread_id: add_action!.thread_id,
+          content_url: add_action!.content_url,
           created_at: new Date(),
         });
 
