@@ -15,6 +15,26 @@ export const ReactionView = z.object({
   last_active: z.date().or(z.string()).nullish(),
 });
 
+export const ContestView = z.object({
+  contest_id: z.number(),
+  contest_name: z.string(),
+  contest_address: z.string(),
+  contest_interval: z.number(),
+  content_id: z.number(),
+  start_time: z.string(),
+  end_time: z.string(),
+  score: z.array(
+    z.object({
+      prize: z.string(),
+      votes: z.number(),
+      content_id: z.string(),
+      creator_address: z.string(),
+    }),
+  ),
+  contest_cancelled: z.boolean().nullish(),
+  thread_id: z.number().nullish(),
+});
+
 export const ThreadView = Thread.extend({
   id: PG_INT,
   body: z.string(),
@@ -27,6 +47,7 @@ export const ThreadView = Thread.extend({
   archived_at: z.date().or(z.string()).nullish(),
   locked_at: z.date().or(z.string()).nullish(),
   associatedReactions: z.array(ReactionView).optional(),
+  associatedContests: z.array(ContestView).optional(),
   topic: TopicView.optional(),
 });
 

@@ -160,24 +160,7 @@ export interface IThreadCollaborator {
 }
 
 export type AssociatedReaction = z.infer<typeof schemas.ReactionView>;
-
-export type AssociatedContest = {
-  contest_id: number;
-  contest_name: string;
-  contest_address: string;
-  score: {
-    prize: string;
-    votes: number;
-    content_id: string;
-    creator_address: string;
-  }[];
-  contest_cancelled?: boolean | null;
-  thread_id: number | null | undefined;
-  content_id: number;
-  start_time: string;
-  end_time: string;
-  contest_interval: number;
-};
+export type AssociatedContest = z.infer<typeof schemas.ContestView>;
 
 export type RecentComment = {
   id: number;
