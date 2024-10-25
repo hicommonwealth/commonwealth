@@ -1,10 +1,10 @@
 import { isLinkValid } from './link';
 
 export function replaceBucketWithCDN(url: string) {
-  return url.replace(
-    's3.amazonaws.com/assets.commonwealth.im',
-    'assets.commonwealth.im',
-  );
+  const fileName = url.split('/').pop() || '';
+  if (process.env.APP_ENV === 'production')
+    return `assets.commonwealth.im/${fileName}`;
+  return url;
 }
 
 const S3_URL_REGEX = /^https:\/\/s3(\.[^.]+)?\.amazonaws\.com(\/.*)?$/;
