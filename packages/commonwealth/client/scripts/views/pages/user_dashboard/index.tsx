@@ -52,11 +52,8 @@ const UserDashboard = ({ type }: UserDashboardProps) => {
       isPWA: isAddedToHomeScreen,
     },
   });
-
-  const navigate = useCommonNavigate();
-
   const [scrollElement, setScrollElement] = React.useState(null);
-
+  const navigate = useCommonNavigate();
   const containerRef = useRef<HTMLDivElement>(null);
 
   useBrowserAnalyticsTrack({

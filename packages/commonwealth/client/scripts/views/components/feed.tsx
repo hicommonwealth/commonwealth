@@ -37,10 +37,10 @@ const FeedThread = ({ thread }: { thread: Thread }) => {
   const { data: domain } = useFetchCustomDomainQuery();
 
   const discussionLink = getProposalUrlPath(
-    thread.slug,
-    `${thread.identifier}-${slugify(thread.title)}`,
+    thread?.slug,
+    `${thread?.identifier}-${slugify(thread.title)}`,
     false,
-    thread.communityId,
+    thread?.communityId,
   );
 
   const { data: community } = useGetCommunityByIdQuery({
@@ -226,7 +226,6 @@ export const Feed = ({ query, customScrollParent }: FeedProps) => {
       </div>
     );
   }
-
   return (
     <div className="Feed">
       <Virtuoso
