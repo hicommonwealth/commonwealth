@@ -6,9 +6,9 @@ import {
   usePublisher,
 } from 'commonwealth-mdxeditor';
 import React, { useCallback } from 'react';
+import { EditorTooltip } from 'views/components/MarkdownEditor/toolbars/EditorTooltip';
 import { listTypeToIconName } from 'views/components/MarkdownEditor/toolbars/listTypeToIconName';
 import CWIconButton from 'views/components/component_kit/new_designs/CWIconButton';
-import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import './ListButton.scss';
 
 export type ListType = 'number' | 'bullet' | 'check';
@@ -40,7 +40,7 @@ export const ListButton = (props: ListButtonProps) => {
   );
 
   return (
-    <CWTooltip
+    <EditorTooltip
       content={`Change to ${listType} list`}
       renderTrigger={(handleInteraction) => (
         <CWIconButton
