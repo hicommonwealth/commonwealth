@@ -14,7 +14,6 @@ export const useFetchGlobalActivityQuery = ({ limit }) => {
       cacheTime: USER_ACTIVITY_CACHE_TIME,
       initialCursor: 1,
       getNextPageParam: (lastPage) => {
-        console.log({ lastPage });
         const nextPageNum = lastPage.page + 1;
         if (nextPageNum <= lastPage.totalPages) return nextPageNum;
         return undefined;
