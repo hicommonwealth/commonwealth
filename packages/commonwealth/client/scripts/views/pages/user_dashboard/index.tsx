@@ -51,7 +51,6 @@ const UserDashboard = ({ type }: UserDashboardProps) => {
       isPWA: isAddedToHomeScreen,
     },
   });
-  const [scrollElement, setScrollElement] = React.useState(null);
   const navigate = useCommonNavigate();
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -88,8 +87,7 @@ const UserDashboard = ({ type }: UserDashboardProps) => {
         <CWText type="h2" fontWeight="medium" className="page-header">
           Home
         </CWText>
-        {/*@ts-expect-error StrictNullChecks*/}
-        <div ref={setScrollElement} className="content">
+        <div className="content">
           <div className="user-dashboard-activity">
             <div className="dashboard-header" id="dashboard-header">
               <CWTabsRow>
