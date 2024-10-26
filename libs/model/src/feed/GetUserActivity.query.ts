@@ -7,11 +7,14 @@ export function GetUserActivity(): Query<typeof schemas.ActivityFeed> {
     ...schemas.ActivityFeed,
     auth: [],
     secure: true,
-    body: async ({ actor, payload }) =>
-      await getUserActivityFeed({
+    body: async ({ payload, actor }) => {
+      const { comment_limit = 3, limit = 10, cursor = 1 } = payload;
+      return await getUserActivityFeed({
         user_id: actor.user.id,
-        thread_limit: Math.min(payload.thread_limit ?? 50, 50),
-        comment_limit: Math.min(payload.comment_limit ?? 3, 5),
-      }),
+        comment_limit,
+        limit,
+        cursor,
+      });
+    },
   };
 }

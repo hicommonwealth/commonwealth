@@ -6,7 +6,6 @@ import { notifyInfo } from 'controllers/app/notifications';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import { useFlag } from 'hooks/useFlag';
-import useStickyHeader from 'hooks/useStickyHeader';
 import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/user_dashboard/index.scss';
 import React, { useEffect, useRef } from 'react';
@@ -38,13 +37,6 @@ type UserDashboardProps = {
 const UserDashboard = ({ type }: UserDashboardProps) => {
   const user = useUserStore();
   const { isWindowExtraSmall } = useBrowserWindow({});
-  useStickyHeader({
-    elementId: 'dashboard-header',
-    zIndex: 70,
-    // To account for new authentication buttons, shown in small screen sizes
-    top: !user.isLoggedIn ? 68 : 0,
-    stickyBehaviourEnabled: isWindowExtraSmall,
-  });
 
   const [activePage, setActivePage] = React.useState<DashboardViews>(
     DashboardViews.Global,
@@ -130,12 +122,14 @@ const UserDashboard = ({ type }: UserDashboardProps) => {
             {activePage === DashboardViews.Global ? (
               <Feed
                 query={useFetchGlobalActivityQuery}
-                customScrollParent={scrollElement!}
+                // @ts-expect-error <StrictNullChecks/>
+                customScrollParent={containerRef.current}
               />
             ) : (
               <Feed
                 query={useFetchUserActivityQuery}
-                customScrollParent={scrollElement!}
+                // @ts-expect-error <StrictNullChecks/>
+                customScrollParent={containerRef.current}
               />
             )}
           </div>
