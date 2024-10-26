@@ -33,7 +33,6 @@ export enum DashboardViews {
 type UserDashboardProps = {
   type?: string;
 };
-
 const UserDashboard = ({ type }: UserDashboardProps) => {
   const user = useUserStore();
   const { isWindowExtraSmall } = useBrowserWindow({});
