@@ -237,8 +237,8 @@ export const Feed = ({ query, customScrollParent }: FeedProps) => {
         itemContent={(i, thread) => (
           <FeedThread key={i} thread={mapThread(thread)} />
         )}
-        endReached={async () => {
-          if (hasNextPage) await fetchNextPage();
+        endReached={() => {
+          hasNextPage && fetchNextPage().catch(console.error);
         }}
       />
     </div>
