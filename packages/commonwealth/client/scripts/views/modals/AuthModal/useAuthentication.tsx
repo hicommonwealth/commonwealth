@@ -7,6 +7,7 @@ import {
   WalletSsoSource,
 } from '@hicommonwealth/shared';
 import axios from 'axios';
+import { trpcVanillaClient } from 'client/scripts/utils/trpcClient';
 import {
   completeClientLogin,
   createUserWithAddress,
@@ -321,25 +322,25 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       // Important: when we first create an account and verify it, the user id
       // is initially null from api (reloading the page will update it), to correct
       // it we need to get the id from api
-      // const userAddresses = await trpcVanillaClient.user.getUserAddresses.query(
-      //   {
-      //     communities: account!.profile!.chain,
-      //     addresses: account!.profile!.address,
-      //   },
-      // );
-      // const currentUserAddress = userAddresses[0];
-      // if (!currentUserAddress) {
-      //   console.log('No profile yet.');
-      // } else {
-      //   account?.profile?.initialize(
-      //     currentUserAddress.userId,
-      //     currentUserAddress.name,
-      //     currentUserAddress.address,
-      //     currentUserAddress.avatarUrl ?? '',
-      //     account?.profile?.chain,
-      //     new Date(currentUserAddress.lastActive),
-      //   );
-      // }
+      const userAddresses = await trpcVanillaClient.user.getUserAddresses.query(
+        {
+          communities: account!.profile!.chain,
+          addresses: account!.profile!.address,
+        },
+      );
+      const currentUserAddress = userAddresses[0];
+      if (!currentUserAddress) {
+        console.log('No profile yet.');
+      } else {
+        account?.profile?.initialize(
+          currentUserAddress.userId,
+          currentUserAddress.name,
+          currentUserAddress.address,
+          currentUserAddress.avatarUrl ?? '',
+          account?.profile?.chain,
+          new Date(currentUserAddress.lastActive),
+        );
+      }
     } catch (e) {
       console.log(e);
       notifyError('Failed to create account. Please try again.');

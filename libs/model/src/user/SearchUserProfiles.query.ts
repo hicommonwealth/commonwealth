@@ -1,5 +1,6 @@
 import { type Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
+import { ALL_COMMUNITIES } from '@hicommonwealth/shared';
 import { QueryTypes } from 'sequelize';
 import { z } from 'zod';
 import { models } from '../database';
@@ -10,73 +11,64 @@ export function SearchUserProfiles(): Query<typeof schemas.SearchUserProfiles> {
     auth: [],
     secure: true,
     body: async ({ payload }) => {
-      const { communityId, search, limit, page, orderBy, orderDirection } =
+      const { community_id, search, limit, cursor, order_by, order_direction } =
         payload;
 
-      const { sql: paginationSort, bind: paginationBind } =
-        schemas.buildPaginationSql({
-          limit: Math.min(limit ?? 10, 100),
-          page: page ?? 1,
-          orderDirection,
-          nullsLast: true,
-          orderBy:
-            orderBy === 'created_at'
-              ? '"Users".created_at'
-              : orderBy === 'profile_name'
-                ? `"Users".profile->>'name'`
-                : 'last_active',
-        });
-      const bind: any = {
-        searchTerm: `%${search}%`,
-        ...paginationBind,
-      };
-      if (communityId) bind.community_id = communityId;
-      const where = `
-        ${communityId ? `"Addresses".community_id = $community_id AND ` : ''}
-        ("Users".profile->>'name' ILIKE $searchTerm)
-      `;
+      // pagination configuration
+      const direction = order_direction || 'DESC';
+      const order_col =
+        order_by === 'created_at'
+          ? 'U.created_at'
+          : order_by === 'profile_name'
+            ? `U.profile->>'name'`
+            : 'last_active';
+      const offset = limit! * (cursor! - 1);
 
       const sql = `
-        WITH T AS (
-          SELECT COUNT(DISTINCT "Users".id) AS total_count FROM "Users" WHERE ${where}
-        )
         SELECT
-          "Users".id AS user_id,
-          "Users".profile->>'name' AS profile_name,
-          "Users".profile->>'avatar_url' AS avatar_url,
-          "Users".created_at,
-          MAX("Addresses".last_active) as last_active,
+          U.id AS user_id,
+          U.profile->>'name' AS profile_name,
+          U.profile->>'avatar_url' AS avatar_url,
+          U.created_at,
+          MAX(A.last_active) as last_active,
           array_agg(
             json_build_object(
-              'id', "Addresses".id,
-              'community_id', "Addresses".community_id,
-              'address', "Addresses".address,
-              'role', "Addresses".role
+              'id', A.id,
+              'community_id', A.community_id,
+              'address', A.address,
+              'role', A.role
             )
           ) as addresses,
-          T.total_count
+          COUNT(U.id) OVER()::integer as total
         FROM
-          "Users"
-          JOIN "Addresses" ON "Users".id = "Addresses".user_id 
-          CROSS JOIN T
-        WHERE ${where}
+          "Users" U
+          JOIN "Addresses" A ON U.id = A.user_id 
+        WHERE
+          ${community_id && community_id !== ALL_COMMUNITIES ? `"Addresses".community_id = :community_id AND` : ''}
+          (U.profile->>'name' ILIKE :searchTerm)
         GROUP BY
-          "Users".id,
-          T.total_count
-        ${paginationSort}
+          U.id
+        ORDER BY ${order_col} ${direction}
+        LIMIT :limit
+        OFFSET :offset
       `;
 
       const profiles = await models.sequelize.query<
-        z.infer<typeof schemas.SearchUserProfilesView> & { total_count: number }
+        z.infer<typeof schemas.SearchUserProfilesView> & { total: number }
       >(sql, {
-        bind,
+        replacements: {
+          searchTerm: `%${search}%`,
+          community_id,
+          limit,
+          offset,
+        },
         type: QueryTypes.SELECT,
       });
 
       return schemas.buildPaginatedResponse(
         profiles,
-        profiles?.length ? profiles[0].total_count : 0,
-        bind,
+        profiles.at(0)?.total ?? 0,
+        { limit, offset },
       );
     },
   };

@@ -1,13 +1,10 @@
 import { CommunityMember } from '@hicommonwealth/schemas';
-import { useInfiniteQuery } from '@tanstack/react-query';
-import axios from 'axios';
 import {
   APIOrderBy,
   APIOrderDirection,
 } from 'client/scripts/helpers/constants';
-import { SERVER_URL } from 'state/api/config';
+import { trpc } from 'client/scripts/utils/trpcClient';
 import { z } from 'zod';
-import { ApiEndpoints } from '../config';
 
 const SEARCH_PROFILES_STALE_TIME = 60 * 1_000; // 60 s
 
@@ -31,66 +28,22 @@ interface SearchProfilesProps {
   enabled?: boolean;
 }
 
-const searchProfiles = async ({
-  pageParam = 1,
-  communityId,
-  searchTerm,
-  limit,
-  orderBy,
-  orderDirection,
-  includeCount,
-}: SearchProfilesProps & { pageParam: number }) => {
-  const {
-    data: { result },
-  } = await axios.get<{ result: SearchProfilesResponse }>(
-    `${SERVER_URL}/profiles`,
-    {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      params: {
-        community_id: communityId,
-        search: searchTerm,
-        limit: limit.toString(),
-        page: pageParam.toString(),
-        order_by: orderBy,
-        order_direction: orderDirection,
-        include_count: includeCount,
-      },
-    },
-  );
-  return result;
-};
-
 const useSearchProfilesQuery = ({
   communityId,
   searchTerm,
   limit,
   orderBy,
   orderDirection,
-  includeCount,
   enabled = true,
 }: SearchProfilesProps) => {
-  const key = [
-    ApiEndpoints.searchProfiles(searchTerm),
+  return trpc.user.searchUserProfiles.useInfiniteQuery(
     {
-      communityId,
-      orderBy,
-      orderDirection,
+      search: searchTerm,
+      community_id: communityId,
+      limit,
+      order_by: orderBy,
+      order_direction: orderDirection,
     },
-  ];
-  return useInfiniteQuery(
-    key,
-    ({ pageParam }) =>
-      searchProfiles({
-        pageParam,
-        communityId,
-        searchTerm,
-        limit,
-        orderBy,
-        orderDirection,
-        includeCount,
-      }),
     {
       getNextPageParam: (lastPage) => {
         const nextPageNum = lastPage.page + 1;

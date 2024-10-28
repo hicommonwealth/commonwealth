@@ -5,6 +5,7 @@ import { Comment } from '../entities/comment.schemas';
 import { Tags } from '../entities/tag.schemas';
 import { Address, UserProfile } from '../entities/user.schemas';
 import { PG_INT } from '../utils';
+import { PaginatedResultSchema, PaginationParamsSchema } from './pagination';
 
 export const GetUserProfile = {
   input: z.object({
@@ -39,9 +40,9 @@ export const GetUserProfile = {
 export const SearchUserProfilesView = z.object({
   user_id: PG_INT,
   profile_name: z.string(),
-  avatar_url: z.string(),
-  created_at: z.string(),
-  last_active: z.string(),
+  avatar_url: z.string().nullish(),
+  created_at: z.date().or(z.string()),
+  last_active: z.date().or(z.string()).nullish(),
   addresses: z.array(
     z.object({
       id: PG_INT,
@@ -50,23 +51,18 @@ export const SearchUserProfilesView = z.object({
       role: z.enum(Roles),
     }),
   ),
-  group_ids: z.array(PG_INT),
+  //group_ids: z.array(PG_INT),
 });
 
 export const SearchUserProfiles = {
-  input: z.object({
+  input: PaginationParamsSchema.extend({
     search: z.string(),
-    communityId: z.string().optional(),
-    limit: z.coerce.number().optional(),
-    page: z.coerce.number().optional(),
-    orderBy: z.enum(['last_active', 'created_at', 'profile_name']).optional(),
-    orderDirection: z.enum(['ASC', 'DESC']).optional(),
+    community_id: z.string().optional(),
+    order_by: z
+      .enum(['last_active', 'created_at', 'profile_name', 'rank'])
+      .optional(),
   }),
-  output: z.object({
-    page: z.number(),
-    limit: z.number(),
-    totalPages: z.number(),
-    totalResults: z.number(),
+  output: PaginatedResultSchema.extend({
     results: z.array(SearchUserProfilesView),
   }),
 };

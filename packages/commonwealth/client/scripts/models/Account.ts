@@ -6,6 +6,8 @@ import type momentType from 'moment';
 import moment from 'moment';
 import { SERVER_URL } from 'state/api/config';
 import { userStore } from 'state/ui/user';
+import NewProfilesController from '../controllers/server/newProfiles';
+import { trpcVanillaClient } from '../utils/trpcClient';
 import MinimumProfile from './MinimumProfile';
 
 export type AccountCommunity = {
@@ -87,30 +89,30 @@ class Account {
     } else if (!ignoreProfile && community?.id) {
       const updatedProfile = new MinimumProfile(address, community?.id);
 
-      // trpcVanillaClient.user.getUserAddresses
-      //   .query({ communities: community?.id, addresses: address })
-      //   .then((addresses) => {
-      //     if (addresses.length === 0) {
-      //       console.log(
-      //         'No profile data found for address',
-      //         address,
-      //         'on chain',
-      //         community?.id,
-      //       );
-      //     } else {
-      //       const addr = addresses[0];
-      //       updatedProfile.initialize(
-      //         addr.userId,
-      //         addr.name,
-      //         addr.address,
-      //         addr.avatarUrl ?? '',
-      //         updatedProfile.chain,
-      //         addr.lastActive ? new Date(addr.lastActive) : null,
-      //       );
-      //     }
-      //     // manually trigger an update signal when data is fetched
-      //     NewProfilesController.Instance.isFetched.emit('redraw');
-      //   });
+      trpcVanillaClient.user.getUserAddresses
+        .query({ communities: community?.id, addresses: address })
+        .then((addresses) => {
+          if (addresses.length === 0) {
+            console.log(
+              'No profile data found for address',
+              address,
+              'on chain',
+              community?.id,
+            );
+          } else {
+            const addr = addresses[0];
+            updatedProfile.initialize(
+              addr.userId,
+              addr.name,
+              addr.address,
+              addr.avatarUrl ?? '',
+              updatedProfile.chain,
+              addr.lastActive ? new Date(addr.lastActive) : null,
+            );
+          }
+          // manually trigger an update signal when data is fetched
+          NewProfilesController.Instance.isFetched.emit('redraw');
+        });
 
       this._profile = updatedProfile;
     }
