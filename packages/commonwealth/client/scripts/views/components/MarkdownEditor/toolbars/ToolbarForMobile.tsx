@@ -5,7 +5,7 @@ import {
   Separator,
   useCellValues,
 } from 'commonwealth-mdxeditor';
-import React, { ReactNode, useCallback, useEffect } from 'react';
+import React, { ReactNode, useCallback } from 'react';
 
 import { CustomLinkDialogForMobile } from 'views/components/MarkdownEditor/customLinkDialog/CustomLinkDialogForMobile';
 import { BlockSelectorButton } from 'views/components/MarkdownEditor/toolbars/BlockSelectorButton';
@@ -28,31 +28,6 @@ export const ToolbarForMobile = (props: ToolbarForMobileProps) => {
   const { SubmitButton, focus, onImage } = props;
 
   const [linkDialogState] = useCellValues(linkDialogState$);
-
-  const adjustForKeyboard = useCallback(() => {
-    if (!window.visualViewport) {
-      return;
-    }
-
-    const height = Math.floor(window.visualViewport.height);
-
-    const root = document.getElementById('root');
-
-    if (root) {
-      root.style.maxHeight = `${height}px`;
-    }
-  }, []);
-
-  useEffect(() => {
-    adjustForKeyboard();
-
-    // Adjust whenever the window resizes (e.g., when the keyboard appears)
-    window.addEventListener('resize', adjustForKeyboard);
-
-    return () => {
-      window.removeEventListener('resize', adjustForKeyboard);
-    };
-  }, [adjustForKeyboard]);
 
   const preventKeyboardDeactivation = useCallback(
     (event: React.MouseEvent) => {
