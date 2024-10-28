@@ -11,7 +11,6 @@ export interface CommentVersionHistory {
   thread_id: number;
   address: string;
   body: string;
-  text?: string;
   timestamp: Moment;
   content_url: string;
 }
