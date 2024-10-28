@@ -31,7 +31,7 @@ module.exports = {
 
     console.log('New columns added. Setting up triggers for sync.');
 
-    // 2. Add triggers to keep columns in sync on insert
+    // 2. Add triggers to keep columns in sync on insert and update
     await queryInterface.sequelize.query(`
       CREATE OR REPLACE FUNCTION sync_reactions()
       RETURNS TRIGGER AS $$
@@ -84,77 +84,88 @@ module.exports = {
 
     console.log('Triggers added. Starting batch migration of old data.');
 
-    // 3. Migrate old records in batches
+    // 3. Migrate old records in batches using ID-based pagination
     const BATCH_SIZE = 1000;
-    let offset = 0;
-    let rowsUpdated;
 
     // Migrate Reactions table
     console.log('Migrating data for "Reactions" table.');
+    let lastId = 0;
+    let rowsUpdated;
     do {
       [rowsUpdated] = await queryInterface.sequelize.query(`
+        WITH cte AS (
+          SELECT "id" FROM "Reactions" WHERE "id" > ${lastId} ORDER BY "id" LIMIT ${BATCH_SIZE}
+        )
         UPDATE "Reactions"
         SET "new_calculated_voting_weight" = "calculated_voting_weight"
-        WHERE "id" IN (
-          SELECT "id" FROM "Reactions" ORDER BY "id" LIMIT ${BATCH_SIZE} OFFSET ${offset}
-        );
+        FROM cte
+        WHERE "Reactions"."id" = cte."id"
+        RETURNING "Reactions"."id";
       `);
-      console.log('ROWS: ', rowsUpdated);
-      console.log(
-        `Migrated ${rowsUpdated.length} rows for "Reactions" table at offset ${offset}.`,
-      );
-      offset += BATCH_SIZE;
+
+      if (rowsUpdated.length > 0) {
+        lastId = rowsUpdated[rowsUpdated.length - 1].id;
+      }
     } while (rowsUpdated.length > 0);
 
-    offset = 0;
+    // Migrate Threads table
     console.log('Migrating data for "Threads" table.');
+    lastId = 0;
     do {
       [rowsUpdated] = await queryInterface.sequelize.query(`
+        WITH cte AS (
+          SELECT "id" FROM "Threads" WHERE "id" > ${lastId} ORDER BY "id" LIMIT ${BATCH_SIZE}
+        )
         UPDATE "Threads"
         SET "new_reaction_weights_sum" = "reaction_weights_sum"
-        WHERE "id" IN (
-          SELECT "id" FROM "Threads" ORDER BY "id" LIMIT ${BATCH_SIZE} OFFSET ${offset}
-        );
+        FROM cte
+        WHERE "Threads"."id" = cte."id"
+        RETURNING "Threads"."id";
       `);
 
-      console.log(
-        `Migrated ${rowsUpdated.length} rows for "Threads" table at offset ${offset}.`,
-      );
-      offset += BATCH_SIZE;
+      if (rowsUpdated.length > 0) {
+        lastId = rowsUpdated[rowsUpdated.length - 1].id;
+      }
     } while (rowsUpdated.length > 0);
 
-    offset = 0;
+    // Migrate Comments table
     console.log('Migrating data for "Comments" table.');
+    lastId = 0;
     do {
       [rowsUpdated] = await queryInterface.sequelize.query(`
+        WITH cte AS (
+          SELECT "id" FROM "Comments" WHERE "id" > ${lastId} ORDER BY "id" LIMIT ${BATCH_SIZE}
+        )
         UPDATE "Comments"
         SET "new_reaction_weights_sum" = "reaction_weights_sum"
-        WHERE "id" IN (
-          SELECT "id" FROM "Comments" ORDER BY "id" LIMIT ${BATCH_SIZE} OFFSET ${offset}
-        );
+        FROM cte
+        WHERE "Comments"."id" = cte."id"
+        RETURNING "Comments"."id";
       `);
 
-      console.log(
-        `Migrated ${rowsUpdated.length} rows for "Comments" table at offset ${offset}.`,
-      );
-      offset += BATCH_SIZE;
+      if (rowsUpdated.length > 0) {
+        lastId = rowsUpdated[rowsUpdated.length - 1].id;
+      }
     } while (rowsUpdated.length > 0);
 
-    offset = 0;
+    // Migrate Topics table
     console.log('Migrating data for "Topics" table.');
+    lastId = 0;
     do {
       [rowsUpdated] = await queryInterface.sequelize.query(`
+        WITH cte AS (
+          SELECT "id" FROM "Topics" WHERE "id" > ${lastId} ORDER BY "id" LIMIT ${BATCH_SIZE}
+        )
         UPDATE "Topics"
         SET "new_vote_weight_multiplier" = "vote_weight_multiplier"
-        WHERE "id" IN (
-          SELECT "id" FROM "Topics" ORDER BY "id" LIMIT ${BATCH_SIZE} OFFSET ${offset}
-        );
+        FROM cte
+        WHERE "Topics"."id" = cte."id"
+        RETURNING "Topics"."id";
       `);
 
-      console.log(
-        `Migrated ${rowsUpdated.length} rows for "Topics" table at offset ${offset}.`,
-      );
-      offset += BATCH_SIZE;
+      if (rowsUpdated.length > 0) {
+        lastId = rowsUpdated[rowsUpdated.length - 1].id;
+      }
     } while (rowsUpdated.length > 0);
 
     console.log(
@@ -210,7 +221,5 @@ module.exports = {
     console.log('Migration completed successfully.');
   },
 
-  async down(queryInterface, Sequelize) {
-    // Down migration remains irreversible due to possible data loss.
-  },
+  async down(queryInterface, Sequelize) {},
 };
