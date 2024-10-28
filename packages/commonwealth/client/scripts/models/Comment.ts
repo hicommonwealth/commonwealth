@@ -38,6 +38,7 @@ export class Comment<T extends IUniqueId> {
 
   public readonly canvasSignedData: string;
   public readonly canvasMsgId: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public readonly discord_meta: any;
 
   public readonly profile: UserProfile;
@@ -71,19 +72,23 @@ export class Comment<T extends IUniqueId> {
     body?: string;
     author: string;
     community_id: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     Address: any;
     thread_id: number;
     parent_id?: number | null;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     reactions?: any[];
     reaction_weights_sum: number;
     created_at: Moment | null;
     deleted_at?: string;
     authorChain?: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     last_edited?: any;
     canvas_signed_data?: string | null;
     canvas_msg_id?: string | null;
     CommentVersionHistories?: CommentVersionHistory[];
     marked_as_spam_at?: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     discord_meta?: any;
     content_url?: string | null;
   }) {
@@ -110,6 +115,7 @@ export class Comment<T extends IUniqueId> {
     this.deleted = !!deleted_at;
     this.canvasSignedData = canvas_signed_data!;
     this.canvasMsgId = canvas_msg_id!;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     this.reactions = (reactions || []).map((r) => new Reaction(r as any));
     this.reactionWeightsSum = reaction_weights_sum;
     this.rootThread = String(thread_id);
