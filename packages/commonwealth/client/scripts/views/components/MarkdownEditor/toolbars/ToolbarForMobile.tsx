@@ -1,6 +1,13 @@
-import { IS_BOLD, IS_ITALIC, Separator } from 'commonwealth-mdxeditor';
+import {
+  IS_BOLD,
+  IS_ITALIC,
+  linkDialogState$,
+  Separator,
+  useCellValues,
+} from 'commonwealth-mdxeditor';
 import React, { ReactNode, useCallback, useEffect } from 'react';
 
+import { CustomLinkDialogForMobile } from 'views/components/MarkdownEditor/customLinkDialog/CustomLinkDialogForMobile';
 import { BlockSelectorButton } from 'views/components/MarkdownEditor/toolbars/BlockSelectorButton';
 import { CreateLinkButton } from 'views/components/MarkdownEditor/toolbars/CreateLinkButton';
 import { FormatButton } from 'views/components/MarkdownEditor/toolbars/FormatButton';
@@ -19,6 +26,8 @@ type ToolbarForMobileProps = Readonly<{
 
 export const ToolbarForMobile = (props: ToolbarForMobileProps) => {
   const { SubmitButton, focus, onImage } = props;
+
+  const [linkDialogState] = useCellValues(linkDialogState$);
 
   const adjustForKeyboard = useCallback(() => {
     if (!window.visualViewport) {
@@ -57,6 +66,11 @@ export const ToolbarForMobile = (props: ToolbarForMobileProps) => {
     },
     [focus],
   );
+
+  if (linkDialogState.type !== 'inactive') {
+    // do not use a toolbar when the link dialog is active.
+    return <CustomLinkDialogForMobile />;
+  }
 
   return (
     <div
