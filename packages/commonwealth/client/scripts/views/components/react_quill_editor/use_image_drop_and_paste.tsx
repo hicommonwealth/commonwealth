@@ -79,7 +79,7 @@ export const useImageDropAndPaste = ({
         setIsUploading(false);
       }
     },
-    [editorRef, setContentDelta, setIsUploading],
+    [editorRef, setContentDelta, setIsUploading, uploadImage],
   );
 
   return { handleImageDropAndPaste };

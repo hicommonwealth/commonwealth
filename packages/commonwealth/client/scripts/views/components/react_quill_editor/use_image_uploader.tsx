@@ -54,7 +54,7 @@ export const useImageUploader = ({
         setIsUploading(false);
       }
     },
-    [editorRef, setContentDelta, setIsUploading],
+    [editorRef, setContentDelta, setIsUploading, uploadImage],
   );
 
   return { handleImageUploader };
