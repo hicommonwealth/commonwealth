@@ -43,7 +43,7 @@ export const uploadFile = async ({
 };
 
 type UseUploadFileMutationProps = {
-  onSuccess?: (uploadedFileURL) => void;
+  onSuccess?: (uploadedFileURL: string) => void;
 };
 
 const useUploadFileMutation = ({

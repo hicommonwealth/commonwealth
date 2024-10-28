@@ -20,7 +20,7 @@ type AvatarUploadProps = {
   };
   darkMode?: boolean;
   scope: 'community' | 'user';
-  uploadCompleteCallback?: (file: Array<any>) => void;
+  uploadCompleteCallback?: (uploadUrl: string) => void;
   uploadStartedCallback?: () => void;
 } & AvatarUploadStyleProps;
 
