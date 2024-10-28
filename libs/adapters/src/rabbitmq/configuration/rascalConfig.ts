@@ -140,6 +140,12 @@ export function getAllRascalConfigs(
         arguments: queueOptions,
       },
     },
+    [RascalQueues.LaunchpadPolicy]: {
+      ...queueConfig,
+      options: {
+        arguments: queueOptions,
+      },
+    },
   };
 
   const allBindings: Record<keyof OmittedRascalBindings, BindingConfig> = {

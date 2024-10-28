@@ -1,10 +1,13 @@
-import { Actor, command, dispose } from '@hicommonwealth/core';
+import { Actor, command, dispose, query } from '@hicommonwealth/core';
 import { BalanceType, commonProtocol } from '@hicommonwealth/shared';
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { bootstrap_testing, seed } from 'model/src/tester';
 import { afterAll, beforeAll, describe, test } from 'vitest';
-import { CreateStakeTransaction } from '../../src/community';
+import {
+  CreateStakeTransaction,
+  GetStakeTransaction,
+} from '../../src/community';
 
 chai.use(chaiAsPromised);
 
@@ -81,7 +84,29 @@ describe('Stake transactions', () => {
         community_id,
         id: community_id,
       };
-      z;
+
+      results = await command(CreateStakeTransaction(), {
+        actor,
+        payload,
+      });
+
+      expect(results?.address).to.equal(
+        '0xf6885b5aC5AE36689038dAf30184AeEB266E61f5',
+      );
+      expect(results?.stake_direction).to.equal('buy');
+
+      const getResult = await query(GetStakeTransaction(), {
+        actor,
+        payload: { addresses: results?.address },
+      });
+
+      expect(
+        getResult?.find(
+          (t) =>
+            t?.transaction_hash ===
+            '0x924f40cfea663b2579816173f048b61ab2b118e0c7c055d7b00dbd9cd15eb7c0',
+        ),
+      ).to.exist;
     },
   ); // increase timeout because crypto calls take a while
 

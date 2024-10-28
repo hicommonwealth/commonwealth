@@ -411,7 +411,7 @@ const SingleContestContentUpvotedMapper: EvmMapper<
   }),
 };
 
-const EvmMappers = {
+const EvmMappers: { [key: string]: unknown } = {
   [EvmEventSignatures.NamespaceFactory.NamespaceDeployed]: null,
   [EvmEventSignatures.CommunityStake.Trade]: null,
   [RecurringContestManagerDeployedMapper.signature]: [

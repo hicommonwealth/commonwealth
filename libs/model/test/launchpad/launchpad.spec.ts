@@ -4,6 +4,7 @@ import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { bootstrap_testing, seed } from 'model/src/tester';
 import { afterAll, beforeAll, describe, test } from 'vitest';
+import { ChainNodeAttributes } from '../../src/index';
 import { CreateToken } from '../../src/token';
 
 chai.use(chaiAsPromised);
@@ -12,18 +13,17 @@ describe('Launchpad', () => {
   let actor: Actor;
   let payload;
   let community_id: string;
-  // @ts-ignore
-  let node;
+  let node: ChainNodeAttributes;
 
   beforeAll(async () => {
     await bootstrap_testing(true);
-    [node] = await seed('ChainNode', {
+    [node] = (await seed('ChainNode', {
       url: 'https://base-sepolia-rpc.publicnode.com',
       private_url: 'https://base-sepolia-rpc.publicnode.com',
       name: 'Base Sepolia Testnet',
       eth_chain_id: commonProtocol.ValidChains.SepoliaBase,
       balance_type: BalanceType.Ethereum,
-    });
+    })) as ChainNodeAttributes[];
 
     const [user] = await seed('User', {
       isAdmin: true,
@@ -70,14 +70,13 @@ describe('Launchpad', () => {
       payload = {
         transaction_hash:
           '0xc0e59dfc71f0e81f33b2f96e7fad5d80d4bf81298bf7dd5afdd8913771e47fad',
-        // @ts-ignore
-        chain_node_id: node?.id,
+        chain_node_id: node!.id!,
         description: 'test',
         icon_url: 'test',
-        community_id,
+        community_id: community_id!,
       };
 
-      let results = await command(CreateToken(), {
+      const results = await command(CreateToken(), {
         actor,
         payload,
       });
