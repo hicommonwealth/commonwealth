@@ -21,7 +21,7 @@ type ToolbarForMobileProps = Readonly<{
   SubmitButton?: () => ReactNode;
   focus: () => void;
 
-  onImage?: (file: File) => void;
+  onImage: (file: File) => void;
 }>;
 
 export const ToolbarForMobile = (props: ToolbarForMobileProps) => {
@@ -34,7 +34,7 @@ export const ToolbarForMobile = (props: ToolbarForMobileProps) => {
       event.stopPropagation();
 
       if (focus) {
-        focus?.();
+        focus();
       } else {
         console.warn('No focus');
       }
