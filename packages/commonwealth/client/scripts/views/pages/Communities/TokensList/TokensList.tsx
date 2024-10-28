@@ -29,7 +29,7 @@ const TokensList = () => {
 
   const handleFetchMoreTokens = () => {
     if (hasNextPage && !isFetchingNextPage) {
-      fetchNextPage();
+      fetchNextPage().catch(console.error);
     }
   };
 
