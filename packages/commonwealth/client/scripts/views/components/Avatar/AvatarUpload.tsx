@@ -58,14 +58,13 @@ export const AvatarUpload = ({
         ),
       );
     },
-    onDropAccepted: async (acceptedFiles: Array<File>) => {
-      try {
-        await uploadImage({
-          file: acceptedFiles[0],
-        });
-      } catch (e) {
+    onDropAccepted: (acceptedFiles: Array<File>) => {
+      uploadImage({
+        file: acceptedFiles[0],
+      }).catch((e) => {
+        console.error(e);
         notifyError('Failed to get an S3 signed upload URL');
-      }
+      });
     },
   });
 

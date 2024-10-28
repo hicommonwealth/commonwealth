@@ -9,9 +9,12 @@ import { ImageURL } from './MarkdownEditor';
 export function useImageUploadHandlerS3() {
   const { mutateAsync: uploadImage } = useUploadFileMutation({});
 
-  return useCallback(async (file: File): Promise<ImageURL> => {
-    return await uploadImage({
-      file,
-    });
-  }, []);
+  return useCallback(
+    async (file: File): Promise<ImageURL> => {
+      return await uploadImage({
+        file,
+      });
+    },
+    [uploadImage],
+  );
 }
