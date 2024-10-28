@@ -45,12 +45,11 @@ export const BlockSelectorButton = (props: BlockSelectorButtonProps) => {
   return (
     <ClickAwayListener onClickAway={handleClickAway}>
       <div className="BlockSelectorButton">
-        <button onClick={handleClick}>
-          <div className="DropdownIndicator">
-            {iconName && <CWIcon iconName={iconName} />}
-            {!iconName && <PlaceholderIcon />}
-            <CWIcon iconName="caretDown" iconSize="xs" />
-          </div>
+        <button onClick={handleClick} style={{ display: 'flex' }}>
+          {iconName && <CWIcon iconName={iconName} />}
+          {!iconName && <PlaceholderIcon />}
+
+          <CWIcon iconName="caretDown" iconSize="xs" />
         </button>
 
         <CWPopover
