@@ -1,4 +1,4 @@
-const erc20Abi = [
+export const erc20Abi = [
   {
     constant: true,
     inputs: [],

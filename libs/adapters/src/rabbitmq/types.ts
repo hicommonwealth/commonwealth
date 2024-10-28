@@ -33,6 +33,7 @@ export enum RascalQueues {
   NotificationsSettings = 'NotificationsSettingsQueue',
   ContestWorkerPolicy = 'ContestWorkerPolicyQueue',
   ContestProjection = 'ContestProjection',
+  LaunchpadPolicy = 'LaunchpadPolicy',
 }
 
 export enum RascalBindings {
@@ -43,6 +44,7 @@ export enum RascalBindings {
   ChainEvent = 'ChainEventBinding',
   ContestWorkerPolicy = 'ContestWorkerPolicy',
   ContestProjection = 'ContestProjection',
+  LaunchpadPolicy = 'LaunchpadPolicy',
 }
 
 export enum RascalRoutingKeys {

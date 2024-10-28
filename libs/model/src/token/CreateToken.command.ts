@@ -5,6 +5,8 @@ import Web3 from 'web3';
 import { models } from '../database';
 import { AuthContext, isAuthorized } from '../middleware';
 import { mustExist } from '../middleware/guards';
+import { tokenCommunityManagerAbi } from '../services/commonProtocol/abi/TokenCommunityManager';
+import { erc20Abi } from '../services/commonProtocol/abi/erc20';
 
 export async function createTokenHandler(
   chainNodeId: number,
@@ -44,7 +46,7 @@ export async function createTokenHandler(
 
   let name: string;
   let symbol: string;
-  let totalSupply: number;
+  let totalSupply: bigint;
 
   try {
     name = await erc20Contract.methods.name().call();
@@ -56,17 +58,20 @@ export async function createTokenHandler(
     );
   }
 
-  const token = await models.Token.create({
-    token_address: tokenAddress,
-    namespace,
-    name,
-    symbol,
-    initial_supply: totalSupply,
-    chain_node_id: chainNodeId,
-    is_locked: false,
-    description: description ?? null,
-    icon_url: iconUrl ?? null,
-  });
+  const token = await models.Token.create(
+    {
+      token_address: tokenAddress,
+      namespace,
+      name,
+      symbol,
+      initial_supply: totalSupply,
+      chain_node_id: chainNodeId,
+      is_locked: false,
+      description: description ?? null,
+      icon_url: iconUrl ?? null,
+    },
+    { logging: true },
+  );
 
   return token!.toJSON();
 }
@@ -82,9 +87,22 @@ export function CreateToken(): Command<
       const { chain_node_id, transaction_hash, description, icon_url } =
         payload;
 
-      console.log('here');
+      const chainNode = await models.ChainNode.findOne({
+        where: { id: chain_node_id },
+        attributes: ['eth_chain_id', 'url', 'private_url'],
+      });
 
-      const tokenAddress = '';
+      mustExist('Chain Node', chainNode);
+
+      const web3 = new Web3(chainNode.private_url || chainNode.url);
+
+      const txReceipt = await web3.eth.getTransactionReceipt(transaction_hash);
+      const tokenAddress = txReceipt.logs[0].address!;
+      if (!tokenAddress) {
+        throw Error(
+          'Failed to find tokenAddress is token creation command. Review tokenAddress logic',
+        );
+      }
 
       return createTokenHandler(
         chain_node_id,

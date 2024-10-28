@@ -1,4 +1,4 @@
-const tokenCommunityManagerAbi = [
+export const tokenCommunityManagerAbi = [
   {
     type: 'constructor',
     inputs: [

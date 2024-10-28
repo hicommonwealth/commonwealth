@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { PG_INT } from '../utils';
+import { PG_ETH, PG_INT } from '../utils';
 
 export const Token = z.object({
   // derivable from creation event
@@ -7,7 +7,7 @@ export const Token = z.object({
   namespace: z.string(),
   name: z.string(),
   symbol: z.string(),
-  initial_supply: z.number(),
+  initial_supply: PG_ETH,
   is_locked: z.boolean().default(false),
   chain_node_id: PG_INT,
 

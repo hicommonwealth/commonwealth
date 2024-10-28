@@ -29,7 +29,7 @@ module.exports = {
           },
           name: { type: Sequelize.STRING },
           symbol: { type: Sequelize.STRING },
-          initial_supply: { type: Sequelize.INTEGER },
+          initial_supply: { type: Sequelize.DECIMAL(78, 0) },
 
           // platform related
           description: { type: Sequelize.STRING, allowNull: true },

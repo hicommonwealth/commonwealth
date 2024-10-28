@@ -231,6 +231,10 @@ export function getAllRascalConfigs(
       queue: RascalQueues.NotificationsSettings,
       ...subscriptionConfig,
     },
+    [RascalSubscriptions.LaunchpadPolicy]: {
+      queue: RascalQueues.LaunchpadPolicy,
+      ...subscriptionConfig,
+    },
   };
 
   const baseConfig: BrokerConfig = {

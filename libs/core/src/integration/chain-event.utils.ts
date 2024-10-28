@@ -35,6 +35,9 @@ export const EvmEventSignatures = {
   CommunityStake: {
     Trade: '0xfc13c9a8a9a619ac78b803aecb26abdd009182411d51a986090f82519d88a89e',
   },
+  Launchpad: {
+    TokenLaunched: '0x6b118c6efa258903939ed981e6f644330effebab',
+  },
 } as const;
 
 type Values<T> = T[keyof T];
@@ -253,6 +256,14 @@ export const EvmEventAbis = {
       type: 'uint256',
       indexed: false,
       internalType: 'uint256',
+    },
+  ] as const,
+  [EvmEventSignatures.Launchpad.TokenLaunched]: [
+    {
+      name: 'token',
+      type: 'address',
+      indexed: false,
+      internalType: 'address',
     },
   ] as const,
 };

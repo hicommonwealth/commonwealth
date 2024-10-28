@@ -8,10 +8,11 @@ import { CreateToken } from '../../src/token';
 
 chai.use(chaiAsPromised);
 
-describe('Stake transactions', () => {
+describe('Launchpad', () => {
   let actor: Actor;
   let payload;
   let community_id: string;
+  // @ts-ignore
   let node;
 
   beforeAll(async () => {
@@ -64,11 +65,12 @@ describe('Stake transactions', () => {
 
   test(
     'Create Token works given txHash and chainNodeId',
-    { timeout: 10_000 },
+    { timeout: 10_0000000 },
     async () => {
       payload = {
         transaction_hash:
           '0x82802acbf566bf2f1c9ca7b2469810ac7017afc262ff60fe602ab3768ddb186d',
+        // @ts-ignore
         chain_node_id: node?.id,
         description: 'test',
         icon_url: 'test',
@@ -79,18 +81,12 @@ describe('Stake transactions', () => {
         actor,
         payload,
       });
-      // This address comes from the actual crypto transaction
-      expect(results?.address).to.equal(
-        '0xf6885b5aC5AE36689038dAf30184AeEB266E61f5',
-      );
-      expect(results?.stake_direction).to.equal('buy');
 
-      payload = {
-        transaction_hash:
-          '0x924f40cfea663b2579816173f048b61ab2b118e0c7c055d7b00dbd9cd15eb7c0',
-        community_id,
-        id: community_id,
-      };
+      expect(results?.token_address).to.equal(
+        '0x6893cfa091ddb564cf739ba3bfd08fa9d69f0061',
+      );
+      expect(results?.symbol).to.equal('ewrw');
+      expect(results?.namespace).to.equal('fill this out when fixed');
     },
-  ); // increase timeout because crypto calls take a while
+  );
 });

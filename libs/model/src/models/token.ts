@@ -31,7 +31,7 @@ export default (
       },
       name: { type: Sequelize.STRING },
       symbol: { type: Sequelize.STRING },
-      initial_supply: { type: Sequelize.INTEGER },
+      initial_supply: { type: Sequelize.DECIMAL(78, 0) },
       is_locked: {
         type: Sequelize.BOOLEAN,
         allowNull: false,
