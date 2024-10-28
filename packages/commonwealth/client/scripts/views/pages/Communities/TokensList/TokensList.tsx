@@ -59,14 +59,15 @@ const TokensList = () => {
               key={token.name}
               name={token.name}
               symbol={token.symbol}
-              // TODO: start - get this data for each token
+              // {
+              // TODO: https://github.com/hicommonwealth/commonwealth/issues/9694
               price="0.75"
               pricePercentage24HourChange={1.15}
               marketCap={{
                 current: 300,
                 goal: 4500,
               }}
-              // TODO: end
+              // }
               mode="buy"
               iconURL={token.icon_url || ''}
               onCardBodyClick={() =>
