@@ -198,7 +198,7 @@ export const ThreadOptions = ({
             />
           )}
         </div>
-        {Boolean(thread?.recentComments?.length) && expandCommentBtnVisible && (
+        {Boolean(thread?.numberOfComments) && expandCommentBtnVisible && (
           <CWButton
             className="latest-button"
             buttonType="tertiary"
@@ -208,7 +208,7 @@ export const ThreadOptions = ({
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              toggleShowComments && toggleShowComments();
+              toggleShowComments?.();
             }}
           />
         )}
