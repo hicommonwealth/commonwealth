@@ -112,7 +112,8 @@ class Account {
           }
           // manually trigger an update signal when data is fetched
           NewProfilesController.Instance.isFetched.emit('redraw');
-        });
+        })
+        .catch(console.error);
 
       this._profile = updatedProfile;
     }
