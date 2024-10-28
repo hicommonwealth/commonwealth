@@ -1,11 +1,13 @@
 import { useFlag } from 'hooks/useFlag';
 import React, { useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import app from 'state';
 import { useTokenMetadataQuery } from 'state/api/tokens';
 import useUserStore from 'state/ui/user';
 import Permissions from 'utils/Permissions';
 import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
 import { PageNotFound } from 'views/pages/404';
+import { ContestType } from '../types';
 import './ManageContest.scss';
 import {
   ContestLiveStep,
@@ -24,6 +26,10 @@ const ManageContest = ({ contestAddress }: ManageContestProps) => {
     useState<LaunchContestStep>('DetailsForm');
   const [createdContestAddress, setCreatedContestAddress] = useState('');
   const weightedTopicsEnabled = useFlag('weightedTopics');
+
+  const [searchParams] = useSearchParams();
+  const contestType = searchParams.get('type');
+  const isFarcasterContest = contestType === ContestType.Farcaster;
 
   const user = useUserStore();
 
@@ -65,6 +71,7 @@ const ManageContest = ({ contestAddress }: ManageContestProps) => {
             // @ts-expect-error <StrictNullChecks/>
             contestFormData={contestFormData}
             onSetContestFormData={setContestFormData}
+            isFarcasterContest={isFarcasterContest}
           />
         );
 
@@ -76,6 +83,7 @@ const ManageContest = ({ contestAddress }: ManageContestProps) => {
             contestFormData={contestFormData}
             onSetCreatedContestAddress={setCreatedContestAddress}
             fundingTokenTicker={fundingTokenTicker}
+            isFarcasterContest={isFarcasterContest}
           />
         );
 
@@ -83,7 +91,7 @@ const ManageContest = ({ contestAddress }: ManageContestProps) => {
         return (
           <ContestLiveStep
             createdContestAddress={createdContestAddress}
-            isFarcasterContest={false}
+            isFarcasterContest={isFarcasterContest}
             fundingTokenTicker={fundingTokenTicker}
             fundingTokenAddress={contestFormData?.fundingTokenAddress || ''}
           />

@@ -40,6 +40,7 @@ interface SignTransactionsStepProps {
   contestFormData: ContestFormData;
   onSetCreatedContestAddress: (address: string) => void;
   fundingTokenTicker: string;
+  isFarcasterContest: boolean;
 }
 
 const SEVEN_DAYS_IN_SECONDS = 60 * 60 * 24 * 7;
@@ -50,6 +51,7 @@ const SignTransactionsStep = ({
   contestFormData,
   onSetCreatedContestAddress,
   fundingTokenTicker,
+  isFarcasterContest,
 }: SignTransactionsStepProps) => {
   const weightedTopicsEnabled = useFlag('weightedTopics');
 
@@ -159,7 +161,7 @@ const SignTransactionsStep = ({
             // @ts-expect-error <StrictNullChecks/>
             recurring,
           ))
-        : weightedTopicsEnabled
+        : weightedTopicsEnabled && !isFarcasterContest
           ? (contestAddress =
               await deploySingleERC20ContestOnchainMutation(singleERC20))
           : // @ts-expect-error <StrictNullChecks/>
