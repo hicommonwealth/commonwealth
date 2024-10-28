@@ -80,6 +80,7 @@ const SearchBarPreviewSection: FC<SearchBarPreviewSectionProps> = ({
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const SearchBarDropdown: FC<SearchBarDropdownProps> = ({
   searchTerm,
   searchResults,
