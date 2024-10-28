@@ -198,12 +198,12 @@ export const ThreadOptions = ({
             />
           )}
         </div>
-        {expandCommentBtnVisible && (
+        {Boolean(thread?.recentComments?.length) && expandCommentBtnVisible && (
           <CWButton
             className="latest-button"
             buttonType="tertiary"
             buttonHeight="sm"
-            label={showCommentVisible ? 'Hide' : 'Show more'}
+            label={showCommentVisible ? 'Hide comments' : 'Show comments'}
             iconLeft={showCommentVisible ? 'chevronUp' : 'chevronDown'}
             onClick={(e) => {
               e.preventDefault();
