@@ -47,6 +47,7 @@ export class Comment<T extends IUniqueId> {
   constructor({
     id,
     text,
+    body,
     author,
     community_id,
     Address,
@@ -68,7 +69,9 @@ export class Comment<T extends IUniqueId> {
     const versionHistory = CommentVersionHistories;
     this.communityId = community_id;
     this.author = Address?.address || author;
-    this.text = deleted_at?.length > 0 ? '[deleted]' : getDecodedString(text);
+    if (deleted_at?.length > 0) this.text = '[deleted]';
+    // TODO: temporary - this model will be entirely replaced by tRPC soon
+    else this.text = text ? getDecodedString(text) : getDecodedString(body);
     this.versionHistory = versionHistory;
     this.threadId = thread_id;
     this.id = id;

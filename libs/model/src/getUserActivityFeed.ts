@@ -68,7 +68,7 @@ SELECT
         'user_id', C.user_id,
         'profile_name', C.profile_name,
         'profile_avatar', C.profile_avatar,
-        'text', C.text,
+        'body', C.body,
         'content_url', C.content_url,
         'created_at', C.created_at::text,
         'updated_at', C.updated_at::text,
