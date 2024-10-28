@@ -10,13 +10,18 @@
   width: 100%;
   min-height: 360px;
   border: 1px solid $neutral-300;
+  cursor: pointer;
 
   .text-dark {
     color: $neutral-600;
+    width: fit-content;
+    cursor: initial;
   }
 
   .text-light {
     color: $neutral-500;
+    width: fit-content;
+    cursor: initial;
   }
 
   .image {
@@ -38,6 +43,7 @@
       flex-direction: column;
 
       .price-change {
+        width: fit-content;
         &.negative {
           color: $rorange-500;
         }
@@ -88,6 +94,7 @@
 
       .caps {
         word-spacing: 2px;
+        width: fit-content;
       }
 
       .token-capped-icon {

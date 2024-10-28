@@ -16,6 +16,7 @@ interface TokenCardProps {
   mode: 'buy' | 'swap';
   className?: string;
   onCTAClick?: () => void;
+  onCardBodyClick?: () => void;
 }
 
 const currentNameToSymbol = {
@@ -32,6 +33,7 @@ const TokenCard = ({
   pricePercentage24HourChange,
   mode,
   className,
+  onCardBodyClick,
   onCTAClick,
 }: TokenCardProps) => {
   const currencySymbol = currentNameToSymbol[currency];
@@ -40,11 +42,19 @@ const TokenCard = ({
     (marketCap.current / marketCap.goal) * 100,
   );
 
+  const handleBodyClick = (e: React.MouseEvent) =>
+    e.target === e.currentTarget && onCardBodyClick?.();
+
   return (
-    <div className={clsx('TokenCard', className)} role="button">
-      <img src={iconURL} className="image" />
+    <div
+      role="button"
+      tabIndex={0}
+      className={clsx('TokenCard', className)}
+      onClick={handleBodyClick}
+    >
+      <img src={iconURL} className="image" onClick={handleBodyClick} />
       {/* name and price row */}
-      <div className="basic-info">
+      <div className="basic-info" onClick={handleBodyClick}>
         <div className="col">
           <CWText className="text-dark" type="h4" fontWeight="regular">
             {name}
@@ -73,7 +83,7 @@ const TokenCard = ({
         </div>
       </div>
       {/* market cap row */}
-      <div className="market-cap">
+      <div className="market-cap" onClick={handleBodyClick}>
         <progress
           className={clsx('goal-progress', { isCapped })}
           value={progressPercentage}
