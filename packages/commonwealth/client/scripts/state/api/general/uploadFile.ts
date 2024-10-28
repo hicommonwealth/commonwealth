@@ -1,7 +1,7 @@
+import { formatBucketUrlToAssetCDN } from '@hicommonwealth/shared';
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import { compressImage } from 'client/scripts/utils/ImageCompression';
-import { replaceBucketWithCDN } from 'helpers/awsHelpers';
 import { ApiEndpoints, SERVER_URL } from 'state/api/config';
 import { userStore } from '../../ui/user';
 
@@ -39,8 +39,7 @@ export const uploadFile = async ({
     },
   });
 
-  const trimmedURL = replaceBucketWithCDN(signedUploadUrl.split('?')[0]);
-  return replaceBucketWithCDN(trimmedURL);
+  return formatBucketUrlToAssetCDN(signedUploadUrl.split('?')[0]);
 };
 
 type UseUploadFileMutationProps = {

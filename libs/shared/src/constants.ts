@@ -16,3 +16,7 @@ export const DISCORD_BOT_ADDRESS = '0xdiscordbot';
 export const DEFAULT_NAME = 'Anonymous';
 
 export const MAX_RECIPIENTS_PER_WORKFLOW_TRIGGER = 1_000;
+
+export const S3_RAW_ASSET_BUCKET_DOMAIN =
+  's3.us-east-1.amazonaws.com/assets.commonwealth.im';
+export const S3_ASSET_BUCKET_CDN = 'assets.commonwealth.im';

@@ -1,11 +1,8 @@
 import { DeltaStatic } from 'quill';
 import { MutableRefObject, useCallback } from 'react';
 import ReactQuill from 'react-quill';
-import { SERVER_URL } from 'state/api/config';
-import { SerializableDeltaStatic, uploadFileToS3 } from './utils';
-
-import useUserStore from 'state/ui/user';
-import { compressImage } from 'utils/ImageCompression';
+import { useUploadFileMutation } from 'state/api/general';
+import { SerializableDeltaStatic } from './utils';
 
 type UseImageUploaderProps = {
   editorRef: MutableRefObject<ReactQuill>;
@@ -18,7 +15,7 @@ export const useImageUploader = ({
   setIsUploading,
   setContentDelta,
 }: UseImageUploaderProps) => {
-  const user = useUserStore();
+  const { mutateAsync: uploadImage } = useUploadFileMutation({});
 
   const handleImageUploader = useCallback(
     async (file: File) => {
@@ -36,14 +33,9 @@ export const useImageUploader = ({
         const selectedIndex =
           editor.getSelection()?.index || editor.getLength() || 0;
 
-        // Compress the image before uploading
-        const compressedFile = await compressImage(file);
-
-        const uploadedFileUrl = await uploadFileToS3(
-          compressedFile,
-          SERVER_URL,
-          user.jwt || '',
-        );
+        const uploadedFileUrl = await uploadImage({
+          file,
+        });
 
         // insert image op at the selected index
         editor.insertText(selectedIndex, `![image](${uploadedFileUrl})`);
@@ -62,7 +54,7 @@ export const useImageUploader = ({
         setIsUploading(false);
       }
     },
-    [editorRef, setContentDelta, setIsUploading, user.jwt],
+    [editorRef, setContentDelta, setIsUploading],
   );
 
   return { handleImageUploader };
