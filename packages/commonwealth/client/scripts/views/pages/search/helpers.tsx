@@ -1,4 +1,4 @@
-import { CommunityMember } from '@hicommonwealth/schemas';
+import { SearchUserProfilesView } from '@hicommonwealth/schemas';
 import { getDecodedString } from '@hicommonwealth/shared';
 import moment from 'moment';
 import 'pages/search/index.scss';
@@ -207,7 +207,7 @@ const CommunityResultRow = ({
   );
 };
 
-export type MemberResult = z.infer<typeof CommunityMember>;
+export type MemberResult = z.infer<typeof SearchUserProfilesView>;
 
 type MemberResultRowProps = {
   addr: MemberResult;

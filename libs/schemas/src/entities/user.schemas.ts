@@ -104,7 +104,7 @@ export const CommunityMember = z.object({
       community_id: z.string(),
       address: z.string(),
       stake_balance: z.number().nullish(),
-      role: z.string(),
+      role: z.enum(Roles),
     }),
   ),
   group_ids: z.array(PG_INT),

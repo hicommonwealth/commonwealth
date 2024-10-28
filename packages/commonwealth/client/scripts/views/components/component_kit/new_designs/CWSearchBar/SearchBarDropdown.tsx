@@ -8,10 +8,11 @@ import { SearchBarCommunityPreviewRow } from './SearchBarCommunityPreviewRow';
 import { SearchBarMemberPreviewRow } from './SearchBarMemberPreviewRow';
 import { SearchBarThreadPreviewRow } from './SearchBarThreadPreviewRow';
 
+import { SearchUserProfilesView } from '@hicommonwealth/schemas';
+import { z } from 'zod';
 import { SearchResults } from '../../../../../hooks/useSearchResults';
 import { SearchChainsResponse } from '../../../../../state/api/chains/searchChains';
 import { SearchCommentsResponse } from '../../../../../state/api/comments/searchComments';
-import { SearchProfilesResponse } from '../../../../../state/api/profiles/searchProfiles';
 import { SearchThreadsResponse } from '../../../../../state/api/threads/searchThreads';
 import './SearchBarDropdown.scss';
 
@@ -20,7 +21,7 @@ interface SearchBarPreviewSectionProps {
     | SearchThreadsResponse['results']
     | SearchCommentsResponse['results']
     | SearchChainsResponse['results']
-    | SearchProfilesResponse['results'];
+    | z.infer<typeof SearchUserProfilesView>[];
   searchTerm: string;
   searchScope: SearchScope;
   onSearchItemClick?: () => void;
