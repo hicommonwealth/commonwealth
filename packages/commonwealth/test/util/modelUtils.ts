@@ -105,6 +105,7 @@ export interface CommentArgs {
   address: string;
   did: `did:${string}`;
   jwt: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   body: any;
   parentCommentId?: any;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
