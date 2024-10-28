@@ -105,7 +105,7 @@ export interface CommentArgs {
   address: string;
   did: `did:${string}`;
   jwt: any;
-  text: any;
+  body: any;
   parentCommentId?: any;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   threadId?: any;
@@ -414,7 +414,7 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
       address,
       did,
       jwt,
-      text,
+      body,
       parentCommentId,
       threadId,
       threadMsgId,
@@ -427,7 +427,7 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
       did,
       name: 'comment',
       args: {
-        body: text,
+        body,
         thread_id: threadMsgId,
         parent_comment_id: parentCommentId || null,
       },
@@ -453,7 +453,7 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
         parent_id: parentCommentId || null,
         thread_id: threadId,
         thread_msg_id: threadMsgId,
-        text,
+        body,
         jwt,
         ...toCanvasSignedDataApiArgs(canvasSignResult),
       });
