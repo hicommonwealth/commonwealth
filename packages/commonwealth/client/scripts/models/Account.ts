@@ -5,9 +5,7 @@ import axios from 'axios';
 import type momentType from 'moment';
 import moment from 'moment';
 import { SERVER_URL } from 'state/api/config';
-import { DISCOURAGED_NONREACTIVE_fetchProfilesByAddress } from 'state/api/profiles/fetchProfilesByAddress';
 import { userStore } from 'state/ui/user';
-import NewProfilesController from '../controllers/server/newProfiles';
 import MinimumProfile from './MinimumProfile';
 
 export type AccountCommunity = {
@@ -89,38 +87,30 @@ class Account {
     } else if (!ignoreProfile && community?.id) {
       const updatedProfile = new MinimumProfile(address, community?.id);
 
-      // the `ignoreProfile` var tells that we have to refetch any profile data related to provided
-      // address and chain. This method mimic react query for non-react files and as the name suggests
-      // its discouraged to use and should be avoided at all costs. Its used here because we have some
-      // wallet related code and a lot of other code that depends on the `new Account(...)` instance.
-      // As an effort to gradually migrate, this method is used. After this account controller is
-      // de-side-effected (all api calls removed from here). Then we would be in a better position to
-      // remove this discouraged method
-      DISCOURAGED_NONREACTIVE_fetchProfilesByAddress(
-        community?.id,
-        address,
-      ).then((res) => {
-        const data = res[0];
-        if (!data) {
-          console.log(
-            'No profile data found for address',
-            address,
-            'on chain',
-            community?.id,
-          );
-        } else {
-          updatedProfile.initialize(
-            data?.userId,
-            data?.name,
-            data.address,
-            data?.avatarUrl,
-            updatedProfile.chain,
-            data?.lastActive,
-          );
-        }
-        // manually trigger an update signal when data is fetched
-        NewProfilesController.Instance.isFetched.emit('redraw');
-      });
+      // trpcVanillaClient.user.getUserAddresses
+      //   .query({ communities: community?.id, addresses: address })
+      //   .then((addresses) => {
+      //     if (addresses.length === 0) {
+      //       console.log(
+      //         'No profile data found for address',
+      //         address,
+      //         'on chain',
+      //         community?.id,
+      //       );
+      //     } else {
+      //       const addr = addresses[0];
+      //       updatedProfile.initialize(
+      //         addr.userId,
+      //         addr.name,
+      //         addr.address,
+      //         addr.avatarUrl ?? '',
+      //         updatedProfile.chain,
+      //         addr.lastActive ? new Date(addr.lastActive) : null,
+      //       );
+      //     }
+      //     // manually trigger an update signal when data is fetched
+      //     NewProfilesController.Instance.isFetched.emit('redraw');
+      //   });
 
       this._profile = updatedProfile;
     }

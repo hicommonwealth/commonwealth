@@ -1,6 +1,7 @@
 import { Roles, WalletId } from '@hicommonwealth/shared';
 import { z } from 'zod';
 import { PG_INT } from '../utils';
+import { Tags } from './tag.schemas';
 
 export const ApiKey = z.object({
   user_id: PG_INT.optional(),
@@ -32,6 +33,8 @@ export const ProfileTags = z.object({
 
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional(),
+
+  Tag: Tags.nullish(),
 });
 
 export const User = z.object({

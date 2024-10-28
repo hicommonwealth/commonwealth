@@ -47,7 +47,6 @@ import useAppStatus from '../../../hooks/useAppStatus';
 import { useBrowserAnalyticsTrack } from '../../../hooks/useBrowserAnalyticsTrack';
 import Account from '../../../models/Account';
 import IWebWallet from '../../../models/IWebWallet';
-import { DISCOURAGED_NONREACTIVE_fetchProfilesByAddress } from '../../../state/api/profiles/fetchProfilesByAddress';
 
 type UseAuthenticationProps = {
   onSuccess?: (
@@ -322,26 +321,25 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       // Important: when we first create an account and verify it, the user id
       // is initially null from api (reloading the page will update it), to correct
       // it we need to get the id from api
-      const updatedProfiles =
-        await DISCOURAGED_NONREACTIVE_fetchProfilesByAddress(
-          // @ts-expect-error <StrictNullChecks>
-          account.profile.chain,
-          // @ts-expect-error <StrictNullChecks>
-          account.profile.address,
-        );
-      const currentUserUpdatedProfile = updatedProfiles[0];
-      if (!currentUserUpdatedProfile) {
-        console.log('No profile yet.');
-      } else {
-        account?.profile?.initialize(
-          currentUserUpdatedProfile.userId,
-          currentUserUpdatedProfile.name,
-          currentUserUpdatedProfile.address,
-          currentUserUpdatedProfile.avatarUrl,
-          account?.profile?.chain,
-          currentUserUpdatedProfile.lastActive,
-        );
-      }
+      // const userAddresses = await trpcVanillaClient.user.getUserAddresses.query(
+      //   {
+      //     communities: account!.profile!.chain,
+      //     addresses: account!.profile!.address,
+      //   },
+      // );
+      // const currentUserAddress = userAddresses[0];
+      // if (!currentUserAddress) {
+      //   console.log('No profile yet.');
+      // } else {
+      //   account?.profile?.initialize(
+      //     currentUserAddress.userId,
+      //     currentUserAddress.name,
+      //     currentUserAddress.address,
+      //     currentUserAddress.avatarUrl ?? '',
+      //     account?.profile?.chain,
+      //     new Date(currentUserAddress.lastActive),
+      //   );
+      // }
     } catch (e) {
       console.log(e);
       notifyError('Failed to create account. Please try again.');

@@ -17,8 +17,6 @@ export const ApiEndpoints = {
   FETCH_COMMENTS: '/viewComments',
   FETCH_RELATED_COMMUNITIES: '/relatedCommunities',
   FETCH_THREADS: '/threads',
-  FETCH_PROFILES_BY_ADDRESS: '/getAddressProfile',
-  FETCH_PROFILES_BY_ID: '/profile/v2',
   FETCH_NODES: '/nodes',
   FETCH_DOMAIN: '/domain',
   FETCH_PROPOSALS: '/proposals',
