@@ -30,7 +30,7 @@ describe('Launchpad', () => {
     });
 
     const [community] = await seed('Community', {
-      namespace: 'testtest',
+      namespace: 'testt',
       chain_node_id: node?.id,
       lifetime_thread_count: 0,
       profile_count: 1,
@@ -69,7 +69,7 @@ describe('Launchpad', () => {
     async () => {
       payload = {
         transaction_hash:
-          '0x82802acbf566bf2f1c9ca7b2469810ac7017afc262ff60fe602ab3768ddb186d',
+          '0xc0e59dfc71f0e81f33b2f96e7fad5d80d4bf81298bf7dd5afdd8913771e47fad',
         // @ts-ignore
         chain_node_id: node?.id,
         description: 'test',
@@ -83,10 +83,9 @@ describe('Launchpad', () => {
       });
 
       expect(results?.token_address).to.equal(
-        '0x6893cfa091ddb564cf739ba3bfd08fa9d69f0061',
+        '0x99a3574fed7b8935709bb13f35448bf7922770ea',
       );
-      expect(results?.symbol).to.equal('ewrw');
-      expect(results?.namespace).to.equal('fill this out when fixed');
+      expect(results?.symbol).to.equal('tst');
     },
   );
 });
