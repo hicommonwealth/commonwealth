@@ -30,7 +30,12 @@ export const KnockNotifications = () => {
   const notifButtonRef = useRef(null);
 
   useEffect(() => {
-    if (!user.id) {
+    if (!user.id || !user.isLoggedIn) {
+      return;
+    }
+
+    if (!user.knockJWT) {
+      console.warn('user knockJWT not set!  Will not attempt to identify.');
       return;
     }
 
@@ -46,9 +51,9 @@ export const KnockNotifications = () => {
     }
 
     doAsync().catch(console.error);
-  }, [user.email, user.id, user.knockJWT]);
+  }, [user.email, user.id, user.isLoggedIn, user.knockJWT]);
 
-  if (user.id === 0) {
+  if (!user.id || !user.isLoggedIn) {
     return null;
   }
 

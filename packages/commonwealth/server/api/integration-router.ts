@@ -1,8 +1,10 @@
 import { express } from '@hicommonwealth/adapters';
 import { AppError } from '@hicommonwealth/core';
-import { ChainEvents, Snapshot } from '@hicommonwealth/model';
+import { ChainEvents, Contest, Snapshot, config } from '@hicommonwealth/model';
 import { Router, raw } from 'express';
-import { config } from '../config';
+import farcasterRouter from 'server/farcaster/router';
+import { validateNeynarWebhook } from 'server/middleware/validateNeynarWebhook';
+import { config as serverConfig } from '../config';
 
 const PATH = '/api/integration';
 
@@ -26,13 +28,42 @@ function build() {
     express.command(ChainEvents.ChainEventCreated()),
   );
 
+  if (config.CONTESTS.FLAG_FARCASTER_CONTEST) {
+    // Farcaster frames
+    router.use('/farcaster/contests', farcasterRouter);
+
+    // Farcaster webhooks/actions
+    router.post(
+      '/farcaster/CastCreated',
+      validateNeynarWebhook(config.CONTESTS.NEYNAR_CAST_CREATED_WEBHOOK_SECRET),
+      express.command(Contest.FarcasterCastCreatedWebhook()),
+    );
+
+    router.post(
+      '/farcaster/ReplyCastCreated',
+      validateNeynarWebhook(config.CONTESTS.NEYNAR_CAST_CREATED_WEBHOOK_SECRET),
+      express.command(Contest.FarcasterReplyCastCreatedWebhook()),
+    );
+
+    router.get(
+      '/farcaster/CastUpvoteAction',
+      express.query(Contest.GetFarcasterUpvoteActionMetadata()),
+    );
+
+    router.post(
+      '/farcaster/CastUpvoteAction',
+      validateNeynarWebhook(config.CONTESTS.NEYNAR_CAST_CREATED_WEBHOOK_SECRET),
+      express.command(Contest.FarcasterUpvoteAction()),
+    );
+  }
+
   router.post(
     '/snapshot/webhook',
     (req, _, next) => {
       const headerSecret = req.headers['authentication'];
       if (
-        config.SNAPSHOT_WEBHOOK_SECRET &&
-        headerSecret !== config.SNAPSHOT_WEBHOOK_SECRET
+        serverConfig.SNAPSHOT_WEBHOOK_SECRET &&
+        headerSecret !== serverConfig.SNAPSHOT_WEBHOOK_SECRET
       ) {
         throw new AppError('Unauthorized', 401);
       }

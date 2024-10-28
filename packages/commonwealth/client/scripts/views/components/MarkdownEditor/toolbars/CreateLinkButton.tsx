@@ -1,7 +1,7 @@
 import { openLinkEditDialog$, usePublisher } from 'commonwealth-mdxeditor';
 import React, { useCallback } from 'react';
+import { EditorTooltip } from 'views/components/MarkdownEditor/toolbars/EditorTooltip';
 import CWIconButton from 'views/components/component_kit/new_designs/CWIconButton';
-import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import './HeadingButton.scss';
 
 export type CWCreateLinkButtonProps = Readonly<{
@@ -21,7 +21,7 @@ export const CreateLinkButton = (props: CWCreateLinkButtonProps) => {
   );
 
   return (
-    <CWTooltip
+    <EditorTooltip
       content="Create link"
       renderTrigger={(handleInteraction) => (
         <CWIconButton

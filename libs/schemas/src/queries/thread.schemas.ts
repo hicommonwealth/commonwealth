@@ -6,6 +6,7 @@ import {
   linksSchema,
   paginationSchema,
 } from '../utils';
+import { PaginatedResultSchema } from './pagination';
 
 export const OrderByQueriesKeys = z.enum([
   'createdAt:asc',
@@ -164,3 +165,37 @@ export const DEPRECATED_GetBulkThreads = z.object({
   status: z.string().optional(),
   withXRecentComments: z.coerce.number().optional(),
 });
+
+export const GetThreadCount = {
+  input: z.object({
+    community_id: z.string(),
+  }),
+  output: z.number(),
+};
+
+export const GetActiveThreads = {
+  input: z.object({
+    community_id: z.string(),
+    threads_per_topic: z.coerce.number().min(0).max(10).optional(),
+    withXRecentComments: z.coerce.number().optional(),
+  }),
+  output: z.array(Thread),
+};
+
+export const SearchThreads = {
+  input: z.object({
+    communityId: z.string(),
+    searchTerm: z.string(),
+    threadTitleOnly: z.coerce.boolean().default(false),
+    limit: z.coerce.number().optional(),
+    page: z.coerce.number().optional(),
+    orderBy: z
+      .enum(['last_active', 'rank', 'created_at', 'profile_name'])
+      .optional(),
+    orderDirection: z.enum(['ASC', 'DESC']).optional(),
+    includeCount: z.coerce.boolean().default(false),
+  }),
+  output: PaginatedResultSchema.extend({
+    results: z.array(Thread),
+  }),
+};

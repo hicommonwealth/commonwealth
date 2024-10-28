@@ -390,7 +390,7 @@ const RecurringContestContentUpvotedMapper: EvmMapper<
       contest_id: BigNumber.from(contestId).toNumber(),
       content_id: BigNumber.from(contentId).toNumber(),
       voter_address: voter,
-      voting_power: BigNumber.from(votingPower).toNumber(),
+      voting_power: BigNumber.from(votingPower).toString(),
     },
   }),
 };
@@ -406,7 +406,7 @@ const SingleContestContentUpvotedMapper: EvmMapper<
       contest_id: BigNumber.from(0).toNumber(),
       content_id: BigNumber.from(contentId).toNumber(),
       voter_address: voter,
-      voting_power: BigNumber.from(votingPower).toNumber(),
+      voting_power: BigNumber.from(votingPower).toString(),
     },
   }),
 };
