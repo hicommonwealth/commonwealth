@@ -363,7 +363,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
                   isOnArchivePage
                     ? filteredThreads.length || 0
                     : threads
-                      ? community?.lifetime_thread_count || 0
+                      ? threads.length || 0
                       : 0
                 }
                 isIncludingSpamThreads={includeSpamThreads}
