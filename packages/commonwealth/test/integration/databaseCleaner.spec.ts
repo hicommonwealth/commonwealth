@@ -195,7 +195,7 @@ describe('DatabaseCleaner Tests', async () => {
       const comment = await models.Comment.create({
         thread_id: thread.id!,
         address_id: address.id!,
-        text: 'Testing',
+        body: 'Testing',
         reaction_count: 0,
         reaction_weights_sum: '0',
         search: getCommentSearchVector('Testing'),
