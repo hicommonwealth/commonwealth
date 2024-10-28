@@ -351,7 +351,7 @@ export function UpdateThread(): Command<
               attributes: [
                 'id',
                 'address_id',
-                'text',
+                'body',
                 'created_at',
                 'updated_at',
                 'deleted_at',
