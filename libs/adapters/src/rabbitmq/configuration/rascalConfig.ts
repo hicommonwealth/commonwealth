@@ -213,6 +213,12 @@ export function getAllRascalConfigs(
         RascalRoutingKeys.FarcasterWorkerPolicyVoteCreated,
       ],
     },
+    [RascalBindings.LaunchpadPolicy]: {
+      source: RascalExchanges.MessageRelayer,
+      destination: RascalQueues.FarcasterWorkerPolicy,
+      destinationType: 'queue',
+      bindingKeys: [RascalRoutingKeys.LaunchpadWorkerPolicyTokenLaunched],
+    },
   };
 
   const allPublications: Record<RascalPublications, PublicationConfig> = {
