@@ -33,6 +33,7 @@ interface SearchBarDropdownProps {
   onSearchItemClick?: () => void;
 }
 
+/* eslint-disable react/no-multi-comp */
 const SearchBarPreviewSection: FC<SearchBarPreviewSectionProps> = ({
   searchResults,
   searchTerm,
