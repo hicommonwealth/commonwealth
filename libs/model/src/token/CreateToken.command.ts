@@ -58,20 +58,16 @@ export async function createTokenHandler(
     );
   }
 
-  const token = await models.Token.create(
-    {
-      token_address: tokenAddress,
-      namespace,
-      name,
-      symbol,
-      initial_supply: totalSupply,
-      chain_node_id: chainNodeId,
-      is_locked: false,
-      description: description ?? null,
-      icon_url: iconUrl ?? null,
-    },
-    { logging: true },
-  );
+  const token = await models.Token.create({
+    token_address: tokenAddress,
+    namespace,
+    name,
+    symbol,
+    initial_supply: totalSupply,
+    is_locked: false,
+    description: description ?? null,
+    icon_url: iconUrl ?? null,
+  });
 
   return token!.toJSON();
 }

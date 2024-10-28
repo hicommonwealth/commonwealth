@@ -31,18 +31,7 @@ export function GetTokens(): Query<typeof schemas.GetTokens> {
       };
 
       const sql = `
-        SELECT
-        name,
-        icon_url,
-        description,
-        symbol,
-        chain_node_id,
-        base,
-        created_at,
-        updated_at,
-        author_address,
-        community_id,
-        launchpad_contract_address,
+        SELECT *,
         count(*) OVER() AS total
         FROM "Tokens"
         ${search ? 'WHERE LOWER(name) LIKE :search' : ''}

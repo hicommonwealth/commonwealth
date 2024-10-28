@@ -219,9 +219,9 @@ export const QuickTokenLaunchForm = ({
         });
 
         await createToken({
-          transaction_hash: txReceipt,
+          transaction_hash: txReceipt.transactionHash,
           chain_node_id: baseNode.id,
-          name: sanitizedTokenInfo.name,
+          community_id: communityId,
           icon_url: sanitizedTokenInfo.imageURL,
         });
 

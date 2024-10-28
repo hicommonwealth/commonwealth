@@ -36,7 +36,7 @@ export const factoryContracts: {
     communityStake: '0xd097926d8765A7717206559E7d19EECCbBa68c18',
     launchpad: '0xe1aa28e217a6a6bf39f74455ddd4d24aa4fa0aec',
     lpBondingCurve: '0xaEA78B289A769DA4dde967262b5076ea8FE56607',
-    tokenCommunityManager: '0xfa9ff727d2ee42cc337d2008a74440bff8d2e9ae',
+    tokenCommunityManager: '0x5dF8A174D95D01e5508B1f3d3F691af226eC8888',
     chainId: 84532,
   },
   [ValidChains.Blast]: {

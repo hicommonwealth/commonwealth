@@ -171,7 +171,7 @@ module.exports = {
         'Communities',
         'namespace',
         {
-          type: Sequelize.STRING, // up to 78 digits with no decimal places
+          type: Sequelize.STRING,
           allowNull: true,
           unique: true,
         },
