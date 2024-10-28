@@ -462,7 +462,7 @@ export class Thread implements IUniqueId {
           parent_id: null,
           reactions: [],
           CommentVersionHistories: [],
-          reaction_weights_sum: '0',
+          reaction_weights_sum: 0,
           canvas_signed_data: null,
           canvas_msg_id: null,
           content_url: rc.content_url || null,
