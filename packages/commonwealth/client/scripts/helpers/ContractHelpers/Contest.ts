@@ -244,7 +244,7 @@ class Contest extends ContractBase {
       feeManagerABI,
       oneOff,
     );
-    return contestBalance;
+    return parseInt(contestBalance, 10);
   }
 }
 
