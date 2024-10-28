@@ -12,10 +12,10 @@ export function resizeRootElementForKeyboard() {
 
   const height = Math.floor(window.visualViewport.height);
 
-  const root = document.getElementById('root');
+  const elementToResize = document.getElementById('root');
 
-  if (root) {
-    root.style.maxHeight = `${height}px`;
+  if (elementToResize) {
+    elementToResize.style.maxHeight = `${height}px`;
   }
 }
 
