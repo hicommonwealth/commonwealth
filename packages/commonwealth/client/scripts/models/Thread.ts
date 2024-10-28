@@ -432,6 +432,7 @@ export class Thread implements IUniqueId {
       (rc) =>
         new Comment({
           authorChain: this.authorCommunity,
+          community_id: this.authorCommunity,
           id: rc?.id,
           thread_id: id,
           author: rc?.address,

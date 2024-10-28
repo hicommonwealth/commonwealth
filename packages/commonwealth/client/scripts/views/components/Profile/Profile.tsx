@@ -30,7 +30,6 @@ const Profile = ({ userId }: ProfileProps) => {
   const [threads, setThreads] = useState<Thread[]>([]);
   const [isOwner, setIsOwner] = useState<boolean>();
   const [comments, setComments] = useState<CommentWithAssociatedThread[]>([]);
-
   const { data, error, isLoading } = useFetchProfileByIdQuery({
     userId,
     apiCallEnabled: !!userId,
