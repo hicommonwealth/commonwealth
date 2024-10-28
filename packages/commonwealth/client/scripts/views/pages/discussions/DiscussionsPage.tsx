@@ -353,9 +353,12 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
                           </span>
                           <CWIconButton
                             iconName="copy"
-                            onClick={() =>
-                              saveToClipboard(topicObj.token_address!, true)
-                            }
+                            onClick={() => {
+                              saveToClipboard(
+                                topicObj.token_address!,
+                                true,
+                              ).catch(console.error);
+                            }}
                           />
                         </CWText>
                       </>
