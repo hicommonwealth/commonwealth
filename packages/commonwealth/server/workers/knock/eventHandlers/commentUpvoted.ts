@@ -90,7 +90,7 @@ export const processCommentUpvoted: EventHandler<
       reaction: payload.reaction,
       comment_id: payload.comment_id,
       comment_body: safeTruncateBody(
-        getDecodedString(commentAndAuthor.text),
+        getDecodedString(commentAndAuthor.body),
         255,
       ),
       created_at: payload.created_at!.toISOString(),
