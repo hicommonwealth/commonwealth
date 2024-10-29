@@ -1,3 +1,4 @@
+import { MIN_CHARS_TO_SHOW_MORE } from '@hicommonwealth/shared';
 import clsx from 'clsx';
 import { isDefaultStage, threadStageToLabel } from 'helpers';
 import {
@@ -203,6 +204,7 @@ export const ThreadCard = ({
               <MarkdownViewerUsingQuillOrNewEditor
                 markdown={thread.body}
                 cutoffLines={4}
+                maxChars={MIN_CHARS_TO_SHOW_MORE}
                 customShowMoreButton={
                   <CWText type="b1" className="show-more-btn">
                     Show more
