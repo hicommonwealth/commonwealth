@@ -33,13 +33,14 @@ const AccountConnectionIndicator = ({
               <div className={clsx('status-light', { connected })} />
               <CWIdentificationTag address={address} />
               <CWTooltip
+                placement="top"
                 content="address copied!"
                 renderTrigger={(handleInteraction) => {
                   return (
                     <CopySimple
                       size={20}
                       onMouseDown={(event) => {
-                        saveToClipboard(address);
+                        saveToClipboard(address).catch(console.error);
                         handleInteraction(event);
                       }}
                       onMouseLeave={handleInteraction}
