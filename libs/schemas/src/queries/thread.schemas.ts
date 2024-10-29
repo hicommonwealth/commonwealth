@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { ContestManager, Thread } from '../entities';
+import { Comment, ContestManager, Thread } from '../entities';
 import { ContestAction } from '../projections';
 import { PG_INT, paginationSchema } from '../utils';
 import { TopicView } from './community.schemas';
@@ -65,6 +65,7 @@ export const ThreadView = Thread.extend({
   associatedContests: z.array(ContestView).optional(),
   topic: TopicView.optional(),
   ContestActions: z.array(ContestActionView).optional(),
+  Comments: z.array(Comment).optional(),
 });
 
 export const OrderByQueriesKeys = z.enum([

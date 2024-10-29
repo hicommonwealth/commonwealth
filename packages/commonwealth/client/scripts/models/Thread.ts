@@ -318,7 +318,7 @@ export class Thread implements IUniqueId {
       t.ContestActions,
     );
     this.contentUrl = t.content_url;
-    this.recentComments = (t.recentComments || []).map(
+    this.recentComments = (t.recentComments ?? t.Comments ?? []).map(
       (rc) =>
         new Comment({
           authorChain: this.authorCommunity,
@@ -330,12 +330,13 @@ export class Thread implements IUniqueId {
           created_at: rc?.created_at ? moment(rc?.created_at) : null,
           text: rc?.text,
           Address: {
-            user_id: rc?.user_id,
-            address: rc?.address,
+            user_id: rc?.user_id ?? rc.Address?.User?.id,
+            address: rc?.address ?? rc.Address?.address,
             User: {
               profile: {
-                name: rc?.profile_name,
-                avatar_url: rc?.profile_avatar,
+                name: rc?.profile_name ?? rc.Address?.User?.profile?.name,
+                avatar_url:
+                  rc?.profile_avatar ?? rc.Address?.User?.profile?.avatar_url,
               },
             },
           },
