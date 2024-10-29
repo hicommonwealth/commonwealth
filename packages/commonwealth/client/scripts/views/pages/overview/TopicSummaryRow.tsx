@@ -144,6 +144,7 @@ export const TopicSummaryRow = ({
               disabledActionsTooltipText={disabledActionsTooltipText}
               hideReactionButton
               hideUpvotesDrawer
+              expandCommentBtnVisible
             />
           );
         })}
