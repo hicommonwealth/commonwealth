@@ -40,7 +40,7 @@ export const ReactionButton = ({
   undoUpvoteDisabled,
 }: ReactionButtonProps) => {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
-  const reactors = thread?.associatedReactions?.map((t) => t.address);
+  const reactors = thread?.associatedReactions?.map((t) => t.address!);
 
   const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
   const user = useUserStore();
