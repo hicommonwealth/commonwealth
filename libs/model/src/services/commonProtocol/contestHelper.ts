@@ -28,7 +28,7 @@ export type ContestScores = {
     winningAddress: string;
     voteCount: string;
   }[];
-  contestBalance: number;
+  contestBalance: string;
 };
 
 /**
@@ -257,7 +257,7 @@ export const getContestBalance = async (
   rpcNodeUrl: string,
   contest: string,
   oneOff?: boolean,
-): Promise<number> => {
+): Promise<string> => {
   const web3 = new Web3(rpcNodeUrl);
 
   const contestInstance = new web3.eth.Contract(
