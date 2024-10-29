@@ -4,7 +4,6 @@
 import * as core from '../../../../../core';
 import { CreateCommunityRequestBase } from '../../types/CreateCommunityRequestBase';
 import { CreateCommunityRequestType } from '../../types/CreateCommunityRequestType';
-
 export const CreateCommunityRequest = core.serialization.object({
   id: core.serialization.string(),
   name: core.serialization.string(),

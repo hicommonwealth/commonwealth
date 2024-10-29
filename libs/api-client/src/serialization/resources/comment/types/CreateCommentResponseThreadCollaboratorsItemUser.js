@@ -6,7 +6,6 @@ import { CreateCommentResponseThreadCollaboratorsItemUserApiKey } from './Create
 import { CreateCommentResponseThreadCollaboratorsItemUserEmailNotificationInterval } from './CreateCommentResponseThreadCollaboratorsItemUserEmailNotificationInterval';
 import { CreateCommentResponseThreadCollaboratorsItemUserProfile } from './CreateCommentResponseThreadCollaboratorsItemUserProfile';
 import { CreateCommentResponseThreadCollaboratorsItemUserProfileTagsItem } from './CreateCommentResponseThreadCollaboratorsItemUserProfileTagsItem';
-
 export const CreateCommentResponseThreadCollaboratorsItemUser =
   core.serialization.object({
     id: core.serialization.number().optional(),

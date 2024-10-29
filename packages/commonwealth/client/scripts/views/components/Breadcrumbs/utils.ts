@@ -175,14 +175,8 @@ export const generateBreadcrumbs = (
     }
 
     if (pathSegments.includes('contests')) {
-      if (pathSegments.length === 4 && pathSegments[1] === 'manage') {
-        if (pathSegments[3] === 'launch') {
-          pathSegments[3] = 'Launch Contest';
-        } else {
-          pathSegments[3] = 'Edit Contest';
-        }
-      } else {
-        pathSegments[2] = 'Leaderboard';
+      if (index === 2 && pathSegment !== 'launch') {
+        label = 'Edit';
       }
     }
 

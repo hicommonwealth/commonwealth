@@ -11,6 +11,7 @@ const getContestBalance = async ({
   contestAddress,
   chainRpc,
   ethChainId,
+  isOneOff,
 }: UseGetContestBalanceProps) => {
   const contest = new Contest(
     contestAddress,
@@ -18,7 +19,7 @@ const getContestBalance = async ({
     chainRpc,
   );
 
-  return await contest.getContestBalance();
+  return await contest.getContestBalance(isOneOff);
 };
 
 interface UseGetContestBalanceQueryProps {
@@ -26,6 +27,7 @@ interface UseGetContestBalanceQueryProps {
   chainRpc: string;
   ethChainId: number;
   apiEnabled?: boolean;
+  isOneOff: boolean;
 }
 
 const useGetContestBalanceQuery = ({
@@ -33,6 +35,7 @@ const useGetContestBalanceQuery = ({
   chainRpc,
   ethChainId,
   apiEnabled = true,
+  isOneOff,
 }: UseGetContestBalanceQueryProps) => {
   return useQuery({
     queryKey: [
@@ -40,8 +43,10 @@ const useGetContestBalanceQuery = ({
       contestAddress,
       chainRpc,
       ethChainId,
+      isOneOff,
     ],
-    queryFn: () => getContestBalance({ contestAddress, chainRpc, ethChainId }),
+    queryFn: () =>
+      getContestBalance({ contestAddress, chainRpc, ethChainId, isOneOff }),
     staleTime: GET_CONTEST_BALANCE_STALE_TIME,
     enabled: !!contestAddress && apiEnabled,
   });

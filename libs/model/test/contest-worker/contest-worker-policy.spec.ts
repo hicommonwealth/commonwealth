@@ -94,7 +94,7 @@ describe('Contest Worker Policy', () => {
             stage: '',
             view_count: 0,
             reaction_count: 0,
-            reaction_weights_sum: 0,
+            reaction_weights_sum: '0',
             comment_count: 0,
             deleted_at: undefined,
             pinned: false,
@@ -147,7 +147,7 @@ describe('Contest Worker Policy', () => {
         content_url: '/ethhh/discussion/888',
         thread_id: threadId,
         thread_title: threadTitle,
-        voting_power: 10,
+        voting_power: '10',
         created_at: new Date(),
       });
 

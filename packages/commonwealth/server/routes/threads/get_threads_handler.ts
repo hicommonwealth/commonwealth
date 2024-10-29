@@ -1,5 +1,8 @@
-import { AppError } from '@hicommonwealth/core';
+import { AppError, query } from '@hicommonwealth/core';
 import { Thread } from '@hicommonwealth/model';
+import * as schemas from '@hicommonwealth/schemas';
+import { GetThreadsOrderBy, GetThreadsStatus } from '@hicommonwealth/schemas';
+import { z } from 'zod';
 import { ALL_COMMUNITIES } from '../../middleware/databaseValidationService';
 import { ServerControllers } from '../../routing/router';
 import {
@@ -33,6 +36,7 @@ export type ActiveThreadsRequestQuery = {
 export type SearchThreadsRequestQuery = {
   search: string;
   thread_title_only?: string;
+  order_by?: 'last_active' | 'rank' | 'created_at' | 'profile_name';
 } & PaginationQueryParams;
 export type BulkThreadsRequestQuery = {
   topic_id: string;
@@ -66,7 +70,7 @@ export const getThreadsHandler = async (
   >,
   res: TypedResponse<GetThreadsResponse>,
 ) => {
-  const queryValidationResult = Thread.GetThreadsParamsSchema.safeParse(
+  const queryValidationResult = schemas.DEPRECATED_GetThreads.safeParse(
     req.query,
   );
 
@@ -74,15 +78,8 @@ export const getThreadsHandler = async (
     throw new AppError(formatErrorPretty(queryValidationResult));
   }
 
-  const {
-    thread_ids,
-    bulk,
-    active,
-    search,
-    count,
-    community_id,
-    include_count,
-  } = queryValidationResult.data;
+  const { thread_ids, bulk, active, search, community_id, include_count } =
+    queryValidationResult.data;
 
   // get threads by IDs
   if (thread_ids) {
@@ -95,7 +92,7 @@ export const getThreadsHandler = async (
   // get bulk threads
   if (bulk) {
     const bulkQueryValidationResult =
-      Thread.GetBulkThreadsParamsSchema.safeParse(req.query);
+      schemas.DEPRECATED_GetBulkThreads.safeParse(req.query);
 
     if (bulkQueryValidationResult.success === false) {
       throw new AppError(formatErrorPretty(bulkQueryValidationResult));
@@ -116,31 +113,25 @@ export const getThreadsHandler = async (
       withXRecentComments,
     } = bulkQueryValidationResult.data;
 
-    const bulkThreads = await controllers.threads.getBulkThreads({
-      communityId: community_id,
-      // @ts-expect-error StrictNullChecks
-      stage,
-      // @ts-expect-error StrictNullChecks
-      topicId: topic_id,
-      // @ts-expect-error StrictNullChecks
-      includePinnedThreads,
-      // @ts-expect-error StrictNullChecks
-      page,
-      // @ts-expect-error StrictNullChecks
-      limit,
-      // @ts-expect-error StrictNullChecks
-      orderBy,
-      // @ts-expect-error StrictNullChecks
-      fromDate: from_date,
-      // @ts-expect-error StrictNullChecks
-      toDate: to_date,
-      // @ts-expect-error StrictNullChecks
-      archived: archived,
-      // @ts-expect-error StrictNullChecks
-      contestAddress,
-      // @ts-expect-error StrictNullChecks
-      status,
-      withXRecentComments,
+    const bulkThreads = await query(Thread.GetThreads(), {
+      actor: {
+        user: { email: '' },
+      },
+      payload: {
+        page,
+        limit,
+        community_id,
+        stage,
+        topic_id,
+        includePinnedThreads,
+        order_by: orderBy as z.infer<typeof GetThreadsOrderBy>,
+        from_date,
+        to_date,
+        archived: archived,
+        contestAddress,
+        status: status as z.infer<typeof GetThreadsStatus>,
+        withXRecentComments,
+      },
     });
     return success(res, bulkThreads);
   }
@@ -150,10 +141,13 @@ export const getThreadsHandler = async (
     const { threads_per_topic, withXRecentComments } =
       req.query as ActiveThreadsRequestQuery;
 
-    const activeThreads = await controllers.threads.getActiveThreads({
-      communityId: community_id,
-      threadsPerTopic: parseInt(threads_per_topic, 10),
-      withXRecentComments,
+    const activeThreads = await query(Thread.GetActiveThreads(), {
+      actor: { user: { email: '' } },
+      payload: {
+        community_id,
+        threads_per_topic: parseInt(threads_per_topic, 10),
+        withXRecentComments,
+      },
     });
     return success(res, activeThreads);
   }
@@ -168,29 +162,20 @@ export const getThreadsHandler = async (
       throw new AppError(Errors.NoCommunity);
     }
 
-    const searchResults = await controllers.threads.searchThreads({
-      communityId: community_id,
-      searchTerm: search,
-      threadTitleOnly: thread_title_only === 'true',
-      // @ts-expect-error StrictNullChecks
-      limit: parseInt(limit, 10) || 0,
-      // @ts-expect-error StrictNullChecks
-      page: parseInt(page, 10) || 0,
-      orderBy: order_by,
-      orderDirection: order_direction as any,
-      includeCount: include_count,
+    const searchResults = await query(Thread.SearchThreads(), {
+      actor: { user: { email: '' } },
+      payload: {
+        communityId: community_id,
+        searchTerm: search,
+        threadTitleOnly: thread_title_only === 'true',
+        limit: parseInt(limit!, 10) || 0,
+        page: parseInt(page!, 10) || 0,
+        orderBy: order_by,
+        orderDirection: order_direction,
+        includeCount: include_count,
+      },
     });
     return success(res, searchResults);
-  }
-
-  // count threads
-  if (count) {
-    const { limit } = req.query as CountThreadsRequestQuery;
-    const countResult = await controllers.threads.countThreads({
-      communityId: community_id,
-      limit,
-    });
-    return success(res, { count: countResult });
   }
 
   throw new AppError(Errors.InvalidRequest);

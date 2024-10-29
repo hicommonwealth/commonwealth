@@ -1,5 +1,5 @@
 import Thread from 'models/Thread';
-import Topic from 'models/Topic';
+import type { Topic } from 'models/Topic';
 import { ApiEndpoints, queryClient } from 'state/api/config';
 
 /**
@@ -99,7 +99,6 @@ export const cacheTypes = {
   SINGLE_THREAD: 'single',
   BULK_THREADS: 'bulk',
   ACTIVE_THREADS: 'active',
-  COUNT_THREADS: 'count',
 };
 
 const updateCacheForBulkThreads = ({

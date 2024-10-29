@@ -7,11 +7,9 @@ import React, { useEffect, useRef, useState } from 'react';
 import { matchRoutes, useLocation } from 'react-router-dom';
 import app from 'state';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
-import useGetFeeManagerBalanceQuery from 'state/api/communityStake/getFeeManagerBalance';
 import { useFetchTopicsQuery } from 'state/api/topics';
 import useUserStore from 'state/ui/user';
 import Permissions from 'utils/Permissions';
-import { useCommunityStake } from 'views/components/CommunityStake';
 import MarkdownViewerUsingQuillOrNewEditor from 'views/components/MarkdownViewerWithFallback';
 import { Select } from 'views/components/Select';
 import { CWCheckbox } from 'views/components/component_kit/cw_checkbox';
@@ -22,8 +20,7 @@ import { EditTopicModal } from 'views/modals/edit_topic_modal';
 import { Contest } from 'views/pages/CommunityManagement/Contests/ContestsList';
 import ContestCard from 'views/pages/CommunityManagement/Contests/ContestsList/ContestCard';
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
-import { useFlag } from '../../../../hooks/useFlag';
-import type Topic from '../../../../models/Topic';
+import type { Topic } from '../../../../models/Topic';
 import {
   ThreadFeaturedFilterTypes,
   ThreadStage,
@@ -58,7 +55,6 @@ export const HeaderWithFilters = ({
   isOnArchivePage,
   activeContests,
 }: HeaderWithFiltersProps) => {
-  const contestsEnabled = useFlag('contest');
   const navigate = useCommonNavigate();
   const location = useLocation();
   const [topicSelectedToEdit, setTopicSelectedToEdit] = useState<
@@ -69,22 +65,12 @@ export const HeaderWithFilters = ({
   const [rightFiltersDropdownPosition, setRightFiltersDropdownPosition] =
     useState<'bottom-end' | 'bottom-start'>('bottom-end');
 
-  const ethChainId = app?.chain?.meta?.ChainNode?.eth_chain_id || 0;
-  const { stakeData } = useCommunityStake();
-  const namespace = stakeData?.Community?.namespace;
-  const { isContestAvailable, contestsData, stakeEnabled } =
-    useCommunityContests();
+  const { isContestAvailable, contestsData } = useCommunityContests();
 
   const { data: community } = useGetCommunityByIdQuery({
     id: app.activeChainId() || '',
     enabled: !!app.activeChainId(),
     includeNodeInfo: true,
-  });
-
-  const { data: feeManagerBalance } = useGetFeeManagerBalanceQuery({
-    ethChainId: ethChainId!,
-    namespace,
-    apiEnabled: !!ethChainId && !!namespace && stakeEnabled,
   });
 
   const user = useUserStore();
@@ -121,13 +107,13 @@ export const HeaderWithFilters = ({
   );
 
   const featuredTopics = (topics || [])
-    .filter((t) => t.featuredInSidebar)
+    .filter((t) => t.featured_in_sidebar)
     .sort((a, b) => a.name.localeCompare(b.name))
     // @ts-expect-error <StrictNullChecks/>
     .sort((a, b) => a.order - b.order);
 
   const otherTopics = (topics || [])
-    .filter((t) => !t.featuredInSidebar)
+    .filter((t) => !t.featured_in_sidebar)
     .sort((a, b) => a.name.localeCompare(b.name));
 
   const selectedTopic = (topics || []).find((t) => topic && topic === t.name);
@@ -209,8 +195,6 @@ export const HeaderWithFilters = ({
       );
     }
   };
-
-  const contestFiltersVisible = contestsEnabled && isContestAvailable;
 
   return (
     <div className="HeaderWithFilters">
@@ -341,7 +325,7 @@ export const HeaderWithFilters = ({
                     onFilterSelect({ pickedTopic: item.value });
                   }}
                   options={[
-                    ...(contestFiltersVisible
+                    ...(isContestAvailable
                       ? [{ type: 'header', label: 'Topics' }]
                       : []),
                     {
@@ -354,7 +338,7 @@ export const HeaderWithFilters = ({
                       value: t.name,
                       label: t.name,
                     })),
-                    ...(contestFiltersVisible
+                    ...(isContestAvailable
                       ? [
                           { type: 'header-divider', label: 'Contests' },
                           ...contestNameOptions,
@@ -490,7 +474,7 @@ export const HeaderWithFilters = ({
       </div>
 
       {(activeContests || []).map((contest) => {
-        const { end_time, score } =
+        const { end_time } =
           // @ts-expect-error <StrictNullChecks/>
           contest?.contests[0] || {};
 
@@ -505,7 +489,6 @@ export const HeaderWithFilters = ({
             imageUrl={contest.image_url}
             // @ts-expect-error <StrictNullChecks/>
             topics={contest.topics}
-            score={score}
             decimals={contest.decimals}
             ticker={contest.ticker}
             finishDate={end_time ? moment(end_time).toISOString() : ''}
@@ -513,7 +496,7 @@ export const HeaderWithFilters = ({
             isRecurring={!contest.funding_token_address}
             isHorizontal
             showShareButton={false}
-            feeManagerBalance={feeManagerBalance}
+            payoutStructure={contest.payout_structure}
           />
         );
       })}

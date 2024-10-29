@@ -1,4 +1,5 @@
 import { commonProtocol } from '@hicommonwealth/shared';
+import { saveToClipboard } from 'client/scripts/utils/clipboard';
 import clsx from 'clsx';
 import { findDenominationIcon } from 'helpers/findDenomination';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
@@ -131,7 +132,7 @@ const StakeExchangeForm = ({
   const { trackAnalytics } = useBrowserAnalyticsTrack<BaseMixpanelPayload>({
     onAction: true,
   });
-
+  // eslint-disable-next-line @typescript-eslint/no-floating-promises
   const handleBuy = async () => {
     try {
       onSetModalState(ManageCommunityStakeModalState.Loading);
@@ -239,7 +240,7 @@ const StakeExchangeForm = ({
     onSetNumberOfStakeToExchange((prevState) => prevState + 1);
   };
 
-  const handleInput = (e) => {
+  const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
     const numericValue = inputValue.replace(/[^0-9]/g, '');
     const parsed = parseInt(numericValue);
@@ -329,6 +330,8 @@ const StakeExchangeForm = ({
           isSearchable={false}
           options={addressOptions}
           onChange={onSetSelectedAddress}
+          saveToClipboard={saveToClipboard}
+          showCopyIcon={true}
         />
 
         <div className="current-balance-row">
@@ -361,7 +364,7 @@ const StakeExchangeForm = ({
             </CWText>
           </div>
           <CWText type="caption" className="vote-weight">
-            Current vote weight {currentVoteWeight}
+            Current vote weight {currentVoteWeight?.toString()}
           </CWText>
         </div>
 
@@ -416,7 +419,7 @@ const StakeExchangeForm = ({
             Total weight
           </CWText>
           <CWText type="h3" fontWeight="bold" className="number">
-            {expectedVoteWeight}
+            {expectedVoteWeight?.toString()}
           </CWText>
         </div>
 

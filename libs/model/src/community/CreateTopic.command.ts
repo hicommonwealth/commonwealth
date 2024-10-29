@@ -57,13 +57,12 @@ export function CreateTopic(): Command<
         throw new InvalidState(Errors.StakeNotAllowed);
       }
 
-      if (config.CONTESTS.FLAG_FARCASTER_CONTEST) {
+      if (config.CONTESTS.FLAG_WEIGHTED_TOPICS) {
         // new path: stake or ERC20
         if (payload.weighted_voting) {
           options = {
             ...options,
             weighted_voting: payload.weighted_voting,
-            chain_node_id: payload.chain_node_id || undefined,
             token_address: payload.token_address || undefined,
             token_symbol: payload.token_symbol || undefined,
             vote_weight_multiplier: payload.vote_weight_multiplier || undefined,

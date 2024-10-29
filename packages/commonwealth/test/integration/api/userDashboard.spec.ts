@@ -161,12 +161,15 @@ describe('User Dashboard API', () => {
     await dispose()();
   });
 
-  describe('/viewUserActivity', () => {
+  describe('/GetUserActivity', () => {
+    const apiUrl = '/api/v1/GetUserActivity';
+
     test('should fail without JWT', async () => {
       const res = await chai.request
         .agent(server.app)
-        .post('/api/viewUserActivity')
+        .get(apiUrl)
         .set('Accept', 'application/json')
+        .set('address', userAddress)
         .send({ chain });
       expect(res).to.not.be.null;
       expect(res.error).to.not.be.null;
@@ -175,16 +178,15 @@ describe('User Dashboard API', () => {
     test('should return user activity for joined communities only', async () => {
       const res = await chai.request
         .agent(server.app)
-        .post('/api/viewUserActivity')
+        .get(apiUrl)
         .set('Accept', 'application/json')
+        .set('address', userAddress)
         .send({ chain, jwt: userJWT });
 
       expect(res.status).to.be.equal(200);
-      expect(res.body.status).to.be.equal('Success');
-      expect(res.body).to.not.be.null;
-      expect(res.body.result).to.not.be.null;
-
-      const threadIds = res.body.result.map((a) => a.thread.id);
+      expect(res.text).to.not.be.null;
+      const resBody = JSON.parse(res.text);
+      const threadIds = resBody?.results?.map((a) => a.id);
       const chains = await server.models.Thread.findAll({
         attributes: attributesOf<ThreadAttributes>('community_id'),
         where: {
@@ -209,16 +211,16 @@ describe('User Dashboard API', () => {
 
       const res = await chai.request
         .agent(server.app)
-        .post('/api/viewUserActivity')
+        .get(apiUrl)
         .set('Accept', 'application/json')
+        .set('address', userAddress)
         .send({ chain, jwt: userJWT });
 
       expect(res.status).to.be.equal(200);
-      expect(res.body.status).to.be.equal('Success');
-      expect(res.body).to.not.be.null;
-      expect(res.body.result).to.not.be.null;
+      expect(res.text).to.not.be.null;
 
-      const threadIds = res.body.result.map((a) => a.thread.id);
+      const resBody = JSON.parse(res.text);
+      const threadIds = resBody?.results.map((a) => a.id);
       const chains = await server.models.Thread.findAll({
         attributes: attributesOf<ThreadAttributes>('community_id'),
         where: {
@@ -257,16 +259,16 @@ describe('User Dashboard API', () => {
 
       const res = await chai.request
         .agent(server.app)
-        .post('/api/viewUserActivity')
+        .get(apiUrl)
         .set('Accept', 'application/json')
+        .set('address', userAddress)
         .send({ chain, jwt: userJWT });
 
       expect(res.status).to.be.equal(200);
-      expect(res.body.status).to.be.equal('Success');
-      expect(res.body).to.not.be.null;
-      expect(res.body.result).to.not.be.null;
+      expect(res.text).to.not.be.null;
 
-      const threadIds = res.body.result.map((a) => a.thread_id);
+      const resBody = JSON.parse(res.text);
+      const threadIds = resBody.results.map((a) => a.id);
       const chains = (
         await server.models.Thread.findAll({
           attributes: attributesOf<ThreadAttributes>('community_id'),
@@ -282,5 +284,5 @@ describe('User Dashboard API', () => {
     });
   });
 
-  describe.todo('/viewGlobalActivity', () => {});
+  describe.todo('/GetGlobalActivity', () => {});
 });

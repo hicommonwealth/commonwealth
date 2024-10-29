@@ -1,5 +1,5 @@
 import { express, trpc } from '@hicommonwealth/adapters';
-import { Comment, Community } from '@hicommonwealth/model';
+import { Comment, Community, Feed, Thread } from '@hicommonwealth/model';
 import cors from 'cors';
 import { Router } from 'express';
 import passport from 'passport';
@@ -10,7 +10,8 @@ import {
   addRateLimiterMiddleware,
   apiKeyAuthMiddleware,
 } from './external-router-middleware';
-import * as thread from './threads';
+import * as thread from './thread';
+import * as user from './user';
 
 const {
   createCommunity,
@@ -22,26 +23,46 @@ const {
   updateGroup,
   deleteGroup,
   joinCommunity,
+  banAddress,
 } = community.trpcRouter;
 const {
   createThread,
   updateThread,
-  deleteThread,
   createThreadReaction,
   deleteReaction,
+  deleteThread,
 } = thread.trpcRouter;
 const { createComment, updateComment, deleteComment, createCommentReaction } =
   comment.trpcRouter;
+const { getNewContent } = user.trpcRouter;
 
 const api = {
-  getCommunities: trpc.query(
-    Community.GetCommunities,
-    trpc.Tag.Community,
-    true,
-  ),
-  getCommunity: trpc.query(Community.GetCommunity, trpc.Tag.Community, true),
-  getMembers: trpc.query(Community.GetMembers, trpc.Tag.Community, true),
-  getComments: trpc.query(Comment.GetComments, trpc.Tag.Comment, true),
+  getGlobalActivity: trpc.query(Feed.GetGlobalActivity, trpc.Tag.User, {
+    forceSecure: true,
+    ttlSecs: config.NO_GLOBAL_ACTIVITY_CACHE ? undefined : 60 * 5,
+  }),
+  getUserActivity: trpc.query(Feed.GetUserActivity, trpc.Tag.User, {
+    forceSecure: true,
+  }),
+  getNewContent,
+  getCommunities: trpc.query(Community.GetCommunities, trpc.Tag.Community, {
+    forceSecure: true,
+  }),
+  getCommunity: trpc.query(Community.GetCommunity, trpc.Tag.Community, {
+    forceSecure: true,
+  }),
+  getMembers: trpc.query(Community.GetMembers, trpc.Tag.Community, {
+    forceSecure: true,
+  }),
+  getComments: trpc.query(Comment.GetComments, trpc.Tag.Comment, {
+    forceSecure: true,
+  }),
+  getTopics: trpc.query(Community.GetTopics, trpc.Tag.Community, {
+    forceSecure: true,
+  }),
+  getThreads: trpc.query(Thread.GetThreads, trpc.Tag.Thread, {
+    forceSecure: true,
+  }),
   createCommunity,
   updateCommunity,
   createTopic,
@@ -60,11 +81,19 @@ const api = {
   createCommentReaction,
   deleteReaction,
   joinCommunity,
+  banAddress,
 };
 
 const PATH = '/api/v1';
 const router = Router();
-router.use(cors(), express.statsMiddleware);
+router.use(
+  cors({
+    origin: '*',
+    methods: ['GET', 'POST'],
+    allowedHeaders: ['Content-Type', 'api-key', 'address'],
+  }),
+  express.statsMiddleware,
+);
 
 // ===============================================================================
 /**
@@ -88,7 +117,7 @@ const trpcRouter = trpc.router(api);
 trpc.useOAS(router, trpcRouter, {
   title: 'Common API',
   path: PATH,
-  version: '0.0.1',
+  version: '1.0.0',
 });
 
 export { PATH, router };

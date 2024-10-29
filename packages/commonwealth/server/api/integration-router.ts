@@ -1,8 +1,10 @@
 import { express } from '@hicommonwealth/adapters';
+import { AppError } from '@hicommonwealth/core';
 import { ChainEvents, Contest, Snapshot, config } from '@hicommonwealth/model';
 import { Router, raw } from 'express';
 import farcasterRouter from 'server/farcaster/router';
 import { validateNeynarWebhook } from 'server/middleware/validateNeynarWebhook';
+import { config as serverConfig } from '../config';
 
 const PATH = '/api/integration';
 
@@ -57,6 +59,16 @@ function build() {
 
   router.post(
     '/snapshot/webhook',
+    (req, _, next) => {
+      const headerSecret = req.headers['authentication'];
+      if (
+        serverConfig.SNAPSHOT_WEBHOOK_SECRET &&
+        headerSecret !== serverConfig.SNAPSHOT_WEBHOOK_SECRET
+      ) {
+        throw new AppError('Unauthorized', 401);
+      }
+      return next();
+    },
     express.command(Snapshot.CreateSnapshotProposal()),
   );
 

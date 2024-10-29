@@ -8,7 +8,6 @@ import { UpdateCommunityResponseAddressesItemUserApiKey } from './UpdateCommunit
 import { UpdateCommunityResponseAddressesItemUserEmailNotificationInterval } from './UpdateCommunityResponseAddressesItemUserEmailNotificationInterval';
 import { UpdateCommunityResponseAddressesItemUserProfile } from './UpdateCommunityResponseAddressesItemUserProfile';
 import { UpdateCommunityResponseAddressesItemUserProfileTagsItem } from './UpdateCommunityResponseAddressesItemUserProfileTagsItem';
-
 export declare const UpdateCommunityResponseAddressesItemUser: core.serialization.ObjectSchema<
   serializers.UpdateCommunityResponseAddressesItemUser.Raw,
   CommonApi.UpdateCommunityResponseAddressesItemUser

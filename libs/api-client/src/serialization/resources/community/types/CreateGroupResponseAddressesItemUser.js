@@ -6,7 +6,6 @@ import { CreateGroupResponseAddressesItemUserApiKey } from './CreateGroupRespons
 import { CreateGroupResponseAddressesItemUserEmailNotificationInterval } from './CreateGroupResponseAddressesItemUserEmailNotificationInterval';
 import { CreateGroupResponseAddressesItemUserProfile } from './CreateGroupResponseAddressesItemUserProfile';
 import { CreateGroupResponseAddressesItemUserProfileTagsItem } from './CreateGroupResponseAddressesItemUserProfileTagsItem';
-
 export const CreateGroupResponseAddressesItemUser = core.serialization.object({
   id: core.serialization.number().optional(),
   email: core.serialization.string().optional(),

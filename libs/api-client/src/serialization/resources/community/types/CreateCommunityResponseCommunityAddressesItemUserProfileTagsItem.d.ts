@@ -4,7 +4,6 @@
 import * as CommonApi from '../../../../api/index';
 import * as core from '../../../../core';
 import * as serializers from '../../../index';
-
 export declare const CreateCommunityResponseCommunityAddressesItemUserProfileTagsItem: core.serialization.ObjectSchema<
   serializers.CreateCommunityResponseCommunityAddressesItemUserProfileTagsItem.Raw,
   CommonApi.CreateCommunityResponseCommunityAddressesItemUserProfileTagsItem

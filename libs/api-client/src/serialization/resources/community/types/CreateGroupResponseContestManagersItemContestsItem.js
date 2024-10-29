@@ -4,7 +4,6 @@
 import * as core from '../../../../core';
 import { CreateGroupResponseContestManagersItemContestsItemActionsItem } from './CreateGroupResponseContestManagersItemContestsItemActionsItem';
 import { CreateGroupResponseContestManagersItemContestsItemScoreItem } from './CreateGroupResponseContestManagersItemContestsItemScoreItem';
-
 export const CreateGroupResponseContestManagersItemContestsItem =
   core.serialization.object({
     contestAddress: core.serialization.property(

@@ -4,7 +4,6 @@
 import * as CommonApi from '../../../../api/index';
 import * as core from '../../../../core';
 import * as serializers from '../../../index';
-
 export declare const GetMembersRequestOrderDirection: core.serialization.Schema<
   serializers.GetMembersRequestOrderDirection.Raw,
   CommonApi.GetMembersRequestOrderDirection

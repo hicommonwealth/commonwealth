@@ -25,7 +25,10 @@ export default (
       comment_id: { type: Sequelize.INTEGER, allowNull: true },
       address_id: { type: Sequelize.INTEGER, allowNull: false },
       reaction: { type: Sequelize.ENUM('like'), allowNull: false },
-      calculated_voting_weight: { type: Sequelize.INTEGER, allowNull: true },
+      calculated_voting_weight: {
+        type: Sequelize.DECIMAL(78, 0),
+        allowNull: true,
+      },
       // canvas-related columns
       canvas_signed_data: { type: Sequelize.JSONB, allowNull: true },
       canvas_msg_id: { type: Sequelize.STRING, allowNull: true },

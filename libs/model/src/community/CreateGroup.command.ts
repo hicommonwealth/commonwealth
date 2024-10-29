@@ -25,7 +25,7 @@ export function CreateGroup(): Command<
 
       const topics = await models.Topic.findAll({
         where: {
-          id: { [Op.in]: payload.topics || [] },
+          id: { [Op.in]: payload.topics?.map((t) => t.id) || [] },
           community_id,
         },
       });
@@ -70,6 +70,20 @@ export function CreateGroup(): Command<
                 transaction,
               },
             );
+
+            if (group.id) {
+              // add topic level interaction permissions for current group
+              const groupPermissions = (payload.topics || []).map((t) => ({
+                group_id: group.id!,
+                topic_id: t.id,
+                allowed_actions: sequelize.literal(
+                  `ARRAY[${t.permissions.map((p) => `'${p}'`).join(', ')}]::"enum_GroupPermissions_allowed_actions"[]`,
+                ) as unknown as schemas.PermissionEnum[],
+              }));
+              await models.GroupPermission.bulkCreate(groupPermissions, {
+                transaction,
+              });
+            }
           }
           return group.toJSON();
         },

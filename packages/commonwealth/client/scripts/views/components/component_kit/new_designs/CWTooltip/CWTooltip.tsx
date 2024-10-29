@@ -10,7 +10,7 @@ import CWPopover, {
 import { CWText } from '../../cw_text';
 import { TooltipContainer } from './TooltipContainer';
 
-type TooltipProps = {
+export type TooltipProps = {
   content: string | React.ReactNode;
   placement?: Placement;
   disablePortal?: boolean;

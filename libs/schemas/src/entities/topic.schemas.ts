@@ -31,9 +31,6 @@ export const Topic = z.object({
   group_ids: z.array(PG_INT).default([]),
   default_offchain_template_backup: z.string().nullish(),
   weighted_voting: z.nativeEnum(TopicWeightedVoting).nullish(),
-  chain_node_id: PG_INT.nullish().describe(
-    'token chain node ID, used for ERC20 topics',
-  ),
   token_address: z
     .string()
     .nullish()
@@ -42,9 +39,11 @@ export const Topic = z.object({
     .string()
     .nullish()
     .describe('token symbol, used for ERC20 topics'),
-  vote_weight_multiplier: PG_INT.nullish().describe(
-    'vote weight multiplier, used for ERC20 topics',
-  ),
+  vote_weight_multiplier: z
+    .number()
+    .gt(0)
+    .nullish()
+    .describe('vote weight multiplier, used for ERC20 topics'),
 
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional(),

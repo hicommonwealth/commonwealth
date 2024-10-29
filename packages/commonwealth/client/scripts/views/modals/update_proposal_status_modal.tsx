@@ -144,7 +144,6 @@ export const UpdateProposalStatusModal = ({
                       title: enrichedSnapshot.title,
                     },
                   ],
-                  isPWA: isAddedToHomeScreen,
                 }).then((updatedThread) => {
                   links = updatedThread.links;
                   return { toDelete, links };
@@ -175,7 +174,6 @@ export const UpdateProposalStatusModal = ({
                           title: enrichedSnapshot.title,
                         },
                       ],
-                      isPWA: isAddedToHomeScreen,
                     });
                   })
                   .then((updatedThread) => {
@@ -228,7 +226,6 @@ export const UpdateProposalStatusModal = ({
                   identifier: identifier,
                   title: title,
                 })),
-                isPWA: isAddedToHomeScreen,
               }).then((updatedThread) => {
                 // eslint-disable-next-line no-param-reassign
                 links = updatedThread.links;
