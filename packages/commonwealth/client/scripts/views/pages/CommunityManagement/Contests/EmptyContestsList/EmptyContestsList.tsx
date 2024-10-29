@@ -1,12 +1,14 @@
 import React from 'react';
 
+import farcasterUrl from 'assets/img/farcaster.svg';
 import shape1Url from 'assets/img/shapes/shape1.svg';
 import shape2Url from 'assets/img/shapes/shape2.svg';
+import { useFlag } from 'hooks/useFlag';
 import { useCommonNavigate } from 'navigation/helpers';
 
+import { ContestType } from '../types';
 import EmptyCard from './EmptyCard';
 
-import { useFlag } from 'hooks/useFlag';
 import './EmptyContestsList.scss';
 
 interface EmptyContestsListProps {
@@ -29,30 +31,48 @@ const EmptyContestsList = ({
   return (
     <div className="EmptyContestsList">
       {(weightedTopicsEnabled ? !hasWeightedTopic : !isStakeEnabled) ? (
-        <EmptyCard
-          img={shape2Url}
-          title={
-            weightedTopicsEnabled
-              ? 'You must have at least one topic with weighted voting enabled to run contest'
-              : 'You must enable Community Stake'
-          }
-          subtitle={
-            weightedTopicsEnabled
-              ? 'Setting up a contest just takes a few minutes and can be a huge boost to your community.'
-              : 'Contests require Community Stake...'
-          }
-          button={
-            weightedTopicsEnabled
-              ? {
-                  label: 'Create a topic',
-                  handler: () => navigate('/manage/topics'),
-                }
-              : {
-                  label: 'Enable Community Stake',
-                  handler: () => navigate('/manage/integrations'),
-                }
-          }
-        />
+        <>
+          <EmptyCard
+            img={shape2Url}
+            title={
+              weightedTopicsEnabled
+                ? 'You must have at least one topic with weighted voting enabled to run contest'
+                : 'You must enable Community Stake'
+            }
+            subtitle={
+              weightedTopicsEnabled
+                ? 'Setting up a contest just takes a few minutes and can be a huge boost to your community.'
+                : 'Contests require Community Stake...'
+            }
+            button={
+              weightedTopicsEnabled
+                ? {
+                    label: 'Create a topic',
+                    handler: () => navigate('/manage/topics'),
+                  }
+                : {
+                    label: 'Enable Community Stake',
+                    handler: () => navigate('/manage/integrations'),
+                  }
+            }
+          />
+          {farcasterContestEnabled && (
+            <div className="farcaster-card">
+              <EmptyCard
+                img={farcasterUrl}
+                title="Launch on Farcaster"
+                subtitle="Farcaster contest does not require to create a weighted topic."
+                button={{
+                  label: 'Launch Farcaster contest',
+                  handler: () =>
+                    navigate(
+                      `/manage/contests/launch?type=${ContestType.Farcaster}`,
+                    ),
+                }}
+              />
+            </div>
+          )}
+        </>
       ) : !isContestAvailable ? (
         <EmptyCard
           img={shape1Url}
