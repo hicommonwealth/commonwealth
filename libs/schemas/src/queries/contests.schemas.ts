@@ -48,7 +48,7 @@ export const ContestLogEntry = z.object({
   contest_id: PG_INT,
   action: z.string().nullish(),
   actor_address: z.string().nullish(),
-  voting_power: PG_INT.nullish(),
+  voting_power: z.string().nullish(),
   thread_id: PG_INT.nullish(),
   thread_title: z.string().nullish(),
   created_at: z.coerce.date(),
@@ -71,4 +71,18 @@ export const GetThreadContestManagers = {
       contest_address: z.string(),
     }),
   ),
+};
+
+export const GetFarcasterUpvoteActionMetadata = {
+  input: z.any(),
+  output: z.object({
+    name: z.string(),
+    icon: z.string(),
+    description: z.string(),
+    aboutUrl: z.string().url(),
+    action: z.object({
+      type: z.literal('post'),
+      postUrl: z.string().url(),
+    }),
+  }),
 };

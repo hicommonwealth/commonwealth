@@ -35,6 +35,13 @@ const {
   ALCHEMY_PUBLIC_APP_KEY,
   MEMBERSHIP_REFRESH_BATCH_SIZE,
   MEMBERSHIP_REFRESH_TTL_SECONDS,
+  NEYNAR_API_KEY,
+  NEYNAR_CAST_CREATED_WEBHOOK_SECRET,
+  NEYNAR_REPLY_WEBHOOK_URL,
+  FARCASTER_ACTION_URL,
+  FLAG_FARCASTER_CONTEST,
+  OPENAI_API_KEY,
+  OPENAI_ORGANIZATION,
 } = process.env;
 
 const NAME =
@@ -85,6 +92,11 @@ export const config = configure(
       MAX_USER_POSTS_PER_CONTEST: MAX_USER_POSTS_PER_CONTEST
         ? parseInt(MAX_USER_POSTS_PER_CONTEST, 10)
         : 2,
+      FLAG_FARCASTER_CONTEST: FLAG_FARCASTER_CONTEST === 'true',
+      NEYNAR_API_KEY: NEYNAR_API_KEY,
+      NEYNAR_CAST_CREATED_WEBHOOK_SECRET: NEYNAR_CAST_CREATED_WEBHOOK_SECRET,
+      NEYNAR_REPLY_WEBHOOK_URL: NEYNAR_REPLY_WEBHOOK_URL,
+      FARCASTER_ACTION_URL: FARCASTER_ACTION_URL,
       FLAG_WEIGHTED_TOPICS: FLAG_WEIGHTED_TOPICS === 'true',
     },
     AUTH: {
@@ -142,6 +154,10 @@ export const config = configure(
       CLIENT_ID: DISCORD_CLIENT_ID,
       BOT_TOKEN: DISCORD_TOKEN,
     },
+    OPENAI: {
+      API_KEY: OPENAI_API_KEY,
+      ORGANIZATION: OPENAI_ORGANIZATION || 'org-D0ty00TJDApqHYlrn1gge2Ql',
+    },
   },
   z.object({
     DB: z.object({
@@ -183,6 +199,11 @@ export const config = configure(
     CONTESTS: z.object({
       MIN_USER_ETH: z.number(),
       MAX_USER_POSTS_PER_CONTEST: z.number().int(),
+      FLAG_FARCASTER_CONTEST: z.boolean().nullish(),
+      NEYNAR_API_KEY: z.string().nullish(),
+      NEYNAR_CAST_CREATED_WEBHOOK_SECRET: z.string().nullish(),
+      NEYNAR_REPLY_WEBHOOK_URL: z.string().nullish(),
+      FARCASTER_ACTION_URL: z.string().nullish(),
       FLAG_WEIGHTED_TOPICS: z.boolean(),
     }),
     AUTH: z
@@ -264,6 +285,10 @@ export const config = configure(
             ),
           'DISCORD_TOKEN is required in production, frick, frack, beta (QA), and demo',
         ),
+    }),
+    OPENAI: z.object({
+      API_KEY: z.string().optional(),
+      ORGANIZATION: z.string().optional(),
     }),
   }),
 );

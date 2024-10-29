@@ -82,6 +82,7 @@ type ContentPageProps = {
   activeThreadVersionId?: number;
   onChangeVersionHistoryNumber?: (id: number) => void;
   editingDisabled?: boolean;
+  onCommentClick?: () => void;
 };
 
 export const CWContentPage = ({
@@ -121,6 +122,7 @@ export const CWContentPage = ({
   activeThreadVersionId,
   onChangeVersionHistoryNumber,
   editingDisabled,
+  onCommentClick,
 }: ContentPageProps) => {
   const navigate = useNavigate();
   const [urlQueryParams] = useSearchParams();
@@ -202,7 +204,7 @@ export const CWContentPage = ({
         // @ts-expect-error <StrictNullChecks/>
         isHot={isHot(thread)}
         profile={thread?.profile}
-        versionHistory={thread?.versionHistory}
+        versionHistory={thread!.versionHistory!}
         activeThreadVersionId={activeThreadVersionId}
         onChangeVersionHistoryNumber={onChangeVersionHistoryNumber}
       />
@@ -264,6 +266,7 @@ export const CWContentPage = ({
             upvoteBtnVisible={!thread?.readOnly}
             upvoteDrawerBtnBelow={true}
             commentBtnVisible={!thread?.readOnly}
+            onCommentClick={onCommentClick}
             // @ts-expect-error <StrictNullChecks/>
             thread={thread}
             totalComments={thread?.numberOfComments}

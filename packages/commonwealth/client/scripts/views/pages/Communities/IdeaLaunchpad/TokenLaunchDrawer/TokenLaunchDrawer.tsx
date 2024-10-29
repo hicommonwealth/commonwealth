@@ -9,18 +9,23 @@ import {
 import CWDrawer, {
   CWDrawerTopBar,
 } from 'views/components/component_kit/new_designs/CWDrawer';
-import { triggerTokenLaunchFormAbort } from '../../LaunchToken/steps/TokenInformationStep/TokenInformationForm/helpers';
-import QuickTokenLaunchForm from './QuickTokenLaunchForm';
+// eslint-disable-next-line max-len
+import { triggerTokenLaunchFormAbort } from '../../../LaunchToken/steps/TokenInformationStep/TokenInformationForm/helpers';
+import QuickTokenLaunchForm from '../QuickTokenLaunchForm';
 import './TokenLaunchDrawer.scss';
 
 type TokenLaunchDrawerProps = {
   isOpen: boolean;
   onClose: () => void;
+  initialIdeaPrompt?: string;
+  generateIdeaOnMount?: boolean;
 };
 
 export const TokenLaunchDrawer = ({
   isOpen,
   onClose,
+  initialIdeaPrompt,
+  generateIdeaOnMount = false,
 }: TokenLaunchDrawerProps) => {
   const { isAddedToHomeScreen } = useAppStatus();
 
@@ -63,6 +68,8 @@ export const TokenLaunchDrawer = ({
             <QuickTokenLaunchForm
               onCancel={handleDrawerCloseTrigger}
               onCommunityCreated={setCreatedCommunityId}
+              initialIdeaPrompt={initialIdeaPrompt}
+              generateIdeaOnMount={generateIdeaOnMount}
             />
           )}
         </div>

@@ -1,7 +1,7 @@
-import { PermissionEnum } from '@hicommonwealth/schemas';
+import { PermissionEnum, TopicWeightedVoting } from '@hicommonwealth/schemas';
 import { notifyError } from 'controllers/app/notifications';
 import { SessionKeyError } from 'controllers/server/sessions';
-import { parseCustomStages } from 'helpers';
+import { parseCustomStages, weightedVotingValueToLabel } from 'helpers';
 import { detectURL, getThreadActionTooltipText } from 'helpers/threads';
 import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
 import useTopicGating from 'hooks/useTopicGating';
@@ -89,7 +89,7 @@ export const NewThreadForm = () => {
   } = useNewThreadForm(communityId, topicsForSelector);
 
   const hasTopicOngoingContest =
-    threadTopic?.active_contest_managers?.length > 0;
+    threadTopic?.active_contest_managers?.length ?? 0 > 0;
 
   const user = useUserStore();
   const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
@@ -276,6 +276,11 @@ export const NewThreadForm = () => {
                         topic: topicsForSelector.find(
                           (t) => String(t.id) === originalProps.data.value,
                         ),
+                        helpText: weightedVotingValueToLabel(
+                          topicsForSelector.find(
+                            (t) => String(t.id) === originalProps.data.value,
+                          )?.weighted_voting as TopicWeightedVoting,
+                        ),
                       }),
                   }}
                   formatOptionLabel={(option) => (
@@ -321,7 +326,7 @@ export const NewThreadForm = () => {
 
               {contestTopicAffordanceVisible && (
                 <ContestTopicBanner
-                  contests={threadTopic?.active_contest_managers.map((acm) => {
+                  contests={threadTopic?.active_contest_managers?.map((acm) => {
                     return {
                       name: acm?.name,
                       address: acm?.contest_address,
@@ -368,7 +373,7 @@ export const NewThreadForm = () => {
               )}
 
               <MessageRow
-                hasFeedback={walletBalanceError}
+                hasFeedback={!!walletBalanceError}
                 statusMessage={`Ensure that your connected wallet has at least
                 ${MIN_ETH_FOR_CONTEST_THREAD} ETH to participate.`}
                 validationStatus="failure"

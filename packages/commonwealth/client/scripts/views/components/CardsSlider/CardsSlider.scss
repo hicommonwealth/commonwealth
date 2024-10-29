@@ -46,4 +46,13 @@
       padding-bottom: 8px;
     }
   }
+
+  .CardsSlider.narrow-gap {
+    gap: 4px;
+
+    .cards {
+      gap: 4px;
+      padding-bottom: 1px;
+    }
+  }
 }

@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 
 import { TopicWeightedVoting } from '@hicommonwealth/schemas';
 import { notifyError } from 'controllers/app/notifications';
+import { weightedVotingValueToLabel } from 'helpers';
 import { useFlag } from 'hooks/useFlag';
 import { useCommonNavigate } from 'navigation/helpers';
 import app from 'state';
@@ -47,7 +48,6 @@ import {
   initialContestDuration,
   initialPayoutStructure,
   prizePercentageOptions,
-  weightedVotingValueToLabel,
 } from './utils';
 import { detailsFormValidationSchema } from './validation';
 

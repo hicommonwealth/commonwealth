@@ -1,0 +1,14 @@
+.CustomLinkEdit {
+  display: flex;
+  gap: 4px;
+  flex-grow: 1;
+
+  input {
+    flex-grow: 1;
+    padding: 4px;
+  }
+}
+
+.CustomLinkDialogForDesktopPopover input {
+  min-width: 25em;
+}

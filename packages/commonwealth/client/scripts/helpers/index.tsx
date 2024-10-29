@@ -1,3 +1,4 @@
+import { TopicWeightedVoting } from '@hicommonwealth/schemas';
 import BigNumber from 'bignumber.js';
 import moment from 'moment';
 import React from 'react';
@@ -249,4 +250,18 @@ export const handleRedirectClicks = (
   if (callback) {
     callback();
   }
+};
+
+export const weightedVotingValueToLabel = (
+  weightedVoting: TopicWeightedVoting,
+) => {
+  if (weightedVoting === TopicWeightedVoting.Stake) {
+    return 'Community Stake';
+  }
+
+  if (weightedVoting === TopicWeightedVoting.ERC20) {
+    return 'ERC20';
+  }
+
+  return '';
 };

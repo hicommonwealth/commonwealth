@@ -1,7 +1,7 @@
 import { type Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../database';
-import { removeUndefined } from '../utils/index';
+import { removeUndefined, sanitizeDeletedComment } from '../utils/index';
 import { formatSequelizePagination } from '../utils/paginationUtils';
 
 export function GetComments(): Query<typeof schemas.GetComments> {
@@ -58,7 +58,15 @@ export function GetComments(): Query<typeof schemas.GetComments> {
         paranoid: false,
       });
 
-      return schemas.buildPaginatedResponse(comments, count as number, payload);
+      const sanitizedComments = comments.map((c) => {
+        const data = c.toJSON();
+        return {
+          ...sanitizeDeletedComment(data),
+          last_edited: data.updated_at,
+        };
+      });
+
+      return schemas.buildPaginatedResponse(sanitizedComments, count, payload);
     },
   };
 }
