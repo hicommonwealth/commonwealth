@@ -125,6 +125,10 @@ function mapThread(thread: z.infer<typeof ActivityThread>): Thread {
     Address: {
       address: thread.user_address,
       community_id: thread.community_id,
+      ghost_address: false,
+      is_user_default: false,
+      is_banned: false,
+      role: 'member',
     },
     title: thread.title,
     id: thread.id,
@@ -153,7 +157,7 @@ function mapThread(thread: z.infer<typeof ActivityThread>): Thread {
     archived_at: thread.archived_at ?? '',
     has_poll: thread.has_poll ?? false,
     marked_as_spam_at: thread.marked_as_spam_at ?? '',
-    discord_meta: thread.discord_meta,
+    discord_meta: thread.discord_meta!,
     profile_name: thread.profile_name ?? '',
     avatar_url: thread.profile_avatar ?? '',
     user_id: thread.user_id,
@@ -162,6 +166,8 @@ function mapThread(thread: z.infer<typeof ActivityThread>): Thread {
     last_commented_on: '',
     reaction_weights_sum: '0',
     address_last_active: '',
+    address_id: 0,
+    search: '',
     ContestActions: [],
     numberOfComments: thread.number_of_comments,
     recentComments:

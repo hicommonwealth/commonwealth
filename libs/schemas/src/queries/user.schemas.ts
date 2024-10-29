@@ -1,11 +1,12 @@
 import { Roles } from '@hicommonwealth/shared';
 import { z } from 'zod';
-import { Community, Thread } from '../entities';
+import { Community } from '../entities';
 import { Comment } from '../entities/comment.schemas';
 import { Tags } from '../entities/tag.schemas';
 import { Address, UserProfile } from '../entities/user.schemas';
 import { PG_INT } from '../utils';
 import { PaginatedResultSchema, PaginationParamsSchema } from './pagination';
+import { ThreadView } from './thread.schemas';
 
 export const GetUserProfile = {
   input: z.object({
@@ -24,14 +25,14 @@ export const GetUserProfile = {
         }),
       }),
     ),
-    threads: z.array(Thread),
+    threads: z.array(ThreadView),
     comments: z.array(
       Comment.extend({
         Thread: z.undefined(),
         community_id: z.string(),
       }),
     ),
-    commentThreads: z.array(Thread),
+    commentThreads: z.array(ThreadView),
     isOwner: z.boolean(),
     tags: z.array(Tags.extend({ id: PG_INT })),
   }),
