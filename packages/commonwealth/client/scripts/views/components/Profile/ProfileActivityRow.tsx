@@ -23,6 +23,7 @@ type ProfileActivityRowProps = {
 const ProfileActivityRow = ({ activity }: ProfileActivityRowProps) => {
   const navigate = useCommonNavigate();
   const { createdAt, author, id } = activity;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const communityId =
     (activity as any)?.thread?.community_id || activity?.communityId;
   let title: string;
