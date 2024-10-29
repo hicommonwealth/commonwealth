@@ -105,7 +105,7 @@ WITH topic_data AS (
       });
 
       results.forEach((r) => {
-        r.active_contest_managers.forEach((cm) => {
+        r.active_contest_managers?.forEach((cm) => {
           cm.content.forEach((c) => {
             c.voting_power = BigNumber.from(c.voting_power).toString();
           });

@@ -71,10 +71,10 @@ const ProfileActivityRow = ({ activity }: ProfileActivityRowProps) => {
     <CWIconButton iconName="share" iconSize="small" onClick={onclick} />
   );
 
-  return (
+  return community ? (
     <div className="ProfileActivityRow">
       <div className="chain-info">
-        <img src={community?.icon_url || ''} alt="chain-logo" />
+        <img src={community.icon_url || ''} alt="chain-logo" />
         <CWText fontWeight="semiBold" className="link">
           <a
             onClick={(e) => {
@@ -187,6 +187,8 @@ const ProfileActivityRow = ({ activity }: ProfileActivityRowProps) => {
         </div>
       </div>
     </div>
+  ) : (
+    <></>
   );
 };
 
