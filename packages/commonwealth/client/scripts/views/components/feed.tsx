@@ -34,14 +34,13 @@ const DEFAULT_COUNT = 10;
 const FeedThread = ({ thread }: { thread: Thread }) => {
   const navigate = useCommonNavigate();
   const user = useUserStore();
-
   const { data: domain } = useFetchCustomDomainQuery();
 
   const discussionLink = getProposalUrlPath(
-    thread.slug,
-    `${thread.identifier}-${slugify(thread.title)}`,
+    thread?.slug,
+    `${thread?.identifier}-${slugify(thread.title)}`,
     false,
-    thread.communityId,
+    thread?.communityId,
   );
 
   const { data: community } = useGetCommunityByIdQuery({
@@ -197,9 +196,14 @@ type FeedProps = {
 
 // eslint-disable-next-line react/no-multi-comp
 export const Feed = ({ query, customScrollParent }: FeedProps) => {
-  const feed = query();
-
-  if (feed.isLoading) {
+  const {
+    data: feed,
+    isLoading,
+    hasNextPage,
+    fetchNextPage,
+    isError,
+  } = query({ limit: 10 });
+  if (isLoading) {
     return (
       <div className="Feed">
         <Virtuoso
@@ -212,11 +216,14 @@ export const Feed = ({ query, customScrollParent }: FeedProps) => {
     );
   }
 
-  if (feed.isError) {
+  if (isError) {
     return <PageNotFound message="There was an error rendering the feed." />;
   }
+  const allThreads = feed?.pages
+    ? feed.pages.flatMap((page) => page.results || [])
+    : [];
 
-  if (feed.data.length === 0) {
+  if (!allThreads?.length) {
     return (
       <div className="Feed">
         <div className="no-feed-message">
@@ -225,16 +232,20 @@ export const Feed = ({ query, customScrollParent }: FeedProps) => {
       </div>
     );
   }
-
   return (
     <div className="Feed">
       <Virtuoso
+        overscan={50}
         customScrollParent={customScrollParent}
-        totalCount={feed.data.length || DEFAULT_COUNT}
+        totalCount={allThreads?.length || DEFAULT_COUNT}
+        data={allThreads || []}
         style={{ height: '100%' }}
-        itemContent={(i) => (
-          <FeedThread key={i} thread={mapThread(feed.data[i])} />
+        itemContent={(i, thread) => (
+          <FeedThread key={i} thread={mapThread(thread)} />
         )}
+        endReached={() => {
+          hasNextPage && fetchNextPage().catch(console.error);
+        }}
       />
     </div>
   );
