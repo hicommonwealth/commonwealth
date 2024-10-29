@@ -23,7 +23,6 @@ type ProfileActivityRowProps = {
 const ProfileActivityRow = ({ activity }: ProfileActivityRowProps) => {
   const navigate = useCommonNavigate();
   const { createdAt, author, id } = activity;
-  // @ts-expect-error: Allows usage of any
   const communityId =
     (activity as any)?.thread?.community_id || activity?.communityId;
   let title: string;
