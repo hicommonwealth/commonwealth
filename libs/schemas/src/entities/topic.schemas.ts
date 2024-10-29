@@ -96,6 +96,6 @@ export const ContestManager = z
     farcaster_frame_url: z.string().nullish(),
     farcaster_frame_hashes: z.array(z.string()).nullish(),
     neynar_webhook_id: z.string().nullish(),
-    topic_id: PG_INT,
+    topic_id: PG_INT.nullish(),
   })
   .describe('On-Chain Contest Manager');

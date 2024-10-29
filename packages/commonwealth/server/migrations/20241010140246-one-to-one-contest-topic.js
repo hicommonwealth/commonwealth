@@ -80,21 +80,6 @@ module.exports = {
         { transaction: t },
       );
 
-      // do not allow null topic
-      await queryInterface.changeColumn(
-        'ContestManagers',
-        'topic_id',
-        {
-          type: Sequelize.INTEGER,
-          allowNull: false,
-          references: {
-            model: 'Topics',
-            key: 'id',
-          },
-        },
-        { transaction: t },
-      );
-
       await queryInterface.dropTable('ContestTopics', { transaction: t });
     });
   },

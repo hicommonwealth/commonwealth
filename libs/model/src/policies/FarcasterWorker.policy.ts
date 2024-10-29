@@ -110,11 +110,30 @@ export function FarcasterWorker(): Policy<typeof inputs> {
         });
         mustExist('Contest Manager', contestManager);
 
+        const community = await models.Community.findByPk(
+          contestManager.community_id,
+          {
+            include: [
+              {
+                model: models.ChainNode,
+                required: false,
+              },
+            ],
+          },
+        );
+        mustExist('Community with Chain Node', community?.ChainNode);
+
         // create onchain content from reply cast
         const content_url = buildFarcasterContentUrl(payload.hash);
         await createOnchainContestContent({
-          community_id: contestManager.community_id,
-          topic_id: contestManager.topic_id, // TODO: remove topic
+          contestManagers: [
+            {
+              url: community.ChainNode!.private_url!,
+              contest_address: contestManager.contest_address,
+              actions: [],
+            },
+          ],
+          bypass_quota: true,
           author_address: payload.author.custody_address,
           content_url,
         });
@@ -140,12 +159,38 @@ export function FarcasterWorker(): Policy<typeof inputs> {
         ]);
         mustExist('Farcaster User', users[0]);
 
+        const community = await models.Community.findByPk(
+          contestManager.community_id,
+          {
+            include: [
+              {
+                model: models.ChainNode,
+                required: false,
+              },
+            ],
+          },
+        );
+        mustExist('Community with Chain Node', community?.ChainNode);
+
         const content_url = buildFarcasterContentUrl(
           payload.untrustedData.castId.hash,
         );
+
+        // find content by url
+        const contestActions = await models.ContestAction.findAll({
+          where: {
+            contest_address: contestManager.contest_address,
+            action: 'added',
+            content_url,
+          },
+        });
+
         await createOnchainContestVote({
-          community_id: contestManager.community_id,
-          topic_id: contestManager.topic_id, // TODO: remove topic
+          contestManagers: contestActions.map((ca) => ({
+            url: community.ChainNode!.private_url!,
+            contest_address: contestManager.contest_address,
+            content_id: ca.content_id,
+          })),
           author_address: users[0].custody_address,
           content_url,
         });
