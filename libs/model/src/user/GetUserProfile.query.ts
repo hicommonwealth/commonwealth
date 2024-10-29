@@ -1,6 +1,7 @@
 import { type Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { Op } from 'sequelize';
+import { z } from 'zod';
 import { models } from '../database';
 
 export function GetUserProfile(): Query<typeof schemas.GetUserProfile> {
@@ -74,18 +75,29 @@ export function GetUserProfile(): Query<typeof schemas.GetUserProfile> {
         totalUpvotes,
         addresses: addresses.map((a) => {
           const address = a.toJSON();
-          return { ...address, Community: address.Community! }; // ensure Community is present in typed response
+          // ensure Community is present in typed response
+          return { ...address, Community: address.Community! } as z.infer<
+            typeof schemas.UserProfileAddressView
+          >;
         }),
-        threads: threads.map((t) => t.toJSON()),
+        threads: threads.map(
+          (t) => t.toJSON() as z.infer<typeof schemas.ThreadView>,
+        ),
         comments: comments.map((c) => {
           const comment = c.toJSON();
+          // ensure typed response
           return {
             ...comment,
+            user_id: c.Address!.user_id!,
+            address: c.Address!.address!,
             Thread: undefined,
+            search: undefined,
             community_id: c.Thread!.community_id,
-          }; // ensure typed response
+          } as z.infer<typeof schemas.UserProfileCommentView>;
         }),
-        commentThreads: commentThreads.map((c) => c.toJSON()),
+        commentThreads: commentThreads.map(
+          (c) => c.toJSON() as z.infer<typeof schemas.ThreadView>,
+        ),
         isOwner: actor.user.id === user_id,
         tags: profileTags.map((t) => ({ id: t.Tag!.id!, name: t.Tag!.name })), // ensure Tag is present in typed response
       };

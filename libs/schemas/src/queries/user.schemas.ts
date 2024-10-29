@@ -1,41 +1,40 @@
-import { Roles } from '@hicommonwealth/shared';
+import { ChainBase, Roles } from '@hicommonwealth/shared';
 import { z } from 'zod';
-import { Community } from '../entities';
-import { Comment } from '../entities/comment.schemas';
 import { Tags } from '../entities/tag.schemas';
-import { Address, UserProfile } from '../entities/user.schemas';
+import { UserProfile } from '../entities/user.schemas';
 import { PG_INT } from '../utils';
 import { PaginatedResultSchema, PaginationParamsSchema } from './pagination';
-import { ThreadView } from './thread.schemas';
+import { AddressView, CommentView, ThreadView } from './thread.schemas';
+
+export const UserProfileAddressView = AddressView.extend({
+  Community: z.object({
+    id: z.string(),
+    base: z.nativeEnum(ChainBase),
+    ss58_prefix: PG_INT.nullish(),
+  }),
+});
+
+export const UserProfileCommentView = CommentView.extend({
+  community_id: z.string(),
+});
+
+export const UserProfileView = z.object({
+  userId: PG_INT,
+  profile: UserProfile,
+  totalUpvotes: z.number().int(),
+  addresses: z.array(UserProfileAddressView),
+  threads: z.array(ThreadView),
+  comments: z.array(UserProfileCommentView),
+  commentThreads: z.array(ThreadView),
+  isOwner: z.boolean(),
+  tags: z.array(Tags.extend({ id: PG_INT })),
+});
 
 export const GetUserProfile = {
   input: z.object({
     userId: PG_INT.optional(),
   }),
-  output: z.object({
-    userId: PG_INT,
-    profile: UserProfile,
-    totalUpvotes: z.number().int(),
-    addresses: z.array(
-      Address.extend({
-        Community: Community.pick({
-          id: true,
-          base: true,
-          ss58_prefix: true,
-        }),
-      }),
-    ),
-    threads: z.array(ThreadView),
-    comments: z.array(
-      Comment.extend({
-        Thread: z.undefined(),
-        community_id: z.string(),
-      }),
-    ),
-    commentThreads: z.array(ThreadView),
-    isOwner: z.boolean(),
-    tags: z.array(Tags.extend({ id: PG_INT })),
-  }),
+  output: UserProfileView,
 };
 
 export const SearchUserProfilesView = z.object({
