@@ -3,8 +3,11 @@ import React from 'react';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWIdentificationTag } from 'views/components/component_kit/new_designs/CWIdentificationTag';
 
+import { CopySimple } from '@phosphor-icons/react';
+import { saveToClipboard } from 'client/scripts/utils/clipboard';
 import useJoinCommunity from 'views/components/SublayoutHeader/useJoinCommunity';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
+import { CWTooltip } from '../../component_kit/new_designs/CWTooltip';
 import './AccountConnectionIndicator.scss';
 
 interface AccountConnectionIndicatorProps {
@@ -29,6 +32,22 @@ const AccountConnectionIndicator = ({
             <div className="status-row">
               <div className={clsx('status-light', { connected })} />
               <CWIdentificationTag address={address} />
+              <CWTooltip
+                content="address copied!"
+                renderTrigger={(handleInteraction) => {
+                  return (
+                    <CopySimple
+                      size={20}
+                      onMouseDown={(event) => {
+                        saveToClipboard(address);
+                        handleInteraction(event);
+                      }}
+                      onMouseLeave={handleInteraction}
+                      className="copy-icon"
+                    />
+                  );
+                }}
+              />
             </div>
           </div>
         )}
