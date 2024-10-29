@@ -1,3 +1,4 @@
+import { BigNumber } from '@ethersproject/bignumber';
 import { ZERO_ADDRESS } from '@hicommonwealth/shared';
 
 export const getTotalContestBalance = async (
@@ -9,7 +10,7 @@ export const getTotalContestBalance = async (
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   feeManagerAbi: any[],
   oneOff?: boolean,
-): Promise<number> => {
+): Promise<string> => {
   const promises = [contestContract.methods.contestToken().call()];
 
   if (!oneOff) {
@@ -18,7 +19,7 @@ export const getTotalContestBalance = async (
 
   const results = await Promise.all(promises);
 
-  const balancePromises: Promise<number>[] = [];
+  const balancePromises: Promise<string>[] = [];
 
   if (!oneOff) {
     const feeManager = new web3.eth.Contract(feeManagerAbi, String(results[1]));
@@ -30,8 +31,8 @@ export const getTotalContestBalance = async (
   }
   if (String(results[0]) === ZERO_ADDRESS) {
     balancePromises.push(
-      web3.eth.getBalance(contestAddress).then((v: bigint) => {
-        return Number(v);
+      web3.eth.getBalance(contestAddress).then((v: string) => {
+        return v.toString();
       }),
     );
   } else {
@@ -45,16 +46,17 @@ export const getTotalContestBalance = async (
           data: calldata,
         })
         .then((v: string) => {
-          return Number(web3.eth.abi.decodeParameter('uint256', v));
+          return web3.eth.abi.decodeParameter('uint256', v);
         }),
     );
   }
 
   const balanceResults = await Promise.all(balancePromises);
 
-  return Number(
+  const balance =
     balanceResults.length === 2
-      ? BigInt(balanceResults[0]) + BigInt(balanceResults[1])
-      : BigInt(balanceResults[0]),
-  );
+      ? BigNumber.from(balanceResults[0]).add(balanceResults[1])
+      : BigNumber.from(balanceResults[0]);
+
+  return BigNumber.from(balance).toString();
 };

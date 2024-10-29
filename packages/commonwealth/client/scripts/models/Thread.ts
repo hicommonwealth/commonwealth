@@ -180,7 +180,7 @@ export type AssociatedContest = {
   contest_address: string;
   score: {
     prize: string;
-    votes: number;
+    votes: string;
     content_id: string;
     creator_address: string;
   }[];

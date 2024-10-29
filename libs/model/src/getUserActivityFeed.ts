@@ -1,4 +1,4 @@
-import { ActivityFeed, ActivityThread } from '@hicommonwealth/schemas';
+import * as schemas from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
 import { z } from 'zod';
 import { models } from './database';
@@ -6,14 +6,21 @@ import { models } from './database';
 /**
  * Gets last updated threads and their recent comments
  * @param user_id by user id communities, 0 for global
- * @param thread_limit thread limit
+ * @param limit thread limit
  * @param comment_limit comment limit
  */
+
+type GetUserActivityFeedParams = z.infer<typeof schemas.ActivityFeed.input> & {
+  user_id?: number;
+};
+
 export async function getUserActivityFeed({
   user_id = 0,
-  thread_limit = 50,
-  comment_limit = 3,
-}: z.infer<typeof ActivityFeed.input> & { user_id?: number }) {
+  comment_limit,
+  limit,
+  cursor,
+}: GetUserActivityFeedParams) {
+  const offset = (cursor - 1) * limit;
   const query = `
 WITH 
 user_communities AS (
@@ -22,13 +29,14 @@ user_communities AS (
     WHERE user_id = :user_id
 ),
 top_threads AS (
-    SELECT T.*
-    FROM "Threads" T
-    ${user_id ? 'JOIN user_communities UC ON UC.community_id = T.community_id' : ''}
-    WHERE T.deleted_at IS NULL
-    ORDER BY T.activity_rank_date DESC NULLS LAST
-    LIMIT :thread_limit
+  SELECT T.*, count(*) OVER() AS total
+  FROM "Threads" T
+  ${user_id ? 'JOIN user_communities UC ON UC.community_id = T.community_id' : ''}
+  WHERE T.deleted_at IS NULL
+  ORDER BY T.activity_rank_date DESC NULLS LAST
+  LIMIT :limit OFFSET :offset 
 )
+
 SELECT 
   jsonb_set(
     jsonb_build_object(
@@ -91,7 +99,8 @@ SELECT
             C.thread_id = T.id 
             AND C.deleted_at IS NULL
       ) C WHERE C.rn <= :comment_limit), '[]')
-  ) AS thread
+  ) AS thread,
+  T.total 
 FROM
   top_threads T
   JOIN "Communities" C ON T.community_id = C.id
@@ -99,16 +108,26 @@ FROM
   JOIN "Users" U ON U.id = A.user_id
   JOIN "Topics" Tp ON Tp.id = T.topic_id
 ORDER BY
-  T.activity_rank_date DESC NULLS LAST;
+  T.activity_rank_date DESC NULLS LAST
   `;
 
-  const threads = await models.sequelize.query<{
-    thread: z.infer<typeof ActivityThread>;
-  }>(query, {
+  const threads = await models.sequelize.query<
+    z.infer<typeof schemas.ActivityThreadWrapper> & { total?: number }
+  >(query, {
     type: QueryTypes.SELECT,
     raw: true,
-    replacements: { user_id, thread_limit, comment_limit },
+    replacements: { user_id, limit, comment_limit, offset },
   });
 
-  return threads.map((t) => t.thread);
+  const formattedThreads = threads.map((item) => ({
+    ...item?.thread,
+  }));
+  return schemas.buildPaginatedResponse(
+    formattedThreads,
+    +(threads.at(0)?.total ?? 0),
+    {
+      limit,
+      offset,
+    },
+  );
 }
