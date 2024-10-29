@@ -4,7 +4,7 @@ import { MarkdownEditorMode } from 'views/components/MarkdownEditor/MarkdownEdit
 /**
  * Do the actual keyboard resize now.
  */
-export function resizeRootElementForKeyboard() {
+function resizeRootElementForKeyboard() {
   if (!window.visualViewport) {
     console.warn('No visual viewport.');
     return;
@@ -37,8 +37,12 @@ export function resizeRootElementForKeyboard() {
  */
 export const useMobileKeyboardResizeHandler = (mode: MarkdownEditorMode) => {
   const animationTaskRef = useRef<number | undefined>(undefined);
+  const unmountedRef = useRef<boolean>(false);
 
   const listenForResize = useCallback(() => {
+    if (unmountedRef.current) {
+      return;
+    }
     resizeRootElementForKeyboard();
     animationTaskRef.current = requestAnimationFrame(listenForResize);
   }, []);
@@ -55,6 +59,7 @@ export const useMobileKeyboardResizeHandler = (mode: MarkdownEditorMode) => {
 
     return () => {
       if (animationTaskRef.current !== undefined) {
+        unmountedRef.current = true;
         // if there's an animation frame scheduled, we have to cancel it now
         // otherwise, it will just keep running forever.
         cancelAnimationFrame(animationTaskRef.current);
