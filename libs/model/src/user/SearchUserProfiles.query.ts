@@ -44,7 +44,7 @@ export function SearchUserProfiles(): Query<typeof schemas.SearchUserProfiles> {
           "Users" U
           JOIN "Addresses" A ON U.id = A.user_id 
         WHERE
-          ${community_id && community_id !== ALL_COMMUNITIES ? `"Addresses".community_id = :community_id AND` : ''}
+          ${community_id && community_id !== ALL_COMMUNITIES ? `A.community_id = :community_id AND` : ''}
           (U.profile->>'name' ILIKE :searchTerm)
         GROUP BY
           U.id

@@ -51,7 +51,6 @@ export const SearchUserProfilesView = z.object({
       role: z.enum(Roles),
     }),
   ),
-  //group_ids: z.array(PG_INT),
 });
 
 export const SearchUserProfiles = {
