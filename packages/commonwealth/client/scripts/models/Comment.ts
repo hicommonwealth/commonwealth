@@ -22,7 +22,7 @@ export class Comment<T extends IUniqueId> {
   public readonly Address: AddressInfo;
   public readonly text: string;
   public reactions: Reaction[];
-  public reactionWeightsSum: number;
+  public reactionWeightsSum: string;
   public readonly id: number;
   public readonly createdAt: momentType.Moment;
   public readonly authorChain?: string;
@@ -77,7 +77,7 @@ export class Comment<T extends IUniqueId> {
     parent_id?: number | null;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     reactions?: any[];
-    reaction_weights_sum: number;
+    reaction_weights_sum: string;
     created_at: Moment | null;
     deleted_at?: string;
     authorChain?: string;
