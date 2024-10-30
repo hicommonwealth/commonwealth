@@ -12,6 +12,7 @@ export const LaunchpadFactory = [
       { name: 'scalar', type: 'uint256', internalType: 'uint256' },
       { name: 'lphook', type: 'address', internalType: 'address' },
       { name: 'launchAction', type: 'address', internalType: 'address' },
+      { name: 'connectorWeight', type: 'uint32', internalType: 'uint32' },
     ],
     outputs: [],
     stateMutability: 'payable',

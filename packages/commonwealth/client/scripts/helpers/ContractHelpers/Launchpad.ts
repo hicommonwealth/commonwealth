@@ -43,6 +43,7 @@ class LaunchpadBondingCurve extends ContractBase {
     symbol: string,
     walletAddress: string,
     chainId: string,
+    connectorWeight: number = 830000,
   ) {
     if (!this.initialized || !this.walletEnabled) {
       await this.initialize(true, chainId);
@@ -57,6 +58,7 @@ class LaunchpadBondingCurve extends ContractBase {
       [],
       this.web3.utils.toWei(1e9, 'ether'), // Default 1B tokens
       walletAddress,
+      connectorWeight,
     );
     return txReceipt;
   }
