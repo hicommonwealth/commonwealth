@@ -32,7 +32,6 @@ import updateEmail from '../routes/updateEmail';
 import updateSiteAdmin from '../routes/updateSiteAdmin';
 import verifyAddress from '../routes/verifyAddress';
 import viewComments from '../routes/viewComments';
-import viewCount from '../routes/viewCount';
 
 import getProfileNew from '../routes/getNewProfile';
 import setDefaultRole from '../routes/setDefaultRole';
@@ -48,7 +47,6 @@ import writeUserSetting from '../routes/writeUserSetting';
 import updateCommunityCategory from '../routes/updateCommunityCategory';
 import updateCommunityCustomDomain from '../routes/updateCommunityCustomDomain';
 import updateCommunityPriority from '../routes/updateCommunityPriority';
-import type ViewCountCache from '../util/viewCountCache';
 
 import { type DB } from '@hicommonwealth/model';
 import setAddressWallet from '../routes/setAddressWallet';
@@ -122,7 +120,6 @@ function setupRouter(
   endpoint: string,
   app: Express,
   models: DB,
-  viewCountCache: ViewCountCache,
   databaseValidationService: DatabaseValidationService,
   cacheDecorator: CacheDecorator,
 ) {
@@ -462,14 +459,6 @@ function setupRouter(
     '/setDefaultRole',
     passport.authenticate('jwt', { session: false }),
     setDefaultRole.bind(this, models),
-  );
-
-  // viewCount
-  registerRoute(
-    router,
-    'post',
-    '/viewCount',
-    viewCount.bind(this, models, viewCountCache),
   );
 
   // uploads
