@@ -143,56 +143,10 @@ export async function setupCommonwealthConsumer(): Promise<void> {
     BrokerSubscriptions.LaunchpadPolicy,
     LaunchpadPolicy(),
   );
-
-  if (!discordBotSubRes) {
-    log.fatal(
-      'Failed to subscribe to discord bot policy. Requires restart!',
-      undefined,
-      {
-        topic: BrokerSubscriptions.DiscordBotPolicy,
-      },
-    );
-  }
-
-  if (!chainEventSubRes) {
-    log.fatal(
-      'Failed to subscribe to chain-events. Requires restart!',
-      undefined,
-      {
-        topic: BrokerSubscriptions.ChainEvent,
-      },
-    );
-  }
-
-  if (!contestWorkerSubRes) {
-    log.fatal(
-      'Failed to subscribe to contest worker events. Requires restart!',
-      undefined,
-      {
-        topic: BrokerSubscriptions.ContestWorkerPolicy,
-      },
-    );
-  }
-
-  if (!contestProjectionsSubRes) {
-    log.fatal(
-      'Failed to subscribe to contest projection events. Requires restart!',
-      undefined,
-      {
-        topic: BrokerSubscriptions.ContestProjection,
-      },
-    );
-  }
-
-  if (!launchpadSubRes) {
-    log.fatal(
-      'Failed to subscribe to launchpad worker events. Requires restart!',
-      undefined,
-      {
-        topic: BrokerSubscriptions.LaunchpadPolicy,
-      },
-    );
-  }
+  checkSubscriptionResponse(
+    launchpadSubRes,
+    BrokerSubscriptions.LaunchpadPolicy,
+  );
 }
 
 function startRolloverLoop() {

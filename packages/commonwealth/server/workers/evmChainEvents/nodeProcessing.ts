@@ -7,6 +7,7 @@ import {
   EvmEventSignatures,
   OneOffContestManagerDeployed,
   RecurringContestManagerDeployed,
+  TokenLaunched,
   events as coreEvents,
   logger,
   parseEvmEventToContestEvent,
@@ -141,6 +142,11 @@ export async function processChainNode(
             return parseContestEvent('VoterVotedOneOff') as {
               event_name: EventNames.ContestContentUpvoted;
               event_payload: z.infer<typeof ContestContentUpvoted>;
+            };
+          case EvmEventSignatures.Launchpad.NewTokenCreated:
+            return parseContestEvent('TokenLaunched') as {
+              event_name: EventNames.LaunchpadTokenLaunched;
+              event_payload: z.infer<typeof TokenLaunched>;
             };
         }
 

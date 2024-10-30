@@ -65,7 +65,7 @@ describe('Launchpad', () => {
 
   test(
     'Create Token works given txHash and chainNodeId',
-    { timeout: 10_0000000 },
+    { timeout: 10_000 },
     async () => {
       payload = {
         transaction_hash:

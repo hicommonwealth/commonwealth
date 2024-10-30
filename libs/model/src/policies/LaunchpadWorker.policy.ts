@@ -1,6 +1,6 @@
 import { events, Policy } from '@hicommonwealth/core';
 import { models } from '../database';
-import { createTokenHandler } from '../token';
+import { createTokenHandler } from '../services/commonProtocol/launchpadHelpers';
 
 const inputs = {
   TokenLaunched: events.TokenLaunched,
