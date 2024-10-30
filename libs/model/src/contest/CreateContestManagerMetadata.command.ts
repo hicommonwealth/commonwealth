@@ -4,6 +4,7 @@ import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../database';
 import { isAuthorized, type AuthContext } from '../middleware';
 import { mustExist } from '../middleware/guards';
+import { TopicInstance } from '../models';
 import { buildFarcasterContestFrameUrl } from '../utils';
 
 const Errors = {
@@ -32,9 +33,12 @@ export function CreateContestManagerMetadata(): Command<
       }
 
       // verify topic exists
-      const topic = await models.Topic.findByPk(topic_id);
-      if (!topic) {
-        throw new InvalidState(Errors.InvalidTopics);
+      let topic: TopicInstance | null = null;
+      if (typeof topic_id !== 'undefined') {
+        topic = await models.Topic.findByPk(topic_id);
+        if (!topic) {
+          throw new InvalidState(Errors.InvalidTopics);
+        }
       }
 
       const contestManager = await models.sequelize.transaction(
@@ -48,7 +52,7 @@ export function CreateContestManagerMetadata(): Command<
               farcaster_frame_url: is_farcaster_contest
                 ? buildFarcasterContestFrameUrl(payload.contest_address)
                 : null,
-              topic_id: topic.id!,
+              topic_id: topic?.id || null,
             },
             { transaction },
           );
@@ -61,7 +65,7 @@ export function CreateContestManagerMetadata(): Command<
         contest_managers: [
           {
             ...contestManager.get({ plain: true }),
-            topic: topic.get({ plain: true }),
+            topic: topic?.get({ plain: true }),
           },
         ],
       };

@@ -97,7 +97,7 @@ order by
           replacements: { community_id: payload.community_id },
         },
       );
-      results.forEach((r) =>
+      results.forEach((r) => {
         r.contests.forEach((c) => {
           c.score?.forEach((w) => {
             w.tickerPrize = Number(w.prize) / 10 ** r.decimals;
@@ -107,8 +107,9 @@ order by
           c.score_updated_at =
             c.score_updated_at && new Date(c.score_updated_at);
           // c.actions.forEach((a) => (a.created_at = new Date(a.created_at)));
-        }),
-      );
+        });
+        r.topics = r.topics.filter((t) => !!t.id);
+      });
 
       return results;
     },
