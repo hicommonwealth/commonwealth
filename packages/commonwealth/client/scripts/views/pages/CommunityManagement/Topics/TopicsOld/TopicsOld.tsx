@@ -10,6 +10,9 @@ import {
 import CreateTopicSectionOld from './CreateTopicsSectionOld';
 import ManageTopicsSectionOld from './ManageTopicsSectionOld';
 
+import useUserStore from 'client/scripts/state/ui/user';
+import Permissions from 'client/scripts/utils/Permissions';
+import { PageNotFound } from '../../../404';
 import './TopicsOld.scss';
 
 const TABS = [
@@ -19,6 +22,7 @@ const TABS = [
 
 export const TopicsOld = () => {
   const navigate = useCommonNavigate();
+  const user = useUserStore();
   const [selectedTab, setSelectedTab] = useState(TABS[0].value);
 
   const updateActiveTab = (activeTab: string) => {
@@ -28,6 +32,12 @@ export const TopicsOld = () => {
     setSelectedTab(activeTab);
   };
 
+  if (
+    !user.isLoggedIn ||
+    !(Permissions.isSiteAdmin() || Permissions.isCommunityAdmin())
+  ) {
+    return <PageNotFound />;
+  }
   return (
     <CWPageLayout>
       <div className="TopicsOld">
