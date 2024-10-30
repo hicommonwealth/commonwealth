@@ -86,7 +86,7 @@ export async function __searchComments(
     SELECT
       "Comments".id,
       "Threads".title,
-      "Comments".text,
+      "Comments".body,
       "Comments".thread_id as proposalId,
       'comment' as type,
       "Addresses".id as address_id,

@@ -561,18 +561,18 @@ describe('Thread lifecycle', () => {
 
   describe('comments', () => {
     test('should create a thread comment as member of group with permissions', async () => {
-      let text = chance.paragraph({ sentences: 50 });
+      let body = chance.paragraph({ sentences: 50 });
       const firstComment = await command(CreateComment(), {
         actor: actors.member,
         payload: {
           parent_msg_id: thread!.canvas_msg_id,
           thread_id: thread.id!,
-          text,
+          body,
         },
       });
       expect(firstComment).to.include({
         thread_id: thread!.id,
-        text,
+        body,
         community_id: thread!.community_id,
       });
       expect(firstComment?.content_url).toBeTruthy();
@@ -583,19 +583,19 @@ describe('Thread lifecycle', () => {
         }),
       ).toBeTruthy();
 
-      text = 'hello';
+      body = 'hello';
       const _comment = await command(CreateComment(), {
         actor: actors.member,
         payload: {
           parent_msg_id: thread!.canvas_msg_id,
           thread_id: thread.id!,
-          text,
+          body,
         },
       });
       if (!comment) comment = _comment!;
       expect(_comment).to.include({
         thread_id: thread!.id,
-        text,
+        body,
         community_id: thread!.community_id,
       });
       expect(_comment?.content_url).toBeFalsy();
@@ -608,7 +608,7 @@ describe('Thread lifecycle', () => {
           payload: {
             parent_msg_id: thread.canvas_msg_id,
             thread_id: thread.id! + 5,
-            text: 'hi',
+            body: 'hi',
           },
         }),
       ).rejects.toThrowError(InvalidInput);
@@ -621,7 +621,7 @@ describe('Thread lifecycle', () => {
           payload: {
             parent_msg_id: thread.canvas_msg_id,
             thread_id: thread.id!,
-            text: 'hi',
+            body: 'hi',
           },
         }),
       ).rejects.toThrowError(NonMember);
@@ -634,7 +634,7 @@ describe('Thread lifecycle', () => {
           payload: {
             parent_msg_id: thread!.canvas_msg_id,
             thread_id: archived!.id,
-            text: 'hi',
+            body: 'hi',
           },
         }),
       ).rejects.toThrowError(CreateCommentErrors.ThreadArchived);
@@ -647,7 +647,7 @@ describe('Thread lifecycle', () => {
           payload: {
             parent_msg_id: thread!.canvas_msg_id,
             thread_id: read_only!.id,
-            text: 'hi',
+            body: 'hi',
           },
         }),
       ).rejects.toThrowError(CreateCommentErrors.CantCommentOnReadOnly);
@@ -661,7 +661,7 @@ describe('Thread lifecycle', () => {
             parent_msg_id: thread.canvas_msg_id,
             thread_id: thread.id!,
             parent_id: 1234567890,
-            text: 'hi',
+            body: 'hi',
           },
         }),
       ).rejects.toThrowError(InvalidState);
@@ -677,7 +677,7 @@ describe('Thread lifecycle', () => {
             parent_msg_id: thread.canvas_msg_id,
             thread_id: thread.id!,
             parent_id,
-            text: `level${i}`,
+            body: `level${i}`,
           },
         });
         parent_id = comment!.id;
@@ -696,24 +696,24 @@ describe('Thread lifecycle', () => {
             parent_msg_id: thread.canvas_msg_id,
             thread_id: thread.id!,
             parent_id,
-            text: 'hi',
+            body: 'hi',
           },
         }),
       ).rejects.toThrowError(CreateCommentErrors.NestingTooDeep);
     });
 
     test('should update comment', async () => {
-      let text = chance.paragraph({ sentences: 50 });
+      let body = chance.paragraph({ sentences: 50 });
       let updated = await command(UpdateComment(), {
         actor: actors.member,
         payload: {
           comment_id: comment!.id!,
-          text,
+          body,
         },
       });
       expect(updated).to.include({
         thread_id: thread!.id,
-        text,
+        body,
         community_id: thread!.community_id,
       });
       expect(updated?.content_url).toBeTruthy();
@@ -724,17 +724,17 @@ describe('Thread lifecycle', () => {
         }),
       ).toBeTruthy();
 
-      text = 'hello updated';
+      body = 'hello updated';
       updated = await command(UpdateComment(), {
         actor: actors.member,
         payload: {
           comment_id: comment!.id!,
-          text,
+          body,
         },
       });
       expect(updated).to.include({
         thread_id: thread!.id,
-        text,
+        body,
         community_id: thread!.community_id,
       });
       expect(updated?.content_url).toBeFalsy();
@@ -754,24 +754,24 @@ describe('Thread lifecycle', () => {
           actor: actors.member,
           payload: {
             comment_id: 1234567890,
-            text: 'hi',
+            body: 'hi',
           },
         }),
       ).rejects.toThrowError(InvalidInput);
     });
 
     test('should delete a comment as author', async () => {
-      const text = 'to be deleted';
+      const body = 'to be deleted';
       const tbd = await command(CreateComment(), {
         actor: actors.member,
         payload: {
           thread_id: thread.id!,
-          text,
+          body,
         },
       });
       expect(tbd).to.include({
         thread_id: thread!.id,
-        text,
+        body,
         community_id: thread!.community_id,
       });
       const deleted = await command(DeleteComment(), {
@@ -782,17 +782,17 @@ describe('Thread lifecycle', () => {
     });
 
     test('should delete a comment as admin', async () => {
-      const text = 'to be deleted';
+      const body = 'to be deleted';
       const tbd = await command(CreateComment(), {
         actor: actors.member,
         payload: {
           thread_id: thread.id!,
-          text,
+          body,
         },
       });
       expect(tbd).to.include({
         thread_id: thread!.id,
-        text,
+        body,
         community_id: thread!.community_id,
       });
       const deleted = await command(DeleteComment(), {

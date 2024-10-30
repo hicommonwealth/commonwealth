@@ -181,7 +181,7 @@ function mapThread(thread: z.infer<typeof ActivityThread>): Thread {
             updated_at: c.updated_at,
             profile_avatar: c.profile_avatar,
             profile_name: c.profile_name,
-            text: c.text,
+            text: c.body,
             content_url: c.content_url || null,
           }) as RecentComment,
       ) ?? [],
