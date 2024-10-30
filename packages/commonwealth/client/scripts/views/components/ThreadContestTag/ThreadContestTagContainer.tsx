@@ -1,12 +1,12 @@
 import React from 'react';
 
-import { AssociatedContest } from 'models/Thread';
+import { ContestView } from 'models/Thread';
 
 import ThreadContestTag from './ThreadContestTag';
 import { getWinnersFromAssociatedContests } from './utils';
 
 interface ThreadContestTagContainerProps {
-  associatedContests?: AssociatedContest[];
+  associatedContests?: ContestView[];
 }
 
 const ThreadContestTagContainer = ({
@@ -28,7 +28,7 @@ const ThreadContestTagContainer = ({
             <ThreadContestTag
               date={winner.date}
               round={winner.round}
-              title={winner.title}
+              title={winner.title ?? ''}
               prize={winner.prize}
               key={index}
             />
