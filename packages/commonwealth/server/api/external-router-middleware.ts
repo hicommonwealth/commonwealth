@@ -24,7 +24,6 @@ export async function apiKeyAuthMiddleware(
   if (req.path.startsWith('/docs/') || req.path === '/openapi.json') {
     return next();
   }
-
   const apiKey = req.headers['x-api-key'];
   if (!apiKey) throw new AppError('Unauthorized', 401);
   if (typeof apiKey !== 'string') throw new AppError('Unauthorized', 401);
@@ -39,6 +38,7 @@ export async function apiKeyAuthMiddleware(
     CacheNamespaces.Api_key_auth,
     addressHeader.toLowerCase(),
   );
+
   if (cacheRes) {
     const cachedAuth: {
       hashedApiKey: string;
@@ -74,6 +74,7 @@ export async function apiKeyAuthMiddleware(
         },
       ],
     });
+
     if (!addressInstance || !addressInstance.user_id)
       throw new AppError('Unauthorized', 401);
     const address = addressInstance.get({ plain: true })!;

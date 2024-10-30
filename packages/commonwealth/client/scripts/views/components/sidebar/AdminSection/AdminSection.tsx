@@ -4,13 +4,11 @@ import { handleRedirectClicks } from 'helpers';
 import { useCommonNavigate } from 'navigation/helpers';
 import { matchRoutes, useLocation } from 'react-router-dom';
 import app from 'state';
-import { useFlag } from '../../../../hooks/useFlag';
 import { SidebarSectionGroup } from '../sidebar_section';
 import type { SectionGroupAttrs, SidebarSectionAttrs } from '../types';
 import { useSidebarTreeToggle } from '../useSidebarTreeToggle';
 
 const AdminSection = () => {
-  const contestsEnabled = useFlag('contest');
   const communityId = app.activeChainId() || '';
 
   const navigate = useCommonNavigate();
@@ -149,32 +147,28 @@ const AdminSection = () => {
         });
       },
     },
-    ...(contestsEnabled
-      ? [
-          {
-            title: 'Contests',
-            containsChildren: false,
-            displayData: null,
-            hasDefaultToggle: false,
-            isActive: !!matchesContestsRoute,
-            isVisible: true,
-            isUpdated: false,
-            onClick: (e, toggle: boolean) => {
-              e.preventDefault();
-              resetSidebarState();
-              handleRedirectClicks(
-                navigate,
-                e,
-                `/manage/contests`,
-                communityId,
-                () => {
-                  setToggleTree(`children.contests.toggledState`, toggle);
-                },
-              );
-            },
+    {
+      title: 'Contests',
+      containsChildren: false,
+      displayData: null,
+      hasDefaultToggle: false,
+      isActive: !!matchesContestsRoute,
+      isVisible: true,
+      isUpdated: false,
+      onClick: (e, toggle: boolean) => {
+        e.preventDefault();
+        resetSidebarState();
+        handleRedirectClicks(
+          navigate,
+          e,
+          `/manage/contests`,
+          communityId,
+          () => {
+            setToggleTree(`children.contests.toggledState`, toggle);
           },
-        ]
-      : []),
+        );
+      },
+    },
     {
       title: 'Analytics',
       containsChildren: false,

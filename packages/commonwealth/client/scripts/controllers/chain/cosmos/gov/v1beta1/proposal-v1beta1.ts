@@ -146,10 +146,6 @@ export class CosmosProposal extends Proposal<
     this._Governance.store.add(this);
   }
 
-  public update() {
-    throw new Error('unimplemented');
-  }
-
   public init() {
     if (!this.initialized) {
       this._initialized = true;

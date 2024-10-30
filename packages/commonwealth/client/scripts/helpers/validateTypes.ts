@@ -1,4 +1,3 @@
-import { bech32 } from 'bech32';
 import { isAddress } from 'web3-utils';
 import type { ValidationStatus } from '../views/components/component_kit/cw_validation_text';
 
@@ -9,16 +8,6 @@ enum FormType {
 }
 export function isValidEthAddress(address: string) {
   return isAddress(address);
-}
-
-export function isValidCosmosAddress(address) {
-  try {
-    const decodedAddress = bech32.decode(address);
-    bech32.fromWords(decodedAddress.words);
-    return true;
-  } catch {
-    return false;
-  }
 }
 
 function isValidToken(input: string) {

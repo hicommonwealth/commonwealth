@@ -22,7 +22,6 @@ import { EditTopicModal } from 'views/modals/edit_topic_modal';
 import { Contest } from 'views/pages/CommunityManagement/Contests/ContestsList';
 import ContestCard from 'views/pages/CommunityManagement/Contests/ContestsList/ContestCard';
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
-import { useFlag } from '../../../../hooks/useFlag';
 import type Topic from '../../../../models/Topic';
 import {
   ThreadFeaturedFilterTypes,
@@ -58,7 +57,6 @@ export const HeaderWithFilters = ({
   isOnArchivePage,
   activeContests,
 }: HeaderWithFiltersProps) => {
-  const contestsEnabled = useFlag('contest');
   const navigate = useCommonNavigate();
   const location = useLocation();
   const [topicSelectedToEdit, setTopicSelectedToEdit] = useState<
@@ -210,8 +208,6 @@ export const HeaderWithFilters = ({
     }
   };
 
-  const contestFiltersVisible = contestsEnabled && isContestAvailable;
-
   return (
     <div className="HeaderWithFilters">
       <div className="header-row">
@@ -341,7 +337,7 @@ export const HeaderWithFilters = ({
                     onFilterSelect({ pickedTopic: item.value });
                   }}
                   options={[
-                    ...(contestFiltersVisible
+                    ...(isContestAvailable
                       ? [{ type: 'header', label: 'Topics' }]
                       : []),
                     {
@@ -354,7 +350,7 @@ export const HeaderWithFilters = ({
                       value: t.name,
                       label: t.name,
                     })),
-                    ...(contestFiltersVisible
+                    ...(isContestAvailable
                       ? [
                           { type: 'header-divider', label: 'Contests' },
                           ...contestNameOptions,

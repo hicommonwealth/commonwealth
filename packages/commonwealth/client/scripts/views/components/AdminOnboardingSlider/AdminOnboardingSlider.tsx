@@ -4,7 +4,6 @@ import shape3Url from 'assets/img/shapes/shape3.svg';
 import shape4Url from 'assets/img/shapes/shape4.svg';
 import shape5Url from 'assets/img/shapes/shape5.svg';
 import shape6Url from 'assets/img/shapes/shape6.svg';
-import { useFlag } from 'hooks/useFlag';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useState } from 'react';
 import app from 'state';
@@ -53,7 +52,6 @@ const CARD_TYPES = {
 
 export const AdminOnboardingSlider = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const contestEnabled = useFlag('contest');
 
   const navigate = useCommonNavigate();
 
@@ -127,7 +125,7 @@ export const AdminOnboardingSlider = () => {
       commonProtocol.ValidChains.SepoliaBase,
     ].includes(community?.ChainNode?.eth_chain_id);
   const isContestActionCompleted =
-    contestEnabled && isCommunitySupported && contestsData?.length > 0;
+    isCommunitySupported && contestsData?.length > 0;
 
   const isSliderHidden =
     !communityId ||
@@ -163,7 +161,7 @@ export const AdminOnboardingSlider = () => {
         headerText="Finish setting up your community"
         onDismiss={() => setIsModalVisible(true)}
       >
-        {contestEnabled && isCommunitySupported && (
+        {isCommunitySupported && (
           <ActionCard
             ctaText={CARD_TYPES['launch-contest'].ctaText}
             title={CARD_TYPES['launch-contest'].title}
