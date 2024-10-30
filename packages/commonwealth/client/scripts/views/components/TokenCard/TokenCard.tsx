@@ -1,8 +1,9 @@
 import clsx from 'clsx';
-import React from 'react';
+import React, { ReactNode } from 'react';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { CWText } from '../component_kit/cw_text';
 import { CWButton } from '../component_kit/new_designs/CWButton';
+import { CWTooltip } from '../component_kit/new_designs/CWTooltip';
 import './TokenCard.scss';
 
 interface TokenCardProps {
@@ -22,6 +23,8 @@ interface TokenCardProps {
 const currentNameToSymbol = {
   USD: '$',
 };
+
+const MAX_CHARS_FOR_LABELS = 9;
 
 const TokenCard = ({
   name,
@@ -45,6 +48,38 @@ const TokenCard = ({
   const handleBodyClick = (e: React.MouseEvent) =>
     e.target === e.currentTarget && onCardBodyClick?.();
 
+  const isNameTrimmed = name.length > MAX_CHARS_FOR_LABELS;
+  const trimmedName = isNameTrimmed
+    ? name.slice(0, MAX_CHARS_FOR_LABELS) + '...'
+    : name;
+  const isSymbolTrimmed = symbol.length > MAX_CHARS_FOR_LABELS;
+  const trimmedSymbol = isSymbolTrimmed
+    ? symbol.slice(0, MAX_CHARS_FOR_LABELS) + '...'
+    : symbol;
+
+  const withOptionalTooltip = (
+    children: ReactNode,
+    content: string,
+    shouldDisplay,
+  ) => {
+    if (!shouldDisplay) return children;
+
+    return (
+      <CWTooltip
+        placement="bottom"
+        content={content}
+        renderTrigger={(handleInteraction) => (
+          <span
+            onMouseEnter={handleInteraction}
+            onMouseLeave={handleInteraction}
+          >
+            {children}
+          </span>
+        )}
+      />
+    );
+  };
+
   return (
     <div
       role="button"
@@ -56,10 +91,18 @@ const TokenCard = ({
       {/* name and price row */}
       <div className="basic-info" onClick={handleBodyClick}>
         <div className="col">
-          <CWText className="text-dark" type="h4" fontWeight="regular">
-            {name}
-          </CWText>
-          <CWText className="text-light">{symbol}</CWText>
+          {withOptionalTooltip(
+            <CWText className="text-dark" type="h4" fontWeight="regular">
+              {trimmedName}
+            </CWText>,
+            name,
+            isNameTrimmed,
+          )}
+          {withOptionalTooltip(
+            <CWText className="text-light">{trimmedSymbol}</CWText>,
+            symbol,
+            isSymbolTrimmed,
+          )}
         </div>
         <div className="col">
           <CWText className="text-dark ml-auto" type="h4" fontWeight="regular">
