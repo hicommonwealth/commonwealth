@@ -1,7 +1,7 @@
-import { PermissionEnum } from '@hicommonwealth/schemas';
+import { PermissionEnum, TopicWeightedVoting } from '@hicommonwealth/schemas';
 import { notifyError } from 'controllers/app/notifications';
 import { SessionKeyError } from 'controllers/server/sessions';
-import { parseCustomStages } from 'helpers';
+import { parseCustomStages, weightedVotingValueToLabel } from 'helpers';
 import { detectURL, getThreadActionTooltipText } from 'helpers/threads';
 import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
 import useTopicGating from 'hooks/useTopicGating';
@@ -82,13 +82,14 @@ export const NewThreadForm = () => {
     setCanShowTopicPermissionBanner,
   } = useNewThreadForm(communityId, topicsForSelector);
 
-  const hasTopicOngoingContest = threadTopic?.activeContestManagers?.length > 0;
+  const hasTopicOngoingContest =
+    threadTopic?.active_contest_managers?.length ?? 0 > 0;
 
   const user = useUserStore();
   const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
 
-  const contestTopicError = threadTopic?.activeContestManagers?.length
-    ? threadTopic?.activeContestManagers
+  const contestTopicError = threadTopic?.active_contest_managers?.length
+    ? threadTopic?.active_contest_managers
         ?.map(
           (acm) =>
             acm?.content?.filter(
@@ -259,6 +260,11 @@ export const NewThreadForm = () => {
                         topic: topicsForSelector.find(
                           (t) => String(t.id) === originalProps.data.value,
                         ),
+                        helpText: weightedVotingValueToLabel(
+                          topicsForSelector.find(
+                            (t) => String(t.id) === originalProps.data.value,
+                          )?.weighted_voting as TopicWeightedVoting,
+                        ),
                       }),
                   }}
                   formatOptionLabel={(option) => (
@@ -303,10 +309,10 @@ export const NewThreadForm = () => {
 
               {contestTopicAffordanceVisible && (
                 <ContestTopicBanner
-                  contests={threadTopic?.activeContestManagers.map((acm) => {
+                  contests={threadTopic?.active_contest_managers?.map((acm) => {
                     return {
-                      name: acm?.contest_manager?.name,
-                      address: acm?.contest_manager?.contest_address,
+                      name: acm?.name,
+                      address: acm?.contest_address,
                       submittedEntries:
                         acm?.content?.filter(
                           (c) =>
@@ -368,7 +374,7 @@ export const NewThreadForm = () => {
               )}
 
               <MessageRow
-                hasFeedback={walletBalanceError}
+                hasFeedback={!!walletBalanceError}
                 statusMessage={`Ensure that your connected wallet has at least
                 ${MIN_ETH_FOR_CONTEST_THREAD} ETH to participate.`}
                 validationStatus="failure"

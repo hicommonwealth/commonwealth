@@ -72,25 +72,55 @@ export async function __getStats(
     this.models.sequelize.query<{ monthlySummary: TableCounts }>(
       `
       WITH MonthlyStats AS (
-        SELECT 'numCommentsLastMonth' as label, COUNT(*) as count FROM "Comments" WHERE "created_at" >= :oneMonthAgo
+        SELECT 
+          'numCommentsLastMonth' as label, 
+          COUNT(C.*) as count 
+          FROM "Comments" C JOIN "Threads" T ON C.thread_id = T.id
+          WHERE C."created_at" >= :oneMonthAgo
+          ${community ? `AND T.community_id = :communityId` : ''}
+        UNION ALL
+        SELECT 
+          'numThreadsLastMonth' as label, 
+          COUNT(*) 
+          FROM "Threads" 
+          WHERE "created_at" >= :oneMonthAgo
           ${community ? `AND community_id = :communityId` : ''}
         UNION ALL
-        SELECT 'numThreadsLastMonth' as label, COUNT(*) FROM "Threads" WHERE "created_at" >= :oneMonthAgo
+        SELECT 
+          'numReactionsLastMonth' as label, 
+          COUNT(R.*) 
+          FROM "Reactions" R
+            LEFT JOIN "Threads" T ON R.thread_id = T.id ${community ? `AND T.community_id = :communityId` : ''}
+            LEFT JOIN "Comments" C ON R.comment_id = C.id
+            LEFT JOIN "Threads" TC ON C.thread_id = TC.id ${community ? `AND TC.community_id = :communityId` : ''}
+          WHERE R."created_at" >= :oneMonthAgo
+        UNION ALL
+        SELECT 
+          'numProposalVotesLastMonth' as label, 
+          COUNT(*) 
+          FROM "Votes" 
+          WHERE "created_at" >= :oneMonthAgo
           ${community ? `AND community_id = :communityId` : ''}
         UNION ALL
-        SELECT 'numReactionsLastMonth' as label, COUNT(*) FROM "Reactions" WHERE "created_at" >= :oneMonthAgo
+        SELECT 
+          'numPollsLastMonth' as label, 
+          COUNT(*) 
+          FROM "Polls" 
+          WHERE "created_at" >= :oneMonthAgo
           ${community ? `AND community_id = :communityId` : ''}
         UNION ALL
-        SELECT 'numProposalVotesLastMonth' as label, COUNT(*) FROM "Votes" WHERE "created_at" >= :oneMonthAgo
+        SELECT 
+          'numMembersLastMonth' as label, 
+          COUNT(*) 
+          FROM "Addresses" 
+          WHERE "created_at" >= :oneMonthAgo
           ${community ? `AND community_id = :communityId` : ''}
         UNION ALL
-        SELECT 'numPollsLastMonth' as label, COUNT(*) FROM "Polls" WHERE "created_at" >= :oneMonthAgo
-          ${community ? `AND community_id = :communityId` : ''}
-        UNION ALL
-        SELECT 'numMembersLastMonth' as label, COUNT(*) FROM "Addresses" WHERE "created_at" >= :oneMonthAgo
-          ${community ? `AND community_id = :communityId` : ''}
-        UNION ALL
-        SELECT 'numGroupsLastMonth' as label, COUNT(*) FROM "Groups" WHERE "created_at" >= :oneMonthAgo
+        SELECT 
+          'numGroupsLastMonth' as label, 
+          COUNT(*) 
+          FROM "Groups" 
+          WHERE "created_at" >= :oneMonthAgo
           ${community ? `AND community_id = :communityId` : ''}
       )
       SELECT json_build_object(

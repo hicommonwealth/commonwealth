@@ -19,7 +19,6 @@ import { ThreadCard } from './ThreadCard';
 import { sortByFeaturedFilter, sortPinned } from './helpers';
 
 import { slugify, splitAndDecodeURL } from '@hicommonwealth/shared';
-import { formatAddressShort } from 'helpers';
 import { getThreadActionTooltipText } from 'helpers/threads';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import { useFlag } from 'hooks/useFlag';
@@ -28,8 +27,10 @@ import useTopicGating from 'hooks/useTopicGating';
 import 'pages/discussions/index.scss';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { useFetchCustomDomainQuery } from 'state/api/configuration';
+import { useGetERC20BalanceQuery } from 'state/api/tokens';
 import useUserStore from 'state/ui/user';
 import Permissions from 'utils/Permissions';
+import { saveToClipboard } from 'utils/clipboard';
 import { checkIsTopicInContest } from 'views/components/NewThreadFormLegacy/helpers';
 import TokenBanner from 'views/components/TokenBanner';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
@@ -38,6 +39,8 @@ import { isContestActive } from 'views/pages/CommunityManagement/Contests/utils'
 import useTokenMetadataQuery from '../../../state/api/tokens/getTokenMetadata';
 import { AdminOnboardingSlider } from '../../components/AdminOnboardingSlider';
 import { UserTrainingSlider } from '../../components/UserTrainingSlider';
+import { CWText } from '../../components/component_kit/cw_text';
+import CWIconButton from '../../components/component_kit/new_designs/CWIconButton';
 import { DiscussionsFeedDiscovery } from './DiscussionsFeedDiscovery';
 import { EmptyThreadsPlaceholder } from './EmptyThreadsPlaceholder';
 
@@ -99,6 +102,12 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
 
   const { contestsData } = useCommunityContests();
 
+  const { data: erc20Balance } = useGetERC20BalanceQuery({
+    tokenAddress: topicObj?.token_address || '',
+    userAddress: user.activeAccount?.address || '',
+    nodeRpc: app?.chain.meta?.ChainNode?.url || '',
+  });
+
   const { dateCursor } = useDateCursor({
     dateRange: searchParams.get('dateRange') as ThreadTimelineFilterTypes,
   });
@@ -108,7 +117,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     (domain?.isCustomDomain ? `/archived` : `/${app.activeChainId()}/archived`);
 
   const { data: tokenMetadata } = useTokenMetadataQuery({
-    tokenId: topicObj?.tokenAddress || '',
+    tokenId: topicObj?.token_address || '',
     nodeEthChainId: app?.chain.meta?.ChainNode?.eth_chain_id || 0,
   });
 
@@ -175,7 +184,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const isTopicWeighted =
     weightedTopicsEnabled &&
     topicId &&
-    topicObj.weightedVoting === TopicWeightedVoting.ERC20;
+    topicObj.weighted_voting === TopicWeightedVoting.ERC20;
 
   const activeContestsInTopic = contestsData?.filter((contest) => {
     const isContestInTopic = (contest.topics || []).find(
@@ -184,6 +193,15 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     const isActive = isContestActive({ contest });
     return isContestInTopic && isActive;
   });
+
+  const voteWeight =
+    isTopicWeighted && erc20Balance
+      ? String(
+          (
+            (topicObj?.vote_weight_multiplier || 1) * Number(erc20Balance)
+          ).toFixed(0),
+        )
+      : '';
 
   return (
     // @ts-expect-error <StrictNullChecks/>
@@ -207,13 +225,13 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
           const isTopicGated = !!(memberships || []).find(
             (membership) =>
               thread?.topic?.id &&
-              membership.topics.find((t) => t.id === thread.topic.id),
+              membership.topics.find((t) => t.id === thread.topic!.id),
           );
 
           const isActionAllowedInGatedTopic = !!(memberships || []).find(
             (membership) =>
               thread?.topic?.id &&
-              membership.topics.find((t) => t.id === thread.topic.id) &&
+              membership.topics.find((t) => t.id === thread.topic!.id) &&
               membership.isAllowed,
           );
 
@@ -221,7 +239,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
             !isAdmin && isTopicGated && !isActionAllowedInGatedTopic;
 
           const foundTopicPermissions = topicPermissions.find(
-            (tp) => tp.id === thread.topic.id,
+            (tp) => tp.id === thread.topic!.id,
           );
 
           const disabledActionsTooltipText = getThreadActionTooltipText({
@@ -276,7 +294,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
                   ? !disabledCommentPermissionTooltipText
                   : !disabledActionsTooltipText
               }
-              onEditStart={() => navigate(`${discussionLink}`)}
+              onEditStart={() => navigate(`${discussionLink}?isEdit=true`)}
               onStageTagClick={() => {
                 navigate(`/discussions?stage=${thread.stage}`);
               }}
@@ -321,11 +339,30 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
               {isTopicWeighted && (
                 <TokenBanner
                   name={tokenMetadata?.name}
-                  ticker={topicObj?.tokenSymbol}
+                  ticker={topicObj?.token_symbol}
                   avatarUrl={tokenMetadata?.logo}
+                  voteWeight={voteWeight}
                   popover={{
                     title: tokenMetadata?.name,
-                    body: formatAddressShort(topicObj.tokenAddress!, 6, 6),
+                    body: (
+                      <>
+                        <CWText type="b2" className="token-description">
+                          This topic has weighted voting enabled using{' '}
+                          <span className="token-address">
+                            {topicObj.token_address}
+                          </span>
+                          <CWIconButton
+                            iconName="copy"
+                            onClick={() => {
+                              saveToClipboard(
+                                topicObj.token_address!,
+                                true,
+                              ).catch(console.error);
+                            }}
+                          />
+                        </CWText>
+                      </>
+                    ),
                   }}
                 />
               )}

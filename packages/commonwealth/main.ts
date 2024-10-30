@@ -79,6 +79,7 @@ export async function main(
     saveUninitialized: false,
     cookie: {
       maxAge: config.AUTH.SESSION_EXPIRY_MILLIS,
+      sameSite: 'lax',
     },
   });
 

@@ -9,6 +9,7 @@ const {
   TELEGRAM_BOT_TOKEN,
   TELEGRAM_BOT_TOKEN_DEV,
   SESSION_SECRET,
+  SNAPSHOT_WEBHOOK_SECRET,
   NO_PRERENDER: _NO_PRERENDER,
   NO_GLOBAL_ACTIVITY_CACHE,
   PRERENDER_TOKEN,
@@ -21,7 +22,7 @@ const {
   EVM_CE_POLL_INTERVAL,
   CF_ZONE_ID,
   CF_API_KEY,
-  PEER_ID,
+  LIBP2P_PRIVATE_KEY,
 } = process.env;
 
 const NO_PRERENDER = _NO_PRERENDER;
@@ -94,7 +95,8 @@ export const config = configure(
         10,
       ),
     },
-    PEER_ID,
+    LIBP2P_PRIVATE_KEY,
+    SNAPSHOT_WEBHOOK_SECRET,
   },
   z.object({
     NO_PRERENDER: z.boolean(),
@@ -155,6 +157,13 @@ export const config = configure(
       MESSAGE_RELAYER_PREFETCH: z.number().int().positive(),
       EVM_CE_POLL_INTERVAL_MS: z.number().int().positive(),
     }),
-    PEER_ID: z.string().optional(),
+    LIBP2P_PRIVATE_KEY: z.string().optional(),
+    SNAPSHOT_WEBHOOK_SECRET: z
+      .string()
+      .optional()
+      .refine(
+        (data) => !(!['local', 'CI'].includes(model_config.APP_ENV) && !data),
+        'SNAPSHOT_WEBHOOK_SECRET is required in public environments',
+      ),
   }),
 );

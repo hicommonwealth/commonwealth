@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { DiscordMetaSchema, PG_INT } from '../utils';
+import { PaginatedResultSchema, PaginationParamsSchema } from './pagination';
 
 export const ActivityComment = z.object({
   id: z.number(),
@@ -8,6 +9,7 @@ export const ActivityComment = z.object({
   profile_name: z.string().nullish(),
   profile_avatar: z.string().nullish(),
   text: z.string(),
+  content_url: z.string().nullish(),
   created_at: z.string(),
   updated_at: z.string().nullish(),
   deleted_at: z.string().nullish(),
@@ -24,6 +26,7 @@ export const ActivityThread = z.object({
   profile_name: z.string().nullish(),
   profile_avatar: z.string().nullish(),
   body: z.string(),
+  content_url: z.string().nullish(),
   title: z.string(),
   kind: z.string(),
   stage: z.string(),
@@ -46,13 +49,17 @@ export const ActivityThread = z.object({
 });
 
 export const ActivityFeed = {
-  input: z.object({
+  input: PaginationParamsSchema.extend({
     thread_limit: z.number().optional(),
     comment_limit: z.number().optional(),
   }),
-  output: z.array(ActivityThread),
+  output: PaginatedResultSchema.extend({
+    results: z.array(ActivityThread),
+  }),
 };
-
+export const ActivityThreadWrapper = z.object({
+  thread: ActivityThread,
+});
 export const ChainFeedRecord = z.object({
   community_id: z.string(),
   network: z.string(),

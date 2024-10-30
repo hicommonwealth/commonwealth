@@ -31,6 +31,7 @@ export async function getSignedUrl_S3sdk(
     }),
     {
       expiresIn: options.ttl,
+      signableHeaders: new Set(['content-type']),
     },
   );
 }

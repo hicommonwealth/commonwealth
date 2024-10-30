@@ -16,7 +16,6 @@ import { getThreadActionTooltipText } from 'helpers/threads';
 import useTopicGating from 'hooks/useTopicGating';
 import { getProposalUrlPath } from 'identifiers';
 import { Thread, type RecentComment } from 'models/Thread';
-import Topic from 'models/Topic';
 import { ThreadKind, ThreadStage } from 'models/types';
 import { useCommonNavigate } from 'navigation/helpers';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
@@ -35,14 +34,13 @@ const DEFAULT_COUNT = 10;
 const FeedThread = ({ thread }: { thread: Thread }) => {
   const navigate = useCommonNavigate();
   const user = useUserStore();
-
   const { data: domain } = useFetchCustomDomainQuery();
 
   const discussionLink = getProposalUrlPath(
-    thread.slug,
-    `${thread.identifier}-${slugify(thread.title)}`,
+    thread?.slug,
+    `${thread?.identifier}-${slugify(thread.title)}`,
     false,
-    thread.communityId,
+    thread?.communityId,
   );
 
   const { data: community } = useGetCommunityByIdQuery({
@@ -127,41 +125,49 @@ function mapThread(thread: z.infer<typeof ActivityThread>): Thread {
     Address: {
       address: thread.user_address,
       community_id: thread.community_id,
+      ghost_address: false,
+      is_user_default: false,
+      is_banned: false,
+      role: 'member',
     },
     title: thread.title,
     id: thread.id,
     created_at: thread.created_at ?? '',
     updated_at: thread.updated_at ?? thread.created_at ?? '',
-    topic: new Topic({
+    topic: {
       community_id: thread.community_id,
       id: thread.topic.id,
       name: thread.topic.name,
       description: thread.topic.description,
+      created_at: '',
       featured_in_sidebar: false,
       featured_in_new_post: false,
       group_ids: [],
       active_contest_managers: [],
       total_threads: 0,
-    }),
+    },
     kind: thread.kind as ThreadKind,
     stage: thread.stage as ThreadStage,
     ThreadVersionHistories: [],
     community_id: thread.community_id,
     read_only: thread.read_only,
     body: thread.body,
+    content_url: thread.content_url || null,
     locked_at: thread.locked_at ?? '',
     archived_at: thread.archived_at ?? '',
     has_poll: thread.has_poll ?? false,
     marked_as_spam_at: thread.marked_as_spam_at ?? '',
-    discord_meta: thread.discord_meta,
+    discord_meta: thread.discord_meta!,
     profile_name: thread.profile_name ?? '',
     avatar_url: thread.profile_avatar ?? '',
     user_id: thread.user_id,
     userId: thread.user_id,
     last_edited: thread.updated_at ?? '',
     last_commented_on: '',
-    reaction_weights_sum: 0,
+    reaction_weights_sum: '0',
     address_last_active: '',
+    address_id: 0,
+    search: '',
     ContestActions: [],
     numberOfComments: thread.number_of_comments,
     recentComments:
@@ -176,6 +182,7 @@ function mapThread(thread: z.infer<typeof ActivityThread>): Thread {
             profile_avatar: c.profile_avatar,
             profile_name: c.profile_name,
             text: c.text,
+            content_url: c.content_url || null,
           }) as RecentComment,
       ) ?? [],
   });
@@ -189,9 +196,14 @@ type FeedProps = {
 
 // eslint-disable-next-line react/no-multi-comp
 export const Feed = ({ query, customScrollParent }: FeedProps) => {
-  const feed = query();
-
-  if (feed.isLoading) {
+  const {
+    data: feed,
+    isLoading,
+    hasNextPage,
+    fetchNextPage,
+    isError,
+  } = query({ limit: 10 });
+  if (isLoading) {
     return (
       <div className="Feed">
         <Virtuoso
@@ -204,11 +216,14 @@ export const Feed = ({ query, customScrollParent }: FeedProps) => {
     );
   }
 
-  if (feed.isError) {
+  if (isError) {
     return <PageNotFound message="There was an error rendering the feed." />;
   }
+  const allThreads = feed?.pages
+    ? feed.pages.flatMap((page) => page.results || [])
+    : [];
 
-  if (feed.data.length === 0) {
+  if (!allThreads?.length) {
     return (
       <div className="Feed">
         <div className="no-feed-message">
@@ -217,16 +232,20 @@ export const Feed = ({ query, customScrollParent }: FeedProps) => {
       </div>
     );
   }
-
   return (
     <div className="Feed">
       <Virtuoso
+        overscan={50}
         customScrollParent={customScrollParent}
-        totalCount={feed.data.length || DEFAULT_COUNT}
+        totalCount={allThreads?.length || DEFAULT_COUNT}
+        data={allThreads || []}
         style={{ height: '100%' }}
-        itemContent={(i) => (
-          <FeedThread key={i} thread={mapThread(feed.data[i])} />
+        itemContent={(i, thread) => (
+          <FeedThread key={i} thread={mapThread(thread)} />
         )}
+        endReached={() => {
+          hasNextPage && fetchNextPage().catch(console.error);
+        }}
       />
     </div>
   );

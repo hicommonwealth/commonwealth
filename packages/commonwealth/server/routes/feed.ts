@@ -1,13 +1,15 @@
 import { AppError, query } from '@hicommonwealth/core';
 import { Thread, type DB } from '@hicommonwealth/model';
+import * as schemas from '@hicommonwealth/schemas';
 import {
   GetThreads,
   GetThreadsOrderBy,
   GetThreadsStatus,
-  Thread as ThreadSchema,
 } from '@hicommonwealth/schemas';
 import { getDecodedString, slugify } from '@hicommonwealth/shared';
+import { ThreadView } from 'client/scripts/models/Thread';
 import { Feed } from 'feed';
+import moment from 'moment';
 import { z } from 'zod';
 import { ServerControllers } from '../routing/router';
 import { TypedRequestQuery, TypedResponse } from '../types';
@@ -20,14 +22,11 @@ import {
   SearchThreadsRequestQuery,
 } from './threads/get_threads_handler';
 
-function toDate(t: z.infer<typeof ThreadSchema>): Date {
-  return t.last_edited ?? t.created_at!;
+function toDate(t: ThreadView): Date {
+  return moment(t.last_edited ?? t.created_at!).toDate();
 }
 
-function sortByDateDesc(
-  a: z.infer<typeof ThreadSchema>,
-  b: z.infer<typeof ThreadSchema>,
-) {
+function sortByDateDesc(a: ThreadView, b: ThreadView) {
   return toDate(b).getTime() - toDate(a).getTime();
 }
 
@@ -56,7 +55,7 @@ export const getFeedHandler = async (
   >,
   res: TypedResponse<GetThreadsResponse>,
 ) => {
-  const queryValidationResult = Thread.GetThreadsParamsSchema.safeParse(
+  const queryValidationResult = schemas.DEPRECATED_GetThreads.safeParse(
     req.query,
   );
 
@@ -74,7 +73,7 @@ export const getFeedHandler = async (
   // get bulk threads
   if (bulk) {
     const bulkQueryValidationResult =
-      Thread.GetBulkThreadsParamsSchema.safeParse(req.query);
+      schemas.DEPRECATED_GetBulkThreads.safeParse(req.query);
 
     if (bulkQueryValidationResult.success === false) {
       throw new AppError(formatErrorPretty(bulkQueryValidationResult));
