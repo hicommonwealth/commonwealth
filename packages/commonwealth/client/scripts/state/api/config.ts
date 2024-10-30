@@ -34,7 +34,6 @@ export const ApiEndpoints = {
   searchComments: (searchTerm: string) => `/comments?search=${searchTerm}`,
   searchProfiles: (searchTerm: string) => `/profiles?search=${searchTerm}`,
   searchChains: (searchTerm: string) => `/communities?search=${searchTerm}`,
-  VIEW_COUNT: '/viewCount',
   GENERATE_IMAGE: '/generateImage',
   GENERATE_TOKEN_IDEA: '/generateTokenIdea',
   UPLOAD_FILE: '/getUploadSignature',
