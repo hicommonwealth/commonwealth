@@ -175,12 +175,12 @@ export const ConstestManagerView = ContestManager.extend({
 });
 
 export const TopicView = Topic.extend({
-  created_at: z.string(),
+  created_at: z.string().nullish(),
   updated_at: z.string().nullish(),
   deleted_at: z.string().nullish(),
   contest_topics: z.undefined(),
-  total_threads: z.number(),
-  active_contest_managers: z.array(ConstestManagerView),
+  total_threads: z.number().default(0),
+  active_contest_managers: z.array(ConstestManagerView).optional(),
 });
 
 export const GetTopics = {

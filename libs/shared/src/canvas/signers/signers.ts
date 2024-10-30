@@ -8,14 +8,16 @@ import {
   DidIdentifier,
   Session,
   Signer,
+  Snapshot,
 } from '@canvas-js/interfaces';
 import { fromBech32, toBech32 } from '@cosmjs/encoding';
 import { addressSwapper } from '@hicommonwealth/shared';
 import * as json from '@ipld/dag-json';
 import { KeypairType } from '@polkadot/util-crypto/types';
+import { Wallet } from 'ethers';
 
 export const getTestSigner = () => {
-  return new SIWESigner();
+  return new SIWESigner({ signer: Wallet.createRandom() });
 };
 
 export const getSessionSigners = () => {
@@ -168,7 +170,7 @@ export class SubstrateSignerCW extends SubstrateSigner {
     options: { did?: string; address?: string } = {},
   ): Promise<{
     payload: Session<SubstrateSessionData>;
-    signer: Signer<Action | Session<SubstrateSessionData>>;
+    signer: Signer<Action | Snapshot | Session<SubstrateSessionData>>;
   } | null> {
     let did;
     if (options.address) {
