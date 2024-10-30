@@ -25,16 +25,16 @@ export const ArchiveThreadModal = ({
   const { mutateAsync: editThread } = useEditThreadMutation({
     communityId: app.activeChainId() || '',
     threadId: thread.id,
-    threadMsgId: thread.canvasMsgId,
+    threadMsgId: thread.canvasMsgId!,
     currentStage: thread.stage,
-    currentTopicId: thread.topic.id!,
+    currentTopicId: thread.topic!.id!,
   });
   const user = useUserStore();
 
   const handleArchiveThread = async () => {
     const input = await buildUpdateThreadInput({
       threadId: thread.id,
-      threadMsgId: thread.canvasMsgId,
+      threadMsgId: thread.canvasMsgId!,
       communityId: app.activeChainId() || '',
       archived: !thread.archivedAt,
       address: user.activeAccount?.address || '',

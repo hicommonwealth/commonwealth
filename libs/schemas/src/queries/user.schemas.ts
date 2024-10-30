@@ -2,8 +2,8 @@ import { z } from 'zod';
 import { Community } from '../entities';
 import { Comment } from '../entities/comment.schemas';
 import { Tags } from '../entities/tag.schemas';
-import { Thread } from '../entities/thread.schemas';
 import { Address, UserProfile } from '../entities/user.schemas';
+import { ThreadView } from './thread.schemas';
 
 export const GetNewProfileReq = z.object({
   userId: z.string().optional(),
@@ -22,9 +22,9 @@ export const GetNewProfileResp = z.object({
       }),
     }),
   ),
-  threads: z.array(Thread),
+  threads: z.array(ThreadView),
   comments: z.array(Comment),
-  commentThreads: z.array(Thread),
+  commentThreads: z.array(ThreadView),
   isOwner: z.boolean(),
   tags: z.array(Tags),
 });
