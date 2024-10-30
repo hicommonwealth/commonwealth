@@ -1,3 +1,4 @@
+import { BigNumber } from '@ethersproject/bignumber';
 import { Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
@@ -95,14 +96,23 @@ WITH topic_data AS (
     ${contest_managers}
   `;
 
-      return await models.sequelize.query<z.infer<typeof schemas.TopicView>>(
-        sql,
-        {
-          replacements: { community_id },
-          type: QueryTypes.SELECT,
-          raw: true,
-        },
-      );
+      const results = await models.sequelize.query<
+        z.infer<typeof schemas.TopicView>
+      >(sql, {
+        replacements: { community_id },
+        type: QueryTypes.SELECT,
+        raw: true,
+      });
+
+      results.forEach((r) => {
+        r.active_contest_managers?.forEach((cm) => {
+          cm.content.forEach((c) => {
+            c.voting_power = BigNumber.from(c.voting_power).toString();
+          });
+        });
+      });
+
+      return results;
     },
   };
 }
