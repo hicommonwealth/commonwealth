@@ -8,7 +8,7 @@ export const ActivityComment = z.object({
   user_id: z.number().nullish(),
   profile_name: z.string().nullish(),
   profile_avatar: z.string().nullish(),
-  text: z.string(),
+  body: z.string(),
   content_url: z.string().nullish(),
   created_at: z.string(),
   updated_at: z.string().nullish(),

@@ -183,8 +183,8 @@ export const CommentCard = ({
     );
 
     if (!foundVersion?.content_url) {
-      setCommentText(foundVersion?.text || '');
-      setCommentDelta(foundVersion?.text || '');
+      setCommentText(foundVersion?.body || '');
+      setCommentDelta(foundVersion?.body || '');
       return;
     }
 

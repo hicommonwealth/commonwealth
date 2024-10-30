@@ -73,7 +73,7 @@ export const processCommentCreated: EventHandler<
     })) as { user_id: number }[];
   }
 
-  const commentSummary = safeTruncateBody(getDecodedString(payload.text), 255);
+  const commentSummary = safeTruncateBody(getDecodedString(payload.body), 255);
   const commentUrl = getCommentUrl(
     payload.community_id,
     payload.thread_id,
@@ -113,7 +113,7 @@ export const processCommentCreated: EventHandler<
     });
     const previewImg = Webhook.getPreviewImageUrl(
       community,
-      getDecodedString(payload.text),
+      getDecodedString(payload.body),
     );
 
     const provider = notificationsProvider();

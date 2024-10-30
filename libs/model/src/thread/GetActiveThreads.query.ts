@@ -45,7 +45,7 @@ export function GetActiveThreads(): Query<typeof schemas.GetActiveThreads> {
                 attributes: [
                   'id',
                   'address_id',
-                  'text',
+                  'body',
                   'created_at',
                   'updated_at',
                   'deleted_at',
