@@ -4,7 +4,15 @@
 html,
 body,
 #root {
-  max-height: 100vh;
+  max-height: 1550px;
+}
+
+body {
+  background-color: red;
+}
+
+.mdxeditor {
+  background-color: white;
 }
 
 #root {

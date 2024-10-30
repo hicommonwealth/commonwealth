@@ -8,16 +8,20 @@ import {
 
 import './MarkdownEditorPage.scss';
 
+import { Helmet } from 'react-helmet-async';
 import { MarkdownSubmitButton } from 'views/components/MarkdownEditor/MarkdownSubmitButton';
 import overview from 'views/components/MarkdownEditor/markdown/editor_overview.md?raw';
 import supported from 'views/components/MarkdownEditor/markdown/supported.md?raw';
 import { useMarkdownEditorMethods } from 'views/components/MarkdownEditor/useMarkdownEditorMethods';
+import { FakeEditor } from 'views/pages/MarkdownEditorPage/FakeEditor';
 
 function useParams() {
   const [searchParams] = useSearchParams();
   const mode = searchParams.get('mode') ?? 'desktop';
+  const fake = searchParams.get('fake') === 'true';
   return {
     mode: mode as MarkdownEditorMode,
+    fake,
   };
 }
 
@@ -25,7 +29,11 @@ function useParams() {
  * Basic demo page that allows us to use either mode and to log the markdown.
  */
 export const MarkdownEditorPage = () => {
-  const { mode } = useParams();
+  const { mode, fake } = useParams();
+
+  if (fake) {
+    return <FakeEditor />;
+  }
 
   if (mode === 'desktop') {
     return (
@@ -55,6 +63,13 @@ const SubmitButton = () => {
 const Inner = (props: Pick<MarkdownEditorProps, 'mode'>) => {
   return (
     <>
+      <Helmet>
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1.0, user-scalable=no"
+        />
+      </Helmet>
+
       <MarkdownEditor
         {...props}
         markdown={`${overview}\n${supported}`}
