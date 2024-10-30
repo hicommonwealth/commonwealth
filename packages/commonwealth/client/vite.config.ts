@@ -123,6 +123,13 @@ export default defineConfig(({ mode }) => {
         'long',
         '@osmonauts/lcd',
         'protobufjs/minimal',
+        'underscore',
+        'react-router',
+        '@lexical/rich-text',
+        'lexical',
+        'numeral',
+        'firebase/app',
+        'firebase/messaging',
       ],
     },
     build: {
