@@ -68,7 +68,7 @@ export function GetThreads(): Query<typeof schemas.GetThreads> {
       };
 
       const responseThreadsQuery = models.sequelize.query<
-        z.infer<typeof schemas.MappedThread>
+        z.infer<typeof schemas.ThreadView>
       >(
         `
             WITH contest_ids as (

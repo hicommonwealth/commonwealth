@@ -28,6 +28,7 @@ import {
   type Role,
 } from '@hicommonwealth/shared';
 import chai from 'chai';
+import { Wallet } from 'ethers';
 import type { Application } from 'express';
 import { z } from 'zod';
 import { TEST_BLOCK_INFO_STRING } from './keys';
@@ -260,7 +261,10 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
     if (chain === 'ethereum' || chain === 'alex') {
       wallet_id = 'metamask';
       chain_id = chain === 'alex' ? '3' : '1'; // use ETH mainnet for testing except alex
-      sessionSigner = new SIWESigner({ chainId: parseInt(chain_id) });
+      sessionSigner = new SIWESigner({
+        chainId: parseInt(chain_id),
+        signer: Wallet.createRandom(),
+      });
     } else if (chain === 'edgeware') {
       wallet_id = 'polkadot';
       sessionSigner = new SubstrateSignerCW();

@@ -86,7 +86,7 @@ export const ThreadOptions = ({
   useEffect(() => {
     try {
       const canvasSignedData: CanvasSignedData = deserializeCanvas(
-        thread.canvasSignedData,
+        thread.canvasSignedData!,
       );
       if (!canvasSignedData) return;
       verify(canvasSignedData)
