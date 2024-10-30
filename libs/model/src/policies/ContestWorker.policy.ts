@@ -24,21 +24,20 @@ export function ContestWorker(): Policy<typeof inputs> {
           payload.id!,
         );
 
-        const activeContestManagers =
-          await Contest.GetActiveContestManagers().body({
-            actor: {} as Actor,
-            payload: {
-              community_id: payload.community_id!,
-              topic_id: payload.topic_id!,
-            },
-          });
-        if (!activeContestManagers?.length) {
+        const contestManagers = await Contest.GetActiveContestManagers().body({
+          actor: {} as Actor,
+          payload: {
+            community_id: payload.community_id!,
+            topic_id: payload.topic_id!,
+          },
+        });
+        if (!contestManagers?.length) {
           log.warn('ThreadCreated: no matching contest managers found');
           return;
         }
 
         await createOnchainContestContent({
-          contestManagers: activeContestManagers,
+          contestManagers,
           bypass_quota: false,
           content_url,
           author_address: payload.address!,
@@ -116,14 +115,16 @@ export function ContestWorker(): Policy<typeof inputs> {
           activeContestManagersWithoutVote[0]!,
         );
 
+        const contestManagers = activeContestManagersWithoutVote.map(
+          ({ contest_address, content_id }) => ({
+            url: chainNodeUrl,
+            contest_address,
+            content_id,
+          }),
+        );
+
         await createOnchainContestVote({
-          contestManagers: activeContestManagersWithoutVote.map(
-            ({ contest_address, content_id }) => ({
-              url: chainNodeUrl,
-              contest_address,
-              content_id,
-            }),
-          ),
+          contestManagers,
           content_url,
           author_address: payload.address!,
         });

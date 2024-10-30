@@ -123,22 +123,28 @@ export function FarcasterWorker(): Policy<typeof inputs> {
         );
         mustExist('Community with Chain Node', community?.ChainNode);
 
+        const contestManagers = [
+          {
+            url: community.ChainNode!.private_url!,
+            contest_address: contestManager.contest_address,
+            actions: [],
+          },
+        ];
+
         // create onchain content from reply cast
         const content_url = buildFarcasterContentUrl(payload.hash);
         await createOnchainContestContent({
-          contestManagers: [
-            {
-              url: community.ChainNode!.private_url!,
-              contest_address: contestManager.contest_address,
-              actions: [],
-            },
-          ],
+          contestManagers,
           bypass_quota: true,
           author_address: payload.author.custody_address,
           content_url,
         });
       },
       FarcasterVoteCreated: async ({ payload }) => {
+        const content_url = buildFarcasterContentUrl(
+          payload.untrustedData.castId.hash,
+        );
+
         const contestManager = await models.ContestManager.findOne({
           where: {
             cancelled: {
@@ -151,6 +157,15 @@ export function FarcasterWorker(): Policy<typeof inputs> {
           },
         });
         mustExist('Contest Manager', contestManager);
+
+        // find content by url
+        const contestActions = await models.ContestAction.findAll({
+          where: {
+            contest_address: contestManager.contest_address,
+            action: 'added',
+            content_url,
+          },
+        });
 
         const client = new NeynarAPIClient(config.CONTESTS.NEYNAR_API_KEY!);
 
@@ -172,25 +187,14 @@ export function FarcasterWorker(): Policy<typeof inputs> {
         );
         mustExist('Community with Chain Node', community?.ChainNode);
 
-        const content_url = buildFarcasterContentUrl(
-          payload.untrustedData.castId.hash,
-        );
-
-        // find content by url
-        const contestActions = await models.ContestAction.findAll({
-          where: {
-            contest_address: contestManager.contest_address,
-            action: 'added',
-            content_url,
-          },
-        });
+        const contestManagers = contestActions.map((ca) => ({
+          url: community.ChainNode!.private_url!,
+          contest_address: contestManager.contest_address,
+          content_id: ca.content_id,
+        }));
 
         await createOnchainContestVote({
-          contestManagers: contestActions.map((ca) => ({
-            url: community.ChainNode!.private_url!,
-            contest_address: contestManager.contest_address,
-            content_id: ca.content_id,
-          })),
+          contestManagers,
           author_address: users[0].custody_address,
           content_url,
         });
