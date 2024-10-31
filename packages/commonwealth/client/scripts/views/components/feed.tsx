@@ -176,7 +176,7 @@ function mapThread(thread: z.infer<typeof ActivityThread>): Thread {
         updated_at: c.updated_at,
         profile_avatar: c.profile_avatar ?? '',
         profile_name: c.profile_name ?? '',
-        text: c.body,
+        body: c.body,
         content_url: c.content_url || null,
         thread_id: 0,
         address_id: 0,

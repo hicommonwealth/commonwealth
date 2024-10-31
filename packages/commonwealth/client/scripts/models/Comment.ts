@@ -79,14 +79,14 @@ export class Comment<T extends IUniqueId> {
     reactions?: any[];
     reaction_weights_sum: string;
     created_at: Moment | null;
-    deleted_at?: string;
+    deleted_at?: string | null | Date;
     authorChain?: string;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     last_edited?: any;
     canvas_signed_data?: string | null;
     canvas_msg_id?: string | null;
     CommentVersionHistories?: CommentVersionHistory[];
-    marked_as_spam_at?: string;
+    marked_as_spam_at?: string | null | Date;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     discord_meta?: any;
     content_url?: string | null;
