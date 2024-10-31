@@ -5,6 +5,7 @@ import {
   BLAST_ID,
   POLYGON_ETH_CHAIN_ID,
 } from 'views/components/CommunityInformationForm/constants';
+import { z } from 'zod';
 import { CommunitySortDirections, CommunitySortOptions } from './types';
 
 export const communityBases = {
@@ -21,7 +22,7 @@ export const communityChains = {
 
 export const communityTypes = Object.keys(CommunityType) as CommunityType[];
 
-const getPickedKeys = (schema: any) => {
+const getPickedKeys = (schema: z.AnyZodObject) => {
   return Object.keys(schema.shape);
 };
 
