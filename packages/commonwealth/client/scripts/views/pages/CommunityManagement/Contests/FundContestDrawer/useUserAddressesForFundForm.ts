@@ -12,7 +12,7 @@ const useUserAddressesForFundForm = () => {
 
   const activeAccountOption = useMemo(
     () => ({
-      value: activeAccount?.address,
+      value: activeAccount?.address || '',
       label: activeAccount?.address || '',
     }),
     [activeAccount?.address],

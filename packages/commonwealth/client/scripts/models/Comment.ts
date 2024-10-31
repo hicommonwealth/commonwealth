@@ -94,7 +94,7 @@ export class Comment<T extends IUniqueId> {
     const versionHistory = CommentVersionHistories;
     this.communityId = community_id;
     this.author = Address?.address || author;
-    if (deleted_at) this.text = '[deleted]';
+    if (deleted_at && deleted_at?.length > 0) this.text = '[deleted]';
     // TODO: temporary - this model will be entirely replaced by tRPC soon
     else this.text = text ? getDecodedString(text) : getDecodedString(body!);
     this.versionHistory = versionHistory!;
