@@ -16,13 +16,20 @@ import { CWText } from '../component_kit/cw_text';
 import { CWTag } from '../component_kit/new_designs/CWTag';
 import type { CommentWithAssociatedThread } from './ProfileActivity';
 
+type CommentWithThreadCommunity = CommentWithAssociatedThread & {
+  thread?: { community_id?: string };
+};
 type ProfileActivityRowProps = {
   activity: CommentWithAssociatedThread | Thread;
 };
 
 const ProfileActivityRow = ({ activity }: ProfileActivityRowProps) => {
   const navigate = useCommonNavigate();
-  const { communityId, createdAt, author, id } = activity;
+  const { createdAt, author, id } = activity;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const communityId =
+    (activity as CommentWithThreadCommunity)?.thread?.community_id ||
+    activity?.communityId;
   let title: string;
   let body: string = '';
   if (activity instanceof Thread) {

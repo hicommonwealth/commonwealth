@@ -29,22 +29,22 @@ export function UpdateComment(): Command<
         order: [['timestamp', 'DESC']],
       });
 
-      if (currentVersion?.text !== payload.text) {
-        const text = decodeContent(payload.text);
+      if (currentVersion?.body !== payload.body) {
+        const body = decodeContent(payload.body);
         const mentions = findMentionDiff(
-          parseUserMentions(currentVersion?.text),
-          uniqueMentions(parseUserMentions(text)),
+          parseUserMentions(currentVersion?.body),
+          uniqueMentions(parseUserMentions(body)),
         );
 
-        const { contentUrl } = await uploadIfLarge('comments', text);
+        const { contentUrl } = await uploadIfLarge('comments', body);
 
         // == mutation transaction boundary ==
         await models.sequelize.transaction(async (transaction) => {
           await models.Comment.update(
             // TODO: text should be set to truncatedBody once client renders content_url
             {
-              text,
-              search: getCommentSearchVector(text),
+              body,
+              search: getCommentSearchVector(body),
               content_url: contentUrl,
             },
             { where: { id: comment.id }, transaction },
@@ -54,7 +54,7 @@ export function UpdateComment(): Command<
             {
               comment_id: comment.id!,
               // TODO: text should be set to truncatedBody once client renders content_url
-              text,
+              body,
               timestamp: new Date(),
               content_url: contentUrl,
             },

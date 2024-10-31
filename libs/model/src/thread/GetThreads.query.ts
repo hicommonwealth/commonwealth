@@ -199,7 +199,7 @@ export function GetThreads(): Query<typeof schemas.GetThreads> {
                   json_agg(json_strip_nulls(json_build_object(
                   'id', COM.id,
                   'address', A.address,
-                  'text', COM.text,
+                  'body', COM.body,
                   'created_at', COM.created_at::text,
                   'updated_at', COM.updated_at::text,
                   'deleted_at', COM.deleted_at::text,

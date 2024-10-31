@@ -94,7 +94,7 @@ export type ReplyResult = {
   proposalid: number;
   community_id: string;
   title: string;
-  text: string;
+  body: string;
   address_id: number;
   address: string;
   address_community_id: string;
@@ -156,7 +156,7 @@ const ReplyResultRow = ({
           <QuillRenderer
             containerClass="SearchQuillRenderer"
             hideFormatting={true}
-            doc={comment.text}
+            doc={comment.body}
             searchTerm={searchTerm}
           />
         </CWText>
