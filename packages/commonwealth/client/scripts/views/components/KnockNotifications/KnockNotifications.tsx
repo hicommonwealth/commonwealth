@@ -6,7 +6,7 @@ import {
   NotificationIconButton,
 } from '@knocklabs/react';
 import '@knocklabs/react-notification-feed/dist/index.css';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { memo, useEffect, useRef, useState } from 'react';
 import useUserStore from 'state/ui/user';
 import './KnockNotifications.scss';
 
@@ -23,7 +23,7 @@ const getBrowserTimezone = (): string => {
   return Intl.DateTimeFormat().resolvedOptions().timeZone;
 };
 
-export const KnockNotifications = () => {
+export const KnockNotifications = memo(function KnockNotifications() {
   const user = useUserStore();
   const [isVisible, setIsVisible] = useState(false);
 
@@ -85,4 +85,4 @@ export const KnockNotifications = () => {
       </KnockProvider>
     </div>
   );
-};
+});
