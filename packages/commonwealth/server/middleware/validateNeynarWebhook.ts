@@ -6,25 +6,16 @@ export function validateNeynarWebhook(
   webhookSecret: string | null | undefined,
 ) {
   return async (req, _, next) => {
-    console.log(
-      JSON.stringify(
-        {
-          // sig,
-          // generatedSignature,
-          body: req.body,
-          bodyType: typeof req.body,
-        },
-        null,
-        2,
-      ),
-    );
-
+    console.log(req.body);
     if (!webhookSecret) {
       const { parent_hash } = req.body.data;
+      if (!parent_hash) {
+        throw new Error('Parent hash not found in body');
+      }
       const contestManager = await models.ContestManager.findOne({
         where: {
           farcaster_frame_hashes: {
-            [Op.contains]: parent_hash,
+            [Op.contains]: [parent_hash],
           },
         },
       });

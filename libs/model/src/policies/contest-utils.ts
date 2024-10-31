@@ -58,6 +58,8 @@ export async function createOnchainContestContent(payload: {
     )}`,
   );
 
+  console.log(JSON.stringify(payload.contestManagers[0]));
+
   const results = await contestHelper.addContentBatch(
     payload.contestManagers[0].url,
     addressesToProcess,

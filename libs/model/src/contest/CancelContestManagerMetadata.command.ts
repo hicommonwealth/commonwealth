@@ -28,6 +28,8 @@ export function CancelContestManagerMetadata(): Command<
         const client = new NeynarAPIClient(config.CONTESTS.NEYNAR_API_KEY!);
         try {
           await client.deleteWebhook(contestManager.neynar_webhook_id);
+          contestManager.neynar_webhook_id = null;
+          contestManager.neynar_webhook_secret = null;
         } catch (err) {
           log.warn(
             `failed to delete neynar webhook: ${contestManager.neynar_webhook_id}`,

@@ -52,7 +52,7 @@ function build() {
 
     router.post(
       '/farcaster/CastUpvoteAction',
-      // TODO: validate
+      // TODO: create new validation middleware for actions
       express.command(Contest.FarcasterUpvoteAction()),
     );
   }

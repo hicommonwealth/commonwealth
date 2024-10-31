@@ -127,7 +127,7 @@ export function FarcasterWorker(): Policy<typeof inputs> {
 
         const contestManagers = [
           {
-            url: community.ChainNode!.private_url!,
+            url: community.ChainNode!.private_url! || community.ChainNode!.url!,
             contest_address: contestManager.contest_address,
             actions: [],
           },
@@ -138,7 +138,10 @@ export function FarcasterWorker(): Policy<typeof inputs> {
           'Farcaster Author Custody Address',
           payload.author?.custody_address,
         );
-        const content_url = buildFarcasterContentUrl(payload.hash);
+        const content_url = buildFarcasterContentUrl(
+          payload.parent_hash!,
+          payload.hash,
+        );
         await createOnchainContestContent({
           contestManagers,
           bypass_quota: true,
@@ -147,9 +150,12 @@ export function FarcasterWorker(): Policy<typeof inputs> {
         });
       },
       FarcasterVoteCreated: async ({ payload }) => {
-        const content_url = buildFarcasterContentUrl(
+        const client = new NeynarAPIClient(config.CONTESTS.NEYNAR_API_KEY!);
+        const castsResponse = await client.fetchBulkCasts([
           payload.untrustedData.castId.hash,
-        );
+        ]);
+        const { parent_hash, hash } = castsResponse.result.casts.at(0)!;
+        const content_url = buildFarcasterContentUrl(parent_hash!, hash);
 
         const contestManager = await models.ContestManager.findOne({
           where: {
@@ -173,8 +179,6 @@ export function FarcasterWorker(): Policy<typeof inputs> {
           },
         });
 
-        const client = new NeynarAPIClient(config.CONTESTS.NEYNAR_API_KEY!);
-
         const { users } = await client.fetchBulkUsers([
           payload.untrustedData.fid,
         ]);
@@ -194,7 +198,7 @@ export function FarcasterWorker(): Policy<typeof inputs> {
         mustExist('Community with Chain Node', community?.ChainNode);
 
         const contestManagers = contestActions.map((ca) => ({
-          url: community.ChainNode!.private_url!,
+          url: community.ChainNode!.url! || community.ChainNode!.private_url!,
           contest_address: contestManager.contest_address,
           content_id: ca.content_id,
         }));
