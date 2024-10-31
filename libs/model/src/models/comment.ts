@@ -36,7 +36,7 @@ export default (
       parent_id: { type: Sequelize.STRING, allowNull: true },
       address_id: { type: Sequelize.INTEGER, allowNull: true },
       created_by: { type: Sequelize.STRING, allowNull: true },
-      text: { type: Sequelize.TEXT, allowNull: false },
+      body: { type: Sequelize.TEXT, allowNull: false },
 
       // canvas-related columns
       canvas_signed_data: { type: Sequelize.JSONB, allowNull: true },
