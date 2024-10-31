@@ -22,29 +22,33 @@ self.addEventListener('push', function (event) {
   // NOTE that the raw event can't be called because it has a custom toJSON
   // implementation and all you can see is "isTrusted": true.
 
-  const data = event.data.json();
+  const event_data = event.data.json();
 
   // we're keeping this JSON stringify here because setting breakpoints in service
   // workers is inconsistent and this is the only way to see the REAL JSON sent
   // from Knock. Note that this is different from what we see in their logs
-  // and there are different properties here including data.notification which
-  // is not actually shown in the Knock console.
+  // and there are different properties here including event_data.notification
+  // which is not actually shown in the Knock console.
   console.log(
     'Received event data from Knock: ',
-    JSON.stringify(data, null, 2),
+    JSON.stringify(event_data, null, 2),
   );
 
   // we MUST handle body, title, and url computation here... for all workflow
   // message types including comment-created,
 
-  const title = data.notification.title || data.title || 'No title';
+  const title = event_data.notification.title || event_data.title || 'No title';
   const body =
-    data.notification.body || data.body || data.comment_body || 'No body';
+    event_data.notification.body ||
+    event_data.body ||
+    event_data.comment_body ||
+    'No body';
   const url =
-    data.notification.url ||
-    data.url ||
-    data.data.comment_url ||
-    data.data.object_url ||
+    event_data.notification.url ||
+    event_data.url ||
+    event_data.data.comment_url ||
+    event_data.data.object_url ||
+    event_data.data.community_stakes_url ||
     'https://common.xyz';
 
   const options = {
