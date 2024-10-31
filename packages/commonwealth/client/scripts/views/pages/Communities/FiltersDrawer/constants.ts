@@ -1,9 +1,11 @@
+import { Community } from '@hicommonwealth/schemas';
 import { ChainBase, ChainNetwork, CommunityType } from '@hicommonwealth/shared';
 import {
   BASE_ID,
   BLAST_ID,
   POLYGON_ETH_CHAIN_ID,
 } from 'views/components/CommunityInformationForm/constants';
+import { CommunitySortDirections, CommunitySortOptions } from './types';
 
 export const communityBases = {
   Cosmos: ChainBase.CosmosSDK,
@@ -19,17 +21,28 @@ export const communityChains = {
 
 export const communityTypes = Object.keys(CommunityType) as CommunityType[];
 
+const getPickedKeys = (schema: any) => {
+  return Object.keys(schema.shape);
+};
+
 export const communitySortOptionsLabelToKeysMap = {
-  'Most Recent': 'created_at',
-  'Market Cap': '',
-  Price: '',
-  'Number of Members': 'profile_count',
-  'Number of Threads': 'lifetime_thread_count',
+  // this would correctly throw TS errors if the community schema removes the specified keys
+  [CommunitySortOptions.MostRecent]: getPickedKeys(
+    Community.pick({ created_at: true }),
+  )[0],
+  [CommunitySortOptions.MarketCap]: '',
+  [CommunitySortOptions.Price]: '',
+  [CommunitySortOptions.MemberCount]: getPickedKeys(
+    Community.pick({ profile_count: true }),
+  )[0],
+  [CommunitySortOptions.ThreadCount]: getPickedKeys(
+    Community.pick({ lifetime_thread_count: true }),
+  )[0],
 };
 
 export const sortOrderLabelsToDirectionsMap = {
-  Ascending: 'ASC',
-  Descending: 'DESC',
+  [CommunitySortDirections.Ascending]: 'ASC',
+  [CommunitySortDirections.Descending]: 'DESC',
 };
 
 export const communityNetworks: string[] = Object.keys(ChainNetwork).filter(

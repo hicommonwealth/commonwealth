@@ -26,12 +26,13 @@ import CreateCommunityButton from '../../components/sidebar/CreateCommunityButto
 import ManageCommunityStakeModal from '../../modals/ManageCommunityStakeModal/ManageCommunityStakeModal';
 import './Communities.scss';
 import {
+  CommunityFilters,
+  CommunitySortOptions,
   FiltersDrawer,
   communityChains,
   communitySortOptionsLabelToKeysMap,
   sortOrderLabelsToDirectionsMap,
 } from './FiltersDrawer';
-import { CommunityFilters } from './FiltersDrawer/types';
 import IdeaLaunchpad from './IdeaLaunchpad';
 import TokensList from './TokensList';
 import { getCommunityCountsString } from './helpers';
@@ -229,7 +230,8 @@ const CommunitiesPage = () => {
               <CWTag
                 label={`${filters.withCommunitySortBy}${
                   filters.withCommunitySortOrder &&
-                  filters.withCommunitySortBy !== 'Most Recent'
+                  filters.withCommunitySortBy !==
+                    CommunitySortOptions.MostRecent
                     ? ` : ${filters.withCommunitySortOrder}`
                     : ''
                 }

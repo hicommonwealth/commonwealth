@@ -19,7 +19,7 @@ import {
   communityTypes,
   sortOrderLabelsToDirectionsMap,
 } from './constants';
-import { FiltersDrawerProps } from './types';
+import { CommunitySortOptions, FiltersDrawerProps } from './types';
 
 export const FiltersDrawer = ({
   isOpen,
@@ -84,7 +84,7 @@ export const FiltersDrawer = ({
     onFiltersChange({
       ...filters,
       withCommunitySortOrder:
-        sortOption === 'Most Recent'
+        sortOption === CommunitySortOptions.MostRecent
           ? Object.entries(sortOrderLabelsToDirectionsMap).find(
               ([_, v]) => v === 'DESC',
             )?.[0]
@@ -167,7 +167,8 @@ export const FiltersDrawer = ({
                             checked={filters.withCommunitySortOrder === order}
                             onChange={() => onCommunityOrderChange(order)}
                             disabled={
-                              filters.withCommunitySortBy === 'Most Recent'
+                              filters.withCommunitySortBy ===
+                              CommunitySortOptions.MostRecent
                             }
                           />
                         ),
