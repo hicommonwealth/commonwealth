@@ -25,7 +25,13 @@ export const Quest = (
       updatedAt: 'updated_at',
       underscored: true,
       tableName: 'Quests',
-      indexes: [{ fields: ['name', 'community_id'], unique: true }],
+      indexes: [
+        {
+          name: 'Quests_community_id_name_key',
+          fields: ['community_id', 'name'],
+          unique: true,
+        },
+      ],
     },
   );
 
@@ -38,8 +44,9 @@ export const QuestActionMeta = (
   sequelize.define<QuestActionMetaInstance>(
     'QuestActionMeta',
     {
-      quest_id: { type: Sequelize.INTEGER, allowNull: false, primaryKey: true },
-      event_name: { type: Sequelize.ENUM, allowNull: false, primaryKey: true },
+      id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },
+      quest_id: { type: Sequelize.INTEGER, allowNull: false },
+      event_name: { type: Sequelize.STRING, allowNull: false },
       reward_amount: { type: Sequelize.INTEGER, allowNull: false },
       creator_reward_weight: {
         type: Sequelize.FLOAT,
@@ -76,17 +83,14 @@ export const QuestAction = (
   sequelize: Sequelize.Sequelize,
 ): Sequelize.ModelStatic<QuestActionInstance> =>
   sequelize.define<QuestActionInstance>(
-    'Quest',
+    'QuestAction',
     {
       user_id: { type: Sequelize.INTEGER, allowNull: false, primaryKey: true },
-      quest_id: { type: Sequelize.INTEGER, allowNull: false, primaryKey: true },
-      event_name: {
-        type: Sequelize.STRING,
+      quest_action_meta_id: {
+        type: Sequelize.INTEGER,
         allowNull: false,
         primaryKey: true,
       },
-      creator_id: { type: Sequelize.INTEGER, allowNull: true },
-      created_at: { type: Sequelize.DATE, allowNull: false },
     },
     {
       timestamps: true,

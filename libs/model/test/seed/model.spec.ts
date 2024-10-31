@@ -33,7 +33,9 @@ const generateSchemas = async () => {
       Topics: ['default_offchain_template_backup'],
       GroupPermissions: ['allowed_actions'],
     },
-    ignore_constraints: {},
+    ignore_constraints: {
+      Quests: ['UNIQUE(community_id,name)'], // This is found as index in model
+    },
   });
 
   return Object.keys(model_schema)
@@ -73,10 +75,11 @@ describe('Model schema', () => {
       //console.log(model.columns, migration.columns);
       expect(model.columns).deep.equals(migration.columns);
 
-      // model.table_name === 'Topics' &&
+      // ['Quests', 'Addresses'].includes(model.table_name) &&
       //   console.log(
-      //     [...model.constraints.values()],
-      //     [...migration.constraints.values()],
+      //     { model, migration },
+      //     //[...model.constraints.values()],
+      //     //[...migration.constraints.values()],
       //   );
       expect([...model.constraints.values()]).deep.equals([
         ...migration.constraints.values(),

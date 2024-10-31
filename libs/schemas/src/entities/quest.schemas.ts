@@ -23,8 +23,9 @@ export enum QuestParticipationPeriod {
 
 export const QuestActionMeta = z
   .object({
-    quest_id: PG_INT, // PK
-    event_name: z.enum(QUEST_EVENTS), // PK - using event names instead of enums to allow more flexibility when adding new events
+    id: PG_INT.nullish(),
+    quest_id: PG_INT,
+    event_name: z.enum(QUEST_EVENTS), // using event names instead of enums to allow more flexibility when adding new events
     reward_amount: z.number(),
     creator_reward_weight: z.number().min(0).max(1).default(0),
     participation_limit: z.nativeEnum(QuestParticipationLimit).optional(),
@@ -60,17 +61,7 @@ export const Quest = z
 export const QuestAction = z
   .object({
     user_id: PG_INT.describe('The user who took the action'),
-    quest_id: PG_INT.describe(
-      'The quest that the action was taken in - PK to action metadata',
-    ),
-    event_name: z
-      .string()
-      .describe(
-        'The name of the event represented by the action - PK to action metadata',
-      ),
-    creator_id: PG_INT.nullish().describe(
-      'The user who created the entity where the action was taken',
-    ),
+    quest_action_meta_id: PG_INT.describe('The action metadata for the action'),
     created_at: z.coerce.date().optional(),
   })
   .describe('Records user actions in a quest');
