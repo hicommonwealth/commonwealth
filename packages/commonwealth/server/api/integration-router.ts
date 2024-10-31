@@ -41,7 +41,7 @@ function build() {
 
     router.post(
       '/farcaster/ReplyCastCreated',
-      validateNeynarWebhook(config.CONTESTS.NEYNAR_CAST_CREATED_WEBHOOK_SECRET),
+      validateNeynarWebhook(null),
       express.command(Contest.FarcasterReplyCastCreatedWebhook()),
     );
 
@@ -52,7 +52,7 @@ function build() {
 
     router.post(
       '/farcaster/CastUpvoteAction',
-      validateNeynarWebhook(config.CONTESTS.NEYNAR_CAST_CREATED_WEBHOOK_SECRET),
+      // TODO: validate
       express.command(Contest.FarcasterUpvoteAction()),
     );
   }

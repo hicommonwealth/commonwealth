@@ -83,6 +83,8 @@ export function FarcasterWorker(): Policy<typeof inputs> {
             },
           );
           contestManager.neynar_webhook_id = neynarWebhook.webhook!.webhook_id;
+          contestManager.neynar_webhook_secret =
+            neynarWebhook.webhook?.secrets.at(0)?.value;
         }
 
         // append frame hash to Contest Manager

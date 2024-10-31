@@ -1,11 +1,39 @@
+import { models } from '@hicommonwealth/model';
 import { createHmac } from 'crypto';
+import { Op } from 'sequelize';
 
 export function validateNeynarWebhook(
   webhookSecret: string | null | undefined,
 ) {
-  return (req, _, next) => {
+  return async (req, _, next) => {
+    console.log(
+      JSON.stringify(
+        {
+          // sig,
+          // generatedSignature,
+          body: req.body,
+          bodyType: typeof req.body,
+        },
+        null,
+        2,
+      ),
+    );
+
     if (!webhookSecret) {
-      throw new Error('Neynar webhook secret not set');
+      const { parent_hash } = req.body.data;
+      const contestManager = await models.ContestManager.findOne({
+        where: {
+          farcaster_frame_hashes: {
+            [Op.contains]: parent_hash,
+          },
+        },
+      });
+      if (contestManager) {
+        webhookSecret = contestManager.neynar_webhook_secret;
+      }
+      if (!webhookSecret) {
+        throw new Error('Neynar webhook secret not set');
+      }
     }
 
     const sig = req.headers['x-neynar-signature'];
