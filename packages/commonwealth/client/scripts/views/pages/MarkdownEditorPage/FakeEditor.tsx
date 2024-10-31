@@ -14,16 +14,32 @@ export const FakeEditor = () => {
     [],
   );
 
+  const createMouseHandler = useCallback((eventName: string) => {
+    return (event: React.MouseEvent | React.UIEvent) => {
+      console.log('Got event: ' + eventName);
+    };
+  }, []);
+
   const handleFocus = useCallback(() => {
     focusRef.current = true;
   }, []);
 
   return (
     <div
+      // onPointerDown={createMouseHandler('onPointerDown')}
+      // onPointerUp={createMouseHandler('onPointerUp')}
+      // onPointerMove={createMouseHandler('onPointerMove')}
+      // onMouseDown={createMouseHandler('onMouseDown')}
+      // onMouseUp={createMouseHandler('onMouseUp')}
+      // onMouseMove={createMouseHandler('onMouseMove')}
+      // onWheel={createMouseHandler('onWheel')}
+      // onScroll={createMouseHandler('onScroll')}
       onMouseUp={handleMouseEvent}
       onMouseDown={handleMouseEvent}
+      onMouseMove={handleMouseEvent}
       onPointerUp={handleMouseEvent}
       onPointerDown={handleMouseEvent}
+      onPointerMove={handleMouseEvent}
       onMouseUpCapture={handleMouseEvent}
       onMouseDownCapture={handleMouseEvent}
       onPointerUpCapture={handleMouseEvent}
@@ -42,9 +58,7 @@ export const FakeEditor = () => {
           height: '200px',
           width: '100vw',
         }}
-      >
-        Hello World
-      </div>
+      ></div>
       <div
         style={{
           padding: '5px',
