@@ -1,10 +1,14 @@
-import { ChainBase, ChainNetwork } from '@hicommonwealth/shared';
+import { ChainBase, ChainNetwork, CommunityType } from '@hicommonwealth/shared';
 
 export type CommunityFilters = {
   withNetwork?: ChainNetwork;
-  withChainBase?: ChainBase;
+  withCommunityEcosystem?: ChainBase;
+  withEcosystemChainId?: string | number;
   withStakeEnabled?: boolean;
   withTagsIds?: number[];
+  withCommunityType?: CommunityType;
+  withCommunitySortBy?: string;
+  withCommunitySortOrder?: string;
 };
 
 export type FiltersDrawerProps = {
