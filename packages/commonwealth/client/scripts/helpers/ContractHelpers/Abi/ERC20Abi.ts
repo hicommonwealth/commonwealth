@@ -16,4 +16,11 @@ export const Erc20Abi = [
     name: 'balanceOf',
     outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
   },
+  {
+    inputs: [],
+    stateMutability: 'view',
+    type: 'function',
+    name: 'decimals',
+    outputs: [{ internalType: 'uint8', name: '', type: 'uint8' }],
+  },
 ];
