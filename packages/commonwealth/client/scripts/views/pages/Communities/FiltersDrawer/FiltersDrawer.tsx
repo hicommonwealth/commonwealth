@@ -19,7 +19,11 @@ import {
   communityTypes,
   sortOrderLabelsToDirectionsMap,
 } from './constants';
-import { CommunitySortOptions, FiltersDrawerProps } from './types';
+import {
+  CommunitySortDirections,
+  CommunitySortOptions,
+  FiltersDrawerProps,
+} from './types';
 
 export const FiltersDrawer = ({
   isOpen,
@@ -80,24 +84,23 @@ export const FiltersDrawer = ({
     });
   };
 
-  const onCommunitySortOptionChange = (sortOption: string) => {
+  const onCommunitySortOptionChange = (sortOption: CommunitySortOptions) => {
     onFiltersChange({
       ...filters,
-      withCommunitySortOrder:
-        sortOption === CommunitySortOptions.MostRecent
-          ? Object.entries(sortOrderLabelsToDirectionsMap).find(
-              ([_, v]) => v === 'DESC',
-            )?.[0]
-          : filters.withCommunitySortOrder ||
-            Object.entries(sortOrderLabelsToDirectionsMap).find(
-              ([_, v]) => v === 'DESC',
-            )?.[0],
+      withCommunitySortOrder: (sortOption === CommunitySortOptions.MostRecent
+        ? Object.entries(sortOrderLabelsToDirectionsMap).find(
+            ([_, v]) => v === sortOrderLabelsToDirectionsMap.Descending,
+          )?.[0]
+        : filters.withCommunitySortOrder ||
+          Object.entries(sortOrderLabelsToDirectionsMap).find(
+            ([_, v]) => v === sortOrderLabelsToDirectionsMap.Descending,
+          )?.[0]) as CommunitySortDirections,
       withCommunitySortBy:
         filters.withCommunitySortBy === sortOption ? undefined : sortOption,
     });
   };
 
-  const onCommunityOrderChange = (sortOrder: string) => {
+  const onCommunityOrderChange = (sortOrder: CommunitySortDirections) => {
     onFiltersChange({
       ...filters,
       withCommunitySortOrder:
@@ -144,7 +147,9 @@ export const FiltersDrawer = ({
                             label={sortOption}
                             checked={filters.withCommunitySortBy === sortOption}
                             onChange={() =>
-                              onCommunitySortOptionChange(sortOption)
+                              onCommunitySortOptionChange(
+                                sortOption as CommunitySortOptions,
+                              )
                             }
                           />
                         ),
@@ -165,7 +170,11 @@ export const FiltersDrawer = ({
                             value={order}
                             label={order}
                             checked={filters.withCommunitySortOrder === order}
-                            onChange={() => onCommunityOrderChange(order)}
+                            onChange={() =>
+                              onCommunityOrderChange(
+                                order as CommunitySortDirections,
+                              )
+                            }
                             disabled={
                               filters.withCommunitySortBy ===
                               CommunitySortOptions.MostRecent
