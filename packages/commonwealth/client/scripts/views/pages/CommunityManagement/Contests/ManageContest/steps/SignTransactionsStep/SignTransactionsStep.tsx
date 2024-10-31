@@ -176,12 +176,14 @@ const SignTransactionsStep = ({
           : 0,
         payout_structure: contestFormData?.payoutStructure,
         interval: isContestRecurring ? contestInterval! : 0,
-        topic_ids: weightedTopicsEnabled
-          ? [contestFormData?.contestTopic?.value as number]
+        topic_id: weightedTopicsEnabled
+          ? [contestFormData?.contestTopic?.value as number].at(0)
           : contestFormData?.toggledTopicList
               .filter((t) => t.checked)
-              .map((t) => t.id!),
+              .map((t) => t.id!)
+              .at(0),
         ticker: fundingTokenTicker,
+        is_farcaster_contest: contestFormData.isFarcasterContest,
       });
 
       onSetLaunchContestStep('ContestLive');

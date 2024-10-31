@@ -222,6 +222,7 @@ const DetailsFormStep = ({
       payoutStructure,
       toggledTopicList,
       contestDuration,
+      isFarcasterContest,
     };
 
     if (editMode) {
@@ -231,9 +232,10 @@ const DetailsFormStep = ({
           contest_address: contestAddress,
           name: values.contestName,
           image_url: values.contestImage,
-          topic_ids: toggledTopicList
+          topic_id: toggledTopicList
             .filter((t) => t.checked)
-            .map((t) => t.id!),
+            .map((t) => t.id!)
+            .at(0),
         });
 
         goBack();

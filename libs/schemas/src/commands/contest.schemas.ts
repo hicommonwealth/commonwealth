@@ -86,28 +86,31 @@ export const FarcasterCast = z.object({
   parent_author: z.object({
     fid: z.number().nullable(),
   }),
-  author: z.object({
-    object: z.string(),
-    fid: z.number(),
-    custody_address: z.string(),
-    username: z.string(),
-    display_name: z.string(),
-    pfp_url: z.string().url(),
-    profile: z.object({
-      bio: z.object({
-        text: z.string(),
+  author: z
+    .object({
+      object: z.string(),
+      fid: z.number(),
+      custody_address: z.string(),
+      username: z.string(),
+      display_name: z.string(),
+      pfp_url: z.string().url(),
+      profile: z.object({
+        bio: z.object({
+          text: z.string(),
+        }),
       }),
-    }),
-    follower_count: z.number(),
-    following_count: z.number(),
-    verifications: z.array(z.unknown()),
-    verified_addresses: z.object({
-      eth_addresses: z.array(z.string()),
-      sol_addresses: z.array(z.string()),
-    }),
-    active_status: z.string(),
-    power_badge: z.boolean(),
-  }),
+      follower_count: z.number(),
+      following_count: z.number(),
+      verifications: z.array(z.unknown()),
+      verified_addresses: z.object({
+        eth_addresses: z.array(z.string()),
+        sol_addresses: z.array(z.string()),
+      }),
+      active_status: z.string(),
+      power_badge: z.boolean(),
+    })
+    .partial()
+    .nullish(),
   text: z.string(),
   timestamp: z.string(),
   embeds: z.array(

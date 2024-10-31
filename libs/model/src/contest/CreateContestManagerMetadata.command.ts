@@ -53,6 +53,7 @@ export function CreateContestManagerMetadata(): Command<
                 ? buildFarcasterContestFrameUrl(payload.contest_address)
                 : null,
               topic_id: topic?.id || null,
+              is_farcaster_contest: !!is_farcaster_contest,
             },
             { transaction },
           );

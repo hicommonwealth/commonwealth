@@ -28,6 +28,7 @@ select
   cm.payout_structure,
   cm.cancelled,
   cm.topic_id,
+  cm.is_farcaster_contest,
   coalesce((
     select jsonb_agg(json_build_object('id', t.id, 'name', t.name) order by t.name)
     from "ContestManagers" cm2

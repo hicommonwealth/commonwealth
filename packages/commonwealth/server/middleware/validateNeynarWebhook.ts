@@ -8,8 +8,9 @@ export function validateNeynarWebhook(
       throw new Error('Neynar webhook secret not set');
     }
 
-    const sig = req.headers['X-Neynar-Signature'];
+    const sig = req.headers['x-neynar-signature'];
     if (!sig) {
+      console.log(req.headers);
       throw new Error('Neynar signature missing from request headers');
     }
 

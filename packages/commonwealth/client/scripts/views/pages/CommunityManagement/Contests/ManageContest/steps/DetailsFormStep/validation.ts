@@ -6,6 +6,10 @@ import z from 'zod';
 
 const client = OpenFeature.getClient();
 const weightedTopicsEnabled = client.getBooleanValue('weightedTopics', false);
+const farcasterContestEnabled = client.getBooleanValue(
+  'farcasterContest',
+  false,
+);
 
 export const detailsFormValidationSchema = z.object({
   contestName: z
@@ -22,13 +26,18 @@ export const detailsFormValidationSchema = z.object({
       weightedVoting: z.nativeEnum(TopicWeightedVoting).optional().nullish(),
     })
     .optional()
-    .refine((value) => (weightedTopicsEnabled ? !!value : true), {
-      message: 'You must select a topic',
-    }),
+    .refine(
+      (value) =>
+        farcasterContestEnabled ? true : weightedTopicsEnabled ? !!value : true,
+      {
+        message: 'You must select a topic',
+      },
+    ),
   feeType: z.enum([
     ContestFeeType.CommunityStake,
     ContestFeeType.DirectDeposit,
   ]),
   contestRecurring: z.string(),
   fundingTokenAddress: z.string().optional().nullable(),
+  isFarcasterContest: z.boolean().default(false),
 });

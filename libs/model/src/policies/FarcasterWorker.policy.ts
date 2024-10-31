@@ -132,6 +132,10 @@ export function FarcasterWorker(): Policy<typeof inputs> {
         ];
 
         // create onchain content from reply cast
+        mustExist(
+          'Farcaster Author Custody Address',
+          payload.author?.custody_address,
+        );
         const content_url = buildFarcasterContentUrl(payload.hash);
         await createOnchainContestContent({
           contestManagers,
