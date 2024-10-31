@@ -326,7 +326,7 @@ export class Thread implements IUniqueId {
           author: rc?.address,
           last_edited: rc?.updated_at ? moment(rc.updated_at) : null,
           created_at: rc?.created_at ? moment(rc?.created_at) : null,
-          text: rc?.text,
+          text: rc?.body,
           Address: {
             user_id: rc?.user_id ?? rc.Address?.User?.id,
             address: rc?.address ?? rc.Address?.address,
@@ -339,7 +339,9 @@ export class Thread implements IUniqueId {
             },
           },
           discord_meta: rc?.discord_meta,
+          // @ts-expect-error StrictNullChecks
           marked_as_spam_at: rc?.marked_as_spam_at,
+          // @ts-expect-error StrictNullChecks
           deleted_at: rc?.deleted_at,
           // fallback, we are not using this in display for thread preview
           // and these should not be added here unless needed.
