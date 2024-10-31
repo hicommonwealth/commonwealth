@@ -7,7 +7,6 @@ import {
   WalletSsoSource,
 } from '@hicommonwealth/shared';
 import axios from 'axios';
-import { trpcVanillaClient } from 'client/scripts/utils/trpcClient';
 import {
   completeClientLogin,
   createUserWithAddress,
@@ -33,6 +32,7 @@ import { useEffect, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import app, { initAppState } from 'state';
 import { SERVER_URL } from 'state/api/config';
+import { DISCOURAGED_NONREACTIVE_fetchProfilesByAddress } from 'state/api/profiles/fetchProfilesByAddress';
 import { useUpdateUserMutation } from 'state/api/user';
 import useUserStore from 'state/ui/user';
 import {
@@ -322,12 +322,11 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       // Important: when we first create an account and verify it, the user id
       // is initially null from api (reloading the page will update it), to correct
       // it we need to get the id from api
-      const userAddresses = await trpcVanillaClient.user.getUserAddresses.query(
-        {
-          communities: account!.profile!.chain,
-          addresses: account!.profile!.address,
-        },
-      );
+      const userAddresses =
+        await DISCOURAGED_NONREACTIVE_fetchProfilesByAddress(
+          [account!.profile!.chain],
+          [account!.profile!.address],
+        );
       const currentUserAddress = userAddresses[0];
       if (!currentUserAddress) {
         console.log('No profile yet.');
