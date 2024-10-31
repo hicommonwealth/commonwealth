@@ -56,7 +56,7 @@ export const processUserMentioned: EventHandler<
       object_body:
         'thread' in payload
           ? safeTruncateBody(getDecodedString(payload.thread!.body || ''), 255)
-          : safeTruncateBody(getDecodedString(payload.comment!.text), 255),
+          : safeTruncateBody(getDecodedString(payload.comment!.body), 255),
       object_url:
         'thread' in payload
           ? getThreadUrl(
