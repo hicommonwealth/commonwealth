@@ -92,6 +92,7 @@ const GroupsSection = ({
               topics={(group?.topics || []).map((x) => ({
                 id: x.id,
                 name: x.name,
+                permissions: x.permissions,
               }))}
               canEdit={canManageGroups}
               onEditClick={() => navigate(`/members/groups/${group.id}/update`)}

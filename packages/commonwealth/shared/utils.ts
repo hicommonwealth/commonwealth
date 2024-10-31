@@ -29,7 +29,11 @@ export const getCommunityUrl = (community: string): string => {
     : `http://localhost:8080/${community}`;
 };
 
-export const smartTrim = (text, maxLength = 200) => {
+export const smartTrim = (
+  text: string | undefined,
+  maxLength = 200,
+): string => {
+  if (!text) return '';
   if (text.length > maxLength) {
     const smartTrimmedText = text.slice(0, maxLength).replace(/\W+$/, '');
     if (smartTrimmedText.length === 0) return `${text.slice(0, maxLength)}...`;

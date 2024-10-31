@@ -18,7 +18,7 @@ class Reaction {
 
   public readonly profile: UserProfile;
 
-  public calculatedVotingWeight: number;
+  public calculatedVotingWeight: string;
   // TODO: Do thread/comment/proposal ids ever appear as strings?
 
   constructor({

@@ -1,3 +1,4 @@
+import { PermissionEnum } from '@hicommonwealth/schemas';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { ApiEndpoints, SERVER_URL } from 'state/api/config';
@@ -14,7 +15,7 @@ interface RefreshMembershipProps {
 
 export interface Memberships {
   groupId: number;
-  topicIds: number[];
+  topics: { id: number; permissions: PermissionEnum[] }[];
   isAllowed: boolean;
   rejectReason?: string;
 }
@@ -34,7 +35,7 @@ const refreshMembership = async ({
 
   return response?.data?.result?.map((r) => ({
     groupId: r.groupId,
-    topicIds: r.topicIds,
+    topics: r.topics,
     isAllowed: r.allowed,
     rejectReason: r.rejectReason,
   }));

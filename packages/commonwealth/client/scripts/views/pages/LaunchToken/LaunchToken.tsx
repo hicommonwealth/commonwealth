@@ -1,3 +1,4 @@
+import useBeforeUnload from 'hooks/useBeforeUnload';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 import CWFormSteps from 'views/components/component_kit/new_designs/CWFormSteps';
@@ -10,7 +11,7 @@ import CommunityInformationStep from './steps/CommunityInformationStep';
 import SignatureStep from './steps/SignatureStep';
 import SuccessStep from './steps/SuccessStep';
 import TokenInformationStep from './steps/TokenInformationStep';
-import useCreateCommunity from './useCreateCommunity';
+import useCreateTokenCommunity from './useCreateTokenCommunity';
 import { CreateTokenCommunityStep, getFormSteps } from './utils';
 
 const LaunchToken = () => {
@@ -27,9 +28,11 @@ const LaunchToken = () => {
     setCreatedCommunityId,
     isTokenLaunched,
     setIsTokenLaunched,
-  } = useCreateCommunity();
+  } = useCreateTokenCommunity();
 
   const { isAddedToHomeScreen } = useAppStatus();
+
+  useBeforeUnload(!!draftTokenInfo && !isTokenLaunched);
 
   useBrowserAnalyticsTrack({
     payload: {
@@ -48,12 +51,7 @@ const LaunchToken = () => {
           <TokenInformationStep
             handleGoBack={() => navigate('/')} // redirect to home
             handleContinue={(tokenInfo) => {
-              setDraftTokenInfo({
-                name: tokenInfo.tokenName,
-                symbol: tokenInfo.tokenTicker,
-                description: tokenInfo.tokenDescription,
-                imageURL: tokenInfo.tokenImageURL,
-              });
+              setDraftTokenInfo(tokenInfo);
 
               onChangeStep(true);
             }}

@@ -9,6 +9,7 @@ const {
   TELEGRAM_BOT_TOKEN,
   TELEGRAM_BOT_TOKEN_DEV,
   SESSION_SECRET,
+  SNAPSHOT_WEBHOOK_SECRET,
   NO_PRERENDER: _NO_PRERENDER,
   NO_GLOBAL_ACTIVITY_CACHE,
   PRERENDER_TOKEN,
@@ -95,6 +96,7 @@ export const config = configure(
       ),
     },
     PEER_ID,
+    SNAPSHOT_WEBHOOK_SECRET,
   },
   z.object({
     NO_PRERENDER: z.boolean(),
@@ -156,5 +158,12 @@ export const config = configure(
       EVM_CE_POLL_INTERVAL_MS: z.number().int().positive(),
     }),
     PEER_ID: z.string().optional(),
+    SNAPSHOT_WEBHOOK_SECRET: z
+      .string()
+      .optional()
+      .refine(
+        (data) => !(!['local', 'CI'].includes(model_config.APP_ENV) && !data),
+        'SNAPSHOT_WEBHOOK_SECRET is required in public environments',
+      ),
   }),
 );

@@ -8,7 +8,6 @@ import { CreateGroupResponseChainNodeBalanceType } from './CreateGroupResponseCh
 import { CreateGroupResponseChainNodeContractsItem } from './CreateGroupResponseChainNodeContractsItem';
 import { CreateGroupResponseChainNodeCosmosGovVersion } from './CreateGroupResponseChainNodeCosmosGovVersion';
 import { CreateGroupResponseChainNodeHealth } from './CreateGroupResponseChainNodeHealth';
-
 export declare const CreateGroupResponseChainNode: core.serialization.ObjectSchema<
   serializers.CreateGroupResponseChainNode.Raw,
   CommonApi.CreateGroupResponseChainNode

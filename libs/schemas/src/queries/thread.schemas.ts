@@ -1,10 +1,12 @@
 import { z } from 'zod';
+import { Thread } from '../entities';
 import {
   DiscordMetaSchema,
+  PG_INT,
   linksSchema,
   paginationSchema,
-  PG_INT,
 } from '../utils';
+import { PaginatedResultSchema } from './pagination';
 
 export const OrderByQueriesKeys = z.enum([
   'createdAt:asc',
@@ -88,5 +90,105 @@ export const GetBulkThreads = {
     numVotingThreads: PG_INT,
     cursor: PG_INT,
     threads: z.array(BulkThread),
+  }),
+};
+
+export const MappedReaction = z.object({
+  id: z.number(),
+  type: z.literal('like'),
+  address: z.string(),
+  updated_at: z.date(),
+  voting_weight: z.number(),
+  profile_name: z.string().optional(),
+  avatar_url: z.string().optional(),
+  last_active: z.date().optional(),
+});
+
+export const MappedThread = Thread.extend({
+  associatedReactions: z.array(MappedReaction),
+});
+
+export const GetThreadsStatus = z.enum(['active', 'pastWinners', 'all']);
+export const GetThreadsOrderBy = z.enum([
+  'newest',
+  'oldest',
+  'mostLikes',
+  'mostComments',
+  'latestActivity',
+]);
+
+export const GetThreads = {
+  input: z.object({
+    community_id: z.string(),
+    page: z.number().optional(),
+    limit: z.number().optional(),
+    stage: z.string().optional(),
+    topic_id: PG_INT.optional(),
+    includePinnedThreads: z.boolean().optional(),
+    order_by: GetThreadsOrderBy.optional(),
+    from_date: z.string().optional(),
+    to_date: z.string().optional(),
+    archived: z.boolean().optional(),
+    contestAddress: z.string().optional(),
+    status: GetThreadsStatus.optional(),
+    withXRecentComments: z.number().optional(),
+  }),
+  output: z.object({
+    page: z.number(),
+    limit: z.number(),
+    numVotingThreads: z.number(),
+    threads: z.array(MappedThread),
+  }),
+};
+
+export const DEPRECATED_GetThreads = z.object({
+  community_id: z.string(),
+  bulk: z.coerce.boolean().default(false),
+  thread_ids: z.coerce.number().int().array().optional(),
+  active: z.string().optional(),
+  search: z.string().optional(),
+  count: z.coerce.boolean().optional().default(false),
+  include_count: z.coerce.boolean().default(false),
+});
+
+export const DEPRECATED_GetBulkThreads = z.object({
+  topic_id: z.coerce.number().int().optional(),
+  includePinnedThreads: z.coerce.boolean().optional(),
+  limit: z.coerce.number().int().optional(),
+  page: z.coerce.number().int().optional(),
+  archived: z.coerce.boolean().optional(),
+  stage: z.string().optional(),
+  orderBy: z.string().optional(),
+  from_date: z.string().optional(),
+  to_date: z.string().optional(),
+  contestAddress: z.string().optional(),
+  status: z.string().optional(),
+  withXRecentComments: z.coerce.number().optional(),
+});
+
+export const GetActiveThreads = {
+  input: z.object({
+    community_id: z.string(),
+    threads_per_topic: z.coerce.number().min(0).max(10).optional(),
+    withXRecentComments: z.coerce.number().optional(),
+  }),
+  output: z.array(Thread),
+};
+
+export const SearchThreads = {
+  input: z.object({
+    communityId: z.string(),
+    searchTerm: z.string(),
+    threadTitleOnly: z.coerce.boolean().default(false),
+    limit: z.coerce.number().optional(),
+    page: z.coerce.number().optional(),
+    orderBy: z
+      .enum(['last_active', 'rank', 'created_at', 'profile_name'])
+      .optional(),
+    orderDirection: z.enum(['ASC', 'DESC']).optional(),
+    includeCount: z.coerce.boolean().default(false),
+  }),
+  output: PaginatedResultSchema.extend({
+    results: z.array(Thread),
   }),
 };

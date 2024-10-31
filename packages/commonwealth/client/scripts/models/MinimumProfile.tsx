@@ -15,7 +15,7 @@ export function addressToUserProfile(
   address: z.infer<typeof Address>,
 ): UserProfile {
   return {
-    userId: address.user_id!,
+    userId: address.user_id ?? address.User?.id ?? 0,
     avatarUrl: address.User?.profile.avatar_url ?? '',
     name: address.User?.profile.name ?? DEFAULT_NAME,
     address: address?.address,

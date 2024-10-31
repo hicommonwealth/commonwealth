@@ -1,4 +1,4 @@
-import { TopicWeightedVoting } from '@hicommonwealth/schemas';
+import { PermissionEnum, TopicWeightedVoting } from '@hicommonwealth/schemas';
 import { getProposalUrlPath } from 'identifiers';
 import { getScopePrefix, useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useRef, useState } from 'react';
@@ -19,17 +19,18 @@ import { ThreadCard } from './ThreadCard';
 import { sortByFeaturedFilter, sortPinned } from './helpers';
 
 import { slugify, splitAndDecodeURL } from '@hicommonwealth/shared';
-import { formatAddressShort } from 'helpers';
 import { getThreadActionTooltipText } from 'helpers/threads';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import { useFlag } from 'hooks/useFlag';
 import useManageDocumentTitle from 'hooks/useManageDocumentTitle';
+import useTopicGating from 'hooks/useTopicGating';
 import 'pages/discussions/index.scss';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { useFetchCustomDomainQuery } from 'state/api/configuration';
-import { useRefreshMembershipQuery } from 'state/api/groups';
+import { useGetERC20BalanceQuery } from 'state/api/tokens';
 import useUserStore from 'state/ui/user';
 import Permissions from 'utils/Permissions';
+import { saveToClipboard } from 'utils/clipboard';
 import { checkIsTopicInContest } from 'views/components/NewThreadFormLegacy/helpers';
 import TokenBanner from 'views/components/TokenBanner';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
@@ -38,10 +39,10 @@ import { isContestActive } from 'views/pages/CommunityManagement/Contests/utils'
 import useTokenMetadataQuery from '../../../state/api/tokens/getTokenMetadata';
 import { AdminOnboardingSlider } from '../../components/AdminOnboardingSlider';
 import { UserTrainingSlider } from '../../components/UserTrainingSlider';
+import { CWText } from '../../components/component_kit/cw_text';
+import CWIconButton from '../../components/component_kit/new_designs/CWIconButton';
 import { DiscussionsFeedDiscovery } from './DiscussionsFeedDiscovery';
 import { EmptyThreadsPlaceholder } from './EmptyThreadsPlaceholder';
-
-const ETH_CHAIN_NODE_ID = 37;
 
 type DiscussionsPageProps = {
   topicName?: string;
@@ -91,15 +92,21 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
 
   const user = useUserStore();
 
-  const { data: memberships = [] } = useRefreshMembershipQuery({
+  const { memberships, topicPermissions } = useTopicGating({
     communityId: communityId,
-    address: user.activeAccount?.address || '',
+    userAddress: user.activeAccount?.address || '',
     apiEnabled: !!user.activeAccount?.address && !!communityId,
   });
 
   const { data: domain } = useFetchCustomDomainQuery();
 
   const { contestsData } = useCommunityContests();
+
+  const { data: erc20Balance } = useGetERC20BalanceQuery({
+    tokenAddress: topicObj?.token_address || '',
+    userAddress: user.activeAccount?.address || '',
+    nodeRpc: app?.chain.meta?.ChainNode?.url || '',
+  });
 
   const { dateCursor } = useDateCursor({
     dateRange: searchParams.get('dateRange') as ThreadTimelineFilterTypes,
@@ -110,8 +117,8 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     (domain?.isCustomDomain ? `/archived` : `/${app.activeChainId()}/archived`);
 
   const { data: tokenMetadata } = useTokenMetadataQuery({
-    tokenId: topicObj?.tokenAddress || '',
-    chainId: ETH_CHAIN_NODE_ID,
+    tokenId: topicObj?.token_address || '',
+    nodeEthChainId: app?.chain.meta?.ChainNode?.eth_chain_id || 0,
   });
 
   const { fetchNextPage, data, isInitialLoading, hasNextPage } =
@@ -177,7 +184,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const isTopicWeighted =
     weightedTopicsEnabled &&
     topicId &&
-    topicObj.weightedVoting === TopicWeightedVoting.ERC20;
+    topicObj.weighted_voting === TopicWeightedVoting.ERC20;
 
   const activeContestsInTopic = contestsData?.filter((contest) => {
     const isContestInTopic = (contest.topics || []).find(
@@ -186,6 +193,15 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     const isActive = isContestActive({ contest });
     return isContestInTopic && isActive;
   });
+
+  const voteWeight =
+    isTopicWeighted && erc20Balance
+      ? String(
+          (
+            (topicObj?.vote_weight_multiplier || 1) * Number(erc20Balance)
+          ).toFixed(0),
+        )
+      : '';
 
   return (
     // @ts-expect-error <StrictNullChecks/>
@@ -209,18 +225,22 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
           const isTopicGated = !!(memberships || []).find(
             (membership) =>
               thread?.topic?.id &&
-              membership.topicIds.includes(thread.topic.id),
+              membership.topics.find((t) => t.id === thread.topic.id),
           );
 
           const isActionAllowedInGatedTopic = !!(memberships || []).find(
             (membership) =>
               thread?.topic?.id &&
-              membership.topicIds.includes(thread.topic.id) &&
+              membership.topics.find((t) => t.id === thread.topic.id) &&
               membership.isAllowed,
           );
 
           const isRestrictedMembership =
             !isAdmin && isTopicGated && !isActionAllowedInGatedTopic;
+
+          const foundTopicPermissions = topicPermissions.find(
+            (tp) => tp.id === thread.topic.id,
+          );
 
           const disabledActionsTooltipText = getThreadActionTooltipText({
             isCommunityMember: !!user.activeAccount,
@@ -228,6 +248,32 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
             isThreadLocked: !!thread?.lockedAt,
             isThreadTopicGated: isRestrictedMembership,
           });
+
+          const disabledReactPermissionTooltipText = getThreadActionTooltipText(
+            {
+              isCommunityMember: !!user.activeAccount,
+              threadTopicInteractionRestrictions:
+                !isAdmin &&
+                !foundTopicPermissions?.permissions?.includes(
+                  // this should be updated if we start displaying recent comments on this page
+                  PermissionEnum.CREATE_THREAD_REACTION,
+                )
+                  ? foundTopicPermissions?.permissions
+                  : undefined,
+            },
+          );
+
+          const disabledCommentPermissionTooltipText =
+            getThreadActionTooltipText({
+              isCommunityMember: !!user.activeAccount,
+              threadTopicInteractionRestrictions:
+                !isAdmin &&
+                !foundTopicPermissions?.permissions?.includes(
+                  PermissionEnum.CREATE_COMMENT,
+                )
+                  ? foundTopicPermissions?.permissions
+                  : undefined,
+            });
 
           const isThreadTopicInContest = checkIsTopicInContest(
             contestsData,
@@ -238,9 +284,17 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
             <ThreadCard
               key={thread?.id + '-' + thread.readOnly}
               thread={thread}
-              canReact={!disabledActionsTooltipText}
-              canComment={!disabledActionsTooltipText}
-              onEditStart={() => navigate(`${discussionLink}`)}
+              canReact={
+                disabledReactPermissionTooltipText
+                  ? !disabledReactPermissionTooltipText
+                  : !disabledActionsTooltipText
+              }
+              canComment={
+                disabledCommentPermissionTooltipText
+                  ? !disabledCommentPermissionTooltipText
+                  : !disabledActionsTooltipText
+              }
+              onEditStart={() => navigate(`${discussionLink}?isEdit=true`)}
               onStageTagClick={() => {
                 navigate(`/discussions?stage=${thread.stage}`);
               }}
@@ -254,7 +308,11 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
               onCommentBtnClick={() =>
                 navigate(`${discussionLink}?focusComments=true`)
               }
-              disabledActionsTooltipText={disabledActionsTooltipText}
+              disabledActionsTooltipText={
+                disabledCommentPermissionTooltipText ||
+                disabledReactPermissionTooltipText ||
+                disabledActionsTooltipText
+              }
               hideRecentComments
               editingDisabled={isThreadTopicInContest}
             />
@@ -281,11 +339,30 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
               {isTopicWeighted && (
                 <TokenBanner
                   name={tokenMetadata?.name}
-                  ticker={topicObj?.tokenSymbol}
+                  ticker={topicObj?.token_symbol}
                   avatarUrl={tokenMetadata?.logo}
+                  voteWeight={voteWeight}
                   popover={{
                     title: tokenMetadata?.name,
-                    body: formatAddressShort(topicObj.tokenAddress!, 6, 6),
+                    body: (
+                      <>
+                        <CWText type="b2" className="token-description">
+                          This topic has weighted voting enabled using{' '}
+                          <span className="token-address">
+                            {topicObj.token_address}
+                          </span>
+                          <CWIconButton
+                            iconName="copy"
+                            onClick={() => {
+                              saveToClipboard(
+                                topicObj.token_address!,
+                                true,
+                              ).catch(console.error);
+                            }}
+                          />
+                        </CWText>
+                      </>
+                    ),
                   }}
                 />
               )}
