@@ -1,3 +1,4 @@
+import commonLogo from 'assets/img/branding/common-logo.svg';
 import clsx from 'clsx';
 import React, { useState } from 'react';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
@@ -7,11 +8,12 @@ import './WelcomeOnboardModal.scss';
 import { JoinCommunityStep } from './steps/JoinCommunityStep';
 import { PersonalInformationStep } from './steps/PersonalInformationStep';
 import { PreferencesStep } from './steps/PreferencesStep';
+import { TermsOfServicesStep } from './steps/TermsOfServicesStep';
 import { WelcomeOnboardModalProps, WelcomeOnboardModalSteps } from './types';
 
 const WelcomeOnboardModal = ({ isOpen, onClose }: WelcomeOnboardModalProps) => {
   const [activeStep, setActiveStep] = useState<WelcomeOnboardModalSteps>(
-    WelcomeOnboardModalSteps.PersonalInformation,
+    WelcomeOnboardModalSteps.TermsOfServices,
   );
 
   const handleClose = () => {
@@ -23,9 +25,23 @@ const WelcomeOnboardModal = ({ isOpen, onClose }: WelcomeOnboardModalProps) => {
 
   const getCurrentStep = () => {
     switch (activeStep) {
-      case WelcomeOnboardModalSteps.PersonalInformation: {
+      case WelcomeOnboardModalSteps.TermsOfServices: {
         return {
           index: 1,
+          title: 'Terms of Service',
+          component: (
+            <TermsOfServicesStep
+              onComplete={() => {
+                setActiveStep(WelcomeOnboardModalSteps.PersonalInformation);
+              }}
+            />
+          ),
+        };
+      }
+      case WelcomeOnboardModalSteps.PersonalInformation: {
+        return {
+          index: 2,
+
           title: 'Welcome to Common!',
           component: (
             <PersonalInformationStep
@@ -39,7 +55,7 @@ const WelcomeOnboardModal = ({ isOpen, onClose }: WelcomeOnboardModalProps) => {
 
       case WelcomeOnboardModalSteps.Preferences: {
         return {
-          index: 2,
+          index: 3,
           title: 'Customize your experience',
           component: (
             <PreferencesStep
@@ -53,7 +69,7 @@ const WelcomeOnboardModal = ({ isOpen, onClose }: WelcomeOnboardModalProps) => {
 
       case WelcomeOnboardModalSteps.JoinCommunity: {
         return {
-          index: 3,
+          index: 4,
           title: 'Join a community',
           component: <JoinCommunityStep onComplete={handleClose} />,
         };
@@ -73,13 +89,18 @@ const WelcomeOnboardModal = ({ isOpen, onClose }: WelcomeOnboardModalProps) => {
             iconName="close"
             onClick={handleClose}
             className="close-btn"
-            disabled={
-              activeStep === WelcomeOnboardModalSteps.PersonalInformation
-            }
+            disabled={activeStep === WelcomeOnboardModalSteps.TermsOfServices}
           />
-          <CWText type="h2">{getCurrentStep().title}</CWText>
+
+          <div className="logo-container">
+            <img src={commonLogo} className="logo" />
+          </div>
+
+          <CWText type="h2" className="modal-heading">
+            {getCurrentStep().title}
+          </CWText>
           <div className="progress">
-            {[1, 2, 3].map((step) => (
+            {[1, 2, 3, 4].map((step) => (
               <span
                 key={step}
                 className={clsx({ completed: getCurrentStep().index >= step })}
