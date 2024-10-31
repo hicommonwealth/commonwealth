@@ -27,7 +27,7 @@ import Membership from './membership';
 import Outbox from './outbox';
 import Poll from './poll';
 import ProfileTags from './profile_tags';
-import Quest from './quest';
+import { Quest, QuestAction, QuestActionMeta } from './quest';
 import Reaction from './reaction';
 import SsoToken from './sso_token';
 import StakeTransaction from './stake_transaction';
@@ -73,6 +73,8 @@ export const Factories = {
   Poll,
   ProfileTags,
   Quest,
+  QuestAction,
+  QuestActionMeta,
   Reaction,
   SsoToken,
   StakeTransaction,

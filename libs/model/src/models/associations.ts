@@ -15,7 +15,8 @@ export const buildAssociations = (db: DB) => {
     .withOne(db.ApiKey, {
       targetKey: 'id',
       onDelete: 'CASCADE',
-    });
+    })
+    .withMany(db.QuestAction);
 
   db.Address.withMany(db.Thread, {
     asOne: 'Address',
@@ -73,7 +74,12 @@ export const buildAssociations = (db: DB) => {
     .withOne(db.User, {
       foreignKey: 'selected_community_id',
       as: 'selectedCommunity',
-    });
+    })
+    .withMany(db.Quest);
+
+  db.Quest.withMany(db.QuestActionMeta).withMany(db.QuestAction, {
+    foreignKey: ['quest_id', 'event_name'],
+  });
 
   db.Tags.withMany(db.ProfileTags, {
     foreignKey: 'tag_id',

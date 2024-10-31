@@ -1,74 +1,57 @@
 import z from 'zod';
 import { PG_INT } from '../utils';
 
+// Should we move all event names to libs/schemas?
+export const QUEST_EVENTS = [
+  'CommentCreated',
+  'CommentUpvoted',
+  'ThreadCreated',
+  'ThreadUpvoted',
+  'UserMentioned',
+] as const;
+
 export enum QuestParticipationLimit {
-  Once = 'once',
+  OncePerQuest = 'once_per_quest',
   OncePerPeriod = 'once_per_period',
 }
 
-export enum QuestPeriod {
-  Day = 'day',
-  Week = 'week',
-  Month = 'month',
-}
-
-export enum QuestActionType {
-  Post = 'post',
-  Comment = 'comment',
-  Vote = 'vote',
-  LinkingSso = 'linking_sso',
-  BuyingToken = 'buying_token',
-  SellingToken = 'selling_token',
-}
-
-export enum QuestRewardType {
-  Token = 'token',
-  NFT = 'nft',
+export enum QuestParticipationPeriod {
+  Daily = 'daily',
+  Weekly = 'weekly',
+  Monthly = 'monthly',
 }
 
 export const QuestActionMeta = z
   .object({
     quest_id: PG_INT, // PK
-    action_type: z.nativeEnum(QuestActionType), // PK
-    description: z.string().max(255).optional(), // do we need this?
-    period: z.nativeEnum(QuestPeriod).optional(),
+    event_name: z.enum(QUEST_EVENTS), // PK - using event names instead of enums to allow more flexibility when adding new events
+    reward_amount: z.number(),
+    creator_reward_weight: z.number().min(0).max(1).default(0),
     participation_limit: z.nativeEnum(QuestParticipationLimit).optional(),
-    reward_type: z.nativeEnum(QuestRewardType),
-    reward_amount: z.number().optional(),
-    token_id: z.string().optional(),
-    token_address: z.string().optional(),
-    token_name: z.string().optional(),
-    token_symbol: z.string().optional(),
-    token_decimals: z.number().optional(),
+    participation_period: z.nativeEnum(QuestParticipationPeriod).optional(),
+    participation_times_per_period: z.number().optional(),
     created_at: z.coerce.date().optional(),
   })
-  .describe('Quest action type, participation limits, and reward');
+  .describe('Quest action metadata associated to a quest instance');
 
 export const QuestScore = z
   .object({
-    quest_id: PG_INT,
     user_id: PG_INT,
-    score: z.number(),
-    created_at: z.coerce.date().optional(),
+    points: z.number(),
+    period: z.nativeEnum(QuestParticipationPeriod).optional(),
   })
-  .describe(
-    'Records the score of a user in a quest, by accumulating their action values',
-  );
+  .describe('Value type with user total/period score');
 
 export const Quest = z
   .object({
     id: PG_INT.nullish(),
+    community_id: z.string(),
     name: z.string().max(255),
     description: z.string().max(1000),
-    community_id: z.string(),
     start_date: z.coerce.date(),
     end_date: z.coerce.date(),
-
     created_at: z.coerce.date().optional(),
     updated_at: z.coerce.date().optional(),
-
-    // final projected scores or real-time scores?
-    scores: z.array(QuestScore).nullish(),
   })
   .describe(
     'A quest is a collection of actions that users can take to earn rewards',
@@ -76,9 +59,18 @@ export const Quest = z
 
 export const QuestAction = z
   .object({
-    quest_id: PG_INT,
-    user_id: PG_INT,
-    action_id: PG_INT,
+    user_id: PG_INT.describe('The user who took the action'),
+    quest_id: PG_INT.describe(
+      'The quest that the action was taken in - PK to action metadata',
+    ),
+    event_name: z
+      .string()
+      .describe(
+        'The name of the event represented by the action - PK to action metadata',
+      ),
+    creator_id: PG_INT.nullish().describe(
+      'The user who created the entity where the action was taken',
+    ),
     created_at: z.coerce.date().optional(),
   })
   .describe('Records user actions in a quest');
