@@ -44,7 +44,7 @@ export function GetActiveContestManagers(): Query<
                 ca.created_at > co.start_time AND
                 ca.created_at < co.end_time
                 )
-            WHERE c.topic_id = :topic_id
+            WHERE cm.topic_id = :topic_id
               AND cm.community_id = :community_id
               AND cm.cancelled IS NOT TRUE
               AND (
