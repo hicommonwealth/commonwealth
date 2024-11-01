@@ -24,6 +24,7 @@ import {
 import { AddressAttributes, R2_ADAPTER_KEY } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import { TopicWeightedVoting } from '@hicommonwealth/schemas';
+import { MAX_TRUNCATED_CONTENT_LENGTH } from '@hicommonwealth/shared';
 import { Chance } from 'chance';
 import { z } from 'zod';
 import {
