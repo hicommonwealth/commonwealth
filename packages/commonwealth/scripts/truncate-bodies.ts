@@ -12,15 +12,14 @@ async function truncateText(
   {
     tableName,
     columnName,
-  }:
-    | {
-        tableName: 'Threads' | 'ThreadVersionHistories';
-        columnName: 'body';
-      }
-    | {
-        tableName: 'Comments' | 'CommentVersionHistories';
-        columnName: 'text';
-      },
+  }: {
+    tableName:
+      | 'Threads'
+      | 'ThreadVersionHistories'
+      | 'Comments'
+      | 'CommentVersionHistories';
+    columnName: 'body';
+  },
   lastId = 0,
 ) {
   let lastProcessedId = lastId;
@@ -117,7 +116,7 @@ async function main() {
       await truncateText({ tableName: 'Threads', columnName: 'body' }, lastId);
       break;
     case 'comments':
-      await truncateText({ tableName: 'Comments', columnName: 'text' }, lastId);
+      await truncateText({ tableName: 'Comments', columnName: 'body' }, lastId);
       break;
     case 'thread-versions':
       await truncateText(
@@ -127,7 +126,7 @@ async function main() {
       break;
     case 'comment-versions':
       await truncateText(
-        { tableName: 'CommentVersionHistories', columnName: 'text' },
+        { tableName: 'CommentVersionHistories', columnName: 'body' },
         lastId,
       );
       break;
