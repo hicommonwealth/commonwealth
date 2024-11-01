@@ -1,6 +1,6 @@
-import Web3 from 'web3';
 import { Erc20Abi } from './Abi/ERC20Abi';
 import ContractBase from './ContractBase';
+
 class ERC20Helper extends ContractBase {
   constructor(contractAddress: string, rpc: string) {
     super(contractAddress, Erc20Abi, rpc);
@@ -11,7 +11,11 @@ class ERC20Helper extends ContractBase {
     }
     const balance = await this.contract.methods.balanceOf(userAddress).call();
 
-    return Web3.utils.fromWei(balance, 'ether');
+    const decimals = await this.contract.methods.decimals().call();
+
+    const adjustedBalance = Number(balance) / 10 ** Number(decimals);
+
+    return adjustedBalance.toString();
   }
 }
 

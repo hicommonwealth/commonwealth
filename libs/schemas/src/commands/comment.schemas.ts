@@ -5,7 +5,7 @@ import { DiscordMetaSchema, PG_INT } from '../utils';
 export const CanvasComment = z.object({
   thread_id: PG_INT,
   thread_msg_id: z.string().nullish(),
-  text: z.string().min(1),
+  body: z.string().min(1),
   parent_id: PG_INT.optional(),
   parent_msg_id: z.string().nullish(),
   canvas_signed_data: z.string().optional(),
@@ -22,7 +22,7 @@ export const CreateComment = {
 export const UpdateComment = {
   input: z.object({
     comment_id: PG_INT,
-    text: z.string().min(1),
+    body: z.string().min(1),
   }),
   output: Comment.extend({ community_id: z.string() }),
 };

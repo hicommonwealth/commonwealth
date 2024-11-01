@@ -112,7 +112,7 @@ describe('parseEvmEventToContestEvent', () => {
     expect(parsedEvent.content_id).to.eq(10);
     expect(parsedEvent.contest_id).to.eq(888);
     expect(parsedEvent.voter_address).to.eq('0x2');
-    expect(parsedEvent.voting_power).to.eq(9000);
+    expect(parsedEvent.voting_power).to.eq('9000');
   });
 
   test('should map VoterVotedOneOff raw evm result to ContestContentUpvoted outbox shape', () => {
@@ -131,7 +131,7 @@ describe('parseEvmEventToContestEvent', () => {
     expect(parsedEvent.contest_address).to.eq(contestAddress);
     expect(parsedEvent.content_id).to.eq(10);
     expect(parsedEvent.voter_address).to.eq('0x2');
-    expect(parsedEvent.voting_power).to.eq(9000);
+    expect(parsedEvent.voting_power).to.eq('9000');
   });
 
   test('should throw if the wrong number of args are used outbox shape', () => {

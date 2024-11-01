@@ -84,7 +84,6 @@ const EditProfile = () => {
     refetch,
   } = useFetchProfileByIdQuery({
     apiCallEnabled: user.isLoggedIn,
-    shouldFetchSelfProfile: true,
   });
 
   useEffect(() => {

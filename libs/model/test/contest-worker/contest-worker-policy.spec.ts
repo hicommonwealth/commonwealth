@@ -97,6 +97,7 @@ describe('Contest Worker Policy', () => {
             canvas_msg_id: '',
             kind: '',
             stage: '',
+            body: '',
             view_count: 0,
             reaction_count: 0,
             reaction_weights_sum: '0',
@@ -152,7 +153,7 @@ describe('Contest Worker Policy', () => {
         content_url: '/ethhh/discussion/888',
         thread_id: threadId,
         thread_title: threadTitle,
-        voting_power: 10,
+        voting_power: '10',
         created_at: new Date(),
       });
 

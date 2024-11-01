@@ -40,14 +40,14 @@ export const ReactionButton = ({
   undoUpvoteDisabled,
 }: ReactionButtonProps) => {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
-  const reactors = thread?.associatedReactions?.map((t) => t.address);
+  const reactors = thread?.associatedReactions?.map((t) => t.address!);
 
   const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
   const user = useUserStore();
 
   const reactionWeightsSum =
     thread?.associatedReactions?.reduce(
-      (acc, reaction) => acc.add(reaction.voting_weight || 1),
+      (acc, reaction) => acc.add(reaction.calculated_voting_weight || 1),
       BigNumber.from(0),
     ) || BigNumber.from(0);
 
@@ -65,14 +65,14 @@ export const ReactionButton = ({
     useCreateThreadReactionMutation({
       communityId,
       threadId: thread.id,
-      threadMsgId: thread.canvasMsgId,
+      threadMsgId: thread.canvasMsgId!,
     });
   const { mutateAsync: deleteThreadReaction, isLoading: isDeletingReaction } =
     useDeleteThreadReactionMutation({
       communityId,
       address: user.activeAccount?.address || '',
       threadId: thread.id,
-      threadMsgId: thread.canvasMsgId,
+      threadMsgId: thread.canvasMsgId!,
     });
 
   if (showSkeleton) return <ReactionButtonSkeleton />;
@@ -97,7 +97,7 @@ export const ReactionButton = ({
         communityId,
         address: user.activeAccount?.address,
         threadId: thread.id!,
-        threadMsgId: thread.canvasMsgId,
+        threadMsgId: thread.canvasMsgId!,
         reactionId: +reactedId,
       });
       deleteThreadReaction(input).catch((e) => {
@@ -113,7 +113,7 @@ export const ReactionButton = ({
         communityId,
         address: activeAddress || '',
         threadId: thread.id,
-        threadMsgId: thread.canvasMsgId,
+        threadMsgId: thread.canvasMsgId!,
         reactionType: 'like',
       });
       createThreadReaction(input).catch((e) => {
@@ -146,6 +146,7 @@ export const ReactionButton = ({
             reactors,
           })}
           tooltipText={tooltipText}
+          reactors={reactors}
         />
       ) : tooltipText ? (
         <TooltipWrapper disabled={disabled} text={tooltipText}>
