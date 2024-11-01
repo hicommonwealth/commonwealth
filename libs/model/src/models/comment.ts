@@ -9,7 +9,7 @@ import type {
   ReactionAttributes,
   ThreadInstance,
 } from '.';
-import { beforeValidateCommentsHook } from './utils';
+import { beforeValidateBodyHook } from './utils';
 
 export type CommentAttributes = z.infer<typeof Comment> & {
   // associations
@@ -70,7 +70,7 @@ export default (
     {
       hooks: {
         beforeValidate(instance: CommentInstance) {
-          beforeValidateCommentsHook(instance);
+          beforeValidateBodyHook(instance);
         },
         afterCreate: async (comment, options) => {
           await (

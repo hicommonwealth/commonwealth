@@ -8,7 +8,7 @@ import { AddressAttributes } from './address';
 import type { CommunityAttributes } from './community';
 import type { ThreadSubscriptionAttributes } from './thread_subscriptions';
 import type { ModelInstance } from './types';
-import { beforeValidateThreadsHook } from './utils';
+import { beforeValidateBodyHook } from './utils';
 
 export type ThreadAttributes = z.infer<typeof Thread> & {
   // associations
@@ -118,7 +118,7 @@ export default (
       ],
       hooks: {
         beforeValidate(instance: ThreadInstance) {
-          beforeValidateThreadsHook(instance);
+          beforeValidateBodyHook(instance);
         },
         afterCreate: async (
           thread: ThreadInstance,

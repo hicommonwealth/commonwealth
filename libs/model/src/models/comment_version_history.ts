@@ -3,7 +3,7 @@ import Sequelize from 'sequelize';
 import { z } from 'zod';
 import { CommentAttributes } from './comment';
 import type { ModelInstance } from './types';
-import { beforeValidateCommentsHook } from './utils';
+import { beforeValidateBodyHook } from './utils';
 
 export type CommentVersionHistoryAttributes = z.infer<
   typeof CommentVersionHistory
@@ -33,7 +33,7 @@ export default (
       indexes: [{ fields: ['comment_id'] }],
       hooks: {
         beforeValidate(instance: CommentVersionHistoryInstance) {
-          beforeValidateCommentsHook(instance);
+          beforeValidateBodyHook(instance);
         },
       },
     },
