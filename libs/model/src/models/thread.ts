@@ -1,6 +1,9 @@
 import { EventNames } from '@hicommonwealth/core';
 import { Thread } from '@hicommonwealth/schemas';
-import { getDecodedString } from '@hicommonwealth/shared';
+import {
+  getDecodedString,
+  MAX_TRUNCATED_CONTENT_LENGTH,
+} from '@hicommonwealth/shared';
 import Sequelize from 'sequelize';
 import { z } from 'zod';
 import { emitEvent, getThreadContestManagers } from '../utils/utils';
@@ -27,7 +30,10 @@ export default (
       address_id: { type: Sequelize.INTEGER, allowNull: true },
       created_by: { type: Sequelize.STRING, allowNull: true },
       title: { type: Sequelize.TEXT, allowNull: false },
-      body: { type: Sequelize.TEXT, allowNull: false },
+      body: {
+        type: Sequelize.STRING(MAX_TRUNCATED_CONTENT_LENGTH),
+        allowNull: false,
+      },
       kind: { type: Sequelize.STRING, allowNull: false },
       stage: {
         type: Sequelize.TEXT,
