@@ -20,7 +20,8 @@ import { AddressAttributes, R2_ADAPTER_KEY } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import { TopicWeightedVoting } from '@hicommonwealth/schemas';
 import { Chance } from 'chance';
-import { afterAll, afterEach, beforeAll, describe, expect, test } from 'vitest';
+import { afterEach } from 'node:test'; // WARNING: sinon won't work if we import from vitest
+import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 import { z } from 'zod';
 import {
   CreateComment,
