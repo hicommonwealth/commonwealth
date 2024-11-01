@@ -6,10 +6,9 @@ module.exports = {
     await queryInterface.sequelize.transaction(async (transaction) => {
       await queryInterface.changeColumn('Threads', 'body', {
         type: Sequelize.STRING(2000),
-        allowNull: false,
         transaction,
       });
-      await queryInterface.changeColumn('Comments', 'text', {
+      await queryInterface.changeColumn('Comments', 'body', {
         type: Sequelize.STRING(2000),
         transaction,
       });
@@ -17,7 +16,7 @@ module.exports = {
         type: Sequelize.STRING(2000),
         transaction,
       });
-      await queryInterface.changeColumn('CommentVersionHistories', 'text', {
+      await queryInterface.changeColumn('CommentVersionHistories', 'body', {
         type: Sequelize.STRING(2000),
         transaction,
       });
