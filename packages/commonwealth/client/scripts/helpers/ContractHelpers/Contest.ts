@@ -206,7 +206,7 @@ class Contest extends ContractBase {
         tokenAddress,
       );
       const decimals = await token.methods.decimals().call();
-      const weiAmount = amount / 10 ** Number(decimals);
+      const weiAmount = amount * 10 ** Number(decimals);
       await token.methods
         .approve(this.contractAddress, weiAmount)
         .send({ from: walletAddress });
