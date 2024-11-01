@@ -206,6 +206,7 @@ export class Thread implements IUniqueId {
   public associatedContests?: ContestView[];
   public recentComments?: Comment<IUniqueId>[];
   public reactionWeightsSum: string;
+  public reactionCount: number;
   public links: Link[];
   public readonly discord_meta?: z.infer<
     typeof schemas.DiscordMetaSchema
@@ -300,6 +301,7 @@ export class Thread implements IUniqueId {
       ? (t.ThreadVersionHistories as unknown as ThreadVersionHistory[])
       : null;
     this.reactionWeightsSum = t.reaction_weights_sum ?? '';
+    this.reactionCount = t.reaction_count ?? 0;
     this.associatedReactions =
       t.associatedReactions ??
       processAssociatedReactions(
