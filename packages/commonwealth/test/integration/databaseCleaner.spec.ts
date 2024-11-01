@@ -182,6 +182,7 @@ describe('DatabaseCleaner Tests', async () => {
       const thread = await models.Thread.create({
         address_id: address.id!,
         title: 'Testing',
+        body: 'test',
         community_id: 'ethereum',
         reaction_count: 0,
         reaction_weights_sum: '0',

@@ -20,3 +20,8 @@ export const MAX_RECIPIENTS_PER_WORKFLOW_TRIGGER = 1_000;
 export const S3_RAW_ASSET_BUCKET_DOMAIN =
   's3.us-east-1.amazonaws.com/assets.commonwealth.im';
 export const S3_ASSET_BUCKET_CDN = 'assets.commonwealth.im';
+
+// The maximum number of characters allowed in 'body' and 'text'
+// columns of Threads, Comments, and version history models.
+// Full content found by fetching from 'content_url'.
+export const MAX_TRUNCATED_CONTENT_LENGTH = 2_000;

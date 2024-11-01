@@ -64,7 +64,7 @@ export const User = ({
     );
   }
 
-  const profile = users?.[0] || {};
+  const profile = users?.at(0);
 
   const fullAddress = formatAddressShort(userAddress, userCommunityId);
   const redactedAddress = formatAddressShort(
@@ -124,7 +124,7 @@ export const User = ({
   const userFinal = shouldShowAvatarOnly ? (
     <div className="User avatar-only" key={profile?.address || '-'}>
       <Avatar
-        url={profile?.avatarUrl}
+        url={profile?.avatarUrl ?? ''}
         size={profile?.avatarUrl ? avatarSize : avatarSize - 4}
         address={profile?.userId}
       />
@@ -148,7 +148,7 @@ export const User = ({
           style={{ width: `${avatarSize}px`, height: `${avatarSize}px` }}
         >
           <Avatar
-            url={profile?.avatarUrl}
+            url={profile?.avatarUrl ?? ''}
             size={avatarSize}
             address={profile?.userId}
           />

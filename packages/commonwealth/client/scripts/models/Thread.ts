@@ -53,9 +53,7 @@ function emptyStringToNull(input: string) {
 }
 
 function processAssociatedReactions(
-  reactions: Array<
-    z.infer<typeof schemas.Reaction> & { type?: string; address?: string }
-  >,
+  reactions: Array<z.infer<typeof schemas.ReactionView>>,
   reactionIds: number[],
   reactionType: string[],
   reactionTimestamps: string[],
@@ -69,8 +67,7 @@ function processAssociatedReactions(
   const tempReactionIds =
     (reactions ? reactions.map((r) => r.id) : reactionIds) || [];
   const tempReactionType =
-    (reactions ? reactions.map((r) => r?.type || r?.reaction) : reactionType) ||
-    [];
+    (reactions ? reactions.map((r) => r?.reaction) : reactionType) || [];
   const tempAddressesReacted =
     (reactions
       ? reactions.map((r) => r?.address || r?.Address?.address)
@@ -130,6 +127,7 @@ export interface IThreadCollaborator {
 export type ReactionView = z.infer<typeof schemas.ReactionView>;
 export type ContestView = z.infer<typeof schemas.ContestView>;
 export type ContestActionView = z.infer<typeof schemas.ContestActionView>;
+export type CommentView = z.infer<typeof schemas.CommentView>;
 
 export type RecentComment = {
   id: number;
@@ -179,6 +177,7 @@ export class Thread implements IUniqueId {
   public readonly kind: ThreadKind;
   public stage: ThreadStage;
   public readOnly: boolean;
+  public viewCount: number;
 
   public readonly canvasSignedData?: string;
   public readonly canvasMsgId?: string;
@@ -239,7 +238,7 @@ export class Thread implements IUniqueId {
       address_last_active?: string;
       associatedReactions?: ReactionView[];
       associatedContests?: ContestView[];
-      recentComments?: RecentComment[];
+      recentComments?: CommentView[];
       ContestActions?: ContestActionView[];
     },
   ) {
@@ -258,6 +257,7 @@ export class Thread implements IUniqueId {
     this.url = t.url!;
     this.communityId = t.community_id;
     this.readOnly = t.read_only ?? false;
+    this.viewCount = t.view_count || 1;
     this.collaborators =
       t.collaborators?.map((c) => ({
         address: c.address,
@@ -328,7 +328,7 @@ export class Thread implements IUniqueId {
           author: rc?.address,
           last_edited: rc?.updated_at ? moment(rc.updated_at) : null,
           created_at: rc?.created_at ? moment(rc?.created_at) : null,
-          text: rc?.text,
+          text: rc?.body,
           Address: {
             user_id: rc?.user_id ?? rc.Address?.User?.id,
             address: rc?.address ?? rc.Address?.address,

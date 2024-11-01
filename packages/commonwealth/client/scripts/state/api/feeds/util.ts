@@ -56,6 +56,7 @@ export function formatActivityResponse(response: AxiosResponse<any, any>) {
         locked_at: x.thread.locked_at,
         has_poll: x.thread.has_poll,
         Address: {
+          id: 0,
           address: x.thread.user_address,
           community_id: x.thread.community_id,
           ghost_address: false,

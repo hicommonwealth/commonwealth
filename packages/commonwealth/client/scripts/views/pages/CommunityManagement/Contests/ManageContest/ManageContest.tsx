@@ -1,3 +1,4 @@
+import { commonProtocol } from '@hicommonwealth/shared';
 import { useFlag } from 'hooks/useFlag';
 import React, { useState } from 'react';
 import app from 'state';
@@ -53,7 +54,10 @@ const ManageContest = ({ contestAddress }: ManageContestProps) => {
     return <PageNotFound />;
   }
 
-  const fundingTokenTicker = tokenMetadata?.symbol || 'ETH';
+  const fundingTokenTicker =
+    tokenMetadata?.symbol || commonProtocol.Denominations.ETH;
+  const fundingTokenDecimals =
+    tokenMetadata?.decimals || commonProtocol.WeiDecimals.ETH;
 
   const getCurrentStep = () => {
     switch (launchContestStep) {
@@ -76,6 +80,7 @@ const ManageContest = ({ contestAddress }: ManageContestProps) => {
             contestFormData={contestFormData}
             onSetCreatedContestAddress={setCreatedContestAddress}
             fundingTokenTicker={fundingTokenTicker}
+            fundingTokenDecimals={fundingTokenDecimals}
           />
         );
 

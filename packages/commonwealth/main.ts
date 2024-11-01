@@ -26,7 +26,6 @@ import DatabaseValidationService from './server/middleware/databaseValidationSer
 import setupPassport from './server/passport';
 import setupAPI from './server/routing/router';
 import setupServer from './server/scripts/setupServer';
-import ViewCountCache from './server/util/viewCountCache';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -61,7 +60,6 @@ export async function main(
   const cacheDecorator = new CacheDecorator();
 
   const SequelizeStore = SessionSequelizeStore(session.Store);
-  const viewCountCache = new ViewCountCache(2 * 60, 10 * 60);
 
   const sessionStore = new SequelizeStore({
     db: db.sequelize,
@@ -156,14 +154,7 @@ export async function main(
   const dbValidationService: DatabaseValidationService =
     new DatabaseValidationService(db);
 
-  setupAPI(
-    '/api',
-    app,
-    db,
-    viewCountCache,
-    dbValidationService,
-    cacheDecorator,
-  );
+  setupAPI('/api', app, db, dbValidationService, cacheDecorator);
 
   app.use('/robots.txt', (req: Request, res: Response) => {
     res.sendFile(`${__dirname}/robots.txt`);
