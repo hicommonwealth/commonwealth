@@ -1,3 +1,3 @@
-import useUploadFileMutation from './uploadFile';
+import useUploadFileMutation, { uploadFile } from './uploadFile';
 
-export { useUploadFileMutation };
+export { uploadFile, useUploadFileMutation };

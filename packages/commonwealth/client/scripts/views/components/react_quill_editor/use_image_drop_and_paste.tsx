@@ -2,8 +2,7 @@ import { DeltaOperation, DeltaStatic } from 'quill';
 import imageDropAndPaste from 'quill-image-drop-and-paste';
 import { MutableRefObject, useCallback } from 'react';
 import ReactQuill, { Quill } from 'react-quill';
-
-import { useUploadFileMutation } from 'state/api/general';
+import { uploadFile } from 'state/api/general';
 import {
   SerializableDeltaStatic,
   VALID_IMAGE_TYPES,
@@ -23,8 +22,6 @@ export const useImageDropAndPaste = ({
   setIsUploading,
   setContentDelta,
 }: UseImageDropAndPasteProps) => {
-  const { mutateAsync: uploadImage } = useUploadFileMutation({});
-
   // must be memoized or else infinite loop
   const handleImageDropAndPaste = useCallback(
     async (imageDataUrl, imageType) => {
@@ -58,7 +55,7 @@ export const useImageDropAndPaste = ({
 
         const file = base64ToFile(imageDataUrl, imageType);
 
-        const uploadedFileUrl = await uploadImage({
+        const uploadedFileUrl = await uploadFile({
           file,
         });
 
@@ -79,7 +76,7 @@ export const useImageDropAndPaste = ({
         setIsUploading(false);
       }
     },
-    [editorRef, setContentDelta, setIsUploading, uploadImage],
+    [editorRef, setContentDelta, setIsUploading],
   );
 
   return { handleImageDropAndPaste };

@@ -1,7 +1,7 @@
 import { DeltaStatic } from 'quill';
 import { MutableRefObject, useCallback } from 'react';
 import ReactQuill from 'react-quill';
-import { useUploadFileMutation } from 'state/api/general';
+import { uploadFile } from 'state/api/general';
 import { SerializableDeltaStatic } from './utils';
 
 type UseImageUploaderProps = {
@@ -15,8 +15,6 @@ export const useImageUploader = ({
   setIsUploading,
   setContentDelta,
 }: UseImageUploaderProps) => {
-  const { mutateAsync: uploadImage } = useUploadFileMutation({});
-
   const handleImageUploader = useCallback(
     async (file: File) => {
       const editor = editorRef.current?.editor;
@@ -33,7 +31,7 @@ export const useImageUploader = ({
         const selectedIndex =
           editor.getSelection()?.index || editor.getLength() || 0;
 
-        const uploadedFileUrl = await uploadImage({
+        const uploadedFileUrl = await uploadFile({
           file,
         });
 
@@ -54,7 +52,7 @@ export const useImageUploader = ({
         setIsUploading(false);
       }
     },
-    [editorRef, setContentDelta, setIsUploading, uploadImage],
+    [editorRef, setContentDelta, setIsUploading],
   );
 
   return { handleImageUploader };
