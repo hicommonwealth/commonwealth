@@ -17,6 +17,7 @@ export function CreateQuest(): Command<
 
       const existingName = await models.Quest.findOne({
         where: { community_id, name },
+        attributes: ['id'],
       });
       mustNotExist(
         `Quest named "${name}" in community "${community_id}"`,
