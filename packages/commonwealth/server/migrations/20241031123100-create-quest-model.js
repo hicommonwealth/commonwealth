@@ -8,12 +8,7 @@ module.exports = {
         `
         CREATE TYPE "enum_QuestActionMetas_participation_limit" AS ENUM('once_per_quest', 'once_per_period');
         CREATE TYPE "enum_QuestActionMetas_participation_period" AS ENUM('daily', 'weekly', 'monthly');
-      `,
-        { transaction },
-      );
-
-      await queryInterface.sequelize.query(
-        `
+        
         CREATE TABLE "Quests" (
           "id" SERIAL PRIMARY KEY,
           "community_id" VARCHAR(255) NOT NULL,
@@ -23,15 +18,10 @@ module.exports = {
           "end_date" TIMESTAMPTZ NOT NULL,
           "created_at" TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
           "updated_at" TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
-          UNIQUE ("community_id", "name"),
           FOREIGN KEY ("community_id") REFERENCES "Communities" ("id") ON DELETE CASCADE ON UPDATE CASCADE
         );
-      `,
-        { transaction },
-      );
+        CREATE UNIQUE INDEX "Quests_community_id_name_key" ON "Quests"(community_id, name);
 
-      await queryInterface.sequelize.query(
-        `
         CREATE TABLE "QuestActionMetas" (
           "id" SERIAL PRIMARY KEY,
           "quest_id" INTEGER NOT NULL,
@@ -45,12 +35,7 @@ module.exports = {
           "updated_at" TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
           FOREIGN KEY ("quest_id") REFERENCES "Quests" ("id") ON DELETE CASCADE ON UPDATE CASCADE
         );
-      `,
-        { transaction },
-      );
 
-      await queryInterface.sequelize.query(
-        `
         CREATE TABLE "QuestActions" (
           "user_id" INTEGER NOT NULL,
           "quest_action_meta_id" INTEGER NOT NULL,
@@ -69,23 +54,13 @@ module.exports = {
   down: async (queryInterface) => {
     await queryInterface.sequelize.transaction(async (transaction) => {
       await queryInterface.sequelize.query(
-        'DROP TABLE IF EXISTS "QuestActions";',
-        { transaction },
-      );
-      await queryInterface.sequelize.query(
-        'DROP TABLE IF EXISTS "QuestActionMetas";',
-        { transaction },
-      );
-      await queryInterface.sequelize.query('DROP TABLE IF EXISTS "Quests";', {
-        transaction,
-      });
-
-      await queryInterface.sequelize.query(
-        'DROP TYPE IF EXISTS "enum_QuestActionMeta_participation_limit";',
-        { transaction },
-      );
-      await queryInterface.sequelize.query(
-        'DROP TYPE IF EXISTS "enum_QuestActionMeta_participation_period";',
+        `
+        DROP TABLE IF EXISTS "QuestActions";
+        DROP TABLE IF EXISTS "QuestActionMetas";
+        DROP TABLE IF EXISTS "Quests";
+        DROP TYPE IF EXISTS "enum_QuestActionMeta_participation_limit";
+        DROP TYPE IF EXISTS "enum_QuestActionMeta_participation_period";
+        `,
         { transaction },
       );
     });

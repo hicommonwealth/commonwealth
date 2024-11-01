@@ -33,9 +33,7 @@ const generateSchemas = async () => {
       Topics: ['default_offchain_template_backup'],
       GroupPermissions: ['allowed_actions'],
     },
-    ignore_constraints: {
-      Quests: ['UNIQUE(community_id,name)'], // This is found as index in model
-    },
+    ignore_constraints: {},
   });
 
   return Object.keys(model_schema)
