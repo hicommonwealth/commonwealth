@@ -97,7 +97,7 @@ export const AuthorAndPublishInfo = ({
 
   const collaboratorLookupInfo: Record<string, string> =
     collaboratorsInfo?.reduce((acc, collaborator) => {
-      acc[collaborator.address] = collaborator.User.profile.name;
+      acc[collaborator.address] = collaborator.User?.profile.name ?? '';
       return acc;
     }, {}) ?? {};
 

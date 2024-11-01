@@ -33,7 +33,6 @@ export const ViewThreadUpvotesDrawer = ({
     <ViewUpvotesDrawer
       isOpen={isOpen}
       setIsOpen={setIsOpen}
-      contentBody={thread.body}
       header="Thread upvotes"
       reactorData={reactorData}
       // @ts-expect-error <StrictNullChecks/>

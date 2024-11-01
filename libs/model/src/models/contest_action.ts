@@ -36,7 +36,7 @@ export default (
       },
       thread_id: { type: Sequelize.INTEGER },
       voting_power: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.DECIMAL(78, 0),
         allowNull: false,
       },
       created_at: { type: Sequelize.DATE, allowNull: false },

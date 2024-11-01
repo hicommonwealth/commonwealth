@@ -40,12 +40,12 @@ describe('createComment Integration Tests', () => {
 
   const getUniqueCommentText = async () => {
     const time = new Date().getMilliseconds();
-    const text = `${chance.name()} at ${time}`;
+    const body = `${chance.name()} at ${time}`;
     const comment = await server.models.Comment.findOne({
-      where: { text },
+      where: { body },
     });
     chai.assert.isNull(comment);
-    return text;
+    return body;
   };
 
   const deleteComment = async (commentId, jwtToken) => {
@@ -116,34 +116,34 @@ describe('createComment Integration Tests', () => {
 
   // TODO: negative thread ids are not valid in new API
   test.skip('should create comment and return a success response', async () => {
-    const text = await getUniqueCommentText();
+    const body = await getUniqueCommentText();
     const response = await createValidComment(
       server.e2eTestEntities.testThreads[0].id,
-      text,
+      body,
       jwtTokenUser1,
     );
     chai.assert.equal(response.status, 200);
     const comment = await server.models.Comment.findOne({
-      where: { text },
+      where: { body },
     });
     chai.assert.isNotNull(comment);
   });
 
   // TODO: negative thread ids are not valid in new API
   test.skip('should create and delete comment and verify thread comment counts', async () => {
-    const text = await getUniqueCommentText();
+    const body = await getUniqueCommentText();
     const beforeCommentCount = await getThreadCommentCount(
       server.e2eTestEntities.testThreads[0].id,
     );
 
     const response = await createValidComment(
       server.e2eTestEntities.testThreads[0].id,
-      text,
+      body,
       jwtTokenUser1,
     );
 
     let comment = await server.models.Comment.findOne({
-      where: { text },
+      where: { body },
     });
     let afterCommentCount = await getThreadCommentCount(
       server.e2eTestEntities.testThreads[0].id,
@@ -155,7 +155,7 @@ describe('createComment Integration Tests', () => {
 
     const deleteResponse = await deleteComment(comment!.id, jwtTokenUser1);
     comment = await server.models.Comment.findOne({
-      where: { text },
+      where: { body },
     });
     afterCommentCount = await getThreadCommentCount(
       server.e2eTestEntities.testThreads[0].id,

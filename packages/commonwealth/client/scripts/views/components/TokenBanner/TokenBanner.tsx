@@ -85,19 +85,18 @@ const TokenBanner = ({
       )}
 
       {popover && (
-        <>
-          <CWIconButton
-            iconName="infoEmpty"
-            buttonSize="sm"
-            onMouseEnter={popoverProps.handleInteraction}
-            onMouseLeave={popoverProps.handleInteraction}
-          />
+        <div
+          onMouseEnter={popoverProps.handleInteraction}
+          onMouseLeave={popoverProps.handleInteraction}
+        >
+          <CWIconButton iconName="infoEmpty" buttonSize="sm" />
           <CWPopover
+            className="TokenBannerPopover"
             title={<>{popover.title}</>}
             body={popover.body}
             {...popoverProps}
           />
-        </>
+        </div>
       )}
     </div>
   );

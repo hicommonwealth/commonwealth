@@ -95,7 +95,7 @@ export const CreateComment = ({
           communityId,
           address: user.activeAccount!.address,
           threadId: rootThread.id,
-          threadMsgId: rootThread.canvasMsgId,
+          threadMsgId: rootThread.canvasMsgId!,
           unescapedText: serializeDelta(contentDelta),
           parentCommentId: parentCommentId ?? null,
           parentCommentMsgId: parentCommentMsgId ?? null,
@@ -167,6 +167,6 @@ export const CreateComment = ({
       isReplying={isReplying}
     />
   ) : (
-    <ArchiveMsg archivedAt={rootThread.archivedAt} />
+    <ArchiveMsg archivedAt={rootThread.archivedAt!} />
   );
 };
