@@ -1,21 +1,23 @@
 import type { BlobStorage } from './interfaces';
 
-const blobs = new Map();
+export const inMemoryBlobUrl = 'http://commonblob.com/';
+export const inMemoryBlobs = new Map();
 
 export const inMemoryBlobStorage: BlobStorage = {
   name: 'in-memory-blob-storage',
   dispose: () => {
-    blobs.clear();
+    inMemoryBlobs.clear();
     return Promise.resolve();
   },
   upload: ({ bucket, key, content }) => {
-    blobs.set(bucket.concat(key), content);
+    inMemoryBlobs.set(bucket.concat(key), content);
     return Promise.resolve({
-      url: `http://commonblob.com/${bucket}/${key}`,
-      location: key,
+      url: `${inMemoryBlobUrl}${bucket}/${key}`,
+      location: `${inMemoryBlobUrl}${bucket}/${key}`,
     });
   },
-  exists: ({ bucket, key }) => Promise.resolve(blobs.has(bucket.concat(key))),
+  exists: ({ bucket, key }) =>
+    Promise.resolve(inMemoryBlobs.has(bucket.concat(key))),
   getSignedUrl: ({ bucket, key }) =>
-    Promise.resolve(`http://commonblob.com/${bucket}/${key}`),
+    Promise.resolve(`${inMemoryBlobUrl}${bucket}/${key}`),
 };

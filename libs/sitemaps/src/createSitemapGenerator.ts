@@ -44,10 +44,8 @@ export function createSitemapGenerator(
           content: sitemap,
           contentType: 'text/xml; charset=utf-8',
         });
-        const url = new URL(res.location);
-        const location = 'https://' + url.hostname + '/' + sitemapPath;
-        log.info(`Wrote sitemap: ${sitemapPath} to location ${location}`);
-        children.push({ location });
+        log.info(`Wrote sitemap: ${sitemapPath} to location ${res.url}`);
+        children.push({ location: res.url });
       }
     }
 
