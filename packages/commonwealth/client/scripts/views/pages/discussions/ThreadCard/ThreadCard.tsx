@@ -47,6 +47,7 @@ type CardProps = AdminActionsProps & {
   layoutType?: 'author-first' | 'community-first';
   customStages?: string[];
   editingDisabled?: boolean;
+  expandCommentBtnVisible?: boolean;
 };
 
 export const ThreadCard = ({
@@ -78,11 +79,14 @@ export const ThreadCard = ({
   layoutType = 'author-first',
   customStages,
   editingDisabled,
+  expandCommentBtnVisible,
 }: CardProps) => {
   const navigate = useCommonNavigate();
   const user = useUserStore();
   const { isWindowSmallInclusive } = useBrowserWindow({});
   const [isUpvoteDrawerOpen, setIsUpvoteDrawerOpen] = useState<boolean>(false);
+  const [showCommentVisible, setShowCommentVisible] = useState<boolean>(false);
+  const toggleShowComments = () => setShowCommentVisible((prev) => !prev);
 
   useEffect(() => {
     if (localStorage.getItem('dark-mode-state') === 'on') {
@@ -160,7 +164,7 @@ export const ThreadCard = ({
                   thread.updatedAt
                 ).toISOString(),
               })}
-              discord_meta={thread.discord_meta}
+              discord_meta={thread.discord_meta!}
               // @ts-expect-error <StrictNullChecks/>
               archivedAt={thread.archivedAt}
               profile={thread?.profile}
@@ -276,12 +280,16 @@ export const ThreadCard = ({
               setIsUpvoteDrawerOpen={setIsUpvoteDrawerOpen}
               hideUpvoteDrawerButton={hideUpvotesDrawer}
               editingDisabled={editingDisabled}
+              expandCommentBtnVisible={expandCommentBtnVisible}
+              showCommentVisible={showCommentVisible}
+              toggleShowComments={toggleShowComments}
             />
           </div>
         </div>
       </Link>
       {!hideRecentComments &&
       maxRecentCommentsToDisplay &&
+      showCommentVisible &&
       // @ts-expect-error <StrictNullChecks/>
       thread?.recentComments?.length > 0 ? (
         <div className={clsx('RecentComments', { hideReactionButton })}>

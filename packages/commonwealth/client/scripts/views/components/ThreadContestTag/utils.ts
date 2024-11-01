@@ -1,8 +1,8 @@
-import { AssociatedContest } from 'models/Thread';
+import { ContestView } from 'models/Thread';
 import moment from 'moment/moment';
 
 export const getWinnersFromAssociatedContests = (
-  associatedContests?: AssociatedContest[],
+  associatedContests?: ContestView[],
 ) => {
   if (!associatedContests) {
     return [];
@@ -24,7 +24,8 @@ export const getWinnersFromAssociatedContests = (
             (s) => s.content_id === String(contest.content_id),
           ) + 1,
         // show only for recurring
-        round: contest.contest_interval > 0 ? contest.contest_id + 1 : null,
+        round:
+          (contest.contest_interval ?? 0) > 0 ? contest.contest_id + 1 : null,
         title: contest.contest_name,
       };
     })

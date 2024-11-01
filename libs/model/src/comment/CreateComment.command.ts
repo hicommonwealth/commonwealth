@@ -57,10 +57,10 @@ export function CreateComment(): Command<
           throw new InvalidState(CreateCommentErrors.NestingTooDeep);
       }
 
-      const text = decodeContent(payload.text);
-      const mentions = uniqueMentions(parseUserMentions(text));
+      const body = decodeContent(payload.body);
+      const mentions = uniqueMentions(parseUserMentions(body));
 
-      const { contentUrl } = await uploadIfLarge('comments', text);
+      const { contentUrl } = await uploadIfLarge('comments', body);
 
       // == mutation transaction boundary ==
       const new_comment_id = await models.sequelize.transaction(
@@ -70,12 +70,12 @@ export function CreateComment(): Command<
               ...rest,
               thread_id,
               parent_id: parent_id ? parent_id.toString() : null, // TODO: change parent_id from string to number
-              text,
+              body,
               address_id: address.id!,
               reaction_count: 0,
               reaction_weights_sum: '0',
               created_by: '',
-              search: getCommentSearchVector(text),
+              search: getCommentSearchVector(body),
               content_url: contentUrl,
             },
             {
@@ -86,7 +86,7 @@ export function CreateComment(): Command<
           await models.CommentVersionHistory.create(
             {
               comment_id: comment.id!,
-              text: comment.text,
+              body: comment.body,
               timestamp: comment.created_at!,
               content_url: contentUrl,
             },
