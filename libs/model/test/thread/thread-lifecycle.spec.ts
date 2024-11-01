@@ -19,15 +19,8 @@ import {
 import { AddressAttributes, R2_ADAPTER_KEY } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import { TopicWeightedVoting } from '@hicommonwealth/schemas';
-import {
-  CANVAS_TOPIC,
-  getTestSigner,
-  sign,
-  toCanvasSignedDataApiArgs,
-} from '@hicommonwealth/shared';
 import { Chance } from 'chance';
-import { afterEach } from 'node:test';
-import { afterAll, beforeAll, describe, expect, test } from 'vitest';
+import { afterAll, afterEach, beforeAll, describe, expect, test } from 'vitest';
 import { z } from 'zod';
 import {
   CreateComment,
@@ -50,32 +43,9 @@ import {
   UpdateThreadErrors,
 } from '../../src/thread';
 import { getCommentDepth } from '../../src/utils/getCommentDepth';
+import { getSignersInfo, signCreateThread } from '../utils/canvas-signers';
 
 const chance = Chance();
-
-async function signPayload(
-  address: string,
-  payload: z.infer<typeof schemas.CreateThread.input>,
-) {
-  const did = `did:pkh:eip155:1:${address}`;
-  return {
-    ...payload,
-    ...toCanvasSignedDataApiArgs(
-      await sign(
-        did,
-        'thread',
-        {
-          community: payload.community_id,
-          title: payload.title,
-          body: payload.body,
-          link: payload.url,
-          topic: payload.topic_id,
-        },
-        async () => [1, []] as [number, string[]],
-      ),
-    ),
-  };
-}
 
 describe('Thread lifecycle', () => {
   let community: z.infer<typeof schemas.Community>,
@@ -110,19 +80,7 @@ describe('Thread lifecycle', () => {
   };
 
   beforeAll(async () => {
-    const signerInfo = await Promise.all(
-      roles.map(async () => {
-        const signer = getTestSigner();
-        const did = await signer.getDid();
-        await signer.newSession(CANVAS_TOPIC);
-        return {
-          signer,
-          did,
-          address: signer.getAddressFromDid(did),
-        };
-      }),
-    );
-
+    const signerInfo = await getSignersInfo(roles);
     const threadGroupId = 123456;
     const commentGroupId = 654321;
     const [node] = await seed('ChainNode', { eth_chain_id: 1 });
@@ -280,7 +238,10 @@ describe('Thread lifecycle', () => {
         test(`should create thread as ${role}`, async () => {
           const _thread = await command(CreateThread(), {
             actor: actors[role],
-            payload: await signPayload(actors[role].address!, instancePayload),
+            payload: await signCreateThread(
+              actors[role].address!,
+              instancePayload,
+            ),
           });
           expect(_thread?.title).to.equal(instancePayload.title);
           expect(_thread?.body).to.equal(instancePayload.body);
@@ -515,7 +476,7 @@ describe('Thread lifecycle', () => {
     test('should delete a thread as author', async () => {
       const _thread = await command(CreateThread(), {
         actor: actors.member,
-        payload: await signPayload(actors.member.address!, payload),
+        payload: await signCreateThread(actors.member.address!, payload),
       });
       const _deleted = await command(DeleteThread(), {
         actor: actors.member,
@@ -527,7 +488,7 @@ describe('Thread lifecycle', () => {
     test('should delete a thread as admin', async () => {
       const _thread = await command(CreateThread(), {
         actor: actors.member,
-        payload: await signPayload(actors.member.address!, payload),
+        payload: await signCreateThread(actors.member.address!, payload),
       });
       const _deleted = await command(DeleteThread(), {
         actor: actors.admin,
@@ -548,7 +509,7 @@ describe('Thread lifecycle', () => {
     test('should throw error when not owned', async () => {
       const _thread = await command(CreateThread(), {
         actor: actors.member,
-        payload: await signPayload(actors.member.address!, payload),
+        payload: await signCreateThread(actors.member.address!, payload),
       });
       await expect(
         command(DeleteThread(), {
