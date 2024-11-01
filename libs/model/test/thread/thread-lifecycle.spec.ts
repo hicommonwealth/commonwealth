@@ -1,10 +1,15 @@
-import sinon from 'sinon';
-import { contractHelpers } from '../../src/services/commonProtocol';
+import {
+  afterAll,
+  afterEach,
+  beforeAll,
+  describe,
+  expect,
+  test,
+  vi,
+} from 'vitest';
 
-const getNamespaceBalanceStub = sinon.stub(
-  contractHelpers,
-  'getNamespaceBalance',
-);
+import { contractHelpers } from '../../src/services/commonProtocol';
+const getNamespaceBalanceSpy = vi.spyOn(contractHelpers, 'getNamespaceBalance');
 
 import {
   Actor,
@@ -20,8 +25,6 @@ import { AddressAttributes, R2_ADAPTER_KEY } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import { TopicWeightedVoting } from '@hicommonwealth/schemas';
 import { Chance } from 'chance';
-import { afterEach } from 'node:test'; // WARNING: sinon won't work if we import from vitest
-import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 import { z } from 'zod';
 import {
   CreateComment,
@@ -778,11 +781,13 @@ describe('Thread lifecycle', () => {
 
   describe('thread reaction', () => {
     afterEach(() => {
-      getNamespaceBalanceStub.restore();
+      getNamespaceBalanceSpy.mockClear();
     });
 
     test('should create a thread reaction as a member of a group with permissions', async () => {
-      getNamespaceBalanceStub.resolves({ [actors.member.address!]: '50' });
+      getNamespaceBalanceSpy.mockResolvedValue({
+        [actors.member.address!]: '50',
+      });
       const reaction = await command(CreateThreadReaction(), {
         actor: actors.member,
         payload: {
@@ -799,7 +804,9 @@ describe('Thread lifecycle', () => {
     });
 
     test('should throw error when actor does not have stake', async () => {
-      getNamespaceBalanceStub.resolves({ [actors.member.address!]: '0' });
+      getNamespaceBalanceSpy.mockResolvedValue({
+        [actors.member.address!]: '0',
+      });
       await expect(
         command(CreateThreadReaction(), {
           actor: actors.member,
@@ -852,7 +859,9 @@ describe('Thread lifecycle', () => {
     });
 
     test('should set thread reaction vote weight and thread vote sum correctly', async () => {
-      getNamespaceBalanceStub.resolves({ [actors.admin.address!]: '50' });
+      getNamespaceBalanceSpy.mockResolvedValue({
+        [actors.admin.address!]: '50',
+      });
       const reaction = await command(CreateThreadReaction(), {
         actor: actors.admin,
         payload: {
@@ -903,11 +912,13 @@ describe('Thread lifecycle', () => {
 
   describe('comment reaction', () => {
     afterEach(() => {
-      getNamespaceBalanceStub.restore();
+      getNamespaceBalanceSpy.mockClear();
     });
 
     test('should create a comment reaction as a member of a group with permissions', async () => {
-      getNamespaceBalanceStub.resolves({ [actors.member.address!]: '50' });
+      getNamespaceBalanceSpy.mockResolvedValue({
+        [actors.member.address!]: '50',
+      });
       const reaction = await command(CreateCommentReaction(), {
         actor: actors.member,
         payload: {
@@ -924,7 +935,9 @@ describe('Thread lifecycle', () => {
     });
 
     test('should set comment reaction vote weight and comment vote sum correctly', async () => {
-      getNamespaceBalanceStub.resolves({ [actors.admin.address!]: '50' });
+      getNamespaceBalanceSpy.mockResolvedValue({
+        [actors.admin.address!]: '50',
+      });
       const reaction = await command(CreateCommentReaction(), {
         actor: actors.admin,
         payload: {
@@ -955,7 +968,9 @@ describe('Thread lifecycle', () => {
     });
 
     test('should throw error when actor does not have stake', async () => {
-      getNamespaceBalanceStub.resolves({ [actors.member.address!]: '0' });
+      getNamespaceBalanceSpy.mockResolvedValue({
+        [actors.member.address!]: '0',
+      });
       await expect(
         command(CreateCommentReaction(), {
           actor: actors.member,
@@ -982,7 +997,9 @@ describe('Thread lifecycle', () => {
     });
 
     test('should delete a reaction', async () => {
-      getNamespaceBalanceStub.resolves({ [actors.member.address!]: '50' });
+      getNamespaceBalanceSpy.mockResolvedValue({
+        [actors.member.address!]: '50',
+      });
       const reaction = await command(CreateCommentReaction(), {
         actor: actors.member,
         payload: {
@@ -1002,7 +1019,9 @@ describe('Thread lifecycle', () => {
     });
 
     test('should throw when trying to delete a reaction that is not yours', async () => {
-      getNamespaceBalanceStub.resolves({ [actors.member.address!]: '50' });
+      getNamespaceBalanceSpy.mockResolvedValue({
+        [actors.member.address!]: '50',
+      });
       const reaction = await command(CreateCommentReaction(), {
         actor: actors.member,
         payload: {
