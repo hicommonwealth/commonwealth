@@ -20,6 +20,7 @@ const useUpdateUserMutation = ({
 
   return trpc.user.updateUser.useMutation({
     onSuccess: async (updated) => {
+      await utils.user.getUserProfile.refetch({}); // we access this in some page which fetches auth user profile
       await utils.user.getUserProfile.refetch({ userId: user.id });
 
       updated.is_welcome_onboard_flow_complete &&
