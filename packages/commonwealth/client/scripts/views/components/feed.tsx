@@ -6,16 +6,12 @@ import 'components/feed.scss';
 import { PageNotFound } from '../pages/404';
 import { UserDashboardRowSkeleton } from '../pages/user_dashboard/user_dashboard_row';
 
-import {
-  ActivityComment,
-  ActivityThread,
-  PermissionEnum,
-} from '@hicommonwealth/schemas';
+import { ActivityThread, PermissionEnum } from '@hicommonwealth/schemas';
 import { slugify } from '@hicommonwealth/shared';
 import { getThreadActionTooltipText } from 'helpers/threads';
 import useTopicGating from 'hooks/useTopicGating';
 import { getProposalUrlPath } from 'identifiers';
-import { Thread, type RecentComment } from 'models/Thread';
+import { Thread } from 'models/Thread';
 import { ThreadKind, ThreadStage } from 'models/types';
 import { useCommonNavigate } from 'navigation/helpers';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
@@ -123,6 +119,7 @@ const FeedThread = ({ thread }: { thread: Thread }) => {
 function mapThread(thread: z.infer<typeof ActivityThread>): Thread {
   return new Thread({
     Address: {
+      id: 0,
       address: thread.user_address,
       community_id: thread.community_id,
       ghost_address: false,
@@ -171,20 +168,20 @@ function mapThread(thread: z.infer<typeof ActivityThread>): Thread {
     ContestActions: [],
     numberOfComments: thread.number_of_comments,
     recentComments:
-      thread.recent_comments?.map(
-        (c: z.infer<typeof ActivityComment>) =>
-          ({
-            id: c.id,
-            address: c.address,
-            user_id: c.user_id ?? '',
-            created_at: c.created_at,
-            updated_at: c.updated_at,
-            profile_avatar: c.profile_avatar,
-            profile_name: c.profile_name,
-            text: c.body,
-            content_url: c.content_url || null,
-          }) as RecentComment,
-      ) ?? [],
+      thread.recent_comments?.map((c) => ({
+        id: c.id,
+        address: c.address,
+        user_id: c.user_id ?? 0,
+        created_at: c.created_at,
+        updated_at: c.updated_at,
+        profile_avatar: c.profile_avatar ?? '',
+        profile_name: c.profile_name ?? '',
+        body: c.body,
+        content_url: c.content_url || null,
+        thread_id: 0,
+        address_id: 0,
+        reaction_count: 0,
+      })) ?? [],
   });
 }
 

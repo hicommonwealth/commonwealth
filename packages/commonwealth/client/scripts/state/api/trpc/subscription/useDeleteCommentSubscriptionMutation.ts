@@ -1,5 +1,5 @@
 import { trpc } from 'utils/trpcClient';
 
 export function useDeleteCommentSubscriptionMutation() {
-  return trpc.subscription.deleteCommentSubscription.useMutation();
+  return trpc.subscriptions.deleteCommentSubscription.useMutation();
 }

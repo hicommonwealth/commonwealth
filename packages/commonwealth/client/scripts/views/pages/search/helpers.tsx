@@ -1,4 +1,4 @@
-import { CommunityMember } from '@hicommonwealth/schemas';
+import { SearchUserProfilesView } from '@hicommonwealth/schemas';
 import { getDecodedString } from '@hicommonwealth/shared';
 import moment from 'moment';
 import 'pages/search/index.scss';
@@ -7,7 +7,6 @@ import app from 'state';
 import { useFetchCustomDomainQuery } from 'state/api/configuration';
 import { useFetchProfilesByAddressesQuery } from 'state/api/profiles';
 import { z } from 'zod';
-import type MinimumProfile from '../../../models/MinimumProfile';
 import { SearchScope } from '../../../models/SearchQuery';
 import { CommunityLabel } from '../../components/community_label';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
@@ -208,7 +207,7 @@ const CommunityResultRow = ({
   );
 };
 
-export type MemberResult = z.infer<typeof CommunityMember>;
+export type MemberResult = z.infer<typeof SearchUserProfilesView>;
 
 type MemberResultRowProps = {
   addr: MemberResult;
@@ -223,7 +222,7 @@ const MemberResultRow = ({ addr, setRoute }: MemberResultRowProps) => {
     currentChainId: app.activeChainId() || '',
     apiCallEnabled: !!(community_id && address),
   });
-  const profile: MinimumProfile = users?.[0];
+  const profile = users?.[0];
 
   const { data: domain } = useFetchCustomDomainQuery();
 

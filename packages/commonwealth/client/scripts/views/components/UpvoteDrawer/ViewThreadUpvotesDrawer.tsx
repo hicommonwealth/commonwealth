@@ -25,7 +25,7 @@ export const ViewThreadUpvotesDrawer = ({
       avatarUrl: profile.avatar_url,
       address: profile.address,
       updated_at: reactor?.updated_at,
-      voting_weight: reactor?.voting_weight || 1,
+      voting_weight: reactor?.calculated_voting_weight || 1,
     };
   });
 
@@ -33,7 +33,6 @@ export const ViewThreadUpvotesDrawer = ({
     <ViewUpvotesDrawer
       isOpen={isOpen}
       setIsOpen={setIsOpen}
-      contentBody={thread.body}
       header="Thread upvotes"
       reactorData={reactorData}
       // @ts-expect-error <StrictNullChecks/>
