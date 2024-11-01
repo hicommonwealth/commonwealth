@@ -40,14 +40,14 @@ export const ReactionButton = ({
   undoUpvoteDisabled,
 }: ReactionButtonProps) => {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
-  const reactors = thread?.associatedReactions?.map((t) => t.address);
+  const reactors = thread?.associatedReactions?.map((t) => t.address!);
 
   const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
   const user = useUserStore();
 
   const reactionWeightsSum =
     thread?.associatedReactions?.reduce(
-      (acc, reaction) => acc.add(reaction.voting_weight || 1),
+      (acc, reaction) => acc.add(reaction.calculated_voting_weight || 1),
       BigNumber.from(0),
     ) || BigNumber.from(0);
 

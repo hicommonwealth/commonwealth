@@ -1,7 +1,10 @@
-import { useQuery } from '@tanstack/react-query';
+import * as schemas from '@hicommonwealth/schemas';
+import { getQueryKey } from '@trpc/react-query';
 import axios from 'axios';
 import MinimumProfile from 'models/MinimumProfile';
-import { ApiEndpoints, SERVER_URL, queryClient } from 'state/api/config';
+import { queryClient } from 'state/api/config';
+import { BASE_API_PATH, trpc } from 'utils/trpcClient';
+import { z } from 'zod';
 import { userStore } from '../../ui/user';
 
 const PROFILES_STALE_TIME = 30 * 1_000; // 3 minutes
@@ -13,37 +16,6 @@ interface FetchProfilesByAddressProps {
   initiateProfilesAfterFetch?: boolean;
 }
 
-export const fetchProfilesByAddress = async ({
-  currentChainId,
-  profileAddresses,
-  profileChainIds,
-  initiateProfilesAfterFetch = true,
-}: FetchProfilesByAddressProps) => {
-  const response = await axios.post(
-    `${SERVER_URL}${ApiEndpoints.FETCH_PROFILES_BY_ADDRESS}`,
-    {
-      addresses: profileAddresses,
-      communities: profileChainIds,
-      ...(userStore.getState().jwt && { jwt: userStore.getState().jwt }),
-    },
-  );
-
-  if (!initiateProfilesAfterFetch) return response.data.result;
-
-  return response.data.result.map((t) => {
-    const profile = new MinimumProfile(t.address, currentChainId);
-    profile.initialize(
-      t.userId,
-      t.name,
-      t.address,
-      t.avatarUrl,
-      currentChainId,
-      t.lastActive,
-    );
-    return profile;
-  });
-};
-
 interface UseFetchProfilesByAddressesQuery extends FetchProfilesByAddressProps {
   apiCallEnabled?: boolean;
 }
@@ -52,28 +24,30 @@ const useFetchProfilesByAddressesQuery = ({
   profileChainIds,
   profileAddresses = [],
   apiCallEnabled = true,
-  initiateProfilesAfterFetch = true,
 }: UseFetchProfilesByAddressesQuery) => {
-  return useQuery({
-    // eslint-disable-next-line @tanstack/query/exhaustive-deps
-    queryKey: [
-      ApiEndpoints.FETCH_PROFILES_BY_ADDRESS,
-      // we should not cache by currentChainId as it can break logic for DISCOURAGED_NONREACTIVE_fetchProfilesByAddress
-      // currentChainId,
-      // sort the chain/address ids by ascending so the keys are always in the same order
-      ...[...profileChainIds].sort((a, b) => a.localeCompare(b)),
-      ...[...profileAddresses].sort((a, b) => a.localeCompare(b)),
-    ],
-    queryFn: () =>
-      fetchProfilesByAddress({
-        currentChainId,
-        profileAddresses,
-        profileChainIds,
-        initiateProfilesAfterFetch,
-      }),
-    staleTime: PROFILES_STALE_TIME,
-    enabled: apiCallEnabled,
-  });
+  return trpc.user.getUserAddresses.useQuery(
+    {
+      communities: profileChainIds.join(','),
+      addresses: profileAddresses.join(','),
+    },
+    {
+      select: (profiles) =>
+        profiles.map((t) => {
+          const profile = new MinimumProfile(t.address, currentChainId);
+          profile.initialize(
+            t.userId,
+            t.name,
+            t.address,
+            t.avatarUrl ?? '',
+            currentChainId,
+            new Date(t.lastActive),
+          );
+          return profile;
+        }),
+      staleTime: PROFILES_STALE_TIME,
+      enabled: apiCallEnabled,
+    },
+  );
 };
 
 // Some of the core logic in the app is non-reactive like the Account.ts file. These non-reactive
@@ -85,21 +59,70 @@ const useFetchProfilesByAddressesQuery = ({
 // reason of its creation.
 // TODO: After account controller is de-side-effected (all api calls removed). Then we would be in a better
 // position to remove this discouraged method
-export const DISCOURAGED_NONREACTIVE_fetchProfilesByAddress = (
-  chainId: string,
-  address: string,
+export const DISCOURAGED_NONREACTIVE_fetchProfilesByAddress = async (
+  communities: string[],
+  addresses: string[],
 ) => {
-  return queryClient.fetchQuery(
-    [ApiEndpoints.FETCH_PROFILES_BY_ADDRESS, chainId, address],
+  const queryKey = getQueryKey(trpc.user.getUserAddresses, {
+    communities: communities.join(','),
+    addresses: addresses.join(','),
+  });
+
+  // if profile already exists in cache, return that
+  const cachedProfile = queryClient.getQueryData<
+    z.infer<typeof schemas.GetUserAddresses.output> | undefined
+  >(queryKey);
+
+  if (cachedProfile) {
+    return cachedProfile;
+  }
+
+  // HACK: with @trpc/react-query v10.x, we can't directly call an endpoint outside of 'react-context'
+  // with this way the api can be used in non-react files. This should be cleaned up when we migrate
+  // to @trpc/react-query v11.x
+
+  // eslint-disable-next-line max-len
+  const getUserAddressesTrpcUrl = `user.getUserAddresses?batch=1&input=${encodeURIComponent(`{"0":{"communities":"${communities.join(',')}","addresses":"${addresses.join(',')}"}}`)}`;
+
+  const user = userStore.getState();
+
+  if (
+    !user.addressSelectorSelectedAddress &&
+    !user.activeAccount &&
+    user.addresses.length === 0
+  ) {
+    return;
+  }
+
+  const response = await axios.get(
+    `${BASE_API_PATH}/${getUserAddressesTrpcUrl}`,
     {
-      queryFn: () =>
-        fetchProfilesByAddress({
-          currentChainId: chainId,
-          profileChainIds: [chainId],
-          profileAddresses: [address],
-        }),
+      headers: {
+        authorization: user.jwt || '',
+        address:
+          user.addressSelectorSelectedAddress ??
+          user.activeAccount?.address ??
+          user.addresses?.at(0)?.address,
+      },
     },
   );
+
+  const mappedProfiles = (response?.data?.[0]?.result?.data || []).map((t) => {
+    const profile = new MinimumProfile(t.address, communities[0]);
+    profile.initialize(
+      t.userId,
+      t.name,
+      t.address,
+      t.avatarUrl,
+      communities[0],
+      t.lastActive,
+    );
+    return profile;
+  });
+
+  queryClient.setQueryData(queryKey, mappedProfiles);
+
+  return mappedProfiles;
 };
 
 export default useFetchProfilesByAddressesQuery;

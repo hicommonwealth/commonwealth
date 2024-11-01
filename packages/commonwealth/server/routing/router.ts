@@ -17,9 +17,6 @@ import createAddress from '../routes/createAddress';
 import deleteAddress from '../routes/deleteAddress';
 import domain from '../routes/domain';
 import finishUpdateEmail from '../routes/finishUpdateEmail';
-import getAddressProfile, {
-  getAddressProfileValidation,
-} from '../routes/getAddressProfile';
 import getAddressStatus from '../routes/getAddressStatus';
 import { healthHandler } from '../routes/health';
 import reactionsCounts from '../routes/reactionsCounts';
@@ -34,7 +31,6 @@ import verifyAddress from '../routes/verifyAddress';
 import viewComments from '../routes/viewComments';
 import viewCount from '../routes/viewCount';
 
-import getProfileNew from '../routes/getNewProfile';
 import setDefaultRole from '../routes/setDefaultRole';
 import upgradeMember, {
   upgradeMemberValidation,
@@ -70,7 +66,6 @@ import { ServerCommentsController } from '../controllers/server_comments_control
 import { ServerCommunitiesController } from '../controllers/server_communities_controller';
 import { ServerGroupsController } from '../controllers/server_groups_controller';
 import { ServerPollsController } from '../controllers/server_polls_controller';
-import { ServerProfilesController } from '../controllers/server_profiles_controller';
 import { ServerThreadsController } from '../controllers/server_threads_controller';
 import { ServerTopicsController } from '../controllers/server_topics_controller';
 
@@ -94,7 +89,6 @@ import { refreshMembershipHandler } from '../routes/groups/refresh_membership_ha
 import { deletePollHandler } from '../routes/polls/delete_poll_handler';
 import { getPollVotesHandler } from '../routes/polls/get_poll_votes_handler';
 import { updatePollVoteHandler } from '../routes/polls/update_poll_vote_handler';
-import { searchProfilesHandler } from '../routes/profiles/search_profiles_handler';
 import { getTagsHandler } from '../routes/tags/get_tags_handler';
 import { createThreadPollHandler } from '../routes/threads/create_thread_poll_handler';
 import { getThreadPollsHandler } from '../routes/threads/get_thread_polls_handler';
@@ -109,7 +103,6 @@ export type ServerControllers = {
   threads: ServerThreadsController;
   comments: ServerCommentsController;
   analytics: ServerAnalyticsController;
-  profiles: ServerProfilesController;
   communities: ServerCommunitiesController;
   polls: ServerPollsController;
   groups: ServerGroupsController;
@@ -131,7 +124,6 @@ function setupRouter(
     threads: new ServerThreadsController(models),
     comments: new ServerCommentsController(models),
     analytics: new ServerAnalyticsController(),
-    profiles: new ServerProfilesController(models),
     communities: new ServerCommunitiesController(models),
     polls: new ServerPollsController(models),
     groups: new ServerGroupsController(models),
@@ -194,13 +186,6 @@ function setupRouter(
     '/getAddressStatus',
     passport.authenticate('jwt', { session: false }),
     getAddressStatus.bind(this, models),
-  );
-  registerRoute(
-    router,
-    'post',
-    '/getAddressProfile',
-    getAddressProfileValidation,
-    getAddressProfile.bind(this, models),
   );
   registerRoute(
     router,
@@ -346,15 +331,6 @@ function setupRouter(
     databaseValidationService.validateCommunity,
     getFeedHandler.bind(this, models, serverControllers),
   );
-
-  registerRoute(
-    router,
-    'get',
-    '/profiles',
-    databaseValidationService.validateCommunity,
-    searchProfilesHandler.bind(this, serverControllers),
-  );
-  registerRoute(router, 'get', '/profile/v2', getProfileNew.bind(this, models));
 
   // comments
   registerRoute(
