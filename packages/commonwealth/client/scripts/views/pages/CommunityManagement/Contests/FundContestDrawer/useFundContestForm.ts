@@ -5,7 +5,10 @@ import {
   useGetUserEthBalanceQuery,
 } from 'state/api/communityStake';
 import { useGetContestBalanceQuery } from 'state/api/contests';
-import { useTokenBalanceQuery, useTokenMetadataQuery } from 'state/api/tokens';
+import {
+  useGetERC20BalanceQuery,
+  useTokenMetadataQuery,
+} from 'state/api/tokens';
 import { convertTokenAmountToUsd } from 'views/modals/ManageCommunityStakeModal/utils';
 import { calculateNewContractBalance, getAmountError } from './utils';
 
@@ -14,7 +17,6 @@ export const INITIAL_AMOUNT = '0.0001';
 interface UseFundContestFormProps {
   contestAddress: string;
   chainRpc: string;
-  chainNodeId: number;
   ethChainId: number;
   userAddress: string;
   fundingTokenAddress?: string;
@@ -23,7 +25,6 @@ interface UseFundContestFormProps {
 const useFundContestForm = ({
   contestAddress,
   chainRpc,
-  chainNodeId,
   ethChainId,
   userAddress,
   fundingTokenAddress,
@@ -48,16 +49,13 @@ const useFundContestForm = ({
     ethChainId,
   });
 
-  const { data: tokenBalances } = useTokenBalanceQuery({
-    chainId: chainNodeId,
-    tokenId: userAddress,
+  const { data: tokenBalance } = useGetERC20BalanceQuery({
+    tokenAddress: fundingTokenAddress || '',
+    userAddress,
+    nodeRpc: chainRpc,
   });
 
-  const userTokenBalance = fundingTokenAddress
-    ? tokenBalances?.tokenBalances?.find(
-        (token) => +token.contractAddress === +fundingTokenAddress,
-      )?.tokenBalance
-    : userEthBalance;
+  const userTokenBalance = fundingTokenAddress ? tokenBalance : userEthBalance;
 
   const { data: contestBalanceData } = useGetContestBalanceQuery({
     contestAddress,

@@ -248,7 +248,6 @@ describe('Thread lifecycle', () => {
             ),
           });
           expect(_thread?.title).to.equal(instancePayload.title);
-          expect(_thread?.body).to.equal(instancePayload.body);
           expect(_thread?.stage).to.equal(instancePayload.stage);
           // capture as admin author for other tests
           if (!thread) thread = _thread!;
@@ -261,6 +260,12 @@ describe('Thread lifecycle', () => {
                 key: _thread!.content_url!.split('/').pop()!,
               }),
             ).toBeTruthy();
+
+            expect(_thread?.body).to.equal(
+              instancePayload.body.slice(0, MAX_TRUNCATED_CONTENT_LENGTH),
+            );
+          } else {
+            expect(_thread?.body).to.equal(instancePayload.body);
           }
         });
       } else {
@@ -278,7 +283,7 @@ describe('Thread lifecycle', () => {
 
   describe('updates', () => {
     test('should patch content', async () => {
-      const body = {
+      const payloadContent = {
         title: 'hello',
         body: chance.paragraph({ sentences: 50 }),
         canvas_msg_id: '',
@@ -288,10 +293,13 @@ describe('Thread lifecycle', () => {
         actor: actors.admin,
         payload: {
           thread_id: thread.id!,
-          ...body,
+          ...payloadContent,
         },
       });
-      expect(updated).to.contain(body);
+      expect(updated).to.contain({
+        ...payloadContent,
+        body: payloadContent.body.slice(0, MAX_TRUNCATED_CONTENT_LENGTH),
+      });
       expect(updated?.content_url).toBeTruthy();
       expect(
         await blobStorage({ key: R2_ADAPTER_KEY }).exists({
@@ -301,15 +309,15 @@ describe('Thread lifecycle', () => {
       ).toBeTruthy();
       expect(updated?.ThreadVersionHistories?.length).to.equal(2);
 
-      body.body = 'wasup';
+      payloadContent.body = 'wasup';
       updated = await command(UpdateThread(), {
         actor: actors.admin,
         payload: {
           thread_id: thread.id!,
-          ...body,
+          ...payloadContent,
         },
       });
-      expect(updated).to.contain(body);
+      expect(updated).to.contain(payloadContent);
       expect(updated?.content_url).toBeFalsy();
       expect(updated!.ThreadVersionHistories?.length).to.equal(3);
       const sortedHistory = updated!.ThreadVersionHistories!.sort(
@@ -537,7 +545,7 @@ describe('Thread lifecycle', () => {
       });
       expect(firstComment).to.include({
         thread_id: thread!.id,
-        body,
+        body: body.slice(0, MAX_TRUNCATED_CONTENT_LENGTH),
         community_id: thread!.community_id,
       });
       expect(firstComment?.content_url).toBeTruthy();
@@ -678,7 +686,7 @@ describe('Thread lifecycle', () => {
       });
       expect(updated).to.include({
         thread_id: thread!.id,
-        body,
+        body: body.slice(0, MAX_TRUNCATED_CONTENT_LENGTH),
         community_id: thread!.community_id,
       });
       expect(updated?.content_url).toBeTruthy();
