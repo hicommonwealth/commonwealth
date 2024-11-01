@@ -177,6 +177,7 @@ export class Thread implements IUniqueId {
   public readonly kind: ThreadKind;
   public stage: ThreadStage;
   public readOnly: boolean;
+  public viewCount: number;
 
   public readonly canvasSignedData?: string;
   public readonly canvasMsgId?: string;
@@ -256,6 +257,7 @@ export class Thread implements IUniqueId {
     this.url = t.url!;
     this.communityId = t.community_id;
     this.readOnly = t.read_only ?? false;
+    this.viewCount = t.view_count || 1;
     this.collaborators =
       t.collaborators?.map((c) => ({
         address: c.address,
