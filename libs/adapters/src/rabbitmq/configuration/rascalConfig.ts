@@ -140,12 +140,6 @@ export function getAllRascalConfigs(
         arguments: queueOptions,
       },
     },
-    [RascalQueues.LaunchpadPolicy]: {
-      ...queueConfig,
-      options: {
-        arguments: queueOptions,
-      },
-    },
   };
 
   const allBindings: Record<keyof OmittedRascalBindings, BindingConfig> = {
@@ -219,12 +213,6 @@ export function getAllRascalConfigs(
         RascalRoutingKeys.FarcasterWorkerPolicyVoteCreated,
       ],
     },
-    [RascalBindings.LaunchpadPolicy]: {
-      source: RascalExchanges.MessageRelayer,
-      destination: RascalQueues.FarcasterWorkerPolicy,
-      destinationType: 'queue',
-      bindingKeys: [RascalRoutingKeys.LaunchpadWorkerPolicyTokenLaunched],
-    },
   };
 
   const allPublications: Record<RascalPublications, PublicationConfig> = {
@@ -261,10 +249,6 @@ export function getAllRascalConfigs(
     },
     [RascalSubscriptions.NotificationsSettings]: {
       queue: RascalQueues.NotificationsSettings,
-      ...subscriptionConfig,
-    },
-    [RascalSubscriptions.LaunchpadPolicy]: {
-      queue: RascalQueues.LaunchpadPolicy,
       ...subscriptionConfig,
     },
   };

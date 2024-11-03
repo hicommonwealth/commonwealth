@@ -165,6 +165,15 @@ module.exports = {
     });
     const launchpadHash = hashInstance.hash(namespaceAbi);
 
+    const node = queryInterface.sequelize.query(`
+        SELECT id FROM "ChainNodes"
+        WHERE id = 1399;
+    `);
+
+    if (!node) {
+      return;
+    }
+
     return queryInterface.sequelize.transaction(async (t) => {
       await queryInterface.changeColumn(
         'Communities',
