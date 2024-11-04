@@ -34,9 +34,6 @@ export default defineConfig(({ mode }) => {
   const featureFlags = {
     'process.env.FLAG_NEW_EDITOR': JSON.stringify(env.FLAG_NEW_EDITOR),
     'process.env.FLAG_CONTEST_DEV': JSON.stringify(env.FLAG_CONTEST_DEV),
-    'process.env.FLAG_WEIGHTED_TOPICS': JSON.stringify(
-      env.FLAG_WEIGHTED_TOPICS,
-    ),
     'process.env.FLAG_KNOCK_PUSH_NOTIFICATIONS_ENABLED': JSON.stringify(
       env.FLAG_KNOCK_PUSH_NOTIFICATIONS_ENABLED,
     ),
