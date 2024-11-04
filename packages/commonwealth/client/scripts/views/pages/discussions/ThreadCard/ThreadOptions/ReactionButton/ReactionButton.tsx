@@ -44,10 +44,7 @@ export const ReactionButton = ({
   const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
   const user = useUserStore();
 
-  const reactionWeightsSum =
-    BigInt(thread?.reactionWeightsSum) > 0
-      ? thread?.reactionWeightsSum
-      : thread?.reactionCount?.toString() || '0';
+  const reactionWeightsSum = thread?.reactionWeightsSum;
 
   const activeAddress = user.activeAccount?.address;
   const thisUserReaction = thread?.associatedReactions?.filter(

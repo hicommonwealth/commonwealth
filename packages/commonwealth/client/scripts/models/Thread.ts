@@ -266,7 +266,6 @@ export class Thread implements IUniqueId {
   public associatedContests?: AssociatedContest[];
   public recentComments?: Comment<IUniqueId>[];
   public reactionWeightsSum: string;
-  public reactionCount: number;
   public links: Link[];
   public readonly discord_meta: any;
   public readonly latestActivity: Moment;
@@ -399,26 +398,22 @@ export class Thread implements IUniqueId {
     this.lastEdited = last_edited
       ? moment(last_edited)
       : this.versionHistory && this.versionHistory?.length > 1
-        ? moment(this.versionHistory[0].timestamp)
-        : t.updated_at
-          ? moment(t.updated_at)
-          : undefined;
-    this.markedAsSpamAt = t.marked_as_spam_at
-      ? moment(t.marked_as_spam_at)
-      : undefined;
-    this.archivedAt = t.archived_at ? moment(t.archived_at) : null;
-    this.lockedAt = t.locked_at ? moment(t.locked_at) : undefined;
-    this.numberOfComments =
-      t.numberOfComments ?? t.number_of_comments ?? t.comment_count ?? 0;
-    this.canvasSignedData = t.canvas_signed_data ?? undefined;
-    this.canvasMsgId = t.canvas_msg_id ?? undefined;
-    this.links = t.links || [];
-    this.discord_meta = t.discord_meta;
-    this.versionHistory = t.ThreadVersionHistories
-      ? (t.ThreadVersionHistories as unknown as ThreadVersionHistory[])
-      : null;
-    this.reactionWeightsSum = t.reaction_weights_sum ?? '';
-    this.reactionCount = t.reaction_count ?? 0;
+        ? this.versionHistory[0].timestamp
+        : null;
+    // @ts-expect-error StrictNullChecks
+    this.markedAsSpamAt = marked_as_spam_at ? moment(marked_as_spam_at) : null;
+    this.archivedAt = archived_at ? moment(archived_at) : null;
+    // @ts-expect-error StrictNullChecks
+    this.lockedAt = locked_at ? moment(locked_at) : null;
+    this.numberOfComments = numberOfComments || 0;
+    // @ts-expect-error StrictNullChecks
+    this.canvasSignedData = canvas_signed_data;
+    // @ts-expect-error <StrictNullChecks>
+    this.canvasMsgId = canvas_msg_id;
+    this.links = links || [];
+    this.discord_meta = discord_meta;
+    this.versionHistory = ThreadVersionHistories;
+    this.reactionWeightsSum = reaction_weights_sum;
     this.associatedReactions =
       associatedReactions ??
       processAssociatedReactions(
