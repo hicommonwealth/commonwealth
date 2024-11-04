@@ -1,12 +1,141 @@
 import { z } from 'zod';
-import { Thread } from '../entities';
 import {
-  DiscordMetaSchema,
-  PG_INT,
-  linksSchema,
-  paginationSchema,
-} from '../utils';
+  Address,
+  Comment,
+  ContestManager,
+  ProfileTags,
+  Thread,
+  ThreadVersionHistory,
+  User,
+} from '../entities';
+import { ContestAction } from '../projections';
+import { PG_INT, paginationSchema } from '../utils';
+import { TopicView } from './community.schemas';
 import { PaginatedResultSchema } from './pagination';
+
+export const ContestManagerView = ContestManager.pick({
+  name: true,
+  cancelled: true,
+  interval: true,
+});
+
+export const ContestView = z.object({
+  ContestManager: ContestManagerView,
+  contest_id: z.number(),
+  contest_address: z.string(),
+  start_time: z.date().or(z.string()),
+  end_time: z.date().or(z.string()),
+  score: z.array(
+    z.object({
+      prize: z.string(),
+      votes: z.string(),
+      content_id: z.string(),
+      creator_address: z.string(),
+    }),
+  ),
+  contest_name: z.string().nullish(),
+  contest_interval: z.number().nullish(),
+  content_id: z.number().nullish(),
+  contest_cancelled: z.boolean().nullish(),
+  thread_id: z.number().nullish(),
+});
+
+export const ContestActionView = ContestAction.pick({
+  content_id: true,
+  thread_id: true,
+}).extend({
+  Contest: ContestView,
+});
+
+export const ProfileTagsView = ProfileTags.extend({
+  created_at: z.date().or(z.string()).nullish(),
+  updated_at: z.date().or(z.string()).nullish(),
+});
+
+export const UserView = User.extend({
+  id: PG_INT,
+  created_at: z.date().or(z.string()).nullish(),
+  updated_at: z.date().or(z.string()).nullish(),
+  ProfileTags: z.array(ProfileTagsView).optional(),
+  ApiKey: z.undefined(),
+});
+
+export const AddressView = Address.extend({
+  id: PG_INT,
+  verified: z.date().or(z.string()).nullish(),
+  verification_token_expires: z.date().or(z.string()).nullish(),
+  last_active: z.date().or(z.string()).nullish(),
+  created_at: z.date().or(z.string()).nullish(),
+  updated_at: z.date().or(z.string()).nullish(),
+  User: UserView.optional(),
+});
+
+export const ReactionView = z.object({
+  id: PG_INT,
+  address_id: PG_INT,
+  reaction: z.enum(['like']),
+  thread_id: PG_INT.nullish(),
+  comment_id: PG_INT.nullish(),
+  proposal_id: z.number().nullish(),
+  calculated_voting_weight: z.string().nullish(),
+  canvas_signed_data: z.any().nullish(),
+  canvas_msg_id: z.string().max(255).nullish(),
+  created_at: z.date().or(z.string()).nullish(),
+  updated_at: z.date().or(z.string()).nullish(),
+  // associations
+  Address: AddressView.optional(),
+  // added by GetThreads query
+  address: z.string().optional(),
+  last_active: z.date().or(z.string()).nullish(),
+  profile_name: z.string().optional(),
+  avatar_url: z.string().optional(),
+});
+
+export const CommentView = Comment.extend({
+  id: PG_INT,
+  created_at: z.date().or(z.string()).nullish(),
+  updated_at: z.date().or(z.string()).nullish(),
+  deleted_at: z.date().or(z.string()).nullish(),
+  marked_as_spam_at: z.date().or(z.string()).nullish(),
+  Address: AddressView.nullish(),
+  Thread: z.undefined(),
+  Reaction: ReactionView.nullish(),
+  CommentVersionHistories: z.undefined(),
+  search: z.undefined(),
+  // this is returned by GetThreads
+  address: z.string(),
+  profile_name: z.string().optional(),
+  profile_avatar: z.string().optional(),
+  user_id: PG_INT,
+});
+
+export const ThreadVersionHistoryView = ThreadVersionHistory.extend({
+  id: PG_INT,
+  timestamp: z.date().or(z.string()),
+});
+
+export const ThreadView = Thread.extend({
+  id: PG_INT,
+  body: z.string(),
+  created_at: z.date().or(z.string()).nullish(),
+  updated_at: z.date().or(z.string()).nullish(),
+  deleted_at: z.date().or(z.string()).nullish(),
+  last_edited: z.date().or(z.string()).nullish(),
+  last_commented_on: z.date().or(z.string()).nullish(),
+  marked_as_spam_at: z.date().or(z.string()).nullish(),
+  archived_at: z.date().or(z.string()).nullish(),
+  locked_at: z.date().or(z.string()).nullish(),
+  activity_rank_date: z.date().or(z.string()).nullish(),
+  Address: AddressView.nullish(),
+  Reaction: ReactionView.nullish(),
+  collaborators: AddressView.array().nullish(),
+  reactions: ReactionView.array().nullish(),
+  associatedContests: z.array(ContestView).optional(),
+  topic: TopicView.optional(),
+  ContestActions: z.array(ContestActionView).optional(),
+  Comments: z.array(CommentView).optional(),
+  ThreadVersionHistories: z.array(ThreadVersionHistoryView).nullish(),
+});
 
 export const OrderByQueriesKeys = z.enum([
   'createdAt:asc',
@@ -19,23 +148,9 @@ export const OrderByQueriesKeys = z.enum([
   'latestActivity:desc',
 ]);
 
-export const BulkThread = z.object({
-  id: PG_INT,
-  title: z.string(),
-  url: z.string().nullable(),
-  body: z.string(),
-  last_edited: z.date().nullable().optional(),
-  kind: z.string(),
-  stage: z.string(),
-  read_only: z.boolean(),
-  discord_meta: DiscordMetaSchema.nullish(),
-  pinned: z.boolean(),
+// TODO: reconcile this with ThreadView, so that all thread queries return the same shape
+export const BulkThreadView = ThreadView.extend({
   chain: z.string(),
-  locked_at: z.date().nullable().optional(),
-  links: z.object(linksSchema).array().nullable().optional(),
-  collaborators: z.any().array(),
-  has_poll: z.boolean().nullable().optional(),
-  last_commented_on: z.date().nullable().optional(),
   Address: z.object({
     id: PG_INT,
     address: z.string(),
@@ -45,31 +160,16 @@ export const BulkThread = z.object({
   reactionIds: z.string().array(),
   reactionTimestamps: z.coerce.date().array(),
   reactionWeights: PG_INT.array(),
-  reaction_weights_sum: PG_INT,
   addressesReacted: z.string().array(),
   reactedProfileName: z.string().array().optional(),
   reactedProfileAvatarUrl: z.string().array().optional(),
   reactedAddressLastActive: z.string().array().optional(),
   reactionType: z.string().array(),
-  marked_as_spam_at: z.date().nullable().optional(),
-  archived_at: z.date().nullable().optional(),
   latest_activity: z.date().nullable().optional(),
-  topic: z
-    .object({
-      id: PG_INT,
-      name: z.string(),
-      description: z.string(),
-      chainId: z.string(),
-      telegram: z.string().nullish(),
-    })
-    .optional(),
   user_id: PG_INT,
   avatar_url: z.string().nullable(),
   address_last_active: z.date().nullable(),
   profile_name: z.string().nullable(),
-
-  created_at: z.coerce.date().optional(),
-  updated_at: z.coerce.date().optional(),
 });
 
 export const GetBulkThreads = {
@@ -89,24 +189,9 @@ export const GetBulkThreads = {
     limit: PG_INT,
     numVotingThreads: PG_INT,
     cursor: PG_INT,
-    threads: z.array(BulkThread),
+    threads: z.array(BulkThreadView),
   }),
 };
-
-export const MappedReaction = z.object({
-  id: z.number(),
-  type: z.literal('like'),
-  address: z.string(),
-  updated_at: z.date(),
-  voting_weight: z.number(),
-  profile_name: z.string().optional(),
-  avatar_url: z.string().optional(),
-  last_active: z.date().optional(),
-});
-
-export const MappedThread = Thread.extend({
-  associatedReactions: z.array(MappedReaction),
-});
 
 export const GetThreadsStatus = z.enum(['active', 'pastWinners', 'all']);
 export const GetThreadsOrderBy = z.enum([
@@ -137,7 +222,7 @@ export const GetThreads = {
     page: z.number(),
     limit: z.number(),
     numVotingThreads: z.number(),
-    threads: z.array(MappedThread),
+    threads: z.array(ThreadView),
   }),
 };
 
@@ -166,6 +251,14 @@ export const DEPRECATED_GetBulkThreads = z.object({
   withXRecentComments: z.coerce.number().optional(),
 });
 
+export const GetThreadsByIds = {
+  input: z.object({
+    community_id: z.string(),
+    thread_ids: z.string(),
+  }),
+  output: z.array(ThreadView),
+};
+
 export const GetThreadCount = {
   input: z.object({
     community_id: z.string(),
@@ -179,7 +272,7 @@ export const GetActiveThreads = {
     threads_per_topic: z.coerce.number().min(0).max(10).optional(),
     withXRecentComments: z.coerce.number().optional(),
   }),
-  output: z.array(Thread),
+  output: z.array(ThreadView),
 };
 
 export const SearchThreads = {
@@ -196,6 +289,6 @@ export const SearchThreads = {
     includeCount: z.coerce.boolean().default(false),
   }),
   output: PaginatedResultSchema.extend({
-    results: z.array(Thread),
+    results: z.array(ThreadView),
   }),
 };

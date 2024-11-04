@@ -24,7 +24,6 @@ const JoinCommunityStep = ({ onComplete }: JoinCommunityStepProps) => {
   const { data: profile, isLoading: isLoadingProfile } =
     useFetchProfileByIdQuery({
       apiCallEnabled: true,
-      shouldFetchSelfProfile: true,
     });
 
   const profileTagIds = (profile?.tags || [])

@@ -6,8 +6,7 @@ import React, { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import app from 'state';
 import { useGetThreadsByIdQuery } from 'state/api/threads';
-import type Thread from '../../../models/Thread';
-import { LinkSource } from '../../../models/Thread';
+import Thread, { LinkSource } from '../../../models/Thread';
 import { CWContentPageCard } from '../../components/component_kit/CWContentPageCard';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWButton } from '../../components/component_kit/new_designs/CWButton';
@@ -36,8 +35,8 @@ export const LinkedThreadsCard = ({
 
   const communityId = app.activeChainId() || '';
   const { data: linkedThreads, isLoading } = useGetThreadsByIdQuery({
-    communityId,
-    ids: linkedThreadIds.map(Number),
+    community_id: communityId,
+    thread_ids: linkedThreadIds.map(Number),
     apiCallEnabled: linkedThreadIds.length > 0 && !!communityId, // only call the api if we have thread id
   });
 
@@ -54,11 +53,11 @@ export const LinkedThreadsCard = ({
             <div className="LinkedThreadsCard">
               {linkedThreadIds.length > 0 ? (
                 <div className="links-container">
-                  {/* @ts-expect-error StrictNullChecks*/}
-                  {linkedThreads.map((t) => {
+                  {linkedThreads!.map((t) => {
+                    const tt = new Thread(t);
                     const discussionLink = getProposalUrlPath(
-                      t.slug,
-                      `${t.identifier}-${slugify(t.title)}`,
+                      tt.slug,
+                      `${tt.identifier}-${slugify(t.title)}`,
                       false,
                     );
 

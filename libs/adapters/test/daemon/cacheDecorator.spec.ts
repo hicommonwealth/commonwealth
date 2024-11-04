@@ -5,7 +5,6 @@ import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import sinon from 'sinon';
 import { afterAll, beforeAll, beforeEach, describe, test } from 'vitest';
-import { Activity } from '../../src/daemon';
 import { CacheDecorator } from '../../src/redis';
 import { CacheKeyDuration } from '../../src/utils';
 chai.use(chaiAsPromised);
@@ -422,114 +421,6 @@ describe('CacheDecorator', () => {
         expect(mockCache.getKey.calledOnce).to.be.true;
         expect(mockCache.setKey.calledOnce).to.be.false;
         expect(fn.calledOnce).to.be.true;
-      });
-    });
-
-    describe('verify activity helper class', () => {
-      const ActivityLabel = 'test-activity';
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const query = async (a: any, b: any, c: any) => {
-        console.log('running query with params', a, b, c);
-        return a + b + c;
-      };
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const keyGenerator1 = (a: any, b: any, c: any) => {
-        return {
-          cacheKey: `${a}-${b}-${c}`,
-          cacheDuration: a + b + c,
-        } as CacheKeyDuration;
-      };
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const keyGenerator2 = (a: any, b: any, c: any) => {
-        return `${a}-${b}-${c}`;
-      };
-
-      const keyGenerator3 = 'test-key';
-
-      test('should cache the function result and return it', async () => {
-        mockCache.getKey.resolves(undefined);
-        mockCache.setKey.resolves(true);
-
-        const activityWrapper = new Activity(
-          ActivityLabel,
-          query,
-          keyGenerator1,
-          60,
-          CacheNamespaces.Function_Response,
-          cacheDecorator,
-        );
-        const wrapFn = activityWrapper.queryWithCache;
-        const result = await wrapFn(1, 2, 3);
-        expect(result).to.equal(6);
-        expect(
-          mockCache.getKey.calledWith(
-            CacheNamespaces.Function_Response,
-            '1-2-3',
-          ),
-        ).to.be.true;
-        expect(mockCache.getKey.calledOnce).to.be.true;
-        expect(mockCache.setKey.calledOnce).to.be.true;
-        expect(
-          mockCache.setKey.calledWith(
-            CacheNamespaces.Function_Response,
-            '1-2-3',
-            JSON.stringify(6),
-            6,
-          ),
-        ).to.be.true;
-      });
-
-      test('should return the cached result if it exists', async () => {
-        mockCache.getKey.resolves(JSON.stringify(8));
-        mockCache.setKey.resolves(true);
-
-        const activityWrapper = new Activity(
-          ActivityLabel,
-          query,
-          keyGenerator3,
-          60,
-          CacheNamespaces.Function_Response,
-          cacheDecorator,
-        );
-        const wrapFn = activityWrapper.queryWithCache;
-        const result = await wrapFn(1, 2, 3);
-        expect(result).to.equal(8);
-        expect(mockCache.getKey.calledOnce).to.be.true;
-        expect(
-          mockCache.getKey.calledWith(
-            CacheNamespaces.Function_Response,
-            'test-key',
-          ),
-        ).to.be.true;
-        expect(mockCache.setKey.called).to.be.false;
-      });
-
-      test('should not lookup cache, and override the cache', async () => {
-        mockCache.setKey.resolves(true);
-
-        const activityWrapper = new Activity(
-          ActivityLabel,
-          query,
-          keyGenerator2,
-          60,
-          CacheNamespaces.Function_Response,
-          cacheDecorator,
-        );
-        const wrapFn = activityWrapper.queryWithCacheOverride;
-        const result = await wrapFn(1, 2, 3);
-        expect(result).to.equal(6);
-        expect(mockCache.getKey.called).to.be.false;
-        expect(mockCache.setKey.calledOnce).to.be.true;
-        expect(
-          mockCache.setKey.calledWith(
-            CacheNamespaces.Function_Response,
-            '1-2-3',
-            JSON.stringify(6),
-            60,
-          ),
-        ).to.be.true;
       });
     });
   });

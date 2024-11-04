@@ -50,6 +50,7 @@ describe('Thread queries', () => {
           title: 'title',
           kind: 'kind',
           stage: 'stage',
+          body: '',
         },
         defaults: {
           search: getThreadSearchVector('title', ''),

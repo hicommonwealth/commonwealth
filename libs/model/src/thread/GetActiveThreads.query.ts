@@ -1,5 +1,7 @@
 import { Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
+import { ThreadView } from '@hicommonwealth/schemas';
+import { z } from 'zod';
 import { models } from '../database';
 
 export function GetActiveThreads(): Query<typeof schemas.GetActiveThreads> {
@@ -43,7 +45,7 @@ export function GetActiveThreads(): Query<typeof schemas.GetActiveThreads> {
                 attributes: [
                   'id',
                   'address_id',
-                  'text',
+                  'body',
                   'created_at',
                   'updated_at',
                   'deleted_at',
@@ -71,7 +73,7 @@ export function GetActiveThreads(): Query<typeof schemas.GetActiveThreads> {
       });
       return topThreadsByTopic
         .map((topic) => topic.toJSON().threads ?? [])
-        .flat();
+        .flat() as z.infer<typeof ThreadView>[];
     },
   };
 }

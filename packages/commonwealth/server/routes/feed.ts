@@ -5,10 +5,11 @@ import {
   GetThreads,
   GetThreadsOrderBy,
   GetThreadsStatus,
-  Thread as ThreadSchema,
 } from '@hicommonwealth/schemas';
 import { getDecodedString, slugify } from '@hicommonwealth/shared';
+import { ThreadView } from 'client/scripts/models/Thread';
 import { Feed } from 'feed';
+import moment from 'moment';
 import { z } from 'zod';
 import { ServerControllers } from '../routing/router';
 import { TypedRequestQuery, TypedResponse } from '../types';
@@ -21,14 +22,11 @@ import {
   SearchThreadsRequestQuery,
 } from './threads/get_threads_handler';
 
-function toDate(t: z.infer<typeof ThreadSchema>): Date {
-  return t.last_edited ?? t.created_at!;
+function toDate(t: ThreadView): Date {
+  return moment(t.last_edited ?? t.created_at!).toDate();
 }
 
-function sortByDateDesc(
-  a: z.infer<typeof ThreadSchema>,
-  b: z.infer<typeof ThreadSchema>,
-) {
+function sortByDateDesc(a: ThreadView, b: ThreadView) {
   return toDate(b).getTime() - toDate(a).getTime();
 }
 

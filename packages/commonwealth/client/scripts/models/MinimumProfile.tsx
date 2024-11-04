@@ -1,4 +1,4 @@
-import { Address } from '@hicommonwealth/schemas';
+import { AddressView } from '@hicommonwealth/schemas';
 import { DEFAULT_NAME } from '@hicommonwealth/shared';
 import jdenticon from 'jdenticon';
 import { z } from 'zod';
@@ -12,7 +12,7 @@ export type UserProfile = {
 };
 
 export function addressToUserProfile(
-  address: z.infer<typeof Address>,
+  address: z.infer<typeof AddressView>,
 ): UserProfile {
   return {
     userId: address.user_id ?? address.User?.id ?? 0,

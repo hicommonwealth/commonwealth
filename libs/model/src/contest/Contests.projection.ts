@@ -69,7 +69,11 @@ async function updateOrCreateWithAlert(
   }
 
   const { ticker, decimals } =
-    await protocol.contractHelpers.getTokenAttributes(contest_address, url);
+    await protocol.contractHelpers.getTokenAttributes(
+      contest_address,
+      url,
+      true,
+    );
 
   const { startTime, endTime } = await protocol.contestHelper.getContestStatus(
     url,

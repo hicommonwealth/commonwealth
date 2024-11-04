@@ -1,6 +1,8 @@
 import { ExtendedCommunity } from '@hicommonwealth/schemas';
 import { ChainBase, ChainNetwork } from '@hicommonwealth/shared';
+import clsx from 'clsx';
 import { findDenominationString } from 'helpers/findDenomination';
+import { useFlag } from 'hooks/useFlag';
 import React, { Fragment, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Virtuoso } from 'react-virtuoso';
@@ -25,6 +27,7 @@ import './Communities.scss';
 import { FiltersDrawer } from './FiltersDrawer/FiltersDrawer';
 import { CommunityFilters } from './FiltersDrawer/types';
 import IdeaLaunchpad from './IdeaLaunchpad';
+import TokensList from './TokensList';
 import { getCommunityCountsString } from './helpers';
 
 type ExtendedCommunityType = z.infer<typeof ExtendedCommunity>;
@@ -35,6 +38,7 @@ type ExtendedCommunitySliceType = [
 
 const CommunitiesPage = () => {
   const containerRef = useRef();
+  const tokenizedCommunityEnabled = useFlag('tokenizedCommunity');
 
   const {
     setModeOfManageCommunityStakeModal,
@@ -143,7 +147,12 @@ const CommunitiesPage = () => {
       <div className="CommunitiesPage">
         <div className="header-section">
           <div className="description">
-            <CWText type="h2">Explore communities</CWText>
+            <CWText
+              type="h2"
+              {...(tokenizedCommunityEnabled && { fontWeight: 'semiBold' })}
+            >
+              Explore {tokenizedCommunityEnabled ? '' : 'Communities'}
+            </CWText>
             <div className="actions">
               <CWText type="caption" className="communities-count">
                 {!isLoading && communities?.pages?.[0]?.totalResults
@@ -200,6 +209,8 @@ const CommunitiesPage = () => {
           </div>
           <IdeaLaunchpad />
         </div>
+        <TokensList />
+        {tokenizedCommunityEnabled && <CWText type="h2">Communities</CWText>}
         {isLoading && communitiesList.length === 0 ? (
           <CWCircleMultiplySpinner />
         ) : (
@@ -261,7 +272,11 @@ const CommunitiesPage = () => {
             components={{
               // eslint-disable-next-line react/no-multi-comp
               EmptyPlaceholder: () => (
-                <section className="empty-placeholder">
+                <section
+                  className={clsx('empty-placeholder', {
+                    'my-16': tokenizedCommunityEnabled,
+                  })}
+                >
                   <CWText type="h2">
                     No communities found
                     {filters.withChainBase ||

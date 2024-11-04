@@ -43,12 +43,12 @@ describe('createReaction Integration Tests', () => {
 
   const getUniqueCommentText = async () => {
     const time = new Date().getMilliseconds();
-    const text = `testCommentCreated at ${time}`;
+    const body = `testCommentCreated at ${time}`;
     const comment = await server.models.Comment.findOne({
-      where: { text },
+      where: { body },
     });
     chai.assert.isNull(comment);
-    return text;
+    return body;
   };
 
   beforeAll(async () => {
@@ -101,13 +101,13 @@ describe('createReaction Integration Tests', () => {
   });
 
   test('should create comment reactions and verify comment reaction count', async () => {
-    const text = await getUniqueCommentText();
+    const body = await getUniqueCommentText();
     const createCommentResponse = await server.seeder.createComment({
       chain: 'ethereum',
       address: userAddress,
       did: userDid,
       jwt: userJWT,
-      text,
+      body,
       threadId: threadId,
       threadMsgId,
       session: userSession.session,
@@ -115,7 +115,7 @@ describe('createReaction Integration Tests', () => {
     });
 
     const comment = await server.models.Comment.findOne({
-      where: { text },
+      where: { body },
     });
 
     chai.assert.isNotNull(comment);
