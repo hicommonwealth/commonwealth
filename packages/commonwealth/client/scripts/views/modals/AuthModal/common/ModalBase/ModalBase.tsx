@@ -357,9 +357,13 @@ const ModalBase = ({
               <CWText isCentered>
                 By connecting to Common you agree to our&nbsp;
                 <br />
-                <Link to="/terms">Terms of Service</Link>
+                <Link to="/terms" onClick={() => onClose()}>
+                  Terms of Service
+                </Link>
                 &nbsp;and&nbsp;
-                <Link to="/privacy">Privacy Policy</Link>
+                <Link to="/privacy" onClick={() => onClose()}>
+                  Privacy Policy
+                </Link>
               </CWText>
 
               {copy.showExistingAccountSignInFooter && (

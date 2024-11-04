@@ -32,6 +32,7 @@ import { useEffect, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import app, { initAppState } from 'state';
 import { SERVER_URL } from 'state/api/config';
+import { DISCOURAGED_NONREACTIVE_fetchProfilesByAddress } from 'state/api/profiles/fetchProfilesByAddress';
 import { useUpdateUserMutation } from 'state/api/user';
 import useUserStore from 'state/ui/user';
 import {
@@ -47,7 +48,6 @@ import useAppStatus from '../../../hooks/useAppStatus';
 import { useBrowserAnalyticsTrack } from '../../../hooks/useBrowserAnalyticsTrack';
 import Account from '../../../models/Account';
 import IWebWallet from '../../../models/IWebWallet';
-import { DISCOURAGED_NONREACTIVE_fetchProfilesByAddress } from '../../../state/api/profiles/fetchProfilesByAddress';
 
 type UseAuthenticationProps = {
   onSuccess?: (
@@ -322,24 +322,22 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       // Important: when we first create an account and verify it, the user id
       // is initially null from api (reloading the page will update it), to correct
       // it we need to get the id from api
-      const updatedProfiles =
+      const userAddresses =
         await DISCOURAGED_NONREACTIVE_fetchProfilesByAddress(
-          // @ts-expect-error <StrictNullChecks>
-          account.profile.chain,
-          // @ts-expect-error <StrictNullChecks>
-          account.profile.address,
+          [account!.profile!.chain],
+          [account!.profile!.address],
         );
-      const currentUserUpdatedProfile = updatedProfiles[0];
-      if (!currentUserUpdatedProfile) {
+      const currentUserAddress = userAddresses[0];
+      if (!currentUserAddress) {
         console.log('No profile yet.');
       } else {
         account?.profile?.initialize(
-          currentUserUpdatedProfile.userId,
-          currentUserUpdatedProfile.name,
-          currentUserUpdatedProfile.address,
-          currentUserUpdatedProfile.avatarUrl,
+          currentUserAddress.userId,
+          currentUserAddress.name,
+          currentUserAddress.address,
+          currentUserAddress.avatarUrl ?? '',
           account?.profile?.chain,
-          currentUserUpdatedProfile.lastActive,
+          new Date(currentUserAddress.lastActive),
         );
       }
     } catch (e) {

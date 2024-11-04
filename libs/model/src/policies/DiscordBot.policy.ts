@@ -172,7 +172,7 @@ export function DiscordBotPolicy(): Policy<typeof inputs> {
           actor: await getActor(),
           payload: {
             thread_id: thread.id!,
-            text: payload.content,
+            body: payload.content,
             discord_meta: {
               user: {
                 id: payload.user.id,
@@ -192,7 +192,7 @@ export function DiscordBotPolicy(): Policy<typeof inputs> {
           actor: await getActor(),
           payload: {
             comment_id: comment.id!,
-            text: payload.content,
+            body: payload.content,
           },
         });
       },

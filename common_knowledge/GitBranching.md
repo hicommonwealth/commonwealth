@@ -37,3 +37,30 @@ Don't rebase your branches as this will increase the risk of merge conflicts.
 There’s really no major advantage to rebase other than a cleaner git history.
 However, the downsides are higher risk of merge conflicts and conflicts when you
 share rebased commits
+
+# Cherry Picking Specific Branches
+
+Let's say you want to merge a specific branch:
+
+https://github.com/hicommonwealth/commonwealth/pull/9689/commits
+
+You can see all the merge commits on master with this command:
+
+```bash
+git log --merges --oneline master
+```
+
+Now we should have the PR merge that we want (9689) and to compute a patch all
+we have to do is diff between the commit on the next line.
+
+```text
+5a1d547b77 Merge pull request #9689 from hicommonwealth/9681.israel.incorrect-redirect-from-profile
+afeefe9fa7 Merge pull request #9704 from hicommonwealth/kaleemNeslit.9651.tooltip_reverse_state
+```
+
+```bash
+git diff -r afeefe9fa7 -r 5a1d547b77 > cherrypick.patch
+```
+
+This will be the cherrypicked patch file, and you can patch that onto a specific
+branch with the patch command.
