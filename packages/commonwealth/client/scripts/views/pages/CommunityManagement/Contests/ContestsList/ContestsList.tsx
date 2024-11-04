@@ -56,6 +56,7 @@ const ContestsList = ({
   onSetContestSelectionView,
 }: ContestsListProps) => {
   const [fundDrawerContest, setFundDrawerContest] = useState<Contest>();
+  const farcasterContestEnabled = useFlag('farcasterContest');
 
   if (isLoading) {
     return (
@@ -70,7 +71,9 @@ const ContestsList = ({
   return (
     <>
       <div className="ContestsList">
-        {isAdmin && (!hasWeightedTopic || !isContestAvailable) ? (
+        {isAdmin && farcasterContestEnabled ? (
+          !isContestAvailable
+        ) : !hasWeightedTopic || !isContestAvailable ? (
           <EmptyContestsList
             hasWeightedTopic={hasWeightedTopic}
             isContestAvailable={isContestAvailable}

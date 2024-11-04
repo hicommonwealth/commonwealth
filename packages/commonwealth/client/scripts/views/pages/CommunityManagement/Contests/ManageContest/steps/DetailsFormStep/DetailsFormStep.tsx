@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
 
 import { TopicWeightedVoting } from '@hicommonwealth/schemas';
 import { notifyError } from 'controllers/app/notifications';
@@ -24,7 +23,6 @@ import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelec
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import { MessageRow } from 'views/components/component_kit/new_designs/CWTextInput/MessageRow';
 import { openConfirmation } from 'views/modals/confirmation_modal';
-import { ContestType } from 'views/pages/CommunityManagement/Contests/types';
 import CommunityManagementLayout from 'views/pages/CommunityManagement/common/CommunityManagementLayout';
 
 import { CONTEST_FAQ_URL } from '../../../utils';
@@ -53,6 +51,7 @@ interface DetailsFormStepProps {
   onSetLaunchContestStep: (step: LaunchContestStep) => void;
   contestFormData: ContestFormData;
   onSetContestFormData: (data: ContestFormData) => void;
+  isFarcasterContest: boolean;
 }
 
 const DetailsFormStep = ({
@@ -60,12 +59,10 @@ const DetailsFormStep = ({
   onSetLaunchContestStep,
   contestFormData,
   onSetContestFormData,
+  isFarcasterContest,
 }: DetailsFormStepProps) => {
   const navigate = useCommonNavigate();
   const farcasterContestEnabled = useFlag('farcasterContest');
-  const [searchParams] = useSearchParams();
-  const contestType = searchParams.get('type');
-  const isFarcasterContest = contestType === ContestType.Farcaster;
 
   const [payoutStructure, setPayoutStructure] = useState<
     ContestFormData['payoutStructure']
@@ -173,6 +170,8 @@ const DetailsFormStep = ({
     });
   };
 
+  const schema = detailsFormValidationSchema(isFarcasterContest);
+
   const handleSubmit = async (values: ContestFormValidationSubmitValues) => {
     if (totalPayoutPercentageError || payoutRowError) {
       return;
@@ -263,7 +262,7 @@ const DetailsFormStep = ({
     >
       <div className="DetailsFormStep">
         <CWForm
-          validationSchema={detailsFormValidationSchema}
+          validationSchema={schema}
           onSubmit={handleSubmit}
           initialValues={getInitialValues()}
           onErrors={console.error}
@@ -293,6 +292,11 @@ const DetailsFormStep = ({
                           (topic) => topic.id === t.value,
                         )?.token_address;
                         setTokenValue(token || '');
+                        setValue('feeType', ContestFeeType.DirectDeposit);
+                        setValue('contestRecurring', ContestRecurringType.No);
+                      } else {
+                        setValue('feeType', ContestFeeType.CommunityStake);
+                        setValue('contestRecurring', ContestRecurringType.Yes);
                       }
                     }}
                   />
@@ -566,7 +570,12 @@ const DetailsFormStep = ({
                 <CWButton
                   label={editMode ? 'Save changes' : 'Save & continue'}
                   type="submit"
-                  disabled={isProcessingProfileImage || !!getTokenError()}
+                  disabled={
+                    isProcessingProfileImage ||
+                    !!getTokenError(
+                      watch('contestRecurring') === ContestRecurringType.No,
+                    )
+                  }
                 />
               </div>
             </>
