@@ -68,7 +68,7 @@ export async function getVotingWeight(
     return commonProtocol.calculateVoteWeight(stakeBalance, stake.vote_weight);
   } else if (topic.weighted_voting === TopicWeightedVoting.ERC20) {
     mustExist('Chain Node Eth Chain Id', chain_node?.eth_chain_id);
-    const chainNodeUrl = chain_node!.private_url!;
+    const chainNodeUrl = chain_node!.private_url! || chain_node!.url!;
     mustExist('Chain Node URL', chainNodeUrl);
 
     const balances = await tokenBalanceCache.getBalances({
