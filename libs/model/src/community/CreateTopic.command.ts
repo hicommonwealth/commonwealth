@@ -1,7 +1,6 @@
 import { InvalidInput, InvalidState, type Command } from '@hicommonwealth/core';
 
 import * as schemas from '@hicommonwealth/schemas';
-import { config } from '../config';
 import { models } from '../database';
 import { AuthContext, isAuthorized } from '../middleware';
 import { mustBeAuthorized } from '../middleware/guards';
@@ -57,22 +56,15 @@ export function CreateTopic(): Command<
         throw new InvalidState(Errors.StakeNotAllowed);
       }
 
-      if (config.CONTESTS.FLAG_WEIGHTED_TOPICS) {
-        // new path: stake or ERC20
-        if (payload.weighted_voting) {
-          options = {
-            ...options,
-            weighted_voting: payload.weighted_voting,
-            token_address: payload.token_address || undefined,
-            token_symbol: payload.token_symbol || undefined,
-            vote_weight_multiplier: payload.vote_weight_multiplier || undefined,
-          };
-        }
-      } else {
-        // old path: topic staked if community is staked
-        if (stake) {
-          options.weighted_voting = schemas.TopicWeightedVoting.Stake;
-        }
+      // new path: stake or ERC20
+      if (payload.weighted_voting) {
+        options = {
+          ...options,
+          weighted_voting: payload.weighted_voting,
+          token_address: payload.token_address || undefined,
+          token_symbol: payload.token_symbol || undefined,
+          vote_weight_multiplier: payload.vote_weight_multiplier || undefined,
+        };
       }
 
       const [newTopic] = await models.Topic.findOrCreate({

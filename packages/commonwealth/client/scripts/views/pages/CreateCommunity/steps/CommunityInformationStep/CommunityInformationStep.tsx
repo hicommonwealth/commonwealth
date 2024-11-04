@@ -1,7 +1,6 @@
 import { notifyError } from 'controllers/app/notifications';
 import useAppStatus from 'hooks/useAppStatus';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
-import { useFlag } from 'hooks/useFlag';
 import React from 'react';
 import {
   BaseMixpanelPayload,
@@ -35,7 +34,6 @@ const CommunityInformationStep = ({
   handleSelectedChainId,
 }: CommunityInformationStepProps) => {
   const { isAddedToHomeScreen } = useAppStatus();
-  const weightedTopicsEnabled = useFlag('weightedTopics');
 
   const { trackAnalytics } = useBrowserAnalyticsTrack<
     MixpanelLoginPayload | BaseMixpanelPayload
@@ -111,22 +109,11 @@ const CommunityInformationStep = ({
       </section>
 
       <FeatureHint
-        title={
-          weightedTopicsEnabled
-            ? 'Chain selection cannot be changed'
-            : 'Selecting your chain'
-        }
-        hint={
-          weightedTopicsEnabled
-            ? `
+        title="Chain selection cannot be changed"
+        hint={`
               Choose the chain that your Ethereum project is built on. Chain selection 
               determines availability of features such as Contests, Stakes, and Weighted Voting.
-            `
-            : `
-              Choose the chain that your Ethereum project is built on. If you’re
-              not sure what to choose you can select the Ethereum Mainnet.
-            `
-        }
+            `}
       />
 
       <CommunityInformationForm
