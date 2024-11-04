@@ -31,9 +31,10 @@ export function GetTokens(): Query<typeof schemas.GetTokens> {
       };
 
       const sql = `
-        SELECT *,
+        SELECT T.*, C.community_id
         count(*) OVER() AS total
-        FROM "Tokens"
+        FROM "Tokens" as T
+        JOIN "Communities" as C ON T.namespace = C.namespace
         ${search ? 'WHERE LOWER(name) LIKE :search' : ''}
         ORDER BY ${order_col} :direction
         LIMIT :limit
@@ -41,7 +42,7 @@ export function GetTokens(): Query<typeof schemas.GetTokens> {
       `;
 
       const tokens = await models.sequelize.query<
-        z.infer<typeof schemas.Token> & { total?: number }
+        z.infer<typeof schemas.Token> & { total?: number; community_id: string }
       >(sql, {
         replacements,
         type: QueryTypes.SELECT,

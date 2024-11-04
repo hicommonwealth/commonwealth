@@ -8,6 +8,6 @@ export const GetTokens = {
     order_by: z.enum(['name']).optional(),
   }),
   output: PaginatedResultSchema.extend({
-    results: Token.array(),
+    results: Token.extend({ community_id: z.string() }).array(),
   }),
 };
