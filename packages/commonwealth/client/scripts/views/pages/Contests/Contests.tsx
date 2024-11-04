@@ -57,10 +57,10 @@ const Contests = () => {
 
         <CWDivider className="ended" />
         <CWText type="h3" className="mb-12">
-          Ended Contests
+          Previous Contests
         </CWText>
         {isContestAvailable && contestsData.finished.length === 0 ? (
-          <CWText>No finished contests available</CWText>
+          <CWText>No previous contests available</CWText>
         ) : (
           <ContestsList
             contests={contestsData.finished}
