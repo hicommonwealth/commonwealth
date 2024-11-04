@@ -54,7 +54,7 @@ const AdminContestsPage = () => {
     contestsData,
     isContestAvailable,
     isContestDataLoading,
-  } = useCommunityContests();
+  } = useCommunityContests({ shouldPolling: true });
 
   const { data: topicData } = useFetchTopicsQuery({
     communityId,
