@@ -32,6 +32,7 @@ export const QuestActionMeta = z
     participation_period: z.nativeEnum(QuestParticipationPeriod).optional(),
     participation_times_per_period: z.number().optional(),
     created_at: z.coerce.date().optional(),
+    updated_at: z.coerce.date().optional(),
   })
   .describe('Quest action metadata associated to a quest instance');
 
@@ -53,6 +54,9 @@ export const Quest = z
     end_date: z.coerce.date(),
     created_at: z.coerce.date().optional(),
     updated_at: z.coerce.date().optional(),
+
+    // associations
+    action_metas: z.array(QuestActionMeta).optional(),
   })
   .describe(
     'A quest is a collection of actions that users can take to earn rewards',

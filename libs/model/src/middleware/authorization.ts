@@ -95,7 +95,7 @@ async function buildAuth(
 ): Promise<AuthContext> {
   const { actor, payload } = ctx;
   if (!actor.address)
-    throw new InvalidActor(ctx.actor, 'Must provide an address');
+    throw new InvalidActor(ctx.actor, 'Must provide an address to authorize');
 
   const { id, community_id, topic_id, thread_id, comment_id } = payload;
   const auth: AuthContext = {
@@ -119,7 +119,7 @@ async function buildAuth(
       ],
     });
     if (!auth.comment)
-      throw new InvalidInput('Must provide a valid comment id');
+      throw new InvalidInput('Must provide a valid comment id to authorize');
     auth.community_id = auth.comment.Thread!.community_id;
     auth.topic_id = auth.comment.Thread!.topic_id;
     auth.thread_id = auth.comment.Thread!.id;
@@ -136,12 +136,13 @@ async function buildAuth(
       where: { id: auth.thread_id },
       include,
     });
-    if (!auth.thread) throw new InvalidInput('Must provide a valid thread id');
+    if (!auth.thread)
+      throw new InvalidInput('Must provide a valid thread id to authorize');
     auth.community_id = auth.thread.community_id;
     auth.topic_id = auth.thread.topic_id;
     auth.author_address_id = auth.thread.address_id;
   } else if (!auth.community_id)
-    throw new InvalidInput('Must provide a community id');
+    throw new InvalidInput('Must provide a valid community id to authorize');
 
   auth.address = await models.Address.findOne({
     where: {
@@ -187,7 +188,8 @@ async function hasTopicInteractionPermissions(
   auth: AuthContext,
   action: GroupPermissionAction,
 ): Promise<void> {
-  if (!auth.topic_id) throw new InvalidInput('Must provide a topic id');
+  if (!auth.topic_id)
+    throw new InvalidInput('Must provide a valid topic id to authorize');
 
   auth.topic = await models.Topic.findOne({ where: { id: auth.topic_id } });
   if (!auth.topic) throw new InvalidInput('Topic not found');
