@@ -108,6 +108,11 @@ export const FiltersDrawer = ({
     });
   };
 
+  const hasAppliedFilters =
+    Object.values(filters).filter(Boolean).length === 1
+      ? !filters.withCommunitySortOrder
+      : Object.values(filters).filter(Boolean).length > 0;
+
   return (
     <div className="FiltersDrawer">
       <CWDrawer
@@ -177,7 +182,8 @@ export const FiltersDrawer = ({
                             }
                             disabled={
                               filters.withCommunitySortBy ===
-                              CommunitySortOptions.MostRecent
+                                CommunitySortOptions.MostRecent ||
+                              !hasAppliedFilters
                             }
                           />
                         ),
