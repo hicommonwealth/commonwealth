@@ -23,7 +23,7 @@ class Contest extends ContractBase {
       this.namespaceFactoryAddress,
       this.rpc,
     );
-    await this.namespaceFactory.initialize(true);
+    await this.namespaceFactory.initialize(withWallet);
   }
 
   /**
