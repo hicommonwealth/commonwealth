@@ -28,14 +28,16 @@ const EmptyContestsList = ({
   return (
     <div className="EmptyContestsList">
       {!hasWeightedTopic ? (
-        <EmptyCard
-          img={shape2Url}
-          title="You must have at least one topic with weighted voting enabled to run contest"
-          subtitle="Setting up a contest just takes a few minutes and can be a huge boost to your community."
-          button={{
-            label: 'Create a topic',
-            handler: () => navigate('/manage/topics'),
-          }}
+        <>
+          <EmptyCard
+            img={shape2Url}
+            title="You must have at least one topic with weighted voting enabled to run contest"
+            subtitle="Setting up a contest just takes a few minutes and can be a huge boost to your community."
+            button={{
+              label: 'Create a topic',
+              handler: () => navigate('/manage/topics'),
+            }}
+          />
           {farcasterContestEnabled && (
             <div className="farcaster-card">
               <EmptyCard
@@ -52,7 +54,7 @@ const EmptyContestsList = ({
               />
             </div>
           )}
-        />
+        </>
       ) : !isContestAvailable ? (
         <EmptyCard
           img={shape1Url}

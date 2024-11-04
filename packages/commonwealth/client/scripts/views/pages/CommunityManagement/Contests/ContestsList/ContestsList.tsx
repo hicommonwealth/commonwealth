@@ -1,6 +1,7 @@
 import moment from 'moment';
 import React, { useState } from 'react';
 
+import { useFlag } from 'hooks/useFlag';
 import { Skeleton } from 'views/components/Skeleton';
 
 import EmptyContestsList from '../EmptyContestsList';
@@ -71,9 +72,9 @@ const ContestsList = ({
   return (
     <>
       <div className="ContestsList">
-        {isAdmin && farcasterContestEnabled ? (
-          !isContestAvailable
-        ) : !hasWeightedTopic || !isContestAvailable ? (
+        {isAdmin &&
+        ((farcasterContestEnabled ? !isContestAvailable : !hasWeightedTopic) ||
+          !isContestAvailable) ? (
           <EmptyContestsList
             hasWeightedTopic={hasWeightedTopic}
             isContestAvailable={isContestAvailable}
