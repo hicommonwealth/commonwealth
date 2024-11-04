@@ -98,14 +98,17 @@ export default (sequelize: Sequelize.Sequelize): UserModelStatic =>
       },
       validate: {
         definedAvatarUrl() {
-          if (!(this.profile as z.infer<typeof UserProfile>)?.avatar_url) {
+          if (
+            this.profile &&
+            !(this.profile as z.infer<typeof UserProfile>)?.avatar_url
+          ) {
             throw new Error('profile.avatar_url must be defined');
           }
         },
       },
       hooks: {
         beforeValidate(instance: UserInstance) {
-          if (!instance.profile.avatar_url) {
+          if (instance.profile && !instance.profile.avatar_url) {
             instance.profile.avatar_url = getRandomAvatar();
           }
         },
