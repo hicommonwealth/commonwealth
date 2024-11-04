@@ -18,7 +18,7 @@ import { SIWESigner } from '@canvas-js/chain-ethereum';
 import { Session } from '@canvas-js/interfaces';
 import { CANVAS_TOPIC, serializeCanvas } from '@hicommonwealth/shared';
 import { CosmosExtension } from '@magic-ext/cosmos';
-import { OAuthExtension } from '@magic-ext/oauth';
+import { OAuthExtension } from '@magic-ext/oauth2';
 import { Magic } from 'magic-sdk';
 
 import { ExtendedCommunity } from '@hicommonwealth/schemas';
@@ -338,7 +338,7 @@ export async function startLoginWithMagicLink({
     const params = `?redirectTo=${
       redirectTo ? encodeURIComponent(redirectTo) : ''
     }&chain=${chain || ''}&sso=${provider}`;
-    await magic.oauth.loginWithRedirect({
+    await magic.oauth2.loginWithRedirect({
       provider,
       redirectURI: new URL(
         '/finishsociallogin' + params,
@@ -423,7 +423,7 @@ export async function handleSocialLoginCallback({
       magicAddress = utils.getAddress(metadata.publicAddress);
     }
   } else {
-    const result = await magic.oauth.getRedirectResult();
+    const result = await magic.oauth2.getRedirectResult();
 
     if (!bearer) {
       console.log('No bearer token found in magic redirect result');
