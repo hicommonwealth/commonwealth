@@ -268,7 +268,7 @@ const DetailsFormStep = ({
           initialValues={getInitialValues()}
           onErrors={console.error}
         >
-          {({ watch, setValue }) => (
+          {({ watch }) => (
             <>
               {!isFarcasterContest && (
                 <div className="contest-section contest-section-topic">

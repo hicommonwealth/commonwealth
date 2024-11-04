@@ -14,7 +14,7 @@ export const detailsFormValidationSchema = z.object({
     .object({
       value: z.number().optional(),
       label: z.string(),
-      helpText: z.string(),
+      helpText: z.string().optional(),
       weightedVoting: z.nativeEnum(TopicWeightedVoting).optional().nullish(),
     })
     .optional()
