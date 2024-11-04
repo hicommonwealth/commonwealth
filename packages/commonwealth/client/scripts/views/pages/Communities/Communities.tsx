@@ -183,6 +183,7 @@ const CommunitiesPage = () => {
     setFilters({
       ...filters,
       withCommunitySortBy: undefined,
+      withCommunitySortOrder: undefined,
     });
   };
 
