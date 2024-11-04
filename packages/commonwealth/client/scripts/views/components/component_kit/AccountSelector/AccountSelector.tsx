@@ -1,26 +1,29 @@
 import { ChainBase } from '@hicommonwealth/shared';
+import clsx from 'clsx';
 import type Substrate from 'controllers/chain/substrate/adapter';
-import React from 'react';
+import React, { useState } from 'react';
 import app from 'state';
 import { addressSwapper } from 'utils';
-import { User } from '../../user/user';
+import { CWButton } from '../new_designs/CWButton';
 import { CWModalBody, CWModalHeader } from '../new_designs/CWModal';
 import './AccountSelector.scss';
 
 type LinkAccountItemProps = {
   account: { address: string; meta?: { name: string } };
   idx: number;
-  onSelect: (idx: number) => void;
   walletChain: ChainBase;
   walletNetwork: string;
+  isChecked: boolean;
+  onToggle: (idx: number) => void;
 };
 
 const LinkAccountItem = ({
   account,
   walletNetwork,
   walletChain,
-  onSelect,
   idx,
+  isChecked,
+  onToggle,
 }: LinkAccountItemProps) => {
   const address = app.chain
     ? addressSwapper({
@@ -42,31 +45,16 @@ const LinkAccountItem = ({
     account.meta?.name ||
     `${capitalizedBaseName} address ${account.address.slice(0, 6)}...`;
 
+  const formattedAddress =
+    address && `${address.slice(0, 8)}...${address.slice(-5)}`;
+
   return (
-    <div
-      className="account-item account-item-emphasized"
-      onClick={() => onSelect(idx)}
-    >
-      <div className="account-item-avatar">
-        <div className="account-user">
-          <User
-            userAddress={address}
-            userCommunityId={app.chain?.id || walletNetwork}
-            shouldShowAvatarOnly
-            avatarSize={40}
-          />
-        </div>
-      </div>
-      <div className="account-item-left">
-        <div className="account-item-name">{name}</div>
-        <div className="account-item-address">
-          <div className="account-user">
-            <User
-              userAddress={address}
-              userCommunityId={app.chain?.id || walletNetwork}
-              shouldHideAvatar
-            />
-          </div>
+    <div className="account-item account-item-emphasized">
+      <div className="account-item-left" onClick={() => onToggle(idx)}>
+        <input type="radio" checked={isChecked} />
+        <div>
+          <div className="account-item-name">{capitalizedBaseName}</div>
+          <div className="account-item-address">{formattedAddress}</div>
         </div>
       </div>
     </div>
@@ -91,25 +79,42 @@ export const AccountSelector = ({
   walletChain,
   onSelect,
 }: AccountSelectorProps) => {
+  const [selectedAccountIdx, setSelectedAccountIdx] = useState<number>(0);
+  const handleToggle = (idx: number) => {
+    setSelectedAccountIdx(idx);
+  };
+  const handleNext = () => {
+    onSelect(selectedAccountIdx);
+  };
   return (
     <div className="AccountSelector">
       <CWModalHeader
-        label="Select account to join"
+        label="Select Account to Join"
         onModalClose={onModalClose}
       />
-      <CWModalBody>
-        {accounts.map((account, idx) => {
-          return (
-            <LinkAccountItem
-              key={`${account.address}-${idx}`}
-              account={account}
-              walletChain={walletChain}
-              walletNetwork={walletNetwork}
-              onSelect={onSelect}
-              idx={idx}
-            />
-          );
-        })}
+      <CWModalBody className={clsx('CWModalBody', 'zero-gap')}>
+        <>
+          {accounts.map((account, idx) => {
+            return (
+              <LinkAccountItem
+                key={`${account.address}-${idx}`}
+                account={account}
+                walletChain={walletChain}
+                walletNetwork={walletNetwork}
+                idx={idx}
+                onToggle={() => handleToggle(idx)}
+                isChecked={selectedAccountIdx === idx}
+              />
+            );
+          })}
+          <CWButton
+            label="Next"
+            type="submit"
+            buttonHeight="med"
+            buttonWidth="full"
+            onClick={handleNext}
+          />
+        </>
       </CWModalBody>
     </div>
   );
