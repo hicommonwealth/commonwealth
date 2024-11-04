@@ -238,28 +238,28 @@ const CommunitiesPage = () => {
                 }
                 `}
                 type="filter"
-                onClick={removeCommunitySortByFilter}
+                onCloseClick={removeCommunitySortByFilter}
               />
             )}
             {filters.withCommunityType && (
               <CWTag
                 label={filters.withCommunityType}
                 type="filter"
-                onClick={removeCommunityTypeFilter}
+                onCloseClick={removeCommunityTypeFilter}
               />
             )}
             {filters.withNetwork && (
               <CWTag
                 label={filters.withNetwork}
                 type="filter"
-                onClick={removeChainNetworkFilter}
+                onCloseClick={removeChainNetworkFilter}
               />
             )}
             {filters.withCommunityEcosystem && (
               <CWTag
                 label={filters.withCommunityEcosystem}
                 type="filter"
-                onClick={removeCommunityEcosystemFilter}
+                onCloseClick={removeCommunityEcosystemFilter}
               />
             )}
             {filters.withEcosystemChainId && (
@@ -270,11 +270,15 @@ const CommunitiesPage = () => {
                   )?.[0] as string
                 }
                 type="filter"
-                onClick={removeEcosystemChainIdFilter}
+                onCloseClick={removeEcosystemChainIdFilter}
               />
             )}
             {filters.withStakeEnabled && (
-              <CWTag label="Stake" type="filter" onClick={removeStakeFilter} />
+              <CWTag
+                label="Stake"
+                type="filter"
+                onCloseClick={removeStakeFilter}
+              />
             )}
             {filters.withTagsIds &&
               filters.withTagsIds.map((id) => (
@@ -282,7 +286,7 @@ const CommunitiesPage = () => {
                   key={id}
                   type="filter"
                   label={(tags || []).find((t) => t.id === id)?.name || ''}
-                  onClick={() => removeTagFilter(id)}
+                  onCloseClick={() => removeTagFilter(id)}
                 />
               ))}
             <FiltersDrawer
