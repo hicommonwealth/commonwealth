@@ -1,5 +1,6 @@
 import { CompleteMultipartUploadCommandOutput, S3 } from '@aws-sdk/client-s3';
 import { BlobBucket, type BlobStorage } from '@hicommonwealth/core';
+import { S3_ASSET_BUCKET_CDN } from '@hicommonwealth/shared';
 import { config } from '../config';
 import { exists_S3sdk, getSignedUrl_S3sdk, upload_S3sdk } from './util';
 
@@ -11,7 +12,7 @@ const s3Buckets: Partial<Record<BlobBucket, string>> =
         sitemap: 'local.sitemap',
       }
     : {
-        assets: 'assets.commonwealth.im',
+        assets: S3_ASSET_BUCKET_CDN,
         archives: 'outbox-event-stream-archive',
         sitemap: 'sitemap.commonwealth.im',
       };
