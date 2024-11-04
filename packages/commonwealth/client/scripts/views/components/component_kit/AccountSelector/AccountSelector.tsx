@@ -19,7 +19,6 @@ type LinkAccountItemProps = {
 
 const LinkAccountItem = ({
   account,
-  walletNetwork,
   walletChain,
   idx,
   isChecked,
@@ -40,10 +39,6 @@ const LinkAccountItem = ({
   const capitalizedBaseName = `${baseName
     ?.charAt(0)
     ?.toUpperCase()}${baseName?.slice(1)}`;
-
-  const name =
-    account.meta?.name ||
-    `${capitalizedBaseName} address ${account.address.slice(0, 6)}...`;
 
   const formattedAddress =
     address && `${address.slice(0, 8)}...${address.slice(-5)}`;
