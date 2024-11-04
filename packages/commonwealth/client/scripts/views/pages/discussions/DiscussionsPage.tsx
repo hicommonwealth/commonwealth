@@ -186,7 +186,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     topicId &&
     topicObj.weighted_voting === TopicWeightedVoting.ERC20;
 
-  const activeContestsInTopic = contestsData?.filter((contest) => {
+  const activeContestsInTopic = contestsData.all?.filter((contest) => {
     const isContestInTopic = (contest.topics || []).find(
       (topic) => topic.id === topicId,
     );
@@ -276,7 +276,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
             });
 
           const isThreadTopicInContest = checkIsTopicInContest(
-            contestsData,
+            contestsData.all,
             thread?.topic?.id,
           );
 
