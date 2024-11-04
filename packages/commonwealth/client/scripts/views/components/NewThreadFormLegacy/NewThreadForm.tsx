@@ -238,9 +238,11 @@ export const NewThreadForm = () => {
   const contestTopicAffordanceVisible =
     isContestAvailable && hasTopicOngoingContest;
 
+  const isWalletBalanceErrorEnabled = false;
   const walletBalanceError =
     isContestAvailable &&
     hasTopicOngoingContest &&
+    isWalletBalanceErrorEnabled &&
     parseFloat(userEthBalance || '0') < MIN_ETH_FOR_CONTEST_THREAD;
 
   useEffect(() => {
