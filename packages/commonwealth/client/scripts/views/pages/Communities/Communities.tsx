@@ -237,28 +237,28 @@ const CommunitiesPage = () => {
                 }
                 `}
                 type="filter"
-                onClick={() => removeCommunitySortByFilter()}
+                onClick={removeCommunitySortByFilter}
               />
             )}
             {filters.withCommunityType && (
               <CWTag
                 label={filters.withCommunityType}
                 type="filter"
-                onClick={() => removeCommunityTypeFilter()}
+                onClick={removeCommunityTypeFilter}
               />
             )}
             {filters.withNetwork && (
               <CWTag
                 label={filters.withNetwork}
                 type="filter"
-                onClick={() => removeChainNetworkFilter()}
+                onClick={removeChainNetworkFilter}
               />
             )}
             {filters.withCommunityEcosystem && (
               <CWTag
                 label={filters.withCommunityEcosystem}
                 type="filter"
-                onClick={() => removeCommunityEcosystemFilter()}
+                onClick={removeCommunityEcosystemFilter}
               />
             )}
             {filters.withEcosystemChainId && (
@@ -269,15 +269,11 @@ const CommunitiesPage = () => {
                   )?.[0] as string
                 }
                 type="filter"
-                onClick={() => removeEcosystemChainIdFilter()}
+                onClick={removeEcosystemChainIdFilter}
               />
             )}
             {filters.withStakeEnabled && (
-              <CWTag
-                label="Stake"
-                type="filter"
-                onClick={() => removeStakeFilter()}
-              />
+              <CWTag label="Stake" type="filter" onClick={removeStakeFilter} />
             )}
             {filters.withTagsIds &&
               filters.withTagsIds.map((id) => (
