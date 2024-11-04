@@ -45,7 +45,7 @@ export const ReactionButton = ({
   const user = useUserStore();
 
   const reactionWeightsSum =
-    BigInt(thread?.reactionWeightsSum || 0) > 0
+    BigInt(thread?.reactionWeightsSum) > 0
       ? thread?.reactionWeightsSum
       : thread?.reactionCount?.toString() || '0';
 
