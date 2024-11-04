@@ -231,7 +231,7 @@ const TokenInformationForm = ({
       />
 
       <CWImageInput
-        label="Image (Optional - Accepts JPG and PNG files)"
+        label="Image (Accepts JPG and PNG files)"
         canSelectImageBehavior={false}
         onImageProcessingChange={({ isGenerating, isUploading }) =>
           setIsProcessingProfileImage(isGenerating || isUploading)

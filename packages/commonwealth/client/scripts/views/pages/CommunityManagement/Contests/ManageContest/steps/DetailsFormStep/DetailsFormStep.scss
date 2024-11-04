@@ -34,18 +34,6 @@
         display: flex;
         align-items: center;
       }
-
-      .radio-row {
-        display: flex;
-        align-items: center;
-        justify-items: flex-start;
-        flex-wrap: wrap;
-
-        .container {
-          margin-right: 24px;
-          margin-top: 16px;
-        }
-      }
     }
 
     .contest-section-name {
@@ -75,14 +63,6 @@
         .b1 {
           margin-left: 4px;
         }
-      }
-    }
-
-    .contest-section-fee {
-      .funding-token-address-description {
-        font-weight: 500;
-        margin-bottom: 8px;
-        margin-top: 24px;
       }
     }
 
@@ -210,39 +190,6 @@
         justify-content: flex-end;
         gap: 12px;
         margin-top: 32px;
-      }
-    }
-
-    .contest-section-topics {
-      .topics-list {
-        .list-header {
-          display: flex;
-          justify-content: space-between;
-          padding: 12px 8px;
-        }
-
-        .list-row {
-          display: flex;
-          justify-content: space-between;
-          padding: 12px 8px;
-          border-top: 1px solid $neutral-100;
-
-          .Text {
-            color: $neutral-700;
-          }
-        }
-
-        .list-footer {
-          display: flex;
-          justify-content: end;
-          gap: 16px;
-          padding: 12px 8px;
-          border-top: 1px solid $neutral-100;
-        }
-
-        .MessageRow {
-          justify-content: flex-end;
-        }
       }
     }
 
