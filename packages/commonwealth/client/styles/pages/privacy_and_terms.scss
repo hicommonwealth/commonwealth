@@ -98,7 +98,8 @@
     display: flex;
     flex-direction: column;
     gap: 16px;
-    width: 736px;
+    width: 100%;
+    max-width: 736px;
 
     @include smallInclusive {
       width: 100%;

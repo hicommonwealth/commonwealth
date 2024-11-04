@@ -8,13 +8,12 @@ const PrivacyPage = lazy(() => import('views/pages/privacy'));
 const ComponentsShowcasePage = lazy(
   () => import('views/pages/ComponentsShowcase'),
 );
-const isInIframe = window.self !== window.top;
 
 const GeneralRoutes = () => [
   <Route
     key="/terms"
     path="/terms"
-    element={withLayout(TermsPage, { type: isInIframe ? 'blank' : 'common' })}
+    element={withLayout(TermsPage, { type: 'common' })}
   />,
   <Route
     key="/privacy"

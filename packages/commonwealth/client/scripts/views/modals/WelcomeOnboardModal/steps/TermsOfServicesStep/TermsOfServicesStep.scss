@@ -23,9 +23,9 @@
       width: 175px;
     }
   }
-  .terms-frame {
+  .terms-container {
     width: 100%;
-    min-height: 300px;
+    max-height: 300px;
     border: 1px solid #e0dfe1;
     border-radius: 6px;
     overflow: auto;

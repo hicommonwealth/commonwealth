@@ -1,6 +1,7 @@
 import React, { useRef } from 'react';
 import { Link } from 'react-router-dom';
 
+import TermsPage from 'client/scripts/views/pages/terms';
 import { CWCheckbox } from 'views/components/component_kit/cw_checkbox';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
@@ -37,13 +38,10 @@ const TermsOfServicesStep = ({ onComplete }: TermsOfServicesStepProps) => {
       {({ watch }) => {
         const isTermsChecked = watch('enableTermsOfServices');
         return (
-          <React.Fragment>
-            <iframe
-              className="terms-frame"
-              allowFullScreen={true}
-              src={`${window.location.origin}/terms`}
-              loading="eager"
-            />
+          <>
+            <div className="terms-container">
+              <TermsPage />
+            </div>
 
             <div className="notification-section">
               <CWCheckbox
@@ -67,7 +65,7 @@ const TermsOfServicesStep = ({ onComplete }: TermsOfServicesStepProps) => {
               For questions, please review our&nbsp;
               <Link to="/privacy">Privacy Policy</Link>
             </CWText>
-          </React.Fragment>
+          </>
         );
       }}
     </CWForm>

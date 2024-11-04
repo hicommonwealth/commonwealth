@@ -4,12 +4,13 @@ import React, { useState } from 'react';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWModal } from '../../components/component_kit/new_designs/CWModal';
-import './WelcomeOnboardModal.scss';
 import { JoinCommunityStep } from './steps/JoinCommunityStep';
 import { PersonalInformationStep } from './steps/PersonalInformationStep';
 import { PreferencesStep } from './steps/PreferencesStep';
 import { TermsOfServicesStep } from './steps/TermsOfServicesStep';
 import { WelcomeOnboardModalProps, WelcomeOnboardModalSteps } from './types';
+
+import './WelcomeOnboardModal.scss';
 
 const WelcomeOnboardModal = ({ isOpen, onClose }: WelcomeOnboardModalProps) => {
   const [activeStep, setActiveStep] = useState<WelcomeOnboardModalSteps>(
