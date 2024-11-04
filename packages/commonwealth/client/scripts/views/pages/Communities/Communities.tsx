@@ -27,6 +27,7 @@ import ManageCommunityStakeModal from '../../modals/ManageCommunityStakeModal/Ma
 import './Communities.scss';
 import {
   CommunityFilters,
+  CommunitySortDirections,
   CommunitySortOptions,
   FiltersDrawer,
   communityChains,
@@ -56,6 +57,11 @@ const CommunitiesPage = () => {
     withCommunityEcosystem: undefined,
     withStakeEnabled: undefined,
     withTagsIds: undefined,
+    withCommunitySortBy: CommunitySortOptions.MemberCount,
+    withCommunitySortOrder: CommunitySortDirections.Descending,
+    withCommunityType: undefined,
+    withEcosystemChainId: undefined,
+    withNetwork: undefined,
   });
 
   const [selectedCommunityId, setSelectedCommunityId] = useState<string>();
