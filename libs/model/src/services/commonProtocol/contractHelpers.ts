@@ -89,16 +89,17 @@ export const getNamespaceBalance = async (
  * @param rpcNodeUrl Note this MUST be a private_url with no associated whitelist.
  */
 export const getTokenAttributes = async (
-  address: string,
+  contestAddress: string,
   rpcNodeUrl: string,
-  fetchFromContest: boolean,
 ): Promise<TokenAttributes> => {
   const web3 = new Web3(rpcNodeUrl);
-  if (fetchFromContest) {
-    const contest = new web3.eth.Contract(contestABI as AbiItem[], address);
-    address = await contest.methods.contestToken().call();
-  }
-  if (address === ZERO_ADDRESS) {
+  const contest = new web3.eth.Contract(
+    contestABI as AbiItem[],
+    contestAddress,
+  );
+  const contestToken: string = await contest.methods.contestToken().call();
+
+  if (contestToken === ZERO_ADDRESS) {
     return Promise.resolve({
       ticker: commonProtocol.Denominations.ETH,
       decimals: commonProtocol.WeiDecimals[commonProtocol.Denominations.ETH],
@@ -126,7 +127,7 @@ export const getTokenAttributes = async (
         type: 'function',
       },
     ] as AbiItem[],
-    address,
+    contestToken,
   );
 
   const [symbol, decimals] = await Promise.all([
