@@ -94,12 +94,11 @@ export const getTokenAttributes = async (
   fetchFromContest: boolean,
 ): Promise<TokenAttributes> => {
   const web3 = new Web3(rpcNodeUrl);
-  let addr = address;
   if (fetchFromContest) {
     const contest = new web3.eth.Contract(contestABI as AbiItem[], address);
-    addr = await contest.methods.contestToken().call();
+    address = await contest.methods.contestToken().call();
   }
-  if (addr === ZERO_ADDRESS) {
+  if (address === ZERO_ADDRESS) {
     return Promise.resolve({
       ticker: commonProtocol.Denominations.ETH,
       decimals: commonProtocol.WeiDecimals[commonProtocol.Denominations.ETH],
@@ -127,7 +126,7 @@ export const getTokenAttributes = async (
         type: 'function',
       },
     ] as AbiItem[],
-    addr,
+    address,
   );
 
   const [symbol, decimals] = await Promise.all([
