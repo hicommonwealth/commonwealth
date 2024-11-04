@@ -30,7 +30,7 @@ export async function getVotingWeight(
         required: true,
         include: [
           {
-            model: models.ChainNode,
+            model: models.ChainNode.scope('withPrivateData'),
             required: false,
           },
           {
