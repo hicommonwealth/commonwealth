@@ -40,6 +40,7 @@ interface SignTransactionsStepProps {
   contestFormData: ContestFormData;
   onSetCreatedContestAddress: (address: string) => void;
   fundingTokenTicker: string;
+  fundingTokenDecimals: number;
 }
 
 const SEVEN_DAYS_IN_SECONDS = 60 * 60 * 24 * 7;
@@ -50,6 +51,7 @@ const SignTransactionsStep = ({
   contestFormData,
   onSetCreatedContestAddress,
   fundingTokenTicker,
+  fundingTokenDecimals,
 }: SignTransactionsStepProps) => {
   const weightedTopicsEnabled = useFlag('weightedTopics');
 
@@ -184,6 +186,7 @@ const SignTransactionsStep = ({
               .at(0),
         ticker: fundingTokenTicker,
         is_farcaster_contest: contestFormData.isFarcasterContest,
+        decimals: fundingTokenDecimals,
       });
 
       onSetLaunchContestStep('ContestLive');

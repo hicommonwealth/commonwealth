@@ -14,7 +14,6 @@ import app from 'state';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { ApiEndpoints, queryClient } from 'state/api/config';
 import { useFetchGroupsQuery } from 'state/api/groups';
-import { SearchProfilesResponse } from 'state/api/profiles/searchProfiles';
 import useGroupMutationBannerStore from 'state/ui/group';
 import useUserStore from 'state/ui/user';
 import { useDebounce } from 'usehooks-ts';
@@ -216,12 +215,9 @@ const CommunityMembersPage = () => {
     const clonedMembersPages = [...members.pages];
 
     const results = clonedMembersPages
-      .reduce(
-        (acc, page) => {
-          return [...acc, ...page.results];
-        },
-        [] as SearchProfilesResponse['results'],
-      )
+      .reduce((acc, page) => {
+        return [...acc, ...page.results];
+      }, [])
       .map((p) => ({
         userId: p.user_id,
         avatarUrl: p.avatar_url,
@@ -233,8 +229,7 @@ const CommunityMembersPage = () => {
               (groups || []).find((group) => group.id === groupId)?.name,
           )
           .filter(Boolean)
-          // @ts-expect-error <StrictNullChecks/>
-          .sort((a, b) => a.localeCompare(b)),
+          .sort((a, b) => a!.localeCompare(b!)),
         stakeBalance: p.addresses[0].stake_balance,
         lastActive: p.last_active,
       }));

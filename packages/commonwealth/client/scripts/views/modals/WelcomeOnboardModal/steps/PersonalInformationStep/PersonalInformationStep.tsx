@@ -50,7 +50,6 @@ const PersonalInformationStep = ({
     useUpdateUserEmailSettingsMutation();
   const { refetch: refetchProfileData } = useFetchProfileByIdQuery({
     apiCallEnabled: true,
-    shouldFetchSelfProfile: true,
   });
 
   useNecessaryEffect(() => {

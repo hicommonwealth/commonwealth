@@ -3,6 +3,7 @@ import { CacheNamespaces, cache } from '@hicommonwealth/core';
 import { Reaction, Thread } from '@hicommonwealth/model';
 import { MixpanelCommunityInteractionEvent } from '../../shared/analytics/types';
 import { applyCanvasSignedDataMiddleware } from '../federation';
+import { incrementThreadViewCount } from '../util/incrementThreadViewCount';
 
 export const trpcRouter = trpc.router({
   createThread: trpc.command(
@@ -55,5 +56,10 @@ export const trpcRouter = trpc.router({
     applyCanvasSignedDataMiddleware,
   ),
   getThreads: trpc.query(Thread.GetThreads, trpc.Tag.Thread),
-  getThreadsByIds: trpc.query(Thread.GetThreadsByIds, trpc.Tag.Thread),
+  getThreadsByIds: trpc.query(
+    Thread.GetThreadsByIds,
+    trpc.Tag.Thread,
+    undefined,
+    incrementThreadViewCount,
+  ),
 });

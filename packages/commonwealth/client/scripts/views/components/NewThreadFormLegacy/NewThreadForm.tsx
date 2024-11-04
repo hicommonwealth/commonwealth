@@ -285,7 +285,7 @@ export const NewThreadForm = () => {
                   }}
                   formatOptionLabel={(option) => (
                     <>
-                      {contestTopicAffordanceVisible && (
+                      {!!contestTopicAffordanceVisible && (
                         <CWIcon
                           className="trophy-icon"
                           iconName="trophy"

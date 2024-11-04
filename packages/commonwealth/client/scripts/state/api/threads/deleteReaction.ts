@@ -52,10 +52,10 @@ const useDeleteThreadReactionMutation = ({
           associatedReactions: [
             {
               id: deleted.reaction_id,
-              type: 'like',
-              voting_weight: 0,
+              reaction: 'like',
               address: '',
               updated_at: '',
+              address_id: 0,
             },
           ],
         },

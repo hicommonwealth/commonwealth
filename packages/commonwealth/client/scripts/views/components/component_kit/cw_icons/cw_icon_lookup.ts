@@ -33,6 +33,7 @@ import {
   Coins,
   Compass,
   Copy,
+  CopySimple,
   DotsThreeVertical,
   Download,
   DownloadSimple,
@@ -290,6 +291,7 @@ export const iconLookup = {
   members: Icons.CWMembers,
   download: withPhosphorIcon(Download),
   downloadSimple: withPhosphorIcon(DownloadSimple),
+  copySimple: withPhosphorIcon(CopySimple),
 };
 
 export const customIconLookup = {
