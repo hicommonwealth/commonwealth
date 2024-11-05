@@ -14,11 +14,11 @@ import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { ThreadCard } from '../../pages/discussions/ThreadCard';
 import './ThreadPreviewModal.scss';
 
-type FeedThreadProps = {
+type ThreadModalProps = {
   thread: Thread;
 };
 
-const FeedThread: React.FC<FeedThreadProps> = ({ thread }) => {
+const ThreadModal: React.FC<ThreadModalProps> = ({ thread }) => {
   const navigate = useCommonNavigate();
   const user = useUserStore();
   const { data: domain } = useFetchCustomDomainQuery();
@@ -100,7 +100,7 @@ const FeedThread: React.FC<FeedThreadProps> = ({ thread }) => {
       customStages={community.custom_stages}
       hideReactionButton
       hideUpvotesDrawer
-      layoutType="community-first"
+      layoutType="author-first"
       showCommentState
       removeImagesFromMarkDown
     />
@@ -160,7 +160,7 @@ const ThreadPreviewModal: React.FC<FeedThreadPreviewProps> = ({
           )}
         </div>
         <div className="modal-right">
-          <FeedThread thread={thread} />
+          <ThreadModal thread={thread} />
         </div>
       </div>
     </div>

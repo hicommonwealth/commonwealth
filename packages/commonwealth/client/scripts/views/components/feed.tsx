@@ -244,8 +244,7 @@ export const Feed = ({ query, customScrollParent }: FeedProps) => {
   }
 
   const openModal = (thread: z.infer<typeof ActivityThread>) => {
-    const seletedThread = mapThread(thread);
-    setSelectedThread(seletedThread);
+    setSelectedThread(mapThread(thread));
     setIsThreadModalOpen(true);
   };
 

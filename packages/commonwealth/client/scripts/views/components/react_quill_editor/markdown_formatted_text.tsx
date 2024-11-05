@@ -167,14 +167,14 @@ export const MarkdownFormattedText = ({
   );
 
   useEffect(() => {
-    if (containerRef.current && onImageClick) {
+    if (containerRef?.current && onImageClick) {
       const images = containerRef.current.querySelectorAll('img');
       images.forEach((img) => {
         img.onclick = (event) => {
           event.preventDefault();
           event.stopPropagation();
 
-          onImageClick();
+          onImageClick?.();
         };
       });
     }
