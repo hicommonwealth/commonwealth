@@ -130,9 +130,10 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
       ...(featuredFilter && {
         orderBy: featuredFilter,
       }),
-      toDate: dateCursor.toDate,
-      // @ts-expect-error <StrictNullChecks/>
-      fromDate: dateCursor.fromDate,
+      ...(dateCursor.fromDate && {
+        toDate: dateCursor.toDate,
+        fromDate: dateCursor.fromDate,
+      }),
       includeArchivedThreads: isOnArchivePage || includeArchivedThreads,
       // @ts-expect-error <StrictNullChecks/>
       contestAddress,
