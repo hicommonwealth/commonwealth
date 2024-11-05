@@ -3,6 +3,22 @@
 .WelcomeOnboardModal {
   overflow-y: scroll;
   position: relative;
+  .logo-container {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 10px 0px;
+    .logo {
+      height: auto;
+      margin: 0 auto;
+      width: 227px;
+
+      @include extraSmall {
+        display: none;
+      }
+    }
+  }
 
   .content {
     .close-btn {
@@ -18,6 +34,13 @@
       }
     }
 
+    .modal-heading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 10px 0px;
+    }
+
     padding: 48px;
 
     @include extraSmall {
@@ -26,7 +49,7 @@
 
     .progress {
       display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
+      grid-template-columns: 1fr 1fr 1fr 1fr;
       gap: 8px;
       padding-bottom: 18px;
 
