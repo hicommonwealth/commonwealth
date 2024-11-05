@@ -8,6 +8,7 @@ export const LaunchpadTrade = z.object({
   trader_address: EVM_ADDRESS,
   is_buy: z.boolean(),
   community_token_amount: PG_ETH,
+  price: PG_ETH,
   floating_supply: PG_ETH,
   timestamp: PG_INT,
 });

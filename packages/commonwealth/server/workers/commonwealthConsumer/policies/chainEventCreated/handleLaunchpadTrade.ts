@@ -12,7 +12,7 @@ export async function handleLaunchpadTrade(
     1: tokenAddress,
     2: isBuy,
     3: communityTokenAmount,
-    // 4: ethAmount,
+    4: ethAmount,
     // 5: protocolEthAmount,
     6: floatingSupply,
   } = event.parsedArgs as z.infer<typeof LaunchpadTrade>;
@@ -56,6 +56,9 @@ export async function handleLaunchpadTrade(
       trader_address: traderAddress,
       is_buy: isBuy,
       community_token_amount: BigNumber.from(communityTokenAmount).toBigInt(),
+      price:
+        BigNumber.from(communityTokenAmount).toBigInt() /
+        BigNumber.from(ethAmount).toBigInt(),
       floating_supply: BigNumber.from(floatingSupply).toBigInt(),
       timestamp: Number(block.timestamp),
     });
