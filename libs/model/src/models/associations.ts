@@ -84,10 +84,6 @@ export const buildAssociations = (db: DB) => {
       foreignKey: 'selected_community_id',
       as: 'selectedCommunity',
     })
-    .withOne(db.Token, {
-      targetKey: 'namespace',
-      foreignKey: 'namespace',
-    })
     .withMany(db.Quest, { onUpdate: 'CASCADE', onDelete: 'CASCADE' });
 
   db.Tags.withMany(db.ProfileTags, {

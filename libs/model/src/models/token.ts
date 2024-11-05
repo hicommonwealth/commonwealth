@@ -24,6 +24,10 @@ export default (
       token_address: { type: Sequelize.STRING, primaryKey: true },
       namespace: {
         type: Sequelize.STRING,
+        references: {
+          model: 'Communities',
+          key: 'namespace',
+        },
       },
       name: { type: Sequelize.STRING },
       symbol: { type: Sequelize.STRING },
