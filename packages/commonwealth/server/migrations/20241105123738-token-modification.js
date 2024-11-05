@@ -186,9 +186,9 @@ module.exports = {
         `
             ALTER TABLE "Tokens"
             ADD COLUMN token_address VARCHAR(255) PRIMARY KEY,
-            ADD COLUMN namespace VARCHAR(255),
+            ADD COLUMN namespace VARCHAR(255) NOT NULL,
             ADD CONSTRAINT fk_namespace FOREIGN KEY (namespace) REFERENCES "Communities"(namespace),
-            ADD COLUMN initial_supply DECIMAL(78, 0),
+            ADD COLUMN initial_supply DECIMAL(78, 0) NOT NULL,
             ADD COLUMN is_locked BOOLEAN NOT NULL DEFAULT false,
             DROP COLUMN chain_node_id,
             DROP COLUMN base,
@@ -196,7 +196,7 @@ module.exports = {
             DROP COLUMN launchpad_contract_address,
             DROP COLUMN uniswap_pool_address,
             DROP COLUMN community_id,
-            ALTER COLUMN name DROP NOT NULL,
+            ALTER COLUMN symbol SET NOT NULL,
             DROP CONSTRAINT "Tokens_pkey";
         `,
         { transaction: t },
