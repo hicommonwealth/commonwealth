@@ -12,7 +12,7 @@ const {
   NO_SSL,
   PRIVATE_KEY,
   TBC_BALANCE_TTL_SECONDS,
-  ALLOWED_EVENTS,
+  BLACKLISTED_EVENTS,
   INIT_TEST_DB,
   MAX_USER_POSTS_PER_CONTEST,
   JWT_SECRET,
@@ -79,7 +79,9 @@ export const config = configure(
         : 300,
     },
     OUTBOX: {
-      ALLOWED_EVENTS: ALLOWED_EVENTS ? ALLOWED_EVENTS.split(',') : [],
+      BLACKLISTED_EVENTS: BLACKLISTED_EVENTS
+        ? BLACKLISTED_EVENTS.split(',')
+        : [],
     },
     STAKE: {
       REACTION_WEIGHT_OVERRIDE: REACTION_WEIGHT_OVERRIDE
@@ -189,7 +191,7 @@ export const config = configure(
       TTL_SECS: z.number().int(),
     }),
     OUTBOX: z.object({
-      ALLOWED_EVENTS: z.array(z.string()),
+      BLACKLISTED_EVENTS: z.array(z.string()),
     }),
     STAKE: z.object({
       REACTION_WEIGHT_OVERRIDE: z.number().int().nullish(),
