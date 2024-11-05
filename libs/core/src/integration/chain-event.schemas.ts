@@ -1,5 +1,9 @@
 // TODO: temporary - will be deleted as part of chain-events removal
-import { ETHERS_BIG_NUMBER, EVM_ADDRESS } from '@hicommonwealth/schemas';
+import {
+  ETHERS_BIG_NUMBER,
+  EVM_ADDRESS,
+  zBoolean,
+} from '@hicommonwealth/schemas';
 import { z } from 'zod';
 
 export const CommunityStakeTrade = z.tuple([
@@ -28,7 +32,7 @@ export const LaunchpadTokenCreated = z.tuple([
 export const LaunchpadTrade = z.tuple([
   EVM_ADDRESS.describe('trader'),
   EVM_ADDRESS.describe('tokenAddress'), // The contract definition is incorrect (confirmed with Ian)
-  z.boolean().describe('isBuy'),
+  zBoolean.describe('isBuy'),
   ETHERS_BIG_NUMBER.describe('communityTokenAmount'),
   ETHERS_BIG_NUMBER.describe('ethAmount'),
   ETHERS_BIG_NUMBER.describe('protocolEthAmount'),

@@ -37,11 +37,11 @@ export default (sequelize: Sequelize.Sequelize): LaunchpadTradeModelStatic =>
         allowNull: false,
       },
       community_token_amount: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.DECIMAL(78, 0),
         allowNull: false,
       },
       floating_supply: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.DECIMAL(78, 0),
         allowNull: false,
       },
       timestamp: {
