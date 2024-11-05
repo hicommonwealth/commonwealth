@@ -71,6 +71,7 @@ export const QuestActionMeta = (
     {
       timestamps: true,
       createdAt: 'created_at',
+      updatedAt: 'updated_at',
       underscored: true,
       tableName: 'QuestActionMetas',
     },
@@ -95,6 +96,7 @@ export const QuestAction = (
     {
       timestamps: true,
       createdAt: 'created_at',
+      updatedAt: false,
       underscored: true,
       tableName: 'QuestActions',
     },

@@ -66,7 +66,7 @@ export const usePopover = (): UsePopoverProps => {
   >(null);
 
   const handleInteraction = (e: React.MouseEvent<AnchorType>) => {
-    setAnchorEl(e.type === 'mouseleave' ? null : e.currentTarget);
+    setAnchorEl(anchorEl ? null : e.currentTarget);
   };
 
   const dispose = () => {
