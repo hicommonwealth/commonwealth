@@ -170,10 +170,6 @@ module.exports = {
         WHERE id = 1399;
     `);
 
-    if (node[0].length === 0) {
-      return;
-    }
-
     return queryInterface.sequelize.transaction(async (t) => {
       await queryInterface.changeColumn(
         'Communities',
@@ -223,6 +219,10 @@ module.exports = {
           transaction: t,
         },
       );
+
+      if (node[0].length === 0) {
+        return;
+      }
 
       await queryInterface.bulkInsert(
         'EvmEventSources',
