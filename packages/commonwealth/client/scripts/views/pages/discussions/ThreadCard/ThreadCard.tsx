@@ -22,7 +22,7 @@ import useBrowserWindow from '../../../../hooks/useBrowserWindow';
 import { ThreadStage } from '../../../../models/types';
 import Permissions from '../../../../utils/Permissions';
 import { CommentCard } from '../CommentCard';
-import { isHot } from '../helpers';
+import { isHot, removeImageFormMarkDown } from '../helpers';
 import { AuthorAndPublishInfo } from './AuthorAndPublishInfo';
 import './ThreadCard.scss';
 import { CardSkeleton } from './ThreadCardSkeleton';
@@ -48,6 +48,9 @@ type CardProps = AdminActionsProps & {
   customStages?: string[];
   editingDisabled?: boolean;
   expandCommentBtnVisible?: boolean;
+  onImageClick?: () => void;
+  showCommentState?: boolean;
+  removeImagesFromMarkDown?: boolean;
 };
 
 export const ThreadCard = ({
@@ -80,12 +83,16 @@ export const ThreadCard = ({
   customStages,
   editingDisabled,
   expandCommentBtnVisible,
+  showCommentState = false,
+  onImageClick,
+  removeImagesFromMarkDown = false,
 }: CardProps) => {
   const navigate = useCommonNavigate();
   const user = useUserStore();
   const { isWindowSmallInclusive } = useBrowserWindow({});
   const [isUpvoteDrawerOpen, setIsUpvoteDrawerOpen] = useState<boolean>(false);
-  const [showCommentVisible, setShowCommentVisible] = useState<boolean>(false);
+  const [showCommentVisible, setShowCommentVisible] =
+    useState<boolean>(showCommentState);
   const toggleShowComments = () => setShowCommentVisible((prev) => !prev);
 
   useEffect(() => {
@@ -201,13 +208,18 @@ export const ThreadCard = ({
             </div>
             <CWText type="b1" className="content-body">
               <MarkdownViewerUsingQuillOrNewEditor
-                markdown={thread.body}
+                markdown={
+                  !removeImagesFromMarkDown
+                    ? thread.body
+                    : removeImageFormMarkDown(thread.body)
+                }
                 cutoffLines={4}
                 customShowMoreButton={
                   <CWText type="b1" className="show-more-btn">
                     Show more
                   </CWText>
                 }
+                onImageClick={onImageClick}
               />
             </CWText>
           </div>

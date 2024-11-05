@@ -125,7 +125,9 @@
           }
 
           img {
-            display: none;
+            width: 350px;
+            height: 200px;
+            object-fit: cover;
           }
 
           &.collapsed {

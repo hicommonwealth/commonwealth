@@ -1,0 +1,88 @@
+.thread-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.7);
+  z-index: 1000;
+
+  .modal-overlay {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background: transparent;
+  }
+
+  .modal-content {
+    position: relative;
+    display: flex;
+    width: 80%;
+    height: 80%;
+    max-width: 1200px;
+    max-height: 90vh;
+    background-color: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+
+    .modal-left {
+      position: relative;
+      width: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #f4f4f4;
+
+      .close-btn {
+        position: absolute;
+        top: 16px;
+        left: 16px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: #f4f4f4;
+        z-index: 1;
+      }
+
+      .modal-image {
+        width: 100%;
+        height: auto;
+        object-fit: cover;
+      }
+
+      .nav-btn {
+        position: absolute;
+        background: rgba(0, 0, 0, 0.5);
+        color: #fff;
+        border: none;
+        padding: 8px 6px;
+        cursor: pointer;
+        z-index: 2;
+        border-radius: 8px;
+
+        &.prev-btn {
+          left: 10px;
+        }
+
+        &.next-btn {
+          right: 10px;
+        }
+
+        &:hover {
+          background: rgba(0, 0, 0, 0.7);
+        }
+      }
+    }
+
+    .modal-right {
+      width: 50%;
+      padding: 20px;
+      overflow-y: auto;
+    }
+  }
+}
