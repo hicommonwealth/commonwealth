@@ -39,14 +39,21 @@
       background-color: #f4f4f4;
 
       .close-btn {
+        width: 35px;
+        height: 35px;
         position: absolute;
+        background: rgba(0, 0, 0, 0.5);
         top: 16px;
         left: 16px;
-        background: none;
         border: none;
         cursor: pointer;
-        color: #f4f4f4;
+        color: #fff;
         z-index: 1;
+        padding: 8px 6px;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
       }
 
       .modal-image {
