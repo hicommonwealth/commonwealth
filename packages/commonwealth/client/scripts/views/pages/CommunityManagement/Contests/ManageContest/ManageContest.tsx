@@ -1,5 +1,4 @@
 import { commonProtocol } from '@hicommonwealth/shared';
-import { useFlag } from 'hooks/useFlag';
 import React, { useState } from 'react';
 import app from 'state';
 import { useTokenMetadataQuery } from 'state/api/tokens';
@@ -24,7 +23,6 @@ const ManageContest = ({ contestAddress }: ManageContestProps) => {
   const [launchContestStep, setLaunchContestStep] =
     useState<LaunchContestStep>('DetailsForm');
   const [createdContestAddress, setCreatedContestAddress] = useState('');
-  const weightedTopicsEnabled = useFlag('weightedTopics');
 
   const user = useUserStore();
 
@@ -32,7 +30,6 @@ const ManageContest = ({ contestAddress }: ManageContestProps) => {
     setContestFormData,
     contestFormData,
     isContestDataLoading,
-    stakeEnabled,
     contestNotFound,
   } = useManageContestForm({
     contestAddress,
@@ -47,7 +44,6 @@ const ManageContest = ({ contestAddress }: ManageContestProps) => {
 
   if (
     !user.isLoggedIn ||
-    (weightedTopicsEnabled ? false : !stakeEnabled) ||
     !(Permissions.isSiteAdmin() || Permissions.isCommunityAdmin()) ||
     contestNotFound
   ) {

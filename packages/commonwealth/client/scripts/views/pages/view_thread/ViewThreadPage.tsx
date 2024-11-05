@@ -150,7 +150,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   const { contestsData } = useCommunityContests();
   const isTopicInContest = checkIsTopicInContest(
-    contestsData,
+    contestsData.all,
     thread?.topic?.id,
   );
 

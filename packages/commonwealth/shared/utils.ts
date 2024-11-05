@@ -66,6 +66,7 @@ export function formatAddressShort(
   includeEllipsis?: boolean,
   maxCharLength?: number,
   prefix?: string,
+  firstAndLastDigit?: boolean,
 ) {
   if (!address) return;
   if (chain === 'near') {
@@ -77,6 +78,8 @@ export function formatAddressShort(
       totalLength - 4,
       totalLength,
     )}`;
+  } else if (firstAndLastDigit) {
+    return `${address.slice(0, 4)}...${address.slice(-2)}`;
   } else {
     return `${address.slice(0, maxCharLength || 5)}${
       includeEllipsis ? '…' : ''

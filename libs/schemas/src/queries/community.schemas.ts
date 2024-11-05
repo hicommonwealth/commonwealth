@@ -1,6 +1,7 @@
 import {
   ChainBase,
   ChainNetwork,
+  CommunityType,
   MAX_SCHEMA_INT,
   MIN_SCHEMA_INT,
 } from '@hicommonwealth/shared';
@@ -32,6 +33,9 @@ export const GetCommunities = {
       ),
     network: z.nativeEnum(ChainNetwork).optional(),
     base: z.nativeEnum(ChainBase).optional(),
+    eth_chain_id: z.number().optional(),
+    cosmos_chain_id: z.string().optional(),
+    community_type: z.nativeEnum(CommunityType).optional(),
     // NOTE 8/7/24: passing arrays in GET requests directly is not supported.
     //    Instead we support comma-separated strings of ids.
     tag_ids: z
@@ -48,11 +52,14 @@ export const GetCommunities = {
     include_last_30_day_thread_count: z.boolean().optional(),
     order_by: z
       .enum([
+        'created_at',
         'profile_count',
         'lifetime_thread_count',
         'last_30_day_thread_count',
+        // TODO: https://github.com/hicommonwealth/commonwealth/issues/9694 add price and market cap options
       ])
       .optional(),
+    order_direction: z.enum(['ASC', 'DESC']).optional(),
   }).refine(
     (data) => {
       // order_by can't be 'last_30_day_thread_count' if 'include_last_30_day_thread_count' is falsy

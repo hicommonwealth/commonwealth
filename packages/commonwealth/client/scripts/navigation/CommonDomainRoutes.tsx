@@ -78,9 +78,7 @@ const CommunityIntegrations = lazy(
 const CommunityStakeIntegration = lazy(
   () => import('views/pages/CommunityManagement/StakeIntegration'),
 );
-const CommunityTopicsOld = lazy(
-  () => import('views/pages/CommunityManagement/Topics/TopicsOld'),
-);
+
 const CommunityTopics = lazy(
   () => import('views/pages/CommunityManagement/Topics'),
 );
@@ -117,7 +115,6 @@ const CommunityNotFoundPage = lazy(
 );
 
 const CommonDomainRoutes = ({
-  weightedTopicsEnabled,
   tokenizedCommunityEnabled,
 }: RouteFeatureFlags) => [
   <Route
@@ -405,12 +402,9 @@ const CommonDomainRoutes = ({
   <Route
     key="/:scope/manage/topics"
     path="/:scope/manage/topics"
-    element={withLayout(
-      weightedTopicsEnabled ? CommunityTopics : CommunityTopicsOld,
-      {
-        scoped: true,
-      },
-    )}
+    element={withLayout(CommunityTopics, {
+      scoped: true,
+    })}
   />,
   <Route
     key="/:scope/manage/moderators"
