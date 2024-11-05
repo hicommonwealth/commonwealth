@@ -84,8 +84,6 @@ const DetailsFormStep = ({
     useState(false);
 
   const {
-    allTopicsToggled,
-    handleToggleAllTopics,
     toggledTopicList,
     handleToggleTopic,
     sortedTopics,
@@ -537,14 +535,14 @@ const DetailsFormStep = ({
                   <div className="contest-section contest-section-topics">
                     <CWText type="h4">Included topics</CWText>
                     <CWText type="b1">
-                      Select which topics you would like to include in this
-                      contest. Only threads posted to these topics will be
+                      Select which topic you would like to include in this
+                      contest. Only threads posted to this topic will be
                       eligible for the contest prizes.
                     </CWText>
 
                     <CWText type="b1">
                       Community members are limited to 2 entries per contest
-                      round. Keep this in mind when selecting your topics.
+                      round. Keep this in mind when selecting your topic.
                     </CWText>
 
                     <div className="topics-list">
@@ -567,15 +565,6 @@ const DetailsFormStep = ({
                             />
                           </div>
                         ))}
-                      <div className="list-footer">
-                        <CWText>All</CWText>
-                        <CWToggle
-                          disabled={editMode}
-                          checked={allTopicsToggled}
-                          size="small"
-                          onChange={handleToggleAllTopics}
-                        />
-                      </div>
                       <MessageRow
                         hasFeedback={topicsEnabledError}
                         validationStatus="failure"

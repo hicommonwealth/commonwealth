@@ -192,7 +192,7 @@ describe('Contests metadata commands lifecycle', () => {
             interval,
             ticker,
             decimals,
-            topic_ids: topics.map((t) => t.id!),
+            topic_ids: [topics[0].id!],
           },
         },
       );
@@ -214,14 +214,6 @@ describe('Contests metadata commands lifecycle', () => {
       expect(createResult!.contest_managers![0].topics![0]).to.deep.contain({
         id: topics[0].id,
         name: topics[0].name,
-      });
-      expect(createResult!.contest_managers![0].topics![1]).to.deep.contain({
-        id: topics[1].id,
-        name: topics[1].name,
-      });
-      expect(createResult!.contest_managers![0].topics![2]).to.deep.contain({
-        id: topics[2].id,
-        name: topics[2].name,
       });
     });
   });
@@ -316,15 +308,14 @@ describe('Contests metadata commands lifecycle', () => {
             payload: {
               id: community_id,
               contest_address,
-              topic_ids: [topics[0]!.id!, topics[1]!.id!],
+              topic_ids: [topics[0]!.id!],
             },
           },
         );
         const metadata = updateResult?.contest_managers![0];
-        expect(metadata!.topics).to.have.length(2);
+        expect(metadata!.topics).to.have.length(1);
         const resultTopicIds = metadata!.topics!.map((t) => t.id);
         expect(resultTopicIds).to.contain(topics[0]!.id!);
-        expect(resultTopicIds).to.contain(topics[1]!.id!);
       }
 
       {

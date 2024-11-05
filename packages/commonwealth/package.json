@@ -73,6 +73,7 @@
   },
   "dependencies": {
     "@apollo/client": "^3.3.18",
+    "@atomone/govgen-types-long": "^0.3.9",
     "@brillout/import": "^0.2.2",
     "@canvas-js/chain-cosmos": "0.10.0-beta.3",
     "@canvas-js/chain-ethereum": "0.10.0-beta.3",
@@ -84,6 +85,7 @@
     "@cosmjs/cosmwasm-stargate": "^0.31.3",
     "@cosmjs/crypto": "0.31.3",
     "@cosmjs/encoding": "0.32.3",
+    "@cosmjs/math": "^0.31.3",
     "@cosmjs/proto-signing": "^0.31.3",
     "@cosmjs/stargate": "^0.31.3",
     "@cosmjs/tendermint-rpc": "^0.31.3",

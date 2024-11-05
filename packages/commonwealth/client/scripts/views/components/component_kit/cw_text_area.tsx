@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import 'components/component_kit/cw_text_area.scss';
 
 import { useFormContext } from 'react-hook-form';
-import { CWText } from 'views/components/component_kit/cw_text';
+import { CWLabel } from './cw_label';
 import type { BaseTextInputProps } from './cw_text_input';
 import { MessageRow, useTextInputWithValidation } from './cw_text_input';
 import type { ValidationStatus } from './cw_validation_text';
@@ -164,9 +164,7 @@ export const CWTextArea = (props: TextAreaProps) => {
       )}
       {charCount && (
         <div className="character-count">
-          <CWText type="caption">
-            Character count: {characterCount}/{charCount}
-          </CWText>
+          <CWLabel label={`Character count: ${characterCount}/${charCount}`} />
         </div>
       )}
     </div>

@@ -39,6 +39,7 @@ export function CreateContestManagerMetadata(): Command<
         }
         contestTopics = topics.map((t) => t.get({ plain: true }));
         contestTopicsToCreate = topics.map((t) => ({
+          weighted_voting: schemas.TopicWeightedVoting.Stake,
           contest_address: rest.contest_address,
           topic_id: t.id!,
           created_at: new Date(),

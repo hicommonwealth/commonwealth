@@ -1,3 +1,4 @@
+import { TopicWeightedVoting } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize';
 import type { CommunityAttributes } from './community';
 import type { ThreadAttributes } from './thread';
@@ -18,6 +19,12 @@ export type TopicAttributes = {
   default_offchain_template?: string;
   group_ids?: number[];
   telegram?: string;
+
+  weighted_voting?: TopicWeightedVoting;
+  chain_node_id?: number;
+  token_address?: string;
+  token_symbol?: string;
+  vote_weight_multiplier?: number;
 
   // associations
   community?: CommunityAttributes;
@@ -63,6 +70,19 @@ export default (
         defaultValue: [],
       },
       telegram: { type: Sequelize.STRING, allowNull: true },
+      weighted_voting: { type: Sequelize.STRING, allowNull: true },
+      chain_node_id: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+        references: {
+          model: 'ChainNodes',
+          key: 'id',
+        },
+        onUpdate: 'CASCADE',
+      },
+      token_address: { type: Sequelize.STRING, allowNull: true },
+      token_symbol: { type: Sequelize.STRING, allowNull: true },
+      vote_weight_multiplier: { type: Sequelize.INTEGER, allowNull: true },
     },
     {
       timestamps: true,

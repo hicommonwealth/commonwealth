@@ -41,6 +41,9 @@ export default defineConfig(({ mode }) => {
     'process.env.FLAG_FARCASTER_CONTEST': JSON.stringify(
       env.FLAG_FARCASTER_CONTEST,
     ),
+    'process.env.FLAG_TOKENIZED_COMMUNITY': JSON.stringify(
+      env.FLAG_TOKENIZED_COMMUNITY,
+    ),
   };
 
   const config = {
