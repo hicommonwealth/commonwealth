@@ -165,12 +165,12 @@ module.exports = {
     });
     const launchpadHash = hashInstance.hash(namespaceAbi);
 
-    const node = queryInterface.sequelize.query(`
+    const node = await queryInterface.sequelize.query(`
         SELECT id FROM "ChainNodes"
         WHERE id = 1399;
     `);
 
-    if (!node) {
+    if (node[0].length === 0) {
       return;
     }
 
@@ -199,6 +199,7 @@ module.exports = {
             DROP COLUMN author_address,
             DROP COLUMN launchpad_contract_address,
             DROP COLUMN uniswap_pool_address,
+            DROP COLUMN community_id,
             DROP CONSTRAINT "Tokens_pkey";
         `,
         { transaction: t },
