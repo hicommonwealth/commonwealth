@@ -266,6 +266,7 @@ export class Thread implements IUniqueId {
   public associatedContests?: AssociatedContest[];
   public recentComments?: Comment<IUniqueId>[];
   public reactionWeightsSum: string;
+  public reactionCount: number;
   public links: Link[];
   public readonly discord_meta: any;
   public readonly latestActivity: Moment;
@@ -413,7 +414,7 @@ export class Thread implements IUniqueId {
     this.links = links || [];
     this.discord_meta = discord_meta;
     this.versionHistory = ThreadVersionHistories;
-    this.reactionWeightsSum = reaction_weights_sum;
+    this.reactionWeightsSum = reaction_weights_sum ?? '';
     this.associatedReactions =
       associatedReactions ??
       processAssociatedReactions(
