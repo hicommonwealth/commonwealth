@@ -27,7 +27,7 @@ export const LaunchpadTokenCreated = z.tuple([
 
 export const LaunchpadTrade = z.tuple([
   EVM_ADDRESS.describe('trader'),
-  EVM_ADDRESS.describe('namespace'),
+  EVM_ADDRESS.describe('tokenAddress'), // The contract definition is incorrect (confirmed with Ian)
   z.boolean().describe('isBuy'),
   ETHERS_BIG_NUMBER.describe('communityTokenAmount'),
   ETHERS_BIG_NUMBER.describe('ethAmount'),

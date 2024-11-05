@@ -4,10 +4,12 @@ import {
   communityStakeTradeEventSignature,
   deployedNamespaceEventSignature,
   launchpadTokenLaunchedEventSignature,
+  launchpadTradeEventSignature,
   models,
 } from '@hicommonwealth/model';
 import { ZodUndefined } from 'zod';
 import { handleCommunityStakeTrades } from './handleCommunityStakeTrades';
+import { handleLaunchpadTrade } from './handleLaunchpadTrade';
 
 const log = logger(import.meta);
 
@@ -30,6 +32,10 @@ export const processChainEventCreated: EventHandler<
     payload.eventSource.eventSignature === deployedNamespaceEventSignature
   ) {
     log.info('Implementation not defined', { payload });
+  } else if (
+    payload.eventSource.eventSignature === launchpadTradeEventSignature
+  ) {
+    await handleLaunchpadTrade(payload);
   } else {
     log.error('Attempted to process an unsupported chain-event', undefined, {
       event: payload,
