@@ -45,20 +45,21 @@ export async function handleLaunchpadTrade(
     },
   });
 
+  if (!trade) {
+    const web3 = new Web3(chainNode.private_url! || chainNode.url!);
+    const block = await web3.eth.getBlock(event.rawLog.blockHash);
+
+    await models.LaunchpadTrade.create({
+      eth_chain_id: chainNode.eth_chain_id!,
+      transaction_hash: event.rawLog.transactionHash,
+      token_address: tokenAddress,
+      trader_address: traderAddress,
+      is_buy: isBuy,
+      community_token_amount: BigNumber.from(communityTokenAmount).toBigInt(),
+      floating_supply: BigNumber.from(floatingSupply).toBigInt(),
+      timestamp: Number(block.timestamp),
+    });
+  }
+
   // TODO: check that liquidity has been transferred if above threshold
-  if (trade) return;
-
-  const web3 = new Web3(chainNode.private_url! || chainNode.url!);
-  const block = await web3.eth.getBlock(event.rawLog.blockHash);
-
-  await models.LaunchpadTrade.create({
-    eth_chain_id: chainNode.eth_chain_id!,
-    transaction_hash: event.rawLog.transactionHash,
-    token_address: tokenAddress,
-    trader_address: traderAddress,
-    is_buy: isBuy,
-    community_token_amount: BigNumber.from(communityTokenAmount).toBigInt(),
-    floating_supply: BigNumber.from(floatingSupply).toBigInt(),
-    timestamp: Number(block.timestamp),
-  });
 }
