@@ -6,6 +6,7 @@ import app from 'state';
 import { addressSwapper } from 'utils';
 import { CWButton } from '../new_designs/CWButton';
 import { CWModalBody, CWModalHeader } from '../new_designs/CWModal';
+import { CWRadioButton } from '../new_designs/cw_radio_button';
 import './AccountSelector.scss';
 
 type LinkAccountItemProps = {
@@ -46,7 +47,15 @@ const LinkAccountItem = ({
   return (
     <div className="account-item account-item-emphasized">
       <div className="account-item-left" onClick={() => onToggle(idx)}>
-        <input type="radio" checked={isChecked} />
+        <CWRadioButton
+          groupName="account-selection"
+          value={capitalizedBaseName}
+          checked={isChecked}
+          onChange={() => onToggle(idx)}
+          label={null}
+          hideLabels={true}
+          className="margin-right-10"
+        />
         <div>
           <div className="account-item-name">{capitalizedBaseName}</div>
           <div className="account-item-address">{formattedAddress}</div>

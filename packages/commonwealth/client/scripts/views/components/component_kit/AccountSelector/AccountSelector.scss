@@ -26,57 +26,6 @@
       display: flex;
       align-items: center;
       gap: 8px;
-
-      input[type='radio'] {
-        appearance: none;
-        width: 18px;
-        height: 18px;
-        border: 0.5px solid $neutral-500;
-        border-radius: 50%;
-        position: relative;
-        cursor: pointer;
-        outline: none;
-        background-color: transparent;
-
-        &:checked {
-          background-color: $primary-500;
-          border: 1px solid $primary-500;
-        }
-
-        &::before {
-          content: '';
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          width: 16px;
-          height: 16px;
-          background-color: white;
-          border-radius: 50%;
-          opacity: 0;
-        }
-
-        &:checked::before {
-          opacity: 1;
-        }
-
-        &::after {
-          content: '';
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          width: 10px;
-          height: 10px;
-          background-color: $primary-500;
-          border-radius: 50%;
-          opacity: 0;
-        }
-
-        &:checked::after {
-          opacity: 1;
-        }
-      }
     }
 
     .account-item-name {
