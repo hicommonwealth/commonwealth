@@ -73,10 +73,11 @@ describe('Model schema', () => {
       //console.log(model.columns, migration.columns);
       expect(model.columns).deep.equals(migration.columns);
 
-      // model.table_name === 'Topics' &&
+      // ['Quests', 'Addresses'].includes(model.table_name) &&
       //   console.log(
-      //     [...model.constraints.values()],
-      //     [...migration.constraints.values()],
+      //     { model, migration },
+      //     //[...model.constraints.values()],
+      //     //[...migration.constraints.values()],
       //   );
       expect([...model.constraints.values()]).deep.equals([
         ...migration.constraints.values(),

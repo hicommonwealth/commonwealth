@@ -1,10 +1,11 @@
 import { Actor, command, dispose } from '@hicommonwealth/core';
+import { config } from '@hicommonwealth/model';
 import { BalanceType, commonProtocol } from '@hicommonwealth/shared';
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { bootstrap_testing, seed } from 'model/src/tester';
 import { afterAll, beforeAll, describe, test } from 'vitest';
-import { ChainNodeAttributes } from '../../src/index';
+import { ChainNodeAttributes } from '../../src';
 import { CreateToken } from '../../src/token';
 
 chai.use(chaiAsPromised);
@@ -18,8 +19,8 @@ describe('Launchpad', () => {
   beforeAll(async () => {
     await bootstrap_testing(true);
     [node] = (await seed('ChainNode', {
-      url: 'https://base-sepolia-rpc.publicnode.com',
-      private_url: 'https://base-sepolia-rpc.publicnode.com',
+      url: `https://base-sepolia.g.alchemy.com/v2/${config.ALCHEMY.APP_KEYS.PUBLIC}`,
+      private_url: `https://base-sepolia.g.alchemy.com/v2/${config.ALCHEMY.APP_KEYS.PUBLIC}`,
       name: 'Base Sepolia Testnet',
       eth_chain_id: commonProtocol.ValidChains.SepoliaBase,
       balance_type: BalanceType.Ethereum,
@@ -65,7 +66,7 @@ describe('Launchpad', () => {
 
   test(
     'Create Token works given txHash and chainNodeId',
-    { timeout: 10_0000000 },
+    { timeout: 10_000 },
     async () => {
       payload = {
         transaction_hash:

@@ -35,10 +35,6 @@ export const EvmEventSignatures = {
   CommunityStake: {
     Trade: '0xfc13c9a8a9a619ac78b803aecb26abdd009182411d51a986090f82519d88a89e',
   },
-  Launchpad: {
-    TokenLaunched:
-      '0xd7ca5dc2f8c6bb37c3a4de2a81499b25f8ca8bbb3082010244fe747077d0f6cc',
-  },
 } as const;
 
 type Values<T> = T[keyof T];
@@ -259,14 +255,6 @@ export const EvmEventAbis = {
       internalType: 'uint256',
     },
   ] as const,
-  [EvmEventSignatures.Launchpad.TokenLaunched]: [
-    {
-      name: 'token',
-      type: 'address',
-      indexed: false,
-      internalType: 'address',
-    },
-  ] as const,
 };
 
 type AbiTypeToTS<T> = T extends 'address'
@@ -411,7 +399,7 @@ const SingleContestContentUpvotedMapper: EvmMapper<
   }),
 };
 
-const EvmMappers: { [key: string]: unknown } = {
+const EvmMappers = {
   [EvmEventSignatures.NamespaceFactory.NamespaceDeployed]: null,
   [EvmEventSignatures.CommunityStake.Trade]: null,
   [RecurringContestManagerDeployedMapper.signature]: [

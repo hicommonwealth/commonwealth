@@ -36,9 +36,6 @@ export enum EventNames {
   FarcasterReplyCastCreated = 'FarcasterReplyCastCreated',
   FarcasterVoteCreated = 'FarcasterVoteCreated',
 
-  // Launchpad
-  LaunchpadTokenLaunched = 'TokenLaunched',
-
   // Preferences
   SubscriptionPreferencesUpdated = 'SubscriptionPreferencesUpdated',
 }

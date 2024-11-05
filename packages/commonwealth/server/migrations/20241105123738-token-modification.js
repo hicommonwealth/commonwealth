@@ -165,8 +165,16 @@ module.exports = {
     });
     const launchpadHash = hashInstance.hash(namespaceAbi);
 
+    const node = await queryInterface.sequelize.query(`
+        SELECT id FROM "ChainNodes"
+        WHERE id = 1399;
+    `);
+
+    if (node[0].length === 0) {
+      return;
+    }
+
     return queryInterface.sequelize.transaction(async (t) => {
-      await queryInterface.dropTable('Tokens', { transaction: t });
       await queryInterface.changeColumn(
         'Communities',
         'namespace',
@@ -177,37 +185,24 @@ module.exports = {
         },
         { transaction: t },
       );
-      await queryInterface.createTable(
-        'Tokens',
-        {
-          // derived from event
-          token_address: { type: Sequelize.STRING, primaryKey: true },
-          namespace: {
-            type: Sequelize.STRING,
-            references: {
-              model: 'Communities',
-              key: 'namespace',
-            },
-          },
-          name: { type: Sequelize.STRING },
-          symbol: { type: Sequelize.STRING },
-          initial_supply: { type: Sequelize.DECIMAL(78, 0) },
 
-          // platform related
-          description: { type: Sequelize.STRING, allowNull: true },
-          icon_url: { type: Sequelize.STRING, allowNull: true },
-          is_locked: {
-            type: Sequelize.BOOLEAN,
-            allowNull: false,
-            defaultValue: false,
-          },
-          created_at: { type: Sequelize.DATE, allowNull: false },
-          updated_at: { type: Sequelize.DATE, allowNull: false },
-        },
-        {
-          timestamps: true,
-          transactions: t,
-        },
+      await queryInterface.sequelize.query(
+        `
+            ALTER TABLE "Tokens"
+            ADD COLUMN token_address VARCHAR PRIMARY KEY,
+            ADD COLUMN namespace VARCHAR,
+            ADD CONSTRAINT fk_namespace FOREIGN KEY (namespace) REFERENCES "Communities"(namespace),
+            ADD COLUMN initial_supply DECIMAL(78, 0),
+            ADD COLUMN is_locked BOOLEAN NOT NULL DEFAULT false,
+            DROP COLUMN chain_node_id,
+            DROP COLUMN base,
+            DROP COLUMN author_address,
+            DROP COLUMN launchpad_contract_address,
+            DROP COLUMN uniswap_pool_address,
+            DROP COLUMN community_id,
+            DROP CONSTRAINT "Tokens_pkey";
+        `,
+        { transaction: t },
       );
       const contract = await queryInterface.sequelize.query(
         `

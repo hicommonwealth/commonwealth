@@ -85,7 +85,6 @@ export function getRabbitMQConfig(
       RascalBindings.ContestProjection,
       RascalBindings.FarcasterWorkerPolicy,
       RascalBindings.DiscordBotPolicy,
-      RascalBindings.LaunchpadPolicy,
     ]);
     copyConfigs(allPublications, vhostConfig.publications, [
       RascalPublications.MessageRelayer,

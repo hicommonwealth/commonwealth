@@ -68,7 +68,7 @@ export function GetThreads(): Query<typeof schemas.GetThreads> {
       };
 
       const responseThreadsQuery = models.sequelize.query<
-        z.infer<typeof schemas.MappedThread>
+        z.infer<typeof schemas.ThreadView>
       >(
         `
             WITH contest_ids as (
@@ -154,14 +154,14 @@ export function GetThreads(): Query<typeof schemas.GetThreads> {
                 TT.id as thread_id,
                 json_agg(json_strip_nulls(json_build_object(
                 'id', R.id,
-                'type', R.reaction,
-                'address', A.address,
+                'reaction', R.reaction,
                 'updated_at', R.updated_at::text,
-                'voting_weight', R.calculated_voting_weight,
+                'calculated_voting_weight', R.calculated_voting_weight,
                 'profile_name', U.profile->>'name',
                 'avatar_url', U.profile->>'avatar_url',
+                'address', A.address,
                 'last_active', A.last_active::text
-            ))) as "associatedReactions"
+            ))) as "reactions"
             FROM "Reactions" R JOIN top_threads TT ON TT.id = R.thread_id
             JOIN "Addresses" A ON A.id = R.address_id
             JOIN "Users" U ON U.id = A.user_id
@@ -199,7 +199,7 @@ export function GetThreads(): Query<typeof schemas.GetThreads> {
                   json_agg(json_strip_nulls(json_build_object(
                   'id', COM.id,
                   'address', A.address,
-                  'text', COM.text,
+                  'body', COM.body,
                   'created_at', COM.created_at::text,
                   'updated_at', COM.updated_at::text,
                   'deleted_at', COM.deleted_at::text,

@@ -445,22 +445,25 @@ export const QuickTokenLaunchForm = ({
                     placement="bottom"
                     content={`You can only generate a max of ${MAX_IDEAS_LIMIT} ideas.`}
                     renderTrigger={(handleInteraction) => (
-                      <CWButton
-                        iconLeft="brain"
-                        label="Randomize"
-                        containerClassName="ml-auto"
-                        type="button"
-                        disabled={
-                          isProcessingProfileImage ||
-                          isCreatingQuickToken ||
-                          isMaxTokenIdeaLimitReached
-                        }
-                        onClick={() => {
-                          generateIdea().catch(console.error);
-                        }}
+                      <div
                         onMouseEnter={handleInteraction}
                         onMouseLeave={handleInteraction}
-                      />
+                      >
+                        <CWButton
+                          iconLeft="brain"
+                          label="Randomize"
+                          containerClassName="ml-auto"
+                          type="button"
+                          disabled={
+                            isProcessingProfileImage ||
+                            isCreatingQuickToken ||
+                            isMaxTokenIdeaLimitReached
+                          }
+                          onClick={() => {
+                            generateIdea().catch(console.error);
+                          }}
+                        />
+                      </div>
                     )}
                   />
                 ) : (
