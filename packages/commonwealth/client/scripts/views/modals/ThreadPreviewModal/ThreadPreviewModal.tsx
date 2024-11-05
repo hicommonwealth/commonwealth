@@ -83,6 +83,13 @@ const FeedThread: React.FC<FeedThreadProps> = ({ thread }) => {
       canReact={!disabledActionsTooltipText}
       canComment={!disabledCommentActionTooltipText}
       canUpdateThread={false} // we dont want user to update thread from here, even if they have permissions
+      onStageTagClick={() => {
+        navigate(
+          `${
+            domain?.isCustomDomain ? '' : `/${thread.communityId}`
+          }/discussions?stage=${thread.stage}`,
+        );
+      }}
       threadHref={discussionLink}
       onCommentBtnClick={() => navigate(`${discussionLink}?focusComments=true`)}
       disabledActionsTooltipText={
@@ -107,6 +114,7 @@ type FeedThreadPreviewProps = {
   images: string[];
 };
 
+// eslint-disable-next-line react/no-multi-comp
 const ThreadPreviewModal: React.FC<FeedThreadPreviewProps> = ({
   isThreadModalOpen,
   onClose,

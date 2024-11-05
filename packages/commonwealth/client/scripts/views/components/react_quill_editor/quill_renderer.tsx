@@ -119,6 +119,7 @@ export const QuillRenderer = ({
     markdownCutoffLength,
     customClass,
     customShowMoreButton,
+    onImageClick,
   ]);
 
   if (containerClass) {
