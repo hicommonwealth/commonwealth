@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 
 import AddressInfo from 'models/AddressInfo';
+import { openConfirmation } from 'views/modals/confirmation_modal';
 import { CreateTopicStep } from 'views/pages/CommunityManagement/Topics/utils';
 import EnableStake from './EnableStake';
 import SignStakeTransactions from './SignStakeTransactions';
@@ -71,6 +72,38 @@ const CommunityStakeStep = ({
     isTopicFlow ? setEnableStakePage(true) : goToSuccessStep();
   };
 
+  const handleLaunchStakeSuccess = () => {
+    return onSuccessSignTransactions();
+  };
+
+  const handleReserveNamespaceSuccess = () => {
+    return onlyNamespace ? onSuccessSignTransactions() : undefined;
+  };
+
+  const handleCancelSignStakeTransactions = () => {
+    isTopicFlow
+      ? onCancelSignTransactions()
+      : openConfirmation({
+          title: 'Are you sure you want to cancel?',
+          description: onlyNamespace
+            ? 'Namespace has not been enabled for your community yet'
+            : 'Community Stake has not been enabled for your community yet',
+          buttons: [
+            {
+              label: 'Cancel',
+              buttonType: 'destructive',
+              buttonHeight: 'sm',
+              onClick: onCancelSignTransactions,
+            },
+            {
+              label: 'Continue',
+              buttonType: 'primary',
+              buttonHeight: 'sm',
+            },
+          ],
+        });
+  };
+
   return (
     <div className="CommunityStakeStep">
       {enableStakePage ? (
@@ -89,15 +122,18 @@ const CommunityStakeStep = ({
         />
       ) : (
         <SignStakeTransactions
-          onSuccess={onSuccessSignTransactions}
-          onCancel={onCancelSignTransactions}
           communityStakeData={communityStakeData}
           selectedAddress={selectedAddress}
           createdCommunityId={createdCommunityId}
           chainId={chainId}
-          isTopicFlow={isTopicFlow}
           onlyNamespace={onlyNamespace}
           hasNamespaceReserved={hasNamespaceReserved}
+          onLaunchStakeSuccess={handleLaunchStakeSuccess}
+          onReserveNamespaceSuccess={handleReserveNamespaceSuccess}
+          backButton={{
+            label: isTopicFlow ? 'Back' : 'Cancel',
+            action: handleCancelSignStakeTransactions,
+          }}
         />
       )}
     </div>
