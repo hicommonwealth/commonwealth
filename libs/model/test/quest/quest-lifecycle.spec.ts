@@ -7,7 +7,7 @@ import {
 import { Chance } from 'chance';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { z } from 'zod';
-import { CreateQuest, UpdateQuest } from '../../src/quest';
+import { CreateQuest, GetQuest, UpdateQuest } from '../../src/quest';
 import { seedCommunity } from '../utils/community-seeder';
 
 const chance = new Chance();
@@ -189,6 +189,29 @@ describe('Quest lifecycle', () => {
       ).rejects.toThrowError(
         `Cannot update quest "${quest!.name}" because it has already started`,
       );
+    });
+  });
+
+  describe('query', () => {
+    it('should get a quest', async () => {
+      const quest = await command(CreateQuest(), {
+        actor: admin,
+        payload: {
+          community_id,
+          name: chance.name(),
+          description: chance.sentence(),
+          start_date: new Date(new Date().getTime() + 1000 * 60 * 60 * 24),
+          end_date: new Date(new Date().getTime() + 1000 * 60 * 60 * 24 * 2),
+        },
+      });
+      const retrieved = await command(GetQuest(), {
+        actor: admin,
+        payload: {
+          community_id,
+          quest_id: quest!.id!,
+        },
+      });
+      expect(retrieved).toMatchObject(quest!);
     });
   });
 });
