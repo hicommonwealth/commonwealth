@@ -187,7 +187,6 @@ module.exports = {
             ALTER TABLE "Tokens"
             ADD COLUMN token_address VARCHAR(255) PRIMARY KEY,
             ADD COLUMN namespace VARCHAR(255) NOT NULL,
-            ADD CONSTRAINT fk_namespace FOREIGN KEY (namespace) REFERENCES "Communities"(namespace),
             ADD COLUMN initial_supply DECIMAL(78, 0) NOT NULL,
             ADD COLUMN is_locked BOOLEAN NOT NULL DEFAULT false,
             DROP COLUMN chain_node_id,
