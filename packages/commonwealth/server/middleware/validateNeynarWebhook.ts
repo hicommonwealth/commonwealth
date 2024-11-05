@@ -3,10 +3,11 @@ import { createHmac } from 'crypto';
 import { Op } from 'sequelize';
 
 export function validateNeynarWebhook(
-  webhookSecret: string | null | undefined,
+  _webhookSecret: string | null | undefined,
 ) {
   return async (req, _, next) => {
-    console.log(req.body);
+    let webhookSecret = _webhookSecret;
+
     if (!webhookSecret) {
       const { parent_hash } = req.body.data;
       if (!parent_hash) {
