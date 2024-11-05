@@ -185,8 +185,8 @@ module.exports = {
       await queryInterface.sequelize.query(
         `
             ALTER TABLE "Tokens"
-            ADD COLUMN token_address VARCHAR PRIMARY KEY,
-            ADD COLUMN namespace VARCHAR,
+            ADD COLUMN token_address VARCHAR(255) PRIMARY KEY,
+            ADD COLUMN namespace VARCHAR(255),
             ADD CONSTRAINT fk_namespace FOREIGN KEY (namespace) REFERENCES "Communities"(namespace),
             ADD COLUMN initial_supply DECIMAL(78, 0),
             ADD COLUMN is_locked BOOLEAN NOT NULL DEFAULT false,
