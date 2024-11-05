@@ -147,8 +147,7 @@ export async function getThreadContestManagers(
         SELECT cm.contest_address, cm.cancelled, cm.ended
         FROM "Communities" c
                  JOIN "ContestManagers" cm ON cm.community_id = c.id
-                 JOIN "ContestTopics" ct ON cm.contest_address = ct.contest_address
-        WHERE ct.topic_id = :topic_id
+        WHERE cm.topic_id = :topic_id
           AND cm.community_id = :community_id
           AND cm.cancelled IS NOT TRUE
           AND cm.ended IS NOT TRUE

@@ -31,8 +31,8 @@ SELECT
 						AND ca.created_at > co.start_time
 						AND ca.created_at < co.end_time), '[]'::jsonb) -- Use an empty array as fallback if no actions are found
 ))
-	FROM "ContestTopics" ct
-	LEFT JOIN "ContestManagers" cm ON cm.contest_address = ct.contest_address
+	FROM "Topics" t
+	LEFT JOIN "ContestManagers" cm ON cm.topic_id = t.id
 	JOIN (
 		-- Subquery to get the max contest_id, start_time, and end_time for each contest address
 		SELECT
@@ -45,7 +45,7 @@ SELECT
 		GROUP BY
 			contest_address) co ON cm.contest_address = co.contest_address
 		WHERE
-			ct.topic_id = td.id
+			t.id = td.id
 			AND cm.community_id = :community_id
 			AND COALESCE(cm.cancelled, FALSE) = FALSE -- Exclude cancelled managers
 			AND (cm.interval = 0

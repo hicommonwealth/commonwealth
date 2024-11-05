@@ -154,8 +154,9 @@ const SignTransactionsStep = ({
           : 0,
         payout_structure: contestFormData?.payoutStructure,
         interval: isContestRecurring ? contestInterval! : 0,
-        topic_ids: [contestFormData?.contestTopic?.value as number],
+        topic_id: contestFormData?.contestTopic?.value as number,
         ticker: fundingTokenTicker,
+        is_farcaster_contest: contestFormData.isFarcasterContest,
         decimals: fundingTokenDecimals,
       });
 

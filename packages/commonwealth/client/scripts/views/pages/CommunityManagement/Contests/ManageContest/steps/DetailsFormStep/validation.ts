@@ -1,7 +1,14 @@
 import { TopicWeightedVoting } from '@hicommonwealth/schemas';
+import { OpenFeature } from '@openfeature/web-sdk';
 import { VALIDATION_MESSAGES } from 'helpers/formValidations/messages';
 import { ContestFeeType } from 'views/pages/CommunityManagement/Contests/ManageContest/types';
 import z from 'zod';
+
+const client = OpenFeature.getClient();
+const farcasterContestEnabled = client.getBooleanValue(
+  'farcasterContest',
+  false,
+);
 
 export const detailsFormValidationSchema = z.object({
   contestName: z
@@ -18,7 +25,7 @@ export const detailsFormValidationSchema = z.object({
       weightedVoting: z.nativeEnum(TopicWeightedVoting).optional().nullish(),
     })
     .optional()
-    .refine((value) => !!value, {
+    .refine((value) => (farcasterContestEnabled ? true : !!value), {
       message: 'You must select a topic',
     }),
   feeType: z.enum([
@@ -27,4 +34,5 @@ export const detailsFormValidationSchema = z.object({
   ]),
   contestRecurring: z.string(),
   fundingTokenAddress: z.string().optional().nullable(),
+  isFarcasterContest: z.boolean().default(false),
 });
