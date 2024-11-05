@@ -91,7 +91,6 @@ export const ContestManager = z
       .describe(
         'Flags when the one-off contest has ended and rollover was completed',
       ),
-    topics: z.array(Topic).nullish(),
     contests: z.array(Contest).nullish(),
     farcaster_frame_url: z.string().nullish(),
     farcaster_frame_hashes: z.array(z.string()).nullish(),
@@ -104,6 +103,7 @@ export const ContestManager = z
       .nullish()
       .describe('Neynar secret for the CastCreated webhook'),
     topic_id: PG_INT.nullish(),
+    topics: z.array(Topic).nullish(),
     is_farcaster_contest: z.boolean(),
   })
   .describe('On-Chain Contest Manager');
