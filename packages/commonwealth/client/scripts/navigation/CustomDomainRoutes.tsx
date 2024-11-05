@@ -68,9 +68,6 @@ const CommunityIntegrations = lazy(
 const CommunityStakeIntegration = lazy(
   () => import('views/pages/CommunityManagement/StakeIntegration'),
 );
-const CommunityTopicsOld = lazy(
-  () => import('views/pages/CommunityManagement/Topics/TopicsOld'),
-);
 const CommunityTopics = lazy(
   () => import('views/pages/CommunityManagement/Topics'),
 );
@@ -103,7 +100,6 @@ const EditNewProfilePage = lazy(() => import('views/pages/edit_new_profile'));
 const ProfilePageRedirect = lazy(() => import('views/pages/profile_redirect'));
 
 const CustomDomainRoutes = ({
-  weightedTopicsEnabled,
   tokenizedCommunityEnabled,
 }: RouteFeatureFlags) => {
   return [
@@ -305,12 +301,9 @@ const CustomDomainRoutes = ({
     <Route
       key="/manage/topics"
       path="/manage/topics"
-      element={withLayout(
-        weightedTopicsEnabled ? CommunityTopics : CommunityTopicsOld,
-        {
-          scoped: true,
-        },
-      )}
+      element={withLayout(CommunityTopics, {
+        scoped: true,
+      })}
     />,
     <Route
       key="/manage/moderators"

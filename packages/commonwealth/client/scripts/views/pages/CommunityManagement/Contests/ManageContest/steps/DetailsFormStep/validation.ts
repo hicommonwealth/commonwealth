@@ -1,11 +1,7 @@
 import { TopicWeightedVoting } from '@hicommonwealth/schemas';
-import { OpenFeature } from '@openfeature/web-sdk';
 import { VALIDATION_MESSAGES } from 'helpers/formValidations/messages';
 import { ContestFeeType } from 'views/pages/CommunityManagement/Contests/ManageContest/types';
 import z from 'zod';
-
-const client = OpenFeature.getClient();
-const weightedTopicsEnabled = client.getBooleanValue('weightedTopics', false);
 
 export const detailsFormValidationSchema = z.object({
   contestName: z
@@ -22,7 +18,7 @@ export const detailsFormValidationSchema = z.object({
       weightedVoting: z.nativeEnum(TopicWeightedVoting).optional().nullish(),
     })
     .optional()
-    .refine((value) => (weightedTopicsEnabled ? !!value : true), {
+    .refine((value) => !!value, {
       message: 'You must select a topic',
     }),
   feeType: z.enum([

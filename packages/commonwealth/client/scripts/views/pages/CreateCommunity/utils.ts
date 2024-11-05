@@ -11,7 +11,6 @@ export enum CreateCommunityStep {
 export const getFormSteps = (
   createCommunityStep: CreateCommunityStep,
   showCommunityStakeStep: boolean,
-  weightedTopicsEnabled: boolean,
 ): CWFormStepsProps['steps'] => {
   return [
     {
@@ -33,7 +32,7 @@ export const getFormSteps = (
     ...((showCommunityStakeStep
       ? [
           {
-            label: weightedTopicsEnabled ? 'Namespace' : 'Community Stake',
+            label: 'Namespace',
             state:
               createCommunityStep < CreateCommunityStep.CommunityStake
                 ? 'inactive'

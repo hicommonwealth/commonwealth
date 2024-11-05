@@ -30,7 +30,6 @@ const Profile = ({ userId }: ProfileProps) => {
   const [threads, setThreads] = useState<Thread[]>([]);
   const [isOwner, setIsOwner] = useState<boolean>();
   const [comments, setComments] = useState<CommentWithAssociatedThread[]>([]);
-
   const { data, error, isLoading } = useFetchProfileByIdQuery({
     userId,
     apiCallEnabled: !!userId,
@@ -50,9 +49,9 @@ const Profile = ({ userId }: ProfileProps) => {
         new NewProfile({ ...data.profile, userId, isOwner: isOwner ?? false }),
       );
       setThreads(data.threads.map((t) => new Thread(t)));
-
       // @ts-expect-error <StrictNullChecks/>
       const responseComments = data.comments.map((c) => new Comment(c));
+
       const commentsWithAssociatedThread = responseComments.map((c) => {
         const thread = data.commentThreads.find(
           // @ts-expect-error <StrictNullChecks/>

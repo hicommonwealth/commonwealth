@@ -136,7 +136,7 @@ export const VoteWeightModule = ({
       <CWPopover
         title={
           <>
-            Vote Weight Explainer
+            Your Community Stake vote weight
             {isMobile && (
               <div className="close">
                 <CWIconButton

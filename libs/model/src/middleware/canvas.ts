@@ -60,7 +60,7 @@ export const verifyCommentSignature: AuthHandler<
     await verifyComment(canvasSignedData, {
       thread_id: payload.thread_msg_id ?? null,
       parent_comment_id: payload.parent_msg_id ?? null,
-      text: payload.text,
+      body: payload.body,
       address:
         canvasSignedData.actionMessage.payload.did.split(':')[2] === 'polkadot'
           ? addressSwapper({

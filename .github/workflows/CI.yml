@@ -438,18 +438,11 @@ jobs:
       - name: Run EVM Devnet tests
         run: pnpm -F commonwealth test-devnet:evm --allowOnly=false
 
-      - name: Coveralls parallel
-        uses: coverallsapp/github-action@v2
-        with:
-          flag-name: evm-devnet-test-coverage
-          parallel: true
-          files: packages/commonwealth/coverage/lcov.info
-
   report-coverage:
     name: Upload Test Coverage Report
     runs-on: ubuntu-latest
     timeout-minutes: 5
-    needs: [ commonwealth-evm-tests, commonwealth-unit-tests ]
+    needs: [ commonwealth-unit-tests ]
     if: always()
     strategy:
       matrix:

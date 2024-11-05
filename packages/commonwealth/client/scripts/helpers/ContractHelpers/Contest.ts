@@ -23,7 +23,7 @@ class Contest extends ContractBase {
       this.namespaceFactoryAddress,
       this.rpc,
     );
-    await this.namespaceFactory.initialize(true);
+    await this.namespaceFactory.initialize(withWallet);
   }
 
   /**
@@ -186,8 +186,9 @@ class Contest extends ContractBase {
     const tokenAddress = await this.contract.methods.contestToken().call();
 
     let txReceipt;
-    const weiAmount = this.web3.utils.toWei(amount, 'ether');
+
     if (tokenAddress === ZERO_ADDRESS) {
+      const weiAmount = this.web3.utils.toWei(amount, 'ether');
       //ETH funding route
       try {
         txReceipt = await this.contract.methods.deposit(weiAmount).send({
@@ -204,6 +205,8 @@ class Contest extends ContractBase {
         Erc20Abi as AbiItem[],
         tokenAddress,
       );
+      const decimals = await token.methods.decimals().call();
+      const weiAmount = amount * 10 ** Number(decimals);
       await token.methods
         .approve(this.contractAddress, weiAmount)
         .send({ from: walletAddress });
