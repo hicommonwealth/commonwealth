@@ -196,6 +196,7 @@ module.exports = {
             DROP COLUMN launchpad_contract_address,
             DROP COLUMN uniswap_pool_address,
             DROP COLUMN community_id,
+            ALTER COLUMN name DROP NOT NULL,
             DROP CONSTRAINT "Tokens_pkey";
         `,
         { transaction: t },
