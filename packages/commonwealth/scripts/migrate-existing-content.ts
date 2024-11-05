@@ -2,18 +2,17 @@ import { R2BlobStorage } from '@hicommonwealth/adapters';
 import { blobStorage, dispose, logger } from '@hicommonwealth/core';
 import { R2_ADAPTER_KEY, models, uploadIfLarge } from '@hicommonwealth/model';
 import { QueryTypes } from 'sequelize';
-import { config } from '../server/config';
 
 const log = logger(import.meta);
 const BATCH_SIZE = 10;
 const queryCase = 'WHEN id = ? THEN ? ';
 
 async function migrateComments(lastId = 0) {
-  let lastVersionHistoryId = lastId;
+  let lastCommentId = lastId;
   while (true) {
     const transaction = await models.sequelize.transaction();
     try {
-      const commentVersions = await models.sequelize.query<{
+      const comments = await models.sequelize.query<{
         id: number;
         body: string;
       }>(
@@ -28,42 +27,42 @@ async function migrateComments(lastId = 0) {
         {
           transaction,
           replacements: {
-            lastId: lastVersionHistoryId,
+            lastId: lastCommentId,
             batchSize: BATCH_SIZE,
           },
           type: QueryTypes.SELECT,
         },
       );
 
-      if (commentVersions.length === 0) {
+      if (comments.length === 0) {
         await transaction.rollback();
         break;
       }
 
-      lastVersionHistoryId = commentVersions.at(-1)!.id!;
+      lastCommentId = comments.at(-1)!.id!;
 
       let queryCases = '';
       const replacements: (number | string)[] = [];
-      const commentVersionIds: number[] = [];
-      for (const { id, body } of commentVersions) {
+      const commentIds: number[] = [];
+      for (const { id, body } of comments) {
         const { contentUrl } = await uploadIfLarge('comments', body);
         if (!contentUrl) continue;
         queryCases += queryCase;
         replacements.push(id!, contentUrl);
-        commentVersionIds.push(id!);
+        commentIds.push(id!);
       }
 
       if (replacements.length > 0) {
         await models.sequelize.query(
           `
-              UPDATE "CommentVersionHistories"
+              UPDATE "Comments"
               SET content_url = CASE
                   ${queryCases}
                   END
               WHERE id IN (?);
           `,
           {
-            replacements: [...replacements, commentVersionIds],
+            replacements: [...replacements, commentIds],
             type: QueryTypes.BULKUPDATE,
             transaction,
           },
@@ -71,24 +70,23 @@ async function migrateComments(lastId = 0) {
       }
       await transaction.commit();
       log.info(
-        'Successfully uploaded comment version histories ' +
-          `${commentVersions[0].id} to ${commentVersions.at(-1)!.id!}`,
+        'Successfully uploaded comments ' +
+          `${comments[0].id} to ${comments.at(-1)!.id!}`,
       );
     } catch (e) {
       log.error('Failed to update', e);
       await transaction.rollback();
       break;
     }
-    break;
   }
 }
 
 async function migrateThreads(lastId: number = 0) {
-  let lastVersionHistoryId = lastId;
+  let lastThreadId = lastId;
   while (true) {
     const transaction = await models.sequelize.transaction();
     try {
-      const threadVersions = await models.sequelize.query<{
+      const threads = await models.sequelize.query<{
         id: number;
         body: string;
       }>(
@@ -103,42 +101,42 @@ async function migrateThreads(lastId: number = 0) {
         {
           transaction,
           replacements: {
-            lastId: lastVersionHistoryId,
+            lastId: lastThreadId,
             batchSize: BATCH_SIZE,
           },
           type: QueryTypes.SELECT,
         },
       );
 
-      if (threadVersions.length === 0) {
+      if (threads.length === 0) {
         await transaction.rollback();
         break;
       }
 
-      lastVersionHistoryId = threadVersions.at(-1)!.id!;
+      lastThreadId = threads.at(-1)!.id!;
 
       let queryCases = '';
       const replacements: (number | string)[] = [];
-      const threadVersionIds: number[] = [];
-      for (const { id, body } of threadVersions) {
+      const threadIds: number[] = [];
+      for (const { id, body } of threads) {
         const { contentUrl } = await uploadIfLarge('threads', body);
         if (!contentUrl) continue;
         queryCases += queryCase;
         replacements.push(id!, contentUrl);
-        threadVersionIds.push(id!);
+        threadIds.push(id!);
       }
 
       if (replacements.length > 0) {
         await models.sequelize.query(
           `
-              UPDATE "ThreadVersionHistories"
+              UPDATE "Threads"
               SET content_url = CASE
                   ${queryCases}
                   END
               WHERE id IN (?);
           `,
           {
-            replacements: [...replacements, threadVersionIds],
+            replacements: [...replacements, threadIds],
             type: QueryTypes.BULKUPDATE,
             transaction,
           },
@@ -146,8 +144,8 @@ async function migrateThreads(lastId: number = 0) {
       }
       await transaction.commit();
       log.info(
-        'Successfully uploaded thread version histories ' +
-          `${threadVersions[0].id} to ${threadVersions.at(-1)!.id!}`,
+        'Successfully uploaded threads ' +
+          `${threads[0].id} to ${threads.at(-1)!.id!}`,
       );
     } catch (e) {
       log.error('Failed to update', e);
@@ -158,13 +156,11 @@ async function migrateThreads(lastId: number = 0) {
 }
 
 async function main() {
-  if (config.NODE_ENV === 'production') {
-    blobStorage({
-      key: R2_ADAPTER_KEY,
-      adapter: R2BlobStorage(),
-      isDefault: false,
-    });
-  }
+  blobStorage({
+    key: R2_ADAPTER_KEY,
+    adapter: R2BlobStorage(),
+    isDefault: false,
+  });
 
   const acceptedArgs = ['threads', 'comments'];
 
