@@ -203,6 +203,14 @@ export const UploadControl = ({
         <div
           className="generate-image-section"
           onClick={(e) => e.stopPropagation()}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && imagePrompt.trim()) {
+              e.preventDefault(); // Prevents any default form submission behavior
+              generateImage({ prompt: imagePrompt.trim() }).catch(
+                console.error,
+              );
+            }
+          }}
         >
           <CWIconButton
             onClick={(e) => {
