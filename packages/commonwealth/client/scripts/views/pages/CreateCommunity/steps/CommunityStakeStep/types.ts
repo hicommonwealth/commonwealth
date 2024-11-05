@@ -24,12 +24,17 @@ export interface SignStakeTransactionsProps {
 }
 
 export interface EnableStakeProps {
-  goToSuccessStep: () => void;
-  onOptInEnablingStake: ({ namespace, symbol }: StakeData) => void;
   communityStakeData: StakeData;
   chainId: string;
-  isTopicFlow?: boolean;
   onlyNamespace?: boolean;
+  backButton?: {
+    label: string;
+    action: () => void;
+  };
+  confirmButton?: {
+    label: string;
+    action: (data: StakeData) => void;
+  };
 }
 
 export const defaultActionState: ActionState = {

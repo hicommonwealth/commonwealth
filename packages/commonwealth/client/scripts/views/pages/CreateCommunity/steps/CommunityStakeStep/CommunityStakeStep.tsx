@@ -75,12 +75,17 @@ const CommunityStakeStep = ({
     <div className="CommunityStakeStep">
       {enableStakePage ? (
         <EnableStake
-          goToSuccessStep={enableStakeHandler}
-          onOptInEnablingStake={handleOptInEnablingStake}
           communityStakeData={communityStakeData}
           chainId={chainId}
-          isTopicFlow={isTopicFlow}
           onlyNamespace={onlyNamespace}
+          backButton={{
+            label: isTopicFlow ? 'Back' : 'No',
+            action: enableStakeHandler,
+          }}
+          confirmButton={{
+            label: 'Yes',
+            action: handleOptInEnablingStake,
+          }}
         />
       ) : (
         <SignStakeTransactions
