@@ -6,11 +6,12 @@ import type { ModelInstance } from './types';
 export type CollaborationAttributes = {
   address_id: number;
   thread_id: number;
-  created_at: Date;
-  updated_at: Date;
 
-  Address: AddressAttributes;
-  Thread: ThreadAttributes;
+  created_at?: Date;
+  updated_at?: Date;
+
+  Address?: AddressAttributes;
+  Thread?: ThreadAttributes;
 };
 
 export type CollaborationInstance = ModelInstance<CollaborationAttributes> & {

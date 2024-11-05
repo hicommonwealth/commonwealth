@@ -19,6 +19,7 @@ interface CWRadioPanelProps<T> {
   description: string;
   isSelected: boolean;
   onSelect: (value: T) => void;
+  disabled?: boolean;
 }
 
 const CWRadioPanel = <T,>({
@@ -28,12 +29,17 @@ const CWRadioPanel = <T,>({
   popover,
   isSelected,
   onSelect,
+  disabled,
 }: CWRadioPanelProps<T>) => {
   const popoverProps = usePopover();
 
   return (
-    <div
-      className={clsx(ComponentType.RadioPanel, { selected: isSelected })}
+    <button
+      className={clsx(ComponentType.RadioPanel, {
+        selected: isSelected,
+        disabled,
+      })}
+      disabled={disabled}
       onClick={() => onSelect(value)}
     >
       <div className="top-row">
@@ -41,6 +47,7 @@ const CWRadioPanel = <T,>({
           checked={isSelected}
           value={value as string}
           label={label}
+          disabled={disabled}
         />
         {popover && (
           <>
@@ -59,7 +66,7 @@ const CWRadioPanel = <T,>({
         )}
       </div>
       <CWText className="option-description">{description}</CWText>
-    </div>
+    </button>
   );
 };
 

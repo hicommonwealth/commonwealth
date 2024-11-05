@@ -1,0 +1,37 @@
+@import '../../../../../styles/shared';
+
+.DesktopEditorFooter {
+  color: $neutral-500;
+
+  display: flex;
+  padding: 6px;
+
+  user-select: none;
+
+  background-color: $neutral-50;
+
+  .Item {
+    display: flex;
+    margin-top: auto;
+    margin-bottom: auto;
+    gap: 6px;
+
+    button {
+      outline: none;
+    }
+  }
+
+  .SubmitButtonItem {
+    margin-left: auto;
+    background-color: $neutral-200;
+
+    button {
+      border: none;
+      font-size: 1.2em;
+      padding: 8px 16px;
+      cursor: pointer;
+      border-radius: 8px;
+      display: inline-block;
+    }
+  }
+}

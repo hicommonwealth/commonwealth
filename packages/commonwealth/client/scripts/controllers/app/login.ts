@@ -45,19 +45,6 @@ function storeActiveAccount(account: Account) {
     user.setData({ accounts: [...user.accounts, account] });
 }
 
-export function linkExistingAddressToChainOrCommunity(
-  address: string,
-  community: string,
-  originChain: string,
-) {
-  return axios.post(`${SERVER_URL}/linkExistingAddressToCommunity`, {
-    address,
-    community_id: community,
-    originChain, // not used
-    jwt: userStore.getState().jwt,
-  });
-}
-
 export async function setActiveAccount(account: Account): Promise<void> {
   const community = app.activeChainId();
   try {
@@ -304,6 +291,9 @@ async function constructMagic(isCosmos: boolean, chain?: string) {
     throw new Error('Must be in a community to sign in with Cosmos magic link');
   }
 
+  if (process.env.MAGIC_PUBLISHABLE_KEY === undefined) {
+    throw new Error('Missing magic key');
+  }
   return new Magic(process.env.MAGIC_PUBLISHABLE_KEY, {
     extensions: !isCosmos
       ? [new OAuthExtension()]
@@ -427,6 +417,9 @@ export async function handleSocialLoginCallback({
       magicAddress = metadata.publicAddress;
     } else {
       const { utils } = await import('ethers');
+      if (metadata.publicAddress === null) {
+        throw new Error('Expected magic to return publicAddress');
+      }
       magicAddress = utils.getAddress(metadata.publicAddress);
     }
   } else {

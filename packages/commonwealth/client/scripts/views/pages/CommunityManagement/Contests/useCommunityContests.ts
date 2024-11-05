@@ -1,15 +1,73 @@
+import { useMemo } from 'react';
 import app from 'state';
 import { useGetContestsQuery } from 'state/api/contests';
 import { useCommunityStake } from 'views/components/CommunityStake';
 import { Contest } from 'views/pages/CommunityManagement/Contests/ContestsList';
-import { useFlag } from '../../../../hooks/useFlag';
+import { isContestActive } from './utils';
 
-const useCommunityContests = () => {
-  const enabled = useFlag('contest');
+type UseCommunityContestsProps =
+  | {
+      shouldPolling?: boolean;
+    }
+  | undefined;
+
+const useCommunityContests = (props?: UseCommunityContestsProps) => {
+  const { shouldPolling = false } = props || {};
   const { stakeEnabled } = useCommunityStake();
 
   const { data: contestsData, isLoading: isContestDataLoading } =
-    useGetContestsQuery({ community_id: app.activeChainId() || '', enabled });
+    useGetContestsQuery({
+      community_id: app.activeChainId() || '',
+      shouldPolling,
+    });
+
+  const { finishedContests, activeContests } = useMemo(() => {
+    const finished: Contest[] = [];
+    const active: Contest[] = [];
+
+    (contestsData || []).map((contest) => {
+      const tempFinishedContests: Pick<Contest, 'contests'>[] = [];
+      const tempActiveContests: Pick<Contest, 'contests'>[] = [];
+      (contest?.contests || []).map((c) => {
+        const end_time = c.end_time || null;
+
+        const isActive = end_time
+          ? isContestActive({
+              contest: {
+                cancelled: !!contest.cancelled,
+                contests: [{ end_time: new Date(end_time) }],
+              },
+            })
+          : false;
+
+        // filters both recurring and 1-off contests
+        if (!isActive) {
+          tempFinishedContests.push(c as Pick<Contest, 'contests'>);
+        } else {
+          tempActiveContests.push(c as Pick<Contest, 'contests'>);
+        }
+      });
+
+      if (tempFinishedContests.length > 0) {
+        finished.push({
+          ...contest,
+          contests: tempFinishedContests,
+        } as unknown as Contest);
+      }
+
+      if (tempActiveContests.length > 0) {
+        active.push({
+          ...contest,
+          contests: tempActiveContests,
+        } as unknown as Contest);
+      }
+    });
+
+    return {
+      finishedContests: finished,
+      activeContests: active,
+    };
+  }, [contestsData]);
 
   // @ts-expect-error StrictNullChecks
   const isContestAvailable = !isContestDataLoading && contestsData?.length > 0;
@@ -23,8 +81,12 @@ const useCommunityContests = () => {
   return {
     stakeEnabled,
     isContestAvailable,
-    contestsData: contestsData as unknown as Contest[],
-    isContestDataLoading: isContestDataLoading && enabled,
+    contestsData: {
+      all: contestsData as unknown as Contest[],
+      finished: finishedContests,
+      active: activeContests,
+    },
+    isContestDataLoading: isContestDataLoading,
     getContestByAddress,
   };
 };

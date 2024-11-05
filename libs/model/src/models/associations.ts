@@ -10,7 +10,27 @@ export const buildAssociations = (db: DB) => {
       asMany: 'SubscriptionPreferences',
       onDelete: 'CASCADE',
     })
-    .withMany(db.Wallets);
+    .withMany(db.Wallets)
+    .withMany(db.XpLog, { onDelete: 'CASCADE' })
+    .withOne(db.ApiKey, {
+      targetKey: 'id',
+      onDelete: 'CASCADE',
+    })
+    .withMany(db.QuestAction, {
+      foreignKey: 'user_id',
+      onUpdate: 'CASCADE',
+      onDelete: 'CASCADE',
+    });
+
+  db.Quest.withMany(db.QuestActionMeta, {
+    asMany: 'action_metas',
+    onUpdate: 'CASCADE',
+    onDelete: 'CASCADE',
+  });
+  db.QuestActionMeta.withMany(db.QuestAction, {
+    onUpdate: 'CASCADE',
+    onDelete: 'CASCADE',
+  });
 
   db.Address.withMany(db.Thread, {
     asOne: 'Address',
@@ -28,14 +48,10 @@ export const buildAssociations = (db: DB) => {
     });
 
   db.ChainNode.withMany(db.Community)
-    .withMany(db.Contract, { asMany: 'contracts' })
     .withMany(db.EvmEventSource)
     .withOne(db.LastProcessedEvmBlock);
 
-  db.ContractAbi.withMany(db.Contract, { foreignKey: 'abi_id' }).withMany(
-    db.EvmEventSource,
-    { foreignKey: 'abi_id' },
-  );
+  db.ContractAbi.withMany(db.EvmEventSource, { foreignKey: 'abi_id' });
 
   db.Community.withMany(db.Group, { asMany: 'groups' })
     .withMany(db.Topic, {
@@ -61,14 +77,19 @@ export const buildAssociations = (db: DB) => {
     .withMany(db.CommunityTags, {
       onDelete: 'CASCADE',
     })
+    .withOne(db.Token, {
+      onUpdate: 'CASCADE',
+      onDelete: 'SET NULL',
+    })
     .withOne(db.DiscordBotConfig, {
-      targeyKey: 'discord_config_id',
+      targetKey: 'discord_config_id',
       onDelete: 'CASCADE',
     })
     .withOne(db.User, {
       foreignKey: 'selected_community_id',
       as: 'selectedCommunity',
-    });
+    })
+    .withMany(db.Quest, { onUpdate: 'CASCADE', onDelete: 'CASCADE' });
 
   db.Tags.withMany(db.ProfileTags, {
     foreignKey: 'tag_id',
@@ -83,7 +104,13 @@ export const buildAssociations = (db: DB) => {
     asMany: 'threads',
     onUpdate: 'CASCADE',
     onDelete: 'SET NULL',
-  }).withMany(db.ContestTopic);
+  })
+    .withMany(db.ContestTopic, { asMany: 'contest_topics' })
+    .withMany(db.GroupPermission, {
+      foreignKey: 'topic_id',
+      onUpdate: 'CASCADE',
+      onDelete: 'CASCADE',
+    });
 
   db.Thread.withMany(db.Poll)
     .withMany(db.ContestAction, {
@@ -124,7 +151,11 @@ export const buildAssociations = (db: DB) => {
     onDelete: 'CASCADE',
   });
 
-  db.Group.withMany(db.GroupPermission);
+  db.Group.withMany(db.GroupPermission, {
+    foreignKey: 'group_id',
+    onUpdate: 'CASCADE',
+    onDelete: 'CASCADE',
+  });
 
   // Many-to-many associations (cross-references)
   db.Membership.withManyToMany(
@@ -143,11 +174,6 @@ export const buildAssociations = (db: DB) => {
   db.Collaboration.withManyToMany(
     { model: db.Address },
     { model: db.Thread, asMany: 'collaborators' },
-  );
-
-  db.CommunityContract.withManyToMany(
-    { model: db.Community },
-    { model: db.Contract },
   );
 
   db.StarredCommunity.withManyToMany(

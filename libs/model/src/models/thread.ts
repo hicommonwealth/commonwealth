@@ -1,25 +1,21 @@
 import { EventNames } from '@hicommonwealth/core';
 import { Thread } from '@hicommonwealth/schemas';
+import { getDecodedString } from '@hicommonwealth/shared';
 import Sequelize from 'sequelize';
 import { z } from 'zod';
-import { emitEvent, getThreadContestManagers } from '../utils';
-import type { AddressAttributes } from './address';
+import { emitEvent, getThreadContestManagers } from '../utils/utils';
+import { AddressAttributes } from './address';
 import type { CommunityAttributes } from './community';
-import type { ReactionAttributes } from './reaction';
 import type { ThreadSubscriptionAttributes } from './thread_subscriptions';
 import type { ModelInstance } from './types';
+import { beforeValidateBodyHook } from './utils';
 
 export type ThreadAttributes = z.infer<typeof Thread> & {
   // associations
   Community?: CommunityAttributes;
-  collaborators?: AddressAttributes[];
-  reactions?: ReactionAttributes[];
   subscriptions?: ThreadSubscriptionAttributes[];
 };
-
-export type ThreadInstance = ModelInstance<ThreadAttributes> & {
-  // no mixins used
-};
+export type ThreadInstance = ModelInstance<ThreadAttributes>;
 
 export default (
   sequelize: Sequelize.Sequelize,
@@ -31,8 +27,7 @@ export default (
       address_id: { type: Sequelize.INTEGER, allowNull: true },
       created_by: { type: Sequelize.STRING, allowNull: true },
       title: { type: Sequelize.TEXT, allowNull: false },
-      body: { type: Sequelize.TEXT, allowNull: true },
-      plaintext: { type: Sequelize.TEXT, allowNull: true },
+      body: { type: Sequelize.TEXT, allowNull: false },
       kind: { type: Sequelize.STRING, allowNull: false },
       stage: {
         type: Sequelize.TEXT,
@@ -63,7 +58,7 @@ export default (
 
       // canvas-related columns
       canvas_signed_data: { type: Sequelize.JSONB, allowNull: true },
-      canvas_hash: { type: Sequelize.STRING, allowNull: true },
+      canvas_msg_id: { type: Sequelize.STRING, allowNull: true },
       // timestamps
       created_at: { type: Sequelize.DATE, allowNull: false },
       updated_at: { type: Sequelize.DATE, allowNull: false },
@@ -84,7 +79,7 @@ export default (
         defaultValue: 0,
       },
       reaction_weights_sum: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.DECIMAL(78, 0),
         allowNull: false,
         defaultValue: 0,
       },
@@ -102,6 +97,7 @@ export default (
         type: Sequelize.TSVECTOR,
         allowNull: false,
       },
+      content_url: { type: Sequelize.STRING, allowNull: true },
     },
     {
       timestamps: true,
@@ -118,14 +114,17 @@ export default (
         { fields: ['community_id', 'updated_at'] },
         { fields: ['community_id', 'pinned'] },
         { fields: ['community_id', 'has_poll'] },
-        { fields: ['canvas_hash'] },
+        { fields: ['canvas_msg_id'] },
       ],
       hooks: {
+        beforeValidate(instance: ThreadInstance) {
+          beforeValidateBodyHook(instance);
+        },
         afterCreate: async (
           thread: ThreadInstance,
           options: Sequelize.CreateOptions<ThreadAttributes>,
         ) => {
-          const { Community, Outbox } = sequelize.models;
+          const { Community, Outbox, Address } = sequelize.models;
 
           await Community.increment('lifetime_thread_count', {
             by: 1,
@@ -140,6 +139,10 @@ export default (
             ? []
             : await getThreadContestManagers(sequelize, topic_id, community_id);
 
+          const address = (await Address.findByPk(
+            thread.address_id,
+          )) as AddressAttributes | null;
+
           await emitEvent(
             Outbox,
             [
@@ -147,6 +150,7 @@ export default (
                 event_name: EventNames.ThreadCreated,
                 event_payload: {
                   ...thread.get({ plain: true }),
+                  address: address!.address,
                   contestManagers,
                 },
               },
@@ -170,20 +174,9 @@ export default (
   );
 
 export function getThreadSearchVector(title: string, body: string) {
-  let decodedTitle = title;
-  let decodedBody = body;
-  try {
-    decodedTitle = decodeURIComponent(title);
-    // eslint-disable-next-line no-empty
-  } catch {}
-
-  try {
-    decodedBody = decodeURIComponent(body);
-    // eslint-disable-next-line no-empty
-  } catch {}
   return Sequelize.fn(
     'to_tsvector',
     'english',
-    decodedTitle + ' ' + decodedBody,
+    getDecodedString(title) + ' ' + getDecodedString(body),
   );
 }

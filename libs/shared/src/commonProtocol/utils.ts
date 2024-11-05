@@ -1,8 +1,15 @@
+import { BigNumber } from '@ethersproject/bignumber';
+
 export const calculateVoteWeight = (
-  stakeBalance: string,
-  voteWeight: number,
-) => {
-  return parseInt(stakeBalance, 10) * voteWeight;
+  balance: string, // should be in wei
+  voteWeight: number = 0,
+): BigNumber | null => {
+  if (!balance || voteWeight <= 0) return null;
+  const bigBalance = BigNumber.from(balance);
+  const precision = 1e6;
+  const scaledVoteWeight = Math.floor(voteWeight * precision);
+  const result = bigBalance.mul(scaledVoteWeight).div(precision);
+  return result;
 };
 
 export enum Denominations {

@@ -1,0 +1,24 @@
+@import '../../../../../../styles/shared';
+
+.SnapshotInformationCard {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px;
+  width: 100%;
+
+  .info-rows-container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+  }
+
+  .linked-discussions {
+    border-top: 1px solid $neutral-100;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding-top: 16px;
+  }
+}

@@ -21,7 +21,4 @@ export const topicCreationValidationSchema = z.object({
         });
       }
     }),
-  topicDescription: z.string({
-    invalid_type_error: VALIDATION_MESSAGES.NO_INPUT,
-  }),
 });

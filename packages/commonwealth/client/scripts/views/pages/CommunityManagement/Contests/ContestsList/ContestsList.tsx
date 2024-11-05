@@ -42,21 +42,22 @@ interface ContestsListProps {
   contests: Contest[];
   isAdmin: boolean;
   isLoading: boolean;
-  stakeEnabled: boolean;
+  hasWeightedTopic: boolean;
   isContestAvailable: boolean;
-  feeManagerBalance?: string;
   onSetContestSelectionView?: () => void;
+  displayAllRecurringContests?: boolean;
 }
+
 const ContestsList = ({
   contests,
   isAdmin,
   isLoading,
-  stakeEnabled,
+  hasWeightedTopic,
   isContestAvailable,
-  feeManagerBalance,
   onSetContestSelectionView,
+  displayAllRecurringContests = false,
 }: ContestsListProps) => {
-  const [fundDrawerAddress, setFundDrawerAddress] = useState('');
+  const [fundDrawerContest, setFundDrawerContest] = useState<Contest>();
 
   if (isLoading) {
     return (
@@ -71,52 +72,76 @@ const ContestsList = ({
   return (
     <>
       <div className="ContestsList">
-        {isAdmin && (!stakeEnabled || !isContestAvailable) ? (
+        {isAdmin && (!hasWeightedTopic || !isContestAvailable) ? (
           <EmptyContestsList
-            isStakeEnabled={stakeEnabled}
+            hasWeightedTopic={hasWeightedTopic}
             isContestAvailable={isContestAvailable}
             onSetContestSelectionView={onSetContestSelectionView}
           />
         ) : (
           contests.map((contest) => {
-            // only last contest is relevant
             const sortedContests = (contest?.contests || []).toSorted((a, b) =>
               moment(a.end_time).isBefore(b.end_time) ? -1 : 1,
             );
 
-            const { end_time, score } =
-              sortedContests[sortedContests.length - 1] || {};
+            if (!displayAllRecurringContests) {
+              // only last contest is relevant
+              const { end_time } =
+                sortedContests[sortedContests.length - 1] || {};
 
-            return (
-              <ContestCard
-                key={contest.contest_address}
-                isAdmin={isAdmin}
-                // @ts-expect-error <StrictNullChecks/>
-                address={contest.contest_address}
-                // @ts-expect-error <StrictNullChecks/>
-                name={contest.name}
-                imageUrl={contest.image_url}
-                // @ts-expect-error <StrictNullChecks/>
-                topics={contest.topics}
-                // @ts-expect-error <StrictNullChecks/>
-                score={score}
-                decimals={contest.decimals}
-                ticker={contest.ticker}
-                finishDate={end_time ? moment(end_time).toISOString() : ''}
-                isCancelled={contest.cancelled}
-                // @ts-expect-error <StrictNullChecks/>
-                onFund={() => setFundDrawerAddress(contest.contest_address)}
-                feeManagerBalance={feeManagerBalance}
-                isRecurring={!contest.funding_token_address}
-              />
-            );
+              return (
+                <ContestCard
+                  key={contest.contest_address}
+                  isAdmin={isAdmin}
+                  // @ts-expect-error <StrictNullChecks/>
+                  address={contest.contest_address}
+                  // @ts-expect-error <StrictNullChecks/>
+                  name={contest.name}
+                  imageUrl={contest.image_url}
+                  // @ts-expect-error <StrictNullChecks/>
+                  topics={contest.topics}
+                  decimals={contest.decimals}
+                  ticker={contest.ticker}
+                  finishDate={end_time ? moment(end_time).toISOString() : ''}
+                  isCancelled={contest.cancelled}
+                  onFund={() => setFundDrawerContest(contest)}
+                  isRecurring={!contest.funding_token_address}
+                  payoutStructure={contest.payout_structure}
+                />
+              );
+            } else {
+              return sortedContests.map((sc) => (
+                <ContestCard
+                  key={contest.contest_address}
+                  isAdmin={isAdmin}
+                  // @ts-expect-error <StrictNullChecks/>
+                  address={contest.contest_address}
+                  // @ts-expect-error <StrictNullChecks/>
+                  name={contest.name}
+                  imageUrl={contest.image_url}
+                  // @ts-expect-error <StrictNullChecks/>
+                  topics={contest.topics}
+                  decimals={contest.decimals}
+                  ticker={contest.ticker}
+                  finishDate={
+                    sc.end_time ? moment(sc.end_time || {}).toISOString() : ''
+                  }
+                  isCancelled={contest.cancelled}
+                  onFund={() => setFundDrawerContest(contest)}
+                  isRecurring={!contest.funding_token_address}
+                  payoutStructure={contest.payout_structure}
+                />
+              ));
+            }
           })
         )}
       </div>
       <FundContestDrawer
-        onClose={() => setFundDrawerAddress('')}
-        isOpen={!!fundDrawerAddress}
-        contestAddress={fundDrawerAddress}
+        onClose={() => setFundDrawerContest(undefined)}
+        isOpen={!!fundDrawerContest}
+        contestAddress={fundDrawerContest?.contest_address || ''}
+        fundingTokenAddress={fundDrawerContest?.funding_token_address}
+        fundingTokenTicker={fundDrawerContest?.ticker || 'ETH'}
       />
     </>
   );

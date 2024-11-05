@@ -9,9 +9,9 @@ export const Reaction = z.object({
   thread_id: PG_INT.nullish(),
   comment_id: PG_INT.nullish(),
   proposal_id: z.number().nullish(),
-  calculated_voting_weight: PG_INT.nullish(),
+  calculated_voting_weight: z.string().nullish(),
   canvas_signed_data: z.any().nullish(),
-  canvas_hash: z.string().max(255).nullish(),
+  canvas_msg_id: z.string().max(255).nullish(),
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional(),
 

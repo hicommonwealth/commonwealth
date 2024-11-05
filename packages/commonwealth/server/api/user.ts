@@ -4,4 +4,10 @@ import { User } from '@hicommonwealth/model';
 export const trpcRouter = trpc.router({
   updateUser: trpc.command(User.UpdateUser, trpc.Tag.User),
   getNewContent: trpc.query(User.GetNewContent, trpc.Tag.User),
+  createApiKey: trpc.command(User.CreateApiKey, trpc.Tag.User),
+  getApiKey: trpc.query(User.GetApiKey, trpc.Tag.User),
+  deleteApiKey: trpc.command(User.DeleteApiKey, trpc.Tag.User),
+  getUserProfile: trpc.query(User.GetUserProfile, trpc.Tag.User),
+  getUserAddresses: trpc.query(User.GetUserAddresses, trpc.Tag.User),
+  searchUserProfiles: trpc.query(User.SearchUserProfiles, trpc.Tag.User),
 });

@@ -3,6 +3,7 @@ import Sequelize from 'sequelize';
 import { z } from 'zod';
 import { ThreadAttributes } from './thread';
 import type { ModelInstance } from './types';
+import { beforeValidateBodyHook } from './utils';
 
 export type ThreadVersionHistoryAttributes = z.infer<
   typeof ThreadVersionHistory
@@ -25,10 +26,16 @@ export default (
       address: { type: Sequelize.STRING, allowNull: false },
       body: { type: Sequelize.TEXT, allowNull: false },
       timestamp: { type: Sequelize.DATE, allowNull: false },
+      content_url: { type: Sequelize.STRING, allowNull: true },
     },
     {
       tableName: 'ThreadVersionHistories',
       timestamps: false,
       indexes: [{ fields: ['thread_id'] }],
+      hooks: {
+        beforeValidate(instance: ThreadVersionHistoryInstance) {
+          beforeValidateBodyHook(instance);
+        },
+      },
     },
   );

@@ -7,12 +7,16 @@ import SignStakeTransactions from './SignStakeTransactions';
 
 interface CommunityStakeStepProps {
   goToSuccessStep: () => void;
-  createdCommunityName: string;
+  createdCommunityName?: string;
   createdCommunityId: string;
   selectedAddress: AddressInfo;
   chainId: string;
   isTopicFlow?: boolean;
   onTopicFlowStepChange?: (step: CreateTopicStep) => void;
+  refetchStakeQuery?: () => void;
+  onlyNamespace?: boolean;
+  namespace?: string | null;
+  symbol?: string;
 }
 
 const CommunityStakeStep = ({
@@ -23,15 +27,25 @@ const CommunityStakeStep = ({
   chainId,
   isTopicFlow,
   onTopicFlowStepChange,
+  refetchStakeQuery,
+  onlyNamespace,
+  namespace,
+  symbol,
 }: CommunityStakeStepProps) => {
-  const [enableStakePage, setEnableStakePage] = useState(true);
+  const hasNamespaceReserved = !!namespace;
+  const [enableStakePage, setEnableStakePage] = useState(
+    hasNamespaceReserved ? false : true,
+  );
   const [communityStakeData, setCommunityStakeData] = useState({
-    namespace: createdCommunityName,
-    symbol: createdCommunityName.toUpperCase().slice(0, 4),
+    namespace: namespace || createdCommunityName || '',
+    symbol: symbol || (createdCommunityName || '').toUpperCase().slice(0, 4),
   });
 
-  const handleOptInEnablingStake = ({ namespace, symbol }) => {
-    setCommunityStakeData({ namespace, symbol });
+  const handleOptInEnablingStake = (stakeData: {
+    namespace: string;
+    symbol: string;
+  }) => {
+    setCommunityStakeData(stakeData);
     setEnableStakePage(false);
   };
 
@@ -41,7 +55,19 @@ const CommunityStakeStep = ({
       : goToSuccessStep();
   };
 
-  const signStakeHandler = () => {
+  const onSuccessSignTransactions = () => {
+    if (isTopicFlow) {
+      if (onlyNamespace) {
+        return goToSuccessStep();
+      } else {
+        return refetchStakeQuery?.();
+      }
+    }
+
+    goToSuccessStep();
+  };
+
+  const onCancelSignTransactions = () => {
     isTopicFlow ? setEnableStakePage(true) : goToSuccessStep();
   };
 
@@ -54,15 +80,19 @@ const CommunityStakeStep = ({
           communityStakeData={communityStakeData}
           chainId={chainId}
           isTopicFlow={isTopicFlow}
+          onlyNamespace={onlyNamespace}
         />
       ) : (
         <SignStakeTransactions
-          goToSuccessStep={signStakeHandler}
+          onSuccess={onSuccessSignTransactions}
+          onCancel={onCancelSignTransactions}
           communityStakeData={communityStakeData}
           selectedAddress={selectedAddress}
           createdCommunityId={createdCommunityId}
           chainId={chainId}
           isTopicFlow={isTopicFlow}
+          onlyNamespace={onlyNamespace}
+          hasNamespaceReserved={hasNamespaceReserved}
         />
       )}
     </div>

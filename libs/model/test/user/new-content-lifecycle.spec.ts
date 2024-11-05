@@ -23,13 +23,13 @@ describe('New Content lifecycle', () => {
         {
           role: 'member',
           user_id: user1!.id,
-          verified: true,
+          verified: new Date(),
           last_active: new Date().toISOString(),
         },
         {
           role: 'member',
           user_id: user2!.id,
-          verified: true,
+          verified: new Date(),
           last_active: new Date().toISOString(),
         },
       ],
@@ -74,6 +74,7 @@ describe('New Content lifecycle', () => {
       pinned: false,
       read_only: false,
       body: 'Sample 1',
+      reaction_weights_sum: '0',
     });
     await seed('Thread', {
       address_id: address1.id!,
@@ -81,6 +82,7 @@ describe('New Content lifecycle', () => {
       pinned: false,
       read_only: false,
       body: 'Sample 2',
+      reaction_weights_sum: '0',
     });
 
     // now actor 2 should only get 1 entry for that community in new content array

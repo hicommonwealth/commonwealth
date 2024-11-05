@@ -182,9 +182,10 @@ describe('DatabaseCleaner Tests', async () => {
       const thread = await models.Thread.create({
         address_id: address.id!,
         title: 'Testing',
+        body: 'test',
         community_id: 'ethereum',
         reaction_count: 0,
-        reaction_weights_sum: 0,
+        reaction_weights_sum: '0',
         kind: 'discussion',
         stage: 'discussion',
         view_count: 0,
@@ -195,10 +196,9 @@ describe('DatabaseCleaner Tests', async () => {
       const comment = await models.Comment.create({
         thread_id: thread.id!,
         address_id: address.id!,
-        text: 'Testing',
+        body: 'Testing',
         reaction_count: 0,
-        reaction_weights_sum: 0,
-        plaintext: 'Testing',
+        reaction_weights_sum: '0',
         search: getCommentSearchVector('Testing'),
       });
 

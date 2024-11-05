@@ -1,6 +1,5 @@
-import { useMutation } from '@tanstack/react-query';
-import axios from 'axios';
-import { SERVER_URL } from 'state/api/config';
+import { trpc } from 'utils/trpcClient';
+import { GroupFormTopicSubmitValues } from 'views/pages/CommunityGroupsAndMembers/Groups/common/GroupForm/index.types';
 import { userStore } from '../../ui/user';
 import { ApiEndpoints, queryClient } from '../config';
 
@@ -10,42 +9,42 @@ interface EditGroupProps {
   address: string;
   groupName: string;
   groupDescription?: string;
-  topicIds: number[];
+  topics: GroupFormTopicSubmitValues[];
   requirementsToFulfill: number | undefined;
   requirements?: any[];
 }
 
-const editGroup = async ({
+export const buildUpdateGroupInput = ({
   groupId,
   communityId,
   address,
   groupName,
   groupDescription,
-  topicIds,
+  topics,
   requirementsToFulfill,
   requirements,
 }: EditGroupProps) => {
-  return await axios.put(`${SERVER_URL}/groups/${groupId}`, {
+  return {
     jwt: userStore.getState().jwt,
     community_id: communityId,
+    group_id: +groupId,
     author_community_id: communityId,
     address,
     metadata: {
       name: groupName,
-      description: groupDescription,
+      description: groupDescription ?? '',
       ...(requirementsToFulfill && {
         required_requirements: requirementsToFulfill,
       }),
     },
     ...(requirements && { requirements }),
-    topics: topicIds,
-  });
+    topics,
+  };
 };
 
 const useEditGroupMutation = ({ communityId }: { communityId: string }) => {
-  return useMutation({
-    mutationFn: editGroup,
-    onSuccess: async () => {
+  return trpc.community.updateGroup.useMutation({
+    onSuccess: () => {
       const key = [ApiEndpoints.FETCH_GROUPS, communityId];
       queryClient.cancelQueries(key);
       queryClient.refetchQueries(key);

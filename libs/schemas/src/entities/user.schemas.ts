@@ -1,6 +1,15 @@
 import { Roles, WalletId } from '@hicommonwealth/shared';
 import { z } from 'zod';
 import { PG_INT } from '../utils';
+import { Tags } from './tag.schemas';
+
+export const ApiKey = z.object({
+  user_id: PG_INT.optional(),
+  hashed_api_key: z.string(),
+  salt: z.string(),
+  created_at: z.coerce.date().optional(),
+  updated_at: z.coerce.date().optional(),
+});
 
 export const Image = z.object({
   url: z.string().nullish(),
@@ -24,6 +33,8 @@ export const ProfileTags = z.object({
 
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional(),
+
+  Tag: Tags.nullish(),
 });
 
 export const User = z.object({
@@ -39,9 +50,12 @@ export const User = z.object({
     .optional(),
   promotional_emails_enabled: z.boolean().nullish(),
   is_welcome_onboard_flow_complete: z.boolean().default(false).optional(),
+
   profile: UserProfile,
+  xp_points: PG_INT.default(0).nullish(),
 
   ProfileTags: z.array(ProfileTags).optional(),
+  ApiKey: ApiKey.optional(),
 
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional(),
@@ -53,9 +67,9 @@ export const Address = z.object({
   community_id: z.string().max(255),
   user_id: PG_INT.nullish(),
   verification_token: z.string().max(255).optional(),
-  verification_token_expires: z.date().nullable().nullish(),
-  verified: z.date().nullable().nullish(),
-  last_active: z.date().nullable().nullish(),
+  verification_token_expires: z.date().nullish(),
+  verified: z.date().nullish(),
+  last_active: z.date().nullish(),
   ghost_address: z.boolean().default(false),
   wallet_id: z.nativeEnum(WalletId).nullish(),
   block_info: z.string().max(255).nullish(),
@@ -90,9 +104,16 @@ export const CommunityMember = z.object({
       community_id: z.string(),
       address: z.string(),
       stake_balance: z.number().nullish(),
-      role: z.string(),
+      role: z.enum(Roles),
     }),
   ),
   group_ids: z.array(PG_INT),
   last_active: z.any().nullish().describe('string or date'),
+});
+
+export const XpLog = z.object({
+  user_id: PG_INT,
+  created_at: z.coerce.date(),
+  event_name: z.string(),
+  xp_points: PG_INT,
 });

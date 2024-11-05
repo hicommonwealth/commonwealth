@@ -1,4 +1,8 @@
-import { decamelize } from '@hicommonwealth/shared';
+import {
+  decamelize,
+  MAX_TRUNCATED_CONTENT_LENGTH,
+  safeTruncateBody,
+} from '@hicommonwealth/shared';
 import {
   Model,
   Sequelize,
@@ -62,9 +66,10 @@ export function oneToOne<Source extends State, Target extends State>(
     onDelete: options?.onDelete ?? 'NO ACTION',
   });
 
-  options?.targeyKey &&
+  // TODO: why belongsTo iff targetKey is defined + why not hasOne() instead?
+  options?.targetKey &&
     this.belongsTo(target, {
-      foreignKey: options?.targeyKey,
+      foreignKey: options?.targetKey,
       onUpdate: 'NO ACTION',
       onDelete: 'NO ACTION',
     });
@@ -249,8 +254,8 @@ export const createFk = (
     ALTER TABLE "${source}" ADD CONSTRAINT "${name}"
     FOREIGN KEY (${fk.join(',')}) REFERENCES "${target}"(${pk.join(',')})
     ON UPDATE ${rules?.onUpdate ?? 'NO ACTION'} ON DELETE ${
-    rules?.onDelete ?? 'NO ACTION'
-  };`);
+      rules?.onDelete ?? 'NO ACTION'
+    };`);
 
 /**
  * Drops composite FK constraints (not supported by sequelize)
@@ -276,4 +281,24 @@ export const syncHooks = {
   afterSync(options: SyncOptions) {
     options.logging = false;
   },
+};
+
+export const beforeValidateBodyHook = (instance: {
+  body: string;
+  content_url?: string | null | undefined;
+}) => {
+  if (!instance.body || instance.body.length <= MAX_TRUNCATED_CONTENT_LENGTH)
+    return;
+
+  if (!instance.content_url) {
+    throw new Error(
+      'content_url must be defined if body ' +
+        `length is greater than ${MAX_TRUNCATED_CONTENT_LENGTH}`,
+    );
+  } else
+    instance.body = safeTruncateBody(
+      instance.body,
+      MAX_TRUNCATED_CONTENT_LENGTH,
+    );
+  return instance;
 };

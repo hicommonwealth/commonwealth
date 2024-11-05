@@ -17,11 +17,11 @@ import { mustBeAuthorized } from '../middleware/guards';
 import { getThreadSearchVector } from '../models/thread';
 import { tokenBalanceCache } from '../services';
 import {
+  decodeContent,
   emitMentions,
   parseUserMentions,
-  quillToPlain,
-  sanitizeQuillText,
   uniqueMentions,
+  uploadIfLarge,
 } from '../utils';
 
 export const CreateThreadErrors = {
@@ -88,7 +88,9 @@ export function CreateThread(): Command<
   return {
     ...schemas.CreateThread,
     auth: [
-      isAuthorized({ action: schemas.PermissionEnum.CREATE_THREAD }),
+      isAuthorized({
+        action: schemas.PermissionEnum.CREATE_THREAD,
+      }),
       verifyThreadSignature,
     ],
     body: async ({ actor, payload, auth }) => {
@@ -112,9 +114,10 @@ export function CreateThread(): Command<
         checkContestLimits(activeContestManagers, actor.address!);
       }
 
-      const body = sanitizeQuillText(payload.body);
-      const plaintext = kind === 'discussion' ? quillToPlain(body) : body;
+      const body = decodeContent(payload.body);
       const mentions = uniqueMentions(parseUserMentions(body));
+
+      const { contentUrl } = await uploadIfLarge('threads', body);
 
       // == mutation transaction boundary ==
       const new_thread_id = await models.sequelize.transaction(
@@ -127,12 +130,12 @@ export function CreateThread(): Command<
               topic_id,
               kind,
               body,
-              plaintext,
               view_count: 0,
               comment_count: 0,
               reaction_count: 0,
-              reaction_weights_sum: 0,
+              reaction_weights_sum: '0',
               search: getThreadSearchVector(rest.title, body),
+              content_url: contentUrl,
             },
             {
               transaction,
@@ -145,14 +148,12 @@ export function CreateThread(): Command<
               body,
               address: address.address,
               timestamp: thread.created_at!,
+              content_url: contentUrl,
             },
             {
               transaction,
             },
           );
-
-          address.last_active = new Date();
-          await address.save({ transaction });
 
           await models.ThreadSubscription.create(
             {
@@ -163,7 +164,7 @@ export function CreateThread(): Command<
           );
 
           mentions.length &&
-            (await emitMentions(models, transaction, {
+            (await emitMentions(transaction, {
               authorAddressId: address.id!,
               authorUserId: actor.user.id!,
               authorAddress: address.address,

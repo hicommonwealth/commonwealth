@@ -60,8 +60,6 @@
     position: absolute;
     z-index: 70;
 
-    animation: slidein 0.2s ease-in-out;
-
     background-color: $neutral-25;
     border-right: 1px solid $neutral-200;
     height: 100%;
@@ -81,6 +79,10 @@
     &.onremove {
       animation: slideout 0.2s ease-in-out;
       left: -100%;
+    }
+
+    .TokenLaunchButton {
+      padding: 8px 16px;
     }
   }
 

@@ -5,7 +5,7 @@ import {
   WorkflowKeys,
 } from '@hicommonwealth/core';
 import { models } from '@hicommonwealth/model';
-import { safeTruncateBody } from '@hicommonwealth/shared';
+import { getDecodedString, safeTruncateBody } from '@hicommonwealth/shared';
 import z from 'zod';
 import { getCommentUrl } from '../util';
 
@@ -90,7 +90,7 @@ export const processCommentUpvoted: EventHandler<
       reaction: payload.reaction,
       comment_id: payload.comment_id,
       comment_body: safeTruncateBody(
-        decodeURIComponent(commentAndAuthor.text),
+        getDecodedString(commentAndAuthor.body),
         255,
       ),
       created_at: payload.created_at!.toISOString(),

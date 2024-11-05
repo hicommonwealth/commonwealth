@@ -1,32 +1,13 @@
-import axios from 'axios';
 import 'components/Avatar/AvatarUpload.scss';
 import { notifyError } from 'controllers/app/notifications';
 import React, { useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import app from 'state';
-import { SERVER_URL } from 'state/api/config';
-import useUserStore from 'state/ui/user';
-import { compressImage } from 'utils/ImageCompression';
+import { useUploadFileMutation } from 'state/api/general';
 import { Avatar } from 'views/components/Avatar/Avatar';
-import { replaceBucketWithCDN } from '../../../helpers/awsHelpers';
 import { CWIconButton } from '../component_kit/cw_icon_button';
 import { getClasses } from '../component_kit/helpers';
 import { ComponentType } from '../component_kit/types';
-
-const uploadToS3 = async (file: File, signedUrl: string) => {
-  const options = {
-    headers: {
-      'Content-Type': file.type,
-    },
-  };
-
-  try {
-    await axios.put(signedUrl, file, options);
-  } catch (error) {
-    notifyError('Failed to upload the file to S3');
-    throw error;
-  }
-};
 
 type AvatarUploadStyleProps = {
   size?: 'small' | 'large';
@@ -39,7 +20,7 @@ type AvatarUploadProps = {
   };
   darkMode?: boolean;
   scope: 'community' | 'user';
-  uploadCompleteCallback?: (file: Array<any>) => void;
+  uploadCompleteCallback?: (uploadUrl: string) => void;
   uploadStartedCallback?: () => void;
 } & AvatarUploadStyleProps;
 
@@ -52,7 +33,11 @@ export const AvatarUpload = ({
   uploadStartedCallback,
 }: AvatarUploadProps) => {
   const [files, setFiles] = useState([]);
-  const user = useUserStore();
+
+  const { mutateAsync: uploadImage } = useUploadFileMutation({
+    onSuccess: uploadCompleteCallback,
+  });
+
   const { getRootProps, getInputProps } = useDropzone({
     maxFiles: 1,
     maxSize: 10000000,
@@ -73,31 +58,13 @@ export const AvatarUpload = ({
         ),
       );
     },
-    onDropAccepted: async (acceptedFiles: any) => {
-      try {
-        const response = await axios.post(`${SERVER_URL}/getUploadSignature`, {
-          name: acceptedFiles[0].name, // imageName.png
-          mimetype: acceptedFiles[0].type, // image/png
-          auth: true,
-          jwt: user.jwt,
-        });
-        if (response.data.status !== 'Success') throw new Error();
-
-        const uploadURL = response.data.result;
-        acceptedFiles[0].uploadURL = uploadURL;
-
-        const compressedFile = await compressImage(acceptedFiles[0]);
-
-        // Upload the file to S3
-        await uploadToS3(compressedFile, uploadURL);
-
-        if (uploadCompleteCallback) {
-          acceptedFiles[0].uploadURL = replaceBucketWithCDN(uploadURL);
-          uploadCompleteCallback([acceptedFiles[0]]);
-        }
-      } catch (e) {
+    onDropAccepted: (acceptedFiles: Array<File>) => {
+      uploadImage({
+        file: acceptedFiles[0],
+      }).catch((e) => {
+        console.error(e);
         notifyError('Failed to get an S3 signed upload URL');
-      }
+      });
     },
   });
 

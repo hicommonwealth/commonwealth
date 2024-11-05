@@ -1,6 +1,6 @@
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import useBrowserWindow from 'hooks/useBrowserWindow';
-import type Topic from 'models/Topic';
+import type { Topic } from 'models/Topic';
 import React, { useEffect, useState } from 'react';
 import app from 'state';
 import {
@@ -18,7 +18,7 @@ import './ManageTopicsSection.scss';
 export const ManageTopicsSection = () => {
   const getFeaturedTopics = (rawTopics: Topic[]): Topic[] => {
     const topics = rawTopics
-      .filter((topic) => topic.featuredInSidebar)
+      .filter((topic) => topic.featured_in_sidebar)
       .map((topic) => ({ ...topic }) as Topic);
 
     if (!topics.length) return [];
@@ -37,7 +37,7 @@ export const ManageTopicsSection = () => {
 
   const getRegularTopics = (rawTopics: Topic[]): Topic[] => {
     const topics = rawTopics
-      .filter((topic) => !topic.featuredInSidebar)
+      .filter((topic) => !topic.featured_in_sidebar)
       .map((topic) => ({ ...topic }) as Topic);
 
     if (!topics.length) return [];
@@ -162,7 +162,7 @@ export const ManageTopicsSection = () => {
           buttonHeight="med"
           onClick={handleReversion}
           disabled={initialFeaturedTopics.every(
-            (value, index) => value.id === featuredTopics[index].id,
+            (value, index) => value.id === featuredTopics?.[index]?.id,
           )}
         />
         <CWButton

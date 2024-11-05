@@ -12,12 +12,15 @@ export type StakeData = {
 };
 
 export interface SignStakeTransactionsProps {
-  goToSuccessStep: () => void;
+  onSuccess: () => void;
+  onCancel: () => void;
   communityStakeData: StakeData;
   selectedAddress: AddressInfo;
   createdCommunityId: string;
   chainId: string;
   isTopicFlow?: boolean;
+  onlyNamespace?: boolean;
+  hasNamespaceReserved?: boolean;
 }
 
 export interface EnableStakeProps {
@@ -26,6 +29,7 @@ export interface EnableStakeProps {
   communityStakeData: StakeData;
   chainId: string;
   isTopicFlow?: boolean;
+  onlyNamespace?: boolean;
 }
 
 export const defaultActionState: ActionState = {

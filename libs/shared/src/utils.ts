@@ -1,9 +1,11 @@
+import { fromBech32, toHex } from '@cosmjs/encoding';
 import { isHex, isU8a } from '@polkadot/util';
 import {
   checkAddress,
   decodeAddress,
   encodeAddress,
 } from '@polkadot/util-crypto';
+import { S3_ASSET_BUCKET_CDN, S3_RAW_ASSET_BUCKET_DOMAIN } from './constants';
 
 /**
  * Decamelizes a string
@@ -84,12 +86,38 @@ export function delay(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+/**
+ * Converts an S3 file URL from the raw bucket URL to the Cloudflare CDN format.
+ * This is most often used in combination with pre-signed S3 upload URLs.
+ * Ex Input: https://s3.us-east-1.amazonaws.com/assets.commonwealth.im/f2e44ed9-2fb4-4746-8d7a-4a60fcd83b77.png
+ * Ex Output: https://assets.commonwealth.im/f2e44ed9-2fb4-4746-8d7a-4a60fcd83b77.png
+ */
+export function formatBucketUrlToAssetCDN(uploadLocation: string) {
+  if (
+    process.env.APP_ENV &&
+    ['production', 'beta'].includes(process.env.APP_ENV)
+  ) {
+    const fileName = uploadLocation.split('/').pop() || '';
+    return `${S3_ASSET_BUCKET_CDN}/${fileName}`;
+  }
+  return uploadLocation;
+}
+
+/**
+ * Converts an S3 file URL from the CDN format to the raw assets bucket URL.
+ * This function should only be used server side when the raw S3 headers are
+ * required in the response (CloudFlare truncates headers).
+ * Ex Input: https://assets.commonwealth.im/f2e44ed9-2fb4-4746-8d7a-4a60fcd83b77.png
+ * Ex Output: https://s3.us-east-1.amazonaws.com/assets.commonwealth.im/f2e44ed9-2fb4-4746-8d7a-4a60fcd83b77.png
+ */
 export function formatAssetUrlToS3(uploadLocation: string): string {
-  const S3Domain = 's3.us-east-1.amazonaws.com/assets.commonwealth.im';
-  if (uploadLocation.includes(S3Domain)) {
+  if (uploadLocation.includes(S3_RAW_ASSET_BUCKET_DOMAIN)) {
     return uploadLocation;
   }
-  return uploadLocation.replace('assets.commonwealth.im', S3Domain);
+  return uploadLocation.replace(
+    S3_ASSET_BUCKET_CDN,
+    S3_RAW_ASSET_BUCKET_DOMAIN,
+  );
 }
 
 export async function getFileSizeBytes(url: string): Promise<number> {
@@ -307,4 +335,34 @@ export function getWebhookDestination(webhookUrl = ''): string {
   }
 
   return destination;
+}
+
+export function getDecodedString(str: string) {
+  try {
+    return decodeURIComponent(str);
+  } catch (err) {
+    return str;
+  }
+}
+
+/**
+ * Convert Cosmos bech32 address to a hexadecimal string
+ * hex is used as a common identifier for addresses across chains.
+ * This allows us to achieve One Signer, One Account
+ *
+ * Example:
+ * bech32ToHex('osmo18q3tlnx8vguv2fadqslm7x59ejauvsmnhltgq6') => '3822bfccc76238c527ad043fbf1a85ccbbc64373'
+ * bech32ToHex('cosmos18q3tlnx8vguv2fadqslm7x59ejauvsmnlycckg') => '3822bfccc76238c527ad043fbf1a85ccbbc64373' (same)
+ *
+ * Caveat: Ethermint addresses will share a hex, but it will differ from
+ * their siblings on standard Cosmos derivation paths.
+ * e.g. evmos hex != osmo hex, but evmos hex == inj hex
+ */
+export function bech32ToHex(address: string) {
+  try {
+    const encodedData = fromBech32(address).data;
+    return toHex(encodedData);
+  } catch (e) {
+    console.log(`Error converting bech32 to hex: ${e}. Hex was not generated.`);
+  }
 }

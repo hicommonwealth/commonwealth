@@ -76,7 +76,6 @@ export async function __updateTopicChannel(
     );
 
     // Remove channel_id from old topic
-    // @ts-expect-error StrictNullChecks
     topicWithChannel.channel_id = null;
     await topicWithChannel.save();
   } else {

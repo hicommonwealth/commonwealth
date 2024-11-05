@@ -1,4 +1,4 @@
-import { EventNames } from '@hicommonwealth/core';
+import { disposeAdapter, EventNames } from '@hicommonwealth/core';
 import { DB, tester } from '@hicommonwealth/model';
 import { delay } from '@hicommonwealth/shared';
 import { expect } from 'chai';
@@ -21,6 +21,7 @@ describe('messageRelayer', { timeout: 20_000 }, () => {
 
   afterEach(async () => {
     await models.Outbox.truncate();
+    disposeAdapter('brokerFactory');
   });
 
   test('should correctly increment number of unrelayed events on startup', async () => {

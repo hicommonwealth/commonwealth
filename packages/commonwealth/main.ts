@@ -1,7 +1,6 @@
 import { CacheDecorator, setupErrorHandlers } from '@hicommonwealth/adapters';
 import { logger } from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
-import { GlobalActivityCache } from '@hicommonwealth/model';
 import sgMail from '@sendgrid/mail';
 import compression from 'compression';
 import SessionSequelizeStore from 'connect-session-sequelize';
@@ -27,7 +26,6 @@ import DatabaseValidationService from './server/middleware/databaseValidationSer
 import setupPassport from './server/passport';
 import setupAPI from './server/routing/router';
 import setupServer from './server/scripts/setupServer';
-import ViewCountCache from './server/util/viewCountCache';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -41,12 +39,10 @@ export async function main(
   db: DB,
   {
     port,
-    noGlobalActivityCache = true,
     withLoggingMiddleware = false,
     withPrerender = false,
   }: {
     port: number;
-    noGlobalActivityCache?: boolean;
     withLoggingMiddleware?: boolean;
     withPrerender?: boolean;
   },
@@ -64,7 +60,6 @@ export async function main(
   const cacheDecorator = new CacheDecorator();
 
   const SequelizeStore = SessionSequelizeStore(session.Store);
-  const viewCountCache = new ViewCountCache(2 * 60, 10 * 60);
 
   const sessionStore = new SequelizeStore({
     db: db.sequelize,
@@ -82,6 +77,7 @@ export async function main(
     saveUninitialized: false,
     cookie: {
       maxAge: config.AUTH.SESSION_EXPIRY_MILLIS,
+      sameSite: 'lax',
     },
   });
 
@@ -153,25 +149,12 @@ export async function main(
   setupMiddleware();
   setupPassport(db);
 
-  // TODO: decouple as global singleton
-  const globalActivityCache = GlobalActivityCache.getInstance(db);
-  // initialize async to avoid blocking startup
-  if (!noGlobalActivityCache) globalActivityCache.start();
-
   // Declare Validation Middleware Service
   // middleware to use for all requests
   const dbValidationService: DatabaseValidationService =
     new DatabaseValidationService(db);
 
-  setupAPI(
-    '/api',
-    app,
-    db,
-    viewCountCache,
-    globalActivityCache,
-    dbValidationService,
-    cacheDecorator,
-  );
+  setupAPI('/api', app, db, dbValidationService, cacheDecorator);
 
   app.use('/robots.txt', (req: Request, res: Response) => {
     res.sendFile(`${__dirname}/robots.txt`);

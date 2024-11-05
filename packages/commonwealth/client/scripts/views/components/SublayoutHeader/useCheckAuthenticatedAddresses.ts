@@ -56,20 +56,20 @@ const useCheckAuthenticatedAddresses = ({
         // @ts-expect-error <StrictNullChecks>
         communityIdOrPrefix,
       );
-      const caip2Address = `${communityCaip2Prefix}:${communityCanvasChainId}:${account.address}`;
+      const did: `did:${string}` = `did:pkh:${communityCaip2Prefix}:${communityCanvasChainId}:${account.address}`;
 
       // find a session signer that matches
       const matchedSessionSigner = sessionSigners.find((sessionSigner) =>
-        sessionSigner.match(caip2Address),
+        sessionSigner.match(did),
       );
       if (!matchedSessionSigner) {
-        newAuthenticatedAddresses[caip2Address] = false;
+        newAuthenticatedAddresses[did] = false;
         continue;
       }
       // check if it has an authorised session
-      newAuthenticatedAddresses[caip2Address] = matchedSessionSigner.hasSession(
+      newAuthenticatedAddresses[did] = matchedSessionSigner.hasSession(
         CANVAS_TOPIC,
-        caip2Address,
+        did,
       );
     }
 

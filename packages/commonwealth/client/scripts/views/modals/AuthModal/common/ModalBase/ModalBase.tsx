@@ -43,7 +43,8 @@ const MODAL_COPY = {
   },
   [AuthModalType.RevalidateSession]: {
     title: 'Session Expired',
-    description: 'To continue what you were doing, please sign in again',
+    description:
+      'To continue what you were doing with this address, please sign in again',
     showFooter: true,
     showExistingAccountSignInFooter: false,
   },
@@ -356,9 +357,13 @@ const ModalBase = ({
               <CWText isCentered>
                 By connecting to Common you agree to our&nbsp;
                 <br />
-                <Link to="/terms">Terms of Service</Link>
+                <Link to="/terms" onClick={() => onClose()}>
+                  Terms of Service
+                </Link>
                 &nbsp;and&nbsp;
-                <Link to="/privacy">Privacy Policy</Link>
+                <Link to="/privacy" onClick={() => onClose()}>
+                  Privacy Policy
+                </Link>
               </CWText>
 
               {copy.showExistingAccountSignInFooter && (

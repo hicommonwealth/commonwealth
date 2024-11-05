@@ -31,12 +31,14 @@ describe('Linking Tests', () => {
   let topicId: number,
     adminJWT: string,
     adminAddress: string,
+    adminDid: `did:${string}`,
     adminSession: {
       session: Session;
       sign: (payload: Message<Action | Session>) => Awaitable<Signature>;
     },
     userJWT: string,
     userAddress: string,
+    userDid: `did:${string}`,
     userSession: {
       session: Session;
       sign: (payload: Message<Action | Session>) => Awaitable<Signature>;
@@ -68,6 +70,7 @@ describe('Linking Tests', () => {
 
     let res = await server.seeder.createAndVerifyAddress({ chain }, 'Alice');
     adminAddress = res.address;
+    adminDid = res.did;
     adminJWT = jwt.sign(
       { id: res.user_id, email: res.email },
       config.AUTH.JWT_SECRET,
@@ -79,23 +82,27 @@ describe('Linking Tests', () => {
     });
     adminSession = { session: res.session, sign: res.sign };
     expect(adminAddress).to.not.be.null;
+    expect(adminDid).to.not.be.null;
     expect(adminJWT).to.not.be.null;
     expect(isAdmin).to.not.be.null;
 
     res = await server.seeder.createAndVerifyAddress({ chain }, 'Alice');
     userAddress = res.address;
+    userDid = res.did;
     userJWT = jwt.sign(
       { id: res.user_id, email: res.email },
       config.AUTH.JWT_SECRET,
     );
     userSession = { session: res.session, sign: res.sign };
     expect(userAddress).to.not.be.null;
+    expect(userDid).to.not.be.null;
     expect(userJWT).to.not.be.null;
 
     // @ts-expect-error StrictNullChecks
     thread1 = (
       await server.seeder.createThread({
         address: userAddress,
+        did: userDid,
         kind,
         stage,
         chainId: chain,
@@ -112,6 +119,7 @@ describe('Linking Tests', () => {
     thread2 = (
       await server.seeder.createThread({
         address: adminAddress,
+        did: adminDid,
         kind,
         stage,
         chainId: chain,

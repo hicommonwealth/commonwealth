@@ -181,7 +181,6 @@ export const useMarkdownToolbarHandlers = ({
       if (!selection) {
         return;
       }
-
       const start = selection.index;
       const prefix = start === 0 ? '' : '\n';
       editor.insertText(start, `${prefix}> `);

@@ -1,39 +1,16 @@
-import { TopicWeightedVoting } from '@hicommonwealth/schemas';
+import { Topic } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize';
+import { z } from 'zod';
 import type { CommunityAttributes } from './community';
 import type { ThreadAttributes } from './thread';
 import type { ModelInstance } from './types';
 
-export type TopicAttributes = {
-  id?: number;
-  name: string;
-  description?: string;
-  community_id: string;
-  featured_in_sidebar?: boolean;
-  featured_in_new_post?: boolean;
-  order?: number;
-  channel_id?: string;
-  created_at?: Date;
-  updated_at?: Date;
-  deleted_at?: Date;
-  default_offchain_template?: string;
-  group_ids?: number[];
-  telegram?: string;
-
-  weighted_voting?: TopicWeightedVoting;
-  chain_node_id?: number;
-  token_address?: string;
-  token_symbol?: string;
-  vote_weight_multiplier?: number;
-
+export type TopicAttributes = z.infer<typeof Topic> & {
   // associations
   community?: CommunityAttributes;
-  threads?: ThreadAttributes[] | TopicAttributes['id'][];
+  threads?: ThreadAttributes[];
 };
-
-export type TopicInstance = ModelInstance<TopicAttributes> & {
-  // no mixins used
-};
+export type TopicInstance = ModelInstance<TopicAttributes>;
 
 export default (
   sequelize: Sequelize.Sequelize,
@@ -71,18 +48,9 @@ export default (
       },
       telegram: { type: Sequelize.STRING, allowNull: true },
       weighted_voting: { type: Sequelize.STRING, allowNull: true },
-      chain_node_id: {
-        type: Sequelize.INTEGER,
-        allowNull: true,
-        references: {
-          model: 'ChainNodes',
-          key: 'id',
-        },
-        onUpdate: 'CASCADE',
-      },
       token_address: { type: Sequelize.STRING, allowNull: true },
       token_symbol: { type: Sequelize.STRING, allowNull: true },
-      vote_weight_multiplier: { type: Sequelize.INTEGER, allowNull: true },
+      vote_weight_multiplier: { type: Sequelize.FLOAT, allowNull: true },
     },
     {
       timestamps: true,

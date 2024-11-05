@@ -13,7 +13,9 @@ export function CreateCommentReaction(): Command<
   return {
     ...schemas.CreateCommentReaction,
     auth: [
-      isAuthorized({ action: schemas.PermissionEnum.CREATE_COMMENT_REACTION }),
+      isAuthorized({
+        action: schemas.PermissionEnum.CREATE_COMMENT_REACTION,
+      }),
       verifyReactionSignature,
     ],
     body: async ({ payload, actor, auth }) => {
@@ -21,7 +23,7 @@ export function CreateCommentReaction(): Command<
       const thread = comment.Thread!;
 
       const calculated_voting_weight = await getVotingWeight(
-        thread.community_id,
+        thread.topic_id!,
         address.address,
       );
 
@@ -38,15 +40,12 @@ export function CreateCommentReaction(): Command<
               address_id: address.id!,
               comment_id: comment.id,
               reaction: payload.reaction,
-              calculated_voting_weight,
-              canvas_hash: payload.canvas_hash,
+              calculated_voting_weight: calculated_voting_weight?.toString(),
+              canvas_msg_id: payload.canvas_msg_id,
               canvas_signed_data: payload.canvas_signed_data,
             },
             transaction,
           });
-
-          address.last_active = new Date();
-          await address.save({ transaction });
 
           return reaction.id;
         },

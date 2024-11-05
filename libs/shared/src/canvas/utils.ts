@@ -1,6 +1,4 @@
-import { configure } from 'safe-stable-stringify';
-
-export const CANVAS_TOPIC = 'canvas:commonwealth';
+import { parse, stringify } from '@ipld/dag-json';
 
 export function assert(
   condition: unknown,
@@ -21,12 +19,16 @@ export function assertMatches(a: any, b: any, obj: string, field: string) {
   );
 }
 
-export const stringify = configure({
-  bigint: false,
-  circularValue: Error,
-  strict: true,
-  deterministic: true,
-});
+// The `CanvasSignedData` and `Session` objects may contain data that cannot be
+// automatically serialized by JSON, e.g. Uint8Array. We are using the IPLD dag-json codec
+// to serialize and deserialize these objects.
 
-export const caip2AddressEquals = (address1: string, address2: string) =>
-  address1 === address2;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const serializeCanvas = (data: any): string => {
+  return stringify(data);
+};
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const deserializeCanvas = (serializedData: string): any => {
+  return parse(serializedData);
+};

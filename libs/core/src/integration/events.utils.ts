@@ -1,5 +1,6 @@
 import { ETHERS_BIG_NUMBER, EVM_ADDRESS } from '@hicommonwealth/schemas';
-import ethers from 'ethers';
+import { BigNumber } from 'ethers';
+import type { Result } from 'ethers/lib/utils';
 import { ZodSchema, z } from 'zod';
 import { EventNames } from './events';
 import {
@@ -78,7 +79,7 @@ const RecurringContestManagerDeployedMapper: EvmMapper<
     event_payload: {
       contest_address: contest,
       namespace: namespace,
-      interval: ethers.BigNumber.from(interval).toNumber(),
+      interval: BigNumber.from(interval).toNumber(),
     },
   }),
 };
@@ -98,7 +99,7 @@ const OneOffContestManagerDeployedMapper: EvmMapper<
     event_payload: {
       contest_address: contest,
       namespace: namespace,
-      length: ethers.BigNumber.from(interval).toNumber(),
+      length: BigNumber.from(interval).toNumber(),
     },
   }),
 };
@@ -113,9 +114,9 @@ const NewRecurringContestStartedMapper: EvmMapper<
     event_name: EventNames.ContestStarted,
     event_payload: {
       contest_address: contestAddress!,
-      contest_id: ethers.BigNumber.from(contestId).toNumber(),
-      start_time: new Date(ethers.BigNumber.from(startTime).toNumber() * 1000),
-      end_time: new Date(ethers.BigNumber.from(endTime).toNumber() * 1000),
+      contest_id: BigNumber.from(contestId).toNumber(),
+      start_time: new Date(BigNumber.from(startTime).toNumber() * 1000),
+      end_time: new Date(BigNumber.from(endTime).toNumber() * 1000),
     },
   }),
 };
@@ -131,8 +132,8 @@ const NewSingleContestStartedMapper: EvmMapper<
     event_payload: {
       contest_address: contestAddress!,
       contest_id: 0,
-      start_time: new Date(ethers.BigNumber.from(startTime).toNumber() * 1000),
-      end_time: new Date(ethers.BigNumber.from(endTime).toNumber() * 1000),
+      start_time: new Date(BigNumber.from(startTime).toNumber() * 1000),
+      end_time: new Date(BigNumber.from(endTime).toNumber() * 1000),
     },
   }),
 };
@@ -147,7 +148,7 @@ const NewContestContentAddedMapper: EvmMapper<
     event_name: EventNames.ContestContentAdded,
     event_payload: {
       contest_address: contestAddress!,
-      content_id: ethers.BigNumber.from(contentId).toNumber(),
+      content_id: BigNumber.from(contentId).toNumber(),
       creator_address: creator,
       content_url: url,
     },
@@ -167,10 +168,10 @@ const ContestContentUpvotedRecurringMapper: EvmMapper<
     event_name: EventNames.ContestContentUpvoted,
     event_payload: {
       contest_address: contestAddress!,
-      contest_id: ethers.BigNumber.from(contestId).toNumber(),
-      content_id: ethers.BigNumber.from(contentId).toNumber(),
+      contest_id: BigNumber.from(contestId).toNumber(),
+      content_id: BigNumber.from(contentId).toNumber(),
       voter_address: voter,
-      voting_power: ethers.BigNumber.from(votingPower).toNumber(),
+      voting_power: BigNumber.from(votingPower).toString(),
     },
   }),
 };
@@ -185,10 +186,10 @@ const ContestContentUpvotedOneOffMapper: EvmMapper<
     event_name: EventNames.ContestContentUpvoted,
     event_payload: {
       contest_address: contestAddress!,
-      contest_id: ethers.BigNumber.from(0).toNumber(),
-      content_id: ethers.BigNumber.from(contentId).toNumber(),
+      contest_id: BigNumber.from(0).toNumber(),
+      content_id: BigNumber.from(contentId).toNumber(),
       voter_address: voter,
-      voting_power: ethers.BigNumber.from(votingPower).toNumber(),
+      voting_power: BigNumber.from(votingPower).toString(),
     },
   }),
 };
@@ -210,7 +211,7 @@ const EvmMappers = {
 // based on solidity event signature.
 const parseEthersResult = (
   signature: string,
-  evmParsedArgs: ethers.utils.Result,
+  evmParsedArgs: Result,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): Record<string, any> => {
   const sigParts = signature.split(',').map((str: string) => str.trim());
@@ -256,7 +257,7 @@ export const parseEvmEventToContestEvent = <
 >(
   chainEventName: Event,
   contestAddress: string | null,
-  evmParsedArgs: ethers.utils.Result,
+  evmParsedArgs: Result,
 ): ContestOutboxEvent<Event> => {
   const m = EvmMappers[chainEventName];
   if (!m) {

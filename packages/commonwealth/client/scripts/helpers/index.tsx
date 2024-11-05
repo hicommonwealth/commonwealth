@@ -1,12 +1,9 @@
-import { ChainBase, ChainNetwork } from '@hicommonwealth/shared';
-import type { Coin } from 'adapters/currency';
+import { TopicWeightedVoting } from '@hicommonwealth/schemas';
 import BigNumber from 'bignumber.js';
 import moment from 'moment';
 import React from 'react';
 import app from 'state';
-import { getChainDecimals } from '../controllers/app/webWallets/utils';
 import Account from '../models/Account';
-import IChainAdapter from '../models/IChainAdapter';
 import { ThreadStage } from '../models/types';
 
 export async function sleep(msec) {
@@ -98,24 +95,6 @@ export function pluralizeWithoutNumberPrefix(num: number, str: string) {
   }
 }
 
-export function articlize(str: string) {
-  if (str.trimLeft().match(/^[aeiouAEIOU]/)) {
-    return `an ${str.trimLeft()}`;
-  } else {
-    return `a ${str.trimLeft()}`;
-  }
-}
-
-export function formatAsTitleCase(str: string) {
-  return str
-    .toLowerCase()
-    .split(' ')
-    .map((word) => {
-      return word.replace(word[0], word[0].toUpperCase());
-    })
-    .join(' ');
-}
-
 export function formatLastUpdated(timestamp) {
   if (timestamp.isBefore(moment().subtract(365, 'days')))
     return timestamp.format('MMM D YYYY');
@@ -142,12 +121,6 @@ export function formatTimestamp(timestamp) {
     .replace(' month', 'mo')}`;
 }
 
-export function formatTimestampAsDate(timestamp: moment.Moment) {
-  if (timestamp.isBefore(moment().startOf('year')))
-    return timestamp.format('MMM D YYYY');
-  else return timestamp.format('MMM D');
-}
-
 // duplicated in adapters/currency.ts
 export function formatNumberLong(num: number) {
   // format small numbers with decimals, large numbers with commas
@@ -156,21 +129,6 @@ export function formatNumberLong(num: number) {
   if (num < 0.001) return num.toString();
   const nf = new Intl.NumberFormat();
   return nf.format(num);
-}
-
-export function formatPercentShort(num: number) {
-  if (num === 0) return '0%';
-  if (num === 1) return '100%';
-  if (num > 1) return '100%+';
-  return `${(num * 100).toFixed(1)}%`;
-}
-
-/* Choose Total Digits to Display*/
-export function formatPercent(num: number, digits: number) {
-  if (num === 0) return '0%';
-  if (num === 1) return '100%';
-  if (num > 1) return '100%+';
-  return `${(num * 100).toFixed(digits)}%`;
 }
 
 export function formatDuration(
@@ -184,11 +142,6 @@ export function formatDuration(
     days || duration.minutes() ? `${duration.minutes()}m ` : '',
     includeSeconds ? `${duration.seconds()}s` : '',
   ].join('');
-}
-
-export function formatProposalHashShort(hash: string) {
-  if (!hash) return;
-  return `${hash.slice(0, 8)}…`;
 }
 
 export function formatAddressShort(
@@ -232,10 +185,6 @@ export function blocknumToDuration(blocknum: number) {
   return moment
     .duration(blocknumToTime(blocknum).diff(moment()))
     .asMilliseconds();
-}
-
-export function blockperiodToDuration(blocknum: number) {
-  return moment.duration(blocknum * app.chain.block.duration, 'seconds');
 }
 
 // loads remote scripts from a URI, e.g. Twitter widgets
@@ -303,40 +252,16 @@ export const handleRedirectClicks = (
   }
 };
 
-// Returns a default chain for a chainbase
-export function baseToNetwork(n: ChainBase): ChainNetwork {
-  switch (n) {
-    case ChainBase.CosmosSDK:
-      return ChainNetwork.Osmosis;
-    case ChainBase.Substrate:
-      return ChainNetwork.Edgeware;
-    case ChainBase.Ethereum:
-      return ChainNetwork.Ethereum;
-    case ChainBase.NEAR:
-      return ChainNetwork.NEAR;
-    case ChainBase.Solana:
-      return ChainNetwork.Solana;
-    default:
-      // @ts-expect-error <StrictNullChecks/>
-      return null;
-  }
-}
-
-// Decimals For Tokens
-export function getDecimals(chain: IChainAdapter<Coin, Account>): number {
-  let decimals;
-  if (chain.meta.id === 'evmos') {
-    // Custom for evmos
-    decimals = 18;
-  } else if (chain && chain.meta) {
-    decimals = getChainDecimals(chain.id || '', chain.base);
-  } else if (chain.network === ChainNetwork.ERC721) {
-    decimals = 0;
-  } else if (chain.network === ChainNetwork.ERC1155) {
-    decimals = 0;
-  } else if (chain.base === ChainBase.CosmosSDK) {
-    decimals = 6;
+export const weightedVotingValueToLabel = (
+  weightedVoting: TopicWeightedVoting,
+) => {
+  if (weightedVoting === TopicWeightedVoting.Stake) {
+    return 'Community Stake';
   }
 
-  return decimals;
-}
+  if (weightedVoting === TopicWeightedVoting.ERC20) {
+    return 'ERC20';
+  }
+
+  return '';
+};

@@ -83,10 +83,10 @@
         word-break: break-word;
         font-size: 16px !important;
         overflow: hidden;
+        white-space: pre-wrap;
 
         @include extraSmall {
           overflow: hidden !important;
-          max-height: 54px !important;
         }
 
         .MarkdownFormattedText {

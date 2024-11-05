@@ -5,7 +5,7 @@ export function useCommunityAlertsQuery({
 }: {
   enabled?: boolean;
 }) {
-  return trpc.subscription.getCommunityAlerts.useQuery(
+  return trpc.subscriptions.getCommunityAlerts.useQuery(
     {},
     {
       enabled,

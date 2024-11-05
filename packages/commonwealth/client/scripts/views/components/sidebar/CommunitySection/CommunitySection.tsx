@@ -54,8 +54,9 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
 
   const { data: domain } = useFetchCustomDomainQuery();
 
-  const topicIdsIncludedInContest =
-    getUniqueTopicIdsIncludedInActiveContest(contestsData);
+  const topicIdsIncludedInContest = getUniqueTopicIdsIncludedInActiveContest(
+    contestsData.all,
+  );
 
   const communityAlerts = useCommunityAlertsQuery({
     enabled: user.isLoggedIn && !!app.chain,
@@ -81,7 +82,7 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
 
             {stakeEnabled && (
               <VoteWeightModule
-                voteWeight={currentVoteWeight}
+                voteWeight={currentVoteWeight?.toString() || '0'}
                 stakeNumber={stakeBalance}
                 stakeValue={stakeValue}
                 denomination={findDenominationString(activeChainId) || 'ETH'}

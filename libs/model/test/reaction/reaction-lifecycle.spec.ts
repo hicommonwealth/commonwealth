@@ -53,6 +53,7 @@ describe('Reactions lifecycle', () => {
         deleted_at: undefined, // so we can find it!
         pinned: false,
         read_only: false,
+        reaction_weights_sum: '0',
       },
       //{ mock: true, log: true },
     );
@@ -67,8 +68,8 @@ describe('Reactions lifecycle', () => {
       thread_id: threadId,
       reaction: 'like',
       canvas_signed_data: '',
-      canvas_hash: '',
-      calculated_voting_weight: 0,
+      canvas_msg_id: '',
+      calculated_voting_weight: '0',
     });
 
     const lastOutboxEntry = await models.Outbox.findOne({

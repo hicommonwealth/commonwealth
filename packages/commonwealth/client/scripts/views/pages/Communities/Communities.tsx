@@ -1,6 +1,9 @@
 import { ExtendedCommunity } from '@hicommonwealth/schemas';
-import { ChainBase, ChainNetwork } from '@hicommonwealth/shared';
+import { ChainNetwork, CommunityType } from '@hicommonwealth/shared';
+import clsx from 'clsx';
 import { findDenominationString } from 'helpers/findDenomination';
+import useBrowserWindow from 'hooks/useBrowserWindow';
+import { useFlag } from 'hooks/useFlag';
 import React, { Fragment, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Virtuoso } from 'react-virtuoso';
@@ -10,7 +13,7 @@ import { useManageCommunityStakeModalStore } from 'state/ui/modals';
 import useUserStore from 'state/ui/user';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { z } from 'zod';
-import { useFetchEthUsdRateQuery } from '../../../state/api/communityStake/index';
+import { useFetchTokenUsdRateQuery } from '../../../state/api/communityStake/index';
 import { trpc } from '../../../utils/trpcClient';
 import { NewCommunityCard } from '../../components/CommunityCard';
 import { CWText } from '../../components/component_kit/cw_text';
@@ -22,8 +25,17 @@ import { CWTag } from '../../components/component_kit/new_designs/CWTag';
 import CreateCommunityButton from '../../components/sidebar/CreateCommunityButton';
 import ManageCommunityStakeModal from '../../modals/ManageCommunityStakeModal/ManageCommunityStakeModal';
 import './Communities.scss';
-import { FiltersDrawer } from './FiltersDrawer/FiltersDrawer';
-import { CommunityFilters } from './FiltersDrawer/types';
+import {
+  CommunityFilters,
+  CommunitySortDirections,
+  CommunitySortOptions,
+  FiltersDrawer,
+  communityChains,
+  communitySortOptionsLabelToKeysMap,
+  sortOrderLabelsToDirectionsMap,
+} from './FiltersDrawer';
+import IdeaLaunchpad from './IdeaLaunchpad';
+import TokensList from './TokensList';
 import { getCommunityCountsString } from './helpers';
 
 type ExtendedCommunityType = z.infer<typeof ExtendedCommunity>;
@@ -34,6 +46,7 @@ type ExtendedCommunitySliceType = [
 
 const CommunitiesPage = () => {
   const containerRef = useRef();
+  const tokenizedCommunityEnabled = useFlag('tokenizedCommunity');
 
   const {
     setModeOfManageCommunityStakeModal,
@@ -41,9 +54,14 @@ const CommunitiesPage = () => {
   } = useManageCommunityStakeModalStore();
 
   const [filters, setFilters] = useState<CommunityFilters>({
-    withChainBase: undefined,
+    withCommunityEcosystem: undefined,
     withStakeEnabled: undefined,
     withTagsIds: undefined,
+    withCommunitySortBy: CommunitySortOptions.MemberCount,
+    withCommunitySortOrder: CommunitySortDirections.Descending,
+    withCommunityType: undefined,
+    withEcosystemChainId: undefined,
+    withNetwork: undefined,
   });
 
   const [selectedCommunityId, setSelectedCommunityId] = useState<string>();
@@ -53,6 +71,8 @@ const CommunitiesPage = () => {
 
   const { data: tags, isLoading: isLoadingTags } = useFetchTagsQuery();
 
+  const { isWindowSmallInclusive } = useBrowserWindow({});
+
   const {
     data: communities,
     fetchNextPage: fetchMoreCommunities,
@@ -61,15 +81,30 @@ const CommunitiesPage = () => {
   } = useFetchCommunitiesQuery({
     limit: 50,
     include_node_info: true,
-    order_by: 'lifetime_thread_count',
-    order_direction: 'DESC',
-    base: filters.withChainBase ? ChainBase[filters.withChainBase] : undefined,
+    order_by:
+      communitySortOptionsLabelToKeysMap[filters.withCommunitySortBy || ''] ||
+      'lifetime_thread_count',
+    order_direction:
+      sortOrderLabelsToDirectionsMap[filters.withCommunitySortOrder || ''] ||
+      'DESC',
+    eth_chain_id:
+      typeof filters.withEcosystemChainId === 'number'
+        ? filters.withEcosystemChainId
+        : undefined,
+    cosmos_chain_id:
+      typeof filters.withEcosystemChainId === 'string'
+        ? filters.withEcosystemChainId
+        : undefined,
+    base: filters.withCommunityEcosystem || undefined,
     network: filters.withNetwork
       ? ChainNetwork[filters.withNetwork]
       : undefined,
     stake_enabled: filters.withStakeEnabled,
     cursor: 1,
     tag_ids: filters.withTagsIds,
+    community_type: filters.withCommunityType
+      ? CommunityType[filters.withCommunityType]
+      : undefined,
   });
 
   const { data: historicalPrices, isLoading: isLoadingHistoricalPrices } =
@@ -78,7 +113,9 @@ const CommunitiesPage = () => {
     });
 
   const { data: ethUsdRateData, isLoading: isLoadingEthUsdRate } =
-    useFetchEthUsdRateQuery();
+    useFetchTokenUsdRateQuery({
+      tokenSymbol: 'ETH',
+    });
   const ethUsdRate = ethUsdRateData?.data?.data?.amount;
 
   const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
@@ -120,10 +157,17 @@ const CommunitiesPage = () => {
     });
   };
 
-  const removeChainBaseFilter = () => {
+  const removeCommunityEcosystemFilter = () => {
     setFilters({
       ...filters,
-      withChainBase: undefined,
+      withCommunityEcosystem: undefined,
+    });
+  };
+
+  const removeEcosystemChainIdFilter = () => {
+    setFilters({
+      ...filters,
+      withEcosystemChainId: undefined,
     });
   };
 
@@ -134,49 +178,112 @@ const CommunitiesPage = () => {
     });
   };
 
+  const removeCommunityTypeFilter = () => {
+    setFilters({
+      ...filters,
+      withCommunityType: undefined,
+    });
+  };
+
+  const removeCommunitySortByFilter = () => {
+    setFilters({
+      ...filters,
+      withCommunitySortBy: undefined,
+      withCommunitySortOrder: undefined,
+    });
+  };
+
+  const communitiesCount = (
+    <CWText type="b2" className="communities-count">
+      {!isLoading && communities?.pages?.[0]?.totalResults
+        ? getCommunityCountsString(communities?.pages?.[0]?.totalResults)
+        : 'No communities found'}
+    </CWText>
+  );
+
   return (
     // @ts-expect-error <StrictNullChecks/>
     <CWPageLayout ref={containerRef} className="CommunitiesPageLayout">
       <div className="CommunitiesPage">
         <div className="header-section">
           <div className="description">
-            <CWText type="h2">Explore communities</CWText>
+            <CWText
+              type="h1"
+              {...(tokenizedCommunityEnabled && { fontWeight: 'semiBold' })}
+            >
+              Explore {tokenizedCommunityEnabled ? '' : 'Communities'}
+            </CWText>
+            {isWindowSmallInclusive ? communitiesCount : <></>}
             <div className="actions">
-              <CWText type="caption" className="communities-count">
-                {!isLoading && communities?.pages?.[0]?.totalResults
-                  ? getCommunityCountsString(
-                      communities?.pages?.[0]?.totalResults,
-                    )
-                  : 'No communities found'}
-              </CWText>
-              <CreateCommunityButton />
+              {!isWindowSmallInclusive ? communitiesCount : <></>}
+              <CWButton
+                label="Filters"
+                iconRight="funnelSimple"
+                buttonType="secondary"
+                onClick={() => setIsFilterDrawerOpen((isOpen) => !isOpen)}
+              />
+              <CreateCommunityButton buttonHeight="med" withIcon />
             </div>
           </div>
-          <div className="filters">
-            <CWButton
-              label="Filters"
-              iconRight="funnelSimple"
-              onClick={() => setIsFilterDrawerOpen((isOpen) => !isOpen)}
-            />
+          <div
+            className={clsx('filters', {
+              hasAppliedFilter:
+                Object.values(filters).filter(Boolean).length === 1
+                  ? !filters.withCommunitySortOrder
+                  : Object.values(filters).filter(Boolean).length > 0,
+            })}
+          >
+            {filters.withCommunitySortBy && (
+              <CWTag
+                label={`${filters.withCommunitySortBy}${
+                  filters.withCommunitySortOrder &&
+                  filters.withCommunitySortBy !==
+                    CommunitySortOptions.MostRecent
+                    ? ` : ${filters.withCommunitySortOrder}`
+                    : ''
+                }
+                `}
+                type="filter"
+                onCloseClick={removeCommunitySortByFilter}
+              />
+            )}
+            {filters.withCommunityType && (
+              <CWTag
+                label={filters.withCommunityType}
+                type="filter"
+                onCloseClick={removeCommunityTypeFilter}
+              />
+            )}
             {filters.withNetwork && (
               <CWTag
                 label={filters.withNetwork}
                 type="filter"
-                onClick={() => removeChainNetworkFilter()}
+                onCloseClick={removeChainNetworkFilter}
               />
             )}
-            {filters.withChainBase && (
+            {filters.withCommunityEcosystem && (
               <CWTag
-                label={filters.withChainBase}
+                label={filters.withCommunityEcosystem}
                 type="filter"
-                onClick={() => removeChainBaseFilter()}
+                onCloseClick={removeCommunityEcosystemFilter}
+              />
+            )}
+            {filters.withEcosystemChainId && (
+              <CWTag
+                label={
+                  Object.entries(communityChains).find(
+                    ([_, v]) => filters.withEcosystemChainId === v,
+                  )?.[0] as string
+                }
+                type="filter"
+                onCloseClick={removeEcosystemChainIdFilter}
               />
             )}
             {filters.withStakeEnabled && (
               <CWTag
                 label="Stake"
                 type="filter"
-                onClick={() => removeStakeFilter()}
+                onCloseClick={removeStakeFilter}
               />
             )}
             {filters.withTagsIds &&
@@ -185,7 +292,7 @@ const CommunitiesPage = () => {
                   key={id}
                   type="filter"
                   label={(tags || []).find((t) => t.id === id)?.name || ''}
-                  onClick={() => removeTagFilter(id)}
+                  onCloseClick={() => removeTagFilter(id)}
                 />
               ))}
             <FiltersDrawer
@@ -195,12 +302,18 @@ const CommunitiesPage = () => {
               onFiltersChange={(newFilters) => setFilters(newFilters)}
             />
           </div>
+
+          <IdeaLaunchpad />
         </div>
+        <TokensList />
+        {tokenizedCommunityEnabled && <CWText type="h2">Communities</CWText>}
         {isLoading && communitiesList.length === 0 ? (
           <CWCircleMultiplySpinner />
         ) : (
           <Virtuoso
-            key={`${filters.withChainBase}-${filters.withNetwork}-${filters.withStakeEnabled}-${filters.withTagsIds}`}
+            key={Object.values(filters)
+              .map((v) => `${v}`)
+              .join('-')}
             className="communities-list"
             style={{ height: '100%', width: '100%' }}
             data={isInitialCommunitiesLoading ? [] : communitiesList}
@@ -257,10 +370,14 @@ const CommunitiesPage = () => {
             components={{
               // eslint-disable-next-line react/no-multi-comp
               EmptyPlaceholder: () => (
-                <section className="empty-placeholder">
+                <section
+                  className={clsx('empty-placeholder', {
+                    'my-16': tokenizedCommunityEnabled,
+                  })}
+                >
                   <CWText type="h2">
                     No communities found
-                    {filters.withChainBase ||
+                    {filters.withCommunityEcosystem ||
                     filters.withNetwork ||
                     filters.withStakeEnabled ||
                     filters.withTagsIds

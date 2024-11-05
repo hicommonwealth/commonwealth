@@ -14,7 +14,11 @@ import {
   startLoginWithMagicLink,
   updateActiveAddresses,
 } from 'controllers/app/login';
-import { notifyError, notifyInfo } from 'controllers/app/notifications';
+import {
+  notifyError,
+  notifyInfo,
+  notifySuccess,
+} from 'controllers/app/notifications';
 import WebWalletController from 'controllers/app/web_wallets';
 import TerraWalletConnectWebWalletController from 'controllers/app/webWallets/terra_walletconnect_web_wallet';
 import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
@@ -24,10 +28,11 @@ import {
   signSessionWithAccount,
 } from 'controllers/server/sessions';
 import _ from 'lodash';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import app, { initAppState } from 'state';
 import { SERVER_URL } from 'state/api/config';
+import { DISCOURAGED_NONREACTIVE_fetchProfilesByAddress } from 'state/api/profiles/fetchProfilesByAddress';
 import { useUpdateUserMutation } from 'state/api/user';
 import useUserStore from 'state/ui/user';
 import {
@@ -43,15 +48,12 @@ import useAppStatus from '../../../hooks/useAppStatus';
 import { useBrowserAnalyticsTrack } from '../../../hooks/useBrowserAnalyticsTrack';
 import Account from '../../../models/Account';
 import IWebWallet from '../../../models/IWebWallet';
-import { DISCOURAGED_NONREACTIVE_fetchProfilesByAddress } from '../../../state/api/profiles/fetchProfilesByAddress';
-import useAuthModalStore from '../../../state/ui/modals/authModal';
-import { openConfirmation } from '../confirmation_modal';
 
 type UseAuthenticationProps = {
   onSuccess?: (
     address?: string | null | undefined,
     isNewlyCreated?: boolean,
-  ) => void;
+  ) => Promise<void>;
   onModalClose: () => void;
   withSessionKeyLoginFlow?: boolean;
 };
@@ -92,14 +94,12 @@ const useAuthentication = (props: UseAuthenticationProps) => {
 
   const { mutateAsync: updateUser } = useUpdateUserMutation();
 
-  const { sessionKeyValidationError } = useAuthModalStore();
-
   useEffect(() => {
     if (process.env.ETH_RPC === 'e2e-test') {
       import('../../../helpers/mockMetaMaskUtil')
         .then((f) => {
           window['ethereum'] = new f.MockMetaMaskProvider(
-            `https://eth-mainnet.g.alchemy.com/v2/${process.env.ETH_ALCHEMY_API_KEY}`,
+            `https://eth-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_PUBLIC_APP_KEY}`,
             '0x09187906d2ff8848c20050df632152b5b27d816ec62acd41d4498feb522ac5c3',
           );
         })
@@ -127,69 +127,11 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     }
   }, []);
 
-  const formatAddress = (address: string) => {
-    return `${address.slice(0, 8)}...${address.slice(-5)}`;
-  };
-
   const handleSuccess = async (
     authAddress?: string | null | undefined,
     isNew?: boolean,
   ) => {
-    props?.onSuccess?.(authAddress, isNew);
-
-    // show address mismatch message, if user revalidated session with unexpected address
-    if (props.withSessionKeyLoginFlow) {
-      // @ts-expect-error StrictNullChecks
-      const isSubstrate = user.accounts.find(
-        (addr) => addr.address === sessionKeyValidationError?.address,
-      ).community?.ss58Prefix;
-      if (
-        authAddress === sessionKeyValidationError?.address ||
-        (isSubstrate &&
-          addressSwapper({
-            address: sessionKeyValidationError?.address || '',
-            currentPrefix: 42,
-          }) === authAddress)
-      ) {
-        const updatedAddress = user.accounts.find(
-          (addr) => addr.address === sessionKeyValidationError?.address,
-        );
-        await setActiveAccount(updatedAddress!);
-      } else {
-        const signedAddressAccount = user.accounts.find(
-          (addr) => addr.address === authAddress,
-        );
-        await setActiveAccount(signedAddressAccount!);
-        openConfirmation({
-          title: 'Address Mismatch',
-          description: (
-            <>
-              You tried to sign in as
-              {formatAddress(sessionKeyValidationError?.address || '')} but your
-              wallet has the address {formatAddress(authAddress || '')}.
-              {signedAddressAccount ? (
-                <p>
-                  We&apos;ve switched your active address to the one in your
-                  wallet. You can switch it back in the user menu.
-                </p>
-              ) : (
-                <p>
-                  Select <strong>Connect a new address</strong> in the user menu
-                  to connect this as a new address, or switch addresses in your
-                  wallet to continue.
-                </p>
-              )}
-            </>
-          ),
-          buttons: [
-            {
-              label: 'Continue',
-              buttonType: 'primary',
-            },
-          ],
-        });
-      }
-    }
+    await props?.onSuccess?.(authAddress, isNew);
   };
 
   const trackLoginEvent = (loginOption: string, isSocialLogin: boolean) => {
@@ -305,6 +247,8 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     wallet?: Wallet,
   ) => {
     if (props.withSessionKeyLoginFlow) {
+      await setActiveAccount(account);
+      notifySuccess('Account verified!');
       await handleSuccess(account.address, newlyCreated);
       return;
     }
@@ -353,7 +297,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
         // @ts-expect-error StrictNullChecks
         const session = await signSessionWithAccount(walletToUse, account);
         // Can't call authSession now, since chain.base is unknown, so we wait till action
-        props.onSuccess?.(account.address, newlyCreated);
+        await props.onSuccess?.(account.address, newlyCreated);
 
         // Create the account with default values
         // await onCreateNewAccount(walletToUse, session, account);
@@ -378,24 +322,22 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       // Important: when we first create an account and verify it, the user id
       // is initially null from api (reloading the page will update it), to correct
       // it we need to get the id from api
-      const updatedProfiles =
+      const userAddresses =
         await DISCOURAGED_NONREACTIVE_fetchProfilesByAddress(
-          // @ts-expect-error <StrictNullChecks>
-          account.profile.chain,
-          // @ts-expect-error <StrictNullChecks>
-          account.profile.address,
+          [account!.profile!.chain],
+          [account!.profile!.address],
         );
-      const currentUserUpdatedProfile = updatedProfiles[0];
-      if (!currentUserUpdatedProfile) {
+      const currentUserAddress = userAddresses[0];
+      if (!currentUserAddress) {
         console.log('No profile yet.');
       } else {
         account?.profile?.initialize(
-          currentUserUpdatedProfile.userId,
-          currentUserUpdatedProfile.name,
-          currentUserUpdatedProfile.address,
-          currentUserUpdatedProfile.avatarUrl,
+          currentUserAddress.userId,
+          currentUserAddress.name,
+          currentUserAddress.address,
+          currentUserAddress.avatarUrl ?? '',
           account?.profile?.chain,
-          currentUserUpdatedProfile.lastActive,
+          new Date(currentUserAddress.lastActive),
         );
       }
     } catch (e) {
@@ -521,7 +463,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     }
 
     try {
-      const session = await getSessionFromWallet(wallet);
+      const session = await getSessionFromWallet(wallet, { newSession: true });
       const chainIdentifier = app.chain?.id || wallet.defaultNetwork;
 
       const validationBlockInfo = await getWalletRecentBlock(

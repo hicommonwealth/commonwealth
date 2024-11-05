@@ -4,7 +4,6 @@ import CWFormSteps from 'views/components/component_kit/new_designs/CWFormSteps'
 
 import { MixpanelCommunityCreationEvent } from '../../../../../shared/analytics/types';
 import { useBrowserAnalyticsTrack } from '../../../hooks/useBrowserAnalyticsTrack';
-import BasicInformationStep from './steps/BasicInformationStep';
 import CommunityStakeStep from './steps/CommunityStakeStep';
 import CommunityTypeStep from './steps/CommunityTypeStep';
 import SuccessStep from './steps/SuccessStep';
@@ -14,6 +13,7 @@ import { CreateCommunityStep, getFormSteps } from './utils';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import useAppStatus from '../../../hooks/useAppStatus';
 import './CreateCommunity.scss';
+import CommunityInformationStep from './steps/CommunityInformationStep';
 
 const CreateCommunity = () => {
   const {
@@ -25,7 +25,7 @@ const CreateCommunity = () => {
     setSelectedChainId,
     createdCommunityId,
     createdCommunityName,
-    handleCompleteBasicInformationStep,
+    handleCompleteCommunityInformationStep,
     onChangeStep,
     showCommunityStakeStep,
     selectedChainId,
@@ -54,15 +54,13 @@ const CreateCommunity = () => {
           />
         );
 
-      case CreateCommunityStep.BasicInformation:
+      case CreateCommunityStep.CommunityInformation:
         return (
-          <BasicInformationStep
-            selectedAddress={selectedAddress}
+          <CommunityInformationStep
             selectedCommunity={selectedCommunity}
-            // @ts-expect-error <StrictNullChecks/>
             handleSelectedChainId={setSelectedChainId}
             handleGoBack={() => onChangeStep(false)}
-            handleContinue={handleCompleteBasicInformationStep}
+            handleContinue={handleCompleteCommunityInformationStep}
           />
         );
 
@@ -75,6 +73,7 @@ const CreateCommunity = () => {
             selectedAddress={selectedAddress}
             // @ts-expect-error <StrictNullChecks/>
             chainId={selectedChainId}
+            onlyNamespace
           />
         );
 

@@ -1,7 +1,11 @@
+import {
+  useFetchGlobalActivityQuery,
+  useFetchUserActivityQuery,
+} from 'client/scripts/state/api/feeds/fetchUserActivity';
 import { notifyInfo } from 'controllers/app/notifications';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import useBrowserWindow from 'hooks/useBrowserWindow';
-import useStickyHeader from 'hooks/useStickyHeader';
+import { useFlag } from 'hooks/useFlag';
 import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/user_dashboard/index.scss';
 import React, { useEffect, useRef } from 'react';
@@ -12,6 +16,7 @@ import {
   MixpanelPageViewEvent,
 } from '../../../../../shared/analytics/types';
 import useAppStatus from '../../../hooks/useAppStatus';
+import LaunchTokenCard from '../../components/LaunchTokenCard';
 import { CWText } from '../../components/component_kit/cw_text';
 import {
   CWTab,
@@ -28,17 +33,9 @@ export enum DashboardViews {
 type UserDashboardProps = {
   type?: string;
 };
-
 const UserDashboard = ({ type }: UserDashboardProps) => {
   const user = useUserStore();
   const { isWindowExtraSmall } = useBrowserWindow({});
-  useStickyHeader({
-    elementId: 'dashboard-header',
-    zIndex: 70,
-    // To account for new authentication buttons, shown in small screen sizes
-    top: !user.isLoggedIn ? 68 : 0,
-    stickyBehaviourEnabled: isWindowExtraSmall,
-  });
 
   const [activePage, setActivePage] = React.useState<DashboardViews>(
     DashboardViews.Global,
@@ -46,17 +43,15 @@ const UserDashboard = ({ type }: UserDashboardProps) => {
 
   const { isAddedToHomeScreen } = useAppStatus();
 
+  const tokenizedCommunityEnabled = useFlag('tokenizedCommunity');
+
   useBrowserAnalyticsTrack({
     payload: {
       event: MixpanelPageViewEvent.DASHBOARD_VIEW,
       isPWA: isAddedToHomeScreen,
     },
   });
-
   const navigate = useCommonNavigate();
-
-  const [scrollElement, setScrollElement] = React.useState(null);
-
   const containerRef = useRef<HTMLDivElement>(null);
 
   useBrowserAnalyticsTrack({
@@ -92,8 +87,7 @@ const UserDashboard = ({ type }: UserDashboardProps) => {
         <CWText type="h2" fontWeight="medium" className="page-header">
           Home
         </CWText>
-        {/*@ts-expect-error StrictNullChecks*/}
-        <div ref={setScrollElement} className="content">
+        <div className="content">
           <div className="user-dashboard-activity">
             <div className="dashboard-header" id="dashboard-header">
               <CWTabsRow>
@@ -119,26 +113,31 @@ const UserDashboard = ({ type }: UserDashboardProps) => {
                 />
               </CWTabsRow>
             </div>
-            <>
-              {activePage === DashboardViews.ForYou && (
-                <Feed
-                  dashboardView={DashboardViews.ForYou}
-                  noFeedMessage="Join some communities to see Activity!"
-                  // @ts-expect-error <StrictNullChecks/>
-                  customScrollParent={scrollElement}
-                />
-              )}
-              {activePage === DashboardViews.Global && (
-                <Feed
-                  dashboardView={DashboardViews.Global}
-                  noFeedMessage="No Activity"
-                  // @ts-expect-error <StrictNullChecks/>
-                  customScrollParent={scrollElement}
-                />
-              )}
-            </>
+            {activePage === DashboardViews.Global ? (
+              <Feed
+                query={useFetchGlobalActivityQuery}
+                // @ts-expect-error <StrictNullChecks/>
+                customScrollParent={containerRef.current}
+              />
+            ) : (
+              <Feed
+                query={useFetchUserActivityQuery}
+                // @ts-expect-error <StrictNullChecks/>
+                customScrollParent={containerRef.current}
+              />
+            )}
           </div>
-          <TrendingCommunitiesPreview />
+          {isWindowExtraSmall ? (
+            <>
+              {tokenizedCommunityEnabled && <LaunchTokenCard />}
+              <TrendingCommunitiesPreview />
+            </>
+          ) : (
+            <div className="featured-cards">
+              {tokenizedCommunityEnabled && <LaunchTokenCard />}
+              <TrendingCommunitiesPreview />
+            </div>
+          )}
         </div>
       </div>
     </CWPageLayout>

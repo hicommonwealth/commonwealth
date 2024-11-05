@@ -1,8 +1,8 @@
+import { BigNumber } from '@ethersproject/bignumber';
 import {
   Actor,
   DeepPartial,
   EventNames,
-  InvalidState,
   dispose,
   handleEvent,
   query,
@@ -39,9 +39,9 @@ describe('Contests projection lifecycle', () => {
   const voter1 = 'voter-address1';
   const voter2 = 'voter-address2';
   const voter3 = 'voter-address3';
-  const voting_power1 = 1;
-  const voting_power2 = 2;
-  const voting_power3 = 3;
+  const voting_power1 = '1';
+  const voting_power2 = '2';
+  const voting_power3 = '3';
   const created_at = new Date();
   const start_time = created_at;
   const end_time = new Date(start_time.getTime() + 1000);
@@ -162,7 +162,7 @@ describe('Contests projection lifecycle', () => {
           topic_id: undefined,
           view_count: 1,
           reaction_count: 1,
-          reaction_weights_sum: 1,
+          reaction_weights_sum: '1',
           comment_count: 1,
           discord_meta: undefined,
           deleted_at: undefined, // so we can find it!
@@ -362,6 +362,7 @@ describe('Contests projection lifecycle', () => {
             score: score.map((s) => ({
               ...s,
               tickerPrize: Number(BigInt(s.prize)) / 10 ** decimals,
+              votes: BigNumber.from(s.votes).toString(),
             })),
             // actions: [
             //   {
@@ -399,35 +400,5 @@ describe('Contests projection lifecycle', () => {
         ],
       },
     ] as Array<DeepPartial<z.infer<typeof ContestResults>>>);
-  });
-
-  test('should raise invalid state when community with namespace not found', async () => {
-    expect(
-      handleEvent(Contests(), {
-        name: EventNames.RecurringContestManagerDeployed,
-        payload: {
-          namespace: 'not-found',
-          contest_address: 'new-address',
-          interval: 10,
-          created_at,
-        },
-      }),
-    ).to.eventually.be.rejectedWith(InvalidState);
-  });
-
-  test('should raise retryable error when protocol helper fails', async () => {
-    getTokenAttributes.rejects(new Error());
-    expect(
-      handleEvent(Contests(), {
-        name: EventNames.RecurringContestManagerDeployed,
-        payload: {
-          namespace: 'not-found',
-          contest_address: 'new-address',
-          interval: 10,
-          created_at,
-        },
-      }),
-    ).to.eventually.be.rejectedWith(Error);
-    getTokenAttributes.reset();
   });
 });

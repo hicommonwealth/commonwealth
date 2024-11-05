@@ -2,6 +2,8 @@
 
 .UserDashboard {
   padding-top: 20px;
+  overflow: auto;
+  height: 100%;
 
   @include extraSmall {
     padding-top: 0; // because of the breadcrumbs being in static position on mobile
@@ -49,10 +51,25 @@
         margin-bottom: 16px;
         background-color: white;
 
+        @include smallInclusive {
+          position: sticky;
+          top: 0;
+          z-index: 70;
+        }
+
         @include small {
           margin-top: 12px;
+          position: sticky;
+          top: 0;
+          z-index: 70;
         }
       }
+    }
+
+    .featured-cards {
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
     }
 
     .Divider {

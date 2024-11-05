@@ -1,9 +1,11 @@
 type Delta<T> = Partial<{
-  [K in keyof T]: T[K] extends object
-    ? Delta<T[K]>
-    : T[K] extends Array<infer U>
-      ? Array<U>
-      : T[K];
+  [K in keyof T]: T[K] extends Date
+    ? T[K]
+    : T[K] extends object
+      ? Delta<T[K]>
+      : T[K] extends Array<infer U>
+        ? Array<U>
+        : T[K];
 }>;
 
 /**
@@ -47,6 +49,10 @@ export function getDelta<T extends object>(
         JSON.stringify(target_field) !== JSON.stringify(source_field) &&
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (delta[key] = source_field as any);
+      } else if (source_field instanceof Date && target_field instanceof Date) {
+        if (target_field.getTime() !== source_field.getTime())
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          delta[key] = source_field as any;
       } else if (typeof source_field === 'object') {
         const key_delta = getDelta(target_field ?? {}, source_field as object);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any

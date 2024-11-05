@@ -1,5 +1,10 @@
-import { EventPairs, logger } from '@hicommonwealth/core';
-import { getThreadUrl, type AbiType } from '@hicommonwealth/shared';
+import { blobStorage, EventPairs, logger } from '@hicommonwealth/core';
+import {
+  getThreadUrl,
+  safeTruncateBody,
+  type AbiType,
+} from '@hicommonwealth/shared';
+import { createHash } from 'crypto';
 import { hasher } from 'node-object-hash';
 import {
   Model,
@@ -8,9 +13,10 @@ import {
   Sequelize,
   Transaction,
 } from 'sequelize';
+import { v4 as uuidv4 } from 'uuid';
 import { isAddress } from 'web3-validator';
 import { config } from '../config';
-import { OutboxAttributes } from '../models';
+import type { OutboxAttributes } from '../models/outbox';
 
 const log = logger(import.meta);
 
@@ -69,9 +75,15 @@ export function buildThreadContentUrl(communityId: string, threadId: number) {
 
 // returns community ID and thread ID from content url
 export function decodeThreadContentUrl(contentUrl: string): {
-  communityId: string;
-  threadId: number;
+  communityId: string | null;
+  threadId: number | null;
 } {
+  if (contentUrl.startsWith('/farcaster/')) {
+    return {
+      communityId: null,
+      threadId: null,
+    };
+  }
   if (!contentUrl.includes('/discussion/')) {
     throw new Error(`invalid content url: ${contentUrl}`);
   }
@@ -132,16 +144,15 @@ export async function getThreadContestManagers(
     contest_address: string;
   }>(
     `
-            SELECT
-              cm.contest_address
-            FROM "Communities" c
-            JOIN "ContestManagers" cm ON cm.community_id = c.id
-            JOIN "ContestTopics" ct ON cm.contest_address = ct.contest_address
-            WHERE ct.topic_id = :topic_id
-            AND cm.community_id = :community_id
-            AND cm.cancelled = false
-            AND (cm.ended IS NULL OR cm.ended = false)
-          `,
+        SELECT cm.contest_address, cm.cancelled, cm.ended
+        FROM "Communities" c
+                 JOIN "ContestManagers" cm ON cm.community_id = c.id
+                 JOIN "ContestTopics" ct ON cm.contest_address = ct.contest_address
+        WHERE ct.topic_id = :topic_id
+          AND cm.community_id = :community_id
+          AND cm.cancelled IS NOT TRUE
+          AND cm.ended IS NOT TRUE
+    `,
     {
       type: QueryTypes.SELECT,
       replacements: {
@@ -165,4 +176,82 @@ export function removeUndefined(
   });
 
   return result;
+}
+
+const alchemyUrlPattern = /^https:\/\/[a-z]+-[a-z]+\.g\.alchemy\.com\/v2\//;
+
+export function buildChainNodeUrl(url: string, privacy: 'private' | 'public') {
+  if (url === '') return url;
+
+  if (alchemyUrlPattern.test(url)) {
+    const [baseUrl, key] = url.split('/v2/');
+    if (key === config.ALCHEMY.APP_KEYS.PRIVATE && privacy !== 'private')
+      return `${baseUrl}/v2/${config.ALCHEMY.APP_KEYS.PUBLIC}`;
+    else if (key === config.ALCHEMY.APP_KEYS.PUBLIC && privacy !== 'public')
+      return `${baseUrl}/v2/${config.ALCHEMY.APP_KEYS.PRIVATE}`;
+    else if (key === '')
+      return (
+        url +
+        (privacy === 'private'
+          ? config.ALCHEMY.APP_KEYS.PRIVATE
+          : config.ALCHEMY.APP_KEYS.PUBLIC)
+      );
+  }
+  return url;
+}
+
+export function getChainNodeUrl({
+  url,
+  private_url,
+}: {
+  url: string;
+  private_url?: string;
+}) {
+  if (!private_url || private_url === '')
+    return buildChainNodeUrl(url, 'public');
+  return buildChainNodeUrl(private_url, 'private');
+}
+
+export const R2_ADAPTER_KEY = 'blobStorageFactory.R2BlobStorage.Main';
+
+/**
+ * Limits content in the Threads.body and Comments.text columns to 2k characters (2kB)
+ * Anything over this character limit is stored in Cloudflare R2.
+ * 55% of threads and 90% of comments are shorter than this.
+ * Anything over 2kB is TOASTed by Postgres so this limit prevents TOAST.
+ */
+const CONTENT_CHAR_LIMIT = 2_000;
+
+/**
+ * Uploads content to the appropriate R2 bucket if the content exceeds the
+ * preview limit (CONTENT_CHAR_LIMIT),
+ */
+export async function uploadIfLarge(
+  type: 'threads' | 'comments',
+  content: string,
+): Promise<{
+  contentUrl: string | null;
+  truncatedBody: string | null;
+}> {
+  if (content.length > CONTENT_CHAR_LIMIT) {
+    const { url } = await blobStorage({
+      key: R2_ADAPTER_KEY,
+    }).upload({
+      key: `${uuidv4()}.md`,
+      bucket: type,
+      content: content,
+      contentType: 'text/markdown',
+    });
+    return { contentUrl: url, truncatedBody: safeTruncateBody(content, 500) };
+  } else return { contentUrl: null, truncatedBody: null };
+}
+
+export function getSaltedApiKeyHash(apiKey: string, salt: string): string {
+  return createHash('sha256')
+    .update(apiKey + salt)
+    .digest('hex');
+}
+
+export function buildApiKeySaltCacheKey(address: string) {
+  return `salt_${address.toLowerCase()}`;
 }

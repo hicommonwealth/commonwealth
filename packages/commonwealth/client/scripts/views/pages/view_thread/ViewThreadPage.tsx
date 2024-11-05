@@ -1,4 +1,6 @@
-import { ContentType, getThreadUrl, slugify } from '@hicommonwealth/shared';
+import { PermissionEnum } from '@hicommonwealth/schemas';
+import { ContentType, getThreadUrl } from '@hicommonwealth/shared';
+import { Thread, ThreadView } from 'client/scripts/models/Thread';
 import { notifyError } from 'controllers/app/notifications';
 import { extractDomain, isDefaultStage } from 'helpers';
 import { commentsByDate } from 'helpers/dates';
@@ -6,20 +8,18 @@ import { filterLinks, getThreadActionTooltipText } from 'helpers/threads';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
-import useNecessaryEffect from 'hooks/useNecessaryEffect';
-import { getProposalUrlPath } from 'identifiers';
+import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
+import useTopicGating from 'hooks/useTopicGating';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/view_thread/index.scss';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
+import { useSearchParams } from 'react-router-dom';
 import app from 'state';
 import { useFetchCommentsQuery } from 'state/api/comments';
-import useGetViewCountByObjectIdQuery from 'state/api/general/getViewCountByObjectId';
-import {
-  useFetchGroupsQuery,
-  useRefreshMembershipQuery,
-} from 'state/api/groups';
+import useGetContentByUrlQuery from 'state/api/general/getContentByUrl';
+import { useFetchGroupsQuery } from 'state/api/groups';
 import {
   useAddThreadLinksMutation,
   useGetThreadPollsQuery,
@@ -28,7 +28,8 @@ import {
 import useUserStore from 'state/ui/user';
 import ExternalLink from 'views/components/ExternalLink';
 import JoinCommunityBanner from 'views/components/JoinCommunityBanner';
-import { checkIsTopicInContest } from 'views/components/NewThreadForm/helpers';
+import MarkdownViewerUsingQuillOrNewEditor from 'views/components/MarkdownViewerWithFallback';
+import { checkIsTopicInContest } from 'views/components/NewThreadFormLegacy/helpers';
 import useJoinCommunity from 'views/components/SublayoutHeader/useJoinCommunity';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { PageNotFound } from 'views/pages/404';
@@ -55,7 +56,6 @@ import {
   isWindowMediumSmallInclusive,
 } from '../../components/component_kit/helpers';
 import { getTextFromDelta } from '../../components/react_quill_editor/';
-import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
 import { CommentTree } from '../discussions/CommentTree';
 import { clearEditingLocalStorage } from '../discussions/CommentTree/helpers';
 import { LinkedUrlCard } from './LinkedUrlCard';
@@ -70,12 +70,11 @@ import { SnapshotCreationCard } from './snapshot_creation_card';
 type ViewThreadPageProps = {
   identifier: string;
 };
-
 const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const threadId = identifier.split('-')[0];
-
+  const [searchParams] = useSearchParams();
+  const isEdit = searchParams.get('isEdit') ?? undefined;
   const navigate = useCommonNavigate();
-
   const [isEditingBody, setIsEditingBody] = useState(false);
   const [isGloballyEditing, setIsGloballyEditing] = useState(false);
   const [savedEdits, setSavedEdits] = useState('');
@@ -95,6 +94,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const { handleJoinCommunity, JoinCommunityModals } = useJoinCommunity();
 
   const user = useUserStore();
+  const commentsRef = useRef<HTMLDivElement | null>(null);
 
   const { isAddedToHomeScreen } = useAppStatus();
 
@@ -110,8 +110,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     error: fetchThreadError,
     isLoading,
   } = useGetThreadsByIdQuery({
-    communityId,
-    ids: [+threadId].filter(Boolean),
+    community_id: communityId,
+    thread_ids: [+threadId].filter(Boolean),
     apiCallEnabled: !!threadId && !!communityId, // only call the api if we have thread id
   });
 
@@ -121,16 +121,53 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     apiCallEnabled: !!threadId && !!communityId,
   });
 
-  const thread = data?.[0];
+  const thread = useMemo(() => {
+    const t = data?.at(0);
+    return t ? new Thread(t as ThreadView) : undefined;
+  }, [data]);
+
+  const [contentUrlBodyToFetch, setContentUrlBodyToFetch] = useState<
+    string | null
+  >(null);
+
+  useRunOnceOnCondition({
+    callback: () => {
+      thread?.contentUrl && setContentUrlBodyToFetch(thread?.contentUrl);
+    },
+    shouldRun: !!thread?.contentUrl,
+  });
+
+  const { data: contentUrlBody, isLoading: isLoadingContentBody } =
+    useGetContentByUrlQuery({
+      contentUrl: contentUrlBodyToFetch || '',
+      enabled: !!contentUrlBodyToFetch,
+    });
+
+  const [activeThreadVersionId, setActiveThreadVersionId] = useState<number>();
   const [threadBody, setThreadBody] = useState(thread?.body);
 
   const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
 
   const { contestsData } = useCommunityContests();
   const isTopicInContest = checkIsTopicInContest(
-    contestsData,
+    contestsData.all,
     thread?.topic?.id,
   );
+
+  useEffect(() => {
+    if (
+      isEdit === 'true' &&
+      thread &&
+      (isAdmin || Permissions.isThreadAuthor(thread))
+    ) {
+      setShouldRestoreEdits(true);
+      setIsGloballyEditing(true);
+      setIsEditingBody(true);
+    }
+    if (thread && thread?.title) {
+      setDraftTitle(thread.title);
+    }
+  }, [isEdit, thread, isAdmin]);
 
   const { data: comments = [], error: fetchCommentsError } =
     useFetchCommentsQuery({
@@ -144,31 +181,12 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     threadId: parseInt(threadId),
   });
 
-  const { data: memberships = [] } = useRefreshMembershipQuery({
+  const { isRestrictedMembership, foundTopicPermissions } = useTopicGating({
     communityId,
-    address: user?.activeAccount?.address || '',
     apiEnabled: !!user?.activeAccount?.address && !!communityId,
+    userAddress: user?.activeAccount?.address || '',
+    topicId: thread?.topic?.id || 0,
   });
-
-  const { data: viewCount = 0 } = useGetViewCountByObjectIdQuery({
-    communityId,
-    objectId: thread?.id || '',
-    apiCallEnabled: !!thread?.id && !!communityId,
-  });
-
-  const isTopicGated = !!(memberships || []).find((membership) =>
-    // @ts-expect-error <StrictNullChecks/>
-    membership.topicIds.includes(thread?.topic?.id),
-  );
-
-  const isActionAllowedInGatedTopic = !!(memberships || []).find(
-    (membership) =>
-      // @ts-expect-error <StrictNullChecks/>
-      membership.topicIds.includes(thread?.topic?.id) && membership.isAllowed,
-  );
-
-  const isRestrictedMembership =
-    !isAdmin && isTopicGated && !isActionAllowedInGatedTopic;
 
   useEffect(() => {
     if (fetchCommentsError) notifyError('Failed to load comments');
@@ -203,7 +221,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     if (thread?.topic) {
       return (
         Array.isArray(x.topics) &&
-        x?.topics?.find((y) => y.id === thread.topic.id)
+        x?.topics?.find((y) => y.id === thread.topic!.id)
       );
     }
   });
@@ -215,30 +233,46 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     },
   });
 
-  // TODO: unnecessary code - must be in a redirect hook
-  useNecessaryEffect(() => {
-    if (!thread) {
-      return;
-    }
-
-    if (thread && identifier !== `${threadId}-${slugify(thread?.title)}`) {
-      const url = getProposalUrlPath(
-        thread.slug,
-        `${threadId}-${slugify(thread?.title)}${window.location.search}`,
-        true,
-      );
-      navigate(url, { replace: true });
-    }
-  }, [identifier, navigate, thread, thread?.slug, thread?.title, threadId]);
-  // ------------
-
   useManageDocumentTitle('View thread', thread?.title);
+
+  // Imp: this correctly sets the thread body
+  // 1. if content_url is provided it will fetch body from there
+  // 2. else it will use available body
+  // 3. it won't interfere with version history selection, unless thread body or content_url changes
+  useEffect(() => {
+    if (thread?.contentUrl) {
+      setContentUrlBodyToFetch(thread.contentUrl);
+    } else {
+      setThreadBody(thread?.body || '');
+      setContentUrlBodyToFetch('');
+    }
+  }, [thread?.body, thread?.contentUrl]);
+
+  // Imp: this is expected to override version history selection
+  useEffect(() => {
+    if (contentUrlBody) {
+      setThreadBody(contentUrlBody);
+    }
+  }, [contentUrlBody]);
+
+  // Imp: this is expected to "not-interfere" with version history selector
+  useEffect(() => {
+    if (thread?.versionHistory) {
+      setActiveThreadVersionId(
+        Math.max(...thread.versionHistory.map(({ id }) => id)),
+      );
+    }
+  }, [thread?.versionHistory]);
 
   if (typeof identifier !== 'string') {
     return <PageNotFound />;
   }
 
-  if (!app.chain?.meta || isLoading) {
+  if (
+    !app.chain?.meta ||
+    isLoading ||
+    (isLoadingContentBody && contentUrlBodyToFetch)
+  ) {
     return (
       <CWPageLayout>
         <CWContentPage
@@ -252,24 +286,19 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   if (
     (!isLoading && !thread) ||
     fetchThreadError ||
-    // @ts-expect-error <StrictNullChecks/>
-    thread.communityId !== app.activeChainId()
+    thread?.communityId !== app.activeChainId()
   ) {
     return <PageNotFound message="Thread not found" />;
   }
 
   // Original posters have full editorial control, while added collaborators
   // merely have access to the body and title
-  // @ts-expect-error <StrictNullChecks/>
-  const isAuthor = Permissions.isThreadAuthor(thread);
+  const isAuthor = thread && Permissions.isThreadAuthor(thread);
   const isAdminOrMod = isAdmin || Permissions.isCommunityModerator();
 
-  // @ts-expect-error <StrictNullChecks/>
-  const linkedSnapshots = filterLinks(thread.links, LinkSource.Snapshot);
-  // @ts-expect-error <StrictNullChecks/>
-  const linkedProposals = filterLinks(thread.links, LinkSource.Proposal);
-  // @ts-expect-error <StrictNullChecks/>
-  const linkedThreads = filterLinks(thread.links, LinkSource.Thread);
+  const linkedSnapshots = filterLinks(thread?.links, LinkSource.Snapshot);
+  const linkedProposals = filterLinks(thread?.links, LinkSource.Proposal);
+  const linkedThreads = filterLinks(thread?.links, LinkSource.Thread);
 
   const showLinkedProposalOptions =
     linkedSnapshots.length > 0 ||
@@ -284,13 +313,11 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const showLinkedThreadOptions =
     linkedThreads.length > 0 || isAuthor || isAdminOrMod;
 
-  // @ts-expect-error <StrictNullChecks/>
-  const hasSnapshotProposal = thread.links.find((x) => x.source === 'snapshot');
+  const hasSnapshotProposal = thread?.links.find(
+    (x) => x.source === 'snapshot',
+  );
 
-  // @ts-expect-error <StrictNullChecks/>
-  const hasWebLinks = thread.links.find((x) => x.source === 'web');
-
-  const canComment = !!user.activeAccount && !isRestrictedMembership;
+  const hasWebLinks = thread?.links.find((x) => x.source === 'web');
 
   const handleNewSnapshotChange = async ({
     id,
@@ -306,11 +333,10 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     };
     const toAdd = [newLink]; // Add this line to create an array with the new link
 
-    if (toAdd.length > 0) {
+    if (thread && toAdd.length > 0) {
       try {
         await addThreadLinks({
           communityId,
-          // @ts-expect-error <StrictNullChecks/>
           threadId: thread.id,
           links: toAdd,
         });
@@ -322,11 +348,9 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   };
 
   const editsToSave = localStorage.getItem(
-    // @ts-expect-error <StrictNullChecks/>
-    `${app.activeChainId()}-edit-thread-${thread.id}-storedText`,
+    `${app.activeChainId()}-edit-thread-${thread?.id}-storedText`,
   );
-  // @ts-expect-error <StrictNullChecks/>
-  const isStageDefault = isDefaultStage(thread.stage);
+  const isStageDefault = thread && isDefaultStage(thread.stage);
 
   const tabsShouldBePresent =
     showLinkedProposalOptions ||
@@ -339,21 +363,18 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   const showBanner = !user.activeAccount && isBannerVisible;
   const fromDiscordBot =
-    // @ts-expect-error <StrictNullChecks/>
-    thread.discord_meta !== null && thread.discord_meta !== undefined;
+    thread?.discord_meta !== null && thread?.discord_meta !== undefined;
 
   const showLocked =
-    // @ts-expect-error <StrictNullChecks/>
-    (thread.readOnly && !thread.markedAsSpamAt) || fromDiscordBot;
+    (thread?.readOnly && !thread?.markedAsSpamAt) || fromDiscordBot;
 
   const canUpdateThread =
+    thread &&
     user.isLoggedIn &&
     (Permissions.isSiteAdmin() ||
       Permissions.isCommunityAdmin() ||
       Permissions.isCommunityModerator() ||
-      // @ts-expect-error <StrictNullChecks/>
       Permissions.isThreadAuthor(thread) ||
-      // @ts-expect-error <StrictNullChecks/>
       Permissions.isThreadCollaborator(thread) ||
       (fromDiscordBot && isAdmin));
 
@@ -366,7 +387,37 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     isThreadArchived: !!thread?.archivedAt,
     isThreadLocked: !!thread?.lockedAt,
     isThreadTopicGated: isRestrictedMembership,
+    threadTopicInteractionRestrictions:
+      !isAdmin &&
+      !foundTopicPermissions?.permissions?.includes(
+        PermissionEnum.CREATE_COMMENT,
+      )
+        ? foundTopicPermissions?.permissions
+        : undefined,
   });
+
+  const canComment =
+    !!user.activeAccount &&
+    !isRestrictedMembership &&
+    !disabledActionsTooltipText;
+
+  const handleVersionHistoryChange = (versionId: number) => {
+    const foundVersion = (thread?.versionHistory || []).find(
+      (version) => version.id === versionId,
+    );
+    foundVersion && setActiveThreadVersionId(foundVersion?.id);
+    if (!foundVersion?.content_url) {
+      setThreadBody(foundVersion?.body || '');
+      setContentUrlBodyToFetch('');
+      return;
+    }
+    if (contentUrlBodyToFetch === foundVersion.content_url && contentUrlBody) {
+      setThreadBody(contentUrlBody);
+      setContentUrlBodyToFetch('');
+      return;
+    }
+    setContentUrlBodyToFetch(foundVersion.content_url);
+  };
 
   const getMetaDescription = (meta: string) => {
     try {
@@ -382,17 +433,25 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   };
 
   const ogTitle =
-    // @ts-expect-error <StrictNullChecks/>
-    thread?.title?.length > 60
+    (thread?.title?.length ?? 0 > 60)
       ? `${thread?.title?.slice?.(0, 52)}...`
       : thread?.title;
   const ogDescription =
     // @ts-expect-error <StrictNullChecks/>
-    getMetaDescription(thread?.body || '')?.length > 155
-      ? `${getMetaDescription(thread?.body || '')?.slice?.(0, 152)}...`
-      : getMetaDescription(thread?.body || '');
+    getMetaDescription(threadBody || '')?.length > 155
+      ? `${getMetaDescription(threadBody || '')?.slice?.(0, 152)}...`
+      : getMetaDescription(threadBody || '');
   const ogImageUrl = app?.chain?.meta?.icon_url || '';
 
+  const scrollToFirstComment = () => {
+    if (commentsRef?.current) {
+      const ref = document.getElementsByClassName('Body')[0];
+      ref.scrollTo({
+        top: commentsRef?.current.offsetTop - 105,
+        behavior: 'smooth',
+      });
+    }
+  };
   return (
     // TODO: the editing experience can be improved (we can remove a stale code and make it smooth) - create a ticket
     <>
@@ -400,18 +459,15 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
         customMeta={[
           {
             name: 'title',
-            // @ts-expect-error <StrictNullChecks/>
-            content: ogTitle,
+            content: ogTitle!,
           },
           {
             name: 'description',
-            // @ts-expect-error <StrictNullChecks/>
-            content: ogDescription,
+            content: ogDescription!,
           },
           {
             name: 'author',
-            // @ts-expect-error <StrictNullChecks/>
-            content: thread?.author,
+            content: thread?.author ?? '',
           },
           {
             name: 'twitter:card',
@@ -419,13 +475,11 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           },
           {
             name: 'twitter:title',
-            // @ts-expect-error <StrictNullChecks/>
-            content: ogTitle,
+            content: ogTitle!,
           },
           {
             name: 'twitter:description',
-            // @ts-expect-error <StrictNullChecks/>
-            content: ogDescription,
+            content: ogDescription!,
           },
           {
             name: 'twitter:image',
@@ -437,13 +491,11 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           },
           {
             name: 'og:title',
-            // @ts-expect-error <StrictNullChecks/>
-            content: ogTitle,
+            content: ogTitle!,
           },
           {
             name: 'og:description',
-            // @ts-expect-error <StrictNullChecks/>
-            content: ogDescription,
+            content: ogDescription!,
           },
           {
             name: 'og:image',
@@ -482,20 +534,18 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
             isAuthor ||
             !!hasWebLinks
           }
-          // @ts-expect-error <StrictNullChecks/>
-          isSpamThread={!!thread.markedAsSpamAt}
+          onCommentClick={scrollToFirstComment}
+          isSpamThread={!!thread?.markedAsSpamAt}
           title={
             isEditingBody ? (
               <CWTextInput
                 onInput={(e) => {
                   setDraftTitle(e.target.value);
                 }}
-                // @ts-expect-error <StrictNullChecks/>
-                value={draftTitle || thread.title}
+                value={draftTitle}
               />
             ) : (
-              // @ts-expect-error <StrictNullChecks/>
-              thread.title
+              thread?.title
             )
           }
           isEditing={isEditingBody}
@@ -503,26 +553,17 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           author={
             thread?.author ? app.chain.accounts.get(thread?.author) : null
           }
-          // @ts-expect-error <StrictNullChecks/>
-          discord_meta={thread.discord_meta}
-          // @ts-expect-error <StrictNullChecks/>
-          collaborators={thread.collaborators}
-          // @ts-expect-error <StrictNullChecks/>
-          createdAt={thread.createdAt}
-          // @ts-expect-error <StrictNullChecks/>
-          updatedAt={thread.updatedAt}
-          // @ts-expect-error <StrictNullChecks/>
-          lastEdited={thread.lastEdited}
-          viewCount={viewCount}
+          discord_meta={thread!.discord_meta!}
+          collaborators={thread?.collaborators}
+          createdAt={thread?.createdAt}
+          updatedAt={thread?.updatedAt}
+          lastEdited={thread?.lastEdited}
+          viewCount={thread?.viewCount}
           canUpdateThread={canUpdateThread}
-          // @ts-expect-error <StrictNullChecks/>
-          stageLabel={!isStageDefault && thread.stage}
+          stageLabel={!isStageDefault ? thread?.stage : undefined}
           subHeader={
-            // @ts-expect-error <StrictNullChecks/>
-            !!thread.url && (
-              // @ts-expect-error <StrictNullChecks/>
+            !!thread?.url && (
               <ExternalLink url={thread.url}>
-                {/* @ts-expect-error StrictNullChecks*/}
                 {extractDomain(thread.url)}
               </ExternalLink>
             )
@@ -543,8 +584,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
             setIsEditingBody(true);
           }}
           onEditStart={() => {
-            if (editsToSave) {
-              // @ts-expect-error <StrictNullChecks/>
+            if (thread && editsToSave) {
               clearEditingLocalStorage(thread.id, ContentType.Thread);
 
               setSavedEdits(editsToSave || '');
@@ -558,41 +598,45 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
             setIsEditingBody(false);
           }}
           hasPendingEdits={!!editsToSave}
-          setThreadBody={setThreadBody}
+          activeThreadVersionId={activeThreadVersionId}
+          onChangeVersionHistoryNumber={handleVersionHistoryChange}
           body={(threadOptionsComp) => (
             <div className="thread-content">
-              {isEditingBody ? (
+              {thread && isEditingBody && threadBody ? (
                 <>
                   {/*// TODO editing thread */}
                   <EditBody
                     title={draftTitle}
-                    // @ts-expect-error <StrictNullChecks/>
                     thread={thread}
+                    activeThreadBody={threadBody}
                     savedEdits={savedEdits}
                     shouldRestoreEdits={shouldRestoreEdits}
                     cancelEditing={() => {
                       setIsGloballyEditing(false);
                       setIsEditingBody(false);
+                      if (!draftTitle.length) {
+                        setDraftTitle(thread?.title);
+                      }
                     }}
                     threadUpdatedCallback={() => {
                       setIsGloballyEditing(false);
                       setIsEditingBody(false);
                     }}
+                    isDisabled={draftTitle && draftTitle.length ? false : true}
                   />
                   {threadOptionsComp}
                 </>
               ) : (
                 <>
-                  <QuillRenderer
-                    // @ts-expect-error <StrictNullChecks/>
-                    doc={threadBody ?? thread?.body}
+                  <MarkdownViewerUsingQuillOrNewEditor
+                    key={threadBody}
+                    markdown={threadBody || ''}
                     cutoffLines={50}
                   />
-                  {/* @ts-expect-error StrictNullChecks*/}
-                  {thread.readOnly || fromDiscordBot ? (
+
+                  {thread?.readOnly || fromDiscordBot ? (
                     <>
                       {threadOptionsComp}
-                      {/* @ts-expect-error StrictNullChecks*/}
                       {!thread.readOnly && thread.markedAsSpamAt && (
                         <div className="callout-text">
                           <CWIcon
@@ -602,7 +646,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                           />
                           <CWText type="h5">
                             This thread was flagged as spam on{' '}
-                            {/* @ts-expect-error StrictNullChecks*/}
                             {moment(thread.createdAt).format('DD/MM/YYYY')},
                             meaning it can no longer be edited or commented on.
                           </CWText>
@@ -610,19 +653,16 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                       )}
                       {showLocked && (
                         <LockMessage
-                          // @ts-expect-error <StrictNullChecks/>
                           lockedAt={thread.lockedAt}
-                          // @ts-expect-error <StrictNullChecks/>
                           updatedAt={thread.updatedAt}
                           fromDiscordBot={fromDiscordBot}
                         />
                       )}
                     </>
-                  ) : !isGloballyEditing && user.isLoggedIn ? (
+                  ) : thread && !isGloballyEditing && user.isLoggedIn ? (
                     <>
                       {threadOptionsComp}
                       <CreateComment
-                        // @ts-expect-error <StrictNullChecks/>
                         rootThread={thread}
                         canComment={canComment}
                         tooltipText={
@@ -656,7 +696,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           comments={
             <>
               {comments.length > 0 && (
-                <div className="comments-filter-row">
+                <div className="comments-filter-row" ref={commentsRef}>
                   <Select
                     key={commentSortType}
                     size="compact"
@@ -690,8 +730,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
               <CommentTree
                 comments={sortedComments}
                 includeSpams={includeSpamThreads}
-                // @ts-expect-error <StrictNullChecks/>
-                thread={thread}
+                thread={thread!}
                 setIsGloballyEditing={setIsGloballyEditing}
                 isReplying={isReplying}
                 setIsReplying={setIsReplying}
@@ -717,15 +756,13 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                         <div className="cards-column">
                           {showLinkedProposalOptions && (
                             <LinkedProposalsCard
-                              // @ts-expect-error <StrictNullChecks/>
-                              thread={thread}
+                              thread={thread!}
                               showAddProposalButton={isAuthor || isAdminOrMod}
                             />
                           )}
                           {showLinkedThreadOptions && (
                             <LinkedThreadsCard
-                              // @ts-expect-error <StrictNullChecks/>
-                              thread={thread}
+                              thread={thread!}
                               allowLinking={isAuthor || isAdminOrMod}
                             />
                           )}
@@ -741,8 +778,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                       item: (
                         <div className="cards-column">
                           <LinkedUrlCard
-                            // @ts-expect-error <StrictNullChecks/>
-                            thread={thread}
+                            thread={thread!}
                             allowLinking={isAuthor || isAdminOrMod}
                           />
                         </div>
@@ -757,8 +793,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                       item: (
                         <div className="cards-column">
                           <SnapshotCreationCard
-                            // @ts-expect-error <StrictNullChecks/>
-                            thread={thread}
+                            thread={thread!}
                             allowSnapshotCreation={isAuthor || isAdminOrMod}
                             onChangeHandler={handleNewSnapshotChange}
                           />
@@ -794,7 +829,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                             (!app.chain?.meta?.admin_only_polling ||
                               isAdmin) && (
                               <ThreadPollEditorCard
-                                // @ts-expect-error <StrictNullChecks/>
                                 thread={thread}
                                 threadAlreadyHasPolling={!pollsData?.length}
                               />

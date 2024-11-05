@@ -3,15 +3,12 @@ import axios from 'axios';
 import type { DeltaStatic } from 'quill';
 import React from 'react';
 import ReactDOMServer from 'react-dom/server';
-import { compressImage } from 'utils/ImageCompression';
-import { notifyError } from '../../../controllers/app/notifications';
-import { replaceBucketWithCDN } from '../../../helpers/awsHelpers';
 
 export const VALID_IMAGE_TYPES = ['jpeg', 'gif', 'png'];
 
 // createDeltaFromText returns a new DeltaStatic object from a string
 export const createDeltaFromText = (
-  str: string,
+  str: string | DeltaStatic,
   isMarkdown?: boolean,
 ): SerializableDeltaStatic => {
   return {
@@ -51,8 +48,8 @@ export const getTextFromDelta = (delta: DeltaStatic): string => {
         typeof op.insert === 'string'
           ? op.insert
           : op.insert.twitter
-          ? '(tweet)'
-          : '(image)\n';
+            ? '(tweet)'
+            : '(image)\n';
       return acc + text;
     }, '');
 };
@@ -66,52 +63,6 @@ export const base64ToFile = (data: string, fileType: string): File => {
   while (n--) u8arr[n] = bstr.charCodeAt(n);
   const filename = new Date().getTime().toString();
   return new File([u8arr], filename, { type: fileType });
-};
-
-// uploadFileToS3 uploads file data to S3 and returns the URL for the file
-export const uploadFileToS3 = async (
-  file: File,
-  appServerUrl: string,
-  jwtToken: string,
-): Promise<string> => {
-  try {
-    // get a signed upload URL for s3
-    const sigResponse = await axios.post(
-      `${appServerUrl}/getUploadSignature`,
-      new URLSearchParams({
-        mimetype: file.type,
-        name: file.name,
-        auth: 'true',
-        jwt: jwtToken,
-      }),
-    );
-
-    if (sigResponse.status != 200) {
-      throw new Error(
-        `failed to get an S3 signed upload URL: ${sigResponse.data.error}`,
-      );
-    }
-
-    const signedUploadUrl = sigResponse.data.result;
-
-    const compressedFile = await compressImage(file);
-
-    // upload the file via the signed URL
-    await axios.put(signedUploadUrl, compressedFile, {
-      headers: {
-        'Content-Type': file.type,
-      },
-    });
-
-    const trimmedURL = replaceBucketWithCDN(signedUploadUrl.split('?')[0]);
-    console.log(`upload succeeded: ${trimmedURL}`);
-
-    return trimmedURL;
-  } catch (err) {
-    console.error('upload failed: ', err);
-    notifyError('Upload failed');
-    throw err;
-  }
 };
 
 export type SerializableDeltaStatic = DeltaStatic & {

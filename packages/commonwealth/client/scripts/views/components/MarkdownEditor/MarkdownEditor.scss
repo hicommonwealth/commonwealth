@@ -1,0 +1,139 @@
+@import '../../../../styles/shared';
+@import './layout';
+
+html,
+body,
+#root {
+  max-height: 100vh;
+}
+
+#root {
+  // this is needed for mobile layout
+  display: flex;
+}
+
+// disable misc buttons on mobile for now.
+#mava,
+.ReactQueryDevtools * {
+  display: none;
+}
+
+.mdxeditor-container {
+  outline: 1px solid $neutral-200;
+  border-radius: 4px;
+}
+
+.mdxeditor-container-active {
+  outline: 1px solid $primary-300;
+}
+
+.mdxeditor-container-mode-mobile {
+  .mdxeditor {
+    flex-grow: 1;
+    overflow: auto;
+  }
+
+  .mdxeditor-toolbar {
+    border-top: solid $neutral-200 1px;
+
+    min-height: 45px !important;
+  }
+}
+
+.mdxeditor-container-disabled {
+  background-color: $neutral-50;
+  cursor: not-allowed !important;
+
+  .DesktopEditorFooter {
+    background-color: $neutral-50;
+  }
+
+  * {
+    pointer-events: none;
+  }
+
+  .mdxeditor-root-contenteditable {
+    // TODO: disable editing here...
+  }
+}
+
+.mdxeditor-container-mode-desktop {
+  .mdxeditor-root-contenteditable {
+    border-top: 1px solid $neutral-200;
+
+    min-height: 150px;
+    //max-height: 450px;
+  }
+
+  .mdxeditor-toolbar {
+    height: 45px !important;
+  }
+}
+
+.mdxeditor-parent {
+  flex-grow: 1;
+}
+
+.mdxeditor-parent-mode-mobile {
+  display: flex;
+}
+
+.mdxeditor-container {
+  // this is needed so that we can have a progress indicator on top of the main
+  // content.
+  position: relative;
+}
+
+.mdxeditor {
+  display: flex;
+  flex-direction: column;
+
+  .mdxeditor-toolbar {
+    // TODO this only shows up properly for the *mobile* editor not the desktop
+    // one.
+    border-radius: inherit;
+    background-color: inherit;
+    overflow: hidden;
+
+    position: initial;
+    top: initial;
+  }
+
+  .cm-gutters {
+    // necessary because otherwise code mirror line numbers are too small.
+    font-size: inherit !important;
+  }
+
+  div[data-editor-block-type='image'] {
+    // this selects and hides the settings button
+    button:nth-of-type(2) {
+      display: none;
+    }
+  }
+
+  button {
+    outline: none;
+  }
+}
+
+.mdxeditor-diff-source-wrapper {
+  overflow: auto;
+}
+
+.mdxeditor-diff-source-wrapper,
+.mdxeditor-root-contenteditable,
+.mdxeditor-rich-text-editor {
+  display: flex !important;
+  flex-grow: 1;
+}
+
+.mdxeditor-block-type-select,
+.mdxeditor-block-type-select button {
+  width: 45px;
+}
+
+.mdxeditor-container {
+  display: flex;
+  flex-grow: 1;
+  flex-direction: column;
+}

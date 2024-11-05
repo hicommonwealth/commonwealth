@@ -8,6 +8,7 @@ import { parseCustomStages, threadStageToLabel } from '../../helpers';
 import type Thread from '../../models/Thread';
 
 import { ChainBase } from '@hicommonwealth/shared';
+import { buildUpdateThreadInput } from 'client/scripts/state/api/threads/editThread';
 import { notifyError } from 'controllers/app/notifications';
 import { CosmosProposal } from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
 import { filterLinks, getAddedAndDeleted } from 'helpers/threads';
@@ -89,8 +90,9 @@ export const UpdateProposalStatusModal = ({
   const { mutateAsync: editThread } = useEditThreadMutation({
     communityId: app.activeChainId() || '',
     threadId: thread.id,
+    threadMsgId: thread.canvasMsgId!,
     currentStage: thread.stage,
-    currentTopicId: thread.topic.id,
+    currentTopicId: thread.topic!.id!,
   });
 
   const { mutateAsync: addThreadLinks } = useAddThreadLinksMutation({
@@ -110,57 +112,28 @@ export const UpdateProposalStatusModal = ({
 
   const handleSaveChanges = () => {
     // set stage
-    editThread({
+    buildUpdateThreadInput({
       address: user.activeAccount?.address || '',
       communityId: app.activeChainId() || '',
       threadId: thread.id,
-      // @ts-expect-error <StrictNullChecks/>
-      stage: tempStage,
+      threadMsgId: thread.canvasMsgId!,
+      stage: tempStage!,
     })
-      .then(() => {
-        let links = thread.links;
-        const { toAdd, toDelete } = getAddedAndDeleted(
-          tempSnapshotProposals,
-          getInitialSnapshots(thread),
-        );
+      .then((input) => {
+        editThread(input)
+          .then(() => {
+            let links = thread.links;
+            const { toAdd, toDelete } = getAddedAndDeleted(
+              tempSnapshotProposals,
+              getInitialSnapshots(thread),
+            );
 
-        if (toAdd.length > 0) {
-          if (app.chain.meta?.snapshot_spaces?.length === 1) {
-            const enrichedSnapshot = {
-              id: `${app.chain.meta?.snapshot_spaces?.[0]}/${toAdd[0].id}`,
-              title: toAdd[0].title,
-            };
-            return addThreadLinks({
-              communityId: app.activeChainId() || '',
-              threadId: thread.id,
-              links: [
-                {
-                  source: LinkSource.Snapshot,
-                  identifier: String(enrichedSnapshot.id),
-                  title: enrichedSnapshot.title,
-                },
-              ],
-              isPWA: isAddedToHomeScreen,
-            }).then((updatedThread) => {
-              links = updatedThread.links;
-              return { toDelete, links };
-            });
-          } else {
-            return loadMultipleSpacesData(app.chain.meta?.snapshot_spaces)
-              .then((data) => {
-                let enrichedSnapshot;
-                for (const { space: _space, proposals } of data) {
-                  const matchingSnapshot = proposals.find(
-                    (sn) => sn.id === toAdd[0].id,
-                  );
-                  if (matchingSnapshot) {
-                    enrichedSnapshot = {
-                      id: `${_space.id}/${toAdd[0].id}`,
-                      title: toAdd[0].title,
-                    };
-                    break;
-                  }
-                }
+            if (toAdd.length > 0) {
+              if (app.chain.meta?.snapshot_spaces?.length === 1) {
+                const enrichedSnapshot = {
+                  id: `${app.chain.meta?.snapshot_spaces?.[0]}/${toAdd[0].id}`,
+                  title: toAdd[0].title,
+                };
                 return addThreadLinks({
                   communityId: app.activeChainId() || '',
                   threadId: thread.id,
@@ -171,100 +144,134 @@ export const UpdateProposalStatusModal = ({
                       title: enrichedSnapshot.title,
                     },
                   ],
-                  isPWA: isAddedToHomeScreen,
+                }).then((updatedThread) => {
+                  links = updatedThread.links;
+                  return { toDelete, links };
                 });
-              })
-              .then((updatedThread) => {
+              } else {
+                return loadMultipleSpacesData(app.chain.meta?.snapshot_spaces)
+                  .then((data) => {
+                    let enrichedSnapshot;
+                    for (const { space: _space, proposals } of data) {
+                      const matchingSnapshot = proposals.find(
+                        (sn) => sn.id === toAdd[0].id,
+                      );
+                      if (matchingSnapshot) {
+                        enrichedSnapshot = {
+                          id: `${_space.id}/${toAdd[0].id}`,
+                          title: toAdd[0].title,
+                        };
+                        break;
+                      }
+                    }
+                    return addThreadLinks({
+                      communityId: app.activeChainId() || '',
+                      threadId: thread.id,
+                      links: [
+                        {
+                          source: LinkSource.Snapshot,
+                          identifier: String(enrichedSnapshot.id),
+                          title: enrichedSnapshot.title,
+                        },
+                      ],
+                    });
+                  })
+                  .then((updatedThread) => {
+                    links = updatedThread.links;
+                    return { toDelete, links };
+                  });
+              }
+            } else {
+              return { toDelete, links };
+            }
+          })
+          .then(({ toDelete, links }) => {
+            if (toDelete.length > 0) {
+              return deleteThreadLinks({
+                communityId: app.activeChainId() || '',
+                threadId: thread.id,
+                links: toDelete.map((sn) => ({
+                  source: LinkSource.Snapshot,
+                  identifier: String(sn.id),
+                })),
+              }).then((updatedThread) => {
+                // eslint-disable-next-line no-param-reassign
+                links = updatedThread.links;
+                return links;
+              });
+            } else {
+              return links;
+            }
+          })
+          .catch((err) => {
+            const error =
+              err.response.data.error ||
+              'Failed to update stage. Make sure one is selected.';
+            notifyError(error);
+            throw new Error(error);
+          })
+          .then((links) => {
+            const { toAdd, toDelete } = getAddedAndDeleted(
+              tempCosmosProposals,
+              getInitialCosmosProposals(thread),
+              'identifier',
+            );
+
+            if (toAdd.length > 0) {
+              return addThreadLinks({
+                communityId: app.activeChainId() || '',
+                threadId: thread.id,
+                links: toAdd.map(({ identifier, title }) => ({
+                  source: LinkSource.Proposal,
+                  identifier: identifier,
+                  title: title,
+                })),
+              }).then((updatedThread) => {
+                // eslint-disable-next-line no-param-reassign
                 links = updatedThread.links;
                 return { toDelete, links };
               });
-          }
-        } else {
-          return { toDelete, links };
-        }
-      })
-      .then(({ toDelete, links }) => {
-        if (toDelete.length > 0) {
-          return deleteThreadLinks({
-            communityId: app.activeChainId() || '',
-            threadId: thread.id,
-            links: toDelete.map((sn) => ({
-              source: LinkSource.Snapshot,
-              identifier: String(sn.id),
-            })),
-          }).then((updatedThread) => {
-            // eslint-disable-next-line no-param-reassign
-            links = updatedThread.links;
-            return links;
-          });
-        } else {
-          return links;
-        }
-      })
-      .catch((err) => {
-        const error =
-          err.response.data.error ||
-          'Failed to update stage. Make sure one is selected.';
-        notifyError(error);
-        throw new Error(error);
-      })
-      .then((links) => {
-        const { toAdd, toDelete } = getAddedAndDeleted(
-          tempCosmosProposals,
-          getInitialCosmosProposals(thread),
-          'identifier',
-        );
+            } else {
+              return { toDelete, links };
+            }
+          })
+          .then(({ toDelete, links }) => {
+            if (toDelete.length > 0) {
+              return deleteThreadLinks({
+                communityId: app.activeChainId() || '',
+                threadId: thread.id,
+                links: toDelete.map(({ identifier }) => ({
+                  source: LinkSource.Proposal,
+                  identifier: String(identifier),
+                })),
+              }).then((updatedThread) => {
+                // eslint-disable-next-line no-param-reassign
+                links = updatedThread.links;
+                return links;
+              });
+            } else {
+              return links;
+            }
+          })
+          .catch((err) => {
+            console.log(err);
+            notifyError('Failed to update linked proposals');
+          })
+          .then((links) => {
+            trackAnalytics({
+              event:
+                MixpanelCommunityInteractionEvent.LINK_PROPOSAL_BUTTON_PRESSED,
+              isPWA: isAddedToHomeScreen,
+            });
 
-        if (toAdd.length > 0) {
-          return addThreadLinks({
-            communityId: app.activeChainId() || '',
-            threadId: thread.id,
-            links: toAdd.map(({ identifier, title }) => ({
-              source: LinkSource.Proposal,
-              identifier: identifier,
-              title: title,
-            })),
-            isPWA: isAddedToHomeScreen,
-          }).then((updatedThread) => {
-            // eslint-disable-next-line no-param-reassign
-            links = updatedThread.links;
-            return { toDelete, links };
+            // @ts-expect-error <StrictNullChecks/>
+            onChangeHandler?.(tempStage, links);
+            onModalClose();
+          })
+          .catch((err) => {
+            console.log(err);
+            notifyError('An unexpected error occurred');
           });
-        } else {
-          return { toDelete, links };
-        }
-      })
-      .then(({ toDelete, links }) => {
-        if (toDelete.length > 0) {
-          return deleteThreadLinks({
-            communityId: app.activeChainId() || '',
-            threadId: thread.id,
-            links: toDelete.map(({ identifier }) => ({
-              source: LinkSource.Proposal,
-              identifier: String(identifier),
-            })),
-          }).then((updatedThread) => {
-            // eslint-disable-next-line no-param-reassign
-            links = updatedThread.links;
-            return links;
-          });
-        } else {
-          return links;
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-        notifyError('Failed to update linked proposals');
-      })
-      .then((links) => {
-        trackAnalytics({
-          event: MixpanelCommunityInteractionEvent.LINK_PROPOSAL_BUTTON_PRESSED,
-          isPWA: isAddedToHomeScreen,
-        });
-
-        // @ts-expect-error <StrictNullChecks/>
-        onChangeHandler?.(tempStage, links);
-        onModalClose();
       })
       .catch((err) => {
         console.log(err);

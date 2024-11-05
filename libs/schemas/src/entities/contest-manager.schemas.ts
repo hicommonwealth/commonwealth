@@ -47,6 +47,8 @@ export const ContestManager = z
       ),
     topics: z.array(Topic).nullish(),
     contests: z.array(Contest).nullish(),
+    farcaster_frame_url: z.string().nullish(),
+    farcaster_frame_hashes: z.array(z.string()).nullish(),
   })
   .describe('On-Chain Contest Manager');
 

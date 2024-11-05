@@ -1,23 +1,20 @@
 import React from 'react';
 
-import { useFlag } from 'hooks/useFlag';
-import { AssociatedContest } from 'models/Thread';
+import { ContestView } from 'models/Thread';
 
 import ThreadContestTag from './ThreadContestTag';
 import { getWinnersFromAssociatedContests } from './utils';
 
 interface ThreadContestTagContainerProps {
-  associatedContests?: AssociatedContest[];
+  associatedContests?: ContestView[];
 }
 
 const ThreadContestTagContainer = ({
   associatedContests,
 }: ThreadContestTagContainerProps) => {
-  const contestsEnabled = useFlag('contest');
-
   const contestWinners = getWinnersFromAssociatedContests(associatedContests);
 
-  const showContestWinnerTag = contestsEnabled && contestWinners.length > 0;
+  const showContestWinnerTag = contestWinners.length > 0;
 
   return (
     <>
@@ -31,7 +28,7 @@ const ThreadContestTagContainer = ({
             <ThreadContestTag
               date={winner.date}
               round={winner.round}
-              title={winner.title}
+              title={winner.title ?? ''}
               prize={winner.prize}
               key={index}
             />

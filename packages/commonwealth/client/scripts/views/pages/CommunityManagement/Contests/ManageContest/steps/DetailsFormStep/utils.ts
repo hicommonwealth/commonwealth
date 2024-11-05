@@ -47,7 +47,7 @@ export const getPrizeColor = (index: number) => {
 
 export const DAY_IN_SECONDS = 24 * 60 * 60;
 
-export const farcasterDurationOptions = Array.from({ length: 7 }, (_, i) => {
+export const contestDurationOptions = Array.from({ length: 7 }, (_, i) => {
   const days = i + 1;
   return {
     label: `${days} Day${days > 1 ? 's' : ''}`,
@@ -55,4 +55,4 @@ export const farcasterDurationOptions = Array.from({ length: 7 }, (_, i) => {
   };
 });
 
-export const initialFarcasterDuration = farcasterDurationOptions[6].value;
+export const initialContestDuration = contestDurationOptions[6].value;

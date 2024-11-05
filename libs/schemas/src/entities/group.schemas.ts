@@ -49,11 +49,11 @@ const AllowlistData = z.object({
 
 export const Requirement = z.union([
   z.object({
-    rule: z.enum(['threshold']),
+    rule: z.literal('threshold'),
     data: ThresholdData,
   }),
   z.object({
-    rule: z.enum(['allow']),
+    rule: z.literal('allow'),
     data: AllowlistData,
   }),
 ]);

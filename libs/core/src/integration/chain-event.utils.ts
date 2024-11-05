@@ -1,6 +1,6 @@
 import { EventNames, EventPairs } from '@hicommonwealth/core';
 import { ETHERS_BIG_NUMBER, EVM_ADDRESS } from '@hicommonwealth/schemas';
-import ethers from 'ethers';
+import { BigNumber } from 'ethers';
 import { decodeLog } from 'web3-eth-abi';
 import { z } from 'zod';
 
@@ -260,17 +260,17 @@ export const EvmEventAbis = {
 type AbiTypeToTS<T> = T extends 'address'
   ? z.infer<typeof EVM_ADDRESS>
   : T extends 'uint256'
-  ? z.infer<typeof ETHERS_BIG_NUMBER>
-  : T extends 'bool'
-  ? boolean
-  : never;
+    ? z.infer<typeof ETHERS_BIG_NUMBER>
+    : T extends 'bool'
+      ? boolean
+      : never;
 
 type Transform<T extends ReadonlyArray<{ name: string; type: string }>> = {
   [K in T[number] as K['name']]: AbiTypeToTS<K['type']>;
 };
 
 type DecodedEvmEvent<Signature extends EvmEventSignature> = Transform<
-  typeof EvmEventAbis[Signature]
+  (typeof EvmEventAbis)[Signature]
 >;
 
 // EvmMapper maps chain event args as input to a zod event schema type as output
@@ -296,7 +296,7 @@ const RecurringContestManagerDeployedMapper: EvmMapper<
     event_payload: {
       contest_address: contest,
       namespace: namespace,
-      interval: ethers.BigNumber.from(interval).toNumber(),
+      interval: BigNumber.from(interval).toNumber(),
     },
   }),
 };
@@ -314,7 +314,7 @@ const OneOffContestManagerDeployedMapper: EvmMapper<
     event_payload: {
       contest_address: contest,
       namespace: namespace,
-      length: ethers.BigNumber.from(interval).toNumber(),
+      length: BigNumber.from(interval).toNumber(),
     },
   }),
 };
@@ -328,8 +328,8 @@ const SingleContestStartedMapper: EvmMapper<
     event_payload: {
       contest_address: contestAddress!,
       contest_id: 0,
-      start_time: new Date(ethers.BigNumber.from(startTime).toNumber() * 1000),
-      end_time: new Date(ethers.BigNumber.from(endTime).toNumber() * 1000),
+      start_time: new Date(BigNumber.from(startTime).toNumber() * 1000),
+      end_time: new Date(BigNumber.from(endTime).toNumber() * 1000),
     },
   }),
 };
@@ -342,9 +342,9 @@ const RecurringContestStartedMapper: EvmMapper<
     event_name: EventNames.ContestStarted,
     event_payload: {
       contest_address: contestAddress!,
-      contest_id: ethers.BigNumber.from(contestId).toNumber(),
-      start_time: new Date(ethers.BigNumber.from(startTime).toNumber() * 1000),
-      end_time: new Date(ethers.BigNumber.from(endTime).toNumber() * 1000),
+      contest_id: BigNumber.from(contestId).toNumber(),
+      start_time: new Date(BigNumber.from(startTime).toNumber() * 1000),
+      end_time: new Date(BigNumber.from(endTime).toNumber() * 1000),
     },
   }),
 };
@@ -357,7 +357,7 @@ const ContestContentAddedMapper: EvmMapper<
     event_name: EventNames.ContestContentAdded,
     event_payload: {
       contest_address: contestAddress!,
-      content_id: ethers.BigNumber.from(contentId).toNumber(),
+      content_id: BigNumber.from(contentId).toNumber(),
       creator_address: creator,
       content_url: url,
     },
@@ -375,10 +375,10 @@ const RecurringContestContentUpvotedMapper: EvmMapper<
     event_name: EventNames.ContestContentUpvoted,
     event_payload: {
       contest_address: contestAddress!,
-      contest_id: ethers.BigNumber.from(contestId).toNumber(),
-      content_id: ethers.BigNumber.from(contentId).toNumber(),
+      contest_id: BigNumber.from(contestId).toNumber(),
+      content_id: BigNumber.from(contentId).toNumber(),
       voter_address: voter,
-      voting_power: ethers.BigNumber.from(votingPower).toNumber(),
+      voting_power: BigNumber.from(votingPower).toString(),
     },
   }),
 };
@@ -391,10 +391,10 @@ const SingleContestContentUpvotedMapper: EvmMapper<
     event_name: EventNames.ContestContentUpvoted,
     event_payload: {
       contest_address: contestAddress!,
-      contest_id: ethers.BigNumber.from(0).toNumber(),
-      content_id: ethers.BigNumber.from(contentId).toNumber(),
+      contest_id: BigNumber.from(0).toNumber(),
+      content_id: BigNumber.from(contentId).toNumber(),
       voter_address: voter,
-      voting_power: ethers.BigNumber.from(votingPower).toNumber(),
+      voting_power: BigNumber.from(votingPower).toString(),
     },
   }),
 };

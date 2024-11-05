@@ -1,15 +1,16 @@
+import { PermissionEnum } from '@hicommonwealth/schemas';
 import { slugify } from '@hicommonwealth/shared';
 import { getThreadActionTooltipText } from 'helpers/threads';
+import useTopicGating from 'hooks/useTopicGating';
 import { getProposalUrlPath } from 'identifiers';
 import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/overview/TopicSummaryRow.scss';
 import React from 'react';
 import app from 'state';
-import { useRefreshMembershipQuery } from 'state/api/groups';
 import useUserStore from 'state/ui/user';
 import Permissions from 'utils/Permissions';
 import type Thread from '../../../models/Thread';
-import type Topic from '../../../models/Topic';
+import type { Topic } from '../../../models/Topic';
 import { CWText } from '../../components/component_kit/cw_text';
 import { ThreadCard } from '../discussions/ThreadCard';
 import { TopicSummaryRowSkeleton } from './TopicSummaryRowSkeleton';
@@ -31,9 +32,10 @@ export const TopicSummaryRow = ({
   const user = useUserStore();
 
   const communityId = app.activeChainId() || '';
-  const { data: memberships = [] } = useRefreshMembershipQuery({
+
+  const { memberships, topicPermissions } = useTopicGating({
     communityId,
-    address: user.activeAccount?.address || '',
+    userAddress: user.activeAccount?.address || '',
     apiEnabled: !!user.activeAccount?.address || !!communityId,
   });
 
@@ -71,7 +73,7 @@ export const TopicSummaryRow = ({
             fontWeight="medium"
             className="threads-count-text"
           >
-            {topic.totalThreads || 0} Threads
+            {topic.total_threads || 0} Threads
           </CWText>
         </div>
         {topic.description && <CWText type="b2">{topic.description}</CWText>}
@@ -89,18 +91,25 @@ export const TopicSummaryRow = ({
             true,
           );
 
-          const isTopicGated = !!(memberships || []).find((membership) =>
-            membership.topicIds.includes(thread?.topic?.id),
+          const isTopicGated = !!(memberships || []).find(
+            (membership) =>
+              thread?.topic?.id &&
+              membership.topics.find((t) => t.id === thread.topic!.id),
           );
 
           const isActionAllowedInGatedTopic = !!(memberships || []).find(
             (membership) =>
-              membership.topicIds.includes(thread?.topic?.id) &&
+              thread?.topic?.id &&
+              membership.topics.find((t) => t.id === thread.topic!.id) &&
               membership.isAllowed,
           );
 
           const isRestrictedMembership =
             !isAdmin && isTopicGated && !isActionAllowedInGatedTopic;
+
+          const foundTopicPermissions = topicPermissions.find(
+            (tp) => tp.id === thread.topic!.id,
+          );
 
           const disabledActionsTooltipText = getThreadActionTooltipText({
             isCommunityMember: Permissions.isCommunityMember(
@@ -109,6 +118,13 @@ export const TopicSummaryRow = ({
             isThreadArchived: !!thread?.archivedAt,
             isThreadLocked: !!thread?.lockedAt,
             isThreadTopicGated: isRestrictedMembership,
+            threadTopicInteractionRestrictions:
+              !isAdmin &&
+              !foundTopicPermissions?.permissions?.includes(
+                PermissionEnum.CREATE_COMMENT, // on this page we only show comment option
+              )
+                ? foundTopicPermissions?.permissions
+                : undefined,
           });
 
           return (
@@ -128,6 +144,7 @@ export const TopicSummaryRow = ({
               disabledActionsTooltipText={disabledActionsTooltipText}
               hideReactionButton
               hideUpvotesDrawer
+              expandCommentBtnVisible
             />
           );
         })}

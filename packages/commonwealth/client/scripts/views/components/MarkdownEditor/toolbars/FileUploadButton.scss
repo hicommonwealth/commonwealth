@@ -1,0 +1,34 @@
+@import '../../../../../styles/shared';
+
+.FileUploadButton {
+  display: flex;
+  user-select: none;
+
+  .Item {
+    display: flex;
+    margin-top: auto;
+    margin-bottom: auto;
+    margin-left: 8px;
+  }
+
+  .FilePickerInput {
+    visibility: hidden;
+    width: 1px;
+    height: 1px;
+  }
+
+  .FilePickerButton {
+    cursor: pointer;
+    border: none;
+    color: $neutral-500;
+  }
+
+  .IconAndText {
+    display: flex;
+    gap: 4px;
+
+    div {
+      margin: auto auto;
+    }
+  }
+}

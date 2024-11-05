@@ -1,3 +1,4 @@
+import { BigNumber } from '@ethersproject/bignumber';
 import {
   EvmEventSignatures,
   InvalidState,
@@ -12,7 +13,7 @@ import { models } from '../database';
 import { mustExist } from '../middleware/guards';
 import { EvmEventSourceAttributes } from '../models';
 import * as protocol from '../services/commonProtocol';
-import { decodeThreadContentUrl } from '../utils';
+import { decodeThreadContentUrl, getChainNodeUrl } from '../utils';
 
 const log = logger(import.meta);
 
@@ -62,13 +63,17 @@ async function updateOrCreateWithAlert(
     },
   });
   const url = community?.ChainNode?.private_url;
-  if (!url)
-    throw new InvalidState(
-      `Chain node url not found on namespace ${namespace}`,
-    );
+  if (!url) {
+    log.warn(`Chain node url not found on namespace ${namespace}`);
+    return;
+  }
 
   const { ticker, decimals } =
-    await protocol.contractHelpers.getTokenAttributes(contest_address, url);
+    await protocol.contractHelpers.getTokenAttributes(
+      contest_address,
+      url,
+      true,
+    );
 
   const { startTime, endTime } = await protocol.contestHelper.getContestStatus(
     url,
@@ -148,7 +153,7 @@ async function updateOrCreateWithAlert(
           contract_address: contest_address,
           event_signature: eventSignature,
           kind: signatureToKind[eventSignature],
-          abi_id: contestAbi.id,
+          abi_id: contestAbi.id!,
         };
       },
     );
@@ -168,9 +173,12 @@ type ContestDetails = {
 async function getContestDetails(
   contest_address: string,
 ): Promise<ContestDetails | undefined> {
-  const [result] = await models.sequelize.query<ContestDetails>(
+  const [result] = await models.sequelize.query<
+    ContestDetails & { private_url: string }
+  >(
     `
-        select coalesce(cn.private_url, cn.url) as url,
+        select cn.private_url,
+               cn.url,
                cm.prize_percentage,
                cm.payout_structure
         from "ContestManagers" cm
@@ -184,7 +192,12 @@ async function getContestDetails(
       replacements: { contest_address },
     },
   );
-  return result;
+
+  return {
+    url: getChainNodeUrl(result),
+    prize_percentage: result.prize_percentage,
+    payout_structure: result.payout_structure,
+  };
 }
 
 /**
@@ -213,20 +226,19 @@ export async function updateScore(contest_address: string, contest_id: number) {
         oneOff,
       );
 
-    const prizePool =
-      (Number(contestBalance) *
-        Number(oneOff ? 100 : details.prize_percentage)) /
-      100;
+    const prizePool = BigNumber.from(contestBalance)
+      .mul(oneOff ? 100 : details.prize_percentage)
+      .div(100);
     const score: z.infer<typeof ContestScore> = scores.map((s, i) => ({
       content_id: s.winningContent.toString(),
       creator_address: s.winningAddress,
-      votes: Number(s.voteCount),
+      votes: BigNumber.from(s.voteCount).toString(),
       prize:
         i < Number(details.payout_structure.length)
-          ? (
-              (Number(prizePool) * Number(details.payout_structure[i])) /
-              100
-            ).toString()
+          ? BigNumber.from(prizePool)
+              .mul(details.payout_structure[i])
+              .div(100)
+              .toString()
           : '0',
     }));
     await models.Contest.update(
@@ -290,7 +302,7 @@ export function Contests(): Projection<typeof inputs> {
           action: 'added',
           content_url: payload.content_url,
           thread_id: threadId,
-          voting_power: 0,
+          voting_power: '0',
           created_at: new Date(),
         });
       },
@@ -303,7 +315,6 @@ export function Contests(): Projection<typeof inputs> {
             content_id: payload.content_id,
             action: 'added',
           },
-          attributes: ['thread_id'],
           raw: true,
         });
         await models.ContestAction.upsert({
@@ -312,6 +323,7 @@ export function Contests(): Projection<typeof inputs> {
           actor_address: payload.voter_address,
           action: 'upvoted',
           thread_id: add_action!.thread_id,
+          content_url: add_action!.content_url,
           created_at: new Date(),
         });
 

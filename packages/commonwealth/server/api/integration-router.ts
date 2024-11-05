@@ -1,28 +1,14 @@
 import { express } from '@hicommonwealth/adapters';
-import { ChainEvents, Comment, Thread } from '@hicommonwealth/model';
-import { RequestHandler, Router, raw } from 'express';
-
-// TODO: remove as we migrate to tRPC commands
-import DatabaseValidationService from 'server/middleware/databaseValidationService';
-import { deleteBotCommentHandler } from 'server/routes/comments/delete_comment_bot_handler';
-import { deleteBotThreadHandler } from 'server/routes/threads/delete_thread_bot_handler';
-import { updateThreadHandler } from 'server/routes/threads/update_thread_handler';
-import { ServerControllers } from 'server/routing/router';
+import { AppError } from '@hicommonwealth/core';
+import { ChainEvents, Contest, Snapshot, config } from '@hicommonwealth/model';
+import { Router, raw } from 'express';
+import farcasterRouter from 'server/farcaster/router';
+import { validateNeynarWebhook } from 'server/middleware/validateNeynarWebhook';
+import { config as serverConfig } from '../config';
 
 const PATH = '/api/integration';
 
-function build(
-  controllers: ServerControllers,
-  validator: DatabaseValidationService,
-) {
-  // Async middleware wrappers
-  const isBotUser: RequestHandler = (req, res, next) => {
-    validator.validateBotUser(req, res, next).catch(next);
-  };
-  const isAuthor: RequestHandler = (req, res, next) => {
-    validator.validateAuthor(req, res, next).catch(next);
-  };
-
+function build() {
   const router = Router();
   router.use(express.statsMiddleware);
 
@@ -42,43 +28,48 @@ function build(
     express.command(ChainEvents.ChainEventCreated()),
   );
 
-  // Discord BOT integration
+  if (config.CONTESTS.FLAG_FARCASTER_CONTEST) {
+    // Farcaster frames
+    router.use('/farcaster/contests', farcasterRouter);
+
+    // Farcaster webhooks/actions
+    router.post(
+      '/farcaster/CastCreated',
+      validateNeynarWebhook(config.CONTESTS.NEYNAR_CAST_CREATED_WEBHOOK_SECRET),
+      express.command(Contest.FarcasterCastCreatedWebhook()),
+    );
+
+    router.post(
+      '/farcaster/ReplyCastCreated',
+      validateNeynarWebhook(config.CONTESTS.NEYNAR_CAST_CREATED_WEBHOOK_SECRET),
+      express.command(Contest.FarcasterReplyCastCreatedWebhook()),
+    );
+
+    router.get(
+      '/farcaster/CastUpvoteAction',
+      express.query(Contest.GetFarcasterUpvoteActionMetadata()),
+    );
+
+    router.post(
+      '/farcaster/CastUpvoteAction',
+      validateNeynarWebhook(config.CONTESTS.NEYNAR_CAST_CREATED_WEBHOOK_SECRET),
+      express.command(Contest.FarcasterUpvoteAction()),
+    );
+  }
+
   router.post(
-    '/bot/threads',
-    isBotUser,
-    express.command(Thread.CreateThread()),
-  );
-
-  router.patch(
-    '/bot/threads',
-    isBotUser,
-    isAuthor,
-    updateThreadHandler.bind(this, controllers),
-  );
-
-  router.delete(
-    '/bot/threads/:message_id',
-    isBotUser,
-    deleteBotThreadHandler.bind(this, controllers),
-  );
-
-  router.post(
-    '/bot/threads/:id/comments',
-    isBotUser,
-    express.command(Comment.CreateComment()),
-  );
-
-  router.patch(
-    '/bot/threads/:id/comments',
-    isBotUser,
-    express.command(Comment.UpdateComment()),
-  );
-
-  router.delete(
-    '/bot/comments/:message_id',
-    isBotUser,
-    isAuthor,
-    deleteBotCommentHandler.bind(this, controllers),
+    '/snapshot/webhook',
+    (req, _, next) => {
+      const headerSecret = req.headers['authentication'];
+      if (
+        serverConfig.SNAPSHOT_WEBHOOK_SECRET &&
+        headerSecret !== serverConfig.SNAPSHOT_WEBHOOK_SECRET
+      ) {
+        throw new AppError('Unauthorized', 401);
+      }
+      return next();
+    },
+    express.command(Snapshot.CreateSnapshotProposal()),
   );
 
   return router;

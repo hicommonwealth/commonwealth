@@ -6,6 +6,7 @@ import type Thread from '../../models/Thread';
 import { CWText } from '../components/component_kit/cw_text';
 import { CWButton } from '../components/component_kit/new_designs/CWButton';
 
+import { buildUpdateThreadInput } from 'client/scripts/state/api/threads/editThread';
 import useUserStore from 'state/ui/user';
 import {
   notifyError,
@@ -24,19 +25,22 @@ export const ArchiveThreadModal = ({
   const { mutateAsync: editThread } = useEditThreadMutation({
     communityId: app.activeChainId() || '',
     threadId: thread.id,
+    threadMsgId: thread.canvasMsgId!,
     currentStage: thread.stage,
-    currentTopicId: thread.topic.id,
+    currentTopicId: thread.topic!.id!,
   });
   const user = useUserStore();
 
   const handleArchiveThread = async () => {
-    editThread({
+    const input = await buildUpdateThreadInput({
       threadId: thread.id,
+      threadMsgId: thread.canvasMsgId!,
       communityId: app.activeChainId() || '',
       archived: !thread.archivedAt,
       address: user.activeAccount?.address || '',
       pinned: false,
-    })
+    });
+    editThread(input)
       .then(() => {
         notifySuccess(
           `Thread has been ${thread?.archivedAt ? 'unarchived' : 'archived'}!`,

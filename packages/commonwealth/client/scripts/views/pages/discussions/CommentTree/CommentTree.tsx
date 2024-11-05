@@ -1,5 +1,6 @@
 import { ContentType } from '@hicommonwealth/shared';
 import { buildUpdateCommentInput } from 'client/scripts/state/api/comments/editComment';
+import { useAuthModalStore } from 'client/scripts/state/ui/modals';
 import clsx from 'clsx';
 import { SessionKeyError } from 'controllers/server/sessions';
 import { GetThreadActionTooltipTextResponse } from 'helpers/threads';
@@ -67,6 +68,7 @@ export const CommentTree = ({
   const focusCommentsParam = urlParams.get('focusComments') === 'true';
 
   const user = useUserStore();
+  const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
 
   useEffect(() => {
     let timeout;
@@ -157,17 +159,22 @@ export const CommentTree = ({
     isLoggedIn: user.isLoggedIn,
   });
 
-  const scrollToRef = useRef(null);
+  const commentRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const [expandedComment, setExpandedComment] = useState<number | null>(null);
 
-  const scrollToElement = () => {
-    if (scrollToRef.current) {
-      // @ts-expect-error <StrictNullChecks/>
-      scrollToRef.current.scrollIntoView({
+  const handleScrollToComment = (index: number) => {
+    setExpandedComment(index);
+  };
+
+  useEffect(() => {
+    if (expandedComment !== null && commentRefs.current[expandedComment]) {
+      commentRefs.current[expandedComment]?.scrollIntoView({
         behavior: 'smooth',
         block: 'center',
+        inline: 'nearest',
       });
     }
-  };
+  }, [expandedComment]);
 
   // eslint-disable-next-line @typescript-eslint/no-shadow
   const handleIsReplying = (isReplying: boolean, id?: number) => {
@@ -193,18 +200,13 @@ export const CommentTree = ({
           buttonHeight: 'sm',
           onClick: async () => {
             try {
-              await deleteComment({
-                communityId,
-                commentId: comment.id,
-                canvasHash: comment.canvasHash,
-                address: user.activeAccount?.address || '',
-                existingNumberOfComments: thread.numberOfComments,
-              });
+              await deleteComment({ comment_id: comment.id });
             } catch (err) {
               if (err instanceof SessionKeyError) {
+                checkForSessionKeyRevalidationErrors(err);
                 return;
               }
-              console.error(err.response.data.error || err?.message);
+              console.error(err.message);
               notifyError('Failed to delete comment');
             }
           },
@@ -267,7 +269,6 @@ export const CommentTree = ({
       setIsGloballyEditing(false);
     }
   };
-
   const handleEditStart = (comment: CommentType<any>) => {
     const editDraft = localStorage.getItem(
       `${app.activeChainId()}-edit-comment-${comment.id}-storedText`,
@@ -350,8 +351,7 @@ export const CommentTree = ({
       const input = await buildUpdateCommentInput({
         commentId: comment.id,
         updatedBody: serializeDelta(newDelta) || comment.text,
-        threadId: thread.id,
-        parentCommentId: comment.parentComment,
+        commentMsgId: comment.canvasMsgId,
         communityId,
         profile: {
           userId: user.activeAccount?.profile?.userId || 0,
@@ -376,6 +376,7 @@ export const CommentTree = ({
       clearEditingLocalStorage(comment.id, ContentType.Comment);
     } catch (err) {
       if (err instanceof SessionKeyError) {
+        checkForSessionKeyRevalidationErrors(err);
         return;
       }
       console.error(err?.responseJSON?.error || err?.message);
@@ -459,7 +460,12 @@ export const CommentTree = ({
         const nextCommentThreadLevel = nextComment?.threadLevel;
 
         return (
-          <React.Fragment key={comment.id + '' + comment.markedAsSpamAt}>
+          <div
+            key={comment.id + '' + comment.markedAsSpamAt}
+            ref={(el) => {
+              commentRefs.current[index] = el;
+            }}
+          >
             <div className={`Comment comment-${comment.id}`}>
               {comment.threadLevel > 0 && (
                 <div className="thread-connectors-container">
@@ -514,7 +520,7 @@ export const CommentTree = ({
                 onReply={() => {
                   setParentCommentId(comment.id);
                   setIsReplying(true);
-                  scrollToElement();
+                  handleScrollToComment(index);
                 }}
                 onDelete={() => handleDeleteComment(comment)}
                 isSpam={!!comment.markedAsSpamAt}
@@ -526,16 +532,21 @@ export const CommentTree = ({
                 shareURL={`${window.location.origin}${window.location.pathname}?comment=${comment.id}`}
               />
             </div>
-            <div ref={scrollToRef}></div>
             {isReplying && parentCommentId === comment.id && (
               <CreateComment
                 handleIsReplying={handleIsReplying}
                 parentCommentId={parentCommentId}
                 rootThread={thread}
                 canComment={canComment}
+                isReplying={isReplying}
+                tooltipText={
+                  !canComment && typeof disabledActionsTooltipText === 'string'
+                    ? disabledActionsTooltipText
+                    : ''
+                }
               />
             )}
-          </React.Fragment>
+          </div>
         );
       })}
     </div>

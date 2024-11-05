@@ -10,29 +10,29 @@ import { useFlag } from 'hooks/useFlag';
 import './EmptyContestsList.scss';
 
 interface EmptyContestsListProps {
-  isStakeEnabled: boolean;
   isContestAvailable: boolean;
   onSetContestSelectionView?: () => void;
+  hasWeightedTopic: boolean;
 }
 
 const EmptyContestsList = ({
-  isStakeEnabled,
   isContestAvailable,
   onSetContestSelectionView,
+  hasWeightedTopic,
 }: EmptyContestsListProps) => {
   const navigate = useCommonNavigate();
   const farcasterContestEnabled = useFlag('farcasterContest');
 
   return (
     <div className="EmptyContestsList">
-      {!isStakeEnabled ? (
+      {!hasWeightedTopic ? (
         <EmptyCard
           img={shape2Url}
-          title="You must enable Community Stake"
-          subtitle="Contests require Community Stake..."
+          title="You must have at least one topic with weighted voting enabled to run contest"
+          subtitle="Setting up a contest just takes a few minutes and can be a huge boost to your community."
           button={{
-            label: 'Enable Community Stake',
-            handler: () => navigate('/manage/integrations'),
+            label: 'Create a topic',
+            handler: () => navigate('/manage/topics'),
           }}
         />
       ) : !isContestAvailable ? (

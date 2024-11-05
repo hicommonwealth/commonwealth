@@ -3,6 +3,7 @@ import * as schemas from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
 import { models } from '../database';
 import { rollOverContest } from '../services/commonProtocol/contestHelper';
+import { getChainNodeUrl } from '../utils/utils';
 
 const log = logger(import.meta);
 
@@ -18,33 +19,31 @@ export function PerformContestRollovers(): Command<
         interval: number;
         ended: boolean;
         url: string;
+        private_url: string;
       }>(
         `
-          SELECT
-            cm.contest_address,
-            cm.interval,
-            cm.ended,
-            co.end_time,
-            COALESCE(cn.private_url, cn.url) as url
-          FROM "ContestManagers" cm
-          JOIN (
-              SELECT *
-              FROM "Contests"
-              WHERE (contest_address, contest_id) IN (
-                  SELECT contest_address, MAX(contest_id) AS contest_id
-                  FROM "Contests"
-                  GROUP BY contest_address
-              )
-          ) co ON co.contest_address = cm.contest_address
-          AND (
-            cm.interval = 0 AND cm.ended IS NOT TRUE
-            OR
-            cm.interval > 0
-          )
-          AND NOW() > co.end_time
-          AND cm.cancelled = false
-          JOIN "Communities" cu ON cm.community_id = cu.id
-          JOIN "ChainNodes" cn ON cu.chain_node_id = cn.id;
+            SELECT cm.contest_address,
+                   cm.interval,
+                   cm.ended,
+                   co.end_time,
+                   cn.private_url,
+                   cn.url
+            FROM "ContestManagers" cm
+                     JOIN (SELECT *
+                           FROM "Contests"
+                           WHERE (contest_address, contest_id) IN (SELECT contest_address, MAX(contest_id) AS contest_id
+                                                                   FROM "Contests"
+                                                                   GROUP BY contest_address)) co
+                          ON co.contest_address = cm.contest_address
+                              AND (
+                                 cm.interval = 0 AND cm.ended IS NOT TRUE
+                                     OR
+                                 cm.interval > 0
+                                 )
+                              AND NOW() > co.end_time
+                              AND cm.cancelled IS NOT TRUE
+                     JOIN "Communities" cu ON cm.community_id = cu.id
+                     JOIN "ChainNodes" cn ON cu.chain_node_id = cn.id;
         `,
         {
           type: QueryTypes.SELECT,
@@ -53,8 +52,8 @@ export function PerformContestRollovers(): Command<
       );
 
       const contestRolloverPromises = contestManagersWithEndedContest.map(
-        async ({ url, contest_address, interval, ended }) => {
-          log.debug(`ROLLOVER: ${contest_address}`);
+        async ({ url, private_url, contest_address, interval, ended }) => {
+          log.info(`ROLLOVER: ${contest_address}`);
 
           if (interval === 0 && !ended) {
             // preemptively mark as ended so that rollover
@@ -71,7 +70,11 @@ export function PerformContestRollovers(): Command<
             );
           }
 
-          return rollOverContest(url, contest_address, interval === 0);
+          return rollOverContest(
+            getChainNodeUrl({ url, private_url }),
+            contest_address,
+            interval === 0,
+          );
         },
       );
 

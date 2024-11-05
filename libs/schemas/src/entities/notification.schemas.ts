@@ -83,8 +83,7 @@ export const CommentSubscription = z.object({
     id: true,
     created_at: true,
     updated_at: true,
-    text: true,
-    plaintext: true,
+    body: true,
   })
     .merge(
       z.object({

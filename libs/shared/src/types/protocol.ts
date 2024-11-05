@@ -18,16 +18,6 @@ export enum BalanceType {
   Substrate = 'substrate',
 }
 
-export enum SupportedNetwork {
-  Substrate = 'substrate',
-  Aave = 'aave',
-  Compound = 'compound',
-  ERC20 = 'erc20',
-  ERC721 = 'erc721',
-  ERC1155 = 'erc1155',
-  Cosmos = 'cosmos',
-}
-
 export type ContractSource = {
   source_type:
     | BalanceSourceType.ERC20
@@ -104,27 +94,11 @@ export enum ChainBase {
   Solana = 'solana',
 }
 
-export enum ContractType {
-  AAVE = 'aave',
-  COMPOUND = 'compound',
-  ERC20 = 'erc20',
-  ERC721 = 'erc721',
-  MARLINTESTNET = 'marlin-testnet',
-  SPL = 'spl',
-  COMMONPROTOCOL = 'common-protocol',
-}
-
 export enum ChainType {
   Chain = 'chain',
   DAO = 'dao',
   Token = 'token',
   Offchain = 'offchain',
-}
-
-// TODO: this type should be deprecated as community tags/categories are dynamic
-export enum CommunityCategoryType {
-  DeFi = 'DeFi',
-  DAO = 'DAO',
 }
 
 // This enum represents known values for the "network" field on Community, which can be used for
@@ -143,7 +117,6 @@ export enum ChainNetwork {
   Terra = 'terra',
   NEAR = 'near',
   Stargaze = 'stargaze',
-  Compound = 'compound',
   Evmos = 'evmos',
   Kava = 'kava',
   Kyve = 'kyve',
@@ -158,4 +131,9 @@ export enum CosmosGovernanceVersion {
   v1beta1 = 'v1beta1',
   v1beta1Failed = 'v1beta1-attempt-failed',
   v1Failed = 'v1-attempt-failed',
+}
+
+export enum CommunityType {
+  Launchpad = 'launchpad',
+  Basic = 'basic',
 }
