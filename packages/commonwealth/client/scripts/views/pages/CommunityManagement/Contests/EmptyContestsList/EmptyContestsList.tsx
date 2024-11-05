@@ -6,21 +6,23 @@ import shape2Url from 'assets/img/shapes/shape2.svg';
 import { useFlag } from 'hooks/useFlag';
 import { useCommonNavigate } from 'navigation/helpers';
 
-import { ContestType } from '../types';
+import { ContestType, ContestView } from '../types';
 import EmptyCard from './EmptyCard';
 
 import './EmptyContestsList.scss';
 
 interface EmptyContestsListProps {
   isContestAvailable: boolean;
-  onSetContestSelectionView?: () => void;
+  onSetContestView?: (type: ContestView) => void;
   hasWeightedTopic: boolean;
+  hasNamespace: boolean;
 }
 
 const EmptyContestsList = ({
   isContestAvailable,
-  onSetContestSelectionView,
+  onSetContestView,
   hasWeightedTopic,
+  hasNamespace,
 }: EmptyContestsListProps) => {
   const navigate = useCommonNavigate();
   const farcasterContestEnabled = useFlag('farcasterContest');
@@ -46,10 +48,15 @@ const EmptyContestsList = ({
                 subtitle="Farcaster contest does not require to create a weighted topic."
                 button={{
                   label: 'Launch Farcaster contest',
-                  handler: () =>
-                    navigate(
-                      `/manage/contests/launch?type=${ContestType.Farcaster}`,
-                    ),
+                  handler: () => {
+                    if (hasNamespace) {
+                      return navigate(
+                        `/manage/contests/launch?type=${ContestType.Farcaster}`,
+                      );
+                    }
+
+                    onSetContestView?.(ContestView.NamespaceEnablemenement);
+                  },
                 }}
               />
             </div>
@@ -64,7 +71,7 @@ const EmptyContestsList = ({
             label: 'Launch a contest',
             handler: () =>
               farcasterContestEnabled
-                ? onSetContestSelectionView?.()
+                ? onSetContestView?.(ContestView.TypeSelection)
                 : navigate('/manage/contests/launch'),
           }}
         />

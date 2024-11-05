@@ -6,6 +6,7 @@ import { Skeleton } from 'views/components/Skeleton';
 
 import EmptyContestsList from '../EmptyContestsList';
 import FundContestDrawer from '../FundContestDrawer';
+import { ContestView } from '../types';
 import ContestCard from './ContestCard';
 
 import './ContestsList.scss';
@@ -45,7 +46,8 @@ interface ContestsListProps {
   isLoading: boolean;
   hasWeightedTopic: boolean;
   isContestAvailable: boolean;
-  onSetContestSelectionView?: () => void;
+  onSetContestView?: (type: ContestView) => void;
+  hasNamespace?: boolean;
 }
 
 const ContestsList = ({
@@ -54,7 +56,8 @@ const ContestsList = ({
   isLoading,
   hasWeightedTopic,
   isContestAvailable,
-  onSetContestSelectionView,
+  hasNamespace = false,
+  onSetContestView,
 }: ContestsListProps) => {
   const [fundDrawerContest, setFundDrawerContest] = useState<Contest>();
   const farcasterContestEnabled = useFlag('farcasterContest');
@@ -78,7 +81,8 @@ const ContestsList = ({
           <EmptyContestsList
             hasWeightedTopic={hasWeightedTopic}
             isContestAvailable={isContestAvailable}
-            onSetContestSelectionView={onSetContestSelectionView}
+            onSetContestView={onSetContestView}
+            hasNamespace={hasNamespace}
           />
         ) : (
           contests.map((contest) => {

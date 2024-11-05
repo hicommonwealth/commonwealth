@@ -11,16 +11,17 @@ import {
   MixpanelContestEvents,
 } from 'shared/analytics/types';
 import app from 'state';
+import { useGetCommunityByIdQuery } from 'state/api/communities';
 import useGetFeeManagerBalanceQuery from 'state/api/communityStake/getFeeManagerBalance';
 import { useFetchTopicsQuery } from 'state/api/topics';
 import useUserStore from 'state/ui/user';
 import Permissions from 'utils/Permissions';
-import { useCommunityStake } from 'views/components/CommunityStake';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { PageNotFound } from 'views/pages/404';
 import EmptyCard from 'views/pages/CommunityManagement/Contests/EmptyContestsList/EmptyCard';
+import CommunityStakeStep from 'views/pages/CreateCommunity/steps/CommunityStakeStep';
 
 import ContestsList from '../ContestsList';
 import { ContestType, ContestView } from '../types';
@@ -40,9 +41,12 @@ const AdminContestsPage = () => {
   const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
 
   const ethChainId = app?.chain?.meta?.ChainNode?.eth_chain_id || 0;
-  const { stakeData } = useCommunityStake();
-  const namespace = stakeData?.Community?.namespace;
+
   const communityId = app.activeChainId() || '';
+
+  const { data: community } = useGetCommunityByIdQuery({
+    id: communityId,
+  });
 
   const { trackAnalytics } = useBrowserAnalyticsTrack<BaseMixpanelPayload>({
     onAction: true,
@@ -67,8 +71,10 @@ const AdminContestsPage = () => {
   const { data: feeManagerBalance, isLoading: isFeeManagerBalanceLoading } =
     useGetFeeManagerBalanceQuery({
       ethChainId: ethChainId!,
-      namespace,
-      apiEnabled: !!ethChainId && !!namespace ? true : stakeEnabled,
+      namespace: community?.namespace || '',
+      apiEnabled: Boolean(
+        !!ethChainId && !!community?.namespace ? true : stakeEnabled,
+      ),
     });
 
   const handleCreateContestClicked = () => {
@@ -86,11 +92,17 @@ const AdminContestsPage = () => {
     return <PageNotFound />;
   }
 
+  const selectedAddress = user.addresses.find(
+    (x) =>
+      x.address === user.activeAccount?.address &&
+      x.community?.id === community?.id,
+  );
+
   const showBanner =
     hasAtLeastOneWeightedVotingTopic &&
     isContestAvailable &&
     ethChainId &&
-    namespace;
+    community?.namespace;
 
   return (
     <CWPageLayout>
@@ -123,12 +135,11 @@ const AdminContestsPage = () => {
               isAdmin={isAdmin}
               hasWeightedTopic={!!hasAtLeastOneWeightedVotingTopic}
               isContestAvailable={isContestAvailable}
-              onSetContestSelectionView={() =>
-                setContestView(ContestView.TypeSelection)
-              }
+              onSetContestView={setContestView}
+              hasNamespace={!!community?.namespace}
             />
           </>
-        ) : (
+        ) : contestView === ContestView.TypeSelection ? (
           <div className="type-selection-list">
             <EmptyCard
               img={commonUrl}
@@ -148,14 +159,28 @@ const AdminContestsPage = () => {
               subtitle="lorem ipsum dolor sit amet"
               button={{
                 label: 'Launch Farcaster contest',
-                handler: () =>
-                  navigate(
-                    `/manage/contests/launch?type=${ContestType.Farcaster}`,
-                  ),
+                handler: () => {
+                  if (community?.namespace) {
+                    return navigate(
+                      `/manage/contests/launch?type=${ContestType.Farcaster}`,
+                    );
+                  }
+
+                  setContestView(ContestView.NamespaceEnablemenement);
+                },
               }}
             />
           </div>
-        )}
+        ) : contestView === ContestView.NamespaceEnablemenement ? (
+          <CommunityStakeStep
+            goToSuccessStep={() => console.log('goToSuccessStep')}
+            createdCommunityName={community?.name}
+            createdCommunityId={community?.id || ''}
+            selectedAddress={selectedAddress!}
+            chainId={String(ethChainId)}
+            onlyNamespace
+          />
+        ) : null}
       </div>
     </CWPageLayout>
   );
