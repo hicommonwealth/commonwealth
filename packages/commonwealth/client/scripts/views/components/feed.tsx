@@ -210,7 +210,7 @@ export const Feed = ({ query, customScrollParent }: FeedProps) => {
     isError,
   } = query({ limit: 10 });
 
-  const [isThreadModalOpen, setIsThreadModalOpen] = useState(false);
+  const [isThreadModalOpen, setIsThreadModalOpen] = useState<boolean>(false);
   const [selectedThread, setSelectedThread] = useState<Thread | null>(null);
 
   if (isLoading) {
