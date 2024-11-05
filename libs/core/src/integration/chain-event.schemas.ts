@@ -24,3 +24,13 @@ export const NamespaceDeployed = z.tuple([
 export const LaunchpadTokenCreated = z.tuple([
   z.string().describe('tokenAddress'),
 ]);
+
+export const LaunchpadTrade = z.tuple([
+  EVM_ADDRESS.describe('trader'),
+  EVM_ADDRESS.describe('namespace'),
+  z.boolean().describe('isBuy'),
+  ETHERS_BIG_NUMBER.describe('communityTokenAmount'),
+  ETHERS_BIG_NUMBER.describe('ethAmount'),
+  ETHERS_BIG_NUMBER.describe('protocolEthAmount'),
+  ETHERS_BIG_NUMBER.describe('supply'),
+]);
