@@ -1,8 +1,13 @@
-import { Command, InvalidInput } from '@hicommonwealth/core';
+import { Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../database';
 import { AuthContext, isAuthorized } from '../middleware';
-import { mustExist, mustNotExist } from '../middleware/guards';
+import {
+  mustBeValidDateRange,
+  mustExist,
+  mustNotBeStarted,
+  mustNotExist,
+} from '../middleware/guards';
 import { getDelta } from '../utils';
 
 export function UpdateQuest(): Command<
@@ -15,6 +20,7 @@ export function UpdateQuest(): Command<
     secure: true,
     body: async ({ payload }) => {
       const {
+        community_id,
         quest_id,
         name,
         description,
@@ -24,32 +30,26 @@ export function UpdateQuest(): Command<
       } = payload;
 
       const quest = await models.Quest.findOne({
-        where: { id: quest_id },
+        where: { community_id, id: quest_id },
       });
       mustExist(`Quest with id "${quest_id}`, quest);
 
       if (name) {
         const existingName = await models.Quest.findOne({
-          where: { community_id: quest.community_id, name },
+          where: { community_id, name },
           attributes: ['id'],
         });
         mustNotExist(
-          `Quest named "${name}" in community "${quest.community_id}"`,
+          `Quest named "${name}" in community "${community_id}"`,
           existingName,
         );
       }
 
-      const now = new Date();
-      if (quest.end_date <= now) {
-        throw new InvalidInput(
-          `Cannot update quest "${quest.name}" because it has already ended`,
-        );
-      }
-      if (quest.start_date <= now) {
-        throw new InvalidInput(
-          `Cannot update quest "${quest.name}" because it has already started`,
-        );
-      }
+      mustNotBeStarted(start_date ?? quest.start_date);
+      mustBeValidDateRange(
+        start_date ?? quest.start_date,
+        end_date ?? quest.end_date,
+      );
 
       await models.sequelize.transaction(async (transaction) => {
         if (action_metas?.length) {
