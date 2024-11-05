@@ -1,4 +1,5 @@
-import { ChainBase, ChainNetwork } from '@hicommonwealth/shared';
+import { ChainBase, ChainNetwork, CommunityType } from '@hicommonwealth/shared';
+import { useFlag } from 'hooks/useFlag';
 import React from 'react';
 import { useFetchTagsQuery } from 'state/api/tags';
 import CWAccordion from 'views/components/CWAccordion';
@@ -7,15 +8,22 @@ import { CWText } from 'views/components/component_kit/cw_text';
 import CWDrawer, {
   CWDrawerTopBar,
 } from 'views/components/component_kit/new_designs/CWDrawer';
+import { CWRadioButton } from 'views/components/component_kit/new_designs/cw_radio_button';
 import { CWToggle } from 'views/components/component_kit/new_designs/cw_toggle';
 import './FiltersDrawer.scss';
-import { FiltersDrawerProps } from './types';
-
-const communityBases = Object.keys(ChainBase) as ChainBase[];
-
-const communityNetworks: string[] = Object.keys(ChainNetwork).filter(
-  (val) => val === 'ERC20', // only allowing ERC20 for now
-);
+import {
+  communityBases,
+  communityChains,
+  communityNetworks,
+  communitySortOptionsLabelToKeysMap,
+  communityTypes,
+  sortOrderLabelsToDirectionsMap,
+} from './constants';
+import {
+  CommunitySortDirections,
+  CommunitySortOptions,
+  FiltersDrawerProps,
+} from './types';
 
 export const FiltersDrawer = ({
   isOpen,
@@ -24,6 +32,7 @@ export const FiltersDrawer = ({
   onFiltersChange,
 }: FiltersDrawerProps) => {
   const { data: tags } = useFetchTagsQuery();
+  const tokenizedCommunityEnabled = useFlag('tokenizedCommunity');
 
   const onStakeFilterChange = () => {
     onFiltersChange({
@@ -41,10 +50,23 @@ export const FiltersDrawer = ({
     });
   };
 
-  const onChainBaseOptionChange = (base: ChainBase) => {
+  const onCommunityEcosystemOptionChange = (base: ChainBase) => {
     onFiltersChange({
       ...filters,
-      withChainBase: filters.withChainBase === base ? undefined : base,
+      withCommunityEcosystem:
+        filters.withCommunityEcosystem === base ? undefined : base,
+      withEcosystemChainId: base ? undefined : filters.withEcosystemChainId,
+    });
+  };
+
+  const onCommunityEcosystemChainIdChange = (chainId: number | string) => {
+    onFiltersChange({
+      ...filters,
+      withCommunityEcosystem: chainId
+        ? undefined
+        : filters.withCommunityEcosystem,
+      withEcosystemChainId:
+        filters.withEcosystemChainId === chainId ? undefined : chainId,
     });
   };
 
@@ -54,6 +76,42 @@ export const FiltersDrawer = ({
       withNetwork: filters.withNetwork === network ? undefined : network,
     });
   };
+
+  const onCommunityTypeChange = (type: CommunityType) => {
+    onFiltersChange({
+      ...filters,
+      withCommunityType: filters.withCommunityType === type ? undefined : type,
+    });
+  };
+
+  const onCommunitySortOptionChange = (sortOption: CommunitySortOptions) => {
+    onFiltersChange({
+      ...filters,
+      withCommunitySortOrder: (sortOption === CommunitySortOptions.MostRecent
+        ? Object.entries(sortOrderLabelsToDirectionsMap).find(
+            ([_, v]) => v === sortOrderLabelsToDirectionsMap.Descending,
+          )?.[0]
+        : filters.withCommunitySortOrder ||
+          Object.entries(sortOrderLabelsToDirectionsMap).find(
+            ([_, v]) => v === sortOrderLabelsToDirectionsMap.Descending,
+          )?.[0]) as CommunitySortDirections,
+      withCommunitySortBy:
+        filters.withCommunitySortBy === sortOption ? undefined : sortOption,
+    });
+  };
+
+  const onCommunityOrderChange = (sortOrder: CommunitySortDirections) => {
+    onFiltersChange({
+      ...filters,
+      withCommunitySortOrder:
+        filters.withCommunitySortOrder === sortOrder ? undefined : sortOrder,
+    });
+  };
+
+  const hasAppliedFilters =
+    Object.values(filters).filter(Boolean).length === 1
+      ? !filters.withCommunitySortOrder
+      : Object.values(filters).filter(Boolean).length > 0;
 
   return (
     <div className="FiltersDrawer">
@@ -79,8 +137,83 @@ export const FiltersDrawer = ({
               />
             </div>
 
+            {tokenizedCommunityEnabled && (
+              <>
+                <CWAccordion
+                  header="Sort By"
+                  content={
+                    <div className="options-list">
+                      {Object.entries(communitySortOptionsLabelToKeysMap).map(
+                        ([sortOption]) => (
+                          <CWRadioButton
+                            key={sortOption}
+                            groupName="community-sort-option"
+                            value={sortOption}
+                            label={sortOption}
+                            checked={filters.withCommunitySortBy === sortOption}
+                            onChange={() =>
+                              onCommunitySortOptionChange(
+                                sortOption as CommunitySortOptions,
+                              )
+                            }
+                          />
+                        ),
+                      )}
+                    </div>
+                  }
+                />
+
+                <CWAccordion
+                  header="Sort Order"
+                  content={
+                    <div className="options-list">
+                      {Object.entries(sortOrderLabelsToDirectionsMap).map(
+                        ([order]) => (
+                          <CWRadioButton
+                            key={order}
+                            groupName="community-sort-direction"
+                            value={order}
+                            label={order}
+                            checked={filters.withCommunitySortOrder === order}
+                            onChange={() =>
+                              onCommunityOrderChange(
+                                order as CommunitySortDirections,
+                              )
+                            }
+                            disabled={
+                              filters.withCommunitySortBy ===
+                                CommunitySortOptions.MostRecent ||
+                              !hasAppliedFilters
+                            }
+                          />
+                        ),
+                      )}
+                    </div>
+                  }
+                />
+
+                <CWAccordion
+                  header="Community Type"
+                  content={
+                    <div className="options-list">
+                      {communityTypes.map((type) => (
+                        <CWRadioButton
+                          key={type}
+                          groupName="community-type"
+                          value={type}
+                          label={type}
+                          checked={filters.withCommunityType === type}
+                          onChange={() => onCommunityTypeChange(type)}
+                        />
+                      ))}
+                    </div>
+                  }
+                />
+              </>
+            )}
+
             <CWAccordion
-              header="Community Tags"
+              header="Community Preferences"
               content={
                 <div className="options-list">
                   {(tags || [])?.map((t) => (
@@ -96,24 +229,43 @@ export const FiltersDrawer = ({
             />
 
             <CWAccordion
-              header="Community Chain"
+              header="Community Ecosystem"
               content={
                 <div className="options-list">
-                  {communityBases.map((base) => (
-                    <button
-                      className="chainbase-filter-btn"
+                  {Object.keys(communityBases).map((base) => (
+                    <CWRadioButton
                       key={base}
-                      onClick={() => onChainBaseOptionChange(base)}
-                    >
-                      <CWText
-                        fontWeight={
-                          filters.withChainBase === base ? 'black' : 'regular'
-                        }
-                      >
-                        {base}
-                      </CWText>
-                    </button>
+                      groupName="community-ecosystem"
+                      value={base}
+                      label={base}
+                      checked={
+                        filters.withCommunityEcosystem === communityBases[base]
+                      }
+                      onChange={(e) =>
+                        e.target.checked &&
+                        onCommunityEcosystemOptionChange(communityBases[base])
+                      }
+                    />
                   ))}
+                  {tokenizedCommunityEnabled &&
+                    Object.keys(communityChains).map((chain) => (
+                      <CWRadioButton
+                        key={chain}
+                        groupName="community-ecosystem"
+                        value={chain}
+                        label={chain}
+                        checked={
+                          filters.withEcosystemChainId ===
+                          communityChains[chain]
+                        }
+                        onChange={(e) =>
+                          e.target.checked &&
+                          onCommunityEcosystemChainIdChange(
+                            communityChains[chain],
+                          )
+                        }
+                      />
+                    ))}
                 </div>
               }
             />
