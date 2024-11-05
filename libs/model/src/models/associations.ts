@@ -23,6 +23,7 @@ export const buildAssociations = (db: DB) => {
     });
 
   db.Quest.withMany(db.QuestActionMeta, {
+    asMany: 'action_metas',
     onUpdate: 'CASCADE',
     onDelete: 'CASCADE',
   });
