@@ -25,11 +25,10 @@ export async function handleLaunchpadTrade(
     throw new Error('Token not found');
   }
 
-  // const trade = await models.LaunchpadTrade.create({
-  //   trader,
-  //   tokenAddress,
-  //   isBuy,
-  //   communityTokenAmount,
-  //   floatingSupply,
-  // });
+  // const trade = await models.LaunchpadTrade.findOrCreate({
+  //   where: {
+  //     transaction_hash: '',
+  //     eth_chain_id:
+  //   }
+  // })
 }

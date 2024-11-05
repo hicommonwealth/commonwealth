@@ -23,6 +23,7 @@ import EvmEventSource from './evmEventSource';
 import Group from './group';
 import GroupPermission from './groupPermission';
 import LastProcessedEvmBlock from './lastProcessedEvmBlock';
+import LaunchpadTrade from './launchpad_trade';
 import Membership from './membership';
 import Outbox from './outbox';
 import Poll from './poll';
@@ -68,6 +69,7 @@ export const Factories = {
   Group,
   GroupPermission,
   LastProcessedEvmBlock,
+  LaunchpadTrade,
   Membership,
   Outbox,
   Poll,
