@@ -53,11 +53,6 @@ const useManageContestForm = ({
         // @ts-expect-error StrictNullChecks
         prizePercentage: contestData.prize_percentage,
         payoutStructure: contestData.payout_structure,
-        toggledTopicList: contestData.topics.map((topic) => ({
-          name: topic.name,
-          id: topic.id,
-          checked: true,
-        })),
       });
     }
   }, [

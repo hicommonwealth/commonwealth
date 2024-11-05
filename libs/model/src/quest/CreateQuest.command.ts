@@ -24,13 +24,14 @@ export function CreateQuest(): Command<
         existingName,
       );
 
-      return await models.Quest.create({
+      const quest = await models.Quest.create({
         community_id,
         name,
         description,
         start_date,
         end_date,
       });
+      return quest.toJSON();
     },
   };
 }
