@@ -44,21 +44,16 @@ describe('Contest Worker Policy', () => {
         {
           contest_address: contestAddress,
           cancelled: false,
-        },
-      ],
-      topics: [
-        {
-          name: 'zzz',
+          topics: [
+            {
+              name: 'zzz',
+            },
+          ],
         },
       ],
     });
-    topicId = community!.topics![0].id!;
-    expect(topicId, 'topicId not assigned').to.exist;
-    await models.ContestTopic.create({
-      topic_id: topicId,
-      contest_address: community!.contest_managers![0].contest_address!,
-      created_at: new Date(),
-    });
+    topicId = community!.contest_managers![0].topics![0].id!;
+    expect(topicId, 'seeded topic not assigned to contest manager').to.exist;
     await seed('Thread', {
       id: threadId,
       community_id: communityId,

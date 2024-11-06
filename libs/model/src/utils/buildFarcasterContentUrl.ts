@@ -1,3 +1,6 @@
-export function buildFarcasterContentUrl(castHash: string) {
-  return `/farcaster/${castHash}`;
+export function buildFarcasterContentUrl(
+  parentCastHash: string,
+  replyCashHash: string,
+) {
+  return `/farcaster/${parentCastHash}/${replyCashHash}`;
 }

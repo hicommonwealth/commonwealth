@@ -203,6 +203,7 @@ const DetailsFormStep = ({
       prizePercentage,
       payoutStructure,
       contestDuration,
+      isFarcasterContest,
     };
 
     if (editMode) {

@@ -7,7 +7,6 @@ env:
   NODE_ENV: 'test'
   ROLLBAR_ENV: 'GitHubCI'
   TEST_WITHOUT_LOGS: 'true'
-  ALLOWED_EVENTS: 'ChainEventCreated,SnapshotProposalCreated,ThreadCreated,ThreadUpvoted,SubscriptionPreferencesUpdated,CommentCreated,UserMentioned'
   PRIVATE_KEY: 'web3-pk'
   USES_DOCKER_PGSQL: true
   PORT: 8080

@@ -39,10 +39,6 @@ NEYNAR_REPLY_WEBHOOK_URL=https://YOUR_NGROK_DOMAIN/api/integration/farcaster/Rep
 FARCASTER_ACTION_URL=https://YOUR_NGROK_DOMAIN/api/integration/farcaster/CastUpvoteAction
 ```
 
-The `ALLOWED_EVENTS` env var contains a comma-seperated list of outbox events. Add these to the list:
-
-`FarcasterCastCreated,FarcasterReplyCastCreated,FarcasterVoteCreated`
-
 ## Run local services
 
 Run services required for testing contests:
