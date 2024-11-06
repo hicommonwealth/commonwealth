@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 
-import { useFlag } from 'hooks/useFlag';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
@@ -25,7 +24,6 @@ const EnableStake = ({
   const [namespaceError, setNamespaceError] = useState('');
 
   const { namespaceFactory } = useNamespaceFactory(parseInt(chainId));
-  const weightedTopicsEnabled = useFlag('weightedTopics');
 
   const clearNamespaceError = () => {
     setNamespaceError('');
@@ -62,12 +60,12 @@ const EnableStake = ({
     <div className="EnableStake">
       <section className="header">
         <CWText type="h2">
-          {onlyNamespace && weightedTopicsEnabled
+          {onlyNamespace
             ? 'Register a Namespace for your community'
             : 'Do you want to enable community stake?'}
         </CWText>
         <CWText type="b1" className="description">
-          {onlyNamespace && weightedTopicsEnabled ? (
+          {onlyNamespace ? (
             <>
               Registering your Namespace onchain will enable you to utilize
               onchain features on Common such as contests and weighted voting
@@ -117,7 +115,7 @@ const EnableStake = ({
           />
         </CWForm>
 
-        {!onlyNamespace && !weightedTopicsEnabled && (
+        {!onlyNamespace && (
           <CWText className="info" fontWeight="medium">
             Not sure?
             <a

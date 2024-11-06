@@ -1,3 +1,4 @@
+import { BigNumber } from '@ethersproject/bignumber';
 import {
   Actor,
   DeepPartial,
@@ -38,9 +39,9 @@ describe('Contests projection lifecycle', () => {
   const voter1 = 'voter-address1';
   const voter2 = 'voter-address2';
   const voter3 = 'voter-address3';
-  const voting_power1 = 1;
-  const voting_power2 = 2;
-  const voting_power3 = 3;
+  const voting_power1 = '1';
+  const voting_power2 = '2';
+  const voting_power3 = '3';
   const created_at = new Date();
   const start_time = created_at;
   const end_time = new Date(start_time.getTime() + 1000);
@@ -55,6 +56,7 @@ describe('Contests projection lifecycle', () => {
   const thread_title = 'thread-in-contest';
   const ticker = commonProtocol.Denominations.ETH;
   const decimals = commonProtocol.WeiDecimals[commonProtocol.Denominations.ETH];
+  const topic_id = 100;
 
   let getTokenAttributes: Sinon.SinonStub;
   let getContestScore: Sinon.SinonStub;
@@ -116,14 +118,13 @@ describe('Contests projection lifecycle', () => {
             },
           ],
           CommunityStakes: [],
-          topics: [],
+          topics: [{ id: topic_id, name: 'test-topic' }],
           groups: [],
           contest_managers: [
             {
               contest_address: recurring,
               name: recurring,
               interval,
-              topics: [],
               contests: [],
               image_url,
               payout_structure,
@@ -131,12 +132,13 @@ describe('Contests projection lifecycle', () => {
               funding_token_address,
               created_at,
               cancelled,
+              topic_id,
+              is_farcaster_contest: true,
             },
             {
               contest_address: oneoff,
               name: oneoff,
               interval: 0,
-              topics: [],
               contests: [],
               image_url,
               payout_structure,
@@ -144,6 +146,8 @@ describe('Contests projection lifecycle', () => {
               funding_token_address,
               created_at,
               cancelled,
+              topics: [],
+              is_farcaster_contest: false,
             },
           ],
         },
@@ -351,7 +355,9 @@ describe('Contests projection lifecycle', () => {
         decimals,
         cancelled,
         created_at,
-        topics: [],
+        topic_id: topic_id,
+        topics: [{ id: topic_id, name: 'test-topic' }],
+        is_farcaster_contest: true,
         contests: [
           {
             contest_id,
@@ -361,6 +367,7 @@ describe('Contests projection lifecycle', () => {
             score: score.map((s) => ({
               ...s,
               tickerPrize: Number(BigInt(s.prize)) / 10 ** decimals,
+              votes: BigNumber.from(s.votes).toString(),
             })),
             // actions: [
             //   {

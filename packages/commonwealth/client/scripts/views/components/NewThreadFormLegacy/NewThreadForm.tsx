@@ -89,7 +89,7 @@ export const NewThreadForm = () => {
   } = useNewThreadForm(communityId, topicsForSelector);
 
   const hasTopicOngoingContest =
-    threadTopic?.active_contest_managers?.length > 0;
+    threadTopic?.active_contest_managers?.length ?? 0 > 0;
 
   const user = useUserStore();
   const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
@@ -238,9 +238,11 @@ export const NewThreadForm = () => {
   const contestTopicAffordanceVisible =
     isContestAvailable && hasTopicOngoingContest;
 
+  const isWalletBalanceErrorEnabled = false;
   const walletBalanceError =
     isContestAvailable &&
     hasTopicOngoingContest &&
+    isWalletBalanceErrorEnabled &&
     parseFloat(userEthBalance || '0') < MIN_ETH_FOR_CONTEST_THREAD;
 
   useEffect(() => {
@@ -285,7 +287,7 @@ export const NewThreadForm = () => {
                   }}
                   formatOptionLabel={(option) => (
                     <>
-                      {contestTopicAffordanceVisible && (
+                      {!!contestTopicAffordanceVisible && (
                         <CWIcon
                           className="trophy-icon"
                           iconName="trophy"
@@ -324,9 +326,9 @@ export const NewThreadForm = () => {
                 />
               )}
 
-              {contestTopicAffordanceVisible && (
+              {!!contestTopicAffordanceVisible && (
                 <ContestTopicBanner
-                  contests={threadTopic?.active_contest_managers.map((acm) => {
+                  contests={threadTopic?.active_contest_managers?.map((acm) => {
                     return {
                       name: acm?.name,
                       address: acm?.contest_address,
@@ -365,7 +367,7 @@ export const NewThreadForm = () => {
                 placeholder="Enter text or drag images and media here. Use the tab button to see your formatted post."
               />
 
-              {contestThreadBannerVisible && (
+              {!!contestThreadBannerVisible && (
                 <ContestThreadBanner
                   submitEntryChecked={submitEntryChecked}
                   onSetSubmitEntryChecked={setSubmitEntryChecked}
@@ -373,7 +375,7 @@ export const NewThreadForm = () => {
               )}
 
               <MessageRow
-                hasFeedback={walletBalanceError}
+                hasFeedback={!!walletBalanceError}
                 statusMessage={`Ensure that your connected wallet has at least
                 ${MIN_ETH_FOR_CONTEST_THREAD} ETH to participate.`}
                 validationStatus="failure"

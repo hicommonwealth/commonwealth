@@ -118,7 +118,7 @@ export const HeaderWithFilters = ({
 
   const selectedTopic = (topics || []).find((t) => topic && topic === t.name);
 
-  const contestNameOptions = (contestsData || []).map((contest) => ({
+  const contestNameOptions = (contestsData.all || []).map((contest) => ({
     label: contest?.name,
     value: contest?.contest_address,
     id: contest?.contest_address,

@@ -31,7 +31,6 @@ import './AdminContestsPage.scss';
 
 const AdminContestsPage = () => {
   const farcasterContestEnabled = useFlag('farcasterContest');
-  const weightedTopicsEnabled = useFlag('weightedTopics');
   const [contestView, setContestView] = useState<ContestView>(ContestView.List);
 
   const navigate = useCommonNavigate();
@@ -54,7 +53,7 @@ const AdminContestsPage = () => {
     contestsData,
     isContestAvailable,
     isContestDataLoading,
-  } = useCommunityContests();
+  } = useCommunityContests({ shouldPolling: true });
 
   const { data: topicData } = useFetchTopicsQuery({
     communityId,
@@ -69,10 +68,7 @@ const AdminContestsPage = () => {
     useGetFeeManagerBalanceQuery({
       ethChainId: ethChainId!,
       namespace,
-      apiEnabled:
-        !!ethChainId && !!namespace && weightedTopicsEnabled
-          ? true
-          : stakeEnabled,
+      apiEnabled: !!ethChainId && !!namespace ? true : stakeEnabled,
     });
 
   const handleCreateContestClicked = () => {
@@ -91,7 +87,7 @@ const AdminContestsPage = () => {
   }
 
   const showBanner =
-    (weightedTopicsEnabled ? hasAtLeastOneWeightedVotingTopic : stakeEnabled) &&
+    hasAtLeastOneWeightedVotingTopic &&
     isContestAvailable &&
     ethChainId &&
     namespace;
@@ -102,9 +98,7 @@ const AdminContestsPage = () => {
         <div className="admin-header-row">
           <CWText type="h2">Contests</CWText>
 
-          {(weightedTopicsEnabled
-            ? hasAtLeastOneWeightedVotingTopic
-            : stakeEnabled) &&
+          {hasAtLeastOneWeightedVotingTopic &&
             contestView !== ContestView.TypeSelection && (
               <CWButton
                 iconLeft="plusPhosphor"
@@ -124,12 +118,11 @@ const AdminContestsPage = () => {
             )}
 
             <ContestsList
-              contests={contestsData}
+              contests={contestsData.all}
               isLoading={isContestDataLoading}
               isAdmin={isAdmin}
               hasWeightedTopic={!!hasAtLeastOneWeightedVotingTopic}
               isContestAvailable={isContestAvailable}
-              stakeEnabled={stakeEnabled}
               onSetContestSelectionView={() =>
                 setContestView(ContestView.TypeSelection)
               }

@@ -1,3 +1,4 @@
+import { BigNumber } from '@ethersproject/bignumber';
 import {
   EvmEventSignatures,
   InvalidState,
@@ -68,7 +69,11 @@ async function updateOrCreateWithAlert(
   }
 
   const { ticker, decimals } =
-    await protocol.contractHelpers.getTokenAttributes(contest_address, url);
+    await protocol.contractHelpers.getTokenAttributes(
+      contest_address,
+      url,
+      true,
+    );
 
   const { startTime, endTime } = await protocol.contestHelper.getContestStatus(
     url,
@@ -106,6 +111,7 @@ async function updateOrCreateWithAlert(
           name: community.name,
           image_url: 'http://default.image', // TODO: can we have a default image for this?
           payout_structure: [],
+          is_farcaster_contest: false,
         },
         { transaction },
       );
@@ -221,20 +227,19 @@ export async function updateScore(contest_address: string, contest_id: number) {
         oneOff,
       );
 
-    const prizePool =
-      (Number(contestBalance) *
-        Number(oneOff ? 100 : details.prize_percentage)) /
-      100;
+    const prizePool = BigNumber.from(contestBalance)
+      .mul(oneOff ? 100 : details.prize_percentage)
+      .div(100);
     const score: z.infer<typeof ContestScore> = scores.map((s, i) => ({
       content_id: s.winningContent.toString(),
       creator_address: s.winningAddress,
-      votes: Number(s.voteCount),
+      votes: BigNumber.from(s.voteCount).toString(),
       prize:
         i < Number(details.payout_structure.length)
-          ? (
-              (Number(prizePool) * Number(details.payout_structure[i])) /
-              100
-            ).toString()
+          ? BigNumber.from(prizePool)
+              .mul(details.payout_structure[i])
+              .div(100)
+              .toString()
           : '0',
     }));
     await models.Contest.update(
@@ -298,7 +303,7 @@ export function Contests(): Projection<typeof inputs> {
           action: 'added',
           content_url: payload.content_url,
           thread_id: threadId,
-          voting_power: 0,
+          voting_power: '0',
           created_at: new Date(),
         });
       },
@@ -311,7 +316,6 @@ export function Contests(): Projection<typeof inputs> {
             content_id: payload.content_id,
             action: 'added',
           },
-          attributes: ['thread_id'],
           raw: true,
         });
         await models.ContestAction.upsert({
@@ -320,6 +324,7 @@ export function Contests(): Projection<typeof inputs> {
           actor_address: payload.voter_address,
           action: 'upvoted',
           thread_id: add_action!.thread_id,
+          content_url: add_action!.content_url,
           created_at: new Date(),
         });
 

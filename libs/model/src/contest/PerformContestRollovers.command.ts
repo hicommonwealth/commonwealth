@@ -1,6 +1,8 @@
 import { logger, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
+import { NeynarAPIClient } from '@neynar/nodejs-sdk';
 import { QueryTypes } from 'sequelize';
+import { config } from '../config';
 import { models } from '../database';
 import { rollOverContest } from '../services/commonProtocol/contestHelper';
 import { getChainNodeUrl } from '../utils/utils';
@@ -20,11 +22,13 @@ export function PerformContestRollovers(): Command<
         ended: boolean;
         url: string;
         private_url: string;
+        neynar_webhook_id?: string;
       }>(
         `
             SELECT cm.contest_address,
                    cm.interval,
                    cm.ended,
+                   cm.neynar_webhook_id,
                    co.end_time,
                    cn.private_url,
                    cn.url
@@ -41,7 +45,7 @@ export function PerformContestRollovers(): Command<
                                  cm.interval > 0
                                  )
                               AND NOW() > co.end_time
-                              AND cm.cancelled = false
+                              AND cm.cancelled IS NOT TRUE
                      JOIN "Communities" cu ON cm.community_id = cu.id
                      JOIN "ChainNodes" cn ON cu.chain_node_id = cn.id;
         `,
@@ -52,8 +56,15 @@ export function PerformContestRollovers(): Command<
       );
 
       const contestRolloverPromises = contestManagersWithEndedContest.map(
-        async ({ url, private_url, contest_address, interval, ended }) => {
-          log.debug(`ROLLOVER: ${contest_address}`);
+        async ({
+          url,
+          private_url,
+          contest_address,
+          interval,
+          ended,
+          neynar_webhook_id,
+        }) => {
+          log.info(`ROLLOVER: ${contest_address}`);
 
           if (interval === 0 && !ended) {
             // preemptively mark as ended so that rollover
@@ -70,11 +81,34 @@ export function PerformContestRollovers(): Command<
             );
           }
 
-          return rollOverContest(
+          await rollOverContest(
             getChainNodeUrl({ url, private_url }),
             contest_address,
             interval === 0,
           );
+
+          // clean up neynar webhooks when farcaster contest ends
+          if (interval === 0 && neynar_webhook_id) {
+            try {
+              const client = new NeynarAPIClient(
+                config.CONTESTS.NEYNAR_API_KEY!,
+              );
+              await client.deleteWebhook(neynar_webhook_id);
+              await models.ContestManager.update(
+                {
+                  neynar_webhook_id: null,
+                  neynar_webhook_secret: null,
+                },
+                {
+                  where: {
+                    contest_address,
+                  },
+                },
+              );
+            } catch (err) {
+              log.warn(`failed to delete neynar webhook: ${neynar_webhook_id}`);
+            }
+          }
         },
       );
 

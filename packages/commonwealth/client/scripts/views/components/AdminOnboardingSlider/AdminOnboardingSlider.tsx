@@ -9,7 +9,6 @@ import React, { useEffect, useState } from 'react';
 import app from 'state';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { useFetchGroupsQuery } from 'state/api/groups';
-import { useFetchThreadsQuery } from 'state/api/threads';
 import { useFetchTopicsQuery } from 'state/api/topics';
 import useAdminOnboardingSliderMutationStore from 'state/ui/adminOnboardingCards';
 import Permissions from 'utils/Permissions';
@@ -94,14 +93,6 @@ export const AdminOnboardingSlider = () => {
       enabled: !!communityId,
     });
 
-  const { data: threadCount = [], isLoading: isLoadingThreads = false } =
-    useFetchThreadsQuery({
-      communityId,
-      queryType: 'count',
-      limit: 1,
-      apiEnabled: !!communityId,
-    });
-
   const redirectToPage = (
     pageName:
       | 'launch-contest'
@@ -125,7 +116,7 @@ export const AdminOnboardingSlider = () => {
       commonProtocol.ValidChains.SepoliaBase,
     ].includes(community?.ChainNode?.eth_chain_id);
   const isContestActionCompleted =
-    isCommunitySupported && contestsData?.length > 0;
+    isCommunitySupported && contestsData.all?.length > 0;
 
   const isSliderHidden =
     !communityId ||
@@ -133,11 +124,10 @@ export const AdminOnboardingSlider = () => {
     isContestDataLoading ||
     isLoadingTopics ||
     isLoadingGroups ||
-    isLoadingThreads ||
     (isContestActionCompleted &&
       topics.length > 0 &&
       groups.length > 0 &&
-      threadCount > 0 &&
+      (community.lifetime_thread_count ?? 0 > 0) &&
       hasAnyIntegration) ||
     !(Permissions.isSiteAdmin() || Permissions.isCommunityAdmin()) ||
     [
@@ -168,7 +158,7 @@ export const AdminOnboardingSlider = () => {
             description={CARD_TYPES['launch-contest'].description}
             iconURL={CARD_TYPES['launch-contest'].iconURL}
             iconAlt="launch-contest-icon"
-            isActionCompleted={contestsData?.length > 0}
+            isActionCompleted={contestsData.all?.length > 0}
             onCTAClick={() => redirectToPage('launch-contest')}
           />
         )}
@@ -205,7 +195,7 @@ export const AdminOnboardingSlider = () => {
           description={CARD_TYPES['create-thread'].description}
           iconURL={CARD_TYPES['create-thread'].iconURL}
           iconAlt="create-thread-icon"
-          isActionCompleted={threadCount > 0}
+          isActionCompleted={(community?.lifetime_thread_count ?? 0) > 0}
           onCTAClick={() => redirectToPage('create-thread')}
         />
       </CardsSlider>

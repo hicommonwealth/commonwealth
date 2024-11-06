@@ -5,7 +5,10 @@ import { ContestFeeType } from 'views/pages/CommunityManagement/Contests/ManageC
 import z from 'zod';
 
 const client = OpenFeature.getClient();
-const weightedTopicsEnabled = client.getBooleanValue('weightedTopics', false);
+const farcasterContestEnabled = client.getBooleanValue(
+  'farcasterContest',
+  false,
+);
 
 export const detailsFormValidationSchema = z.object({
   contestName: z
@@ -22,7 +25,7 @@ export const detailsFormValidationSchema = z.object({
       weightedVoting: z.nativeEnum(TopicWeightedVoting).optional().nullish(),
     })
     .optional()
-    .refine((value) => (weightedTopicsEnabled ? !!value : true), {
+    .refine((value) => (farcasterContestEnabled ? true : !!value), {
       message: 'You must select a topic',
     }),
   feeType: z.enum([
@@ -31,4 +34,5 @@ export const detailsFormValidationSchema = z.object({
   ]),
   contestRecurring: z.string(),
   fundingTokenAddress: z.string().optional().nullable(),
+  isFarcasterContest: z.boolean().default(false),
 });

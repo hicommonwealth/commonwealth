@@ -28,6 +28,7 @@ import {
   type Role,
 } from '@hicommonwealth/shared';
 import chai from 'chai';
+import { Wallet } from 'ethers';
 import type { Application } from 'express';
 import { z } from 'zod';
 import { TEST_BLOCK_INFO_STRING } from './keys';
@@ -105,7 +106,8 @@ export interface CommentArgs {
   address: string;
   did: `did:${string}`;
   jwt: any;
-  text: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  body: any;
   parentCommentId?: any;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   threadId?: any;
@@ -259,7 +261,10 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
     if (chain === 'ethereum' || chain === 'alex') {
       wallet_id = 'metamask';
       chain_id = chain === 'alex' ? '3' : '1'; // use ETH mainnet for testing except alex
-      sessionSigner = new SIWESigner({ chainId: parseInt(chain_id) });
+      sessionSigner = new SIWESigner({
+        chainId: parseInt(chain_id),
+        signer: Wallet.createRandom(),
+      });
     } else if (chain === 'edgeware') {
       wallet_id = 'polkadot';
       sessionSigner = new SubstrateSignerCW();
@@ -414,7 +419,7 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
       address,
       did,
       jwt,
-      text,
+      body,
       parentCommentId,
       threadId,
       threadMsgId,
@@ -427,7 +432,7 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
       did,
       name: 'comment',
       args: {
-        body: text,
+        body,
         thread_id: threadMsgId,
         parent_comment_id: parentCommentId || null,
       },
@@ -453,7 +458,7 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
         parent_id: parentCommentId || null,
         thread_id: threadId,
         thread_msg_id: threadMsgId,
-        text,
+        body,
         jwt,
         ...toCanvasSignedDataApiArgs(canvasSignResult),
       });

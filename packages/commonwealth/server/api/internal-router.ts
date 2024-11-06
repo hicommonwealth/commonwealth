@@ -26,7 +26,7 @@ const api = {
   integrations: integrations.trpcRouter,
   feed: feed.trpcRouter,
   contest: contest.trpcRouter,
-  subscription: subscription.trpcRouter,
+  subscriptions: subscription.trpcRouter,
   loadTest: loadTest.trpcRouter,
   webhook: webhook.trpcRouter,
   superAdmin: superAdmin.trpcRouter,

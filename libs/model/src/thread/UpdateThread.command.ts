@@ -203,7 +203,7 @@ export function UpdateThread(): Command<
         collaboratorsPatch.add.length > 0 ||
         collaboratorsPatch.remove.length > 0
       ) {
-        const found = await models.ContestTopic.findOne({
+        const found = await models.ContestManager.findOne({
           where: { topic_id: thread.topic_id! },
         });
         if (found) throw new InvalidInput(UpdateThreadErrors.ContestLock);
@@ -351,7 +351,7 @@ export function UpdateThread(): Command<
               attributes: [
                 'id',
                 'address_id',
-                'text',
+                'body',
                 'created_at',
                 'updated_at',
                 'deleted_at',
