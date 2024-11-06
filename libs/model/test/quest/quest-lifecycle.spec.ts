@@ -13,6 +13,7 @@ import {
   CreateQuest,
   DeleteQuest,
   GetQuest,
+  GetQuests,
   UpdateQuest,
 } from '../../src/quest';
 import { seedCommunity } from '../utils/community-seeder';
@@ -239,14 +240,30 @@ describe('Quest lifecycle', () => {
               community_id,
               name: chance.name() + Math.random(),
               description: chance.sentence(),
-              start_date: new Date(),
-              end_date: new Date(),
+              start_date,
+              end_date,
             },
           }),
         ),
       );
-
-      expect(quests).toHaveLength(2);
+      await command(UpdateQuest(), {
+        actor: admin,
+        payload: {
+          community_id,
+          quest_id: quests[0]!.id!,
+          action_metas,
+        },
+      });
+      const retrieved = await query(GetQuests(), {
+        actor: admin,
+        payload: { community_id },
+      });
+      expect(retrieved?.length).toBe(8);
+      quests
+        .at(-1)
+        ?.action_metas?.forEach((meta, index) =>
+          expect(meta).toMatchObject(action_metas[index]),
+        );
     });
   });
 
