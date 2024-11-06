@@ -16,13 +16,6 @@ const externalApiConfig = JSON.parse(
   readFileSync(path.join(__dirname, '../external-api-config.json'), 'utf8'),
 );
 
-const apiClientPackageJson = JSON.parse(
-  readFileSync(
-    path.join(__dirname, '../../../../libs/api-client/package.json'),
-    'utf8',
-  ),
-);
-
 const productionOasPath = 'external-production-openapi.json';
 const localOasPath = 'external-openapi.json';
 
@@ -34,15 +27,6 @@ async function updateVersionInFile(newVersion: string) {
   await writeFile(
     path.join(__dirname, '../external-api-config.json'),
     JSON.stringify(updatedApiConfig),
-    'utf8',
-  );
-  const updatedPackageJson = {
-    ...apiClientPackageJson,
-    version: newVersion,
-  };
-  await writeFile(
-    path.join(__dirname, '../../libs/api-client/package.json'),
-    JSON.stringify(updatedPackageJson),
     'utf8',
   );
 }
@@ -101,14 +85,6 @@ function compareSemVersions(versionOne: string, versionTwo: string) {
 }
 
 async function validateExternalApiVersioning() {
-  // verify matching version numbers
-  if (externalApiConfig.version !== apiClientPackageJson.version) {
-    throw new Error(
-      `Mismatching version from external api config (${externalApiConfig.version}) ` +
-        `and api-client/package.json (${apiClientPackageJson.version})`,
-    );
-  }
-
   // NPM version must be provided since the version on master is never updated
   if (!process.argv[2] || typeof process.argv[2] !== 'string') {
     throw new Error('Must provide @commonxyz/api-client package version');

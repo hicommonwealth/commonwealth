@@ -47,18 +47,17 @@ jobs:
         with:
           files: |
             packages/commonwealth/server/external-api-config.json
-            libs/api-client/package.json
 
       - name: Format updated files
         if: steps.changed-files-specific.outputs.any_changed == 'true'
-        run: pnpm dlx prettier --write ./libs/api-client/package.json ./packages/commonwealth/server/external-api-config.json
+        run: pnpm dlx prettier --write ./packages/commonwealth/server/external-api-config.json
 
       - name: Commit and push updated files
         if: steps.changed-files-specific.outputs.any_changed == 'true'
         run: |
           git config --global user.name "timolegros"
           git config --global user.email "timothee@ualberta.ca"
-          git add libs/api-client/package.json packages/commonwealth/server/external-api-config.json
+          git add packages/commonwealth/server/external-api-config.json
           git commit -m "chore: update client SDK version"
           git push origin HEAD
       # May need to add a `repo` scoped personal access token
