@@ -48,7 +48,7 @@ export interface TopicForm extends TopicFormRegular, TopicFormERC20 {}
 
 export const Topics = () => {
   const [topicFormData, setTopicFormData] = useState<TopicForm | null>(null);
-  const [createCommunityStep, setCreateCommunityStep] = useState(
+  const [createTopicStep, setCreateTopicStep] = useState(
     CreateTopicStep.TopicDetails,
   );
 
@@ -111,12 +111,16 @@ export const Topics = () => {
     }
   };
 
+  const goToMethodSelectionStep = () => {
+    setCreateTopicStep(CreateTopicStep.WVMethodSelection);
+  };
+
   const getCurrentStep = () => {
-    switch (createCommunityStep) {
+    switch (createTopicStep) {
       case CreateTopicStep.TopicDetails:
         return (
           <TopicDetails
-            onStepChange={setCreateCommunityStep}
+            onStepChange={setCreateTopicStep}
             onSetTopicFormData={handleSetTopicFormData}
             topicFormData={topicFormData}
           />
@@ -124,36 +128,37 @@ export const Topics = () => {
       case CreateTopicStep.WVConsent:
         return (
           <WVConsent
-            onStepChange={setCreateCommunityStep}
+            onStepChange={setCreateTopicStep}
             onCreateTopic={handleCreateTopic}
           />
         );
       case CreateTopicStep.WVMethodSelection:
         return (
           <WVMethodSelection
-            onStepChange={setCreateCommunityStep}
+            onStepChange={setCreateTopicStep}
             hasNamespace={!!community?.namespace}
           />
         );
       case CreateTopicStep.WVNamespaceEnablement:
         return (
           <CommunityStakeStep
-            goToSuccessStep={() =>
-              setCreateCommunityStep(CreateTopicStep.WVERC20Details)
-            }
             createdCommunityName={community?.name}
             createdCommunityId={community?.id || ''}
-            onTopicFlowStepChange={setCreateCommunityStep}
             selectedAddress={selectedAddress!}
             chainId={String(community?.ChainNode?.eth_chain_id)}
             onlyNamespace
             isTopicFlow
+            onEnableStakeStepCancel={goToMethodSelectionStep}
+            onSignTransactionsStepReserveNamespaceSuccess={() =>
+              setCreateTopicStep(CreateTopicStep.WVERC20Details)
+            }
+            onSignTransactionsStepCancel={goToMethodSelectionStep}
           />
         );
       case CreateTopicStep.WVERC20Details:
         return (
           <WVERC20Details
-            onStepChange={setCreateCommunityStep}
+            onStepChange={setCreateTopicStep}
             onCreateTopic={handleCreateTopic}
           />
         );
@@ -161,7 +166,7 @@ export const Topics = () => {
         return (
           <StakeIntegration
             isTopicFlow
-            onTopicFlowStepChange={setCreateCommunityStep}
+            onTopicFlowStepChange={setCreateTopicStep}
             onCreateTopic={handleCreateTopic}
           />
         );
@@ -171,7 +176,7 @@ export const Topics = () => {
   return (
     <CWPageLayout>
       <div className="Topics">
-        <CWFormSteps steps={getCreateTopicSteps(createCommunityStep)} />
+        <CWFormSteps steps={getCreateTopicSteps(createTopicStep)} />
 
         {getCurrentStep()}
       </div>

@@ -104,6 +104,14 @@ const AdminContestsPage = () => {
     ethChainId &&
     community?.namespace;
 
+  const gotToContestTypeSelection = () => {
+    setContestView(ContestView.TypeSelection);
+  };
+
+  const goToLaunchFarcasterContest = () => {
+    navigate(`/manage/contests/launch?type=${ContestType.Common}`);
+  };
+
   return (
     <CWPageLayout>
       <div className="AdminContestsPage">
@@ -161,9 +169,7 @@ const AdminContestsPage = () => {
                 label: 'Launch Farcaster contest',
                 handler: () => {
                   if (community?.namespace) {
-                    return navigate(
-                      `/manage/contests/launch?type=${ContestType.Farcaster}`,
-                    );
+                    goToLaunchFarcasterContest();
                   }
 
                   setContestView(ContestView.NamespaceEnablemenement);
@@ -173,12 +179,16 @@ const AdminContestsPage = () => {
           </div>
         ) : contestView === ContestView.NamespaceEnablemenement ? (
           <CommunityStakeStep
-            goToSuccessStep={() => console.log('goToSuccessStep')}
             createdCommunityName={community?.name}
             createdCommunityId={community?.id || ''}
             selectedAddress={selectedAddress!}
             chainId={String(ethChainId)}
             onlyNamespace
+            onEnableStakeStepCancel={gotToContestTypeSelection}
+            onSignTransactionsStepReserveNamespaceSuccess={
+              goToLaunchFarcasterContest
+            }
+            onSignTransactionsStepCancel={gotToContestTypeSelection}
           />
         ) : null}
       </div>

@@ -2,36 +2,40 @@ import React, { useState } from 'react';
 
 import AddressInfo from 'models/AddressInfo';
 import { openConfirmation } from 'views/modals/confirmation_modal';
-import { CreateTopicStep } from 'views/pages/CommunityManagement/Topics/utils';
 import EnableStake from './EnableStake';
 import SignStakeTransactions from './SignStakeTransactions';
 
 interface CommunityStakeStepProps {
-  goToSuccessStep: () => void;
   createdCommunityName?: string;
   createdCommunityId: string;
   selectedAddress: AddressInfo;
   chainId: string;
   isTopicFlow?: boolean;
-  onTopicFlowStepChange?: (step: CreateTopicStep) => void;
-  refetchStakeQuery?: () => void;
+
   onlyNamespace?: boolean;
   namespace?: string | null;
   symbol?: string;
+  onEnableStakeStepSucess?: () => void;
+  onEnableStakeStepCancel?: () => void;
+  onSignTransactionsStepReserveNamespaceSuccess?: () => void;
+  onSignTransactionsStepLaunchStakeSuccess?: () => void;
+  onSignTransactionsStepCancel?: () => void;
 }
 
 const CommunityStakeStep = ({
-  goToSuccessStep,
   createdCommunityName,
   createdCommunityId,
   selectedAddress,
   chainId,
   isTopicFlow,
-  onTopicFlowStepChange,
-  refetchStakeQuery,
   onlyNamespace,
   namespace,
   symbol,
+  onEnableStakeStepSucess,
+  onEnableStakeStepCancel,
+  onSignTransactionsStepReserveNamespaceSuccess,
+  onSignTransactionsStepLaunchStakeSuccess,
+  onSignTransactionsStepCancel,
 }: CommunityStakeStepProps) => {
   const hasNamespaceReserved = !!namespace;
   const [enableStakePage, setEnableStakePage] = useState(
@@ -50,58 +54,46 @@ const CommunityStakeStep = ({
     setEnableStakePage(false);
   };
 
-  const enableStakeHandler = () => {
-    isTopicFlow && onTopicFlowStepChange
-      ? onTopicFlowStepChange(CreateTopicStep.WVMethodSelection)
-      : goToSuccessStep();
+  const handleEnableStakeStepSuccess = (data: {
+    namespace: string;
+    symbol: string;
+  }) => {
+    handleOptInEnablingStake(data);
+    onEnableStakeStepSucess?.();
   };
 
-  const onSuccessSignTransactions = () => {
-    if (isTopicFlow) {
-      if (onlyNamespace) {
-        return goToSuccessStep();
-      } else {
-        return refetchStakeQuery?.();
-      }
-    }
-
-    goToSuccessStep();
+  const handleEnableStakeStepCancel = () => {
+    onEnableStakeStepCancel?.();
   };
 
-  const onCancelSignTransactions = () => {
-    isTopicFlow ? setEnableStakePage(true) : goToSuccessStep();
+  const handleSignTransactionsStepReserveNamespaceSuccess = () => {
+    onSignTransactionsStepReserveNamespaceSuccess?.();
   };
 
-  const handleLaunchStakeSuccess = () => {
-    return onSuccessSignTransactions();
+  const handleSignTransactionsStepLaunchStakeSuccess = () => {
+    onSignTransactionsStepLaunchStakeSuccess?.();
   };
 
-  const handleReserveNamespaceSuccess = () => {
-    return onlyNamespace ? onSuccessSignTransactions() : undefined;
-  };
-
-  const handleCancelSignStakeTransactions = () => {
-    isTopicFlow
-      ? onCancelSignTransactions()
-      : openConfirmation({
-          title: 'Are you sure you want to cancel?',
-          description: onlyNamespace
-            ? 'Namespace has not been enabled for your community yet'
-            : 'Community Stake has not been enabled for your community yet',
-          buttons: [
-            {
-              label: 'Cancel',
-              buttonType: 'destructive',
-              buttonHeight: 'sm',
-              onClick: onCancelSignTransactions,
-            },
-            {
-              label: 'Continue',
-              buttonType: 'primary',
-              buttonHeight: 'sm',
-            },
-          ],
-        });
+  const handleSignTransactionsStepCancel = () => {
+    openConfirmation({
+      title: 'Are you sure you want to cancel?',
+      description: onlyNamespace
+        ? 'Namespace has not been enabled for your community yet'
+        : 'Community Stake has not been enabled for your community yet',
+      buttons: [
+        {
+          label: 'Cancel',
+          buttonType: 'destructive',
+          buttonHeight: 'sm',
+          onClick: onSignTransactionsStepCancel,
+        },
+        {
+          label: 'Continue',
+          buttonType: 'primary',
+          buttonHeight: 'sm',
+        },
+      ],
+    });
   };
 
   return (
@@ -111,13 +103,13 @@ const CommunityStakeStep = ({
           communityStakeData={communityStakeData}
           chainId={chainId}
           onlyNamespace={onlyNamespace}
-          backButton={{
-            label: isTopicFlow ? 'Back' : 'No',
-            action: enableStakeHandler,
-          }}
           confirmButton={{
             label: 'Yes',
-            action: handleOptInEnablingStake,
+            action: handleEnableStakeStepSuccess,
+          }}
+          backButton={{
+            label: isTopicFlow ? 'Back' : 'No',
+            action: handleEnableStakeStepCancel,
           }}
         />
       ) : (
@@ -128,11 +120,13 @@ const CommunityStakeStep = ({
           chainId={chainId}
           onlyNamespace={onlyNamespace}
           hasNamespaceReserved={hasNamespaceReserved}
-          onLaunchStakeSuccess={handleLaunchStakeSuccess}
-          onReserveNamespaceSuccess={handleReserveNamespaceSuccess}
+          onReserveNamespaceSuccess={
+            handleSignTransactionsStepReserveNamespaceSuccess
+          }
+          onLaunchStakeSuccess={handleSignTransactionsStepLaunchStakeSuccess}
           backButton={{
             label: isTopicFlow ? 'Back' : 'Cancel',
-            action: handleCancelSignStakeTransactions,
+            action: handleSignTransactionsStepCancel,
           }}
         />
       )}
