@@ -205,7 +205,7 @@ export const UploadControl = ({
           onClick={(e) => e.stopPropagation()}
           onKeyDown={(e) => {
             if (e.key === 'Enter' && imagePrompt.trim()) {
-              e.preventDefault(); // Prevents any default form submission behavior
+              e.preventDefault();
               generateImage({ prompt: imagePrompt.trim() }).catch(
                 console.error,
               );
