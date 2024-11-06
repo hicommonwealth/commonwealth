@@ -116,7 +116,7 @@ export const AdminOnboardingSlider = () => {
       commonProtocol.ValidChains.SepoliaBase,
     ].includes(community?.ChainNode?.eth_chain_id);
   const isContestActionCompleted =
-    isCommunitySupported && contestsData?.length > 0;
+    isCommunitySupported && contestsData.all?.length > 0;
 
   const isSliderHidden =
     !communityId ||
@@ -158,7 +158,7 @@ export const AdminOnboardingSlider = () => {
             description={CARD_TYPES['launch-contest'].description}
             iconURL={CARD_TYPES['launch-contest'].iconURL}
             iconAlt="launch-contest-icon"
-            isActionCompleted={contestsData?.length > 0}
+            isActionCompleted={contestsData.all?.length > 0}
             onCTAClick={() => redirectToPage('launch-contest')}
           />
         )}

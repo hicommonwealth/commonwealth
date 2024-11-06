@@ -138,7 +138,7 @@ const AdminContestsPage = () => {
             )}
 
             <ContestsList
-              contests={contestsData}
+              contests={contestsData.all}
               isLoading={isContestDataLoading}
               isAdmin={isAdmin}
               hasWeightedTopic={!!hasAtLeastOneWeightedVotingTopic}

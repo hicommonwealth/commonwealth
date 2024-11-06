@@ -44,5 +44,6 @@ export const detailsFormValidationSchema = (isFarcasterContest: boolean) => {
     ]),
     contestRecurring: z.string(),
     fundingTokenAddress: z.string().optional().nullable(),
+    isFarcasterContest: z.boolean().default(false),
   });
 };

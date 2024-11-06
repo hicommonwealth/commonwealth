@@ -19,6 +19,8 @@ import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { useCreateTopicMutation } from 'state/api/topics';
 import useUserStore from 'state/ui/user';
 
+import Permissions from 'client/scripts/utils/Permissions';
+import { PageNotFound } from '../../404';
 import './Topics.scss';
 
 interface TopicFormRegular {
@@ -71,6 +73,13 @@ export const Topics = () => {
   const handleSetTopicFormData = (data: Partial<TopicForm>) => {
     setTopicFormData((prevState) => ({ ...prevState, ...data }));
   };
+
+  if (
+    !user.isLoggedIn ||
+    !(Permissions.isSiteAdmin() || Permissions.isCommunityAdmin())
+  ) {
+    return <PageNotFound />;
+  }
 
   const handleCreateTopic = async ({
     erc20,
