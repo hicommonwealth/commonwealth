@@ -1,8 +1,11 @@
 import { logger } from '@hicommonwealth/core';
 import { readFileSync } from 'fs';
 import fetch from 'node-fetch';
-import path from 'path';
+import path, { dirname } from 'path';
+import { fileURLToPath } from 'url';
 import { config } from '../config';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const log = logger(import.meta);
 const externalApiConfig = JSON.parse(
