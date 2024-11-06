@@ -233,7 +233,7 @@ describe('Quest lifecycle', () => {
           },
         ];
       const quests = await Promise.all(
-        [...Array(3)].map((v) =>
+        [...Array(3)].map(() =>
           command(CreateQuest(), {
             actor: admin,
             payload: {
