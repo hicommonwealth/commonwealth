@@ -130,9 +130,10 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
       ...(featuredFilter && {
         orderBy: featuredFilter,
       }),
-      toDate: dateCursor.toDate,
-      // @ts-expect-error <StrictNullChecks/>
-      fromDate: dateCursor.fromDate,
+      ...(dateCursor.fromDate && {
+        toDate: dateCursor.toDate,
+        fromDate: dateCursor.fromDate,
+      }),
       includeArchivedThreads: isOnArchivePage || includeArchivedThreads,
       // @ts-expect-error <StrictNullChecks/>
       contestAddress,
@@ -181,7 +182,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const isTopicWeighted =
     topicId && topicObj.weighted_voting === TopicWeightedVoting.ERC20;
 
-  const activeContestsInTopic = contestsData?.filter((contest) => {
+  const activeContestsInTopic = contestsData.all?.filter((contest) => {
     const isContestInTopic = (contest.topics || []).find(
       (topic) => topic.id === topicId,
     );
@@ -271,7 +272,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
             });
 
           const isThreadTopicInContest = checkIsTopicInContest(
-            contestsData,
+            contestsData.all,
             thread?.topic?.id,
           );
 
