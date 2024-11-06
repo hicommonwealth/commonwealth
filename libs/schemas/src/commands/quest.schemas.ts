@@ -25,3 +25,11 @@ export const UpdateQuest = {
   }),
   output: Quest,
 };
+
+export const DeleteQuest = {
+  input: z.object({
+    community_id: z.string(),
+    quest_id: PG_INT,
+  }),
+  output: z.boolean(),
+};

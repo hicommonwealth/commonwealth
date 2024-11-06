@@ -14,11 +14,13 @@ export function GetQuest(): Query<typeof schemas.GetQuest, AuthContext> {
         where: { id: quest_id },
         include: { model: models.QuestActionMeta, as: 'action_metas' },
       });
-      return {
-        ...quest!.toJSON(),
-        id: quest_id,
-        created_at: quest!.created_at!,
-      };
+      return quest
+        ? {
+            ...quest.toJSON(),
+            id: quest_id,
+            created_at: quest!.created_at!,
+          }
+        : undefined;
     },
   };
 }
