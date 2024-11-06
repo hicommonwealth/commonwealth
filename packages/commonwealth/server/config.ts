@@ -173,7 +173,10 @@ export const config = configure(
       API_CLIENT_REPO_TOKEN: z
         .string()
         .optional()
-        .refine((data) => !(model_config.APP_ENV === 'production' && !data)),
+        .refine((data) => !(model_config.APP_ENV === 'production' && !data))
+        .describe(
+          'A token used to authenticate with the GitHub API. Primarily used to trigger workflows',
+        ),
     }),
   }),
 );
