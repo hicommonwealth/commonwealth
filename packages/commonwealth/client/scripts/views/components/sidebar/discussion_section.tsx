@@ -56,10 +56,6 @@ export const DiscussionSection = ({
     [{ path: '/discussions' }, { path: ':scope/discussions' }],
     location,
   );
-  const matchesOverviewRoute = matchRoutes(
-    [{ path: '/overview' }, { path: ':scope/overview' }],
-    location,
-  );
   const matchesContestsRoute = matchRoutes(
     [{ path: '/contests' }, { path: ':scope/contests' }],
     location,
