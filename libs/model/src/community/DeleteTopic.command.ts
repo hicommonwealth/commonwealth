@@ -21,7 +21,7 @@ export function DeleteTopic(): Command<
 
       await models.sequelize.transaction(async (transaction) => {
         await models.Thread.update(
-          { topic_id: null },
+          { topic_id: null, archived_at: new Date() },
           {
             where: {
               community_id: topic.community_id,

@@ -64,7 +64,7 @@ export function formatActivityResponse(response: AxiosResponse<any, any>) {
           is_user_default: false,
           role: 'member',
         },
-        topic: x.thread.topic,
+        topic: x?.thread?.topic,
 
         // filler values
         ThreadVersionHistories: [],
