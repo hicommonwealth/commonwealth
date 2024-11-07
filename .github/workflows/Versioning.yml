@@ -37,6 +37,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.event.pull_request.head.ref }}
+          token: ${{ secrets.SERVICE_PERSON_ACCESS_TOKEN }}
 
       - uses: ./.github/actions/setup
         with:
@@ -52,10 +53,6 @@ jobs:
           else
             echo "version_updated=false" >> $GITHUB_ENV
           fi
-
-      - name: Format updated files
-        if: env.version_updated == 'true'
-        run: pnpm dlx prettier --write ./packages/commonwealth/server/external-api-config.json
 
       - name: Commit and Push
         if: env.version_updated == 'true'
