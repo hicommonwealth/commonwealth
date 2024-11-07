@@ -44,13 +44,12 @@ export const FullUser = ({
   const loggedInUser = useUserStore();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const { data: userCommunity, isLoading: isLoadingUserCommunity } =
-    useGetCommunityByIdQuery({
-      id: userCommunityId || '',
-      enabled: !!userCommunityId,
-    });
+  const { data: userCommunity } = useGetCommunityByIdQuery({
+    id: userCommunityId || '',
+    enabled: !!userCommunityId,
+  });
 
-  if (showSkeleton || isLoadingUserCommunity) {
+  if (showSkeleton) {
     return (
       <UserSkeleton
         shouldShowAvatarOnly={shouldShowAvatarOnly}
