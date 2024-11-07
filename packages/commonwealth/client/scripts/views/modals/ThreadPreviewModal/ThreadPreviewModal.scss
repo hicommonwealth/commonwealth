@@ -32,6 +32,14 @@
     border-radius: 8px;
     overflow: hidden;
 
+    @include mediumSmallInclusive {
+      flex-direction: column;
+      width: 90%;
+      height: auto;
+      max-height: 90vh;
+      overflow: auto;
+    }
+
     .modal-left {
       position: relative;
       width: 50%;
@@ -39,6 +47,11 @@
       align-items: center;
       justify-content: center;
       background-color: $neutral-25;
+
+      @include mediumSmallInclusive {
+        width: 100%;
+        flex: 1;
+      }
 
       .close-btn {
         width: 35px;
@@ -60,7 +73,7 @@
 
       .modal-image {
         width: 100%;
-        height: auto;
+        height: 100%;
         object-fit: cover;
       }
 
@@ -92,6 +105,13 @@
       width: 50%;
       padding: 20px;
       overflow-y: auto;
+
+      @include mediumSmallInclusive {
+        width: 100%;
+        flex: 1;
+        padding: 16px;
+        min-height: fit-content;
+      }
     }
   }
 }
