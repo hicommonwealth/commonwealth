@@ -58,8 +58,7 @@ jobs:
           git config --global user.name "timolegros"
           git config --global user.email "timothee@ualberta.ca"
           git add packages/commonwealth/server/external-api-config.json
-          git commit -m "chore: update client SDK version"
-          git push origin HEAD
+          git diff --cached --exit-code || git commit -m "chore: update client SDK version" && git push origin HEAD
       # May need to add a `repo` scoped personal access token
       # if we want to run checks for this new push
       # https://github.com/peter-evans/create-pull-request/issues/48#issuecomment-536204092
