@@ -111,6 +111,7 @@ async function updateOrCreateWithAlert(
           name: community.name,
           image_url: 'http://default.image', // TODO: can we have a default image for this?
           payout_structure: [],
+          is_farcaster_contest: false,
         },
         { transaction },
       );

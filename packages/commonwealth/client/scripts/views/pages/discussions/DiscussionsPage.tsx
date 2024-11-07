@@ -21,7 +21,6 @@ import { sortByFeaturedFilter, sortPinned } from './helpers';
 import { slugify, splitAndDecodeURL } from '@hicommonwealth/shared';
 import { getThreadActionTooltipText } from 'helpers/threads';
 import useBrowserWindow from 'hooks/useBrowserWindow';
-import { useFlag } from 'hooks/useFlag';
 import useManageDocumentTitle from 'hooks/useManageDocumentTitle';
 import useTopicGating from 'hooks/useTopicGating';
 import 'pages/discussions/index.scss';
@@ -57,8 +56,6 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const [searchParams] = useSearchParams();
   // @ts-expect-error <StrictNullChecks/>
   const stageName: string = searchParams.get('stage');
-
-  const weightedTopicsEnabled = useFlag('weightedTopics');
 
   const featuredFilter: ThreadFeaturedFilterTypes = searchParams.get(
     'featured',
@@ -133,9 +130,10 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
       ...(featuredFilter && {
         orderBy: featuredFilter,
       }),
-      toDate: dateCursor.toDate,
-      // @ts-expect-error <StrictNullChecks/>
-      fromDate: dateCursor.fromDate,
+      ...(dateCursor.fromDate && {
+        toDate: dateCursor.toDate,
+        fromDate: dateCursor.fromDate,
+      }),
       includeArchivedThreads: isOnArchivePage || includeArchivedThreads,
       // @ts-expect-error <StrictNullChecks/>
       contestAddress,
@@ -182,11 +180,9 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   useManageDocumentTitle('Discussions');
 
   const isTopicWeighted =
-    weightedTopicsEnabled &&
-    topicId &&
-    topicObj.weighted_voting === TopicWeightedVoting.ERC20;
+    topicId && topicObj.weighted_voting === TopicWeightedVoting.ERC20;
 
-  const activeContestsInTopic = contestsData?.filter((contest) => {
+  const activeContestsInTopic = contestsData.all?.filter((contest) => {
     const isContestInTopic = (contest.topics || []).find(
       (topic) => topic.id === topicId,
     );
@@ -276,7 +272,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
             });
 
           const isThreadTopicInContest = checkIsTopicInContest(
-            contestsData,
+            contestsData.all,
             thread?.topic?.id,
           );
 

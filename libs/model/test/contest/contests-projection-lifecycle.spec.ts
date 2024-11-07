@@ -56,6 +56,7 @@ describe('Contests projection lifecycle', () => {
   const thread_title = 'thread-in-contest';
   const ticker = commonProtocol.Denominations.ETH;
   const decimals = commonProtocol.WeiDecimals[commonProtocol.Denominations.ETH];
+  const topic_id = 100;
 
   let getTokenAttributes: Sinon.SinonStub;
   let getContestScore: Sinon.SinonStub;
@@ -117,14 +118,13 @@ describe('Contests projection lifecycle', () => {
             },
           ],
           CommunityStakes: [],
-          topics: [],
+          topics: [{ id: topic_id, name: 'test-topic' }],
           groups: [],
           contest_managers: [
             {
               contest_address: recurring,
               name: recurring,
               interval,
-              topics: [],
               contests: [],
               image_url,
               payout_structure,
@@ -132,12 +132,13 @@ describe('Contests projection lifecycle', () => {
               funding_token_address,
               created_at,
               cancelled,
+              topic_id,
+              is_farcaster_contest: true,
             },
             {
               contest_address: oneoff,
               name: oneoff,
               interval: 0,
-              topics: [],
               contests: [],
               image_url,
               payout_structure,
@@ -145,6 +146,8 @@ describe('Contests projection lifecycle', () => {
               funding_token_address,
               created_at,
               cancelled,
+              topics: [],
+              is_farcaster_contest: false,
             },
           ],
         },
@@ -352,7 +355,9 @@ describe('Contests projection lifecycle', () => {
         decimals,
         cancelled,
         created_at,
-        topics: [],
+        topic_id: topic_id,
+        topics: [{ id: topic_id, name: 'test-topic' }],
+        is_farcaster_contest: true,
         contests: [
           {
             contest_id,

@@ -21,6 +21,7 @@ const launchToken = async ({
     commonProtocol.factoryContracts[ethChainId].lpBondingCurve,
     commonProtocol.factoryContracts[ethChainId].launchpad,
     '',
+    commonProtocol.factoryContracts[ethChainId].tokenCommunityManager,
     chainRpc,
   );
 
