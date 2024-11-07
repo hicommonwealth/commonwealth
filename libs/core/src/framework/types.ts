@@ -51,6 +51,7 @@ export type User = {
  * - Unique identification is established through the `user.id`
  * - Extends users with additional (optional) attributes that may include:
  *   - `address` for the active web wallet address
+ *   - `is_system_actor` for policy actors that are not real users
  *
  * Authorization for actors is facilitated through {@link CommandHandler} or {@link QueryHandler} middleware within the context of the invoked command or query.
  * - When executing a command, the `aggregate` may need loading before completing the authorization process.
@@ -58,6 +59,7 @@ export type User = {
 export type Actor = {
   readonly user: Readonly<User>;
   readonly address?: string;
+  readonly is_system_actor?: boolean;
 };
 
 /**
