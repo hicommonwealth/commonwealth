@@ -175,9 +175,9 @@ const ContestCard = ({
           <CWText type="h3">{name}</CWText>
           {finishDate ? (
             <ContestCountdown finishTime={finishDate} isActive={isActive} />
-          ) : (
+          ) : isActive ? (
             <Skeleton width="70px" />
-          )}
+          ) : null}
         </div>
         {!isFarcaster && (
           <CWText className="topics">
