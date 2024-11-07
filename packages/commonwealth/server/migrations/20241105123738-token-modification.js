@@ -167,7 +167,7 @@ module.exports = {
 
     const node = await queryInterface.sequelize.query(`
         SELECT id FROM "ChainNodes"
-        WHERE id = 1399;
+        WHERE eth_chain_id = 84532;
     `);
 
     return queryInterface.sequelize.transaction(async (t) => {
