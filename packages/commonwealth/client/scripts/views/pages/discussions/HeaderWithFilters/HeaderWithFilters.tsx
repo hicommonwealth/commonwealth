@@ -1,3 +1,7 @@
+import {
+  CWTab,
+  CWTabsRow,
+} from 'client/scripts/views/components/component_kit/new_designs/CWTabs';
 import { parseCustomStages, threadStageToLabel } from 'helpers';
 import { isUndefined } from 'helpers/typeGuards';
 import useBrowserWindow from 'hooks/useBrowserWindow';
@@ -28,6 +32,11 @@ import {
 } from '../../../../models/types';
 import './HeaderWithFilters.scss';
 
+type TabsProps = {
+  label: string;
+  value: string;
+};
+
 type HeaderWithFiltersProps = {
   stage: string;
   topic: string;
@@ -40,6 +49,10 @@ type HeaderWithFiltersProps = {
   onIncludeArchivedThreads: (includeArchived: boolean) => any;
   isOnArchivePage?: boolean;
   activeContests: Contest[];
+  tabs?: TabsProps[];
+  selectedTab?: string;
+  updateActiveTab?: (tabValue: string) => void;
+  showTabs?: boolean;
 };
 
 export const HeaderWithFilters = ({
@@ -54,6 +67,10 @@ export const HeaderWithFilters = ({
   onIncludeArchivedThreads,
   isOnArchivePage,
   activeContests,
+  tabs,
+  selectedTab,
+  updateActiveTab,
+  showTabs,
 }: HeaderWithFiltersProps) => {
   const navigate = useCommonNavigate();
   const location = useLocation();
@@ -199,13 +216,26 @@ export const HeaderWithFilters = ({
   return (
     <div className="HeaderWithFilters">
       <div className="header-row">
-        <CWText type="h3" fontWeight="semiBold" className="header-text">
-          {isUndefined(topic)
-            ? isOnArchivePage
-              ? 'Archived'
-              : 'All Discussions'
-            : topic}
-        </CWText>
+        {showTabs && tabs && tabs.length ? (
+          <CWTabsRow>
+            {tabs.map((tab, index) => (
+              <CWTab
+                key={index}
+                label={tab.label}
+                onClick={() => updateActiveTab?.(tab.value)}
+                isSelected={selectedTab === tab.value}
+              />
+            ))}
+          </CWTabsRow>
+        ) : (
+          <CWText type="h3" fontWeight="semiBold" className="header-text">
+            {isUndefined(topic)
+              ? isOnArchivePage
+                ? 'Archived'
+                : 'All Discussions'
+              : topic}
+          </CWText>
+        )}
         <div className="count-and-button">
           <CWText
             type="caption"
