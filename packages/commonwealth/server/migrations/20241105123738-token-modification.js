@@ -167,7 +167,7 @@ module.exports = {
 
     const node = await queryInterface.sequelize.query(`
         SELECT id FROM "ChainNodes"
-        WHERE id = 1399;
+        WHERE eth_chain_id = 84532;
     `);
 
     return queryInterface.sequelize.transaction(async (t) => {
@@ -228,7 +228,7 @@ module.exports = {
         'EvmEventSources',
         [
           {
-            chain_node_id: 1399,
+            chain_node_id: node[0][0].id,
             contract_address: '0x6b118c6efa258903939ed981e6f644330effebab',
             event_signature:
               '0xd7ca5dc2f8c6bb37c3a4de2a81499b25f8ca8bbb3082010244fe747077d0f6cc',
