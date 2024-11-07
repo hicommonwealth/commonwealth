@@ -21,6 +21,7 @@ import { PG_INT, checkIconSize } from '../utils';
 
 export const CreateCommunity = {
   input: z.object({
+    something: z.string().optional(),
     id: z.string(),
     name: z
       .string()
