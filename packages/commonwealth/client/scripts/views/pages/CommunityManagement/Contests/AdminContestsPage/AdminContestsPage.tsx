@@ -109,7 +109,7 @@ const AdminContestsPage = () => {
   };
 
   const goToLaunchFarcasterContest = () => {
-    navigate(`/manage/contests/launch?type=${ContestType.Common}`);
+    navigate(`/manage/contests/launch?type=${ContestType.Farcaster}`);
   };
 
   return (

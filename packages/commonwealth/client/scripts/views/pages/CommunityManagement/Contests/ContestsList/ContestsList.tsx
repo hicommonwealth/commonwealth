@@ -12,6 +12,7 @@ import ContestCard from './ContestCard';
 import './ContestsList.scss';
 
 export type Contest = {
+  is_farcaster_contest?: boolean;
   community_id?: string;
   contest_address?: string;
   created_at?: Date;
@@ -115,6 +116,9 @@ const ContestsList = ({
                   onFund={() => setFundDrawerContest(contest)}
                   isRecurring={!contest.funding_token_address}
                   payoutStructure={contest.payout_structure}
+                  isFarcaster={
+                    farcasterContestEnabled && contest.is_farcaster_contest
+                  }
                 />
               );
             } else {
@@ -138,6 +142,9 @@ const ContestsList = ({
                   onFund={() => setFundDrawerContest(contest)}
                   isRecurring={!contest.funding_token_address}
                   payoutStructure={contest.payout_structure}
+                  isFarcaster={
+                    farcasterContestEnabled && contest.is_farcaster_contest
+                  }
                 />
               ));
             }

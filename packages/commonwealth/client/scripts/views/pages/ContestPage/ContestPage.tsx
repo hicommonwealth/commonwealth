@@ -86,6 +86,7 @@ const ContestPage = ({ contestAddress }: ContestPageProps) => {
             showShareButton={false}
             showLeaderboardButton={false}
             payoutStructure={contest?.payout_structure}
+            isFarcaster={contest?.is_farcaster_contest}
           />
         )}
 

@@ -268,7 +268,6 @@ const DetailsFormStep = ({
           validationSchema={schema}
           onSubmit={handleSubmit}
           initialValues={getInitialValues()}
-          onErrors={console.error}
         >
           {({ watch, setValue }) => (
             <>
