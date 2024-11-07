@@ -6,6 +6,7 @@ import passport from 'passport';
 import { config } from '../config';
 import * as comment from './comment';
 import * as community from './community';
+import * as contest from './contest';
 import {
   addRateLimiterMiddleware,
   apiKeyAuthMiddleware,
@@ -35,6 +36,12 @@ const {
 const { createComment, updateComment, deleteComment, createCommentReaction } =
   comment.trpcRouter;
 const { getNewContent } = user.trpcRouter;
+const {
+  getAllContests,
+  createContestMetadata,
+  updateContestMetadata,
+  cancelContestMetadata,
+} = contest.trpcRouter;
 
 const api = {
   getGlobalActivity: trpc.query(Feed.GetGlobalActivity, trpc.Tag.User, {
@@ -63,6 +70,10 @@ const api = {
   getThreads: trpc.query(Thread.GetThreads, trpc.Tag.Thread, {
     forceSecure: true,
   }),
+  getAllContests,
+  createContestMetadata,
+  updateContestMetadata,
+  cancelContestMetadata,
   createCommunity,
   updateCommunity,
   createTopic,
