@@ -36,7 +36,6 @@ import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayou
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
 import { isContestActive } from 'views/pages/CommunityManagement/Contests/utils';
 import useTokenMetadataQuery from '../../../state/api/tokens/getTokenMetadata';
-import { SublayoutBanners } from '../../SublayoutBanners';
 import { AdminOnboardingSlider } from '../../components/AdminOnboardingSlider';
 import { UserTrainingSlider } from '../../components/UserTrainingSlider';
 import { CWText } from '../../components/component_kit/cw_text';
@@ -232,7 +231,6 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
 
   return (
     <>
-      <SublayoutBanners banner="“Overview” page has been merged with the “All” page" />
       <CWPageLayout
         // @ts-expect-error <StrictNullChecks/>
         ref={containerRef}
