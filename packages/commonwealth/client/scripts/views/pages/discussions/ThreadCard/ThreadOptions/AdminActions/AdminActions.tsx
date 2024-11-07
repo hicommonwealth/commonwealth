@@ -83,12 +83,14 @@ export const AdminActions = ({
 
   const { mutateAsync: deleteThread } = useDeleteThreadMutation(thread);
 
+  // TODO: @Malik - currentTopicId is required but could be undefined
+  //  defaulting to 0 breaks caching
   const { mutateAsync: editThread } = useEditThreadMutation({
     communityId: app.activeChainId() || '',
     threadId: thread.id,
     threadMsgId: thread.canvasMsgId!,
     currentStage: thread.stage,
-    currentTopicId: thread.topic?.id!,
+    currentTopicId: thread.topic?.id ?? 0,
   });
 
   const handleDeleteThread = () => {

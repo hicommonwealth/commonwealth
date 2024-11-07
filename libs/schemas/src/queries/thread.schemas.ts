@@ -131,7 +131,7 @@ export const ThreadView = Thread.extend({
   collaborators: AddressView.array().nullish(),
   reactions: ReactionView.array().nullish(),
   associatedContests: z.array(ContestView).optional(),
-  topic: TopicView.optional(),
+  topic: TopicView.nullish(),
   ContestActions: z.array(ContestActionView).optional(),
   Comments: z.array(CommentView).optional(),
   ThreadVersionHistories: z.array(ThreadVersionHistoryView).nullish(),
