@@ -217,6 +217,7 @@ export const GetThreads = {
     contestAddress: z.string().optional(),
     status: GetThreadsStatus.optional(),
     withXRecentComments: z.number().optional(),
+    random: z.string().nullish(),
   }),
   output: z.object({
     page: z.number(),
