@@ -1,4 +1,6 @@
-.thread-modal {
+@import '../../../../styles/shared.scss';
+
+.thread-preview-modal {
   position: fixed;
   top: 0;
   left: 0;
@@ -26,7 +28,7 @@
     height: 80%;
     max-width: 1200px;
     max-height: 90vh;
-    background-color: #fff;
+    background-color: $neutral-25;
     border-radius: 8px;
     overflow: hidden;
 
@@ -36,7 +38,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background-color: #f4f4f4;
+      background-color: $neutral-25;
 
       .close-btn {
         width: 35px;
@@ -47,7 +49,7 @@
         left: 16px;
         border: none;
         cursor: pointer;
-        color: #fff;
+        color: $neutral-25;
         z-index: 1;
         padding: 8px 6px;
         border-radius: 50%;
@@ -65,7 +67,7 @@
       .nav-btn {
         position: absolute;
         background: rgba(0, 0, 0, 0.5);
-        color: #fff;
+        color: $neutral-25;
         border: none;
         padding: 8px 6px;
         cursor: pointer;
