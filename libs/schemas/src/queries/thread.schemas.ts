@@ -255,6 +255,7 @@ export const GetThreadsByIds = {
   input: z.object({
     community_id: z.string(),
     thread_ids: z.string(),
+    random: z.string().nullish(),
   }),
   output: z.array(ThreadView),
 };
