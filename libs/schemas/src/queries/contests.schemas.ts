@@ -86,3 +86,10 @@ export const GetFarcasterUpvoteActionMetadata = {
     }),
   }),
 };
+
+export const GetFarcasterContestCasts = {
+  input: z.object({
+    contest_address: z.string(),
+  }),
+  output: z.array(z.any()),
+};
