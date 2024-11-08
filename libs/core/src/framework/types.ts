@@ -108,10 +108,10 @@ export class InvalidState extends Error {
  * - `payload`: validated command payload
  * - `auth`: authorization context
  */
-export type Context<Input extends ZodSchema, Context extends ZodSchema> = {
+export type Context<Input extends ZodSchema, _Context extends ZodSchema> = {
   readonly actor: Actor;
   readonly payload: z.infer<Input>;
-  readonly context?: z.infer<Context>;
+  readonly context?: z.infer<_Context>;
 };
 
 /**
