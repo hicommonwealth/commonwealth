@@ -91,7 +91,11 @@ const start = async () => {
 
       // checking the DYNO env var ensures this only runs on one dyno
       if (config.APP_ENV === 'production' && process.env.DYNO === 'web.1') {
-        dispatchSDKPublishWorkflow();
+        dispatchSDKPublishWorkflow().catch((e) =>
+          log.error(
+            `Failed to dispatch publishing workflow ${JSON.stringify(e)}`,
+          ),
+        );
       }
     })
     .catch((e) => log.error(e.message, e));
