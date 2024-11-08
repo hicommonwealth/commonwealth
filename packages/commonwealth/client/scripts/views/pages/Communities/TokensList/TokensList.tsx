@@ -1,18 +1,31 @@
-import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/CWButton';
+import { Token } from '@hicommonwealth/schemas';
+import { ChainBase } from '@hicommonwealth/shared';
 import clsx from 'clsx';
 import { useFlag } from 'hooks/useFlag';
 import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useFetchTokensQuery } from 'state/api/tokens';
 import { CWText } from 'views/components/component_kit/cw_text';
+import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
+import TradeTokenModal from 'views/modals/TradeTokenModel';
+import { TradingMode } from 'views/modals/TradeTokenModel/TradeTokenForm/types';
+import { z } from 'zod';
 import TokenCard from '../../../components/TokenCard';
 import './TokensList.scss';
 
 const TokensList = () => {
   const navigate = useCommonNavigate();
   const tokenizedCommunityEnabled = useFlag('tokenizedCommunity');
+  const [tokenLaunchModalConfig, setTokenLaunchModalConfig] = useState<{
+    isOpen: boolean;
+    tradeConfig?: {
+      mode: TradingMode;
+      token: z.infer<typeof Token>;
+      addressType: ChainBase;
+    };
+  }>({ isOpen: false, tradeConfig: undefined });
 
   const {
     data: tokensList,
@@ -70,6 +83,16 @@ const TokensList = () => {
               // }
               mode="buy"
               iconURL={token.icon_url || ''}
+              onCTAClick={() =>
+                setTokenLaunchModalConfig({
+                  isOpen: true,
+                  tradeConfig: {
+                    mode: TradingMode.Buy,
+                    token: token as z.infer<typeof Token>,
+                    addressType: ChainBase.Ethereum,
+                  },
+                })
+              }
               onCardBodyClick={() =>
                 navigateToCommunity({
                   navigate,
@@ -94,6 +117,13 @@ const TokensList = () => {
         />
       ) : (
         <></>
+      )}
+      {tokenLaunchModalConfig.tradeConfig && (
+        <TradeTokenModal
+          isOpen={tokenLaunchModalConfig.isOpen}
+          tradeConfig={tokenLaunchModalConfig.tradeConfig}
+          onModalClose={() => setTokenLaunchModalConfig({ isOpen: false })}
+        />
       )}
     </div>
   );
