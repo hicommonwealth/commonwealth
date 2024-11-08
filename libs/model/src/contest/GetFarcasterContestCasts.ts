@@ -41,7 +41,10 @@ export function GetFarcasterContestCasts(): Query<
       const frameHashesToFetch = [...parentCastHashes, ...replyCastHashes];
       const client = new NeynarAPIClient(config.CONTESTS.NEYNAR_API_KEY!);
       const castsResponse = await client.fetchBulkCasts(frameHashesToFetch, {
-        sortType: BulkCastsSortType.LIKES,
+        sortType:
+          payload.sort_by === 'likes'
+            ? BulkCastsSortType.LIKES
+            : BulkCastsSortType.RECENT,
       });
 
       const { casts } = castsResponse.result;
