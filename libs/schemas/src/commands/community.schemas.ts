@@ -21,7 +21,6 @@ import { PG_INT, checkIconSize } from '../utils';
 
 export const CreateCommunity = {
   input: z.object({
-    something: z.string().optional(),
     id: z.string(),
     name: z
       .string()
@@ -57,7 +56,7 @@ export const CreateCommunity = {
     discord: z.string().url().startsWith('https://discord.com/').optional(),
   }),
   output: z.object({
-    community: Community,
+    community: Community.optional(),
     admin_address: z.string().optional(),
   }),
 };
