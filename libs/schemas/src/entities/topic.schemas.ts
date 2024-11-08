@@ -48,6 +48,7 @@ export const Topic = z.object({
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional(),
   deleted_at: z.coerce.date().nullish(),
+  is_default: z.boolean().nullish(),
 });
 
 export const ContestManager = z
