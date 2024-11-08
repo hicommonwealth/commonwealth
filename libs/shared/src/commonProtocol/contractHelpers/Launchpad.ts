@@ -99,3 +99,19 @@ export const transferLiquidity = async (
     .send({ value: amountIn, from: walletAddress });
   return txReceipt;
 };
+
+// Returns market cap in ETH. Default variables will always return ~29.5 ETH
+// Will need to be converted to USD on the client using APIs used for stake, etc
+// USD Mkt Cap = ETH * USD/ETH rate
+export const getTargetMarketCap = (
+  initialReserve: number = 4.167e8,
+  initialSupply: number = 1e18,
+  currentSupply: number = 4.3e26,
+  connectorWeight: number = 0.83,
+  totalSupply: number = 1e9,
+): number => {
+  const x = initialReserve / (initialSupply * connectorWeight);
+  const y = (currentSupply / initialSupply) ** (1 / connectorWeight - 1);
+  const price = x * y;
+  return price * totalSupply;
+};
