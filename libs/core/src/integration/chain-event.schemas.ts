@@ -20,3 +20,7 @@ export const NamespaceDeployed = z.tuple([
   z.string().describe('_signature'),
   EVM_ADDRESS.describe('_namespaceDeployer'),
 ]);
+
+export const LaunchpadTokenCreated = z.tuple([
+  z.string().describe('tokenAddress'),
+]);
