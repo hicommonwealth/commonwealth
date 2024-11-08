@@ -125,9 +125,7 @@
           }
 
           img {
-            width: 350px;
-            height: 200px;
-            object-fit: cover;
+            display: none;
           }
 
           &.collapsed {
@@ -152,6 +150,13 @@
             text-decoration: underline;
           }
         }
+      }
+
+      .content-body.show-image .MarkdownFormattedText img {
+        display: block !important;
+        width: 350px;
+        height: 200px;
+        object-fit: cover;
       }
 
       .content-title {

@@ -1,3 +1,4 @@
+import { useShowImage } from 'client/scripts/hooks/useShowImage';
 import clsx from 'clsx';
 import { isDefaultStage, threadStageToLabel } from 'helpers';
 import {
@@ -94,6 +95,7 @@ export const ThreadCard = ({
   const [showCommentVisible, setShowCommentVisible] =
     useState<boolean>(showCommentState);
   const toggleShowComments = () => setShowCommentVisible((prev) => !prev);
+  const showImage = useShowImage();
 
   useEffect(() => {
     if (localStorage.getItem('dark-mode-state') === 'on') {
@@ -206,7 +208,10 @@ export const ThreadCard = ({
                 />
               )}
             </div>
-            <CWText type="b1" className="content-body">
+            <CWText
+              type="b1"
+              className={clsx('content-body', { 'show-image': showImage })}
+            >
               <MarkdownViewerUsingQuillOrNewEditor
                 markdown={
                   !removeImagesFromMarkDown
