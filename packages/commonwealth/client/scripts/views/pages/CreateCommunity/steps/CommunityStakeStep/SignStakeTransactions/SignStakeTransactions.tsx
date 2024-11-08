@@ -4,7 +4,6 @@ import useBeforeUnload from 'hooks/useBeforeUnload';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
-import { openConfirmation } from 'views/modals/confirmation_modal';
 
 import ActionSteps from '../../../components/ActionSteps';
 import { ActionStepsProps } from '../../../components/ActionSteps/types';
@@ -20,11 +19,11 @@ const SignStakeTransactions = ({
   selectedAddress,
   createdCommunityId,
   chainId,
-  isTopicFlow,
-  onSuccess,
-  onCancel,
   onlyNamespace,
   hasNamespaceReserved,
+  onReserveNamespaceSuccess,
+  onLaunchStakeSuccess,
+  backButton,
 }: SignStakeTransactionsProps) => {
   const { handleReserveCommunityNamespace, reserveNamespaceData } =
     useReserveCommunityNamespace({
@@ -33,7 +32,7 @@ const SignStakeTransactions = ({
       symbol: communityStakeData.symbol,
       userAddress: selectedAddress.address,
       chainId,
-      onSuccess: onlyNamespace ? onSuccess : undefined,
+      onSuccess: onReserveNamespaceSuccess,
       hasNamespaceReserved,
     });
 
@@ -41,7 +40,7 @@ const SignStakeTransactions = ({
     useLaunchCommunityStake({
       namespace: communityStakeData.namespace,
       communityId: createdCommunityId,
-      goToSuccessStep: onSuccess,
+      goToSuccessStep: onLaunchStakeSuccess,
       selectedAddress: selectedAddress.address,
       chainId,
     });
@@ -86,30 +85,6 @@ const SignStakeTransactions = ({
     ];
   };
 
-  const handleCancel = () => {
-    isTopicFlow
-      ? onCancel()
-      : openConfirmation({
-          title: 'Are you sure you want to cancel?',
-          description: onlyNamespace
-            ? 'Namespace has not been enabled for your community yet'
-            : 'Community Stake has not been enabled for your community yet',
-          buttons: [
-            {
-              label: 'Cancel',
-              buttonType: 'destructive',
-              buttonHeight: 'sm',
-              onClick: onCancel,
-            },
-            {
-              label: 'Continue',
-              buttonType: 'primary',
-              buttonHeight: 'sm',
-            },
-          ],
-        });
-  };
-
   const cancelDisabled =
     reserveNamespaceData.state === 'loading' ||
     launchStakeData.state === 'loading';
@@ -149,11 +124,11 @@ const SignStakeTransactions = ({
         <section className="action-buttons">
           <CWButton
             type="button"
-            label={isTopicFlow ? 'Back' : 'Cancel'}
+            label={backButton?.label}
             buttonWidth="wide"
             buttonType="secondary"
             disabled={cancelDisabled}
-            onClick={handleCancel}
+            onClick={backButton?.action}
           />
         </section>
       </section>

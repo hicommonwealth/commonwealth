@@ -1,11 +1,11 @@
 import type { Command } from '@hicommonwealth/core';
 import { InvalidState } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
+import { buildFarcasterContestFrameUrl } from '@hicommonwealth/shared';
 import { models } from '../database';
 import { isAuthorized, type AuthContext } from '../middleware';
 import { mustExist } from '../middleware/guards';
 import { TopicInstance } from '../models';
-import { buildFarcasterContestFrameUrl } from '../utils';
 
 const Errors = {
   InvalidTopics: 'Invalid topic',
