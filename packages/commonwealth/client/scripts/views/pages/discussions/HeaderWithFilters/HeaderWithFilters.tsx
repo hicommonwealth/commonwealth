@@ -36,7 +36,11 @@ type TabsProps = {
   label: string;
   value: string;
 };
-
+type FilterSelectParams = {
+  pickedTopic?: string;
+  filterKey?: 'featured' | 'contest' | 'status' | 'stage' | 'dateRange';
+  filterVal?: string;
+};
 type HeaderWithFiltersProps = {
   stage: string;
   topic: string;
@@ -286,6 +290,7 @@ export const HeaderWithFilters = ({
                 <p className="filter-label">Sort</p>
                 <Select
                   selected={featuredFilter || ThreadFeaturedFilterTypes.Newest}
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   onSelect={(item: any) => {
                     onFilterSelect({
                       filterKey: 'featured',
@@ -378,6 +383,7 @@ export const HeaderWithFilters = ({
                       ]}
                       dropdownPosition={rightFiltersDropdownPosition}
                       canEditOption={Permissions.isCommunityAdmin()}
+                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
                       onOptionEdit={(item: any) =>
                         setTopicSelectedToEdit(
                           [...featuredTopics, ...otherTopics].find(
@@ -390,6 +396,7 @@ export const HeaderWithFilters = ({
                   {matchesContestFilterRoute ? (
                     <Select
                       selected={urlParams.status || 'all'}
+                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
                       onSelect={(item: any) =>
                         onFilterSelect({
                           filterKey: 'status',
@@ -452,6 +459,7 @@ export const HeaderWithFilters = ({
                   )}
                   <Select
                     selected={dateRange || ThreadTimelineFilterTypes.AllTime}
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     onSelect={(item: any) => {
                       onFilterSelect({
                         filterKey: 'dateRange',
