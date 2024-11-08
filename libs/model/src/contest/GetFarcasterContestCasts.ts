@@ -1,7 +1,6 @@
 import { Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { BulkCastsSortType, NeynarAPIClient } from '@neynar/nodejs-sdk';
-import { CastWithInteractions } from '@neynar/nodejs-sdk/build/neynar-api/v2';
 import lo from 'lodash';
 import { config } from '../config';
 import { models } from '../database';
@@ -49,22 +48,17 @@ export function GetFarcasterContestCasts(): Query<
 
       const { casts } = castsResponse.result;
 
+      const replyCasts = lo.groupBy(casts, (cast) => {
+        return cast.parent_hash;
+      });
+
       const parentCasts = casts
         .filter((cast) => parentCastHashes.includes(cast.hash))
         .map((cast) => ({
           ...cast,
-          replies: [] as Array<CastWithInteractions>,
+          replies: replyCasts[cast.hash],
         }));
 
-      const replyCasts = lo.groupBy(casts, (cast) => {
-        return cast.parent_hash;
-      });
-      for (const parentCast of parentCasts) {
-        for (const replyCast of replyCasts[parentCast.hash]) {
-          parentCast.replies = parentCast.replies || [];
-          parentCast.replies.push(replyCast);
-        }
-      }
       return parentCasts;
     },
   };
