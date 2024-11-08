@@ -36,11 +36,6 @@ type TabsProps = {
   label: string;
   value: string;
 };
-type FilterSelectParams = {
-  pickedTopic?: string;
-  filterKey?: 'featured' | 'contest' | 'status' | 'stage' | 'dateRange';
-  filterVal?: string;
-};
 type HeaderWithFiltersProps = {
   stage: string;
   topic: string;
