@@ -1,19 +1,18 @@
 import { type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../database';
-import { isAuthorized, type AuthContext } from '../middleware';
+import { authComment } from '../middleware';
 import { verifyReactionSignature } from '../middleware/canvas';
 import { mustBeAuthorizedComment } from '../middleware/guards';
 import { getVotingWeight } from '../services/stakeHelper';
 
 export function CreateCommentReaction(): Command<
-  typeof schemas.CreateCommentReaction,
-  AuthContext
+  typeof schemas.CreateCommentReaction
 > {
   return {
     ...schemas.CreateCommentReaction,
     auth: [
-      isAuthorized({
+      authComment({
         action: schemas.PermissionEnum.CREATE_COMMENT_REACTION,
       }),
       verifyReactionSignature,

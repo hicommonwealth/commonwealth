@@ -6,7 +6,7 @@ import {
 } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../database';
-import { isAuthorized, type AuthContext } from '../middleware';
+import { authThread } from '../middleware';
 import { verifyCommentSignature } from '../middleware/canvas';
 import { mustBeAuthorizedThread, mustExist } from '../middleware/guards';
 import {
@@ -25,14 +25,11 @@ export const CreateCommentErrors = {
   ThreadArchived: 'Thread is archived',
 };
 
-export function CreateComment(): Command<
-  typeof schemas.CreateComment,
-  AuthContext
-> {
+export function CreateComment(): Command<typeof schemas.CreateComment> {
   return {
     ...schemas.CreateComment,
     auth: [
-      isAuthorized({
+      authThread({
         action: schemas.PermissionEnum.CREATE_COMMENT,
       }),
       verifyCommentSignature,

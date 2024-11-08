@@ -4,9 +4,13 @@ import {
   logger,
   type Actor,
 } from '@hicommonwealth/core';
+import {
+  AuthContext,
+  CommentAuthContext,
+  ThreadAuthContext,
+} from '@hicommonwealth/schemas';
 import moment from 'moment';
 import type { AddressInstance, ThreadInstance } from '../models';
-import type { AuthContext } from './authorization';
 
 const log = logger(import.meta);
 
@@ -78,7 +82,7 @@ export function mustBeAuthorized(actor: Actor, auth?: AuthContext) {
  * @param auth auth context
  * @returns narrowed auth context
  */
-export function mustBeAuthorizedThread(actor: Actor, auth?: AuthContext) {
+export function mustBeAuthorizedThread(actor: Actor, auth?: ThreadAuthContext) {
   if (!auth?.address) throw new InvalidActor(actor, 'Not authorized');
   if (!auth?.thread) throw new InvalidActor(actor, 'Not authorized thread');
   return auth as AuthContext & {
@@ -95,10 +99,13 @@ export function mustBeAuthorizedThread(actor: Actor, auth?: AuthContext) {
  * @param auth auth context
  * @returns narrowed auth context
  */
-export function mustBeAuthorizedComment(actor: Actor, auth?: AuthContext) {
+export function mustBeAuthorizedComment(
+  actor: Actor,
+  auth?: CommentAuthContext,
+) {
   if (!auth?.address) throw new InvalidActor(actor, 'Not authorized');
   if (!auth?.comment) throw new InvalidActor(actor, 'Not authorized comment');
-  return auth as AuthContext & {
+  return auth as CommentAuthContext & {
     address: AddressInstance;
     comment: ThreadInstance;
     community_id: string;

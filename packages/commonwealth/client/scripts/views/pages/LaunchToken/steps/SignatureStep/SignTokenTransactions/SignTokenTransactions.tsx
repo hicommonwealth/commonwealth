@@ -70,7 +70,7 @@ const SignTokenTransactions = ({
 
       // 3. update community to reference the created token
       await updateCommunity({
-        id: createdCommunityId,
+        community_id: createdCommunityId,
         token_name: payload.name,
       });
 

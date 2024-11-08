@@ -148,7 +148,7 @@ describe('Contests metadata commands lifecycle', () => {
       const promise = command(Contest.CreateContestManagerMetadata(), {
         actor: communityMemberActor!,
         payload: {
-          id: community_id,
+          community_id,
           name,
           contest_address: '0x123',
           image_url,
@@ -168,7 +168,7 @@ describe('Contests metadata commands lifecycle', () => {
       const promise = command(Contest.CreateContestManagerMetadata(), {
         actor: communityAdminActor!,
         payload: {
-          id: 'does-not-exist',
+          community_id: 'does-not-exist',
           name,
           contest_address: '0x123',
           image_url,
@@ -195,7 +195,7 @@ describe('Contests metadata commands lifecycle', () => {
         {
           actor: communityAdminActor!,
           payload: {
-            id: community_id,
+            community_id,
             contest_address,
             name,
             image_url,
@@ -234,7 +234,7 @@ describe('Contests metadata commands lifecycle', () => {
       const promise = command(Contest.UpdateContestManagerMetadata(), {
         actor: communityMemberActor!,
         payload: {
-          id: community_id,
+          community_id,
           contest_address,
           name: 'xxx',
           image_url: 'https://blah',
@@ -248,7 +248,7 @@ describe('Contests metadata commands lifecycle', () => {
       const promise = command(Contest.UpdateContestManagerMetadata(), {
         actor: communityAdminActor!,
         payload: {
-          id: community_id,
+          community_id,
           contest_address: 'contest-manager-not-exists',
           name: 'xxx',
         },
@@ -264,7 +264,7 @@ describe('Contests metadata commands lifecycle', () => {
         {
           actor: communityAdminActor!,
           payload: {
-            id: community_id,
+            community_id,
             contest_address,
             name: 'xxx',
             image_url: 'https://blah',
@@ -298,7 +298,7 @@ describe('Contests metadata commands lifecycle', () => {
           {
             actor: communityAdminActor!,
             payload: {
-              id: community_id,
+              community_id,
               contest_address,
               topic_id: topics[1].id,
             },
@@ -320,7 +320,7 @@ describe('Contests metadata commands lifecycle', () => {
       const promise = command(Contest.CancelContestManagerMetadata(), {
         actor: communityMemberActor!,
         payload: {
-          id: community_id,
+          community_id,
           contest_address,
         },
       });
@@ -331,7 +331,7 @@ describe('Contests metadata commands lifecycle', () => {
       const promise = command(Contest.CancelContestManagerMetadata(), {
         actor: communityAdminActor!,
         payload: {
-          id: community_id,
+          community_id,
           contest_address: 'does-not-exist',
         },
       });
@@ -349,7 +349,7 @@ describe('Contests metadata commands lifecycle', () => {
         {
           actor: communityAdminActor!,
           payload: {
-            id: community_id,
+            community_id,
             contest_address,
           },
         },

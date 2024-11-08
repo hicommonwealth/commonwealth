@@ -2,7 +2,7 @@ import { InvalidInput, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { ChainBase } from '@hicommonwealth/shared';
 import { models } from '../database';
-import { AuthContext, isAuthorized } from '../middleware';
+import { authRoles } from '../middleware';
 import { mustExist } from '../middleware/guards';
 
 export const CreateTokenErrors = {
@@ -15,13 +15,10 @@ export const CreateTokenErrors = {
   InvalidNode: 'RPC url returned invalid response. Check your node url',
 };
 
-export function CreateToken(): Command<
-  typeof schemas.CreateToken,
-  AuthContext
-> {
+export function CreateToken(): Command<typeof schemas.CreateToken> {
   return {
     ...schemas.CreateToken,
-    auth: [isAuthorized({ roles: ['admin'] })],
+    auth: [authRoles('admin')],
     body: async ({ actor, payload }) => {
       const {
         base,

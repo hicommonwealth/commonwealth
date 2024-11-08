@@ -2,7 +2,7 @@ import { InvalidInput, InvalidState, type Command } from '@hicommonwealth/core';
 
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../database';
-import { AuthContext, isAuthorized } from '../middleware';
+import { authRoles } from '../middleware';
 import { mustBeAuthorized } from '../middleware/guards';
 import { TopicAttributes } from '../models';
 import { sanitizeQuillText } from '../utils';
@@ -13,13 +13,10 @@ const Errors = {
     'Cannot create a staked topic if community has not enabled stake',
 };
 
-export function CreateTopic(): Command<
-  typeof schemas.CreateTopic,
-  AuthContext
-> {
+export function CreateTopic(): Command<typeof schemas.CreateTopic> {
   return {
     ...schemas.CreateTopic,
-    auth: [isAuthorized({ roles: ['admin'] })],
+    auth: [authRoles('admin')],
     body: async ({ actor, payload, auth }) => {
       const { community_id } = mustBeAuthorized(actor, auth);
       const { name, description, featured_in_sidebar, featured_in_new_post } =

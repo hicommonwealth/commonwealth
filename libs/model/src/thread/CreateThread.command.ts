@@ -11,7 +11,7 @@ import { z } from 'zod';
 import { config } from '../config';
 import { GetActiveContestManagers } from '../contest';
 import { models } from '../database';
-import { isAuthorized, type AuthContext } from '../middleware';
+import { authTopic } from '../middleware';
 import { verifyThreadSignature } from '../middleware/canvas';
 import { mustBeAuthorized } from '../middleware/guards';
 import { getThreadSearchVector } from '../models/thread';
@@ -81,16 +81,11 @@ function checkContestLimits(
     throw new AppError(CreateThreadErrors.PostLimitReached);
 }
 
-export function CreateThread(): Command<
-  typeof schemas.CreateThread,
-  AuthContext
-> {
+export function CreateThread(): Command<typeof schemas.CreateThread> {
   return {
     ...schemas.CreateThread,
     auth: [
-      isAuthorized({
-        action: schemas.PermissionEnum.CREATE_THREAD,
-      }),
+      authTopic({ action: schemas.PermissionEnum.CREATE_THREAD }),
       verifyThreadSignature,
     ],
     body: async ({ actor, payload, auth }) => {

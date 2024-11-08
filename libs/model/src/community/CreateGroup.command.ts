@@ -2,7 +2,7 @@ import { InvalidInput, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { Op } from 'sequelize';
 import { models, sequelize } from '../database';
-import { isAuthorized, type AuthContext } from '../middleware';
+import { authRoles } from '../middleware';
 import { mustBeAuthorized, mustNotExist } from '../middleware/guards';
 import { GroupAttributes } from '../models';
 
@@ -13,13 +13,10 @@ export const CreateGroupErrors = {
   InvalidTopics: 'Invalid topics',
 };
 
-export function CreateGroup(): Command<
-  typeof schemas.CreateGroup,
-  AuthContext
-> {
+export function CreateGroup(): Command<typeof schemas.CreateGroup> {
   return {
     ...schemas.CreateGroup,
-    auth: [isAuthorized({ roles: ['admin'] })],
+    auth: [authRoles('admin')],
     body: async ({ actor, payload, auth }) => {
       const { community_id } = mustBeAuthorized(actor, auth);
 

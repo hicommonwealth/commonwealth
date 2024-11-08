@@ -58,9 +58,9 @@ const trpcerror = (error: unknown): TRPCError => {
 export const command = <
   Input extends ZodSchema,
   Output extends ZodSchema,
-  AuthContext,
+  Auth extends ZodSchema,
 >(
-  factory: () => Metadata<Input, Output, AuthContext>,
+  factory: () => Metadata<Input, Output, Auth>,
   tag: Tag,
   track?: Track<Input, Output>,
   commit?: Commit<Input, Output>,
@@ -101,9 +101,9 @@ export const command = <
 export const query = <
   Input extends ZodSchema,
   Output extends ZodSchema,
-  AuthContext,
+  Auth extends ZodSchema,
 >(
-  factory: () => Metadata<Input, Output, AuthContext>,
+  factory: () => Metadata<Input, Output, Auth>,
   tag: Tag,
   options?: {
     forceSecure?: boolean;

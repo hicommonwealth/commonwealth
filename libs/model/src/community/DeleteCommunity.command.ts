@@ -2,7 +2,7 @@ import { InvalidActor, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { ModelStatic } from 'sequelize';
 import { models } from '../database';
-import { AuthContext, isAuthorized } from '../middleware';
+import { authRoles } from '../middleware';
 import { mustBeAuthorized, mustExist } from '../middleware/guards';
 import { ModelInstance } from '../models';
 
@@ -10,13 +10,10 @@ export const DeleteCommunityErrors = {
   NotAdmin: 'Must be a site admin',
 };
 
-export function DeleteCommunity(): Command<
-  typeof schemas.DeleteCommunity,
-  AuthContext
-> {
+export function DeleteCommunity(): Command<typeof schemas.DeleteCommunity> {
   return {
     ...schemas.DeleteCommunity,
-    auth: [isAuthorized({ roles: ['admin'] })],
+    auth: [authRoles('admin')],
     body: async ({ actor, auth }) => {
       const { community_id } = mustBeAuthorized(actor, auth);
 

@@ -9,6 +9,7 @@ import {
   WalletId,
 } from '@hicommonwealth/shared';
 import { z } from 'zod';
+import { AuthContextSchema, TopicAuthContextSchema } from '../auth';
 import {
   Community,
   Group,
@@ -63,7 +64,7 @@ export const CreateCommunity = {
 
 export const SetCommunityStake = {
   input: z.object({
-    id: z.string(),
+    community_id: z.string(),
     stake_id: z.coerce.number().int().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT),
     stake_token: z.string().default(''),
     vote_weight: z.coerce
@@ -75,15 +76,16 @@ export const SetCommunityStake = {
     stake_enabled: z.coerce.boolean().default(true),
   }),
   output: Community,
+  auth_context: AuthContextSchema,
 };
 
 export const CreateStakeTransaction = {
   input: z.object({
-    id: z.string(), // should be id instead of community_id
-    transaction_hash: z.string().length(66),
     community_id: z.string(),
+    transaction_hash: z.string().length(66),
   }),
   output: StakeTransaction,
+  auth_context: AuthContextSchema,
 };
 
 export const RefreshCustomDomain = {
@@ -120,6 +122,7 @@ export const UpdateCustomDomain = {
     updated_at: z.string().datetime(),
     sni_endpoint: z.null(),
   }),
+  auth_context: AuthContextSchema,
 };
 
 const Snapshot = z.string().regex(/.+\.(eth|xyz)$/);
@@ -128,7 +131,7 @@ export const UpdateCommunity = {
   input: Community.omit({ network: true, custom_domain: true })
     .partial()
     .extend({
-      id: z.string(),
+      community_id: z.string(),
       name: z
         .string()
         .max(255)
@@ -144,6 +147,7 @@ export const UpdateCommunity = {
       transactionHash: z.string().optional(),
     }),
   output: Community,
+  auth_context: AuthContextSchema,
 };
 
 export const GenerateStakeholderGroups = {
@@ -180,6 +184,7 @@ export const CreateTopic = {
     topic: Topic.partial(),
     user_id: z.number(),
   }),
+  auth_context: AuthContextSchema,
 };
 
 export const UpdateTopic = {
@@ -203,6 +208,7 @@ export const UpdateTopic = {
     topic: Topic.partial(),
     user_id: z.number(),
   }),
+  auth_context: TopicAuthContextSchema,
 };
 
 export const DeleteTopic = {
@@ -214,6 +220,7 @@ export const DeleteTopic = {
     community_id: z.string(),
     topic_id: PG_INT,
   }),
+  auth_context: TopicAuthContextSchema,
 };
 
 const GroupMetadata = z.object({
@@ -238,6 +245,7 @@ export const CreateGroup = {
       .optional(),
   }),
   output: Community.extend({ groups: z.array(Group).optional() }).partial(),
+  auth_context: AuthContextSchema,
 };
 
 export const UpdateGroup = {
@@ -256,6 +264,7 @@ export const UpdateGroup = {
       .optional(),
   }),
   output: Group.partial(),
+  auth_context: AuthContextSchema,
 };
 
 export const DeleteGroup = {
@@ -267,6 +276,7 @@ export const DeleteGroup = {
     community_id: z.string(),
     group_id: PG_INT,
   }),
+  auth_context: AuthContextSchema,
 };
 
 export const DeleteCommunity = {
@@ -276,6 +286,7 @@ export const DeleteCommunity = {
   output: z.object({
     community_id: z.string(),
   }),
+  auth_context: AuthContextSchema,
 };
 
 export const RefreshCommunityMemberships = {
@@ -288,6 +299,7 @@ export const RefreshCommunityMemberships = {
     created: z.number(),
     updated: z.number(),
   }),
+  auth_context: AuthContextSchema,
 };
 
 export const JoinCommunity = {
@@ -310,4 +322,5 @@ export const BanAddress = {
     address: z.string(),
   }),
   output: z.object({}),
+  auth_context: AuthContextSchema,
 };

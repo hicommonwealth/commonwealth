@@ -8,7 +8,7 @@ import * as schemas from '@hicommonwealth/schemas';
 import { getWebhookDestination } from '@hicommonwealth/shared';
 import fetch from 'node-fetch';
 import { models } from '../database';
-import { isAuthorized, type AuthContext } from '../middleware';
+import { authRoles } from '../middleware';
 
 const log = logger(import.meta);
 
@@ -22,13 +22,10 @@ const Errors = {
   UnauthorizedWebhooks: 'Cannot make requests to unauthorized webhooks',
 };
 
-export function CreateWebhook(): Command<
-  typeof schemas.CreateWebhook,
-  AuthContext
-> {
+export function CreateWebhook(): Command<typeof schemas.CreateWebhook> {
   return {
     ...schemas.CreateWebhook,
-    auth: [isAuthorized({ roles: ['admin'] })],
+    auth: [authRoles('admin')],
     secure: true,
     body: async ({ payload }) => {
       const destination = getWebhookDestination(payload.webhookUrl);
@@ -38,7 +35,7 @@ export function CreateWebhook(): Command<
 
       const existingWebhook = await models.Webhook.findOne({
         where: {
-          community_id: payload.id,
+          community_id: payload.community_id,
           destination,
           url: payload.webhookUrl,
         },
@@ -64,7 +61,7 @@ export function CreateWebhook(): Command<
       }
 
       const webhook = await models.Webhook.create({
-        community_id: payload.id,
+        community_id: payload.community_id,
         url: payload.webhookUrl,
         destination,
         events: [],

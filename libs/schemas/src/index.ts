@@ -24,6 +24,7 @@ export type Aggregates = Extract<
   | 'CommunityTags'
 >;
 
+export * from './auth';
 export * from './commands';
 export * from './entities';
 export * from './projections';

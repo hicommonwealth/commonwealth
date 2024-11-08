@@ -14,14 +14,14 @@ import { InvalidInput, type Context, type Metadata } from './types';
 export const query = async <
   Input extends ZodSchema,
   Output extends ZodSchema,
-  AuthContext,
+  Auth extends ZodSchema,
 >(
-  { input, auth, body }: Metadata<Input, Output, AuthContext>,
-  { actor, payload }: Context<Input, AuthContext>,
+  { input, auth, body }: Metadata<Input, Output, Auth>,
+  { actor, payload }: Context<Input, Auth>,
   validate = true,
 ): Promise<z.infer<Output> | undefined> => {
   try {
-    const context: Context<Input, AuthContext> = {
+    const context: Context<Input, Auth> = {
       actor,
       payload: validate
         ? Object.fromEntries(

@@ -8,7 +8,7 @@ import * as schemas from '@hicommonwealth/schemas';
 import { Op, Sequelize } from 'sequelize';
 import { z } from 'zod';
 import { models } from '../database';
-import { isAuthorized, type AuthContext } from '../middleware';
+import { authThread } from '../middleware';
 import { mustBeAuthorizedThread, mustExist } from '../middleware/guards';
 import {
   ThreadAttributes,
@@ -61,7 +61,7 @@ function getContentPatch(
 
 async function getCollaboratorsPatch(
   actor: Actor,
-  auth: AuthContext,
+  auth: schemas.ThreadAuthContext,
   { collaborators }: z.infer<typeof schemas.UpdateThread.input>,
 ) {
   const removeSet = new Set(collaborators?.toRemove ?? []);
@@ -96,7 +96,7 @@ async function getCollaboratorsPatch(
 
 function getAdminOrModeratorPatch(
   actor: Actor,
-  auth: AuthContext,
+  auth: schemas.ThreadAuthContext,
   { pinned, spam }: z.infer<typeof schemas.UpdateThread.input>,
 ) {
   const patch: Partial<ThreadAttributes> = {};
@@ -117,7 +117,7 @@ function getAdminOrModeratorPatch(
 
 async function getAdminOrModeratorOrOwnerPatch(
   actor: Actor,
-  auth: AuthContext,
+  auth: schemas.ThreadAuthContext,
   {
     locked,
     archived,
@@ -170,13 +170,10 @@ async function getAdminOrModeratorOrOwnerPatch(
   return patch;
 }
 
-export function UpdateThread(): Command<
-  typeof schemas.UpdateThread,
-  AuthContext
-> {
+export function UpdateThread(): Command<typeof schemas.UpdateThread> {
   return {
     ...schemas.UpdateThread,
-    auth: [isAuthorized({ collaborators: true })],
+    auth: [authThread({ collaborators: true })],
     body: async ({ actor, payload, auth }) => {
       const { address, thread, thread_id } = mustBeAuthorizedThread(
         actor,

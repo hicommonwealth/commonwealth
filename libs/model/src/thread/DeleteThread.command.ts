@@ -1,7 +1,7 @@
 import { Command, InvalidInput } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { models, sequelize } from '../database';
-import { isAuthorized, type AuthContext } from '../middleware';
+import { authThread } from '../middleware';
 import { verifyDeleteThreadSignature } from '../middleware/canvas';
 import { mustBeAuthorizedThread } from '../middleware/guards';
 
@@ -9,13 +9,10 @@ export const DeleteThreadErrors = {
   ContestLock: 'Cannot delete thread that is in a contest',
 };
 
-export function DeleteThread(): Command<
-  typeof schemas.DeleteThread,
-  AuthContext
-> {
+export function DeleteThread(): Command<typeof schemas.DeleteThread> {
   return {
     ...schemas.DeleteThread,
-    auth: [isAuthorized({ author: true }), verifyDeleteThreadSignature],
+    auth: [authThread({ author: true }), verifyDeleteThreadSignature],
     body: async ({ actor, auth }) => {
       const { thread } = mustBeAuthorizedThread(actor, auth);
 

@@ -146,7 +146,7 @@ const SignTransactionsStep = ({
       await createContestMutation({
         contest_address: contestAddress,
         name: contestFormData?.contestName,
-        id: app.activeChainId() || '',
+        community_id: app.activeChainId() || '',
         image_url: contestFormData?.contestImage,
         funding_token_address: exchangeToken,
         prize_percentage: isContestRecurring

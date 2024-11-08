@@ -12,8 +12,8 @@ import { ZodSchema } from 'zod';
  * @returns express command handler
  */
 export const command =
-  <Input extends ZodSchema, Output extends ZodSchema, AuthContext>(
-    md: Metadata<Input, Output, AuthContext>,
+  <Input extends ZodSchema, Output extends ZodSchema, Auth extends ZodSchema>(
+    md: Metadata<Input, Output, Auth>,
   ): RequestHandler =>
   async (req: Request, res: Response, next: NextFunction) => {
     try {
