@@ -1,68 +1,110 @@
-import { InvalidInput, type Command } from '@hicommonwealth/core';
+import { type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
-import { ChainBase } from '@hicommonwealth/shared';
+import { commonProtocol } from '@hicommonwealth/shared';
+import Web3 from 'web3';
 import { models } from '../database';
 import { authRoles } from '../middleware';
 import { mustExist } from '../middleware/guards';
+import { tokenCommunityManagerAbi } from '../services/commonProtocol/abi/TokenCommunityManager';
+import { erc20Abi } from '../services/commonProtocol/abi/erc20';
 
-export const CreateTokenErrors = {
-  TokenNameExists:
-    'The name for this token already exists, please choose another name',
-  InvalidEthereumChainId: 'Ethereum chain ID not provided or unsupported',
-  InvalidAddress: 'Address is invalid',
-  InvalidBase: 'Must provide valid chain base',
-  MissingNodeUrl: 'Missing node url',
-  InvalidNode: 'RPC url returned invalid response. Check your node url',
-};
+export async function createTokenHandler(
+  chainNodeId: number,
+  tokenAddress: string,
+  description?: string | null,
+  iconUrl?: string | null,
+) {
+  const chainNode = await models.ChainNode.findOne({
+    where: { id: chainNodeId },
+    attributes: ['eth_chain_id', 'url', 'private_url'],
+  });
+
+  mustExist('Chain Node', chainNode);
+
+  const web3 = new Web3(chainNode.private_url || chainNode.url);
+
+  const contracts =
+    commonProtocol.factoryContracts[
+      chainNode!.eth_chain_id as commonProtocol.ValidChains
+    ];
+  const tokenManagerAddress = contracts.tokenCommunityManager;
+  const tokenManagerContract = new web3.eth.Contract(
+    tokenCommunityManagerAbi,
+    tokenManagerAddress,
+  );
+
+  let namespace: string;
+  try {
+    namespace = await tokenManagerContract.methods
+      .namespaceForToken(tokenAddress)
+      .call();
+  } catch (error) {
+    throw Error(`Failed to get namespace for token ${tokenAddress}`);
+  }
+
+  const erc20Contract = new web3.eth.Contract(erc20Abi, tokenAddress);
+
+  let name: string;
+  let symbol: string;
+  let totalSupply: bigint;
+
+  try {
+    [name, symbol, totalSupply] = await Promise.all([
+      erc20Contract.methods.name().call() as unknown as string,
+      erc20Contract.methods.symbol().call() as unknown as string,
+      erc20Contract.methods.totalSupply().call() as unknown as bigint,
+    ]);
+  } catch (e) {
+    throw Error(
+      `Failed to get erc20 token properties for token ${tokenAddress}`,
+    );
+  }
+
+  const token = await models.Token.create({
+    token_address: tokenAddress,
+    namespace,
+    name,
+    symbol,
+    initial_supply: totalSupply,
+    is_locked: false,
+    description: description ?? null,
+    icon_url: iconUrl ?? null,
+  });
+
+  return token!.toJSON();
+}
 
 export function CreateToken(): Command<typeof schemas.CreateToken> {
   return {
     ...schemas.CreateToken,
     auth: [authRoles('admin')],
-    body: async ({ actor, payload }) => {
-      const {
-        base,
-        chain_node_id,
-        name,
-        symbol,
-        description,
-        icon_url,
-        community_id,
-        launchpad_contract_address,
-      } = payload;
+    body: async ({ payload }) => {
+      const { chain_node_id, transaction_hash, description, icon_url } =
+        payload;
 
-      const token = await models.Token.findOne({
-        where: { name },
-      });
-      if (token) throw new InvalidInput(CreateTokenErrors.TokenNameExists);
-
-      const baseCommunity = await models.Community.findOne({
-        where: { base, id: community_id },
-      });
-      mustExist('Community Chain Base', baseCommunity);
-
-      const node = await models.ChainNode.findOne({
+      const chainNode = await models.ChainNode.findOne({
         where: { id: chain_node_id },
+        attributes: ['eth_chain_id', 'url', 'private_url'],
       });
-      mustExist(`Chain Node`, node);
 
-      if (base === ChainBase.Ethereum && !node.eth_chain_id)
-        throw new InvalidInput(CreateTokenErrors.InvalidEthereumChainId);
+      mustExist('Chain Node', chainNode);
 
-      const createdToken = await models.Token.create({
-        base,
+      const web3 = new Web3(chainNode.private_url || chainNode.url);
+
+      const txReceipt = await web3.eth.getTransactionReceipt(transaction_hash);
+      const tokenAddress = txReceipt.logs[0].address!;
+      if (!tokenAddress) {
+        throw Error(
+          'Failed to find tokenAddress is token creation command. Review tokenAddress logic',
+        );
+      }
+
+      return await createTokenHandler(
         chain_node_id,
-        name,
-        symbol,
+        tokenAddress,
         description,
         icon_url,
-        author_address: actor.address || '',
-        community_id,
-        launchpad_contract_address,
-        // uniswap_pool_address, - TODO: add when uniswap integration is done
-      });
-
-      return createdToken!.toJSON();
+      );
     },
   };
 }

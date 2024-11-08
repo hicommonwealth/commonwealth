@@ -366,3 +366,7 @@ export function bech32ToHex(address: string) {
     console.log(`Error converting bech32 to hex: ${e}. Hex was not generated.`);
   }
 }
+
+export function buildFarcasterContestFrameUrl(contestAddress: string) {
+  return `/api/integration/farcaster/contests/${contestAddress}/contestCard`;
+}

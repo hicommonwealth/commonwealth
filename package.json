@@ -116,6 +116,7 @@
     "ignore-styles": "^5.0.1",
     "mock-express-request": "^0.2.2",
     "nyc": "^15.1.0",
+    "openapi-diff": "^0.23.7",
     "playwright-json-summary-reporter": "^1.0.0",
     "playwright-test": "^8.2.0",
     "prettier": "3.3.3",

@@ -14,12 +14,11 @@ import { validationSchema } from './validations';
 import './EnableStake.scss';
 
 const EnableStake = ({
-  goToSuccessStep,
-  onOptInEnablingStake,
   communityStakeData,
   chainId,
-  isTopicFlow,
   onlyNamespace,
+  backButton,
+  confirmButton,
 }: EnableStakeProps) => {
   const [namespaceError, setNamespaceError] = useState('');
 
@@ -40,10 +39,7 @@ const EnableStake = ({
         return setNamespaceError('Namespace already exists');
       }
 
-      onOptInEnablingStake({
-        namespace: data.namespace,
-        symbol: data.symbol,
-      });
+      confirmButton?.action(data);
     } catch (err) {
       console.log(err);
     }
@@ -133,16 +129,16 @@ const EnableStake = ({
         <section className="action-buttons">
           <CWButton
             type="button"
-            label={isTopicFlow ? 'Back' : 'No'}
+            label={backButton?.label}
             buttonWidth="wide"
             buttonType="secondary"
-            onClick={goToSuccessStep}
+            onClick={backButton?.action}
           />
           <CWButton
             form="communityStakeForm"
             type="submit"
             buttonWidth="wide"
-            label="Yes"
+            label={confirmButton?.label}
           />
         </section>
       </section>

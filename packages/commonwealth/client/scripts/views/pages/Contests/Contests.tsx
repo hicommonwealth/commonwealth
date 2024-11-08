@@ -38,7 +38,6 @@ const Contests = () => {
           <ContestsList
             contests={contestsData.active}
             isAdmin={false}
-            hasWeightedTopic={false}
             isLoading={isContestDataLoading}
             isContestAvailable={isContestAvailable}
           />
@@ -54,7 +53,6 @@ const Contests = () => {
           <ContestsList
             contests={contestsData.finished}
             isAdmin={false}
-            hasWeightedTopic={false}
             isLoading={isContestDataLoading}
             isContestAvailable={isContestAvailable}
             displayAllRecurringContests

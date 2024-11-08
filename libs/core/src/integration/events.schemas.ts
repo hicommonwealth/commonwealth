@@ -8,7 +8,11 @@ import {
   Thread,
 } from '@hicommonwealth/schemas';
 import { z } from 'zod';
-import { CommunityStakeTrade, NamespaceDeployed } from './chain-event.schemas';
+import {
+  CommunityStakeTrade,
+  LaunchpadTokenCreated,
+  NamespaceDeployed,
+} from './chain-event.schemas';
 import { EventMetadata } from './util.schemas';
 
 export const ThreadCreated = Thread.omit({
@@ -172,6 +176,14 @@ export const ChainEventCreated = z.union([
       ),
     }),
     parsedArgs: CommunityStakeTrade,
+  }),
+  ChainEventCreatedBase.extend({
+    eventSource: ChainEventCreatedBase.shape.eventSource.extend({
+      eventSignature: z.literal(
+        '0xd7ca5dc2f8c6bb37c3a4de2a81499b25f8ca8bbb3082010244fe747077d0f6cc',
+      ),
+    }),
+    parsedArgs: LaunchpadTokenCreated,
   }),
 ]);
 
