@@ -36,8 +36,13 @@
       flex-direction: column;
       width: 90%;
       height: auto;
-      max-height: 90vh;
       overflow: auto;
+    }
+
+    @include extraSmall {
+      width: 100%;
+      height: 100%;
+      max-height: 100vh;
     }
 
     .modal-left {
@@ -46,11 +51,17 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background-color: $neutral-25;
+      background-color: $black;
 
       @include mediumSmallInclusive {
         width: 100%;
         flex: 1;
+      }
+
+      @include extraSmall {
+        width: 100%;
+        height: 100%;
+        background-color: $black;
       }
 
       .close-btn {
@@ -74,10 +85,14 @@
       .modal-image {
         width: 100%;
         height: 100%;
-        object-fit: cover;
+        object-fit: contain;
 
         @include mediumSmallMid {
           height: 700px;
+        }
+
+        @include extraSmall {
+          height: 100%;
         }
       }
 
@@ -115,6 +130,10 @@
         flex: 1;
         padding: 16px;
         min-height: fit-content;
+      }
+
+      @include extraSmall {
+        display: none;
       }
     }
   }
