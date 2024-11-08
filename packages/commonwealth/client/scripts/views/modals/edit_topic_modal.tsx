@@ -4,8 +4,8 @@ import type { Topic } from '../../models/Topic';
 import { useCommonNavigate } from '../../navigation/helpers';
 import app from '../../state';
 import {
-  useDeleteTopicMutation,
   useEditTopicMutation,
+  useToggleArchiveTopicMutation,
 } from '../../state/api/topics';
 import { CWCheckbox } from '../components/component_kit/cw_checkbox';
 import { CWTextInput } from '../components/component_kit/cw_text_input';
@@ -44,7 +44,7 @@ export const EditTopicModal = ({
 
   const navigate = useCommonNavigate();
   const { mutateAsync: editTopic } = useEditTopicMutation();
-  const { mutateAsync: deleteTopic } = useDeleteTopicMutation();
+  const { mutateAsync: archiveTopic } = useToggleArchiveTopicMutation();
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [description, setDescription] = useState<DeltaStatic>(
@@ -85,7 +85,7 @@ export const EditTopicModal = ({
   const handleDeleteTopic = async () => {
     openConfirmation({
       title: 'Warning',
-      description: <>Delete this topic?</>,
+      description: <>Archive this topic?</>,
       buttons: [
         {
           label: 'Cancel',
@@ -97,9 +97,10 @@ export const EditTopicModal = ({
           buttonType: 'destructive',
           buttonHeight: 'sm',
           onClick: async () => {
-            await deleteTopic({
+            await archiveTopic({
               community_id: app.activeChainId() || '',
               topic_id: id!,
+              archive: true,
             });
             if (noRedirect) {
               onModalClose();

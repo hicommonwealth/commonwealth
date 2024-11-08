@@ -1,6 +1,6 @@
 import { trpc } from 'utils/trpcClient';
 
-const useDeleteTopicMutation = () => {
+const useToggleArchiveTopicMutation = () => {
   const utils = trpc.useUtils();
   return trpc.community.toggleArchiveTopic.useMutation({
     onSuccess: async (response) => {
@@ -13,4 +13,4 @@ const useDeleteTopicMutation = () => {
   });
 };
 
-export default useDeleteTopicMutation;
+export default useToggleArchiveTopicMutation;
