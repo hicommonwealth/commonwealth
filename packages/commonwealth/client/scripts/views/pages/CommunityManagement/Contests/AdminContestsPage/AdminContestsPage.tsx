@@ -47,6 +47,7 @@ const AdminContestsPage = () => {
 
   const { data: community } = useGetCommunityByIdQuery({
     id: communityId,
+    enabled: !!communityId,
   });
 
   const { trackAnalytics } = useBrowserAnalyticsTrack<BaseMixpanelPayload>({
