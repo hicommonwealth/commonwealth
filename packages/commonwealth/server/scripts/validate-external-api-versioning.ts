@@ -163,6 +163,7 @@ async function validateExternalApiVersioning() {
   }
 
   if (
+    oldVersion.minor === newVersion.minor &&
     oldVersion.patch === newVersion.patch &&
     result.nonBreakingDifferences.length > 0
   ) {
