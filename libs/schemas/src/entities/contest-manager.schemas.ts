@@ -51,11 +51,3 @@ export const ContestManager = z
     farcaster_frame_hashes: z.array(z.string()).nullish(),
   })
   .describe('On-Chain Contest Manager');
-
-export const ContestTopic = z
-  .object({
-    contest_address: z.string(),
-    topic_id: PG_INT,
-    created_at: z.coerce.date(),
-  })
-  .describe('X-Ref to topics in contest');

@@ -95,7 +95,7 @@ async function buildAuth(
 ): Promise<AuthContext> {
   const { actor, payload } = ctx;
   if (!actor.address)
-    throw new InvalidActor(ctx.actor, 'Must provide an address');
+    throw new InvalidActor(ctx.actor, 'Must provide an address to authorize');
 
   const { id, community_id, topic_id, thread_id, comment_id } = payload;
   const auth: AuthContext = {
@@ -119,7 +119,7 @@ async function buildAuth(
       ],
     });
     if (!auth.comment)
-      throw new InvalidInput('Must provide a valid comment id');
+      throw new InvalidInput('Must provide a valid comment id to authorize');
     auth.community_id = auth.comment.Thread!.community_id;
     auth.topic_id = auth.comment.Thread!.topic_id;
     auth.thread_id = auth.comment.Thread!.id;
@@ -136,13 +136,21 @@ async function buildAuth(
       where: { id: auth.thread_id },
       include,
     });
-    if (!auth.thread) throw new InvalidInput('Must provide a valid thread id');
+    if (!auth.thread)
+      throw new InvalidInput('Must provide a valid thread id to authorize');
     auth.community_id = auth.thread.community_id;
     auth.topic_id = auth.thread.topic_id;
     auth.author_address_id = auth.thread.address_id;
   } else if (!auth.community_id)
-    throw new InvalidInput('Must provide a community id');
+    throw new InvalidInput('Must provide a valid community id to authorize');
 
+  // Policies as system actors behave like super admins
+  // TODO: we can check if there is an address to load or fake it
+  if (actor.is_system_actor) {
+    return auth;
+  }
+
+  // Loads and tracks real user's address activity
   auth.address = await models.Address.findOne({
     where: {
       user_id: actor.user.id,
@@ -187,7 +195,8 @@ async function hasTopicInteractionPermissions(
   auth: AuthContext,
   action: GroupPermissionAction,
 ): Promise<void> {
-  if (!auth.topic_id) throw new InvalidInput('Must provide a topic id');
+  if (!auth.topic_id)
+    throw new InvalidInput('Must provide a valid topic id to authorize');
 
   auth.topic = await models.Topic.findOne({ where: { id: auth.topic_id } });
   if (!auth.topic) throw new InvalidInput('Topic not found');
@@ -254,6 +263,31 @@ async function hasTopicInteractionPermissions(
     );
 }
 
+/**
+ * Utility to easily create a system actor.
+ * We can identify each policy actor by a predefined system user id,
+ * email, and address.
+ * This will allow us to audit and track distinct policy actors.
+ *
+ * @param address a distict policy address, defaults to "0x0"
+ * @param id a distict policy user id, defaults to 0
+ * @param email a distict policy email address, defaults to `system@common.im`
+ * @returns system actor flagged as a system actor
+ */
+export const systemActor = ({
+  address = '0x0',
+  id = 0,
+  email = 'system@common.im',
+}: {
+  address?: string;
+  id?: number;
+  email?: string;
+}): Actor => ({
+  user: { id, email },
+  address,
+  is_system_actor: true,
+});
+
 //  MIDDLEWARE
 export const isSuperAdmin: AuthHandler = async (ctx) => {
   if (!ctx.actor.user.isAdmin)
@@ -294,6 +328,9 @@ export function isAuthorized({
       isAdmin ? ['admin', 'moderator', 'member'] : roles,
       collaborators,
     );
+
+    // system actors are always allowed
+    if (ctx.actor.is_system_actor) return;
 
     if (isAdmin || auth.address?.role === 'admin') return;
 

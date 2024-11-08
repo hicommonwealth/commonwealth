@@ -33,6 +33,7 @@ export type TagProps = {
   label: string;
   type: TagType;
   onClick?: (e?: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
+  onCloseClick?: () => void;
   trimAt?: number;
   classNames?: string;
   community?: {
@@ -48,6 +49,7 @@ export const CWTag = ({
   label,
   type,
   onClick,
+  onCloseClick,
   trimAt,
   classNames,
   community,
@@ -65,8 +67,6 @@ export const CWTag = ({
 
     return label.slice(0, trimAt) + '...';
   };
-
-  const handleClick = () => onClick?.();
 
   return (
     <div
@@ -95,7 +95,7 @@ export const CWTag = ({
         {displayLabel()}
       </CWText>
       {(type === 'input' || type === 'filter') && (
-        <div className="close-container" onClick={handleClick}>
+        <div className="close-container" onClick={onCloseClick}>
           <X
             className={getClasses({ action: true }, ComponentType.Tag)}
             size={16}

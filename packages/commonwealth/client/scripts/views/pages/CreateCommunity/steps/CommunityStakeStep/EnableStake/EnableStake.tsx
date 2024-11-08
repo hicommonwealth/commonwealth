@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 
-import { useFlag } from 'hooks/useFlag';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
@@ -15,17 +14,15 @@ import { validationSchema } from './validations';
 import './EnableStake.scss';
 
 const EnableStake = ({
-  goToSuccessStep,
-  onOptInEnablingStake,
   communityStakeData,
   chainId,
-  isTopicFlow,
   onlyNamespace,
+  backButton,
+  confirmButton,
 }: EnableStakeProps) => {
   const [namespaceError, setNamespaceError] = useState('');
 
   const { namespaceFactory } = useNamespaceFactory(parseInt(chainId));
-  const weightedTopicsEnabled = useFlag('weightedTopics');
 
   const clearNamespaceError = () => {
     setNamespaceError('');
@@ -42,10 +39,7 @@ const EnableStake = ({
         return setNamespaceError('Namespace already exists');
       }
 
-      onOptInEnablingStake({
-        namespace: data.namespace,
-        symbol: data.symbol,
-      });
+      confirmButton?.action(data);
     } catch (err) {
       console.log(err);
     }
@@ -62,12 +56,12 @@ const EnableStake = ({
     <div className="EnableStake">
       <section className="header">
         <CWText type="h2">
-          {onlyNamespace && weightedTopicsEnabled
+          {onlyNamespace
             ? 'Register a Namespace for your community'
             : 'Do you want to enable community stake?'}
         </CWText>
         <CWText type="b1" className="description">
-          {onlyNamespace && weightedTopicsEnabled ? (
+          {onlyNamespace ? (
             <>
               Registering your Namespace onchain will enable you to utilize
               onchain features on Common such as contests and weighted voting
@@ -117,7 +111,7 @@ const EnableStake = ({
           />
         </CWForm>
 
-        {!onlyNamespace && !weightedTopicsEnabled && (
+        {!onlyNamespace && (
           <CWText className="info" fontWeight="medium">
             Not sure?
             <a
@@ -135,16 +129,16 @@ const EnableStake = ({
         <section className="action-buttons">
           <CWButton
             type="button"
-            label={isTopicFlow ? 'Back' : 'No'}
+            label={backButton?.label}
             buttonWidth="wide"
             buttonType="secondary"
-            onClick={goToSuccessStep}
+            onClick={backButton?.action}
           />
           <CWButton
             form="communityStakeForm"
             type="submit"
             buttonWidth="wide"
-            label="Yes"
+            label={confirmButton?.label}
           />
         </section>
       </section>

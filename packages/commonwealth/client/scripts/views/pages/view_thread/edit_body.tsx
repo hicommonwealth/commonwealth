@@ -24,6 +24,7 @@ type EditBodyProps = {
   activeThreadBody: string; // body of the active/selected thread version
   cancelEditing: () => void;
   threadUpdatedCallback: (title: string, body: string) => void;
+  isDisabled?: boolean;
 };
 
 export const EditBody = (props: EditBodyProps) => {
@@ -35,6 +36,7 @@ export const EditBody = (props: EditBodyProps) => {
     activeThreadBody,
     cancelEditing,
     threadUpdatedCallback,
+    isDisabled = false,
   } = props;
 
   const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
@@ -144,7 +146,7 @@ export const EditBody = (props: EditBodyProps) => {
         <CWButton
           label="Save"
           buttonWidth="wide"
-          disabled={saving}
+          disabled={saving || isDisabled}
           onClick={save}
         />
       </div>

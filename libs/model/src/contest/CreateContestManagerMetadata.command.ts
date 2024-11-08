@@ -1,16 +1,14 @@
 import type { Command } from '@hicommonwealth/core';
 import { InvalidState } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
-import { Op } from 'sequelize';
-import z from 'zod';
+import { buildFarcasterContestFrameUrl } from '@hicommonwealth/shared';
 import { models } from '../database';
 import { isAuthorized, type AuthContext } from '../middleware';
 import { mustExist } from '../middleware/guards';
-import { TopicAttributes } from '../models';
-import { buildFarcasterContestFrameUrl } from '../utils';
+import { TopicInstance } from '../models';
 
 const Errors = {
-  InvalidTopics: 'Invalid topics',
+  InvalidTopics: 'Invalid topic',
   StakeNotEnabled: 'Stake must be enabled to create a recurring contest',
 };
 
@@ -22,7 +20,7 @@ export function CreateContestManagerMetadata(): Command<
     ...schemas.CreateContestManagerMetadata,
     auth: [isAuthorized({ roles: ['admin'] })],
     body: async ({ payload }) => {
-      const { id, topic_ids, ...rest } = payload;
+      const { id, topic_id, is_farcaster_contest, ...rest } = payload;
 
       // if stake is not enabled, only allow one-off contests
       const stake = await models.CommunityStake.findOne({
@@ -34,32 +32,14 @@ export function CreateContestManagerMetadata(): Command<
         throw new InvalidState(Errors.StakeNotEnabled);
       }
 
-      let contestTopics: TopicAttributes[] = [];
-      let contestTopicsToCreate: z.infer<typeof schemas.ContestTopic>[] = [];
-
-      if (topic_ids) {
-        // verify topics exist
-        const topics = await models.Topic.findAll({
-          where: {
-            id: {
-              [Op.in]: topic_ids,
-            },
-          },
-        });
-        if (topics.length !== topic_ids.length) {
+      // verify topic exists
+      let topic: TopicInstance | null = null;
+      if (typeof topic_id !== 'undefined') {
+        topic = await models.Topic.findByPk(topic_id);
+        if (!topic) {
           throw new InvalidState(Errors.InvalidTopics);
         }
-        contestTopics = topics.map((t) => t.get({ plain: true }));
-        contestTopicsToCreate = topics.map((t) => ({
-          contest_address: rest.contest_address,
-          topic_id: t.id!,
-          created_at: new Date(),
-        }));
       }
-
-      const farcaster_frame_url = buildFarcasterContestFrameUrl(
-        payload.contest_address,
-      );
 
       const contestManager = await models.sequelize.transaction(
         async (transaction) => {
@@ -69,15 +49,14 @@ export function CreateContestManagerMetadata(): Command<
               community_id: id.toString(),
               created_at: new Date(),
               cancelled: false,
-              farcaster_frame_url,
+              farcaster_frame_url: is_farcaster_contest
+                ? buildFarcasterContestFrameUrl(payload.contest_address)
+                : null,
+              topic_id: topic?.id || null,
+              is_farcaster_contest: !!is_farcaster_contest,
             },
             { transaction },
           );
-
-          await models.ContestTopic.bulkCreate(contestTopicsToCreate, {
-            transaction,
-          });
-
           return manager;
         },
       );
@@ -87,7 +66,7 @@ export function CreateContestManagerMetadata(): Command<
         contest_managers: [
           {
             ...contestManager.get({ plain: true }),
-            topics: contestTopics as Required<TopicAttributes>[],
+            topic: topic?.get({ plain: true }),
           },
         ],
       };

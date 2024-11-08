@@ -22,16 +22,10 @@ export default (
     {
       // derivable when event received
       token_address: { type: Sequelize.STRING, primaryKey: true },
-      namespace: {
-        type: Sequelize.STRING,
-        references: {
-          model: 'Communities',
-          key: 'namespace',
-        },
-      },
-      name: { type: Sequelize.STRING },
-      symbol: { type: Sequelize.STRING },
-      initial_supply: { type: Sequelize.DECIMAL(78, 0) },
+      namespace: { type: Sequelize.STRING, allowNull: false },
+      name: { type: Sequelize.STRING, allowNull: false },
+      symbol: { type: Sequelize.STRING, allowNull: false },
+      initial_supply: { type: Sequelize.DECIMAL(78, 0), allowNull: false },
       is_locked: {
         type: Sequelize.BOOLEAN,
         allowNull: false,

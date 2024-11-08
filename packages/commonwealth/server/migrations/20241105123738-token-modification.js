@@ -167,12 +167,8 @@ module.exports = {
 
     const node = await queryInterface.sequelize.query(`
         SELECT id FROM "ChainNodes"
-        WHERE id = 1399;
+        WHERE eth_chain_id = 84532;
     `);
-
-    if (node[0].length === 0) {
-      return;
-    }
 
     return queryInterface.sequelize.transaction(async (t) => {
       await queryInterface.changeColumn(
@@ -189,10 +185,9 @@ module.exports = {
       await queryInterface.sequelize.query(
         `
             ALTER TABLE "Tokens"
-            ADD COLUMN token_address VARCHAR PRIMARY KEY,
-            ADD COLUMN namespace VARCHAR,
-            ADD CONSTRAINT fk_namespace FOREIGN KEY (namespace) REFERENCES "Communities"(namespace),
-            ADD COLUMN initial_supply DECIMAL(78, 0),
+            ADD COLUMN token_address VARCHAR(255) PRIMARY KEY,
+            ADD COLUMN namespace VARCHAR(255) NOT NULL,
+            ADD COLUMN initial_supply DECIMAL(78, 0) NOT NULL,
             ADD COLUMN is_locked BOOLEAN NOT NULL DEFAULT false,
             DROP COLUMN chain_node_id,
             DROP COLUMN base,
@@ -200,6 +195,7 @@ module.exports = {
             DROP COLUMN launchpad_contract_address,
             DROP COLUMN uniswap_pool_address,
             DROP COLUMN community_id,
+            ALTER COLUMN symbol SET NOT NULL,
             DROP CONSTRAINT "Tokens_pkey";
         `,
         { transaction: t },
@@ -224,11 +220,15 @@ module.exports = {
         },
       );
 
+      if (node[0].length === 0) {
+        return;
+      }
+
       await queryInterface.bulkInsert(
         'EvmEventSources',
         [
           {
-            chain_node_id: 1399,
+            chain_node_id: node[0][0].id,
             contract_address: '0x6b118c6efa258903939ed981e6f644330effebab',
             event_signature:
               '0xd7ca5dc2f8c6bb37c3a4de2a81499b25f8ca8bbb3082010244fe747077d0f6cc',

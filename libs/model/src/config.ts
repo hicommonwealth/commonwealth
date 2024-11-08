@@ -12,7 +12,7 @@ const {
   NO_SSL,
   PRIVATE_KEY,
   TBC_BALANCE_TTL_SECONDS,
-  ALLOWED_EVENTS,
+  BLACKLISTED_EVENTS,
   INIT_TEST_DB,
   MAX_USER_POSTS_PER_CONTEST,
   JWT_SECRET,
@@ -30,7 +30,6 @@ const {
   ETH_RPC,
   COSMOS_REGISTRY_API,
   REACTION_WEIGHT_OVERRIDE,
-  FLAG_WEIGHTED_TOPICS,
   ALCHEMY_PRIVATE_APP_KEY,
   ALCHEMY_PUBLIC_APP_KEY,
   MEMBERSHIP_REFRESH_BATCH_SIZE,
@@ -80,7 +79,9 @@ export const config = configure(
         : 300,
     },
     OUTBOX: {
-      ALLOWED_EVENTS: ALLOWED_EVENTS ? ALLOWED_EVENTS.split(',') : [],
+      BLACKLISTED_EVENTS: BLACKLISTED_EVENTS
+        ? BLACKLISTED_EVENTS.split(',')
+        : [],
     },
     STAKE: {
       REACTION_WEIGHT_OVERRIDE: REACTION_WEIGHT_OVERRIDE
@@ -97,7 +98,6 @@ export const config = configure(
       NEYNAR_CAST_CREATED_WEBHOOK_SECRET: NEYNAR_CAST_CREATED_WEBHOOK_SECRET,
       NEYNAR_REPLY_WEBHOOK_URL: NEYNAR_REPLY_WEBHOOK_URL,
       FARCASTER_ACTION_URL: FARCASTER_ACTION_URL,
-      FLAG_WEIGHTED_TOPICS: FLAG_WEIGHTED_TOPICS === 'true',
     },
     AUTH: {
       JWT_SECRET: JWT_SECRET || DEFAULTS.JWT_SECRET,
@@ -191,7 +191,7 @@ export const config = configure(
       TTL_SECS: z.number().int(),
     }),
     OUTBOX: z.object({
-      ALLOWED_EVENTS: z.array(z.string()),
+      BLACKLISTED_EVENTS: z.array(z.string()),
     }),
     STAKE: z.object({
       REACTION_WEIGHT_OVERRIDE: z.number().int().nullish(),
@@ -204,7 +204,6 @@ export const config = configure(
       NEYNAR_CAST_CREATED_WEBHOOK_SECRET: z.string().nullish(),
       NEYNAR_REPLY_WEBHOOK_URL: z.string().nullish(),
       FARCASTER_ACTION_URL: z.string().nullish(),
-      FLAG_WEIGHTED_TOPICS: z.boolean(),
     }),
     AUTH: z
       .object({

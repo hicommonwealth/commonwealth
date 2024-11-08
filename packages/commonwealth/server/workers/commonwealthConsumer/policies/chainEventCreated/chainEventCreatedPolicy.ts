@@ -1,6 +1,6 @@
 import { EventHandler, Policy, events, logger } from '@hicommonwealth/core';
 import {
-  commonProtocol,
+  Token,
   communityStakeTradeEventSignature,
   deployedNamespaceEventSignature,
   launchpadTokenLaunchedEventSignature,
@@ -24,7 +24,7 @@ export const processChainEventCreated: EventHandler<
   } else if (
     payload.eventSource.eventSignature === launchpadTokenLaunchedEventSignature
   ) {
-    await commonProtocol.launchpadHelper.createTokenHandler(
+    await Token.createTokenHandler(
       payload.eventSource.chainNodeId,
       payload.parsedArgs[0],
     );
