@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 
 import commonUrl from 'assets/img/branding/common.svg';
 import farcasterUrl from 'assets/img/farcaster.svg';
+import shape2Url from 'assets/img/shapes/shape2.svg';
 import useAppStatus from 'hooks/useAppStatus';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import { useFlag } from 'hooks/useFlag';
@@ -83,9 +84,7 @@ const AdminContestsPage = () => {
       isPWA: isAddedToHomeScreen,
     });
 
-    return farcasterContestEnabled
-      ? setContestView(ContestView.TypeSelection)
-      : navigate('/manage/contests/launch');
+    setContestView(ContestView.TypeSelection);
   };
 
   if (!user.isLoggedIn || !isAdmin) {
@@ -118,14 +117,13 @@ const AdminContestsPage = () => {
         <div className="admin-header-row">
           <CWText type="h2">Contests</CWText>
 
-          {hasAtLeastOneWeightedVotingTopic &&
-            contestView !== ContestView.TypeSelection && (
-              <CWButton
-                iconLeft="plusPhosphor"
-                label="Create contest"
-                onClick={handleCreateContestClicked}
-              />
-            )}
+          {contestView === ContestView.List && isContestAvailable && (
+            <CWButton
+              iconLeft="plusPhosphor"
+              label="Create contest"
+              onClick={handleCreateContestClicked}
+            />
+          )}
         </div>
 
         {contestView === ContestView.List ? (
@@ -141,41 +139,62 @@ const AdminContestsPage = () => {
               contests={contestsData.all}
               isLoading={isContestDataLoading}
               isAdmin={isAdmin}
-              hasWeightedTopic={!!hasAtLeastOneWeightedVotingTopic}
               isContestAvailable={isContestAvailable}
               onSetContestView={setContestView}
-              hasNamespace={!!community?.namespace}
             />
           </>
         ) : contestView === ContestView.TypeSelection ? (
           <div className="type-selection-list">
-            <EmptyCard
-              img={commonUrl}
-              title="Launch on Common"
-              subtitle="lorem ipsum dolor sit amet"
-              button={{
-                label: 'Launch Common contest',
-                handler: () =>
-                  navigate(
-                    `/manage/contests/launch?type=${ContestType.Common}`,
-                  ),
-              }}
-            />
-            <EmptyCard
-              img={farcasterUrl}
-              title="Launch on Farcaster"
-              subtitle="lorem ipsum dolor sit amet"
-              button={{
-                label: 'Launch Farcaster contest',
-                handler: () => {
-                  if (community?.namespace) {
-                    goToLaunchFarcasterContest();
-                  }
+            {hasAtLeastOneWeightedVotingTopic ? (
+              <EmptyCard
+                img={commonUrl}
+                title="Launch on Common"
+                subtitle="Setting up a contest just takes a few minutes and can be a huge boost to your community."
+                button={{
+                  label: 'Launch Common contest',
+                  handler: () =>
+                    navigate(
+                      `/manage/contests/launch?type=${ContestType.Common}`,
+                    ),
+                }}
+              />
+            ) : (
+              <EmptyCard
+                img={shape2Url}
+                title="You must have at least one topic with weighted voting enabled to run contest"
+                subtitle="Setting up a contest just takes a few minutes and can be a huge boost to your community."
+                button={{
+                  label: 'Create a topic',
+                  handler: () => navigate('/manage/topics'),
+                }}
+              />
+            )}
 
-                  setContestView(ContestView.NamespaceEnablemenement);
-                },
-              }}
-            />
+            {!farcasterContestEnabled ? null : community?.namespace ? (
+              <EmptyCard
+                img={farcasterUrl}
+                title="Launch on Farcaster"
+                subtitle="Share your contest on Farcastr platform"
+                button={{
+                  label: 'Launch Farcaster contest',
+                  handler: () => {
+                    goToLaunchFarcasterContest();
+                  },
+                }}
+              />
+            ) : (
+              <EmptyCard
+                img={farcasterUrl}
+                title="You must have namespace reserved for your community to run farcaster contest"
+                subtitle="Share your contest on Farcastr platform"
+                button={{
+                  label: 'Create a namespace',
+                  handler: () => {
+                    setContestView(ContestView.NamespaceEnablemenement);
+                  },
+                }}
+              />
+            )}
           </div>
         ) : contestView === ContestView.NamespaceEnablemenement ? (
           <CommunityStakeStep

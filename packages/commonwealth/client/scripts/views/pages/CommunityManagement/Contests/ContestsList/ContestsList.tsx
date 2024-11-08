@@ -45,10 +45,8 @@ interface ContestsListProps {
   contests: Contest[];
   isAdmin: boolean;
   isLoading: boolean;
-  hasWeightedTopic: boolean;
   isContestAvailable: boolean;
   onSetContestView?: (type: ContestView) => void;
-  hasNamespace?: boolean;
   displayAllRecurringContests?: boolean;
 }
 
@@ -56,9 +54,7 @@ const ContestsList = ({
   contests,
   isAdmin,
   isLoading,
-  hasWeightedTopic,
   isContestAvailable,
-  hasNamespace = false,
   onSetContestView,
   displayAllRecurringContests = false,
 }: ContestsListProps) => {
@@ -78,15 +74,8 @@ const ContestsList = ({
   return (
     <>
       <div className="ContestsList">
-        {isAdmin &&
-        ((farcasterContestEnabled ? !isContestAvailable : !hasWeightedTopic) ||
-          !isContestAvailable) ? (
-          <EmptyContestsList
-            hasWeightedTopic={hasWeightedTopic}
-            isContestAvailable={isContestAvailable}
-            onSetContestView={onSetContestView}
-            hasNamespace={hasNamespace}
-          />
+        {isAdmin && !isContestAvailable ? (
+          <EmptyContestsList onSetContestView={onSetContestView} />
         ) : (
           contests.map((contest) => {
             const sortedContests = (contest?.contests || []).toSorted((a, b) =>
