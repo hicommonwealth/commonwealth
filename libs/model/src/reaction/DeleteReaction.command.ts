@@ -9,8 +9,8 @@ export function DeleteReaction(): Command<typeof schemas.DeleteReaction> {
   return {
     ...schemas.DeleteReaction,
     auth: [authReaction(), verifyDeleteReactionSignature],
-    body: async ({ actor, payload, auth }) => {
-      const { address } = mustBeAuthorized(actor, auth);
+    body: async ({ actor, payload, context }) => {
+      const { address } = mustBeAuthorized(actor, context);
       const { reaction_id } = payload;
 
       // TODO: this can be replaced by the loaded reaction in auth context

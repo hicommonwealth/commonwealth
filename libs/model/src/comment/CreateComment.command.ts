@@ -34,8 +34,8 @@ export function CreateComment(): Command<typeof schemas.CreateComment> {
       }),
       verifyCommentSignature,
     ],
-    body: async ({ actor, payload, auth }) => {
-      const { address, thread } = mustBeAuthorizedThread(actor, auth);
+    body: async ({ actor, payload, context }) => {
+      const { address, thread } = mustBeAuthorizedThread(actor, context);
 
       if (thread.read_only)
         throw new InvalidState(CreateCommentErrors.CantCommentOnReadOnly);

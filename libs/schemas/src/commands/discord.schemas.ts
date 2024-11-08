@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { AuthContextSchema } from '../auth';
+import { AuthContext } from '../context';
 
 export const RemoveDiscordBotConfig = {
   input: z.object({
@@ -8,7 +8,7 @@ export const RemoveDiscordBotConfig = {
   output: z.object({
     message: z.string(),
   }),
-  auth_context: AuthContextSchema,
+  context: AuthContext,
 };
 
 export const CreateDiscordBotConfig = {
@@ -19,7 +19,7 @@ export const CreateDiscordBotConfig = {
   output: z.object({
     message: z.string(),
   }),
-  auth_context: AuthContextSchema,
+  context: AuthContext,
 };
 
 export const SetDiscordBotConfig = {
@@ -32,5 +32,5 @@ export const SetDiscordBotConfig = {
     message: z.string(),
     discordConfigId: z.number().nullish(),
   }),
-  auth_context: AuthContextSchema,
+  context: AuthContext,
 };

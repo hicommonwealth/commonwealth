@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { AuthContextSchema } from '../auth';
+import { AuthContext } from '../context';
 
 export const GetDiscordChannels = {
   input: z.object({
@@ -19,5 +19,5 @@ export const GetDiscordChannels = {
       }),
     ),
   }),
-  auth_context: AuthContextSchema,
+  context: AuthContext,
 };

@@ -17,8 +17,8 @@ export function CreateCommentReaction(): Command<
       }),
       verifyReactionSignature,
     ],
-    body: async ({ payload, actor, auth }) => {
-      const { address, comment } = mustBeAuthorizedComment(actor, auth);
+    body: async ({ payload, actor, context }) => {
+      const { address, comment } = mustBeAuthorizedComment(actor, context);
       const thread = comment.Thread!;
 
       const calculated_voting_weight = await getVotingWeight(

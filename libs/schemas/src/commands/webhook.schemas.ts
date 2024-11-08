@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { AuthContextSchema } from '../auth';
+import { AuthContext } from '../context';
 import { Webhook, WebhookSupportedEvents } from '../entities/webhook.schemas';
 
 export const CreateWebhook = {
@@ -10,7 +10,7 @@ export const CreateWebhook = {
     webhookUrl: z.string(),
   }),
   output: Webhook,
-  auth_context: AuthContextSchema,
+  context: AuthContext,
 };
 
 export const GetWebhooks = {
@@ -18,7 +18,7 @@ export const GetWebhooks = {
     community_id: z.string().describe('The community_id to fetch webhooks for'),
   }),
   output: z.array(Webhook),
-  auth_context: AuthContextSchema,
+  context: AuthContext,
 };
 
 export const DeleteWebhook = {
@@ -29,7 +29,7 @@ export const DeleteWebhook = {
   output: z.object({
     webhook_deleted: z.boolean(),
   }),
-  auth_context: AuthContextSchema,
+  context: AuthContext,
 };
 
 export const UpdateWebhook = {
@@ -39,5 +39,5 @@ export const UpdateWebhook = {
     events: z.array(WebhookSupportedEvents),
   }),
   output: Webhook,
-  auth_context: AuthContextSchema,
+  context: AuthContext,
 };

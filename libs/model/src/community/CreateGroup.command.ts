@@ -3,7 +3,7 @@ import * as schemas from '@hicommonwealth/schemas';
 import { Op } from 'sequelize';
 import { models, sequelize } from '../database';
 import { authRoles } from '../middleware';
-import { mustBeAuthorized, mustNotExist } from '../middleware/guards';
+import { mustNotExist } from '../middleware/guards';
 import { GroupAttributes } from '../models';
 
 export const MAX_GROUPS_PER_COMMUNITY = 20;
@@ -17,8 +17,8 @@ export function CreateGroup(): Command<typeof schemas.CreateGroup> {
   return {
     ...schemas.CreateGroup,
     auth: [authRoles('admin')],
-    body: async ({ actor, payload, auth }) => {
-      const { community_id } = mustBeAuthorized(actor, auth);
+    body: async ({ payload }) => {
+      const { community_id } = payload;
 
       const topics = await models.Topic.findAll({
         where: {

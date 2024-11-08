@@ -3,7 +3,7 @@ import * as schemas from '@hicommonwealth/schemas';
 import { Op } from 'sequelize';
 import { models, sequelize } from '../database';
 import { authRoles } from '../middleware';
-import { mustBeAuthorized, mustExist } from '../middleware/guards';
+import { mustExist } from '../middleware/guards';
 
 export const DeleteGroupErrors = {
   SystemManaged: 'Cannot delete group that is system-managed',
@@ -13,9 +13,8 @@ export function DeleteGroup(): Command<typeof schemas.DeleteGroup> {
   return {
     ...schemas.DeleteGroup,
     auth: [authRoles('admin')],
-    body: async ({ actor, payload, auth }) => {
-      const { community_id } = mustBeAuthorized(actor, auth);
-      const { group_id } = payload;
+    body: async ({ actor, payload }) => {
+      const { community_id, group_id } = payload;
 
       const group = await models.Group.findOne({
         where: { community_id, id: group_id },

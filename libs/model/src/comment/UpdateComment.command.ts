@@ -17,8 +17,8 @@ export function UpdateComment(): Command<typeof schemas.UpdateComment> {
   return {
     ...schemas.UpdateComment,
     auth: [authComment({ author: true })],
-    body: async ({ actor, payload, auth }) => {
-      const { address, comment } = mustBeAuthorizedComment(actor, auth);
+    body: async ({ actor, payload, context }) => {
+      const { address, comment } = mustBeAuthorizedComment(actor, context);
 
       const thread = comment.Thread!;
       const currentVersion = await models.CommentVersionHistory.findOne({

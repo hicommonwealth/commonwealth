@@ -7,18 +7,17 @@ import {
 import {
   Address,
   AuthContext,
-  AuthContextSchema,
-  AuthInputSchema,
-  CommentAuthContextSchema,
-  CommentAuthInputSchema,
+  AuthContextInput,
+  CommentContext,
+  CommentContextInput,
   Group,
   GroupPermissionAction,
-  ReactionAuthContextSchema,
-  ReactionAuthInputSchema,
-  ThreadAuthContextSchema,
-  ThreadAuthInputSchema,
-  TopicAuthContextSchema,
-  TopicAuthInputSchema,
+  ReactionContext,
+  ReactionContextInput,
+  ThreadContext,
+  ThreadContextInput,
+  TopicContext,
+  TopicContextInput,
 } from '@hicommonwealth/schemas';
 import { Role } from '@hicommonwealth/shared';
 import { Op, QueryTypes } from 'sequelize';
@@ -270,7 +269,7 @@ async function hasTopicPermissions(
  * - **collaborators**: Allows when actor is a collaborator in the thread
  */
 async function mustBeAuthorized(
-  { actor, auth }: Context<ZodSchema, ZodSchema>,
+  { actor, context }: Context<ZodSchema, ZodSchema>,
   check: {
     permissions?: {
       topic_id: number;
@@ -281,30 +280,30 @@ async function mustBeAuthorized(
   } = {},
 ) {
   if (actor.is_system_actor) return;
-  if (actor.user.isAdmin || auth.address.role === 'admin') return;
-  if (auth.address.is_banned) throw new BannedActor(actor);
+  if (actor.user.isAdmin || context.address.role === 'admin') return;
+  if (context.address.is_banned) throw new BannedActor(actor);
 
   if (check.permissions)
     return await hasTopicPermissions(
       actor,
-      auth.address!.id!,
+      context.address!.id!,
       check.permissions.action,
       check.permissions.topic_id,
     );
 
-  if (auth.is_author) return;
+  if (context.is_author) return;
 
   if (check.collaborators) {
     const found = check.collaborators?.find(
       ({ address }) => address === actor.address,
     );
-    auth.is_collaborator = !!found;
-    if (auth.is_collaborator) return;
+    context.is_collaborator = !!found;
+    if (context.is_collaborator) return;
     throw new InvalidActor(actor, 'Not authorized collaborator');
   }
 
   // enforce author check
-  if (check.author && auth.address.role === 'member')
+  if (check.author && context.address.role === 'member')
     throw new InvalidActor(actor, 'Not authorized author');
 }
 
@@ -344,9 +343,7 @@ export async function isSuperAdmin(ctx: Context<ZodSchema, ZodSchema>) {
  * @throws InvalidActor when not authorized
  */
 export function authRoles(...roles: Role[]) {
-  return async (
-    ctx: Context<typeof AuthInputSchema, typeof AuthContextSchema>,
-  ) => {
+  return async (ctx: Context<typeof AuthContextInput, typeof AuthContext>) => {
     const { address, is_author } = await findAddress(
       ctx.actor,
       ctx.payload.community_id,
@@ -355,7 +352,7 @@ export function authRoles(...roles: Role[]) {
         : roles,
     );
 
-    (ctx as { auth: AuthContext }).auth = {
+    (ctx as { context: AuthContext }).context = {
       address,
       is_author,
       community_id: ctx.payload.community_id,
@@ -380,10 +377,7 @@ type AggregateAuthOptions = {
  */
 export function authComment({ action, author }: AggregateAuthOptions = {}) {
   return async (
-    ctx: Context<
-      typeof CommentAuthInputSchema,
-      typeof CommentAuthContextSchema
-    >,
+    ctx: Context<typeof CommentContextInput, typeof CommentContext>,
   ) => {
     const auth = await findComment(ctx.actor, ctx.payload.comment_id);
     const { address, is_author } = await findAddress(
@@ -393,7 +387,7 @@ export function authComment({ action, author }: AggregateAuthOptions = {}) {
       auth.author_address_id,
     );
 
-    (ctx as { auth: AuthContext }).auth = {
+    (ctx as { context: CommentContext }).context = {
       ...auth,
       address,
       is_author,
@@ -419,7 +413,7 @@ export function authThread({
   collaborators,
 }: AggregateAuthOptions = {}) {
   return async (
-    ctx: Context<typeof ThreadAuthInputSchema, typeof ThreadAuthContextSchema>,
+    ctx: Context<typeof ThreadContextInput, typeof ThreadContext>,
   ) => {
     const auth = await findThread(
       ctx.actor,
@@ -433,7 +427,7 @@ export function authThread({
       auth.author_address_id,
     );
 
-    (ctx as { auth: AuthContext }).auth = {
+    (ctx as { context: ThreadContext }).context = {
       ...auth,
       address,
       is_author,
@@ -454,7 +448,7 @@ export function authThread({
  */
 export function authTopic({ roles, action }: AggregateAuthOptions = {}) {
   return async (
-    ctx: Context<typeof TopicAuthInputSchema, typeof TopicAuthContextSchema>,
+    ctx: Context<typeof TopicContextInput, typeof TopicContext>,
   ) => {
     const auth = await findTopic(ctx.actor, ctx.payload.topic_id);
     const { address, is_author } = await findAddress(
@@ -463,7 +457,7 @@ export function authTopic({ roles, action }: AggregateAuthOptions = {}) {
       roles ?? ['admin', 'moderator', 'member'],
     );
 
-    (ctx as { auth: AuthContext }).auth = {
+    (ctx as { context: TopicContext }).context = {
       ...auth,
       address,
       is_author,
@@ -481,10 +475,7 @@ export function authTopic({ roles, action }: AggregateAuthOptions = {}) {
  */
 export function authReaction() {
   return async (
-    ctx: Context<
-      typeof ReactionAuthInputSchema,
-      typeof ReactionAuthContextSchema
-    >,
+    ctx: Context<typeof ReactionContextInput, typeof ReactionContext>,
   ) => {
     const auth = await findReaction(
       ctx.actor,
@@ -497,7 +488,7 @@ export function authReaction() {
       ['admin', 'moderator', 'member'],
     );
 
-    (ctx as { auth: AuthContext }).auth = {
+    (ctx as { context: ReactionContext }).context = {
       ...auth,
       address,
       is_author,

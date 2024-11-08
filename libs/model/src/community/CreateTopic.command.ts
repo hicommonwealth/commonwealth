@@ -3,7 +3,6 @@ import { InvalidInput, InvalidState, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../database';
 import { authRoles } from '../middleware';
-import { mustBeAuthorized } from '../middleware/guards';
 import { TopicAttributes } from '../models';
 import { sanitizeQuillText } from '../utils';
 
@@ -17,8 +16,8 @@ export function CreateTopic(): Command<typeof schemas.CreateTopic> {
   return {
     ...schemas.CreateTopic,
     auth: [authRoles('admin')],
-    body: async ({ actor, payload, auth }) => {
-      const { community_id } = mustBeAuthorized(actor, auth);
+    body: async ({ actor, payload }) => {
+      const { community_id } = payload;
       const { name, description, featured_in_sidebar, featured_in_new_post } =
         payload;
 

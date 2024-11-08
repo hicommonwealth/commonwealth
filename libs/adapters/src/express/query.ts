@@ -9,8 +9,12 @@ import { ZodSchema, z } from 'zod';
  * @returns express query handler
  */
 export const query =
-  <Input extends ZodSchema, Output extends ZodSchema, Auth extends ZodSchema>(
-    md: Metadata<Input, Output, Auth>,
+  <
+    Input extends ZodSchema,
+    Output extends ZodSchema,
+    Context extends ZodSchema,
+  >(
+    md: Metadata<Input, Output, Context>,
   ): RequestHandler =>
   async (
     req: Request,

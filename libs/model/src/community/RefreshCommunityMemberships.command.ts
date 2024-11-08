@@ -6,7 +6,6 @@ import { Op } from 'sequelize';
 import { config } from '../config';
 import { models } from '../database';
 import { authRoles } from '../middleware';
-import { mustBeAuthorized } from '../middleware/guards';
 import type {
   AddressAttributes,
   GroupAttributes,
@@ -127,9 +126,8 @@ export function RefreshCommunityMemberships(): Command<
   return {
     ...schemas.RefreshCommunityMemberships,
     auth: [authRoles('admin')],
-    body: async ({ actor, payload, auth }) => {
-      const { community_id } = mustBeAuthorized(actor, auth);
-      const { group_id } = payload;
+    body: async ({ payload }) => {
+      const { community_id, group_id } = payload;
 
       const groups = await models.Group.findAll({
         where: group_id ? { id: group_id, community_id } : { community_id },

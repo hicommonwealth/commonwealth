@@ -88,8 +88,8 @@ export function CreateThread(): Command<typeof schemas.CreateThread> {
       authTopic({ action: schemas.PermissionEnum.CREATE_THREAD }),
       verifyThreadSignature,
     ],
-    body: async ({ actor, payload, auth }) => {
-      const { address } = mustBeAuthorized(actor, auth);
+    body: async ({ actor, payload, context }) => {
+      const { address } = mustBeAuthorized(actor, context);
 
       const { community_id, topic_id, kind, url, ...rest } = payload;
 

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { CommentAuthContextSchema, ThreadAuthContextSchema } from '../auth';
+import { CommentContext, ThreadContext } from '../context';
 import { Comment, Reaction } from '../entities';
 import { DiscordMetaSchema, PG_INT } from '../utils';
 
@@ -18,7 +18,7 @@ export const CreateComment = {
     discord_meta: DiscordMetaSchema.optional(),
   }),
   output: Comment.extend({ community_id: z.string() }),
-  auth_context: ThreadAuthContextSchema,
+  context: ThreadContext,
 };
 
 export const UpdateComment = {
@@ -27,7 +27,7 @@ export const UpdateComment = {
     body: z.string().min(1),
   }),
   output: Comment.extend({ community_id: z.string() }),
-  auth_context: CommentAuthContextSchema,
+  context: CommentContext,
 };
 
 export const CommentCanvasReaction = z.object({
@@ -41,7 +41,7 @@ export const CommentCanvasReaction = z.object({
 export const CreateCommentReaction = {
   input: CommentCanvasReaction,
   output: Reaction.extend({ community_id: z.string() }),
-  auth_context: CommentAuthContextSchema,
+  context: CommentContext,
 };
 
 export const DeleteComment = {
@@ -53,5 +53,5 @@ export const DeleteComment = {
     canvas_signed_data: z.string().nullish(),
     canvas_msg_id: z.string().nullish(),
   }),
-  auth_context: CommentAuthContextSchema,
+  context: CommentContext,
 };

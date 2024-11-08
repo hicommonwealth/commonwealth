@@ -21,8 +21,8 @@ export function CreateThreadReaction(): Command<
       }),
       verifyReactionSignature,
     ],
-    body: async ({ payload, actor, auth }) => {
-      const { address, thread } = mustBeAuthorizedThread(actor, auth);
+    body: async ({ payload, actor, context }) => {
+      const { address, thread } = mustBeAuthorizedThread(actor, context);
 
       if (thread.archived_at)
         throw new InvalidState(CreateThreadReactionErrors.ThreadArchived);

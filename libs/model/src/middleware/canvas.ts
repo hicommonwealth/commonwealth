@@ -24,7 +24,7 @@ export const verifyThreadSignature = async ({
   payload,
 }: Context<
   typeof schemas.CanvasThread,
-  typeof schemas.ThreadAuthContextSchema | typeof schemas.TopicAuthContextSchema
+  typeof schemas.ThreadContext | typeof schemas.TopicContext
 >) => {
   if (hasCanvasSignedDataApiArgs(payload)) {
     const { canvasSignedData } = fromCanvasSignedDataApiArgs(payload);
@@ -50,7 +50,7 @@ export const verifyDeleteThreadSignature = async ({
   payload,
 }: Context<
   typeof schemas.DeleteThread.input,
-  typeof schemas.ThreadAuthContextSchema
+  typeof schemas.ThreadContext
 >) => {
   if (hasCanvasSignedDataApiArgs(payload)) {
     const { canvasSignedData } = fromCanvasSignedDataApiArgs(payload);
@@ -64,8 +64,7 @@ export const verifyCommentSignature = async ({
   payload,
 }: Context<
   typeof schemas.CanvasComment,
-  | typeof schemas.CommentAuthContextSchema
-  | typeof schemas.ThreadAuthContextSchema
+  typeof schemas.CommentContext | typeof schemas.ThreadContext
 >) => {
   if (hasCanvasSignedDataApiArgs(payload)) {
     const { canvasSignedData } = fromCanvasSignedDataApiArgs(payload);
@@ -89,8 +88,7 @@ export const verifyReactionSignature = async ({
   payload,
 }: Context<
   typeof schemas.ThreadCanvasReaction | typeof schemas.CommentCanvasReaction,
-  | typeof schemas.ThreadAuthContextSchema
-  | typeof schemas.CommentAuthContextSchema
+  typeof schemas.ThreadContext | typeof schemas.CommentContext
 >) => {
   if (hasCanvasSignedDataApiArgs(payload)) {
     const { canvasSignedData } = fromCanvasSignedDataApiArgs(payload);
@@ -127,7 +125,7 @@ export const verifyDeleteReactionSignature = async ({
   payload,
 }: Context<
   typeof schemas.DeleteReaction.input,
-  typeof schemas.ReactionAuthContextSchema
+  typeof schemas.ReactionContext
 >) => {
   if (hasCanvasSignedDataApiArgs(payload)) {
     const { canvasSignedData } = fromCanvasSignedDataApiArgs(payload);

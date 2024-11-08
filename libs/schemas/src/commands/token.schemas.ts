@@ -1,6 +1,6 @@
 import { ChainBase } from '@hicommonwealth/shared';
 import { z } from 'zod';
-import { AuthContextSchema } from '../auth';
+import { AuthContext } from '../context';
 import { Token } from '../entities';
 import { PG_INT } from '../utils';
 
@@ -16,5 +16,5 @@ export const CreateToken = {
     launchpad_contract_address: z.string(),
   }),
   output: Token,
-  auth_context: AuthContextSchema,
+  context: AuthContext,
 };

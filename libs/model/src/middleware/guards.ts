@@ -6,8 +6,8 @@ import {
 } from '@hicommonwealth/core';
 import {
   AuthContext,
-  CommentAuthContext,
-  ThreadAuthContext,
+  CommentContext,
+  ThreadContext,
 } from '@hicommonwealth/schemas';
 import moment from 'moment';
 import type { AddressInstance, ThreadInstance } from '../models';
@@ -66,12 +66,12 @@ export function mustBeSuperAdmin(actor: Actor) {
 
 /**
  * Address authorization guard
- * @param auth auth context
+ * @param context auth context
  * @returns narrowed auth context
  */
-export function mustBeAuthorized(actor: Actor, auth?: AuthContext) {
-  if (!auth?.address) throw new InvalidActor(actor, 'Not authorized');
-  return auth as AuthContext & {
+export function mustBeAuthorized(actor: Actor, context?: AuthContext) {
+  if (!context?.address) throw new InvalidActor(actor, 'Not authorized');
+  return context as AuthContext & {
     address: AddressInstance;
     community_id: string;
   };
@@ -79,13 +79,13 @@ export function mustBeAuthorized(actor: Actor, auth?: AuthContext) {
 
 /**
  * Thread authorization guard
- * @param auth auth context
+ * @param context auth context
  * @returns narrowed auth context
  */
-export function mustBeAuthorizedThread(actor: Actor, auth?: ThreadAuthContext) {
-  if (!auth?.address) throw new InvalidActor(actor, 'Not authorized');
-  if (!auth?.thread) throw new InvalidActor(actor, 'Not authorized thread');
-  return auth as AuthContext & {
+export function mustBeAuthorizedThread(actor: Actor, context?: ThreadContext) {
+  if (!context?.address) throw new InvalidActor(actor, 'Not authorized');
+  if (!context?.thread) throw new InvalidActor(actor, 'Not authorized thread');
+  return context as AuthContext & {
     address: AddressInstance;
     thread: ThreadInstance;
     community_id: string;
@@ -96,16 +96,17 @@ export function mustBeAuthorizedThread(actor: Actor, auth?: ThreadAuthContext) {
 
 /**
  * Comment authorization guard
- * @param auth auth context
+ * @param context auth context
  * @returns narrowed auth context
  */
 export function mustBeAuthorizedComment(
   actor: Actor,
-  auth?: CommentAuthContext,
+  context?: CommentContext,
 ) {
-  if (!auth?.address) throw new InvalidActor(actor, 'Not authorized');
-  if (!auth?.comment) throw new InvalidActor(actor, 'Not authorized comment');
-  return auth as CommentAuthContext & {
+  if (!context?.address) throw new InvalidActor(actor, 'Not authorized');
+  if (!context?.comment)
+    throw new InvalidActor(actor, 'Not authorized comment');
+  return context as CommentContext & {
     address: AddressInstance;
     comment: ThreadInstance;
     community_id: string;

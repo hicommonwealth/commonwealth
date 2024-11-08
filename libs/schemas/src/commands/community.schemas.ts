@@ -9,7 +9,7 @@ import {
   WalletId,
 } from '@hicommonwealth/shared';
 import { z } from 'zod';
-import { AuthContextSchema, TopicAuthContextSchema } from '../auth';
+import { AuthContext, TopicContext } from '../context';
 import {
   Community,
   Group,
@@ -76,7 +76,7 @@ export const SetCommunityStake = {
     stake_enabled: z.coerce.boolean().default(true),
   }),
   output: Community,
-  auth_context: AuthContextSchema,
+  context: AuthContext,
 };
 
 export const CreateStakeTransaction = {
@@ -85,7 +85,7 @@ export const CreateStakeTransaction = {
     transaction_hash: z.string().length(66),
   }),
   output: StakeTransaction,
-  auth_context: AuthContextSchema,
+  context: AuthContext,
 };
 
 export const RefreshCustomDomain = {
@@ -122,7 +122,7 @@ export const UpdateCustomDomain = {
     updated_at: z.string().datetime(),
     sni_endpoint: z.null(),
   }),
-  auth_context: AuthContextSchema,
+  context: AuthContext,
 };
 
 const Snapshot = z.string().regex(/.+\.(eth|xyz)$/);
@@ -147,7 +147,7 @@ export const UpdateCommunity = {
       transactionHash: z.string().optional(),
     }),
   output: Community,
-  auth_context: AuthContextSchema,
+  context: AuthContext,
 };
 
 export const GenerateStakeholderGroups = {
@@ -184,7 +184,7 @@ export const CreateTopic = {
     topic: Topic.partial(),
     user_id: z.number(),
   }),
-  auth_context: AuthContextSchema,
+  context: AuthContext,
 };
 
 export const UpdateTopic = {
@@ -208,7 +208,7 @@ export const UpdateTopic = {
     topic: Topic.partial(),
     user_id: z.number(),
   }),
-  auth_context: TopicAuthContextSchema,
+  context: TopicContext,
 };
 
 export const DeleteTopic = {
@@ -220,7 +220,7 @@ export const DeleteTopic = {
     community_id: z.string(),
     topic_id: PG_INT,
   }),
-  auth_context: TopicAuthContextSchema,
+  context: TopicContext,
 };
 
 const GroupMetadata = z.object({
@@ -245,7 +245,7 @@ export const CreateGroup = {
       .optional(),
   }),
   output: Community.extend({ groups: z.array(Group).optional() }).partial(),
-  auth_context: AuthContextSchema,
+  context: AuthContext,
 };
 
 export const UpdateGroup = {
@@ -264,7 +264,7 @@ export const UpdateGroup = {
       .optional(),
   }),
   output: Group.partial(),
-  auth_context: AuthContextSchema,
+  context: AuthContext,
 };
 
 export const DeleteGroup = {
@@ -276,7 +276,7 @@ export const DeleteGroup = {
     community_id: z.string(),
     group_id: PG_INT,
   }),
-  auth_context: AuthContextSchema,
+  context: AuthContext,
 };
 
 export const DeleteCommunity = {
@@ -286,7 +286,7 @@ export const DeleteCommunity = {
   output: z.object({
     community_id: z.string(),
   }),
-  auth_context: AuthContextSchema,
+  context: AuthContext,
 };
 
 export const RefreshCommunityMemberships = {
@@ -299,7 +299,7 @@ export const RefreshCommunityMemberships = {
     created: z.number(),
     updated: z.number(),
   }),
-  auth_context: AuthContextSchema,
+  context: AuthContext,
 };
 
 export const JoinCommunity = {
@@ -322,5 +322,5 @@ export const BanAddress = {
     address: z.string(),
   }),
   output: z.object({}),
-  auth_context: AuthContextSchema,
+  context: AuthContext,
 };

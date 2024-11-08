@@ -14,8 +14,8 @@ export function DeleteCommunity(): Command<typeof schemas.DeleteCommunity> {
   return {
     ...schemas.DeleteCommunity,
     auth: [authRoles('admin')],
-    body: async ({ actor, auth }) => {
-      const { community_id } = mustBeAuthorized(actor, auth);
+    body: async ({ actor, context }) => {
+      const { community_id } = mustBeAuthorized(actor, context);
 
       if (!actor.user.isAdmin)
         throw new InvalidActor(actor, DeleteCommunityErrors.NotAdmin);

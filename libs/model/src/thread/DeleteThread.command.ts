@@ -13,8 +13,8 @@ export function DeleteThread(): Command<typeof schemas.DeleteThread> {
   return {
     ...schemas.DeleteThread,
     auth: [authThread({ author: true }), verifyDeleteThreadSignature],
-    body: async ({ actor, auth }) => {
-      const { thread } = mustBeAuthorizedThread(actor, auth);
+    body: async ({ actor, context }) => {
+      const { thread } = mustBeAuthorizedThread(actor, context);
 
       const found = await models.ContestManager.findOne({
         where: { topic_id: thread.topic_id! },

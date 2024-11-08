@@ -8,8 +8,8 @@ export function DeleteComment(): Command<typeof schemas.DeleteComment> {
   return {
     ...schemas.DeleteComment,
     auth: [authComment({ author: true })],
-    body: async ({ actor, auth }) => {
-      const { comment } = mustBeAuthorizedComment(actor, auth);
+    body: async ({ actor, context }) => {
+      const { comment } = mustBeAuthorizedComment(actor, context);
 
       // == mutation transaction boundary ==
       await models.sequelize.transaction(async (transaction) => {

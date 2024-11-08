@@ -1,6 +1,6 @@
 import { commonProtocol } from '@hicommonwealth/shared';
 import z from 'zod';
-import { AuthContextSchema } from '../auth';
+import { AuthContext } from '../context';
 import { ContestManager } from '../entities';
 import { PG_INT } from '../utils';
 
@@ -37,7 +37,7 @@ export const CreateContestManagerMetadata = {
   output: z.object({
     contest_managers: z.array(ContestManager),
   }),
-  auth_context: AuthContextSchema,
+  context: AuthContext,
 };
 
 export const UpdateContestManagerMetadata = {
@@ -51,7 +51,7 @@ export const UpdateContestManagerMetadata = {
   output: z.object({
     contest_managers: z.array(ContestManager),
   }),
-  auth_context: AuthContextSchema,
+  context: AuthContext,
 };
 
 export const CancelContestManagerMetadata = {
@@ -62,7 +62,7 @@ export const CancelContestManagerMetadata = {
   output: z.object({
     contest_managers: z.array(ContestManager),
   }),
-  auth_context: AuthContextSchema,
+  context: AuthContext,
 };
 
 export const ResumeContestManagerMetadata = {
@@ -73,7 +73,7 @@ export const ResumeContestManagerMetadata = {
   output: z.object({
     contest_managers: z.array(ContestManager),
   }),
-  auth_context: AuthContextSchema,
+  context: AuthContext,
 };
 
 export const PerformContestRollovers = {
