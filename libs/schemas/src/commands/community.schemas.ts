@@ -56,7 +56,7 @@ export const CreateCommunity = {
     discord: z.string().url().startsWith('https://discord.com/').optional(),
   }),
   output: z.object({
-    community: Community.optional(),
+    community: Community,
     admin_address: z.string().optional(),
   }),
 };
@@ -74,7 +74,7 @@ export const SetCommunityStake = {
       .default(1),
     stake_enabled: z.coerce.boolean().default(true),
   }),
-  output: Community.optional(),
+  output: Community,
 };
 
 export const CreateStakeTransaction = {
