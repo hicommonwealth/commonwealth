@@ -33,7 +33,7 @@ const ThreadPreviewModal = ({
   };
 
   return (
-    <div className="thread-preview-modal">
+    <div className="ThreadPreviewModal">
       <div className="modal-overlay" onClick={onClose}></div>
       <div className="modal-content">
         <div className="modal-left">

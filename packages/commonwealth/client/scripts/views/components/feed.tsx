@@ -35,7 +35,7 @@ type FeedThreadProps = {
   onClick: () => void;
 };
 
-const FeedThread: React.FC<FeedThreadProps> = ({ thread, onClick }) => {
+const FeedThread = ({ thread, onClick }: FeedThreadProps) => {
   const navigate = useCommonNavigate();
   const user = useUserStore();
   const { data: domain } = useFetchCustomDomainQuery();
