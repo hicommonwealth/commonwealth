@@ -51,7 +51,7 @@ type DiscussionsPageProps = {
   updateActiveTab?: (tabValue: string) => void;
 };
 const TABS = [
-  { value: 'all', label: 'ALL' },
+  { value: 'all', label: 'All' },
   { value: 'overview', label: 'Overview' },
 ];
 const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
