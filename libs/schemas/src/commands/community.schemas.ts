@@ -74,7 +74,7 @@ export const SetCommunityStake = {
       .default(1),
     stake_enabled: z.coerce.boolean().default(true),
   }),
-  output: Community,
+  output: Community.optional(),
 };
 
 export const CreateStakeTransaction = {
