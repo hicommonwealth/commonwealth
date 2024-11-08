@@ -21,7 +21,7 @@ export function ArchiveTopic(): Command<
 
       await models.sequelize.transaction(async (transaction) => {
         await models.Thread.update(
-          { topic_id: null },
+          { archived_at: new Date() },
           {
             where: {
               community_id: topic.community_id,
@@ -30,7 +30,8 @@ export function ArchiveTopic(): Command<
             transaction,
           },
         );
-        await topic.destroy({ transaction });
+        topic.archived_at = new Date();
+        await topic.save({ transaction });
       });
 
       return { community_id, topic_id: topic.id! };
