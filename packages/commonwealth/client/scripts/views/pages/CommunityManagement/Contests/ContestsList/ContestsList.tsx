@@ -1,15 +1,18 @@
 import moment from 'moment';
 import React, { useState } from 'react';
 
+import { useFlag } from 'hooks/useFlag';
 import { Skeleton } from 'views/components/Skeleton';
 
 import EmptyContestsList from '../EmptyContestsList';
 import FundContestDrawer from '../FundContestDrawer';
+import { ContestView } from '../types';
 import ContestCard from './ContestCard';
 
 import './ContestsList.scss';
 
 export type Contest = {
+  is_farcaster_contest?: boolean;
   community_id?: string;
   contest_address?: string;
   created_at?: Date;
@@ -42,9 +45,8 @@ interface ContestsListProps {
   contests: Contest[];
   isAdmin: boolean;
   isLoading: boolean;
-  hasWeightedTopic: boolean;
   isContestAvailable: boolean;
-  onSetContestSelectionView?: () => void;
+  onSetContestView?: (type: ContestView) => void;
   displayAllRecurringContests?: boolean;
 }
 
@@ -52,12 +54,12 @@ const ContestsList = ({
   contests,
   isAdmin,
   isLoading,
-  hasWeightedTopic,
   isContestAvailable,
-  onSetContestSelectionView,
+  onSetContestView,
   displayAllRecurringContests = false,
 }: ContestsListProps) => {
   const [fundDrawerContest, setFundDrawerContest] = useState<Contest>();
+  const farcasterContestEnabled = useFlag('farcasterContest');
 
   if (isLoading) {
     return (
@@ -72,12 +74,8 @@ const ContestsList = ({
   return (
     <>
       <div className="ContestsList">
-        {isAdmin && (!hasWeightedTopic || !isContestAvailable) ? (
-          <EmptyContestsList
-            hasWeightedTopic={hasWeightedTopic}
-            isContestAvailable={isContestAvailable}
-            onSetContestSelectionView={onSetContestSelectionView}
-          />
+        {isAdmin && !isContestAvailable ? (
+          <EmptyContestsList onSetContestView={onSetContestView} />
         ) : (
           contests.map((contest) => {
             const sortedContests = (contest?.contests || []).toSorted((a, b) =>
@@ -107,6 +105,9 @@ const ContestsList = ({
                   onFund={() => setFundDrawerContest(contest)}
                   isRecurring={!contest.funding_token_address}
                   payoutStructure={contest.payout_structure}
+                  isFarcaster={
+                    farcasterContestEnabled && contest.is_farcaster_contest
+                  }
                 />
               );
             } else {
@@ -130,6 +131,9 @@ const ContestsList = ({
                   onFund={() => setFundDrawerContest(contest)}
                   isRecurring={!contest.funding_token_address}
                   payoutStructure={contest.payout_structure}
+                  isFarcaster={
+                    farcasterContestEnabled && contest.is_farcaster_contest
+                  }
                 />
               ));
             }
