@@ -4,12 +4,12 @@ import { models } from '../database';
 import { AuthContext, isAuthorized } from '../middleware';
 import { mustBeAuthorized, mustExist } from '../middleware/guards';
 
-export function DeleteTopic(): Command<
-  typeof schemas.DeleteTopic,
+export function ArchiveTopic(): Command<
+  typeof schemas.ArchiveTopic,
   AuthContext
 > {
   return {
-    ...schemas.DeleteTopic,
+    ...schemas.ArchiveTopic,
     auth: [isAuthorized({ roles: ['admin', 'moderator'] })],
     body: async ({ actor, auth }) => {
       const { community_id, topic_id } = mustBeAuthorized(actor, auth);

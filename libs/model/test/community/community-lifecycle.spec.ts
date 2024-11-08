@@ -14,6 +14,7 @@ import { CreateTopic } from 'model/src/community/CreateTopic.command';
 import { UpdateTopic } from 'model/src/community/UpdateTopic.command';
 import { afterAll, assert, beforeAll, describe, expect, test } from 'vitest';
 import {
+  ArchiveTopic,
   BanAddress,
   BanAddressErrors,
   CreateCommunity,
@@ -21,7 +22,6 @@ import {
   CreateGroupErrors,
   DeleteGroup,
   DeleteGroupErrors,
-  DeleteTopic,
   GetCommunities,
   GetMembers,
   GetTopics,
@@ -555,7 +555,7 @@ describe('Community lifecycle', () => {
           description: '',
         },
       }))!;
-      const response = await command(DeleteTopic(), {
+      const response = await command(ArchiveTopic(), {
         actor: ethAdminActor,
         payload: { community_id: community.id, topic_id: topic!.id! },
       });
@@ -575,7 +575,7 @@ describe('Community lifecycle', () => {
       }))!;
 
       await expect(
-        command(DeleteTopic(), {
+        command(ArchiveTopic(), {
           actor: ethActor,
           payload: { community_id: community.id, topic_id: topic!.id! },
         }),

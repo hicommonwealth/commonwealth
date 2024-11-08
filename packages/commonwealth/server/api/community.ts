@@ -114,7 +114,7 @@ export const trpcRouter = trpc.router({
       userId: result.user_id,
     }),
   ]),
-  deleteTopic: trpc.command(Community.DeleteTopic, trpc.Tag.Community),
+  archiveTopic: trpc.command(Community.ArchiveTopic, trpc.Tag.Community),
   deleteGroup: trpc.command(Community.DeleteGroup, trpc.Tag.Community),
   deleteCommunity: trpc.command(Community.DeleteCommunity, trpc.Tag.Community),
   refreshCommunityMemberships: trpc.command(

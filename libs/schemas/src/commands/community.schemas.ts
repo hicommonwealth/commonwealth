@@ -205,7 +205,7 @@ export const UpdateTopic = {
   }),
 };
 
-export const DeleteTopic = {
+export const ArchiveTopic = {
   input: z.object({
     community_id: z.string(),
     topic_id: PG_INT,

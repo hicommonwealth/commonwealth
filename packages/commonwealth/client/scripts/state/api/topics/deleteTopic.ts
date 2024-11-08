@@ -2,7 +2,7 @@ import { trpc } from 'utils/trpcClient';
 
 const useDeleteTopicMutation = () => {
   const utils = trpc.useUtils();
-  return trpc.community.deleteTopic.useMutation({
+  return trpc.community.archiveTopic.useMutation({
     onSuccess: async (response) => {
       await utils.community.getTopics.invalidate({
         community_id: response.community_id,
