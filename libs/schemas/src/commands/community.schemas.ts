@@ -205,10 +205,11 @@ export const UpdateTopic = {
   }),
 };
 
-export const ArchiveTopic = {
+export const ToggleArchiveTopic = {
   input: z.object({
     community_id: z.string(),
     topic_id: PG_INT,
+    archive: z.boolean(),
   }),
   output: z.object({
     community_id: z.string(),

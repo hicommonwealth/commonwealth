@@ -1,4 +1,3 @@
-export * from './ArchiveTopic.command';
 export * from './BanAddress.command';
 export * from './CreateCommunity.command';
 export * from './CreateGroup.command';
@@ -18,6 +17,7 @@ export * from './JoinCommunity.command';
 export * from './RefreshCommunityMemberships.command';
 export * from './RefreshCustomDomain.query';
 export * from './SetCommunityStake.command';
+export * from './ToggleArchiveTopic.command';
 export * from './UpdateCommunity.command';
 export * from './UpdateCustomDomain.command';
 export * from './UpdateGroup.command';
