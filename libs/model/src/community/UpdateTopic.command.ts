@@ -23,6 +23,10 @@ export function UpdateTopic(): Command<
       const topic = await models.Topic.findByPk(topic_id!);
       mustExist('Topic', topic);
 
+      if (topic.archived_at) {
+        throw new InvalidState('Cannot update archived topic');
+      }
+
       const {
         name,
         description,
