@@ -143,7 +143,7 @@ async function validateExternalApiVersioning() {
     },
   });
   await Promise.all([unlink(productionOasPath), unlink(localOasPath)]);
-  console.log('OpenAPI spec diff:', result);
+  console.log('OpenAPI spec diff:', JSON.stringify(result, null, 2));
 
   if (result.breakingDifferencesFound) {
     throw Error('External API has breaking changes, update the Major version');
