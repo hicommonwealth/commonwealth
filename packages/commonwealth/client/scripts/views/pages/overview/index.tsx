@@ -1,12 +1,12 @@
 import { splitAndDecodeURL } from '@hicommonwealth/shared';
+import useRunOnceOnCondition from 'client/scripts/hooks/useRunOnceOnCondition';
 import { useCommonNavigate } from 'navigation/helpers';
 import 'pages/discussions/index.scss';
 import 'pages/overview/index.scss';
-import React, { useEffect } from 'react';
+import React from 'react';
 import app from 'state';
 import { useFetchThreadsQuery } from 'state/api/threads';
 import { useFetchTopicsQuery } from 'state/api/topics';
-import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import type Thread from '../../../models/Thread';
 import type { Topic } from '../../../models/Topic';
 import { CWDivider } from '../../components/component_kit/cw_divider';
@@ -17,15 +17,18 @@ import { TopicSummaryRow } from './TopicSummaryRow';
 const OverviewPage = () => {
   const navigate = useCommonNavigate();
   const topicNameFromURL = splitAndDecodeURL(location.pathname);
-  useEffect(() => {
-    if (topicNameFromURL === 'overview') {
-      const params = new URLSearchParams();
-      params.set('tab', 'overview');
-      const url = `/discussions?${params.toString()}`;
-      navigate(url);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+
+  useRunOnceOnCondition({
+    callback: () => {
+      if (topicNameFromURL === 'overview') {
+        const params = new URLSearchParams();
+        params.set('tab', 'overview');
+        const url = `/discussions?${params.toString()}`;
+        navigate(url);
+      }
+    },
+    shouldRun: topicNameFromURL === 'overview',
+  });
 
   const communityId = app.activeChainId() || '';
   const { data: recentlyActiveThreads, isLoading } = useFetchThreadsQuery({
@@ -36,6 +39,7 @@ const OverviewPage = () => {
     apiEnabled: !!communityId,
   });
 
+  console.log('i am called');
   const { data: topics = [] } = useFetchTopicsQuery({
     communityId,
     apiEnabled: !!communityId,
@@ -76,32 +80,30 @@ const OverviewPage = () => {
   return !topicSummaryRows.length ? (
     <PageLoading />
   ) : (
-    <CWPageLayout>
-      <div className="OverviewPage">
-        <div className="column-headers-row">
+    <div className="OverviewPage">
+      <div className="column-headers-row">
+        <CWText
+          type="h5"
+          fontWeight="semiBold"
+          className="threads-header-row-text"
+        >
+          Topic
+        </CWText>
+        <div className="threads-header-container">
           <CWText
             type="h5"
             fontWeight="semiBold"
             className="threads-header-row-text"
           >
-            Topic
+            Recent threads
           </CWText>
-          <div className="threads-header-container">
-            <CWText
-              type="h5"
-              fontWeight="semiBold"
-              className="threads-header-row-text"
-            >
-              Recent threads
-            </CWText>
-          </div>
         </div>
-        <CWDivider />
-        {topicSummaryRows.map((row, i) => (
-          <TopicSummaryRow {...row} key={i} isLoading={isLoading} />
-        ))}
       </div>
-    </CWPageLayout>
+      <CWDivider />
+      {topicSummaryRows.map((row, i) => (
+        <TopicSummaryRow {...row} key={i} isLoading={isLoading} />
+      ))}
+    </div>
   );
 };
 

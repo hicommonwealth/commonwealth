@@ -91,11 +91,10 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
 
   const containerRef = useRef();
   useLayoutEffect(() => {
-    if (tabStatus) {
+    if (tabStatus === 'overview') {
       setSelectedTab(TABS[1].value);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [tabStatus]);
 
   useBrowserWindow({});
 
@@ -156,7 +155,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
       contestAddress,
       // @ts-expect-error <StrictNullChecks/>
       contestStatus,
-      apiEnabled: !!communityId,
+      apiEnabled: !!communityId && selectedTab === 'all',
     });
 
   const threads = sortPinned(sortByFeaturedFilter(data || [], featuredFilter));
@@ -226,6 +225,9 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
         )
       : '';
   const updateActiveTab = (activeTab: string) => {
+    const params = new URLSearchParams();
+    params.set('tab', activeTab);
+    navigate(`${window.location.pathname}?${params.toString()}`, {}, null);
     setSelectedTab(activeTab);
   };
 
@@ -275,6 +277,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
             }}
           />
         )}
+
         <HeaderWithFilters
           // @ts-expect-error <StrictNullChecks/>
           topic={topicName}
