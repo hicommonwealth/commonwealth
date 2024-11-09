@@ -34,7 +34,7 @@ export function ToggleArchiveTopic(): Command<
           {
             where: {
               community_id: topic.community_id,
-              topic_id,
+              topic_id: topic_id!,
               // don't update archival date for already archived threads
               // see warning above
               archived_at: null,

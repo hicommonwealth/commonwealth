@@ -35,6 +35,7 @@ describe('CommentCreated Event Handler', () => {
     subscriber: z.infer<typeof schemas.User> | undefined,
     mentionedUser: z.infer<typeof schemas.User> | undefined,
     thread: z.infer<typeof schemas.Thread> | undefined,
+    topic: z.infer<typeof schemas.Topic> | undefined,
     rootComment: z.infer<typeof schemas.Comment> | undefined,
     replyComment: z.infer<typeof schemas.Comment> | undefined,
     mentionedComment: z.infer<typeof schemas.Comment> | undefined,
@@ -79,10 +80,13 @@ describe('CommentCreated Event Handler', () => {
       ],
     });
 
+    [topic] = await tester.seed('Topic', {
+      name: 'test',
+    });
     [thread] = await tester.seed('Thread', {
       community_id: community!.id!,
       address_id: community!.Addresses![1].id,
-      topic_id: null,
+      topic_id: topic!.id!,
       deleted_at: null,
       read_only: false,
       pinned: false,

@@ -14,7 +14,6 @@ import { CreateTopic } from 'model/src/community/CreateTopic.command';
 import { UpdateTopic } from 'model/src/community/UpdateTopic.command';
 import { afterAll, assert, beforeAll, describe, expect, test } from 'vitest';
 import {
-  ArchiveTopic,
   BanAddress,
   BanAddressErrors,
   CreateCommunity,
@@ -28,6 +27,7 @@ import {
   JoinCommunity,
   JoinCommunityErrors,
   MAX_GROUPS_PER_COMMUNITY,
+  ToggleArchiveTopic,
   UpdateCommunity,
   UpdateCommunityErrors,
 } from '../../src/community';
@@ -544,7 +544,7 @@ describe('Community lifecycle', () => {
       expect(updatedTopic.description).to.eq('newDesc');
     });
 
-    test('should delete a topic', async () => {
+    test('should archive a topic', async () => {
       const { topic } = (await command(CreateTopic(), {
         actor: superAdminActor,
         payload: {
@@ -555,11 +555,21 @@ describe('Community lifecycle', () => {
           description: '',
         },
       }))!;
-      const response = await command(ArchiveTopic(), {
+      const response = await command(ToggleArchiveTopic(), {
         actor: ethAdminActor,
-        payload: { community_id: community.id, topic_id: topic!.id! },
+        payload: {
+          community_id: community.id,
+          topic_id: topic!.id!,
+          archive: true,
+        },
       });
       expect(response?.topic_id).to.equal(topic.id);
+      const archivedTopic = await models.Topic.findOne({
+        where: {
+          id: topic!.id!,
+        },
+      });
+      expect(archivedTopic?.archived_at).toBeTruthy();
     });
 
     test('should throw if not authorized', async () => {
@@ -575,9 +585,13 @@ describe('Community lifecycle', () => {
       }))!;
 
       await expect(
-        command(ArchiveTopic(), {
+        command(ToggleArchiveTopic(), {
           actor: ethActor,
-          payload: { community_id: community.id, topic_id: topic!.id! },
+          payload: {
+            community_id: community.id,
+            topic_id: topic!.id!,
+            archive: true,
+          },
         }),
       ).rejects.toThrow(InvalidActor);
     });

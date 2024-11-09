@@ -26,6 +26,7 @@ describe('userMentioned Event Handler', () => {
   let community: z.infer<typeof schemas.Community> | undefined;
   let user, author: z.infer<typeof schemas.User> | undefined;
   let thread: z.infer<typeof schemas.Thread> | undefined;
+  let topic: z.infer<typeof schemas.Topic> | undefined;
   let sandbox: sinon.SinonSandbox;
 
   beforeAll(async () => {
@@ -57,12 +58,13 @@ describe('userMentioned Event Handler', () => {
         },
       ],
     });
+    [topic] = await tester.seed('Topic', {
+      name: 'test',
+    });
     [thread] = await tester.seed('Thread', {
-      // @ts-expect-error StrictNullChecks
-      community_id: community.id,
-      // @ts-expect-error StrictNullChecks
-      address_id: community.Addresses[1].id,
-      topic_id: null,
+      community_id: community!.id!,
+      address_id: community!.Addresses![1].id!,
+      topic_id: topic!.id!,
       deleted_at: null,
       pinned: false,
       read_only: false,
