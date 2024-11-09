@@ -159,13 +159,13 @@ export type EventHandler<
 export type Metadata<
   Input extends ZodSchema,
   Output extends ZodSchema,
-  Context extends ZodSchema,
+  _Context extends ZodSchema,
 > = {
   readonly input: Input;
   readonly output: Output;
-  readonly context?: Context;
-  readonly auth: Handler<Input, Output, Context>[];
-  readonly body: Handler<Input, Output, Context>;
+  readonly context?: _Context;
+  readonly auth: Handler<Input, Output, _Context>[];
+  readonly body: Handler<Input, Output, _Context>;
   readonly secure?: boolean;
   readonly authStrategy?: AuthStrategies;
 };
@@ -198,27 +198,27 @@ export type EventsHandlerMetadata<
 export type Schemas<
   Input extends ZodSchema,
   Output extends ZodSchema,
-  Context extends ZodSchema,
+  _Context extends ZodSchema,
 > = {
   input: Input;
   output: Output;
-  context?: Context;
+  context?: _Context;
 };
 
 /**
  * Command metadata
  */
 export type Command<Schema> =
-  Schema extends Schemas<infer Input, infer Output, infer Context>
-    ? Metadata<Input, Output, Context>
+  Schema extends Schemas<infer Input, infer Output, infer _Context>
+    ? Metadata<Input, Output, _Context>
     : never;
 
 /**
  * Query metadata
  */
 export type Query<Schema> =
-  Schema extends Schemas<infer Input, infer Output, infer Context>
-    ? Metadata<Input, Output, Context>
+  Schema extends Schemas<infer Input, infer Output, infer _Context>
+    ? Metadata<Input, Output, _Context>
     : never;
 
 /**

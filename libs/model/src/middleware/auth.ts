@@ -74,8 +74,6 @@ async function findThread(
       ({ address }) => address === actor.address,
     );
     is_collaborator = !!found;
-    if (!is_collaborator)
-      throw new InvalidActor(actor, 'Not authorized collaborator');
   }
 
   return {
@@ -261,12 +259,6 @@ async function hasTopicPermissions(
 
 /**
  * Generic authorization guard used by all middleware once the authorization context is loaded
- * - **system actor**: Always allowed
- * - **admin**: Always allowed when the actor is an admin or super admin
- * - **not banned**: Rejects banned actors
- * - **topic group permissions**: Allows when actor has group permissions in topic
- * - **author**: Allows when actor is the creator of the entity
- * - **collaborators**: Allows when actor is a collaborator in the thread
  */
 async function mustBeAuthorized(
   { actor, context }: Context<ZodSchema, ZodSchema>,
@@ -279,10 +271,19 @@ async function mustBeAuthorized(
     collaborators?: z.infer<typeof Address>[];
   } = {},
 ) {
+  // System actors are always allowed
   if (actor.is_system_actor) return;
+
+  // Admins (and super admins) are always allowed to act on any entity
   if (actor.user.isAdmin || context.address.role === 'admin') return;
+
+  // Banned actors are always rejected (if not admin or system actors)
   if (context.address.is_banned) throw new BannedActor(actor);
 
+  // Author is always allowed to act on their own entity, unless banned
+  if (context.is_author) return;
+
+  // Allows when actor has group permissions in topic
   if (check.permissions)
     return await hasTopicPermissions(
       actor,
@@ -291,8 +292,7 @@ async function mustBeAuthorized(
       check.permissions.topic_id,
     );
 
-  if (context.is_author) return;
-
+  // Allows when actor is a collaborator in the thread
   if (check.collaborators) {
     const found = check.collaborators?.find(
       ({ address }) => address === actor.address,
@@ -302,9 +302,12 @@ async function mustBeAuthorized(
     throw new InvalidActor(actor, 'Not authorized collaborator');
   }
 
-  // enforce author check
-  if (check.author && context.address.role === 'member')
-    throw new InvalidActor(actor, 'Not authorized author');
+  // At this point, we know the actor is not the author of the entity
+  // and it's also not an admin, system actor, or collaborator...
+  // This guard is used to enforce that the author is the only one who can
+  // perform actions on the entity.
+  if (check.author)
+    throw new InvalidActor(actor, 'Not the author of the entity');
 }
 
 /**
@@ -486,6 +489,7 @@ export function authReaction() {
       ctx.actor,
       auth.community_id,
       ['admin', 'moderator', 'member'],
+      auth.author_address_id,
     );
 
     (ctx as { context: ReactionContext }).context = {
