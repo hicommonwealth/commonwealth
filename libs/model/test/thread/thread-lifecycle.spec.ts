@@ -903,7 +903,7 @@ describe('Thread lifecycle', () => {
           reaction_id: reaction!.id!,
         },
       });
-      expect(deleted).to.include({ reaction_id: reaction!.id });
+      expect(deleted).to.be.true;
     });
 
     test('should throw error when reaction not found', () => {
@@ -1024,7 +1024,7 @@ describe('Thread lifecycle', () => {
           reaction_id: reaction!.id!,
         },
       });
-      expect(deleted).to.include({ reaction_id: reaction!.id });
+      expect(deleted).to.be.true;
     });
 
     test('should throw when trying to delete a reaction that is not yours', async () => {

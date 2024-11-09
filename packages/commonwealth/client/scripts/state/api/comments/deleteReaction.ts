@@ -53,24 +53,26 @@ const useDeleteCommentReactionMutation = ({
   const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
 
   return trpc.thread.deleteReaction.useMutation({
-    onSuccess: (deleted) => {
+    onSuccess: (deleted, variables) => {
       // update fetch comments query state
-      const key = [ApiEndpoints.FETCH_COMMENTS, communityId, threadId];
-      queryClient.cancelQueries({ queryKey: key });
-      queryClient.setQueryData(key, () => {
-        const tempComments = [...comments];
-        return tempComments.map((comment) => {
-          if (comment.id === commentId) {
-            return {
-              ...comment,
-              reactions: comment.reactions.filter(
-                (r) => r.id !== deleted.reaction_id,
-              ),
-            };
-          }
-          return comment;
+      if (deleted) {
+        const key = [ApiEndpoints.FETCH_COMMENTS, communityId, threadId];
+        queryClient.cancelQueries({ queryKey: key });
+        queryClient.setQueryData(key, () => {
+          const tempComments = [...comments];
+          return tempComments.map((comment) => {
+            if (comment.id === commentId) {
+              return {
+                ...comment,
+                reactions: comment.reactions.filter(
+                  (r) => r.id !== variables.reaction_id,
+                ),
+              };
+            }
+            return comment;
+          });
         });
-      });
+      }
     },
     onError: (error) => checkForSessionKeyRevalidationErrors(error),
   });

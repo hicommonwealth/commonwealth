@@ -188,8 +188,6 @@ describe('Contests metadata commands lifecycle', () => {
     test(`should create contest manager metadata`, async () => {
       const contest_address = '0xContestAddress';
 
-      console.log(topics);
-
       const createResult = await command(
         Contest.CreateContestManagerMetadata(),
         {
