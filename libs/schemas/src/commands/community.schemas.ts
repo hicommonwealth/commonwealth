@@ -128,7 +128,7 @@ export const UpdateCustomDomain = {
 const Snapshot = z.string().regex(/.+\.(eth|xyz)$/);
 
 export const UpdateCommunity = {
-  input: Community.omit({ network: true, custom_domain: true })
+  input: Community.omit({ id: true, network: true, custom_domain: true })
     .partial()
     .extend({
       community_id: z.string(),

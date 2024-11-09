@@ -20,7 +20,7 @@ export function UpdateCommunity(): Command<typeof schemas.UpdateCommunity> {
     auth: [authRoles('admin')],
     body: async ({ actor, payload }) => {
       const {
-        id,
+        community_id,
         snapshot,
         name,
         description,
@@ -43,7 +43,7 @@ export function UpdateCommunity(): Command<typeof schemas.UpdateCommunity> {
       } = payload;
 
       const community = await models.Community.findOne({
-        where: { id },
+        where: { id: community_id },
         include: [
           {
             model: models.ChainNode,
