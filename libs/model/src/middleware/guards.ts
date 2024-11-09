@@ -146,7 +146,7 @@ export function mustBeValidDateRange(
   const rangeInDays = end.diff(start, 'days');
   if (rangeInDays < minDaysInRange)
     throw new InvalidState(
-      `Start ${start.format('YYYY-MM-DD')} and End ${end.format('YYYY-MM-DD')} dates range must be at least ${minDaysInRange} days apart, but are ${rangeInDays} days apart`,
+      `${start.format('YYYY-MM-DD')} - ${end.format('YYYY-MM-DD')} must be at least ${minDaysInRange} days apart.`,
       { start_date, end_date },
     );
 
