@@ -16,3 +16,10 @@ export const GetQuest = {
   output: QuestView.optional(),
   context: AuthContext,
 };
+
+export const GetQuests = {
+  input: z.object({
+    community_id: z.string(),
+  }),
+  output: z.array(QuestView),
+};
