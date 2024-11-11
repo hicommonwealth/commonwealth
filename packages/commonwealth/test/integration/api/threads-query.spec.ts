@@ -27,15 +27,20 @@ describe('Thread queries', () => {
   });
 
   test('query_thread_through_collaborations', async () => {
-    const chain = await models.Community.findOne();
+    const community = await models.Community.findOne();
+    const topic = await models.Topic.findOne({
+      where: {
+        community_id: community!.id!,
+      },
+    });
     // @ts-expect-error StrictNullChecks
-    expect(chain.id).to.not.be.null;
+    expect(community.id).to.not.be.null;
     const address = (
       await models.Address.findOrCreate({
         where: {
           address: 'JhgYcbJOdWHLVFHJKLPhC12',
           // @ts-expect-error StrictNullChecks
-          community_id: chain.id,
+          community_id: community.id,
           verification_token: 'fgdfgd',
         },
       })
@@ -45,12 +50,13 @@ describe('Thread queries', () => {
     const thread = (
       await models.Thread.findOrCreate({
         where: {
-          community_id: chain!.id,
+          community_id: community!.id,
           address_id: address.id,
           title: 'title',
           kind: 'kind',
           stage: 'stage',
           body: '',
+          topic_id: topic!.id!,
         },
         defaults: {
           search: getThreadSearchVector('title', ''),
