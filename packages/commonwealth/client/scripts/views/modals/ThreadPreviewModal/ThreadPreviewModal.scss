@@ -1,0 +1,140 @@
+@import '../../../../styles/shared.scss';
+
+.ThreadPreviewModal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.7);
+  z-index: 1000;
+
+  .modal-overlay {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background: transparent;
+  }
+
+  .modal-content {
+    position: relative;
+    display: flex;
+    width: 80%;
+    height: 80%;
+    max-width: 1200px;
+    max-height: 90vh;
+    background-color: $neutral-25;
+    border-radius: 8px;
+    overflow: hidden;
+
+    @include mediumSmallInclusive {
+      flex-direction: column;
+      width: 90%;
+      height: auto;
+      overflow: auto;
+    }
+
+    @include extraSmall {
+      width: 100%;
+      height: 100%;
+      max-height: 100vh;
+    }
+
+    .modal-left {
+      position: relative;
+      width: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: $black;
+
+      @include mediumSmallInclusive {
+        width: 100%;
+        flex: 1;
+      }
+
+      @include extraSmall {
+        width: 100%;
+        height: 100%;
+        background-color: $black;
+      }
+
+      .close-btn {
+        width: 35px;
+        height: 35px;
+        position: absolute;
+        background: rgba(0, 0, 0, 0.5);
+        top: 16px;
+        left: 16px;
+        border: none;
+        cursor: pointer;
+        color: $neutral-25;
+        z-index: 1;
+        padding: 8px 6px;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .modal-image {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+
+        @include mediumSmallMid {
+          height: 700px;
+        }
+
+        @include extraSmall {
+          height: 100%;
+        }
+      }
+
+      .nav-btn {
+        position: absolute;
+        background: rgba(0, 0, 0, 0.5);
+        color: $neutral-25;
+        border: none;
+        padding: 8px 6px;
+        cursor: pointer;
+        z-index: 2;
+        border-radius: 8px;
+
+        &.prev-btn {
+          left: 10px;
+        }
+
+        &.next-btn {
+          right: 10px;
+        }
+
+        &:hover {
+          background: rgba(0, 0, 0, 0.7);
+        }
+      }
+    }
+
+    .modal-right {
+      width: 50%;
+      padding: 20px;
+      overflow-y: auto;
+
+      @include mediumSmallInclusive {
+        width: 100%;
+        flex: 1;
+        padding: 16px;
+        min-height: fit-content;
+      }
+
+      @include extraSmall {
+        display: none;
+      }
+    }
+  }
+}
