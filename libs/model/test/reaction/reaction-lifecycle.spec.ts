@@ -36,7 +36,7 @@ describe('Reactions lifecycle', () => {
           },
         ],
         // CommunityStakes: [],
-        topics: [],
+        topics: [{}],
         // groups: [],
         // contest_managers: [],
       },
@@ -49,7 +49,7 @@ describe('Reactions lifecycle', () => {
         Address: community?.Addresses?.at(0),
         id: threadId,
         address_id: community?.Addresses?.at(0)?.id,
-        topic_id: undefined,
+        topic_id: community!.topics!.at(0)!.id!,
         deleted_at: undefined, // so we can find it!
         pinned: false,
         read_only: false,

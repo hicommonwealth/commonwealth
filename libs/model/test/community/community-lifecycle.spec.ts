@@ -596,10 +596,22 @@ describe('Community lifecycle', () => {
       ).rejects.toThrow(InvalidActor);
     });
 
-    test('should get topics', async () => {
+    test("should get topics that aren't archived", async () => {
       const topics = await query(GetTopics(), {
         actor: superAdminActor,
         payload: { community_id: community.id, with_contest_managers: false },
+      });
+      expect(topics?.length).toBe(3);
+    });
+
+    test('should get all topics', async () => {
+      const topics = await query(GetTopics(), {
+        actor: superAdminActor,
+        payload: {
+          community_id: community.id,
+          with_contest_managers: false,
+          with_archived_topics: true,
+        },
       });
       expect(topics?.length).toBe(4);
     });
