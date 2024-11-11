@@ -25,6 +25,8 @@ const EVMWalletsSubModal = ({
   canResetWalletConnect,
   onResetWalletConnect,
 }: EVMWalletsSubModalProps) => {
+  const { matches } = window.matchMedia(`(prefers-color-scheme: light)`);
+
   return (
     <CWModal
       rootClassName="EVMWalletsSubModal"
@@ -46,7 +48,7 @@ const EVMWalletsSubModal = ({
                 <AuthButton
                   type={wallet}
                   rounded
-                  variant="dark"
+                  variant={matches ? 'light' : 'dark'}
                   showDescription={false}
                   // @ts-expect-error <StrictNullChecks/>
                   onClick={() => onWalletSelect(wallet)}
