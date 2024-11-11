@@ -166,6 +166,7 @@ async function main() {
 
   if (!acceptedArgs.includes(process.argv[2])) {
     log.error(`Must provide one of: ${JSON.stringify(acceptedArgs)}`);
+    return;
   }
 
   let lastId = 0;
