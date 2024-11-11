@@ -1,7 +1,3 @@
-import {
-  CWTab,
-  CWTabsRow,
-} from 'client/scripts/views/components/component_kit/new_designs/CWTabs';
 import { parseCustomStages, threadStageToLabel } from 'helpers';
 import { isUndefined } from 'helpers/typeGuards';
 import useBrowserWindow from 'hooks/useBrowserWindow';
@@ -29,12 +25,20 @@ import {
   ThreadFeaturedFilterTypes,
   ThreadStage,
   ThreadTimelineFilterTypes,
+  ThreadViewFilterTypes,
 } from '../../../../models/types';
 import './HeaderWithFilters.scss';
 
 type TabsProps = {
   label: string;
   value: string;
+};
+
+type ViewType = {
+  id: number;
+  value: string;
+  label: string;
+  iconLeft: string;
 };
 type HeaderWithFiltersProps = {
   stage: string;
@@ -48,10 +52,10 @@ type HeaderWithFiltersProps = {
   onIncludeArchivedThreads: (includeArchived: boolean) => any;
   isOnArchivePage?: boolean;
   activeContests: Contest[];
-  tabs?: TabsProps[];
-  selectedTab?: string;
-  updateActiveTab?: (tabValue: string) => void;
-  showTabs?: boolean;
+  views?: TabsProps[];
+  selectedView?: string;
+  setSelectedView?: (tabValue: string) => void;
+  showViews?: boolean;
 };
 
 export const HeaderWithFilters = ({
@@ -66,10 +70,10 @@ export const HeaderWithFilters = ({
   onIncludeArchivedThreads,
   isOnArchivePage,
   activeContests,
-  tabs,
-  selectedTab,
-  updateActiveTab,
-  showTabs,
+  views,
+  selectedView,
+  setSelectedView,
+  showViews,
 }: HeaderWithFiltersProps) => {
   const navigate = useCommonNavigate();
   const location = useLocation();
@@ -215,17 +219,29 @@ export const HeaderWithFilters = ({
   return (
     <div className="HeaderWithFilters">
       <div className="header-row">
-        {showTabs && tabs && tabs.length ? (
-          <CWTabsRow>
-            {tabs.map((tab, index) => (
-              <CWTab
-                key={index}
-                label={tab.label}
-                onClick={() => updateActiveTab?.(tab.value)}
-                isSelected={selectedTab === tab.value}
-              />
-            ))}
-          </CWTabsRow>
+        {showViews && views && views.length ? (
+          <div className="filter-section">
+            <Select
+              selected={selectedView || ThreadViewFilterTypes.All}
+              onSelect={(item) => {
+                setSelectedView?.((item as ViewType).value);
+              }}
+              options={[
+                {
+                  id: 1,
+                  value: ThreadViewFilterTypes.All,
+                  label: 'All',
+                  iconLeft: 'viewAll',
+                },
+                {
+                  id: 2,
+                  value: ThreadViewFilterTypes.Overview,
+                  label: 'Overview',
+                  iconLeft: 'viewOverView',
+                },
+              ]}
+            />
+          </div>
         ) : (
           <CWText type="h3" fontWeight="semiBold" className="header-text">
             {isUndefined(topic)
@@ -261,7 +277,7 @@ export const HeaderWithFilters = ({
           )}
         </div>
       </div>
-      {tabs && tabs[0].value === selectedTab ? (
+      {views && views[0].value === selectedView ? (
         <>
           {selectedTopic?.description && (
             <MarkdownViewerUsingQuillOrNewEditor

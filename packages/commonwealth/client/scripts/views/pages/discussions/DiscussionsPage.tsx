@@ -46,17 +46,17 @@ import { EmptyThreadsPlaceholder } from './EmptyThreadsPlaceholder';
 
 type DiscussionsPageProps = {
   tabs?: { value: string; label: string };
-  selectedTab?: string;
+  selectedView?: string;
   topicName?: string;
-  updateActiveTab?: (tabValue: string) => void;
+  updateSelectedView?: (tabValue: string) => void;
 };
-const TABS = [
+const VIEWS = [
   { value: 'all', label: 'All' },
   { value: 'overview', label: 'Overview' },
 ];
 const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
-  const [selectedTab, setSelectedTab] = useState(TABS[0].value);
-  const [showTab, setShowTab] = useState(true);
+  const [selectedView, setSelectedView] = useState(VIEWS[0].value);
+  const [showView, setShowView] = useState(true);
 
   const communityId = app.activeChainId() || '';
   const navigate = useCommonNavigate();
@@ -92,7 +92,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const containerRef = useRef();
   useLayoutEffect(() => {
     if (tabStatus === 'overview') {
-      setSelectedTab(TABS[1].value);
+      setSelectedView(VIEWS[1].value);
     }
   }, [tabStatus]);
 
@@ -155,7 +155,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
       contestAddress,
       // @ts-expect-error <StrictNullChecks/>
       contestStatus,
-      apiEnabled: !!communityId && selectedTab === 'all',
+      apiEnabled: !!communityId && selectedView === 'all',
     });
 
   const threads = sortPinned(sortByFeaturedFilter(data || [], featuredFilter));
@@ -191,14 +191,14 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
       if (!validTopics) {
         navigate('/discussions');
       } else if (validTopics) {
-        setShowTab(false);
+        setShowView(false);
       }
     }
     if (topicNameFromURL === 'archived') {
-      setShowTab(false);
+      setShowView(false);
     }
     if (topicNameFromURL === 'overview') {
-      setSelectedTab(TABS[1].value);
+      setSelectedView(VIEWS[1].value);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [topics, topicNameFromURL, isLoadingTopics]);
@@ -224,11 +224,11 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
           ).toFixed(0),
         )
       : '';
-  const updateActiveTab = (activeTab: string) => {
+  const updateSelectedView = (activeTab: string) => {
     const params = new URLSearchParams();
     params.set('tab', activeTab);
     navigate(`${window.location.pathname}?${params.toString()}`, {}, null);
-    setSelectedTab(activeTab);
+    setSelectedView(activeTab);
   };
 
   return (
@@ -297,13 +297,13 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
           onIncludeArchivedThreads={setIncludeArchivedThreads}
           isOnArchivePage={isOnArchivePage}
           activeContests={activeContestsInTopic}
-          tabs={TABS}
-          selectedTab={selectedTab}
-          updateActiveTab={updateActiveTab}
-          showTabs={showTab}
+          views={VIEWS}
+          selectedView={selectedView}
+          setSelectedView={updateSelectedView}
+          showViews={showView}
         />
 
-        {selectedTab === TABS[0].value ? (
+        {selectedView === VIEWS[0].value ? (
           <Virtuoso
             className="thread-list"
             style={{ height: '100%', width: '100%' }}
