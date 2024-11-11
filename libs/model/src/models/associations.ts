@@ -216,14 +216,8 @@ export const buildAssociations = (db: DB) => {
     },
   );
 
-  db.LaunchpadTrade.withOne(db.Token, {
-    targetKey: 'token_address',
-    foreignKey: 'token_address',
-    onDelete: 'CASCADE',
-  });
-
   db.Token.withMany(db.LaunchpadTrade, {
     foreignKey: 'token_address',
-    onDelete: 'CASCADE',
+    onDelete: 'NO ACTION',
   });
 };
