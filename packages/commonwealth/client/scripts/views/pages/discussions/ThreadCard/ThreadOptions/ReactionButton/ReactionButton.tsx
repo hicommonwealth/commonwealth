@@ -172,6 +172,7 @@ export const ReactionButton = ({
               body={getDisplayedReactorsForPopup({
                 reactors,
               })}
+              className="popover-content"
               {...popoverProps}
             />
           )}
