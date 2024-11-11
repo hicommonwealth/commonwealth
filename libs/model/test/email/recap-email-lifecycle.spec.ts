@@ -64,6 +64,7 @@ describe('Recap email lifecycle', () => {
           user_id: recipientUser!.id,
         },
       ],
+      topics: [{}],
     });
 
     [thread] = await seed('Thread', {
