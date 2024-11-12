@@ -21,7 +21,9 @@ export function useUnregisterPushNotificationSubscriptionCallback() {
 
     const permission = await Notification.requestPermission();
     if (permission === 'granted') {
-      console.log('Notification permission granted.');
+      console.log(
+        'Notification permission granted for channelType: ' + channelType,
+      );
       const token = await getFirebaseMessagingToken();
       await unregisterClientRegistrationToken.mutateAsync({
         id: user.id,
