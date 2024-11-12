@@ -7,6 +7,7 @@ import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayou
 import ContestsList from 'views/pages/CommunityManagement/Contests/ContestsList';
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
 
+import { CWDivider } from '../../components/component_kit/cw_divider';
 import './Contests.scss';
 
 const Contests = () => {
@@ -20,20 +21,43 @@ const Contests = () => {
   return (
     <CWPageLayout>
       <div className="Contests">
-        <CWText type="h2">Active Contests</CWText>
+        <CWText type="h2">Contests</CWText>
         <CWText className="description">
           Check out the contests in this community. Winners are determined by
           having the most upvoted content in the contest topics.{' '}
           <a href="https://blog.commonwealth.im">Learn more</a>
         </CWText>
 
-        <ContestsList
-          contests={contestsData}
-          isAdmin={false}
-          hasWeightedTopic={false}
-          isLoading={isContestDataLoading}
-          isContestAvailable={isContestAvailable}
-        />
+        <CWDivider className="active" />
+        <CWText type="h3" className="mb-12">
+          Active Contests
+        </CWText>
+        {isContestAvailable && contestsData.active.length === 0 ? (
+          <CWText>No active contests available</CWText>
+        ) : (
+          <ContestsList
+            contests={contestsData.active}
+            isAdmin={false}
+            isLoading={isContestDataLoading}
+            isContestAvailable={isContestAvailable}
+          />
+        )}
+
+        <CWDivider className="ended" />
+        <CWText type="h3" className="mb-12">
+          Previous Contests
+        </CWText>
+        {isContestAvailable && contestsData.finished.length === 0 ? (
+          <CWText>No previous contests available</CWText>
+        ) : (
+          <ContestsList
+            contests={contestsData.finished}
+            isAdmin={false}
+            isLoading={isContestDataLoading}
+            isContestAvailable={isContestAvailable}
+            displayAllRecurringContests
+          />
+        )}
       </div>
     </CWPageLayout>
   );

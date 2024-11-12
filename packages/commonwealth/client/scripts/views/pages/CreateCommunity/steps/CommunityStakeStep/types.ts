@@ -12,24 +12,32 @@ export type StakeData = {
 };
 
 export interface SignStakeTransactionsProps {
-  onSuccess: () => void;
-  onCancel: () => void;
   communityStakeData: StakeData;
   selectedAddress: AddressInfo;
   createdCommunityId: string;
   chainId: string;
-  isTopicFlow?: boolean;
   onlyNamespace?: boolean;
   hasNamespaceReserved?: boolean;
+  onReserveNamespaceSuccess: () => void;
+  onLaunchStakeSuccess: () => void;
+  backButton?: {
+    label: string;
+    action: () => void;
+  };
 }
 
 export interface EnableStakeProps {
-  goToSuccessStep: () => void;
-  onOptInEnablingStake: ({ namespace, symbol }: StakeData) => void;
   communityStakeData: StakeData;
   chainId: string;
-  isTopicFlow?: boolean;
   onlyNamespace?: boolean;
+  backButton?: {
+    label: string;
+    action: () => void;
+  };
+  confirmButton?: {
+    label: string;
+    action: (data: StakeData) => void;
+  };
 }
 
 export const defaultActionState: ActionState = {
