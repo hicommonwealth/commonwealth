@@ -6,13 +6,14 @@ import chaiAsPromised from 'chai-as-promised';
 import { bootstrap_testing, seed } from 'model/src/tester';
 import { afterAll, beforeAll, describe, test } from 'vitest';
 import { ChainNodeAttributes } from '../../src';
-import { CreateToken } from '../../src/token';
+import { CreateLaunchpadTrade, CreateToken } from '../../src/token';
 
 chai.use(chaiAsPromised);
 
-describe('Launchpad', () => {
+const token_address = '0x99a3574fed7b8935709bb13f35448bf7922770ea';
+
+describe('Launchpad Lifecycle', () => {
   let actor: Actor;
-  let payload;
   let community_id: string;
   let node: ChainNodeAttributes;
 
@@ -68,7 +69,7 @@ describe('Launchpad', () => {
     'Create Token works given txHash and chainNodeId',
     { timeout: 10_000 },
     async () => {
-      payload = {
+      const payload = {
         transaction_hash:
           '0xc0e59dfc71f0e81f33b2f96e7fad5d80d4bf81298bf7dd5afdd8913771e47fad',
         chain_node_id: node!.id!,
@@ -82,10 +83,36 @@ describe('Launchpad', () => {
         payload,
       });
 
-      expect(results?.token_address).to.equal(
-        '0x99a3574fed7b8935709bb13f35448bf7922770ea',
-      );
+      expect(results?.token_address).to.equal(token_address);
       expect(results?.symbol).to.equal('tst');
+    },
+  );
+
+  // TODO: complete test in #9867
+  test.skip(
+    'Get a launchpad trade txn and project it',
+    { timeout: 10_000 },
+    async () => {
+      const buyTxHash = '';
+      const payload = {
+        transaction_hash: buyTxHash,
+        eth_chain_id: commonProtocol.ValidChains.SepoliaBase,
+      };
+      const results = await command(CreateLaunchpadTrade(), {
+        actor,
+        payload,
+      });
+      expect(results).to.deep.equal({
+        eth_chain_id: commonProtocol.ValidChains.SepoliaBase,
+        transaction_hash: buyTxHash,
+        token_address,
+        trader_address: '',
+        is_buy: true,
+        community_token_amount: 1n,
+        price: 1n,
+        floating_supply: 1n,
+        timestamp: 1,
+      });
     },
   );
 });
