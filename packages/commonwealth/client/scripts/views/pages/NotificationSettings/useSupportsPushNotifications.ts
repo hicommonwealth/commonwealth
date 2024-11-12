@@ -5,7 +5,7 @@ import useAppStatus from 'hooks/useAppStatus';
 // because when we enable Safari, we're going to have so work on a larger patch
 // *anyway* due to the fact that Knock doesn't support push notifications with
 // Safari in the browser.
-const SAFARI_ENABLED = false;
+const SAFARI_ENABLED = true;
 
 export const useSupportsPushNotifications = () => {
   const { isAddedToHomeScreen } = useAppStatus();
