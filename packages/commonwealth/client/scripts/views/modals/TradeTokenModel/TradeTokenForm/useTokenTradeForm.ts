@@ -9,6 +9,7 @@ import {
 } from 'state/api/communityStake';
 import { useBuyTokenMutation } from 'state/api/launchPad';
 import { fetchCachedNodes } from 'state/api/nodes';
+import { useCreateTokenTradeMutation } from 'state/api/tokens';
 import useUserStore from 'state/ui/user';
 import './TradeTokenForm.scss';
 import { TradingMode, UseTokenTradeFormProps } from './types';
@@ -80,6 +81,9 @@ const useTokenTradeForm = ({
   const { mutateAsync: buyToken, isLoading: isBuyingToken } =
     useBuyTokenMutation();
 
+  const { mutateAsync: createTokenTrade, isLoading: isCreatingTokenTrade } =
+    useCreateTokenTradeMutation();
+
   const onTradingAmountChange = (
     change: React.ChangeEvent<HTMLInputElement> | number,
   ) => {
@@ -106,6 +110,7 @@ const useTokenTradeForm = ({
     // this condition wouldn't be called, but adding to avoid typescript issues
     if (!baseNode?.url || !baseNode?.ethChainId || !selectedAddress) return;
 
+    // buy token on chain
     const payload = {
       chainRpc: baseNode.url,
       ethChainId: baseNode.ethChainId,
@@ -113,9 +118,13 @@ const useTokenTradeForm = ({
       walletAddress: selectedAddress,
       tokenAddress: tradeConfig.token.token_address,
     };
-    console.log('buy payload => ', payload);
-    const receipt = await buyToken(payload);
-    console.log('receipt => ', receipt);
+    const txReceipt = await buyToken(payload);
+
+    // create token trade on db
+    await createTokenTrade({
+      eth_chain_id: baseNode?.ethChainId,
+      transaction_hash: txReceipt.transactionHash,
+    });
   };
 
   const handleTokenSell = async () => {
@@ -127,7 +136,8 @@ const useTokenTradeForm = ({
     isLoadingTokenCommunity ||
     isLoadingUserEthBalance ||
     isBuyingToken ||
-    isLoadingETHToCurrencyRate;
+    isLoadingETHToCurrencyRate ||
+    isCreatingTokenTrade;
 
   const onCTAClick = () => {
     if (isActionPending) return;
