@@ -15,6 +15,7 @@ const AuthButtonsShowcase = () => {
         <AuthButton type="discord" />
         <AuthButton type="x" />
         <AuthButton type="email" />
+        <AuthButton type="farcaster" />
       </div>
       <CWText type="h5">Disabled</CWText>
       <div className="flex-row">

@@ -152,4 +152,11 @@ export const AUTH_TYPES: AuthTypesList = {
     },
     label: 'Email',
   },
+  farcaster: {
+    icon: {
+      name: 'farcaster',
+      isCustom: true,
+    },
+    label: 'Farcaster',
+  },
 };

@@ -57,6 +57,7 @@ const SSO_OPTIONS: AuthSSOs[] = [
   'apple',
   'github',
   'email',
+  'farcaster',
 ] as const;
 
 /**
