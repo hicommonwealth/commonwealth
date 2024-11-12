@@ -26,10 +26,15 @@ export default (
       name: { type: Sequelize.STRING, allowNull: false },
       symbol: { type: Sequelize.STRING, allowNull: false },
       initial_supply: { type: Sequelize.DECIMAL(78, 0), allowNull: false },
-      is_locked: {
+      liquidity_transferred: {
         type: Sequelize.BOOLEAN,
         allowNull: false,
         defaultValue: false,
+      },
+      launchpad_liquidity: { type: Sequelize.DECIMAL(78, 0), allowNull: false },
+      eth_market_cap_target: {
+        type: Sequelize.DECIMAL(78, 0),
+        allowNull: false,
       },
       created_at: { type: Sequelize.DATE, allowNull: false },
       updated_at: { type: Sequelize.DATE, allowNull: false },

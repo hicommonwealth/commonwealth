@@ -66,7 +66,9 @@ export async function createTokenHandler(
     name,
     symbol,
     initial_supply: totalSupply,
-    is_locked: false,
+    liquidity_transferred: false,
+    launchpad_liquidity: 1n,
+    eth_market_cap_target: 1n,
     description: description ?? null,
     icon_url: iconUrl ?? null,
   });
