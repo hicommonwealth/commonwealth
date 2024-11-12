@@ -25,18 +25,16 @@ const TradeTokenModal = ({
   onModalClose,
   tradeConfig,
 }: TradeTokenModalProps) => {
-  const {
-    tradingAmount,
-    onTradingAmountChange,
-    tradingMode,
-    onTradingModeChange,
-    userAddresses,
-    isActionPending,
-    onCTAClick,
-  } = useTokenTradeForm({
-    tradeConfig: { ...tradeConfig, currency: TRADING_CURRENCY },
-    addressType: tradeConfig.addressType,
-  });
+  const { trading, addresses, isActionPending, onCTAClick } = useTokenTradeForm(
+    {
+      tradeConfig: {
+        ...tradeConfig,
+        currency: TRADING_CURRENCY,
+        presetAmounts: [100, 300, 1000],
+      },
+      addressType: tradeConfig.addressType,
+    },
+  );
 
   return (
     <CWModal
@@ -52,15 +50,8 @@ const TradeTokenModal = ({
           />
           <CWModalBody>
             <TradeTokenForm
-              tradingMode={tradingMode}
-              onTradingModeChange={onTradingModeChange}
-              tradingAmount={tradingAmount}
-              onTradingAmountChange={onTradingAmountChange}
-              trading={{
-                currency: TRADING_CURRENCY,
-                presetAmounts: [100, 300, 1000],
-              }}
-              addresses={userAddresses}
+              trading={trading}
+              addresses={addresses}
               onCTAClick={onCTAClick}
               isActionPending={isActionPending}
             />

@@ -4,6 +4,7 @@ import {
   getAmountWithCurrencySymbol,
 } from 'helpers/currency';
 import React, { ReactNode, useState } from 'react';
+import { Skeleton } from 'views/components/Skeleton';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
@@ -27,10 +28,6 @@ import { TradeTokenFormProps, TradingMode } from './types';
 const TradeTokenForm = ({
   trading,
   addresses,
-  tradingMode,
-  onTradingAmountChange,
-  tradingAmount,
-  onTradingModeChange,
   onCTAClick,
   isActionPending,
 }: TradeTokenFormProps) => {
@@ -72,8 +69,8 @@ const TradeTokenForm = ({
           <CWTab
             key={mode}
             label={mode}
-            onClick={() => onTradingModeChange(TradingMode[mode])}
-            isSelected={tradingMode === TradingMode[mode]}
+            onClick={() => trading.mode.onChange(TradingMode[mode])}
+            isSelected={trading.mode.value === TradingMode[mode]}
           />
         ))}
       </CWTabsRow>
@@ -84,16 +81,17 @@ const TradeTokenForm = ({
             Option: (originalProps) =>
               CustomAddressOption({
                 originalProps,
-                selectedAddressValue: addresses.selected || '',
+                selectedAddressValue: addresses.selected.value || '',
               }),
           }}
           noOptionsMessage={() => 'No available Metamask address'}
-          value={convertAddressToDropdownOption(addresses.selected || '')}
+          value={convertAddressToDropdownOption(addresses.selected.value || '')}
+          defaultValue={convertAddressToDropdownOption(addresses.default || '')}
           formatOptionLabel={(option) => (
             <CustomAddressOptionElement
               value={option.value}
               label={option.label}
-              selectedAddressValue={addresses.selected || ''}
+              selectedAddressValue={addresses.selected.value || ''}
             />
           )}
           label="Select address"
@@ -103,7 +101,7 @@ const TradeTokenForm = ({
             convertAddressToDropdownOption,
           )}
           onChange={(option) =>
-            option?.value && addresses.onChange(option.value)
+            option?.value && addresses.selected.onChange(option.value)
           }
         />
 
@@ -111,14 +109,19 @@ const TradeTokenForm = ({
           <CWText type="caption">Current balance</CWText>
           <CWText type="caption">
             <CWIcon iconName="ethereum" iconSize="small" />
-            0.005 ETH
+            {addresses.selected.ethBalance.isLoading ? (
+              <Skeleton width={80} />
+            ) : (
+              addresses.selected.ethBalance.value
+            )}
+            &nbsp;ETH
           </CWText>
         </div>
       </div>
 
       <div className="amount-selection">
         <CWText className="uppercase text-light" type="b2">
-          You&apos;re {tradingMode}ing
+          You&apos;re {trading.mode.value}ing
         </CWText>
 
         <div className="amount-input-with-currency-symbol">
@@ -127,8 +130,8 @@ const TradeTokenForm = ({
           <CWTextInput
             containerClassName="amount-input"
             placeholder={getAmountWithCurrencySymbol(0, trading.currency)}
-            value={tradingAmount}
-            onInput={(e) => onTradingAmountChange(e)}
+            value={trading.amount.value}
+            onInput={(e) => trading.amount.onChange(e)}
           />
           {currencySymbolPlacements.onRight.includes(trading.currency) &&
             amountCurrenySymbol}
@@ -136,7 +139,7 @@ const TradeTokenForm = ({
 
         <CWText type="caption" className="amount-to-crypto">
           <CWIcon iconName="ethereum" iconSize="small" />
-          0.005 ETH
+          {trading.ethAmounts.buy} ETH
         </CWText>
 
         {trading.presetAmounts && (
@@ -149,7 +152,7 @@ const TradeTokenForm = ({
                   presetAmount,
                   trading.currency,
                 )}
-                onClick={() => onTradingAmountChange(presetAmount)}
+                onClick={() => trading.amount.onChange(presetAmount)}
               />
             ))}
           </div>
@@ -176,17 +179,19 @@ const TradeTokenForm = ({
 
       {withOptionalTooltip(
         <CWButton
-          label={tradingMode}
+          label={trading.mode.value}
           containerClassName="action-btn"
           buttonWidth="full"
           buttonType="secondary"
           className="capitalize"
-          buttonAlt={tradingMode === TradingMode.Buy ? 'green' : 'rorange'}
-          disabled={isActionPending || tradingAmount === 0}
+          buttonAlt={
+            trading.mode.value === TradingMode.Buy ? 'green' : 'rorange'
+          }
+          disabled={isActionPending || trading.amount.value === 0}
           onClick={onCTAClick}
         />,
         'Please add trading amount to continue',
-        tradingAmount === 0,
+        trading.amount.value === 0,
       )}
     </section>
   );

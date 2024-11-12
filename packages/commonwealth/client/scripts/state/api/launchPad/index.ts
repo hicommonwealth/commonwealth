@@ -1,3 +1,4 @@
+import useBuyTokenMutation from './buyToken';
 import useLaunchTokenMutation from './launchToken';
 
-export { useLaunchTokenMutation };
+export { useBuyTokenMutation, useLaunchTokenMutation };
