@@ -64,7 +64,7 @@ const useTokenTradeForm = ({
   // imp: this query uses CommunityStakes helper to get eth price, but its
   // a generic query so no need to initiate a separate Launhpad helper
   const {
-    data: selectedAddressEthBalance,
+    data: selectedAddressEthBalance = `0.0`,
     isLoading: isLoadingUserEthBalance,
   } = useGetUserEthBalanceQuery({
     chainRpc: tokenCommunity?.ChainNode?.url || '',
@@ -171,6 +171,8 @@ const useTokenTradeForm = ({
             amount: baseCurrencyTradingAmount,
             onAmountChange: onBaseCurrencyTradingAmountChange,
           },
+          insufficientFunds:
+            ethBuyAmount > parseFloat(selectedAddressEthBalance),
         },
       },
       mode: { value: tradingMode, onChange: onTradingModeChange },
@@ -181,7 +183,7 @@ const useTokenTradeForm = ({
       selected: {
         value: selectedAddress,
         ethBalance: {
-          value: selectedAddressEthBalance || `0.0`,
+          value: selectedAddressEthBalance,
           isLoading: isLoadingUserEthBalance,
         },
         onChange: onChangeSelectedAddress,

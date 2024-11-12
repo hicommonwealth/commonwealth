@@ -39,17 +39,21 @@ const TradeTokenForm = ({
     </CWText>
   );
 
-  const withOptionalTooltip = (
-    children: ReactNode,
-    content: string,
-    shouldDisplay,
-  ) => {
-    if (!shouldDisplay) return children;
+  const getCTADisabledTooltipText = () => {
+    if (isActionPending || trading.amounts.buy.baseCurrency.amount === 0)
+      return 'Please add trading amount to continue';
+    if (trading.amounts.buy.insufficientFunds)
+      return `You don't have sufficient funds to buy token`;
+  };
+
+  const withOptionalTooltip = (children: ReactNode) => {
+    const tooltipText = getCTADisabledTooltipText();
+    if (!tooltipText) return children;
 
     return (
       <CWTooltip
         placement="top"
-        content={content}
+        content={tooltipText}
         renderTrigger={(handleInteraction) => (
           <span
             onMouseEnter={handleInteraction}
@@ -204,13 +208,9 @@ const TradeTokenForm = ({
           buttonAlt={
             trading.mode.value === TradingMode.Buy ? 'green' : 'rorange'
           }
-          disabled={
-            isActionPending || trading.amounts.buy.baseCurrency.amount === 0
-          }
+          disabled={!!getCTADisabledTooltipText()}
           onClick={onCTAClick}
         />,
-        'Please add trading amount to continue',
-        trading.amounts.buy.baseCurrency.amount === 0,
       )}
     </section>
   );
