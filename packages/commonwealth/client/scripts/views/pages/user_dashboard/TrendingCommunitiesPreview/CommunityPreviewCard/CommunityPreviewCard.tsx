@@ -1,5 +1,4 @@
 import clsx from 'clsx';
-import { pluralize } from 'helpers';
 import React from 'react';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
@@ -56,10 +55,7 @@ const CommunityPreviewCard = ({
           <div className="thread-counts">
             <CWIcon iconName="notepad" weight="light" />
             <CWText className="card-subtext" type="b2" fontWeight="medium">
-              {`${pluralize(
-                monthlyThreadCount || 0,
-                'new thread',
-              )} created this month`}
+              {`${monthlyThreadCount || 0}`}
             </CWText>
             {isCommunityMember && hasNewContent && (
               <CWTag type="new" label="New" />
