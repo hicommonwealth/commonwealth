@@ -95,7 +95,7 @@ export function CreateToken(): Command<typeof schemas.CreateToken> {
       const tokenAddress = txReceipt.logs[0].address!;
       if (!tokenAddress) {
         throw Error(
-          'Failed to find tokenAddress is token creation command. Review tokenAddress logic',
+          'Failed to find tokenAddress in token creation command. Review tokenAddress logic',
         );
       }
 
