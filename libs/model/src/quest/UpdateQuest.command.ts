@@ -1,7 +1,7 @@
 import { Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../database';
-import { AuthContext, isAuthorized } from '../middleware';
+import { authRoles } from '../middleware';
 import {
   mustBeValidDateRange,
   mustExist,
@@ -10,13 +10,10 @@ import {
 } from '../middleware/guards';
 import { getDelta } from '../utils';
 
-export function UpdateQuest(): Command<
-  typeof schemas.UpdateQuest,
-  AuthContext
-> {
+export function UpdateQuest(): Command<typeof schemas.UpdateQuest> {
   return {
     ...schemas.UpdateQuest,
-    auth: [isAuthorized({ roles: ['admin'] })],
+    auth: [authRoles('admin')],
     secure: true,
     body: async ({ payload }) => {
       const {

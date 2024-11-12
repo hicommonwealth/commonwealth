@@ -1,18 +1,15 @@
 import { type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../database';
-import { AuthContext, isAuthorized } from '../middleware';
-import { mustBeAuthorized, mustExist } from '../middleware/guards';
+import { authTopic } from '../middleware';
+import { mustExist } from '../middleware/guards';
 
-export function DeleteTopic(): Command<
-  typeof schemas.DeleteTopic,
-  AuthContext
-> {
+export function DeleteTopic(): Command<typeof schemas.DeleteTopic> {
   return {
     ...schemas.DeleteTopic,
-    auth: [isAuthorized({ roles: ['admin', 'moderator'] })],
-    body: async ({ actor, auth }) => {
-      const { community_id, topic_id } = mustBeAuthorized(actor, auth);
+    auth: [authTopic({ roles: ['admin', 'moderator'] })],
+    body: async ({ payload }) => {
+      const { community_id, topic_id } = payload;
 
       const topic = await models.Topic.findOne({
         where: { community_id, id: topic_id! },

@@ -105,7 +105,7 @@ const ContestCard = ({
   const handleCancel = () => {
     cancelContest({
       contest_address: address,
-      id: app.activeChainId() || '',
+      community_id: app.activeChainId() || '',
     }).catch((error) => {
       console.error('Failed to cancel contest: ', error);
     });

@@ -1,17 +1,30 @@
 import { express, trpc } from '@hicommonwealth/adapters';
-import { Comment, Community, Feed, Thread } from '@hicommonwealth/model';
+import {
+  Comment,
+  Community,
+  Contest,
+  Feed,
+  Thread,
+} from '@hicommonwealth/model';
 import cors from 'cors';
 import { Router } from 'express';
+import { readFileSync } from 'fs';
 import passport from 'passport';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import { config } from '../config';
 import * as comment from './comment';
 import * as community from './community';
+import * as contest from './contest';
 import {
   addRateLimiterMiddleware,
   apiKeyAuthMiddleware,
 } from './external-router-middleware';
 import * as thread from './thread';
 import * as user from './user';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const {
   createCommunity,
@@ -35,6 +48,8 @@ const {
 const { createComment, updateComment, deleteComment, createCommentReaction } =
   comment.trpcRouter;
 const { getNewContent } = user.trpcRouter;
+const { createContestMetadata, updateContestMetadata, cancelContestMetadata } =
+  contest.trpcRouter;
 
 const api = {
   getGlobalActivity: trpc.query(Feed.GetGlobalActivity, trpc.Tag.User, {
@@ -63,6 +78,12 @@ const api = {
   getThreads: trpc.query(Thread.GetThreads, trpc.Tag.Thread, {
     forceSecure: true,
   }),
+  getAllContests: trpc.query(Contest.GetAllContests, trpc.Tag.Contest, {
+    forceSecure: true,
+  }),
+  createContestMetadata,
+  updateContestMetadata,
+  cancelContestMetadata,
   createCommunity,
   updateCommunity,
   createTopic,
@@ -113,11 +134,18 @@ if (config.NODE_ENV !== 'test' && config.CACHE.REDIS_URL) {
   addRateLimiterMiddleware();
 }
 
-const trpcRouter = trpc.router(api);
-trpc.useOAS(router, trpcRouter, {
+const externalApiConfig = JSON.parse(
+  readFileSync(path.join(__dirname, '../external-api-config.json'), 'utf8'),
+);
+
+const oasOptions: trpc.OasOptions = {
   title: 'Common API',
   path: PATH,
-  version: '1.0.0',
-});
+  version: externalApiConfig.version,
+  securityScheme: 'apiKey',
+};
 
-export { PATH, router };
+const trpcRouter = trpc.router(api);
+trpc.useOAS(router, trpcRouter, oasOptions);
+
+export { PATH, oasOptions, router, trpcRouter };

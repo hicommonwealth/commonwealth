@@ -4,9 +4,13 @@ import {
   logger,
   type Actor,
 } from '@hicommonwealth/core';
+import {
+  AuthContext,
+  CommentContext,
+  ThreadContext,
+} from '@hicommonwealth/schemas';
 import moment from 'moment';
 import type { AddressInstance, ThreadInstance } from '../models';
-import type { AuthContext } from './authorization';
 
 const log = logger(import.meta);
 
@@ -62,12 +66,12 @@ export function mustBeSuperAdmin(actor: Actor) {
 
 /**
  * Address authorization guard
- * @param auth auth context
+ * @param context auth context
  * @returns narrowed auth context
  */
-export function mustBeAuthorized(actor: Actor, auth?: AuthContext) {
-  if (!auth?.address) throw new InvalidActor(actor, 'Not authorized');
-  return auth as AuthContext & {
+export function mustBeAuthorized(actor: Actor, context?: AuthContext) {
+  if (!context?.address) throw new InvalidActor(actor, 'Not authorized');
+  return context as AuthContext & {
     address: AddressInstance;
     community_id: string;
   };
@@ -75,13 +79,13 @@ export function mustBeAuthorized(actor: Actor, auth?: AuthContext) {
 
 /**
  * Thread authorization guard
- * @param auth auth context
+ * @param context auth context
  * @returns narrowed auth context
  */
-export function mustBeAuthorizedThread(actor: Actor, auth?: AuthContext) {
-  if (!auth?.address) throw new InvalidActor(actor, 'Not authorized');
-  if (!auth?.thread) throw new InvalidActor(actor, 'Not authorized thread');
-  return auth as AuthContext & {
+export function mustBeAuthorizedThread(actor: Actor, context?: ThreadContext) {
+  if (!context?.address) throw new InvalidActor(actor, 'Not authorized');
+  if (!context?.thread) throw new InvalidActor(actor, 'Not authorized thread');
+  return context as AuthContext & {
     address: AddressInstance;
     thread: ThreadInstance;
     community_id: string;
@@ -92,13 +96,17 @@ export function mustBeAuthorizedThread(actor: Actor, auth?: AuthContext) {
 
 /**
  * Comment authorization guard
- * @param auth auth context
+ * @param context auth context
  * @returns narrowed auth context
  */
-export function mustBeAuthorizedComment(actor: Actor, auth?: AuthContext) {
-  if (!auth?.address) throw new InvalidActor(actor, 'Not authorized');
-  if (!auth?.comment) throw new InvalidActor(actor, 'Not authorized comment');
-  return auth as AuthContext & {
+export function mustBeAuthorizedComment(
+  actor: Actor,
+  context?: CommentContext,
+) {
+  if (!context?.address) throw new InvalidActor(actor, 'Not authorized');
+  if (!context?.comment)
+    throw new InvalidActor(actor, 'Not authorized comment');
+  return context as CommentContext & {
     address: AddressInstance;
     comment: ThreadInstance;
     community_id: string;
@@ -138,7 +146,7 @@ export function mustBeValidDateRange(
   const rangeInDays = end.diff(start, 'days');
   if (rangeInDays < minDaysInRange)
     throw new InvalidState(
-      `Start ${start.format('YYYY-MM-DD')} and End ${end.format('YYYY-MM-DD')} dates range must be at least ${minDaysInRange} days apart, but are ${rangeInDays} days apart`,
+      `${start.format('YYYY-MM-DD')} - ${end.format('YYYY-MM-DD')} must be at least ${minDaysInRange} days apart.`,
       { start_date, end_date },
     );
 

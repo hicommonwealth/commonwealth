@@ -126,7 +126,7 @@ describe('Stake lifecycle', () => {
     expect(
       command(SetCommunityStake(), {
         actor,
-        payload: { ...payload, id: id_with_stake },
+        payload: { ...payload, community_id: id_with_stake },
       }),
     ).to.eventually.be.rejected;
   });
@@ -134,7 +134,7 @@ describe('Stake lifecycle', () => {
   test('should set and get community stake', async () => {
     const cr = await command(SetCommunityStake(), {
       actor,
-      payload: { ...payload, id: id_without_stake_to_set },
+      payload: { ...payload, community_id: id_without_stake_to_set },
     });
     expect(cr).to.deep.contains({
       CommunityStakes: [
@@ -164,7 +164,7 @@ describe('Stake lifecycle', () => {
     expect(
       command(SetCommunityStake(), {
         actor,
-        payload: { ...payload, id: 'does-not-exist' },
+        payload: { ...payload, community_id: 'does-not-exist' },
       }),
     ).to.eventually.be.rejectedWith(InvalidActor);
   });
@@ -176,7 +176,7 @@ describe('Stake lifecycle', () => {
     expect(
       command(SetCommunityStake(), {
         actor,
-        payload: { ...payload, id: id_with_stake },
+        payload: { ...payload, community_id: id_with_stake },
       }),
     ).to.eventually.be.rejectedWith(
       InvalidState,
