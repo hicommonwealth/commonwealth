@@ -101,6 +101,7 @@
     "chromatic": "^6.17.4",
     "concurrently": "^7.6.0",
     "dependency-cruiser": "^16.2.0",
+    "dotenv": "^16.0.3",
     "eslint": "^8.51.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-diff": "^2.0.3",

@@ -1,8 +1,13 @@
 /// <reference types="vitest" />
 
+import * as dotenv from 'dotenv';
 import path from 'path';
 import { defineConfig } from 'vite';
 import tsconfigPaths from 'vite-tsconfig-paths';
+
+dotenv.config({
+  path: path.resolve(__dirname, '.env'),
+});
 
 export default defineConfig({
   plugins: [tsconfigPaths()],
