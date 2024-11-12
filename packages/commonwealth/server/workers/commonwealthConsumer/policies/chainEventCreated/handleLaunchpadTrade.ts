@@ -1,5 +1,6 @@
 import { events, LaunchpadTrade } from '@hicommonwealth/core';
-import { models } from '@hicommonwealth/model';
+import { commonProtocol, models } from '@hicommonwealth/model';
+import { commonProtocol as sharedCommonProtocol } from '@hicommonwealth/shared';
 import { BigNumber } from 'ethers';
 import Web3 from 'web3';
 import { z } from 'zod';
@@ -64,5 +65,28 @@ export async function handleLaunchpadTrade(
     });
   }
 
-  // TODO: check that liquidity has been transferred if above threshold
+  const lpBondingCurveAddress =
+    sharedCommonProtocol.factoryContracts[
+      chainNode!.eth_chain_id as sharedCommonProtocol.ValidChains
+    ].lpBondingCurve!;
+
+  // TODO: update 1n to the launchpadLiquidity stored on Token model
+  if (!token.is_locked && BigNumber.from(floatingSupply).toBigInt() === 1n) {
+    const onChainTokenData = await commonProtocol.launchpadHelpers.getToken({
+      rpc: chainNode.private_url!,
+      tokenAddress,
+      lpBondingCurveAddress,
+    });
+
+    if (!onChainTokenData.funded) {
+      await commonProtocol.launchpadHelpers.transferLiquidityToUniswap({
+        rpc: chainNode.private_url!,
+        tokenAddress,
+        lpBondingCurveAddress,
+      });
+    }
+
+    token.is_locked = true;
+    await token.save();
+  }
 }

@@ -49,16 +49,46 @@ export async function getLaunchpadTradeTransaction({
 
 export async function transferLiquidityToUniswap({
   rpc,
+  lpBondingCurveAddress,
   tokenAddress,
 }: {
   rpc: string;
+  lpBondingCurveAddress: string;
   tokenAddress: string;
 }) {
   const web3 = await createWeb3Provider(rpc);
-  const contract = new web3.eth.Contract(LPBondingCurveAbi, tokenAddress);
+  const contract = new web3.eth.Contract(
+    LPBondingCurveAbi,
+    lpBondingCurveAddress,
+  );
   await commonProtocol.transferLiquidity(
     contract,
     tokenAddress,
     web3.eth.defaultAccount!,
   );
+}
+
+export async function getToken({
+  rpc,
+  lpBondingCurveAddress,
+  tokenAddress,
+}: {
+  rpc: string;
+  lpBondingCurveAddress: string;
+  tokenAddress: string;
+}): Promise<{
+  launchpadLiquidity: bigint;
+  poolLiquidity: bigint;
+  curveId: bigint;
+  scalar: bigint;
+  reserveRation: bigint;
+  LPhook: string;
+  funded: boolean;
+}> {
+  const web3 = new Web3(rpc);
+  const contract = new web3.eth.Contract(
+    LPBondingCurveAbi,
+    lpBondingCurveAddress,
+  );
+  return await contract.methods.tokens(tokenAddress).call();
 }

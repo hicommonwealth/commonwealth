@@ -35,7 +35,7 @@ export const factoryContracts: {
     factory: '0xD8a357847cABA76133D5f2cB51317D3C74609710',
     communityStake: '0xd097926d8765A7717206559E7d19EECCbBa68c18',
     launchpad: '0xe1aa28e217a6a6bf39f74455ddd4d24aa4fa0aec',
-    lpBondingCurve: '0xaEA78B289A769DA4dde967262b5076ea8FE56607',
+    lpBondingCurve: '0x094Dd77FbF7E50126D1dc7a8cb9CDa713ab50D4a',
     tokenCommunityManager: '0x5dF8A174D95D01e5508B1f3d3F691af226eC8888',
     chainId: 84532,
   },
