@@ -7,7 +7,6 @@ env:
   NODE_ENV: 'test'
   ROLLBAR_ENV: 'GitHubCI'
   TEST_WITHOUT_LOGS: 'true'
-  ALLOWED_EVENTS: 'ChainEventCreated,SnapshotProposalCreated,ThreadCreated,ThreadUpvoted,SubscriptionPreferencesUpdated,CommentCreated,UserMentioned'
   PRIVATE_KEY: 'web3-pk'
   USES_DOCKER_PGSQL: true
   PORT: 8080
@@ -291,8 +290,8 @@ jobs:
         run: cd packages/commonwealth && ./scripts/detect-broken-ts-expect-error.sh
 
   # These tests run quickly, so run them in a separate job
-  commonwealth-unit-integration:
-    name: Commonwealth Unit And Integration Tests
+  commonwealth-integration-test:
+    name: Commonwealth Integration Tests
     runs-on: ubuntu-latest
     timeout-minutes: 20
     strategy:
@@ -336,6 +335,50 @@ jobs:
       - name: Build
         run: pnpm -r build
 
+      - name: Run integration tests
+        run: pnpm -F commonwealth test-integration --allowOnly=false
+
+  commonwealth-unit-tests:
+    name: Commonwealth Unit Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      matrix:
+        node: [ 20 ]
+
+    services:
+      postgres:
+        image: hicommonwealth/cw_postgres:latest
+        env:
+          POSTGRES_USER: commonwealth
+          POSTGRES_DB: common_test
+          POSTGRES_PASSWORD: edgeware
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          # Maps tcp port 5432 on service container to the host
+          - 5432:5432
+      redis:
+        image: redis:latest
+        ports:
+          - 6379:6379
+      rabbitmq:
+        image: rabbitmq:3.11-management
+        ports:
+          - 5672:5672
+          - 15672:15672
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+        with:
+          node-version: ${{ matrix.node }}
+
       - name: Run unit tests
         run: pnpm -r test -- --allowOnly=false
 
@@ -345,25 +388,14 @@ jobs:
           chmod -R 755 ./libs/core/coverage/lcov.info
           chmod -R 755 ./libs/model/coverage/lcov.info
           chmod -R 755 ./libs/sitemaps/coverage/lcov.info
-          chmod -R 755 ./packages/commonwealth/coverage/lcov.info
-          chmod -R 755 ./packages/scripts/coverage/lcov.info
 
       - name: Coveralls parallel
         uses: coverallsapp/github-action@v2
         with:
           flag-name: unit-test-coverage
           parallel: true
-          files: libs/adapters/coverage/lcov.info libs/core/coverage/lcov.info libs/model/coverage/lcov.info libs/sitemaps/coverage/lcov.info packages/commonwealth/coverage/lcov.info packages/scripts/coverage/lcov.info
+          files: libs/adapters/coverage/lcov.info libs/core/coverage/lcov.info libs/model/coverage/lcov.info libs/sitemaps/coverage/lcov.info
 
-      - name: Run integration tests
-        run: pnpm -F commonwealth test-integration --allowOnly=false
-
-      - name: Coveralls parallel
-        uses: coverallsapp/github-action@v2
-        with:
-          flag-name: integration-test-coverage
-          parallel: true
-          files: ./packages/commonwealth/coverage/lcov.info
 
   commonwealth-evm-tests:
     name: EVM Devnet Tests
@@ -405,101 +437,11 @@ jobs:
       - name: Run EVM Devnet tests
         run: pnpm -F commonwealth test-devnet:evm --allowOnly=false
 
-      - name: Coveralls parallel
-        uses: coverallsapp/github-action@v2
-        with:
-          flag-name: evm-devnet-test-coverage
-          parallel: true
-          files: packages/commonwealth/coverage/lcov.info
-
-  # These tests run slowly, so run them in a separate job
-  commonwealth-cosmos-tests:
-    name: Cosmos Devnet Tests
-    runs-on: ubuntu-latest
-    timeout-minutes: 25
-    strategy:
-      matrix:
-        node: [ 20 ]
-
-    services:
-      postgres:
-        image: hicommonwealth/cw_postgres:latest
-        env:
-          POSTGRES_USER: commonwealth
-          POSTGRES_DB: common_test
-          POSTGRES_PASSWORD: edgeware
-        # Set health checks to wait until postgres has started
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          # Maps tcp port 5432 on service container to the host
-          - 5432:5432
-      cosmos_test_app:
-        image: mhagel1/csdk-v1
-        ports:
-          - 5051:5051
-      cosmos_beta_test_app:
-        image: mhagel1/csdk-beta
-        ports:
-          - 5050:5050
-      evmos_test_app:
-        image: mhagel1/evmos-dev
-        ports:
-          - 5052:5052
-      redis:
-        image: redis:latest
-        ports:
-          - 6379:6379
-
-    steps:
-      - uses: actions/checkout@v4
-      - uses: ./.github/actions/setup
-        with:
-          node-version: ${{ matrix.node }}
-
-      ## Cosmos Section:
-      # We only run Cosmos devnet tests if any files in the following folders changes
-      - name: Get changed Cosmos devnet-related files
-        id: changed-files-specific
-        uses: tj-actions/changed-files@v35
-        with:
-          files: |
-            packages/commonwealth/test/devnet/cosmos/**/*
-            packages/commonwealth/server/cosmos-gov-notifications/**/*
-            packages/commonwealth/test/integration/cosmosGovNotifGenerator.spec.ts
-            packages/commonwealth/server/util/cosmosProxy.ts
-            packages/commonwealth/client/scripts/controllers/chain/cosmos/gov/**/*
-            packages/commonwealth/test/util/cosmos-chain-testing/**/*
-            libs/chains/src/cosmos-ts/**/*
-
-      - name: Run following steps if any file(s) in the Cosmos folders change
-        if: steps.changed-files-specific.outputs.all_changed_files
-        run: |
-          echo "One or more Cosmos Devnet-related files has changed."
-          echo "List all the files that have changed: ${{ steps.changed-files-specific.outputs.all_changed_files }}"
-
-      - name: Run Cosmos Devnet tests
-        if: steps.changed-files-specific.outputs.any_changed == 'true'
-        run: |
-          pnpm -F commonwealth start &
-          (pnpm -F commonwealth wait-server && pnpm -F commonwealth test-devnet:cosmos --allowOnly=false)
-
-      - name: Coveralls parallel
-        if: steps.changed-files-specific.outputs.all_changed_files
-        uses: coverallsapp/github-action@v2
-        with:
-          flag-name: cosmos-devnet-test-coverage
-          parallel: true
-          files: packages/commonwealth/coverage/lcov.info
-
   report-coverage:
     name: Upload Test Coverage Report
     runs-on: ubuntu-latest
     timeout-minutes: 5
-    needs: [ commonwealth-cosmos-tests, commonwealth-evm-tests, commonwealth-unit-integration, e2e-tests-serial, e2e-tests-Parallel, e2e-tests-Mature ]
+    needs: [ commonwealth-unit-tests ]
     if: always()
     strategy:
       matrix:
@@ -510,4 +452,3 @@ jobs:
         uses: coverallsapp/github-action@v2
         with:
           parallel-finished: true
-          carryforward: "cosmos-devnet-test-coverage"

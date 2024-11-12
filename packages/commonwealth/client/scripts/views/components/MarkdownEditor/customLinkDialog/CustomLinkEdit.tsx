@@ -42,7 +42,6 @@ export const CustomLinkEdit = () => {
       <input
         type="url"
         value={link}
-        style={{ flexGrow: 1 }}
         autoFocus={true}
         placeholder="Enter link"
         onKeyDown={handleKeyDown}

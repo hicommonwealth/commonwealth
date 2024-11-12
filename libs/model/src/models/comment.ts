@@ -9,6 +9,7 @@ import type {
   ReactionAttributes,
   ThreadInstance,
 } from '.';
+import { beforeValidateBodyHook } from './utils';
 
 export type CommentAttributes = z.infer<typeof Comment> & {
   // associations
@@ -36,7 +37,7 @@ export default (
       parent_id: { type: Sequelize.STRING, allowNull: true },
       address_id: { type: Sequelize.INTEGER, allowNull: true },
       created_by: { type: Sequelize.STRING, allowNull: true },
-      text: { type: Sequelize.TEXT, allowNull: false },
+      body: { type: Sequelize.TEXT, allowNull: false },
 
       // canvas-related columns
       canvas_signed_data: { type: Sequelize.JSONB, allowNull: true },
@@ -56,7 +57,7 @@ export default (
         defaultValue: 0,
       },
       reaction_weights_sum: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.DECIMAL(78, 0),
         allowNull: false,
         defaultValue: 0,
       },
@@ -68,6 +69,9 @@ export default (
     },
     {
       hooks: {
+        beforeValidate(instance: CommentInstance) {
+          beforeValidateBodyHook(instance);
+        },
         afterCreate: async (comment, options) => {
           await (
             sequelize.models.Thread as Sequelize.ModelStatic<ThreadInstance>
@@ -85,7 +89,6 @@ export default (
             thread_id: String(comment.thread_id),
           });
         },
-
         afterDestroy: async ({ thread_id }, options) => {
           await (
             sequelize.models.Thread as Sequelize.ModelStatic<ThreadInstance>

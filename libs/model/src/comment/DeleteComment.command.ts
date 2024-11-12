@@ -1,18 +1,15 @@
 import { type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../database';
-import { isAuthorized, type AuthContext } from '../middleware';
+import { authComment } from '../middleware';
 import { mustBeAuthorizedComment } from '../middleware/guards';
 
-export function DeleteComment(): Command<
-  typeof schemas.DeleteComment,
-  AuthContext
-> {
+export function DeleteComment(): Command<typeof schemas.DeleteComment> {
   return {
     ...schemas.DeleteComment,
-    auth: [isAuthorized({ author: true })],
-    body: async ({ actor, auth }) => {
-      const { comment } = mustBeAuthorizedComment(actor, auth);
+    auth: [authComment({ author: true })],
+    body: async ({ actor, context }) => {
+      const { comment } = mustBeAuthorizedComment(actor, context);
 
       // == mutation transaction boundary ==
       await models.sequelize.transaction(async (transaction) => {

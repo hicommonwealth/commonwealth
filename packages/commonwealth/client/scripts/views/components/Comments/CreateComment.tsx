@@ -25,6 +25,7 @@ type CreateCommentProps = {
   rootThread: Thread;
   canComment: boolean;
   tooltipText?: string;
+  isReplying?: boolean;
 };
 
 export const CreateComment = ({
@@ -34,6 +35,7 @@ export const CreateComment = ({
   rootThread,
   canComment,
   tooltipText = '',
+  isReplying,
 }: CreateCommentProps) => {
   const { saveDraft, restoreDraft, clearDraft } = useDraft<DeltaStatic>(
     !parentCommentId
@@ -93,7 +95,7 @@ export const CreateComment = ({
           communityId,
           address: user.activeAccount!.address,
           threadId: rootThread.id,
-          threadMsgId: rootThread.canvasMsgId,
+          threadMsgId: rootThread.canvasMsgId!,
           unescapedText: serializeDelta(contentDelta),
           parentCommentId: parentCommentId ?? null,
           parentCommentMsgId: parentCommentMsgId ?? null,
@@ -136,6 +138,7 @@ export const CreateComment = ({
   const handleCancel = (e) => {
     e.preventDefault();
     setContentDelta(createDeltaFromText(''));
+
     if (handleIsReplying) {
       handleIsReplying(false);
     }
@@ -161,8 +164,9 @@ export const CreateComment = ({
       author={author as Account}
       editorValue={editorValue}
       tooltipText={tooltipText}
+      isReplying={isReplying}
     />
   ) : (
-    <ArchiveMsg archivedAt={rootThread.archivedAt} />
+    <ArchiveMsg archivedAt={rootThread.archivedAt!} />
   );
 };

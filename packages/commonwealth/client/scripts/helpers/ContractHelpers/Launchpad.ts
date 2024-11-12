@@ -15,16 +15,19 @@ class LaunchpadBondingCurve extends ContractBase {
   tokenAddress: string;
   launchpadFactoryAddress: string;
   launchpadFactory: Contract<typeof LaunchpadFactory>;
+  tokenCommunityManager: string;
 
   constructor(
     bondingCurveAddress: string,
     launchpadFactoryAddress: string,
     tokenAddress: string,
+    tokenCommunityManager: string,
     rpc: string,
   ) {
     super(bondingCurveAddress, LpBondingCurve, rpc);
     this.tokenAddress = tokenAddress;
     this.launchpadFactoryAddress = launchpadFactoryAddress;
+    this.tokenCommunityManager = tokenCommunityManager;
   }
 
   async initialize(
@@ -52,11 +55,12 @@ class LaunchpadBondingCurve extends ContractBase {
       this.launchpadFactory,
       name,
       symbol,
-      [7000, 1250, 1000, 750], // 9181 parameters
+      [], // 9181 parameters
       // should include at community treasury at [0] and contest creation util at [1] curr tbd
-      [walletAddress, walletAddress],
+      [],
       this.web3.utils.toWei(1e9, 'ether'), // Default 1B tokens
       walletAddress,
+      this.tokenCommunityManager,
     );
     return txReceipt;
   }

@@ -24,23 +24,22 @@ describe('getCommentDepth', () => {
     });
     const thread = await models.Thread.create({
       community_id,
+      body: 'test',
       address_id: address!.id!,
       title: 'Testing',
       kind: 'discussion',
       search: getThreadSearchVector('Testing', ''),
+      reaction_weights_sum: '0',
     });
-    let comment: CommentInstance;
+    let comment: CommentInstance | undefined;
     for (let i = 0; i < maxDepth; i++) {
       const result = await models.Comment.create({
-        community_id,
-        // @ts-expect-error StrictNullChecks
-        thread_id: thread.id,
-        // @ts-expect-error StrictNullChecks
+        thread_id: thread.id!,
         parent_id: comment ? String(comment.id) : undefined,
-        // @ts-expect-error StrictNullChecks
-        address_id: address.id,
-        text: String(i),
+        address_id: address!.id!,
+        body: String(i),
         search: getCommentSearchVector(String(i)),
+        reaction_count: 0,
       });
       comments.push(result);
       comment = result;

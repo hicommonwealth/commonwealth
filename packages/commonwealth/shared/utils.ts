@@ -29,7 +29,11 @@ export const getCommunityUrl = (community: string): string => {
     : `http://localhost:8080/${community}`;
 };
 
-export const smartTrim = (text, maxLength = 200) => {
+export const smartTrim = (
+  text: string | undefined,
+  maxLength = 200,
+): string => {
+  if (!text) return '';
   if (text.length > maxLength) {
     const smartTrimmedText = text.slice(0, maxLength).replace(/\W+$/, '');
     if (smartTrimmedText.length === 0) return `${text.slice(0, maxLength)}...`;
@@ -62,6 +66,7 @@ export function formatAddressShort(
   includeEllipsis?: boolean,
   maxCharLength?: number,
   prefix?: string,
+  firstAndLastDigit?: boolean,
 ) {
   if (!address) return;
   if (chain === 'near') {
@@ -73,6 +78,8 @@ export function formatAddressShort(
       totalLength - 4,
       totalLength,
     )}`;
+  } else if (firstAndLastDigit) {
+    return `${address.slice(0, 4)}...${address.slice(-2)}`;
   } else {
     return `${address.slice(0, maxCharLength || 5)}${
       includeEllipsis ? '…' : ''

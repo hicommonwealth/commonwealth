@@ -1,0 +1,187 @@
+@import '../../../../../styles/shared.scss';
+
+.CWImageInput {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  height: 100%;
+  width: 100%;
+
+  .UploadControl {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    height: 100%;
+    width: 100%;
+    padding: 16px;
+    background-color: $neutral-25;
+    border: 1px solid $neutral-200;
+    border-radius: $border-radius-corners;
+    position: relative;
+    cursor: pointer;
+    min-height: 175px;
+
+    &.hasImageURL {
+      min-height: 270px;
+    }
+
+    &.isLoading {
+      cursor: default;
+    }
+
+    &.disabled {
+      cursor: not-allowed;
+
+      .Text {
+        color: $neutral-400;
+      }
+
+      .Icon {
+        color: $neutral-300;
+      }
+    }
+
+    &.hovered {
+      border: 1px solid $primary-500;
+    }
+
+    .file-input {
+      display: none;
+    }
+
+    .img-circle {
+      height: 180px;
+      width: 180px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .img-cover {
+      width: 100%;
+      max-height: 100%;
+      object-fit: cover;
+      position: absolute;
+      top: 0;
+      left: 0;
+      border-radius: $border-radius-corners;
+    }
+
+    .img-repeat {
+      width: 100%;
+      max-height: 100%;
+      min-height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      border-radius: $border-radius-corners;
+      background-repeat: repeat;
+      background-position: 0px 0px;
+      background-size: 150px 100px;
+    }
+
+    .gray {
+      color: $neutral-500;
+    }
+
+    .btn-focus-styles {
+      margin: 0 !important;
+
+      &:focus-within {
+        border-width: 1px !important;
+        padding: 0 !important;
+      }
+    }
+
+    .switch-left-btn,
+    .switch-right-btn {
+      position: absolute;
+      z-index: 1;
+      top: calc(50% - 16px);
+    }
+
+    .switch-left-btn {
+      left: 12px;
+    }
+
+    .switch-right-btn {
+      right: 12px;
+    }
+
+    .generate-img-btn {
+      z-index: 1;
+
+      &.autoMarginTop {
+        margin-top: auto !important;
+      }
+    }
+
+    .loading-container,
+    .generate-image-section {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      left: 0;
+      top: 0;
+      background: rgba(255, 255, 255, 0.5);
+      backdrop-filter: blur(5px);
+      border-radius: $border-radius-corners;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .loading-container {
+      z-index: 3;
+    }
+
+    .generate-image-section {
+      z-index: 2;
+
+      .close-btn {
+        position: absolute;
+        right: 4px;
+        top: 4px;
+      }
+
+      .prompt-input-container {
+        width: 80%;
+
+        .prompt-input {
+          padding: 8px !important;
+          padding-right: 32px !important;
+          line-height: 16px !important;
+          height: auto !important;
+        }
+      }
+    }
+
+    &.formError {
+      margin-bottom: 24px;
+      border-color: $rorange-500;
+    }
+
+    .form-validation-error {
+      cursor: default;
+      position: absolute;
+      bottom: -24px;
+      left: 0;
+    }
+  }
+
+  .ImageBehaviorSelector {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    gap: 4px;
+    margin-top: 8px;
+
+    .cover-image-title {
+      color: $neutral-700 !important;
+      padding-bottom: 8px;
+    }
+  }
+}

@@ -44,23 +44,24 @@ const useDeleteThreadReactionMutation = ({
   const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
 
   return trpc.thread.deleteReaction.useMutation({
-    onSuccess: (deleted) => {
-      updateThreadInAllCaches(
-        communityId,
-        threadId,
-        {
-          associatedReactions: [
-            {
-              id: deleted.reaction_id,
-              type: 'like',
-              voting_weight: 0,
-              address: '',
-              updated_at: '',
-            },
-          ],
-        },
-        'removeFromExisting',
-      );
+    onSuccess: (deleted, variables) => {
+      deleted &&
+        updateThreadInAllCaches(
+          communityId,
+          threadId,
+          {
+            associatedReactions: [
+              {
+                id: variables.reaction_id,
+                reaction: 'like',
+                address: '',
+                updated_at: '',
+                address_id: 0,
+              },
+            ],
+          },
+          'removeFromExisting',
+        );
     },
     onError: (error) => checkForSessionKeyRevalidationErrors(error),
   });

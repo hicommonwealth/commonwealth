@@ -86,27 +86,31 @@ describe('CommentCreated Event Handler', () => {
       deleted_at: null,
       read_only: false,
       pinned: false,
+      reaction_weights_sum: '0',
     });
     [rootComment] = await tester.seed('Comment', {
       parent_id: null,
       thread_id: thread!.id!,
       address_id: community!.Addresses![0].id,
       deleted_at: null,
+      reaction_weights_sum: '0',
     });
     [replyComment] = await tester.seed('Comment', {
       parent_id: String(rootComment!.id),
       thread_id: thread!.id!,
       address_id: community!.Addresses![0].id,
       deleted_at: null,
+      reaction_weights_sum: '0',
     });
     [mentionedComment] = await tester.seed('Comment', {
-      text: `Hi [@${mentionedUser!.profile.name}](/profile/id/${
+      body: `Hi [@${mentionedUser!.profile.name}](/profile/id/${
         mentionedUser!.id
       }).`,
       parent_id: String(rootComment!.id),
       thread_id: thread!.id!,
       address_id: community!.Addresses![0].id,
       deleted_at: null,
+      reaction_weights_sum: '0',
     });
   });
 
@@ -206,7 +210,7 @@ describe('CommentCreated Event Handler', () => {
         author: author?.profile.name,
         comment_parent_name: 'thread',
         community_name: community?.name,
-        comment_body: rootComment?.text.substring(0, 255),
+        comment_body: rootComment?.body.substring(0, 255),
         comment_url: `https://${customDomain}/${community!
           .id!}/discussion/${thread!.id!}?comment=${rootComment!.id!}`,
         comment_created_event: { ...rootComment, community_id: community!.id },
@@ -251,7 +255,7 @@ describe('CommentCreated Event Handler', () => {
         author: author?.profile.name,
         comment_parent_name: 'comment',
         community_name: community?.name,
-        comment_body: replyComment?.text.substring(0, 255),
+        comment_body: replyComment?.body.substring(0, 255),
         comment_url: getCommentUrl(
           community!.id!,
           thread!.id!,
@@ -329,7 +333,7 @@ describe('CommentCreated Event Handler', () => {
         author: author?.profile.name,
         comment_parent_name: 'comment',
         community_name: community?.name,
-        comment_body: mentionedComment?.text.substring(0, 255),
+        comment_body: mentionedComment?.body.substring(0, 255),
         comment_url: getCommentUrl(
           community!.id!,
           thread!.id!,

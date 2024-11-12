@@ -39,16 +39,16 @@ export const ReactionButton = ({
   undoUpvoteDisabled,
 }: ReactionButtonProps) => {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
-  const reactors = thread?.associatedReactions?.map((t) => t.address);
+  const reactors = thread?.associatedReactions?.map((t) => t.address!);
 
   const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
   const user = useUserStore();
 
   const reactionWeightsSum =
-    thread?.associatedReactions?.reduce(
-      (acc, curr) => acc + (curr.voting_weight || 1),
-      0,
-    ) || 0;
+    BigInt(thread?.reactionWeightsSum || 0) > 0
+      ? thread?.reactionWeightsSum
+      : thread?.reactionCount?.toString() || '0';
+
   const activeAddress = user.activeAccount?.address;
   const thisUserReaction = thread?.associatedReactions?.filter(
     (r) => r.address === activeAddress,
@@ -63,14 +63,14 @@ export const ReactionButton = ({
     useCreateThreadReactionMutation({
       communityId,
       threadId: thread.id,
-      threadMsgId: thread.canvasMsgId,
+      threadMsgId: thread.canvasMsgId!,
     });
   const { mutateAsync: deleteThreadReaction, isLoading: isDeletingReaction } =
     useDeleteThreadReactionMutation({
       communityId,
       address: user.activeAccount?.address || '',
       threadId: thread.id,
-      threadMsgId: thread.canvasMsgId,
+      threadMsgId: thread.canvasMsgId!,
     });
 
   if (showSkeleton) return <ReactionButtonSkeleton />;
@@ -95,7 +95,7 @@ export const ReactionButton = ({
         communityId,
         address: user.activeAccount?.address,
         threadId: thread.id!,
-        threadMsgId: thread.canvasMsgId,
+        threadMsgId: thread.canvasMsgId!,
         reactionId: +reactedId,
       });
       deleteThreadReaction(input).catch((e) => {
@@ -111,7 +111,7 @@ export const ReactionButton = ({
         communityId,
         address: activeAddress || '',
         threadId: thread.id,
-        threadMsgId: thread.canvasMsgId,
+        threadMsgId: thread.canvasMsgId!,
         reactionType: 'like',
       });
       createThreadReaction(input).catch((e) => {
@@ -119,7 +119,13 @@ export const ReactionButton = ({
           checkForSessionKeyRevalidationErrors(e);
           return;
         }
-        notifyError('Failed to upvote');
+        if ((e.message as string)?.includes('Insufficient token balance')) {
+          notifyError(
+            'You must have the requisite tokens to upvote in this topic',
+          );
+        } else {
+          notifyError('Failed to upvote');
+        }
         console.error(e?.response?.data?.error || e?.message);
       });
     }
@@ -129,7 +135,7 @@ export const ReactionButton = ({
     <>
       {size === 'small' ? (
         <CWUpvoteSmall
-          voteCount={reactionWeightsSum}
+          voteCount={reactionWeightsSum.toString()}
           disabled={disabled}
           isThreadArchived={!!thread.archivedAt}
           selected={hasReacted}
@@ -138,12 +144,13 @@ export const ReactionButton = ({
             reactors,
           })}
           tooltipText={tooltipText}
+          reactors={reactors}
         />
       ) : tooltipText ? (
         <TooltipWrapper disabled={disabled} text={tooltipText}>
           <CWUpvote
             onClick={handleVoteClick}
-            voteCount={reactionWeightsSum}
+            voteCount={reactionWeightsSum.toString()}
             disabled={disabled}
             active={hasReacted}
           />
@@ -155,7 +162,7 @@ export const ReactionButton = ({
         >
           <CWUpvote
             onClick={handleVoteClick}
-            voteCount={reactionWeightsSum}
+            voteCount={reactionWeightsSum.toString()}
             disabled={disabled}
             active={hasReacted}
           />

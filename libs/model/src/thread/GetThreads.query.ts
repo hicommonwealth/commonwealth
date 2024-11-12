@@ -68,7 +68,7 @@ export function GetThreads(): Query<typeof schemas.GetThreads> {
       };
 
       const responseThreadsQuery = models.sequelize.query<
-        z.infer<typeof schemas.MappedThread>
+        z.infer<typeof schemas.ThreadView>
       >(
         `
             WITH contest_ids as (
@@ -83,7 +83,7 @@ export function GetThreads(): Query<typeof schemas.GetThreads> {
                 ${contestAddress ? contestStatus[status!] || contestStatus.all : ''}
             ),
             top_threads AS (
-            SELECT id, title, url, body, kind, stage, read_only, discord_meta,
+            SELECT id, title, url, body, kind, stage, read_only, discord_meta, content_url,
                 pinned, community_id, T.created_at, updated_at, locked_at as thread_locked, links,
                 has_poll, last_commented_on, comment_count as "numberOfComments",
                 marked_as_spam_at, archived_at, topic_id, reaction_weights_sum, canvas_signed_data,
@@ -154,14 +154,14 @@ export function GetThreads(): Query<typeof schemas.GetThreads> {
                 TT.id as thread_id,
                 json_agg(json_strip_nulls(json_build_object(
                 'id', R.id,
-                'type', R.reaction,
-                'address', A.address,
+                'reaction', R.reaction,
                 'updated_at', R.updated_at::text,
-                'voting_weight', R.calculated_voting_weight,
+                'calculated_voting_weight', R.calculated_voting_weight,
                 'profile_name', U.profile->>'name',
                 'avatar_url', U.profile->>'avatar_url',
+                'address', A.address,
                 'last_active', A.last_active::text
-            ))) as "associatedReactions"
+            ))) as "reactions"
             FROM "Reactions" R JOIN top_threads TT ON TT.id = R.thread_id
             JOIN "Addresses" A ON A.id = R.address_id
             JOIN "Users" U ON U.id = A.user_id
@@ -199,7 +199,7 @@ export function GetThreads(): Query<typeof schemas.GetThreads> {
                   json_agg(json_strip_nulls(json_build_object(
                   'id', COM.id,
                   'address', A.address,
-                  'text', COM.text,
+                  'body', COM.body,
                   'created_at', COM.created_at::text,
                   'updated_at', COM.updated_at::text,
                   'deleted_at', COM.deleted_at::text,
@@ -207,7 +207,8 @@ export function GetThreads(): Query<typeof schemas.GetThreads> {
                   'discord_meta', COM.discord_meta,
                   'profile_name', U.profile->>'name',
                   'profile_avatar', U.profile->>'avatar_url',
-                  'user_id', U.id
+                  'user_id', U.id,
+                  'content_url', COM.content_url
               ))) as "recentComments"
               FROM (
                 Select tempC.* FROM "Comments" tempC

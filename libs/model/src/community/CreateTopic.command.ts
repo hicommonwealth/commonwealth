@@ -1,10 +1,8 @@
 import { InvalidInput, InvalidState, type Command } from '@hicommonwealth/core';
 
 import * as schemas from '@hicommonwealth/schemas';
-import { config } from '../config';
 import { models } from '../database';
-import { AuthContext, isAuthorized } from '../middleware';
-import { mustBeAuthorized } from '../middleware/guards';
+import { authRoles } from '../middleware';
 import { TopicAttributes } from '../models';
 import { sanitizeQuillText } from '../utils';
 
@@ -14,15 +12,12 @@ const Errors = {
     'Cannot create a staked topic if community has not enabled stake',
 };
 
-export function CreateTopic(): Command<
-  typeof schemas.CreateTopic,
-  AuthContext
-> {
+export function CreateTopic(): Command<typeof schemas.CreateTopic> {
   return {
     ...schemas.CreateTopic,
-    auth: [isAuthorized({ roles: ['admin'] })],
-    body: async ({ actor, payload, auth }) => {
-      const { community_id } = mustBeAuthorized(actor, auth);
+    auth: [authRoles('admin')],
+    body: async ({ actor, payload }) => {
+      const { community_id } = payload;
       const { name, description, featured_in_sidebar, featured_in_new_post } =
         payload;
 
@@ -57,23 +52,15 @@ export function CreateTopic(): Command<
         throw new InvalidState(Errors.StakeNotAllowed);
       }
 
-      if (config.CONTESTS.FLAG_WEIGHTED_TOPICS) {
-        // new path: stake or ERC20
-        if (payload.weighted_voting) {
-          options = {
-            ...options,
-            weighted_voting: payload.weighted_voting,
-            chain_node_id: payload.chain_node_id || undefined,
-            token_address: payload.token_address || undefined,
-            token_symbol: payload.token_symbol || undefined,
-            vote_weight_multiplier: payload.vote_weight_multiplier || undefined,
-          };
-        }
-      } else {
-        // old path: topic staked if community is staked
-        if (stake) {
-          options.weighted_voting = schemas.TopicWeightedVoting.Stake;
-        }
+      // new path: stake or ERC20
+      if (payload.weighted_voting) {
+        options = {
+          ...options,
+          weighted_voting: payload.weighted_voting,
+          token_address: payload.token_address || undefined,
+          token_symbol: payload.token_symbol || undefined,
+          vote_weight_multiplier: payload.vote_weight_multiplier || undefined,
+        };
       }
 
       const [newTopic] = await models.Topic.findOrCreate({

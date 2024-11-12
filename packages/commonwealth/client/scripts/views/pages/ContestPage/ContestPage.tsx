@@ -60,7 +60,7 @@ const ContestPage = ({ contestAddress }: ContestPageProps) => {
     return <PageNotFound />;
   }
 
-  const { end_time, score } = contest?.contests[0] || {};
+  const { end_time } = contest?.contests[0] || {};
 
   return (
     <CWPageLayout>
@@ -77,7 +77,6 @@ const ContestPage = ({ contestAddress }: ContestPageProps) => {
             name={contest?.name}
             imageUrl={contest?.image_url || ''}
             topics={contest?.topics}
-            score={score}
             decimals={contest?.decimals}
             ticker={contest?.ticker}
             finishDate={end_time ? moment(end_time).toISOString() : ''}
@@ -86,6 +85,8 @@ const ContestPage = ({ contestAddress }: ContestPageProps) => {
             isHorizontal
             showShareButton={false}
             showLeaderboardButton={false}
+            payoutStructure={contest?.payout_structure}
+            isFarcaster={contest?.is_farcaster_contest}
           />
         )}
 

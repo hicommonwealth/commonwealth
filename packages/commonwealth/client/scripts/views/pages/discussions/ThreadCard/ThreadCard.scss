@@ -87,7 +87,6 @@
 
         @include extraSmall {
           overflow: hidden !important;
-          max-height: 54px !important;
         }
 
         .MarkdownFormattedText {
@@ -151,6 +150,13 @@
             text-decoration: underline;
           }
         }
+      }
+
+      .content-body.show-image .MarkdownFormattedText img {
+        display: block !important;
+        width: 350px;
+        height: 200px;
+        object-fit: cover;
       }
 
       .content-title {

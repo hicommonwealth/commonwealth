@@ -1,5 +1,5 @@
 import { AppError } from '@hicommonwealth/core';
-import { ZERO_ADDRESS } from '@hicommonwealth/shared';
+import { commonProtocol } from '@hicommonwealth/shared';
 import { Mutex } from 'async-mutex';
 import Web3, { PayableCallOptions } from 'web3';
 import { AbiItem } from 'web3-utils';
@@ -28,7 +28,7 @@ export type ContestScores = {
     winningAddress: string;
     voteCount: string;
   }[];
-  contestBalance: number;
+  contestBalance: string;
 };
 
 /**
@@ -257,61 +257,23 @@ export const getContestBalance = async (
   rpcNodeUrl: string,
   contest: string,
   oneOff?: boolean,
-): Promise<number> => {
+): Promise<string> => {
   const web3 = new Web3(rpcNodeUrl);
+
   const contestInstance = new web3.eth.Contract(
     contestABI as AbiItem[],
     contest,
   );
 
-  const promises = [contestInstance.methods.contestToken().call()];
-
-  if (!oneOff) {
-    promises.push(contestInstance.methods.FeeMangerAddress().call());
-  }
-
-  const results = await Promise.all(promises);
-
-  const balancePromises: Promise<number>[] = [];
-
-  if (!oneOff) {
-    const feeManager = new web3.eth.Contract(
-      feeManagerABI as AbiItem[],
-      String(results[1]),
-    );
-    balancePromises.push(
-      feeManager.methods.getBeneficiaryBalance(contest, results[0]).call(),
-    );
-  }
-  if (String(results[0]) === ZERO_ADDRESS) {
-    balancePromises.push(
-      web3.eth.getBalance(contest).then((v) => {
-        return Number(v);
-      }),
-    );
-  } else {
-    const calldata =
-      '0x70a08231' +
-      web3.eth.abi.encodeParameters(['address'], [contest]).substring(2);
-    balancePromises.push(
-      web3.eth
-        .call({
-          to: String(results[0]),
-          data: calldata,
-        })
-        .then((v) => {
-          return Number(web3.eth.abi.decodeParameter('uint256', v));
-        }),
-    );
-  }
-
-  const balanceResults = await Promise.all(balancePromises);
-
-  return Number(
-    balanceResults.length === 2
-      ? BigInt(balanceResults[0]) + BigInt(balanceResults[1])
-      : BigInt(balanceResults[0]),
+  const balance = await commonProtocol.getTotalContestBalance(
+    contestInstance,
+    contest,
+    web3,
+    feeManagerABI,
+    oneOff,
   );
+
+  return balance;
 };
 
 export const addContentBatch = async (

@@ -1,7 +1,7 @@
 import { InvalidState, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../database';
-import { isAuthorized, type AuthContext } from '../middleware';
+import { authThread } from '../middleware';
 import { verifyReactionSignature } from '../middleware/canvas';
 import { mustBeAuthorizedThread } from '../middleware/guards';
 import { getVotingWeight } from '../services/stakeHelper';
@@ -11,19 +11,18 @@ export const CreateThreadReactionErrors = {
 };
 
 export function CreateThreadReaction(): Command<
-  typeof schemas.CreateThreadReaction,
-  AuthContext
+  typeof schemas.CreateThreadReaction
 > {
   return {
     ...schemas.CreateThreadReaction,
     auth: [
-      isAuthorized({
+      authThread({
         action: schemas.PermissionEnum.CREATE_THREAD_REACTION,
       }),
       verifyReactionSignature,
     ],
-    body: async ({ payload, actor, auth }) => {
-      const { address, thread } = mustBeAuthorizedThread(actor, auth);
+    body: async ({ payload, actor, context }) => {
+      const { address, thread } = mustBeAuthorizedThread(actor, context);
 
       if (thread.archived_at)
         throw new InvalidState(CreateThreadReactionErrors.ThreadArchived);
@@ -46,7 +45,7 @@ export function CreateThreadReaction(): Command<
               address_id: address.id!,
               thread_id: thread.id,
               reaction: payload.reaction,
-              calculated_voting_weight,
+              calculated_voting_weight: calculated_voting_weight?.toString(),
               canvas_msg_id: payload.canvas_msg_id,
               canvas_signed_data: payload.canvas_signed_data,
             },

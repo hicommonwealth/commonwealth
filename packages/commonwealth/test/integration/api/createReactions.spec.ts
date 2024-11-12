@@ -37,18 +37,17 @@ describe('createReaction Integration Tests', () => {
       .set('address', address)
       .send(validRequest);
     assert.equal((res as any).statusCode, 200);
-
-    return JSON.parse(res.text);
+    return res.text === 'true';
   };
 
   const getUniqueCommentText = async () => {
     const time = new Date().getMilliseconds();
-    const text = `testCommentCreated at ${time}`;
+    const body = `testCommentCreated at ${time}`;
     const comment = await server.models.Comment.findOne({
-      where: { text },
+      where: { body },
     });
     chai.assert.isNull(comment);
-    return text;
+    return body;
   };
 
   beforeAll(async () => {
@@ -101,13 +100,13 @@ describe('createReaction Integration Tests', () => {
   });
 
   test('should create comment reactions and verify comment reaction count', async () => {
-    const text = await getUniqueCommentText();
+    const body = await getUniqueCommentText();
     const createCommentResponse = await server.seeder.createComment({
       chain: 'ethereum',
       address: userAddress,
       did: userDid,
       jwt: userJWT,
-      text,
+      body,
       threadId: threadId,
       threadMsgId,
       session: userSession.session,
@@ -115,7 +114,7 @@ describe('createReaction Integration Tests', () => {
     });
 
     const comment = await server.models.Comment.findOne({
-      where: { text },
+      where: { body },
     });
 
     chai.assert.isNotNull(comment);
@@ -146,7 +145,7 @@ describe('createReaction Integration Tests', () => {
       userJWT,
       userAddress,
     );
-    chai.assert.equal(deleteReactionResponse.reaction_id, reactionId);
+    chai.assert.equal(deleteReactionResponse, true);
 
     await comment!.reload();
     chai.assert.equal(comment!.reaction_count, beforeReactionCount);
@@ -184,7 +183,7 @@ describe('createReaction Integration Tests', () => {
       userAddress,
     );
 
-    chai.assert.equal(deleteReactionResponse.reaction_id, reactionId);
+    chai.assert.equal(deleteReactionResponse, true);
 
     await thread!.reload();
     chai.assert.equal(thread!.reaction_count, beforeReactionCount!);

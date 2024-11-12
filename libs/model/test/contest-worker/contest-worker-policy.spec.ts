@@ -44,21 +44,16 @@ describe('Contest Worker Policy', () => {
         {
           contest_address: contestAddress,
           cancelled: false,
-        },
-      ],
-      topics: [
-        {
-          name: 'zzz',
+          topics: [
+            {
+              name: 'zzz',
+            },
+          ],
         },
       ],
     });
-    topicId = community!.topics![0].id!;
-    expect(topicId, 'topicId not assigned').to.exist;
-    await models.ContestTopic.create({
-      topic_id: topicId,
-      contest_address: community!.contest_managers![0].contest_address!,
-      created_at: new Date(),
-    });
+    topicId = community!.contest_managers![0].topics![0].id!;
+    expect(topicId, 'seeded topic not assigned to contest manager').to.exist;
     await seed('Thread', {
       id: threadId,
       community_id: communityId,
@@ -97,9 +92,10 @@ describe('Contest Worker Policy', () => {
             canvas_msg_id: '',
             kind: '',
             stage: '',
+            body: '',
             view_count: 0,
             reaction_count: 0,
-            reaction_weights_sum: 0,
+            reaction_weights_sum: '0',
             comment_count: 0,
             deleted_at: undefined,
             pinned: false,
@@ -152,7 +148,7 @@ describe('Contest Worker Policy', () => {
         content_url: '/ethhh/discussion/888',
         thread_id: threadId,
         thread_title: threadTitle,
-        voting_power: 10,
+        voting_power: '10',
         created_at: new Date(),
       });
 

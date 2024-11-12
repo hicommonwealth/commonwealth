@@ -10,15 +10,14 @@ import _ from 'lodash';
 import { Op } from 'sequelize';
 import { config } from '../config';
 import { models } from '../database';
-import { isSuperAdmin, type AuthContext } from '../middleware';
+import { isSuperAdmin } from '../middleware';
 
 const log = logger(import.meta);
 // limit number of users in non-production environment
 const USERS_PER_DB_REQUEST = config.APP_ENV === 'production' ? 20_000 : 100;
 
 export function TriggerNotificationsWorkflow(): Command<
-  typeof schemas.TriggerNotificationsWorkflow,
-  AuthContext
+  typeof schemas.TriggerNotificationsWorkflow
 > {
   return {
     ...schemas.TriggerNotificationsWorkflow,

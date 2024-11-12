@@ -190,7 +190,20 @@
   .user-chain {
     color: $neutral-500 !important;
   }
+  .address-container {
+    display: 'flex';
+    justify-content: center;
+    align-items: 'center';
+    gap: 10;
+    padding: 6px;
 
+    .user-address,
+    .copy-icon {
+      margin-left: 2px;
+      padding-top: 2px;
+      cursor: pointer;
+    }
+  }
   .role-tag {
     margin-top: 10px !important;
   }

@@ -1,10 +1,15 @@
-import sinon from 'sinon';
-import { contractHelpers } from '../../src/services/commonProtocol';
+import {
+  afterAll,
+  afterEach,
+  beforeAll,
+  describe,
+  expect,
+  test,
+  vi,
+} from 'vitest';
 
-const getNamespaceBalanceStub = sinon.stub(
-  contractHelpers,
-  'getNamespaceBalance',
-);
+import { contractHelpers } from '../../src/services/commonProtocol';
+const getNamespaceBalanceSpy = vi.spyOn(contractHelpers, 'getNamespaceBalance');
 
 import {
   Actor,
@@ -19,15 +24,8 @@ import {
 import { AddressAttributes, R2_ADAPTER_KEY } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import { TopicWeightedVoting } from '@hicommonwealth/schemas';
-import {
-  CANVAS_TOPIC,
-  getTestSigner,
-  sign,
-  toCanvasSignedDataApiArgs,
-} from '@hicommonwealth/shared';
+import { MAX_TRUNCATED_CONTENT_LENGTH } from '@hicommonwealth/shared';
 import { Chance } from 'chance';
-import { afterEach } from 'node:test';
-import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 import { z } from 'zod';
 import {
   CreateComment,
@@ -50,32 +48,9 @@ import {
   UpdateThreadErrors,
 } from '../../src/thread';
 import { getCommentDepth } from '../../src/utils/getCommentDepth';
+import { getSignersInfo, signCreateThread } from '../utils/canvas-signers';
 
 const chance = Chance();
-
-async function signPayload(
-  address: string,
-  payload: z.infer<typeof schemas.CreateThread.input>,
-) {
-  const did = `did:pkh:eip155:1:${address}`;
-  return {
-    ...payload,
-    ...toCanvasSignedDataApiArgs(
-      await sign(
-        did,
-        'thread',
-        {
-          community: payload.community_id,
-          title: payload.title,
-          body: payload.body,
-          link: payload.url,
-          topic: payload.topic_id,
-        },
-        async () => [1, []] as [number, string[]],
-      ),
-    ),
-  };
-}
 
 describe('Thread lifecycle', () => {
   let community: z.infer<typeof schemas.Community>,
@@ -110,19 +85,7 @@ describe('Thread lifecycle', () => {
   };
 
   beforeAll(async () => {
-    const signerInfo = await Promise.all(
-      roles.map(async () => {
-        const signer = getTestSigner();
-        const did = await signer.getDid();
-        await signer.newSession(CANVAS_TOPIC);
-        return {
-          signer,
-          did,
-          address: signer.getAddressFromDid(did),
-        };
-      }),
-    );
-
+    const signerInfo = await getSignersInfo(roles);
     const threadGroupId = 123456;
     const commentGroupId = 654321;
     const [node] = await seed('ChainNode', { eth_chain_id: 1 });
@@ -230,6 +193,7 @@ describe('Thread lifecycle', () => {
       archived_at: new Date(),
       pinned: false,
       read_only: false,
+      reaction_weights_sum: '0',
     });
     archived = archived_thread;
 
@@ -239,6 +203,7 @@ describe('Thread lifecycle', () => {
       topic_id: community?.topics?.at(0)?.id,
       pinned: false,
       read_only: true,
+      reaction_weights_sum: '0',
     });
     read_only = read_only_thread;
 
@@ -278,10 +243,12 @@ describe('Thread lifecycle', () => {
         test(`should create thread as ${role}`, async () => {
           const _thread = await command(CreateThread(), {
             actor: actors[role],
-            payload: await signPayload(actors[role].address!, instancePayload),
+            payload: await signCreateThread(
+              actors[role].address!,
+              instancePayload,
+            ),
           });
           expect(_thread?.title).to.equal(instancePayload.title);
-          expect(_thread?.body).to.equal(instancePayload.body);
           expect(_thread?.stage).to.equal(instancePayload.stage);
           // capture as admin author for other tests
           if (!thread) thread = _thread!;
@@ -294,6 +261,12 @@ describe('Thread lifecycle', () => {
                 key: _thread!.content_url!.split('/').pop()!,
               }),
             ).toBeTruthy();
+
+            expect(_thread?.body).to.equal(
+              instancePayload.body.slice(0, MAX_TRUNCATED_CONTENT_LENGTH),
+            );
+          } else {
+            expect(_thread?.body).to.equal(instancePayload.body);
           }
         });
       } else {
@@ -311,7 +284,7 @@ describe('Thread lifecycle', () => {
 
   describe('updates', () => {
     test('should patch content', async () => {
-      const body = {
+      const payloadContent = {
         title: 'hello',
         body: chance.paragraph({ sentences: 50 }),
         canvas_msg_id: '',
@@ -321,10 +294,13 @@ describe('Thread lifecycle', () => {
         actor: actors.admin,
         payload: {
           thread_id: thread.id!,
-          ...body,
+          ...payloadContent,
         },
       });
-      expect(updated).to.contain(body);
+      expect(updated).to.contain({
+        ...payloadContent,
+        body: payloadContent.body.slice(0, MAX_TRUNCATED_CONTENT_LENGTH),
+      });
       expect(updated?.content_url).toBeTruthy();
       expect(
         await blobStorage({ key: R2_ADAPTER_KEY }).exists({
@@ -334,15 +310,15 @@ describe('Thread lifecycle', () => {
       ).toBeTruthy();
       expect(updated?.ThreadVersionHistories?.length).to.equal(2);
 
-      body.body = 'wasup';
+      payloadContent.body = 'wasup';
       updated = await command(UpdateThread(), {
         actor: actors.admin,
         payload: {
           thread_id: thread.id!,
-          ...body,
+          ...payloadContent,
         },
       });
-      expect(updated).to.contain(body);
+      expect(updated).to.contain(payloadContent);
       expect(updated?.content_url).toBeFalsy();
       expect(updated!.ThreadVersionHistories?.length).to.equal(3);
       const sortedHistory = updated!.ThreadVersionHistories!.sort(
@@ -513,7 +489,7 @@ describe('Thread lifecycle', () => {
     test('should delete a thread as author', async () => {
       const _thread = await command(CreateThread(), {
         actor: actors.member,
-        payload: await signPayload(actors.member.address!, payload),
+        payload: await signCreateThread(actors.member.address!, payload),
       });
       const _deleted = await command(DeleteThread(), {
         actor: actors.member,
@@ -525,7 +501,7 @@ describe('Thread lifecycle', () => {
     test('should delete a thread as admin', async () => {
       const _thread = await command(CreateThread(), {
         actor: actors.member,
-        payload: await signPayload(actors.member.address!, payload),
+        payload: await signCreateThread(actors.member.address!, payload),
       });
       const _deleted = await command(DeleteThread(), {
         actor: actors.admin,
@@ -546,7 +522,7 @@ describe('Thread lifecycle', () => {
     test('should throw error when not owned', async () => {
       const _thread = await command(CreateThread(), {
         actor: actors.member,
-        payload: await signPayload(actors.member.address!, payload),
+        payload: await signCreateThread(actors.member.address!, payload),
       });
       await expect(
         command(DeleteThread(), {
@@ -559,18 +535,18 @@ describe('Thread lifecycle', () => {
 
   describe('comments', () => {
     test('should create a thread comment as member of group with permissions', async () => {
-      let text = chance.paragraph({ sentences: 50 });
+      let body = chance.paragraph({ sentences: 50 });
       const firstComment = await command(CreateComment(), {
         actor: actors.member,
         payload: {
           parent_msg_id: thread!.canvas_msg_id,
           thread_id: thread.id!,
-          text,
+          body,
         },
       });
       expect(firstComment).to.include({
         thread_id: thread!.id,
-        text,
+        body: body.slice(0, MAX_TRUNCATED_CONTENT_LENGTH),
         community_id: thread!.community_id,
       });
       expect(firstComment?.content_url).toBeTruthy();
@@ -581,19 +557,19 @@ describe('Thread lifecycle', () => {
         }),
       ).toBeTruthy();
 
-      text = 'hello';
+      body = 'hello';
       const _comment = await command(CreateComment(), {
         actor: actors.member,
         payload: {
           parent_msg_id: thread!.canvas_msg_id,
           thread_id: thread.id!,
-          text,
+          body,
         },
       });
       if (!comment) comment = _comment!;
       expect(_comment).to.include({
         thread_id: thread!.id,
-        text,
+        body,
         community_id: thread!.community_id,
       });
       expect(_comment?.content_url).toBeFalsy();
@@ -606,7 +582,7 @@ describe('Thread lifecycle', () => {
           payload: {
             parent_msg_id: thread.canvas_msg_id,
             thread_id: thread.id! + 5,
-            text: 'hi',
+            body: 'hi',
           },
         }),
       ).rejects.toThrowError(InvalidInput);
@@ -619,7 +595,7 @@ describe('Thread lifecycle', () => {
           payload: {
             parent_msg_id: thread.canvas_msg_id,
             thread_id: thread.id!,
-            text: 'hi',
+            body: 'hi',
           },
         }),
       ).rejects.toThrowError(NonMember);
@@ -632,7 +608,7 @@ describe('Thread lifecycle', () => {
           payload: {
             parent_msg_id: thread!.canvas_msg_id,
             thread_id: archived!.id,
-            text: 'hi',
+            body: 'hi',
           },
         }),
       ).rejects.toThrowError(CreateCommentErrors.ThreadArchived);
@@ -645,7 +621,7 @@ describe('Thread lifecycle', () => {
           payload: {
             parent_msg_id: thread!.canvas_msg_id,
             thread_id: read_only!.id,
-            text: 'hi',
+            body: 'hi',
           },
         }),
       ).rejects.toThrowError(CreateCommentErrors.CantCommentOnReadOnly);
@@ -659,7 +635,7 @@ describe('Thread lifecycle', () => {
             parent_msg_id: thread.canvas_msg_id,
             thread_id: thread.id!,
             parent_id: 1234567890,
-            text: 'hi',
+            body: 'hi',
           },
         }),
       ).rejects.toThrowError(InvalidState);
@@ -675,7 +651,7 @@ describe('Thread lifecycle', () => {
             parent_msg_id: thread.canvas_msg_id,
             thread_id: thread.id!,
             parent_id,
-            text: `level${i}`,
+            body: `level${i}`,
           },
         });
         parent_id = comment!.id;
@@ -694,24 +670,24 @@ describe('Thread lifecycle', () => {
             parent_msg_id: thread.canvas_msg_id,
             thread_id: thread.id!,
             parent_id,
-            text: 'hi',
+            body: 'hi',
           },
         }),
       ).rejects.toThrowError(CreateCommentErrors.NestingTooDeep);
     });
 
     test('should update comment', async () => {
-      let text = chance.paragraph({ sentences: 50 });
+      let body = chance.paragraph({ sentences: 50 });
       let updated = await command(UpdateComment(), {
         actor: actors.member,
         payload: {
           comment_id: comment!.id!,
-          text,
+          body,
         },
       });
       expect(updated).to.include({
         thread_id: thread!.id,
-        text,
+        body: body.slice(0, MAX_TRUNCATED_CONTENT_LENGTH),
         community_id: thread!.community_id,
       });
       expect(updated?.content_url).toBeTruthy();
@@ -722,17 +698,17 @@ describe('Thread lifecycle', () => {
         }),
       ).toBeTruthy();
 
-      text = 'hello updated';
+      body = 'hello updated';
       updated = await command(UpdateComment(), {
         actor: actors.member,
         payload: {
           comment_id: comment!.id!,
-          text,
+          body,
         },
       });
       expect(updated).to.include({
         thread_id: thread!.id,
-        text,
+        body,
         community_id: thread!.community_id,
       });
       expect(updated?.content_url).toBeFalsy();
@@ -752,24 +728,24 @@ describe('Thread lifecycle', () => {
           actor: actors.member,
           payload: {
             comment_id: 1234567890,
-            text: 'hi',
+            body: 'hi',
           },
         }),
       ).rejects.toThrowError(InvalidInput);
     });
 
     test('should delete a comment as author', async () => {
-      const text = 'to be deleted';
+      const body = 'to be deleted';
       const tbd = await command(CreateComment(), {
         actor: actors.member,
         payload: {
           thread_id: thread.id!,
-          text,
+          body,
         },
       });
       expect(tbd).to.include({
         thread_id: thread!.id,
-        text,
+        body,
         community_id: thread!.community_id,
       });
       const deleted = await command(DeleteComment(), {
@@ -780,17 +756,17 @@ describe('Thread lifecycle', () => {
     });
 
     test('should delete a comment as admin', async () => {
-      const text = 'to be deleted';
+      const body = 'to be deleted';
       const tbd = await command(CreateComment(), {
         actor: actors.member,
         payload: {
           thread_id: thread.id!,
-          text,
+          body,
         },
       });
       expect(tbd).to.include({
         thread_id: thread!.id,
-        text,
+        body,
         community_id: thread!.community_id,
       });
       const deleted = await command(DeleteComment(), {
@@ -814,11 +790,13 @@ describe('Thread lifecycle', () => {
 
   describe('thread reaction', () => {
     afterEach(() => {
-      getNamespaceBalanceStub.restore();
+      getNamespaceBalanceSpy.mockClear();
     });
 
     test('should create a thread reaction as a member of a group with permissions', async () => {
-      getNamespaceBalanceStub.resolves({ [actors.member.address!]: '50' });
+      getNamespaceBalanceSpy.mockResolvedValue({
+        [actors.member.address!]: '50',
+      });
       const reaction = await command(CreateThreadReaction(), {
         actor: actors.member,
         payload: {
@@ -835,7 +813,9 @@ describe('Thread lifecycle', () => {
     });
 
     test('should throw error when actor does not have stake', async () => {
-      getNamespaceBalanceStub.resolves({ [actors.member.address!]: '0' });
+      getNamespaceBalanceSpy.mockResolvedValue({
+        [actors.member.address!]: '0',
+      });
       await expect(
         command(CreateThreadReaction(), {
           actor: actors.member,
@@ -888,7 +868,9 @@ describe('Thread lifecycle', () => {
     });
 
     test('should set thread reaction vote weight and thread vote sum correctly', async () => {
-      getNamespaceBalanceStub.resolves({ [actors.admin.address!]: '50' });
+      getNamespaceBalanceSpy.mockResolvedValue({
+        [actors.admin.address!]: '50',
+      });
       const reaction = await command(CreateThreadReaction(), {
         actor: actors.admin,
         payload: {
@@ -898,9 +880,11 @@ describe('Thread lifecycle', () => {
         },
       });
       const expectedWeight = 50 * vote_weight;
-      expect(reaction?.calculated_voting_weight).to.eq(expectedWeight);
+      expect(`${reaction?.calculated_voting_weight}`).to.eq(
+        `${expectedWeight}`,
+      );
       const t = await models.Thread.findByPk(thread!.id);
-      expect(t!.reaction_weights_sum).to.eq(expectedWeight);
+      expect(`${t!.reaction_weights_sum}`).to.eq(`${expectedWeight}`);
     });
 
     test('should delete a reaction', async () => {
@@ -919,7 +903,7 @@ describe('Thread lifecycle', () => {
           reaction_id: reaction!.id!,
         },
       });
-      expect(deleted).to.include({ reaction_id: reaction!.id });
+      expect(deleted).to.be.true;
     });
 
     test('should throw error when reaction not found', () => {
@@ -931,17 +915,19 @@ describe('Thread lifecycle', () => {
             reaction_id: 888,
           },
         }),
-      ).rejects.toThrowError(InvalidState);
+      ).rejects.toThrowError(InvalidInput);
     });
   });
 
   describe('comment reaction', () => {
     afterEach(() => {
-      getNamespaceBalanceStub.restore();
+      getNamespaceBalanceSpy.mockClear();
     });
 
     test('should create a comment reaction as a member of a group with permissions', async () => {
-      getNamespaceBalanceStub.resolves({ [actors.member.address!]: '50' });
+      getNamespaceBalanceSpy.mockResolvedValue({
+        [actors.member.address!]: '50',
+      });
       const reaction = await command(CreateCommentReaction(), {
         actor: actors.member,
         payload: {
@@ -958,7 +944,9 @@ describe('Thread lifecycle', () => {
     });
 
     test('should set comment reaction vote weight and comment vote sum correctly', async () => {
-      getNamespaceBalanceStub.resolves({ [actors.admin.address!]: '50' });
+      getNamespaceBalanceSpy.mockResolvedValue({
+        [actors.admin.address!]: '50',
+      });
       const reaction = await command(CreateCommentReaction(), {
         actor: actors.admin,
         payload: {
@@ -968,9 +956,11 @@ describe('Thread lifecycle', () => {
         },
       });
       const expectedWeight = 50 * vote_weight;
-      expect(reaction?.calculated_voting_weight).to.eq(expectedWeight);
+      expect(`${reaction?.calculated_voting_weight}`).to.eq(
+        `${expectedWeight}`,
+      );
       const c = await models.Comment.findByPk(comment!.id);
-      expect(c!.reaction_weights_sum).to.eq(expectedWeight * 2); // *2 to account for first member reaction
+      expect(`${c!.reaction_weights_sum}`).to.eq(`${expectedWeight * 2}`); // *2 to account for first member reaction
     });
 
     test('should throw error when comment not found', async () => {
@@ -987,7 +977,9 @@ describe('Thread lifecycle', () => {
     });
 
     test('should throw error when actor does not have stake', async () => {
-      getNamespaceBalanceStub.resolves({ [actors.member.address!]: '0' });
+      getNamespaceBalanceSpy.mockResolvedValue({
+        [actors.member.address!]: '0',
+      });
       await expect(
         command(CreateCommentReaction(), {
           actor: actors.member,
@@ -1014,7 +1006,9 @@ describe('Thread lifecycle', () => {
     });
 
     test('should delete a reaction', async () => {
-      getNamespaceBalanceStub.resolves({ [actors.member.address!]: '50' });
+      getNamespaceBalanceSpy.mockResolvedValue({
+        [actors.member.address!]: '50',
+      });
       const reaction = await command(CreateCommentReaction(), {
         actor: actors.member,
         payload: {
@@ -1030,13 +1024,15 @@ describe('Thread lifecycle', () => {
           reaction_id: reaction!.id!,
         },
       });
-      expect(deleted).to.include({ reaction_id: reaction!.id });
+      expect(deleted).to.be.true;
     });
 
     test('should throw when trying to delete a reaction that is not yours', async () => {
-      getNamespaceBalanceStub.resolves({ [actors.member.address!]: '50' });
+      getNamespaceBalanceSpy.mockResolvedValue({
+        [actors.admin.address!]: '50',
+      });
       const reaction = await command(CreateCommentReaction(), {
-        actor: actors.member,
+        actor: actors.admin,
         payload: {
           comment_msg_id: comment!.canvas_msg_id || '',
           comment_id: comment!.id!,
@@ -1045,17 +1041,13 @@ describe('Thread lifecycle', () => {
       });
       await expect(
         command(DeleteReaction(), {
-          actor: actors.admin,
+          actor: actors.member,
           payload: {
             community_id: thread.community_id,
             reaction_id: reaction!.id!,
           },
         }),
-      ).rejects.toThrowError(InvalidState);
+      ).rejects.toThrow('Not the author of the entity');
     });
   });
-
-  // @rbennettcw do we have contest validation tests to include here?
-  // - updating thread in contest
-  // - deleting thread in contest
 });

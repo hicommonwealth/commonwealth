@@ -1,10 +1,11 @@
-import { PermissionEnum } from '@hicommonwealth/schemas';
+import { PermissionEnum, TopicWeightedVoting } from '@hicommonwealth/schemas';
 import { notifyError } from 'controllers/app/notifications';
 import { SessionKeyError } from 'controllers/server/sessions';
-import { parseCustomStages } from 'helpers';
+import { parseCustomStages, weightedVotingValueToLabel } from 'helpers';
 import { detectURL, getThreadActionTooltipText } from 'helpers/threads';
 import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
 import useTopicGating from 'hooks/useTopicGating';
+import type { Topic } from 'models/Topic';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useLocation } from 'react-router-dom';
@@ -62,7 +63,9 @@ export const NewThreadForm = () => {
 
   const { isContestAvailable } = useCommunityContests();
 
-  const sortedTopics = [...topics].sort((a, b) => a.name.localeCompare(b.name));
+  const sortedTopics: Topic[] = [...topics].sort((a, b) =>
+    a.name.localeCompare(b.name),
+  );
   const hasTopics = sortedTopics?.length;
   const topicsForSelector = hasTopics ? sortedTopics : [];
 
@@ -85,13 +88,14 @@ export const NewThreadForm = () => {
     setCanShowTopicPermissionBanner,
   } = useNewThreadForm(communityId, topicsForSelector);
 
-  const hasTopicOngoingContest = threadTopic?.activeContestManagers?.length > 0;
+  const hasTopicOngoingContest =
+    threadTopic?.active_contest_managers?.length ?? 0 > 0;
 
   const user = useUserStore();
   const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
 
-  const contestTopicError = threadTopic?.activeContestManagers?.length
-    ? threadTopic?.activeContestManagers
+  const contestTopicError = threadTopic?.active_contest_managers?.length
+    ? threadTopic?.active_contest_managers
         ?.map(
           (acm) =>
             acm?.content?.filter(
@@ -209,10 +213,7 @@ export const NewThreadForm = () => {
 
   const handleCancel = () => {
     setThreadTitle('');
-    setThreadTopic(
-      // @ts-expect-error <StrictNullChecks/>
-      topicsForSelector?.find((t) => t?.name?.includes('General')) || null,
-    );
+    setThreadTopic(topicsForSelector.find((t) => t.name.includes('General'))!);
     setThreadContentDelta(createDeltaFromText(''));
   };
 
@@ -237,9 +238,11 @@ export const NewThreadForm = () => {
   const contestTopicAffordanceVisible =
     isContestAvailable && hasTopicOngoingContest;
 
+  const isWalletBalanceErrorEnabled = false;
   const walletBalanceError =
     isContestAvailable &&
     hasTopicOngoingContest &&
+    isWalletBalanceErrorEnabled &&
     parseFloat(userEthBalance || '0') < MIN_ETH_FOR_CONTEST_THREAD;
 
   useEffect(() => {
@@ -275,11 +278,16 @@ export const NewThreadForm = () => {
                         topic: topicsForSelector.find(
                           (t) => String(t.id) === originalProps.data.value,
                         ),
+                        helpText: weightedVotingValueToLabel(
+                          topicsForSelector.find(
+                            (t) => String(t.id) === originalProps.data.value,
+                          )?.weighted_voting as TopicWeightedVoting,
+                        ),
                       }),
                   }}
                   formatOptionLabel={(option) => (
                     <>
-                      {contestTopicAffordanceVisible && (
+                      {!!contestTopicAffordanceVisible && (
                         <CWIcon
                           className="trophy-icon"
                           iconName="trophy"
@@ -318,12 +326,12 @@ export const NewThreadForm = () => {
                 />
               )}
 
-              {contestTopicAffordanceVisible && (
+              {!!contestTopicAffordanceVisible && (
                 <ContestTopicBanner
-                  contests={threadTopic?.activeContestManagers.map((acm) => {
+                  contests={threadTopic?.active_contest_managers?.map((acm) => {
                     return {
-                      name: acm?.contest_manager?.name,
-                      address: acm?.contest_manager?.contest_address,
+                      name: acm?.name,
+                      address: acm?.contest_address,
                       submittedEntries:
                         acm?.content?.filter(
                           (c) =>
@@ -359,7 +367,7 @@ export const NewThreadForm = () => {
                 placeholder="Enter text or drag images and media here. Use the tab button to see your formatted post."
               />
 
-              {contestThreadBannerVisible && (
+              {!!contestThreadBannerVisible && (
                 <ContestThreadBanner
                   submitEntryChecked={submitEntryChecked}
                   onSetSubmitEntryChecked={setSubmitEntryChecked}
@@ -367,7 +375,7 @@ export const NewThreadForm = () => {
               )}
 
               <MessageRow
-                hasFeedback={walletBalanceError}
+                hasFeedback={!!walletBalanceError}
                 statusMessage={`Ensure that your connected wallet has at least
                 ${MIN_ETH_FOR_CONTEST_THREAD} ETH to participate.`}
                 validationStatus="failure"

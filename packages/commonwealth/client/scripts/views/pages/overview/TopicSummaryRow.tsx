@@ -10,7 +10,7 @@ import app from 'state';
 import useUserStore from 'state/ui/user';
 import Permissions from 'utils/Permissions';
 import type Thread from '../../../models/Thread';
-import type Topic from '../../../models/Topic';
+import type { Topic } from '../../../models/Topic';
 import { CWText } from '../../components/component_kit/cw_text';
 import { ThreadCard } from '../discussions/ThreadCard';
 import { TopicSummaryRowSkeleton } from './TopicSummaryRowSkeleton';
@@ -73,7 +73,7 @@ export const TopicSummaryRow = ({
             fontWeight="medium"
             className="threads-count-text"
           >
-            {topic.totalThreads || 0} Threads
+            {topic.total_threads || 0} Threads
           </CWText>
         </div>
         {topic.description && <CWText type="b2">{topic.description}</CWText>}
@@ -94,13 +94,13 @@ export const TopicSummaryRow = ({
           const isTopicGated = !!(memberships || []).find(
             (membership) =>
               thread?.topic?.id &&
-              membership.topics.find((t) => t.id === thread.topic.id),
+              membership.topics.find((t) => t.id === thread.topic!.id),
           );
 
           const isActionAllowedInGatedTopic = !!(memberships || []).find(
             (membership) =>
               thread?.topic?.id &&
-              membership.topics.find((t) => t.id === thread.topic.id) &&
+              membership.topics.find((t) => t.id === thread.topic!.id) &&
               membership.isAllowed,
           );
 
@@ -108,7 +108,7 @@ export const TopicSummaryRow = ({
             !isAdmin && isTopicGated && !isActionAllowedInGatedTopic;
 
           const foundTopicPermissions = topicPermissions.find(
-            (tp) => tp.id === thread.topic.id,
+            (tp) => tp.id === thread.topic!.id,
           );
 
           const disabledActionsTooltipText = getThreadActionTooltipText({
@@ -144,6 +144,7 @@ export const TopicSummaryRow = ({
               disabledActionsTooltipText={disabledActionsTooltipText}
               hideReactionButton
               hideUpvotesDrawer
+              expandCommentBtnVisible
             />
           );
         })}

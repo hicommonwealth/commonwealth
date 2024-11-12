@@ -1,5 +1,4 @@
 import { CommunityInstance, UserInstance } from '@hicommonwealth/model';
-import { expect } from 'chai';
 import { ServerTopicsController } from 'server/controllers/server_topics_controller';
 import { describe, test } from 'vitest';
 
@@ -79,15 +78,6 @@ const createMockedTopicsController = (isAdmin: boolean = false) => {
 };
 
 describe('ServerTopicsController', () => {
-  test('#getTopics', async () => {
-    const { controller, chain } = createMockedTopicsController();
-    const topics = await controller.getTopics({
-      community: chain,
-      with_contest_managers: false,
-    });
-    expect(topics).to.have.length(1);
-  });
-
   test('#updateTopicChannel', async () => {
     const { controller, user } = createMockedTopicsController(true);
     await controller.updateTopicChannel({

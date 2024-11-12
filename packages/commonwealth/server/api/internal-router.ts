@@ -12,7 +12,7 @@ import * as integrations from './integrations';
 import * as loadTest from './load-test';
 import * as subscription from './subscription';
 import * as superAdmin from './super-admin';
-import * as thread from './threads';
+import * as thread from './thread';
 import * as token from './token';
 import * as user from './user';
 import * as wallet from './wallet';
@@ -26,7 +26,7 @@ const api = {
   integrations: integrations.trpcRouter,
   feed: feed.trpcRouter,
   contest: contest.trpcRouter,
-  subscription: subscription.trpcRouter,
+  subscriptions: subscription.trpcRouter,
   loadTest: loadTest.trpcRouter,
   webhook: webhook.trpcRouter,
   superAdmin: superAdmin.trpcRouter,
@@ -55,6 +55,7 @@ if (config.NODE_ENV !== 'production') {
     title: 'Internal API',
     path: PATH,
     version: '0.0.1',
+    securityScheme: 'jwt',
   });
 }
 

@@ -33,7 +33,6 @@ const {
   R2_ACCESS_KEY_ID,
   R2_SECRET_ACCESS_KEY,
   R2_ACCOUNT_ID,
-  GENERATE_PRODUCTION_SDK,
 } = process.env;
 
 export const config = configure(
@@ -87,7 +86,6 @@ export const config = configure(
         SECRET_ACCESS_KEY: R2_SECRET_ACCESS_KEY,
       },
     },
-    GENERATE_PRODUCTION_SDK: GENERATE_PRODUCTION_SDK === 'true',
   },
   z.object({
     CACHE: z.object({
@@ -296,9 +294,7 @@ export const config = configure(
       })
       .refine(
         (data) => {
-          if (
-            !['local', 'CI', 'discobot', 'snapshot'].includes(target.APP_ENV)
-          ) {
+          if (!['local', 'CI'].includes(target.APP_ENV)) {
             return (
               !!LOAD_TESTING_AUTH_TOKEN &&
               data.AUTH_TOKEN !== DEFAULTS.LOAD_TESTING_AUTH_TOKEN
@@ -328,6 +324,5 @@ export const config = configure(
             );
         }),
     }),
-    GENERATE_PRODUCTION_SDK: z.boolean(),
   }),
 );

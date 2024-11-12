@@ -1,7 +1,8 @@
-import { ZERO_ADDRESS } from '@hicommonwealth/shared';
+import { ZERO_ADDRESS, commonProtocol } from '@hicommonwealth/shared';
 import { AbiItem, TransactionReceipt } from 'web3';
 import { ContestAbi } from './Abi/ContestAbi';
 import { Erc20Abi } from './Abi/ERC20Abi';
+import { feeManagerABI } from './Abi/feeManagerAbi';
 import ContractBase from './ContractBase';
 import NamespaceFactory from './NamespaceFactory';
 
@@ -22,7 +23,7 @@ class Contest extends ContractBase {
       this.namespaceFactoryAddress,
       this.rpc,
     );
-    await this.namespaceFactory.initialize(true);
+    await this.namespaceFactory.initialize(withWallet);
   }
 
   /**
@@ -185,8 +186,9 @@ class Contest extends ContractBase {
     const tokenAddress = await this.contract.methods.contestToken().call();
 
     let txReceipt;
-    const weiAmount = this.web3.utils.toWei(amount, 'ether');
+
     if (tokenAddress === ZERO_ADDRESS) {
+      const weiAmount = this.web3.utils.toWei(amount, 'ether');
       //ETH funding route
       try {
         txReceipt = await this.contract.methods.deposit(weiAmount).send({
@@ -203,9 +205,11 @@ class Contest extends ContractBase {
         Erc20Abi as AbiItem[],
         tokenAddress,
       );
-      await token.methods
-        .approve(this.contractAddress, weiAmount)
-        .send({ from: walletAddress });
+      const decimals = await token.methods.decimals().call();
+      const weiAmount = amount * 10 ** Number(decimals);
+      await token.methods.approve(this.contractAddress, weiAmount).send({
+        from: walletAddress,
+      });
       txReceipt = await this.contract.methods.deposit(weiAmount).send({
         from: walletAddress,
         maxPriorityFeePerGas: null,
@@ -230,27 +234,20 @@ class Contest extends ContractBase {
     }
   }
 
-  async getContestBalance(): Promise<number> {
+  //Indicate if contest is not recurring
+  async getContestBalance(oneOff: boolean): Promise<number> {
     if (!this.initialized || !this.walletEnabled) {
       await this.initialize(false);
     }
     this.reInitContract();
-    const tokenAddress = await this.contract.methods.contestToken().call();
-    if (tokenAddress === ZERO_ADDRESS) {
-      const balance = await this.web3.eth.getBalance(this.contractAddress);
-      return parseFloat(this.web3.utils.fromWei(balance, 'ether'));
-    } else {
-      const calldata =
-        '0x70a08231' +
-        this.web3.eth.abi
-          .encodeParameters(['address'], [this.contractAddress])
-          .substring(2);
-      const returnData = await this.web3.eth.call({
-        to: tokenAddress,
-        data: calldata,
-      });
-      return Number(this.web3.eth.abi.decodeParameter('uint256', returnData));
-    }
+    const contestBalance = await commonProtocol.getTotalContestBalance(
+      this.contract,
+      this.contractAddress,
+      this.web3,
+      feeManagerABI,
+      oneOff,
+    );
+    return parseInt(contestBalance, 10);
   }
 }
 

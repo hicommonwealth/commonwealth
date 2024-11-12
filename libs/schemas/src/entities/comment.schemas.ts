@@ -7,7 +7,7 @@ import { Address } from './user.schemas';
 export const CommentVersionHistory = z.object({
   id: PG_INT.optional(),
   comment_id: PG_INT,
-  text: z.string(),
+  body: z.string(),
   timestamp: z.date(),
   content_url: z.string().nullish(),
 });
@@ -16,7 +16,7 @@ export const Comment = z.object({
   id: PG_INT.optional(),
   thread_id: PG_INT,
   address_id: PG_INT,
-  text: z.string(),
+  body: z.string(),
   parent_id: z.string().nullish(),
   content_url: z.string().nullish(),
 
@@ -41,8 +41,12 @@ export const Comment = z.object({
     .nullish(),
 
   reaction_count: PG_INT,
-  reaction_weights_sum: PG_INT.optional(),
-
+  reaction_weights_sum: z
+    .string()
+    .refine((str) => {
+      return /^[0-9]+$/.test(str); // only numbers
+    })
+    .nullish(),
   search: z.union([z.string(), z.record(z.any())]),
 
   Address: Address.nullish(),

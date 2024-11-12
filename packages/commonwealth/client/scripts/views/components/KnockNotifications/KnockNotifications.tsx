@@ -6,7 +6,7 @@ import {
   NotificationIconButton,
 } from '@knocklabs/react';
 import '@knocklabs/react-notification-feed/dist/index.css';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { memo, useEffect, useRef, useState } from 'react';
 import useUserStore from 'state/ui/user';
 import './KnockNotifications.scss';
 
@@ -23,14 +23,19 @@ const getBrowserTimezone = (): string => {
   return Intl.DateTimeFormat().resolvedOptions().timeZone;
 };
 
-export const KnockNotifications = () => {
+export const KnockNotifications = memo(function KnockNotifications() {
   const user = useUserStore();
   const [isVisible, setIsVisible] = useState(false);
 
   const notifButtonRef = useRef(null);
 
   useEffect(() => {
-    if (!user.id) {
+    if (!user.id || !user.isLoggedIn) {
+      return;
+    }
+
+    if (!user.knockJWT) {
+      console.warn('user knockJWT not set!  Will not attempt to identify.');
       return;
     }
 
@@ -46,9 +51,9 @@ export const KnockNotifications = () => {
     }
 
     doAsync().catch(console.error);
-  }, [user.email, user.id, user.knockJWT]);
+  }, [user.email, user.id, user.isLoggedIn, user.knockJWT]);
 
-  if (user.id === 0) {
+  if (!user.id || !user.isLoggedIn) {
     return null;
   }
 
@@ -80,4 +85,4 @@ export const KnockNotifications = () => {
       </KnockProvider>
     </div>
   );
-};
+});

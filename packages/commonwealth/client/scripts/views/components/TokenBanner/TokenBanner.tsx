@@ -21,7 +21,7 @@ interface TokenBannerProps {
   change?: number;
   isLoading?: boolean;
   popover?: Pick<CWPopoverProps, 'title' | 'body'>;
-  voteWeight?: number;
+  voteWeight?: string;
 }
 
 const TokenBanner = ({
@@ -76,7 +76,7 @@ const TokenBanner = ({
       )}
 
       {voteWeight && (
-        <div>
+        <div className="vote-weight">
           <CWText className="vote-weight-label" type="caption">
             Your vote weight
           </CWText>
@@ -85,19 +85,18 @@ const TokenBanner = ({
       )}
 
       {popover && (
-        <>
-          <CWIconButton
-            iconName="infoEmpty"
-            buttonSize="sm"
-            onMouseEnter={popoverProps.handleInteraction}
-            onMouseLeave={popoverProps.handleInteraction}
-          />
+        <div
+          onMouseEnter={popoverProps.handleInteraction}
+          onMouseLeave={popoverProps.handleInteraction}
+        >
+          <CWIconButton iconName="infoEmpty" buttonSize="sm" />
           <CWPopover
+            className="TokenBannerPopover"
             title={<>{popover.title}</>}
             body={popover.body}
             {...popoverProps}
           />
-        </>
+        </div>
       )}
     </div>
   );

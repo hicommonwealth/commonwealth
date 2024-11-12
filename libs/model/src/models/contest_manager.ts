@@ -40,6 +40,15 @@ export default (
       created_at: { type: Sequelize.DATE, allowNull: false },
       cancelled: { type: Sequelize.BOOLEAN },
       ended: { type: Sequelize.BOOLEAN },
+      farcaster_frame_url: { type: Sequelize.STRING, allowNull: true },
+      farcaster_frame_hashes: {
+        type: Sequelize.ARRAY(Sequelize.STRING),
+        allowNull: true,
+      },
+      neynar_webhook_id: { type: Sequelize.STRING, allowNull: true },
+      neynar_webhook_secret: { type: Sequelize.STRING, allowNull: true },
+      topic_id: { type: Sequelize.INTEGER, allowNull: true },
+      is_farcaster_contest: { type: Sequelize.BOOLEAN, allowNull: false },
     },
     {
       tableName: 'ContestManagers',
