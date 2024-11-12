@@ -1,4 +1,7 @@
+import { commonProtocol } from '@hicommonwealth/shared';
 import Web3 from 'web3';
+import { LPBondingCurveAbi } from './abi/LPBondingCurve';
+import { createWeb3Provider } from './contractHelpers';
 
 export async function getLaunchpadTradeTransaction({
   rpc,
@@ -42,4 +45,20 @@ export async function getLaunchpadTradeTransaction({
       floatingSupply: floatingSupply as bigint,
     },
   };
+}
+
+export async function transferLiquidityToUniswap({
+  rpc,
+  tokenAddress,
+}: {
+  rpc: string;
+  tokenAddress: string;
+}) {
+  const web3 = await createWeb3Provider(rpc);
+  const contract = new web3.eth.Contract(LPBondingCurveAbi, tokenAddress);
+  await commonProtocol.transferLiquidity(
+    contract,
+    tokenAddress,
+    web3.eth.defaultAccount!,
+  );
 }
