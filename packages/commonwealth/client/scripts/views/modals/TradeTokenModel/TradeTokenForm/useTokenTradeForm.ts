@@ -19,9 +19,8 @@ const useTokenTradeForm = ({
   addressType,
   onTradeComplete,
 }: UseTokenTradeFormProps) => {
-  // when tradeConfig.mode === TradingMode.Buy - trade amount represents value in tradeConfig.currency
-  // when tradeConfig.mode === TradingMode.Sell - trade amount represents value in tradeConfig.token.symbol
-  const [tradingAmount, setTradingAmount] = useState<number>(0);
+  const [baseCurrencyTradingAmount, setBaseCurrencyTradingAmount] =
+    useState<number>(0);
   const [tradingMode, setTradingMode] = useState<TradingMode>(
     tradeConfig.mode || TradingMode.Buy,
   );
@@ -53,7 +52,7 @@ const useTokenTradeForm = ({
     ethToCurrencyRateData?.data?.data?.amount || '0.00',
   );
 
-  const ethBuyAmount = tradingAmount / ethToCurrencyRate;
+  const ethBuyAmount = baseCurrencyTradingAmount / ethToCurrencyRate;
 
   const { data: tokenCommunity, isLoading: isLoadingTokenCommunity } =
     useGetCommunityByIdQuery({
@@ -85,17 +84,18 @@ const useTokenTradeForm = ({
   const { mutateAsync: createTokenTrade, isLoading: isCreatingTokenTrade } =
     useCreateTokenTradeMutation();
 
-  const onTradingAmountChange = (
+  const onBaseCurrencyTradingAmountChange = (
     change: React.ChangeEvent<HTMLInputElement> | number,
   ) => {
     if (typeof change == 'number') {
-      setTradingAmount(change);
+      setBaseCurrencyTradingAmount(change);
     } else {
       const value = change.target.value;
 
-      if (value === '') setTradingAmount(0);
+      if (value === '') setBaseCurrencyTradingAmount(0);
       // verify only numbers with decimal (optional) are present
-      else if (/^\d+(\.\d+)?$/.test(value)) setTradingAmount(parseFloat(value));
+      else if (/^\d+(\.\d+)?$/.test(value))
+        setBaseCurrencyTradingAmount(parseFloat(value));
     }
   };
 
@@ -162,13 +162,18 @@ const useTokenTradeForm = ({
     // Note: not exporting state setters directly, since some extra
     // functionality is done in most "onChange" handlers above
     trading: {
-      amount: { value: tradingAmount, onChange: onTradingAmountChange },
-      mode: { value: tradingMode, onChange: onTradingModeChange },
-      currency: tradeConfig.currency,
-      presetAmounts: tradeConfig.presetAmounts,
-      ethAmounts: {
-        buy: ethBuyAmount,
+      amounts: {
+        buy: {
+          ethAmount: ethBuyAmount,
+          baseCurrency: {
+            presetAmounts: tradeConfig.presetAmounts,
+            name: tradeConfig.currency, // USD/GBP etc
+            amount: baseCurrencyTradingAmount,
+            onAmountChange: onBaseCurrencyTradingAmountChange,
+          },
+        },
       },
+      mode: { value: tradingMode, onChange: onTradingModeChange },
     },
     addresses: {
       available: userAddresses,

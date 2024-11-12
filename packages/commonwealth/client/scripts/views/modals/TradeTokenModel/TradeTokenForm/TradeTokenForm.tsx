@@ -33,9 +33,9 @@ const TradeTokenForm = ({
 }: TradeTokenFormProps) => {
   const [isReceiptDetailOpen, setIsReceiptDetailOpen] = useState(false);
 
-  const amountCurrenySymbol = (
+  const buyAmountCurrenySymbol = (
     <CWText className="amount-symbol">
-      {currencyNameToSymbolMap[trading.currency]}
+      {currencyNameToSymbolMap[trading.amounts.buy.baseCurrency.name]}
     </CWText>
   );
 
@@ -127,36 +127,49 @@ const TradeTokenForm = ({
         {trading.mode.value === TradingMode.Buy && (
           <>
             <div className="amount-input-with-currency-symbol">
-              {currencySymbolPlacements.onLeft.includes(trading.currency) &&
-                amountCurrenySymbol}
+              {currencySymbolPlacements.onLeft.includes(
+                trading.amounts.buy.baseCurrency.name,
+              ) && buyAmountCurrenySymbol}
               <CWTextInput
                 containerClassName="amount-input"
-                placeholder={getAmountWithCurrencySymbol(0, trading.currency)}
-                value={trading.amount.value}
-                onInput={(e) => trading.amount.onChange(e)}
+                placeholder={getAmountWithCurrencySymbol(
+                  0,
+                  trading.amounts.buy.baseCurrency.name,
+                )}
+                value={trading.amounts.buy.baseCurrency.amount}
+                onInput={(e) =>
+                  trading.amounts.buy.baseCurrency.onAmountChange(e)
+                }
               />
-              {currencySymbolPlacements.onRight.includes(trading.currency) &&
-                amountCurrenySymbol}
+              {currencySymbolPlacements.onRight.includes(
+                trading.amounts.buy.baseCurrency.name,
+              ) && buyAmountCurrenySymbol}
             </div>
 
             <CWText type="caption" className="amount-to-crypto">
               <CWIcon iconName="ethereum" iconSize="small" />
-              {trading.ethAmounts.buy} ETH
+              {trading.amounts.buy.ethAmount} ETH
             </CWText>
 
-            {trading.presetAmounts && (
+            {trading.amounts.buy.baseCurrency.presetAmounts && (
               <div className="preset-amounts">
-                {trading.presetAmounts?.map((presetAmount) => (
-                  <CWTag
-                    key={presetAmount}
-                    type="amount"
-                    label={getAmountWithCurrencySymbol(
-                      presetAmount,
-                      trading.currency,
-                    )}
-                    onClick={() => trading.amount.onChange(presetAmount)}
-                  />
-                ))}
+                {trading.amounts.buy.baseCurrency.presetAmounts?.map(
+                  (presetAmount) => (
+                    <CWTag
+                      key={presetAmount}
+                      type="amount"
+                      label={getAmountWithCurrencySymbol(
+                        presetAmount,
+                        trading.amounts.buy.baseCurrency.name,
+                      )}
+                      onClick={() =>
+                        trading.amounts.buy.baseCurrency.onAmountChange(
+                          presetAmount,
+                        )
+                      }
+                    />
+                  ),
+                )}
               </div>
             )}
           </>
@@ -191,11 +204,13 @@ const TradeTokenForm = ({
           buttonAlt={
             trading.mode.value === TradingMode.Buy ? 'green' : 'rorange'
           }
-          disabled={isActionPending || trading.amount.value === 0}
+          disabled={
+            isActionPending || trading.amounts.buy.baseCurrency.amount === 0
+          }
           onClick={onCTAClick}
         />,
         'Please add trading amount to continue',
-        trading.amount.value === 0,
+        trading.amounts.buy.baseCurrency.amount === 0,
       )}
     </section>
   );
