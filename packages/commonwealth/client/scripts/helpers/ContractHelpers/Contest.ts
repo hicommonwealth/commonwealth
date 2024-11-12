@@ -209,7 +209,11 @@ class Contest extends ContractBase {
       const weiAmount = amount * 10 ** Number(decimals);
       await token.methods
         .approve(this.contractAddress, weiAmount)
-        .send({ from: walletAddress });
+        .send({
+          from: walletAddress,
+          maxPriorityFeePerGas: null,
+          maxFeePerGas: null,
+        });
       txReceipt = await this.contract.methods.deposit(weiAmount).send({
         from: walletAddress,
         maxPriorityFeePerGas: null,
