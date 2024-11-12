@@ -25,4 +25,5 @@ export type UseTokenTradeFormProps = {
     presetAmounts?: number[];
   };
   addressType?: ChainBase;
+  onTradeComplete?: () => void;
 };

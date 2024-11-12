@@ -17,6 +17,7 @@ import { TradingMode, UseTokenTradeFormProps } from './types';
 const useTokenTradeForm = ({
   tradeConfig,
   addressType,
+  onTradeComplete,
 }: UseTokenTradeFormProps) => {
   // when tradeConfig.mode === TradingMode.Buy - trade amount represents value in tradeConfig.currency
   // when tradeConfig.mode === TradingMode.Sell - trade amount represents value in tradeConfig.token.symbol
@@ -125,6 +126,8 @@ const useTokenTradeForm = ({
       eth_chain_id: baseNode?.ethChainId,
       transaction_hash: txReceipt.transactionHash,
     });
+
+    onTradeComplete?.();
   };
 
   const handleTokenSell = async () => {

@@ -33,6 +33,7 @@ const TradeTokenModal = ({
         presetAmounts: [100, 300, 1000],
       },
       addressType: tradeConfig.addressType,
+      onTradeComplete: () => onModalClose?.(),
     },
   );
 
