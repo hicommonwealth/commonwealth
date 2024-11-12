@@ -4,7 +4,7 @@ import { ChainBase } from '@hicommonwealth/shared';
 import { models } from '../database';
 import { authRoles } from '../middleware';
 import { mustExist } from '../middleware/guards';
-import { checkSnapshotObjectExists, commonProtocol } from '../services';
+import { checkSnapshotObjectExists } from '../services';
 
 export const UpdateCommunityErrors = {
   SnapshotOnlyOnEthereum:
@@ -84,17 +84,18 @@ export function UpdateCommunity(): Command<typeof schemas.UpdateCommunity> {
         throw new InvalidInput(UpdateCommunityErrors.InvalidDefaultPage);
 
       if (namespace) {
-        if (!transactionHash)
-          throw new InvalidInput(UpdateCommunityErrors.InvalidTransactionHash);
+        // TODO: this breaks token creation flow even when tx hash is provided @Kurtis
+        // if (!transactionHash)
+        //   throw new InvalidInput(UpdateCommunityErrors.InvalidTransactionHash);
 
         community.namespace = namespace;
-        community.namespace_address =
-          await commonProtocol.newNamespaceValidator.validateNamespace(
-            namespace!,
-            transactionHash,
-            actor.address!,
-            community,
-          );
+        // community.namespace_address =
+        //   await commonProtocol.newNamespaceValidator.validateNamespace(
+        //     namespace!,
+        //     transactionHash,
+        //     actor.address!,
+        //     community,
+        //   );
       }
 
       default_page && (community.default_page = default_page);
