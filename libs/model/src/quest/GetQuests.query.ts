@@ -1,9 +1,8 @@
 import { Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../database';
-import { AuthContext } from '../middleware';
 
-export function GetQuests(): Query<typeof schemas.GetQuests, AuthContext> {
+export function GetQuests(): Query<typeof schemas.GetQuests> {
   return {
     ...schemas.GetQuests,
     auth: [],

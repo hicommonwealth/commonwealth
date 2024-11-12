@@ -7,7 +7,7 @@ import {
 import * as schemas from '@hicommonwealth/schemas';
 import { DISCORD_BOT_ADDRESS, DISCORD_BOT_EMAIL } from '@hicommonwealth/shared';
 import { models } from '../database';
-import { isAuthorized, type AuthContext } from '../middleware';
+import { authRoles } from '../middleware';
 
 const log = logger(import.meta);
 
@@ -20,12 +20,11 @@ const Errors = {
 };
 
 export function SetDiscordBotConfig(): Command<
-  typeof schemas.SetDiscordBotConfig,
-  AuthContext
+  typeof schemas.SetDiscordBotConfig
 > {
   return {
     ...schemas.SetDiscordBotConfig,
-    auth: [isAuthorized({ roles: ['admin'] })],
+    auth: [authRoles('admin')],
     body: async ({ payload }) => {
       const { community_id, guild_id, verification_token } = payload;
 

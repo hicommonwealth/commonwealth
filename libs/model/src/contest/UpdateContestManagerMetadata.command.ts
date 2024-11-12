@@ -1,7 +1,7 @@
 import { InvalidState, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../database';
-import { isAuthorized, type AuthContext } from '../middleware';
+import { authRoles } from '../middleware';
 import { mustExist } from '../middleware/guards';
 
 const Errors = {
@@ -9,16 +9,15 @@ const Errors = {
 };
 
 export function UpdateContestManagerMetadata(): Command<
-  typeof schemas.UpdateContestManagerMetadata,
-  AuthContext
+  typeof schemas.UpdateContestManagerMetadata
 > {
   return {
     ...schemas.UpdateContestManagerMetadata,
-    auth: [isAuthorized({ roles: ['admin'] })],
+    auth: [authRoles('admin')],
     body: async ({ payload }) => {
       const contestManager = await models.ContestManager.findOne({
         where: {
-          community_id: payload.id,
+          community_id: payload.community_id,
           contest_address: payload.contest_address,
         },
       });

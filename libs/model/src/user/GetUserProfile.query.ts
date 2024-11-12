@@ -99,7 +99,8 @@ export function GetUserProfile(): Query<typeof schemas.GetUserProfile> {
           (c) => c.toJSON() as z.infer<typeof schemas.ThreadView>,
         ),
         isOwner: actor.user.id === user_id,
-        tags: profileTags.map((t) => ({ id: t.Tag!.id!, name: t.Tag!.name })), // ensure Tag is present in typed response
+        // ensure Tag is present in typed response
+        tags: profileTags.map((t) => ({ id: t.Tag!.id!, name: t.Tag!.name })),
       };
     },
   };

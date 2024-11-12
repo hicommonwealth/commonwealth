@@ -1,11 +1,12 @@
 import { commonProtocol } from '@hicommonwealth/shared';
 import z from 'zod';
+import { AuthContext } from '../context';
 import { ContestManager } from '../entities';
 import { PG_INT } from '../utils';
 
 export const CreateContestManagerMetadata = {
   input: z.object({
-    id: z.string(),
+    community_id: z.string(),
     contest_address: z.string().describe('On-Chain contest manager address'),
     name: z.string(),
     image_url: z.string().optional(),
@@ -36,11 +37,12 @@ export const CreateContestManagerMetadata = {
   output: z.object({
     contest_managers: z.array(ContestManager),
   }),
+  context: AuthContext,
 };
 
 export const UpdateContestManagerMetadata = {
   input: z.object({
-    id: z.string(),
+    community_id: z.string(),
     contest_address: z.string().describe('On-Chain contest manager address'),
     name: z.string().optional(),
     image_url: z.string().optional(),
@@ -49,26 +51,29 @@ export const UpdateContestManagerMetadata = {
   output: z.object({
     contest_managers: z.array(ContestManager),
   }),
+  context: AuthContext,
 };
 
 export const CancelContestManagerMetadata = {
   input: z.object({
-    id: z.string(),
+    community_id: z.string(),
     contest_address: z.string(),
   }),
   output: z.object({
     contest_managers: z.array(ContestManager),
   }),
+  context: AuthContext,
 };
 
 export const ResumeContestManagerMetadata = {
   input: z.object({
-    id: z.string(),
+    community_id: z.string(),
     contest_address: z.string(),
   }),
   output: z.object({
     contest_managers: z.array(ContestManager),
   }),
+  context: AuthContext,
 };
 
 export const PerformContestRollovers = {
