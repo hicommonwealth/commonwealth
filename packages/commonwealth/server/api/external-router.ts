@@ -1,5 +1,11 @@
 import { express, trpc } from '@hicommonwealth/adapters';
-import { Comment, Community, Feed, Thread } from '@hicommonwealth/model';
+import {
+  Comment,
+  Community,
+  Contest,
+  Feed,
+  Thread,
+} from '@hicommonwealth/model';
 import cors from 'cors';
 import { Router } from 'express';
 import passport from 'passport';
@@ -36,12 +42,8 @@ const {
 const { createComment, updateComment, deleteComment, createCommentReaction } =
   comment.trpcRouter;
 const { getNewContent } = user.trpcRouter;
-const {
-  getAllContests,
-  createContestMetadata,
-  updateContestMetadata,
-  cancelContestMetadata,
-} = contest.trpcRouter;
+const { createContestMetadata, updateContestMetadata, cancelContestMetadata } =
+  contest.trpcRouter;
 
 const api = {
   getGlobalActivity: trpc.query(Feed.GetGlobalActivity, trpc.Tag.User, {
@@ -70,7 +72,9 @@ const api = {
   getThreads: trpc.query(Thread.GetThreads, trpc.Tag.Thread, {
     forceSecure: true,
   }),
-  getAllContests,
+  getAllContests: trpc.query(Contest.GetAllContests, trpc.Tag.Contest, {
+    forceSecure: true,
+  }),
   createContestMetadata,
   updateContestMetadata,
   cancelContestMetadata,
