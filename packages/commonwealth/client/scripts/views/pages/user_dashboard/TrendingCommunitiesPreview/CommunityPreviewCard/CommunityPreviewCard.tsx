@@ -55,7 +55,7 @@ const CommunityPreviewCard = ({
           <div className="thread-counts">
             <CWIcon iconName="notepad" weight="light" />
             <CWText className="card-subtext" type="b2" fontWeight="medium">
-              {`${monthlyThreadCount || 0}`}
+              {monthlyThreadCount || 0}
             </CWText>
             {isCommunityMember && hasNewContent && (
               <CWTag type="new" label="New" />
