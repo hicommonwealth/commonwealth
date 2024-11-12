@@ -124,38 +124,42 @@ const TradeTokenForm = ({
           You&apos;re {trading.mode.value}ing
         </CWText>
 
-        <div className="amount-input-with-currency-symbol">
-          {currencySymbolPlacements.onLeft.includes(trading.currency) &&
-            amountCurrenySymbol}
-          <CWTextInput
-            containerClassName="amount-input"
-            placeholder={getAmountWithCurrencySymbol(0, trading.currency)}
-            value={trading.amount.value}
-            onInput={(e) => trading.amount.onChange(e)}
-          />
-          {currencySymbolPlacements.onRight.includes(trading.currency) &&
-            amountCurrenySymbol}
-        </div>
-
-        <CWText type="caption" className="amount-to-crypto">
-          <CWIcon iconName="ethereum" iconSize="small" />
-          {trading.ethAmounts.buy} ETH
-        </CWText>
-
-        {trading.presetAmounts && (
-          <div className="preset-amounts">
-            {trading.presetAmounts?.map((presetAmount) => (
-              <CWTag
-                key={presetAmount}
-                type="amount"
-                label={getAmountWithCurrencySymbol(
-                  presetAmount,
-                  trading.currency,
-                )}
-                onClick={() => trading.amount.onChange(presetAmount)}
+        {trading.mode.value === TradingMode.Buy && (
+          <>
+            <div className="amount-input-with-currency-symbol">
+              {currencySymbolPlacements.onLeft.includes(trading.currency) &&
+                amountCurrenySymbol}
+              <CWTextInput
+                containerClassName="amount-input"
+                placeholder={getAmountWithCurrencySymbol(0, trading.currency)}
+                value={trading.amount.value}
+                onInput={(e) => trading.amount.onChange(e)}
               />
-            ))}
-          </div>
+              {currencySymbolPlacements.onRight.includes(trading.currency) &&
+                amountCurrenySymbol}
+            </div>
+
+            <CWText type="caption" className="amount-to-crypto">
+              <CWIcon iconName="ethereum" iconSize="small" />
+              {trading.ethAmounts.buy} ETH
+            </CWText>
+
+            {trading.presetAmounts && (
+              <div className="preset-amounts">
+                {trading.presetAmounts?.map((presetAmount) => (
+                  <CWTag
+                    key={presetAmount}
+                    type="amount"
+                    label={getAmountWithCurrencySymbol(
+                      presetAmount,
+                      trading.currency,
+                    )}
+                    onClick={() => trading.amount.onChange(presetAmount)}
+                  />
+                ))}
+              </div>
+            )}
+          </>
         )}
       </div>
 
