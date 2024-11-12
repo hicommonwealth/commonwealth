@@ -1,21 +1,33 @@
-import { ChainBase } from '@hicommonwealth/shared';
 import { z } from 'zod';
-import { PG_INT } from '../utils';
+import { PG_ETH } from '../utils';
 
 export const Token = z.object({
-  // 1. Regular fields are nullish when nullable instead of optional
-  name: z.string(),
-  icon_url: z.string().nullish(),
-  description: z.string().nullish(),
-  symbol: z.string(),
-  chain_node_id: PG_INT,
-  base: z.nativeEnum(ChainBase),
-  author_address: z.string(),
-  community_id: z.string(),
-  launchpad_contract_address: z.string(),
-  uniswap_pool_address: z.string().optional().nullish(),
+  // derivable from creation event
+  token_address: z.string().describe('Address of the token'),
+  namespace: z.string().describe('Namespace associated with the token'),
+  name: z.string().describe('Name of the token'),
+  symbol: z.string().describe('Symbol of the token'),
+  initial_supply: PG_ETH.describe(
+    'Initial supply of the token before deploying to uniswap',
+  ),
+  is_locked: z
+    .boolean()
+    .default(false)
+    .describe('False if the token is not yet deployed to uniswap'),
 
-  // 2. Timestamps are managed by sequelize, thus optional
-  created_at: z.coerce.date().optional(),
-  updated_at: z.coerce.date().optional(),
+  // use specified
+  icon_url: z
+    .string()
+    .nullish()
+    .describe('Icon url of the token (platform only)'),
+  description: z
+    .string()
+    .nullish()
+    .describe('description of the token (platform only)'),
+
+  created_at: z.coerce.date().optional().describe('Date the token was created'),
+  updated_at: z.coerce
+    .date()
+    .optional()
+    .describe('Date the token was updated (platform only)'),
 });

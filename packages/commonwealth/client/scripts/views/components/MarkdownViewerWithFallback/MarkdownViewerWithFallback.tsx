@@ -8,6 +8,7 @@ type MarkdownViewerWithFallbackProps = {
   readonly cutoffLines?: number;
   readonly customShowMoreButton?: ReactNode;
   readonly className?: string;
+  onImageClick?: () => void;
 };
 
 /**
@@ -16,7 +17,13 @@ type MarkdownViewerWithFallbackProps = {
 export const MarkdownViewerWithFallback = (
   props: MarkdownViewerWithFallbackProps,
 ) => {
-  const { markdown, cutoffLines, customShowMoreButton, className } = props;
+  const {
+    markdown,
+    cutoffLines,
+    customShowMoreButton,
+    className,
+    onImageClick,
+  } = props;
 
   const newEditor = useFlag('newEditor');
 
@@ -37,6 +44,7 @@ export const MarkdownViewerWithFallback = (
       doc={markdown ?? ''}
       cutoffLines={cutoffLines}
       customShowMoreButton={customShowMoreButton}
+      onImageClick={onImageClick}
     />
   );
 };

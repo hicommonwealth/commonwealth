@@ -65,7 +65,6 @@ describe('Stake transactions', () => {
         transaction_hash:
           '0x924f40cfea663b2579816173f048b61ab2b118e0c7c055d7b00dbd9cd15eb7c0',
         community_id,
-        id: community_id,
       };
 
       let results = await command(CreateStakeTransaction(), {
@@ -82,7 +81,6 @@ describe('Stake transactions', () => {
         transaction_hash:
           '0x924f40cfea663b2579816173f048b61ab2b118e0c7c055d7b00dbd9cd15eb7c0',
         community_id,
-        id: community_id,
       };
 
       results = await command(CreateStakeTransaction(), {
@@ -118,7 +116,6 @@ describe('Stake transactions', () => {
         transaction_hash:
           '0x84939478bc5fbcca178e006dccdfaab6aebed40ef0a7b02684487780c10d8ce8',
         community_id,
-        id: community_id,
       };
 
       try {

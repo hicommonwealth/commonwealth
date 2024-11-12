@@ -126,7 +126,7 @@ export default (
         allowNull: false,
         defaultValue: 0,
       },
-      namespace: { type: Sequelize.STRING, allowNull: true },
+      namespace: { type: Sequelize.STRING, allowNull: true, unique: true },
       namespace_address: {
         type: Sequelize.STRING,
         allowNull: true,

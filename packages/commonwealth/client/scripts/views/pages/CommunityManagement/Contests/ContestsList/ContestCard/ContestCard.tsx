@@ -22,7 +22,7 @@ import { SharePopoverOld } from 'views/components/share_popover_old';
 import { capDecimals } from 'views/modals/ManageCommunityStakeModal/utils';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 
-import { isContestActive } from '../../utils';
+import { copyFarcasterContestFrameUrl, isContestActive } from '../../utils';
 import ContestAlert from '../ContestAlert';
 import ContestCountdown from '../ContestCountdown';
 
@@ -105,7 +105,7 @@ const ContestCard = ({
   const handleCancel = () => {
     cancelContest({
       contest_address: address,
-      id: app.activeChainId() || '',
+      community_id: app.activeChainId() || '',
     }).catch((error) => {
       console.error('Failed to cancel contest: ', error);
     });
@@ -147,7 +147,7 @@ const ContestCard = ({
   };
 
   const handleFarcasterClick = () => {
-    console.log('Frame copied!');
+    copyFarcasterContestFrameUrl(address).catch(console.log);
   };
 
   const showNoFundsInfo = isActive && (contestBalance || 0) <= 0;
@@ -179,9 +179,11 @@ const ContestCard = ({
             <Skeleton width="70px" />
           ) : null}
         </div>
-        <CWText className="topics">
-          Topic: {topics.map(({ name: topicName }) => topicName).join(', ')}
-        </CWText>
+        {!isFarcaster && (
+          <CWText className="topics">
+            Topic: {topics.map(({ name: topicName }) => topicName).join(', ')}
+          </CWText>
+        )}
 
         <>
           {showNoFundsInfo ? (
@@ -249,7 +251,11 @@ const ContestCard = ({
         </div>
 
         {isFarcaster && (
-          <button className="farcaster-cta" onClick={handleFarcasterClick}>
+          <button
+            className={clsx('farcaster-cta', { disabled: !isActive })}
+            onClick={handleFarcasterClick}
+            disabled={!isActive}
+          >
             <img src={farcasterUrl} alt="farcaster" />
             <CWText type="h5" fontWeight="bold">
               Copy Farcaster Frame

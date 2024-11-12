@@ -1,11 +1,11 @@
 import type { Command } from '@hicommonwealth/core';
 import { InvalidState } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
+import { buildFarcasterContestFrameUrl } from '@hicommonwealth/shared';
 import { models } from '../database';
-import { isAuthorized, type AuthContext } from '../middleware';
+import { authRoles } from '../middleware';
 import { mustExist } from '../middleware/guards';
 import { TopicInstance } from '../models';
-import { buildFarcasterContestFrameUrl } from '../utils';
 
 const Errors = {
   InvalidTopics: 'Invalid topic',
@@ -13,19 +13,18 @@ const Errors = {
 };
 
 export function CreateContestManagerMetadata(): Command<
-  typeof schemas.CreateContestManagerMetadata,
-  AuthContext
+  typeof schemas.CreateContestManagerMetadata
 > {
   return {
     ...schemas.CreateContestManagerMetadata,
-    auth: [isAuthorized({ roles: ['admin'] })],
+    auth: [authRoles('admin')],
     body: async ({ payload }) => {
-      const { id, topic_id, is_farcaster_contest, ...rest } = payload;
+      const { community_id, topic_id, is_farcaster_contest, ...rest } = payload;
 
       // if stake is not enabled, only allow one-off contests
       const stake = await models.CommunityStake.findOne({
         where: {
-          community_id: id,
+          community_id,
         },
       });
       if (!stake && payload.interval > 0) {
@@ -46,7 +45,7 @@ export function CreateContestManagerMetadata(): Command<
           const manager = await models.ContestManager.create(
             {
               ...rest,
-              community_id: id.toString(),
+              community_id,
               created_at: new Date(),
               cancelled: false,
               farcaster_frame_url: is_farcaster_contest

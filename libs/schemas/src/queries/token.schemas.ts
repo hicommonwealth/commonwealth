@@ -8,6 +8,6 @@ export const GetTokens = {
     order_by: z.enum(['name']).optional(),
   }),
   output: PaginatedResultSchema.extend({
-    results: Token.omit({ uniswap_pool_address: true }).array(),
+    results: Token.extend({ community_id: z.string() }).array(),
   }),
 };

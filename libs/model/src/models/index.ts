@@ -60,6 +60,7 @@ export * from './email_update_token';
 export * from './evmEventSource';
 export * from './group';
 export * from './lastProcessedEvmBlock';
+export * from './launchpad_trade';
 export * from './membership';
 export * from './outbox';
 export * from './poll';

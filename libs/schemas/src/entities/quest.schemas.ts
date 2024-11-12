@@ -25,7 +25,8 @@ export const QuestActionMeta = z
   .object({
     id: PG_INT.nullish(),
     quest_id: PG_INT,
-    event_name: z.enum(QUEST_EVENTS), // using event names instead of enums to allow more flexibility when adding new events
+    //event names instead of enums for flexibility when adding new events
+    event_name: z.enum(QUEST_EVENTS),
     reward_amount: z.number(),
     creator_reward_weight: z.number().min(0).max(1).default(0),
     participation_limit: z.nativeEnum(QuestParticipationLimit).optional(),

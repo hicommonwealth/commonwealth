@@ -6,7 +6,7 @@ export const IMAGE_ACCEPT =
   '.jpg, .jpeg, .png, .gif, .webp, .svg, .apng, .avif';
 
 type ImageButtonProps = Readonly<{
-  onImage?: (file: File) => void;
+  onImage: (file: File) => void;
   text?: string;
 }>;
 
