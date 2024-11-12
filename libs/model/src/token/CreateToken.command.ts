@@ -1,80 +1,13 @@
-import { type Command } from '@hicommonwealth/core';
+import { InvalidState, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { commonProtocol } from '@hicommonwealth/shared';
-import Web3 from 'web3';
 import { models } from '../database';
 import { AuthContext, isAuthorized } from '../middleware';
 import { mustExist } from '../middleware/guards';
-import { tokenCommunityManagerAbi } from '../services/commonProtocol/abi/TokenCommunityManager';
-import { erc20Abi } from '../services/commonProtocol/abi/erc20';
-
-export async function createTokenHandler(
-  chainNodeId: number,
-  tokenAddress: string,
-  description?: string | null,
-  iconUrl?: string | null,
-) {
-  const chainNode = await models.ChainNode.findOne({
-    where: { id: chainNodeId },
-    attributes: ['eth_chain_id', 'url', 'private_url'],
-  });
-
-  mustExist('Chain Node', chainNode);
-
-  const web3 = new Web3(chainNode.private_url || chainNode.url);
-
-  const contracts =
-    commonProtocol.factoryContracts[
-      chainNode!.eth_chain_id as commonProtocol.ValidChains
-    ];
-  const tokenManagerAddress = contracts.tokenCommunityManager;
-  const tokenManagerContract = new web3.eth.Contract(
-    tokenCommunityManagerAbi,
-    tokenManagerAddress,
-  );
-
-  let namespace: string;
-  try {
-    namespace = await tokenManagerContract.methods
-      .namespaceForToken(tokenAddress)
-      .call();
-  } catch (error) {
-    throw Error(`Failed to get namespace for token ${tokenAddress}`);
-  }
-
-  const erc20Contract = new web3.eth.Contract(erc20Abi, tokenAddress);
-
-  let name: string;
-  let symbol: string;
-  let totalSupply: bigint;
-
-  try {
-    [name, symbol, totalSupply] = await Promise.all([
-      erc20Contract.methods.name().call() as unknown as string,
-      erc20Contract.methods.symbol().call() as unknown as string,
-      erc20Contract.methods.totalSupply().call() as unknown as bigint,
-    ]);
-  } catch (e) {
-    throw Error(
-      `Failed to get erc20 token properties for token ${tokenAddress}`,
-    );
-  }
-
-  const token = await models.Token.create({
-    token_address: tokenAddress,
-    namespace,
-    name,
-    symbol,
-    initial_supply: totalSupply,
-    liquidity_transferred: false,
-    launchpad_liquidity: 1n,
-    eth_market_cap_target: 1n,
-    description: description ?? null,
-    icon_url: iconUrl ?? null,
-  });
-
-  return token!.toJSON();
-}
+import {
+  getErc20TokenInfo,
+  getTokenCreatedTransaction,
+} from '../services/commonProtocol/launchpadHelpers';
 
 export function CreateToken(): Command<
   typeof schemas.CreateToken,
@@ -94,22 +27,41 @@ export function CreateToken(): Command<
 
       mustExist('Chain Node', chainNode);
 
-      const web3 = new Web3(chainNode.private_url || chainNode.url);
+      const tokenData = await getTokenCreatedTransaction({
+        rpc: chainNode.private_url! || chainNode.url!,
+        transactionHash: transaction_hash,
+      });
 
-      const txReceipt = await web3.eth.getTransactionReceipt(transaction_hash);
-      const tokenAddress = txReceipt.logs[0].address!;
-      if (!tokenAddress) {
-        throw Error(
-          'Failed to find tokenAddress is token creation command. Review tokenAddress logic',
+      if (!tokenData) {
+        throw new InvalidState('Transaction not found');
+      }
+
+      let tokenInfo: { name: string; symbol: string; totalSupply: bigint };
+      try {
+        tokenInfo = await getErc20TokenInfo({
+          rpc: chainNode.private_url || chainNode.url,
+          tokenAddress: tokenData.parsedArgs.tokenAddress,
+        });
+      } catch (e) {
+        throw new Error(
+          `Failed to get erc20 token properties for token ${tokenData.parsedArgs.tokenAddress}`,
         );
       }
 
-      return await createTokenHandler(
-        chain_node_id,
-        tokenAddress,
-        description,
-        icon_url,
-      );
+      const token = await models.Token.create({
+        token_address: tokenData.parsedArgs.tokenAddress,
+        namespace: tokenData.parsedArgs.namespace,
+        name: tokenInfo.name,
+        symbol: tokenInfo.symbol,
+        initial_supply: tokenInfo.totalSupply,
+        liquidity_transferred: false,
+        launchpad_liquidity: tokenData.parsedArgs.launchpadLiquidity,
+        eth_market_cap_target: commonProtocol.getTargetMarketCap(),
+        description: description ?? null,
+        icon_url: icon_url ?? null,
+      });
+
+      return token!.toJSON();
     },
   };
 }

@@ -109,9 +109,9 @@ export const getTargetMarketCap = (
   currentSupply: number = 4.3e26,
   connectorWeight: number = 0.83,
   totalSupply: number = 1e9,
-): number => {
+): bigint => {
   const x = initialReserve / (initialSupply * connectorWeight);
   const y = (currentSupply / initialSupply) ** (1 / connectorWeight - 1);
   const price = x * y;
-  return price * totalSupply;
+  return BigInt(price * totalSupply);
 };

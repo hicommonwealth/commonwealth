@@ -323,14 +323,14 @@ export function isAuthorized({
   return async (ctx) => {
     const isAdmin = ctx.actor.user.isAdmin;
 
+    // system actors are always allowed
+    if (ctx.actor.is_system_actor) return;
+
     const auth = await buildAuth(
       ctx,
       isAdmin ? ['admin', 'moderator', 'member'] : roles,
       collaborators,
     );
-
-    // system actors are always allowed
-    if (ctx.actor.is_system_actor) return;
 
     if (isAdmin || auth.address?.role === 'admin') return;
 

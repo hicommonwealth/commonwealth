@@ -4,6 +4,14 @@
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.sequelize.transaction(async (transaction) => {
+      await queryInterface.renameColumn(
+        'Tokens',
+        'is_locked',
+        'liquidity_transferred',
+        {
+          transaction,
+        },
+      );
       await queryInterface.addColumn(
         'Tokens',
         'launchpad_liquidity',
@@ -27,6 +35,14 @@ module.exports = {
 
   async down(queryInterface, Sequelize) {
     await queryInterface.sequelize.transaction(async (transaction) => {
+      await queryInterface.renameColumn(
+        'Tokens',
+        'liquidity_transferred',
+        'is_locked',
+        {
+          transaction,
+        },
+      );
       await queryInterface.removeColumn('Tokens', 'eth_market_cap_target', {
         transaction,
       });
