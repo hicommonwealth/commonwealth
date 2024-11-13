@@ -903,7 +903,11 @@ describe('Thread lifecycle', () => {
           reaction_id: reaction!.id!,
         },
       });
-      expect(deleted).to.be.true;
+      if (reaction) {
+        if (reaction.community_id) delete reaction.community_id;
+        if (reaction.Address) delete reaction.Address;
+      }
+      expect(deleted).to.toEqual(reaction);
     });
 
     test('should throw error when reaction not found', () => {
@@ -1024,7 +1028,11 @@ describe('Thread lifecycle', () => {
           reaction_id: reaction!.id!,
         },
       });
-      expect(deleted).to.be.true;
+      if (reaction) {
+        if (reaction.community_id) delete reaction.community_id;
+        if (reaction.Address) delete reaction.Address;
+      }
+      expect(deleted).to.toEqual(reaction);
     });
 
     test('should throw when trying to delete a reaction that is not yours', async () => {
