@@ -1,4 +1,5 @@
 import { commonProtocol } from '@hicommonwealth/shared';
+import { notifyError } from 'controllers/app/notifications';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import NodeInfo from 'models/NodeInfo';
 import { useMemo, useState } from 'react';
@@ -108,26 +109,31 @@ const useTokenTradeForm = ({
   };
 
   const handleTokenBuy = async () => {
-    // this condition wouldn't be called, but adding to avoid typescript issues
-    if (!baseNode?.url || !baseNode?.ethChainId || !selectedAddress) return;
+    try {
+      // this condition wouldn't be called, but adding to avoid typescript issues
+      if (!baseNode?.url || !baseNode?.ethChainId || !selectedAddress) return;
 
-    // buy token on chain
-    const payload = {
-      chainRpc: baseNode.url,
-      ethChainId: baseNode.ethChainId,
-      amountEth: ethBuyAmount,
-      walletAddress: selectedAddress,
-      tokenAddress: tradeConfig.token.token_address,
-    };
-    const txReceipt = await buyToken(payload);
+      // buy token on chain
+      const payload = {
+        chainRpc: baseNode.url,
+        ethChainId: baseNode.ethChainId,
+        amountEth: ethBuyAmount,
+        walletAddress: selectedAddress,
+        tokenAddress: tradeConfig.token.token_address,
+      };
+      const txReceipt = await buyToken(payload);
 
-    // create token trade on db
-    await createTokenTrade({
-      eth_chain_id: baseNode?.ethChainId,
-      transaction_hash: txReceipt.transactionHash,
-    });
+      // create token trade on db
+      await createTokenTrade({
+        eth_chain_id: baseNode?.ethChainId,
+        transaction_hash: txReceipt.transactionHash,
+      });
 
-    onTradeComplete?.();
+      onTradeComplete?.();
+    } catch (e) {
+      notifyError('Failed to buy token');
+      console.log('Failed to buy token => ', e);
+    }
   };
 
   const handleTokenSell = async () => {
