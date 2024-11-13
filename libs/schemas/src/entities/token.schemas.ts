@@ -10,10 +10,19 @@ export const Token = z.object({
   initial_supply: PG_ETH.describe(
     'Initial supply of the token before deploying to uniswap',
   ),
-  is_locked: z
+  liquidity_transferred: z
     .boolean()
     .default(false)
     .describe('False if the token is not yet deployed to uniswap'),
+  launchpad_liquidity: PG_ETH.describe(
+    'The amount of tokens (portion of the initial_supply) given to the bonding ' +
+      'curve. Once this amount of tokens is sold the rest of the remaining initial_supply is transferred to Uniswap',
+  ),
+  eth_market_cap_target: z
+    .number()
+    .describe(
+      'The amount in eth (wei) that must be sold/bought before liquidity is transferred to Uniswap',
+    ),
 
   // use specified
   icon_url: z

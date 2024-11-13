@@ -1,8 +1,7 @@
 import React from 'react';
-
-import 'components/sidebar/index.scss';
-import { useCommonNavigate } from 'navigation/helpers';
 import { matchRoutes, useLocation } from 'react-router-dom';
+
+import { useCommonNavigate } from 'navigation/helpers';
 import app from 'state';
 import { useFetchTopicsQuery } from 'state/api/topics';
 import { sidebarStore } from 'state/ui/sidebar';
@@ -17,6 +16,8 @@ import type {
   ToggleTree,
 } from './types';
 
+import 'components/sidebar/index.scss';
+
 const resetSidebarState = () => {
   if (isWindowSmallInclusive(window.innerWidth)) {
     sidebarStore.getState().setMenu({ name: 'default', isVisible: false });
@@ -24,7 +25,6 @@ const resetSidebarState = () => {
     sidebarStore.getState().setMenu({ name: 'default', isVisible: true });
   }
 };
-
 function setDiscussionsToggleTree(path: string, toggle: boolean) {
   let currentTree = JSON.parse(
     localStorage[`${app.activeChainId()}-discussions-toggle-tree`],
@@ -42,25 +42,18 @@ function setDiscussionsToggleTree(path: string, toggle: boolean) {
   localStorage[`${app.activeChainId()}-discussions-toggle-tree`] =
     JSON.stringify(newTree);
 }
-
 interface DiscussionSectionProps {
   isContestAvailable: boolean;
   topicIdsIncludedInContest: number[];
 }
-
 export const DiscussionSection = ({
   isContestAvailable,
   topicIdsIncludedInContest,
 }: DiscussionSectionProps) => {
   const navigate = useCommonNavigate();
   const location = useLocation();
-
   const matchesDiscussionsRoute = matchRoutes(
     [{ path: '/discussions' }, { path: ':scope/discussions' }],
-    location,
-  );
-  const matchesOverviewRoute = matchRoutes(
-    [{ path: '/overview' }, { path: ':scope/overview' }],
     location,
   );
   const matchesContestsRoute = matchRoutes(
@@ -124,7 +117,6 @@ export const DiscussionSection = ({
   const toggleTreeState = JSON.parse(
     localStorage[`${app.activeChainId()}-discussions-toggle-tree`],
   );
-
   const discussionsGroupData: SectionGroupAttrs[] = [
     {
       title: 'All',
@@ -171,22 +163,6 @@ export const DiscussionSection = ({
           },
         ]
       : []),
-    {
-      title: 'Overview',
-      containsChildren: false,
-      hasDefaultToggle: false,
-      isVisible: true,
-      isUpdated: true,
-      isActive: !!matchesOverviewRoute,
-      onClick: (e, toggle: boolean) => {
-        e.preventDefault();
-        resetSidebarState();
-        handleRedirectClicks(navigate, e, `/overview`, communityId, () => {
-          setDiscussionsToggleTree(`children.Overview.toggledState`, toggle);
-        });
-      },
-      displayData: null,
-    },
   ];
 
   for (const topic of topics) {

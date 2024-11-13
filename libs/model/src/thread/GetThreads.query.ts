@@ -87,7 +87,7 @@ export function GetThreads(): Query<typeof schemas.GetThreads> {
                 pinned, community_id, T.created_at, updated_at, locked_at as thread_locked, links,
                 has_poll, last_commented_on, comment_count as "numberOfComments",
                 marked_as_spam_at, archived_at, topic_id, reaction_weights_sum, canvas_signed_data,
-                canvas_msg_id, last_edited, address_id
+                canvas_msg_id, last_edited, address_id, reaction_count
             FROM "Threads" T
             WHERE
                 community_id = :community_id AND

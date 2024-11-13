@@ -31,7 +31,7 @@ export function GetTokens(): Query<typeof schemas.GetTokens> {
       };
 
       const sql = `
-        SELECT T.*, C.community_id
+        SELECT T.*, C.id as community_id,
         count(*) OVER() AS total
         FROM "Tokens" as T
         JOIN "Communities" as C ON T.namespace = C.namespace

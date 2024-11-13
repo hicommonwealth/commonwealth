@@ -1,10 +1,17 @@
-import { EventHandler, Policy, events, logger } from '@hicommonwealth/core';
+import {
+  EventHandler,
+  Policy,
+  command,
+  events,
+  logger,
+} from '@hicommonwealth/core';
 import {
   Token,
   communityStakeTradeEventSignature,
   deployedNamespaceEventSignature,
   launchpadTokenLaunchedEventSignature,
   launchpadTradeEventSignature,
+  middleware,
   models,
 } from '@hicommonwealth/model';
 import { ZodUndefined } from 'zod';
@@ -24,10 +31,14 @@ export const processChainEventCreated: EventHandler<
   } else if (
     payload.eventSource.eventSignature === launchpadTokenLaunchedEventSignature
   ) {
-    await Token.createTokenHandler(
-      payload.eventSource.chainNodeId,
-      payload.parsedArgs[0],
-    );
+    await command(Token.CreateToken(), {
+      actor: middleware.systemActor({}),
+      payload: {
+        chain_node_id: payload.eventSource.chainNodeId,
+        community_id: '', // not required for system actors
+        transaction_hash: payload.rawLog.transactionHash,
+      },
+    });
   } else if (
     payload.eventSource.eventSignature === deployedNamespaceEventSignature
   ) {
