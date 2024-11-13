@@ -10,13 +10,15 @@ const includeContestManagersQuery = `
            coalesce((SELECT jsonb_agg(jsonb_set(to_jsonb(cm), -- Convert the contest manager (cm) row to JSONB
                                                 '{content}', -- Set the 'content' key in the resulting JSONB
                                                 coalesce(
-                                                        (SELECT jsonb_agg(ca) -- Aggregates the filtered actions into content
+                                                    -- Aggregates the filtered actions into content
+                                                        (SELECT jsonb_agg(ca)
                                                          FROM "ContestActions" ca
                                                          WHERE ca.contest_address = cm.contest_address
                                                            AND ca.action = 'added'
                                                            AND ca.created_at > co.start_time
                                                            AND ca.created_at < co.end_time),
-                                                        '[]'::jsonb) -- Use an empty array as fallback if no actions are found
+                                                    -- Use an empty array as fallback if no actions are found
+                                                        '[]'::jsonb)
                                       ))
                      FROM "Topics" t
                               LEFT JOIN "ContestManagers" cm ON cm.topic_id = t.id
