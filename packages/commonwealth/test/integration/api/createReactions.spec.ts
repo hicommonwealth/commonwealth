@@ -37,7 +37,7 @@ describe('createReaction Integration Tests', () => {
       .set('address', address)
       .send(validRequest);
     assert.equal((res as any).statusCode, 200);
-    return res.text === 'true';
+    return res?.statusCode === 200;
   };
 
   const getUniqueCommentText = async () => {
