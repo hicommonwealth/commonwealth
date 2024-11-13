@@ -1,4 +1,5 @@
 import { InvalidInput, type Command } from '@hicommonwealth/core';
+import { commonProtocol } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import { ChainBase } from '@hicommonwealth/shared';
 import { models } from '../database';
@@ -84,18 +85,17 @@ export function UpdateCommunity(): Command<typeof schemas.UpdateCommunity> {
         throw new InvalidInput(UpdateCommunityErrors.InvalidDefaultPage);
 
       if (namespace) {
-        // TODO: this breaks token creation flow even when tx hash is provided @Kurtis
-        // if (!transactionHash)
-        //   throw new InvalidInput(UpdateCommunityErrors.InvalidTransactionHash);
+        if (!transactionHash)
+          throw new InvalidInput(UpdateCommunityErrors.InvalidTransactionHash);
 
         community.namespace = namespace;
-        // community.namespace_address =
-        //   await commonProtocol.newNamespaceValidator.validateNamespace(
-        //     namespace!,
-        //     transactionHash,
-        //     actor.address!,
-        //     community,
-        //   );
+        community.namespace_address =
+          await commonProtocol.newNamespaceValidator.validateNamespace(
+            namespace!,
+            transactionHash,
+            actor.address!,
+            community,
+          );
       }
 
       default_page && (community.default_page = default_page);
