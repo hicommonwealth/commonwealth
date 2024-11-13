@@ -16,6 +16,8 @@ import useJoinCommunity from 'views/components/SublayoutHeader/useJoinCommunity'
 import './TradeTokenForm.scss';
 import { TradingMode, UseTradeTokenFormProps } from './types';
 
+const COMMON_PLATFORM_FEE_PERCENTAGE = 5; // make configurable when needed
+
 const useTradeTokenForm = ({
   tradeConfig,
   addressType,
@@ -57,6 +59,8 @@ const useTradeTokenForm = ({
   );
 
   const ethBuyAmount = baseCurrencyTradingAmount / ethToCurrencyRate;
+  const commonPlatformFeeForBuyTradeInEth =
+    (COMMON_PLATFORM_FEE_PERCENTAGE / 100) * ethBuyAmount;
 
   const { data: tokenCommunity, isLoading: isLoadingTokenCommunity } =
     useGetCommunityByIdQuery({
@@ -213,8 +217,8 @@ const useTradeTokenForm = ({
       token: tradeConfig.token,
       // TODO: hardcoded for now
       commonPlatformFee: {
-        percentage: '0.5%',
-        eth: 0.0000178,
+        percentage: `${COMMON_PLATFORM_FEE_PERCENTAGE}%`,
+        eth: commonPlatformFeeForBuyTradeInEth,
       },
     },
     addresses: {
