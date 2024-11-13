@@ -12,7 +12,7 @@
     padding: 8px 4px;
   }
 
-  .amount-selection {
+  .amount-selection-container {
     .text-light {
       color: $neutral-400;
     }
@@ -27,68 +27,6 @@
 
     @include extraSmall {
       gap: 16px;
-    }
-
-    .amount-input-with-currency-symbol {
-      display: flex;
-      width: fit-content;
-      margin: auto;
-      background-color: $neutral-200;
-      border: 1px solid $neutral-300;
-      border-radius: 6px;
-      --font-size: 28px;
-
-      .amount-symbol {
-        border-radius: 6px;
-        margin: auto;
-        font-size: var(--font-size);
-        padding: 10px 8px;
-        background-color: $neutral-200;
-        color: $neutral-500;
-      }
-
-      .amount-input,
-      .amount-input > * {
-        max-width: 120px;
-        height: 48px !important;
-        min-height: 48px !important;
-
-        input {
-          height: 48px !important;
-          min-height: 48px !important;
-          text-align: center;
-          font-size: var(--font-size);
-          font-weight: bold;
-          color: $black;
-
-          &:focus-within {
-            border-color: $primary-500 !important;
-            box-shadow:
-              0px 2px 2px -1px rgba(0, 0, 0, 0.12),
-              0px 0px 0px 3px $primary-200 !important;
-          }
-        }
-      }
-    }
-
-    .amount-to-crypto {
-      text-align: center;
-      margin: auto;
-      width: fit-content;
-    }
-
-    .preset-amounts {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin: auto;
-      margin-top: 12px;
-
-      @include extraSmall {
-        margin-top: 4px;
-      }
     }
   }
 

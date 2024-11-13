@@ -28,6 +28,11 @@ export type UseTradeTokenFormProps = {
   onTradeComplete?: () => void;
 };
 
+export type BuyAmountSelectionProps = Pick<
+  ReturnType<typeof useTradeTokenForm>,
+  'trading'
+>;
+
 export type ReceiptDetailsProps = Pick<
   ReturnType<typeof useTradeTokenForm>,
   'trading'

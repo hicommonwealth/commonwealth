@@ -1,8 +1,3 @@
-import {
-  currencyNameToSymbolMap,
-  currencySymbolPlacements,
-  getAmountWithCurrencySymbol,
-} from 'helpers/currency';
 import React, { ReactNode, useState } from 'react';
 import { Skeleton } from 'views/components/Skeleton';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
@@ -14,13 +9,12 @@ import {
   CWTab,
   CWTabsRow,
 } from 'views/components/component_kit/new_designs/CWTabs';
-import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
-import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import {
   CustomAddressOption,
   CustomAddressOptionElement,
 } from '../../ManageCommunityStakeModal/StakeExchangeForm/CustomAddressOption';
+import BuyAmountSelection from './AmountSelections/BuyAmountSelection';
 import BuyReceipt from './ReceiptDetails/BuyReceipt';
 import './TradeTokenForm.scss';
 import { convertAddressToDropdownOption } from './helpers';
@@ -33,12 +27,6 @@ const TradeTokenForm = ({
   isActionPending,
 }: TradeTokenFormProps) => {
   const [isReceiptDetailOpen, setIsReceiptDetailOpen] = useState(false);
-
-  const buyAmountCurrenySymbol = (
-    <CWText className="amount-symbol">
-      {currencyNameToSymbolMap[trading.amounts.buy.baseCurrency.name]}
-    </CWText>
-  );
 
   const getCTADisabledTooltipText = () => {
     if (isActionPending) return 'Processing trade...';
@@ -129,63 +117,15 @@ const TradeTokenForm = ({
         </div>
       </div>
 
-      <div className="amount-selection">
+      <div className="amount-selection-container">
         <CWText className="uppercase text-light" type="b2">
           You&apos;re {trading.mode.value}ing
         </CWText>
 
         {trading.mode.value === TradingMode.Buy ? (
-          <>
-            <div className="amount-input-with-currency-symbol">
-              {currencySymbolPlacements.onLeft.includes(
-                trading.amounts.buy.baseCurrency.name,
-              ) && buyAmountCurrenySymbol}
-              <CWTextInput
-                containerClassName="amount-input"
-                placeholder={getAmountWithCurrencySymbol(
-                  0,
-                  trading.amounts.buy.baseCurrency.name,
-                )}
-                value={trading.amounts.buy.baseCurrency.amount}
-                onInput={(e) =>
-                  trading.amounts.buy.baseCurrency.onAmountChange(e)
-                }
-              />
-              {currencySymbolPlacements.onRight.includes(
-                trading.amounts.buy.baseCurrency.name,
-              ) && buyAmountCurrenySymbol}
-            </div>
-
-            <CWText type="caption" className="amount-to-crypto">
-              <CWIcon iconName="ethereum" iconSize="small" />
-              {trading.amounts.buy.eth} ETH = {trading.amounts.buy.token}{' '}
-              {trading.token.symbol}
-            </CWText>
-
-            {trading.amounts.buy.baseCurrency.presetAmounts && (
-              <div className="preset-amounts">
-                {trading.amounts.buy.baseCurrency.presetAmounts?.map(
-                  (presetAmount) => (
-                    <CWTag
-                      key={presetAmount}
-                      type="amount"
-                      label={getAmountWithCurrencySymbol(
-                        presetAmount,
-                        trading.amounts.buy.baseCurrency.name,
-                      )}
-                      onClick={() =>
-                        trading.amounts.buy.baseCurrency.onAmountChange(
-                          presetAmount,
-                        )
-                      }
-                    />
-                  ),
-                )}
-              </div>
-            )}
-          </>
+          <BuyAmountSelection trading={trading} />
         ) : (
-          <>{/* TODO: sell mode data here */}</>
+          <>{/* TODO: sell mode components here */}</>
         )}
       </div>
 
@@ -207,7 +147,7 @@ const TradeTokenForm = ({
           trading.mode.value === TradingMode.Buy ? (
             <BuyReceipt trading={trading} />
           ) : (
-            <>{/* TODO: sell mode data here */}</>
+            <>{/* TODO: sell mode components here */}</>
           )
         ) : (
           <></>
