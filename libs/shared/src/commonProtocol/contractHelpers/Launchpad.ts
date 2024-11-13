@@ -16,7 +16,7 @@ export const launchToken = async (
       shares,
       holders,
       totalSupply,
-      0,
+      1,
       0,
       '0x0000000000000000000000000000000000000000',
       tokenCommunityManager,
@@ -32,9 +32,18 @@ export const buyToken = async (
   walletAddress: string,
   value: number,
 ) => {
-  const txReceipt = await contract.methods.buyToken(tokenAddress, 0).send({
+  const contractCall = contract.methods.buyToken(tokenAddress, 0);
+  let gasResult;
+  gasResult = await contractCall.estimateGas({
     from: walletAddress,
-    value,
+    value: value.toFixed(0),
+  });
+
+  const txReceipt = await contractCall.send({
+    from: walletAddress,
+    value: value.toFixed(0),
+    gas: gasResult.toString(),
+    type: '0x2',
   });
   return txReceipt;
 };
@@ -47,7 +56,7 @@ export const sellToken = async (
   walletAddress: string,
 ) => {
   const txReceipt = await contract.methods
-    .sellToken(tokenAddress, amount, 0)
+    .sellToken(tokenAddress, amount.toFixed(0), 0)
     .send({ from: walletAddress });
   return txReceipt;
 };
