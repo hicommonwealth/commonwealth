@@ -1,4 +1,4 @@
-import { Token } from '@hicommonwealth/schemas';
+import { TokenView } from '@hicommonwealth/schemas';
 import { ChainBase } from '@hicommonwealth/shared';
 import { SupportedCurrencies } from 'helpers/currency';
 import { z } from 'zod';
@@ -11,9 +11,8 @@ export enum TradingMode {
 
 export type TradeTokenFormProps = ReturnType<typeof useTradeTokenForm>;
 
-const TokenWithCommunity = Token.extend({
+const TokenWithCommunity = TokenView.extend({
   community_id: z.string(),
-  initial_supply: z.string(),
 });
 
 export type TradingConfig = {

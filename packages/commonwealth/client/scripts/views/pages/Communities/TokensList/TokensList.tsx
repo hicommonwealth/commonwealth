@@ -1,4 +1,4 @@
-import { Token } from '@hicommonwealth/schemas';
+import { TokenView } from '@hicommonwealth/schemas';
 import { ChainBase } from '@hicommonwealth/shared';
 import clsx from 'clsx';
 import { useFlag } from 'hooks/useFlag';
@@ -15,9 +15,8 @@ import { z } from 'zod';
 import TokenCard from '../../../components/TokenCard';
 import './TokensList.scss';
 
-const TokenWithCommunity = Token.extend({
+const TokenWithCommunity = TokenView.extend({
   community_id: z.string(),
-  initial_supply: z.string(),
 });
 
 const TokensList = () => {
