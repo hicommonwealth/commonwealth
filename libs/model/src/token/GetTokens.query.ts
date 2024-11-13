@@ -35,7 +35,7 @@ export function GetTokens(): Query<typeof schemas.GetTokens> {
         count(*) OVER() AS total
         FROM "Tokens" as T
         JOIN "Communities" as C ON T.namespace = C.namespace
-        ${search ? 'WHERE LOWER(name) LIKE :search' : ''}
+        ${search ? 'WHERE LOWER(T.name) LIKE :search' : ''}
         ORDER BY ${order_col} :direction
         LIMIT :limit
         OFFSET :offset
