@@ -3,7 +3,7 @@ import path from 'path';
 import { QueryTypes, Sequelize } from 'sequelize';
 import { SequelizeStorage, Umzug } from 'umzug';
 import { config } from '../config';
-import { buildDb, type DB } from '../models';
+import { buildDb, syncDb, type DB } from '../models';
 
 /**
  * Verifies the existence of a database,
@@ -215,22 +215,30 @@ export const bootstrap_testing = async (
   meta: ImportMeta,
   truncate = false,
 ): Promise<DB> => {
+  const filename = path.basename(meta.filename);
   if (!db) {
-    db = buildDb(
-      new Sequelize({
-        dialect: 'postgres',
-        database: config.DB.NAME,
-        username: 'commonwealth',
-        password: 'edgeware',
-        logging: false,
-      }),
-    );
-    console.log('Database object built:', meta.filename);
+    try {
+      await verify_db(config.DB.NAME);
+      db = buildDb(
+        new Sequelize({
+          dialect: 'postgres',
+          database: config.DB.NAME,
+          username: 'commonwealth',
+          password: 'edgeware',
+          logging: false,
+        }),
+      );
+      await syncDb(db);
+      console.log('Database synced:', filename);
+    } catch (e) {
+      console.error('Error bootstrapping test db:', e);
+      throw e;
+    }
   }
 
   if (truncate) {
     await truncate_db(db);
-    console.log('Database truncated:', meta.filename);
+    console.log('Database truncated:', filename);
   }
 
   return db;
