@@ -1,3 +1,4 @@
+import { logger } from '@hicommonwealth/core';
 import {
   deployedNamespaceEventSignature,
   launchpadTokenRegisteredEventSignature,
@@ -5,6 +6,8 @@ import {
 } from '@hicommonwealth/model';
 import { Web3 } from 'web3';
 import { erc20Abi } from './abi/erc20';
+
+const log = logger(import.meta);
 
 export async function getLaunchpadTradeTransaction({
   rpc,
@@ -69,6 +72,7 @@ export async function getTokenCreatedTransaction({
 
   const txReceipt = await web3.eth.getTransactionReceipt(transactionHash);
   if (!txReceipt) {
+    log.debug('Transaction not found');
     return;
   }
 
@@ -80,7 +84,10 @@ export async function getTokenCreatedTransaction({
     }
     return false;
   });
-  if (!deployedNamespaceLog) return;
+  if (!deployedNamespaceLog) {
+    log.debug('DeployedNamespace log not found');
+    return;
+  }
   const {
     0: namespace,
     // 1: feeManager,
@@ -97,17 +104,23 @@ export async function getTokenCreatedTransaction({
     }
     return false;
   });
-  if (!tokenRegisteredLog) return;
+  if (!tokenRegisteredLog) {
+    log.debug('Token registered event not found');
+    return;
+  }
   const {
-    0: tokenAddress,
-    1: curveId,
-    2: totalSupply,
-    3: launchpadLiquidity,
-    4: reserveRatio,
-    5: initialPurchaseEthAmount,
+    0: curveId,
+    1: totalSupply,
+    2: launchpadLiquidity,
+    3: reserveRatio,
+    4: initialPurchaseEthAmount,
   } = web3.eth.abi.decodeParameters(
-    ['address, uint256, uint256', 'uint256', 'uint256', 'uint256', 'uint256'],
+    ['uint256', 'uint256', 'uint256', 'uint256', 'uint256'],
     tokenRegisteredLog.data!.toString(),
+  );
+  const tokenAddress = web3.eth.abi.decodeParameter(
+    'address',
+    tokenRegisteredLog.topics![1].toString(),
   );
 
   return {

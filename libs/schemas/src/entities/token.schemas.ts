@@ -18,9 +18,11 @@ export const Token = z.object({
     'The amount of tokens (portion of the initial_supply) given to the bonding ' +
       'curve. Once this amount of tokens is sold the rest of the remaining initial_supply is transferred to Uniswap',
   ),
-  eth_market_cap_target: PG_ETH.describe(
-    'The amount in eth (wei) that must be sold/bought before liquidity is transferred to Uniswap',
-  ),
+  eth_market_cap_target: z
+    .number()
+    .describe(
+      'The amount in eth (wei) that must be sold/bought before liquidity is transferred to Uniswap',
+    ),
 
   // use specified
   icon_url: z

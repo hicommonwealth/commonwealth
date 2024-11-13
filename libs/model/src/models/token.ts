@@ -33,7 +33,7 @@ export default (
       },
       launchpad_liquidity: { type: Sequelize.DECIMAL(78, 0), allowNull: false },
       eth_market_cap_target: {
-        type: Sequelize.DECIMAL(78, 0),
+        type: Sequelize.FLOAT,
         allowNull: false,
       },
       created_at: { type: Sequelize.DATE, allowNull: false },
