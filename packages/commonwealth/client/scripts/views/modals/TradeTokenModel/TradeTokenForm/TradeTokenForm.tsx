@@ -40,7 +40,10 @@ const TradeTokenForm = ({
   );
 
   const getCTADisabledTooltipText = () => {
-    if (isActionPending || trading.amounts.buy.baseCurrency.amount === 0)
+    if (isActionPending) return 'Processing trade...';
+
+    // buy mode
+    if (trading.amounts.buy.baseCurrency.amount === 0)
       return 'Please add trading amount to continue';
     if (trading.amounts.buy.insufficientFunds)
       return `You don't have sufficient funds to buy token`;
