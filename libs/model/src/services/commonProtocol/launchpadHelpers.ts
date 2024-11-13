@@ -1,3 +1,8 @@
+import {
+  deployedNamespaceEventSignature,
+  launchpadTokenRegisteredEventSignature,
+  launchpadTradeEventSignature,
+} from '@hicommonwealth/model';
 import { Web3 } from 'web3';
 import { erc20Abi } from './abi/erc20';
 
@@ -16,6 +21,14 @@ export async function getLaunchpadTradeTransaction({
   }
 
   const block = await web3.eth.getBlock(txReceipt.blockHash.toString());
+
+  const tradeLog = txReceipt.logs.find((l) => {
+    if (l.topics && l.topics.length > 0) {
+      return l.topics[0].toString() === launchpadTradeEventSignature;
+    }
+    return false;
+  });
+  if (!tradeLog) return;
 
   const {
     0: traderAddress,
@@ -61,18 +74,30 @@ export async function getTokenCreatedTransaction({
 
   const block = await web3.eth.getBlock(txReceipt.blockHash.toString());
 
-  // Deployed Namespace
+  const deployedNamespaceLog = txReceipt.logs.find((l) => {
+    if (l.topics && l.topics.length > 0) {
+      return l.topics[0].toString() === deployedNamespaceEventSignature;
+    }
+    return false;
+  });
+  if (!deployedNamespaceLog) return;
   const {
     0: namespace,
     // 1: feeManager,
     // 2: signature,
-    // 3: namespaceDeploye,
+    // 3: namespaceDeployed,
   } = web3.eth.abi.decodeParameters(
     ['string', 'address', 'bytes', 'address'],
-    txReceipt.logs[7].data!.toString(),
+    deployedNamespaceLog.data!.toString(),
   );
 
-  // TokenRegistered
+  const tokenRegisteredLog = txReceipt.logs.find((l) => {
+    if (l.topics && l.topics.length > 0) {
+      return l.topics[0].toString() === launchpadTokenRegisteredEventSignature;
+    }
+    return false;
+  });
+  if (!tokenRegisteredLog) return;
   const {
     0: tokenAddress,
     1: curveId,
@@ -82,7 +107,7 @@ export async function getTokenCreatedTransaction({
     5: initialPurchaseEthAmount,
   } = web3.eth.abi.decodeParameters(
     ['address, uint256, uint256', 'uint256', 'uint256', 'uint256', 'uint256'],
-    txReceipt.logs[16].data!.toString(),
+    tokenRegisteredLog.data!.toString(),
   );
 
   return {

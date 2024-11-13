@@ -9,3 +9,6 @@ export const launchpadTokenLaunchedEventSignature =
 
 export const launchpadTradeEventSignature =
   '0x9adcf0ad0cda63c4d50f26a48925cf6405df27d422a39c456b5f03f661c82982';
+
+export const launchpadTokenRegisteredEventSignature =
+  '0xc2fe88a1a3c1957424571593960b97f158a519d0aa4cef9e13a247c64f1f4c35';
