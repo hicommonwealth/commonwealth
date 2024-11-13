@@ -71,7 +71,10 @@ export async function handleLaunchpadTrade(
     ].lpBondingCurve!;
 
   // TODO: update 1n to the launchpadLiquidity stored on Token model
-  if (!token.is_locked && BigNumber.from(floatingSupply).toBigInt() === 1n) {
+  if (
+    !token.liquidity_transferred &&
+    BigNumber.from(floatingSupply).toBigInt() === 1n
+  ) {
     const onChainTokenData = await commonProtocol.launchpadHelpers.getToken({
       rpc: chainNode.private_url!,
       tokenAddress,
@@ -86,7 +89,7 @@ export async function handleLaunchpadTrade(
       });
     }
 
-    token.is_locked = true;
+    token.liquidity_transferred = true;
     await token.save();
   }
 }
