@@ -70,7 +70,7 @@ const TradeTokenForm = ({
   };
 
   return (
-    <section className="TokenTradeForm">
+    <section className="TradeTokenForm">
       <CWTabsRow>
         {Object.keys(TradingMode).map((mode) => (
           <CWTab

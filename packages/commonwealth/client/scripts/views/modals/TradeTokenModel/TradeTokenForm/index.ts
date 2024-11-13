@@ -1,6 +1,6 @@
 import TradeTokenForm from './TradeTokenForm';
-import useTokenTradeForm from './useTokenTradeForm';
+import useTradeTokenForm from './useTradeTokenForm';
 export * from './types';
-export * from './useTokenTradeForm';
-export { useTokenTradeForm };
+export * from './useTradeTokenForm';
+export { useTradeTokenForm };
 export default TradeTokenForm;

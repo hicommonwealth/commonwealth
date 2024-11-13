@@ -8,7 +8,7 @@ import {
 } from '../../components/component_kit/new_designs/CWModal';
 import TradeTokenForm, {
   TradingConfig,
-  useTokenTradeForm,
+  useTradeTokenForm,
 } from './TradeTokenForm';
 import './TradeTokenModal.scss';
 
@@ -25,7 +25,7 @@ const TradeTokenModal = ({
   onModalClose,
   tradeConfig,
 }: TradeTokenModalProps) => {
-  const { trading, addresses, isActionPending, onCTAClick } = useTokenTradeForm(
+  const { trading, addresses, isActionPending, onCTAClick } = useTradeTokenForm(
     {
       tradeConfig: {
         ...tradeConfig,

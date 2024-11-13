@@ -13,13 +13,13 @@ import { fetchCachedNodes } from 'state/api/nodes';
 import { useCreateTokenTradeMutation } from 'state/api/tokens';
 import useUserStore from 'state/ui/user';
 import './TradeTokenForm.scss';
-import { TradingMode, UseTokenTradeFormProps } from './types';
+import { TradingMode, UseTradeTokenFormProps } from './types';
 
-const useTokenTradeForm = ({
+const useTradeTokenForm = ({
   tradeConfig,
   addressType,
   onTradeComplete,
-}: UseTokenTradeFormProps) => {
+}: UseTradeTokenFormProps) => {
   const [baseCurrencyTradingAmount, setBaseCurrencyTradingAmount] =
     useState<number>(0);
   const [tradingMode, setTradingMode] = useState<TradingMode>(
@@ -208,4 +208,4 @@ const useTokenTradeForm = ({
   };
 };
 
-export default useTokenTradeForm;
+export default useTradeTokenForm;
