@@ -37,7 +37,7 @@ export function ToggleArchiveTopic(): Command<
               topic_id: topic_id!,
               // don't update archival date for already archived threads
               // see warning above
-              archived_at: null,
+              archived_at: archive ? null : topic.archived_at,
             },
             transaction,
           },

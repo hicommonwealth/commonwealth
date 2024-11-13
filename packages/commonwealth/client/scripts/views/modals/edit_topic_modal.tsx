@@ -112,7 +112,7 @@ export const EditTopicModal = ({
           buttonHeight: 'sm',
         },
         {
-          label: topic.archived_at ? 'Unarchive' : 'Acrhive',
+          label: topic.archived_at ? 'Unarchive' : 'Archive',
           buttonType: topic.archived_at ? 'primary' : 'destructive',
           buttonHeight: 'sm',
           onClick: async () => {
