@@ -20,7 +20,9 @@ export function useRegisterPushNotificationSubscriptionCallback() {
 
     const permission = await Notification.requestPermission();
     if (permission === 'granted') {
-      console.log('Notification permission granted.');
+      console.log(
+        'Notification permission granted for channelType: ' + channelType,
+      );
       const token = await getFirebaseMessagingToken();
       await registerClientRegistrationToken.mutateAsync({
         id: user.id,
