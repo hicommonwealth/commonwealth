@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { AuthContext } from '../context';
-import { LaunchpadTrade, Token } from '../entities';
+import { LaunchpadTrade } from '../entities';
+import { TokenView } from '../queries';
 
 export const CreateToken = {
   input: z.object({
@@ -10,7 +11,7 @@ export const CreateToken = {
     description: z.string().nullish(),
     icon_url: z.string().nullish(),
   }),
-  output: Token,
+  output: TokenView,
   context: AuthContext,
 };
 
