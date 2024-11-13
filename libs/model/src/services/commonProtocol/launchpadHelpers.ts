@@ -1,4 +1,4 @@
-import Web3 from 'web3';
+import { Web3 } from 'web3';
 import { erc20Abi } from './abi/erc20';
 
 export async function getLaunchpadTradeTransaction({
@@ -78,7 +78,7 @@ export async function getTokenCreatedTransaction({
     1: curveId,
     2: totalSupply,
     3: launchpadLiquidity,
-    4: reserveRation,
+    4: reserveRatio,
     5: initialPurchaseEthAmount,
   } = web3.eth.abi.decodeParameters(
     ['address, uint256, uint256', 'uint256', 'uint256', 'uint256', 'uint256'],
@@ -94,7 +94,7 @@ export async function getTokenCreatedTransaction({
       curveId: curveId as bigint,
       totalSupply: totalSupply as bigint,
       launchpadLiquidity: launchpadLiquidity as bigint,
-      reserveRation: reserveRation as bigint,
+      reserveRation: reserveRatio as bigint,
       initialPurchaseEthAmount: initialPurchaseEthAmount as bigint,
     },
   };
@@ -106,7 +106,7 @@ export async function getErc20TokenInfo({
 }: {
   rpc: string;
   tokenAddress: string;
-}) {
+}): Promise<{ name: string; symbol: string; totalSupply: bigint }> {
   const web3 = new Web3(rpc);
   const erc20Contract = new web3.eth.Contract(erc20Abi, tokenAddress);
   const [name, symbol, totalSupply] = await Promise.all([
@@ -115,8 +115,8 @@ export async function getErc20TokenInfo({
     erc20Contract.methods.totalSupply().call(),
   ]);
   return {
-    name: name as unknown as string,
-    symbol: symbol as unknown as string,
-    totalSupply: totalSupply as unknown as bigint,
+    name,
+    symbol,
+    totalSupply: totalSupply as bigint,
   };
 }
