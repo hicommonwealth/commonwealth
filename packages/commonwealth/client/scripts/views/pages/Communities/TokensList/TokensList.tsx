@@ -15,6 +15,8 @@ import { z } from 'zod';
 import TokenCard from '../../../components/TokenCard';
 import './TokensList.scss';
 
+const TokenWithCommunity = Token.extend({ community_id: z.string() });
+
 const TokensList = () => {
   const navigate = useCommonNavigate();
   const tokenizedCommunityEnabled = useFlag('tokenizedCommunity');
@@ -22,7 +24,7 @@ const TokensList = () => {
     isOpen: boolean;
     tradeConfig?: {
       mode: TradingMode;
-      token: z.infer<typeof Token>;
+      token: z.infer<typeof TokenWithCommunity>;
       addressType: ChainBase;
     };
   }>({ isOpen: false, tradeConfig: undefined });
@@ -88,7 +90,7 @@ const TokensList = () => {
                   isOpen: true,
                   tradeConfig: {
                     mode: TradingMode.Buy,
-                    token: token as z.infer<typeof Token>,
+                    token: token as z.infer<typeof TokenWithCommunity>,
                     addressType: ChainBase.Ethereum,
                   },
                 })
