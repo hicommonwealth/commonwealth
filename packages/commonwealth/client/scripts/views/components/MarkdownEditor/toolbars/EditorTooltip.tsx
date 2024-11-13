@@ -4,6 +4,10 @@ import { AnchorType } from 'views/components/component_kit/new_designs/CWPopover
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import { TooltipProps } from 'views/components/component_kit/new_designs/CWTooltip/CWTooltip';
 
+function nullRenderTrigger() {
+  // noop render trigger that does nothing on mobile.
+}
+
 /**
  * Functions just like CWTooltip but only activates tooltip when the editor
  * is in desktop mode.  Otherwise, tooltips can popup on mobile and that is
@@ -12,6 +16,12 @@ import { TooltipProps } from 'views/components/component_kit/new_designs/CWToolt
 export const EditorTooltip = (props: TooltipProps) => {
   const { renderTrigger } = props;
   const mode = useMarkdownEditorMode();
+
+  if (mode === 'mobile') {
+    // don't use the CWTooltip on mobile to avoid issues with rendering on
+    // Safari mobile
+    return renderTrigger(nullRenderTrigger);
+  }
 
   return (
     <CWTooltip

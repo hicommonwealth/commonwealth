@@ -2,20 +2,17 @@ import { InvalidState, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { commonProtocol } from '@hicommonwealth/shared';
 import { models } from '../database';
-import { AuthContext, isAuthorized } from '../middleware';
+import { authRoles } from '../middleware';
 import { mustExist } from '../middleware/guards';
 import {
   getErc20TokenInfo,
   getTokenCreatedTransaction,
 } from '../services/commonProtocol/launchpadHelpers';
 
-export function CreateToken(): Command<
-  typeof schemas.CreateToken,
-  AuthContext
-> {
+export function CreateToken(): Command<typeof schemas.CreateToken> {
   return {
     ...schemas.CreateToken,
-    auth: [isAuthorized({ roles: ['admin'] })],
+    auth: [authRoles('admin')],
     body: async ({ payload }) => {
       const { chain_node_id, transaction_hash, description, icon_url } =
         payload;

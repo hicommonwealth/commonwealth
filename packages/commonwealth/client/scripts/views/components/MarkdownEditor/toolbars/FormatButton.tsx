@@ -43,7 +43,7 @@ export const FormatButton = (props: HeadingButtonProps) => {
       content={`Change to ${formatName}`}
       renderTrigger={(handleInteraction) => (
         <CWIconButton
-          className={clsx({ FormatButtonActive: active })}
+          className={clsx('FormatButton', { FormatButtonActive: active })}
           buttonSize="lg"
           iconName={formatToIconName(format)}
           onMouseEnter={handleInteraction}
