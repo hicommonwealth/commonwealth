@@ -300,7 +300,6 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
           views={VIEWS}
           selectedView={selectedView}
           setSelectedView={updateSelectedView}
-          showViews={showView}
         />
 
         {selectedView === VIEWS[0].value ? (

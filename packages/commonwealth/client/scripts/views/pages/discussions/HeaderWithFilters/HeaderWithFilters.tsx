@@ -55,7 +55,6 @@ type HeaderWithFiltersProps = {
   views?: TabsProps[];
   selectedView?: string;
   setSelectedView?: (tabValue: string) => void;
-  showViews?: boolean;
 };
 
 export const HeaderWithFilters = ({
@@ -73,7 +72,6 @@ export const HeaderWithFilters = ({
   views,
   selectedView,
   setSelectedView,
-  showViews,
 }: HeaderWithFiltersProps) => {
   const navigate = useCommonNavigate();
   const location = useLocation();
@@ -219,7 +217,7 @@ export const HeaderWithFilters = ({
   return (
     <div className="HeaderWithFilters">
       <div className="header-row">
-        {showViews && views && views.length ? (
+        {views && views.length ? (
           <div className="filter-section">
             <Select
               selected={selectedView || ThreadViewFilterTypes.All}

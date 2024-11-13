@@ -39,7 +39,6 @@ const OverviewPage = () => {
     apiEnabled: !!communityId,
   });
 
-  console.log('i am called');
   const { data: topics = [] } = useFetchTopicsQuery({
     communityId,
     apiEnabled: !!communityId,
