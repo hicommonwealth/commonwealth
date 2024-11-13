@@ -117,7 +117,7 @@ const useTradeTokenForm = ({
       const payload = {
         chainRpc: baseNode.url,
         ethChainId: baseNode.ethChainId,
-        amountEth: ethBuyAmount,
+        amountEth: ethBuyAmount * 1e18, // amount in wei
         walletAddress: selectedAddress,
         tokenAddress: tradeConfig.token.token_address,
       };
