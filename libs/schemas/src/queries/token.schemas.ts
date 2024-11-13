@@ -4,6 +4,7 @@ import { PaginatedResultSchema, PaginationParamsSchema } from './pagination';
 
 export const TokenView = Token.extend({
   initial_supply: z.string(),
+  launchpad_liquidity: z.string(),
 });
 
 export const GetTokens = {
