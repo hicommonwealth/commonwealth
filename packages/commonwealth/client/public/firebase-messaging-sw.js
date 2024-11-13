@@ -10,6 +10,11 @@
 // typescript package JUST for our service worker which I feel is a waste of time
 // since our service worker is just one file and less than 100 lines of code
 
+/**
+ * Safari doesn't work with console.log messages from serviceWorker context
+ * so the only way to debug it is to do a postMessage to the client and then
+ * the client then logs the message.
+ */
 function log(message) {
   self.clients.matchAll().then((clients) => {
     clients.forEach((client) => client.postMessage({ type: 'log', message }));
