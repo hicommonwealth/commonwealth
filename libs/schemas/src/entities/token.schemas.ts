@@ -7,9 +7,10 @@ export const Token = z.object({
   namespace: z.string().describe('Namespace associated with the token'),
   name: z.string().describe('Name of the token'),
   symbol: z.string().describe('Symbol of the token'),
-  initial_supply: PG_ETH.describe(
-    'Initial supply of the token before deploying to uniswap',
-  ),
+  initial_supply: z.union([
+    PG_ETH.describe('Initial supply of the token before deploying to uniswap'),
+    z.any(),
+  ]),
   is_locked: z
     .boolean()
     .default(false)
