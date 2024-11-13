@@ -32,6 +32,7 @@ import {
   UpdateCommunityErrors,
 } from '../../src/community';
 import { models } from '../../src/database';
+import { systemActor } from '../../src/middleware';
 import type {
   ChainNodeAttributes,
   CommunityAttributes,
@@ -544,6 +545,18 @@ describe('Community lifecycle', () => {
       expect(updatedTopic.description).to.eq('newDesc');
     });
 
+    test('should update a topic as a system actor', async () => {
+      const { topic: updatedTopic } = (await command(UpdateTopic(), {
+        actor: systemActor({}),
+        payload: {
+          topic_id: createdTopic.id!,
+          community_id: community.id,
+          description: 'newDesc by system actor',
+        },
+      }))!;
+      expect(updatedTopic.description).to.eq('newDesc by system actor');
+    });
+
     test('should delete a topic', async () => {
       const { topic } = (await command(CreateTopic(), {
         actor: superAdminActor,
@@ -580,6 +593,15 @@ describe('Community lifecycle', () => {
           payload: { community_id: community.id, topic_id: topic!.id! },
         }),
       ).rejects.toThrow(InvalidActor);
+    });
+
+    test("should throw error when topic doesn't exist", async () => {
+      await expect(
+        command(DeleteTopic(), {
+          actor: ethAdminActor,
+          payload: { community_id: community.id, topic_id: 123456789 },
+        }),
+      ).rejects.toThrow(InvalidInput);
     });
 
     test('should get topics', async () => {

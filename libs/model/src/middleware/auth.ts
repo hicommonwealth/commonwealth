@@ -206,12 +206,9 @@ async function hasTopicPermissions(
     }
   >(
     `
-    SELECT 
-      g.*, 
-      gp.allowed_actions as allowed_actions
-    FROM "Groups" as g 
-    LEFT JOIN "GroupPermissions" gp ON g.id = gp.group_id AND gp.topic_id = :topic_id
-    WHERE g.community_id = :community_id
+    SELECT g.*, gp.topic_id, gp.allowed_actions
+    FROM "Groups" as g JOIN "GroupPermissions" gp ON g.id = gp.group_id 
+    WHERE g.community_id = :community_id AND gp.topic_id = :topic_id
     `,
     {
       type: QueryTypes.SELECT,
@@ -226,16 +223,16 @@ async function hasTopicPermissions(
   // There are 2 cases here. We either have the old group permission system where the group doesn't have
   // any group_allowed_actions, or we have the new fine-grained permission system where the action must be in
   // the group_allowed_actions list.
-  const allowedGroupActions = groups.filter(
+  const allowedActions = groups.filter(
     (g) => !g.allowed_actions || g.allowed_actions.includes(action),
   );
-  if (!allowedGroupActions.length!)
+  if (allowedActions.length === 0)
     throw new NonMember(actor, topic.name, action);
 
   // check membership for all groups of topic
   const memberships = await models.Membership.findAll({
     where: {
-      group_id: { [Op.in]: allowedGroupActions.map((g) => g.id!) },
+      group_id: { [Op.in]: allowedActions.map((g) => g.id!) },
       address_id,
     },
     include: [
@@ -245,7 +242,7 @@ async function hasTopicPermissions(
       },
     ],
   });
-  if (!memberships.length) throw new NonMember(actor, topic.name, action);
+  if (memberships.length === 0) throw new NonMember(actor, topic.name, action);
 
   const rejects = memberships.filter((m) => m.reject_reason);
   if (rejects.length === memberships.length)
@@ -269,7 +266,7 @@ async function mustBeAuthorized(
     };
     author?: boolean;
     collaborators?: z.infer<typeof Address>[];
-  } = {},
+  },
 ) {
   // System actors are always allowed
   if (actor.is_system_actor) return;
@@ -361,7 +358,7 @@ export function authRoles(...roles: Role[]) {
       community_id: ctx.payload.community_id,
     };
 
-    await mustBeAuthorized(ctx);
+    await mustBeAuthorized(ctx, {});
   };
 }
 
@@ -378,7 +375,7 @@ type AggregateAuthOptions = {
  * @param author when true, rejects members that are not the author
  * @throws InvalidActor when not authorized
  */
-export function authComment({ action, author }: AggregateAuthOptions = {}) {
+export function authComment({ action, author }: AggregateAuthOptions) {
   return async (
     ctx: Context<typeof CommentContextInput, typeof CommentContext>,
   ) => {
@@ -414,7 +411,7 @@ export function authThread({
   action,
   author,
   collaborators,
-}: AggregateAuthOptions = {}) {
+}: AggregateAuthOptions) {
   return async (
     ctx: Context<typeof ThreadContextInput, typeof ThreadContext>,
   ) => {
@@ -449,7 +446,7 @@ export function authThread({
  * @param action specific group permission action
  * @throws InvalidActor when not authorized
  */
-export function authTopic({ roles, action }: AggregateAuthOptions = {}) {
+export function authTopic({ roles, action }: AggregateAuthOptions) {
   return async (
     ctx: Context<typeof TopicContextInput, typeof TopicContext>,
   ) => {
