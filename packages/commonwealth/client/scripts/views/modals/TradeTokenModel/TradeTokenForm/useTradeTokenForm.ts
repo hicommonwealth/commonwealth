@@ -12,6 +12,7 @@ import { useBuyTokenMutation } from 'state/api/launchPad';
 import { fetchCachedNodes } from 'state/api/nodes';
 import { useCreateTokenTradeMutation } from 'state/api/tokens';
 import useUserStore from 'state/ui/user';
+import useJoinCommunity from 'views/components/SublayoutHeader/useJoinCommunity';
 import './TradeTokenForm.scss';
 import { TradingMode, UseTradeTokenFormProps } from './types';
 
@@ -44,6 +45,8 @@ const useTradeTokenForm = ({
   const baseNode = nodes?.find(
     (n) => n.ethChainId === commonProtocol.ValidChains.SepoliaBase,
   ) as NodeInfo; // this is expected to exist
+
+  const { linkSpecificAddressToSpecificCommunity } = useJoinCommunity();
 
   const { data: ethToCurrencyRateData, isLoading: isLoadingETHToCurrencyRate } =
     useFetchTokenUsdRateQuery({
@@ -111,7 +114,14 @@ const useTradeTokenForm = ({
   const handleTokenBuy = async () => {
     try {
       // this condition wouldn't be called, but adding to avoid typescript issues
-      if (!baseNode?.url || !baseNode?.ethChainId || !selectedAddress) return;
+      if (
+        !baseNode?.url ||
+        !baseNode?.ethChainId ||
+        !selectedAddress ||
+        !tokenCommunity
+      ) {
+        return;
+      }
 
       // buy token on chain
       const payload = {
@@ -128,6 +138,22 @@ const useTradeTokenForm = ({
         eth_chain_id: baseNode?.ethChainId,
         transaction_hash: txReceipt.transactionHash,
       });
+
+      // join user's selected address to community
+      const isMemberOfCommunity = user.addresses.find(
+        (x) => x.community.id === tokenCommunity.id,
+      );
+      if (!isMemberOfCommunity) {
+        await linkSpecificAddressToSpecificCommunity({
+          address: selectedAddress,
+          community: {
+            base: tokenCommunity.base,
+            iconUrl: tokenCommunity.icon_url || '',
+            id: tokenCommunity.id,
+            name: tokenCommunity.name,
+          },
+        });
+      }
 
       onTradeComplete?.();
     } catch (e) {
