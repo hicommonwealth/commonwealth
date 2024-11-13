@@ -41,8 +41,10 @@ const useDeleteThreadReactionMutation = ({
   communityId,
   threadId,
   currentReactionCount,
+  currentReactionWeightsSum,
 }: UseDeleteThreadReactionMutationProps & {
   currentReactionCount: number;
+  currentReactionWeightsSum: string;
 }) => {
   const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
 
@@ -68,6 +70,11 @@ const useDeleteThreadReactionMutation = ({
 
         updateThreadInAllCaches(communityId, threadId, {
           reactionCount: currentReactionCount - 1,
+          reactionWeightsSum: `${
+            parseInt(currentReactionWeightsSum) -
+            // TODO: need to get vote weight of deleted reaction from delete reaction response
+            parseInt(deleted?.calculated_voting_weight || `0`)
+          }`,
         });
       }
     },

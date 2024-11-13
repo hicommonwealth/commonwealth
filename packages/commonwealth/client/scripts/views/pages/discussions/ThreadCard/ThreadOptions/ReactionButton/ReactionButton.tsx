@@ -65,6 +65,7 @@ export const ReactionButton = ({
       threadId: thread.id,
       threadMsgId: thread.canvasMsgId!,
       currentReactionCount: thread.reactionCount || 0,
+      currentReactionWeightsSum: `${thread?.reactionWeightsSum || 0}`,
     });
   const { mutateAsync: deleteThreadReaction, isLoading: isDeletingReaction } =
     useDeleteThreadReactionMutation({
@@ -73,6 +74,7 @@ export const ReactionButton = ({
       threadId: thread.id,
       threadMsgId: thread.canvasMsgId!,
       currentReactionCount: thread.reactionCount || 0,
+      currentReactionWeightsSum: `${thread?.reactionWeightsSum || 0}`,
     });
 
   if (showSkeleton) return <ReactionButtonSkeleton />;

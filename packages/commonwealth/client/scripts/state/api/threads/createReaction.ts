@@ -46,8 +46,10 @@ const useCreateThreadReactionMutation = ({
   communityId,
   threadId,
   currentReactionCount,
+  currentReactionWeightsSum,
 }: IUseCreateThreadReactionMutation & {
   currentReactionCount: number;
+  currentReactionWeightsSum: string;
 }) => {
   const { markTrainingActionAsComplete } =
     useUserOnboardingSliderMutationStore();
@@ -73,6 +75,10 @@ const useCreateThreadReactionMutation = ({
       );
       updateThreadInAllCaches(communityId, threadId, {
         reactionCount: currentReactionCount + 1,
+        reactionWeightsSum: `${
+          parseInt(currentReactionWeightsSum) +
+          parseInt(newReaction.calculated_voting_weight || `0`)
+        }`,
       });
 
       const userId = user.addresses?.[0]?.profile?.userId;
