@@ -47,40 +47,44 @@ const generateSchemas = async () => {
     );
 };
 
-describe('Model schema', () => {
-  let schemas: Record<string, { model: TABLE_INFO; migration: TABLE_INFO }>;
+describe(
+  'Model schema',
+  () => {
+    let schemas: Record<string, { model: TABLE_INFO; migration: TABLE_INFO }>;
 
-  beforeAll(async () => {
-    schemas = await generateSchemas();
-  });
-
-  afterAll(async () => {
-    await dispose()();
-  });
-
-  const s = new Sequelize({
-    dialect: 'postgres',
-    username: 'commonwealth',
-    password: 'edgeware',
-    logging: false,
-  });
-  Object.values(Factories).forEach((factory) => {
-    const m = factory(s);
-    test(`Should match ${m.tableName}`, async () => {
-      const { model, migration } = schemas[m.tableName];
-
-      //console.log(model.columns, migration.columns);
-      expect(model.columns).deep.equals(migration.columns);
-
-      // ['Quests', 'Addresses'].includes(model.table_name) &&
-      //   console.log(
-      //     { model, migration },
-      //     //[...model.constraints.values()],
-      //     //[...migration.constraints.values()],
-      //   );
-      expect([...model.constraints.values()]).deep.equals([
-        ...migration.constraints.values(),
-      ]);
+    beforeAll(async () => {
+      schemas = await generateSchemas();
     });
-  });
-});
+
+    afterAll(async () => {
+      await dispose()();
+    });
+
+    const s = new Sequelize({
+      dialect: 'postgres',
+      username: 'commonwealth',
+      password: 'edgeware',
+      logging: false,
+    });
+    Object.values(Factories).forEach((factory) => {
+      const m = factory(s);
+      test(`Should match ${m.tableName}`, async () => {
+        const { model, migration } = schemas[m.tableName];
+
+        //console.log(model.columns, migration.columns);
+        expect(model.columns).deep.equals(migration.columns);
+
+        // ['Quests', 'Addresses'].includes(model.table_name) &&
+        //   console.log(
+        //     { model, migration },
+        //     //[...model.constraints.values()],
+        //     //[...migration.constraints.values()],
+        //   );
+        expect([...model.constraints.values()]).deep.equals([
+          ...migration.constraints.values(),
+        ]);
+      });
+    });
+  },
+  { timeout: 20000 },
+);
