@@ -241,4 +241,4 @@ export const contestABI = [
     stateMutability: 'nonpayable',
     type: 'function',
   },
-] as const;
+];

@@ -204,4 +204,4 @@ export const tokenCommunityManagerAbi = [
     ],
     anonymous: false,
   },
-] as const;
+];
