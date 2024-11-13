@@ -164,18 +164,26 @@ const useTokenTradeForm = ({
     trading: {
       amounts: {
         buy: {
-          ethAmount: ethBuyAmount,
+          eth: ethBuyAmount,
+          token: 100, // TODO: hardcoded for now
           baseCurrency: {
-            presetAmounts: tradeConfig.presetAmounts,
             name: tradeConfig.currency, // USD/GBP etc
             amount: baseCurrencyTradingAmount,
             onAmountChange: onBaseCurrencyTradingAmountChange,
+            presetAmounts: tradeConfig.presetAmounts,
           },
           insufficientFunds:
             ethBuyAmount > parseFloat(selectedAddressEthBalance),
         },
       },
+      unitEthToBaseCurrencyRate: ethToCurrencyRate,
       mode: { value: tradingMode, onChange: onTradingModeChange },
+      token: tradeConfig.token,
+      // TODO: hardcoded for now
+      commonPlatformFee: {
+        percentage: '0.5%',
+        eth: 0.0000178,
+      },
     },
     addresses: {
       available: userAddresses,

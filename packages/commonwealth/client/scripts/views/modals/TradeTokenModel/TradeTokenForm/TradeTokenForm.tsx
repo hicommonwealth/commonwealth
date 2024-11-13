@@ -131,7 +131,7 @@ const TradeTokenForm = ({
           You&apos;re {trading.mode.value}ing
         </CWText>
 
-        {trading.mode.value === TradingMode.Buy && (
+        {trading.mode.value === TradingMode.Buy ? (
           <>
             <div className="amount-input-with-currency-symbol">
               {currencySymbolPlacements.onLeft.includes(
@@ -155,7 +155,8 @@ const TradeTokenForm = ({
 
             <CWText type="caption" className="amount-to-crypto">
               <CWIcon iconName="ethereum" iconSize="small" />
-              {trading.amounts.buy.ethAmount} ETH
+              {trading.amounts.buy.eth} ETH = {trading.amounts.buy.token}{' '}
+              {trading.token.symbol}
             </CWText>
 
             {trading.amounts.buy.baseCurrency.presetAmounts && (
@@ -180,6 +181,8 @@ const TradeTokenForm = ({
               </div>
             )}
           </>
+        ) : (
+          <>{/* TODO: sell mode data here */}</>
         )}
       </div>
 
@@ -190,15 +193,86 @@ const TradeTokenForm = ({
               iconName={isReceiptDetailOpen ? 'caretUp' : 'caretDown'}
               weight="fill"
               onClick={() => setIsReceiptDetailOpen((o) => !o)}
+              disabled={!!getCTADisabledTooltipText()}
             />
             Subtotal + fees
           </CWText>
-          <CWText type="caption">
-            <CWIcon iconName="ethereum" iconSize="small" />
-            0.053 ETH
-          </CWText>
         </div>
-        {/* TODO: add receipt details here */}
+        {isReceiptDetailOpen ? (
+          trading.mode.value === TradingMode.Buy ? (
+            <div className="details">
+              <div className="entry">
+                <CWText type="caption">
+                  ETH to {trading.amounts.buy.baseCurrency.name} rate
+                </CWText>
+                <CWText type="caption">
+                  1 ETH ={' '}
+                  {currencySymbolPlacements.onLeft.includes(
+                    trading.amounts.buy.baseCurrency.name,
+                  )
+                    ? currencyNameToSymbolMap[
+                        trading.amounts.buy.baseCurrency.name
+                      ]
+                    : ''}{' '}
+                  {trading.unitEthToBaseCurrencyRate}
+                  {currencySymbolPlacements.onRight.includes(
+                    trading.amounts.buy.baseCurrency.name,
+                  )
+                    ? currencyNameToSymbolMap[
+                        trading.amounts.buy.baseCurrency.name
+                      ]
+                    : ''}
+                </CWText>
+              </div>
+              <div className="entry">
+                <CWText type="caption">
+                  Amount invested ({trading.amounts.buy.baseCurrency.name})
+                </CWText>
+                <CWText type="caption">
+                  {currencySymbolPlacements.onLeft.includes(
+                    trading.amounts.buy.baseCurrency.name,
+                  )
+                    ? currencyNameToSymbolMap[
+                        trading.amounts.buy.baseCurrency.name
+                      ]
+                    : ''}{' '}
+                  {trading.amounts.buy.baseCurrency.amount}
+                  {currencySymbolPlacements.onRight.includes(
+                    trading.amounts.buy.baseCurrency.name,
+                  )
+                    ? currencyNameToSymbolMap[
+                        trading.amounts.buy.baseCurrency.name
+                      ]
+                    : ''}
+                </CWText>
+              </div>
+              <div className="entry">
+                <CWText type="caption">ETH bought from invested amount</CWText>
+                <CWText type="caption">{trading.amounts.buy.eth} ETH</CWText>
+              </div>
+              <div className="entry">
+                <CWText type="caption">
+                  Common&apos;s Platform Fee (
+                  {trading.commonPlatformFee.percentage})
+                </CWText>
+                <CWText type="caption">
+                  {trading.commonPlatformFee.eth} ETH
+                </CWText>
+              </div>
+              <div className="entry">
+                <CWText type="caption">Remaining ETH to tokens</CWText>
+                <CWText type="caption">
+                  {trading.amounts.buy.eth - trading.commonPlatformFee.eth} ETH
+                  = {trading.amounts.buy.token} {trading.token.symbol}
+                </CWText>
+              </div>
+            </div>
+          ) : (
+            <>{/* TODO: sell mode data here */}</>
+          )
+        ) : (
+          <></>
+        )}
       </div>
 
       {withOptionalTooltip(

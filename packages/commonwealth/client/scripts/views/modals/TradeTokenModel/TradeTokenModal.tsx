@@ -46,7 +46,7 @@ const TradeTokenModal = ({
       content={
         <>
           <CWModalHeader
-            label="Trade Tokens"
+            label={`Trade Token - ${tradeConfig.token.symbol}`}
             onModalClose={() => onModalClose?.()}
           />
           <CWModalBody>
