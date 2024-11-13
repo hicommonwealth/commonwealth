@@ -88,6 +88,7 @@ describe('Thread lifecycle', () => {
     const signerInfo = await getSignersInfo(roles);
     const threadGroupId = 123456;
     const commentGroupId = 654321;
+    const emptyGroupId = 987654;
     const [node] = await seed('ChainNode', { eth_chain_id: 1 });
     const users = await seedRecord('User', roles, (role) => ({
       profile: { name: role },
@@ -107,11 +108,24 @@ describe('Thread lifecycle', () => {
           verified: new Date(),
         };
       }),
-      groups: [{ id: threadGroupId }, { id: commentGroupId }],
+      groups: [
+        { id: threadGroupId },
+        { id: commentGroupId },
+        { id: emptyGroupId },
+      ],
       topics: [
         {
+          name: 'topic with permissions',
           group_ids: [threadGroupId, commentGroupId],
           weighted_voting: TopicWeightedVoting.Stake,
+        },
+        {
+          name: 'topic without thread permissions',
+          group_ids: [emptyGroupId],
+        },
+        {
+          name: 'topic without groups',
+          group_ids: [],
         },
       ],
       CommunityStakes: [
@@ -137,6 +151,11 @@ describe('Thread lifecycle', () => {
       group_id: commentGroupId,
       topic_id: _community?.topics?.[0]?.id || 0,
       allowed_actions: [schemas.PermissionEnum.CREATE_COMMENT],
+    });
+    await seed('GroupPermission', {
+      group_id: emptyGroupId,
+      topic_id: _community?.topics?.[1]?.id || 0,
+      allowed_actions: [],
     });
 
     community = _community!;
@@ -279,6 +298,32 @@ describe('Thread lifecycle', () => {
           ).rejects.toThrowError(authorizationTests[role]);
         });
       }
+    });
+  });
+
+  describe('topic permissions', () => {
+    test('should create thread in topic with no permissions', async () => {
+      const topic_id = community!.topics!.at(2)!.id!; // no groups
+      const thread = await command(CreateThread(), {
+        actor: actors.member,
+        payload: await signCreateThread(actors.member.address!, {
+          ...payload,
+          topic_id,
+        }),
+      });
+      expect(thread?.topic_id).to.equal(topic_id);
+    });
+
+    test('should throw error when actor is not member of group with permission', async () => {
+      await expect(
+        command(CreateThread(), {
+          actor: actors.nonmember,
+          payload: await signCreateThread(actors.nonmember.address!, {
+            ...payload,
+            topic_id: community!.topics!.at(1)!.id!,
+          }),
+        }),
+      ).rejects.toThrowError(NonMember);
     });
   });
 
@@ -482,6 +527,18 @@ describe('Thread lifecycle', () => {
           },
         }),
       ).rejects.toThrowError('Must be admin, moderator, or author');
+    });
+
+    test('should fail when collaborator not found', async () => {
+      await expect(
+        command(UpdateThread(), {
+          actor: actors.nonmember,
+          payload: {
+            thread_id: thread.id!,
+            title: 'new title',
+          },
+        }),
+      ).rejects.toThrowError(InvalidActor);
     });
   });
 
@@ -903,7 +960,7 @@ describe('Thread lifecycle', () => {
           reaction_id: reaction!.id!,
         },
       });
-      expect(deleted).to.include({ reaction_id: reaction!.id });
+      expect(deleted).to.be.true;
     });
 
     test('should throw error when reaction not found', () => {
@@ -915,7 +972,7 @@ describe('Thread lifecycle', () => {
             reaction_id: 888,
           },
         }),
-      ).rejects.toThrowError(InvalidState);
+      ).rejects.toThrowError(InvalidInput);
     });
   });
 
@@ -1024,15 +1081,15 @@ describe('Thread lifecycle', () => {
           reaction_id: reaction!.id!,
         },
       });
-      expect(deleted).to.include({ reaction_id: reaction!.id });
+      expect(deleted).to.be.true;
     });
 
     test('should throw when trying to delete a reaction that is not yours', async () => {
       getNamespaceBalanceSpy.mockResolvedValue({
-        [actors.member.address!]: '50',
+        [actors.admin.address!]: '50',
       });
       const reaction = await command(CreateCommentReaction(), {
-        actor: actors.member,
+        actor: actors.admin,
         payload: {
           comment_msg_id: comment!.canvas_msg_id || '',
           comment_id: comment!.id!,
@@ -1041,17 +1098,13 @@ describe('Thread lifecycle', () => {
       });
       await expect(
         command(DeleteReaction(), {
-          actor: actors.admin,
+          actor: actors.member,
           payload: {
             community_id: thread.community_id,
             reaction_id: reaction!.id!,
           },
         }),
-      ).rejects.toThrowError(InvalidState);
+      ).rejects.toThrow('Not the author of the entity');
     });
   });
-
-  // @rbennettcw do we have contest validation tests to include here?
-  // - updating thread in contest
-  // - deleting thread in contest
 });

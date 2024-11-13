@@ -1,17 +1,16 @@
 import { type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../database';
-import { isAuthorized, type AuthContext } from '../middleware';
+import { authRoles } from '../middleware';
 
 const TOKEN_EXPIRATION_MINUTES = 5;
 
 export function CreateDiscordBotConfig(): Command<
-  typeof schemas.CreateDiscordBotConfig,
-  AuthContext
+  typeof schemas.CreateDiscordBotConfig
 > {
   return {
     ...schemas.CreateDiscordBotConfig,
-    auth: [isAuthorized({ roles: ['admin'] })],
+    auth: [authRoles('admin')],
     body: async ({ payload }) => {
       const { community_id, verification_token } = payload;
       const token_expiration = new Date(

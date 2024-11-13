@@ -32,6 +32,7 @@ import {
   UpdateCommunityErrors,
 } from '../../src/community';
 import { models } from '../../src/database';
+import { systemActor } from '../../src/middleware';
 import type {
   ChainNodeAttributes,
   CommunityAttributes,
@@ -544,6 +545,18 @@ describe('Community lifecycle', () => {
       expect(updatedTopic.description).to.eq('newDesc');
     });
 
+    test('should update a topic as a system actor', async () => {
+      const { topic: updatedTopic } = (await command(UpdateTopic(), {
+        actor: systemActor({}),
+        payload: {
+          topic_id: createdTopic.id!,
+          community_id: community.id,
+          description: 'newDesc by system actor',
+        },
+      }))!;
+      expect(updatedTopic.description).to.eq('newDesc by system actor');
+    });
+
     test('should delete a topic', async () => {
       const { topic } = (await command(CreateTopic(), {
         actor: superAdminActor,
@@ -582,6 +595,15 @@ describe('Community lifecycle', () => {
       ).rejects.toThrow(InvalidActor);
     });
 
+    test("should throw error when topic doesn't exist", async () => {
+      await expect(
+        command(DeleteTopic(), {
+          actor: ethAdminActor,
+          payload: { community_id: community.id, topic_id: 123456789 },
+        }),
+      ).rejects.toThrow(InvalidInput);
+    });
+
     test('should get topics', async () => {
       const topics = await query(GetTopics(), {
         actor: superAdminActor,
@@ -606,7 +628,7 @@ describe('Community lifecycle', () => {
         actor: ethAdminActor,
         payload: {
           ...baseRequest,
-          id: community.id,
+          community_id: community.id,
           chain_node_id: ethNode.id,
           directory_page_enabled: true,
           directory_page_chain_node_id: ethNode.id,
@@ -624,7 +646,7 @@ describe('Community lifecycle', () => {
         actor: ethAdminActor,
         payload: {
           ...baseRequest,
-          id: community.id,
+          community_id: community.id,
           chain_node_id: ethNode.id,
           directory_page_enabled: false,
           directory_page_chain_node_id: null,
@@ -643,7 +665,7 @@ describe('Community lifecycle', () => {
           actor: ethAdminActor,
           payload: {
             ...baseRequest,
-            id: community.id,
+            community_id: community.id,
             snapshot: ['not-found'],
           },
         }),
@@ -656,7 +678,7 @@ describe('Community lifecycle', () => {
           actor: ethAdminActor,
           payload: {
             ...baseRequest,
-            id: community.id,
+            community_id: community.id,
             namespace: 'tempNamespace',
             chain_node_id: 1263,
           },
@@ -670,7 +692,7 @@ describe('Community lifecycle', () => {
           actor: ethActor,
           payload: {
             ...baseRequest,
-            id: community.id,
+            community_id: community.id,
             namespace: 'tempNamespace',
             transactionHash: '0x1234',
             chain_node_id: edgewareNode!.id!,
@@ -684,7 +706,7 @@ describe('Community lifecycle', () => {
         actor: superAdminActor,
         payload: {
           ...baseRequest,
-          id: community.id,
+          community_id: community.id,
           chain_node_id: edgewareNode!.id!,
         },
       });
@@ -693,7 +715,7 @@ describe('Community lifecycle', () => {
           actor: superAdminActor,
           payload: {
             ...baseRequest,
-            id: community.id,
+            community_id: community.id,
             namespace: 'tempNamespace',
             transactionHash: '0x1234',
           },

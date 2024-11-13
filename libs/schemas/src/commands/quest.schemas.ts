@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { AuthContext } from '../context';
 import { Quest, QuestActionMeta } from '../entities';
 import { PG_INT } from '../utils';
 
@@ -11,6 +12,7 @@ export const CreateQuest = {
     end_date: z.coerce.date(),
   }),
   output: Quest,
+  context: AuthContext,
 };
 
 export const UpdateQuest = {
@@ -24,6 +26,7 @@ export const UpdateQuest = {
     action_metas: z.array(QuestActionMeta.omit({ quest_id: true })).optional(),
   }),
   output: Quest,
+  context: AuthContext,
 };
 
 export const DeleteQuest = {
@@ -32,4 +35,5 @@ export const DeleteQuest = {
     quest_id: PG_INT,
   }),
   output: z.boolean(),
+  context: AuthContext,
 };
