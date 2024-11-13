@@ -31,7 +31,7 @@ describe('Contests metadata commands lifecycle', () => {
   let communityMemberActor: Actor | null = null;
 
   beforeAll(async () => {
-    await bootstrap_testing();
+    await bootstrap_testing(import.meta);
     const [chain] = await seed('ChainNode', {});
 
     const [communityAdminUser] = await seed(

@@ -13,7 +13,6 @@ const {
   PRIVATE_KEY,
   TBC_BALANCE_TTL_SECONDS,
   BLACKLISTED_EVENTS,
-  INIT_TEST_DB,
   MAX_USER_POSTS_PER_CONTEST,
   JWT_SECRET,
   ADDRESS_TOKEN_EXPIRES_IN,
@@ -67,7 +66,6 @@ export const config = configure(
       CLEAN_HOUR: DATABASE_CLEAN_HOUR
         ? parseInt(DATABASE_CLEAN_HOUR, 10)
         : undefined,
-      INIT_TEST_DB: INIT_TEST_DB === 'true',
       TRACE: DATABASE_LOG_TRACE === 'true',
     },
     WEB3: {
@@ -175,7 +173,6 @@ export const config = configure(
       NAME: z.string(),
       NO_SSL: z.boolean(),
       CLEAN_HOUR: z.coerce.number().int().min(0).max(24).optional(),
-      INIT_TEST_DB: z.boolean(),
       TRACE: z.boolean(),
     }),
     WEB3: z.object({

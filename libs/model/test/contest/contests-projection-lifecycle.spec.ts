@@ -67,7 +67,7 @@ describe('Contests projection lifecycle', () => {
     getContestScore = Sinon.stub(contestHelper, 'getContestScore');
     getContestStatus = Sinon.stub(contestHelper, 'getContestStatus');
 
-    await bootstrap_testing();
+    await bootstrap_testing(import.meta);
 
     try {
       const recurringContestAbi = await models.ContractAbi.create({

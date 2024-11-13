@@ -10,7 +10,7 @@ describe('Reactions lifecycle', () => {
   const threadId = 999;
 
   beforeAll(async () => {
-    await bootstrap_testing();
+    await bootstrap_testing(import.meta);
     const [chain] = await seed('ChainNode', { contracts: [] });
     const [user] = await seed(
       'User',

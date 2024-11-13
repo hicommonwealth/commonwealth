@@ -207,10 +207,14 @@ export const get_info_schema = async (
 let db: DB | undefined = undefined;
 /**
  * Bootstraps testing, creating/migrating a fresh instance if it doesn't exist.
+ * @meta import meta of calling test
  * @param truncate when true, truncates all tables in model
  * @returns synchronized sequelize db instance
  */
-export const bootstrap_testing = async (truncate = false): Promise<DB> => {
+export const bootstrap_testing = async (
+  meta: ImportMeta,
+  truncate = false,
+): Promise<DB> => {
   if (!db) {
     db = buildDb(
       new Sequelize({
@@ -221,12 +225,12 @@ export const bootstrap_testing = async (truncate = false): Promise<DB> => {
         logging: false,
       }),
     );
-    console.log('Database object built');
+    console.log('Database object built:', meta.filename);
   }
 
   if (truncate) {
     await truncate_db(db);
-    console.log('Database truncated');
+    console.log('Database truncated:', meta.filename);
   }
 
   return db;

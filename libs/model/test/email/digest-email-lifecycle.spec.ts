@@ -14,7 +14,7 @@ describe('Digest email lifecycle', () => {
   let communityThree: z.infer<typeof Community> | undefined;
 
   beforeAll(async () => {
-    await bootstrap_testing(true);
+    await bootstrap_testing(import.meta, true);
     const [authorUser] = await seed('User', {
       isAdmin: false,
       selected_community_id: null,

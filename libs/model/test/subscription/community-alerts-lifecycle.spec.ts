@@ -18,7 +18,7 @@ describe('Community alerts lifecycle', () => {
   let communityTwo: z.infer<typeof schemas.Community> | undefined;
 
   beforeAll(async () => {
-    await bootstrap_testing(true);
+    await bootstrap_testing(import.meta, true);
     const [user] = await seed('User', {
       isAdmin: false,
     });

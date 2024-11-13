@@ -40,7 +40,7 @@ export const testServer = async (): Promise<TestServer> => {
   const { tester } = await import('@hicommonwealth/model');
   const { main } = await import('./main');
 
-  const db = await tester.seedDb();
+  const db = await tester.seedDb(import.meta);
   const app = express();
   const { server, cacheDecorator } = await main(app, db, {
     port: 8081,

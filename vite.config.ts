@@ -1,21 +1,19 @@
 /// <reference types="vitest" />
 
 import * as dotenv from 'dotenv';
-import path from 'path';
 import { defineConfig } from 'vite';
 import tsconfigPaths from 'vite-tsconfig-paths';
 
-dotenv.config({
-  path: path.resolve(__dirname, '.env'),
-});
+dotenv.config();
+
+const pkg = process.env.npm_package_name;
+console.log('vitest:', pkg);
 
 export default defineConfig({
   plugins: [tsconfigPaths()],
   test: {
-    globalSetup: path.resolve(
-      __dirname,
-      './libs/model/src/tester/vitestDatabaseSetup.ts',
-    ),
+    sequence: { concurrent: false },
+    fileParallelism: false, // pkg !== '@hicommonwealth/model',
     coverage: {
       provider: 'istanbul',
       reporter:

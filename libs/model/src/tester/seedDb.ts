@@ -18,9 +18,9 @@ import { bootstrap_testing } from './bootstrap';
  * such as associated IDs and seed values. Additionally, not all tests require every
  * entity to be seeded, so focus should be on seeding only what is explicitly needed.
  */
-export const seedDb = async () => {
+export const seedDb = async (meta: ImportMeta) => {
   try {
-    const models = await bootstrap_testing(true);
+    const models = await bootstrap_testing(meta, true);
 
     await models.User.bulkCreate(
       [{ email: 'drewstone329@gmail.com' }, { email: 'temp@gmail.com' }].map(

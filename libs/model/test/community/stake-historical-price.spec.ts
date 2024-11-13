@@ -13,7 +13,7 @@ describe('Stake Historical Price', () => {
   let actor: Actor;
 
   beforeAll(async () => {
-    await bootstrap_testing(true);
+    await bootstrap_testing(import.meta, true);
     const [node] = await seed('ChainNode', {
       url: 'https://ethereum-sepolia.publicnode.com',
       name: 'Sepolia Testnet',

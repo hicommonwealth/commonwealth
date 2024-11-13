@@ -18,7 +18,7 @@ describe('Launchpad Lifecycle', () => {
   let node: ChainNodeAttributes;
 
   beforeAll(async () => {
-    await bootstrap_testing(true);
+    await bootstrap_testing(import.meta, true);
     [node] = (await seed('ChainNode', {
       url: `https://base-sepolia.g.alchemy.com/v2/${config.ALCHEMY.APP_KEYS.PUBLIC}`,
       private_url: `https://base-sepolia.g.alchemy.com/v2/${config.ALCHEMY.APP_KEYS.PUBLIC}`,

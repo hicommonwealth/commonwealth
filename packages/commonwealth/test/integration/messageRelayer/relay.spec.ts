@@ -11,7 +11,7 @@ describe('relay', () => {
   beforeAll(async () => {
     const res = await import('@hicommonwealth/model');
     models = res['models'];
-    await tester.bootstrap_testing(true);
+    await tester.bootstrap_testing(import.meta, true);
   });
 
   afterEach(async () => {

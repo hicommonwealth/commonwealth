@@ -17,7 +17,7 @@ describe('Stake transactions', () => {
   let community_id: string;
 
   beforeAll(async () => {
-    await bootstrap_testing(true);
+    await bootstrap_testing(import.meta, true);
     const [node] = await seed('ChainNode', {
       url: 'https://ethereum-sepolia.publicnode.com',
       private_url: 'https://ethereum-sepolia.publicnode.com',

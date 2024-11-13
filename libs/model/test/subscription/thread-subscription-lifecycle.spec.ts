@@ -17,7 +17,7 @@ describe('Thread subscription lifecycle', () => {
   let threadOne: z.infer<typeof schemas.Thread> | undefined;
   let threadTwo: z.infer<typeof schemas.Thread> | undefined;
   beforeAll(async () => {
-    await bootstrap_testing(true);
+    await bootstrap_testing(import.meta, true);
     const [user] = await seed('User', {
       isAdmin: false,
     });

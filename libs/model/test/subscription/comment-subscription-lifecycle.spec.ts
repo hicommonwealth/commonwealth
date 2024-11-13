@@ -17,7 +17,7 @@ describe('Comment subscription lifecycle', () => {
   let commentOne: z.infer<typeof schemas.Comment> | undefined;
   let commentTwo: z.infer<typeof schemas.Comment> | undefined;
   beforeAll(async () => {
-    await bootstrap_testing(true);
+    await bootstrap_testing(import.meta, true);
     const [user] = await seed('User', {
       isAdmin: false,
       selected_community_id: null,
