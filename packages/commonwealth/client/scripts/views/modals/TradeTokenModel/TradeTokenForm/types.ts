@@ -27,3 +27,8 @@ export type UseTradeTokenFormProps = {
   addressType?: ChainBase;
   onTradeComplete?: () => void;
 };
+
+export type ReceiptDetailsProps = Pick<
+  ReturnType<typeof useTradeTokenForm>,
+  'trading'
+>;

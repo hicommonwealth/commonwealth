@@ -21,6 +21,7 @@ import {
   CustomAddressOption,
   CustomAddressOptionElement,
 } from '../../ManageCommunityStakeModal/StakeExchangeForm/CustomAddressOption';
+import BuyReceipt from './ReceiptDetails/BuyReceipt';
 import './TradeTokenForm.scss';
 import { convertAddressToDropdownOption } from './helpers';
 import { TradeTokenFormProps, TradingMode } from './types';
@@ -42,11 +43,13 @@ const TradeTokenForm = ({
   const getCTADisabledTooltipText = () => {
     if (isActionPending) return 'Processing trade...';
 
-    // buy mode
-    if (trading.amounts.buy.baseCurrency.amount === 0)
-      return 'Please add trading amount to continue';
-    if (trading.amounts.buy.insufficientFunds)
-      return `You don't have sufficient funds to buy token`;
+    // only use these in buy mode
+    if (trading.mode.value === TradingMode.Buy) {
+      if (trading.amounts.buy.baseCurrency.amount === 0)
+        return 'Please add trading amount to continue';
+      if (trading.amounts.buy.insufficientFunds)
+        return `You don't have sufficient funds to buy token`;
+    }
   };
 
   const withOptionalTooltip = (children: ReactNode) => {
@@ -189,84 +192,20 @@ const TradeTokenForm = ({
       <div className="receipt-and-fees">
         <div className="header">
           <CWText type="caption" className="dropdown">
-            <CWIconButton
-              iconName={isReceiptDetailOpen ? 'caretUp' : 'caretDown'}
-              weight="fill"
-              onClick={() => setIsReceiptDetailOpen((o) => !o)}
-              disabled={!!getCTADisabledTooltipText()}
-            />
+            {withOptionalTooltip(
+              <CWIconButton
+                iconName={isReceiptDetailOpen ? 'caretUp' : 'caretDown'}
+                weight="fill"
+                onClick={() => setIsReceiptDetailOpen((o) => !o)}
+                disabled={!!getCTADisabledTooltipText()}
+              />,
+            )}
             Subtotal + fees
           </CWText>
         </div>
         {isReceiptDetailOpen ? (
           trading.mode.value === TradingMode.Buy ? (
-            <div className="details">
-              <div className="entry">
-                <CWText type="caption">
-                  ETH to {trading.amounts.buy.baseCurrency.name} rate
-                </CWText>
-                <CWText type="caption">
-                  1 ETH ={' '}
-                  {currencySymbolPlacements.onLeft.includes(
-                    trading.amounts.buy.baseCurrency.name,
-                  )
-                    ? currencyNameToSymbolMap[
-                        trading.amounts.buy.baseCurrency.name
-                      ]
-                    : ''}{' '}
-                  {trading.unitEthToBaseCurrencyRate}
-                  {currencySymbolPlacements.onRight.includes(
-                    trading.amounts.buy.baseCurrency.name,
-                  )
-                    ? currencyNameToSymbolMap[
-                        trading.amounts.buy.baseCurrency.name
-                      ]
-                    : ''}
-                </CWText>
-              </div>
-              <div className="entry">
-                <CWText type="caption">
-                  Amount invested ({trading.amounts.buy.baseCurrency.name})
-                </CWText>
-                <CWText type="caption">
-                  {currencySymbolPlacements.onLeft.includes(
-                    trading.amounts.buy.baseCurrency.name,
-                  )
-                    ? currencyNameToSymbolMap[
-                        trading.amounts.buy.baseCurrency.name
-                      ]
-                    : ''}{' '}
-                  {trading.amounts.buy.baseCurrency.amount}
-                  {currencySymbolPlacements.onRight.includes(
-                    trading.amounts.buy.baseCurrency.name,
-                  )
-                    ? currencyNameToSymbolMap[
-                        trading.amounts.buy.baseCurrency.name
-                      ]
-                    : ''}
-                </CWText>
-              </div>
-              <div className="entry">
-                <CWText type="caption">ETH bought from invested amount</CWText>
-                <CWText type="caption">{trading.amounts.buy.eth} ETH</CWText>
-              </div>
-              <div className="entry">
-                <CWText type="caption">
-                  Common&apos;s Platform Fee (
-                  {trading.commonPlatformFee.percentage})
-                </CWText>
-                <CWText type="caption">
-                  {trading.commonPlatformFee.eth} ETH
-                </CWText>
-              </div>
-              <div className="entry">
-                <CWText type="caption">Remaining ETH to tokens</CWText>
-                <CWText type="caption">
-                  {trading.amounts.buy.eth - trading.commonPlatformFee.eth} ETH
-                  = {trading.amounts.buy.token} {trading.token.symbol}
-                </CWText>
-              </div>
-            </div>
+            <BuyReceipt trading={trading} />
           ) : (
             <>{/* TODO: sell mode data here */}</>
           )
