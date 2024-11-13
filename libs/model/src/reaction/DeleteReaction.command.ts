@@ -19,7 +19,7 @@ export function DeleteReaction(): Command<typeof schemas.DeleteReaction> {
         await reaction.destroy({ transaction });
         // TODO: move hook logic to command mutation
       });
-      return true;
+      return reaction;
     },
   };
 }

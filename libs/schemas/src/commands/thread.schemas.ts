@@ -87,6 +87,6 @@ export const DeleteReaction = {
     canvas_signed_data: z.string().optional(),
     canvas_msg_id: z.string().optional(),
   }),
-  output: z.boolean(),
+  output: Reaction,
   context: ReactionContext,
 };

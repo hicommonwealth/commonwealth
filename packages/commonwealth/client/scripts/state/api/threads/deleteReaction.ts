@@ -49,8 +49,8 @@ const useDeleteThreadReactionMutation = ({
   const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
 
   return trpc.thread.deleteReaction.useMutation({
-    onSuccess: (deleted, variables) => {
-      if (deleted) {
+    onSuccess: (deletedReaction, variables) => {
+      if (deletedReaction) {
         updateThreadInAllCaches(
           communityId,
           threadId,
@@ -73,7 +73,7 @@ const useDeleteThreadReactionMutation = ({
           reactionWeightsSum: `${
             parseInt(currentReactionWeightsSum) -
             // TODO: need to get vote weight of deleted reaction from delete reaction response
-            parseInt(deleted?.calculated_voting_weight || `0`)
+            parseInt(deletedReaction?.calculated_voting_weight || `0`)
           }`,
         });
       }
