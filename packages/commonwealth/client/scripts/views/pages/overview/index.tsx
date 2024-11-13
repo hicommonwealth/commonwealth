@@ -13,7 +13,6 @@ import type Thread from '../../../models/Thread';
 import type { Topic } from '../../../models/Topic';
 import { CWDivider } from '../../components/component_kit/cw_divider';
 import { CWText } from '../../components/component_kit/cw_text';
-import { PageLoading } from '../loading';
 import { TopicSummaryRow } from './TopicSummaryRow';
 
 const OverviewPage = () => {
@@ -67,9 +66,7 @@ const OverviewPage = () => {
     };
   });
 
-  return !topicSummaryRows.length ? (
-    <PageLoading />
-  ) : (
+  return (
     <CWPageLayout>
       <div className="OverviewPage">
         <div className="header-row">
@@ -123,6 +120,11 @@ const OverviewPage = () => {
         {topicSummaryRows.map((row, i) => (
           <TopicSummaryRow {...row} key={i} isLoading={isLoading} />
         ))}
+        {!isLoading && topicSummaryRows.length === 0 && (
+          <CWText type="b1" className="empty-placeholder">
+            No threads available
+          </CWText>
+        )}
       </div>
     </CWPageLayout>
   );
