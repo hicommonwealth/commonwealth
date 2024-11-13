@@ -72,7 +72,6 @@ const useDeleteThreadReactionMutation = ({
           reactionCount: currentReactionCount - 1,
           reactionWeightsSum: `${
             parseInt(currentReactionWeightsSum) -
-            // TODO: need to get vote weight of deleted reaction from delete reaction response
             parseInt(deletedReaction?.calculated_voting_weight || `0`)
           }`,
         });
