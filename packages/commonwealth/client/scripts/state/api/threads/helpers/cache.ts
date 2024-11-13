@@ -309,7 +309,9 @@ const cacheUpdater = ({
           }
           if (method === 'remove') {
             // @ts-expect-error StrictNullChecks
-            remainingCallbacks.push(() => queryClient.refetchQueries(cacheKey));
+            remainingCallbacks.push(() =>
+              queryClient.refetchQueries(cacheKey).catch(console.error),
+            );
             return [{}];
           }
         }
@@ -404,8 +406,8 @@ const updateThreadTopicInAllCaches = (
       }
       // and refetch new topic queries
       if (k[3] === newTopic.id || k[3] === undefined) {
-        queryClient.cancelQueries(k);
-        queryClient.refetchQueries(k);
+        queryClient.cancelQueries(k).catch(console.error);
+        queryClient.refetchQueries(k).catch(console.error);
       }
     }
   });
@@ -428,8 +430,8 @@ const addThreadInAllCaches = (communityId: string, newThread: Thread) => {
         (k[3] === newThread.topic?.id || k[3] === undefined)) ||
       k[2] === cacheTypes.ACTIVE_THREADS
     ) {
-      queryClient.cancelQueries(k);
-      queryClient.refetchQueries(k);
+      queryClient.cancelQueries(k).catch(console.error);
+      queryClient.refetchQueries(k).catch(console.error);
     }
     // TODO: for now single cache will fetch the thread - not adding its state, ideally we should
     // add the thread here
@@ -444,8 +446,8 @@ const clearThreadCache = (communityId: string) => {
   );
 
   keysForThreads.map((k) => {
-    queryClient.cancelQueries(k);
-    queryClient.refetchQueries(k);
+    queryClient.cancelQueries(k).catch(console.error);
+    queryClient.refetchQueries(k).catch(console.error);
   });
 };
 

@@ -83,7 +83,7 @@ export const EditTopicModal = ({
     }
   };
 
-  const handleArchiveTopic = async () => {
+  const handleArchiveTopic = () => {
     openConfirmation({
       title: topic.archived_at
         ? 'Unarchive this topic?'
@@ -120,7 +120,7 @@ export const EditTopicModal = ({
               community_id: app.activeChainId() || '',
               topic_id: id!,
               archive: !topic.archived_at,
-            });
+            }).catch(console.error);
             if (noRedirect) {
               onModalClose();
             } else {
