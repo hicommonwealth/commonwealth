@@ -1,4 +1,5 @@
 import { trpc } from 'utils/trpcClient';
+import { clearThreadCache } from '../threads/helpers/cache';
 
 const useToggleArchiveTopicMutation = () => {
   const utils = trpc.useUtils();
@@ -7,8 +8,9 @@ const useToggleArchiveTopicMutation = () => {
       await utils.community.getTopics.invalidate({
         community_id: response.community_id,
       });
-      // TODO: add a new method in thread cache to deal with this
-      // await app.threads.listingStore.removeTopic(variables.topicName);
+
+      // since this is an admin action, it only affects 1 user (the admin), clear cache
+      clearThreadCache(response.community_id);
     },
   });
 };

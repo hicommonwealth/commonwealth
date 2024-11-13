@@ -436,8 +436,22 @@ const addThreadInAllCaches = (communityId: string, newThread: Thread) => {
   });
 };
 
+const clearThreadCache = (communityId: string) => {
+  const queryCache = queryClient.getQueryCache();
+  const queryKeys = queryCache.getAll().map((cache) => cache.queryKey);
+  const keysForThreads = queryKeys.filter(
+    (x) => x[0] === ApiEndpoints.FETCH_THREADS && x[1] === communityId,
+  );
+
+  keysForThreads.map((k) => {
+    queryClient.cancelQueries(k);
+    queryClient.refetchQueries(k);
+  });
+};
+
 export {
   addThreadInAllCaches,
+  clearThreadCache,
   removeThreadFromAllCaches,
   updateThreadInAllCaches,
   updateThreadTopicInAllCaches,
