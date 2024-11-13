@@ -42,7 +42,10 @@ export function GetTokens(): Query<typeof schemas.GetTokens> {
       `;
 
       const tokens = await models.sequelize.query<
-        z.infer<typeof schemas.Token> & { total?: number; community_id: string }
+        z.infer<typeof schemas.TokenView> & {
+          total?: number;
+          community_id: string;
+        }
       >(sql, {
         replacements,
         type: QueryTypes.SELECT,
