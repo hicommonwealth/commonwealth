@@ -102,6 +102,11 @@ const OverviewPage = () => {
       {topicSummaryRows.map((row, i) => (
         <TopicSummaryRow {...row} key={i} isLoading={isLoading} />
       ))}
+      {!isLoading && topicSummaryRows.length === 0 && (
+        <CWText type="b1" className="empty-placeholder">
+          No threads available
+        </CWText>
+      )}
     </div>
   );
 };

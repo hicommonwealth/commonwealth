@@ -56,13 +56,12 @@ describe('userMentioned Event Handler', () => {
           user_id: user!.id,
         },
       ],
+      topics: [{}],
     });
     [thread] = await tester.seed('Thread', {
-      // @ts-expect-error StrictNullChecks
-      community_id: community.id,
-      // @ts-expect-error StrictNullChecks
-      address_id: community.Addresses[1].id,
-      topic_id: null,
+      community_id: community!.id!,
+      address_id: community!.Addresses![1].id!,
+      topic_id: community!.topics![0]!.id!,
       deleted_at: null,
       pinned: false,
       read_only: false,

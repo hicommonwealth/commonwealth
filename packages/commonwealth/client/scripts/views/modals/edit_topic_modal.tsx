@@ -4,8 +4,8 @@ import type { Topic } from '../../models/Topic';
 import { useCommonNavigate } from '../../navigation/helpers';
 import app from '../../state';
 import {
-  useDeleteTopicMutation,
   useEditTopicMutation,
+  useToggleArchiveTopicMutation,
 } from '../../state/api/topics';
 import { CWCheckbox } from '../components/component_kit/cw_checkbox';
 import { CWTextInput } from '../components/component_kit/cw_text_input';
@@ -21,6 +21,7 @@ import { openConfirmation } from './confirmation_modal';
 import { notifySuccess } from 'controllers/app/notifications';
 import { DeltaStatic } from 'quill';
 import '../../../styles/modals/edit_topic_modal.scss';
+import { CWText } from '../components/component_kit/cw_text';
 import { ReactQuillEditor } from '../components/react_quill_editor';
 import { createDeltaFromText } from '../components/react_quill_editor/utils';
 
@@ -44,7 +45,7 @@ export const EditTopicModal = ({
 
   const navigate = useCommonNavigate();
   const { mutateAsync: editTopic } = useEditTopicMutation();
-  const { mutateAsync: deleteTopic } = useDeleteTopicMutation();
+  const { mutateAsync: archiveTopic } = useToggleArchiveTopicMutation();
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [description, setDescription] = useState<DeltaStatic>(
@@ -82,10 +83,28 @@ export const EditTopicModal = ({
     }
   };
 
-  const handleDeleteTopic = async () => {
+  const handleArchiveTopic = () => {
     openConfirmation({
-      title: 'Warning',
-      description: <>Delete this topic?</>,
+      title: topic.archived_at
+        ? 'Unarchive this topic?'
+        : 'Archive this topic?',
+      description: (
+        <>
+          {topic.archived_at ? (
+            <CWText>
+              Unarchiving this topic will mark all of its threads as unarchived
+              (only those threads that were marked archived when this topic was
+              archived). Users will be able to interact with those threads
+              normally.
+            </CWText>
+          ) : (
+            <CWText>
+              Archiving this topic will mark all of its threads as archived.
+              Users can still see archived threads in the archived section.
+            </CWText>
+          )}
+        </>
+      ),
       buttons: [
         {
           label: 'Cancel',
@@ -93,14 +112,15 @@ export const EditTopicModal = ({
           buttonHeight: 'sm',
         },
         {
-          label: 'Delete',
-          buttonType: 'destructive',
+          label: topic.archived_at ? 'Unarchive' : 'Archive',
+          buttonType: topic.archived_at ? 'primary' : 'destructive',
           buttonHeight: 'sm',
           onClick: async () => {
-            await deleteTopic({
+            await archiveTopic({
               community_id: app.activeChainId() || '',
               topic_id: id!,
-            });
+              archive: !topic.archived_at,
+            }).catch(console.error);
             if (noRedirect) {
               onModalClose();
             } else {
@@ -119,6 +139,7 @@ export const EditTopicModal = ({
         <CWTextInput
           label="Name"
           value={name}
+          disabled={!!topic.archived_at}
           onInput={(e) => {
             setName(e.target.value);
           }}
@@ -149,6 +170,10 @@ export const EditTopicModal = ({
           contentDelta={description}
           setContentDelta={setDescription}
           fromManageTopic
+          {...(topic.archived_at && {
+            tooltipLabel: 'Cannot modify an archived topic',
+          })}
+          isDisabled={!!topic.archived_at}
         />
         <CWCheckbox
           label="Featured in Sidebar"
@@ -157,17 +182,19 @@ export const EditTopicModal = ({
             setFeaturedInSidebar(!featuredInSidebar);
           }}
           value=""
+          disabled={!!topic.archived_at}
         />
       </CWModalBody>
       <CWModalFooter className="EditTopicModalFooter">
         <div className="action-buttons">
           <div className="delete-topic">
             <CWButton
-              buttonType="destructive"
+              buttonType={topic.archived_at ? 'primary' : 'destructive'}
+              {...(topic.archived_at && { buttonAlt: 'green' })}
               buttonHeight="sm"
               disabled={isSaving}
-              onClick={handleDeleteTopic}
-              label="Delete topic"
+              onClick={handleArchiveTopic}
+              label={topic.archived_at ? 'Unarchive topic' : 'Archive topic'}
             />
           </div>
           <CWButton
@@ -175,12 +202,14 @@ export const EditTopicModal = ({
             buttonType="secondary"
             buttonHeight="sm"
             onClick={onModalClose}
+            disabled={!!topic.archived_at}
           />
           <CWButton
             buttonType="primary"
             buttonHeight="sm"
             onClick={handleSaveChanges}
             label="Save changes"
+            disabled={!!topic.archived_at}
           />
         </div>
         {errorMsg && (
