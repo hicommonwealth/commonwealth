@@ -3,6 +3,7 @@ import { Skeleton } from 'views/components/Skeleton';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
+import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
 import CWIconButton from 'views/components/component_kit/new_designs/CWIconButton';
 import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
 import {
@@ -144,10 +145,16 @@ const TradeTokenForm = ({
           </CWText>
         </div>
         {isReceiptDetailOpen ? (
-          trading.mode.value === TradingMode.Buy ? (
-            <BuyReceipt trading={trading} />
+          isActionPending ? (
+            <CWCircleMultiplySpinner />
           ) : (
-            <>{/* TODO: sell mode components here */}</>
+            <>
+              {trading.mode.value === TradingMode.Buy ? (
+                <BuyReceipt trading={trading} />
+              ) : (
+                <>{/* TODO: sell mode components here */}</>
+              )}
+            </>
           )
         ) : (
           <></>
