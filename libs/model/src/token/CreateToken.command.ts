@@ -1,7 +1,9 @@
 import { type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
+import { TokenView } from '@hicommonwealth/schemas';
 import { commonProtocol } from '@hicommonwealth/shared';
 import Web3 from 'web3';
+import z from 'zod';
 import { models } from '../database';
 import { authRoles } from '../middleware';
 import { mustExist } from '../middleware/guards';
@@ -61,7 +63,7 @@ export async function createTokenHandler(
   }
 
   const token = await models.Token.create({
-    token_address: tokenAddress,
+    token_address: tokenAddress.toLowerCase(),
     namespace,
     name,
     symbol,
@@ -71,7 +73,7 @@ export async function createTokenHandler(
     icon_url: iconUrl ?? null,
   });
 
-  return token!.toJSON();
+  return token!.toJSON() as unknown as z.infer<typeof TokenView>;
 }
 
 export function CreateToken(): Command<typeof schemas.CreateToken> {

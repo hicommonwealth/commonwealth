@@ -15,10 +15,16 @@ export const CreateToken = {
   context: AuthContext,
 };
 
+export const LaunchpadTradeView = LaunchpadTrade.extend({
+  community_token_amount: z.string(),
+  price: z.string(),
+  floating_supply: z.string(),
+});
+
 export const CreateLaunchpadTrade = {
   input: z.object({
     eth_chain_id: z.number(),
     transaction_hash: z.string().length(66),
   }),
-  output: LaunchpadTrade,
+  output: LaunchpadTradeView,
 };
