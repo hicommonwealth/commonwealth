@@ -52,7 +52,7 @@ describe('Model schema', () => {
 
   beforeAll(async () => {
     schemas = await generateSchemas();
-  });
+  }, 20000);
 
   afterAll(async () => {
     await dispose()();
@@ -66,25 +66,21 @@ describe('Model schema', () => {
   });
   Object.values(Factories).forEach((factory) => {
     const m = factory(s);
-    test(
-      `Should match ${m.tableName}`,
-      async () => {
-        const { model, migration } = schemas[m.tableName];
+    test(`Should match ${m.tableName}`, async () => {
+      const { model, migration } = schemas[m.tableName];
 
-        //console.log(model.columns, migration.columns);
-        expect(model.columns).deep.equals(migration.columns);
+      //console.log(model.columns, migration.columns);
+      expect(model.columns).deep.equals(migration.columns);
 
-        // ['Quests', 'Addresses'].includes(model.table_name) &&
-        //   console.log(
-        //     { model, migration },
-        //     //[...model.constraints.values()],
-        //     //[...migration.constraints.values()],
-        //   );
-        expect([...model.constraints.values()]).deep.equals([
-          ...migration.constraints.values(),
-        ]);
-      },
-      { timeout: 20000 },
-    );
+      // ['Quests', 'Addresses'].includes(model.table_name) &&
+      //   console.log(
+      //     { model, migration },
+      //     //[...model.constraints.values()],
+      //     //[...migration.constraints.values()],
+      //   );
+      expect([...model.constraints.values()]).deep.equals([
+        ...migration.constraints.values(),
+      ]);
+    });
   });
 });
