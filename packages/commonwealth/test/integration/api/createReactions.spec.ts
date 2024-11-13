@@ -38,7 +38,7 @@ describe('createReaction Integration Tests', () => {
       .send(validRequest);
     assert.equal((res as any).statusCode, 200);
 
-    return JSON.parse(res.text);
+    return res?.statusCode === 200;
   };
 
   const getUniqueCommentText = async () => {
