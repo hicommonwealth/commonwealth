@@ -6,3 +6,6 @@ export const communityStakeTradeEventSignature =
 
 export const launchpadTokenLaunchedEventSignature =
   '0xd7ca5dc2f8c6bb37c3a4de2a81499b25f8ca8bbb3082010244fe747077d0f6cc';
+
+export const launchpadTradeEventSignature =
+  '0x9adcf0ad0cda63c4d50f26a48925cf6405df27d422a39c456b5f03f661c82982';

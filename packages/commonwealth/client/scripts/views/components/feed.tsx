@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Virtuoso } from 'react-virtuoso';
 
 import 'components/feed.scss';
@@ -8,6 +8,7 @@ import { UserDashboardRowSkeleton } from '../pages/user_dashboard/user_dashboard
 
 import { ActivityThread, PermissionEnum } from '@hicommonwealth/schemas';
 import { slugify } from '@hicommonwealth/shared';
+import { extractImages } from 'client/scripts/helpers/feed';
 import { getThreadActionTooltipText } from 'helpers/threads';
 import useTopicGating from 'hooks/useTopicGating';
 import { getProposalUrlPath } from 'identifiers';
@@ -23,11 +24,18 @@ import {
 import useUserStore from 'state/ui/user';
 import Permissions from 'utils/Permissions';
 import { z } from 'zod';
+import ThreadPreviewModal from '../modals/ThreadPreviewModal';
 import { ThreadCard } from '../pages/discussions/ThreadCard';
+import { CWModal } from './component_kit/new_designs/CWModal';
 
 const DEFAULT_COUNT = 10;
 
-const FeedThread = ({ thread }: { thread: Thread }) => {
+type FeedThreadProps = {
+  thread: Thread;
+  onClick: () => void;
+};
+
+const FeedThread = ({ thread, onClick }: FeedThreadProps) => {
   const navigate = useCommonNavigate();
   const user = useUserStore();
   const { data: domain } = useFetchCustomDomainQuery();
@@ -111,6 +119,7 @@ const FeedThread = ({ thread }: { thread: Thread }) => {
       hideReactionButton
       hideUpvotesDrawer
       layoutType="community-first"
+      onImageClick={onClick}
     />
   );
 };
@@ -200,6 +209,10 @@ export const Feed = ({ query, customScrollParent }: FeedProps) => {
     fetchNextPage,
     isError,
   } = query({ limit: 10 });
+
+  const [isThreadModalOpen, setIsThreadModalOpen] = useState<boolean>(false);
+  const [selectedThread, setSelectedThread] = useState<Thread | null>(null);
+
   if (isLoading) {
     return (
       <div className="Feed">
@@ -229,6 +242,17 @@ export const Feed = ({ query, customScrollParent }: FeedProps) => {
       </div>
     );
   }
+
+  const openModal = (thread: z.infer<typeof ActivityThread>) => {
+    setSelectedThread(mapThread(thread));
+    setIsThreadModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsThreadModalOpen(false);
+    setSelectedThread(null);
+  };
+
   return (
     <div className="Feed">
       <Virtuoso
@@ -238,12 +262,31 @@ export const Feed = ({ query, customScrollParent }: FeedProps) => {
         data={allThreads || []}
         style={{ height: '100%' }}
         itemContent={(i, thread) => (
-          <FeedThread key={i} thread={mapThread(thread)} />
+          <FeedThread
+            key={i}
+            thread={mapThread(thread)}
+            onClick={() => openModal(thread)}
+          />
         )}
         endReached={() => {
           hasNextPage && fetchNextPage().catch(console.error);
         }}
       />
+      {selectedThread && (
+        <CWModal
+          size="large"
+          content={
+            <ThreadPreviewModal
+              isThreadModalOpen={isThreadModalOpen}
+              onClose={() => setIsThreadModalOpen(false)}
+              images={extractImages(selectedThread?.body)}
+              thread={selectedThread}
+            />
+          }
+          onClose={closeModal}
+          open={isThreadModalOpen}
+        />
+      )}
     </div>
   );
 };

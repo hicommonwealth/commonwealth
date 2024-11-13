@@ -5,8 +5,7 @@ import moment from 'moment';
 import { Op } from 'sequelize';
 import { config } from '../config';
 import { models } from '../database';
-import { isAuthorized, type AuthContext } from '../middleware';
-import { mustBeAuthorized } from '../middleware/guards';
+import { authRoles } from '../middleware';
 import type {
   AddressAttributes,
   GroupAttributes,
@@ -122,15 +121,13 @@ async function paginateAddresses(
 // TODO: This can be a long running process, let's think about refactoring into a process manager (policy) that calls
 // this command as RefreshCommunityMembershipsBatch, keeping track of position in the refresh process
 export function RefreshCommunityMemberships(): Command<
-  typeof schemas.RefreshCommunityMemberships,
-  AuthContext
+  typeof schemas.RefreshCommunityMemberships
 > {
   return {
     ...schemas.RefreshCommunityMemberships,
-    auth: [isAuthorized({ roles: ['admin'] })],
-    body: async ({ actor, payload, auth }) => {
-      const { community_id } = mustBeAuthorized(actor, auth);
-      const { group_id } = payload;
+    auth: [authRoles('admin')],
+    body: async ({ payload }) => {
+      const { community_id, group_id } = payload;
 
       const groups = await models.Group.findAll({
         where: group_id ? { id: group_id, community_id } : { community_id },

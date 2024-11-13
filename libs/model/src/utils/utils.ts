@@ -50,7 +50,8 @@ export async function emitEvent(
     } else {
       log.warn(
         `Event not inserted into outbox! ` +
-          `The event "${event.event_name}" is blacklisted. Remove it from BLACKLISTED_EVENTS env in order to allow emitting this event.`,
+          `The event "${event.event_name}" is blacklisted. 
+          Remove it from BLACKLISTED_EVENTS env in order to allow emitting this event.`,
         {
           event_name: event.event_name,
           allowed_events: config.OUTBOX.BLACKLISTED_EVENTS,

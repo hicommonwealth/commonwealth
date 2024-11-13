@@ -1,7 +1,7 @@
 import { type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../database';
-import { isAuthorized, type AuthContext } from '../middleware';
+import { authComment } from '../middleware';
 import { mustBeAuthorizedComment } from '../middleware/guards';
 import { getCommentSearchVector } from '../models';
 import {
@@ -13,15 +13,12 @@ import {
   uploadIfLarge,
 } from '../utils';
 
-export function UpdateComment(): Command<
-  typeof schemas.UpdateComment,
-  AuthContext
-> {
+export function UpdateComment(): Command<typeof schemas.UpdateComment> {
   return {
     ...schemas.UpdateComment,
-    auth: [isAuthorized({ author: true })],
-    body: async ({ actor, payload, auth }) => {
-      const { address, comment } = mustBeAuthorizedComment(actor, auth);
+    auth: [authComment({ author: true })],
+    body: async ({ actor, payload, context }) => {
+      const { address, comment } = mustBeAuthorizedComment(actor, context);
 
       const thread = comment.Thread!;
       const currentVersion = await models.CommentVersionHistory.findOne({

@@ -3,7 +3,7 @@ import * as schemas from '@hicommonwealth/schemas';
 import { commonProtocol } from '@hicommonwealth/shared';
 import Web3 from 'web3';
 import { models } from '../database';
-import { AuthContext, isAuthorized } from '../middleware';
+import { authRoles } from '../middleware';
 import { mustExist } from '../middleware/guards';
 import { tokenCommunityManagerAbi } from '../services/commonProtocol/abi/TokenCommunityManager';
 import { erc20Abi } from '../services/commonProtocol/abi/erc20';
@@ -74,13 +74,10 @@ export async function createTokenHandler(
   return token!.toJSON();
 }
 
-export function CreateToken(): Command<
-  typeof schemas.CreateToken,
-  AuthContext
-> {
+export function CreateToken(): Command<typeof schemas.CreateToken> {
   return {
     ...schemas.CreateToken,
-    auth: [isAuthorized({ roles: ['admin'] })],
+    auth: [authRoles('admin')],
     body: async ({ payload }) => {
       const { chain_node_id, transaction_hash, description, icon_url } =
         payload;

@@ -1,5 +1,6 @@
 import { z } from 'zod';
-import { Token } from '../entities';
+import { AuthContext } from '../context';
+import { LaunchpadTrade, Token } from '../entities';
 
 export const CreateToken = {
   input: z.object({
@@ -10,4 +11,13 @@ export const CreateToken = {
     icon_url: z.string().nullish(),
   }),
   output: Token,
+  context: AuthContext,
+};
+
+export const CreateLaunchpadTrade = {
+  input: z.object({
+    eth_chain_id: z.number(),
+    transaction_hash: z.string().length(66),
+  }),
+  output: LaunchpadTrade,
 };

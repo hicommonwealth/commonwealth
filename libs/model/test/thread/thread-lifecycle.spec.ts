@@ -903,7 +903,7 @@ describe('Thread lifecycle', () => {
           reaction_id: reaction!.id!,
         },
       });
-      expect(deleted).to.include({ reaction_id: reaction!.id });
+      expect(deleted).to.be.true;
     });
 
     test('should throw error when reaction not found', () => {
@@ -915,7 +915,7 @@ describe('Thread lifecycle', () => {
             reaction_id: 888,
           },
         }),
-      ).rejects.toThrowError(InvalidState);
+      ).rejects.toThrowError(InvalidInput);
     });
   });
 
@@ -1024,15 +1024,15 @@ describe('Thread lifecycle', () => {
           reaction_id: reaction!.id!,
         },
       });
-      expect(deleted).to.include({ reaction_id: reaction!.id });
+      expect(deleted).to.be.true;
     });
 
     test('should throw when trying to delete a reaction that is not yours', async () => {
       getNamespaceBalanceSpy.mockResolvedValue({
-        [actors.member.address!]: '50',
+        [actors.admin.address!]: '50',
       });
       const reaction = await command(CreateCommentReaction(), {
-        actor: actors.member,
+        actor: actors.admin,
         payload: {
           comment_msg_id: comment!.canvas_msg_id || '',
           comment_id: comment!.id!,
@@ -1041,17 +1041,13 @@ describe('Thread lifecycle', () => {
       });
       await expect(
         command(DeleteReaction(), {
-          actor: actors.admin,
+          actor: actors.member,
           payload: {
             community_id: thread.community_id,
             reaction_id: reaction!.id!,
           },
         }),
-      ).rejects.toThrowError(InvalidState);
+      ).rejects.toThrow('Not the author of the entity');
     });
   });
-
-  // @rbennettcw do we have contest validation tests to include here?
-  // - updating thread in contest
-  // - deleting thread in contest
 });
