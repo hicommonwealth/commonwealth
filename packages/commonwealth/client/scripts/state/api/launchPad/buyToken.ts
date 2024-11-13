@@ -25,7 +25,7 @@ const buyToken = async ({
     chainRpc,
   );
 
-  return await launchPad.buyToken(amountEth, walletAddress);
+  return await launchPad.buyToken(amountEth, walletAddress, `${ethChainId}`);
 };
 
 const useBuyTokenMutation = () => {
