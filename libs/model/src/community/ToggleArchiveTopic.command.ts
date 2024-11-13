@@ -1,18 +1,17 @@
 import { type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../database';
-import { AuthContext, isAuthorized } from '../middleware';
-import { mustBeAuthorized, mustExist } from '../middleware/guards';
+import { authTopic } from '../middleware';
+import { mustExist } from '../middleware/guards';
 
 export function ToggleArchiveTopic(): Command<
-  typeof schemas.ToggleArchiveTopic,
-  AuthContext
+  typeof schemas.ToggleArchiveTopic
 > {
   return {
     ...schemas.ToggleArchiveTopic,
-    auth: [isAuthorized({ roles: ['admin', 'moderator'] })],
-    body: async ({ actor, payload, auth }) => {
-      const { community_id, topic_id } = mustBeAuthorized(actor, auth);
+    auth: [authTopic({ roles: ['admin', 'moderator'] })],
+    body: async ({ payload }) => {
+      const { community_id, topic_id } = payload;
       const { archive } = payload;
 
       const topic = await models.Topic.findOne({
