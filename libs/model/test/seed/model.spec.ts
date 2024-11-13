@@ -47,28 +47,28 @@ const generateSchemas = async () => {
     );
 };
 
-describe(
-  'Model schema',
-  () => {
-    let schemas: Record<string, { model: TABLE_INFO; migration: TABLE_INFO }>;
+describe('Model schema', () => {
+  let schemas: Record<string, { model: TABLE_INFO; migration: TABLE_INFO }>;
 
-    beforeAll(async () => {
-      schemas = await generateSchemas();
-    });
+  beforeAll(async () => {
+    schemas = await generateSchemas();
+  });
 
-    afterAll(async () => {
-      await dispose()();
-    });
+  afterAll(async () => {
+    await dispose()();
+  });
 
-    const s = new Sequelize({
-      dialect: 'postgres',
-      username: 'commonwealth',
-      password: 'edgeware',
-      logging: false,
-    });
-    Object.values(Factories).forEach((factory) => {
-      const m = factory(s);
-      test(`Should match ${m.tableName}`, async () => {
+  const s = new Sequelize({
+    dialect: 'postgres',
+    username: 'commonwealth',
+    password: 'edgeware',
+    logging: false,
+  });
+  Object.values(Factories).forEach((factory) => {
+    const m = factory(s);
+    test(
+      `Should match ${m.tableName}`,
+      async () => {
         const { model, migration } = schemas[m.tableName];
 
         //console.log(model.columns, migration.columns);
@@ -83,8 +83,8 @@ describe(
         expect([...model.constraints.values()]).deep.equals([
           ...migration.constraints.values(),
         ]);
-      });
-    });
-  },
-  { timeout: 20000 },
-);
+      },
+      { timeout: 20000 },
+    );
+  });
+});
