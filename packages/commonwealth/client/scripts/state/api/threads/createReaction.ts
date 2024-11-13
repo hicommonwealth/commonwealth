@@ -45,7 +45,10 @@ export const buildCreateThreadReactionInput = async ({
 const useCreateThreadReactionMutation = ({
   communityId,
   threadId,
-}: IUseCreateThreadReactionMutation) => {
+  currentReactionCount,
+}: IUseCreateThreadReactionMutation & {
+  currentReactionCount: number;
+}) => {
   const { markTrainingActionAsComplete } =
     useUserOnboardingSliderMutationStore();
 
@@ -68,6 +71,9 @@ const useCreateThreadReactionMutation = ({
         { associatedReactions: [reaction] },
         'combineAndRemoveDups',
       );
+      updateThreadInAllCaches(communityId, threadId, {
+        reactionCount: currentReactionCount + 1,
+      });
 
       const userId = user.addresses?.[0]?.profile?.userId;
       userId &&
