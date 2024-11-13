@@ -21,9 +21,12 @@ export function DeleteReaction(): Command<
       });
       mustExist('Reaction', reaction);
 
-      await reaction.destroy();
-
-      return { reaction_id };
+      await models.sequelize.transaction(async (transaction) => {
+        // must call reaction.destroy() to trigger the hook
+        await reaction.destroy({ transaction });
+        // TODO: move hook logic to command mutation
+      });
+      return { ...reaction!.toJSON() };
     },
   };
 }

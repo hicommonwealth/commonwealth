@@ -82,9 +82,5 @@ export const DeleteReaction = {
     canvas_signed_data: z.string().optional(),
     canvas_msg_id: z.string().optional(),
   }),
-  output: z.object({
-    reaction_id: PG_INT,
-    canvas_signed_data: z.string().nullish(),
-    canvas_msg_id: z.string().nullish(),
-  }),
+  output: Reaction,
 };
