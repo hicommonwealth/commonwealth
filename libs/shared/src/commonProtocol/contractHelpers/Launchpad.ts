@@ -33,8 +33,7 @@ export const buyToken = async (
   value: number,
 ) => {
   const contractCall = contract.methods.buyToken(tokenAddress, 0);
-  let gasResult;
-  gasResult = await contractCall.estimateGas({
+  const gasResult = await contractCall.estimateGas({
     from: walletAddress,
     value: value.toFixed(0),
   });
