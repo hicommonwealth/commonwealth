@@ -15,7 +15,10 @@ import { z } from 'zod';
 import TokenCard from '../../../components/TokenCard';
 import './TokensList.scss';
 
-const TokenWithCommunity = Token.extend({ community_id: z.string() });
+const TokenWithCommunity = Token.extend({
+  community_id: z.string(),
+  initial_supply: z.string(),
+});
 
 const TokensList = () => {
   const navigate = useCommonNavigate();

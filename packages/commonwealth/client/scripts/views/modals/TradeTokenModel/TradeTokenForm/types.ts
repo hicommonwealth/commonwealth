@@ -11,7 +11,10 @@ export enum TradingMode {
 
 export type TradeTokenFormProps = ReturnType<typeof useTradeTokenForm>;
 
-const TokenWithCommunity = Token.extend({ community_id: z.string() });
+const TokenWithCommunity = Token.extend({
+  community_id: z.string(),
+  initial_supply: z.string(),
+});
 
 export type TradingConfig = {
   mode: TradingMode;
