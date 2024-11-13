@@ -606,7 +606,7 @@ describe('Community lifecycle', () => {
         actor: ethAdminActor,
         payload: {
           ...baseRequest,
-          id: community.id,
+          community_id: community.id,
           chain_node_id: ethNode.id,
           directory_page_enabled: true,
           directory_page_chain_node_id: ethNode.id,
@@ -624,7 +624,7 @@ describe('Community lifecycle', () => {
         actor: ethAdminActor,
         payload: {
           ...baseRequest,
-          id: community.id,
+          community_id: community.id,
           chain_node_id: ethNode.id,
           directory_page_enabled: false,
           directory_page_chain_node_id: null,
@@ -643,7 +643,7 @@ describe('Community lifecycle', () => {
           actor: ethAdminActor,
           payload: {
             ...baseRequest,
-            id: community.id,
+            community_id: community.id,
             snapshot: ['not-found'],
           },
         }),
@@ -656,7 +656,7 @@ describe('Community lifecycle', () => {
           actor: ethAdminActor,
           payload: {
             ...baseRequest,
-            id: community.id,
+            community_id: community.id,
             namespace: 'tempNamespace',
             chain_node_id: 1263,
           },
@@ -670,7 +670,7 @@ describe('Community lifecycle', () => {
           actor: ethActor,
           payload: {
             ...baseRequest,
-            id: community.id,
+            community_id: community.id,
             namespace: 'tempNamespace',
             transactionHash: '0x1234',
             chain_node_id: edgewareNode!.id!,
@@ -684,7 +684,7 @@ describe('Community lifecycle', () => {
         actor: superAdminActor,
         payload: {
           ...baseRequest,
-          id: community.id,
+          community_id: community.id,
           chain_node_id: edgewareNode!.id!,
         },
       });
@@ -693,7 +693,7 @@ describe('Community lifecycle', () => {
           actor: superAdminActor,
           payload: {
             ...baseRequest,
-            id: community.id,
+            community_id: community.id,
             namespace: 'tempNamespace',
             transactionHash: '0x1234',
           },

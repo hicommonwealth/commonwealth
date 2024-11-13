@@ -1,3 +1,4 @@
+import { Context } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import {
   addressSwapper,
@@ -10,7 +11,6 @@ import {
   verifyThread,
 } from '@hicommonwealth/shared';
 import { z } from 'zod';
-import type { AuthHandler } from './authorization';
 
 const ThreadSignature = z.object({
   title: z.string(),
@@ -19,9 +19,13 @@ const ThreadSignature = z.object({
   topic_id: z.union([z.number(), z.null()]),
 });
 
-export const verifyThreadSignature: AuthHandler<
-  typeof schemas.CanvasThread
-> = async ({ actor, payload }) => {
+export const verifyThreadSignature = async ({
+  actor,
+  payload,
+}: Context<
+  typeof schemas.CanvasThread,
+  typeof schemas.ThreadContext | typeof schemas.TopicContext
+>) => {
   if (hasCanvasSignedDataApiArgs(payload)) {
     const { canvasSignedData } = fromCanvasSignedDataApiArgs(payload);
     const thread = ThreadSignature.parse(payload);
@@ -42,9 +46,12 @@ export const verifyThreadSignature: AuthHandler<
   }
 };
 
-export const verifyDeleteThreadSignature: AuthHandler<
-  typeof schemas.DeleteThread.input
-> = async ({ payload }) => {
+export const verifyDeleteThreadSignature = async ({
+  payload,
+}: Context<
+  typeof schemas.DeleteThread.input,
+  typeof schemas.ThreadContext
+>) => {
   if (hasCanvasSignedDataApiArgs(payload)) {
     const { canvasSignedData } = fromCanvasSignedDataApiArgs(payload);
     const thread_id = canvasSignedData.actionMessage.payload.args.thread_id;
@@ -52,9 +59,13 @@ export const verifyDeleteThreadSignature: AuthHandler<
   }
 };
 
-export const verifyCommentSignature: AuthHandler<
-  typeof schemas.CanvasComment
-> = async ({ actor, payload }) => {
+export const verifyCommentSignature = async ({
+  actor,
+  payload,
+}: Context<
+  typeof schemas.CanvasComment,
+  typeof schemas.CommentContext | typeof schemas.ThreadContext
+>) => {
   if (hasCanvasSignedDataApiArgs(payload)) {
     const { canvasSignedData } = fromCanvasSignedDataApiArgs(payload);
     await verifyComment(canvasSignedData, {
@@ -72,9 +83,13 @@ export const verifyCommentSignature: AuthHandler<
   }
 };
 
-export const verifyReactionSignature: AuthHandler<
-  typeof schemas.ThreadCanvasReaction | typeof schemas.CommentCanvasReaction
-> = async ({ actor, payload }) => {
+export const verifyReactionSignature = async ({
+  actor,
+  payload,
+}: Context<
+  typeof schemas.ThreadCanvasReaction | typeof schemas.CommentCanvasReaction,
+  typeof schemas.ThreadContext | typeof schemas.CommentContext
+>) => {
   if (hasCanvasSignedDataApiArgs(payload)) {
     const { canvasSignedData } = fromCanvasSignedDataApiArgs(payload);
     const address =
@@ -106,9 +121,12 @@ export const verifyReactionSignature: AuthHandler<
   }
 };
 
-export const verifyDeleteReactionSignature: AuthHandler<
-  typeof schemas.DeleteReaction.input
-> = async ({ payload }) => {
+export const verifyDeleteReactionSignature = async ({
+  payload,
+}: Context<
+  typeof schemas.DeleteReaction.input,
+  typeof schemas.ReactionContext
+>) => {
   if (hasCanvasSignedDataApiArgs(payload)) {
     const { canvasSignedData } = fromCanvasSignedDataApiArgs(payload);
     if (canvasSignedData.actionMessage.payload.name === 'unreactComment') {

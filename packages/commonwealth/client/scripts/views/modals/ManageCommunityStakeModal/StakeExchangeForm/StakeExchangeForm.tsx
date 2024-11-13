@@ -151,7 +151,6 @@ const StakeExchangeForm = ({
 
       user.setData({ addressSelectorSelectedAddress: selectedAddress?.value });
       await createStakeTransaction.mutateAsync({
-        id: '1',
         transaction_hash: txReceipt.transactionHash,
         community_id: communityId,
       });
@@ -204,7 +203,6 @@ const StakeExchangeForm = ({
       });
 
       await createStakeTransaction.mutateAsync({
-        id: '1',
         transaction_hash: txReceipt.transactionHash,
         community_id: communityId,
       });

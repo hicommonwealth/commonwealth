@@ -13,6 +13,7 @@ import {
   CreateQuest,
   DeleteQuest,
   GetQuest,
+  GetQuests,
   UpdateQuest,
 } from '../../src/quest';
 import { seedCommunity } from '../utils/community-seeder';
@@ -208,6 +209,61 @@ describe('Quest lifecycle', () => {
         },
       });
       expect(retrieved).toMatchObject(quest!);
+    });
+
+    it('should return multiple quests with action metas', async () => {
+      // add some quests to the community
+      const action_metas: Omit<z.infer<typeof QuestActionMeta>, 'quest_id'>[] =
+        [
+          {
+            event_name: 'CommentCreated',
+            reward_amount: 100,
+            participation_limit: QuestParticipationLimit.OncePerPeriod,
+            participation_period: QuestParticipationPeriod.Daily,
+            participation_times_per_period: 3,
+            creator_reward_weight: 0,
+          },
+          {
+            event_name: 'CommentUpvoted',
+            reward_amount: 200,
+            participation_limit: QuestParticipationLimit.OncePerPeriod,
+            participation_period: QuestParticipationPeriod.Monthly,
+            participation_times_per_period: 3,
+            creator_reward_weight: 0.1,
+          },
+        ];
+      const quests = await Promise.all(
+        [...Array(3)].map(() =>
+          command(CreateQuest(), {
+            actor: admin,
+            payload: {
+              community_id,
+              name: chance.name() + Math.random(),
+              description: chance.sentence(),
+              start_date,
+              end_date,
+            },
+          }),
+        ),
+      );
+      await command(UpdateQuest(), {
+        actor: admin,
+        payload: {
+          community_id,
+          quest_id: quests[0]!.id!,
+          action_metas,
+        },
+      });
+      const retrieved = await query(GetQuests(), {
+        actor: admin,
+        payload: { community_id },
+      });
+      expect(retrieved?.length).toBe(8);
+      quests
+        .at(-1)
+        ?.action_metas?.forEach((meta, index) =>
+          expect(meta).toMatchObject(action_metas[index]),
+        );
     });
   });
 

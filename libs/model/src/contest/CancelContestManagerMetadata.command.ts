@@ -3,22 +3,21 @@ import * as schemas from '@hicommonwealth/schemas';
 import { NeynarAPIClient } from '@neynar/nodejs-sdk';
 import { config } from '../config';
 import { models } from '../database';
-import { isAuthorized, type AuthContext } from '../middleware';
+import { authRoles } from '../middleware';
 import { mustExist } from '../middleware/guards';
 
 const log = logger(import.meta);
 
 export function CancelContestManagerMetadata(): Command<
-  typeof schemas.CancelContestManagerMetadata,
-  AuthContext
+  typeof schemas.CancelContestManagerMetadata
 > {
   return {
     ...schemas.CancelContestManagerMetadata,
-    auth: [isAuthorized({ roles: ['admin'] })],
+    auth: [authRoles('admin')],
     body: async ({ payload }) => {
       const contestManager = await models.ContestManager.findOne({
         where: {
-          community_id: payload.id,
+          community_id: payload.community_id,
           contest_address: payload.contest_address,
         },
       });

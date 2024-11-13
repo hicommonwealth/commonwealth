@@ -1,1 +1,2 @@
-export * from './authorization';
+export * from './auth';
+export * from './errors';

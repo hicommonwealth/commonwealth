@@ -3,15 +3,12 @@ import * as schemas from '@hicommonwealth/schemas';
 import axios from 'axios';
 import { config } from '../config';
 import { models } from '../database';
-import { AuthContext, isAuthorized } from '../middleware';
+import { authRoles } from '../middleware';
 
-export function GetDiscordChannels(): Query<
-  typeof schemas.GetDiscordChannels,
-  AuthContext
-> {
+export function GetDiscordChannels(): Query<typeof schemas.GetDiscordChannels> {
   return {
     ...schemas.GetDiscordChannels,
-    auth: [isAuthorized({ roles: ['admin'] })],
+    auth: [authRoles('admin')],
     body: async ({ payload }) => {
       const configEntry = await models.DiscordBotConfig.findOne({
         where: {

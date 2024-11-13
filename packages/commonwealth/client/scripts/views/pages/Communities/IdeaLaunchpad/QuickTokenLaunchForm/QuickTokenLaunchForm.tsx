@@ -268,7 +268,7 @@ export const QuickTokenLaunchForm = ({
           addressSelectorSelectedAddress: selectedAddress.address,
         });
         await updateCommunity({
-          id: communityId,
+          community_id: communityId,
           token_name: sanitizedTokenInfo.name,
           ...(sanitizedTokenInfo.description && {
             description: sanitizedTokenInfo.description,

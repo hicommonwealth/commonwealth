@@ -2,8 +2,8 @@ import { InvalidInput, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { Op } from 'sequelize';
 import { models, sequelize } from '../database';
-import { isAuthorized, type AuthContext } from '../middleware';
-import { mustBeAuthorized, mustNotExist } from '../middleware/guards';
+import { authRoles } from '../middleware';
+import { mustNotExist } from '../middleware/guards';
 import { GroupAttributes } from '../models';
 
 export const MAX_GROUPS_PER_COMMUNITY = 20;
@@ -13,15 +13,12 @@ export const CreateGroupErrors = {
   InvalidTopics: 'Invalid topics',
 };
 
-export function CreateGroup(): Command<
-  typeof schemas.CreateGroup,
-  AuthContext
-> {
+export function CreateGroup(): Command<typeof schemas.CreateGroup> {
   return {
     ...schemas.CreateGroup,
-    auth: [isAuthorized({ roles: ['admin'] })],
-    body: async ({ actor, payload, auth }) => {
-      const { community_id } = mustBeAuthorized(actor, auth);
+    auth: [authRoles('admin')],
+    body: async ({ payload }) => {
+      const { community_id } = payload;
 
       const topics = await models.Topic.findAll({
         where: {

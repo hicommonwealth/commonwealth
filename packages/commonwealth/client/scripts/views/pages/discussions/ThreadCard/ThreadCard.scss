@@ -152,6 +152,13 @@
         }
       }
 
+      .content-body.show-image .MarkdownFormattedText img {
+        display: block !important;
+        width: 350px;
+        height: 200px;
+        object-fit: cover;
+      }
+
       .content-title {
         display: flex;
         flex-wrap: wrap;

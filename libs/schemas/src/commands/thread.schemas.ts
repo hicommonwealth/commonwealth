@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { ReactionContext, ThreadContext, TopicContext } from '../context';
 import { Reaction, Thread } from '../entities';
 import { DiscordMetaSchema, PG_INT } from '../utils';
 
@@ -23,6 +24,7 @@ export const CreateThread = {
     canvas_msg_id: z.string().optional(),
   }),
   output: Thread,
+  context: TopicContext,
 };
 
 export const UpdateThread = {
@@ -47,6 +49,7 @@ export const UpdateThread = {
     canvas_msg_id: z.string().optional(),
   }),
   output: Thread,
+  context: ThreadContext,
 };
 
 export const ThreadCanvasReaction = z.object({
@@ -60,6 +63,7 @@ export const ThreadCanvasReaction = z.object({
 export const CreateThreadReaction = {
   input: ThreadCanvasReaction,
   output: Reaction.extend({ community_id: z.string() }),
+  context: ThreadContext,
 };
 
 export const DeleteThread = {
@@ -73,6 +77,7 @@ export const DeleteThread = {
     canvas_signed_data: z.string().nullish(),
     canvas_msg_id: z.string().nullish(),
   }),
+  context: ThreadContext,
 };
 
 export const DeleteReaction = {
@@ -82,9 +87,6 @@ export const DeleteReaction = {
     canvas_signed_data: z.string().optional(),
     canvas_msg_id: z.string().optional(),
   }),
-  output: z.object({
-    reaction_id: PG_INT,
-    canvas_signed_data: z.string().nullish(),
-    canvas_msg_id: z.string().nullish(),
-  }),
+  output: z.boolean(),
+  context: ReactionContext,
 };
