@@ -1,5 +1,5 @@
 import { commonProtocol } from '@hicommonwealth/shared';
-import { notifyError } from 'controllers/app/notifications';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import NodeInfo from 'models/NodeInfo';
 import { useMemo, useState } from 'react';
@@ -158,6 +158,9 @@ const useTradeTokenForm = ({
           },
         });
       }
+
+      // update user about success
+      notifySuccess('Transactions successful!');
 
       onTradeComplete?.();
     } catch (e) {
