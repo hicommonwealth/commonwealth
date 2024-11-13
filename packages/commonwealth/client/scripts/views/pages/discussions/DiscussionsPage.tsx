@@ -56,7 +56,6 @@ const VIEWS = [
 ];
 const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const [selectedView, setSelectedView] = useState(VIEWS[0].value);
-  const [showView, setShowView] = useState(true);
 
   const communityId = app.activeChainId() || '';
   const navigate = useCommonNavigate();
@@ -190,12 +189,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
       );
       if (!validTopics) {
         navigate('/discussions');
-      } else if (validTopics) {
-        setShowView(false);
       }
-    }
-    if (topicNameFromURL === 'archived') {
-      setShowView(false);
     }
     if (topicNameFromURL === 'overview') {
       setSelectedView(VIEWS[1].value);
