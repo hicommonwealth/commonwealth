@@ -1,29 +1,25 @@
 import { Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../database';
-import { AuthContext, isAuthorized } from '../middleware';
+import { authReaction } from '../middleware';
 import { verifyDeleteReactionSignature } from '../middleware/canvas';
-import { mustBeAuthorized, mustExist } from '../middleware/guards';
+import { mustExist } from '../middleware/guards';
 
-export function DeleteReaction(): Command<
-  typeof schemas.DeleteReaction,
-  AuthContext
-> {
+export function DeleteReaction(): Command<typeof schemas.DeleteReaction> {
   return {
     ...schemas.DeleteReaction,
-    auth: [isAuthorized({}), verifyDeleteReactionSignature],
-    body: async ({ actor, payload, auth }) => {
-      const { address } = mustBeAuthorized(actor, auth);
-      const { reaction_id } = payload;
-
+    auth: [authReaction(), verifyDeleteReactionSignature],
+    body: async ({ payload }) => {
       const reaction = await models.Reaction.findOne({
-        where: { id: reaction_id, address_id: address.id }, // only the author can delete a reaction
+        where: { id: payload.reaction_id },
       });
       mustExist('Reaction', reaction);
-
-      await reaction.destroy();
-
-      return { reaction_id };
+      await models.sequelize.transaction(async (transaction) => {
+        // must call reaction.destroy() to trigger the hook
+        await reaction.destroy({ transaction });
+        // TODO: move hook logic to command mutation
+      });
+      return { ...reaction!.toJSON() };
     },
   };
 }

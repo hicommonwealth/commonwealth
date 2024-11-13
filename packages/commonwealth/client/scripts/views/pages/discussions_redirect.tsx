@@ -20,16 +20,15 @@ export default function DiscussionsRedirect() {
     // Note that because this is a redirect, we do not add it to the history. If we only keep the original URL
     // in history, when something like the back button is clicked, it will not come back to this redirect.
     const dontAddHistory: NavigateOptions = { replace: true };
-
     switch (view) {
       case DefaultPage.Overview:
-        navigate('/overview', dontAddHistory);
+        navigate('/overview?tab=overview', dontAddHistory);
         break;
       case DefaultPage.Discussions:
-        navigate('/discussions', dontAddHistory);
+        navigate('/discussions?tab=all', dontAddHistory);
         break;
       default:
-        navigate('/discussions', dontAddHistory);
+        navigate('/discussions?tab=all', dontAddHistory);
     }
   }, [navigate]);
 

@@ -26,6 +26,19 @@ const app = initializeApp(PUBLIC_FIREBASE_CONFIG);
 // Initialize Firebase Cloud Messaging and get a reference to the service
 const messaging = getMessaging(app);
 
+if (navigator.serviceWorker) {
+  console.log('Registering message listener for service worker.');
+  navigator.serviceWorker.onmessage = (event) => {
+    if (event.data.type === 'log') {
+      console.log('Service Worker:', event.data.message);
+    } else {
+      console.warn('Ignoring message: ', event);
+    }
+  };
+} else {
+  console.log('No service worker');
+}
+
 export async function getFirebaseMessagingToken() {
   const reg = await navigator.serviceWorker.register(
     '/firebase-messaging-sw.js',

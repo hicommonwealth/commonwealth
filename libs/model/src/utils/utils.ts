@@ -45,15 +45,16 @@ export async function emitEvent(
 ) {
   const records: Array<EventPairs> = [];
   for (const event of values) {
-    if (config.OUTBOX.ALLOWED_EVENTS.includes(event.event_name)) {
+    if (!config.OUTBOX.BLACKLISTED_EVENTS.includes(event.event_name)) {
       records.push(event);
     } else {
       log.warn(
         `Event not inserted into outbox! ` +
-          `Add ${event.event_name} to the ALLOWED_EVENTS env var to enable emitting this event.`,
+          `The event "${event.event_name}" is blacklisted. 
+          Remove it from BLACKLISTED_EVENTS env in order to allow emitting this event.`,
         {
           event_name: event.event_name,
-          allowed_events: config.OUTBOX.ALLOWED_EVENTS,
+          allowed_events: config.OUTBOX.BLACKLISTED_EVENTS,
         },
       );
     }
@@ -147,8 +148,7 @@ export async function getThreadContestManagers(
         SELECT cm.contest_address, cm.cancelled, cm.ended
         FROM "Communities" c
                  JOIN "ContestManagers" cm ON cm.community_id = c.id
-                 JOIN "ContestTopics" ct ON cm.contest_address = ct.contest_address
-        WHERE ct.topic_id = :topic_id
+        WHERE cm.topic_id = :topic_id
           AND cm.community_id = :community_id
           AND cm.cancelled IS NOT TRUE
           AND cm.ended IS NOT TRUE

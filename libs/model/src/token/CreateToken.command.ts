@@ -1,71 +1,64 @@
-import { InvalidInput, type Command } from '@hicommonwealth/core';
+import { InvalidState, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
-import { ChainBase } from '@hicommonwealth/shared';
+import { commonProtocol } from '@hicommonwealth/shared';
 import { models } from '../database';
-import { AuthContext, isAuthorized } from '../middleware';
+import { authRoles } from '../middleware';
 import { mustExist } from '../middleware/guards';
+import {
+  getErc20TokenInfo,
+  getTokenCreatedTransaction,
+} from '../services/commonProtocol/launchpadHelpers';
 
-export const CreateTokenErrors = {
-  TokenNameExists:
-    'The name for this token already exists, please choose another name',
-  InvalidEthereumChainId: 'Ethereum chain ID not provided or unsupported',
-  InvalidAddress: 'Address is invalid',
-  InvalidBase: 'Must provide valid chain base',
-  MissingNodeUrl: 'Missing node url',
-  InvalidNode: 'RPC url returned invalid response. Check your node url',
-};
-
-export function CreateToken(): Command<
-  typeof schemas.CreateToken,
-  AuthContext
-> {
+export function CreateToken(): Command<typeof schemas.CreateToken> {
   return {
     ...schemas.CreateToken,
-    auth: [isAuthorized({ roles: ['admin'] })],
-    body: async ({ actor, payload }) => {
-      const {
-        base,
-        chain_node_id,
-        name,
-        symbol,
-        description,
-        icon_url,
-        community_id,
-        launchpad_contract_address,
-      } = payload;
+    auth: [authRoles('admin')],
+    body: async ({ payload }) => {
+      const { chain_node_id, transaction_hash, description, icon_url } =
+        payload;
 
-      const token = await models.Token.findOne({
-        where: { name },
-      });
-      if (token) throw new InvalidInput(CreateTokenErrors.TokenNameExists);
-
-      const baseCommunity = await models.Community.findOne({
-        where: { base, id: community_id },
-      });
-      mustExist('Community Chain Base', baseCommunity);
-
-      const node = await models.ChainNode.findOne({
+      const chainNode = await models.ChainNode.findOne({
         where: { id: chain_node_id },
-      });
-      mustExist(`Chain Node`, node);
-
-      if (base === ChainBase.Ethereum && !node.eth_chain_id)
-        throw new InvalidInput(CreateTokenErrors.InvalidEthereumChainId);
-
-      const createdToken = await models.Token.create({
-        base,
-        chain_node_id,
-        name,
-        symbol,
-        description,
-        icon_url,
-        author_address: actor.address || '',
-        community_id,
-        launchpad_contract_address,
-        // uniswap_pool_address, - TODO: add when uniswap integration is done
+        attributes: ['eth_chain_id', 'url', 'private_url'],
       });
 
-      return createdToken!.toJSON();
+      mustExist('Chain Node', chainNode);
+
+      const tokenData = await getTokenCreatedTransaction({
+        rpc: chainNode.private_url! || chainNode.url!,
+        transactionHash: transaction_hash,
+      });
+
+      if (!tokenData) {
+        throw new InvalidState('Transaction not found');
+      }
+
+      let tokenInfo: { name: string; symbol: string; totalSupply: bigint };
+      try {
+        tokenInfo = await getErc20TokenInfo({
+          rpc: chainNode.private_url || chainNode.url,
+          tokenAddress: tokenData.parsedArgs.tokenAddress,
+        });
+      } catch (e) {
+        throw new Error(
+          `Failed to get erc20 token properties for token ${tokenData.parsedArgs.tokenAddress}`,
+        );
+      }
+
+      const token = await models.Token.create({
+        token_address: tokenData.parsedArgs.tokenAddress,
+        namespace: tokenData.parsedArgs.namespace,
+        name: tokenInfo.name,
+        symbol: tokenInfo.symbol,
+        initial_supply: tokenInfo.totalSupply,
+        liquidity_transferred: false,
+        launchpad_liquidity: tokenData.parsedArgs.launchpadLiquidity,
+        eth_market_cap_target: commonProtocol.getTargetMarketCap(),
+        description: description ?? null,
+        icon_url: icon_url ?? null,
+      });
+
+      return token!.toJSON();
     },
   };
 }

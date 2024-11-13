@@ -25,6 +25,7 @@ import {
   Check,
   CheckCircle,
   CircleNotch,
+  CirclesFour,
   CirclesThreePlus,
   Clipboard,
   ClockCounterClockwise,
@@ -33,6 +34,7 @@ import {
   Coins,
   Compass,
   Copy,
+  CopySimple,
   DotsThreeVertical,
   Download,
   DownloadSimple,
@@ -290,6 +292,9 @@ export const iconLookup = {
   members: Icons.CWMembers,
   download: withPhosphorIcon(Download),
   downloadSimple: withPhosphorIcon(DownloadSimple),
+  copySimple: withPhosphorIcon(CopySimple),
+  viewAll: withPhosphorIcon(Rows),
+  viewOverView: withPhosphorIcon(CirclesFour),
 };
 
 export const customIconLookup = {

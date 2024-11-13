@@ -33,8 +33,6 @@ export const ViewCommentUpvotesDrawer = ({
     <ViewUpvotesDrawer
       isOpen={isOpen}
       setIsOpen={setIsOpen}
-      // @ts-expect-error <StrictNullChecks/>
-      contentBody={comment.text}
       header="Comment upvotes"
       // @ts-expect-error <StrictNullChecks/>
       reactorData={reactorData}

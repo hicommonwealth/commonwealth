@@ -23,7 +23,6 @@ export const UserTrainingSlider = () => {
   const { data: profile, isLoading: isLoadingProfile } =
     useFetchProfileByIdQuery({
       apiCallEnabled: user.isLoggedIn,
-      shouldFetchSelfProfile: true,
     });
 
   const { isVisible: isAdminSliderVisible } = useAdminActionCardsStore();

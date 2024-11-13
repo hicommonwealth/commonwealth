@@ -8,14 +8,6 @@ export enum TopicWeightedVoting {
   ERC20 = 'erc20',
 }
 
-export const ContestTopic = z
-  .object({
-    contest_address: z.string(),
-    topic_id: PG_INT,
-    created_at: z.coerce.date(),
-  })
-  .describe('X-Ref to topics in contest');
-
 export const Topic = z.object({
   id: PG_INT.optional(),
   name: z
@@ -56,9 +48,6 @@ export const Topic = z.object({
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional(),
   deleted_at: z.coerce.date().nullish(),
-
-  // associations
-  contest_topics: z.array(ContestTopic).nullish(),
 });
 
 export const ContestManager = z
@@ -102,10 +91,19 @@ export const ContestManager = z
       .describe(
         'Flags when the one-off contest has ended and rollover was completed',
       ),
-    topics: z.array(Topic).nullish(),
     contests: z.array(Contest).nullish(),
     farcaster_frame_url: z.string().nullish(),
     farcaster_frame_hashes: z.array(z.string()).nullish(),
-    neynar_webhook_id: z.string().nullish(),
+    neynar_webhook_id: z
+      .string()
+      .nullish()
+      .describe('Neynar ID of the CastCreated webhook'),
+    neynar_webhook_secret: z
+      .string()
+      .nullish()
+      .describe('Neynar secret for the CastCreated webhook'),
+    topic_id: PG_INT.nullish(),
+    topics: z.array(Topic).nullish(),
+    is_farcaster_contest: z.boolean(),
   })
   .describe('On-Chain Contest Manager');

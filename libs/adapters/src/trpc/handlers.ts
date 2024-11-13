@@ -58,9 +58,9 @@ const trpcerror = (error: unknown): TRPCError => {
 export const command = <
   Input extends ZodSchema,
   Output extends ZodSchema,
-  AuthContext,
+  Context extends ZodSchema,
 >(
-  factory: () => Metadata<Input, Output, AuthContext>,
+  factory: () => Metadata<Input, Output, Context>,
   tag: Tag,
   track?: Track<Input, Output>,
   commit?: Commit<Input, Output>,
@@ -93,21 +93,23 @@ export const command = <
  * Builds tRPC query GET endpoint
  * @param factory query factory
  * @param tag query tag used for OpenAPI spec grouping
- * @param forceSecure whether to force secure requests for rate-limited external-router
- * @param ttlSecs cache response ttl in seconds
+ * @param options An object with security and caching related configuration
+ * @param commit output middleware (best effort), mainly used to update statistics
+ * - `(input,output,ctx) => Promise<Record<string,unknown>> | undefined | void`
  * @returns tRPC query procedure
  */
 export const query = <
   Input extends ZodSchema,
   Output extends ZodSchema,
-  AuthContext,
+  Context extends ZodSchema,
 >(
-  factory: () => Metadata<Input, Output, AuthContext>,
+  factory: () => Metadata<Input, Output, Context>,
   tag: Tag,
   options?: {
     forceSecure?: boolean;
     ttlSecs?: number;
   },
+  commit?: Commit<Input, Output>,
 ) => {
   const md = factory();
   return buildproc({
@@ -115,6 +117,7 @@ export const query = <
     name: factory.name,
     md,
     tag,
+    commit,
     forceSecure: options?.forceSecure,
   }).query(async ({ ctx, input }) => {
     try {

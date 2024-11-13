@@ -35,7 +35,7 @@ export const buildUpdateCommentInput = async ({
     author_community_id: communityId,
     comment_id: commentId,
     community_id: communityId,
-    text: updatedBody,
+    body: updatedBody,
     jwt: userStore.getState().jwt,
     ...toCanvasSignedDataApiArgs(canvasSignedData),
   };

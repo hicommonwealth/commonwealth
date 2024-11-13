@@ -19,7 +19,6 @@ import { useSearchParams } from 'react-router-dom';
 import app from 'state';
 import { useFetchCommentsQuery } from 'state/api/comments';
 import useGetContentByUrlQuery from 'state/api/general/getContentByUrl';
-import useGetViewCountByObjectIdQuery from 'state/api/general/getViewCountByObjectId';
 import { useFetchGroupsQuery } from 'state/api/groups';
 import {
   useAddThreadLinksMutation,
@@ -151,7 +150,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   const { contestsData } = useCommunityContests();
   const isTopicInContest = checkIsTopicInContest(
-    contestsData,
+    contestsData.all,
     thread?.topic?.id,
   );
 
@@ -164,6 +163,9 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
       setShouldRestoreEdits(true);
       setIsGloballyEditing(true);
       setIsEditingBody(true);
+    }
+    if (thread && thread?.title) {
+      setDraftTitle(thread.title);
     }
   }, [isEdit, thread, isAdmin]);
 
@@ -184,12 +186,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     apiEnabled: !!user?.activeAccount?.address && !!communityId,
     userAddress: user?.activeAccount?.address || '',
     topicId: thread?.topic?.id || 0,
-  });
-
-  const { data: viewCount = 0 } = useGetViewCountByObjectIdQuery({
-    communityId,
-    objectId: thread?.id || '',
-    apiCallEnabled: !!thread?.id && !!communityId,
   });
 
   useEffect(() => {
@@ -546,7 +542,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                 onInput={(e) => {
                   setDraftTitle(e.target.value);
                 }}
-                value={draftTitle || thread?.title}
+                value={draftTitle}
               />
             ) : (
               thread?.title
@@ -562,7 +558,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
           createdAt={thread?.createdAt}
           updatedAt={thread?.updatedAt}
           lastEdited={thread?.lastEdited}
-          viewCount={viewCount}
+          viewCount={thread?.viewCount}
           canUpdateThread={canUpdateThread}
           stageLabel={!isStageDefault ? thread?.stage : undefined}
           subHeader={
@@ -618,11 +614,15 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                     cancelEditing={() => {
                       setIsGloballyEditing(false);
                       setIsEditingBody(false);
+                      if (!draftTitle.length) {
+                        setDraftTitle(thread?.title);
+                      }
                     }}
                     threadUpdatedCallback={() => {
                       setIsGloballyEditing(false);
                       setIsEditingBody(false);
                     }}
+                    isDisabled={draftTitle && draftTitle.length ? false : true}
                   />
                   {threadOptionsComp}
                 </>

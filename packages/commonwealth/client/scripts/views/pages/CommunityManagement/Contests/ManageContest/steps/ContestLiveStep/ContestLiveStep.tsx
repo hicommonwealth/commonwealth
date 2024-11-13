@@ -10,6 +10,7 @@ import CopyAddressInput from '../../../CopyAddressInput';
 import FundContestDrawer from '../../../FundContestDrawer';
 
 import contestSuccess from 'assets/img/contestSuccess.png';
+import { copyFarcasterContestFrameUrl } from '../../../utils';
 import './ContestLiveStep.scss';
 
 interface ContestLiveStepProps {
@@ -51,16 +52,22 @@ const ContestLiveStep = ({
                 buttonType="secondary"
                 onClick={() => setIsDrawerOpen(true)}
               />
+              {isFarcasterContest && (
+                <CWButton
+                  containerClassName="cta-btn"
+                  label="Copy Farcaster Frame"
+                  onClick={() => {
+                    copyFarcasterContestFrameUrl(createdContestAddress).catch(
+                      console.log,
+                    );
+                  }}
+                />
+              )}
               <CWButton
+                buttonType={isFarcasterContest ? 'tertiary' : 'primary'}
                 containerClassName="cta-btn"
-                label={
-                  isFarcasterContest ? 'Copy Farcaster Frame' : 'Go to contests'
-                }
-                onClick={() =>
-                  isFarcasterContest
-                    ? console.log('Farcaster frame copied')
-                    : navigate('/manage/contests')
-                }
+                label="Go to contests list"
+                onClick={() => navigate('/manage/contests')}
               />
             </div>
           </div>

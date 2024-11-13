@@ -54,6 +54,7 @@ marked
 type MarkdownFormattedTextProps = Omit<QuillRendererProps, 'doc'> & {
   doc: string;
   customClass?: string;
+  onImageClick?: () => void;
 };
 
 // NOTE: Do NOT use this directly. Use QuillRenderer instead.
@@ -64,6 +65,7 @@ export const MarkdownFormattedText = ({
   cutoffLines,
   customClass,
   customShowMoreButton,
+  onImageClick,
 }: MarkdownFormattedTextProps) => {
   const containerRef = useRef<HTMLDivElement>();
   const [userExpand, setUserExpand] = useState<boolean>(false);
@@ -89,15 +91,14 @@ export const MarkdownFormattedText = ({
   const sanitizedHTML: string = useMemo(() => {
     return hideFormatting || searchTerm
       ? DOMPurify.sanitize(unsanitizedHTML, {
-          ALLOWED_TAGS: ['a'],
-          ADD_ATTR: ['target'],
+          ALLOWED_TAGS: ['a', 'img'],
+          ADD_ATTR: ['target', 'onclick'],
         })
       : DOMPurify.sanitize(unsanitizedHTML, {
           USE_PROFILES: { html: true },
-          ADD_ATTR: ['target'],
+          ADD_ATTR: ['target', 'onclick'],
         });
   }, [hideFormatting, searchTerm, unsanitizedHTML]);
-
   // finalDoc is the rendered content which may include search term highlights
   const finalDoc = useMemo(() => {
     // if no search term, just render the doc normally
@@ -164,6 +165,20 @@ export const MarkdownFormattedText = ({
     }, 300),
     [],
   );
+
+  useEffect(() => {
+    if (containerRef?.current && onImageClick) {
+      const images = containerRef.current.querySelectorAll('img');
+      images.forEach((img) => {
+        img.onclick = (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+
+          onImageClick?.();
+        };
+      });
+    }
+  }, [finalDoc, onImageClick]);
 
   // when doc is rendered, convert twitter links to embeds
   useEffect(() => {
