@@ -10,10 +10,18 @@
 // typescript package JUST for our service worker which I feel is a waste of time
 // since our service worker is just one file and less than 100 lines of code
 
+function log(message) {
+  self.clients.matchAll().then((clients) => {
+    clients.forEach((client) => client.postMessage({ type: 'log', message }));
+  });
+}
+
+log('Within firebase-messaging-sw.js');
+
 // Listen for 'push' events from the push service
 self.addEventListener('push', function (event) {
   if (!event.data) {
-    console.warn('Push notification lacks data. Ignoring');
+    log('Push notification lacks data. Ignoring');
     return;
   }
 
@@ -29,10 +37,7 @@ self.addEventListener('push', function (event) {
   // from Knock. Note that this is different from what we see in their logs
   // and there are different properties here including event_data.notification
   // which is not actually shown in the Knock console.
-  console.log(
-    'Received event data from Knock: ',
-    JSON.stringify(event_data, null, 2),
-  );
+  log('Received event data from Knock: ' + JSON.stringify(event_data, null, 2));
 
   // we MUST handle body, title, and url computation here... for all workflow
   // message types including comment-created,
@@ -69,25 +74,27 @@ self.addEventListener('push', function (event) {
 
 // Listen for 'notificationclick' events to handle notification interactions
 self.addEventListener('notificationclick', function (event) {
+  log('Got notification click');
   event.notification.close();
 
   // Extract the data from the notification
   const { url } = event.notification.data;
 
-  // // Perform an action when the notification is clicked, like opening a URL
+  log('Going to load URL ' + url);
+
+  // Perform an action when the notification is clicked, like opening a URL
   event.waitUntil(
-    clients.matchAll({ type: 'window' }).then((windowClients) => {
+    self.clients.matchAll({ type: 'window' }).then((windowClients) => {
       // Check if there is at least one client (browser tab)
       for (let i = 0; i < windowClients.length; i++) {
-        const client = windowClients[i];
-        // If the app is already open in a tab, focus it
-        if (client.url === url && 'focus' in client) {
-          return client.focus();
-        }
+        const windowClient = windowClients[i];
+        windowClient.navigate(url).then(() => windowClient.focus());
+        return;
       }
       // If no clients are found, open a new one
-      if (clients.openWindow) {
-        return clients.openWindow(url);
+      if (self.clients.openWindow) {
+        log('Opening URL in new window: ' + url);
+        return self.clients.openWindow(url);
       }
     }),
   );
