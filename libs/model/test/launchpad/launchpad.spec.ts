@@ -10,7 +10,9 @@ import { CreateLaunchpadTrade, CreateToken } from '../../src/token';
 
 chai.use(chaiAsPromised);
 
-const token_address = '0x99a3574fed7b8935709bb13f35448bf7922770ea';
+const transaction_hash =
+  '0x754d65b374aa224c0f74b0951e88f97e223b1fdd7e0ec468e253c486ae7e8a68';
+const token_address = '0x48651D8dE5F3c1634C77A46f77836FE2338fdc0C';
 
 describe('Launchpad Lifecycle', () => {
   let actor: Actor;
@@ -32,7 +34,7 @@ describe('Launchpad Lifecycle', () => {
     });
 
     const [community] = await seed('Community', {
-      namespace: 'testt',
+      namespace: 'Tim Testing 3',
       chain_node_id: node?.id,
       lifetime_thread_count: 0,
       profile_count: 1,
@@ -70,8 +72,7 @@ describe('Launchpad Lifecycle', () => {
     { timeout: 10_000 },
     async () => {
       const payload = {
-        transaction_hash:
-          '0xc0e59dfc71f0e81f33b2f96e7fad5d80d4bf81298bf7dd5afdd8913771e47fad',
+        transaction_hash,
         chain_node_id: node!.id!,
         description: 'test',
         icon_url: 'test',
@@ -84,7 +85,7 @@ describe('Launchpad Lifecycle', () => {
       });
 
       expect(results?.token_address).to.equal(token_address);
-      expect(results?.symbol).to.equal('tst');
+      expect(results?.symbol).to.equal('tim3');
     },
   );
 
