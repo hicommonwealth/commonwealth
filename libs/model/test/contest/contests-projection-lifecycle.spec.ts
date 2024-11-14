@@ -162,7 +162,7 @@ describe('Contests projection lifecycle', () => {
           title: thread_title,
           address_id: community?.Addresses?.at(0)?.id,
           url: content_url,
-          topic_id: undefined,
+          topic_id: topic_id,
           view_count: 1,
           reaction_count: 1,
           reaction_weights_sum: '1',

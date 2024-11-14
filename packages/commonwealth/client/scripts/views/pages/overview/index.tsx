@@ -39,7 +39,6 @@ const OverviewPage = () => {
     apiEnabled: !!communityId,
   });
 
-  console.log('i am called');
   const { data: topics = [] } = useFetchTopicsQuery({
     communityId,
     apiEnabled: !!communityId,
@@ -103,6 +102,11 @@ const OverviewPage = () => {
       {topicSummaryRows.map((row, i) => (
         <TopicSummaryRow {...row} key={i} isLoading={isLoading} />
       ))}
+      {!isLoading && topicSummaryRows.length === 0 && (
+        <CWText type="b1" className="empty-placeholder">
+          No threads available
+        </CWText>
+      )}
     </div>
   );
 };

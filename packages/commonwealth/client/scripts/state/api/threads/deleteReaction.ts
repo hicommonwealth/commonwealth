@@ -40,12 +40,17 @@ export const buildDeleteThreadReactionInput = async ({
 const useDeleteThreadReactionMutation = ({
   communityId,
   threadId,
-}: UseDeleteThreadReactionMutationProps) => {
+  currentReactionCount,
+  currentReactionWeightsSum,
+}: UseDeleteThreadReactionMutationProps & {
+  currentReactionCount: number;
+  currentReactionWeightsSum: string;
+}) => {
   const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
 
   return trpc.thread.deleteReaction.useMutation({
-    onSuccess: (deleted, variables) => {
-      deleted &&
+    onSuccess: (deletedReaction, variables) => {
+      if (deletedReaction) {
         updateThreadInAllCaches(
           communityId,
           threadId,
@@ -62,6 +67,15 @@ const useDeleteThreadReactionMutation = ({
           },
           'removeFromExisting',
         );
+
+        updateThreadInAllCaches(communityId, threadId, {
+          reactionCount: currentReactionCount - 1,
+          reactionWeightsSum: `${
+            parseInt(currentReactionWeightsSum) -
+            parseInt(deletedReaction?.calculated_voting_weight || `0`)
+          }`,
+        });
+      }
     },
     onError: (error) => checkForSessionKeyRevalidationErrors(error),
   });

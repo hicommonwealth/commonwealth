@@ -1,5 +1,7 @@
 import { BrowserType } from 'helpers/browser';
 
+const SAFARI_USES_FCM = true;
+
 /**
  * Compute the channel for Knock notifications.  Firebase cloud messaging or
  * Apple.
@@ -9,7 +11,7 @@ export function computeChannelTypeFromBrowserType(
 ): 'FCM' | 'APNS' | undefined {
   switch (browserType) {
     case 'safari':
-      return 'APNS';
+      return SAFARI_USES_FCM ? 'FCM' : 'APNS';
     case 'chrome':
       return 'FCM';
   }

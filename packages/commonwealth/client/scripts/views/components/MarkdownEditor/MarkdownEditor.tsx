@@ -33,6 +33,7 @@ import { MarkdownEditorModeContext } from 'views/components/MarkdownEditor/Markd
 import { NullComponent } from 'views/components/MarkdownEditor/NullComponent';
 import { useDeviceProfile } from 'views/components/MarkdownEditor/useDeviceProfile';
 import { MarkdownEditorMethods } from 'views/components/MarkdownEditor/useMarkdownEditorMethods';
+import { useMobileKeyboardResizeHandler } from 'views/components/MarkdownEditor/useMobileKeyboardResizeHandler';
 import { DragIndicator } from './indicators/DragIndicator';
 import { UploadIndicator } from './indicators/UploadIndicator';
 import './MarkdownEditor.scss';
@@ -119,6 +120,7 @@ export const MarkdownEditor = memo(function MarkdownEditor(
   const mdxEditorRef: MutableRefObject<MDXEditorMethods | null> = useRef(null);
 
   const imageUploadHandlerDelegate = useImageUploadHandler(imageHandler);
+  useMobileKeyboardResizeHandler(mode);
 
   /**
    * When we've stopped dragging, we also need to decrement the drag counter.
@@ -321,6 +323,14 @@ export const MarkdownEditor = memo(function MarkdownEditor(
     [disabled],
   );
 
+  const handleFocus = useCallback(() => {
+    setActive(true);
+  }, []);
+
+  const handleBlur = useCallback(() => {
+    setActive(false);
+  }, []);
+
   return (
     <MarkdownEditorModeContext.Provider value={mode}>
       <MarkdownEditorContext.Provider value={mdxEditorMethods}>
@@ -340,8 +350,8 @@ export const MarkdownEditor = memo(function MarkdownEditor(
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onPaste={(event) => handlePaste(event)}
-            onFocus={() => setActive(true)}
-            onBlur={() => setActive(false)}
+            onFocus={handleFocus}
+            onBlur={handleBlur}
             onMouseEnter={() => setHovering(true)}
             onMouseLeave={() => setHovering(false)}
             autoFocus={autoFocus}

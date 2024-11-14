@@ -311,7 +311,6 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
           views={VIEWS}
           selectedView={selectedView}
           setSelectedView={updateSelectedView}
-          showViews={true}
         />
         {selectedView === VIEWS[0].value ? (
           <Virtuoso

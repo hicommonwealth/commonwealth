@@ -27,6 +27,8 @@ export * from './policies';
 export * as tester from './tester';
 export type { E2E_TestEntities } from './tester';
 
+export * as middleware from './middleware';
+
 // Internals - Should not be exported once we finish the migrations to models
 export * from './chainEventSignatures';
 export * from './config';
