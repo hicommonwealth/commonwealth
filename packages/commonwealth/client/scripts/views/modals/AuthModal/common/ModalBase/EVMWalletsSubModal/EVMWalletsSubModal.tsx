@@ -1,3 +1,4 @@
+import usePrefersColorScheme from 'client/scripts/hooks/useColorScheme';
 import React from 'react';
 import AuthButton from 'views/components/AuthButton';
 import { EVMWallets } from 'views/components/AuthButton/types';
@@ -25,8 +26,7 @@ const EVMWalletsSubModal = ({
   canResetWalletConnect,
   onResetWalletConnect,
 }: EVMWalletsSubModalProps) => {
-  const { matches } = window.matchMedia(`(prefers-color-scheme: light)`);
-
+  const isLightMode = usePrefersColorScheme();
   return (
     <CWModal
       rootClassName="EVMWalletsSubModal"
@@ -48,7 +48,7 @@ const EVMWalletsSubModal = ({
                 <AuthButton
                   type={wallet}
                   rounded
-                  variant={matches ? 'light' : 'dark'}
+                  variant={isLightMode ? 'light' : 'dark'}
                   showDescription={false}
                   // @ts-expect-error <StrictNullChecks/>
                   onClick={() => onWalletSelect(wallet)}
