@@ -39,15 +39,18 @@ const BuyReceipt = ({ trading }: ReceiptDetailsProps) => {
       </div>
       <div className="entry">
         <CWText type="caption">
-          Common&apos;s Platform Fee ({trading.commonPlatformFee.percentage})
+          Common&apos;s Platform Fee (
+          {trading.amounts.buy.commonPlatformFee.percentage})
         </CWText>
-        <CWText type="caption">{trading.commonPlatformFee.eth} ETH</CWText>
+        <CWText type="caption">
+          {trading.amounts.buy.commonPlatformFee.eth} ETH
+        </CWText>
       </div>
       <div className="entry">
         <CWText type="caption">Remaining ETH to tokens</CWText>
         <CWText type="caption">
-          {trading.amounts.buy.eth - trading.commonPlatformFee.eth} ETH ={' '}
-          {trading.amounts.buy.token} {trading.token.symbol}
+          {trading.amounts.buy.eth - trading.amounts.buy.commonPlatformFee.eth}{' '}
+          ETH = {trading.amounts.buy.token} {trading.token.symbol}
         </CWText>
       </div>
     </div>

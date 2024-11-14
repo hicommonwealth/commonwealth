@@ -213,25 +213,26 @@ const useTradeTokenForm = ({
           },
           insufficientFunds:
             ethBuyAmount > parseFloat(selectedAddressEthBalance),
+          commonPlatformFee: {
+            percentage: `${COMMON_PLATFORM_FEE_PERCENTAGE}%`,
+            eth: commonPlatformFeeForBuyTradeInEth,
+          },
         },
       },
       unitEthToBaseCurrencyRate: ethToCurrencyRate,
       mode: { value: tradingMode, onChange: onTradingModeChange },
       token: tradeConfig.token,
-      // TODO: hardcoded for now
-      commonPlatformFee: {
-        percentage: `${COMMON_PLATFORM_FEE_PERCENTAGE}%`,
-        eth: commonPlatformFeeForBuyTradeInEth,
-      },
     },
     addresses: {
       available: userAddresses,
       default: selectedAddress,
       selected: {
         value: selectedAddress,
-        ethBalance: {
-          value: selectedAddressEthBalance,
-          isLoading: isLoadingUserEthBalance,
+        balances: {
+          eth: {
+            value: selectedAddressEthBalance,
+            isLoading: isLoadingUserEthBalance,
+          },
         },
         onChange: onChangeSelectedAddress,
       },

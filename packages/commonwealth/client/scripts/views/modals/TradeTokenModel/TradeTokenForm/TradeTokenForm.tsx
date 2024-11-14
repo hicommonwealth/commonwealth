@@ -108,10 +108,10 @@ const TradeTokenForm = ({
           <CWText type="caption">Current balance</CWText>
           <CWText type="caption">
             <CWIcon iconName="ethereum" iconSize="small" />
-            {addresses.selected.ethBalance.isLoading ? (
+            {addresses.selected.balances.eth.isLoading ? (
               <Skeleton width={80} />
             ) : (
-              addresses.selected.ethBalance.value
+              addresses.selected.balances.eth.value
             )}
             &nbsp;ETH
           </CWText>
