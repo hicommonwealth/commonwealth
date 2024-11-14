@@ -38,3 +38,10 @@ export const DeleteApiKey = {
     deleted: z.boolean(),
   }),
 };
+
+export const CreateReferralLink = {
+  input: z.object({}),
+  output: z.object({
+    referral_link: z.string(),
+  }),
+};
