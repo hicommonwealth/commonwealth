@@ -127,6 +127,7 @@ export const HeaderWithFilters = ({
   const featuredTopics = (topics || [])
     .filter((t) => t.featured_in_sidebar)
     .sort((a, b) => a.name.localeCompare(b.name))
+    // @ts-expect-error <StrictNullChecks/>
     .sort((a, b) => a.order - b.order);
 
   const otherTopics = (topics || [])
