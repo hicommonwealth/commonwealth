@@ -5,7 +5,7 @@ import Web3, { PayableCallOptions } from 'web3';
 import { AbiItem } from 'web3-utils';
 import { contestABI } from './abi/contestAbi';
 import { feeManagerABI } from './abi/feeManagerAbi';
-import { createWeb3Provider } from './contractHelpers';
+import { createWeb3Provider } from './utils';
 
 const nonceMutex = new Mutex();
 

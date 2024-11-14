@@ -8,7 +8,7 @@ import { commonProtocol } from '@hicommonwealth/shared';
 import { Web3 } from 'web3';
 import { LPBondingCurveAbi } from './abi/LPBondingCurve';
 import { erc20Abi } from './abi/erc20';
-import { createWeb3Provider } from './contractHelpers';
+import { createWeb3Provider } from './utils';
 
 const log = logger(import.meta);
 
