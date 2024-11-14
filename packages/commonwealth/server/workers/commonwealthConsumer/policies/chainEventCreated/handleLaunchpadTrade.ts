@@ -70,10 +70,10 @@ export async function handleLaunchpadTrade(
       chainNode!.eth_chain_id as sharedCommonProtocol.ValidChains
     ].lpBondingCurve!;
 
-  // TODO: update 1n to the launchpadLiquidity stored on Token model
   if (
     !token.liquidity_transferred &&
-    BigNumber.from(floatingSupply).toBigInt() === 1n
+    BigNumber.from(floatingSupply).toBigInt() ===
+      BigInt(token.launchpad_liquidity)
   ) {
     const onChainTokenData = await commonProtocol.launchpadHelpers.getToken({
       rpc: chainNode.private_url!,
