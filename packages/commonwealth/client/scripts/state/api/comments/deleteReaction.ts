@@ -63,9 +63,7 @@ const useDeleteCommentReactionMutation = ({
           if (comment.id === commentId) {
             return {
               ...comment,
-              reactions: comment.reactions.filter(
-                (r) => r.id !== deleted.reaction_id,
-              ),
+              reactions: comment.reactions.filter((r) => r.id !== deleted.id),
             };
           }
           return comment;
