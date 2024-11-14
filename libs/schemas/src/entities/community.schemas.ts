@@ -22,7 +22,7 @@ export const Community = z.object({
   default_symbol: z.string().default(''),
   network: z.string().default(ChainNetwork.Ethereum),
   base: z.nativeEnum(ChainBase),
-  icon_url: z.string().nullish(),
+  icon_url: z.string(),
   active: z.boolean(),
   type: z.nativeEnum(ChainType).default(ChainType.Chain),
   description: z.string().nullish(),
