@@ -1,16 +1,13 @@
 import { Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../database';
-import { AuthContext, isAuthorized } from '../middleware';
-import { mustNotExist } from '../middleware/guards';
+import { authRoles } from '../middleware';
+import { mustBeValidDateRange, mustNotExist } from '../middleware/guards';
 
-export function CreateQuest(): Command<
-  typeof schemas.CreateQuest,
-  AuthContext
-> {
+export function CreateQuest(): Command<typeof schemas.CreateQuest> {
   return {
     ...schemas.CreateQuest,
-    auth: [isAuthorized({ roles: ['admin'] })],
+    auth: [authRoles('admin')],
     secure: true,
     body: async ({ payload }) => {
       const { community_id, name, description, start_date, end_date } = payload;
@@ -23,6 +20,8 @@ export function CreateQuest(): Command<
         `Quest named "${name}" in community "${community_id}"`,
         existingName,
       );
+
+      mustBeValidDateRange(start_date, end_date);
 
       const quest = await models.Quest.create({
         community_id,

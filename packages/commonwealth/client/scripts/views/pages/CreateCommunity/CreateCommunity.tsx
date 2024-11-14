@@ -42,6 +42,10 @@ const CreateCommunity = () => {
 
   const isSuccessStep = createCommunityStep === CreateCommunityStep.Success;
 
+  const goToSuccessStep = () => {
+    onChangeStep(true);
+  };
+
   const getCurrentStep = () => {
     switch (createCommunityStep) {
       case CreateCommunityStep.CommunityTypeSelection:
@@ -67,13 +71,14 @@ const CreateCommunity = () => {
       case CreateCommunityStep.CommunityStake:
         return (
           <CommunityStakeStep
-            goToSuccessStep={() => onChangeStep(true)}
             createdCommunityName={createdCommunityName}
             createdCommunityId={createdCommunityId}
             selectedAddress={selectedAddress}
-            // @ts-expect-error <StrictNullChecks/>
-            chainId={selectedChainId}
+            chainId={selectedChainId || ''}
             onlyNamespace
+            onEnableStakeStepCancel={goToSuccessStep}
+            onSignTransactionsStepReserveNamespaceSuccess={goToSuccessStep}
+            onSignTransactionsStepCancel={goToSuccessStep}
           />
         );
 

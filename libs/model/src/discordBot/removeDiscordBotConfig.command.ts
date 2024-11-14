@@ -1,19 +1,18 @@
 import { InvalidState, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../database';
-import { isAuthorized, type AuthContext } from '../middleware';
+import { authRoles } from '../middleware';
 
 export const Errors = {
   ConfigNotFound: 'Config not found.',
 };
 
 export function RemoveDiscordBotConfig(): Command<
-  typeof schemas.RemoveDiscordBotConfig,
-  AuthContext
+  typeof schemas.RemoveDiscordBotConfig
 > {
   return {
     ...schemas.RemoveDiscordBotConfig,
-    auth: [isAuthorized({ roles: ['admin'] })],
+    auth: [authRoles('admin')],
     body: async ({ payload }) => {
       const config = await models.DiscordBotConfig.findOne({
         where: {

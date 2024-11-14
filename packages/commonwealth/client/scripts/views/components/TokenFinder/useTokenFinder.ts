@@ -20,7 +20,11 @@ const useTokenFinder = ({
       nodeEthChainId,
     });
 
-  const getTokenError = () => {
+  const getTokenError = (isOneOff?: boolean) => {
+    if (isOneOff && !tokenValue) {
+      return 'You must enter a token address';
+    }
+
     if (debouncedTokenValue && !tokenMetadataLoading && !tokenMetadata?.name) {
       return 'You must enter a valid token address';
     }

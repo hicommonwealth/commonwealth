@@ -40,6 +40,7 @@ interface SignTransactionsStepProps {
   onSetCreatedContestAddress: (address: string) => void;
   fundingTokenTicker: string;
   fundingTokenDecimals: number;
+  isFarcasterContest: boolean;
 }
 
 const ONE_HOUR_IN_SECONDS = 60 * 60;
@@ -146,7 +147,7 @@ const SignTransactionsStep = ({
       await createContestMutation({
         contest_address: contestAddress,
         name: contestFormData?.contestName,
-        id: app.activeChainId() || '',
+        community_id: app.activeChainId() || '',
         image_url: contestFormData?.contestImage,
         funding_token_address: exchangeToken,
         prize_percentage: isContestRecurring

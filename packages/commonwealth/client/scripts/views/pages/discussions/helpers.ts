@@ -69,3 +69,13 @@ export const sortByFeaturedFilter = (t: Thread[], featuredFilter) => {
   // Default: Assuming featuredFilter === 'newest'
   return [...t].sort((a, b) => moment(b.createdAt).diff(moment(a.createdAt)));
 };
+
+/**
+ * Removes image URLs from the given Markdown text.
+ * This function looks for image syntax in Markdown format (i.e., ![image](url))
+ * and replaces it with an empty string, effectively removing the images.
+ */
+export const removeImageFormMarkDown = (text: string) => {
+  const urlPattern = /!\[image\]\((https:\/\/[^\s]+)\)/g;
+  return text.replace(urlPattern, '').trim();
+};

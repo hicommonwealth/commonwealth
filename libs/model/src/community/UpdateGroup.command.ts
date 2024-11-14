@@ -2,8 +2,8 @@ import { InvalidInput, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { Op } from 'sequelize';
 import { models, sequelize } from '../database';
-import { isAuthorized, type AuthContext } from '../middleware';
-import { mustBeAuthorized, mustExist } from '../middleware/guards';
+import { authRoles } from '../middleware';
+import { mustExist } from '../middleware/guards';
 import { GroupAttributes } from '../models';
 
 export const UpdateGroupErrors = {
@@ -12,16 +12,12 @@ export const UpdateGroupErrors = {
   SystemManaged: 'Cannot update group that is system-managed',
 };
 
-export function UpdateGroup(): Command<
-  typeof schemas.UpdateGroup,
-  AuthContext
-> {
+export function UpdateGroup(): Command<typeof schemas.UpdateGroup> {
   return {
     ...schemas.UpdateGroup,
-    auth: [isAuthorized({ roles: ['admin'] })],
-    body: async ({ actor, payload, auth }) => {
-      const { community_id } = mustBeAuthorized(actor, auth);
-      const { group_id, metadata, requirements } = payload;
+    auth: [authRoles('admin')],
+    body: async ({ payload }) => {
+      const { community_id, group_id, metadata, requirements } = payload;
 
       const group = await models.Group.findOne({
         where: { community_id, id: group_id },

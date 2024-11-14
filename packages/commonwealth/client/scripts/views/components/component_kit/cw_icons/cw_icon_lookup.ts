@@ -25,6 +25,7 @@ import {
   Check,
   CheckCircle,
   CircleNotch,
+  CirclesFour,
   CirclesThreePlus,
   Clipboard,
   ClockCounterClockwise,
@@ -292,6 +293,8 @@ export const iconLookup = {
   download: withPhosphorIcon(Download),
   downloadSimple: withPhosphorIcon(DownloadSimple),
   copySimple: withPhosphorIcon(CopySimple),
+  viewAll: withPhosphorIcon(Rows),
+  viewOverView: withPhosphorIcon(CirclesFour),
 };
 
 export const customIconLookup = {
