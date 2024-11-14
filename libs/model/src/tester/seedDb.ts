@@ -20,7 +20,7 @@ import { bootstrap_testing } from './bootstrap';
  */
 export const seedDb = async (meta: ImportMeta) => {
   try {
-    const models = await bootstrap_testing(meta, true);
+    const models = await bootstrap_testing(meta);
 
     await models.User.bulkCreate(
       [{ email: 'drewstone329@gmail.com' }, { email: 'temp@gmail.com' }].map(
