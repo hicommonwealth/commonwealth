@@ -129,7 +129,6 @@ export const HeaderWithFilters = ({
   const featuredTopics = (topics || [])
     .filter((t) => t.featured_in_sidebar)
     .sort((a, b) => a.name.localeCompare(b.name))
-    // @ts-expect-error <StrictNullChecks/>
     .sort((a, b) => a.order - b.order);
 
   const otherTopics = (topics || [])
@@ -219,7 +218,7 @@ export const HeaderWithFilters = ({
   return (
     <div className="HeaderWithFilters">
       <div className="header-row">
-        {showViews && views && views.length ? (
+        {!isOnArchivePage && views && views.length ? (
           <div className="filter-section">
             <Select
               selected={selectedView || ThreadViewFilterTypes.All}
@@ -238,6 +237,12 @@ export const HeaderWithFilters = ({
                   value: ThreadViewFilterTypes.Overview,
                   label: 'Overview',
                   iconLeft: 'viewOverView',
+                },
+                {
+                  id: 3,
+                  value: ThreadViewFilterTypes.CardView,
+                  label: 'CardView',
+                  iconLeft: 'kanban',
                 },
               ]}
             />
@@ -277,7 +282,7 @@ export const HeaderWithFilters = ({
           )}
         </div>
       </div>
-      {views && views[0].value === selectedView ? (
+      {views && views[1].value !== selectedView ? (
         <>
           {selectedTopic?.description && (
             <MarkdownViewerUsingQuillOrNewEditor

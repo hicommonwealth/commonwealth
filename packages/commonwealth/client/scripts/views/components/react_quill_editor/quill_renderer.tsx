@@ -15,6 +15,8 @@ export type QuillRendererProps = {
   customClass?: string;
   customShowMoreButton?: ReactNode;
   onImageClick?: () => void;
+  threadImage?: string | null;
+  isCardView?: boolean;
 };
 
 type RichTextDocInfo = { format: 'richtext'; content: DeltaStatic };
@@ -33,6 +35,8 @@ export const QuillRenderer = ({
   customClass,
   customShowMoreButton = null,
   onImageClick,
+  threadImage,
+  isCardView,
 }: QuillRendererProps) => {
   const docInfo: DocInfo = useMemo(() => {
     let decodedText: string;
@@ -105,6 +109,8 @@ export const QuillRenderer = ({
             customClass={customClass}
             customShowMoreButton={customShowMoreButton}
             onImageClick={onImageClick}
+            threadImage={threadImage}
+            isCardView={isCardView}
           />
         );
       default:

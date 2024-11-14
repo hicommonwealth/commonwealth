@@ -52,6 +52,9 @@ type CardProps = AdminActionsProps & {
   onImageClick?: () => void;
   showCommentState?: boolean;
   removeImagesFromMarkDown?: boolean;
+  showThreadOptions?: boolean;
+  threadImage?: string | null;
+  isCardView?: boolean;
 };
 
 export const ThreadCard = ({
@@ -87,6 +90,9 @@ export const ThreadCard = ({
   showCommentState = false,
   onImageClick,
   removeImagesFromMarkDown = false,
+  showThreadOptions = true,
+  threadImage,
+  isCardView = false,
 }: CardProps) => {
   const navigate = useCommonNavigate();
   const user = useUserStore();
@@ -178,6 +184,7 @@ export const ThreadCard = ({
               archivedAt={thread.archivedAt}
               profile={thread?.profile}
               layoutType={layoutType}
+              isCardView={isCardView}
             />
             <div className="content-header-icons">
               {thread.pinned && <CWIcon iconName="pin" />}
@@ -225,6 +232,8 @@ export const ThreadCard = ({
                   </CWText>
                 }
                 onImageClick={onImageClick}
+                threadImage={threadImage}
+                isCardView={isCardView}
               />
             </CWText>
           </div>
@@ -262,46 +271,54 @@ export const ThreadCard = ({
                 ))}
             </div>
           )}
-          <div
-            className="content-footer"
-            onClick={(e) => {
-              e.stopPropagation();
-            }}
-          >
-            <ThreadOptions
-              totalComments={thread.numberOfComments}
-              shareEndpoint={`${window.location.origin}${threadHref}`}
-              thread={thread}
-              upvoteBtnVisible={!hideReactionButton && isWindowSmallInclusive}
-              commentBtnVisible={!thread.readOnly}
-              canUpdateThread={
-                canUpdateThread &&
-                user.isLoggedIn &&
-                (isThreadAuthor || isThreadCollaborator || hasAdminPermissions)
-              }
-              canReact={canReact}
-              canComment={canComment}
-              onDelete={onDelete}
-              onSpamToggle={onSpamToggle}
-              onLockToggle={onLockToggle}
-              onPinToggle={onPinToggle}
-              onProposalStageChange={onProposalStageChange}
-              onSnapshotProposalFromThread={onSnapshotProposalFromThread}
-              onCollaboratorsEdit={onCollaboratorsEdit}
-              onEditStart={onEditStart}
-              onEditCancel={onEditCancel}
-              onEditConfirm={onEditConfirm}
-              hasPendingEdits={hasPendingEdits}
-              onCommentBtnClick={onCommentBtnClick}
-              disabledActionsTooltipText={disabledActionsTooltipText}
-              setIsUpvoteDrawerOpen={setIsUpvoteDrawerOpen}
-              hideUpvoteDrawerButton={hideUpvotesDrawer}
-              editingDisabled={editingDisabled}
-              expandCommentBtnVisible={expandCommentBtnVisible}
-              showCommentVisible={showCommentVisible}
-              toggleShowComments={toggleShowComments}
-            />
-          </div>
+          {showThreadOptions && (
+            <div
+              className="content-footer"
+              onClick={(e) => {
+                e.stopPropagation();
+              }}
+            >
+              {!isCardView && (
+                <ThreadOptions
+                  totalComments={thread.numberOfComments}
+                  shareEndpoint={`${window.location.origin}${threadHref}`}
+                  thread={thread}
+                  upvoteBtnVisible={
+                    !hideReactionButton && isWindowSmallInclusive
+                  }
+                  commentBtnVisible={!thread.readOnly}
+                  canUpdateThread={
+                    canUpdateThread &&
+                    user.isLoggedIn &&
+                    (isThreadAuthor ||
+                      isThreadCollaborator ||
+                      hasAdminPermissions)
+                  }
+                  canReact={canReact}
+                  canComment={canComment}
+                  onDelete={onDelete}
+                  onSpamToggle={onSpamToggle}
+                  onLockToggle={onLockToggle}
+                  onPinToggle={onPinToggle}
+                  onProposalStageChange={onProposalStageChange}
+                  onSnapshotProposalFromThread={onSnapshotProposalFromThread}
+                  onCollaboratorsEdit={onCollaboratorsEdit}
+                  onEditStart={onEditStart}
+                  onEditCancel={onEditCancel}
+                  onEditConfirm={onEditConfirm}
+                  hasPendingEdits={hasPendingEdits}
+                  onCommentBtnClick={onCommentBtnClick}
+                  disabledActionsTooltipText={disabledActionsTooltipText}
+                  setIsUpvoteDrawerOpen={setIsUpvoteDrawerOpen}
+                  hideUpvoteDrawerButton={hideUpvotesDrawer}
+                  editingDisabled={editingDisabled}
+                  expandCommentBtnVisible={expandCommentBtnVisible}
+                  showCommentVisible={showCommentVisible}
+                  toggleShowComments={toggleShowComments}
+                />
+              )}
+            </div>
+          )}
         </div>
       </Link>
       {!hideRecentComments &&

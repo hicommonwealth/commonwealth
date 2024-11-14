@@ -58,6 +58,7 @@ export type AuthorAndPublishInfoProps = {
   versionHistory?: ThreadVersionHistory[] | CommentVersionHistory[];
   activeThreadVersionId?: number;
   onChangeVersionHistoryNumber?: (id: number) => void;
+  isCardView?: boolean;
 };
 
 export const AuthorAndPublishInfo = ({
@@ -85,6 +86,7 @@ export const AuthorAndPublishInfo = ({
   versionHistory,
   activeThreadVersionId,
   onChangeVersionHistoryNumber,
+  isCardView = false,
 }: AuthorAndPublishInfoProps) => {
   const popoverProps = usePopover();
   const containerRef = useRef(null);
@@ -305,11 +307,15 @@ export const AuthorAndPublishInfo = ({
         </>
       )}
 
-      <NewThreadTag threadCreatedAt={moment(publishDate)} />
-
-      {isHot && <CWTag iconName="trendUp" label="Trending" type="trending" />}
-
-      {isSpamThread && <CWTag label="SPAM" type="disabled" />}
+      {!isCardView && (
+        <>
+          <NewThreadTag threadCreatedAt={moment(publishDate)} />
+          {isHot && (
+            <CWTag iconName="trendUp" label="Trending" type="trending" />
+          )}
+          {isSpamThread && <CWTag label="SPAM" type="disabled" />}
+        </>
+      )}
 
       {isLocked && lockedAt && lastUpdated && (
         <LockWithTooltip

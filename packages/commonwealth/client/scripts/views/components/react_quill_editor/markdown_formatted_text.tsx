@@ -55,6 +55,8 @@ type MarkdownFormattedTextProps = Omit<QuillRendererProps, 'doc'> & {
   doc: string;
   customClass?: string;
   onImageClick?: () => void;
+  threadImage?: string | null;
+  isCardView?: boolean;
 };
 
 // NOTE: Do NOT use this directly. Use QuillRenderer instead.
@@ -66,6 +68,8 @@ export const MarkdownFormattedText = ({
   customClass,
   customShowMoreButton,
   onImageClick,
+  threadImage,
+  isCardView,
 }: MarkdownFormattedTextProps) => {
   const containerRef = useRef<HTMLDivElement>();
   const [userExpand, setUserExpand] = useState<boolean>(false);
@@ -193,16 +197,36 @@ export const MarkdownFormattedText = ({
 
   return (
     <>
-      <div
-        // @ts-expect-error <StrictNullChecks/>
-        ref={containerRef}
-        className={getClasses<{ collapsed?: boolean }>(
-          { collapsed: isTruncated },
-          customClass || 'MarkdownFormattedText',
-        )}
-      >
-        {finalDoc}
-      </div>
+      {isCardView ? (
+        <div className="card-view">
+          <div
+            // @ts-expect-error <StrictNullChecks/>
+            ref={containerRef}
+            className={getClasses<{ collapsed?: boolean }>(
+              { collapsed: isTruncated },
+              customClass || 'MarkdownFormattedText',
+            )}
+          >
+            {finalDoc}
+          </div>
+          {threadImage ? (
+            <div className="card-image-container">
+              <img src={threadImage} alt={`Thread content`} />
+            </div>
+          ) : null}
+        </div>
+      ) : (
+        <div
+          // @ts-expect-error <StrictNullChecks/>
+          ref={containerRef}
+          className={getClasses<{ collapsed?: boolean }>(
+            { collapsed: isTruncated },
+            customClass || 'MarkdownFormattedText',
+          )}
+        >
+          {finalDoc}
+        </div>
+      )}
       {isTruncated && (
         <>
           {customShowMoreButton || (

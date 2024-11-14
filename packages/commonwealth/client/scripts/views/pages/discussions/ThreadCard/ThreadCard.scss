@@ -10,6 +10,8 @@
   gap: 16px;
   text-decoration: none;
   color: unset !important;
+  overflow: hidden;
+  min-width: 100%;
 
   @include smallInclusive {
     padding: 12px;
@@ -163,7 +165,6 @@
         display: flex;
         flex-wrap: wrap;
         gap: 8px;
-        padding-right: 72px; // hack to be removed on completion of discussion listings
 
         @include extraSmall {
           padding-right: 0;
@@ -263,4 +264,69 @@
 
 .ThreadDivider {
   margin-top: 0 !important;
+}
+
+.virtuoso-grid-list {
+  border: 1px solid #f0eff0 !important;
+  gap: 5px !important;
+  display: flex !important;
+  flex-wrap: wrap !important;
+}
+.virtuoso-grid-item {
+  border: 1px solid #f0eff0 !important;
+  width: 33% !important;
+  display: flex !important;
+  @include smallInclusive {
+    width: 100% !important;
+  }
+  .ThreadCard .content-wrapper .content-body-wrapper .content-title .Text {
+    font-size: 16px !important;
+  }
+  .ThreadCard .content-wrapper .content-body-wrapper .content-title {
+    padding-right: 0 !important;
+  }
+  .ThreadCard .content-wrapper .content-body-wrapper {
+    gap: 2px !important;
+  }
+  .ThreadCard
+    .content-wrapper
+    .content-body-wrapper
+    .content-body
+    .MarkdownFormattedText
+    p {
+    font-size: 14px !important;
+  }
+  .ThreadCard
+    .content-wrapper
+    .content-body-wrapper
+    .content-body
+    .show-more-btn {
+    display: none;
+  }
+
+  .ThreadCard .content-wrapper .content-body-wrapper {
+    min-height: 150px !important;
+    height: 200px !important;
+    overflow: hidden;
+    position: relative;
+  }
+  .ThreadCard .content-wrapper .content-body-wrapper .content-body .card-view {
+    display: flex;
+    flex-direction: row;
+    position: relative;
+  }
+  .ThreadCard
+    .content-wrapper
+    .content-body-wrapper
+    .content-body
+    .card-view
+    .card-image-container {
+    width: 70px;
+    height: 80px;
+    margin-top: 20px;
+  }
+
+  .ThreadCard {
+    height: 300px !important;
+  }
 }
