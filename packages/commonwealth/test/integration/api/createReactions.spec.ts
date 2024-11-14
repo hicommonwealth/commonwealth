@@ -146,7 +146,7 @@ describe('createReaction Integration Tests', () => {
       userJWT,
       userAddress,
     );
-    chai.assert.equal(deleteReactionResponse.reaction_id, reactionId);
+    chai.assert.isTrue(deleteReactionResponse);
 
     await comment!.reload();
     chai.assert.equal(comment!.reaction_count, beforeReactionCount);
@@ -184,7 +184,7 @@ describe('createReaction Integration Tests', () => {
       userAddress,
     );
 
-    chai.assert.equal(deleteReactionResponse.reaction_id, reactionId);
+    chai.assert.isTrue(deleteReactionResponse);
 
     await thread!.reload();
     chai.assert.equal(thread!.reaction_count, beforeReactionCount!);
