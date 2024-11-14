@@ -1,6 +1,7 @@
-import { Actor, command, dispose } from '@hicommonwealth/core';
-import { CreateReferralLink } from 'model/src/user/CreateReferralLink.command';
+import { Actor, command, dispose, query } from '@hicommonwealth/core';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { GetReferralLink } from '../../src/user';
+import { CreateReferralLink } from '../../src/user/CreateReferralLink.command';
 import { seedCommunity } from '../utils/community-seeder';
 
 describe('User lifecycle', () => {
@@ -23,6 +24,13 @@ describe('User lifecycle', () => {
       payload: {},
     });
     expect(response!.referral_link).toBeDefined();
+
+    // make sure it's saved
+    const response2 = await query(GetReferralLink(), {
+      actor: member,
+      payload: {},
+    });
+    expect(response2!.referral_link).to.eq(response?.referral_link);
   });
 
   it('should fail to create referral link when one already exists', async () => {

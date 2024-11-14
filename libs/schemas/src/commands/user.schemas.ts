@@ -45,3 +45,10 @@ export const CreateReferralLink = {
     referral_link: z.string(),
   }),
 };
+
+export const GetReferralLink = {
+  input: z.object({}),
+  output: z.object({
+    referral_link: z.string().nullish(),
+  }),
+};
