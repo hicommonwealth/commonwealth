@@ -30,6 +30,7 @@ describe('Digest email lifecycle', () => {
           user_id: authorUser!.id,
         },
       ],
+      topics: [{}],
     });
     [communityTwo] = await seed('Community', {
       chain_node_id: undefined,
@@ -41,6 +42,7 @@ describe('Digest email lifecycle', () => {
           user_id: authorUser!.id,
         },
       ],
+      topics: [{}],
     });
     // create an additional community to ensure only specific threads are selected
     [communityThree] = await seed('Community', {
@@ -53,6 +55,7 @@ describe('Digest email lifecycle', () => {
           user_id: authorUser!.id,
         },
       ],
+      topics: [{}],
     });
   });
 

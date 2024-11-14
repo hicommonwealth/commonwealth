@@ -38,6 +38,7 @@ describe('Comment subscription lifecycle', () => {
           user_id: user!.id,
         },
       ],
+      topics: [{}],
     });
 
     const [thread] = await seed('Thread', {

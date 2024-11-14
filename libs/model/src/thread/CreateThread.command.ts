@@ -2,6 +2,7 @@ import {
   Actor,
   AppError,
   InvalidInput,
+  InvalidState,
   type Command,
 } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
@@ -34,6 +35,7 @@ export const CreateThreadErrors = {
   DiscussionMissingTitle: 'Discussion posts must include a title',
   NoBody: 'Thread body cannot be blank',
   PostLimitReached: 'Post limit reached',
+  ArchivedTopic: 'Cannot post in archived topic',
 };
 
 const getActiveContestManagersQuery = GetActiveContestManagers();
@@ -95,6 +97,10 @@ export function CreateThread(): Command<typeof schemas.CreateThread> {
 
       if (kind === 'link' && !url?.trim())
         throw new InvalidInput(CreateThreadErrors.LinkMissingTitleOrUrl);
+
+      const topic = await models.Topic.findOne({ where: { id: topic_id } });
+      if (topic?.archived_at)
+        throw new InvalidState(CreateThreadErrors.ArchivedTopic);
 
       // check contest invariants
       const activeContestManagers = await getActiveContestManagersQuery.body({
@@ -175,12 +181,12 @@ export function CreateThread(): Command<typeof schemas.CreateThread> {
 
       const thread = await models.Thread.findOne({
         where: { id: new_thread_id },
-        include: [
-          { model: models.Address, as: 'Address' },
-          { model: models.Topic, as: 'topic' },
-        ],
+        include: [{ model: models.Address, as: 'Address' }],
       });
-      return thread!.toJSON();
+      return {
+        ...thread!.toJSON(),
+        topic: topic!.toJSON(),
+      };
     },
   };
 }

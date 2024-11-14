@@ -21,13 +21,13 @@ import {
   CreateGroupErrors,
   DeleteGroup,
   DeleteGroupErrors,
-  DeleteTopic,
   GetCommunities,
   GetMembers,
   GetTopics,
   JoinCommunity,
   JoinCommunityErrors,
   MAX_GROUPS_PER_COMMUNITY,
+  ToggleArchiveTopic,
   UpdateCommunity,
   UpdateCommunityErrors,
 } from '../../src/community';
@@ -557,7 +557,7 @@ describe('Community lifecycle', () => {
       expect(updatedTopic.description).to.eq('newDesc by system actor');
     });
 
-    test('should delete a topic', async () => {
+    test('should archive a topic', async () => {
       const { topic } = (await command(CreateTopic(), {
         actor: superAdminActor,
         payload: {
@@ -568,11 +568,21 @@ describe('Community lifecycle', () => {
           description: '',
         },
       }))!;
-      const response = await command(DeleteTopic(), {
+      const response = await command(ToggleArchiveTopic(), {
         actor: ethAdminActor,
-        payload: { community_id: community.id, topic_id: topic!.id! },
+        payload: {
+          community_id: community.id,
+          topic_id: topic!.id!,
+          archive: true,
+        },
       });
       expect(response?.topic_id).to.equal(topic.id);
+      const archivedTopic = await models.Topic.findOne({
+        where: {
+          id: topic!.id!,
+        },
+      });
+      expect(archivedTopic?.archived_at).toBeTruthy();
     });
 
     test('should throw if not authorized', async () => {
@@ -588,26 +598,46 @@ describe('Community lifecycle', () => {
       }))!;
 
       await expect(
-        command(DeleteTopic(), {
+        command(ToggleArchiveTopic(), {
           actor: ethActor,
-          payload: { community_id: community.id, topic_id: topic!.id! },
+          payload: {
+            community_id: community.id,
+            topic_id: topic!.id!,
+            archive: true,
+          },
         }),
       ).rejects.toThrow(InvalidActor);
     });
 
     test("should throw error when topic doesn't exist", async () => {
       await expect(
-        command(DeleteTopic(), {
+        command(ToggleArchiveTopic(), {
           actor: ethAdminActor,
-          payload: { community_id: community.id, topic_id: 123456789 },
+          payload: {
+            community_id: community.id,
+            topic_id: 123456789,
+            archive: false,
+          },
         }),
       ).rejects.toThrow(InvalidInput);
     });
 
-    test('should get topics', async () => {
+    test("should get topics that aren't archived", async () => {
       const topics = await query(GetTopics(), {
         actor: superAdminActor,
         payload: { community_id: community.id, with_contest_managers: false },
+      });
+      expect(topics?.length).toBe(3);
+    });
+
+    test('should get all topics', async () => {
+      const topics = await query(GetTopics(), {
+        actor: superAdminActor,
+        payload: {
+          community_id: community.id,
+          with_contest_managers: false,
+          with_archived_topics: true,
+        },
       });
       expect(topics?.length).toBe(4);
     });

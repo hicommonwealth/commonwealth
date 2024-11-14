@@ -211,10 +211,11 @@ export const UpdateTopic = {
   context: TopicContext,
 };
 
-export const DeleteTopic = {
+export const ToggleArchiveTopic = {
   input: z.object({
     community_id: z.string(),
     topic_id: PG_INT,
+    archive: z.boolean(),
   }),
   output: z.object({
     community_id: z.string(),
