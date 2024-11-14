@@ -83,7 +83,7 @@ const Webhooks = () => {
       await Promise.all(
         webhooksToCreate.map(async (webhook) => {
           await createWebhook({
-            id: communityId,
+            community_id: communityId,
             webhookUrl: webhook.value.trim(),
           });
         }),

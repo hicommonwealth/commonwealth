@@ -24,7 +24,7 @@ import { TableButton } from 'views/components/MarkdownEditor/toolbars/TableButto
 import './ToolbarForDesktop.scss';
 
 type ToolbarForDesktopProps = Readonly<{
-  onImage?: (file: File) => void;
+  onImage: (file: File) => void;
   focus: () => void;
 }>;
 

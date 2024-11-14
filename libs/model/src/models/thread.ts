@@ -8,6 +8,7 @@ import { AddressAttributes } from './address';
 import type { CommunityAttributes } from './community';
 import type { ThreadSubscriptionAttributes } from './thread_subscriptions';
 import type { ModelInstance } from './types';
+import { beforeValidateBodyHook } from './utils';
 
 export type ThreadAttributes = z.infer<typeof Thread> & {
   // associations
@@ -26,7 +27,7 @@ export default (
       address_id: { type: Sequelize.INTEGER, allowNull: true },
       created_by: { type: Sequelize.STRING, allowNull: true },
       title: { type: Sequelize.TEXT, allowNull: false },
-      body: { type: Sequelize.TEXT, allowNull: true },
+      body: { type: Sequelize.TEXT, allowNull: false },
       kind: { type: Sequelize.STRING, allowNull: false },
       stage: {
         type: Sequelize.TEXT,
@@ -34,7 +35,7 @@ export default (
         defaultValue: 'discussion',
       },
       url: { type: Sequelize.TEXT, allowNull: true },
-      topic_id: { type: Sequelize.INTEGER, allowNull: true },
+      topic_id: { type: Sequelize.INTEGER, allowNull: false },
       pinned: {
         type: Sequelize.BOOLEAN,
         defaultValue: false,
@@ -116,6 +117,9 @@ export default (
         { fields: ['canvas_msg_id'] },
       ],
       hooks: {
+        beforeValidate(instance: ThreadInstance) {
+          beforeValidateBodyHook(instance);
+        },
         afterCreate: async (
           thread: ThreadInstance,
           options: Sequelize.CreateOptions<ThreadAttributes>,

@@ -39,7 +39,6 @@ const FundContestDrawer = ({
   const [txHash, setTxHash] = useState('');
 
   const chainRpc = app?.chain?.meta?.ChainNode?.url || '';
-  const chainNodeId = app?.chain?.meta?.ChainNode?.id || 0;
   const ethChainId = app?.chain?.meta?.ChainNode?.eth_chain_id || 0;
 
   const { addressOptions, selectedAddress, setSelectedAddress } =
@@ -59,7 +58,6 @@ const FundContestDrawer = ({
     contestAddress,
     chainRpc,
     ethChainId,
-    chainNodeId,
     userAddress: selectedAddress.value,
   });
 

@@ -6,7 +6,7 @@ import {
 } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../database';
-import { isAuthorized, type AuthContext } from '../middleware';
+import { authThread } from '../middleware';
 import { verifyCommentSignature } from '../middleware/canvas';
 import { mustBeAuthorizedThread, mustExist } from '../middleware/guards';
 import {
@@ -25,20 +25,17 @@ export const CreateCommentErrors = {
   ThreadArchived: 'Thread is archived',
 };
 
-export function CreateComment(): Command<
-  typeof schemas.CreateComment,
-  AuthContext
-> {
+export function CreateComment(): Command<typeof schemas.CreateComment> {
   return {
     ...schemas.CreateComment,
     auth: [
-      isAuthorized({
+      authThread({
         action: schemas.PermissionEnum.CREATE_COMMENT,
       }),
       verifyCommentSignature,
     ],
-    body: async ({ actor, payload, auth }) => {
-      const { address, thread } = mustBeAuthorizedThread(actor, auth);
+    body: async ({ actor, payload, context }) => {
+      const { address, thread } = mustBeAuthorizedThread(actor, context);
 
       if (thread.read_only)
         throw new InvalidState(CreateCommentErrors.CantCommentOnReadOnly);
@@ -57,10 +54,10 @@ export function CreateComment(): Command<
           throw new InvalidState(CreateCommentErrors.NestingTooDeep);
       }
 
-      const text = decodeContent(payload.text);
-      const mentions = uniqueMentions(parseUserMentions(text));
+      const body = decodeContent(payload.body);
+      const mentions = uniqueMentions(parseUserMentions(body));
 
-      const { contentUrl } = await uploadIfLarge('comments', text);
+      const { contentUrl } = await uploadIfLarge('comments', body);
 
       // == mutation transaction boundary ==
       const new_comment_id = await models.sequelize.transaction(
@@ -70,12 +67,12 @@ export function CreateComment(): Command<
               ...rest,
               thread_id,
               parent_id: parent_id ? parent_id.toString() : null, // TODO: change parent_id from string to number
-              text,
+              body,
               address_id: address.id!,
               reaction_count: 0,
               reaction_weights_sum: '0',
               created_by: '',
-              search: getCommentSearchVector(text),
+              search: getCommentSearchVector(body),
               content_url: contentUrl,
             },
             {
@@ -86,7 +83,7 @@ export function CreateComment(): Command<
           await models.CommentVersionHistory.create(
             {
               comment_id: comment.id!,
-              text: comment.text,
+              body: comment.body,
               timestamp: comment.created_at!,
               content_url: contentUrl,
             },

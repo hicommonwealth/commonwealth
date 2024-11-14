@@ -273,7 +273,7 @@ export const e2eTestEntities = async function (
                 },
                 defaults: {
                   address_id: -1,
-                  text: '',
+                  body: '',
                   thread_id: -1,
                   reaction_count: 0,
                   reaction_weights_sum: '0',
@@ -296,7 +296,7 @@ export const e2eTestEntities = async function (
                 },
                 defaults: {
                   address_id: -2,
-                  text: '',
+                  body: '',
                   thread_id: -2,
                   reaction_count: 0,
                   reaction_weights_sum: '0',

@@ -238,9 +238,11 @@ export const NewThreadForm = () => {
   const contestTopicAffordanceVisible =
     isContestAvailable && hasTopicOngoingContest;
 
+  const isWalletBalanceErrorEnabled = false;
   const walletBalanceError =
     isContestAvailable &&
     hasTopicOngoingContest &&
+    isWalletBalanceErrorEnabled &&
     parseFloat(userEthBalance || '0') < MIN_ETH_FOR_CONTEST_THREAD;
 
   useEffect(() => {
@@ -285,7 +287,7 @@ export const NewThreadForm = () => {
                   }}
                   formatOptionLabel={(option) => (
                     <>
-                      {contestTopicAffordanceVisible && (
+                      {!!contestTopicAffordanceVisible && (
                         <CWIcon
                           className="trophy-icon"
                           iconName="trophy"
@@ -324,7 +326,7 @@ export const NewThreadForm = () => {
                 />
               )}
 
-              {contestTopicAffordanceVisible && (
+              {!!contestTopicAffordanceVisible && (
                 <ContestTopicBanner
                   contests={threadTopic?.active_contest_managers?.map((acm) => {
                     return {
@@ -365,7 +367,7 @@ export const NewThreadForm = () => {
                 placeholder="Enter text or drag images and media here. Use the tab button to see your formatted post."
               />
 
-              {contestThreadBannerVisible && (
+              {!!contestThreadBannerVisible && (
                 <ContestThreadBanner
                   submitEntryChecked={submitEntryChecked}
                   onSetSubmitEntryChecked={setSubmitEntryChecked}

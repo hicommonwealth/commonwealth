@@ -179,9 +179,19 @@ describe('DatabaseCleaner Tests', async () => {
         last_active: Sequelize.literal(`NOW()`) as any,
       });
 
+      const topic = await models.Topic.create({
+        name: 'test-123',
+        community_id: 'ethereum',
+        description: 'test-123',
+        featured_in_sidebar: false,
+        featured_in_new_post: false,
+        group_ids: [],
+      });
+
       const thread = await models.Thread.create({
         address_id: address.id!,
         title: 'Testing',
+        body: 'test',
         community_id: 'ethereum',
         reaction_count: 0,
         reaction_weights_sum: '0',
@@ -190,12 +200,13 @@ describe('DatabaseCleaner Tests', async () => {
         view_count: 0,
         comment_count: 0,
         search: getThreadSearchVector('Testing', ''),
+        topic_id: topic!.id!,
       });
 
       const comment = await models.Comment.create({
         thread_id: thread.id!,
         address_id: address.id!,
-        text: 'Testing',
+        body: 'Testing',
         reaction_count: 0,
         reaction_weights_sum: '0',
         search: getCommentSearchVector('Testing'),

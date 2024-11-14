@@ -203,6 +203,15 @@ export const UploadControl = ({
         <div
           className="generate-image-section"
           onClick={(e) => e.stopPropagation()}
+          onKeyDown={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (e.key === 'Enter' && imagePrompt.trim()) {
+              generateImage({ prompt: imagePrompt.trim() }).catch(
+                console.error,
+              );
+            }
+          }}
         >
           <CWIconButton
             onClick={(e) => {
@@ -247,7 +256,7 @@ export const UploadControl = ({
             containerClassName="btn-focus-styles"
             disabled={areActionsDisabled}
             onClick={() => {
-              imagePrompt &&
+              imagePrompt.trim() &&
                 generateImage({ prompt: imagePrompt.trim() }).catch(
                   console.error,
                 );

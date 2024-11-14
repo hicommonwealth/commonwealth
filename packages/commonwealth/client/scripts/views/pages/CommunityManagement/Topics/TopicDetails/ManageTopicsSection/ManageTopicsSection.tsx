@@ -18,7 +18,7 @@ import './ManageTopicsSection.scss';
 export const ManageTopicsSection = () => {
   const getFeaturedTopics = (rawTopics: Topic[]): Topic[] => {
     const topics = rawTopics
-      .filter((topic) => topic.featured_in_sidebar)
+      .filter((topic) => topic.featured_in_sidebar && !topic.archived_at)
       .map((topic) => ({ ...topic }) as Topic);
 
     if (!topics.length) return [];
@@ -37,7 +37,26 @@ export const ManageTopicsSection = () => {
 
   const getRegularTopics = (rawTopics: Topic[]): Topic[] => {
     const topics = rawTopics
-      .filter((topic) => !topic.featured_in_sidebar)
+      .filter((topic) => !topic.featured_in_sidebar && !topic.archived_at)
+      .map((topic) => ({ ...topic }) as Topic);
+
+    if (!topics.length) return [];
+
+    if (!topics[0].order) {
+      return [...topics]
+        .sort((a, b) => a.name.localeCompare(b.name))
+        .reduce((acc, curr, index) => {
+          return [...acc, { ...curr, order: index + 1 }];
+        }, []);
+    } else {
+      // @ts-expect-error <StrictNullChecks/>
+      return [...topics].sort((a, b) => a.order - b.order);
+    }
+  };
+
+  const getArchivedTopics = (rawTopics: Topic[]): Topic[] => {
+    const topics = rawTopics
+      .filter((topic) => topic.archived_at)
       .map((topic) => ({ ...topic }) as Topic);
 
     if (!topics.length) return [];
@@ -59,8 +78,10 @@ export const ManageTopicsSection = () => {
   const communityId = app.activeChainId() || '';
   const { data: rawTopics } = useFetchTopicsQuery({
     communityId,
+    includeArchivedTopics: true,
     apiEnabled: !!communityId,
   });
+  console.log('rawTopics => ', rawTopics);
 
   const { mutateAsync: updateFeaturedTopicsOrder } =
     useUpdateFeaturedTopicsOrderMutation();
@@ -73,6 +94,11 @@ export const ManageTopicsSection = () => {
   const [regularTopics, setRegularTopics] = useState<Topic[]>(() =>
     // @ts-expect-error <StrictNullChecks/>
     getRegularTopics(rawTopics),
+  );
+
+  const [archivedTopics, setArchivedTopics] = useState<Topic[]>(() =>
+    // @ts-expect-error <StrictNullChecks/>
+    getArchivedTopics(rawTopics),
   );
 
   // @ts-expect-error <StrictNullChecks/>
@@ -99,6 +125,8 @@ export const ManageTopicsSection = () => {
     setFeaturedTopics(getFeaturedTopics(rawTopics));
     // @ts-expect-error <StrictNullChecks/>
     setRegularTopics(getRegularTopics(rawTopics));
+    // @ts-expect-error <StrictNullChecks/>
+    setArchivedTopics(getArchivedTopics(rawTopics));
   }, [rawTopics]);
 
   return (
@@ -134,6 +162,37 @@ export const ManageTopicsSection = () => {
           <div className="topic-list-container">
             {regularTopics.length ? (
               regularTopics.map((regTopic, index) => (
+                <div key={index} className="topic-row">
+                  <CWText>
+                    {regTopic.name}
+                    <CWIconButton
+                      iconName="pencil"
+                      buttonSize="sm"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setTopicSelectedToEdit(regTopic);
+                      }}
+                    />
+                  </CWText>
+                </div>
+              ))
+            ) : (
+              <CWText>No Topics to View</CWText>
+            )}
+          </div>
+        </div>
+
+        <div className="regular-topic-list">
+          <div className="header">
+            <CWText type="h4">Archived Topics</CWText>
+            <CWText type="b1">
+              Manage the topics that you archived earlier
+            </CWText>
+          </div>
+
+          <div className="topic-list-container">
+            {archivedTopics.length ? (
+              archivedTopics.map((regTopic, index) => (
                 <div key={index} className="topic-row">
                   <CWText>
                     {regTopic.name}

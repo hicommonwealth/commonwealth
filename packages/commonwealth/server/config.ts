@@ -23,6 +23,7 @@ const {
   CF_ZONE_ID,
   CF_API_KEY,
   LIBP2P_PRIVATE_KEY,
+  API_CLIENT_REPO_TOKEN,
 } = process.env;
 
 const NO_PRERENDER = _NO_PRERENDER;
@@ -97,6 +98,9 @@ export const config = configure(
     },
     LIBP2P_PRIVATE_KEY,
     SNAPSHOT_WEBHOOK_SECRET,
+    GITHUB: {
+      API_CLIENT_REPO_TOKEN,
+    },
   },
   z.object({
     NO_PRERENDER: z.boolean(),
@@ -165,5 +169,14 @@ export const config = configure(
         (data) => !(!['local', 'CI'].includes(model_config.APP_ENV) && !data),
         'SNAPSHOT_WEBHOOK_SECRET is required in public environments',
       ),
+    GITHUB: z.object({
+      API_CLIENT_REPO_TOKEN: z
+        .string()
+        .optional()
+        .refine((data) => !(model_config.APP_ENV === 'production' && !data))
+        .describe(
+          'A token used to authenticate with the GitHub API. Primarily used to trigger workflows',
+        ),
+    }),
   }),
 );

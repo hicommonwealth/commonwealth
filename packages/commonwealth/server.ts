@@ -23,6 +23,7 @@ import { DatabaseCleaner } from './server/util/databaseCleaner';
 
 // handle exceptions thrown in express routes
 import 'express-async-errors';
+import { dispatchSDKPublishWorkflow } from './server/util/dispatchSDKPublishWorkflow';
 
 // bootstrap adapters
 stats({
@@ -86,6 +87,15 @@ const start = async () => {
       if (typeof config.DB.CLEAN_HOUR !== 'undefined') {
         const databaseCleaner = new DatabaseCleaner();
         databaseCleaner.initLoop(models, config.DB.CLEAN_HOUR);
+      }
+
+      // checking the DYNO env var ensures this only runs on one dyno
+      if (config.APP_ENV === 'production' && process.env.DYNO === 'web.1') {
+        dispatchSDKPublishWorkflow().catch((e) =>
+          log.error(
+            `Failed to dispatch publishing workflow ${JSON.stringify(e)}`,
+          ),
+        );
       }
     })
     .catch((e) => log.error(e.message, e));

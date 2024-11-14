@@ -83,6 +83,8 @@ export function FarcasterWorker(): Policy<typeof inputs> {
             },
           );
           contestManager.neynar_webhook_id = neynarWebhook.webhook!.webhook_id;
+          contestManager.neynar_webhook_secret =
+            neynarWebhook.webhook?.secrets.at(0)?.value;
         }
 
         // append frame hash to Contest Manager
@@ -110,23 +112,51 @@ export function FarcasterWorker(): Policy<typeof inputs> {
         });
         mustExist('Contest Manager', contestManager);
 
-        const contestTopic = await models.ContestTopic.findOne({
-          where: {
-            contest_address: contestManager.contest_address,
+        const community = await models.Community.findByPk(
+          contestManager.community_id,
+          {
+            include: [
+              {
+                model: models.ChainNode,
+                required: false,
+              },
+            ],
           },
-        });
-        mustExist('Contest Topic', contestTopic);
+        );
+        mustExist('Community with Chain Node', community?.ChainNode);
+
+        const contestManagers = [
+          {
+            url: community.ChainNode!.private_url! || community.ChainNode!.url!,
+            contest_address: contestManager.contest_address,
+            actions: [],
+          },
+        ];
 
         // create onchain content from reply cast
-        const content_url = buildFarcasterContentUrl(payload.hash);
+        mustExist(
+          'Farcaster Author Custody Address',
+          payload.author?.custody_address,
+        );
+        const content_url = buildFarcasterContentUrl(
+          payload.parent_hash!,
+          payload.hash,
+        );
         await createOnchainContestContent({
-          community_id: contestManager.community_id,
-          topic_id: contestTopic.topic_id,
+          contestManagers,
+          bypass_quota: true,
           author_address: payload.author.custody_address,
           content_url,
         });
       },
       FarcasterVoteCreated: async ({ payload }) => {
+        const client = new NeynarAPIClient(config.CONTESTS.NEYNAR_API_KEY!);
+        const castsResponse = await client.fetchBulkCasts([
+          payload.untrustedData.castId.hash,
+        ]);
+        const { parent_hash, hash } = castsResponse.result.casts.at(0)!;
+        const content_url = buildFarcasterContentUrl(parent_hash!, hash);
+
         const contestManager = await models.ContestManager.findOne({
           where: {
             cancelled: {
@@ -140,26 +170,41 @@ export function FarcasterWorker(): Policy<typeof inputs> {
         });
         mustExist('Contest Manager', contestManager);
 
-        const contestTopic = await models.ContestTopic.findOne({
+        // find content by url
+        const contestActions = await models.ContestAction.findAll({
           where: {
             contest_address: contestManager.contest_address,
+            action: 'added',
+            content_url,
           },
         });
-        mustExist('Contest Topic', contestTopic);
-
-        const client = new NeynarAPIClient(config.CONTESTS.NEYNAR_API_KEY!);
 
         const { users } = await client.fetchBulkUsers([
           payload.untrustedData.fid,
         ]);
         mustExist('Farcaster User', users[0]);
 
-        const content_url = buildFarcasterContentUrl(
-          payload.untrustedData.castId.hash,
+        const community = await models.Community.findByPk(
+          contestManager.community_id,
+          {
+            include: [
+              {
+                model: models.ChainNode,
+                required: false,
+              },
+            ],
+          },
         );
+        mustExist('Community with Chain Node', community?.ChainNode);
+
+        const contestManagers = contestActions.map((ca) => ({
+          url: community.ChainNode!.url! || community.ChainNode!.private_url!,
+          contest_address: contestManager.contest_address,
+          content_id: ca.content_id,
+        }));
+
         await createOnchainContestVote({
-          community_id: contestManager.community_id,
-          topic_id: contestTopic.topic_id,
+          contestManagers,
           author_address: users[0].custody_address,
           content_url,
         });

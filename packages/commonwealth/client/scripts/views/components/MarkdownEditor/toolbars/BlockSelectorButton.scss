@@ -1,12 +1,11 @@
 .BlockSelectorButton {
+  display: flex;
+  gap: 2px;
   button {
+    display: flex;
     outline: none;
     border: none;
     cursor: pointer;
-  }
-  .DropdownIndicator {
-    display: flex;
-    gap: 2px;
   }
 }
 

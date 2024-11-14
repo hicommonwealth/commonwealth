@@ -15,7 +15,6 @@ import CommunityTags from './community_tags';
 import Contest from './contest';
 import ContestAction from './contest_action';
 import ContestManager from './contest_manager';
-import ContestTopic from './contest_topic';
 import ContractAbi from './contract_abi';
 import DiscordBotConfig from './discord_bot_config';
 import EmailUpdateToken from './email_update_token';
@@ -23,10 +22,12 @@ import EvmEventSource from './evmEventSource';
 import Group from './group';
 import GroupPermission from './groupPermission';
 import LastProcessedEvmBlock from './lastProcessedEvmBlock';
+import LaunchpadTrade from './launchpad_trade';
 import Membership from './membership';
 import Outbox from './outbox';
 import Poll from './poll';
 import ProfileTags from './profile_tags';
+import { Quest, QuestAction, QuestActionMeta } from './quest';
 import Reaction from './reaction';
 import SsoToken from './sso_token';
 import StakeTransaction from './stake_transaction';
@@ -59,7 +60,6 @@ export const Factories = {
   Contest,
   ContestAction,
   ContestManager,
-  ContestTopic,
   ContractAbi,
   DiscordBotConfig,
   EmailUpdateToken,
@@ -67,10 +67,14 @@ export const Factories = {
   Group,
   GroupPermission,
   LastProcessedEvmBlock,
+  LaunchpadTrade,
   Membership,
   Outbox,
   Poll,
   ProfileTags,
+  Quest,
+  QuestAction,
+  QuestActionMeta,
   Reaction,
   SsoToken,
   StakeTransaction,

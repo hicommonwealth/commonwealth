@@ -1,3 +1,4 @@
+import { Role } from '@hicommonwealth/shared';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import Permissions from 'utils/Permissions';
@@ -10,9 +11,9 @@ import './MembersSection.scss';
 
 export type Member = {
   userId: number;
-  avatarUrl: string;
+  avatarUrl?: string | null;
   name: string;
-  role: 'admin' | 'moderator' | '';
+  role: Role;
   groups: string[];
   stakeBalance?: string;
   lastActive?: string;
@@ -59,7 +60,7 @@ const MembersSection = ({
                 )}
                 <Link to={`/profile/id/${member.userId}`} className="user-info">
                   <Avatar
-                    url={member.avatarUrl}
+                    url={member.avatarUrl ?? ''}
                     size={24}
                     address={member.userId}
                   />
