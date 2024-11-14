@@ -1,97 +1,74 @@
-export const ContestAbi = [
+export const contestAbi = [
   {
-    inputs: [],
-    name: 'contestToken',
-    outputs: [
+    inputs: [
       {
         internalType: 'address',
-        name: '',
+        name: 'creator',
         type: 'address',
       },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [
-      {
-        internalType: 'uint256',
-        name: 'amount',
-        type: 'uint256',
-      },
-    ],
-    name: 'deposit',
-    outputs: [],
-    stateMutability: 'payable',
-    type: 'function',
-  },
-  {
-    inputs: [
-      {
-        internalType: 'uint256',
-        name: '',
-        type: 'uint256',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-    name: 'winnerIds',
-    outputs: [
-      {
-        internalType: 'uint256',
-        name: '',
-        type: 'uint256',
-      },
-    ],
-  },
-  {
-    inputs: [
       {
         internalType: 'string',
-        name: 'name',
+        name: 'url',
         type: 'string',
       },
       {
+        internalType: 'bytes',
+        name: 'data',
+        type: 'bytes',
+      },
+    ],
+    name: 'addContent',
+    outputs: [
+      {
         internalType: 'uint256',
-        name: 'length',
+        name: '',
         type: 'uint256',
       },
+    ],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [
       {
-        internalType: 'uint256[]',
-        name: 'winnerShares',
-        type: 'uint256[]',
+        internalType: 'uint256',
+        name: 'contentId',
+        type: 'uint256',
+        indexed: true,
+      },
+      {
+        internalType: 'address',
+        name: 'creator',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        internalType: 'string',
+        name: 'url',
+        type: 'string',
+        indexed: false,
+      },
+    ],
+    type: 'event',
+    name: 'ContentAdded',
+    anonymous: false,
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'voter',
+        type: 'address',
       },
       {
         internalType: 'uint256',
         name: 'id',
         type: 'uint256',
       },
-      {
-        internalType: 'uint256',
-        name: 'voterShare',
-        type: 'uint256',
-      },
-      {
-        internalType: 'uint256',
-        name: 'weight',
-        type: 'uint256',
-      },
-      {
-        internalType: 'address',
-        name: 'exhangeToken',
-        type: 'address',
-      },
-    ],
-    name: 'newSingleContest',
-    outputs: [
-      {
-        internalType: 'address',
-        name: '',
-        type: 'address',
-      },
     ],
     stateMutability: 'nonpayable',
     type: 'function',
+    name: 'voteContent',
   },
   {
     inputs: [],
@@ -140,6 +117,19 @@ export const ContestAbi = [
         internalType: 'uint256',
         name: '',
         type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'contestToken',
+    outputs: [
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
       },
     ],
     stateMutability: 'view',

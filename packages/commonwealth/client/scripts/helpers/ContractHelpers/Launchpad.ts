@@ -1,3 +1,4 @@
+import { commonProtocol } from '@hicommonwealth/shared';
 import { Contract } from 'web3';
 import { AbiItem } from 'web3-utils';
 import {
@@ -7,7 +8,6 @@ import {
   sellToken,
   transferLiquidity,
 } from '../../../../../../libs/shared/src/commonProtocol';
-import { LpBondingCurve } from './Abi/LpBondingCurveAbi';
 import ContractBase from './ContractBase';
 import { LaunchpadFactory } from './LaunchpadFactoryAbi';
 
@@ -24,7 +24,7 @@ class LaunchpadBondingCurve extends ContractBase {
     tokenCommunityManager: string,
     rpc: string,
   ) {
-    super(bondingCurveAddress, LpBondingCurve, rpc);
+    super(bondingCurveAddress, commonProtocol.lpBondingCurveAbi, rpc);
     this.tokenAddress = tokenAddress;
     this.launchpadFactoryAddress = launchpadFactoryAddress;
     this.tokenCommunityManager = tokenCommunityManager;
