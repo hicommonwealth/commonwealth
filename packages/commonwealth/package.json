@@ -203,7 +203,7 @@
     "lexical": "^0.17.0",
     "lodash": "^4.17.21",
     "long": "^5.2.3",
-    "magic-sdk": "^17.4.0",
+    "magic-sdk": "^28.17.0",
     "marked": "^11.0.0",
     "marked-footnote": "^1.2.2",
     "marked-smartypants": "1.1.5",

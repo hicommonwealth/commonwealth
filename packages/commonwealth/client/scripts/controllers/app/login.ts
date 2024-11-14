@@ -15,9 +15,7 @@ import {
   WalletSsoSource,
 } from '@hicommonwealth/shared';
 import { CosmosExtension } from '@magic-ext/cosmos';
-import { FarcasterExtension } from '@magic-ext/farcaster';
 import { OAuthExtension } from '@magic-ext/oauth2';
-import { MagicSDKExtensionsOption } from '@magic-sdk/provider/dist/types/core/sdk';
 import axios from 'axios';
 import { notifyError } from 'controllers/app/notifications';
 import { getMagicCosmosSessionSigner } from 'controllers/server/sessions';
@@ -34,6 +32,7 @@ import {
 import { welcomeOnboardModal } from 'state/ui/modals/welcomeOnboardModal';
 import { userStore } from 'state/ui/user';
 import { z } from 'zod';
+import { defaultMagic } from '../../App';
 import Account from '../../models/Account';
 import AddressInfo from '../../models/AddressInfo';
 import type BlockInfo from '../../models/BlockInfo';
@@ -286,11 +285,11 @@ export async function createUserWithAddress(
   };
 }
 
-async function constructMagic(
-  provider: string,
-  isCosmos: boolean,
-  chain?: string,
-) {
+async function constructMagic(isCosmos: boolean, chain?: string) {
+  if (!isCosmos) {
+    return defaultMagic;
+  }
+
   if (isCosmos && !chain) {
     throw new Error('Must be in a community to sign in with Cosmos magic link');
   }
@@ -299,22 +298,15 @@ async function constructMagic(
     throw new Error('Missing magic key');
   }
 
-  const extensions: MagicSDKExtensionsOption[] = [new OAuthExtension()];
-  if (provider === 'farcaster') {
-    extensions.push(new FarcasterExtension());
-  }
-  if (isCosmos) {
-    extensions.push(
+  return new Magic(process.env.MAGIC_PUBLISHABLE_KEY, {
+    extensions: [
+      new OAuthExtension(),
       new CosmosExtension({
         // Magic has a strict cross-origin policy that restricts rpcs to whitelisted URLs,
         // so we can't use app.chain.meta?.node?.url
         rpcUrl: `${document.location.origin}${SERVER_URL}/magicCosmosProxy/${chain}`,
       }),
-    );
-  }
-
-  return new Magic(process.env.MAGIC_PUBLISHABLE_KEY, {
-    extensions,
+    ],
   });
 }
 
@@ -333,7 +325,7 @@ export async function startLoginWithMagicLink({
 }) {
   if (!email && !provider)
     throw new Error('Must provide email or SSO provider');
-  const magic = await constructMagic(provider as string, isCosmos, chain);
+  const magic = await constructMagic(isCosmos, chain);
 
   if (email) {
     // email-based login
@@ -349,7 +341,7 @@ export async function startLoginWithMagicLink({
 
     const { address } = await handleSocialLoginCallback({
       bearer,
-      walletSsoSource: WalletSsoSource.Email,
+      walletSsoSource: WalletSsoSource.Farcaster,
     });
 
     return { bearer, address };
@@ -422,13 +414,13 @@ export async function handleSocialLoginCallback({
     desiredChain = communityInfo as z.infer<typeof ExtendedCommunity>;
   }
   const isCosmos = desiredChain?.base === ChainBase.CosmosSDK;
-  const magic = await constructMagic(bearer, isCosmos, desiredChain?.id);
+  const magic = await constructMagic(isCosmos, desiredChain?.id);
   const isEmail = walletSsoSource === WalletSsoSource.Email;
 
   // Code up to this line might run multiple times because of extra calls to useEffect().
   // Those runs will be rejected because getRedirectResult purges the browser search param.
   let profileMetadata, magicAddress;
-  if (isEmail) {
+  if (isEmail || walletSsoSource === WalletSsoSource.Farcaster) {
     const metadata = await magic.user.getMetadata();
     profileMetadata = { username: null };
 
