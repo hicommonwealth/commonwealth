@@ -9,12 +9,11 @@ import {
   transferLiquidity,
 } from '../../../../../../libs/shared/src/commonProtocol';
 import ContractBase from './ContractBase';
-import { LaunchpadFactory } from './LaunchpadFactoryAbi';
 
 class LaunchpadBondingCurve extends ContractBase {
   tokenAddress: string;
   launchpadFactoryAddress: string;
-  launchpadFactory: Contract<typeof LaunchpadFactory>;
+  launchpadFactory: Contract<typeof commonProtocol.launchpadFactoryAbi>;
   tokenCommunityManager: string;
 
   constructor(
@@ -36,9 +35,9 @@ class LaunchpadBondingCurve extends ContractBase {
   ): Promise<void> {
     await super.initialize(withWallet, chainId);
     this.launchpadFactory = new this.web3.eth.Contract(
-      LaunchpadFactory as AbiItem[],
+      commonProtocol.launchpadFactoryAbi as AbiItem[],
       this.launchpadFactoryAddress,
-    ) as unknown as Contract<typeof LaunchpadFactory>;
+    ) as unknown as Contract<typeof commonProtocol.launchpadFactoryAbi>;
   }
 
   async launchToken(
