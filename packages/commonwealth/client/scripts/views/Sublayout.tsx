@@ -183,6 +183,7 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
             buttonLink="https://commonwealth.im/common/discussion/25536-Weighted%20Voting%20and%20Contest%20FAQs"
             growlImage={contestsGTMGrowlImage}
             extraText="Spark creativity and foster connections within your community."
+            growlType="contests"
           />
         </div>
         <WelcomeOnboardModal
