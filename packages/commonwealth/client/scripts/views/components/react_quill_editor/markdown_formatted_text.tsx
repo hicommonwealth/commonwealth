@@ -211,7 +211,7 @@ export const MarkdownFormattedText = ({
           </div>
           {threadImage ? (
             <div className="card-image-container">
-              <img src={threadImage} alt={`Thread content`} />
+              <img src={threadImage} alt="Thread content" />
             </div>
           ) : null}
         </div>

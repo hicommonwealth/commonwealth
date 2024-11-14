@@ -26,7 +26,6 @@ import { extractImages } from 'client/scripts/helpers/feed';
 import { getThreadActionTooltipText } from 'client/scripts/helpers/threads';
 import { getProposalUrlPath } from 'client/scripts/identifiers';
 import useUserStore from 'client/scripts/state/ui/user';
-import useBrowserWindow from 'hooks/useBrowserWindow';
 import useManageDocumentTitle from 'hooks/useManageDocumentTitle';
 import useTopicGating from 'hooks/useTopicGating';
 import 'pages/discussions/index.scss';
@@ -110,7 +109,6 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     }
   }, [tabStatus]);
 
-  const { isWindowExtraSmall } = useBrowserWindow({});
   const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
 
   const topicObj = topics?.find(({ name }) => name === topicName);
