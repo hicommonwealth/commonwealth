@@ -54,11 +54,7 @@ const CWUpvoteSmall = ({
               onClick={handleClick}
             />
             {reactors.length > 0 && (
-              <CWPopover
-                className="popover-content"
-                body={popoverContent}
-                {...popoverProps}
-              />
+              <CWPopover body={popoverContent} {...popoverProps} />
             )}
           </>
         ) : (
