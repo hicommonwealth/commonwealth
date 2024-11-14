@@ -1,5 +1,5 @@
 import { disposeAdapter, EventNames } from '@hicommonwealth/core';
-import { DB, tester } from '@hicommonwealth/model';
+import { models, tester } from '@hicommonwealth/model';
 import { delay } from '@hicommonwealth/shared';
 import { expect } from 'chai';
 import { afterEach, beforeAll, describe, test } from 'vitest';
@@ -11,12 +11,8 @@ import {
 import { testOutboxEvents } from './util';
 
 describe('messageRelayer', { timeout: 20_000 }, () => {
-  let models: DB;
-
   beforeAll(async () => {
-    const res = await import('@hicommonwealth/model');
-    models = res['models'];
-    await tester.bootstrap_testing(import.meta, true);
+    await tester.bootstrap_testing(import.meta);
   });
 
   afterEach(async () => {

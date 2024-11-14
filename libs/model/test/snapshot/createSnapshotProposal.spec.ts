@@ -8,7 +8,6 @@ import { CreateSnapshotProposal } from '../../src/snapshot';
 
 describe('Snapshot Listener API', { timeout: 5_000 }, () => {
   beforeAll(async () => {
-    await tester.bootstrap_testing(import.meta, true);
     const [chainNode] = await tester.seed(
       'ChainNode',
       {

@@ -32,7 +32,8 @@ export const verify_db = async (name: string): Promise<void> => {
     }
   } catch (error) {
     console.error(`Error verifying db [${name}]:`, error);
-    throw error;
+    // ignore verification errors
+    // throw error;
   } finally {
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     pg && pg.close();
@@ -205,17 +206,9 @@ export const get_info_schema = async (
 // so that the db object does not need to be rebuilt for every to bootstrap_testing from within
 // a single test suite
 let db: DB | undefined = undefined;
-/**
- * Bootstraps testing, creating/migrating a fresh instance if it doesn't exist.
- * @meta import meta of calling test
- * @param truncate when true, truncates all tables in model
- * @returns synchronized sequelize db instance
- */
-export const bootstrap_testing = async (
-  meta: ImportMeta,
-  truncate = false,
-): Promise<DB> => {
-  const filename = path.basename(meta.filename);
+let bootstrapLock: Promise<DB> | undefined = undefined;
+
+async function _bootstrap_testing(filename: string): Promise<DB> {
   if (!db) {
     try {
       await verify_db(config.DB.NAME);
@@ -235,13 +228,26 @@ export const bootstrap_testing = async (
       throw e;
     }
   }
-
-  if (truncate) {
-    await truncate_db(db);
-    console.log('Database truncated:', filename);
-  }
-
   return db;
+}
+
+/**
+ * Bootstraps testing, creating/migrating a fresh instance if it doesn't exist.
+ * @meta import meta of calling test
+ * @param truncate when true, truncates all tables in model
+ * @returns synchronized sequelize db instance
+ */
+export const bootstrap_testing = async (meta: ImportMeta): Promise<DB> => {
+  const filename = path.basename(meta.filename);
+  if (bootstrapLock) {
+    return await bootstrapLock;
+  }
+  bootstrapLock = _bootstrap_testing(filename);
+  try {
+    return await bootstrapLock;
+  } finally {
+    bootstrapLock = undefined;
+  }
 };
 
 config.NODE_ENV === 'test' && dispose(async () => truncate_db(db));

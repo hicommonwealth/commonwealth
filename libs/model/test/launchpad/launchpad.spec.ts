@@ -3,7 +3,7 @@ import { config } from '@hicommonwealth/model';
 import { BalanceType, commonProtocol } from '@hicommonwealth/shared';
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import { bootstrap_testing, seed } from 'model/src/tester';
+import { seed } from 'model/src/tester';
 import { afterAll, beforeAll, describe, test } from 'vitest';
 import { ChainNodeAttributes } from '../../src';
 import { CreateLaunchpadTrade, CreateToken } from '../../src/token';
@@ -20,7 +20,6 @@ describe('Launchpad Lifecycle', () => {
   let node: ChainNodeAttributes;
 
   beforeAll(async () => {
-    await bootstrap_testing(import.meta, true);
     [node] = (await seed('ChainNode', {
       url: `https://base-sepolia.g.alchemy.com/v2/${config.ALCHEMY.APP_KEYS.PUBLIC}`,
       private_url: `https://base-sepolia.g.alchemy.com/v2/${config.ALCHEMY.APP_KEYS.PUBLIC}`,

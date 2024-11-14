@@ -2,7 +2,6 @@ import { configure, config as target } from '@hicommonwealth/core';
 import { z } from 'zod';
 
 const {
-  TEST_DB_NAME,
   DATABASE_URL,
   DATABASE_CLEAN_HOUR,
   DATABASE_LOG_TRACE,
@@ -42,8 +41,7 @@ const {
   OPENAI_ORGANIZATION,
 } = process.env;
 
-const NAME =
-  target.NODE_ENV === 'test' ? TEST_DB_NAME || 'common_test' : 'commonwealth';
+const NAME = target.NODE_ENV === 'test' ? 'common_test' : 'commonwealth';
 
 const DEFAULTS = {
   JWT_SECRET: 'my secret',

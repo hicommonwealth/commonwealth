@@ -6,14 +6,16 @@ import tsconfigPaths from 'vite-tsconfig-paths';
 
 dotenv.config();
 
-const pkg = process.env.npm_package_name;
-console.log('vitest:', pkg);
+const pkg = process.env.npm_package_name!;
+const parallel = !['@hicommonwealth/model', 'commonwealth'].includes(pkg);
+
+console.log('vitest:', pkg, 'parallel:', parallel);
 
 export default defineConfig({
   plugins: [tsconfigPaths()],
   test: {
     sequence: { concurrent: false },
-    fileParallelism: false, // pkg !== '@hicommonwealth/model',
+    fileParallelism: parallel,
     coverage: {
       provider: 'istanbul',
       reporter:
