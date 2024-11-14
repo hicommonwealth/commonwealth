@@ -455,7 +455,8 @@ export async function handleSocialLoginCallback({
   try {
     // Sign a session
     if (isCosmos && desiredChain) {
-      const signer = { signMessage: magic.cosmos.sign };
+      // eslint-disable-next-line
+      const signer = { signMessage: (magic as unknown as any).cosmos.sign };
       const prefix = app.chain?.meta?.bech32_prefix || 'cosmos';
       const canvasChainId = chainBaseToCanvasChainId(
         ChainBase.CosmosSDK,
