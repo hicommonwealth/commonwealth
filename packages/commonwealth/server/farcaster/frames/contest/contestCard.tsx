@@ -1,6 +1,7 @@
 import { Button } from 'frames.js/express';
 import moment from 'moment';
 import React from 'react';
+import { getContestManagerScores } from 'server/farcaster/utils';
 import { frames } from '../../config';
 
 const PrizeRow = ({ index, prize }: { index: number; prize: number }) => {
@@ -35,12 +36,13 @@ export const contestCard = frames(async (ctx) => {
   // image, title, description, prizes
   // check designs https://www.figma.com/design/NNqlhNPHvn0O96TCBIi6WU/Contests?node-id=960-3689&t=8ogN11dhaRqJP8ET-1
 
-  const prizes = [0.005, 0.003, 0.001];
-
   const contest_address = ctx.url.pathname.split('/')[1];
 
+  const { contestManager, prizes } =
+    await getContestManagerScores(contest_address);
+
   return {
-    title: 'Contest Title',
+    title: contestManager.name,
     image: (
       <div
         style={{
@@ -59,12 +61,10 @@ export const contestCard = frames(async (ctx) => {
             fontSize: '56px',
           }}
         >
-          Contest Title
+          {contestManager.name}
         </p>
 
         <p style={{ fontSize: '32px' }}>{contest_address}</p>
-
-        <p style={{ fontSize: '32px' }}>This is contest description.</p>
         <p style={{ fontSize: '42px' }}>Current Prizes</p>
 
         {prizes.length ? (
