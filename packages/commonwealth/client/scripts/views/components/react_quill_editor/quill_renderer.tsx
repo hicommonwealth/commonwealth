@@ -126,6 +126,8 @@ export const QuillRenderer = ({
     customClass,
     customShowMoreButton,
     onImageClick,
+    threadImage,
+    isCardView,
   ]);
 
   if (containerClass) {
