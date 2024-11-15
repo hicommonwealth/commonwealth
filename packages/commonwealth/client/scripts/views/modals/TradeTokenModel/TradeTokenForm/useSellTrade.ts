@@ -92,7 +92,7 @@ const useSellTrade = ({
       invest: {
         // not to be confused with "Base" network on ethereum
         baseToken: {
-          amount: setTokenSellAmountString,
+          amount: tokenSellAmountString,
           onAmountChange: onTokenSellAmountChange,
           unitEthExchangeRate: 100, // TODO: hardcoded for now - blocked token pricing
           toEth: 100, // TODO: hardcoded for now - blocked token pricing

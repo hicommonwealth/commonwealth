@@ -41,7 +41,9 @@ const TradeTokenForm = ({
 
     // only use these in buy mode
     if (trading.mode.value === TradingMode.Buy) {
-      if (trading.amounts.buy.invest.baseCurrency.amount === 0)
+      if (
+        (parseFloat(trading.amounts.buy.invest.baseCurrency.amount) || 0) === 0
+      )
         return labels.tradingAmountRequired;
       if (trading.amounts.buy.invest.insufficientFunds)
         return labels.insufficientFunds;
@@ -49,7 +51,7 @@ const TradeTokenForm = ({
 
     // only use these in sell mode
     if (trading.mode.value === TradingMode.Sell) {
-      if (trading.amounts.sell.invest.baseToken.amount === 0)
+      if ((parseFloat(trading.amounts.sell.invest.baseToken.amount) || 0) === 0)
         return labels.tradingAmountRequired;
       if (trading.amounts.sell.invest.insufficientFunds)
         return labels.insufficientFunds;
