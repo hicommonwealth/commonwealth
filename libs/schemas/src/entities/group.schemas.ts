@@ -43,10 +43,20 @@ const ThresholdData = z.object({
   ]),
 });
 
-export const Requirement = z.object({
-  rule: z.literal('threshold'),
-  data: ThresholdData,
+const AllowlistData = z.object({
+  allow: z.array(z.string().regex(/^0x[a-fA-F0-9]{40}$/)),
 });
+
+export const Requirement = z.union([
+  z.object({
+    rule: z.literal('threshold'),
+    data: ThresholdData,
+  }),
+  z.object({
+    rule: z.literal('allow'),
+    data: AllowlistData,
+  }),
+]);
 
 export const GroupMetadata = z.object({
   name: z.string(),
