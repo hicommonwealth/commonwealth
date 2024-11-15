@@ -55,9 +55,11 @@ export const sellToken = async (
   walletAddress: string,
   tokenContract: any,
 ) => {
-  await tokenContract.methods.approve(tokenAddress, BigInt(amount)).send({
-    from: walletAddress,
-  });
+  await tokenContract.methods
+    .approve(contract.options.address, BigInt(amount))
+    .send({
+      from: walletAddress,
+    });
   const txReceipt = await contract.methods
     .sellToken(tokenAddress, BigInt(amount), 0)
     .send({ from: walletAddress });
