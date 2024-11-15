@@ -1,6 +1,7 @@
 import { Command, InvalidState } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { commonProtocol } from '@hicommonwealth/shared';
+import z from 'zod';
 import { models } from '../database';
 import { mustExist } from '../middleware/guards';
 import { getLaunchpadTradeTransaction } from '../services/commonProtocol/launchpadHelpers';
@@ -35,7 +36,9 @@ export function CreateLaunchpadTrade(): Command<
         },
       });
       if (existingTrade) {
-        return existingTrade?.get({ plain: true });
+        return existingTrade?.get({ plain: true }) as unknown as z.infer<
+          typeof schemas.LaunchpadTradeView
+        >;
       }
 
       const chainNode = await models.ChainNode.scope('withPrivateData').findOne(
@@ -58,7 +61,7 @@ export function CreateLaunchpadTrade(): Command<
       const trade = await models.LaunchpadTrade.create({
         eth_chain_id,
         transaction_hash,
-        token_address: result.parsedArgs.tokenAddress,
+        token_address: result.parsedArgs.tokenAddress.toLowerCase(),
         trader_address: result.parsedArgs.traderAddress,
         is_buy: result.parsedArgs.isBuy,
         community_token_amount: result.parsedArgs.communityTokenAmount,
@@ -68,7 +71,9 @@ export function CreateLaunchpadTrade(): Command<
         timestamp: Number(result.block.timestamp),
       });
 
-      return trade.get({ plain: true });
+      return trade.get({ plain: true }) as unknown as z.infer<
+        typeof schemas.LaunchpadTradeView
+      >;
     },
   };
 }

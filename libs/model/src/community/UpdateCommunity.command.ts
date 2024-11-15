@@ -1,10 +1,11 @@
 import { InvalidInput, type Command } from '@hicommonwealth/core';
+import { commonProtocol } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import { ChainBase } from '@hicommonwealth/shared';
 import { models } from '../database';
 import { authRoles } from '../middleware';
 import { mustExist } from '../middleware/guards';
-import { checkSnapshotObjectExists, commonProtocol } from '../services';
+import { checkSnapshotObjectExists } from '../services';
 
 export const UpdateCommunityErrors = {
   SnapshotOnlyOnEthereum:

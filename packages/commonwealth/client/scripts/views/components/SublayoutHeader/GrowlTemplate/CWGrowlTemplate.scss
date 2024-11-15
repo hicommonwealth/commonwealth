@@ -24,6 +24,9 @@
     &:hover {
       color: $neutral-400;
     }
+    &.noGrowlImage {
+      margin-right: 10px;
+    }
   }
 
   .img {

@@ -6,7 +6,6 @@ import * as contest from './contestHelper';
 import * as contract from './contractHelpers';
 import * as launchpad from './launchpadHelpers';
 
-// export modules as objects so they can be stubbed in tests
 export const communityStakeConfigValidator = { ...stake };
 export const contractHelpers = { ...contract };
 export const contestHelper = { ...contest };
