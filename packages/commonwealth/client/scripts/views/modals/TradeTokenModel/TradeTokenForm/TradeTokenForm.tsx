@@ -1,7 +1,6 @@
 import React, { ReactNode, useState } from 'react';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
-import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
 import CWIconButton from 'views/components/component_kit/new_designs/CWIconButton';
 import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
 import {
@@ -153,20 +152,14 @@ const TradeTokenForm = ({
             Subtotal + fees
           </CWText>
         </div>
-        {isReceiptDetailOpen ? (
-          isActionPending ? (
-            <CWCircleMultiplySpinner />
-          ) : (
-            <>
-              {trading.mode.value === TradingMode.Buy ? (
-                <BuyReceipt trading={trading} />
-              ) : (
-                <SellReceipt trading={trading} />
-              )}
-            </>
-          )
-        ) : (
-          <></>
+        {isReceiptDetailOpen && (
+          <>
+            {trading.mode.value === TradingMode.Buy ? (
+              <BuyReceipt trading={trading} />
+            ) : (
+              <SellReceipt trading={trading} />
+            )}
+          </>
         )}
       </div>
 

@@ -28,6 +28,7 @@ const tokenEthExchangeRate = async ({
   return await launchPad.getAmountOut(
     tokenAmount,
     mode === 'sell' ? false : true,
+    `${ethChainId}`,
   );
 };
 
@@ -50,6 +51,7 @@ const useTokenEthExchangeRateQuery = ({
         mode,
       }),
     staleTime: 1000, // 1 second
+    cacheTime: 1000, // 1 second
     enabled,
   });
 };

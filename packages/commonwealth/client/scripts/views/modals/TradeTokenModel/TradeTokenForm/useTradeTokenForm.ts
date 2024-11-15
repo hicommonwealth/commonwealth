@@ -67,6 +67,7 @@ const useTradeTokenForm = ({
     isBuyActionPending,
     selectedAddressEthBalance,
   } = useBuyTrade({
+    enabled: tradingMode === TradingMode.Buy,
     chainNode: baseNode,
     selectedAddress,
     commonFeePercentage: COMMON_PLATFORM_FEE_PERCENTAGE,
@@ -81,6 +82,7 @@ const useTradeTokenForm = ({
     isSellActionPending,
     selectedAddressTokenBalance,
   } = useSellTrade({
+    enabled: tradingMode === TradingMode.Sell,
     chainNode: baseNode,
     selectedAddress,
     commonFeePercentage: COMMON_PLATFORM_FEE_PERCENTAGE,

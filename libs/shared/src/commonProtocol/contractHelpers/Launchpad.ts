@@ -53,6 +53,7 @@ export const sellToken = async (
   tokenAddress: string,
   amount: number,
   walletAddress: string,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   tokenContract: any,
 ) => {
   await tokenContract.methods
@@ -74,7 +75,7 @@ export const getPrice = async (
   isBuy: boolean,
 ) => {
   const price = await contract.methods.getPrice(tokenAddress, amountIn, isBuy);
-  return price;
+  return price.call();
 };
 
 export const getAmountIn = async (

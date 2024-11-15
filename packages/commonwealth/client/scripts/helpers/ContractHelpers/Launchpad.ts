@@ -111,14 +111,18 @@ class LaunchpadBondingCurve extends ContractBase {
     return txReceipt;
   }
 
-  async getAmountOut(amountIn: number, buy: boolean) {
+  async getAmountOut(amountIn: number, buy: boolean, chainId: string) {
+    if (!this.initialized || !this.walletEnabled) {
+      await this.initialize(true, chainId);
+    }
+
     const amountOut = await getPrice(
-      this.contractAddress,
+      this.contract,
       this.tokenAddress,
       amountIn,
       buy,
     );
-    return Number(amountOut / 1e18);
+    return Number(amountOut) / 1e18;
   }
 }
 
