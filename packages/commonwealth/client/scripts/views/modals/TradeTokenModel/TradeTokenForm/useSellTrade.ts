@@ -1,10 +1,14 @@
+import {
+  useSellTokenMutation,
+  useTokenEthExchangeRateQuery,
+} from 'client/scripts/state/api/launchPad';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { useState } from 'react';
-import useSellTokenMutation from 'state/api/launchPad/sellToken';
 import {
   useCreateTokenTradeMutation,
   useGetERC20BalanceQuery,
 } from 'state/api/tokens';
+import { useDebounce } from 'usehooks-ts';
 import { UseSellTradeProps } from './types';
 
 const useSellTrade = ({
@@ -18,6 +22,10 @@ const useSellTrade = ({
   const [tokenSellAmountString, setTokenSellAmountString] =
     useState<string>(`0`); // can be fractional
   const tokenSellAmountDecimals = parseFloat(tokenSellAmountString) || 0;
+  const debouncedTokenSellAmountDecimals = useDebounce<number>(
+    tokenSellAmountDecimals,
+    500,
+  );
 
   const { mutateAsync: createTokenTrade, isLoading: isCreatingTokenTrade } =
     useCreateTokenTradeMutation();
@@ -32,6 +40,39 @@ const useSellTrade = ({
     nodeRpc: tokenCommunity?.ChainNode?.url || '',
     tokenAddress: tradeConfig.token.token_address,
     userAddress: selectedAddress || '',
+  });
+
+  const {
+    data: tokenEthSellExchangeRate = 0,
+    error: tokenEthSellExchangeRateError,
+    isLoading: isLoadingTokenEthSellExchangeRate,
+  } = useTokenEthExchangeRateQuery({
+    chainRpc: chainNode.url,
+    ethChainId: chainNode.ethChainId || 0,
+    mode: 'sell',
+    tokenAmount: debouncedTokenSellAmountDecimals * 1e18, // convert to wei
+    tokenAddress: tradeConfig.token.token_address,
+    enabled: !!(
+      chainNode?.url &&
+      chainNode?.ethChainId &&
+      selectedAddress &&
+      tokenCommunity &&
+      debouncedTokenSellAmountDecimals > 0
+    ),
+  });
+
+  // TODO: remove
+  console.log('exchange rate =>', {
+    payload: {
+      chainRpc: chainNode.url,
+      ethChainId: chainNode.ethChainId || 0,
+      mode: 'sell',
+      tokenAmount: debouncedTokenSellAmountDecimals * 1e18, // convert to wei
+      tokenAddress: tradeConfig.token.token_address,
+    },
+    tokenEthSellExchangeRate,
+    tokenEthSellExchangeRateError,
+    isLoadingTokenEthSellExchangeRate,
   });
 
   const onTokenSellAmountChange = (
