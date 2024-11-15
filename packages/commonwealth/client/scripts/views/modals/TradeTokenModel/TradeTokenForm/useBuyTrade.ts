@@ -19,7 +19,7 @@ const useBuyTrade = ({
   onTradeComplete,
 }: UseBuyTradeProps) => {
   const user = useUserStore();
-  const [baseCurrencyBuyAmount, setBaseCurrencyBuyAmount] = useState<number>(0);
+  const [baseCurrencyBuyAmount, setBaseCurrencyBuyAmount] = useState<number>(0); // can be fractional
 
   const { linkSpecificAddressToSpecificCommunity } = useJoinCommunity();
 
@@ -136,7 +136,7 @@ const useBuyTrade = ({
           name: tradeConfig.currency, // USD/GBP etc
           amount: baseCurrencyBuyAmount,
           onAmountChange: onBaseCurrencyBuyAmountChange,
-          presetAmounts: tradeConfig.presetAmounts,
+          presetAmounts: tradeConfig.buyTokenPresetAmounts,
           unitEthExchangeRate: ethToCurrencyRate,
           toEth: ethBuyAmount,
         },

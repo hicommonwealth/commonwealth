@@ -23,7 +23,7 @@ export type TradingConfig = {
 export type UseTradeTokenFormProps = {
   tradeConfig: TradingConfig & {
     currency: SupportedCurrencies;
-    presetAmounts?: number[];
+    buyTokenPresetAmounts?: number[];
   };
   addressType?: ChainBase;
   onTradeComplete?: () => void;
@@ -35,6 +35,8 @@ export type UseBuyTradeProps = UseTradeTokenFormProps & {
   selectedAddress?: string;
   commonFeePercentage: number;
 };
+
+export type UseSellTradeProps = UseBuyTradeProps;
 
 export type TradeTokenFormProps = ReturnType<typeof useTradeTokenForm>;
 

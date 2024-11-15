@@ -32,7 +32,7 @@ const TradeTokenModal = ({
       tradeConfig: {
         ...tradeConfig,
         currency: TRADING_CURRENCY,
-        presetAmounts: [100, 300, 1000],
+        buyTokenPresetAmounts: [100, 300, 1000],
       },
       addressType: tradeConfig.addressType,
       onTradeComplete: () => onModalClose?.(),
