@@ -120,10 +120,11 @@ const useSellTrade = ({
 
   // flag to indicate if something is ongoing
   const isSellActionPending =
-    isLoadingUserTokenBalance ||
-    isSellingToken ||
-    isCreatingTokenTrade ||
-    isLoadingUnitTokenToEthSellExchangeRate;
+    enabled &&
+    (isLoadingUserTokenBalance ||
+      isSellingToken ||
+      isCreatingTokenTrade ||
+      isLoadingUnitTokenToEthSellExchangeRate);
 
   return {
     // Note: not exporting state setters directly, all "sell token" business logic should be done in this hook

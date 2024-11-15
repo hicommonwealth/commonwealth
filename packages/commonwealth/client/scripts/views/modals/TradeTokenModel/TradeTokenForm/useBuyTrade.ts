@@ -150,11 +150,12 @@ const useBuyTrade = ({
 
   // flag to indicate if something is ongoing
   const isBuyActionPending =
-    isLoadingUserEthBalance ||
-    isBuyingToken ||
-    isLoadingETHToCurrencyRate ||
-    isCreatingTokenTrade ||
-    isLoadingUnitEthToTokenBuyExchangeRate;
+    enabled &&
+    (isLoadingUserEthBalance ||
+      isBuyingToken ||
+      isLoadingETHToCurrencyRate ||
+      isCreatingTokenTrade ||
+      isLoadingUnitEthToTokenBuyExchangeRate);
 
   return {
     // Note: not exporting state setters directly, all "buy token" business logic should be done in this hook
