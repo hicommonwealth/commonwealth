@@ -11,7 +11,7 @@ import {
 import { useCreateTokenTradeMutation } from 'state/api/tokens';
 import useUserStore from 'state/ui/user';
 import useJoinCommunity from 'views/components/SublayoutHeader/useJoinCommunity';
-import { UseBuyTradeProps } from './types';
+import { TokenPresetAmounts, UseBuyTradeProps } from './types';
 
 const useBuyTrade = ({
   enabled,
@@ -79,10 +79,12 @@ const useBuyTrade = ({
     useCreateTokenTradeMutation();
 
   const onBaseCurrencyBuyAmountChange = (
-    change: React.ChangeEvent<HTMLInputElement> | number,
+    change: React.ChangeEvent<HTMLInputElement> | TokenPresetAmounts,
   ) => {
     if (typeof change == 'number') {
       setBaseCurrencyBuyAmountString(`${change}`);
+    } else if (typeof change == 'string') {
+      // not handling string type preset amounts atm
     } else {
       const value = change.target.value;
 

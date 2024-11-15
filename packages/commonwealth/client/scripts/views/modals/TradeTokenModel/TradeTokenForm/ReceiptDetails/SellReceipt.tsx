@@ -30,7 +30,7 @@ const SellReceipt = ({ trading }: ReceiptDetailsProps) => {
       </div>
       <div className="entry">
         <CWText type="caption">
-          Common&apos;s Platform Fee ({invest.commonPlatformFee.percentage})
+          Fee ({invest.commonPlatformFee.percentage})
         </CWText>
         <CWText type="caption">{invest.commonPlatformFee.eth} ETH</CWText>
       </div>

@@ -53,7 +53,7 @@ const BuyAmountSelection = ({ trading }: BuyAmountSelectionProps) => {
                 key={presetAmount}
                 type="amount"
                 label={getAmountWithCurrencySymbol(
-                  presetAmount,
+                  presetAmount as number,
                   baseCurrencyName,
                 )}
                 onClick={() =>

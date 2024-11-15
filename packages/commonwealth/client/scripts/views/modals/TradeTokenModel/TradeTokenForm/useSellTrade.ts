@@ -8,7 +8,7 @@ import {
   useCreateTokenTradeMutation,
   useGetERC20BalanceQuery,
 } from 'state/api/tokens';
-import { UseSellTradeProps } from './types';
+import { TokenPresetAmounts, UseSellTradeProps } from './types';
 
 const useSellTrade = ({
   enabled,
@@ -63,13 +63,21 @@ const useSellTrade = ({
     (commonFeePercentage / 100) * ethSellAmount;
 
   const onTokenSellAmountChange = (
-    change: React.ChangeEvent<HTMLInputElement>,
+    change: React.ChangeEvent<HTMLInputElement> | TokenPresetAmounts,
   ) => {
-    const value = change.target.value;
+    if (typeof change == 'number') {
+      // not handling number type preset amounts atm
+    } else if (typeof change == 'string') {
+      if (change === 'Max') {
+        setTokenSellAmountString(selectedAddressTokenBalance);
+      }
+    } else {
+      const value = change.target.value;
 
-    if (value === '') setTokenSellAmountString(`0`);
-    // verify only numbers with decimal (optional) are present
-    else if (/^\d*\.?\d*$/.test(value)) setTokenSellAmountString(value);
+      if (value === '') setTokenSellAmountString(`0`);
+      // verify only numbers with decimal (optional) are present
+      else if (/^\d*\.?\d*$/.test(value)) setTokenSellAmountString(value);
+    }
   };
 
   const handleTokenSell = async () => {
@@ -125,6 +133,7 @@ const useSellTrade = ({
         baseToken: {
           amount: tokenSellAmountString,
           onAmountChange: onTokenSellAmountChange,
+          presetAmounts: tradeConfig.sellTokenPresetAmounts,
           unitEthExchangeRate: unitTokenToEthSellExchangeRate,
           toEth: ethSellAmount,
         },

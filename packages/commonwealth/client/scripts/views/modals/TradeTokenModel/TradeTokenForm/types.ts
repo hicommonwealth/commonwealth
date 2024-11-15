@@ -20,10 +20,13 @@ export type TradingConfig = {
   addressType: ChainBase;
 };
 
+export type TokenPresetAmounts = number | 'Max';
+
 export type UseTradeTokenFormProps = {
   tradeConfig: TradingConfig & {
     currency: SupportedCurrencies;
-    buyTokenPresetAmounts?: number[];
+    buyTokenPresetAmounts?: TokenPresetAmounts[];
+    sellTokenPresetAmounts?: TokenPresetAmounts[]; // we could also do 25%, 50% etc
   };
   addressType?: ChainBase;
   onTradeComplete?: () => void;
