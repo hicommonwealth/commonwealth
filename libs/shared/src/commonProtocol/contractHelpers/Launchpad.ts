@@ -23,7 +23,7 @@ export const launchToken = async (
       tokenCommunityManager,
       connectorWeight,
     )
-    .send({ from: walletAddress, value: 0.00000011e18 });
+    .send({ from: walletAddress, value: 4.167e8 });
   return txReceipt;
 };
 
