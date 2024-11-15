@@ -3,8 +3,11 @@ import { Token } from '../entities';
 import { PaginatedResultSchema, PaginationParamsSchema } from './pagination';
 
 export const TokenView = Token.extend({
+  community_id: z.string(),
   initial_supply: z.string(),
   launchpad_liquidity: z.string(),
+  latest_price: z.string().nullish(),
+  old_price: z.string().nullish(),
 });
 
 export const GetTokens = {
@@ -14,10 +17,6 @@ export const GetTokens = {
     with_stats: z.boolean().optional(),
   }),
   output: PaginatedResultSchema.extend({
-    results: TokenView.extend({
-      community_id: z.string(),
-      latest_price: z.string().optional(),
-      old_price: z.string().optional(),
-    }).array(),
+    results: TokenView.array(),
   }),
 };
