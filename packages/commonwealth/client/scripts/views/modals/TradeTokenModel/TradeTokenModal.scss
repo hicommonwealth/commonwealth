@@ -1,6 +1,8 @@
 @import '../../../../styles/shared.scss';
 
 .TradeTokenModal {
+  overflow-y: scroll;
+
   .token-info {
     display: flex;
     align-items: center;
