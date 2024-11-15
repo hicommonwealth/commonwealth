@@ -22,10 +22,13 @@ import {
   addActivePlugin$,
   addComposerChild$,
   addExportVisitor$,
+  addImportVisitor$,
   addLexicalNode$,
+  addToMarkdownExtension$,
   realmPlugin,
 } from 'commonwealth-mdxeditor';
 import { MentionLexicalExportVisitor } from 'views/components/MarkdownEditor/plugins/MentionLexicalExportVisitor';
+import { MentionMdastImportVisitor } from 'views/components/MarkdownEditor/plugins/MentionMdastImportVisitor';
 import { $createMentionNode, MentionNode } from './MentionNode';
 
 const PUNCTUATION =
@@ -704,6 +707,41 @@ export function NewMentionsPlugin(): JSX.Element | null {
   );
 }
 
+/**
+ * Create an extension for `mdast-util-to-markdown` to enable directives in
+ * markdown.
+ *
+ * @returns {ToMarkdownExtension}
+ *   Extension for `mdast-util-to-markdown` to enable directives.
+ */
+export function mentionToMarkdown() {
+  console.log('FIXME: mentionToMarkdown');
+  return {
+    unsafe: [
+      {
+        character: '\r',
+        inConstruct: ['leafDirectiveLabel', 'containerDirectiveLabel'],
+      },
+      {
+        character: '\n',
+        inConstruct: ['leafDirectiveLabel', 'containerDirectiveLabel'],
+      },
+      {
+        before: '[^:]',
+        character: ':',
+        after: '[A-Za-z]',
+        inConstruct: ['phrasing'],
+      },
+      { atBreak: true, character: ':', after: ':' },
+    ],
+    handlers: {
+      // containerDirective: handleDirective,
+      // leafDirective: handleDirective,
+      // textDirective: handleDirective
+    },
+  };
+}
+
 export const mentionsPlugin = realmPlugin<{}>({
   update: (realm, params) => {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
@@ -713,9 +751,11 @@ export const mentionsPlugin = realmPlugin<{}>({
   init: (realm, params) => {
     realm.pubIn({
       [addActivePlugin$]: 'mention',
+      [addImportVisitor$]: MentionMdastImportVisitor,
       [addLexicalNode$]: MentionNode,
       [addExportVisitor$]: MentionLexicalExportVisitor,
-      // [addToMarkdownExtension$]: directiveToMarkdown()
+      // FIXME: I think this is the one I need now...
+      [addToMarkdownExtension$]: mentionToMarkdown(),
       [addComposerChild$]: () => (
         <>
           <NewMentionsPlugin />

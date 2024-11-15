@@ -11,8 +11,8 @@ export const MentionLexicalExportVisitor: LexicalExportVisitor<
 > = {
   testLexicalNode: $isMentionNode,
   visitLexicalNode: ({ lexicalNode, actions }) => {
-    console.log('FIXME: visitLexicalNode');
-    actions.addAndStepInto('link', {
+    console.log('FIXME: MentionLexicalExportVisitor.visitLexicalNode');
+    actions.addAndStepInto('mention', {
       url: 'http://example.com#mention',
       title: 'FIXME title',
     });

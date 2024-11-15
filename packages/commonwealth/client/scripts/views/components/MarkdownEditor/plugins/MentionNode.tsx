@@ -74,8 +74,8 @@ export class MentionNode extends TextNode {
     console.log('FIXME exportJSON');
     return {
       ...super.exportJSON(),
-      mentionName: this.__mention,
       type: 'mention',
+      mentionName: this.__mention,
       version: 1,
     };
   }
