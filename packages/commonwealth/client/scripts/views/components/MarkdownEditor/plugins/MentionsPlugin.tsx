@@ -18,7 +18,12 @@ import * as React from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import * as ReactDOM from 'react-dom';
 
-import { $createMentionNode } from './MentionNode';
+import {
+  addComposerChild$,
+  addLexicalNode$,
+  realmPlugin,
+} from 'commonwealth-mdxeditor';
+import { $createMentionNode, MentionNode } from './MentionNode';
 
 const PUNCTUATION =
   '\\.,\\+\\*\\?\\$\\@\\|#{}\\(\\)\\^\\-\\[\\]\\\\/!%\'"~=<>_:;';
@@ -606,7 +611,7 @@ const MentionsTypeaheadMenuItem = ({
   );
 };
 
-export default function NewMentionsPlugin(): JSX.Element | null {
+export function NewMentionsPlugin(): JSX.Element | null {
   const [editor] = useLexicalComposerContext();
 
   const [queryString, setQueryString] = useState<string | null>(null);
@@ -695,3 +700,29 @@ export default function NewMentionsPlugin(): JSX.Element | null {
     />
   );
 }
+
+export const mentionsPlugin = realmPlugin<{}>({
+  update: (realm, params) => {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    // realm.pub(directiveDescriptors$, params?.directiveDescriptors ?? [])
+  },
+
+  init: (realm, params) => {
+    realm.pubIn({
+      // [directiveDescriptors$]: params?.directiveDescriptors ?? [],
+      // // import
+      // [addMdastExtension$]: directiveFromMarkdown(),
+      // [addSyntaxExtension$]: directive(),
+      // [addImportVisitor$]: MdastDirectiveVisitor,
+      // // export
+      [addLexicalNode$]: MentionNode,
+      // [addExportVisitor$]: DirectiveVisitor,
+      // [addToMarkdownExtension$]: directiveToMarkdown()
+      [addComposerChild$]: () => (
+        <>
+          <NewMentionsPlugin />
+        </>
+      ),
+    });
+  },
+});

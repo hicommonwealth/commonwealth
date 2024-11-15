@@ -31,6 +31,7 @@ import React, {
 import { TooltipIndicator } from 'views/components/MarkdownEditor/indicators/TooltipIndicator';
 import { MarkdownEditorModeContext } from 'views/components/MarkdownEditor/MarkdownEditorModeContext';
 import { NullComponent } from 'views/components/MarkdownEditor/NullComponent';
+import { mentionsPlugin } from 'views/components/MarkdownEditor/plugins/MentionsPlugin';
 import { useDeviceProfile } from 'views/components/MarkdownEditor/useDeviceProfile';
 import { MarkdownEditorMethods } from 'views/components/MarkdownEditor/useMarkdownEditorMethods';
 import { useMobileKeyboardResizeHandler } from 'views/components/MarkdownEditor/useMobileKeyboardResizeHandler';
@@ -401,6 +402,7 @@ export const MarkdownEditor = memo(function MarkdownEditor(
                   diffMarkdown: 'boo',
                 }),
                 markdownShortcutPlugin(),
+                mentionsPlugin(),
               ]}
             />
 
