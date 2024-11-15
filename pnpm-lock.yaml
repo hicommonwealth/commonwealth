@@ -1412,6 +1412,9 @@ importers:
       '@types/express':
         specifier: ^4.17.21
         version: 4.17.21
+      '@types/mdast':
+        specifier: ^4.0.0
+        version: 4.0.4
       '@types/moment':
         specifier: ^2.13.0
         version: 2.13.0

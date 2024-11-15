@@ -19,10 +19,13 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import * as ReactDOM from 'react-dom';
 
 import {
+  addActivePlugin$,
   addComposerChild$,
+  addExportVisitor$,
   addLexicalNode$,
   realmPlugin,
 } from 'commonwealth-mdxeditor';
+import { MentionVisitor } from 'views/components/MarkdownEditor/plugins/MentionVisitor';
 import { $createMentionNode, MentionNode } from './MentionNode';
 
 const PUNCTUATION =
@@ -709,14 +712,9 @@ export const mentionsPlugin = realmPlugin<{}>({
 
   init: (realm, params) => {
     realm.pubIn({
-      // [directiveDescriptors$]: params?.directiveDescriptors ?? [],
-      // // import
-      // [addMdastExtension$]: directiveFromMarkdown(),
-      // [addSyntaxExtension$]: directive(),
-      // [addImportVisitor$]: MdastDirectiveVisitor,
-      // // export
+      [addActivePlugin$]: 'mention',
       [addLexicalNode$]: MentionNode,
-      // [addExportVisitor$]: DirectiveVisitor,
+      [addExportVisitor$]: MentionVisitor,
       // [addToMarkdownExtension$]: directiveToMarkdown()
       [addComposerChild$]: () => (
         <>

@@ -12,7 +12,6 @@ import {
   type DOMConversionMap,
   type DOMConversionOutput,
   type DOMExportOutput,
-  type EditorConfig,
   type LexicalNode,
   type NodeKey,
   type SerializedTextNode,
@@ -29,6 +28,8 @@ export type SerializedMentionNode = Spread<
 function $convertMentionElement(
   domNode: HTMLElement,
 ): DOMConversionOutput | null {
+  console.log('FIXME $convertMentionElement');
+
   const textContent = domNode.textContent;
 
   if (textContent !== null) {
@@ -41,18 +42,25 @@ function $convertMentionElement(
   return null;
 }
 
-const mentionStyle = 'background-color: rgba(24, 119, 232, 0.2)';
 export class MentionNode extends TextNode {
   __mention: string;
+
+  constructor(mentionName: string, text?: string, key?: NodeKey) {
+    super(text ?? mentionName, key);
+    this.__mention = mentionName;
+  }
 
   static getType(): string {
     return 'mention';
   }
 
   static clone(node: MentionNode): MentionNode {
+    console.log('FIXME clone');
     return new MentionNode(node.__mention, node.__text, node.__key);
   }
   static importJSON(serializedNode: SerializedMentionNode): MentionNode {
+    console.log('FIXME importJSON');
+
     const node = $createMentionNode(serializedNode.mentionName);
     node.setTextContent(serializedNode.text);
     node.setFormat(serializedNode.format);
@@ -62,12 +70,8 @@ export class MentionNode extends TextNode {
     return node;
   }
 
-  constructor(mentionName: string, text?: string, key?: NodeKey) {
-    super(text ?? mentionName, key);
-    this.__mention = mentionName;
-  }
-
   exportJSON(): SerializedMentionNode {
+    console.log('FIXME exportJSON');
     return {
       ...super.exportJSON(),
       mentionName: this.__mention,
@@ -76,23 +80,31 @@ export class MentionNode extends TextNode {
     };
   }
 
-  createDOM(config: EditorConfig): HTMLElement {
-    const dom = super.createDOM(config);
-    dom.style.cssText = mentionStyle;
-    dom.className = 'mention';
+  createDOM(): HTMLElement {
+    console.log('FIXME createDOM');
+
+    // FIXME: if I type a space after it goes a way and is replaced with text
+    // FIXME: the export is only in markdown format!
+
+    const dom = document.createElement('a');
+    dom.setAttribute('data-lexical-mention', 'true');
+    dom.textContent = '@' + this.__text;
     return dom;
   }
 
   exportDOM(): DOMExportOutput {
-    const element = document.createElement('span');
+    console.log('FIXME exportDOM');
+
+    const element = document.createElement('a');
     element.setAttribute('data-lexical-mention', 'true');
-    element.textContent = this.__text;
+    element.textContent = '@' + this.__text;
     return { element };
   }
 
   static importDOM(): DOMConversionMap | null {
+    console.log('FIXME importDOM');
     return {
-      span: (domNode: HTMLElement) => {
+      a: (domNode: HTMLElement) => {
         if (!domNode.hasAttribute('data-lexical-mention')) {
           return null;
         }
@@ -118,6 +130,8 @@ export class MentionNode extends TextNode {
 }
 
 export function $createMentionNode(mentionName: string): MentionNode {
+  console.log('FIXME $createMentionNode');
+
   const mentionNode = new MentionNode(mentionName);
   mentionNode.setMode('segmented').toggleDirectionless();
   return $applyNodeReplacement(mentionNode);
@@ -126,5 +140,7 @@ export function $createMentionNode(mentionName: string): MentionNode {
 export function $isMentionNode(
   node: LexicalNode | null | undefined,
 ): node is MentionNode {
+  console.log('FIXME $isMentionNode');
+
   return node instanceof MentionNode;
 }

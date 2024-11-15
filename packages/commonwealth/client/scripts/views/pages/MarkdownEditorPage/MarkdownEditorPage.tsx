@@ -60,6 +60,7 @@ const Inner = (props: Pick<MarkdownEditorProps, 'mode'>) => {
         markdown={`${overview}\n${supported}`}
         imageHandler="local"
         SubmitButton={SubmitButton}
+        autoFocus={true}
       />
     </>
   );
