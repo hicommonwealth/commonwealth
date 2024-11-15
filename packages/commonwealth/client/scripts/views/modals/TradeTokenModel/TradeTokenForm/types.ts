@@ -30,6 +30,7 @@ export type UseTradeTokenFormProps = {
 };
 
 export type UseBuyTradeProps = UseTradeTokenFormProps & {
+  enabled: boolean;
   chainNode: NodeInfo;
   tokenCommunity?: z.infer<typeof ExtendedCommunity>;
   selectedAddress?: string;

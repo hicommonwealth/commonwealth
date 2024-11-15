@@ -72,7 +72,7 @@ export const getPrice = async (
   isBuy: boolean,
 ) => {
   const price = await contract.methods.getPrice(tokenAddress, amountIn, isBuy);
-  return price;
+  return price.call();
 };
 
 export const getAmountIn = async (

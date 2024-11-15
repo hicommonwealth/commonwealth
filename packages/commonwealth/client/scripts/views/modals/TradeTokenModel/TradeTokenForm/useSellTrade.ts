@@ -8,10 +8,10 @@ import {
   useCreateTokenTradeMutation,
   useGetERC20BalanceQuery,
 } from 'state/api/tokens';
-import { useDebounce } from 'usehooks-ts';
 import { UseSellTradeProps } from './types';
 
 const useSellTrade = ({
+  enabled,
   chainNode,
   commonFeePercentage,
   selectedAddress,
@@ -22,10 +22,6 @@ const useSellTrade = ({
   const [tokenSellAmountString, setTokenSellAmountString] =
     useState<string>(`0`); // can be fractional
   const tokenSellAmountDecimals = parseFloat(tokenSellAmountString) || 0;
-  const debouncedTokenSellAmountDecimals = useDebounce<number>(
-    tokenSellAmountDecimals,
-    500,
-  );
 
   const { mutateAsync: createTokenTrade, isLoading: isCreatingTokenTrade } =
     useCreateTokenTradeMutation();
@@ -40,40 +36,31 @@ const useSellTrade = ({
     nodeRpc: tokenCommunity?.ChainNode?.url || '',
     tokenAddress: tradeConfig.token.token_address,
     userAddress: selectedAddress || '',
+    enabled,
   });
 
   const {
-    data: tokenEthSellExchangeRate = 0,
-    error: tokenEthSellExchangeRateError,
-    isLoading: isLoadingTokenEthSellExchangeRate,
+    data: unitTokenToEthSellExchangeRate = 0,
+    isLoading: isLoadingUnitTokenToEthSellExchangeRate,
   } = useTokenEthExchangeRateQuery({
     chainRpc: chainNode.url,
     ethChainId: chainNode.ethChainId || 0,
     mode: 'sell',
-    tokenAmount: debouncedTokenSellAmountDecimals * 1e18, // convert to wei
+    tokenAmount: 1 * 1e18, // convert to wei - get exchange rate of 1 unit token to eth
     tokenAddress: tradeConfig.token.token_address,
     enabled: !!(
       chainNode?.url &&
       chainNode?.ethChainId &&
       selectedAddress &&
       tokenCommunity &&
-      debouncedTokenSellAmountDecimals > 0
+      enabled
     ),
   });
 
-  // TODO: remove
-  console.log('exchange rate =>', {
-    payload: {
-      chainRpc: chainNode.url,
-      ethChainId: chainNode.ethChainId || 0,
-      mode: 'sell',
-      tokenAmount: debouncedTokenSellAmountDecimals * 1e18, // convert to wei
-      tokenAddress: tradeConfig.token.token_address,
-    },
-    tokenEthSellExchangeRate,
-    tokenEthSellExchangeRateError,
-    isLoadingTokenEthSellExchangeRate,
-  });
+  const ethSellAmount =
+    unitTokenToEthSellExchangeRate * tokenSellAmountDecimals;
+  const commonPlatformFeeForSellTradeInEth =
+    (commonFeePercentage / 100) * ethSellAmount;
 
   const onTokenSellAmountChange = (
     change: React.ChangeEvent<HTMLInputElement>,
@@ -125,7 +112,10 @@ const useSellTrade = ({
 
   // flag to indicate if something is ongoing
   const isSellActionPending =
-    isLoadingUserTokenBalance || isSellingToken || isCreatingTokenTrade;
+    isLoadingUserTokenBalance ||
+    isSellingToken ||
+    isCreatingTokenTrade ||
+    isLoadingUnitTokenToEthSellExchangeRate;
 
   return {
     // Note: not exporting state setters directly, all "sell token" business logic should be done in this hook
@@ -135,18 +125,18 @@ const useSellTrade = ({
         baseToken: {
           amount: tokenSellAmountString,
           onAmountChange: onTokenSellAmountChange,
-          unitEthExchangeRate: 100, // TODO: hardcoded for now - blocked token pricing
-          toEth: 100, // TODO: hardcoded for now - blocked token pricing
+          unitEthExchangeRate: unitTokenToEthSellExchangeRate,
+          toEth: ethSellAmount,
         },
         insufficientFunds:
           tokenSellAmountDecimals > parseFloat(selectedAddressTokenBalance),
         commonPlatformFee: {
           percentage: `${commonFeePercentage}%`,
-          eth: 100, // TODO: hardcoded for now - blocked token pricing
+          eth: commonPlatformFeeForSellTradeInEth,
         },
       },
       gain: {
-        eth: 100, // TODO: hardcoded for now - blocked token pricing
+        eth: ethSellAmount - commonPlatformFeeForSellTradeInEth,
       },
     },
     selectedAddressTokenBalance: {

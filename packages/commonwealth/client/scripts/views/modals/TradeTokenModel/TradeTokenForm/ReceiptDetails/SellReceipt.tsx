@@ -12,7 +12,10 @@ const SellReceipt = ({ trading }: ReceiptDetailsProps) => {
       <div className="entry">
         <CWText type="caption">{baseTokenSymbol} to ETH rate</CWText>
         <CWText type="caption">
-          {invest.baseToken.unitEthExchangeRate} {baseTokenSymbol} = 1 ETH
+          {/* if the token value is in 10 ^ -1 or greater it is displayed
+          as such, a fixed string here avoids those secnarios */}
+          {invest.baseToken.unitEthExchangeRate.toFixed(18)} {baseTokenSymbol} =
+          1 ETH
         </CWText>
       </div>
       <div className="entry">
