@@ -14,6 +14,7 @@ import {
 import React from 'react';
 // eslint-disable-next-line max-len
 import { CustomLinkDialogForDesktop } from 'views/components/MarkdownEditor/customLinkDialog/CustomLinkDialogForDesktop';
+import { DebugEditorState } from 'views/components/MarkdownEditor/DebugEditorState';
 import { CreateLinkButton } from 'views/components/MarkdownEditor/toolbars/CreateLinkButton';
 import { FormatButton } from 'views/components/MarkdownEditor/toolbars/FormatButton';
 import { HeadingButton } from 'views/components/MarkdownEditor/toolbars/HeadingButton';
@@ -89,6 +90,8 @@ export const ToolbarForDesktop = (props: ToolbarForDesktopProps) => {
                     <HeadingButton blockType="quote" />
                     <TableButton />
                   </div>
+
+                  <DebugEditorState />
                 </>
               ),
             },
