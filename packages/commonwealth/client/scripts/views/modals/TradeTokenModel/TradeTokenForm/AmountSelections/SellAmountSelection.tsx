@@ -11,7 +11,7 @@ const SellAmountSelection = ({ trading }: SellAmountSelectionProps) => {
       <div className="amount-input-with-currency-symbol">
         <CWTextInput
           containerClassName="amount-input"
-          placeholder={`0 ${trading.token.symbol}`}
+          placeholder="0"
           value={trading.amounts.sell.invest.baseToken.amount}
           onInput={(e) =>
             trading.amounts.sell.invest.baseToken.onAmountChange(e)

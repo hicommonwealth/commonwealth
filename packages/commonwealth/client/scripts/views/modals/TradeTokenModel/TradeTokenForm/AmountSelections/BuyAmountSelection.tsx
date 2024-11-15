@@ -28,7 +28,7 @@ const BuyAmountSelection = ({ trading }: BuyAmountSelectionProps) => {
           buyAmountCurrenySymbol}
         <CWTextInput
           containerClassName="amount-input"
-          placeholder={getAmountWithCurrencySymbol(0, baseCurrencyName)}
+          placeholder="0"
           value={trading.amounts.buy.invest.baseCurrency.amount}
           onInput={(e) =>
             trading.amounts.buy.invest.baseCurrency.onAmountChange(e)
