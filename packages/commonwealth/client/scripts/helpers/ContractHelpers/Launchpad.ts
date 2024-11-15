@@ -7,6 +7,7 @@ import {
   sellToken,
   transferLiquidity,
 } from '../../../../../../libs/shared/src/commonProtocol';
+import { Erc20Abi } from './Abi/ERC20Abi';
 import { LpBondingCurve } from './Abi/LpBondingCurveAbi';
 import ContractBase from './ContractBase';
 import { LaunchpadFactory } from './LaunchpadFactoryAbi';
@@ -83,12 +84,16 @@ class LaunchpadBondingCurve extends ContractBase {
     if (!this.initialized || !this.walletEnabled) {
       await this.initialize(true, chainId);
     }
-
+    const tokenContract = new this.web3.eth.Contract(
+      Erc20Abi as AbiItem[],
+      this.tokenAddress,
+    );
     const txReceipt = await sellToken(
       this.contract,
       this.tokenAddress,
       amountSell,
       walletAddress,
+      tokenContract,
     );
     return txReceipt;
   }
