@@ -53,6 +53,7 @@ export const sellToken = async (
   tokenAddress: string,
   amount: number,
   walletAddress: string,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   tokenContract: any,
 ) => {
   await tokenContract.methods.approve(tokenAddress, BigInt(amount)).send({
