@@ -4,13 +4,17 @@ import {
   useFetchTokenUsdRateQuery,
   useGetUserEthBalanceQuery,
 } from 'state/api/communityStake';
-import { useBuyTokenMutation } from 'state/api/launchPad';
+import {
+  useBuyTokenMutation,
+  useTokenEthExchangeRateQuery,
+} from 'state/api/launchPad';
 import { useCreateTokenTradeMutation } from 'state/api/tokens';
 import useUserStore from 'state/ui/user';
 import useJoinCommunity from 'views/components/SublayoutHeader/useJoinCommunity';
 import { UseBuyTradeProps } from './types';
 
 const useBuyTrade = ({
+  enabled,
   tradeConfig,
   chainNode,
   tokenCommunity,
@@ -29,6 +33,7 @@ const useBuyTrade = ({
   const { data: ethToCurrencyRateData, isLoading: isLoadingETHToCurrencyRate } =
     useFetchTokenUsdRateQuery({
       tokenSymbol: 'ETH',
+      enabled,
     });
   const ethToCurrencyRate = parseFloat(
     ethToCurrencyRateData?.data?.data?.amount || '0.00',
@@ -46,7 +51,25 @@ const useBuyTrade = ({
     chainRpc: tokenCommunity?.ChainNode?.url || '',
     ethChainId: tokenCommunity?.ChainNode?.eth_chain_id || 0,
     walletAddress: selectedAddress || '',
-    apiEnabled: !!(selectedAddress && tokenCommunity),
+    apiEnabled: !!(selectedAddress && tokenCommunity && enabled),
+  });
+
+  const {
+    data: unitEthToTokenBuyExchangeRate = 0,
+    isLoading: isLoadingUnitEthToTokenBuyExchangeRate,
+  } = useTokenEthExchangeRateQuery({
+    chainRpc: chainNode.url,
+    ethChainId: chainNode.ethChainId || 0,
+    mode: 'buy',
+    tokenAmount: 1 * 1e18, // convert to wei - get exchange rate of 1 unit token to eth
+    tokenAddress: tradeConfig.token.token_address,
+    enabled: !!(
+      chainNode?.url &&
+      chainNode?.ethChainId &&
+      selectedAddress &&
+      tokenCommunity &&
+      enabled
+    ),
   });
 
   const { mutateAsync: buyToken, isLoading: isBuyingToken } =
@@ -128,7 +151,8 @@ const useBuyTrade = ({
     isLoadingUserEthBalance ||
     isBuyingToken ||
     isLoadingETHToCurrencyRate ||
-    isCreatingTokenTrade;
+    isCreatingTokenTrade ||
+    isLoadingUnitEthToTokenBuyExchangeRate;
 
   return {
     // Note: not exporting state setters directly, all "buy token" business logic should be done in this hook
@@ -149,7 +173,9 @@ const useBuyTrade = ({
         },
       },
       gain: {
-        token: 100, // TODO: hardcoded for now - blocked token pricing
+        token:
+          unitEthToTokenBuyExchangeRate *
+          (ethBuyAmount - commonPlatformFeeForBuyTradeInEth),
       },
     },
     selectedAddressEthBalance: {

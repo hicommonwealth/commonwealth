@@ -88,7 +88,7 @@ const useSellTrade = ({
       const payload = {
         chainRpc: chainNode.url,
         ethChainId: chainNode.ethChainId,
-        amountToken: tokenSellAmountDecimals * 1e18, // amount in wei // TODO: needs fix
+        amountToken: tokenSellAmountDecimals * 1e18, // amount in wei
         walletAddress: selectedAddress,
         tokenAddress: tradeConfig.token.token_address,
       };
