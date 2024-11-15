@@ -347,7 +347,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const editsToSave = localStorage.getItem(
     `${app.activeChainId()}-edit-thread-${thread?.id}-storedText`,
   );
-  const isStageDefault = thread && isDefaultStage(thread.stage);
+  const isStageDefault = thread && isDefaultStage(app, thread.stage);
 
   const tabsShouldBePresent =
     showLinkedProposalOptions ||
