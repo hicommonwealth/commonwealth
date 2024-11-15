@@ -1,4 +1,10 @@
 @import '../../../../styles/shared.scss';
 
 .TradeTokenModal {
+  .token-info {
+    display: flex;
+    align-items: center;
+    justify-self: flex-end;
+    gap: 4px;
+  }
 }

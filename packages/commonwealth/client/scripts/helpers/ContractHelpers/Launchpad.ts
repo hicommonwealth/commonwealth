@@ -79,9 +79,9 @@ class LaunchpadBondingCurve extends ContractBase {
     return txReceipt;
   }
 
-  async sellToken(amountSell: number, walletAddress: string) {
+  async sellToken(amountSell: number, walletAddress: string, chainId: string) {
     if (!this.initialized || !this.walletEnabled) {
-      await this.initialize(true);
+      await this.initialize(true, chainId);
     }
 
     const txReceipt = await sellToken(

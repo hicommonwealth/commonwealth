@@ -9,8 +9,12 @@ import {
   useGetUserEthBalanceQuery,
 } from 'state/api/communityStake';
 import { useBuyTokenMutation } from 'state/api/launchPad';
+import useSellTokenMutation from 'state/api/launchPad/sellToken';
 import { fetchCachedNodes } from 'state/api/nodes';
-import { useCreateTokenTradeMutation } from 'state/api/tokens';
+import {
+  useCreateTokenTradeMutation,
+  useGetERC20BalanceQuery,
+} from 'state/api/tokens';
 import useUserStore from 'state/ui/user';
 import useJoinCommunity from 'views/components/SublayoutHeader/useJoinCommunity';
 import './TradeTokenForm.scss';
@@ -23,8 +27,7 @@ const useTradeTokenForm = ({
   addressType,
   onTradeComplete,
 }: UseTradeTokenFormProps) => {
-  const [baseCurrencyTradingAmount, setBaseCurrencyTradingAmount] =
-    useState<number>(0);
+  const [baseCurrencyBuyAmount, setBaseCurrencyBuyAmount] = useState<number>(0);
   const [tradingMode, setTradingMode] = useState<TradingMode>(
     tradeConfig.mode || TradingMode.Buy,
   );
@@ -58,7 +61,7 @@ const useTradeTokenForm = ({
     ethToCurrencyRateData?.data?.data?.amount || '0.00',
   );
 
-  const ethBuyAmount = baseCurrencyTradingAmount / ethToCurrencyRate;
+  const ethBuyAmount = baseCurrencyBuyAmount / ethToCurrencyRate;
   const commonPlatformFeeForBuyTradeInEth =
     (COMMON_PLATFORM_FEE_PERCENTAGE / 100) * ethBuyAmount;
 
@@ -92,18 +95,18 @@ const useTradeTokenForm = ({
   const { mutateAsync: createTokenTrade, isLoading: isCreatingTokenTrade } =
     useCreateTokenTradeMutation();
 
-  const onBaseCurrencyTradingAmountChange = (
+  const onBaseCurrencyBuyAmountChange = (
     change: React.ChangeEvent<HTMLInputElement> | number,
   ) => {
     if (typeof change == 'number') {
-      setBaseCurrencyTradingAmount(change);
+      setBaseCurrencyBuyAmount(change);
     } else {
       const value = change.target.value;
 
-      if (value === '') setBaseCurrencyTradingAmount(0);
+      if (value === '') setBaseCurrencyBuyAmount(0);
       // verify only numbers with decimal (optional) are present
       else if (/^\d+(\.\d+)?$/.test(value))
-        setBaseCurrencyTradingAmount(parseFloat(value));
+        setBaseCurrencyBuyAmount(parseFloat(value));
     }
   };
 
@@ -169,15 +172,80 @@ const useTradeTokenForm = ({
     }
   };
 
+  // sell mode logic start --- {
+  const [tokenSellAmount, setTokenSellAmount] = useState<number>(0); // can be fractional
+
+  const { mutateAsync: sellToken, isLoading: isSellingToken } =
+    useSellTokenMutation();
+
   const handleTokenSell = async () => {
-    // TODO: implement selling logic
+    try {
+      // this condition wouldn't be called, but adding to avoid typescript issues
+      if (
+        !baseNode?.url ||
+        !baseNode?.ethChainId ||
+        !selectedAddress ||
+        !tokenCommunity
+      ) {
+        return;
+      }
+
+      // buy token on chain
+      const payload = {
+        chainRpc: baseNode.url,
+        ethChainId: baseNode.ethChainId,
+        amountToken: tokenSellAmount * 1e18, // amount in wei // TODO
+        walletAddress: selectedAddress,
+        tokenAddress: tradeConfig.token.token_address,
+      };
+      const txReceipt = await sellToken(payload);
+
+      // create token trade on db
+      await createTokenTrade({
+        eth_chain_id: baseNode?.ethChainId,
+        transaction_hash: txReceipt.transactionHash,
+      });
+
+      // update user about success
+      notifySuccess('Transactions successful!');
+
+      onTradeComplete?.();
+    } catch (e) {
+      notifyError('Failed to sell token');
+      console.log('Failed to sell token => ', e);
+    }
   };
+
+  const {
+    data: selectedAddressTokenBalance = `0.0`,
+    isLoading: isLoadingUserTokenBalance,
+  } = useGetERC20BalanceQuery({
+    nodeRpc: tokenCommunity?.ChainNode?.url || '',
+    tokenAddress: tradeConfig.token.token_address,
+    userAddress: selectedAddress || '',
+  });
+
+  const onTokenSellAmountChange = (
+    change: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const value = change.target.value;
+
+    if (value === '')
+      setTokenSellAmount(0); // TODO: fix decimal
+    // verify only numbers with decimal (optional) are present
+    else if (/^\d*(\.\d+)?$/.test(value)) {
+      setTokenSellAmount(parseFloat(value));
+    }
+  };
+  // sell mode logic end --- }
 
   // flag to indicate if something is ongoing
   const isActionPending =
     isLoadingTokenCommunity ||
     isLoadingUserEthBalance ||
     isBuyingToken ||
+    isLoadingUserTokenBalance ||
+    isSellingToken ||
     isLoadingETHToCurrencyRate ||
     isCreatingTokenTrade;
 
@@ -203,26 +271,51 @@ const useTradeTokenForm = ({
     trading: {
       amounts: {
         buy: {
-          eth: ethBuyAmount,
-          token: 100, // TODO: hardcoded for now
-          baseCurrency: {
-            name: tradeConfig.currency, // USD/GBP etc
-            amount: baseCurrencyTradingAmount,
-            onAmountChange: onBaseCurrencyTradingAmountChange,
-            presetAmounts: tradeConfig.presetAmounts,
+          invest: {
+            baseCurrency: {
+              name: tradeConfig.currency, // USD/GBP etc
+              amount: baseCurrencyBuyAmount,
+              onAmountChange: onBaseCurrencyBuyAmountChange,
+              presetAmounts: tradeConfig.presetAmounts,
+              unitEthExchangeRate: ethToCurrencyRate,
+              toEth: ethBuyAmount,
+            },
+            insufficientFunds:
+              ethBuyAmount > parseFloat(selectedAddressEthBalance),
+            commonPlatformFee: {
+              percentage: `${COMMON_PLATFORM_FEE_PERCENTAGE}%`,
+              eth: commonPlatformFeeForBuyTradeInEth,
+            },
           },
-          insufficientFunds:
-            ethBuyAmount > parseFloat(selectedAddressEthBalance),
-          commonPlatformFee: {
-            percentage: `${COMMON_PLATFORM_FEE_PERCENTAGE}%`,
-            eth: commonPlatformFeeForBuyTradeInEth,
+          gain: {
+            token: 100, // TODO: hardcoded for now - blocked token pricing
+          },
+        },
+        sell: {
+          invest: {
+            // not to be confused with "Base" network on ethereum
+            baseToken: {
+              amount: tokenSellAmount,
+              onAmountChange: onTokenSellAmountChange,
+              unitEthExchangeRate: 100, // TODO: hardcoded for now - blocked token pricing
+              toEth: 100, // TODO: hardcoded for now - blocked token pricing
+            },
+            insufficientFunds:
+              tokenSellAmount > parseFloat(selectedAddressTokenBalance),
+            commonPlatformFee: {
+              percentage: `${COMMON_PLATFORM_FEE_PERCENTAGE}%`,
+              eth: 100, // TODO: hardcoded for now - blocked token pricing
+            },
+          },
+          gain: {
+            eth: 100, // TODO: hardcoded for now - blocked token pricing
           },
         },
       },
-      unitEthToBaseCurrencyRate: ethToCurrencyRate,
       mode: { value: tradingMode, onChange: onTradingModeChange },
       token: tradeConfig.token,
     },
+    // TODO: add presets for max amounts?
     addresses: {
       available: userAddresses,
       default: selectedAddress,
@@ -232,6 +325,10 @@ const useTradeTokenForm = ({
           eth: {
             value: selectedAddressEthBalance,
             isLoading: isLoadingUserEthBalance,
+          },
+          selectedToken: {
+            value: selectedAddressTokenBalance,
+            isLoading: isLoadingUserTokenBalance,
           },
         },
         onChange: onChangeSelectedAddress,

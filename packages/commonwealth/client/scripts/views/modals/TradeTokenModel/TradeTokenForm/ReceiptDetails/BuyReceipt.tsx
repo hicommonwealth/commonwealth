@@ -8,7 +8,8 @@ import { ReceiptDetailsProps } from '../types';
 import './ReceiptDetails.scss';
 
 const BuyReceipt = ({ trading }: ReceiptDetailsProps) => {
-  const baseCurrencyName = trading.amounts.buy.baseCurrency.name;
+  const { invest, gain } = trading.amounts.buy;
+  const baseCurrencyName = invest.baseCurrency.name;
   const baseCurrencySymbol = currencyNameToSymbolMap[baseCurrencyName];
   const isLeftSymbolCurrency =
     currencySymbolPlacements.onLeft.includes(baseCurrencyName);
@@ -18,39 +19,36 @@ const BuyReceipt = ({ trading }: ReceiptDetailsProps) => {
   return (
     <div className="ReceiptDetails">
       <div className="entry">
-        <CWText type="caption">ETH to {baseCurrencyName} rate</CWText>
+        <CWText type="caption">{baseCurrencyName} to ETH rate</CWText>
         <CWText type="caption">
-          1 ETH = {isLeftSymbolCurrency ? baseCurrencySymbol : ''}{' '}
-          {trading.unitEthToBaseCurrencyRate}
-          {isRightSymbolCurrency ? baseCurrencySymbol : ''}
+          {isLeftSymbolCurrency ? baseCurrencySymbol : ''}{' '}
+          {invest.baseCurrency.unitEthExchangeRate}
+          {isRightSymbolCurrency ? baseCurrencySymbol : ''} = 1 ETH
         </CWText>
       </div>
       <div className="entry">
         <CWText type="caption">Amount invested ({baseCurrencyName})</CWText>
         <CWText type="caption">
           {isLeftSymbolCurrency ? baseCurrencySymbol : ''}{' '}
-          {trading.amounts.buy.baseCurrency.amount}
+          {invest.baseCurrency.amount}
           {isRightSymbolCurrency ? baseCurrencySymbol : ''}
         </CWText>
       </div>
       <div className="entry">
         <CWText type="caption">ETH bought from invested amount</CWText>
-        <CWText type="caption">{trading.amounts.buy.eth} ETH</CWText>
+        <CWText type="caption">{invest.baseCurrency.toEth} ETH</CWText>
       </div>
       <div className="entry">
         <CWText type="caption">
-          Common&apos;s Platform Fee (
-          {trading.amounts.buy.commonPlatformFee.percentage})
+          Common&apos;s Platform Fee ({invest.commonPlatformFee.percentage})
         </CWText>
-        <CWText type="caption">
-          {trading.amounts.buy.commonPlatformFee.eth} ETH
-        </CWText>
+        <CWText type="caption">{invest.commonPlatformFee.eth} ETH</CWText>
       </div>
       <div className="entry">
         <CWText type="caption">Remaining ETH to tokens</CWText>
         <CWText type="caption">
-          {trading.amounts.buy.eth - trading.amounts.buy.commonPlatformFee.eth}{' '}
-          ETH = {trading.amounts.buy.token} {trading.token.symbol}
+          {invest.baseCurrency.toEth - invest.commonPlatformFee.eth} ETH ={' '}
+          {gain.token} {trading.token.symbol}
         </CWText>
       </div>
     </div>

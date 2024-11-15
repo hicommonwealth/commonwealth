@@ -1,11 +1,13 @@
 import { SupportedCurrencies } from 'helpers/currency';
 import React from 'react';
+import { CWText } from '../../components/component_kit/cw_text';
 import {
   CWModal,
   CWModalBody,
   CWModalFooter,
   CWModalHeader,
 } from '../../components/component_kit/new_designs/CWModal';
+import TokenIcon from './TokenIcon';
 import TradeTokenForm, {
   TradingConfig,
   useTradeTokenForm,
@@ -42,11 +44,18 @@ const TradeTokenModal = ({
       open={isOpen}
       onClose={() => onModalClose?.()}
       size="medium"
-      className="AuthModal"
+      className="TradeTokenModal"
       content={
         <>
           <CWModalHeader
-            label={`Trade Token - ${tradeConfig.token.symbol}`}
+            label={
+              <CWText type="h4" className="token-info">
+                Trade Token - {tradeConfig.token.symbol}{' '}
+                {trading.token.icon_url && (
+                  <TokenIcon size="large" url={trading.token.icon_url} />
+                )}
+              </CWText>
+            }
             onModalClose={() => onModalClose?.()}
           />
           <CWModalBody>

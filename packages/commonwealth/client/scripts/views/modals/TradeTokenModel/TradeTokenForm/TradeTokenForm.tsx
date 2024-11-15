@@ -1,6 +1,4 @@
 import React, { ReactNode, useState } from 'react';
-import { Skeleton } from 'views/components/Skeleton';
-import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
@@ -15,8 +13,11 @@ import {
   CustomAddressOption,
   CustomAddressOptionElement,
 } from '../../ManageCommunityStakeModal/StakeExchangeForm/CustomAddressOption';
+import AddressBalance from './AddressBalance';
 import BuyAmountSelection from './AmountSelections/BuyAmountSelection';
+import SellAmountSelection from './AmountSelections/SellAmountSelection';
 import BuyReceipt from './ReceiptDetails/BuyReceipt';
+import SellReceipt from './ReceiptDetails/SellReceipt';
 import './TradeTokenForm.scss';
 import { convertAddressToDropdownOption } from './helpers';
 import { TradeTokenFormProps, TradingMode } from './types';
@@ -30,14 +31,28 @@ const TradeTokenForm = ({
   const [isReceiptDetailOpen, setIsReceiptDetailOpen] = useState(false);
 
   const getCTADisabledTooltipText = () => {
-    if (isActionPending) return 'Processing trade...';
+    const labels = {
+      processingTrade: 'Processing trade...',
+      tradingAmountRequired: 'Please add trading amount to continue',
+      insufficientFunds: `You don't have sufficient funds to continue`,
+    };
+
+    if (isActionPending) return labels.processingTrade;
 
     // only use these in buy mode
     if (trading.mode.value === TradingMode.Buy) {
-      if (trading.amounts.buy.baseCurrency.amount === 0)
-        return 'Please add trading amount to continue';
-      if (trading.amounts.buy.insufficientFunds)
-        return `You don't have sufficient funds to buy token`;
+      if (trading.amounts.buy.invest.baseCurrency.amount === 0)
+        return labels.tradingAmountRequired;
+      if (trading.amounts.buy.invest.insufficientFunds)
+        return labels.insufficientFunds;
+    }
+
+    // only use these in sell mode
+    if (trading.mode.value === TradingMode.Sell) {
+      if (trading.amounts.sell.invest.baseToken.amount === 0)
+        return labels.tradingAmountRequired;
+      if (trading.amounts.sell.invest.insufficientFunds)
+        return labels.insufficientFunds;
     }
   };
 
@@ -106,15 +121,7 @@ const TradeTokenForm = ({
 
         <div className="balance-row">
           <CWText type="caption">Current balance</CWText>
-          <CWText type="caption">
-            <CWIcon iconName="ethereum" iconSize="small" />
-            {addresses.selected.balances.eth.isLoading ? (
-              <Skeleton width={80} />
-            ) : (
-              addresses.selected.balances.eth.value
-            )}
-            &nbsp;ETH
-          </CWText>
+          <AddressBalance trading={trading} addresses={addresses} />
         </div>
       </div>
 
@@ -126,7 +133,7 @@ const TradeTokenForm = ({
         {trading.mode.value === TradingMode.Buy ? (
           <BuyAmountSelection trading={trading} />
         ) : (
-          <>{/* TODO: sell mode components here */}</>
+          <SellAmountSelection trading={trading} />
         )}
       </div>
 
@@ -152,7 +159,7 @@ const TradeTokenForm = ({
               {trading.mode.value === TradingMode.Buy ? (
                 <BuyReceipt trading={trading} />
               ) : (
-                <>{/* TODO: sell mode components here */}</>
+                <SellReceipt trading={trading} />
               )}
             </>
           )

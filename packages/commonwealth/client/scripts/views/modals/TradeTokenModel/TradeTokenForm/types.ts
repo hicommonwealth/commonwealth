@@ -30,7 +30,17 @@ export type UseTradeTokenFormProps = {
   onTradeComplete?: () => void;
 };
 
+export type AddressBalanceProps = Pick<
+  ReturnType<typeof useTradeTokenForm>,
+  'trading' | 'addresses'
+>;
+
 export type BuyAmountSelectionProps = Pick<
+  ReturnType<typeof useTradeTokenForm>,
+  'trading'
+>;
+
+export type SellAmountSelectionProps = Pick<
   ReturnType<typeof useTradeTokenForm>,
   'trading'
 >;
