@@ -1,5 +1,8 @@
 import { AppError, ServerError } from '@hicommonwealth/core';
-import { models } from '@hicommonwealth/model';
+import {
+  communityNamespaceCreatedEventSignature,
+  models,
+} from '@hicommonwealth/model';
 import { BalanceSourceType, commonProtocol } from '@hicommonwealth/shared';
 import Web3 from 'web3';
 import { CommunityAttributes } from '../../models';
@@ -74,7 +77,27 @@ export const validateNamespace = async (
     factoryData.factory,
   );
 
-  if (!equalEvmAddresses(activeNamespace, txReceipt.logs[0].address)) {
+  let namespaceAddress: string | undefined;
+
+  // only emitted in token launch flows (launchpad)
+  const communityNamespaceCreatedLog = txReceipt.logs.find((l) => {
+    if (l.topics && l.topics.length > 0) {
+      return l.topics[0].toString() === communityNamespaceCreatedEventSignature;
+    }
+    return false;
+  });
+  if (communityNamespaceCreatedLog) {
+    const { 0: _namespaceAddress } = web3.eth.abi.decodeParameters(
+      ['address', 'address'],
+      communityNamespaceCreatedLog.data!.toString(),
+    );
+    namespaceAddress = _namespaceAddress as string;
+  } else {
+    // default namespace deployment tx
+    namespaceAddress = txReceipt.logs[0].address;
+  }
+
+  if (!equalEvmAddresses(activeNamespace, namespaceAddress)) {
     throw new AppError('Invalid tx hash for namespace creation');
   }
 

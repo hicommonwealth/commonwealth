@@ -6,6 +6,7 @@ import {
 } from '@hicommonwealth/shared';
 import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
+
 import { Balances, TokenAttributes, getBalances } from '../tokenBalanceCache';
 import { contestABI } from './abi/contestAbi';
 
