@@ -19,7 +19,10 @@ const useBuyTrade = ({
   onTradeComplete,
 }: UseBuyTradeProps) => {
   const user = useUserStore();
-  const [baseCurrencyBuyAmount, setBaseCurrencyBuyAmount] = useState<number>(0); // can be fractional
+  const [baseCurrencyBuyAmountString, setBaseCurrencyBuyAmountString] =
+    useState<string>('0'); // can be fractional
+  const baseCurrencyBuyAmountDecimals =
+    parseFloat(baseCurrencyBuyAmountString) || 0;
 
   const { linkSpecificAddressToSpecificCommunity } = useJoinCommunity();
 
@@ -30,7 +33,7 @@ const useBuyTrade = ({
   const ethToCurrencyRate = parseFloat(
     ethToCurrencyRateData?.data?.data?.amount || '0.00',
   );
-  const ethBuyAmount = baseCurrencyBuyAmount / ethToCurrencyRate;
+  const ethBuyAmount = baseCurrencyBuyAmountDecimals / ethToCurrencyRate;
   const commonPlatformFeeForBuyTradeInEth =
     (commonFeePercentage / 100) * ethBuyAmount;
 
@@ -56,14 +59,13 @@ const useBuyTrade = ({
     change: React.ChangeEvent<HTMLInputElement> | number,
   ) => {
     if (typeof change == 'number') {
-      setBaseCurrencyBuyAmount(change);
+      setBaseCurrencyBuyAmountString(`${change}`);
     } else {
       const value = change.target.value;
 
-      if (value === '') setBaseCurrencyBuyAmount(0);
+      if (value === '') setBaseCurrencyBuyAmountString('0');
       // verify only numbers with decimal (optional) are present
-      else if (/^\d+(\.\d+)?$/.test(value))
-        setBaseCurrencyBuyAmount(parseFloat(value));
+      else if (/^\d*\.?\d*$/.test(value)) setBaseCurrencyBuyAmountString(value);
     }
   };
 
@@ -134,7 +136,7 @@ const useBuyTrade = ({
       invest: {
         baseCurrency: {
           name: tradeConfig.currency, // USD/GBP etc
-          amount: baseCurrencyBuyAmount,
+          amount: baseCurrencyBuyAmountString,
           onAmountChange: onBaseCurrencyBuyAmountChange,
           presetAmounts: tradeConfig.buyTokenPresetAmounts,
           unitEthExchangeRate: ethToCurrencyRate,

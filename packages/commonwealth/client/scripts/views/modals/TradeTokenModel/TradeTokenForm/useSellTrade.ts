@@ -15,7 +15,9 @@ const useSellTrade = ({
   tradeConfig,
   onTradeComplete,
 }: UseSellTradeProps) => {
-  const [tokenSellAmount, setTokenSellAmount] = useState<number>(0); // can be fractional
+  const [tokenSellAmountString, setTokenSellAmountString] =
+    useState<string>(`0`); // can be fractional
+  const tokenSellAmountDecimals = parseFloat(tokenSellAmountString) || 0;
 
   const { mutateAsync: createTokenTrade, isLoading: isCreatingTokenTrade } =
     useCreateTokenTradeMutation();
@@ -37,12 +39,9 @@ const useSellTrade = ({
   ) => {
     const value = change.target.value;
 
-    if (value === '')
-      setTokenSellAmount(0); // TODO: fix decimal
+    if (value === '') setTokenSellAmountString(`0`);
     // verify only numbers with decimal (optional) are present
-    else if (/^\d*(\.\d+)?$/.test(value)) {
-      setTokenSellAmount(parseFloat(value));
-    }
+    else if (/^\d*\.?\d*$/.test(value)) setTokenSellAmountString(value);
   };
 
   const handleTokenSell = async () => {
@@ -61,7 +60,7 @@ const useSellTrade = ({
       const payload = {
         chainRpc: chainNode.url,
         ethChainId: chainNode.ethChainId,
-        amountToken: tokenSellAmount * 1e18, // amount in wei // TODO: needs fix?
+        amountToken: tokenSellAmountDecimals * 1e18, // amount in wei // TODO: needs fix
         walletAddress: selectedAddress,
         tokenAddress: tradeConfig.token.token_address,
       };
@@ -93,13 +92,13 @@ const useSellTrade = ({
       invest: {
         // not to be confused with "Base" network on ethereum
         baseToken: {
-          amount: tokenSellAmount,
+          amount: setTokenSellAmountString,
           onAmountChange: onTokenSellAmountChange,
           unitEthExchangeRate: 100, // TODO: hardcoded for now - blocked token pricing
           toEth: 100, // TODO: hardcoded for now - blocked token pricing
         },
         insufficientFunds:
-          tokenSellAmount > parseFloat(selectedAddressTokenBalance),
+          tokenSellAmountDecimals > parseFloat(selectedAddressTokenBalance),
         commonPlatformFee: {
           percentage: `${commonFeePercentage}%`,
           eth: 100, // TODO: hardcoded for now - blocked token pricing
