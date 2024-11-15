@@ -12,10 +12,8 @@ const SellReceipt = ({ trading }: ReceiptDetailsProps) => {
       <div className="entry">
         <CWText type="caption">{baseTokenSymbol} to ETH rate</CWText>
         <CWText type="caption">
-          {/* if the token value is in 10 ^ -1 or greater it is displayed
-          as such, a fixed string here avoids those secnarios */}
-          {invest.baseToken.unitEthExchangeRate.toFixed(18)} {baseTokenSymbol} =
-          1 ETH
+          1 {baseTokenSymbol} ={' '}
+          {invest.baseToken.unitEthExchangeRate.toFixed(18)} ETH
         </CWText>
       </div>
       <div className="entry">
@@ -25,18 +23,20 @@ const SellReceipt = ({ trading }: ReceiptDetailsProps) => {
         </CWText>
       </div>
       <div className="entry">
-        <CWText type="caption">ETH bought from invested amount</CWText>
-        <CWText type="caption">{invest.baseToken.toEth} ETH</CWText>
+        <CWText type="caption">ETH gained from invested amount</CWText>
+        <CWText type="caption">{invest.baseToken.toEth.toFixed(18)} ETH</CWText>
       </div>
       <div className="entry">
         <CWText type="caption">
-          Fee ({invest.commonPlatformFee.percentage})
+          Fee ({invest.commonPlatformFee.percentage}) ETH
         </CWText>
-        <CWText type="caption">{invest.commonPlatformFee.eth} ETH</CWText>
+        <CWText type="caption">
+          {invest.commonPlatformFee.eth.toFixed(18)} ETH
+        </CWText>
       </div>
       <div className="entry">
         <CWText type="caption">Gain ETH amount</CWText>
-        <CWText type="caption">{gain.eth} ETH</CWText>
+        <CWText type="caption">{gain.eth.toFixed(18)} ETH</CWText>
       </div>
     </div>
   );

@@ -24,7 +24,7 @@ const SellAmountSelection = ({ trading }: SellAmountSelectionProps) => {
       <CWText type="caption" className="invest-to-gain-amounts">
         =
         <CWIcon iconName="ethereum" iconSize="small" />{' '}
-        {trading.amounts.sell.gain.eth} ETH
+        {trading.amounts.sell.gain.eth.toFixed(18)} ETH
       </CWText>
 
       {trading.amounts.sell.invest.baseToken.presetAmounts && (

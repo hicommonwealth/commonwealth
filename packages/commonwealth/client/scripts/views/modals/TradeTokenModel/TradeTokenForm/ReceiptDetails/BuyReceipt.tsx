@@ -22,7 +22,7 @@ const BuyReceipt = ({ trading }: ReceiptDetailsProps) => {
         <CWText type="caption">{baseCurrencyName} to ETH rate</CWText>
         <CWText type="caption">
           {isLeftSymbolCurrency ? baseCurrencySymbol : ''}{' '}
-          {invest.baseCurrency.unitEthExchangeRate}
+          {invest.baseCurrency.unitEthExchangeRate.toFixed(18)}
           {isRightSymbolCurrency ? baseCurrencySymbol : ''} = 1 ETH
         </CWText>
       </div>
@@ -36,19 +36,31 @@ const BuyReceipt = ({ trading }: ReceiptDetailsProps) => {
       </div>
       <div className="entry">
         <CWText type="caption">ETH bought from invested amount</CWText>
-        <CWText type="caption">{invest.baseCurrency.toEth} ETH</CWText>
-      </div>
-      <div className="entry">
         <CWText type="caption">
-          Fee ({invest.commonPlatformFee.percentage})
+          {invest.baseCurrency.toEth.toFixed(18)} ETH
         </CWText>
-        <CWText type="caption">{invest.commonPlatformFee.eth} ETH</CWText>
       </div>
       <div className="entry">
-        <CWText type="caption">Remaining ETH to tokens</CWText>
         <CWText type="caption">
-          {invest.baseCurrency.toEth - invest.commonPlatformFee.eth} ETH ={' '}
-          {gain.token} {trading.token.symbol}
+          Fee ({invest.commonPlatformFee.percentage}) ETH
+        </CWText>
+        <CWText type="caption">
+          {invest.commonPlatformFee.eth.toFixed(18)} ETH
+        </CWText>
+      </div>
+      <div className="entry">
+        <CWText type="caption">Remaining ETH</CWText>
+        <CWText type="caption">
+          {(invest.baseCurrency.toEth - invest.commonPlatformFee.eth).toFixed(
+            18,
+          )}{' '}
+          ETH
+        </CWText>
+      </div>
+      <div className="entry">
+        <CWText type="caption">Gain {trading.token.symbol} amount</CWText>
+        <CWText type="caption">
+          {gain.token.toFixed(18)} {trading.token.symbol}
         </CWText>
       </div>
     </div>
