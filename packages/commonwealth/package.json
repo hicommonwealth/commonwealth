@@ -123,6 +123,7 @@
     "@knocklabs/react": "^0.2.15",
     "@knocklabs/react-notification-feed": "^0.8.15",
     "@lexical/rich-text": "^0.17.0",
+    "@lexical/react": "^0.17.0",
     "@libp2p/crypto": "^5.0.4",
     "@libp2p/peer-id": "^5.0.4",
     "@magic-ext/cosmos": "^12.1.3",
