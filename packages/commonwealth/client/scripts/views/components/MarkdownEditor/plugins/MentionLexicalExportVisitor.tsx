@@ -5,7 +5,10 @@ import {
   MentionNode,
 } from 'views/components/MarkdownEditor/plugins/MentionNode';
 
-export const MentionVisitor: LexicalExportVisitor<MentionNode, Mdast.Link> = {
+export const MentionLexicalExportVisitor: LexicalExportVisitor<
+  MentionNode,
+  Mdast.Link
+> = {
   testLexicalNode: $isMentionNode,
   visitLexicalNode: ({ lexicalNode, actions }) => {
     console.log('FIXME: visitLexicalNode');

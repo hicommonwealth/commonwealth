@@ -25,7 +25,7 @@ import {
   addLexicalNode$,
   realmPlugin,
 } from 'commonwealth-mdxeditor';
-import { MentionVisitor } from 'views/components/MarkdownEditor/plugins/MentionVisitor';
+import { MentionLexicalExportVisitor } from 'views/components/MarkdownEditor/plugins/MentionLexicalExportVisitor';
 import { $createMentionNode, MentionNode } from './MentionNode';
 
 const PUNCTUATION =
@@ -714,7 +714,7 @@ export const mentionsPlugin = realmPlugin<{}>({
     realm.pubIn({
       [addActivePlugin$]: 'mention',
       [addLexicalNode$]: MentionNode,
-      [addExportVisitor$]: MentionVisitor,
+      [addExportVisitor$]: MentionLexicalExportVisitor,
       // [addToMarkdownExtension$]: directiveToMarkdown()
       [addComposerChild$]: () => (
         <>
