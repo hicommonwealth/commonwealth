@@ -26,6 +26,7 @@ import {
   addLexicalNode$,
   addToMarkdownExtension$,
   realmPlugin,
+  ToMarkdownExtension,
 } from 'commonwealth-mdxeditor';
 import { MentionLexicalExportVisitor } from 'views/components/MarkdownEditor/plugins/MentionLexicalExportVisitor';
 import { MentionMdastImportVisitor } from 'views/components/MarkdownEditor/plugins/MentionMdastImportVisitor';
@@ -714,30 +715,43 @@ export function NewMentionsPlugin(): JSX.Element | null {
  * @returns {ToMarkdownExtension}
  *   Extension for `mdast-util-to-markdown` to enable directives.
  */
-export function mentionToMarkdown() {
+export function mentionToMarkdown(): ToMarkdownExtension {
   console.log('FIXME: mentionToMarkdown');
   return {
-    unsafe: [
-      {
-        character: '\r',
-        inConstruct: ['leafDirectiveLabel', 'containerDirectiveLabel'],
-      },
-      {
-        character: '\n',
-        inConstruct: ['leafDirectiveLabel', 'containerDirectiveLabel'],
-      },
-      {
-        before: '[^:]',
-        character: ':',
-        after: '[A-Za-z]',
-        inConstruct: ['phrasing'],
-      },
-      { atBreak: true, character: ':', after: ':' },
-    ],
+    // unsafe: [
+    //   {
+    //     character: '\r',
+    //     inConstruct: ['leafDirectiveLabel', 'containerDirectiveLabel'],
+    //   },
+    //   {
+    //     character: '\n',
+    //     inConstruct: ['leafDirectiveLabel', 'containerDirectiveLabel'],
+    //   },
+    //   {
+    //     before: '[^:]',
+    //     character: ':',
+    //     after: '[A-Za-z]',
+    //     inConstruct: ['phrasing'],
+    //   },
+    //   { atBreak: true, character: ':', after: ':' },
+    // ],
+    // FIXME: I think this is what I might need to fix.
     handlers: {
-      // containerDirective: handleDirective,
-      // leafDirective: handleDirective,
-      // textDirective: handleDirective
+      //   // containerDirective: handleDirective,
+      //   // leafDirective: handleDirective,
+      //   // textDirective: handleDirective
+      containerDirective: () => {
+        console.log('FIXME containerDirective');
+        return 'FIXME';
+      },
+      leafDirective: () => {
+        console.log('FIXME leafDirective');
+        return 'FIXME';
+      },
+      textDirective: () => {
+        console.log('FIXME textDirective');
+        return 'FIXME';
+      },
     },
   };
 }

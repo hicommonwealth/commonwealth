@@ -25,9 +25,9 @@ export type SerializedMentionNode = Spread<
   SerializedTextNode
 >;
 
-function $convertMentionElement(
+const $convertMentionElement = (
   domNode: HTMLElement,
-): DOMConversionOutput | null {
+): DOMConversionOutput | null => {
   console.log('FIXME $convertMentionElement');
 
   const textContent = domNode.textContent;
@@ -40,7 +40,7 @@ function $convertMentionElement(
   }
 
   return null;
-}
+};
 
 export class MentionNode extends TextNode {
   __mention: string;
@@ -51,6 +51,7 @@ export class MentionNode extends TextNode {
   }
 
   static getType(): string {
+    console.log('FIXME: getType');
     return 'mention';
   }
 
@@ -105,6 +106,8 @@ export class MentionNode extends TextNode {
     console.log('FIXME importDOM');
     return {
       a: (domNode: HTMLElement) => {
+        // FIXME: this might have to be refactored to work with the href and text
+        // starting with '@'
         if (!domNode.hasAttribute('data-lexical-mention')) {
           return null;
         }
@@ -117,14 +120,17 @@ export class MentionNode extends TextNode {
   }
 
   isTextEntity(): true {
+    console.log('FIXME: isTextEntity');
     return true;
   }
 
   canInsertTextBefore(): boolean {
+    console.log('FIXME: canInsertTextBefore');
     return false;
   }
 
   canInsertTextAfter(): boolean {
+    console.log('FIXME: canInsertTextAfter');
     return false;
   }
 }
