@@ -511,6 +511,12 @@ importers:
         specifier: ^8
         version: 8.57.0
 
+  libs/evm-protocols:
+    dependencies:
+      moment:
+        specifier: ^2.23.0
+        version: 2.30.1
+
   libs/evm-testing:
     dependencies:
       '@hicommonwealth/model':
