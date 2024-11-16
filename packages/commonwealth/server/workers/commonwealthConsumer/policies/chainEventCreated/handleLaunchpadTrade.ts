@@ -58,8 +58,8 @@ export async function handleLaunchpadTrade(
       is_buy: isBuy,
       community_token_amount: BigNumber.from(communityTokenAmount).toBigInt(),
       price:
-        BigNumber.from(communityTokenAmount).toBigInt() /
-        BigNumber.from(ethAmount).toBigInt(),
+        BigNumber.from(ethAmount).toBigInt() /
+        BigNumber.from(communityTokenAmount).toBigInt(),
       floating_supply: BigNumber.from(floatingSupply).toBigInt(),
       timestamp: Number(block.timestamp),
     });
