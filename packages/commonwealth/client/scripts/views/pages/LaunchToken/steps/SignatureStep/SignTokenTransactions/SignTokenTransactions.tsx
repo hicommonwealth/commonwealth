@@ -55,7 +55,7 @@ const SignTokenTransactions = ({
       const txReceipt = await launchToken(payload);
 
       // 2. store `tokenInfo` on db
-      await createToken({
+      const token = await createToken({
         transaction_hash: txReceipt.transactionHash,
         chain_node_id: baseNode.id,
         community_id: createdCommunityId,
@@ -65,8 +65,10 @@ const SignTokenTransactions = ({
 
       // 3. update community to reference the created token
       await updateCommunity({
-        id: createdCommunityId,
+        community_id: createdCommunityId,
         token_name: payload.name,
+        namespace: token.namespace,
+        transactionHash: txReceipt.transactionHash,
       });
 
       onSuccess();

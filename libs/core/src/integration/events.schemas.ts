@@ -11,6 +11,7 @@ import { z } from 'zod';
 import {
   CommunityStakeTrade,
   LaunchpadTokenCreated,
+  LaunchpadTrade,
   NamespaceDeployed,
 } from './chain-event.schemas';
 import { EventMetadata } from './util.schemas';
@@ -184,6 +185,14 @@ export const ChainEventCreated = z.union([
       ),
     }),
     parsedArgs: LaunchpadTokenCreated,
+  }),
+  ChainEventCreatedBase.extend({
+    eventSource: ChainEventCreatedBase.shape.eventSource.extend({
+      eventSignature: z.literal(
+        '0x9adcf0ad0cda63c4d50f26a48925cf6405df27d422a39c456b5f03f661c82982',
+      ),
+    }),
+    parsedArgs: LaunchpadTrade,
   }),
 ]);
 

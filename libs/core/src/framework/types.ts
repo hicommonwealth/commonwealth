@@ -108,10 +108,10 @@ export class InvalidState extends Error {
  * - `payload`: validated command payload
  * - `auth`: authorization context
  */
-export type Context<Input extends ZodSchema, AuthContext> = {
+export type Context<Input extends ZodSchema, _Context extends ZodSchema> = {
   readonly actor: Actor;
   readonly payload: z.infer<Input>;
-  readonly auth?: AuthContext;
+  readonly context?: z.infer<_Context>;
 };
 
 /**
@@ -133,9 +133,9 @@ export type EventContext<Name extends Events> = {
 export type Handler<
   Input extends ZodSchema,
   Output extends ZodSchema,
-  AuthContext,
+  _Context extends ZodSchema,
 > = (
-  context: Context<Input, AuthContext>,
+  context: Context<Input, _Context>,
 ) => Promise<z.infer<Output> | undefined | void>;
 
 /**
@@ -159,12 +159,13 @@ export type EventHandler<
 export type Metadata<
   Input extends ZodSchema,
   Output extends ZodSchema,
-  AuthContext,
+  _Context extends ZodSchema,
 > = {
   readonly input: Input;
   readonly output: Output;
-  readonly auth: Handler<Input, Output, AuthContext>[];
-  readonly body: Handler<Input, Output, AuthContext>;
+  readonly context?: _Context;
+  readonly auth: Handler<Input, Output, _Context>[];
+  readonly body: Handler<Input, Output, _Context>;
   readonly secure?: boolean;
   readonly authStrategy?: AuthStrategies;
 };
@@ -194,25 +195,30 @@ export type EventsHandlerMetadata<
 };
 
 // =========== PUBLIC ARTIFACT FACTORY INTERFACE ===========
-export type Schemas<Input extends ZodSchema, Output extends ZodSchema> = {
+export type Schemas<
+  Input extends ZodSchema,
+  Output extends ZodSchema,
+  _Context extends ZodSchema,
+> = {
   input: Input;
   output: Output;
+  context?: _Context;
 };
 
 /**
  * Command metadata
  */
-export type Command<Schema, AuthContext = unknown> =
-  Schema extends Schemas<infer Input, infer Output>
-    ? Metadata<Input, Output, AuthContext>
+export type Command<Schema> =
+  Schema extends Schemas<infer Input, infer Output, infer _Context>
+    ? Metadata<Input, Output, _Context>
     : never;
 
 /**
  * Query metadata
  */
-export type Query<Schema, AuthContext = unknown> =
-  Schema extends Schemas<infer Input, infer Output>
-    ? Metadata<Input, Output, AuthContext>
+export type Query<Schema> =
+  Schema extends Schemas<infer Input, infer Output, infer _Context>
+    ? Metadata<Input, Output, _Context>
     : never;
 
 /**

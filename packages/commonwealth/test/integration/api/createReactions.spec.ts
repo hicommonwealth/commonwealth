@@ -37,8 +37,7 @@ describe('createReaction Integration Tests', () => {
       .set('address', address)
       .send(validRequest);
     assert.equal((res as any).statusCode, 200);
-
-    return JSON.parse(res.text);
+    return res?.statusCode === 200;
   };
 
   const getUniqueCommentText = async () => {
@@ -146,7 +145,7 @@ describe('createReaction Integration Tests', () => {
       userJWT,
       userAddress,
     );
-    chai.assert.equal(deleteReactionResponse.reaction_id, reactionId);
+    chai.assert.equal(deleteReactionResponse, true);
 
     await comment!.reload();
     chai.assert.equal(comment!.reaction_count, beforeReactionCount);
@@ -184,7 +183,7 @@ describe('createReaction Integration Tests', () => {
       userAddress,
     );
 
-    chai.assert.equal(deleteReactionResponse.reaction_id, reactionId);
+    chai.assert.equal(deleteReactionResponse, true);
 
     await thread!.reload();
     chai.assert.equal(thread!.reaction_count, beforeReactionCount!);

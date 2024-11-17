@@ -77,12 +77,12 @@ describe('CommentCreated Event Handler', () => {
           user_id: mentionedUser!.id,
         },
       ],
+      topics: [{}],
     });
-
     [thread] = await tester.seed('Thread', {
       community_id: community!.id!,
       address_id: community!.Addresses![1].id,
-      topic_id: null,
+      topic_id: community!.topics![0]!.id!,
       deleted_at: null,
       read_only: false,
       pinned: false,

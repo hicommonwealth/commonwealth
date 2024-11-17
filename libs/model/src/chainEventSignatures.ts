@@ -6,3 +6,12 @@ export const communityStakeTradeEventSignature =
 
 export const launchpadTokenLaunchedEventSignature =
   '0xd7ca5dc2f8c6bb37c3a4de2a81499b25f8ca8bbb3082010244fe747077d0f6cc';
+
+export const launchpadTradeEventSignature =
+  '0x9adcf0ad0cda63c4d50f26a48925cf6405df27d422a39c456b5f03f661c82982';
+
+export const launchpadTokenRegisteredEventSignature =
+  '0xc2fe88a1a3c1957424571593960b97f158a519d0aa4cef9e13a247c64f1f4c35';
+
+export const communityNamespaceCreatedEventSignature =
+  '0xa16d784cb6c784b621c7877ce80495765ed32ca0b3dba2ef467116a435f125fd';

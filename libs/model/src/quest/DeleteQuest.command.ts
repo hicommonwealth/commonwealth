@@ -1,16 +1,13 @@
 import { Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../database';
-import { AuthContext, isAuthorized } from '../middleware';
+import { authRoles } from '../middleware';
 import { mustExist, mustNotBeStarted } from '../middleware/guards';
 
-export function DeleteQuest(): Command<
-  typeof schemas.DeleteQuest,
-  AuthContext
-> {
+export function DeleteQuest(): Command<typeof schemas.DeleteQuest> {
   return {
     ...schemas.DeleteQuest,
-    auth: [isAuthorized({ roles: ['admin'] })],
+    auth: [authRoles('admin')],
     secure: true,
     body: async ({ payload }) => {
       const { community_id, quest_id } = payload;

@@ -204,9 +204,9 @@ export const UploadControl = ({
           className="generate-image-section"
           onClick={(e) => e.stopPropagation()}
           onKeyDown={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
             if (e.key === 'Enter' && imagePrompt.trim()) {
+              e.preventDefault();
+              e.stopPropagation();
               generateImage({ prompt: imagePrompt.trim() }).catch(
                 console.error,
               );
