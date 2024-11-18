@@ -118,8 +118,8 @@
     "@ipld/dag-json": "^10.2.0",
     "@keplr-wallet/types": "^0.12.23",
     "@keplr-wallet/unit": "^0.12.23",
-    "@knocklabs/node": "^0.6.13",
     "@knocklabs/client": "^0.10.13",
+    "@knocklabs/node": "^0.6.13",
     "@knocklabs/react": "^0.2.15",
     "@knocklabs/react-notification-feed": "^0.8.15",
     "@lexical/rich-text": "^0.17.0",
@@ -287,6 +287,7 @@
     "@types/passport-auth-token": "^1.0.4",
     "@types/sinon": "^17.0.3",
     "@types/uuid": "^9.0.7",
-    "sinon": "^17.0.2"
+    "sinon": "^17.0.2",
+    "testcontainers": "^10.14.0"
   }
 }
