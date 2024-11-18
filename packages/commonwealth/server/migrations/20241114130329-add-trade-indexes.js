@@ -4,6 +4,15 @@
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.sequelize.transaction(async (transaction) => {
+      await queryInterface.changeColumn(
+        'LaunchpadTrades',
+        'price',
+        {
+          type: Sequelize.FLOAT,
+          allowNull: false,
+        },
+        { transaction },
+      );
       await queryInterface.removeIndex(
         'LaunchpadTrades',
         'launchpad_trades_token_address',
@@ -21,6 +30,15 @@ module.exports = {
 
   async down(queryInterface, Sequelize) {
     await queryInterface.sequelize.transaction(async (transaction) => {
+      await queryInterface.changeColumn(
+        'LaunchpadTrades',
+        'price',
+        {
+          type: Sequelize.NUMERIC(78, 0),
+          allowNull: false,
+        },
+        { transaction },
+      );
       await queryInterface.addIndex('LaunchpadTrades', ['token_address'], {
         transaction,
       });

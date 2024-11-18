@@ -41,7 +41,7 @@ export default (sequelize: Sequelize.Sequelize): LaunchpadTradeModelStatic =>
         allowNull: false,
       },
       price: {
-        type: Sequelize.DECIMAL(78, 0),
+        type: Sequelize.FLOAT,
         allowNull: false,
       },
       floating_supply: {
