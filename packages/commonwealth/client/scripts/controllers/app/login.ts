@@ -15,6 +15,7 @@ import {
   WalletSsoSource,
 } from '@hicommonwealth/shared';
 import { CosmosExtension } from '@magic-ext/cosmos';
+import { FarcasterExtension } from '@magic-ext/farcaster';
 import { OAuthExtension } from '@magic-ext/oauth2';
 import axios from 'axios';
 import { notifyError } from 'controllers/app/notifications';
@@ -32,10 +33,15 @@ import {
 import { welcomeOnboardModal } from 'state/ui/modals/welcomeOnboardModal';
 import { userStore } from 'state/ui/user';
 import { z } from 'zod';
-import { defaultMagic } from '../../App';
 import Account from '../../models/Account';
 import AddressInfo from '../../models/AddressInfo';
 import type BlockInfo from '../../models/BlockInfo';
+
+// need to instantiate it early because the farcaster sdk has an async constructor which will cause a race condition
+// if instantiated right before the login is called;
+export const defaultMagic = new Magic(process.env.MAGIC_PUBLISHABLE_KEY!, {
+  extensions: [new FarcasterExtension(), new OAuthExtension()],
+});
 
 function storeActiveAccount(account: Account) {
   const user = userStore.getState();
