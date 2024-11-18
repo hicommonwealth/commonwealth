@@ -8,7 +8,6 @@ import app from 'state';
 import useSidebarStore from 'state/ui/sidebar';
 import { SublayoutHeader } from 'views/components/SublayoutHeader';
 import { Sidebar } from 'views/components/sidebar';
-import contestsGTMGrowlImage from '../../assets/img/contestsGTMGrowlImage.svg';
 import useNecessaryEffect from '../hooks/useNecessaryEffect';
 import useStickyHeader from '../hooks/useStickyHeader';
 import { useAuthModalStore, useWelcomeOnboardModal } from '../state/ui/modals';
@@ -18,7 +17,6 @@ import { AdminOnboardingSlider } from './components/AdminOnboardingSlider';
 import { Breadcrumbs } from './components/Breadcrumbs';
 import MobileNavigation from './components/MobileNavigation';
 import AuthButtons from './components/SublayoutHeader/AuthButtons';
-import { CWGrowlTemplate } from './components/SublayoutHeader/GrowlTemplate/CWGrowlTemplate';
 import { UserTrainingSlider } from './components/UserTrainingSlider';
 import CollapsableSidebarButton from './components/sidebar/CollapsableSidebarButton';
 import { AuthModal, AuthModalType } from './modals/AuthModal';
@@ -175,16 +173,6 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
             )}
             {children}
           </div>
-          <CWGrowlTemplate
-            headerText="Ignite Your Community with Weekly Contests"
-            bodyText="Supercharge engagement with real rewards! Common Contests spark
-            creativity and bring your community's best ideas to life!"
-            buttonText="Learn More"
-            buttonLink="https://commonwealth.im/common/discussion/25536-Weighted%20Voting%20and%20Contest%20FAQs"
-            growlImage={contestsGTMGrowlImage}
-            extraText="Spark creativity and foster connections within your community."
-            growlType="contests"
-          />
         </div>
         <WelcomeOnboardModal
           isOpen={isWelcomeOnboardModalOpen}
