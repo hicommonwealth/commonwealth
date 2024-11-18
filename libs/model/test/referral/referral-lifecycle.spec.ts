@@ -28,7 +28,7 @@ describe('Referral lifecycle', () => {
 
   it('should create a referral', async () => {
     // admin creates a referral link
-    const referral_link = await command(CreateReferralLink(), {
+    const response = await command(CreateReferralLink(), {
       actor: admin,
       payload: {},
     });
@@ -47,7 +47,7 @@ describe('Referral lifecycle', () => {
         social_links: [],
         directory_page_enabled: false,
         tags: [],
-        referral_link,
+        referral_link: response?.referral_link,
       },
     });
 
