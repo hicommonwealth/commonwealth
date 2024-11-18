@@ -2,6 +2,8 @@ import { commonProtocol } from '@hicommonwealth/shared';
 import { useQuery } from '@tanstack/react-query';
 import LaunchpadBondingCurve from 'helpers/ContractHelpers/Launchpad';
 
+const TOKEN_ETH_EXCHANGE_TIME = 1000; // 1s
+
 interface TokenEthExchangeRateProps {
   chainRpc: string;
   ethChainId: number;
@@ -50,8 +52,8 @@ const useTokenEthExchangeRateQuery = ({
         tokenAmount,
         mode,
       }),
-    staleTime: 1000, // 1 second
-    cacheTime: 1000, // 1 second
+    staleTime: TOKEN_ETH_EXCHANGE_TIME,
+    cacheTime: TOKEN_ETH_EXCHANGE_TIME,
     enabled,
   });
 };
