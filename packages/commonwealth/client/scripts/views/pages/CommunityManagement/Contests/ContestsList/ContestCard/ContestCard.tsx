@@ -33,13 +33,6 @@ const noFundsProps = {
   iconName: 'coins' as IconName,
 };
 
-const noUpvotesWarningProps = {
-  title: 'Upvote contests to avoid return of funds',
-  description:
-    "The prize amount will be returned to Common and then to admin's wallet if there are no upvotes",
-  iconName: 'warning' as IconName,
-};
-
 interface ContestCardProps {
   address: string;
   name: string;
@@ -57,7 +50,13 @@ interface ContestCardProps {
   isHorizontal?: boolean;
   isFarcaster?: boolean;
   payoutStructure?: number[];
-  hasVotes?: boolean;
+  score?: {
+    creator_address?: string;
+    content_id?: string;
+    votes?: number;
+    prize?: string;
+    tickerPrize?: number;
+  }[];
 }
 
 const ContestCard = ({
@@ -77,7 +76,7 @@ const ContestCard = ({
   isHorizontal = false,
   isFarcaster = false,
   payoutStructure,
-  hasVotes = false,
+  score = [],
 }: ContestCardProps) => {
   const navigate = useCommonNavigate();
   const user = useUserStore();
@@ -95,12 +94,13 @@ const ContestCard = ({
 
   const { isWindowMediumSmallInclusive } = useBrowserWindow({});
 
-  const { data: contestBalance } = useGetContestBalanceQuery({
-    contestAddress: address,
-    chainRpc: app.chain.meta?.ChainNode?.url || '',
-    ethChainId: app.chain.meta?.ChainNode?.eth_chain_id || 0,
-    isOneOff: !isRecurring,
-  });
+  const { data: contestBalance, isLoading: isLoadingContestBalance } =
+    useGetContestBalanceQuery({
+      contestAddress: address,
+      chainRpc: app.chain.meta?.ChainNode?.url || '',
+      ethChainId: app.chain.meta?.ChainNode?.eth_chain_id || 0,
+      isOneOff: !isRecurring,
+    });
 
   const prizes =
     contestBalance && payoutStructure
@@ -159,17 +159,21 @@ const ContestCard = ({
     copyFarcasterContestFrameUrl(address).catch(console.log);
   };
 
-  const showNoFundsInfo = isActive && (contestBalance || 0) <= 0;
+  const showNoFundsInfo =
+    isActive && !isLoadingContestBalance && (contestBalance || 0) <= 0;
 
   const isLessThan24HoursLeft =
     moment(finishDate).diff(moment(), 'hours') <= 24;
+
+  const hasVotes = score.length > 0;
+  const hasLessVotesThanPrizes = (payoutStructure || []).length > score.length;
 
   const showNoUpvotesWarning =
     isActive &&
     isAdmin &&
     isLessThan24HoursLeft &&
     (contestBalance || 0) > 0 &&
-    !hasVotes;
+    (!hasVotes || hasLessVotesThanPrizes);
 
   return (
     <CWCard
@@ -217,7 +221,19 @@ const ContestCard = ({
           ) : (
             <>
               {showNoUpvotesWarning && (
-                <ContestAlert {...noUpvotesWarningProps} />
+                <ContestAlert
+                  title="Upvote contests to avoid return of funds"
+                  iconName="warning"
+                  description={
+                    !hasVotes
+                      ? "The prize amount will be returned to Common and then to admin's wallet if there are no upvotes"
+                      : hasLessVotesThanPrizes
+                        ? `You have ${payoutStructure?.length} prizes but only ${score.length} thread upvotes. 
+                        Upvote more threads to avoid return of funds. 
+                        The prize amount will be returned to Common and then to admin's wallet if there are no upvotes`
+                        : ''
+                  }
+                />
               )}
               <CWText className="prizes-header" fontWeight="bold">
                 Current Prizes

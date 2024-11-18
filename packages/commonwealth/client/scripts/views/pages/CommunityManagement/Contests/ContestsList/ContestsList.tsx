@@ -108,7 +108,7 @@ const ContestsList = ({
                   isFarcaster={
                     farcasterContestEnabled && contest.is_farcaster_contest
                   }
-                  hasVotes={(score || []).length > 0}
+                  score={score || []}
                 />
               );
             } else {
@@ -135,7 +135,7 @@ const ContestsList = ({
                   isFarcaster={
                     farcasterContestEnabled && contest.is_farcaster_contest
                   }
-                  hasVotes={(sc?.score || [])?.length > 0}
+                  score={sc?.score || []}
                 />
               ));
             }
