@@ -3,6 +3,7 @@ import BigNumber from 'bignumber.js';
 import moment from 'moment';
 import React from 'react';
 import Account from '../models/Account';
+import { IBlockInfo } from '../models/interfaces';
 import { ThreadStage } from '../models/types';
 import type { IApp } from '../state/index';
 
@@ -178,16 +179,19 @@ export function renderMultilineText(text: string) {
  * blocknum helpers
  */
 
-export function blocknumToTime(app: IApp, blocknum: number): moment.Moment {
-  const currentBlocknum = app.chain.block.height;
-  const blocktime = app.chain.block.duration;
-  const lastBlockTime: moment.Moment = app.chain.block.lastTime.clone();
+export function blocknumToTime(
+  block: IBlockInfo,
+  blocknum: number,
+): moment.Moment {
+  const currentBlocknum = block.height;
+  const blocktime = block.duration;
+  const lastBlockTime: moment.Moment = block.lastTime.clone();
   return lastBlockTime.add((blocknum - currentBlocknum) * blocktime, 'seconds');
 }
 
-export function blocknumToDuration(app: IApp, blocknum: number) {
+export function blocknumToDuration(block: IBlockInfo, blocknum: number) {
   return moment
-    .duration(blocknumToTime(app, blocknum).diff(moment()))
+    .duration(blocknumToTime(block, blocknum).diff(moment()))
     .asMilliseconds();
 }
 

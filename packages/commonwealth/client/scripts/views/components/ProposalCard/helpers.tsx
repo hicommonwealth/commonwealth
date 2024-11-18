@@ -49,7 +49,10 @@ export const getStatusText = (proposal: AnyProposal, isLoading?: boolean) => {
         ? [
             <Countdown
               key={proposal.endTime.kind}
-              duration={blocknumToDuration(app, proposal.endTime.blocknum)}
+              duration={blocknumToDuration(
+                app.chain.block,
+                proposal.endTime.blocknum,
+              )}
             />,
             ` left (ends on block ${formatNumberLong(
               proposal.endTime.blocknum,
@@ -60,7 +63,7 @@ export const getStatusText = (proposal: AnyProposal, isLoading?: boolean) => {
               <Countdown
                 key={proposal.endTime.kind}
                 duration={blocknumToDuration(
-                  app,
+                  app.chain.block,
                   proposal.endTime.getBlocknum(),
                 )}
               />,
