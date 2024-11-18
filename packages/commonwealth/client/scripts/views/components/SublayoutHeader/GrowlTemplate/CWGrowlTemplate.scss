@@ -57,6 +57,12 @@
     gap: 1rem;
     cursor: default;
 
+    @include smallInclusive {
+      max-width: 20rem;
+      padding: 0.5rem;
+      gap: 0.3rem;
+    }
+
     .subtitle-text {
       margin-top: -12px;
     }
