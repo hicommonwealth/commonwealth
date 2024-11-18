@@ -5,6 +5,15 @@ module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.sequelize.transaction(async (transaction) => {
       await queryInterface.changeColumn(
+        'Tokens',
+        'initial_supply',
+        {
+          type: Sequelize.INTEGER,
+          allowNull: false,
+        },
+        { transaction },
+      );
+      await queryInterface.changeColumn(
         'LaunchpadTrades',
         'price',
         {
@@ -30,6 +39,15 @@ module.exports = {
 
   async down(queryInterface, Sequelize) {
     await queryInterface.sequelize.transaction(async (transaction) => {
+      await queryInterface.changeColumn(
+        'Tokens',
+        'initial_supply',
+        {
+          type: Sequelize.NUMERIC(78, 0),
+          allowNull: false,
+        },
+        { transaction },
+      );
       await queryInterface.changeColumn(
         'LaunchpadTrades',
         'price',

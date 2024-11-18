@@ -3,7 +3,6 @@ import { Token } from '../entities';
 import { PaginatedResultSchema, PaginationParamsSchema } from './pagination';
 
 export const TokenView = Token.extend({
-  initial_supply: z.string(),
   launchpad_liquidity: z.string(),
   latest_price: z.number().nullish(),
   old_price: z.number().nullish(),
