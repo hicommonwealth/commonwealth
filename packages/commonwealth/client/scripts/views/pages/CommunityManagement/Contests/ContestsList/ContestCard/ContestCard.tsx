@@ -33,6 +33,13 @@ const noFundsProps = {
   iconName: 'coins' as IconName,
 };
 
+const noUpvotesWarningProps = {
+  title: 'Upvote contests to avoid return of funds',
+  description:
+    "The prize amount will be returned to Common and then to admin's wallet if there are no upvotes",
+  iconName: 'warning' as IconName,
+};
+
 interface ContestCardProps {
   address: string;
   name: string;
@@ -50,6 +57,7 @@ interface ContestCardProps {
   isHorizontal?: boolean;
   isFarcaster?: boolean;
   payoutStructure?: number[];
+  hasVotes?: boolean;
 }
 
 const ContestCard = ({
@@ -69,6 +77,7 @@ const ContestCard = ({
   isHorizontal = false,
   isFarcaster = false,
   payoutStructure,
+  hasVotes = false,
 }: ContestCardProps) => {
   const navigate = useCommonNavigate();
   const user = useUserStore();
@@ -152,6 +161,16 @@ const ContestCard = ({
 
   const showNoFundsInfo = isActive && (contestBalance || 0) <= 0;
 
+  const isLessThan24HoursLeft =
+    moment(finishDate).diff(moment(), 'hours') <= 24;
+
+  const showNoUpvotesWarning =
+    isActive &&
+    isAdmin &&
+    isLessThan24HoursLeft &&
+    (contestBalance || 0) > 0 &&
+    !hasVotes;
+
   return (
     <CWCard
       className={clsx('ContestCard', {
@@ -197,6 +216,9 @@ const ContestCard = ({
             />
           ) : (
             <>
+              {showNoUpvotesWarning && (
+                <ContestAlert {...noUpvotesWarningProps} />
+              )}
               <CWText className="prizes-header" fontWeight="bold">
                 Current Prizes
               </CWText>
