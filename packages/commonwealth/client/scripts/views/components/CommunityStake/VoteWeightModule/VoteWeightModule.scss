@@ -3,11 +3,12 @@
 .VoteWeightModule {
   padding: 16px 24px;
   border-bottom: 1px solid $neutral-200;
+  background-color: $primary-50;
 
   .content {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 2px;
 
     .title-container {
       display: flex;
