@@ -8,11 +8,12 @@ import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
+import TokenIcon from '../../TokenIcon';
 import { BuyAmountSelectionProps } from '../types';
 import './AmountSelections.scss';
 
 const BuyAmountSelection = ({ trading }: BuyAmountSelectionProps) => {
-  const baseCurrencyName = trading.amounts.buy.baseCurrency.name;
+  const baseCurrencyName = trading.amounts.buy.invest.baseCurrency.name;
 
   const buyAmountCurrenySymbol = (
     <CWText className="amount-symbol">
@@ -27,33 +28,38 @@ const BuyAmountSelection = ({ trading }: BuyAmountSelectionProps) => {
           buyAmountCurrenySymbol}
         <CWTextInput
           containerClassName="amount-input"
-          placeholder={getAmountWithCurrencySymbol(0, baseCurrencyName)}
-          value={trading.amounts.buy.baseCurrency.amount}
-          onInput={(e) => trading.amounts.buy.baseCurrency.onAmountChange(e)}
+          placeholder="0"
+          value={trading.amounts.buy.invest.baseCurrency.amount}
+          onInput={(e) =>
+            trading.amounts.buy.invest.baseCurrency.onAmountChange(e)
+          }
         />
         {currencySymbolPlacements.onRight.includes(baseCurrencyName) &&
           buyAmountCurrenySymbol}
       </div>
 
-      <CWText type="caption" className="amount-to-crypto">
+      <CWText type="caption" className="invest-to-gain-amounts">
         <CWIcon iconName="ethereum" iconSize="small" />
-        {trading.amounts.buy.eth} ETH = {trading.amounts.buy.token}{' '}
-        {trading.token.symbol}
+        {trading.amounts.buy.invest.baseCurrency.toEth} ETH =
+        {trading.token.icon_url && <TokenIcon url={trading.token.icon_url} />}
+        {trading.amounts.buy.gain.token} {trading.token.symbol}
       </CWText>
 
-      {trading.amounts.buy.baseCurrency.presetAmounts && (
+      {trading.amounts.buy.invest.baseCurrency.presetAmounts && (
         <div className="preset-amounts">
-          {trading.amounts.buy.baseCurrency.presetAmounts?.map(
+          {trading.amounts.buy.invest.baseCurrency.presetAmounts?.map(
             (presetAmount) => (
               <CWTag
                 key={presetAmount}
                 type="amount"
                 label={getAmountWithCurrencySymbol(
-                  presetAmount,
+                  presetAmount as number,
                   baseCurrencyName,
                 )}
                 onClick={() =>
-                  trading.amounts.buy.baseCurrency.onAmountChange(presetAmount)
+                  trading.amounts.buy.invest.baseCurrency.onAmountChange(
+                    presetAmount,
+                  )
                 }
               />
             ),
