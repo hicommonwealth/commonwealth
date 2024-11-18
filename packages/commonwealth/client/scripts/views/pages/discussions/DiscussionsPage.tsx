@@ -134,7 +134,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     nodeEthChainId: app?.chain.meta?.ChainNode?.eth_chain_id || 0,
   });
 
-  const { fetchNextPage, data, isInitialLoading, hasNextPage } =
+  const { fetchNextPage, data, isInitialLoading, hasNextPage, threadCount } =
     useFetchThreadsQuery({
       communityId: communityId,
       queryType: 'bulk',
@@ -283,7 +283,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
             isOnArchivePage
               ? filteredThreads.length || 0
               : threads
-                ? community?.lifetime_thread_count || 0
+                ? threadCount || 0
                 : 0
           }
           isIncludingSpamThreads={includeSpamThreads}

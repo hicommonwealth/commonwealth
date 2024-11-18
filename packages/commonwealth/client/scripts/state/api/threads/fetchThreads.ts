@@ -136,6 +136,7 @@ const fetchBulkThreads = (props) => {
       limit: number;
       page: number;
       threads: Thread[];
+      threadCount: number;
     };
     pageParam: number | undefined;
   }> => {
@@ -165,11 +166,11 @@ const fetchBulkThreads = (props) => {
         }),
       },
     });
-
     // transform the response
     const transformedData = {
       ...res.data.result,
       threads: res.data.result.threads.map((c) => new Thread(c)),
+      threadCount: res.data.result.threadCount,
     };
 
     return {
@@ -233,10 +234,13 @@ const useFetchThreadsQuery = (
       { threads: [] },
     );
 
-    return {
+    const newData = {
       ...chosenQueryType,
       data: reducedData.threads,
+      threadCount: chosenQueryType?.data?.pages[0].data.threadCount,
     };
+    console.log({ newData });
+    return newData;
   }
 
   if (isFetchActiveThreadsProps(props)) return chosenQueryType;

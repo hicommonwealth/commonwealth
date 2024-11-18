@@ -243,6 +243,27 @@ export function GetThreads(): Query<typeof schemas.GetThreads> {
           type: QueryTypes.SELECT,
         },
       );
+      const baseWhereClause = `
+        community_id = :community_id AND
+        deleted_at IS NULL AND
+        archived_at IS ${archived ? 'NOT' : ''} NULL
+        ${topic_id ? ' AND topic_id = :topic_id' : ''}
+        ${stage ? ' AND stage = :stage' : ''}
+        ${from_date ? ' AND T.created_at > :from_date' : ''}
+        ${to_date ? ' AND T.created_at < :to_date' : ''}
+        ${contestAddress ? ' AND id IN (SELECT * FROM "contest_ids")' : ''}
+      `;
+      const countThreadsQuery = models.sequelize.query<{ count: number }>(
+        `
+          SELECT COUNT(*) AS count
+          FROM "Threads" T
+          WHERE ${baseWhereClause}
+        `,
+        {
+          replacements,
+          type: QueryTypes.SELECT,
+        },
+      );
 
       const numVotingThreadsQuery = models.Thread.count({
         where: {
@@ -251,9 +272,10 @@ export function GetThreads(): Query<typeof schemas.GetThreads> {
         },
       });
 
-      const [threads, numVotingThreads] = await Promise.all([
+      const [threads, numVotingThreads, countResult] = await Promise.all([
         responseThreadsQuery,
         numVotingThreadsQuery,
+        countThreadsQuery,
       ]);
 
       return {
@@ -261,6 +283,7 @@ export function GetThreads(): Query<typeof schemas.GetThreads> {
         page: replacements.page,
         threads,
         numVotingThreads,
+        threadCount: Number(countResult[0]?.count) || 0,
       };
     },
   };
