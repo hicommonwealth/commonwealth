@@ -4,8 +4,9 @@ import {
   launchpadTokenRegisteredEventSignature,
   launchpadTradeEventSignature,
 } from '@hicommonwealth/model';
+import { commonProtocol } from '@hicommonwealth/shared';
 import { Web3 } from 'web3';
-import { erc20Abi } from './abi/erc20';
+import { createWeb3Provider } from './utils';
 
 const log = logger(import.meta);
 
@@ -146,7 +147,10 @@ export async function getErc20TokenInfo({
   tokenAddress: string;
 }): Promise<{ name: string; symbol: string; totalSupply: bigint }> {
   const web3 = new Web3(rpc);
-  const erc20Contract = new web3.eth.Contract(erc20Abi, tokenAddress);
+  const erc20Contract = new web3.eth.Contract(
+    commonProtocol.erc20Abi,
+    tokenAddress,
+  );
   const [name, symbol, totalSupply] = await Promise.all([
     erc20Contract.methods.name().call(),
     erc20Contract.methods.symbol().call(),
@@ -157,4 +161,50 @@ export async function getErc20TokenInfo({
     symbol,
     totalSupply: totalSupply as bigint,
   };
+}
+
+export async function transferLiquidityToUniswap({
+  rpc,
+  lpBondingCurveAddress,
+  tokenAddress,
+}: {
+  rpc: string;
+  lpBondingCurveAddress: string;
+  tokenAddress: string;
+}) {
+  const web3 = await createWeb3Provider(rpc);
+  const contract = new web3.eth.Contract(
+    commonProtocol.lpBondingCurveAbi,
+    lpBondingCurveAddress,
+  );
+  await commonProtocol.transferLiquidity(
+    contract,
+    tokenAddress,
+    web3.eth.defaultAccount!,
+  );
+}
+
+export async function getToken({
+  rpc,
+  lpBondingCurveAddress,
+  tokenAddress,
+}: {
+  rpc: string;
+  lpBondingCurveAddress: string;
+  tokenAddress: string;
+}): Promise<{
+  launchpadLiquidity: bigint;
+  poolLiquidity: bigint;
+  curveId: bigint;
+  scalar: bigint;
+  reserveRation: bigint;
+  LPhook: string;
+  funded: boolean;
+}> {
+  const web3 = new Web3(rpc);
+  const contract = new web3.eth.Contract(
+    commonProtocol.lpBondingCurveAbi,
+    lpBondingCurveAddress,
+  );
+  return await contract.methods.tokens(tokenAddress).call();
 }

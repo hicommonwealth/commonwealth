@@ -1,4 +1,4 @@
-export const LaunchpadFactory = [
+export const launchpadFactoryAbi = [
   {
     type: 'function',
     name: 'launchTokenWithLiquidity',

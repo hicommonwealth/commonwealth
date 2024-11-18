@@ -1,6 +1,8 @@
 import { InvalidState, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
+import { TokenView } from '@hicommonwealth/schemas';
 import { commonProtocol } from '@hicommonwealth/shared';
+import z from 'zod';
 import { models } from '../database';
 import { authRoles } from '../middleware';
 import { mustExist } from '../middleware/guards';
@@ -46,7 +48,7 @@ export function CreateToken(): Command<typeof schemas.CreateToken> {
       }
 
       const token = await models.Token.create({
-        token_address: tokenData.parsedArgs.tokenAddress,
+        token_address: tokenData.parsedArgs.tokenAddress.toLowerCase(),
         namespace: tokenData.parsedArgs.namespace,
         name: tokenInfo.name,
         symbol: tokenInfo.symbol,
@@ -58,7 +60,7 @@ export function CreateToken(): Command<typeof schemas.CreateToken> {
         icon_url: icon_url ?? null,
       });
 
-      return token!.toJSON();
+      return token!.toJSON() as unknown as z.infer<typeof TokenView>;
     },
   };
 }

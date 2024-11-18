@@ -1,5 +1,6 @@
 import { events, LaunchpadTrade } from '@hicommonwealth/core';
-import { models } from '@hicommonwealth/model';
+import { commonProtocol, models } from '@hicommonwealth/model';
+import { commonProtocol as sharedCommonProtocol } from '@hicommonwealth/shared';
 import { BigNumber } from 'ethers';
 import Web3 from 'web3';
 import { z } from 'zod';
@@ -52,7 +53,7 @@ export async function handleLaunchpadTrade(
     await models.LaunchpadTrade.create({
       eth_chain_id: chainNode.eth_chain_id!,
       transaction_hash: event.rawLog.transactionHash,
-      token_address: tokenAddress,
+      token_address: tokenAddress.toLowerCase(),
       trader_address: traderAddress,
       is_buy: isBuy,
       community_token_amount: BigNumber.from(communityTokenAmount).toBigInt(),
@@ -64,5 +65,31 @@ export async function handleLaunchpadTrade(
     });
   }
 
-  // TODO: check that liquidity has been transferred if above threshold
+  const lpBondingCurveAddress =
+    sharedCommonProtocol.factoryContracts[
+      chainNode!.eth_chain_id as sharedCommonProtocol.ValidChains
+    ].lpBondingCurve!;
+
+  if (
+    !token.liquidity_transferred &&
+    BigNumber.from(floatingSupply).toBigInt() ===
+      BigInt(token.launchpad_liquidity)
+  ) {
+    const onChainTokenData = await commonProtocol.launchpadHelpers.getToken({
+      rpc: chainNode.private_url!,
+      tokenAddress,
+      lpBondingCurveAddress,
+    });
+
+    if (!onChainTokenData.funded) {
+      await commonProtocol.launchpadHelpers.transferLiquidityToUniswap({
+        rpc: chainNode.private_url!,
+        tokenAddress,
+        lpBondingCurveAddress,
+      });
+    }
+
+    token.liquidity_transferred = true;
+    await token.save();
+  }
 }
