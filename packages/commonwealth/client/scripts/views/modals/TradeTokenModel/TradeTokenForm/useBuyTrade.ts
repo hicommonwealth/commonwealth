@@ -1,4 +1,5 @@
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import { useState } from 'react';
 import {
   useFetchTokenUsdRateQuery,
@@ -44,32 +45,53 @@ const useBuyTrade = ({
 
   // imp: this query uses CommunityStakes helper to get eth price, but its
   // a generic query so no need to initiate a separate Launchpad helper
+  const isSelectedAddressEthBalanceQueryEnabled = !!(
+    selectedAddress &&
+    tokenCommunity &&
+    enabled
+  );
   const {
     data: selectedAddressEthBalance = `0.0`,
     isLoading: isLoadingUserEthBalance,
+    refetch: refetchEthBalance,
   } = useGetUserEthBalanceQuery({
     chainRpc: tokenCommunity?.ChainNode?.url || '',
     ethChainId: tokenCommunity?.ChainNode?.eth_chain_id || 0,
     walletAddress: selectedAddress || '',
-    apiEnabled: !!(selectedAddress && tokenCommunity && enabled),
+    apiEnabled: isSelectedAddressEthBalanceQueryEnabled,
   });
 
+  const isUnitEthToTokenBuyExchangeRateQueryEnabled = !!(
+    chainNode?.url &&
+    chainNode?.ethChainId &&
+    selectedAddress &&
+    tokenCommunity &&
+    enabled
+  );
   const {
     data: unitEthToTokenBuyExchangeRate = 0,
     isLoading: isLoadingUnitEthToTokenBuyExchangeRate,
+    refetch: refetchEthToTokenExchangeRate,
   } = useTokenEthExchangeRateQuery({
     chainRpc: chainNode.url,
     ethChainId: chainNode.ethChainId || 0,
     mode: 'buy',
     tokenAmount: 1 * 1e18, // convert to wei - get exchange rate of 1 unit token to eth
     tokenAddress: tradeConfig.token.token_address,
-    enabled: !!(
-      chainNode?.url &&
-      chainNode?.ethChainId &&
-      selectedAddress &&
-      tokenCommunity &&
-      enabled
-    ),
+    enabled: isUnitEthToTokenBuyExchangeRateQueryEnabled,
+  });
+
+  useRunOnceOnCondition({
+    callback: () => {
+      // fetch fresh rates if there are any stale values
+      refetchEthBalance().catch(console.error);
+      refetchEthToTokenExchangeRate().catch(console.error);
+    },
+    shouldRun:
+      isSelectedAddressEthBalanceQueryEnabled &&
+      !!refetchEthBalance &&
+      isUnitEthToTokenBuyExchangeRateQueryEnabled &&
+      !!refetchEthToTokenExchangeRate,
   });
 
   const { mutateAsync: buyToken, isLoading: isBuyingToken } =

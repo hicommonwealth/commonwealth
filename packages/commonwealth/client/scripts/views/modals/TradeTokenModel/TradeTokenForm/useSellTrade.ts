@@ -1,9 +1,10 @@
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
+import { useState } from 'react';
 import {
   useSellTokenMutation,
   useTokenEthExchangeRateQuery,
-} from 'client/scripts/state/api/launchPad';
-import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import { useState } from 'react';
+} from 'state/api/launchPad';
 import {
   useCreateTokenTradeMutation,
   useGetERC20BalanceQuery,
@@ -29,32 +30,53 @@ const useSellTrade = ({
   const { mutateAsync: sellToken, isLoading: isSellingToken } =
     useSellTokenMutation();
 
+  const isSelectedAddressTokenBalanceQueryEnabled = !!(
+    selectedAddress &&
+    tokenCommunity &&
+    enabled
+  );
   const {
     data: selectedAddressTokenBalance = `0.0`,
     isLoading: isLoadingUserTokenBalance,
+    refetch: refetchTokenBalance,
   } = useGetERC20BalanceQuery({
     nodeRpc: tokenCommunity?.ChainNode?.url || '',
     tokenAddress: tradeConfig.token.token_address,
     userAddress: selectedAddress || '',
-    enabled,
+    enabled: isSelectedAddressTokenBalanceQueryEnabled,
   });
 
+  const isUnitTokenToEthSellExchangeRateQueryEnabled = !!(
+    chainNode?.url &&
+    chainNode?.ethChainId &&
+    selectedAddress &&
+    tokenCommunity &&
+    enabled
+  );
   const {
     data: unitTokenToEthSellExchangeRate = 0,
     isLoading: isLoadingUnitTokenToEthSellExchangeRate,
+    refetch: refetchTokenToEthExchangeRate,
   } = useTokenEthExchangeRateQuery({
     chainRpc: chainNode.url,
     ethChainId: chainNode.ethChainId || 0,
     mode: 'sell',
     tokenAmount: 1 * 1e18, // convert to wei - get exchange rate of 1 unit token to eth
     tokenAddress: tradeConfig.token.token_address,
-    enabled: !!(
-      chainNode?.url &&
-      chainNode?.ethChainId &&
-      selectedAddress &&
-      tokenCommunity &&
-      enabled
-    ),
+    enabled: isUnitTokenToEthSellExchangeRateQueryEnabled,
+  });
+
+  useRunOnceOnCondition({
+    callback: () => {
+      // fetch fresh rates if there are any stale values
+      refetchTokenBalance().catch(console.error);
+      refetchTokenToEthExchangeRate().catch(console.error);
+    },
+    shouldRun:
+      isSelectedAddressTokenBalanceQueryEnabled &&
+      !!refetchTokenBalance &&
+      isUnitTokenToEthSellExchangeRateQueryEnabled &&
+      !!refetchTokenToEthExchangeRate,
   });
 
   const ethSellAmount =

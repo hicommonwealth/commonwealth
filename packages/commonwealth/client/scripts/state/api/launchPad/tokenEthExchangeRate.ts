@@ -2,7 +2,7 @@ import { commonProtocol } from '@hicommonwealth/shared';
 import { useQuery } from '@tanstack/react-query';
 import LaunchpadBondingCurve from 'helpers/ContractHelpers/Launchpad';
 
-const TOKEN_ETH_EXCHANGE_TIME = 1000; // 1s
+const TOKEN_ETH_EXCHANGE_TIME = 30 * 1000; // 30s
 
 interface TokenEthExchangeRateProps {
   chainRpc: string;
