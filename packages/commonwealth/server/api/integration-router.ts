@@ -30,6 +30,7 @@ function build() {
 
   if (config.CONTESTS.FLAG_FARCASTER_CONTEST) {
     // Farcaster frames
+    // WARNING: do not change this because cloudflare may route to it
     router.use('/farcaster/contests', farcasterRouter);
 
     // Farcaster webhooks/actions
