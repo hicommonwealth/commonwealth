@@ -20,6 +20,16 @@ export const buildAssociations = (db: DB) => {
       foreignKey: 'user_id',
       onUpdate: 'CASCADE',
       onDelete: 'CASCADE',
+    })
+    .withMany(db.Referral, {
+      foreignKey: 'referrer_id',
+      onUpdate: 'CASCADE',
+      onDelete: 'CASCADE',
+    })
+    .withMany(db.Referral, {
+      foreignKey: 'referee_id',
+      onUpdate: 'CASCADE',
+      onDelete: 'CASCADE',
     });
 
   db.Quest.withMany(db.QuestActionMeta, {
