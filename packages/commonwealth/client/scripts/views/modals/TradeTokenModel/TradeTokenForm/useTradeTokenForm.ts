@@ -122,7 +122,6 @@ const useTradeTokenForm = ({
       mode: { value: tradingMode, onChange: onTradingModeChange },
       token: tradeConfig.token,
     },
-    // TODO: add presets for max amounts?
     addresses: {
       available: userAddresses,
       default: selectedAddress,
