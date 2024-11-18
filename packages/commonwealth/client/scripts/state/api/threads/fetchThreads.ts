@@ -234,13 +234,12 @@ const useFetchThreadsQuery = (
       { threads: [] },
     );
 
-    const newData = {
+    const formattedData = {
       ...chosenQueryType,
       data: reducedData.threads,
       threadCount: chosenQueryType?.data?.pages[0].data.threadCount,
     };
-    console.log({ newData });
-    return newData;
+    return formattedData;
   }
 
   if (isFetchActiveThreadsProps(props)) return chosenQueryType;
