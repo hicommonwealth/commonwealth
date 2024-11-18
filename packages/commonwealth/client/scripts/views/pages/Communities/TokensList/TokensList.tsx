@@ -69,8 +69,7 @@ const TokensList = () => {
     const pricePercentage24HourChange = parseFloat(
       (((currentPrice - price24HrAgo) / price24HrAgo) * 100 || 0).toFixed(2),
     );
-    const marketCapCurrent =
-      currentPrice * (Number(token.initial_supply) / 1e18);
+    const marketCapCurrent = currentPrice * token.initial_supply;
     const marketCapGoal = token.eth_market_cap_target * ethToUsdRate;
     const isMarketCapGoalReached = false;
 

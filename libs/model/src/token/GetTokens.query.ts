@@ -21,7 +21,12 @@ export function GetTokens(): Query<typeof schemas.GetTokens> {
 
       // pagination configuration
       const direction = order_direction || 'DESC';
-      const order_col = order_by || 'name';
+      let order_col: string = order_by || 'name';
+      if (order_by === 'market_cap' || order_by === 'price') {
+        order_col = 'trades.latest_price';
+      }
+      const includeStats = with_stats || order_col === 'trades.latest_price';
+
       const offset = limit! * (cursor! - 1);
       const replacements: {
         search?: string;
@@ -39,7 +44,7 @@ export function GetTokens(): Query<typeof schemas.GetTokens> {
 
       const sql = `
           ${
-            with_stats
+            includeStats
               ? `WITH latest_trades AS (SELECT DISTINCT ON (token_address) *
                                  FROM "LaunchpadTrades"
                                  ORDER BY token_address, timestamp DESC),
@@ -59,12 +64,12 @@ export function GetTokens(): Query<typeof schemas.GetTokens> {
           }
           SELECT T.*,
                  C.id as community_id,
-                 ${with_stats ? 'trades.latest_price, trades.old_price,' : ''}
+                 ${includeStats ? 'trades.latest_price, trades.old_price,' : ''}
                          count(*) OVER () AS total
           FROM "Tokens" as T
               JOIN "Communities" as C
           ON T.namespace = C.namespace
-              ${with_stats ? 'LEFT JOIN trades ON trades.token_address = T.token_address' : ''}
+              ${includeStats ? 'LEFT JOIN trades ON trades.token_address = T.token_address' : ''}
               ${search ? 'WHERE LOWER(T.name) LIKE :search' : ''}
           ORDER BY ${order_col} :direction
           LIMIT :limit OFFSET :offset
