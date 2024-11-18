@@ -1,20 +1,15 @@
+import { ExtendedCommunity } from '@hicommonwealth/schemas';
 import { commonProtocol } from '@hicommonwealth/shared';
-import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import NodeInfo from 'models/NodeInfo';
 import { useMemo, useState } from 'react';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
-import {
-  useFetchTokenUsdRateQuery,
-  useGetUserEthBalanceQuery,
-} from 'state/api/communityStake';
-import { useBuyTokenMutation } from 'state/api/launchPad';
 import { fetchCachedNodes } from 'state/api/nodes';
-import { useCreateTokenTradeMutation } from 'state/api/tokens';
 import useUserStore from 'state/ui/user';
-import useJoinCommunity from 'views/components/SublayoutHeader/useJoinCommunity';
-import './TradeTokenForm.scss';
+import { z } from 'zod';
 import { TradingMode, UseTradeTokenFormProps } from './types';
+import useBuyTrade from './useBuyTrade';
+import useSellTrade from './useSellTrade';
 
 const COMMON_PLATFORM_FEE_PERCENTAGE = 5; // make configurable when needed
 
@@ -23,8 +18,6 @@ const useTradeTokenForm = ({
   addressType,
   onTradeComplete,
 }: UseTradeTokenFormProps) => {
-  const [baseCurrencyTradingAmount, setBaseCurrencyTradingAmount] =
-    useState<number>(0);
   const [tradingMode, setTradingMode] = useState<TradingMode>(
     tradeConfig.mode || TradingMode.Buy,
   );
@@ -48,20 +41,6 @@ const useTradeTokenForm = ({
     (n) => n.ethChainId === commonProtocol.ValidChains.SepoliaBase,
   ) as NodeInfo; // this is expected to exist
 
-  const { linkSpecificAddressToSpecificCommunity } = useJoinCommunity();
-
-  const { data: ethToCurrencyRateData, isLoading: isLoadingETHToCurrencyRate } =
-    useFetchTokenUsdRateQuery({
-      tokenSymbol: 'ETH',
-    });
-  const ethToCurrencyRate = parseFloat(
-    ethToCurrencyRateData?.data?.data?.amount || '0.00',
-  );
-
-  const ethBuyAmount = baseCurrencyTradingAmount / ethToCurrencyRate;
-  const commonPlatformFeeForBuyTradeInEth =
-    (COMMON_PLATFORM_FEE_PERCENTAGE / 100) * ethBuyAmount;
-
   const { data: tokenCommunity, isLoading: isLoadingTokenCommunity } =
     useGetCommunityByIdQuery({
       id: tradeConfig.token.community_id,
@@ -69,43 +48,10 @@ const useTradeTokenForm = ({
       includeNodeInfo: true,
     });
 
-  // imp: this query uses CommunityStakes helper to get eth price, but its
-  // a generic query so no need to initiate a separate Launhpad helper
-  const {
-    data: selectedAddressEthBalance = `0.0`,
-    isLoading: isLoadingUserEthBalance,
-  } = useGetUserEthBalanceQuery({
-    chainRpc: tokenCommunity?.ChainNode?.url || '',
-    ethChainId: tokenCommunity?.ChainNode?.eth_chain_id || 0,
-    walletAddress: selectedAddress || '',
-    apiEnabled: !!(selectedAddress && tokenCommunity),
-  });
-
   useRunOnceOnCondition({
     callback: () => setSelectedAddress(userAddresses[0]),
     shouldRun: userAddresses.length > 0 && !selectedAddress,
   });
-
-  const { mutateAsync: buyToken, isLoading: isBuyingToken } =
-    useBuyTokenMutation();
-
-  const { mutateAsync: createTokenTrade, isLoading: isCreatingTokenTrade } =
-    useCreateTokenTradeMutation();
-
-  const onBaseCurrencyTradingAmountChange = (
-    change: React.ChangeEvent<HTMLInputElement> | number,
-  ) => {
-    if (typeof change == 'number') {
-      setBaseCurrencyTradingAmount(change);
-    } else {
-      const value = change.target.value;
-
-      if (value === '') setBaseCurrencyTradingAmount(0);
-      // verify only numbers with decimal (optional) are present
-      else if (/^\d+(\.\d+)?$/.test(value))
-        setBaseCurrencyTradingAmount(parseFloat(value));
-    }
-  };
 
   const onTradingModeChange = (mode: TradingMode) => {
     setTradingMode(mode);
@@ -115,71 +61,39 @@ const useTradeTokenForm = ({
     setSelectedAddress(address);
   };
 
-  const handleTokenBuy = async () => {
-    try {
-      // this condition wouldn't be called, but adding to avoid typescript issues
-      if (
-        !baseNode?.url ||
-        !baseNode?.ethChainId ||
-        !selectedAddress ||
-        !tokenCommunity
-      ) {
-        return;
-      }
+  const {
+    amounts: buyTradeAmounts,
+    handleTokenBuy,
+    isBuyActionPending,
+    selectedAddressEthBalance,
+  } = useBuyTrade({
+    enabled: tradingMode === TradingMode.Buy,
+    chainNode: baseNode,
+    selectedAddress,
+    commonFeePercentage: COMMON_PLATFORM_FEE_PERCENTAGE,
+    tradeConfig,
+    onTradeComplete,
+    tokenCommunity: tokenCommunity as z.infer<typeof ExtendedCommunity>,
+  });
 
-      // buy token on chain
-      const payload = {
-        chainRpc: baseNode.url,
-        ethChainId: baseNode.ethChainId,
-        amountEth: ethBuyAmount * 1e18, // amount in wei
-        walletAddress: selectedAddress,
-        tokenAddress: tradeConfig.token.token_address,
-      };
-      const txReceipt = await buyToken(payload);
-
-      // create token trade on db
-      await createTokenTrade({
-        eth_chain_id: baseNode?.ethChainId,
-        transaction_hash: txReceipt.transactionHash,
-      });
-
-      // join user's selected address to community
-      const isMemberOfCommunity = user.addresses.find(
-        (x) => x.community.id === tokenCommunity.id,
-      );
-      if (!isMemberOfCommunity) {
-        await linkSpecificAddressToSpecificCommunity({
-          address: selectedAddress,
-          community: {
-            base: tokenCommunity.base,
-            iconUrl: tokenCommunity.icon_url || '',
-            id: tokenCommunity.id,
-            name: tokenCommunity.name,
-          },
-        });
-      }
-
-      // update user about success
-      notifySuccess('Transactions successful!');
-
-      onTradeComplete?.();
-    } catch (e) {
-      notifyError('Failed to buy token');
-      console.log('Failed to buy token => ', e);
-    }
-  };
-
-  const handleTokenSell = async () => {
-    // TODO: implement selling logic
-  };
+  const {
+    amounts: sellTradeAmounts,
+    handleTokenSell,
+    isSellActionPending,
+    selectedAddressTokenBalance,
+  } = useSellTrade({
+    enabled: tradingMode === TradingMode.Sell,
+    chainNode: baseNode,
+    selectedAddress,
+    commonFeePercentage: COMMON_PLATFORM_FEE_PERCENTAGE,
+    tradeConfig,
+    onTradeComplete,
+    tokenCommunity: tokenCommunity as z.infer<typeof ExtendedCommunity>,
+  });
 
   // flag to indicate if something is ongoing
   const isActionPending =
-    isLoadingTokenCommunity ||
-    isLoadingUserEthBalance ||
-    isBuyingToken ||
-    isLoadingETHToCurrencyRate ||
-    isCreatingTokenTrade;
+    isLoadingTokenCommunity || isBuyActionPending || isSellActionPending;
 
   const onCTAClick = () => {
     if (isActionPending) return;
@@ -198,40 +112,30 @@ const useTradeTokenForm = ({
   };
 
   return {
-    // Note: not exporting state setters directly, since some extra
-    // functionality is done in most "onChange" handlers above
+    // Note: not exporting state setters directly, all "buy/sell token"
+    // business logic should be done (or exported from) in this hook
     trading: {
       amounts: {
-        buy: {
-          eth: ethBuyAmount,
-          token: 100, // TODO: hardcoded for now
-          baseCurrency: {
-            name: tradeConfig.currency, // USD/GBP etc
-            amount: baseCurrencyTradingAmount,
-            onAmountChange: onBaseCurrencyTradingAmountChange,
-            presetAmounts: tradeConfig.presetAmounts,
-          },
-          insufficientFunds:
-            ethBuyAmount > parseFloat(selectedAddressEthBalance),
-        },
+        buy: buyTradeAmounts,
+        sell: sellTradeAmounts,
       },
-      unitEthToBaseCurrencyRate: ethToCurrencyRate,
       mode: { value: tradingMode, onChange: onTradingModeChange },
       token: tradeConfig.token,
-      // TODO: hardcoded for now
-      commonPlatformFee: {
-        percentage: `${COMMON_PLATFORM_FEE_PERCENTAGE}%`,
-        eth: commonPlatformFeeForBuyTradeInEth,
-      },
     },
     addresses: {
       available: userAddresses,
       default: selectedAddress,
       selected: {
         value: selectedAddress,
-        ethBalance: {
-          value: selectedAddressEthBalance,
-          isLoading: isLoadingUserEthBalance,
+        balances: {
+          eth: {
+            value: selectedAddressEthBalance.value,
+            isLoading: selectedAddressEthBalance.isLoading,
+          },
+          selectedToken: {
+            value: selectedAddressTokenBalance.value,
+            isLoading: selectedAddressTokenBalance.isLoading,
+          },
         },
         onChange: onChangeSelectedAddress,
       },
