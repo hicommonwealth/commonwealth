@@ -112,7 +112,11 @@ const useBuyTrade = ({
 
       if (value === '') setBaseCurrencyBuyAmountString('0');
       // verify only numbers with decimal (optional) are present
-      else if (/^\d*\.?\d*$/.test(value)) setBaseCurrencyBuyAmountString(value);
+      else if (/^\d*\.?\d*$/.test(value)) {
+        setBaseCurrencyBuyAmountString(
+          value.includes('.') ? value : value.replace(/^0+(?!$)/, ''), // remove leading 0's from non-decimal values
+        );
+      }
     }
   };
 
