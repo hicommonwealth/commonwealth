@@ -3,8 +3,10 @@ import { ChainBase } from '@hicommonwealth/shared';
 import clsx from 'clsx';
 import { useFlag } from 'hooks/useFlag';
 import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
+import numeral from 'numeral';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useFetchTokenUsdRateQuery } from 'state/api/communityStake';
 import { useFetchTokensQuery } from 'state/api/tokens';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
@@ -40,9 +42,18 @@ const TokensList = () => {
   } = useFetchTokensQuery({
     cursor: 1,
     limit: 8,
+    with_stats: true,
     enabled: tokenizedCommunityEnabled,
   });
   const tokens = (tokensList?.pages || []).flatMap((page) => page.results);
+
+  const { data: ethToCurrencyRateData, isLoading: isLoadingETHToCurrencyRate } =
+    useFetchTokenUsdRateQuery({
+      tokenSymbol: 'ETH',
+    });
+  const ethToUsdRate = parseFloat(
+    ethToCurrencyRateData?.data?.data?.amount || '0',
+  );
 
   const handleFetchMoreTokens = () => {
     if (hasNextPage && !isFetchingNextPage) {
@@ -50,12 +61,30 @@ const TokensList = () => {
     }
   };
 
+  const calculateTokenPricing = (token: z.infer<typeof TokenView>) => {
+    const currentPrice = token.latest_price || '0';
+    const pricePercentage24HourChange = 1.15;
+    const marketCapCurrent = 300;
+    const marketCapGoal = numeral(
+      parseFloat((token.eth_market_cap_target * ethToUsdRate).toFixed(2)),
+    ).format('0.0a');
+    const isMarketCapGoalReached = false;
+
+    return {
+      currentPrice,
+      pricePercentage24HourChange,
+      marketCapCurrent,
+      marketCapGoal,
+      isMarketCapGoalReached,
+    };
+  };
+
   if (!tokenizedCommunityEnabled) return <></>;
 
   return (
     <div className="TokensList">
       <CWText type="h2">Tokens</CWText>
-      {isInitialLoading ? (
+      {isInitialLoading || isLoadingETHToCurrencyRate ? (
         <CWCircleMultiplySpinner />
       ) : tokens.length === 0 ? (
         <div
@@ -71,41 +100,48 @@ const TokensList = () => {
         </div>
       ) : (
         <div className="list">
-          {(tokens || []).map((token) => (
-            <TokenCard
-              key={token.name}
-              name={token.name}
-              symbol={token.symbol}
-              // {
-              // TODO: https://github.com/hicommonwealth/commonwealth/issues/9694
-              price="0.75"
-              pricePercentage24HourChange={1.15}
-              marketCap={{
-                current: 300,
-                goal: 4500,
-              }}
-              // }
-              mode="buy"
-              iconURL={token.icon_url || ''}
-              onCTAClick={() =>
-                setTokenLaunchModalConfig({
-                  isOpen: true,
-                  tradeConfig: {
-                    mode: TradingMode.Buy,
-                    token: token as z.infer<typeof TokenWithCommunity>,
-                    addressType: ChainBase.Ethereum,
-                  },
-                })
-              }
-              onCardBodyClick={() =>
-                navigateToCommunity({
-                  navigate,
-                  path: '',
-                  chain: token.community_id,
-                })
-              }
-            />
-          ))}
+          {(tokens || []).map((token) => {
+            const pricing = calculateTokenPricing(
+              token as z.infer<typeof TokenView>,
+            );
+
+            return (
+              <TokenCard
+                key={token.name}
+                name={token.name}
+                symbol={token.symbol}
+                price={pricing.currentPrice}
+                pricePercentage24HourChange={
+                  pricing.pricePercentage24HourChange
+                }
+                marketCap={{
+                  current: pricing.marketCapCurrent,
+                  goal: pricing.marketCapGoal,
+                }}
+                mode={pricing.isMarketCapGoalReached ? 'swap' : 'buy'}
+                iconURL={token.icon_url || ''}
+                onCTAClick={() => {
+                  if (pricing.isMarketCapGoalReached) return;
+
+                  setTokenLaunchModalConfig({
+                    isOpen: true,
+                    tradeConfig: {
+                      mode: TradingMode.Buy,
+                      token: token as z.infer<typeof TokenWithCommunity>,
+                      addressType: ChainBase.Ethereum,
+                    },
+                  });
+                }}
+                onCardBodyClick={() =>
+                  navigateToCommunity({
+                    navigate,
+                    path: '',
+                    chain: token.community_id,
+                  })
+                }
+              />
+            );
+          })}
         </div>
       )}
       {isFetchingNextPage ? (
