@@ -127,7 +127,7 @@ export const FarcasterCast = z.object({
   replies: z.object({
     count: z.number(),
   }),
-  channel: z.string().nullable(),
+  channel: z.any().nullable(),
   mentioned_profiles: z.array(z.unknown()),
   event_timestamp: z.string(),
 });
