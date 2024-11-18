@@ -41,7 +41,7 @@ describe('Referral lifecycle', () => {
         chain_node_id: node.id!,
         id,
         name: id,
-        type: ChainType.Chain,
+        type: ChainType.Offchain,
         base: ChainBase.Ethereum,
         default_symbol: 'TEST',
         social_links: [],
@@ -52,6 +52,9 @@ describe('Referral lifecycle', () => {
     });
 
     // drain the outbox
+    // TODO: Create a testing utility to drain the outbox and push
+    // the events to the predefined event handlers ... this is a simple
+    // simulation of what the infrastructure would do in production
 
     // get referrals
     const referrals = await models.Referral.findAll({
