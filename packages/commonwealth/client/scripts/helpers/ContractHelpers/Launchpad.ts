@@ -64,9 +64,9 @@ class LaunchpadBondingCurve extends ContractBase {
     return txReceipt;
   }
 
-  async buyToken(amountEth: number, walletAddress: string) {
+  async buyToken(amountEth: number, walletAddress: string, chainId: string) {
     if (!this.initialized || !this.walletEnabled) {
-      await this.initialize(true);
+      await this.initialize(true, chainId);
     }
 
     const txReceipt = await buyToken(
@@ -78,16 +78,20 @@ class LaunchpadBondingCurve extends ContractBase {
     return txReceipt;
   }
 
-  async sellToken(amountSell: number, walletAddress: string) {
+  async sellToken(amountSell: number, walletAddress: string, chainId: string) {
     if (!this.initialized || !this.walletEnabled) {
-      await this.initialize(true);
+      await this.initialize(true, chainId);
     }
-
+    const tokenContract = new this.web3.eth.Contract(
+      commonProtocol.erc20Abi as unknown as AbiItem[],
+      this.tokenAddress,
+    );
     const txReceipt = await sellToken(
       this.contract,
       this.tokenAddress,
       amountSell,
       walletAddress,
+      tokenContract,
     );
     return txReceipt;
   }
@@ -105,14 +109,18 @@ class LaunchpadBondingCurve extends ContractBase {
     return txReceipt;
   }
 
-  async getAmountOut(amountIn: number, buy: boolean) {
+  async getAmountOut(amountIn: number, buy: boolean, chainId: string) {
+    if (!this.initialized || !this.walletEnabled) {
+      await this.initialize(true, chainId);
+    }
+
     const amountOut = await getPrice(
-      this.contractAddress,
+      this.contract,
       this.tokenAddress,
       amountIn,
       buy,
     );
-    return Number(amountOut / 1e18);
+    return Number(amountOut) / 1e18;
   }
 }
 

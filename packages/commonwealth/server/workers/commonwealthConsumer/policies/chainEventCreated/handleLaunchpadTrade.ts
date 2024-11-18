@@ -53,7 +53,7 @@ export async function handleLaunchpadTrade(
     await models.LaunchpadTrade.create({
       eth_chain_id: chainNode.eth_chain_id!,
       transaction_hash: event.rawLog.transactionHash,
-      token_address: tokenAddress,
+      token_address: tokenAddress.toLowerCase(),
       trader_address: traderAddress,
       is_buy: isBuy,
       community_token_amount: BigNumber.from(communityTokenAmount).toBigInt(),

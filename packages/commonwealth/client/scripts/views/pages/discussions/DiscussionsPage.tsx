@@ -37,6 +37,7 @@ import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCo
 import { isContestActive } from 'views/pages/CommunityManagement/Contests/utils';
 import useTokenMetadataQuery from '../../../state/api/tokens/getTokenMetadata';
 import { AdminOnboardingSlider } from '../../components/AdminOnboardingSlider';
+import { CWGrowlTemplate } from '../../components/SublayoutHeader/GrowlTemplate/CWGrowlTemplate';
 import { UserTrainingSlider } from '../../components/UserTrainingSlider';
 import { CWText } from '../../components/component_kit/cw_text';
 import CWIconButton from '../../components/component_kit/new_designs/CWIconButton';
@@ -359,41 +360,51 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
               );
 
               return (
-                <ThreadCard
-                  key={thread?.id + '-' + thread.readOnly}
-                  thread={thread}
-                  canReact={
-                    disabledReactPermissionTooltipText
-                      ? !disabledReactPermissionTooltipText
-                      : !disabledActionsTooltipText
-                  }
-                  canComment={
-                    disabledCommentPermissionTooltipText
-                      ? !disabledCommentPermissionTooltipText
-                      : !disabledActionsTooltipText
-                  }
-                  onEditStart={() => navigate(`${discussionLink}?isEdit=true`)}
-                  onStageTagClick={() => {
-                    navigate(`/discussions?stage=${thread.stage}`);
-                  }}
-                  threadHref={`${getScopePrefix()}${discussionLink}`}
-                  onBodyClick={() => {
-                    const scrollEle =
-                      document.getElementsByClassName('Body')[0];
-                    localStorage[`${communityId}-discussions-scrollY`] =
-                      scrollEle.scrollTop;
-                  }}
-                  onCommentBtnClick={() =>
-                    navigate(`${discussionLink}?focusComments=true`)
-                  }
-                  disabledActionsTooltipText={
-                    disabledCommentPermissionTooltipText ||
-                    disabledReactPermissionTooltipText ||
-                    disabledActionsTooltipText
-                  }
-                  hideRecentComments
-                  editingDisabled={isThreadTopicInContest}
-                />
+                <>
+                  <ThreadCard
+                    key={thread?.id + '-' + thread.readOnly}
+                    thread={thread}
+                    canReact={
+                      disabledReactPermissionTooltipText
+                        ? !disabledReactPermissionTooltipText
+                        : !disabledActionsTooltipText
+                    }
+                    canComment={
+                      disabledCommentPermissionTooltipText
+                        ? !disabledCommentPermissionTooltipText
+                        : !disabledActionsTooltipText
+                    }
+                    onEditStart={() =>
+                      navigate(`${discussionLink}?isEdit=true`)
+                    }
+                    onStageTagClick={() => {
+                      navigate(`/discussions?stage=${thread.stage}`);
+                    }}
+                    threadHref={`${getScopePrefix()}${discussionLink}`}
+                    onBodyClick={() => {
+                      const scrollEle =
+                        document.getElementsByClassName('Body')[0];
+                      localStorage[`${communityId}-discussions-scrollY`] =
+                        scrollEle.scrollTop;
+                    }}
+                    onCommentBtnClick={() =>
+                      navigate(`${discussionLink}?focusComments=true`)
+                    }
+                    disabledActionsTooltipText={
+                      disabledCommentPermissionTooltipText ||
+                      disabledReactPermissionTooltipText ||
+                      disabledActionsTooltipText
+                    }
+                    hideRecentComments
+                    editingDisabled={isThreadTopicInContest}
+                  />
+                  <CWGrowlTemplate
+                    headerText="Attention!"
+                    bodyText="'Overview' page has been merged with the 'All' page"
+                    buttonText="test"
+                    growlType="discussion"
+                  />
+                </>
               );
             }}
             endReached={() => {

@@ -255,11 +255,12 @@ export const QuickTokenLaunchForm = ({
           addressSelectorSelectedAddress: selectedAddress.address,
         });
 
-        await createToken({
+        const token = await createToken({
           transaction_hash: txReceipt.transactionHash,
           chain_node_id: baseNode.id,
           community_id: communityId,
           icon_url: sanitizedTokenInfo.imageURL,
+          description: sanitizedTokenInfo.description,
         });
 
         // 4. update community to reference the created token
@@ -269,6 +270,8 @@ export const QuickTokenLaunchForm = ({
         });
         await updateCommunity({
           community_id: communityId,
+          namespace: token.namespace,
+          transactionHash: txReceipt.transactionHash,
           token_name: sanitizedTokenInfo.name,
           ...(sanitizedTokenInfo.description && {
             description: sanitizedTokenInfo.description,
