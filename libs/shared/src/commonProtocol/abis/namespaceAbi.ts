@@ -1,4 +1,4 @@
-export const NamespaceAbi = [
+export const namespaceAbi = [
   {
     type: 'function',
     name: 'balanceOf',

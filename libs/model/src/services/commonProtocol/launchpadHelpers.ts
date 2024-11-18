@@ -6,8 +6,6 @@ import {
 } from '@hicommonwealth/model';
 import { commonProtocol } from '@hicommonwealth/shared';
 import { Web3 } from 'web3';
-import { LPBondingCurveAbi } from './abi/LPBondingCurve';
-import { erc20Abi } from './abi/erc20';
 import { createWeb3Provider } from './utils';
 
 const log = logger(import.meta);
@@ -149,7 +147,10 @@ export async function getErc20TokenInfo({
   tokenAddress: string;
 }): Promise<{ name: string; symbol: string; totalSupply: bigint }> {
   const web3 = new Web3(rpc);
-  const erc20Contract = new web3.eth.Contract(erc20Abi, tokenAddress);
+  const erc20Contract = new web3.eth.Contract(
+    commonProtocol.erc20Abi,
+    tokenAddress,
+  );
   const [name, symbol, totalSupply] = await Promise.all([
     erc20Contract.methods.name().call(),
     erc20Contract.methods.symbol().call(),
@@ -173,7 +174,7 @@ export async function transferLiquidityToUniswap({
 }) {
   const web3 = await createWeb3Provider(rpc);
   const contract = new web3.eth.Contract(
-    LPBondingCurveAbi,
+    commonProtocol.lpBondingCurveAbi,
     lpBondingCurveAddress,
   );
   await commonProtocol.transferLiquidity(
@@ -202,7 +203,7 @@ export async function getToken({
 }> {
   const web3 = new Web3(rpc);
   const contract = new web3.eth.Contract(
-    LPBondingCurveAbi,
+    commonProtocol.lpBondingCurveAbi,
     lpBondingCurveAddress,
   );
   return await contract.methods.tokens(tokenAddress).call();

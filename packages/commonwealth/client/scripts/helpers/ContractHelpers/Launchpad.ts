@@ -1,3 +1,4 @@
+import { commonProtocol } from '@hicommonwealth/shared';
 import { Contract } from 'web3';
 import { AbiItem } from 'web3-utils';
 import {
@@ -7,15 +8,12 @@ import {
   sellToken,
   transferLiquidity,
 } from '../../../../../../libs/shared/src/commonProtocol';
-import { Erc20Abi } from './Abi/ERC20Abi';
-import { LpBondingCurve } from './Abi/LpBondingCurveAbi';
 import ContractBase from './ContractBase';
-import { LaunchpadFactory } from './LaunchpadFactoryAbi';
 
 class LaunchpadBondingCurve extends ContractBase {
   tokenAddress: string;
   launchpadFactoryAddress: string;
-  launchpadFactory: Contract<typeof LaunchpadFactory>;
+  launchpadFactory: Contract<typeof commonProtocol.launchpadFactoryAbi>;
   tokenCommunityManager: string;
 
   constructor(
@@ -25,7 +23,7 @@ class LaunchpadBondingCurve extends ContractBase {
     tokenCommunityManager: string,
     rpc: string,
   ) {
-    super(bondingCurveAddress, LpBondingCurve, rpc);
+    super(bondingCurveAddress, commonProtocol.lpBondingCurveAbi, rpc);
     this.tokenAddress = tokenAddress;
     this.launchpadFactoryAddress = launchpadFactoryAddress;
     this.tokenCommunityManager = tokenCommunityManager;
@@ -37,9 +35,9 @@ class LaunchpadBondingCurve extends ContractBase {
   ): Promise<void> {
     await super.initialize(withWallet, chainId);
     this.launchpadFactory = new this.web3.eth.Contract(
-      LaunchpadFactory as AbiItem[],
+      commonProtocol.launchpadFactoryAbi as AbiItem[],
       this.launchpadFactoryAddress,
-    ) as unknown as Contract<typeof LaunchpadFactory>;
+    ) as unknown as Contract<typeof commonProtocol.launchpadFactoryAbi>;
   }
 
   async launchToken(
@@ -85,7 +83,7 @@ class LaunchpadBondingCurve extends ContractBase {
       await this.initialize(true, chainId);
     }
     const tokenContract = new this.web3.eth.Contract(
-      Erc20Abi as AbiItem[],
+      commonProtocol.erc20Abi as unknown as AbiItem[],
       this.tokenAddress,
     );
     const txReceipt = await sellToken(
