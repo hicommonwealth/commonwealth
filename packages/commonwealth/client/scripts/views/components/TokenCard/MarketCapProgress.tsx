@@ -1,0 +1,46 @@
+import clsx from 'clsx';
+import { currencyNameToSymbolMap, SupportedCurrencies } from 'helpers/currency';
+import React from 'react';
+import { CWIcon } from '../component_kit/cw_icons/cw_icon';
+import { CWText } from '../component_kit/cw_text';
+import './MarketCapProgress.scss';
+
+interface MarketCapProgressProps {
+  currency?: SupportedCurrencies;
+  marketCap: { current: number; goal: number };
+  onBodyClick?: (e: React.MouseEvent) => void;
+}
+
+const MarketCapProgress = ({
+  currency = SupportedCurrencies.USD,
+  marketCap,
+  onBodyClick,
+}: MarketCapProgressProps) => {
+  const currencySymbol = currencyNameToSymbolMap[currency];
+  const isCapped = marketCap.current === marketCap.goal;
+  const progressPercentage = Math.floor(
+    (marketCap.current / marketCap.goal) * 100,
+  );
+
+  return (
+    <div className="MarketCapProgress" onClick={onBodyClick}>
+      <progress
+        className={clsx('goal-progress', { isCapped })}
+        value={progressPercentage}
+        max={100}
+      />
+      <div className="prices">
+        <CWText className="text-dark caps" type="caption">
+          MCAP {currencySymbol}
+          {marketCap.current} | Goal {currencySymbol}
+          {marketCap.goal}
+        </CWText>
+        {isCapped && (
+          <CWIcon iconName="rocketLaunch" className="token-capped-icon" />
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default MarketCapProgress;

@@ -1,5 +1,7 @@
+import { TokenView } from '@hicommonwealth/schemas';
 import 'components/sidebar/CommunitySection/CommunitySection.scss';
 import { findDenominationString } from 'helpers/findDenomination';
+import { useFlag } from 'hooks/useFlag';
 import React from 'react';
 import app from 'state';
 import { useFetchCustomDomainQuery } from 'state/api/configuration';
@@ -15,6 +17,7 @@ import { getUniqueTopicIdsIncludedInActiveContest } from 'views/components/sideb
 import { SubscriptionButton } from 'views/components/subscription_button';
 import ManageCommunityStakeModal from 'views/modals/ManageCommunityStakeModal/ManageCommunityStakeModal';
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
+import { z } from 'zod';
 import useManageCommunityStakeModalStore from '../../../../state/ui/modals/manageCommunityStakeModal';
 import Permissions from '../../../../utils/Permissions';
 import AccountConnectionIndicator from '../AccountConnectionIndicator';
@@ -25,12 +28,15 @@ import { DiscussionSection } from '../discussion_section';
 import { ExternalLinksModule } from '../external_links_module';
 import { GovernanceSection } from '../governance_section';
 import { CommunitySectionSkeleton } from './CommunitySectionSkeleton';
+import { TokenTradeWidget } from './TokenTradeWidget';
 
 interface CommunitySectionProps {
   showSkeleton: boolean;
 }
 
 export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
+  const tokenizedCommunityEnabled = useFlag('tokenizedCommunity');
+
   const user = useUserStore();
   const {
     selectedAddress,
@@ -51,6 +57,26 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
   });
   const { isContestAvailable, isContestDataLoading, contestsData } =
     useCommunityContests();
+
+  // TODO: need api to get token per community;
+  const communityToken = {
+    token_address: '0xa40d9517de7e6536ccbbf6df45a1ad12fe2d040c',
+    namespace: 'TikTokTulipMania',
+    name: 'TikTokTulipMania',
+    symbol: 'TTTMN',
+    initial_supply: '1000000000000000000000000000',
+    liquidity_transferred: false,
+    launchpad_liquidity: '430000000000000000000000000',
+    eth_market_cap_target: 29.447347142468825,
+    icon_url:
+      'https://s3.amazonaws.com/local.assets/de0e4788-8abe-436b-84cc-7f83a2f6cb5f.png',
+    // eslint-disable-next-line max-len
+    description: `TikTokTulipMania: Because nothing says "investment" like fleeting trends and historical economic collapses. Dive in, it's only pixels! 🌷💸`,
+    created_at: '2024-11-18T19:28:15.103Z',
+    updated_at: '2024-11-18T19:28:15.103Z',
+    community_id: 'tiktoktulipmania-tttmn-community',
+  } as unknown as z.infer<typeof TokenView>;
+  const isLoadingToken = false;
 
   const { data: domain } = useFetchCustomDomainQuery();
 
@@ -90,6 +116,13 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
               />
             )}
           </>
+        )}
+
+        {tokenizedCommunityEnabled && communityToken && (
+          <TokenTradeWidget
+            showSkeleton={isLoadingToken}
+            token={communityToken}
+          />
         )}
 
         <CreateCommunityButton />

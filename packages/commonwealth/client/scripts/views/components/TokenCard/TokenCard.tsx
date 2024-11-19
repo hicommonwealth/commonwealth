@@ -1,16 +1,17 @@
 import clsx from 'clsx';
+import { currencyNameToSymbolMap, SupportedCurrencies } from 'helpers/currency';
 import React, { ReactNode } from 'react';
-import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { CWText } from '../component_kit/cw_text';
 import { CWButton } from '../component_kit/new_designs/CWButton';
 import { CWTooltip } from '../component_kit/new_designs/CWTooltip';
+import MarketCapProgress from './MarketCapProgress';
 import './TokenCard.scss';
 
 interface TokenCardProps {
   name: string;
   symbol: string;
   iconURL: string;
-  currency?: 'USD';
+  currency?: SupportedCurrencies;
   marketCap: { current: number; goal: number };
   price: string;
   pricePercentage24HourChange: number;
@@ -20,17 +21,13 @@ interface TokenCardProps {
   onCardBodyClick?: () => void;
 }
 
-const currentNameToSymbol = {
-  USD: '$',
-};
-
 const MAX_CHARS_FOR_LABELS = 9;
 
 const TokenCard = ({
   name,
   symbol,
   iconURL,
-  currency = 'USD',
+  currency = SupportedCurrencies.USD,
   marketCap,
   price,
   pricePercentage24HourChange,
@@ -39,11 +36,7 @@ const TokenCard = ({
   onCardBodyClick,
   onCTAClick,
 }: TokenCardProps) => {
-  const currencySymbol = currentNameToSymbol[currency];
-  const isCapped = marketCap.current === marketCap.goal;
-  const progressPercentage = Math.floor(
-    (marketCap.current / marketCap.goal) * 100,
-  );
+  const currencySymbol = currencyNameToSymbolMap[currency];
 
   const handleBodyClick = (e: React.MouseEvent) =>
     e.target === e.currentTarget && onCardBodyClick?.();
@@ -126,23 +119,11 @@ const TokenCard = ({
         </div>
       </div>
       {/* market cap row */}
-      <div className="market-cap" onClick={handleBodyClick}>
-        <progress
-          className={clsx('goal-progress', { isCapped })}
-          value={progressPercentage}
-          max={100}
-        />
-        <div className="prices">
-          <CWText className="text-dark caps" type="caption">
-            MCAP {currencySymbol}
-            {marketCap.current} | Goal {currencySymbol}
-            {marketCap.goal}
-          </CWText>
-          {isCapped && (
-            <CWIcon iconName="rocketLaunch" className="token-capped-icon" />
-          )}
-        </div>
-      </div>
+      <MarketCapProgress
+        marketCap={marketCap}
+        currency={currency}
+        onBodyClick={handleBodyClick}
+      />
       {/* action cta */}
       <CWButton
         label={mode}
