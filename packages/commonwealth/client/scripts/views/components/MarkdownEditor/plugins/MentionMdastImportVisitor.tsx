@@ -2,6 +2,7 @@ import { Descriptors, MdastImportVisitor } from 'commonwealth-mdxeditor';
 import * as Mdast from 'mdast';
 import {
   $createMentionNode,
+  parseHandleFromMention,
   parseIdFromPath,
 } from 'views/components/MarkdownEditor/plugins/MentionNode';
 
@@ -37,10 +38,26 @@ export const MentionMdastImportVisitor: MdastImportVisitor<Mdast.Link> = {
 
     const uid = parseIdFromPath(mdastNode.url) ?? '';
     // const handle = parseHandleFromMention(mdastNode.data)
-    const handle = 'FIXME';
+    console.log('FIXME: mdastNode, ', mdastNode);
+
+    if (mdastNode.children.length !== 1) {
+      throw new Error('Expected only one child node');
+    }
+
+    const firstChild = mdastNode.children[0];
+
+    if (firstChild.type !== 'text') {
+      throw new Error('Expected text node');
+    }
+
+    const handle = parseHandleFromMention(firstChild.value);
+
+    if (!handle) {
+      throw new Error('Could not parse handle from mention');
+    }
 
     const mentionNode = $createMentionNode(handle, uid);
-    console.log('FIXME: mentionNode created!');
+    console.log('FIXME: mentionNode created for handle: ', { handle, uid });
     actions.addAndStepInto(mentionNode);
     //
     // const linkNode = $createLinkNode(mdastNode.url, {

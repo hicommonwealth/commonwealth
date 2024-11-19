@@ -649,7 +649,7 @@ export function NewMentionsPlugin(): JSX.Element | null {
       editor.update(() => {
         // const mentionNode = $createMentionNode(selectedOption.name);
         // FIXME
-        const mentionNode = $createMentionNode('FIXME', '666');
+        const mentionNode = $createMentionNode(selectedOption.name, '666');
         if (nodeToReplace) {
           nodeToReplace.replace(mentionNode);
         }

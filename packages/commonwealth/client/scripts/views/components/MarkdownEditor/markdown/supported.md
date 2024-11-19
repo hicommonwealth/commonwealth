@@ -1,2 +1,2 @@
 
-[@foo](/users/foo)
+[@alice101](/profile/id/1234)
