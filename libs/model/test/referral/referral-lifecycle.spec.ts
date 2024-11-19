@@ -51,13 +51,23 @@ describe('Referral lifecycle', () => {
       },
     });
 
-    await drainOutbox(['CommunityCreated'], UserReferrals());
+    await drainOutbox(['CommunityCreated'], UserReferrals);
 
     // get referrals
+    // TODO: use query after implementing it
     const referrals = await models.Referral.findAll({
       where: { referee_id: member.user.id },
-      order: [['created_at', 'DESC']],
     });
+
     expect(referrals.length).toBe(1);
+    expect(referrals[0].toJSON()).toMatchObject({
+      referrer_id: admin.user.id,
+      referee_id: member.user.id,
+      event_name: 'CommunityCreated',
+      event_payload: {
+        userId: member.user.id?.toString(),
+        communityId: id,
+      },
+    });
   });
 });
