@@ -23,23 +23,23 @@
   },
   "dependencies": {
     "@hicommonwealth/schemas": "workspace:*",
-    "dotenv": "^16.0.3",
+    "dotenv": "^16.4.5",
     "ethers": "5.7.2",
     "lodash": "^4.17.21",
-    "moment": "^2.23.0",
+    "moment": "^2.30.1",
     "node-object-hash": "^3.0.0",
-    "pino": "^8.19.0",
+    "pino": "^8.21.0",
     "pino-http": "^9.0.0",
     "pino-http-print": "^3.1.0",
     "pino-pretty": "^10.3.1",
-    "rollbar": "^2.6.1",
-    "web3-eth-abi": "^4.2.1",
-    "zod": "^3.22.4"
+    "rollbar": "^2.26.4",
+    "web3-eth-abi": "^4.4.0",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@types/moment": "^2.13.0",
     "@types/sinon": "^17.0.3",
     "sinon": "^17.0.2",
-    "tsx": "^4.7.2"
+    "tsx": "^4.19.2"
   }
 }
