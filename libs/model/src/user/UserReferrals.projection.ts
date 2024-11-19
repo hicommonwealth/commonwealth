@@ -16,7 +16,7 @@ export function UserReferrals(): Projection<typeof inputs> {
         if (referral_link?.startsWith('ref_')) {
           try {
             const referrer_id = parseInt(referral_link.split('_').at(1)!);
-            models.Referral.create({
+            await models.Referral.create({
               referrer_id,
               referee_id: parseInt(payload.userId),
               event_name: 'CommunityCreated',
@@ -25,7 +25,9 @@ export function UserReferrals(): Projection<typeof inputs> {
             });
           } catch (e) {
             // TODO: should we do something else when we fail to create a referral?
-            e instanceof Error && log.error(e.message, e);
+            // Logging the error will allows us to manually fix the issue
+            e instanceof Error &&
+              log.error('Failed to project referral', e, payload);
           }
         }
       },
