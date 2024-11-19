@@ -58,9 +58,6 @@ export function CreateLaunchpadTrade(): Command<
         throw new InvalidState('Transaction not found');
       }
 
-      console.log(
-        `Eth amount: ${result.parsedArgs.ethAmount}, communityTokenAmount: ${result.parsedArgs.communityTokenAmount} --- ${result.parsedArgs.ethAmount / result.parsedArgs.communityTokenAmount}`,
-      );
       const trade = await models.LaunchpadTrade.create({
         eth_chain_id,
         transaction_hash,
