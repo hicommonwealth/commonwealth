@@ -12,7 +12,6 @@ export default class SolanaAccount extends Account {
 
   private _balance: SolanaToken;
   public get balance() {
-    // @ts-expect-error StrictNullChecks
     return this.updateBalance().then(() => this._balance);
   }
 
