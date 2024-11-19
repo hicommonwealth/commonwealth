@@ -8,32 +8,42 @@
 
 import {
   $applyNodeReplacement,
-  TextNode,
+  EditorConfig,
+  ElementNode,
+  SerializedElementNode,
   type DOMConversionMap,
   type DOMConversionOutput,
-  type DOMExportOutput,
   type LexicalNode,
   type NodeKey,
-  type SerializedTextNode,
   type Spread,
 } from 'lexical';
 
 export type SerializedMentionNode = Spread<
   {
-    mentionName: string;
+    handle: string;
+    uid: string;
   },
-  SerializedTextNode
+  SerializedElementNode
 >;
+
+export function parseIdFromPath(path: string): string | null {
+  const match = path.match(/\/(\d+)$/);
+  return match ? match[1] : null;
+}
+
+export function parseHandleFromMention(atMention: string): string | null {
+  const match = atMention.match(/^@(\w+)$/);
+  return match ? match[1] : null;
+}
 
 const $convertMentionElement = (
   domNode: HTMLElement,
 ): DOMConversionOutput | null => {
-  console.log('FIXME $convertMentionElement');
+  const handle = parseHandleFromMention(domNode.textContent ?? '');
+  const id = parseIdFromPath(domNode.getAttribute('href') ?? '');
 
-  const textContent = domNode.textContent;
-
-  if (textContent !== null) {
-    const node = $createMentionNode(textContent);
+  if (handle && id) {
+    const node = $createMentionNode(handle, id);
     return {
       node,
     };
@@ -42,13 +52,56 @@ const $convertMentionElement = (
   return null;
 };
 
-export class MentionNode extends TextNode {
-  __mention: string;
-
-  constructor(mentionName: string, text?: string, key?: NodeKey) {
-    super(text ?? mentionName, key);
-    this.__mention = mentionName;
+export default function normalizeClassNames(
+  ...classNames: Array<typeof undefined | boolean | null | string>
+): Array<string> {
+  const rval: string[] = [];
+  for (const className of classNames) {
+    if (className && typeof className === 'string') {
+      for (const [s] of className.matchAll(/\S+/g)) {
+        rval.push(s);
+      }
+    }
   }
+  return rval;
+}
+
+/**
+ * Takes an HTML element and adds the classNames passed within an array,
+ * ignoring any non-string types. A space can be used to add multiple classes
+ * eg. addClassNamesToElement(element, ['element-inner active', true, null])
+ * will add both 'element-inner' and 'active' as classes to that element.
+ * @param element - The element in which the classes are added
+ * @param classNames - An array defining the class names to add to the element
+ */
+export function addClassNamesToElement(
+  element: HTMLElement,
+  ...classNames: Array<typeof undefined | boolean | null | string>
+): void {
+  const classesToAdd = normalizeClassNames(...classNames);
+  if (classesToAdd.length > 0) {
+    element.classList.add(...classesToAdd);
+  }
+}
+
+type MentionHTMLElementType = HTMLAnchorElement;
+
+/**
+ *
+ * Mention node that handles mentions.
+ *
+ * The markdoown syntax is:
+ *
+ * [@inputneuron](/profile/id/3)
+ */
+export class MentionNode extends ElementNode {
+  /** @internal */
+  __handle: string;
+
+  /** @internal */
+  __uid: string;
+
+  __url: string;
 
   static getType(): string {
     console.log('FIXME: getType');
@@ -57,57 +110,46 @@ export class MentionNode extends TextNode {
 
   static clone(node: MentionNode): MentionNode {
     console.log('FIXME clone');
-    return new MentionNode(node.__mention, node.__text, node.__key);
-  }
-  static importJSON(serializedNode: SerializedMentionNode): MentionNode {
-    console.log('FIXME importJSON');
-
-    const node = $createMentionNode(serializedNode.mentionName);
-    node.setTextContent(serializedNode.text);
-    node.setFormat(serializedNode.format);
-    node.setDetail(serializedNode.detail);
-    node.setMode(serializedNode.mode);
-    node.setStyle(serializedNode.style);
-    return node;
+    return new MentionNode(node.__handle, node.__uid, node.__key);
   }
 
-  exportJSON(): SerializedMentionNode {
-    console.log('FIXME exportJSON');
-    return {
-      ...super.exportJSON(),
-      type: 'mention',
-      mentionName: this.__mention,
-      version: 1,
-    };
+  constructor(handle: string, uid: string, key?: NodeKey) {
+    super(key);
+    console.log('FIXME new mention node being created.');
+    this.__handle = handle;
+    this.__uid = uid;
+    this.__url = '/profile/id/' + uid;
   }
 
-  createDOM(): HTMLElement {
-    console.log('FIXME createDOM');
-
-    // FIXME: if I type a space after it goes a way and is replaced with text
-    // FIXME: the export is only in markdown format!
-
-    const dom = document.createElement('a');
-    dom.setAttribute('data-lexical-mention', 'true');
-    dom.textContent = '@' + this.__text;
-    return dom;
-  }
-
-  exportDOM(): DOMExportOutput {
-    console.log('FIXME exportDOM');
-
+  createDOM(config: EditorConfig): HTMLElement {
     const element = document.createElement('a');
+    element.href = this.__url;
+    element.appendChild(document.createTextNode('@' + this.__handle));
     element.setAttribute('data-lexical-mention', 'true');
-    element.textContent = '@' + this.__text;
-    return { element };
+    addClassNamesToElement(element, config.theme.link);
+    return element;
+  }
+
+  updateDOM(
+    prevNode: MentionNode,
+    anchor: MentionHTMLElementType,
+    config: EditorConfig,
+  ): boolean {
+    if (anchor instanceof HTMLAnchorElement) {
+      anchor.href = this.__url;
+      anchor.setAttribute('data-lexical-mention', 'true');
+      if (anchor.firstElementChild) {
+        anchor.removeChild(anchor.firstElementChild);
+      }
+      anchor.appendChild(document.createTextNode('@' + this.__handle));
+    }
+    return false;
   }
 
   static importDOM(): DOMConversionMap | null {
     console.log('FIXME importDOM');
     return {
       a: (domNode: HTMLElement) => {
-        // FIXME: this might have to be refactored to work with the href and text
-        // starting with '@'
         if (!domNode.hasAttribute('data-lexical-mention')) {
           return null;
         }
@@ -119,27 +161,36 @@ export class MentionNode extends TextNode {
     };
   }
 
-  isTextEntity(): true {
-    console.log('FIXME: isTextEntity');
-    return true;
+  static importJSON(serializedNode: SerializedMentionNode): MentionNode {
+    console.log('FIXME importJSON');
+    return $createMentionNode(serializedNode.handle, serializedNode.uid);
   }
 
-  canInsertTextBefore(): boolean {
-    console.log('FIXME: canInsertTextBefore');
-    return false;
+  exportJSON(): SerializedMentionNode {
+    console.log('FIXME exportJSON');
+    return {
+      ...super.exportJSON(),
+      type: 'mention',
+      handle: this.__handle,
+      uid: this.__uid,
+      version: 1,
+    };
   }
 
-  canInsertTextAfter(): boolean {
-    console.log('FIXME: canInsertTextAfter');
-    return false;
-  }
+  // canInsertTextBefore(): boolean {
+  //   console.log('FIXME: canInsertTextBefore');
+  //   return false;
+  // }
+  //
+  // canInsertTextAfter(): boolean {
+  //   console.log('FIXME: canInsertTextAfter');
+  //   return false;
+  // }
 }
 
-export function $createMentionNode(mentionName: string): MentionNode {
-  console.log('FIXME $createMentionNode');
-
-  const mentionNode = new MentionNode(mentionName);
-  mentionNode.setMode('segmented').toggleDirectionless();
+export function $createMentionNode(handle: string, uid: string): MentionNode {
+  console.log('FIXME $createMentionNode', { handle, uid });
+  const mentionNode = new MentionNode(handle, uid);
   return $applyNodeReplacement(mentionNode);
 }
 

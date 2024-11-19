@@ -9,7 +9,6 @@ import {
 import './MarkdownEditorPage.scss';
 
 import { MarkdownSubmitButton } from 'views/components/MarkdownEditor/MarkdownSubmitButton';
-import overview from 'views/components/MarkdownEditor/markdown/editor_overview.md?raw';
 import supported from 'views/components/MarkdownEditor/markdown/supported.md?raw';
 import { useMarkdownEditorMethods } from 'views/components/MarkdownEditor/useMarkdownEditorMethods';
 
@@ -45,7 +44,8 @@ const SubmitButton = () => {
   const methods = useMarkdownEditorMethods();
 
   const handleClick = () => {
-    console.log(methods.getMarkdown());
+    const markdown = methods.getMarkdown();
+    console.log(markdown);
   };
 
   return <MarkdownSubmitButton label="Create Thread" onClick={handleClick} />;
@@ -57,7 +57,7 @@ const Inner = (props: Pick<MarkdownEditorProps, 'mode'>) => {
     <>
       <MarkdownEditor
         {...props}
-        markdown={`${overview}\n${supported}`}
+        markdown={`${supported}`}
         imageHandler="local"
         SubmitButton={SubmitButton}
         autoFocus={true}

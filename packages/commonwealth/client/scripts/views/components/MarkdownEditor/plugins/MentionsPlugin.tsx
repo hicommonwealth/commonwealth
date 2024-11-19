@@ -647,7 +647,9 @@ export function NewMentionsPlugin(): JSX.Element | null {
       closeMenu: () => void,
     ) => {
       editor.update(() => {
-        const mentionNode = $createMentionNode(selectedOption.name);
+        // const mentionNode = $createMentionNode(selectedOption.name);
+        // FIXME
+        const mentionNode = $createMentionNode('FIXME', '666');
         if (nodeToReplace) {
           nodeToReplace.replace(mentionNode);
         }
@@ -757,11 +759,21 @@ export function mentionToMarkdown(): ToMarkdownExtension {
 }
 
 export const mentionsPlugin = realmPlugin<{}>({
-  update: (realm, params) => {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    // realm.pub(directiveDescriptors$, params?.directiveDescriptors ?? [])
-  },
-
+  // update: (realm, params) => {
+  //   // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+  //   // realm.pub(directiveDescriptors$, params?.directiveDescriptors ?? [])
+  // },
+  //
+  // // TODO: this has the same methods as the link plugin but I'm not sure how the
+  // // link plugin defines the mentions...
+  // // I *think* I might need these:
+  // //   [addMdastExtension$]: directiveFromMarkdown(),
+  // //   [addSyntaxExtension$]: directive(),
+  //
+  // // TODO: OK, the linkPlugin MUST be used or links can't be parsed so something must be triggering it!!
+  // // OK... one debug strategy is to make the mention plugin work just like the
+  // // link plugin and then make whatever changes are required to get it to work.
+  //
   init: (realm, params) => {
     realm.pubIn({
       [addActivePlugin$]: 'mention',

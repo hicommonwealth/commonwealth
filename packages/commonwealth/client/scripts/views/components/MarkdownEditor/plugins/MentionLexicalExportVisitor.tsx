@@ -10,11 +10,13 @@ export const MentionLexicalExportVisitor: LexicalExportVisitor<
   Mdast.Link
 > = {
   testLexicalNode: $isMentionNode,
+
+  // FIXME: for some reasont his is being called too!
   visitLexicalNode: ({ lexicalNode, actions }) => {
     console.log('FIXME: MentionLexicalExportVisitor.visitLexicalNode');
-    actions.addAndStepInto('mention', {
-      url: 'http://example.com#mention',
-      title: 'FIXME title',
-    });
+    // actions.addAndStepInto('mention', {
+    //   url: 'http://example.com#mention',
+    //   title: 'FIXME title',
+    // });
   },
 };
