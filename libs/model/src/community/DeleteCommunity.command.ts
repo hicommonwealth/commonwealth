@@ -108,14 +108,15 @@ export function DeleteCommunity(): Command<typeof schemas.DeleteCommunity> {
         const communityIdModels: ModelStatic<
           ModelInstance<{ community_id: string }>
         >[] = [
+          models.ContestManager,
           models.CommunityAlert,
           models.CommunityStake,
           models.DiscordBotConfig,
-          models.Topic,
           models.Webhook,
           models.Vote,
           models.Poll,
           models.Thread,
+          models.Topic,
           models.StarredCommunity,
           models.Group,
           models.Address,
