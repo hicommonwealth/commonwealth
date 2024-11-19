@@ -7,6 +7,7 @@ import {
   headingsPlugin,
   imagePlugin,
   linkDialogPlugin,
+  linkPlugin,
   listsPlugin,
   markdownShortcutPlugin,
   MDXEditor,
@@ -385,7 +386,7 @@ export const MarkdownEditor = memo(function MarkdownEditor(
                 quotePlugin(),
                 headingsPlugin(),
                 mentionsPlugin(),
-                // linkPlugin(),
+                linkPlugin(),
                 // disable the link dialog and use our own. We have a different
                 // type of dialog based on device type.
                 linkDialogPlugin({ LinkDialog: NullComponent }),

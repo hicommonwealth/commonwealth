@@ -782,7 +782,11 @@ export const mentionsPlugin = realmPlugin<{}>({
       [addExportVisitor$]: MentionLexicalExportVisitor,
       // FIXME: I think this is the one I need now...
       [addToMarkdownExtension$]: mentionToMarkdown(),
-      [addComposerChild$]: () => <NewMentionsPlugin />,
+      [addComposerChild$]: () => (
+        <>
+          <NewMentionsPlugin />
+        </>
+      ),
     });
   },
 });
