@@ -124,7 +124,10 @@ export class MentionNode extends ElementNode {
   createDOM(config: EditorConfig): HTMLElement {
     const element = document.createElement('a');
     element.href = this.__url;
-    element.appendChild(document.createTextNode('@' + this.__handle));
+    // TODO: I'm not sure why but if we add this appendChild it will create TWO
+    // @mention text entries like @alice@alice and I am unsure why this is
+    // happening.
+    //element.appendChild(document.createTextNode('@' + this.__handle));
     element.setAttribute('data-lexical-mention', 'true');
     addClassNamesToElement(element, config.theme.link);
     return element;

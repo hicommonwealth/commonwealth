@@ -59,11 +59,5 @@ export const MentionMdastImportVisitor: MdastImportVisitor<Mdast.Link> = {
     const mentionNode = $createMentionNode(handle, uid);
     console.log('FIXME: mentionNode created for handle: ', { handle, uid });
     actions.addAndStepInto(mentionNode);
-    //
-    // const linkNode = $createLinkNode(mdastNode.url, {
-    //   title: mdastNode.title
-    // })
-
-    // actions.addAndStepInto(linkNode);
   },
 };
