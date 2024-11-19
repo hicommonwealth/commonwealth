@@ -195,15 +195,22 @@ export class MentionNode extends ElementNode {
     };
   }
 
-  // canInsertTextBefore(): boolean {
-  //   console.log('FIXME: canInsertTextBefore');
-  //   return false;
-  // }
-  //
-  // canInsertTextAfter(): boolean {
-  //   console.log('FIXME: canInsertTextAfter');
-  //   return false;
-  // }
+  canInsertTextBefore(): boolean {
+    console.log('FIXME: canInsertTextBefore');
+    return true;
+  }
+
+  canInsertTextAfter(): boolean {
+    console.log('FIXME: canInsertTextAfter');
+    return true;
+  }
+  isInline(): boolean {
+    return true;
+  }
+
+  canBeEmpty(): boolean {
+    return true;
+  }
 }
 
 export function $createMentionNode(handle: string, uid: string): MentionNode {

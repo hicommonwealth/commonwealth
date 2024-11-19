@@ -2,11 +2,11 @@ import { LexicalExportVisitor } from 'commonwealth-mdxeditor';
 import * as Mdast from 'mdast';
 import {
   $isMentionNode,
-  MentionNodeAsTextNode,
-} from 'views/components/MarkdownEditor/plugins/MentionNodeAsTextNode';
+  MentionNode,
+} from 'views/components/MarkdownEditor/plugins/MentionNode';
 
 export const MentionLexicalExportVisitor: LexicalExportVisitor<
-  MentionNodeAsTextNode,
+  MentionNode,
   Mdast.Link
 > = {
   testLexicalNode: $isMentionNode,

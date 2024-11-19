@@ -1,11 +1,10 @@
 import { Descriptors, MdastImportVisitor } from 'commonwealth-mdxeditor';
-import { ElementNode } from 'lexical';
 import * as Mdast from 'mdast';
 import {
   $createMentionNode,
   parseHandleFromMention,
   parseIdFromPath,
-} from 'views/components/MarkdownEditor/plugins/MentionNodeAsTextNode';
+} from 'views/components/MarkdownEditor/plugins/MentionNode';
 
 export const MentionMdastImportVisitor: MdastImportVisitor<Mdast.Link> = {
   testNode: (mdastNode: Mdast.Nodes, options: Descriptors): boolean => {
@@ -64,16 +63,16 @@ export const MentionMdastImportVisitor: MdastImportVisitor<Mdast.Link> = {
 
     const mentionNode = $createMentionNode(handle, uid);
     console.log('FIXME: mentionNode created for handle: ', { handle, uid });
-    // actions.addAndStepInto(mentionNode);
-
-    function isParent(node: unknown): node is Mdast.Parent {
-      return (node as { children?: any[] }).children instanceof Array;
-    }
-
-    (lexicalParent as ElementNode).append(mentionNode);
-
-    if (isParent(mdastNode)) {
-      actions.visitChildren(mdastNode, lexicalParent);
-    }
+    actions.addAndStepInto(mentionNode);
+    //
+    // function isParent(node: unknown): node is Mdast.Parent {
+    //   return (node as { children?: any[] }).children instanceof Array;
+    // }
+    //
+    // (lexicalParent as ElementNode).append(mentionNode);
+    //
+    // if (isParent(mdastNode)) {
+    //   actions.visitChildren(mdastNode, lexicalParent);
+    // }
   },
 };

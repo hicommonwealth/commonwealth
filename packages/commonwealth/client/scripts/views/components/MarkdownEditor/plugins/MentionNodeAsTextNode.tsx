@@ -184,11 +184,11 @@ export class MentionNodeAsTextNode extends TextNode {
   }
 
   canInsertTextBefore(): boolean {
-    return false;
+    return true;
   }
 
   canInsertTextAfter(): boolean {
-    return false;
+    return true;
   }
 }
 
