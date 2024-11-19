@@ -14,13 +14,22 @@ import TradeTokenModal from 'views/modals/TradeTokenModel';
 import { TradingMode } from 'views/modals/TradeTokenModel/TradeTokenForm/types';
 import { z } from 'zod';
 import TokenCard from '../../../components/TokenCard';
+import {
+  CommunityFilters,
+  CommunitySortOptions,
+  communitySortOptionsLabelToKeysMap,
+} from '../FiltersDrawer';
 import './TokensList.scss';
 
 const TokenWithCommunity = TokenView.extend({
   community_id: z.string(),
 });
 
-const TokensList = () => {
+type TokensListProps = {
+  filters: CommunityFilters;
+};
+
+const TokensList = ({ filters }: TokensListProps) => {
   const navigate = useCommonNavigate();
   const tokenizedCommunityEnabled = useFlag('tokenizedCommunity');
   const [tokenLaunchModalConfig, setTokenLaunchModalConfig] = useState<{
@@ -42,6 +51,21 @@ const TokensList = () => {
     cursor: 1,
     limit: 8,
     with_stats: true,
+    order_by: (() => {
+      if (
+        filters.withCommunitySortBy &&
+        [CommunitySortOptions.MarketCap, CommunitySortOptions.Price].includes(
+          filters.withCommunitySortBy,
+        )
+      ) {
+        return communitySortOptionsLabelToKeysMap[
+          filters.withCommunitySortBy
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        ] as any;
+      }
+
+      return undefined;
+    })(),
     enabled: tokenizedCommunityEnabled,
   });
   const tokens = (tokensList?.pages || []).flatMap((page) => page.results);

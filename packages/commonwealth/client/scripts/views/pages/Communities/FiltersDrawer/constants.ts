@@ -31,8 +31,8 @@ export const communitySortOptionsLabelToKeysMap = {
   [CommunitySortOptions.MostRecent]: getPickedKeys(
     Community.pick({ created_at: true }),
   )[0],
-  [CommunitySortOptions.MarketCap]: 'market_cap_current', // TODO: might need to update based on api @Tim?
-  [CommunitySortOptions.Price]: 'latest_price',
+  [CommunitySortOptions.MarketCap]: 'market_cap', // this field doesn't exist on the tokens schema = hardcoding string
+  [CommunitySortOptions.Price]: 'price', // this field doesn't exist on the tokens schema = hardcoding string
   [CommunitySortOptions.MemberCount]: getPickedKeys(
     Community.pick({ profile_count: true }),
   )[0],
