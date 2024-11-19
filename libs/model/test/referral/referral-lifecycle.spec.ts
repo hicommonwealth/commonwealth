@@ -1,12 +1,12 @@
 import { Actor, command, dispose } from '@hicommonwealth/core';
-import { models } from '@hicommonwealth/model';
 import { ChainNode } from '@hicommonwealth/schemas';
 import { ChainBase, ChainType } from '@hicommonwealth/shared';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { z } from 'zod';
 import { CreateCommunity } from '../../src/community';
-import { CreateReferralLink } from '../../src/user';
-import { seedCommunity } from '../utils/community-seeder';
+import { models } from '../../src/database';
+import { CreateReferralLink, UserReferrals } from '../../src/user';
+import { drainOutbox, seedCommunity } from '../utils';
 
 describe('Referral lifecycle', () => {
   let admin: Actor;
@@ -51,10 +51,7 @@ describe('Referral lifecycle', () => {
       },
     });
 
-    // drain the outbox
-    // TODO: Create a testing utility to drain the outbox and push
-    // the events to the predefined event handlers ... this is a simple
-    // simulation of what the infrastructure would do in production
+    await drainOutbox(['CommunityCreated'], UserReferrals());
 
     // get referrals
     const referrals = await models.Referral.findAll({
