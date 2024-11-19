@@ -71,7 +71,7 @@ export function GetTokens(): Query<typeof schemas.GetTokens> {
           ON T.namespace = C.namespace
               ${includeStats ? 'LEFT JOIN trades ON trades.token_address = T.token_address' : ''}
               ${search ? 'WHERE LOWER(T.name) LIKE :search' : ''}
-          ORDER BY ${order_col} :direction
+          ORDER BY ${order_col} ${direction}
           LIMIT :limit OFFSET :offset
       `;
 
@@ -86,6 +86,7 @@ export function GetTokens(): Query<typeof schemas.GetTokens> {
         replacements,
         type: QueryTypes.SELECT,
         nest: true,
+        logging: console.log,
       });
 
       return schemas.buildPaginatedResponse(
