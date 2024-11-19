@@ -10,9 +10,18 @@ import {
 } from '../../../../../../shared/analytics/types';
 import useAppStatus from '../../../../hooks/useAppStatus';
 import { useBrowserAnalyticsTrack } from '../../../../hooks/useBrowserAnalyticsTrack';
+import { ButtonHeight } from '../../component_kit/new_designs/CWButton/CWButton';
 import './CreateCommunityButton.scss';
 
-const CreateCommunityButton = () => {
+type CreateCommunityButtonProps = {
+  withIcon?: boolean;
+  buttonHeight?: ButtonHeight;
+};
+
+const CreateCommunityButton = ({
+  withIcon = false,
+  buttonHeight = 'sm',
+}: CreateCommunityButtonProps) => {
   const navigate = useCommonNavigate();
 
   const { isAddedToHomeScreen } = useAppStatus();
@@ -35,8 +44,9 @@ const CreateCommunityButton = () => {
     <div className="CreateCommunityButton">
       <CWButton
         label="Create Community"
-        buttonHeight="sm"
+        buttonHeight={buttonHeight}
         buttonWidth="full"
+        {...(withIcon && { iconLeft: 'peopleNew' })}
         onClick={handleCreateCommunity}
       />
     </div>

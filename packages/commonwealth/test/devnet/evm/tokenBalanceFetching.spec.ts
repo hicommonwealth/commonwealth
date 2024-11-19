@@ -94,7 +94,7 @@ describe('Token Balance Cache EVM Tests', { timeout: 160_000 }, function () {
 
   beforeAll(async () => {
     anvil = await getAnvil(1);
-    models = await tester.seedDb();
+    models = await tester.seedDb(import.meta);
     cache({
       adapter: new RedisCache('redis://localhost:6379'),
     });

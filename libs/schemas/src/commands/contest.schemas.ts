@@ -1,11 +1,12 @@
 import { commonProtocol } from '@hicommonwealth/shared';
 import z from 'zod';
+import { AuthContext } from '../context';
 import { ContestManager } from '../entities';
 import { PG_INT } from '../utils';
 
 export const CreateContestManagerMetadata = {
   input: z.object({
-    id: z.string(),
+    community_id: z.string(),
     contest_address: z.string().describe('On-Chain contest manager address'),
     name: z.string(),
     image_url: z.string().optional(),
@@ -30,44 +31,49 @@ export const CreateContestManagerMetadata = {
     decimals: PG_INT.optional().default(
       commonProtocol.WeiDecimals[commonProtocol.Denominations.ETH],
     ),
-    topic_ids: z.array(z.number()).max(1).optional(),
+    topic_id: z.number().optional(),
+    is_farcaster_contest: z.boolean().nullish(),
   }),
   output: z.object({
     contest_managers: z.array(ContestManager),
   }),
+  context: AuthContext,
 };
 
 export const UpdateContestManagerMetadata = {
   input: z.object({
-    id: z.string(),
+    community_id: z.string(),
     contest_address: z.string().describe('On-Chain contest manager address'),
     name: z.string().optional(),
     image_url: z.string().optional(),
-    topic_ids: z.array(z.number()).max(1).optional(),
+    topic_id: PG_INT.optional(),
   }),
   output: z.object({
     contest_managers: z.array(ContestManager),
   }),
+  context: AuthContext,
 };
 
 export const CancelContestManagerMetadata = {
   input: z.object({
-    id: z.string(),
+    community_id: z.string(),
     contest_address: z.string(),
   }),
   output: z.object({
     contest_managers: z.array(ContestManager),
   }),
+  context: AuthContext,
 };
 
 export const ResumeContestManagerMetadata = {
   input: z.object({
-    id: z.string(),
+    community_id: z.string(),
     contest_address: z.string(),
   }),
   output: z.object({
     contest_managers: z.array(ContestManager),
   }),
+  context: AuthContext,
 };
 
 export const PerformContestRollovers = {
@@ -85,28 +91,31 @@ export const FarcasterCast = z.object({
   parent_author: z.object({
     fid: z.number().nullable(),
   }),
-  author: z.object({
-    object: z.string(),
-    fid: z.number(),
-    custody_address: z.string(),
-    username: z.string(),
-    display_name: z.string(),
-    pfp_url: z.string().url(),
-    profile: z.object({
-      bio: z.object({
-        text: z.string(),
+  author: z
+    .object({
+      object: z.string(),
+      fid: z.number(),
+      custody_address: z.string(),
+      username: z.string(),
+      display_name: z.string(),
+      pfp_url: z.string().url(),
+      profile: z.object({
+        bio: z.object({
+          text: z.string(),
+        }),
       }),
-    }),
-    follower_count: z.number(),
-    following_count: z.number(),
-    verifications: z.array(z.unknown()),
-    verified_addresses: z.object({
-      eth_addresses: z.array(z.string()),
-      sol_addresses: z.array(z.string()),
-    }),
-    active_status: z.string(),
-    power_badge: z.boolean(),
-  }),
+      follower_count: z.number(),
+      following_count: z.number(),
+      verifications: z.array(z.unknown()),
+      verified_addresses: z.object({
+        eth_addresses: z.array(z.string()),
+        sol_addresses: z.array(z.string()),
+      }),
+      active_status: z.string(),
+      power_badge: z.boolean(),
+    })
+    .partial()
+    .nullish(),
   text: z.string(),
   timestamp: z.string(),
   embeds: z.array(
@@ -123,7 +132,7 @@ export const FarcasterCast = z.object({
   replies: z.object({
     count: z.number(),
   }),
-  channel: z.string().nullable(),
+  channel: z.any().nullable(),
   mentioned_profiles: z.array(z.unknown()),
   event_timestamp: z.string(),
 });

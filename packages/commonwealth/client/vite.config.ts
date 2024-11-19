@@ -34,9 +34,6 @@ export default defineConfig(({ mode }) => {
   const featureFlags = {
     'process.env.FLAG_NEW_EDITOR': JSON.stringify(env.FLAG_NEW_EDITOR),
     'process.env.FLAG_CONTEST_DEV': JSON.stringify(env.FLAG_CONTEST_DEV),
-    'process.env.FLAG_WEIGHTED_TOPICS': JSON.stringify(
-      env.FLAG_WEIGHTED_TOPICS,
-    ),
     'process.env.FLAG_KNOCK_PUSH_NOTIFICATIONS_ENABLED': JSON.stringify(
       env.FLAG_KNOCK_PUSH_NOTIFICATIONS_ENABLED,
     ),
@@ -61,6 +58,10 @@ export default defineConfig(({ mode }) => {
     ),
     'process.env.KNOCK_IN_APP_FEED_ID': JSON.stringify(
       env.KNOCK_IN_APP_FEED_ID,
+    ),
+    // FARCASTER_NGROK_DOMAIN should only be setup on local development
+    'process.env.FARCASTER_NGROK_DOMAIN': JSON.stringify(
+      env.FARCASTER_NGROK_DOMAIN,
     ),
     'process.env.MIXPANEL_DEV_TOKEN':
       JSON.stringify(env.MIXPANEL_DEV_TOKEN) ||

@@ -132,3 +132,8 @@ export enum CosmosGovernanceVersion {
   v1beta1Failed = 'v1beta1-attempt-failed',
   v1Failed = 'v1-attempt-failed',
 }
+
+export enum CommunityType {
+  Launchpad = 'launchpad',
+  Basic = 'basic',
+}

@@ -30,18 +30,25 @@ function build() {
 
   if (config.CONTESTS.FLAG_FARCASTER_CONTEST) {
     // Farcaster frames
+    // WARNING: do not change this because cloudflare may route to it
     router.use('/farcaster/contests', farcasterRouter);
 
     // Farcaster webhooks/actions
     router.post(
       '/farcaster/CastCreated',
-      validateNeynarWebhook(config.CONTESTS.NEYNAR_CAST_CREATED_WEBHOOK_SECRET),
+      (req, _, next) => {
+        validateNeynarWebhook(
+          config.CONTESTS.NEYNAR_CAST_CREATED_WEBHOOK_SECRET,
+        )(req, _, next).catch(next);
+      },
       express.command(Contest.FarcasterCastCreatedWebhook()),
     );
 
     router.post(
       '/farcaster/ReplyCastCreated',
-      validateNeynarWebhook(config.CONTESTS.NEYNAR_CAST_CREATED_WEBHOOK_SECRET),
+      (req, _, next) => {
+        validateNeynarWebhook(null)(req, _, next).catch(next);
+      },
       express.command(Contest.FarcasterReplyCastCreatedWebhook()),
     );
 
@@ -52,7 +59,7 @@ function build() {
 
     router.post(
       '/farcaster/CastUpvoteAction',
-      validateNeynarWebhook(config.CONTESTS.NEYNAR_CAST_CREATED_WEBHOOK_SECRET),
+      // TODO: create new validation middleware for actions
       express.command(Contest.FarcasterUpvoteAction()),
     );
   }

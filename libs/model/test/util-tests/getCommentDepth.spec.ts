@@ -16,11 +16,19 @@ describe('getCommentDepth', () => {
   const maxDepth = 8;
 
   beforeAll(async () => {
-    await tester.seedDb();
+    await tester.seedDb(import.meta);
     const address = await models.Address.findOne({
       where: {
         community_id,
       },
+    });
+    const topic = await models.Topic.create({
+      name: 'test',
+      community_id,
+      description: 'test',
+      featured_in_sidebar: false,
+      featured_in_new_post: false,
+      group_ids: [],
     });
     const thread = await models.Thread.create({
       community_id,
@@ -30,6 +38,7 @@ describe('getCommentDepth', () => {
       kind: 'discussion',
       search: getThreadSearchVector('Testing', ''),
       reaction_weights_sum: '0',
+      topic_id: topic!.id!,
     });
     let comment: CommentInstance | undefined;
     for (let i = 0; i < maxDepth; i++) {

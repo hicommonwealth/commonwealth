@@ -150,7 +150,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   const { contestsData } = useCommunityContests();
   const isTopicInContest = checkIsTopicInContest(
-    contestsData,
+    contestsData.all,
     thread?.topic?.id,
   );
 
@@ -163,6 +163,9 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
       setShouldRestoreEdits(true);
       setIsGloballyEditing(true);
       setIsEditingBody(true);
+    }
+    if (thread && thread?.title) {
+      setDraftTitle(thread.title);
     }
   }, [isEdit, thread, isAdmin]);
 
@@ -539,7 +542,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                 onInput={(e) => {
                   setDraftTitle(e.target.value);
                 }}
-                value={draftTitle || thread?.title}
+                value={draftTitle}
               />
             ) : (
               thread?.title
@@ -611,11 +614,15 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                     cancelEditing={() => {
                       setIsGloballyEditing(false);
                       setIsEditingBody(false);
+                      if (!draftTitle.length) {
+                        setDraftTitle(thread?.title);
+                      }
                     }}
                     threadUpdatedCallback={() => {
                       setIsGloballyEditing(false);
                       setIsEditingBody(false);
                     }}
+                    isDisabled={draftTitle && draftTitle.length ? false : true}
                   />
                   {threadOptionsComp}
                 </>

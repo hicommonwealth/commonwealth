@@ -41,7 +41,7 @@ export default (
         defaultValue: 'discussion',
       },
       url: { type: Sequelize.TEXT, allowNull: true },
-      topic_id: { type: Sequelize.INTEGER, allowNull: true },
+      topic_id: { type: Sequelize.INTEGER, allowNull: false },
       pinned: {
         type: Sequelize.BOOLEAN,
         defaultValue: false,

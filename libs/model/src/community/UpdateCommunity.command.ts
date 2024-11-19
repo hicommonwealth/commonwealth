@@ -1,10 +1,11 @@
 import { InvalidInput, type Command } from '@hicommonwealth/core';
+import { commonProtocol } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import { ChainBase } from '@hicommonwealth/shared';
 import { models } from '../database';
-import { AuthContext, isAuthorized } from '../middleware';
+import { authRoles } from '../middleware';
 import { mustExist } from '../middleware/guards';
-import { checkSnapshotObjectExists, commonProtocol } from '../services';
+import { checkSnapshotObjectExists } from '../services';
 
 export const UpdateCommunityErrors = {
   SnapshotOnlyOnEthereum:
@@ -14,16 +15,13 @@ export const UpdateCommunityErrors = {
   SnapshotNotFound: 'Snapshot not found',
 };
 
-export function UpdateCommunity(): Command<
-  typeof schemas.UpdateCommunity,
-  AuthContext
-> {
+export function UpdateCommunity(): Command<typeof schemas.UpdateCommunity> {
   return {
     ...schemas.UpdateCommunity,
-    auth: [isAuthorized({ roles: ['admin'] })],
+    auth: [authRoles('admin')],
     body: async ({ actor, payload }) => {
       const {
-        id,
+        community_id,
         snapshot,
         name,
         description,
@@ -46,7 +44,7 @@ export function UpdateCommunity(): Command<
       } = payload;
 
       const community = await models.Community.findOne({
-        where: { id },
+        where: { id: community_id },
         include: [
           {
             model: models.ChainNode,

@@ -2,14 +2,11 @@ import { DeltaOperation, DeltaStatic } from 'quill';
 import imageDropAndPaste from 'quill-image-drop-and-paste';
 import { MutableRefObject, useCallback } from 'react';
 import ReactQuill, { Quill } from 'react-quill';
-import { SERVER_URL } from 'state/api/config';
-
-import useUserStore from 'state/ui/user';
+import { uploadFile } from 'state/api/general';
 import {
   SerializableDeltaStatic,
   VALID_IMAGE_TYPES,
   base64ToFile,
-  uploadFileToS3,
 } from './utils';
 
 Quill.register('modules/imageDropAndPaste', imageDropAndPaste);
@@ -25,8 +22,6 @@ export const useImageDropAndPaste = ({
   setIsUploading,
   setContentDelta,
 }: UseImageDropAndPasteProps) => {
-  const user = useUserStore();
-
   // must be memoized or else infinite loop
   const handleImageDropAndPaste = useCallback(
     async (imageDataUrl, imageType) => {
@@ -60,11 +55,9 @@ export const useImageDropAndPaste = ({
 
         const file = base64ToFile(imageDataUrl, imageType);
 
-        const uploadedFileUrl = await uploadFileToS3(
+        const uploadedFileUrl = await uploadFile({
           file,
-          SERVER_URL,
-          user.jwt || '',
-        );
+        });
 
         const selectedIndex = editor.getSelection()?.index || 0;
 
@@ -83,7 +76,7 @@ export const useImageDropAndPaste = ({
         setIsUploading(false);
       }
     },
-    [editorRef, setContentDelta, setIsUploading, user.jwt],
+    [editorRef, setContentDelta, setIsUploading],
   );
 
   return { handleImageDropAndPaste };

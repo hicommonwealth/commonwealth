@@ -3,9 +3,8 @@ export type DeviceProfile = 'mobile' | 'desktop';
 export type DeviceOrientation = 'vertical' | 'horizontal';
 
 function useDeviceOrientation(): DeviceOrientation {
-  return [0, 180].includes(window.screen.orientation.angle)
-    ? 'vertical'
-    : 'horizontal';
+  if (window.innerHeight > window.innerWidth) return 'vertical';
+  else return 'horizontal';
 }
 
 /**

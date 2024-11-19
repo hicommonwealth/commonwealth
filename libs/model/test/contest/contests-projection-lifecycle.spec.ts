@@ -56,6 +56,7 @@ describe('Contests projection lifecycle', () => {
   const thread_title = 'thread-in-contest';
   const ticker = commonProtocol.Denominations.ETH;
   const decimals = commonProtocol.WeiDecimals[commonProtocol.Denominations.ETH];
+  const topic_id = 100;
 
   let getTokenAttributes: Sinon.SinonStub;
   let getContestScore: Sinon.SinonStub;
@@ -66,7 +67,8 @@ describe('Contests projection lifecycle', () => {
     getContestScore = Sinon.stub(contestHelper, 'getContestScore');
     getContestStatus = Sinon.stub(contestHelper, 'getContestStatus');
 
-    await bootstrap_testing();
+    // TODO: add ContractAbi to seeder aggregates and replace direct model calls below to avoid calling this here
+    await bootstrap_testing(import.meta);
 
     try {
       const recurringContestAbi = await models.ContractAbi.create({
@@ -117,14 +119,13 @@ describe('Contests projection lifecycle', () => {
             },
           ],
           CommunityStakes: [],
-          topics: [],
+          topics: [{ id: topic_id, name: 'test-topic' }],
           groups: [],
           contest_managers: [
             {
               contest_address: recurring,
               name: recurring,
               interval,
-              topics: [],
               contests: [],
               image_url,
               payout_structure,
@@ -132,12 +133,13 @@ describe('Contests projection lifecycle', () => {
               funding_token_address,
               created_at,
               cancelled,
+              topic_id,
+              is_farcaster_contest: true,
             },
             {
               contest_address: oneoff,
               name: oneoff,
               interval: 0,
-              topics: [],
               contests: [],
               image_url,
               payout_structure,
@@ -145,6 +147,8 @@ describe('Contests projection lifecycle', () => {
               funding_token_address,
               created_at,
               cancelled,
+              topics: [],
+              is_farcaster_contest: false,
             },
           ],
         },
@@ -159,7 +163,7 @@ describe('Contests projection lifecycle', () => {
           title: thread_title,
           address_id: community?.Addresses?.at(0)?.id,
           url: content_url,
-          topic_id: undefined,
+          topic_id: topic_id,
           view_count: 1,
           reaction_count: 1,
           reaction_weights_sum: '1',
@@ -352,7 +356,9 @@ describe('Contests projection lifecycle', () => {
         decimals,
         cancelled,
         created_at,
-        topics: [],
+        topic_id: topic_id,
+        topics: [{ id: topic_id, name: 'test-topic' }],
+        is_farcaster_contest: true,
         contests: [
           {
             contest_id,

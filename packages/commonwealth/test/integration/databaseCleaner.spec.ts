@@ -26,7 +26,7 @@ describe('DatabaseCleaner Tests', async () => {
   let models: DB;
 
   beforeAll(async () => {
-    models = await tester.seedDb();
+    models = await tester.seedDb(import.meta);
   });
 
   afterAll(async () => {
@@ -179,6 +179,15 @@ describe('DatabaseCleaner Tests', async () => {
         last_active: Sequelize.literal(`NOW()`) as any,
       });
 
+      const topic = await models.Topic.create({
+        name: 'test-123',
+        community_id: 'ethereum',
+        description: 'test-123',
+        featured_in_sidebar: false,
+        featured_in_new_post: false,
+        group_ids: [],
+      });
+
       const thread = await models.Thread.create({
         address_id: address.id!,
         title: 'Testing',
@@ -191,6 +200,7 @@ describe('DatabaseCleaner Tests', async () => {
         view_count: 0,
         comment_count: 0,
         search: getThreadSearchVector('Testing', ''),
+        topic_id: topic!.id!,
       });
 
       const comment = await models.Comment.create({

@@ -31,28 +31,21 @@ export function GetTokens(): Query<typeof schemas.GetTokens> {
       };
 
       const sql = `
-        SELECT
-        name,
-        icon_url,
-        description,
-        symbol,
-        chain_node_id,
-        base,
-        created_at,
-        updated_at,
-        author_address,
-        community_id,
-        launchpad_contract_address,
+        SELECT T.*, C.id as community_id,
         count(*) OVER() AS total
-        FROM "Tokens"
-        ${search ? 'WHERE LOWER(name) LIKE :search' : ''}
+        FROM "Tokens" as T
+        JOIN "Communities" as C ON T.namespace = C.namespace
+        ${search ? 'WHERE LOWER(T.name) LIKE :search' : ''}
         ORDER BY ${order_col} :direction
         LIMIT :limit
         OFFSET :offset
       `;
 
       const tokens = await models.sequelize.query<
-        z.infer<typeof schemas.Token> & { total?: number }
+        z.infer<typeof schemas.TokenView> & {
+          total?: number;
+          community_id: string;
+        }
       >(sql, {
         replacements,
         type: QueryTypes.SELECT,

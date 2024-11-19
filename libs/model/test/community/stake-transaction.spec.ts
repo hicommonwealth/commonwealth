@@ -2,7 +2,7 @@ import { Actor, command, dispose, query } from '@hicommonwealth/core';
 import { BalanceType, commonProtocol } from '@hicommonwealth/shared';
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import { bootstrap_testing, seed } from 'model/src/tester';
+import { seed } from 'model/src/tester';
 import { afterAll, beforeAll, describe, test } from 'vitest';
 import {
   CreateStakeTransaction,
@@ -17,7 +17,6 @@ describe('Stake transactions', () => {
   let community_id: string;
 
   beforeAll(async () => {
-    await bootstrap_testing(true);
     const [node] = await seed('ChainNode', {
       url: 'https://ethereum-sepolia.publicnode.com',
       private_url: 'https://ethereum-sepolia.publicnode.com',
@@ -65,7 +64,6 @@ describe('Stake transactions', () => {
         transaction_hash:
           '0x924f40cfea663b2579816173f048b61ab2b118e0c7c055d7b00dbd9cd15eb7c0',
         community_id,
-        id: community_id,
       };
 
       let results = await command(CreateStakeTransaction(), {
@@ -82,7 +80,6 @@ describe('Stake transactions', () => {
         transaction_hash:
           '0x924f40cfea663b2579816173f048b61ab2b118e0c7c055d7b00dbd9cd15eb7c0',
         community_id,
-        id: community_id,
       };
 
       results = await command(CreateStakeTransaction(), {
@@ -118,7 +115,6 @@ describe('Stake transactions', () => {
         transaction_hash:
           '0x84939478bc5fbcca178e006dccdfaab6aebed40ef0a7b02684487780c10d8ce8',
         community_id,
-        id: community_id,
       };
 
       try {

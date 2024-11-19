@@ -3,7 +3,6 @@ import { buildDeleteThreadReactionInput } from 'client/scripts/state/api/threads
 import { useAuthModalStore } from 'client/scripts/state/ui/modals';
 import { notifyError } from 'controllers/app/notifications';
 import { SessionKeyError } from 'controllers/server/sessions';
-import { BigNumber } from 'ethers';
 import type Thread from 'models/Thread';
 import React, { useState } from 'react';
 import app from 'state';
@@ -46,10 +45,9 @@ export const ReactionButton = ({
   const user = useUserStore();
 
   const reactionWeightsSum =
-    thread?.associatedReactions?.reduce(
-      (acc, reaction) => acc.add(reaction.calculated_voting_weight || 1),
-      BigNumber.from(0),
-    ) || BigNumber.from(0);
+    BigInt(thread?.reactionWeightsSum || 0) > 0
+      ? thread?.reactionWeightsSum
+      : thread?.reactionCount?.toString() || '0';
 
   const activeAddress = user.activeAccount?.address;
   const thisUserReaction = thread?.associatedReactions?.filter(
@@ -66,6 +64,8 @@ export const ReactionButton = ({
       communityId,
       threadId: thread.id,
       threadMsgId: thread.canvasMsgId!,
+      currentReactionCount: thread.reactionCount || 0,
+      currentReactionWeightsSum: `${thread?.reactionWeightsSum || 0}`,
     });
   const { mutateAsync: deleteThreadReaction, isLoading: isDeletingReaction } =
     useDeleteThreadReactionMutation({
@@ -73,6 +73,8 @@ export const ReactionButton = ({
       address: user.activeAccount?.address || '',
       threadId: thread.id,
       threadMsgId: thread.canvasMsgId!,
+      currentReactionCount: thread.reactionCount || 0,
+      currentReactionWeightsSum: `${thread?.reactionWeightsSum || 0}`,
     });
 
   if (showSkeleton) return <ReactionButtonSkeleton />;
@@ -174,6 +176,7 @@ export const ReactionButton = ({
               body={getDisplayedReactorsForPopup({
                 reactors,
               })}
+              className="popover-content"
               {...popoverProps}
             />
           )}

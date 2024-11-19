@@ -20,16 +20,28 @@ export default (
   sequelize.define<TokenInstance>(
     'Token',
     {
-      name: { type: Sequelize.STRING, primaryKey: true },
-      icon_url: { type: Sequelize.STRING, allowNull: true },
+      // derivable when event received
+      token_address: { type: Sequelize.STRING, primaryKey: true },
+      namespace: { type: Sequelize.STRING, allowNull: false },
+      name: { type: Sequelize.STRING, allowNull: false },
+      symbol: { type: Sequelize.STRING, allowNull: false },
+      initial_supply: { type: Sequelize.DECIMAL(78, 0), allowNull: false },
+      liquidity_transferred: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
+      launchpad_liquidity: { type: Sequelize.DECIMAL(78, 0), allowNull: false },
+      eth_market_cap_target: {
+        type: Sequelize.FLOAT,
+        allowNull: false,
+      },
+      created_at: { type: Sequelize.DATE, allowNull: false },
+      updated_at: { type: Sequelize.DATE, allowNull: false },
+
+      // optional after token linked
       description: { type: Sequelize.STRING, allowNull: true },
-      symbol: { type: Sequelize.STRING },
-      chain_node_id: { type: Sequelize.INTEGER },
-      base: { type: Sequelize.STRING, allowNull: false },
-      author_address: { type: Sequelize.STRING, allowNull: false },
-      community_id: { type: Sequelize.STRING, allowNull: false },
-      launchpad_contract_address: { type: Sequelize.STRING, allowNull: false },
-      uniswap_pool_address: { type: Sequelize.STRING, allowNull: true },
+      icon_url: { type: Sequelize.STRING, allowNull: true },
     },
     {
       tableName: 'Tokens',

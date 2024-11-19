@@ -35,6 +35,7 @@ export default (
       created_at: { type: Sequelize.DATE, allowNull: false },
       updated_at: { type: Sequelize.DATE, allowNull: false },
       deleted_at: { type: Sequelize.DATE, allowNull: true },
+      archived_at: { type: Sequelize.DATE, allowNull: true },
       order: { type: Sequelize.INTEGER, allowNull: true },
       default_offchain_template: {
         type: Sequelize.TEXT,

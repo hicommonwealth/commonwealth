@@ -1,18 +1,30 @@
-import { ChainBase } from '@hicommonwealth/shared';
 import { z } from 'zod';
-import { Token } from '../entities';
-import { PG_INT } from '../utils';
+import { AuthContext } from '../context';
+import { LaunchpadTrade } from '../entities';
+import { TokenView } from '../queries';
 
 export const CreateToken = {
   input: z.object({
-    name: z.string(),
-    symbol: z.string(),
-    icon_url: z.string().nullish(),
-    description: z.string().nullish(),
-    chain_node_id: PG_INT,
-    base: z.nativeEnum(ChainBase),
     community_id: z.string(),
-    launchpad_contract_address: z.string(),
+    transaction_hash: z.string().length(66),
+    chain_node_id: z.number(),
+    description: z.string().nullish(),
+    icon_url: z.string().nullish(),
   }),
-  output: Token,
+  output: TokenView,
+  context: AuthContext,
+};
+
+export const LaunchpadTradeView = LaunchpadTrade.extend({
+  community_token_amount: z.string(),
+  price: z.string(),
+  floating_supply: z.string(),
+});
+
+export const CreateLaunchpadTrade = {
+  input: z.object({
+    eth_chain_id: z.number(),
+    transaction_hash: z.string().length(66),
+  }),
+  output: LaunchpadTradeView,
 };

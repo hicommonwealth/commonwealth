@@ -22,6 +22,7 @@ export const factoryContracts: {
     communityStake: string;
     launchpad?: string;
     lpBondingCurve?: string;
+    tokenCommunityManager?: string;
     chainId: number;
   };
 } = {
@@ -33,8 +34,9 @@ export const factoryContracts: {
   [ValidChains.SepoliaBase]: {
     factory: '0xD8a357847cABA76133D5f2cB51317D3C74609710',
     communityStake: '0xd097926d8765A7717206559E7d19EECCbBa68c18',
-    launchpad: '0xe1aa28e217a6a6bf39f74455ddd4d24aa4fa0aec',
-    lpBondingCurve: '0xaEA78B289A769DA4dde967262b5076ea8FE56607',
+    launchpad: '0xc6e7B0AdDf35AE4a5A65bb3bCb78D11Db6c8fB8F',
+    lpBondingCurve: '0x2ECc0af0e4794F0Ab4797549a5a8cf97688D7D21',
+    tokenCommunityManager: '0xC8fe1F23AbC4Eb55f4aa9E52dAFa3761111CF03a',
     chainId: 84532,
   },
   [ValidChains.Blast]: {

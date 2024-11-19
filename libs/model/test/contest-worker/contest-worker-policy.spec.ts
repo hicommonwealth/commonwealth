@@ -5,7 +5,7 @@ import { dispose, handleEvent } from '@hicommonwealth/core';
 import { afterAll, beforeAll, describe, test } from 'vitest';
 import { commonProtocol, models } from '../../src';
 import { ContestWorker } from '../../src/policies';
-import { bootstrap_testing, seed } from '../../src/tester';
+import { seed } from '../../src/tester';
 
 describe('Contest Worker Policy', () => {
   const addressId = 444;
@@ -17,7 +17,6 @@ describe('Contest Worker Policy', () => {
   let topicId: number = 0;
 
   beforeAll(async () => {
-    await bootstrap_testing();
     const [chainNode] = await seed('ChainNode', { contracts: [] });
     const [user] = await seed(
       'User',
@@ -44,21 +43,16 @@ describe('Contest Worker Policy', () => {
         {
           contest_address: contestAddress,
           cancelled: false,
-        },
-      ],
-      topics: [
-        {
-          name: 'zzz',
+          topics: [
+            {
+              name: 'zzz',
+            },
+          ],
         },
       ],
     });
-    topicId = community!.topics![0].id!;
-    expect(topicId, 'topicId not assigned').to.exist;
-    await models.ContestTopic.create({
-      topic_id: topicId,
-      contest_address: community!.contest_managers![0].contest_address!,
-      created_at: new Date(),
-    });
+    topicId = community!.contest_managers![0].topics![0].id!;
+    expect(topicId, 'seeded topic not assigned to contest manager').to.exist;
     await seed('Thread', {
       id: threadId,
       community_id: communityId,

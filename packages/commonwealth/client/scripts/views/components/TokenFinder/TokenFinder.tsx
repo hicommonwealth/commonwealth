@@ -27,7 +27,7 @@ const TokenFinder = ({
       <CWTextInput
         // can be overridden by `...rest`
         label="Token"
-        placeholder="Please enter primary token"
+        placeholder="Enter Token Address"
         {...rest}
         // not changeable
         value={tokenValue}

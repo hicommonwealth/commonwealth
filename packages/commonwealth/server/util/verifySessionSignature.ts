@@ -91,8 +91,17 @@ const verifySessionSignature = async (
         });
         if (!user || !user.id) throw new Error('Failed to create user');
         addressModel.user_id = user!.id;
+
+        await addressModel.save();
+        return;
       }
     }
+
+    // user already exists but new community joined
+    await incrementProfileCount(
+      addressModel.community_id!,
+      addressModel.user_id!,
+    );
   } else {
     // mark the address as verified
     addressModel.verification_token_expires = null;
