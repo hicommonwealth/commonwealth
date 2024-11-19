@@ -30,7 +30,7 @@ module.exports = {
         allowNull: true,
         transaction,
       });
-      await queryInterface.changeColumn('Comments', 'text', {
+      await queryInterface.changeColumn('Comments', 'body', {
         type: Sequelize.TEXT,
         transaction,
       });
@@ -38,7 +38,7 @@ module.exports = {
         type: Sequelize.TEXT,
         transaction,
       });
-      await queryInterface.changeColumn('CommentVersionHistories', 'text', {
+      await queryInterface.changeColumn('CommentVersionHistories', 'body', {
         type: Sequelize.TEXT,
         transaction,
       });
