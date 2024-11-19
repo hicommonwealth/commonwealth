@@ -168,7 +168,12 @@ const ContestCard = ({
   const hasVotes = score.length > 0;
   const hasLessVotesThanPrizes = (payoutStructure || []).length > score.length;
 
+  // TODO remove this flag during the bacakend
+  // implementation in https://github.com/hicommonwealth/commonwealth/issues/9922
+  const showNoUpvotesWarningFlag = false;
+
   const showNoUpvotesWarning =
+    showNoUpvotesWarningFlag &&
     isActive &&
     isAdmin &&
     isLessThan24HoursLeft &&
