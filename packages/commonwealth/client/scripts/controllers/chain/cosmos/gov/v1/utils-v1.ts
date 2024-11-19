@@ -104,14 +104,10 @@ export const getCompletedProposalsV1 = async (
 export const sortProposalsV1 = (
   proposals: ProposalSDKType[],
 ): ICosmosProposal[] => {
-  // @ts-expect-error StrictNullChecks
-  return (
-    proposals
-      .map((p) => propToIProposal(p))
-      .filter((p) => !!p)
-      // @ts-expect-error StrictNullChecks
-      .sort((p1, p2) => +p2.identifier - +p1.identifier)
-  );
+  return proposals
+    .map((p) => propToIProposal(p))
+    .filter((p) => !!p)
+    .sort((p1, p2) => +p2.identifier - +p1.identifier);
 };
 
 export const propToIProposal = (p: ProposalSDKType): ICosmosProposal | null => {

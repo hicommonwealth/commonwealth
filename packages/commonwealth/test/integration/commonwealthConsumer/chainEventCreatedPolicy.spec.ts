@@ -3,7 +3,7 @@ import { DB, tester } from '@hicommonwealth/model';
 import { BalanceType } from '@hicommonwealth/shared';
 
 import { BigNumber } from 'ethers';
-import { afterAll, afterEach, beforeAll, describe, test } from 'vitest';
+import { afterAll, afterEach, beforeAll, describe, expect, test } from 'vitest';
 // eslint-disable-next-line max-len
 import { processChainEventCreated } from '../../../server/workers/commonwealthConsumer/policies/chainEventCreated/chainEventCreatedPolicy';
 
