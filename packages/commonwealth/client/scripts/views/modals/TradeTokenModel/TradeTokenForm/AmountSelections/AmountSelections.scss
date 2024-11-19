@@ -48,10 +48,13 @@
     }
   }
 
-  .amount-to-crypto {
+  .invest-to-gain-amounts {
     text-align: center;
     margin: auto;
     width: fit-content;
+    display: flex;
+    align-items: center;
+    gap: 3px;
   }
 
   .preset-amounts {
