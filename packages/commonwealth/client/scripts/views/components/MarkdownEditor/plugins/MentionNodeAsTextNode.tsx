@@ -1,8 +1,9 @@
 import {
   $applyNodeReplacement,
+  DOMExportOutput,
   EditorConfig,
-  ElementNode,
-  SerializedElementNode,
+  SerializedTextNode,
+  TextNode,
   isHTMLAnchorElement,
   type DOMConversionMap,
   type DOMConversionOutput,
@@ -16,7 +17,7 @@ export type SerializedMentionNode = Spread<
     handle: string;
     uid: string;
   },
-  SerializedElementNode
+  SerializedTextNode
 >;
 
 export function parseIdFromPath(path: string): string | null {
@@ -95,6 +96,8 @@ export function addClassNamesToElement(
 
 type MentionHTMLElementType = HTMLAnchorElement;
 
+const mentionStyle = 'background-color: rgba(24, 119, 232, 0.2)';
+
 /**
  *
  * Mention node that handles mentions.
@@ -103,7 +106,7 @@ type MentionHTMLElementType = HTMLAnchorElement;
  *
  * [@inputneuron](/profile/id/3)
  */
-export class MentionNodeAsTextNode extends ElementNode {
+export class MentionNodeAsTextNode extends TextNode {
   /** @internal */
   __handle: string;
 
@@ -122,60 +125,19 @@ export class MentionNodeAsTextNode extends ElementNode {
     return new MentionNodeAsTextNode(node.__handle, node.__uid, node.__key);
   }
 
-  constructor(handle: string, uid: string, key?: NodeKey) {
-    super(key);
-    console.log('FIXME new mention node being created.');
-    this.__handle = handle;
-    this.__uid = uid;
-    this.__url = '/profile/id/' + uid;
-  }
-
-  createDOM(config: EditorConfig): HTMLElement {
-    const element = document.createElement('a');
-    element.href = this.__url;
-    element.textContent = '@' + this.__handle;
-    element.setAttribute('data-lexical-mention', 'true');
-    addClassNamesToElement(element, config.theme.link);
-    return element;
-  }
-
-  updateDOM(
-    prevNode: MentionNodeAsTextNode,
-    anchor: MentionHTMLElementType,
-    config: EditorConfig,
-  ): boolean {
-    if (anchor instanceof HTMLAnchorElement) {
-      anchor.href = this.__url;
-      anchor.setAttribute('data-lexical-mention', 'true');
-      if (anchor.firstElementChild) {
-        anchor.removeChild(anchor.firstElementChild);
-      }
-      anchor.textContent = '@' + this.__handle;
-    }
-    return false;
-  }
-
-  static importDOM(): DOMConversionMap | null {
-    console.log('FIXME importDOM');
-    return {
-      a: (domNode: HTMLElement) => {
-        if (!domNode.hasAttribute('data-lexical-mention')) {
-          return null;
-        }
-        return {
-          //conversion: $convertMentionElement,
-          conversion: $convertAnchorElement,
-          priority: 1,
-        };
-      },
-    };
-  }
-
   static importJSON(
     serializedNode: SerializedMentionNode,
   ): MentionNodeAsTextNode {
     console.log('FIXME importJSON');
     return $createMentionNode(serializedNode.handle, serializedNode.uid);
+  }
+
+  constructor(handle: string, uid: string, key?: NodeKey) {
+    super(handle, key);
+    console.log('FIXME new mention node being created.');
+    this.__handle = handle;
+    this.__uid = uid;
+    this.__url = '/profile/id/' + uid;
   }
 
   exportJSON(): SerializedMentionNode {
@@ -189,15 +151,45 @@ export class MentionNodeAsTextNode extends ElementNode {
     };
   }
 
-  // canInsertTextBefore(): boolean {
-  //   console.log('FIXME: canInsertTextBefore');
-  //   return false;
-  // }
-  //
-  // canInsertTextAfter(): boolean {
-  //   console.log('FIXME: canInsertTextAfter');
-  //   return false;
-  // }
+  createDOM(config: EditorConfig): HTMLElement {
+    const dom = super.createDOM(config);
+    dom.style.cssText = mentionStyle;
+    dom.className = 'mention';
+    return dom;
+  }
+
+  exportDOM(): DOMExportOutput {
+    const element = document.createElement('span');
+    element.setAttribute('data-lexical-mention', 'true');
+    element.textContent = this.__text;
+    return { element };
+  }
+
+  static importDOM(): DOMConversionMap | null {
+    return {
+      span: (domNode: HTMLElement) => {
+        if (!domNode.hasAttribute('data-lexical-mention')) {
+          return null;
+        }
+        return {
+          conversion: $convertMentionElement,
+          priority: 1,
+        };
+      },
+    };
+  }
+
+  isTextEntity(): true {
+    return true;
+  }
+
+  canInsertTextBefore(): boolean {
+    return false;
+  }
+
+  canInsertTextAfter(): boolean {
+    return false;
+  }
 }
 
 export function $createMentionNode(
