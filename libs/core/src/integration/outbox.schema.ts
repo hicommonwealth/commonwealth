@@ -10,7 +10,7 @@ const BaseOutboxProperties = z.object({
   updated_at: z.coerce.date().optional(),
 });
 
-export const Outbox = z.union([
+export const Outbox: z.ZodUnion<z.ZodUnionOptions> = z.union([
   z
     .object({
       event_name: z.literal(EventNames.ThreadCreated),

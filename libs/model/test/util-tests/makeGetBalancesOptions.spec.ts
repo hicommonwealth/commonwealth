@@ -5,8 +5,8 @@ import {
   makeGetBalancesOptions,
 } from '@hicommonwealth/model';
 import { BalanceSourceType } from '@hicommonwealth/shared';
-import { expect } from 'chai';
-import { describe, test } from 'vitest';
+
+import { describe, expect, test } from 'vitest';
 
 describe('makeGetBalancesOptions', () => {
   test('should return empty array', () => {

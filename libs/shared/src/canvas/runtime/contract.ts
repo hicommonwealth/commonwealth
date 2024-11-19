@@ -64,7 +64,7 @@ export const contract = {
       { thread_id, title, body, link, topic },
       { did, timestamp },
     ) {
-      const t = await db.get('threads', thread_id);
+      const t: any = await db.get('threads', thread_id);
       if (!t || !t.id) throw new Error('invalid thread');
       if (t.author !== did) throw new Error('invalid thread');
       await db.set('threads', {
@@ -79,7 +79,7 @@ export const contract = {
       });
     },
     async deleteThread(db, { thread_id }, { did }) {
-      const t = await db.get('threads', thread_id);
+      const t: any = await db.get('threads', thread_id);
       if (!t || !t.id) throw new Error('invalid thread');
       if (t.author !== did) throw new Error('invalid thread');
       await db.delete('threads', t.id as string);
@@ -100,7 +100,7 @@ export const contract = {
     },
     // TODO: not implemented (packages/commonwealth/server/routes/comments/update_comment_handler.ts)
     async updateComment(db, { comment_id, body }, { did, timestamp }) {
-      const c = await db.get('comments', comment_id);
+      const c: any = await db.get('comments', comment_id);
       if (!c || !c.id) throw new Error('invalid comment');
       if (c.author !== did) throw new Error('invalid comment');
       await db.set('comments', {
@@ -113,7 +113,7 @@ export const contract = {
       });
     },
     async deleteComment(db, { comment_id }, { did }) {
-      const c = await db.get('comments', comment_id);
+      const c: any = await db.get('comments', comment_id);
       if (!c || !c.id) throw new Error('invalid comment');
       if (c.author !== did) throw new Error('invalid comment');
       await db.delete('comments', c.id as string);
@@ -131,7 +131,7 @@ export const contract = {
       });
     },
     async unreactThread(db, { thread_id }, { did }) {
-      const r = await db.get('thread_reactions', `${thread_id}/${did}`);
+      const r: any = await db.get('thread_reactions', `${thread_id}/${did}`);
       if (!r || !r.id) throw new Error('reaction does not exist');
       await db.delete('thread_reactions', `${thread_id}/${did}`);
     },
@@ -148,7 +148,7 @@ export const contract = {
       });
     },
     async unreactComment(db, { comment_id }, { did }) {
-      const r = await db.get('comment_reactions', `${comment_id}/${did}`);
+      const r: any = await db.get('comment_reactions', `${comment_id}/${did}`);
       if (!r || !r.id) throw new Error('reaction does not exist');
       await db.delete('comment_reactions', `${comment_id}/${did}`);
     },

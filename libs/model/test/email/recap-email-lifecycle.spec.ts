@@ -10,10 +10,10 @@ import {
 } from '@hicommonwealth/core';
 import { Comment, Community, Thread, User } from '@hicommonwealth/schemas';
 import { BalanceType } from '@hicommonwealth/shared';
-import chai, { expect } from 'chai';
+import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import sinon from 'sinon';
-import { afterAll, afterEach, beforeAll, describe, test } from 'vitest';
+import { afterAll, afterEach, beforeAll, describe, expect, test } from 'vitest';
 import { z } from 'zod';
 import { GetRecapEmailDataQuery } from '../../src/emails';
 import { seed } from '../../src/tester';

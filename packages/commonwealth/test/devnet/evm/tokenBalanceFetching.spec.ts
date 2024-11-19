@@ -20,8 +20,8 @@ import {
 } from '@hicommonwealth/shared';
 import { Anvil } from '@viem/anvil';
 import BN from 'bn.js';
-import { expect } from 'chai';
-import { afterAll, beforeAll, describe, test } from 'vitest';
+
+import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 import Web3 from 'web3';
 import { toWei } from 'web3-utils';
 

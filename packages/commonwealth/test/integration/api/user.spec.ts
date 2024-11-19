@@ -5,13 +5,19 @@ import { dispose } from '@hicommonwealth/core';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
-import { afterAll, beforeAll, beforeEach, describe, test } from 'vitest';
+import {
+  afterAll,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  test,
+} from 'vitest';
 import { TestServer, testServer } from '../../../server-test';
 import { config } from '../../../server/config';
 import { Errors as updateEmailErrors } from '../../../server/routes/updateEmail';
 
 chai.use(chaiHttp);
-const { expect } = chai;
 
 describe('User Model Routes', () => {
   let server: TestServer;

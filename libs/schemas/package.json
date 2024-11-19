@@ -26,7 +26,5 @@
     "moment": "^2.30.1",
     "zod": "^3.23.8"
   },
-  "devDependencies": {
-    "@types/moment": "^2.13.0"
-  }
+  "devDependencies": {}
 }

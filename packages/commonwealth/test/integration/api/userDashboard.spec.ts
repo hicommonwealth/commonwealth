@@ -4,14 +4,13 @@ import chai from 'chai';
 import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
 import { Op } from 'sequelize';
-import { afterAll, beforeAll, describe, test } from 'vitest';
+import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 import { TestServer, testServer } from '../../../server-test';
 import { config } from '../../../server/config';
 import { attributesOf } from '../../../server/util/sequelizeHelpers';
 import { JoinCommunityArgs, ThreadArgs } from '../../util/modelUtils';
 
 chai.use(chaiHttp);
-const { expect } = chai;
 
 describe('User Dashboard API', () => {
   const chain = 'ethereum';

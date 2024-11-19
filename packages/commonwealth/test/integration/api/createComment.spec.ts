@@ -1,9 +1,16 @@
 import { dispose } from '@hicommonwealth/core';
-import chai, { expect } from 'chai';
+import chai from 'chai';
 import chaiHttp from 'chai-http';
 import Chance from 'chance';
 import jwt from 'jsonwebtoken';
-import { afterAll, beforeAll, beforeEach, describe, test } from 'vitest';
+import {
+  afterAll,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  test,
+} from 'vitest';
 import { TestServer, testServer } from '../../../server-test';
 import { config } from '../../../server/config';
 

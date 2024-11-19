@@ -1,9 +1,9 @@
 import { ExternalServiceUserIds, dispose, query } from '@hicommonwealth/core';
 import { models } from '@hicommonwealth/model';
 import { Community } from '@hicommonwealth/schemas';
-import { expect } from 'chai';
+
 import { seed } from 'model/src/tester';
-import { afterAll, afterEach, beforeAll, describe, test } from 'vitest';
+import { afterAll, afterEach, beforeAll, describe, expect, test } from 'vitest';
 import { z } from 'zod';
 import { GetDigestEmailDataQuery } from '../../src/emails';
 import { generateThreads } from './util';

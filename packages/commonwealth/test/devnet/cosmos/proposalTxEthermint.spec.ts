@@ -4,7 +4,6 @@ import { DirectSecp256k1HdWallet } from '@cosmjs/proto-signing';
 import { Wallet as EthWallet } from '@ethersproject/wallet';
 import { dispose } from '@hicommonwealth/core';
 import { tester } from '@hicommonwealth/model';
-import chai from 'chai';
 import { CosmosToken } from 'client/scripts/controllers/chain/cosmos/types';
 import { CosmosApiType } from 'controllers/chain/cosmos/chain';
 import {
@@ -22,11 +21,9 @@ import {
   ProposalStatus,
   VoteOption,
 } from 'cosmjs-types/cosmos/gov/v1beta1/gov';
-import { afterAll, beforeAll, describe, test } from 'vitest';
+import { afterAll, assert, beforeAll, describe, expect, test } from 'vitest';
 import EthSigner from './utils/eth-signer';
 import { waitOneBlock } from './utils/helpers';
-
-const { expect, assert } = chai;
 
 // evmos1yc36qsnpgnnwnhjp5v524lk3cadlq4480u47x2
 const mnemonic =

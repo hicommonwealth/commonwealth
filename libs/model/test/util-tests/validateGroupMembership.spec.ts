@@ -3,8 +3,8 @@ import {
   validateGroupMembership,
 } from '@hicommonwealth/model';
 import { BalanceSourceType, Requirement } from '@hicommonwealth/shared';
-import { expect } from 'chai';
-import { describe, test } from 'vitest';
+
+import { describe, expect, test } from 'vitest';
 
 type MockRequirementOptions = {
   threshold: string;

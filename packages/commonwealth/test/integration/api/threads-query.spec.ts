@@ -10,10 +10,9 @@ import chai from 'chai';
 import chaiHttp from 'chai-http';
 import { Optional } from 'sequelize';
 import { NullishPropertiesOf } from 'sequelize/lib/utils';
-import { afterAll, beforeAll, describe, test } from 'vitest';
+import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 
 chai.use(chaiHttp);
-const { expect } = chai;
 
 describe('Thread queries', () => {
   let models: DB;

@@ -4,12 +4,11 @@ import { CANVAS_TOPIC, serializeCanvas } from '@hicommonwealth/shared';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import { Wallet } from 'ethers';
-import { afterAll, beforeAll, describe, test } from 'vitest';
+import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 import { TestServer, testServer } from '../../../server-test';
 import { TEST_BLOCK_INFO_STRING } from '../../util/keys';
 
 chai.use(chaiHttp);
-const { expect } = chai;
 
 describe('Verify Address Routes', () => {
   let server: TestServer;

@@ -11,7 +11,7 @@ import {
   cosmosRPCDuration,
   cosmosRPCKey,
 } from 'server/util/cosmosCache';
-import { afterAll, beforeAll, describe, test } from 'vitest';
+import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 
 const V1BETA1_CHAIN_ID = 'csdk-beta';
 const V1_CHAIN_ID = 'csdk';
@@ -19,7 +19,6 @@ const V1BETA1_API = `/api/cosmosProxy`;
 const V1_API = `/api/cosmosProxy/v1`;
 
 chai.use(chaiHttp);
-const expect = chai.expect;
 
 function verifyNoCacheResponse(res) {
   expect(res.body).to.not.be.null;

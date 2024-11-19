@@ -1,8 +1,8 @@
 import { disposeAdapter, EventNames } from '@hicommonwealth/core';
 import { models, tester } from '@hicommonwealth/model';
 import { delay } from '@hicommonwealth/shared';
-import { expect } from 'chai';
-import { afterEach, beforeAll, describe, test } from 'vitest';
+
+import { afterEach, beforeAll, describe, expect, test } from 'vitest';
 import { startMessageRelayer } from '../../../server/workers/messageRelayer/messageRelayer';
 import {
   numUnrelayedEvents,

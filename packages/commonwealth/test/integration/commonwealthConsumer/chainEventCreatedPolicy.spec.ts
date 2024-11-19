@@ -1,7 +1,7 @@
 import { EventContext, dispose } from '@hicommonwealth/core';
 import { DB, tester } from '@hicommonwealth/model';
 import { BalanceType } from '@hicommonwealth/shared';
-import { expect } from 'chai';
+
 import { BigNumber } from 'ethers';
 import { afterAll, afterEach, beforeAll, describe, test } from 'vitest';
 // eslint-disable-next-line max-len

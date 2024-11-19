@@ -1,7 +1,6 @@
 import { isDeliverTxSuccess } from '@cosmjs/stargate';
 import { dispose } from '@hicommonwealth/core';
 import { tester } from '@hicommonwealth/model';
-import chai from 'chai';
 import { CosmosApiType } from 'controllers/chain/cosmos/chain';
 import {
   getRPCClient,
@@ -18,15 +17,13 @@ import {
   ProposalStatus,
   VoteOption,
 } from 'cosmjs-types/cosmos/gov/v1beta1/gov';
-import { afterAll, beforeAll, describe, test } from 'vitest';
+import { afterAll, assert, beforeAll, describe, expect, test } from 'vitest';
 import {
   deposit,
   sendTx,
   setupTestSigner,
   waitOneBlock,
 } from './utils/helpers';
-
-const { expect, assert } = chai;
 
 describe('Proposal Transaction Tests - gov v1beta1 chain (csdk-beta-local)', () => {
   let rpc: CosmosApiType;

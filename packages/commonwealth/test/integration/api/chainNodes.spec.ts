@@ -1,8 +1,7 @@
 import { dispose } from '@hicommonwealth/core';
 import { tester, type DB, type UserInstance } from '@hicommonwealth/model';
 import { BalanceType } from '@hicommonwealth/shared';
-import { assert, expect } from 'chai';
-import { afterAll, beforeAll, describe, test } from 'vitest';
+import { afterAll, assert, beforeAll, describe, expect, test } from 'vitest';
 import { ServerCommunitiesController } from '../../../server/controllers/server_communities_controller';
 import { buildUser } from '../../unit/unitHelpers';
 

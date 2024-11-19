@@ -1,8 +1,7 @@
 import { models } from '@hicommonwealth/model';
-import { expect, test } from '@playwright/test';
-import chai from 'chai';
+import { expect as playrightExpect, test } from '@playwright/test';
 import sleep from 'sleep-promise';
-const chaiExpect = chai.expect;
+import { expect } from 'vitest';
 
 test.describe.configure({ mode: 'parallel' });
 
@@ -18,7 +17,7 @@ test.describe('Community proposals page', () => {
       .filter({ hasText: 'Active' })
       .first();
     const innerText = await activeHeader.innerText();
-    expect(innerText).toEqual('Active');
+    playrightExpect(innerText).toEqual('Active');
   };
 
   const closeBanner = async ({ page }) => {
@@ -33,18 +32,19 @@ test.describe('Community proposals page', () => {
     await waitForCompletedProposals({ page });
     const inactiveCardsCollection = await page.$$('.CardsCollection');
     const inactiveCardsContainer = await inactiveCardsCollection?.[1];
-    const inactiveCardsSpinner = await inactiveCardsContainer?.$(
-      '.LoadingSpinner',
-    );
+    const inactiveCardsSpinner =
+      await inactiveCardsContainer?.$('.LoadingSpinner');
     await inactiveCardsSpinner?.waitForElementState('hidden');
     const inactiveCards = await inactiveCardsContainer?.$('.cards');
 
-    await expect(async () => {
+    await playrightExpect(async () => {
       const cardCount = await inactiveCards.$$eval(
         '.ProposalCard',
         (cards) => cards.length,
       );
-      await expect(cardCount).toBeGreaterThanOrEqual(expectedMinimumCount);
+      await playrightExpect(cardCount).toBeGreaterThanOrEqual(
+        expectedMinimumCount,
+      );
     }).toPass();
   };
 
@@ -76,7 +76,7 @@ test.describe('Community proposals page', () => {
     const activeCardsContainer = await collections[0]?.$('.cards');
     const inactiveCardsContainer = await collections[1]?.$('.cards');
 
-    await expect(async () => {
+    await playrightExpect(async () => {
       const activeCardTitles = await activeCardsContainer?.$$(
         '.ProposalCard .Text.b1.semiBold.noWrap',
       );
@@ -85,12 +85,12 @@ test.describe('Community proposals page', () => {
       );
 
       const cardTitles = [...activeCardTitles, ...inactiveCardTitles];
-      expect(cardTitles.length).toBeGreaterThan(0);
+      playrightExpect(cardTitles.length).toBeGreaterThan(0);
 
       for (const title of cardTitles) {
         const titleText = await title.innerText();
-        expect(titleText).toBeTruthy();
-        expect(titleText.length).toBeGreaterThan(0);
+        playrightExpect(titleText).toBeTruthy();
+        playrightExpect(titleText.length).toBeGreaterThan(0);
       }
     }).toPass();
   };
@@ -161,12 +161,12 @@ test.describe('Community proposals page', () => {
     const votingResult = await content.$('.VotingResult');
     const voteResult = await votingResult?.innerText();
 
-    expect(headerText).toBeTruthy();
-    expect(headerText.length).toBeGreaterThan(0);
-    if (expectedTitle) expect(headerText).toEqual(expectedTitle);
-    expect(statusText).toBeTruthy();
-    expect(descText).toBeTruthy();
-    expect(voteResult).toBeTruthy();
+    playrightExpect(headerText).toBeTruthy();
+    playrightExpect(headerText.length).toBeGreaterThan(0);
+    if (expectedTitle) playrightExpect(headerText).toEqual(expectedTitle);
+    playrightExpect(statusText).toBeTruthy();
+    playrightExpect(descText).toBeTruthy();
+    playrightExpect(voteResult).toBeTruthy();
   };
 
   // now the test runs:
@@ -324,13 +324,11 @@ test.describe('Community proposals page', () => {
       });
 
       // @ts-expect-error StrictNullChecks
-      chaiExpect(communityBeforeUpgrade.ChainNode.cosmos_gov_version).to.equal(
+      expect(communityBeforeUpgrade.ChainNode.cosmos_gov_version).to.equal(
         null,
       );
       // @ts-expect-error StrictNullChecks
-      chaiExpect(communityBeforeUpgrade.ChainNode.alt_wallet_url).to.equal(
-        null,
-      );
+      expect(communityBeforeUpgrade.ChainNode.alt_wallet_url).to.equal(null);
 
       await page.goto(proposalsPageUrl);
       await inactiveProposalCardsTest({ page }, 0);
@@ -341,7 +339,7 @@ test.describe('Community proposals page', () => {
         include: [models.ChainNode],
       });
       // @ts-expect-error StrictNullChecks
-      chaiExpect(communityAfterFailure.ChainNode.cosmos_gov_version).to.equal(
+      expect(communityAfterFailure.ChainNode.cosmos_gov_version).to.equal(
         'v1beta1-attempt-failed',
       );
     });
@@ -357,9 +355,7 @@ test.describe('Community proposals page', () => {
       });
 
       // @ts-expect-error StrictNullChecks
-      chaiExpect(communityAfterRefresh.ChainNode.cosmos_gov_version).to.equal(
-        'v1',
-      );
+      expect(communityAfterRefresh.ChainNode.cosmos_gov_version).to.equal('v1');
     });
     test('Inactive proposal page loads from Proposal Card click', async ({
       page,

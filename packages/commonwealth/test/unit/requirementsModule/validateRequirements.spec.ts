@@ -1,7 +1,7 @@
 import { BalanceSourceType, Requirement } from '@hicommonwealth/shared';
-import { expect } from 'chai';
+
 import validateRequirements from 'server/util/requirementsModule/validateRequirements';
-import { describe, test } from 'vitest';
+import { describe, expect, test } from 'vitest';
 
 describe('validateRequirements', () => {
   test('should pass as valid for ERC20 ContractSource', () => {

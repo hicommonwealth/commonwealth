@@ -1,8 +1,8 @@
 import { models, tester } from '@hicommonwealth/model';
 import { delay } from '@hicommonwealth/shared';
-import { expect } from 'chai';
+
 import { Client } from 'pg';
-import { afterAll, afterEach, beforeAll, describe, test } from 'vitest';
+import { afterAll, afterEach, beforeAll, describe, expect, test } from 'vitest';
 import { setupListener } from '../../../server/workers/messageRelayer/pgListener';
 import {
   numUnrelayedEvents,

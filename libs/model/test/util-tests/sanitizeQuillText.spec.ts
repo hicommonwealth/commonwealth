@@ -1,6 +1,6 @@
 import { sanitizeQuillText } from '@hicommonwealth/model';
-import { expect } from 'chai';
-import { describe, test } from 'vitest';
+
+import { describe, expect, test } from 'vitest';
 
 const encode = (input: { ops: any }): string =>
   encodeURIComponent(JSON.stringify(input));

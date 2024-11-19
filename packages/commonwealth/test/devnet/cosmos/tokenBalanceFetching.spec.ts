@@ -27,9 +27,9 @@ import {
   delay,
 } from '@hicommonwealth/shared';
 import BN from 'bn.js';
-import { use as chaiUse, expect } from 'chai';
+import { use as chaiUse } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import { afterAll, beforeAll, describe, test } from 'vitest';
+import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 
 chaiUse(chaiAsPromised);
 

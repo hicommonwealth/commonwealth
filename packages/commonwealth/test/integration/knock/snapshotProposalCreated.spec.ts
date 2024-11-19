@@ -12,7 +12,7 @@ import {
 import { models, tester } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import { SnapshotEventType } from '@hicommonwealth/shared';
-import chai, { expect } from 'chai';
+import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import sinon from 'sinon';
 import {
@@ -21,6 +21,7 @@ import {
   beforeAll,
   beforeEach,
   describe,
+  expect,
   test,
 } from 'vitest';
 import z from 'zod';

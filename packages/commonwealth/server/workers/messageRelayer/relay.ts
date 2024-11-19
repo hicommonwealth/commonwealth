@@ -45,7 +45,6 @@ export async function relay(broker: Broker, models: DB): Promise<number> {
           });
           break;
         }
-        // @ts-expect-error StrictNullChecks
         publishedEventIds.push(event.event_id);
         stats().incrementBy(
           'messageRelayerPublished',

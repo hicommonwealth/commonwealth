@@ -1,5 +1,4 @@
-import { expect } from 'chai';
-import { describe, test } from 'vitest';
+import { describe, expect, test } from 'vitest';
 import {
   PaginationSqlOptions,
   PaginationSqlResult,

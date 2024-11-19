@@ -4,7 +4,7 @@ import { CacheNamespaces, cache, dispose } from '@hicommonwealth/core';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import express, { RequestHandler, json } from 'express';
-import { afterAll, beforeAll, describe, test } from 'vitest';
+import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 import { config } from '../../src/config';
 import { CacheDecorator, RedisCache, XCACHE_VALUES } from '../../src/redis';
 import {
@@ -13,7 +13,6 @@ import {
 } from './setupCacheEndpoints';
 
 chai.use(chaiHttp);
-const expect = chai.expect;
 const app = express();
 app.use(json() as RequestHandler);
 
