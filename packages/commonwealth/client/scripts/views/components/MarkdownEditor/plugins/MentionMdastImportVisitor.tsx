@@ -1,4 +1,5 @@
 import { Descriptors, MdastImportVisitor } from 'commonwealth-mdxeditor';
+import { ElementNode } from 'lexical';
 import * as Mdast from 'mdast';
 import {
   $createMentionNode,
@@ -29,11 +30,14 @@ export const MentionMdastImportVisitor: MdastImportVisitor<Mdast.Link> = {
 
     return !!value && value.startsWith('@');
   },
-  visitNode({ mdastNode, actions }) {
+  visitNode({ mdastNode, actions, mdastParent, lexicalParent }) {
     // FIXME: this part isn't working because I get an issue where teh parent is not available.
     // FIXME I need to look at the source of createLinkNode as maybe it creates itw own parent?
 
     // FIXME: this neds to be fixed next...
+
+    console.log('FIXME mdastParent: ', mdastParent);
+    console.log('FIXME lexicalParent: ', lexicalParent);
 
     console.log(
       'FIXME: MentionMdastImportVisitor.visitNode: actions: ',
@@ -60,6 +64,16 @@ export const MentionMdastImportVisitor: MdastImportVisitor<Mdast.Link> = {
 
     const mentionNode = $createMentionNode(handle, uid);
     console.log('FIXME: mentionNode created for handle: ', { handle, uid });
-    actions.addAndStepInto(mentionNode);
+    // actions.addAndStepInto(mentionNode);
+
+    function isParent(node: unknown): node is Mdast.Parent {
+      return (node as { children?: any[] }).children instanceof Array;
+    }
+
+    (lexicalParent as ElementNode).append(mentionNode);
+
+    if (isParent(mdastNode)) {
+      actions.visitChildren(mdastNode, lexicalParent);
+    }
   },
 };

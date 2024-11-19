@@ -1,4 +1,4 @@
 
-[@alice](/profile/id/123)
+[@Alice](/profile/id/123)
 
-[@bob](/profile/id/234)
+[@Bob](/profile/id/234)
