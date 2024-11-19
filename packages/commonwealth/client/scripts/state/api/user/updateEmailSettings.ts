@@ -18,20 +18,16 @@ const updateUserEmailSettings = async ({
   emailNotificationInterval,
   promotionalEmailsEnabled,
 }: UseUpdateUserEmailSettingsProps) => {
-  // TODO: cleanup https://github.com/hicommonwealth/commonwealth/issues/8393
-  const key = emailNotificationInterval
-    ? 'updateEmailInterval'
-    : 'promotional_emails_enabled';
-  const value = emailNotificationInterval
-    ? emailNotificationInterval
-    : `${promotionalEmailsEnabled}`;
-
   await axios.post(
     `${SERVER_URL}/${ApiEndpoints.UPDATE_USER_EMAIL_INTERVAL_SETTINGS}`,
     {
       jwt: userStore.getState().jwt,
-      key,
-      value,
+      ...(typeof promotionalEmailsEnabled === 'boolean' && {
+        promotional_emails_enabled: promotionalEmailsEnabled,
+      }),
+      ...(typeof emailNotificationInterval === 'string' && {
+        email_notification_interval: emailNotificationInterval,
+      }),
     },
   );
 
