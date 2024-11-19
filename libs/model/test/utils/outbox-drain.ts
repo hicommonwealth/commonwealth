@@ -16,4 +16,5 @@ export async function drainOutbox<E extends Events>(
   // loads events from outbox starting from ?? a minute ago
   // pushes events to projection
   // ignore errors??? this is for testing only
+  console.log(events, projection, from);
 }
