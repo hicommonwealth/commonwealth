@@ -128,11 +128,13 @@ export const buildAssociations = (db: DB) => {
   db.ContestManager.withMany(db.Contest, {
     foreignKey: 'contest_address',
     asMany: 'contests',
+    onDelete: 'CASCADE',
   });
 
   db.Contest.withMany(db.ContestAction, {
     foreignKey: ['contest_address', 'contest_id'],
     asMany: 'actions',
+    onDelete: 'CASCADE',
   });
 
   db.CommunityStake.withMany(db.StakeTransaction, {
