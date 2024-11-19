@@ -1,9 +1,7 @@
 import { config } from '@hicommonwealth/core';
-import { models } from '@hicommonwealth/model';
+import { commonProtocol, models } from '@hicommonwealth/model';
 import { Button } from 'frames.js/express';
 import moment from 'moment';
-import { mustExist } from 'node_modules/@hicommonwealth/model/src/middleware/guards';
-import { getContestBalance } from 'node_modules/@hicommonwealth/model/src/services/commonProtocol/contestHelper';
 import React from 'react';
 import { frames } from '../../config';
 
@@ -56,11 +54,38 @@ export const contestCard = frames(async (ctx) => {
       },
     ],
   });
-  mustExist('Contest Manager', contestManager);
+
+  if (!contestManager) {
+    return {
+      title: 'N/A',
+      image: (
+        <div
+          style={{
+            backgroundColor: '#2A2432',
+            color: 'white',
+            padding: '40px',
+            display: 'flex',
+            flexDirection: 'column',
+            width: '100%',
+            height: '100%',
+            lineHeight: '0.5',
+          }}
+        >
+          <p
+            style={{
+              fontSize: '56px',
+            }}
+          >
+            Not Found
+          </p>
+        </div>
+      ),
+    };
+  }
 
   const chainNode = contestManager.Community!.ChainNode!;
   const chainNodeUrl = chainNode.private_url! || chainNode.url!;
-  const contestBalance = await getContestBalance(
+  const contestBalance = await commonProtocol.contestHelper.getContestBalance(
     chainNodeUrl,
     contestManager.contest_address,
     contestManager.interval === 0,
