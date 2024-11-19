@@ -85,7 +85,8 @@ export const buildAssociations = (db: DB) => {
       foreignKey: 'selected_community_id',
       as: 'selectedCommunity',
     })
-    .withMany(db.Quest, { onUpdate: 'CASCADE', onDelete: 'CASCADE' });
+    .withMany(db.Quest, { onUpdate: 'CASCADE', onDelete: 'CASCADE' })
+    .withMany(db.ContestManager, { onUpdate: 'CASCADE', onDelete: 'CASCADE' });
 
   db.Tags.withMany(db.ProfileTags, {
     foreignKey: 'tag_id',

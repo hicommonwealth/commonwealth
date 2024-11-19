@@ -1,7 +1,9 @@
+import { models } from '@hicommonwealth/model';
 import { Button } from 'frames.js/express';
 import moment from 'moment';
+import { mustExist } from 'node_modules/@hicommonwealth/model/src/middleware/guards';
+import { getContestBalance } from 'node_modules/@hicommonwealth/model/src/services/commonProtocol/contestHelper';
 import React from 'react';
-import { getContestManagerScores } from 'server/farcaster/utils';
 import { frames } from '../../config';
 
 const PrizeRow = ({ index, prize }: { index: number; prize: number }) => {
@@ -38,8 +40,39 @@ export const contestCard = frames(async (ctx) => {
 
   const contest_address = ctx.url.pathname.split('/')[1];
 
-  const { contestManager, prizes } =
-    await getContestManagerScores(contest_address);
+  const contestManager = await models.ContestManager.findOne({
+    where: {
+      contest_address: contest_address,
+    },
+    include: [
+      {
+        model: models.Community,
+        include: [
+          {
+            model: models.ChainNode.scope('withPrivateData'),
+          },
+        ],
+      },
+    ],
+  });
+  mustExist('Contest Manager', contestManager);
+
+  const chainNode = contestManager.Community!.ChainNode!;
+  const chainNodeUrl = chainNode.private_url! || chainNode.url!;
+  const contestBalance = await getContestBalance(
+    chainNodeUrl,
+    contestManager.contest_address,
+    contestManager.interval === 0,
+  );
+
+  const prizes =
+    contestBalance && contestManager.payout_structure
+      ? contestManager.payout_structure.map(
+          (percentage) =>
+            (Number(contestBalance) * (percentage / 100)) /
+            Math.pow(10, contestManager.decimals || 18),
+        )
+      : [];
 
   return {
     title: contestManager.name,
