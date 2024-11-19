@@ -1,11 +1,12 @@
 /* eslint-disable dot-notation */
 import { CacheDecorator, RedisCache } from '@hicommonwealth/adapters';
 import { cache, dispose } from '@hicommonwealth/core';
-import type { DB, E2E_TestEntities } from '@hicommonwealth/model';
+import { tester, type DB, type E2E_TestEntities } from '@hicommonwealth/model';
 import express from 'express';
 import 'express-async-errors'; // handle exceptions thrown in express routes
 import { config } from './server/config';
 import { ModelSeeder, modelSeeder } from './test/util/modelUtils';
+const { main } = await import('./main');
 
 /**
  * Encapsulates all the infrastructure required for integration testing, including:
@@ -31,16 +32,12 @@ export type TestServer = {
  * Creates local test server connected to test db and seeder utils
  * @returns test server
  */
-export const testServer = async (): Promise<TestServer> => {
+export const testServer = async (meta: ImportMeta): Promise<TestServer> => {
   // bootstrap test adapters
   cache({
     adapter: new RedisCache('redis://localhost:6379'),
   });
-
-  const { tester } = await import('@hicommonwealth/model');
-  const { main } = await import('./main');
-
-  const db = await tester.seedDb();
+  const db = await tester.seedDb(meta);
   const app = express();
   const { server, cacheDecorator } = await main(app, db, {
     port: 8081,
