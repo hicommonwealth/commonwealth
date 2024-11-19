@@ -11,6 +11,7 @@ import {
   EditorConfig,
   ElementNode,
   SerializedElementNode,
+  isHTMLAnchorElement,
   type DOMConversionMap,
   type DOMConversionOutput,
   type LexicalNode,
@@ -51,6 +52,22 @@ const $convertMentionElement = (
 
   return null;
 };
+
+function $convertAnchorElement(domNode: Node): DOMConversionOutput {
+  let node: MentionNode | null = null;
+  if (isHTMLAnchorElement(domNode)) {
+    const content = domNode.textContent;
+    if ((content !== null && content !== '') || domNode.children.length > 0) {
+      const handle = parseHandleFromMention(domNode.textContent ?? '');
+      const id = parseIdFromPath(domNode.getAttribute('href') ?? '');
+
+      if (handle && id) {
+        node = $createMentionNode(handle, id);
+      }
+    }
+  }
+  return { node };
+}
 
 export default function normalizeClassNames(
   ...classNames: Array<typeof undefined | boolean | null | string>
@@ -154,7 +171,8 @@ export class MentionNode extends ElementNode {
           return null;
         }
         return {
-          conversion: $convertMentionElement,
+          //conversion: $convertMentionElement,
+          conversion: $convertAnchorElement,
           priority: 1,
         };
       },

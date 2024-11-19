@@ -21,7 +21,11 @@ export const MentionMdastImportVisitor: MdastImportVisitor<Mdast.Link> = {
 
     const firstChild = mdastNode.children[0];
 
-    const value = (firstChild as any).value as string | undefined | null;
+    if (firstChild.type !== 'text') {
+      throw new Error('First child is not text');
+    }
+
+    const value = firstChild.value;
 
     return !!value && value.startsWith('@');
   },
