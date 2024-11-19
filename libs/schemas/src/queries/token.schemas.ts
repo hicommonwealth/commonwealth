@@ -18,3 +18,11 @@ export const GetTokens = {
     results: TokenView.extend({ community_id: z.string() }).array(),
   }),
 };
+
+export const GetToken = {
+  input: z.object({
+    community_id: z.string(),
+    with_stats: z.boolean().optional(),
+  }),
+  output: z.union([TokenView, z.undefined()]),
+};

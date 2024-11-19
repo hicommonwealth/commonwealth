@@ -79,14 +79,13 @@ export function GetTokens(): Query<typeof schemas.GetTokens> {
         z.infer<typeof schemas.TokenView> & {
           total?: number;
           community_id: string;
-          latest_price?: string;
-          old_price?: string;
+          latest_price?: number;
+          old_price?: number;
         }
       >(sql, {
         replacements,
         type: QueryTypes.SELECT,
         nest: true,
-        logging: console.log,
       });
 
       return schemas.buildPaginatedResponse(
