@@ -41,8 +41,6 @@ export const MentionMdastImportVisitor: MdastImportVisitor<Mdast.Link> = {
     );
 
     const uid = parseIdFromPath(mdastNode.url) ?? '';
-    // const handle = parseHandleFromMention(mdastNode.data)
-    console.log('FIXME: mdastNode, ', mdastNode);
 
     if (mdastNode.children.length !== 1) {
       throw new Error('Expected only one child node');
