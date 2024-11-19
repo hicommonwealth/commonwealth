@@ -32,8 +32,11 @@ export const CreateTopicSection = ({
   onSetTopicFormData,
   topicFormData,
 }: CreateTopicSectionProps) => {
+  const communityId = app.activeChainId() || '';
   const { data: topics } = useFetchTopicsQuery({
-    communityId: app.activeChainId() || '',
+    communityId: communityId,
+    includeArchivedTopics: true,
+    apiEnabled: !!communityId,
   });
 
   const [nameErrorMsg, setNameErrorMsg] = useState<string | null>(null);

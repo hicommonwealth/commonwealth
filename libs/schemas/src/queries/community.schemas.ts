@@ -185,6 +185,7 @@ export const TopicView = Topic.extend({
   created_at: z.string().nullish(),
   updated_at: z.string().nullish(),
   deleted_at: z.string().nullish(),
+  archived_at: z.string().nullish(),
   contest_topics: z.undefined(),
   total_threads: z.number().default(0),
   active_contest_managers: z.array(ConstestManagerView).optional(),
@@ -194,6 +195,7 @@ export const GetTopics = {
   input: z.object({
     community_id: z.string(),
     with_contest_managers: z.boolean().optional(),
+    with_archived_topics: z.boolean().optional(),
   }),
   output: z.array(TopicView),
 };

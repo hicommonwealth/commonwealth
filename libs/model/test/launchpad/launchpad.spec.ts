@@ -1,5 +1,5 @@
 import { Actor, command, dispose } from '@hicommonwealth/core';
-import { config } from '@hicommonwealth/model';
+import { config, equalEvmAddresses } from '@hicommonwealth/model';
 import { BalanceType, commonProtocol } from '@hicommonwealth/shared';
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
@@ -10,7 +10,11 @@ import { CreateLaunchpadTrade, CreateToken } from '../../src/token';
 
 chai.use(chaiAsPromised);
 
-const token_address = '0x99a3574fed7b8935709bb13f35448bf7922770ea';
+const CREATE_TOKEN_TXN_HASH =
+  '0x735a6ec2a5d1b71634e74183f2436f4b76855e613e97fc008f2df486d9eb73db';
+const TRADE_TOKEN_TXN_HASH =
+  '0xf516b28f2baba449b2776c190580200320165f5436a94f5f2dc35500a3001aee';
+const TOKEN_ADDRESS = '0x656a7C7429a7Ef95f55A1c1F4cc0D5D0B9E11b87';
 
 describe('Launchpad Lifecycle', () => {
   let actor: Actor;
@@ -32,7 +36,7 @@ describe('Launchpad Lifecycle', () => {
     });
 
     const [community] = await seed('Community', {
-      namespace: 'testt',
+      namespace: 'DogeMoonLanding',
       chain_node_id: node?.id,
       lifetime_thread_count: 0,
       profile_count: 1,
@@ -70,8 +74,7 @@ describe('Launchpad Lifecycle', () => {
     { timeout: 10_000 },
     async () => {
       const payload = {
-        transaction_hash:
-          '0xc0e59dfc71f0e81f33b2f96e7fad5d80d4bf81298bf7dd5afdd8913771e47fad',
+        transaction_hash: CREATE_TOKEN_TXN_HASH,
         chain_node_id: node!.id!,
         description: 'test',
         icon_url: 'test',
@@ -83,19 +86,18 @@ describe('Launchpad Lifecycle', () => {
         payload,
       });
 
-      expect(results?.token_address).to.equal(token_address);
-      expect(results?.symbol).to.equal('tst');
+      expect(equalEvmAddresses(results?.token_address, TOKEN_ADDRESS)).to.be
+        .true;
+      expect(results?.symbol).to.equal('DMLND');
     },
   );
 
-  // TODO: complete test in #9867
-  test.skip(
+  test(
     'Get a launchpad trade txn and project it',
     { timeout: 10_000 },
     async () => {
-      const buyTxHash = '';
       const payload = {
-        transaction_hash: buyTxHash,
+        transaction_hash: TRADE_TOKEN_TXN_HASH,
         eth_chain_id: commonProtocol.ValidChains.SepoliaBase,
       };
       const results = await command(CreateLaunchpadTrade(), {
@@ -104,14 +106,14 @@ describe('Launchpad Lifecycle', () => {
       });
       expect(results).to.deep.equal({
         eth_chain_id: commonProtocol.ValidChains.SepoliaBase,
-        transaction_hash: buyTxHash,
-        token_address,
-        trader_address: '',
+        transaction_hash: TRADE_TOKEN_TXN_HASH,
+        token_address: TOKEN_ADDRESS.toLowerCase(),
+        trader_address: '0x2cE1F5d4f84B583Ab320cAc0948AddE52a131FBE',
         is_buy: true,
-        community_token_amount: 1n,
-        price: 1n,
-        floating_supply: 1n,
-        timestamp: 1,
+        community_token_amount: '534115082271506067334',
+        price: '2507151',
+        floating_supply: '535115082271506067334',
+        timestamp: 1731523956,
       });
     },
   );

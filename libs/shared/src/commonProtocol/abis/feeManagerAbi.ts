@@ -1,4 +1,4 @@
-export const feeManagerABI = [
+export const feeManagerAbi = [
   {
     inputs: [
       {
