@@ -1,3 +1,4 @@
+import { config } from '@hicommonwealth/core';
 import { models } from '@hicommonwealth/model';
 import { Button } from 'frames.js/express';
 import moment from 'moment';
@@ -97,7 +98,18 @@ export const contestCard = frames(async (ctx) => {
           {contestManager.name}
         </p>
 
-        <p style={{ fontSize: '32px' }}>{contest_address}</p>
+        {contestManager.description && (
+          <p
+            style={{
+              fontSize: '32px',
+            }}
+          >
+            {contestManager.description}
+          </p>
+        )}
+
+        <p style={{ fontSize: '24px' }}>{contest_address}</p>
+
         <p style={{ fontSize: '42px' }}>Current Prizes</p>
 
         {prizes.length ? (
@@ -112,8 +124,8 @@ export const contestCard = frames(async (ctx) => {
     buttons: [
       <Button
         key="leaderboard"
-        action="post"
-        target={`${contest_address}/viewLeaderboard?fromMain=true`}
+        action="link"
+        target={`${getBaseUrl()}/${contestManager.community_id}/contests/${contestManager.contest_address}`}
       >
         View Leaderboard
       </Button>,
@@ -127,3 +139,16 @@ export const contestCard = frames(async (ctx) => {
     ],
   };
 });
+
+const getBaseUrl = () => {
+  switch (config.APP_ENV) {
+    case 'local':
+      return 'http://localhost:8080';
+    case 'beta':
+      return 'https://qa.commonwealth.im';
+    case 'demo':
+      return 'https://demo.commonwealth.im';
+    default:
+      return 'https://commonwealth.im';
+  }
+};
