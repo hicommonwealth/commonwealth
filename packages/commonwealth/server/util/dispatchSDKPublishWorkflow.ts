@@ -14,7 +14,7 @@ const externalApiConfig = JSON.parse(
 );
 
 const owner = 'hicommonwealth';
-const repo = 'api-client';
+const repo = 'common-api-fern-config';
 const workflow_id = 'publish.yml';
 const API_CLIENT_NPM_NAME = '@commonxyz/api-client';
 
