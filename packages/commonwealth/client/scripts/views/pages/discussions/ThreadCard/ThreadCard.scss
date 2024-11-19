@@ -267,7 +267,6 @@
 }
 
 .virtuoso-grid-list {
-  border: 1px solid #f0eff0 !important;
   gap: 5px !important;
   display: flex !important;
   flex-wrap: wrap !important;
@@ -276,6 +275,7 @@
   border: 1px solid #f0eff0 !important;
   width: 33% !important;
   display: flex !important;
+  border-radius: 6px;
   @include smallInclusive {
     width: 100% !important;
   }

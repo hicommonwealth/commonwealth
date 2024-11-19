@@ -25,6 +25,7 @@ import { slugify, splitAndDecodeURL } from '@hicommonwealth/shared';
 import { extractImages } from 'client/scripts/helpers/feed';
 import { getThreadActionTooltipText } from 'client/scripts/helpers/threads';
 import { getProposalUrlPath } from 'client/scripts/identifiers';
+import Thread from 'client/scripts/models/Thread';
 import useUserStore from 'client/scripts/state/ui/user';
 import useManageDocumentTitle from 'hooks/useManageDocumentTitle';
 import useTopicGating from 'hooks/useTopicGating';
@@ -42,7 +43,6 @@ import { isContestActive } from 'views/pages/CommunityManagement/Contests/utils'
 import useTokenMetadataQuery from '../../../state/api/tokens/getTokenMetadata';
 import { AdminOnboardingSlider } from '../../components/AdminOnboardingSlider';
 import { checkIsTopicInContest } from '../../components/NewThreadFormLegacy/helpers';
-import { CWGrowlTemplate } from '../../components/SublayoutHeader/GrowlTemplate/CWGrowlTemplate';
 import { UserTrainingSlider } from '../../components/UserTrainingSlider';
 import { CWText } from '../../components/component_kit/cw_text';
 import CWIconButton from '../../components/component_kit/new_designs/CWIconButton';
@@ -60,6 +60,15 @@ type ListContainerProps = React.HTMLProps<HTMLDivElement> & {
   children: React.ReactNode;
   style?: React.CSSProperties;
 };
+type RenderThreadCardProps = {
+  thread: Thread;
+  isCardView?: boolean;
+  hideThreadOptions?: boolean;
+  hidePublishDate?: boolean;
+  hideTrendingTag?: boolean;
+  hideSpamTag?: boolean;
+};
+
 const VIEWS = [
   { value: 'all', label: 'All' },
   { value: 'overview', label: 'Overview' },
@@ -241,6 +250,111 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     setSelectedView(activeTab);
   };
 
+  // eslint-disable-next-line react/no-multi-comp
+  const RenderThreadCard = ({
+    thread,
+    isCardView,
+    hidePublishDate,
+    hideSpamTag,
+    hideTrendingTag,
+  }: RenderThreadCardProps) => {
+    const discussionLink = getProposalUrlPath(
+      thread.slug,
+      `${thread.identifier}-${slugify(thread.title)}`,
+    );
+
+    const isTopicGated = !!(memberships || []).find(
+      (membership) =>
+        thread?.topic?.id &&
+        membership.topics.find((t) => t.id === thread.topic!.id),
+    );
+    const isActionAllowedInGatedTopic = !!(memberships || []).find(
+      (membership) =>
+        thread?.topic?.id &&
+        membership.topics.find((t) => t.id === thread.topic!.id) &&
+        membership.isAllowed,
+    );
+    const isRestrictedMembership =
+      !isAdmin && isTopicGated && !isActionAllowedInGatedTopic;
+    const foundTopicPermissions = topicPermissions.find(
+      (tp) => tp.id === thread.topic!.id,
+    );
+    const disabledActionsTooltipText = getThreadActionTooltipText({
+      isCommunityMember: !!user.activeAccount,
+      isThreadArchived: !!thread?.archivedAt,
+      isThreadLocked: !!thread?.lockedAt,
+      isThreadTopicGated: isRestrictedMembership,
+    });
+    const disabledReactPermissionTooltipText = getThreadActionTooltipText({
+      isCommunityMember: !!user.activeAccount,
+      threadTopicInteractionRestrictions:
+        !isAdmin &&
+        !foundTopicPermissions?.permissions?.includes(
+          PermissionEnum.CREATE_THREAD_REACTION,
+        )
+          ? foundTopicPermissions?.permissions
+          : undefined,
+    });
+    const disabledCommentPermissionTooltipText = getThreadActionTooltipText({
+      isCommunityMember: !!user.activeAccount,
+      threadTopicInteractionRestrictions:
+        !isAdmin &&
+        !foundTopicPermissions?.permissions?.includes(
+          PermissionEnum.CREATE_COMMENT,
+        )
+          ? foundTopicPermissions?.permissions
+          : undefined,
+    });
+    const isThreadTopicInContest = checkIsTopicInContest(
+      contestsData.all,
+      thread?.topic?.id,
+    );
+
+    const images = isCardView && extractImages(thread?.body);
+
+    return (
+      <ThreadCard
+        key={thread?.id + '-' + thread.readOnly}
+        thread={thread}
+        canReact={
+          disabledReactPermissionTooltipText
+            ? !disabledReactPermissionTooltipText
+            : !disabledActionsTooltipText
+        }
+        canComment={
+          disabledCommentPermissionTooltipText
+            ? !disabledCommentPermissionTooltipText
+            : !disabledActionsTooltipText
+        }
+        onEditStart={() => navigate(`${discussionLink}?isEdit=true`)}
+        onStageTagClick={() => {
+          navigate(`/discussions?stage=${thread.stage}`);
+        }}
+        threadHref={`${getScopePrefix()}${discussionLink}`}
+        onBodyClick={() => {
+          const scrollEle = document.getElementsByClassName('Body')[0];
+          localStorage[`${communityId}-discussions-scrollY`] =
+            scrollEle.scrollTop;
+        }}
+        onCommentBtnClick={() =>
+          navigate(`${discussionLink}?focusComments=true`)
+        }
+        disabledActionsTooltipText={
+          disabledCommentPermissionTooltipText ||
+          disabledReactPermissionTooltipText ||
+          disabledActionsTooltipText
+        }
+        hideRecentComments
+        editingDisabled={isThreadTopicInContest}
+        threadImage={images && isCardView && images.length ? images[0] : null}
+        isCardView={isCardView}
+        hidePublishDate={hidePublishDate}
+        hideTrendingTag={hideTrendingTag}
+        hideSpamTag={hideSpamTag}
+      />
+    );
+  };
+
   return (
     <>
       <CWPageLayout
@@ -317,110 +431,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
             style={{ height: '100%', width: '100%' }}
             data={isInitialLoading ? [] : filteredThreads}
             customScrollParent={containerRef.current}
-            itemContent={(i, thread) => {
-              const discussionLink = getProposalUrlPath(
-                thread.slug,
-                `${thread.identifier}-${slugify(thread.title)}`,
-              );
-
-              const isTopicGated = !!(memberships || []).find(
-                (membership) =>
-                  thread?.topic?.id &&
-                  membership.topics.find((t) => t.id === thread.topic!.id),
-              );
-              const isActionAllowedInGatedTopic = !!(memberships || []).find(
-                (membership) =>
-                  thread?.topic?.id &&
-                  membership.topics.find((t) => t.id === thread.topic!.id) &&
-                  membership.isAllowed,
-              );
-              const isRestrictedMembership =
-                !isAdmin && isTopicGated && !isActionAllowedInGatedTopic;
-              const foundTopicPermissions = topicPermissions.find(
-                (tp) => tp.id === thread.topic!.id,
-              );
-              const disabledActionsTooltipText = getThreadActionTooltipText({
-                isCommunityMember: !!user.activeAccount,
-                isThreadArchived: !!thread?.archivedAt,
-                isThreadLocked: !!thread?.lockedAt,
-                isThreadTopicGated: isRestrictedMembership,
-              });
-              const disabledReactPermissionTooltipText =
-                getThreadActionTooltipText({
-                  isCommunityMember: !!user.activeAccount,
-                  threadTopicInteractionRestrictions:
-                    !isAdmin &&
-                    !foundTopicPermissions?.permissions?.includes(
-                      // this should be updated if we start displaying recent comments on this page
-                      PermissionEnum.CREATE_THREAD_REACTION,
-                    )
-                      ? foundTopicPermissions?.permissions
-                      : undefined,
-                });
-              const disabledCommentPermissionTooltipText =
-                getThreadActionTooltipText({
-                  isCommunityMember: !!user.activeAccount,
-                  threadTopicInteractionRestrictions:
-                    !isAdmin &&
-                    !foundTopicPermissions?.permissions?.includes(
-                      PermissionEnum.CREATE_COMMENT,
-                    )
-                      ? foundTopicPermissions?.permissions
-                      : undefined,
-                });
-              const isThreadTopicInContest = checkIsTopicInContest(
-                contestsData.all,
-                thread?.topic?.id,
-              );
-
-              return (
-                <>
-                  <ThreadCard
-                    key={thread?.id + '-' + thread.readOnly}
-                    thread={thread}
-                    canReact={
-                      disabledReactPermissionTooltipText
-                        ? !disabledReactPermissionTooltipText
-                        : !disabledActionsTooltipText
-                    }
-                    canComment={
-                      disabledCommentPermissionTooltipText
-                        ? !disabledCommentPermissionTooltipText
-                        : !disabledActionsTooltipText
-                    }
-                    onEditStart={() =>
-                      navigate(`${discussionLink}?isEdit=true`)
-                    }
-                    onStageTagClick={() => {
-                      navigate(`/discussions?stage=${thread.stage}`);
-                    }}
-                    threadHref={`${getScopePrefix()}${discussionLink}`}
-                    onBodyClick={() => {
-                      const scrollEle =
-                        document.getElementsByClassName('Body')[0];
-                      localStorage[`${communityId}-discussions-scrollY`] =
-                        scrollEle.scrollTop;
-                    }}
-                    onCommentBtnClick={() =>
-                      navigate(`${discussionLink}?focusComments=true`)
-                    }
-                    disabledActionsTooltipText={
-                      disabledCommentPermissionTooltipText ||
-                      disabledReactPermissionTooltipText ||
-                      disabledActionsTooltipText
-                    }
-                    hideRecentComments
-                    editingDisabled={isThreadTopicInContest}
-                  />
-                  <CWGrowlTemplate
-                    headerText="Attention!"
-                    bodyText="'Overview' page has been merged with the 'All' page"
-                    buttonText="test"
-                    growlType="discussion"
-                  />
-                </>
-              );
-            }}
+            itemContent={(_, thread) => <RenderThreadCard thread={thread} />}
             endReached={() => {
               hasNextPage && fetchNextPage();
             }}
@@ -457,101 +468,16 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
                 ),
               } as GridComponents
             }
-            itemContent={(i, thread) => {
-              const discussionLink = getProposalUrlPath(
-                thread.slug,
-                `${thread.identifier}-${slugify(thread.title)}`,
-              );
-
-              const isTopicGated = !!(memberships || []).find(
-                (membership) =>
-                  thread?.topic?.id &&
-                  membership.topics.find((t) => t.id === thread.topic!.id),
-              );
-              const isActionAllowedInGatedTopic = !!(memberships || []).find(
-                (membership) =>
-                  thread?.topic?.id &&
-                  membership.topics.find((t) => t.id === thread.topic!.id) &&
-                  membership.isAllowed,
-              );
-              const isRestrictedMembership =
-                !isAdmin && isTopicGated && !isActionAllowedInGatedTopic;
-              const foundTopicPermissions = topicPermissions.find(
-                (tp) => tp.id === thread.topic!.id,
-              );
-              const disabledActionsTooltipText = getThreadActionTooltipText({
-                isCommunityMember: !!user.activeAccount,
-                isThreadArchived: !!thread?.archivedAt,
-                isThreadLocked: !!thread?.lockedAt,
-                isThreadTopicGated: isRestrictedMembership,
-              });
-
-              const disabledReactPermissionTooltipText =
-                getThreadActionTooltipText({
-                  isCommunityMember: !!user.activeAccount,
-                  threadTopicInteractionRestrictions:
-                    !isAdmin &&
-                    !foundTopicPermissions?.permissions?.includes(
-                      // this should be updated if we start displaying recent comments on this page
-                      PermissionEnum.CREATE_THREAD_REACTION,
-                    )
-                      ? foundTopicPermissions?.permissions
-                      : undefined,
-                });
-              const disabledCommentPermissionTooltipText =
-                getThreadActionTooltipText({
-                  isCommunityMember: !!user.activeAccount,
-                  threadTopicInteractionRestrictions:
-                    !isAdmin &&
-                    !foundTopicPermissions?.permissions?.includes(
-                      PermissionEnum.CREATE_COMMENT,
-                    )
-                      ? foundTopicPermissions?.permissions
-                      : undefined,
-                });
-              const isThreadTopicInContest = checkIsTopicInContest(
-                contestsData.all,
-                thread?.topic?.id,
-              );
-              const images = extractImages(thread?.body);
-
-              return (
-                <ThreadCard
-                  key={thread?.id + '-' + thread.readOnly}
-                  thread={thread}
-                  canReact={
-                    disabledReactPermissionTooltipText
-                      ? !disabledReactPermissionTooltipText
-                      : !disabledActionsTooltipText
-                  }
-                  canComment={false}
-                  onEditStart={() => navigate(`${discussionLink}?isEdit=true`)}
-                  onStageTagClick={() => {
-                    navigate(`/discussions?stage=${thread.stage}`);
-                  }}
-                  threadHref={`${getScopePrefix()}${discussionLink}`}
-                  onBodyClick={() => {
-                    const scrollEle =
-                      document.getElementsByClassName('Body')[0];
-                    localStorage[`${communityId}-discussions-scrollY`] =
-                      scrollEle.scrollTop;
-                  }}
-                  onCommentBtnClick={() =>
-                    navigate(`${discussionLink}?focusComments=true`)
-                  }
-                  disabledActionsTooltipText={
-                    disabledCommentPermissionTooltipText ||
-                    disabledReactPermissionTooltipText ||
-                    disabledActionsTooltipText
-                  }
-                  hideRecentComments
-                  editingDisabled={isThreadTopicInContest}
-                  showThreadOptions={false}
-                  threadImage={images && images.length ? images[0] : null}
-                  isCardView={true}
-                />
-              );
-            }}
+            itemContent={(_, thread) => (
+              <RenderThreadCard
+                thread={thread}
+                hideThreadOptions={true}
+                isCardView={true}
+                hidePublishDate={true}
+                hideTrendingTag={true}
+                hideSpamTag={true}
+              />
+            )}
             endReached={() => {
               hasNextPage && fetchNextPage();
             }}

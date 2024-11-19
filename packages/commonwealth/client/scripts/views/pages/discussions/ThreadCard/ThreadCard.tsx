@@ -52,9 +52,12 @@ type CardProps = AdminActionsProps & {
   onImageClick?: () => void;
   showCommentState?: boolean;
   removeImagesFromMarkDown?: boolean;
-  showThreadOptions?: boolean;
+  hideThreadOptions?: boolean;
   threadImage?: string | null;
   isCardView?: boolean;
+  hidePublishDate?: boolean;
+  hideTrendingTag?: boolean;
+  hideSpamTag?: boolean;
 };
 
 export const ThreadCard = ({
@@ -90,9 +93,12 @@ export const ThreadCard = ({
   showCommentState = false,
   onImageClick,
   removeImagesFromMarkDown = false,
-  showThreadOptions = true,
+  hideThreadOptions = false,
   threadImage,
   isCardView = false,
+  hidePublishDate = false,
+  hideTrendingTag = false,
+  hideSpamTag = false,
 }: CardProps) => {
   const navigate = useCommonNavigate();
   const user = useUserStore();
@@ -184,7 +190,9 @@ export const ThreadCard = ({
               archivedAt={thread.archivedAt}
               profile={thread?.profile}
               layoutType={layoutType}
-              isCardView={isCardView}
+              hidePublishDate={hidePublishDate}
+              hideSpamTag={hideSpamTag}
+              hideTrendingTag={hideTrendingTag}
             />
             <div className="content-header-icons">
               {thread.pinned && <CWIcon iconName="pin" />}
@@ -271,7 +279,7 @@ export const ThreadCard = ({
                 ))}
             </div>
           )}
-          {showThreadOptions && (
+          {!hideThreadOptions && (
             <div
               className="content-footer"
               onClick={(e) => {
