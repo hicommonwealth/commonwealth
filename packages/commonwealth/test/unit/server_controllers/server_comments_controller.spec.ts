@@ -1,10 +1,10 @@
 import { CommunityInstance, commonProtocol } from '@hicommonwealth/model';
-import chai, { expect } from 'chai';
+import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { ServerCommentsController } from 'server/controllers/server_comments_controller';
 import { SearchCommentsOptions } from 'server/controllers/server_comments_methods/search_comments';
 import Sinon from 'sinon';
-import { afterEach, beforeEach, describe, test } from 'vitest';
+import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 
 chai.use(chaiAsPromised);
 

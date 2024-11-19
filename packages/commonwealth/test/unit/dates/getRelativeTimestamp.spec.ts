@@ -1,7 +1,6 @@
-import { expect } from 'chai';
 import { getRelativeTimestamp } from 'helpers/dates';
 import moment from 'moment';
-import { describe, test } from 'vitest';
+import { describe, expect, test } from 'vitest';
 
 describe('getRelativeTimestamp', () => {
   test('should return "Less than 1 min ago" for dates less than 1 minute ago', () => {

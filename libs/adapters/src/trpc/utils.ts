@@ -36,7 +36,13 @@ export const toExpress = (router: OpenApiRouter) =>
       req,
       res,
     }),
-    onError: ({ path, error }) => logError(path, error),
+    onError: ({
+      path,
+      error,
+    }: {
+      path: string | undefined;
+      error: TRPCError;
+    }) => logError(path, error),
   });
 
 // used for REST like routes (External)

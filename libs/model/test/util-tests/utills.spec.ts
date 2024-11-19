@@ -1,6 +1,6 @@
 import { bech32ToHex } from '@hicommonwealth/shared';
-import { expect } from 'chai';
-import { describe, test } from 'vitest';
+
+import { describe, expect, test } from 'vitest';
 
 describe('shared utils unit tests', () => {
   test('bech32toHex should convert bech32 addresses to hex', async () => {

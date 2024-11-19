@@ -1,10 +1,10 @@
 import { expect as pwexpect } from '@playwright/test';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
+import { expect } from 'vitest';
 import { login } from '../../utils/e2eUtils';
 
 chai.use(chaiHttp);
-const { expect } = chai;
 
 export const discussionTests = (test) => {
   return () => {

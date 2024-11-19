@@ -26,7 +26,7 @@
     "@hicommonwealth/core": "workspace:*",
     "@hicommonwealth/model": "workspace:*",
     "@hicommonwealth/shared": "workspace:*",
-    "moment": "^2.23.0",
-    "sequelize": "^6.32.1"
+    "moment": "^2.30.1",
+    "sequelize": "^6.37.5"
   }
 }

@@ -7,10 +7,10 @@ import {
   dispose,
   query,
 } from '@hicommonwealth/core';
-import chai, { expect } from 'chai';
+import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import Sinon from 'sinon';
-import { afterAll, beforeAll, describe, test } from 'vitest';
+import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 import {
   GetCommunities,
   GetCommunityStake,

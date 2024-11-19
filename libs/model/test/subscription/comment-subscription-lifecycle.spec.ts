@@ -1,9 +1,9 @@
 import { Actor, command, dispose, query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { BalanceType } from '@hicommonwealth/shared';
-import { expect } from 'chai';
+
 import { seed } from 'model/src/tester';
-import { afterAll, afterEach, beforeAll, describe, test } from 'vitest';
+import { afterAll, afterEach, beforeAll, describe, expect, test } from 'vitest';
 import z from 'zod';
 import { models } from '../../src/database';
 import {

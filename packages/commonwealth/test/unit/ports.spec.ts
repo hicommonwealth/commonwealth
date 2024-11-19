@@ -1,10 +1,9 @@
 import { Disposable, disposeAdapter, port } from '@hicommonwealth/core';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
-import { afterEach, describe, test } from 'vitest';
+import { afterEach, describe, expect, test } from 'vitest';
 
 chai.use(chaiHttp);
-const { expect } = chai;
 
 interface TestAdapter extends Disposable {
   fakeMethod(): string;

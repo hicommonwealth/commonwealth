@@ -1,11 +1,12 @@
 import { Actor, command, dispose, query } from '@hicommonwealth/core';
-import { expect } from 'chai';
+
 import {
   afterAll,
   afterEach,
   beforeAll,
   beforeEach,
   describe,
+  expect,
   test,
 } from 'vitest';
 import { models } from '../../src/database';

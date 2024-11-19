@@ -1,7 +1,7 @@
 import { Broker, successfulInMemoryBroker } from '@hicommonwealth/core';
 import { models, tester } from '@hicommonwealth/model';
-import { expect } from 'chai';
-import { afterEach, beforeAll, describe, test } from 'vitest';
+
+import { afterEach, beforeAll, describe, expect, test } from 'vitest';
 import { relay } from '../../../server/workers/messageRelayer/relay';
 import { testOutboxEvents } from './util';
 

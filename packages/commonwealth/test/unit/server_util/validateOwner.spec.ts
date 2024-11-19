@@ -1,7 +1,7 @@
 import { AddressAttributes } from '@hicommonwealth/model';
-import { expect } from 'chai';
+
 import { validateOwner } from 'server/util/validateOwner';
-import { describe, test } from 'vitest';
+import { describe, expect, test } from 'vitest';
 
 describe('validateOwner', () => {
   describe('default behavior', () => {

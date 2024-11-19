@@ -58,7 +58,7 @@ const Webhooks = () => {
 
   useNecessaryEffect(() => {
     if (!isLoadingWebhooks && existingWebhooks) {
-      const currentWebhooks = ([...existingWebhooks] || []).map((hookData) => ({
+      const currentWebhooks = [...existingWebhooks].map((hookData) => ({
         value: hookData.url,
         canDelete: true,
         canConfigure: true,

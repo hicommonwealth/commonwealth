@@ -1,5 +1,4 @@
 import { isDeliverTxSuccess } from '@cosmjs/stargate';
-import chai from 'chai';
 
 import { longify } from '@cosmjs/stargate/build/queryclient';
 import {
@@ -21,7 +20,7 @@ import {
   encodeTextProposal,
 } from 'controllers/chain/cosmos/gov/v1beta1/utils-v1beta1';
 import Long from 'long';
-import { afterAll, beforeAll, describe, test } from 'vitest';
+import { afterAll, assert, beforeAll, describe, expect, test } from 'vitest';
 import { LCD } from '../../../shared/chain/types/cosmos';
 import {
   deposit,
@@ -29,8 +28,6 @@ import {
   setupTestSigner,
   waitOneBlock,
 } from './utils/helpers';
-
-const { expect, assert } = chai;
 
 const idV1 = 'csdk-v1-local'; // V1 CI devnet
 const rpcUrl = `http://localhost:8080/cosmosAPI/${idV1}`;

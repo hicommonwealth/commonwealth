@@ -1,8 +1,7 @@
-import { expect } from 'chai';
 import Sinon from 'sinon';
 
 import { dispose, handleEvent } from '@hicommonwealth/core';
-import { afterAll, beforeAll, describe, test } from 'vitest';
+import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 import { commonProtocol, models } from '../../src';
 import { ContestWorker } from '../../src/policies';
 import { seed } from '../../src/tester';

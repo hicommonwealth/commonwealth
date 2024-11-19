@@ -1,8 +1,8 @@
 import { Actor, command, dispose } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
-import chai, { expect } from 'chai';
+import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import { afterAll, beforeAll, describe, test } from 'vitest';
+import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 import z from 'zod';
 import { Contest, TopicAttributes } from '../../src/index';
 import { seed } from '../../src/tester';

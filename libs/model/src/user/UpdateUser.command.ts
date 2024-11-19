@@ -62,9 +62,12 @@ export function UpdateUser(): Command<typeof schemas.UpdateUser> {
       });
 
       const tags_delta = tag_ids
-        ? getDelta({ tag_ids: user.ProfileTags?.map((t) => t.tag_id) } ?? [], {
-            tag_ids,
-          })
+        ? getDelta(
+            { tag_ids: user.ProfileTags?.map((t) => t.tag_id) },
+            {
+              tag_ids,
+            },
+          )
         : {};
 
       const update_user = Object.keys(user_delta).length;

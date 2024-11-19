@@ -15,12 +15,12 @@ import {
   beforeAll,
   beforeEach,
   describe,
+  expect,
   test,
 } from 'vitest';
 import { DatabaseCleaner } from '../../server/util/databaseCleaner';
 
 chai.use(chaiHttp);
-const { expect } = chai;
 
 describe('DatabaseCleaner Tests', async () => {
   let models: DB;

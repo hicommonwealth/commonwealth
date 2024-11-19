@@ -6,10 +6,10 @@ import {
   ChainNetwork,
   ChainType,
 } from '@hicommonwealth/shared';
-import chai, { expect } from 'chai';
+import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { Model, ValidationError, type ModelStatic } from 'sequelize';
-import { afterAll, beforeAll, describe, test } from 'vitest';
+import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 import z from 'zod';
 import { models } from '../../src/database';
 import { SeedOptions, bootstrap_testing, seed } from '../../src/tester';

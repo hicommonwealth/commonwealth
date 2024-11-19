@@ -12,10 +12,10 @@ import {
 import { tester } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import { BalanceType, safeTruncateBody } from '@hicommonwealth/shared';
-import chai, { expect } from 'chai';
+import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import sinon from 'sinon';
-import { afterAll, afterEach, beforeAll, describe, test } from 'vitest';
+import { afterAll, afterEach, beforeAll, describe, expect, test } from 'vitest';
 import z from 'zod';
 import { processUserMentioned } from '../../../server/workers/knock/eventHandlers/userMentioned';
 import { getThreadUrl } from '../../../server/workers/knock/util';

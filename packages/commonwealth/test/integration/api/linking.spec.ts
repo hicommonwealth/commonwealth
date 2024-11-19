@@ -13,11 +13,10 @@ import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
 import { config } from 'server/config';
 import { Errors } from 'server/util/linkingValidationHelper';
-import { afterAll, beforeAll, describe, test } from 'vitest';
+import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 import { TestServer, testServer } from '../../../server-test';
 
 chai.use(chaiHttp);
-const { expect } = chai;
 
 describe('Linking Tests', () => {
   let server: TestServer;

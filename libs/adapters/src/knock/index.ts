@@ -115,7 +115,7 @@ export function KnockProvider(): NotificationsProvider {
         after: options.cursor,
       });
 
-      return res.items;
+      return res.items as NotificationsProviderGetMessagesReturn;
     },
 
     async getSchedules(options): Promise<NotificationsProviderSchedulesReturn> {

@@ -1,6 +1,6 @@
 import { dispose } from '@hicommonwealth/core';
-import { expect } from 'chai';
-import { afterAll, beforeAll, describe, test } from 'vitest';
+
+import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 import {
   CommentInstance,
   getCommentSearchVector,

@@ -1,10 +1,17 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Cache, CacheNamespaces, cache, dispose } from '@hicommonwealth/core';
-import chai, { expect } from 'chai';
+import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import sinon from 'sinon';
-import { afterAll, beforeAll, beforeEach, describe, test } from 'vitest';
+import {
+  afterAll,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  test,
+} from 'vitest';
 import { CacheDecorator } from '../../src/redis';
 import { CacheKeyDuration } from '../../src/utils';
 chai.use(chaiAsPromised);

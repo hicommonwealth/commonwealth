@@ -2,7 +2,7 @@ import type { Contract } from '@canvas-js/core';
 
 export const contractTopic = 'common.xyz';
 
-export const contract = {
+export const contract: Contract = {
   models: {
     threads: {
       id: 'primary',

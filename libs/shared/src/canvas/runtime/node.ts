@@ -1,4 +1,4 @@
-import { Canvas } from '@canvas-js/core';
+import { Canvas, Contract } from '@canvas-js/core';
 import { generateKeyPair, privateKeyFromProtobuf } from '@libp2p/crypto/keys';
 import { Libp2p } from 'libp2p';
 import { ConnectionConfig } from 'pg';
@@ -53,7 +53,7 @@ export const startCanvasNode = async (config: {
   const app = await Canvas.initialize({
     topic: contractTopic,
     path: pgConnectionConfig!,
-    contract,
+    contract: contract as unknown as Contract,
     signers: getSessionSigners(),
   });
 

@@ -1,10 +1,10 @@
 import { Actor, command, dispose } from '@hicommonwealth/core';
 import { config, equalEvmAddresses } from '@hicommonwealth/model';
 import { BalanceType, commonProtocol } from '@hicommonwealth/shared';
-import chai, { expect } from 'chai';
+import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { seed } from 'model/src/tester';
-import { afterAll, beforeAll, describe, test } from 'vitest';
+import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 import { ChainNodeAttributes } from '../../src';
 import { CreateLaunchpadTrade, CreateToken } from '../../src/token';
 
