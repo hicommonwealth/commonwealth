@@ -62,9 +62,10 @@ const TokensList = () => {
 
   const calculateTokenPricing = (token: z.infer<typeof TokenView>) => {
     const currentPrice = token.latest_price || 0;
-    const currentPriceRoundingExponent = Math.floor(
-      Math.log10(Math.abs(currentPrice)),
-    );
+    const currentPriceRoundingExponent =
+      currentPrice !== 0
+        ? Math.floor(Math.log10(Math.abs(currentPrice)))
+        : currentPrice;
     const price24HrAgo = token.old_price || 0;
     const pricePercentage24HourChange = parseFloat(
       (((currentPrice - price24HrAgo) / price24HrAgo) * 100 || 0).toFixed(2),
