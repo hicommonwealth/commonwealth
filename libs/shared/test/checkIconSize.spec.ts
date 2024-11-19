@@ -11,8 +11,8 @@ describe('checkIconSize', () => {
   // TODO: make this test not require a remote HTTP request?
   test('should return the image size', async () => {
     const fileSizeBytes = await getFileSizeBytes(
-      'https://commonwealth-uploads.s3.us-east-2.amazonaws.com/bebbda6b-6b10-4cbd-8839-4fa8d2a0b266.jpg',
+      'https://assets.commonwealth.im/39115039-f3dc-4723-8813-f8a09107ca27.jpeg',
     );
-    expect(fileSizeBytes).to.equal(14296);
+    expect(fileSizeBytes).to.equal(155407);
   });
 });
