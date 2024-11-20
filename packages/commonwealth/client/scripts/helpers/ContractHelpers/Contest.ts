@@ -1,3 +1,8 @@
+import {
+  contestAbi,
+  erc20Abi,
+  feeManagerAbi,
+} from '@hicommonwealth/evm-protocols';
 import { ZERO_ADDRESS, commonProtocol } from '@hicommonwealth/shared';
 import { AbiItem, TransactionReceipt } from 'web3';
 import ContractBase from './ContractBase';
@@ -10,7 +15,7 @@ class Contest extends ContractBase {
   namespaceFactory: NamespaceFactory;
 
   constructor(contractAddress: string, factoryAddress: string, rpc: string) {
-    super(contractAddress, commonProtocol.contestAbi, rpc);
+    super(contractAddress, contestAbi, rpc);
     this.namespaceFactoryAddress = factoryAddress;
   }
 
@@ -199,7 +204,7 @@ class Contest extends ContractBase {
       }
     } else {
       const token = new this.web3.eth.Contract(
-        commonProtocol.erc20Abi as unknown as AbiItem[],
+        erc20Abi as unknown as AbiItem[],
         tokenAddress,
       );
       const decimals = await token.methods.decimals().call();
@@ -241,7 +246,7 @@ class Contest extends ContractBase {
       this.contract,
       this.contractAddress,
       this.web3,
-      commonProtocol.feeManagerAbi,
+      feeManagerAbi,
       oneOff,
     );
     return parseInt(contestBalance, 10);

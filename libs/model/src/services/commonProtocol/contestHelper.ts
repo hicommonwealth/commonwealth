@@ -1,4 +1,5 @@
 import { AppError } from '@hicommonwealth/core';
+import { contestAbi, feeManagerAbi } from '@hicommonwealth/evm-protocols';
 import { commonProtocol } from '@hicommonwealth/shared';
 import { Mutex } from 'async-mutex';
 import Web3, { PayableCallOptions } from 'web3';
@@ -50,7 +51,7 @@ const addContent = async (
     web3 = await createWeb3Provider(rpcNodeUrl);
   }
   const contestInstance = new web3.eth.Contract(
-    commonProtocol.contestAbi as AbiItem[],
+    contestAbi as AbiItem[],
     contest,
   );
 
@@ -112,7 +113,7 @@ const voteContent = async (
     web3 = await createWeb3Provider(rpcNodeUrl);
   }
   const contestInstance = new web3.eth.Contract(
-    commonProtocol.contestAbi as AbiItem[],
+    contestAbi as AbiItem[],
     contest,
   );
 
@@ -152,7 +153,7 @@ export const getContestStatus = async (
 ): Promise<ContestStatus> => {
   const web3 = new Web3(rpcNodeUrl);
   const contestInstance = new web3.eth.Contract(
-    commonProtocol.contestAbi as AbiItem[],
+    contestAbi as AbiItem[],
     contest,
   );
 
@@ -189,7 +190,7 @@ export const getContestScore = async (
 ): Promise<ContestScores> => {
   const web3 = new Web3(rpcNodeUrl);
   const contestInstance = new web3.eth.Contract(
-    commonProtocol.contestAbi as AbiItem[],
+    contestAbi as AbiItem[],
     contest,
   );
 
@@ -242,7 +243,7 @@ export const getContestBalance = async (
   const web3 = new Web3(rpcNodeUrl);
 
   const contestInstance = new web3.eth.Contract(
-    commonProtocol.contestAbi as AbiItem[],
+    contestAbi as AbiItem[],
     contest,
   );
 
@@ -250,7 +251,7 @@ export const getContestBalance = async (
     contestInstance,
     contest,
     web3,
-    commonProtocol.feeManagerAbi,
+    feeManagerAbi,
     oneOff,
   );
 
@@ -335,7 +336,7 @@ export const rollOverContest = async (
   return nonceMutex.runExclusive(async () => {
     const web3 = await createWeb3Provider(rpcNodeUrl);
     const contestInstance = new web3.eth.Contract(
-      commonProtocol.contestAbi as AbiItem[],
+      contestAbi as AbiItem[],
       contest,
     );
 

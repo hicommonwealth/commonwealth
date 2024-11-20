@@ -1,4 +1,5 @@
 import { logger } from '@hicommonwealth/core';
+import { erc20Abi, lpBondingCurveAbi } from '@hicommonwealth/evm-protocols';
 import {
   deployedNamespaceEventSignature,
   launchpadTokenRegisteredEventSignature,
@@ -147,10 +148,7 @@ export async function getErc20TokenInfo({
   tokenAddress: string;
 }): Promise<{ name: string; symbol: string; totalSupply: bigint }> {
   const web3 = new Web3(rpc);
-  const erc20Contract = new web3.eth.Contract(
-    commonProtocol.erc20Abi,
-    tokenAddress,
-  );
+  const erc20Contract = new web3.eth.Contract(erc20Abi, tokenAddress);
   const [name, symbol, totalSupply] = await Promise.all([
     erc20Contract.methods.name().call(),
     erc20Contract.methods.symbol().call(),
@@ -174,7 +172,7 @@ export async function transferLiquidityToUniswap({
 }) {
   const web3 = await createWeb3Provider(rpc);
   const contract = new web3.eth.Contract(
-    commonProtocol.lpBondingCurveAbi,
+    lpBondingCurveAbi,
     lpBondingCurveAddress,
   );
   await commonProtocol.transferLiquidity(
@@ -203,7 +201,7 @@ export async function getToken({
 }> {
   const web3 = new Web3(rpc);
   const contract = new web3.eth.Contract(
-    commonProtocol.lpBondingCurveAbi,
+    lpBondingCurveAbi,
     lpBondingCurveAddress,
   );
   return await contract.methods.tokens(tokenAddress).call();
