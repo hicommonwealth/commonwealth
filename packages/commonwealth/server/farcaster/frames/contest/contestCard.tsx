@@ -1,7 +1,8 @@
-import { config } from '@hicommonwealth/core';
-import { commonProtocol, models } from '@hicommonwealth/model';
+import { command, config } from '@hicommonwealth/core';
+import { commonProtocol } from '@hicommonwealth/model';
 import { Button } from 'frames.js/express';
 import moment from 'moment';
+import { GetContest } from 'node_modules/@hicommonwealth/model/src/contest';
 import React from 'react';
 import { frames } from '../../config';
 
@@ -39,20 +40,9 @@ export const contestCard = frames(async (ctx) => {
 
   const contest_address = ctx.url.pathname.split('/')[1];
 
-  const contestManager = await models.ContestManager.findOne({
-    where: {
-      contest_address: contest_address,
-    },
-    include: [
-      {
-        model: models.Community,
-        include: [
-          {
-            model: models.ChainNode.scope('withPrivateData'),
-          },
-        ],
-      },
-    ],
+  const contestManager = await command(GetContest(), {
+    actor: { user: { email: '' } },
+    payload: { contest_address, with_chain_node: true },
   });
 
   if (!contestManager) {

@@ -21,15 +21,17 @@ export const GetAllContests = {
     contest_address: z.string().optional(),
     contest_id: z.number().int().optional(),
     running: z.boolean().optional().describe('Only active contests'),
+    with_chain_node: z.string().optional(),
   }),
   output: z.array(ContestResults),
 };
 
 export const GetContest = {
   input: z.object({
-    contest_address: z.string().optional(),
+    contest_address: z.string(),
+    with_chain_node: z.boolean().optional(),
   }),
-  output: z.object({}).merge(ContestManager),
+  output: ContestManager.nullish(),
 };
 
 export const GetActiveContestManagers = {
