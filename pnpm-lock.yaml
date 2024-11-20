@@ -952,6 +952,9 @@ importers:
       '@magic-ext/farcaster':
         specifier: ^0.16.0
         version: 0.16.0
+      '@magic-ext/oauth':
+        specifier: ^22.17.0
+        version: 22.17.0
       '@magic-ext/oauth2':
         specifier: ^9.16.0
         version: 9.16.0
@@ -4566,6 +4569,9 @@ packages:
 
   '@magic-ext/oauth2@9.16.0':
     resolution: {integrity: sha512-+ixOFjjLZtbk7GgRdzfGKpREGZUyqpIjXDftUjNOlgbaroBBjqrVj4scnzz06VQwCuiWotZ4ZU1vSFz/NszotQ==}
+
+  '@magic-ext/oauth@22.17.0':
+    resolution: {integrity: sha512-WSSf/g7l3B5cWzRenfizxE1qo4smbWPzOh4r14HEkIhvJS4m+gqNjav2Rp2HQElfXY7EuEeWM6KhZa/Irnd3eQ==}
 
   '@magic-sdk/admin@0.1.0-beta.10':
     resolution: {integrity: sha512-bW+Yoy7lNwgUd9KnizrignhuBpbGrBO3doCWezhq5/pi3aPujjUzmyl8mqqgxaPlNovznyq6tzMSFkdqi+6TpA==}
@@ -19376,7 +19382,7 @@ snapshots:
 
   '@babel/traverse@7.25.3':
     dependencies:
-      '@babel/code-frame': 7.24.7
+      '@babel/code-frame': 7.26.2
       '@babel/generator': 7.25.6
       '@babel/parser': 7.25.3
       '@babel/template': 7.25.0
@@ -22456,6 +22462,10 @@ snapshots:
   '@magic-ext/farcaster@0.16.0': {}
 
   '@magic-ext/oauth2@9.16.0':
+    dependencies:
+      crypto-js: 3.3.0
+
+  '@magic-ext/oauth@22.17.0':
     dependencies:
       crypto-js: 3.3.0
 
@@ -32574,7 +32584,7 @@ snapshots:
 
   jest-message-util@29.7.0:
     dependencies:
-      '@babel/code-frame': 7.25.7
+      '@babel/code-frame': 7.26.2
       '@jest/types': 29.6.3
       '@types/stack-utils': 2.0.3
       chalk: 4.1.2
@@ -33740,7 +33750,7 @@ snapshots:
 
   metro@0.80.10(bufferutil@4.0.8)(utf-8-validate@5.0.10):
     dependencies:
-      '@babel/code-frame': 7.24.7
+      '@babel/code-frame': 7.26.2
       '@babel/core': 7.24.5
       '@babel/generator': 7.25.6
       '@babel/parser': 7.25.3

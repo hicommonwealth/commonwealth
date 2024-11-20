@@ -127,6 +127,7 @@
     "@libp2p/peer-id": "^5.0.4",
     "@magic-ext/cosmos": "^12.4.0",
     "@magic-ext/farcaster": "^0.16.0",
+    "@magic-ext/oauth": "^22.17.0",
     "@magic-ext/oauth2": "^9.16.0",
     "@magic-sdk/admin": "^2.4.1",
     "@metamask/detect-provider": "^2.0.0",

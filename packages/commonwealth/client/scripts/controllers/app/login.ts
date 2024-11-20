@@ -16,7 +16,8 @@ import {
 } from '@hicommonwealth/shared';
 import { CosmosExtension } from '@magic-ext/cosmos';
 import { FarcasterExtension } from '@magic-ext/farcaster';
-import { OAuthExtension } from '@magic-ext/oauth2';
+import { OAuthExtension } from '@magic-ext/oauth';
+import { OAuthExtension as OAuthExtensionV2 } from '@magic-ext/oauth2';
 import axios from 'axios';
 import { notifyError } from 'controllers/app/notifications';
 import { getMagicCosmosSessionSigner } from 'controllers/server/sessions';
@@ -36,11 +37,16 @@ import { z } from 'zod';
 import Account from '../../models/Account';
 import AddressInfo from '../../models/AddressInfo';
 import type BlockInfo from '../../models/BlockInfo';
+import { fetchCachedCustomDomain } from '../../state/api/configuration/index';
 
 // need to instantiate it early because the farcaster sdk has an async constructor which will cause a race condition
 // if instantiated right before the login is called;
 export const defaultMagic = new Magic(process.env.MAGIC_PUBLISHABLE_KEY!, {
-  extensions: [new FarcasterExtension(), new OAuthExtension()],
+  extensions: [
+    new FarcasterExtension(),
+    new OAuthExtension(),
+    new OAuthExtensionV2(),
+  ],
 });
 
 function storeActiveAccount(account: Account) {
@@ -307,6 +313,7 @@ async function constructMagic(isCosmos: boolean, chain?: string) {
   return new Magic(process.env.MAGIC_PUBLISHABLE_KEY, {
     extensions: [
       new OAuthExtension(),
+      new OAuthExtensionV2(),
       new CosmosExtension({
         // Magic has a strict cross-origin policy that restricts rpcs to whitelisted URLs,
         // so we can't use app.chain.meta?.node?.url
@@ -331,6 +338,8 @@ export async function startLoginWithMagicLink({
 }) {
   if (!email && !phoneNumber && !provider)
     throw new Error('Must provide email or SMS or SSO provider');
+
+  const { isCustomDomain } = fetchCachedCustomDomain() || {};
   const magic = await constructMagic(isCosmos, chain);
 
   if (email) {
@@ -368,15 +377,24 @@ export async function startLoginWithMagicLink({
     localStorage.setItem('magic_chain', chain!);
     localStorage.setItem('magic_redirect_to', window.location.href);
 
-    let redirectURI = new URL('/finishsociallogin', window.location.origin)
-      .href;
-    if (process.env.APP_ENV === 'production') {
-      redirectURI = 'https://commonwealth.im/finishsociallogin';
+    if (isCustomDomain) {
+      const redirectTo = document.location.pathname + document.location.search;
+      const params = `?redirectTo=${
+        redirectTo ? encodeURIComponent(redirectTo) : ''
+      }&chain=${chain || ''}&sso=${provider}`;
+      await magic.oauth.loginWithRedirect({
+        provider,
+        redirectURI: new URL(
+          '/finishsociallogin' + params,
+          window.location.origin,
+        ).href,
+      });
+    } else {
+      await magic.oauth2.loginWithRedirect({
+        provider,
+        redirectURI: new URL('/finishsociallogin', window.location.origin).href,
+      });
     }
-    await magic.oauth2.loginWithRedirect({
-      provider,
-      redirectURI,
-    });
 
     // magic should redirect away from this page, but we return after 5 sec if it hasn't
     await new Promise<void>((resolve) => setTimeout(() => resolve(), 5000));
