@@ -1,5 +1,6 @@
 import { TokenView } from '@hicommonwealth/schemas';
 import { ChainBase } from '@hicommonwealth/shared';
+import { currencyNameToSymbolMap, SupportedCurrencies } from 'helpers/currency';
 import { calculateTokenPricing } from 'helpers/launchpad';
 import React, { useState } from 'react';
 import app from 'state';
@@ -10,24 +11,28 @@ import {
   TradingMode,
 } from 'views/modals/TradeTokenModel/TradeTokenForm';
 import { z } from 'zod';
-import MarketCapProgress from '../../../TokenCard/MarketCapProgress';
-import PricePercentageChange from '../../../TokenCard/PricePercentageChange';
 import { CWDivider } from '../../../component_kit/cw_divider';
 import { CWIconButton } from '../../../component_kit/cw_icon_button';
 import { CWText } from '../../../component_kit/cw_text';
 import { CWButton } from '../../../component_kit/new_designs/CWButton';
+import MarketCapProgress from '../../../TokenCard/MarketCapProgress';
+import PricePercentageChange from '../../../TokenCard/PricePercentageChange';
 import './TokenTradeWidget.scss';
 import { TokenTradeWidgetSkeleton } from './TokenTradeWidgetSkeleton';
 
 interface TokenTradeWidgetProps {
   showSkeleton: boolean;
   token: z.infer<typeof TokenView>;
+  currency?: SupportedCurrencies;
 }
 
 export const TokenTradeWidget = ({
   showSkeleton,
   token,
+  currency = SupportedCurrencies.USD,
 }: TokenTradeWidgetProps) => {
+  const currencySymbol = currencyNameToSymbolMap[currency];
+
   const [isWidgetExpanded, setIsWidgetExpanded] = useState(true);
   const [tokenLaunchModalConfig, setTokenLaunchModalConfig] = useState<{
     isOpen: boolean;
@@ -78,7 +83,8 @@ export const TokenTradeWidget = ({
       {isWidgetExpanded && (
         <>
           <CWText type="h3" fontWeight="bold" className="pad-8">
-            {token.symbol} {tokenPricing.currentPrice}
+            {token.symbol} {currencySymbol}
+            {tokenPricing.currentPrice}
           </CWText>
 
           <PricePercentageChange

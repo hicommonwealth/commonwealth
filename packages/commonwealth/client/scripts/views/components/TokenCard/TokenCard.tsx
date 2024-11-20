@@ -5,6 +5,7 @@ import { CWText } from '../component_kit/cw_text';
 import { CWButton } from '../component_kit/new_designs/CWButton';
 import { CWTooltip } from '../component_kit/new_designs/CWTooltip';
 import MarketCapProgress from './MarketCapProgress';
+import PricePercentageChange from './PricePercentageChange';
 import './TokenCard.scss';
 
 interface TokenCardProps {
@@ -103,18 +104,9 @@ const TokenCard = ({
             {price}
           </CWText>
           <CWText className="ml-auto text-light" type="caption">
-            <CWText
-              className={clsx(
-                'price-change',
-                { negative: pricePercentage24HourChange < 0 },
-                { positive: pricePercentage24HourChange >= 0 },
-              )}
-              type="caption"
-            >
-              {pricePercentage24HourChange >= 0 ? '+' : ''}
-              {pricePercentage24HourChange}%
-            </CWText>{' '}
-            &nbsp;24hr
+            <PricePercentageChange
+              pricePercentage24HourChange={pricePercentage24HourChange}
+            />
           </CWText>
         </div>
       </div>

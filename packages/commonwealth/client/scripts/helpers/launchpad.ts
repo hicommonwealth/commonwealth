@@ -5,21 +5,23 @@ export const calculateTokenPricing = (
   token: z.infer<typeof TokenView>,
   ethToUsdRate: number,
 ) => {
-  const currentPrice = token.latest_price || 0;
-  const currentPriceRoundingExponent =
-    currentPrice !== 0
-      ? Math.floor(Math.log10(Math.abs(currentPrice)))
-      : currentPrice;
-  const price24HrAgo = token.old_price || 0;
+  const currentPrice = (token.latest_price || 0) * ethToUsdRate;
+  const price24HrAgo = (token.old_price || 0) * ethToUsdRate;
+  const priceChange = (currentPrice - price24HrAgo) / price24HrAgo;
   const pricePercentage24HourChange = parseFloat(
-    (((currentPrice - price24HrAgo) / price24HrAgo) * 100 || 0).toFixed(2),
+    (
+      (priceChange === Number.POSITIVE_INFINITY ||
+      priceChange === Number.NEGATIVE_INFINITY
+        ? 0
+        : priceChange) * 100 || 0
+    ).toFixed(2),
   );
-  const marketCapCurrent = currentPrice * token.initial_supply;
+  const marketCapCurrent = currentPrice * (token.initial_supply * ethToUsdRate);
   const marketCapGoal = token.eth_market_cap_target * ethToUsdRate;
   const isMarketCapGoalReached = false;
 
   return {
-    currentPrice: `${currentPrice.toFixed(-currentPriceRoundingExponent || 2)}`,
+    currentPrice: `${currentPrice.toFixed(8)}`,
     pricePercentage24HourChange,
     marketCapCurrent,
     marketCapGoal,
