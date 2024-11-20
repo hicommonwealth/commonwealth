@@ -51,7 +51,7 @@ describe('createReaction Integration Tests', () => {
   };
 
   beforeAll(async () => {
-    server = await testServer();
+    server = await testServer(import.meta);
 
     const res = await server.seeder.createAndVerifyAddress(
       { chain: communityId },

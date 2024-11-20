@@ -56,6 +56,7 @@ export const ContestManager = z
     contest_address: z.string().describe('On-Chain contest manager address'),
     community_id: z.string(),
     name: z.string(),
+    description: z.string().nullish(),
     image_url: z.string().nullish(),
     funding_token_address: z
       .string()
@@ -98,11 +99,11 @@ export const ContestManager = z
     neynar_webhook_id: z
       .string()
       .nullish()
-      .describe('Neynar ID of the CastCreated webhook'),
+      .describe('Neynar ID of the ReplyCastCreated webhook'),
     neynar_webhook_secret: z
       .string()
       .nullish()
-      .describe('Neynar secret for the CastCreated webhook'),
+      .describe('Neynar secret for the ReplyCastCreated webhook'),
     topic_id: PG_INT.nullish(),
     topics: z.array(Topic).nullish(),
     is_farcaster_contest: z.boolean(),
