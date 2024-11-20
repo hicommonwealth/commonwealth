@@ -58,6 +58,7 @@ export const contestCard = frames(async (ctx) => {
       >
         <p
           style={{
+            lineHeight: '1.2',
             fontSize: '56px',
           }}
         >
@@ -68,6 +69,7 @@ export const contestCard = frames(async (ctx) => {
           <p
             style={{
               fontSize: '32px',
+              lineHeight: '1.2',
             }}
           >
             {contestManager.description}
