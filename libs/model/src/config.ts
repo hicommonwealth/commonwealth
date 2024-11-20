@@ -2,7 +2,6 @@ import { configure, config as target } from '@hicommonwealth/core';
 import { z } from 'zod';
 
 const {
-  TEST_DB_NAME,
   DATABASE_URL,
   DATABASE_CLEAN_HOUR,
   DATABASE_LOG_TRACE,
@@ -13,7 +12,6 @@ const {
   PRIVATE_KEY,
   TBC_BALANCE_TTL_SECONDS,
   BLACKLISTED_EVENTS,
-  INIT_TEST_DB,
   MAX_USER_POSTS_PER_CONTEST,
   JWT_SECRET,
   ADDRESS_TOKEN_EXPIRES_IN,
@@ -43,8 +41,7 @@ const {
   OPENAI_ORGANIZATION,
 } = process.env;
 
-const NAME =
-  target.NODE_ENV === 'test' ? TEST_DB_NAME || 'common_test' : 'commonwealth';
+const NAME = target.NODE_ENV === 'test' ? 'common_test' : 'commonwealth';
 
 const DEFAULTS = {
   JWT_SECRET: 'my secret',
@@ -67,7 +64,6 @@ export const config = configure(
       CLEAN_HOUR: DATABASE_CLEAN_HOUR
         ? parseInt(DATABASE_CLEAN_HOUR, 10)
         : undefined,
-      INIT_TEST_DB: INIT_TEST_DB === 'true',
       TRACE: DATABASE_LOG_TRACE === 'true',
     },
     WEB3: {
@@ -175,7 +171,6 @@ export const config = configure(
       NAME: z.string(),
       NO_SSL: z.boolean(),
       CLEAN_HOUR: z.coerce.number().int().min(0).max(24).optional(),
-      INIT_TEST_DB: z.boolean(),
       TRACE: z.boolean(),
     }),
     WEB3: z.object({

@@ -19,7 +19,7 @@ describe('Thread queries', () => {
   let models: DB;
 
   beforeAll(async () => {
-    models = await tester.seedDb();
+    models = await tester.seedDb(import.meta);
   });
 
   afterAll(async () => {

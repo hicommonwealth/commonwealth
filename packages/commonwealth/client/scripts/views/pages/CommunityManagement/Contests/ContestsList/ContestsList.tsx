@@ -84,7 +84,7 @@ const ContestsList = ({
 
             if (!displayAllRecurringContests) {
               // only last contest is relevant
-              const { end_time } =
+              const { end_time, score } =
                 sortedContests[sortedContests.length - 1] || {};
 
               return (
@@ -108,6 +108,7 @@ const ContestsList = ({
                   isFarcaster={
                     farcasterContestEnabled && contest.is_farcaster_contest
                   }
+                  score={score || []}
                 />
               );
             } else {
@@ -134,6 +135,7 @@ const ContestsList = ({
                   isFarcaster={
                     farcasterContestEnabled && contest.is_farcaster_contest
                   }
+                  score={sc?.score || []}
                 />
               ));
             }

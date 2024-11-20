@@ -33,7 +33,7 @@ const useTopicGating = ({
         acc.push(current);
         // IMP: this logic can break if `PermissionEnum` or the `GroupPermissions`
         // schema is changed substantially and might not give off a ts issue.
-      } else if (current.permissions.length > existing.permissions.length) {
+      } else if (current?.permissions?.length > existing?.permissions?.length) {
         // Replace with the current item if it has a longer permission string
         const index = acc.indexOf(existing);
         acc[index] = current;
