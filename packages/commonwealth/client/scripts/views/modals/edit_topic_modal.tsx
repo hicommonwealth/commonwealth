@@ -55,6 +55,25 @@ export const EditTopicModal = ({
     featuredInSidebarProp,
   );
   const [name, setName] = useState<string>(nameProp);
+  // const [characterCount, setCharacterCount] = useState(0);
+  console.log('this is description', description);
+  // const getCharacterCount = (delta) => {
+  //   if (!delta || !delta.ops) {
+  //     return 0;
+  //   }
+  //   return delta.ops.reduce((count, op) => {
+  //     if (typeof op.insert === 'string') {
+  //       const cleanedText = op.insert.replace(/\n$/, '');
+  //       return count + cleanedText.length;
+  //     }
+  //     return count;
+  //   }, 0);
+  // };
+
+  // useEffect(() => {
+  //   const count = getCharacterCount(description);
+  //   setCharacterCount(count);
+  // }, [description]);
 
   const handleSaveChanges = async () => {
     setIsSaving(true);
@@ -175,6 +194,7 @@ export const EditTopicModal = ({
           })}
           isDisabled={!!topic.archived_at}
         />
+        <CWText type="caption">Character count: /250</CWText>
         <CWCheckbox
           label="Featured in Sidebar"
           checked={featuredInSidebar}
