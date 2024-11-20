@@ -318,17 +318,19 @@ async function constructMagic(isCosmos: boolean, chain?: string) {
 
 export async function startLoginWithMagicLink({
   email,
+  phoneNumber,
   provider,
   chain,
   isCosmos,
 }: {
   email?: string;
+  phoneNumber?: string;
   provider?: WalletSsoSource;
   chain?: string;
   isCosmos: boolean;
 }) {
-  if (!email && !provider)
-    throw new Error('Must provide email or SSO provider');
+  if (!email && !phoneNumber && !provider)
+    throw new Error('Must provide email or SMS or SSO provider');
   const magic = await constructMagic(isCosmos, chain);
 
   if (email) {
@@ -346,6 +348,18 @@ export async function startLoginWithMagicLink({
     const { address } = await handleSocialLoginCallback({
       bearer,
       walletSsoSource: WalletSsoSource.Farcaster,
+    });
+
+    return { bearer, address };
+  } else if (phoneNumber) {
+    const bearer = await magic.auth.loginWithSMS({
+      phoneNumber,
+      showUI: true,
+    });
+
+    const { address } = await handleSocialLoginCallback({
+      bearer,
+      walletSsoSource: WalletSsoSource.SMS,
     });
 
     return { bearer, address };
@@ -416,12 +430,15 @@ export async function handleSocialLoginCallback({
   }
   const isCosmos = desiredChain?.base === ChainBase.CosmosSDK;
   const magic = await constructMagic(isCosmos, desiredChain?.id);
-  const isEmail = walletSsoSource === WalletSsoSource.Email;
 
   // Code up to this line might run multiple times because of extra calls to useEffect().
   // Those runs will be rejected because getRedirectResult purges the browser search param.
   let profileMetadata, magicAddress;
-  if (isEmail || walletSsoSource === WalletSsoSource.Farcaster) {
+  if (
+    walletSsoSource === WalletSsoSource.Email ||
+    walletSsoSource === WalletSsoSource.Farcaster ||
+    walletSsoSource === WalletSsoSource.SMS
+  ) {
     const metadata = await magic.user.getMetadata();
     profileMetadata = { username: null };
 
