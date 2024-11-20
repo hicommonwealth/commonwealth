@@ -3,6 +3,7 @@ import {
   Context,
   InvalidActor,
   InvalidInput,
+  InvalidState,
 } from '@hicommonwealth/core';
 import {
   Address,
@@ -12,6 +13,8 @@ import {
   CommentContextInput,
   Group,
   GroupPermissionAction,
+  PollContext,
+  PollContextInput,
   ReactionContext,
   ReactionContextInput,
   ThreadContext,
@@ -81,7 +84,7 @@ async function findThread(
     thread,
     author_address_id: thread.address_id,
     community_id: thread.community_id,
-    topic_id: thread.topic_id ?? undefined,
+    topic_id: thread.topic_id,
     is_collaborator,
   };
 }
@@ -115,6 +118,17 @@ async function findReaction(
     community_id,
     author_address_id: reaction.address_id,
   };
+}
+
+async function findPoll(actor: Actor, poll_id: number) {
+  const poll = await models.Poll.findOne({
+    where: { id: poll_id },
+  });
+  if (!poll) {
+    throw new InvalidInput('Must provide a valid poll id to authorize');
+  }
+
+  return poll;
 }
 
 async function findAddress(
@@ -206,9 +220,11 @@ async function hasTopicPermissions(
     }
   >(
     `
-    SELECT g.*, gp.topic_id, gp.allowed_actions
-    FROM "Groups" as g JOIN "GroupPermissions" gp ON g.id = gp.group_id 
-    WHERE g.community_id = :community_id AND gp.topic_id = :topic_id
+        SELECT g.*, gp.topic_id, gp.allowed_actions
+        FROM "Groups" as g
+                 JOIN "GroupPermissions" gp ON g.id = gp.group_id
+        WHERE g.community_id = :community_id
+          AND gp.topic_id = :topic_id
     `,
     {
       type: QueryTypes.SELECT,
@@ -497,5 +513,38 @@ export function authReaction() {
 
     // reactions are only authorized by the author
     await mustBeAuthorized(ctx, { author: true });
+  };
+}
+
+export function authPoll({ action }: AggregateAuthOptions) {
+  return async (ctx: Context<typeof PollContextInput, typeof PollContext>) => {
+    const poll = await findPoll(ctx.actor, ctx.payload.poll_id);
+    const threadAuth = await findThread(ctx.actor, poll.thread_id, false);
+    const { address, is_author } = await findAddress(
+      ctx.actor,
+      threadAuth.community_id,
+      ['admin', 'moderator', 'member'],
+    );
+
+    if (threadAuth.thread.archived_at)
+      throw new InvalidState('Thread is archived');
+    (ctx as { context: PollContext }).context = {
+      address,
+      is_author,
+      poll,
+      poll_id: poll.id!,
+      community_id: threadAuth.community_id,
+      thread: threadAuth.thread,
+    };
+
+    await mustBeAuthorized(ctx, {
+      author: true,
+      permissions: action
+        ? {
+            topic_id: threadAuth.topic_id,
+            action: 'UPDATE_POLL',
+          }
+        : undefined,
+    });
   };
 }
