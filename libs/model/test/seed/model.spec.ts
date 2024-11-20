@@ -11,7 +11,7 @@ import {
 } from '../../src/tester';
 
 const generateSchemas = async () => {
-  const model = await bootstrap_testing();
+  const model = await bootstrap_testing(import.meta);
   const migration = await create_db_from_migrations('common_migrated_test');
 
   // TODO: resolve remaining conflicts!!!
@@ -28,8 +28,7 @@ const generateSchemas = async () => {
   const migration_schema = await get_info_schema(migration, {
     ignore_columns: {
       // Missing in model - migrations with backups
-      Comments: ['body_backup', 'text_backup', 'root_id'],
-      Threads: ['body_backup'],
+      Comments: ['root_id'],
       Topics: ['default_offchain_template_backup'],
       GroupPermissions: ['allowed_actions'],
     },
@@ -53,7 +52,7 @@ describe('Model schema', () => {
 
   beforeAll(async () => {
     schemas = await generateSchemas();
-  });
+  }, 20000);
 
   afterAll(async () => {
     await dispose()();

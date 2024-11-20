@@ -35,8 +35,10 @@ const validate = async (
 
     if (!isCustomDomain) {
       setRoute(redirectToUrl.pathname);
+    } else if (redirectTo) {
+      window.location.href = redirectTo;
     } else {
-      window.location.href = redirectTo!;
+      setRoute(`/${chain}`);
     }
   } catch (error) {
     return `Error: ${error.message}`;

@@ -2,7 +2,6 @@ import { configure, config as target } from '@hicommonwealth/core';
 import { z } from 'zod';
 
 const {
-  TEST_DB_NAME,
   DATABASE_URL,
   DATABASE_CLEAN_HOUR,
   DATABASE_LOG_TRACE,
@@ -12,8 +11,7 @@ const {
   NO_SSL,
   PRIVATE_KEY,
   TBC_BALANCE_TTL_SECONDS,
-  ALLOWED_EVENTS,
-  INIT_TEST_DB,
+  BLACKLISTED_EVENTS,
   MAX_USER_POSTS_PER_CONTEST,
   JWT_SECRET,
   ADDRESS_TOKEN_EXPIRES_IN,
@@ -30,7 +28,6 @@ const {
   ETH_RPC,
   COSMOS_REGISTRY_API,
   REACTION_WEIGHT_OVERRIDE,
-  FLAG_WEIGHTED_TOPICS,
   ALCHEMY_PRIVATE_APP_KEY,
   ALCHEMY_PUBLIC_APP_KEY,
   MEMBERSHIP_REFRESH_BATCH_SIZE,
@@ -44,8 +41,7 @@ const {
   OPENAI_ORGANIZATION,
 } = process.env;
 
-const NAME =
-  target.NODE_ENV === 'test' ? TEST_DB_NAME || 'common_test' : 'commonwealth';
+const NAME = target.NODE_ENV === 'test' ? 'common_test' : 'commonwealth';
 
 const DEFAULTS = {
   JWT_SECRET: 'my secret',
@@ -68,7 +64,6 @@ export const config = configure(
       CLEAN_HOUR: DATABASE_CLEAN_HOUR
         ? parseInt(DATABASE_CLEAN_HOUR, 10)
         : undefined,
-      INIT_TEST_DB: INIT_TEST_DB === 'true',
       TRACE: DATABASE_LOG_TRACE === 'true',
     },
     WEB3: {
@@ -80,7 +75,9 @@ export const config = configure(
         : 300,
     },
     OUTBOX: {
-      ALLOWED_EVENTS: ALLOWED_EVENTS ? ALLOWED_EVENTS.split(',') : [],
+      BLACKLISTED_EVENTS: BLACKLISTED_EVENTS
+        ? BLACKLISTED_EVENTS.split(',')
+        : [],
     },
     STAKE: {
       REACTION_WEIGHT_OVERRIDE: REACTION_WEIGHT_OVERRIDE
@@ -97,7 +94,6 @@ export const config = configure(
       NEYNAR_CAST_CREATED_WEBHOOK_SECRET: NEYNAR_CAST_CREATED_WEBHOOK_SECRET,
       NEYNAR_REPLY_WEBHOOK_URL: NEYNAR_REPLY_WEBHOOK_URL,
       FARCASTER_ACTION_URL: FARCASTER_ACTION_URL,
-      FLAG_WEIGHTED_TOPICS: FLAG_WEIGHTED_TOPICS === 'true',
     },
     AUTH: {
       JWT_SECRET: JWT_SECRET || DEFAULTS.JWT_SECRET,
@@ -175,7 +171,6 @@ export const config = configure(
       NAME: z.string(),
       NO_SSL: z.boolean(),
       CLEAN_HOUR: z.coerce.number().int().min(0).max(24).optional(),
-      INIT_TEST_DB: z.boolean(),
       TRACE: z.boolean(),
     }),
     WEB3: z.object({
@@ -191,7 +186,7 @@ export const config = configure(
       TTL_SECS: z.number().int(),
     }),
     OUTBOX: z.object({
-      ALLOWED_EVENTS: z.array(z.string()),
+      BLACKLISTED_EVENTS: z.array(z.string()),
     }),
     STAKE: z.object({
       REACTION_WEIGHT_OVERRIDE: z.number().int().nullish(),
@@ -204,7 +199,6 @@ export const config = configure(
       NEYNAR_CAST_CREATED_WEBHOOK_SECRET: z.string().nullish(),
       NEYNAR_REPLY_WEBHOOK_URL: z.string().nullish(),
       FARCASTER_ACTION_URL: z.string().nullish(),
-      FLAG_WEIGHTED_TOPICS: z.boolean(),
     }),
     AUTH: z
       .object({

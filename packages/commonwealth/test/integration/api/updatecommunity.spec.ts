@@ -36,7 +36,7 @@ describe('Update Community/Chain Tests', () => {
   let server: TestServer;
 
   beforeAll(async () => {
-    server = await testServer();
+    server = await testServer(import.meta);
 
     // get logged in address/user with JWT
     const result = await server.seeder.createAndVerifyAddress(
@@ -101,7 +101,7 @@ describe('Update Community/Chain Tests', () => {
       const name = 'commonwealtheum';
       const res = await update(server.app, loggedInAddr, {
         jwt: jwtToken,
-        id: chain,
+        community_id: chain,
         name,
       });
       expect(res.status).to.be.equal(200);
@@ -112,7 +112,7 @@ describe('Update Community/Chain Tests', () => {
       const description = 'hello this the new chain';
       const res = await update(server.app, loggedInAddr, {
         jwt: jwtToken,
-        id: chain,
+        community_id: chain,
         description,
       });
       expect(res.status).to.be.equal(200);
@@ -123,7 +123,7 @@ describe('Update Community/Chain Tests', () => {
       const website = 'http://edgewa.re';
       const res = await update(server.app, loggedInAddr, {
         jwt: jwtToken,
-        id: chain,
+        community_id: chain,
         website,
       });
       expect(res.status).to.be.equal(200);
@@ -134,7 +134,7 @@ describe('Update Community/Chain Tests', () => {
       const discord = ['http://discord.gg'];
       const res = await update(server.app, loggedInAddr, {
         jwt: jwtToken,
-        id: chain,
+        community_id: chain,
         social_links: discord,
       });
       expect(res.status).to.be.equal(200);
@@ -145,7 +145,7 @@ describe('Update Community/Chain Tests', () => {
       const socialLinks = ['github.com'];
       const res = await update(server.app, loggedInAddr, {
         jwt: jwtToken,
-        id: chain,
+        community_id: chain,
         socialLinks,
       });
       expect(res.body.error).to.exist;
@@ -155,7 +155,7 @@ describe('Update Community/Chain Tests', () => {
       const telegram = ['https://t.me/'];
       const res = await update(server.app, loggedInAddr, {
         jwt: jwtToken,
-        id: chain,
+        community_id: chain,
         social_links: telegram,
       });
       expect(res.status).to.be.equal(200);
@@ -166,7 +166,7 @@ describe('Update Community/Chain Tests', () => {
       const github = ['https://github.com/'];
       const res = await update(server.app, loggedInAddr, {
         jwt: jwtToken,
-        id: chain,
+        community_id: chain,
         github,
       });
       expect(res.status).to.be.equal(200);
@@ -177,7 +177,7 @@ describe('Update Community/Chain Tests', () => {
       const default_symbol = 'CWL';
       const res = await update(server.app, loggedInAddr, {
         jwt: jwtToken,
-        id: chain,
+        community_id: chain,
         default_symbol,
       });
       expect(res.status).to.be.equal(200);
@@ -188,7 +188,7 @@ describe('Update Community/Chain Tests', () => {
       const icon_url = 'assets/img/protocols/cwl.png';
       const res = await update(server.app, loggedInAddr, {
         jwt: jwtToken,
-        id: chain,
+        community_id: chain,
         icon_url,
       });
       expect(res.status).to.be.equal(200);
@@ -199,7 +199,7 @@ describe('Update Community/Chain Tests', () => {
       const active = false;
       const res = await update(server.app, loggedInAddr, {
         jwt: jwtToken,
-        id: chain,
+        community_id: chain,
         active,
       });
       expect(res.status).to.be.equal(200);
@@ -210,7 +210,7 @@ describe('Update Community/Chain Tests', () => {
       const type = 'parachain';
       const res = await update(server.app, loggedInAddr, {
         jwt: jwtToken,
-        id: chain,
+        community_id: chain,
         type,
       });
       expect(res.status).to.be.equal(200);
@@ -227,13 +227,16 @@ describe('Update Community/Chain Tests', () => {
     });
 
     test('should fail if no chain found', async () => {
-      const id = 'ethereum-testnet';
-      const res = await update(server.app, loggedInAddr, { jwt: jwtToken, id });
+      const community_id = 'ethereum-testnet';
+      const res = await update(server.app, loggedInAddr, {
+        jwt: jwtToken,
+        community_id,
+      });
       expect(res.body.message).to.not.be.null;
     });
 
     test('should fail if not admin ', async () => {
-      const id = 'ethereum';
+      const community_id = 'ethereum';
       const result = await server.seeder.createAndVerifyAddress(
         { chain },
         'Alice',
@@ -242,7 +245,10 @@ describe('Update Community/Chain Tests', () => {
         { id: result.user_id, email: result.email },
         config.AUTH.JWT_SECRET,
       );
-      const res = await update(server.app, loggedInAddr, { jwt: newJwt, id });
+      const res = await update(server.app, loggedInAddr, {
+        jwt: newJwt,
+        community_id,
+      });
       expect(res.body.message).to.be.equal(
         'User is not admin in the community',
       );

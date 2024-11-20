@@ -2,7 +2,7 @@ import { ExternalServiceUserIds, dispose, query } from '@hicommonwealth/core';
 import { models } from '@hicommonwealth/model';
 import { Community } from '@hicommonwealth/schemas';
 import { expect } from 'chai';
-import { bootstrap_testing, seed } from 'model/src/tester';
+import { seed } from 'model/src/tester';
 import { afterAll, afterEach, beforeAll, describe, test } from 'vitest';
 import { z } from 'zod';
 import { GetDigestEmailDataQuery } from '../../src/emails';
@@ -14,7 +14,6 @@ describe('Digest email lifecycle', () => {
   let communityThree: z.infer<typeof Community> | undefined;
 
   beforeAll(async () => {
-    await bootstrap_testing(true);
     const [authorUser] = await seed('User', {
       isAdmin: false,
       selected_community_id: null,
@@ -30,6 +29,7 @@ describe('Digest email lifecycle', () => {
           user_id: authorUser!.id,
         },
       ],
+      topics: [{}],
     });
     [communityTwo] = await seed('Community', {
       chain_node_id: undefined,
@@ -41,6 +41,7 @@ describe('Digest email lifecycle', () => {
           user_id: authorUser!.id,
         },
       ],
+      topics: [{}],
     });
     // create an additional community to ensure only specific threads are selected
     [communityThree] = await seed('Community', {
@@ -53,6 +54,7 @@ describe('Digest email lifecycle', () => {
           user_id: authorUser!.id,
         },
       ],
+      topics: [{}],
     });
   });
 

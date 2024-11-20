@@ -98,7 +98,7 @@ export function formatBucketUrlToAssetCDN(uploadLocation: string) {
     ['production', 'beta'].includes(process.env.APP_ENV)
   ) {
     const fileName = uploadLocation.split('/').pop() || '';
-    return `${S3_ASSET_BUCKET_CDN}/${fileName}`;
+    return `https://${S3_ASSET_BUCKET_CDN}/${fileName}`;
   }
   return uploadLocation;
 }
@@ -365,4 +365,8 @@ export function bech32ToHex(address: string) {
   } catch (e) {
     console.log(`Error converting bech32 to hex: ${e}. Hex was not generated.`);
   }
+}
+
+export function buildFarcasterContestFrameUrl(contestAddress: string) {
+  return `/api/integration/farcaster/contests/${contestAddress}/contestCard`;
 }

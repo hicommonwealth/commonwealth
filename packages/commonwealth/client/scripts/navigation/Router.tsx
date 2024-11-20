@@ -13,14 +13,11 @@ import CommonDomainRoutes from './CommonDomainRoutes';
 import GeneralRoutes from './GeneralRoutes';
 
 export type RouteFeatureFlags = {
-  weightedTopicsEnabled: boolean;
   tokenizedCommunityEnabled: boolean;
 };
 
 const Router = () => {
   const client = OpenFeature.getClient();
-
-  const weightedTopicsEnabled = client.getBooleanValue('weightedTopics', false);
 
   const tokenizedCommunityEnabled = client.getBooleanValue(
     'tokenizedCommunity',
@@ -28,7 +25,6 @@ const Router = () => {
   );
 
   const flags = {
-    weightedTopicsEnabled,
     tokenizedCommunityEnabled,
   };
 

@@ -1,8 +1,5 @@
 import { ZERO_ADDRESS, commonProtocol } from '@hicommonwealth/shared';
 import { AbiItem, TransactionReceipt } from 'web3';
-import { ContestAbi } from './Abi/ContestAbi';
-import { Erc20Abi } from './Abi/ERC20Abi';
-import { feeManagerABI } from './Abi/feeManagerAbi';
 import ContractBase from './ContractBase';
 import NamespaceFactory from './NamespaceFactory';
 
@@ -13,7 +10,7 @@ class Contest extends ContractBase {
   namespaceFactory: NamespaceFactory;
 
   constructor(contractAddress: string, factoryAddress: string, rpc: string) {
-    super(contractAddress, ContestAbi, rpc);
+    super(contractAddress, commonProtocol.contestAbi, rpc);
     this.namespaceFactoryAddress = factoryAddress;
   }
 
@@ -23,7 +20,7 @@ class Contest extends ContractBase {
       this.namespaceFactoryAddress,
       this.rpc,
     );
-    await this.namespaceFactory.initialize(true);
+    await this.namespaceFactory.initialize(withWallet);
   }
 
   /**
@@ -202,14 +199,14 @@ class Contest extends ContractBase {
       }
     } else {
       const token = new this.web3.eth.Contract(
-        Erc20Abi as AbiItem[],
+        commonProtocol.erc20Abi as unknown as AbiItem[],
         tokenAddress,
       );
       const decimals = await token.methods.decimals().call();
       const weiAmount = amount * 10 ** Number(decimals);
-      await token.methods
-        .approve(this.contractAddress, weiAmount)
-        .send({ from: walletAddress });
+      await token.methods.approve(this.contractAddress, weiAmount).send({
+        from: walletAddress,
+      });
       txReceipt = await this.contract.methods.deposit(weiAmount).send({
         from: walletAddress,
         maxPriorityFeePerGas: null,
@@ -244,7 +241,7 @@ class Contest extends ContractBase {
       this.contract,
       this.contractAddress,
       this.web3,
-      feeManagerABI,
+      commonProtocol.feeManagerAbi,
       oneOff,
     );
     return parseInt(contestBalance, 10);

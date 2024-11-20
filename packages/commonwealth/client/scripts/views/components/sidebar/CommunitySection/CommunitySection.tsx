@@ -54,8 +54,9 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
 
   const { data: domain } = useFetchCustomDomainQuery();
 
-  const topicIdsIncludedInContest =
-    getUniqueTopicIdsIncludedInActiveContest(contestsData);
+  const topicIdsIncludedInContest = getUniqueTopicIdsIncludedInActiveContest(
+    contestsData.all,
+  );
 
   const communityAlerts = useCommunityAlertsQuery({
     enabled: user.isLoggedIn && !!app.chain,
@@ -102,7 +103,7 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
 
         <CWDivider />
         <DiscussionSection
-          isContestAvailable={stakeEnabled && isContestAvailable}
+          isContestAvailable={isContestAvailable}
           // @ts-expect-error <StrictNullChecks/>
           topicIdsIncludedInContest={topicIdsIncludedInContest}
         />

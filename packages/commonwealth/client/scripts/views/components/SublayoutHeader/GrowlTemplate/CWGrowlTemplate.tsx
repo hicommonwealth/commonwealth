@@ -8,22 +8,28 @@ import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from '../../component_kit/new_designs/CWButton';
 import './CWGrowlTemplate.scss';
 
-const LOCALSTORAGE_GROWL_TEMPLATE_KEY = 'GrowlTemplateHidden';
-
 interface CWGrowlTemplateProps {
-  headerText: string;
-  bodyText: string;
-  buttonText: string;
-  buttonLink: string;
-  growlImage: string;
+  discordLink?: boolean;
+  headerText?: string;
+  bodyText?: string;
+  buttonText?: string;
+  buttonLink?: string;
+  growlImage?: string;
+  extraText?: string;
+  growlType: string;
 }
 
+//CWGrowlTemplate should be placed in Sublayout.tsx when used for general announcements
+
 export const CWGrowlTemplate = ({
+  discordLink = false,
   headerText,
   bodyText,
   buttonText,
   buttonLink,
   growlImage,
+  extraText,
+  growlType,
 }: CWGrowlTemplateProps) => {
   const { setIsGrowlHidden, isGrowlHidden } = useGrowlStore();
 
@@ -31,8 +37,9 @@ export const CWGrowlTemplate = ({
     useState(false);
 
   const [isDisabled, setIsDisabled] = useState(
-    localStorage.getItem(LOCALSTORAGE_GROWL_TEMPLATE_KEY) === 'true' ||
-      isGrowlHidden,
+    localStorage.getItem(
+      `LOCALSTORAGE_GROWL_TEMPLATE_${growlType.toUpperCase()}_KEY`,
+    ) === 'true' || isGrowlHidden,
   );
 
   const handleExit = () => {
@@ -40,7 +47,10 @@ export const CWGrowlTemplate = ({
     setIsGrowlHidden(true);
 
     if (shouldHideGrowlPermanently) {
-      localStorage.setItem(LOCALSTORAGE_GROWL_TEMPLATE_KEY, 'true');
+      localStorage.setItem(
+        `LOCALSTORAGE_GROWL_TEMPLATE_${growlType.toUpperCase()}_KEY`,
+        'true',
+      );
     }
   };
 
@@ -50,10 +60,10 @@ export const CWGrowlTemplate = ({
         <CWIconButton
           iconName="close"
           iconSize="medium"
-          className="closeButton"
+          className={`closeButton ${!growlImage ? 'noGrowlImage' : ''}`}
           onClick={handleExit}
         />
-        <img src={growlImage} alt="" className="img" />
+        {growlImage && <img src={growlImage} alt="" className="img" />}
         <div className="container">
           <CWText type="h2" fontWeight="bold" isCentered>
             {headerText}
@@ -61,39 +71,57 @@ export const CWGrowlTemplate = ({
           <CWText type="b1" fontWeight="medium" isCentered className="body">
             {bodyText}
           </CWText>
-          <CWButton
-            className="CalenderButton"
-            buttonType="primary"
-            buttonHeight="med"
-            label={buttonText}
-            onClick={(e) => {
-              e.preventDefault();
-              window.open(buttonLink, '_blank');
-            }}
-          />
-          <CWText type="b2" fontWeight="regular" isCentered className="body">
-            Have more feedback? Reach out to us on Discord!
-          </CWText>
-          <a
-            href="https://discord.com/channels/799041511165394986/1099034105997426709"
-            target="_blank"
-            rel="noreferrer"
-            style={{ textDecoration: 'none' }}
-          >
-            <CWText
-              type="b1"
-              fontWeight="link"
-              isCentered
-              className="discordLink"
-            >
-              Open Discord
-              <CWIcon
-                iconName="arrowSquareOut"
-                iconSize="medium"
-                className="icon"
-              />
-            </CWText>
-          </a>
+          {buttonLink && (
+            <CWButton
+              className="CalenderButton"
+              buttonType="primary"
+              buttonHeight="med"
+              label={buttonText}
+              onClick={(e) => {
+                e.preventDefault();
+                window.open(buttonLink, '_blank');
+              }}
+            />
+          )}
+          {discordLink && (
+            <>
+              <CWText
+                type="b2"
+                fontWeight="regular"
+                isCentered
+                className="body"
+              >
+                Have more feedback? Reach out to us on Discord!
+              </CWText>
+              <a
+                href="https://discord.com/channels/799041511165394986/1099034105997426709"
+                target="_blank"
+                rel="noreferrer"
+                style={{ textDecoration: 'none' }}
+              >
+                <CWText
+                  type="b1"
+                  fontWeight="link"
+                  isCentered
+                  className="discordLink"
+                >
+                  Open Discord
+                  <CWIcon
+                    iconName="arrowSquareOut"
+                    iconSize="medium"
+                    className="icon"
+                  />
+                </CWText>
+              </a>
+            </>
+          )}
+          {extraText && extraText.length > 0 && (
+            <div>
+              <CWText type="b2" fontWeight="medium" isCentered className="body">
+                {extraText}
+              </CWText>
+            </div>
+          )}
         </div>
         <div className="checkboxContainer">
           <CWCheckbox

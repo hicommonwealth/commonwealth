@@ -40,7 +40,7 @@ export const CustomLinkEdit = () => {
   return (
     <div className="CustomLinkEdit">
       <input
-        type="text"
+        type="url"
         value={link}
         autoFocus={true}
         placeholder="Enter link"

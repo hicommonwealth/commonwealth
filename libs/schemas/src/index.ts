@@ -25,6 +25,7 @@ export type Aggregates = Extract<
 >;
 
 export * from './commands';
+export * from './context';
 export * from './entities';
 export * from './projections';
 export * from './queries';

@@ -45,6 +45,7 @@ export function GetThreadsByIds(): Query<typeof schemas.GetThreadsByIds> {
           {
             model: models.Topic,
             as: 'topic',
+            required: true,
           },
           {
             model: models.Reaction,

@@ -23,7 +23,7 @@ export const Thread = z.object({
   stage: z.string().optional(),
   body: z.string(),
   url: z.string().nullish(),
-  topic_id: PG_INT.nullish(),
+  topic_id: PG_INT,
   pinned: z.boolean().nullish(),
   community_id: z.string(),
   view_count: PG_INT.optional(),
