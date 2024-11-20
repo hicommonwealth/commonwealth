@@ -1,5 +1,5 @@
-import { calculateVoteWeight } from 'shared/src/commonProtocol';
 import { describe, expect, it } from 'vitest';
+import { calculateVoteWeight } from '../src/commonProtocol';
 
 describe('commonProtocol', () => {
   describe('calculateVoteWeight', () => {

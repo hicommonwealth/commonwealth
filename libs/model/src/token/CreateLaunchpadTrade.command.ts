@@ -1,6 +1,6 @@
 import { Command, InvalidState } from '@hicommonwealth/core';
+import { commonProtocol } from '@hicommonwealth/evm-protocols';
 import * as schemas from '@hicommonwealth/schemas';
-import { commonProtocol } from '@hicommonwealth/shared';
 import z from 'zod';
 import { models } from '../database';
 import { mustExist } from '../middleware/guards';

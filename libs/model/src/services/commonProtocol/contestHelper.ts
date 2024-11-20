@@ -1,6 +1,9 @@
 import { AppError } from '@hicommonwealth/core';
-import { contestAbi, feeManagerAbi } from '@hicommonwealth/evm-protocols';
-import { commonProtocol } from '@hicommonwealth/shared';
+import {
+  commonProtocol,
+  contestAbi,
+  feeManagerAbi,
+} from '@hicommonwealth/evm-protocols';
 import { Mutex } from 'async-mutex';
 import Web3, { PayableCallOptions } from 'web3';
 import { AbiItem } from 'web3-utils';

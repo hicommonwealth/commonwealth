@@ -1,12 +1,12 @@
 import { logger } from '@hicommonwealth/core';
 import {
+  commonProtocol,
   deployedNamespaceEventSignature,
   erc20Abi,
   launchpadTokenRegisteredEventSignature,
   launchpadTradeEventSignature,
   lpBondingCurveAbi,
 } from '@hicommonwealth/evm-protocols';
-import { commonProtocol } from '@hicommonwealth/shared';
 import { Web3 } from 'web3';
 import { createWeb3Provider } from './utils';
 

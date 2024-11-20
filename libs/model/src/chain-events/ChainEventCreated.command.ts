@@ -2,6 +2,7 @@ import { parseEvmEvent, type Command } from '@hicommonwealth/core';
 import {
   EvmEventSignature,
   EvmEventSignatures,
+  commonProtocol as cp,
 } from '@hicommonwealth/evm-protocols';
 import {
   config,
@@ -10,7 +11,6 @@ import {
   models,
 } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
-import { commonProtocol as cp } from '@hicommonwealth/shared';
 import { Hmac, createHmac } from 'crypto';
 
 // TODO: how do we handle chain re-orgs

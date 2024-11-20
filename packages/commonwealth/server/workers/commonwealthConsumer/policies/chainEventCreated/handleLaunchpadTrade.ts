@@ -1,6 +1,6 @@
 import { events, LaunchpadTrade } from '@hicommonwealth/core';
+import { commonProtocol as cp } from '@hicommonwealth/evm-protocols';
 import { commonProtocol, models } from '@hicommonwealth/model';
-import { commonProtocol as sharedCommonProtocol } from '@hicommonwealth/shared';
 import { BigNumber } from 'ethers';
 import Web3 from 'web3';
 import { z } from 'zod';
@@ -68,9 +68,8 @@ export async function handleLaunchpadTrade(
   }
 
   const lpBondingCurveAddress =
-    sharedCommonProtocol.factoryContracts[
-      chainNode!.eth_chain_id as sharedCommonProtocol.ValidChains
-    ].lpBondingCurve!;
+    cp.factoryContracts[chainNode!.eth_chain_id as cp.ValidChains]
+      .lpBondingCurve!;
 
   if (
     !token.liquidity_transferred &&

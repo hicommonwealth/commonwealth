@@ -1,9 +1,10 @@
 import {
+  commonProtocol,
   contestAbi,
   erc20Abi,
   feeManagerAbi,
 } from '@hicommonwealth/evm-protocols';
-import { ZERO_ADDRESS, commonProtocol } from '@hicommonwealth/shared';
+import { ZERO_ADDRESS } from '@hicommonwealth/shared';
 import { AbiItem, TransactionReceipt } from 'web3';
 import ContractBase from './ContractBase';
 import NamespaceFactory from './NamespaceFactory';

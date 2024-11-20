@@ -1,7 +1,10 @@
 import { AppError, ServerError } from '@hicommonwealth/core';
-import { communityNamespaceCreatedEventSignature } from '@hicommonwealth/evm-protocols';
+import {
+  commonProtocol,
+  communityNamespaceCreatedEventSignature,
+} from '@hicommonwealth/evm-protocols';
 import { models } from '@hicommonwealth/model';
-import { BalanceSourceType, commonProtocol } from '@hicommonwealth/shared';
+import { BalanceSourceType } from '@hicommonwealth/shared';
 import Web3 from 'web3';
 import { CommunityAttributes } from '../../models';
 import { equalEvmAddresses } from '../../utils';

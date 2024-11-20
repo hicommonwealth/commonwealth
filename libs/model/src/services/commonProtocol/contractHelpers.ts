@@ -1,10 +1,6 @@
 import { AppError } from '@hicommonwealth/core';
-import { contestAbi } from '@hicommonwealth/evm-protocols';
-import {
-  BalanceSourceType,
-  ZERO_ADDRESS,
-  commonProtocol,
-} from '@hicommonwealth/shared';
+import { commonProtocol, contestAbi } from '@hicommonwealth/evm-protocols';
+import { BalanceSourceType, ZERO_ADDRESS } from '@hicommonwealth/shared';
 import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
 

@@ -1,17 +1,11 @@
 import {
+  commonProtocol as cp,
   erc20Abi,
   launchpadFactoryAbi,
   lpBondingCurveAbi,
 } from '@hicommonwealth/evm-protocols';
 import { Contract } from 'web3';
 import { AbiItem } from 'web3-utils';
-import {
-  buyToken,
-  getPrice,
-  launchToken,
-  sellToken,
-  transferLiquidity,
-} from '../../../../../../libs/shared/src/commonProtocol';
 import ContractBase from './ContractBase';
 
 class LaunchpadBondingCurve extends ContractBase {
@@ -55,7 +49,7 @@ class LaunchpadBondingCurve extends ContractBase {
       await this.initialize(true, chainId);
     }
 
-    const txReceipt = await launchToken(
+    const txReceipt = await cp.launchToken(
       this.launchpadFactory,
       name,
       symbol,
@@ -75,7 +69,7 @@ class LaunchpadBondingCurve extends ContractBase {
       await this.initialize(true, chainId);
     }
 
-    const txReceipt = await buyToken(
+    const txReceipt = await cp.buyToken(
       this.contract,
       this.tokenAddress,
       walletAddress,
@@ -92,7 +86,7 @@ class LaunchpadBondingCurve extends ContractBase {
       erc20Abi as unknown as AbiItem[],
       this.tokenAddress,
     );
-    const txReceipt = await sellToken(
+    const txReceipt = await cp.sellToken(
       this.contract,
       this.tokenAddress,
       amountSell,
@@ -107,7 +101,7 @@ class LaunchpadBondingCurve extends ContractBase {
       await this.initialize(true);
     }
 
-    const txReceipt = await transferLiquidity(
+    const txReceipt = await cp.transferLiquidity(
       this.contract,
       this.tokenAddress,
       walletAddress,
@@ -120,7 +114,7 @@ class LaunchpadBondingCurve extends ContractBase {
       await this.initialize(true, chainId);
     }
 
-    const amountOut = await getPrice(
+    const amountOut = await cp.getPrice(
       this.contract,
       this.tokenAddress,
       amountIn,
