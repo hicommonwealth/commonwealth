@@ -4,7 +4,15 @@ import moment from 'moment';
 import React from 'react';
 import { frames } from '../../config';
 
-const PrizeRow = ({ index, prize }: { index: number; prize: number }) => {
+const PrizeRow = ({
+  index,
+  prize,
+  ticker = 'ETH',
+}: {
+  index: number;
+  prize: number;
+  ticker?: string;
+}) => {
   return (
     <div
       style={{
@@ -25,7 +33,7 @@ const PrizeRow = ({ index, prize }: { index: number; prize: number }) => {
           textShadow: '0px 0px 3px white',
         }}
       >
-        ETH {prize}
+        {ticker} {prize}
       </p>
     </div>
   );
@@ -114,7 +122,12 @@ export const contestPrizes = frames(async (ctx) => {
 
         {prizes.length ? (
           prizes.map((prize, index) => (
-            <PrizeRow key={index} index={index} prize={prize} />
+            <PrizeRow
+              key={index}
+              index={index}
+              prize={prize}
+              ticker={contestManager.ticker}
+            />
           ))
         ) : (
           <p style={{ fontSize: '32px' }}>Contest has no prizes yet.</p>
