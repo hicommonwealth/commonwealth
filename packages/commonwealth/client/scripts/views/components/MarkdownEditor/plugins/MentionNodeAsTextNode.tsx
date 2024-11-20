@@ -129,7 +129,13 @@ export class MentionNodeAsTextNode extends TextNode {
     serializedNode: SerializedMentionNode,
   ): MentionNodeAsTextNode {
     console.log('FIXME importJSON');
-    return $createMentionNode(serializedNode.handle, serializedNode.uid);
+    const node = $createMentionNode(serializedNode.handle, serializedNode.uid);
+    node.setTextContent(serializedNode.text);
+    node.setFormat(serializedNode.format);
+    node.setDetail(serializedNode.detail);
+    node.setMode(serializedNode.mode);
+    node.setStyle(serializedNode.style);
+    return node;
   }
 
   constructor(handle: string, uid: string, key?: NodeKey) {
@@ -184,11 +190,11 @@ export class MentionNodeAsTextNode extends TextNode {
   }
 
   canInsertTextBefore(): boolean {
-    return true;
+    return false;
   }
 
   canInsertTextAfter(): boolean {
-    return true;
+    return false;
   }
 }
 
