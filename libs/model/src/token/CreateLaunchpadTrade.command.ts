@@ -66,7 +66,10 @@ export function CreateLaunchpadTrade(): Command<
         is_buy: result.parsedArgs.isBuy,
         community_token_amount: result.parsedArgs.communityTokenAmount,
         price:
-          result.parsedArgs.communityTokenAmount / result.parsedArgs.ethAmount,
+          Number(
+            (result.parsedArgs.ethAmount * BigInt(1e18)) /
+              result.parsedArgs.communityTokenAmount,
+          ) / 1e18,
         floating_supply: result.parsedArgs.floatingSupply,
         timestamp: Number(result.block.timestamp),
       });

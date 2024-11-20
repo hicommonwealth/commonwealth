@@ -9,6 +9,7 @@ export * from './launchpad.schemas';
 export * from './notification.schemas';
 export * from './quest.schemas';
 export * from './reaction.schemas';
+export * from './referral.schemas';
 export * from './snapshot.schemas';
 export * from './stake.schemas';
 export * from './tag.schemas';

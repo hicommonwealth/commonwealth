@@ -57,6 +57,7 @@ export const UserMentioned = z.object({
 export const CommunityCreated = z.object({
   communityId: z.string(),
   userId: z.string(),
+  referralLink: z.string().optional(),
 });
 export const SnapshotProposalCreated = z.object({
   id: z.string().optional(),
