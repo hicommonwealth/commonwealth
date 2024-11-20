@@ -1,8 +1,7 @@
 import { command, config } from '@hicommonwealth/core';
-import { commonProtocol } from '@hicommonwealth/model';
+import { Contest, commonProtocol } from '@hicommonwealth/model';
 import { Button } from 'frames.js/express';
 import moment from 'moment';
-import { GetContest } from 'node_modules/@hicommonwealth/model/src/contest';
 import React from 'react';
 import { frames } from '../../config';
 
@@ -40,7 +39,7 @@ export const contestCard = frames(async (ctx) => {
 
   const contest_address = ctx.url.pathname.split('/')[1];
 
-  const contestManager = await command(GetContest(), {
+  const contestManager = await command(Contest.GetContest(), {
     actor: { user: { email: '' } },
     payload: { contest_address, with_chain_node: true },
   });

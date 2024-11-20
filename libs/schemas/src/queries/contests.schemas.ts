@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { ContestManager } from '../entities';
+import { ChainNode, Community, ContestManager } from '../entities';
 import { Contest, ContestAction } from '../projections';
 import { PG_INT } from '../utils';
 
@@ -31,7 +31,11 @@ export const GetContest = {
     contest_address: z.string(),
     with_chain_node: z.boolean().optional(),
   }),
-  output: ContestManager.nullish(),
+  output: ContestManager.extend({
+    Community: Community.extend({
+      ChainNode: ChainNode.nullish(),
+    }).nullish(),
+  }).nullish(),
 };
 
 export const GetActiveContestManagers = {
