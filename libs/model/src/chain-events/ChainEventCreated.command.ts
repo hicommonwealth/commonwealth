@@ -1,9 +1,8 @@
+import { parseEvmEvent, type Command } from '@hicommonwealth/core';
 import {
   EvmEventSignature,
   EvmEventSignatures,
-  parseEvmEvent,
-  type Command,
-} from '@hicommonwealth/core';
+} from '@hicommonwealth/evm-protocols';
 import {
   config,
   emitEvent,

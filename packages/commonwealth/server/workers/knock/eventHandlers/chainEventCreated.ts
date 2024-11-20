@@ -2,8 +2,8 @@ import { EventHandler, logger } from '@hicommonwealth/core';
 import {
   communityStakeTradeEventSignature,
   deployedNamespaceEventSignature,
-  models,
-} from '@hicommonwealth/model';
+} from '@hicommonwealth/evm-protocols';
+import { models } from '@hicommonwealth/model';
 import z from 'zod';
 import { handleCommunityStakeTrades } from './chainEvents/handleCommunityStakeTrades';
 

@@ -9,11 +9,8 @@ import {
   disposeAdapter,
   notificationsProvider,
 } from '@hicommonwealth/core';
-import {
-  communityStakeTradeEventSignature,
-  models,
-  tester,
-} from '@hicommonwealth/model';
+import { communityStakeTradeEventSignature } from '@hicommonwealth/evm-protocols';
+import { models, tester } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import { BalanceType } from '@hicommonwealth/shared';
 import chai, { expect } from 'chai';

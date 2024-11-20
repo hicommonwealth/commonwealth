@@ -455,6 +455,9 @@ importers:
 
   libs/core:
     dependencies:
+      '@hicommonwealth/evm-protocols':
+        specifier: workspace:*
+        version: link:../evm-protocols
       '@hicommonwealth/schemas':
         specifier: workspace:*
         version: link:../schemas

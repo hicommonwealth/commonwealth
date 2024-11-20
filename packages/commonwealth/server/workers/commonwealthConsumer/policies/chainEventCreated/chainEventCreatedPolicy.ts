@@ -6,14 +6,12 @@ import {
   logger,
 } from '@hicommonwealth/core';
 import {
-  Token,
   communityStakeTradeEventSignature,
   deployedNamespaceEventSignature,
   launchpadTokenLaunchedEventSignature,
   launchpadTradeEventSignature,
-  middleware,
-  models,
-} from '@hicommonwealth/model';
+} from '@hicommonwealth/evm-protocols';
+import { Token, middleware, models } from '@hicommonwealth/model';
 import { ZodUndefined } from 'zod';
 import { handleCommunityStakeTrades } from './handleCommunityStakeTrades';
 import { handleLaunchpadTrade } from './handleLaunchpadTrade';

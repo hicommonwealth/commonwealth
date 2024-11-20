@@ -8,3 +8,4 @@ export * from './abis/namespaceAbi';
 export * from './abis/namespaceFactoryAbi';
 export * from './abis/reservationHookAbi';
 export * from './abis/tokenCommunityManagerAbi';
+export * from './event-registry/eventSignatures';
