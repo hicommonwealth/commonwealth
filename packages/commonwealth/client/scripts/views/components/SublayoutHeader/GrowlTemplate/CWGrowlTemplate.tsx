@@ -17,6 +17,7 @@ interface CWGrowlTemplateProps {
   growlImage?: string;
   extraText?: string;
   growlType: string;
+  blackCloseButton?: boolean;
 }
 
 //CWGrowlTemplate should be placed in Sublayout.tsx when used for general announcements
@@ -30,6 +31,7 @@ export const CWGrowlTemplate = ({
   growlImage,
   extraText,
   growlType,
+  blackCloseButton,
 }: CWGrowlTemplateProps) => {
   const { setIsGrowlHidden, isGrowlHidden } = useGrowlStore();
 
@@ -60,7 +62,7 @@ export const CWGrowlTemplate = ({
         <CWIconButton
           iconName="close"
           iconSize="medium"
-          className={`closeButton ${!growlImage ? 'noGrowlImage' : ''}`}
+          className={`closeButton ${!growlImage ? 'noGrowlImage' : ''} ${blackCloseButton ? 'blackCloseButton' : ''}`}
           onClick={handleExit}
         />
         {growlImage && <img src={growlImage} alt="" className="img" />}
