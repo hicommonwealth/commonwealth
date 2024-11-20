@@ -8,4 +8,5 @@ export const trpcRouter = trpc.router({
   ),
   createToken: trpc.command(Token.CreateToken, trpc.Tag.Token),
   getTokens: trpc.query(Token.GetTokens, trpc.Tag.Token),
+  getToken: trpc.query(Token.GetToken, trpc.Tag.Token),
 });
