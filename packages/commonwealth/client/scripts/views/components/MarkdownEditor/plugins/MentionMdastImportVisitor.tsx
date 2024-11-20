@@ -1,4 +1,5 @@
 import { Descriptors, MdastImportVisitor } from 'commonwealth-mdxeditor';
+import { ElementNode } from 'lexical';
 import * as Mdast from 'mdast';
 import {
   $createMentionNode,
@@ -6,9 +7,11 @@ import {
   parseIdFromPath,
 } from 'views/components/MarkdownEditor/plugins/MentionNode';
 
+const USE_ELEMENT_NODE_STRATEGY = true;
+
 export const MentionMdastImportVisitor: MdastImportVisitor<Mdast.Link> = {
   testNode: (mdastNode: Mdast.Nodes, options: Descriptors): boolean => {
-    console.log('FIXME within testNode: ', mdastNode);
+    console.log('FIXME within MentionMdastImportVisitor.testNode: ', mdastNode);
 
     // FIXME: ok this part is looking good because I figured out how to
     // activate the import.
@@ -34,6 +37,10 @@ export const MentionMdastImportVisitor: MdastImportVisitor<Mdast.Link> = {
     // FIXME I need to look at the source of createLinkNode as maybe it creates itw own parent?
 
     // FIXME: this neds to be fixed next...
+    console.log(
+      'FIXME within MentionMdastImportVisitor.visitNode: ',
+      mdastNode,
+    );
 
     console.log('FIXME mdastParent: ', mdastParent);
     console.log('FIXME lexicalParent: ', lexicalParent);
@@ -63,16 +70,19 @@ export const MentionMdastImportVisitor: MdastImportVisitor<Mdast.Link> = {
 
     const mentionNode = $createMentionNode(handle, uid);
     console.log('FIXME: mentionNode created for handle: ', { handle, uid });
-    actions.addAndStepInto(mentionNode);
-    //
-    // function isParent(node: unknown): node is Mdast.Parent {
-    //   return (node as { children?: any[] }).children instanceof Array;
-    // }
-    //
-    // (lexicalParent as ElementNode).append(mentionNode);
-    //
-    // if (isParent(mdastNode)) {
-    //   actions.visitChildren(mdastNode, lexicalParent);
-    // }
+
+    function isParent(node: unknown): node is Mdast.Parent {
+      return (node as { children?: any[] }).children instanceof Array;
+    }
+
+    if (USE_ELEMENT_NODE_STRATEGY) {
+      actions.addAndStepInto(mentionNode);
+    } else {
+      (lexicalParent as ElementNode).append(mentionNode);
+
+      if (isParent(mdastNode)) {
+        actions.visitChildren(mdastNode, lexicalParent);
+      }
+    }
   },
 };

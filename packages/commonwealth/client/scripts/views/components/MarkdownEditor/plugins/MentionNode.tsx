@@ -107,7 +107,7 @@ type MentionHTMLElementType = HTMLAnchorElement;
  *
  * Mention node that handles mentions.
  *
- * The markdoown syntax is:
+ * The markdown syntax is:
  *
  * [@inputneuron](/profile/id/3)
  */
@@ -194,23 +194,23 @@ export class MentionNode extends ElementNode {
       version: 1,
     };
   }
-
-  canInsertTextBefore(): boolean {
-    console.log('FIXME: canInsertTextBefore');
-    return true;
-  }
-
-  canInsertTextAfter(): boolean {
-    console.log('FIXME: canInsertTextAfter');
-    return true;
-  }
-  isInline(): boolean {
-    return true;
-  }
-
-  canBeEmpty(): boolean {
-    return true;
-  }
+  //
+  // canInsertTextBefore(): boolean {
+  //   console.log('FIXME: canInsertTextBefore');
+  //   return true;
+  // }
+  //
+  // canInsertTextAfter(): boolean {
+  //   console.log('FIXME: canInsertTextAfter');
+  //   return true;
+  // }
+  // isInline(): boolean {
+  //   return true;
+  // }
+  //
+  // canBeEmpty(): boolean {
+  //   return true;
+  // }
 }
 
 export function $createMentionNode(handle: string, uid: string): MentionNode {
