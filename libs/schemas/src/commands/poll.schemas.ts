@@ -1,3 +1,4 @@
+import { PollContext } from '@hicommonwealth/schemas';
 import { z } from 'zod';
 import { Vote } from '../entities/poll.schemas';
 import { PG_INT } from '../utils';
@@ -9,4 +10,5 @@ export const CreatePollVote = {
     option: z.string(),
   }),
   output: Vote,
+  context: PollContext,
 };
