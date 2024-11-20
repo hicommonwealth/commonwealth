@@ -47,6 +47,7 @@ export const CreateCommunity = {
 
     // hidden optional params
     token_name: z.string().optional(),
+    referral_link: z.string().optional(),
 
     // deprecated params to be removed
     default_symbol: z.string().max(9),

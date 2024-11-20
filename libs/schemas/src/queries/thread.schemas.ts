@@ -6,7 +6,7 @@ import {
   ProfileTags,
   Thread,
   ThreadVersionHistory,
-  User,
+  UserProfile,
 } from '../entities';
 import { ContestAction } from '../projections';
 import { PG_INT, paginationSchema } from '../utils';
@@ -52,12 +52,27 @@ export const ProfileTagsView = ProfileTags.extend({
   updated_at: z.date().or(z.string()).nullish(),
 });
 
-export const UserView = User.extend({
+export const UserView = z.object({
   id: PG_INT,
+  email: z.string().max(255).email().nullish(),
+  isAdmin: z.boolean().default(false).nullish(),
+  disableRichText: z.boolean().default(false).optional(),
+  emailVerified: z.boolean().default(false).nullish(),
+  selected_community_id: z.string().max(255).nullish(),
+  emailNotificationInterval: z
+    .enum(['weekly', 'never'])
+    .default('never')
+    .optional(),
+  promotional_emails_enabled: z.boolean().nullish(),
+  is_welcome_onboard_flow_complete: z.boolean().default(false).optional(),
+
+  profile: UserProfile,
+  xp_points: PG_INT.default(0).nullish(),
+  referral_link: z.string().nullish(),
+
   created_at: z.date().or(z.string()).nullish(),
   updated_at: z.date().or(z.string()).nullish(),
   ProfileTags: z.array(ProfileTagsView).optional(),
-  ApiKey: z.undefined(),
 });
 
 export const AddressView = Address.extend({

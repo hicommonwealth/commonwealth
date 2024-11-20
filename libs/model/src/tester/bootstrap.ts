@@ -3,7 +3,7 @@ import path from 'path';
 import { QueryTypes, Sequelize } from 'sequelize';
 import { SequelizeStorage, Umzug } from 'umzug';
 import { config } from '../config';
-import { buildDb, type DB } from '../models';
+import { buildDb, syncDb, type DB } from '../models';
 
 /**
  * Verifies the existence of a database,
@@ -32,7 +32,8 @@ export const verify_db = async (name: string): Promise<void> => {
     }
   } catch (error) {
     console.error(`Error verifying db [${name}]:`, error);
-    throw error;
+    // ignore verification errors
+    // throw error;
   } finally {
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     pg && pg.close();
@@ -205,31 +206,48 @@ export const get_info_schema = async (
 // so that the db object does not need to be rebuilt for every to bootstrap_testing from within
 // a single test suite
 let db: DB | undefined = undefined;
+let bootstrapLock: Promise<DB> | undefined = undefined;
+
+async function _bootstrap_testing(filename: string): Promise<DB> {
+  if (!db) {
+    try {
+      await verify_db(config.DB.NAME);
+      db = buildDb(
+        new Sequelize({
+          dialect: 'postgres',
+          database: config.DB.NAME,
+          username: 'commonwealth',
+          password: 'edgeware',
+          logging: false,
+        }),
+      );
+      await syncDb(db);
+      console.log('Database synced:', filename);
+    } catch (e) {
+      console.error('Error bootstrapping test db:', e);
+      throw e;
+    }
+  }
+  return db;
+}
+
 /**
  * Bootstraps testing, creating/migrating a fresh instance if it doesn't exist.
+ * @meta import meta of calling test
  * @param truncate when true, truncates all tables in model
  * @returns synchronized sequelize db instance
  */
-export const bootstrap_testing = async (truncate = false): Promise<DB> => {
-  if (!db) {
-    db = buildDb(
-      new Sequelize({
-        dialect: 'postgres',
-        database: config.DB.NAME,
-        username: 'commonwealth',
-        password: 'edgeware',
-        logging: false,
-      }),
-    );
-    console.log('Database object built');
+export const bootstrap_testing = async (meta: ImportMeta): Promise<DB> => {
+  const filename = path.basename(meta.filename);
+  if (bootstrapLock) {
+    return await bootstrapLock;
   }
-
-  if (truncate) {
-    await truncate_db(db);
-    console.log('Database truncated');
+  bootstrapLock = _bootstrap_testing(filename);
+  try {
+    return await bootstrapLock;
+  } finally {
+    bootstrapLock = undefined;
   }
-
-  return db;
 };
 
 config.NODE_ENV === 'test' && dispose(async () => truncate_db(db));

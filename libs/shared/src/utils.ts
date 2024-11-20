@@ -98,7 +98,7 @@ export function formatBucketUrlToAssetCDN(uploadLocation: string) {
     ['production', 'beta'].includes(process.env.APP_ENV)
   ) {
     const fileName = uploadLocation.split('/').pop() || '';
-    return `${S3_ASSET_BUCKET_CDN}/${fileName}`;
+    return `https://${S3_ASSET_BUCKET_CDN}/${fileName}`;
   }
   return uploadLocation;
 }

@@ -20,6 +20,16 @@ export const buildAssociations = (db: DB) => {
       foreignKey: 'user_id',
       onUpdate: 'CASCADE',
       onDelete: 'CASCADE',
+    })
+    .withMany(db.Referral, {
+      foreignKey: 'referrer_id',
+      onUpdate: 'CASCADE',
+      onDelete: 'CASCADE',
+    })
+    .withMany(db.Referral, {
+      foreignKey: 'referee_id',
+      onUpdate: 'CASCADE',
+      onDelete: 'CASCADE',
     });
 
   db.Quest.withMany(db.QuestActionMeta, {
@@ -85,7 +95,8 @@ export const buildAssociations = (db: DB) => {
       foreignKey: 'selected_community_id',
       as: 'selectedCommunity',
     })
-    .withMany(db.Quest, { onUpdate: 'CASCADE', onDelete: 'CASCADE' });
+    .withMany(db.Quest, { onUpdate: 'CASCADE', onDelete: 'CASCADE' })
+    .withMany(db.ContestManager, { onUpdate: 'CASCADE', onDelete: 'CASCADE' });
 
   db.Tags.withMany(db.ProfileTags, {
     foreignKey: 'tag_id',
@@ -128,11 +139,13 @@ export const buildAssociations = (db: DB) => {
   db.ContestManager.withMany(db.Contest, {
     foreignKey: 'contest_address',
     asMany: 'contests',
+    onDelete: 'CASCADE',
   });
 
   db.Contest.withMany(db.ContestAction, {
     foreignKey: ['contest_address', 'contest_id'],
     asMany: 'actions',
+    onDelete: 'CASCADE',
   });
 
   db.CommunityStake.withMany(db.StakeTransaction, {

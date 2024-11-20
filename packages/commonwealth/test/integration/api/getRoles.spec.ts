@@ -15,7 +15,7 @@ describe('get roles Integration Tests', () => {
   let server: TestServer;
 
   beforeAll(async () => {
-    server = await testServer();
+    server = await testServer(import.meta);
   });
 
   afterAll(async () => {

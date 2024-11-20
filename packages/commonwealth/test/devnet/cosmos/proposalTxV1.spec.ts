@@ -41,7 +41,7 @@ describe('Proposal Transaction Tests - gov v1 chain using cosmJs signer (csdk-v1
   let signer: string;
 
   beforeAll(async () => {
-    await tester.seedDb();
+    await tester.seedDb(import.meta);
     lcd = await getLCDClient(lcdUrl);
     const { signerAddress } = await setupTestSigner(rpcUrl);
     signer = signerAddress;

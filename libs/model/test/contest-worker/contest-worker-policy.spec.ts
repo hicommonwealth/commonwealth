@@ -5,7 +5,7 @@ import { dispose, handleEvent } from '@hicommonwealth/core';
 import { afterAll, beforeAll, describe, test } from 'vitest';
 import { commonProtocol, models } from '../../src';
 import { ContestWorker } from '../../src/policies';
-import { bootstrap_testing, seed } from '../../src/tester';
+import { seed } from '../../src/tester';
 
 describe('Contest Worker Policy', () => {
   const addressId = 444;
@@ -17,7 +17,6 @@ describe('Contest Worker Policy', () => {
   let topicId: number = 0;
 
   beforeAll(async () => {
-    await bootstrap_testing();
     const [chainNode] = await seed('ChainNode', { contracts: [] });
     const [user] = await seed(
       'User',

@@ -52,7 +52,7 @@ export function CreateToken(): Command<typeof schemas.CreateToken> {
         namespace: tokenData.parsedArgs.namespace,
         name: tokenInfo.name,
         symbol: tokenInfo.symbol,
-        initial_supply: tokenInfo.totalSupply,
+        initial_supply: Number(tokenInfo.totalSupply / BigInt(1e18)),
         liquidity_transferred: false,
         launchpad_liquidity: tokenData.parsedArgs.launchpadLiquidity,
         eth_market_cap_target: commonProtocol.getTargetMarketCap(),
