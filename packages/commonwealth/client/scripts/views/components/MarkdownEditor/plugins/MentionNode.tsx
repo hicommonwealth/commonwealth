@@ -12,6 +12,7 @@ import {
   BaseSelection,
   EditorConfig,
   ElementNode,
+  RangeSelection,
   SerializedElementNode,
   isHTMLAnchorElement,
   type DOMConversionMap,
@@ -144,6 +145,7 @@ export class MentionNode extends ElementNode {
     const element = document.createElement('a');
     element.href = this.__url;
     element.textContent = '@' + this.__handle;
+    element.contentEditable = 'true';
     element.setAttribute('data-lexical-mention', 'true');
     addClassNamesToElement(element, config.theme.link);
     return element;
@@ -201,6 +203,18 @@ export class MentionNode extends ElementNode {
       version: 1,
     };
   }
+
+  insertNewAfter(
+    _: RangeSelection,
+    restoreSelection = true,
+  ): null | ElementNode {
+    console.log('FIXME: insertNewAfter');
+
+    const node = $createMentionNode(this.__handle, this.__uid);
+    this.insertAfter(node, restoreSelection);
+    return node;
+  }
+
   canInsertTextBefore(): boolean {
     console.log('FIXME: canInsertTextBefore');
     return false;
@@ -214,7 +228,14 @@ export class MentionNode extends ElementNode {
     console.log('FIXME: isInline');
     return true;
   }
+  isSelectable(): boolean {
+    return true; // Allow the cursor to select the node
+  }
 
+  collapseAtStart(): boolean {
+    console.log('FIXME: collapseAtStart');
+    return true; // Allow the cursor to move into the node from the left
+  }
   canBeEmpty(): boolean {
     console.log('FIXME: canBeEmpty');
     return false;
@@ -225,6 +246,8 @@ export class MentionNode extends ElementNode {
     selection: BaseSelection,
     destination: 'clone' | 'html',
   ): boolean {
+    console.log('FIXME: extractWithChild');
+
     if (!$isRangeSelection(selection)) {
       return false;
     }
