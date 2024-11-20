@@ -16,7 +16,7 @@ export const calculateTokenPricing = (
         : priceChange) * 100 || 0
     ).toFixed(2),
   );
-  const marketCapCurrent = currentPrice * (token.initial_supply * ethToUsdRate);
+  const marketCapCurrent = currentPrice * token.initial_supply;
   const marketCapGoal = token.eth_market_cap_target * ethToUsdRate;
   const isMarketCapGoalReached = false;
 
