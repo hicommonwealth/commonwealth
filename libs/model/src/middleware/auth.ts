@@ -542,7 +542,7 @@ export function authPoll({ action }: AggregateAuthOptions) {
       permissions: action
         ? {
             topic_id: threadAuth.topic_id,
-            action: 'UPDATE_POLL',
+            action,
           }
         : undefined,
     });
