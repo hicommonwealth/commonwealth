@@ -1,5 +1,6 @@
 import { ChainBase, Roles } from '@hicommonwealth/shared';
 import { z } from 'zod';
+import { Referral } from '../entities';
 import { Tags } from '../entities/tag.schemas';
 import { UserProfile } from '../entities/user.schemas';
 import { PG_INT } from '../utils';
@@ -80,4 +81,20 @@ export const GetUserAddresses = {
       avatarUrl: z.string().nullish(),
     }),
   ),
+};
+
+export const ReferralView = Referral.extend({
+  referrer: z.object({
+    id: PG_INT,
+    profile: UserProfile,
+  }),
+  referee: z.object({
+    id: PG_INT,
+    profile: UserProfile,
+  }),
+});
+
+export const GetUserReferrals = {
+  input: z.object({ user_id: PG_INT.optional() }),
+  output: z.array(ReferralView),
 };

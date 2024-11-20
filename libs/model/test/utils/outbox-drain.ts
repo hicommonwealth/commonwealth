@@ -1,5 +1,4 @@
 import { Events, Projection, events, handleEvent } from '@hicommonwealth/core';
-import { delay } from '@hicommonwealth/shared';
 import { Op } from 'sequelize';
 import { ZodUndefined } from 'zod';
 import { models } from '../../src/database';
@@ -24,6 +23,7 @@ export async function drainOutbox<E extends Events>(
         [Op.gte]: from ?? new Date(Date.now() - 1000 * 60 * 60 * 24 * 7),
       },
     },
+    order: [['created_at', 'ASC']],
   });
   const projection = factory();
   for (const { event_name, event_payload } of drained) {
@@ -31,8 +31,8 @@ export async function drainOutbox<E extends Events>(
       name: event_name,
       payload: event_payload,
     });
-    console.log(`>>> ${event_name} >>> ${factory.name}`);
+    console.log(
+      `>>> ${event_name} >>> ${factory.name} >>> ${JSON.stringify(event_payload)}`,
+    );
   }
-  // take a breather
-  await delay(500);
 }

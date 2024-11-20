@@ -23,11 +23,13 @@ export const buildAssociations = (db: DB) => {
     })
     .withMany(db.Referral, {
       foreignKey: 'referrer_id',
+      asOne: 'referrer',
       onUpdate: 'CASCADE',
       onDelete: 'CASCADE',
     })
     .withMany(db.Referral, {
       foreignKey: 'referee_id',
+      asOne: 'referee',
       onUpdate: 'CASCADE',
       onDelete: 'CASCADE',
     });
