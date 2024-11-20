@@ -367,9 +367,15 @@ export async function startLoginWithMagicLink({
     localStorage.setItem('magic_provider', provider!);
     localStorage.setItem('magic_chain', chain!);
     localStorage.setItem('magic_redirect_to', window.location.href);
+
+    let redirectURI = new URL('/finishsociallogin', window.location.origin)
+      .href;
+    if (process.env.APP_ENV === 'production') {
+      redirectURI = 'https://commonwealth.im/finishsociallogin';
+    }
     await magic.oauth2.loginWithRedirect({
       provider,
-      redirectURI: new URL('/finishsociallogin', window.location.origin).href,
+      redirectURI,
     });
 
     // magic should redirect away from this page, but we return after 5 sec if it hasn't
