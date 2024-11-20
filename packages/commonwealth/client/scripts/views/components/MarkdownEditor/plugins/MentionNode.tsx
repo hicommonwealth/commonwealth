@@ -8,6 +8,8 @@
 
 import {
   $applyNodeReplacement,
+  $isRangeSelection,
+  BaseSelection,
   EditorConfig,
   ElementNode,
   SerializedElementNode,
@@ -178,10 +180,15 @@ export class MentionNode extends ElementNode {
       },
     };
   }
+  // FIXME here ******************************
 
   static importJSON(serializedNode: SerializedMentionNode): MentionNode {
     console.log('FIXME importJSON');
-    return $createMentionNode(serializedNode.handle, serializedNode.uid);
+    const node = $createMentionNode(serializedNode.handle, serializedNode.uid);
+    node.setFormat(serializedNode.format);
+    node.setIndent(serializedNode.indent);
+    node.setDirection(serializedNode.direction);
+    return node;
   }
 
   exportJSON(): SerializedMentionNode {
@@ -194,23 +201,43 @@ export class MentionNode extends ElementNode {
       version: 1,
     };
   }
-  //
-  // canInsertTextBefore(): boolean {
-  //   console.log('FIXME: canInsertTextBefore');
-  //   return true;
-  // }
-  //
-  // canInsertTextAfter(): boolean {
-  //   console.log('FIXME: canInsertTextAfter');
-  //   return true;
-  // }
-  // isInline(): boolean {
-  //   return true;
-  // }
-  //
-  // canBeEmpty(): boolean {
-  //   return true;
-  // }
+  canInsertTextBefore(): boolean {
+    console.log('FIXME: canInsertTextBefore');
+    return false;
+  }
+
+  canInsertTextAfter(): boolean {
+    console.log('FIXME: canInsertTextAfter');
+    return false;
+  }
+  isInline(): boolean {
+    console.log('FIXME: isInline');
+    return true;
+  }
+
+  canBeEmpty(): boolean {
+    console.log('FIXME: canBeEmpty');
+    return false;
+  }
+
+  extractWithChild(
+    child: LexicalNode,
+    selection: BaseSelection,
+    destination: 'clone' | 'html',
+  ): boolean {
+    if (!$isRangeSelection(selection)) {
+      return false;
+    }
+
+    const anchorNode = selection.anchor.getNode();
+    const focusNode = selection.focus.getNode();
+
+    return (
+      this.isParentOf(anchorNode) &&
+      this.isParentOf(focusNode) &&
+      selection.getTextContent().length > 0
+    );
+  }
 }
 
 export function $createMentionNode(handle: string, uid: string): MentionNode {

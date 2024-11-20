@@ -5,9 +5,9 @@ import {
   $createMentionNode,
   parseHandleFromMention,
   parseIdFromPath,
-} from 'views/components/MarkdownEditor/plugins/MentionNodeAsTextNode';
+} from 'views/components/MarkdownEditor/plugins/MentionNode';
 
-const USE_ELEMENT_NODE_STRATEGY = false;
+const USE_ELEMENT_NODE_STRATEGY = true;
 
 export const MentionMdastImportVisitor: MdastImportVisitor<Mdast.Link> = {
   testNode: (mdastNode: Mdast.Nodes, options: Descriptors): boolean => {
