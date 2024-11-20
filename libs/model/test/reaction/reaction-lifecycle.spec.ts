@@ -1,8 +1,8 @@
 import { dispose } from '@hicommonwealth/core';
 import { expect } from 'chai';
-import { seed } from 'model/src/tester';
 import { afterAll, beforeAll, describe, test } from 'vitest';
 import { models } from '../../src/database';
+import { seed } from '../../src/tester';
 
 describe('Reactions lifecycle', () => {
   const addressId = 555;

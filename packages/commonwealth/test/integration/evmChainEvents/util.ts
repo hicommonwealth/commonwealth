@@ -31,11 +31,13 @@ export async function createEventSources(): Promise<{
     max_ce_block_range: -1,
   });
   const namespaceAbiInstance = await models.ContractAbi.create({
+    id: 1,
     abi: namespaceFactoryAbi,
     nickname: 'NamespaceFactory',
     abi_hash: hashAbi(namespaceFactoryAbi),
   });
   const stakesAbiInstance = await models.ContractAbi.create({
+    id: 2,
     abi: communityStakesAbi,
     nickname: 'CommunityStakes',
     abi_hash: hashAbi(communityStakesAbi),

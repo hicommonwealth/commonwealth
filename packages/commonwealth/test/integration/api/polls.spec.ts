@@ -34,7 +34,7 @@ describe('Polls', () => {
   let server: TestServer;
 
   beforeAll(async () => {
-    server = await testServer(import.meta);
+    server = await testServer();
 
     const topic = await server.models.Topic.findOne({
       where: {
