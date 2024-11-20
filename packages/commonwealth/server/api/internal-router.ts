@@ -10,6 +10,7 @@ import * as email from './emails';
 import * as feed from './feed';
 import * as integrations from './integrations';
 import * as loadTest from './load-test';
+import * as poll from './poll';
 import * as subscription from './subscription';
 import * as superAdmin from './super-admin';
 import * as thread from './thread';
@@ -32,6 +33,7 @@ const api = {
   superAdmin: superAdmin.trpcRouter,
   discordBot: discordBot.trpcRouter,
   token: token.trpcRouter,
+  poll: poll.trpcRouter,
 };
 
 if (config.NOTIFICATIONS.FLAG_KNOCK_INTEGRATION_ENABLED) {

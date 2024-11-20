@@ -6,7 +6,7 @@ import { PG_INT } from '../utils';
 export const CreatePollVote = {
   input: z.object({
     thread_id: PG_INT,
-    pollId: z.number(),
+    poll_id: z.number(),
     option: z.string(),
   }),
   output: Vote,

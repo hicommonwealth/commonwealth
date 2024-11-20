@@ -7,10 +7,11 @@ import {
 import {
   AuthContext,
   CommentContext,
+  PollContext,
   ThreadContext,
 } from '@hicommonwealth/schemas';
 import moment from 'moment';
-import type { AddressInstance, ThreadInstance } from '../models';
+import type { AddressInstance, PollInstance, ThreadInstance } from '../models';
 
 const log = logger(import.meta);
 
@@ -113,6 +114,16 @@ export function mustBeAuthorizedComment(
     topic_id: number;
     thread_id: number;
     comment_id: number;
+  };
+}
+
+export function mustBeAuthorizedPoll(actor: Actor, context?: PollContext) {
+  if (!context?.address) throw new InvalidActor(actor, 'Not authorized');
+  if (!context?.poll) throw new InvalidActor(actor, 'Not authorized poll');
+  return context as PollContext & {
+    address: AddressInstance;
+    poll: PollInstance;
+    thread: ThreadInstance;
   };
 }
 
