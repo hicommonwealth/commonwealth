@@ -32,6 +32,10 @@ export function UpdateContestManagerMetadata(): Command<
         contestManager.name = payload.name;
       }
 
+      if (typeof payload.description !== 'undefined') {
+        contestManager.description = payload.description;
+      }
+
       if (typeof payload.topic_id !== 'undefined') {
         const topic = await models.Topic.findByPk(payload.topic_id);
         if (!topic) {

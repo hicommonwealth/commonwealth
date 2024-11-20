@@ -81,9 +81,25 @@ const CommunitiesPage = () => {
   } = useFetchCommunitiesQuery({
     limit: 50,
     include_node_info: true,
-    order_by:
-      communitySortOptionsLabelToKeysMap[filters.withCommunitySortBy || ''] ||
-      'lifetime_thread_count',
+    order_by: (() => {
+      if (
+        filters.withCommunitySortBy &&
+        [
+          CommunitySortOptions.MemberCount,
+          CommunitySortOptions.ThreadCount,
+          CommunitySortOptions.MostRecent,
+        ].includes(filters.withCommunitySortBy)
+      ) {
+        return (
+          (communitySortOptionsLabelToKeysMap[
+            filters.withCommunitySortBy
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          ] as any) || 'lifetime_thread_count'
+        );
+      }
+
+      return 'lifetime_thread_count';
+    })(),
     order_direction:
       sortOrderLabelsToDirectionsMap[filters.withCommunitySortOrder || ''] ||
       'DESC',
@@ -305,7 +321,7 @@ const CommunitiesPage = () => {
 
           <IdeaLaunchpad />
         </div>
-        <TokensList />
+        <TokensList filters={filters} />
         {tokenizedCommunityEnabled && <CWText type="h2">Communities</CWText>}
         {isLoading && communitiesList.length === 0 ? (
           <CWCircleMultiplySpinner />

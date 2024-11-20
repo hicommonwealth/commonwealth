@@ -1,21 +1,27 @@
 import { Button } from 'frames.js/express';
 import React from 'react';
 import { frames } from '../../config';
-import { circleCheckIcon, circleXIcon, fakeApiCall } from '../../utils';
+import { circleCheckIcon, circleXIcon, getFarcasterUser } from '../../utils';
 
 export const checkEligibility = frames(async (ctx) => {
-  let eligible: boolean;
+  let ethAddress: string | null | undefined = null;
 
   try {
-    await fakeApiCall({ error: 'error' });
-    eligible = true;
-  } catch {
-    eligible = false;
+    const fid = ctx.message?.requesterFid;
+    if (!fid) {
+      throw new Error('invalid fid');
+    }
+    const user = await getFarcasterUser(fid);
+    ethAddress = user?.custody_address;
+  } catch (err) {
+    console.warn(err);
   }
 
-  const icon = eligible ? circleCheckIcon : circleXIcon;
-  const title = eligible ? 'You are eligible to enter' : 'You are not eligible';
-  const description = eligible
+  const icon = ethAddress ? circleCheckIcon : circleXIcon;
+  const title = ethAddress
+    ? `You are eligible to enter`
+    : 'You are not eligible';
+  const description = ethAddress
     ? 'Reply to this cast or quote this frame to be entered into the contest.'
     : 'In order to enter this contest you must connect an Ethereum wallet to your Farcaster account.';
 
@@ -47,6 +53,8 @@ export const checkEligibility = frames(async (ctx) => {
         >
           {title}
         </p>
+
+        <p style={{ fontSize: '28px', padding: '0 20%' }}>{ethAddress}</p>
 
         <p style={{ fontSize: '32px', padding: '0 20%' }}>{description}</p>
       </div>

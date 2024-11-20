@@ -341,6 +341,26 @@ export const contestAbi = [
   },
   {
     inputs: [],
+    name: 'contestLength',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'endContest',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [],
     name: 'newContest',
     outputs: [],
     stateMutability: 'nonpayable',

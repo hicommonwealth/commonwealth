@@ -1,5 +1,6 @@
 import clsx from 'clsx';
 import { currencyNameToSymbolMap, SupportedCurrencies } from 'helpers/currency';
+import numeral from 'numeral';
 import React from 'react';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { CWText } from '../component_kit/cw_text';
@@ -32,8 +33,8 @@ const MarketCapProgress = ({
       <div className="prices">
         <CWText className="text-dark caps" type="caption">
           MCAP {currencySymbol}
-          {marketCap.current} | Goal {currencySymbol}
-          {marketCap.goal}
+          {numeral(marketCap.current).format('0.0a')} | Goal {currencySymbol}
+          {numeral(marketCap.goal).format('0.0a')}
         </CWText>
         {isCapped && (
           <CWIcon iconName="rocketLaunch" className="token-capped-icon" />

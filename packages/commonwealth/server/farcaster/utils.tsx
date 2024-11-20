@@ -1,3 +1,6 @@
+import { Actor, query } from '@hicommonwealth/core';
+import { Contest, config } from '@hicommonwealth/model';
+import { NeynarAPIClient } from '@neynar/nodejs-sdk';
 import React from 'react';
 
 // This might not be needed in the future but for now reduces the amount of boilerplate
@@ -110,3 +113,30 @@ export const getRandomColor = () =>
 
 export const getInvertedColor = (randomColor: string) =>
   (parseInt(randomColor, 16) ^ 16777215).toString(16);
+
+export const getFarcasterUser = async (fid: number) => {
+  const client = new NeynarAPIClient(config.CONTESTS.NEYNAR_API_KEY!);
+  const farcasterUser = await client.fetchBulkUsers([fid]);
+  return farcasterUser.users.at(0);
+};
+
+export const getContestManagerScores = async (contest_address: string) => {
+  const actor: Actor = { user: { email: '' } };
+  const results = await query(Contest.GetAllContests(), {
+    actor,
+    payload: { contest_address },
+  });
+
+  if (!results?.length) {
+    throw new Error('contest manager not found');
+  }
+
+  const contestManager = results[0];
+
+  const prizes =
+    contestManager.contests[0].score?.map(
+      (score) => Number(score.prize) / 10 ** contestManager.decimals,
+    ) || [];
+
+  return { contestManager, prizes };
+};

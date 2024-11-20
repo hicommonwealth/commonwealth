@@ -9,6 +9,7 @@ export const CreateContestManagerMetadata = {
     community_id: z.string(),
     contest_address: z.string().describe('On-Chain contest manager address'),
     name: z.string(),
+    description: z.string().nullish(),
     image_url: z.string().optional(),
     funding_token_address: z
       .string()
@@ -45,6 +46,7 @@ export const UpdateContestManagerMetadata = {
     community_id: z.string(),
     contest_address: z.string().describe('On-Chain contest manager address'),
     name: z.string().optional(),
+    description: z.string().optional(),
     image_url: z.string().optional(),
     topic_id: PG_INT.optional(),
   }),
