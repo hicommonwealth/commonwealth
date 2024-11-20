@@ -1,3 +1,4 @@
+import { TokenView } from '@hicommonwealth/schemas';
 import 'components/sidebar/CommunitySection/CommunitySection.scss';
 import { findDenominationString } from 'helpers/findDenomination';
 import { useFlag } from 'hooks/useFlag';
@@ -17,6 +18,7 @@ import { getUniqueTopicIdsIncludedInActiveContest } from 'views/components/sideb
 import { SubscriptionButton } from 'views/components/subscription_button';
 import ManageCommunityStakeModal from 'views/modals/ManageCommunityStakeModal/ManageCommunityStakeModal';
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
+import { z } from 'zod';
 import useManageCommunityStakeModalStore from '../../../../state/ui/modals/manageCommunityStakeModal';
 import Permissions from '../../../../utils/Permissions';
 import AccountConnectionIndicator from '../AccountConnectionIndicator';
@@ -108,7 +110,7 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
         {tokenizedCommunityEnabled && communityToken && (
           <TokenTradeWidget
             showSkeleton={isLoadingToken}
-            token={communityToken}
+            token={communityToken as z.infer<typeof TokenView>}
           />
         )}
 

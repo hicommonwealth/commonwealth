@@ -1,8 +1,14 @@
 import { TokenView } from '@hicommonwealth/schemas';
 import { ChainBase } from '@hicommonwealth/shared';
+import { calculateTokenPricing } from 'helpers/launchpad';
 import React, { useState } from 'react';
+import app from 'state';
+import { useFetchTokenUsdRateQuery } from 'state/api/communityStake';
 import TradeTokenModal from 'views/modals/TradeTokenModel';
-import { TradingMode } from 'views/modals/TradeTokenModel/TradeTokenForm';
+import {
+  TokenWithCommunity,
+  TradingMode,
+} from 'views/modals/TradeTokenModel/TradeTokenForm';
 import { z } from 'zod';
 import MarketCapProgress from '../../../TokenCard/MarketCapProgress';
 import PricePercentageChange from '../../../TokenCard/PricePercentageChange';
@@ -22,34 +28,37 @@ export const TokenTradeWidget = ({
   showSkeleton,
   token,
 }: TokenTradeWidgetProps) => {
-  const currentPrice = (token as any).latest_price || 0; // TODO: fix type
-  const price24HrAgo = (token as any).old_price || 0; // TODO: fix type
-  const pricePercentage24HourChange = parseFloat(
-    (((currentPrice - price24HrAgo) / price24HrAgo) * 100 || 0).toFixed(2),
-  );
-
   const [isWidgetExpanded, setIsWidgetExpanded] = useState(true);
   const [tokenLaunchModalConfig, setTokenLaunchModalConfig] = useState<{
     isOpen: boolean;
     tradeConfig?: {
       mode: TradingMode;
-      token: z.infer<typeof TokenView>;
+      token: z.infer<typeof TokenWithCommunity>;
       addressType: ChainBase;
     };
   }>({ isOpen: false, tradeConfig: undefined });
+
+  const { data: ethToCurrencyRateData, isLoading: isLoadingETHToCurrencyRate } =
+    useFetchTokenUsdRateQuery({
+      tokenSymbol: 'ETH',
+    });
+  const ethToUsdRate = parseFloat(
+    ethToCurrencyRateData?.data?.data?.amount || '0',
+  );
+  const tokenPricing = calculateTokenPricing(token, ethToUsdRate);
 
   const handleCTAClick = (mode: TradingMode) => {
     setTokenLaunchModalConfig({
       isOpen: true,
       tradeConfig: {
         mode,
-        token,
+        token: { ...token, community_id: app.activeChainId() || '' },
         addressType: ChainBase.Ethereum,
       },
     });
   };
 
-  if (showSkeleton) {
+  if (showSkeleton || isLoadingETHToCurrencyRate) {
     return <TokenTradeWidgetSkeleton />;
   }
 
@@ -69,18 +78,20 @@ export const TokenTradeWidget = ({
       {isWidgetExpanded && (
         <>
           <CWText type="h3" fontWeight="bold" className="pad-8">
-            {token.symbol} {(token as any).latest_price || '$10.68'}
+            {token.symbol} {tokenPricing.currentPrice}
           </CWText>
 
           <PricePercentageChange
-            pricePercentage24HourChange={pricePercentage24HourChange}
+            pricePercentage24HourChange={
+              tokenPricing.pricePercentage24HourChange
+            }
             alignment="left"
             className="pad-8"
           />
           <MarketCapProgress
             marketCap={{
-              current: 300,
-              goal: 1000,
+              current: tokenPricing.marketCapCurrent,
+              goal: tokenPricing.marketCapGoal,
             }}
           />
           <div className="action-btns">
@@ -101,7 +112,7 @@ export const TokenTradeWidget = ({
       {tokenLaunchModalConfig.tradeConfig && (
         <TradeTokenModal
           isOpen={tokenLaunchModalConfig.isOpen}
-          tradeConfig={tokenLaunchModalConfig.tradeConfig as any} // TODO: fix this type
+          tradeConfig={tokenLaunchModalConfig.tradeConfig}
           onModalClose={() => setTokenLaunchModalConfig({ isOpen: false })}
         />
       )}

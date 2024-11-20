@@ -13,7 +13,7 @@ const useGetTokenByCommunityId = ({
   with_stats = true,
   enabled,
 }: UseFetchTokensProps) => {
-  return trpc.token.getToken.useInfiniteQuery(
+  return trpc.token.getToken.useQuery(
     {
       community_id,
       with_stats,
