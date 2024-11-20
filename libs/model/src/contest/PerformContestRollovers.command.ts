@@ -40,7 +40,7 @@ export function PerformContestRollovers(): Command<
                                                                    GROUP BY contest_address)) co
                           ON co.contest_address = cm.contest_address
                               AND (
-                                 cm.interval = 0 AND cm.ended IS NOT TRUE
+                                 (cm.interval = 0 AND cm.ended IS NOT TRUE)
                                      OR
                                  cm.interval > 0
                                  )
@@ -88,7 +88,7 @@ export function PerformContestRollovers(): Command<
           );
 
           // clean up neynar webhooks when farcaster contest ends
-          if (interval === 0 && neynar_webhook_id) {
+          if (neynar_webhook_id) {
             try {
               const client = new NeynarAPIClient(
                 config.CONTESTS.NEYNAR_API_KEY!,
