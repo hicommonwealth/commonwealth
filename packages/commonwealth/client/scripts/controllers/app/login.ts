@@ -319,13 +319,11 @@ async function constructMagic(isCosmos: boolean, chain?: string) {
 export async function startLoginWithMagicLink({
   email,
   provider,
-  redirectTo,
   chain,
   isCosmos,
 }: {
   email?: string;
   provider?: WalletSsoSource;
-  redirectTo?: string;
   chain?: string;
   isCosmos: boolean;
 }) {
@@ -352,15 +350,12 @@ export async function startLoginWithMagicLink({
 
     return { bearer, address };
   } else {
-    const params = `?redirectTo=${
-      redirectTo ? encodeURIComponent(redirectTo) : ''
-    }&chain=${chain || ''}&sso=${provider}`;
+    localStorage.setItem('magic_provider', provider!);
+    localStorage.setItem('magic_chain', chain!);
+    localStorage.setItem('magic_redirect_to', window.location.href);
     await magic.oauth2.loginWithRedirect({
       provider,
-      redirectURI: new URL(
-        '/finishsociallogin' + params,
-        window.location.origin,
-      ).href,
+      redirectURI: new URL('/finishsociallogin', window.location.origin).href,
     });
 
     // magic should redirect away from this page, but we return after 5 sec if it hasn't

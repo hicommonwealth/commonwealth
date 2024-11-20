@@ -165,7 +165,6 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       const { address: magicAddress } = await startLoginWithMagicLink({
         email: tempEmailToUse,
         isCosmos,
-        redirectTo: document.location.pathname + document.location.search,
         chain: app.chain?.id,
       });
       setIsMagicLoading(false);
@@ -190,7 +189,6 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       const { address: magicAddress } = await startLoginWithMagicLink({
         provider,
         isCosmos,
-        redirectTo: document.location.pathname + document.location.search,
         chain: app.chain?.id,
       });
       setIsMagicLoading(false);
