@@ -1,3 +1,4 @@
+import useBrowserWindow from 'client/scripts/hooks/useBrowserWindow';
 import React, { useState } from 'react';
 import useGrowlStore from 'state/ui/growl';
 import { CWCheckbox } from 'views/components/component_kit/cw_checkbox';
@@ -17,6 +18,7 @@ interface CWGrowlTemplateProps {
   growlImage?: string;
   extraText?: string;
   growlType: string;
+  blackCloseButton?: boolean;
 }
 
 //CWGrowlTemplate should be placed in Sublayout.tsx when used for general announcements
@@ -30,9 +32,10 @@ export const CWGrowlTemplate = ({
   growlImage,
   extraText,
   growlType,
+  blackCloseButton,
 }: CWGrowlTemplateProps) => {
   const { setIsGrowlHidden, isGrowlHidden } = useGrowlStore();
-
+  const { isWindowSmallInclusive } = useBrowserWindow({});
   const [shouldHideGrowlPermanently, setShouldHideGrowlPermanently] =
     useState(false);
 
@@ -55,20 +58,32 @@ export const CWGrowlTemplate = ({
   };
 
   return (
-    <CWGrowl disabled={isDisabled} position="bottom-right">
+    <CWGrowl
+      disabled={isDisabled}
+      position={isWindowSmallInclusive ? 'center' : 'bottom-right'}
+    >
       <div className="CWGrowlTemplate">
         <CWIconButton
           iconName="close"
           iconSize="medium"
-          className={`closeButton ${!growlImage ? 'noGrowlImage' : ''}`}
+          className={`closeButton ${!growlImage ? 'noGrowlImage' : ''} ${blackCloseButton ? 'blackCloseButton' : ''}`}
           onClick={handleExit}
         />
         {growlImage && <img src={growlImage} alt="" className="img" />}
         <div className="container">
-          <CWText type="h2" fontWeight="bold" isCentered>
+          <CWText
+            type={isWindowSmallInclusive ? 'h4' : 'h2'}
+            fontWeight="bold"
+            isCentered
+          >
             {headerText}
           </CWText>
-          <CWText type="b1" fontWeight="medium" isCentered className="body">
+          <CWText
+            type={isWindowSmallInclusive ? 'b2' : 'b1'}
+            fontWeight="medium"
+            isCentered
+            className="body"
+          >
             {bodyText}
           </CWText>
           {buttonLink && (
