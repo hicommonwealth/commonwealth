@@ -45,6 +45,7 @@ export function GetToken(): Query<typeof schemas.GetToken> {
           }
           SELECT T.*${with_stats ? ', trades.latest_price, trades.old_price' : ''}
           FROM "Tokens" as T
+          ${with_stats ? 'LEFT JOIN trades ON trades.token_address = T.token_address' : ''}
           WHERE T.namespace = :namespace;
       `;
 
