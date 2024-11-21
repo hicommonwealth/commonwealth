@@ -7,7 +7,7 @@ env:
   NODE_ENV: 'test'
   ROLLBAR_ENV: 'GitHubCI'
   TEST_WITHOUT_LOGS: 'true'
-  PRIVATE_KEY: '83c65f24efbc8f4bc54ad425e897fc3ea01f760d5e71671a30eacb075ebe2313'
+  PRIVATE_KEY: '0x83c65f24efbc8f4bc54ad425e897fc3ea01f760d5e71671a30eacb075ebe2313'
   USES_DOCKER_PGSQL: true
   PORT: 8080
   REDIS_URL: redis://localhost:6379
