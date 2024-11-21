@@ -28,7 +28,7 @@ export function CreatePollVote(): Command<typeof schemas.CreatePollVote> {
       }
 
       // TODO: migrate this to be JSONB array of strings in the DB
-      let options = JSON.parse(poll.options);
+      const options = JSON.parse(poll.options);
       if (!options.includes(payload.option)) {
         throw new InvalidState(CreateVotePollErrors.InvalidOption);
       }
