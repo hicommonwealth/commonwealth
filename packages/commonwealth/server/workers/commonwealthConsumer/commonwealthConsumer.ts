@@ -8,11 +8,11 @@ import {
   startHealthCheckLoop,
 } from '@hicommonwealth/adapters';
 import {
-  Actor,
   Broker,
   BrokerSubscriptions,
+  EventNames,
   broker,
-  command,
+  handleEvent,
   logger,
   stats,
 } from '@hicommonwealth/core';
@@ -144,27 +144,19 @@ function startRolloverLoop() {
 
   const loop = async () => {
     try {
-      await command(
-        Contest.CheckContests(),
-        {
-          actor: {} as Actor,
-          payload: { id: '' },
-        },
-        false,
-      );
+      await handleEvent(ContestWorker(), {
+        name: EventNames.CheckContests,
+        payload: {},
+      });
     } catch (err) {
       log.error(err);
     }
 
     try {
-      await command(
-        Contest.PerformContestRollovers(),
-        {
-          actor: {} as Actor,
-          payload: { id: '' },
-        },
-        false,
-      );
+      await handleEvent(ContestWorker(), {
+        name: EventNames.RolloverContests,
+        payload: {},
+      });
     } catch (err) {
       log.error(err);
     }

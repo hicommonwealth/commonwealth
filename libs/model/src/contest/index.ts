@@ -1,5 +1,4 @@
 export * from './CancelContestManagerMetadata.command';
-export * from './CheckContests.command';
 export * from './Contests.projection';
 export * from './CreateContestManagerMetadata.command';
 export * from './FarcasterCastCreatedWebhook.command';
@@ -11,5 +10,4 @@ export * from './GetContest.query';
 export * from './GetContestLog.query';
 export * from './GetFarcasterContestCasts';
 export * from './GetFarcasterUpvoteActionMetadata.query';
-export * from './PerformContestRollovers.command';
 export * from './UpdateContestManagerMetadata.command';

@@ -1,6 +1,6 @@
 import Sinon from 'sinon';
 
-import { Actor, command, dispose, EventNames } from '@hicommonwealth/core';
+import { dispose, EventNames, handleEvent } from '@hicommonwealth/core';
 import {
   commonProtocol,
   ContestWorker,
@@ -9,7 +9,6 @@ import {
 } from '@hicommonwealth/model';
 import { expect } from 'chai';
 import { Contests } from 'model/src/contest';
-import { CheckContests } from 'model/src/contest/CheckContests.command';
 import { literal } from 'sequelize';
 import { afterAll, beforeAll, describe, test } from 'vitest';
 import { bootstrap_testing, seed } from '../../src/tester';
@@ -168,9 +167,9 @@ describe('Check Contests', () => {
       },
     );
 
-    await command(CheckContests(), {
-      actor: {} as Actor,
-      payload: { id: '' },
+    await handleEvent(ContestWorker(), {
+      name: EventNames.CheckContests,
+      payload: {},
     });
 
     expect(voteContentStub.called, 'vote should not be cast yet').to.be.false;
@@ -188,9 +187,9 @@ describe('Check Contests', () => {
       },
     );
 
-    await command(CheckContests(), {
-      actor: {} as Actor,
-      payload: { id: '' },
+    await handleEvent(ContestWorker(), {
+      name: EventNames.CheckContests,
+      payload: {},
     });
 
     expect(voteContentStub.called, 'vote should have been cast').to.be.true;

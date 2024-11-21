@@ -35,6 +35,8 @@ export enum EventNames {
   FarcasterCastCreated = 'FarcasterCastCreated',
   FarcasterReplyCastCreated = 'FarcasterReplyCastCreated',
   FarcasterVoteCreated = 'FarcasterVoteCreated',
+  CheckContests = 'CheckContests',
+  RolloverContests = 'RolloverContests',
 
   // Preferences
   SubscriptionPreferencesUpdated = 'SubscriptionPreferencesUpdated',
@@ -112,6 +114,14 @@ export type EventPairs =
   | {
       event_name: EventNames.FarcasterVoteCreated;
       event_payload: z.infer<typeof events.FarcasterVoteCreated>;
+    }
+  | {
+      event_name: EventNames.CheckContests;
+      event_payload: z.infer<typeof events.CheckContests>;
+    }
+  | {
+      event_name: EventNames.RolloverContests;
+      event_payload: z.infer<typeof events.RolloverContests>;
     }
   | {
       event_name: EventNames.DiscordThreadCreated;

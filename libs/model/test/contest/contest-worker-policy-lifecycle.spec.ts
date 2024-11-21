@@ -1,10 +1,10 @@
 import { expect } from 'chai';
 import Sinon from 'sinon';
 
-import { Actor, command, dispose, EventNames } from '@hicommonwealth/core';
+import { dispose, EventNames, handleEvent } from '@hicommonwealth/core';
 import { literal } from 'sequelize';
 import { afterAll, beforeAll, describe, test } from 'vitest';
-import { commonProtocol, Contest, emitEvent, models } from '../../src';
+import { commonProtocol, emitEvent, models } from '../../src';
 import { Contests } from '../../src/contest';
 import { ContestWorker } from '../../src/policies';
 import { bootstrap_testing, seed } from '../../src/tester';
@@ -179,14 +179,10 @@ describe('Contest Worker Policy Lifecycle', () => {
 
     expect(voteContentStub.called, 'voteContent was not called').to.be.true;
 
-    command(
-      Contest.PerformContestRollovers(),
-      {
-        actor: {} as Actor,
-        payload: { id: '' },
-      },
-      false,
-    );
+    await handleEvent(ContestWorker(), {
+      name: EventNames.RolloverContests,
+      payload: {},
+    });
 
     const contestManagerBeforeContestEnded =
       await models.ContestManager.findByPk(contestAddress);
@@ -209,14 +205,10 @@ describe('Contest Worker Policy Lifecycle', () => {
       },
     );
 
-    await command(
-      Contest.PerformContestRollovers(),
-      {
-        actor: {} as Actor,
-        payload: { id: '' },
-      },
-      false,
-    );
+    await handleEvent(ContestWorker(), {
+      name: EventNames.RolloverContests,
+      payload: {},
+    });
 
     const contestManagerAfterContestEnded =
       await models.ContestManager.findByPk(contestAddress);
