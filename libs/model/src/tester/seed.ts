@@ -63,7 +63,6 @@ export async function seed<T extends schemas.Aggregates>(
   options: SeedOptions = { mock: true },
 ): Promise<[z.infer<(typeof schemas)[T]> | undefined, State[]]> {
   const db = await bootstrap_testing();
-
   const records: State[] = [];
   await _seed(db![name], values ?? {}, options, records, 0);
   return [records.at(0) as any, records];

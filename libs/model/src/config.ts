@@ -41,10 +41,7 @@ const {
   OPENAI_ORGANIZATION,
 } = process.env;
 
-const NAME =
-  target.NODE_ENV === 'test'
-    ? `common_test_${process.env.VITEST_POOL_ID ?? ''}`
-    : 'commonwealth';
+const NAME = target.NODE_ENV === 'test' ? 'common_test' : 'commonwealth';
 
 const DEFAULTS = {
   JWT_SECRET: 'my secret',
