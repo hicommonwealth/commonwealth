@@ -119,7 +119,7 @@ describe('Polls', () => {
 
   test('should fail to cast a vote with invalid option', async () => {
     try {
-      const res = await command(Poll.CreatePollVote(), {
+      await command(Poll.CreatePollVote(), {
         actor: {
           user: {
             id: userId,
@@ -134,6 +134,7 @@ describe('Polls', () => {
         },
       });
       expect.fail();
+      // eslint-disable-next-line no-empty
     } catch (e) {}
   });
 
