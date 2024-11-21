@@ -33,6 +33,7 @@ export function GetToken(): Query<typeof schemas.GetToken> {
                                   older_trades AS (SELECT DISTINCT ON (token_address) *
                                                    FROM "LaunchpadTrades"
                                                    WHERE timestamp >=
+                                                         -- eslint-disable-next-line max-len
                                                          (SELECT EXTRACT(EPOCH FROM CURRENT_TIMESTAMP - INTERVAL '24 hours'))
                                                    ORDER BY token_address, timestamp ASC),
                                   trades AS (SELECT lt.token_address,
