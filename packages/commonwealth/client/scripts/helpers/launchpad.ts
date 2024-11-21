@@ -21,7 +21,7 @@ export const calculateTokenPricing = (
   const isMarketCapGoalReached = false; // TODO: https://github.com/hicommonwealth/commonwealth/issues/9887
 
   return {
-    currentPrice: `${currentPrice.toFixed(8)}`,
+    currentPrice: parseFloat(`${currentPrice.toFixed(8)}`),
     pricePercentage24HourChange,
     marketCapCurrent,
     marketCapGoal,

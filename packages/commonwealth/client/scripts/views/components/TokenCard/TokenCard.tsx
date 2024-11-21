@@ -4,6 +4,7 @@ import React, { ReactNode } from 'react';
 import { CWText } from '../component_kit/cw_text';
 import { CWButton } from '../component_kit/new_designs/CWButton';
 import { CWTooltip } from '../component_kit/new_designs/CWTooltip';
+import FractionalValue from '../FractionalValue';
 import MarketCapProgress from './MarketCapProgress';
 import PricePercentageChange from './PricePercentageChange';
 import './TokenCard.scss';
@@ -14,7 +15,7 @@ interface TokenCardProps {
   iconURL: string;
   currency?: SupportedCurrencies;
   marketCap: { current: number; goal: number };
-  price: string;
+  price: number;
   pricePercentage24HourChange: number;
   mode: 'buy' | 'swap';
   className?: string;
@@ -101,7 +102,12 @@ const TokenCard = ({
         <div className="col">
           <CWText className="text-dark ml-auto" type="h4" fontWeight="regular">
             {currencySymbol}
-            {price}
+            <FractionalValue
+              value={price}
+              type="h4"
+              fontWeight="regular"
+              className="text-dark"
+            />
           </CWText>
           <CWText className="ml-auto text-light" type="caption">
             <PricePercentageChange
