@@ -9,7 +9,7 @@ let sequelize: Sequelize;
 let models: DB;
 
 function connect_sequelize() {
-  if (sequelize) sequelize.close();
+  if (sequelize) void sequelize.close();
 
   sequelize = new Sequelize(config.DB.URI, {
     // disable string operators (https://github.com/sequelize/sequelize/issues/8417)

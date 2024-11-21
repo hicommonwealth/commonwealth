@@ -28,19 +28,19 @@ export function GetToken(): Query<typeof schemas.GetToken> {
           ${
             with_stats
               ? `WITH latest_trades AS (SELECT DISTINCT ON (token_address) *
-                                                    FROM "LaunchpadTrades"
-                                                    ORDER BY token_address, timestamp DESC),
-                                  older_trades AS (SELECT DISTINCT ON (token_address) *
-                                                   FROM "LaunchpadTrades"
-                                                   WHERE timestamp >=
-                                                         (SELECT EXTRACT(EPOCH FROM CURRENT_TIMESTAMP - INTERVAL '24 hours'))
-                                                   ORDER BY token_address, timestamp ASC),
-                                  trades AS (SELECT lt.token_address,
-                                                    lt.price as latest_price,
-                                                    ot.price as old_price
-                                             FROM latest_trades lt
-                                                      LEFT JOIN
-                                                  older_trades ot ON lt.token_address = ot.token_address)`
+                    FROM "LaunchpadTrades"
+                    ORDER BY token_address, timestamp DESC),
+                    older_trades AS (SELECT DISTINCT ON (token_address) *
+                      FROM "LaunchpadTrades"
+                      WHERE timestamp >=
+                            (SELECT EXTRACT(EPOCH FROM CURRENT_TIMESTAMP - INTERVAL '24 hours'))
+                      ORDER BY token_address, timestamp ASC),
+                    trades AS (SELECT lt.token_address,
+                    lt.price as latest_price,
+                    ot.price as old_price
+                    FROM latest_trades lt
+                      LEFT JOIN
+                      older_trades ot ON lt.token_address = ot.token_address)`
               : ''
           }
           SELECT T.*${with_stats ? ', trades.latest_price, trades.old_price' : ''}
