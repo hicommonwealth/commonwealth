@@ -172,7 +172,7 @@ function startRolloverLoop() {
 
   // TODO: move to external service triggered via scheduler?
   setInterval(() => {
-    loop();
+    loop().catch(console.error);
   }, 1_000 * 60);
 }
 
