@@ -144,7 +144,7 @@ export function ContestWorker(): Policy<typeof inputs> {
           author_address: payload.address!,
         });
       },
-      CheckContests: async ({ payload }) => {
+      CheckContests: async () => {
         const activeContestManagers = await GetActiveContestManagers().body({
           actor: {} as Actor,
           payload: {},
@@ -193,7 +193,7 @@ export function ContestWorker(): Policy<typeof inputs> {
           log.error(`CheckContests: failed with errors: ${errors.join(', ')}"`);
         }
       },
-      RolloverContests: async ({ payload }) => {
+      RolloverContests: async () => {
         const contestManagersWithEndedContest = await models.sequelize.query<{
           contest_address: string;
           interval: number;
