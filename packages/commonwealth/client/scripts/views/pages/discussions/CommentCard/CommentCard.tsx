@@ -7,6 +7,7 @@ import {
   deserializeCanvas,
   verify,
 } from '@hicommonwealth/shared';
+import { ReactQuillEditor } from 'client/scripts/views/components/react_quill_editor';
 import clsx from 'clsx';
 import { GetThreadActionTooltipTextResponse } from 'helpers/threads';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
@@ -27,7 +28,6 @@ import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
-import { ReactQuillEditor } from 'views/components/react_quill_editor';
 import { deserializeDelta } from 'views/components/react_quill_editor/utils';
 import { ToggleCommentSubscribe } from 'views/pages/discussions/CommentCard/ToggleCommentSubscribe';
 import { AuthorAndPublishInfo } from '../ThreadCard/AuthorAndPublishInfo';
@@ -104,9 +104,11 @@ export const CommentCard = ({
   const userOwnsComment = comment.profile.userId === user.id;
 
   const [commentText, setCommentText] = useState(comment.text);
-  const commentBody = deserializeDelta(
-    (editDraft || commentText) ?? comment.text,
-  );
+  const commentBody = React.useMemo(() => {
+    const rawContent = editDraft || commentText || comment.text;
+    const deserializedContent = deserializeDelta(rawContent);
+    return deserializedContent;
+  }, [editDraft, commentText, comment.text]);
   const [commentDelta, setCommentDelta] = useState<DeltaStatic>(commentBody);
   const author =
     comment?.author && app?.chain?.accounts
@@ -121,7 +123,9 @@ export const CommentCard = ({
   const [contentUrlBodyToFetch, setContentUrlBodyToFetch] = useState<
     string | null
   >(null);
-
+  useEffect(() => {
+    setCommentDelta(commentBody);
+  }, [commentBody]);
   useRunOnceOnCondition({
     callback: () => {
       comment.contentUrl && setContentUrlBodyToFetch(comment.contentUrl);
