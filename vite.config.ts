@@ -26,7 +26,6 @@ export default defineConfig({
       },
     },
     sequence: { concurrent: false },
-    reporters: ['default'],
     coverage: {
       include: ['src/**/*.ts'],
       exclude: ['src/**/*.d.ts', '**/migrations/**', '**/node_modules/**'],
