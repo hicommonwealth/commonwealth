@@ -214,6 +214,7 @@ const DetailsFormStep = ({
           contest_address: contestAddress,
           name: values.contestName,
           image_url: values.contestImage,
+          description: values.contestDescription,
         });
 
         goBack();

@@ -1,6 +1,7 @@
 import { TokenView } from '@hicommonwealth/schemas';
 import { ChainBase } from '@hicommonwealth/shared';
 import clsx from 'clsx';
+import { calculateTokenPricing } from 'helpers/launchpad';
 import { useFlag } from 'hooks/useFlag';
 import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
 import React, { useState } from 'react';
@@ -84,29 +85,6 @@ const TokensList = ({ filters }: TokensListProps) => {
     }
   };
 
-  const calculateTokenPricing = (token: z.infer<typeof TokenView>) => {
-    const currentPrice = token.latest_price || 0;
-    const currentPriceRoundingExponent =
-      currentPrice !== 0
-        ? Math.floor(Math.log10(Math.abs(currentPrice)))
-        : currentPrice;
-    const price24HrAgo = token.old_price || 0;
-    const pricePercentage24HourChange = parseFloat(
-      (((currentPrice - price24HrAgo) / price24HrAgo) * 100 || 0).toFixed(2),
-    );
-    const marketCapCurrent = currentPrice * token.initial_supply;
-    const marketCapGoal = token.eth_market_cap_target * ethToUsdRate;
-    const isMarketCapGoalReached = false;
-
-    return {
-      currentPrice: `${currentPrice.toFixed(-currentPriceRoundingExponent || 2)}`,
-      pricePercentage24HourChange,
-      marketCapCurrent,
-      marketCapGoal,
-      isMarketCapGoalReached,
-    };
-  };
-
   if (!tokenizedCommunityEnabled) return <></>;
 
   return (
@@ -131,6 +109,7 @@ const TokensList = ({ filters }: TokensListProps) => {
           {(tokens || []).map((token) => {
             const pricing = calculateTokenPricing(
               token as z.infer<typeof TokenView>,
+              ethToUsdRate,
             );
 
             return (
