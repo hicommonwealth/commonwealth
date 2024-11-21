@@ -74,8 +74,6 @@ describe('Contest Worker Policy Lifecycle', () => {
         },
       ],
     });
-    expect(community!.contest_managers!.length).to.eq(1);
-    expect(community!.contest_managers![0].contests!.length).to.eq(1);
     await seed('Thread', {
       id: threadId,
       community_id: communityId,

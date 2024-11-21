@@ -42,10 +42,10 @@ export function GetActiveContestManagers(): Query<
                            FROM "Contests"
                            GROUP BY contest_address) co ON cm.contest_address = co.contest_address
                      LEFT JOIN "ContestActions" ca on (
-                ca.contest_address = cm.contest_address AND
-                ca.created_at > co.start_time AND
-                ca.created_at < co.end_time
-                )
+                      ca.contest_address = cm.contest_address AND
+                      ca.created_at > co.start_time AND
+                      ca.created_at < co.end_time
+                     )
             WHERE
               cm.cancelled IS NOT TRUE
               AND cm.ended IS NOT TRUE
@@ -56,7 +56,7 @@ export function GetActiveContestManagers(): Query<
                     OR
                 cm.interval > 0
                 )
-            GROUP BY cn.eth_chain_id, cn.private_url, cn.url, cm.contest_address, co.max_contest_id
+            GROUP BY cn.eth_chain_id, cn.private_url, cn.url, cm.contest_address, co.max_contest_id, co.end_time
         `,
         {
           type: QueryTypes.SELECT,

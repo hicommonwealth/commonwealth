@@ -142,16 +142,37 @@ export async function setupCommonwealthConsumer(): Promise<void> {
 function startRolloverLoop() {
   log.info('Starting rollover loop');
 
+  const loop = async () => {
+    try {
+      await command(
+        Contest.CheckContests(),
+        {
+          actor: {} as Actor,
+          payload: { id: '' },
+        },
+        false,
+      );
+    } catch (err) {
+      log.error(err);
+    }
+
+    try {
+      await command(
+        Contest.PerformContestRollovers(),
+        {
+          actor: {} as Actor,
+          payload: { id: '' },
+        },
+        false,
+      );
+    } catch (err) {
+      log.error(err);
+    }
+  };
+
   // TODO: move to external service triggered via scheduler?
   setInterval(() => {
-    command(
-      Contest.PerformContestRollovers(),
-      {
-        actor: {} as Actor,
-        payload: { id: '' },
-      },
-      false,
-    ).catch(console.error);
+    loop();
   }, 1_000 * 60);
 }
 

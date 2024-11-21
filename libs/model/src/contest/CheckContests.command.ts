@@ -1,5 +1,6 @@
 import { Actor, logger, query, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
+import moment from 'moment';
 import Web3 from 'web3';
 import { config } from '../config';
 import { createOnchainContestVote } from '../policies/contest-utils';
@@ -31,7 +32,7 @@ export function CheckContests(): Command<typeof schemas.CheckContests> {
           !contestManager.actions.some(
             (action) => action.action === 'upvoted',
           ) &&
-          Date.now() - contestManager.end_time.getTime() < 1000 * 60 * 60,
+          moment(contestManager.end_time).diff(moment(), 'minutes') < 60,
       );
 
       const promises = contestsWithoutVote.map(async (contestManager) => {
