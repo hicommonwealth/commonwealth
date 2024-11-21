@@ -84,12 +84,17 @@ export const TokenTradeWidget = ({
       {isWidgetExpanded && (
         <>
           <CWText type="h3" fontWeight="bold" className="pad-8">
-            {token.symbol} {currencySymbol}
-            <FractionalValue
-              value={tokenPricing.currentPrice}
-              type="h3"
-              fontWeight="bold"
-            />
+            <CWText type="h3" fontWeight="bold">
+              {token.symbol}
+            </CWText>
+            <CWText type="h3" fontWeight="bold" className="ml-auto">
+              {currencySymbol}
+              <FractionalValue
+                value={tokenPricing.currentPrice}
+                type="h3"
+                fontWeight="bold"
+              />
+            </CWText>
           </CWText>
 
           <PricePercentageChange
