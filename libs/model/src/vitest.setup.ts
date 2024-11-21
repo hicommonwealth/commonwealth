@@ -13,7 +13,7 @@ beforeAll(async ({ name }) => {
 
     const { sequelize, connect_sequelize } = await import('./database');
     await sequelize.close();
-    const { sequelize: vite_sequelize } = await connect_sequelize();
+    const { sequelize: vite_sequelize } = connect_sequelize();
     console.log(`LC-SUITE: ${suite_name} => ${vite_sequelize.config.database}`);
   }
 });

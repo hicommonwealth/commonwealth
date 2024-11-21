@@ -19,7 +19,7 @@ export default defineConfig({
       threads: { minThreads: 1, maxThreads: 1 },
       forks: { minForks: 1, maxForks: 5 },
     },
-    maxConcurrency: 1,
+    fileParallelism: process.env.npm_package_name === '@hicommonwealth/model',
     sequence: { concurrent: false },
     coverage: {
       include: ['src/**/*.ts'],
