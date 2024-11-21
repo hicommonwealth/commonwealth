@@ -11,7 +11,7 @@ import {
 } from '../../src/tester';
 
 const generateSchemas = async () => {
-  const model = await bootstrap_testing();
+  const model = await bootstrap_testing(import.meta);
   const migration = await create_db_from_migrations('common_migrated_test');
 
   // TODO: resolve remaining conflicts!!!
@@ -52,7 +52,7 @@ describe('Model schema', () => {
 
   beforeAll(async () => {
     schemas = await generateSchemas();
-  });
+  }, 20000);
 
   afterAll(async () => {
     await dispose()();

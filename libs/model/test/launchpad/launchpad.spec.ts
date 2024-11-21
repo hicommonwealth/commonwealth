@@ -3,7 +3,7 @@ import { config, equalEvmAddresses } from '@hicommonwealth/model';
 import { BalanceType, commonProtocol } from '@hicommonwealth/shared';
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import { bootstrap_testing, seed } from 'model/src/tester';
+import { seed } from 'model/src/tester';
 import { afterAll, beforeAll, describe, test } from 'vitest';
 import { ChainNodeAttributes } from '../../src';
 import { CreateLaunchpadTrade, CreateToken } from '../../src/token';
@@ -22,7 +22,6 @@ describe('Launchpad Lifecycle', () => {
   let node: ChainNodeAttributes;
 
   beforeAll(async () => {
-    await bootstrap_testing(true);
     [node] = (await seed('ChainNode', {
       url: `https://base-sepolia.g.alchemy.com/v2/${config.ALCHEMY.APP_KEYS.PUBLIC}`,
       private_url: `https://base-sepolia.g.alchemy.com/v2/${config.ALCHEMY.APP_KEYS.PUBLIC}`,
@@ -111,7 +110,7 @@ describe('Launchpad Lifecycle', () => {
         trader_address: '0x2cE1F5d4f84B583Ab320cAc0948AddE52a131FBE',
         is_buy: true,
         community_token_amount: '534115082271506067334',
-        price: '2507151',
+        price: 3.98859030778e-7,
         floating_supply: '535115082271506067334',
         timestamp: 1731523956,
       });

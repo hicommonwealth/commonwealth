@@ -103,7 +103,7 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
 
         <CWDivider />
         <DiscussionSection
-          isContestAvailable={stakeEnabled && isContestAvailable}
+          isContestAvailable={isContestAvailable}
           // @ts-expect-error <StrictNullChecks/>
           topicIdsIncludedInContest={topicIdsIncludedInContest}
         />

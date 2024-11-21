@@ -10,6 +10,7 @@ const useCreateTokenMutation = () => {
       user.setData({ addressSelectorSelectedAddress: undefined });
 
       await utils.token.getTokens.invalidate();
+      await utils.token.getTokens.refetch();
     },
   });
 };

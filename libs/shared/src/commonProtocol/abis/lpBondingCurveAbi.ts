@@ -1,4 +1,4 @@
-export const LPBondingCurveAbi = [
+export const lpBondingCurveAbi = [
   {
     type: 'constructor',
     inputs: [
