@@ -11,8 +11,9 @@ export default defineConfig({
   test: {
     setupFiles: [path.resolve(__dirname, './libs/model/src/vitest.setup.ts')],
     poolMatchGlobs: [
-      ['**/*-lifecycle.spec.ts', 'threads'],
-      ['**/*.spec.ts', 'forks'],
+      ['**/libs/model/**/*-lifecycle.spec.ts', 'threads'],
+      ['**/libs/model/**/*.spec.ts', 'forks'],
+      ['**/commonwealth/**/*.spec.ts', 'forks'],
     ],
     poolOptions: {
       threads: {
@@ -27,6 +28,8 @@ export default defineConfig({
     sequence: { concurrent: false },
     reporters: ['default'],
     coverage: {
+      include: ['src/**/*.ts'],
+      exclude: ['src/**/*.d.ts', '**/migrations/**', '**/node_modules/**'],
       provider: 'istanbul',
       reporter:
         process.env.CI === 'true'
