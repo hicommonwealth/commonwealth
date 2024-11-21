@@ -127,6 +127,18 @@ export const Outbox = z.union([
     .merge(BaseOutboxProperties),
   z
     .object({
+      event_name: z.literal(EventNames.CheckContests),
+      event_payload: events.CheckContests,
+    })
+    .merge(BaseOutboxProperties),
+  z
+    .object({
+      event_name: z.literal(EventNames.RolloverContests),
+      event_payload: events.RolloverContests,
+    })
+    .merge(BaseOutboxProperties),
+  z
+    .object({
       event_name: z.literal(EventNames.DiscordThreadCreated),
       event_payload: events.DiscordThreadCreated,
     })
