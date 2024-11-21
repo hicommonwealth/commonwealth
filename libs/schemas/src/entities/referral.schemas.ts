@@ -1,5 +1,6 @@
 import z from 'zod';
 import { PG_INT } from '../utils';
+import { UserProfile } from './user.schemas';
 
 export const REFERRAL_EVENTS = ['CommunityCreated'] as const;
 
@@ -11,5 +12,19 @@ export const Referral = z
     event_payload: z.any().describe('The payload of the event'),
     created_at: z.coerce.date().optional(),
     // TODO: add other metrics
+
+    // associations
+    referrer: z
+      .object({
+        id: PG_INT,
+        profile: UserProfile,
+      })
+      .optional(),
+    referee: z
+      .object({
+        id: PG_INT,
+        profile: UserProfile,
+      })
+      .optional(),
   })
   .describe('Projects referral events');

@@ -1,0 +1,13 @@
+@import '../../../../styles/shared';
+
+.PricePercentageChange {
+  width: fit-content;
+
+  &.negative {
+    color: $rorange-500;
+  }
+
+  &.positive {
+    color: $green-600;
+  }
+}
