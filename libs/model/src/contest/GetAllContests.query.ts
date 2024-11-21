@@ -1,4 +1,4 @@
-import { Query } from '@hicommonwealth/core';
+import { InvalidInput, Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
 import { z } from 'zod';
@@ -10,6 +10,9 @@ export function GetAllContests(): Query<typeof schemas.GetAllContests> {
     auth: [],
     secure: false,
     body: async ({ payload }) => {
+      if (!payload.community_id && !payload.contest_address) {
+        throw new InvalidInput('Must specify community_id or contest_address');
+      }
       const results = await models.sequelize.query<
         z.infer<typeof schemas.ContestResults>
       >(
@@ -23,6 +26,7 @@ select
   cm.created_at,
   cm.name,
   cm.image_url,
+  cm.description,
   cm.funding_token_address,
   cm.prize_percentage,
   cm.payout_structure,
@@ -69,12 +73,9 @@ from
 	  group by c.contest_address
   ) as c on cm.contest_address = c.contest_address
 where
-  cm.community_id = :community_id
-  ${
-    payload.contest_address
-      ? `and cm.contest_address = '${payload.contest_address}'`
-      : ''
-  }
+  ${payload.community_id ? 'cm.community_id = :community_id' : ''}
+  ${payload.community_id && payload.contest_address ? 'and' : ''}
+  ${payload.contest_address ? `cm.contest_address = :contest_address` : ''}
 group by
   cm.community_id,
   cm.contest_address,
@@ -84,6 +85,7 @@ group by
   cm.created_at,
   cm.name,
   cm.image_url,
+  cm.description,
   cm.funding_token_address,
   cm.prize_percentage,
   cm.payout_structure,
@@ -95,7 +97,10 @@ order by
         {
           type: QueryTypes.SELECT,
           raw: true,
-          replacements: { community_id: payload.community_id },
+          replacements: {
+            community_id: payload.community_id,
+            contest_address: payload.contest_address,
+          },
         },
       );
       results.forEach((r) => {

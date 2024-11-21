@@ -67,7 +67,8 @@ describe('Contests projection lifecycle', () => {
     getContestScore = Sinon.stub(contestHelper, 'getContestScore');
     getContestStatus = Sinon.stub(contestHelper, 'getContestStatus');
 
-    await bootstrap_testing();
+    // TODO: add ContractAbi to seeder aggregates and replace direct model calls below to avoid calling this here
+    await bootstrap_testing(import.meta);
 
     try {
       const recurringContestAbi = await models.ContractAbi.create({
@@ -350,6 +351,7 @@ describe('Contests projection lifecycle', () => {
         payout_structure,
         funding_token_address,
         image_url,
+        description: null,
         interval,
         ticker,
         decimals,

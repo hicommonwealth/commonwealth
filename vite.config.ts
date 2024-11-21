@@ -1,16 +1,21 @@
 /// <reference types="vitest" />
 
-import path from 'path';
+import * as dotenv from 'dotenv';
 import { defineConfig } from 'vite';
 import tsconfigPaths from 'vite-tsconfig-paths';
+
+dotenv.config();
+
+const pkg = process.env.npm_package_name!;
+const parallel = !['@hicommonwealth/model', 'commonwealth'].includes(pkg);
+
+console.log('vitest:', pkg, 'parallel:', parallel);
 
 export default defineConfig({
   plugins: [tsconfigPaths()],
   test: {
-    globalSetup: path.resolve(
-      __dirname,
-      './libs/model/src/tester/vitestDatabaseSetup.ts',
-    ),
+    sequence: { concurrent: false },
+    fileParallelism: parallel,
     coverage: {
       provider: 'istanbul',
       reporter:
