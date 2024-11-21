@@ -11,8 +11,9 @@ beforeAll(async ({ name }) => {
     config.DB.NAME = suite_db;
     config.DB.URI = `postgresql://commonwealth:edgeware@localhost/${suite_db}`;
 
-    const { connect_sequelize } = await import('./database');
-    const { sequelize } = connect_sequelize();
-    console.log(`LC-SUITE: ${suite_name} => ${sequelize.config.database}`);
+    const { sequelize, connect_sequelize } = await import('./database');
+    await sequelize.close();
+    const { sequelize: vite_sequelize } = await connect_sequelize();
+    console.log(`LC-SUITE: ${suite_name} => ${vite_sequelize.config.database}`);
   }
 });

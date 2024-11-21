@@ -11,20 +11,15 @@ export default defineConfig({
   test: {
     setupFiles: [path.resolve(__dirname, './libs/model/src/vitest.setup.ts')],
     poolMatchGlobs: [
-      ['**/libs/model/**/*-lifecycle.spec.ts', 'threads'],
-      ['**/libs/model/**/*.spec.ts', 'forks'],
-      ['**/commonwealth/**/*.spec.ts', 'forks'],
+      // lifecycle tests in forks pool (uses node:child_process)
+      ['**/libs/model/**/*-lifecycle.spec.ts', 'forks'],
+      // everything else runs in threads pool
     ],
     poolOptions: {
-      threads: {
-        minThreads: 1,
-        maxThreads: 5,
-      },
-      forks: {
-        minForks: 1,
-        maxForks: 1,
-      },
+      threads: { minThreads: 1, maxThreads: 1 },
+      forks: { minForks: 1, maxForks: 5 },
     },
+    maxConcurrency: 1,
     sequence: { concurrent: false },
     coverage: {
       include: ['src/**/*.ts'],
