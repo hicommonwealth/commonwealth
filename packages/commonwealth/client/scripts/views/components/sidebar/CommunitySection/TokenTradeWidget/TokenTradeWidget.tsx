@@ -15,6 +15,7 @@ import { CWDivider } from '../../../component_kit/cw_divider';
 import { CWIconButton } from '../../../component_kit/cw_icon_button';
 import { CWText } from '../../../component_kit/cw_text';
 import { CWButton } from '../../../component_kit/new_designs/CWButton';
+import FractionalValue from '../../../FractionalValue';
 import MarketCapProgress from '../../../TokenCard/MarketCapProgress';
 import PricePercentageChange from '../../../TokenCard/PricePercentageChange';
 import './TokenTradeWidget.scss';
@@ -84,7 +85,11 @@ export const TokenTradeWidget = ({
         <>
           <CWText type="h3" fontWeight="bold" className="pad-8">
             {token.symbol} {currencySymbol}
-            {tokenPricing.currentPrice}
+            <FractionalValue
+              value={tokenPricing.currentPrice}
+              type="h3"
+              fontWeight="bold"
+            />
           </CWText>
 
           <PricePercentageChange
