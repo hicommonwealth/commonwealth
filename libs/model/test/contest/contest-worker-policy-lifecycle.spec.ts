@@ -18,8 +18,7 @@ describe('Contest Worker Policy Lifecycle', () => {
   const threadTitle = 'Hello There';
   const contestAddress = '0x1';
   const contestId = 0;
-  const contentId = 1;
-  let topicId: number = 0;
+  const topicId: number = 0;
 
   beforeAll(async () => {
     await bootstrap_testing(import.meta);
@@ -33,7 +32,7 @@ describe('Contest Worker Policy Lifecycle', () => {
       },
       //{ mock: true, log: true },
     );
-    const [community] = await seed('Community', {
+    await seed('Community', {
       id: communityId,
       chain_node_id: chainNode!.id,
       lifetime_thread_count: 0,
