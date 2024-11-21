@@ -122,10 +122,8 @@ export function PerformContestRollovers(): Command<
         );
 
       if (errors.length > 0) {
-        log.warn(
-          `GetAllContests performContestRollovers: failed with errors: ${errors.join(
-            ', ',
-          )}"`,
+        log.error(
+          `PerformContestRollovers: failed with errors: ${errors.join(', ')}"`,
         );
       }
     },

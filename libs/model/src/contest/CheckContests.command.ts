@@ -64,7 +64,7 @@ export function CheckContests(): Command<typeof schemas.CheckContests> {
         );
 
       if (errors.length > 0) {
-        log.warn(`CheckContests: failed with errors: ${errors.join(', ')}"`);
+        log.error(`CheckContests: failed with errors: ${errors.join(', ')}"`);
       }
     },
   };
