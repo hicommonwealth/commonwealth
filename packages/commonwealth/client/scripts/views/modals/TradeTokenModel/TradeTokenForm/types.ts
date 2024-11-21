@@ -10,7 +10,7 @@ export enum TradingMode {
   Sell = 'sell',
 }
 
-const TokenWithCommunity = TokenView.extend({
+export const TokenWithCommunity = TokenView.extend({
   community_id: z.string(),
 });
 

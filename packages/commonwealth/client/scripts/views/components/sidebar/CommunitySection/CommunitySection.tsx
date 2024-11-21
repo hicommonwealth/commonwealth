@@ -1,8 +1,11 @@
+import { TokenView } from '@hicommonwealth/schemas';
 import 'components/sidebar/CommunitySection/CommunitySection.scss';
 import { findDenominationString } from 'helpers/findDenomination';
+import { useFlag } from 'hooks/useFlag';
 import React from 'react';
 import app from 'state';
 import { useFetchCustomDomainQuery } from 'state/api/configuration';
+import { useGetTokenByCommunityId } from 'state/api/tokens';
 import { useCommunityAlertsQuery } from 'state/api/trpc/subscription/useCommunityAlertsQuery';
 import useUserStore from 'state/ui/user';
 import {
@@ -15,6 +18,7 @@ import { getUniqueTopicIdsIncludedInActiveContest } from 'views/components/sideb
 import { SubscriptionButton } from 'views/components/subscription_button';
 import ManageCommunityStakeModal from 'views/modals/ManageCommunityStakeModal/ManageCommunityStakeModal';
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
+import { z } from 'zod';
 import useManageCommunityStakeModalStore from '../../../../state/ui/modals/manageCommunityStakeModal';
 import Permissions from '../../../../utils/Permissions';
 import AccountConnectionIndicator from '../AccountConnectionIndicator';
@@ -25,12 +29,15 @@ import { DiscussionSection } from '../discussion_section';
 import { ExternalLinksModule } from '../external_links_module';
 import { GovernanceSection } from '../governance_section';
 import { CommunitySectionSkeleton } from './CommunitySectionSkeleton';
+import { TokenTradeWidget } from './TokenTradeWidget';
 
 interface CommunitySectionProps {
   showSkeleton: boolean;
 }
 
 export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
+  const tokenizedCommunityEnabled = useFlag('tokenizedCommunity');
+
   const user = useUserStore();
   const {
     selectedAddress,
@@ -53,6 +60,14 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
     useCommunityContests();
 
   const { data: domain } = useFetchCustomDomainQuery();
+
+  const communityId = app.activeChainId() || '';
+  const { data: communityToken, isLoading: isLoadingToken } =
+    useGetTokenByCommunityId({
+      community_id: communityId,
+      with_stats: true,
+      enabled: !!communityId,
+    });
 
   const topicIdsIncludedInContest = getUniqueTopicIdsIncludedInActiveContest(
     contestsData.all,
@@ -90,6 +105,13 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
               />
             )}
           </>
+        )}
+
+        {tokenizedCommunityEnabled && communityToken && (
+          <TokenTradeWidget
+            showSkeleton={isLoadingToken}
+            token={communityToken as z.infer<typeof TokenView>}
+          />
         )}
 
         <CreateCommunityButton />

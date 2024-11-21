@@ -29,6 +29,7 @@ import Poll from './poll';
 import ProfileTags from './profile_tags';
 import { Quest, QuestAction, QuestActionMeta } from './quest';
 import Reaction from './reaction';
+import { Referral } from './referral';
 import SsoToken from './sso_token';
 import StakeTransaction from './stake_transaction';
 import StarredCommunity from './starred_community';
@@ -76,6 +77,7 @@ export const Factories = {
   QuestAction,
   QuestActionMeta,
   Reaction,
+  Referral,
   SsoToken,
   StakeTransaction,
   StarredCommunity,

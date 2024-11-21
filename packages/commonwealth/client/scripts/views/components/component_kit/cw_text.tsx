@@ -34,7 +34,7 @@ type FontType =
   | 'monospace1'
   | 'monospace2';
 
-type TextStyleProps = {
+export type TextStyleProps = {
   className?: string;
   disabled?: boolean;
   fontStyle?: FontStyle;

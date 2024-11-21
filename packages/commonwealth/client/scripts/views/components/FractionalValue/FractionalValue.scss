@@ -1,0 +1,16 @@
+@import '../../../../styles/shared';
+
+.FractionalValue {
+  height: fit-content;
+
+  span {
+    all: inherit;
+  }
+
+  sub {
+    all: unset;
+    font-size: 75%;
+    vertical-align: baseline;
+    margin-top: 5%;
+  }
+}
