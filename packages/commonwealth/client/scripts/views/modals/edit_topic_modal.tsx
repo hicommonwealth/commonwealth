@@ -1,5 +1,5 @@
 import { pluralizeWithoutNumberPrefix } from 'helpers';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import type { Topic } from '../../models/Topic';
 import { useCommonNavigate } from '../../navigation/helpers';
 import app from '../../state';
@@ -77,7 +77,7 @@ export const EditTopicModal = ({
     setCharacterCount(count);
   }, [description]);
 
-  useMemo(() => {
+  useEffect(() => {
     if ((description?.ops || [])?.[0]?.insert?.length > 250) {
       setDescErrorMsg('Description must be 250 characters or less');
     } else {
@@ -207,8 +207,7 @@ export const EditTopicModal = ({
         <div className="char-error-row">
           <CWText type="caption">Character count: {characterCount}/250</CWText>
           <MessageRow
-            // @ts-expect-error <StrictNullChecks/>
-            statusMessage={descErrorMsg}
+            statusMessage={descErrorMsg || ''}
             hasFeedback={!!descErrorMsg}
             validationStatus={descErrorMsg ? 'failure' : undefined}
           />
