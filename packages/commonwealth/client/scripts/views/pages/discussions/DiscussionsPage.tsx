@@ -403,6 +403,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
                     bodyText="'Overview' page has been merged with the 'All' page"
                     buttonText="test"
                     growlType="discussion"
+                    blackCloseButton
                   />
                 </>
               );
