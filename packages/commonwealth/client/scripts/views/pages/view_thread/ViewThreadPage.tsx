@@ -662,15 +662,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                   ) : thread && !isGloballyEditing && user.isLoggedIn ? (
                     <>
                       {threadOptionsComp}
-                      <CreateComment
-                        rootThread={thread}
-                        canComment={canComment}
-                        tooltipText={
-                          typeof disabledActionsTooltipText === 'function'
-                            ? disabledActionsTooltipText?.('comment')
-                            : disabledActionsTooltipText
-                        }
-                      />
                       {foundGatedTopic &&
                         !hideGatingBanner &&
                         isRestrictedMembership && (
@@ -743,6 +734,18 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                 commentSortType={commentSortType}
                 disabledActionsTooltipText={disabledActionsTooltipText}
               />
+
+              {thread && (
+                <CreateComment
+                  rootThread={thread}
+                  canComment={canComment}
+                  tooltipText={
+                    typeof disabledActionsTooltipText === 'function'
+                      ? disabledActionsTooltipText?.('comment')
+                      : disabledActionsTooltipText
+                  }
+                />
+              )}
             </>
           }
           editingDisabled={isTopicInContest}

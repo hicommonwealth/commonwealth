@@ -10,13 +10,13 @@ import React, { useEffect, useMemo, useState } from 'react';
 import app from 'state';
 import { useCreateCommentMutation } from 'state/api/comments';
 import useUserStore from 'state/ui/user';
+import { StickEditorContainer } from 'views/components/StickEditorContainer';
 import Thread from '../../../models/Thread';
 import { useFetchProfilesByAddressesQuery } from '../../../state/api/profiles/index';
 import { jumpHighlightComment } from '../../pages/discussions/CommentTree/helpers';
 import { createDeltaFromText, getTextFromDelta } from '../react_quill_editor';
 import { serializeDelta } from '../react_quill_editor/utils';
 import { ArchiveMsg } from './ArchiveMsg';
-import { CommentEditor } from './CommentEditor';
 
 type CreateCommentProps = {
   handleIsReplying?: (isReplying: boolean, id?: number) => void;
@@ -151,12 +151,11 @@ export const CreateComment = ({
   }, [handleIsReplying, saveDraft, contentDelta]);
 
   return rootThread.archivedAt === null ? (
-    <CommentEditor
+    <StickEditorContainer
       parentType={parentType}
       canComment={canComment}
       handleSubmitComment={handleSubmitComment}
-      // @ts-expect-error <StrictNullChecks/>
-      errorMsg={errorMsg}
+      errorMsg={errorMsg ?? ''}
       contentDelta={contentDelta}
       setContentDelta={setContentDelta}
       disabled={disabled}

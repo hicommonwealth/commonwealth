@@ -10,7 +10,7 @@ import { CWButton } from '../../component_kit/new_designs/CWButton';
 import { ReactQuillEditor } from '../../react_quill_editor';
 import './CommentEditor.scss';
 
-type CommentEditorProps = {
+export type CommentEditorProps = {
   parentType: ContentType;
   canComment: boolean;
   handleSubmitComment: () => void;
@@ -21,7 +21,7 @@ type CommentEditorProps = {
   onCancel: (e: any) => void;
   author: Account;
   editorValue: string;
-  shouldFocus: boolean;
+  shouldFocus?: boolean;
   tooltipText?: string;
   isReplying?: boolean;
 };
@@ -81,7 +81,7 @@ export const CommentEditor = ({
             buttonWidth="wide"
             disabled={disabled}
             onClick={handleSubmitComment}
-            label="Submit"
+            label="Create Comment"
           />
         </div>
       </div>
