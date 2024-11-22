@@ -1,6 +1,3 @@
-export const communityStakeTradeEventSignature =
-  '0xfc13c9a8a9a619ac78b803aecb26abdd009182411d51a986090f82519d88a89e';
-
 export const ChainEventSigs = {
   NewContest:
     'address contest, address namespace, uint256 interval, bool oneOff' as const,
