@@ -32,7 +32,7 @@ export async function handleLaunchpadTrade(
 
   const chainNode = await models.ChainNode.scope('withPrivateData').findOne({
     where: {
-      id: event.eventSource.chainNodeId,
+      eth_chain_id: event.eventSource.ethChainId,
     },
   });
 
