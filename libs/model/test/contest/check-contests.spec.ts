@@ -168,7 +168,7 @@ describe('Check Contests', () => {
     );
 
     await handleEvent(ContestWorker(), {
-      name: EventNames.CheckContests,
+      name: EventNames.ContestRolloverTimerTicked,
       payload: {},
     });
 
@@ -188,7 +188,7 @@ describe('Check Contests', () => {
     );
 
     await handleEvent(ContestWorker(), {
-      name: EventNames.CheckContests,
+      name: EventNames.ContestRolloverTimerTicked,
       payload: {},
     });
 

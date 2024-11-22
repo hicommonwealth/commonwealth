@@ -35,8 +35,7 @@ export enum EventNames {
   FarcasterCastCreated = 'FarcasterCastCreated',
   FarcasterReplyCastCreated = 'FarcasterReplyCastCreated',
   FarcasterVoteCreated = 'FarcasterVoteCreated',
-  CheckContests = 'CheckContests',
-  RolloverContests = 'RolloverContests',
+  ContestRolloverTimerTicked = 'ContestRolloverTimerTicked',
 
   // Preferences
   SubscriptionPreferencesUpdated = 'SubscriptionPreferencesUpdated',

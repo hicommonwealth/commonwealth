@@ -145,16 +145,7 @@ function startRolloverLoop() {
   const loop = async () => {
     try {
       await handleEvent(ContestWorker(), {
-        name: EventNames.CheckContests,
-        payload: {},
-      });
-    } catch (err) {
-      log.error(err);
-    }
-
-    try {
-      await handleEvent(ContestWorker(), {
-        name: EventNames.RolloverContests,
+        name: EventNames.ContestRolloverTimerTicked,
         payload: {},
       });
     } catch (err) {

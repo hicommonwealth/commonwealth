@@ -265,4 +265,4 @@ export const FarcasterVoteCreated = FarcasterAction.extend({
 
 export const CheckContests = z.object({});
 
-export const RolloverContests = z.object({});
+export const ContestRolloverTimerTicked = z.object({});
