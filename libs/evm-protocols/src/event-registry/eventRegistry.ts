@@ -1,5 +1,6 @@
 import {
   communityStakesAbi,
+  contestAbi,
   EvmEventSignature,
   EvmEventSignatures,
   launchpadFactoryAbi,
@@ -30,39 +31,74 @@ type ContractAddresses = {
         : never);
 };
 
-export type EventRegistryType = {
-  [key in ValidChains]: {
-    [address in ContractAddresses[key]]: {
+// Unique names used to identify contracts that are deployed by users at runtime
+export enum ChildContractNames {
+  SingleContest = 'SingleContest',
+  RecurringContest = 'RecurringContest',
+}
+
+type ContractSource = {
+  abi: Readonly<Array<unknown>>;
+  eventSignatures: Array<EvmEventSignature>;
+  // Runtime/user deployed contract sources
+  // Address for these contracts stored in EvmEventSources
+  // TODO: Get address from projections instead?
+  childContracts?: {
+    [key in ChildContractNames]: {
       abi: Readonly<Array<unknown>>;
       eventSignatures: Array<EvmEventSignature>;
     };
   };
 };
 
-const namespaceFactorySource = {
+export type EventRegistryType = {
+  [key in ValidChains]: {
+    [address in ContractAddresses[key]]: ContractSource;
+  };
+};
+
+const namespaceFactorySource: ContractSource = {
   abi: namespaceFactoryAbi,
   eventSignatures: [
     EvmEventSignatures.NamespaceFactory.ContestManagerDeployed,
     EvmEventSignatures.NamespaceFactory.NamespaceDeployed,
   ],
+  childContracts: {
+    [ChildContractNames.RecurringContest]: {
+      abi: contestAbi,
+      eventSignatures: [
+        EvmEventSignatures.Contests.ContentAdded,
+        EvmEventSignatures.Contests.RecurringContestStarted,
+        EvmEventSignatures.Contests.RecurringContestVoterVoted,
+      ],
+    },
+    [ChildContractNames.SingleContest]: {
+      abi: contestAbi,
+      eventSignatures: [
+        EvmEventSignatures.Contests.ContentAdded,
+        EvmEventSignatures.Contests.SingleContestStarted,
+        EvmEventSignatures.Contests.SingleContestVoterVoted,
+      ],
+    },
+  },
 };
 
-const communityStakesSource = {
+const communityStakesSource: ContractSource = {
   abi: communityStakesAbi,
   eventSignatures: [EvmEventSignatures.CommunityStake.Trade],
 };
 
-const launchpadSource = {
+const launchpadSource: ContractSource = {
   abi: launchpadFactoryAbi,
   eventSignatures: [EvmEventSignatures.Launchpad.TokenLaunched],
 };
 
-const lpBondingCurveSource = {
+const lpBondingCurveSource: ContractSource = {
   abi: lpBondingCurveAbi,
   eventSignatures: [EvmEventSignatures.Launchpad.Trade],
 };
 
-const tokenCommunityManagerSource = {
+const tokenCommunityManagerSource: ContractSource = {
   abi: tokenCommunityManagerAbi,
   eventSignatures: [],
 };
