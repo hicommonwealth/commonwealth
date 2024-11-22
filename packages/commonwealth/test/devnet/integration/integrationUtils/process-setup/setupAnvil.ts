@@ -3,7 +3,7 @@ import { GenericContainer } from 'testcontainers';
 import { contractAbiSql } from '../chain-info/contractAbis';
 import { evmEventSources } from '../chain-info/evmEventSources';
 
-export const imageUrl = 'public.ecr.aws/f8g0x5p7/commonwealth-anvil:386bdb7';
+export const imageUrl = 'public.ecr.aws/f8g0x5p7/commonwealth-anvil:72bdcb7';
 
 export async function setupAnvil() {
   try {
@@ -39,6 +39,8 @@ export async function setupAnvil() {
     // populate with ABIs
     await models.sequelize.query(contractAbiSql);
     await models.sequelize.query(evmEventSources);
+
+    await models.sequelize.query(`DELETE FROM "LastProcessedEvmBlocks";`);
 
     return container;
   } catch (err) {
