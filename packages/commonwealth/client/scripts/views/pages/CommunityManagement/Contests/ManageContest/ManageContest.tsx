@@ -1,4 +1,4 @@
-import { commonProtocol } from '@hicommonwealth/shared';
+import { commonProtocol } from '@hicommonwealth/evm-protocols';
 import React, { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import app from 'state';
