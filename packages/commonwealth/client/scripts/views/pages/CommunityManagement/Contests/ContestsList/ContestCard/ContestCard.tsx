@@ -22,6 +22,7 @@ import { SharePopoverOld } from 'views/components/share_popover_old';
 import { capDecimals } from 'views/modals/ManageCommunityStakeModal/utils';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 
+import { ContestType } from '../../types';
 import { copyFarcasterContestFrameUrl, isContestActive } from '../../utils';
 import ContestAlert from '../ContestAlert';
 import ContestCountdown from '../ContestCountdown';
@@ -142,7 +143,11 @@ const ContestCard = ({
   };
 
   const handleEditContest = () => {
-    navigate(`/manage/contests/${address}`);
+    navigate(
+      `/manage/contests/${address}${
+        isFarcaster ? `?type=${ContestType.Farcaster}` : ''
+      }`,
+    );
   };
 
   const handleLeaderboardClick = () => {

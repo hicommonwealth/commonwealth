@@ -1,10 +1,10 @@
-import { Actor, command, dispose } from '@hicommonwealth/core';
+import { Actor, command, dispose, query } from '@hicommonwealth/core';
 import { ChainNode } from '@hicommonwealth/schemas';
 import { ChainBase, ChainType } from '@hicommonwealth/shared';
+import { GetUserReferrals } from 'model/src/user/GetUserReferrals.query';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { z } from 'zod';
 import { CreateCommunity } from '../../src/community';
-import { models } from '../../src/database';
 import { CreateReferralLink, UserReferrals } from '../../src/user';
 import { drainOutbox, seedCommunity } from '../utils';
 
@@ -54,15 +54,29 @@ describe('Referral lifecycle', () => {
     await drainOutbox(['CommunityCreated'], UserReferrals);
 
     // get referrals
-    // TODO: use query after implementing it
-    const referrals = await models.Referral.findAll({
-      where: { referee_id: member.user.id },
+    const referrals = await query(GetUserReferrals(), {
+      actor: admin,
+      payload: {},
     });
 
-    expect(referrals.length).toBe(1);
-    expect(referrals[0].toJSON()).toMatchObject({
-      referrer_id: admin.user.id,
-      referee_id: member.user.id,
+    expect(referrals?.length).toBe(1);
+
+    const ref = referrals!.at(0)!;
+    expect(ref).toMatchObject({
+      referrer: {
+        id: admin.user.id,
+        profile: {
+          name: 'admin',
+          avatar_url: ref.referrer.profile.avatar_url,
+        },
+      },
+      referee: {
+        id: member.user.id,
+        profile: {
+          name: 'member',
+          avatar_url: ref.referee.profile.avatar_url,
+        },
+      },
       event_name: 'CommunityCreated',
       event_payload: {
         userId: member.user.id?.toString(),
