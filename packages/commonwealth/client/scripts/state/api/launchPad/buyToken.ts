@@ -2,12 +2,9 @@ import { commonProtocol } from '@hicommonwealth/shared';
 import { useMutation } from '@tanstack/react-query';
 import LaunchpadBondingCurve from 'helpers/ContractHelpers/Launchpad';
 import { trpc } from 'utils/trpcClient';
-import { getUserEthBalanceQueryKey } from '../communityStake/getUserEthBalance';
-import { queryClient } from '../config';
-import { getERC20BalanceQueryKey } from '../tokens/getERC20Balance';
-import { getTokenEthExchangeRateQueryKey } from './tokenEthExchangeRate';
+import { resetBalancesCache } from './helpers/resetBalancesCache';
 
-interface BuyTokenProps {
+export interface BuyTokenProps {
   chainRpc: string;
   ethChainId: number;
   tokenAddress: string;
@@ -33,54 +30,12 @@ const buyToken = async ({
   return await launchPad.buyToken(amountEth, walletAddress, `${ethChainId}`);
 };
 
-export const handleQuerySuccess = async (
-  _: unknown,
-  variables: Omit<BuyTokenProps, 'amountEth'>,
-  trpcUtils: ReturnType<typeof trpc.useUtils>,
-) => {
-  await queryClient.invalidateQueries({
-    queryKey: getUserEthBalanceQueryKey({
-      chainRpc: variables.chainRpc,
-      ethChainId: variables.ethChainId,
-      walletAddress: variables.walletAddress,
-    }),
-  });
-  await queryClient.invalidateQueries({
-    queryKey: getERC20BalanceQueryKey({
-      tokenAddress: variables.tokenAddress,
-      userAddress: variables.walletAddress,
-      nodeRpc: variables.chainRpc,
-    }),
-  });
-  await queryClient.invalidateQueries({
-    queryKey: getTokenEthExchangeRateQueryKey({
-      chainRpc: variables.chainRpc,
-      ethChainId: variables.ethChainId,
-      mode: 'buy',
-      tokenAddress: variables.tokenAddress,
-      tokenAmount: 1 * 1e18, // amount per unit
-    }),
-  });
-  await queryClient.invalidateQueries({
-    queryKey: getTokenEthExchangeRateQueryKey({
-      chainRpc: variables.chainRpc,
-      ethChainId: variables.ethChainId,
-      mode: 'sell',
-      tokenAddress: variables.tokenAddress,
-      tokenAmount: 1 * 1e18, // amount per unit
-    }),
-  });
-  await trpcUtils.token.getTokens.invalidate();
-  await trpcUtils.token.getTokens.refetch();
-  await trpcUtils.token.getToken.invalidate();
-};
-
 const useBuyTokenMutation = () => {
   const utils = trpc.useUtils();
   return useMutation({
     mutationFn: buyToken,
     onSuccess: async (_, variables) => {
-      await handleQuerySuccess(_, variables, utils);
+      await resetBalancesCache(_, variables, utils);
     },
   });
 };

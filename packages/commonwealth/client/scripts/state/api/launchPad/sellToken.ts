@@ -2,7 +2,7 @@ import { commonProtocol } from '@hicommonwealth/shared';
 import { useMutation } from '@tanstack/react-query';
 import LaunchpadBondingCurve from 'helpers/ContractHelpers/Launchpad';
 import { trpc } from 'utils/trpcClient';
-import { handleQuerySuccess } from './buyToken';
+import { resetBalancesCache } from './helpers/resetBalancesCache';
 
 interface SellTokenProps {
   chainRpc: string;
@@ -35,7 +35,7 @@ const useSellTokenMutation = () => {
   return useMutation({
     mutationFn: sellToken,
     onSuccess: async (_, variables) => {
-      await handleQuerySuccess(_, variables, utils);
+      await resetBalancesCache(_, variables, utils);
     },
   });
 };
