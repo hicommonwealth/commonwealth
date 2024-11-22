@@ -1,6 +1,7 @@
 import { commonProtocol } from '@hicommonwealth/shared';
 import { useMutation } from '@tanstack/react-query';
 import LaunchpadBondingCurve from 'helpers/ContractHelpers/Launchpad';
+import { handleQuerySuccess } from './buyToken';
 
 interface SellTokenProps {
   chainRpc: string;
@@ -31,6 +32,7 @@ const sellToken = async ({
 const useSellTokenMutation = () => {
   return useMutation({
     mutationFn: sellToken,
+    onSuccess: handleQuerySuccess,
   });
 };
 
