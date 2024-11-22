@@ -5,12 +5,7 @@ import {
   events,
   logger,
 } from '@hicommonwealth/core';
-import {
-  communityStakeTradeEventSignature,
-  deployedNamespaceEventSignature,
-  launchpadTokenLaunchedEventSignature,
-  launchpadTradeEventSignature,
-} from '@hicommonwealth/evm-protocols';
+import { EvmEventSignatures } from '@hicommonwealth/evm-protocols';
 import { Token, middleware, models } from '@hicommonwealth/model';
 import { ZodUndefined } from 'zod';
 import { handleCommunityStakeTrades } from './handleCommunityStakeTrades';
@@ -23,11 +18,13 @@ export const processChainEventCreated: EventHandler<
   ZodUndefined
 > = async ({ payload }) => {
   if (
-    payload.eventSource.eventSignature === communityStakeTradeEventSignature
+    payload.eventSource.eventSignature ===
+    EvmEventSignatures.CommunityStake.Trade
   ) {
     await handleCommunityStakeTrades(models, payload);
   } else if (
-    payload.eventSource.eventSignature === launchpadTokenLaunchedEventSignature
+    payload.eventSource.eventSignature ===
+    EvmEventSignatures.Launchpad.TokenLaunched
   ) {
     await command(Token.CreateToken(), {
       actor: middleware.systemActor({}),
@@ -38,11 +35,12 @@ export const processChainEventCreated: EventHandler<
       },
     });
   } else if (
-    payload.eventSource.eventSignature === deployedNamespaceEventSignature
+    payload.eventSource.eventSignature ===
+    EvmEventSignatures.NamespaceFactory.NamespaceDeployed
   ) {
     log.info('Implementation not defined', { payload });
   } else if (
-    payload.eventSource.eventSignature === launchpadTradeEventSignature
+    payload.eventSource.eventSignature === EvmEventSignatures.Launchpad.Trade
   ) {
     await handleLaunchpadTrade(payload);
   } else {

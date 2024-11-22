@@ -115,6 +115,3 @@ export const EventRegistry = {
       communityStakesSource,
   },
 } as const satisfies EventRegistryType;
-
-const x =
-  EventRegistry[84532]['0xc6e7B0AdDf35AE4a5A65bb3bCb78D11Db6c8fB8F'].abi;

@@ -1,10 +1,8 @@
 import { logger } from '@hicommonwealth/core';
 import {
   commonProtocol,
-  deployedNamespaceEventSignature,
   erc20Abi,
-  launchpadTokenRegisteredEventSignature,
-  launchpadTradeEventSignature,
+  EvmEventSignatures,
   lpBondingCurveAbi,
 } from '@hicommonwealth/evm-protocols';
 import { Web3 } from 'web3';
@@ -30,7 +28,7 @@ export async function getLaunchpadTradeTransaction({
 
   const tradeLog = txReceipt.logs.find((l) => {
     if (l.topics && l.topics.length > 0) {
-      return l.topics[0].toString() === launchpadTradeEventSignature;
+      return l.topics[0].toString() === EvmEventSignatures.Launchpad.Trade;
     }
     return false;
   });
@@ -83,7 +81,10 @@ export async function getTokenCreatedTransaction({
 
   const deployedNamespaceLog = txReceipt.logs.find((l) => {
     if (l.topics && l.topics.length > 0) {
-      return l.topics[0].toString() === deployedNamespaceEventSignature;
+      return (
+        l.topics[0].toString() ===
+        EvmEventSignatures.NamespaceFactory.NamespaceDeployed
+      );
     }
     return false;
   });
@@ -103,7 +104,9 @@ export async function getTokenCreatedTransaction({
 
   const tokenRegisteredLog = txReceipt.logs.find((l) => {
     if (l.topics && l.topics.length > 0) {
-      return l.topics[0].toString() === launchpadTokenRegisteredEventSignature;
+      return (
+        l.topics[0].toString() === EvmEventSignatures.Launchpad.TokenRegistered
+      );
     }
     return false;
   });
