@@ -4,7 +4,7 @@ import { describe, test } from 'vitest';
 import { Contract } from 'web3';
 import { AbiItem } from 'web3-utils';
 import { launchToken } from '../../../../../libs/shared/src/commonProtocol';
-import { setupCommonwealthE2E } from './utils';
+import { setupCommonwealthE2E } from './integrationUtils/mainSetup';
 
 describe('End to end event tests', () => {
   test(

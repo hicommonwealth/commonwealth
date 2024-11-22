@@ -1,8 +1,4 @@
-import { models } from '@hicommonwealth/model';
-import { GenericContainer } from 'testcontainers';
-import { evmEventSources } from '../evmEventSources';
-
-export const imageUrl = 'public.ecr.aws/f8g0x5p7/commonwealth-anvil:386bdb7';
+import Web3 from 'web3';
 
 export const anvilAccounts: { address: string; privateKey: string }[] = [
   {
@@ -57,43 +53,14 @@ export const anvilAccounts: { address: string; privateKey: string }[] = [
   },
 ];
 
-export async function setupAnvil() {
-  try {
-    const container = await new GenericContainer(imageUrl)
-      .withExposedPorts(8545)
-      .start();
+export function setupWeb3(anvilPort: number) {
+  const web3 = new Web3(
+    new Web3.providers.HttpProvider(`http://127.0.0.1:${anvilPort}`),
+  );
 
-    const port = container.getMappedPort(8545);
+  anvilAccounts.forEach((a) => {
+    web3.eth.accounts.wallet.add(a.privateKey);
+  });
 
-    await models.sequelize.query(`
-      INSERT INTO "ChainNodes" (
-          id,
-          url,
-          eth_chain_id,
-          alt_wallet_url,
-          balance_type,
-          name,
-          created_at,
-          updated_at
-      ) VALUES (
-        1,
-        'http://localhost:${port}',
-        31337,
-        'http://localhost:${port}',
-        'ethereum',
-        'Anvil Local Testnet',
-        NOW(),
-        NOW()
-      )
-        ON CONFLICT (id) DO UPDATE SET url = EXCLUDED.url, alt_wallet_url = EXCLUDED.alt_wallet_url;
-    `);
-
-    // populate with ABIs
-    // await models.sequelize.query(contractAbiSql);
-    await models.sequelize.query(evmEventSources);
-
-    return container;
-  } catch (err) {
-    console.error('Failed to start container:', err);
-  }
+  return web3;
 }
