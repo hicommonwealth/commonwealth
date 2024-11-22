@@ -263,6 +263,4 @@ export const FarcasterVoteCreated = FarcasterAction.extend({
   contest_address: z.string(),
 }).describe('When a farcaster action is initiated on a cast reply');
 
-export const CheckContests = z.object({});
-
 export const ContestRolloverTimerTicked = z.object({});
