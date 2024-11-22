@@ -1,4 +1,4 @@
-import { InvalidInput, Query } from '@hicommonwealth/core';
+import { Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
 import { z } from 'zod';
@@ -10,9 +10,14 @@ export function GetAllContests(): Query<typeof schemas.GetAllContests> {
     auth: [],
     secure: false,
     body: async ({ payload }) => {
-      if (!payload.community_id && !payload.contest_address) {
-        throw new InvalidInput('Must specify community_id or contest_address');
-      }
+      const whereClause = [
+        payload.community_id ? 'cm.community_id = :community_id' : '',
+        payload.contest_address ? 'cm.contest_address = :contest_address' : '',
+        payload.contest_id ? `c.contest_id = ${payload.contest_id}` : '',
+      ]
+        .filter(Boolean)
+        .join(' and ');
+
       const results = await models.sequelize.query<
         z.infer<typeof schemas.ContestResults>
       >(
@@ -72,10 +77,7 @@ from
     ${payload.contest_id ? `where c.contest_id = ${payload.contest_id}` : ''}
 	  group by c.contest_address
   ) as c on cm.contest_address = c.contest_address
-where
-  ${payload.community_id ? 'cm.community_id = :community_id' : ''}
-  ${payload.community_id && payload.contest_address ? 'and' : ''}
-  ${payload.contest_address ? `cm.contest_address = :contest_address` : ''}
+${whereClause ? `where ${whereClause}` : ''}
 group by
   cm.community_id,
   cm.contest_address,
