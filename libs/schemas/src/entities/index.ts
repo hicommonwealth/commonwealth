@@ -3,6 +3,7 @@ export * from './comment.schemas';
 export * from './community.schemas';
 export * from './contract.schemas';
 export * from './discordBotConfig.schemas';
+export * from './evm-event-source.schemas';
 export * from './group-permission.schemas';
 export * from './group.schemas';
 export * from './launchpad.schemas';

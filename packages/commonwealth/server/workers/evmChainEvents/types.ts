@@ -6,7 +6,7 @@ import { ethers } from 'ethers';
 export type EvmEvent = {
   eventSource: {
     kind: string;
-    chainNodeId: number;
+    ethChainId: number;
     eventSignature: string;
   };
   parsedArgs: ethers.utils.Result;
@@ -29,5 +29,5 @@ export type EvmSource = {
 };
 
 export type EvmSources = {
-  [chainNodeId: string]: EvmSource;
+  [ethChainID: string]: EvmSource;
 };

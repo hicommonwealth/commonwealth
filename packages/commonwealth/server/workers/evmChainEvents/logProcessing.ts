@@ -153,7 +153,7 @@ export async function parseLogs(
     events.push({
       eventSource: {
         kind: evmEventSource.kind,
-        chainNodeId: evmEventSource.chain_node_id,
+        ethChainId: evmEventSource.eth_chain_id,
         eventSignature: evmEventSource.event_signature,
       },
       parsedArgs: parsedLog.args,

@@ -1,22 +1,9 @@
+import { EvmEventSource } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize';
-import { ChainNodeAttributes } from './chain_node';
-import { ContractAbiAttributes } from './contract_abi';
+import { z } from 'zod';
 import { ModelInstance } from './types';
 
-export type EvmEventSourceAttributes = {
-  id?: number;
-  chain_node_id: number;
-  contract_address: string;
-  event_signature: string;
-  kind: string;
-  created_at_block?: number;
-  events_migrated?: boolean;
-  active?: boolean;
-  abi_id: number;
-
-  ContractAbi?: ContractAbiAttributes;
-  ChainNode?: ChainNodeAttributes;
-};
+export type EvmEventSourceAttributes = z.infer<typeof EvmEventSource>;
 
 export type EvmEventSourceInstance = ModelInstance<EvmEventSourceAttributes>;
 
@@ -26,35 +13,24 @@ export default (
   sequelize.define(
     'EvmEventSource',
     {
-      id: {
-        type: Sequelize.INTEGER,
-        autoIncrement: true,
-        primaryKey: true,
-      },
-      chain_node_id: {
+      eth_chain_id: {
         type: Sequelize.INTEGER,
         allowNull: false,
-        unique: 'unique_event_source',
+        primaryKey: true,
       },
       contract_address: {
         type: Sequelize.STRING,
         allowNull: false,
-        unique: 'unique_event_source',
+        primaryKey: true,
       },
       event_signature: {
         type: Sequelize.STRING,
         allowNull: false,
-        unique: 'unique_event_source',
+        primaryKey: true,
       },
       kind: { type: Sequelize.STRING, allowNull: false },
       created_at_block: { type: Sequelize.INTEGER, allowNull: true },
       events_migrated: { type: Sequelize.BOOLEAN, allowNull: true },
-      active: {
-        type: Sequelize.BOOLEAN,
-        allowNull: false,
-        defaultValue: true,
-      },
-      abi_id: { type: Sequelize.INTEGER, allowNull: false },
     },
     {
       tableName: 'EvmEventSources',
