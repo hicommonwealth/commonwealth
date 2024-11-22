@@ -1,6 +1,7 @@
 import { commonProtocol } from '@hicommonwealth/shared';
 import { useMutation } from '@tanstack/react-query';
 import LaunchpadBondingCurve from 'helpers/ContractHelpers/Launchpad';
+import { trpc } from 'utils/trpcClient';
 import { getUserEthBalanceQueryKey } from '../communityStake/getUserEthBalance';
 import { queryClient } from '../config';
 import { getERC20BalanceQueryKey } from '../tokens/getERC20Balance';
@@ -35,6 +36,7 @@ const buyToken = async ({
 export const handleQuerySuccess = async (
   _: unknown,
   variables: Omit<BuyTokenProps, 'amountEth'>,
+  trpcUtils: ReturnType<typeof trpc.useUtils>,
 ) => {
   await queryClient.invalidateQueries({
     queryKey: getUserEthBalanceQueryKey({
@@ -68,12 +70,18 @@ export const handleQuerySuccess = async (
       tokenAmount: 1 * 1e18, // amount per unit
     }),
   });
+  await trpcUtils.token.getTokens.invalidate();
+  await trpcUtils.token.getTokens.refetch();
+  await trpcUtils.token.getToken.invalidate();
 };
 
 const useBuyTokenMutation = () => {
+  const utils = trpc.useUtils();
   return useMutation({
     mutationFn: buyToken,
-    onSuccess: handleQuerySuccess,
+    onSuccess: async (_, variables) => {
+      await handleQuerySuccess(_, variables, utils);
+    },
   });
 };
 

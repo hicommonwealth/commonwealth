@@ -1,6 +1,7 @@
 import { commonProtocol } from '@hicommonwealth/shared';
 import { useMutation } from '@tanstack/react-query';
 import LaunchpadBondingCurve from 'helpers/ContractHelpers/Launchpad';
+import { trpc } from 'utils/trpcClient';
 import { handleQuerySuccess } from './buyToken';
 
 interface SellTokenProps {
@@ -30,9 +31,12 @@ const sellToken = async ({
 };
 
 const useSellTokenMutation = () => {
+  const utils = trpc.useUtils();
   return useMutation({
     mutationFn: sellToken,
-    onSuccess: handleQuerySuccess,
+    onSuccess: async (_, variables) => {
+      await handleQuerySuccess(_, variables, utils);
+    },
   });
 };
 
