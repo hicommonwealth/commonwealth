@@ -9,7 +9,7 @@ import { getLaunchpadTradeTransaction } from '../services/commonProtocol/launchp
 const launchpadEthChainIds = Object.values(
   commonProtocol.factoryContracts,
 ).reduce<number[]>((acc, contract) => {
-  if (contract.launchpad) {
+  if ('launchpad' in contract) {
     acc.push(contract.chainId);
   }
   return acc;

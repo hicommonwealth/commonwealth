@@ -1,9 +1,11 @@
-import { events, LaunchpadTrade } from '@hicommonwealth/core';
+import { events, LaunchpadTrade, logger } from '@hicommonwealth/core';
 import { commonProtocol as cp } from '@hicommonwealth/evm-protocols';
 import { commonProtocol, models } from '@hicommonwealth/model';
 import { BigNumber } from 'ethers';
 import Web3 from 'web3';
 import { z } from 'zod';
+
+const log = logger(import.meta);
 
 export async function handleLaunchpadTrade(
   event: z.infer<typeof events.ChainEventCreated>,
@@ -67,9 +69,17 @@ export async function handleLaunchpadTrade(
     });
   }
 
-  const lpBondingCurveAddress =
-    cp.factoryContracts[chainNode!.eth_chain_id as cp.ValidChains]
-      .lpBondingCurve!;
+  const contracts =
+    cp.factoryContracts[chainNode!.eth_chain_id as cp.ValidChains];
+  let lpBondingCurveAddress: string;
+  if ('lpBondingCurve' in contracts) {
+    lpBondingCurveAddress = contracts.lpBondingCurve;
+  } else {
+    log.error('No lpBondingCurve address found for chain', undefined, {
+      eth_chain_id: chainNode.eth_chain_id,
+    });
+    return;
+  }
 
   if (
     !token.liquidity_transferred &&

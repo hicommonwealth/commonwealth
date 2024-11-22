@@ -52,6 +52,13 @@ export const EvmEventSignatures = {
   CommunityStake: {
     Trade: '0xfc13c9a8a9a619ac78b803aecb26abdd009182411d51a986090f82519d88a89e',
   },
+  Launchpad: {
+    TokenLaunched:
+      '0xd7ca5dc2f8c6bb37c3a4de2a81499b25f8ca8bbb3082010244fe747077d0f6cc',
+    Trade: '0x9adcf0ad0cda63c4d50f26a48925cf6405df27d422a39c456b5f03f661c82982',
+    TokenRegistered:
+      '0xc2fe88a1a3c1957424571593960b97f158a519d0aa4cef9e13a247c64f1f4c35',
+  },
 } as const;
 
 type Values<T> = T[keyof T];
