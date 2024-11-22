@@ -57,7 +57,7 @@ export type EventRegistryType = {
   };
 };
 
-const namespaceFactorySource: ContractSource = {
+const namespaceFactorySource = {
   abi: namespaceFactoryAbi,
   eventSignatures: [
     EvmEventSignatures.NamespaceFactory.ContestManagerDeployed,
@@ -81,27 +81,27 @@ const namespaceFactorySource: ContractSource = {
       ],
     },
   },
-};
+} satisfies ContractSource;
 
-const communityStakesSource: ContractSource = {
+const communityStakesSource = {
   abi: communityStakesAbi,
   eventSignatures: [EvmEventSignatures.CommunityStake.Trade],
-};
+} satisfies ContractSource;
 
 const launchpadSource: ContractSource = {
   abi: launchpadFactoryAbi,
   eventSignatures: [EvmEventSignatures.Launchpad.TokenLaunched],
-};
+} satisfies ContractSource;
 
 const lpBondingCurveSource: ContractSource = {
   abi: lpBondingCurveAbi,
   eventSignatures: [EvmEventSignatures.Launchpad.Trade],
-};
+} satisfies ContractSource;
 
 const tokenCommunityManagerSource: ContractSource = {
   abi: tokenCommunityManagerAbi,
   eventSignatures: [],
-};
+} satisfies ContractSource;
 
 /**
  * Note that this object does not contain details for contracts deployed by users
