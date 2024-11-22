@@ -1,4 +1,4 @@
-import { commonProtocol } from '@hicommonwealth/shared';
+import { commonProtocol } from '@hicommonwealth/evm-protocols';
 import { useQuery } from '@tanstack/react-query';
 import { ContractMethods } from 'state/api/config';
 import { lazyLoadCommunityStakes } from '../../../helpers/ContractHelpers/LazyCommunityStakes';
