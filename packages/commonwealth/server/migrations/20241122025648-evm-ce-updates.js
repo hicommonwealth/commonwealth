@@ -6,10 +6,10 @@ module.exports = {
     await queryInterface.sequelize.transaction(async (transaction) => {
       await queryInterface.sequelize.query(
         `
-          DELETE
-          FROM "EvmEventSources"
-          WHERE event_signature NOT IN (?);
-      `,
+            DELETE
+            FROM "EvmEventSources"
+            WHERE event_signature NOT IN (?);
+        `,
         {
           replacements: [
             [
@@ -54,6 +54,59 @@ module.exports = {
         { transaction },
       );
 
+      await queryInterface.addConstraint('EvmEventSources', {
+        fields: ['contract_name'],
+        type: 'check',
+        where: {
+          contract_name: ['SingleContest', 'RecurringContest'],
+        },
+        name: 'check_contract_name', // Optional: you can name your constraint
+        transaction,
+      });
+      await queryInterface.changeColumn(
+        'EvmEventSources',
+        'contract_name',
+        {
+          type: Sequelize.STRING,
+          allowNull: false,
+        },
+        { transaction },
+      );
+
+      await queryInterface.removeConstraint(
+        'EvmEventSources',
+        'EvmEventSources_chain_node_id_fkey',
+        { transaction },
+      );
+      await queryInterface.sequelize.query(
+        `
+          UPDATE "EvmEventSources" EES
+          SET chain_node_id = (SELECT CN.eth_chain_id FROM "ChainNodes" CN WHERE CN.id = EES.chain_node_id);
+      `,
+        { transaction },
+      );
+      await queryInterface.renameColumn(
+        'EvmEventSources',
+        'chain_node_id',
+        'eth_chain_id',
+        { transaction },
+      );
+
+      await queryInterface.sequelize.query(
+        `
+            ALTER TABLE "EvmEventSources"
+                DROP CONSTRAINT IF EXISTS "EvmEventSources_pkey",
+                ADD PRIMARY KEY (eth_chain_id, contract_address, event_signature);
+        `,
+        { transaction },
+      );
+      await queryInterface.removeColumn('EvmEventSources', 'id', {
+        transaction,
+      });
+
+      await queryInterface.removeColumn('EvmEventSources', 'active', {
+        transaction,
+      });
       await queryInterface.removeColumn('EvmEventSources', 'abi_id', {
         transaction,
       });
