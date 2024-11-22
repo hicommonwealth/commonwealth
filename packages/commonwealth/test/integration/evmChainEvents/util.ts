@@ -1,3 +1,4 @@
+import { commonProtocol } from '@hicommonwealth/evm-protocols';
 import {
   communityStakesAbi,
   localRpc,
@@ -10,7 +11,7 @@ import {
   hashAbi,
   models,
 } from '@hicommonwealth/model';
-import { BalanceType, commonProtocol } from '@hicommonwealth/shared';
+import { BalanceType } from '@hicommonwealth/shared';
 
 const namespaceDeployedSignature =
   '0x8870ba2202802ce285ce6bead5ac915b6dc2d35c8a9d6f96fa56de9de12829d5';

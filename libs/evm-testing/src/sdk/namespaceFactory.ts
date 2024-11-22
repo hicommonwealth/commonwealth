@@ -1,4 +1,4 @@
-import { factoryContracts } from 'shared/src/commonProtocol';
+import { commonProtocol as cp } from '@hicommonwealth/evm-protocols';
 import { AbiFragment, Contract } from 'web3';
 import { namespace_factory } from '../utils/contracts';
 import { SdkBase } from './sdkBase';
@@ -7,7 +7,7 @@ const TOPIC_LOG =
   '0x990f533044dbc89b838acde9cd2c72c400999871cf8f792d731edcae15ead693';
 
 export class NamespaceFactory extends SdkBase {
-  public address: string = factoryContracts[84532].factory;
+  public address: string = cp.factoryContracts[84532].factory;
   public contract: Contract<AbiFragment[]> = namespace_factory(
     this.address,
     this.web3,

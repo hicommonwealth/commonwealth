@@ -14,9 +14,7 @@ export const STAKE_ID = 2;
 export const CONTEST_VOTER_SHARE = 0;
 export const CONTEST_FEE_SHARE = 100;
 
-// Requires a live contract for each enum chain. Add address of factory here on new deploy.
-// WARNING: ADD THE CONTRACT IN EvmEventSources TABLE VIA MIGRATION IF ADDING HERE!
-export const factoryContracts: {
+type factoryContractsType = {
   [key in ValidChains]: {
     factory: string;
     communityStake: string;
@@ -25,7 +23,11 @@ export const factoryContracts: {
     tokenCommunityManager?: string;
     chainId: number;
   };
-} = {
+};
+
+// Requires a live contract for each enum chain. Add address of factory here on new deploy.
+// WARNING: ADD THE CONTRACT IN EvmEventSources TABLE VIA MIGRATION IF ADDING HERE!
+export const factoryContracts = {
   [ValidChains.Sepolia]: {
     factory: '0xEAB6373E6a722EeC8A65Fd38b014d8B81d5Bc1d4',
     communityStake: '0xf6C1B02257f0Ac4Af5a1FADd2dA8E37EC5f9E5fd',
@@ -69,4 +71,4 @@ export const factoryContracts: {
     communityStake: '0xcc752fd15A7Dd0d5301b6A626316E7211352Cf62',
     chainId: 42161,
   },
-};
+} as const satisfies factoryContractsType;

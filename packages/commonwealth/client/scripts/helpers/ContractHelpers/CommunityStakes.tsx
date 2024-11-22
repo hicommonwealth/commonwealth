@@ -1,4 +1,4 @@
-import { commonProtocol } from '@hicommonwealth/shared';
+import { communityStakesAbi } from '@hicommonwealth/evm-protocols';
 import { toBigInt } from 'web3-utils';
 import ContractBase from './ContractBase';
 import NamespaceFactory from './NamespaceFactory';
@@ -21,7 +21,7 @@ class CommunityStakes extends ContractBase {
     rpc: string,
     chainId?: string,
   ) {
-    super(contractAddress, commonProtocol.communityStakesAbi, rpc);
+    super(contractAddress, communityStakesAbi, rpc);
     this.namespaceFactoryAddress = factoryAddress;
     this.chainId = chainId;
   }
