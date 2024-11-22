@@ -379,9 +379,6 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
 
-      - name: Rebuild
-        run: pnpm rebuild
-
       - name: Run unit tests
         run: pnpm -r test -- --allowOnly=false
 
