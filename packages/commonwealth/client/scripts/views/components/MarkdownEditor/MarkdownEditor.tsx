@@ -1,22 +1,5 @@
 import clsx from 'clsx';
-import {
-  codeBlockPlugin,
-  codeMirrorPlugin,
-  diffSourcePlugin,
-  frontmatterPlugin,
-  headingsPlugin,
-  imagePlugin,
-  linkDialogPlugin,
-  linkPlugin,
-  listsPlugin,
-  markdownShortcutPlugin,
-  MDXEditor,
-  MDXEditorMethods,
-  quotePlugin,
-  tablePlugin,
-  thematicBreakPlugin,
-  toolbarPlugin,
-} from 'commonwealth-mdxeditor';
+import { MDXEditor, MDXEditorMethods } from 'commonwealth-mdxeditor';
 import 'commonwealth-mdxeditor/style.css';
 import { notifyError } from 'controllers/app/notifications';
 import React, {
@@ -30,7 +13,6 @@ import React, {
 } from 'react';
 import { TooltipIndicator } from 'views/components/MarkdownEditor/indicators/TooltipIndicator';
 import { MarkdownEditorModeContext } from 'views/components/MarkdownEditor/MarkdownEditorModeContext';
-import { NullComponent } from 'views/components/MarkdownEditor/NullComponent';
 import { mentionsPlugin } from 'views/components/MarkdownEditor/plugins/MentionsPlugin';
 import { useDeviceProfile } from 'views/components/MarkdownEditor/useDeviceProfile';
 import { MarkdownEditorMethods } from 'views/components/MarkdownEditor/useMarkdownEditorMethods';
@@ -40,12 +22,9 @@ import { UploadIndicator } from './indicators/UploadIndicator';
 import './MarkdownEditor.scss';
 import { MarkdownEditorContext } from './MarkdownEditorContext';
 import { DesktopEditorFooter } from './toolbars/DesktopEditorFooter';
-import { ToolbarForDesktop } from './toolbars/ToolbarForDesktop';
-import { ToolbarForMobile } from './toolbars/ToolbarForMobile';
 import { useImageUploadHandler } from './useImageUploadHandler';
 import { useMarkdownEditorErrorHandler } from './useMarkdownEditorErrorHandler';
 import { canAcceptFileForImport } from './utils/canAcceptFileForImport';
-import { codeBlockLanguages } from './utils/codeBlockLanguages';
 import { editorTranslator } from './utils/editorTranslator';
 import { fileToText } from './utils/fileToText';
 import { iconComponentFor } from './utils/iconComponentFor';
@@ -366,43 +345,43 @@ export const MarkdownEditor = memo(function MarkdownEditor(
               translation={editorTranslator}
               onChange={(markdown) => onChange?.(markdown)}
               plugins={[
-                toolbarPlugin({
-                  location: mode === 'mobile' ? 'bottom' : 'top',
-                  toolbarContents: () =>
-                    mode === 'mobile' ? (
-                      <ToolbarForMobile
-                        SubmitButton={SubmitButton}
-                        onImage={imageUploadHandlerWithMarkdownInsertion}
-                        focus={doFocus}
-                      />
-                    ) : (
-                      <ToolbarForDesktop
-                        focus={doFocus}
-                        onImage={imageUploadHandlerWithMarkdownInsertion}
-                      />
-                    ),
-                }),
-                listsPlugin(),
-                quotePlugin(),
-                headingsPlugin(),
+                // toolbarPlugin({
+                //   location: mode === 'mobile' ? 'bottom' : 'top',
+                //   toolbarContents: () =>
+                //     mode === 'mobile' ? (
+                //       <ToolbarForMobile
+                //         SubmitButton={SubmitButton}
+                //         onImage={imageUploadHandlerWithMarkdownInsertion}
+                //         focus={doFocus}
+                //       />
+                //     ) : (
+                //       <ToolbarForDesktop
+                //         focus={doFocus}
+                //         onImage={imageUploadHandlerWithMarkdownInsertion}
+                //       />
+                //     ),
+                // }),
+                // listsPlugin(),
+                // quotePlugin(),
+                // headingsPlugin(),
                 mentionsPlugin(),
-                linkPlugin(),
-                // disable the link dialog and use our own. We have a different
-                // type of dialog based on device type.
-                linkDialogPlugin({ LinkDialog: NullComponent }),
-                codeBlockPlugin({ defaultCodeBlockLanguage: 'js' }),
-                codeMirrorPlugin({
-                  codeBlockLanguages,
-                }),
-                imagePlugin({ imageUploadHandler }),
-                tablePlugin(),
-                thematicBreakPlugin(),
-                frontmatterPlugin(),
-                diffSourcePlugin({
-                  viewMode: 'rich-text',
-                  diffMarkdown: 'boo',
-                }),
-                markdownShortcutPlugin(),
+                // linkPlugin(),
+                // // disable the link dialog and use our own. We have a different
+                // // type of dialog based on device type.
+                // linkDialogPlugin({ LinkDialog: NullComponent }),
+                // codeBlockPlugin({ defaultCodeBlockLanguage: 'js' }),
+                // codeMirrorPlugin({
+                //   codeBlockLanguages,
+                // }),
+                // imagePlugin({ imageUploadHandler }),
+                // tablePlugin(),
+                // thematicBreakPlugin(),
+                // frontmatterPlugin(),
+                // diffSourcePlugin({
+                //   viewMode: 'rich-text',
+                //   diffMarkdown: 'boo',
+                // }),
+                // markdownShortcutPlugin(),
               ]}
             />
 
