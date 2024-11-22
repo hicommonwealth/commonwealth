@@ -1,6 +1,6 @@
+import { models } from '@hicommonwealth/model';
 import { commonProtocol } from '@hicommonwealth/shared';
-import sleep from 'sleep-promise';
-import { describe, test } from 'vitest';
+import { describe, expect, test, vi } from 'vitest';
 import { Contract } from 'web3';
 import { AbiItem } from 'web3-utils';
 import { launchToken } from '../../../../../libs/shared/src/commonProtocol';
@@ -8,9 +8,9 @@ import { setupCommonwealthE2E } from './integrationUtils/mainSetup';
 
 describe('End to end event tests', () => {
   test(
-    'should run',
+    'Launch token happy path',
     async () => {
-      const { web3, anvilAccounts } = await setupCommonwealthE2E();
+      const { web3, mineBlocks, anvilAccounts } = await setupCommonwealthE2E();
 
       const launchpadFactory = new web3.eth.Contract(
         commonProtocol.launchpadFactoryAbi as AbiItem[],
@@ -30,9 +30,20 @@ describe('End to end event tests', () => {
         '0x84ea74d481ee0a5332c457a4d796187f6ba67feb',
       );
 
-      for (let i = 0; i < 10000; i++) {
-        await sleep(100);
-      }
+      await mineBlocks(1);
+
+      await vi.waitUntil(
+        async () => {
+          const token = await models.Token.findOne({
+            where: { name: 'testToken' },
+          });
+          expect(token).toBeTruthy();
+        },
+        {
+          timeout: 10000,
+          interval: 500,
+        },
+      );
     },
     { timeout: 100000000 },
   );

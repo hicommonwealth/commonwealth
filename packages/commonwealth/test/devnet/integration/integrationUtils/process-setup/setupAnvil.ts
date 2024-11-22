@@ -1,9 +1,30 @@
 import { models } from '@hicommonwealth/model';
 import { GenericContainer } from 'testcontainers';
+import Web3 from 'web3';
 import { contractAbiSql } from '../chain-info/contractAbis';
 import { evmEventSources } from '../chain-info/evmEventSources';
 
 export const imageUrl = 'public.ecr.aws/f8g0x5p7/commonwealth-anvil:72bdcb7';
+
+let port;
+
+export async function mineBlocks(blocks: number) {
+  const provider = new Web3.providers.HttpProvider(`http://localhost:${port}`);
+
+  // mine blocks
+  const res = await provider.request({
+    jsonrpc: '2.0',
+    id: 1,
+    method: 'anvil_mine',
+    params: [blocks],
+  });
+
+  if (res.error) {
+    throw new Error((res.error as { code: number; message: string }).message);
+  }
+
+  return true;
+}
 
 export async function setupAnvil() {
   try {
@@ -11,7 +32,7 @@ export async function setupAnvil() {
       .withExposedPorts(8545)
       .start();
 
-    const port = container.getMappedPort(8545);
+    port = container.getMappedPort(8545);
 
     await models.sequelize.query(`
       INSERT INTO "ChainNodes" (
@@ -40,7 +61,10 @@ export async function setupAnvil() {
     await models.sequelize.query(contractAbiSql);
     await models.sequelize.query(evmEventSources);
 
-    await models.sequelize.query(`DELETE FROM "LastProcessedEvmBlocks";`);
+    await models.sequelize.query(`
+        INSERT INTO "LastProcessedEvmBlocks" (chain_node_id, block_number)
+        VALUES (1, 18) ON CONFLICT (chain_node_id) DO UPDATE SET block_number = EXCLUDED.block_number;
+    `);
 
     return container;
   } catch (err) {

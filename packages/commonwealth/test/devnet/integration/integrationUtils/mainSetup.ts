@@ -1,5 +1,5 @@
 import { setupCommonwealthConsumer } from '../../../../server/workers/commonwealthConsumer/commonwealthConsumer';
-import { setupAnvil } from './process-setup/setupAnvil';
+import { mineBlocks, setupAnvil } from './process-setup/setupAnvil';
 import { setupEvmCe } from './process-setup/setupEvmCe';
 import { setupRabbitMq } from './process-setup/setupRabbitMq';
 import { anvilAccounts, setupWeb3 } from './process-setup/setupWeb3';
@@ -16,5 +16,5 @@ export async function setupCommonwealthE2E() {
 
   const web3 = setupWeb3(anvilContainer!.getMappedPort(8545));
 
-  return { web3, anvilAccounts, anvilContainer, rabbitmqContainer };
+  return { web3, anvilAccounts, mineBlocks, anvilContainer, rabbitmqContainer };
 }
