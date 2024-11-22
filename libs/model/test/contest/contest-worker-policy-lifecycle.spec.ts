@@ -180,7 +180,7 @@ describe('Contest Worker Policy Lifecycle', () => {
     expect(voteContentStub.called, 'voteContent was not called').to.be.true;
 
     await handleEvent(ContestWorker(), {
-      name: EventNames.RolloverContests,
+      name: EventNames.ContestRolloverTimerTicked,
       payload: {},
     });
 
@@ -206,7 +206,7 @@ describe('Contest Worker Policy Lifecycle', () => {
     );
 
     await handleEvent(ContestWorker(), {
-      name: EventNames.RolloverContests,
+      name: EventNames.ContestRolloverTimerTicked,
       payload: {},
     });
 
