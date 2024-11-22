@@ -1,14 +1,42 @@
+import { commonProtocol } from '@hicommonwealth/shared';
+import sleep from 'sleep-promise';
 import { describe, test } from 'vitest';
-import { startEvmPolling } from '../../../server/workers/evmChainEvents/startEvmPolling';
-import { setupCommonwealthAnvilContainer } from './utils';
+import { Contract } from 'web3';
+import { AbiItem } from 'web3-utils';
+import { launchToken } from '../../../../../libs/shared/src/commonProtocol';
+import { setupCommonwealthE2E } from './utils';
 
 describe('End to end event tests', () => {
   test(
     'should run',
     async () => {
-      const container = await setupCommonwealthAnvilContainer();
+      const { web3, anvilAccounts } = await setupCommonwealthE2E();
 
-      await startEvmPolling(1);
+      const launchpadFactory = new web3.eth.Contract(
+        commonProtocol.launchpadFactoryAbi as AbiItem[],
+        '0x7a2088a1bfc9d81c55368ae168c2c02570cb814f',
+      ) as unknown as Contract<typeof commonProtocol.launchpadFactoryAbi>;
+
+      try {
+        const txReceipt = await launchToken(
+          launchpadFactory,
+          'testToken',
+          'test',
+          [], // 9181 parameters
+          // should include at community treasury at [0] and contest creation util at [1] curr tbd
+          [],
+          web3.utils.toWei(1e9, 'ether'), // Default 1B tokens
+          anvilAccounts[0].address,
+          830000,
+          '0x84ea74d481ee0a5332c457a4d796187f6ba67feb',
+        );
+      } catch (e) {
+        console.log(e);
+      }
+
+      for (let i = 0; i < 100; i++) {
+        await sleep(100);
+      }
     },
     { timeout: 100000000 },
   );

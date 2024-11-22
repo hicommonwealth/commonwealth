@@ -1,15 +1,10 @@
 import { models } from '@hicommonwealth/model';
-import { GenericContainer, Wait } from 'testcontainers';
-import { StartedTestContainer } from 'testcontainers/build/test-container';
-import Web3 from 'web3';
-import { config } from '../../../server/config';
-import { setupCommonwealthConsumer } from '../../../server/workers/commonwealthConsumer/commonwealthConsumer';
-import { startEvmPolling } from '../../../server/workers/evmChainEvents/startEvmPolling';
-import { evmEventSources } from './evmEventSources';
+import { GenericContainer } from 'testcontainers';
+import { evmEventSources } from '../evmEventSources';
 
 export const imageUrl = 'public.ecr.aws/f8g0x5p7/commonwealth-anvil:386bdb7';
 
-const anvilAccounts: { address: string; privateKey: string }[] = [
+export const anvilAccounts: { address: string; privateKey: string }[] = [
   {
     address: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
     privateKey:
@@ -62,51 +57,6 @@ const anvilAccounts: { address: string; privateKey: string }[] = [
   },
 ];
 
-function setupWeb3(anvilPort: number) {
-  const web3 = new Web3(
-    new Web3.providers.HttpProvider(`http://127.0.0.1:${anvilPort}`),
-  );
-
-  anvilAccounts.forEach((a) => {
-    web3.eth.accounts.wallet.add(a.privateKey);
-  });
-
-  return web3;
-}
-
-async function getDeploymentInfo(
-  deploymentName: string,
-  container: StartedTestContainer,
-) {
-  const filePath = `/app/broadcast/${deploymentName}/31337/run-latest.json`;
-
-  const execResult = await container.exec(['cat', filePath]);
-  const fileContent = execResult.output.trim();
-  return JSON.parse(fileContent);
-}
-
-export async function setupRabbitMq() {
-  const rabbitMQContainer = await new GenericContainer(
-    'rabbitmq:3.11-management',
-  )
-    .withExposedPorts(5672, 15672)
-    .withWaitStrategy(Wait.forLogMessage('Server startup complete'))
-    .start();
-
-  console.log(
-    `rabbitMQ management port`,
-    rabbitMQContainer.getMappedPort(15672),
-  );
-
-  config.BROKER.RABBITMQ_URI = `amqp://127.0.0.1:${rabbitMQContainer.getMappedPort(5672)}`;
-
-  return rabbitMQContainer;
-}
-
-export async function setupEvmCe() {
-  return await startEvmPolling(100);
-}
-
 export async function setupAnvil() {
   try {
     const container = await new GenericContainer(imageUrl)
@@ -146,19 +96,4 @@ export async function setupAnvil() {
   } catch (err) {
     console.error('Failed to start container:', err);
   }
-}
-
-export async function setupCommonwealthE2E() {
-  // need to set up anvil before we can run evmCE.
-  // need to set up rmq before running consumer
-  const [anvilContainer, rabbitmqContainer] = await Promise.all([
-    setupAnvil(),
-    setupRabbitMq(),
-  ]);
-
-  await Promise.all([setupEvmCe(), setupCommonwealthConsumer()]);
-
-  const web3 = setupWeb3(anvilContainer!.getMappedPort(8545));
-
-  return { web3, anvilAccounts, anvilContainer, rabbitmqContainer };
 }
