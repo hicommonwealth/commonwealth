@@ -17,7 +17,7 @@ export default defineConfig({
     ],
     poolOptions: {
       threads: { minThreads: 1, maxThreads: 1 },
-      forks: { minForks: 1, maxForks: 5 },
+      forks: { minForks: 1, maxForks: 10 },
     },
     fileParallelism: process.env.npm_package_name === '@hicommonwealth/model',
     sequence: { concurrent: false },
