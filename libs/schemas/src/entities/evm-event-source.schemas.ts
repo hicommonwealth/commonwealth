@@ -9,9 +9,6 @@ export const EvmEventSource = z.object({
   contract_name: z.nativeEnum(ChildContractNames),
   parent_contract_address: EVM_ADDRESS,
 
-  // TODO: remove
-  kind: z.string(),
-
   // TODO: this should be required
   created_at_block: z.number().optional(),
   events_migrated: z.boolean().optional(),

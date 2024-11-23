@@ -140,11 +140,13 @@ module.exports = {
       await queryInterface.removeColumn('EvmEventSources', 'id', {
         transaction,
       });
-
       await queryInterface.removeColumn('EvmEventSources', 'active', {
         transaction,
       });
       await queryInterface.removeColumn('EvmEventSources', 'abi_id', {
+        transaction,
+      });
+      await queryInterface.removeColumn('EvmEventSources', 'kind', {
         transaction,
       });
 

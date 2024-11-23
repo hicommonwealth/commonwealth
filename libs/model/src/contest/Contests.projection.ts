@@ -3,6 +3,7 @@ import { InvalidState, Projection, events, logger } from '@hicommonwealth/core';
 import {
   ChildContractNames,
   EvmEventSignatures,
+  commonProtocol as cp,
 } from '@hicommonwealth/evm-protocols';
 import { ContestScore } from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
@@ -63,6 +64,14 @@ async function updateOrCreateWithAlert(
   const url = community?.ChainNode?.private_url;
   if (!url) {
     log.warn(`Chain node url not found on namespace ${namespace}`);
+    return;
+  }
+
+  const ethChainId = community!.ChainNode!.eth_chain_id!;
+  if (!cp.isValidChain(ethChainId)) {
+    log.error(
+      `Unsupported eth chain id: ${ethChainId} for namespace: ${namespace}`,
+    );
     return;
   }
 
@@ -144,12 +153,12 @@ async function updateOrCreateWithAlert(
     const sourcesToCreate: EvmEventSourceAttributes[] = sigs.map(
       (eventSignature) => {
         return {
-          eth_chain_id: community!.ChainNode!.eth_chain_id!,
+          eth_chain_id: ethChainId,
           contract_address: contest_address,
           event_signature: eventSignature,
           contract_name: childContractName,
-          kind: signatureToKind[eventSignature],
-          // TODO: add created_at_block so EVM CE runs the migration
+          parent_contract_address: cp.factoryContracts[ethChainId].factory,
+          // TODO: add created_at_block so EVM CE runs the migrateEvents func
         };
       },
     );

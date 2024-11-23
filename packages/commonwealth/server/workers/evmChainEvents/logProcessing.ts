@@ -148,11 +148,9 @@ export async function parseLogs(
     }
     stats().increment('ce.evm.event', {
       contractAddress: address,
-      kind: evmEventSource.kind,
     });
     events.push({
       eventSource: {
-        kind: evmEventSource.kind,
         ethChainId: evmEventSource.eth_chain_id,
         eventSignature: evmEventSource.event_signature,
       },

@@ -143,7 +143,6 @@ export const DiscordThreadDeleted = DiscordEventBase.pick({
 
 const ChainEventCreatedBase = z.object({
   eventSource: z.object({
-    kind: z.string(),
     ethChainId: z.number(),
   }),
   rawLog: z.object({

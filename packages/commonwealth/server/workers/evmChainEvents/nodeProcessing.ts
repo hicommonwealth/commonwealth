@@ -14,7 +14,7 @@ import {
   ChainEventSigs,
   EvmEventSignatures,
 } from '@hicommonwealth/evm-protocols';
-import { DB, emitEvent } from '@hicommonwealth/model';
+import { emitEvent, models } from '@hicommonwealth/model';
 import { ethers } from 'ethers';
 import { z } from 'zod';
 import { getEventSources } from './getEventSources';
@@ -29,7 +29,6 @@ const log = logger(import.meta);
  * the last fetched block number. This function will never throw an error.
  */
 export async function processChainNode(
-  models: DB,
   chainNodeId: number,
   evmSource: EvmSource,
 ): Promise<void> {
@@ -177,15 +176,10 @@ export async function processChainNode(
  * @param processFn WARNING: must never throw an error. Errors thrown by processFn will not be caught.
  */
 export async function scheduleNodeProcessing(
-  models: DB,
   interval: number,
-  processFn: (
-    models: DB,
-    chainNodeId: number,
-    sources: EvmSource,
-  ) => Promise<void>,
+  processFn: (chainNodeId: number, sources: EvmSource) => Promise<void>,
 ) {
-  const evmSources = await getEventSources(models);
+  const evmSources = await getEventSources();
 
   const numEvmSources = Object.keys(evmSources).length;
   if (!numEvmSources) {
@@ -199,7 +193,7 @@ export async function scheduleNodeProcessing(
     const delay = index * betweenInterval;
 
     setTimeout(async () => {
-      await processFn(models, +chainNodeId, evmSources[chainNodeId]);
+      await processFn(+chainNodeId, evmSources[chainNodeId]);
     }, delay);
   });
 }

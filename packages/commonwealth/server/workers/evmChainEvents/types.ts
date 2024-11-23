@@ -5,7 +5,6 @@ import { ethers } from 'ethers';
 
 export type EvmEvent = {
   eventSource: {
-    kind: string;
     ethChainId: number;
     eventSignature: string;
   };
