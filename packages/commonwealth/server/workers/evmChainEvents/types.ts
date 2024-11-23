@@ -1,7 +1,8 @@
 import { Log } from '@ethersproject/providers';
-import { EvmEventSourceAttributes } from '@hicommonwealth/model';
+import { EvmEventSource } from '@hicommonwealth/schemas';
 import { AbiType } from '@hicommonwealth/shared';
 import { ethers } from 'ethers';
+import { z } from 'zod';
 
 export type EvmEvent = {
   eventSource: {
@@ -12,9 +13,14 @@ export type EvmEvent = {
   rawLog: Log;
 };
 
+const sourceType = EvmEventSource.extend({
+  contract_name: z.string().optional(),
+  parent_contract_address: z.string().optional(),
+});
+
 export type AbiSignatures = {
   abi: AbiType;
-  sources: Array<EvmEventSourceAttributes & { contract_name?: string }>;
+  sources: Array<z.infer<typeof sourceType>>;
 };
 
 export type ContractSources = {

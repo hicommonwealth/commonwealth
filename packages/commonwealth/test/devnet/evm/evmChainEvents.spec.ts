@@ -1,6 +1,9 @@
 import { Log } from '@ethersproject/providers';
 import { ChainEventCreated, dispose, EventNames } from '@hicommonwealth/core';
-import { commonProtocol } from '@hicommonwealth/evm-protocols';
+import {
+  commonProtocol,
+  EvmEventSignatures,
+} from '@hicommonwealth/evm-protocols';
 import {
   CommunityStake,
   communityStakesAbi,
@@ -12,7 +15,6 @@ import {
 import {
   ChainNodeInstance,
   equalEvmAddresses,
-  hashAbi,
   models,
 } from '@hicommonwealth/model';
 import { AbiType, BalanceType, delay } from '@hicommonwealth/shared';
@@ -53,7 +55,7 @@ const namespaceFactoryAddress =
     commonProtocol.ValidChains.SepoliaBase
   ].factory.toLowerCase();
 const namespaceDeployedSignature =
-  '0x8870ba2202802ce285ce6bead5ac915b6dc2d35c8a9d6f96fa56de9de12829d5';
+  EvmEventSignatures.NamespaceFactory.NamespaceDeployed;
 const namespaceFactory = new NamespaceFactory();
 const namespaceName = `cetest${new Date().getTime()}`;
 
@@ -61,8 +63,7 @@ const communityStakeAddress =
   commonProtocol.factoryContracts[
     commonProtocol.ValidChains.SepoliaBase
   ].communityStake.toLowerCase();
-const communityStakeTradeSignature =
-  '0xfc13c9a8a9a619ac78b803aecb26abdd009182411d51a986090f82519d88a89e';
+const communityStakeTradeSignature = EvmEventSignatures.CommunityStake.Trade;
 const communityStake = new CommunityStake();
 
 describe('EVM Chain Events Devnet Tests', () => {
@@ -182,9 +183,7 @@ describe('EVM Chain Events Devnet Tests', () => {
             sources: [
               {
                 event_signature: namespaceDeployedSignature,
-                kind: 'DeployedNamespace',
-                abi_id: 1,
-                chain_node_id: 1,
+                eth_chain_id: 1,
                 contract_address: '0x1',
               },
             ],
@@ -215,9 +214,7 @@ describe('EVM Chain Events Devnet Tests', () => {
             sources: [
               {
                 event_signature: namespaceDeployedSignature,
-                kind: 'DeployedNamespace',
-                abi_id: 1,
-                chain_node_id: 1,
+                eth_chain_id: 1,
                 contract_address: namespaceFactoryAddress,
               },
             ],
@@ -237,7 +234,6 @@ describe('EVM Chain Events Devnet Tests', () => {
         equalEvmAddresses(events[0].rawLog.address, namespaceFactoryAddress),
       ).toBeTruthy();
 
-      expect(events[0].eventSource.kind).to.equal('DeployedNamespace');
       expect(events[0].rawLog.blockNumber).to.equal(
         namespaceDeployedLog.blockNumber,
       );
@@ -256,9 +252,7 @@ describe('EVM Chain Events Devnet Tests', () => {
             sources: [
               {
                 event_signature: namespaceDeployedSignature,
-                kind: 'DeployedNamespace',
-                abi_id: 1,
-                chain_node_id: 1,
+                eth_chain_id: 1,
                 contract_address: namespaceFactoryAddress,
               },
             ],
@@ -268,9 +262,7 @@ describe('EVM Chain Events Devnet Tests', () => {
             sources: [
               {
                 event_signature: communityStakeTradeSignature,
-                kind: 'Trade',
-                abi_id: 1,
-                chain_node_id: 1,
+                eth_chain_id: 1,
                 contract_address: communityStakeAddress,
               },
             ],
@@ -286,7 +278,9 @@ describe('EVM Chain Events Devnet Tests', () => {
       // namespace deployed + configure stake buy event + explicit buy event
       expect(result.events.length).to.equal(3);
       const deployedNamespaceEvent = result.events.find(
-        (e) => e.eventSource.kind === 'DeployedNamespace',
+        (e) =>
+          e.eventSource.eventSignature ===
+          EvmEventSignatures.NamespaceFactory.NamespaceDeployed,
       );
       expect(deployedNamespaceEvent).toBeTruthy();
       expect(
@@ -296,7 +290,9 @@ describe('EVM Chain Events Devnet Tests', () => {
         ),
       ).toBeTruthy();
       const communityStakeBuyEvent = result.events.find(
-        (e) => e.eventSource.kind === 'Trade',
+        (e) =>
+          e.eventSource.eventSignature ===
+          EvmEventSignatures.CommunityStake.Trade,
       );
       expect(communityStakeBuyEvent).toBeTruthy();
       expect(
@@ -313,7 +309,9 @@ describe('EVM Chain Events Devnet Tests', () => {
       );
       expect(result.events.length).to.equal(1);
       const communityStakeSellEvent = result.events.find(
-        (e) => e.eventSource.kind === 'Trade',
+        (e) =>
+          e.eventSource.eventSignature ===
+          EvmEventSignatures.CommunityStake.Trade,
       );
       expect(communityStakeSellEvent).toBeTruthy();
       expect(
@@ -335,38 +333,25 @@ describe('EVM Chain Events Devnet Tests', () => {
         eth_chain_id: commonProtocol.ValidChains.SepoliaBase,
         max_ce_block_range: -1,
       });
-      const namespaceAbiInstance = await models.ContractAbi.create({
-        abi: namespaceFactoryAbi,
-        nickname: 'NamespaceFactory',
-        abi_hash: hashAbi(namespaceFactoryAbi),
-      });
-      const stakesAbiInstance = await models.ContractAbi.create({
-        abi: communityStakesAbi,
-        nickname: 'CommunityStakes',
-        abi_hash: hashAbi(communityStakesAbi),
-      });
-      await models.EvmEventSource.bulkCreate([
-        {
-          chain_node_id: chainNode.id!,
-          contract_address:
-            commonProtocol.factoryContracts[
-              commonProtocol.ValidChains.SepoliaBase
-            ].factory.toLowerCase(),
-          event_signature: namespaceDeployedSignature,
-          kind: 'DeployedNamespace',
-          abi_id: namespaceAbiInstance.id!,
-        },
-        {
-          chain_node_id: chainNode.id!,
-          contract_address:
-            commonProtocol.factoryContracts[
-              commonProtocol.ValidChains.SepoliaBase
-            ].communityStake.toLowerCase(),
-          event_signature: communityStakeTradeSignature,
-          kind: 'Trade',
-          abi_id: stakesAbiInstance.id!,
-        },
-      ]);
+      // TODO: add contest contracts to EES?
+      // await models.EvmEventSource.bulkCreate([
+      //   {
+      //     eth_chain_id: chainNode.eth_chain_id!,
+      //     contract_address:
+      //       commonProtocol.factoryContracts[
+      //         commonProtocol.ValidChains.SepoliaBase
+      //       ].factory.toLowerCase(),
+      //     event_signature: namespaceDeployedSignature,
+      //   },
+      //   {
+      //     eth_chain__id: chainNode.eth_chain_id!,
+      //     contract_address:
+      //       commonProtocol.factoryContracts[
+      //         commonProtocol.ValidChains.SepoliaBase
+      //       ].communityStake.toLowerCase(),
+      //     event_signature: communityStakeTradeSignature,
+      //   },
+      // ]);
     });
 
     test(
