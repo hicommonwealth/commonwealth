@@ -92,6 +92,43 @@ module.exports = {
         { transaction },
       );
 
+      await queryInterface.addColumn(
+        'EvmEventSources',
+        'parent_contract_address',
+        {
+          type: Sequelize.STRING,
+          allowNull: true,
+        },
+        { transaction },
+      );
+
+      await queryInterface.sequelize.query(
+        `
+        UPDATE "EvmEventSources"
+        SET parent_contract_address = CASE
+            WHEN eth_chain_id = 8453 THEN '0xedf43C919f59900C82d963E99d822dA3F95575EA'
+            WHEN eth_chain_id = 84532 THEN '0xD8a357847cABA76133D5f2cB51317D3C74609710'
+            WHEN eth_chain_id = 11155111 THEN '0xEAB6373E6a722EeC8A65Fd38b014d8B81d5Bc1d4'
+            WHEN eth_chain_id = 81457 THEN '0xedf43C919f59900C82d963E99d822dA3F95575EA'
+            WHEN eth_chain_id = 59144 THEN '0xe3ae9569f4523161742414480f87967e991741bd'
+            WHEN eth_chain_id = 10 THEN '0xe3ae9569f4523161742414480f87967e991741bd'
+            WHEN eth_chain_id = 1 THEN '0x90aa47bf6e754f69ee53f05b5187b320e3118b0f'
+            WHEN eth_chain_id = 42161 THEN '0xE3AE9569f4523161742414480f87967e991741bd'
+        END;
+      `,
+        { transaction },
+      );
+
+      await queryInterface.changeColumn(
+        'EvmEventSources',
+        'parent_contract_address',
+        {
+          type: Sequelize.STRING,
+          allowNull: false,
+        },
+        { transaction },
+      );
+
       await queryInterface.sequelize.query(
         `
             ALTER TABLE "EvmEventSources"

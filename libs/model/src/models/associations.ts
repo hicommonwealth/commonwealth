@@ -59,9 +59,7 @@ export const buildAssociations = (db: DB) => {
       onDelete: 'SET NULL',
     });
 
-  db.ChainNode.withMany(db.Community)
-    .withMany(db.EvmEventSource)
-    .withOne(db.LastProcessedEvmBlock);
+  db.ChainNode.withMany(db.Community).withOne(db.LastProcessedEvmBlock);
 
   db.Community.withMany(db.Group, { asMany: 'groups' })
     .withMany(db.Topic, {

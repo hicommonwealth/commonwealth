@@ -15,7 +15,7 @@ export type EvmEvent = {
 
 export type AbiSignatures = {
   abi: AbiType;
-  sources: EvmEventSourceAttributes[];
+  sources: Array<EvmEventSourceAttributes & { contract_name?: string }>;
 };
 
 export type ContractSources = {
@@ -29,5 +29,5 @@ export type EvmSource = {
 };
 
 export type EvmSources = {
-  [ethChainID: string]: EvmSource;
+  [ethChainId: string]: EvmSource;
 };

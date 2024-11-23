@@ -15,18 +15,23 @@ export default (
     {
       eth_chain_id: {
         type: Sequelize.INTEGER,
-        allowNull: false,
         primaryKey: true,
       },
       contract_address: {
         type: Sequelize.STRING,
-        allowNull: false,
         primaryKey: true,
       },
       event_signature: {
         type: Sequelize.STRING,
-        allowNull: false,
         primaryKey: true,
+      },
+      contract_name: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      parent_contract_address: {
+        type: Sequelize.STRING,
+        allowNull: false,
       },
       kind: { type: Sequelize.STRING, allowNull: false },
       created_at_block: { type: Sequelize.INTEGER, allowNull: true },

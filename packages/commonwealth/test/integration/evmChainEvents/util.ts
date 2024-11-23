@@ -43,24 +43,22 @@ export async function createEventSources(): Promise<{
   });
   const evmEventSourceInstances = await models.EvmEventSource.bulkCreate([
     {
-      chain_node_id: chainNodeInstance.id!,
+      eth_chain_id: chainNodeInstance.eth_chain_id!,
       contract_address:
         commonProtocol.factoryContracts[
           commonProtocol.ValidChains.SepoliaBase
         ].factory.toLowerCase(),
       event_signature: namespaceDeployedSignature,
       kind: 'DeployedNamespace',
-      abi_id: namespaceAbiInstance.id!,
     },
     {
-      chain_node_id: chainNodeInstance.id!,
+      eth_chain_id: chainNodeInstance.eth_chain_id!,
       contract_address:
         commonProtocol.factoryContracts[
           commonProtocol.ValidChains.SepoliaBase
         ].communityStake.toLowerCase(),
       event_signature: communityStakeTradeSignature,
       kind: 'Trade',
-      abi_id: stakesAbiInstance.id!,
     },
   ]);
 

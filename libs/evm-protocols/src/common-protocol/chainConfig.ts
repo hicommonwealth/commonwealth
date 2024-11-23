@@ -10,6 +10,15 @@ export enum ValidChains {
   Arbitrum = 42161,
 }
 
+/**
+ * Type guard to verify if a given number is a value in the ValidChains enum.
+ * @param chainId - The number to verify.
+ * @returns boolean - true if the number is a valid chain ID.
+ */
+export function isValidChain(chainId: number): chainId is ValidChains {
+  return Object.values(ValidChains).includes(chainId);
+}
+
 export const STAKE_ID = 2;
 export const CONTEST_VOTER_SHARE = 0;
 export const CONTEST_FEE_SHARE = 100;
@@ -26,7 +35,7 @@ type factoryContractsType = {
 };
 
 // Requires a live contract for each enum chain. Add address of factory here on new deploy.
-// WARNING: ADD THE CONTRACT IN EvmEventSources TABLE VIA MIGRATION IF ADDING HERE!
+// WARNING: UPDATE THE EvmEventSources.parent_contract_address IN THE DB IF THE FACTORY ADDRESS IS UPDATED
 export const factoryContracts = {
   [ValidChains.Sepolia]: {
     factory: '0xEAB6373E6a722EeC8A65Fd38b014d8B81d5Bc1d4',
