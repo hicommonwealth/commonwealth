@@ -10,7 +10,7 @@ import {
 import { commonProtocol } from '@hicommonwealth/evm-protocols';
 import { models } from '@hicommonwealth/model';
 import { ContestResults } from '@hicommonwealth/schemas';
-import { AbiType, delay } from '@hicommonwealth/shared';
+import { delay } from '@hicommonwealth/shared';
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import Sinon from 'sinon';
@@ -72,27 +72,7 @@ describe('Contests projection lifecycle', () => {
     await bootstrap_testing(import.meta);
 
     try {
-      const recurringContestAbi = await models.ContractAbi.create({
-        id: 700,
-        abi: [] as AbiType,
-        nickname: 'RecurringContest',
-        abi_hash: 'hash1',
-      });
-      const singleContestAbi = await models.ContractAbi.create({
-        id: 701,
-        abi: [] as AbiType,
-        nickname: 'SingleContest',
-        abi_hash: 'hash2',
-      });
       const [chain] = await seed('ChainNode', {
-        contracts: [
-          {
-            abi_id: recurringContestAbi.id,
-          },
-          {
-            abi_id: singleContestAbi.id,
-          },
-        ],
         url: 'https://test',
         private_url: 'https://test',
       });

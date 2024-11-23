@@ -54,7 +54,6 @@ export * from './community';
 export * from './community_role';
 export * from './community_stake';
 export * from './community_tags';
-export * from './contract_abi';
 export * from './discord_bot_config';
 export * from './email_update_token';
 export * from './evmEventSource';

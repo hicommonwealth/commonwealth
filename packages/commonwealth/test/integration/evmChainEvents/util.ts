@@ -8,7 +8,6 @@ import {
   ChainNodeInstance,
   ContractAbiInstance,
   EvmEventSourceInstance,
-  hashAbi,
   models,
 } from '@hicommonwealth/model';
 import { BalanceType } from '@hicommonwealth/shared';
@@ -31,16 +30,6 @@ export async function createEventSources(): Promise<{
     eth_chain_id: commonProtocol.ValidChains.SepoliaBase,
     max_ce_block_range: -1,
   });
-  const namespaceAbiInstance = await models.ContractAbi.create({
-    abi: namespaceFactoryAbi,
-    nickname: 'NamespaceFactory',
-    abi_hash: hashAbi(namespaceFactoryAbi),
-  });
-  const stakesAbiInstance = await models.ContractAbi.create({
-    abi: communityStakesAbi,
-    nickname: 'CommunityStakes',
-    abi_hash: hashAbi(communityStakesAbi),
-  });
   const evmEventSourceInstances = await models.EvmEventSource.bulkCreate([
     {
       eth_chain_id: chainNodeInstance.eth_chain_id!,
@@ -49,7 +38,6 @@ export async function createEventSources(): Promise<{
           commonProtocol.ValidChains.SepoliaBase
         ].factory.toLowerCase(),
       event_signature: namespaceDeployedSignature,
-      kind: 'DeployedNamespace',
     },
     {
       eth_chain_id: chainNodeInstance.eth_chain_id!,
@@ -58,14 +46,11 @@ export async function createEventSources(): Promise<{
           commonProtocol.ValidChains.SepoliaBase
         ].communityStake.toLowerCase(),
       event_signature: communityStakeTradeSignature,
-      kind: 'Trade',
     },
   ]);
 
   return {
     chainNodeInstance,
-    namespaceAbiInstance,
-    stakesAbiInstance,
     evmEventSourceInstances,
   };
 }
