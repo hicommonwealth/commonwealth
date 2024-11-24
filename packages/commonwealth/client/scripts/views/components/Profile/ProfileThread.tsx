@@ -153,7 +153,7 @@ export function mapProfileThread(thread): Thread {
     ContestActions: thread.associatedContests ?? [],
     numberOfComments: thread.numberOfComments,
     recentComments:
-      thread.recentComments?.map((c: any) => ({
+      thread.recentComments?.map((c) => ({
         id: c.id ?? 0,
         address: c.address ?? '',
         user_id: c.user_id ?? 0,
