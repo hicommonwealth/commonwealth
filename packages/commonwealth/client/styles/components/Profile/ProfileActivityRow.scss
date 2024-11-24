@@ -3,7 +3,7 @@
 .ProfileActivityRow {
   position: relative;
   border-bottom: 1px solid #dddddd;
-  padding: 24px 0;
+  padding: 5px 0;
   min-width: 100%;
   max-width: 0;
 
@@ -59,12 +59,46 @@
     cursor: pointer;
   }
 
-  .title {
+  .heading {
     display: flex;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
+
+    .Text {
+      font-weight: 500;
+      font-size: 20px;
+      line-height: 20px;
+    }
+    a {
+      font-weight: 500;
+      font-size: 20px;
+      line-height: 20px;
+      color: $neutral-800 !important;
+      align-self: flex-start;
+    }
 
     span {
+      font-weight: 300;
+      font-size: 19px;
+      line-height: 19px;
+    }
+  }
+
+  .title {
+    display: flex;
+    .Text {
+      display: flex;
       font-weight: 400;
+      font-size: 18px;
+      line-height: 18px;
+    }
+    a {
+      color: $neutral-800 !important;
+    }
+
+    span {
+      font-weight: 300;
+      font-size: 20px;
+      line-height: 20px;
     }
   }
 
@@ -75,8 +109,14 @@
     overflow: auto;
 
     .Text {
+      padding-bottom: 10px;
+      padding-top: 10px;
       width: 90%;
       margin-right: 16px;
+      font-size: 21px !important;
+      line-height: 21px !important;
+      font-weight: 400;
+      font-family: $font-family-neue-haas-unica;
     }
   }
 }

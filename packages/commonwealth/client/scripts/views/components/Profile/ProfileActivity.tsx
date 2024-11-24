@@ -34,13 +34,6 @@ const ProfileActivity = ({ comments, threads }: ProfileActivityProps) => {
       <div className="activity-nav">
         <CWTabsRow>
           <CWTab
-            label="All Activity"
-            onClick={() => {
-              setSelectedActivity(ProfileActivityType.Comments);
-            }}
-            isSelected={selectedActivity === ProfileActivityType.Comments}
-          />
-          <CWTab
             label={
               <div className="tab-header">
                 Threads
@@ -51,6 +44,13 @@ const ProfileActivity = ({ comments, threads }: ProfileActivityProps) => {
               setSelectedActivity(ProfileActivityType.Threads);
             }}
             isSelected={selectedActivity === ProfileActivityType.Threads}
+          />
+          <CWTab
+            label="Comments"
+            onClick={() => {
+              setSelectedActivity(ProfileActivityType.Comments);
+            }}
+            isSelected={selectedActivity === ProfileActivityType.Comments}
           />
         </CWTabsRow>
       </div>

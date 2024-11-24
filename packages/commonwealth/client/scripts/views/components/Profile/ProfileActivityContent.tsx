@@ -2,10 +2,11 @@ import React from 'react';
 
 import 'components/Profile/Profile.scss';
 
-import type Thread from 'models/Thread';
+import Thread from 'models/Thread';
 import { CWText } from '../component_kit/cw_text';
 import type { CommentWithAssociatedThread } from './ProfileActivity';
 import ProfileActivityRow from './ProfileActivityRow';
+import { ProfileThread, mapProfileThread } from './ProfileThread';
 
 enum ProfileActivityType {
   Addresses,
@@ -43,7 +44,10 @@ const ProfileActivityContent = ({
         {threads
           .sort((a, b) => +b.createdAt - +a.createdAt)
           .map((thread, i) => (
-            <ProfileActivityRow key={i} activity={thread} />
+            <ProfileThread
+              thread={mapProfileThread(thread) as Thread}
+              key={i}
+            />
           ))}
       </>
     );
