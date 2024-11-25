@@ -2,6 +2,7 @@ import { useFlag } from 'hooks/useFlag';
 import React, { useCallback, useState } from 'react';
 import { CommentEditor } from 'views/components/Comments/CommentEditor';
 import { CommentEditorProps } from 'views/components/Comments/CommentEditor/CommentEditor';
+import './StickyEditorContainer.scss';
 
 export const StickyEditorContainer = (props: CommentEditorProps) => {
   const stickEditor = useFlag('stickyEditor');
@@ -11,13 +12,19 @@ export const StickyEditorContainer = (props: CommentEditorProps) => {
     setFocused(true);
   }, []);
 
+  const handleCancel = useCallback(() => {
+    setFocused(false);
+  }, []);
+
   if (!stickEditor) {
     return <CommentEditor {...props} />;
   }
 
   return (
     <div className="StickyEditorContainer">
-      {focused && <CommentEditor {...props} shouldFocus={true} />}
+      {focused && (
+        <CommentEditor {...props} shouldFocus={true} onCancel={handleCancel} />
+      )}
 
       {!focused && (
         <input

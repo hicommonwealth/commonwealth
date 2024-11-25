@@ -74,14 +74,12 @@ export const CommentEditor = ({
       />
       <div className="form-bottom">
         <div className="form-buttons">
-          {(editorValue.length > 0 || isReplying) && (
-            <CWButton buttonType="tertiary" onClick={onCancel} label="Cancel" />
-          )}
+          <CWButton buttonType="tertiary" onClick={onCancel} label="Cancel" />
           <CWButton
             buttonWidth="wide"
             disabled={disabled}
             onClick={handleSubmitComment}
-            label="Create Comment"
+            label="Post"
           />
         </div>
       </div>
