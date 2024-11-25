@@ -37,7 +37,9 @@ export async function startMessageRelayer(maxRelayIterations?: number) {
     );
     await rmqAdapter.init();
     broker({
+      key: 'w.w.w',
       adapter: rmqAdapter,
+      isDefault: true,
     });
   } catch (e) {
     log.error(

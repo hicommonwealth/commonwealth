@@ -74,7 +74,7 @@ export async function setupCommonwealthConsumer(): Promise<void> {
     );
     await rmqAdapter.init();
     broker({
-      adapter: rmqAdapter,
+      key: 'w.w.w',
     });
     brokerInstance = rmqAdapter;
   } catch (e) {

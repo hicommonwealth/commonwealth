@@ -66,6 +66,8 @@ export async function setupAnvil() {
         VALUES (1, 18) ON CONFLICT (chain_node_id) DO UPDATE SET block_number = EXCLUDED.block_number;
     `);
 
+    await models.sequelize.query(`DELETE FROM "Outbox";`);
+
     return container;
   } catch (err) {
     console.error('Failed to start container:', err);
