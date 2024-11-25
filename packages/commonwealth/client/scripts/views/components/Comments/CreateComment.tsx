@@ -94,7 +94,7 @@ export const CreateComment = ({
         const input = await buildCreateCommentInput({
           communityId,
           address: user.activeAccount!.address,
-          threadId: rootThread.id,
+          threadId: rootThread.id ?? null,
           threadMsgId: rootThread.canvasMsgId!,
           unescapedText: serializeDelta(contentDelta),
           parentCommentId: parentCommentId ?? null,
