@@ -1,1 +1,1 @@
-export * from './StickEditorContainer';
+export * from './StickyEditorContainer';

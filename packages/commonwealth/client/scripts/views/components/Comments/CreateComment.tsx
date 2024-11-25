@@ -10,7 +10,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import app from 'state';
 import { useCreateCommentMutation } from 'state/api/comments';
 import useUserStore from 'state/ui/user';
-import { StickEditorContainer } from 'views/components/StickEditorContainer';
+import { StickyEditorContainer } from 'views/components/StickEditorContainer';
 import Thread from '../../../models/Thread';
 import { useFetchProfilesByAddressesQuery } from '../../../state/api/profiles/index';
 import { jumpHighlightComment } from '../../pages/discussions/CommentTree/helpers';
@@ -151,7 +151,7 @@ export const CreateComment = ({
   }, [handleIsReplying, saveDraft, contentDelta]);
 
   return rootThread.archivedAt === null ? (
-    <StickEditorContainer
+    <StickyEditorContainer
       parentType={parentType}
       canComment={canComment}
       handleSubmitComment={handleSubmitComment}
