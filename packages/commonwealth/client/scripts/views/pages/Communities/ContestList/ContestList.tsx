@@ -1,6 +1,7 @@
 import React from 'react';
 import { trpc } from 'utils/trpcClient';
 import { Skeleton } from 'views/components/Skeleton';
+import { CWText } from 'views/components/component_kit/cw_text';
 import useCommunityContests from '../../CommunityManagement/Contests/useCommunityContests';
 import ContestCard from './ContestCard';
 
@@ -39,20 +40,32 @@ const ContestList = () => {
 
   return (
     <div className="ContestList">
-      {isContestDataLoading ? (
-        <>
-          <Skeleton height="300px" />
-          <Skeleton height="300px" />
-        </>
-      ) : (
-        activeContests.map((contest) => (
-          <ContestCard
-            key={contest.contest_address}
-            contest={contest}
-            community={community[contest.community_id as string]}
-          />
-        ))
-      )}
+      <CWText type="h2">Contests</CWText>
+      <>
+        {!isContestDataLoading && activeContests.length === 0 && (
+          <CWText type="h2" className="empty-contests">
+            No active contests found
+          </CWText>
+        )}
+        {isContestDataLoading ? (
+          <div className="content">
+            <>
+              <Skeleton height="300px" />
+              <Skeleton height="300px" />
+            </>
+          </div>
+        ) : (
+          <div className="content">
+            {activeContests.map((contest) => (
+              <ContestCard
+                key={contest.contest_address}
+                contest={contest}
+                community={community[contest.community_id as string]}
+              />
+            ))}
+          </div>
+        )}
+      </>
     </div>
   );
 };

@@ -91,6 +91,13 @@ const ContestCard = ({ contest, community }: ContestCardProps) => {
       <div className="contest-content">
         <div className="contest-header">
           <CWCommunityAvatar
+            onClick={() => {
+              navigateToCommunity({
+                navigate,
+                path: '',
+                chain: contest.community_id || '',
+              });
+            }}
             community={{
               name: community.name,
               iconUrl: community.iconUrl,
