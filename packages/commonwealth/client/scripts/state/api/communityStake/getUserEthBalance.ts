@@ -32,6 +32,15 @@ interface UseGetUserEthBalanceQueryProps {
   ethChainId: number;
 }
 
+export const getUserEthBalanceQueryKey = (
+  params: Omit<UseGetUserEthBalanceQueryProps, 'apiEnabled'>,
+) => [
+  ContractMethods.GET_USER_ETH_BALANCE,
+  params.chainRpc,
+  params.walletAddress,
+  params.ethChainId,
+];
+
 const useGetUserEthBalanceQuery = ({
   chainRpc,
   walletAddress,
@@ -39,12 +48,11 @@ const useGetUserEthBalanceQuery = ({
   ethChainId,
 }: UseGetUserEthBalanceQueryProps) => {
   return useQuery({
-    queryKey: [
-      ContractMethods.GET_USER_ETH_BALANCE,
+    queryKey: getUserEthBalanceQueryKey({
       chainRpc,
-      walletAddress,
       ethChainId,
-    ],
+      walletAddress,
+    }),
     queryFn: () => getUserEthBalance({ chainRpc, walletAddress, ethChainId }),
     staleTime: GET_USER_ETH_BALANCE_STALE_TIME,
     enabled: apiEnabled,

@@ -1,8 +1,9 @@
 import { commonProtocol } from '@hicommonwealth/evm-protocols';
 import { useMutation } from '@tanstack/react-query';
 import LaunchpadBondingCurve from 'helpers/ContractHelpers/Launchpad';
+import { resetBalancesCache } from './helpers/resetBalancesCache';
 
-interface BuyTokenProps {
+export interface BuyTokenProps {
   chainRpc: string;
   ethChainId: number;
   tokenAddress: string;
@@ -31,6 +32,9 @@ const buyToken = async ({
 const useBuyTokenMutation = () => {
   return useMutation({
     mutationFn: buyToken,
+    onSuccess: async (_, variables) => {
+      await resetBalancesCache(_, variables);
+    },
   });
 };
 
