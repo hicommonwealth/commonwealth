@@ -1,9 +1,11 @@
+import {
+  commonProtocol as cp,
+  launchpadFactoryAbi,
+} from '@hicommonwealth/evm-protocols';
 import { models } from '@hicommonwealth/model';
-import { commonProtocol } from '@hicommonwealth/shared';
 import { describe, expect, test, vi } from 'vitest';
 import { Contract } from 'web3';
 import { AbiItem } from 'web3-utils';
-import { launchToken } from '../../../../../libs/shared/src/commonProtocol';
 import { setupCommonwealthE2E } from './integrationUtils/mainSetup';
 
 describe('End to end event tests', () => {
@@ -13,11 +15,11 @@ describe('End to end event tests', () => {
       const { web3, mineBlocks, anvilAccounts } = await setupCommonwealthE2E();
 
       const launchpadFactory = new web3.eth.Contract(
-        commonProtocol.launchpadFactoryAbi as AbiItem[],
+        launchpadFactoryAbi as AbiItem[],
         '0x7a2088a1bfc9d81c55368ae168c2c02570cb814f',
-      ) as unknown as Contract<typeof commonProtocol.launchpadFactoryAbi>;
+      ) as unknown as Contract<typeof launchpadFactoryAbi>;
 
-      await launchToken(
+      await cp.launchToken(
         launchpadFactory,
         'testToken',
         'test',
@@ -46,6 +48,6 @@ describe('End to end event tests', () => {
         },
       );
     },
-    { timeout: 100000000 },
+    { timeout: 1000000 },
   );
 });
