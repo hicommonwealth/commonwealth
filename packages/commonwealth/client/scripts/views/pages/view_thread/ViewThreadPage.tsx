@@ -735,17 +735,21 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                 disabledActionsTooltipText={disabledActionsTooltipText}
               />
 
-              {thread && (
-                <CreateComment
-                  rootThread={thread}
-                  canComment={canComment}
-                  tooltipText={
-                    typeof disabledActionsTooltipText === 'function'
-                      ? disabledActionsTooltipText?.('comment')
-                      : disabledActionsTooltipText
-                  }
-                />
-              )}
+              {thread &&
+                !thread.readOnly &&
+                !fromDiscordBot &&
+                !isGloballyEditing &&
+                user.isLoggedIn && (
+                  <CreateComment
+                    rootThread={thread}
+                    canComment={canComment}
+                    tooltipText={
+                      typeof disabledActionsTooltipText === 'function'
+                        ? disabledActionsTooltipText?.('comment')
+                        : disabledActionsTooltipText
+                    }
+                  />
+                )}
             </>
           }
           editingDisabled={isTopicInContest}

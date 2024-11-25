@@ -3,7 +3,8 @@
 #mava {
   .loadButton {
     @media only screen and (max-width: $breakpoint-small-max-px) {
-      bottom: 75px !important;
+      // nuke Mava on mobile because it conflicts with the floating action button.
+      display: none !important;
     }
   }
 }
