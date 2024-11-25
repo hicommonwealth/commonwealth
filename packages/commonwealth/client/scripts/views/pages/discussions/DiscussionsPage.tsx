@@ -36,7 +36,6 @@ import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCo
 import { isContestActive } from 'views/pages/CommunityManagement/Contests/utils';
 import useTokenMetadataQuery from '../../../state/api/tokens/getTokenMetadata';
 import { AdminOnboardingSlider } from '../../components/AdminOnboardingSlider';
-import { CWGrowlTemplate } from '../../components/SublayoutHeader/GrowlTemplate/CWGrowlTemplate';
 import { UserTrainingSlider } from '../../components/UserTrainingSlider';
 import { CWText } from '../../components/component_kit/cw_text';
 import CWIconButton from '../../components/component_kit/new_designs/CWIconButton';
@@ -390,13 +389,6 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
                     }
                     hideRecentComments
                     editingDisabled={isThreadTopicInContest}
-                  />
-                  <CWGrowlTemplate
-                    headerText="Attention!"
-                    bodyText="'Overview' page has been merged with the 'All' page"
-                    buttonText="test"
-                    growlType="discussion"
-                    blackCloseButton
                   />
                 </>
               );
