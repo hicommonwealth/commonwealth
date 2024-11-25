@@ -1,6 +1,7 @@
 import { Actor, command, dispose } from '@hicommonwealth/core';
+import { commonProtocol } from '@hicommonwealth/evm-protocols';
 import { config, equalEvmAddresses } from '@hicommonwealth/model';
-import { BalanceType, commonProtocol } from '@hicommonwealth/shared';
+import { BalanceType } from '@hicommonwealth/shared';
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { seed } from 'model/src/tester';
