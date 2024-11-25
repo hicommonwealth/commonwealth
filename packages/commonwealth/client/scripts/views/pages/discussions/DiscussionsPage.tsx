@@ -25,7 +25,6 @@ import useBrowserWindow from 'hooks/useBrowserWindow';
 import useManageDocumentTitle from 'hooks/useManageDocumentTitle';
 import useTopicGating from 'hooks/useTopicGating';
 import 'pages/discussions/index.scss';
-import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { useFetchCustomDomainQuery } from 'state/api/configuration';
 import { useGetERC20BalanceQuery } from 'state/api/tokens';
 import Permissions from 'utils/Permissions';
@@ -74,12 +73,6 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const dateRange: ThreadTimelineFilterTypes = searchParams.get(
     'dateRange',
   ) as ThreadTimelineFilterTypes;
-
-  const { data: community } = useGetCommunityByIdQuery({
-    id: communityId,
-    enabled: !!communityId,
-    includeNodeInfo: true,
-  });
 
   const { data: topics, isLoading: isLoadingTopics } = useFetchTopicsQuery({
     communityId,
@@ -134,7 +127,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     nodeEthChainId: app?.chain.meta?.ChainNode?.eth_chain_id || 0,
   });
 
-  const { fetchNextPage, data, isInitialLoading, hasNextPage } =
+  const { fetchNextPage, data, isInitialLoading, hasNextPage, threadCount } =
     useFetchThreadsQuery({
       communityId: communityId,
       queryType: 'bulk',
@@ -283,7 +276,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
             isOnArchivePage
               ? filteredThreads.length || 0
               : threads
-                ? community?.lifetime_thread_count || 0
+                ? threadCount || 0
                 : 0
           }
           isIncludingSpamThreads={includeSpamThreads}
