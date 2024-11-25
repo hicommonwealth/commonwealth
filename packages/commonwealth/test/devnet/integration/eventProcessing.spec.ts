@@ -1,8 +1,10 @@
 import {
   commonProtocol as cp,
   launchpadFactoryAbi,
+  lpBondingCurveAbi,
 } from '@hicommonwealth/evm-protocols';
 import { models } from '@hicommonwealth/model';
+import { TokenInstance } from '@hicommonwealth/model/src/models/token';
 import { describe, expect, test, vi } from 'vitest';
 import { Contract } from 'web3';
 import { AbiItem } from 'web3-utils';
@@ -10,7 +12,7 @@ import { setupCommonwealthE2E } from './integrationUtils/mainSetup';
 
 describe('End to end event tests', () => {
   test(
-    'Launch token happy path',
+    'Token trade happy path',
     async () => {
       const { web3, mineBlocks, anvilAccounts } = await setupCommonwealthE2E();
 
@@ -34,13 +36,40 @@ describe('End to end event tests', () => {
 
       await mineBlocks(1);
 
+      let token: TokenInstance;
       await vi.waitFor(
         async () => {
-          const token = await models.Token.findOne({
+          token = await models.Token.findOne({
             where: { name: 'testToken' },
           });
           expect(token).toBeTruthy();
-          return token;
+        },
+        {
+          timeout: 10000,
+          interval: 500,
+        },
+      );
+
+      const lpBondingCurveFactory = new web3.eth.Contract(
+        lpBondingCurveAbi as AbiItem[],
+        '0xdc17c27ae8be831af07cc38c02930007060020f4',
+      ) as unknown as Contract<typeof lpBondingCurveAbi>;
+
+      await cp.buyToken(
+        lpBondingCurveFactory,
+        token.token_address,
+        anvilAccounts[0].address,
+        1,
+      );
+
+      await mineBlocks(1);
+
+      await vi.waitFor(
+        async () => {
+          const launchpadTrade = await models.LaunchpadTrade.findOne({
+            where: { token_address: token.token_address, is_buy: true },
+          });
+          expect(launchpadTrade).toBeTruthy();
         },
         {
           timeout: 10000,
