@@ -3,11 +3,11 @@ import { trpc } from 'utils/trpcClient';
 import { Skeleton } from 'views/components/Skeleton';
 import { CWText } from 'views/components/component_kit/cw_text';
 import useCommunityContests from '../../CommunityManagement/Contests/useCommunityContests';
-import ContestCard from './ContestCard';
+import ExploreContestCard from './ExploreContestCard';
 
-import './ContestList.scss';
+import './ExploreContestList.scss';
 
-const ContestList = () => {
+const ExploreContestList = () => {
   const {
     contestsData: { active: activeContests },
     isContestDataLoading,
@@ -39,7 +39,7 @@ const ContestList = () => {
   }, {});
 
   return (
-    <div className="ContestList">
+    <div className="ExploreContestList">
       <CWText type="h2">Contests</CWText>
       <>
         {!isContestDataLoading && activeContests.length === 0 && (
@@ -57,7 +57,7 @@ const ContestList = () => {
         ) : (
           <div className="content">
             {activeContests.map((contest) => (
-              <ContestCard
+              <ExploreContestCard
                 key={contest.contest_address}
                 contest={contest}
                 community={community[contest.community_id as string]}
@@ -70,4 +70,4 @@ const ContestList = () => {
   );
 };
 
-export default ContestList;
+export default ExploreContestList;

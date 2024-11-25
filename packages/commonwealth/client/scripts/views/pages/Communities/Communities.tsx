@@ -25,7 +25,7 @@ import { CWTag } from '../../components/component_kit/new_designs/CWTag';
 import CreateCommunityButton from '../../components/sidebar/CreateCommunityButton';
 import ManageCommunityStakeModal from '../../modals/ManageCommunityStakeModal/ManageCommunityStakeModal';
 import './Communities.scss';
-import ContestList from './ContestList';
+import ExploreContestList from './ExploreContestList';
 import {
   CommunityFilters,
   CommunitySortDirections,
@@ -323,7 +323,7 @@ const CommunitiesPage = () => {
           <IdeaLaunchpad />
         </div>
         <TokensList filters={filters} />
-        <ContestList />
+        <ExploreContestList />
         {tokenizedCommunityEnabled && <CWText type="h2">Communities</CWText>}
         {isLoading && communitiesList.length === 0 ? (
           <CWCircleMultiplySpinner />

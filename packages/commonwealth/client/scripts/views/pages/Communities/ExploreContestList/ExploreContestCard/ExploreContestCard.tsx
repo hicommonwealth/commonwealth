@@ -16,9 +16,9 @@ import { CWThreadAction } from '../../../../components/component_kit/new_designs
 import { Contest } from '../../../CommunityManagement/Contests/ContestsList';
 import ContestCountdown from '../../../CommunityManagement/Contests/ContestsList/ContestCountdown';
 
-import './ContestCard.scss';
+import './ExploreContestCard.scss';
 
-interface ContestCardProps {
+interface ExploreContestCardProps {
   contest: Contest;
   community: {
     name: string;
@@ -28,7 +28,10 @@ interface ContestCardProps {
   };
 }
 
-const ContestCard = ({ contest, community }: ContestCardProps) => {
+const ExploreContestCard = ({
+  contest,
+  community,
+}: ExploreContestCardProps) => {
   const navigate = useCommonNavigate();
   const finishDate = moment(contest.contests?.[0].end_time).toISOString();
 
@@ -37,7 +40,7 @@ const ContestCard = ({ contest, community }: ContestCardProps) => {
       contestAddress: contest.contest_address || '',
       chainRpc: community.chainNodeUrl,
       ethChainId: community.ethChainId,
-      isOneOff: !contest.funding_token_address,
+      isOneOff: !!contest.funding_token_address,
       apiEnabled: Boolean(
         contest.contest_address &&
           community.chainNodeUrl &&
@@ -57,7 +60,7 @@ const ContestCard = ({ contest, community }: ContestCardProps) => {
   const handleGoToContest = () => {
     const path = contest.is_farcaster_contest
       ? `/contests/${contest.contest_address}`
-      : `/discussions/${contest.topics?.[0].name}`;
+      : `/discussions/${contest.topics?.[0]?.name}`;
 
     navigateToCommunity({
       navigate,
@@ -79,7 +82,7 @@ const ContestCard = ({ contest, community }: ContestCardProps) => {
   };
 
   return (
-    <div className="ContestCard">
+    <div className="ExploreContestCard">
       <div className="contest-banner">
         <img
           src={contest.image_url}
@@ -174,4 +177,4 @@ const ContestCard = ({ contest, community }: ContestCardProps) => {
   );
 };
 
-export default ContestCard;
+export default ExploreContestCard;
