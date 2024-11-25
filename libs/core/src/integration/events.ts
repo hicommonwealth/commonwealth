@@ -38,6 +38,9 @@ export enum EventNames {
 
   // Preferences
   SubscriptionPreferencesUpdated = 'SubscriptionPreferencesUpdated',
+
+  // Referrals
+  SignUpFlowCompleted = 'SignUpFlowCompleted',
 }
 
 export type EventPairs =
@@ -140,4 +143,8 @@ export type EventPairs =
   | {
       event_name: EventNames.DiscordThreadDeleted;
       event_payload: z.infer<typeof events.DiscordThreadDeleted>;
+    }
+  | {
+      event_name: EventNames.SignUpFlowCompleted;
+      event_payload: z.infer<typeof events.SignUpFlowCompleted>;
     };
