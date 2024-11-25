@@ -17,6 +17,7 @@ import { seed } from '../../src/tester';
 
 describe('Subscription preferences lifecycle', () => {
   let actor: Actor;
+
   beforeAll(async () => {
     const [user] = await seed('User', {
       isAdmin: false,

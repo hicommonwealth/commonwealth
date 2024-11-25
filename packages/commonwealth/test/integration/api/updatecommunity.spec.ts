@@ -36,7 +36,7 @@ describe('Update Community/Chain Tests', () => {
   let server: TestServer;
 
   beforeAll(async () => {
-    server = await testServer(import.meta);
+    server = await testServer();
 
     // get logged in address/user with JWT
     const result = await server.seeder.createAndVerifyAddress(

@@ -22,7 +22,7 @@ describe('Verify Address Routes', () => {
   const chain_id = '1';
 
   beforeAll(async () => {
-    server = await testServer(import.meta);
+    server = await testServer();
 
     sessionSigner = new SIWESigner({ chainId: parseInt(chain_id) });
     const { payload } = await sessionSigner.newSession(CANVAS_TOPIC);
