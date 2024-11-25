@@ -58,7 +58,6 @@ const SignTokenTransactions = ({
       const token = await createToken({
         transaction_hash: txReceipt.transactionHash,
         chain_node_id: baseNode.id,
-        community_id: createdCommunityId,
         icon_url: tokenInfo?.imageURL?.trim() || '',
         description: tokenInfo?.description?.trim() || '',
       });

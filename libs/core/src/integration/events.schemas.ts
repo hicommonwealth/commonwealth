@@ -182,7 +182,7 @@ export const ChainEventCreated = z.union([
   ChainEventCreatedBase.extend({
     eventSource: ChainEventCreatedBase.shape.eventSource.extend({
       eventSignature: z.literal(
-        '0xd7ca5dc2f8c6bb37c3a4de2a81499b25f8ca8bbb3082010244fe747077d0f6cc',
+        '0xacba89c290ec5301484c0453f480dc9b83ab3a739c6b6e345ecd1b0525787d23',
       ),
     }),
     parsedArgs: LaunchpadTokenCreated,

@@ -27,6 +27,9 @@ export const NamespaceDeployed = z.tuple([
 
 export const LaunchpadTokenCreated = z.tuple([
   z.string().describe('tokenAddress'),
+  ETHERS_BIG_NUMBER.describe('totalSupply'),
+  z.string().describe('name'),
+  z.string().describe('symbol'),
 ]);
 
 export const LaunchpadTrade = z.tuple([

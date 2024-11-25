@@ -1,6 +1,6 @@
+import { models } from '@hicommonwealth/model';
 import { commonProtocol } from '@hicommonwealth/shared';
-import sleep from 'sleep-promise';
-import { describe, test } from 'vitest';
+import { describe, expect, test, vi } from 'vitest';
 import { Contract } from 'web3';
 import { AbiItem } from 'web3-utils';
 import { launchToken } from '../../../../../libs/shared/src/commonProtocol';
@@ -17,7 +17,7 @@ describe('End to end event tests', () => {
         '0x7a2088a1bfc9d81c55368ae168c2c02570cb814f',
       ) as unknown as Contract<typeof commonProtocol.launchpadFactoryAbi>;
 
-      const txReceipt = await launchToken(
+      await launchToken(
         launchpadFactory,
         'testToken',
         'test',
@@ -32,23 +32,19 @@ describe('End to end event tests', () => {
 
       await mineBlocks(1);
 
-      for (let i = 0; i < 1000000; i++) {
-        await sleep(100);
-      }
-
-      // await vi.waitFor(
-      //   async () => {
-      //     const token = await models.Token.findOne({
-      //       where: { name: 'testToken' },
-      //     });
-      //     expect(token).toBeTruthy();
-      //     return token;
-      //   },
-      //   {
-      //     timeout: 10000,
-      //     interval: 500,
-      //   },
-      // );
+      await vi.waitFor(
+        async () => {
+          const token = await models.Token.findOne({
+            where: { name: 'testToken' },
+          });
+          expect(token).toBeTruthy();
+          return token;
+        },
+        {
+          timeout: 10000,
+          interval: 500,
+        },
+      );
     },
     { timeout: 100000000 },
   );

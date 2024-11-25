@@ -1,4 +1,5 @@
 import {
+  Actor,
   EventHandler,
   Policy,
   command,
@@ -11,7 +12,6 @@ import {
   deployedNamespaceEventSignature,
   launchpadTokenLaunchedEventSignature,
   launchpadTradeEventSignature,
-  middleware,
   models,
 } from '@hicommonwealth/model';
 import { ZodUndefined } from 'zod';
@@ -32,10 +32,9 @@ export const processChainEventCreated: EventHandler<
     payload.eventSource.eventSignature === launchpadTokenLaunchedEventSignature
   ) {
     await command(Token.CreateToken(), {
-      actor: middleware.systemActor({}),
+      actor: [] as unknown as Actor,
       payload: {
         chain_node_id: payload.eventSource.chainNodeId,
-        community_id: '', // not required for system actors
         transaction_hash: payload.rawLog.transactionHash,
       },
     });
