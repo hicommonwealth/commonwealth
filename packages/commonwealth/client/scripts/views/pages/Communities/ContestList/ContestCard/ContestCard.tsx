@@ -1,22 +1,54 @@
 import commonLogo from 'assets/img/branding/common.svg';
 import farcasterUrl from 'assets/img/farcaster.svg';
+import { useGetContestBalanceQuery } from 'client/scripts/state/api/contests';
+import { Skeleton } from 'client/scripts/views/components/Skeleton';
 import clsx from 'clsx';
+import moment from 'moment';
 import React from 'react';
 import { CWCommunityAvatar } from 'views/components/component_kit/cw_community_avatar';
+import { capDecimals } from 'views/modals/ManageCommunityStakeModal/utils';
 import { CWText } from '../../../../components/component_kit/cw_text';
 import { CWButton } from '../../../../components/component_kit/new_designs/CWButton/CWButton';
 import { CWThreadAction } from '../../../../components/component_kit/new_designs/cw_thread_action';
 import { Contest } from '../../../CommunityManagement/Contests/ContestsList';
+import ContestCountdown from '../../../CommunityManagement/Contests/ContestsList/ContestCountdown';
 
 import './ContestCard.scss';
 
 interface ContestCardProps {
   contest: Contest;
-  community: { name: string; iconUrl: string };
+  community: {
+    name: string;
+    iconUrl: string;
+    chainNodeUrl: string;
+    ethChainId: number;
+  };
 }
 
 const ContestCard = ({ contest, community }: ContestCardProps) => {
-  const timeRemaining = '23 hours'; // TODO: Calculate from contest.end_time
+  const finishDate = moment(contest.contests?.[0].end_time).toISOString();
+
+  const { data: contestBalance, isLoading: isContestBalanceLoading } =
+    useGetContestBalanceQuery({
+      contestAddress: contest.contest_address || '',
+      chainRpc: community.chainNodeUrl,
+      ethChainId: community.ethChainId,
+      isOneOff: !contest.funding_token_address,
+      apiEnabled: Boolean(
+        contest.contest_address &&
+          community.chainNodeUrl &&
+          community.ethChainId,
+      ),
+    });
+
+  const prizes =
+    contestBalance && contest.payout_structure
+      ? contest.payout_structure.map(
+          (percentage) =>
+            (contestBalance * (percentage / 100)) /
+            Math.pow(10, contest.decimals || 18),
+        )
+      : [];
 
   return (
     <div className="ContestCard">
@@ -39,7 +71,6 @@ const ContestCard = ({ contest, community }: ContestCardProps) => {
 
           <CWText type="h3" fontWeight="medium" className="contest-title">
             {contest.name}
-
             <div className="contest-icon-container">
               <img
                 className={clsx(
@@ -53,9 +84,7 @@ const ContestCard = ({ contest, community }: ContestCardProps) => {
         </div>
 
         <div className="contest-timing">
-          <CWText type="b2" fontWeight="medium" className="time-remaining">
-            Ends in {timeRemaining}
-          </CWText>
+          <ContestCountdown finishTime={finishDate} isActive />
         </div>
 
         <div className="prizes-section">
@@ -63,24 +92,26 @@ const ContestCard = ({ contest, community }: ContestCardProps) => {
             Current Prizes
           </CWText>
           <div className="prize-list">
-            <div className="prize-item">
-              <CWText type="b2">1st Prize</CWText>
-              <CWText type="b2" fontWeight="semiBold">
-                ETH .00013456
-              </CWText>
-            </div>
-            <div className="prize-item">
-              <CWText type="b2">2nd Prize</CWText>
-              <CWText type="b2" fontWeight="semiBold">
-                ETH .00002518
-              </CWText>
-            </div>
-            <div className="prize-item">
-              <CWText type="b2">3rd Prize</CWText>
-              <CWText type="b2" fontWeight="semiBold">
-                ETH .00000981
-              </CWText>
-            </div>
+            {isContestBalanceLoading ? (
+              <>
+                <Skeleton width="100%" height="20px" />
+                <Skeleton width="100%" height="20px" />
+                <Skeleton width="100%" height="20px" />
+              </>
+            ) : prizes.length > 0 ? (
+              prizes?.map((prize, index) => (
+                <div className="prize-row" key={index}>
+                  <CWText className="label">
+                    {moment.localeData().ordinal(index + 1)} Prize
+                  </CWText>
+                  <CWText fontWeight="bold">
+                    {capDecimals(String(prize))} {contest.ticker}
+                  </CWText>
+                </div>
+              ))
+            ) : (
+              <CWText type="b2">No prizes available</CWText>
+            )}
           </div>
         </div>
 

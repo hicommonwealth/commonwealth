@@ -3,6 +3,7 @@ import { trpc } from 'utils/trpcClient';
 import useCommunityContests from '../../CommunityManagement/Contests/useCommunityContests';
 import ContestCard from './ContestCard';
 
+import { Skeleton } from 'client/scripts/views/components/Skeleton';
 import './ContestList.scss';
 
 const ContestList = () => {
@@ -18,16 +19,20 @@ const ContestList = () => {
   ];
 
   const communityQueries = trpc.useQueries((t) =>
-    communityIds.map((id) => t.community.getCommunity({ id: id! })),
+    communityIds.map((id) =>
+      t.community.getCommunity({ id: id!, include_node_info: true }),
+    ),
   );
 
-  const communityIcons = communityIds.reduce((acc, id, index) => {
+  const community = communityIds.reduce((acc, id, index) => {
     const communityData = communityQueries[index].data;
     return {
       ...acc,
       [id as string]: {
         name: communityData?.name || '',
         iconUrl: communityData?.icon_url || '',
+        chainNodeUrl: communityData?.ChainNode?.url,
+        ethChainId: communityData?.ChainNode?.eth_chain_id,
       },
     };
   }, {});
@@ -35,13 +40,14 @@ const ContestList = () => {
   return (
     <div className="ContestList">
       {isContestDataLoading ? (
-        <div>Loading...</div>
+        // TODO: adjust width and height
+        <Skeleton width={'100%'} height={'200px'} />
       ) : (
         activeContests.map((contest) => (
           <ContestCard
             key={contest.contest_address}
             contest={contest}
-            community={communityIcons[contest.community_id as string]}
+            community={community[contest.community_id as string]}
           />
         ))
       )}

@@ -55,10 +55,6 @@
 
     .contest-timing {
       margin-bottom: 16px;
-
-      .time-remaining {
-        color: var(--accent-red);
-      }
     }
 
     .prizes-section {
@@ -66,13 +62,15 @@
 
       .prize-list {
         margin-top: 8px;
-      }
 
-      .prize-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 4px;
+        .prize-row {
+          display: flex;
+          justify-content: space-between;
+
+          .label {
+            color: $neutral-600;
+          }
+        }
       }
     }
 
