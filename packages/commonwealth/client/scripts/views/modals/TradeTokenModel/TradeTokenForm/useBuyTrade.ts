@@ -1,5 +1,4 @@
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import { useState } from 'react';
 import {
   useFetchTokenUsdRateQuery,
@@ -53,7 +52,6 @@ const useBuyTrade = ({
   const {
     data: selectedAddressEthBalance = `0.0`,
     isLoading: isLoadingUserEthBalance,
-    refetch: refetchEthBalance,
   } = useGetUserEthBalanceQuery({
     chainRpc: tokenCommunity?.ChainNode?.url || '',
     ethChainId: tokenCommunity?.ChainNode?.eth_chain_id || 0,
@@ -71,7 +69,6 @@ const useBuyTrade = ({
   const {
     data: unitEthToTokenBuyExchangeRate = 0,
     isLoading: isLoadingUnitEthToTokenBuyExchangeRate,
-    refetch: refetchEthToTokenExchangeRate,
   } = useTokenEthExchangeRateQuery({
     chainRpc: chainNode.url,
     ethChainId: chainNode.ethChainId || 0,
@@ -79,19 +76,6 @@ const useBuyTrade = ({
     tokenAmount: 1 * 1e18, // convert to wei - get exchange rate of 1 unit token to eth
     tokenAddress: tradeConfig.token.token_address,
     enabled: isUnitEthToTokenBuyExchangeRateQueryEnabled,
-  });
-
-  useRunOnceOnCondition({
-    callback: () => {
-      // fetch fresh rates if there are any stale values
-      refetchEthBalance().catch(console.error);
-      refetchEthToTokenExchangeRate().catch(console.error);
-    },
-    shouldRun:
-      isSelectedAddressEthBalanceQueryEnabled &&
-      !!refetchEthBalance &&
-      isUnitEthToTokenBuyExchangeRateQueryEnabled &&
-      !!refetchEthToTokenExchangeRate,
   });
 
   const { mutateAsync: buyToken, isLoading: isBuyingToken } =

@@ -1,5 +1,5 @@
-import { command, config } from '@hicommonwealth/core';
-import { Contest } from '@hicommonwealth/model';
+import { config, query } from '@hicommonwealth/core';
+import { Contest, config as modelConfig } from '@hicommonwealth/model';
 import { Button } from 'frames.js/express';
 import React from 'react';
 
@@ -8,7 +8,7 @@ import { frames } from '../../config';
 export const contestCard = frames(async (ctx) => {
   const contest_address = ctx.url.pathname.split('/')[1];
 
-  const contestManager = await command(Contest.GetContest(), {
+  const contestManager = await query(Contest.GetContest(), {
     actor: { user: { email: '' } },
     payload: { contest_address, with_chain_node: true },
   });
@@ -101,6 +101,9 @@ export const contestCard = frames(async (ctx) => {
       >
         Check Eligibility
       </Button>,
+      <Button key="install" action="link" target={getActionInstallUrl()}>
+        Install Upvote Action
+      </Button>,
     ],
   };
 });
@@ -117,3 +120,7 @@ const getBaseUrl = () => {
       return 'https://commonwealth.im';
   }
 };
+
+export const getActionInstallUrl = () =>
+  // eslint-disable-next-line max-len
+  `https://warpcast.com/~/add-cast-action?actionType=post&name=Upvote+Content&icon=thumbsup&postUrl=${modelConfig.CONTESTS.FARCASTER_ACTION_URL}`;

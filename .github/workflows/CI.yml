@@ -33,7 +33,7 @@ jobs:
     timeout-minutes: 20
     strategy:
       matrix:
-        node: [ 20 ]
+        node: [ 22 ]
 
     services:
       postgres:
@@ -91,7 +91,7 @@ jobs:
     timeout-minutes: 30
     strategy:
       matrix:
-        node: [ 20 ]
+        node: [ 22 ]
 
     services:
       postgres:
@@ -150,7 +150,7 @@ jobs:
     timeout-minutes: 10
     strategy:
       matrix:
-        node: [ 20 ]
+        node: [ 22 ]
 
     services:
       postgres:
@@ -203,7 +203,7 @@ jobs:
     timeout-minutes: 10
     strategy:
       matrix:
-        node: [ 20 ]
+        node: [ 22 ]
 
     steps:
       - uses: actions/checkout@v4
@@ -223,7 +223,7 @@ jobs:
     timeout-minutes: 10
     strategy:
       matrix:
-        node: [ 20 ]
+        node: [ 22 ]
 
     steps:
       - uses: actions/checkout@v4
@@ -266,7 +266,7 @@ jobs:
     timeout-minutes: 10
     strategy:
       matrix:
-        node: [ 20 ]
+        node: [ 22 ]
 
     steps:
       - uses: actions/checkout@v4
@@ -296,7 +296,7 @@ jobs:
     timeout-minutes: 20
     strategy:
       matrix:
-        node: [ 20 ]
+        node: [ 22 ]
 
     services:
       postgres:
@@ -344,7 +344,7 @@ jobs:
     timeout-minutes: 20
     strategy:
       matrix:
-        node: [ 20 ]
+        node: [ 22 ]
 
     services:
       postgres:
@@ -403,7 +403,7 @@ jobs:
     timeout-minutes: 10
     strategy:
       matrix:
-        node: [ 20 ]
+        node: [ 22 ]
 
     services:
       postgres:
@@ -445,7 +445,7 @@ jobs:
     if: always()
     strategy:
       matrix:
-        node: [ 20 ]
+        node: [ 22 ]
 
     steps:
       - name: Coveralls Finished
