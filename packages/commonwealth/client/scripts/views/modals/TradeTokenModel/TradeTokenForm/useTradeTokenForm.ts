@@ -1,5 +1,5 @@
+import { commonProtocol } from '@hicommonwealth/evm-protocols';
 import { ExtendedCommunity } from '@hicommonwealth/schemas';
-import { commonProtocol } from '@hicommonwealth/shared';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import NodeInfo from 'models/NodeInfo';
 import { useMemo, useState } from 'react';

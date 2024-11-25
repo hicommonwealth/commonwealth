@@ -8,3 +8,4 @@ export * from './GetUserAddresses.query';
 export * from './GetUserProfile.query';
 export * from './SearchUserProfiles.query';
 export * from './UpdateUser.command';
+export * from './UserReferrals.projection';

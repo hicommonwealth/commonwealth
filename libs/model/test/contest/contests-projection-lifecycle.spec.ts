@@ -7,9 +7,10 @@ import {
   handleEvent,
   query,
 } from '@hicommonwealth/core';
+import { commonProtocol } from '@hicommonwealth/evm-protocols';
 import { models } from '@hicommonwealth/model';
 import { ContestResults } from '@hicommonwealth/schemas';
-import { AbiType, commonProtocol, delay } from '@hicommonwealth/shared';
+import { AbiType, delay } from '@hicommonwealth/shared';
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import Sinon from 'sinon';
@@ -351,6 +352,7 @@ describe('Contests projection lifecycle', () => {
         payout_structure,
         funding_token_address,
         image_url,
+        description: null,
         interval,
         ticker,
         decimals,
