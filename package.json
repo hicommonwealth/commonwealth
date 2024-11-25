@@ -6,7 +6,7 @@
     "url": "git+https://github.com/hicommonwealth/commonwealth.git"
   },
   "type": "module",
-  "packageManager": "pnpm@9.10.0",
+  "packageManager": "pnpm@9.14.2",
   "scripts": {
     "build": "chmod u+x scripts/build.sh && ./scripts/build.sh",
     "docker-build-commonwealth": "docker build -f Dockerfile.commonwealth_base --tag commonwealth:latest .",
@@ -147,6 +147,6 @@
     "esbuild-darwin-64": "^0.15.12"
   },
   "engines": {
-    "node": "20.x"
+    "node": "22.x"
   }
 }

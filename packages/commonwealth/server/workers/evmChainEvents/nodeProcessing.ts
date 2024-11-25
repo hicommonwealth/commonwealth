@@ -1,10 +1,8 @@
 import {
-  ChainEventSigs,
   ContestContentAdded,
   ContestContentUpvoted,
   ContestStarted,
   EventNames,
-  EvmEventSignatures,
   OneOffContestManagerDeployed,
   RecurringContestManagerDeployed,
   events as coreEvents,
@@ -12,6 +10,10 @@ import {
   parseEvmEventToContestEvent,
   stats,
 } from '@hicommonwealth/core';
+import {
+  ChainEventSigs,
+  EvmEventSignatures,
+} from '@hicommonwealth/evm-protocols';
 import { DB, emitEvent } from '@hicommonwealth/model';
 import { ethers } from 'ethers';
 import { z } from 'zod';

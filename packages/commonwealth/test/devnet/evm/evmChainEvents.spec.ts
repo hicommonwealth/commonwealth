@@ -1,5 +1,6 @@
 import { Log } from '@ethersproject/providers';
 import { ChainEventCreated, dispose, EventNames } from '@hicommonwealth/core';
+import { commonProtocol } from '@hicommonwealth/evm-protocols';
 import {
   CommunityStake,
   communityStakesAbi,
@@ -14,12 +15,7 @@ import {
   hashAbi,
   models,
 } from '@hicommonwealth/model';
-import {
-  AbiType,
-  BalanceType,
-  commonProtocol,
-  delay,
-} from '@hicommonwealth/shared';
+import { AbiType, BalanceType, delay } from '@hicommonwealth/shared';
 import { Anvil } from '@viem/anvil';
 import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 import { z } from 'zod';
