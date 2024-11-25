@@ -1,9 +1,9 @@
 import React from 'react';
 import { trpc } from 'utils/trpcClient';
+import { Skeleton } from 'views/components/Skeleton';
 import useCommunityContests from '../../CommunityManagement/Contests/useCommunityContests';
 import ContestCard from './ContestCard';
 
-import { Skeleton } from 'client/scripts/views/components/Skeleton';
 import './ContestList.scss';
 
 const ContestList = () => {
@@ -40,8 +40,10 @@ const ContestList = () => {
   return (
     <div className="ContestList">
       {isContestDataLoading ? (
-        // TODO: adjust width and height
-        <Skeleton width={'100%'} height={'200px'} />
+        <>
+          <Skeleton height="300px" />
+          <Skeleton height="300px" />
+        </>
       ) : (
         activeContests.map((contest) => (
           <ContestCard

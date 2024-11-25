@@ -1,12 +1,15 @@
-import commonLogo from 'assets/img/branding/common.svg';
-import farcasterUrl from 'assets/img/farcaster.svg';
-import { useGetContestBalanceQuery } from 'client/scripts/state/api/contests';
-import { Skeleton } from 'client/scripts/views/components/Skeleton';
 import clsx from 'clsx';
 import moment from 'moment';
 import React from 'react';
+
+import commonLogo from 'assets/img/branding/common.svg';
+import farcasterUrl from 'assets/img/farcaster.svg';
+import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
+import { useGetContestBalanceQuery } from 'state/api/contests';
+import { Skeleton } from 'views/components/Skeleton';
 import { CWCommunityAvatar } from 'views/components/component_kit/cw_community_avatar';
 import { capDecimals } from 'views/modals/ManageCommunityStakeModal/utils';
+
 import { CWText } from '../../../../components/component_kit/cw_text';
 import { CWButton } from '../../../../components/component_kit/new_designs/CWButton/CWButton';
 import { CWThreadAction } from '../../../../components/component_kit/new_designs/cw_thread_action';
@@ -26,6 +29,7 @@ interface ContestCardProps {
 }
 
 const ContestCard = ({ contest, community }: ContestCardProps) => {
+  const navigate = useCommonNavigate();
   const finishDate = moment(contest.contests?.[0].end_time).toISOString();
 
   const { data: contestBalance, isLoading: isContestBalanceLoading } =
@@ -49,6 +53,30 @@ const ContestCard = ({ contest, community }: ContestCardProps) => {
             Math.pow(10, contest.decimals || 18),
         )
       : [];
+
+  const handleGoToContest = () => {
+    const path = contest.is_farcaster_contest
+      ? `/contests/${contest.contest_address}`
+      : `/discussions/${contest.topics?.[0].name}`;
+
+    navigateToCommunity({
+      navigate,
+      path,
+      chain: contest.community_id || '',
+    });
+  };
+
+  const handleLeaderboardClick = () => {
+    const path = contest.is_farcaster_contest
+      ? `/contests/${contest.contest_address}`
+      : `/discussions?featured=mostLikes&contest=${contest.contest_address}`;
+
+    navigateToCommunity({
+      navigate,
+      path,
+      chain: contest.community_id || '',
+    });
+  };
 
   return (
     <div className="ContestCard">
@@ -116,18 +144,24 @@ const ContestCard = ({ contest, community }: ContestCardProps) => {
         </div>
 
         <div className="contest-actions">
-          <CWThreadAction action="leaderboard" label="Leaderboard" />
-          <CWThreadAction action="fund" label="Previous winners" />
+          <CWThreadAction
+            action="leaderboard"
+            label="Leaderboard"
+            onClick={handleLeaderboardClick}
+          />
         </div>
 
-        <CWButton
-          buttonHeight="sm"
-          buttonWidth="full"
-          label="Go to contest"
-          onClick={() => {
-            /* TODO: Navigate to contest */
-          }}
-        />
+        <div className="cta-button-container">
+          <CWButton
+            buttonHeight="sm"
+            buttonWidth="full"
+            label="Go to contest"
+            buttonType="secondary"
+            buttonAlt="green"
+            className="cta-button"
+            onClick={handleGoToContest}
+          />
+        </div>
       </div>
     </div>
   );

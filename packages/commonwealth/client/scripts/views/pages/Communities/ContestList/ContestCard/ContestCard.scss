@@ -1,10 +1,14 @@
 @import '../../../../../../styles/shared';
 
 .ContestCard {
-  border: 1px solid $neutral-400;
   border-radius: 6px;
-  width: 300px;
-  padding: 8px;
+  padding: 16px;
+  border: 1px solid $neutral-100;
+  background: $white;
+
+  &:hover {
+    box-shadow: $elevation-2;
+  }
 
   .contest-banner {
     border-radius: 6px;
@@ -78,6 +82,12 @@
       display: flex;
       gap: 16px;
       margin-bottom: 16px;
+    }
+
+    .cta-button-container {
+      display: flex;
+      align-items: center;
+      height: 40px;
     }
   }
 }
