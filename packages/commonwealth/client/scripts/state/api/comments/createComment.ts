@@ -31,9 +31,9 @@ export const buildCreateCommentInput = async ({
   parentCommentMsgId = null,
 }: CreateCommentProps) => {
   const canvasSignedData = await signComment(address, {
-    thread_id: threadMsgId,
+    thread_id: threadMsgId ?? null,
     body: unescapedText,
-    parent_comment_id: parentCommentMsgId,
+    parent_comment_id: parentCommentMsgId ?? null,
   });
   return {
     thread_id: threadId,
