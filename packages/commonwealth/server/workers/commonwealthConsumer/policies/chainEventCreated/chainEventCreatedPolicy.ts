@@ -1,4 +1,5 @@
 import {
+  Actor,
   EventHandler,
   Policy,
   command,
