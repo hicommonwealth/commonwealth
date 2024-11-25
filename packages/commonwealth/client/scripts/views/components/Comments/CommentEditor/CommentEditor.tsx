@@ -36,10 +36,8 @@ export const CommentEditor = ({
   disabled,
   onCancel,
   author,
-  editorValue,
   shouldFocus,
   tooltipText,
-  isReplying,
 }: CommentEditorProps) => {
   return (
     <div className="CommentEditor">
