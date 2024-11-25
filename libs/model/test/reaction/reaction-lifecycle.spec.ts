@@ -1,6 +1,6 @@
 import { dispose } from '@hicommonwealth/core';
 import { expect } from 'chai';
-import { bootstrap_testing, seed } from 'model/src/tester';
+import { seed } from 'model/src/tester';
 import { afterAll, beforeAll, describe, test } from 'vitest';
 import { models } from '../../src/database';
 
@@ -10,7 +10,6 @@ describe('Reactions lifecycle', () => {
   const threadId = 999;
 
   beforeAll(async () => {
-    await bootstrap_testing();
     const [chain] = await seed('ChainNode', { contracts: [] });
     const [user] = await seed(
       'User',

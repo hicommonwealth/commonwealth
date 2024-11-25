@@ -1,8 +1,11 @@
-import { events, LaunchpadTrade } from '@hicommonwealth/core';
-import { models } from '@hicommonwealth/model';
+import { events, LaunchpadTrade, logger } from '@hicommonwealth/core';
+import { commonProtocol as cp } from '@hicommonwealth/evm-protocols';
+import { commonProtocol, models } from '@hicommonwealth/model';
 import { BigNumber } from 'ethers';
 import Web3 from 'web3';
 import { z } from 'zod';
+
+const log = logger(import.meta);
 
 export async function handleLaunchpadTrade(
   event: z.infer<typeof events.ChainEventCreated>,
@@ -52,17 +55,52 @@ export async function handleLaunchpadTrade(
     await models.LaunchpadTrade.create({
       eth_chain_id: chainNode.eth_chain_id!,
       transaction_hash: event.rawLog.transactionHash,
-      token_address: tokenAddress,
+      token_address: tokenAddress.toLowerCase(),
       trader_address: traderAddress,
       is_buy: isBuy,
       community_token_amount: BigNumber.from(communityTokenAmount).toBigInt(),
       price:
-        BigNumber.from(communityTokenAmount).toBigInt() /
-        BigNumber.from(ethAmount).toBigInt(),
+        Number(
+          (BigNumber.from(ethAmount).toBigInt() * BigInt(1e18)) /
+            BigNumber.from(communityTokenAmount).toBigInt(),
+        ) / 1e18,
       floating_supply: BigNumber.from(floatingSupply).toBigInt(),
       timestamp: Number(block.timestamp),
     });
   }
 
-  // TODO: check that liquidity has been transferred if above threshold
+  const contracts =
+    cp.factoryContracts[chainNode!.eth_chain_id as cp.ValidChains];
+  let lpBondingCurveAddress: string;
+  if ('lpBondingCurve' in contracts) {
+    lpBondingCurveAddress = contracts.lpBondingCurve;
+  } else {
+    log.error('No lpBondingCurve address found for chain', undefined, {
+      eth_chain_id: chainNode.eth_chain_id,
+    });
+    return;
+  }
+
+  if (
+    !token.liquidity_transferred &&
+    BigNumber.from(floatingSupply).toBigInt() ===
+      BigInt(token.launchpad_liquidity)
+  ) {
+    const onChainTokenData = await commonProtocol.launchpadHelpers.getToken({
+      rpc: chainNode.private_url!,
+      tokenAddress,
+      lpBondingCurveAddress,
+    });
+
+    if (!onChainTokenData.funded) {
+      await commonProtocol.launchpadHelpers.transferLiquidityToUniswap({
+        rpc: chainNode.private_url!,
+        tokenAddress,
+        lpBondingCurveAddress,
+      });
+    }
+
+    token.liquidity_transferred = true;
+    await token.save();
+  }
 }

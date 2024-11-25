@@ -25,7 +25,7 @@ export default (
       namespace: { type: Sequelize.STRING, allowNull: false },
       name: { type: Sequelize.STRING, allowNull: false },
       symbol: { type: Sequelize.STRING, allowNull: false },
-      initial_supply: { type: Sequelize.DECIMAL(78, 0), allowNull: false },
+      initial_supply: { type: Sequelize.INTEGER, allowNull: false },
       liquidity_transferred: {
         type: Sequelize.BOOLEAN,
         allowNull: false,

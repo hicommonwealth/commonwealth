@@ -31,7 +31,7 @@ describe('DatabaseValidationService Tests', () => {
   let server: TestServer;
 
   beforeAll(async function () {
-    server = await testServer();
+    server = await testServer(import.meta);
     console.log('Database reset');
     databaseValidationService = new DatabaseValidationService(server.models);
     let res = await server.seeder.createAndVerifyAddress({ chain }, 'Alice');

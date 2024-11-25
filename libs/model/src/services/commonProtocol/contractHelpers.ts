@@ -1,13 +1,10 @@
 import { AppError } from '@hicommonwealth/core';
-import {
-  BalanceSourceType,
-  ZERO_ADDRESS,
-  commonProtocol,
-} from '@hicommonwealth/shared';
+import { commonProtocol, contestAbi } from '@hicommonwealth/evm-protocols';
+import { BalanceSourceType, ZERO_ADDRESS } from '@hicommonwealth/shared';
 import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
+
 import { Balances, TokenAttributes, getBalances } from '../tokenBalanceCache';
-import { contestABI } from './abi/contestAbi';
 
 /**
  * Retrieves a namespace.
@@ -96,7 +93,7 @@ export const getTokenAttributes = async (
   const web3 = new Web3(rpcNodeUrl);
   let addr = address;
   if (fetchFromContest) {
-    const contest = new web3.eth.Contract(contestABI as AbiItem[], address);
+    const contest = new web3.eth.Contract(contestAbi as AbiItem[], address);
     addr = await contest.methods.contestToken().call();
   }
   if (addr === ZERO_ADDRESS) {

@@ -316,4 +316,17 @@
       color: $black !important;
     }
   }
+
+  &.amount {
+    height: auto;
+    background-color: $neutral-200;
+    padding: 8px 12px;
+    border-radius: 40px;
+    cursor: pointer;
+
+    .Text {
+      font-size: 16px;
+      color: $neutral-500;
+    }
+  }
 }

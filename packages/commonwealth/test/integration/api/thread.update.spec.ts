@@ -48,7 +48,7 @@ describe('Thread Patch Update', () => {
   let server: TestServer;
 
   beforeAll(async () => {
-    server = await testServer();
+    server = await testServer(import.meta);
 
     const adminRes = await server.seeder.createAndVerifyAddress(
       { chain },

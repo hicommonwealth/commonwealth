@@ -1,47 +1,7 @@
+import { Actor, query } from '@hicommonwealth/core';
+import { Contest, config } from '@hicommonwealth/model';
+import { NeynarAPIClient } from '@neynar/nodejs-sdk';
 import React from 'react';
-
-// This might not be needed in the future but for now reduces the amount of boilerplate
-export const CardWithText = ({
-  text,
-  color,
-  element,
-}: {
-  text?: string;
-  color?: string;
-  element?: React.ReactNode;
-}) => {
-  return (
-    <div
-      style={{
-        alignItems: 'center',
-        background: color || 'black',
-        backgroundSize: '100% 100%',
-        display: 'flex',
-        flexDirection: 'column',
-        flexWrap: 'nowrap',
-        height: '100%',
-        justifyContent: 'center',
-        textAlign: 'center',
-        width: '100%',
-      }}
-    >
-      <div
-        style={{
-          color: 'white',
-          fontSize: 60,
-          fontStyle: 'normal',
-          letterSpacing: '-0.025em',
-          lineHeight: 1.4,
-          marginTop: 30,
-          padding: '0 120px',
-          whiteSpace: 'pre-wrap',
-        }}
-      >
-        {element || text}
-      </div>
-    </div>
-  );
-};
 
 export const circleCheckIcon = (
   <svg
@@ -69,44 +29,29 @@ export const circleXIcon = (
   </svg>
 );
 
-export const fakeApiCall = async ({
-  result,
-  error,
-}: {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  result?: any;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  error?: any;
-}) => {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      if (!error) {
-        return resolve(result);
-      }
+export const getFarcasterUser = async (fid: number) => {
+  const client = new NeynarAPIClient(config.CONTESTS.NEYNAR_API_KEY!);
+  const farcasterUser = await client.fetchBulkUsers([fid]);
+  return farcasterUser.users.at(0);
+};
 
-      if (Math.random() > 0.5) {
-        return resolve(result);
-      } else {
-        return reject(error);
-      }
-    }, 1000);
+export const getContestManagerScores = async (contest_address: string) => {
+  const actor: Actor = { user: { email: '' } };
+  const results = await query(Contest.GetAllContests(), {
+    actor,
+    payload: { contest_address },
   });
+
+  if (!results?.length) {
+    throw new Error('contest manager not found');
+  }
+
+  const contestManager = results[0];
+
+  const prizes =
+    contestManager.contests[0].score?.map(
+      (score) => Number(score.prize) / 10 ** contestManager.decimals,
+    ) || [];
+
+  return { contestManager, prizes };
 };
-
-export const getLeaderboard = () => {
-  const sortedList = Array.from({ length: 10 }, (_, index) => ({
-    nickname: `Author${index + 1}`,
-    text: `This is entry text ${index + 1}`,
-    likes: Math.floor(Math.random() * 100),
-  }))
-    .sort((a, b) => b.likes - a.likes)
-    .slice(0, 5);
-
-  return fakeApiCall({ result: sortedList });
-};
-
-export const getRandomColor = () =>
-  Math.floor(Math.random() * 16777215).toString(16);
-
-export const getInvertedColor = (randomColor: string) =>
-  (parseInt(randomColor, 16) ^ 16777215).toString(16);

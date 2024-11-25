@@ -62,7 +62,7 @@ export async function seed<T extends schemas.Aggregates>(
   values?: DeepPartial<z.infer<(typeof schemas)[T]>>,
   options: SeedOptions = { mock: true },
 ): Promise<[z.infer<(typeof schemas)[T]> | undefined, State[]]> {
-  const db = await bootstrap_testing();
+  const db = await bootstrap_testing(import.meta);
 
   const records: State[] = [];
   await _seed(db![name], values ?? {}, options, records, 0);

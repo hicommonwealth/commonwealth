@@ -8,7 +8,7 @@ import app from 'state';
 import useSidebarStore from 'state/ui/sidebar';
 import { SublayoutHeader } from 'views/components/SublayoutHeader';
 import { Sidebar } from 'views/components/sidebar';
-import contestsGTMGrowlImage from '../../assets/img/contestsGTMGrowlImage.svg';
+import litepaperGrowlImage from '../../assets/img/litepaperGrowlImage.svg';
 import useNecessaryEffect from '../hooks/useNecessaryEffect';
 import useStickyHeader from '../hooks/useStickyHeader';
 import { useAuthModalStore, useWelcomeOnboardModal } from '../state/ui/modals';
@@ -176,13 +176,14 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
             {children}
           </div>
           <CWGrowlTemplate
-            headerText="Ignite Your Community with Weekly Contests"
-            bodyText="Supercharge engagement with real rewards! Common Contests spark
-            creativity and bring your community's best ideas to life!"
-            buttonText="Learn More"
-            buttonLink="https://commonwealth.im/common/discussion/25536-Weighted%20Voting%20and%20Contest%20FAQs"
-            growlImage={contestsGTMGrowlImage}
-            extraText="Spark creativity and foster connections within your community."
+            headerText="Common Protocol Litepaper"
+            bodyText="We’re building programmable communities, bringing together app, protocol, and agents to enable
+            DAOs in ways we only dreamed of!"
+            buttonText="Learn more"
+            buttonLink="https://x.com/dillchen/status/1859286283090264241"
+            growlImage={litepaperGrowlImage}
+            growlType="litepaper"
+            blackCloseButton
           />
         </div>
         <WelcomeOnboardModal

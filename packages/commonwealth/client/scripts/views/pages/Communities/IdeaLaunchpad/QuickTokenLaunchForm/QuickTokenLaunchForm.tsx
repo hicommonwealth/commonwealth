@@ -255,11 +255,12 @@ export const QuickTokenLaunchForm = ({
           addressSelectorSelectedAddress: selectedAddress.address,
         });
 
-        await createToken({
+        const token = await createToken({
           transaction_hash: txReceipt.transactionHash,
           chain_node_id: baseNode.id,
           community_id: communityId,
           icon_url: sanitizedTokenInfo.imageURL,
+          description: sanitizedTokenInfo.description,
         });
 
         // 4. update community to reference the created token
@@ -269,6 +270,8 @@ export const QuickTokenLaunchForm = ({
         });
         await updateCommunity({
           community_id: communityId,
+          namespace: token.namespace,
+          transactionHash: txReceipt.transactionHash,
           token_name: sanitizedTokenInfo.name,
           ...(sanitizedTokenInfo.description && {
             description: sanitizedTokenInfo.description,
@@ -303,7 +306,7 @@ export const QuickTokenLaunchForm = ({
   };
 
   const handleSubmit = (tokenInfo: FormSubmitValues) => {
-    if (tokenIdeas.length > 0) {
+    if (tokenIdeas.length > 1) {
       // if there are multiple drafts, then confirm from user if they want to proceed with
       // active draft and discard the others
       triggerDiscardExtraTokenDraftsConfirmation(() =>

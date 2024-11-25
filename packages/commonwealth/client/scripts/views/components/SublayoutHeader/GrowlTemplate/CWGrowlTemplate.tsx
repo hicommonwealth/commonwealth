@@ -1,3 +1,4 @@
+import useBrowserWindow from 'client/scripts/hooks/useBrowserWindow';
 import React, { useState } from 'react';
 import useGrowlStore from 'state/ui/growl';
 import { CWCheckbox } from 'views/components/component_kit/cw_checkbox';
@@ -8,19 +9,19 @@ import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from '../../component_kit/new_designs/CWButton';
 import './CWGrowlTemplate.scss';
 
-const LOCALSTORAGE_GROWL_TEMPLATE_KEY = 'GrowlTemplateHidden';
-
 interface CWGrowlTemplateProps {
   discordLink?: boolean;
-  headerText: string;
-  bodyText: string;
-  buttonText: string;
-  buttonLink: string;
-  growlImage: string;
+  headerText?: string;
+  bodyText?: string;
+  buttonText?: string;
+  buttonLink?: string;
+  growlImage?: string;
   extraText?: string;
+  growlType: string;
+  blackCloseButton?: boolean;
 }
 
-//CWGrowlTemplate should be placed in Sublayout.tsx when used
+//CWGrowlTemplate should be placed in Sublayout.tsx when used for general announcements
 
 export const CWGrowlTemplate = ({
   discordLink = false,
@@ -30,15 +31,18 @@ export const CWGrowlTemplate = ({
   buttonLink,
   growlImage,
   extraText,
+  growlType,
+  blackCloseButton,
 }: CWGrowlTemplateProps) => {
   const { setIsGrowlHidden, isGrowlHidden } = useGrowlStore();
-
+  const { isWindowSmallInclusive } = useBrowserWindow({});
   const [shouldHideGrowlPermanently, setShouldHideGrowlPermanently] =
     useState(false);
 
   const [isDisabled, setIsDisabled] = useState(
-    localStorage.getItem(LOCALSTORAGE_GROWL_TEMPLATE_KEY) === 'true' ||
-      isGrowlHidden,
+    localStorage.getItem(
+      `LOCALSTORAGE_GROWL_TEMPLATE_${growlType.toUpperCase()}_KEY`,
+    ) === 'true' || isGrowlHidden,
   );
 
   const handleExit = () => {
@@ -46,37 +50,54 @@ export const CWGrowlTemplate = ({
     setIsGrowlHidden(true);
 
     if (shouldHideGrowlPermanently) {
-      localStorage.setItem(LOCALSTORAGE_GROWL_TEMPLATE_KEY, 'true');
+      localStorage.setItem(
+        `LOCALSTORAGE_GROWL_TEMPLATE_${growlType.toUpperCase()}_KEY`,
+        'true',
+      );
     }
   };
 
   return (
-    <CWGrowl disabled={isDisabled} position="bottom-right">
+    <CWGrowl
+      disabled={isDisabled}
+      position={isWindowSmallInclusive ? 'center' : 'bottom-right'}
+    >
       <div className="CWGrowlTemplate">
         <CWIconButton
           iconName="close"
           iconSize="medium"
-          className="closeButton"
+          className={`closeButton ${!growlImage ? 'noGrowlImage' : ''} ${blackCloseButton ? 'blackCloseButton' : ''}`}
           onClick={handleExit}
         />
-        <img src={growlImage} alt="" className="img" />
+        {growlImage && <img src={growlImage} alt="" className="img" />}
         <div className="container">
-          <CWText type="h2" fontWeight="bold" isCentered>
+          <CWText
+            type={isWindowSmallInclusive ? 'h4' : 'h2'}
+            fontWeight="bold"
+            isCentered
+          >
             {headerText}
           </CWText>
-          <CWText type="b1" fontWeight="medium" isCentered className="body">
+          <CWText
+            type={isWindowSmallInclusive ? 'b2' : 'b1'}
+            fontWeight="medium"
+            isCentered
+            className="body"
+          >
             {bodyText}
           </CWText>
-          <CWButton
-            className="CalenderButton"
-            buttonType="primary"
-            buttonHeight="med"
-            label={buttonText}
-            onClick={(e) => {
-              e.preventDefault();
-              window.open(buttonLink, '_blank');
-            }}
-          />
+          {buttonLink && (
+            <CWButton
+              className="CalenderButton"
+              buttonType="primary"
+              buttonHeight="med"
+              label={buttonText}
+              onClick={(e) => {
+                e.preventDefault();
+                window.open(buttonLink, '_blank');
+              }}
+            />
+          )}
           {discordLink && (
             <>
               <CWText

@@ -1,11 +1,12 @@
 import { logger } from '@hicommonwealth/core';
 import {
-  deployedNamespaceEventSignature,
-  launchpadTokenRegisteredEventSignature,
-  launchpadTradeEventSignature,
-} from '@hicommonwealth/model';
+  commonProtocol,
+  erc20Abi,
+  EvmEventSignatures,
+  lpBondingCurveAbi,
+} from '@hicommonwealth/evm-protocols';
 import { Web3 } from 'web3';
-import { erc20Abi } from './abi/erc20';
+import { createWeb3Provider } from './utils';
 
 const log = logger(import.meta);
 
@@ -27,7 +28,7 @@ export async function getLaunchpadTradeTransaction({
 
   const tradeLog = txReceipt.logs.find((l) => {
     if (l.topics && l.topics.length > 0) {
-      return l.topics[0].toString() === launchpadTradeEventSignature;
+      return l.topics[0].toString() === EvmEventSignatures.Launchpad.Trade;
     }
     return false;
   });
@@ -80,7 +81,10 @@ export async function getTokenCreatedTransaction({
 
   const deployedNamespaceLog = txReceipt.logs.find((l) => {
     if (l.topics && l.topics.length > 0) {
-      return l.topics[0].toString() === deployedNamespaceEventSignature;
+      return (
+        l.topics[0].toString() ===
+        EvmEventSignatures.NamespaceFactory.NamespaceDeployed
+      );
     }
     return false;
   });
@@ -100,7 +104,9 @@ export async function getTokenCreatedTransaction({
 
   const tokenRegisteredLog = txReceipt.logs.find((l) => {
     if (l.topics && l.topics.length > 0) {
-      return l.topics[0].toString() === launchpadTokenRegisteredEventSignature;
+      return (
+        l.topics[0].toString() === EvmEventSignatures.Launchpad.TokenRegistered
+      );
     }
     return false;
   });
@@ -157,4 +163,50 @@ export async function getErc20TokenInfo({
     symbol,
     totalSupply: totalSupply as bigint,
   };
+}
+
+export async function transferLiquidityToUniswap({
+  rpc,
+  lpBondingCurveAddress,
+  tokenAddress,
+}: {
+  rpc: string;
+  lpBondingCurveAddress: string;
+  tokenAddress: string;
+}) {
+  const web3 = await createWeb3Provider(rpc);
+  const contract = new web3.eth.Contract(
+    lpBondingCurveAbi,
+    lpBondingCurveAddress,
+  );
+  await commonProtocol.transferLiquidity(
+    contract,
+    tokenAddress,
+    web3.eth.defaultAccount!,
+  );
+}
+
+export async function getToken({
+  rpc,
+  lpBondingCurveAddress,
+  tokenAddress,
+}: {
+  rpc: string;
+  lpBondingCurveAddress: string;
+  tokenAddress: string;
+}): Promise<{
+  launchpadLiquidity: bigint;
+  poolLiquidity: bigint;
+  curveId: bigint;
+  scalar: bigint;
+  reserveRation: bigint;
+  LPhook: string;
+  funded: boolean;
+}> {
+  const web3 = new Web3(rpc);
+  const contract = new web3.eth.Contract(
+    lpBondingCurveAbi,
+    lpBondingCurveAddress,
+  );
+  return await contract.methods.tokens(tokenAddress).call();
 }

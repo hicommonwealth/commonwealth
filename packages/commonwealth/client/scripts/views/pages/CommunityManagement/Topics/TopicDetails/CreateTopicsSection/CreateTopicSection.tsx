@@ -1,6 +1,6 @@
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import { DeltaStatic } from 'quill';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import app from 'state';
 import { useFetchTopicsQuery } from 'state/api/topics';
 import { CWCheckbox } from 'views/components/component_kit/cw_checkbox';
@@ -85,7 +85,7 @@ export const CreateTopicSection = ({
     return ['success', 'Valid topic name'];
   };
 
-  useMemo(() => {
+  useEffect(() => {
     if ((descriptionDelta?.ops || [])?.[0]?.insert?.length > 250) {
       setDescErrorMsg('Description must be 250 characters or less');
     } else {
@@ -160,8 +160,7 @@ export const CreateTopicSection = ({
         </div>
         <div className="actions">
           <MessageRow
-            // @ts-expect-error <StrictNullChecks/>
-            statusMessage={descErrorMsg}
+            statusMessage={descErrorMsg || ''}
             hasFeedback={!!descErrorMsg}
             validationStatus={descErrorMsg ? 'failure' : undefined}
           />

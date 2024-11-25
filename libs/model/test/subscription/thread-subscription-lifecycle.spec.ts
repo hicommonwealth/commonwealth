@@ -2,7 +2,7 @@ import { Actor, command, dispose, query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { BalanceType } from '@hicommonwealth/shared';
 import { expect } from 'chai';
-import { bootstrap_testing, seed } from 'model/src/tester';
+import { seed } from 'model/src/tester';
 import { afterAll, afterEach, beforeAll, describe, test } from 'vitest';
 import z from 'zod';
 import { models } from '../../src/database';
@@ -17,7 +17,6 @@ describe('Thread subscription lifecycle', () => {
   let threadOne: z.infer<typeof schemas.Thread> | undefined;
   let threadTwo: z.infer<typeof schemas.Thread> | undefined;
   beforeAll(async () => {
-    await bootstrap_testing(true);
     const [user] = await seed('User', {
       isAdmin: false,
     });

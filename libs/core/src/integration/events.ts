@@ -42,6 +42,10 @@ export enum EventNames {
 
 export type EventPairs =
   | {
+      event_name: EventNames.CommunityCreated;
+      event_payload: z.infer<typeof events.CommunityCreated>;
+    }
+  | {
       event_name: EventNames.CommentCreated;
       event_payload: z.infer<typeof events.CommentCreated>;
     }

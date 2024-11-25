@@ -2,6 +2,10 @@
   margin: auto !important;
 }
 
+.mr-auto {
+  margin-right: auto !important;
+}
+
 .ml-auto {
   margin-left: auto !important;
 }
@@ -20,6 +24,10 @@
 
 .capitalize {
   text-transform: capitalize;
+}
+
+.uppercase {
+  text-transform: uppercase;
 }
 
 .px-16 {

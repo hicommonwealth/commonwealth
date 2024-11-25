@@ -1,9 +1,11 @@
+import {
+  namespaceAbi,
+  namespaceFactoryAbi,
+  reservationHookAbi,
+} from '@hicommonwealth/evm-protocols';
 import { ZERO_ADDRESS } from '@hicommonwealth/shared';
 import { TransactionReceipt } from 'web3';
 import { AbiItem } from 'web3-utils';
-import { NamespaceAbi } from './Abi/NamespaceAbi';
-import { namespaceFactoryAbi } from './Abi/NamespaceFactoryAbi';
-import { reservationHookAbi } from './Abi/ReservationHookAbi';
 import ContractBase from './ContractBase';
 
 /**
@@ -323,7 +325,7 @@ class NamespaceFactory extends ContractBase {
     }
     const namespaceAddr = await this.getNamespaceAddress(namespace);
     const namespaceContract = new this.web3.eth.Contract(
-      NamespaceAbi,
+      namespaceAbi,
       namespaceAddr,
     );
     const balance = await namespaceContract.methods
