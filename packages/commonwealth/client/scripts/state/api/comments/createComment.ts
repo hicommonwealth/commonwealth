@@ -15,7 +15,7 @@ interface CreateCommentProps {
   communityId: string;
   address: string;
   threadId: number;
-  threadMsgId: string;
+  threadMsgId: string | null;
   unescapedText: string;
   parentCommentId: number | null;
   parentCommentMsgId: string | null;
