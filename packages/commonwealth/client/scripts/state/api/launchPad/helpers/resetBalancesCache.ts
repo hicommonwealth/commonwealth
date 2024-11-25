@@ -1,4 +1,3 @@
-import { trpc } from 'utils/trpcClient';
 import { getUserEthBalanceQueryKey } from '../../communityStake/getUserEthBalance';
 import { queryClient } from '../../config';
 import { getERC20BalanceQueryKey } from '../../tokens/getERC20Balance';
@@ -8,7 +7,6 @@ import { getTokenEthExchangeRateQueryKey } from '../tokenEthExchangeRate';
 export const resetBalancesCache = async (
   _: unknown,
   variables: Omit<BuyTokenProps, 'amountEth'>,
-  trpcUtils: ReturnType<typeof trpc.useUtils>,
 ) => {
   await queryClient.invalidateQueries({
     queryKey: getUserEthBalanceQueryKey({
@@ -42,7 +40,19 @@ export const resetBalancesCache = async (
       tokenAmount: 1 * 1e18, // amount per unit
     }),
   });
-  await trpcUtils.token.getTokens.invalidate();
-  await trpcUtils.token.getTokens.refetch();
-  await trpcUtils.token.getToken.invalidate();
+  void queryClient.invalidateQueries({
+    predicate: (query) => {
+      const [path] = query.queryKey;
+      if (Array.isArray(path) && path.length === 2) {
+        const [entity, name] = path;
+        if (
+          entity === 'token' &&
+          (name === 'getTokens' || name === 'getToken')
+        ) {
+          return true;
+        }
+      }
+      return false;
+    },
+  });
 };
