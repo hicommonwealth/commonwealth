@@ -1,0 +1,17 @@
+@import '../../../../../../styles/shared.scss';
+
+.MagicWalletCreationStep {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 16px;
+  align-items: center;
+
+  .h4 {
+    color: $neutral-600;
+
+    .b1 {
+      color: $neutral-500;
+    }
+  }
+}

@@ -1,8 +1,9 @@
-import { commonProtocol } from '@hicommonwealth/shared';
+import { commonProtocol, WalletId } from '@hicommonwealth/shared';
 import { saveToClipboard } from 'client/scripts/utils/clipboard';
 import clsx from 'clsx';
 import { findDenominationIcon } from 'helpers/findDenomination';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
+import { Magic } from 'magic-sdk';
 import React from 'react';
 import { isMobile } from 'react-device-detect';
 import {
@@ -17,9 +18,6 @@ import {
 import { useManageCommunityStakeModalStore } from 'state/ui/modals';
 import useUserStore from 'state/ui/user';
 import { useCommunityStake } from 'views/components/CommunityStake';
-import NumberSelector from 'views/components/NumberSelector';
-import { Skeleton } from 'views/components/Skeleton';
-import useJoinCommunity from 'views/components/SublayoutHeader/useJoinCommunity';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
@@ -33,6 +31,9 @@ import CWPopover, {
 } from 'views/components/component_kit/new_designs/CWPopover';
 import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
 import { MessageRow } from 'views/components/component_kit/new_designs/CWTextInput/MessageRow';
+import NumberSelector from 'views/components/NumberSelector';
+import { Skeleton } from 'views/components/Skeleton';
+import useJoinCommunity from 'views/components/SublayoutHeader/useJoinCommunity';
 import useAppStatus from '../../../../hooks/useAppStatus';
 import { trpc } from '../../../../utils/trpcClient';
 import { useStakeExchange } from '../hooks';
@@ -46,6 +47,8 @@ import {
   CustomAddressOptionElement,
 } from './CustomAddressOption';
 import './StakeExchangeForm.scss';
+
+const magic = new Magic(process.env.MAGIC_PUBLISHABLE_KEY!);
 
 type OptionDropdown = {
   value: string;
@@ -128,6 +131,9 @@ const StakeExchangeForm = ({
   const communityId = community?.id || app.activeChainId() || '';
 
   const { isAddedToHomeScreen } = useAppStatus();
+
+  const userData = useUserStore();
+  const hasMagic = userData.addresses?.[0]?.walletId === WalletId.Magic;
 
   const { trackAnalytics } = useBrowserAnalyticsTrack<BaseMixpanelPayload>({
     onAction: true,
@@ -249,6 +255,14 @@ const StakeExchangeForm = ({
     }
   };
 
+  const openMagicWallet = async () => {
+    try {
+      await magic.wallet.showUI();
+    } catch (error) {
+      console.trace(error);
+    }
+  };
+
   const insufficientFunds = isBuyMode
     ? // @ts-expect-error <StrictNullChecks/>
       parseFloat(userEthBalance) < parseFloat(buyPriceData?.totalPrice)
@@ -331,23 +345,32 @@ const StakeExchangeForm = ({
           saveToClipboard={saveToClipboard}
           showCopyIcon={true}
         />
-
         <div className="current-balance-row">
           <CWText type="caption">Current balance</CWText>
-          {userEthBalanceLoading ? (
-            <Skeleton className="price-skeleton" />
-          ) : (
-            <CWText
-              type="caption"
-              fontWeight="medium"
-              className={clsx({ error: insufficientFunds })}
-            >
-              {/* @ts-expect-error StrictNullChecks*/}
-              {capDecimals(userEthBalance)} {denomination}
-            </CWText>
-          )}
+          <div className="balance-and-magic">
+            {userEthBalanceLoading ? (
+              <Skeleton className="price-skeleton" />
+            ) : (
+              <CWText
+                type="caption"
+                fontWeight="medium"
+                className={clsx({ error: insufficientFunds })}
+              >
+                {/* @ts-expect-error StrictNullChecks*/}
+                {capDecimals(userEthBalance)} {denomination}
+              </CWText>
+            )}
+            {hasMagic && (
+              <CWText
+                className="wallet-btn"
+                type="caption"
+                onClick={openMagicWallet}
+              >
+                Add Funds
+              </CWText>
+            )}
+          </div>
         </div>
-
         <CWDivider />
 
         <div className="stake-valued-row">

@@ -5,6 +5,7 @@ import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWModal } from '../../components/component_kit/new_designs/CWModal';
 import { JoinCommunityStep } from './steps/JoinCommunityStep';
+import { MagicWalletCreationStep } from './steps/MagicWalletCreationStep';
 import { PersonalInformationStep } from './steps/PersonalInformationStep';
 import { PreferencesStep } from './steps/PreferencesStep';
 import { TermsOfServicesStep } from './steps/TermsOfServicesStep';
@@ -61,6 +62,19 @@ const WelcomeOnboardModal = ({ isOpen, onClose }: WelcomeOnboardModalProps) => {
           component: (
             <PreferencesStep
               onComplete={() =>
+                setActiveStep(WelcomeOnboardModalSteps.MagicWallet)
+              }
+            />
+          ),
+        };
+      }
+      case WelcomeOnboardModalSteps.MagicWallet: {
+        return {
+          index: 4,
+          title: 'Magic Wallet Creation',
+          component: (
+            <MagicWalletCreationStep
+              onComplete={() =>
                 setActiveStep(WelcomeOnboardModalSteps.JoinCommunity)
               }
             />
@@ -70,7 +84,7 @@ const WelcomeOnboardModal = ({ isOpen, onClose }: WelcomeOnboardModalProps) => {
 
       case WelcomeOnboardModalSteps.JoinCommunity: {
         return {
-          index: 4,
+          index: 5,
           title: 'Join a community',
           component: <JoinCommunityStep onComplete={handleClose} />,
         };
@@ -101,7 +115,7 @@ const WelcomeOnboardModal = ({ isOpen, onClose }: WelcomeOnboardModalProps) => {
             {getCurrentStep().title}
           </CWText>
           <div className="progress">
-            {[1, 2, 3, 4].map((step) => (
+            {[1, 2, 3, 4, 5].map((step) => (
               <span
                 key={step}
                 className={clsx({ completed: getCurrentStep().index >= step })}

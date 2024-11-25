@@ -1,4 +1,10 @@
-import { ChainBase, WalletId } from '@hicommonwealth/shared';
+import {
+  ChainBase,
+  WalletId,
+  chainBaseToCaip2,
+  chainBaseToCanvasChainId,
+  getSessionSigners,
+} from '@hicommonwealth/shared';
 import axios from 'axios';
 import { setActiveAccount } from 'controllers/app/login';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
@@ -6,9 +12,11 @@ import WebWalletController from 'controllers/app/web_wallets';
 import { SessionKeyError } from 'controllers/server/sessions';
 import { setDarkMode } from 'helpers/darkMode';
 import { getUniqueUserAddresses } from 'helpers/user';
+import { Magic } from 'magic-sdk';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useCallback, useEffect, useState } from 'react';
 import app, { initAppState } from 'state';
+import { EXCEPTION_CASE_VANILLA_getCommunityById } from 'state/api/communities/getCommuityById';
 import { SERVER_URL } from 'state/api/config';
 import useAdminOnboardingSliderMutationStore from 'state/ui/adminOnboardingCards';
 import useGroupMutationBannerStore from 'state/ui/group';
@@ -16,25 +24,18 @@ import {
   useAuthModalStore,
   useManageCommunityStakeModalStore,
 } from 'state/ui/modals';
+import useUserStore from 'state/ui/user';
 import { PopoverMenuItem } from 'views/components/component_kit/CWPopoverMenu';
 import {
   CWToggle,
   toggleDarkMode,
 } from 'views/components/component_kit/cw_toggle';
-
-import {
-  chainBaseToCaip2,
-  chainBaseToCanvasChainId,
-  getSessionSigners,
-} from '@hicommonwealth/shared';
-
+import CWIconButton from 'views/components/component_kit/new_designs/CWIconButton';
 import { useCommunityStake } from '../CommunityStake';
-
-import { EXCEPTION_CASE_VANILLA_getCommunityById } from 'state/api/communities/getCommuityById';
-import useUserStore from 'state/ui/user';
 import UserMenuItem from './UserMenuItem';
 import useCheckAuthenticatedAddresses from './useCheckAuthenticatedAddresses';
 
+const magic = new Magic(process.env.MAGIC_PUBLISHABLE_KEY!);
 const resetWalletConnectSession = async () => {
   /**
    * Imp to reset wc session on logout as otherwise, subsequent login attempts will fail
@@ -85,6 +86,7 @@ const useUserMenuItems = ({
   });
 
   const userData = useUserStore();
+  const hasMagic = userData.addresses?.[0]?.walletId === WalletId.Magic;
 
   const navigate = useCommonNavigate();
   const { stakeEnabled } = useCommunityStake();
@@ -92,6 +94,10 @@ const useUserMenuItems = ({
     useManageCommunityStakeModalStore();
 
   const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
+
+  const [canvasSignedAddresses, setCanvasSignedAddresses] = useState<string[]>(
+    [],
+  );
 
   const uniqueChainAddresses = getUniqueUserAddresses({
     forChain: app?.chain?.base,
@@ -118,10 +124,6 @@ const useUserMenuItems = ({
     selectedAddress,
     setSelectedAddress,
   ]);
-
-  const [canvasSignedAddresses, setCanvasSignedAddresses] = useState<string[]>(
-    [],
-  );
 
   const updateCanvasSignedAddresses = useCallback(async () => {
     const signedAddresses: string[] = [];
@@ -162,6 +164,14 @@ const useUserMenuItems = ({
   useEffect(() => {
     updateCanvasSignedAddresses().catch(console.error);
   }, [updateCanvasSignedAddresses]);
+
+  const openMagicWallet = async () => {
+    try {
+      await magic.wallet.showUI();
+    } catch (error) {
+      console.trace(error);
+    }
+  };
 
   const addresses: PopoverMenuItem[] = userData.accounts.map((account) => {
     const signed = canvasSignedAddresses.includes(account.address);
@@ -261,6 +271,21 @@ const useUserMenuItems = ({
         label: 'Edit profile',
         onClick: () => navigate(`/profile/edit`, {}, null),
       },
+      ...(hasMagic
+        ? [
+            {
+              type: 'default',
+              // label: 'Open wallet',
+              label: (
+                <div className="UserMenuItem">
+                  <div>Open wallet</div>
+                  <CWIconButton iconName="arrowSquareOut" />
+                </div>
+              ),
+              onClick: () => openMagicWallet(),
+            },
+          ]
+        : []),
       {
         type: 'default',
         label: 'My community stake',

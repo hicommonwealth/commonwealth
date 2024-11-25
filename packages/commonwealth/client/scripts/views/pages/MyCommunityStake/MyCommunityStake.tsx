@@ -1,10 +1,13 @@
+import { WalletId } from '@hicommonwealth/shared';
 import { formatAddressShort } from 'helpers';
 import useTransactionHistory from 'hooks/useTransactionHistory';
+import { Magic } from 'magic-sdk';
 import React, { useState } from 'react';
 import useUserStore from 'state/ui/user';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../components/component_kit/cw_text';
+import { CWButton } from '../../components/component_kit/new_designs/CWButton';
 import { CWSelectList } from '../../components/component_kit/new_designs/CWSelectList';
 import {
   CWTab,
@@ -24,6 +27,8 @@ const BASE_ADDRESS_FILTER = {
   value: '',
 };
 
+const magic = new Magic(process.env.MAGIC_PUBLISHABLE_KEY!);
+
 const MyCommunityStake = () => {
   const [activeTabIndex, setActiveTabIndex] = useState<number>(0);
   const [filterOptions, setFilterOptions] = useState<FilterOptions>({
@@ -31,6 +36,7 @@ const MyCommunityStake = () => {
     selectedAddress: BASE_ADDRESS_FILTER,
   });
   const user = useUserStore();
+  const hasMagic = user.addresses?.[0]?.walletId === WalletId.Magic;
 
   const ADDRESS_FILTERS = [
     BASE_ADDRESS_FILTER,
@@ -51,6 +57,14 @@ const MyCommunityStake = () => {
     addressFilter = possibleAddresses;
   }
 
+  const openMagicWallet = async () => {
+    try {
+      await magic.wallet.showUI();
+    } catch (error) {
+      console.trace(error);
+    }
+  };
+
   const data = useTransactionHistory({
     filterOptions,
     addressFilter,
@@ -63,9 +77,14 @@ const MyCommunityStake = () => {
   return (
     <CWPageLayout>
       <section className="MyCommunityStake">
-        <CWText type="h2" className="header">
-          My Community Stake
-        </CWText>
+        <div className="title-and-wallet-button">
+          <CWText type="h2" className="header">
+            My Community Stake
+          </CWText>
+          {hasMagic && (
+            <CWButton label="Open wallet" onClick={openMagicWallet} />
+          )}
+        </div>
 
         {!(data?.length > 0) ? (
           <NoTransactionHistory />
