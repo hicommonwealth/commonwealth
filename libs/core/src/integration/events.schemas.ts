@@ -267,3 +267,5 @@ export const SignUpFlowCompleted = z.object({
   user_id: z.number(),
   referral_link: z.string(),
 });
+
+export const ContestRolloverTimerTicked = z.object({});

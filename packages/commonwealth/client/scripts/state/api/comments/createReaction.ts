@@ -29,7 +29,7 @@ export const buildCreateCommentReactionInput = async ({
   commentMsgId,
 }: CreateReactionProps) => {
   const canvasSignedData = await signCommentReaction(address, {
-    comment_id: commentMsgId,
+    comment_id: commentMsgId ?? null,
     like: reactionType === 'like',
   });
 
@@ -41,7 +41,7 @@ export const buildCreateCommentReactionInput = async ({
     jwt: userStore.getState().jwt,
     ...toCanvasSignedDataApiArgs(canvasSignedData),
     comment_id: commentId,
-    comment_msg_id: commentMsgId,
+    comment_msg_id: commentMsgId ?? null,
   };
 };
 
