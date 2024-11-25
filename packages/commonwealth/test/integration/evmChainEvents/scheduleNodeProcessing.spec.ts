@@ -22,7 +22,7 @@ describe('scheduleNodeProcessing', () => {
   let stakesAbiInstance: ContractAbiInstance;
 
   beforeAll(async () => {
-    await tester.bootstrap_testing(import.meta);
+    await tester.bootstrap_testing();
   });
 
   afterAll(async () => {

@@ -455,6 +455,9 @@ importers:
 
   libs/core:
     dependencies:
+      '@hicommonwealth/evm-protocols':
+        specifier: workspace:*
+        version: link:../evm-protocols
       '@hicommonwealth/schemas':
         specifier: workspace:*
         version: link:../schemas
@@ -513,6 +516,18 @@ importers:
       eslint:
         specifier: ^8
         version: 8.57.0
+
+  libs/evm-protocols:
+    dependencies:
+      '@ethersproject/bignumber':
+        specifier: ^5.7.0
+        version: 5.7.0
+      '@hicommonwealth/shared':
+        specifier: workspace:*
+        version: link:../shared
+      moment:
+        specifier: ^2.23.0
+        version: 2.30.1
 
   libs/evm-testing:
     dependencies:
@@ -601,6 +616,9 @@ importers:
       '@hicommonwealth/core':
         specifier: workspace:*
         version: link:../core
+      '@hicommonwealth/evm-protocols':
+        specifier: workspace:*
+        version: link:../evm-protocols
       '@hicommonwealth/schemas':
         specifier: workspace:*
         version: link:../schemas
@@ -701,6 +719,9 @@ importers:
 
   libs/schemas:
     dependencies:
+      '@hicommonwealth/evm-protocols':
+        specifier: workspace:*
+        version: link:../evm-protocols
       '@hicommonwealth/shared':
         specifier: workspace:*
         version: link:../shared
@@ -898,6 +919,9 @@ importers:
       '@hicommonwealth/core':
         specifier: workspace:*
         version: link:../../libs/core
+      '@hicommonwealth/evm-protocols':
+        specifier: workspace:*
+        version: link:../../libs/evm-protocols
       '@hicommonwealth/evm-testing':
         specifier: workspace:*
         version: link:../../libs/evm-testing
@@ -970,6 +994,9 @@ importers:
       '@mui/base':
         specifier: 5.0.0-beta.5
         version: 5.0.0-beta.5(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@neynar/nodejs-sdk':
+        specifier: ^1.55.0
+        version: 1.66.0(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)(zod@3.23.6)
       '@noble/hashes':
         specifier: ^1.4.0
         version: 1.4.0
@@ -31655,7 +31682,7 @@ snapshots:
       iron-webcrypto: 1.1.1
       ohash: 1.1.4
       radix3: 1.1.2
-      ufo: 1.5.3
+      ufo: 1.5.4
       uncrypto: 0.1.3
       unenv: 1.10.0
     transitivePeerDependencies:
@@ -33044,7 +33071,7 @@ snapshots:
       node-forge: 1.3.1
       pathe: 1.1.2
       std-env: 3.7.0
-      ufo: 1.5.3
+      ufo: 1.5.4
       untun: 0.1.3
       uqr: 0.1.2
     transitivePeerDependencies:
@@ -34685,7 +34712,7 @@ snapshots:
     dependencies:
       destr: 2.0.3
       node-fetch-native: 1.6.4
-      ufo: 1.5.3
+      ufo: 1.5.4
 
   ohash@1.1.4: {}
 
@@ -38689,7 +38716,7 @@ snapshots:
 
   web3-eth-iban@1.5.2:
     dependencies:
-      bn.js: 4.12.0
+      bn.js: 4.12.1
       web3-utils: 1.5.2
 
   web3-eth-iban@4.0.7:

@@ -1,3 +1,4 @@
+import { commonProtocol } from '@hicommonwealth/evm-protocols';
 import {
   communityStakesAbi,
   localRpc,
@@ -10,7 +11,7 @@ import {
   hashAbi,
   models,
 } from '@hicommonwealth/model';
-import { BalanceType, commonProtocol } from '@hicommonwealth/shared';
+import { BalanceType } from '@hicommonwealth/shared';
 
 const namespaceDeployedSignature =
   '0x8870ba2202802ce285ce6bead5ac915b6dc2d35c8a9d6f96fa56de9de12829d5';
@@ -31,11 +32,13 @@ export async function createEventSources(): Promise<{
     max_ce_block_range: -1,
   });
   const namespaceAbiInstance = await models.ContractAbi.create({
+    id: 1,
     abi: namespaceFactoryAbi,
     nickname: 'NamespaceFactory',
     abi_hash: hashAbi(namespaceFactoryAbi),
   });
   const stakesAbiInstance = await models.ContractAbi.create({
+    id: 2,
     abi: communityStakesAbi,
     nickname: 'CommunityStakes',
     abi_hash: hashAbi(communityStakesAbi),

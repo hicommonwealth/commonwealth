@@ -63,7 +63,7 @@ describe('createComment Integration Tests', () => {
   };
 
   beforeAll(async () => {
-    server = await testServer(import.meta);
+    server = await testServer();
   });
 
   afterAll(async () => {

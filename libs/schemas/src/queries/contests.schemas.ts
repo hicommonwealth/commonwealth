@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { ContestManager } from '../entities';
+import { ChainNode, Community, ContestManager } from '../entities';
 import { Contest, ContestAction } from '../projections';
 import { PG_INT } from '../utils';
 
@@ -17,18 +17,31 @@ export const ContestResults = ContestManager.extend({
 
 export const GetAllContests = {
   input: z.object({
-    community_id: z.string(),
+    community_id: z.string().optional(),
     contest_address: z.string().optional(),
     contest_id: z.number().int().optional(),
     running: z.boolean().optional().describe('Only active contests'),
+    with_chain_node: z.string().optional(),
   }),
   output: z.array(ContestResults),
 };
 
+export const GetContest = {
+  input: z.object({
+    contest_address: z.string(),
+    with_chain_node: z.boolean().optional(),
+  }),
+  output: ContestManager.extend({
+    Community: Community.extend({
+      ChainNode: ChainNode.nullish(),
+    }).nullish(),
+  }).nullish(),
+};
+
 export const GetActiveContestManagers = {
   input: z.object({
-    community_id: z.string(),
-    topic_id: z.number(),
+    community_id: z.string().optional(),
+    topic_id: z.number().optional(),
   }),
   output: z.array(
     z.object({
@@ -36,6 +49,7 @@ export const GetActiveContestManagers = {
       url: z.string(),
       contest_address: z.string(),
       max_contest_id: z.number(),
+      end_time: z.coerce.date(),
       actions: z.array(ContestAction),
     }),
   ),

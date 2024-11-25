@@ -1,4 +1,5 @@
-import { commonProtocol, WalletId } from '@hicommonwealth/shared';
+import { commonProtocol } from '@hicommonwealth/evm-protocols';
+import { WalletId } from '@hicommonwealth/shared';
 import { saveToClipboard } from 'client/scripts/utils/clipboard';
 import clsx from 'clsx';
 import { findDenominationIcon } from 'helpers/findDenomination';
@@ -18,6 +19,9 @@ import {
 import { useManageCommunityStakeModalStore } from 'state/ui/modals';
 import useUserStore from 'state/ui/user';
 import { useCommunityStake } from 'views/components/CommunityStake';
+import NumberSelector from 'views/components/NumberSelector';
+import { Skeleton } from 'views/components/Skeleton';
+import useJoinCommunity from 'views/components/SublayoutHeader/useJoinCommunity';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
@@ -31,9 +35,6 @@ import CWPopover, {
 } from 'views/components/component_kit/new_designs/CWPopover';
 import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
 import { MessageRow } from 'views/components/component_kit/new_designs/CWTextInput/MessageRow';
-import NumberSelector from 'views/components/NumberSelector';
-import { Skeleton } from 'views/components/Skeleton';
-import useJoinCommunity from 'views/components/SublayoutHeader/useJoinCommunity';
 import useAppStatus from '../../../../hooks/useAppStatus';
 import { trpc } from '../../../../utils/trpcClient';
 import { useStakeExchange } from '../hooks';
