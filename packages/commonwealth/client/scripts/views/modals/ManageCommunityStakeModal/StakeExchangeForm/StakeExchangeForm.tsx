@@ -1,5 +1,8 @@
 import { commonProtocol } from '@hicommonwealth/evm-protocols';
+<<<<<<< HEAD
 import { WalletId } from '@hicommonwealth/shared';
+=======
+>>>>>>> origin/israel.5309.embedded-magic-ui
 import { saveToClipboard } from 'client/scripts/utils/clipboard';
 import clsx from 'clsx';
 import { findDenominationIcon } from 'helpers/findDenomination';
