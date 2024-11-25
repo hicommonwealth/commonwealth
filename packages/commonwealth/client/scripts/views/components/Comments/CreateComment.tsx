@@ -95,7 +95,7 @@ export const CreateComment = ({
           communityId,
           address: user.activeAccount!.address,
           threadId: rootThread.id ?? null,
-          threadMsgId: rootThread.canvasMsgId!,
+          threadMsgId: rootThread.canvasMsgId ?? null,
           unescapedText: serializeDelta(contentDelta),
           parentCommentId: parentCommentId ?? null,
           parentCommentMsgId: parentCommentMsgId ?? null,
