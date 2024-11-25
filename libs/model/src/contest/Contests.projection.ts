@@ -13,7 +13,11 @@ import { models } from '../database';
 import { mustExist } from '../middleware/guards';
 import { EvmEventSourceAttributes } from '../models';
 import * as protocol from '../services/commonProtocol';
-import { decodeThreadContentUrl, getChainNodeUrl } from '../utils';
+import {
+  decodeThreadContentUrl,
+  getChainNodeUrl,
+  getDefaultContestImage,
+} from '../utils';
 
 const log = logger(import.meta);
 
@@ -109,7 +113,7 @@ async function updateOrCreateWithAlert(
           decimals,
           created_at: new Date(),
           name: community.name,
-          image_url: 'http://default.image', // TODO: can we have a default image for this?
+          image_url: getDefaultContestImage(),
           payout_structure: [],
           is_farcaster_contest: false,
         },
