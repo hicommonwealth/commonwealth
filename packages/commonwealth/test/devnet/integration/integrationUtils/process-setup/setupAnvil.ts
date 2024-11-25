@@ -54,7 +54,6 @@ export async function setupAnvil() {
         NOW(),
         NOW()
       )
-        ON CONFLICT (id) DO UPDATE SET url = EXCLUDED.url, alt_wallet_url = EXCLUDED.alt_wallet_url;
     `);
 
     // populate with ABIs
@@ -63,10 +62,8 @@ export async function setupAnvil() {
 
     await models.sequelize.query(`
         INSERT INTO "LastProcessedEvmBlocks" (chain_node_id, block_number)
-        VALUES (1, 18) ON CONFLICT (chain_node_id) DO UPDATE SET block_number = EXCLUDED.block_number;
+        VALUES (1, 18);
     `);
-
-    await models.sequelize.query(`DELETE FROM "Outbox";`);
 
     return container;
   } catch (err) {
