@@ -30,6 +30,15 @@ const MobileNavigation = () => {
       onClick: () => navigate('/dashboard', {}, null),
       selected: !!matchesDashboard,
     },
+    ...(user.isLoggedIn
+      ? [
+          {
+            type: 'create' as const,
+            onClick: () => setIsDrawerOpen(true),
+            selected: false,
+          },
+        ]
+      : []),
     {
       type: 'explore',
       onClick: () => navigate('/communities', {}, null),
