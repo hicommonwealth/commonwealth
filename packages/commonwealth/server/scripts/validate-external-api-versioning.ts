@@ -90,10 +90,10 @@ async function validateExternalApiVersioning() {
     throw new Error('Must provide @commonxyz/api-client package version');
   }
 
-  await downloadFile(
-    'https://commonwealth.im/api/v1/openapi.json',
-    productionOasPath,
-  );
+  // await downloadFile(
+  //   'https://commonwealth.im/api/v1/openapi.json',
+  //   productionOasPath,
+  // );
 
   const newOas = trpc.toOpenApiDocument(
     trpcRouter,

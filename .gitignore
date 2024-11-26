@@ -19,5 +19,4 @@ redis-data
 *coverage
 **/*.dump.sql
 **/*.dump.sql.gz
-external-production-openapi.json
 external-openapi.json
