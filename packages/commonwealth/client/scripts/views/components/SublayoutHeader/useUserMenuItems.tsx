@@ -14,6 +14,7 @@ import useAdminOnboardingSliderMutationStore from 'state/ui/adminOnboardingCards
 import useGroupMutationBannerStore from 'state/ui/group';
 import {
   useAuthModalStore,
+  useInviteLinkModal,
   useManageCommunityStakeModalStore,
 } from 'state/ui/modals';
 import { PopoverMenuItem } from 'views/components/component_kit/CWPopoverMenu';
@@ -30,6 +31,7 @@ import {
 
 import { useCommunityStake } from '../CommunityStake';
 
+import { useFlag } from 'hooks/useFlag';
 import { EXCEPTION_CASE_VANILLA_getCommunityById } from 'state/api/communities/getCommuityById';
 import useUserStore from 'state/ui/user';
 import UserMenuItem from './UserMenuItem';
@@ -83,6 +85,8 @@ const useUserMenuItems = ({
   const { authenticatedAddresses } = useCheckAuthenticatedAddresses({
     recheck: isMenuOpen,
   });
+
+  const referralsEnabled = useFlag('referrals');
 
   const userData = useUserStore();
 
@@ -214,6 +218,8 @@ const useUserMenuItems = ({
     },
   );
 
+  const { setIsInviteLinkModalOpen } = useInviteLinkModal();
+
   return {
     userMenuItems: [
       // if a user is in a stake enabled community without membership, show user addresses that
@@ -261,6 +267,15 @@ const useUserMenuItems = ({
         label: 'Edit profile',
         onClick: () => navigate(`/profile/edit`, {}, null),
       },
+      ...(referralsEnabled
+        ? [
+            {
+              type: 'default',
+              label: 'Get referral link',
+              onClick: () => setIsInviteLinkModalOpen(true),
+            },
+          ]
+        : []),
       {
         type: 'default',
         label: 'My community stake',
