@@ -29,6 +29,22 @@
           color: $neutral-700;
         }
       }
+
+      .new-topic-template-section {
+        border-radius: 6px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+
+        &.enabled {
+          padding: 12px;
+          background-color: $neutral-50;
+
+          .QuillEditor {
+            background-color: white;
+          }
+        }
+      }
     }
 
     .actions {
