@@ -1,3 +1,5 @@
+@import '../../../../styles/shared';
+
 .InviteLinkModal {
   .content {
     display: flex;
@@ -5,7 +7,46 @@
     gap: 16px;
   }
 
-  input {
+  input,
+  svg {
     cursor: pointer !important;
+  }
+
+  .share-section {
+    .Text.bold {
+      margin-block: 16px;
+    }
+
+    .share-options {
+      display: flex;
+      justify-content: space-between;
+      overflow-y: auto;
+
+      .share-option {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+        padding: 12px;
+        transition: background-color 0.2s;
+
+        .icon {
+          width: 48px;
+          height: 48px;
+        }
+
+        .Text.caption {
+          color: $neutral-400;
+          white-space: nowrap;
+          justify-content: center;
+        }
+
+        &:hover {
+          background-color: $neutral-50;
+          transition: background-color 0.2s;
+        }
+      }
+    }
   }
 }
