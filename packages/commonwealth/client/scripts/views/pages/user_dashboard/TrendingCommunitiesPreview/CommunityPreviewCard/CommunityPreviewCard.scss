@@ -2,16 +2,22 @@
 
 .CommunityPreviewCard.Card {
   display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: 16px;
+  flex-direction: row;
+  gap: 12px;
+  padding: 8px;
   width: 392px;
-  border-radius: 6px;
+  border-radius: 12px;
+  min-height: 78px;
+  position: relative;
+  flex-wrap: wrap;
 
   @include smallInclusive {
-    min-height: 144px;
+    min-height: 100px;
     max-width: 200px;
     min-width: 200px;
+  }
+  .CommunityAvatar {
+    margin-top: 12px !important;
   }
 
   .card-top {
@@ -21,6 +27,7 @@
 
     .CommunityAvatar {
       margin-right: 8px;
+      flex-direction: row;
     }
   }
 
@@ -29,6 +36,7 @@
     justify-content: center;
     align-content: center;
     border: 1px solid $neutral-700;
+    flex-direction: column;
 
     .explore-label {
       width: 100%;
@@ -45,10 +53,24 @@
 
   .thread-counts {
     margin-top: auto;
-    padding-top: 12px;
+    padding-top: 4px;
     display: flex;
-    gap: 8px;
+    gap: 2px;
     align-items: center;
     color: $neutral-500;
+  }
+
+  .community-name {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .join-community {
+    position: absolute;
+    right: 0;
+
+    @include smallInclusive {
+      position: relative;
+    }
   }
 }
