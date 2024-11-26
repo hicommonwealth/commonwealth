@@ -85,7 +85,7 @@ const useNewThreadForm = (communityId: string, topicsForSelector: Topic[]) => {
     if (!editorText && threadTopic?.default_offchain_template) {
       try {
         const template = JSON.parse(
-          threadTopic.default_offchain_template,
+          decodeURIComponent(threadTopic.default_offchain_template),
         ) as string;
         setEditorText(template);
       } catch (e) {
