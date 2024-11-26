@@ -22,11 +22,7 @@ const ProfileActivityRow = ({ activity }: ProfileActivityRowProps) => {
     (activity as CommentWithThreadCommunity)?.thread?.community_id ||
     activity?.communityId;
   let title: string;
-  let body: string = '';
-  if (activity instanceof Thread) {
-    title = activity.title;
-    body = activity.body;
-  }
+
   const isThread = !!(activity as Thread).kind;
 
   const comment = activity as CommentWithAssociatedThread;
@@ -34,36 +30,9 @@ const ProfileActivityRow = ({ activity }: ProfileActivityRowProps) => {
     id: communityId,
     enabled: !!communityId,
   });
-  let decodedTitle: string;
+
   const isReply = comment && comment?.parentComment;
-  try {
-    if (isThread) {
-      // @ts-expect-error <StrictNullChecks/>
-      decodedTitle = decodeURIComponent(title);
-    } else {
-      decodedTitle = decodeURIComponent(comment.thread?.title);
-    }
-  } catch (err) {
-    // If we get an error trying to decode URI component, see if it passes when we first encode it.
-    // (Maybe it has % Sign in the title)
-    try {
-      if (isThread) {
-        // @ts-expect-error <StrictNullChecks/>
-        decodedTitle = decodeURIComponent(encodeURIComponent(title));
-      } else {
-        decodedTitle = decodeURIComponent(
-          encodeURIComponent(comment.thread?.title),
-        );
-      }
-    } catch (e) {
-      console.error(
-        // @ts-expect-error <StrictNullChecks/>
-        `Could not decode title: ${title ? title : comment.thread?.title}`,
-      );
-      // @ts-expect-error <StrictNullChecks/>
-      decodedTitle = title;
-    }
-  }
+
   const redactedAddress = formatAddressShort(
     comment.author,
     communityId,
@@ -98,7 +67,7 @@ const ProfileActivityRow = ({ activity }: ProfileActivityRowProps) => {
         </CWText>
       </div>
       <div className="content">
-        <CWText fontWeight="regular">{comment.text}</CWText>
+        <CWText fontWeight="regular">{comment?.text}</CWText>
       </div>
     </div>
   ) : (
