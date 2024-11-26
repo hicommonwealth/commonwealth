@@ -1,4 +1,4 @@
-import { commonProtocol } from '@hicommonwealth/shared';
+import { commonProtocol } from '@hicommonwealth/evm-protocols';
 import AddressInfo from 'models/AddressInfo';
 import NodeInfo from 'models/NodeInfo';
 import { useState } from 'react';

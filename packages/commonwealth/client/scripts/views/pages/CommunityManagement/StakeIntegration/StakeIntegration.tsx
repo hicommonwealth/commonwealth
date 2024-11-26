@@ -1,5 +1,5 @@
+import { commonProtocol } from '@hicommonwealth/evm-protocols';
 import { TopicWeightedVoting } from '@hicommonwealth/schemas';
-import { commonProtocol } from '@hicommonwealth/shared';
 import clsx from 'clsx';
 import { notifyError } from 'controllers/app/notifications';
 import AddressInfo from 'models/AddressInfo';

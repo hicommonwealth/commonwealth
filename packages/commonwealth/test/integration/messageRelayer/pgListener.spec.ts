@@ -13,7 +13,7 @@ describe.skip('pgListener', { timeout: 10_000 }, () => {
   let client: Client;
 
   beforeAll(async () => {
-    await tester.bootstrap_testing(import.meta);
+    await tester.bootstrap_testing();
     client = await setupListener();
   });
 

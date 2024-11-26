@@ -21,7 +21,7 @@ export const buildDeleteCommentReactionInput = async ({
   reactionId,
 }: DeleteReactionProps) => {
   const canvasSignedData = await signDeleteCommentReaction(address, {
-    comment_id: commentMsgId,
+    comment_id: commentMsgId ?? null,
   });
   return {
     author_community_id: communityId,

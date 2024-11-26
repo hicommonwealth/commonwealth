@@ -1,48 +1,11 @@
-import { useMutation } from '@tanstack/react-query';
-import axios from 'axios';
-import { ApiEndpoints, queryClient, SERVER_URL } from 'state/api/config';
-import { userStore } from 'state/ui/user';
+import { ApiEndpoints, queryClient } from 'state/api/config';
+import { trpc } from 'utils/trpcClient';
 
-interface VotePollProps {
-  pollId: number;
-  communityId: string;
-  authorCommunityId: string;
-  address: string;
-  selectedOption: string;
-}
-
-const votePoll = async ({
-  pollId,
-  communityId,
-  authorCommunityId,
-  address,
-  selectedOption,
-}: VotePollProps) => {
-  const response = await axios.put(`${SERVER_URL}/polls/${pollId}/votes`, {
-    poll_id: pollId,
-    chain_id: communityId,
-    author_chain: authorCommunityId,
-    option: selectedOption,
-    address,
-    jwt: userStore.getState().jwt,
-  });
-
-  return response.data.result;
-};
-
-interface UseVotePollMutationProps {
-  threadId: number;
-}
-
-const useVotePollMutation = ({ threadId }: UseVotePollMutationProps) => {
-  return useMutation({
-    mutationFn: votePoll,
-    onSuccess: async (_, variables) => {
+const useVotePollMutation = ({ threadId }: { threadId: number }) => {
+  return trpc.poll.createPollVote.useMutation({
+    onSuccess: async (data) => {
       await queryClient.invalidateQueries({
-        queryKey: [
-          ApiEndpoints.fetchThreadPolls(threadId),
-          variables.communityId,
-        ],
+        queryKey: [ApiEndpoints.fetchThreadPolls(threadId), data.community_id],
       });
     },
   });

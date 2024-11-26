@@ -11,6 +11,7 @@
     { "path": "libs/model/tsconfig.build.json" },
     { "path": "libs/schemas/tsconfig.build.json" },
     { "path": "libs/shared/tsconfig.build.json" },
+    { "path": "libs/evm-protocols/tsconfig.build.json" },
     { "path": "packages/commonwealth/tsconfig.build.json" },
     { "path": "packages/load-testing/tsconfig.json" }
   ]

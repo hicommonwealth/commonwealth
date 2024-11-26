@@ -1,6 +1,7 @@
 import { InvalidState } from '@hicommonwealth/core';
+import { commonProtocol } from '@hicommonwealth/evm-protocols';
 import { TopicWeightedVoting } from '@hicommonwealth/schemas';
-import { BalanceSourceType, commonProtocol } from '@hicommonwealth/shared';
+import { BalanceSourceType } from '@hicommonwealth/shared';
 import { BigNumber } from 'ethers';
 import { tokenBalanceCache } from '.';
 import { config } from '../config';

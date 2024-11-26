@@ -12,7 +12,7 @@ export const buildDeleteThreadInput = async (
   thread: Thread,
 ) => {
   const canvasSignedData = await signDeleteThread(address, {
-    thread_id: thread.canvasMsgId,
+    thread_id: thread.canvasMsgId ?? null,
   });
   return {
     thread_id: thread.id,

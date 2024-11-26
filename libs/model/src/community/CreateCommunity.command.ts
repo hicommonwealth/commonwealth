@@ -1,4 +1,4 @@
-import { InvalidInput, type Command } from '@hicommonwealth/core';
+import { EventNames, InvalidInput, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import {
   ChainBase,
@@ -10,6 +10,7 @@ import {
 import { Op } from 'sequelize';
 import { models } from '../database';
 import { mustBeSuperAdmin, mustExist } from '../middleware/guards';
+import { emitEvent } from '../utils';
 import { findCompatibleAddress } from '../utils/findBaseAddress';
 
 export const CreateCommunityErrors = {
@@ -166,6 +167,21 @@ export function CreateCommunity(): Command<typeof schemas.CreateCommunity> {
             is_banned: false,
           },
           { transaction },
+        );
+
+        await emitEvent(
+          models.Outbox,
+          [
+            {
+              event_name: EventNames.CommunityCreated,
+              event_payload: {
+                communityId: id,
+                userId: actor.user.id!.toString(),
+                referralLink: payload.referral_link,
+              },
+            },
+          ],
+          transaction,
         );
       });
       // == end of command transaction boundary ==

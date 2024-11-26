@@ -81,7 +81,6 @@ export const ManageTopicsSection = () => {
     includeArchivedTopics: true,
     apiEnabled: !!communityId,
   });
-  console.log('rawTopics => ', rawTopics);
 
   const { mutateAsync: updateFeaturedTopicsOrder } =
     useUpdateFeaturedTopicsOrderMutation();

@@ -1,3 +1,4 @@
+import { ChainEventSigs } from '@hicommonwealth/evm-protocols';
 import { ETHERS_BIG_NUMBER, EVM_ADDRESS } from '@hicommonwealth/schemas';
 import { BigNumber } from 'ethers';
 import type { Result } from 'ethers/lib/utils';
@@ -48,20 +49,6 @@ type EvmMapper<Input extends string, Output extends ZodSchema> = {
     event_name: EventNames;
     event_payload: z.infer<Output>;
   };
-};
-
-export const ChainEventSigs = {
-  NewContest:
-    'address contest, address namespace, uint256 interval, bool oneOff' as const,
-  NewRecurringContestStarted:
-    'uint256 indexed contestId, uint256 startTime, uint256 endTime' as const,
-  NewSingleContestStarted: 'uint256 startTime, uint256 endTime' as const,
-  ContentAdded:
-    'uint256 indexed contentId, address indexed creator, string url' as const,
-  VoterVotedRecurring:
-    'address indexed voter, uint256 indexed contentId, uint256 contestId, uint256 votingPower' as const,
-  VoterVotedOneOff:
-    'address indexed voter, uint256 indexed contentId, uint256 votingPower' as const,
 };
 
 const RecurringContestManagerDeployedMapper: EvmMapper<
