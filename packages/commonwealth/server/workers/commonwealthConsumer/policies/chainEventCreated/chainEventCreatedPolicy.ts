@@ -34,7 +34,7 @@ export const processChainEventCreated: EventHandler<
     await command(Token.CreateToken(), {
       actor: middleware.systemActor({}),
       payload: {
-        chain_node_id: chainNode?.id!,
+        chain_node_id: chainNode!.id!,
         community_id: '', // not required for system actors
         transaction_hash: payload.rawLog.transactionHash,
       },

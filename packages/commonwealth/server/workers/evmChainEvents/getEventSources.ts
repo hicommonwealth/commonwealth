@@ -42,7 +42,7 @@ export async function getEventSources(): Promise<EvmSources> {
       };
     }
 
-    let dbContractSources = {};
+    const dbContractSources = {};
     for (const source of dbEvmSources.filter(
       (e) => e.eth_chain_id === ethChainId,
     )) {
