@@ -29,22 +29,32 @@ const log = logger(import.meta);
  * the last fetched block number. This function will never throw an error.
  */
 export async function processChainNode(
-  chainNodeId: number,
+  ethChainId: number,
   evmSource: EvmSource,
 ): Promise<void> {
   try {
     log.info(
       'Processing:\n' +
-        `\tchainNodeId: ${chainNodeId}\n` +
+        `\tchainNodeId: ${ethChainId}\n` +
         `\tcontracts: ${JSON.stringify(Object.keys(evmSource.contracts))}`,
     );
     stats().increment('ce.evm.chain_node_id', {
-      chainNodeId: String(chainNodeId),
+      chainNodeId: String(ethChainId),
     });
+
+    const chainNode = await models.ChainNode.findOne({
+      where: {
+        eth_chain_id: ethChainId,
+      },
+    });
+    if (!chainNode) {
+      log.error(`ChainNode not found - ETH chain id: ${ethChainId}`);
+      return;
+    }
 
     const lastProcessedBlock = await models.LastProcessedEvmBlock.findOne({
       where: {
-        chain_node_id: chainNodeId,
+        chain_node_id: chainNode.id!,
       },
     });
 
@@ -84,7 +94,7 @@ export async function processChainNode(
       if (!lastProcessedBlock) {
         await models.LastProcessedEvmBlock.create(
           {
-            chain_node_id: chainNodeId,
+            chain_node_id: chainNode.id!,
             block_number: lastBlockNum,
           },
           { transaction },
@@ -95,7 +105,7 @@ export async function processChainNode(
       }
 
       if (allEvents.length === 0) {
-        log.info(`Processed 0 events for chainNodeId ${chainNodeId}`);
+        log.info(`Processed 0 events for chainNodeId ${ethChainId}`);
         return;
       }
 
@@ -159,10 +169,10 @@ export async function processChainNode(
     });
 
     log.info(
-      `Processed ${allEvents.length} events for chainNodeId ${chainNodeId}`,
+      `Processed ${allEvents.length} events for ethChainId ${ethChainId}`,
     );
   } catch (e) {
-    const msg = `Error occurred while processing chainNodeId ${chainNodeId}`;
+    const msg = `Error occurred while processing ethChainId ${ethChainId}`;
     log.error(msg, e);
   }
 }
@@ -186,14 +196,14 @@ export async function scheduleNodeProcessing(
     return;
   }
 
-  const chainNodeIds = Object.keys(evmSources);
+  const ethChainIds = Object.keys(evmSources);
   const betweenInterval = interval / numEvmSources;
 
-  chainNodeIds.forEach((chainNodeId, index) => {
+  ethChainIds.forEach((ethChainId, index) => {
     const delay = index * betweenInterval;
 
     setTimeout(async () => {
-      await processFn(+chainNodeId, evmSources[chainNodeId]);
+      await processFn(+ethChainId, evmSources[ethChainId]);
     }, delay);
   });
 }

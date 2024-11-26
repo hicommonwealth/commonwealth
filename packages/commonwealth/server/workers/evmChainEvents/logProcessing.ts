@@ -113,7 +113,7 @@ export async function parseLogs(
   const events: EvmEvent[] = [];
   const interfaces = {};
   for (const log of logs) {
-    const address = ethers.utils.getAddress(log.address).toLowerCase();
+    const address = ethers.utils.getAddress(log.address);
     const data: AbiSignatures = sources[address];
     if (!data) {
       logger.error('Missing event source', undefined, {
