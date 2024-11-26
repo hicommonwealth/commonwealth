@@ -24,7 +24,7 @@ describe('scheduleNodeProcessing', () => {
   let singleSourceSuccess = false;
 
   beforeAll(async () => {
-    await tester.bootstrap_testing(import.meta);
+    await tester.bootstrap_testing();
   });
 
   afterAll(async () => {

@@ -22,7 +22,7 @@ import {
   contestHelper,
   contractHelpers,
 } from '../../src/services/commonProtocol';
-import { bootstrap_testing, seed } from '../../src/tester';
+import { seed } from '../../src/tester';
 
 chai.use(chaiAsPromised);
 
@@ -67,9 +67,6 @@ describe('Contests projection lifecycle', () => {
     getTokenAttributes = Sinon.stub(contractHelpers, 'getTokenAttributes');
     getContestScore = Sinon.stub(contestHelper, 'getContestScore');
     getContestStatus = Sinon.stub(contestHelper, 'getContestStatus');
-
-    // TODO: add ContractAbi to seeder aggregates and replace direct model calls below to avoid calling this here
-    await bootstrap_testing(import.meta);
 
     try {
       const [chain] = await seed('ChainNode', {

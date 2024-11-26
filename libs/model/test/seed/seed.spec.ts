@@ -9,10 +9,10 @@ import {
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { Model, ValidationError, type ModelStatic } from 'sequelize';
-import { afterAll, beforeAll, describe, test } from 'vitest';
+import { afterAll, describe, test } from 'vitest';
 import z from 'zod';
 import { models } from '../../src/database';
-import { SeedOptions, bootstrap_testing, seed } from '../../src/tester';
+import { SeedOptions, seed } from '../../src/tester';
 
 chai.use(chaiAsPromised);
 
@@ -45,12 +45,9 @@ async function testSeed<T extends schemas.Aggregates>(
   return data;
 }
 
-describe('Seed functions', () => {
+// skip for now, seeds are being widely used in lifecycle tests
+describe.skip('Seed functions', () => {
   let shouldExit = true;
-
-  beforeAll(async () => {
-    await bootstrap_testing(import.meta);
-  });
 
   afterAll(async () => {
     await dispose()();

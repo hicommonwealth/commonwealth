@@ -12,7 +12,7 @@ import { testOutboxEvents } from './util';
 
 describe('messageRelayer', { timeout: 20_000 }, () => {
   beforeAll(async () => {
-    await tester.bootstrap_testing(import.meta);
+    await tester.bootstrap_testing();
   });
 
   afterEach(async () => {

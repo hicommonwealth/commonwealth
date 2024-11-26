@@ -66,7 +66,16 @@ export function GetThreads(): Query<typeof schemas.GetThreads> {
         pastWinners: ' AND CON.end_time <= NOW()',
         all: '',
       };
-
+      const baseWhereClause = `
+      community_id = :community_id AND
+      deleted_at IS NULL AND
+      archived_at IS ${archived ? 'NOT' : ''} NULL
+      ${topic_id ? ' AND topic_id = :topic_id' : ''}
+      ${stage ? ' AND stage = :stage' : ''}
+      ${from_date ? ' AND T.created_at > :from_date' : ''}
+      ${to_date ? ' AND T.created_at < :to_date' : ''}
+      ${contestAddress ? ' AND id IN (SELECT * FROM "contest_ids")' : ''}
+    `;
       const responseThreadsQuery = models.sequelize.query<
         z.infer<typeof schemas.ThreadView>
       >(
@@ -89,15 +98,8 @@ export function GetThreads(): Query<typeof schemas.GetThreads> {
                 marked_as_spam_at, archived_at, topic_id, reaction_weights_sum, canvas_signed_data,
                 canvas_msg_id, last_edited, address_id, reaction_count
             FROM "Threads" T
-            WHERE
-                community_id = :community_id AND
-                deleted_at IS NULL AND
-                archived_at IS ${archived ? 'NOT' : ''} NULL
-                ${topic_id ? ' AND topic_id = :topic_id' : ''}
-                ${stage ? ' AND stage = :stage' : ''}
-                ${from_date ? ' AND T.created_at > :from_date' : ''}
-                ${to_date ? ' AND T.created_at < :to_date' : ''}
-                ${contestAddress ? ' AND id IN (SELECT * FROM "contest_ids")' : ''}
+            WHERE ${baseWhereClause}
+              
             ORDER BY pinned DESC, ${orderByQueries[order_by ?? 'newest']}
             LIMIT :limit OFFSET :offset
         ), thread_metadata AS (
@@ -244,6 +246,18 @@ export function GetThreads(): Query<typeof schemas.GetThreads> {
         },
       );
 
+      const countThreadsQuery = models.sequelize.query<{ count: number }>(
+        `
+          SELECT COUNT(*) AS count
+          FROM "Threads" T
+          WHERE ${baseWhereClause}
+        `,
+        {
+          replacements,
+          type: QueryTypes.SELECT,
+        },
+      );
+
       const numVotingThreadsQuery = models.Thread.count({
         where: {
           community_id,
@@ -251,9 +265,10 @@ export function GetThreads(): Query<typeof schemas.GetThreads> {
         },
       });
 
-      const [threads, numVotingThreads] = await Promise.all([
+      const [threads, numVotingThreads, countResult] = await Promise.all([
         responseThreadsQuery,
         numVotingThreadsQuery,
+        countThreadsQuery,
       ]);
 
       return {
@@ -261,6 +276,7 @@ export function GetThreads(): Query<typeof schemas.GetThreads> {
         page: replacements.page,
         threads,
         numVotingThreads,
+        threadCount: Number(countResult[0]?.count) || 0,
       };
     },
   };

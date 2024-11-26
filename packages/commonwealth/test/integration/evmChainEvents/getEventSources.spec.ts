@@ -13,7 +13,7 @@ import {
 
 describe('getEventSources', () => {
   beforeAll(async () => {
-    await tester.bootstrap_testing(import.meta);
+    await tester.bootstrap_testing();
     await createEventRegistryChainNodes();
     await createContestEventSources(cp.ValidChains.SepoliaBase);
   });
