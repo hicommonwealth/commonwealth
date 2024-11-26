@@ -21,7 +21,9 @@ const MakeSiteAdminTask = () => {
   const onPromote = () => {
     openConfirmation({
       title: 'Promote to Site Admin',
-      description: `Are you sure you want promote ${address} to super admin? The apotheosis of a user is not to be taken lightly.`,
+      description: `
+        Are you sure you want promote ${address} to super admin? The apotheosis of a user is not to be taken lightly.
+      `,
       buttons: [
         {
           label: 'promote',

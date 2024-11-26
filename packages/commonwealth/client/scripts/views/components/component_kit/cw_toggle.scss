@@ -1,0 +1,52 @@
+@import '../../../../styles/shared.scss';
+
+.Toggle {
+  background-color: $neutral-300;
+  border-radius: $border-radius-rounded-corners;
+  display: inline-block;
+  height: 24px;
+  position: relative;
+  width: 48px;
+  cursor: pointer;
+
+  .toggle-input {
+    @include hideInput;
+  }
+
+  .slider {
+    background-color: $white;
+    border-radius: $border-radius-round;
+    height: 20px;
+    left: 2px;
+    position: absolute;
+    top: 2px;
+    width: 20px;
+    transition: all ease-in-out 0.2s;
+  }
+
+  &.checked {
+    background-color: $primary-300;
+    transition: all ease-in-out 0.2s;
+
+    .slider {
+      transform: translateX(24px);
+    }
+
+    &.disabled {
+      background-color: $primary-200;
+
+      .slider {
+        background-color: $primary-50;
+      }
+    }
+  }
+
+  &.disabled {
+    background-color: $neutral-200;
+    pointer-events: none;
+
+    .slider {
+      background-color: $neutral-25;
+    }
+  }
+}

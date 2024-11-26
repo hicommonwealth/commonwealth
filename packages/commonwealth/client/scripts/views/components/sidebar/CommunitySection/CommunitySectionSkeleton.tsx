@@ -1,6 +1,6 @@
-import 'components/sidebar/CommunitySection/CommunitySectionSkeleton.scss';
 import React from 'react';
 import { Skeleton } from '../../Skeleton';
+import './CommunitySectionSkeleton.scss';
 
 export const CommunitySectionSkeleton = ({
   sections = 3,

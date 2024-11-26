@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 
-import 'components/component_kit/cw_text_area.scss';
+import './cw_text_area.scss';
 
 import { useFormContext } from 'react-hook-form';
 import { CWLabel } from './cw_label';

@@ -1,0 +1,35 @@
+@import '../../../../styles/shared.scss';
+
+.Breadcrumbs {
+  align-items: center;
+  display: flex;
+  gap: 4px;
+
+  .Text {
+    text-transform: capitalize;
+    white-space: nowrap;
+    line-height: 20px;
+    font-size: 14px;
+  }
+
+  .current-text.Text {
+    color: $neutral-600;
+    font-weight: 500;
+  }
+
+  .separator-text.Text {
+    color: $neutral-500;
+  }
+
+  .parent-text.Text {
+    color: $neutral-500;
+
+    &:hover {
+      color: $primary-300;
+    }
+
+    &:active {
+      color: $primary-500;
+    }
+  }
+}

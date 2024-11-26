@@ -1,0 +1,46 @@
+@import '../../../../styles/shared.scss';
+
+.dropdown-wrapper {
+  position: relative;
+
+  .dropdown-options-display {
+    background-color: $white;
+    border-radius: $border-radius-corners;
+    box-shadow: $elevation-3;
+    margin-top: 5px;
+    overflow: hidden;
+    position: relative;
+    width: 100%;
+    z-index: 1001;
+
+    .dropdown-item {
+      align-items: center;
+      cursor: pointer;
+      display: flex;
+      gap: 4px;
+      padding: 8px 16px;
+      user-select: none;
+
+      .dropdown-item-text.Text {
+        color: $neutral-600;
+      }
+
+      &:hover {
+        background-color: $neutral-50;
+      }
+
+      &:active {
+        background-color: $neutral-100;
+      }
+
+      &.disabled {
+        background-color: $neutral-50;
+        pointer-events: none;
+
+        .dropdown-item-text.Text {
+          color: $neutral-500;
+        }
+      }
+    }
+  }
+}

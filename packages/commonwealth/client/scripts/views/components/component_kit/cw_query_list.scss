@@ -1,0 +1,12 @@
+@import '../../../../styles/shared.scss';
+
+.QueryList {
+  .LoadingSpinner {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto;
+    width: 95%;
+    height: 100%;
+  }
+}

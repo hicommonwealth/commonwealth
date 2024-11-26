@@ -1,0 +1,42 @@
+@import '../../../../styles/shared.scss';
+
+@mixin bannerStyles {
+  align-items: flex-start;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 49px;
+  box-sizing: border-box;
+  padding: 8px 16px 8px 192px;
+
+  @include mediumSmall {
+    padding: 8px 16px 8px 32px;
+  }
+
+  @include small {
+    padding: 8px 16px 8px 32px;
+  }
+
+  @include extraSmall {
+    padding: 16px;
+  }
+}
+
+.Banner {
+  @include bannerStyles;
+
+  background-color: $neutral-100;
+  border-bottom: 1px solid $neutral-200;
+}
+
+.MessageBanner {
+  @include bannerStyles;
+
+  background-color: $primary-50;
+  border-bottom: 1px solid $primary-100;
+  height: unset;
+
+  @include smallInclusive {
+    border: 4px solid $primary-100;
+  }
+}

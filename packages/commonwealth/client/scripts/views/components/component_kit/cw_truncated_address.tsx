@@ -1,6 +1,6 @@
 import React from 'react';
 
-import 'components/component_kit/cw_truncated_address.scss';
+import './cw_truncated_address.scss';
 
 import { formatAddressShort } from '../../../helpers';
 import { CWCommunityAvatar } from './cw_community_avatar';

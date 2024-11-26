@@ -2,8 +2,8 @@ import React from 'react';
 import type { GroupBase, OptionProps, Props } from 'react-select';
 import Select, { components } from 'react-select';
 
-import 'components/component_kit/cw_select_list.scss';
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
+import './cw_select_list.scss';
 
 const CustomOption = (
   props: OptionProps & { disabledOptionTooltipText?: string },

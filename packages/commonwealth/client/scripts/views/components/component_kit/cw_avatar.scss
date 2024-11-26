@@ -1,0 +1,8 @@
+@import '../../../../styles/shared.scss';
+
+.Avatar {
+  background-size: cover;
+  border-radius: $border-radius-round;
+  overflow: hidden;
+  background-position: center;
+}

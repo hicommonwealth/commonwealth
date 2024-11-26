@@ -1,0 +1,68 @@
+@import '../../../../styles/shared.scss';
+
+.Profile {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  width: 100%;
+
+  .breadcrumbs {
+    padding-left: 32px;
+  }
+  .fixed-slug-header {
+    height: 52px;
+    width: 100%;
+    background-color: white;
+    position: fixed;
+
+    @include extraSmall {
+      display: none;
+    }
+  }
+
+  .header {
+    margin-bottom: 24px;
+  }
+
+  &.loading {
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .ProfilePageContainer {
+    display: flex;
+    flex-direction: row;
+    gap: 24px;
+
+    @include smallInclusive {
+      flex-direction: column;
+    }
+  }
+
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 176px 0;
+
+    @include mediumSmallInclusive {
+      padding: 96px 0;
+    }
+
+    .empty-state-text {
+      color: $neutral-400;
+      text-align: center;
+    }
+  }
+
+  .ErrorPage {
+    padding: 56px 0;
+    text-align: center;
+
+    h3 {
+      margin-bottom: 36px;
+    }
+  }
+}

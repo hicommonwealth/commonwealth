@@ -1,0 +1,32 @@
+@import '../../../../styles/shared.scss';
+
+.BlobContainer {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-direction: column;
+  background: $neutral-50;
+  border-radius: 5px;
+
+  .labelText {
+    color: $neutral-600;
+    padding: 15px 15px 0px;
+  }
+  .title-and-button {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 15px 15px 0 0;
+  }
+
+  .Blob {
+    background: $neutral-50;
+    border-radius: 5px;
+    display: flex;
+    padding: 8px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    width: 100%;
+    overflow: auto;
+  }
+}

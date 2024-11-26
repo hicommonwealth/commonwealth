@@ -1,7 +1,7 @@
 import React from 'react';
 
-import 'components/gov_explainer.scss';
 import { CWText } from './component_kit/cw_text';
+import './gov_explainer.scss';
 
 type StatHeader = {
   statName: string;

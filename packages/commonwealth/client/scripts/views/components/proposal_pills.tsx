@@ -1,6 +1,6 @@
 import React from 'react';
 
-import 'components/proposal_pills.scss';
+import './proposal_pills.scss';
 
 import { formatTimestamp } from 'helpers';
 import moment from 'moment';

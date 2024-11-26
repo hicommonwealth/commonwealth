@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import React from 'react';
 
-import 'components/sidebar/sidebar_section.scss';
+import './sidebar_section.scss';
 
 import { isNotUndefined } from 'helpers/typeGuards';
 import useSidebarStore from 'state/ui/sidebar';
