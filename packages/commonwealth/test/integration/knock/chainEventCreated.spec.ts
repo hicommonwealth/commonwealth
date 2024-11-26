@@ -9,11 +9,8 @@ import {
   disposeAdapter,
   notificationsProvider,
 } from '@hicommonwealth/core';
-import {
-  communityStakeTradeEventSignature,
-  models,
-  tester,
-} from '@hicommonwealth/model';
+import { EvmEventSignatures } from '@hicommonwealth/evm-protocols';
+import { models, tester } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import { BalanceType } from '@hicommonwealth/shared';
 import chai, { expect } from 'chai';
@@ -101,7 +98,7 @@ describe('chainEventCreated Event Handler', () => {
         name: EventNames.ChainEventCreated,
         payload: {
           eventSource: {
-            eventSignature: communityStakeTradeEventSignature,
+            eventSignature: EvmEventSignatures.CommunityStake.Trade,
           },
           parsedArgs: ['0x1', '0xunsupported', true],
         } as unknown as z.infer<typeof ChainEventCreated>,
@@ -119,7 +116,7 @@ describe('chainEventCreated Event Handler', () => {
         name: EventNames.ChainEventCreated,
         payload: {
           eventSource: {
-            eventSignature: communityStakeTradeEventSignature,
+            eventSignature: EvmEventSignatures.CommunityStake.Trade,
           },
           parsedArgs: ['0x1', namespaceAddress, true],
         } as unknown as z.infer<typeof ChainEventCreated>,
@@ -145,7 +142,7 @@ describe('chainEventCreated Event Handler', () => {
         name: EventNames.ChainEventCreated,
         payload: {
           eventSource: {
-            eventSignature: communityStakeTradeEventSignature,
+            eventSignature: EvmEventSignatures.CommunityStake.Trade,
           },
           parsedArgs: ['0x1', namespaceAddress, true],
         } as unknown as z.infer<typeof ChainEventCreated>,
@@ -184,7 +181,7 @@ describe('chainEventCreated Event Handler', () => {
           name: EventNames.ChainEventCreated,
           payload: {
             eventSource: {
-              eventSignature: communityStakeTradeEventSignature,
+              eventSignature: EvmEventSignatures.CommunityStake.Trade,
             },
             parsedArgs: ['0x1', namespaceAddress, true],
           } as unknown as z.infer<typeof ChainEventCreated>,

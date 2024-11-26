@@ -1,17 +1,10 @@
+import { type Command } from '@hicommonwealth/core';
 import {
-  EvmEventSignature,
   EvmEventSignatures,
-  parseEvmEvent,
-  type Command,
-} from '@hicommonwealth/core';
-import {
-  config,
-  emitEvent,
-  equalEvmAddresses,
-  models,
-} from '@hicommonwealth/model';
+  commonProtocol as cp,
+} from '@hicommonwealth/evm-protocols';
+import { config, equalEvmAddresses, models } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
-import { commonProtocol as cp } from '@hicommonwealth/shared';
 import { Hmac, createHmac } from 'crypto';
 
 // TODO: how do we handle chain re-orgs
@@ -115,14 +108,15 @@ export function ChainEventCreated(): Command<typeof schemas.ChainEventCreated> {
             contractAddress,
           )
         ) {
-          events.push(
-            parseEvmEvent(
-              contractAddress,
-              eventSignature as EvmEventSignature,
-              log.data,
-              log.topics,
-            ),
-          );
+          events
+            .push
+            // parseEvmEvent(
+            //   contractAddress,
+            //   eventSignature as EvmEventSignature,
+            //   log.data,
+            //   log.topics,
+            // ),
+            ();
         } else if (
           // Contests
           Object.values(EvmEventSignatures.Contests).includes(
@@ -138,21 +132,22 @@ export function ChainEventCreated(): Command<typeof schemas.ChainEventCreated> {
           );
 
           if (matchingContestContract) {
-            events.push(
-              parseEvmEvent(
-                contractAddress,
-                eventSignature as EvmEventSignature,
-                log.data,
-                log.topics,
-              ),
-            );
+            events
+              .push
+              // parseEvmEvent(
+              //   contractAddress,
+              //   eventSignature as EvmEventSignature,
+              //   log.data,
+              //   log.topics,
+              // ),
+              ();
           }
         }
       }
 
-      if (events.length > 0) {
-        await emitEvent(models.Outbox, events);
-      }
+      // if (events.length > 0) {
+      //   await emitEvent(models.Outbox, events);
+      // }
     },
   };
 }

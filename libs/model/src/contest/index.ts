@@ -10,5 +10,4 @@ export * from './GetContest.query';
 export * from './GetContestLog.query';
 export * from './GetFarcasterContestCasts';
 export * from './GetFarcasterUpvoteActionMetadata.query';
-export * from './PerformContestRollovers.command';
 export * from './UpdateContestManagerMetadata.command';

@@ -33,7 +33,7 @@ describe('POST communityStakes Tests', () => {
   let server: TestServer;
 
   beforeAll(async () => {
-    server = await testServer(import.meta);
+    server = await testServer();
   });
 
   afterAll(async () => {

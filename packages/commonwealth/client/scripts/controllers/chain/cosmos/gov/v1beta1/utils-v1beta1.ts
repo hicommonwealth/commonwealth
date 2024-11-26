@@ -150,14 +150,10 @@ export const getCompletedProposalsV1Beta1 = async (
 };
 
 const sortProposals = (proposals: Proposal[]): ICosmosProposal[] => {
-  // @ts-expect-error StrictNullChecks
-  return (
-    proposals
-      .map((p) => msgToIProposal(p))
-      .filter((p) => !!p)
-      // @ts-expect-error StrictNullChecks
-      .sort((p1, p2) => +p2.identifier - +p1.identifier)
-  );
+  return proposals
+    .map((p) => msgToIProposal(p))
+    .filter((p): p is ICosmosProposal => !!p)
+    .sort((p1, p2) => +p2.identifier - +p1.identifier);
 };
 
 export const msgToIProposal = (p: Proposal): ICosmosProposal | null => {

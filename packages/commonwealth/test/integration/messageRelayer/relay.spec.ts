@@ -7,7 +7,7 @@ import { testOutboxEvents } from './util';
 
 describe('relay', () => {
   beforeAll(async () => {
-    await tester.bootstrap_testing(import.meta);
+    await tester.bootstrap_testing();
   });
 
   afterEach(async () => {

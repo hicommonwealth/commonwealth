@@ -86,7 +86,6 @@ import { getGroupsHandler } from '../routes/groups/get_groups_handler';
 import { refreshMembershipHandler } from '../routes/groups/refresh_membership_handler';
 import { deletePollHandler } from '../routes/polls/delete_poll_handler';
 import { getPollVotesHandler } from '../routes/polls/get_poll_votes_handler';
-import { updatePollVoteHandler } from '../routes/polls/update_poll_vote_handler';
 import { getTagsHandler } from '../routes/tags/get_tags_handler';
 import { createThreadPollHandler } from '../routes/threads/create_thread_poll_handler';
 import { getThreadPollsHandler } from '../routes/threads/get_thread_polls_handler';
@@ -297,14 +296,6 @@ function setupRouter(
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,
     deletePollHandler.bind(this, serverControllers),
-  );
-  registerRoute(
-    router,
-    'put',
-    '/polls/:id/votes',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateAuthor,
-    updatePollVoteHandler.bind(this, serverControllers),
   );
   registerRoute(
     router,
