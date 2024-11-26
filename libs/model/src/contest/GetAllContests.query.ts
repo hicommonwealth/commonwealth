@@ -10,49 +10,11 @@ export function GetAllContests(): Query<typeof schemas.GetAllContests> {
     auth: [],
     secure: false,
     body: async ({ payload }) => {
-      const whereConditions = [];
-      const replacements: Record<string, any> = {};
-
-      if (payload.community_id) {
-        whereConditions.push('cm.community_id = :community_id');
-        replacements.community_id = payload.community_id;
-      }
-
-      if (payload.contest_address) {
-        whereConditions.push('cm.contest_address = :contest_address');
-        replacements.contest_address = payload.contest_address;
-      }
-
-      if (payload.contest_id) {
-        whereConditions.push(
-          'exists (select 1 from "Contests" c2 where c2.contest_address = cm.contest_address and c2.contest_id = :contest_id)',
-        );
-        replacements.contest_id = payload.contest_id;
-      }
-
-      const whereClause =
-        whereConditions.length > 0
-          ? 'WHERE ' + whereConditions.join(' AND ')
-          : '';
-
       const results = await models.sequelize.query<
         z.infer<typeof schemas.ContestResults>
       >(
         `
-WITH contest_data AS (
-  SELECT
-    c.contest_address,
-    jsonb_agg(json_build_object(
-      'contest_id', c.contest_id,
-      'start_time', c.start_time,
-      'end_time', c.end_time,
-      'score_updated_at', c.score_updated_at,
-      'score', c.score
-    ) ORDER BY c.contest_id DESC) AS contests
-  FROM "Contests" c
-  GROUP BY c.contest_address
-)
-SELECT
+select
   cm.community_id,
   cm.contest_address,
   cm.interval,
@@ -68,25 +30,74 @@ SELECT
   cm.cancelled,
   cm.topic_id,
   cm.is_farcaster_contest,
-  COALESCE((
-    SELECT jsonb_agg(json_build_object('id', t.id, 'name', t.name) ORDER BY t.name)
-    FROM "ContestManagers" cm2
-    LEFT JOIN "Topics" t ON cm2.topic_id = t.id
+  coalesce((
+    select jsonb_agg(json_build_object('id', t.id, 'name', t.name) order by t.name)
+    from "ContestManagers" cm2
+    left join "Topics" t on cm2.topic_id = t.id
     WHERE cm2.contest_address = cm.contest_address
-  ), '[]'::jsonb) AS topics,
-  COALESCE(cd.contests, '[]'::jsonb) AS contests
-FROM 
-  "ContestManagers" cm
-LEFT JOIN 
-  contest_data cd ON cm.contest_address = cd.contest_address
-${whereClause}
-ORDER BY 
+  ), '[]'::jsonb) as topics,
+  coalesce(c.contests, '[]'::jsonb) as contests
+from
+"ContestManagers" cm left join (
+	select
+	  c.contest_address,
+    jsonb_agg(json_build_object(
+      'contest_id', c.contest_id,
+      'start_time', c.start_time,
+      'end_time', c.end_time,
+      'score_updated_at', c.score_updated_at,
+      'score', c.score --,
+--      'actions', coalesce(ca.actions, '[]'::jsonb)
+		) order by c.contest_id desc) as contests
+	from "Contests" c
+--    left join (
+--      select
+--        a.contest_id,
+--        jsonb_agg(jsonb_build_object(
+--          'content_id', a.content_id,
+--          'actor_address', a.actor_address,
+--          'action', a.action,
+--          'content_url', a.content_url,
+--          'thread_id', a.thread_id,
+--          'thread_title', tr.title,
+--          'voting_power', a.voting_power,
+--          'created_at', a.created_at
+--        ) order by a.created_at) as actions
+--      from "ContestActions" a left join "Threads" tr on a.thread_id = tr.id
+--      group by a.contest_id
+--    ) as ca on c.contest_id = ca.contest_id
+    ${payload.contest_id ? `where c.contest_id = ${payload.contest_id}` : ''}
+	  group by c.contest_address
+  ) as c on cm.contest_address = c.contest_address
+where
+  ${payload.community_id ? 'cm.community_id = :community_id' : ''}
+  ${payload.community_id && payload.contest_address ? 'and' : ''}
+  ${payload.contest_address ? `cm.contest_address = :contest_address` : ''}
+group by
+  cm.community_id,
+  cm.contest_address,
+  cm.interval,
+  cm.ticker,
+  cm.decimals,
+  cm.created_at,
+  cm.name,
+  cm.image_url,
+  cm.description,
+  cm.funding_token_address,
+  cm.prize_percentage,
+  cm.payout_structure,
+  cm.cancelled,
+  c.contests
+order by
   cm.name;
 `,
         {
           type: QueryTypes.SELECT,
           raw: true,
-          replacements,
+          replacements: {
+            community_id: payload.community_id,
+            contest_address: payload.contest_address,
+          },
         },
       );
       results.forEach((r) => {
