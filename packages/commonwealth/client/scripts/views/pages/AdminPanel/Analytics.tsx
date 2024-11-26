@@ -1,12 +1,12 @@
 import axios from 'axios';
 import { notifyError } from 'controllers/app/notifications';
 import useNecessaryEffect from 'hooks/useNecessaryEffect';
-import 'pages/AdminPanel.scss';
 import React, { useState } from 'react';
 import { SERVER_URL } from 'state/api/config';
 import useUserStore from 'state/ui/user';
 import { CWText } from '../../components/component_kit/cw_text';
 import CWCircleMultiplySpinner from '../../components/component_kit/new_designs/CWCircleMultiplySpinner';
+import './AdminPanel.scss';
 import CommunityFinder from './CommunityFinder';
 
 type Stats = {

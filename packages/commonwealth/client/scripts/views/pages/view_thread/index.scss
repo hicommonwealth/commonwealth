@@ -1,4 +1,4 @@
-@import '../../shared';
+@import '../../../../styles/shared.scss';
 
 .thread-content {
   display: flex;
@@ -48,7 +48,6 @@
     background-color: $neutral-100;
   }
 }
-
 
 .comments-filter-row {
   display: flex;
