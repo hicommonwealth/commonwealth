@@ -12,7 +12,7 @@ import { CWCommunityAvatar } from '../../../../components/component_kit/cw_commu
 import { CWText } from '../../../../components/component_kit/cw_text';
 import './CommunityPreviewCard.scss';
 type CommunityPreviewCardProps = {
-  community: {
+  community?: {
     name: string;
     icon_url: string;
     id: string;
@@ -23,7 +23,18 @@ type CommunityPreviewCardProps = {
   hasNewContent?: boolean;
   onClick?: () => any;
   isExploreMode?: boolean;
-};
+} & (
+  | { isExploreMode: true }
+  | {
+      isExploreMode?: false;
+      community: NonNullable<{
+        name: string;
+        icon_url: string;
+        id: string;
+        base: ChainBase;
+      }>;
+    }
+);
 
 const CommunityPreviewCard = ({
   community,
@@ -44,15 +55,17 @@ const CommunityPreviewCard = ({
 
     void (async () => {
       try {
-        await linkSpecificAddressToSpecificCommunity({
-          address: userAddress?.address,
-          community: {
-            id: community.id,
-            base: community.base,
-            iconUrl: community.icon_url,
-            name: community.name,
-          },
-        });
+        if (community) {
+          await linkSpecificAddressToSpecificCommunity({
+            address: userAddress?.address,
+            community: {
+              id: community.id,
+              base: community.base,
+              iconUrl: community.icon_url,
+              name: community.name,
+            },
+          });
+        }
       } catch (error) {
         console.error('Failed to join community:', error);
       }
