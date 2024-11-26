@@ -1,16 +1,26 @@
 import { trpc } from 'utils/trpcClient';
 import useUserStore from '../../ui/user';
+import { queryClient } from '../config';
 
 const useCreateTokenMutation = () => {
   const user = useUserStore();
-  const utils = trpc.useUtils();
 
   return trpc.token.createToken.useMutation({
-    onSuccess: async () => {
+    onSuccess: () => {
       user.setData({ addressSelectorSelectedAddress: undefined });
 
-      await utils.token.getTokens.invalidate();
-      await utils.token.getTokens.refetch();
+      void queryClient.invalidateQueries({
+        predicate: (query) => {
+          const [path] = query.queryKey;
+          if (Array.isArray(path) && path.length === 2) {
+            const [entity, name] = path;
+            if (entity === 'token' && name === 'getTokens') {
+              return true;
+            }
+          }
+          return false;
+        },
+      });
     },
   });
 };

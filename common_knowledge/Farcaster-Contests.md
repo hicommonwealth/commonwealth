@@ -34,7 +34,8 @@ Add these env vars to your .env file. Fill in the API key (ask a dev) and your o
 
 ```
 FLAG_FARCASTER_CONTEST=true
-NEYNAR_API_KEY=
+NEYNAR_API_KEY=<Get from Neynar dashboard>
+NEYNAR_CAST_CREATED_WEBHOOK_SECRET=<Get from Neynar dashboard>
 NEYNAR_REPLY_WEBHOOK_URL=https://YOUR_NGROK_DOMAIN/api/integration/farcaster/ReplyCastCreated
 FARCASTER_ACTION_URL=https://YOUR_NGROK_DOMAIN/api/integration/farcaster/CastUpvoteAction
 FARCASTER_NGROK_DOMAIN=https://YOUR_NGROK_DOMAIN

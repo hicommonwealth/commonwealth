@@ -17,7 +17,7 @@ describe('User Model Routes', () => {
   let server: TestServer;
 
   beforeAll(async () => {
-    server = await testServer(import.meta);
+    server = await testServer();
   });
 
   afterAll(async () => {

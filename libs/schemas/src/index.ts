@@ -22,6 +22,7 @@ export type Aggregates = Extract<
   | 'GroupPermission'
   | 'Tags'
   | 'CommunityTags'
+  | 'ContractAbi'
 >;
 
 export * from './commands';
