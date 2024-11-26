@@ -263,4 +263,9 @@ export const FarcasterVoteCreated = FarcasterAction.extend({
   contest_address: z.string(),
 }).describe('When a farcaster action is initiated on a cast reply');
 
+export const SignUpFlowCompleted = z.object({
+  user_id: z.number(),
+  referral_link: z.string(),
+});
+
 export const ContestRolloverTimerTicked = z.object({});
