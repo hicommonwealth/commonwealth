@@ -124,15 +124,6 @@ export async function parseLogs(
       continue;
     }
 
-    interfaces[address] = new ethers.utils.Interface(data.abi);
-    try {
-      const temp = interfaces[address].parseLog(log);
-
-      console.log(temp);
-    } catch (e) {
-      console.log(e);
-    }
-
     const evmEventSource = data.sources.find(
       (s) => s.event_signature === log.topics[0],
     );
