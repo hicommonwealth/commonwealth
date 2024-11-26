@@ -83,11 +83,9 @@ export const ThreadPollCard = ({
 
             try {
               await votePoll({
-                pollId: votedPoll.id,
-                communityId: votedPoll.communityId,
-                authorCommunityId: user.activeAccount?.community?.id || '',
-                address: user.activeAccount?.address || '',
-                selectedOption,
+                thread_id: votedPoll.threadId,
+                poll_id: votedPoll.id,
+                option: selectedOption,
               });
             } catch (err) {
               console.error(err);

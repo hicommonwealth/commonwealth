@@ -1,6 +1,6 @@
 import { AppError, ServerError } from '@hicommonwealth/core';
+import { commonProtocol } from '@hicommonwealth/evm-protocols';
 import { models } from '@hicommonwealth/model';
-import { commonProtocol } from '@hicommonwealth/shared';
 import Web3, { AbiFunctionFragment } from 'web3';
 import { CommunityAttributes } from '../../models/community';
 

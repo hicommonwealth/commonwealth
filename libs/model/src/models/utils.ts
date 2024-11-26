@@ -226,9 +226,9 @@ export function mapFk<Source extends State, Target extends State>(
   },
   rules?: RuleOptions,
 ) {
-  const name = `${source.tableName}_${target.tableName.toLowerCase()}_fkey`;
   const pk = primaryKey.map((k) => target.getAttributes()[k].field!);
   const fk = foreignKey.map((k) => source.getAttributes()[k].field!);
+  const name = `${source.tableName}_${target.tableName.toLowerCase()}_${fk}_fkey`;
   // console.log(
   //   'mapFk:',
   //   `${name}(${fk.join(', ')}) -> ${target.tableName}(${pk.join(', ')})`,

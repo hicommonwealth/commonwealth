@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-
-import { commonProtocol, ZERO_ADDRESS } from '@hicommonwealth/shared';
+import { commonProtocol } from '@hicommonwealth/evm-protocols';
+import { ZERO_ADDRESS } from '@hicommonwealth/shared';
 import useAppStatus from 'hooks/useAppStatus';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import { useFlag } from 'hooks/useFlag';
+import React, { useState } from 'react';
 import {
   BaseMixpanelPayload,
   MixpanelContestEvents,
@@ -147,6 +147,7 @@ const SignTransactionsStep = ({
       await createContestMutation({
         contest_address: contestAddress,
         name: contestFormData?.contestName,
+        description: contestFormData?.contestDescription,
         community_id: app.activeChainId() || '',
         image_url: contestFormData?.contestImage,
         funding_token_address: exchangeToken,

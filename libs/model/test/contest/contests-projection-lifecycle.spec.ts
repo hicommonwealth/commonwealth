@@ -7,9 +7,10 @@ import {
   handleEvent,
   query,
 } from '@hicommonwealth/core';
+import { commonProtocol } from '@hicommonwealth/evm-protocols';
 import { models } from '@hicommonwealth/model';
 import { ContestResults } from '@hicommonwealth/schemas';
-import { AbiType, commonProtocol, delay } from '@hicommonwealth/shared';
+import { AbiType, delay } from '@hicommonwealth/shared';
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import Sinon from 'sinon';
@@ -21,7 +22,7 @@ import {
   contestHelper,
   contractHelpers,
 } from '../../src/services/commonProtocol';
-import { bootstrap_testing, seed } from '../../src/tester';
+import { seed } from '../../src/tester';
 
 chai.use(chaiAsPromised);
 
@@ -67,29 +68,25 @@ describe('Contests projection lifecycle', () => {
     getContestScore = Sinon.stub(contestHelper, 'getContestScore');
     getContestStatus = Sinon.stub(contestHelper, 'getContestStatus');
 
-    await bootstrap_testing();
-
     try {
-      const recurringContestAbi = await models.ContractAbi.create({
+      const [recurringContestAbi] = await seed('ContractAbi', {
         id: 700,
         abi: [] as AbiType,
         nickname: 'RecurringContest',
         abi_hash: 'hash1',
+        verified: true,
       });
-      const singleContestAbi = await models.ContractAbi.create({
+      const [singleContestAbi] = await seed('ContractAbi', {
         id: 701,
         abi: [] as AbiType,
         nickname: 'SingleContest',
         abi_hash: 'hash2',
+        verified: true,
       });
       const [chain] = await seed('ChainNode', {
         contracts: [
-          {
-            abi_id: recurringContestAbi.id,
-          },
-          {
-            abi_id: singleContestAbi.id,
-          },
+          { abi_id: recurringContestAbi!.id },
+          { abi_id: singleContestAbi!.id },
         ],
         url: 'https://test',
         private_url: 'https://test',
@@ -350,6 +347,7 @@ describe('Contests projection lifecycle', () => {
         payout_structure,
         funding_token_address,
         image_url,
+        description: null,
         interval,
         ticker,
         decimals,

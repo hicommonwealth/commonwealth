@@ -1,11 +1,12 @@
 /* eslint-disable dot-notation */
 import { CacheDecorator, RedisCache } from '@hicommonwealth/adapters';
 import { cache, dispose } from '@hicommonwealth/core';
-import type { DB, E2E_TestEntities } from '@hicommonwealth/model';
+import { tester, type DB, type E2E_TestEntities } from '@hicommonwealth/model';
 import express from 'express';
 import 'express-async-errors'; // handle exceptions thrown in express routes
 import { config } from './server/config';
 import { ModelSeeder, modelSeeder } from './test/util/modelUtils';
+const { main } = await import('./main');
 
 /**
  * Encapsulates all the infrastructure required for integration testing, including:
@@ -24,7 +25,6 @@ export type TestServer = {
   models: DB;
   seeder: ModelSeeder;
   e2eTestEntities: E2E_TestEntities;
-  truncate: () => Promise<void>;
 };
 
 /**
@@ -36,10 +36,6 @@ export const testServer = async (): Promise<TestServer> => {
   cache({
     adapter: new RedisCache('redis://localhost:6379'),
   });
-
-  const { tester } = await import('@hicommonwealth/model');
-  const { main } = await import('./main');
-
   const db = await tester.seedDb();
   const app = express();
   const { server, cacheDecorator } = await main(app, db, {
@@ -60,6 +56,5 @@ export const testServer = async (): Promise<TestServer> => {
     models: db,
     seeder,
     e2eTestEntities,
-    truncate: () => tester.truncate_db(db),
   };
 };

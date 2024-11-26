@@ -1,8 +1,9 @@
 import { Actor, command, dispose, query } from '@hicommonwealth/core';
-import { BalanceType, commonProtocol } from '@hicommonwealth/shared';
+import { commonProtocol } from '@hicommonwealth/evm-protocols';
+import { BalanceType } from '@hicommonwealth/shared';
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import { bootstrap_testing, seed } from 'model/src/tester';
+import { seed } from 'model/src/tester';
 import { afterAll, beforeAll, describe, test } from 'vitest';
 import {
   CreateStakeTransaction,
@@ -17,7 +18,6 @@ describe('Stake transactions', () => {
   let community_id: string;
 
   beforeAll(async () => {
-    await bootstrap_testing(true);
     const [node] = await seed('ChainNode', {
       url: 'https://ethereum-sepolia.publicnode.com',
       private_url: 'https://ethereum-sepolia.publicnode.com',

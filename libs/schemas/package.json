@@ -23,6 +23,7 @@
   },
   "dependencies": {
     "@hicommonwealth/shared": "workspace:*",
+    "@hicommonwealth/evm-protocols": "workspace:*",
     "moment": "^2.23.0",
     "zod": "^3.22.4"
   },

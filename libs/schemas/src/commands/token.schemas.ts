@@ -17,7 +17,6 @@ export const CreateToken = {
 
 export const LaunchpadTradeView = LaunchpadTrade.extend({
   community_token_amount: z.string(),
-  price: z.string(),
   floating_supply: z.string(),
 });
 
