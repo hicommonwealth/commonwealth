@@ -1,0 +1,20 @@
+.MobileInput {
+  flex-grow: 1;
+  display: flex;
+
+  .InputBox {
+    flex-grow: 1;
+    display: flex;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    margin-top: 8px;
+    margin-left: 8px;
+    margin-right: 8px;
+  }
+
+  .RightButton {
+    margin-top: auto;
+    margin-bottom: auto;
+    padding-right: 8px;
+  }
+}
