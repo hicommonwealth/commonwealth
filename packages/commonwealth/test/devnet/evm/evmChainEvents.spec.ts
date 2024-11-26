@@ -2,6 +2,7 @@ import { Log } from '@ethersproject/providers';
 import { ChainEventCreated, dispose, EventNames } from '@hicommonwealth/core';
 import {
   commonProtocol,
+  EventRegistry,
   EvmEventSignatures,
 } from '@hicommonwealth/evm-protocols';
 import {
@@ -17,10 +18,19 @@ import {
   equalEvmAddresses,
   models,
 } from '@hicommonwealth/model';
-import { AbiType, BalanceType, delay } from '@hicommonwealth/shared';
+import { AbiType, delay } from '@hicommonwealth/shared';
 import { Anvil } from '@viem/anvil';
 import { bootstrap_testing } from 'node_modules/@hicommonwealth/model/src/tester';
-import { afterAll, beforeAll, describe, expect, test } from 'vitest';
+import {
+  afterAll,
+  afterEach,
+  beforeAll,
+  describe,
+  expect,
+  MockInstance,
+  test,
+  vi,
+} from 'vitest';
 import { z } from 'zod';
 import {
   getEvents,
@@ -33,6 +43,9 @@ import {
   ContractSources,
   EvmSource,
 } from '../../../server/workers/evmChainEvents/types';
+import { createEventRegistryChainNodes } from '../../util/util';
+
+vi.mock('../../../server/workers/evmChainEvents/getEventSources');
 
 const namespaceDeployedLog = {
   address: '0xd8a357847caba76133d5f2cb51317d3c74609710',
@@ -323,6 +336,7 @@ describe('EVM Chain Events Devnet Tests', () => {
       ).toBeTruthy();
     });
   });
+
   describe('EVM Chain Events End to End Tests', () => {
     let chainNode: ChainNodeInstance;
 
@@ -331,13 +345,22 @@ describe('EVM Chain Events Devnet Tests', () => {
       // and avoid conflicts with other tests using same chain
       await bootstrap_testing();
 
-      chainNode = await models.ChainNode.create({
-        url: localRpc,
-        balance_type: BalanceType.Ethereum,
-        name: 'Local Base Sepolia',
-        eth_chain_id: commonProtocol.ValidChains.SepoliaBase,
-        max_ce_block_range: -1,
-      });
+      const chainNodes = await createEventRegistryChainNodes();
+      const sepoliaBaseChainNode = chainNodes.find(
+        (c) => c.eth_chain_id === commonProtocol.ValidChains.SepoliaBase,
+      );
+      sepoliaBaseChainNode!.url = localRpc;
+      sepoliaBaseChainNode!.private_url = localRpc;
+      await sepoliaBaseChainNode!.save();
+      chainNode = sepoliaBaseChainNode!;
+
+      // chainNode = await models.ChainNode.create({
+      //   url: localRpc,
+      //   balance_type: BalanceType.Ethereum,
+      //   name: 'Local Base Sepolia',
+      //   eth_chain_id: commonProtocol.ValidChains.SepoliaBase,
+      //   max_ce_block_range: -1,
+      // });
       // TODO: add contest contracts to EES?
       // await models.EvmEventSource.bulkCreate([
       //   {
@@ -359,10 +382,53 @@ describe('EVM Chain Events Devnet Tests', () => {
       // ]);
     });
 
+    afterEach(() => {
+      vi.resetAllMocks();
+    });
+
     test(
       'should insert events into the outbox',
       { timeout: 80_000 },
       async () => {
+        const sepoliaBaseChainId = commonProtocol.ValidChains.SepoliaBase;
+        const factoryAddress =
+          commonProtocol.factoryContracts[sepoliaBaseChainId].factory;
+        const stakeAddress =
+          commonProtocol.factoryContracts[sepoliaBaseChainId].communityStake;
+        const factoryEventRegistry =
+          EventRegistry[sepoliaBaseChainId][factoryAddress];
+        const { getEventSources } = await import(
+          '../../../server/workers/evmChainEvents/getEventSources'
+        );
+        (getEventSources as unknown as MockInstance).mockImplementation(
+          async () =>
+            Promise.resolve({
+              [sepoliaBaseChainId]: {
+                rpc: localRpc,
+                maxBlockRange: 500,
+                contracts: {
+                  [factoryAddress]: {
+                    abi: factoryEventRegistry.abi,
+                    sources: [
+                      {
+                        eth_chain_id: sepoliaBaseChainId,
+                        contract_address: factoryAddress,
+                        event_signature:
+                          EvmEventSignatures.NamespaceFactory.NamespaceDeployed,
+                      },
+                      {
+                        eth_chain_id: sepoliaBaseChainId,
+                        contract_address: stakeAddress,
+                        event_signature:
+                          EvmEventSignatures.CommunityStake.Trade,
+                      },
+                    ],
+                  },
+                },
+              },
+            }),
+        );
+
         expect(await models.Outbox.count()).to.equal(0);
         let lastProcessedBlockNumber =
           await models.LastProcessedEvmBlock.findOne({
