@@ -46,7 +46,6 @@ describe('chainEventCreated Event Handler', () => {
         name: 'Sepolia Testnet',
         eth_chain_id: 11155111,
         balance_type: BalanceType.Ethereum,
-        contracts: [],
       },
       { mock: false },
     );
