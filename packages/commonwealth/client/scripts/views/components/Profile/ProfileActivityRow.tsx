@@ -21,7 +21,6 @@ const ProfileActivityRow = ({ activity }: ProfileActivityRowProps) => {
   const communityId =
     (activity as CommentWithThreadCommunity)?.thread?.community_id ||
     activity?.communityId;
-  let title: string;
 
   const isThread = !!(activity as Thread).kind;
 
