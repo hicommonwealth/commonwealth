@@ -11,7 +11,7 @@ import { expect } from 'chai';
 import { Contests } from 'model/src/contest';
 import { literal } from 'sequelize';
 import { afterAll, beforeAll, describe, test } from 'vitest';
-import { bootstrap_testing, seed } from '../../src/tester';
+import { seed } from '../../src/tester';
 import { drainOutbox } from '../utils';
 
 describe('Check Contests', () => {
@@ -25,8 +25,6 @@ describe('Check Contests', () => {
   const topicId: number = 0;
 
   beforeAll(async () => {
-    await bootstrap_testing();
-
     const [chainNode] = await seed('ChainNode');
     const [user] = await seed(
       'User',
