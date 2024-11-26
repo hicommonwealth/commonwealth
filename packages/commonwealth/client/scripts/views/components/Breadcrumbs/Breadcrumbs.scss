@@ -21,7 +21,6 @@
     @include extraSmall {
       position: static;
     }
-
     .disable-active-cursor {
       &:hover {
         cursor: default;
