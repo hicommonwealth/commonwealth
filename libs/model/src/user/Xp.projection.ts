@@ -1,10 +1,9 @@
 import { Projection, events } from '@hicommonwealth/core';
+import { Op } from 'sequelize';
 import { models, sequelize } from '../database';
 import { mustExist } from '../middleware/guards';
 
 const inputs = {
-  SignUpFlowCompleted: events.SignUpFlowCompleted,
-  CommunityCreated: events.CommunityCreated,
   ThreadCreated: events.ThreadCreated,
   CommentCreated: events.CommentCreated,
   CommentUpvoted: events.CommentUpvoted,
@@ -14,35 +13,34 @@ const inputs = {
   //PollEdited: events.PollEdited,
 };
 
-//  TODO: implement points formulas
-const xpVals: Record<
-  keyof typeof inputs,
-  (user_id: number) => Promise<number>
-> = {
-  SignUpFlowCompleted: () => Promise.resolve(10),
-  CommunityCreated: () => Promise.resolve(10),
-  ThreadCreated: () => Promise.resolve(10),
-  CommentCreated: () => Promise.resolve(10),
-  CommentUpvoted: () => Promise.resolve(10),
-};
-
-async function getUserId(address_id: number) {
+async function getUserId(payload: { address_id: number }) {
   const address = await models.Address.findOne({
-    where: { id: address_id },
+    where: { id: payload.address_id },
     attributes: ['user_id'],
   });
   mustExist('Address not found', address);
   return address.user_id!;
 }
 
-async function handleXp(
-  event_name: keyof typeof inputs,
-  ids: { user_id?: number; address_id?: number },
-) {
-  // TODO: check if action in valid quest
+async function getQuest(payload: { community_id: string; created_at?: Date }) {
+  const quest = await models.Quest.findOne({
+    where: {
+      community_id: payload.community_id,
+      start_date: { [Op.lte]: payload.created_at },
+      end_date: { [Op.gte]: payload.created_at },
+    },
+  });
+  return quest;
+}
 
-  const user_id = ids.user_id ?? (await getUserId(ids.address_id!));
-  const xp_points = await xpVals[event_name](user_id);
+async function recordXps(
+  event_name: keyof typeof inputs,
+  user_id: number,
+  xp_points: number,
+  // TODO: audit attributes
+  // quest_id?: number,
+  // audit: string, // details at the moment of xp collection
+) {
   await sequelize.transaction(async (transaction) => {
     await models.XpLog.create(
       {
@@ -65,22 +63,39 @@ export function Xp(): Projection<typeof inputs> {
   return {
     inputs,
     body: {
-      CommunityCreated: async ({ payload }) => {
-        await handleXp('CommunityCreated', {
-          user_id: parseInt(payload.userId),
-        });
-      },
-      SignUpFlowCompleted: async ({ payload }) => {
-        await handleXp('SignUpFlowCompleted', { user_id: payload.user_id });
-      },
       ThreadCreated: async ({ payload }) => {
-        await handleXp('ThreadCreated', { address_id: payload.address_id });
+        const user_id = await getUserId(payload);
+        const quest = await getQuest(payload);
+        if (quest) {
+          const xp_points = 10; // TODO: calculate points
+          await recordXps('ThreadCreated', user_id, xp_points);
+        }
       },
       CommentCreated: async ({ payload }) => {
-        await handleXp('CommentCreated', { address_id: payload.address_id });
+        const user_id = await getUserId(payload);
+        const quest = await getQuest(payload);
+        if (quest) {
+          const xp_points = 10; // TODO: calculate points
+          await recordXps('CommentCreated', user_id, xp_points);
+        }
       },
       CommentUpvoted: async ({ payload }) => {
-        await handleXp('CommentUpvoted', { address_id: payload.address_id });
+        const user_id = await getUserId(payload);
+        const comment = await models.Comment.findOne({
+          where: { id: payload.comment_id },
+          include: {
+            model: models.Thread,
+            attributes: ['community_id'],
+            required: true,
+          },
+        });
+        const quest = await getQuest({
+          community_id: comment!.Thread!.community_id,
+        });
+        if (quest) {
+          const xp_points = 10; // TODO: calculate points
+          await recordXps('CommentUpvoted', user_id, xp_points);
+        }
       },
     },
   };
