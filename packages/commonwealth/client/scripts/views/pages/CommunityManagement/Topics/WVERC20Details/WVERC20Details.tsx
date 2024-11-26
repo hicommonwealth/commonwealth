@@ -11,6 +11,8 @@ import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextIn
 import { CreateTopicStep } from '../utils';
 
 import { TopicWeightedVoting } from '@hicommonwealth/schemas';
+import { ZERO_ADDRESS } from '@hicommonwealth/shared';
+import { CWCheckbox } from 'client/scripts/views/components/component_kit/cw_checkbox';
 import { notifyError } from 'controllers/app/notifications';
 import TokenFinder, { useTokenFinder } from 'views/components/TokenFinder';
 import { HandleCreateTopicProps } from 'views/pages/CommunityManagement/Topics/Topics';
@@ -77,7 +79,6 @@ const WVERC20Details = ({ onStepChange, onCreateTopic }: WVConsentProps) => {
         selection is only available when the community is created
       </CWText>
       <CWSelectList
-        isDisabled
         options={options}
         value={selectedChain}
         onChange={setSelectedChain}
@@ -96,9 +97,19 @@ const WVERC20Details = ({ onStepChange, onCreateTopic }: WVConsentProps) => {
         setTokenValue={setTokenValue}
         tokenValue={tokenValue}
         containerClassName="token-input"
-        disabled={editMode}
+        disabled={editMode || tokenValue == ZERO_ADDRESS}
         fullWidth
         tokenError={getTokenError()}
+      />
+      <CWCheckbox
+        label="Use native token"
+        onChange={() => {
+          if (tokenValue == ZERO_ADDRESS) {
+            setTokenValue('');
+          } else {
+            setTokenValue(ZERO_ADDRESS);
+          }
+        }}
       />
 
       <CWText type="h5">Vote weight multiplier</CWText>

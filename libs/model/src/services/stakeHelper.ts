@@ -40,6 +40,11 @@ export async function getVotingWeight(
           },
         ],
       },
+      {
+        model: models.ChainNode.scope('withPrivateData'),
+        as: 'token_chain_node',
+        required: false,
+      },
     ],
   });
   mustExist('Topic', topic);
@@ -47,10 +52,10 @@ export async function getVotingWeight(
   const { community } = topic;
   mustExist('Community', community);
 
-  const chain_node = community.ChainNode;
+  const namespaceChainNode = community.ChainNode;
 
   if (topic.weighted_voting === TopicWeightedVoting.Stake) {
-    mustExist('Chain Node Eth Chain Id', chain_node?.eth_chain_id);
+    mustExist('Chain Node Eth Chain Id', namespaceChainNode?.eth_chain_id);
     mustExist('Community Namespace Address', community.namespace_address);
 
     const stake = topic.community?.CommunityStakes?.at(0);
@@ -59,7 +64,7 @@ export async function getVotingWeight(
     const stakeBalances = await contractHelpers.getNamespaceBalance(
       community.namespace_address,
       stake.stake_id,
-      chain_node.eth_chain_id,
+      namespaceChainNode.eth_chain_id,
       [address],
     );
     const stakeBalance = stakeBalances[address];
@@ -68,16 +73,21 @@ export async function getVotingWeight(
 
     return commonProtocol.calculateVoteWeight(stakeBalance, stake.vote_weight);
   } else if (topic.weighted_voting === TopicWeightedVoting.ERC20) {
-    mustExist('Chain Node Eth Chain Id', chain_node?.eth_chain_id);
-    const chainNodeUrl = chain_node!.private_url! || chain_node!.url!;
+    // use topic chain node or fallback on namespace chain node
+    const { eth_chain_id, private_url, url } = topic.token_chain_node
+      ? topic.token_chain_node
+      : namespaceChainNode || {};
+    mustExist('Chain Node Eth Chain Id', eth_chain_id);
+    const chainNodeUrl = private_url! || url!;
     mustExist('Chain Node URL', chainNodeUrl);
+    mustExist('Topic Token Address', topic.token_address);
 
     const balances = await tokenBalanceCache.getBalances({
       balanceSourceType: BalanceSourceType.ERC20,
       addresses: [address],
       sourceOptions: {
-        evmChainId: chain_node.eth_chain_id,
-        contractAddress: topic.token_address!,
+        evmChainId: eth_chain_id,
+        contractAddress: topic.token_address,
       },
       cacheRefresh: true,
     });
