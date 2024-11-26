@@ -7,7 +7,7 @@ import { afterAll, beforeAll, describe, test } from 'vitest';
 import { commonProtocol, emitEvent, models } from '../../src';
 import { Contests } from '../../src/contest';
 import { ContestWorker } from '../../src/policies';
-import { bootstrap_testing, seed } from '../../src/tester';
+import { seed } from '../../src/tester';
 import { drainOutbox } from '../utils/outbox-drain';
 
 describe('Contest Worker Policy Lifecycle', () => {
@@ -21,8 +21,6 @@ describe('Contest Worker Policy Lifecycle', () => {
   const topicId: number = 0;
 
   beforeAll(async () => {
-    await bootstrap_testing(import.meta);
-
     const [chainNode] = await seed('ChainNode', { contracts: [] });
     const [user] = await seed(
       'User',
