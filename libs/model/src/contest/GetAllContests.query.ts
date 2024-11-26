@@ -13,7 +13,7 @@ export function GetAllContests(): Query<typeof schemas.GetAllContests> {
       const whereClause = [
         payload.community_id ? 'cm.community_id = :community_id' : '',
         payload.contest_address ? 'cm.contest_address = :contest_address' : '',
-        payload.contest_id ? `c.contest_id = ${payload.contest_id}` : '',
+        payload.contest_id ? 'c.contest_id = :contest_id' : '',
       ]
         .filter(Boolean)
         .join(' and ');
@@ -74,7 +74,8 @@ from
 --      from "ContestActions" a left join "Threads" tr on a.thread_id = tr.id
 --      group by a.contest_id
 --    ) as ca on c.contest_id = ca.contest_id
-    ${payload.contest_id ? `where c.contest_id = ${payload.contest_id}` : ''}
+where 1=1
+${payload.contest_id ? 'and c.contest_id = :contest_id' : ''}
 	  group by c.contest_address
   ) as c on cm.contest_address = c.contest_address
 ${whereClause ? `where ${whereClause}` : ''}
@@ -102,6 +103,7 @@ order by
           replacements: {
             community_id: payload.community_id,
             contest_address: payload.contest_address,
+            contest_id: payload.contest_id,
           },
         },
       );
