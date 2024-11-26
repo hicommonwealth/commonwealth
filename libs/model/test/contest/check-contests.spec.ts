@@ -25,9 +25,9 @@ describe('Check Contests', () => {
   const topicId: number = 0;
 
   beforeAll(async () => {
-    await bootstrap_testing(import.meta);
+    await bootstrap_testing();
 
-    const [chainNode] = await seed('ChainNode', { contracts: [] });
+    const [chainNode] = await seed('ChainNode');
     const [user] = await seed(
       'User',
       {
