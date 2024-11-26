@@ -15,7 +15,7 @@ import {
 } from '@hicommonwealth/model';
 import { BalanceType } from '@hicommonwealth/shared';
 
-function createTestRpc(
+export function createTestRpc(
   ethChainId: commonProtocol.ValidChains,
   scope: 'private' | 'public' = 'public',
 ): string {

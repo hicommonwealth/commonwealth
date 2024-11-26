@@ -17,7 +17,7 @@ describe('Contest Worker Policy', () => {
   let topicId: number = 0;
 
   beforeAll(async () => {
-    const [chainNode] = await seed('ChainNode', { contracts: [] });
+    const [chainNode] = await seed('ChainNode');
     const [user] = await seed(
       'User',
       {

@@ -9,7 +9,7 @@ import { getEventSources } from '../../../server/workers/evmChainEvents/getEvent
 import {
   createContestEventSources,
   createEventRegistryChainNodes,
-} from './util';
+} from '../../util/util';
 
 describe('getEventSources', () => {
   beforeAll(async () => {

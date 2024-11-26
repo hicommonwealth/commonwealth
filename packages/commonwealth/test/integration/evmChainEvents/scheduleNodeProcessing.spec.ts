@@ -13,7 +13,7 @@ import {
   vi,
 } from 'vitest';
 import { scheduleNodeProcessing } from '../../../server/workers/evmChainEvents/nodeProcessing';
-import { multipleEventSource, singleEventSource } from './util';
+import { multipleEventSource, singleEventSource } from '../../util/util';
 
 vi.mock('../../../server/workers/evmChainEvents/getEventSources');
 
