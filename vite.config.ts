@@ -12,14 +12,14 @@ export default defineConfig({
     setupFiles: [path.resolve(__dirname, './libs/model/src/vitest.setup.ts')],
     poolMatchGlobs: [
       // lifecycle tests in forks pool (uses node:child_process)
-      ['**/libs/model/**/*-lifecycle.spec.ts', 'forks'],
+      // ['**/libs/model/**/*-lifecycle.spec.ts', 'forks'],
       // everything else runs in threads pool
     ],
     poolOptions: {
       threads: { minThreads: 1, maxThreads: 1 },
-      forks: { minForks: 1, maxForks: 10 },
+      // forks: { minForks: 1, maxForks: 10 },
     },
-    fileParallelism: process.env.npm_package_name === '@hicommonwealth/model',
+    fileParallelism: false, // process.env.npm_package_name === '@hicommonwealth/model',
     sequence: { concurrent: false },
     coverage: {
       include: ['src/**/*.ts'],
