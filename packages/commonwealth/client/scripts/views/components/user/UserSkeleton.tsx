@@ -1,6 +1,6 @@
 import React from 'react';
 
-import 'components/user/user.scss';
+import './user.scss';
 
 import { Avatar } from 'views/components/Avatar';
 import { Skeleton } from '../Skeleton';
