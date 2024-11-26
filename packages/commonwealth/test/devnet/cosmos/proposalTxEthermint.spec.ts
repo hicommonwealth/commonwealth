@@ -89,7 +89,7 @@ describe('Proposal Transaction Tests - ethermint chain (evmos-dev-local)', () =>
   const lcdUrl = `http://localhost:8080/cosmosAPI/v1/${id}`;
 
   beforeAll(async () => {
-    await tester.seedDb(import.meta);
+    await tester.seedDb();
     const tm = await getTMClient(rpcUrl);
     rpc = await getRPCClient(tm);
     const { signerAddress } = await setupTestSigner(lcdUrl);
@@ -175,7 +175,7 @@ describe('Proposal Transaction Tests - ethermint chain (evmos-dev-local)', () =>
 describe('Ethermint Governance v1beta1 util Tests', () => {
   describe('getActiveProposals', () => {
     beforeAll(async () => {
-      await tester.seedDb(import.meta);
+      await tester.seedDb();
     });
 
     afterAll(async () => {

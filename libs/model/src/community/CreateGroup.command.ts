@@ -1,5 +1,6 @@
 import { InvalidInput, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
+import { PermissionEnum } from '@hicommonwealth/schemas';
 import { Op } from 'sequelize';
 import { models, sequelize } from '../database';
 import { authRoles } from '../middleware';
@@ -70,13 +71,21 @@ export function CreateGroup(): Command<typeof schemas.CreateGroup> {
 
             if (group.id) {
               // add topic level interaction permissions for current group
-              const groupPermissions = (payload.topics || []).map((t) => ({
-                group_id: group.id!,
-                topic_id: t.id,
-                allowed_actions: sequelize.literal(
-                  `ARRAY[${t.permissions.map((p) => `'${p}'`).join(', ')}]::"enum_GroupPermissions_allowed_actions"[]`,
-                ) as unknown as schemas.PermissionEnum[],
-              }));
+              const groupPermissions = (payload.topics || []).map((t) => {
+                const permissions = t.permissions;
+                // Enable UPDATE_POLL by default for all group permissions
+                // TODO: remove once client supports selecting the UPDATE_POLL permission
+                permissions.push(PermissionEnum.UPDATE_POLL);
+                return {
+                  group_id: group.id!,
+                  topic_id: t.id,
+                  allowed_actions: sequelize.literal(
+                    `ARRAY[${permissions
+                      .map((p) => `'${p}'`)
+                      .join(', ')}]::"enum_GroupPermissions_allowed_actions"[]`,
+                  ) as unknown as schemas.PermissionEnum[],
+                };
+              });
               await models.GroupPermission.bulkCreate(groupPermissions, {
                 transaction,
               });

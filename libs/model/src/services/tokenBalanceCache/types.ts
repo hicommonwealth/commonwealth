@@ -1,4 +1,5 @@
-import { BalanceSourceType, commonProtocol } from '@hicommonwealth/shared';
+import { commonProtocol } from '@hicommonwealth/evm-protocols';
+import { BalanceSourceType } from '@hicommonwealth/shared';
 import { ChainNodeInstance } from '../../models/chain_node';
 
 export type Balances = { [address: string]: string };

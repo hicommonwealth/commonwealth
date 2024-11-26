@@ -1,4 +1,4 @@
-import { commonProtocol } from '@hicommonwealth/shared';
+import { commonProtocol } from '@hicommonwealth/evm-protocols';
 import z from 'zod';
 import { AuthContext } from '../context';
 import { ContestManager } from '../entities';
@@ -76,11 +76,6 @@ export const ResumeContestManagerMetadata = {
     contest_managers: z.array(ContestManager),
   }),
   context: AuthContext,
-};
-
-export const PerformContestRollovers = {
-  input: z.object({ id: z.string() }),
-  output: z.object({}),
 };
 
 export const FarcasterCast = z.object({

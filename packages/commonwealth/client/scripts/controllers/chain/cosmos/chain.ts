@@ -271,7 +271,7 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
       } else if (cosm.isDeliverTxSuccess(result)) {
         const txHash = result.transactionHash;
         const txResult = await this._tmClient.tx({
-          hash: Buffer.from(txHash, 'hex'),
+          hash: new Uint8Array(Buffer.from(txHash, 'hex')),
         });
         return txResult.result.events;
       } else {
