@@ -22,7 +22,7 @@ export async function handleLaunchpadTrade(
 
   const token = await models.Token.findOne({
     where: {
-      token_address: tokenAddress,
+      token_address: tokenAddress.toLowerCase(),
     },
   });
 
@@ -72,7 +72,7 @@ export async function handleLaunchpadTrade(
   const contracts =
     cp.factoryContracts[chainNode!.eth_chain_id as cp.ValidChains];
   let lpBondingCurveAddress: string;
-  if ('lpBondingCurve' in contracts) {
+  if (contracts && 'lpBondingCurve' in contracts) {
     lpBondingCurveAddress = contracts.lpBondingCurve;
   } else {
     log.error('No lpBondingCurve address found for chain', undefined, {

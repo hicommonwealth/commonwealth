@@ -1,3 +1,4 @@
+import { commonProtocol as cp } from '@hicommonwealth/evm-protocols';
 import { models, tester } from '@hicommonwealth/model';
 import { setupCommonwealthConsumer } from '../../../../server/workers/commonwealthConsumer/commonwealthConsumer';
 import { startMessageRelayer } from '../../../../server/workers/messageRelayer/messageRelayer';
@@ -42,5 +43,12 @@ export async function setupCommonwealthE2E() {
 
   const web3 = setupWeb3(anvilContainer!.getMappedPort(8545));
 
-  return { web3, anvilAccounts, mineBlocks, anvilContainer, rabbitMQContainer };
+  return {
+    web3,
+    anvilAccounts,
+    mineBlocks,
+    anvilContainer,
+    rabbitMQContainer,
+    contractAddresses: cp.factoryContracts[31337],
+  };
 }

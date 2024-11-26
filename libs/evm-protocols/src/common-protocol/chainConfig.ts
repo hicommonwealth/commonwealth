@@ -8,6 +8,7 @@ export enum ValidChains {
   Optimism = 10,
   Mainnet = 1,
   Arbitrum = 42161,
+  Anvil = 31337,
 }
 
 export const STAKE_ID = 2;
@@ -70,5 +71,13 @@ export const factoryContracts = {
     factory: '0xE3AE9569f4523161742414480f87967e991741bd',
     communityStake: '0xcc752fd15A7Dd0d5301b6A626316E7211352Cf62',
     chainId: 42161,
+  },
+  [ValidChains.Anvil]: {
+    factory: '', //TODO: Fix
+    communityStake: '', //TODO: Fix
+    launchpad: '0x7a2088a1bfc9d81c55368ae168c2c02570cb814f',
+    lpBondingCurve: '0xdc17c27ae8be831af07cc38c02930007060020f4',
+    tokenCommunityManager: '0x84ea74d481ee0a5332c457a4d796187f6ba67feb',
+    chainId: 31337,
   },
 } as const satisfies factoryContractsType;
