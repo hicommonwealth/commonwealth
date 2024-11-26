@@ -18,27 +18,37 @@ describe('User lifecycle', () => {
     await dispose()();
   });
 
-  it('should create referral link when user is created', async () => {
-    const response = await command(CreateReferralLink(), {
-      actor: member,
-      payload: {},
-    });
-    expect(response!.referral_link).toBeDefined();
-
-    // make sure it's saved
-    const response2 = await query(GetReferralLink(), {
-      actor: member,
-      payload: {},
-    });
-    expect(response2!.referral_link).to.eq(response?.referral_link);
-  });
-
-  it('should fail to create referral link when one already exists', async () => {
-    expect(
-      command(CreateReferralLink(), {
+  describe('referrals', () => {
+    it('should create referral link when user is created', async () => {
+      const response = await command(CreateReferralLink(), {
         actor: member,
         payload: {},
-      }),
-    ).rejects.toThrowError('Referral link already exists');
+      });
+      expect(response!.referral_link).toBeDefined();
+
+      // make sure it's saved
+      const response2 = await query(GetReferralLink(), {
+        actor: member,
+        payload: {},
+      });
+      expect(response2!.referral_link).to.eq(response?.referral_link);
+    });
+
+    it('should fail to create referral link when one already exists', async () => {
+      expect(
+        command(CreateReferralLink(), {
+          actor: member,
+          payload: {},
+        }),
+      ).rejects.toThrowError('Referral link already exists');
+    });
+  });
+
+  describe('xp', () => {
+    it('should project xp points', async () => {
+      // TODO: setup quest
+      // TODO: act on quest
+      // TODO: check if xp points were projected
+    });
   });
 });
