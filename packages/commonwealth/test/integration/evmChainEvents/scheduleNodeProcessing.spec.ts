@@ -1,7 +1,8 @@
 import { dispose } from '@hicommonwealth/core';
-import { ContractAbiInstance, models, tester } from '@hicommonwealth/model';
+import { tester } from '@hicommonwealth/model';
 import sinon from 'sinon';
 import {
+  MockInstance,
   afterAll,
   afterEach,
   beforeAll,
@@ -9,20 +10,18 @@ import {
   describe,
   expect,
   test,
+  vi,
 } from 'vitest';
 import { scheduleNodeProcessing } from '../../../server/workers/evmChainEvents/nodeProcessing';
-import {
-  createAdditionalEventSources,
-  createContestEventSources,
-} from './util';
+import { multipleEventSource, singleEventSource } from './util';
+
+vi.mock('../../../server/workers/evmChainEvents/getEventSources');
 
 describe('scheduleNodeProcessing', () => {
   const sandbox = sinon.createSandbox();
   let processChainStub: sinon.SinonSpy;
   let clock: sinon.SinonFakeTimers;
   let singleSourceSuccess = false;
-  let namespaceAbiInstance: ContractAbiInstance;
-  let stakesAbiInstance: ContractAbiInstance;
 
   beforeAll(async () => {
     await tester.bootstrap_testing(import.meta);
@@ -39,21 +38,33 @@ describe('scheduleNodeProcessing', () => {
 
   afterEach(() => {
     sandbox.restore();
+    vi.resetAllMocks();
   });
 
   test('should not schedule anything if there are no event sources', async () => {
-    await scheduleNodeProcessing(models, 1000, processChainStub);
+    const { getEventSources } = await import(
+      '../../../server/workers/evmChainEvents/getEventSources'
+    );
+    (getEventSources as unknown as MockInstance).mockImplementation(() =>
+      Promise.resolve({}),
+    );
+
+    await scheduleNodeProcessing(1000, processChainStub);
     clock.tick(1001);
     expect(processChainStub.called).to.be.false;
   });
 
   test('should schedule processing for a single source', async () => {
-    const res = await createContestEventSources();
-    namespaceAbiInstance = res.namespaceAbiInstance;
-    stakesAbiInstance = res.stakesAbiInstance;
+    // const res = await createContestEventSources();
+    const { getEventSources } = await import(
+      '../../../server/workers/evmChainEvents/getEventSources'
+    );
+    (getEventSources as unknown as MockInstance).mockImplementation(() =>
+      Promise.resolve(singleEventSource),
+    );
 
     const interval = 10_000;
-    await scheduleNodeProcessing(models, interval, processChainStub);
+    await scheduleNodeProcessing(interval, processChainStub);
 
     expect(processChainStub.calledOnce).to.be.false;
 
@@ -63,14 +74,15 @@ describe('scheduleNodeProcessing', () => {
   });
 
   test('should evenly schedule 2 sources per interval', async () => {
-    expect(singleSourceSuccess).to.be.true;
-    expect(namespaceAbiInstance).toBeTruthy();
-    expect(stakesAbiInstance).toBeTruthy();
-
-    await createAdditionalEventSources(namespaceAbiInstance, stakesAbiInstance);
+    const { getEventSources } = await import(
+      '../../../server/workers/evmChainEvents/getEventSources'
+    );
+    (getEventSources as unknown as MockInstance).mockImplementation(() =>
+      Promise.resolve(multipleEventSource),
+    );
 
     const interval = 10_000;
-    await scheduleNodeProcessing(models, interval, processChainStub);
+    await scheduleNodeProcessing(interval, processChainStub);
 
     expect(processChainStub.calledOnce).to.be.false;
     clock.tick(1);
