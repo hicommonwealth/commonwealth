@@ -1,3 +1,4 @@
+import { logger } from '@hicommonwealth/core';
 import {
   ContractSource,
   EventRegistry,
@@ -8,6 +9,8 @@ import { AbiType } from '@hicommonwealth/shared';
 import { EvmSources } from './types';
 
 const DEFAULT_MAX_BLOCK_RANGE = 500;
+
+const log = logger(import.meta);
 
 export async function getEventSources(): Promise<EvmSources> {
   const evmSources: EvmSources = {};
@@ -43,10 +46,20 @@ export async function getEventSources(): Promise<EvmSources> {
     for (const source of dbEvmSources.filter(
       (e) => e.eth_chain_id === ethChainId,
     )) {
+      const childContracts: ContractSource['childContracts'] =
+        EventRegistry[ethChainId][source.parent_contract_address]
+          ?.childContracts;
+      if (!childContracts) {
+        log.error(`Child contracts not found in Event Registry!`, undefined, {
+          eth_chain_id: ethChainId,
+          parent_contract_address: source.parent_contract_address,
+        });
+        continue;
+      }
+
       if (!dbContractSources[source.contract_address]) {
         dbContractSources[source.contract_address] = {
-          abi: EventRegistry[ethChainId][source.parent_contract_address]
-            .childContracts[source.contract_name].abi as AbiType,
+          abi: childContracts[source.contract_name].abi as AbiType,
           sources: [],
         };
       }
@@ -62,6 +75,5 @@ export async function getEventSources(): Promise<EvmSources> {
       },
     };
   }
-
   return evmSources;
 }

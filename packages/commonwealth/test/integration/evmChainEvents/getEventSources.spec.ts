@@ -1,40 +1,39 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { dispose } from '@hicommonwealth/core';
-import { ContractAbiInstance, models, tester } from '@hicommonwealth/model';
+import {
+  EventRegistry,
+  commonProtocol as cp,
+} from '@hicommonwealth/evm-protocols';
+import { tester } from '@hicommonwealth/model';
 import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 import { getEventSources } from '../../../server/workers/evmChainEvents/getEventSources';
 import {
-  createAdditionalEventSources,
-  createEventSources,
-  multipleEventSource,
-  singleEventSource,
+  createContestEventSources,
+  createEventRegistryChainNodes,
 } from './util';
 
 describe('getEventSources', () => {
-  let namespaceAbiInstance: ContractAbiInstance;
-  let stakesAbiInstance: ContractAbiInstance;
-
   beforeAll(async () => {
     await tester.bootstrap_testing(import.meta);
-    const res = await createEventSources();
-    namespaceAbiInstance = res.namespaceAbiInstance;
-    stakesAbiInstance = res.stakesAbiInstance;
+    await createEventRegistryChainNodes();
+    await createContestEventSources(cp.ValidChains.SepoliaBase);
   });
 
   afterAll(async () => {
     await dispose()();
   });
 
-  test('should return a single event source', async () => {
-    const result = await getEventSources(models);
-    expect(JSON.stringify(result)).to.equal(JSON.stringify(singleEventSource));
-  });
-
-  test('should return multiple event sources', async () => {
-    await createAdditionalEventSources(namespaceAbiInstance, stakesAbiInstance);
-    const result = await getEventSources(models);
-    expect(JSON.stringify(result)).to.equal(
-      JSON.stringify(multipleEventSource),
-    );
+  test('should get Event-Registry and EvmEventSources', async () => {
+    const result = await getEventSources();
+    expect(Object.keys(result)).deep.equal(Object.keys(EventRegistry));
+    for (const ethChainId in EventRegistry) {
+      expect(result[ethChainId]).haveOwnProperty('rpc');
+      expect(result[ethChainId]).to.haveOwnProperty('contracts');
+      expect(
+        result[ethChainId].contracts[cp.factoryContracts[ethChainId].factory],
+      ).to.haveOwnProperty('abi');
+      expect(
+        result[ethChainId].contracts[cp.factoryContracts[ethChainId].factory],
+      ).to.haveOwnProperty('sources');
+    }
   });
 });

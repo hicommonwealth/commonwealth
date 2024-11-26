@@ -11,7 +11,10 @@ import {
   test,
 } from 'vitest';
 import { scheduleNodeProcessing } from '../../../server/workers/evmChainEvents/nodeProcessing';
-import { createAdditionalEventSources, createEventSources } from './util';
+import {
+  createAdditionalEventSources,
+  createContestEventSources,
+} from './util';
 
 describe('scheduleNodeProcessing', () => {
   const sandbox = sinon.createSandbox();
@@ -45,7 +48,7 @@ describe('scheduleNodeProcessing', () => {
   });
 
   test('should schedule processing for a single source', async () => {
-    const res = await createEventSources();
+    const res = await createContestEventSources();
     namespaceAbiInstance = res.namespaceAbiInstance;
     stakesAbiInstance = res.stakesAbiInstance;
 
