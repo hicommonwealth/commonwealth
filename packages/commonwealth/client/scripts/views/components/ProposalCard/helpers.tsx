@@ -1,5 +1,5 @@
-import 'components/ProposalCard/ProposalCard.scss';
 import React from 'react';
+import './ProposalCard.scss';
 
 import {
   blocknumToDuration,
@@ -17,12 +17,12 @@ export const getStatusClass = (proposal: AnyProposal, isLoading?: boolean) => {
   return proposal.isPassing === ProposalStatus.Passing
     ? 'pass'
     : proposal.isPassing === ProposalStatus.Passed
-    ? 'pass'
-    : proposal.isPassing === ProposalStatus.Failing
-    ? 'fail'
-    : proposal.isPassing === ProposalStatus.Failed
-    ? 'fail'
-    : '';
+      ? 'pass'
+      : proposal.isPassing === ProposalStatus.Failing
+        ? 'fail'
+        : proposal.isPassing === ProposalStatus.Failed
+          ? 'fail'
+          : '';
 };
 
 export const getStatusText = (proposal: AnyProposal, isLoading?: boolean) => {
@@ -45,34 +45,34 @@ export const getStatusText = (proposal: AnyProposal, isLoading?: boolean) => {
           ' left',
         ]
       : proposal.endTime.kind === 'fixed_block'
-      ? [
-          <Countdown
-            key={proposal.endTime.kind}
-            duration={blocknumToDuration(proposal.endTime.blocknum)}
-          />,
-          ` left (ends on block ${formatNumberLong(
-            proposal.endTime.blocknum,
-          )})`,
-        ]
-      : proposal.endTime.kind === 'dynamic'
-      ? [
-          <Countdown
-            key={proposal.endTime.kind}
-            duration={blocknumToDuration(proposal.endTime.getBlocknum())}
-          />,
-          ` left (ends on block ${formatNumberLong(
-            proposal.endTime.getBlocknum(),
-          )})`,
-        ]
-      : proposal.endTime.kind === 'threshold'
-      ? `needs ${proposal.endTime.threshold} votes`
-      : proposal.endTime.kind === 'not_started'
-      ? 'not yet started'
-      : proposal.endTime.kind === 'queued'
-      ? 'in queue'
-      : proposal.endTime.kind === 'unavailable'
-      ? ''
-      : '';
+        ? [
+            <Countdown
+              key={proposal.endTime.kind}
+              duration={blocknumToDuration(proposal.endTime.blocknum)}
+            />,
+            ` left (ends on block ${formatNumberLong(
+              proposal.endTime.blocknum,
+            )})`,
+          ]
+        : proposal.endTime.kind === 'dynamic'
+          ? [
+              <Countdown
+                key={proposal.endTime.kind}
+                duration={blocknumToDuration(proposal.endTime.getBlocknum())}
+              />,
+              ` left (ends on block ${formatNumberLong(
+                proposal.endTime.getBlocknum(),
+              )})`,
+            ]
+          : proposal.endTime.kind === 'threshold'
+            ? `needs ${proposal.endTime.threshold} votes`
+            : proposal.endTime.kind === 'not_started'
+              ? 'not yet started'
+              : proposal.endTime.kind === 'queued'
+                ? 'in queue'
+                : proposal.endTime.kind === 'unavailable'
+                  ? ''
+                  : '';
 
   if (proposal.isPassing === ProposalStatus.Passed)
     return [
