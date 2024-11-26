@@ -16,7 +16,7 @@ describe('getCommentDepth', () => {
   const maxDepth = 8;
 
   beforeAll(async () => {
-    await tester.seedDb(import.meta);
+    await tester.seedDb();
     const address = await models.Address.findOne({
       where: {
         community_id,

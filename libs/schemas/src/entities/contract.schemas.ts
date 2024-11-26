@@ -25,3 +25,14 @@ export const Contract = z.object({
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional(),
 });
+
+export const ContractAbi = z.object({
+  id: PG_INT,
+  abi: z.record(z.string(), z.unknown()).array(),
+  abi_hash: z.string().max(255).nullish(),
+  nickname: z.string().max(255).nullish(),
+  verified: z.boolean().default(false).nullish(),
+
+  created_at: z.coerce.date().optional(),
+  updated_at: z.coerce.date().optional(),
+});
