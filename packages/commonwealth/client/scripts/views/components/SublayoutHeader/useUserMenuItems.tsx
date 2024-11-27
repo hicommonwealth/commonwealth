@@ -14,7 +14,6 @@ import useAdminOnboardingSliderMutationStore from 'state/ui/adminOnboardingCards
 import useGroupMutationBannerStore from 'state/ui/group';
 import {
   useAuthModalStore,
-  useInviteLinkModal,
   useManageCommunityStakeModalStore,
 } from 'state/ui/modals';
 import { PopoverMenuItem } from 'views/components/component_kit/CWPopoverMenu';
@@ -68,12 +67,14 @@ interface UseUserMenuItemsProps {
   onAuthModalOpen: () => void;
   isMenuOpen: boolean;
   onAddressItemClick?: () => void;
+  onReferralItemClick?: () => void;
 }
 
 const useUserMenuItems = ({
   onAuthModalOpen,
   isMenuOpen,
   onAddressItemClick,
+  onReferralItemClick,
 }: UseUserMenuItemsProps) => {
   const [isDarkModeOn, setIsDarkModeOn] = useState<boolean>(
     localStorage.getItem('dark-mode-state') === 'on',
@@ -218,8 +219,6 @@ const useUserMenuItems = ({
     },
   );
 
-  const { setIsInviteLinkModalOpen } = useInviteLinkModal();
-
   return {
     userMenuItems: [
       // if a user is in a stake enabled community without membership, show user addresses that
@@ -272,7 +271,9 @@ const useUserMenuItems = ({
             {
               type: 'default',
               label: 'Get referral link',
-              onClick: () => setIsInviteLinkModalOpen(true),
+              onClick: () => {
+                onReferralItemClick?.();
+              },
             },
           ]
         : []),

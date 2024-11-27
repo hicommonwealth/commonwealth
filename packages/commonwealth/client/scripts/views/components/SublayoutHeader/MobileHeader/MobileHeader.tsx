@@ -30,6 +30,7 @@ const MobileHeader = ({
   isInsideCommunity,
 }: MobileHeaderProps) => {
   const [isUserDrawerOpen, setIsUserDrawerOpen] = useState(false);
+  const [isInviteLinkDrawerOpen, setIsInviteLinkDrawerOpen] = useState(false);
   const [isModalOpen, isSetModalOpen] = useState(false);
   const { menuVisible } = useSidebarStore();
   const userData = useUserStore();
@@ -44,6 +45,10 @@ const MobileHeader = ({
     onAuthModalOpen,
     isMenuOpen: isUserDrawerOpen,
     onAddressItemClick: () => setIsUserDrawerOpen(false),
+    onReferralItemClick: () => {
+      setIsUserDrawerOpen(false);
+      setIsInviteLinkDrawerOpen(true);
+    },
   });
 
   const mobileItems = [
@@ -118,6 +123,15 @@ const MobileHeader = ({
 
           <MenuContent menuItems={mobileItems} />
         </div>
+      </CWDrawer>
+
+      <CWDrawer
+        size="auto"
+        direction="bottom"
+        open={isInviteLinkDrawerOpen}
+        onClose={() => setIsInviteLinkDrawerOpen(false)}
+      >
+        <div>drawer</div>
       </CWDrawer>
 
       <CWModal
