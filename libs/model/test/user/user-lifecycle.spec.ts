@@ -32,7 +32,7 @@ describe('User lifecycle', () => {
       roles: ['admin', 'member'],
     });
     community_id = community!.id;
-    topic_id = community!.topics?.at(0)?.id!;
+    topic_id = community!.topics!.at(0)!.id!;
     admin = actors.admin;
     member = actors.member;
   });
