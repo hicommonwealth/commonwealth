@@ -1,4 +1,6 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
+import useUserStore from 'state/ui/user';
+import { Avatar } from 'views/components/Avatar';
 import { CommentEditorProps } from 'views/components/Comments/CommentEditor/CommentEditor';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { createDeltaFromText } from 'views/components/react_quill_editor';
@@ -11,6 +13,7 @@ type MobileInputProps = CommentEditorProps & {
 export const MobileInput = (props: MobileInputProps) => {
   const { onFocus, setContentDelta, handleSubmitComment } = props;
   const [value, setValue] = useState('');
+  const user = useUserStore();
 
   const handleChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -30,8 +33,27 @@ export const MobileInput = (props: MobileInputProps) => {
     [handleSubmitComment],
   );
 
+  const avatarURL = useMemo(() => {
+    const filtered = user.accounts.filter(
+      (current) => current.profile?.avatarUrl,
+    );
+    if (filtered.length > 0) {
+      return filtered[0].profile?.avatarUrl;
+    }
+
+    return undefined;
+  }, [user]);
+
+  console.log('FIXME: avatarURL: ' + avatarURL);
+
   return (
     <div className="MobileInput">
+      {avatarURL && (
+        <div className="AvatarBox">
+          <Avatar url={avatarURL} size={32} />
+        </div>
+      )}
+
       <div className="InputBox">
         <input
           type="text"
