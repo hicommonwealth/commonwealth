@@ -9,12 +9,7 @@ import {
   CWModalHeader,
 } from '../../components/component_kit/new_designs/CWModal';
 import { CWTextInput } from '../../components/component_kit/new_designs/CWTextInput';
-
-import mailImg from 'assets/img/share/mail.png';
-import messagesImg from 'assets/img/share/messages.png';
-import telegramImg from 'assets/img/share/telegram.png';
-import warpcastImg from 'assets/img/share/warpcast.png';
-import twitterImg from 'assets/img/share/x.png';
+import { getShareOptions } from './utils';
 
 import './InviteLinkModal.scss';
 
@@ -23,84 +18,18 @@ interface InviteLinkModalProps {
   isInsideCommunity: boolean;
 }
 
-interface ShareOption {
-  name: string;
-  icon: string;
-  onClick: () => void;
-}
-
-const inviteCommunityMessage = 'Hey, check out my community on Common!';
-const inviteCommonMessage = 'Hey, check out Common!';
-
-const generatePermalink = (isInsideCommunity: boolean, inviteLink: string) => {
-  const message = isInsideCommunity
-    ? inviteCommunityMessage
-    : inviteCommonMessage;
-
-  return `${message} \n${inviteLink}`;
-};
-
 const InviteLinkModal = ({
   onModalClose,
   isInsideCommunity,
 }: InviteLinkModalProps) => {
-  // TODO: replace with actual invite link
+  // TODO: replace with actual invite link from backend in upcoming PR
   const inviteLink = 'https://commonwealth.im/~/invite/774037=89defcb8';
 
   const handleCopy = async () => {
     await saveToClipboard(inviteLink, true);
   };
 
-  const shareOptions: ShareOption[] = [
-    {
-      name: 'Messages',
-      icon: messagesImg,
-      onClick: () =>
-        window.open(
-          `sms:?&body=${encodeURIComponent(generatePermalink(isInsideCommunity, inviteLink))}`,
-        ),
-    },
-    {
-      name: 'Telegram',
-      icon: telegramImg,
-      onClick: () =>
-        window.open(
-          `https://t.me/share/url?url=${encodeURIComponent(
-            generatePermalink(isInsideCommunity, inviteLink),
-          )}`,
-        ),
-    },
-    {
-      name: 'X (Twitter)',
-      icon: twitterImg,
-      onClick: () =>
-        window.open(
-          `https://twitter.com/intent/tweet?url=${encodeURIComponent(
-            generatePermalink(isInsideCommunity, inviteLink),
-          )}`,
-        ),
-    },
-    {
-      name: 'Warpcast',
-      icon: warpcastImg,
-      onClick: () =>
-        window.open(
-          `https://warpcast.com/~/compose?text=${encodeURIComponent(
-            generatePermalink(isInsideCommunity, inviteLink),
-          )}`,
-        ),
-    },
-    {
-      name: 'Email',
-      icon: mailImg,
-      onClick: () =>
-        window.open(
-          `mailto:?body=${encodeURIComponent(
-            generatePermalink(isInsideCommunity, inviteLink),
-          )}`,
-        ),
-    },
-  ];
+  const shareOptions = getShareOptions(isInsideCommunity, inviteLink);
 
   return (
     <div className="InviteLinkModal">
