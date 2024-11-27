@@ -1,6 +1,6 @@
 import React from 'react';
 
-import 'components/cards_collection.scss';
+import './cards_collection.scss';
 
 import { CWText } from './component_kit/cw_text';
 

@@ -7,7 +7,7 @@ import { CWText } from '../cw_text';
 import { getClasses } from '../helpers';
 import { ComponentType } from '../types';
 
-import 'components/component_kit/new_designs/CWTag.scss';
+import './CWTag.scss';
 
 type TagType =
   | 'passed'

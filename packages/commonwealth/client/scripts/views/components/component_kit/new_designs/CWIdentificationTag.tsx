@@ -4,7 +4,7 @@ import { CWCustomIcon } from 'views/components/component_kit/cw_icons/cw_custom_
 import { CustomIconName } from 'views/components/component_kit/cw_icons/cw_icon_lookup';
 import { CWText } from 'views/components/component_kit/cw_text';
 
-import 'components/component_kit/new_designs/CWIdentificationTag.scss';
+import './CWIdentificationTag.scss';
 
 interface CWIdentificationTagProps {
   iconLeft?: CustomIconName;

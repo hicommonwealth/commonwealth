@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import 'pages/terms_banner.scss';
+import './terms_banner.scss';
 
 import app from 'state';
 import { Old_CWBanner } from './component_kit/cw_banner';
@@ -12,7 +12,7 @@ export const TermsBanner = ({ terms }: TermsBannerProps) => {
   const localStorageId = `${app.activeChainId()}-tos`;
 
   const [isVisible, setIsVisible] = useState(
-    localStorage.getItem(localStorageId)
+    localStorage.getItem(localStorageId),
   );
 
   const handleClickDismiss = () => {

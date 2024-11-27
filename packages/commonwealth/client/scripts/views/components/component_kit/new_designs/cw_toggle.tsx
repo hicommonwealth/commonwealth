@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import 'components/component_kit/new_designs/cw_toggle.scss';
+import './cw_toggle.scss';
 
 import { useFormContext } from 'react-hook-form';
 import { setDarkMode } from '../../../../helpers/darkMode';

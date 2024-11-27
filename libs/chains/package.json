@@ -31,7 +31,6 @@
     "protobufjs": "^6.1.13"
   },
   "devDependencies": {
-    "@types/moment": "^2.13.0",
     "tsx": "^4.7.2"
   }
 }

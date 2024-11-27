@@ -7,7 +7,6 @@ import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import { useFlag } from 'hooks/useFlag';
 import { useCommonNavigate } from 'navigation/helpers';
-import 'pages/user_dashboard/index.scss';
 import React, { useEffect, useRef } from 'react';
 import useUserStore from 'state/ui/user';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
@@ -24,6 +23,7 @@ import {
 } from '../../components/component_kit/new_designs/CWTabs';
 import { Feed } from '../../components/feed';
 import { TrendingCommunitiesPreview } from './TrendingCommunitiesPreview';
+import './index.scss';
 
 export enum DashboardViews {
   ForYou = 'For You',

@@ -1,0 +1,24 @@
+@import '../../../../../styles/shared';
+
+.ExploreContestList {
+  margin: 16px 0;
+
+  .content {
+    display: grid;
+    grid-gap: 28px;
+    grid-template-columns: 1fr 1fr;
+    justify-content: center;
+    margin: 24px 0;
+
+    @include extraSmall {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .empty-contests {
+    margin: 24px auto;
+    display: flex;
+    justify-content: center;
+    text-align: center;
+  }
+}

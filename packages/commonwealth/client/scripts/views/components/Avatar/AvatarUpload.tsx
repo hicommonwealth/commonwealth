@@ -1,4 +1,3 @@
-import 'components/Avatar/AvatarUpload.scss';
 import { notifyError } from 'controllers/app/notifications';
 import React, { useState } from 'react';
 import { useDropzone } from 'react-dropzone';
@@ -8,6 +7,7 @@ import { Avatar } from 'views/components/Avatar/Avatar';
 import { CWIconButton } from '../component_kit/cw_icon_button';
 import { getClasses } from '../component_kit/helpers';
 import { ComponentType } from '../component_kit/types';
+import './AvatarUpload.scss';
 
 type AvatarUploadStyleProps = {
   size?: 'small' | 'large';

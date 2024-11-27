@@ -7,7 +7,7 @@ import {
 } from '../components/component_kit/new_designs/CWModal';
 import { User } from '../components/user/user';
 
-import '../../../styles/modals/offchain_voting_modal.scss';
+import './offchain_voting_modal.scss';
 
 type OffchainVotingModalProps = {
   onModalClose: () => void;

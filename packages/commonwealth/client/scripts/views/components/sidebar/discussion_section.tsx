@@ -16,7 +16,7 @@ import type {
   ToggleTree,
 } from './types';
 
-import 'components/sidebar/index.scss';
+import './index.scss';
 
 const resetSidebarState = () => {
   if (isWindowSmallInclusive(window.innerWidth)) {

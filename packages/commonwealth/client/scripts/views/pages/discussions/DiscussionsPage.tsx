@@ -24,7 +24,6 @@ import { getThreadActionTooltipText } from 'helpers/threads';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import useManageDocumentTitle from 'hooks/useManageDocumentTitle';
 import useTopicGating from 'hooks/useTopicGating';
-import 'pages/discussions/index.scss';
 import { useFetchCustomDomainQuery } from 'state/api/configuration';
 import { useGetERC20BalanceQuery } from 'state/api/tokens';
 import Permissions from 'utils/Permissions';
@@ -41,6 +40,7 @@ import { CWText } from '../../components/component_kit/cw_text';
 import CWIconButton from '../../components/component_kit/new_designs/CWIconButton';
 import OverviewPage from '../overview';
 import { DiscussionsFeedDiscovery } from './DiscussionsFeedDiscovery';
+import './DiscussionsPage.scss';
 import { EmptyThreadsPlaceholder } from './EmptyThreadsPlaceholder';
 
 type DiscussionsPageProps = {
