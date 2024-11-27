@@ -21,7 +21,7 @@ const AccountConnectionIndicator = ({
   address,
 }: AccountConnectionIndicatorProps) => {
   const { handleJoinCommunity, JoinCommunityModals } = useJoinCommunity();
-  const isReferralsEnabled = useFlag('referrals');
+  const referralsEnabled = useFlag('referrals');
   const { setIsInviteLinkModalOpen } = useInviteLinkModal();
 
   return (
@@ -58,7 +58,7 @@ const AccountConnectionIndicator = ({
               />
             </div>
 
-            {isReferralsEnabled && (
+            {referralsEnabled && (
               <CWButton
                 buttonType="tertiary"
                 buttonHeight="sm"
