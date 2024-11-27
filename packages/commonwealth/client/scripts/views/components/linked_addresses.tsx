@@ -132,10 +132,9 @@ export const LinkedAddresses = (props: LinkedAddressesProps) => {
     }),
   );
 
-  const TableComponent = useMemo(
-    () => <CWTable columnInfo={columnInfo} rowData={rowData} />,
-    [addresses],
-  );
+  const TableComponent = useMemo(() => {
+    return <CWTable columnInfo={columnInfo} rowData={rowData} />;
+  }, [addresses]);
 
   return (
     <div>
