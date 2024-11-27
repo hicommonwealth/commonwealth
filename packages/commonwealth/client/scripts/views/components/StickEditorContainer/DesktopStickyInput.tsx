@@ -5,6 +5,7 @@ import './DesktopStickyInput.scss';
 
 export const DesktopStickyInput = (props: CommentEditorProps) => {
   const [focused, setFocused] = useState(false);
+  const { handleSubmitComment } = props;
 
   const handleFocused = useCallback(() => {
     setFocused(true);
@@ -14,10 +15,20 @@ export const DesktopStickyInput = (props: CommentEditorProps) => {
     setFocused(false);
   }, []);
 
+  const customHandleSubmitComment = useCallback(() => {
+    setFocused(false);
+    handleSubmitComment();
+  }, [handleSubmitComment]);
+
   return (
     <div className="DesktopStickyInput">
       {focused && (
-        <CommentEditor {...props} shouldFocus={true} onCancel={handleCancel} />
+        <CommentEditor
+          {...props}
+          shouldFocus={true}
+          onCancel={handleCancel}
+          handleSubmitComment={customHandleSubmitComment}
+        />
       )}
 
       {!focused && (
