@@ -44,8 +44,6 @@ export const MobileInput = (props: MobileInputProps) => {
     return undefined;
   }, [user]);
 
-  console.log('FIXME: avatarURL: ' + avatarURL);
-
   return (
     <div className="MobileInput">
       {avatarURL && (
