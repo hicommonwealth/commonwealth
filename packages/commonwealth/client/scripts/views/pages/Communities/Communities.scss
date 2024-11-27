@@ -18,11 +18,11 @@
   display: flex;
   flex: 1;
   flex-direction: column;
+  overflow: hidden;
 
   .header-section {
     display: flex;
     flex-direction: column;
-
     gap: 16px;
     position: sticky;
     top: 0;
