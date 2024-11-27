@@ -17,7 +17,7 @@ export default (sequelize: Sequelize.Sequelize) =>
       action_meta_id: { type: Sequelize.INTEGER, allowNull: true },
       creator_user_id: { type: Sequelize.INTEGER, allowNull: true },
       creator_xp_points: { type: Sequelize.INTEGER, allowNull: true },
-      created_at: { type: Sequelize.DATE },
+      created_at: { type: Sequelize.DATE, allowNull: false },
     },
     {
       timestamps: true,
