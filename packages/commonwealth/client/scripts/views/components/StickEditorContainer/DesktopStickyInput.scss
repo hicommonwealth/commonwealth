@@ -1,0 +1,19 @@
+.DesktopStickyInput {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  flex-grow: 1;
+  z-index: 100;
+  // FIXME: make this use our standard background color.
+  background: white;
+
+  .DesktopStickyInputPending {
+    flex-grow: 1;
+    padding: 12px;
+    // FIXME: use a better color here...
+    box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    border: 1px solid #ccc;
+    margin-bottom: 16px;
+    border-radius: 8px;
+  }
+}

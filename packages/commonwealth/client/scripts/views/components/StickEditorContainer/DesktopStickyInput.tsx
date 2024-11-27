@@ -1,6 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import { CommentEditor } from 'views/components/Comments/CommentEditor';
 import { CommentEditorProps } from 'views/components/Comments/CommentEditor/CommentEditor';
+import './DesktopStickyInput.scss';
 
 export const DesktopStickyInput = (props: CommentEditorProps) => {
   const [focused, setFocused] = useState(false);
@@ -21,7 +22,7 @@ export const DesktopStickyInput = (props: CommentEditorProps) => {
 
       {!focused && (
         <input
-          className="StickyEditorPendingInput"
+          className="DesktopStickyInputPending"
           type="text"
           onFocus={handleFocused}
           placeholder="Comment on thread here..."
