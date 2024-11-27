@@ -73,8 +73,8 @@ export const factoryContracts = {
     chainId: 42161,
   },
   [ValidChains.Anvil]: {
-    factory: '', //TODO: Fix
-    communityStake: '', //TODO: Fix
+    factory: '', //TODO: Fix, this is incorrect
+    communityStake: 'temp', //TODO: Fix, this is incorrect
     launchpad: '0x7a2088a1bfc9d81c55368ae168c2c02570cb814f',
     lpBondingCurve: '0xdc17c27ae8be831af07cc38c02930007060020f4',
     tokenCommunityManager: '0x84ea74d481ee0a5332c457a4d796187f6ba67feb',
