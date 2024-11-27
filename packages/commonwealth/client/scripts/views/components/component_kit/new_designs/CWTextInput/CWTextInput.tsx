@@ -41,6 +41,7 @@ export type BaseTextInputProps = {
   type?: 'text' | 'number';
   min?: number;
   step?: number;
+  readOnly?: boolean;
 };
 
 type InputStyleProps = {
@@ -110,6 +111,7 @@ const CWTextInput = (props: TextInputProps) => {
     type = 'text',
     min,
     step,
+    readOnly,
   } = props;
 
   const formContext = useFormContext();
@@ -171,6 +173,7 @@ const CWTextInput = (props: TextInputProps) => {
         <input
           ref={inputRef}
           {...formFieldContext}
+          readOnly={readOnly}
           autoFocus={autoFocus}
           autoComplete={autoComplete}
           className={getClasses<InputStyleProps & InputInternalStyleProps>({

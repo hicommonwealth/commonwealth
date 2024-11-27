@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 import useSidebarStore from 'state/ui/sidebar';
-
+import useUserStore from 'state/ui/user';
 import { PopoverMenuItem } from 'views/components/component_kit/CWPopoverMenu';
 import MenuContent from 'views/components/component_kit/CWPopoverMenu/MenuContent';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
@@ -10,12 +10,12 @@ import CWDrawer from 'views/components/component_kit/new_designs/CWDrawer';
 import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
 import CollapsableSidebarButton from 'views/components/sidebar/CollapsableSidebarButton';
 import { User } from 'views/components/user/user';
+import { AuthModalType } from 'views/modals/AuthModal';
+import InviteLinkModal from 'views/modals/InviteLinkModal';
 import MobileSearchModal from 'views/modals/MobileSearchModal';
 
 import useUserMenuItems from '../useUserMenuItems';
 
-import useUserStore from 'state/ui/user';
-import { AuthModalType } from 'views/modals/AuthModal';
 import './MobileHeader.scss';
 
 interface MobileHeaderProps {
@@ -128,10 +128,14 @@ const MobileHeader = ({
       <CWDrawer
         size="auto"
         direction="bottom"
+        className="InviteLinkDrawer"
         open={isInviteLinkDrawerOpen}
         onClose={() => setIsInviteLinkDrawerOpen(false)}
       >
-        <div>drawer</div>
+        <InviteLinkModal
+          isInsideCommunity={isInsideCommunity}
+          onModalClose={() => setIsInviteLinkDrawerOpen(false)}
+        />
       </CWDrawer>
 
       <CWModal

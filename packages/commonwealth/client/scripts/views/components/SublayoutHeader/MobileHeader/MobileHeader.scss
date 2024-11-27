@@ -53,3 +53,25 @@
     }
   }
 }
+
+.InviteLinkDrawer {
+  padding: 0 !important;
+
+  .CWModalHeader {
+    padding: 24px 16px !important;
+  }
+
+  .CWModalBody {
+    padding-inline: 16px !important;
+
+    .share-section {
+      .bold {
+        margin: 0 !important;
+      }
+    }
+  }
+
+  .CWModalFooter {
+    padding: 0 !important;
+  }
+}

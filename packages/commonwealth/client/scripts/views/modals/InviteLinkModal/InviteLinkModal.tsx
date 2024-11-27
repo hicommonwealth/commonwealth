@@ -125,7 +125,7 @@ const InviteLinkModal = ({
             fullWidth
             type="text"
             value={inviteLink}
-            disabled
+            readOnly
             onClick={handleCopy}
             iconRight={<CWIcon iconName="copy" />}
           />
