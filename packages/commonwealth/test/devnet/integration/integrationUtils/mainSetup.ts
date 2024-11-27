@@ -9,7 +9,7 @@ import { anvilAccounts, setupWeb3 } from './process-setup/setupWeb3';
 
 export async function setupCommonwealthE2E() {
   // reset db
-  await tester.bootstrap_testing(import.meta);
+  await tester.bootstrap_testing();
 
   // setup outbox notifications
   await models.sequelize.query(`
@@ -39,7 +39,7 @@ export async function setupCommonwealthE2E() {
   // note need to run this in between so we can set up the rmq adapter
   await startMessageRelayer();
 
-  await Promise.all([setupEvmCe(), setupCommonwealthConsumer()]);
+  await Promise.all([setupEvmCe(), setupCommonwealthConsumer(true)]);
 
   const web3 = setupWeb3(anvilContainer!.getMappedPort(8545));
 

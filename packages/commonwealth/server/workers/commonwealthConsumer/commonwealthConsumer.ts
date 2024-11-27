@@ -63,7 +63,9 @@ function checkSubscriptionResponse(
 // properly handling/processing those messages. Using the script is rarely necessary in
 // local development.
 
-export async function setupCommonwealthConsumer(): Promise<void> {
+export async function setupCommonwealthConsumer(
+  skipRmqAdapter?: boolean,
+): Promise<void> {
   let brokerInstance: Broker;
   try {
     const rmqAdapter = new RabbitMQAdapter(
@@ -73,9 +75,11 @@ export async function setupCommonwealthConsumer(): Promise<void> {
       ),
     );
     await rmqAdapter.init();
-    broker({
-      key: 'w.w.w',
-    });
+    if (!skipRmqAdapter) {
+      broker({
+        adapter: rmqAdapter,
+      });
+    }
     brokerInstance = rmqAdapter;
   } catch (e) {
     log.error(
