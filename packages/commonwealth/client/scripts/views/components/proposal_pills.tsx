@@ -25,6 +25,7 @@ export const ActiveProposalPill = (props: ActiveProposalPillProps) => {
 
 type ClosedProposalPillProps = { proposalState: string };
 
+// eslint-disable-next-line react/no-multi-comp
 export const ClosedProposalPill = (props: ClosedProposalPillProps) => {
   const { proposalState } = props;
 

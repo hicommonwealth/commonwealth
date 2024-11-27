@@ -1,3 +1,5 @@
+/* eslint-disable react/no-multi-comp */
+/* eslint-disable react/destructuring-assignment */
 import React from 'react';
 import type { GroupBase, OptionProps, Props } from 'react-select';
 import Select, { components } from 'react-select';
@@ -56,6 +58,7 @@ export const SelectList = <
           // @ts-expect-error <StrictNullChecks/>
           <CustomOption
             {...optionProps}
+            // eslint-disable-next-line react/no-children-prop
             children={optionProps.children}
             disabledOptionTooltipText={props.disabledOptionTooltipText}
           />

@@ -1,3 +1,4 @@
+/* eslint-disable react/no-multi-comp */
 /* eslint-disable max-len */
 import React from 'react';
 

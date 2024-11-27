@@ -49,6 +49,7 @@ const SubSection = (props: SubSectionAttrs) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const SubSectionGroup = (props: SectionGroupAttrs) => {
   const {
     containsChildren,
@@ -153,6 +154,7 @@ export const SubSectionGroup = (props: SectionGroupAttrs) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const SidebarSectionGroup = (props: SidebarSectionAttrs) => {
   const {
     displayData,
