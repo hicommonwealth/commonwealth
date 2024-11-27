@@ -137,6 +137,13 @@ module.exports = {
         `,
         { transaction },
       );
+      await queryInterface.sequelize.query(
+        `
+            ALTER TABLE "EvmEventSources"
+                DROP CONSTRAINT IF EXISTS "unique_event_source";
+        `,
+        { transaction },
+      );
       await queryInterface.removeColumn('EvmEventSources', 'id', {
         transaction,
       });
