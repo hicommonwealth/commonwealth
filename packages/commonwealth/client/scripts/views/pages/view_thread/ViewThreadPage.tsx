@@ -7,6 +7,7 @@ import { commentsByDate } from 'helpers/dates';
 import { filterLinks, getThreadActionTooltipText } from 'helpers/threads';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import useBrowserWindow from 'hooks/useBrowserWindow';
+import { useFlag } from 'hooks/useFlag';
 import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import useTopicGating from 'hooks/useTopicGating';
@@ -72,6 +73,7 @@ type ViewThreadPageProps = {
 };
 const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const threadId = identifier.split('-')[0];
+  const stickyEditor = useFlag('stickyEditor');
   const [searchParams] = useSearchParams();
   const isEdit = searchParams.get('isEdit') ?? undefined;
   const navigate = useCommonNavigate();
@@ -662,6 +664,18 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                   ) : thread && !isGloballyEditing && user.isLoggedIn ? (
                     <>
                       {threadOptionsComp}
+
+                      {!stickyEditor && (
+                        <CreateComment
+                          rootThread={thread}
+                          canComment={canComment}
+                          tooltipText={
+                            typeof disabledActionsTooltipText === 'function'
+                              ? disabledActionsTooltipText?.('comment')
+                              : disabledActionsTooltipText
+                          }
+                        />
+                      )}
                       {foundGatedTopic &&
                         !hideGatingBanner &&
                         isRestrictedMembership && (
@@ -735,7 +749,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                 disabledActionsTooltipText={disabledActionsTooltipText}
               />
 
-              {thread &&
+              {stickyEditor &&
+                thread &&
                 !thread.readOnly &&
                 !fromDiscordBot &&
                 !isGloballyEditing &&
