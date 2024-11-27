@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import 'components/Profile/ProfileActivity.scss';
+import './ProfileActivity.scss';
 
 import type Comment from 'models/Comment';
 import type Thread from 'models/Thread';

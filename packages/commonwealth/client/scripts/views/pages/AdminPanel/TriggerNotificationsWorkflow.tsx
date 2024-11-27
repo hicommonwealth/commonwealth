@@ -1,5 +1,4 @@
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import 'pages/AdminPanel.scss';
 import React, { useState } from 'react';
 import { useTriggerNotificationsWorkflowMutation } from 'state/api/superAdmin';
 import { openConfirmation } from 'views/modals/confirmation_modal';
@@ -7,6 +6,7 @@ import { CWText } from '../../components/component_kit/cw_text';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import { ValidationStatus } from '../../components/component_kit/cw_validation_text';
 import { CWButton } from '../../components/component_kit/new_designs/CWButton';
+import './AdminPanel.scss';
 
 const TriggerNotificationsWorkflow = () => {
   const [workflowKey, setWorkflowKey] = useState<string>('');

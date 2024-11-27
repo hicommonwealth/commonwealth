@@ -1,13 +1,13 @@
 import React, { useCallback, useMemo, useState } from 'react';
 
-import 'components/ProposalSelector.scss';
 import { CosmosProposal } from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
+import './ProposalSelector.scss';
 
-import app, { ApiStatus } from 'state';
-import { CWTextInput } from 'views/components/component_kit/cw_text_input';
-import { QueryList } from 'views/components/component_kit/cw_query_list';
-import { CosmosProposalSelectorItem } from 'views/components/CosmosProposalSelector';
 import { useGetAllCosmosProposals } from 'hooks/cosmos/useGetAllCosmosProposals';
+import app, { ApiStatus } from 'state';
+import { CosmosProposalSelectorItem } from 'views/components/CosmosProposalSelector';
+import { QueryList } from 'views/components/component_kit/cw_query_list';
+import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 
 const filterProposals = (ce: CosmosProposal, searchTerm: string) => {
   return (
@@ -60,7 +60,7 @@ export const CosmosProposalSelector = ({
   const renderItem = useCallback(
     (i: number, proposal: CosmosProposal) => {
       const isSelected = !!proposalsToSet.find(
-        (el) => String(el.identifier) === proposal.identifier
+        (el) => String(el.identifier) === proposal.identifier,
       );
 
       return (
@@ -73,7 +73,7 @@ export const CosmosProposalSelector = ({
         />
       );
     },
-    [onSelect, proposalsToSet]
+    [onSelect, proposalsToSet],
   );
 
   if (!app.chain || !app.activeChainId()) {

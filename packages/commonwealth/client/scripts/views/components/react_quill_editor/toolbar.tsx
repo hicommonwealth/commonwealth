@@ -14,10 +14,10 @@ import {
   TextStrikethrough,
 } from '@phosphor-icons/react';
 import clsx from 'clsx';
-import 'components/react_quill/react_quill_editor.scss';
 import { DeltaStatic } from 'quill';
 import React, { MutableRefObject, useMemo } from 'react';
 import ReactQuill from 'react-quill';
+import './react_quill_editor.scss';
 import { SerializableDeltaStatic, renderToolbarIcon } from './utils';
 
 const quillIcons = ReactQuill.Quill.import('ui/icons');
