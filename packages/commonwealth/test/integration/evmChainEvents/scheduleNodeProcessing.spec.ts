@@ -21,7 +21,6 @@ describe('scheduleNodeProcessing', () => {
   const sandbox = sinon.createSandbox();
   let processChainStub: sinon.SinonSpy;
   let clock: sinon.SinonFakeTimers;
-  let singleSourceSuccess = false;
 
   beforeAll(async () => {
     await tester.bootstrap_testing();
@@ -70,7 +69,6 @@ describe('scheduleNodeProcessing', () => {
 
     clock.tick(1);
     expect(processChainStub.calledOnce).to.be.true;
-    singleSourceSuccess = true;
   });
 
   test('should evenly schedule 2 sources per interval', async () => {

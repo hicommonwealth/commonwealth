@@ -35,15 +35,6 @@ const inputs = {
   ContestContentUpvoted: events.ContestContentUpvoted,
 };
 
-// TODO: remove kind column from EvmEventSources
-const signatureToKind = {
-  [EvmEventSignatures.Contests.ContentAdded]: 'ContentAdded',
-  [EvmEventSignatures.Contests.RecurringContestStarted]: 'ContestStarted',
-  [EvmEventSignatures.Contests.RecurringContestVoterVoted]: 'VoterVoted',
-  [EvmEventSignatures.Contests.SingleContestStarted]: 'ContestStarted',
-  [EvmEventSignatures.Contests.SingleContestVoterVoted]: 'VoterVoted',
-};
-
 /**
  * Makes sure contest manager (off-chain metadata) record exists
  * - Alerts when not found and inserts default record to patch distributed transaction

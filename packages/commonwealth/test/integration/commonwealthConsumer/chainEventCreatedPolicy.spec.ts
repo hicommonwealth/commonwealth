@@ -8,6 +8,7 @@ import { afterAll, afterEach, beforeAll, describe, test } from 'vitest';
 import { commonProtocol as cp } from '@hicommonwealth/evm-protocols';
 import { Community } from '@hicommonwealth/schemas';
 import { z } from 'zod';
+// eslint-disable-next-line max-len
 import { processChainEventCreated } from '../../../server/workers/commonwealthConsumer/policies/chainEventCreated/chainEventCreatedPolicy';
 import { createTestRpc } from '../../util/util';
 
