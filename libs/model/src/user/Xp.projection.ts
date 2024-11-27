@@ -25,14 +25,14 @@ async function getUserId(payload: { address_id: number }) {
 }
 
 async function getQuestActionMeta(
-  payload: { community_id: string; created_at?: Date },
+  event_payload: { community_id: string; created_at?: Date },
   event_name: keyof typeof events,
 ) {
   const quest = await models.Quest.findOne({
     where: {
-      community_id: payload.community_id,
-      start_date: { [Op.lte]: payload.created_at },
-      end_date: { [Op.gte]: payload.created_at },
+      community_id: event_payload.community_id,
+      start_date: { [Op.lte]: event_payload.created_at },
+      end_date: { [Op.gte]: event_payload.created_at },
     },
     include: [
       { required: true, model: models.QuestActionMeta, as: 'action_metas' },
@@ -41,36 +41,39 @@ async function getQuestActionMeta(
   if (!quest || !quest.action_metas) return;
 
   const action_metas = quest.get({ plain: true }).action_metas!;
-  return action_metas.find((a) => a.event_name === event_name);
+  const action_meta = action_metas.find((a) => a.event_name === event_name);
+  if (action_meta)
+    return {
+      ...action_meta,
+      event_created_at: event_payload.created_at!,
+    };
 }
 
 async function recordXps(
   user_id: number,
-  creator_user_id: number,
-  action_meta: z.infer<typeof schemas.QuestActionMeta>,
+  action_meta: z.infer<typeof schemas.QuestActionMeta> & {
+    event_created_at: Date;
+  },
+  creator_user_id?: number,
 ) {
-  const creator_xp_points = Math.round(
-    action_meta.reward_amount * action_meta.creator_reward_weight,
-  );
-  const xp_points = action_meta.reward_amount - creator_xp_points;
+  const creator_xp_points = creator_user_id
+    ? Math.round(action_meta.reward_amount * action_meta.creator_reward_weight)
+    : null;
+  const xp_points = action_meta.reward_amount - (creator_xp_points ?? 0);
 
-  // TODO: validate action participation limits
-
-  // TODO: calculate author's share of quest reward
-  // TODO: audit attributes in logs, including quest_id, action_meta_id, and
-  // current user balances
+  // TODO: validate action participation limits by looking at the
+  // actions log
 
   await sequelize.transaction(async (transaction) => {
     await models.XpLog.create(
       {
-        user_id,
         event_name: action_meta.event_name,
+        event_created_at: action_meta.event_created_at,
+        user_id,
         xp_points,
-        // TODO: audit attributes
-        // quest_id?: number,
-        // action_meta_id?: number,
-        // creator_xp_points?: number,
-        // audit: string, // details at the moment of xp collection
+        action_meta_id: action_meta.id,
+        creator_user_id,
+        creator_xp_points,
         created_at: new Date(),
       },
       { transaction },
@@ -84,7 +87,7 @@ async function recordXps(
         transaction,
       },
     );
-    if (creator_xp_points > 0) {
+    if (creator_xp_points) {
       await models.User.update(
         {
           xp_points: sequelize.literal(
@@ -107,12 +110,12 @@ export function Xp(): Projection<typeof inputs> {
       ThreadCreated: async ({ payload }) => {
         const user_id = await getUserId(payload);
         const action_meta = await getQuestActionMeta(payload, 'ThreadCreated');
-        if (action_meta) await recordXps(user_id, user_id, action_meta);
+        if (action_meta) await recordXps(user_id, action_meta);
       },
       CommentCreated: async ({ payload }) => {
         const user_id = await getUserId(payload);
         const action_meta = await getQuestActionMeta(payload, 'CommentCreated');
-        if (action_meta) await recordXps(user_id, user_id, action_meta);
+        if (action_meta) await recordXps(user_id, action_meta);
       },
       CommentUpvoted: async ({ payload }) => {
         const user_id = await getUserId(payload);
@@ -140,7 +143,7 @@ export function Xp(): Projection<typeof inputs> {
           'CommentUpvoted',
         );
         if (action_meta)
-          await recordXps(user_id, comment!.Address!.user_id!, action_meta);
+          await recordXps(user_id, action_meta, comment!.Address!.user_id!);
       },
     },
   };

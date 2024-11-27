@@ -163,7 +163,48 @@ describe('User lifecycle', () => {
       // validate xp audit log
       const logs = await models.XpLog.findAll();
       expect(logs.length).to.equal(4);
-      console.log(logs.map((l) => l.toJSON()));
+      expect(logs.map((l) => l.toJSON())).to.deep.equal([
+        {
+          event_name: 'ThreadCreated',
+          event_created_at: logs[0].event_created_at,
+          user_id: member.user.id,
+          xp_points: 10,
+          action_meta_id: 1,
+          creator_user_id: null,
+          creator_xp_points: null,
+          created_at: logs[0].created_at,
+        },
+        {
+          event_name: 'CommentCreated',
+          event_created_at: logs[1].event_created_at,
+          user_id: admin.user.id,
+          xp_points: 5,
+          action_meta_id: 2,
+          creator_user_id: null,
+          creator_xp_points: null,
+          created_at: logs[1].created_at,
+        },
+        {
+          event_name: 'CommentCreated',
+          event_created_at: logs[2].event_created_at,
+          user_id: admin.user.id,
+          xp_points: 5,
+          action_meta_id: 2,
+          creator_user_id: null,
+          creator_xp_points: null,
+          created_at: logs[2].created_at,
+        },
+        {
+          event_name: 'CommentUpvoted',
+          event_created_at: logs[3].event_created_at,
+          user_id: member.user.id,
+          xp_points: 18,
+          action_meta_id: 3,
+          creator_user_id: admin.user.id,
+          creator_xp_points: 2,
+          created_at: logs[3].created_at,
+        },
+      ]);
     });
   });
 });

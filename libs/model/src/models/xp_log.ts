@@ -10,10 +10,14 @@ export default (sequelize: Sequelize.Sequelize) =>
   <XpLogModelStatic>sequelize.define<XpLogInstance>(
     'XpLog',
     {
-      user_id: { type: Sequelize.INTEGER, primaryKey: true },
-      created_at: { type: Sequelize.DATE, primaryKey: true },
       event_name: { type: Sequelize.STRING, primaryKey: true },
+      event_created_at: { type: Sequelize.DATE, primaryKey: true },
+      user_id: { type: Sequelize.INTEGER, primaryKey: true },
       xp_points: { type: Sequelize.INTEGER, allowNull: false },
+      action_meta_id: { type: Sequelize.INTEGER, allowNull: true },
+      creator_user_id: { type: Sequelize.INTEGER, allowNull: true },
+      creator_xp_points: { type: Sequelize.INTEGER, allowNull: true },
+      created_at: { type: Sequelize.DATE },
     },
     {
       timestamps: true,
