@@ -1,4 +1,3 @@
-/* eslint-disable react/no-multi-comp */
 /* eslint-disable max-len */
 import React from 'react';
 
@@ -108,6 +107,7 @@ export const CWArchiveTray = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWArchiveTrayFilled = (props: IconProps) => {
   const {
     className,
@@ -139,6 +139,7 @@ export const CWArchiveTrayFilled = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWArrowDownBlue500 = (props: IconProps) => {
   const {
     className,
@@ -178,6 +179,7 @@ export const CWArrowDownBlue500 = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWArrowFatUp = (props: IconProps) => {
   const {
     className,
@@ -212,6 +214,7 @@ export const CWArrowFatUp = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWArrowFatUpNeutral = (props: IconProps) => {
   const {
     className,
@@ -245,6 +248,7 @@ export const CWArrowFatUpNeutral = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWArrowFatUpBlue500 = (props: IconProps) => {
   const {
     className,
@@ -278,6 +282,7 @@ export const CWArrowFatUpBlue500 = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWArrowFatUpBlue600 = (props: IconProps) => {
   const {
     className,
@@ -311,6 +316,7 @@ export const CWArrowFatUpBlue600 = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWArrowLeft = (props: IconProps) => {
   const {
     className,
@@ -344,6 +350,7 @@ export const CWArrowLeft = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWArrowRight = (props: IconProps) => {
   const {
     className,
@@ -376,6 +383,7 @@ export const CWArrowRight = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWArrowUpBlue500 = (props: IconProps) => {
   const {
     className,
@@ -415,6 +423,7 @@ export const CWArrowUpBlue500 = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWArrowUpNeutral400 = (props: IconProps) => {
   const {
     className,
@@ -456,6 +465,7 @@ export const CWArrowUpNeutral400 = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWBacker = (props: IconProps) => {
   const {
     className,
@@ -493,6 +503,7 @@ export const CWBacker = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWBadge = (props: IconProps) => {
   const {
     className,
@@ -522,6 +533,7 @@ export const CWBadge = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWBellNew = (props: IconProps) => {
   const {
     className,
@@ -563,6 +575,7 @@ export const CWBellNew = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWCautionCircle = (props: IconProps) => {
   const {
     className,
@@ -597,6 +610,7 @@ export const CWCautionCircle = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWCautionTriangle = (props: IconProps) => {
   const {
     className,
@@ -631,6 +645,7 @@ export const CWCautionTriangle = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWCheck = (props: IconProps) => {
   const {
     className,
@@ -663,6 +678,7 @@ export const CWCheck = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWChevronDown = (props: IconProps) => {
   const {
     className,
@@ -695,6 +711,7 @@ export const CWChevronDown = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWChevronLeft = (props: IconProps) => {
   const {
     className,
@@ -727,6 +744,7 @@ export const CWChevronLeft = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWChevronRight = (props: IconProps) => {
   const {
     className,
@@ -759,6 +777,7 @@ export const CWChevronRight = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWChevronUp = (props: IconProps) => {
   const {
     className,
@@ -791,6 +810,7 @@ export const CWChevronUp = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWClock = (props: IconProps) => {
   const {
     className,
@@ -823,6 +843,7 @@ export const CWClock = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWClose = (props: IconProps) => {
   const {
     className,
@@ -859,6 +880,7 @@ export const CWClose = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWCloud = (props: IconProps) => {
   const {
     className,
@@ -895,6 +917,7 @@ export const CWCloud = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWCollapse = (props: IconProps) => {
   const {
     className,
@@ -927,6 +950,7 @@ export const CWCollapse = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWCommonLogo = (props: IconProps) => {
   const {
     className,
@@ -983,6 +1007,7 @@ export const CWCommonLogo = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWCompass = (props: IconProps) => {
   const {
     className,
@@ -1016,6 +1041,7 @@ export const CWCompass = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWCopy = (props: IconProps) => {
   const {
     className,
@@ -1049,6 +1075,7 @@ export const CWCopy = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWCosmos = (props: IconProps) => {
   const {
     className,
@@ -1109,6 +1136,7 @@ export const CWCosmos = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWCow = (props: IconProps) => {
   const {
     className,
@@ -1141,6 +1169,7 @@ export const CWCow = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWCurator = (props: IconProps) => {
   const {
     className,
@@ -1175,6 +1204,7 @@ export const CWCurator = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWDelegate = (props: IconProps) => {
   const {
     className,
@@ -1210,6 +1240,7 @@ export const CWDelegate = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWDemocraticProposal = (props: IconProps) => {
   const {
     className,
@@ -1242,6 +1273,7 @@ export const CWDemocraticProposal = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWDiscord = (props: IconProps) => {
   const {
     className,
@@ -1270,6 +1302,7 @@ export const CWDiscord = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWDiscordLogin = (props: IconProps) => {
   const {
     className,
@@ -1301,6 +1334,7 @@ export const CWDiscordLogin = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWDot = (props: IconProps) => {
   const {
     className,
@@ -1333,6 +1367,7 @@ export const CWDot = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWDots = (props: IconProps) => {
   const {
     className,
@@ -1361,6 +1396,7 @@ export const CWDots = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWDotsHorizontal = (props: IconProps) => {
   const {
     className,
@@ -1404,6 +1440,7 @@ export const CWDotsHorizontal = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWDotsVertical = (props: IconProps) => {
   const {
     className,
@@ -1432,6 +1469,7 @@ export const CWDotsVertical = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWEdgeware = (props: IconProps) => {
   const {
     className,
@@ -1495,6 +1533,7 @@ export const CWEdgeware = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWElement = (props: IconProps) => {
   const {
     className,
@@ -1527,6 +1566,7 @@ export const CWElement = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWEnvelope = (props: IconProps) => {
   const {
     className,
@@ -1566,6 +1606,7 @@ export const CWEnvelope = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWEthereum = (props: IconProps) => {
   const {
     className,
@@ -1617,6 +1658,7 @@ export const CWEthereum = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWEtherscan = (props: IconProps) => {
   const {
     className,
@@ -1652,6 +1694,7 @@ export const CWEtherscan = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWExpand = (props: IconProps) => {
   const {
     className,
@@ -1684,6 +1727,7 @@ export const CWExpand = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWExploreCommunities = (props: IconProps) => {
   const {
     className,
@@ -1717,6 +1761,7 @@ export const CWExploreCommunities = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWExternalLink = (props: IconProps) => {
   const {
     className,
@@ -1772,6 +1817,7 @@ export const CWExternalLink = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWFeedback = (props: IconProps) => {
   const {
     className,
@@ -1804,6 +1850,7 @@ export const CWFeedback = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWFilter = (props: IconProps) => {
   const {
     className,
@@ -1836,6 +1883,7 @@ export const CWFilter = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWFlame = (props: IconProps) => {
   const {
     className,
@@ -1864,6 +1912,7 @@ export const CWFlame = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWGear = (props: IconProps) => {
   const {
     className,
@@ -1946,6 +1995,7 @@ export const CWGear = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWGithub = (props: IconProps) => {
   const {
     className,
@@ -1978,6 +2028,7 @@ export const CWGithub = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWHamburger = (props: IconProps) => {
   const {
     className,
@@ -2005,6 +2056,7 @@ export const CWHamburger = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWHash = (props: IconProps) => {
   const {
     className,
@@ -2037,6 +2089,7 @@ export const CWHash = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWHeartEmpty = (props: IconProps) => {
   const {
     className,
@@ -2069,6 +2122,7 @@ export const CWHeartEmpty = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWHeartFilled = (props: IconProps) => {
   const {
     className,
@@ -2101,6 +2155,7 @@ export const CWHeartFilled = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWHelp = (props: IconProps) => {
   const {
     className,
@@ -2133,6 +2188,7 @@ export const CWHelp = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWHome = (props: IconProps) => {
   const {
     className,
@@ -2165,6 +2221,7 @@ export const CWHome = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWInfoEmpty = (props: IconProps) => {
   const {
     className,
@@ -2196,6 +2253,7 @@ export const CWInfoEmpty = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWImageUpload = (props: IconProps) => {
   const {
     className,
@@ -2224,6 +2282,7 @@ export const CWImageUpload = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWInfoFilled = (props: IconProps) => {
   const {
     className,
@@ -2256,6 +2315,7 @@ export const CWInfoFilled = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWJar = (props: IconProps) => {
   const {
     className,
@@ -2289,6 +2349,7 @@ export const CWJar = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWLink = (props: IconProps) => {
   const {
     className,
@@ -2321,6 +2382,7 @@ export const CWLink = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWLock = (props: IconProps) => {
   const {
     className,
@@ -2353,6 +2415,7 @@ export const CWLock = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWLogout = (props: IconProps) => {
   const {
     className,
@@ -2390,6 +2453,7 @@ export const CWLogout = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWMail = (props: IconProps) => {
   const {
     className,
@@ -2422,6 +2486,7 @@ export const CWMail = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWMute = (props: IconProps) => {
   const {
     className,
@@ -2455,6 +2520,7 @@ export const CWMute = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWNear = (props: IconProps) => {
   const {
     className,
@@ -2486,6 +2552,7 @@ export const CWNear = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWNewStar = (props: IconProps) => {
   const {
     className,
@@ -2514,6 +2581,7 @@ export const CWNewStar = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWOctocat = (props: IconProps) => {
   const {
     className,
@@ -2545,6 +2613,7 @@ export const CWOctocat = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWPeople = (props: IconProps) => {
   const {
     className,
@@ -2578,6 +2647,7 @@ export const CWPeople = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWPerson = (props: IconProps) => {
   const {
     className,
@@ -2610,6 +2680,7 @@ export const CWPerson = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWPlus = (props: IconProps) => {
   const {
     className,
@@ -2639,6 +2710,7 @@ export const CWPlus = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWPlusCircle = (props: IconProps) => {
   const {
     className,
@@ -2671,6 +2743,7 @@ export const CWPlusCircle = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWPolkadot = (props: IconProps) => {
   const {
     className,
@@ -2722,6 +2795,7 @@ export const CWPolkadot = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWPolygon = (props: IconProps) => {
   const {
     className,
@@ -2753,6 +2827,7 @@ export const CWPolygon = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWSearch = (props: IconProps) => {
   const {
     className,
@@ -2785,6 +2860,7 @@ export const CWSearch = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWSend = (props: IconProps) => {
   const {
     className,
@@ -2817,6 +2893,7 @@ export const CWSend = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWShare2 = (props: IconProps) => {
   const {
     className,
@@ -2849,6 +2926,7 @@ export const CWShare2 = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWSidebarCollapse = (props: IconProps) => {
   const {
     className,
@@ -2881,6 +2959,7 @@ export const CWSidebarCollapse = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWSidebarExpand = (props: IconProps) => {
   const {
     className,
@@ -2913,6 +2992,7 @@ export const CWSidebarExpand = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWStar = (props: IconProps) => {
   const {
     className,
@@ -2941,6 +3021,7 @@ export const CWStar = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWSun = (props: IconProps) => {
   const {
     className,
@@ -3019,6 +3100,7 @@ export const CWSun = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWTelegram = (props: IconProps) => {
   const {
     className,
@@ -3051,6 +3133,7 @@ export const CWTelegram = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWTransfer = (props: IconProps) => {
   const {
     className,
@@ -3083,6 +3166,7 @@ export const CWTransfer = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWTreasuryProposal = (props: IconProps) => {
   const {
     className,
@@ -3115,6 +3199,7 @@ export const CWTreasuryProposal = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWTrendUp = (props: IconProps) => {
   const {
     className,
@@ -3155,6 +3240,7 @@ export const CWTrendUp = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWTwitter = (props: IconProps) => {
   const {
     className,
@@ -3186,6 +3272,7 @@ export const CWTwitter = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWTwitterNew = (props: IconProps) => {
   const {
     className,
@@ -3217,6 +3304,7 @@ export const CWTwitterNew = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWTwitterX = (props: IconProps) => {
   const {
     className,
@@ -3248,6 +3336,7 @@ export const CWTwitterX = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWUnsubscribe = (props: IconProps) => {
   const {
     className,
@@ -3280,6 +3369,7 @@ export const CWUnsubscribe = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWViews = (props: IconProps) => {
   const {
     className,
@@ -3313,6 +3403,7 @@ export const CWViews = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWVote = (props: IconProps) => {
   const {
     className,
@@ -3351,6 +3442,7 @@ export const CWVote = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWWallet = (props: IconProps) => {
   const {
     className,
@@ -3389,6 +3481,7 @@ export const CWWallet = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWWebsite = (props: IconProps) => {
   const {
     className,
@@ -3421,6 +3514,7 @@ export const CWWebsite = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWWrite = (props: IconProps) => {
   const {
     className,
@@ -3453,6 +3547,7 @@ export const CWWrite = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWGoogle = (props: IconProps) => {
   const {
     className,
@@ -3497,6 +3592,7 @@ export const CWGoogle = (props: IconProps) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const CWMembers = ({
   componentType,
   iconSize,
