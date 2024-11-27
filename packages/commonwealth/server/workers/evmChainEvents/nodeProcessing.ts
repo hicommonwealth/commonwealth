@@ -55,7 +55,7 @@ export async function processChainNode(
     let startBlockNum: number;
     if (!lastProcessedBlock) {
       startBlockNum = currentBlock - 10;
-    } else if (lastProcessedBlock.block_number === currentBlock) {
+    } else if (lastProcessedBlock.block_number === currentBlock - 1) {
       // last processed block number is the same as the most recent block
       // that EVM CE will process (-1 to avoid chain the majority of re-orgs)
       return;

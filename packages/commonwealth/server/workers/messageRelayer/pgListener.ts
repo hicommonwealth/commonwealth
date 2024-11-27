@@ -49,14 +49,8 @@ async function reconnect(client: pg.Client) {
 export async function setupListener(): Promise<pg.Client> {
   log.info('Setting up listener...');
   const { config } = await import('@hicommonwealth/model');
-
-  const dbURI =
-    config.NODE_ENV === 'test'
-      ? 'postgresql://commonwealth:edgeware@localhost/common_test'
-      : config.DB.URI;
-
   const client = new pg.Client({
-    connectionString: dbURI,
+    connectionString: config.DB.URI,
     ssl:
       config.APP_ENV === 'local' || config.APP_ENV === 'CI'
         ? false
