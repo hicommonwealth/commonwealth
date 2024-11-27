@@ -1,6 +1,8 @@
+import { useFlag } from 'client/scripts/hooks/useFlag';
 import { saveToClipboard } from 'client/scripts/utils/clipboard';
 import clsx from 'clsx';
 import React from 'react';
+import { useInviteLinkModal } from 'state/ui/modals';
 import useJoinCommunity from 'views/components/SublayoutHeader/useJoinCommunity';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
@@ -19,6 +21,8 @@ const AccountConnectionIndicator = ({
   address,
 }: AccountConnectionIndicatorProps) => {
   const { handleJoinCommunity, JoinCommunityModals } = useJoinCommunity();
+  const isReferralsEnabled = useFlag('referrals');
+  const { setIsInviteLinkModalOpen } = useInviteLinkModal();
 
   return (
     <>
@@ -53,6 +57,17 @@ const AccountConnectionIndicator = ({
                 }}
               />
             </div>
+
+            {isReferralsEnabled && (
+              <CWButton
+                buttonType="tertiary"
+                buttonHeight="sm"
+                buttonWidth="full"
+                label="Get referral link"
+                className="referral-link-button"
+                onClick={() => setIsInviteLinkModalOpen(true)}
+              />
+            )}
           </div>
         )}
 
