@@ -10,7 +10,6 @@ import {
 } from '../../components/component_kit/new_designs/CWModal';
 import { CWTextInput } from '../../components/component_kit/new_designs/CWTextInput';
 
-import discordImg from 'assets/img/share/discord.png';
 import mailImg from 'assets/img/share/mail.png';
 import messagesImg from 'assets/img/share/messages.png';
 import telegramImg from 'assets/img/share/telegram.png';
@@ -30,43 +29,55 @@ interface ShareOption {
   onClick: () => void;
 }
 
+const inviteCommunityMessage = 'Hey, check out my community on Common!';
+const inviteCommonMessage = 'Hey, check out Common!';
+
+const generatePermalink = (isInsideCommunity: boolean, inviteLink: string) => {
+  const message = isInsideCommunity
+    ? inviteCommunityMessage
+    : inviteCommonMessage;
+
+  return `${message} \n${inviteLink}`;
+};
+
 const InviteLinkModal = ({
   onModalClose,
   isInsideCommunity,
 }: InviteLinkModalProps) => {
   // TODO: replace with actual invite link
-  const value = 'https://commonwealth.im/~/invite/774037=89defcb8';
+  const inviteLink = 'https://commonwealth.im/~/invite/774037=89defcb8';
 
   const handleCopy = async () => {
-    await saveToClipboard(value, true);
+    await saveToClipboard(inviteLink, true);
   };
 
   const shareOptions: ShareOption[] = [
     {
       name: 'Messages',
       icon: messagesImg,
-      onClick: () => window.open(`sms:?&body=${encodeURIComponent(value)}`),
-    },
-    {
-      name: 'Discord',
-      icon: discordImg,
       onClick: () =>
         window.open(
-          `https://discord.com/share?url=${encodeURIComponent(value)}`,
+          `sms:?&body=${encodeURIComponent(generatePermalink(isInsideCommunity, inviteLink))}`,
         ),
     },
     {
       name: 'Telegram',
       icon: telegramImg,
       onClick: () =>
-        window.open(`https://t.me/share/url?url=${encodeURIComponent(value)}`),
+        window.open(
+          `https://t.me/share/url?url=${encodeURIComponent(
+            generatePermalink(isInsideCommunity, inviteLink),
+          )}`,
+        ),
     },
     {
       name: 'X (Twitter)',
       icon: twitterImg,
       onClick: () =>
         window.open(
-          `https://twitter.com/intent/tweet?url=${encodeURIComponent(value)}`,
+          `https://twitter.com/intent/tweet?url=${encodeURIComponent(
+            generatePermalink(isInsideCommunity, inviteLink),
+          )}`,
         ),
     },
     {
@@ -74,13 +85,20 @@ const InviteLinkModal = ({
       icon: warpcastImg,
       onClick: () =>
         window.open(
-          `https://warpcast.com/~/compose?text=${encodeURIComponent(value)}`,
+          `https://warpcast.com/~/compose?text=${encodeURIComponent(
+            generatePermalink(isInsideCommunity, inviteLink),
+          )}`,
         ),
     },
     {
       name: 'Email',
       icon: mailImg,
-      onClick: () => window.open(`mailto:?body=${encodeURIComponent(value)}`),
+      onClick: () =>
+        window.open(
+          `mailto:?body=${encodeURIComponent(
+            generatePermalink(isInsideCommunity, inviteLink),
+          )}`,
+        ),
     },
   ];
 
@@ -106,7 +124,7 @@ const InviteLinkModal = ({
           <CWTextInput
             fullWidth
             type="text"
-            value={value}
+            value={inviteLink}
             disabled
             onClick={handleCopy}
             iconRight={<CWIcon iconName="copy" />}

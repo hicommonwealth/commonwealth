@@ -188,7 +188,7 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
           onClose={() => setIsWelcomeOnboardModalOpen(false)}
         />
         <CWModal
-          size="medium"
+          size="small"
           content={
             <InviteLinkModal
               onModalClose={() => setIsInviteLinkModalOpen(false)}
