@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 
 import 'components/linked_addresses.scss';
 
+import { formatAddressShort } from 'client/scripts/helpers';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
 import type AddressInfo from '../../models/AddressInfo';
@@ -9,10 +10,18 @@ import type NewProfile from '../../models/NewProfile';
 import { DeleteAddressModal } from '../modals/delete_address_modal';
 import { CWIconButton } from './component_kit/cw_icon_button';
 import { CWTruncatedAddress } from './component_kit/cw_truncated_address';
+import CWCommunityInfo from './component_kit/new_designs/CWCommunityInfo';
 import { CWModal } from './component_kit/new_designs/CWModal';
+import { CWTable } from './component_kit/new_designs/CWTable';
+import { CWTableColumnInfo } from './component_kit/new_designs/CWTable/CWTable';
+
 /* eslint-disable react/no-multi-comp */
 
 type AddressProps = {
+  address: string;
+};
+
+type AddressDetailsProps = {
   profile: NewProfile;
   addressInfo: AddressInfo;
   toggleRemoveModal: (val: boolean, address: AddressInfo) => void;
@@ -25,6 +34,16 @@ type LinkedAddressesProps = {
 };
 
 const Address = (props: AddressProps) => {
+  const { address } = props;
+
+  return (
+    <div className="AddressContainer">
+      <CWTruncatedAddress address={address} />
+    </div>
+  );
+};
+
+const AddressDetails = (props: AddressDetailsProps) => {
   const { addressInfo, toggleRemoveModal } = props;
   const { address, community } = addressInfo;
 
@@ -37,9 +56,8 @@ const Address = (props: AddressProps) => {
   });
 
   return (
-    <div className="AddressContainer">
-      <CWTruncatedAddress
-        address={address}
+    <div className="AddressDetails">
+      <CWCommunityInfo
         communityInfo={{
           iconUrl: fetchedCommunity?.icon_url || '',
           name: fetchedCommunity?.name || '',
@@ -48,8 +66,7 @@ const Address = (props: AddressProps) => {
       <PopoverMenu
         menuItems={[
           {
-            label: 'Remove',
-            iconLeft: 'trash',
+            label: `Disconnect ${formatAddressShort(address)}`,
             onClick: () => toggleRemoveModal(true, addressInfo),
           },
         ]}
@@ -69,21 +86,60 @@ export const LinkedAddresses = (props: LinkedAddressesProps) => {
 
   const { profile, addresses, refreshProfiles } = props;
 
+  const groupedAddresses = useMemo(() => {
+    return addresses.reduce((acc: Record<string, AddressInfo[]>, addr) => {
+      if (!acc[addr.address]) acc[addr.address] = [];
+      acc[addr.address].push(addr);
+      return acc;
+    }, {});
+  }, [addresses]);
+
+  const columnInfo: CWTableColumnInfo[] = [
+    {
+      key: 'address',
+      header: 'Address',
+      numeric: false,
+      sortable: false,
+    },
+    {
+      key: 'communities',
+      header: 'Communities',
+      numeric: false,
+      sortable: false,
+    },
+  ];
+
+  const rowData = Object.entries(groupedAddresses).map(
+    ([address, communities]) => ({
+      address: <Address address={address} />,
+      communities: (
+        <div>
+          {communities.map((addr, index) => {
+            return (
+              <AddressDetails
+                key={index}
+                profile={profile}
+                addressInfo={addr}
+                toggleRemoveModal={(val: boolean, address: AddressInfo) => {
+                  setIsRemoveModalOpen(val);
+                  setCurrentAddress(address);
+                }}
+              />
+            );
+          })}
+        </div>
+      ),
+    }),
+  );
+
+  const TableComponent = useMemo(
+    () => <CWTable columnInfo={columnInfo} rowData={rowData} />,
+    [addresses],
+  );
+
   return (
-    <div className="LinkedAddresses">
-      {addresses?.map((addr, i) => {
-        return (
-          <Address
-            key={i}
-            profile={profile}
-            addressInfo={addr}
-            toggleRemoveModal={(val: boolean, address: AddressInfo) => {
-              setIsRemoveModalOpen(val);
-              setCurrentAddress(address);
-            }}
-          />
-        );
-      })}
+    <div>
+      {TableComponent}
       <CWModal
         size="small"
         content={
