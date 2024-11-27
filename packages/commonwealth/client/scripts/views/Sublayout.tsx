@@ -195,7 +195,7 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
               isInsideCommunity={!!isInsideCommunity}
             />
           }
-          open={isInviteLinkModalOpen}
+          open={!isWindowExtraSmall && isInviteLinkModalOpen}
           onClose={() => setIsInviteLinkModalOpen(false)}
         />
       </div>

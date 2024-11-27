@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 
+import { useInviteLinkModal } from 'state/ui/modals';
 import useSidebarStore from 'state/ui/sidebar';
 import useUserStore from 'state/ui/user';
 import { PopoverMenuItem } from 'views/components/component_kit/CWPopoverMenu';
@@ -30,11 +31,12 @@ const MobileHeader = ({
   isInsideCommunity,
 }: MobileHeaderProps) => {
   const [isUserDrawerOpen, setIsUserDrawerOpen] = useState(false);
-  const [isInviteLinkDrawerOpen, setIsInviteLinkDrawerOpen] = useState(false);
   const [isModalOpen, isSetModalOpen] = useState(false);
   const { menuVisible } = useSidebarStore();
   const userData = useUserStore();
   const user = userData.addresses?.[0];
+  const { isInviteLinkModalOpen, setIsInviteLinkModalOpen } =
+    useInviteLinkModal();
 
   const magnifyingGlassVisible = true;
   const shouldShowCollapsableSidebarButton = isInsideCommunity
@@ -47,7 +49,7 @@ const MobileHeader = ({
     onAddressItemClick: () => setIsUserDrawerOpen(false),
     onReferralItemClick: () => {
       setIsUserDrawerOpen(false);
-      setIsInviteLinkDrawerOpen(true);
+      setIsInviteLinkModalOpen(true);
     },
   });
 
@@ -129,12 +131,16 @@ const MobileHeader = ({
         size="auto"
         direction="bottom"
         className="InviteLinkDrawer"
-        open={isInviteLinkDrawerOpen}
-        onClose={() => setIsInviteLinkDrawerOpen(false)}
+        open={isInviteLinkModalOpen}
+        onClose={() => {
+          setIsInviteLinkModalOpen(false);
+        }}
       >
         <InviteLinkModal
           isInsideCommunity={isInsideCommunity}
-          onModalClose={() => setIsInviteLinkDrawerOpen(false)}
+          onModalClose={() => {
+            setIsInviteLinkModalOpen(false);
+          }}
         />
       </CWDrawer>
 
