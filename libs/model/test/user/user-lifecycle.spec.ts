@@ -81,7 +81,7 @@ describe('User lifecycle', () => {
         },
       });
       // setup quest actions
-      await command(UpdateQuest(), {
+      const updated = await command(UpdateQuest(), {
         actor: admin,
         payload: {
           community_id,
@@ -96,6 +96,9 @@ describe('User lifecycle', () => {
               event_name: 'CommentCreated',
               reward_amount: 5,
               creator_reward_weight: 0,
+              participation_limit: QuestParticipationLimit.OncePerPeriod,
+              participation_period: QuestParticipationPeriod.Monthly,
+              participation_times_per_period: 2,
             },
             {
               event_name: 'CommentUpvoted',
@@ -127,14 +130,14 @@ describe('User lifecycle', () => {
           read_only: false,
         },
       });
-      await command(CreateComment(), {
+      const comment = await command(CreateComment(), {
         actor: admin,
         payload: {
           thread_id: thread!.id!,
           body: 'Comment body 1',
         },
       });
-      const comment = await command(CreateComment(), {
+      await command(CreateComment(), {
         actor: admin,
         payload: {
           thread_id: thread!.id!,
@@ -181,7 +184,7 @@ describe('User lifecycle', () => {
           event_created_at: logs[0].event_created_at,
           user_id: member.user.id,
           xp_points: 10,
-          action_meta_id: 1,
+          action_meta_id: updated!.action_metas![0].id,
           creator_user_id: null,
           creator_xp_points: null,
           created_at: logs[0].created_at,
@@ -191,7 +194,7 @@ describe('User lifecycle', () => {
           event_created_at: logs[1].event_created_at,
           user_id: admin.user.id,
           xp_points: 5,
-          action_meta_id: 2,
+          action_meta_id: updated!.action_metas![1].id,
           creator_user_id: null,
           creator_xp_points: null,
           created_at: logs[1].created_at,
@@ -201,7 +204,7 @@ describe('User lifecycle', () => {
           event_created_at: logs[2].event_created_at,
           user_id: admin.user.id,
           xp_points: 5,
-          action_meta_id: 2,
+          action_meta_id: updated!.action_metas![1].id,
           creator_user_id: null,
           creator_xp_points: null,
           created_at: logs[2].created_at,
@@ -211,7 +214,7 @@ describe('User lifecycle', () => {
           event_created_at: logs[3].event_created_at,
           user_id: member.user.id,
           xp_points: 18,
-          action_meta_id: 3,
+          action_meta_id: updated!.action_metas![2].id,
           creator_user_id: admin.user.id,
           creator_xp_points: 2,
           created_at: logs[3].created_at,
@@ -232,7 +235,7 @@ describe('User lifecycle', () => {
         },
       });
       // setup quest actions
-      await command(UpdateQuest(), {
+      const updated = await command(UpdateQuest(), {
         actor: admin,
         payload: {
           community_id,
@@ -283,14 +286,14 @@ describe('User lifecycle', () => {
           read_only: false,
         },
       });
-      await command(CreateComment(), {
+      const comment = await command(CreateComment(), {
         actor: admin,
         payload: {
           thread_id: thread!.id!,
           body: 'Comment body 1',
         },
       });
-      const comment = await command(CreateComment(), {
+      await command(CreateComment(), {
         actor: admin,
         payload: {
           thread_id: thread!.id!,
@@ -318,8 +321,9 @@ describe('User lifecycle', () => {
         actor: admin,
         payload: {},
       });
-      // accumulating xp points from the first test
-      expect(admin_profile?.xp_points).to.equal(24);
+      // accumulating xp points from the first test (12 + 7)
+      // notice that the second comment created action is not counted
+      expect(admin_profile?.xp_points).to.equal(19);
 
       // expect xp points awarded to member who created a thread
       // and upvoted a comment
@@ -327,21 +331,22 @@ describe('User lifecycle', () => {
         actor: member,
         payload: {},
       });
-      // accumulating xp points from the second test
+      // accumulating xp points from the second test (28 + 28)
       expect(member_profile?.xp_points).to.equal(56);
 
       // validate xp audit log
       const logs = await models.XpLog.findAll({
         where: { created_at: { [Op.gte]: from } },
       });
-      expect(logs.length).to.equal(4);
+      // notice that the second comment created action is not counted
+      expect(logs.length).to.equal(3);
       expect(logs.map((l) => l.toJSON())).to.deep.equal([
         {
           event_name: 'ThreadCreated',
           event_created_at: logs[0].event_created_at,
           user_id: member.user.id,
           xp_points: 10,
-          action_meta_id: 1,
+          action_meta_id: updated!.action_metas![0].id,
           creator_user_id: null,
           creator_xp_points: null,
           created_at: logs[0].created_at,
@@ -351,30 +356,20 @@ describe('User lifecycle', () => {
           event_created_at: logs[1].event_created_at,
           user_id: admin.user.id,
           xp_points: 5,
-          action_meta_id: 2,
+          action_meta_id: updated!.action_metas![1].id,
           creator_user_id: null,
           creator_xp_points: null,
           created_at: logs[1].created_at,
         },
         {
-          event_name: 'CommentCreated',
-          event_created_at: logs[2].event_created_at,
-          user_id: admin.user.id,
-          xp_points: 5,
-          action_meta_id: 2,
-          creator_user_id: null,
-          creator_xp_points: null,
-          created_at: logs[2].created_at,
-        },
-        {
           event_name: 'CommentUpvoted',
-          event_created_at: logs[3].event_created_at,
+          event_created_at: logs[2].event_created_at,
           user_id: member.user.id,
           xp_points: 18,
-          action_meta_id: 3,
+          action_meta_id: updated!.action_metas![2].id,
           creator_user_id: admin.user.id,
           creator_xp_points: 2,
-          created_at: logs[3].created_at,
+          created_at: logs[2].created_at,
         },
       ]);
     });

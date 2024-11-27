@@ -1,5 +1,10 @@
 import { Projection, events } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
+import {
+  QuestParticipationLimit,
+  QuestParticipationPeriod,
+} from '@hicommonwealth/schemas';
+import { isWithinPeriod } from '@hicommonwealth/shared';
 import { Op } from 'sequelize';
 import { z } from 'zod';
 import { models, sequelize } from '../database';
@@ -57,22 +62,54 @@ async function recordXps(
   },
   creator_user_id?: number,
 ) {
-  const creator_xp_points = creator_user_id
-    ? Math.round(action_meta.reward_amount * action_meta.creator_reward_weight)
-    : null;
-  const xp_points = action_meta.reward_amount - (creator_xp_points ?? 0);
-
-  // TODO: validate action participation
-  // look at actions log and validate:
-  // - participation_limit
-  // - participation_period
-  // - participation_times_per_period
+  const event_created_at = action_meta.event_created_at;
 
   await sequelize.transaction(async (transaction) => {
+    // get logged actions for this user and action meta
+    const log = await models.XpLog.findAll({
+      where: {
+        user_id,
+        event_name: action_meta.event_name,
+        action_meta_id: action_meta.id,
+      },
+    });
+
+    // validate action participation
+    if (log.length > 0) {
+      if (
+        (action_meta.participation_limit ??
+          QuestParticipationLimit.OncePerQuest) ===
+        QuestParticipationLimit.OncePerQuest
+      )
+        // when participation_limit is once_per_quest, ignore after the first action
+        return;
+
+      // participation_limit is once_per_period
+      const tpp = action_meta.participation_times_per_period ?? 1;
+      const period =
+        action_meta.participation_period === QuestParticipationPeriod.Monthly
+          ? 'month'
+          : action_meta.participation_period === QuestParticipationPeriod.Weekly
+            ? 'week'
+            : 'day';
+      const actions_in_period = log.filter((l) =>
+        isWithinPeriod(event_created_at, l.created_at, period),
+      );
+      if (actions_in_period.length >= tpp) return;
+    }
+
+    // calculate xp points and log it
+    const creator_xp_points = creator_user_id
+      ? Math.round(
+          action_meta.reward_amount * action_meta.creator_reward_weight,
+        )
+      : null;
+    const xp_points = action_meta.reward_amount - (creator_xp_points ?? 0);
+
     await models.XpLog.create(
       {
         event_name: action_meta.event_name,
-        event_created_at: action_meta.event_created_at,
+        event_created_at,
         user_id,
         xp_points,
         action_meta_id: action_meta.id,
@@ -82,6 +119,8 @@ async function recordXps(
       },
       { transaction },
     );
+
+    // accumulate xp points in user profiles
     await models.User.update(
       {
         xp_points: sequelize.literal(`COALESCE(xp_points, 0) + ${xp_points}`),
