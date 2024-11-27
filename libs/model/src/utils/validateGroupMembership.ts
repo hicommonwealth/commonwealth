@@ -1,5 +1,4 @@
 import {
-  AllowlistData,
   BalanceSourceType,
   Requirement,
   ThresholdData,
@@ -32,7 +31,7 @@ export function validateGroupMembership(
     isValid: true,
     messages: [],
   };
-  let allowListOverride = false;
+
   let numRequirementsMet = 0;
 
   requirements.forEach((requirement) => {
@@ -40,16 +39,6 @@ export function validateGroupMembership(
     switch (requirement.rule) {
       case 'threshold': {
         checkResult = _thresholdCheck(userAddress, requirement.data, balances);
-        break;
-      }
-      case 'allow': {
-        checkResult = _allowlistCheck(
-          userAddress,
-          requirement.data as AllowlistData,
-        );
-        if (checkResult.result) {
-          allowListOverride = true;
-        }
         break;
       }
       default:
@@ -71,11 +60,6 @@ export function validateGroupMembership(
       });
     }
   });
-
-  if (allowListOverride) {
-    // allow if address is whitelisted
-    return { isValid: true };
-  }
 
   if (numRequiredRequirements) {
     if (numRequirementsMet >= numRequiredRequirements) {
@@ -195,24 +179,6 @@ function _thresholdCheck(
       message: !result
         ? `User Balance of ${balance} below threshold ${thresholdData.threshold}`
         : 'pass',
-    };
-  } catch (error) {
-    return {
-      result: false,
-      message: `Error: ${error instanceof Error ? error.message : error}`,
-    };
-  }
-}
-
-function _allowlistCheck(
-  userAddress: string,
-  allowlistData: AllowlistData,
-): { result: boolean; message: string } {
-  try {
-    const result = allowlistData.allow.includes(userAddress);
-    return {
-      result,
-      message: !result ? 'User Address not in Allowlist' : 'pass',
     };
   } catch (error) {
     return {
