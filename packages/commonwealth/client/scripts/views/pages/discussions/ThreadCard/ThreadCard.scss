@@ -279,8 +279,14 @@
   display: flex !important;
   border: 1px solid $neutral-100 !important;
 
+  @include mediumToLarge {
+    width: 49% !important;
+  }
+
   @include smallInclusive {
     width: 100% !important;
+    max-height: 200px !important;
+    min-height: 200px !important;
   }
 
   .ThreadCard {
@@ -288,11 +294,82 @@
     overflow: hidden !important;
     padding: 10px !important;
     gap: 10px !important;
+
     .content-wrapper {
-      gap: 16px !important;
       max-width: 100%;
-      overflow: hidden !important;
+      gap: 16px !important;
       font-size: 14px !important;
+      overflow: hidden !important;
+      max-height: 250px;
+      min-height: 250px;
+      .content-body-wrapper {
+        min-height: 100% !important;
+        overflow: hidden;
+        position: relative;
+        gap: 2px !important;
+        .show-more-btn {
+          display: none;
+        }
+        .content-body.show-image {
+          display: flex;
+          align-items: flex-start;
+          justify-content: space-between;
+          .card-image-container {
+            max-width: 100px !important;
+            width: 100%;
+            object-fit: cover;
+            padding: 5px 0px;
+            img {
+              object-fit: contain;
+              max-width: 100%;
+              max-height: 100%;
+            }
+          }
+          .card-view {
+            display: flex;
+            .MarkdownFormattedText {
+              max-width: 100%;
+            }
+          }
+        }
+        .content-body {
+          .card-view {
+            width: 100%;
+            display: flex;
+            position: relative;
+            flex-direction: row;
+            padding: 5px 0px !important;
+            .card-image-container {
+              width: 100px !important;
+              height: 100px !important;
+              object-fit: cover;
+              margin-top: 20px;
+              img {
+                object-fit: contain;
+                max-width: 100%;
+                max-height: 100%;
+              }
+            }
+          }
+          .show-more-btn {
+            display: none;
+          }
+          .MarkdownFormattedText {
+            img {
+              display: none !important;
+            }
+            p {
+              font-size: 14px !important;
+            }
+          }
+        }
+        .content-title {
+          padding-right: 0 !important;
+          .Text {
+            font-size: 14px !important;
+          }
+        }
+      }
     }
   }
 
@@ -307,82 +384,5 @@
   }
   .publish-date {
     margin: 0 !important;
-  }
-  .ThreadCard .content-wrapper .content-body-wrapper .content-title .Text {
-    font-size: 14px !important;
-  }
-  .ThreadCard .content-wrapper .content-body-wrapper .content-title {
-    padding-right: 0 !important;
-  }
-  .ThreadCard .content-wrapper .content-body-wrapper {
-    gap: 2px !important;
-  }
-  .ThreadCard
-    .content-wrapper
-    .content-body-wrapper
-    .content-body
-    .MarkdownFormattedText
-    p {
-    font-size: 14px !important;
-  }
-  .ThreadCard
-    .content-wrapper
-    .content-body-wrapper
-    .content-body
-    .show-more-btn {
-    display: none;
-  }
-
-  .card-view {
-    max-width: 100%;
-  }
-  .ThreadCard
-    .content-wrapper
-    .content-body-wrapper
-    .content-body
-    .card-view
-    .card-image-container {
-    width: 100px !important;
-    height: 100px !important;
-    object-fit: cover;
-  }
-  .ThreadCard
-    .content-wrapper
-    .content-body-wrapper
-    .content-body
-    .card-view
-    .card-image-container
-    img {
-    object-fit: contain;
-    max-width: 100%;
-    max-height: 100%;
-  }
-
-  .card-view {
-    padding: 5px 0px !important;
-  }
-  .ThreadCard .content-wrapper .content-body-wrapper {
-    min-height: 100% !important;
-    overflow: hidden;
-    position: relative;
-  }
-  .ThreadCard .content-wrapper .content-body-wrapper .content-body .card-view {
-    display: flex;
-    flex-direction: row;
-    position: relative;
-  }
-  .ThreadCard
-    .content-wrapper
-    .content-body-wrapper
-    .content-body
-    .card-view
-    .card-image-container {
-    width: 70px;
-    height: 80px;
-    margin-top: 20px;
-  }
-
-  .ThreadCard {
-    height: 300px !important;
   }
 }

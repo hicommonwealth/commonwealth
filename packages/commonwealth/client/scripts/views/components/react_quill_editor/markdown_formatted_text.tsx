@@ -209,11 +209,6 @@ export const MarkdownFormattedText = ({
           >
             {finalDoc}
           </div>
-          {threadImage ? (
-            <div className="card-image-container">
-              <img src={threadImage} alt="Thread content" />
-            </div>
-          ) : null}
         </div>
       ) : (
         <div

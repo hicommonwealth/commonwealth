@@ -225,7 +225,9 @@ export const ThreadCard = ({
             </div>
             <CWText
               type="b1"
-              className={clsx('content-body', { 'show-image': showImage })}
+              className={clsx('content-body', {
+                'show-image': showImage || threadImage,
+              })}
             >
               <MarkdownViewerUsingQuillOrNewEditor
                 markdown={
@@ -243,6 +245,11 @@ export const ThreadCard = ({
                 threadImage={threadImage}
                 isCardView={isCardView}
               />
+              {threadImage && (
+                <div className="card-image-container">
+                  <img src={threadImage} alt="Thread content" />
+                </div>
+              )}
             </CWText>
           </div>
           {isTagsRowVisible && (
