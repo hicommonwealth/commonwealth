@@ -1,4 +1,5 @@
 import { SupportedCurrencies } from 'helpers/currency';
+import useBeforeUnload from 'hooks/useBeforeUnload';
 import React from 'react';
 import { CWText } from '../../components/component_kit/cw_text';
 import {
@@ -40,10 +41,12 @@ const TradeTokenModal = ({
     },
   );
 
+  useBeforeUnload(isActionPending);
+
   return (
     <CWModal
       open={isOpen}
-      onClose={() => onModalClose?.()}
+      onClose={() => !isActionPending && onModalClose?.()}
       size="medium"
       className="TradeTokenModal"
       content={
@@ -57,7 +60,7 @@ const TradeTokenModal = ({
                 )}
               </CWText>
             }
-            onModalClose={() => onModalClose?.()}
+            onModalClose={() => !isActionPending && onModalClose?.()}
           />
           <CWModalBody>
             <TradeTokenForm

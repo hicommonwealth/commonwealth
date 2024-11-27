@@ -78,11 +78,6 @@ export const ResumeContestManagerMetadata = {
   context: AuthContext,
 };
 
-export const PerformContestRollovers = {
-  input: z.object({ id: z.string() }),
-  output: z.object({}),
-};
-
 export const FarcasterCast = z.object({
   object: z.string(),
   hash: z.string(),

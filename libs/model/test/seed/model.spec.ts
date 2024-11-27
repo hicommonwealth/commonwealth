@@ -11,7 +11,7 @@ import {
 } from '../../src/tester';
 
 const generateSchemas = async () => {
-  const model = await bootstrap_testing(import.meta);
+  const model = await bootstrap_testing();
   const migration = await create_db_from_migrations('common_migrated_test');
 
   // TODO: resolve remaining conflicts!!!

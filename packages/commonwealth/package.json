@@ -217,6 +217,7 @@
     "node-jose": "^2.2.0",
     "node-object-hash": "^3.0.0",
     "numeral": "^2.0.6",
+    "octokit": "^4.0.2",
     "openai": "^4.0.0",
     "os-browserify": "^0.3.0",
     "parchment": "^1.1.4",
@@ -284,7 +285,6 @@
   "devDependencies": {
     "@ethersproject/keccak256": "5.7.0",
     "@types/express": "^4.17.21",
-    "@types/moment": "^2.13.0",
     "@types/passport": "^1.0.16",
     "@types/passport-auth-token": "^1.0.4",
     "@types/sinon": "^17.0.3",

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import 'components/component_kit/cw_radio_button.scss';
+import './cw_radio_button.scss';
 import { CWText } from './cw_text';
 import { getClasses } from './helpers';
 
@@ -49,7 +49,7 @@ export const CWRadioButton = (props: RadioButtonProps) => {
           checked,
           disabled,
         },
-        ComponentType.RadioButton
+        ComponentType.RadioButton,
       )}
     >
       <input className="radio-input" {...params} />

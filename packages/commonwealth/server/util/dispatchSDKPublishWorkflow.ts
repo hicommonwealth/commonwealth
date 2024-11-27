@@ -1,6 +1,7 @@
 import { logger } from '@hicommonwealth/core';
 import { readFileSync } from 'fs';
 import fetch from 'node-fetch';
+import { App } from 'octokit';
 import path, { dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { config } from '../config';
@@ -12,10 +13,32 @@ const externalApiConfig = JSON.parse(
   readFileSync(path.join(__dirname, '../external-api-config.json'), 'utf8'),
 );
 
-const API_CLIENT_GH_ORG = 'hicommonwealth';
-const API_CLIENT_GH_REPO = 'api-client';
-const API_CLIENT_PUBLISH_WORKFLOW_FILE_NAME = 'publish.yml';
+const owner = 'hicommonwealth';
+const repo = 'common-api-fern-config';
+const workflow_id = 'publish.yml';
 const API_CLIENT_NPM_NAME = '@commonxyz/api-client';
+
+export async function getOctokit() {
+  if (
+    !config.GITHUB.DISPATCHER_APP_ID ||
+    !config.GITHUB.DISPATCHER_APP_PRIVATE_KEY
+  ) {
+    log.error('Missing GitHub app credentials');
+    return;
+  }
+  const app = new App({
+    appId: config.GITHUB.DISPATCHER_APP_ID,
+    privateKey: config.GITHUB.DISPATCHER_APP_PRIVATE_KEY,
+  });
+
+  // https://docs.github.com/en/rest/apps/apps?#get-a-repository-installation-for-the-authenticated-app
+  const { data: installation } = await app.octokit.request(
+    `GET /repos/{owner}/{repo}/installation`,
+    { owner, repo },
+  );
+
+  return app.getInstallationOctokit(installation.id);
+}
 
 export async function dispatchSDKPublishWorkflow() {
   let currentVersionNPM: string | undefined = undefined;
@@ -50,33 +73,26 @@ export async function dispatchSDKPublishWorkflow() {
     return;
   }
 
-  const url =
-    `https://api.github.com/repos/${API_CLIENT_GH_ORG}/${API_CLIENT_GH_REPO}` +
-    `/actions/workflows/${API_CLIENT_PUBLISH_WORKFLOW_FILE_NAME}/dispatches`;
-
-  const data = {
-    ref: 'main',
-    inputs: {
-      version: externalApiConfig.version,
-    },
-  };
+  const url = `/repos/{owner}/{repo}/actions/workflows/{workflow_id}/dispatches`;
 
   try {
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        Accept: 'application/vnd.github+json',
-        Authorization: `Bearer ${config.GITHUB.API_CLIENT_REPO_TOKEN}`,
-        'X-GitHub-Api-Version': '2022-11-28',
-        'Content-Type': 'application/json',
+    const octokit = await getOctokit();
+    if (!octokit) return;
+    const res = await octokit.request(`POST ${url}`, {
+      owner,
+      repo,
+      workflow_id,
+      ref: 'main',
+      inputs: {
+        version: externalApiConfig.version,
       },
-      body: JSON.stringify(data),
+      headers: {
+        'X-GitHub-Api-Version': '2022-11-28',
+      },
     });
 
-    if (response.status !== 204) {
-      log.fatal(
-        `Failed to dispatch workflow: ${response.status} - ${response.statusText}`,
-      );
+    if (res.status !== 204) {
+      log.fatal(`Failed to dispatch workflow: ${res.status}`);
     } else {
       log.info('Workflow dispatched successfully');
     }

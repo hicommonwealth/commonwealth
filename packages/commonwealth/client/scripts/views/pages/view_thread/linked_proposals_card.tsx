@@ -4,7 +4,6 @@ import { filterLinks } from 'helpers/threads';
 import { ProposalType } from '@hicommonwealth/shared';
 import { getProposalUrlPath } from 'identifiers';
 import { LinkSource } from 'models/Thread';
-import 'pages/view_thread/linked_proposals_card.scss';
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link as ReactRouterLink } from 'react-router-dom';
 import app from 'state';
@@ -16,6 +15,7 @@ import { CWButton } from '../../components/component_kit/new_designs/CWButton';
 import CWCircleMultiplySpinner from '../../components/component_kit/new_designs/CWCircleMultiplySpinner';
 import { CWModal } from '../../components/component_kit/new_designs/CWModal';
 import { UpdateProposalStatusModal } from '../../modals/update_proposal_status_modal';
+import './linked_proposals_card.scss';
 
 type ThreadLinkProps = {
   threadChain: string;

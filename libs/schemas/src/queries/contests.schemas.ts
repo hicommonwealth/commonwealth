@@ -40,8 +40,8 @@ export const GetContest = {
 
 export const GetActiveContestManagers = {
   input: z.object({
-    community_id: z.string(),
-    topic_id: z.number(),
+    community_id: z.string().optional(),
+    topic_id: z.number().optional(),
   }),
   output: z.array(
     z.object({
@@ -49,6 +49,7 @@ export const GetActiveContestManagers = {
       url: z.string(),
       contest_address: z.string(),
       max_contest_id: z.number(),
+      end_time: z.coerce.date(),
       actions: z.array(ContestAction),
     }),
   ),

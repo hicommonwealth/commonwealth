@@ -25,19 +25,18 @@ export type TestServer = {
   models: DB;
   seeder: ModelSeeder;
   e2eTestEntities: E2E_TestEntities;
-  truncate: () => Promise<void>;
 };
 
 /**
  * Creates local test server connected to test db and seeder utils
  * @returns test server
  */
-export const testServer = async (meta: ImportMeta): Promise<TestServer> => {
+export const testServer = async (): Promise<TestServer> => {
   // bootstrap test adapters
   cache({
     adapter: new RedisCache('redis://localhost:6379'),
   });
-  const db = await tester.seedDb(meta);
+  const db = await tester.seedDb();
   const app = express();
   const { server, cacheDecorator } = await main(app, db, {
     port: 8081,
@@ -57,6 +56,5 @@ export const testServer = async (meta: ImportMeta): Promise<TestServer> => {
     models: db,
     seeder,
     e2eTestEntities,
-    truncate: () => tester.truncate_db(db),
   };
 };

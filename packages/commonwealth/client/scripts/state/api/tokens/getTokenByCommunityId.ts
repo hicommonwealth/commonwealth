@@ -19,7 +19,7 @@ const useGetTokenByCommunityId = ({
       with_stats,
     },
     {
-      staleTime: FETCH_TOKEN_STALE_TIME,
+      cacheTime: FETCH_TOKEN_STALE_TIME,
       enabled,
     },
   );

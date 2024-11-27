@@ -1,5 +1,4 @@
 import { TokenView } from '@hicommonwealth/schemas';
-import 'components/sidebar/CommunitySection/CommunitySection.scss';
 import { findDenominationString } from 'helpers/findDenomination';
 import { useFlag } from 'hooks/useFlag';
 import React from 'react';
@@ -28,6 +27,7 @@ import DirectoryMenuItem from '../DirectoryMenuItem';
 import { DiscussionSection } from '../discussion_section';
 import { ExternalLinksModule } from '../external_links_module';
 import { GovernanceSection } from '../governance_section';
+import './CommunitySection.scss';
 import { CommunitySectionSkeleton } from './CommunitySectionSkeleton';
 import { TokenTradeWidget } from './TokenTradeWidget';
 

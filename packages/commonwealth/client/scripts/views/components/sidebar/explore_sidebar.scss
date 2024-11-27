@@ -1,0 +1,46 @@
+@import '../../../styles/shared.scss';
+
+.ExploreCommunitiesSidebar {
+  display: flex;
+  flex-direction: column;
+
+  @include smallInclusive {
+    width: 100%;
+  }
+
+  .SidebarMenuItem.community {
+    align-items: center;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+
+    &:hover {
+      background-color: $neutral-100;
+    }
+
+    &.isSelected {
+      background-color: $purple-100;
+    }
+
+    .roles-and-star {
+      align-items: center;
+      display: flex;
+      gap: 8px;
+
+      .star-filled::after {
+        color: $yellow-400;
+        content: '\2605';
+        display: block;
+        font-size: 18px;
+      }
+
+      .star-empty::after {
+        color: $yellow-400;
+        content: '\2606';
+        display: block;
+        font-size: 18px;
+      }
+    }
+  }
+}

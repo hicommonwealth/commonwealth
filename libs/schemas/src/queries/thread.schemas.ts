@@ -239,6 +239,7 @@ export const GetThreads = {
     limit: z.number(),
     numVotingThreads: z.number(),
     threads: z.array(ThreadView),
+    threadCount: z.number().optional(),
   }),
 };
 

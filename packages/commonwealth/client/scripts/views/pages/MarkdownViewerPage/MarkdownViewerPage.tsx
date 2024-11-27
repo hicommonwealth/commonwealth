@@ -2,7 +2,7 @@ import React from 'react';
 import { useSearchParams } from 'react-router-dom';
 import MarkdownViewer from 'views/components/MarkdownViewer';
 import { QuillRenderer } from 'views/components/react_quill_editor/quill_renderer';
-import '../../../../styles/index.scss';
+import '../../../styles/index.scss';
 import './MarkdownViewerPage.scss';
 
 import supported from 'views/components/MarkdownEditor/markdown/supported.md?raw';
