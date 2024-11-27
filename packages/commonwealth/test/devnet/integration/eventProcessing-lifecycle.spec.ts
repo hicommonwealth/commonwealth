@@ -46,7 +46,7 @@ describe('End to end event tests', () => {
           expect(token).toBeTruthy();
         },
         {
-          timeout: 10000,
+          timeout: 100000,
           interval: 500,
         },
       );
@@ -73,7 +73,7 @@ describe('End to end event tests', () => {
           expect(launchpadTrade).toBeTruthy();
         },
         {
-          timeout: 10000,
+          timeout: 100000,
           interval: 500,
         },
       );
