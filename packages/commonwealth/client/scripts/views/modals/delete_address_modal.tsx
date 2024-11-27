@@ -18,7 +18,7 @@ import {
 import axios from 'axios';
 import { formatAddressShort } from 'client/scripts/helpers';
 import useUserStore from 'state/ui/user';
-import '../../../styles/modals/delete_address_modal.scss';
+import './delete_address_modal.scss';
 
 type DeleteAddressModalAttrs = {
   profile: NewProfile;

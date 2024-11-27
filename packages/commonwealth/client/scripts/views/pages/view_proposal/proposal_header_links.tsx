@@ -2,7 +2,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-import 'pages/view_proposal/proposal_header_links.scss';
+import './proposal_header_links.scss';
 
 import { getDecodedString, ProposalType } from '@hicommonwealth/shared';
 import { getProposalUrlPath } from 'identifiers';

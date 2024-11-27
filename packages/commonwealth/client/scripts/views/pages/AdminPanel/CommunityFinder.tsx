@@ -1,9 +1,9 @@
-import 'pages/AdminPanel.scss';
 import React, { useState } from 'react';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { useDebounce } from 'usehooks-ts';
 import { CWButton } from '../../components/component_kit/new_designs/CWButton';
 import { CWTextInput } from '../../components/component_kit/new_designs/CWTextInput';
+import './AdminPanel.scss';
 
 type CommunityFinderProps = {
   ctaLabel: string;

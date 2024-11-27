@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 
-import 'components/linked_addresses.scss';
+import './linked_addresses.scss';
 
 import { formatAddressShort } from 'client/scripts/helpers';
 import { useGetCommunityByIdQuery } from 'state/api/communities';

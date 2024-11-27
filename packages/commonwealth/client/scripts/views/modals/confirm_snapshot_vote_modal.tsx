@@ -6,7 +6,6 @@ import { BigNumber } from 'ethers';
 import type { SnapshotProposal, SnapshotSpace } from 'helpers/snapshot_utils';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import useUserStore from 'state/ui/user';
-import '../../../styles/modals/confirm_snapshot_vote_modal.scss';
 import { notifyError } from '../../controllers/app/notifications';
 import { castVote } from '../../helpers/snapshot_utils';
 import useAppStatus from '../../hooks/useAppStatus';
@@ -17,6 +16,7 @@ import {
   CWModalFooter,
   CWModalHeader,
 } from '../components/component_kit/new_designs/CWModal';
+import './confirm_snapshot_vote_modal.scss';
 
 type ConfirmSnapshotVoteModalProps = {
   id: string;

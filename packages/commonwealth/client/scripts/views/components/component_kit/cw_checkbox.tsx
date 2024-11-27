@@ -1,6 +1,6 @@
 import React, { ChangeEvent } from 'react';
 
-import 'components/component_kit/cw_checkbox.scss';
+import './cw_checkbox.scss';
 import { CWText } from './cw_text';
 import { getClasses } from './helpers';
 

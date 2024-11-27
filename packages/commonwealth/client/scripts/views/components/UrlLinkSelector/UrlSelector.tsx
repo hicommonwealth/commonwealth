@@ -1,9 +1,9 @@
 import React, { useCallback } from 'react';
 
-import 'components/UrlLinkSelector.scss';
 import { Link } from 'models/Thread';
 import app from 'state';
 import { QueryList } from 'views/components/component_kit/cw_query_list';
+import './UrlLinkSelector.scss';
 import { UrlSelectorItem } from './UrlSelectorItem';
 
 type UrlSelectorProps = {

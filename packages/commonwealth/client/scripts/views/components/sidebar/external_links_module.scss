@@ -1,0 +1,37 @@
+@import '../../../styles/shared.scss';
+
+.ExternalLinksModule {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 24px;
+  width: 80%;
+  gap: 16px;
+
+  .telegram-link {
+    color: $primary-500;
+    cursor: pointer;
+  }
+
+  .element-link {
+    color: $green-500;
+    cursor: pointer;
+  }
+
+  .discord-link {
+    color: $purple-300;
+    cursor: pointer;
+  }
+
+  .website-link {
+    color: $neutral-800;
+    cursor: pointer;
+  }
+
+  .github-link {
+    color: $neutral-800;
+    cursor: pointer;
+  }
+}

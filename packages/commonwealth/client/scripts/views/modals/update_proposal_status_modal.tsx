@@ -25,7 +25,6 @@ import {
   MixpanelCommunityInteractionEvent,
   MixpanelCommunityInteractionEventPayload,
 } from '../../../../shared/analytics/types';
-import '../../../styles/pages/UpdateProposalStatusModal.scss';
 import useAppStatus from '../../hooks/useAppStatus';
 import { ThreadStage } from '../../models/types';
 import { CosmosProposalSelector } from '../components/CosmosProposalSelector';
@@ -38,6 +37,7 @@ import {
   CWModalHeader,
 } from '../components/component_kit/new_designs/CWModal';
 import { SnapshotProposalSelector } from '../components/snapshot_proposal_selector';
+import './UpdateProposalStatusModal.scss';
 
 const getInitialSnapshots = (thread: Thread) =>
   filterLinks(thread.links, LinkSource.Snapshot).map((l) => ({
