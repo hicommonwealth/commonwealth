@@ -12,15 +12,10 @@ export const MobileInput = (props: MobileInputProps) => {
   return (
     <div className="MobileInput">
       <div className="InputBox">
-        <input
-          className=""
-          type="text"
-          onFocus={onFocus}
-          placeholder="Comment on thread here..."
-        />
+        <input type="text" placeholder="Comment on thread here..." />
 
         <div className="RightButton">
-          <CWIconButton iconName="arrowsOutSimple" />
+          <CWIconButton iconName="arrowsOutSimple" onClick={onFocus} />
         </div>
       </div>
     </div>
