@@ -43,7 +43,7 @@ describe('Cosmos Cache', () => {
   }
 
   beforeAll(async () => {
-    server = await testServer(import.meta);
+    server = await testServer();
     await cache().ready();
   });
 
