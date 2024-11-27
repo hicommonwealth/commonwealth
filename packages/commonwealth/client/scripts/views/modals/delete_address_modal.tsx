@@ -6,7 +6,6 @@ import {
   notifySuccess,
 } from '../../controllers/app/notifications';
 import AddressInfo from '../../models/AddressInfo';
-import NewProfile from '../../models/NewProfile';
 import { CWText } from '../components/component_kit/cw_text';
 import { CWButton } from '../components/component_kit/new_designs/CWButton';
 import {
@@ -21,7 +20,6 @@ import useUserStore from 'state/ui/user';
 import './delete_address_modal.scss';
 
 type DeleteAddressModalAttrs = {
-  profile: NewProfile;
   addresses: AddressInfo[];
   address: AddressInfo;
   chain: string;
@@ -33,7 +31,6 @@ export const DeleteAddressModal = ({
   addresses,
   chain,
   closeModal,
-  profile,
 }: DeleteAddressModalAttrs) => {
   const user = useUserStore();
 
@@ -97,8 +94,8 @@ export const DeleteAddressModal = ({
       <CWModalBody>
         <CWText>
           By removing this address you will be leaving the{' '}
-          {address.community.id}. Your contributions and commetns will remain.
-          Don't worry, you can rejoin anytime.
+          {address.community.id}. Your contributions and comments will remain.
+          Don&apos;t worry, you can rejoin anytime.
         </CWText>
       </CWModalBody>
       <CWModalFooter>

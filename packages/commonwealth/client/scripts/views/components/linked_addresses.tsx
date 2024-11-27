@@ -120,9 +120,12 @@ export const LinkedAddresses = (props: LinkedAddressesProps) => {
                 key={index}
                 profile={profile}
                 addressInfo={addr}
-                toggleRemoveModal={(val: boolean, address: AddressInfo) => {
+                toggleRemoveModal={(
+                  val: boolean,
+                  selectedAddress: AddressInfo,
+                ) => {
                   setIsRemoveModalOpen(val);
-                  setCurrentAddress(address);
+                  setCurrentAddress(selectedAddress);
                 }}
               />
             );
@@ -134,6 +137,7 @@ export const LinkedAddresses = (props: LinkedAddressesProps) => {
 
   const TableComponent = useMemo(() => {
     return <CWTable columnInfo={columnInfo} rowData={rowData} />;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [addresses]);
 
   return (
@@ -144,7 +148,6 @@ export const LinkedAddresses = (props: LinkedAddressesProps) => {
         content={
           currentAddress && (
             <DeleteAddressModal
-              profile={profile}
               addresses={addresses}
               address={currentAddress}
               chain={currentAddress?.community?.id}
