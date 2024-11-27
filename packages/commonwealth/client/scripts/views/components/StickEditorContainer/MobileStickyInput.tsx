@@ -40,7 +40,7 @@ export const MobileStickyInput = (props: CommentEditorProps) => {
   return createPortal(
     <>
       <div className="MobileStickyInput">
-        <MobileInput onFocus={handleFocused} />
+        <MobileInput {...props} onFocus={handleFocused} />
       </div>
     </>,
     parent,
