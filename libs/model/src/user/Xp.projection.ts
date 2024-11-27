@@ -28,6 +28,7 @@ async function getQuestActionMeta(
   event_payload: { community_id: string; created_at?: Date },
   event_name: keyof typeof events,
 ) {
+  // make sure quest was active when event was created
   const quest = await models.Quest.findOne({
     where: {
       community_id: event_payload.community_id,
@@ -61,8 +62,11 @@ async function recordXps(
     : null;
   const xp_points = action_meta.reward_amount - (creator_xp_points ?? 0);
 
-  // TODO: validate action participation limits by looking at the
-  // actions log
+  // TODO: validate action participation
+  // look at actions log and validate:
+  // - participation_limit
+  // - participation_period
+  // - participation_times_per_period
 
   await sequelize.transaction(async (transaction) => {
     await models.XpLog.create(
