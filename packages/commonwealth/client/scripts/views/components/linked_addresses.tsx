@@ -78,6 +78,21 @@ const AddressDetails = (props: AddressDetailsProps) => {
   );
 };
 
+const columnInfo: CWTableColumnInfo[] = [
+  {
+    key: 'address',
+    header: 'Address',
+    numeric: false,
+    sortable: false,
+  },
+  {
+    key: 'communities',
+    header: 'Communities',
+    numeric: false,
+    sortable: false,
+  },
+];
+
 export const LinkedAddresses = (props: LinkedAddressesProps) => {
   const [isRemoveModalOpen, setIsRemoveModalOpen] = useState(false);
   const [currentAddress, setCurrentAddress] = useState<AddressInfo | null>(
@@ -93,21 +108,6 @@ export const LinkedAddresses = (props: LinkedAddressesProps) => {
       return acc;
     }, {});
   }, [addresses]);
-
-  const columnInfo: CWTableColumnInfo[] = [
-    {
-      key: 'address',
-      header: 'Address',
-      numeric: false,
-      sortable: false,
-    },
-    {
-      key: 'communities',
-      header: 'Communities',
-      numeric: false,
-      sortable: false,
-    },
-  ];
 
   const rowData = Object.entries(groupedAddresses).map(
     ([address, communities]) => ({
