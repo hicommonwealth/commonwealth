@@ -3,9 +3,11 @@
 .ProfileActivityRow {
   position: relative;
   border-bottom: 1px solid #dddddd;
-  padding: 5px 0;
+  padding: 20px 0;
   min-width: 100%;
   max-width: 0;
+  display: flex;
+  flex-direction: column;
 
   .actions {
     display: flex;
@@ -62,11 +64,19 @@
   .heading {
     display: flex;
     margin-bottom: 10px;
+    width: 100%;
+    max-width: fit-content;
 
     .Text {
-      font-weight: 500;
       font-size: 20px;
       line-height: 20px;
+      word-spacing: 0.1cap;
+
+      @include extraSmall {
+        font-size: 14px !important;
+        line-height: 14px !important;
+        word-spacing: 0cap !important;
+      }
     }
     a {
       font-weight: 500;
@@ -85,12 +95,16 @@
 
   .title {
     display: flex;
-    .Text {
-      display: flex;
-      font-weight: 400;
-      font-size: 18px;
-      line-height: 18px;
+    display: flex;
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 18px;
+    @include extraSmall {
+      font-size: 14px !important;
+      line-height: 14px !important;
+      word-spacing: 0cap !important;
     }
+
     a {
       color: $neutral-800 !important;
     }
@@ -117,6 +131,10 @@
       line-height: 21px !important;
       font-weight: 400;
       font-family: $font-family-neue-haas-unica;
+      @include extraSmall {
+        font-size: 14px !important;
+        line-height: 14px !important;
+      }
     }
   }
 }

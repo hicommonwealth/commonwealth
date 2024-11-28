@@ -116,9 +116,8 @@ export function mapProfileThread(thread): Thread {
     created_at: thread.createdAt ?? '',
     updated_at: thread.updatedAt ?? thread.createdAt ?? '',
     topic: {
-      // Note: You might want to adjust topic details based on your actual data structure
       community_id: thread.communityId,
-      id: 4422, // Extracted from canvasSignedData
+      id: thread?.topic?.id,
       name: thread.slug,
       description: '',
       created_at: '',
