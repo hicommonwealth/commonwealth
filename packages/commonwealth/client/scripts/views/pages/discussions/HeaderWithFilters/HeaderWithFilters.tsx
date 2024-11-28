@@ -261,7 +261,7 @@ export const HeaderWithFilters = ({
             <CWButton
               buttonType="primary"
               buttonHeight="sm"
-              label="Create thread"
+              label="Create"
               iconLeft="plus"
               onClick={() => {
                 navigate(
