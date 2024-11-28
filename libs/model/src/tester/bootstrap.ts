@@ -219,7 +219,7 @@ async function _bootstrap_testing(): Promise<DB> {
         }),
       );
       await syncDb(db);
-      await truncate_db(db);
+      //await truncate_db(db); // this is causing deadlocks
       console.log(`Bootstrapped [${db_name}]`);
     } catch (e) {
       console.error(`Error bootstrapping: ${db_name}`, e);
