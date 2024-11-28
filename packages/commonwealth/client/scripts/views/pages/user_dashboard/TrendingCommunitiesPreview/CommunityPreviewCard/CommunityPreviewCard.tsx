@@ -1,10 +1,13 @@
 import { ChainBase } from '@hicommonwealth/shared';
+import useDeferredConditionTriggerCallback from 'client/scripts/hooks/useDeferredConditionTriggerCallback';
 import useUserStore from 'client/scripts/state/ui/user';
 import Permissions from 'client/scripts/utils/Permissions';
 import useJoinCommunity from 'client/scripts/views/components/SublayoutHeader/useJoinCommunity';
 import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/CWButton';
+import { AuthModal } from 'client/scripts/views/modals/AuthModal';
 import clsx from 'clsx';
 import React from 'react';
+import { smartTrim } from 'shared/utils';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import { CWCard } from '../../../../components/component_kit/cw_card';
@@ -45,31 +48,21 @@ const CommunityPreviewCard = ({
   isExploreMode,
 }: CommunityPreviewCardProps) => {
   const user = useUserStore();
+  const [isAuthModalOpen, setIsAuthModalOpen] = React.useState(false);
   const userAddress = user.addresses?.[0];
   const isJoined = Permissions.isCommunityMember(community?.id);
   const { linkSpecificAddressToSpecificCommunity } = useJoinCommunity();
 
-  const handleJoinButtonClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
+  const { register, trigger } = useDeferredConditionTriggerCallback({
+    shouldRunTrigger: user.isLoggedIn,
+  });
 
-    void (async () => {
-      try {
-        if (community) {
-          await linkSpecificAddressToSpecificCommunity({
-            address: userAddress?.address,
-            community: {
-              id: community.id,
-              base: community.base,
-              iconUrl: community.icon_url,
-              name: community.name,
-            },
-          });
-        }
-      } catch (error) {
-        console.error('Failed to join community:', error);
-      }
-    })();
+  const openAuthModalOrTriggerCallback = () => {
+    if (user.isLoggedIn) {
+      trigger();
+    } else {
+      setIsAuthModalOpen(!user.isLoggedIn);
+    }
   };
 
   return (
@@ -99,7 +92,7 @@ const CommunityPreviewCard = ({
             <div className="community-name">
               {community?.name && (
                 <CWText type="h4" fontWeight="medium">
-                  {community?.name}
+                  {smartTrim(community?.name, 13)}
                 </CWText>
               )}
 
@@ -127,13 +120,41 @@ const CommunityPreviewCard = ({
                   iconLeft: 'checkCircleFilled',
                   iconLeftWeight: 'fill',
                 })}
-                disabled={isJoined}
-                onClick={handleJoinButtonClick}
+                disabled={false}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+
+                  register({
+                    cb: (communityData: typeof community) => {
+                      if (communityData && userAddress?.address) {
+                        linkSpecificAddressToSpecificCommunity({
+                          address: userAddress.address,
+                          community: {
+                            id: communityData.id,
+                            base: communityData.base,
+                            iconUrl: communityData.icon_url,
+                            name: communityData.name,
+                          },
+                        });
+                      }
+                    },
+                    args: community,
+                  });
+                  openAuthModalOrTriggerCallback();
+                }}
               />
             </div>
           </>
         )}
       </CWCard>
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => {
+          setIsAuthModalOpen(false);
+        }}
+        showWalletsFor={ChainBase.Ethereum}
+      />
     </>
   );
 };

@@ -58,6 +58,10 @@
     gap: 2px;
     align-items: center;
     color: $neutral-500;
+
+    .Tag.new {
+      margin-left: 6px !important;
+    }
   }
 
   .community-name {
