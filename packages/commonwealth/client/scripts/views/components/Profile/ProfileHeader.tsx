@@ -13,6 +13,7 @@ import useUserStore from 'state/ui/user';
 import { MarkdownViewerWithFallback } from 'views/components/MarkdownViewerWithFallback/MarkdownViewerWithFallback';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import type NewProfile from '../../../models/NewProfile';
+import { SharePopover } from '../SharePopover';
 import { CWText } from '../component_kit/cw_text';
 import { SocialAccounts } from '../social_accounts';
 
@@ -66,7 +67,10 @@ const ProfileHeader = ({ profile, isOwner }: ProfileHeaderProps) => {
         <CWText type="h3" className={name ? 'name hasMargin' : 'name'}>
           {name || DEFAULT_NAME}
         </CWText>
-        <SocialAccounts profile={profile} />
+        <div className="icon-container">
+          <SocialAccounts profile={profile} />
+          <SharePopover linkToShare={window.location.href} />
+        </div>
         {hasBio() && (
           <div>
             <CWText type="h4">Bio</CWText>

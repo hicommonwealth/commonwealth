@@ -37,6 +37,11 @@
     .bio {
       margin-top: 16px;
     }
+    .icon-container {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+    }
 
     .buttons {
       display: flex;
