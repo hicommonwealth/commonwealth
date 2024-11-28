@@ -246,22 +246,27 @@ export function mapFk<Source extends State, Target extends State>(
 /**
  * Creates composite FK constraints (not supported by sequelize)
  */
-export const createFk = (
+export const createFk = async (
   sequelize: Sequelize,
   { name, source, fk, target, pk, rules }: FkMap,
-) =>
-  sequelize?.query(`
-    ALTER TABLE "${source}" ADD CONSTRAINT "${name}"
+) => {
+  try {
+    await sequelize?.query(`
+    ALTER TABLE IF EXISTS "${source}" ADD CONSTRAINT "${name}"
     FOREIGN KEY (${fk.join(',')}) REFERENCES "${target}"(${pk.join(',')})
     ON UPDATE ${rules?.onUpdate ?? 'NO ACTION'} ON DELETE ${
       rules?.onDelete ?? 'NO ACTION'
     };`);
+  } catch (e) {
+    console.error('<<<Error creating Fk>>>', e);
+  }
+};
 
 /**
  * Drops composite FK constraints (not supported by sequelize)
  */
-export const dropFk = (sequelize: Sequelize, { source, name }: FkMap) =>
-  sequelize?.query(
+export const dropFk = async (sequelize: Sequelize, { source, name }: FkMap) =>
+  await sequelize?.query(
     `ALTER TABLE IF EXISTS "${source}" DROP CONSTRAINT IF EXISTS "${name}";`,
   );
 

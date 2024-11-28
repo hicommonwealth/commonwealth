@@ -1,3 +1,4 @@
+import { delay } from '@hicommonwealth/shared';
 import path from 'path';
 import { QueryTypes, Sequelize } from 'sequelize';
 import { SequelizeStorage, Umzug } from 'umzug';
@@ -71,20 +72,25 @@ const migrate_db = async (sequelize: Sequelize) => {
 };
 
 /**
- * Truncates all tables
+ * Truncates all sequelize tables.
+ * Use with caution since this can cause deadlocks.
  * @param db database models
  */
 const truncate_db = async (db?: DB) => {
   if (!db) return;
-  try {
-    const tables = Object.values(db.sequelize.models)
-      .map((model) => `"${model.tableName}"`)
-      .join(',');
-    await db.sequelize.query(
-      `TRUNCATE TABLE ${tables} RESTART IDENTITY CASCADE;`,
-    );
-  } catch {
-    // ignore failed truncate
+  for (let i = 1; i <= 10; i++) {
+    try {
+      const tables = Object.values(db.sequelize.models)
+        .map((model) => `"${model.tableName}"`)
+        .join(',');
+      await db.sequelize.query(
+        `TRUNCATE TABLE ${tables} RESTART IDENTITY CASCADE;`,
+      );
+      break;
+    } catch (e) {
+      console.error(`<<<Failed to truncate db (${i})>>>`, e);
+      await delay(100);
+    }
   }
 };
 
@@ -219,10 +225,10 @@ async function _bootstrap_testing(): Promise<DB> {
         }),
       );
       await syncDb(db);
-      //await truncate_db(db); // this is causing deadlocks
+      await truncate_db(db); // this is causing deadlocks
       console.log(`Bootstrapped [${db_name}]`);
     } catch (e) {
-      console.error(`Error bootstrapping: ${db_name}`, e);
+      console.error(`<<<Error Bootstrapping>>>: ${db_name}`, e);
       throw e;
     }
   }

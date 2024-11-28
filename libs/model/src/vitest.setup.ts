@@ -1,5 +1,6 @@
 import path from 'path';
 import { beforeAll } from 'vitest';
+import { bootstrap_testing } from './tester';
 
 beforeAll(async ({ name }) => {
   const lcsuite = name.includes('-lifecycle');
@@ -16,4 +17,7 @@ beforeAll(async ({ name }) => {
     const { sequelize: vite_sequelize } = connect_sequelize();
     console.log(`LC-SUITE: ${suite_name} => ${vite_sequelize.config.database}`);
   }
+
+  // single point of test bootstrapping
+  await bootstrap_testing();
 });
