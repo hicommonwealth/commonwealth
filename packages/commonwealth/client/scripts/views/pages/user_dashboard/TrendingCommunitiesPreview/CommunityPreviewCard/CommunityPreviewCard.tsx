@@ -15,21 +15,17 @@ import { CWCommunityAvatar } from '../../../../components/component_kit/cw_commu
 import { CWText } from '../../../../components/component_kit/cw_text';
 import './CommunityPreviewCard.scss';
 type CommunityPreviewCardProps = {
-  community?: {
-    name: string;
-    icon_url: string;
-    id: string;
-    base: ChainBase;
-  };
   monthlyThreadCount?: number;
   isCommunityMember?: boolean;
   hasNewContent?: boolean;
   onClick?: () => any;
-  isExploreMode?: boolean;
 } & (
-  | { isExploreMode: true }
   | {
-      isExploreMode?: false;
+      isExploreMode: true;
+      community?: never;
+    }
+  | {
+      isExploreMode?: never;
       community: NonNullable<{
         name: string;
         icon_url: string;
@@ -92,7 +88,7 @@ const CommunityPreviewCard = ({
             <div className="community-name">
               {community?.name && (
                 <CWText type="h4" fontWeight="medium">
-                  {smartTrim(community?.name, 13)}
+                  {smartTrim(community?.name, 10)}
                 </CWText>
               )}
 
@@ -120,7 +116,7 @@ const CommunityPreviewCard = ({
                   iconLeft: 'checkCircleFilled',
                   iconLeftWeight: 'fill',
                 })}
-                disabled={false}
+                disabled={isJoined}
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
