@@ -18,6 +18,12 @@ beforeAll(async ({ name }) => {
     console.log(`LC-SUITE: ${suite_name} => ${vite_sequelize.config.database}`);
   }
 
-  // single point of test bootstrapping
-  await bootstrap_testing();
+  // Single point of test bootstrapping!
+  // Only when running tests in libs/model and legacy commonwealth
+  if (
+    ['@hicommonwealth/model', 'commonwealth'].includes(
+      process.env.npm_package_name ?? '',
+    )
+  )
+    await bootstrap_testing();
 });
