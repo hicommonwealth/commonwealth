@@ -20,7 +20,7 @@ export default defineConfig({
       threads: { minThreads: 1, maxThreads: 1 },
       forks: { minForks: 1, maxForks: 8 },
     },
-    fileParallelism: process.env.npm_package_name === '@hicommonwealth/model',
+    fileParallelism: process.env.npm_package_name !== 'commonwealth',
     testTimeout: 60_000,
 
     // Disables parallel lifecycle tests
