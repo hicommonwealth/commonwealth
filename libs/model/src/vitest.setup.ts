@@ -26,4 +26,4 @@ beforeAll(async ({ name }) => {
     )
   )
     await bootstrap_testing();
-});
+}, 20_000);

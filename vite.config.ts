@@ -18,10 +18,10 @@ export default defineConfig({
     ],
     poolOptions: {
       threads: { minThreads: 1, maxThreads: 1 },
-      forks: { minForks: 1, maxForks: 8 },
+      forks: { minForks: 1, maxForks: 5 },
     },
     fileParallelism: process.env.npm_package_name !== 'commonwealth',
-    testTimeout: 60_000,
+    testTimeout: 20_000,
 
     // Disables parallel lifecycle tests
     // fileParallelism: false,
