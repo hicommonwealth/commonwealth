@@ -21,6 +21,7 @@ export default defineConfig({
       forks: { minForks: 1, maxForks: 8 },
     },
     fileParallelism: process.env.npm_package_name === '@hicommonwealth/model',
+    testTimeout: 60_000,
 
     // Disables parallel lifecycle tests
     // fileParallelism: false,

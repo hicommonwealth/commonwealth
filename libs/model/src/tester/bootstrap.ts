@@ -208,9 +208,13 @@ export const get_info_schema = async (
 };
 
 let db: DB | undefined = undefined;
-let bootstrapLock: Promise<DB> | undefined = undefined;
 
-async function _bootstrap_testing(): Promise<DB> {
+/**
+ * Bootstraps testing
+ * Creates a clean model if it doesn't exist
+ * @returns synchronized and truncated sequelize db instance
+ */
+export async function bootstrap_testing(): Promise<DB> {
   if (!db) {
     const db_name = config.DB.NAME;
     try {
@@ -225,7 +229,7 @@ async function _bootstrap_testing(): Promise<DB> {
         }),
       );
       await syncDb(db);
-      await truncate_db(db); // this is causing deadlocks
+      await truncate_db(db); // this might be causing deadlocks
       console.log(`Bootstrapped [${db_name}]`);
     } catch (e) {
       console.error(`<<<Error Bootstrapping>>>: ${db_name}`, e);
@@ -234,21 +238,3 @@ async function _bootstrap_testing(): Promise<DB> {
   }
   return db;
 }
-
-/**
- * Bootstraps testing, creating/migrating a fresh instance if it doesn't exist.
- * @meta import meta of calling test
- * @param truncate when true, truncates all tables in model
- * @returns synchronized sequelize db instance
- */
-export const bootstrap_testing = async (): Promise<DB> => {
-  if (bootstrapLock) {
-    return await bootstrapLock;
-  }
-  bootstrapLock = _bootstrap_testing();
-  try {
-    return await bootstrapLock;
-  } finally {
-    bootstrapLock = undefined;
-  }
-};
