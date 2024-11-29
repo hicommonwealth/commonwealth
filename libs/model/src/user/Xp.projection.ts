@@ -106,8 +106,9 @@ async function recordXps(
       : null;
     const xp_points = action_meta.reward_amount - (creator_xp_points ?? 0);
 
-    await models.XpLog.create(
-      {
+    const [, created] = await models.XpLog.findOrCreate({
+      where: { user_id, event_name: action_meta.event_name, event_created_at },
+      defaults: {
         event_name: action_meta.event_name,
         event_created_at,
         user_id,
@@ -117,31 +118,33 @@ async function recordXps(
         creator_xp_points,
         created_at: new Date(),
       },
-      { transaction },
-    );
+      transaction,
+    });
 
     // accumulate xp points in user profiles
-    await models.User.update(
-      {
-        xp_points: sequelize.literal(`COALESCE(xp_points, 0) + ${xp_points}`),
-      },
-      {
-        where: { id: user_id },
-        transaction,
-      },
-    );
-    if (creator_xp_points) {
+    if (created) {
       await models.User.update(
         {
-          xp_points: sequelize.literal(
-            `COALESCE(xp_points, 0) + ${creator_xp_points}`,
-          ),
+          xp_points: sequelize.literal(`COALESCE(xp_points, 0) + ${xp_points}`),
         },
         {
-          where: { id: creator_user_id },
+          where: { id: user_id },
           transaction,
         },
       );
+      if (creator_xp_points) {
+        await models.User.update(
+          {
+            xp_points: sequelize.literal(
+              `COALESCE(xp_points, 0) + ${creator_xp_points}`,
+            ),
+          },
+          {
+            where: { id: creator_user_id },
+            transaction,
+          },
+        );
+      }
     }
   });
 }
