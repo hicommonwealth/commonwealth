@@ -34,13 +34,10 @@ export const buildAssociations = (db: DB) => {
     })
     .withMany(db.XpLog, {
       foreignKey: 'user_id',
-      onUpdate: 'NO ACTION',
       onDelete: 'CASCADE',
     })
     .withMany(db.XpLog, {
       foreignKey: 'creator_user_id',
-      onUpdate: 'NO ACTION',
-      onDelete: 'NO ACTION',
     });
 
   db.Quest.withMany(db.QuestActionMeta, {
@@ -53,8 +50,6 @@ export const buildAssociations = (db: DB) => {
     onDelete: 'CASCADE',
   }).withMany(db.XpLog, {
     foreignKey: 'action_meta_id',
-    onUpdate: 'NO ACTION',
-    onDelete: 'NO ACTION',
   });
 
   db.Address.withMany(db.Thread, {
@@ -132,10 +127,7 @@ export const buildAssociations = (db: DB) => {
       onUpdate: 'CASCADE',
       onDelete: 'CASCADE',
     })
-    .withMany(db.ContestManager, {
-      onUpdate: 'NO ACTION',
-      onDelete: 'NO ACTION',
-    });
+    .withMany(db.ContestManager, {});
 
   db.Thread.withMany(db.Poll)
     .withMany(db.ContestAction, {
@@ -246,6 +238,5 @@ export const buildAssociations = (db: DB) => {
 
   db.Token.withMany(db.LaunchpadTrade, {
     foreignKey: 'token_address',
-    onDelete: 'NO ACTION',
   });
 };

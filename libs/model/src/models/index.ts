@@ -12,16 +12,9 @@ export const syncDb = async (db: DB, log = false) => {
   const fks = Object.keys(Factories).flatMap(
     (k) => db[k as keyof typeof Factories]._fks,
   );
-  for (const fk of fks) {
-    await dropFk(db.sequelize, fk);
-  }
-  await db.sequelize.sync({
-    force: true,
-    logging: log ? console.log : false,
-  });
-  for (const fk of fks) {
-    await createFk(db.sequelize, fk);
-  }
+  await db.sequelize.query(fks.map(dropFk).join('\n'));
+  await db.sequelize.sync({ force: true, logging: log ? console.log : false });
+  await db.sequelize.query(fks.map(createFk).join('\n'));
 };
 
 /**

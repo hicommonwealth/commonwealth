@@ -31,7 +31,7 @@ const verify_db = async (name: string): Promise<void> => {
       console.log('Created new test db:', name);
     }
   } catch (error) {
-    console.error(`Error verifying db [${name}]:`, error);
+    console.error(`<<<Error verifying ${name}>>>`, error);
     // ignore verification errors
     // throw error;
   } finally {
@@ -88,7 +88,7 @@ const truncate_db = async (db?: DB) => {
       );
       break;
     } catch (e) {
-      console.error(`<<<Failed to truncate db (${i})>>>`, e);
+      console.error(`<<<Error truncating tables (${i})>>>`, e);
       await delay(100);
     }
   }
@@ -229,10 +229,10 @@ export async function bootstrap_testing(): Promise<DB> {
         }),
       );
       await syncDb(db);
-      await truncate_db(db); // this might be causing deadlocks
+      await truncate_db(db);
       console.log(`Bootstrapped [${db_name}]`);
     } catch (e) {
-      console.error(`<<<Error Bootstrapping>>>: ${db_name}`, e);
+      console.error(`<<<Error bootstrapping ${db_name}>>>`, e);
       throw e;
     }
   }

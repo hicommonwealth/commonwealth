@@ -3,12 +3,7 @@ import {
   MAX_TRUNCATED_CONTENT_LENGTH,
   safeTruncateBody,
 } from '@hicommonwealth/shared';
-import {
-  Model,
-  Sequelize,
-  type ModelStatic,
-  type SyncOptions,
-} from 'sequelize';
+import { Model, type ModelStatic, type SyncOptions } from 'sequelize';
 import type {
   Associable,
   FkMap,
@@ -246,29 +241,17 @@ export function mapFk<Source extends State, Target extends State>(
 /**
  * Creates composite FK constraints (not supported by sequelize)
  */
-export const createFk = async (
-  sequelize: Sequelize,
-  { name, source, fk, target, pk, rules }: FkMap,
-) => {
-  try {
-    await sequelize?.query(`
-    ALTER TABLE IF EXISTS "${source}" ADD CONSTRAINT "${name}"
-    FOREIGN KEY (${fk.join(',')}) REFERENCES "${target}"(${pk.join(',')})
-    ON UPDATE ${rules?.onUpdate ?? 'NO ACTION'} ON DELETE ${
-      rules?.onDelete ?? 'NO ACTION'
-    };`);
-  } catch (e) {
-    console.error('<<<Error creating Fk>>>', e);
-  }
-};
+export const createFk = ({ name, source, fk, target, pk, rules }: FkMap) => `
+ALTER TABLE IF EXISTS "${source}" ADD CONSTRAINT "${name}"
+FOREIGN KEY (${fk.join(',')}) REFERENCES "${target}"(${pk.join(',')})
+ON UPDATE ${rules?.onUpdate ?? 'NO ACTION'} ON DELETE ${rules?.onDelete ?? 'NO ACTION'};
+`;
 
 /**
  * Drops composite FK constraints (not supported by sequelize)
  */
-export const dropFk = async (sequelize: Sequelize, { source, name }: FkMap) =>
-  await sequelize?.query(
-    `ALTER TABLE IF EXISTS "${source}" DROP CONSTRAINT IF EXISTS "${name}";`,
-  );
+export const dropFk = ({ source, name }: FkMap) =>
+  `ALTER TABLE IF EXISTS "${source}" DROP CONSTRAINT IF EXISTS "${name}";`;
 
 /**
  * Model sync hooks that can be used to inspect sequelize generated scripts
