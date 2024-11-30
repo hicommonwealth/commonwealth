@@ -29,12 +29,15 @@ async function getUserId(payload: { address_id: number }) {
   return address.user_id!;
 }
 
-async function getQuestActionMeta(
+/*
+ * Finds all active quest action metas for a given event
+ */
+async function getQuestActionMetas(
   event_payload: { community_id: string; created_at?: Date },
   event_name: keyof typeof events,
 ) {
   // make sure quest was active when event was created
-  const quest = await models.Quest.findOne({
+  const quests = await models.Quest.findAll({
     where: {
       community_id: event_payload.community_id,
       start_date: { [Op.lte]: event_payload.created_at },
@@ -44,106 +47,109 @@ async function getQuestActionMeta(
       { required: true, model: models.QuestActionMeta, as: 'action_metas' },
     ],
   });
-  if (!quest || !quest.action_metas) return;
-
-  const action_metas = quest.get({ plain: true }).action_metas!;
-  const action_meta = action_metas.find((a) => a.event_name === event_name);
-  if (action_meta)
-    return {
-      ...action_meta,
-      event_created_at: event_payload.created_at!,
-    };
+  return quests.flatMap((q) =>
+    q
+      .get({ plain: true })
+      .action_metas!.find((a) => a.event_name === event_name),
+  );
 }
 
 async function recordXps(
   user_id: number,
-  action_meta: z.infer<typeof schemas.QuestActionMeta> & {
-    event_created_at: Date;
-  },
+  event_created_at: Date,
+  action_metas: Array<z.infer<typeof schemas.QuestActionMeta> | undefined>,
   creator_user_id?: number,
 ) {
-  const event_created_at = action_meta.event_created_at;
-
   await sequelize.transaction(async (transaction) => {
-    // get logged actions for this user and action meta
-    const log = await models.XpLog.findAll({
-      where: {
-        user_id,
-        event_name: action_meta.event_name,
-        action_meta_id: action_meta.id,
-      },
-    });
+    for (const action_meta of action_metas) {
+      if (!action_meta) continue;
+      // get logged actions for this user and action meta
+      const log = await models.XpLog.findAll({
+        where: {
+          user_id,
+          event_name: action_meta.event_name,
+          action_meta_id: action_meta.id,
+        },
+      });
 
-    // validate action participation
-    if (log.length > 0) {
-      if (
-        (action_meta.participation_limit ??
-          QuestParticipationLimit.OncePerQuest) ===
-        QuestParticipationLimit.OncePerQuest
-      )
-        // when participation_limit is once_per_quest, ignore after the first action
-        return;
-
-      // participation_limit is once_per_period
-      const tpp = action_meta.participation_times_per_period ?? 1;
-      const period =
-        action_meta.participation_period === QuestParticipationPeriod.Monthly
-          ? 'month'
-          : action_meta.participation_period === QuestParticipationPeriod.Weekly
-            ? 'week'
-            : 'day';
-      const actions_in_period = log.filter((l) =>
-        isWithinPeriod(event_created_at, l.created_at, period),
-      );
-      if (actions_in_period.length >= tpp) return;
-    }
-
-    // calculate xp points and log it
-    const creator_xp_points = creator_user_id
-      ? Math.round(
-          action_meta.reward_amount * action_meta.creator_reward_weight,
+      // validate action participation
+      if (log.length > 0) {
+        if (
+          (action_meta.participation_limit ??
+            QuestParticipationLimit.OncePerQuest) ===
+          QuestParticipationLimit.OncePerQuest
         )
-      : null;
-    const xp_points = action_meta.reward_amount - (creator_xp_points ?? 0);
+          // when participation_limit is once_per_quest, ignore after the first action
+          continue;
 
-    const [, created] = await models.XpLog.findOrCreate({
-      where: { user_id, event_name: action_meta.event_name, event_created_at },
-      defaults: {
-        event_name: action_meta.event_name,
-        event_created_at,
-        user_id,
-        xp_points,
-        action_meta_id: action_meta.id,
-        creator_user_id,
-        creator_xp_points,
-        created_at: new Date(),
-      },
-      transaction,
-    });
+        // participation_limit is once_per_period
+        const tpp = action_meta.participation_times_per_period ?? 1;
+        const period =
+          action_meta.participation_period === QuestParticipationPeriod.Monthly
+            ? 'month'
+            : action_meta.participation_period ===
+                QuestParticipationPeriod.Weekly
+              ? 'week'
+              : 'day';
+        const actions_in_period = log.filter((l) =>
+          isWithinPeriod(event_created_at, l.created_at, period),
+        );
+        if (actions_in_period.length >= tpp) continue;
+      }
 
-    // accumulate xp points in user profiles
-    if (created) {
-      await models.User.update(
-        {
-          xp_points: sequelize.literal(`COALESCE(xp_points, 0) + ${xp_points}`),
+      // calculate xp points and log it
+      const creator_xp_points = creator_user_id
+        ? Math.round(
+            action_meta.reward_amount * action_meta.creator_reward_weight,
+          )
+        : null;
+      const xp_points = action_meta.reward_amount - (creator_xp_points ?? 0);
+
+      const [, created] = await models.XpLog.findOrCreate({
+        where: {
+          user_id,
+          event_name: action_meta.event_name,
+          event_created_at,
         },
-        {
-          where: { id: user_id },
-          transaction,
+        defaults: {
+          event_name: action_meta.event_name,
+          event_created_at,
+          user_id,
+          xp_points,
+          action_meta_id: action_meta.id,
+          creator_user_id,
+          creator_xp_points,
+          created_at: new Date(),
         },
-      );
-      if (creator_xp_points) {
+        transaction,
+      });
+
+      // accumulate xp points in user profiles
+      if (created) {
         await models.User.update(
           {
             xp_points: sequelize.literal(
-              `COALESCE(xp_points, 0) + ${creator_xp_points}`,
+              `COALESCE(xp_points, 0) + ${xp_points}`,
             ),
           },
           {
-            where: { id: creator_user_id },
+            where: { id: user_id },
             transaction,
           },
         );
+        if (creator_xp_points) {
+          await models.User.update(
+            {
+              xp_points: sequelize.literal(
+                `COALESCE(xp_points, 0) + ${creator_xp_points}`,
+              ),
+            },
+            {
+              where: { id: creator_user_id },
+              transaction,
+            },
+          );
+        }
       }
     }
   });
@@ -155,13 +161,19 @@ export function Xp(): Projection<typeof inputs> {
     body: {
       ThreadCreated: async ({ payload }) => {
         const user_id = await getUserId(payload);
-        const action_meta = await getQuestActionMeta(payload, 'ThreadCreated');
-        if (action_meta) await recordXps(user_id, action_meta);
+        const action_metas = await getQuestActionMetas(
+          payload,
+          'ThreadCreated',
+        );
+        await recordXps(user_id, payload.created_at!, action_metas);
       },
       CommentCreated: async ({ payload }) => {
         const user_id = await getUserId(payload);
-        const action_meta = await getQuestActionMeta(payload, 'CommentCreated');
-        if (action_meta) await recordXps(user_id, action_meta);
+        const action_metas = await getQuestActionMetas(
+          payload,
+          'CommentCreated',
+        );
+        await recordXps(user_id, payload.created_at!, action_metas);
       },
       CommentUpvoted: async ({ payload }) => {
         const user_id = await getUserId(payload);
@@ -181,15 +193,19 @@ export function Xp(): Projection<typeof inputs> {
             },
           ],
         });
-        const action_meta = await getQuestActionMeta(
+        const action_metas = await getQuestActionMetas(
           {
             community_id: comment!.Thread!.community_id,
             created_at: payload.created_at,
           },
           'CommentUpvoted',
         );
-        if (action_meta)
-          await recordXps(user_id, action_meta, comment!.Address!.user_id!);
+        await recordXps(
+          user_id,
+          payload.created_at!,
+          action_metas,
+          comment!.Address!.user_id!,
+        );
       },
     },
   };
