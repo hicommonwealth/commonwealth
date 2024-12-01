@@ -1,4 +1,4 @@
-import { commonProtocol } from '@hicommonwealth/shared';
+import { commonProtocol } from '@hicommonwealth/evm-protocols';
 import { useQuery } from '@tanstack/react-query';
 import LaunchpadBondingCurve from 'helpers/ContractHelpers/Launchpad';
 
@@ -34,6 +34,16 @@ const tokenEthExchangeRate = async ({
   );
 };
 
+export const getTokenEthExchangeRateQueryKey = (
+  params: TokenEthExchangeRateProps,
+) => [
+  params.ethChainId,
+  params.chainRpc,
+  params.tokenAddress,
+  params.tokenAmount,
+  params.mode,
+];
+
 const useTokenEthExchangeRateQuery = ({
   ethChainId,
   chainRpc,
@@ -43,7 +53,13 @@ const useTokenEthExchangeRateQuery = ({
   enabled = true,
 }: TokenEthExchangeRateProps & { enabled?: boolean }) => {
   return useQuery({
-    queryKey: [ethChainId, chainRpc, tokenAddress, tokenAmount, mode],
+    queryKey: getTokenEthExchangeRateQueryKey({
+      chainRpc,
+      ethChainId,
+      mode,
+      tokenAddress,
+      tokenAmount,
+    }),
     queryFn: () =>
       tokenEthExchangeRate({
         ethChainId,

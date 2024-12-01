@@ -23,7 +23,8 @@ const {
   CF_ZONE_ID,
   CF_API_KEY,
   LIBP2P_PRIVATE_KEY,
-  API_CLIENT_REPO_TOKEN,
+  DISPATCHER_APP_ID,
+  DISPATCHER_APP_PRIVATE_KEY,
 } = process.env;
 
 const NO_PRERENDER = _NO_PRERENDER;
@@ -99,7 +100,10 @@ export const config = configure(
     LIBP2P_PRIVATE_KEY,
     SNAPSHOT_WEBHOOK_SECRET,
     GITHUB: {
-      API_CLIENT_REPO_TOKEN,
+      DISPATCHER_APP_ID: DISPATCHER_APP_ID
+        ? parseInt(DISPATCHER_APP_ID)
+        : undefined,
+      DISPATCHER_APP_PRIVATE_KEY,
     },
   },
   z.object({
@@ -170,12 +174,17 @@ export const config = configure(
         'SNAPSHOT_WEBHOOK_SECRET is required in public environments',
       ),
     GITHUB: z.object({
-      API_CLIENT_REPO_TOKEN: z
+      DISPATCHER_APP_ID: z
+        .number()
+        .optional()
+        .refine((data) => !(model_config.APP_ENV === 'production' && !data))
+        .describe('The ID of the Common Workflow Dispatcher GitHub app'),
+      DISPATCHER_APP_PRIVATE_KEY: z
         .string()
         .optional()
         .refine((data) => !(model_config.APP_ENV === 'production' && !data))
         .describe(
-          'A token used to authenticate with the GitHub API. Primarily used to trigger workflows',
+          'The private key of the Common Workflow Dispatcher GitHub app',
         ),
     }),
   }),

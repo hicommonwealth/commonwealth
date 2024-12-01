@@ -24,7 +24,7 @@ import { User } from '../components/user/user';
 
 import { buildUpdateThreadInput } from 'client/scripts/state/api/threads/editThread';
 import useUserStore from 'state/ui/user';
-import '../../../styles/modals/edit_collaborators_modal.scss';
+import './edit_collaborators_modal.scss';
 
 type EditCollaboratorsModalProps = {
   onModalClose: () => void;

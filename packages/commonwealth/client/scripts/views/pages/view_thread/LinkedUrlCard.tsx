@@ -1,5 +1,4 @@
 import { filterLinks } from 'helpers/threads';
-import 'pages/view_thread/linked_threads_card.scss';
 import React, { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
@@ -9,6 +8,7 @@ import { CWContentPageCard } from '../../components/component_kit/CWContentPageC
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWButton } from '../../components/component_kit/new_designs/CWButton';
 import { LinkedUrlModal } from '../../modals/linked_url_modal';
+import './linked_threads_card.scss';
 
 type LinkedUrlCardProps = {
   thread: Thread;

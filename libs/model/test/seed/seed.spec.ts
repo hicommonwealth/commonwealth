@@ -47,6 +47,7 @@ async function testSeed<T extends schemas.Aggregates>(
 
 describe('Seed functions', () => {
   let shouldExit = true;
+
   afterAll(async () => {
     await dispose()();
   });

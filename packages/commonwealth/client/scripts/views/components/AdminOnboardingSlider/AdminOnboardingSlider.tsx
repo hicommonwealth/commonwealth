@@ -1,4 +1,5 @@
-import { ChainBase, commonProtocol } from '@hicommonwealth/shared';
+import { commonProtocol } from '@hicommonwealth/evm-protocols';
+import { ChainBase } from '@hicommonwealth/shared';
 import shape1Url from 'assets/img/shapes/shape1.svg';
 import shape3Url from 'assets/img/shapes/shape3.svg';
 import shape4Url from 'assets/img/shapes/shape4.svg';

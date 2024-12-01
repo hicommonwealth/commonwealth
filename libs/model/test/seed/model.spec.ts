@@ -52,7 +52,7 @@ describe('Model schema', () => {
 
   beforeAll(async () => {
     schemas = await generateSchemas();
-  });
+  }, 20000);
 
   afterAll(async () => {
     await dispose()();

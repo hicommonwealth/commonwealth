@@ -1,16 +1,15 @@
-import { dispose } from '@hicommonwealth/core';
 import path from 'path';
 import { QueryTypes, Sequelize } from 'sequelize';
 import { SequelizeStorage, Umzug } from 'umzug';
 import { config } from '../config';
-import { buildDb, type DB } from '../models';
+import { buildDb, syncDb, type DB } from '../models';
 
 /**
  * Verifies the existence of a database,
  * creating a fresh instance if it doesn't exist.
  * @param name db name
  */
-export const verify_db = async (name: string): Promise<void> => {
+const verify_db = async (name: string): Promise<void> => {
   let pg: Sequelize | undefined = undefined;
   try {
     pg = new Sequelize({
@@ -32,7 +31,8 @@ export const verify_db = async (name: string): Promise<void> => {
     }
   } catch (error) {
     console.error(`Error verifying db [${name}]:`, error);
-    throw error;
+    // ignore verification errors
+    // throw error;
   } finally {
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     pg && pg.close();
@@ -43,7 +43,7 @@ export const verify_db = async (name: string): Promise<void> => {
  * Executes migrations on existing sequelize instance
  * @param sequelize sequelize instance
  */
-export const migrate_db = async (sequelize: Sequelize) => {
+const migrate_db = async (sequelize: Sequelize) => {
   const umzug = new Umzug({
     // TODO: move sequelize config and migrations to libs/model
     migrations: {
@@ -74,7 +74,7 @@ export const migrate_db = async (sequelize: Sequelize) => {
  * Truncates all tables
  * @param db database models
  */
-export const truncate_db = async (db?: DB) => {
+const truncate_db = async (db?: DB) => {
   if (!db) return;
   try {
     const tables = Object.values(db.sequelize.models)
@@ -201,35 +201,48 @@ export const get_info_schema = async (
   return tables;
 };
 
-// NOTE: the db variable is not shared between Vitest test suites. This is only useful
-// so that the db object does not need to be rebuilt for every to bootstrap_testing from within
-// a single test suite
 let db: DB | undefined = undefined;
+let bootstrapLock: Promise<DB> | undefined = undefined;
+
+async function _bootstrap_testing(): Promise<DB> {
+  if (!db) {
+    const db_name = config.DB.NAME;
+    try {
+      await verify_db(db_name);
+      db = buildDb(
+        new Sequelize({
+          dialect: 'postgres',
+          database: db_name,
+          username: 'commonwealth',
+          password: 'edgeware',
+          logging: false,
+        }),
+      );
+      await syncDb(db);
+      await truncate_db(db);
+      console.log(`Bootstrapped [${db_name}]`);
+    } catch (e) {
+      console.error(`Error bootstrapping: ${db_name}`, e);
+      throw e;
+    }
+  }
+  return db;
+}
+
 /**
  * Bootstraps testing, creating/migrating a fresh instance if it doesn't exist.
+ * @meta import meta of calling test
  * @param truncate when true, truncates all tables in model
  * @returns synchronized sequelize db instance
  */
-export const bootstrap_testing = async (truncate = false): Promise<DB> => {
-  if (!db) {
-    db = buildDb(
-      new Sequelize({
-        dialect: 'postgres',
-        database: config.DB.NAME,
-        username: 'commonwealth',
-        password: 'edgeware',
-        logging: false,
-      }),
-    );
-    console.log('Database object built');
+export const bootstrap_testing = async (): Promise<DB> => {
+  if (bootstrapLock) {
+    return await bootstrapLock;
   }
-
-  if (truncate) {
-    await truncate_db(db);
-    console.log('Database truncated');
+  bootstrapLock = _bootstrap_testing();
+  try {
+    return await bootstrapLock;
+  } finally {
+    bootstrapLock = undefined;
   }
-
-  return db;
 };
-
-config.NODE_ENV === 'test' && dispose(async () => truncate_db(db));

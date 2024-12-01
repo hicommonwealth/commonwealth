@@ -1,5 +1,4 @@
 import { ExtendedCommunity } from '@hicommonwealth/schemas';
-import 'Layout.scss';
 import { deinitChainOrCommunity, loadCommunityChainInfo } from 'helpers/chain';
 import withRouter, { useCommonNavigate } from 'navigation/helpers';
 import React, { ReactNode, Suspense, useEffect, useState } from 'react';
@@ -19,6 +18,7 @@ import useAppStatus from '../hooks/useAppStatus';
 import useNecessaryEffect from '../hooks/useNecessaryEffect';
 import { useGetCommunityByIdQuery } from '../state/api/communities';
 import { useUpdateUserActiveCommunityMutation } from '../state/api/user';
+import './Layout.scss';
 import SubLayout from './Sublayout';
 import MetaTags from './components/MetaTags';
 import { CWEmptyState } from './components/component_kit/cw_empty_state';

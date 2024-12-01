@@ -1,9 +1,10 @@
 import { AppError, ServerError } from '@hicommonwealth/core';
 import {
-  communityNamespaceCreatedEventSignature,
-  models,
-} from '@hicommonwealth/model';
-import { BalanceSourceType, commonProtocol } from '@hicommonwealth/shared';
+  EvmEventSignatures,
+  commonProtocol,
+} from '@hicommonwealth/evm-protocols';
+import { models } from '@hicommonwealth/model';
+import { BalanceSourceType } from '@hicommonwealth/shared';
 import Web3 from 'web3';
 import { CommunityAttributes } from '../../models';
 import { equalEvmAddresses } from '../../utils';
@@ -82,7 +83,10 @@ export const validateNamespace = async (
   // only emitted in token launch flows (launchpad)
   const communityNamespaceCreatedLog = txReceipt.logs.find((l) => {
     if (l.topics && l.topics.length > 0) {
-      return l.topics[0].toString() === communityNamespaceCreatedEventSignature;
+      return (
+        l.topics[0].toString() ===
+        EvmEventSignatures.NamespaceFactory.CommunityNamespaceCreated
+      );
     }
     return false;
   });
