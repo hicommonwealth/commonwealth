@@ -25,8 +25,8 @@ const InviteLinkModal = ({
   // TODO: replace with actual invite link from backend in upcoming PR
   const inviteLink = 'https://commonwealth.im/~/invite/774037=89defcb8';
 
-  const handleCopy = async () => {
-    await saveToClipboard(inviteLink, true);
+  const handleCopy = () => {
+    saveToClipboard(inviteLink, true).catch(console.error);
   };
 
   const shareOptions = getShareOptions(isInsideCommunity, inviteLink);

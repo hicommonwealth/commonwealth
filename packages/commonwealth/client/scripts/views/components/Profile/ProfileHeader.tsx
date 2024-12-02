@@ -29,8 +29,6 @@ const ProfileHeader = ({ profile, isOwner }: ProfileHeaderProps) => {
   const { setIsInviteLinkModalOpen } = useInviteLinkModal();
   const referralsEnabled = useFlag('referrals');
 
-  console.log('user', user);
-
   if (!profile) return;
   const { bio, name } = profile;
 
