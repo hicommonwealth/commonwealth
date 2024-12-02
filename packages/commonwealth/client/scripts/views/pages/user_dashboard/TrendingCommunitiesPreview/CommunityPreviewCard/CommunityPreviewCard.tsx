@@ -132,7 +132,7 @@ const CommunityPreviewCard = ({
                             iconUrl: communityData.icon_url,
                             name: communityData.name,
                           },
-                        });
+                        }).catch(console.error);
                       }
                     },
                     args: community,
