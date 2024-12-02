@@ -22,6 +22,7 @@ import { SharePopoverOld } from 'views/components/share_popover_old';
 import { capDecimals } from 'views/modals/ManageCommunityStakeModal/utils';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 
+import { ContestType } from '../../types';
 import { copyFarcasterContestFrameUrl, isContestActive } from '../../utils';
 import ContestAlert from '../ContestAlert';
 import ContestCountdown from '../ContestCountdown';
@@ -142,7 +143,11 @@ const ContestCard = ({
   };
 
   const handleEditContest = () => {
-    navigate(`/manage/contests/${address}`);
+    navigate(
+      `/manage/contests/${address}${
+        isFarcaster ? `?type=${ContestType.Farcaster}` : ''
+      }`,
+    );
   };
 
   const handleLeaderboardClick = () => {
@@ -168,12 +173,7 @@ const ContestCard = ({
   const hasVotes = score.length > 0;
   const hasLessVotesThanPrizes = (payoutStructure || []).length > score.length;
 
-  // TODO remove this flag during the bacakend
-  // implementation in https://github.com/hicommonwealth/commonwealth/issues/9922
-  const showNoUpvotesWarningFlag = false;
-
   const showNoUpvotesWarning =
-    showNoUpvotesWarningFlag &&
     isActive &&
     isAdmin &&
     isLessThan24HoursLeft &&
@@ -233,8 +233,8 @@ const ContestCard = ({
                     !hasVotes
                       ? "The prize amount will be returned to Common and then to admin's wallet if there are no upvotes"
                       : hasLessVotesThanPrizes
-                        ? `You have ${payoutStructure?.length} prizes but only ${score.length} thread upvotes. 
-                        Upvote more threads to avoid return of funds. 
+                        ? `You have ${payoutStructure?.length} prizes but only ${score.length} thread upvotes.
+                        Upvote more threads to avoid return of funds.
                         The prize amount will be returned to Common and then to admin's wallet if there are no upvotes`
                         : ''
                   }

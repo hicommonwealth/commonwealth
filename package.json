@@ -6,7 +6,7 @@
     "url": "git+https://github.com/hicommonwealth/commonwealth.git"
   },
   "type": "module",
-  "packageManager": "pnpm@9.10.0",
+  "packageManager": "pnpm@9.14.2",
   "scripts": {
     "build": "chmod u+x scripts/build.sh && ./scripts/build.sh",
     "docker-build-commonwealth": "docker build -f Dockerfile.commonwealth_base --tag commonwealth:latest .",
@@ -71,7 +71,6 @@
     "@types/jsonwebtoken": "^8.3.9",
     "@types/lodash": "^4.14.123",
     "@types/marked": "^4.0.1",
-    "@types/moment": "^2.13.0",
     "@types/morgan": "^1.9.4",
     "@types/node": "^20.11.25",
     "@types/node-fetch": "2.x",
@@ -147,6 +146,6 @@
     "esbuild-darwin-64": "^0.15.12"
   },
   "engines": {
-    "node": "20.x"
+    "node": "22.x"
   }
 }

@@ -1,0 +1,12 @@
+@import '../../styles/shared.scss';
+
+.WebhookSettingsModal {
+  .checkbox-section {
+    display: flex;
+    flex-direction: column;
+
+    .checkbox {
+      margin-top: 4px;
+    }
+  }
+}

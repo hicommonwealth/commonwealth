@@ -1,9 +1,9 @@
 import { renderMultilineText } from 'helpers';
 import { useCommonNavigate } from 'navigation/helpers';
 /* eslint-disable max-len */
-import 'pages/privacy_and_terms.scss';
 import React from 'react';
 import { CWText } from '../components/component_kit/cw_text';
+import './privacy_and_terms.scss';
 
 const TOS = `Terms of Services
 PLEASE READ THE BELOW GOVERNANCE PLATFORM SERVICES AGREEMENT VERY CAREFULLY. THE BELOW GOVERNANCE PLATFORM SERVICES AGREEMENT IS A LEGALLY BINDING CONTRACT BETWEEN YOU AND COW MOON WEALTH SOFTWARE INC. THAT SETS FORTH AND DETERMINES, AMONG OTHER THINGS:

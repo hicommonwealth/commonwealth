@@ -24,7 +24,7 @@ export const buildDeleteThreadReactionInput = async ({
   reactionId,
 }: DeleteReactionProps) => {
   const canvasSignedData = await signDeleteThreadReaction(address, {
-    thread_id: threadMsgId,
+    thread_id: threadMsgId ?? null,
   });
 
   return {

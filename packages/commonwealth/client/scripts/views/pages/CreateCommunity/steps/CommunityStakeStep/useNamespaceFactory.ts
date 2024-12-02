@@ -1,4 +1,4 @@
-import { commonProtocol } from '@hicommonwealth/shared';
+import { commonProtocol } from '@hicommonwealth/evm-protocols';
 import NamespaceFactory from 'helpers/ContractHelpers/NamespaceFactory';
 import { useFetchNodesQuery } from 'state/api/nodes';
 

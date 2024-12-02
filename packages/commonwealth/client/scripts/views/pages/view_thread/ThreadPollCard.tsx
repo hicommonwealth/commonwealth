@@ -1,6 +1,5 @@
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import moment from 'moment';
-import 'pages/view_thread/poll_cards.scss';
 import React, { useState } from 'react';
 import { useDeletePollMutation, useVotePollMutation } from 'state/api/polls';
 import useUserStore from 'state/ui/user';
@@ -10,6 +9,7 @@ import { PollCard } from '../../components/Polls';
 import { CWModal } from '../../components/component_kit/new_designs/CWModal';
 import { OffchainVotingModal } from '../../modals/offchain_voting_modal';
 import { getPollTimestamp } from './helpers';
+import './poll_cards.scss';
 
 type ThreadPollCardProps = {
   poll: Poll;
@@ -83,11 +83,9 @@ export const ThreadPollCard = ({
 
             try {
               await votePoll({
-                pollId: votedPoll.id,
-                communityId: votedPoll.communityId,
-                authorCommunityId: user.activeAccount?.community?.id || '',
-                address: user.activeAccount?.address || '',
-                selectedOption,
+                thread_id: votedPoll.threadId,
+                poll_id: votedPoll.id,
+                option: selectedOption,
               });
             } catch (err) {
               console.error(err);

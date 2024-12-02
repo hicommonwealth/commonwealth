@@ -1,5 +1,6 @@
 import { Actor } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
+import { ChainBase } from '@hicommonwealth/shared';
 import { z } from 'zod';
 import { seed, seedRecord } from '../../src/tester';
 import { getSignersInfo } from './canvas-signers';
@@ -46,7 +47,26 @@ export async function seedCommunity({
   const users = await seedRecord('User', roles, (role) => ({
     profile: { name: role },
     isAdmin: role === 'admin',
+    is_welcome_onboard_flow_complete: false,
   }));
+
+  // seed ethereum base community
+  await seed('Community', {
+    chain_node_id: node!.id!,
+    base: ChainBase.Ethereum,
+    active: true,
+    lifetime_thread_count: 0,
+    profile_count: 1,
+    Addresses: roles.map((role, index) => {
+      return {
+        address: signerInfo[index].address,
+        user_id: users[role].id,
+        role: role === 'admin' ? 'admin' : 'member',
+        is_banned: role === 'banned',
+        verified: new Date(),
+      };
+    }),
+  });
 
   const [community] = await seed('Community', {
     chain_node_id: node!.id!,

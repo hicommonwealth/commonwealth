@@ -1,6 +1,6 @@
 import { Command, InvalidState } from '@hicommonwealth/core';
+import { commonProtocol } from '@hicommonwealth/evm-protocols';
 import * as schemas from '@hicommonwealth/schemas';
-import { commonProtocol } from '@hicommonwealth/shared';
 import z from 'zod';
 import { models } from '../database';
 import { mustExist } from '../middleware/guards';
@@ -9,7 +9,7 @@ import { getLaunchpadTradeTransaction } from '../services/commonProtocol/launchp
 const launchpadEthChainIds = Object.values(
   commonProtocol.factoryContracts,
 ).reduce<number[]>((acc, contract) => {
-  if (contract.launchpad) {
+  if ('launchpad' in contract) {
     acc.push(contract.chainId);
   }
   return acc;
@@ -66,7 +66,10 @@ export function CreateLaunchpadTrade(): Command<
         is_buy: result.parsedArgs.isBuy,
         community_token_amount: result.parsedArgs.communityTokenAmount,
         price:
-          result.parsedArgs.communityTokenAmount / result.parsedArgs.ethAmount,
+          Number(
+            (result.parsedArgs.ethAmount * BigInt(1e18)) /
+              result.parsedArgs.communityTokenAmount,
+          ) / 1e18,
         floating_supply: result.parsedArgs.floatingSupply,
         timestamp: Number(result.block.timestamp),
       });

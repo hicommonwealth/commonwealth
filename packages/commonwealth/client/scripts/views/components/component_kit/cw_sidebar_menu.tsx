@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { isMobile } from 'react-device-detect';
 
-import 'components/component_kit/cw_sidebar_menu.scss';
+import './cw_sidebar_menu.scss';
 
 import useBrowserWindow from 'client/scripts/hooks/useBrowserWindow';
 import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';

@@ -306,7 +306,7 @@ export const QuickTokenLaunchForm = ({
   };
 
   const handleSubmit = (tokenInfo: FormSubmitValues) => {
-    if (tokenIdeas.length > 0) {
+    if (tokenIdeas.length > 1) {
       // if there are multiple drafts, then confirm from user if they want to proceed with
       // active draft and discard the others
       triggerDiscardExtraTokenDraftsConfirmation(() =>
