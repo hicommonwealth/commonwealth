@@ -12,10 +12,17 @@ import {
 import { tester } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import { BalanceType, safeTruncateBody } from '@hicommonwealth/shared';
-import chai, { expect } from 'chai';
+import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import sinon from 'sinon';
-import { afterAll, afterEach, beforeAll, describe, test } from 'vitest';
+import {
+  afterAll,
+  afterEach,
+  beforeAll,
+  describe,
+  expect,
+  test,
+  vi,
+} from 'vitest';
 import z from 'zod';
 import { processUserMentioned } from '../../../server/workers/knock/eventHandlers/userMentioned';
 import { getThreadUrl } from '../../../server/workers/knock/util';
@@ -26,7 +33,6 @@ describe('userMentioned Event Handler', () => {
   let community: z.infer<typeof schemas.Community> | undefined;
   let user, author: z.infer<typeof schemas.User> | undefined;
   let thread: z.infer<typeof schemas.Thread> | undefined;
-  let sandbox: sinon.SinonSandbox;
 
   beforeAll(async () => {
     const [chainNode] = await tester.seed(
@@ -73,10 +79,7 @@ describe('userMentioned Event Handler', () => {
   afterEach(() => {
     const provider = notificationsProvider();
     disposeAdapter(provider.name);
-
-    if (sandbox) {
-      sandbox.restore();
-    }
+    vi.restoreAllMocks();
   });
 
   afterAll(async () => {
@@ -94,9 +97,8 @@ describe('userMentioned Event Handler', () => {
   });
 
   test('should execute the triggerWorkflow function with the appropriate data', async () => {
-    sandbox = sinon.createSandbox();
     const provider = notificationsProvider({
-      adapter: SpyNotificationsProvider(sandbox),
+      adapter: SpyNotificationsProvider(),
     });
 
     const res = await processUserMentioned({
@@ -140,9 +142,8 @@ describe('userMentioned Event Handler', () => {
   });
 
   test('should throw if triggerWorkflow fails', async () => {
-    sandbox = sinon.createSandbox();
     notificationsProvider({
-      adapter: ThrowingSpyNotificationsProvider(sandbox),
+      adapter: ThrowingSpyNotificationsProvider(),
     });
 
     await expect(
