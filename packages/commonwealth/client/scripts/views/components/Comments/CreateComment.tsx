@@ -26,6 +26,7 @@ type CreateCommentProps = {
   canComment: boolean;
   tooltipText?: string;
   isReplying?: boolean;
+  replyingToAuthor?: string;
 };
 
 export const CreateComment = ({
@@ -36,6 +37,7 @@ export const CreateComment = ({
   canComment,
   tooltipText = '',
   isReplying,
+  replyingToAuthor,
 }: CreateCommentProps) => {
   const { saveDraft, restoreDraft, clearDraft } = useDraft<DeltaStatic>(
     !parentCommentId
@@ -164,6 +166,7 @@ export const CreateComment = ({
       editorValue={editorValue}
       tooltipText={tooltipText}
       isReplying={isReplying}
+      replyingToAuthor={replyingToAuthor}
     />
   ) : (
     <ArchiveMsg archivedAt={rootThread.archivedAt!} />

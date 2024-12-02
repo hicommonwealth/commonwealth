@@ -30,7 +30,11 @@ import ExternalLink from 'views/components/ExternalLink';
 import JoinCommunityBanner from 'views/components/JoinCommunityBanner';
 import MarkdownViewerUsingQuillOrNewEditor from 'views/components/MarkdownViewerWithFallback';
 import { checkIsTopicInContest } from 'views/components/NewThreadFormLegacy/helpers';
-import { StickCommentProvider } from 'views/components/StickEditorContainer/CommentStateContext';
+import {
+  StickCommentProvider,
+  StickyCommentElementSelector,
+  WithDefaultStickyComment,
+} from 'views/components/StickEditorContainer/CommentStateContext';
 import useJoinCommunity from 'views/components/SublayoutHeader/useJoinCommunity';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { PageNotFound } from 'views/pages/404';
@@ -750,22 +754,26 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                 disabledActionsTooltipText={disabledActionsTooltipText}
               />
 
-              {stickyEditor &&
-                thread &&
-                !thread.readOnly &&
-                !fromDiscordBot &&
-                !isGloballyEditing &&
-                user.isLoggedIn && (
-                  <CreateComment
-                    rootThread={thread}
-                    canComment={canComment}
-                    tooltipText={
-                      typeof disabledActionsTooltipText === 'function'
-                        ? disabledActionsTooltipText?.('comment')
-                        : disabledActionsTooltipText
-                    }
-                  />
-                )}
+              <WithDefaultStickyComment>
+                {stickyEditor &&
+                  thread &&
+                  !thread.readOnly &&
+                  !fromDiscordBot &&
+                  !isGloballyEditing &&
+                  user.isLoggedIn && (
+                    <CreateComment
+                      rootThread={thread}
+                      canComment={canComment}
+                      tooltipText={
+                        typeof disabledActionsTooltipText === 'function'
+                          ? disabledActionsTooltipText?.('comment')
+                          : disabledActionsTooltipText
+                      }
+                    />
+                  )}
+              </WithDefaultStickyComment>
+
+              <StickyCommentElementSelector />
             </>
           }
           editingDisabled={isTopicInContest}

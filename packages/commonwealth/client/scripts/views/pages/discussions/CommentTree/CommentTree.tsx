@@ -16,6 +16,7 @@ import {
 } from 'state/api/comments';
 import useUserStore from 'state/ui/user';
 import { CreateComment } from 'views/components/Comments/CreateComment';
+import { WithActiveStickyComment } from 'views/components/StickEditorContainer/CommentStateContext';
 import {
   deserializeDelta,
   serializeDelta,
@@ -533,18 +534,22 @@ export const CommentTree = ({
               />
             </div>
             {isReplying && parentCommentId === comment.id && (
-              <CreateComment
-                handleIsReplying={handleIsReplying}
-                parentCommentId={parentCommentId}
-                rootThread={thread}
-                canComment={canComment}
-                isReplying={isReplying}
-                tooltipText={
-                  !canComment && typeof disabledActionsTooltipText === 'string'
-                    ? disabledActionsTooltipText
-                    : ''
-                }
-              />
+              <WithActiveStickyComment>
+                <CreateComment
+                  handleIsReplying={handleIsReplying}
+                  parentCommentId={parentCommentId}
+                  rootThread={thread}
+                  canComment={canComment}
+                  isReplying={isReplying}
+                  replyingToAuthor={comment.profile.name}
+                  tooltipText={
+                    !canComment &&
+                    typeof disabledActionsTooltipText === 'string'
+                      ? disabledActionsTooltipText
+                      : ''
+                  }
+                />
+              </WithActiveStickyComment>
             )}
           </div>
         );

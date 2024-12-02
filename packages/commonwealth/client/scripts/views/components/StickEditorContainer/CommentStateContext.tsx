@@ -98,15 +98,15 @@ export const WithActiveStickyComment = memo((props: Props) => {
  * fall back to the default element (the main comment), or if nothing is being
  * used just return nothing.
  */
-export const StickyCommentElement = memo(() => {
+export const StickyCommentElementSelector = memo(() => {
   const activator = useActivatorContext();
 
   if (activator.activeElement) {
-    return activator.activeElement;
+    return <>{activator.activeElement}</>;
   }
 
   if (activator.defaultElement) {
-    return activator.defaultElement;
+    return <>{activator.defaultElement}</>;
   }
 
   return null;

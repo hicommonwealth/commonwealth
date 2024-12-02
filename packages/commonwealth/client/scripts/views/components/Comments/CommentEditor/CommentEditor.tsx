@@ -24,6 +24,7 @@ export type CommentEditorProps = {
   shouldFocus?: boolean;
   tooltipText?: string;
   isReplying?: boolean;
+  replyingToAuthor?: string;
 };
 
 export const CommentEditor = ({

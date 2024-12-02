@@ -11,7 +11,13 @@ type MobileInputProps = CommentEditorProps & {
 };
 
 export const MobileInput = (props: MobileInputProps) => {
-  const { onFocus, setContentDelta, handleSubmitComment } = props;
+  const {
+    onFocus,
+    setContentDelta,
+    handleSubmitComment,
+    isReplying,
+    replyingToAuthor,
+  } = props;
   const [value, setValue] = useState('');
   const user = useUserStore();
 
@@ -44,6 +50,10 @@ export const MobileInput = (props: MobileInputProps) => {
     return undefined;
   }, [user]);
 
+  const placeholder = isReplying
+    ? `Replying to ${replyingToAuthor} ...`
+    : `Comment on thread here...`;
+
   return (
     <div className="MobileInput">
       {avatarURL && (
@@ -55,7 +65,7 @@ export const MobileInput = (props: MobileInputProps) => {
       <div className="InputBox">
         <input
           type="text"
-          placeholder="Comment on thread here..."
+          placeholder={placeholder}
           onKeyDown={handleKeyDown}
           onChange={handleChange}
           value={value}
