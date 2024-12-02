@@ -18,7 +18,9 @@ import type {
   SidebarSectionAttrs,
   ToggleTree,
 } from './types';
-
+interface AppSectionProps {
+  isContestAvailable: boolean;
+}
 const resetSidebarState = () => {
   if (isWindowSmallInclusive(window.innerWidth)) {
     sidebarStore.getState().setMenu({ name: 'default', isVisible: false });
@@ -50,7 +52,7 @@ function setGovernanceToggleTree(path: string, toggle: boolean) {
     JSON.stringify(newTree);
 }
 
-export const GovernanceSection = () => {
+export const GovernanceSection = ({ isContestAvailable }: AppSectionProps) => {
   const navigate = useCommonNavigate();
   const location = useLocation();
 
@@ -97,6 +99,12 @@ export const GovernanceSection = () => {
           children: {},
         },
       }),
+      ...(isContestAvailable && {
+        Contests: {
+          toggledState: false,
+          children: {},
+        },
+      }),
     },
   };
 
@@ -129,7 +137,10 @@ export const GovernanceSection = () => {
     [{ path: '/members' }, { path: ':scope/members' }],
     location,
   );
-
+  const matchesContestsRoute = matchRoutes(
+    [{ path: '/contests' }, { path: ':scope/contests' }],
+    location,
+  );
   // ---------- Build Section Props ---------- //
 
   // Members
@@ -221,18 +232,38 @@ export const GovernanceSection = () => {
     isActive: !!matchesProposalRoute,
     displayData: null,
   };
-
+  //Contests
+  const contestData: SectionGroupAttrs = {
+    title: 'Contests',
+    containsChildren: false,
+    displayData: null,
+    hasDefaultToggle: false,
+    isActive: !!matchesContestsRoute,
+    isVisible: true,
+    isUpdated: true,
+    onClick: (e, toggle: boolean) => {
+      e.preventDefault();
+      resetSidebarState();
+      handleRedirectClicks(navigate, e, `/contests`, communityId, () => {
+        setGovernanceToggleTree('children.Contests.toggledState', toggle);
+      });
+    },
+  };
   let governanceGroupData: SectionGroupAttrs[] = [
     membersData,
     snapshotData,
     proposalsData,
+    contestData,
   ];
 
   if (!hasProposals) governanceGroupData = [membersData];
+  if (isContestAvailable) {
+    governanceGroupData.push(contestData);
+  }
 
   const sidebarSectionData: SidebarSectionAttrs = {
-    title: 'Governance',
-    className: 'GovernanceSection',
+    title: 'Apps',
+    className: 'AppsSection',
     hasDefaultToggle: toggleTreeState['toggledState'],
     onClick: (e, toggle: boolean) => {
       e.preventDefault();
