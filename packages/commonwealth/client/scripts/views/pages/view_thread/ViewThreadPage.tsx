@@ -30,6 +30,7 @@ import ExternalLink from 'views/components/ExternalLink';
 import JoinCommunityBanner from 'views/components/JoinCommunityBanner';
 import MarkdownViewerUsingQuillOrNewEditor from 'views/components/MarkdownViewerWithFallback';
 import { checkIsTopicInContest } from 'views/components/NewThreadFormLegacy/helpers';
+import { StickCommentProvider } from 'views/components/StickEditorContainer/CommentStateContext';
 import useJoinCommunity from 'views/components/SublayoutHeader/useJoinCommunity';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { PageNotFound } from 'views/pages/404';
@@ -456,7 +457,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   };
   return (
     // TODO: the editing experience can be improved (we can remove a stale code and make it smooth) - create a ticket
-    <>
+    <StickCommentProvider>
       <MetaTags
         customMeta={[
           {
@@ -865,7 +866,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
         />
       </CWPageLayout>
       {JoinCommunityModals}
-    </>
+    </StickCommentProvider>
   );
 };
 
