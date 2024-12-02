@@ -10,10 +10,17 @@ import {
 } from '@hicommonwealth/core';
 import { Comment, Community, Thread, User } from '@hicommonwealth/schemas';
 import { BalanceType } from '@hicommonwealth/shared';
-import chai, { expect } from 'chai';
+import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import sinon from 'sinon';
-import { afterAll, afterEach, beforeAll, describe, test } from 'vitest';
+import {
+  afterAll,
+  afterEach,
+  beforeAll,
+  describe,
+  expect,
+  test,
+  vi,
+} from 'vitest';
 import { z } from 'zod';
 import { GetRecapEmailDataQuery } from '../../src/emails';
 import { seed } from '../../src/tester';
@@ -106,15 +113,12 @@ describe('Recap email lifecycle', () => {
       comment!,
     );
 
-    sandbox = sinon.createSandbox();
     notificationsProvider({
-      adapter: SpyNotificationsProvider(sandbox, {
-        getMessagesStub: sandbox
-          .stub()
-          .onFirstCall()
-          .returns(Promise.resolve(discussionData.messages))
-          .onSecondCall()
-          .returns(Promise.resolve([])),
+      adapter: SpyNotificationsProvider({
+        getMessagesStub: vi
+          .fn()
+          .mockResolvedValueOnce(discussionData.messages)
+          .mockResolvedValueOnce([]),
       }),
     });
 
@@ -143,15 +147,12 @@ describe('Recap email lifecycle', () => {
       community!,
     );
 
-    sandbox = sinon.createSandbox();
     notificationsProvider({
-      adapter: SpyNotificationsProvider(sandbox, {
-        getMessagesStub: sandbox
-          .stub()
-          .onFirstCall()
-          .returns(Promise.resolve(governanceData.messages))
-          .onSecondCall()
-          .returns(Promise.resolve([])),
+      adapter: SpyNotificationsProvider({
+        getMessagesStub: vi
+          .fn()
+          .mockResolvedValueOnce(governanceData.messages)
+          .mockResolvedValueOnce([]),
       }),
     });
 
@@ -180,15 +181,12 @@ describe('Recap email lifecycle', () => {
       community!,
     );
 
-    sandbox = sinon.createSandbox();
     notificationsProvider({
-      adapter: SpyNotificationsProvider(sandbox, {
-        getMessagesStub: sandbox
-          .stub()
-          .onFirstCall()
-          .returns(Promise.resolve(protocolData.messages))
-          .onSecondCall()
-          .returns(Promise.resolve([])),
+      adapter: SpyNotificationsProvider({
+        getMessagesStub: vi
+          .fn()
+          .mockResolvedValueOnce(protocolData.messages)
+          .mockResolvedValueOnce([]),
       }),
     });
 
@@ -208,9 +206,8 @@ describe('Recap email lifecycle', () => {
   });
 
   test.skip('should throw if the notifications provider fails', async () => {
-    sandbox = sinon.createSandbox();
     notificationsProvider({
-      adapter: ThrowingSpyNotificationsProvider(sandbox),
+      adapter: ThrowingSpyNotificationsProvider(),
     });
 
     await expect(

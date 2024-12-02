@@ -1,79 +1,84 @@
 import { NotificationsProvider } from '@hicommonwealth/core';
-import sinon from 'sinon';
+import { Mock, vi } from 'vitest';
 
-export function SpyNotificationsProvider(
-  sandbox: sinon.SinonSandbox,
-  stubs?: {
-    triggerWorkflowStub?: sinon.SinonStub;
-    getMessagesStub?: sinon.SinonStub;
-    getSchedulesStub?: sinon.SinonStub;
-    createSchedulesStub?: sinon.SinonStub;
-    deleteSchedulesStub?: sinon.SinonStub;
-    identifyUserStub?: sinon.SinonStub;
-    registerClientRegistrationToken?: sinon.SinonStub;
-    unregisterClientRegistrationToken?: sinon.SinonStub;
-  },
-): NotificationsProvider {
+export function SpyNotificationsProvider(stubs?: {
+  triggerWorkflowStub?: Mock<[], Promise<any>>;
+  getMessagesStub?: Mock<[], Promise<any[]>>;
+  getSchedulesStub?: Mock<[], Promise<any[]>>;
+  createSchedulesStub?: Mock<[], Promise<any[]>>;
+  deleteSchedulesStub?: Mock<[], Promise<Set<string>>>;
+  identifyUserStub?: Mock<[], Promise<{ id: string }>>;
+  registerClientRegistrationToken?: Mock<[], Promise<boolean>>;
+  unregisterClientRegistrationToken?: Mock<[], Promise<boolean>>;
+}): NotificationsProvider {
   return {
     name: 'SpyNotificationsProvider',
-    dispose: sandbox.stub().returns(Promise.resolve()),
+    dispose: vi.fn((): Promise<void> => Promise.resolve()),
     triggerWorkflow:
-      stubs?.triggerWorkflowStub || sandbox.stub().returns(Promise.resolve([])),
+      stubs?.triggerWorkflowStub ||
+      vi.fn((): Promise<any> => Promise.resolve([])),
     getMessages:
-      stubs?.getMessagesStub || sandbox.stub().returns(Promise.resolve([])),
+      stubs?.getMessagesStub ||
+      vi.fn((): Promise<any[]> => Promise.resolve([])),
     getSchedules:
-      stubs?.getSchedulesStub || sandbox.stub().returns(Promise.resolve([])),
+      stubs?.getSchedulesStub ||
+      vi.fn((): Promise<any[]> => Promise.resolve([])),
     createSchedules:
-      stubs?.createSchedulesStub || sandbox.stub().returns(Promise.resolve([])),
+      stubs?.createSchedulesStub ||
+      vi.fn((): Promise<any[]> => Promise.resolve([])),
     deleteSchedules:
-      stubs?.deleteSchedulesStub || sandbox.stub().returns(Promise.resolve([])),
+      stubs?.deleteSchedulesStub ||
+      vi.fn((): Promise<Set<string>> => Promise.resolve(new Set())),
     identifyUser:
       stubs?.identifyUserStub ||
-      sandbox.stub().returns(Promise.resolve({ id: '' })),
+      vi.fn((): Promise<{ id: string }> => Promise.resolve({ id: '' })),
     registerClientRegistrationToken:
       stubs?.registerClientRegistrationToken ||
-      sandbox.stub().returns(Promise.resolve(true)),
+      vi.fn((): Promise<boolean> => Promise.resolve(true)),
     unregisterClientRegistrationToken:
       stubs?.unregisterClientRegistrationToken ||
-      sandbox.stub().returns(Promise.resolve(true)),
+      vi.fn((): Promise<boolean> => Promise.resolve(true)),
   };
 }
 
 export const ProviderError = new Error('some error');
 
-export function ThrowingSpyNotificationsProvider(
-  sandbox: sinon.SinonSandbox,
-  stubs?: {
-    triggerWorkflowStub?: sinon.SinonStub;
-    getMessagesStub?: sinon.SinonStub;
-    getSchedulesStub?: sinon.SinonStub;
-    createSchedulesStub?: sinon.SinonStub;
-    deleteSchedulesStub?: sinon.SinonStub;
-    identifyUserStub?: sinon.SinonStub;
-    registerClientRegistrationToken?: sinon.SinonStub;
-    unregisterClientRegistrationToken?: sinon.SinonStub;
-  },
-): NotificationsProvider {
+export function ThrowingSpyNotificationsProvider(stubs?: {
+  triggerWorkflowStub?: Mock<[], Promise<any>>;
+  getMessagesStub?: Mock<[], Promise<any[]>>;
+  getSchedulesStub?: Mock<[], Promise<any[]>>;
+  createSchedulesStub?: Mock<[], Promise<any[]>>;
+  deleteSchedulesStub?: Mock<[], Promise<Set<string>>>;
+  identifyUserStub?: Mock<[], Promise<{ id: string }>>;
+  registerClientRegistrationToken?: Mock<[], Promise<boolean>>;
+  unregisterClientRegistrationToken?: Mock<[], Promise<boolean>>;
+}): NotificationsProvider {
   return {
     name: 'ThrowingNotificationsProvider',
-    dispose: sandbox.stub().returns(Promise.resolve()),
+    dispose: vi.fn((): Promise<void> => Promise.resolve()),
     triggerWorkflow:
-      stubs?.triggerWorkflowStub || sandbox.stub().rejects(ProviderError),
+      stubs?.triggerWorkflowStub ||
+      vi.fn((): Promise<any> => Promise.reject(ProviderError)),
     getMessages:
-      stubs?.getMessagesStub || sandbox.stub().rejects(ProviderError),
+      stubs?.getMessagesStub ||
+      vi.fn((): Promise<any[]> => Promise.reject(ProviderError)),
     getSchedules:
-      stubs?.getSchedulesStub || sandbox.stub().rejects(ProviderError),
+      stubs?.getSchedulesStub ||
+      vi.fn((): Promise<any[]> => Promise.reject(ProviderError)),
     createSchedules:
-      stubs?.createSchedulesStub || sandbox.stub().rejects(ProviderError),
+      stubs?.createSchedulesStub ||
+      vi.fn((): Promise<any[]> => Promise.reject(ProviderError)),
     deleteSchedules:
-      stubs?.deleteSchedulesStub || sandbox.stub().rejects(ProviderError),
+      stubs?.deleteSchedulesStub ||
+      vi.fn((): Promise<Set<string>> => Promise.reject(ProviderError)),
     identifyUser:
-      stubs?.identifyUserStub || sandbox.stub().rejects(ProviderError),
+      stubs?.identifyUserStub ||
+      vi.fn((): Promise<{ id: string }> => Promise.reject(ProviderError)),
     registerClientRegistrationToken:
       stubs?.registerClientRegistrationToken ||
-      sandbox.stub().rejects(ProviderError),
+      vi.fn((): Promise<boolean> => Promise.reject(ProviderError)),
     unregisterClientRegistrationToken:
       stubs?.unregisterClientRegistrationToken ||
-      sandbox.stub().rejects(ProviderError),
+      vi.fn((): Promise<boolean> => Promise.reject(ProviderError)),
   };
 }
