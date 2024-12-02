@@ -242,7 +242,6 @@ export const ThreadCard = ({
                   </CWText>
                 }
                 onImageClick={onImageClick}
-                threadImage={threadImage}
                 isCardView={isCardView}
               />
               {threadImage && (
