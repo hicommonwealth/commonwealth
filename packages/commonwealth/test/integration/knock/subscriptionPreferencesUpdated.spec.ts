@@ -9,7 +9,7 @@ import {
 } from '@hicommonwealth/core';
 import { models, tester } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
-import chai, { expect } from 'chai';
+import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import sinon from 'sinon';
 import {
@@ -18,7 +18,9 @@ import {
   beforeAll,
   beforeEach,
   describe,
+  expect,
   test,
+  vi,
 } from 'vitest';
 import z from 'zod';
 // eslint-disable-next-line max-len
@@ -66,18 +68,13 @@ describe('subscriptionPreferencesUpdated', () => {
   });
 
   test('should delete all exiting email schedules if emails are disabled', async () => {
-    sandbox = sinon.createSandbox();
     const provider = notificationsProvider({
-      adapter: SpyNotificationsProvider(sandbox, {
-        getSchedulesStub: sandbox.stub().returns(
-          Promise.resolve([
-            { id: '1', workflow: WorkflowKeys.EmailRecap },
-            { id: '2', workflow: WorkflowKeys.EmailDigest },
-          ]),
-        ),
-        deleteSchedulesStub: sandbox
-          .stub()
-          .returns(Promise.resolve(new Set(['1', '2']))),
+      adapter: SpyNotificationsProvider({
+        getSchedulesStub: vi.fn().mockResolvedValue([
+          { id: '1', workflow: WorkflowKeys.EmailRecap },
+          { id: '2', workflow: WorkflowKeys.EmailDigest },
+        ]),
+        deleteSchedulesStub: vi.fn().mockResolvedValue(new Set(['1', '2'])),
       }),
     });
 
@@ -119,11 +116,10 @@ describe('subscriptionPreferencesUpdated', () => {
       },
     );
 
-    sandbox = sinon.createSandbox();
     const provider = notificationsProvider({
-      adapter: SpyNotificationsProvider(sandbox, {
-        getSchedulesStub: sandbox.stub().returns(Promise.resolve([])),
-        createSchedulesStub: sandbox.stub().returns(Promise.resolve({})),
+      adapter: SpyNotificationsProvider({
+        getSchedulesStub: vi.fn().mockResolvedValue([]),
+        createSchedulesStub: vi.fn().mockResolvedValue({}),
       }),
     });
 
@@ -177,15 +173,12 @@ describe('subscriptionPreferencesUpdated', () => {
       },
     );
 
-    sandbox = sinon.createSandbox();
     const provider = notificationsProvider({
-      adapter: SpyNotificationsProvider(sandbox, {
-        getSchedulesStub: sandbox
-          .stub()
-          .returns(
-            Promise.resolve([{ id: '1', workflow: WorkflowKeys.EmailRecap }]),
-          ),
-        createSchedulesStub: sandbox.stub().returns(Promise.resolve({})),
+      adapter: SpyNotificationsProvider({
+        getSchedulesStub: vi
+          .fn()
+          .mockResolvedValue([{ id: '1', workflow: WorkflowKeys.EmailRecap }]),
+        createSchedulesStub: vi.fn().mockResolvedValue({}),
       }),
     });
 
@@ -220,18 +213,13 @@ describe('subscriptionPreferencesUpdated', () => {
       },
     );
 
-    sandbox = sinon.createSandbox();
     const provider = notificationsProvider({
-      adapter: SpyNotificationsProvider(sandbox, {
-        getSchedulesStub: sandbox
-          .stub()
-          .returns(
-            Promise.resolve([{ id: '1', workflow: WorkflowKeys.EmailRecap }]),
-          ),
-        createSchedulesStub: sandbox.stub().returns(Promise.resolve({})),
-        deleteSchedulesStub: sandbox
-          .stub()
-          .returns(Promise.resolve(new Set(['1']))),
+      adapter: SpyNotificationsProvider({
+        getSchedulesStub: vi
+          .fn()
+          .mockResolvedValue([{ id: '1', workflow: WorkflowKeys.EmailRecap }]),
+        createSchedulesStub: vi.fn().mockResolvedValue({}),
+        deleteSchedulesStub: vi.fn().mockResolvedValue(new Set(['1'])),
       }),
     });
 
@@ -271,14 +259,11 @@ describe('subscriptionPreferencesUpdated', () => {
       },
     );
 
-    sandbox = sinon.createSandbox();
     const provider = notificationsProvider({
-      adapter: SpyNotificationsProvider(sandbox, {
-        getSchedulesStub: sandbox.stub().returns(Promise.resolve([])),
-        createSchedulesStub: sandbox.stub().returns(Promise.resolve({})),
-        deleteSchedulesStub: sandbox
-          .stub()
-          .returns(Promise.resolve(new Set(['1']))),
+      adapter: SpyNotificationsProvider({
+        getSchedulesStub: vi.fn().mockResolvedValue([]),
+        createSchedulesStub: vi.fn().mockResolvedValue({}),
+        deleteSchedulesStub: vi.fn().mockResolvedValue(new Set(['1'])),
       }),
     });
 

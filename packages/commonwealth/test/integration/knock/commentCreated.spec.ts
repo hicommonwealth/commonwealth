@@ -12,15 +12,15 @@ import {
 import { models, tester } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import { BalanceType } from '@hicommonwealth/shared';
-import chai, { expect } from 'chai';
+import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import sinon from 'sinon';
 import {
   afterAll,
   afterEach,
   beforeAll,
   beforeEach,
   describe,
+  expect,
   test,
 } from 'vitest';
 import z from 'zod';
@@ -153,9 +153,8 @@ describe('CommentCreated Event Handler', () => {
   });
 
   test('should do nothing if there are no relevant subscriptions', async () => {
-    sandbox = sinon.createSandbox();
     const provider = notificationsProvider({
-      adapter: SpyNotificationsProvider(sandbox),
+      adapter: SpyNotificationsProvider(),
     });
 
     const res = await processCommentCreated({
@@ -176,9 +175,8 @@ describe('CommentCreated Event Handler', () => {
   });
 
   test('should execute the triggerWorkflow function with appropriate data for a root comment', async () => {
-    sandbox = sinon.createSandbox();
     const provider = notificationsProvider({
-      adapter: SpyNotificationsProvider(sandbox),
+      adapter: SpyNotificationsProvider(),
     });
 
     await tester.seed('ThreadSubscription', {
@@ -221,9 +219,8 @@ describe('CommentCreated Event Handler', () => {
   });
 
   test('should execute the triggerWorkflow function with appropriate data for a reply comment', async () => {
-    sandbox = sinon.createSandbox();
     const provider = notificationsProvider({
-      adapter: SpyNotificationsProvider(sandbox),
+      adapter: SpyNotificationsProvider(),
     });
 
     await tester.seed('CommentSubscription', {
@@ -270,9 +267,8 @@ describe('CommentCreated Event Handler', () => {
   });
 
   test('should throw if triggerWorkflow fails', async () => {
-    sandbox = sinon.createSandbox();
     notificationsProvider({
-      adapter: ThrowingSpyNotificationsProvider(sandbox),
+      adapter: ThrowingSpyNotificationsProvider(),
     });
 
     await tester.seed('ThreadSubscription', {
@@ -292,9 +288,8 @@ describe('CommentCreated Event Handler', () => {
   });
 
   test('should not trigger workflow for mentioned users', async () => {
-    sandbox = sinon.createSandbox();
     const provider = notificationsProvider({
-      adapter: SpyNotificationsProvider(sandbox),
+      adapter: SpyNotificationsProvider(),
     });
 
     await tester.seed('CommentSubscription', {
