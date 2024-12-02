@@ -4,6 +4,7 @@ import { CommentEditorProps } from 'views/components/Comments/CommentEditor/Comm
 import './DesktopStickyInput.scss';
 
 export const DesktopStickyInput = (props: CommentEditorProps) => {
+  const { isReplying, replyingToAuthor } = props;
   const [focused, setFocused] = useState(false);
   const { handleSubmitComment } = props;
 
@@ -19,6 +20,10 @@ export const DesktopStickyInput = (props: CommentEditorProps) => {
     setFocused(false);
     handleSubmitComment();
   }, [handleSubmitComment]);
+
+  const placeholder = isReplying
+    ? `Replying to ${replyingToAuthor} ...`
+    : `Comment on thread here...`;
 
   return (
     <div className="DesktopStickyInput">
@@ -36,7 +41,7 @@ export const DesktopStickyInput = (props: CommentEditorProps) => {
           className="DesktopStickyInputPending"
           type="text"
           onFocus={handleFocused}
-          placeholder="Comment on thread here..."
+          placeholder={placeholder}
         />
       )}
     </div>
