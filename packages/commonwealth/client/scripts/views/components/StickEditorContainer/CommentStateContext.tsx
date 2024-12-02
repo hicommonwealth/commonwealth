@@ -2,6 +2,7 @@ import React, {
   createContext,
   memo,
   ReactNode,
+  useCallback,
   useContext,
   useEffect,
   useState,
@@ -25,6 +26,14 @@ const ActivatorContext = createContext<Activator>({
 
 function useActivatorContext() {
   return useContext(ActivatorContext);
+}
+
+export function useActiveStickCommentReset() {
+  const activatorContext = useActivatorContext();
+
+  return useCallback(() => {
+    activatorContext.setActiveElement(null);
+  }, [activatorContext]);
 }
 
 type Props = {

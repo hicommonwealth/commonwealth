@@ -2,6 +2,7 @@ import React, { useCallback, useMemo, useState } from 'react';
 import useUserStore from 'state/ui/user';
 import { Avatar } from 'views/components/Avatar';
 import { CommentEditorProps } from 'views/components/Comments/CommentEditor/CommentEditor';
+import { useActiveStickCommentReset } from 'views/components/StickEditorContainer/CommentStateContext';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { createDeltaFromText } from 'views/components/react_quill_editor';
 import './MobileInput.scss';
@@ -20,6 +21,8 @@ export const MobileInput = (props: MobileInputProps) => {
   } = props;
   const [value, setValue] = useState('');
   const user = useUserStore();
+
+  const handleClose = useActiveStickCommentReset();
 
   const handleChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -72,6 +75,9 @@ export const MobileInput = (props: MobileInputProps) => {
         />
 
         <div className="RightButton">
+          {isReplying && (
+            <CWIconButton iconName="close" onClick={handleClose} />
+          )}
           <CWIconButton iconName="arrowsOutSimple" onClick={onFocus} />
         </div>
       </div>
