@@ -1,11 +1,18 @@
-import { NotificationsProvider } from '@hicommonwealth/core';
+import {
+  NotificationsProvider,
+  NotificationsProviderGetMessagesReturn,
+  NotificationsProviderSchedulesReturn,
+} from '@hicommonwealth/core';
 import { Mock, vi } from 'vitest';
 
 export function SpyNotificationsProvider(stubs?: {
-  triggerWorkflowStub?: Mock<[], Promise<any>>;
-  getMessagesStub?: Mock<[], Promise<any[]>>;
-  getSchedulesStub?: Mock<[], Promise<any[]>>;
-  createSchedulesStub?: Mock<[], Promise<any[]>>;
+  triggerWorkflowStub?: Mock<
+    [],
+    Promise<PromiseSettledResult<{ workflow_run_id: string }>[]>
+  >;
+  getMessagesStub?: Mock<[], Promise<NotificationsProviderGetMessagesReturn>>;
+  getSchedulesStub?: Mock<[], Promise<NotificationsProviderSchedulesReturn>>;
+  createSchedulesStub?: Mock<[], Promise<NotificationsProviderSchedulesReturn>>;
   deleteSchedulesStub?: Mock<[], Promise<Set<string>>>;
   identifyUserStub?: Mock<[], Promise<{ id: string }>>;
   registerClientRegistrationToken?: Mock<[], Promise<boolean>>;
@@ -44,10 +51,13 @@ export function SpyNotificationsProvider(stubs?: {
 export const ProviderError = new Error('some error');
 
 export function ThrowingSpyNotificationsProvider(stubs?: {
-  triggerWorkflowStub?: Mock<[], Promise<any>>;
-  getMessagesStub?: Mock<[], Promise<any[]>>;
-  getSchedulesStub?: Mock<[], Promise<any[]>>;
-  createSchedulesStub?: Mock<[], Promise<any[]>>;
+  triggerWorkflowStub?: Mock<
+    [],
+    Promise<PromiseSettledResult<{ workflow_run_id: string }>[]>
+  >;
+  getMessagesStub?: Mock<[], Promise<NotificationsProviderGetMessagesReturn>>;
+  getSchedulesStub?: Mock<[], Promise<NotificationsProviderSchedulesReturn>>;
+  createSchedulesStub?: Mock<[], Promise<NotificationsProviderSchedulesReturn>>;
   deleteSchedulesStub?: Mock<[], Promise<Set<string>>>;
   identifyUserStub?: Mock<[], Promise<{ id: string }>>;
   registerClientRegistrationToken?: Mock<[], Promise<boolean>>;
