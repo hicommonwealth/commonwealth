@@ -1,6 +1,6 @@
 import React from 'react';
 
-import 'components/component_kit/cw_banner.scss';
+import './cw_banner.scss';
 import { CWIconButton } from './cw_icon_button';
 
 import RenderTextWithLink from './RenderTextWithLink';

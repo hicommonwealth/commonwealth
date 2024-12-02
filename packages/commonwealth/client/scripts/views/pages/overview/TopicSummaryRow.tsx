@@ -4,7 +4,6 @@ import { getThreadActionTooltipText } from 'helpers/threads';
 import useTopicGating from 'hooks/useTopicGating';
 import { getProposalUrlPath } from 'identifiers';
 import { useCommonNavigate } from 'navigation/helpers';
-import 'pages/overview/TopicSummaryRow.scss';
 import React from 'react';
 import app from 'state';
 import useUserStore from 'state/ui/user';
@@ -13,6 +12,7 @@ import type Thread from '../../../models/Thread';
 import type { Topic } from '../../../models/Topic';
 import { CWText } from '../../components/component_kit/cw_text';
 import { ThreadCard } from '../discussions/ThreadCard';
+import './TopicSummaryRow.scss';
 import { TopicSummaryRowSkeleton } from './TopicSummaryRowSkeleton';
 
 type TopicSummaryRowProps = {

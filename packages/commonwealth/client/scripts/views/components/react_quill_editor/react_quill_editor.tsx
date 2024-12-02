@@ -21,12 +21,12 @@ import { RTFtoMD, SerializableDeltaStatic, getTextFromDelta } from './utils';
 
 import { useQuillPasteText } from './useQuillPasteText';
 
-import 'components/react_quill/react_quill_editor.scss';
 import { useFormContext } from 'react-hook-form';
 import 'react-quill/dist/quill.snow.css';
 import { CWModal } from '../component_kit/new_designs/CWModal';
 import { MessageRow } from '../component_kit/new_designs/CWTextInput/MessageRow';
 import { MarkdownPreview } from './MarkdownPreview';
+import './react_quill_editor.scss';
 
 import { LinkModal } from './LinkModal';
 Quill.register('modules/magicUrl', MagicUrl);
