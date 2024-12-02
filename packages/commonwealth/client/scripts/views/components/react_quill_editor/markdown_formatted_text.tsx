@@ -6,7 +6,7 @@ import React, {
   useState,
 } from 'react';
 
-import 'components/react_quill/markdown_formatted_text.scss';
+import './markdown_formatted_text.scss';
 
 import DOMPurify from 'dompurify';
 import { loadScript } from 'helpers';

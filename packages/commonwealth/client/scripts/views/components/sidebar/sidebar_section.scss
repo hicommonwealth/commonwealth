@@ -1,0 +1,142 @@
+@import '../../../styles/shared.scss';
+
+.SidebarSectionGroup {
+  border-bottom-color: $neutral-50;
+  border-bottom-width: 1px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+
+  .section-group-title-container {
+    align-items: center;
+    color: $neutral-800;
+    display: flex;
+    justify-content: left;
+    padding: 8px;
+
+    &:hover {
+      background-color: $primary-50;
+    }
+
+    .Icon {
+      margin-right: 4px;
+    }
+  }
+
+  .sections-container {
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+.SubSectionGroup {
+  .sub-section-group-title {
+    padding: 4px 8px 4px 28px;
+    align-items: center;
+    display: flex;
+    min-width: 0;
+    height: 100%;
+
+    .title-text {
+      color: $neutral-600;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      width: 100%;
+      display: inline-block;
+    }
+
+    .right-icon {
+      margin-left: 8px;
+
+      svg {
+        fill: $neutral-500;
+      }
+    }
+
+    &.background {
+      background-color: $primary-100;
+    }
+
+    &.no-background {
+      background-color: unset;
+    }
+
+    &.active,
+    &:hover {
+      background-color: $primary-50;
+    }
+
+    .section-title-text-active {
+      font-weight: 500;
+    }
+
+    .carat {
+      align-items: center;
+      display: flex;
+      margin: 0 4px;
+    }
+  }
+}
+
+.SubSection {
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+  font-size: 14px;
+  height: 32px;
+  padding: 0 8px 0 32px;
+
+  .title-active {
+    font-weight: 500;
+    margin-right: 8px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .title-stale {
+    margin-right: 8px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &.active {
+    background-color: $primary-100;
+  }
+
+  &:hover {
+    background-color: $primary-50;
+  }
+}
+
+.right-icon {
+  display: flex;
+  margin-left: auto;
+  margin-top: -1px;
+  position: relative;
+
+  .admin-menu {
+    position: fixed;
+    z-index: 1000;
+  }
+
+  .unread-icon {
+    align-items: center;
+    background-color: $rorange-500;
+    border-radius: $border-radius-round;
+    color: $white;
+    display: flex;
+    height: 16px;
+    justify-content: center;
+    margin-right: 4px;
+    padding: 2px 4px 3px;
+    min-width: 16px;
+  }
+
+  svg {
+    fill: transparent;
+  }
+}

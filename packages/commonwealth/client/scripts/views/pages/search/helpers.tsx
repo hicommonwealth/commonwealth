@@ -1,7 +1,6 @@
 import { SearchUserProfilesView } from '@hicommonwealth/schemas';
 import { getDecodedString } from '@hicommonwealth/shared';
 import moment from 'moment';
-import 'pages/search/index.scss';
 import React, { useMemo } from 'react';
 import app from 'state';
 import { useFetchCustomDomainQuery } from 'state/api/configuration';
@@ -14,6 +13,7 @@ import { CWText } from '../../components/component_kit/cw_text';
 import { renderTruncatedHighlights } from '../../components/react_quill_editor/highlighter';
 import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
 import { User } from '../../components/user/user';
+import './index.scss';
 
 export type ThreadResult = {
   id: number;

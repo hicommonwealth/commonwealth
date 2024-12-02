@@ -1,7 +1,6 @@
 import { slugify } from '@hicommonwealth/shared';
 import { filterLinks } from 'helpers/threads';
 import { getProposalUrlPath } from 'identifiers';
-import 'pages/view_thread/linked_threads_card.scss';
 import React, { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import app from 'state';
@@ -13,6 +12,7 @@ import { CWButton } from '../../components/component_kit/new_designs/CWButton';
 import CWCircleMultiplySpinner from '../../components/component_kit/new_designs/CWCircleMultiplySpinner';
 import { CWModal } from '../../components/component_kit/new_designs/CWModal';
 import { LinkedThreadModal } from '../../modals/linked_thread_modal';
+import './linked_threads_card.scss';
 
 type LinkedThreadsCardProps = {
   thread: Thread;

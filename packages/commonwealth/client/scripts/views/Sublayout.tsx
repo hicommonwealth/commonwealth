@@ -1,4 +1,3 @@
-import 'Sublayout.scss';
 import clsx from 'clsx';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import useWindowResize from 'hooks/useWindowResize';
@@ -8,20 +7,25 @@ import app from 'state';
 import useSidebarStore from 'state/ui/sidebar';
 import { SublayoutHeader } from 'views/components/SublayoutHeader';
 import { Sidebar } from 'views/components/sidebar';
-import litepaperGrowlImage from '../../assets/img/litepaperGrowlImage.svg';
 import useNecessaryEffect from '../hooks/useNecessaryEffect';
 import useStickyHeader from '../hooks/useStickyHeader';
-import { useAuthModalStore, useWelcomeOnboardModal } from '../state/ui/modals';
+import {
+  useAuthModalStore,
+  useInviteLinkModal,
+  useWelcomeOnboardModal,
+} from '../state/ui/modals';
 import useUserStore from '../state/ui/user';
+import './Sublayout.scss';
 import { SublayoutBanners } from './SublayoutBanners';
 import { AdminOnboardingSlider } from './components/AdminOnboardingSlider';
 import { Breadcrumbs } from './components/Breadcrumbs';
 import MobileNavigation from './components/MobileNavigation';
 import AuthButtons from './components/SublayoutHeader/AuthButtons';
-import { CWGrowlTemplate } from './components/SublayoutHeader/GrowlTemplate/CWGrowlTemplate';
 import { UserTrainingSlider } from './components/UserTrainingSlider';
+import { CWModal } from './components/component_kit/new_designs/CWModal';
 import CollapsableSidebarButton from './components/sidebar/CollapsableSidebarButton';
 import { AuthModal, AuthModalType } from './modals/AuthModal';
+import InviteLinkModal from './modals/InviteLinkModal';
 import { WelcomeOnboardModal } from './modals/WelcomeOnboardModal';
 
 type SublayoutProps = {
@@ -47,6 +51,9 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
 
   const { isWelcomeOnboardModalOpen, setIsWelcomeOnboardModalOpen } =
     useWelcomeOnboardModal();
+
+  const { isInviteLinkModalOpen, setIsInviteLinkModalOpen } =
+    useInviteLinkModal();
 
   useNecessaryEffect(() => {
     if (
@@ -175,20 +182,21 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
             )}
             {children}
           </div>
-          <CWGrowlTemplate
-            headerText="Common Protocol Litepaper"
-            bodyText="We’re building programmable communities, bringing together app, protocol, and agents to enable
-            DAOs in ways we only dreamed of!"
-            buttonText="Learn more"
-            buttonLink="https://x.com/dillchen/status/1859286283090264241"
-            growlImage={litepaperGrowlImage}
-            growlType="litepaper"
-            blackCloseButton
-          />
         </div>
         <WelcomeOnboardModal
           isOpen={isWelcomeOnboardModalOpen}
           onClose={() => setIsWelcomeOnboardModalOpen(false)}
+        />
+        <CWModal
+          size="small"
+          content={
+            <InviteLinkModal
+              onModalClose={() => setIsInviteLinkModalOpen(false)}
+              isInsideCommunity={!!isInsideCommunity}
+            />
+          }
+          open={!isWindowExtraSmall && isInviteLinkModalOpen}
+          onClose={() => setIsInviteLinkModalOpen(false)}
         />
       </div>
       {isWindowExtraSmall && <MobileNavigation />}

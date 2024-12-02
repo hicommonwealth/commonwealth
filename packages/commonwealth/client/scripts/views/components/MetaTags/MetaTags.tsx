@@ -1,6 +1,6 @@
-import 'Layout.scss';
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
+import '../../Layout.scss';
 
 type MetaTagName =
   | 'application-name'

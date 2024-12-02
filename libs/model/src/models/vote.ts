@@ -1,20 +1,9 @@
+import { Vote } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize';
-import type { PollAttributes } from './poll';
+import { z } from 'zod';
 import type { ModelInstance } from './types';
 
-export type VoteAttributes = {
-  poll_id: number;
-  option: string;
-  address: string;
-  author_community_id: string;
-  community_id: string;
-  id?: number;
-  created_at?: Date;
-  updated_at?: Date;
-
-  // associations
-  poll?: PollAttributes;
-};
+export type VoteAttributes = z.infer<typeof Vote>;
 
 export type VoteInstance = ModelInstance<VoteAttributes>;
 

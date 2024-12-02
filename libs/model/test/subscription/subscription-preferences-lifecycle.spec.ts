@@ -1,13 +1,6 @@
 import { Actor, command, dispose, query } from '@hicommonwealth/core';
 import { expect } from 'chai';
-import {
-  afterAll,
-  afterEach,
-  beforeAll,
-  beforeEach,
-  describe,
-  test,
-} from 'vitest';
+import { afterAll, beforeAll, beforeEach, describe, test } from 'vitest';
 import { models } from '../../src/database';
 import {
   GetSubscriptionPreferences,
@@ -17,6 +10,7 @@ import { seed } from '../../src/tester';
 
 describe('Subscription preferences lifecycle', () => {
   let actor: Actor;
+
   beforeAll(async () => {
     const [user] = await seed('User', {
       isAdmin: false,
@@ -33,6 +27,8 @@ describe('Subscription preferences lifecycle', () => {
   });
 
   beforeEach(async () => {
+    await models.SubscriptionPreference.truncate({});
+    await models.Outbox.truncate({});
     await seed('SubscriptionPreference', {
       user_id: actor.user.id,
       email_notifications_enabled: false,
@@ -42,11 +38,6 @@ describe('Subscription preferences lifecycle', () => {
       mobile_push_discussion_activity_enabled: false,
       mobile_push_admin_alerts_enabled: false,
     });
-  });
-
-  afterEach(async () => {
-    await models.SubscriptionPreference.truncate({});
-    await models.Outbox.truncate({});
   });
 
   test('should update a single property in subscription preferences', async () => {

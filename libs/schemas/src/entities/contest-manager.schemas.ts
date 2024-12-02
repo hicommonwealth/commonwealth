@@ -1,4 +1,5 @@
-import { MAX_SCHEMA_INT, commonProtocol } from '@hicommonwealth/shared';
+import { commonProtocol } from '@hicommonwealth/evm-protocols';
+import { MAX_SCHEMA_INT } from '@hicommonwealth/shared';
 import { z } from 'zod';
 import { Contest } from '../projections';
 import { PG_INT } from '../utils';

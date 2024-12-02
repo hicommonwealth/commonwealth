@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-
-import { commonProtocol, ZERO_ADDRESS } from '@hicommonwealth/shared';
+import { commonProtocol } from '@hicommonwealth/evm-protocols';
+import { ZERO_ADDRESS } from '@hicommonwealth/shared';
 import useAppStatus from 'hooks/useAppStatus';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import { useFlag } from 'hooks/useFlag';
+import React, { useState } from 'react';
 import {
   BaseMixpanelPayload,
   MixpanelContestEvents,

@@ -1,9 +1,6 @@
 import { EventHandler, logger } from '@hicommonwealth/core';
-import {
-  communityStakeTradeEventSignature,
-  deployedNamespaceEventSignature,
-  models,
-} from '@hicommonwealth/model';
+import { EvmEventSignatures } from '@hicommonwealth/evm-protocols';
+import { models } from '@hicommonwealth/model';
 import z from 'zod';
 import { handleCommunityStakeTrades } from './chainEvents/handleCommunityStakeTrades';
 
@@ -16,11 +13,13 @@ export const processChainEventCreated: EventHandler<
   typeof output
 > = async ({ payload }) => {
   if (
-    payload.eventSource.eventSignature === communityStakeTradeEventSignature
+    payload.eventSource.eventSignature ===
+    EvmEventSignatures.CommunityStake.Trade
   ) {
     return await handleCommunityStakeTrades(models, payload);
   } else if (
-    payload.eventSource.eventSignature === deployedNamespaceEventSignature
+    payload.eventSource.eventSignature ===
+    EvmEventSignatures.NamespaceFactory.NamespaceDeployed
   ) {
     log.info('Implementation not defined', { payload });
     return false;

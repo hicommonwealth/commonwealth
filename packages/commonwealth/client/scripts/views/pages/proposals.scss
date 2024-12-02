@@ -1,0 +1,24 @@
+@import '../../styles/shared.scss';
+
+.ProposalsPage {
+  flex: 1;
+
+  .header {
+    padding-bottom: 32px;
+
+    @include small {
+      padding-bottom: 14px;
+    }
+  }
+
+  .active-proposals,
+  .inactive-proposals {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .no-proposals {
+    display: flex;
+    flex-direction: row;
+  }
+}

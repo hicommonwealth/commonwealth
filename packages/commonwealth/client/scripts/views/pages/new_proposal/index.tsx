@@ -1,6 +1,5 @@
 import { ChainBase } from '@hicommonwealth/shared';
 import { useInitChainIfNeeded } from 'hooks/useInitChainIfNeeded';
-import 'pages/new_proposal/index.scss';
 import React, { useEffect, useState } from 'react';
 import app from 'state';
 import { userStore } from 'state/ui/user';
@@ -9,6 +8,7 @@ import { PageLoading } from 'views/pages/loading';
 import { CWText } from '../../components/component_kit/cw_text';
 import { PageNotFound } from '../404';
 import { CosmosProposalForm } from './cosmos_proposal_form';
+import './index.scss';
 
 /// NOTE: THIS PAGE IS ONLY ACCESSIBLE FOR COSMOS CHAINS, FOLLOWING
 /// DEPRECATION OF OTHER GOVERNANCE FORMS, AND IS CONSIDERED LEGACY.

@@ -29,9 +29,7 @@ import Thread from 'client/scripts/models/Thread';
 import useUserStore from 'client/scripts/state/ui/user';
 import useManageDocumentTitle from 'hooks/useManageDocumentTitle';
 import useTopicGating from 'hooks/useTopicGating';
-import 'pages/discussions/index.scss';
 import { GridComponents, Virtuoso, VirtuosoGrid } from 'react-virtuoso';
-import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { useFetchCustomDomainQuery } from 'state/api/configuration';
 import { useGetERC20BalanceQuery } from 'state/api/tokens';
 import Permissions from 'utils/Permissions';
@@ -48,6 +46,7 @@ import { CWText } from '../../components/component_kit/cw_text';
 import CWIconButton from '../../components/component_kit/new_designs/CWIconButton';
 import OverviewPage from '../overview';
 import { DiscussionsFeedDiscovery } from './DiscussionsFeedDiscovery';
+import './DiscussionsPage.scss';
 import { EmptyThreadsPlaceholder } from './EmptyThreadsPlaceholder';
 import { ThreadCard } from './ThreadCard';
 type DiscussionsPageProps = {
@@ -93,12 +92,6 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const dateRange: ThreadTimelineFilterTypes = searchParams.get(
     'dateRange',
   ) as ThreadTimelineFilterTypes;
-
-  const { data: community } = useGetCommunityByIdQuery({
-    id: communityId,
-    enabled: !!communityId,
-    includeNodeInfo: true,
-  });
 
   const { data: topics, isLoading: isLoadingTopics } = useFetchTopicsQuery({
     communityId,
@@ -155,7 +148,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     nodeEthChainId: app?.chain.meta?.ChainNode?.eth_chain_id || 0,
   });
 
-  const { fetchNextPage, data, isInitialLoading, hasNextPage } =
+  const { fetchNextPage, data, isInitialLoading, hasNextPage, threadCount } =
     useFetchThreadsQuery({
       communityId: communityId,
       queryType: 'bulk',
@@ -412,7 +405,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
             isOnArchivePage
               ? filteredThreads.length || 0
               : threads
-                ? community?.lifetime_thread_count || 0
+                ? threadCount || 0
                 : 0
           }
           isIncludingSpamThreads={includeSpamThreads}

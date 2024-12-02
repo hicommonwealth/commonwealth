@@ -1,4 +1,4 @@
-import { commonProtocol } from '@hicommonwealth/shared';
+import { commonProtocol } from '@hicommonwealth/evm-protocols';
 import NodeInfo from 'models/NodeInfo';
 import { fetchCachedNodes } from 'state/api/nodes';
 

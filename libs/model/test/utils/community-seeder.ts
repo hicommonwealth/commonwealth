@@ -47,6 +47,7 @@ export async function seedCommunity({
   const users = await seedRecord('User', roles, (role) => ({
     profile: { name: role },
     isAdmin: role === 'admin',
+    is_welcome_onboard_flow_complete: false,
   }));
 
   // seed ethereum base community

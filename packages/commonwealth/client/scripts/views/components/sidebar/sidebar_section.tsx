@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import React from 'react';
 
-import 'components/sidebar/sidebar_section.scss';
+import './sidebar_section.scss';
 
 import { isNotUndefined } from 'helpers/typeGuards';
 import useSidebarStore from 'state/ui/sidebar';
@@ -49,6 +49,7 @@ const SubSection = (props: SubSectionAttrs) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const SubSectionGroup = (props: SectionGroupAttrs) => {
   const {
     containsChildren,
@@ -153,6 +154,7 @@ export const SubSectionGroup = (props: SectionGroupAttrs) => {
   );
 };
 
+// eslint-disable-next-line react/no-multi-comp
 export const SidebarSectionGroup = (props: SidebarSectionAttrs) => {
   const {
     displayData,

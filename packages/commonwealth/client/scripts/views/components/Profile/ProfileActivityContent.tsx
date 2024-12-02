@@ -1,6 +1,6 @@
 import React from 'react';
 
-import 'components/Profile/Profile.scss';
+import './Profile.scss';
 
 import type Thread from 'models/Thread';
 import { CWText } from '../component_kit/cw_text';

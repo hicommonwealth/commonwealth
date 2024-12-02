@@ -1,0 +1,29 @@
+{
+  "name": "@hicommonwealth/evm-protocols",
+  "private": "true",
+  "type": "module",
+  "version": "0.1.0",
+  "description": "Web3 domain code",
+  "files": [
+    "build"
+  ],
+  "exports": {
+    ".": {
+      "default": "./build/index.js",
+      "devmode": "./src/index.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc -b ./tsconfig.build.json",
+    "clean": "rm -rf build && rm -rf coverage && find . -type f -name '*.tsbuildinfo' -exec rm {} +",
+    "check-types": "tsc --noEmit",
+    "test": "NODE_ENV=test vitest --config ../../vite.config.ts --coverage run ./test/**/*.spec.ts",
+    "lint": "NODE_OPTIONS=\"--max-old-space-size=4096\" eslint -c ../../.eslintrc.cjs './src/**/*.{ts,tsx}'",
+    "lint-diff": "NODE_OPTIONS=\"--max-old-space-size=4096\" eslint -c ../../.eslintrc-diff.cjs './src/**/*.{ts,tsx}'"
+  },
+  "dependencies": {
+    "@hicommonwealth/shared": "workspace:*",
+    "@ethersproject/bignumber": "^5.7.0",
+    "moment": "^2.23.0"
+  }
+}
