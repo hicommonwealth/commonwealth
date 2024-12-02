@@ -109,11 +109,11 @@ export function oneToMany<Parent extends State, Child extends State>(
         onDelete: options?.onDelete ?? 'NO ACTION',
       },
     );
-  // map fk when child has composite pk,
+  // map fk when child has a composite pk that includes the fk,
   // or when fk = pk (sequelize is not creating fk when fk = pk)
   else if (
     (child.primaryKeyAttributes.length > 1 &&
-      this.primaryKeyAttributes.length === 1) ||
+      child.primaryKeyAttributes.includes(foreignKey)) ||
     foreignKey === child.primaryKeyAttribute
   )
     mapFk(
