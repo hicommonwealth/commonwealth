@@ -1,15 +1,16 @@
+import 'components/Profile/ProfileActivityRow.scss';
+import moment from 'moment';
 import React from 'react';
 
-import 'components/Profile/ProfileActivityRow.scss';
-
 import Thread from 'models/Thread';
-import moment from 'moment';
 import withRouter from 'navigation/helpers';
-import { formatAddressShort, smartTrim } from 'shared/utils';
+import { formatAddressShort } from 'shared/utils';
 import app from 'state';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
+import MarkdownViewerUsingQuillOrNewEditor from 'views/components/MarkdownViewerWithFallback';
 import { CWText } from '../component_kit/cw_text';
 import type { CommentWithAssociatedThread } from './ProfileActivity';
+
 type CommentWithThreadCommunity = CommentWithAssociatedThread & {
   thread?: { community_id?: string };
 };
@@ -44,37 +45,42 @@ const ProfileActivityRow = ({ activity }: ProfileActivityRowProps) => {
   if (isThread) {
     return <></>;
   }
+
   return community ? (
     <div className="ProfileActivityRow">
-      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+      <div className="ProfileActivityRowContainer">
         <div className="heading">
-          <CWText fontWeight="regular">
+          <CWText noWrap fontWeight="regular">
             {isReply ? `Replied in` : 'Commented on'}
           </CWText>
           &nbsp; &nbsp;
-          <CWText fontWeight="medium">
+          <CWText noWrap fontWeight="medium">
             {isReply
               ? `${comment?.communityId} Community`
               : `${comment?.communityId} Community`}
           </CWText>
         </div>
-        <CWText noWrap className="created-at ">
+        <CWText noWrap className="created_at">
           {moment(comment.createdAt).fromNow()}
         </CWText>
       </div>
+
       <div className="heading">
-        <CWText noWrap fontWeight="medium">
+        <CWText className="address" fontWeight="medium">
           {redactedAddress}
         </CWText>
       </div>
 
       <div className="title">
-        <CWText noWrap className="gray-text">
+        <CWText noWrap className="gray_text">
           Commented on: {comment?.thread?.title}
         </CWText>
       </div>
       <div className="content">
-        <CWText fontWeight="regular">{smartTrim(comment?.text, 100)}</CWText>
+        <MarkdownViewerUsingQuillOrNewEditor
+          markdown={comment?.text}
+          cutoffLines={2}
+        />
       </div>
     </div>
   ) : (
