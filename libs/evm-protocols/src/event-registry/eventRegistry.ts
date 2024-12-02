@@ -150,4 +150,13 @@ export const EventRegistry = {
     [factoryContracts[ValidChains.Arbitrum].communityStake]:
       communityStakesSource,
   },
+  [ValidChains.BSC]: {
+    [factoryContracts[ValidChains.BSC].factory]: namespaceFactorySource,
+    [factoryContracts[ValidChains.BSC].communityStake]: communityStakesSource,
+  },
+  [ValidChains.SKALE_TEST]: {
+    [factoryContracts[ValidChains.SKALE_TEST].factory]: namespaceFactorySource,
+    [factoryContracts[ValidChains.SKALE_TEST].communityStake]:
+      communityStakesSource,
+  },
 } as const satisfies EventRegistryType;
