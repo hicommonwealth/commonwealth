@@ -1,4 +1,4 @@
-@import '../../../../../styles/shared';
+@import '../../../../styles/shared';
 
 .AccountConnectionIndicator {
   .status-address {
@@ -32,6 +32,12 @@
       .copy-icon {
         margin-left: 6px;
         cursor: pointer;
+      }
+    }
+
+    .referral-link-button {
+      .Text {
+        font-weight: 400 !important;
       }
     }
   }

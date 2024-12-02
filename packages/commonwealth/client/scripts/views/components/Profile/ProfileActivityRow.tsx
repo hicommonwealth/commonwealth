@@ -1,8 +1,7 @@
-import 'components/Profile/ProfileActivityRow.scss';
-import moment from 'moment';
 import React from 'react';
 
 import Thread from 'models/Thread';
+import moment from 'moment';
 import withRouter from 'navigation/helpers';
 import { formatAddressShort } from 'shared/utils';
 import app from 'state';
@@ -10,7 +9,7 @@ import { useGetCommunityByIdQuery } from 'state/api/communities';
 import MarkdownViewerUsingQuillOrNewEditor from 'views/components/MarkdownViewerWithFallback';
 import { CWText } from '../component_kit/cw_text';
 import type { CommentWithAssociatedThread } from './ProfileActivity';
-
+import './ProfileActivityRow.scss';
 type CommentWithThreadCommunity = CommentWithAssociatedThread & {
   thread?: { community_id?: string };
 };

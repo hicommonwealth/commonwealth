@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 
-import 'components/Profile/ProfileActivity.scss';
+import './ProfileActivity.scss';
 
+import { mapProfileThread } from 'client/scripts/utils/mapProfileThread';
 import type Comment from 'models/Comment';
 import type Thread from 'models/Thread';
 import type { IUniqueId } from 'models/interfaces';
 import { CWTab, CWTabsRow } from '../component_kit/new_designs/CWTabs';
 import ProfileActivityContent from './ProfileActivityContent';
-
 enum ProfileActivityType {
   Addresses,
   Comments,
@@ -59,6 +59,7 @@ const ProfileActivity = ({ comments, threads }: ProfileActivityProps) => {
           option={selectedActivity}
           threads={threads}
           comments={comments}
+          mapProfileThread={mapProfileThread}
         />
       </div>
     </div>

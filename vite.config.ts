@@ -1,22 +1,33 @@
 /// <reference types="vitest" />
-
 import * as dotenv from 'dotenv';
 import { defineConfig } from 'vite';
 import tsconfigPaths from 'vite-tsconfig-paths';
 
 dotenv.config();
 
-const pkg = process.env.npm_package_name!;
-const parallel = !['@hicommonwealth/model', 'commonwealth'].includes(pkg);
-
-console.log('vitest:', pkg, 'parallel:', parallel);
-
 export default defineConfig({
   plugins: [tsconfigPaths()],
   test: {
+    // Enables parallel lifecycle tests
+    // setupFiles: [path.resolve(__dirname, './libs/model/src/vitest.setup.ts')],
+    // poolMatchGlobs: [
+    //   // lifecycle tests in forks pool (uses node:child_process)
+    //   ['**/libs/model/**/*-lifecycle.spec.ts', 'forks'],
+    //   // everything else runs in threads pool
+    // ],
+    // poolOptions: {
+    //   threads: { minThreads: 1, maxThreads: 1 },
+    //   forks: { minForks: 1, maxForks: 5 },
+    // },
+    // fileParallelism: process.env.npm_package_name === '@hicommonwealth/model',
+
+    // Disables parallel lifecycle tests
+    fileParallelism: false,
+
     sequence: { concurrent: false },
-    fileParallelism: parallel,
     coverage: {
+      include: ['src/**/*.ts'],
+      exclude: ['src/**/*.d.ts', '**/migrations/**', '**/node_modules/**'],
       provider: 'istanbul',
       reporter:
         process.env.CI === 'true'

@@ -1,19 +1,10 @@
-import type { AbiType } from '@hicommonwealth/shared';
+import { ContractAbi } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
+import { z } from 'zod';
 import { hashAbi } from '../utils/utils';
 import type { ModelInstance } from './types';
 
-export type ContractAbiAttributes = {
-  id?: number;
-  nickname?: string;
-  abi: AbiType;
-  abi_hash?: string;
-  verified?: boolean;
-  created_at?: Date;
-  updated_at?: Date;
-};
-
-export type ContractAbiInstance = ModelInstance<ContractAbiAttributes>;
+export type ContractAbiInstance = ModelInstance<z.infer<typeof ContractAbi>>;
 
 export default (
   sequelize: Sequelize.Sequelize,

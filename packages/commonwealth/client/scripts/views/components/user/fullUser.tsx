@@ -2,7 +2,6 @@ import { ChainBase, DEFAULT_NAME } from '@hicommonwealth/shared';
 import ghostSvg from 'assets/img/ghost.svg';
 import { saveToClipboard } from 'client/scripts/utils/clipboard';
 import clsx from 'clsx';
-import 'components/user/user.scss';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import app from 'state';
@@ -21,6 +20,7 @@ import { CWText } from '../component_kit/cw_text';
 import { CWModal } from '../component_kit/new_designs/CWModal';
 import { CWTooltip } from '../component_kit/new_designs/CWTooltip';
 import { UserSkeleton } from './UserSkeleton';
+import './user.scss';
 import { FullUserAttrsWithSkeletonProp } from './user.types';
 
 // TODO: When we remove all usages of User component (user.tsx). We should rename this file and component to User

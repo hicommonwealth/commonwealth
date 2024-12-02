@@ -16,7 +16,7 @@ import type {
   ToggleTree,
 } from './types';
 
-import 'components/sidebar/index.scss';
+import './index.scss';
 
 const resetSidebarState = () => {
   if (isWindowSmallInclusive(window.innerWidth)) {
@@ -43,11 +43,9 @@ function setDiscussionsToggleTree(path: string, toggle: boolean) {
     JSON.stringify(newTree);
 }
 interface DiscussionSectionProps {
-  isContestAvailable: boolean;
   topicIdsIncludedInContest: number[];
 }
 export const DiscussionSection = ({
-  isContestAvailable,
   topicIdsIncludedInContest,
 }: DiscussionSectionProps) => {
   const navigate = useCommonNavigate();
@@ -56,10 +54,7 @@ export const DiscussionSection = ({
     [{ path: '/discussions' }, { path: ':scope/discussions' }],
     location,
   );
-  const matchesContestsRoute = matchRoutes(
-    [{ path: '/contests' }, { path: ':scope/contests' }],
-    location,
-  );
+
   const matchesArchivedRoute = matchRoutes(
     [{ path: '/archived' }, { path: ':scope/archived' }],
     location,
@@ -134,35 +129,6 @@ export const DiscussionSection = ({
       },
       displayData: null,
     },
-    ...(isContestAvailable
-      ? [
-          {
-            title: 'Contests',
-            containsChildren: false,
-            displayData: null,
-            hasDefaultToggle: false,
-            isActive: !!matchesContestsRoute,
-            isVisible: true,
-            isUpdated: true,
-            onClick: (e, toggle: boolean) => {
-              e.preventDefault();
-              resetSidebarState();
-              handleRedirectClicks(
-                navigate,
-                e,
-                `/contests`,
-                communityId,
-                () => {
-                  setDiscussionsToggleTree(
-                    `children.Contests.toggledState`,
-                    toggle,
-                  );
-                },
-              );
-            },
-          },
-        ]
-      : []),
   ];
 
   for (const topic of topics) {

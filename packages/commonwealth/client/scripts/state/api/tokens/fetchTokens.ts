@@ -25,7 +25,7 @@ const useFetchTokensQuery = ({
       with_stats,
     },
     {
-      staleTime: FETCH_TOKENS_STALE_TIME,
+      cacheTime: FETCH_TOKENS_STALE_TIME,
       enabled,
       initialCursor: 1,
       getNextPageParam: (lastPage) => {

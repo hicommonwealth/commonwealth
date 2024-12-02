@@ -36,7 +36,7 @@ describe('Proposal Transaction Tests - gov v1beta1 chain (csdk-beta-local)', () 
   const rpcUrlBeta = `http://localhost:8080/cosmosAPI/${betaId}`;
 
   beforeAll(async () => {
-    await tester.seedDb(import.meta);
+    await tester.seedDb();
     const tm = await getTMClient(rpcUrlBeta);
     rpc = await getRPCClient(tm);
     const { signerAddress } = await setupTestSigner(rpcUrlBeta);
@@ -177,7 +177,7 @@ describe('Proposal Transaction Tests - gov v1beta1 chain (csdk-beta-local)', () 
 
 describe('Cosmos Governance v1beta1 util Tests', () => {
   beforeAll(async () => {
-    await tester.seedDb(import.meta);
+    await tester.seedDb();
   });
 
   afterAll(async () => {

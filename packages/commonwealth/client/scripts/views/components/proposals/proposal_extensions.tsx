@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 
-import 'components/proposals/proposal_extensions.scss';
 import type { AnyProposal } from '../../../models/types';
+import './proposal_extensions.scss';
 
 import app from 'state';
 

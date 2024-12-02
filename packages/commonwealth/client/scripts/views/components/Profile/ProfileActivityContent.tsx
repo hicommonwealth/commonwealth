@@ -1,12 +1,12 @@
 import React from 'react';
 
-import 'components/Profile/Profile.scss';
+import './Profile.scss';
 
 import Thread from 'models/Thread';
 import { CWText } from '../component_kit/cw_text';
 import type { CommentWithAssociatedThread } from './ProfileActivity';
 import ProfileActivityRow from './ProfileActivityRow';
-import { ProfileThread, mapProfileThread } from './ProfileThread';
+import { ProfileThread } from './ProfileThread';
 
 enum ProfileActivityType {
   Addresses,
@@ -19,12 +19,14 @@ type ProfileActivityContentProps = {
   option: ProfileActivityType;
   threads: Thread[];
   comments: CommentWithAssociatedThread[];
+  mapProfileThread: (thread: Thread) => Thread;
 };
 
 const ProfileActivityContent = ({
   option,
   comments,
   threads,
+  mapProfileThread,
 }: ProfileActivityContentProps) => {
   if (option === ProfileActivityType.Threads) {
     if (threads.length === 0) {
