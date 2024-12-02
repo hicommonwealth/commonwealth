@@ -15,7 +15,6 @@ export type QuillRendererProps = {
   customClass?: string;
   customShowMoreButton?: ReactNode;
   onImageClick?: () => void;
-  threadImage?: string | null;
   isCardView?: boolean;
 };
 
@@ -35,7 +34,6 @@ export const QuillRenderer = ({
   customClass,
   customShowMoreButton = null,
   onImageClick,
-  threadImage,
   isCardView,
 }: QuillRendererProps) => {
   const docInfo: DocInfo = useMemo(() => {
@@ -109,7 +107,6 @@ export const QuillRenderer = ({
             customClass={customClass}
             customShowMoreButton={customShowMoreButton}
             onImageClick={onImageClick}
-            threadImage={threadImage}
             isCardView={isCardView}
           />
         );
@@ -126,7 +123,6 @@ export const QuillRenderer = ({
     customClass,
     customShowMoreButton,
     onImageClick,
-    threadImage,
     isCardView,
   ]);
 

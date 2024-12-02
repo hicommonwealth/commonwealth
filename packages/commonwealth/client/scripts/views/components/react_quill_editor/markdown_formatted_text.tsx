@@ -55,7 +55,6 @@ type MarkdownFormattedTextProps = Omit<QuillRendererProps, 'doc'> & {
   doc: string;
   customClass?: string;
   onImageClick?: () => void;
-  threadImage?: string | null;
   isCardView?: boolean;
 };
 
@@ -68,7 +67,6 @@ export const MarkdownFormattedText = ({
   customClass,
   customShowMoreButton,
   onImageClick,
-  threadImage,
   isCardView,
 }: MarkdownFormattedTextProps) => {
   const containerRef = useRef<HTMLDivElement>();

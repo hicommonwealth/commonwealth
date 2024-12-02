@@ -9,7 +9,6 @@ type MarkdownViewerWithFallbackProps = {
   readonly customShowMoreButton?: ReactNode;
   readonly className?: string;
   onImageClick?: () => void;
-  threadImage?: string | null;
   isCardView?: boolean;
 };
 
@@ -25,7 +24,6 @@ export const MarkdownViewerWithFallback = (
     customShowMoreButton,
     className,
     onImageClick,
-    threadImage,
     isCardView,
   } = props;
 
@@ -49,7 +47,6 @@ export const MarkdownViewerWithFallback = (
       cutoffLines={cutoffLines}
       customShowMoreButton={customShowMoreButton}
       onImageClick={onImageClick}
-      threadImage={threadImage}
       isCardView={isCardView}
     />
   );
