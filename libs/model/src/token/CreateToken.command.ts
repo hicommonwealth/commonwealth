@@ -4,6 +4,7 @@ import * as schemas from '@hicommonwealth/schemas';
 import { TokenView } from '@hicommonwealth/schemas';
 import z from 'zod';
 import { models } from '../database';
+import { authRoles } from '../middleware';
 import { mustExist } from '../middleware/guards';
 import {
   getErc20TokenInfo,
@@ -13,7 +14,7 @@ import {
 export function CreateToken(): Command<typeof schemas.CreateToken> {
   return {
     ...schemas.CreateToken,
-    auth: [],
+    auth: [authRoles('admin')],
     body: async ({ payload }) => {
       const { chain_node_id, transaction_hash, description, icon_url } =
         payload;

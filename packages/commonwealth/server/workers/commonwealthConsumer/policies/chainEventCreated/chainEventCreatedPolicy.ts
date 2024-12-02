@@ -1,5 +1,4 @@
 import {
-  Actor,
   EventHandler,
   Policy,
   command,
@@ -7,7 +6,7 @@ import {
   logger,
 } from '@hicommonwealth/core';
 import { EvmEventSignatures } from '@hicommonwealth/evm-protocols';
-import { Token, models } from '@hicommonwealth/model';
+import { Token, middleware, models } from '@hicommonwealth/model';
 import { ZodUndefined } from 'zod';
 import { handleCommunityStakeTrades } from './handleCommunityStakeTrades';
 import { handleLaunchpadTrade } from './handleLaunchpadTrade';
@@ -28,9 +27,10 @@ export const processChainEventCreated: EventHandler<
     EvmEventSignatures.Launchpad.TokenLaunched
   ) {
     await command(Token.CreateToken(), {
-      actor: [] as unknown as Actor,
+      actor: middleware.systemActor({}),
       payload: {
         chain_node_id: payload.eventSource.chainNodeId,
+        community_id: '', // not required for system actors
         transaction_hash: payload.rawLog.transactionHash,
       },
     });
