@@ -32,7 +32,7 @@ export const Topic = z.object({
   group_ids: z.array(PG_INT).default([]),
   default_offchain_template_backup: z.string().nullish(),
   weighted_voting: z.nativeEnum(TopicWeightedVoting).nullish(),
-  token_chain_node_id: z
+  chain_node_id: z
     .number()
     .int()
     .nullish()

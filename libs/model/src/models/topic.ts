@@ -10,7 +10,7 @@ export type TopicAttributes = z.infer<typeof Topic> & {
   // associations
   community?: CommunityAttributes;
   threads?: ThreadAttributes[];
-  token_chain_node?: ChainNodeAttributes;
+  ChainNode?: ChainNodeAttributes;
 };
 export type TopicInstance = ModelInstance<TopicAttributes>;
 
@@ -51,7 +51,7 @@ export default (
       },
       telegram: { type: Sequelize.STRING, allowNull: true },
       weighted_voting: { type: Sequelize.STRING, allowNull: true },
-      token_chain_node_id: { type: Sequelize.INTEGER, allowNull: true },
+      chain_node_id: { type: Sequelize.INTEGER, allowNull: true },
       token_address: { type: Sequelize.STRING, allowNull: true },
       token_symbol: { type: Sequelize.STRING, allowNull: true },
       vote_weight_multiplier: { type: Sequelize.FLOAT, allowNull: true },

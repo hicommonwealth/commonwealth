@@ -16,6 +16,8 @@ const useTokenFinder = ({
   const [tokenValue, setTokenValue] = useState(initialTokenValue || '');
   const debouncedTokenValue = useDebounce<string>(tokenValue, 500);
 
+  console.log({ debouncedTokenValue, nodeEthChainId });
+
   const { data: tokenMetadata, isLoading: tokenMetadataLoading } =
     useTokenMetadataQuery({
       tokenId: debouncedTokenValue,
@@ -25,8 +27,8 @@ const useTokenFinder = ({
   const nativeTokenMetadata: GetTokenMetadataResponse = {
     decimals: 18,
     logo: '',
-    name: 'Native ETH', // TODO: get native eth name/symbol
-    symbol: '',
+    name: 'ETH', // TODO: get native eth name/symbol
+    symbol: 'ETH',
   };
 
   const getTokenError = (isOneOff?: boolean) => {

@@ -62,9 +62,7 @@ export const buildAssociations = (db: DB) => {
   db.ChainNode.withMany(db.Community)
     .withMany(db.EvmEventSource)
     .withOne(db.LastProcessedEvmBlock)
-    .withMany(db.Topic, {
-      foreignKey: 'token_chain_node_id',
-    });
+    .withMany(db.Topic);
 
   db.ContractAbi.withMany(db.EvmEventSource, { foreignKey: 'abi_id' });
 

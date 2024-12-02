@@ -40,8 +40,13 @@ const WVERC20Details = ({ onStepChange, onCreateTopic }: WVConsentProps) => {
     tokenMetadataLoading,
     tokenValue,
   } = useTokenFinder({
-    nodeEthChainId: app.chain.meta.ChainNode?.eth_chain_id || 0,
+    nodeEthChainId:
+      Number(selectedChain?.value) ||
+      app.chain.meta.ChainNode?.eth_chain_id ||
+      0,
   });
+
+  console.log({ selectedChain });
 
   const editMode = false;
 

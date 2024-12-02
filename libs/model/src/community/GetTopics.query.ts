@@ -4,6 +4,7 @@ import * as schemas from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
 import { z } from 'zod';
 import { models } from '../database';
+import { buildChainNodeUrl } from '../utils';
 
 const includeContestManagersQuery = `
     SELECT td.*,
@@ -58,31 +59,35 @@ export function GetTopics(): Query<typeof schemas.GetTopics> {
         : 'AND archived_at IS NULL';
 
       const sql = `
-          WITH topic_data AS (SELECT id,
-                                     name,
-                                     community_id,
-                                     description,
-                                     telegram,
-                                     featured_in_sidebar,
-                                     featured_in_new_post,
-                                     default_offchain_template,
-                                     "order",
-                                     channel_id,
-                                     group_ids,
-                                     weighted_voting,
-                                     token_symbol,
-                                     vote_weight_multiplier,
-                                     token_address,
-                                     created_at::text           AS created_at,
-                                     updated_at::text           AS updated_at,
-                                     deleted_at::text           AS deleted_at,
-                                     archived_at::text          AS archived_at,
+          WITH topic_data AS (SELECT t.id,
+                                     t.name,
+                                     t.community_id,
+                                     t.description,
+                                     t.telegram,
+                                     t.featured_in_sidebar,
+                                     t.featured_in_new_post,
+                                     t.default_offchain_template,
+                                     t."order",
+                                     t.channel_id,
+                                     t.group_ids,
+                                     t.weighted_voting,
+                                     t.token_symbol,
+                                     t.vote_weight_multiplier,
+                                     t.token_address,
+                                     cn.url as chain_node_url,
+                                     cn.eth_chain_id as eth_chain_id,
+                                     t.created_at::text           AS created_at,
+                                     t.updated_at::text           AS updated_at,
+                                     t.deleted_at::text           AS deleted_at,
+                                     t.archived_at::text          AS archived_at,
                                      (SELECT count(*)::int
                                       FROM "Threads"
                                       WHERE community_id = :community_id
                                         AND topic_id = t.id
                                         AND deleted_at IS NULL) AS total_threads
                               FROM "Topics" t
+                                LEFT JOIN "ChainNodes" cn
+                                ON t.chain_node_id = cn.id
                               WHERE t.community_id = :community_id
                                 AND t.deleted_at IS NULL ${archivedTopicsQuery})
               ${contest_managers}
@@ -102,6 +107,9 @@ export function GetTopics(): Query<typeof schemas.GetTopics> {
             c.voting_power = BigNumber.from(c.voting_power).toString();
           });
         });
+        if (r.chain_node_url) {
+          r.chain_node_url = buildChainNodeUrl(r.chain_node_url, 'public');
+        }
       });
 
       return results;

@@ -42,7 +42,6 @@ export async function getVotingWeight(
       },
       {
         model: models.ChainNode.scope('withPrivateData'),
-        as: 'token_chain_node',
         required: false,
       },
     ],
@@ -74,8 +73,8 @@ export async function getVotingWeight(
     return commonProtocol.calculateVoteWeight(stakeBalance, stake.vote_weight);
   } else if (topic.weighted_voting === TopicWeightedVoting.ERC20) {
     // use topic chain node or fallback on namespace chain node
-    const { eth_chain_id, private_url, url } = topic.token_chain_node
-      ? topic.token_chain_node
+    const { eth_chain_id, private_url, url } = topic.ChainNode
+      ? topic.ChainNode
       : namespaceChainNode || {};
     mustExist('Chain Node Eth Chain Id', eth_chain_id);
     const chainNodeUrl = private_url! || url!;
