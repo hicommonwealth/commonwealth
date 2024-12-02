@@ -2,8 +2,8 @@ import React from 'react';
 
 import { ChainBase, ChainNetwork, ChainType } from '@hicommonwealth/shared';
 
-import 'components/sidebar/index.scss';
 import { handleRedirectClicks } from 'helpers';
+import './index.scss';
 
 import { useCommonNavigate } from 'navigation/helpers';
 import { matchRoutes, useLocation } from 'react-router-dom';

@@ -1,10 +1,10 @@
-import 'modals/ArchiveThreadModal.scss';
 import React from 'react';
 import app from 'state';
 import { useEditThreadMutation } from 'state/api/threads';
 import type Thread from '../../models/Thread';
 import { CWText } from '../components/component_kit/cw_text';
 import { CWButton } from '../components/component_kit/new_designs/CWButton';
+import './ArchiveThreadModal.scss';
 
 import { buildUpdateThreadInput } from 'client/scripts/state/api/threads/editThread';
 import useUserStore from 'state/ui/user';

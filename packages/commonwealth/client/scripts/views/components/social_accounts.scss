@@ -1,0 +1,19 @@
+@import '../../styles/shared.scss';
+
+.SocialAccounts {
+  display: flex;
+  max-width: 240px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin: 16px auto 16px;
+
+  .social-icon {
+    fill: $neutral-500;
+    transition: fill 0.2s ease-in-out;
+    margin: 0 8px 8px 8px;
+
+    &:hover {
+      fill: $neutral-700;
+    }
+  }
+}

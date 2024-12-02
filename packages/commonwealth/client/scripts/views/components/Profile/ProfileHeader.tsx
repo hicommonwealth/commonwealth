@@ -2,7 +2,7 @@ import jdenticon from 'jdenticon';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import 'components/Profile/ProfileHeader.scss';
+import './ProfileHeader.scss';
 
 import {
   DEFAULT_NAME,

@@ -31,6 +31,7 @@ const outboxEvents = {
   [E.GroupCreated]: P.GroupCreated,
   [E.OneOffContestManagerDeployed]: P.OneOffContestManagerDeployed,
   [E.RecurringContestManagerDeployed]: P.RecurringContestManagerDeployed,
+  [E.SignUpFlowCompleted]: P.SignUpFlowCompleted,
   [E.SnapshotProposalCreated]: P.SnapshotProposalCreated,
   [E.SubscriptionPreferencesUpdated]: P.SubscriptionPreferencesUpdated,
   [E.ThreadCreated]: P.ThreadCreated,

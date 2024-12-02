@@ -1,10 +1,10 @@
-import 'components/sidebar/external_links_module.scss';
 import { categorizeSocialLinks } from 'helpers/link';
 import React from 'react';
 import app from 'state';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import CWCircleMultiplySpinner from '../component_kit/new_designs/CWCircleMultiplySpinner';
+import './external_links_module.scss';
 
 export const ExternalLinksModule = () => {
   const { data: community, isLoading } = useGetCommunityByIdQuery({

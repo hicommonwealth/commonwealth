@@ -1,4 +1,3 @@
-import 'Sublayout.scss';
 import clsx from 'clsx';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import useWindowResize from 'hooks/useWindowResize';
@@ -16,6 +15,7 @@ import {
   useWelcomeOnboardModal,
 } from '../state/ui/modals';
 import useUserStore from '../state/ui/user';
+import './Sublayout.scss';
 import { SublayoutBanners } from './SublayoutBanners';
 import { AdminOnboardingSlider } from './components/AdminOnboardingSlider';
 import { Breadcrumbs } from './components/Breadcrumbs';
