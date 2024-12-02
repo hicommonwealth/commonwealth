@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Virtuoso } from 'react-virtuoso';
 
-import 'components/feed.scss';
+import './feed.scss';
 
 import { PageNotFound } from '../pages/404';
 import { UserDashboardRowSkeleton } from '../pages/user_dashboard/user_dashboard_row';

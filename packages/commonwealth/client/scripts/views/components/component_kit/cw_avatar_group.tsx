@@ -3,8 +3,8 @@ import React from 'react';
 import type MinimumProfile from '../../../models/MinimumProfile';
 
 import clsx from 'clsx';
-import 'components/component_kit/cw_avatar_group.scss';
 import { CWAvatar, CWJdenticon } from './cw_avatar';
+import './cw_avatar_group.scss';
 import { CWText } from './cw_text';
 
 export type ProfileWithAddress = MinimumProfile & {

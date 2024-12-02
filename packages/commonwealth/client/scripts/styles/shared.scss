@@ -1,0 +1,112 @@
+@import 'mixins/buttons';
+@import 'mixins/media_queries';
+@import 'mixins/breakpoints.module';
+@import 'mixins/elevation';
+@import 'mixins/colors.module';
+@import 'mixins/border_radius';
+@import 'mixins/choice';
+@import 'mixins/inputs';
+@import 'mixins/icons';
+@import 'mixins/text';
+@import 'utils';
+
+// layout & global nav parameters
+
+$sidebar-width: 232px;
+$quick-switcher-width: 56px;
+$global-header-height: 56px;
+$global-sidebar-header-height: 49px;
+$sidebar-community-header-height: 56px;
+
+// base fonts
+
+$fonts: NeueHaasUnica, Silka, 'Segoe UI', sans-serif, 'Apple Color Emoji',
+  'Segoe UI Emoji', 'Segoe UI Symbol';
+
+$monospace-fonts:
+  SF Mono,
+  Menlo,
+  Monaco,
+  'Lucida Sans Typewriter',
+  'Courier New',
+  Courier,
+  monospace;
+
+$font-family-silka: Silka, sans-serif;
+
+$font-family-neue-haas-unica: NeueHaasUnica, 'Segoe UI', sans-serif,
+  'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
+
+$font-family-monospace: 'DM Mono', monospace;
+$font-family-roboto: 'Roboto', sans-serif;
+
+@mixin visibleScrollbar($theme) {
+  &::-webkit-scrollbar {
+    -webkit-appearance: none;
+  }
+
+  &::-webkit-scrollbar:vertical {
+    height: 88px;
+    width: 8px;
+  }
+
+  @if $theme ==light {
+    &::-webkit-scrollbar-track {
+      background: $neutral-50;
+      border-radius: $border-radius-corners;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      border-radius: $border-radius-corners;
+      background-color: $neutral-200;
+    }
+  } @else if $theme ==dark {
+    &::-webkit-scrollbar-track {
+      background: $neutral-700;
+      border-radius: $border-radius-corners;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      border-radius: $border-radius-corners;
+      background-color: $neutral-500;
+    }
+  }
+}
+
+@mixin contentPadding {
+  padding: 56px;
+
+  @include medium {
+    padding: 40px;
+  }
+
+  @include mediumSmall {
+    padding: 32px;
+  }
+
+  @include smallInclusive {
+    padding: 16px;
+  }
+}
+
+@mixin flame($size: medium) {
+  @if $size ==small {
+    .flame::after {
+      content: '\1F525';
+      display: block;
+      font-size: 14px;
+    }
+  } @else if $size ==medium {
+    .flame::after {
+      content: '\1F525';
+      display: block;
+      font-size: 22px;
+    }
+  } @else if $size ==large {
+    .flame::after {
+      content: '\1F525';
+      display: block;
+      font-size: 30px;
+    }
+  }
+}

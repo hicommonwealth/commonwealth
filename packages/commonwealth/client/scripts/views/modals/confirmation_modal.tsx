@@ -14,7 +14,7 @@ import {
   CWModalHeader,
 } from '../components/component_kit/new_designs/CWModal';
 
-import '../../../styles/modals/confirmation_modal.scss';
+import './confirmation_modal.scss';
 
 interface ConfirmationModalProps {
   title?: string;

@@ -6,8 +6,8 @@ import {
   SearchSort,
   VALID_SEARCH_SCOPES,
 } from 'models/SearchQuery';
-import 'pages/search/index.scss';
 import useSidebarStore from 'state/ui/sidebar';
+import './index.scss';
 
 import useWindowResize from 'hooks/useWindowResize';
 import React, { useEffect, useMemo } from 'react';

@@ -22,10 +22,10 @@ import clsx from 'clsx';
 import { notifySuccess } from 'controllers/app/notifications';
 import { DeltaStatic } from 'quill';
 import { MessageRow } from 'views/components/component_kit/new_designs/CWTextInput/MessageRow';
-import '../../../styles/modals/edit_topic_modal.scss';
 import { CWText } from '../components/component_kit/cw_text';
 import { ReactQuillEditor } from '../components/react_quill_editor';
 import { createDeltaFromText } from '../components/react_quill_editor/utils';
+import './edit_topic_modal.scss';
 
 type EditTopicModalProps = {
   onModalClose: () => void;

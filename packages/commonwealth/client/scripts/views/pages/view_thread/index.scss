@@ -1,0 +1,77 @@
+@import '../../../styles/shared.scss';
+
+.thread-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+
+  .thread-footer-row {
+    align-items: center;
+    display: flex;
+    gap: 16px;
+  }
+
+  .callout-text {
+    background: #f7f6f7;
+    display: flex;
+    gap: 10px;
+    color: #656167;
+    padding: 16px 24px;
+    border-radius: $border-radius-corners;
+
+    .Text {
+      font-style: normal;
+      font-weight: 400;
+      font-size: 14px;
+      line-height: 20px;
+      color: #656167;
+    }
+  }
+
+  .JoinCommunityBanner {
+    margin-top: 8px;
+  }
+}
+
+.cards-column {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.thread-actions .popover-container {
+  display: flex;
+  border-radius: $border-radius-corners;
+
+  &:hover {
+    background-color: $neutral-100;
+  }
+}
+
+.comments-filter-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+
+  .CommentsTree {
+    margin-left: auto;
+  }
+
+  .Checkbox {
+    margin-left: auto !important;
+  }
+}
+
+@include extraSmall {
+  .comments-filter-row {
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+
+    .Checkbox {
+      margin-left: 0 !important;
+    }
+  }
+}

@@ -1,4 +1,3 @@
-import 'Sublayout.scss';
 import clsx from 'clsx';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import useWindowResize from 'hooks/useWindowResize';
@@ -10,16 +9,23 @@ import { SublayoutHeader } from 'views/components/SublayoutHeader';
 import { Sidebar } from 'views/components/sidebar';
 import useNecessaryEffect from '../hooks/useNecessaryEffect';
 import useStickyHeader from '../hooks/useStickyHeader';
-import { useAuthModalStore, useWelcomeOnboardModal } from '../state/ui/modals';
+import {
+  useAuthModalStore,
+  useInviteLinkModal,
+  useWelcomeOnboardModal,
+} from '../state/ui/modals';
 import useUserStore from '../state/ui/user';
+import './Sublayout.scss';
 import { SublayoutBanners } from './SublayoutBanners';
 import { AdminOnboardingSlider } from './components/AdminOnboardingSlider';
 import { Breadcrumbs } from './components/Breadcrumbs';
 import MobileNavigation from './components/MobileNavigation';
 import AuthButtons from './components/SublayoutHeader/AuthButtons';
 import { UserTrainingSlider } from './components/UserTrainingSlider';
+import { CWModal } from './components/component_kit/new_designs/CWModal';
 import CollapsableSidebarButton from './components/sidebar/CollapsableSidebarButton';
 import { AuthModal, AuthModalType } from './modals/AuthModal';
+import InviteLinkModal from './modals/InviteLinkModal';
 import { WelcomeOnboardModal } from './modals/WelcomeOnboardModal';
 
 type SublayoutProps = {
@@ -45,6 +51,9 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
 
   const { isWelcomeOnboardModalOpen, setIsWelcomeOnboardModalOpen } =
     useWelcomeOnboardModal();
+
+  const { isInviteLinkModalOpen, setIsInviteLinkModalOpen } =
+    useInviteLinkModal();
 
   useNecessaryEffect(() => {
     if (
@@ -177,6 +186,17 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
         <WelcomeOnboardModal
           isOpen={isWelcomeOnboardModalOpen}
           onClose={() => setIsWelcomeOnboardModalOpen(false)}
+        />
+        <CWModal
+          size="small"
+          content={
+            <InviteLinkModal
+              onModalClose={() => setIsInviteLinkModalOpen(false)}
+              isInsideCommunity={!!isInsideCommunity}
+            />
+          }
+          open={!isWindowExtraSmall && isInviteLinkModalOpen}
+          onClose={() => setIsInviteLinkModalOpen(false)}
         />
       </div>
       {isWindowExtraSmall && <MobileNavigation />}

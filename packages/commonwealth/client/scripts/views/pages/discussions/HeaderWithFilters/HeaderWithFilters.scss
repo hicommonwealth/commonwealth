@@ -1,4 +1,4 @@
-@import '../../../../../styles/shared';
+@import '../../../../styles/shared';
 
 .HeaderWithFilters {
   background-color: $white;
@@ -60,9 +60,9 @@
 
   @include smallInclusive {
     .filter-row {
-      flex-direction: column;
+      flex-direction: row;
       align-items: flex-start;
-      gap: 8px;
+      gap: 2px;
     }
   }
 
@@ -70,7 +70,7 @@
     margin-top: 0;
 
     .filter-section-right {
-      flex-direction: column;
+      flex-direction: row;
       align-items: flex-start;
     }
 
