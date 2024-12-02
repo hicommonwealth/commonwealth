@@ -188,7 +188,7 @@ describe('Check Contests', () => {
 
     // vote should have been cast
     expect(voteContentStub).toHaveBeenCalled();
-    const [_, addr] = voteContentStub.mock.calls[0];
+    const [, addr] = voteContentStub.mock.calls[0];
     expect(addr.startsWith('0x'), 'using valid wallet address').to.be.true;
     expect(addr).has.length(42, 'using valid wallet address');
   });
