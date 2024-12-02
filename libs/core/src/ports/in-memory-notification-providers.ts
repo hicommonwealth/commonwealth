@@ -20,31 +20,23 @@ export function SpyNotificationsProvider(stubs?: {
 }): NotificationsProvider {
   return {
     name: 'SpyNotificationsProvider',
-    dispose: vi.fn((): Promise<void> => Promise.resolve()),
+    dispose: vi.fn(() => Promise.resolve()),
     triggerWorkflow:
-      stubs?.triggerWorkflowStub ||
-      vi.fn((): Promise<any> => Promise.resolve([])),
-    getMessages:
-      stubs?.getMessagesStub ||
-      vi.fn((): Promise<any[]> => Promise.resolve([])),
-    getSchedules:
-      stubs?.getSchedulesStub ||
-      vi.fn((): Promise<any[]> => Promise.resolve([])),
+      stubs?.triggerWorkflowStub || vi.fn(() => Promise.resolve([])),
+    getMessages: stubs?.getMessagesStub || vi.fn(() => Promise.resolve([])),
+    getSchedules: stubs?.getSchedulesStub || vi.fn(() => Promise.resolve([])),
     createSchedules:
-      stubs?.createSchedulesStub ||
-      vi.fn((): Promise<any[]> => Promise.resolve([])),
+      stubs?.createSchedulesStub || vi.fn(() => Promise.resolve([])),
     deleteSchedules:
-      stubs?.deleteSchedulesStub ||
-      vi.fn((): Promise<Set<string>> => Promise.resolve(new Set())),
+      stubs?.deleteSchedulesStub || vi.fn(() => Promise.resolve(new Set())),
     identifyUser:
-      stubs?.identifyUserStub ||
-      vi.fn((): Promise<{ id: string }> => Promise.resolve({ id: '' })),
+      stubs?.identifyUserStub || vi.fn(() => Promise.resolve({ id: '' })),
     registerClientRegistrationToken:
       stubs?.registerClientRegistrationToken ||
-      vi.fn((): Promise<boolean> => Promise.resolve(true)),
+      vi.fn(() => Promise.resolve(true)),
     unregisterClientRegistrationToken:
       stubs?.unregisterClientRegistrationToken ||
-      vi.fn((): Promise<boolean> => Promise.resolve(true)),
+      vi.fn(() => Promise.resolve(true)),
   };
 }
 
@@ -65,30 +57,24 @@ export function ThrowingSpyNotificationsProvider(stubs?: {
 }): NotificationsProvider {
   return {
     name: 'ThrowingNotificationsProvider',
-    dispose: vi.fn((): Promise<void> => Promise.resolve()),
+    dispose: vi.fn(() => Promise.resolve()),
     triggerWorkflow:
-      stubs?.triggerWorkflowStub ||
-      vi.fn((): Promise<any> => Promise.reject(ProviderError)),
+      stubs?.triggerWorkflowStub || vi.fn(() => Promise.reject(ProviderError)),
     getMessages:
-      stubs?.getMessagesStub ||
-      vi.fn((): Promise<any[]> => Promise.reject(ProviderError)),
+      stubs?.getMessagesStub || vi.fn(() => Promise.reject(ProviderError)),
     getSchedules:
-      stubs?.getSchedulesStub ||
-      vi.fn((): Promise<any[]> => Promise.reject(ProviderError)),
+      stubs?.getSchedulesStub || vi.fn(() => Promise.reject(ProviderError)),
     createSchedules:
-      stubs?.createSchedulesStub ||
-      vi.fn((): Promise<any[]> => Promise.reject(ProviderError)),
+      stubs?.createSchedulesStub || vi.fn(() => Promise.reject(ProviderError)),
     deleteSchedules:
-      stubs?.deleteSchedulesStub ||
-      vi.fn((): Promise<Set<string>> => Promise.reject(ProviderError)),
+      stubs?.deleteSchedulesStub || vi.fn(() => Promise.reject(ProviderError)),
     identifyUser:
-      stubs?.identifyUserStub ||
-      vi.fn((): Promise<{ id: string }> => Promise.reject(ProviderError)),
+      stubs?.identifyUserStub || vi.fn(() => Promise.reject(ProviderError)),
     registerClientRegistrationToken:
       stubs?.registerClientRegistrationToken ||
-      vi.fn((): Promise<boolean> => Promise.reject(ProviderError)),
+      vi.fn(() => Promise.reject(ProviderError)),
     unregisterClientRegistrationToken:
       stubs?.unregisterClientRegistrationToken ||
-      vi.fn((): Promise<boolean> => Promise.reject(ProviderError)),
+      vi.fn(() => Promise.reject(ProviderError)),
   };
 }
