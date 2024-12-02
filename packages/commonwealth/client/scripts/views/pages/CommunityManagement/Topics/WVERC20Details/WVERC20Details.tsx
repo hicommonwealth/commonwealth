@@ -46,8 +46,6 @@ const WVERC20Details = ({ onStepChange, onCreateTopic }: WVConsentProps) => {
       0,
   });
 
-  console.log({ selectedChain });
-
   const editMode = false;
 
   const handleSubmit = () => {

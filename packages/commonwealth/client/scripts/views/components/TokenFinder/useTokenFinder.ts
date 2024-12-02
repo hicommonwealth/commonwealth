@@ -16,8 +16,6 @@ const useTokenFinder = ({
   const [tokenValue, setTokenValue] = useState(initialTokenValue || '');
   const debouncedTokenValue = useDebounce<string>(tokenValue, 500);
 
-  console.log({ debouncedTokenValue, nodeEthChainId });
-
   const { data: tokenMetadata, isLoading: tokenMetadataLoading } =
     useTokenMetadataQuery({
       tokenId: debouncedTokenValue,
