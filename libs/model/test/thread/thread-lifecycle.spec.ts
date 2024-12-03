@@ -20,6 +20,7 @@ import {
   command,
   dispose,
   inMemoryBlobStorage,
+  query,
 } from '@hicommonwealth/core';
 import { AddressAttributes, R2_ADAPTER_KEY } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
@@ -44,6 +45,7 @@ import {
   CreateThreadReaction,
   CreateThreadReactionErrors,
   DeleteThread,
+  GetThreads,
   UpdateThread,
   UpdateThreadErrors,
 } from '../../src/thread';
@@ -1115,6 +1117,24 @@ describe('Thread lifecycle', () => {
           },
         }),
       ).rejects.toThrow('Not the author of the entity');
+    });
+  });
+
+  describe('queries', () => {
+    test('should query threads', async () => {
+      // test GetThreads output schema validation
+      // TODO: include contests, votes, and other fields
+
+      const response = await query(GetThreads(), {
+        actor: actors.member,
+        payload: {
+          community_id: thread.community_id,
+          limit: 100,
+        },
+      });
+
+      // console.log(response);
+      expect(response!.threads.length).to.equal(7);
     });
   });
 });
