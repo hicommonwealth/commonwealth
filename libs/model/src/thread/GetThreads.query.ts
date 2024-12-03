@@ -110,7 +110,7 @@ export function GetThreads(): Query<typeof schemas.GetThreads> {
                     'id', T.id,
                     'name', T.name,
                     'description', T.description,
-                    'communityId', T.community_id,
+                    'community_id', T.community_id,
                     'telegram', T.telegram
                 ) as topic,
                 json_build_object(
@@ -156,9 +156,10 @@ export function GetThreads(): Query<typeof schemas.GetThreads> {
                 TT.id as thread_id,
                 json_agg(json_strip_nulls(json_build_object(
                 'id', R.id,
+                'address_id', R.address_id,
                 'reaction', R.reaction,
                 'updated_at', R.updated_at::text,
-                'calculated_voting_weight', R.calculated_voting_weight,
+                'calculated_voting_weight', R.calculated_voting_weight::text,
                 'profile_name', U.profile->>'name',
                 'avatar_url', U.profile->>'avatar_url',
                 'address', A.address,
@@ -184,7 +185,12 @@ export function GetThreads(): Query<typeof schemas.GetThreads> {
                 'thread_id', TT.id,
                 'content_id', CA.content_id,
                 'start_time', CON.start_time,
-                'end_time', CON.end_time
+                'end_time', CON.end_time,
+                'ContestManager', json_build_object(
+                    'name', CM.name,
+                    'cancelled', CM.cancelled,
+                    'interval', CM.interval
+                )
             ))) as "associatedContests"
             FROM "Contests" CON
             JOIN "ContestManagers" CM ON CM.contest_address = CON.contest_address
