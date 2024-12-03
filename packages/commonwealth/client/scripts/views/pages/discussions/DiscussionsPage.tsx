@@ -126,8 +126,6 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     apiEnabled: topicObj?.token_address === ZERO_ADDRESS,
   });
 
-  console.log({ erc20Balance, userEthBalance });
-
   const { dateCursor } = useDateCursor({
     dateRange: searchParams.get('dateRange') as ThreadTimelineFilterTypes,
   });
