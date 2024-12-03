@@ -1,9 +1,9 @@
 import { InvalidState } from '@hicommonwealth/core';
 import { commonProtocol } from '@hicommonwealth/evm-protocols';
 import { TopicWeightedVoting } from '@hicommonwealth/schemas';
-import { BalanceSourceType } from '@hicommonwealth/shared';
+import { BalanceSourceType, ZERO_ADDRESS } from '@hicommonwealth/shared';
 import { BigNumber } from 'ethers';
-import { tokenBalanceCache } from '.';
+import { GetBalancesOptions, tokenBalanceCache } from '.';
 import { config } from '../config';
 import { models } from '../database';
 import { mustExist } from '../middleware/guards';
@@ -78,19 +78,31 @@ export async function getVotingWeight(
     mustExist('Chain Node URL', chainNodeUrl);
     mustExist('Topic Token Address', topic.token_address);
 
-    const balances = await tokenBalanceCache.getBalances({
-      balanceSourceType: BalanceSourceType.ERC20,
-      addresses: [address],
-      sourceOptions: {
-        evmChainId: eth_chain_id,
-        contractAddress: topic.token_address,
-      },
-      cacheRefresh: true,
-    });
+    const balanceOptions: GetBalancesOptions =
+      topic.token_address == ZERO_ADDRESS
+        ? {
+            balanceSourceType: BalanceSourceType.ETHNative,
+            addresses: [address],
+            sourceOptions: {
+              evmChainId: eth_chain_id,
+            },
+          }
+        : {
+            balanceSourceType: BalanceSourceType.ERC20,
+            addresses: [address],
+            sourceOptions: {
+              evmChainId: eth_chain_id,
+              contractAddress: topic.token_address,
+            },
+          };
+
+    balanceOptions.cacheRefresh = true;
+
+    const balances = await tokenBalanceCache.getBalances(balanceOptions);
 
     const tokenBalance = balances[address];
 
-    if (BigNumber.from(tokenBalance).lte(0))
+    if (BigNumber.from(tokenBalance || 0).lte(0))
       throw new InvalidState('Insufficient token balance');
 
     const result = commonProtocol.calculateVoteWeight(
