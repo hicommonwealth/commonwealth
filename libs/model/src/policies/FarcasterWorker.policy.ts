@@ -198,7 +198,7 @@ export function FarcasterWorker(): Policy<typeof inputs> {
         mustExist('Community with Chain Node', community?.ChainNode);
 
         const contestManagers = contestActions.map((ca) => ({
-          url: community.ChainNode!.url! || community.ChainNode!.private_url!,
+          url: community.ChainNode!.private_url! || community.ChainNode!.url!,
           contest_address: contestManager.contest_address,
           content_id: ca.content_id,
         }));
