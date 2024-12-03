@@ -110,7 +110,7 @@ export const WithActiveStickyComment = memo(function WithActiveStickyComment(
     return () => {
       activator.setActiveElement(null);
     };
-  }, [children, activator]);
+  }, [children, activator, stickyEditor]);
 
   return stickyEditor ? null : props.children;
 });
