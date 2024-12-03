@@ -1,10 +1,9 @@
 import { dispose } from '@hicommonwealth/core';
-import { ContractAbiInstance, models, tester } from '@hicommonwealth/model';
+import { ContractAbiInstance, models } from '@hicommonwealth/model';
 import sinon from 'sinon';
 import {
   afterAll,
   afterEach,
-  beforeAll,
   beforeEach,
   describe,
   expect,
@@ -20,10 +19,6 @@ describe('scheduleNodeProcessing', () => {
   let singleSourceSuccess = false;
   let namespaceAbiInstance: ContractAbiInstance;
   let stakesAbiInstance: ContractAbiInstance;
-
-  beforeAll(async () => {
-    await tester.bootstrap_testing();
-  });
 
   afterAll(async () => {
     await dispose()();

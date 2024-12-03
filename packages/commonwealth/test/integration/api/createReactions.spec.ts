@@ -3,8 +3,7 @@ import { commonProtocol } from '@hicommonwealth/model';
 import chai, { assert } from 'chai';
 import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
-import Sinon from 'sinon';
-import { afterAll, beforeAll, describe, test } from 'vitest';
+import { afterAll, beforeAll, describe, test, vi } from 'vitest';
 import { TestServer, testServer } from '../../../server-test';
 import { config } from '../../../server/config';
 
@@ -59,9 +58,10 @@ describe('createReaction Integration Tests', () => {
     );
     userAddress = res.address;
     userDid = res.did;
-    Sinon.stub(commonProtocol.contractHelpers, 'getNamespaceBalance').value(
-      () => ({ [userAddress]: 300 }),
-    );
+    vi.spyOn(
+      commonProtocol.contractHelpers,
+      'getNamespaceBalance',
+    ).mockResolvedValue({ [userAddress]: '300' });
     userJWT = jwt.sign(
       { id: res.user_id, email: res.email },
       config.AUTH.JWT_SECRET,
@@ -95,7 +95,7 @@ describe('createReaction Integration Tests', () => {
   });
 
   afterAll(async () => {
-    Sinon.restore();
+    vi.restoreAllMocks();
     await dispose()();
   });
 

@@ -3,7 +3,6 @@ import { buildUpdateThreadInput } from 'client/scripts/state/api/threads/editThr
 import { useAuthModalStore } from 'client/scripts/state/ui/modals';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { SessionKeyError } from 'controllers/server/sessions';
-import 'pages/view_thread/edit_body.scss';
 import type { DeltaStatic } from 'quill';
 import React from 'react';
 import app from 'state';
@@ -15,6 +14,7 @@ import { CWButton } from '../../components/component_kit/new_designs/CWButton';
 import { ReactQuillEditor } from '../../components/react_quill_editor';
 import { deserializeDelta } from '../../components/react_quill_editor/utils';
 import { clearEditingLocalStorage } from '../discussions/CommentTree/helpers';
+import './edit_body.scss';
 
 type EditBodyProps = {
   title: string;

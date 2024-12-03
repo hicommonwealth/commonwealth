@@ -1,5 +1,4 @@
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import 'pages/AdminPanel.scss';
 import React, { useState } from 'react';
 import { isAddress } from 'web3-utils';
 import { CWText } from '../../components/component_kit/cw_text';
@@ -7,6 +6,7 @@ import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import { ValidationStatus } from '../../components/component_kit/cw_validation_text';
 import { CWButton } from '../../components/component_kit/new_designs/CWButton';
 import { openConfirmation } from '../../modals/confirmation_modal';
+import './AdminPanel.scss';
 import { updateSiteAdmin } from './utils';
 
 const MakeSiteAdminTask = () => {
@@ -21,7 +21,9 @@ const MakeSiteAdminTask = () => {
   const onPromote = () => {
     openConfirmation({
       title: 'Promote to Site Admin',
-      description: `Are you sure you want promote ${address} to super admin? The apotheosis of a user is not to be taken lightly.`,
+      description: `
+        Are you sure you want promote ${address} to super admin? The apotheosis of a user is not to be taken lightly.
+      `,
       buttons: [
         {
           label: 'promote',

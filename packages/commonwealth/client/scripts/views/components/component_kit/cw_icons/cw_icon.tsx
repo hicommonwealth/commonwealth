@@ -1,7 +1,7 @@
 import React from 'react';
 
-import 'components/component_kit/cw_icon.scss';
 import { ComponentType } from '../types';
+import './cw_icon.scss';
 import { iconLookup } from './cw_icon_lookup';
 import type { IconComponentProps } from './types';
 

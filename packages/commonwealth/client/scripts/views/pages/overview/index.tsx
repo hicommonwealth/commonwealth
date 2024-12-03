@@ -1,8 +1,6 @@
 import { splitAndDecodeURL } from '@hicommonwealth/shared';
 import useRunOnceOnCondition from 'client/scripts/hooks/useRunOnceOnCondition';
 import { useCommonNavigate } from 'navigation/helpers';
-import 'pages/discussions/index.scss';
-import 'pages/overview/index.scss';
 import React from 'react';
 import app from 'state';
 import { useFetchThreadsQuery } from 'state/api/threads';
@@ -11,8 +9,10 @@ import type Thread from '../../../models/Thread';
 import type { Topic } from '../../../models/Topic';
 import { CWDivider } from '../../components/component_kit/cw_divider';
 import { CWText } from '../../components/component_kit/cw_text';
+import '../discussions/DiscussionsPage.scss';
 import { PageLoading } from '../loading';
 import { TopicSummaryRow } from './TopicSummaryRow';
+import './index.scss';
 
 const OverviewPage = () => {
   const navigate = useCommonNavigate();

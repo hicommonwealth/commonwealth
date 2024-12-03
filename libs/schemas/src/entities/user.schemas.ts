@@ -113,8 +113,12 @@ export const CommunityMember = z.object({
 });
 
 export const XpLog = z.object({
-  user_id: PG_INT,
-  created_at: z.coerce.date(),
   event_name: z.string(),
+  event_created_at: z.coerce.date(),
+  user_id: PG_INT,
   xp_points: PG_INT,
+  action_meta_id: PG_INT.nullish(),
+  creator_user_id: PG_INT.nullish(),
+  creator_xp_points: PG_INT.nullish(),
+  created_at: z.coerce.date(),
 });
