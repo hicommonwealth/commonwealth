@@ -67,6 +67,7 @@ export const StickCommentProvider = memo(function StickCommentProvider(
 /**
  * The default sticky comment.  This needs to wrap the main comment reply.
  */
+// eslint-disable-next-line react/no-multi-comp
 export const WithDefaultStickyComment = memo(function WithDefaultStickyComment(
   props: Props,
 ) {
@@ -80,7 +81,7 @@ export const WithDefaultStickyComment = memo(function WithDefaultStickyComment(
     return () => {
       activator.setDefaultElement(null);
     };
-  }, [children]);
+  }, [children, activator]);
 
   return null;
 });
@@ -89,6 +90,7 @@ export const WithDefaultStickyComment = memo(function WithDefaultStickyComment(
  * We need to wrap our comment reply in this so that when the user hits reply
  * it overrides the main comment post.
  */
+// eslint-disable-next-line react/no-multi-comp
 export const WithActiveStickyComment = memo(function WithActiveStickyComment(
   props: Props,
 ) {
@@ -108,7 +110,7 @@ export const WithActiveStickyComment = memo(function WithActiveStickyComment(
     return () => {
       activator.setActiveElement(null);
     };
-  }, [children]);
+  }, [children, activator]);
 
   return stickyEditor ? null : props.children;
 });
@@ -120,6 +122,7 @@ export const WithActiveStickyComment = memo(function WithActiveStickyComment(
  * fall back to the default element (the main comment), or if nothing is being
  * used just return nothing.
  */
+// eslint-disable-next-line react/no-multi-comp
 export const StickyCommentElementSelector = memo(
   function StickyCommentElementSelector() {
     const activator = useActivatorContext();
