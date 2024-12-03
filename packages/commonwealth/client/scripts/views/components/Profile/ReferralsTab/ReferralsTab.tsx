@@ -7,12 +7,16 @@ import { saveToClipboard } from 'utils/clipboard';
 import { APIOrderDirection } from 'helpers/constants';
 import { Avatar } from '../../Avatar';
 import { CWIcon } from '../../component_kit/cw_icons/cw_icon';
+import { CWText } from '../../component_kit/cw_text';
+import CWIconButton from '../../component_kit/new_designs/CWIconButton';
+import CWPopover, {
+  usePopover,
+} from '../../component_kit/new_designs/CWPopover';
 import { CWTable } from '../../component_kit/new_designs/CWTable';
 import { CWTableColumnInfo } from '../../component_kit/new_designs/CWTable/CWTable';
 import { useCWTableState } from '../../component_kit/new_designs/CWTable/useCWTableState';
 import { CWTextInput } from '../../component_kit/new_designs/CWTextInput';
 
-import { CWText } from '../../component_kit/cw_text';
 import './ReferralsTab.scss';
 
 const fakeData = [
@@ -70,6 +74,7 @@ interface ReferralsTabProps {
 
 const ReferralsTab = ({ isOwner }: ReferralsTabProps) => {
   const user = useUserStore();
+  const popoverProps = usePopover();
 
   const tableState = useCWTableState({
     columns,
@@ -102,44 +107,78 @@ const ReferralsTab = ({ isOwner }: ReferralsTabProps) => {
         />
       )}
 
-      <CWTable
-        columnInfo={tableState.columns}
-        sortingState={tableState.sorting}
-        setSortingState={tableState.setSorting}
-        rowData={fakeData.map((item) => ({
-          ...item,
-          member: {
-            sortValue: item.user.name.toLowerCase(),
-            customElement: (
-              <div className="table-cell">
-                <Link
-                  to={`/profile/id/${item.user.userId}`}
-                  className="user-info"
-                >
-                  <Avatar
-                    url={item.user.avatarUrl ?? ''}
-                    size={24}
-                    address={+item.user.address}
-                  />
-                  <p>{item.user.name}</p>
-                </Link>
-              </div>
-            ),
-          },
-          earnings: {
-            sortValue: item.earnings,
-            customElement: (
-              <div className="table-cell text-right">USD {item.earnings}</div>
-            ),
-          },
-        }))}
-      />
-      <div className="referral-totals">
-        <CWText type="b2" fontWeight="bold">
-          Total
-        </CWText>
-        <CWText type="b2">USD 10.30</CWText>
-      </div>
+      {fakeData.length > 0 ? (
+        <>
+          <CWTable
+            columnInfo={tableState.columns}
+            sortingState={tableState.sorting}
+            setSortingState={tableState.setSorting}
+            rowData={fakeData.map((item) => ({
+              ...item,
+              member: {
+                sortValue: item.user.name.toLowerCase(),
+                customElement: (
+                  <div className="table-cell">
+                    <Link
+                      to={`/profile/id/${item.user.userId}`}
+                      className="user-info"
+                    >
+                      <Avatar
+                        url={item.user.avatarUrl ?? ''}
+                        size={24}
+                        address={+item.user.address}
+                      />
+                      <p>{item.user.name}</p>
+                    </Link>
+                  </div>
+                ),
+              },
+              earnings: {
+                sortValue: item.earnings,
+                customElement: (
+                  <div className="table-cell text-right">
+                    USD {item.earnings}
+                  </div>
+                ),
+              },
+            }))}
+          />
+          <div className="referral-totals">
+            <CWText type="b2" fontWeight="bold">
+              Total
+            </CWText>
+            <CWText type="b2">USD 10.30</CWText>
+
+            <>
+              <CWIconButton
+                iconName="infoEmpty"
+                buttonSize="sm"
+                onMouseEnter={popoverProps.handleInteraction}
+                onMouseLeave={popoverProps.handleInteraction}
+              />
+              <CWPopover
+                body={
+                  <CWText type="b2">
+                    Earnings are generated when a referred user makes a
+                    transaction on the platform. 20% of the fees from each
+                    transaction are shared with the referrer.
+                  </CWText>
+                }
+                {...popoverProps}
+              />
+            </>
+          </div>
+        </>
+      ) : (
+        <div className="empty-state">
+          <CWText className="empty-state-text">
+            You currently have no referrals.
+          </CWText>
+          <CWText className="empty-state-text">
+            Refer your friends to earn rewards.
+          </CWText>
+        </div>
+      )}
     </div>
   );
 };
