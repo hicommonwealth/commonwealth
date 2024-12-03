@@ -2,9 +2,10 @@ import { TopicWeightedVoting } from '@hicommonwealth/schemas';
 import BigNumber from 'bignumber.js';
 import moment from 'moment';
 import React from 'react';
-import app from 'state';
 import Account from '../models/Account';
+import { IBlockInfo } from '../models/interfaces';
 import { ThreadStage } from '../models/types';
+import type { IApp } from '../state/index';
 
 export async function sleep(msec) {
   return new Promise((resolve) => setTimeout(resolve, msec));
@@ -26,7 +27,11 @@ export function threadStageToLabel(stage: string) {
   }
 }
 
-export function isDefaultStage(stage: string, customStages?: string[]) {
+export function isDefaultStage(
+  app: IApp,
+  stage: string,
+  customStages?: string[],
+) {
   return (
     stage === ThreadStage.Discussion ||
     stage ===
@@ -174,16 +179,19 @@ export function renderMultilineText(text: string) {
  * blocknum helpers
  */
 
-export function blocknumToTime(blocknum: number): moment.Moment {
-  const currentBlocknum = app.chain.block.height;
-  const blocktime = app.chain.block.duration;
-  const lastBlockTime: moment.Moment = app.chain.block.lastTime.clone();
+export function blocknumToTime(
+  block: IBlockInfo,
+  blocknum: number,
+): moment.Moment {
+  const currentBlocknum = block.height;
+  const blocktime = block.duration;
+  const lastBlockTime: moment.Moment = block.lastTime.clone();
   return lastBlockTime.add((blocknum - currentBlocknum) * blocktime, 'seconds');
 }
 
-export function blocknumToDuration(blocknum: number) {
+export function blocknumToDuration(block: IBlockInfo, blocknum: number) {
   return moment
-    .duration(blocknumToTime(blocknum).diff(moment()))
+    .duration(blocknumToTime(block, blocknum).diff(moment()))
     .asMilliseconds();
 }
 

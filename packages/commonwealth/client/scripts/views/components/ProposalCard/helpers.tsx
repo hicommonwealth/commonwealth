@@ -11,6 +11,7 @@ import type { AnyProposal } from '../../../models/types';
 import { ProposalStatus } from '../../../models/types';
 
 import { Countdown } from 'views/components/countdown';
+import app from '../../../state/index';
 
 export const getStatusClass = (proposal: AnyProposal, isLoading?: boolean) => {
   if (isLoading) return '';
@@ -48,7 +49,10 @@ export const getStatusText = (proposal: AnyProposal, isLoading?: boolean) => {
         ? [
             <Countdown
               key={proposal.endTime.kind}
-              duration={blocknumToDuration(proposal.endTime.blocknum)}
+              duration={blocknumToDuration(
+                app.chain.block,
+                proposal.endTime.blocknum,
+              )}
             />,
             ` left (ends on block ${formatNumberLong(
               proposal.endTime.blocknum,
@@ -58,7 +62,10 @@ export const getStatusText = (proposal: AnyProposal, isLoading?: boolean) => {
           ? [
               <Countdown
                 key={proposal.endTime.kind}
-                duration={blocknumToDuration(proposal.endTime.getBlocknum())}
+                duration={blocknumToDuration(
+                  app.chain.block,
+                  proposal.endTime.getBlocknum(),
+                )}
               />,
               ` left (ends on block ${formatNumberLong(
                 proposal.endTime.getBlocknum(),

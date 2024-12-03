@@ -21,6 +21,7 @@ import { getClasses } from 'views/components/component_kit/helpers';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import useBrowserWindow from '../../../../hooks/useBrowserWindow';
 import { ThreadStage } from '../../../../models/types';
+import app from '../../../../state/index';
 import Permissions from '../../../../utils/Permissions';
 import { CommentCard } from '../CommentCard';
 import { isHot, removeImageFormMarkDown } from '../helpers';
@@ -125,7 +126,7 @@ export const ThreadCard = ({
   const linkedSnapshots = filterLinks(thread.links, LinkSource.Snapshot);
   const linkedProposals = filterLinks(thread.links, LinkSource.Proposal);
 
-  const isStageDefault = isDefaultStage(thread.stage, customStages);
+  const isStageDefault = isDefaultStage(app, thread.stage, customStages);
   const isTagsRowVisible =
     (thread.stage && !isStageDefault) || linkedProposals?.length > 0;
   const stageLabel = threadStageToLabel(thread.stage);

@@ -152,4 +152,18 @@ export const AUTH_TYPES: AuthTypesList = {
     },
     label: 'Email',
   },
+  SMS: {
+    icon: {
+      name: 'SMS',
+      isCustom: true,
+    },
+    label: 'SMS',
+  },
+  farcaster: {
+    icon: {
+      name: 'farcaster',
+      isCustom: true,
+    },
+    label: 'Farcaster',
+  },
 };
