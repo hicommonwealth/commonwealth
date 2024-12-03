@@ -1,3 +1,4 @@
+import { useFlag } from 'hooks/useFlag';
 import React, {
   createContext,
   memo,
@@ -87,9 +88,15 @@ export const WithDefaultStickyComment = memo((props: Props) => {
 export const WithActiveStickyComment = memo((props: Props) => {
   const { children } = props;
 
+  const stickyEditor = useFlag('stickyEditor');
+
   const activator = useActivatorContext();
 
   useEffect(() => {
+    if (!stickyEditor) {
+      return;
+    }
+
     activator.setActiveElement(children);
 
     return () => {
@@ -97,7 +104,7 @@ export const WithActiveStickyComment = memo((props: Props) => {
     };
   }, [children]);
 
-  return null;
+  return stickyEditor ? null : props.children;
 });
 
 /**
