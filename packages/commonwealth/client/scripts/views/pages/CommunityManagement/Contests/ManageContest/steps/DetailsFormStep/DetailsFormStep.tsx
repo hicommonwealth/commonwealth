@@ -468,10 +468,8 @@ const DetailsFormStep = ({
               <div className="contest-section contest-section-payout">
                 <CWText type="h4">Winners & payouts</CWText>
                 <CWText type="b1" className="winners-description">
-                  Set the number of winners and how much of the total prize pool
-                  they take{' '}
-                  <CWText fontWeight="medium">20% of each prize</CWText> will be
-                  split amongst the voters of the winning content.
+                  Set the number of winners and allocate the proportion of
+                  prizes for them.
                 </CWText>
                 <div className="payout-container">
                   {payoutStructure.map((payoutNumber, index) => (
