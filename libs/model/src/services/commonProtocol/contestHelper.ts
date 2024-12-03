@@ -352,7 +352,10 @@ export const rollOverContest = async (
       gasResult = await contractCall.estimateGas({
         from: web3.eth.defaultAccount,
       });
-    } catch {}
+    } catch {
+      //eslint-disable-next-line
+      //@ts-ignore no-empty
+    }
 
     const maxFeePerGasEst = await estimateGas(web3);
 
