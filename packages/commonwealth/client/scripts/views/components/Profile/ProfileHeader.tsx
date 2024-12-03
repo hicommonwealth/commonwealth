@@ -71,6 +71,16 @@ const ProfileHeader = ({ profile, isOwner }: ProfileHeaderProps) => {
         <CWText type="h3" className="name">
           {name || DEFAULT_NAME}
         </CWText>
+
+        {referralsEnabled && isCurrentUser && (
+          <CWButton
+            buttonType="tertiary"
+            buttonHeight="sm"
+            label="Get referral link"
+            className="referral-link-button"
+            onClick={() => setIsInviteLinkModalOpen(true)}
+          />
+        )}
         <div className="icon-container">
           <SocialAccounts profile={profile} />
           <SharePopover linkToShare={window.location.href} />
