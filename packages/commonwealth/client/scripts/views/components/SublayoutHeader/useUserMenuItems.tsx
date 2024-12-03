@@ -30,6 +30,7 @@ import {
 
 import { useCommunityStake } from '../CommunityStake';
 
+import { useFlag } from 'hooks/useFlag';
 import { EXCEPTION_CASE_VANILLA_getCommunityById } from 'state/api/communities/getCommuityById';
 import useUserStore from 'state/ui/user';
 import UserMenuItem from './UserMenuItem';
@@ -66,12 +67,14 @@ interface UseUserMenuItemsProps {
   onAuthModalOpen: () => void;
   isMenuOpen: boolean;
   onAddressItemClick?: () => void;
+  onReferralItemClick?: () => void;
 }
 
 const useUserMenuItems = ({
   onAuthModalOpen,
   isMenuOpen,
   onAddressItemClick,
+  onReferralItemClick,
 }: UseUserMenuItemsProps) => {
   const [isDarkModeOn, setIsDarkModeOn] = useState<boolean>(
     localStorage.getItem('dark-mode-state') === 'on',
@@ -83,6 +86,8 @@ const useUserMenuItems = ({
   const { authenticatedAddresses } = useCheckAuthenticatedAddresses({
     recheck: isMenuOpen,
   });
+
+  const referralsEnabled = useFlag('referrals');
 
   const userData = useUserStore();
 
@@ -261,6 +266,17 @@ const useUserMenuItems = ({
         label: 'Edit profile',
         onClick: () => navigate(`/profile/edit`, {}, null),
       },
+      ...(referralsEnabled
+        ? [
+            {
+              type: 'default',
+              label: 'Get referral link',
+              onClick: () => {
+                onReferralItemClick?.();
+              },
+            },
+          ]
+        : []),
       {
         type: 'default',
         label: 'My community stake',

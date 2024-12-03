@@ -29,6 +29,7 @@ const featureFlags = {
   newEditor: buildFlag(process.env.FLAG_NEW_EDITOR),
   tokenizedCommunity: buildFlag(process.env.FLAG_TOKENIZED_COMMUNITY),
   manageApiKeys: buildFlag(process.env.FLAG_MANAGE_API_KEYS),
+  referrals: buildFlag(process.env.FLAG_REFERRALS),
   stickyEditor: buildFlag(process.env.FLAG_STICKY_EDITOR),
 };
 

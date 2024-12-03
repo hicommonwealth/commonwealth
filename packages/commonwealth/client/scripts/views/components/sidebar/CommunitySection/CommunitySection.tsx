@@ -125,12 +125,11 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
 
         <CWDivider />
         <DiscussionSection
-          isContestAvailable={isContestAvailable}
           // @ts-expect-error <StrictNullChecks/>
           topicIdsIncludedInContest={topicIdsIncludedInContest}
         />
         <CWDivider />
-        <GovernanceSection />
+        <GovernanceSection isContestAvailable={isContestAvailable} />
         <CWDivider />
         <DirectoryMenuItem />
         <CWDivider />
