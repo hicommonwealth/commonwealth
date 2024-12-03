@@ -138,9 +138,6 @@ importers:
       '@types/readline-sync':
         specifier: ^1.4.8
         version: 1.4.8
-      '@types/sinon':
-        specifier: ^17.0.3
-        version: 17.0.3
       '@types/underscore':
         specifier: ^1.9.4
         version: 1.11.15
@@ -255,9 +252,6 @@ importers:
       sharp:
         specifier: ^0.31.2
         version: 0.31.3
-      sinon:
-        specifier: ^15.0.4
-        version: 15.2.0
       source-map-support:
         specifier: ^0.5.21
         version: 0.5.21
@@ -1416,15 +1410,9 @@ importers:
       '@types/passport-auth-token':
         specifier: ^1.0.4
         version: 1.0.4
-      '@types/sinon':
-        specifier: ^17.0.3
-        version: 17.0.3
       '@types/uuid':
         specifier: ^9.0.7
         version: 9.0.8
-      sinon:
-        specifier: ^17.0.2
-        version: 17.0.2
 
   packages/load-testing:
     dependencies:
@@ -14823,10 +14811,6 @@ packages:
 
   simple-swizzle@0.2.2:
     resolution: {integrity: sha512-JA//kQgZtbuY83m+xT+tXJkmJncGMTFT+C+g2h2R9uxkYIrE2yy9sgmcLhCnw57/WSD+Eh3J97FPEDFnbXnDUg==}
-
-  sinon@15.2.0:
-    resolution: {integrity: sha512-nPS85arNqwBXaIsFCkolHjGIkFo+Oxu9vbgmBJizLAhqe6P2o3Qmj3KCUoRkfhHtvgDhZdWD3risLHAUJ8npjw==}
-    deprecated: 16.1.1
 
   sinon@17.0.2:
     resolution: {integrity: sha512-uihLiaB9FhzesElPDFZA7hDcNABzsVHwr3YfmM9sBllVwab3l0ltGlRV1XhpNfIacNDLGD1QRZNLs5nU5+hTuA==}
@@ -37155,15 +37139,6 @@ snapshots:
   simple-swizzle@0.2.2:
     dependencies:
       is-arrayish: 0.3.2
-
-  sinon@15.2.0:
-    dependencies:
-      '@sinonjs/commons': 3.0.1
-      '@sinonjs/fake-timers': 10.3.0
-      '@sinonjs/samsam': 8.0.0
-      diff: 5.2.0
-      nise: 5.1.9
-      supports-color: 7.2.0
 
   sinon@17.0.2:
     dependencies:
