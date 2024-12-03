@@ -1,0 +1,63 @@
+@import '../../../../styles/shared.scss';
+
+.ReferralsTab {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+
+  input,
+  svg {
+    cursor: pointer !important;
+  }
+
+  input:read-only {
+    background-color: $neutral-50;
+    border-color: $neutral-200;
+    color: $neutral-400;
+
+    &:hover {
+      border-color: $neutral-200;
+    }
+
+    &:focus-within {
+      border-color: $neutral-200 !important;
+      box-shadow: none !important;
+    }
+  }
+
+  table {
+    width: 100%;
+
+    .table-cell {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+
+      .user-info {
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: black;
+
+        div {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+        }
+
+        :hover,
+        :focus,
+        :visited {
+          text-decoration: underline;
+        }
+      }
+
+      &.text-right {
+        display: block;
+        text-align: right;
+      }
+    }
+  }
+}
