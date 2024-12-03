@@ -347,15 +347,19 @@ export const rollOverContest = async (
       ? contestInstance.methods.endContest()
       : contestInstance.methods.newContest();
 
-    let gasResult;
+    let gasResult = BigInt(300000);
     try {
       gasResult = await contractCall.estimateGas({
         from: web3.eth.defaultAccount,
       });
-    } catch {
-      return false;
-    }
+    } catch {}
+
     const maxFeePerGasEst = await estimateGas(web3);
+
+    if (gasResult < BigInt(100000)) {
+      gasResult = BigInt(300000);
+    }
+
     await contractCall.send({
       from: web3.eth.defaultAccount,
       gas: gasResult.toString(),
