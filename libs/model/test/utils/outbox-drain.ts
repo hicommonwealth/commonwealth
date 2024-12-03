@@ -27,12 +27,12 @@ export async function drainOutbox<E extends Events>(
   });
   const projection = factory();
   for (const { event_name, event_payload } of drained) {
+    console.log(
+      `>>> ${event_name} >>> ${factory.name} >>> ${JSON.stringify(event_payload)}`,
+    );
     await handleEvent(projection, {
       name: event_name,
       payload: event_payload,
     });
-    console.log(
-      `>>> ${event_name} >>> ${factory.name} >>> ${JSON.stringify(event_payload)}`,
-    );
   }
 }

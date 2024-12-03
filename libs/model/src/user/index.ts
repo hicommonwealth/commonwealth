@@ -10,3 +10,4 @@ export * from './GetUserReferrals.query';
 export * from './SearchUserProfiles.query';
 export * from './UpdateUser.command';
 export * from './UserReferrals.projection';
+export * from './Xp.projection';

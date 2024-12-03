@@ -69,52 +69,43 @@ describe('Launchpad Lifecycle', () => {
     await dispose()();
   });
 
-  test(
-    'Create Token works given txHash and chainNodeId',
-    { timeout: 10_000 },
-    async () => {
-      const payload = {
-        transaction_hash: CREATE_TOKEN_TXN_HASH,
-        chain_node_id: node!.id!,
-        description: 'test',
-        icon_url: 'test',
-        community_id: community_id!,
-      };
+  test('Create Token works given txHash and chainNodeId', async () => {
+    const payload = {
+      transaction_hash: CREATE_TOKEN_TXN_HASH,
+      chain_node_id: node!.id!,
+      description: 'test',
+      icon_url: 'test',
+      community_id: community_id!,
+    };
 
-      const results = await command(CreateToken(), {
-        actor,
-        payload,
-      });
+    const results = await command(CreateToken(), {
+      actor,
+      payload,
+    });
 
-      expect(equalEvmAddresses(results?.token_address, TOKEN_ADDRESS)).to.be
-        .true;
-      expect(results?.symbol).to.equal('DMLND');
-    },
-  );
+    expect(equalEvmAddresses(results?.token_address, TOKEN_ADDRESS)).to.be.true;
+    expect(results?.symbol).to.equal('DMLND');
+  });
 
-  test(
-    'Get a launchpad trade txn and project it',
-    { timeout: 10_000 },
-    async () => {
-      const payload = {
-        transaction_hash: TRADE_TOKEN_TXN_HASH,
-        eth_chain_id: commonProtocol.ValidChains.SepoliaBase,
-      };
-      const results = await command(CreateLaunchpadTrade(), {
-        actor,
-        payload,
-      });
-      expect(results).to.deep.equal({
-        eth_chain_id: commonProtocol.ValidChains.SepoliaBase,
-        transaction_hash: TRADE_TOKEN_TXN_HASH,
-        token_address: TOKEN_ADDRESS.toLowerCase(),
-        trader_address: '0x2cE1F5d4f84B583Ab320cAc0948AddE52a131FBE',
-        is_buy: true,
-        community_token_amount: '534115082271506067334',
-        price: 3.98859030778e-7,
-        floating_supply: '535115082271506067334',
-        timestamp: 1731523956,
-      });
-    },
-  );
+  test('Get a launchpad trade txn and project it', async () => {
+    const payload = {
+      transaction_hash: TRADE_TOKEN_TXN_HASH,
+      eth_chain_id: commonProtocol.ValidChains.SepoliaBase,
+    };
+    const results = await command(CreateLaunchpadTrade(), {
+      actor,
+      payload,
+    });
+    expect(results).to.deep.equal({
+      eth_chain_id: commonProtocol.ValidChains.SepoliaBase,
+      transaction_hash: TRADE_TOKEN_TXN_HASH,
+      token_address: TOKEN_ADDRESS.toLowerCase(),
+      trader_address: '0x2cE1F5d4f84B583Ab320cAc0948AddE52a131FBE',
+      is_buy: true,
+      community_token_amount: '534115082271506067334',
+      price: 3.98859030778e-7,
+      floating_supply: '535115082271506067334',
+      timestamp: 1731523956,
+    });
+  });
 });
