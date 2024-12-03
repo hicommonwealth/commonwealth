@@ -2,6 +2,7 @@ import {
   Comment,
   FarcasterAction,
   FarcasterCast,
+  LaunchpadTrade,
   PG_INT,
   Reaction,
   SubscriptionPreference,
@@ -11,7 +12,6 @@ import { z } from 'zod';
 import {
   CommunityStakeTrade,
   LaunchpadTokenCreated,
-  LaunchpadTrade,
   NamespaceDeployed,
 } from './chain-event.schemas';
 import { EventMetadata } from './util.schemas';
@@ -41,6 +41,9 @@ export const CommentCreated = Comment.omit({ search: true }).extend({
 export const CommentUpvoted = Reaction.omit({ thread_id: true }).extend({
   comment_id: PG_INT,
 });
+
+export const TradeEvent = LaunchpadTrade;
+
 export const GroupCreated = z.object({
   groupId: z.string(),
   userId: z.string(),

@@ -12,6 +12,7 @@ import {
   CommentCreatedNotification,
   CommunityStakeNotification,
   SnapshotProposalCreatedNotification,
+  TradeEventNotification,
   UpvoteNotification,
   UserMentionedNotification,
   WebhookNotification,
@@ -293,6 +294,7 @@ export enum WorkflowKeys {
   EmailRecap = 'email-recap',
   EmailDigest = 'email-digest',
   Webhooks = 'webhooks',
+  TradeEvent = 'trade-event',
 }
 
 export enum KnockChannelIds {
@@ -345,6 +347,10 @@ export type NotificationsProviderTriggerOptions =
         | {
             data: z.infer<typeof UpvoteNotification>;
             key: WorkflowKeys.NewUpvotes;
+          }
+        | {
+            data: z.infer<typeof TradeEventNotification>;
+            key: WorkflowKeys.TradeEvent;
           }
       ))
   | WebhookProviderOptions;
