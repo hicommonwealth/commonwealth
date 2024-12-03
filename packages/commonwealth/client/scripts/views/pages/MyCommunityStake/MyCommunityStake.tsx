@@ -1,7 +1,6 @@
 import { WalletId } from '@hicommonwealth/shared';
 import { formatAddressShort } from 'helpers';
 import useTransactionHistory from 'hooks/useTransactionHistory';
-import { Magic } from 'magic-sdk';
 import React, { useState } from 'react';
 import useUserStore from 'state/ui/user';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
@@ -14,6 +13,7 @@ import {
   CWTabsRow,
 } from '../../components/component_kit/new_designs/CWTabs';
 import { CWTextInput } from '../../components/component_kit/new_designs/CWTextInput';
+import useAuthentication from '../../modals/AuthModal/useAuthentication';
 import { PageNotFound } from '../404';
 import './MyCommunityStake.scss';
 import NoTransactionHistory from './NoTransactionHistory';
@@ -26,8 +26,6 @@ const BASE_ADDRESS_FILTER = {
   label: 'All addresses',
   value: '',
 };
-
-const magic = new Magic(process.env.MAGIC_PUBLISHABLE_KEY!);
 
 const MyCommunityStake = () => {
   const [activeTabIndex, setActiveTabIndex] = useState<number>(0);
@@ -57,13 +55,7 @@ const MyCommunityStake = () => {
     addressFilter = possibleAddresses;
   }
 
-  const openMagicWallet = async () => {
-    try {
-      await magic.wallet.showUI();
-    } catch (error) {
-      console.trace(error);
-    }
-  };
+  const { openMagicWallet } = useAuthentication({});
 
   const data = useTransactionHistory({
     filterOptions,

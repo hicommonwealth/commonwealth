@@ -4,7 +4,6 @@ import { saveToClipboard } from 'client/scripts/utils/clipboard';
 import clsx from 'clsx';
 import { findDenominationIcon } from 'helpers/findDenomination';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
-import { Magic } from 'magic-sdk';
 import React from 'react';
 import { isMobile } from 'react-device-detect';
 import {
@@ -37,6 +36,7 @@ import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelec
 import { MessageRow } from 'views/components/component_kit/new_designs/CWTextInput/MessageRow';
 import useAppStatus from '../../../../hooks/useAppStatus';
 import { trpc } from '../../../../utils/trpcClient';
+import useAuthentication from '../../../modals/AuthModal/useAuthentication';
 import { useStakeExchange } from '../hooks';
 import {
   ManageCommunityStakeModalMode,
@@ -48,8 +48,6 @@ import {
   CustomAddressOptionElement,
 } from './CustomAddressOption';
 import './StakeExchangeForm.scss';
-
-const magic = new Magic(process.env.MAGIC_PUBLISHABLE_KEY!);
 
 type OptionDropdown = {
   value: string;
@@ -256,13 +254,7 @@ const StakeExchangeForm = ({
     }
   };
 
-  const openMagicWallet = async () => {
-    try {
-      await magic.wallet.showUI();
-    } catch (error) {
-      console.trace(error);
-    }
-  };
+  const { openMagicWallet } = useAuthentication({});
 
   const insufficientFunds = isBuyMode
     ? // @ts-expect-error <StrictNullChecks/>

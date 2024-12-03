@@ -28,6 +28,7 @@ import {
   signSessionWithAccount,
 } from 'controllers/server/sessions';
 import _ from 'lodash';
+import { Magic } from 'magic-sdk';
 import { useEffect, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import app, { initAppState } from 'state';
@@ -54,9 +55,11 @@ type UseAuthenticationProps = {
     address?: string | null | undefined,
     isNewlyCreated?: boolean,
   ) => Promise<void>;
-  onModalClose: () => void;
+  onModalClose?: () => void;
   withSessionKeyLoginFlow?: boolean;
 };
+
+const magic = new Magic(process.env.MAGIC_PUBLISHABLE_KEY!);
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Wallet = IWebWallet<any>;
@@ -584,6 +587,14 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     props?.onModalClose?.();
   };
 
+  const openMagicWallet = async () => {
+    try {
+      await magic.wallet.showUI();
+    } catch (error) {
+      console.trace(error);
+    }
+  };
+
   return {
     wallets,
     isMagicLoading,
@@ -598,6 +609,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     setEmail,
     setSMS,
     onVerifyMobileWalletSignature,
+    openMagicWallet,
   };
 };
 

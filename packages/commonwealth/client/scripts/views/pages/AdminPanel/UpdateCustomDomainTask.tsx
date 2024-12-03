@@ -25,8 +25,6 @@ const UpdateCustomDomainTask = () => {
           buttonType: 'destructive',
           buttonHeight: 'sm',
           onClick: () => {
-            console.log('communityId', communityId);
-            console.log('customDomain', customDomain);
             void (async () => {
               await updateCustomDomain.mutateAsync({
                 community_id: communityId,

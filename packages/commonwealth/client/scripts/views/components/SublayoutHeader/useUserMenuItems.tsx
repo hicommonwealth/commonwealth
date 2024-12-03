@@ -12,7 +12,6 @@ import WebWalletController from 'controllers/app/web_wallets';
 import { SessionKeyError } from 'controllers/server/sessions';
 import { setDarkMode } from 'helpers/darkMode';
 import { getUniqueUserAddresses } from 'helpers/user';
-import { Magic } from 'magic-sdk';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useCallback, useEffect, useState } from 'react';
 import app, { initAppState } from 'state';
@@ -31,11 +30,11 @@ import {
   toggleDarkMode,
 } from 'views/components/component_kit/cw_toggle';
 import CWIconButton from 'views/components/component_kit/new_designs/CWIconButton';
+import useAuthentication from '../../modals/AuthModal/useAuthentication';
 import { useCommunityStake } from '../CommunityStake';
 import UserMenuItem from './UserMenuItem';
 import useCheckAuthenticatedAddresses from './useCheckAuthenticatedAddresses';
 
-const magic = new Magic(process.env.MAGIC_PUBLISHABLE_KEY!);
 const resetWalletConnectSession = async () => {
   /**
    * Imp to reset wc session on logout as otherwise, subsequent login attempts will fail
@@ -87,6 +86,8 @@ const useUserMenuItems = ({
 
   const userData = useUserStore();
   const hasMagic = userData.addresses?.[0]?.walletId === WalletId.Magic;
+
+  const { openMagicWallet } = useAuthentication({});
 
   const navigate = useCommonNavigate();
   const { stakeEnabled } = useCommunityStake();
@@ -164,14 +165,6 @@ const useUserMenuItems = ({
   useEffect(() => {
     updateCanvasSignedAddresses().catch(console.error);
   }, [updateCanvasSignedAddresses]);
-
-  const openMagicWallet = async () => {
-    try {
-      await magic.wallet.showUI();
-    } catch (error) {
-      console.trace(error);
-    }
-  };
 
   const addresses: PopoverMenuItem[] = userData.accounts.map((account) => {
     const signed = canvasSignedAddresses.includes(account.address);
@@ -275,7 +268,6 @@ const useUserMenuItems = ({
         ? [
             {
               type: 'default',
-              // label: 'Open wallet',
               label: (
                 <div className="UserMenuItem">
                   <div>Open wallet</div>
