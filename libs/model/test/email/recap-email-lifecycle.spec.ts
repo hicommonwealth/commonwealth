@@ -39,8 +39,6 @@ describe('Recap email lifecycle', () => {
   let recipientUser: z.infer<typeof User> | undefined;
   let authorUser: z.infer<typeof User> | undefined;
 
-  let sandbox: sinon.SinonSandbox;
-
   beforeAll(async () => {
     [recipientUser] = await seed('User', {
       isAdmin: false,
@@ -93,10 +91,7 @@ describe('Recap email lifecycle', () => {
   afterEach(() => {
     const provider = notificationsProvider();
     disposeAdapter(provider.name);
-
-    if (sandbox) {
-      sandbox.restore();
-    }
+    vi.restoreAllMocks();
   });
 
   afterAll(async () => {

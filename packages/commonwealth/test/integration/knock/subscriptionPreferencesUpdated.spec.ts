@@ -11,7 +11,6 @@ import { models, tester } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import sinon from 'sinon';
 import {
   afterAll,
   afterEach,
@@ -19,6 +18,7 @@ import {
   beforeEach,
   describe,
   expect,
+  Mock,
   test,
   vi,
 } from 'vitest';
@@ -29,7 +29,6 @@ import { processSubscriptionPreferencesUpdated } from '../../../server/workers/k
 chai.use(chaiAsPromised);
 
 describe('subscriptionPreferencesUpdated', () => {
-  let sandbox: sinon.SinonSandbox;
   let user: z.infer<typeof schemas.User> | undefined;
 
   beforeAll(async () => {
@@ -58,9 +57,7 @@ describe('subscriptionPreferencesUpdated', () => {
     const provider = notificationsProvider();
     disposeAdapter(provider.name);
 
-    if (sandbox) {
-      sandbox.restore();
-    }
+    vi.restoreAllMocks();
   });
 
   afterAll(async () => {
@@ -89,17 +86,13 @@ describe('subscriptionPreferencesUpdated', () => {
     });
 
     expect(res).to.be.true;
-    expect((provider.getSchedules as sinon.SinonStub).calledOnce).to.be.true;
-    expect(
-      (provider.getSchedules as sinon.SinonStub).getCall(0).args[0],
-    ).to.deep.equal({
+    expect(provider.getSchedules as Mock).toHaveBeenCalledOnce();
+    expect((provider.getSchedules as Mock).mock.calls[0][0]).to.deep.equal({
       // @ts-expect-error StrictNullChecks
       user_id: String(user.id!),
     });
-    expect((provider.deleteSchedules as sinon.SinonStub).calledOnce).to.be.true;
-    expect(
-      (provider.deleteSchedules as sinon.SinonStub).getCall(0).args[0],
-    ).to.deep.equal({
+    expect(provider.deleteSchedules as Mock).toHaveBeenCalledOnce();
+    expect((provider.deleteSchedules as Mock).mock.calls[0][0]).to.deep.equal({
       schedule_ids: ['1', '2'],
     });
   });
@@ -132,32 +125,27 @@ describe('subscriptionPreferencesUpdated', () => {
     });
 
     expect(res).to.be.true;
-    expect((provider.getSchedules as sinon.SinonStub).calledOnce).to.be.true;
-    expect((provider.createSchedules as sinon.SinonStub).calledOnce).to.be.true;
-    // console.log((provider.createSchedules as sinon.SinonStub).getCall(0).args[0]);
+    expect(provider.getSchedules as Mock).toHaveBeenCalledOnce();
+    expect(provider.createSchedules as Mock).toHaveBeenCalledOnce();
+    // console.log((provider.createSchedules as Mock)).mock.calls[0][0]);
     expect(
-      (provider.createSchedules as sinon.SinonStub).getCall(0).args[0].user_ids,
+      (provider.createSchedules as Mock).mock.calls[0][0].user_ids,
       // @ts-expect-error StrictNullChecks
     ).to.deep.equal([String(user.id!)]);
     expect(
-      (provider.createSchedules as sinon.SinonStub).getCall(0).args[0]
-        .workflow_id,
+      (provider.createSchedules as Mock).mock.calls[0][0].workflow_id,
     ).to.deep.equal(WorkflowKeys.EmailRecap);
     expect(
-      (provider.createSchedules as sinon.SinonStub).getCall(0).args[0].schedule
-        .length,
+      (provider.createSchedules as Mock).mock.calls[0][0].schedule.length,
     ).to.equal(1);
     expect(
-      (provider.createSchedules as sinon.SinonStub).getCall(0).args[0]
-        .schedule[0],
+      (provider.createSchedules as Mock).mock.calls[0][0].schedule[0],
     ).to.have.property('days');
     expect(
-      (provider.createSchedules as sinon.SinonStub).getCall(0).args[0]
-        .schedule[0],
+      (provider.createSchedules as Mock).mock.calls[0][0].schedule[0],
     ).to.have.property('hours');
     expect(
-      (provider.createSchedules as sinon.SinonStub).getCall(0).args[0]
-        .schedule[0].frequency,
+      (provider.createSchedules as Mock).mock.calls[0][0].schedule[0].frequency,
     ).to.equal(RepeatFrequency.Weekly);
   });
 
@@ -191,11 +179,9 @@ describe('subscriptionPreferencesUpdated', () => {
     });
 
     expect(res).to.be.true;
-    expect((provider.createSchedules as sinon.SinonStub).called).to.be.false;
-    expect((provider.getSchedules as sinon.SinonStub).calledOnce).to.be.true;
-    expect(
-      (provider.getSchedules as sinon.SinonStub).getCall(0).args[0],
-    ).to.deep.equal({
+    expect(provider.createSchedules as Mock).not.toHaveBeenCalled();
+    expect(provider.getSchedules as Mock).toHaveBeenCalledOnce();
+    expect((provider.getSchedules as Mock).mock.calls[0][0]).to.deep.equal({
       user_id: String(user!.id!),
       workflow_id: WorkflowKeys.EmailRecap,
     });
@@ -232,17 +218,13 @@ describe('subscriptionPreferencesUpdated', () => {
     });
 
     expect(res).to.be.true;
-    expect((provider.createSchedules as sinon.SinonStub).called).to.be.false;
-    expect((provider.getSchedules as sinon.SinonStub).calledOnce).to.be.true;
-    expect(
-      (provider.getSchedules as sinon.SinonStub).getCall(0).args[0],
-    ).to.deep.equal({
+    expect(provider.createSchedules as Mock).not.toHaveBeenCalled();
+    expect(provider.getSchedules as Mock).toHaveBeenCalledOnce();
+    expect((provider.getSchedules as Mock).mock.calls[0][0]).to.deep.equal({
       user_id: String(user!.id!),
       workflow_id: WorkflowKeys.EmailRecap,
     });
-    expect(
-      (provider.deleteSchedules as sinon.SinonStub).getCall(0).args[0],
-    ).to.deep.equal({
+    expect((provider.deleteSchedules as Mock).mock.calls[0][0]).to.deep.equal({
       schedule_ids: ['1'],
     });
   });
@@ -276,15 +258,13 @@ describe('subscriptionPreferencesUpdated', () => {
     });
 
     expect(res).to.be.true;
-    expect((provider.createSchedules as sinon.SinonStub).called).to.be.false;
-    expect((provider.getSchedules as sinon.SinonStub).calledOnce).to.be.true;
-    expect(
-      (provider.getSchedules as sinon.SinonStub).getCall(0).args[0],
-    ).to.deep.equal({
+    expect(provider.createSchedules as Mock).not.toHaveBeenCalled();
+    expect(provider.getSchedules as Mock).toHaveBeenCalled();
+    expect((provider.getSchedules as Mock).mock.calls[0][0]).to.deep.equal({
       // @ts-expect-error StrictNullChecks
       user_id: String(user.id!),
       workflow_id: WorkflowKeys.EmailRecap,
     });
-    expect((provider.deleteSchedules as sinon.SinonStub).called).to.be.false;
+    expect(provider.deleteSchedules as Mock).not.toHaveBeenCalled();
   });
 });

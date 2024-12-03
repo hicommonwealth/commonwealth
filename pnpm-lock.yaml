@@ -492,12 +492,6 @@ importers:
         specifier: ^3.22.4
         version: 3.23.6
     devDependencies:
-      '@types/sinon':
-        specifier: ^17.0.3
-        version: 17.0.3
-      sinon:
-        specifier: ^17.0.2
-        version: 17.0.2
       tsx:
         specifier: ^4.7.2
         version: 4.9.3

@@ -15,6 +15,7 @@ import { SnapshotEventType } from '@hicommonwealth/shared';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import {
+  Mock,
   afterAll,
   afterEach,
   beforeAll,
@@ -22,6 +23,7 @@ import {
   describe,
   expect,
   test,
+  vi,
 } from 'vitest';
 import z from 'zod';
 import { processSnapshotProposalCreated } from '../../../server/workers/knock/eventHandlers/snapshotProposalCreated';
@@ -35,7 +37,6 @@ const proposalId = '0x1';
 describe('snapshotProposalCreated Event Handler', () => {
   let community: z.infer<typeof schemas.Community> | undefined;
   let user: z.infer<typeof schemas.User> | undefined;
-  let sandbox: sinon.SinonSandbox;
 
   beforeAll(async () => {
     [user] = await tester.seed('User', {});
@@ -60,10 +61,7 @@ describe('snapshotProposalCreated Event Handler', () => {
   afterEach(() => {
     const provider = notificationsProvider();
     disposeAdapter(provider.name);
-
-    if (sandbox) {
-      sandbox.restore();
-    }
+    vi.restoreAllMocks();
   });
 
   afterAll(async () => {
@@ -104,7 +102,7 @@ describe('snapshotProposalCreated Event Handler', () => {
       } as z.infer<typeof SnapshotProposalCreated>,
     });
     expect(res).to.be.true;
-    expect((provider.triggerWorkflow as sinon.SinonStub).notCalled).to.be.true;
+    expect(provider.triggerWorkflow as Mock).not.toHaveBeenCalled();
   });
 
   test('should execute triggerWorkflow with the appropriate data', async () => {
@@ -130,13 +128,9 @@ describe('snapshotProposalCreated Event Handler', () => {
       res,
       'The event handler should return true if it triggered a workflow',
     ).to.be.true;
-    expect(
-      (provider.triggerWorkflow as sinon.SinonStub).calledOnce,
-      'triggerWorkflow should be called once',
-    ).to.be.true;
-    expect(
-      (provider.triggerWorkflow as sinon.SinonStub).getCall(0).args[0],
-    ).to.deep.equal({
+    // triggerWorkflow should be called once
+    expect(provider.triggerWorkflow as Mock).toHaveBeenCalledOnce();
+    expect((provider.triggerWorkflow as Mock).mock.calls[0][0]).to.deep.equal({
       key: WorkflowKeys.SnapshotProposals,
       users: [{ id: String(user!.id) }],
       data: {

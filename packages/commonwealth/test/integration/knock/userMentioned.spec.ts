@@ -15,6 +15,7 @@ import { BalanceType, safeTruncateBody } from '@hicommonwealth/shared';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import {
+  Mock,
   afterAll,
   afterEach,
   beforeAll,
@@ -119,13 +120,9 @@ describe('userMentioned Event Handler', () => {
       res,
       'The event handler should return true if it triggered a workflow',
     ).to.be.true;
-    expect(
-      (provider.triggerWorkflow as sinon.SinonStub).calledOnce,
-      'The event handler should trigger a workflow',
-    ).to.be.true;
-    expect(
-      (provider.triggerWorkflow as sinon.SinonStub).getCall(0).args[0],
-    ).to.deep.equal({
+    // The event handler should trigger a workflow
+    expect(provider.triggerWorkflow as Mock).toHaveBeenCalledOnce();
+    expect((provider.triggerWorkflow as Mock).mock.calls[0][0]).to.deep.equal({
       key: WorkflowKeys.UserMentioned,
       users: [{ id: String(user!.id) }],
       data: {
