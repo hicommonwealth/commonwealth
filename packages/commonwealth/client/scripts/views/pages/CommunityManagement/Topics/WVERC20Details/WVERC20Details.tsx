@@ -74,7 +74,7 @@ const WVERC20Details = ({ onStepChange, onCreateTopic }: WVConsentProps) => {
 
       <CWDivider />
 
-      <CWText type="h4">Connect ERC20 token</CWText>
+      <CWText type="h4">Connect ERC20/ETH</CWText>
 
       <CWText type="h5">Your community chain</CWText>
       <CWText type="b1" className="description">
