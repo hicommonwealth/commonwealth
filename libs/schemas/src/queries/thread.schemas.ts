@@ -145,12 +145,13 @@ export const ThreadView = Thread.extend({
   Reaction: ReactionView.nullish(),
   collaborators: AddressView.array().nullish(),
   reactions: ReactionView.array().nullish(),
-  associatedContests: z.array(ContestView).optional(),
+  associatedContests: z.array(ContestView).nullish(),
   topic: TopicView.optional(),
   topic_id: PG_INT.optional(),
   ContestActions: z.array(ContestActionView).optional(),
   Comments: z.array(CommentView).optional(),
   ThreadVersionHistories: z.array(ThreadVersionHistoryView).nullish(),
+  search: z.union([z.string(), z.record(z.any())]).nullish(),
 });
 
 export const OrderByQueriesKeys = z.enum([
