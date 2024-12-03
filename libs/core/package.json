@@ -38,8 +38,6 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
-    "@types/sinon": "^17.0.3",
-    "sinon": "^17.0.2",
     "tsx": "^4.7.2"
   }
 }
