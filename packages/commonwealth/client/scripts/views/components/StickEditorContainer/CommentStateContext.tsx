@@ -44,7 +44,9 @@ type Props = {
 /**
  * The provider which has to wrap our entire comment reply system.
  */
-export const StickCommentProvider = memo((props: Props) => {
+export const StickCommentProvider = memo(function StickCommentProvider(
+  props: Props,
+) {
   const [defaultElement, setDefaultElement] = useState<ReactNode | null>(null);
   const [activeElement, setActiveElement] = useState<ReactNode | null>(null);
 
@@ -65,7 +67,9 @@ export const StickCommentProvider = memo((props: Props) => {
 /**
  * The default sticky comment.  This needs to wrap the main comment reply.
  */
-export const WithDefaultStickyComment = memo((props: Props) => {
+export const WithDefaultStickyComment = memo(function WithDefaultStickyComment(
+  props: Props,
+) {
   const { children } = props;
 
   const activator = useActivatorContext();
@@ -85,7 +89,9 @@ export const WithDefaultStickyComment = memo((props: Props) => {
  * We need to wrap our comment reply in this so that when the user hits reply
  * it overrides the main comment post.
  */
-export const WithActiveStickyComment = memo((props: Props) => {
+export const WithActiveStickyComment = memo(function WithActiveStickyComment(
+  props: Props,
+) {
   const { children } = props;
 
   const stickyEditor = useFlag('stickyEditor');
@@ -114,16 +120,18 @@ export const WithActiveStickyComment = memo((props: Props) => {
  * fall back to the default element (the main comment), or if nothing is being
  * used just return nothing.
  */
-export const StickyCommentElementSelector = memo(() => {
-  const activator = useActivatorContext();
+export const StickyCommentElementSelector = memo(
+  function StickyCommentElementSelector() {
+    const activator = useActivatorContext();
 
-  if (activator.activeElement) {
-    return <>{activator.activeElement}</>;
-  }
+    if (activator.activeElement) {
+      return <>{activator.activeElement}</>;
+    }
 
-  if (activator.defaultElement) {
-    return <>{activator.defaultElement}</>;
-  }
+    if (activator.defaultElement) {
+      return <>{activator.defaultElement}</>;
+    }
 
-  return null;
-});
+    return null;
+  },
+);
