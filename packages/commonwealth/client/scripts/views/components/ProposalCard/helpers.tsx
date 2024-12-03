@@ -1,5 +1,5 @@
-import 'components/ProposalCard/ProposalCard.scss';
 import React from 'react';
+import './ProposalCard.scss';
 
 import {
   blocknumToDuration,

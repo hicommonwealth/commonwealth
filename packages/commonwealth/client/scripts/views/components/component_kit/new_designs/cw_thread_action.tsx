@@ -13,7 +13,7 @@ import { CWText } from '../cw_text';
 import { getClasses } from '../helpers';
 import { ComponentType } from '../types';
 
-import 'components/component_kit/new_designs/cw_thread_action.scss';
+import './cw_thread_action.scss';
 
 export type ActionType =
   | 'upvote'

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import 'components/user/user.scss';
+import './user.scss';
 
 import { Avatar } from 'views/components/Avatar';
 import { Skeleton } from '../Skeleton';
@@ -18,7 +18,7 @@ export const UserSkeleton = ({
   if (shouldShowAvatarOnly) {
     return (
       <div className="User avatar-only">
-        <Avatar url={''} size={16} address={0} showSkeleton />
+        <Avatar url="" size={16} address={0} showSkeleton />
       </div>
     );
   }
@@ -27,10 +27,10 @@ export const UserSkeleton = ({
   const userInfo = (
     <div className="User">
       {!shouldHideAvatar && (
-        <Avatar url={''} size={avatarSize} address={0} showSkeleton={true} />
+        <Avatar url="" size={avatarSize} address={0} showSkeleton={true} />
       )}
       <div className="user-display-name username ml-8">
-        <Skeleton width={'80px'} />
+        <Skeleton width="80px" />
       </div>
     </div>
   );

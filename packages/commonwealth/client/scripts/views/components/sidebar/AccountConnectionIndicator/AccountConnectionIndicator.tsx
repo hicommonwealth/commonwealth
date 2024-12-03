@@ -1,14 +1,17 @@
 import { WalletId } from '@hicommonwealth/shared';
+import { useFlag } from 'client/scripts/hooks/useFlag';
 import { saveToClipboard } from 'client/scripts/utils/clipboard';
 import clsx from 'clsx';
 import { Magic } from 'magic-sdk';
 import React from 'react';
 import useUserStore from 'state/ui/user';
+import { useInviteLinkModal } from 'state/ui/modals';
 import useJoinCommunity from 'views/components/SublayoutHeader/useJoinCommunity';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWIdentificationTag } from 'views/components/component_kit/new_designs/CWIdentificationTag';
 import { handleMouseEnter, handleMouseLeave } from 'views/menus/utils';
+import { SharePopover } from '../../SharePopover';
 import CWIconButton from '../../component_kit/new_designs/CWIconButton';
 import { CWTooltip } from '../../component_kit/new_designs/CWTooltip';
 import './AccountConnectionIndicator.scss';
@@ -25,6 +28,8 @@ const AccountConnectionIndicator = ({
   address,
 }: AccountConnectionIndicatorProps) => {
   const { handleJoinCommunity, JoinCommunityModals } = useJoinCommunity();
+  const referralsEnabled = useFlag('referrals');
+  const { setIsInviteLinkModalOpen } = useInviteLinkModal();
 
   const userData = useUserStore();
   const hasMagic = userData.addresses?.[0]?.walletId === WalletId.Magic;
@@ -99,6 +104,17 @@ const AccountConnectionIndicator = ({
                 />
               )}
             </div>
+
+            {referralsEnabled && (
+              <CWButton
+                buttonType="tertiary"
+                buttonHeight="sm"
+                buttonWidth="full"
+                label="Get referral link"
+                className="referral-link-button"
+                onClick={() => setIsInviteLinkModalOpen(true)}
+              />
+            )}
           </div>
         )}
 
@@ -111,6 +127,7 @@ const AccountConnectionIndicator = ({
             disabled={connected}
             onClick={handleJoinCommunity}
           />
+          <SharePopover linkToShare={window.location.href} />
         </div>
       </div>
       {JoinCommunityModals}

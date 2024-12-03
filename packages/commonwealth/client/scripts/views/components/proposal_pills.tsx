@@ -1,6 +1,6 @@
 import React from 'react';
 
-import 'components/proposal_pills.scss';
+import './proposal_pills.scss';
 
 import { formatTimestamp } from 'helpers';
 import moment from 'moment';
@@ -25,6 +25,7 @@ export const ActiveProposalPill = (props: ActiveProposalPillProps) => {
 
 type ClosedProposalPillProps = { proposalState: string };
 
+// eslint-disable-next-line react/no-multi-comp
 export const ClosedProposalPill = (props: ClosedProposalPillProps) => {
   const { proposalState } = props;
 

@@ -32,6 +32,9 @@ import {
 import CWIconButton from 'views/components/component_kit/new_designs/CWIconButton';
 import useAuthentication from '../../modals/AuthModal/useAuthentication';
 import { useCommunityStake } from '../CommunityStake';
+import { useFlag } from 'hooks/useFlag';
+import { EXCEPTION_CASE_VANILLA_getCommunityById } from 'state/api/communities/getCommuityById';
+import useUserStore from 'state/ui/user';
 import UserMenuItem from './UserMenuItem';
 import useCheckAuthenticatedAddresses from './useCheckAuthenticatedAddresses';
 
@@ -66,12 +69,14 @@ interface UseUserMenuItemsProps {
   onAuthModalOpen: () => void;
   isMenuOpen: boolean;
   onAddressItemClick?: () => void;
+  onReferralItemClick?: () => void;
 }
 
 const useUserMenuItems = ({
   onAuthModalOpen,
   isMenuOpen,
   onAddressItemClick,
+  onReferralItemClick,
 }: UseUserMenuItemsProps) => {
   const [isDarkModeOn, setIsDarkModeOn] = useState<boolean>(
     localStorage.getItem('dark-mode-state') === 'on',
@@ -83,6 +88,8 @@ const useUserMenuItems = ({
   const { authenticatedAddresses } = useCheckAuthenticatedAddresses({
     recheck: isMenuOpen,
   });
+
+  const referralsEnabled = useFlag('referrals');
 
   const userData = useUserStore();
   const hasMagic = userData.addresses?.[0]?.walletId === WalletId.Magic;
@@ -275,6 +282,14 @@ const useUserMenuItems = ({
                 </div>
               ),
               onClick: () => openMagicWallet(),
+      ...(referralsEnabled
+        ? [
+            {
+              type: 'default',
+              label: 'Get referral link',
+              onClick: () => {
+                onReferralItemClick?.();
+              },
             },
           ]
         : []),

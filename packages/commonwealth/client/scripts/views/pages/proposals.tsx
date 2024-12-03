@@ -1,6 +1,5 @@
 import { ChainBase } from '@hicommonwealth/shared';
 import { useInitChainIfNeeded } from 'hooks/useInitChainIfNeeded';
-import 'pages/proposals.scss';
 import React, { useEffect, useState } from 'react';
 import app from 'state';
 import {
@@ -20,6 +19,7 @@ import useManageDocumentTitle from '../../hooks/useManageDocumentTitle';
 import { CardsCollection } from '../components/cards_collection';
 import { CWText } from '../components/component_kit/cw_text';
 import CWCircleMultiplySpinner from '../components/component_kit/new_designs/CWCircleMultiplySpinner';
+import './proposals.scss';
 
 const ProposalsPage = () => {
   const [isLoading, setLoading] = useState(

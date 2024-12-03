@@ -1,14 +1,13 @@
-@import '../../../../../styles/shared.scss';
+@import '../../../../styles/shared.scss';
 
 .VoteWeightModule {
   padding: 16px 24px;
   border-bottom: 1px solid $neutral-200;
-  background-color: $primary-50;
 
   .content {
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    gap: 8px;
 
     .title-container {
       display: flex;

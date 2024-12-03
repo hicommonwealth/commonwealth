@@ -1,0 +1,13 @@
+@import '../../../styles/shared.scss';
+
+.ValidationText.Text {
+  margin-top: 4px;
+
+  &.success {
+    color: $green-600;
+  }
+
+  &.failure {
+    color: $rorange-500;
+  }
+}
