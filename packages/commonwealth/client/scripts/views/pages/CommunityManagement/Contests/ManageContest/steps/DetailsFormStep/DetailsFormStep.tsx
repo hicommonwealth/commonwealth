@@ -276,9 +276,8 @@ const DetailsFormStep = ({
                 <div className="contest-section contest-section-topic">
                   <CWText type="h4">Choose a topic</CWText>
                   <CWText type="b1">
-                    Select which topic you would like to include in this
-                    contest. Only threads posted to this topic will be eligible
-                    for the contest prizes.
+                    Choose a topic for the contest to live in. Only threads
+                    posted to this topic will be part of the contest.
                   </CWText>
 
                   <CWSelectList
