@@ -1,9 +1,9 @@
-import { Erc20Abi } from './Abi/ERC20Abi';
+import { erc20Abi } from '@hicommonwealth/evm-protocols';
 import ContractBase from './ContractBase';
 
 class ERC20Helper extends ContractBase {
   constructor(contractAddress: string, rpc: string) {
-    super(contractAddress, Erc20Abi, rpc);
+    super(contractAddress, erc20Abi, rpc);
   }
   async getBalance(userAddress: string): Promise<string> {
     if (!this.initialized) {

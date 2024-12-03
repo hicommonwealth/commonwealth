@@ -1,6 +1,6 @@
-import 'components/user/user_gallery.scss';
 import React from 'react';
 import { User } from './user';
+import './user_gallery.scss';
 
 type UserGalleryProps = {
   addressesCount?: number;

@@ -1,5 +1,6 @@
 import { Log } from '@ethersproject/providers';
 import { ChainEventCreated, dispose, EventNames } from '@hicommonwealth/core';
+import { commonProtocol } from '@hicommonwealth/evm-protocols';
 import {
   CommunityStake,
   communityStakesAbi,
@@ -14,13 +15,9 @@ import {
   hashAbi,
   models,
 } from '@hicommonwealth/model';
-import {
-  AbiType,
-  BalanceType,
-  commonProtocol,
-  delay,
-} from '@hicommonwealth/shared';
+import { AbiType, BalanceType, delay } from '@hicommonwealth/shared';
 import { Anvil } from '@viem/anvil';
+import { bootstrap_testing } from 'node_modules/@hicommonwealth/model/src/tester';
 import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 import { z } from 'zod';
 import {
@@ -332,6 +329,10 @@ describe('EVM Chain Events Devnet Tests', () => {
     let chainNode: ChainNodeInstance;
 
     beforeAll(async () => {
+      // bootstrapping here to reset the db
+      // and avoid conflicts with other tests using same chain
+      await bootstrap_testing();
+
       chainNode = await models.ChainNode.create({
         url: localRpc,
         balance_type: BalanceType.Ethereum,
@@ -340,11 +341,13 @@ describe('EVM Chain Events Devnet Tests', () => {
         max_ce_block_range: -1,
       });
       const namespaceAbiInstance = await models.ContractAbi.create({
+        id: 1,
         abi: namespaceFactoryAbi,
         nickname: 'NamespaceFactory',
         abi_hash: hashAbi(namespaceFactoryAbi),
       });
       const stakesAbiInstance = await models.ContractAbi.create({
+        id: 2,
         abi: communityStakesAbi,
         nickname: 'CommunityStakes',
         abi_hash: hashAbi(communityStakesAbi),

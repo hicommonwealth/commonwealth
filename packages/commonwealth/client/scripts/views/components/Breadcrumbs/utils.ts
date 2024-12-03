@@ -175,8 +175,18 @@ export const generateBreadcrumbs = (
     }
 
     if (pathSegments.includes('contests')) {
-      if (index === 2 && pathSegment !== 'launch') {
-        label = 'Edit';
+      if (pathSegments.includes('manage')) {
+        if (index === 2 && pathSegment !== 'launch') {
+          label = 'Edit';
+        }
+      } else {
+        if (index === 1 && pathSegment === 'contests') {
+          link = 'contests';
+        }
+
+        if (index === 2) {
+          label = 'Leaderboard';
+        }
       }
     }
 

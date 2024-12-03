@@ -34,10 +34,14 @@ Add these env vars to your .env file. Fill in the API key (ask a dev) and your o
 
 ```
 FLAG_FARCASTER_CONTEST=true
-NEYNAR_API_KEY=
+NEYNAR_API_KEY=<Get from Neynar dashboard>
+NEYNAR_CAST_CREATED_WEBHOOK_SECRET=<Get from Neynar dashboard>
 NEYNAR_REPLY_WEBHOOK_URL=https://YOUR_NGROK_DOMAIN/api/integration/farcaster/ReplyCastCreated
 FARCASTER_ACTION_URL=https://YOUR_NGROK_DOMAIN/api/integration/farcaster/CastUpvoteAction
+FARCASTER_NGROK_DOMAIN=https://YOUR_NGROK_DOMAIN
 ```
+
+Note: `FARCASTER_NGROK_DOMAIN` should only be used locally– not on QA or production.
 
 ## Run local services
 
@@ -57,10 +61,10 @@ Farcaster allows users to add a custom “action” to their account, which can 
 - Paste URL into browser, you’ll see the Warpcast page, then click `Add Action`
 
 ## How to test the Farcaster/Contests integration
-- For testing, you can use any contest that has an associated Topic.
-- First, post a farcaster contest URL on Warpcast. It has this format: `https://YOUR_DOMAIN/api/integration/farcaster/contests/CONTEST_ADDRESS/contestCard`
-	- Fill in your ngrok domain and contest address
-	- Upon posting, it should trigger the `CastCreated` webhook and associate the Cast (message) with the contest. It’ll also create a new programatic webhook for `CastReplyCreated`.
+- Create a Farcaster Contest with a funding token (e.g. CMN on Base Sepolia `0x429ae85883f82203D736e8fc203A455990745ca1`)
+- Copy the Farcaster Contest URL. It should have this format: `https://YOUR_DOMAIN/api/integration/farcaster/contests/CONTEST_ADDRESS/contestCard`
+- Post a the URL to WarpCast
+  - it should trigger the `CastCreated` webhook and associate the Cast (message) with the contest. It’ll also create a new programatic webhook for `CastReplyCreated`.
 - Then, add a reply message to the contest cast.
 	- This should trigger the `CastReplyCreated` webhook, which will create onchain content.
 - Finally, perform the custom Upvote action on your reply message (icon with 4 squares).

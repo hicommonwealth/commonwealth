@@ -1,0 +1,46 @@
+@import '../../styles/shared.scss';
+
+.StatsPage {
+  flex: 1;
+
+  .header {
+    padding-bottom: 24px;
+  }
+
+  .stat-row {
+    border: 1px solid $neutral-100;
+    border-top: none;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+    padding: 12px;
+
+    .Text:first-of-type {
+      justify-content: start;
+    }
+
+    .Text {
+      justify-content: right;
+      margin-right: 8px;
+    }
+  }
+
+  .dark {
+    background-color: $neutral-50;
+    color: $neutral-500;
+  }
+
+  .bottom {
+    border-bottom-right-radius: $border-radius-corners;
+    border-bottom-left-radius: $border-radius-corners;
+  }
+
+  .top {
+    border-top: 1px solid $neutral-100;
+    border-top-right-radius: $border-radius-corners;
+    border-top-left-radius: $border-radius-corners;
+
+    .Text {
+      color: $neutral-500;
+    }
+  }
+}

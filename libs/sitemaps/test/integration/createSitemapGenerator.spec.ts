@@ -9,7 +9,6 @@ import {
 
 describe('createSitemapGenerator', { timeout: 10_000 }, function () {
   beforeAll(async () => {
-    await tester.bootstrap_testing(true);
     const [user] = await tester.seed('User', {
       isAdmin: true,
     });

@@ -1,11 +1,14 @@
 import { SupportedCurrencies } from 'helpers/currency';
+import useBeforeUnload from 'hooks/useBeforeUnload';
 import React from 'react';
+import { CWText } from '../../components/component_kit/cw_text';
 import {
   CWModal,
   CWModalBody,
   CWModalFooter,
   CWModalHeader,
 } from '../../components/component_kit/new_designs/CWModal';
+import TokenIcon from './TokenIcon';
 import TradeTokenForm, {
   TradingConfig,
   useTradeTokenForm,
@@ -30,24 +33,34 @@ const TradeTokenModal = ({
       tradeConfig: {
         ...tradeConfig,
         currency: TRADING_CURRENCY,
-        presetAmounts: [100, 300, 1000],
+        buyTokenPresetAmounts: [100, 300, 1000],
+        sellTokenPresetAmounts: ['Max'],
       },
       addressType: tradeConfig.addressType,
       onTradeComplete: () => onModalClose?.(),
     },
   );
 
+  useBeforeUnload(isActionPending);
+
   return (
     <CWModal
       open={isOpen}
-      onClose={() => onModalClose?.()}
+      onClose={() => !isActionPending && onModalClose?.()}
       size="medium"
-      className="AuthModal"
+      className="TradeTokenModal"
       content={
         <>
           <CWModalHeader
-            label={`Trade Token - ${tradeConfig.token.symbol}`}
-            onModalClose={() => onModalClose?.()}
+            label={
+              <CWText type="h4" className="token-info">
+                Trade Token - {tradeConfig.token.symbol}{' '}
+                {trading.token.icon_url && (
+                  <TokenIcon size="large" url={trading.token.icon_url} />
+                )}
+              </CWText>
+            }
+            onModalClose={() => !isActionPending && onModalClose?.()}
           />
           <CWModalBody>
             <TradeTokenForm

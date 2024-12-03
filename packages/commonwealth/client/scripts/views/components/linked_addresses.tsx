@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import 'components/linked_addresses.scss';
+import './linked_addresses.scss';
 
 import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';

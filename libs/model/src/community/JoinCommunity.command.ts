@@ -3,7 +3,6 @@ import * as schemas from '@hicommonwealth/schemas';
 import { ChainBase, addressSwapper } from '@hicommonwealth/shared';
 import { models } from '../database';
 import { mustExist } from '../middleware/guards';
-import { incrementProfileCount } from '../utils';
 import { findCompatibleAddress } from '../utils/findBaseAddress';
 
 export const JoinCommunityErrors = {
@@ -102,11 +101,11 @@ export function JoinCommunity(): Command<typeof schemas.JoinCommunity> {
             { transaction },
           );
 
-          await incrementProfileCount(
-            community.id,
-            actor.user.id!,
+          await models.Community.increment('profile_count', {
+            by: 1,
+            where: { id: community_id },
             transaction,
-          );
+          });
 
           return created.id!;
         },

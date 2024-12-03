@@ -1,7 +1,7 @@
 import React from 'react';
 
-import 'components/Profile/ProfileActivityRow.scss';
 import moment from 'moment';
+import './ProfileActivityRow.scss';
 
 import Thread from 'models/Thread';
 import withRouter, {

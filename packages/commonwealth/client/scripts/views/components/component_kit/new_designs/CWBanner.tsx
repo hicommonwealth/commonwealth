@@ -9,13 +9,13 @@ import {
 import React, { ReactNode } from 'react';
 
 import clsx from 'clsx';
-import 'components/component_kit/new_designs/CWBanner.scss';
 import { CWText } from 'views/components/component_kit/cw_text';
 import {
   ButtonProps,
   ButtonType,
   CWButton,
 } from 'views/components/component_kit/new_designs/CWButton';
+import './CWBanner.scss';
 
 const typeIconLookup: {
   [key in BannerType]: React.ForwardRefExoticComponent<IconProps>;

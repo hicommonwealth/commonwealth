@@ -35,12 +35,20 @@ export enum EventNames {
   FarcasterCastCreated = 'FarcasterCastCreated',
   FarcasterReplyCastCreated = 'FarcasterReplyCastCreated',
   FarcasterVoteCreated = 'FarcasterVoteCreated',
+  ContestRolloverTimerTicked = 'ContestRolloverTimerTicked',
 
   // Preferences
   SubscriptionPreferencesUpdated = 'SubscriptionPreferencesUpdated',
+
+  // Referrals
+  SignUpFlowCompleted = 'SignUpFlowCompleted',
 }
 
 export type EventPairs =
+  | {
+      event_name: EventNames.CommunityCreated;
+      event_payload: z.infer<typeof events.CommunityCreated>;
+    }
   | {
       event_name: EventNames.CommentCreated;
       event_payload: z.infer<typeof events.CommentCreated>;
@@ -136,4 +144,8 @@ export type EventPairs =
   | {
       event_name: EventNames.DiscordThreadDeleted;
       event_payload: z.infer<typeof events.DiscordThreadDeleted>;
+    }
+  | {
+      event_name: EventNames.SignUpFlowCompleted;
+      event_payload: z.infer<typeof events.SignUpFlowCompleted>;
     };

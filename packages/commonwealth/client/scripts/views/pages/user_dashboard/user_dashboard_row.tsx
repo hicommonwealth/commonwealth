@@ -1,8 +1,8 @@
-import 'pages/user_dashboard/user_dashboard_row.scss';
-import 'pages/user_dashboard/user_dashboard_row_top.scss';
 import React from 'react';
 import { Skeleton } from 'views/components/Skeleton';
 import { CWText } from 'views/components/component_kit/cw_text';
+import './user_dashboard_row.scss';
+import './user_dashboard_row_top.scss';
 
 export const UserDashboardRowSkeleton = () => {
   return (
