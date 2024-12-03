@@ -2,7 +2,6 @@ import { WalletId } from '@hicommonwealth/shared';
 import { useFlag } from 'client/scripts/hooks/useFlag';
 import { saveToClipboard } from 'client/scripts/utils/clipboard';
 import clsx from 'clsx';
-import { Magic } from 'magic-sdk';
 import React from 'react';
 import { useInviteLinkModal } from 'state/ui/modals';
 import useUserStore from 'state/ui/user';
@@ -11,6 +10,7 @@ import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWIdentificationTag } from 'views/components/component_kit/new_designs/CWIdentificationTag';
 import { handleMouseEnter, handleMouseLeave } from 'views/menus/utils';
+import useAuthentication from '../../../modals/AuthModal/useAuthentication';
 import { SharePopover } from '../../SharePopover';
 import CWIconButton from '../../component_kit/new_designs/CWIconButton';
 import { CWTooltip } from '../../component_kit/new_designs/CWTooltip';
@@ -20,8 +20,6 @@ interface AccountConnectionIndicatorProps {
   connected: boolean;
   address: string;
 }
-
-const magic = new Magic(process.env.MAGIC_PUBLISHABLE_KEY!);
 
 const AccountConnectionIndicator = ({
   connected,
@@ -34,13 +32,7 @@ const AccountConnectionIndicator = ({
   const userData = useUserStore();
   const hasMagic = userData.addresses?.[0]?.walletId === WalletId.Magic;
 
-  const openMagicWallet = async () => {
-    try {
-      await magic.wallet.showUI();
-    } catch (error) {
-      console.trace(error);
-    }
-  };
+  const { openMagicWallet } = useAuthentication({});
 
   return (
     <>
