@@ -74,7 +74,9 @@ const AccountConnectionIndicator = ({
                     return (
                       <CWIconButton
                         iconName="arrowSquareOut"
-                        onClick={openMagicWallet}
+                        onClick={() => {
+                          openMagicWallet().catch(console.error);
+                        }}
                         onMouseEnter={(e) => {
                           handleMouseEnter({
                             e,

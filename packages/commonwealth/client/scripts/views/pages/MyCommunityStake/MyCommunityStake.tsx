@@ -74,7 +74,12 @@ const MyCommunityStake = () => {
             My Community Stake
           </CWText>
           {hasMagic && (
-            <CWButton label="Open wallet" onClick={openMagicWallet} />
+            <CWButton
+              label="Open wallet"
+              onClick={() => {
+                openMagicWallet().catch(console.error);
+              }}
+            />
           )}
         </div>
 

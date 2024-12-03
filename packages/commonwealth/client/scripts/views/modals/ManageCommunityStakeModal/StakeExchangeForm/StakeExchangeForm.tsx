@@ -357,7 +357,9 @@ const StakeExchangeForm = ({
               <CWText
                 className="wallet-btn"
                 type="caption"
-                onClick={openMagicWallet}
+                onClick={() => {
+                  openMagicWallet().catch(console.error);
+                }}
               >
                 Add Funds
               </CWText>
