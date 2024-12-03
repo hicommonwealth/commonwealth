@@ -12,6 +12,7 @@ import { CWTableColumnInfo } from '../../component_kit/new_designs/CWTable/CWTab
 import { useCWTableState } from '../../component_kit/new_designs/CWTable/useCWTableState';
 import { CWTextInput } from '../../component_kit/new_designs/CWTextInput';
 
+import { CWText } from '../../component_kit/cw_text';
 import './ReferralsTab.scss';
 
 const fakeData = [
@@ -23,7 +24,7 @@ const fakeData = [
       userId: '128606',
       address: 'address1',
     },
-    earnings: '0.0003',
+    earnings: '5.3',
   },
   {
     user: {
@@ -33,7 +34,7 @@ const fakeData = [
       userId: '135099',
       address: 'address2',
     },
-    earnings: '0.0002',
+    earnings: '1.9',
   },
   {
     user: {
@@ -43,7 +44,7 @@ const fakeData = [
       userId: '158139',
       address: 'address3',
     },
-    earnings: '0.0001',
+    earnings: '0.1',
   },
 ];
 
@@ -58,7 +59,7 @@ const columns: CWTableColumnInfo[] = [
   {
     key: 'earnings',
     header: 'Earnings',
-    numeric: false,
+    numeric: true,
     sortable: true,
   },
 ];
@@ -128,11 +129,17 @@ const ReferralsTab = ({ isOwner }: ReferralsTabProps) => {
           earnings: {
             sortValue: item.earnings,
             customElement: (
-              <div className="table-cell">ETH {item.earnings}</div>
+              <div className="table-cell text-right">USD {item.earnings}</div>
             ),
           },
         }))}
       />
+      <div className="referral-totals">
+        <CWText type="b2" fontWeight="bold">
+          Total
+        </CWText>
+        <CWText type="b2">USD 10.30</CWText>
+      </div>
     </div>
   );
 };
