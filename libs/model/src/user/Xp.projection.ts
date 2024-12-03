@@ -11,6 +11,7 @@ import { models, sequelize } from '../database';
 import { mustExist } from '../middleware/guards';
 
 const inputs = {
+  CommunityJoined: events.CommunityJoined,
   ThreadCreated: events.ThreadCreated,
   CommentCreated: events.CommentCreated,
   CommentUpvoted: events.CommentUpvoted,
@@ -159,6 +160,13 @@ export function Xp(): Projection<typeof inputs> {
   return {
     inputs,
     body: {
+      CommunityJoined: async ({ payload }) => {
+        const action_metas = await getQuestActionMetas(
+          payload,
+          'CommunityJoined',
+        );
+        await recordXps(payload.user_id, payload.created_at!, action_metas);
+      },
       ThreadCreated: async ({ payload }) => {
         const user_id = await getUserId(payload);
         const action_metas = await getQuestActionMetas(

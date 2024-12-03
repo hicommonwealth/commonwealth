@@ -11,6 +11,7 @@ export enum EventNames {
   CommentCreated = 'CommentCreated',
   CommentUpvoted = 'CommentUpvoted',
   CommunityCreated = 'CommunityCreated',
+  CommunityJoined = 'CommunityJoined',
   DiscordMessageCreated = 'DiscordMessageCreated',
   GroupCreated = 'GroupCreated',
   SnapshotProposalCreated = 'SnapshotProposalCreated',
@@ -48,6 +49,10 @@ export type EventPairs =
   | {
       event_name: EventNames.CommunityCreated;
       event_payload: z.infer<typeof events.CommunityCreated>;
+    }
+  | {
+      event_name: EventNames.CommunityJoined;
+      event_payload: z.infer<typeof events.CommunityJoined>;
     }
   | {
       event_name: EventNames.CommentCreated;

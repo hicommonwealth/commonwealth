@@ -2,7 +2,7 @@ import { PG_INT } from '@hicommonwealth/schemas';
 import { z } from 'zod';
 import { EventNames as E, events as P } from './events';
 
-const BaseOutboxProperties = z.object({
+export const BaseOutboxProperties = z.object({
   event_id: PG_INT.optional(),
   relayed: z.boolean().optional(),
   created_at: z.coerce.date().optional(),
