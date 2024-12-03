@@ -57,7 +57,6 @@ const AccountConnectionIndicator = ({
                   );
                 }}
               />
-              <SharePopover linkToShare={window.location.href} />
             </div>
 
             {referralsEnabled && (
@@ -82,6 +81,7 @@ const AccountConnectionIndicator = ({
             disabled={connected}
             onClick={handleJoinCommunity}
           />
+          <SharePopover linkToShare={window.location.href} />
         </div>
       </div>
       {JoinCommunityModals}
