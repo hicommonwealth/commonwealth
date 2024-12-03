@@ -31,7 +31,7 @@ const useTokenFinder = ({
 
   const getTokenError = (isOneOff?: boolean) => {
     if (tokenValue === ZERO_ADDRESS) {
-      return null;
+      return;
     }
     if (isOneOff && !tokenValue) {
       return 'You must enter a token address';
