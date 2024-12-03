@@ -7,6 +7,7 @@ import useJoinCommunity from 'views/components/SublayoutHeader/useJoinCommunity'
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWIdentificationTag } from 'views/components/component_kit/new_designs/CWIdentificationTag';
+import { SharePopover } from '../../SharePopover';
 import CWIconButton from '../../component_kit/new_designs/CWIconButton';
 import { CWTooltip } from '../../component_kit/new_designs/CWTooltip';
 import './AccountConnectionIndicator.scss';
@@ -80,6 +81,7 @@ const AccountConnectionIndicator = ({
             disabled={connected}
             onClick={handleJoinCommunity}
           />
+          <SharePopover linkToShare={window.location.href} />
         </div>
       </div>
       {JoinCommunityModals}
