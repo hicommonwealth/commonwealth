@@ -117,7 +117,7 @@ export function FarcasterWorker(): Policy<typeof inputs> {
           {
             include: [
               {
-                model: models.ChainNode,
+                model: models.ChainNode.scope('withPrivateData'),
                 required: false,
               },
             ],
@@ -189,7 +189,7 @@ export function FarcasterWorker(): Policy<typeof inputs> {
           {
             include: [
               {
-                model: models.ChainNode,
+                model: models.ChainNode.scope('withPrivateData'),
                 required: false,
               },
             ],
