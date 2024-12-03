@@ -12,6 +12,7 @@ import WebWalletController from 'controllers/app/web_wallets';
 import { SessionKeyError } from 'controllers/server/sessions';
 import { setDarkMode } from 'helpers/darkMode';
 import { getUniqueUserAddresses } from 'helpers/user';
+import { useFlag } from 'hooks/useFlag';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useCallback, useEffect, useState } from 'react';
 import app, { initAppState } from 'state';
@@ -32,9 +33,6 @@ import {
 import CWIconButton from 'views/components/component_kit/new_designs/CWIconButton';
 import useAuthentication from '../../modals/AuthModal/useAuthentication';
 import { useCommunityStake } from '../CommunityStake';
-import { useFlag } from 'hooks/useFlag';
-import { EXCEPTION_CASE_VANILLA_getCommunityById } from 'state/api/communities/getCommuityById';
-import useUserStore from 'state/ui/user';
 import UserMenuItem from './UserMenuItem';
 import useCheckAuthenticatedAddresses from './useCheckAuthenticatedAddresses';
 
@@ -282,6 +280,9 @@ const useUserMenuItems = ({
                 </div>
               ),
               onClick: () => openMagicWallet(),
+            },
+          ]
+        : []),
       ...(referralsEnabled
         ? [
             {
