@@ -1,9 +1,6 @@
 import {
   CommentCreated,
   EventNames,
-  ProviderError,
-  SpyNotificationsProvider,
-  ThrowingSpyNotificationsProvider,
   WorkflowKeys,
   dispose,
   disposeAdapter,
@@ -28,6 +25,11 @@ import {
 import z from 'zod';
 import { processCommentCreated } from '../../../server/workers/knock/eventHandlers/commentCreated';
 import { getCommentUrl } from '../../../server/workers/knock/util';
+import {
+  ProviderError,
+  SpyNotificationsProvider,
+  ThrowingSpyNotificationsProvider,
+} from '../../util/mockedNotificationProvider';
 
 chai.use(chaiAsPromised);
 

@@ -4,7 +4,6 @@ import {
   EventNames,
   notificationsProvider,
   RepeatFrequency,
-  SpyNotificationsProvider,
   WorkflowKeys,
 } from '@hicommonwealth/core';
 import { models, tester } from '@hicommonwealth/model';
@@ -25,6 +24,7 @@ import {
 import z from 'zod';
 // eslint-disable-next-line max-len
 import { processSubscriptionPreferencesUpdated } from '../../../server/workers/knock/eventHandlers/subscriptionPreferencesUpdated';
+import { SpyNotificationsProvider } from '../../util/mockedNotificationProvider';
 
 chai.use(chaiAsPromised);
 

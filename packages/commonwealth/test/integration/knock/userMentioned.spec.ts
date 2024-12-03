@@ -1,8 +1,5 @@
 import {
   EventNames,
-  ProviderError,
-  SpyNotificationsProvider,
-  ThrowingSpyNotificationsProvider,
   UserMentioned,
   WorkflowKeys,
   dispose,
@@ -27,6 +24,11 @@ import {
 import z from 'zod';
 import { processUserMentioned } from '../../../server/workers/knock/eventHandlers/userMentioned';
 import { getThreadUrl } from '../../../server/workers/knock/util';
+import {
+  ProviderError,
+  SpyNotificationsProvider,
+  ThrowingSpyNotificationsProvider,
+} from '../../util/mockedNotificationProvider';
 
 chai.use(chaiAsPromised);
 

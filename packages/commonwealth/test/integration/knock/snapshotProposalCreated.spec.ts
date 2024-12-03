@@ -1,9 +1,6 @@
 import {
   EventNames,
-  ProviderError,
   SnapshotProposalCreated,
-  SpyNotificationsProvider,
-  ThrowingSpyNotificationsProvider,
   WorkflowKeys,
   dispose,
   disposeAdapter,
@@ -28,6 +25,11 @@ import {
 import z from 'zod';
 import { processSnapshotProposalCreated } from '../../../server/workers/knock/eventHandlers/snapshotProposalCreated';
 import { getSnapshotUrl } from '../../../server/workers/knock/util';
+import {
+  ProviderError,
+  SpyNotificationsProvider,
+  ThrowingSpyNotificationsProvider,
+} from '../../util/mockedNotificationProvider';
 
 chai.use(chaiAsPromised);
 

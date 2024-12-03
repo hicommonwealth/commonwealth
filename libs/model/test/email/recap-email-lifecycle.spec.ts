@@ -1,8 +1,5 @@
 import {
   ExternalServiceUserIds,
-  ProviderError,
-  SpyNotificationsProvider,
-  ThrowingSpyNotificationsProvider,
   dispose,
   disposeAdapter,
   notificationsProvider,
@@ -24,6 +21,11 @@ import {
 import { z } from 'zod';
 import { GetRecapEmailDataQuery } from '../../src/emails';
 import { seed } from '../../src/tester';
+import {
+  ProviderError,
+  SpyNotificationsProvider,
+  ThrowingSpyNotificationsProvider,
+} from '../utils/mockedNotificationProvider';
 import {
   generateDiscussionData,
   generateGovernanceData,
