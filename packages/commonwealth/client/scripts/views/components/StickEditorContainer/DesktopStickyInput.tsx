@@ -4,7 +4,7 @@ import { CommentEditorProps } from 'views/components/Comments/CommentEditor/Comm
 import './DesktopStickyInput.scss';
 
 export const DesktopStickyInput = (props: CommentEditorProps) => {
-  const { isReplying, replyingToAuthor } = props;
+  const { isReplying, replyingToAuthor, onCancel } = props;
   const [focused, setFocused] = useState(false);
   const { handleSubmitComment } = props;
 
@@ -12,9 +12,13 @@ export const DesktopStickyInput = (props: CommentEditorProps) => {
     setFocused(true);
   }, []);
 
-  const handleCancel = useCallback(() => {
-    setFocused(false);
-  }, []);
+  const handleCancel = useCallback(
+    (event: React.MouseEvent) => {
+      setFocused(false);
+      onCancel(event);
+    },
+    [onCancel],
+  );
 
   const customHandleSubmitComment = useCallback(() => {
     setFocused(false);
@@ -25,9 +29,11 @@ export const DesktopStickyInput = (props: CommentEditorProps) => {
     ? `Replying to ${replyingToAuthor} ...`
     : `Comment on thread here...`;
 
+  const useExpandedEditor = focused || isReplying;
+
   return (
     <div className="DesktopStickyInput">
-      {focused && (
+      {useExpandedEditor && (
         <CommentEditor
           {...props}
           shouldFocus={true}
@@ -36,7 +42,7 @@ export const DesktopStickyInput = (props: CommentEditorProps) => {
         />
       )}
 
-      {!focused && (
+      {!useExpandedEditor && (
         <input
           className="DesktopStickyInputPending"
           type="text"

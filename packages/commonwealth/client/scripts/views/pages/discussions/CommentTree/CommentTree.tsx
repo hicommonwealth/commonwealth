@@ -257,15 +257,20 @@ export const CommentTree = ({
         ],
       });
     } else {
-      setEdits((p) => ({
-        ...p,
-        [comment.id]: {
-          // @ts-expect-error <StrictNullChecks/>
-          ...(p[comment.id] || {}),
-          isEditing: false,
-          editDraft: '',
-        },
-      }));
+      setEdits((p) => {
+        if (!p) {
+          return;
+        }
+
+        return {
+          ...p,
+          [comment.id]: {
+            ...(p[comment.id] || {}),
+            isEditing: false,
+            editDraft: '',
+          },
+        };
+      });
       // @ts-expect-error <StrictNullChecks/>
       setIsGloballyEditing(false);
     }
@@ -542,6 +547,9 @@ export const CommentTree = ({
                   canComment={canComment}
                   isReplying={isReplying}
                   replyingToAuthor={comment.profile.name}
+                  onCancel={() => {
+                    handleEditCancel(comment, false);
+                  }}
                   tooltipText={
                     !canComment &&
                     typeof disabledActionsTooltipText === 'string'

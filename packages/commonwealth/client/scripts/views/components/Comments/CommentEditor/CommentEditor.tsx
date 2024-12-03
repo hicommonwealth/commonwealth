@@ -18,7 +18,7 @@ export type CommentEditorProps = {
   contentDelta: DeltaStatic;
   setContentDelta: React.Dispatch<React.SetStateAction<DeltaStatic>>;
   disabled: boolean;
-  onCancel: (e: any) => void;
+  onCancel: (e: React.MouseEvent) => void;
   author: Account;
   editorValue: string;
   shouldFocus?: boolean;

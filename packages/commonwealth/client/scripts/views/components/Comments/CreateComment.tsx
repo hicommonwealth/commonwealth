@@ -27,6 +27,7 @@ type CreateCommentProps = {
   tooltipText?: string;
   isReplying?: boolean;
   replyingToAuthor?: string;
+  onCancel?: (event: React.MouseEvent) => void;
 };
 
 export const CreateComment = ({
@@ -38,6 +39,7 @@ export const CreateComment = ({
   tooltipText = '',
   isReplying,
   replyingToAuthor,
+  onCancel,
 }: CreateCommentProps) => {
   const { saveDraft, restoreDraft, clearDraft } = useDraft<DeltaStatic>(
     !parentCommentId
@@ -137,14 +139,18 @@ export const CreateComment = ({
 
   const disabled = editorValue.length === 0 || sendingComment;
 
-  const handleCancel = (e) => {
-    e.preventDefault();
+  const handleCancel = (event: React.MouseEvent) => {
+    if (event) {
+      event.preventDefault();
+    }
+
     setContentDelta(createDeltaFromText(''));
 
     if (handleIsReplying) {
       handleIsReplying(false);
     }
     clearDraft();
+    onCancel?.(event);
   };
 
   // on content updated, save draft
