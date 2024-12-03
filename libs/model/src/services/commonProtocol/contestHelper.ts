@@ -1,10 +1,12 @@
 import { AppError } from '@hicommonwealth/core';
-import { commonProtocol } from '@hicommonwealth/shared';
+import {
+  commonProtocol,
+  contestAbi,
+  feeManagerAbi,
+} from '@hicommonwealth/evm-protocols';
 import { Mutex } from 'async-mutex';
 import Web3, { PayableCallOptions } from 'web3';
 import { AbiItem } from 'web3-utils';
-import { contestABI } from './abi/contestAbi';
-import { feeManagerABI } from './abi/feeManagerAbi';
 import { createWeb3Provider } from './utils';
 
 const nonceMutex = new Mutex();
@@ -52,7 +54,7 @@ const addContent = async (
     web3 = await createWeb3Provider(rpcNodeUrl);
   }
   const contestInstance = new web3.eth.Contract(
-    contestABI as AbiItem[],
+    contestAbi as AbiItem[],
     contest,
   );
 
@@ -114,7 +116,7 @@ const voteContent = async (
     web3 = await createWeb3Provider(rpcNodeUrl);
   }
   const contestInstance = new web3.eth.Contract(
-    contestABI as AbiItem[],
+    contestAbi as AbiItem[],
     contest,
   );
 
@@ -154,7 +156,7 @@ export const getContestStatus = async (
 ): Promise<ContestStatus> => {
   const web3 = new Web3(rpcNodeUrl);
   const contestInstance = new web3.eth.Contract(
-    contestABI as AbiItem[],
+    contestAbi as AbiItem[],
     contest,
   );
 
@@ -191,7 +193,7 @@ export const getContestScore = async (
 ): Promise<ContestScores> => {
   const web3 = new Web3(rpcNodeUrl);
   const contestInstance = new web3.eth.Contract(
-    contestABI as AbiItem[],
+    contestAbi as AbiItem[],
     contest,
   );
 
@@ -244,7 +246,7 @@ export const getContestBalance = async (
   const web3 = new Web3(rpcNodeUrl);
 
   const contestInstance = new web3.eth.Contract(
-    contestABI as AbiItem[],
+    contestAbi as AbiItem[],
     contest,
   );
 
@@ -252,7 +254,7 @@ export const getContestBalance = async (
     contestInstance,
     contest,
     web3,
-    feeManagerABI,
+    feeManagerAbi,
     oneOff,
   );
 
@@ -337,7 +339,7 @@ export const rollOverContest = async (
   return nonceMutex.runExclusive(async () => {
     const web3 = await createWeb3Provider(rpcNodeUrl);
     const contestInstance = new web3.eth.Contract(
-      contestABI as AbiItem[],
+      contestAbi as AbiItem[],
       contest,
     );
 

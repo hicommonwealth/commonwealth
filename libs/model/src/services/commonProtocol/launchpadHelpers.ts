@@ -1,13 +1,11 @@
 import { logger } from '@hicommonwealth/core';
 import {
-  deployedNamespaceEventSignature,
-  launchpadTokenRegisteredEventSignature,
-  launchpadTradeEventSignature,
-} from '@hicommonwealth/model';
-import { commonProtocol } from '@hicommonwealth/shared';
+  commonProtocol,
+  erc20Abi,
+  EvmEventSignatures,
+  lpBondingCurveAbi,
+} from '@hicommonwealth/evm-protocols';
 import { Web3 } from 'web3';
-import { LPBondingCurveAbi } from './abi/LPBondingCurve';
-import { erc20Abi } from './abi/erc20';
 import { createWeb3Provider } from './utils';
 
 const log = logger(import.meta);
@@ -30,7 +28,7 @@ export async function getLaunchpadTradeTransaction({
 
   const tradeLog = txReceipt.logs.find((l) => {
     if (l.topics && l.topics.length > 0) {
-      return l.topics[0].toString() === launchpadTradeEventSignature;
+      return l.topics[0].toString() === EvmEventSignatures.Launchpad.Trade;
     }
     return false;
   });
@@ -83,7 +81,10 @@ export async function getTokenCreatedTransaction({
 
   const deployedNamespaceLog = txReceipt.logs.find((l) => {
     if (l.topics && l.topics.length > 0) {
-      return l.topics[0].toString() === deployedNamespaceEventSignature;
+      return (
+        l.topics[0].toString() ===
+        EvmEventSignatures.NamespaceFactory.NamespaceDeployed
+      );
     }
     return false;
   });
@@ -103,7 +104,9 @@ export async function getTokenCreatedTransaction({
 
   const tokenRegisteredLog = txReceipt.logs.find((l) => {
     if (l.topics && l.topics.length > 0) {
-      return l.topics[0].toString() === launchpadTokenRegisteredEventSignature;
+      return (
+        l.topics[0].toString() === EvmEventSignatures.Launchpad.TokenRegistered
+      );
     }
     return false;
   });
@@ -173,7 +176,7 @@ export async function transferLiquidityToUniswap({
 }) {
   const web3 = await createWeb3Provider(rpc);
   const contract = new web3.eth.Contract(
-    LPBondingCurveAbi,
+    lpBondingCurveAbi,
     lpBondingCurveAddress,
   );
   await commonProtocol.transferLiquidity(
@@ -202,7 +205,7 @@ export async function getToken({
 }> {
   const web3 = new Web3(rpc);
   const contract = new web3.eth.Contract(
-    LPBondingCurveAbi,
+    lpBondingCurveAbi,
     lpBondingCurveAddress,
   );
   return await contract.methods.tokens(tokenAddress).call();

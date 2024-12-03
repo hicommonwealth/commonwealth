@@ -1,4 +1,4 @@
-import { commonProtocol } from '@hicommonwealth/shared';
+import { commonProtocol } from '@hicommonwealth/evm-protocols';
 import z from 'zod';
 import { AuthContext } from '../context';
 import { ContestManager } from '../entities';
@@ -9,6 +9,7 @@ export const CreateContestManagerMetadata = {
     community_id: z.string(),
     contest_address: z.string().describe('On-Chain contest manager address'),
     name: z.string(),
+    description: z.string().nullish(),
     image_url: z.string().optional(),
     funding_token_address: z
       .string()
@@ -45,6 +46,7 @@ export const UpdateContestManagerMetadata = {
     community_id: z.string(),
     contest_address: z.string().describe('On-Chain contest manager address'),
     name: z.string().optional(),
+    description: z.string().optional(),
     image_url: z.string().optional(),
     topic_id: PG_INT.optional(),
   }),
@@ -74,11 +76,6 @@ export const ResumeContestManagerMetadata = {
     contest_managers: z.array(ContestManager),
   }),
   context: AuthContext,
-};
-
-export const PerformContestRollovers = {
-  input: z.object({ id: z.string() }),
-  output: z.object({}),
 };
 
 export const FarcasterCast = z.object({
@@ -132,7 +129,7 @@ export const FarcasterCast = z.object({
   replies: z.object({
     count: z.number(),
   }),
-  channel: z.string().nullable(),
+  channel: z.any().nullable(),
   mentioned_profiles: z.array(z.unknown()),
   event_timestamp: z.string(),
 });

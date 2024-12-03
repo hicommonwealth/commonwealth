@@ -15,7 +15,7 @@ describe('getEventSources', () => {
   let stakesAbiInstance: ContractAbiInstance;
 
   beforeAll(async () => {
-    await tester.bootstrap_testing(true);
+    await tester.bootstrap_testing();
     const res = await createEventSources();
     namespaceAbiInstance = res.namespaceAbiInstance;
     stakesAbiInstance = res.stakesAbiInstance;

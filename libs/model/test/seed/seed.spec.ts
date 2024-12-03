@@ -45,8 +45,10 @@ async function testSeed<T extends schemas.Aggregates>(
   return data;
 }
 
-describe('Seed functions', () => {
+// skip for now, seeds are being widely used in lifecycle tests
+describe.skip('Seed functions', () => {
   let shouldExit = true;
+
   afterAll(async () => {
     await dispose()();
   });

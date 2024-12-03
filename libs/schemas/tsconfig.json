@@ -1,4 +1,7 @@
 {
   "extends": "../tsconfig.json",
-  "references": [{ "path": "../shared/tsconfig.build.json" }]
+  "references": [
+    { "path": "../shared/tsconfig.build.json" },
+    { "path": "../evm-protocols/tsconfig.build.json" }
+  ]
 }

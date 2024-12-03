@@ -1,6 +1,7 @@
+import { ContractAbi } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize';
+import { z } from 'zod';
 import { ChainNodeAttributes } from './chain_node';
-import { ContractAbiAttributes } from './contract_abi';
 import { ModelInstance } from './types';
 
 export type EvmEventSourceAttributes = {
@@ -14,7 +15,7 @@ export type EvmEventSourceAttributes = {
   active?: boolean;
   abi_id: number;
 
-  ContractAbi?: ContractAbiAttributes;
+  ContractAbi?: z.infer<typeof ContractAbi>;
   ChainNode?: ChainNodeAttributes;
 };
 

@@ -1,5 +1,5 @@
 import { pluralizeWithoutNumberPrefix } from 'helpers';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import type { Topic } from '../../models/Topic';
 import { useCommonNavigate } from '../../navigation/helpers';
 import app from '../../state';
@@ -18,8 +18,10 @@ import {
 } from '../components/component_kit/new_designs/CWModal';
 import { openConfirmation } from './confirmation_modal';
 
+import clsx from 'clsx';
 import { notifySuccess } from 'controllers/app/notifications';
 import { DeltaStatic } from 'quill';
+import { MessageRow } from 'views/components/component_kit/new_designs/CWTextInput/MessageRow';
 import '../../../styles/modals/edit_topic_modal.scss';
 import { CWText } from '../components/component_kit/cw_text';
 import { ReactQuillEditor } from '../components/react_quill_editor';
@@ -51,10 +53,60 @@ export const EditTopicModal = ({
   const [description, setDescription] = useState<DeltaStatic>(
     createDeltaFromText(descriptionProp),
   );
+  const [newPostTemplate, setNewPostTemplate] = useState<DeltaStatic>(
+    topic?.default_offchain_template
+      ? JSON.parse(decodeURIComponent(topic?.default_offchain_template))
+      : '',
+  );
+  const [newPostTemplateError, setNewPostTemplateError] = useState<
+    string | null
+  >(null);
   const [featuredInSidebar, setFeaturedInSidebar] = useState<boolean>(
     featuredInSidebarProp,
   );
+  const [featuredInNewPost, setFeaturedInNewPost] = useState<boolean>(
+    topic?.featured_in_new_post || false,
+  );
   const [name, setName] = useState<string>(nameProp);
+  const [characterCount, setCharacterCount] = useState(0);
+  const [descErrorMsg, setDescErrorMsg] = useState<string | null>(null);
+
+  const getCharacterCount = (delta) => {
+    if (!delta || !delta.ops) {
+      return 0;
+    }
+    return delta.ops.reduce((count, op) => {
+      if (typeof op.insert === 'string') {
+        const cleanedText = op.insert.replace(/\n$/, '');
+        return count + cleanedText.length;
+      }
+      return count;
+    }, 0);
+  };
+
+  useEffect(() => {
+    const count = getCharacterCount(description);
+    setCharacterCount(count);
+  }, [description]);
+
+  useEffect(() => {
+    if ((description?.ops || [])?.[0]?.insert?.length > 250) {
+      setDescErrorMsg('Description must be 250 characters or less');
+    } else {
+      setDescErrorMsg(null);
+    }
+  }, [description]);
+
+  useEffect(() => {
+    if (
+      featuredInNewPost &&
+      (newPostTemplate?.ops || [])?.[0]?.insert?.trim?.()?.length === 0
+    ) {
+      setNewPostTemplateError('Topic template is required');
+    } else {
+      setNewPostTemplateError(null);
+    }
+  }, [featuredInNewPost, newPostTemplate]);
 
   const handleSaveChanges = async () => {
     setIsSaving(true);
@@ -67,8 +119,11 @@ export const EditTopicModal = ({
         community_id: app.activeChainId()!,
         telegram: null,
         featured_in_sidebar: featuredInSidebar,
-        featured_in_new_post: false,
-        default_offchain_template: '',
+        featured_in_new_post: featuredInNewPost,
+        default_offchain_template:
+          featuredInNewPost && newPostTemplate
+            ? JSON.stringify(newPostTemplate)
+            : '',
       });
       if (noRedirect) {
         onModalClose();
@@ -175,6 +230,22 @@ export const EditTopicModal = ({
           })}
           isDisabled={!!topic.archived_at}
         />
+        <div className="char-error-row">
+          <CWText type="caption">Character count: {characterCount}/250</CWText>
+          <MessageRow
+            statusMessage={descErrorMsg || ''}
+            hasFeedback={!!descErrorMsg}
+            validationStatus={descErrorMsg ? 'failure' : undefined}
+          />
+
+          {featuredInNewPost && (
+            <MessageRow
+              statusMessage={newPostTemplateError || ''}
+              hasFeedback={!!newPostTemplateError}
+              validationStatus={newPostTemplateError ? 'failure' : undefined}
+            />
+          )}
+        </div>
         <CWCheckbox
           label="Featured in Sidebar"
           checked={featuredInSidebar}
@@ -184,6 +255,36 @@ export const EditTopicModal = ({
           value=""
           disabled={!!topic.archived_at}
         />
+        <div
+          className={clsx(
+            'new-topic-template-section',
+            featuredInNewPost && 'enabled',
+          )}
+        >
+          <CWCheckbox
+            className="sidebar-feature-checkbox"
+            label={
+              <div>
+                <CWText type="b2">Featured topic in new post</CWText>
+                <CWText type="caption" className="checkbox-label-caption">
+                  The topic template you add will be added as base text to every
+                  new post within the topic.
+                </CWText>
+              </div>
+            }
+            checked={featuredInNewPost}
+            onChange={() => {
+              setFeaturedInNewPost(!featuredInNewPost);
+            }}
+          />
+          {featuredInNewPost && (
+            <ReactQuillEditor
+              placeholder="Add a template for this topic (Limit of 250 characters)"
+              contentDelta={newPostTemplate}
+              setContentDelta={setNewPostTemplate}
+            />
+          )}
+        </div>
       </CWModalBody>
       <CWModalFooter className="EditTopicModalFooter">
         <div className="action-buttons">
@@ -209,7 +310,11 @@ export const EditTopicModal = ({
             buttonHeight="sm"
             onClick={handleSaveChanges}
             label="Save changes"
-            disabled={!!topic.archived_at}
+            disabled={
+              !!topic.archived_at ||
+              !!descErrorMsg ||
+              (featuredInNewPost && !!newPostTemplateError)
+            }
           />
         </div>
         {errorMsg && (

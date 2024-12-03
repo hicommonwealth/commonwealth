@@ -1,6 +1,8 @@
 import { InvalidState, type Command } from '@hicommonwealth/core';
+import { commonProtocol } from '@hicommonwealth/evm-protocols';
 import * as schemas from '@hicommonwealth/schemas';
-import { commonProtocol } from '@hicommonwealth/shared';
+import { TokenView } from '@hicommonwealth/schemas';
+import z from 'zod';
 import { models } from '../database';
 import { authRoles } from '../middleware';
 import { mustExist } from '../middleware/guards';
@@ -46,11 +48,11 @@ export function CreateToken(): Command<typeof schemas.CreateToken> {
       }
 
       const token = await models.Token.create({
-        token_address: tokenData.parsedArgs.tokenAddress,
+        token_address: tokenData.parsedArgs.tokenAddress.toLowerCase(),
         namespace: tokenData.parsedArgs.namespace,
         name: tokenInfo.name,
         symbol: tokenInfo.symbol,
-        initial_supply: tokenInfo.totalSupply,
+        initial_supply: Number(tokenInfo.totalSupply / BigInt(1e18)),
         liquidity_transferred: false,
         launchpad_liquidity: tokenData.parsedArgs.launchpadLiquidity,
         eth_market_cap_target: commonProtocol.getTargetMarketCap(),
@@ -58,7 +60,7 @@ export function CreateToken(): Command<typeof schemas.CreateToken> {
         icon_url: icon_url ?? null,
       });
 
-      return token!.toJSON();
+      return token!.toJSON() as unknown as z.infer<typeof TokenView>;
     },
   };
 }

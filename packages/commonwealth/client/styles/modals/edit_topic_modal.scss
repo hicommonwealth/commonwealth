@@ -10,6 +10,12 @@
     overflow: auto;
   }
 
+  .char-error-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+  }
+
   .EditTopicModalFooter {
     display: flex;
     flex-direction: column;
@@ -23,12 +29,15 @@
         margin-right: auto;
       }
     }
-
     .error-message {
       display: block;
       align-items: center;
       text-align: end;
       margin-top: 0;
     }
+  }
+
+  .CWModalBody {
+    overflow: scroll;
   }
 }
