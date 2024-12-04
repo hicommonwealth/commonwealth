@@ -160,29 +160,31 @@ const ProfileActivityRow = ({ activity }: ProfileActivityRowProps) => {
                 label: 'Copy link',
                 onClick: async () => {
                   if (isThread) {
-                    await navigator.clipboard.writeText(
-                      `${domain}/${communityId}/discussion/${id}`,
-                    );
+                    await navigator.clipboard
+                      .writeText(`${domain}/${communityId}/discussion/${id}`)
+                      .catch(console.error);
                     return;
                   }
-                  await navigator.clipboard.writeText(
-                    `${domain}/${communityId}/discussion/${comment.thread?.id}?comment=${comment.id}`,
-                  );
+                  await navigator.clipboard
+                    .writeText(
+                      `${domain}/${communityId}/discussion/${comment.thread?.id}?comment=${comment.id}`,
+                    )
+                    .catch(console.error);
                 },
               },
               {
                 iconLeft: 'twitterOutline',
                 iconLeftSize: 'regular',
                 label: 'Share on  X (Twitter)',
-                onClick: async () => {
+                onClick: () => {
                   if (isThread) {
-                    await window.open(
+                    window.open(
                       `https://twitter.com/intent/tweet?text=${domain}/${communityId}/discussion/${id}`,
                       '_blank',
                     );
                     return;
                   }
-                  await window.open(
+                  window.open(
                     `https://twitter.com/intent/tweet?text=${domain}/${communityId}/discussion/${comment.thread?.id}
                       ?comment=${comment.id}`,
                     '_blank',
