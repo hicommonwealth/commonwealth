@@ -23,7 +23,7 @@ import {
 import z from 'zod';
 // eslint-disable-next-line max-len
 import { EventNames } from '@hicommonwealth/schemas';
-import { processSubscriptionPreferencesUpdated } from '../../../server/workers/knock/eventHandlers/subscriptionPreferencesUpdated';
+import { processSubscriptionPreferencesUpdated } from 'server/workers/knock/eventHandlers/subscriptionPreferencesUpdated';
 import { SpyNotificationsProvider } from '../../util/mockedNotificationProvider';
 
 chai.use(chaiAsPromised);
