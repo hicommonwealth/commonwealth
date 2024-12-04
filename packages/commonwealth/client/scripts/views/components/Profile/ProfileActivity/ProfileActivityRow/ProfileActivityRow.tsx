@@ -158,18 +158,21 @@ const ProfileActivityRow = ({ activity }: ProfileActivityRowProps) => {
                 iconLeft: 'linkPhosphor',
                 iconLeftSize: 'regular',
                 label: 'Copy link',
-                onClick: async () => {
-                  if (isThread) {
+                onClick: () => {
+                  const handleAsync = async () => {
+                    if (isThread) {
+                      await navigator.clipboard
+                        .writeText(`${domain}/${communityId}/discussion/${id}`)
+                        .catch(console.error);
+                      return;
+                    }
                     await navigator.clipboard
-                      .writeText(`${domain}/${communityId}/discussion/${id}`)
+                      .writeText(
+                        `${domain}/${communityId}/discussion/${comment.thread?.id}?comment=${comment.id}`,
+                      )
                       .catch(console.error);
-                    return;
-                  }
-                  await navigator.clipboard
-                    .writeText(
-                      `${domain}/${communityId}/discussion/${comment.thread?.id}?comment=${comment.id}`,
-                    )
-                    .catch(console.error);
+                  };
+                  handleAsync().catch(console.error);
                 },
               },
               {

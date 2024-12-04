@@ -56,7 +56,7 @@ const ProfileActivity = ({
             isSelected={selectedActivity === ProfileActivityType.Threads}
           />
           <CWTab
-            label="My stake"
+            label="My Tokens"
             onClick={() => {
               setSelectedActivity(ProfileActivityType.MyStake);
             }}

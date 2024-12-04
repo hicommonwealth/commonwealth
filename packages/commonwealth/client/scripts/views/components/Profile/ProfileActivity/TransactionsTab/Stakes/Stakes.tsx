@@ -97,13 +97,16 @@ const Stakes = ({ transactions }: TransactionsProps) => {
       };
     });
 
-    return Object.values(accumulatedStakes)
-      .map((transaction: any) => ({
-        ...transaction,
-        voteWeight: transaction.voteWeight + 1, // total vote weight is +1 of the stake weight
-        avgPrice: `${transaction.avgPrice.toFixed(5)} ${'ETH'}`,
-      }))
-      .filter((transaction) => transaction.stake > 0);
+    return (
+      Object.values(accumulatedStakes)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .map((transaction: any) => ({
+          ...transaction,
+          voteWeight: transaction.voteWeight + 1, // total vote weight is +1 of the stake weight
+          avgPrice: `${transaction.avgPrice.toFixed(5)} ${'ETH'}`,
+        }))
+        .filter((transaction) => transaction.stake > 0)
+    );
   })();
 
   return (
