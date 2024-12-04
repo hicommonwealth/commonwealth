@@ -11,7 +11,10 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
 import useUserStore from 'state/ui/user';
-import MarkdownViewerUsingQuillOrNewEditor from 'views/components/MarkdownViewerWithFallback';
+import {
+  default as MarkdownViewerUsingQuillOrNewEditor,
+  default as MarkdownViewerWithFallback,
+} from 'views/components/MarkdownViewerWithFallback';
 import { ThreadContestTagContainer } from 'views/components/ThreadContestTag';
 import { ViewThreadUpvotesDrawer } from 'views/components/UpvoteDrawer';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
@@ -229,21 +232,24 @@ export const ThreadCard = ({
                 'show-image': showImage || threadImage,
               })}
             >
-              <MarkdownViewerUsingQuillOrNewEditor
-                markdown={
-                  !removeImagesFromMarkDown
-                    ? thread.body
-                    : removeImageFormMarkDown(thread.body)
-                }
-                cutoffLines={4}
-                customShowMoreButton={
-                  <CWText type="b1" className="show-more-btn">
-                    Show more
-                  </CWText>
-                }
-                onImageClick={onImageClick}
-                isCardView={isCardView}
-              />
+              {!isCardView ? (
+                <MarkdownViewerUsingQuillOrNewEditor
+                  markdown={
+                    !removeImagesFromMarkDown
+                      ? thread.body
+                      : removeImageFormMarkDown(thread.body)
+                  }
+                  cutoffLines={4}
+                  customShowMoreButton={
+                    <CWText type="b1" className="show-more-btn">
+                      Show more
+                    </CWText>
+                  }
+                  onImageClick={onImageClick}
+                />
+              ) : (
+                <MarkdownViewerWithFallback markdown={thread.body} />
+              )}
               {threadImage && (
                 <div className="card-image-container">
                   <img src={threadImage} alt="Thread content" />

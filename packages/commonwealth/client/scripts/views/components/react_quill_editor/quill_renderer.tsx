@@ -34,7 +34,6 @@ export const QuillRenderer = ({
   customClass,
   customShowMoreButton = null,
   onImageClick,
-  isCardView,
 }: QuillRendererProps) => {
   const docInfo: DocInfo = useMemo(() => {
     let decodedText: string;
@@ -107,7 +106,6 @@ export const QuillRenderer = ({
             customClass={customClass}
             customShowMoreButton={customShowMoreButton}
             onImageClick={onImageClick}
-            isCardView={isCardView}
           />
         );
       default:
@@ -123,7 +121,6 @@ export const QuillRenderer = ({
     customClass,
     customShowMoreButton,
     onImageClick,
-    isCardView,
   ]);
 
   if (containerClass) {

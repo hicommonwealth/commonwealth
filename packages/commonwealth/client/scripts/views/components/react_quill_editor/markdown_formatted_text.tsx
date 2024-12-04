@@ -67,7 +67,6 @@ export const MarkdownFormattedText = ({
   customClass,
   customShowMoreButton,
   onImageClick,
-  isCardView,
 }: MarkdownFormattedTextProps) => {
   const containerRef = useRef<HTMLDivElement>();
   const [userExpand, setUserExpand] = useState<boolean>(false);
@@ -195,31 +194,17 @@ export const MarkdownFormattedText = ({
 
   return (
     <>
-      {isCardView ? (
-        <div className="card-view">
-          <div
-            // @ts-expect-error <StrictNullChecks/>
-            ref={containerRef}
-            className={getClasses<{ collapsed?: boolean }>(
-              { collapsed: isTruncated },
-              customClass || 'MarkdownFormattedText',
-            )}
-          >
-            {finalDoc}
-          </div>
-        </div>
-      ) : (
-        <div
-          // @ts-expect-error <StrictNullChecks/>
-          ref={containerRef}
-          className={getClasses<{ collapsed?: boolean }>(
-            { collapsed: isTruncated },
-            customClass || 'MarkdownFormattedText',
-          )}
-        >
-          {finalDoc}
-        </div>
-      )}
+      <div
+        // @ts-expect-error <StrictNullChecks/>
+        ref={containerRef}
+        className={getClasses<{ collapsed?: boolean }>(
+          { collapsed: isTruncated },
+          customClass || 'MarkdownFormattedText',
+        )}
+      >
+        {finalDoc}
+      </div>
+
       {isTruncated && (
         <>
           {customShowMoreButton || (
