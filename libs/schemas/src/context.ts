@@ -1,5 +1,10 @@
 import { z } from 'zod';
-import { Address, Comment, Poll, Reaction, Thread, Topic } from './entities';
+import { Comment } from './entities/comment.schemas';
+import { Poll } from './entities/poll.schemas';
+import { Reaction } from './entities/reaction.schemas';
+import { Thread } from './entities/thread.schemas';
+import { Topic } from './entities/topic.schemas';
+import { Address } from './entities/user.schemas';
 
 // Input schemas for authorization context
 export const AuthContextInput = z.object({ community_id: z.string() });

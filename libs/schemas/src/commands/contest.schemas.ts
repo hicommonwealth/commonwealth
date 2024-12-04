@@ -1,7 +1,7 @@
 import { commonProtocol } from '@hicommonwealth/evm-protocols';
 import z from 'zod';
 import { AuthContext } from '../context';
-import { ContestManager } from '../entities';
+import { ContestManager } from '../entities/contest-manager.schemas';
 import { PG_INT } from '../utils';
 
 export const CreateContestManagerMetadata = {

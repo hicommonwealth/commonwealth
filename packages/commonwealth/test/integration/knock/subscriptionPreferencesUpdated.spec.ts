@@ -7,6 +7,7 @@ import {
 } from '@hicommonwealth/core';
 import { models, tester } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
+import { EventNames } from '@hicommonwealth/schemas';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import {
@@ -22,8 +23,7 @@ import {
 } from 'vitest';
 import z from 'zod';
 // eslint-disable-next-line max-len
-import { EventNames } from '@hicommonwealth/schemas';
-import { processSubscriptionPreferencesUpdated } from 'server/workers/knock/eventHandlers/subscriptionPreferencesUpdated';
+import { processSubscriptionPreferencesUpdated } from '../../../server/workers/knock/eventHandlers/subscriptionPreferencesUpdated';
 import { SpyNotificationsProvider } from '../../util/mockedNotificationProvider';
 
 chai.use(chaiAsPromised);
