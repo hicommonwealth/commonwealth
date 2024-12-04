@@ -57,3 +57,15 @@ export const convertGranularPermissionsToAccumulatedPermissions = (
 
   return TOPIC_PERMISSIONS.UPVOTE_AND_COMMENT_AND_POST;
 };
+
+export const isPermissionGuard = (
+  value: PermissionEnum,
+): value is PermissionEnum => {
+  return [
+    PermissionEnum.CREATE_COMMENT_REACTION,
+    PermissionEnum.CREATE_THREAD_REACTION,
+    PermissionEnum.CREATE_COMMENT,
+    PermissionEnum.CREATE_THREAD,
+    PermissionEnum.UPDATE_POLL,
+  ].includes(value);
+};

@@ -26,20 +26,16 @@ import {
 import Allowlist from './Allowlist';
 import './GroupForm.scss';
 import RequirementSubForm from './RequirementSubForm';
-import TopicPermissionsSubForm from './TopicPermissionsSubForm';
-import {
-  REQUIREMENTS_TO_FULFILL,
-  REVERSED_TOPIC_PERMISSIONS,
-  TOPIC_PERMISSIONS,
-} from './constants';
-import { convertAccumulatedPermissionsToGranularPermissions } from './helpers';
+import TopicPermissionToggleGroupSubForm from './TopicPermissionToggleGroupSubForm';
+import { REQUIREMENTS_TO_FULFILL } from './constants';
+import { isPermissionGuard } from './helpers';
 import {
   FormSubmitValues,
   GroupFormProps,
+  Permission,
   RequirementSubFormsState,
   RequirementSubType,
-  TopicPermissions,
-  TopicPermissionsSubFormsState,
+  TopicPermissionToggleGroupSubFormsState,
 } from './index.types';
 import {
   VALIDATION_MESSAGES,
@@ -175,9 +171,10 @@ const GroupForm = ({
   const [requirementSubForms, setRequirementSubForms] = useState<
     RequirementSubFormsState[]
   >([]);
-  const [topicPermissionsSubForms, setTopicPermissionsSubForms] = useState<
-    TopicPermissionsSubFormsState[]
-  >([]);
+  const [
+    topicPermissionsToggleGroupSubForms,
+    setTopicPermissionsToggleGroupSubForms,
+  ] = useState<TopicPermissionToggleGroupSubFormsState[]>([]);
 
   useEffect(() => {
     if (initialValues.requirements) {
@@ -213,15 +210,26 @@ const GroupForm = ({
     }
 
     if (initialValues.topics) {
-      setTopicPermissionsSubForms(
-        initialValues.topics.map((t) => ({
-          permission: t.permission,
-          topic: { id: parseInt(`${t.value}`), name: t.label },
-        })),
-      );
+      const updatedInitialValues: TopicPermissionToggleGroupSubFormsState[] =
+        initialValues.topics.map(({ label, value, permission }) => ({
+          topic: {
+            id: Number(value),
+            name: label,
+          },
+          permission: (Array.isArray(permission)
+            ? permission.filter(isPermissionGuard)
+            : []) as Permission[],
+        }));
+      setTopicPermissionsToggleGroupSubForms(updatedInitialValues);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const handleTopicPermissionsChange = (
+    updatedPermissions: TopicPermissionToggleGroupSubFormsState[],
+  ) => {
+    setTopicPermissionsToggleGroupSubForms(updatedPermissions);
+  };
 
   const removeRequirementByIndex = (index: number) => {
     const updatedSubForms = [...requirementSubForms];
@@ -388,11 +396,9 @@ const GroupForm = ({
 
     const formValues = {
       ...values,
-      topics: topicPermissionsSubForms.map((t) => ({
+      topics: topicPermissionsToggleGroupSubForms.map((t) => ({
         id: t.topic.id,
-        permissions: convertAccumulatedPermissionsToGranularPermissions(
-          REVERSED_TOPIC_PERMISSIONS[t.permission],
-        ),
+        permissions: t.permission,
       })),
       requirementsToFulfill,
       requirements: requirementSubForms.map((x) => x.values),
@@ -403,27 +409,18 @@ const GroupForm = ({
 
   const handleWatchForm = (values: FormSubmitValues) => {
     if (values?.topics?.length > 0) {
-      setTopicPermissionsSubForms(
+      const updatedTopicPermissions: TopicPermissionToggleGroupSubFormsState[] =
         values.topics.map((topic) => ({
           topic: {
-            id: parseInt(`${topic.value}`),
+            id: Number(topic.value),
             name: topic.label,
           },
-          permission: TOPIC_PERMISSIONS.UPVOTE_AND_COMMENT_AND_POST,
-        })),
-      );
+          permission: [],
+        }));
+      setTopicPermissionsToggleGroupSubForms(updatedTopicPermissions);
     } else {
-      setTopicPermissionsSubForms([]);
+      setTopicPermissionsToggleGroupSubForms([]);
     }
-  };
-
-  const updateTopicPermissionByIndex = (
-    index: number,
-    newPermission: TopicPermissions,
-  ) => {
-    const updatedTopicPermissionsSubForms = [...topicPermissionsSubForms];
-    updatedTopicPermissionsSubForms[index].permission = newPermission;
-    setTopicPermissionsSubForms([...updatedTopicPermissionsSubForms]);
   };
 
   // + 1 for allowlists
@@ -625,7 +622,7 @@ const GroupForm = ({
               </section>
 
               {/* Sub-section: Gated topic permissions */}
-              {topicPermissionsSubForms?.length > 0 && (
+              {topicPermissionsToggleGroupSubForms.length > 0 && (
                 <section className="form-section">
                   <div className="header-row">
                     <CWText
@@ -640,27 +637,12 @@ const GroupForm = ({
                       within.
                     </CWText>
                   </div>
-
-                  <CWText type="b2" className="topic-permission-header">
-                    Topic
-                  </CWText>
-
-                  {topicPermissionsSubForms.map((topicPermission, index) => (
-                    <>
-                      <CWDivider className="divider-spacing" />
-                      <TopicPermissionsSubForm
-                        key={topicPermission.topic.id}
-                        topic={topicPermission.topic}
-                        defaultPermission={topicPermission.permission}
-                        onPermissionChange={(newPermission) =>
-                          updateTopicPermissionByIndex(index, newPermission)
-                        }
-                      />
-                      {index === topicPermissionsSubForms.length - 1 && (
-                        <CWDivider className="divider-spacing" />
-                      )}
-                    </>
-                  ))}
+                  {topicPermissionsToggleGroupSubForms && (
+                    <TopicPermissionToggleGroupSubForm
+                      PermissionFormData={topicPermissionsToggleGroupSubForms}
+                      onChange={handleTopicPermissionsChange}
+                    />
+                  )}
                 </section>
               )}
             </section>
