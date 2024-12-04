@@ -1,6 +1,5 @@
-import { PG_INT } from '@hicommonwealth/schemas';
+import { EventNames as E, events as P, PG_INT } from '@hicommonwealth/schemas';
 import { z } from 'zod';
-import { EventNames as E, events as P } from './events';
 
 export const BaseOutboxProperties = z.object({
   event_id: PG_INT.optional(),

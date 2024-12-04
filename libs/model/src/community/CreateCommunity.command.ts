@@ -1,4 +1,4 @@
-import { EventNames, InvalidInput, type Command } from '@hicommonwealth/core';
+import { InvalidInput, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import {
   ChainBase,
@@ -173,7 +173,7 @@ export function CreateCommunity(): Command<typeof schemas.CreateCommunity> {
           models.Outbox,
           [
             {
-              event_name: EventNames.CommunityCreated,
+              event_name: schemas.EventNames.CommunityCreated,
               event_payload: {
                 communityId: id,
                 userId: actor.user.id!.toString(),

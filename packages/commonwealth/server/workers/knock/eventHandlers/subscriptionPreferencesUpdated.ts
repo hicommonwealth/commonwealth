@@ -3,10 +3,10 @@ import {
   logger,
   notificationsProvider,
   RepeatFrequency,
-  SubscriptionPreferencesUpdated,
   WorkflowKeys,
 } from '@hicommonwealth/core';
 import { models, SubscriptionPreferenceInstance } from '@hicommonwealth/model';
+import { events } from '@hicommonwealth/schemas';
 import { DaysOfWeek } from '@knocklabs/node';
 import z from 'zod';
 import { config } from '../../../config';
@@ -97,7 +97,7 @@ async function deleteScheduleIfExists(
 }
 
 async function handleEmailPreferenceUpdates(
-  payload: z.infer<typeof SubscriptionPreferencesUpdated>,
+  payload: z.infer<typeof events.SubscriptionPreferencesUpdated>,
   subscriptionPreferences: SubscriptionPreferenceInstance,
 ) {
   if (

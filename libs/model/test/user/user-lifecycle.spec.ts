@@ -237,6 +237,11 @@ describe('User lifecycle', () => {
           quest_id: quest!.id!,
           action_metas: [
             {
+              event_name: 'CommunityJoined',
+              reward_amount: 20,
+              creator_reward_weight: 0,
+            },
+            {
               event_name: 'ThreadCreated',
               reward_amount: 10,
               creator_reward_weight: 0,

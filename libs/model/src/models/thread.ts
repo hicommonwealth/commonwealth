@@ -1,5 +1,4 @@
-import { EventNames } from '@hicommonwealth/core';
-import { Thread } from '@hicommonwealth/schemas';
+import { EventNames, Thread } from '@hicommonwealth/schemas';
 import { getDecodedString } from '@hicommonwealth/shared';
 import Sequelize from 'sequelize';
 import { z } from 'zod';

@@ -1,4 +1,4 @@
-import { EventNames, type Command } from '@hicommonwealth/core';
+import { type Command } from '@hicommonwealth/core';
 import { emitEvent } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import { SubscriptionPreference } from '@hicommonwealth/schemas';
@@ -64,7 +64,7 @@ export function UpdateSubscriptionPreferences(): Command<
           models.Outbox,
           [
             {
-              event_name: EventNames.SubscriptionPreferencesUpdated,
+              event_name: schemas.EventNames.SubscriptionPreferencesUpdated,
               event_payload: {
                 user_id: existingPreferences.user_id,
                 ...preferenceUpdates,

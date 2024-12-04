@@ -1,4 +1,5 @@
-import { events, logger, Policy } from '@hicommonwealth/core';
+import { logger, Policy } from '@hicommonwealth/core';
+import { events } from '@hicommonwealth/schemas';
 import { NeynarAPIClient } from '@neynar/nodejs-sdk';
 import { Op } from 'sequelize';
 import { config, models } from '..';

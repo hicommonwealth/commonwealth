@@ -4,9 +4,7 @@ import {
   BrokerSubscriptions,
   CustomRetryStrategyError,
   EventContext,
-  EventNames,
   EventSchemas,
-  Events,
   EventsHandlerMetadata,
   ILogger,
   InvalidInput,
@@ -16,6 +14,7 @@ import {
   handleEvent,
   logger,
 } from '@hicommonwealth/core';
+import { EventNames, Events } from '@hicommonwealth/schemas';
 import { Message } from 'amqplib';
 import { AckOrNack, default as Rascal } from 'rascal';
 

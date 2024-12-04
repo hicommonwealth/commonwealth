@@ -1,4 +1,4 @@
-import { Projection, events } from '@hicommonwealth/core';
+import { Projection } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import {
   QuestParticipationLimit,
@@ -9,17 +9,6 @@ import { Op } from 'sequelize';
 import { z } from 'zod';
 import { models, sequelize } from '../database';
 import { mustExist } from '../middleware/guards';
-
-const inputs = {
-  CommunityJoined: events.CommunityJoined,
-  ThreadCreated: events.ThreadCreated,
-  CommentCreated: events.CommentCreated,
-  CommentUpvoted: events.CommentUpvoted,
-  //PollCreated: events.PollCreated,
-  //ThreadEdited: events.ThreadEdited,
-  //CommentEdited: events.CommentEdited,
-  //PollEdited: events.PollEdited,
-};
 
 async function getUserId(payload: { address_id: number }) {
   const address = await models.Address.findOne({
@@ -35,7 +24,7 @@ async function getUserId(payload: { address_id: number }) {
  */
 async function getQuestActionMetas(
   event_payload: { community_id: string; created_at?: Date },
-  event_name: keyof typeof events,
+  event_name: keyof typeof schemas.QuestEvents,
 ) {
   // make sure quest was active when event was created
   const quests = await models.Quest.findAll({
@@ -156,9 +145,9 @@ async function recordXps(
   });
 }
 
-export function Xp(): Projection<typeof inputs> {
+export function Xp(): Projection<typeof schemas.QuestEvents> {
   return {
-    inputs,
+    inputs: schemas.QuestEvents,
     body: {
       CommunityJoined: async ({ payload }) => {
         const action_metas = await getQuestActionMetas(
@@ -172,6 +161,14 @@ export function Xp(): Projection<typeof inputs> {
         const action_metas = await getQuestActionMetas(
           payload,
           'ThreadCreated',
+        );
+        await recordXps(user_id, payload.created_at!, action_metas);
+      },
+      ThreadUpvoted: async ({ payload }) => {
+        const user_id = await getUserId(payload);
+        const action_metas = await getQuestActionMetas(
+          payload,
+          'ThreadUpvoted',
         );
         await recordXps(user_id, payload.created_at!, action_metas);
       },
@@ -214,6 +211,14 @@ export function Xp(): Projection<typeof inputs> {
           action_metas,
           comment!.Address!.user_id!,
         );
+      },
+      UserMentioned: async () => {
+        // const user_id = await getUserId(payload);
+        // const action_metas = await getQuestActionMetas(
+        //   payload,
+        //   'UserMentioned',
+        // );
+        // await recordXps(user_id, payload.created_at!, action_metas);
       },
     },
   };

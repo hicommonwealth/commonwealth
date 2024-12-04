@@ -1,5 +1,6 @@
+import { Events, events } from '@hicommonwealth/schemas';
 import z, { ZodSchema, ZodUndefined } from 'zod';
-import { BaseOutboxProperties, Events, events } from '../integration';
+import { BaseOutboxProperties } from '../integration';
 
 /**
  * Error names as constants
