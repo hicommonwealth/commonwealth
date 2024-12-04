@@ -244,8 +244,9 @@ const DetailsFormStep = ({
             <CWText className="contest-description">
               Launch a contest using the funds from your community wallet to
               create engagement incentives.{' '}
-              <CWText fontWeight="medium">Contests last 7 days</CWText> in
-              blockchain time.{' '}
+              <CWText fontWeight="medium">
+                Contests can be anywhere from 1 to 7 days in duration.
+              </CWText>{' '}
               <a
                 href={CONTEST_FAQ_URL}
                 rel="noopener noreferrer"
