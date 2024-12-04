@@ -146,7 +146,7 @@ export function CreateCommunity(): Command<typeof schemas.CreateCommunity> {
           { transaction },
         );
 
-        await models.Address.create(
+        const created = await models.Address.create(
           {
             user_id: actor.user.id,
             address: admin_address.address,
@@ -178,6 +178,7 @@ export function CreateCommunity(): Command<typeof schemas.CreateCommunity> {
                 communityId: id,
                 userId: actor.user.id!.toString(),
                 referralLink: payload.referral_link,
+                created_at: created.created_at!,
               },
             },
           ],

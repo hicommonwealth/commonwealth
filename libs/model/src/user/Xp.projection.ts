@@ -154,7 +154,17 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
           payload,
           'CommunityJoined',
         );
-        await recordXps(payload.user_id, payload.created_at!, action_metas);
+        if (action_metas.length > 0) {
+          const referrer_id = payload.referral_link?.startsWith('ref_')
+            ? parseInt(payload.referral_link.split('_').at(1)!)
+            : undefined;
+          await recordXps(
+            payload.user_id,
+            payload.created_at!,
+            action_metas,
+            referrer_id,
+          );
+        }
       },
       ThreadCreated: async ({ payload }) => {
         const user_id = await getUserId(payload);

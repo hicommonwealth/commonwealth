@@ -307,6 +307,7 @@ export const RefreshCommunityMemberships = {
 export const JoinCommunity = {
   input: z.object({
     community_id: z.string(),
+    referral_link: z.string().nullish(),
   }),
   output: z.object({
     community_id: z.string(),

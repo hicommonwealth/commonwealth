@@ -1,6 +1,5 @@
 import { Events, events } from '@hicommonwealth/schemas';
 import z, { ZodSchema, ZodUndefined } from 'zod';
-import { BaseOutboxProperties } from '../integration';
 
 /**
  * Error names as constants
@@ -122,8 +121,7 @@ export type Context<Input extends ZodSchema, _Context extends ZodSchema> = {
  */
 export type EventContext<Name extends Events> = {
   readonly name: Name;
-  readonly payload: z.infer<typeof BaseOutboxProperties> &
-    z.infer<(typeof events)[Name]>;
+  readonly payload: z.infer<(typeof events)[Name]>;
 };
 
 /**

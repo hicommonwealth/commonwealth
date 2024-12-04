@@ -61,12 +61,14 @@ export const CommunityCreated = z.object({
   communityId: z.string(),
   userId: z.string(),
   referralLink: z.string().optional(),
+  created_at: z.coerce.date(),
 });
 
 export const CommunityJoined = z.object({
   community_id: z.string(),
   user_id: z.number(),
-  referral_link: z.string().optional(),
+  referral_link: z.string().nullish(),
+  created_at: z.coerce.date(),
 });
 
 export const SnapshotProposalCreated = z.object({
