@@ -101,6 +101,11 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
     location,
   );
 
+  const routesWithUserOnboardingSlider = matchRoutes(
+    [{ path: '/dashboard/for-you' }],
+    location,
+  );
+
   useEffect(() => {
     let timer: NodeJS.Timeout;
 
@@ -176,7 +181,7 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
               />
             </div>
             {!routesWithoutGenericBreadcrumbs && <Breadcrumbs />}
-            {!routesWithoutGenericSliders && <UserTrainingSlider />}
+            {routesWithUserOnboardingSlider && <UserTrainingSlider />}
             {isInsideCommunity && !routesWithoutGenericSliders && (
               <AdminOnboardingSlider />
             )}
