@@ -117,7 +117,13 @@ export async function getVotingWeight(
     );
 
     // only count full ERC20 tokens
-    return result?.div(BigNumber.from(10).pow(decimals)) || null;
+    const numFullTokens = result?.div(BigNumber.from(10).pow(decimals)) || null;
+    if (!numFullTokens || numFullTokens.isZero()) {
+      // if the weighted value is not at least a full token, reject the action
+      throw new InvalidState('Insufficient token balance');
+    }
+    console.log({ numFullTokens });
+    return numFullTokens;
   }
 
   // no weighted voting
