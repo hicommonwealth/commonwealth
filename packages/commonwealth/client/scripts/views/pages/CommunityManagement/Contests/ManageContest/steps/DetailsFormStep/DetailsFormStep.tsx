@@ -261,8 +261,7 @@ const DetailsFormStep = ({
       featureHint={{
         title: 'How do I fund my contest?',
         description:
-          'Contests are funded when community members purchase stake in the community. ' +
-          'Each transaction includes a small contribution to the community pool that can be used to fund contests.',
+          'Contests can be funded directly using any token that is on the same chain as your community.',
       }}
     >
       <div className="DetailsFormStep">
