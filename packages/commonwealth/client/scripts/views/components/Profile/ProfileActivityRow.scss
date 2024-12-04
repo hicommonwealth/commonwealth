@@ -11,14 +11,18 @@
   .ProfileActivityRowContainer {
     display: flex;
     justify-content: space-between;
+    align-items: center;
 
     @include extraSmall {
       flex-wrap: wrap;
-      margin-bottom: 10px;
+      margin-bottom: 2px;
     }
 
     .created_at {
       color: $neutral-700 !important;
+      @include extraSmall {
+        font-size: 12px !important;
+      }
     }
 
     .heading {
@@ -125,8 +129,8 @@
       color: $neutral-600;
     }
     @include extraSmall {
-      font-size: 14px !important;
-      line-height: 14px !important;
+      font-size: 13px !important;
+      line-height: 13px !important;
       word-spacing: 0cap !important;
     }
 

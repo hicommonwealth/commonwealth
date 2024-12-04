@@ -52,15 +52,15 @@ const ProfileActivityRow = ({ activity }: ProfileActivityRowProps) => {
           <CWText noWrap fontWeight="regular">
             {isReply ? `Replied in` : 'Commented on'}
           </CWText>
-          &nbsp; &nbsp;
+          &nbsp;
           <CWText noWrap fontWeight="medium">
             {isReply
               ? `${comment?.communityId} Community`
               : `${comment?.communityId} Community`}
           </CWText>
         </div>
-        <CWText noWrap className="created_at">
-          {moment(comment.createdAt).fromNow()}
+        <CWText className="created_at">
+          {moment(comment.createdAt).fromNow(true)}
         </CWText>
       </div>
 
