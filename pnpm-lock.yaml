@@ -397,18 +397,12 @@ importers:
       '@types/qs':
         specifier: ^6.9.14
         version: 6.9.15
-      '@types/sinon':
-        specifier: ^17.0.3
-        version: 17.0.3
       '@types/superagent':
         specifier: 4.1.13
         version: 4.1.13
       '@types/swagger-ui-express':
         specifier: ^4.1.6
         version: 4.1.6
-      sinon:
-        specifier: ^17.0.2
-        version: 17.0.2
       superagent:
         specifier: ^5.2.2
         version: 5.3.1
