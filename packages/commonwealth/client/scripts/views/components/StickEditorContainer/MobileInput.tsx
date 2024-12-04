@@ -18,11 +18,20 @@ export const MobileInput = (props: MobileInputProps) => {
     handleSubmitComment,
     isReplying,
     replyingToAuthor,
+    onCancel,
   } = props;
   const [value, setValue] = useState('');
   const user = useUserStore();
 
-  const handleClose = useActiveStickCommentReset();
+  const stickyCommentReset = useActiveStickCommentReset();
+
+  const handleClose = useCallback(
+    (e: React.MouseEvent<HTMLElement | SVGSVGElement>) => {
+      stickyCommentReset();
+      onCancel(e);
+    },
+    [stickyCommentReset],
+  );
 
   const handleChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -34,7 +43,7 @@ export const MobileInput = (props: MobileInputProps) => {
 
   const handleKeyDown = useCallback(
     (event: React.KeyboardEvent<HTMLInputElement>) => {
-      if (event.key === 'Enter') {
+      if (value.trim() !== '' && event.key === 'Enter') {
         setValue('');
         handleSubmitComment();
       }
