@@ -30,11 +30,9 @@ import ExternalLink from 'views/components/ExternalLink';
 import JoinCommunityBanner from 'views/components/JoinCommunityBanner';
 import MarkdownViewerUsingQuillOrNewEditor from 'views/components/MarkdownViewerWithFallback';
 import { checkIsTopicInContest } from 'views/components/NewThreadFormLegacy/helpers';
-import {
-  StickCommentProvider,
-  StickyCommentElementSelector,
-  WithDefaultStickyComment,
-} from 'views/components/StickEditorContainer/CommentStateContext';
+import { StickyCommentElementSelector } from 'views/components/StickEditorContainer/context/CommentStateContext';
+import { StickCommentProvider } from 'views/components/StickEditorContainer/context/StickCommentProvider';
+import { WithDefaultStickyComment } from 'views/components/StickEditorContainer/context/WithDefaultStickyComment';
 import useJoinCommunity from 'views/components/SublayoutHeader/useJoinCommunity';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { PageNotFound } from 'views/pages/404';
