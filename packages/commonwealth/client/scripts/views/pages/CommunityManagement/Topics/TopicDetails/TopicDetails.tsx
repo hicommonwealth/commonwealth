@@ -64,19 +64,12 @@ const TopicDetails = ({
           )}
         </main>
         <aside>
-          {isCreateTopicTab ? (
-            <FeatureHint
-              title="Topics and Subtopics"
-              hint="Top level topics can act as parents to subtopics. Subtopics can not have additional subtopics."
-            />
-          ) : (
-            <FeatureHint
-              title="Topic Sorting"
-              hint="Drag the topics on the left to the order you want them to appear
+          <FeatureHint
+            title="Topic Sorting"
+            hint="Drag the topics on the left to the order you want them to appear
             on the side panel navigation of your community page. Tap the pencil
             icon to edit the topic or delete the topic."
-            />
-          )}
+          />
         </aside>
       </div>
     </div>
