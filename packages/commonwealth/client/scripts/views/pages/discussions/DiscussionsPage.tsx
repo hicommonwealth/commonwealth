@@ -28,7 +28,6 @@ import useTopicGating from 'hooks/useTopicGating';
 import { GridComponents, Virtuoso, VirtuosoGrid } from 'react-virtuoso';
 import { useFetchCustomDomainQuery } from 'state/api/configuration';
 import { useGetERC20BalanceQuery } from 'state/api/tokens';
-import Permissions from 'utils/Permissions';
 import { saveToClipboard } from 'utils/clipboard';
 import TokenBanner from 'views/components/TokenBanner';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
@@ -98,8 +97,6 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
       setSelectedView(VIEWS[0].value);
     }
   }, [tabStatus]);
-
-  const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
 
   const topicObj = topics?.find(({ name }) => name === topicName);
   const topicId = topicObj?.id;
