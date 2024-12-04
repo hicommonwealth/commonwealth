@@ -2,7 +2,7 @@ import React, { useCallback, useMemo, useState } from 'react';
 import useUserStore from 'state/ui/user';
 import { Avatar } from 'views/components/Avatar';
 import { CommentEditorProps } from 'views/components/Comments/CommentEditor/CommentEditor';
-import { useActiveStickCommentReset } from 'views/components/StickEditorContainer/CommentStateContext';
+import { useActiveStickCommentReset } from 'views/components/StickEditorContainer/context/UseActiveStickCommentReset';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { createDeltaFromText } from 'views/components/react_quill_editor';
 import './MobileInput.scss';
@@ -30,7 +30,7 @@ export const MobileInput = (props: MobileInputProps) => {
       stickyCommentReset();
       onCancel(e);
     },
-    [stickyCommentReset],
+    [stickyCommentReset, onCancel],
   );
 
   const handleChange = useCallback(
@@ -48,7 +48,7 @@ export const MobileInput = (props: MobileInputProps) => {
         handleSubmitComment();
       }
     },
-    [handleSubmitComment],
+    [handleSubmitComment, value],
   );
 
   const avatarURL = useMemo(() => {
