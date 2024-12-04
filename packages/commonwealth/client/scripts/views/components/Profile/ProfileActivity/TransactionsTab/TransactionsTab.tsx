@@ -60,53 +60,53 @@ const TransactionsTab = ({ transactionsType }: TransactionsTabProps) => {
 
   return (
     <section className="TransactionsTab">
+      <section className="filters">
+        {hasMagic && (
+          <div className="title-and-wallet-button">
+            <CWButton
+              label="Open wallet"
+              onClick={() => {
+                openMagicWallet().catch(console.error);
+              }}
+            />
+          </div>
+        )}
+        <CWTextInput
+          size="large"
+          fullWidth
+          placeholder="Search community name or symbol"
+          containerClassName="search-input-container"
+          inputClassName="search-input"
+          iconLeft={<CWIcon iconName="search" className="search-icon" />}
+          onInput={(e) =>
+            setFilterOptions((options) => ({
+              ...options,
+              searchText: e.target.value?.trim(),
+            }))
+          }
+        />
+        <div className="select-list-container">
+          <CWText fontWeight="medium">Filter</CWText>
+          <CWSelectList
+            isSearchable={false}
+            isClearable={false}
+            options={ADDRESS_FILTERS}
+            value={filterOptions.selectedAddress}
+            onChange={(option) =>
+              // @ts-expect-error <StrictNullChecks/>
+              setFilterOptions((filters) => ({
+                ...filters,
+                selectedAddress: option,
+              }))
+            }
+          />
+        </div>
+      </section>
+
       {!(data?.length > 0) ? (
         <NoTransactionHistory />
       ) : (
         <>
-          <section className="filters">
-            {hasMagic && (
-              <div className="title-and-wallet-button">
-                <CWButton
-                  label="Open wallet"
-                  onClick={() => {
-                    openMagicWallet().catch(console.error);
-                  }}
-                />
-              </div>
-            )}
-            <CWTextInput
-              size="large"
-              fullWidth
-              placeholder="Search community name or symbol"
-              containerClassName="search-input-container"
-              inputClassName="search-input"
-              iconLeft={<CWIcon iconName="search" className="search-icon" />}
-              onInput={(e) =>
-                setFilterOptions((options) => ({
-                  ...options,
-                  searchText: e.target.value?.trim(),
-                }))
-              }
-            />
-            <div className="select-list-container">
-              <CWText fontWeight="medium">Filter</CWText>
-              <CWSelectList
-                isSearchable={false}
-                isClearable={false}
-                options={ADDRESS_FILTERS}
-                value={filterOptions.selectedAddress}
-                onChange={(option) =>
-                  // @ts-expect-error <StrictNullChecks/>
-                  setFilterOptions((filters) => ({
-                    ...filters,
-                    selectedAddress: option,
-                  }))
-                }
-              />
-            </div>
-          </section>
-
           {transactionsType === 'stake' && <Stakes transactions={data || []} />}
           {transactionsType === 'history' && (
             <TransactionsHistory transactions={data || []} />
