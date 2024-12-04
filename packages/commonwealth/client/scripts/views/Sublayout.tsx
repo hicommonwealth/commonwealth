@@ -102,7 +102,7 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
   );
 
   const routesWithUserOnboardingSlider = matchRoutes(
-    [{ path: '/dashboard/for-you' }],
+    [{ path: '/dashboard/for-you' }, { path: '/dashboard/global' }],
     location,
   );
 
