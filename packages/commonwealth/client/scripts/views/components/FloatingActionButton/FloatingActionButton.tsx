@@ -1,16 +1,19 @@
 import React from 'react';
 
+import './FloatingActionButton.scss';
+
 type FloatingActionButtonProps = {
   onClick: () => void;
   children: React.ReactNode;
 };
 
-export const FloatingActionButton = (props: FloatingActionButtonProps) => {
-  const { onClick } = props;
-
+export const FloatingActionButton = ({
+  children,
+  onClick,
+}: FloatingActionButtonProps) => {
   return (
     <div className="FloatingActionButton" onClick={onClick}>
-      {props.children}
+      {children}
     </div>
   );
 };
