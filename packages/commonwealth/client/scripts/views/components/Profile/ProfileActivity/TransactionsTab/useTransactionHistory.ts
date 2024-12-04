@@ -1,7 +1,7 @@
-import { WEI_PER_ETHER } from '../controllers/chain/ethereum/util';
-import { trpc } from '../utils/trpcClient';
-import { buildEtherscanLink } from '../views/modals/ManageCommunityStakeModal/utils';
-import { FilterOptions } from '../views/pages/MyCommunityStake/types';
+import { WEI_PER_ETHER } from 'controllers/chain/ethereum/util';
+import { trpc } from 'utils/trpcClient';
+import { buildEtherscanLink } from 'views/modals/ManageCommunityStakeModal/utils';
+import { FilterOptions } from '../types';
 
 export type TransactionHistoryProps = {
   filterOptions: FilterOptions;
@@ -36,8 +36,7 @@ const useTransactionHistory = ({
         ).toFixed(5)} ETH`,
         etherscanLink: buildEtherscanLink(
           t.transaction_hash,
-          // @ts-expect-error StrictNullChecks
-          t.community?.chain_node_id,
+          t.community?.chain_node_id || 0,
         ),
       }));
 
@@ -46,8 +45,7 @@ const useTransactionHistory = ({
     filteredData = filteredData.filter((tx) =>
       (tx.community.default_symbol + tx.community.name)
         .toLowerCase()
-        // @ts-expect-error StrictNullChecks
-        .includes(filterOptions.searchText.toLowerCase()),
+        .includes((filterOptions.searchText || '').toLowerCase()),
     );
   }
 

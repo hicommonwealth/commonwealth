@@ -1,7 +1,5 @@
 import { WalletId } from '@hicommonwealth/shared';
-import { PageNotFound } from 'client/scripts/views/pages/404';
 import { formatAddressShort } from 'helpers';
-import useTransactionHistory from 'hooks/useTransactionHistory';
 import React, { useState } from 'react';
 import useUserStore from 'state/ui/user';
 import useAuthentication from '../../../../modals/AuthModal/useAuthentication';
@@ -15,6 +13,7 @@ import NoTransactionHistory from './NoTransactionHistory';
 import Stakes from './Stakes';
 import TransactionsHistory from './TransactionHistory';
 import './TransactionsTab.scss';
+import useTransactionHistory from './useTransactionHistory';
 
 const BASE_ADDRESS_FILTER = {
   label: 'All addresses',
@@ -58,10 +57,6 @@ const TransactionsTab = ({ transactionsType }: TransactionsTabProps) => {
     filterOptions,
     addressFilter,
   });
-
-  if (!user.isLoggedIn) {
-    return <PageNotFound />;
-  }
 
   return (
     <section className="TransactionsTab">
