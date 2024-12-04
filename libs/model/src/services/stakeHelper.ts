@@ -122,7 +122,6 @@ export async function getVotingWeight(
       // if the weighted value is not at least a full token, reject the action
       throw new InvalidState('Insufficient token balance');
     }
-    console.log({ numFullTokens });
     return numFullTokens;
   }
 

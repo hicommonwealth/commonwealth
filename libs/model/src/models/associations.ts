@@ -70,7 +70,10 @@ export const buildAssociations = (db: DB) => {
   db.ChainNode.withMany(db.Community)
     .withMany(db.EvmEventSource)
     .withOne(db.LastProcessedEvmBlock)
-    .withMany(db.Topic);
+    .withMany(db.Topic, {
+      onUpdate: 'CASCADE',
+      onDelete: 'SET NULL',
+    });
 
   db.ContractAbi.withMany(db.EvmEventSource, { foreignKey: 'abi_id' });
 
