@@ -51,7 +51,9 @@ export const UpdateContestManagerMetadata = {
     topic_id: PG_INT.optional(),
   }),
   output: z.object({
-    contest_managers: z.array(ContestManager),
+    contest_managers: z.array(
+      ContestManager.extend({ topic_id: PG_INT.nullish() }),
+    ),
   }),
   context: AuthContext,
 };
