@@ -17,7 +17,6 @@ import {
 } from '@hicommonwealth/model';
 import { AbiType, BalanceType, delay } from '@hicommonwealth/shared';
 import { Anvil } from '@viem/anvil';
-import { bootstrap_testing } from 'node_modules/@hicommonwealth/model/src/tester';
 import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 import { z } from 'zod';
 import {
@@ -329,10 +328,6 @@ describe('EVM Chain Events Devnet Tests', () => {
     let chainNode: ChainNodeInstance;
 
     beforeAll(async () => {
-      // bootstrapping here to reset the db
-      // and avoid conflicts with other tests using same chain
-      await bootstrap_testing();
-
       chainNode = await models.ChainNode.create({
         url: localRpc,
         balance_type: BalanceType.Ethereum,

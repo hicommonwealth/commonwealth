@@ -8,4 +8,5 @@ export enum WelcomeOnboardModalSteps {
   TermsOfServices = 'TermsOfServices',
   Preferences = 'Preferences',
   JoinCommunity = 'JoinCommunity',
+  MagicWallet = 'MagicWallet',
 }

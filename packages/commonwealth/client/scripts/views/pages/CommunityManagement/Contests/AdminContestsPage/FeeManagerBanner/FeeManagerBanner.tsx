@@ -3,7 +3,6 @@ import { isMobile } from 'react-device-detect';
 
 import { useManageCommunityStakeModalStore } from 'state/ui/modals';
 import { Skeleton } from 'views/components/Skeleton';
-import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWIconButton from 'views/components/component_kit/new_designs/CWIconButton';
@@ -38,10 +37,6 @@ const FeeManagerBanner = ({
   return (
     <div className="FeeManagerBanner">
       <div className="left-side">
-        <div className="header">
-          <CWIcon iconName="trophy" iconSize="regular" />
-          <CWText type="caption">Buy stake to fund contests!</CWText>
-        </div>
         <div className="popover-row">
           <CWText className="info-stake">
             Stake fee manager total balance
