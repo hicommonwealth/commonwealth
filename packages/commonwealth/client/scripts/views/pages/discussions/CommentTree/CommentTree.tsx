@@ -16,7 +16,7 @@ import {
 } from 'state/api/comments';
 import useUserStore from 'state/ui/user';
 import { CreateComment } from 'views/components/Comments/CreateComment';
-import { WithActiveStickyComment } from 'views/components/StickEditorContainer/CommentStateContext';
+import { WithActiveStickyComment } from 'views/components/StickEditorContainer/context/WithActiveStickyComment';
 import {
   deserializeDelta,
   serializeDelta,
