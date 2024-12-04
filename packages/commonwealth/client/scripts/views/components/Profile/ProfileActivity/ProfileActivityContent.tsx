@@ -7,6 +7,7 @@ import { CWText } from '../../component_kit/cw_text';
 import type { CommentWithAssociatedThread } from './ProfileActivity';
 import ProfileActivityRow from './ProfileActivityRow';
 import ReferralsTab from './ReferralsTab';
+import { TransactionsTab } from './TransactionsTab/TransactionsTab';
 
 export enum ProfileActivityType {
   Addresses,
@@ -14,6 +15,8 @@ export enum ProfileActivityType {
   Communities,
   Threads,
   Referrals,
+  MyStake,
+  TransactionHistory,
 }
 
 type ProfileActivityContentProps = {
@@ -55,6 +58,14 @@ const ProfileActivityContent = ({
 
   if (option === ProfileActivityType.Referrals) {
     return <ReferralsTab isOwner={isOwner} />;
+  }
+
+  if (option === ProfileActivityType.MyStake) {
+    return <TransactionsTab transactionsType="stake" />;
+  }
+
+  if (option === ProfileActivityType.TransactionHistory) {
+    return <TransactionsTab transactionsType="history" />;
   }
 
   const allActivities: Array<CommentWithAssociatedThread | Thread> = [

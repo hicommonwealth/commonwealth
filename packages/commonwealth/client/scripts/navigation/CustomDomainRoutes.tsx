@@ -80,8 +80,6 @@ const ManageContest = lazy(
 const Contests = lazy(() => import('views/pages/Contests'));
 const ContestPage = lazy(() => import('views/pages/ContestPage'));
 
-const MyCommunityStake = lazy(() => import('views/pages/MyCommunityStake'));
-
 const SnapshotProposalPage = lazy(
   () => import('views/pages/Snapshots/SnapshotProposals'),
 );
@@ -168,11 +166,6 @@ const CustomDomainRoutes = ({
       key="/finishsociallogin"
       path="/finishsociallogin"
       element={withLayout(FinishSocialLoginPage, { type: 'common' })}
-    />,
-    <Route
-      key="/myCommunityStake"
-      path="/myCommunityStake"
-      element={withLayout(MyCommunityStake, { type: 'common' })}
     />,
 
     // NOTIFICATIONS

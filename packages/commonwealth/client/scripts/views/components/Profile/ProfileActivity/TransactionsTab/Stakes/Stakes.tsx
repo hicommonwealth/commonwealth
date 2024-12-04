@@ -1,6 +1,6 @@
+import { WEI_PER_ETHER } from 'controllers/chain/ethereum/util';
 import { formatAddressShort } from 'helpers';
 import { APIOrderDirection } from 'helpers/constants';
-import { getRelativeTimestamp } from 'helpers/dates';
 import React from 'react';
 import CommunityInfo from 'views/components/component_kit/CommunityInfo';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
@@ -8,8 +8,8 @@ import { CWTable } from 'views/components/component_kit/new_designs/CWTable';
 import { CWTableColumnInfo } from 'views/components/component_kit/new_designs/CWTable/CWTable';
 import { useCWTableState } from 'views/components/component_kit/new_designs/CWTable/useCWTableState';
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
-import { TransactionsProps } from '../types';
-import './Transactions.scss';
+import { TransactionsProps } from '../../types';
+import './Stakes.scss';
 
 const columns: CWTableColumnInfo[] = [
   {
@@ -33,14 +33,14 @@ const columns: CWTableColumnInfo[] = [
     hasCustomSortValue: true,
   },
   {
-    key: 'action',
-    header: 'Action',
+    key: 'stake',
+    header: 'Stake',
     numeric: true,
     sortable: true,
   },
   {
-    key: 'stake',
-    header: 'Stake',
+    key: 'voteWeight',
+    header: 'Vote weight',
     numeric: true,
     sortable: true,
   },
@@ -51,19 +51,6 @@ const columns: CWTableColumnInfo[] = [
     sortable: true,
   },
   {
-    key: 'totalPrice',
-    header: 'Total price',
-    numeric: true,
-    sortable: true,
-  },
-  {
-    key: 'timestamp',
-    header: 'Timestamp',
-    numeric: true,
-    sortable: true,
-    hasCustomSortValue: true,
-  },
-  {
     key: 'etherscanLink',
     header: () => <CWIcon iconName="etherscan" iconSize="regular" />,
     numeric: false,
@@ -71,27 +58,68 @@ const columns: CWTableColumnInfo[] = [
   },
 ];
 
-const Transactions = ({ transactions }: TransactionsProps) => {
+const Stakes = ({ transactions }: TransactionsProps) => {
   const tableState = useCWTableState({
     columns,
-    initialSortColumn: 'timestamp',
+    initialSortColumn: 'voteWeight',
     initialSortDirection: APIOrderDirection.Desc,
   });
 
+  // aggregate transaction per community per address
+  const stakes = (() => {
+    const accumulatedStakes = {};
+
+    transactions.map((transaction) => {
+      const key = (
+        transaction.community.id + transaction.address
+      ).toLowerCase();
+      const action = transaction.action === 'mint' ? 1 : -1;
+
+      accumulatedStakes[key] = {
+        ...transaction,
+        ...(accumulatedStakes[key] || {}),
+        chain: transaction?.community?.chain_node_name,
+        stake:
+          (accumulatedStakes[key]?.stake || 0) + transaction.stake * action,
+        voteWeight:
+          (accumulatedStakes[key]?.voteWeight || 0) +
+          transaction.voteWeight * action,
+        avgPrice:
+          (accumulatedStakes[key]?.avgPrice || 0) +
+          parseFloat(
+            (
+              parseFloat(transaction.price) /
+              WEI_PER_ETHER /
+              transaction.stake
+            ).toFixed(5),
+          ) *
+            action,
+      };
+    });
+
+    return Object.values(accumulatedStakes)
+      .map((transaction: any) => ({
+        ...transaction,
+        voteWeight: transaction.voteWeight + 1, // total vote weight is +1 of the stake weight
+        avgPrice: `${transaction.avgPrice.toFixed(5)} ${'ETH'}`,
+      }))
+      .filter((transaction) => transaction.stake > 0);
+  })();
+
   return (
-    <section className="Transactions">
+    <section className="Stakes">
       <CWTable
         columnInfo={tableState.columns}
         sortingState={tableState.sorting}
         setSortingState={tableState.setSorting}
-        rowData={transactions.map((tx) => ({
+        rowData={stakes.map((tx) => ({
           ...tx,
           community: {
-            sortValue: tx?.community?.name?.toLowerCase(),
+            sortValue: tx.community.name.toLowerCase(),
             customElement: (
               <CommunityInfo
-                symbol={tx.community.default_symbol || ''}
-                iconUrl={tx.community.icon_url || ''}
+                symbol={tx.community.default_symbol}
+                iconUrl={tx.community.icon_url}
                 name={tx.community.name}
                 communityId={tx.community.id}
               />
@@ -109,23 +137,6 @@ const Transactions = ({ transactions }: TransactionsProps) => {
                     onMouseLeave={handleInteraction}
                   >
                     {formatAddressShort(tx.address, 5, 5)}
-                  </span>
-                )}
-              />
-            ),
-          },
-          timestamp: {
-            sortValue: tx.timestamp,
-            customElement: (
-              <CWTooltip
-                content={new Date(tx.timestamp).toLocaleString()}
-                renderTrigger={(handleInteraction) => (
-                  <span
-                    className="timestamp"
-                    onMouseEnter={handleInteraction}
-                    onMouseLeave={handleInteraction}
-                  >
-                    {getRelativeTimestamp(tx.timestamp)}
                   </span>
                 )}
               />
@@ -149,4 +160,4 @@ const Transactions = ({ transactions }: TransactionsProps) => {
   );
 };
 
-export { Transactions };
+export { Stakes };
