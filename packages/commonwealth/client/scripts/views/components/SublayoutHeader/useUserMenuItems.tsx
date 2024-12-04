@@ -296,11 +296,6 @@ const useUserMenuItems = ({
         : []),
       {
         type: 'default',
-        label: 'My community stake',
-        onClick: () => navigate(`/myCommunityStake`, {}, null),
-      },
-      {
-        type: 'default',
         label: 'Notification settings',
         onClick: () => navigate('/notification-settings', {}, null),
       },
