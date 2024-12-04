@@ -11,10 +11,10 @@ import withRouter, {
 import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { MarkdownViewerWithFallback } from 'views/components/MarkdownViewerWithFallback/MarkdownViewerWithFallback';
 import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
-import { CWIconButton } from '../component_kit/cw_icon_button';
-import { CWText } from '../component_kit/cw_text';
-import { CWTag } from '../component_kit/new_designs/CWTag';
-import type { CommentWithAssociatedThread } from './ProfileActivity';
+import { CWIconButton } from '../../../component_kit/cw_icon_button';
+import { CWText } from '../../../component_kit/cw_text';
+import { CWTag } from '../../../component_kit/new_designs/CWTag';
+import type { CommentWithAssociatedThread } from '../ProfileActivity';
 
 type CommentWithThreadCommunity = CommentWithAssociatedThread & {
   thread?: { community_id?: string };

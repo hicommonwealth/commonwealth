@@ -5,17 +5,17 @@ import { useUserStore } from 'state/ui/user/user';
 import { saveToClipboard } from 'utils/clipboard';
 
 import { APIOrderDirection } from 'helpers/constants';
-import { Avatar } from '../../Avatar';
-import { CWIcon } from '../../component_kit/cw_icons/cw_icon';
-import { CWText } from '../../component_kit/cw_text';
-import CWIconButton from '../../component_kit/new_designs/CWIconButton';
+import { Avatar } from '../../../Avatar';
+import { CWIcon } from '../../../component_kit/cw_icons/cw_icon';
+import { CWText } from '../../../component_kit/cw_text';
+import CWIconButton from '../../../component_kit/new_designs/CWIconButton';
 import CWPopover, {
   usePopover,
-} from '../../component_kit/new_designs/CWPopover';
-import { CWTable } from '../../component_kit/new_designs/CWTable';
-import { CWTableColumnInfo } from '../../component_kit/new_designs/CWTable/CWTable';
-import { useCWTableState } from '../../component_kit/new_designs/CWTable/useCWTableState';
-import { CWTextInput } from '../../component_kit/new_designs/CWTextInput';
+} from '../../../component_kit/new_designs/CWPopover';
+import { CWTable } from '../../../component_kit/new_designs/CWTable';
+import { CWTableColumnInfo } from '../../../component_kit/new_designs/CWTable/CWTable';
+import { useCWTableState } from '../../../component_kit/new_designs/CWTable/useCWTableState';
+import { CWTextInput } from '../../../component_kit/new_designs/CWTextInput';
 
 import './ReferralsTab.scss';
 

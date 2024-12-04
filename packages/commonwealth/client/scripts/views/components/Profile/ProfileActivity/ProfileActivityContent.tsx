@@ -1,9 +1,9 @@
 import React from 'react';
 
-import './Profile.scss';
+import './../Profile.scss';
 
 import type Thread from 'models/Thread';
-import { CWText } from '../component_kit/cw_text';
+import { CWText } from '../../component_kit/cw_text';
 import type { CommentWithAssociatedThread } from './ProfileActivity';
 import ProfileActivityRow from './ProfileActivityRow';
 import ReferralsTab from './ReferralsTab';

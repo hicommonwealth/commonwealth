@@ -6,7 +6,7 @@ import { useFlag } from 'hooks/useFlag';
 import type Comment from 'models/Comment';
 import type Thread from 'models/Thread';
 import type { IUniqueId } from 'models/interfaces';
-import { CWTab, CWTabsRow } from '../component_kit/new_designs/CWTabs';
+import { CWTab, CWTabsRow } from '../../component_kit/new_designs/CWTabs';
 import ProfileActivityContent, {
   ProfileActivityType,
 } from './ProfileActivityContent';
