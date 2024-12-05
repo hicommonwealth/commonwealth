@@ -1,8 +1,8 @@
 import React from 'react';
 
-import 'components/component_kit/cw_progress_bar.scss';
 import { CWIcon } from './cw_icons/cw_icon';
 import type { IconName } from './cw_icons/cw_icon_lookup';
+import './cw_progress_bar.scss';
 import { CWText } from './cw_text';
 
 import { getClasses } from './helpers';

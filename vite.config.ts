@@ -9,6 +9,7 @@ dotenv.config();
 export default defineConfig({
   plugins: [tsconfigPaths()],
   test: {
+    // Enables parallel lifecycle tests
     setupFiles: [path.resolve(__dirname, './libs/model/src/vitest.setup.ts')],
     poolMatchGlobs: [
       // lifecycle tests in forks pool (uses node:child_process)
@@ -19,7 +20,12 @@ export default defineConfig({
       threads: { minThreads: 1, maxThreads: 1 },
       forks: { minForks: 1, maxForks: 5 },
     },
-    fileParallelism: process.env.npm_package_name === '@hicommonwealth/model',
+    fileParallelism: process.env.npm_package_name !== 'commonwealth',
+    testTimeout: 20_000,
+
+    // Disables parallel lifecycle tests
+    // fileParallelism: false,
+
     sequence: { concurrent: false },
     coverage: {
       include: ['src/**/*.ts'],

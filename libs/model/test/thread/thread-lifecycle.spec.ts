@@ -944,6 +944,44 @@ describe('Thread lifecycle', () => {
       expect(`${t!.reaction_weights_sum}`).to.eq(`${expectedWeight}`);
     });
 
+    // test('should handle ERC20 topic weight vote', async () => {
+    //   const topic = await command(CreateTopic(), {
+    //     actor: actors.admin,
+    //     payload: {
+    //       community_id: community.id,
+    //       name: 'erc20 test topic',
+    //       description: '',
+    //       featured_in_sidebar: false,
+    //       featured_in_new_post: false,
+    //       weighted_voting: TopicWeightedVoting.ERC20,
+    //       token_address: '0x0000000000000000000000000000000000000123',
+    //       token_symbol: 'TEST',
+    //       vote_weight_multiplier: 2,
+    //       chain_node_id: community.chain_node_id,
+    //     },
+    //   });
+    //   const thread = await command(CreateThread(), {
+    //     actor: actors.admin,
+    //     payload: {
+    //       body: 'abc',
+    //       community_id: community.id,
+    //       topic_id: topic!.topic.id!,
+    //       title: 'test thread',
+    //       kind: 'discussion',
+    //       stage: '',
+    //       read_only: false,
+    //     },
+    //   });
+    //   const reaction = await command(CreateThreadReaction(), {
+    //     actor: actors.admin,
+    //     payload: {
+    //       thread_id: thread!.id!,
+    //       reaction: 'like',
+    //     },
+    //   });
+    //   expect(reaction?.calculated_voting_weight).to.eq('100');
+    // });
+
     test('should delete a reaction', async () => {
       const reaction = await command(CreateThreadReaction(), {
         actor: actors.admin,

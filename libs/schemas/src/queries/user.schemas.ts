@@ -29,6 +29,7 @@ export const UserProfileView = z.object({
   commentThreads: z.array(ThreadView),
   isOwner: z.boolean(),
   tags: z.array(Tags.extend({ id: PG_INT })),
+  xp_points: z.number().int(),
 });
 
 export const GetUserProfile = {

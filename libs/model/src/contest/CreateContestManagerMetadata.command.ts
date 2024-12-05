@@ -6,6 +6,7 @@ import { models } from '../database';
 import { authRoles } from '../middleware';
 import { mustExist } from '../middleware/guards';
 import { TopicInstance } from '../models';
+import { getDefaultContestImage } from '../utils';
 
 const Errors = {
   InvalidTopics: 'Invalid topic',
@@ -53,6 +54,7 @@ export function CreateContestManagerMetadata(): Command<
                 : null,
               topic_id: topic?.id || null,
               is_farcaster_contest: !!is_farcaster_contest,
+              image_url: rest.image_url || getDefaultContestImage(),
             },
             { transaction },
           );

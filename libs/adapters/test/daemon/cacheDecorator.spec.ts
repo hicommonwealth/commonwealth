@@ -1,17 +1,29 @@
-/* eslint-disable @typescript-eslint/no-shadow */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import { Cache, CacheNamespaces, cache, dispose } from '@hicommonwealth/core';
-import chai, { expect } from 'chai';
+import {
+  Cache,
+  CacheNamespaces,
+  cache,
+  dispose,
+  disposeAdapter,
+} from '@hicommonwealth/core';
+import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import sinon from 'sinon';
-import { afterAll, beforeAll, beforeEach, describe, test } from 'vitest';
+import {
+  Mocked,
+  afterAll,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  test,
+  vi,
+} from 'vitest';
 import { CacheDecorator } from '../../src/redis';
 import { CacheKeyDuration } from '../../src/utils';
 chai.use(chaiAsPromised);
 
 describe('CacheDecorator', () => {
   let cacheDecorator: CacheDecorator;
-  let mockCache: sinon.SinonStubbedInstance<Cache>;
+  let mockCache: Mocked<Cache>;
 
   beforeAll(async () => {
     cacheDecorator = new CacheDecorator();
@@ -22,9 +34,31 @@ describe('CacheDecorator', () => {
   });
 
   beforeEach(() => {
-    sinon.restore();
-    mockCache = sinon.stub(cache());
-    mockCache.isReady.returns(true);
+    vi.restoreAllMocks();
+    disposeAdapter(cache().name);
+    mockCache = {
+      name: 'mocked-cache',
+      dispose: vi.fn(),
+      ready: vi.fn().mockResolvedValue(true),
+      isReady: vi.fn().mockReturnValue(true),
+      getKey: vi.fn(),
+      setKey: vi.fn(),
+      getKeys: vi.fn(),
+      setKeys: vi.fn(),
+      getNamespaceKeys: vi.fn(),
+      deleteKey: vi.fn(),
+      deleteNamespaceKeys: vi.fn(),
+      flushAll: vi.fn(),
+      incrementKey: vi.fn(),
+      decrementKey: vi.fn(),
+      getKeyTTL: vi.fn(),
+      setKeyTTL: vi.fn(),
+    };
+    cache({
+      key: 'mocked.cache.key',
+      adapter: mockCache,
+      isDefault: true,
+    });
   });
 
   describe('cacheWrap', () => {
@@ -41,8 +75,8 @@ describe('CacheDecorator', () => {
           const fn = async () => 'test-result';
           const duration = 60;
 
-          mockCache.getKey.resolves(undefined);
-          mockCache.setKey.resolves(true);
+          mockCache.getKey.mockResolvedValue(null);
+          mockCache.setKey.mockResolvedValue(true);
 
           const wrapFn = cacheDecorator.cacheWrap(
             false,
@@ -53,8 +87,8 @@ describe('CacheDecorator', () => {
           );
           const result = await wrapFn();
           expect(result).to.equal('test-result');
-          expect(mockCache.getKey.calledOnce).to.be.true;
-          expect(mockCache.setKey.calledOnce).to.be.true;
+          expect(mockCache.getKey).toHaveBeenCalledOnce();
+          expect(mockCache.setKey).toHaveBeenCalledOnce();
         });
 
         test('should return the cached result if it exists', async () => {
@@ -62,7 +96,7 @@ describe('CacheDecorator', () => {
           const key = 'test-key';
           const duration = 60;
 
-          mockCache.getKey.resolves(JSON.stringify('cached-result'));
+          mockCache.getKey.mockResolvedValue(JSON.stringify('cached-result'));
 
           const wrapFn = cacheDecorator.cacheWrap(
             false,
@@ -74,8 +108,8 @@ describe('CacheDecorator', () => {
           const result = await wrapFn();
 
           expect(result).to.equal('cached-result');
-          expect(mockCache.getKey.calledOnce).to.be.true;
-          expect(mockCache.setKey.called).to.be.false;
+          expect(mockCache.getKey).toHaveBeenCalledOnce();
+          expect(mockCache.setKey).not.toHaveBeenCalled();
         });
 
         test('should call the function if redis cache not initialized', async () => {
@@ -83,7 +117,7 @@ describe('CacheDecorator', () => {
           const key = 'test-key';
           const duration = 60;
 
-          mockCache.isReady.returns(false);
+          mockCache.isReady.mockReturnValue(false);
 
           const wrapFn = cacheDecorator.cacheWrap(
             false,
@@ -95,8 +129,8 @@ describe('CacheDecorator', () => {
           const result = await wrapFn();
 
           expect(result).to.equal('test-result');
-          expect(mockCache.getKey.called).to.be.false;
-          expect(mockCache.setKey.called).to.be.false;
+          expect(mockCache.getKey).not.toHaveBeenCalled();
+          expect(mockCache.setKey).not.toHaveBeenCalled();
         });
 
         test('if override is true skip lookup and still set cache', async () => {
@@ -104,7 +138,7 @@ describe('CacheDecorator', () => {
           const key = 'test-key';
           const duration = 60;
 
-          mockCache.setKey.resolves(true);
+          mockCache.setKey.mockResolvedValue(true);
 
           const wrapFn = cacheDecorator.cacheWrap(
             true,
@@ -116,8 +150,8 @@ describe('CacheDecorator', () => {
           const result = await wrapFn();
 
           expect(result).to.equal('test-result');
-          expect(mockCache.getKey.called).to.be.false;
-          expect(mockCache.setKey.called).to.be.true;
+          expect(mockCache.getKey).not.toHaveBeenCalled();
+          expect(mockCache.setKey).toHaveBeenCalled();
         });
 
         test('duration null skip caching', async () => {
@@ -135,8 +169,8 @@ describe('CacheDecorator', () => {
           const result = await wrapFn();
 
           expect(result).to.equal('test-result');
-          expect(mockCache.getKey.called).to.be.false;
-          expect(mockCache.setKey.called).to.be.false;
+          expect(mockCache.getKey).not.toHaveBeenCalled();
+          expect(mockCache.setKey).not.toHaveBeenCalled();
         });
 
         test('duration 0 dont skip caching', async () => {
@@ -154,8 +188,8 @@ describe('CacheDecorator', () => {
           const result = await wrapFn();
 
           expect(result).to.equal('test-result');
-          expect(mockCache.getKey.called).to.be.true;
-          expect(mockCache.setKey.called).to.be.true;
+          expect(mockCache.getKey).toHaveBeenCalled();
+          expect(mockCache.setKey).toHaveBeenCalled();
         });
 
         test('result null skip caching', async () => {
@@ -173,15 +207,15 @@ describe('CacheDecorator', () => {
           const result = await wrapFn();
 
           expect(result).to.equal(null);
-          expect(mockCache.getKey.called).to.be.true;
-          expect(mockCache.setKey.called).to.be.false;
+          expect(mockCache.getKey).toHaveBeenCalled();
+          expect(mockCache.setKey).not.toHaveBeenCalled();
         });
 
         test('response 0 from wrapped function allowed to get from cache', async () => {
           const fn = async () => 0;
           const key = 'test-key';
           const duration = 60;
-          mockCache.getKey.resolves('0');
+          mockCache.getKey.mockResolvedValue('0');
 
           const wrapFn = cacheDecorator.cacheWrap(
             false,
@@ -193,8 +227,8 @@ describe('CacheDecorator', () => {
           const result = await wrapFn();
 
           expect(result).to.equal(0);
-          expect(mockCache.getKey.called).to.be.true;
-          expect(mockCache.setKey.called).to.be.false;
+          expect(mockCache.getKey).toHaveBeenCalled();
+          expect(mockCache.setKey).not.toHaveBeenCalled();
         });
 
         test('response 0 from wrapped function allowed to set in cache', async () => {
@@ -212,8 +246,8 @@ describe('CacheDecorator', () => {
           const result = await wrapFn();
 
           expect(result).to.equal(0);
-          expect(mockCache.getKey.called).to.be.true;
-          expect(mockCache.setKey.called).to.be.true;
+          expect(mockCache.getKey).toHaveBeenCalled();
+          expect(mockCache.setKey).toHaveBeenCalled();
         });
       });
 
@@ -232,8 +266,8 @@ describe('CacheDecorator', () => {
           const result = await wrapFn();
 
           expect(result).to.equal('test-result');
-          expect(mockCache.getKey.called).to.be.false;
-          expect(mockCache.setKey.called).to.be.false;
+          expect(mockCache.getKey).not.toHaveBeenCalled();
+          expect(mockCache.setKey).not.toHaveBeenCalled();
         });
       });
     });
@@ -256,8 +290,8 @@ describe('CacheDecorator', () => {
         const result = await wrapFn();
 
         expect(result).to.equal('test-result');
-        expect(mockCache.getKey.called).to.be.false;
-        expect(mockCache.setKey.called).to.be.false;
+        expect(mockCache.getKey).not.toHaveBeenCalled();
+        expect(mockCache.setKey).not.toHaveBeenCalled();
       });
 
       test('key function if returns object with only cacheKey, skip caching', async () => {
@@ -277,8 +311,8 @@ describe('CacheDecorator', () => {
         const result = await wrapFn();
 
         expect(result).to.equal('test-result');
-        expect(mockCache.getKey.called).to.be.false;
-        expect(mockCache.setKey.called).to.be.false;
+        expect(mockCache.getKey).not.toHaveBeenCalled();
+        expect(mockCache.setKey).not.toHaveBeenCalled();
       });
 
       test('key function if returns object with cacheKey, cacheDuration do caching', async () => {
@@ -290,7 +324,7 @@ describe('CacheDecorator', () => {
             cacheDuration: 100,
           } as CacheKeyDuration;
         };
-        mockCache.getKey.resolves(JSON.stringify('cached-result'));
+        mockCache.getKey.mockResolvedValue(JSON.stringify('cached-result'));
 
         const wrapFn = cacheDecorator.cacheWrap(
           false,
@@ -302,14 +336,12 @@ describe('CacheDecorator', () => {
         const result = await wrapFn();
 
         expect(result).to.equal('cached-result');
-        expect(mockCache.getKey.called).to.be.true;
-        expect(
-          mockCache.getKey.calledWith(
-            CacheNamespaces.Function_Response,
-            'test-key',
-          ),
-        ).to.be.true;
-        expect(mockCache.setKey.called).to.be.false;
+        expect(mockCache.getKey).toHaveBeenCalled();
+        expect(mockCache.getKey).toHaveBeenCalledWith(
+          CacheNamespaces.Function_Response,
+          'test-key',
+        );
+        expect(mockCache.setKey).not.toHaveBeenCalled();
       });
 
       test('key function if returns object with cacheKey, cacheDuration do caching', async () => {
@@ -321,7 +353,7 @@ describe('CacheDecorator', () => {
             cacheDuration: 100,
           } as CacheKeyDuration;
         };
-        mockCache.getKey.resolves(undefined);
+        mockCache.getKey.mockResolvedValue(null);
 
         const wrapFn = cacheDecorator.cacheWrap(
           false,
@@ -333,33 +365,29 @@ describe('CacheDecorator', () => {
         const result = await wrapFn();
 
         expect(result).to.equal('new-result');
-        expect(mockCache.getKey.called).to.be.true;
-        expect(
-          mockCache.getKey.calledWith(
-            CacheNamespaces.Function_Response,
-            'test-key',
-          ),
-        ).to.be.true;
-        expect(mockCache.setKey.called).to.be.true;
-        expect(
-          mockCache.setKey.calledWith(
-            CacheNamespaces.Function_Response,
-            'test-key',
-            JSON.stringify('new-result'),
-            100,
-          ),
-        ).to.be.true;
+        expect(mockCache.getKey).toHaveBeenCalled();
+        expect(mockCache.getKey).toHaveBeenCalledWith(
+          CacheNamespaces.Function_Response,
+          'test-key',
+        );
+        expect(mockCache.setKey).toHaveBeenCalled();
+        expect(mockCache.setKey).toHaveBeenCalledWith(
+          CacheNamespaces.Function_Response,
+          'test-key',
+          JSON.stringify('new-result'),
+          100,
+        );
       });
     });
 
     describe('verify error handling', () => {
       test('should run function if getKey throws error', async () => {
-        const fn = sinon.stub().resolves('test-result');
+        const fn = vi.fn().mockResolvedValue('test-result');
         const duration = 60;
         const key = 'test-key';
 
-        mockCache.getKey.rejects('test-error');
-        mockCache.setKey.resolves(true);
+        mockCache.getKey.mockRejectedValue('test-error');
+        mockCache.setKey.mockResolvedValue(true);
 
         const wrapFn = cacheDecorator.cacheWrap(
           false,
@@ -371,18 +399,18 @@ describe('CacheDecorator', () => {
         const result = await wrapFn();
 
         expect(result).to.equal('test-result');
-        expect(mockCache.getKey.calledOnce).to.be.true;
-        expect(mockCache.setKey.calledOnce).to.be.true;
-        expect(fn.calledOnce).to.be.true;
+        expect(mockCache.getKey).toHaveBeenCalledOnce();
+        expect(mockCache.setKey).toHaveBeenCalledOnce();
+        expect(fn).toHaveBeenCalledOnce();
       });
 
       test('should run function if setKey throws error', async () => {
-        const fn = sinon.stub().resolves('test-result');
+        const fn = vi.fn().mockResolvedValue('test-result');
         const duration = 60;
         const key = 'test-key';
 
-        mockCache.getKey.resolves(undefined);
-        mockCache.setKey.rejects('test-error');
+        mockCache.getKey.mockResolvedValue(null);
+        mockCache.setKey.mockRejectedValue('test-error');
 
         const wrapFn = cacheDecorator.cacheWrap(
           false,
@@ -394,19 +422,19 @@ describe('CacheDecorator', () => {
         const result = await wrapFn();
 
         expect(result).to.equal('test-result');
-        expect(mockCache.getKey.calledOnce).to.be.true;
-        expect(mockCache.setKey.calledOnce).to.be.true;
-        expect(fn.calledOnce).to.be.true;
+        expect(mockCache.getKey).toHaveBeenCalledOnce();
+        expect(mockCache.setKey).toHaveBeenCalledOnce();
+        expect(fn).toHaveBeenCalledOnce();
       });
 
       test('if function throws error, dont run function again', async () => {
         const err = new Error('test-error');
-        const fn = sinon.stub().rejects(err); //() => {throw err};
+        const fn = vi.fn().mockRejectedValue(err); //() => {throw err};
         const duration = 60;
         const key = 'test-key';
 
-        mockCache.getKey.resolves(undefined);
-        mockCache.setKey.rejects();
+        mockCache.getKey.mockResolvedValue(null);
+        mockCache.setKey.mockRejectedValue('test-error');
 
         const wrapFn = cacheDecorator.cacheWrap(
           false,
@@ -418,9 +446,9 @@ describe('CacheDecorator', () => {
         await expect(wrapFn()).to.be.rejectedWith('test-error');
 
         // expect(result).to.equal('test-result');
-        expect(mockCache.getKey.calledOnce).to.be.true;
-        expect(mockCache.setKey.calledOnce).to.be.false;
-        expect(fn.calledOnce).to.be.true;
+        expect(mockCache.getKey).toHaveBeenCalledOnce();
+        expect(mockCache.setKey).not.toHaveBeenCalledOnce();
+        expect(fn).toHaveBeenCalledOnce();
       });
     });
   });

@@ -2,17 +2,20 @@ import jdenticon from 'jdenticon';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import 'components/Profile/ProfileHeader.scss';
+import './ProfileHeader.scss';
 
 import {
   DEFAULT_NAME,
   getDecodedString,
   renderQuillDeltaToText,
 } from '@hicommonwealth/shared';
+import { useFlag } from 'hooks/useFlag';
+import { useInviteLinkModal } from 'state/ui/modals';
 import useUserStore from 'state/ui/user';
 import { MarkdownViewerWithFallback } from 'views/components/MarkdownViewerWithFallback/MarkdownViewerWithFallback';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import type NewProfile from '../../../models/NewProfile';
+import { SharePopover } from '../SharePopover';
 import { CWText } from '../component_kit/cw_text';
 import { SocialAccounts } from '../social_accounts';
 
@@ -24,6 +27,8 @@ type ProfileHeaderProps = {
 const ProfileHeader = ({ profile, isOwner }: ProfileHeaderProps) => {
   const navigate = useNavigate();
   const user = useUserStore();
+  const { setIsInviteLinkModalOpen } = useInviteLinkModal();
+  const referralsEnabled = useFlag('referrals');
 
   if (!profile) return;
   const { bio, name } = profile;
@@ -63,10 +68,23 @@ const ProfileHeader = ({ profile, isOwner }: ProfileHeaderProps) => {
         )}
       </div>
       <div className="profile-name-and-bio">
-        <CWText type="h3" className={name ? 'name hasMargin' : 'name'}>
+        <CWText type="h3" className="name">
           {name || DEFAULT_NAME}
         </CWText>
-        <SocialAccounts profile={profile} />
+
+        {referralsEnabled && isCurrentUser && (
+          <CWButton
+            buttonType="tertiary"
+            buttonHeight="sm"
+            label="Get referral link"
+            className="referral-link-button"
+            onClick={() => setIsInviteLinkModalOpen(true)}
+          />
+        )}
+        <div className="icon-container">
+          <SocialAccounts profile={profile} />
+          <SharePopover linkToShare={window.location.href} />
+        </div>
         {hasBio() && (
           <div>
             <CWText type="h4">Bio</CWText>

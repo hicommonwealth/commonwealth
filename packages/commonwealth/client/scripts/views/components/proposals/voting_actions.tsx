@@ -1,4 +1,3 @@
-import 'components/proposals/voting_actions.scss';
 import { notifyError } from 'controllers/app/notifications';
 import type CosmosAccount from 'controllers/chain/cosmos/account';
 import type Cosmos from 'controllers/chain/cosmos/adapter';
@@ -12,6 +11,7 @@ import React, { useState } from 'react';
 import { MixpanelGovernanceEvents } from 'shared/analytics/types';
 import type { AnyProposal } from '../../../models/types';
 import { VotingType } from '../../../models/types';
+import './voting_actions.scss';
 
 import app from 'state';
 

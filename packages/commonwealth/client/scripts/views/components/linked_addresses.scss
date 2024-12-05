@@ -1,0 +1,12 @@
+@import '../../styles/shared.scss';
+
+.LinkedAddresses {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, 160px);
+  grid-gap: 30px;
+
+  .AddressContainer {
+    display: flex;
+    align-items: center;
+  }
+}

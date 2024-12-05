@@ -1,4 +1,4 @@
-@import '../../../../../styles/shared.scss';
+@import '../../../../styles/shared.scss';
 
 .StakeExchangeForm {
   display: flex;
@@ -24,6 +24,19 @@
     display: flex;
     justify-content: space-between;
     color: $neutral-500;
+
+    .balance-and-magic {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+
+      .wallet-btn {
+        padding-top: 4px;
+        text-decoration: none;
+        color: $primary-600;
+        cursor: pointer;
+      }
+    }
 
     .Text {
       color: $neutral-500;

@@ -1,0 +1,61 @@
+@import '../../../styles/shared.scss';
+
+.SidebarMenuItem {
+  align-items: center;
+  color: $neutral-800;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 16px;
+
+  .sidebar-menu-item-left {
+    align-items: center;
+    display: flex;
+    gap: 6px;
+  }
+
+  &.default {
+    &:hover {
+      background-color: $primary-50;
+    }
+  }
+
+  &.header {
+    margin: 16px 0 8px;
+  }
+}
+
+.SidebarMenu {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: calc(100vh - #{$global-header-height});
+  gap: 16px;
+
+  .sidebar-top {
+    display: flex;
+    flex-direction: column;
+    background-color: inherit;
+
+    .sidebar-menu-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background-color: inherit;
+      align-items: center;
+      border-bottom: 1px solid $neutral-200;
+      cursor: pointer;
+      display: flex;
+      padding: 12px 16px;
+
+      .Icon {
+        margin-right: 12px;
+      }
+    }
+  }
+
+  .sidebar-bottom {
+    border-top: 1px solid $neutral-200;
+    margin-bottom: 16px;
+  }
+}

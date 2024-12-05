@@ -1,8 +1,8 @@
 import React, { useMemo, useState } from 'react';
 
-import 'components/react_quill/quill_formatted_text.scss';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { getClasses } from '../component_kit/helpers';
+import './quill_formatted_text.scss';
 
 import { useCommonNavigate } from 'navigation/helpers';
 import { DeltaStatic } from 'quill';

@@ -3,7 +3,7 @@ import { CWText } from 'views/components/component_kit/cw_text';
 
 import { notifySuccess } from 'controllers/app/notifications';
 import { saveToClipboard } from 'utils/clipboard';
-import colors from '../../../../../styles/mixins/colors.module.scss';
+import colors from '../../../../styles/mixins/colors.module.scss';
 
 const colorKeys = [
   'neutral',

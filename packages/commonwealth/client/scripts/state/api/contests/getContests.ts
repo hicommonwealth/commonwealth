@@ -5,6 +5,7 @@ import { trpc } from 'utils/trpcClient';
 
 type UseGetContestsQueryProps = z.infer<typeof GetAllContests.input> & {
   shouldPolling?: boolean;
+  fetchAll?: boolean;
 };
 
 const CONTESTS_STALE_TIME = 10 * 1_000; // 10 s
@@ -14,6 +15,7 @@ const useGetContestsQuery = ({
   community_id,
   running,
   shouldPolling = false,
+  fetchAll = false,
 }: UseGetContestsQueryProps) => {
   return trpc.contest.getAllContests.useQuery(
     {
@@ -22,7 +24,7 @@ const useGetContestsQuery = ({
       running,
     },
     {
-      enabled: !!community_id,
+      enabled: fetchAll ? true : !!community_id,
       staleTime: CONTESTS_STALE_TIME,
       refetchInterval: (data) => {
         if (!shouldPolling) {

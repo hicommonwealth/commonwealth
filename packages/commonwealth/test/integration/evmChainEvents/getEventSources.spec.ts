@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { dispose } from '@hicommonwealth/core';
-import { ContractAbiInstance, models, tester } from '@hicommonwealth/model';
+import { ContractAbiInstance, models } from '@hicommonwealth/model';
 import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 import { getEventSources } from '../../../server/workers/evmChainEvents/getEventSources';
 import {
@@ -15,7 +15,6 @@ describe('getEventSources', () => {
   let stakesAbiInstance: ContractAbiInstance;
 
   beforeAll(async () => {
-    await tester.bootstrap_testing();
     const res = await createEventSources();
     namespaceAbiInstance = res.namespaceAbiInstance;
     stakesAbiInstance = res.stakesAbiInstance;

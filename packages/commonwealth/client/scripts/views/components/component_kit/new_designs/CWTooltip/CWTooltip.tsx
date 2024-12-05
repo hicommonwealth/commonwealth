@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 
-import 'components/component_kit/new_designs/CWTooltip.scss';
+import './CWTooltip.scss';
 
 import { Placement } from '@popperjs/core/lib';
 import CWPopover, {

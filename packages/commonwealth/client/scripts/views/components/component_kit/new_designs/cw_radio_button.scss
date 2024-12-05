@@ -1,0 +1,39 @@
+@import '../../../../styles/shared.scss';
+
+.container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  margin-right: auto;
+  width: fit-content;
+  cursor: pointer;
+
+  .radio-button {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    accent-color: $neutral-400;
+    z-index: 1;
+
+    &:hover {
+      accent-color: $primary-600;
+    }
+
+    &:checked {
+      accent-color: $primary-500;
+    }
+
+    &:checked:hover {
+      accent-color: $primary-600;
+    }
+  }
+
+  .label {
+    margin-left: 5px;
+  }
+
+  &.margin-right-10 {
+    margin-right: 10px;
+  }
+}
