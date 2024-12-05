@@ -1,4 +1,5 @@
-import { Projection, events } from '@hicommonwealth/core';
+import { Projection } from '@hicommonwealth/core';
+import { events } from '@hicommonwealth/schemas';
 import { models } from '../database';
 
 const inputs = {

@@ -1,14 +1,19 @@
 import z from 'zod';
+import { events } from '../events';
 import { PG_INT } from '../utils';
 
-// Should we move all event names to libs/schemas?
-export const QUEST_EVENTS = [
-  'CommentCreated',
-  'CommentUpvoted',
-  'ThreadCreated',
-  'ThreadUpvoted',
-  'UserMentioned',
-] as const;
+export const QuestEvents = {
+  CommunityJoined: events.CommunityJoined,
+  ThreadCreated: events.ThreadCreated,
+  ThreadUpvoted: events.ThreadUpvoted,
+  CommentCreated: events.CommentCreated,
+  CommentUpvoted: events.CommentUpvoted,
+  UserMentioned: events.UserMentioned,
+  //PollCreated: events.PollCreated,
+  //ThreadEdited: events.ThreadEdited,
+  //CommentEdited: events.CommentEdited,
+  //PollEdited: events.PollEdited,
+} as const;
 
 export enum QuestParticipationLimit {
   OncePerQuest = 'once_per_quest',
@@ -26,7 +31,12 @@ export const QuestActionMeta = z
     id: PG_INT.nullish(),
     quest_id: PG_INT,
     //event names instead of enums for flexibility when adding new events
-    event_name: z.enum(QUEST_EVENTS),
+    event_name: z.enum(
+      Object.keys(QuestEvents) as [
+        keyof typeof QuestEvents,
+        ...Array<keyof typeof QuestEvents>,
+      ],
+    ),
     reward_amount: z.number(),
     creator_reward_weight: z.number().min(0).max(1).default(0),
     participation_limit: z.nativeEnum(QuestParticipationLimit).optional(),

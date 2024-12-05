@@ -1,5 +1,6 @@
 import { trpc } from '@hicommonwealth/adapters';
-import { analytics, events, type Policy } from '@hicommonwealth/core';
+import { analytics, type Policy } from '@hicommonwealth/core';
+import { events } from '@hicommonwealth/schemas';
 import { MixpanelCommunityInteractionEvent } from '../../shared/analytics/types';
 
 const inputs = {
