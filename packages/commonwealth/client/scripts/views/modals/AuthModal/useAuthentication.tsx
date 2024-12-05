@@ -28,6 +28,7 @@ import {
   signSessionWithAccount,
 } from 'controllers/server/sessions';
 import _ from 'lodash';
+import { Magic } from 'magic-sdk';
 import { useEffect, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import app, { initAppState } from 'state';
@@ -54,9 +55,11 @@ type UseAuthenticationProps = {
     address?: string | null | undefined,
     isNewlyCreated?: boolean,
   ) => Promise<void>;
-  onModalClose: () => void;
+  onModalClose?: () => void;
   withSessionKeyLoginFlow?: boolean;
 };
+
+const magic = new Magic(process.env.MAGIC_PUBLISHABLE_KEY!);
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Wallet = IWebWallet<any>;
@@ -64,6 +67,7 @@ type Wallet = IWebWallet<any>;
 const useAuthentication = (props: UseAuthenticationProps) => {
   const [username, setUsername] = useState<string>(DEFAULT_NAME);
   const [email, setEmail] = useState<string>();
+  const [SMS, setSMS] = useState<string>();
   const [wallets, setWallets] = useState<Array<Wallet>>();
   const [selectedWallet, setSelectedWallet] = useState<Wallet>();
   const [primaryAccount, setPrimaryAccount] = useState<Account>();
@@ -148,6 +152,38 @@ const useAuthentication = (props: UseAuthenticationProps) => {
   };
 
   // Handles Magic Link Login
+  const onSMSLogin = async (phoneNumber = '') => {
+    const tempSMSToUse = phoneNumber || SMS;
+    setSMS(tempSMSToUse);
+
+    setIsMagicLoading(true);
+
+    if (!phoneNumber) {
+      notifyError('Please enter a valid phone number.');
+      setIsMagicLoading(false);
+      return;
+    }
+
+    try {
+      const isCosmos = app.chain?.base === ChainBase.CosmosSDK;
+      const { address: magicAddress } = await startLoginWithMagicLink({
+        phoneNumber: tempSMSToUse,
+        isCosmos,
+        chain: app.chain?.id,
+      });
+      setIsMagicLoading(false);
+
+      await handleSuccess(magicAddress, isNewlyCreated);
+      props?.onModalClose?.();
+
+      trackLoginEvent('SMS', true);
+    } catch (e) {
+      notifyError(`Error authenticating with SMS`);
+      console.error(`Error authenticating with SMS: ${e}`);
+      setIsMagicLoading(false);
+    }
+  };
+
   const onEmailLogin = async (emailToUse = '') => {
     const tempEmailToUse = emailToUse || email;
     setEmail(tempEmailToUse);
@@ -165,7 +201,6 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       const { address: magicAddress } = await startLoginWithMagicLink({
         email: tempEmailToUse,
         isCosmos,
-        redirectTo: document.location.pathname + document.location.search,
         chain: app.chain?.id,
       });
       setIsMagicLoading(false);
@@ -190,7 +225,6 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       const { address: magicAddress } = await startLoginWithMagicLink({
         provider,
         isCosmos,
-        redirectTo: document.location.pathname + document.location.search,
         chain: app.chain?.id,
       });
       setIsMagicLoading(false);
@@ -553,6 +587,14 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     props?.onModalClose?.();
   };
 
+  const openMagicWallet = async () => {
+    try {
+      await magic.wallet.showUI();
+    } catch (error) {
+      console.trace(error);
+    }
+  };
+
   return {
     wallets,
     isMagicLoading,
@@ -562,9 +604,12 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     onWalletSelect,
     onResetWalletConnect,
     onEmailLogin,
+    onSMSLogin,
     onSocialLogin,
     setEmail,
+    setSMS,
     onVerifyMobileWalletSignature,
+    openMagicWallet,
   };
 };
 

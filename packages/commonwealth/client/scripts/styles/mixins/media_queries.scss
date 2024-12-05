@@ -63,3 +63,9 @@
     @content;
   }
 }
+
+@mixin mediumToLarge {
+  @media only screen and (min-width: $breakpoint-small-max-px) and (max-width: $breakpoint-medium-large-max) {
+    @content;
+  }
+}

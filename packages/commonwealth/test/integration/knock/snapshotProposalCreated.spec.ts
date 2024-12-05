@@ -1,9 +1,6 @@
 import {
   EventNames,
-  ProviderError,
   SnapshotProposalCreated,
-  SpyNotificationsProvider,
-  ThrowingSpyNotificationsProvider,
   WorkflowKeys,
   dispose,
   disposeAdapter,
@@ -12,20 +9,27 @@ import {
 import { models, tester } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import { SnapshotEventType } from '@hicommonwealth/shared';
-import chai, { expect } from 'chai';
+import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import sinon from 'sinon';
 import {
+  Mock,
   afterAll,
   afterEach,
   beforeAll,
   beforeEach,
   describe,
+  expect,
   test,
+  vi,
 } from 'vitest';
 import z from 'zod';
 import { processSnapshotProposalCreated } from '../../../server/workers/knock/eventHandlers/snapshotProposalCreated';
 import { getSnapshotUrl } from '../../../server/workers/knock/util';
+import {
+  ProviderError,
+  SpyNotificationsProvider,
+  ThrowingSpyNotificationsProvider,
+} from '../../util/mockedNotificationProvider';
 
 chai.use(chaiAsPromised);
 
@@ -35,7 +39,6 @@ const proposalId = '0x1';
 describe('snapshotProposalCreated Event Handler', () => {
   let community: z.infer<typeof schemas.Community> | undefined;
   let user: z.infer<typeof schemas.User> | undefined;
-  let sandbox: sinon.SinonSandbox;
 
   beforeAll(async () => {
     [user] = await tester.seed('User', {});
@@ -60,10 +63,7 @@ describe('snapshotProposalCreated Event Handler', () => {
   afterEach(() => {
     const provider = notificationsProvider();
     disposeAdapter(provider.name);
-
-    if (sandbox) {
-      sandbox.restore();
-    }
+    vi.restoreAllMocks();
   });
 
   afterAll(async () => {
@@ -91,9 +91,8 @@ describe('snapshotProposalCreated Event Handler', () => {
   });
 
   test('should do nothing if there are no relevant community alert subscriptions', async () => {
-    sandbox = sinon.createSandbox();
     const provider = notificationsProvider({
-      adapter: SpyNotificationsProvider(sandbox),
+      adapter: SpyNotificationsProvider(),
     });
 
     const res = await processSnapshotProposalCreated({
@@ -105,13 +104,12 @@ describe('snapshotProposalCreated Event Handler', () => {
       } as z.infer<typeof SnapshotProposalCreated>,
     });
     expect(res).to.be.true;
-    expect((provider.triggerWorkflow as sinon.SinonStub).notCalled).to.be.true;
+    expect(provider.triggerWorkflow as Mock).not.toHaveBeenCalled();
   });
 
   test('should execute triggerWorkflow with the appropriate data', async () => {
-    sandbox = sinon.createSandbox();
     const provider = notificationsProvider({
-      adapter: SpyNotificationsProvider(sandbox),
+      adapter: SpyNotificationsProvider(),
     });
 
     await tester.seed('CommunityAlert', {
@@ -132,13 +130,9 @@ describe('snapshotProposalCreated Event Handler', () => {
       res,
       'The event handler should return true if it triggered a workflow',
     ).to.be.true;
-    expect(
-      (provider.triggerWorkflow as sinon.SinonStub).calledOnce,
-      'triggerWorkflow should be called once',
-    ).to.be.true;
-    expect(
-      (provider.triggerWorkflow as sinon.SinonStub).getCall(0).args[0],
-    ).to.deep.equal({
+    // triggerWorkflow should be called once
+    expect(provider.triggerWorkflow as Mock).toHaveBeenCalledOnce();
+    expect((provider.triggerWorkflow as Mock).mock.calls[0][0]).to.deep.equal({
       key: WorkflowKeys.SnapshotProposals,
       users: [{ id: String(user!.id) }],
       data: {
@@ -151,9 +145,8 @@ describe('snapshotProposalCreated Event Handler', () => {
   });
 
   test('should throw if triggerWorkflow fails', async () => {
-    sandbox = sinon.createSandbox();
     notificationsProvider({
-      adapter: ThrowingSpyNotificationsProvider(sandbox),
+      adapter: ThrowingSpyNotificationsProvider(),
     });
 
     await tester.seed('CommunityAlert', {

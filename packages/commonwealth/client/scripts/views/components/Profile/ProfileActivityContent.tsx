@@ -7,12 +7,14 @@ import { CWText } from '../component_kit/cw_text';
 import type { CommentWithAssociatedThread } from './ProfileActivity';
 import ProfileActivityRow from './ProfileActivityRow';
 import { ProfileThread } from './ProfileThread';
+import ReferralsTab from './ReferralsTab';
 
-enum ProfileActivityType {
+export enum ProfileActivityType {
   Addresses,
   Comments,
   Communities,
   Threads,
+  Referrals,
 }
 
 type ProfileActivityContentProps = {
@@ -20,6 +22,7 @@ type ProfileActivityContentProps = {
   threads: Thread[];
   comments: CommentWithAssociatedThread[];
   mapProfileThread: (thread: Thread) => Thread;
+  isOwner: boolean | undefined;
 };
 
 const ProfileActivityContent = ({
@@ -27,6 +30,7 @@ const ProfileActivityContent = ({
   comments,
   threads,
   mapProfileThread,
+  isOwner,
 }: ProfileActivityContentProps) => {
   if (option === ProfileActivityType.Threads) {
     if (threads.length === 0) {
@@ -53,6 +57,10 @@ const ProfileActivityContent = ({
           ))}
       </>
     );
+  }
+
+  if (option === ProfileActivityType.Referrals) {
+    return <ReferralsTab isOwner={isOwner} />;
   }
 
   const allActivities: Array<CommentWithAssociatedThread | Thread> = [

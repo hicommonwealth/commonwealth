@@ -139,7 +139,11 @@ const Profile = ({ userId }: ProfileProps) => {
           >
             {/* @ts-expect-error StrictNullChecks*/}
             <ProfileHeader profile={profile} isOwner={isOwner} />
-            <ProfileActivity threads={threads} comments={comments} />
+            <ProfileActivity
+              threads={threads}
+              comments={comments}
+              isOwner={isOwner}
+            />
           </div>
         </CWPageLayout>
       </div>
@@ -151,7 +155,11 @@ const Profile = ({ userId }: ProfileProps) => {
           <div className="ProfilePageContainer">
             {/* @ts-expect-error StrictNullChecks*/}
             <ProfileHeader profile={profile} isOwner={isOwner} />
-            <ProfileActivity threads={threads} comments={comments} />
+            <ProfileActivity
+              threads={threads}
+              comments={comments}
+              isOwner={isOwner}
+            />
           </div>
         </div>
       </CWPageLayout>

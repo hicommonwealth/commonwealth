@@ -238,7 +238,7 @@ export class Thread implements IUniqueId {
       avatar_url?: string | null;
       address_last_active?: string;
       associatedReactions?: ReactionView[];
-      associatedContests?: ContestView[];
+      associatedContests?: ContestView[] | null;
       recentComments?: CommentView[];
       ContestActions?: ContestActionView[];
     },

@@ -304,7 +304,7 @@ export const NewThreadForm = () => {
                   {...(!!location.search &&
                     threadTopic?.name &&
                     threadTopic?.id && {
-                      defaultValue: {
+                      value: {
                         label: threadTopic?.name,
                         value: `${threadTopic?.id}`,
                       },
