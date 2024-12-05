@@ -15,6 +15,7 @@ import {
   CreateReferralLink,
   GetReferralLink,
   GetUserProfile,
+  UpdateUser,
   Xp,
 } from '../../src/user';
 import { drainOutbox } from '../utils';
@@ -323,11 +324,17 @@ describe('User lifecycle', () => {
         is_welcome_onboard_flow_complete: false,
         emailVerified: true,
       });
-      const new_address = '0x9000000000000000000000000000000000000000';
+      const new_actor = {
+        address: '0x9000000000000000000000000000000000000000',
+        user: {
+          id: new_user.id,
+          email: new_user.profile.email!,
+        },
+      };
       await models.Address.create({
         community_id: base_id,
         user_id: new_user.id,
-        address: new_address,
+        address: new_actor.address,
         role: 'member',
         is_banned: false,
         verified: new Date(),
@@ -335,15 +342,21 @@ describe('User lifecycle', () => {
         is_user_default: false,
         verification_token: '1234',
       });
-      // the new user joins the community with a referral link
-      await command(JoinCommunity(), {
-        actor: {
-          address: new_address,
-          user: {
-            id: new_user.id,
-            email: new_user.profile.email!,
+      // user signs up for the community with a referral link
+      await command(UpdateUser(), {
+        actor: new_actor,
+        payload: {
+          id: new_user.id!,
+          referral_link: referral_response?.referral_link,
+          profile: {
+            name: 'New User Updated',
           },
         },
+      });
+
+      // the new user joins the community with a referral link
+      await command(JoinCommunity(), {
+        actor: new_actor,
         payload: {
           community_id,
           referral_link: referral_response?.referral_link,
@@ -357,6 +370,7 @@ describe('User lifecycle', () => {
           'ThreadCreated',
           'CommentCreated',
           'CommentUpvoted',
+          'SignUpFlowCompleted',
         ],
         Xp,
       );
@@ -377,8 +391,12 @@ describe('User lifecycle', () => {
         actor: member,
         payload: {},
       });
-      // accumulating xp points from the second test (28 + 28 + 10)
-      expect(member_profile?.xp_points).to.equal(28 + 28 + 10);
+      // accumulating xp points
+      // - 28 from the first test
+      // - 28 from the second test
+      // - 10 from the referral when new user joined the community
+      // - 4 from the referral on a sign up flow completed
+      expect(member_profile?.xp_points).to.equal(28 + 28 + 10 + 4);
 
       // expect xp points awarded to user joining the community
       const new_user_profile = await query(GetUserProfile(), {
@@ -391,16 +409,18 @@ describe('User lifecycle', () => {
         payload: {},
       });
       // joining community awards 10 xp points (50% of 20)
-      expect(new_user_profile?.xp_points).to.equal(10);
+      // sign up flow completed awards 16 xp points (80% of 20)
+      expect(new_user_profile?.xp_points).to.equal(10 + 16);
 
       // validate xp audit log
       const logs = await models.XpLog.findAll({});
       // 4 events of first test
       // 3 events of second test (second comment created action is not counted)
       // 1 event of joining community
-      expect(logs.length).to.equal(4 + 3 + 1);
+      // 1 event of sign up flow completed
+      expect(logs.length).to.equal(4 + 3 + 1 + 1);
 
-      const last = logs.slice(-4); // last 4 logs
+      const last = logs.slice(-5); // last 5 event logs
       expect(last.map((l) => l.toJSON())).to.deep.equal([
         {
           event_name: 'ThreadCreated',
@@ -433,14 +453,24 @@ describe('User lifecycle', () => {
           created_at: last[2].created_at,
         },
         {
-          event_name: 'CommunityJoined',
+          event_name: 'SignUpFlowCompleted',
           event_created_at: last[3].event_created_at,
+          user_id: new_user.id,
+          xp_points: 16,
+          action_meta_id: null, // this is a site event and not a quest action
+          creator_user_id: member.user.id,
+          creator_xp_points: 4,
+          created_at: last[3].created_at,
+        },
+        {
+          event_name: 'CommunityJoined',
+          event_created_at: last[4].event_created_at,
           user_id: new_user.id,
           xp_points: 10,
           action_meta_id: updated!.action_metas![3].id,
           creator_user_id: member.user.id,
           creator_xp_points: 10,
-          created_at: last[3].created_at,
+          created_at: last[4].created_at,
         },
       ]);
     });
