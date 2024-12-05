@@ -3,16 +3,14 @@ import { events } from '../events';
 import { PG_INT } from '../utils';
 
 export const QuestEvents = {
+  SignUpFlowCompleted: events.SignUpFlowCompleted,
+  CommunityCreated: events.CommunityCreated,
   CommunityJoined: events.CommunityJoined,
   ThreadCreated: events.ThreadCreated,
   ThreadUpvoted: events.ThreadUpvoted,
   CommentCreated: events.CommentCreated,
   CommentUpvoted: events.CommentUpvoted,
   UserMentioned: events.UserMentioned,
-  //PollCreated: events.PollCreated,
-  //ThreadEdited: events.ThreadEdited,
-  //CommentEdited: events.CommentEdited,
-  //PollEdited: events.PollEdited,
 } as const;
 
 export enum QuestParticipationLimit {

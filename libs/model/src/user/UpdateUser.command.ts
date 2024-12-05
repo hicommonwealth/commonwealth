@@ -80,19 +80,6 @@ export function UpdateUser(): Command<typeof schemas.UpdateUser> {
               await updateTags(tag_ids!, user.id!, 'user_id', transaction);
 
             if (update_user) {
-              // emit sign-up flow completed event when:
-              if (user_delta.is_welcome_onboard_flow_complete && referral_link)
-                await emitEvent(
-                  models.Outbox,
-                  [
-                    {
-                      event_name: schemas.EventNames.SignUpFlowCompleted,
-                      event_payload: { user_id: id, referral_link },
-                    },
-                  ],
-                  transaction,
-                );
-
               // TODO: utility to deep merge deltas
               const updates = {
                 ...user_delta,
@@ -113,7 +100,26 @@ export function UpdateUser(): Command<typeof schemas.UpdateUser> {
                 returning: true,
                 transaction,
               });
-              return rows.at(0);
+              const updated_user = rows.at(0);
+
+              // emit sign-up flow completed event when:
+              if (updated_user && user_delta.is_welcome_onboard_flow_complete)
+                await emitEvent(
+                  models.Outbox,
+                  [
+                    {
+                      event_name: schemas.EventNames.SignUpFlowCompleted,
+                      event_payload: {
+                        user_id: id,
+                        referral_link,
+                        created_at: updated_user.created_at!,
+                      },
+                    },
+                  ],
+                  transaction,
+                );
+
+              return updated_user;
             } else return user;
           },
         );
