@@ -1,9 +1,9 @@
 import {
   BrokerPublications,
   BrokerSubscriptions,
-  EventNames,
   RoutingKeyTags,
 } from '@hicommonwealth/core';
+import { EventNames } from '@hicommonwealth/schemas';
 
 export enum RascalPublications {
   MessageRelayer = BrokerPublications.MessageRelayer,

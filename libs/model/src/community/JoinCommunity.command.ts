@@ -4,6 +4,7 @@ import { ChainBase, addressSwapper } from '@hicommonwealth/shared';
 import { models } from '../database';
 import { mustExist } from '../middleware/guards';
 import { findCompatibleAddress } from '../utils/findBaseAddress';
+import { emitEvent } from '../utils/utils';
 
 export const JoinCommunityErrors = {
   NotVerifiedAddressOrUser: 'Not verified address or user',
@@ -106,6 +107,18 @@ export function JoinCommunity(): Command<typeof schemas.JoinCommunity> {
             where: { id: community_id },
             transaction,
           });
+
+          await emitEvent(models.Outbox, [
+            {
+              event_name: schemas.EventNames.CommunityJoined,
+              event_payload: {
+                community_id,
+                user_id: actor.user.id!,
+                referral_link: payload.referral_link,
+                created_at: created.created_at!,
+              },
+            },
+          ]);
 
           return created.id!;
         },

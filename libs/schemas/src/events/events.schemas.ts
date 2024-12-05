@@ -1,13 +1,10 @@
-import {
-  Comment,
-  FarcasterAction,
-  FarcasterCast,
-  PG_INT,
-  Reaction,
-  SubscriptionPreference,
-  Thread,
-} from '@hicommonwealth/schemas';
 import { z } from 'zod';
+import { FarcasterAction, FarcasterCast } from '../commands/contest.schemas';
+import { Comment } from '../entities/comment.schemas';
+import { SubscriptionPreference } from '../entities/notification.schemas';
+import { Reaction } from '../entities/reaction.schemas';
+import { Thread } from '../entities/thread.schemas';
+import { PG_INT } from '../utils';
 import {
   CommunityStakeTrade,
   LaunchpadTokenCreated,
@@ -22,6 +19,7 @@ export const ThreadCreated = Thread.omit({
   address: z.string().nullish(),
   contestManagers: z.array(z.object({ contest_address: z.string() })).nullish(),
 });
+
 export const ThreadUpvoted = Reaction.omit({
   comment_id: true,
 }).extend({
@@ -31,6 +29,7 @@ export const ThreadUpvoted = Reaction.omit({
   topic_id: z.number().optional(),
   contestManagers: z.array(z.object({ contest_address: z.string() })).nullish(),
 });
+
 export const CommentCreated = Comment.omit({ search: true }).extend({
   community_id: z.string(),
   users_mentioned: z
@@ -38,13 +37,16 @@ export const CommentCreated = Comment.omit({ search: true }).extend({
     .optional()
     .describe('An array of user ids that are mentioned in the comment'),
 });
+
 export const CommentUpvoted = Reaction.omit({ thread_id: true }).extend({
   comment_id: PG_INT,
 });
+
 export const GroupCreated = z.object({
   groupId: z.string(),
   userId: z.string(),
 });
+
 export const UserMentioned = z.object({
   authorAddressId: z.number(),
   authorUserId: z.number(),
@@ -54,11 +56,21 @@ export const UserMentioned = z.object({
   thread: Thread.optional(),
   comment: Comment.optional(),
 });
+
 export const CommunityCreated = z.object({
   communityId: z.string(),
   userId: z.string(),
   referralLink: z.string().optional(),
+  created_at: z.coerce.date(),
 });
+
+export const CommunityJoined = z.object({
+  community_id: z.string(),
+  user_id: z.number(),
+  referral_link: z.string().nullish(),
+  created_at: z.coerce.date(),
+});
+
 export const SnapshotProposalCreated = z.object({
   id: z.string().optional(),
   title: z.string().optional(),
@@ -71,6 +83,7 @@ export const SnapshotProposalCreated = z.object({
   token: z.string().optional(),
   secret: z.string().optional(),
 });
+
 export const DiscordMessageCreated = z.object({
   user: z
     .object({

@@ -1,5 +1,5 @@
 import { Log } from '@ethersproject/providers';
-import { ChainEventCreated, dispose, EventNames } from '@hicommonwealth/core';
+import { dispose } from '@hicommonwealth/core';
 import { commonProtocol } from '@hicommonwealth/evm-protocols';
 import {
   CommunityStake,
@@ -15,6 +15,7 @@ import {
   hashAbi,
   models,
 } from '@hicommonwealth/model';
+import { events as coreEvents, EventNames } from '@hicommonwealth/schemas';
 import { AbiType, BalanceType, delay } from '@hicommonwealth/shared';
 import { Anvil } from '@viem/anvil';
 import { afterAll, beforeAll, describe, expect, test } from 'vitest';
@@ -401,7 +402,7 @@ describe('EVM Chain Events Devnet Tests', () => {
 
         const events = (await models.Outbox.findAll()) as unknown as Array<{
           event_name: EventNames.ChainEventCreated;
-          event_payload: z.infer<typeof ChainEventCreated>;
+          event_payload: z.infer<typeof coreEvents.ChainEventCreated>;
         }>;
         expect(events.length).to.equal(3);
         for (const { event_name } of events) {
