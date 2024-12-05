@@ -37,6 +37,9 @@ export enum EventNames {
   FarcasterVoteCreated = 'FarcasterVoteCreated',
   ContestRolloverTimerTicked = 'ContestRolloverTimerTicked',
 
+  // Launchpad
+  TradeEvent = 'TradeEvent',
+
   // Preferences
   SubscriptionPreferencesUpdated = 'SubscriptionPreferencesUpdated',
 
@@ -148,4 +151,8 @@ export type EventPairs =
   | {
       event_name: EventNames.SignUpFlowCompleted;
       event_payload: z.infer<typeof events.SignUpFlowCompleted>;
+    }
+  | {
+      event_name: EventNames.TradeEvent;
+      event_payload: z.infer<typeof events.TradeEvent>;
     };

@@ -37,6 +37,7 @@ const outboxEvents = {
   [E.ThreadCreated]: P.ThreadCreated,
   [E.ThreadUpvoted]: P.ThreadUpvoted,
   [E.UserMentioned]: P.UserMentioned,
+  [E.TradeEvent]: P.TradeEvent,
 } as const;
 
 export const Outbox = z.union(

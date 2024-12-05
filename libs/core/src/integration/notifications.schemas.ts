@@ -1,4 +1,3 @@
-import { ETHERS_BIG_NUMBER } from '@hicommonwealth/schemas';
 import { z } from 'zod';
 import * as events from './events.schemas';
 
@@ -161,7 +160,10 @@ export const WebhookNotification = z.object({
 
 export const TradeEventNotification = z.object({
   community_id: z.string().describe('The community associated with the token'),
-  symbol: z.string().describe('The token address'),
+  symbol: z.string().describe('The token symbol'),
   is_buy: z.boolean().describe('If the trade was a buy or sell'),
-  floating_supply: ETHERS_BIG_NUMBER.describe('The remaining supply'),
+});
+
+export const CapReachedNotification = z.object({
+  symbol: z.string().describe('The token symbol'),
 });

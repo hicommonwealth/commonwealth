@@ -8,6 +8,7 @@ import {
 } from '../framework';
 import { EventNames, Events } from '../integration/events';
 import {
+  CapReachedNotification,
   ChainProposalsNotification,
   CommentCreatedNotification,
   CommunityStakeNotification,
@@ -295,6 +296,7 @@ export enum WorkflowKeys {
   EmailDigest = 'email-digest',
   Webhooks = 'webhooks',
   TradeEvent = 'trade-event',
+  CapReached = 'cap-reached',
 }
 
 export enum KnockChannelIds {
@@ -351,6 +353,10 @@ export type NotificationsProviderTriggerOptions =
         | {
             data: z.infer<typeof TradeEventNotification>;
             key: WorkflowKeys.TradeEvent;
+          }
+        | {
+            data: z.infer<typeof CapReachedNotification>;
+            key: WorkflowKeys.CapReached;
           }
       ))
   | WebhookProviderOptions;

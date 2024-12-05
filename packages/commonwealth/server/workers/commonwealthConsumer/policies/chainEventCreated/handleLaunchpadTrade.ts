@@ -1,6 +1,11 @@
-import { events, LaunchpadTrade, logger } from '@hicommonwealth/core';
+import {
+  EventNames,
+  events,
+  LaunchpadTrade,
+  logger,
+} from '@hicommonwealth/core';
 import { commonProtocol as cp } from '@hicommonwealth/evm-protocols';
-import { commonProtocol, models } from '@hicommonwealth/model';
+import { commonProtocol, emitEvent, models } from '@hicommonwealth/model';
 import { BigNumber } from 'ethers';
 import Web3 from 'web3';
 import { z } from 'zod';
@@ -44,7 +49,7 @@ export async function handleLaunchpadTrade(
   const web3 = new Web3(chainNode.private_url! || chainNode.url!);
   const block = await web3.eth.getBlock(event.rawLog.blockHash);
 
-  await models.LaunchpadTrade.findOrCreate({
+  const [trade] = await models.LaunchpadTrade.findOrCreate({
     where: {
       eth_chain_id: chainNode.eth_chain_id!,
       transaction_hash: event.rawLog.transactionHash,
@@ -99,5 +104,14 @@ export async function handleLaunchpadTrade(
 
     token.liquidity_transferred = true;
     await token.save();
+
+    await emitEvent(models.Outbox, [
+      {
+        event_name: EventNames.TradeEvent,
+        event_payload: {
+          ...trade,
+        },
+      },
+    ]);
   }
 }

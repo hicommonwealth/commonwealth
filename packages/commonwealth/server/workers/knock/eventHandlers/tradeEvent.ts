@@ -43,5 +43,13 @@ export const processTradeEvent: EventHandler<
     },
   });
 
-  // if (payload.floating_supply)
+  if (payload.floating_supply < BigInt(10000)) {
+    await provider.triggerWorkflow({
+      key: WorkflowKeys.CapReached,
+      users: results.map((u) => ({ id: String(u.user_id) })),
+      data: {
+        symbol: results[0].symbol,
+      },
+    });
+  }
 };

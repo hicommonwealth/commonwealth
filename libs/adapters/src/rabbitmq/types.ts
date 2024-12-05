@@ -54,6 +54,7 @@ export enum RascalRoutingKeys {
   NotificationsProviderChainEventCreated = EventNames.ChainEventCreated,
   NotificationsProviderSnapshotProposalCreated = EventNames.SnapshotProposalCreated,
   NotificationsProviderUserMentioned = EventNames.UserMentioned,
+  NotificationsProviderTradeEvent = EventNames.TradeEvent,
 
   NotificationsSettingsPreferencesUpdated = EventNames.SubscriptionPreferencesUpdated,
 
