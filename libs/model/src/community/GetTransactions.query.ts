@@ -3,11 +3,9 @@ import * as schemas from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
 import { models } from '../database';
 
-export function GetStakeTransaction(): Query<
-  typeof schemas.GetStakeTransaction
-> {
+export function GetTransactions(): Query<typeof schemas.GetTransactions> {
   return {
-    ...schemas.GetStakeTransaction,
+    ...schemas.GetTransactions,
     auth: [],
     secure: false,
     body: async ({ payload }) => {

@@ -12,7 +12,7 @@ const useTransactionHistory = ({
   filterOptions,
   addressFilter,
 }: TransactionHistoryProps) => {
-  const { data } = trpc.community.getStakeTransaction.useQuery({
+  const { data } = trpc.community.getTransactions.useQuery({
     addresses: addressFilter.length >= 1 ? addressFilter.join(',') : undefined,
   });
 

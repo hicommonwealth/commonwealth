@@ -131,7 +131,7 @@ export const GetCommunityMembers = {
   }),
 };
 
-export const GetStakeTransaction = {
+export const GetTransactions = {
   input: z.object({
     addresses: z.string().optional(),
   }),
