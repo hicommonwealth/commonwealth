@@ -11,6 +11,7 @@ import {
 } from 'state/api/configuration';
 import useErrorStore from 'state/ui/error';
 import useUserStore from 'state/ui/user';
+import { MobileScrollBuffer } from 'views/components/MobileNavigation/MobileScrollBuffer';
 import { PageNotFound } from 'views/pages/404';
 import ErrorPage from 'views/pages/error';
 import { z } from 'zod';
@@ -197,6 +198,8 @@ const LayoutComponent = ({
         ) : (
           <SubLayout isInsideCommunity={type === 'community'}>
             {childToRender()}
+
+            <MobileScrollBuffer />
           </SubLayout>
         )}
       </div>
