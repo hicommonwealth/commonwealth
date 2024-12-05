@@ -7,7 +7,7 @@ import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
 import useTopicGating from 'hooks/useTopicGating';
 import type { Topic } from 'models/Topic';
 import { useCommonNavigate } from 'navigation/helpers';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import app from 'state';
 import { useGetUserEthBalanceQuery } from 'state/api/communityStake';
@@ -54,10 +54,7 @@ export const NewThreadForm = () => {
 
   useAppStatus();
 
-  const [communityId, setCommunityId] = useState<string>(
-    app.activeChainId() ?? '',
-  );
-
+  const communityId = app.activeChainId() || '';
   const { data: topics = [], refetch: refreshTopics } = useFetchTopicsQuery({
     communityId,
     includeContestData: true,
@@ -95,22 +92,6 @@ export const NewThreadForm = () => {
     threadTopic?.active_contest_managers?.length ?? 0 > 0;
 
   const user = useUserStore();
-
-  console.log(
-    'FIXME: activeComunity: ',
-    JSON.stringify(user.activeCommunity, null, 2),
-  );
-
-  console.log(
-    'FIXME: user.communities: ',
-    JSON.stringify(user.communities, null, 2),
-  );
-
-  // console.log(
-  //   'FIXME: user.communities: ',
-  //   JSON.stringify(app.communities, null, 2),
-  // );
-
   const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
 
   const contestTopicError = threadTopic?.active_contest_managers?.length
@@ -268,23 +249,6 @@ export const NewThreadForm = () => {
     refreshTopics().catch(console.error);
   }, [refreshTopics]);
 
-  const doTest = useCallback(() => {
-    // set the chain ID
-    console.log('FIXME here at lest.');
-
-    // trpc.community('getCommunity', { id: 101 }).catch()
-  }, [user]);
-
-  console.log('FIXME1.1: ' + isRestrictedMembership);
-  console.log('FIXME1.2: ' + !!disabledActionsTooltipText);
-  console.log('FIXME1.3: ' + !user.activeAccount);
-
-  console.log('FIXME: Acitve account: ', user.activeAccount);
-
-  // isRestrictedMembership ||
-  // !!disabledActionsTooltipText ||
-  // !user.activeAccount
-
   return (
     <>
       <CWPageLayout>
@@ -302,21 +266,6 @@ export const NewThreadForm = () => {
                 tabIndex={1}
                 onInput={(e) => setThreadTitle(e.target.value)}
               />
-
-              <CWSelectList
-                isOptionSelected={(current) => current.value === communityId}
-                placeholder="Select a community"
-                isClearable={true}
-                onChange={(current) => setCommunityId(current?.value || '')}
-                options={user.communities.map((current) => {
-                  return {
-                    value: current.id,
-                    label: current.name.trim(),
-                  };
-                })}
-              />
-
-              <button onClick={doTest}>test</button>
 
               {!!hasTopics && (
                 <CWSelectList

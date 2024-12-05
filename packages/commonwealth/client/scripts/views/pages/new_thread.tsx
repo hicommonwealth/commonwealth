@@ -1,13 +1,13 @@
 import { notifyInfo } from 'controllers/app/notifications';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect } from 'react';
+import app from 'state';
 import useUserStore from 'state/ui/user';
+import { PageLoading } from 'views/pages/loading';
 import { NewThreadForm } from '../components/NewThreadForm';
 
 const NewThreadPage = () => {
   const navigate = useCommonNavigate();
-
-  console.log('FIXME: here at least in NewThreadPage');
 
   const user = useUserStore();
 
@@ -19,11 +19,7 @@ const NewThreadPage = () => {
     }
   }, [navigate, user.isLoggedIn]);
 
-  console.log('FIXME2: here at least in NewThreadPage');
-
-  // if (!app.chain) return <PageLoading />;
-
-  console.log('FIXME3: here at least in NewThreadPage');
+  if (!app.chain) return <PageLoading />;
 
   return <NewThreadForm />;
 };
