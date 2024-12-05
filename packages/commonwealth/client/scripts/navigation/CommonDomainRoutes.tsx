@@ -91,6 +91,8 @@ const ManageContest = lazy(
 const Contests = lazy(() => import('views/pages/Contests'));
 const ContestPage = lazy(() => import('views/pages/ContestPage'));
 
+const MyTransactions = lazy(() => import('views/pages/MyTransactions'));
+
 const SnapshotProposalPage = lazy(
   () => import('views/pages/Snapshots/SnapshotProposals'),
 );
@@ -179,6 +181,11 @@ const CommonDomainRoutes = ({
     key="/search"
     path="/search"
     element={withLayout(SearchPage, { type: 'common' })}
+  />,
+  <Route
+    key="/myTransactions"
+    path="/myTransactions"
+    element={withLayout(MyTransactions, { type: 'common' })}
   />,
   // scoped
   <Route

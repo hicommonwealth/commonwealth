@@ -62,15 +62,6 @@ const ProfileActivity = ({
             }}
             isSelected={selectedActivity === ProfileActivityType.MyStake}
           />
-          <CWTab
-            label="Transaction History"
-            onClick={() => {
-              setSelectedActivity(ProfileActivityType.TransactionHistory);
-            }}
-            isSelected={
-              selectedActivity === ProfileActivityType.TransactionHistory
-            }
-          />
           {referralsEnabled && (
             <CWTab
               isSelected={selectedActivity === ProfileActivityType.Referrals}

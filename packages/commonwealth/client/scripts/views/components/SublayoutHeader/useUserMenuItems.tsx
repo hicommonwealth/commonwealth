@@ -296,6 +296,11 @@ const useUserMenuItems = ({
         : []),
       {
         type: 'default',
+        label: 'My transactions',
+        onClick: () => navigate(`/myTransactions`, {}, null),
+      },
+      {
+        type: 'default',
         label: 'Notification settings',
         onClick: () => navigate('/notification-settings', {}, null),
       },

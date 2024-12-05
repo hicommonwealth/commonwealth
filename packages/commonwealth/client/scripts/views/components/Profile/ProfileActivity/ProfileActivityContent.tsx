@@ -16,7 +16,6 @@ export enum ProfileActivityType {
   Threads,
   Referrals,
   MyStake,
-  TransactionHistory,
 }
 
 type ProfileActivityContentProps = {
@@ -62,10 +61,6 @@ const ProfileActivityContent = ({
 
   if (option === ProfileActivityType.MyStake) {
     return <TransactionsTab transactionsType="stake" />;
-  }
-
-  if (option === ProfileActivityType.TransactionHistory) {
-    return <TransactionsTab transactionsType="history" />;
   }
 
   const allActivities: Array<CommentWithAssociatedThread | Thread> = [
