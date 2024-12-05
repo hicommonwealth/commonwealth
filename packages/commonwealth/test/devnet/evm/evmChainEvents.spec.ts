@@ -20,7 +20,6 @@ import {
 } from '@hicommonwealth/model';
 import { AbiType, delay } from '@hicommonwealth/shared';
 import { Anvil } from '@viem/anvil';
-import { bootstrap_testing } from 'node_modules/@hicommonwealth/model/src/tester';
 import {
   afterAll,
   afterEach,
@@ -344,10 +343,6 @@ describe('EVM Chain Events Devnet Tests', () => {
     let chainNode: ChainNodeInstance;
 
     beforeAll(async () => {
-      // bootstrapping here to reset the db
-      // and avoid conflicts with other tests using same chain
-      await bootstrap_testing();
-
       const chainNodes = await createEventRegistryChainNodes();
       const sepoliaBaseChainNode = chainNodes.find(
         (c) => c.eth_chain_id === commonProtocol.ValidChains.SepoliaBase,

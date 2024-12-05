@@ -8,17 +8,19 @@ import { isContestActive } from './utils';
 type UseCommunityContestsProps =
   | {
       shouldPolling?: boolean;
+      fetchAll?: boolean;
     }
   | undefined;
 
 const useCommunityContests = (props?: UseCommunityContestsProps) => {
-  const { shouldPolling = false } = props || {};
+  const { shouldPolling = false, fetchAll = false } = props || {};
   const { stakeEnabled } = useCommunityStake();
 
   const { data: contestsData, isLoading: isContestDataLoading } =
     useGetContestsQuery({
       community_id: app.activeChainId() || '',
       shouldPolling,
+      fetchAll,
     });
 
   const { finishedContests, activeContests } = useMemo(() => {

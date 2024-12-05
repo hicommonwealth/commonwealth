@@ -1,5 +1,4 @@
 import { ChainNetwork } from '@hicommonwealth/shared';
-import 'components/proposals/json_display.scss';
 import { CoinObject } from 'controllers/chain/cosmos/types';
 import React from 'react';
 import app from 'state';
@@ -10,6 +9,7 @@ import { CWButton } from '../../components/component_kit/new_designs/CWButton';
 import { CWTooltip } from '../../components/component_kit/new_designs/CWTooltip';
 import { openConfirmation } from '../../modals/confirmation_modal';
 import JSONViewer from './JSONViewer';
+import './json_display.scss';
 
 interface DataType {
   title?: string;

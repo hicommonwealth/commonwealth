@@ -2,7 +2,10 @@ import z from 'zod';
 import { PG_INT } from '../utils';
 import { UserProfile } from './user.schemas';
 
-export const REFERRAL_EVENTS = ['CommunityCreated'] as const;
+export const REFERRAL_EVENTS = [
+  'CommunityCreated',
+  'SignUpFlowCompleted',
+] as const;
 
 export const Referral = z
   .object({

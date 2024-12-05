@@ -3,7 +3,6 @@ import {
   EventRegistry,
   commonProtocol as cp,
 } from '@hicommonwealth/evm-protocols';
-import { tester } from '@hicommonwealth/model';
 import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 import { getEventSources } from '../../../server/workers/evmChainEvents/getEventSources';
 import {
@@ -13,7 +12,6 @@ import {
 
 describe('getEventSources', () => {
   beforeAll(async () => {
-    await tester.bootstrap_testing();
     await createEventRegistryChainNodes();
     await createContestEventSources(cp.ValidChains.SepoliaBase);
   });

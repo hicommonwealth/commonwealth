@@ -1,11 +1,11 @@
 import React from 'react';
 
-import 'components/component_kit/cw_text_input.scss';
 import { CWIconButton } from './cw_icon_button';
 import { CWIcon } from './cw_icons/cw_icon';
 import type { IconName } from './cw_icons/cw_icon_lookup';
 import { CWLabel } from './cw_label';
 import { CWText } from './cw_text';
+import './cw_text_input.scss';
 import type { ValidationStatus } from './cw_validation_text';
 import { getClasses } from './helpers';
 

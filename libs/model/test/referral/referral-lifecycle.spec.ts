@@ -5,7 +5,12 @@ import { GetUserReferrals } from 'model/src/user/GetUserReferrals.query';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { z } from 'zod';
 import { CreateCommunity } from '../../src/community';
-import { CreateReferralLink, UserReferrals } from '../../src/user';
+import {
+  CreateReferralLink,
+  GetReferralLink,
+  UpdateUser,
+  UserReferrals,
+} from '../../src/user';
 import { drainOutbox, seedCommunity } from '../utils';
 
 describe('Referral lifecycle', () => {
@@ -26,7 +31,7 @@ describe('Referral lifecycle', () => {
     await dispose()();
   });
 
-  it('should create a referral', async () => {
+  it('should create a referral when creating a community with a referral link', async () => {
     // admin creates a referral link
     const response = await command(CreateReferralLink(), {
       actor: admin,
@@ -81,6 +86,56 @@ describe('Referral lifecycle', () => {
       event_payload: {
         userId: member.user.id?.toString(),
         communityId: id,
+      },
+    });
+  });
+
+  it('should create a referral when signing up with a referral link', async () => {
+    const response = await query(GetReferralLink(), {
+      actor: admin,
+      payload: {},
+    });
+
+    // member signs up with the referral link
+    await command(UpdateUser(), {
+      actor: member,
+      payload: {
+        id: member.user.id!,
+        referral_link: response?.referral_link,
+        profile: { name: 'member' }, // this flags is_welcome_onboard_flow_complete
+      },
+    });
+
+    await drainOutbox(['SignUpFlowCompleted'], UserReferrals);
+
+    // get referrals
+    const referrals = await query(GetUserReferrals(), {
+      actor: admin,
+      payload: {},
+    });
+
+    expect(referrals?.length).toBe(2);
+
+    const ref = referrals!.at(1)!;
+    expect(ref).toMatchObject({
+      referrer: {
+        id: admin.user.id,
+        profile: {
+          name: 'admin',
+          avatar_url: ref.referrer.profile.avatar_url,
+        },
+      },
+      referee: {
+        id: member.user.id,
+        profile: {
+          name: 'member',
+          avatar_url: ref.referee.profile.avatar_url,
+        },
+      },
+      event_name: 'SignUpFlowCompleted',
+      event_payload: {
+        user_id: member.user.id,
+        referral_link: response?.referral_link,
       },
     });
   });

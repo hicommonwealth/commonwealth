@@ -1,11 +1,9 @@
 import { dispose } from '@hicommonwealth/core';
-import { tester } from '@hicommonwealth/model';
-import sinon from 'sinon';
 import {
+  Mock,
   MockInstance,
   afterAll,
   afterEach,
-  beforeAll,
   beforeEach,
   describe,
   expect,
@@ -18,25 +16,20 @@ import { multipleEventSource, singleEventSource } from '../../util/util';
 vi.mock('../../../server/workers/evmChainEvents/getEventSources');
 
 describe('scheduleNodeProcessing', () => {
-  const sandbox = sinon.createSandbox();
-  let processChainStub: sinon.SinonSpy;
-  let clock: sinon.SinonFakeTimers;
-
-  beforeAll(async () => {
-    await tester.bootstrap_testing();
-  });
+  let processChainStub: Mock;
 
   afterAll(async () => {
     await dispose()();
   });
 
   beforeEach(() => {
-    processChainStub = sandbox.stub();
-    clock = sandbox.useFakeTimers();
+    vi.clearAllMocks();
+    processChainStub = vi.fn();
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
-    sandbox.restore();
+    vi.useRealTimers();
     vi.resetAllMocks();
   });
 
@@ -49,8 +42,8 @@ describe('scheduleNodeProcessing', () => {
     );
 
     await scheduleNodeProcessing(1000, processChainStub);
-    clock.tick(1001);
-    expect(processChainStub.called).to.be.false;
+    vi.advanceTimersByTime(1000);
+    expect(processChainStub).not.toHaveBeenCalled();
   });
 
   test('should schedule processing for a single source', async () => {
@@ -65,10 +58,10 @@ describe('scheduleNodeProcessing', () => {
     const interval = 10_000;
     await scheduleNodeProcessing(interval, processChainStub);
 
-    expect(processChainStub.calledOnce).to.be.false;
+    expect(processChainStub).not.toHaveBeenCalledOnce();
 
-    clock.tick(1);
-    expect(processChainStub.calledOnce).to.be.true;
+    vi.advanceTimersByTime(1);
+    expect(processChainStub).toHaveBeenCalledOnce();
   });
 
   test('should evenly schedule 2 sources per interval', async () => {
@@ -82,11 +75,10 @@ describe('scheduleNodeProcessing', () => {
     const interval = 10_000;
     await scheduleNodeProcessing(interval, processChainStub);
 
-    expect(processChainStub.calledOnce).to.be.false;
-    clock.tick(1);
-    expect(processChainStub.calledOnce).to.be.true;
-
-    clock.tick(interval / 2);
-    expect(processChainStub.calledTwice).to.be.true;
+    expect(processChainStub).not.toHaveBeenCalledOnce();
+    vi.advanceTimersByTime(1);
+    expect(processChainStub).toHaveBeenCalledOnce();
+    vi.advanceTimersByTime(interval / 2);
+    expect(processChainStub).toHaveBeenCalledTimes(2);
   });
 });

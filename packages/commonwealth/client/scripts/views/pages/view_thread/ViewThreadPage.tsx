@@ -12,7 +12,6 @@ import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import useTopicGating from 'hooks/useTopicGating';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
-import 'pages/view_thread/index.scss';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useSearchParams } from 'react-router-dom';
@@ -62,6 +61,7 @@ import { LinkedUrlCard } from './LinkedUrlCard';
 import { ThreadPollCard } from './ThreadPollCard';
 import { ThreadPollEditorCard } from './ThreadPollEditorCard';
 import { EditBody } from './edit_body';
+import './index.scss';
 import { LinkedProposalsCard } from './linked_proposals_card';
 import { LinkedThreadsCard } from './linked_threads_card';
 import { LockMessage } from './lock_message';
@@ -350,7 +350,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const editsToSave = localStorage.getItem(
     `${app.activeChainId()}-edit-thread-${thread?.id}-storedText`,
   );
-  const isStageDefault = thread && isDefaultStage(thread.stage);
+  const isStageDefault = thread && isDefaultStage(app, thread.stage);
 
   const tabsShouldBePresent =
     showLinkedProposalOptions ||

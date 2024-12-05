@@ -1,5 +1,5 @@
 import express from 'express';
-import { checkEligibility, contestCard, contestPrizes } from './frames/contest';
+import { contestCard, contestPrizes } from './frames/contest';
 
 const farcasterRouter = express.Router();
 
@@ -7,6 +7,5 @@ const farcasterRouter = express.Router();
 farcasterRouter.get('/:contest_address/contestCard', contestCard);
 farcasterRouter.post('/:contest_address/contestCard', contestCard);
 farcasterRouter.post('/:contest_address/contestPrizes', contestPrizes);
-farcasterRouter.post('/:contest_address/checkEligibility', checkEligibility);
 
 export default farcasterRouter;

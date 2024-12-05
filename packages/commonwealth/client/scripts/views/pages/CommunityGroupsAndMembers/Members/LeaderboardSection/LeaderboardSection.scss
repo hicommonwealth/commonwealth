@@ -1,0 +1,29 @@
+@import '../../../../../styles/shared';
+
+.LeaderboardSection {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+
+  .search-input-container {
+    margin-block: 4px;
+    .text-input-left-icon {
+      position: absolute;
+    }
+  }
+
+  .search-input {
+    padding-left: 48px !important;
+  }
+
+  .search-icon {
+    position: relative;
+    left: 16px !important;
+    color: $neutral-400;
+  }
+
+  table {
+    width: 100%;
+    @include table-cell;
+  }
+}

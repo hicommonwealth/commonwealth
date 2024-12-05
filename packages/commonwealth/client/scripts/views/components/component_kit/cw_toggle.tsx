@@ -1,6 +1,6 @@
 import React from 'react';
 
-import 'components/component_kit/cw_toggle.scss';
+import './cw_toggle.scss';
 
 import { setDarkMode } from '../../../helpers/darkMode';
 import { getClasses } from './helpers';

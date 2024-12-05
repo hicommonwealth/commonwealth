@@ -1,7 +1,7 @@
 import React from 'react';
 
-import 'components/gov_explainer.scss';
 import { CWText } from './component_kit/cw_text';
+import './gov_explainer.scss';
 
 type StatHeader = {
   statName: string;
@@ -27,8 +27,8 @@ export const GovExplainer = (props: GovExplainerProps) => {
       <div className="emoji">💭</div>
       <div className="main-container">
         <div className="stat-headers-container">
-          {statHeaders.map((s) => (
-            <CWText>
+          {statHeaders.map((s, i) => (
+            <CWText key={i}>
               <div>
                 <b>{s.statName}</b> {s.statDescription}
               </div>
@@ -36,8 +36,8 @@ export const GovExplainer = (props: GovExplainerProps) => {
           ))}
         </div>
         <div className="stats-container">
-          {stats.map((s) => (
-            <div className="stat">
+          {stats.map((s, i) => (
+            <div className="stat" key={i}>
               <CWText type="b1" fontWeight="medium" className="stat-text">
                 {s.statHeading}
               </CWText>
