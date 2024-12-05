@@ -12,6 +12,15 @@
         text-align: start;
       }
 
+      .stake-value {
+        .b1 {
+          color: $neutral-700 !important;
+        }
+        .caption {
+          color: $neutral-600 !important;
+        }
+      }
+
       .etherscanLink {
         cursor: pointer;
         color: $neutral-500;

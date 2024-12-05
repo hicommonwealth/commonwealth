@@ -1,5 +1,5 @@
+import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
 import { WEI_PER_ETHER } from 'controllers/chain/ethereum/util';
-import { formatAddressShort } from 'helpers';
 import { APIOrderDirection } from 'helpers/constants';
 import React from 'react';
 import CommunityInfo from 'views/components/component_kit/CommunityInfo';
@@ -7,7 +7,6 @@ import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWTable } from 'views/components/component_kit/new_designs/CWTable';
 import { CWTableColumnInfo } from 'views/components/component_kit/new_designs/CWTable/CWTable';
 import { useCWTableState } from 'views/components/component_kit/new_designs/CWTable/useCWTableState';
-import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import { TransactionsProps } from '../../types';
 import './Stakes.scss';
 
@@ -20,36 +19,18 @@ const columns: CWTableColumnInfo[] = [
     hasCustomSortValue: true,
   },
   {
-    key: 'chain',
-    header: 'Chain',
-    numeric: true,
-    sortable: true,
-  },
-  {
-    key: 'address',
-    header: 'Address',
+    key: 'stake',
+    header: 'Stake',
     numeric: false,
     sortable: true,
     hasCustomSortValue: true,
   },
-  {
-    key: 'stake',
-    header: 'Stake',
-    numeric: true,
-    sortable: true,
-  },
-  {
-    key: 'voteWeight',
-    header: 'Vote weight',
-    numeric: true,
-    sortable: true,
-  },
-  {
-    key: 'avgPrice',
-    header: 'Avg. price',
-    numeric: true,
-    sortable: true,
-  },
+  // {
+  //   key: 'avgPrice',
+  //   header: 'Avg. price',
+  //   numeric: true,
+  //   sortable: true,
+  // },
   {
     key: 'etherscanLink',
     header: () => <CWIcon iconName="etherscan" iconSize="regular" />,
@@ -128,21 +109,15 @@ const Stakes = ({ transactions }: TransactionsProps) => {
               />
             ),
           },
-          address: {
-            sortValue: tx.address,
+          stake: {
+            sortValue: tx.stake,
             customElement: (
-              <CWTooltip
-                content={tx.address}
-                renderTrigger={(handleInteraction) => (
-                  <span
-                    className="cursor-pointer"
-                    onMouseEnter={handleInteraction}
-                    onMouseLeave={handleInteraction}
-                  >
-                    {formatAddressShort(tx.address, 5, 5)}
-                  </span>
-                )}
-              />
+              <div className="stake-value">
+                <CWText type="b1" fontWeight="semiBold">
+                  {tx.stake} /
+                </CWText>
+                <CWText type="caption">{tx.avgPrice}</CWText>
+              </div>
             ),
           },
           etherscanLink: {
