@@ -20,7 +20,9 @@ export type ModalVariantProps = {
     | ChainBase.Ethereum
     | ChainBase.CosmosSDK
     | ChainBase.Solana
-    | ChainBase.Substrate;
+    | ChainBase.Substrate
+    | ChainBase.Skale;
+
   showAuthOptionFor?: AuthWallets | AuthSSOs;
   onSignInClick?: () => void;
 };
