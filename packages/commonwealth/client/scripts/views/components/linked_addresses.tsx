@@ -10,7 +10,6 @@ import type NewProfile from '../../models/NewProfile';
 import { DeleteAddressModal } from '../modals/delete_address_modal';
 import { CWIconButton } from './component_kit/cw_icon_button';
 import { CWTruncatedAddress } from './component_kit/cw_truncated_address';
-import CWCommunityInfo from './component_kit/new_designs/CWCommunityInfo';
 import { CWModal } from './component_kit/new_designs/CWModal';
 import { CWTable } from './component_kit/new_designs/CWTable';
 import { CWTableColumnInfo } from './component_kit/new_designs/CWTable/CWTable';
@@ -57,11 +56,12 @@ const AddressDetails = (props: AddressDetailsProps) => {
 
   return (
     <div className="AddressDetails">
-      <CWCommunityInfo
+      <CWTruncatedAddress
         communityInfo={{
           iconUrl: fetchedCommunity?.icon_url || '',
           name: fetchedCommunity?.name || '',
         }}
+        showCommunityname
       />
       <PopoverMenu
         menuItems={[
@@ -71,7 +71,7 @@ const AddressDetails = (props: AddressDetailsProps) => {
           },
         ]}
         renderTrigger={(onclick) => (
-          <CWIconButton iconName="dotsVertical" onClick={onclick} />
+          <CWIconButton iconName="dotsHorizontal" onClick={onclick} />
         )}
       />
     </div>
