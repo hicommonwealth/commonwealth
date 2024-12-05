@@ -4,6 +4,7 @@ import { getRelativeTimestamp } from 'helpers/dates';
 import React from 'react';
 import CommunityInfo from 'views/components/component_kit/CommunityInfo';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
+import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTable } from 'views/components/component_kit/new_designs/CWTable';
 import { CWTableColumnInfo } from 'views/components/component_kit/new_designs/CWTable/CWTable';
 import { useCWTableState } from 'views/components/component_kit/new_designs/CWTable/useCWTableState';
@@ -13,6 +14,12 @@ import './TransactionHistory.scss';
 
 const columns: CWTableColumnInfo[] = [
   {
+    key: 'transactionType',
+    header: 'Transaction Type',
+    numeric: false,
+    sortable: true,
+  },
+  {
     key: 'community',
     header: 'Community',
     numeric: false,
@@ -20,41 +27,11 @@ const columns: CWTableColumnInfo[] = [
     hasCustomSortValue: true,
   },
   {
-    key: 'chain',
-    header: 'Chain',
-    numeric: true,
-    sortable: true,
-  },
-  {
-    key: 'address',
-    header: 'Address',
+    key: 'assets',
+    header: 'Assets',
     numeric: false,
     sortable: true,
     hasCustomSortValue: true,
-  },
-  {
-    key: 'action',
-    header: 'Action',
-    numeric: true,
-    sortable: true,
-  },
-  {
-    key: 'stake',
-    header: 'Stake',
-    numeric: true,
-    sortable: true,
-  },
-  {
-    key: 'avgPrice',
-    header: 'Avg. price',
-    numeric: true,
-    sortable: true,
-  },
-  {
-    key: 'totalPrice',
-    header: 'Total price',
-    numeric: true,
-    sortable: true,
   },
   {
     key: 'timestamp',
@@ -95,6 +72,20 @@ const TransactionHistory = ({ transactions }: TransactionsProps) => {
                 name={tx.community.name}
                 communityId={tx.community.id}
               />
+            ),
+          },
+          transactionType: {
+            customElement: <CWText type="b1">Stake</CWText>,
+          },
+          assets: {
+            sortValue: tx.totalPrice,
+            customElement: (
+              <div className="asset-value">
+                <CWText type="b1" fontWeight="semiBold">
+                  {tx.action} / {tx.stake}
+                </CWText>
+                <CWText type="caption">{tx.totalPrice}</CWText>
+              </div>
             ),
           },
           address: {

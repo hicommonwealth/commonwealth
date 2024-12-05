@@ -12,10 +12,19 @@
         text-align: start;
       }
 
+      .asset-value {
+        .b1 {
+          color: $neutral-700 !important;
+        }
+        .caption {
+          color: $neutral-600 !important;
+        }
+      }
+
       .timestamp {
         display: block;
         width: 100%;
-        text-align: start;
+        text-align: end;
         cursor: pointer;
       }
 

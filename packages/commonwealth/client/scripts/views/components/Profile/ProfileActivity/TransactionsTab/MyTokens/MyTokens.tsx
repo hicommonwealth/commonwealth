@@ -113,7 +113,7 @@ const MyTokens = ({ transactions }: TransactionsProps) => {
           assets: {
             sortValue: tx.assets.sortValue,
             customElement: (
-              <div className="stake-value">
+              <div className="asset-value">
                 <CWText type="b1" fontWeight="semiBold">
                   {tx.assets.label.holdings} /
                 </CWText>
