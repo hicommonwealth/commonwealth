@@ -1,20 +1,22 @@
+import useBrowserWindow from 'hooks/useBrowserWindow';
 import { useFlag } from 'hooks/useFlag';
 import app from 'state';
 
-export function useQuickPostButtonActivated() {
+export function useQuickPostButtonActivated(): boolean {
   const newMobileNav = useFlag('newMobileNav');
+
+  const { isWindowExtraSmall } = useBrowserWindow({});
 
   if (!newMobileNav) {
     return false;
   }
 
-  const scopedPage = app.activeChainId();
-
-  // FIXME: this is never activated on mobile.
-
-  if (!scopedPage) {
+  if (!isWindowExtraSmall) {
+    // this is never activated on mobile.
     return false;
   }
 
-  return true;
+  const scopedPage = app.activeChainId();
+
+  return scopedPage !== null && scopedPage !== '';
 }
