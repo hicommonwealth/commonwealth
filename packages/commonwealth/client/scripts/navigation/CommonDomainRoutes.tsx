@@ -337,6 +337,13 @@ const CommonDomainRoutes = ({
     })}
   />,
   <Route
+    key="/new/discussion"
+    path="/new/discussion"
+    element={withLayout(NewThreadPage, {
+      scoped: true,
+    })}
+  />,
+  <Route
     key="/:scope/new/discussion"
     path="/:scope/new/discussion"
     element={withLayout(NewThreadPage, {
@@ -615,6 +622,14 @@ const CommonDomainRoutes = ({
     element={<Navigate to={(parameters) => `/${parameters.scope}/`} />}
   />,
   // LEGACY REDIRECTS END
+
+  <Route
+    key="/:scope/new/discussion"
+    path="/:scope/new/discussion"
+    element={withLayout(CommunityNotFoundPage, {
+      scoped: true,
+    })}
+  />,
 
   // Community not found page - This should be at the end
   <Route
