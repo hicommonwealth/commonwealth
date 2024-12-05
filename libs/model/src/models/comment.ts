@@ -1,6 +1,9 @@
 import { stats } from '@hicommonwealth/core';
 import { Comment } from '@hicommonwealth/schemas';
-import { getDecodedString } from '@hicommonwealth/shared';
+import {
+  getDecodedString,
+  MAX_TRUNCATED_CONTENT_LENGTH,
+} from '@hicommonwealth/shared';
 import Sequelize from 'sequelize';
 import { z } from 'zod';
 import type {
@@ -37,7 +40,10 @@ export default (
       parent_id: { type: Sequelize.STRING, allowNull: true },
       address_id: { type: Sequelize.INTEGER, allowNull: true },
       created_by: { type: Sequelize.STRING, allowNull: true },
-      body: { type: Sequelize.TEXT, allowNull: false },
+      body: {
+        type: Sequelize.STRING(MAX_TRUNCATED_CONTENT_LENGTH),
+        allowNull: false,
+      },
 
       // canvas-related columns
       canvas_signed_data: { type: Sequelize.JSONB, allowNull: true },

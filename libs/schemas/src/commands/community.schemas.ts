@@ -179,6 +179,7 @@ export const CreateTopic = {
         token_address: true,
         token_symbol: true,
         vote_weight_multiplier: true,
+        chain_node_id: true,
       }),
     ),
   output: z.object({
