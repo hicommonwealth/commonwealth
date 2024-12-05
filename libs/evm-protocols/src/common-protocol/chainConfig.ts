@@ -84,4 +84,9 @@ export const factoryContracts = {
     communityStake: '0xc49eecf7af055c4dfa3e918662d9bbac45544bd6',
     chainId: 974399131,
   },
+  [ValidChains.SKALE]: {
+    factory: '0xedf43C919f59900C82d963E99d822dA3F95575EA',
+    communityStake: '0xcc752fd15A7Dd0d5301b6A626316E7211352Cf62',
+    chainId: 1564830818,
+  },
 } as const satisfies factoryContractsType;

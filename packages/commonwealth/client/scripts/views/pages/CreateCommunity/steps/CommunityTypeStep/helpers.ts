@@ -48,6 +48,7 @@ export const communityTypeOptions = [
     description:
       // eslint-disable-next-line max-len
       'SKALE is an on-demand blockchain network with zero gas fees. ' +
+      // eslint-disable-next-line max-len
       'Allowing quick deployment of interoperable EVM-compatible chains without compromising security or decentralization',
   },
   {
