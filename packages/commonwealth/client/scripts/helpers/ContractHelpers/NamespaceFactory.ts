@@ -134,7 +134,7 @@ class NamespaceFactory extends ContractBase {
     feeManager: string,
     referrer: string,
     chainId: string,
-  ): Promise<any> {
+  ): Promise<TransactionReceipt> {
     if (!this.initialized || !this.walletEnabled) {
       await this.initialize(true, chainId);
     }
