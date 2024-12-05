@@ -11,7 +11,10 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
 import useUserStore from 'state/ui/user';
-import MarkdownViewerUsingQuillOrNewEditor from 'views/components/MarkdownViewerWithFallback';
+import {
+  default as MarkdownViewerUsingQuillOrNewEditor,
+  default as MarkdownViewerWithFallback,
+} from 'views/components/MarkdownViewerWithFallback';
 import { ThreadContestTagContainer } from 'views/components/ThreadContestTag';
 import { ViewThreadUpvotesDrawer } from 'views/components/UpvoteDrawer';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
@@ -53,6 +56,12 @@ type CardProps = AdminActionsProps & {
   onImageClick?: () => void;
   showCommentState?: boolean;
   removeImagesFromMarkDown?: boolean;
+  hideThreadOptions?: boolean;
+  threadImage?: string | null;
+  isCardView?: boolean;
+  hidePublishDate?: boolean;
+  hideTrendingTag?: boolean;
+  hideSpamTag?: boolean;
 };
 
 export const ThreadCard = ({
@@ -88,6 +97,12 @@ export const ThreadCard = ({
   showCommentState = false,
   onImageClick,
   removeImagesFromMarkDown = false,
+  hideThreadOptions = false,
+  threadImage,
+  isCardView = false,
+  hidePublishDate = false,
+  hideTrendingTag = false,
+  hideSpamTag = false,
 }: CardProps) => {
   const navigate = useCommonNavigate();
   const user = useUserStore();
@@ -179,6 +194,9 @@ export const ThreadCard = ({
               archivedAt={thread.archivedAt}
               profile={thread?.profile}
               layoutType={layoutType}
+              hidePublishDate={hidePublishDate}
+              hideSpamTag={hideSpamTag}
+              hideTrendingTag={hideTrendingTag}
             />
             <div className="content-header-icons">
               {thread.pinned && <CWIcon iconName="pin" />}
@@ -211,22 +229,33 @@ export const ThreadCard = ({
             </div>
             <CWText
               type="b1"
-              className={clsx('content-body', { 'show-image': showImage })}
+              className={clsx('content-body', {
+                'show-image': showImage || threadImage,
+              })}
             >
-              <MarkdownViewerUsingQuillOrNewEditor
-                markdown={
-                  !removeImagesFromMarkDown
-                    ? thread.body
-                    : removeImageFormMarkDown(thread.body)
-                }
-                cutoffLines={4}
-                customShowMoreButton={
-                  <CWText type="b1" className="show-more-btn">
-                    Show more
-                  </CWText>
-                }
-                onImageClick={onImageClick}
-              />
+              {!isCardView ? (
+                <MarkdownViewerUsingQuillOrNewEditor
+                  markdown={
+                    !removeImagesFromMarkDown
+                      ? thread.body
+                      : removeImageFormMarkDown(thread.body)
+                  }
+                  cutoffLines={4}
+                  customShowMoreButton={
+                    <CWText type="b1" className="show-more-btn">
+                      Show more
+                    </CWText>
+                  }
+                  onImageClick={onImageClick}
+                />
+              ) : (
+                <MarkdownViewerWithFallback markdown={thread.body} />
+              )}
+              {threadImage && (
+                <div className="card-image-container">
+                  <img src={threadImage} alt="Thread content" />
+                </div>
+              )}
             </CWText>
           </div>
           {isTagsRowVisible && (
@@ -263,46 +292,54 @@ export const ThreadCard = ({
                 ))}
             </div>
           )}
-          <div
-            className="content-footer"
-            onClick={(e) => {
-              e.stopPropagation();
-            }}
-          >
-            <ThreadOptions
-              totalComments={thread.numberOfComments}
-              shareEndpoint={`${window.location.origin}${threadHref}`}
-              thread={thread}
-              upvoteBtnVisible={!hideReactionButton && isWindowSmallInclusive}
-              commentBtnVisible={!thread.readOnly}
-              canUpdateThread={
-                canUpdateThread &&
-                user.isLoggedIn &&
-                (isThreadAuthor || isThreadCollaborator || hasAdminPermissions)
-              }
-              canReact={canReact}
-              canComment={canComment}
-              onDelete={onDelete}
-              onSpamToggle={onSpamToggle}
-              onLockToggle={onLockToggle}
-              onPinToggle={onPinToggle}
-              onProposalStageChange={onProposalStageChange}
-              onSnapshotProposalFromThread={onSnapshotProposalFromThread}
-              onCollaboratorsEdit={onCollaboratorsEdit}
-              onEditStart={onEditStart}
-              onEditCancel={onEditCancel}
-              onEditConfirm={onEditConfirm}
-              hasPendingEdits={hasPendingEdits}
-              onCommentBtnClick={onCommentBtnClick}
-              disabledActionsTooltipText={disabledActionsTooltipText}
-              setIsUpvoteDrawerOpen={setIsUpvoteDrawerOpen}
-              hideUpvoteDrawerButton={hideUpvotesDrawer}
-              editingDisabled={editingDisabled}
-              expandCommentBtnVisible={expandCommentBtnVisible}
-              showCommentVisible={showCommentVisible}
-              toggleShowComments={toggleShowComments}
-            />
-          </div>
+          {!hideThreadOptions && (
+            <div
+              className="content-footer"
+              onClick={(e) => {
+                e.stopPropagation();
+              }}
+            >
+              {!isCardView && (
+                <ThreadOptions
+                  totalComments={thread.numberOfComments}
+                  shareEndpoint={`${window.location.origin}${threadHref}`}
+                  thread={thread}
+                  upvoteBtnVisible={
+                    !hideReactionButton && isWindowSmallInclusive
+                  }
+                  commentBtnVisible={!thread.readOnly}
+                  canUpdateThread={
+                    canUpdateThread &&
+                    user.isLoggedIn &&
+                    (isThreadAuthor ||
+                      isThreadCollaborator ||
+                      hasAdminPermissions)
+                  }
+                  canReact={canReact}
+                  canComment={canComment}
+                  onDelete={onDelete}
+                  onSpamToggle={onSpamToggle}
+                  onLockToggle={onLockToggle}
+                  onPinToggle={onPinToggle}
+                  onProposalStageChange={onProposalStageChange}
+                  onSnapshotProposalFromThread={onSnapshotProposalFromThread}
+                  onCollaboratorsEdit={onCollaboratorsEdit}
+                  onEditStart={onEditStart}
+                  onEditCancel={onEditCancel}
+                  onEditConfirm={onEditConfirm}
+                  hasPendingEdits={hasPendingEdits}
+                  onCommentBtnClick={onCommentBtnClick}
+                  disabledActionsTooltipText={disabledActionsTooltipText}
+                  setIsUpvoteDrawerOpen={setIsUpvoteDrawerOpen}
+                  hideUpvoteDrawerButton={hideUpvotesDrawer}
+                  editingDisabled={editingDisabled}
+                  expandCommentBtnVisible={expandCommentBtnVisible}
+                  showCommentVisible={showCommentVisible}
+                  toggleShowComments={toggleShowComments}
+                />
+              )}
+            </div>
+          )}
         </div>
       </Link>
       {!hideRecentComments &&

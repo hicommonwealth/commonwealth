@@ -55,6 +55,7 @@ type MarkdownFormattedTextProps = Omit<QuillRendererProps, 'doc'> & {
   doc: string;
   customClass?: string;
   onImageClick?: () => void;
+  isCardView?: boolean;
 };
 
 // NOTE: Do NOT use this directly. Use QuillRenderer instead.
@@ -203,6 +204,7 @@ export const MarkdownFormattedText = ({
       >
         {finalDoc}
       </div>
+
       {isTruncated && (
         <>
           {customShowMoreButton || (

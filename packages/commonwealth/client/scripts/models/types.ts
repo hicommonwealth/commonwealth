@@ -41,6 +41,7 @@ export enum ThreadFeaturedFilterTypes {
 export enum ThreadViewFilterTypes {
   All = 'all',
   Overview = 'overview',
+  CardView = 'cardview',
 }
 
 export enum CommentsFeaturedFilterTypes {
