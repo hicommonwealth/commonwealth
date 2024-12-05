@@ -21,6 +21,7 @@ import {
   CaretUp,
   ChatCenteredDots,
   ChatDots,
+  ChatText,
   Chats,
   Check,
   CheckCircle,
@@ -326,6 +327,8 @@ export const customIconLookup = {
   coinbase: CustomIcons.CWCoinbase,
   x: CustomIcons.CWX, // twitter
   apple: CustomIcons.CWApple,
+  farcaster: CustomIcons.CWFarcaster,
+  SMS: withPhosphorIcon(ChatText),
 };
 
 export type IconName = keyof typeof iconLookup;

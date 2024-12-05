@@ -1,9 +1,6 @@
-import { expect } from 'chai';
-import Sinon from 'sinon';
-
 import { dispose, EventNames, handleEvent } from '@hicommonwealth/core';
 import { literal } from 'sequelize';
-import { afterAll, beforeAll, describe, test } from 'vitest';
+import { afterAll, beforeAll, describe, expect, test, vi } from 'vitest';
 import { commonProtocol, emitEvent, models } from '../../src';
 import { Contests } from '../../src/contest';
 import { ContestWorker } from '../../src/policies';
@@ -84,15 +81,14 @@ describe('Contest Worker Policy Lifecycle', () => {
   });
 
   afterAll(async () => {
-    Sinon.restore();
+    vi.restoreAllMocks();
     await dispose()();
   });
 
   test('Handle ThreadCreated, ThreadUpvoted and Rollover', async () => {
-    const addContentStub = Sinon.stub(
-      commonProtocol.contestHelper,
-      'addContentBatch',
-    ).resolves([]);
+    const addContentStub = vi
+      .spyOn(commonProtocol.contestHelper, 'addContentBatch')
+      .mockResolvedValue([]);
 
     await emitEvent(models.Outbox, [
       {
@@ -127,12 +123,11 @@ describe('Contest Worker Policy Lifecycle', () => {
 
     await drainOutbox(['ThreadCreated'], ContestWorker);
 
-    expect(addContentStub.called, 'addContent was not called').to.be.true;
+    expect(addContentStub).toHaveBeenCalled();
 
-    const voteContentStub = Sinon.stub(
-      commonProtocol.contestHelper,
-      'voteContentBatch',
-    ).resolves([]);
+    const voteContentStub = vi
+      .spyOn(commonProtocol.contestHelper, 'voteContentBatch')
+      .mockResolvedValue([]);
 
     await emitEvent(models.Outbox, [
       {
@@ -175,7 +170,7 @@ describe('Contest Worker Policy Lifecycle', () => {
 
     await drainOutbox(['ThreadUpvoted'], ContestWorker);
 
-    expect(voteContentStub.called, 'voteContent was not called').to.be.true;
+    expect(voteContentStub).toHaveBeenCalled();
 
     await handleEvent(ContestWorker(), {
       name: EventNames.ContestRolloverTimerTicked,

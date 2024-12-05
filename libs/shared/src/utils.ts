@@ -5,6 +5,7 @@ import {
   decodeAddress,
   encodeAddress,
 } from '@polkadot/util-crypto';
+import moment from 'moment';
 import { S3_ASSET_BUCKET_CDN, S3_RAW_ASSET_BUCKET_DOMAIN } from './constants';
 
 /**
@@ -369,4 +370,15 @@ export function bech32ToHex(address: string) {
 
 export function buildFarcasterContestFrameUrl(contestAddress: string) {
   return `/api/integration/farcaster/contests/${contestAddress}/contestCard`;
+}
+
+// Date utils
+export function isWithinPeriod(
+  refDate: Date,
+  targetDate: Date,
+  period: moment.unitOfTime.Base,
+): boolean {
+  const start = moment(refDate).startOf(period);
+  const end = moment(refDate).endOf(period);
+  return moment(targetDate).isBetween(start, end, null, '[]');
 }

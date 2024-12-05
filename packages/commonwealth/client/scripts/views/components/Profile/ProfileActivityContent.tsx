@@ -6,24 +6,28 @@ import type Thread from 'models/Thread';
 import { CWText } from '../component_kit/cw_text';
 import type { CommentWithAssociatedThread } from './ProfileActivity';
 import ProfileActivityRow from './ProfileActivityRow';
+import ReferralsTab from './ReferralsTab';
 
-enum ProfileActivityType {
+export enum ProfileActivityType {
   Addresses,
   Comments,
   Communities,
   Threads,
+  Referrals,
 }
 
 type ProfileActivityContentProps = {
   option: ProfileActivityType;
   threads: Thread[];
   comments: CommentWithAssociatedThread[];
+  isOwner: boolean | undefined;
 };
 
 const ProfileActivityContent = ({
   option,
   comments,
   threads,
+  isOwner,
 }: ProfileActivityContentProps) => {
   if (option === ProfileActivityType.Threads) {
     if (threads.length === 0) {
@@ -47,6 +51,10 @@ const ProfileActivityContent = ({
           ))}
       </>
     );
+  }
+
+  if (option === ProfileActivityType.Referrals) {
+    return <ReferralsTab isOwner={isOwner} />;
   }
 
   const allActivities: Array<CommentWithAssociatedThread | Thread> = [

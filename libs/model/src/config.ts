@@ -85,10 +85,10 @@ export const config = configure(
         : null,
     },
     CONTESTS: {
-      MIN_USER_ETH: 0.0005,
+      MIN_USER_ETH: 0,
       MAX_USER_POSTS_PER_CONTEST: MAX_USER_POSTS_PER_CONTEST
         ? parseInt(MAX_USER_POSTS_PER_CONTEST, 10)
-        : 2,
+        : 5,
       FLAG_FARCASTER_CONTEST: FLAG_FARCASTER_CONTEST === 'true',
       NEYNAR_API_KEY: NEYNAR_API_KEY,
       NEYNAR_CAST_CREATED_WEBHOOK_SECRET: NEYNAR_CAST_CREATED_WEBHOOK_SECRET,

@@ -138,9 +138,6 @@ importers:
       '@types/readline-sync':
         specifier: ^1.4.8
         version: 1.4.8
-      '@types/sinon':
-        specifier: ^17.0.3
-        version: 17.0.3
       '@types/underscore':
         specifier: ^1.9.4
         version: 1.11.15
@@ -255,9 +252,6 @@ importers:
       sharp:
         specifier: ^0.31.2
         version: 0.31.3
-      sinon:
-        specifier: ^15.0.4
-        version: 15.2.0
       source-map-support:
         specifier: ^0.5.21
         version: 0.5.21
@@ -397,18 +391,12 @@ importers:
       '@types/qs':
         specifier: ^6.9.14
         version: 6.9.15
-      '@types/sinon':
-        specifier: ^17.0.3
-        version: 17.0.3
       '@types/superagent':
         specifier: 4.1.13
         version: 4.1.13
       '@types/swagger-ui-express':
         specifier: ^4.1.6
         version: 4.1.6
-      sinon:
-        specifier: ^17.0.2
-        version: 17.0.2
       superagent:
         specifier: ^5.2.2
         version: 5.3.1
@@ -492,12 +480,6 @@ importers:
         specifier: ^3.22.4
         version: 3.23.6
     devDependencies:
-      '@types/sinon':
-        specifier: ^17.0.3
-        version: 17.0.3
-      sinon:
-        specifier: ^17.0.2
-        version: 17.0.2
       tsx:
         specifier: ^4.7.2
         version: 4.9.3
@@ -695,12 +677,6 @@ importers:
       '@types/node':
         specifier: ^20.11.25
         version: 20.12.10
-      '@types/sinon':
-        specifier: ^17.0.3
-        version: 17.0.3
-      sinon:
-        specifier: ^17.0.2
-        version: 17.0.2
       tsx:
         specifier: ^4.7.2
         version: 4.9.3
@@ -951,13 +927,19 @@ importers:
         specifier: ^5.0.4
         version: 5.0.4
       '@magic-ext/cosmos':
-        specifier: ^12.1.3
+        specifier: ^12.4.0
         version: 12.4.0
+      '@magic-ext/farcaster':
+        specifier: ^0.16.0
+        version: 0.16.0
       '@magic-ext/oauth':
-        specifier: ^11.1.1
-        version: 11.4.0
+        specifier: ^22.17.0
+        version: 22.17.0
+      '@magic-ext/oauth2':
+        specifier: ^9.16.0
+        version: 9.16.0
       '@magic-sdk/admin':
-        specifier: ^2.4.0
+        specifier: ^2.4.1
         version: 2.4.1(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@metamask/detect-provider':
         specifier: ^2.0.0
@@ -1191,8 +1173,8 @@ importers:
         specifier: ^5.2.3
         version: 5.2.3
       magic-sdk:
-        specifier: ^17.1.4
-        version: 17.4.0
+        specifier: ^28.17.0
+        version: 28.17.0
       marked:
         specifier: ^11.0.0
         version: 11.2.0
@@ -1428,15 +1410,9 @@ importers:
       '@types/passport-auth-token':
         specifier: ^1.0.4
         version: 1.0.4
-      '@types/sinon':
-        specifier: ^17.0.3
-        version: 17.0.3
       '@types/uuid':
         specifier: ^9.0.7
         version: 9.0.8
-      sinon:
-        specifier: ^17.0.2
-        version: 17.0.2
 
   packages/load-testing:
     dependencies:
@@ -4565,8 +4541,14 @@ packages:
   '@magic-ext/cosmos@12.4.0':
     resolution: {integrity: sha512-WfLlUzkKVfqO9vv+h8fA7z/KAcBL6tbLjSPHZCr8WbBUL/Me86Pmx8g8Zftb19oaGmYM+XkPVli7h20zBRE2oA==}
 
-  '@magic-ext/oauth@11.4.0':
-    resolution: {integrity: sha512-BDgQolLq6ck5JkFFH0eIs81NOaMQYmr/p4wBrRdxwBBIQtYg3FF5qLPsOoppdEO7BifNhrEKKWkyNzH//Eafmw==}
+  '@magic-ext/farcaster@0.16.0':
+    resolution: {integrity: sha512-+1u6r4sh1Mys2fxqbqU/8uBYeD2RQmjJY/6iwKHTih20gPotH++VoD6Jhl89I9UW8KogwTQ620asu8XZbXOLbw==}
+
+  '@magic-ext/oauth2@9.16.0':
+    resolution: {integrity: sha512-+ixOFjjLZtbk7GgRdzfGKpREGZUyqpIjXDftUjNOlgbaroBBjqrVj4scnzz06VQwCuiWotZ4ZU1vSFz/NszotQ==}
+
+  '@magic-ext/oauth@22.17.0':
+    resolution: {integrity: sha512-WSSf/g7l3B5cWzRenfizxE1qo4smbWPzOh4r14HEkIhvJS4m+gqNjav2Rp2HQElfXY7EuEeWM6KhZa/Irnd3eQ==}
 
   '@magic-sdk/admin@0.1.0-beta.10':
     resolution: {integrity: sha512-bW+Yoy7lNwgUd9KnizrignhuBpbGrBO3doCWezhq5/pi3aPujjUzmyl8mqqgxaPlNovznyq6tzMSFkdqi+6TpA==}
@@ -4575,19 +4557,19 @@ packages:
   '@magic-sdk/admin@2.4.1':
     resolution: {integrity: sha512-mx0Z3yMbdY7JXATQiEC298ZKjA414ixfrsBXABdmoQlzvvo6uxUbXbWIpYZGpci0v/INKIg7ksOvdZurGV/F8g==}
 
-  '@magic-sdk/commons@13.4.0':
-    resolution: {integrity: sha512-F6XG0r0XEZmGB8OTPNFrRz6IgDhb39YxUrG2n/4hajb0vJuA28QjoexG/d7f6Rklvxq9oIBR1wMuqUzGs3oSnA==}
+  '@magic-sdk/commons@24.16.0':
+    resolution: {integrity: sha512-CGICu3E2JNrTNqdT3Bjxg86+mb48RR6GvyEBWsQ0gF5psTrcQ3xVmqYbCdXLKwcoWMHwr6oFosg0Id4S372BKQ==}
     peerDependencies:
-      '@magic-sdk/provider': '>=4.3.0'
-      '@magic-sdk/types': '>=3.1.1'
+      '@magic-sdk/provider': '>=18.6.0'
+      '@magic-sdk/types': '>=15.8.0'
 
-  '@magic-sdk/provider@17.4.0':
-    resolution: {integrity: sha512-DvroR5qCumGtS8TY8wr/4bI9bvkUD222ghbNTsu9MFAgybksc6/ARUX8ttjFZVQXMIIe07PpZroxnxI+ih5mlA==}
+  '@magic-sdk/provider@28.16.0':
+    resolution: {integrity: sha512-FLRfOGWa0c8yPTR7+gx+BAmzBtjXwYq5Ek3mahbCFxDIOB9N4v9lAX2pCHjCer4vFK5fKWsgFQ3Bbef/jfnNJg==}
     peerDependencies:
       localforage: ^1.7.4
 
-  '@magic-sdk/types@15.8.0':
-    resolution: {integrity: sha512-xLQsBAg2JXUn39dRfZW6Z3LUT50qz/3pg6R658oVBr4LbJd/L8iAR0zCRmjLLNXzfYm1RkJYZWuHaxjJgKlkSA==}
+  '@magic-sdk/types@24.14.0':
+    resolution: {integrity: sha512-l5mjRoERU8o1IuKFdfu7EKp+T0qptfwm/U3lkGwO7/8xD/mK3bRoXSJAObgLAW5Kdp+uTeg6m3iNlrsm3Tt7PQ==}
 
   '@mdxeditor/gurx@1.1.3':
     resolution: {integrity: sha512-ywPsQFJKqrESDJWmvVvSnSjliY7vOOEUkkUunV3A6crsTem7Ymo6FhaNsJWpU5DpkpzcU7kUQXZXoW3i8Nj+fw==}
@@ -9216,6 +9198,9 @@ packages:
   crypto-browserify@3.12.0:
     resolution: {integrity: sha512-fz4spIh+znjO2VjL+IdhEpRJ3YN6sMzITSBijk6FK2UvTqruSQW+/cCZTSNsMiZNvUeq0CqurF+dAbyiGOY6Wg==}
 
+  crypto-js@3.3.0:
+    resolution: {integrity: sha512-DIT51nX0dCfKltpRiXV+/TVZq+Qq2NgF4644+K7Ttnla7zEzqc+kjJyiB96BHNyUTBxyjzRcZYpUdZa+QAqi6Q==}
+
   crypto-random-string@4.0.0:
     resolution: {integrity: sha512-x8dy3RnvYdlUcPOjkEHqozhiwzKNSq7GcPuXFbnyMOCHxX8V3OgIg/pYuabl2sbUPfIJaeAQB7PMOK8DFIdoRA==}
     engines: {node: '>=12'}
@@ -12133,8 +12118,8 @@ packages:
   magic-bytes.js@1.10.0:
     resolution: {integrity: sha512-/k20Lg2q8LE5xiaaSkMXk4sfvI+9EGEykFS4b0CHHGWqDYU0bGUFSwchNOMA56D7TCs9GwVTkqe9als1/ns8UQ==}
 
-  magic-sdk@17.4.0:
-    resolution: {integrity: sha512-oIsj0D01pSDhiuscZ4KCUcT07pWlg2+wsqZHzs5IAYbd1d4PM6+ZvYjTeob9W0Cl5FB8NNE0W8GUumvTd4fqqA==}
+  magic-sdk@28.17.0:
+    resolution: {integrity: sha512-5gSUuWDYr9PgndxNFfBg0SQuKRqJDRwZyVtKmwsxuLDDyOxSJs7tnBlXxwgnGGRyDwEgN9gWnh/lw5+qlN4XxQ==}
 
   magic-string@0.25.9:
     resolution: {integrity: sha512-RmF0AsMzgt25qzqqLc1+MbHmhdx0ojF2Fvs4XnOqz2ZOBXzzkEwc/dJQZCYHAn7v1jbVOjAZfK8msRn4BxO4VQ==}
@@ -14836,10 +14821,6 @@ packages:
   simple-swizzle@0.2.2:
     resolution: {integrity: sha512-JA//kQgZtbuY83m+xT+tXJkmJncGMTFT+C+g2h2R9uxkYIrE2yy9sgmcLhCnw57/WSD+Eh3J97FPEDFnbXnDUg==}
 
-  sinon@15.2.0:
-    resolution: {integrity: sha512-nPS85arNqwBXaIsFCkolHjGIkFo+Oxu9vbgmBJizLAhqe6P2o3Qmj3KCUoRkfhHtvgDhZdWD3risLHAUJ8npjw==}
-    deprecated: 16.1.1
-
   sinon@17.0.2:
     resolution: {integrity: sha512-uihLiaB9FhzesElPDFZA7hDcNABzsVHwr3YfmM9sBllVwab3l0ltGlRV1XhpNfIacNDLGD1QRZNLs5nU5+hTuA==}
     deprecated: There
@@ -15711,9 +15692,6 @@ packages:
 
   ua-parser-js@1.0.37:
     resolution: {integrity: sha512-bhTyI94tZofjo+Dn8SN6Zv8nBDvyXTymAdM3LDI/0IboIUwTu1rEhW7v2TfiVsoYWgkQ4kOVqnI8APUFbIQIFQ==}
-
-  ufo@1.5.3:
-    resolution: {integrity: sha512-Y7HYmWaFwPUmkoQCUIAYpKqkOf+SbVj/2fJJZ4RJMCfZp0rTGwRbzQD+HghfnhKOjL9E01okqz+ncJskGYfBNw==}
 
   ufo@1.5.4:
     resolution: {integrity: sha512-UsUk3byDzKd04EyoZ7U4DOlxQaD14JUKQl6/P7wiX4FNvUfm3XL246n9W5AmqwW5RSFJ27NAuM0iLscAOYUiGQ==}
@@ -16997,8 +16975,8 @@ snapshots:
       '@aws-crypto/sha1-browser': 3.0.0
       '@aws-crypto/sha256-browser': 3.0.0
       '@aws-crypto/sha256-js': 3.0.0
-      '@aws-sdk/client-sso-oidc': 3.577.0(@aws-sdk/client-sts@3.577.0)
-      '@aws-sdk/client-sts': 3.577.0
+      '@aws-sdk/client-sso-oidc': 3.577.0
+      '@aws-sdk/client-sts': 3.577.0(@aws-sdk/client-sso-oidc@3.577.0)
       '@aws-sdk/core': 3.576.0
       '@aws-sdk/credential-provider-node': 3.577.0(@aws-sdk/client-sso-oidc@3.577.0)(@aws-sdk/client-sts@3.577.0)
       '@aws-sdk/middleware-bucket-endpoint': 3.577.0
@@ -17055,11 +17033,11 @@ snapshots:
     transitivePeerDependencies:
       - aws-crt
 
-  '@aws-sdk/client-sso-oidc@3.577.0(@aws-sdk/client-sts@3.577.0)':
+  '@aws-sdk/client-sso-oidc@3.577.0':
     dependencies:
       '@aws-crypto/sha256-browser': 3.0.0
       '@aws-crypto/sha256-js': 3.0.0
-      '@aws-sdk/client-sts': 3.577.0
+      '@aws-sdk/client-sts': 3.577.0(@aws-sdk/client-sso-oidc@3.577.0)
       '@aws-sdk/core': 3.576.0
       '@aws-sdk/credential-provider-node': 3.577.0(@aws-sdk/client-sso-oidc@3.577.0)(@aws-sdk/client-sts@3.577.0)
       '@aws-sdk/middleware-host-header': 3.577.0
@@ -17098,7 +17076,6 @@ snapshots:
       '@smithy/util-utf8': 3.0.0
       tslib: 2.7.0
     transitivePeerDependencies:
-      - '@aws-sdk/client-sts'
       - aws-crt
 
   '@aws-sdk/client-sso@3.577.0':
@@ -17144,11 +17121,11 @@ snapshots:
     transitivePeerDependencies:
       - aws-crt
 
-  '@aws-sdk/client-sts@3.577.0':
+  '@aws-sdk/client-sts@3.577.0(@aws-sdk/client-sso-oidc@3.577.0)':
     dependencies:
       '@aws-crypto/sha256-browser': 3.0.0
       '@aws-crypto/sha256-js': 3.0.0
-      '@aws-sdk/client-sso-oidc': 3.577.0(@aws-sdk/client-sts@3.577.0)
+      '@aws-sdk/client-sso-oidc': 3.577.0
       '@aws-sdk/core': 3.576.0
       '@aws-sdk/credential-provider-node': 3.577.0(@aws-sdk/client-sso-oidc@3.577.0)(@aws-sdk/client-sts@3.577.0)
       '@aws-sdk/middleware-host-header': 3.577.0
@@ -17187,6 +17164,7 @@ snapshots:
       '@smithy/util-utf8': 3.0.0
       tslib: 2.7.0
     transitivePeerDependencies:
+      - '@aws-sdk/client-sso-oidc'
       - aws-crt
 
   '@aws-sdk/core@3.576.0':
@@ -17220,7 +17198,7 @@ snapshots:
 
   '@aws-sdk/credential-provider-ini@3.577.0(@aws-sdk/client-sso-oidc@3.577.0)(@aws-sdk/client-sts@3.577.0)':
     dependencies:
-      '@aws-sdk/client-sts': 3.577.0
+      '@aws-sdk/client-sts': 3.577.0(@aws-sdk/client-sso-oidc@3.577.0)
       '@aws-sdk/credential-provider-env': 3.577.0
       '@aws-sdk/credential-provider-process': 3.577.0
       '@aws-sdk/credential-provider-sso': 3.577.0(@aws-sdk/client-sso-oidc@3.577.0)
@@ -17277,7 +17255,7 @@ snapshots:
 
   '@aws-sdk/credential-provider-web-identity@3.577.0(@aws-sdk/client-sts@3.577.0)':
     dependencies:
-      '@aws-sdk/client-sts': 3.577.0
+      '@aws-sdk/client-sts': 3.577.0(@aws-sdk/client-sso-oidc@3.577.0)
       '@aws-sdk/types': 3.577.0
       '@smithy/property-provider': 3.0.0
       '@smithy/types': 3.0.0
@@ -17415,7 +17393,7 @@ snapshots:
 
   '@aws-sdk/token-providers@3.577.0(@aws-sdk/client-sso-oidc@3.577.0)':
     dependencies:
-      '@aws-sdk/client-sso-oidc': 3.577.0(@aws-sdk/client-sts@3.577.0)
+      '@aws-sdk/client-sso-oidc': 3.577.0
       '@aws-sdk/types': 3.577.0
       '@smithy/property-provider': 3.0.0
       '@smithy/shared-ini-file-loader': 3.0.0
@@ -17505,7 +17483,7 @@ snapshots:
       '@babel/traverse': 7.25.6
       '@babel/types': 7.25.2
       convert-source-map: 2.0.0
-      debug: 4.3.5
+      debug: 4.3.7
       gensync: 1.0.0-beta.2
       json5: 2.2.3
       semver: 6.3.1
@@ -17897,7 +17875,7 @@ snapshots:
       '@babel/helper-validator-identifier': 7.24.5
       chalk: 2.4.2
       js-tokens: 4.0.0
-      picocolors: 1.0.0
+      picocolors: 1.1.1
 
   '@babel/highlight@7.24.7':
     dependencies:
@@ -19500,12 +19478,12 @@ snapshots:
 
   '@babel/traverse@7.25.3':
     dependencies:
-      '@babel/code-frame': 7.24.7
+      '@babel/code-frame': 7.26.2
       '@babel/generator': 7.25.6
       '@babel/parser': 7.25.3
       '@babel/template': 7.25.0
       '@babel/types': 7.25.2
-      debug: 4.3.5
+      debug: 4.3.7
       globals: 11.12.0
     transitivePeerDependencies:
       - supports-color
@@ -19517,7 +19495,7 @@ snapshots:
       '@babel/parser': 7.25.6
       '@babel/template': 7.25.0
       '@babel/types': 7.25.6
-      debug: 4.3.5
+      debug: 4.3.7
       globals: 11.12.0
     transitivePeerDependencies:
       - supports-color
@@ -21504,7 +21482,7 @@ snapshots:
   '@grpc/grpc-js@1.9.14':
     dependencies:
       '@grpc/proto-loader': 0.7.13
-      '@types/node': 20.12.10
+      '@types/node': 20.17.6
 
   '@grpc/proto-loader@0.7.13':
     dependencies:
@@ -21594,7 +21572,7 @@ snapshots:
     dependencies:
       '@jest/fake-timers': 29.7.0
       '@jest/types': 29.6.3
-      '@types/node': 20.12.10
+      '@types/node': 20.17.6
       jest-mock: 29.7.0
 
   '@jest/expect-utils@29.7.0':
@@ -21605,7 +21583,7 @@ snapshots:
     dependencies:
       '@jest/types': 29.6.3
       '@sinonjs/fake-timers': 10.3.0
-      '@types/node': 20.12.10
+      '@types/node': 20.17.6
       jest-message-util: 29.7.0
       jest-mock: 29.7.0
       jest-util: 29.7.0
@@ -21618,7 +21596,7 @@ snapshots:
     dependencies:
       '@types/istanbul-lib-coverage': 2.0.6
       '@types/istanbul-reports': 3.0.4
-      '@types/node': 20.12.10
+      '@types/node': 20.17.6
       '@types/yargs': 15.0.19
       chalk: 4.1.2
 
@@ -21627,7 +21605,7 @@ snapshots:
       '@jest/schemas': 29.6.3
       '@types/istanbul-lib-coverage': 2.0.6
       '@types/istanbul-reports': 3.0.4
-      '@types/node': 20.12.10
+      '@types/node': 20.17.6
       '@types/yargs': 17.0.32
       chalk: 4.1.2
 
@@ -21652,7 +21630,7 @@ snapshots:
   '@jridgewell/gen-mapping@0.3.5':
     dependencies:
       '@jridgewell/set-array': 1.2.1
-      '@jridgewell/sourcemap-codec': 1.4.15
+      '@jridgewell/sourcemap-codec': 1.5.0
       '@jridgewell/trace-mapping': 0.3.25
 
   '@jridgewell/resolve-uri@3.1.2': {}
@@ -21671,7 +21649,7 @@ snapshots:
   '@jridgewell/trace-mapping@0.3.25':
     dependencies:
       '@jridgewell/resolve-uri': 3.1.2
-      '@jridgewell/sourcemap-codec': 1.4.15
+      '@jridgewell/sourcemap-codec': 1.5.0
 
   '@jridgewell/trace-mapping@0.3.9':
     dependencies:
@@ -22577,9 +22555,15 @@ snapshots:
 
   '@magic-ext/cosmos@12.4.0': {}
 
-  '@magic-ext/oauth@11.4.0':
+  '@magic-ext/farcaster@0.16.0': {}
+
+  '@magic-ext/oauth2@9.16.0':
     dependencies:
-      '@magic-sdk/types': 15.8.0
+      crypto-js: 3.3.0
+
+  '@magic-ext/oauth@22.17.0':
+    dependencies:
+      crypto-js: 3.3.0
 
   '@magic-sdk/admin@0.1.0-beta.10':
     dependencies:
@@ -22601,21 +22585,21 @@ snapshots:
       - encoding
       - utf-8-validate
 
-  '@magic-sdk/commons@13.4.0(@magic-sdk/provider@17.4.0(localforage@1.10.0))(@magic-sdk/types@15.8.0)':
+  '@magic-sdk/commons@24.16.0(@magic-sdk/provider@28.16.0(localforage@1.10.0))(@magic-sdk/types@24.14.0)':
     dependencies:
-      '@magic-sdk/provider': 17.4.0(localforage@1.10.0)
-      '@magic-sdk/types': 15.8.0
+      '@magic-sdk/provider': 28.16.0(localforage@1.10.0)
+      '@magic-sdk/types': 24.14.0
 
-  '@magic-sdk/provider@17.4.0(localforage@1.10.0)':
+  '@magic-sdk/provider@28.16.0(localforage@1.10.0)':
     dependencies:
-      '@magic-sdk/types': 15.8.0
+      '@magic-sdk/types': 24.14.0
       eventemitter3: 4.0.7
       localforage: 1.10.0
       web3-core: 1.5.2
     transitivePeerDependencies:
       - supports-color
 
-  '@magic-sdk/types@15.8.0': {}
+  '@magic-sdk/types@24.14.0': {}
 
   '@mdxeditor/gurx@1.1.3':
     dependencies:
@@ -22733,7 +22717,7 @@ snapshots:
       bufferutil: 4.0.8
       cross-fetch: 4.0.0
       date-fns: 2.30.0
-      debug: 4.3.5
+      debug: 4.3.7
       eciesjs: 0.3.20
       eventemitter2: 6.4.9
       readable-stream: 3.6.2
@@ -22786,7 +22770,7 @@ snapshots:
       '@types/dom-screen-wake-lock': 1.0.3
       bowser: 2.11.0
       cross-fetch: 4.0.0
-      debug: 4.3.5
+      debug: 4.3.7
       eciesjs: 0.3.20
       eth-rpc-errors: 4.0.3
       eventemitter2: 6.4.9
@@ -22854,7 +22838,7 @@ snapshots:
     dependencies:
       '@ethereumjs/tx': 4.2.0
       '@types/debug': 4.1.12
-      debug: 4.3.5
+      debug: 4.3.7
       semver: 7.6.0
       superstruct: 1.0.4
     transitivePeerDependencies:
@@ -22867,7 +22851,7 @@ snapshots:
       '@noble/hashes': 1.5.0
       '@scure/base': 1.1.6
       '@types/debug': 4.1.12
-      debug: 4.3.5
+      debug: 4.3.7
       pony-cause: 2.1.11
       semver: 7.6.0
       uuid: 9.0.1
@@ -26436,7 +26420,7 @@ snapshots:
 
   '@types/better-sqlite3@7.6.11':
     dependencies:
-      '@types/node': 20.12.10
+      '@types/node': 20.17.6
 
   '@types/bluebird@3.5.42': {}
 
@@ -26474,11 +26458,11 @@ snapshots:
 
   '@types/concat-stream@1.6.1':
     dependencies:
-      '@types/node': 20.12.10
+      '@types/node': 20.17.6
 
   '@types/connect@3.4.38':
     dependencies:
-      '@types/node': 20.12.10
+      '@types/node': 20.17.6
 
   '@types/cookie-parser@1.4.7':
     dependencies:
@@ -26498,7 +26482,7 @@ snapshots:
 
   '@types/dns-packet@5.6.5':
     dependencies:
-      '@types/node': 20.12.10
+      '@types/node': 20.17.6
 
   '@types/dom-screen-wake-lock@1.0.3': {}
 
@@ -26536,7 +26520,7 @@ snapshots:
 
   '@types/form-data@0.0.33':
     dependencies:
-      '@types/node': 20.12.10
+      '@types/node': 20.17.6
 
   '@types/hast@3.0.4':
     dependencies:
@@ -26603,7 +26587,7 @@ snapshots:
 
   '@types/node-forge@1.3.11':
     dependencies:
-      '@types/node': 20.12.10
+      '@types/node': 20.17.6
 
   '@types/node@10.12.18': {}
 
@@ -26654,18 +26638,18 @@ snapshots:
 
   '@types/pbkdf2@3.1.2':
     dependencies:
-      '@types/node': 20.12.10
+      '@types/node': 20.17.6
 
   '@types/pg-cursor@2.7.2':
     dependencies:
-      '@types/node': 20.12.10
+      '@types/node': 20.17.6
       '@types/pg': 8.11.10
 
   '@types/pg-format@1.0.5': {}
 
   '@types/pg@8.11.10':
     dependencies:
-      '@types/node': 20.12.10
+      '@types/node': 20.17.6
       pg-protocol: 1.7.0
       pg-types: 4.0.2
 
@@ -26743,7 +26727,7 @@ snapshots:
   '@types/request@2.48.12':
     dependencies:
       '@types/caseless': 0.12.5
-      '@types/node': 20.12.10
+      '@types/node': 20.17.6
       '@types/tough-cookie': 4.0.5
       form-data: 2.5.1
 
@@ -26751,7 +26735,7 @@ snapshots:
 
   '@types/secp256k1@4.0.6':
     dependencies:
-      '@types/node': 20.12.10
+      '@types/node': 20.17.6
 
   '@types/semver@7.5.8': {}
 
@@ -26806,7 +26790,7 @@ snapshots:
 
   '@types/ws@7.4.7':
     dependencies:
-      '@types/node': 20.12.10
+      '@types/node': 20.17.6
 
   '@types/ws@8.5.12':
     dependencies:
@@ -26814,7 +26798,7 @@ snapshots:
 
   '@types/ws@8.5.3':
     dependencies:
-      '@types/node': 20.12.10
+      '@types/node': 20.17.6
 
   '@types/yargs-parser@21.0.3': {}
 
@@ -26885,7 +26869,7 @@ snapshots:
     dependencies:
       '@typescript-eslint/typescript-estree': 8.3.0(typescript@5.4.5)
       '@typescript-eslint/utils': 8.3.0(eslint@8.57.0)(typescript@5.4.5)
-      debug: 4.3.5
+      debug: 4.3.7
       ts-api-utils: 1.3.0(typescript@5.4.5)
     optionalDependencies:
       typescript: 5.4.5
@@ -26916,7 +26900,7 @@ snapshots:
     dependencies:
       '@typescript-eslint/types': 8.3.0
       '@typescript-eslint/visitor-keys': 8.3.0
-      debug: 4.3.5
+      debug: 4.3.7
       fast-glob: 3.3.2
       is-glob: 4.0.3
       minimatch: 9.0.4
@@ -28229,7 +28213,7 @@ snapshots:
 
   acorn-walk@8.3.4:
     dependencies:
-      acorn: 8.12.1
+      acorn: 8.14.0
 
   acorn@8.11.3: {}
 
@@ -28245,7 +28229,7 @@ snapshots:
 
   agent-base@6.0.2:
     dependencies:
-      debug: 4.3.5
+      debug: 4.3.7
     transitivePeerDependencies:
       - supports-color
 
@@ -28849,7 +28833,6 @@ snapshots:
   braces@3.0.3:
     dependencies:
       fill-range: 7.1.1
-    optional: true
 
   brorand@1.1.0: {}
 
@@ -29045,7 +29028,7 @@ snapshots:
 
   canvas-renderer@2.2.1:
     dependencies:
-      '@types/node': 20.12.10
+      '@types/node': 20.17.6
 
   capnp-ts@0.7.0:
     dependencies:
@@ -29175,7 +29158,7 @@ snapshots:
 
   chrome-launcher@0.15.2:
     dependencies:
-      '@types/node': 20.12.10
+      '@types/node': 20.17.6
       escape-string-regexp: 4.0.0
       is-wsl: 2.2.0
       lighthouse-logger: 1.4.2
@@ -29718,6 +29701,8 @@ snapshots:
       public-encrypt: 4.0.3
       randombytes: 2.1.0
       randomfill: 1.0.4
+
+  crypto-js@3.3.0: {}
 
   crypto-random-string@4.0.0:
     dependencies:
@@ -30305,7 +30290,7 @@ snapshots:
   engine.io-client@6.5.4(bufferutil@4.0.8)(utf-8-validate@5.0.10):
     dependencies:
       '@socket.io/component-emitter': 3.1.2
-      debug: 4.3.5
+      debug: 4.3.7
       engine.io-parser: 5.2.3
       ws: 8.17.1(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       xmlhttprequest-ssl: 2.0.0
@@ -30883,7 +30868,7 @@ snapshots:
   eth-lib@0.2.8:
     dependencies:
       bn.js: 4.12.0
-      elliptic: 6.5.5
+      elliptic: 6.5.7
       xhr-request-promise: 0.1.3
 
   eth-query@2.1.2:
@@ -31330,7 +31315,7 @@ snapshots:
       '@nodelib/fs.walk': 1.2.8
       glob-parent: 5.1.2
       merge2: 1.4.1
-      micromatch: 4.0.5
+      micromatch: 4.0.8
 
   fast-json-stable-stringify@2.1.0: {}
 
@@ -31433,7 +31418,6 @@ snapshots:
   fill-range@7.1.1:
     dependencies:
       to-regex-range: 5.0.1
-    optional: true
 
   filter-obj@1.1.0: {}
 
@@ -32829,7 +32813,7 @@ snapshots:
       '@jest/environment': 29.7.0
       '@jest/fake-timers': 29.7.0
       '@jest/types': 29.6.3
-      '@types/node': 20.12.10
+      '@types/node': 20.17.6
       jest-mock: 29.7.0
       jest-util: 29.7.0
 
@@ -32844,12 +32828,12 @@ snapshots:
 
   jest-message-util@29.7.0:
     dependencies:
-      '@babel/code-frame': 7.24.7
+      '@babel/code-frame': 7.26.2
       '@jest/types': 29.6.3
       '@types/stack-utils': 2.0.3
       chalk: 4.1.2
       graceful-fs: 4.2.11
-      micromatch: 4.0.5
+      micromatch: 4.0.8
       pretty-format: 29.7.0
       slash: 3.0.0
       stack-utils: 2.0.6
@@ -32857,13 +32841,13 @@ snapshots:
   jest-mock@29.7.0:
     dependencies:
       '@jest/types': 29.6.3
-      '@types/node': 20.12.10
+      '@types/node': 20.17.6
       jest-util: 29.7.0
 
   jest-util@29.7.0:
     dependencies:
       '@jest/types': 29.6.3
-      '@types/node': 20.12.10
+      '@types/node': 20.17.6
       chalk: 4.1.2
       ci-info: 3.9.0
       graceful-fs: 4.2.11
@@ -32880,7 +32864,7 @@ snapshots:
 
   jest-worker@29.7.0:
     dependencies:
-      '@types/node': 20.12.10
+      '@types/node': 20.17.6
       jest-util: 29.7.0
       merge-stream: 2.0.0
       supports-color: 8.1.1
@@ -33469,11 +33453,11 @@ snapshots:
 
   magic-bytes.js@1.10.0: {}
 
-  magic-sdk@17.4.0:
+  magic-sdk@28.17.0:
     dependencies:
-      '@magic-sdk/commons': 13.4.0(@magic-sdk/provider@17.4.0(localforage@1.10.0))(@magic-sdk/types@15.8.0)
-      '@magic-sdk/provider': 17.4.0(localforage@1.10.0)
-      '@magic-sdk/types': 15.8.0
+      '@magic-sdk/commons': 24.16.0(@magic-sdk/provider@28.16.0(localforage@1.10.0))(@magic-sdk/types@24.14.0)
+      '@magic-sdk/provider': 28.16.0(localforage@1.10.0)
+      '@magic-sdk/types': 24.14.0
       localforage: 1.10.0
     transitivePeerDependencies:
       - supports-color
@@ -34010,7 +33994,7 @@ snapshots:
 
   metro@0.80.10(bufferutil@4.0.8)(utf-8-validate@5.0.10):
     dependencies:
-      '@babel/code-frame': 7.24.7
+      '@babel/code-frame': 7.26.2
       '@babel/core': 7.24.5
       '@babel/generator': 7.25.6
       '@babel/parser': 7.25.3
@@ -34372,7 +34356,6 @@ snapshots:
     dependencies:
       braces: 3.0.3
       picomatch: 2.3.1
-    optional: true
 
   micromodal@0.4.10: {}
 
@@ -34412,7 +34395,7 @@ snapshots:
   miniflare@3.20241018.0(bufferutil@4.0.8)(utf-8-validate@5.0.10):
     dependencies:
       '@cspotcode/source-map-support': 0.8.1
-      acorn: 8.12.1
+      acorn: 8.14.0
       acorn-walk: 8.3.4
       capnp-ts: 0.7.0
       exit-hook: 2.2.1
@@ -34502,10 +34485,10 @@ snapshots:
 
   mlly@1.7.0:
     dependencies:
-      acorn: 8.11.3
+      acorn: 8.14.0
       pathe: 1.1.2
       pkg-types: 1.1.0
-      ufo: 1.5.3
+      ufo: 1.5.4
 
   mobile-detect@1.4.5: {}
 
@@ -34671,7 +34654,7 @@ snapshots:
 
   nock@13.5.4:
     dependencies:
-      debug: 4.3.5
+      debug: 4.3.7
       json-stringify-safe: 5.0.1
       propagate: 2.0.1
     transitivePeerDependencies:
@@ -37171,15 +37154,6 @@ snapshots:
     dependencies:
       is-arrayish: 0.3.2
 
-  sinon@15.2.0:
-    dependencies:
-      '@sinonjs/commons': 3.0.1
-      '@sinonjs/fake-timers': 10.3.0
-      '@sinonjs/samsam': 8.0.0
-      diff: 5.2.0
-      nise: 5.1.9
-      supports-color: 7.2.0
-
   sinon@17.0.2:
     dependencies:
       '@sinonjs/commons': 3.0.1
@@ -37248,7 +37222,7 @@ snapshots:
   socket.io-client@4.7.5(bufferutil@4.0.8)(utf-8-validate@5.0.10):
     dependencies:
       '@socket.io/component-emitter': 3.1.2
-      debug: 4.3.5
+      debug: 4.3.7
       engine.io-client: 6.5.4(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       socket.io-parser: 4.2.4
     transitivePeerDependencies:
@@ -37259,7 +37233,7 @@ snapshots:
   socket.io-parser@4.2.4:
     dependencies:
       '@socket.io/component-emitter': 3.1.2
-      debug: 4.3.5
+      debug: 4.3.7
     transitivePeerDependencies:
       - supports-color
 
@@ -37830,7 +37804,7 @@ snapshots:
   terser@5.31.0:
     dependencies:
       '@jridgewell/source-map': 0.3.6
-      acorn: 8.12.1
+      acorn: 8.14.0
       commander: 2.20.3
       source-map-support: 0.5.21
 
@@ -38188,8 +38162,6 @@ snapshots:
 
   ua-parser-js@1.0.37: {}
 
-  ufo@1.5.3: {}
-
   ufo@1.5.4: {}
 
   uid-safe@2.1.5:
@@ -38362,7 +38334,7 @@ snapshots:
       mri: 1.2.0
       node-fetch-native: 1.6.4
       ofetch: 1.3.4
-      ufo: 1.5.3
+      ufo: 1.5.4
     optionalDependencies:
       idb-keyval: 6.2.1
     transitivePeerDependencies:
@@ -39101,7 +39073,7 @@ snapshots:
     dependencies:
       eventemitter3: 4.0.4
       web3-core-helpers: 1.5.2
-      websocket: 1.0.34
+      websocket: 1.0.35
     transitivePeerDependencies:
       - supports-color
 
@@ -39261,6 +39233,7 @@ snapshots:
       yaeti: 0.0.6
     transitivePeerDependencies:
       - supports-color
+    optional: true
 
   websocket@1.0.35:
     dependencies:

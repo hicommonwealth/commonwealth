@@ -10,37 +10,6 @@
 
   table {
     width: 100%;
-
-    .table-cell {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-      flex-wrap: wrap;
-
-      .user-info {
-        text-decoration: none;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        color: black;
-
-        div {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-        }
-
-        :hover,
-        :focus,
-        :visited {
-          text-decoration: underline;
-        }
-      }
-
-      &.text-right {
-        display: block;
-        text-align: right;
-      }
-    }
+    @include table-cell;
   }
 }

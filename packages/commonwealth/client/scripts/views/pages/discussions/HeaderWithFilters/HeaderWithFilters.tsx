@@ -4,7 +4,7 @@ import useBrowserWindow from 'hooks/useBrowserWindow';
 import moment from 'moment/moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useRef, useState } from 'react';
-import { matchRoutes, useLocation } from 'react-router-dom';
+import { matchRoutes, useLocation, useSearchParams } from 'react-router-dom';
 import app from 'state';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { useFetchTopicsQuery } from 'state/api/topics';
@@ -92,6 +92,12 @@ export const HeaderWithFilters = ({
   });
 
   const user = useUserStore();
+
+  const [searchParams] = useSearchParams();
+  const contestAddress = searchParams.get('contest');
+
+  const createButtonText =
+    activeContests.length || contestAddress ? 'Create' : 'Create thread';
 
   const onFilterResize = () => {
     if (filterRowRef.current) {
@@ -267,7 +273,7 @@ export const HeaderWithFilters = ({
             <CWButton
               buttonType="primary"
               buttonHeight="sm"
-              label="Create thread"
+              label={createButtonText}
               iconLeft="plus"
               onClick={() => {
                 navigate(
