@@ -8,6 +8,7 @@ import {
 } from 'react-router-dom';
 import { fetchCachedCustomDomain } from 'state/api/configuration';
 import { withLayout } from 'views/Layout';
+import { PageNotFound } from 'views/pages/404';
 import CommonDomainRoutes from './CommonDomainRoutes';
 import GeneralRoutes from './GeneralRoutes';
 
@@ -35,11 +36,7 @@ const Router = () => {
       ...(isCustomDomain
         ? CustomDomainRoutes(flags)
         : CommonDomainRoutes(flags)),
-      <Route
-        key="routes"
-        path="*"
-        element={withLayout(<div>FIXME not found1</div>, {})}
-      />,
+      <Route key="routes" path="*" element={withLayout(PageNotFound, {})} />,
     ]),
   );
 };

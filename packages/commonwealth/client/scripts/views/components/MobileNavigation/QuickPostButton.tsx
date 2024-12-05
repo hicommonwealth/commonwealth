@@ -1,18 +1,21 @@
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
-import app from 'state';
 import { FloatingActionButton } from 'views/components/FloatingActionButton';
+import { useQuickPostButtonActivated } from 'views/components/MobileNavigation/useQuickPostButtonActivated';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 
-export const CreateFab = () => {
+export const QuickPostButton = () => {
   const navigate = useCommonNavigate();
-  const scopedPage = app.activeChainId();
+
+  const activated = useQuickPostButtonActivated();
 
   const handleFab = () => {
-    // FIXME: if this is a scopedPage.. this will work..  otherwise we ahve to
-    // pick a community first.
     navigate('/new/discussion');
   };
+
+  if (!activated) {
+    return null;
+  }
 
   return (
     <FloatingActionButton onClick={handleFab}>

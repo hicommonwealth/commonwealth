@@ -337,13 +337,6 @@ const CommonDomainRoutes = ({
     })}
   />,
   <Route
-    key="/new/discussion"
-    path="/new/discussion"
-    element={withLayout(NewThreadPage, {
-      scoped: true,
-    })}
-  />,
-  <Route
     key="/:scope/new/discussion"
     path="/:scope/new/discussion"
     element={withLayout(NewThreadPage, {

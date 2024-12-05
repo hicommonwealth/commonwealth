@@ -9,7 +9,7 @@ import CreateContentDrawer from './CreateContentDrawer';
 import NavigationButton, { NavigationButtonProps } from './NavigationButton';
 
 import { useFlag } from 'hooks/useFlag';
-import { CreateFab } from 'views/components/MobileNavigation/CreateFab';
+import { QuickPostButton } from 'views/components/MobileNavigation/QuickPostButton';
 import './MobileNavigation.scss';
 
 const MobileNavigation = () => {
@@ -60,7 +60,7 @@ const MobileNavigation = () => {
 
   return (
     <>
-      {newMobileNav && <CreateFab />}
+      {newMobileNav && <QuickPostButton />}
       <div className="MobileNavigation">
         {navigationConfig.map(({ type, selected, onClick }) => (
           <NavigationButton
