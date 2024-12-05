@@ -1,5 +1,6 @@
-import { disposeAdapter, EventNames } from '@hicommonwealth/core';
+import { disposeAdapter } from '@hicommonwealth/core';
 import { models } from '@hicommonwealth/model';
+import { EventNames } from '@hicommonwealth/schemas';
 import { delay } from '@hicommonwealth/shared';
 import { expect } from 'chai';
 import { afterEach, describe, test } from 'vitest';

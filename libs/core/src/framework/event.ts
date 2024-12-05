@@ -1,5 +1,5 @@
+import { Events } from '@hicommonwealth/schemas';
 import { ZodError, ZodSchema, ZodUndefined, z } from 'zod';
-import { Events } from '../integration/events';
 import {
   InvalidInput,
   type EventContext,

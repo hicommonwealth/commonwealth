@@ -1,4 +1,5 @@
-import { Events, Projection, events, handleEvent } from '@hicommonwealth/core';
+import { Projection, handleEvent } from '@hicommonwealth/core';
+import { Events, events } from '@hicommonwealth/schemas';
 import { Op } from 'sequelize';
 import { ZodUndefined } from 'zod';
 import { models } from '../../src/database';

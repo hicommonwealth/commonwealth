@@ -1,4 +1,5 @@
-import { blobStorage, EventPairs, logger } from '@hicommonwealth/core';
+import { blobStorage, logger } from '@hicommonwealth/core';
+import { EventPairs } from '@hicommonwealth/schemas';
 import {
   getThreadUrl,
   safeTruncateBody,

@@ -1,5 +1,6 @@
-import { dispose, EventNames, logger } from '@hicommonwealth/core';
+import { dispose, logger } from '@hicommonwealth/core';
 import { emitEvent, models } from '@hicommonwealth/model';
+import { EventNames } from '@hicommonwealth/schemas';
 import { SnapshotEventType } from '@hicommonwealth/shared';
 
 const log = logger(import.meta);
