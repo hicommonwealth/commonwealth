@@ -65,9 +65,12 @@ const TopicPermissionToggleGroupSubForm = ({
     onChange(updatedData);
   };
 
-  const toggle = (topics: Topic[], permissionLabel: PermissionLabelType) => {
+  const toggle = (
+    selectedTopics: Topic[],
+    permissionLabel: PermissionLabelType,
+  ) => {
     const permissionsToCheck = togglePermissionMap[permissionLabel] || [];
-    const value = topics.every((topic) =>
+    const value = selectedTopics.every((topic) =>
       permissionsToCheck.every((perm) =>
         PermissionFormData.find(
           (item) => item.topic === topic,
