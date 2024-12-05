@@ -94,6 +94,7 @@ export enum ChainBase {
   Ethereum = 'ethereum',
   NEAR = 'near',
   Solana = 'solana',
+  Skale = 'skale',
 }
 
 export enum ChainType {

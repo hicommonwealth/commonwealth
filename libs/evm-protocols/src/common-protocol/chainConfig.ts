@@ -10,6 +10,7 @@ export enum ValidChains {
   Arbitrum = 42161,
   BSC = 56,
   SKALE_TEST = 974399131,
+  SKALE = 1564830818,
 }
 
 export const STAKE_ID = 2;
