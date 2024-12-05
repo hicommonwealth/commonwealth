@@ -616,14 +616,6 @@ const CommonDomainRoutes = ({
   />,
   // LEGACY REDIRECTS END
 
-  <Route
-    key="/:scope/new/discussion"
-    path="/:scope/new/discussion"
-    element={withLayout(CommunityNotFoundPage, {
-      scoped: true,
-    })}
-  />,
-
   // Community not found page - This should be at the end
   <Route
     key="/:scope/*"
