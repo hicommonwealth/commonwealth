@@ -9,8 +9,8 @@ import { CWButton } from '../../../component_kit/new_designs/CWButton';
 import { CWSelectList } from '../../../component_kit/new_designs/CWSelectList';
 import { CWTextInput } from '../../../component_kit/new_designs/CWTextInput';
 import { FilterOptions } from '../types';
+import MyTokens from './MyTokens';
 import NoTransactionHistory from './NoTransactionHistory';
-import Stakes from './Stakes';
 import TransactionsHistory from './TransactionHistory';
 import './TransactionsTab.scss';
 import useTransactionHistory from './useTransactionHistory';
@@ -21,7 +21,7 @@ const BASE_ADDRESS_FILTER = {
 };
 
 type TransactionsTabProps = {
-  transactionsType: 'stake' | 'history';
+  transactionsType: 'tokens' | 'history';
 };
 
 const TransactionsTab = ({ transactionsType }: TransactionsTabProps) => {
@@ -107,7 +107,9 @@ const TransactionsTab = ({ transactionsType }: TransactionsTabProps) => {
         <NoTransactionHistory />
       ) : (
         <>
-          {transactionsType === 'stake' && <Stakes transactions={data || []} />}
+          {transactionsType === 'tokens' && (
+            <MyTokens transactions={data || []} />
+          )}
           {transactionsType === 'history' && (
             <TransactionsHistory transactions={data || []} />
           )}

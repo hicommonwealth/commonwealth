@@ -15,7 +15,7 @@ export enum ProfileActivityType {
   Communities,
   Threads,
   Referrals,
-  MyStake,
+  MyTokens,
 }
 
 type ProfileActivityContentProps = {
@@ -59,8 +59,8 @@ const ProfileActivityContent = ({
     return <ReferralsTab isOwner={isOwner} />;
   }
 
-  if (option === ProfileActivityType.MyStake) {
-    return <TransactionsTab transactionsType="stake" />;
+  if (option === ProfileActivityType.MyTokens) {
+    return <TransactionsTab transactionsType="tokens" />;
   }
 
   const allActivities: Array<CommentWithAssociatedThread | Thread> = [

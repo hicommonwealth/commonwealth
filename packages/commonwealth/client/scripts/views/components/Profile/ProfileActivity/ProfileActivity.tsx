@@ -58,9 +58,9 @@ const ProfileActivity = ({
           <CWTab
             label="My Tokens"
             onClick={() => {
-              setSelectedActivity(ProfileActivityType.MyStake);
+              setSelectedActivity(ProfileActivityType.MyTokens);
             }}
-            isSelected={selectedActivity === ProfileActivityType.MyStake}
+            isSelected={selectedActivity === ProfileActivityType.MyTokens}
           />
           {referralsEnabled && (
             <CWTab
