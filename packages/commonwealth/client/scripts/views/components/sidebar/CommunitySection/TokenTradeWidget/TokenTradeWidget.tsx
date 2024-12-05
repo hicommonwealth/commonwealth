@@ -9,7 +9,7 @@ import TradeTokenModal from 'views/modals/TradeTokenModel';
 import {
   TokenWithCommunity,
   TradingMode,
-} from 'views/modals/TradeTokenModel/TradeTokenForm';
+} from 'views/modals/TradeTokenModel/CommonTradeModal/TradeTokenForm';
 import { z } from 'zod';
 import { CWDivider } from '../../../component_kit/cw_divider';
 import { CWIconButton } from '../../../component_kit/cw_icon_button';
