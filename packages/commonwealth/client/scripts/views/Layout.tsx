@@ -11,6 +11,7 @@ import {
 } from 'state/api/configuration';
 import useErrorStore from 'state/ui/error';
 import useUserStore from 'state/ui/user';
+import { PageNotFound } from 'views/pages/404';
 import ErrorPage from 'views/pages/error';
 import { z } from 'zod';
 import useAppStatus from '../hooks/useAppStatus';
@@ -174,12 +175,11 @@ const LayoutComponent = ({
     if (shouldShowLoadingState) return Bobber;
 
     // If attempting to navigate to a community not fetched by the /status query, return a 404
-
     const pageNotFound =
       providedCommunityScope && !community && !isVerifyingCommunityExistance;
     return (
       <Suspense fallback={Bobber}>
-        <Component {...routerParams} />
+        {pageNotFound ? <PageNotFound /> : <Component {...routerParams} />}
       </Suspense>
     );
   };
