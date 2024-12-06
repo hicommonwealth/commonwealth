@@ -23,7 +23,11 @@ type AddressProps = {
 type AddressDetailsProps = {
   profile: NewProfile;
   addressInfo: AddressInfo;
-  toggleRemoveModal: (val: boolean, address: AddressInfo) => void;
+  toggleRemoveModal: (
+    val: boolean,
+    address: AddressInfo,
+    isBulkDelete: boolean,
+  ) => void;
 };
 
 type LinkedAddressesProps = {
@@ -67,7 +71,11 @@ const AddressDetails = (props: AddressDetailsProps) => {
         menuItems={[
           {
             label: `Disconnect ${formatAddressShort(address)}`,
-            onClick: () => toggleRemoveModal(true, addressInfo),
+            onClick: () => toggleRemoveModal(true, addressInfo, false),
+          },
+          {
+            label: 'Delete All Addresses',
+            onClick: () => toggleRemoveModal(true, addressInfo, true),
           },
         ]}
         renderTrigger={(onclick) => (
@@ -98,6 +106,7 @@ export const LinkedAddresses = (props: LinkedAddressesProps) => {
   const [currentAddress, setCurrentAddress] = useState<AddressInfo | null>(
     null,
   );
+  const [isBulkDelete, setIsBulkDelete] = useState(false);
 
   const { profile, addresses, refreshProfiles } = props;
 
@@ -123,9 +132,11 @@ export const LinkedAddresses = (props: LinkedAddressesProps) => {
                 toggleRemoveModal={(
                   val: boolean,
                   selectedAddress: AddressInfo,
+                  isBulkDelete: boolean = false,
                 ) => {
                   setIsRemoveModalOpen(val);
                   setCurrentAddress(selectedAddress);
+                  setIsBulkDelete(isBulkDelete);
                 }}
               />
             );
@@ -155,6 +166,7 @@ export const LinkedAddresses = (props: LinkedAddressesProps) => {
                 setIsRemoveModalOpen(false);
                 refreshProfiles(currentAddress);
               }}
+              isBulkDelete={isBulkDelete}
             />
           )
         }
