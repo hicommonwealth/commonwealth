@@ -1,3 +1,4 @@
+import { PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import React, { useState } from 'react';
 import { slugifyPreserveDashes } from 'shared/utils';
@@ -76,8 +77,8 @@ const UpdateCommunityIdTask = () => {
     <div className="TaskGroup">
       <CWText type="h4">Update Community Id</CWText>
       <CWText type="caption">
-        Updates a communities url e.g. commonwealth.im/cmn-protocol to
-        commonwealth.im/common. This does not update the Community name.
+        Updates a communities url e.g. ${PRODUCTION_DOMAIN}/cmn-protocol to $
+        {PRODUCTION_DOMAIN}/common. This does not update the Community name.
         WARNING: This will set up a redirect from the old community to the new
         community. The old id cannot be used by any other community.
       </CWText>

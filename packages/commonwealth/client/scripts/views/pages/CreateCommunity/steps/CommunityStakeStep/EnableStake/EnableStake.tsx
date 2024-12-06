@@ -11,6 +11,7 @@ import { EnableStakeProps, StakeData } from '../types';
 import useNamespaceFactory from '../useNamespaceFactory';
 import { validationSchema } from './validations';
 
+import { DOCS_SUBDOMAIN } from '@hicommonwealth/shared';
 import './EnableStake.scss';
 
 const EnableStake = ({
@@ -51,6 +52,8 @@ const EnableStake = ({
       symbol: communityStakeData.symbol,
     };
   };
+
+  const docLink = `https://${DOCS_SUBDOMAIN}/commonwealth/community-overview/community-stake`;
 
   return (
     <div className="EnableStake">
@@ -114,11 +117,7 @@ const EnableStake = ({
         {!onlyNamespace && (
           <CWText className="info" fontWeight="medium">
             Not sure?
-            <a
-              target="_blank"
-              rel="noopener noreferrer"
-              href={`https://${DOCS_SUBDOMAIN}/commonwealth/community-overview/community-stake`}
-            >
+            <a target="_blank" rel="noopener noreferrer" href={docLink}>
               Learn more about community stake
             </a>
           </CWText>
