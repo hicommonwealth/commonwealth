@@ -47,6 +47,7 @@ import {
   House,
   Image,
   ImageSquare,
+  Kanban,
   Lightbulb,
   Link,
   LinkBreak,
@@ -296,6 +297,7 @@ export const iconLookup = {
   copySimple: withPhosphorIcon(CopySimple),
   viewAll: withPhosphorIcon(Rows),
   viewOverView: withPhosphorIcon(CirclesFour),
+  kanban: withPhosphorIcon(Kanban),
 };
 
 export const customIconLookup = {

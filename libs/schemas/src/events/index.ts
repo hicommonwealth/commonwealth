@@ -1,16 +1,18 @@
 import { z } from 'zod';
+import * as chainEvents from './chain-event.schemas';
 import * as events from './events.schemas';
 
 // TODO: All usages of this should be replaced by the EventNames enum - exporting all by default causes issues
 //  when non-event schemas are added to the schema i.e. this is an implicit export and EventNames makes it explicit
 export type Events = keyof typeof events;
-export { events };
+export { chainEvents, events };
 
 export enum EventNames {
   ChainEventCreated = 'ChainEventCreated',
   CommentCreated = 'CommentCreated',
   CommentUpvoted = 'CommentUpvoted',
   CommunityCreated = 'CommunityCreated',
+  CommunityJoined = 'CommunityJoined',
   DiscordMessageCreated = 'DiscordMessageCreated',
   GroupCreated = 'GroupCreated',
   SnapshotProposalCreated = 'SnapshotProposalCreated',
@@ -48,6 +50,10 @@ export type EventPairs =
   | {
       event_name: EventNames.CommunityCreated;
       event_payload: z.infer<typeof events.CommunityCreated>;
+    }
+  | {
+      event_name: EventNames.CommunityJoined;
+      event_payload: z.infer<typeof events.CommunityJoined>;
     }
   | {
       event_name: EventNames.CommentCreated;

@@ -1,4 +1,4 @@
-import { EventNames, InvalidInput, type Command } from '@hicommonwealth/core';
+import { InvalidInput, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { DEFAULT_NAME } from '@hicommonwealth/shared';
 import { models } from '../database';
@@ -86,7 +86,7 @@ export function UpdateUser(): Command<typeof schemas.UpdateUser> {
                   models.Outbox,
                   [
                     {
-                      event_name: EventNames.SignUpFlowCompleted,
+                      event_name: schemas.EventNames.SignUpFlowCompleted,
                       event_payload: { user_id: id, referral_link },
                     },
                   ],
