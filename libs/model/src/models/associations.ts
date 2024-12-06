@@ -73,6 +73,9 @@ export const buildAssociations = (db: DB) => {
     .withMany(db.Topic, {
       onUpdate: 'CASCADE',
       onDelete: 'SET NULL',
+    })
+    .withMany(db.PinnedToken, {
+      onDelete: 'CASCADE',
     });
 
   db.ContractAbi.withMany(db.EvmEventSource, { foreignKey: 'abi_id' });
@@ -110,7 +113,10 @@ export const buildAssociations = (db: DB) => {
       as: 'selectedCommunity',
     })
     .withMany(db.Quest, { onUpdate: 'CASCADE', onDelete: 'CASCADE' })
-    .withMany(db.ContestManager, { onUpdate: 'CASCADE', onDelete: 'CASCADE' });
+    .withMany(db.ContestManager, { onUpdate: 'CASCADE', onDelete: 'CASCADE' })
+    .withMany(db.PinnedToken, {
+      onDelete: 'CASCADE',
+    });
 
   db.Tags.withMany(db.ProfileTags, {
     foreignKey: 'tag_id',

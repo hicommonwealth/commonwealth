@@ -25,6 +25,7 @@ import LastProcessedEvmBlock from './lastProcessedEvmBlock';
 import LaunchpadTrade from './launchpad_trade';
 import Membership from './membership';
 import Outbox from './outbox';
+import PinnedToken from './pinned_token';
 import Poll from './poll';
 import ProfileTags from './profile_tags';
 import { Quest, QuestAction, QuestActionMeta } from './quest';
@@ -71,6 +72,7 @@ export const Factories = {
   LaunchpadTrade,
   Membership,
   Outbox,
+  PinnedToken,
   Poll,
   ProfileTags,
   Quest,

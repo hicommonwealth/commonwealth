@@ -8,17 +8,18 @@ module.exports = {
         transaction,
       });
       await queryInterface.createTable('PinnedTokens', {
-        contract_address: {
-          type: Sequelize.STRING,
-          primaryKey: true,
-        },
         community_id: {
           type: Sequelize.STRING,
           primaryKey: true,
           references: {
             model: 'Communities',
             key: 'id',
+            onDelete: 'CASCADE',
           },
+        },
+        contract_address: {
+          type: Sequelize.STRING,
+          primaryKey: true,
         },
         chain_node_id: {
           type: Sequelize.INTEGER,
@@ -26,7 +27,16 @@ module.exports = {
           references: {
             model: 'ChainNodes',
             key: 'id',
+            onDelete: 'CASCADE',
           },
+        },
+        created_at: {
+          type: Sequelize.DATE,
+          allowNull: false,
+        },
+        updated_at: {
+          type: Sequelize.DATE,
+          allowNull: false,
         },
       });
     });

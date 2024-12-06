@@ -7,6 +7,7 @@ export * from './group-permission.schemas';
 export * from './group.schemas';
 export * from './launchpad.schemas';
 export * from './notification.schemas';
+export * from './pinned-token.schemas';
 export * from './poll.schemas';
 export * from './quest.schemas';
 export * from './reaction.schemas';
