@@ -322,9 +322,10 @@ export const NewThreadForm = () => {
                         value: selectedCommunityId,
                       },
                     })}
-                    onChange={(option) =>
-                      option?.value && setSelectedCommunityId(option.value)
-                    }
+                    onChange={(option) => {
+                      option?.value && setSelectedCommunityId(option.value);
+                      setUserSelectedAddress('');
+                    }}
                   />
                   <CWSelectList
                     components={{
