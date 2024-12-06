@@ -1,9 +1,9 @@
 import { PermissionEnum } from '@hicommonwealth/schemas';
+import { PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 // eslint-disable-next-line max-len
-import { PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
 import { convertGranularPermissionsToAccumulatedPermissions } from 'views/pages/CommunityGroupsAndMembers/Groups/common/GroupForm/helpers';
 import {
   MixpanelClickthroughEvent,
