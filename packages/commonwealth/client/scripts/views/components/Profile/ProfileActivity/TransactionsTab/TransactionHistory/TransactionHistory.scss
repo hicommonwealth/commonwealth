@@ -1,0 +1,48 @@
+@import '../../../../../../styles/shared.scss';
+
+.Transactions {
+  .Table {
+    .header-text {
+      text-align: start;
+    }
+    .data-container {
+      vertical-align: middle;
+
+      .numeric {
+        text-align: start;
+      }
+
+      .asset-value {
+        text-transform: capitalize;
+
+        .b1 {
+          color: $neutral-700 !important;
+        }
+        .caption {
+          color: $neutral-600 !important;
+        }
+      }
+
+      .timestamp {
+        display: block;
+        width: 100%;
+        text-align: end;
+        cursor: pointer;
+      }
+
+      .etherscanLink {
+        cursor: pointer;
+        color: $neutral-500;
+        text-decoration: none;
+
+        &:focus,
+        &:active,
+        &:hover,
+        &:visited {
+          outline: none;
+          text-decoration: none;
+        }
+      }
+    }
+  }
+}

@@ -11,8 +11,8 @@ import { PageNotFound } from '../../pages/404';
 import { ImageBehavior } from '../component_kit/CWImageInput';
 import CWCircleMultiplySpinner from '../component_kit/new_designs/CWCircleMultiplySpinner';
 import './Profile.scss';
-import type { CommentWithAssociatedThread } from './ProfileActivity';
 import ProfileActivity from './ProfileActivity';
+import type { CommentWithAssociatedThread } from './ProfileActivity/ProfileActivity';
 import ProfileHeader from './ProfileHeader';
 
 enum ProfileError {

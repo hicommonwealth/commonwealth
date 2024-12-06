@@ -1,0 +1,41 @@
+@import '../../../../../../styles/shared.scss';
+
+.MyTokens {
+  .Table {
+    .header-content.cursor-pointer.select-none.numeric {
+      justify-content: start;
+    }
+    .data-container {
+      vertical-align: middle;
+
+      .numeric {
+        text-align: start;
+      }
+
+      .asset-value {
+        text-transform: capitalize;
+
+        .b1 {
+          color: $neutral-700 !important;
+        }
+        .caption {
+          color: $neutral-600 !important;
+        }
+      }
+
+      .etherscanLink {
+        cursor: pointer;
+        color: $neutral-500;
+        text-decoration: none;
+
+        &:focus,
+        &:active,
+        &:hover,
+        &:visited {
+          outline: none;
+          text-decoration: none;
+        }
+      }
+    }
+  }
+}
