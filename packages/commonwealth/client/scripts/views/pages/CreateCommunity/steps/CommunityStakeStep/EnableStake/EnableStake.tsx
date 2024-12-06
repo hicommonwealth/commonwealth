@@ -53,8 +53,6 @@ const EnableStake = ({
     };
   };
 
-  const docLink = `https://${DOCS_SUBDOMAIN}/commonwealth/community-overview/community-stake`;
-
   return (
     <div className="EnableStake">
       <section className="header">
@@ -117,7 +115,11 @@ const EnableStake = ({
         {!onlyNamespace && (
           <CWText className="info" fontWeight="medium">
             Not sure?
-            <a target="_blank" rel="noopener noreferrer" href={docLink}>
+            <a
+              target="_blank"
+              rel="noopener noreferrer"
+              href={`https://${DOCS_SUBDOMAIN}/commonwealth/community-overview/community-stake`}
+            >
               Learn more about community stake
             </a>
           </CWText>
