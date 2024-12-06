@@ -1,9 +1,15 @@
 import { CONTEST_ACTIONS, ContestAction } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize';
 import { z } from 'zod';
+import { ContestManagerAttributes } from './contest_manager';
 import type { ModelInstance } from './types';
 
-type ContestAction = ModelInstance<z.infer<typeof ContestAction>>;
+export type ContestActionAttributes = z.infer<typeof ContestAction> & {
+  // associations
+  ContestManager?: ContestManagerAttributes;
+};
+
+type ContestAction = ModelInstance<ContestActionAttributes>;
 
 export default (
   sequelize: Sequelize.Sequelize,

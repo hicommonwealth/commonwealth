@@ -1,15 +1,9 @@
-import { BigNumber } from '@ethersproject/bignumber';
-
 export const calculateVoteWeight = (
   balance: string, // should be in wei
   voteWeight: number = 0,
-): BigNumber | null => {
+): bigint | null => {
   if (!balance || voteWeight <= 0) return null;
-  const bigBalance = BigNumber.from(balance);
-  const precision = 1e6;
-  const scaledVoteWeight = Math.floor(voteWeight * precision);
-  const result = bigBalance.mul(scaledVoteWeight).div(precision);
-  return result;
+  return BigInt(balance) * BigInt(voteWeight);
 };
 
 export enum Denominations {

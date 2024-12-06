@@ -2,7 +2,6 @@ import { InvalidState } from '@hicommonwealth/core';
 import { commonProtocol } from '@hicommonwealth/evm-protocols';
 import { TopicWeightedVoting } from '@hicommonwealth/schemas';
 import { BalanceSourceType, ZERO_ADDRESS } from '@hicommonwealth/shared';
-import { BigNumber } from 'ethers';
 import { GetBalancesOptions, tokenBalanceCache } from '.';
 import { config } from '../config';
 import { models } from '../database';
@@ -19,9 +18,9 @@ import { getTokenAttributes } from './commonProtocol/contractHelpers';
 export async function getVotingWeight(
   topic_id: number,
   address: string,
-): Promise<BigNumber | null> {
+): Promise<bigint | null> {
   if (config.STAKE.REACTION_WEIGHT_OVERRIDE)
-    return BigNumber.from(config.STAKE.REACTION_WEIGHT_OVERRIDE);
+    return BigInt(config.STAKE.REACTION_WEIGHT_OVERRIDE);
 
   const topic = await models.Topic.findByPk(topic_id, {
     include: [
@@ -67,8 +66,9 @@ export async function getVotingWeight(
       [address],
     );
     const stakeBalance = stakeBalances[address];
-    if (BigNumber.from(stakeBalance).lte(0))
+    if (BigInt(stakeBalance) === BigInt(0)) {
       throw new InvalidState('Must have stake to upvote');
+    }
 
     return commonProtocol.calculateVoteWeight(stakeBalance, stake.vote_weight);
   } else if (topic.weighted_voting === TopicWeightedVoting.ERC20) {
@@ -78,47 +78,14 @@ export async function getVotingWeight(
     mustExist('Chain Node URL', chainNodeUrl);
     mustExist('Topic Token Address', topic.token_address);
 
-    const balanceOptions: GetBalancesOptions =
-      topic.token_address == ZERO_ADDRESS
-        ? {
-            balanceSourceType: BalanceSourceType.ETHNative,
-            addresses: [address],
-            sourceOptions: {
-              evmChainId: eth_chain_id,
-            },
-          }
-        : {
-            balanceSourceType: BalanceSourceType.ERC20,
-            addresses: [address],
-            sourceOptions: {
-              evmChainId: eth_chain_id,
-              contractAddress: topic.token_address,
-            },
-          };
-
-    balanceOptions.cacheRefresh = true;
-
-    const balances = await tokenBalanceCache.getBalances(balanceOptions);
-
-    const tokenBalance = balances[address];
-
-    if (BigNumber.from(tokenBalance || 0).lte(0))
-      throw new InvalidState('Insufficient token balance');
-
-    const result = commonProtocol.calculateVoteWeight(
-      tokenBalance,
+    const numFullTokens = await getWeightedNumTokens(
+      address,
+      topic.token_address,
+      eth_chain_id,
+      chainNodeUrl,
       topic.vote_weight_multiplier!,
     );
-
-    const { decimals } = await getTokenAttributes(
-      topic.token_address!,
-      chainNodeUrl,
-      false,
-    );
-
-    // only count full ERC20 tokens
-    const numFullTokens = result?.div(BigNumber.from(10).pow(decimals)) || null;
-    if (!numFullTokens || numFullTokens.isZero()) {
+    if (numFullTokens === BigInt(0)) {
       // if the weighted value is not at least a full token, reject the action
       throw new InvalidState('Insufficient token balance');
     }
@@ -127,4 +94,55 @@ export async function getVotingWeight(
 
   // no weighted voting
   return null;
+}
+
+export async function getWeightedNumTokens(
+  address: string,
+  tokenAddress: string,
+  ethChainId: number,
+  chainNodeUrl: string,
+  voteWeightMultiplier: number,
+): Promise<bigint> {
+  const balanceOptions: GetBalancesOptions =
+    tokenAddress == ZERO_ADDRESS
+      ? {
+          balanceSourceType: BalanceSourceType.ETHNative,
+          addresses: [address],
+          sourceOptions: {
+            evmChainId: ethChainId,
+          },
+        }
+      : {
+          balanceSourceType: BalanceSourceType.ERC20,
+          addresses: [address],
+          sourceOptions: {
+            evmChainId: ethChainId,
+            contractAddress: tokenAddress,
+          },
+        };
+
+  balanceOptions.cacheRefresh = true;
+
+  const balances = await tokenBalanceCache.getBalances(balanceOptions);
+
+  const tokenBalance = balances[address];
+
+  if (BigInt(tokenBalance || 0) <= BigInt(0)) {
+    throw new InvalidState('Insufficient token balance');
+  }
+  const result = commonProtocol.calculateVoteWeight(
+    tokenBalance,
+    voteWeightMultiplier,
+  );
+  const { decimals } = await getTokenAttributes(
+    tokenAddress,
+    chainNodeUrl,
+    false,
+  );
+  // only count full ERC20 tokens
+  const numFullTokens = result ? result / BigInt(10 ** decimals) : null;
+  if (!numFullTokens || numFullTokens === BigInt(0)) {
+    return BigInt(0);
+  }
+  return numFullTokens;
 }
