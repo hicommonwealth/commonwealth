@@ -94,7 +94,7 @@ const MyTokens = ({ transactions }: TransactionsProps) => {
   })();
 
   return (
-    <section className="Stakes">
+    <section className="MyTokens">
       <CWTable
         columnInfo={tableState.columns}
         sortingState={tableState.sorting}
