@@ -499,6 +499,49 @@ const GroupForm = ({
 
             {/* Requirements section */}
             <section className="form-section">
+              <CWText
+                type="h4"
+                fontWeight="semiBold"
+                className="header-row header-text"
+              >
+                Necessary requirements
+              </CWText>
+
+              <div className="radio-buttons">
+                <CWRadioButton
+                  label="All requirements must be satisfied"
+                  value={REQUIREMENTS_TO_FULFILL.ALL_REQUIREMENTS}
+                  name="requirementsToFulfill"
+                  hookToForm
+                  onChange={(e) => {
+                    if (e.target.checked) {
+                      setIsSelectedCustomRequirementsToFulfillOption(false);
+                    }
+                  }}
+                />
+
+                <CWRequirementsRadioButton
+                  maxRequirements={maxRequirements}
+                  inputValue={cwRequiremenetsLabelInputValue}
+                  // @ts-expect-error <StrictNullChecks/>
+                  isSelected={isSelectedCustomRequirementsToFulfillOption}
+                  onSelect={() =>
+                    setIsSelectedCustomRequirementsToFulfillOption(true)
+                  }
+                  onInputValueChange={(value) => {
+                    setCwRequiremenetsLabelInputValue(value);
+                  }}
+                />
+                {formState?.errors?.requirementsToFulfill?.message && (
+                  <MessageRow
+                    hasFeedback
+                    statusMessage={
+                      formState?.errors?.requirementsToFulfill?.message
+                    }
+                    validationStatus="failure"
+                  />
+                )}
+              </div>
               <div className="header-row">
                 <CWText type="h3" fontWeight="semiBold" className="header-text">
                   Requirements
@@ -544,51 +587,6 @@ const GroupForm = ({
                     addRequirementSubForm();
                   }}
                 />
-
-                <CWText
-                  type="h4"
-                  fontWeight="semiBold"
-                  className="header-row header-text"
-                >
-                  Necessary requirements
-                </CWText>
-
-                <div className="radio-buttons">
-                  <CWRadioButton
-                    label="All requirements must be satisfied"
-                    value={REQUIREMENTS_TO_FULFILL.ALL_REQUIREMENTS}
-                    name="requirementsToFulfill"
-                    hookToForm
-                    onChange={(e) => {
-                      if (e.target.checked) {
-                        setIsSelectedCustomRequirementsToFulfillOption(false);
-                      }
-                    }}
-                  />
-
-                  <CWRequirementsRadioButton
-                    maxRequirements={maxRequirements}
-                    inputValue={cwRequiremenetsLabelInputValue}
-                    // @ts-expect-error <StrictNullChecks/>
-                    isSelected={isSelectedCustomRequirementsToFulfillOption}
-                    onSelect={() =>
-                      setIsSelectedCustomRequirementsToFulfillOption(true)
-                    }
-                    onInputValueChange={(value) => {
-                      setCwRequiremenetsLabelInputValue(value);
-                    }}
-                  />
-
-                  {formState?.errors?.requirementsToFulfill?.message && (
-                    <MessageRow
-                      hasFeedback
-                      statusMessage={
-                        formState?.errors?.requirementsToFulfill?.message
-                      }
-                      validationStatus="failure"
-                    />
-                  )}
-                </div>
               </section>
 
               {/* Sub-section: Gated topics */}
