@@ -27,6 +27,7 @@
     "@aws-sdk/s3-request-presigner": "^3.577.0",
     "@hicommonwealth/core": "workspace:*",
     "@hicommonwealth/shared": "workspace:*",
+    "@hicommonwealth/schemas": "workspace:*",
     "@knocklabs/node": "^0.6.13",
     "@trpc/server": "^10.45.1",
     "amqplib": "^0.10.3",

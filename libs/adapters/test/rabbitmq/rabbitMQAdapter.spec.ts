@@ -3,11 +3,10 @@ import {
   BrokerPublications,
   BrokerSubscriptions,
   EventContext,
-  Events,
   InvalidInput,
   Policy,
-  events,
 } from '@hicommonwealth/core';
+import { Events, events } from '@hicommonwealth/schemas';
 import { delay } from '@hicommonwealth/shared';
 import chai from 'chai';
 import { AckOrNack } from 'rascal';

@@ -1,10 +1,6 @@
 // TODO: temporary - will be deleted as part of chain-events removal
-import {
-  ETHERS_BIG_NUMBER,
-  EVM_ADDRESS,
-  zBoolean,
-} from '@hicommonwealth/schemas';
 import { z } from 'zod';
+import { ETHERS_BIG_NUMBER, EVM_ADDRESS, zBoolean } from '../utils';
 
 export const CommunityStakeTrade = z.tuple([
   EVM_ADDRESS.describe('trader'),

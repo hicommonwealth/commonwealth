@@ -1,6 +1,4 @@
 import {
-  EventNames,
-  UserMentioned,
   WorkflowKeys,
   dispose,
   disposeAdapter,
@@ -8,6 +6,7 @@ import {
 } from '@hicommonwealth/core';
 import { tester } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
+import { EventNames } from '@hicommonwealth/schemas';
 import { BalanceType, safeTruncateBody } from '@hicommonwealth/shared';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
@@ -94,7 +93,7 @@ describe('userMentioned Event Handler', () => {
       name: EventNames.UserMentioned,
       payload: {
         communityId: 'nonexistent',
-      } as z.infer<typeof UserMentioned>,
+      } as z.infer<typeof schemas.events.UserMentioned>,
     });
     expect(res).to.be.false;
   });
