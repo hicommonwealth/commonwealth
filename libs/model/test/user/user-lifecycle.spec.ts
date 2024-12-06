@@ -15,6 +15,7 @@ import {
   CreateReferralLink,
   GetReferralLink,
   GetUserProfile,
+  GetXps,
   UpdateUser,
   Xp,
 } from '../../src/user';
@@ -24,7 +25,7 @@ import { seedCommunity } from '../utils/community-seeder';
 const chance = new Chance();
 
 describe('User lifecycle', () => {
-  let admin: Actor, member: Actor;
+  let admin: Actor, member: Actor, new_actor: Actor;
   let community_id: string;
   let topic_id: number;
   let base_id: string;
@@ -324,7 +325,7 @@ describe('User lifecycle', () => {
         is_welcome_onboard_flow_complete: false,
         emailVerified: true,
       });
-      const new_actor = {
+      new_actor = {
         address: '0x9000000000000000000000000000000000000000',
         user: {
           id: new_user.id,
@@ -334,7 +335,7 @@ describe('User lifecycle', () => {
       await models.Address.create({
         community_id: base_id,
         user_id: new_user.id,
-        address: new_actor.address,
+        address: new_actor.address!,
         role: 'member',
         is_banned: false,
         verified: new Date(),
@@ -473,6 +474,69 @@ describe('User lifecycle', () => {
           created_at: last[4].created_at,
         },
       ]);
+    });
+
+    it('should query previous xp logs', async () => {
+      // 8 events (by community id)
+      const xps1 = await query(GetXps(), {
+        actor: admin,
+        payload: { community_id },
+      });
+      expect(xps1!.length).to.equal(8);
+      xps1?.forEach((xp) => {
+        expect(xp.quest_id).to.be.a('number');
+        expect(xp.quest_action_meta_id).to.be.a('number');
+      });
+
+      // 2 CommentUpvoted events (by event name)
+      const xps2 = await query(GetXps(), {
+        actor: admin,
+        payload: { event_name: 'CommentUpvoted' },
+      });
+      expect(xps2!.length).to.equal(2);
+      xps2?.forEach((xp) => {
+        expect(xp.event_name).to.equal('CommentUpvoted');
+      });
+
+      // 5 events after first CommentUpvoted
+      const xps3 = await query(GetXps(), {
+        actor: admin,
+        payload: { from: xps2!.at(-1)!.created_at },
+      });
+      expect(xps3!.length).to.equal(5);
+
+      // 4 events for member (ThreadCreated and CommentUpvoted)
+      const xps4 = await query(GetXps(), {
+        actor: admin,
+        payload: { user_id: member.user.id },
+      });
+      expect(xps4!.length).to.equal(4);
+      xps4?.forEach((xp) => {
+        expect(['ThreadCreated', 'CommentUpvoted'].includes(xp.event_name)).to
+          .be.true;
+      });
+
+      // 2 events for new actor (joining and sign up flow completed)
+      const xps5 = await query(GetXps(), {
+        actor: admin,
+        payload: { user_id: new_actor.user.id },
+      });
+      expect(xps5!.length).to.equal(2);
+      xps5?.forEach((xp) => {
+        expect(
+          ['SignUpFlowCompleted', 'CommunityJoined'].includes(xp.event_name),
+        ).to.be.true;
+      });
+
+      // 3 CommentCreated events for admin
+      const xps6 = await query(GetXps(), {
+        actor: admin,
+        payload: { user_id: admin.user.id },
+      });
+      expect(xps6!.length).to.equal(3);
+      xps6?.forEach((xp) => {
+        expect(xp.event_name).to.equal('CommentCreated');
+      });
     });
   });
 });

@@ -20,3 +20,4 @@ export * from './topic.schemas';
 export * from './user.schemas';
 export * from './wallets.schemas';
 export * from './webhook.schemas';
+export * from './xp.schemas';
