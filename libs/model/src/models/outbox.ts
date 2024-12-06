@@ -1,4 +1,5 @@
-import { EventContext, Events, Outbox } from '@hicommonwealth/core';
+import { EventContext, Outbox } from '@hicommonwealth/core';
+import { Events } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 import { z } from 'zod';
 import { ModelInstance } from './types';

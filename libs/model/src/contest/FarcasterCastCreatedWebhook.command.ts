@@ -1,4 +1,4 @@
-import { EventNames, InvalidInput, type Command } from '@hicommonwealth/core';
+import { InvalidInput, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../database';
 import { emitEvent } from '../utils';
@@ -22,7 +22,7 @@ export function FarcasterCastCreatedWebhook(): Command<
         models.Outbox,
         [
           {
-            event_name: EventNames.FarcasterCastCreated,
+            event_name: schemas.EventNames.FarcasterCastCreated,
             event_payload: payload.data,
           },
         ],

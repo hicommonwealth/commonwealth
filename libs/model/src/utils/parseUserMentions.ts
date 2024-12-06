@@ -1,5 +1,4 @@
-import { EventNames, events } from '@hicommonwealth/core';
-import { Comment, Thread } from '@hicommonwealth/schemas';
+import { Comment, EventNames, Thread, events } from '@hicommonwealth/schemas';
 import { Transaction } from 'sequelize';
 import z from 'zod';
 import { models } from '../database';

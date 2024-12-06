@@ -1,3 +1,4 @@
+import { EventNames, Events } from '@hicommonwealth/schemas';
 import { Readable } from 'stream';
 import { z } from 'zod';
 import {
@@ -6,7 +7,6 @@ import {
   EventsHandlerMetadata,
   InvalidInput,
 } from '../framework';
-import { EventNames, Events } from '../integration/events';
 import {
   ChainProposalsNotification,
   CommentCreatedNotification,

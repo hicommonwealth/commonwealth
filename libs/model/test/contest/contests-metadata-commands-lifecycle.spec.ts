@@ -301,7 +301,8 @@ describe('Contests metadata commands lifecycle', () => {
             },
           },
         );
-        expect(updateResult?.contest_managers[0]!.topic_id).to.eq(
+        console.log(updateResult);
+        expect(updateResult?.contest_managers.at(0)?.topic_id).to.eq(
           topics[1].id!,
         );
       }
