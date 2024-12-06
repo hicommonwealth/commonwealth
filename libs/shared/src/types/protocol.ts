@@ -92,7 +92,6 @@ export enum ChainBase {
   CosmosSDK = 'cosmos',
   Substrate = 'substrate',
   Ethereum = 'ethereum',
-  Skale = 'skale',
   NEAR = 'near',
   Solana = 'solana',
 }
