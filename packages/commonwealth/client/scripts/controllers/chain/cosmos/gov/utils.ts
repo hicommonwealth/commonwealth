@@ -1,5 +1,8 @@
 import { CosmosGovernanceVersion } from '@hicommonwealth/shared';
 import Cosmos from '../adapter';
+import CosmosGovernanceV1AtomOne from './atomone/governance-v1';
+import { CosmosProposalV1AtomOne } from './atomone/proposal-v1';
+import { getCompletedProposalsV1AtomOne } from './atomone/utils-v1';
 import CosmosGovernanceGovgen from './govgen/governance-v1beta1';
 import { CosmosProposalGovgen } from './govgen/proposal-v1beta1';
 import {
@@ -24,6 +27,8 @@ export const getCompletedProposals = async (
 ): Promise<CosmosProposal[]> => {
   const { chain, accounts, governance, meta } = cosmosChain;
   console.log(cosmosChain);
+  const isAtomone =
+    meta.ChainNode?.cosmos_gov_version === CosmosGovernanceVersion.v1atomone;
   const isGovgen =
     meta.ChainNode?.cosmos_gov_version ===
     CosmosGovernanceVersion.v1beta1govgen;
@@ -34,7 +39,19 @@ export const getCompletedProposals = async (
     CosmosGovernanceVersion.v1beta1Failed;
 
   let cosmosProposals = [];
-  if (isGovgen) {
+  if (isAtomone) {
+    const v1proposals = await getCompletedProposalsV1AtomOne(chain.api);
+    // @ts-expect-error StrictNullChecks
+    cosmosProposals = v1proposals.map(
+      (p) =>
+        new CosmosProposalV1AtomOne(
+          chain,
+          accounts,
+          governance as CosmosGovernanceV1AtomOne,
+          p,
+        ),
+    );
+  } else if (isGovgen) {
     const v1Beta1Proposals = await getCompletedProposalsGovgen(chain.api);
     // @ts-expect-error StrictNullChecks
     cosmosProposals = v1Beta1Proposals.map(

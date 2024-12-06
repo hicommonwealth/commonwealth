@@ -127,6 +127,7 @@ export enum ChainNetwork {
  */
 export enum CosmosGovernanceVersion {
   v1 = 'v1',
+  v1atomone = 'v1atomone',
   v1beta1govgen = 'v1beta1govgen',
   v1beta1 = 'v1beta1',
   v1beta1Failed = 'v1beta1-attempt-failed',
