@@ -2,7 +2,7 @@ import { WEI_PER_ETHER } from 'controllers/chain/ethereum/util';
 import { trpc } from 'utils/trpcClient';
 import { buildEtherscanLink } from 'views/modals/ManageCommunityStakeModal/utils';
 import { formatFractionalValue } from '../../../FractionalValue/helpers';
-import { FilterOptions } from '../types';
+import { FilterOptions, TransactionTypes } from '../types';
 
 export type TransactionHistoryProps = {
   filterOptions: FilterOptions;
@@ -27,12 +27,11 @@ const useTransactionHistory = ({
         return {
           ...t,
           timestamp: t.timestamp * 1000,
-          transaction_type:
-            t.transaction_category === 'stake'
-              ? t.transaction_type === 'buy'
-                ? 'mint'
-                : 'burn'
-              : t.transaction_type,
+          transaction_type: (t.transaction_category === 'stake'
+            ? t.transaction_type === 'buy'
+              ? 'mint'
+              : 'burn'
+            : t.transaction_type) as TransactionTypes,
           totalPrice:
             t.transaction_category === 'stake'
               ? `${(parseFloat(`${t.price}`) / WEI_PER_ETHER).toFixed(5)} ETH`

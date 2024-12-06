@@ -6,9 +6,11 @@ export type FilterOptions = {
   selectedAddress?: { label: string; value: string };
 };
 
+export type TransactionTypes = 'buy' | 'sell' | 'mint' | 'burn';
+
 export type TransactionsProps = {
   transactions: ({
-    transaction_type: 'buy' | 'sell' | 'mint' | 'burn';
+    transaction_type: TransactionTypes;
     etherscanLink: string;
     totalPrice: string;
   } & Omit<
