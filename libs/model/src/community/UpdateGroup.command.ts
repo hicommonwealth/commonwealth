@@ -1,6 +1,5 @@
 import { InvalidInput, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
-import { PermissionEnum } from '@hicommonwealth/schemas';
 import { Op } from 'sequelize';
 import { models, sequelize } from '../database';
 import { authRoles } from '../middleware';
@@ -92,9 +91,6 @@ export function UpdateGroup(): Command<typeof schemas.UpdateGroup> {
           await Promise.all(
             (payload.topics || [])?.map(async (t) => {
               const permissions = t.permissions;
-              if (!permissions.includes(PermissionEnum.UPDATE_POLL)) {
-                permissions.push(PermissionEnum.UPDATE_POLL);
-              }
               if (group.id) {
                 await models.GroupPermission.update(
                   {
