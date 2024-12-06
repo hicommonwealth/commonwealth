@@ -116,14 +116,12 @@ export const GetXps = {
       .string()
       .optional()
       .describe('Filters events by community id associated to quest'),
-    from: z
+    from: z.coerce
       .date()
-      .or(z.string())
       .optional()
       .describe('Filters events after this date excluding'),
-    to: z
+    to: z.coerce
       .date()
-      .or(z.string())
       .optional()
       .describe('Filters events before this date including'),
     event_name: z.string().optional().describe('Filters events by event name'),
