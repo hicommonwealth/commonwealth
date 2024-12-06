@@ -8,10 +8,11 @@ import {
 import { z } from 'zod';
 import { PG_INT } from '../utils';
 import { ChainNode } from './chain.schemas';
+import { ContestManager } from './contest-manager.schemas';
 import { Group } from './group.schemas';
 import { CommunityStake } from './stake.schemas';
 import { CommunityTags } from './tag.schemas';
-import { ContestManager, Topic } from './topic.schemas';
+import { Topic } from './topic.schemas';
 import { Address } from './user.schemas';
 
 export const Community = z.object({
