@@ -7,7 +7,7 @@ import {
   query,
 } from '@hicommonwealth/core';
 import { commonProtocol } from '@hicommonwealth/evm-protocols';
-import { models } from '@hicommonwealth/model';
+import { createEventRegistryChainNodes, models } from '@hicommonwealth/model';
 import { ContestResults, EventNames } from '@hicommonwealth/schemas';
 import { delay } from '@hicommonwealth/shared';
 import chai from 'chai';
@@ -71,10 +71,7 @@ describe('Contests projection lifecycle', () => {
 
   beforeAll(async () => {
     try {
-      const [chain] = await seed('ChainNode', {
-        url: 'https://test',
-        private_url: 'https://test',
-      });
+      const chainNodes = await createEventRegistryChainNodes();
       const [user] = await seed(
         'User',
         {
@@ -88,7 +85,7 @@ describe('Contests projection lifecycle', () => {
         {
           id: community_id,
           namespace_address: namespace,
-          chain_node_id: chain!.id,
+          chain_node_id: chainNodes[0]!.id,
           discord_config_id: undefined,
           lifetime_thread_count: 0,
           profile_count: 1,

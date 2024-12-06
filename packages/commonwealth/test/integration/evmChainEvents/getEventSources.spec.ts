@@ -3,12 +3,10 @@ import {
   EventRegistry,
   commonProtocol as cp,
 } from '@hicommonwealth/evm-protocols';
+import { createEventRegistryChainNodes } from '@hicommonwealth/model';
 import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 import { getEventSources } from '../../../server/workers/evmChainEvents/getEventSources';
-import {
-  createContestEventSources,
-  createEventRegistryChainNodes,
-} from '../../util/util';
+import { createContestEventSources } from '../../util/util';
 
 describe('getEventSources', () => {
   beforeAll(async () => {

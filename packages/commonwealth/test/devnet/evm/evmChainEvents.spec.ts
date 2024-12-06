@@ -15,6 +15,7 @@ import {
 } from '@hicommonwealth/evm-testing';
 import {
   ChainNodeInstance,
+  createEventRegistryChainNodes,
   equalEvmAddresses,
   models,
 } from '@hicommonwealth/model';
@@ -43,7 +44,6 @@ import {
   ContractSources,
   EvmSource,
 } from '../../../server/workers/evmChainEvents/types';
-import { createEventRegistryChainNodes } from '../../util/util';
 
 vi.mock('../../../server/workers/evmChainEvents/getEventSources');
 
