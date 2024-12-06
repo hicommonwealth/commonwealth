@@ -71,7 +71,7 @@ export default (
       },
       base: { type: Sequelize.STRING, allowNull: false, defaultValue: '' },
       ss58_prefix: { type: Sequelize.INTEGER, allowNull: true },
-      icon_url: { type: Sequelize.STRING },
+      icon_url: { type: Sequelize.STRING, allowNull: false },
       active: { type: Sequelize.BOOLEAN, defaultValue: false },
       stages_enabled: {
         type: Sequelize.BOOLEAN,
