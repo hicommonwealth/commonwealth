@@ -1,6 +1,67 @@
+@import '../../../styles/shared.scss';
 .KnockNotifications svg {
   color: rgb(117, 117, 117);
   fill: rgb(255, 255, 255) !important;
+}
+
+.KnockNotifications .container {
+  display: flex;
+  border-bottom: 1px solid #ddd;
+  max-height: 180px;
+  height: fit-content;
+  min-height: fit-content;
+  padding: 10px;
+  width: 100%;
+  overflow: hidden;
+  align-items: flex-start;
+  justify-content: flex-start;
+  @include extraSmall {
+    padding: 4px;
+  }
+
+  .avatar {
+    display: flex;
+    justify-items: center;
+    width: 20%;
+    justify-content: center;
+    padding-top: 5px;
+    height: 100%;
+    @include extraSmall {
+      gap: 4px;
+    }
+  }
+  .content-container {
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    gap: 10px;
+
+    @include extraSmall {
+      gap: 4px;
+    }
+
+    .title-container {
+      flex-wrap: wrap;
+      flex-direction: row;
+      display: flex;
+      white-space: break-spaces;
+      @include extraSmall {
+        height: fit-content;
+      }
+
+      .Text {
+        @include extraSmall {
+          font-size: 15px;
+        }
+      }
+    }
+    .content {
+      white-space: break-spaces;
+      .Text {
+        color: #656167 !important;
+      }
+    }
+  }
 }
 
 .KnockNotifications .rnf-notification-feed__knock-branding {
@@ -18,4 +79,7 @@
 .KnockNotifications button:focus,
 .KnockNotifications select:focus {
   outline: none;
+}
+.rnf-notification-cell__content p:last-child {
+  background: red !important;
 }
