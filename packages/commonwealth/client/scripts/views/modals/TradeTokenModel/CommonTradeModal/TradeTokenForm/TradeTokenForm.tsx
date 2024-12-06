@@ -11,7 +11,7 @@ import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip'
 import {
   CustomAddressOption,
   CustomAddressOptionElement,
-} from '../../ManageCommunityStakeModal/StakeExchangeForm/CustomAddressOption';
+} from '../../../ManageCommunityStakeModal/StakeExchangeForm/CustomAddressOption';
 import AddressBalance from './AddressBalance';
 import BuyAmountSelection from './AmountSelections/BuyAmountSelection';
 import SellAmountSelection from './AmountSelections/SellAmountSelection';

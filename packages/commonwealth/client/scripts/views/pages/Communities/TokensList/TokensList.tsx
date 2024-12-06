@@ -12,7 +12,7 @@ import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
 import TradeTokenModal from 'views/modals/TradeTokenModel';
-import { TradingMode } from 'views/modals/TradeTokenModel/TradeTokenForm/types';
+import { TradingMode } from 'views/modals/TradeTokenModel/CommonTradeModal/TradeTokenForm';
 import { z } from 'zod';
 import TokenCard from '../../../components/TokenCard';
 import {
