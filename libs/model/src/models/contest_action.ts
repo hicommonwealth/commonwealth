@@ -39,6 +39,10 @@ export default (
         type: Sequelize.DECIMAL(78, 0),
         allowNull: false,
       },
+      calculated_voting_weight: {
+        type: Sequelize.DECIMAL(78, 0),
+        allowNull: true,
+      },
       created_at: { type: Sequelize.DATE, allowNull: false },
     },
     {

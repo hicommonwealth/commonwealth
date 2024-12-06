@@ -317,6 +317,7 @@ export function Contests(): Projection<typeof inputs> {
           },
           raw: true,
         });
+
         await models.ContestAction.upsert({
           ...payload,
           contest_id,
