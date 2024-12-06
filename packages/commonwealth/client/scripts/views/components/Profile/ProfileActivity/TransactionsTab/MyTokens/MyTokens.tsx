@@ -74,7 +74,8 @@ const MyTokens = ({ transactions }: TransactionsProps) => {
                           action || 0
                     )?.toFixed?.(5) || 0.0
                   } ${'ETH'}`
-                : transaction.totalPrice,
+                : // TODO: fix display value for this
+                  transaction.totalPrice,
           },
           sortValue:
             transaction.transaction_category === 'stake'
