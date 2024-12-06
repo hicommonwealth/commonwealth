@@ -82,7 +82,7 @@ export async function main(
   });
 
   const setupMiddleware = () => {
-    // redirect from commonwealthapp.herokuapp.com to commonwealth.im
+    // redirect from commonwealthapp.herokuapp.com to PRODUCTION_DOMAIN
     app.all(/.*/, (req, res, next) => {
       if (req.header('host')?.match(/commonwealthapp.herokuapp.com/i)) {
         res.redirect(301, `https://commonwealth.im${req.url}`);
