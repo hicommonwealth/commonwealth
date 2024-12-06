@@ -42,6 +42,10 @@ export function createTestRpc(
       return buildChainNodeUrl('https://base-sepolia.g.alchemy.com/v2/', scope);
     case commonProtocol.ValidChains.Base:
       return buildChainNodeUrl('https://base-mainnet.g.alchemy.com/v2/', scope);
+    case commonProtocol.ValidChains.BSC:
+      return buildChainNodeUrl('https://bnb-mainnet.g.alchemy.com/v2/', scope);
+    case commonProtocol.ValidChains.SKALE_TEST:
+      return 'https://testnet.skalenodes.com/v1/giant-half-dual-testnet';
     default:
       throw new Error(`Eth chain id ${ethChainId} not supported`);
   }
