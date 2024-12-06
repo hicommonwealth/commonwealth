@@ -140,9 +140,6 @@ async function findAddress(
   if (!actor.address)
     throw new InvalidActor(actor, 'Must provide an address to authorize');
 
-  if (!community_id)
-    throw new InvalidInput('Must provide a valid community id to authorize');
-
   // Policies as system actors behave like super admins
   // TODO: we can check if there is an address to load or fake it
   if (actor.is_system_actor) {
@@ -151,6 +148,9 @@ async function findAddress(
       is_author: false,
     };
   }
+
+  if (!community_id)
+    throw new InvalidInput('Must provide a valid community id to authorize');
 
   // Loads and tracks real user's address activity
   const address = await models.Address.findOne({
