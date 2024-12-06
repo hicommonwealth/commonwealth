@@ -5,7 +5,7 @@ import { z } from 'zod';
 import { models } from '../database';
 import { mustExist } from '../middleware/guards';
 
-export function GetToken(): Query<typeof schemas.GetToken> {
+export function GetLaunchpadToken(): Query<typeof schemas.GetToken> {
   return {
     ...schemas.GetToken,
     auth: [],

@@ -11,7 +11,7 @@ import {
   getTokenCreatedTransaction,
 } from '../services/commonProtocol/launchpadHelpers';
 
-export function CreateToken(): Command<typeof schemas.CreateToken> {
+export function CreateLaunchpadToken(): Command<typeof schemas.CreateToken> {
   return {
     ...schemas.CreateToken,
     auth: [authRoles('admin')],

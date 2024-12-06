@@ -4,7 +4,7 @@ import { QueryTypes } from 'sequelize';
 import { z } from 'zod';
 import { models } from '../database';
 
-export function GetTokens(): Query<typeof schemas.GetTokens> {
+export function GetLaunchpadTokens(): Query<typeof schemas.GetTokens> {
   return {
     ...schemas.GetTokens,
     auth: [],
