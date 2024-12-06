@@ -1,85 +1,92 @@
 @import '../../../styles/shared.scss';
+
 .KnockNotifications svg {
   color: rgb(117, 117, 117);
   fill: rgb(255, 255, 255) !important;
 }
 
-.KnockNotifications .container {
-  display: flex;
-  border-bottom: 1px solid #ddd;
-  max-height: 180px;
-  height: fit-content;
-  min-height: fit-content;
-  padding: 10px;
-  width: 100%;
-  overflow: hidden;
-  align-items: flex-start;
-  justify-content: flex-start;
-  @include extraSmall {
-    padding: 4px;
-  }
-
-  .avatar {
-    display: flex;
-    justify-items: center;
-    width: 20%;
-    justify-content: center;
-    padding-top: 5px;
-    height: 100%;
-    @include extraSmall {
-      gap: 4px;
-    }
-  }
-  .content-container {
-    display: flex;
-    width: 100%;
-    flex-direction: column;
-    gap: 10px;
-
-    @include extraSmall {
-      gap: 4px;
-    }
-
-    .title-container {
-      flex-wrap: wrap;
-      flex-direction: row;
-      display: flex;
-      white-space: break-spaces;
-      @include extraSmall {
-        height: fit-content;
+.KnockNotifications {
+  .main-container {
+    p {
+      &:last-child {
+        margin-top: 10px;
+        color: #656167;
+        font-size: 14px;
+        line-height: 20px;
+        font-family: $font-family-neue-haas-unica;
       }
-
-      .Text {
-        @include extraSmall {
-          font-size: 15px;
+      &:first-child {
+        font-size: 16px;
+        line-height: 20px;
+        font-family: $font-family-neue-haas-unica;
+        strong {
+          font-weight: 700;
+          letter-spacing: 0.5px;
+          @include extraSmall {
+            font-weight: 600;
+            letter-spacing: 0.2px;
+          }
+        }
+      }
+      &:only-child {
+        font-size: 16px;
+        line-height: 20px;
+        margin-top: unset;
+        color: unset;
+        font-size: unset;
+        line-height: unset;
+        font-family: $font-family-neue-haas-unica;
+        strong {
+          font-weight: 700;
+          letter-spacing: 0.8px;
         }
       }
     }
+  }
+  .container {
+    display: flex;
+    gap: 10px;
+    padding: 10px;
+    flex-direction: row;
+    border-bottom: 1px solid $neutral-200;
+    align-items: flex-start;
+
+    .avatar {
+      display: flex;
+      gap: 10px;
+      padding-top: 4px;
+      height: 100%;
+    }
     .content {
-      white-space: break-spaces;
+      gap: 10px;
+      display: flex;
+      flex-direction: column;
+
       .Text {
-        color: #656167 !important;
+        font-size: 12px;
+        color: #656167;
       }
     }
   }
-}
-
-.KnockNotifications .rnf-notification-feed__knock-branding {
-  display: none;
-}
-
-.KnockNotifications .rnf-notification-feed__knock-branding {
-  display: none;
-}
-
-.KnockNotifications .rnf-notification-feed-popover__inner img {
-  max-width: 350px;
+  .rnf-notification-feed__type {
+    display: none;
+  }
+  .rnf-notification-feed__knock-branding {
+    display: none;
+  }
+  .rnf-notification-feed__knock-branding {
+    display: none;
+  }
+  .rnf-notification-feed-popover__inner img {
+    max-width: 350px;
+  }
+  button:focus,
+  .KnockNotifications select:focus {
+    outline: none;
+  }
 }
 
 .KnockNotifications button:focus,
 .KnockNotifications select:focus {
   outline: none;
-}
-.rnf-notification-cell__content p:last-child {
-  background: red !important;
 }
