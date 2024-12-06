@@ -1,5 +1,6 @@
 import React from 'react';
 
+import { DOCS_SUBDOMAIN } from '@hicommonwealth/shared';
 import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import {
@@ -17,7 +18,7 @@ export const HelpMenuPopover = () => {
           {
             label: 'Help documentation',
             onClick: () =>
-              window.open('https://docs.commonwealth.im/commonwealth/'),
+              window.open(`https://${DOCS_SUBDOMAIN}/commonwealth/`),
           },
         ]}
         renderTrigger={(onClick, isMenuOpen) => (

@@ -1,3 +1,4 @@
+import { DOCS_SUBDOMAIN, PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
 import { buildUpdateCommunityInput } from 'client/scripts/state/api/communities/updateCommunity';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { uuidv4 } from 'lib/util';
@@ -95,7 +96,7 @@ const Discord = () => {
       const redirectURL = encodeURI(
         !domain?.isCustomDomain
           ? window.location.origin
-          : 'https://commonwealth.im',
+          : `https://${PRODUCTION_DOMAIN}`,
       );
       const currentState = encodeURI(
         JSON.stringify({
@@ -180,6 +181,8 @@ const Discord = () => {
     }
   };
 
+  const docLink = `https://${DOCS_SUBDOMAIN}/commonwealth/bridged-discord-forum-bot`;
+
   return (
     <section className="Discord">
       <div className="header">
@@ -187,10 +190,7 @@ const Discord = () => {
         <CWText type="b1">
           <p>
             You can merge content from Discord directly into your community by
-            connecting the Commonbot.{' '}
-            <a href="https://docs.commonwealth.im/commonwealth/bridged-discord-forum-bot">
-              Learn more
-            </a>
+            connecting the Commonbot. <a href={docLink}>Learn more</a>
           </p>
         </CWText>
       </div>

@@ -11,6 +11,7 @@ import {
 import { CWTextInput } from '../../components/component_kit/new_designs/CWTextInput';
 import { getShareOptions } from './utils';
 
+import { PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
 import './InviteLinkModal.scss';
 
 interface InviteLinkModalProps {
@@ -23,7 +24,7 @@ const InviteLinkModal = ({
   isInsideCommunity,
 }: InviteLinkModalProps) => {
   // TODO: replace with actual invite link from backend in upcoming PR
-  const inviteLink = 'https://commonwealth.im/~/invite/774037=89defcb8';
+  const inviteLink = `https://${PRODUCTION_DOMAIN}/~/invite/774037=89defcb8`;
 
   const handleCopy = () => {
     saveToClipboard(inviteLink, true).catch(console.error);
