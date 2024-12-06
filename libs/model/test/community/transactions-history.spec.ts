@@ -5,14 +5,11 @@ import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { seed } from 'model/src/tester';
 import { afterAll, beforeAll, describe, test } from 'vitest';
-import {
-  CreateStakeTransaction,
-  GetStakeTransaction,
-} from '../../src/community';
+import { CreateStakeTransaction, GetTransactions } from '../../src/community';
 
 chai.use(chaiAsPromised);
 
-describe('Stake transactions', () => {
+describe('Transactions history', () => {
   const actor: Actor = { user: { email: '' } };
   let payload;
   let community_id: string;
@@ -90,7 +87,7 @@ describe('Stake transactions', () => {
     );
     expect(results?.stake_direction).to.equal('buy');
 
-    const getResult = await query(GetStakeTransaction(), {
+    const getResult = await query(GetTransactions(), {
       actor,
       payload: { addresses: results?.address },
     });
