@@ -141,8 +141,8 @@ export const GetTransactions = {
       transaction_type: z.enum(['buy', 'sell']),
       transaction_hash: z.string(),
       address: z.string(),
-      price: z.any(), // TODO: fix type
-      amount: z.any(), // TODO: fix type
+      price: z.number(),
+      amount: z.union([z.string(), PG_INT]),
       timestamp: PG_INT,
       community: z.object({
         id: z.string(),

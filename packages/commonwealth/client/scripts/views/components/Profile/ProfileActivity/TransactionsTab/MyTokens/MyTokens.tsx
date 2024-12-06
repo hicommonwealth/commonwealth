@@ -57,7 +57,7 @@ const MyTokens = ({ transactions }: TransactionsProps) => {
           label: {
             holdings:
               transaction.transaction_category === 'stake'
-                ? `${(accumulatedStakes[key]?.amount || 0) + transaction.amount * action} stakes`
+                ? `${(accumulatedStakes[key]?.amount || 0) + (transaction.amount as number) * action} stakes`
                 : `${transaction.amount || 0} tokens`,
             price:
               transaction.transaction_category === 'stake'
@@ -66,9 +66,9 @@ const MyTokens = ({ transactions }: TransactionsProps) => {
                       (accumulatedStakes[key]?.avgPrice || 0) +
                         parseFloat(
                           (
-                            parseFloat(transaction.price) /
+                            parseFloat(`${transaction.price}`) /
                             WEI_PER_ETHER /
-                            transaction.amount
+                            (transaction.amount as number)
                           ).toFixed(5),
                         ) *
                           action || 0
@@ -79,7 +79,7 @@ const MyTokens = ({ transactions }: TransactionsProps) => {
           sortValue:
             transaction.transaction_category === 'stake'
               ? (accumulatedStakes[key]?.amount || 0) +
-                transaction.amount * action
+                (transaction.amount as number) * action
               : transaction.amount,
         },
       };

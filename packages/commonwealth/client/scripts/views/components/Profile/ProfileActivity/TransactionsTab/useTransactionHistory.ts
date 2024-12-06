@@ -33,10 +33,14 @@ const useTransactionHistory = ({
               : 'burn',
           totalPrice:
             t.transaction_category === 'stake'
-              ? `${(parseFloat(t.price) / WEI_PER_ETHER).toFixed(5)} ETH`
-              : `${`0.${Array.from({ length: tempPrice.decimal0Count })
-                  .map((_) => `0`)
-                  .join('')}${tempPrice.valueAfterDecimal0s}`} ETH`,
+              ? `${(parseFloat(`${t.price}`) / WEI_PER_ETHER).toFixed(5)} ETH`
+              : `${
+                  typeof tempPrice === 'string' || typeof tempPrice === 'number'
+                    ? tempPrice
+                    : `0.${Array.from({ length: tempPrice.decimal0Count })
+                        .map((_) => `0`)
+                        .join('')}${tempPrice.valueAfterDecimal0s}`
+                } ETH`,
           etherscanLink: buildEtherscanLink(
             t.transaction_hash,
             t.community?.chain_node_id || 0,
