@@ -28,9 +28,11 @@ const useTransactionHistory = ({
           ...t,
           timestamp: t.timestamp * 1000,
           transaction_type:
-            t.transaction_type === 'buy' && t.transaction_category === 'stake'
-              ? 'mint'
-              : 'burn',
+            t.transaction_category === 'stake'
+              ? t.transaction_type === 'buy'
+                ? 'mint'
+                : 'burn'
+              : t.transaction_type,
           totalPrice:
             t.transaction_category === 'stake'
               ? `${(parseFloat(`${t.price}`) / WEI_PER_ETHER).toFixed(5)} ETH`

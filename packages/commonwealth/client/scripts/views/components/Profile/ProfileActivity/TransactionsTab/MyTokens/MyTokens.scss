@@ -13,6 +13,8 @@
       }
 
       .asset-value {
+        text-transform: capitalize;
+
         .b1 {
           color: $neutral-700 !important;
         }
