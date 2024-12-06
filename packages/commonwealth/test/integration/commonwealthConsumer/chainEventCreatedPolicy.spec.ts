@@ -1,5 +1,5 @@
 import { EventContext, dispose } from '@hicommonwealth/core';
-import { models, tester } from '@hicommonwealth/model';
+import { createTestRpc, models, tester } from '@hicommonwealth/model';
 import { BalanceType } from '@hicommonwealth/shared';
 import { expect } from 'chai';
 import { BigNumber } from 'ethers';
@@ -10,7 +10,6 @@ import { Community } from '@hicommonwealth/schemas';
 import { z } from 'zod';
 // eslint-disable-next-line max-len
 import { processChainEventCreated } from '../../../server/workers/commonwealthConsumer/policies/chainEventCreated/chainEventCreatedPolicy';
-import { createTestRpc } from '../../util/util';
 
 // These are all values for a real txn on the Ethereum Sepolia Testnet
 const transactionHash =
