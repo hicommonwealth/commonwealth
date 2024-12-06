@@ -1,6 +1,6 @@
 import { AppError, logger } from '@hicommonwealth/core';
 import { type DB } from '@hicommonwealth/model';
-import { DynamicTemplate } from '@hicommonwealth/shared';
+import { DynamicTemplate, PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
 import sgMail from '@sendgrid/mail';
 import type { NextFunction, Request, Response } from 'express';
 import Sequelize from 'sequelize';
@@ -63,7 +63,7 @@ const updateEmail = async (
   }&email=${encodeURIComponent(email)}`;
   const msg = {
     to: email,
-    from: 'Commonwealth <no-reply@commonwealth.im>',
+    from: `Commonwealth <no-reply@${PRODUCTION_DOMAIN}>`,
     subject: 'Verify your Commonwealth email',
     templateId: DynamicTemplate.UpdateEmail,
     dynamic_template_data: {

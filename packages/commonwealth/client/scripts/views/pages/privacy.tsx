@@ -1,4 +1,5 @@
 /* eslint-disable max-len */
+import { PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
 import 'pages/privacy_and_terms.scss';
 import React from 'react';
 import { CWText } from '../components/component_kit/cw_text';
@@ -23,11 +24,11 @@ const PrivacyPage = () => {
         </p>
         <p>
           Please read this Privacy Policy, which is part of our{' '}
-          <a href="https://commonwealth.im/terms">Terms of Service</a>, before
-          using our Service. If you do not agree with the Terms of Service
-          and/or this Privacy Policy, you must refrain from using our Service.
-          By accessing or using our Service you agree to our use of your
-          information consistent with the Terms of Service and this Privacy
+          <a href={`https://${PRODUCTION_DOMAIN}/terms`}>Terms of Service</a>,
+          before using our Service. If you do not agree with the Terms of
+          Service and/or this Privacy Policy, you must refrain from using our
+          Service. By accessing or using our Service you agree to our use of
+          your information consistent with the Terms of Service and this Privacy
           Policy, subject to your rights described below.
         </p>
         <h2>

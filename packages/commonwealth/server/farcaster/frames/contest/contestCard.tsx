@@ -3,6 +3,7 @@ import { Contest, config as modelConfig } from '@hicommonwealth/model';
 import { Button } from 'frames.js/express';
 import React from 'react';
 
+import { PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
 import { frames } from '../../config';
 
 export const contestCard = frames(async (ctx) => {
@@ -117,7 +118,7 @@ const getBaseUrl = () => {
     case 'demo':
       return 'https://demo.commonwealth.im';
     default:
-      return 'https://commonwealth.im';
+      return `https://${PRODUCTION_DOMAIN}`;
   }
 };
 

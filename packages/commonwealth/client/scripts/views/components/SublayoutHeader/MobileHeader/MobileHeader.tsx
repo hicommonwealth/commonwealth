@@ -14,6 +14,7 @@ import MobileSearchModal from 'views/modals/MobileSearchModal';
 
 import useUserMenuItems from '../useUserMenuItems';
 
+import { DOCS_SUBDOMAIN } from '@hicommonwealth/shared';
 import useUserStore from 'state/ui/user';
 import { AuthModalType } from 'views/modals/AuthModal';
 import './MobileHeader.scss';
@@ -55,7 +56,7 @@ const MobileHeader = ({
     },
     {
       label: 'Help documentation',
-      onClick: () => window.open('https://docs.commonwealth.im/commonwealth/'),
+      onClick: () => window.open(`https://${DOCS_SUBDOMAIN}/commonwealth/`),
     },
   ] as PopoverMenuItem[];
 

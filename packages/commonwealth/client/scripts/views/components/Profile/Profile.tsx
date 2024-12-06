@@ -1,4 +1,4 @@
-import { DEFAULT_NAME } from '@hicommonwealth/shared';
+import { DEFAULT_NAME, PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
 import 'components/Profile/Profile.scss';
 import React, { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
@@ -119,7 +119,7 @@ const Profile = ({ userId }: ProfileProps) => {
           <Helmet>
             <link
               rel="canonical"
-              href={`https://commonwealth.im/profile/id/${userId}`}
+              href={`https://${PRODUCTION_DOMAIN}/profile/id/${userId}`}
             />
           </Helmet>
 
