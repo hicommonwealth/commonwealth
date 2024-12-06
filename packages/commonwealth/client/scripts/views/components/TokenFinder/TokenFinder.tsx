@@ -34,7 +34,6 @@ const TokenFinder = ({
         onInput={(e) => setTokenValue(e.target.value.trim())}
         customError={tokenError}
       />
-
       {debouncedTokenValue && !tokenError && (
         <TokenBanner
           isLoading={tokenMetadataLoading}

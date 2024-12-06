@@ -10,7 +10,6 @@ import {
 import {
   Broker,
   BrokerSubscriptions,
-  EventNames,
   broker,
   handleEvent,
   logger,
@@ -22,6 +21,7 @@ import {
   DiscordBotPolicy,
   FarcasterWorker,
 } from '@hicommonwealth/model';
+import { EventNames } from '@hicommonwealth/schemas';
 import { fileURLToPath } from 'url';
 import { config } from '../../config';
 import { ChainEventPolicy } from './policies/chainEventCreated/chainEventCreatedPolicy';

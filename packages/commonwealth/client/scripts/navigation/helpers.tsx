@@ -1,3 +1,4 @@
+import { PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
 import React from 'react';
 import type { NavigateOptions, To } from 'react-router-dom';
 import {
@@ -8,8 +9,6 @@ import {
 } from 'react-router-dom';
 import app from 'state';
 import { fetchCachedCustomDomain } from 'state/api/configuration';
-
-const PROD_URL = 'https://commonwealth.im';
 
 type NavigateWithParamsProps = {
   to: string | ((params: Record<string, string | undefined>) => string);
@@ -116,7 +115,7 @@ export const navigateToCommunity = ({
     navigate(path, {}, chain);
   } else {
     if (isExternalLink) {
-      window.open(`${PROD_URL}/${chain}${path}`);
+      window.open(`https://${PRODUCTION_DOMAIN}/${chain}${path}`);
     } else {
       navigate(path);
     }

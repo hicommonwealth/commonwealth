@@ -1,5 +1,7 @@
-import { Projection, events } from '@hicommonwealth/core';
+import { Projection } from '@hicommonwealth/core';
+import { events } from '@hicommonwealth/schemas';
 import { models } from '../database';
+import { getReferrerId } from '../utils/referrals';
 
 const inputs = {
   CommunityCreated: events.CommunityCreated,
@@ -11,12 +13,12 @@ export function UserReferrals(): Projection<typeof inputs> {
     inputs,
     body: {
       CommunityCreated: async ({ payload }) => {
-        const referral_link = payload.referralLink;
-        if (referral_link?.startsWith('ref_')) {
-          const referrer_id = parseInt(referral_link.split('_').at(1)!);
+        const referral_link = payload.referral_link;
+        const referrer_id = getReferrerId(referral_link);
+        if (referrer_id) {
           await models.Referral.create({
             referrer_id,
-            referee_id: parseInt(payload.userId),
+            referee_id: payload.user_id,
             event_name: 'CommunityCreated',
             event_payload: payload,
             created_at: new Date(),
@@ -25,8 +27,8 @@ export function UserReferrals(): Projection<typeof inputs> {
       },
       SignUpFlowCompleted: async ({ payload }) => {
         const referral_link = payload.referral_link;
-        if (referral_link?.startsWith('ref_')) {
-          const referrer_id = parseInt(referral_link.split('_').at(1)!);
+        const referrer_id = getReferrerId(referral_link);
+        if (referrer_id) {
           await models.Referral.create({
             referrer_id,
             referee_id: payload.user_id,

@@ -8,6 +8,8 @@ export enum ValidChains {
   Optimism = 10,
   Mainnet = 1,
   Arbitrum = 42161,
+  BSC = 56,
+  SKALE_TEST = 974399131,
   Anvil = 31337,
 }
 
@@ -71,6 +73,16 @@ export const factoryContracts = {
     factory: '0xE3AE9569f4523161742414480f87967e991741bd',
     communityStake: '0xcc752fd15A7Dd0d5301b6A626316E7211352Cf62',
     chainId: 42161,
+  },
+  [ValidChains.BSC]: {
+    factory: '0xe3ae9569f4523161742414480f87967e991741bd',
+    communityStake: '0xcc752fd15a7dd0d5301b6a626316e7211352cf62',
+    chainId: 56,
+  },
+  [ValidChains.SKALE_TEST]: {
+    factory: '0x16da329328d9816b5e68d96ec5944d939ed9727e',
+    communityStake: '0xc49eecf7af055c4dfa3e918662d9bbac45544bd6',
+    chainId: 974399131,
   },
   [ValidChains.Anvil]: {
     factory: '', //TODO: Fix, this is incorrect

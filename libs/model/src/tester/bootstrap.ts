@@ -1,3 +1,4 @@
+import { delay } from '@hicommonwealth/shared';
 import path from 'path';
 import { QueryTypes, Sequelize } from 'sequelize';
 import { SequelizeStorage, Umzug } from 'umzug';
@@ -30,7 +31,7 @@ const verify_db = async (name: string): Promise<void> => {
       console.log('Created new test db:', name);
     }
   } catch (error) {
-    console.error(`Error verifying db [${name}]:`, error);
+    console.error(`<<<Error verifying ${name}>>>`, error);
     // ignore verification errors
     // throw error;
   } finally {
@@ -71,20 +72,25 @@ const migrate_db = async (sequelize: Sequelize) => {
 };
 
 /**
- * Truncates all tables
+ * Truncates all sequelize tables.
+ * Use with caution since this can cause deadlocks.
  * @param db database models
  */
 const truncate_db = async (db?: DB) => {
   if (!db) return;
-  try {
-    const tables = Object.values(db.sequelize.models)
-      .map((model) => `"${model.tableName}"`)
-      .join(',');
-    await db.sequelize.query(
-      `TRUNCATE TABLE ${tables} RESTART IDENTITY CASCADE;`,
-    );
-  } catch {
-    // ignore failed truncate
+  for (let i = 1; i <= 10; i++) {
+    try {
+      const tables = Object.values(db.sequelize.models)
+        .map((model) => `"${model.tableName}"`)
+        .join(',');
+      await db.sequelize.query(
+        `TRUNCATE TABLE ${tables} RESTART IDENTITY CASCADE;`,
+      );
+      break;
+    } catch (e) {
+      console.error(`<<<Error truncating tables (${i})>>>`, e);
+      await delay(100);
+    }
   }
 };
 
@@ -202,9 +208,13 @@ export const get_info_schema = async (
 };
 
 let db: DB | undefined = undefined;
-let bootstrapLock: Promise<DB> | undefined = undefined;
 
-async function _bootstrap_testing(): Promise<DB> {
+/**
+ * Bootstraps testing
+ * Creates a clean model if it doesn't exist
+ * @returns synchronized and truncated sequelize db instance
+ */
+export async function bootstrap_testing(): Promise<DB> {
   if (!db) {
     const db_name = config.DB.NAME;
     try {
@@ -222,27 +232,9 @@ async function _bootstrap_testing(): Promise<DB> {
       await truncate_db(db);
       console.log(`Bootstrapped [${db_name}]`);
     } catch (e) {
-      console.error(`Error bootstrapping: ${db_name}`, e);
+      console.error(`<<<Error bootstrapping ${db_name}>>>`, e);
       throw e;
     }
   }
   return db;
 }
-
-/**
- * Bootstraps testing, creating/migrating a fresh instance if it doesn't exist.
- * @meta import meta of calling test
- * @param truncate when true, truncates all tables in model
- * @returns synchronized sequelize db instance
- */
-export const bootstrap_testing = async (): Promise<DB> => {
-  if (bootstrapLock) {
-    return await bootstrapLock;
-  }
-  bootstrapLock = _bootstrap_testing();
-  try {
-    return await bootstrapLock;
-  } finally {
-    bootstrapLock = undefined;
-  }
-};

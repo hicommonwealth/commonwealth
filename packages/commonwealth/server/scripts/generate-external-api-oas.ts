@@ -1,5 +1,6 @@
 import { trpc } from '@hicommonwealth/adapters';
 import { dispose, logger } from '@hicommonwealth/core';
+import { PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
 import { promises as fs } from 'fs';
 import { isAbsolute } from 'path';
 import { oasOptions, trpcRouter } from '../api/external-router';
@@ -23,7 +24,7 @@ async function main() {
 
   const host =
     process.argv[2] === 'production'
-      ? 'https://commonwealth.im'
+      ? `https://${PRODUCTION_DOMAIN}`
       : 'http://localhost:8080';
 
   const oas = trpc.toOpenApiDocument(trpcRouter, host, oasOptions);

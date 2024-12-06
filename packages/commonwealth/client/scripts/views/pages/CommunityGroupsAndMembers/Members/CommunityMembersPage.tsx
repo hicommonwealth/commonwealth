@@ -1,4 +1,5 @@
 import { DEFAULT_NAME } from '@hicommonwealth/shared';
+import { OpenFeature } from '@openfeature/web-sdk';
 import { APIOrderDirection } from 'helpers/constants';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import useTopicGating from 'hooks/useTopicGating';
@@ -36,6 +37,7 @@ import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextIn
 import useAppStatus from '../../../../hooks/useAppStatus';
 import './CommunityMembersPage.scss';
 import GroupsSection from './GroupsSection';
+import LeaderboardSection from './LeaderboardSection';
 import MembersSection from './MembersSection';
 import { Member } from './MembersSection/MembersSection';
 import {
@@ -44,9 +46,21 @@ import {
   SearchFilters,
 } from './index.types';
 
+const client = OpenFeature.getClient();
+const referralsEnabled = client.getBooleanValue('referrals', false);
+
+enum TabValues {
+  AllMembers = 'all-members',
+  Leaderboard = 'leaderboard',
+  Groups = 'groups',
+}
+
 const TABS = [
-  { value: 'all-members', label: 'All members' },
-  { value: 'groups', label: 'Groups' },
+  { value: TabValues.AllMembers, label: 'All members' },
+  ...(referralsEnabled
+    ? [{ value: TabValues.Leaderboard, label: 'Leaderboard' }]
+    : []),
+  { value: TabValues.Groups, label: 'Groups' },
 ];
 
 const GROUP_AND_MEMBER_FILTERS: { label: string; value: BaseGroupFilter }[] = [
@@ -59,7 +73,9 @@ const CommunityMembersPage = () => {
   const navigate = useCommonNavigate();
   const user = useUserStore();
 
-  const [selectedTab, setSelectedTab] = useState(TABS[0].value);
+  const [selectedTab, setSelectedTab] = useState<TabValues>(
+    TabValues.AllMembers,
+  );
   const [searchFilters, setSearchFilters] = useState<SearchFilters>({
     searchText: '',
     groupFilter: GROUP_AND_MEMBER_FILTERS[0].value,
@@ -270,16 +286,18 @@ const CommunityMembersPage = () => {
 
   const totalResults = members?.pages?.[0]?.totalResults || 0;
 
-  const updateActiveTab = (activeTab: string) => {
+  const updateActiveTab = (activeTab: TabValues) => {
     const params = new URLSearchParams();
     params.set('tab', activeTab);
     navigate(`${window.location.pathname}?${params.toString()}`, {}, null);
     setSelectedTab(activeTab);
 
     let eventType;
-    if (activeTab === TABS[0].value) {
+    if (activeTab === TabValues.AllMembers) {
       eventType = MixpanelPageViewEvent.MEMBERS_PAGE_VIEW;
-    } else {
+    } else if (activeTab === TabValues.Leaderboard) {
+      eventType = MixpanelPageViewEvent.LEADERBOARD_PAGE_VIEW;
+    } else if (activeTab === TabValues.Groups) {
       eventType = MixpanelPageViewEvent.GROUPS_PAGE_VIEW;
     }
 
@@ -298,14 +316,12 @@ const CommunityMembersPage = () => {
   useEffect(() => {
     // Set the active tab based on URL
     const params = new URLSearchParams(window.location.search.toLowerCase());
-    const activeTab = params.get('tab')?.toLowerCase();
+    const activeTab =
+      TABS.find((t) => t.value === params.get('tab')?.toLowerCase())?.value ||
+      TabValues.AllMembers;
 
-    if (!activeTab || activeTab === TABS[0].value) {
-      updateActiveTab(TABS[0].value);
-      return;
-    }
+    updateActiveTab(activeTab);
 
-    updateActiveTab(TABS[1].value);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.search]);
 
@@ -348,7 +364,7 @@ const CommunityMembersPage = () => {
 
         {/* Gating group post-mutation banner */}
         {shouldShowGroupMutationBannerForCommunities.includes(communityId) &&
-          selectedTab === TABS[0].value && (
+          selectedTab === TabValues.AllMembers && (
             <section>
               <CWBanner
                 type="info"
@@ -368,7 +384,7 @@ const CommunityMembersPage = () => {
           )}
 
         {/* Filter section */}
-        {selectedTab === TABS[1].value && groups?.length === 0 ? (
+        {selectedTab === TabValues.Leaderboard && groups?.length === 0 ? (
           <></>
         ) : (
           <section
@@ -387,7 +403,7 @@ const CommunityMembersPage = () => {
               size="large"
               fullWidth
               placeholder={`Search ${
-                selectedTab === TABS[0].value ? 'members' : 'groups'
+                selectedTab === TabValues.AllMembers ? 'members' : 'groups'
               }`}
               containerClassName="search-input-container"
               inputClassName="search-input"
@@ -435,12 +451,14 @@ const CommunityMembersPage = () => {
         )}
 
         {/* Main content section: based on the selected tab */}
-        {selectedTab === TABS[1].value ? (
+        {selectedTab === TabValues.Groups ? (
           <GroupsSection
             filteredGroups={filteredGroups}
             canManageGroups={isAdmin}
             hasNoGroups={groups?.length === 0}
           />
+        ) : selectedTab === TabValues.Leaderboard ? (
+          <LeaderboardSection />
         ) : (
           <MembersSection
             // @ts-expect-error <StrictNullChecks/>

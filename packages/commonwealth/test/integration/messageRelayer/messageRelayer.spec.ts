@@ -1,8 +1,9 @@
-import { disposeAdapter, EventNames } from '@hicommonwealth/core';
-import { models, tester } from '@hicommonwealth/model';
+import { disposeAdapter } from '@hicommonwealth/core';
+import { models } from '@hicommonwealth/model';
+import { EventNames } from '@hicommonwealth/schemas';
 import { delay } from '@hicommonwealth/shared';
 import { expect } from 'chai';
-import { afterEach, beforeAll, describe, test } from 'vitest';
+import { afterEach, describe, test } from 'vitest';
 import { startMessageRelayer } from '../../../server/workers/messageRelayer/messageRelayer';
 import {
   numUnrelayedEvents,
@@ -11,10 +12,6 @@ import {
 import { testOutboxEvents } from './util';
 
 describe('messageRelayer', { timeout: 20_000 }, () => {
-  beforeAll(async () => {
-    await tester.bootstrap_testing();
-  });
-
   afterEach(async () => {
     await models.Outbox.truncate();
     disposeAdapter('brokerFactory');

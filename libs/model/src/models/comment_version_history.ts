@@ -1,4 +1,5 @@
 import { CommentVersionHistory } from '@hicommonwealth/schemas';
+import { MAX_TRUNCATED_CONTENT_LENGTH } from '@hicommonwealth/shared';
 import Sequelize from 'sequelize';
 import { z } from 'zod';
 import { CommentAttributes } from './comment';
@@ -23,7 +24,10 @@ export default (
     {
       id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },
       comment_id: { type: Sequelize.INTEGER, allowNull: false },
-      body: { type: Sequelize.TEXT, allowNull: false },
+      body: {
+        type: Sequelize.STRING(MAX_TRUNCATED_CONTENT_LENGTH),
+        allowNull: false,
+      },
       timestamp: { type: Sequelize.DATE, allowNull: false },
       content_url: { type: Sequelize.STRING, allowNull: true },
     },

@@ -1,6 +1,7 @@
-import { events, LaunchpadTrade, logger } from '@hicommonwealth/core';
+import { logger } from '@hicommonwealth/core';
 import { commonProtocol as cp } from '@hicommonwealth/evm-protocols';
 import { commonProtocol, models } from '@hicommonwealth/model';
+import { chainEvents, events } from '@hicommonwealth/schemas';
 import { BigNumber } from 'ethers';
 import Web3 from 'web3';
 import { z } from 'zod';
@@ -18,7 +19,7 @@ export async function handleLaunchpadTrade(
     4: ethAmount,
     // 5: protocolEthAmount,
     6: floatingSupply,
-  } = event.parsedArgs as z.infer<typeof LaunchpadTrade>;
+  } = event.parsedArgs as z.infer<typeof chainEvents.LaunchpadTrade>;
 
   const token = await models.Token.findOne({
     where: {

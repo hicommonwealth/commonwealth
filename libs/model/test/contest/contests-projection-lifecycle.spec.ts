@@ -2,19 +2,25 @@ import { BigNumber } from '@ethersproject/bignumber';
 import {
   Actor,
   DeepPartial,
-  EventNames,
   dispose,
   handleEvent,
   query,
 } from '@hicommonwealth/core';
 import { commonProtocol } from '@hicommonwealth/evm-protocols';
 import { models } from '@hicommonwealth/model';
-import { ContestResults } from '@hicommonwealth/schemas';
+import { ContestResults, EventNames } from '@hicommonwealth/schemas';
 import { AbiType, delay } from '@hicommonwealth/shared';
-import chai, { expect } from 'chai';
+import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import Sinon from 'sinon';
-import { afterAll, afterEach, beforeAll, describe, test } from 'vitest';
+import {
+  afterAll,
+  afterEach,
+  beforeAll,
+  describe,
+  expect,
+  test,
+  vi,
+} from 'vitest';
 import { z } from 'zod';
 import { Contests } from '../../src/contest/Contests.projection';
 import { GetAllContests } from '../../src/contest/GetAllContests.query';
@@ -59,15 +65,11 @@ describe('Contests projection lifecycle', () => {
   const decimals = commonProtocol.WeiDecimals[commonProtocol.Denominations.ETH];
   const topic_id = 100;
 
-  let getTokenAttributes: Sinon.SinonStub;
-  let getContestScore: Sinon.SinonStub;
-  let getContestStatus: Sinon.SinonStub;
+  const getTokenAttributes = vi.spyOn(contractHelpers, 'getTokenAttributes');
+  const getContestScore = vi.spyOn(contestHelper, 'getContestScore');
+  const getContestStatus = vi.spyOn(contestHelper, 'getContestStatus');
 
   beforeAll(async () => {
-    getTokenAttributes = Sinon.stub(contractHelpers, 'getTokenAttributes');
-    getContestScore = Sinon.stub(contestHelper, 'getContestScore');
-    getContestStatus = Sinon.stub(contestHelper, 'getContestStatus');
-
     try {
       const [recurringContestAbi] = await seed('ContractAbi', {
         id: 700,
@@ -182,7 +184,7 @@ describe('Contests projection lifecycle', () => {
   });
 
   afterEach(async () => {
-    Sinon.restore();
+    vi.restoreAllMocks();
   });
 
   test('should project events on multiple contests', async () => {
@@ -203,9 +205,9 @@ describe('Contests projection lifecycle', () => {
         prize: ((prizePool * BigInt(payout_structure[1])) / 100n).toString(),
       },
     ];
-    getTokenAttributes.resolves({ ticker, decimals });
-    getContestScore.resolves({
-      contestBalance,
+    getTokenAttributes.mockResolvedValue({ ticker, decimals });
+    getContestScore.mockResolvedValue({
+      contestBalance: contestBalance.toString(),
       scores: [
         {
           winningAddress: creator1,
@@ -219,11 +221,11 @@ describe('Contests projection lifecycle', () => {
         },
       ],
     });
-    getContestStatus.resolves({
+    getContestStatus.mockResolvedValue({
       startTime: 1,
       endTime: 100,
       contestInterval: 50,
-      lastContentId: 1,
+      lastContentId: '1',
     });
 
     await handleEvent(Contests(), {

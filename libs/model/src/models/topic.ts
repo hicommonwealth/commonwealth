@@ -1,6 +1,7 @@
 import { Topic } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize';
 import { z } from 'zod';
+import { ChainNodeAttributes } from './chain_node';
 import type { CommunityAttributes } from './community';
 import type { ThreadAttributes } from './thread';
 import type { ModelInstance } from './types';
@@ -9,6 +10,7 @@ export type TopicAttributes = z.infer<typeof Topic> & {
   // associations
   community?: CommunityAttributes;
   threads?: ThreadAttributes[];
+  ChainNode?: ChainNodeAttributes;
 };
 export type TopicInstance = ModelInstance<TopicAttributes>;
 
@@ -49,6 +51,7 @@ export default (
       },
       telegram: { type: Sequelize.STRING, allowNull: true },
       weighted_voting: { type: Sequelize.STRING, allowNull: true },
+      chain_node_id: { type: Sequelize.INTEGER, allowNull: true },
       token_address: { type: Sequelize.STRING, allowNull: true },
       token_symbol: { type: Sequelize.STRING, allowNull: true },
       vote_weight_multiplier: { type: Sequelize.FLOAT, allowNull: true },

@@ -1,5 +1,6 @@
 import { trpc } from '@hicommonwealth/adapters';
 import { dispose } from '@hicommonwealth/core';
+import { PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
 import { readFileSync } from 'fs';
 import { readFile, unlink, writeFile } from 'fs/promises';
 import pkg from 'openapi-diff';
@@ -91,13 +92,13 @@ async function validateExternalApiVersioning() {
   }
 
   await downloadFile(
-    'https://commonwealth.im/api/v1/openapi.json',
+    `https://${PRODUCTION_DOMAIN}/api/v1/openapi.json`,
     productionOasPath,
   );
 
   const newOas = trpc.toOpenApiDocument(
     trpcRouter,
-    'http://commonwealth.im', // host must be the same as production
+    `https://${PRODUCTION_DOMAIN}`, // host must be the same as production
     oasOptions,
   );
   await writeFile(localOasPath, JSON.stringify(newOas, null, 2), 'utf8');

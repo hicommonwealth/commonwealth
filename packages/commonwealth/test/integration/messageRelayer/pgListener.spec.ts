@@ -1,4 +1,4 @@
-import { models, tester } from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model';
 import { delay } from '@hicommonwealth/shared';
 import { expect } from 'chai';
 import { Client } from 'pg';
@@ -13,7 +13,6 @@ describe.skip('pgListener', { timeout: 10_000 }, () => {
   let client: Client;
 
   beforeAll(async () => {
-    await tester.bootstrap_testing();
     client = await setupListener();
   });
 
