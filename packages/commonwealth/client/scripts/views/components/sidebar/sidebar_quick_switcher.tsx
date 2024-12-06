@@ -58,6 +58,22 @@ export const SidebarQuickSwitcher = ({
               }
             />
           ))}
+        <CWDivider />
+        {user.communities
+          .filter((x) => !x.isStarred)
+          .map((community) => (
+            <CWCommunityAvatar
+              key={community.id}
+              size="large"
+              community={{
+                iconUrl: community.iconUrl,
+                name: community.name,
+              }}
+              onClick={() =>
+                navigateToCommunity({ navigate, path: '', chain: community.id })
+              }
+            />
+          ))}
       </div>
     </div>
   );
