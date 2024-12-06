@@ -44,6 +44,25 @@ const deleteAddress = async (
     return next(new AppError(Errors.CannotDeleteMagic));
   }
 
+  const adminUsers = await models.Address.findAll({
+    where: {
+      community_id: community.id,
+      address: addressObj.address,
+      role: 'admin',
+    },
+  });
+
+  if (
+    adminUsers.length === 1 &&
+    adminUsers[0].dataValues.address === addressObj.address
+  ) {
+    return next(
+      new AppError(
+        'You are the only admin of this community invite and make another user the admin of the community.',
+      ),
+    );
+  }
+
   await models.sequelize.transaction(async (transaction) => {
     await models.Address.update(
       { user_id: null, verified: null },
