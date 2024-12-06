@@ -46,6 +46,12 @@
   }
 }
 
+@mixin isWindowSmallToMediumInclusive {
+  @media only screen and (max-width: $breakpoint-small-max-New-px) {
+    @content;
+  }
+}
+
 @mixin small {
   @media only screen and (min-width: $breakpoint-small-min-px) and (max-width: $breakpoint-small-max-px) {
     @content;
