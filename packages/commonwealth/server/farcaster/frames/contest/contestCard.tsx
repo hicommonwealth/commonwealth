@@ -94,15 +94,8 @@ export const contestCard = frames(async (ctx) => {
       >
         Prizes
       </Button>,
-      <Button
-        key="eligibility"
-        action="post"
-        target={`/${contest_address}/checkEligibility`}
-      >
-        Check Eligibility
-      </Button>,
       <Button key="install" action="link" target={getActionInstallUrl()}>
-        Install Upvote Action
+        Add Upvote Action
       </Button>,
     ],
   };

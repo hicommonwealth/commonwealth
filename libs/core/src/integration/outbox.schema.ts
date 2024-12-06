@@ -1,8 +1,7 @@
-import { PG_INT } from '@hicommonwealth/schemas';
+import { EventNames as E, events as P, PG_INT } from '@hicommonwealth/schemas';
 import { z } from 'zod';
-import { EventNames as E, events as P } from './events';
 
-const BaseOutboxProperties = z.object({
+export const BaseOutboxProperties = z.object({
   event_id: PG_INT.optional(),
   relayed: z.boolean().optional(),
   created_at: z.coerce.date().optional(),
@@ -31,6 +30,7 @@ const outboxEvents = {
   [E.GroupCreated]: P.GroupCreated,
   [E.OneOffContestManagerDeployed]: P.OneOffContestManagerDeployed,
   [E.RecurringContestManagerDeployed]: P.RecurringContestManagerDeployed,
+  [E.SignUpFlowCompleted]: P.SignUpFlowCompleted,
   [E.SnapshotProposalCreated]: P.SnapshotProposalCreated,
   [E.SubscriptionPreferencesUpdated]: P.SubscriptionPreferencesUpdated,
   [E.ThreadCreated]: P.ThreadCreated,

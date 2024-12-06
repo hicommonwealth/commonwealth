@@ -1,5 +1,4 @@
 import { DEFAULT_NAME } from '@hicommonwealth/shared';
-import 'components/Profile/Profile.scss';
 import React, { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useFetchProfileByIdQuery } from 'state/api/profiles';
@@ -11,6 +10,7 @@ import { CWText } from '../../components/component_kit/cw_text';
 import { PageNotFound } from '../../pages/404';
 import { ImageBehavior } from '../component_kit/CWImageInput';
 import CWCircleMultiplySpinner from '../component_kit/new_designs/CWCircleMultiplySpinner';
+import './Profile.scss';
 import type { CommentWithAssociatedThread } from './ProfileActivity';
 import ProfileActivity from './ProfileActivity';
 import ProfileHeader from './ProfileHeader';
@@ -139,7 +139,11 @@ const Profile = ({ userId }: ProfileProps) => {
           >
             {/* @ts-expect-error StrictNullChecks*/}
             <ProfileHeader profile={profile} isOwner={isOwner} />
-            <ProfileActivity threads={threads} comments={comments} />
+            <ProfileActivity
+              threads={threads}
+              comments={comments}
+              isOwner={isOwner}
+            />
           </div>
         </CWPageLayout>
       </div>
@@ -151,7 +155,11 @@ const Profile = ({ userId }: ProfileProps) => {
           <div className="ProfilePageContainer">
             {/* @ts-expect-error StrictNullChecks*/}
             <ProfileHeader profile={profile} isOwner={isOwner} />
-            <ProfileActivity threads={threads} comments={comments} />
+            <ProfileActivity
+              threads={threads}
+              comments={comments}
+              isOwner={isOwner}
+            />
           </div>
         </div>
       </CWPageLayout>

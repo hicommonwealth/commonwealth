@@ -1,6 +1,5 @@
 import {
   CacheNamespaces,
-  Events,
   INVALID_ACTOR_ERROR,
   INVALID_INPUT_ERROR,
   INVALID_STATE_ERROR,
@@ -13,6 +12,7 @@ import {
   type EventsHandlerMetadata,
   type Metadata,
 } from '@hicommonwealth/core';
+import { Events } from '@hicommonwealth/schemas';
 import { TRPCError } from '@trpc/server';
 import { ZodSchema, ZodUndefined, z } from 'zod';
 import { Commit, Tag, Track, buildproc, procedure } from './middleware';

@@ -47,10 +47,11 @@ export async function seedCommunity({
   const users = await seedRecord('User', roles, (role) => ({
     profile: { name: role },
     isAdmin: role === 'admin',
+    is_welcome_onboard_flow_complete: false,
   }));
 
   // seed ethereum base community
-  await seed('Community', {
+  const [base] = await seed('Community', {
     chain_node_id: node!.id!,
     base: ChainBase.Ethereum,
     active: true,
@@ -69,6 +70,7 @@ export async function seedCommunity({
 
   const [community] = await seed('Community', {
     chain_node_id: node!.id!,
+    base: ChainBase.Ethereum,
     namespace_address,
     active: true,
     profile_count: 1,
@@ -115,5 +117,5 @@ export async function seedCommunity({
     addresses[role] = address!;
   });
 
-  return { community, node, actors, addresses, users, roles };
+  return { base, community, node, actors, addresses, users, roles };
 }

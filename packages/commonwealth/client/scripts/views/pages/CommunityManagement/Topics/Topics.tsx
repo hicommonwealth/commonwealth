@@ -27,6 +27,8 @@ interface TopicFormRegular {
   name: string;
   description?: string;
   featuredInSidebar?: boolean;
+  featuredInNewPost?: boolean;
+  newPostTemplate?: string;
 }
 
 export interface TopicFormERC20 {
@@ -94,8 +96,8 @@ export const Topics = () => {
         name: topicFormData.name,
         description: topicFormData.description,
         featured_in_sidebar: topicFormData.featuredInSidebar || false,
-        featured_in_new_post: false,
-        default_offchain_template: '',
+        featured_in_new_post: topicFormData.featuredInNewPost || false,
+        default_offchain_template: topicFormData.newPostTemplate || '',
         community_id: app.activeChainId() || '',
         ...(erc20
           ? {

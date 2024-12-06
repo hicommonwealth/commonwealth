@@ -3,7 +3,7 @@ import * as schemas from '@hicommonwealth/schemas';
 import { DEFAULT_NAME } from '@hicommonwealth/shared';
 import { models } from '../database';
 import { mustExist } from '../middleware/guards';
-import { decodeContent, getDelta, updateTags } from '../utils';
+import { decodeContent, emitEvent, getDelta, updateTags } from '../utils';
 
 export function UpdateUser(): Command<typeof schemas.UpdateUser> {
   return {
@@ -14,7 +14,7 @@ export function UpdateUser(): Command<typeof schemas.UpdateUser> {
       if (actor.user.id != payload.id)
         throw new InvalidInput('Invalid user id');
 
-      const { id, profile, tag_ids } = payload;
+      const { id, profile, tag_ids, referral_link } = payload;
       const {
         slug,
         name,
@@ -78,7 +78,21 @@ export function UpdateUser(): Command<typeof schemas.UpdateUser> {
           async (transaction) => {
             if (update_tags)
               await updateTags(tag_ids!, user.id!, 'user_id', transaction);
+
             if (update_user) {
+              // emit sign-up flow completed event when:
+              if (user_delta.is_welcome_onboard_flow_complete && referral_link)
+                await emitEvent(
+                  models.Outbox,
+                  [
+                    {
+                      event_name: schemas.EventNames.SignUpFlowCompleted,
+                      event_payload: { user_id: id, referral_link },
+                    },
+                  ],
+                  transaction,
+                );
+
               // TODO: utility to deep merge deltas
               const updates = {
                 ...user_delta,

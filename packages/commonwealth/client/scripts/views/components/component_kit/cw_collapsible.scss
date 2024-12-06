@@ -1,0 +1,37 @@
+@import '../../../styles/shared.scss';
+
+.Collapsible {
+  display: flex;
+  width: 100%;
+
+  .header-and-content-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+
+    .collapsible-header {
+      align-items: center;
+      display: flex;
+      width: 100%;
+
+      .expand-icon-button {
+        align-items: center;
+        display: flex;
+        margin-right: 8px;
+
+        @include smallInclusive {
+          margin-right: 4px;
+        }
+
+        .IconButton {
+          color: $neutral-500;
+        }
+      }
+    }
+
+    .content-container {
+      // ensures content aligns with header
+      padding-left: 40px;
+    }
+  }
+}

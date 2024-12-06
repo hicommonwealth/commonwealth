@@ -1,4 +1,4 @@
-@import '../../../../../styles/shared';
+@import '../../../../styles/shared';
 
 .MobileHeader {
   height: 48px;
@@ -51,5 +51,27 @@
     .menu-item-text {
       width: 100%;
     }
+  }
+}
+
+.InviteLinkDrawer {
+  padding: 0 !important;
+
+  .CWModalHeader {
+    padding: 24px 16px !important;
+  }
+
+  .CWModalBody {
+    padding-inline: 16px !important;
+
+    .share-section {
+      .bold {
+        margin: 0 !important;
+      }
+    }
+  }
+
+  .CWModalFooter {
+    padding: 0 !important;
   }
 }

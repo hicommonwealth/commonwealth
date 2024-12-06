@@ -1,0 +1,102 @@
+@import '../../../styles/shared.scss';
+
+.AdminPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+
+  .TaskGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    .TaskRow {
+      display: flex;
+      flex-direction: row;
+      gap: 44px;
+      align-items: flex-end;
+
+      .Downloading {
+        display: flex;
+        width: 250px;
+        align-items: center;
+        height: 100%;
+      }
+    }
+
+    .nonEVMMessage {
+      padding: 12px;
+      color: red;
+    }
+  }
+
+  .MultiRow {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .Analytics {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+
+    .AnalyticsSection {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+
+      .Row {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+
+      .AnalyticsList {
+        display: flex;
+        gap: 4px;
+        overflow-y: scroll;
+        max-height: 200px;
+        flex-direction: column;
+        border: 1px solid $neutral-300;
+        border-radius: 4px;
+
+        .CommunityName {
+          width: 100%;
+          cursor: pointer;
+          padding: 4px;
+
+          .RightSide {
+            align-content: flex-end;
+            margin-left: -500px;
+            padding-top: 4px;
+          }
+
+          &:hover {
+            background-color: $neutral-100;
+          }
+        }
+        .CommunityName.no-hover:hover {
+          background-color: transparent;
+        }
+      }
+
+      .Stats {
+        display: flex;
+        flex-wrap: wrap;
+        border: 1px solid $neutral-300;
+        border-radius: 4px;
+        gap: 8px;
+        padding: 8px;
+
+        .Stat {
+          flex: 1 0 200px; /* Adjust to your preference */
+
+          .StatValue {
+            color: $neutral-500;
+          }
+        }
+      }
+    }
+  }
+}
