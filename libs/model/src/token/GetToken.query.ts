@@ -1,4 +1,4 @@
-import { InvalidState, type Query } from '@hicommonwealth/core';
+import { type Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
 import { z } from 'zod';
@@ -21,7 +21,7 @@ export function GetToken(): Query<typeof schemas.GetToken> {
       mustExist('Community', community);
 
       if (!community.namespace) {
-        throw new InvalidState('Community namespace is not set');
+        return;
       }
 
       const sql = `

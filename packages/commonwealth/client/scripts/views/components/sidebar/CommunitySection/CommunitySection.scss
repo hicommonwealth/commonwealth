@@ -9,7 +9,7 @@
   overflow-y: auto;
   width: $sidebar-width;
 
-  @include smallInclusive {
+  @include isWindowSmallToMediumInclusive {
     width: calc(100vw - $quick-switcher-width);
   }
 
