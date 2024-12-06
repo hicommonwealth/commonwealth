@@ -1,7 +1,7 @@
 import { commonProtocol } from '@hicommonwealth/evm-protocols';
 import z from 'zod';
 import { AuthContext } from '../context';
-import { ContestManager } from '../entities';
+import { ContestManager } from '../entities/contest-manager.schemas';
 import { PG_INT } from '../utils';
 
 export const CreateContestManagerMetadata = {
@@ -51,7 +51,9 @@ export const UpdateContestManagerMetadata = {
     topic_id: PG_INT.optional(),
   }),
   output: z.object({
-    contest_managers: z.array(ContestManager),
+    contest_managers: z.array(
+      ContestManager.extend({ topic_id: PG_INT.nullish() }),
+    ),
   }),
   context: AuthContext,
 };

@@ -1,10 +1,11 @@
-import { dispose, EventNames, handleEvent } from '@hicommonwealth/core';
+import { dispose, handleEvent } from '@hicommonwealth/core';
 import {
-  commonProtocol,
   ContestWorker,
+  commonProtocol,
   emitEvent,
   models,
 } from '@hicommonwealth/model';
+import { EventNames } from '@hicommonwealth/schemas';
 import { Contests } from 'model/src/contest';
 import { literal } from 'sequelize';
 import { afterAll, beforeAll, describe, expect, test, vi } from 'vitest';

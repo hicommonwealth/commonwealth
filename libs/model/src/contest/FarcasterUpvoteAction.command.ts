@@ -1,4 +1,4 @@
-import { EventNames, type Command } from '@hicommonwealth/core';
+import { type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { NeynarAPIClient } from '@neynar/nodejs-sdk';
 import { config } from '../config';
@@ -33,7 +33,7 @@ export function FarcasterUpvoteAction(): Command<
         models.Outbox,
         [
           {
-            event_name: EventNames.FarcasterVoteCreated,
+            event_name: schemas.EventNames.FarcasterVoteCreated,
             event_payload: {
               ...payload,
               contest_address: addAction.contest_address,

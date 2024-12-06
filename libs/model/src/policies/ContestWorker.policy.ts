@@ -1,4 +1,5 @@
-import { Actor, events, logger, Policy } from '@hicommonwealth/core';
+import { Actor, logger, Policy } from '@hicommonwealth/core';
+import { events } from '@hicommonwealth/schemas';
 import { NeynarAPIClient } from '@neynar/nodejs-sdk';
 import moment from 'moment';
 import { QueryTypes } from 'sequelize';

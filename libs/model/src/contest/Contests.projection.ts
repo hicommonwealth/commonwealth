@@ -1,11 +1,11 @@
 import { BigNumber } from '@ethersproject/bignumber';
-import { InvalidState, Projection, events, logger } from '@hicommonwealth/core';
+import { InvalidState, Projection, logger } from '@hicommonwealth/core';
 import {
   ChildContractNames,
   EvmEventSignatures,
   commonProtocol as cp,
 } from '@hicommonwealth/evm-protocols';
-import { ContestScore } from '@hicommonwealth/schemas';
+import { ContestScore, events } from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
 import { z } from 'zod';
 import { models } from '../database';

@@ -1,13 +1,13 @@
 import {
   dispose,
   disposeAdapter,
-  EventNames,
   notificationsProvider,
   RepeatFrequency,
   WorkflowKeys,
 } from '@hicommonwealth/core';
 import { models, tester } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
+import { EventNames } from '@hicommonwealth/schemas';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import {

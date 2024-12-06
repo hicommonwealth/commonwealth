@@ -1,6 +1,4 @@
 import {
-  ChainEventCreated,
-  EventNames,
   WorkflowKeys,
   dispose,
   disposeAdapter,
@@ -9,6 +7,7 @@ import {
 import { EvmEventSignatures } from '@hicommonwealth/evm-protocols';
 import { models, tester } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
+import { EventNames, events } from '@hicommonwealth/schemas';
 import { BalanceType } from '@hicommonwealth/shared';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
@@ -87,7 +86,7 @@ describe('chainEventCreated Event Handler', () => {
         eventSource: {
           eventSignature: '0xunsupported',
         },
-      } as unknown as z.infer<typeof ChainEventCreated>,
+      } as unknown as z.infer<typeof events.ChainEventCreated>,
     });
     expect(res).to.be.false;
   });
@@ -101,7 +100,7 @@ describe('chainEventCreated Event Handler', () => {
             eventSignature: EvmEventSignatures.CommunityStake.Trade,
           },
           parsedArgs: ['0x1', '0xunsupported', true],
-        } as unknown as z.infer<typeof ChainEventCreated>,
+        } as unknown as z.infer<typeof events.ChainEventCreated>,
       });
       expect(res).to.be.false;
     });
@@ -118,7 +117,7 @@ describe('chainEventCreated Event Handler', () => {
             eventSignature: EvmEventSignatures.CommunityStake.Trade,
           },
           parsedArgs: ['0x1', namespaceAddress, true],
-        } as unknown as z.infer<typeof ChainEventCreated>,
+        } as unknown as z.infer<typeof events.ChainEventCreated>,
       });
       expect(res).to.be.true;
       expect(provider.triggerWorkflow as Mock).not.toHaveBeenCalled();
@@ -142,7 +141,7 @@ describe('chainEventCreated Event Handler', () => {
             eventSignature: EvmEventSignatures.CommunityStake.Trade,
           },
           parsedArgs: ['0x1', namespaceAddress, true],
-        } as unknown as z.infer<typeof ChainEventCreated>,
+        } as unknown as z.infer<typeof events.ChainEventCreated>,
       });
       expect(res).to.be.true;
       expect(provider.triggerWorkflow as Mock).toHaveBeenCalledOnce();
@@ -179,7 +178,7 @@ describe('chainEventCreated Event Handler', () => {
               eventSignature: EvmEventSignatures.CommunityStake.Trade,
             },
             parsedArgs: ['0x1', namespaceAddress, true],
-          } as unknown as z.infer<typeof ChainEventCreated>,
+          } as unknown as z.infer<typeof events.ChainEventCreated>,
         }),
       ).to.eventually.be.rejectedWith(ProviderError);
     });

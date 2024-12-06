@@ -1,4 +1,5 @@
-import { dispose, EventNames, handleEvent } from '@hicommonwealth/core';
+import { dispose, handleEvent } from '@hicommonwealth/core';
+import { EventNames } from '@hicommonwealth/schemas';
 import { literal } from 'sequelize';
 import { afterAll, beforeAll, describe, expect, test, vi } from 'vitest';
 import { commonProtocol, emitEvent, models } from '../../src';

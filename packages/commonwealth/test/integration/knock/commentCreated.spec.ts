@@ -1,6 +1,4 @@
 import {
-  CommentCreated,
-  EventNames,
   WorkflowKeys,
   dispose,
   disposeAdapter,
@@ -8,6 +6,7 @@ import {
 } from '@hicommonwealth/core';
 import { models, tester } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
+import { EventNames } from '@hicommonwealth/schemas';
 import { BalanceType } from '@hicommonwealth/shared';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
@@ -134,7 +133,9 @@ describe('CommentCreated Event Handler', () => {
   test('should not throw if a valid author is not found', async () => {
     const res = await processCommentCreated({
       name: EventNames.CommentCreated,
-      payload: { address_id: -999999 } as z.infer<typeof CommentCreated>,
+      payload: { address_id: -999999 } as z.infer<
+        typeof schemas.events.CommentCreated
+      >,
     });
     expect(res).to.be.false;
   });
@@ -146,7 +147,7 @@ describe('CommentCreated Event Handler', () => {
         // @ts-expect-error StrictNullChecks
         address_id: rootComment.address_id,
         community_id: '2f92ekf2fjpe9svk23',
-      } as z.infer<typeof CommentCreated>,
+      } as z.infer<typeof schemas.events.CommentCreated>,
     });
     expect(res).to.be.false;
   });
@@ -167,7 +168,7 @@ describe('CommentCreated Event Handler', () => {
         id: rootComment.id,
         // @ts-expect-error StrictNullChecks
         thread_id: rootComment.thread_id,
-      } as z.infer<typeof CommentCreated>,
+      } as z.infer<typeof schemas.events.CommentCreated>,
     });
     expect(res).to.be.true;
     expect(provider.triggerWorkflow as Mock).not.toHaveBeenCalled();

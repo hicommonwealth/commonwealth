@@ -1,12 +1,7 @@
-import {
-  EventHandler,
-  Policy,
-  command,
-  events,
-  logger,
-} from '@hicommonwealth/core';
+import { EventHandler, Policy, command, logger } from '@hicommonwealth/core';
 import { EvmEventSignatures } from '@hicommonwealth/evm-protocols';
 import { Token, middleware, models } from '@hicommonwealth/model';
+import { events } from '@hicommonwealth/schemas';
 import { ZodUndefined } from 'zod';
 import { handleCommunityStakeTrades } from './handleCommunityStakeTrades';
 import { handleLaunchpadTrade } from './handleLaunchpadTrade';
