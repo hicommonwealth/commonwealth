@@ -7,7 +7,7 @@ import {
   ChainEventSigs,
   EvmEventSignatures,
 } from '@hicommonwealth/evm-protocols';
-import { DB, emitEvent } from '@hicommonwealth/model';
+import { emitEvent, models } from '@hicommonwealth/model';
 import { EventNames, events as coreEvents } from '@hicommonwealth/schemas';
 import { ethers } from 'ethers';
 import { z } from 'zod';
@@ -23,23 +23,32 @@ const log = logger(import.meta);
  * the last fetched block number. This function will never throw an error.
  */
 export async function processChainNode(
-  models: DB,
-  chainNodeId: number,
+  ethChainId: number,
   evmSource: EvmSource,
 ): Promise<void> {
   try {
     log.info(
       'Processing:\n' +
-        `\tchainNodeId: ${chainNodeId}\n` +
+        `\tchainNodeId: ${ethChainId}\n` +
         `\tcontracts: ${JSON.stringify(Object.keys(evmSource.contracts))}`,
     );
     stats().increment('ce.evm.chain_node_id', {
-      chainNodeId: String(chainNodeId),
+      chainNodeId: String(ethChainId),
     });
+
+    const chainNode = await models.ChainNode.findOne({
+      where: {
+        eth_chain_id: ethChainId,
+      },
+    });
+    if (!chainNode) {
+      log.error(`ChainNode not found - ETH chain id: ${ethChainId}`);
+      return;
+    }
 
     const lastProcessedBlock = await models.LastProcessedEvmBlock.findOne({
       where: {
-        chain_node_id: chainNodeId,
+        chain_node_id: chainNode.id!,
       },
     });
 
@@ -79,7 +88,7 @@ export async function processChainNode(
       if (!lastProcessedBlock) {
         await models.LastProcessedEvmBlock.create(
           {
-            chain_node_id: chainNodeId,
+            chain_node_id: chainNode.id!,
             block_number: lastBlockNum,
           },
           { transaction },
@@ -90,7 +99,7 @@ export async function processChainNode(
       }
 
       if (allEvents.length === 0) {
-        log.info(`Processed 0 events for chainNodeId ${chainNodeId}`);
+        log.info(`Processed 0 events for chainNodeId ${ethChainId}`);
         return;
       }
 
@@ -156,10 +165,10 @@ export async function processChainNode(
     });
 
     log.info(
-      `Processed ${allEvents.length} events for chainNodeId ${chainNodeId}`,
+      `Processed ${allEvents.length} events for ethChainId ${ethChainId}`,
     );
   } catch (e) {
-    const msg = `Error occurred while processing chainNodeId ${chainNodeId}`;
+    const msg = `Error occurred while processing ethChainId ${ethChainId}`;
     log.error(msg, e);
   }
 }
@@ -173,29 +182,24 @@ export async function processChainNode(
  * @param processFn WARNING: must never throw an error. Errors thrown by processFn will not be caught.
  */
 export async function scheduleNodeProcessing(
-  models: DB,
   interval: number,
-  processFn: (
-    models: DB,
-    chainNodeId: number,
-    sources: EvmSource,
-  ) => Promise<void>,
+  processFn: (chainNodeId: number, sources: EvmSource) => Promise<void>,
 ) {
-  const evmSources = await getEventSources(models);
+  const evmSources = await getEventSources();
 
   const numEvmSources = Object.keys(evmSources).length;
   if (!numEvmSources) {
     return;
   }
 
-  const chainNodeIds = Object.keys(evmSources);
+  const ethChainIds = Object.keys(evmSources);
   const betweenInterval = interval / numEvmSources;
 
-  chainNodeIds.forEach((chainNodeId, index) => {
+  ethChainIds.forEach((ethChainId, index) => {
     const delay = index * betweenInterval;
 
     setTimeout(async () => {
-      await processFn(models, +chainNodeId, evmSources[chainNodeId]);
+      await processFn(+ethChainId, evmSources[ethChainId]);
     }, delay);
   });
 }

@@ -9,6 +9,7 @@ export * from './makeGetBalancesOptions';
 export * from './parseUserMentions';
 export * from './sanitizeDeletedComment';
 export * from './sanitizeQuillText';
+export * from './testChainNodeUtils';
 export * from './updateTags';
 export * from './utils';
 export * from './validateGroupMembership';
