@@ -75,14 +75,23 @@ const TransactionHistory = ({ transactions }: TransactionsProps) => {
             ),
           },
           transactionType: {
-            customElement: <CWText type="b1">Stake</CWText>,
+            customElement: (
+              <CWText type="b1" className="capitalize">
+                {tx.transaction_category}
+              </CWText>
+            ),
           },
           assets: {
             sortValue: tx.totalPrice,
             customElement: (
               <div className="asset-value">
                 <CWText type="b1" fontWeight="semiBold">
-                  {tx.action} / {tx.stake}
+                  {tx.transaction_type} /{' '}
+                  {tx.transaction_category === 'stake'
+                    ? tx.amount
+                    : // TODO: fix display value for this
+                      tx.amount}{' '}
+                  {tx.transaction_category === 'stake' ? 'stake' : 'tokens'}
                 </CWText>
                 <CWText type="caption">{tx.totalPrice}</CWText>
               </div>

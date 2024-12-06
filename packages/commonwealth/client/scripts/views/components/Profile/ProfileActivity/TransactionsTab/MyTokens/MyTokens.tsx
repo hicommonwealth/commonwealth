@@ -48,46 +48,48 @@ const MyTokens = ({ transactions }: TransactionsProps) => {
       const key = (
         transaction.community.id + transaction.address
       ).toLowerCase();
-      const action = transaction.action === 'mint' ? 1 : -1;
+      const action = transaction.transaction_type === 'mint' ? 1 : -1;
 
       accumulatedStakes[key] = {
         ...transaction,
         ...(accumulatedStakes[key] || {}),
-        chain: transaction?.community?.chain_node_name,
         assets: {
           label: {
-            holdings: `${(accumulatedStakes[key]?.stake || 0) + transaction.stake * action} stakes`,
-            price: `${
-              (
-                (accumulatedStakes[key]?.avgPrice || 0) +
-                  parseFloat(
+            holdings:
+              transaction.transaction_category === 'stake'
+                ? `${(accumulatedStakes[key]?.amount || 0) + transaction.amount * action} stakes`
+                : `${transaction.amount || 0} tokens`,
+            price:
+              transaction.transaction_category === 'stake'
+                ? `${
                     (
-                      parseFloat(transaction.price) /
-                      WEI_PER_ETHER /
-                      transaction.stake
-                    ).toFixed(5),
-                  ) *
-                    action || 0
-              )?.toFixed?.(5) || 0.0
-            } ${'ETH'}`,
+                      (accumulatedStakes[key]?.avgPrice || 0) +
+                        parseFloat(
+                          (
+                            parseFloat(transaction.price) /
+                            WEI_PER_ETHER /
+                            transaction.amount
+                          ).toFixed(5),
+                        ) *
+                          action || 0
+                    )?.toFixed?.(5) || 0.0
+                  } ${'ETH'}`
+                : transaction.totalPrice,
           },
           sortValue:
-            (accumulatedStakes[key]?.stake || 0) + transaction.stake * action,
+            transaction.transaction_category === 'stake'
+              ? (accumulatedStakes[key]?.amount || 0) +
+                transaction.amount * action
+              : transaction.amount,
         },
-        voteWeight:
-          (accumulatedStakes[key]?.voteWeight || 0) +
-          transaction.voteWeight * action,
       };
     });
 
     return (
       Object.values(accumulatedStakes)
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .map((transaction: any) => ({
-          ...transaction,
-          voteWeight: transaction.voteWeight + 1, // total vote weight is +1 of the stake weight
-        }))
-        .filter((transaction) => transaction.stake > 0)
+        .map((transaction: any) => ({ ...transaction }))
+        .filter((transaction) => transaction.amount > 0)
     );
   })();
 

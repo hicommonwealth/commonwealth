@@ -137,13 +137,13 @@ export const GetTransactions = {
   }),
   output: z
     .object({
+      transaction_category: z.enum(['stake', 'launchpad']),
+      transaction_type: z.enum(['buy', 'sell']),
       transaction_hash: z.string(),
       address: z.string(),
-      stake_price: z.string(),
-      stake_amount: PG_INT,
-      vote_weight: PG_INT,
+      price: z.any(), // TODO: fix type
+      amount: z.any(), // TODO: fix type
       timestamp: PG_INT,
-      stake_direction: z.string(),
       community: z.object({
         id: z.string(),
         default_symbol: z.string().nullish(),

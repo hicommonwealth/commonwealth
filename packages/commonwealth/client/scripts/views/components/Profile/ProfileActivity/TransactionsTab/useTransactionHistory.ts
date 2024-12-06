@@ -19,21 +19,13 @@ const useTransactionHistory = ({
   let filteredData = !data
     ? []
     : data.map((t) => ({
-        community: t.community,
-        address: t.address,
-        stake: t.stake_amount,
-        price: t.stake_price,
-        voteWeight: t.stake_amount * t.vote_weight,
+        ...t,
         timestamp: t.timestamp * 1000,
-        action: t.stake_direction === 'buy' ? 'mint' : 'burn',
-        totalPrice: `${(parseFloat(t.stake_price) / WEI_PER_ETHER).toFixed(
-          5,
-        )} ETH`,
-        avgPrice: `${(
-          parseFloat(t.stake_price) /
-          WEI_PER_ETHER /
-          t.stake_amount
-        ).toFixed(5)} ETH`,
+        action:
+          t.transaction_type === 'buy' && t.transaction_category === 'stake'
+            ? 'mint'
+            : 'burn',
+        totalPrice: `${(parseFloat(t.price) / WEI_PER_ETHER).toFixed(5)} ETH`,
         etherscanLink: buildEtherscanLink(
           t.transaction_hash,
           t.community?.chain_node_id || 0,
