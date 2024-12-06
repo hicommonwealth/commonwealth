@@ -1,18 +1,89 @@
+@import '../../../styles/shared.scss';
+
 .KnockNotifications svg {
   color: rgb(117, 117, 117);
   fill: rgb(255, 255, 255) !important;
 }
 
-.KnockNotifications .rnf-notification-feed__knock-branding {
-  display: none;
-}
+.KnockNotifications {
+  .main-container {
+    p {
+      &:last-child {
+        margin-top: 10px;
+        color: #656167;
+        font-size: 14px;
+        line-height: 20px;
+        font-family: $font-family-neue-haas-unica;
+      }
+      &:first-child {
+        font-size: 16px;
+        line-height: 20px;
+        font-family: $font-family-neue-haas-unica;
+        strong {
+          font-weight: 700;
+          letter-spacing: 0.5px;
+          @include extraSmall {
+            font-weight: 600;
+            letter-spacing: 0.2px;
+          }
+        }
+      }
+      &:only-child {
+        font-size: 16px;
+        line-height: 20px;
+        margin-top: unset;
+        color: unset;
+        font-size: unset;
+        line-height: unset;
+        font-family: $font-family-neue-haas-unica;
+        strong {
+          font-weight: 700;
+          letter-spacing: 0.8px;
+        }
+      }
+    }
+  }
+  .container {
+    display: flex;
+    gap: 10px;
+    padding: 10px;
+    flex-direction: row;
+    border-bottom: 1px solid $neutral-200;
+    align-items: flex-start;
 
-.KnockNotifications .rnf-notification-feed__knock-branding {
-  display: none;
-}
+    .avatar {
+      display: flex;
+      gap: 10px;
+      padding-top: 4px;
+      height: 100%;
+    }
+    .content {
+      gap: 10px;
+      display: flex;
+      flex-direction: column;
 
-.KnockNotifications .rnf-notification-feed-popover__inner img {
-  max-width: 350px;
+      .Text {
+        font-size: 12px;
+        color: #656167;
+      }
+    }
+  }
+  .rnf-notification-feed__type {
+    display: none;
+  }
+  .rnf-notification-feed__knock-branding {
+    display: none;
+  }
+  .rnf-notification-feed__knock-branding {
+    display: none;
+  }
+  .rnf-notification-feed-popover__inner img {
+    max-width: 350px;
+  }
+  button:focus,
+  .KnockNotifications select:focus {
+    outline: none;
+  }
 }
 
 .KnockNotifications button:focus,
