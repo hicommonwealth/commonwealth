@@ -9,6 +9,7 @@ import { CWTableColumnInfo } from 'views/components/component_kit/new_designs/CW
 import { useCWTableState } from 'views/components/component_kit/new_designs/CWTable/useCWTableState';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 
+import { S3_ASSET_BUCKET_CDN } from '@hicommonwealth/shared';
 import './LeaderboardSection.scss';
 
 const fakeData = [
@@ -16,8 +17,7 @@ const fakeData = [
     rank: 1,
     user: {
       name: 'cambell',
-      avatarUrl:
-        'https://assets.commonwealth.im/794bb7a3-17d7-407a-b52e-2987501221b5.png',
+      avatarUrl: `https://${S3_ASSET_BUCKET_CDN}/794bb7a3-17d7-407a-b52e-2987501221b5.png`,
       userId: '128606',
       address: 'address1',
     },
@@ -25,8 +25,7 @@ const fakeData = [
     earnings: '0.0003',
     referredBy: {
       name: 'adam',
-      avatarUrl:
-        'https://assets.commonwealth.im/0847e7f5-4d96-4406-8f30-c3082fa2f27c.png',
+      avatarUrl: `https://${S3_ASSET_BUCKET_CDN}/0847e7f5-4d96-4406-8f30-c3082fa2f27c.png`,
       userId: '135099',
       address: 'address2',
     },
@@ -35,8 +34,7 @@ const fakeData = [
     rank: 2,
     user: {
       name: 'adam',
-      avatarUrl:
-        'https://assets.commonwealth.im/0847e7f5-4d96-4406-8f30-c3082fa2f27c.png',
+      avatarUrl: `https://${S3_ASSET_BUCKET_CDN}/0847e7f5-4d96-4406-8f30-c3082fa2f27c.png`,
       userId: '135099',
       address: 'address2',
     },
@@ -44,8 +42,7 @@ const fakeData = [
     earnings: '0.0002',
     referredBy: {
       name: 'cambell',
-      avatarUrl:
-        'https://assets.commonwealth.im/794bb7a3-17d7-407a-b52e-2987501221b5.png',
+      avatarUrl: `https://${S3_ASSET_BUCKET_CDN}/794bb7a3-17d7-407a-b52e-2987501221b5.png`,
       userId: '128606',
       address: 'address1',
     },
@@ -54,8 +51,7 @@ const fakeData = [
     rank: 3,
     user: {
       name: 'mike',
-      avatarUrl:
-        'https://assets.commonwealth.im/181e25ad-ce08-427d-8d3a-d290af3be44b.png',
+      avatarUrl: `https://${S3_ASSET_BUCKET_CDN}/181e25ad-ce08-427d-8d3a-d290af3be44b.png`,
       userId: '158139',
       address: 'address3',
     },
