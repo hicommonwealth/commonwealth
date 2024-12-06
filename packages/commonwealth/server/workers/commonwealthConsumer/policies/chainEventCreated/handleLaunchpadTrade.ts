@@ -21,7 +21,7 @@ export async function handleLaunchpadTrade(
     6: floatingSupply,
   } = event.parsedArgs as z.infer<typeof chainEvents.LaunchpadTrade>;
 
-  const token = await models.Token.findOne({
+  const token = await models.LaunchpadToken.findOne({
     where: {
       token_address: tokenAddress,
     },

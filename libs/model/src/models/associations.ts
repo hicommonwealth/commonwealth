@@ -240,7 +240,7 @@ export const buildAssociations = (db: DB) => {
     },
   );
 
-  db.Token.withMany(db.LaunchpadTrade, {
+  db.LaunchpadToken.withMany(db.LaunchpadTrade, {
     foreignKey: 'token_address',
   });
 };

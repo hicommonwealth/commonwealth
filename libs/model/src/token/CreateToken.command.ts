@@ -47,7 +47,7 @@ export function CreateToken(): Command<typeof schemas.CreateToken> {
         );
       }
 
-      const token = await models.Token.create({
+      const token = await models.LaunchpadToken.create({
         token_address: tokenData.parsedArgs.tokenAddress.toLowerCase(),
         namespace: tokenData.parsedArgs.namespace,
         name: tokenInfo.name,

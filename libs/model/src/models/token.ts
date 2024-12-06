@@ -4,21 +4,21 @@ import { z } from 'zod';
 import type { ChainNodeAttributes, ChainNodeInstance } from './chain_node';
 import type { ModelInstance } from './types';
 
-export type TokenAttributes = z.infer<typeof Token> & {
+export type LaunchpadTokenAttributes = z.infer<typeof Token> & {
   // associations
   ChainNode?: ChainNodeAttributes;
 };
 
-export type TokenInstance = ModelInstance<TokenAttributes> & {
+export type LaunchpadTokenInstance = ModelInstance<LaunchpadTokenAttributes> & {
   // add mixins as needed
   getChainNode: Sequelize.BelongsToGetAssociationMixin<ChainNodeInstance>;
 };
 
 export default (
   sequelize: Sequelize.Sequelize,
-): Sequelize.ModelStatic<TokenInstance> =>
-  sequelize.define<TokenInstance>(
-    'Token',
+): Sequelize.ModelStatic<LaunchpadTokenInstance> =>
+  sequelize.define<LaunchpadTokenInstance>(
+    'LaunchpadToken',
     {
       // derivable when event received
       token_address: { type: Sequelize.STRING, primaryKey: true },
@@ -44,7 +44,7 @@ export default (
       icon_url: { type: Sequelize.STRING, allowNull: true },
     },
     {
-      tableName: 'Tokens',
+      tableName: 'LaunchpadTokens',
       timestamps: true,
       createdAt: 'created_at',
       updatedAt: 'updated_at',
