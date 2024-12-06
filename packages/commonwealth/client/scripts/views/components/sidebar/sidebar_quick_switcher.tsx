@@ -58,6 +58,7 @@ export const SidebarQuickSwitcher = ({
               }
             />
           ))}
+        <CWDivider />
         {user.communities
           .filter((x) => !x.isStarred)
           .map((community) => (
