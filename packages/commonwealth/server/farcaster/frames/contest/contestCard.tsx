@@ -114,6 +114,12 @@ const getBaseUrl = () => {
   }
 };
 
-export const getActionInstallUrl = () =>
+export const getActionInstallUrl = () => {
+  // add environment to button label in non-prod environments
+  let buttonLabel = 'Upvote+Content';
+  if (config.APP_ENV !== 'production') {
+    buttonLabel += `+${config.APP_ENV}`;
+  }
   // eslint-disable-next-line max-len
-  `https://warpcast.com/~/add-cast-action?actionType=post&name=Upvote+Content&icon=thumbsup&postUrl=${modelConfig.CONTESTS.FARCASTER_ACTION_URL}`;
+  return `https://warpcast.com/~/add-cast-action?actionType=post&name=${buttonLabel}&icon=thumbsup&postUrl=${modelConfig.CONTESTS.FARCASTER_ACTION_URL}`;
+};

@@ -331,7 +331,6 @@ export function Contests(): Projection<typeof inputs> {
               ],
             },
           ],
-          raw: true,
         });
 
         let calculated_voting_weight: string | undefined;
