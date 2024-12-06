@@ -1,8 +1,7 @@
-import { EventNames } from '@hicommonwealth/core';
-import { Thread } from '@hicommonwealth/schemas';
+import { EventNames, Thread } from '@hicommonwealth/schemas';
 import {
-  getDecodedString,
   MAX_TRUNCATED_CONTENT_LENGTH,
+  getDecodedString,
 } from '@hicommonwealth/shared';
 import Sequelize from 'sequelize';
 import { z } from 'zod';

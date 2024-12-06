@@ -547,26 +547,31 @@ export async function handleSocialLoginCallback({
   }
 
   // Otherwise, skip Account.validate(), proceed directly to server login
-  const response = await axios.post(
-    `${SERVER_URL}/auth/magic`,
-    {
-      data: {
-        community_id: desiredChain?.id,
-        jwt: userStore.getState().jwt,
-        username: profileMetadata?.username,
-        avatarUrl: profileMetadata?.avatarUrl,
-        magicAddress,
-        session: session && serializeCanvas(session),
-        walletSsoSource,
+  let response;
+  try {
+    response = await axios.post(
+      `${SERVER_URL}/auth/magic`,
+      {
+        data: {
+          community_id: desiredChain?.id,
+          jwt: userStore.getState().jwt,
+          username: profileMetadata?.username,
+          avatarUrl: profileMetadata?.avatarUrl,
+          magicAddress,
+          session: session && serializeCanvas(session),
+          walletSsoSource,
+        },
       },
-    },
-    {
-      withCredentials: true,
-      headers: {
-        Authorization: `Bearer ${bearer}`,
+      {
+        withCredentials: true,
+        headers: {
+          Authorization: `Bearer ${bearer}`,
+        },
       },
-    },
-  );
+    );
+  } catch (e) {
+    notifyError(e.response.data.error);
+  }
 
   if (response.data.status === 'Success') {
     await initAppState(false);

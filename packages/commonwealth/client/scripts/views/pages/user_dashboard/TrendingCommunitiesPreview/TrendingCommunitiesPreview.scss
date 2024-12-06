@@ -28,6 +28,13 @@
     }
 
     gap: 16px;
+
+    .Card {
+      align-items: center;
+      .CommunityAvatar {
+        margin-top: 0 !important;
+      }
+    }
   }
 
   .buttons {

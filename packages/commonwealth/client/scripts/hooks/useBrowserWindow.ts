@@ -8,6 +8,7 @@ import {
   isWindowMediumSmallInclusive,
   isWindowSmall,
   isWindowSmallInclusive,
+  isWindowSmallToMedium,
 } from '../views/components/component_kit/helpers';
 
 type IuseBrowserWindow = {
@@ -33,6 +34,7 @@ const useBrowserWindow = ({
     isWindowMediumSmall: isWindowMediumSmall(windowSize),
     isWindowSmallInclusive: isWindowSmallInclusive(windowSize), // We are using this one for mobile
     isWindowSmall: isWindowSmall(windowSize),
+    isWindowSmallToMedium: isWindowSmallToMedium(windowSize),
   };
   useEffect(() => {
     const _onResize = () => setWindowSize(window.innerWidth);

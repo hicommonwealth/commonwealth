@@ -42,10 +42,11 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
     stickyBehaviourEnabled: true,
     zIndex: 70,
   });
-  const { isWindowSmallInclusive, isWindowExtraSmall } = useBrowserWindow({
-    onResize: () => setResizing(true),
-    resizeListenerUpdateDeps: [resizing],
-  });
+  const { isWindowSmallInclusive, isWindowExtraSmall, isWindowSmallToMedium } =
+    useBrowserWindow({
+      onResize: () => setResizing(true),
+      resizeListenerUpdateDeps: [resizing],
+    });
   const { authModalType, setAuthModalType } = useAuthModalStore();
   const user = useUserStore();
 
@@ -126,7 +127,7 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
 
   return (
     <div className="Sublayout">
-      {!isWindowSmallInclusive && (
+      {(!isWindowSmallInclusive || isWindowSmallToMedium) && (
         <CollapsableSidebarButton
           onMobile={isWindowExtraSmall}
           // @ts-expect-error StrictNullChecks
