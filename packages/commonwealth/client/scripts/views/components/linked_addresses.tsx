@@ -135,6 +135,7 @@ export const LinkedAddresses = (props: LinkedAddressesProps) => {
     }),
   );
 
+  // Memoize CWTable to prevent unnecessary re-renders.
   const TableComponent = useMemo(() => {
     return <CWTable columnInfo={columnInfo} rowData={rowData} />;
     // eslint-disable-next-line react-hooks/exhaustive-deps
