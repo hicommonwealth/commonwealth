@@ -10,6 +10,8 @@ export const Errors = {
   NeedCommunity: 'Must provide community',
   AddressNotFound: 'Address not found',
   CannotDeleteMagic: 'Cannot delete Magic Link address',
+  CannotDeleteOnlyAdmin:
+    'Community must have at least 1 admin. Please assign another community member as admin, to leave this community.',
 };
 
 const deleteAddress = async (
@@ -47,7 +49,6 @@ const deleteAddress = async (
   const adminUsers = await models.Address.findAll({
     where: {
       community_id: community.id,
-      address: addressObj.address,
       role: 'admin',
     },
   });
@@ -56,11 +57,7 @@ const deleteAddress = async (
     adminUsers.length === 1 &&
     adminUsers[0].dataValues.address === addressObj.address
   ) {
-    return next(
-      new AppError(
-        'You are the only admin of this community invite and make another user the admin of the community.',
-      ),
-    );
+    return next(new AppError(Errors.CannotDeleteOnlyAdmin));
   }
 
   await models.sequelize.transaction(async (transaction) => {
