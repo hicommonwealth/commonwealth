@@ -75,7 +75,7 @@ export const DeleteAddressModal = ({
         notifySuccess('Address has been successfully removed.');
       }
     } catch (err) {
-      notifyError('Address was not successfully deleted, please try again.');
+      notifyError(err.response.data.error);
     }
 
     closeModal();
