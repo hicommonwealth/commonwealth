@@ -72,6 +72,7 @@ import { ServerTagsController } from 'server/controllers/server_tags_controller'
 import { rateLimiterMiddleware } from 'server/middleware/rateLimiter';
 import { getTopUsersHandler } from 'server/routes/admin/get_top_users_handler';
 import { getNamespaceMetadata } from 'server/routes/communities/get_namespace_metadata';
+import deleteAllAddress from 'server/routes/deleteAllAddress';
 import { config } from '../config';
 import { getStatsHandler } from '../routes/admin/get_stats_handler';
 import { getCanvasClockHandler } from '../routes/canvas/get_canvas_clock_handler';
@@ -175,6 +176,14 @@ function setupRouter(
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateCommunity,
     deleteAddress.bind(this, models),
+  );
+  registerRoute(
+    router,
+    'post',
+    '/deleteAllAddresses',
+    passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateCommunity,
+    deleteAllAddress.bind(this, models),
   );
   registerRoute(
     router,
