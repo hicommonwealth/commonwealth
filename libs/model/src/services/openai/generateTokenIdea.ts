@@ -8,7 +8,7 @@ import {
 import { v4 as uuidv4 } from 'uuid';
 import { config } from '../../config';
 import { models } from '../../database';
-import { TokenInstance } from '../../models/token';
+import { LaunchpadTokenInstance } from '../../models/token';
 
 type TokenIdea = {
   name: string;
@@ -104,14 +104,14 @@ const generateTokenIdea = async function* ({
 
   try {
     // generate a unique token name
-    let foundToken: TokenInstance | boolean | null = true;
+    let foundToken: LaunchpadTokenInstance | boolean | null = true;
     while (foundToken) {
       tokenIdea.name = await chatWithOpenAI(
         TOKEN_AI_PROMPTS_CONFIG.name(ideaPrompt),
         openai,
       );
 
-      foundToken = await models.Token.findOne({
+      foundToken = await models.LaunchpadToken.findOne({
         where: {
           name: tokenIdea.name,
         },

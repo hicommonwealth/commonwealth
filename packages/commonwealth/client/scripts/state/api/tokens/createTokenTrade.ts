@@ -1,7 +1,7 @@
 import { trpc } from 'utils/trpcClient';
 
 const useCreateTokenTradeMutation = () => {
-  return trpc.token.createLaunchpadTrade.useMutation();
+  return trpc.launchpadToken.createTrade.useMutation();
 };
 
 export default useCreateTokenTradeMutation;
