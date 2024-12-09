@@ -1,6 +1,10 @@
 import { BigNumber } from '@ethersproject/bignumber';
 import { InvalidState, Projection, logger } from '@hicommonwealth/core';
-import { EvmEventSignatures } from '@hicommonwealth/evm-protocols';
+import {
+  ChildContractNames,
+  EvmEventSignatures,
+  commonProtocol as cp,
+} from '@hicommonwealth/evm-protocols';
 import { ContestScore, events } from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
 import { z } from 'zod';
@@ -35,15 +39,6 @@ const inputs = {
   ContestContentUpvoted: events.ContestContentUpvoted,
 };
 
-// TODO: remove kind column from EvmEventSources
-const signatureToKind = {
-  [EvmEventSignatures.Contests.ContentAdded]: 'ContentAdded',
-  [EvmEventSignatures.Contests.RecurringContestStarted]: 'ContestStarted',
-  [EvmEventSignatures.Contests.RecurringContestVoterVoted]: 'VoterVoted',
-  [EvmEventSignatures.Contests.SingleContestStarted]: 'ContestStarted',
-  [EvmEventSignatures.Contests.SingleContestVoterVoted]: 'VoterVoted',
-};
-
 /**
  * Makes sure contest manager (off-chain metadata) record exists
  * - Alerts when not found and inserts default record to patch distributed transaction
@@ -64,6 +59,14 @@ async function updateOrCreateWithAlert(
   const url = community?.ChainNode?.private_url;
   if (!url) {
     log.warn(`Chain node url not found on namespace ${namespace}`);
+    return;
+  }
+
+  const ethChainId = community!.ChainNode!.eth_chain_id!;
+  if (!cp.isValidChain(ethChainId)) {
+    log.error(
+      `Unsupported eth chain id: ${ethChainId} for namespace: ${namespace}`,
+    );
     return;
   }
 
@@ -127,13 +130,9 @@ async function updateOrCreateWithAlert(
       { transaction },
     );
 
-    // TODO: move EVM concerns out of projection
-    // create EVM event sources so chain listener will listen to events on new contest contract
-    const abiNickname = isOneOff ? 'SingleContest' : 'RecurringContest';
-    const contestAbi = await models.ContractAbi.findOne({
-      where: { nickname: abiNickname },
-    });
-    mustExist(`Contest ABI with nickname "${abiNickname}"`, contestAbi);
+    const childContractName = isOneOff
+      ? ChildContractNames.SingleContest
+      : ChildContractNames.RecurringContest;
 
     const sigs = isOneOff
       ? [
@@ -149,11 +148,12 @@ async function updateOrCreateWithAlert(
     const sourcesToCreate: EvmEventSourceAttributes[] = sigs.map(
       (eventSignature) => {
         return {
-          chain_node_id: community!.ChainNode!.id!,
+          eth_chain_id: ethChainId,
           contract_address: contest_address,
           event_signature: eventSignature,
-          kind: signatureToKind[eventSignature],
-          abi_id: contestAbi.id!,
+          contract_name: childContractName,
+          parent_contract_address: cp.factoryContracts[ethChainId].factory,
+          // TODO: add created_at_block so EVM CE runs the migrateEvents func
         };
       },
     );
