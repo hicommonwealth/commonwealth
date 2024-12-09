@@ -8,6 +8,11 @@ import { mustExist } from '../middleware/guards';
 
 const log = logger(import.meta);
 
+export const PinTokenErrors = {
+  NotSupported: 'Pinned tokens only supported on Alchemy supported chains',
+  FailedToFetchPrice: 'Failed to fetch token price',
+};
+
 export function PinToken(): Command<typeof schemas.PinToken> {
   return {
     ...schemas.PinToken,
@@ -29,9 +34,7 @@ export function PinToken(): Command<typeof schemas.PinToken> {
         !chainNode.private_url?.includes('alchemy') ||
         !chainNode.alchemy_metadata?.price_api_supported
       ) {
-        throw new InvalidState(
-          'Pinned tokens only supported on Alchemy supported chains',
-        );
+        throw new InvalidState(PinTokenErrors.NotSupported);
       }
 
       let price: Awaited<ReturnType<typeof alchemyGetTokenPrices>> | undefined;
@@ -64,7 +67,10 @@ export function PinToken(): Command<typeof schemas.PinToken> {
         price.data.length !== 1 ||
         price.data[0].error
       ) {
-        throw new InvalidState('Could not fetch token price');
+        log.error(PinTokenErrors.FailedToFetchPrice, undefined, {
+          price,
+        });
+        throw new InvalidState(PinTokenErrors.FailedToFetchPrice);
       }
 
       return await models.PinnedToken.create({

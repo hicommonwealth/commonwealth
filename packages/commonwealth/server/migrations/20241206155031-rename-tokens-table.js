@@ -58,7 +58,7 @@ module.exports = {
         `
           UPDATE "ChainNodes"
           SET alchemy_metadata = CASE
-                                       WHEN eth_chain_id = 1 THEN '{ "network_id": "eth_mainnet", "price_api_supported": true, "transfer_api_supported": true }'::JSONB
+                                       WHEN eth_chain_id = 1 THEN '{ "network_id": "eth-mainnet", "price_api_supported": true, "transfer_api_supported": true }'::JSONB
                                        WHEN eth_chain_id = 81457 THEN '{ "network_id": "blast-mainnet", "price_api_supported": true, "transfer_api_supported": true }'::JSONB
                                        WHEN eth_chain_id = 10 THEN '{ "network_id": "opt-mainnet", "price_api_supported": true, "transfer_api_supported": true }'::JSONB
                                        WHEN eth_chain_id = 8453 THEN '{ "network_id": "base-mainnet", "price_api_supported": true, "transfer_api_supported": true }'::JSONB
@@ -71,7 +71,7 @@ module.exports = {
                                        WHEN eth_chain_id = 80002 THEN '{ "network_id": "polygon-amoy", "price_api_supported": false, "transfer_api_supported": true }'::JSONB
                                        WHEN eth_chain_id = 11155420 THEN '{ "network_id": "opt-sepolia", "price_api_supported": false, "transfer_api_supported": true }'::JSONB
                                        WHEN url = 'https://solana-mainnet.g.alchemy.com/v2/' THEN '{ "network_id": "solana-mainnet", "price_api_supported": true, "transfer_api_supported": false }'::JSONB
-                                       WHEN url = 'https://solana-devnet.g.alchemy.com/v2/' THEN '{ "network_id": "solana-mainnet", "price_api_supported": false, "transfer_api_supported": false }'::JSONB
+                                       WHEN url = 'https://solana-devnet.g.alchemy.com/v2/' THEN '{ "network_id": "solana-devnet", "price_api_supported": false, "transfer_api_supported": false }'::JSONB
               END
           WHERE private_url LIKE '%alchemy%' OR url LIKE '%alchemy%';
       `,
