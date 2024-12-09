@@ -10,8 +10,10 @@ import {
 } from '../../../components/component_kit/new_designs/CWModal';
 import { TradeTokenModalProps } from '../types';
 import './CommonTradeModal.scss';
+import TradeTokenForm, {
+  useCommonTradeTokenForm,
+} from './CommonTradeTokenForm';
 import TokenIcon from './TokenIcon';
-import TradeTokenForm, { useTradeTokenForm } from './TradeTokenForm';
 
 const TRADING_CURRENCY = SupportedCurrencies.USD; // make configurable when needed
 
@@ -20,8 +22,8 @@ const CommonTradeModal = ({
   onModalClose,
   tradeConfig,
 }: TradeTokenModalProps) => {
-  const { trading, addresses, isActionPending, onCTAClick } = useTradeTokenForm(
-    {
+  const { trading, addresses, isActionPending, onCTAClick } =
+    useCommonTradeTokenForm({
       tradeConfig: {
         ...tradeConfig,
         currency: TRADING_CURRENCY,
@@ -30,8 +32,7 @@ const CommonTradeModal = ({
       },
       addressType: tradeConfig.addressType,
       onTradeComplete: () => onModalClose?.(),
-    },
-  );
+    });
 
   useBeforeUnload(isActionPending);
 

@@ -1,4 +1,21 @@
-import { TradingConfig } from './CommonTradeModal/TradeTokenForm';
+import { TokenView } from '@hicommonwealth/schemas';
+import { ChainBase } from '@hicommonwealth/shared';
+import { z } from 'zod';
+
+export enum TradingMode {
+  Buy = 'buy',
+  Sell = 'sell',
+}
+
+export const TokenWithCommunity = TokenView.extend({
+  community_id: z.string(),
+});
+
+export type TradingConfig = {
+  mode: TradingMode;
+  token: z.infer<typeof TokenWithCommunity>;
+  addressType: ChainBase;
+};
 
 export type TradeTokenModalProps = {
   isOpen: boolean;
