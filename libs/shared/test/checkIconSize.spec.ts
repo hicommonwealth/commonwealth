@@ -1,3 +1,4 @@
+import { S3_ASSET_BUCKET_CDN } from '@hicommonwealth/shared';
 import { expect } from 'chai';
 import { describe, test } from 'vitest';
 import { getFileSizeBytes } from '../src/utils';
@@ -11,7 +12,7 @@ describe('checkIconSize', () => {
   // TODO: make this test not require a remote HTTP request?
   test('should return the image size', async () => {
     const fileSizeBytes = await getFileSizeBytes(
-      'https://assets.commonwealth.im/39115039-f3dc-4723-8813-f8a09107ca27.jpeg',
+      `https://${S3_ASSET_BUCKET_CDN}/39115039-f3dc-4723-8813-f8a09107ca27.jpeg`,
     );
     expect(fileSizeBytes).to.equal(155407);
   });
