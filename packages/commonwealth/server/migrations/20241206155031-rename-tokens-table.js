@@ -44,29 +44,34 @@ module.exports = {
         { transaction },
       );
 
-      await queryInterface.addColumn('ChainNodes', 'alchemy_metadata', {
-        type: Sequelize.JSONB,
-        allowNull: true,
-      });
+      await queryInterface.addColumn(
+        'ChainNodes',
+        'alchemy_metadata',
+        {
+          type: Sequelize.JSONB,
+          allowNull: true,
+        },
+        { transaction },
+      );
 
       await queryInterface.sequelize.query(
         `
-          UPDATE "ChainNode"
+          UPDATE "ChainNodes"
           SET alchemy_metadata = CASE
-                                       WHEN eth_chain_id = 1 THEN '{ "network_id": "eth_mainnet", "price_api_supported": true, "transfer_api_supported": true }'
-                                       WHEN eth_chain_id = 81457 THEN '{ "network_id": "blast-mainnet", "price_api_supported": true, "transfer_api_supported": true }'
-                                       WHEN eth_chain_id = 10 THEN '{ "network_id": "opt-mainnet", "price_api_supported": true, "transfer_api_supported": true }'
-                                       WHEN eth_chain_id = 8453 THEN '{ "network_id": "base-mainnet", "price_api_supported": true, "transfer_api_supported": true }'
-                                       WHEN eth_chain_id = 59144 THEN '{ "network_id": "linea-mainnet", "price_api_supported": true, "transfer_api_supported": true }'
-                                       WHEN eth_chain_id = 42161 THEN '{ "network_id": "arb-mainnet", "price_api_supported": true, "transfer_api_supported": true }'
-                                       WHEN eth_chain_id = 137 THEN '{ "network_id": "polygon-mainnet", "price_api_supported": true, "transfer_api_supported": true }'
-                                       WHEN eth_chain_id = 11155111 THEN '{ "network_id": "eth-sepolia", "price_api_supported": false, "transfer_api_supported": true }'
-                                       WHEN eth_chain_id = 84532 THEN '{ "network_id": "base-sepolia", "price_api_supported": false, "transfer_api_supported": true }'
-                                       WHEN eth_chain_id = 421614 THEN '{ "network_id": "arb-sepolia", "price_api_supported": false, "transfer_api_supported": true }'
-                                       WHEN eth_chain_id = 80002 THEN '{ "network_id": "polygon-amoy", "price_api_supported": false, "transfer_api_supported": true }'
-                                       WHEN eth_chain_id = 11155420 THEN '{ "network_id": "opt-sepolia", "price_api_supported": false, "transfer_api_supported": true }'
-                                       WHEN url = 'https://solana-mainnet.g.alchemy.com/v2/' THEN '{ "network_id": "solana-mainnet", "price_api_supported": true, "transfer_api_supported": false }'
-                                       WHEN url = 'https://solana-devnet.g.alchemy.com/v2/' THEN '{ "network_id": "solana-mainnet", "price_api_supported": false, "transfer_api_supported": false }'
+                                       WHEN eth_chain_id = 1 THEN '{ "network_id": "eth_mainnet", "price_api_supported": true, "transfer_api_supported": true }'::JSONB
+                                       WHEN eth_chain_id = 81457 THEN '{ "network_id": "blast-mainnet", "price_api_supported": true, "transfer_api_supported": true }'::JSONB
+                                       WHEN eth_chain_id = 10 THEN '{ "network_id": "opt-mainnet", "price_api_supported": true, "transfer_api_supported": true }'::JSONB
+                                       WHEN eth_chain_id = 8453 THEN '{ "network_id": "base-mainnet", "price_api_supported": true, "transfer_api_supported": true }'::JSONB
+                                       WHEN eth_chain_id = 59144 THEN '{ "network_id": "linea-mainnet", "price_api_supported": true, "transfer_api_supported": true }'::JSONB
+                                       WHEN eth_chain_id = 42161 THEN '{ "network_id": "arb-mainnet", "price_api_supported": true, "transfer_api_supported": true }'::JSONB
+                                       WHEN eth_chain_id = 137 THEN '{ "network_id": "polygon-mainnet", "price_api_supported": true, "transfer_api_supported": true }'::JSONB
+                                       WHEN eth_chain_id = 11155111 THEN '{ "network_id": "eth-sepolia", "price_api_supported": false, "transfer_api_supported": true }'::JSONB
+                                       WHEN eth_chain_id = 84532 THEN '{ "network_id": "base-sepolia", "price_api_supported": false, "transfer_api_supported": true }'::JSONB
+                                       WHEN eth_chain_id = 421614 THEN '{ "network_id": "arb-sepolia", "price_api_supported": false, "transfer_api_supported": true }'::JSONB
+                                       WHEN eth_chain_id = 80002 THEN '{ "network_id": "polygon-amoy", "price_api_supported": false, "transfer_api_supported": true }'::JSONB
+                                       WHEN eth_chain_id = 11155420 THEN '{ "network_id": "opt-sepolia", "price_api_supported": false, "transfer_api_supported": true }'::JSONB
+                                       WHEN url = 'https://solana-mainnet.g.alchemy.com/v2/' THEN '{ "network_id": "solana-mainnet", "price_api_supported": true, "transfer_api_supported": false }'::JSONB
+                                       WHEN url = 'https://solana-devnet.g.alchemy.com/v2/' THEN '{ "network_id": "solana-mainnet", "price_api_supported": false, "transfer_api_supported": false }'::JSONB
               END
           WHERE private_url LIKE '%alchemy%' OR url LIKE '%alchemy%';
       `,
@@ -75,9 +80,12 @@ module.exports = {
 
       await queryInterface.sequelize.query(
         `
-          ALTER TABLE "ChainNodes"
-              ADD CONSTRAINT alchemy_metadata_check
-                  CHECK (NOT (alchemy_metadata IS NULL AND (url LIKE '%alchemy%' OR private_url LIKE '%alchemy%')));
+            ALTER TABLE "ChainNodes"
+                ADD CONSTRAINT alchemy_metadata_check
+                    CHECK (
+                        (alchemy_metadata IS NOT NULL AND (url LIKE '%alchemy%' OR private_url LIKE '%alchemy%')) OR
+                        (alchemy_metadata IS NULL AND (url NOT LIKE '%alchemy%' AND private_url NOT LIKE '%alchemy%'))
+                        );
       `,
         { transaction },
       );
