@@ -20,6 +20,7 @@
 
     .created_at {
       color: $neutral-700 !important;
+      margin-bottom: 10px;
       @include extraSmall {
         font-size: 12px !important;
       }
@@ -29,10 +30,11 @@
       width: 100%;
       display: flex;
       margin-bottom: 10px;
-      max-width: fit-content;
+      max-width: 90%;
 
       @include extraSmall {
         margin-bottom: 0px;
+        max-width: fit-content;
       }
       .address.Text {
         color: $neutral-900;
