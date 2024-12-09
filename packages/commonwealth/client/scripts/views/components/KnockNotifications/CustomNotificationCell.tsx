@@ -5,6 +5,7 @@ import React from 'react';
 import { CWText } from '../component_kit/cw_text';
 
 // eslint-disable-next-line react/no-multi-comp
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const CustomNotificationCell = ({ item }: any) => {
   return (
     <div className="container">
@@ -25,5 +26,4 @@ const CustomNotificationCell = ({ item }: any) => {
     </div>
   );
 };
-
 export default CustomNotificationCell;
