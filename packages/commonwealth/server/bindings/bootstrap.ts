@@ -20,6 +20,7 @@ import {
   User,
   models,
 } from '@hicommonwealth/model';
+import { Client } from 'pg';
 import { config } from 'server/config';
 import { setupListener } from './pgListener';
 import { incrementNumUnrelayedEvents, relayForever } from './relayForever';
@@ -124,13 +125,13 @@ export async function bootstrapBindings(): Promise<void> {
 
 export async function bootstrapRelayer(
   maxRelayIterations?: number,
-): Promise<void> {
+): Promise<Client> {
   const count = await models.Outbox.count({
     where: { relayed: false },
   });
   incrementNumUnrelayedEvents(count);
 
-  await setupListener();
+  const pgClient = await setupListener();
 
   relayForever(maxRelayIterations).catch((err) => {
     log.fatal(
@@ -138,4 +139,6 @@ export async function bootstrapRelayer(
       err,
     );
   });
+
+  return pgClient;
 }

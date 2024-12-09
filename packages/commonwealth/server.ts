@@ -23,8 +23,6 @@ import { DatabaseCleaner } from './server/util/databaseCleaner';
 
 // handle exceptions thrown in express routes
 import 'express-async-errors';
-import { bootstrapRelayer } from './server/bindings/bootstrap';
-import { dispatchSDKPublishWorkflow } from './server/util/dispatchSDKPublishWorkflow';
 
 // bootstrap adapters
 stats({
@@ -92,6 +90,9 @@ const start = async () => {
 
       // checking the DYNO env var ensures this only runs on one dyno
       if (config.APP_ENV === 'production' && process.env.DYNO === 'web.1') {
+        const { dispatchSDKPublishWorkflow } = await import(
+          './server/util/dispatchSDKPublishWorkflow'
+        );
         dispatchSDKPublishWorkflow().catch((e) =>
           log.error(
             `Failed to dispatch publishing workflow ${JSON.stringify(e)}`,
@@ -101,7 +102,7 @@ const start = async () => {
 
       // bootstrap bindings when in dev mode
       if (config.NODE_ENV === 'development') {
-        const { bootstrapBindings } = await import(
+        const { bootstrapBindings, bootstrapRelayer } = await import(
           './server/bindings/bootstrap'
         );
         await bootstrapBindings();

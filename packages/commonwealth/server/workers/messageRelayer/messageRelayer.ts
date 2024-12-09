@@ -43,7 +43,7 @@ export async function startMessageRelayer(maxRelayIterations?: number) {
     throw e;
   }
 
-  await bootstrapRelayer(maxRelayIterations);
+  return await bootstrapRelayer(maxRelayIterations);
 }
 
 if (import.meta.url.endsWith(process.argv[1])) {
