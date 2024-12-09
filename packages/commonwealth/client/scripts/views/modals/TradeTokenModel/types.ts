@@ -5,6 +5,7 @@ import { z } from 'zod';
 export enum TradingMode {
   Buy = 'buy',
   Sell = 'sell',
+  Swap = 'swap',
 }
 
 export const TokenWithCommunity = TokenView.extend({

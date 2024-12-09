@@ -18,7 +18,7 @@ export const calculateTokenPricing = (
   );
   const marketCapCurrent = currentPrice * token.initial_supply;
   const marketCapGoal = token.eth_market_cap_target * ethToUsdRate;
-  const isMarketCapGoalReached = false; // TODO: https://github.com/hicommonwealth/commonwealth/issues/9887
+  const isMarketCapGoalReached = marketCapCurrent >= marketCapGoal || true; // TODO: force true for testing, todo remove
 
   return {
     currentPrice: parseFloat(`${currentPrice.toFixed(8)}`),

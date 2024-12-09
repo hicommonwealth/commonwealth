@@ -1,5 +1,6 @@
 import { TokenView } from '@hicommonwealth/schemas';
 import { ChainBase } from '@hicommonwealth/shared';
+import clsx from 'clsx';
 import { currencyNameToSymbolMap, SupportedCurrencies } from 'helpers/currency';
 import { calculateTokenPricing } from 'helpers/launchpad';
 import React, { useState } from 'react';
@@ -107,20 +108,36 @@ export const TokenTradeWidget = ({
             marketCap={{
               current: tokenPricing.marketCapCurrent,
               goal: tokenPricing.marketCapGoal,
+              isCapped: tokenPricing.isMarketCapGoalReached,
             }}
           />
-          <div className="action-btns">
-            {[TradingMode.Buy, TradingMode.Sell].map((mode) => (
+          <div
+            className={clsx('action-btns', {
+              [`cols-${tokenPricing.isMarketCapGoalReached ? 1 : 2}`]: true,
+            })}
+          >
+            {!tokenPricing.isMarketCapGoalReached ? (
+              [TradingMode.Buy, TradingMode.Sell].map((mode) => (
+                <CWButton
+                  key={mode}
+                  label={mode}
+                  buttonAlt={mode === TradingMode.Buy ? 'green' : 'rorange'}
+                  buttonWidth="full"
+                  buttonType="secondary"
+                  buttonHeight="sm"
+                  onClick={() => handleCTAClick(mode)}
+                />
+              ))
+            ) : (
               <CWButton
-                key={mode}
-                label={mode}
-                buttonAlt={mode === TradingMode.Buy ? 'green' : 'rorange'}
+                label={TradingMode.Swap}
+                buttonAlt="green"
                 buttonWidth="full"
                 buttonType="secondary"
                 buttonHeight="sm"
-                onClick={() => handleCTAClick(mode)}
+                onClick={() => handleCTAClick(TradingMode.Swap)}
               />
-            ))}
+            )}
           </div>
         </>
       )}

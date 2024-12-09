@@ -151,6 +151,16 @@ export default defineConfig(({ mode }) => {
     resolve: {
       alias: [
         {
+          // needed by @uniswap pkg for path resolution
+          find: '~@fontsource/ibm-plex-mono',
+          replacement: '@fontsource/ibm-plex-mono',
+        },
+        {
+          // needed by @uniswap pkg for path resolution
+          find: '~@fontsource/inter',
+          replacement: '@fontsource/inter',
+        },
+        {
           // matches only non-relative paths that end with .scss
           find: /^([^.].*)\.scss$/,
           replacement: path.resolve(projectRootDir, 'styles', '$1.scss'),

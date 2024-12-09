@@ -8,12 +8,12 @@ import {
   CWModalFooter,
   CWModalHeader,
 } from '../../../components/component_kit/new_designs/CWModal';
+import TokenIcon from '../TokenIcon';
 import { TradeTokenModalProps } from '../types';
 import './CommonTradeModal.scss';
 import TradeTokenForm, {
   useCommonTradeTokenForm,
 } from './CommonTradeTokenForm';
-import TokenIcon from './TokenIcon';
 
 const TRADING_CURRENCY = SupportedCurrencies.USD; // make configurable when needed
 

@@ -123,16 +123,19 @@ const TokensList = ({ filters }: TokensListProps) => {
                 marketCap={{
                   current: pricing.marketCapCurrent,
                   goal: pricing.marketCapGoal,
+                  isCapped: pricing.isMarketCapGoalReached,
                 }}
-                mode={pricing.isMarketCapGoalReached ? 'swap' : 'buy'}
+                mode={
+                  pricing.isMarketCapGoalReached
+                    ? TradingMode.Swap
+                    : TradingMode.Buy
+                }
                 iconURL={token.icon_url || ''}
-                onCTAClick={() => {
-                  if (pricing.isMarketCapGoalReached) return;
-
+                onCTAClick={(mode) => {
                   setTokenLaunchModalConfig({
                     isOpen: true,
                     tradeConfig: {
-                      mode: TradingMode.Buy,
+                      mode: mode,
                       token: token as z.infer<typeof TokenWithCommunity>,
                       addressType: ChainBase.Ethereum,
                     },
