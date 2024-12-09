@@ -11,8 +11,7 @@ import { useFetchTokensQuery } from 'state/api/tokens';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
-import TradeTokenModal from 'views/modals/TradeTokenModel';
-import { TradingMode } from 'views/modals/TradeTokenModel/TradeTokenForm/types';
+import TradeTokenModal, { TradingMode } from 'views/modals/TradeTokenModel';
 import { z } from 'zod';
 import TokenCard from '../../../components/TokenCard';
 import {
@@ -124,16 +123,19 @@ const TokensList = ({ filters }: TokensListProps) => {
                 marketCap={{
                   current: pricing.marketCapCurrent,
                   goal: pricing.marketCapGoal,
+                  isCapped: pricing.isMarketCapGoalReached,
                 }}
-                mode={pricing.isMarketCapGoalReached ? 'swap' : 'buy'}
+                mode={
+                  pricing.isMarketCapGoalReached
+                    ? TradingMode.Swap
+                    : TradingMode.Buy
+                }
                 iconURL={token.icon_url || ''}
-                onCTAClick={() => {
-                  if (pricing.isMarketCapGoalReached) return;
-
+                onCTAClick={(mode) => {
                   setTokenLaunchModalConfig({
                     isOpen: true,
                     tradeConfig: {
-                      mode: TradingMode.Buy,
+                      mode: mode,
                       token: token as z.infer<typeof TokenWithCommunity>,
                       addressType: ChainBase.Ethereum,
                     },

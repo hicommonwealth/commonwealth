@@ -1,0 +1,36 @@
+@import '../../../../styles/shared.scss';
+
+.UniswapTradeModal {
+  overflow-y: scroll;
+  padding-left: 8px;
+
+  .token-info {
+    display: flex;
+    align-items: center;
+    justify-self: flex-end;
+    gap: 4px;
+  }
+
+  .Uniswap {
+    .uniswap-widget-wrapper {
+      border: none !important;
+      box-shadow: none !important;
+      margin: auto;
+      width: 100%;
+
+      button[color='interactive'] {
+        color: $white !important;
+
+        svg {
+          stroke: $white !important;
+        }
+      }
+
+      button[color='accent'] {
+        div {
+          color: $white !important;
+        }
+      }
+    }
+  }
+}

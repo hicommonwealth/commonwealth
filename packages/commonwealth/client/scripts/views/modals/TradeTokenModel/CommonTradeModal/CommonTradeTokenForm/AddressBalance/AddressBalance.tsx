@@ -2,8 +2,9 @@ import React from 'react';
 import { Skeleton } from 'views/components/Skeleton';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
-import TokenIcon from '../../TokenIcon';
-import { AddressBalanceProps, TradingMode } from '../types';
+import TokenIcon from '../../../TokenIcon';
+import { TradingMode } from '../../../types';
+import { AddressBalanceProps } from '../types';
 import './AddressBalance.scss';
 
 const AddressBalance = ({ trading, addresses }: AddressBalanceProps) => {
