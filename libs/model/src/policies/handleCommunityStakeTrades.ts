@@ -1,9 +1,9 @@
 import { logger } from '@hicommonwealth/core';
-import { DB } from '@hicommonwealth/model';
 import { chainEvents, events } from '@hicommonwealth/schemas';
 import { BigNumber } from 'ethers';
 import Web3 from 'web3';
 import { z } from 'zod';
+import { DB } from '../models';
 
 const log = logger(import.meta);
 

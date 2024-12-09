@@ -75,12 +75,12 @@ const start = async () => {
 
   const { main } = await import('./main');
 
-  main(app, models, {
+  await main(app, models, {
     port: config.PORT,
     withLoggingMiddleware: true,
     withPrerender: config.APP_ENV === 'production' && !config.NO_PRERENDER,
   })
-    .then(() => {
+    .then(async () => {
       isServiceHealthy = true;
       // database clean-up jobs (should be run after the API so, we don't affect start-up time
       // TODO: evaluate other options for maintenance jobs
@@ -96,6 +96,14 @@ const start = async () => {
             `Failed to dispatch publishing workflow ${JSON.stringify(e)}`,
           ),
         );
+      }
+
+      // bootstrap bindings when in dev mode
+      if (config.NODE_ENV === 'development') {
+        const { bootstrapBindings } = await import(
+          './server/bindings/bootstrap'
+        );
+        await bootstrapBindings();
       }
     })
     .catch((e) => log.error(e.message, e));
