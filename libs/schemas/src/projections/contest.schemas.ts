@@ -16,6 +16,10 @@ export const ContestAction = z
     voting_power: z
       .string()
       .describe('Voting power of address when action was recorded'),
+    calculated_voting_weight: z
+      .string()
+      .nullish()
+      .describe('Calculated  weight of the vote when action was recorded'),
     created_at: z.coerce.date().describe('Date-time when action was recorded'),
   })
   .describe('On-Chain content related actions on contest instance');

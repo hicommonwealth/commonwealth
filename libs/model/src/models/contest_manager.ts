@@ -59,6 +59,7 @@ export default (
       neynar_webhook_secret: { type: Sequelize.STRING, allowNull: true },
       topic_id: { type: Sequelize.INTEGER, allowNull: true },
       is_farcaster_contest: { type: Sequelize.BOOLEAN, allowNull: false },
+      vote_weight_multiplier: { type: Sequelize.FLOAT, allowNull: true },
     },
     {
       tableName: 'ContestManagers',
