@@ -1,10 +1,11 @@
 import { logger } from '@hicommonwealth/core';
 import { commonProtocol as cp } from '@hicommonwealth/evm-protocols';
-import { commonProtocol, models } from '@hicommonwealth/model';
 import { chainEvents, events } from '@hicommonwealth/schemas';
 import { BigNumber } from 'ethers';
 import Web3 from 'web3';
 import { z } from 'zod';
+import { models } from '../database';
+import { commonProtocol } from '../services';
 
 const log = logger(import.meta);
 

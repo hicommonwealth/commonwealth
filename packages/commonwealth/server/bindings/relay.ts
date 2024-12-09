@@ -8,7 +8,7 @@ import {
 import type { DB } from '@hicommonwealth/model';
 import { QueryTypes } from 'sequelize';
 import { z } from 'zod';
-import { config } from '../../config';
+import { config } from '../config';
 
 const log = logger(import.meta);
 

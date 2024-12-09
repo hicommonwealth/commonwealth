@@ -1,8 +1,8 @@
 import { Broker, successfulInMemoryBroker } from '@hicommonwealth/core';
 import { models } from '@hicommonwealth/model';
 import { expect } from 'chai';
+import { relay } from 'server/bindings/relay';
 import { afterEach, describe, test } from 'vitest';
-import { relay } from '../../../server/workers/messageRelayer/relay';
 import { testOutboxEvents } from './util';
 
 describe('relay', () => {
