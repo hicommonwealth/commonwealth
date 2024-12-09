@@ -8,8 +8,8 @@ import {
 import '@knocklabs/react-notification-feed/dist/index.css';
 import React, { memo, useEffect, useRef, useState } from 'react';
 import useUserStore from 'state/ui/user';
+import CustomNotificationCell from './CustomNotificationCell';
 import './KnockNotifications.scss';
-
 const KNOCK_PUBLIC_API_KEY =
   process.env.KNOCK_PUBLIC_API_KEY ||
   'pk_test_Hd4ZpzlVcz9bqepJQoo9BvZHokgEqvj4T79fPdKqpYM';
@@ -79,6 +79,7 @@ export const KnockNotifications = memo(function KnockNotifications() {
               buttonRef={notifButtonRef}
               isVisible={isVisible}
               onClose={() => setIsVisible(false)}
+              renderItem={CustomNotificationCell}
             />
           </div>
         </KnockFeedProvider>
