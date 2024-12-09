@@ -106,7 +106,7 @@ export const LinkedAddresses = (props: LinkedAddressesProps) => {
   const [currentAddress, setCurrentAddress] = useState<AddressInfo | null>(
     null,
   );
-  const [isBulkDelete, setIsBulkDelete] = useState(false);
+  const [isBulkDeleteState, setIsBulkDeleteState] = useState(false);
 
   const { profile, addresses, refreshProfiles } = props;
 
@@ -136,7 +136,7 @@ export const LinkedAddresses = (props: LinkedAddressesProps) => {
                 ) => {
                   setIsRemoveModalOpen(val);
                   setCurrentAddress(selectedAddress);
-                  setIsBulkDelete(isBulkDelete);
+                  setIsBulkDeleteState(isBulkDelete);
                 }}
               />
             );
@@ -166,7 +166,7 @@ export const LinkedAddresses = (props: LinkedAddressesProps) => {
                 setIsRemoveModalOpen(false);
                 refreshProfiles(currentAddress);
               }}
-              isBulkDelete={isBulkDelete}
+              isBulkDelete={isBulkDeleteState}
             />
           )
         }

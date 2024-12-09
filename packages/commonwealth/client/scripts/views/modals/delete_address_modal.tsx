@@ -102,8 +102,10 @@ export const DeleteAddressModal = ({
       <CWModalBody>
         <CWText>
           {isBulkDelete
-            ? `By leaving ${address?.community.id} you will disconnect all linked addresses. Your threads will remain intact.`
-            : `By removing this address you will be leaving the ${address?.community.id}. Your contributions and comments will remain. Don't worry, you can rejoin anytime.`}
+            ? `By leaving ${address?.community.id} you will disconnect all 
+            linked addresses. Your threads will remain intact.`
+            : `By removing this address you will be leaving the ${address?.community.id}. 
+            Your contributions and comments will remain. Don't worry, you can rejoin anytime.`}
         </CWText>
       </CWModalBody>
       <CWModalFooter>
