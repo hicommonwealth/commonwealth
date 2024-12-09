@@ -1,4 +1,8 @@
 /* eslint-disable react/no-multi-comp */
+import {
+  CWImageInput,
+  ImageBehavior,
+} from 'client/scripts/views/components/component_kit/CWImageInput';
 import { weightedVotingValueToLabel } from 'helpers';
 import { isValidEthAddress } from 'helpers/validateTypes';
 import { useCommonNavigate } from 'navigation/helpers';
@@ -178,6 +182,11 @@ const GroupForm = ({
   const [topicPermissionsSubForms, setTopicPermissionsSubForms] = useState<
     TopicPermissionsSubFormsState[]
   >([]);
+  const [isProcessingProfileImage, setIsProcessingProfileImage] =
+    useState(false);
+  const [groupImageUrl, setGroupImageUrl] = useState(
+    initialValues.groupImageUrl || '',
+  );
 
   useEffect(() => {
     if (initialValues.requirements) {
@@ -388,6 +397,7 @@ const GroupForm = ({
 
     const formValues = {
       ...values,
+      groupImageUrl: values.groupImageUrl || groupImageUrl || '',
       topics: topicPermissionsSubForms.map((t) => ({
         id: t.topic.id,
         permissions: convertAccumulatedPermissionsToGranularPermissions(
@@ -397,6 +407,8 @@ const GroupForm = ({
       requirementsToFulfill,
       requirements: requirementSubForms.map((x) => x.values),
     };
+
+    console.log('Final Form Values', formValues);
 
     await onSubmit(formValues);
   };
@@ -436,6 +448,7 @@ const GroupForm = ({
         initialValues={{
           groupName: initialValues.groupName || '',
           groupDescription: initialValues.groupDescription || '',
+          groupImageUrl: initialValues.groupImageUrl || '',
           requirementsToFulfill: initialValues.requirementsToFulfill
             ? initialValues.requirementsToFulfill ===
               REQUIREMENTS_TO_FULFILL.ALL_REQUIREMENTS
@@ -492,6 +505,24 @@ const GroupForm = ({
                 label="Description (optional)"
                 placeholder="Add a description for your group"
                 instructionalMessage="Can be up to 250 characters long"
+              />
+            </section>
+
+            <CWDivider />
+
+            <section className="form-section">
+              <CWImageInput
+                label="Group Image (Accepts JPG and PNG files)"
+                onImageProcessingChange={({ isGenerating, isUploading }) => {
+                  setIsProcessingProfileImage(isGenerating || isUploading);
+                }}
+                onImageUploaded={(url) => {
+                  setGroupImageUrl(url);
+                }}
+                name="groupImageUrl"
+                hookToForm
+                imageBehavior={ImageBehavior.Circle}
+                withAIImageGeneration
               />
             </section>
 
