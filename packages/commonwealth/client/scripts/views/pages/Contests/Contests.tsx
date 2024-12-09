@@ -7,6 +7,7 @@ import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayou
 import ContestsList from 'views/pages/CommunityManagement/Contests/ContestsList';
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
 
+import { BLOG_SUBDOMAIN } from '@hicommonwealth/shared';
 import { CWDivider } from '../../components/component_kit/cw_divider';
 import './Contests.scss';
 
@@ -25,7 +26,7 @@ const Contests = () => {
         <CWText className="description">
           Check out the contests in this community. Winners are determined by
           having the most upvoted content in the contest topics.{' '}
-          <a href="https://blog.commonwealth.im">Learn more</a>
+          <a href={BLOG_SUBDOMAIN}>Learn more</a>
         </CWText>
 
         <CWDivider className="active" />

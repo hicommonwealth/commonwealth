@@ -1,5 +1,6 @@
 import React from 'react';
 
+import { S3_ASSET_BUCKET_CDN } from '@hicommonwealth/shared';
 import ghostImg from 'assets/img/ghost.svg';
 import { CWAvatar } from 'views/components/component_kit/cw_avatar';
 import {
@@ -105,8 +106,7 @@ const avatarGroupProfiles = [
 
 const communityAvatar = {
   name: 'dYdX',
-  iconUrl:
-    'https://assets.commonwealth.im/5d4b9152-f45f-4864-83e5-074e0e892688.1627998072164',
+  iconUrl: `https://${S3_ASSET_BUCKET_CDN}/5d4b9152-f45f-4864-83e5-074e0e892688.1627998072164`,
 };
 const AvatarsShowcase = () => {
   return (
