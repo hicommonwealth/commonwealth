@@ -159,4 +159,12 @@ export const EventRegistry = {
     [factoryContracts[ValidChains.SKALE_TEST].communityStake]:
       communityStakesSource,
   },
+  [ValidChains.Anvil]: {
+    [factoryContracts[ValidChains.Anvil].factory]: namespaceFactorySource,
+    [factoryContracts[ValidChains.Anvil].communityStake]: communityStakesSource,
+    [factoryContracts[ValidChains.Anvil].launchpad]: launchpadSource,
+    [factoryContracts[ValidChains.Anvil].lpBondingCurve]: lpBondingCurveSource,
+    [factoryContracts[ValidChains.Anvil].tokenCommunityManager]:
+      tokenCommunityManagerSource,
+  },
 } as const satisfies EventRegistryType;
