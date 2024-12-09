@@ -83,8 +83,13 @@ const CommunityTypeStep = ({
     handleContinue();
   };
 
-  const [baseOption, blastOption, ethereumOption, ...advancedOptions] =
-    communityTypeOptions;
+  const [
+    baseOption,
+    blastOption,
+    ethereumOption,
+    skaleOption,
+    ...advancedOptions
+  ] = communityTypeOptions;
 
   return (
     <div className="CommunityTypeStep">
@@ -133,6 +138,19 @@ const CommunityTypeStep = ({
             handleCommunitySelection({
               type: ethereumOption.type,
               chainBase: ethereumOption.chainBase,
+            })
+          }
+        />
+        <CWCommunitySelector
+          key={skaleOption.type}
+          img={skaleOption.img}
+          title={skaleOption.title}
+          description={skaleOption.description}
+          isRecommended={skaleOption.isRecommended}
+          onClick={() =>
+            handleCommunitySelection({
+              type: skaleOption.type,
+              chainBase: skaleOption.chainBase,
             })
           }
         />
