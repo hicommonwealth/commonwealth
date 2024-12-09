@@ -12,8 +12,12 @@ interface ThreadContestTagContainerProps {
 const ThreadContestTagContainer = ({
   associatedContests,
 }: ThreadContestTagContainerProps) => {
+  console.log('--------------------------------');
+  console.log('associatedContests', associatedContests);
   const contestWinners = getWinnersFromAssociatedContests(associatedContests);
 
+  console.log('contestWinners', contestWinners);
+  console.log('--------------------------------');
   const showContestWinnerTag = contestWinners.length > 0;
 
   return (
