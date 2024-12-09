@@ -2,6 +2,7 @@ import { SwapWidget } from '@uniswap/widgets';
 import '@uniswap/widgets/fonts.css';
 import React from 'react';
 import { CWText } from 'views/components/component_kit/cw_text';
+import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
 import {
   CWModal,
   CWModalBody,
@@ -41,18 +42,26 @@ const UniswapTradeModal = ({
           />
           <CWModalBody>
             <div className="Uniswap">
-              <SwapWidget
-                className="uniswap-widget-wrapper"
-                tokenList={uniswapWidget.tokenListURLs.default}
-                routerUrl={uniswapWidget.routerURLs.default}
-                theme={uniswapWidget.theme}
-                defaultInputTokenAddress="NATIVE"
-                defaultOutputTokenAddress={tradeConfig.token.token_address}
-                hideConnectionUI={true}
-                {...(uniswapWidget.provider && {
-                  provider: uniswapWidget.provider,
-                })}
-              />
+              {!uniswapWidget.isReady ? (
+                <CWCircleMultiplySpinner />
+              ) : (
+                <SwapWidget
+                  className="uniswap-widget-wrapper"
+                  tokenList={uniswapWidget.tokensList}
+                  routerUrl={uniswapWidget.routerURLs.default}
+                  theme={uniswapWidget.theme}
+                  defaultInputTokenAddress={
+                    uniswapWidget.defaultTokenAddress.input
+                  }
+                  defaultOutputTokenAddress={
+                    uniswapWidget.defaultTokenAddress.output
+                  }
+                  hideConnectionUI={true}
+                  {...(uniswapWidget.provider && {
+                    provider: uniswapWidget.provider,
+                  })}
+                />
+              )}
             </div>
           </CWModalBody>
           <CWModalFooter>
