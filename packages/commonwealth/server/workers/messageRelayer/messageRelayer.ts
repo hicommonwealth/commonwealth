@@ -11,7 +11,7 @@ import { config } from '../../config';
 
 const log = logger(import.meta);
 
-const isServiceHealthy = false;
+let isServiceHealthy = false;
 
 startHealthCheckLoop({
   enabled: import.meta.url.endsWith(process.argv[1]),
@@ -25,25 +25,17 @@ startHealthCheckLoop({
 });
 
 export async function startMessageRelayer(maxRelayIterations?: number) {
-  try {
-    const rmqAdapter = new RabbitMQAdapter(
-      getRabbitMQConfig(
-        config.BROKER.RABBITMQ_URI,
-        RascalConfigServices.CommonwealthService,
-      ),
-    );
-    await rmqAdapter.init();
-    broker({
-      adapter: rmqAdapter,
-    });
-  } catch (e) {
-    log.error(
-      'Rascal consumer setup failed. Please check the Rascal configuration',
-    );
-    throw e;
-  }
-
-  return await bootstrapRelayer(maxRelayIterations);
+  const rmqAdapter = new RabbitMQAdapter(
+    getRabbitMQConfig(
+      config.BROKER.RABBITMQ_URI,
+      RascalConfigServices.CommonwealthService,
+    ),
+  );
+  await rmqAdapter.init();
+  broker({ adapter: rmqAdapter });
+  const pgClient = await bootstrapRelayer(maxRelayIterations);
+  isServiceHealthy = true;
+  return pgClient;
 }
 
 if (import.meta.url.endsWith(process.argv[1])) {

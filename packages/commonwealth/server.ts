@@ -100,8 +100,8 @@ const start = async () => {
         );
       }
 
-      // bootstrap bindings when in dev mode
-      if (config.NODE_ENV === 'development') {
+      // bootstrap bindings when in dev mode and DEV_MODULITH is true
+      if (config.NODE_ENV === 'development' && config.DEV_MODULITH) {
         const { bootstrapBindings, bootstrapRelayer } = await import(
           './server/bindings/bootstrap'
         );
