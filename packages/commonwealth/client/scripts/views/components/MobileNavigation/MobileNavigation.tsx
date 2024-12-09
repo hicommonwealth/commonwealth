@@ -58,14 +58,21 @@ const MobileNavigation = () => {
   return (
     <>
       <div className="MobileNavigation">
-        {navigationConfig.map(({ type, selected, onClick }) => (
-          <NavigationButton
-            key={type}
-            type={type}
-            selected={selected}
-            onClick={onClick}
-          />
-        ))}
+        <div id="MobileNavigationHead">
+          {/*react portal container for anyone that wants to put content*/}
+          {/*into the bottom nav.*/}
+        </div>
+
+        <div className="MobileNavigationInner">
+          {navigationConfig.map(({ type, selected, onClick }) => (
+            <NavigationButton
+              key={type}
+              type={type}
+              selected={selected}
+              onClick={onClick}
+            />
+          ))}
+        </div>
       </div>
       <CWDrawer
         size="auto"
