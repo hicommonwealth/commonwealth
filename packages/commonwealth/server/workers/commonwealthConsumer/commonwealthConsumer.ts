@@ -20,6 +20,7 @@ import {
   ContestWorker,
   DiscordBotPolicy,
   FarcasterWorker,
+  User,
 } from '@hicommonwealth/model';
 import { EventNames } from '@hicommonwealth/schemas';
 import { fileURLToPath } from 'url';
@@ -117,6 +118,15 @@ export async function setupCommonwealthConsumer(): Promise<void> {
   checkSubscriptionResponse(
     contestProjectionsSubRes,
     BrokerSubscriptions.ContestProjection,
+  );
+
+  const xpProjectionSubRes = await brokerInstance.subscribe(
+    BrokerSubscriptions.XpProjection,
+    User.Xp(),
+  );
+  checkSubscriptionResponse(
+    xpProjectionSubRes,
+    BrokerSubscriptions.XpProjection,
   );
 
   const farcasterWorkerSubRes = await brokerInstance.subscribe(
