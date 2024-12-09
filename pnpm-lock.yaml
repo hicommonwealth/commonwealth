@@ -1163,6 +1163,9 @@ importers:
       jdenticon:
         specifier: ^2.1.1
         version: 2.2.0
+      jsbi:
+        specifier: ^4.3.0
+        version: 4.3.0
       jsdom-global:
         specifier: ^3.0.2
         version: 3.0.2(jsdom@24.0.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))
@@ -10684,9 +10687,11 @@ packages:
 
   ethereumjs-abi@0.6.5:
     resolution: {integrity: sha512-rCjJZ/AE96c/AAZc6O3kaog4FhOsAViaysBxqJNy2+LHP0ttH0zkZ7nXdVHOAyt6lFwLO0nlCwWszysG/ao1+g==}
+    deprecated: This library has been deprecated and usage is discouraged.
 
   ethereumjs-abi@0.6.8:
     resolution: {integrity: sha512-Tx0r/iXI6r+lRsdvkFDlut0N08jWMnKRZ6Gkq+Nmw75lZe4e6o3EkSnkaBP5NF6+m5PTGAr9JP43N3LyeoglsA==}
+    deprecated: This library has been deprecated and usage is discouraged.
 
   ethereumjs-util@4.5.1:
     resolution: {integrity: sha512-WrckOZ7uBnei4+AKimpuF1B3Fv25OmoRgmYCpGsP7u8PFxXAmAgiJSYT2kRWnt6fVIlKaQlZvuwXp7PIrmn3/w==}
@@ -12438,6 +12443,9 @@ packages:
 
   jsbi@3.2.5:
     resolution: {integrity: sha512-aBE4n43IPvjaddScbvWRA2YlTzKEynHzu7MqOyTipdHucf/VxS63ViCjxYRg86M8Rxwbt/GfzHl1kKERkt45fQ==}
+
+  jsbi@4.3.0:
+    resolution: {integrity: sha512-SnZNcinB4RIcnEyZqFPdGPVgrg2AcnykiBy0sHVJQKHYeaLUvi3Exj+iaPpLnFVkDPZIV4U0yvgC9/R4uEAZ9g==}
 
   jsbn@0.1.1:
     resolution: {integrity: sha512-UVU9dibq2JcFWxQPA6KCqj5O42VOmAY3zQUfEKxU0KpTGXwNoCjkX1e13eHNvw/xPynt6pU0rZ1htjWTNTSXsg==}
@@ -35099,6 +35107,8 @@ snapshots:
       argparse: 2.0.1
 
   jsbi@3.2.5: {}
+
+  jsbi@4.3.0: {}
 
   jsbn@0.1.1: {}
 
