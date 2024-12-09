@@ -6,13 +6,12 @@ import {
   startHealthCheckLoop,
 } from '@hicommonwealth/adapters';
 import { broker, logger } from '@hicommonwealth/core';
+import { bootstrapRelayer } from 'server/bindings/bootstrap';
 import { config } from '../../config';
-import { setupListener } from './pgListener';
-import { incrementNumUnrelayedEvents, relayForever } from './relayForever';
 
 const log = logger(import.meta);
 
-let isServiceHealthy = false;
+const isServiceHealthy = false;
 
 startHealthCheckLoop({
   enabled: import.meta.url.endsWith(process.argv[1]),
@@ -26,8 +25,6 @@ startHealthCheckLoop({
 });
 
 export async function startMessageRelayer(maxRelayIterations?: number) {
-  const { models } = await import('@hicommonwealth/model');
-
   try {
     const rmqAdapter = new RabbitMQAdapter(
       getRabbitMQConfig(
@@ -46,24 +43,7 @@ export async function startMessageRelayer(maxRelayIterations?: number) {
     throw e;
   }
 
-  const count = await models.Outbox.count({
-    where: {
-      relayed: false,
-    },
-  });
-  incrementNumUnrelayedEvents(count);
-
-  const pgClient = await setupListener();
-
-  isServiceHealthy = true;
-  relayForever(maxRelayIterations).catch((err) => {
-    log.fatal(
-      'Unknown error fatal requires immediate attention. Restart REQUIRED!',
-      err,
-    );
-  });
-
-  return pgClient;
+  await bootstrapRelayer(maxRelayIterations);
 }
 
 if (import.meta.url.endsWith(process.argv[1])) {

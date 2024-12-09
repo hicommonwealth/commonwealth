@@ -18,8 +18,11 @@ import {
   DiscordBotPolicy,
   FarcasterWorker,
   User,
+  models,
 } from '@hicommonwealth/model';
 import { config } from 'server/config';
+import { setupListener } from './pgListener';
+import { incrementNumUnrelayedEvents, relayForever } from './relayForever';
 
 const log = logger(import.meta);
 
@@ -117,4 +120,22 @@ export async function bootstrapBindings(): Promise<void> {
     discordBotSubRes,
     BrokerSubscriptions.DiscordBotPolicy,
   );
+}
+
+export async function bootstrapRelayer(
+  maxRelayIterations?: number,
+): Promise<void> {
+  const count = await models.Outbox.count({
+    where: { relayed: false },
+  });
+  incrementNumUnrelayedEvents(count);
+
+  await setupListener();
+
+  relayForever(maxRelayIterations).catch((err) => {
+    log.fatal(
+      'Unknown fatal error requires immediate attention. Restart REQUIRED!',
+      err,
+    );
+  });
 }

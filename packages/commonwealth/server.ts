@@ -23,6 +23,7 @@ import { DatabaseCleaner } from './server/util/databaseCleaner';
 
 // handle exceptions thrown in express routes
 import 'express-async-errors';
+import { bootstrapRelayer } from './server/bindings/bootstrap';
 import { dispatchSDKPublishWorkflow } from './server/util/dispatchSDKPublishWorkflow';
 
 // bootstrap adapters
@@ -104,6 +105,7 @@ const start = async () => {
           './server/bindings/bootstrap'
         );
         await bootstrapBindings();
+        await bootstrapRelayer();
       }
     })
     .catch((e) => log.error(e.message, e));

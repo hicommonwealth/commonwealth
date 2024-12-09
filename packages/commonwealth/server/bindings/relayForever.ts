@@ -1,5 +1,5 @@
 import { broker, logger, stats } from '@hicommonwealth/core';
-import { config } from '../../config';
+import { config } from '../config';
 import { relay } from './relay';
 
 const INITIAL_ERROR_TIMEOUT = 2_000;
