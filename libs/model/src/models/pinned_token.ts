@@ -19,7 +19,7 @@ export default (
       },
       contract_address: {
         type: Sequelize.STRING,
-        primaryKey: true,
+        allowNull: false,
       },
       chain_node_id: {
         type: Sequelize.INTEGER,

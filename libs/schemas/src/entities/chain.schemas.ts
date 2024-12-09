@@ -28,6 +28,13 @@ export const ChainNode = z.object({
   contracts: z.array(Contract).nullish(),
   block_explorer: z.string().nullish(),
   max_ce_block_range: z.number().gte(-1).nullish(),
+  alchemy_metadata: z
+    .object({
+      network_id: z.string(),
+      price_api_supported: z.boolean(),
+      transfer_api_supported: z.boolean(),
+    })
+    .nullish(),
 
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional(),
