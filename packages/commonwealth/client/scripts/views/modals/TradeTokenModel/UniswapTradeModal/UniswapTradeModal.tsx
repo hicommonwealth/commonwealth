@@ -1,9 +1,6 @@
-import { ChainBase } from '@hicommonwealth/shared';
 import { SwapWidget, Theme } from '@uniswap/widgets';
 import '@uniswap/widgets/fonts.css';
-import WebWalletController from 'client/scripts/controllers/app/web_wallets';
-import { ethers } from 'ethers';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { CWText } from 'views/components/component_kit/cw_text';
 import {
   CWModal,
@@ -14,6 +11,7 @@ import {
 import TokenIcon from '../TokenIcon';
 import { TradeTokenModalProps } from '../types';
 import './UniswapTradeModal.scss';
+import useUniswapTradeModal from './useUniswapTradeModal';
 
 // By default the widget uses https://gateway.ipfs.io/ipns/tokens.uniswap.org for tokens
 // list, but it doesn't work (DNS_PROBE_FINISHED_NXDOMAIN) for me (@malik). The original
@@ -40,21 +38,7 @@ const UniswapTradeModal = ({
   onModalClose,
   tradeConfig,
 }: TradeTokenModalProps) => {
-  const [provider, setProvider] = useState<any>();
-  useEffect(() => {
-    const handleAsync = async () => {
-      const wallet = WebWalletController.Instance.availableWallets(
-        ChainBase.Ethereum,
-      );
-      const selectedWallet = wallet[0];
-      await selectedWallet.enable('8453'); // TODO: make dynamic
-      const tempProvider = new ethers.providers.Web3Provider(
-        selectedWallet.api.givenProvider,
-      );
-      setProvider(tempProvider);
-    };
-    handleAsync();
-  }, []);
+  const { uniswapProvider } = useUniswapTradeModal({ tradeConfig });
 
   return (
     <CWModal
@@ -84,7 +68,7 @@ const UniswapTradeModal = ({
                 defaultInputTokenAddress="NATIVE"
                 defaultOutputTokenAddress={tradeConfig.token.token_address}
                 hideConnectionUI={true}
-                {...(provider && { provider })}
+                {...(uniswapProvider && { provider: uniswapProvider })}
               />
             </div>
           </CWModalBody>
