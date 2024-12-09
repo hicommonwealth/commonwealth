@@ -23,6 +23,7 @@ export const ExternalLinksModule = () => {
     remainingLinks,
     slacks,
     telegrams,
+    tiktoks,
     twitters,
   } = categorizeSocialLinks(
     (community.social_links || [])
@@ -53,6 +54,14 @@ export const ExternalLinksModule = () => {
           key={link}
           iconName="telegram"
           className="telegram-link"
+          onClick={() => window.open(link)}
+        />
+      ))}
+      {tiktoks.map((link) => (
+        <CWIcon
+          key={link}
+          iconName="tiktok"
+          className="tiktok-link"
           onClick={() => window.open(link)}
         />
       ))}
