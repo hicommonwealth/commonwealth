@@ -14,6 +14,7 @@ import {
   Community,
   Group,
   PermissionEnum,
+  PinnedToken,
   Requirement,
   StakeTransaction,
   Topic,
@@ -326,5 +327,15 @@ export const BanAddress = {
     address: z.string(),
   }),
   output: z.object({}),
+  context: AuthContext,
+};
+
+export const PinToken = {
+  input: z.object({
+    community_id: z.string(),
+    contract_address: z.string(),
+    chain_node_id: z.number(),
+  }),
+  output: PinnedToken,
   context: AuthContext,
 };

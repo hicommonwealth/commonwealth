@@ -12,6 +12,7 @@ import {
   CommunityStake,
   ContestManager,
   ExtendedCommunity,
+  PinnedToken,
   Topic,
 } from '../entities';
 import * as projections from '../projections';
@@ -201,4 +202,12 @@ export const GetTopics = {
     with_archived_topics: z.boolean().optional(),
   }),
   output: z.array(TopicView),
+};
+
+export const GetPinnedToken = {
+  input: z.object({
+    community_id: z.string(),
+    with_chain_node: z.boolean().optional(),
+  }),
+  output: PinnedToken.nullable(),
 };
