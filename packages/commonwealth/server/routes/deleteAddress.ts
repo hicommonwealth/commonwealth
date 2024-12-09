@@ -3,6 +3,7 @@ import type { DB } from '@hicommonwealth/model';
 import { decrementProfileCount } from '@hicommonwealth/model';
 import { WalletId } from '@hicommonwealth/shared';
 import type { NextFunction, Request, Response } from 'express';
+import { Op } from 'sequelize';
 
 export const Errors = {
   NotLoggedIn: 'Not signed in',
@@ -50,6 +51,7 @@ const deleteAddress = async (
     where: {
       community_id: community.id,
       role: 'admin',
+      user_id: { [Op.ne]: null },
     },
   });
 
