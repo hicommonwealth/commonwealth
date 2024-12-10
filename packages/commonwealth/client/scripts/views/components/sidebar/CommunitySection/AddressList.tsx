@@ -31,8 +31,8 @@ export const AddressList = ({
       <div className="content-container">
         {filteredAddresses &&
           filteredAddresses.map((addr, index) => (
-            <div className="address-list">
-              <div className="address-item" key={index}>
+            <div className="address-list" key={index}>
+              <div className="address-item">
                 <CWText
                   className="address-label"
                   type="b2"
