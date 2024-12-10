@@ -1,5 +1,6 @@
 import { SwapWidget } from '@uniswap/widgets';
 import '@uniswap/widgets/fonts.css';
+import { notifySuccess } from 'controllers/app/notifications';
 import React from 'react';
 import { CWText } from 'views/components/component_kit/cw_text';
 import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
@@ -60,6 +61,9 @@ const UniswapTradeModal = ({
                   {...(uniswapWidget.provider && {
                     provider: uniswapWidget.provider,
                   })}
+                  onError={console.error}
+                  onTxFail={console.error}
+                  onTxSuccess={() => notifySuccess('Transaction successful!')}
                 />
               )}
             </div>

@@ -150,7 +150,6 @@ const useUniswapTradeModal = ({ tradeConfig }: UseUniswapTradeModalProps) => {
       provider: uniswapProvider,
       theme: uniswapWidgetTheme,
       tokensList: uniswapTokensList,
-      defaultChainId: baseNode.ethChainId || 0,
       defaultTokenAddress: {
         input: 'NATIVE', // special address for native token of default chain
         output: tradeConfig.token.token_address,
