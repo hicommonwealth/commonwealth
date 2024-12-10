@@ -36,8 +36,10 @@ const InviteLinkModal = ({ onModalClose }: InviteLinkModalProps) => {
 
   const referralLink = refferalLinkData?.referral_link;
   const currentUrl = window.location.origin;
+
+  // TODO modify dashboard route and community route so the refcode is not vanished
   const inviteLink = referralLink
-    ? `${currentUrl}/${communityId ? communityId + '/' : ''}invite/${referralLink}`
+    ? `${currentUrl}${communityId ? `/${communityId}` : '/dashboard'}?refcode=${referralLink}`
     : '';
 
   useRunOnceOnCondition({
