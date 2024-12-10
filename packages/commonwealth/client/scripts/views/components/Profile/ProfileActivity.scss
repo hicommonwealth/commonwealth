@@ -7,6 +7,9 @@
   flex: 2;
   background-color: $white;
 
+  max-width: 100%;
+  overflow: hidden;
+
   .activity-nav {
     display: flex;
     padding: 24px;
