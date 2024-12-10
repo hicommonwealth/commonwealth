@@ -21,7 +21,7 @@ export interface SitemapGenerator {
 
 export function createSitemapGenerator(
   paginators: ReadonlyArray<Paginator>,
-  hostname: string,
+  hostname: string | undefined,
 ): SitemapGenerator {
   async function exec(): Promise<SitemapManifest> {
     let idx = 0;
