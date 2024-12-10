@@ -26,11 +26,11 @@ export const AddressList = ({
   addresses,
   username,
 }: CWIdentificationTagProps) => {
+  const { openMagicWallet } = useAuthentication({});
+
   if ((!address && !username) || !addresses) {
     return null;
   }
-
-  const { openMagicWallet } = useAuthentication({});
 
   const filteredAddresses = Array.from(
     new Map(addresses.map((item) => [item.address, item])).values(),
