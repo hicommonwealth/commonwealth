@@ -13,6 +13,7 @@ import {
   CWImageInput,
   ImageBehavior,
 } from 'views/components/component_kit/CWImageInput';
+import { CWCheckbox } from 'views/components/component_kit/cw_checkbox';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { SelectList } from 'views/components/component_kit/cw_select_list';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -25,6 +26,7 @@ import { MessageRow } from 'views/components/component_kit/new_designs/CWTextInp
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import CommunityManagementLayout from 'views/pages/CommunityManagement/common/CommunityManagementLayout';
 
+import { ZERO_ADDRESS } from '@hicommonwealth/shared';
 import { CONTEST_FAQ_URL } from '../../../utils';
 import {
   ContestFeeType,
@@ -76,6 +78,7 @@ const DetailsFormStep = ({
 
   const [isProcessingProfileImage, setIsProcessingProfileImage] =
     useState(false);
+  const [multiplier, setMultiplier] = useState(1);
 
   const { mutateAsync: updateContest } = useUpdateContestMutation();
 
@@ -362,8 +365,7 @@ const DetailsFormStep = ({
 
               {weightedTopics.find(
                 (t) => t.value === watch('contestTopic')?.value,
-              )?.weightedVoting === TopicWeightedVoting.ERC20 ||
-              isFarcasterContest ? (
+              )?.weightedVoting === TopicWeightedVoting.ERC20 ? (
                 <>
                   <div className="contest-section contest-section-funding">
                     <CWText type="h4">Contest Funding</CWText>
@@ -437,6 +439,65 @@ const DetailsFormStep = ({
                     </div>
                   </div>
                 </>
+              ) : isFarcasterContest ? (
+                <div className="contest-section contest-section-farcaster-token">
+                  <CWText type="h4">Primary token</CWText>
+                  <CWText type="b1">
+                    Enter a token to fund the contest and for weighting upvotes
+                    on the contest.
+                  </CWText>
+                  <TokenFinder
+                    debouncedTokenValue={debouncedTokenValue}
+                    tokenMetadataLoading={tokenMetadataLoading}
+                    tokenMetadata={tokenMetadata}
+                    setTokenValue={setTokenValue}
+                    tokenValue={
+                      editMode
+                        ? contestFormData?.fundingTokenAddress || ''
+                        : tokenValue
+                    }
+                    containerClassName="token-input"
+                    disabled={editMode || tokenValue === ZERO_ADDRESS}
+                    fullWidth
+                    placeholder="Enter funding token address"
+                    tokenError={getTokenError(
+                      watch('contestRecurring') === ContestRecurringType.No,
+                    )}
+                  />
+                  <CWCheckbox
+                    label="Use native token"
+                    onChange={() => {
+                      if (tokenValue == ZERO_ADDRESS) {
+                        setTokenValue('');
+                      } else {
+                        setTokenValue(ZERO_ADDRESS);
+                      }
+                    }}
+                  />
+
+                  <CWText type="h5">Vote weight multiplier</CWText>
+
+                  <div className="input-row">
+                    <CWText type="b1" className="description">
+                      1 token is equal to
+                    </CWText>
+                    <CWTextInput
+                      type="number"
+                      min={1}
+                      defaultValue={1}
+                      isCompact
+                      value={multiplier}
+                      onInput={(e) => setMultiplier(Number(e.target.value))}
+                    />
+                    <CWText type="b1" className="description">
+                      votes.
+                    </CWText>
+                  </div>
+                  <CWText type="b1" className="description">
+                    Vote weight per token held by the user will be{' '}
+                    {multiplier || 0}.
+                  </CWText>
+                </div>
               ) : (
                 <></>
               )}
