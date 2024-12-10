@@ -6,7 +6,7 @@ import { detectURL, getThreadActionTooltipText } from 'helpers/threads';
 import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
 import useTopicGating from 'hooks/useTopicGating';
 import { useCommonNavigate } from 'navigation/helpers';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import app from 'state';
 import { useGetUserEthBalanceQuery } from 'state/api/communityStake';
@@ -39,15 +39,13 @@ import ContestTopicBanner from './ContestTopicBanner';
 import './NewThreadForm.scss';
 import { checkNewThreadErrors, useNewThreadForm } from './helpers';
 
-const MIN_ETH_FOR_CONTEST_THREAD = 0.0005;
+const MIN_ETH_FOR_CONTEST_THREAD = 0.0;
 
 export const NewThreadForm = () => {
   const navigate = useCommonNavigate();
   const location = useLocation();
 
   const markdownEditorMethodsRef = useRef<MarkdownEditorMethods | null>(null);
-
-  const [submitEntryChecked, setSubmitEntryChecked] = useState(false);
 
   useAppStatus();
 
@@ -216,8 +214,6 @@ export const NewThreadForm = () => {
 
   const contestThreadBannerVisible =
     isContestAvailable && hasTopicOngoingContest;
-  const isDisabledBecauseOfContestsConsent =
-    contestThreadBannerVisible && !submitEntryChecked;
 
   const contestTopicAffordanceVisible =
     isContestAvailable && hasTopicOngoingContest;
@@ -288,7 +284,7 @@ export const NewThreadForm = () => {
                   {...(!!location.search &&
                     threadTopic?.name &&
                     threadTopic?.id && {
-                      defaultValue: {
+                      value: {
                         label: threadTopic?.name,
                         value: `${threadTopic?.id}`,
                       },
@@ -357,7 +353,6 @@ export const NewThreadForm = () => {
                       isDisabled ||
                       !user.activeAccount ||
                       !!disabledActionsTooltipText ||
-                      isDisabledBecauseOfContestsConsent ||
                       walletBalanceError ||
                       contestTopicError
                     }
@@ -368,12 +363,7 @@ export const NewThreadForm = () => {
                 )}
               />
 
-              {contestThreadBannerVisible && (
-                <ContestThreadBanner
-                  submitEntryChecked={submitEntryChecked}
-                  onSetSubmitEntryChecked={setSubmitEntryChecked}
-                />
-              )}
+              {contestThreadBannerVisible && <ContestThreadBanner />}
 
               <MessageRow
                 hasFeedback={!!walletBalanceError}

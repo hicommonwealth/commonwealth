@@ -5,7 +5,12 @@ import {
   decodeAddress,
   encodeAddress,
 } from '@polkadot/util-crypto';
-import { S3_ASSET_BUCKET_CDN, S3_RAW_ASSET_BUCKET_DOMAIN } from './constants';
+import moment from 'moment';
+import {
+  PRODUCTION_DOMAIN,
+  S3_ASSET_BUCKET_CDN,
+  S3_RAW_ASSET_BUCKET_DOMAIN,
+} from './constants';
 
 /**
  * Decamelizes a string
@@ -70,7 +75,7 @@ export const getThreadUrl = (
   // - cannot use config util in libs/shared
   // - duplicate found in knock utils
   return process.env.NODE_ENV === 'production'
-    ? `https://commonwealth.im${relativePath}`
+    ? `https://${PRODUCTION_DOMAIN}${relativePath}`
     : `http://localhost:8080${relativePath}`;
 };
 
@@ -89,8 +94,8 @@ export function delay(ms: number): Promise<void> {
 /**
  * Converts an S3 file URL from the raw bucket URL to the Cloudflare CDN format.
  * This is most often used in combination with pre-signed S3 upload URLs.
- * Ex Input: https://s3.us-east-1.amazonaws.com/assets.commonwealth.im/f2e44ed9-2fb4-4746-8d7a-4a60fcd83b77.png
- * Ex Output: https://assets.commonwealth.im/f2e44ed9-2fb4-4746-8d7a-4a60fcd83b77.png
+ * Ex Input: https://s3.us-east-1.amazonaws.com/${S3_ASSET_BUCKET_CDN}/f2e44ed9-2fb4-4746-8d7a-4a60fcd83b77.png
+ * Ex Output: https://${S3_ASSET_BUCKET_CDN}/f2e44ed9-2fb4-4746-8d7a-4a60fcd83b77.png
  */
 export function formatBucketUrlToAssetCDN(uploadLocation: string) {
   if (
@@ -107,8 +112,8 @@ export function formatBucketUrlToAssetCDN(uploadLocation: string) {
  * Converts an S3 file URL from the CDN format to the raw assets bucket URL.
  * This function should only be used server side when the raw S3 headers are
  * required in the response (CloudFlare truncates headers).
- * Ex Input: https://assets.commonwealth.im/f2e44ed9-2fb4-4746-8d7a-4a60fcd83b77.png
- * Ex Output: https://s3.us-east-1.amazonaws.com/assets.commonwealth.im/f2e44ed9-2fb4-4746-8d7a-4a60fcd83b77.png
+ * Ex Input: https://${S3_ASSET_BUCKET_CDN}/f2e44ed9-2fb4-4746-8d7a-4a60fcd83b77.png
+ * Ex Output: https://s3.us-east-1.amazonaws.com/${S3_ASSET_BUCKET_CDN}/f2e44ed9-2fb4-4746-8d7a-4a60fcd83b77.png
  */
 export function formatAssetUrlToS3(uploadLocation: string): string {
   if (uploadLocation.includes(S3_RAW_ASSET_BUCKET_DOMAIN)) {
@@ -369,4 +374,15 @@ export function bech32ToHex(address: string) {
 
 export function buildFarcasterContestFrameUrl(contestAddress: string) {
   return `/api/integration/farcaster/contests/${contestAddress}/contestCard`;
+}
+
+// Date utils
+export function isWithinPeriod(
+  refDate: Date,
+  targetDate: Date,
+  period: moment.unitOfTime.Base,
+): boolean {
+  const start = moment(refDate).startOf(period);
+  const end = moment(refDate).endOf(period);
+  return moment(targetDate).isBetween(start, end, null, '[]');
 }

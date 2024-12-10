@@ -1,4 +1,5 @@
-import { Policy, events } from '@hicommonwealth/core';
+import { Policy } from '@hicommonwealth/core';
+import { events } from '@hicommonwealth/schemas';
 import { processChainEventCreated } from './eventHandlers/chainEventCreated';
 import { processCommentCreated } from './eventHandlers/commentCreated';
 import { processCommentUpvoted } from './eventHandlers/commentUpvoted';

@@ -3,6 +3,7 @@ import { Contest, config as modelConfig } from '@hicommonwealth/model';
 import { Button } from 'frames.js/express';
 import React from 'react';
 
+import { PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
 import { frames } from '../../config';
 
 export const contestCard = frames(async (ctx) => {
@@ -94,15 +95,8 @@ export const contestCard = frames(async (ctx) => {
       >
         Prizes
       </Button>,
-      <Button
-        key="eligibility"
-        action="post"
-        target={`/${contest_address}/checkEligibility`}
-      >
-        Check Eligibility
-      </Button>,
       <Button key="install" action="link" target={getActionInstallUrl()}>
-        Install Upvote Action
+        Add Upvote Action
       </Button>,
     ],
   };
@@ -117,7 +111,7 @@ const getBaseUrl = () => {
     case 'demo':
       return 'https://demo.commonwealth.im';
     default:
-      return 'https://commonwealth.im';
+      return `https://${PRODUCTION_DOMAIN}`;
   }
 };
 

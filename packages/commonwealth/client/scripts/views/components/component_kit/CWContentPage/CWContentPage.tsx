@@ -204,7 +204,7 @@ export const CWContentPage = ({
         // @ts-expect-error <StrictNullChecks/>
         isHot={isHot(thread)}
         profile={thread?.profile}
-        versionHistory={thread!.versionHistory!}
+        versionHistory={thread?.versionHistory || []}
         activeThreadVersionId={activeThreadVersionId}
         onChangeVersionHistoryNumber={onChangeVersionHistoryNumber}
       />

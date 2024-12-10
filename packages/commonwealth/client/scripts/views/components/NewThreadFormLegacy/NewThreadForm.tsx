@@ -7,7 +7,7 @@ import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
 import useTopicGating from 'hooks/useTopicGating';
 import type { Topic } from 'models/Topic';
 import { useCommonNavigate } from 'navigation/helpers';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
 import app from 'state';
 import { useGetUserEthBalanceQuery } from 'state/api/communityStake';
@@ -49,8 +49,6 @@ const MIN_ETH_FOR_CONTEST_THREAD = 0.0005;
 export const NewThreadForm = () => {
   const navigate = useCommonNavigate();
   const location = useLocation();
-
-  const [submitEntryChecked, setSubmitEntryChecked] = useState(false);
 
   useAppStatus();
 
@@ -232,8 +230,6 @@ export const NewThreadForm = () => {
 
   const contestThreadBannerVisible =
     isContestAvailable && hasTopicOngoingContest;
-  const isDisabledBecauseOfContestsConsent =
-    contestThreadBannerVisible && !submitEntryChecked;
 
   const contestTopicAffordanceVisible =
     isContestAvailable && hasTopicOngoingContest;
@@ -304,7 +300,7 @@ export const NewThreadForm = () => {
                   {...(!!location.search &&
                     threadTopic?.name &&
                     threadTopic?.id && {
-                      defaultValue: {
+                      value: {
                         label: threadTopic?.name,
                         value: `${threadTopic?.id}`,
                       },
@@ -367,12 +363,7 @@ export const NewThreadForm = () => {
                 placeholder="Enter text or drag images and media here. Use the tab button to see your formatted post."
               />
 
-              {!!contestThreadBannerVisible && (
-                <ContestThreadBanner
-                  submitEntryChecked={submitEntryChecked}
-                  onSetSubmitEntryChecked={setSubmitEntryChecked}
-                />
-              )}
+              {!!contestThreadBannerVisible && <ContestThreadBanner />}
 
               <MessageRow
                 hasFeedback={!!walletBalanceError}
@@ -396,7 +387,6 @@ export const NewThreadForm = () => {
                   disabled={
                     isDisabled ||
                     !user.activeAccount ||
-                    isDisabledBecauseOfContestsConsent ||
                     walletBalanceError ||
                     contestTopicError ||
                     !!disabledActionsTooltipText

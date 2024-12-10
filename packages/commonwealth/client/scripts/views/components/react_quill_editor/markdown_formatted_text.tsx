@@ -8,6 +8,7 @@ import React, {
 
 import './markdown_formatted_text.scss';
 
+import { PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
 import DOMPurify from 'dompurify';
 import { loadScript } from 'helpers';
 import { twitterLinkRegex } from 'helpers/constants';
@@ -29,7 +30,7 @@ const markdownRenderer = new marked.Renderer();
 
 markdownRenderer.link = (href, title, text) => {
   return `<a ${
-    href.indexOf('://commonwealth.im/') !== -1 && 'target="_blank"'
+    href.indexOf(`://${PRODUCTION_DOMAIN}/`) !== -1 && 'target="_blank"'
   } ${
     OPEN_LINKS_IN_NEW_TAB ? 'target="_blank"' : ''
   } href="${href}">${text}</a>`;
@@ -55,6 +56,7 @@ type MarkdownFormattedTextProps = Omit<QuillRendererProps, 'doc'> & {
   doc: string;
   customClass?: string;
   onImageClick?: () => void;
+  isCardView?: boolean;
 };
 
 // NOTE: Do NOT use this directly. Use QuillRenderer instead.
@@ -203,6 +205,7 @@ export const MarkdownFormattedText = ({
       >
         {finalDoc}
       </div>
+
       {isTruncated && (
         <>
           {customShowMoreButton || (

@@ -1,4 +1,4 @@
-import { EventNames, InvalidState, type Command } from '@hicommonwealth/core';
+import { InvalidState, type Command } from '@hicommonwealth/core';
 import {
   decodeContent,
   getCommentSearchVector,
@@ -107,7 +107,7 @@ export function CreateComment(): Command<typeof schemas.CreateComment> {
             models.Outbox,
             [
               {
-                event_name: EventNames.CommentCreated,
+                event_name: schemas.EventNames.CommentCreated,
                 event_payload: {
                   ...comment.toJSON(),
                   community_id: thread.community_id,

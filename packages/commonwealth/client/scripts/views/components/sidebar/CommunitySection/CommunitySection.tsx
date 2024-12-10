@@ -1,4 +1,5 @@
 import { TokenView } from '@hicommonwealth/schemas';
+import { PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
 import { findDenominationString } from 'helpers/findDenomination';
 import { useFlag } from 'hooks/useFlag';
 import React from 'react';
@@ -145,7 +146,7 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
             <div
               className="powered-by"
               onClick={() => {
-                window.open('https://commonwealth.im/');
+                window.open(`https://${PRODUCTION_DOMAIN}/`);
               }}
             />
           )}

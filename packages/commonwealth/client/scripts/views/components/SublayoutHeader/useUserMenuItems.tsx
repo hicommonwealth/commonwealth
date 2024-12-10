@@ -1,4 +1,10 @@
-import { ChainBase, WalletId } from '@hicommonwealth/shared';
+import {
+  ChainBase,
+  WalletId,
+  chainBaseToCaip2,
+  chainBaseToCanvasChainId,
+  getSessionSigners,
+} from '@hicommonwealth/shared';
 import axios from 'axios';
 import { setActiveAccount } from 'controllers/app/login';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
@@ -6,9 +12,11 @@ import WebWalletController from 'controllers/app/web_wallets';
 import { SessionKeyError } from 'controllers/server/sessions';
 import { setDarkMode } from 'helpers/darkMode';
 import { getUniqueUserAddresses } from 'helpers/user';
+import { useFlag } from 'hooks/useFlag';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useCallback, useEffect, useState } from 'react';
 import app, { initAppState } from 'state';
+import { EXCEPTION_CASE_VANILLA_getCommunityById } from 'state/api/communities/getCommuityById';
 import { SERVER_URL } from 'state/api/config';
 import useAdminOnboardingSliderMutationStore from 'state/ui/adminOnboardingCards';
 import useGroupMutationBannerStore from 'state/ui/group';
@@ -16,23 +24,15 @@ import {
   useAuthModalStore,
   useManageCommunityStakeModalStore,
 } from 'state/ui/modals';
+import useUserStore from 'state/ui/user';
 import { PopoverMenuItem } from 'views/components/component_kit/CWPopoverMenu';
 import {
   CWToggle,
   toggleDarkMode,
 } from 'views/components/component_kit/cw_toggle';
-
-import {
-  chainBaseToCaip2,
-  chainBaseToCanvasChainId,
-  getSessionSigners,
-} from '@hicommonwealth/shared';
-
+import CWIconButton from 'views/components/component_kit/new_designs/CWIconButton';
+import useAuthentication from '../../modals/AuthModal/useAuthentication';
 import { useCommunityStake } from '../CommunityStake';
-
-import { useFlag } from 'hooks/useFlag';
-import { EXCEPTION_CASE_VANILLA_getCommunityById } from 'state/api/communities/getCommuityById';
-import useUserStore from 'state/ui/user';
 import UserMenuItem from './UserMenuItem';
 import useCheckAuthenticatedAddresses from './useCheckAuthenticatedAddresses';
 
@@ -90,6 +90,9 @@ const useUserMenuItems = ({
   const referralsEnabled = useFlag('referrals');
 
   const userData = useUserStore();
+  const hasMagic = userData.addresses?.[0]?.walletId === WalletId.Magic;
+
+  const { openMagicWallet } = useAuthentication({});
 
   const navigate = useCommonNavigate();
   const { stakeEnabled } = useCommunityStake();
@@ -97,6 +100,10 @@ const useUserMenuItems = ({
     useManageCommunityStakeModalStore();
 
   const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
+
+  const [canvasSignedAddresses, setCanvasSignedAddresses] = useState<string[]>(
+    [],
+  );
 
   const uniqueChainAddresses = getUniqueUserAddresses({
     forChain: app?.chain?.base,
@@ -123,10 +130,6 @@ const useUserMenuItems = ({
     selectedAddress,
     setSelectedAddress,
   ]);
-
-  const [canvasSignedAddresses, setCanvasSignedAddresses] = useState<string[]>(
-    [],
-  );
 
   const updateCanvasSignedAddresses = useCallback(async () => {
     const signedAddresses: string[] = [];
@@ -266,6 +269,20 @@ const useUserMenuItems = ({
         label: 'Edit profile',
         onClick: () => navigate(`/profile/edit`, {}, null),
       },
+      ...(hasMagic
+        ? [
+            {
+              type: 'default',
+              label: (
+                <div className="UserMenuItem">
+                  <div>Open wallet</div>
+                  <CWIconButton iconName="arrowSquareOut" />
+                </div>
+              ),
+              onClick: () => openMagicWallet(),
+            },
+          ]
+        : []),
       ...(referralsEnabled
         ? [
             {
@@ -279,8 +296,8 @@ const useUserMenuItems = ({
         : []),
       {
         type: 'default',
-        label: 'My community stake',
-        onClick: () => navigate(`/myCommunityStake`, {}, null),
+        label: 'My transactions',
+        onClick: () => navigate(`/myTransactions`, {}, null),
       },
       {
         type: 'default',
