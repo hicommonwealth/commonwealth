@@ -193,6 +193,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
       topicNameFromURL &&
       topicNameFromURL !== 'archived' &&
       topicNameFromURL !== 'overview' &&
+      topicNameFromURL !== 'undefined' &&
       tabStatus !== 'overview'
     ) {
       const validTopics = topics?.some(
