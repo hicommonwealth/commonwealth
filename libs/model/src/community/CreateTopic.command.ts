@@ -1,5 +1,4 @@
 import { InvalidInput, InvalidState, type Command } from '@hicommonwealth/core';
-
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../database';
 import { authRoles } from '../middleware';

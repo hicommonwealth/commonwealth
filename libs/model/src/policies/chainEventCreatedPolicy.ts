@@ -4,7 +4,7 @@ import { events } from '@hicommonwealth/schemas';
 import { ZodUndefined } from 'zod';
 import { models } from '../database';
 import { systemActor } from '../middleware';
-import { CreateToken } from '../token/CreateToken.command';
+import { CreateLaunchpadToken } from '../token/CreateToken.command';
 import { handleCommunityStakeTrades } from './handleCommunityStakeTrades';
 import { handleLaunchpadTrade } from './handleLaunchpadTrade';
 
@@ -23,7 +23,7 @@ export const processChainEventCreated: EventHandler<
     payload.eventSource.eventSignature ===
     EvmEventSignatures.Launchpad.TokenLaunched
   ) {
-    await command(CreateToken(), {
+    await command(CreateLaunchpadToken(), {
       actor: systemActor({}),
       payload: {
         chain_node_id: payload.eventSource.chainNodeId,
