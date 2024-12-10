@@ -335,11 +335,6 @@ export function Contests(): Projection<typeof inputs> {
 
         let calculated_voting_weight: string | undefined;
 
-        console.log({
-          add_action: add_action?.toJSON(),
-          payload,
-        });
-
         if (
           BigInt(payload.voting_power || 0) > BigInt(0) &&
           add_action?.ContestManager?.vote_weight_multiplier
