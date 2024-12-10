@@ -1,15 +1,18 @@
 import { TokenView } from '@hicommonwealth/schemas';
 import { ChainBase } from '@hicommonwealth/shared';
+import clsx from 'clsx';
 import { currencyNameToSymbolMap, SupportedCurrencies } from 'helpers/currency';
 import { calculateTokenPricing } from 'helpers/launchpad';
+import useDeferredConditionTriggerCallback from 'hooks/useDeferredConditionTriggerCallback';
 import React, { useState } from 'react';
 import app from 'state';
 import { useFetchTokenUsdRateQuery } from 'state/api/communityStake';
-import TradeTokenModal from 'views/modals/TradeTokenModel';
-import {
+import useUserStore from 'state/ui/user';
+import { AuthModal } from 'views/modals/AuthModal';
+import TradeTokenModal, {
   TokenWithCommunity,
   TradingMode,
-} from 'views/modals/TradeTokenModel/TradeTokenForm';
+} from 'views/modals/TradeTokenModel';
 import { z } from 'zod';
 import { CWDivider } from '../../../component_kit/cw_divider';
 import { CWIconButton } from '../../../component_kit/cw_icon_button';
@@ -32,6 +35,7 @@ export const TokenTradeWidget = ({
   token,
   currency = SupportedCurrencies.USD,
 }: TokenTradeWidgetProps) => {
+  const user = useUserStore();
   const currencySymbol = currencyNameToSymbolMap[currency];
 
   const [isWidgetExpanded, setIsWidgetExpanded] = useState(true);
@@ -44,6 +48,11 @@ export const TokenTradeWidget = ({
     };
   }>({ isOpen: false, tradeConfig: undefined });
 
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const { register, trigger } = useDeferredConditionTriggerCallback({
+    shouldRunTrigger: user.isLoggedIn,
+  });
+
   const { data: ethToCurrencyRateData, isLoading: isLoadingETHToCurrencyRate } =
     useFetchTokenUsdRateQuery({
       tokenSymbol: 'ETH',
@@ -53,7 +62,19 @@ export const TokenTradeWidget = ({
   );
   const tokenPricing = calculateTokenPricing(token, ethToUsdRate);
 
+  const openAuthModalOrTriggerCallback = () => {
+    if (user.isLoggedIn) {
+      trigger();
+    } else {
+      setIsAuthModalOpen(!user.isLoggedIn);
+    }
+  };
+
   const handleCTAClick = (mode: TradingMode) => {
+    if (!user.isLoggedIn) {
+      setIsAuthModalOpen(true);
+    }
+
     setTokenLaunchModalConfig({
       isOpen: true,
       tradeConfig: {
@@ -108,23 +129,57 @@ export const TokenTradeWidget = ({
             marketCap={{
               current: tokenPricing.marketCapCurrent,
               goal: tokenPricing.marketCapGoal,
+              isCapped: tokenPricing.isMarketCapGoalReached,
             }}
           />
-          <div className="action-btns">
-            {[TradingMode.Buy, TradingMode.Sell].map((mode) => (
+          <div
+            className={clsx('action-btns', {
+              [`cols-${tokenPricing.isMarketCapGoalReached ? 1 : 2}`]: true,
+            })}
+          >
+            {!tokenPricing.isMarketCapGoalReached ? (
+              [TradingMode.Buy, TradingMode.Sell].map((mode) => (
+                <CWButton
+                  key={mode}
+                  label={mode}
+                  buttonAlt={mode === TradingMode.Buy ? 'green' : 'rorange'}
+                  buttonWidth="full"
+                  buttonType="secondary"
+                  buttonHeight="sm"
+                  onClick={() => {
+                    register({
+                      cb: () => {
+                        handleCTAClick(mode);
+                      },
+                    });
+                    openAuthModalOrTriggerCallback();
+                  }}
+                />
+              ))
+            ) : (
               <CWButton
-                key={mode}
-                label={mode}
-                buttonAlt={mode === TradingMode.Buy ? 'green' : 'rorange'}
+                label={TradingMode.Swap}
+                buttonAlt="green"
                 buttonWidth="full"
                 buttonType="secondary"
                 buttonHeight="sm"
-                onClick={() => handleCTAClick(mode)}
+                onClick={() => {
+                  register({
+                    cb: () => {
+                      handleCTAClick(TradingMode.Swap);
+                    },
+                  });
+                  openAuthModalOrTriggerCallback();
+                }}
               />
-            ))}
+            )}
           </div>
         </>
       )}
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+      />
       {tokenLaunchModalConfig.tradeConfig && (
         <TradeTokenModal
           isOpen={tokenLaunchModalConfig.isOpen}

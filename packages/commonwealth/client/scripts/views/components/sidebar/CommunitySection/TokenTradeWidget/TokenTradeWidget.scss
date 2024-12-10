@@ -25,10 +25,17 @@
 
   .action-btns {
     display: grid;
-    grid-template-columns: 1fr 1fr;
     gap: 8px;
     width: 100%;
     padding: 8px;
+
+    &.cols-1 {
+      grid-template-columns: 1fr;
+    }
+
+    &.cols-2 {
+      grid-template-columns: 1fr 1fr;
+    }
 
     button {
       text-transform: capitalize;

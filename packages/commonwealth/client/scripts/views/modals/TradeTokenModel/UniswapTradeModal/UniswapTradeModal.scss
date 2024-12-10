@@ -1,0 +1,47 @@
+@import '../../../../styles/shared.scss';
+
+.UniswapTradeModal {
+  overflow-y: scroll;
+  padding-left: 8px;
+
+  .CWModalBody {
+    max-height: 500px;
+  }
+
+  .token-info {
+    display: flex;
+    align-items: center;
+    justify-self: flex-end;
+    gap: 4px;
+  }
+
+  .Uniswap {
+    .uniswap-widget-wrapper {
+      border: none !important;
+      box-shadow: none !important;
+      margin: auto;
+      width: 100%;
+
+      button[color='interactive'] {
+        color: $white !important;
+
+        svg {
+          stroke: $white !important;
+        }
+      }
+
+      button[color='accent'],
+      button[color='accentSoft'] {
+        div {
+          color: $white !important;
+        }
+      }
+
+      [class^='TokenOptions__OnHover'] {
+        // fixes a css hover bug with uniswap widget where an extra hover div
+        // appeared before the active hover element
+        display: none !important;
+      }
+    }
+  }
+}
