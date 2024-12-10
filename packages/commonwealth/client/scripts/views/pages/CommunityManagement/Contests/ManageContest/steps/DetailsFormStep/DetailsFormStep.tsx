@@ -25,6 +25,7 @@ import { MessageRow } from 'views/components/component_kit/new_designs/CWTextInp
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import CommunityManagementLayout from 'views/pages/CommunityManagement/common/CommunityManagementLayout';
 
+import { BLOG_SUBDOMAIN } from '@hicommonwealth/shared';
 import { CONTEST_FAQ_URL } from '../../../utils';
 import {
   ContestFeeType,
@@ -236,7 +237,7 @@ const DetailsFormStep = ({
           <>
             <CWText className="contest-description">
               Your contest is live and the smart contract settings cannot be
-              changed. <a href="https://blog.commonwealth.im">Learn more</a>
+              changed. <a href={BLOG_SUBDOMAIN}>Learn more</a>
             </CWText>
           </>
         ) : (
@@ -244,8 +245,9 @@ const DetailsFormStep = ({
             <CWText className="contest-description">
               Launch a contest using the funds from your community wallet to
               create engagement incentives.{' '}
-              <CWText fontWeight="medium">Contests last 7 days</CWText> in
-              blockchain time.{' '}
+              <CWText fontWeight="medium">
+                Contests can be anywhere from 1 to 7 days in duration.
+              </CWText>{' '}
               <a
                 href={CONTEST_FAQ_URL}
                 rel="noopener noreferrer"
@@ -260,8 +262,7 @@ const DetailsFormStep = ({
       featureHint={{
         title: 'How do I fund my contest?',
         description:
-          'Contests are funded when community members purchase stake in the community. ' +
-          'Each transaction includes a small contribution to the community pool that can be used to fund contests.',
+          'Contests can be funded directly using any token that is on the same chain as your community.',
       }}
     >
       <div className="DetailsFormStep">
@@ -276,9 +277,8 @@ const DetailsFormStep = ({
                 <div className="contest-section contest-section-topic">
                   <CWText type="h4">Choose a topic</CWText>
                   <CWText type="b1">
-                    Select which topic you would like to include in this
-                    contest. Only threads posted to this topic will be eligible
-                    for the contest prizes.
+                    Choose a topic for the contest to live in. Only threads
+                    posted to this topic will be part of the contest.
                   </CWText>
 
                   <CWSelectList
@@ -468,10 +468,8 @@ const DetailsFormStep = ({
               <div className="contest-section contest-section-payout">
                 <CWText type="h4">Winners & payouts</CWText>
                 <CWText type="b1" className="winners-description">
-                  Set the number of winners and how much of the total prize pool
-                  they take{' '}
-                  <CWText fontWeight="medium">20% of each prize</CWText> will be
-                  split amongst the voters of the winning content.
+                  Set the number of winners and allocate the proportion of
+                  prizes for them.
                 </CWText>
                 <div className="payout-container">
                   {payoutStructure.map((payoutNumber, index) => (

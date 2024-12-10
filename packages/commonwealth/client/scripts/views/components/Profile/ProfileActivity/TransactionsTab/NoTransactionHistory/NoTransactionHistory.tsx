@@ -1,3 +1,4 @@
+import { BLOG_SUBDOMAIN } from '@hicommonwealth/shared';
 import noTransactionHistory from 'assets/img/noTransactionHistory.svg';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
@@ -7,7 +8,6 @@ import './NoTransactionHistory.scss';
 
 const NoTransactionHistory = () => {
   const navigate = useCommonNavigate();
-
   return (
     <section className="NoTransactionHistory">
       <div className="container">
@@ -20,7 +20,9 @@ const NoTransactionHistory = () => {
             <span>
               Purchasing community stake gives you more upvote power within your
               communities.{' '}
-              <a href="https://blog.commonwealth.im/community-stake-100-owners-around-any-idea/">
+              <a
+                href={`https://${BLOG_SUBDOMAIN}/community-stake-100-owners-around-any-idea/`}
+              >
                 Learn more
               </a>
             </span>

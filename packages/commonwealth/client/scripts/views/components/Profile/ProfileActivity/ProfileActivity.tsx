@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 
 import './ProfileActivity.scss';
 
+import { mapProfileThread } from 'client/scripts/utils/mapProfileThread';
 import { useFlag } from 'hooks/useFlag';
 import type Comment from 'models/Comment';
 import type Thread from 'models/Thread';
@@ -37,13 +38,6 @@ const ProfileActivity = ({
       <div className="activity-nav">
         <CWTabsRow>
           <CWTab
-            label="All Activity"
-            onClick={() => {
-              setSelectedActivity(ProfileActivityType.Comments);
-            }}
-            isSelected={selectedActivity === ProfileActivityType.Comments}
-          />
-          <CWTab
             label={
               <div className="tab-header">
                 Threads
@@ -54,6 +48,13 @@ const ProfileActivity = ({
               setSelectedActivity(ProfileActivityType.Threads);
             }}
             isSelected={selectedActivity === ProfileActivityType.Threads}
+          />
+          <CWTab
+            label="Comments"
+            onClick={() => {
+              setSelectedActivity(ProfileActivityType.Comments);
+            }}
+            isSelected={selectedActivity === ProfileActivityType.Comments}
           />
           <CWTab
             label="My Tokens"
@@ -83,6 +84,7 @@ const ProfileActivity = ({
           option={selectedActivity}
           threads={threads}
           comments={comments}
+          mapProfileThread={mapProfileThread}
           isOwner={isOwner}
         />
       </div>

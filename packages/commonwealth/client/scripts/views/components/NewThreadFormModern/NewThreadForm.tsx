@@ -39,7 +39,7 @@ import ContestTopicBanner from './ContestTopicBanner';
 import './NewThreadForm.scss';
 import { checkNewThreadErrors, useNewThreadForm } from './helpers';
 
-const MIN_ETH_FOR_CONTEST_THREAD = 0.0005;
+const MIN_ETH_FOR_CONTEST_THREAD = 0.0;
 
 export const NewThreadForm = () => {
   const navigate = useCommonNavigate();
@@ -288,7 +288,7 @@ export const NewThreadForm = () => {
                   {...(!!location.search &&
                     threadTopic?.name &&
                     threadTopic?.id && {
-                      defaultValue: {
+                      value: {
                         label: threadTopic?.name,
                         value: `${threadTopic?.id}`,
                       },

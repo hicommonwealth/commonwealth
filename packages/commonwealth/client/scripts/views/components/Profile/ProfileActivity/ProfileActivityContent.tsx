@@ -2,10 +2,11 @@ import React from 'react';
 
 import './../Profile.scss';
 
-import type Thread from 'models/Thread';
+import Thread from 'models/Thread';
 import { CWText } from '../../component_kit/cw_text';
 import type { CommentWithAssociatedThread } from './ProfileActivity';
 import ProfileActivityRow from './ProfileActivityRow';
+import { ProfileThread } from './ProfileThread';
 import ReferralsTab from './ReferralsTab';
 import { TransactionsTab } from './TransactionsTab/TransactionsTab';
 
@@ -22,6 +23,7 @@ type ProfileActivityContentProps = {
   option: ProfileActivityType;
   threads: Thread[];
   comments: CommentWithAssociatedThread[];
+  mapProfileThread: (thread: Thread) => Thread;
   isOwner: boolean | undefined;
 };
 
@@ -29,6 +31,7 @@ const ProfileActivityContent = ({
   option,
   comments,
   threads,
+  mapProfileThread,
   isOwner,
 }: ProfileActivityContentProps) => {
   if (option === ProfileActivityType.Threads) {
@@ -49,7 +52,10 @@ const ProfileActivityContent = ({
         {threads
           .sort((a, b) => +b.createdAt - +a.createdAt)
           .map((thread, i) => (
-            <ProfileActivityRow key={i} activity={thread} />
+            <ProfileThread
+              thread={mapProfileThread(thread) as Thread}
+              key={i}
+            />
           ))}
       </>
     );

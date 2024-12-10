@@ -32,16 +32,20 @@ const useNewThreadForm = (communityId: string, topicsForSelector: Topic[]) => {
   }, [restoreDraft, topicsForSelector, topicIdFromUrl]);
 
   const defaultTopic = useMemo(() => {
-    return (
-      topicsForSelector.find(
-        (t) =>
-          t.id === restoredDraft?.topicId ||
-          (topicIdFromUrl && t.id === topicIdFromUrl),
-      ) ||
-      topicsForSelector.find((t) => t.name.includes('General')) ||
-      null
-    );
+    if (topicIdFromUrl) {
+      return topicsForSelector.find((t) => t.id === topicIdFromUrl);
+    }
+    if (restoredDraft?.topicId) {
+      return topicsForSelector.find((t) => t.id === restoredDraft.topicId);
+    }
+    return topicsForSelector.find((t) => t.name.includes('General')) || null;
   }, [restoredDraft, topicsForSelector, topicIdFromUrl]);
+
+  useEffect(() => {
+    if (defaultTopic) {
+      setThreadTopic(defaultTopic);
+    }
+  }, [defaultTopic]);
 
   const [threadKind, setThreadKind] = useState<ThreadKind>(
     ThreadKind.Discussion,

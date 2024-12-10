@@ -1,6 +1,4 @@
 import {
-  EventNames,
-  SnapshotProposalCreated,
   WorkflowKeys,
   dispose,
   disposeAdapter,
@@ -8,6 +6,7 @@ import {
 } from '@hicommonwealth/core';
 import { models, tester } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
+import { EventNames } from '@hicommonwealth/schemas';
 import { SnapshotEventType } from '@hicommonwealth/shared';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
@@ -74,7 +73,7 @@ describe('snapshotProposalCreated Event Handler', () => {
     const res = await processSnapshotProposalCreated({
       name: EventNames.SnapshotProposalCreated,
       payload: { event: 'ranndommmm' } as z.infer<
-        typeof SnapshotProposalCreated
+        typeof schemas.events.SnapshotProposalCreated
       >,
     });
     expect(res).to.be.false;
@@ -85,7 +84,7 @@ describe('snapshotProposalCreated Event Handler', () => {
       name: EventNames.SnapshotProposalCreated,
       payload: {
         event: SnapshotEventType.Created,
-      } as z.infer<typeof SnapshotProposalCreated>,
+      } as z.infer<typeof schemas.events.SnapshotProposalCreated>,
     });
     expect(res).to.be.false;
   });
@@ -101,7 +100,7 @@ describe('snapshotProposalCreated Event Handler', () => {
         event: SnapshotEventType.Created,
         space,
         id: proposalId,
-      } as z.infer<typeof SnapshotProposalCreated>,
+      } as z.infer<typeof schemas.events.SnapshotProposalCreated>,
     });
     expect(res).to.be.true;
     expect(provider.triggerWorkflow as Mock).not.toHaveBeenCalled();
@@ -124,7 +123,7 @@ describe('snapshotProposalCreated Event Handler', () => {
         event: SnapshotEventType.Created,
         space,
         id: proposalId,
-      } as z.infer<typeof SnapshotProposalCreated>,
+      } as z.infer<typeof schemas.events.SnapshotProposalCreated>,
     });
     expect(
       res,
@@ -162,7 +161,7 @@ describe('snapshotProposalCreated Event Handler', () => {
           event: SnapshotEventType.Created,
           space,
           id: proposalId,
-        } as z.infer<typeof SnapshotProposalCreated>,
+        } as z.infer<typeof schemas.events.SnapshotProposalCreated>,
       }),
     ).to.eventually.be.rejectedWith(ProviderError);
   });

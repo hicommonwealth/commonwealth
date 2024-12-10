@@ -189,6 +189,9 @@ export const TopicView = Topic.extend({
   contest_topics: z.undefined(),
   total_threads: z.number().default(0),
   active_contest_managers: z.array(ConstestManagerView).optional(),
+  chain_node_id: z.number().nullish().optional(),
+  chain_node_url: z.string().nullish().optional(),
+  eth_chain_id: z.number().nullish().optional(),
 });
 
 export const GetTopics = {
