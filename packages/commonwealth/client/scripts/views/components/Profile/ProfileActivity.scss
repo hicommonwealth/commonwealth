@@ -7,6 +7,9 @@
   flex: 2;
   background-color: $white;
 
+  max-width: 100%;
+  overflow: hidden;
+
   .activity-nav {
     display: flex;
     padding: 24px;
@@ -67,6 +70,10 @@
 
   .activity-content {
     padding: 0 60px 30px 60px;
+    .ThreadCard {
+      padding-left: 0px !important;
+      padding-right: 0px !important;
+    }
 
     > :last-child {
       border-bottom: none;
