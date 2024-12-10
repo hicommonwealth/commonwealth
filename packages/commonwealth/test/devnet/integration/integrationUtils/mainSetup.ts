@@ -1,5 +1,5 @@
 import { commonProtocol as cp } from '@hicommonwealth/evm-protocols';
-import { models, tester } from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model';
 import { setupCommonwealthConsumer } from '../../../../server/workers/commonwealthConsumer/commonwealthConsumer';
 import { startMessageRelayer } from '../../../../server/workers/messageRelayer/messageRelayer';
 import { mineBlocks, setupAnvil } from './process-setup/setupAnvil';
@@ -8,9 +8,6 @@ import { setupRabbitMq } from './process-setup/setupRabbitMq';
 import { anvilAccounts, setupWeb3 } from './process-setup/setupWeb3';
 
 export async function setupCommonwealthE2E() {
-  // reset db
-  await tester.bootstrap_testing();
-
   // setup outbox notifications
   await models.sequelize.query(`
   CREATE OR REPLACE FUNCTION notify_insert_outbox_function()
