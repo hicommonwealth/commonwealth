@@ -1,3 +1,4 @@
+// TODO: remove when we remove Contest mappers
 export const ChainEventSigs = {
   NewContest:
     'address contest, address namespace, uint256 interval, bool oneOff' as const,

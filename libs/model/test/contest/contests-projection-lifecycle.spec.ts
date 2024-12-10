@@ -7,9 +7,9 @@ import {
   query,
 } from '@hicommonwealth/core';
 import { commonProtocol } from '@hicommonwealth/evm-protocols';
-import { models } from '@hicommonwealth/model';
+import { createEventRegistryChainNodes, models } from '@hicommonwealth/model';
 import { ContestResults, EventNames } from '@hicommonwealth/schemas';
-import { AbiType, delay } from '@hicommonwealth/shared';
+import { delay } from '@hicommonwealth/shared';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import {
@@ -71,28 +71,7 @@ describe('Contests projection lifecycle', () => {
 
   beforeAll(async () => {
     try {
-      const [recurringContestAbi] = await seed('ContractAbi', {
-        id: 700,
-        abi: [] as AbiType,
-        nickname: 'RecurringContest',
-        abi_hash: 'hash1',
-        verified: true,
-      });
-      const [singleContestAbi] = await seed('ContractAbi', {
-        id: 701,
-        abi: [] as AbiType,
-        nickname: 'SingleContest',
-        abi_hash: 'hash2',
-        verified: true,
-      });
-      const [chain] = await seed('ChainNode', {
-        contracts: [
-          { abi_id: recurringContestAbi!.id },
-          { abi_id: singleContestAbi!.id },
-        ],
-        url: 'https://test',
-        private_url: 'https://test',
-      });
+      const chainNodes = await createEventRegistryChainNodes();
       const [user] = await seed(
         'User',
         {
@@ -106,7 +85,7 @@ describe('Contests projection lifecycle', () => {
         {
           id: community_id,
           namespace_address: namespace,
-          chain_node_id: chain!.id,
+          chain_node_id: chainNodes[0]!.id,
           discord_config_id: undefined,
           lifetime_thread_count: 0,
           profile_count: 1,
