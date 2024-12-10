@@ -17,14 +17,14 @@ import { CWTableColumnInfo } from '../../component_kit/new_designs/CWTable/CWTab
 import { useCWTableState } from '../../component_kit/new_designs/CWTable/useCWTableState';
 import { CWTextInput } from '../../component_kit/new_designs/CWTextInput';
 
+import { PRODUCTION_DOMAIN, S3_ASSET_BUCKET_CDN } from '@hicommonwealth/shared';
 import './ReferralsTab.scss';
 
 const fakeData = [
   {
     user: {
       name: 'cambell',
-      avatarUrl:
-        'https://assets.commonwealth.im/794bb7a3-17d7-407a-b52e-2987501221b5.png',
+      avatarUrl: `https://${S3_ASSET_BUCKET_CDN}/794bb7a3-17d7-407a-b52e-2987501221b5.png`,
       userId: '128606',
       address: 'address1',
     },
@@ -33,8 +33,7 @@ const fakeData = [
   {
     user: {
       name: 'adam',
-      avatarUrl:
-        'https://assets.commonwealth.im/0847e7f5-4d96-4406-8f30-c3082fa2f27c.png',
+      avatarUrl: `https://${S3_ASSET_BUCKET_CDN}/0847e7f5-4d96-4406-8f30-c3082fa2f27c.png`,
       userId: '135099',
       address: 'address2',
     },
@@ -43,8 +42,7 @@ const fakeData = [
   {
     user: {
       name: 'mike',
-      avatarUrl:
-        'https://assets.commonwealth.im/181e25ad-ce08-427d-8d3a-d290af3be44b.png',
+      avatarUrl: `https://${S3_ASSET_BUCKET_CDN}/181e25ad-ce08-427d-8d3a-d290af3be44b.png`,
       userId: '158139',
       address: 'address3',
     },
@@ -83,7 +81,7 @@ const ReferralsTab = ({ isOwner }: ReferralsTabProps) => {
   });
 
   // TODO: replace with actual invite link from backend in upcoming PR
-  const inviteLink = 'https://commonwealth.im/~/invite/774037=89defcb8';
+  const inviteLink = `https://${PRODUCTION_DOMAIN}/~/invite/774037=89defcb8`;
 
   const handleCopy = () => {
     saveToClipboard(inviteLink, true).catch(console.error);

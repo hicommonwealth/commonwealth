@@ -175,9 +175,9 @@ export function CreateCommunity(): Command<typeof schemas.CreateCommunity> {
             {
               event_name: schemas.EventNames.CommunityCreated,
               event_payload: {
-                communityId: id,
-                userId: actor.user.id!.toString(),
-                referralLink: payload.referral_link,
+                community_id: id,
+                user_id: actor.user.id!,
+                referral_link: payload.referral_link,
                 created_at: created.created_at!,
               },
             },

@@ -2,6 +2,7 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { dispose } from '@hicommonwealth/core';
+import { PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
@@ -52,7 +53,7 @@ describe('User Model Routes', () => {
     });
 
     test('should add an email to user with just an address', async () => {
-      const email = 'test@commonwealth.im';
+      const email = `test@${PRODUCTION_DOMAIN}`;
       const res = await chai
         .request(server.app)
         .post('/api/updateEmail')
@@ -84,7 +85,7 @@ describe('User Model Routes', () => {
         .set('Accept', 'application/json')
         .send({
           jwt: jwtToken,
-          email: 'test@commonwealth.im',
+          email: `test@${PRODUCTION_DOMAIN}`,
         });
       expect(res.body.error).to.not.be.null;
       expect(res.body.error).to.be.equal(updateEmailErrors.EmailInUse);
