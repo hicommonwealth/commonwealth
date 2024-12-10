@@ -9,9 +9,15 @@ import {
   CWModalHeader,
 } from '../../components/component_kit/new_designs/CWModal';
 import { CWTextInput } from '../../components/component_kit/new_designs/CWTextInput';
+import { ShareSkeleton } from './ShareSkeleton';
 import { getShareOptions } from './utils';
 
-import { PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
+import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
+import {
+  useCreateReferralLinkMutation,
+  useGetReferralLinkQuery,
+} from 'state/api/user';
+
 import './InviteLinkModal.scss';
 
 interface InviteLinkModalProps {
@@ -23,11 +29,23 @@ const InviteLinkModal = ({
   onModalClose,
   isInsideCommunity,
 }: InviteLinkModalProps) => {
-  // TODO: replace with actual invite link from backend in upcoming PR
-  const inviteLink = `https://${PRODUCTION_DOMAIN}/~/invite/774037=89defcb8`;
+  const { data: refferalLinkData, isLoading: isLoadingReferralLink } =
+    useGetReferralLinkQuery();
+
+  const inviteLink = refferalLinkData?.referral_link;
+
+  const { mutate: createReferralLink, isLoading: isLoadingCreateReferralLink } =
+    useCreateReferralLinkMutation();
+
+  useRunOnceOnCondition({
+    callback: () => createReferralLink({}),
+    shouldRun: !isLoadingReferralLink && !inviteLink,
+  });
 
   const handleCopy = () => {
-    saveToClipboard(inviteLink, true).catch(console.error);
+    if (inviteLink) {
+      saveToClipboard(inviteLink, true).catch(console.error);
+    }
   };
 
   const shareOptions = getShareOptions(isInsideCommunity, inviteLink);
@@ -51,30 +69,40 @@ const InviteLinkModal = ({
               Common over their lifetime engaging with web 3 native forums.`}
           </CWText>
 
-          <CWTextInput
-            fullWidth
-            type="text"
-            value={inviteLink}
-            readOnly
-            onClick={handleCopy}
-            iconRight={<CWIcon iconName="copy" />}
-          />
+          {isLoadingReferralLink || isLoadingCreateReferralLink ? (
+            <ShareSkeleton />
+          ) : (
+            <>
+              <CWTextInput
+                fullWidth
+                type="text"
+                value={inviteLink || ''}
+                readOnly
+                onClick={handleCopy}
+                iconRight={<CWIcon iconName="copy" />}
+              />
 
-          <div className="share-section">
-            <CWText fontWeight="bold">Share to</CWText>
-            <div className="share-options">
-              {shareOptions.map((option) => (
-                <div
-                  key={option.name}
-                  className="share-option"
-                  onClick={option.onClick}
-                >
-                  <img src={option.icon} alt={option.name} className="icon" />
-                  <CWText type="caption">{option.name}</CWText>
+              <div className="share-section">
+                <CWText fontWeight="bold">Share to</CWText>
+                <div className="share-options">
+                  {shareOptions.map((option) => (
+                    <div
+                      key={option.name}
+                      className="share-option"
+                      onClick={option.onClick}
+                    >
+                      <img
+                        src={option.icon}
+                        alt={option.name}
+                        className="icon"
+                      />
+                      <CWText type="caption">{option.name}</CWText>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          </div>
+              </div>
+            </>
+          )}
         </div>
       </CWModalBody>
       <CWModalFooter>
