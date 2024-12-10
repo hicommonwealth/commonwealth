@@ -1,7 +1,6 @@
 import { PermissionEnum, TopicWeightedVoting } from '@hicommonwealth/schemas';
 import { notifyError } from 'controllers/app/notifications';
-import { SessionKeyError } from 'controllers/server/sessions';
-import { parseCustomStages, weightedVotingValueToLabel } from 'helpers';
+import { weightedVotingValueToLabel } from 'helpers';
 import { detectURL, getThreadActionTooltipText } from 'helpers/threads';
 import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
 import useTopicGating from 'hooks/useTopicGating';
@@ -12,7 +11,6 @@ import app from 'state';
 import { useGetUserEthBalanceQuery } from 'state/api/communityStake';
 import { useFetchGroupsQuery } from 'state/api/groups';
 import { useCreateThreadMutation } from 'state/api/threads';
-import { buildCreateThreadInput } from 'state/api/threads/createThread';
 import { useFetchTopicsQuery } from 'state/api/topics';
 import { useAuthModalStore } from 'state/ui/modals';
 import useUserStore from 'state/ui/user';
@@ -29,7 +27,7 @@ import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextIn
 import { MessageRow } from 'views/components/component_kit/new_designs/CWTextInput/MessageRow';
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
 import useAppStatus from '../../../hooks/useAppStatus';
-import { ThreadKind, ThreadStage } from '../../../models/types';
+import { ThreadKind } from '../../../models/types';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWGatedTopicBanner } from '../component_kit/CWGatedTopicBanner';
 import { CWGatedTopicPermissionLevelBanner } from '../component_kit/CWGatedTopicPermissionLevelBanner';
@@ -160,43 +158,43 @@ export const NewThreadForm = () => {
 
     setIsSaving(true);
 
-    try {
-      const input = await buildCreateThreadInput({
-        address: user.activeAccount?.address || '',
-        kind: threadKind,
-        stage: app.chain.meta?.custom_stages
-          ? parseCustomStages(app.chain.meta?.custom_stages)[0]
-          : ThreadStage.Discussion,
-        communityId,
-        title: threadTitle,
-        topic: threadTopic,
-        body,
-        url: threadUrl,
-      });
-      const thread = await createThread(input);
-
-      setEditorText('');
-      clearDraft();
-
-      navigate(`/discussion/${thread.id}`);
-    } catch (err) {
-      if (err instanceof SessionKeyError) {
-        checkForSessionKeyRevalidationErrors(err);
-        return;
-      }
-
-      if (err?.message?.includes('limit')) {
-        notifyError(
-          'Limit of submitted threads in selected contest has been exceeded.',
-        );
-        return;
-      }
-
-      console.error(err?.message);
-      notifyError('Failed to create thread');
-    } finally {
-      setIsSaving(false);
-    }
+    // try {
+    //   const input = await buildCreateThreadInput({
+    //     address: user.activeAccount?.address || '',
+    //     kind: threadKind,
+    //     stage: app.chain.meta?.custom_stages
+    //       ? parseCustomStages(app.chain.meta?.custom_stages)[0]
+    //       : ThreadStage.Discussion,
+    //     communityId,
+    //     title: threadTitle,
+    //     topic: threadTopic,
+    //     body,
+    //     url: threadUrl,
+    //   });
+    //   const thread = await createThread(input);
+    //
+    //   setEditorText('');
+    //   clearDraft();
+    //
+    //   navigate(`/discussion/${thread.id}`);
+    // } catch (err) {
+    //   if (err instanceof SessionKeyError) {
+    //     checkForSessionKeyRevalidationErrors(err);
+    //     return;
+    //   }
+    //
+    //   if (err?.message?.includes('limit')) {
+    //     notifyError(
+    //       'Limit of submitted threads in selected contest has been exceeded.',
+    //     );
+    //     return;
+    //   }
+    //
+    //   console.error(err?.message);
+    //   notifyError('Failed to create thread');
+    // } finally {
+    //   setIsSaving(false);
+    // }
   };
 
   const showBanner = !user.activeAccount && isBannerVisible;
