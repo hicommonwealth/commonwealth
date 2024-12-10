@@ -51,7 +51,7 @@ export async function emitEvent(
     } else {
       log.warn(
         `Event not inserted into outbox! ` +
-          `The event "${event.event_name}" is blacklisted. 
+          `The event "${event.event_name}" is blacklisted.
           Remove it from BLACKLISTED_EVENTS env in order to allow emitting this event.`,
         {
           event_name: event.event_name,
@@ -206,7 +206,7 @@ export function getChainNodeUrl({
   private_url,
 }: {
   url: string;
-  private_url?: string;
+  private_url?: string | null | undefined;
 }) {
   if (!private_url || private_url === '')
     return buildChainNodeUrl(url, 'public');

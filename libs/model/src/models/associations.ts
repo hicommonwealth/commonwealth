@@ -154,6 +154,8 @@ export const buildAssociations = (db: DB) => {
     foreignKey: 'contest_address',
     asMany: 'contests',
     onDelete: 'CASCADE',
+  }).withMany(db.ContestAction, {
+    foreignKey: 'contest_address',
   });
 
   db.Contest.withMany(db.ContestAction, {
