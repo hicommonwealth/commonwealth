@@ -18,7 +18,7 @@ export const calculateTokenPricing = (
   );
   const marketCapCurrent = currentPrice * token.initial_supply;
   const marketCapGoal = token.eth_market_cap_target * ethToUsdRate;
-  const isMarketCapGoalReached = marketCapCurrent >= marketCapGoal || true; // TODO: force true for testing, todo remove
+  const isMarketCapGoalReached = marketCapCurrent >= marketCapGoal;
 
   return {
     currentPrice: parseFloat(`${currentPrice.toFixed(8)}`),
