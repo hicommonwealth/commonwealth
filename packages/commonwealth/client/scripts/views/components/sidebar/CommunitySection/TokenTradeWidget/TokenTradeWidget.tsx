@@ -3,9 +3,12 @@ import { ChainBase } from '@hicommonwealth/shared';
 import clsx from 'clsx';
 import { currencyNameToSymbolMap, SupportedCurrencies } from 'helpers/currency';
 import { calculateTokenPricing } from 'helpers/launchpad';
+import useDeferredConditionTriggerCallback from 'hooks/useDeferredConditionTriggerCallback';
 import React, { useState } from 'react';
 import app from 'state';
 import { useFetchTokenUsdRateQuery } from 'state/api/communityStake';
+import useUserStore from 'state/ui/user';
+import { AuthModal } from 'views/modals/AuthModal';
 import TradeTokenModal, {
   TokenWithCommunity,
   TradingMode,
@@ -32,6 +35,7 @@ export const TokenTradeWidget = ({
   token,
   currency = SupportedCurrencies.USD,
 }: TokenTradeWidgetProps) => {
+  const user = useUserStore();
   const currencySymbol = currencyNameToSymbolMap[currency];
 
   const [isWidgetExpanded, setIsWidgetExpanded] = useState(true);
@@ -44,6 +48,11 @@ export const TokenTradeWidget = ({
     };
   }>({ isOpen: false, tradeConfig: undefined });
 
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const { register, trigger } = useDeferredConditionTriggerCallback({
+    shouldRunTrigger: user.isLoggedIn,
+  });
+
   const { data: ethToCurrencyRateData, isLoading: isLoadingETHToCurrencyRate } =
     useFetchTokenUsdRateQuery({
       tokenSymbol: 'ETH',
@@ -53,7 +62,19 @@ export const TokenTradeWidget = ({
   );
   const tokenPricing = calculateTokenPricing(token, ethToUsdRate);
 
+  const openAuthModalOrTriggerCallback = () => {
+    if (user.isLoggedIn) {
+      trigger();
+    } else {
+      setIsAuthModalOpen(!user.isLoggedIn);
+    }
+  };
+
   const handleCTAClick = (mode: TradingMode) => {
+    if (!user.isLoggedIn) {
+      setIsAuthModalOpen(true);
+    }
+
     setTokenLaunchModalConfig({
       isOpen: true,
       tradeConfig: {
@@ -125,7 +146,14 @@ export const TokenTradeWidget = ({
                   buttonWidth="full"
                   buttonType="secondary"
                   buttonHeight="sm"
-                  onClick={() => handleCTAClick(mode)}
+                  onClick={() => {
+                    register({
+                      cb: () => {
+                        handleCTAClick(mode);
+                      },
+                    });
+                    openAuthModalOrTriggerCallback();
+                  }}
                 />
               ))
             ) : (
@@ -135,12 +163,23 @@ export const TokenTradeWidget = ({
                 buttonWidth="full"
                 buttonType="secondary"
                 buttonHeight="sm"
-                onClick={() => handleCTAClick(TradingMode.Swap)}
+                onClick={() => {
+                  register({
+                    cb: () => {
+                      handleCTAClick(TradingMode.Swap);
+                    },
+                  });
+                  openAuthModalOrTriggerCallback();
+                }}
               />
             )}
           </div>
         </>
       )}
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+      />
       {tokenLaunchModalConfig.tradeConfig && (
         <TradeTokenModal
           isOpen={tokenLaunchModalConfig.isOpen}
