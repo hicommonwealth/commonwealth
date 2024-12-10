@@ -3,12 +3,12 @@ import { models } from '@hicommonwealth/model';
 import { EventNames } from '@hicommonwealth/schemas';
 import { delay } from '@hicommonwealth/shared';
 import { expect } from 'chai';
-import { afterEach, describe, test } from 'vitest';
-import { startMessageRelayer } from '../../../server/workers/messageRelayer/messageRelayer';
 import {
   numUnrelayedEvents,
   resetNumUnrelayedEvents,
-} from '../../../server/workers/messageRelayer/relayForever';
+} from 'server/bindings/relayForever';
+import { afterEach, describe, test } from 'vitest';
+import { startMessageRelayer } from '../../../server/workers/messageRelayer/messageRelayer';
 import { testOutboxEvents } from './util';
 
 describe('messageRelayer', { timeout: 20_000 }, () => {
