@@ -494,7 +494,6 @@ export const NewThreadForm = () => {
                     isDisabled ||
                     !user.activeAccount ||
                     !userSelectedAddress ||
-                    isDisabledBecauseOfContestsConsent ||
                     walletBalanceError ||
                     contestTopicError ||
                     (selectedCommunityId && !!disabledActionsTooltipText) ||
