@@ -16,8 +16,8 @@ module.exports = {
             references: {
               model: 'Communities',
               key: 'id',
-              onDelete: 'CASCADE',
             },
+            onDelete: 'CASCADE',
           },
           contract_address: {
             type: Sequelize.STRING,
@@ -29,8 +29,8 @@ module.exports = {
             references: {
               model: 'ChainNodes',
               key: 'id',
-              onDelete: 'CASCADE',
             },
+            onDelete: 'CASCADE',
           },
           created_at: {
             type: Sequelize.DATE,
@@ -78,13 +78,24 @@ module.exports = {
         { transaction },
       );
 
+      // this only affects empty development db (no effect in prod)
+      // the chain node here was manually updated in production but created via a migration
+      await queryInterface.sequelize.query(
+        `
+        UPDATE "ChainNodes"
+        SET alchemy_metadata = '{ "network_id": "arb-mainnet", "price_api_supported": true, "transfer_api_supported": true }'
+        WHERE url = 'wss://arb-mainnet.g.alchemy.com/v2/';
+      `,
+        { transaction },
+      );
+
       await queryInterface.sequelize.query(
         `
             ALTER TABLE "ChainNodes"
                 ADD CONSTRAINT alchemy_metadata_check
                     CHECK (
-                        (alchemy_metadata IS NOT NULL AND (url LIKE '%alchemy%' OR private_url LIKE '%alchemy%')) OR
-                        (alchemy_metadata IS NULL AND (url NOT LIKE '%alchemy%' AND private_url NOT LIKE '%alchemy%'))
+                        (alchemy_metadata IS NOT NULL AND (url LIKE '%.g.alchemy.com%' OR private_url LIKE '%.g.alchemy.com%')) OR
+                        (alchemy_metadata IS NULL AND (url NOT LIKE '%.g.alchemy.com%' AND private_url NOT LIKE '%.g.alchemy.com%'))
                         );
       `,
         { transaction },
