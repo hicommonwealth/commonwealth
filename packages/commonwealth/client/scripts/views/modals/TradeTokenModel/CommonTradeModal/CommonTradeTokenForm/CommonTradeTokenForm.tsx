@@ -81,12 +81,12 @@ const CommonTradeTokenForm = ({
   return (
     <section className="CommonTradeTokenForm">
       <CWTabsRow>
-        {Object.keys(TradingMode).map((mode) => (
+        {[TradingMode.Buy, TradingMode.Sell].map((mode) => (
           <CWTab
             key={mode}
             label={mode}
-            onClick={() => trading.mode.onChange(TradingMode[mode])}
-            isSelected={trading.mode.value === TradingMode[mode]}
+            onClick={() => trading.mode.onChange(mode)}
+            isSelected={trading.mode.value === mode}
           />
         ))}
       </CWTabsRow>

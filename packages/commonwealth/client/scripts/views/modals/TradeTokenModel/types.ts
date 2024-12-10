@@ -3,9 +3,9 @@ import { ChainBase } from '@hicommonwealth/shared';
 import { z } from 'zod';
 
 export enum TradingMode {
-  Buy = 'buy',
-  Sell = 'sell',
-  Swap = 'swap',
+  Buy = 'buy', // for trade on common
+  Sell = 'sell', // for trade on common
+  Swap = 'swap', // for trade via uniswap
 }
 
 export const TokenWithCommunity = TokenView.extend({

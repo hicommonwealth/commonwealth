@@ -5,6 +5,12 @@
   flex-direction: column;
   gap: 12px;
 
+  .Tab {
+    .Text {
+      text-transform: capitalize;
+    }
+  }
+
   .balance-row {
     display: flex;
     justify-content: space-between;
