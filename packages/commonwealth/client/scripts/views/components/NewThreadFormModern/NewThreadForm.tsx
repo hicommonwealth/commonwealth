@@ -40,6 +40,7 @@ import { checkNewThreadErrors, useNewThreadForm } from './helpers';
 const MIN_ETH_FOR_CONTEST_THREAD = 0.0;
 
 export const NewThreadForm = () => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const navigate = useCommonNavigate();
   const location = useLocation();
 
@@ -71,6 +72,7 @@ export const NewThreadForm = () => {
     setEditorText,
     setIsSaving,
     isDisabled,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     clearDraft,
     canShowGatingBanner,
     setCanShowGatingBanner,
@@ -82,6 +84,7 @@ export const NewThreadForm = () => {
     threadTopic?.active_contest_managers?.length ?? 0 > 0;
 
   const user = useUserStore();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
 
   const contestTopicError = threadTopic?.active_contest_managers?.length
@@ -112,6 +115,7 @@ export const NewThreadForm = () => {
 
   const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { mutateAsync: createThread } = useCreateThreadMutation({
     communityId,
   });
