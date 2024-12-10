@@ -4,14 +4,16 @@ import { AnalyticsPayload, BaseMixpanelPayload, providers } from './types';
 // WARN: Using process.env to avoid webpack failures
 try {
   if (process.env.APP_ENV === 'production') {
-    mixpanel.init(process.env.MIXPANEL_PROD_TOKEN, { debug: true });
-  } else if (process.env.APP_ENV === 'development') {
-    // NOTE: Only works if NODE_ENV defined in .env
-    // Make sure that is set to development if you want to use backend Mixpanel locally.
-    mixpanel.init(process.env.MIXPANEL_DEV_TOKEN, { debug: true });
+    mixpanel.init(process.env.MIXPANEL_PROD_TOKEN, {
+      debug: true,
+    });
+  } else if (process.env.APP_ENV === 'local') {
+    mixpanel.init(process.env.MIXPANEL_DEV_TOKEN, {
+      debug: true,
+    });
   }
 } catch (e) {
-  console.log('Unable to initialized the backend mixpanel client: ', e);
+  console.log('Unable to initialize the frontend mixpanel: ', e);
 }
 
 // ----- Client Side Mixpanel Library Utils ------ //
@@ -20,7 +22,10 @@ export function mixpanelBrowserTrack<T extends BaseMixpanelPayload>(data: T) {
   try {
     mixpanel.track(event, payload);
   } catch (e) {
-    console.log(`Failed to track event, ${event.toString()}:`, e.message);
+    console.log(
+      `Failed to track frontend mixpanel event, ${event.toString()}:`,
+      e.message,
+    );
   }
 }
 
