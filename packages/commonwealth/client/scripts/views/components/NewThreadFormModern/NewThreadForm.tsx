@@ -141,6 +141,7 @@ export const NewThreadForm = () => {
     )
     .map((group) => group.name);
 
+  // eslint-disable-next-line @typescript-eslint/require-await
   const handleNewThreadCreation = async () => {
     const body = markdownEditorMethodsRef.current!.getMarkdown();
 
