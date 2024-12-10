@@ -32,18 +32,20 @@ const InviteLinkModal = ({
   const { data: refferalLinkData, isLoading: isLoadingReferralLink } =
     useGetReferralLinkQuery();
 
-  const inviteLink = refferalLinkData?.referral_link;
-
   const { mutate: createReferralLink, isLoading: isLoadingCreateReferralLink } =
     useCreateReferralLinkMutation();
 
+  const referralLink = refferalLinkData?.referral_link;
+  const currentUrl = window.location.origin;
+  const inviteLink = referralLink ? `${currentUrl}/invite/${referralLink}` : '';
+
   useRunOnceOnCondition({
     callback: () => createReferralLink({}),
-    shouldRun: !isLoadingReferralLink && !inviteLink,
+    shouldRun: !isLoadingReferralLink && !referralLink,
   });
 
   const handleCopy = () => {
-    if (inviteLink) {
+    if (referralLink) {
       saveToClipboard(inviteLink, true).catch(console.error);
     }
   };
@@ -76,7 +78,7 @@ const InviteLinkModal = ({
               <CWTextInput
                 fullWidth
                 type="text"
-                value={inviteLink || ''}
+                value={inviteLink}
                 readOnly
                 onClick={handleCopy}
                 iconRight={<CWIcon iconName="copy" />}
