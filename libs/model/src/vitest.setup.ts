@@ -5,6 +5,10 @@ import { bootstrap_testing } from './tester';
 beforeAll(async ({ name }) => {
   const lcsuite = name.includes('-lifecycle');
   if (lcsuite) {
+    if (/[A-Z]/.test(name)) {
+      throw new Error('Test file name must not contain uppercase letters');
+    }
+
     const suite_name = path.basename(name, '.spec.ts');
     const suite_db = 'test_' + suite_name.replace(/-/g, '_');
 
