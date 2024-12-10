@@ -2,10 +2,17 @@ import { formatAddressShort } from 'helpers';
 import React from 'react';
 import { CWText } from 'views/components/component_kit/cw_text';
 
+import { WalletId } from '@hicommonwealth/shared';
 import AddressInfo from 'client/scripts/models/AddressInfo';
+import {
+  handleMouseEnter,
+  handleMouseLeave,
+} from 'client/scripts/views/menus/utils';
+import useAuthentication from 'client/scripts/views/modals/AuthModal/useAuthentication';
 import { PopoverMenu } from '../../component_kit/CWPopoverMenu';
 import { CWIcon } from '../../component_kit/cw_icons/cw_icon';
 import CWIconButton from '../../component_kit/new_designs/CWIconButton';
+import { CWTooltip } from '../../component_kit/new_designs/CWTooltip';
 import './AddressList.scss';
 
 interface CWIdentificationTagProps {
@@ -22,6 +29,8 @@ export const AddressList = ({
   if ((!address && !username) || !addresses) {
     return null;
   }
+
+  const { openMagicWallet } = useAuthentication({});
 
   const filteredAddresses = Array.from(
     new Map(addresses.map((item) => [item.address, item])).values(),
@@ -44,6 +53,37 @@ export const AddressList = ({
               </div>
               {addr.address === address && (
                 <CWIcon iconName="checkCircleFilled" />
+              )}
+              {addr.walletId == WalletId.Magic && (
+                <CWTooltip
+                  placement="top"
+                  content="Open wallet"
+                  renderTrigger={(handleInteraction, isTooltipOpen) => {
+                    return (
+                      <CWIconButton
+                        iconName="arrowSquareOut"
+                        onClick={() => {
+                          openMagicWallet().catch(console.error);
+                        }}
+                        onMouseEnter={(e) => {
+                          handleMouseEnter({
+                            e,
+                            isTooltipOpen,
+                            handleInteraction,
+                          });
+                        }}
+                        onMouseLeave={(e) => {
+                          handleMouseLeave({
+                            e,
+                            isTooltipOpen,
+                            handleInteraction,
+                          });
+                        }}
+                        className="open-wallet-icon"
+                      />
+                    );
+                  }}
+                />
               )}
               <PopoverMenu
                 menuItems={[
