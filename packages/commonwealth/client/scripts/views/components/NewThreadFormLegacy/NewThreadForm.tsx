@@ -61,8 +61,6 @@ export const NewThreadForm = () => {
 
   const user = useUserStore();
 
-  const [submitEntryChecked, setSubmitEntryChecked] = useState(false);
-
   useAppStatus();
 
   const isInsideCommunity = !!app.chain; // if this is not set user is not inside community
