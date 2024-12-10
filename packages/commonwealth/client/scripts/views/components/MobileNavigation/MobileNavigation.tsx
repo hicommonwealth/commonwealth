@@ -8,12 +8,15 @@ import CWDrawer from 'views/components/component_kit/new_designs/CWDrawer';
 import CreateContentDrawer from './CreateContentDrawer';
 import NavigationButton, { NavigationButtonProps } from './NavigationButton';
 
+import { useFlag } from 'hooks/useFlag';
+import { QuickPostButton } from 'views/components/MobileNavigation/QuickPostButton';
 import './MobileNavigation.scss';
 
 const MobileNavigation = () => {
   const navigate = useCommonNavigate();
   const location = useLocation();
   const user = useUserStore();
+  const newMobileNav = useFlag('newMobileNav');
 
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
@@ -30,7 +33,7 @@ const MobileNavigation = () => {
       onClick: () => navigate('/dashboard', {}, null),
       selected: !!matchesDashboard,
     },
-    ...(user.isLoggedIn
+    ...(user.isLoggedIn && !newMobileNav
       ? [
           {
             type: 'create' as const,
@@ -57,6 +60,7 @@ const MobileNavigation = () => {
 
   return (
     <>
+      {newMobileNav && <QuickPostButton />}
       <div className="MobileNavigation">
         <div id="MobileNavigationHead">
           {/*react portal container for anyone that wants to put content*/}
