@@ -6,7 +6,13 @@ import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import './NoTransactionHistory.scss';
 
-const NoTransactionHistory = () => {
+type NoTransactionHistoryProps = {
+  withSelectedAddress?: boolean;
+};
+
+const NoTransactionHistory = ({
+  withSelectedAddress = false,
+}: NoTransactionHistoryProps = {}) => {
   const navigate = useCommonNavigate();
   return (
     <section className="NoTransactionHistory">
@@ -14,12 +20,13 @@ const NoTransactionHistory = () => {
         <img src={noTransactionHistory} alt="no transaction history icon" />
         <div className="labels">
           <CWText type="h4" fontWeight="semiBold">
-            You have not purchased stake in any communities
+            You have not purchased any assets in any communities{' '}
+            {withSelectedAddress ? 'with the selected address' : ''}
           </CWText>
           <CWText type="b1">
             <span>
-              Purchasing community stake gives you more upvote power within your
-              communities.{' '}
+              Purchasing assets like community stake gives you more upvote power
+              within your communities.{' '}
               <a
                 href={`https://${BLOG_SUBDOMAIN}/community-stake-100-owners-around-any-idea/`}
               >

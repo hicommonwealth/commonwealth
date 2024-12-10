@@ -104,7 +104,9 @@ const TransactionsTab = ({ transactionsType }: TransactionsTabProps) => {
       </section>
 
       {!(data?.length > 0) ? (
-        <NoTransactionHistory />
+        <NoTransactionHistory
+          withSelectedAddress={!!filterOptions?.selectedAddress?.value}
+        />
       ) : (
         <>
           {transactionsType === 'tokens' && (
