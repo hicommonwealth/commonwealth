@@ -13,6 +13,7 @@ import { ShareSkeleton } from './ShareSkeleton';
 import { getShareOptions } from './utils';
 
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
+import app from 'state';
 import {
   useCreateReferralLinkMutation,
   useGetReferralLinkQuery,
@@ -22,22 +23,22 @@ import './InviteLinkModal.scss';
 
 interface InviteLinkModalProps {
   onModalClose: () => void;
-  isInsideCommunity: boolean;
 }
 
-const InviteLinkModal = ({
-  onModalClose,
-  isInsideCommunity,
-}: InviteLinkModalProps) => {
+const InviteLinkModal = ({ onModalClose }: InviteLinkModalProps) => {
   const { data: refferalLinkData, isLoading: isLoadingReferralLink } =
     useGetReferralLinkQuery();
+
+  const communityId = app.activeChainId();
 
   const { mutate: createReferralLink, isLoading: isLoadingCreateReferralLink } =
     useCreateReferralLinkMutation();
 
   const referralLink = refferalLinkData?.referral_link;
   const currentUrl = window.location.origin;
-  const inviteLink = referralLink ? `${currentUrl}/invite/${referralLink}` : '';
+  const inviteLink = referralLink
+    ? `${currentUrl}/${communityId ? communityId + '/' : ''}invite/${referralLink}`
+    : '';
 
   useRunOnceOnCondition({
     callback: () => createReferralLink({}),
@@ -50,22 +51,20 @@ const InviteLinkModal = ({
     }
   };
 
-  const shareOptions = getShareOptions(isInsideCommunity, inviteLink);
+  const shareOptions = getShareOptions(!!communityId, inviteLink);
 
   return (
     <div className="InviteLinkModal">
       <CWModalHeader
         label={
-          isInsideCommunity
-            ? 'Community invite link'
-            : 'Commonwealth invite link'
+          communityId ? 'Community invite link' : 'Commonwealth invite link'
         }
         onModalClose={onModalClose}
       />
       <CWModalBody>
         <div className="content">
           <CWText>
-            {isInsideCommunity
+            {communityId
               ? 'Get more voting power in your communities when people join with your referral link.'
               : `When you refer your friends to Common, you'll get a portion of any fees they pay to 
               Common over their lifetime engaging with web 3 native forums.`}
