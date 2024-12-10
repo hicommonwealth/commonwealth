@@ -190,7 +190,7 @@ describe('Pinned token lifecycle', () => {
     let res = await query(GetPinnedTokens(), {
       actor: adminActor,
       payload: {
-        community_ids: ['random_community_id'],
+        community_ids: 'random_community_id',
         with_chain_node: true,
       },
     });
@@ -199,7 +199,7 @@ describe('Pinned token lifecycle', () => {
     res = await query(GetPinnedTokens(), {
       actor: userActor,
       payload: {
-        community_ids: ['random_community_id'],
+        community_ids: 'random_community_id',
         with_chain_node: true,
       },
     });
@@ -210,7 +210,7 @@ describe('Pinned token lifecycle', () => {
     let res = await query(GetPinnedTokens(), {
       actor: adminActor,
       payload: {
-        community_ids: [community_id!],
+        community_ids: `${community_id}`,
         with_chain_node: true,
       },
     });
@@ -222,7 +222,7 @@ describe('Pinned token lifecycle', () => {
     res = await query(GetPinnedTokens(), {
       actor: userActor,
       payload: {
-        community_ids: [community_id!],
+        community_ids: `${community_id}`,
         with_chain_node: true,
       },
     });
@@ -234,7 +234,7 @@ describe('Pinned token lifecycle', () => {
     res = await query(GetPinnedTokens(), {
       actor: userActor,
       payload: {
-        community_ids: [community_id!, second_community_id!],
+        community_ids: `${community_id},${second_community_id}`,
         with_chain_node: true,
       },
     });

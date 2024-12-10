@@ -206,7 +206,7 @@ export const GetTopics = {
 
 export const GetPinnedTokens = {
   input: z.object({
-    community_ids: z.array(z.string()),
+    community_ids: z.string(),
     with_chain_node: z.boolean().optional(),
   }),
   output: PinnedToken.array(),

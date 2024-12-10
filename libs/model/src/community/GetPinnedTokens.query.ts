@@ -11,6 +11,8 @@ export function GetPinnedTokens(): Query<typeof schemas.GetPinnedTokens> {
     body: async ({ payload }) => {
       const { community_ids, with_chain_node } = payload;
       if (community_ids.length === 0) return [];
+      const parsedIds = community_ids.split(',').filter((v) => v !== '');
+      if (parsedIds.length === 0) return [];
 
       const include: Includeable[] = [];
       if (with_chain_node) {
@@ -23,7 +25,7 @@ export function GetPinnedTokens(): Query<typeof schemas.GetPinnedTokens> {
       return (
         await models.PinnedToken.findAll({
           where: {
-            community_id: community_ids,
+            community_id: parsedIds,
           },
           include,
         })
