@@ -4,6 +4,7 @@ import { CWText } from 'views/components/component_kit/cw_text';
 
 import AddressInfo from 'client/scripts/models/AddressInfo';
 import { PopoverMenu } from '../../component_kit/CWPopoverMenu';
+import { CWIcon } from '../../component_kit/cw_icons/cw_icon';
 import CWIconButton from '../../component_kit/new_designs/CWIconButton';
 import './AddressList.scss';
 
@@ -41,6 +42,9 @@ export const AddressList = ({
                   {formatAddressShort(addr.address, 6)}
                 </CWText>
               </div>
+              {addr.address === address && (
+                <CWIcon iconName="checkCircleFilled" />
+              )}
               <PopoverMenu
                 menuItems={[
                   {
