@@ -43,9 +43,13 @@ export default async (models: DB, req: Request, res: Response) => {
     throw new AppError(Errors.NotAdmin);
   }
 
-  await comment.update({
-    marked_as_spam_at: Sequelize.literal('CURRENT_TIMESTAMP'),
-  });
+  console.log('COMMENT_INFO:', comment.id);
+  await comment.update(
+    {
+      marked_as_spam_at: Sequelize.literal('CURRENT_TIMESTAMP'),
+    },
+    { logging: console.log },
+  );
 
   // get comment with updated timestamp
   const updatedComment = await models.Comment.findOne({
