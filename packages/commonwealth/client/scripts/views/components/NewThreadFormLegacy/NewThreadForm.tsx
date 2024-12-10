@@ -1,15 +1,19 @@
 import { PermissionEnum, TopicWeightedVoting } from '@hicommonwealth/schemas';
 import { notifyError } from 'controllers/app/notifications';
-import { SessionKeyError } from 'controllers/server/sessions';
-import { parseCustomStages, weightedVotingValueToLabel } from 'helpers';
+import {
+  SessionKeyError,
+  getEthChainIdOrBech32Prefix,
+} from 'controllers/server/sessions';
+import { weightedVotingValueToLabel } from 'helpers';
 import { detectURL, getThreadActionTooltipText } from 'helpers/threads';
 import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
 import useTopicGating from 'hooks/useTopicGating';
 import type { Topic } from 'models/Topic';
 import { useCommonNavigate } from 'navigation/helpers';
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import app from 'state';
+import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { useGetUserEthBalanceQuery } from 'state/api/communityStake';
 import { useFetchGroupsQuery } from 'state/api/groups';
 import { useCreateThreadMutation } from 'state/api/threads';
@@ -30,6 +34,11 @@ import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCo
 import useAppStatus from '../../../hooks/useAppStatus';
 import { ThreadKind, ThreadStage } from '../../../models/types';
 import { CWText } from '../../components/component_kit/cw_text';
+import {
+  CustomAddressOption,
+  CustomAddressOptionElement,
+} from '../../modals/ManageCommunityStakeModal/StakeExchangeForm/CustomAddressOption';
+import { convertAddressToDropdownOption } from '../../modals/TradeTokenModel/TradeTokenForm/helpers';
 import { CWGatedTopicBanner } from '../component_kit/CWGatedTopicBanner';
 import { CWGatedTopicPermissionLevelBanner } from '../component_kit/CWGatedTopicPermissionLevelBanner';
 import { CWSelectList } from '../component_kit/new_designs/CWSelectList';
@@ -50,13 +59,31 @@ export const NewThreadForm = () => {
   const navigate = useCommonNavigate();
   const location = useLocation();
 
+  const user = useUserStore();
+
   useAppStatus();
 
-  const communityId = app.activeChainId() || '';
+  const isInsideCommunity = !!app.chain; // if this is not set user is not inside community
+
+  const [selectedCommunityId, setSelectedCommunityId] = useState(
+    app.activeChainId() || '',
+  );
+  const [userSelectedAddress, setUserSelectedAddress] = useState(
+    user?.activeAccount?.address,
+  );
+  const { data: community, isLoading: isLoadingCommunity } =
+    useGetCommunityByIdQuery({
+      id: selectedCommunityId,
+      includeNodeInfo: true,
+      enabled: !!selectedCommunityId,
+    });
+  const chainRpc = community?.ChainNode?.url || '';
+  const ethChainId = community?.ChainNode?.eth_chain_id || 0;
+
   const { data: topics = [], refetch: refreshTopics } = useFetchTopicsQuery({
-    communityId,
+    communityId: selectedCommunityId,
     includeContestData: true,
-    apiEnabled: !!communityId,
+    apiEnabled: !!selectedCommunityId,
   });
 
   const { isContestAvailable } = useCommunityContests();
@@ -84,21 +111,19 @@ export const NewThreadForm = () => {
     setCanShowGatingBanner,
     canShowTopicPermissionBanner,
     setCanShowTopicPermissionBanner,
-  } = useNewThreadForm(communityId, topicsForSelector);
+  } = useNewThreadForm(selectedCommunityId, topicsForSelector);
 
   const hasTopicOngoingContest =
     threadTopic?.active_contest_managers?.length ?? 0 > 0;
 
-  const user = useUserStore();
   const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
 
   const contestTopicError = threadTopic?.active_contest_managers?.length
     ? threadTopic?.active_contest_managers
         ?.map(
           (acm) =>
-            acm?.content?.filter(
-              (c) => c.actor_address === user.activeAccount?.address,
-            ).length || 0,
+            acm?.content?.filter((c) => c.actor_address === userSelectedAddress)
+              .length || 0,
         )
         ?.every((n) => n >= 2)
     : false;
@@ -107,33 +132,31 @@ export const NewThreadForm = () => {
   const { isBannerVisible, handleCloseBanner } = useJoinCommunityBanner();
 
   const { data: groups = [] } = useFetchGroupsQuery({
-    communityId,
+    communityId: selectedCommunityId,
     includeTopics: true,
-    enabled: !!communityId,
+    enabled: !!selectedCommunityId,
   });
   const { isRestrictedMembership, foundTopicPermissions } = useTopicGating({
-    communityId,
-    userAddress: user.activeAccount?.address || '',
-    apiEnabled: !!user.activeAccount?.address && !!communityId,
+    communityId: selectedCommunityId,
+    userAddress: userSelectedAddress || '',
+    apiEnabled: !!userSelectedAddress && !!selectedCommunityId,
     topicId: threadTopic?.id || 0,
   });
 
   const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
 
   const { mutateAsync: createThread } = useCreateThreadMutation({
-    communityId,
+    communityId: selectedCommunityId,
   });
-
-  const chainRpc = app?.chain?.meta?.ChainNode?.url || '';
-  const ethChainId = app?.chain?.meta?.ChainNode?.eth_chain_id || 0;
 
   const { data: userEthBalance } = useGetUserEthBalanceQuery({
     chainRpc,
-    walletAddress: user.activeAccount?.address || '',
+    walletAddress: userSelectedAddress || '',
     apiEnabled:
       isContestAvailable &&
-      !!user.activeAccount?.address &&
-      Number(ethChainId) > 0,
+      !!userSelectedAddress &&
+      Number(ethChainId) > 0 &&
+      !!chainRpc,
     ethChainId: ethChainId || 0,
   });
 
@@ -150,6 +173,12 @@ export const NewThreadForm = () => {
     .map((group) => group.name);
 
   const handleNewThreadCreation = async () => {
+    // adding to avoid ts issues, submit button is disabled in this case
+    if (!community || !userSelectedAddress || !selectedCommunityId) {
+      notifyError('Invalid form state!');
+      return;
+    }
+
     if (isRestrictedMembership) {
       notifyError('Topic is gated!');
       return;
@@ -172,23 +201,34 @@ export const NewThreadForm = () => {
 
     try {
       const input = await buildCreateThreadInput({
-        address: user.activeAccount?.address || '',
+        address: userSelectedAddress || '',
         kind: threadKind,
-        stage: app.chain.meta?.custom_stages
-          ? parseCustomStages(app.chain.meta?.custom_stages)[0]
-          : ThreadStage.Discussion,
-        communityId,
+        stage: ThreadStage.Discussion,
+        communityId: selectedCommunityId,
+        communityBase: community.base,
         title: threadTitle,
         topic: threadTopic,
         body: serializeDelta(threadContentDelta),
         url: threadUrl,
+        ethChainIdOrBech32Prefix: getEthChainIdOrBech32Prefix({
+          base: community.base,
+          bech32_prefix: community?.bech32_prefix || '',
+          eth_chain_id: community?.ChainNode?.eth_chain_id || 0,
+        }),
       });
+      if (!isInsideCommunity) {
+        user.setData({
+          addressSelectorSelectedAddress: userSelectedAddress,
+        });
+      }
       const thread = await createThread(input);
 
       setThreadContentDelta(createDeltaFromText(''));
       clearDraft();
 
-      navigate(`/discussion/${thread.id}-${thread.title}`);
+      navigate(
+        `${isInsideCommunity ? '' : `/${selectedCommunityId}`}/discussion/${thread.id}-${thread.title}`,
+      );
     } catch (err) {
       if (err instanceof SessionKeyError) {
         checkForSessionKeyRevalidationErrors(err);
@@ -206,6 +246,11 @@ export const NewThreadForm = () => {
       notifyError('Failed to create thread');
     } finally {
       setIsSaving(false);
+      if (!isInsideCommunity) {
+        user.setData({
+          addressSelectorSelectedAddress: undefined,
+        });
+      }
     }
   };
 
@@ -215,9 +260,10 @@ export const NewThreadForm = () => {
     setThreadContentDelta(createDeltaFromText(''));
   };
 
-  const showBanner = !user.activeAccount && isBannerVisible;
+  const showBanner =
+    selectedCommunityId && !userSelectedAddress && isBannerVisible;
   const disabledActionsTooltipText = getThreadActionTooltipText({
-    isCommunityMember: !!user.activeAccount,
+    isCommunityMember: !!userSelectedAddress,
     isThreadTopicGated: isRestrictedMembership,
     threadTopicInteractionRestrictions:
       !isAdmin &&
@@ -254,6 +300,65 @@ export const NewThreadForm = () => {
           </CWText>
           <div className="new-thread-body">
             <div className="new-thread-form-inputs">
+              {!isInsideCommunity && (
+                <>
+                  <CWSelectList
+                    className="community-select"
+                    options={user?.communities?.map((c) => ({
+                      label: c.name,
+                      value: c.id,
+                    }))}
+                    placeholder="Select community"
+                    {...(selectedCommunityId && {
+                      value: {
+                        label:
+                          user.communities.find(
+                            (c) => c.id === selectedCommunityId,
+                          )?.name || '',
+                        value: selectedCommunityId,
+                      },
+                    })}
+                    onChange={(option) => {
+                      option?.value && setSelectedCommunityId(option.value);
+                      setUserSelectedAddress('');
+                    }}
+                  />
+                  <CWSelectList
+                    components={{
+                      Option: (originalProps) =>
+                        CustomAddressOption({
+                          originalProps,
+                          selectedAddressValue: userSelectedAddress || '',
+                        }),
+                    }}
+                    noOptionsMessage={() => 'No available Metamask address'}
+                    {...(userSelectedAddress && {
+                      value: convertAddressToDropdownOption(
+                        userSelectedAddress || '',
+                      ),
+                    })}
+                    formatOptionLabel={(option) => (
+                      <CustomAddressOptionElement
+                        value={option.value}
+                        label={option.label}
+                        selectedAddressValue={userSelectedAddress || ''}
+                      />
+                    )}
+                    placeholder="Select address"
+                    isClearable={false}
+                    isSearchable={false}
+                    options={(
+                      user.addresses
+                        .filter((a) => a.community.id === selectedCommunityId)
+                        .map((a) => a.address) || []
+                    )?.map(convertAddressToDropdownOption)}
+                    onChange={(option) =>
+                      option?.value && setUserSelectedAddress(option.value)
+                    }
+                  />
+                </>
+              )}
+
               <CWTextInput
                 fullWidth
                 autoFocus
@@ -330,8 +435,7 @@ export const NewThreadForm = () => {
                       address: acm?.contest_address,
                       submittedEntries:
                         acm?.content?.filter(
-                          (c) =>
-                            c.actor_address === user.activeAccount?.address,
+                          (c) => c.actor_address === userSelectedAddress,
                         ).length || 0,
                     };
                   })}
@@ -350,16 +454,16 @@ export const NewThreadForm = () => {
               <ReactQuillEditor
                 contentDelta={threadContentDelta}
                 setContentDelta={setThreadContentDelta}
-                isDisabled={
-                  isRestrictedMembership ||
-                  !!disabledActionsTooltipText ||
-                  !user.activeAccount
-                }
-                tooltipLabel={
-                  typeof disabledActionsTooltipText === 'function'
-                    ? disabledActionsTooltipText?.('submit')
-                    : disabledActionsTooltipText
-                }
+                {...(selectedCommunityId && {
+                  isDisabled:
+                    isRestrictedMembership ||
+                    !!disabledActionsTooltipText ||
+                    !userSelectedAddress,
+                  tooltipLabel:
+                    typeof disabledActionsTooltipText === 'function'
+                      ? disabledActionsTooltipText?.('submit')
+                      : disabledActionsTooltipText,
+                })}
                 placeholder="Enter text or drag images and media here. Use the tab button to see your formatted post."
               />
 
@@ -373,7 +477,7 @@ export const NewThreadForm = () => {
               />
 
               <div className="buttons-row">
-                {isPopulated && user.activeAccount && (
+                {isPopulated && userSelectedAddress && (
                   <CWButton
                     buttonType="tertiary"
                     onClick={handleCancel}
@@ -387,9 +491,13 @@ export const NewThreadForm = () => {
                   disabled={
                     isDisabled ||
                     !user.activeAccount ||
+                    !userSelectedAddress ||
                     walletBalanceError ||
                     contestTopicError ||
-                    !!disabledActionsTooltipText
+                    (selectedCommunityId && !!disabledActionsTooltipText) ||
+                    isLoadingCommunity ||
+                    (isInsideCommunity &&
+                      (!userSelectedAddress || !selectedCommunityId))
                   }
                   // eslint-disable-next-line @typescript-eslint/no-misused-promises
                   onClick={handleNewThreadCreation}
