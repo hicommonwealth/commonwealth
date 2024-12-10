@@ -14,7 +14,7 @@ export async function setupCommonwealthE2E() {
     RETURNS TRIGGER AS $$
     BEGIN
       IF NEW.relayed = false THEN
-        PERFORM pg_notify('outbox_channel', NEW.event_name);
+        PERFORM pg_notify('outbox_channel', NEW.event_id::TEXT);
       END IF;
       RETURN NEW;
     END;

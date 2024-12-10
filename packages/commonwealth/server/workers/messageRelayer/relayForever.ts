@@ -42,8 +42,7 @@ export async function relayForever(maxIterations?: number) {
       stats().gauge('messageRelayerNumUnrelayedEvents', numUnrelayedEvents);
     }
 
-    // TODO: Figure out why numUnrelayedEvents is negative. Skipping sleep step causing event queue to clog
-    if (numUnrelayedEvents <= 0) {
+    if (numUnrelayedEvents === 0) {
       // wait 200ms before checking again so we don't clog execution
       await new Promise((resolve) =>
         setTimeout(resolve, config.WORKERS.MESSAGE_RELAYER_TIMEOUT_MS),
