@@ -85,7 +85,7 @@ describe('createSitemapGenerator', { timeout: 10_000 }, function () {
     const paginator = createDatabasePaginatorDefault(50);
     const sitemapGenerator = createSitemapGenerator(
       [paginator.threads, paginator.profiles],
-      'example.com',
+      undefined,
     );
 
     const written = await sitemapGenerator.exec();
