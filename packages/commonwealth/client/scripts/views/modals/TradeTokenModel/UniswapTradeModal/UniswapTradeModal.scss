@@ -4,6 +4,10 @@
   overflow-y: scroll;
   padding-left: 8px;
 
+  .CWModalBody {
+    max-height: 500px;
+  }
+
   .token-info {
     display: flex;
     align-items: center;
@@ -26,7 +30,8 @@
         }
       }
 
-      button[color='accent'] {
+      button[color='accent'],
+      button[color='accentSoft'] {
         div {
           color: $white !important;
         }

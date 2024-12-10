@@ -79,15 +79,16 @@ const uniswapRouterURLs = {
 
 // custom theme to make the widget match common's style
 const uniswapWidgetTheme: Theme = {
-  primary: '#282729',
-  secondary: '#666666',
-  accent: '#514e52',
-  interactive: '#3d3a3e',
   container: '#ffffff',
   dialog: '#ffffff',
-  fontFamily: 'Silka',
-  outline: '#e0dfe1',
   module: '#e7e7e7',
+  outline: '#e0dfe1',
+  fontFamily: 'Silka',
+  accent: '#514e52', // primary actions color
+  accentSoft: '#514e52', // primary actions color with soft tone
+  interactive: '#3d3a3e', // secondary actions color
+  primary: '#282729', // primary text color
+  secondary: '#666666', // secondary text color
 };
 
 const useUniswapTradeModal = ({ tradeConfig }: UseUniswapTradeModalProps) => {
