@@ -204,10 +204,10 @@ export const GetTopics = {
   output: z.array(TopicView),
 };
 
-export const GetPinnedToken = {
+export const GetPinnedTokens = {
   input: z.object({
-    community_id: z.string(),
+    community_ids: z.array(z.string()),
     with_chain_node: z.boolean().optional(),
   }),
-  output: PinnedToken.nullable(),
+  output: PinnedToken.array(),
 };

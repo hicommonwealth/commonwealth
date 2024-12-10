@@ -10,7 +10,7 @@ export * from './GetCommunities.query';
 export * from './GetCommunity.query';
 export * from './GetCommunityStake.query';
 export * from './GetMembers.query';
-export * from './GetPinnedToken.query';
+export * from './GetPinnedTokens.query';
 export * from './GetStakeHistoricalPrice.query';
 export * from './GetStakeTransaction.query';
 export * from './GetTopics.query';

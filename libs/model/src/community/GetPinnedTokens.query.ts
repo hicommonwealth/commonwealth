@@ -3,13 +3,15 @@ import * as schemas from '@hicommonwealth/schemas';
 import { Includeable } from 'sequelize';
 import { models } from '../database';
 
-export function GetPinnedToken(): Query<typeof schemas.GetPinnedToken> {
+export function GetPinnedTokens(): Query<typeof schemas.GetPinnedTokens> {
   return {
-    ...schemas.GetPinnedToken,
+    ...schemas.GetPinnedTokens,
     auth: [],
     secure: false,
     body: async ({ payload }) => {
-      const { community_id, with_chain_node } = payload;
+      const { community_ids, with_chain_node } = payload;
+      if (community_ids.length === 0) return [];
+
       const include: Includeable[] = [];
       if (with_chain_node) {
         include.push({
@@ -18,12 +20,14 @@ export function GetPinnedToken(): Query<typeof schemas.GetPinnedToken> {
         });
       }
 
-      return await models.PinnedToken.findOne({
-        where: {
-          community_id,
-        },
-        include,
-      });
+      return (
+        await models.PinnedToken.findAll({
+          where: {
+            community_id: community_ids,
+          },
+          include,
+        })
+      ).map((t) => t.get({ plain: true }));
     },
   };
 }
