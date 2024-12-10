@@ -40,12 +40,12 @@ export default (
       created_at: {
         type: Sequelize.DATE,
         allowNull: false,
-        defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
+        defaultValue: new Date(),
       },
       updated_at: {
         type: Sequelize.DATE,
         allowNull: false,
-        defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
+        defaultValue: new Date(),
       },
     },
     {

@@ -1,7 +1,6 @@
 import { AppError } from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
 import type { Request, Response } from 'express';
-import { Sequelize } from 'sequelize';
 import { validateOwner } from 'server/util/validateOwner';
 import { success } from '../../types';
 
@@ -44,7 +43,7 @@ export default async (models: DB, req: Request, res: Response) => {
   }
 
   await comment.update({
-    marked_as_spam_at: Sequelize.literal('CURRENT_TIMESTAMP'),
+    marked_as_spam_at: new Date(),
   });
 
   // get comment with updated timestamp

@@ -5,7 +5,7 @@ import {
   type Command,
 } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
-import { Op, Sequelize } from 'sequelize';
+import { Op } from 'sequelize';
 import { z } from 'zod';
 import { models } from '../database';
 import { authThread } from '../middleware';
@@ -230,7 +230,7 @@ export function UpdateThread(): Command<typeof schemas.UpdateThread> {
             ...content,
             ...adminPatch,
             ...ownerPatch,
-            last_edited: Sequelize.literal('CURRENT_TIMESTAMP'),
+            last_edited: new Date(),
             ...searchUpdate,
             content_url: contentUrl,
           },
