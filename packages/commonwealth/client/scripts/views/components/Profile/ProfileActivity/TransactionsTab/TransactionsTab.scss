@@ -56,6 +56,17 @@
       margin-left: auto;
       gap: 16px;
 
+      @include extraSmall {
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: start;
+        width: 100%;
+
+        .CWSelectList {
+          min-width: 100% !important;
+        }
+      }
+
       .CWSelectList {
         min-width: 240px;
       }
