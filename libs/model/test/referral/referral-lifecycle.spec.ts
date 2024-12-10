@@ -84,8 +84,10 @@ describe('Referral lifecycle', () => {
       },
       event_name: 'CommunityCreated',
       event_payload: {
-        userId: member.user.id?.toString(),
-        communityId: id,
+        community_id: id,
+        user_id: member.user.id,
+        created_at: ref.event_payload.created_at,
+        referral_link: response!.referral_link,
       },
     });
   });

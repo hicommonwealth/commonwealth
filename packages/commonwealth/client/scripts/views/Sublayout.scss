@@ -41,7 +41,7 @@
 
         transition: margin-left 0.2s ease-in-out;
 
-        @include smallInclusive {
+        @include isWindowSmallToMediumInclusive {
           margin-left: 100vw;
         }
       }

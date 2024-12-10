@@ -97,7 +97,7 @@ export const HeaderWithFilters = ({
   const contestAddress = searchParams.get('contest');
 
   const createButtonText =
-    activeContests.length || contestAddress ? 'Create' : 'Create thread';
+    activeContests?.length || contestAddress ? 'Create' : 'Create thread';
 
   const onFilterResize = () => {
     if (filterRowRef.current) {
@@ -223,7 +223,7 @@ export const HeaderWithFilters = ({
   return (
     <div className="HeaderWithFilters">
       <div className="header-row">
-        {views && views.length ? (
+        {!isOnArchivePage && views && views.length ? (
           <div className="filter-section">
             <Select
               selected={selectedView || ThreadViewFilterTypes.All}
@@ -242,6 +242,12 @@ export const HeaderWithFilters = ({
                   value: ThreadViewFilterTypes.Overview,
                   label: 'Overview',
                   iconLeft: 'viewOverView',
+                },
+                {
+                  id: 3,
+                  value: ThreadViewFilterTypes.CardView,
+                  label: 'CardView',
+                  iconLeft: 'kanban',
                 },
               ]}
             />
@@ -281,7 +287,7 @@ export const HeaderWithFilters = ({
           )}
         </div>
       </div>
-      {views && views[0].value === selectedView ? (
+      {views && views[1].value !== selectedView ? (
         <>
           {selectedTopic?.description && (
             <MarkdownViewerUsingQuillOrNewEditor

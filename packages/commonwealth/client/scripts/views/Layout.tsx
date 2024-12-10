@@ -69,8 +69,8 @@ const LayoutComponent = ({
     }
   }, [isAddedToHomeScreen, user.isOnPWA, user]);
 
-  // If community id was updated ex: `commonwealth.im/{community-id}/**/*`
-  // redirect to new community id ex: `commonwealth.im/{new-community-id}/**/*`
+  // If community id was updated ex: `${PRODUCTION_DOMAIN}/{community-id}/**/*`
+  // redirect to new community id ex: `${PRODUCTION_DOMAIN}/{new-community-id}/**/*`
   useNecessaryEffect(() => {
     // @ts-expect-error <StrictNullChecks/>
     const redirectTo = configurationData?.redirects?.[providedCommunityScope];

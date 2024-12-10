@@ -47,6 +47,7 @@ import {
   House,
   Image,
   ImageSquare,
+  Kanban,
   Lightbulb,
   Link,
   LinkBreak,
@@ -270,6 +271,7 @@ export const iconLookup = {
   star: Icons.CWStar,
   sun: Icons.CWSun,
   telegram: Icons.CWTelegram,
+  tiktok: Icons.CWTiktok,
   trophy: withPhosphorIcon(Trophy),
   timer: withPhosphorIcon(Timer),
   transfer: Icons.CWTransfer,
@@ -296,6 +298,7 @@ export const iconLookup = {
   copySimple: withPhosphorIcon(CopySimple),
   viewAll: withPhosphorIcon(Rows),
   viewOverView: withPhosphorIcon(CirclesFour),
+  kanban: withPhosphorIcon(Kanban),
 };
 
 export const customIconLookup = {

@@ -296,8 +296,8 @@ const useUserMenuItems = ({
         : []),
       {
         type: 'default',
-        label: 'My community stake',
-        onClick: () => navigate(`/myCommunityStake`, {}, null),
+        label: 'My transactions',
+        onClick: () => navigate(`/myTransactions`, {}, null),
       },
       {
         type: 'default',

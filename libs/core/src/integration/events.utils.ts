@@ -1,16 +1,13 @@
 import { ChainEventSigs } from '@hicommonwealth/evm-protocols';
-import { ETHERS_BIG_NUMBER, EVM_ADDRESS } from '@hicommonwealth/schemas';
+import {
+  ETHERS_BIG_NUMBER,
+  EVM_ADDRESS,
+  EventNames,
+  events,
+} from '@hicommonwealth/schemas';
 import { BigNumber } from 'ethers';
 import type { Result } from 'ethers/lib/utils';
 import { ZodSchema, z } from 'zod';
-import { EventNames } from './events';
-import {
-  ContestContentAdded,
-  ContestContentUpvoted,
-  ContestStarted,
-  OneOffContestManagerDeployed,
-  RecurringContestManagerDeployed,
-} from './events.schemas';
 
 // TODO: delete this file when we transition from CE v2 to CE v3. It is superseded by chain-event.utils.ts
 
@@ -53,10 +50,10 @@ type EvmMapper<Input extends string, Output extends ZodSchema> = {
 
 const RecurringContestManagerDeployedMapper: EvmMapper<
   typeof ChainEventSigs.NewContest,
-  typeof RecurringContestManagerDeployed
+  typeof events.RecurringContestManagerDeployed
 > = {
   signature: ChainEventSigs.NewContest,
-  output: RecurringContestManagerDeployed,
+  output: events.RecurringContestManagerDeployed,
   condition: (evmInput) => !evmInput.oneOff,
   mapEvmToSchema: (
     contestAddress,
@@ -73,10 +70,10 @@ const RecurringContestManagerDeployedMapper: EvmMapper<
 
 const OneOffContestManagerDeployedMapper: EvmMapper<
   typeof ChainEventSigs.NewContest,
-  typeof OneOffContestManagerDeployed
+  typeof events.OneOffContestManagerDeployed
 > = {
   signature: ChainEventSigs.NewContest,
-  output: OneOffContestManagerDeployed,
+  output: events.OneOffContestManagerDeployed,
   condition: (evmInput) => evmInput.oneOff,
   mapEvmToSchema: (
     contestAddress,
@@ -93,10 +90,10 @@ const OneOffContestManagerDeployedMapper: EvmMapper<
 
 const NewRecurringContestStartedMapper: EvmMapper<
   typeof ChainEventSigs.NewRecurringContestStarted,
-  typeof ContestStarted
+  typeof events.ContestStarted
 > = {
   signature: ChainEventSigs.NewRecurringContestStarted,
-  output: ContestStarted,
+  output: events.ContestStarted,
   mapEvmToSchema: (contestAddress, { contestId, startTime, endTime }) => ({
     event_name: EventNames.ContestStarted,
     event_payload: {
@@ -110,10 +107,10 @@ const NewRecurringContestStartedMapper: EvmMapper<
 
 const NewSingleContestStartedMapper: EvmMapper<
   typeof ChainEventSigs.NewSingleContestStarted,
-  typeof ContestStarted
+  typeof events.ContestStarted
 > = {
   signature: ChainEventSigs.NewSingleContestStarted,
-  output: ContestStarted,
+  output: events.ContestStarted,
   mapEvmToSchema: (contestAddress, { startTime, endTime }) => ({
     event_name: EventNames.ContestStarted,
     event_payload: {
@@ -127,10 +124,10 @@ const NewSingleContestStartedMapper: EvmMapper<
 
 const NewContestContentAddedMapper: EvmMapper<
   typeof ChainEventSigs.ContentAdded,
-  typeof ContestContentAdded
+  typeof events.ContestContentAdded
 > = {
   signature: ChainEventSigs.ContentAdded,
-  output: ContestContentAdded,
+  output: events.ContestContentAdded,
   mapEvmToSchema: (contestAddress, { contentId, creator, url }) => ({
     event_name: EventNames.ContestContentAdded,
     event_payload: {
@@ -144,10 +141,10 @@ const NewContestContentAddedMapper: EvmMapper<
 
 const ContestContentUpvotedRecurringMapper: EvmMapper<
   typeof ChainEventSigs.VoterVotedRecurring,
-  typeof ContestContentUpvoted
+  typeof events.ContestContentUpvoted
 > = {
   signature: ChainEventSigs.VoterVotedRecurring,
-  output: ContestContentUpvoted,
+  output: events.ContestContentUpvoted,
   mapEvmToSchema: (
     contestAddress,
     { contestId, contentId, voter, votingPower },
@@ -165,10 +162,10 @@ const ContestContentUpvotedRecurringMapper: EvmMapper<
 
 const ContestContentUpvotedOneOffMapper: EvmMapper<
   typeof ChainEventSigs.VoterVotedOneOff,
-  typeof ContestContentUpvoted
+  typeof events.ContestContentUpvoted
 > = {
   signature: ChainEventSigs.VoterVotedOneOff,
-  output: ContestContentUpvoted,
+  output: events.ContestContentUpvoted,
   mapEvmToSchema: (contestAddress, { contentId, voter, votingPower }) => ({
     event_name: EventNames.ContestContentUpvoted,
     event_payload: {

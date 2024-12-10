@@ -64,8 +64,8 @@ const WVMethodSelection = ({
           <CWRadioPanel
             value={WVMethod.ERC20}
             onSelect={setSelectedWVMethod}
-            label="Connect ERC20 token"
-            description="Only ERC20s"
+            label="Connect ERC20/ETH"
+            description="ERC20 Token or Native ETH"
             popover={{
               title: 'ERC20',
               body: (
