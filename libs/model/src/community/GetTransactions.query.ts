@@ -10,6 +10,11 @@ export function GetTransactions(): Query<typeof schemas.GetTransactions> {
     secure: false,
     body: async ({ payload }) => {
       const { addresses } = payload;
+      const addressesList = addresses?.includes(',')
+        ? addresses.split(',')
+        : addresses
+          ? [addresses]
+          : [];
 
       return (await models.sequelize.query(
         `
@@ -33,7 +38,7 @@ export function GetTransactions(): Query<typeof schemas.GetTransactions> {
           FROM "StakeTransactions" AS t
           LEFT JOIN "Communities" AS c ON c.id = t.community_id
           LEFT JOIN "ChainNodes" AS cn ON cn.id = c.chain_node_id
-          ${addresses ? 'WHERE t.address IN (:addresses)' : ''}
+          ${addressesList.length > 0 ? 'WHERE t.address IN (:addresses)' : ''}
         )
 
         UNION ALL
@@ -62,7 +67,7 @@ export function GetTransactions(): Query<typeof schemas.GetTransactions> {
           LEFT JOIN "Tokens" AS tkns ON tkns.token_address = lts.token_address
           LEFT JOIN "Communities" AS c ON c.namespace = tkns.namespace
           LEFT JOIN "ChainNodes" AS cn ON cn.id = c.chain_node_id
-          ${addresses ? 'WHERE lts.trader_address IN (:addresses)' : ''}
+          ${addressesList.length > 0 ? 'WHERE lts.trader_address IN (:addresses)' : ''}
         )
 
         ORDER BY timestamp DESC
@@ -70,7 +75,7 @@ export function GetTransactions(): Query<typeof schemas.GetTransactions> {
         {
           type: QueryTypes.SELECT,
           replacements: {
-            addresses: addresses ?? null,
+            addresses: addressesList.length > 0 ? addressesList : null,
           },
         },
         // eslint-disable-next-line @typescript-eslint/no-explicit-any

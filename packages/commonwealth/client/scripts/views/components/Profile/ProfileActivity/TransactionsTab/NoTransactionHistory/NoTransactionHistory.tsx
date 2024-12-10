@@ -20,7 +20,7 @@ const NoTransactionHistory = ({
         <img src={noTransactionHistory} alt="no transaction history icon" />
         <div className="labels">
           <CWText type="h4" fontWeight="semiBold">
-            You have not purchased any assets in any communities{' '}
+            You have not purchased assets in any communities{' '}
             {withSelectedAddress ? 'with the selected address' : ''}
           </CWText>
           <CWText type="b1">
