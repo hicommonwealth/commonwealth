@@ -31,6 +31,12 @@
           color: $white !important;
         }
       }
+
+      [class^='TokenOptions__OnHover'] {
+        // fixes a css hover bug with uniswap widget where an extra hover div
+        // appeared before the active hover element
+        display: none !important;
+      }
     }
   }
 }
