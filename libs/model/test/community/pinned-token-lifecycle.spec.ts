@@ -1,6 +1,16 @@
 import { Actor, command, dispose, query } from '@hicommonwealth/core';
-import { ChainBase } from '@hicommonwealth/shared';
-import { afterAll, beforeAll, describe, expect, test } from 'vitest';
+import * as shared from '@hicommonwealth/shared';
+import {
+  MockInstance,
+  afterAll,
+  afterEach,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  test,
+  vi,
+} from 'vitest';
 import { GetPinnedTokens, PinToken, PinTokenErrors } from '../../src/community';
 import { seed } from '../../src/tester';
 
@@ -15,6 +25,7 @@ describe('Pinned token lifecycle', () => {
   let unsupported_chain_node_id: number | undefined;
   let adminActor: Actor;
   let userActor: Actor;
+  let topSpy: MockInstance;
 
   beforeAll(async () => {
     const [ethNode] = await seed('ChainNode', {
@@ -32,7 +43,7 @@ describe('Pinned token lifecycle', () => {
     const [randomNode] = await seed('ChainNode', {});
     const [community] = await seed('Community', {
       chain_node_id: randomNode!.id!,
-      base: ChainBase.Ethereum,
+      base: shared.ChainBase.Ethereum,
       active: true,
       profile_count: 2,
       lifetime_thread_count: 0,
@@ -52,7 +63,7 @@ describe('Pinned token lifecycle', () => {
     });
     const [secondCommunity] = await seed('Community', {
       chain_node_id: randomNode!.id!,
-      base: ChainBase.Ethereum,
+      base: shared.ChainBase.Ethereum,
       active: true,
       profile_count: 2,
       lifetime_thread_count: 0,
@@ -96,6 +107,34 @@ describe('Pinned token lifecycle', () => {
     await dispose()();
   });
 
+  beforeEach(() => {
+    topSpy = vi
+      .spyOn(shared, 'alchemyGetTokenPrices')
+      .mockImplementation(() => {
+        console.log('alchemyGetTokenPrices mock');
+        return Promise.resolve({
+          data: [
+            {
+              network: 'eth-mainnet',
+              address: '0x123',
+              prices: [
+                {
+                  currency: 'USDC',
+                  value: '1',
+                  lastUpdatedAt: new Date().toISOString(),
+                },
+              ],
+              error: null,
+            },
+          ],
+        });
+      });
+  });
+
+  afterEach(() => {
+    vi.clearAllMocks();
+  });
+
   test('should to pin token if not admin', async () => {
     await expect(() =>
       command(PinToken(), {
@@ -107,6 +146,7 @@ describe('Pinned token lifecycle', () => {
         },
       }),
     ).rejects.toThrow('User is not admin in the community');
+    expect(topSpy).toBeCalledTimes(0);
   });
 
   test('should fail to create a pinned token for an unsupported node', async () => {
@@ -120,9 +160,16 @@ describe('Pinned token lifecycle', () => {
         },
       }),
     ).rejects.toThrow(PinTokenErrors.NotSupported);
+    expect(topSpy).toBeCalledTimes(0);
   });
 
   test('should fail to create a pinned token for an invalid token', async () => {
+    let spy = vi
+      .spyOn(shared, 'alchemyGetTokenPrices')
+      .mockImplementation(() => {
+        throw new Error('Invalid token');
+      });
+
     await expect(() =>
       command(PinToken(), {
         actor: adminActor,
@@ -134,6 +181,39 @@ describe('Pinned token lifecycle', () => {
         },
       }),
     ).rejects.toThrow(PinTokenErrors.FailedToFetchPrice);
+    expect(spy).toBeCalledTimes(1);
+
+    spy = vi.spyOn(shared, 'alchemyGetTokenPrices').mockImplementation(() => {
+      return Promise.resolve({
+        data: [
+          {
+            network: 'eth-mainnet',
+            address: '0x123',
+            prices: [
+              {
+                currency: 'USDC',
+                value: '1',
+                lastUpdatedAt: new Date().toISOString(),
+              },
+            ],
+            error: 'Something failed',
+          },
+        ],
+      });
+    });
+
+    await expect(() =>
+      command(PinToken(), {
+        actor: adminActor,
+        payload: {
+          community_id: community_id!,
+          chain_node_id: chain_node_id!,
+          // random address
+          contract_address: '0x0b84092914abaA89dDCb9C788Ace0B1fD6Ea7d91',
+        },
+      }),
+    ).rejects.toThrow(PinTokenErrors.FailedToFetchPrice);
+    expect(spy).toBeCalledTimes(1);
   });
 
   test('should pin a token', async () => {
@@ -160,6 +240,8 @@ describe('Pinned token lifecycle', () => {
     expect(res?.community_id).to.equal(second_community_id);
     expect(res?.chain_node_id).to.equal(chain_node_id);
     expect(res?.contract_address).to.equal(ethMainnetUSDT);
+
+    expect(topSpy).toBeCalledTimes(2);
   });
 
   test('should fail to pin more than 1 token on the same community', async () => {
@@ -184,6 +266,8 @@ describe('Pinned token lifecycle', () => {
         },
       }),
     ).rejects.toThrow();
+
+    expect(topSpy).toBeCalledTimes(2);
   });
 
   test('should return empty array if no pinned token', async () => {
