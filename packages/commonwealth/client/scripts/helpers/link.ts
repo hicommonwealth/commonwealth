@@ -6,6 +6,7 @@ export type LinkType =
   | 'slack'
   | 'telegram'
   | 'x (twitter)'
+  | 'tiktok'
   | 'github'
   | 'matrix'
   | '';
@@ -17,6 +18,7 @@ export const getLinkType = (link: string): LinkType => {
   if (link.includes('slack.com')) return 'slack';
   if (link.includes('telegram.com')) return 'telegram';
   if (link.includes('t.me')) return 'telegram';
+  if (link.includes('tiktok.com')) return 'tiktok';
   if (link.includes('twitter.com') || link.includes('x.com'))
     return 'x (twitter)';
   if (link.includes('github.com')) return 'github';
@@ -28,6 +30,7 @@ export type CategorizedSocialLinks = {
   discords: string[];
   githubs: string[];
   telegrams: string[];
+  tiktoks: string[];
   twitters: string[];
   elements: string[];
   slacks: string[];
@@ -41,6 +44,7 @@ export const categorizeSocialLinks = (
     discords: [],
     githubs: [],
     telegrams: [],
+    tiktoks: [],
     twitters: [],
     elements: [],
     slacks: [],
@@ -61,6 +65,9 @@ export const categorizeSocialLinks = (
         break;
       case 'telegram':
         categorized.telegrams.push(link);
+        break;
+      case 'tiktok':
+        categorized.tiktoks.push(link);
         break;
       case 'x (twitter)':
         categorized.twitters.push(link);
