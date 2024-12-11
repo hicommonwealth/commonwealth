@@ -11,8 +11,8 @@ import { queryClient, QueryKeys, SERVER_URL } from 'state/api/config';
 import { Configuration, fetchCustomDomainQuery } from 'state/api/configuration';
 import { fetchNodesQuery } from 'state/api/nodes';
 import { errorStore } from 'state/ui/error';
+import { getBrowserLanguage, languageStore } from 'state/ui/language/language';
 import { EXCEPTION_CASE_VANILLA_getCommunityById } from './api/communities/getCommuityById';
-import { languageStore } from './ui/language/language';
 import { userStore } from './ui/user';
 
 export enum ApiStatus {
@@ -68,7 +68,10 @@ export async function initAppState(
 ): Promise<void> {
   try {
     // Initialize language settings first since it doesn't depend on API
-    languageStore.getState().initializeLanguage();
+    const browserLang = getBrowserLanguage();
+    if (!languageStore.getState().currentLanguage) {
+      languageStore.getState().setLanguage(browserLang);
+    }
 
     const [{ data: statusRes }] = await Promise.all([
       axios.get(`${SERVER_URL}/status`),
