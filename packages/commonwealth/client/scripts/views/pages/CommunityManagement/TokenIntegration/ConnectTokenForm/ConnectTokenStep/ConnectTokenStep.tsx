@@ -92,7 +92,7 @@ const ConnectTokenStep = ({
         notifyError('Failed to pin token to community!');
       }
     };
-    handleAsync();
+    handleAsync().catch(console.error);
   };
 
   return (
