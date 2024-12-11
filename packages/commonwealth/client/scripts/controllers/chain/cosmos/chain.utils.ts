@@ -1,8 +1,11 @@
-import { OfflineSigner } from '@cosmjs/proto-signing';
+import { registry as atomoneRegistry } from '@atomone/atomone-types-long/atomone/gov/v1/tx.registry';
+import { registry as govgenRegistry } from '@atomone/govgen-types-long/govgen/gov/v1beta1/tx.registry';
+import { OfflineSigner, Registry } from '@cosmjs/proto-signing';
 import {
   AminoTypes,
   SigningStargateClient,
   createDefaultAminoConverters,
+  defaultRegistryTypes,
 } from '@cosmjs/stargate';
 import { Tendermint34Client } from '@cosmjs/tendermint-rpc';
 import { AtomOneLCD, LCD } from '../../../../../shared/chain/types/cosmos';
@@ -66,6 +69,11 @@ export const getSigningClient = async (
   });
 
   return await SigningStargateClient.connectWithSigner(url, signer, {
+    registry: new Registry([
+      ...defaultRegistryTypes,
+      ...atomoneRegistry,
+      ...govgenRegistry,
+    ]),
     aminoTypes,
   });
 };
