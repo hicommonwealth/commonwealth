@@ -84,6 +84,21 @@ const DesktopHeader = ({ onMobile, onAuthModalOpen }: DesktopHeaderProps) => {
           >
             <CreateContentPopover />
             <CWTooltip
+              content="About Common"
+              placement="bottom"
+              renderTrigger={(handleInteraction) => (
+                <CWIconButton
+                  iconButtonTheme="black"
+                  iconName="externalLink"
+                  onClick={() =>
+                    window.open('https://landing.common.xyz', '_blank')
+                  }
+                  onMouseEnter={handleInteraction}
+                  onMouseLeave={handleInteraction}
+                />
+              )}
+            />
+            <CWTooltip
               content="Explore communities"
               placement="bottom"
               renderTrigger={(handleInteraction) => (
