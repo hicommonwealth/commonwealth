@@ -9,7 +9,7 @@ import { CWTableState } from 'views/components/component_kit/new_designs/CWTable
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import './MembersSection.scss';
 
-type Group = {
+export type Group = {
   name: string;
   groupImageUrl: string;
 };
@@ -23,6 +23,10 @@ export type Member = {
   stakeBalance?: string;
   lastActive?: string;
   address?: string;
+};
+
+export type MemberWithGroups = Omit<Member, 'groups'> & {
+  groups: Group[];
 };
 
 type MembersSectionProps = {
