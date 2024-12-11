@@ -1,5 +1,6 @@
 import { devtools } from 'zustand/middleware';
 import { createStore } from 'zustand/vanilla';
+import { GoogleTranslationService } from '../../../services/GoogleTranslationService';
 import { MockTranslationService } from '../../../services/MockTranslationService';
 import { TranslationService } from '../../../services/TranslationService';
 import { SUPPORTED_LANGUAGES } from '../language/constants';
@@ -15,15 +16,17 @@ interface TranslationState {
   detectLanguage: (text: string) => Promise<string>;
 }
 
-// Use mock service by default, can be replaced with Google service when credentials are available
-const defaultTranslationService = new MockTranslationService();
+// Initialize translation service based on environment
+const translationService = process.env.GOOGLE_CLIENT_ID
+  ? new GoogleTranslationService()
+  : new MockTranslationService();
 
 export const translationStore = createStore<TranslationState>()(
   devtools(
     (set, get) => ({
       translations: {},
       pendingTranslations: new Set(),
-      translationService: defaultTranslationService,
+      translationService,
       selectedLanguage: 'en',
 
       setSelectedLanguage: (language) =>

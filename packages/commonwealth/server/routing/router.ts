@@ -96,6 +96,8 @@ import { failure } from '../types';
 import { setupCosmosProxy } from '../util/comsosProxy/setupCosmosProxy';
 import setupIpfsProxy from '../util/ipfsProxy';
 
+import { detectLanguage, translateText } from '../routes/translation';
+
 export type ServerControllers = {
   threads: ServerThreadsController;
   comments: ServerCommentsController;
@@ -529,6 +531,23 @@ function setupRouter(
         JSON.stringify({ status: 'success', message: 'stream ended' }) + '\n',
       );
     },
+  );
+
+  // translation
+  registerRoute(
+    router,
+    'post',
+    '/translate',
+    passport.authenticate('jwt', { session: false }),
+    translateText,
+  );
+
+  registerRoute(
+    router,
+    'post',
+    '/detect-language',
+    passport.authenticate('jwt', { session: false }),
+    detectLanguage,
   );
 
   // linking
