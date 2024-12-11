@@ -1,0 +1,10 @@
+@import '../../../styles/shared.scss';
+
+.UnSubscribeModal {
+  .CWModalBody {
+    padding-bottom: 24px !important;
+  }
+  .CWModalFooter .primary {
+    background-color: $rorange-400 !important;
+  }
+}
