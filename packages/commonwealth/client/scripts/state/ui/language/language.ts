@@ -1,12 +1,10 @@
+import { createBoundedUseStore } from 'state/ui/utils';
 import { devtools, persist } from 'zustand/middleware';
 import { createStore } from 'zustand/vanilla';
-import {
-  LanguageState,
-  SUPPORTED_LANGUAGES,
-  languageSchema,
-} from './constants';
+import { SUPPORTED_LANGUAGES } from './constants';
 
-interface LanguageStore extends LanguageState {
+interface LanguageStore {
+  currentLanguage: keyof typeof SUPPORTED_LANGUAGES;
   setLanguage: (lang: keyof typeof SUPPORTED_LANGUAGES) => void;
 }
 
@@ -18,25 +16,15 @@ export const languageStore = createStore<LanguageStore>()(
         setLanguage: (lang) => set({ currentLanguage: lang }),
       }),
       {
-        name: 'language-storage',
-        storage: localStorage,
-        partialize: (state) => ({ currentLanguage: state.currentLanguage }),
-        onRehydrateStorage: () => (state) => {
-          if (state) {
-            const result = languageSchema.safeParse(state);
-            if (!result.success) {
-              console.error('Invalid language state:', result.error);
-              return;
-            }
-          }
-        },
+        name: 'language-store',
+        partialize: (state: LanguageStore): LanguageStore => ({
+          currentLanguage: state.currentLanguage,
+          setLanguage: state.setLanguage,
+        }),
       },
     ),
   ),
 );
 
-export const useLanguageStore = () => {
-  const currentLanguage = languageStore.getState().currentLanguage;
-  const setLanguage = languageStore.getState().setLanguage;
-  return { currentLanguage, setLanguage };
-};
+const useLanguageStore = createBoundedUseStore(languageStore);
+export default useLanguageStore;
