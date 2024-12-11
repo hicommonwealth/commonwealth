@@ -2,6 +2,7 @@ import { ChainBase } from '@hicommonwealth/shared';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 import app from 'state';
+import { useGetPinnedTokenByCommunityId } from 'state/api/communities';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
@@ -9,15 +10,22 @@ import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip'
 import './Token.scss';
 
 const Token = () => {
+  const communityId = app.activeChainId() || '';
   const navigate = useCommonNavigate();
 
-  const isExternalTokenLinked = false; // TODO: this needs to come from API
+  const { data: communityTokens } = useGetPinnedTokenByCommunityId({
+    community_ids: [communityId],
+    with_chain_node: true,
+    enabled: !!communityId,
+  });
+  const communityPinnedToken = communityTokens?.[0];
+  const isExternalTokenLinked = communityPinnedToken;
   const canAddToken = app?.chain?.base === ChainBase.Ethereum; // only ethereum communities can add a token
 
   const actionButton = (
     <CWButton
       buttonType="secondary"
-      label={isExternalTokenLinked ? 'Manage connected tokens' : 'Add token'}
+      label={isExternalTokenLinked ? 'View token information' : 'Add token'}
       disabled={!canAddToken}
       onClick={() => navigate('/manage/integrations/token')}
     />
@@ -27,7 +35,11 @@ const Token = () => {
     <section className="Stake">
       <div className="header">
         <div className="flex-row">
-          <CWText type="h4">Connect an existing token</CWText>
+          <CWText type="h4">
+            {isExternalTokenLinked
+              ? 'Manage token'
+              : 'Connect an existing token'}
+          </CWText>
           {isExternalTokenLinked && <CWIcon iconName="checkCircleFilled" />}
         </div>
         <CWText type="b1">
