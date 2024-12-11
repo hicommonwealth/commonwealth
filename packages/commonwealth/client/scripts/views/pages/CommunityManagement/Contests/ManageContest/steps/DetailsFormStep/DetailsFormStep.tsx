@@ -13,7 +13,6 @@ import {
   CWImageInput,
   ImageBehavior,
 } from 'views/components/component_kit/CWImageInput';
-import { CWCheckbox } from 'views/components/component_kit/cw_checkbox';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { SelectList } from 'views/components/component_kit/cw_select_list';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -109,7 +108,7 @@ const DetailsFormStep = ({
   const totalPayoutPercentageError = totalPayoutPercentage !== 100;
 
   const weightedTopics = (topicsData || [])
-    .filter((t) => t?.weighted_voting)
+    .filter((t) => t?.weighted_voting && t.token_address !== ZERO_ADDRESS)
     .map((t) => ({
       value: t.id,
       label: t.name,
@@ -272,6 +271,7 @@ const DetailsFormStep = ({
           validationSchema={schema}
           onSubmit={handleSubmit}
           initialValues={getInitialValues()}
+          onErrors={(err) => console.warn('FORM ERRORS: ', err)}
         >
           {({ watch, setValue }) => (
             <>
@@ -457,22 +457,14 @@ const DetailsFormStep = ({
                         : tokenValue
                     }
                     containerClassName="token-input"
-                    disabled={editMode || tokenValue === ZERO_ADDRESS}
+                    disabled={editMode}
                     fullWidth
                     placeholder="Enter funding token address"
                     tokenError={getTokenError(
                       watch('contestRecurring') === ContestRecurringType.No,
                     )}
-                  />
-                  <CWCheckbox
-                    label="Use native token"
-                    onChange={() => {
-                      if (tokenValue == ZERO_ADDRESS) {
-                        setTokenValue('');
-                      } else {
-                        setTokenValue(ZERO_ADDRESS);
-                      }
-                    }}
+                    hookToForm
+                    name="fundingTokenAddress"
                   />
 
                   <CWText type="h5">Vote weight multiplier</CWText>

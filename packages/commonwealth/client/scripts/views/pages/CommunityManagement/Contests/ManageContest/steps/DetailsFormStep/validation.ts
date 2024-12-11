@@ -43,7 +43,21 @@ export const detailsFormValidationSchema = (isFarcasterContest: boolean) => {
       ContestFeeType.DirectDeposit,
     ]),
     contestRecurring: z.string(),
-    fundingTokenAddress: z.string().optional().nullable(),
+    fundingTokenAddress: z
+      .string()
+      .optional()
+      .nullable()
+      .refine(
+        (value) => {
+          if (farcasterContestEnabled && isFarcasterContest && !value) {
+            return false;
+          }
+          return true;
+        },
+        {
+          message: 'Must specify funding token address for Farcaster contests',
+        },
+      ),
     isFarcasterContest: z.boolean().default(false),
   });
 };

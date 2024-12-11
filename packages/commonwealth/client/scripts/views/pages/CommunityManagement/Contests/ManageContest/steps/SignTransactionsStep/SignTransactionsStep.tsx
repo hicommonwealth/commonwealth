@@ -114,6 +114,14 @@ const SignTransactionsStep = ({
       exchangeToken,
     } as DeploySingleERC20ContestOnchainProps;
 
+    console.log({
+      form: contestFormData,
+      exchangeToken,
+      isContestRecurring,
+      isDirectDepositSelected,
+      singleERC20,
+    });
+
     const recurring = {
       ethChainId,
       chainRpc,
