@@ -23,7 +23,7 @@ on:
         description: "PR number to test (optional)"
         required: false
         type: number
-  pull_request_target:
+  pull_request:
   push:
     branches:
       - master
