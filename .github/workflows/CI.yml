@@ -13,6 +13,8 @@ env:
   REDIS_URL: redis://localhost:6379
   GITHUB_BASE_REF: ${{ github.base_ref }}
   FEDERATION_POSTGRES_DB_URL: postgresql://commonwealth:edgeware@localhost/common_test
+  ALCHEMY_PRIVATE_APP_KEY: ${{ secrets.ALCHEMY_PRIVATE_APP_KEY }}
+  ALCHEMY_PUBLIC_APP_KEY: ${{ secrets.ALCHEMY_PUBLIC_APP_KEY }}
 
 on:
   workflow_dispatch:
@@ -349,9 +351,6 @@ jobs:
 
       - name: Run integration tests
         run: pnpm -F commonwealth test-integration --allowOnly=false
-        env:
-          ALCHEMY_PRIVATE_APP_KEY: ${{ secrets.ALCHEMY_PRIVATE_APP_KEY }}
-          ALCHEMY_PUBLIC_APP_KEY: ${{ secrets.ALCHEMY_PUBLIC_APP_KEY }}
 
   commonwealth-unit-tests:
     name: Commonwealth Unit Tests
@@ -398,9 +397,6 @@ jobs:
 
       - name: Run unit tests
         run: pnpm -r test -- --allowOnly=false
-        env:
-          ALCHEMY_PRIVATE_APP_KEY: ${{ secrets.ALCHEMY_PRIVATE_APP_KEY }}
-          ALCHEMY_PUBLIC_APP_KEY: ${{ secrets.ALCHEMY_PUBLIC_APP_KEY }}
 
       - name: Change permissions of coverage files
         run: |
@@ -458,9 +454,6 @@ jobs:
 
       - name: Run EVM Devnet tests
         run: pnpm -F commonwealth test-devnet:evm --allowOnly=false
-        env:
-          ALCHEMY_PRIVATE_APP_KEY: ${{ secrets.ALCHEMY_PRIVATE_APP_KEY }}
-          ALCHEMY_PUBLIC_APP_KEY: ${{ secrets.ALCHEMY_PUBLIC_APP_KEY }}
 
   report-coverage:
     name: Upload Test Coverage Report
