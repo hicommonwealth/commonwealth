@@ -1,6 +1,6 @@
 import { commonProtocol as cp } from '@hicommonwealth/evm-protocols';
 import { models } from '@hicommonwealth/model';
-import { setupCommonwealthConsumer } from '../../../../server/workers/commonwealthConsumer/commonwealthConsumer';
+import { bootstrapBindings } from '../../../../server/bindings/bootstrap';
 import { startMessageRelayer } from '../../../../server/workers/messageRelayer/messageRelayer';
 import { mineBlocks, setupAnvil } from './process-setup/setupAnvil';
 import { setupEvmCe } from './process-setup/setupEvmCe';
@@ -36,7 +36,7 @@ export async function setupCommonwealthE2E() {
   // note need to run this in between so we can set up the rmq adapter
   await startMessageRelayer();
 
-  await Promise.all([setupEvmCe(), setupCommonwealthConsumer(true)]);
+  await Promise.all([setupEvmCe(), bootstrapBindings(true)]);
 
   const web3 = setupWeb3(anvilContainer!.getMappedPort(8545));
 
