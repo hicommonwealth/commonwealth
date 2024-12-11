@@ -34,7 +34,7 @@ export const CreateContestManagerMetadata = {
     ),
     topic_id: z.number().optional(),
     is_farcaster_contest: z.boolean().optional(),
-    vote_weight_multiplier: z.number().optional(),
+    vote_weight_multiplier: z.number().optional().nullish(),
   }),
   output: z.object({
     contest_managers: z.array(ContestManager),
