@@ -2,9 +2,12 @@ import clsx from 'clsx';
 import React from 'react';
 
 import { useCommonNavigate } from 'navigation/helpers';
+import { SUPPORTED_LANGUAGES } from 'state/ui/language/constants';
+import { languageStore } from 'state/ui/language/language';
 import useSidebarStore from 'state/ui/sidebar';
 import KnockNotifications from 'views/components/KnockNotifications';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
+import { CWDropdown } from 'views/components/component_kit/cw_dropdown';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { isWindowSmallInclusive } from 'views/components/component_kit/helpers';
 import { CWSearchBar } from 'views/components/component_kit/new_designs/CWSearchBar';
@@ -98,6 +101,21 @@ const DesktopHeader = ({ onMobile, onAuthModalOpen }: DesktopHeaderProps) => {
             />
 
             <HelpMenuPopover />
+            <CWDropdown
+              containerClassName="language-selector"
+              label={`${SUPPORTED_LANGUAGES[languageStore.getState().currentLanguage].flag}`}
+              options={Object.entries(SUPPORTED_LANGUAGES).map(
+                ([code, { name, flag }]) => ({
+                  label: `${flag} ${name}`,
+                  value: code,
+                }),
+              )}
+              onSelect={(item) =>
+                languageStore
+                  .getState()
+                  .setLanguage(item.value as keyof typeof SUPPORTED_LANGUAGES)
+              }
+            />
           </div>
           {user.isLoggedIn && <KnockNotifications />}
         </div>

@@ -37,6 +37,11 @@
     gap: 8px;
     height: 100%;
 
+    .language-selector {
+      margin-left: 8px;
+      min-width: 48px;
+    }
+
     .header-loader {
       padding: 0 20px;
     }

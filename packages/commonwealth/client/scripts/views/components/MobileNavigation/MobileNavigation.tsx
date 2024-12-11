@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { matchRoutes, useLocation } from 'react-router-dom';
 
 import { useCommonNavigate } from 'navigation/helpers';
+import { SUPPORTED_LANGUAGES } from 'state/ui/language/constants';
+import { languageStore } from 'state/ui/language/language';
 import useUserStore from 'state/ui/user';
 import CWDrawer from 'views/components/component_kit/new_designs/CWDrawer';
 
@@ -56,6 +58,23 @@ const MobileNavigation = () => {
           },
         ]
       : []),
+    {
+      type: 'language' as const,
+      onClick: () => {
+        const currentLanguage = languageStore.getState().currentLanguage;
+        const languages = Object.entries(SUPPORTED_LANGUAGES);
+        const currentIndex = languages.findIndex(
+          ([code]) => code === currentLanguage,
+        );
+        const nextIndex = (currentIndex + 1) % languages.length;
+        languageStore
+          .getState()
+          .setLanguage(
+            languages[nextIndex][0] as keyof typeof SUPPORTED_LANGUAGES,
+          );
+      },
+      selected: false,
+    },
   ];
 
   return (
