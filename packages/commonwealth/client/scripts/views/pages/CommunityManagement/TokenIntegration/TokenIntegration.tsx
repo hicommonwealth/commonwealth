@@ -1,4 +1,5 @@
 import { commonProtocol } from '@hicommonwealth/evm-protocols';
+import { useFlag } from 'hooks/useFlag';
 import React from 'react';
 import app from 'state';
 import { useGetPinnedTokenByCommunityId } from 'state/api/communities';
@@ -18,6 +19,7 @@ import './TokenIntegration.scss';
 
 const TokenIntegration = () => {
   const communityId = app.activeChainId() || '';
+  const tokenizedCommunityEnabled = useFlag('tokenizedCommunity');
 
   const { data: communityLaunchpadToken, isLoading: isLoadingLaunchpadToken } =
     useGetTokenByCommunityId({
@@ -50,6 +52,7 @@ const TokenIntegration = () => {
     ];
 
   if (
+    !tokenizedCommunityEnabled ||
     !contractInfo ||
     // if a community already has a launchpad token, don't allow pinning
     communityLaunchpadToken

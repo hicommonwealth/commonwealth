@@ -1,4 +1,5 @@
 import { ChainBase } from '@hicommonwealth/shared';
+import { useFlag } from 'client/scripts/hooks/useFlag';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 import app from 'state';
@@ -13,6 +14,7 @@ import './Token.scss';
 const Token = () => {
   const communityId = app.activeChainId() || '';
   const navigate = useCommonNavigate();
+  const tokenizedCommunityEnabled = useFlag('tokenizedCommunity');
 
   const { data: communityLaunchpadToken, isLoading: isLoadingLaunchpadToken } =
     useGetTokenByCommunityId({
@@ -30,7 +32,12 @@ const Token = () => {
   const isExternalTokenLinked = communityPinnedToken;
   const canAddToken = app?.chain?.base === ChainBase.Ethereum; // only ethereum communities can add a token
 
-  if (communityLaunchpadToken || isLoadingLaunchpadToken) return <></>;
+  if (
+    communityLaunchpadToken ||
+    isLoadingLaunchpadToken ||
+    !tokenizedCommunityEnabled
+  )
+    return <></>;
 
   const actionButton = (
     <CWButton
