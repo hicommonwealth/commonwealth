@@ -405,8 +405,6 @@ const GroupForm = ({
       requirements: requirementSubForms.map((x) => x.values),
     };
 
-    console.log('Final Form Values', formValues);
-
     await onSubmit(formValues);
   };
 
