@@ -12,8 +12,8 @@ export const FloatingActionButton = ({
   onClick,
 }: FloatingActionButtonProps) => {
   return (
-    <div className="FloatingActionButton" onClick={onClick}>
+    <button className="FloatingActionButton" onClick={onClick}>
       {children}
-    </div>
+    </button>
   );
 };
