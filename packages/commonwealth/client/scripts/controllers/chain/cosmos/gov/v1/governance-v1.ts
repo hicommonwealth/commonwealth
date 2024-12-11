@@ -8,7 +8,7 @@ import { ITXModalData } from 'models/interfaces';
 import type CosmosAccount from '../../account';
 import type CosmosAccounts from '../../accounts';
 import type CosmosChain from '../../chain';
-import type { CosmosApiType } from '../../chain';
+import { isAtomoneLCD, type CosmosApiType } from '../../chain';
 import { encodeMsgSubmitProposal } from '../v1beta1/utils-v1beta1';
 import { CosmosProposalV1 } from './proposal-v1';
 import { propToIProposal } from './utils-v1';
