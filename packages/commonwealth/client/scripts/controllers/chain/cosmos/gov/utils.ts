@@ -33,15 +33,14 @@ export const getCompletedProposals = async (
   const { chain, accounts, governance, meta } = cosmosChain;
   console.log(cosmosChain);
   const isAtomone =
-    meta.ChainNode?.cosmosGovernanceVersion ===
-    CosmosGovernanceVersion.v1atomone;
+    meta.ChainNode?.cosmos_gov_version === CosmosGovernanceVersion.v1atomone;
   const isGovgen =
-    meta.ChainNode?.cosmosGovernanceVersion ===
+    meta.ChainNode?.cosmos_gov_version ===
     CosmosGovernanceVersion.v1beta1govgen;
   const isV1 =
-    meta.ChainNode?.cosmosGovernanceVersion === CosmosGovernanceVersion.v1;
+    meta.ChainNode?.cosmos_gov_version === CosmosGovernanceVersion.v1;
   const betaAttemptFailed =
-    meta.ChainNode?.cosmosGovernanceVersion ===
+    meta.ChainNode?.cosmos_gov_version ===
     CosmosGovernanceVersion.v1beta1Failed;
 
   let cosmosProposals = [];
@@ -102,15 +101,14 @@ export const getActiveProposals = async (
 ): Promise<CosmosProposal[]> => {
   const { chain, accounts, governance, meta } = cosmosChain;
   const isAtomone =
-    meta.ChainNode?.cosmosGovernanceVersion ===
-    CosmosGovernanceVersion.v1atomone;
+    meta.ChainNode?.cosmos_gov_version === CosmosGovernanceVersion.v1atomone;
   const isGovgen =
-    meta.ChainNode?.cosmosGovernanceVersion ===
+    meta.ChainNode?.cosmos_gov_version ===
     CosmosGovernanceVersion.v1beta1govgen;
   const isV1 =
-    meta.ChainNode?.cosmosGovernanceVersion === CosmosGovernanceVersion.v1;
+    meta.ChainNode?.cosmos_gov_version === CosmosGovernanceVersion.v1;
   const betaAttemptFailed =
-    meta.ChainNode?.cosmosGovernanceVersion ===
+    meta.ChainNode?.cosmos_gov_version ===
     CosmosGovernanceVersion.v1beta1Failed;
   let cosmosProposals = [];
   if (isAtomone && isAtomoneLCD(chain.lcd)) {
