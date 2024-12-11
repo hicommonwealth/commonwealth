@@ -8,6 +8,7 @@ import { config } from '../config';
 import { models } from '../database';
 import { mustExist } from '../middleware/guards';
 import { AddressInstance, CommunityInstance } from '../models';
+import { verifyAddress } from '../session/verifyAddress';
 import { emitEvent } from '../utils/utils';
 
 export const CreateAddressErrors = {
@@ -82,15 +83,29 @@ async function validateAddress(
 
 /**
 This may be called when:
-- When logged in, to link a new address for an existing user (TODO: isn't this the same as JoinCommunity?)
-- When logged out, to create a new user by showing proof of an address
+- When logged in, to link a new address for an existing user 
+  - TODO: isn't this the same as JoinCommunity?
+- When logged out, to create a new user by showing proof of an address 
 */
 export function CreateAddress(): Command<typeof schemas.CreateAddress> {
   return {
     ...schemas.CreateAddress,
     secure: true,
     auth: [],
+    authStrategy: {
+      name: 'custom',
+      userResolver: async (input) => {
+        // creates new user if not found
+        return await verifyAddress(
+          input.community_id,
+          input.address,
+          input.wallet_id,
+          input.session,
+        );
+      },
+    },
     body: async ({ actor, payload }) => {
+      const user_id = actor.user.id;
       const { community_id, address, wallet_id, block_info } = payload;
 
       // Injective special validation
@@ -121,14 +136,12 @@ export function CreateAddress(): Command<typeof schemas.CreateAddress> {
         const expiration = existing.verification_token_expires;
         const isExpired = expiration && +expiration <= +new Date();
         const isDisowned = existing.user_id === null;
-        const isCurrUser = existing.user_id === actor.user.id;
+        const isCurrUser = existing.user_id === user_id;
 
         // if owned by someone else, unverified and expired, or disowned, generate a token but don't replace user until verification
         // if owned by actor, or unverified, associate with address immediately
-        existing.user_id =
-          (!existing.verified && isExpired) || isDisowned || isCurrUser
-            ? actor.user.id
-            : existing.user_id;
+        ((!existing.verified && isExpired) || isDisowned || isCurrUser) &&
+          (existing.user_id = user_id);
         existing.verification_token = verification_token;
         existing.verification_token_expires = verification_token_expires;
         existing.last_active = new Date();
@@ -151,7 +164,7 @@ export function CreateAddress(): Command<typeof schemas.CreateAddress> {
         async (transaction) => {
           const created = await models.Address.create(
             {
-              user_id: existingWithHex?.user_id ?? actor.user.id,
+              user_id: existingWithHex?.user_id ?? user_id,
               community_id,
               address: encodedAddress,
               hex: addressHex,
@@ -181,29 +194,26 @@ export function CreateAddress(): Command<typeof schemas.CreateAddress> {
           );
 
           // this was missing in legacy
+          const events: schemas.EventPairs[] = [];
           await models.Community.increment('profile_count', {
             by: 1,
             where: { id: community_id },
             transaction,
           });
-
-          // this was missing in legacy
-          const events: schemas.EventPairs[] = [
-            {
-              event_name: schemas.EventNames.CommunityJoined,
-              event_payload: {
-                community_id,
-                user_id: actor.user.id!,
-                created_at: created.created_at!,
-              },
+          events.push({
+            event_name: schemas.EventNames.CommunityJoined,
+            event_payload: {
+              community_id,
+              user_id: created.user_id!,
+              created_at: created.created_at!,
             },
-          ];
+          });
           // TODO: emit event signaling a new address was created
           // newly_created && events.push({
           //   event_name: schemas.EventNames.AddressCreated,
           //   event_payload: {
           //     community_id,
-          //     user_id: actor.user.id,
+          //     user_id: created.user_id,
           //     address
           //   }
           // })

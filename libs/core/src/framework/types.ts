@@ -13,16 +13,14 @@ export const ExternalServiceUserIds = {
   K6: -2,
 } as const;
 
-export type AuthStrategies =
+export type AuthStrategies<T> =
   | {
       name: 'jwt' | 'authtoken';
       userId?: (typeof ExternalServiceUserIds)[keyof typeof ExternalServiceUserIds];
     }
   | {
       name: 'custom';
-      userId?: (typeof ExternalServiceUserIds)[keyof typeof ExternalServiceUserIds];
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      customStrategyFn: (req: any) => void;
+      userResolver: (payload: T) => Promise<User | undefined>;
     };
 
 /**
@@ -167,7 +165,7 @@ export type Metadata<
   readonly auth: Handler<Input, Output, _Context>[];
   readonly body: Handler<Input, Output, _Context>;
   readonly secure?: boolean;
-  readonly authStrategy?: AuthStrategies;
+  readonly authStrategy?: AuthStrategies<z.infer<Input>>;
 };
 
 /**

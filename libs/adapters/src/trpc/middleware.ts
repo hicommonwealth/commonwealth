@@ -20,11 +20,12 @@ type Metadata<Input extends ZodSchema, Output extends ZodSchema> = {
   readonly output: Output;
   auth: unknown[];
   secure?: boolean;
-  authStrategy?: AuthStrategies;
+  authStrategy?: AuthStrategies<z.infer<Input>>;
 };
 
-const isSecure = (md: Metadata<ZodSchema, ZodSchema>) =>
-  md.secure !== false || (md.auth ?? []).length > 0;
+const isSecure = <Input extends ZodSchema, Output extends ZodSchema>(
+  md: Metadata<Input, Output>,
+) => md.secure !== false || (md.auth ?? []).length > 0;
 
 export interface Context {
   req: Request;
@@ -165,8 +166,8 @@ export const buildproc = <Input extends ZodSchema, Output extends ZodSchema>({
 }: BuildProcOptions<Input, Output>) => {
   const secure = forceSecure ?? isSecure(md);
   return trpc.procedure
-    .use(async ({ ctx, next }) => {
-      if (secure) await authenticate(ctx.req, md.authStrategy);
+    .use(async ({ ctx, rawInput, next }) => {
+      if (secure) await authenticate(ctx.req, rawInput, md.authStrategy);
       return next({
         ctx: {
           ...ctx,
@@ -219,13 +220,13 @@ export const buildproc = <Input extends ZodSchema, Output extends ZodSchema>({
     .output(md.output);
 };
 
-const authenticate = async (
+const authenticate = async <Input extends ZodSchema>(
   req: Request,
-  authStrategy: AuthStrategies = { name: 'jwt' },
+  rawInput: z.infer<Input>,
+  authStrategy: AuthStrategies<Input> = { name: 'jwt' },
 ) => {
   // User is already authenticated. Authentication overridden at router level e.g. external-router.ts
   if (req.user) return;
-
   try {
     if (authStrategy.name === 'authtoken') {
       switch (req.headers['authorization']) {
@@ -245,18 +246,11 @@ const authenticate = async (
           throw new Error('Not authenticated');
       }
     } else if (authStrategy.name === 'custom') {
-      authStrategy.customStrategyFn(req);
-      req.user = {
-        id: authStrategy.userId,
-      };
+      req.user = await authStrategy.userResolver(rawInput);
     } else {
       await passport.authenticate(authStrategy.name, { session: false });
     }
-
     if (!req.user) throw new Error('Not authenticated');
-    if (authStrategy.userId && (req.user as User).id !== authStrategy.userId) {
-      throw new Error('Not authenticated');
-    }
   } catch (error) {
     throw new TRPCError({
       message: error instanceof Error ? error.message : (error as string),

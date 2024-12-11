@@ -336,6 +336,7 @@ export const CreateAddress = {
     community_id: z.string(),
     wallet_id: z.nativeEnum(WalletId),
     block_info: z.string().nullish(),
+    session: z.string(),
   }),
   output: Address.extend({
     community_base: z.nativeEnum(ChainBase),

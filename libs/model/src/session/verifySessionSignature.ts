@@ -1,30 +1,25 @@
 import { Session } from '@canvas-js/interfaces';
-import assert from 'assert';
-
 import {
   CANVAS_TOPIC,
   addressSwapper,
   getSessionSignerForDid,
 } from '@hicommonwealth/shared';
+import assert from 'assert';
 import Sequelize from 'sequelize';
-
-import {
-  incrementProfileCount,
-  type AddressInstance,
-  type DB,
-} from '@hicommonwealth/model';
+import { models } from '../database';
+import { AddressInstance } from '../models';
+import { incrementProfileCount } from '../utils';
 
 /**
  * Verify the session signature is valid for the address model,
  * and either create a new user linked to `addressModel`
  * or attach it to an existing `user_id`.
  */
-const verifySessionSignature = async (
-  models: DB,
+export const verifySessionSignature = async (
   addressModel: AddressInstance,
   user_id: number | undefined | null,
   session: Session,
-): Promise<void> => {
+): Promise<number> => {
   const storedAddress = addressModel.address;
 
   // Re-encode BOTH address if needed for substrate verification, to ensure matching
@@ -50,9 +45,7 @@ const verifySessionSignature = async (
   );
 
   const signer = getSessionSignerForDid(session.did);
-  if (!signer) {
-    throw new Error('missing signer');
-  }
+  if (!signer) throw new Error('missing signer');
 
   await signer.verifySession(CANVAS_TOPIC, session);
 
@@ -89,11 +82,11 @@ const verifySessionSignature = async (
 
           return userEntity;
         });
+
         if (!user || !user.id) throw new Error('Failed to create user');
         addressModel.user_id = user!.id;
-
         await addressModel.save();
-        return;
+        return user.id;
       }
     }
 
@@ -109,7 +102,7 @@ const verifySessionSignature = async (
     addressModel.user_id = user_id;
     await incrementProfileCount(addressModel.community_id!, user_id, undefined);
   }
-  await addressModel.save();
-};
 
-export default verifySessionSignature;
+  await addressModel.save();
+  return addressModel.user_id!;
+};

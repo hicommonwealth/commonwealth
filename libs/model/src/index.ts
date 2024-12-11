@@ -20,6 +20,7 @@ export * as Webhook from './webhook';
 
 // Core Services
 export * from './services';
+export * from './session';
 
 // Policies
 export * from './policies';

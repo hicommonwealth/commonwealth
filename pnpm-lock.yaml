@@ -568,6 +568,9 @@ importers:
       '@anatine/zod-mock':
         specifier: ^3.13.3
         version: 3.13.4(@faker-js/faker@8.4.1)(zod@3.23.6)
+      '@canvas-js/interfaces':
+        specifier: ^0.12.1
+        version: 0.12.1
       '@cosmjs/cosmwasm-stargate':
         specifier: ^0.31.3
         version: 0.31.3(bufferutil@4.0.8)(utf-8-validate@5.0.10)
@@ -604,6 +607,9 @@ importers:
       '@neynar/nodejs-sdk':
         specifier: ^1.55.0
         version: 1.66.0(bufferutil@4.0.8)(typescript@5.4.5)(utf-8-validate@5.0.10)(zod@3.23.6)
+      '@sendgrid/mail':
+        specifier: ^6.5.0
+        version: 6.5.5
       '@solana/spl-token':
         specifier: ^0.4.6
         version: 0.4.6(@solana/web3.js@1.91.8(bufferutil@4.0.8)(utf-8-validate@5.0.10))(bufferutil@4.0.8)(fastestsmallesttextencoderdecoder@1.0.22)(utf-8-validate@5.0.10)
@@ -13756,9 +13762,6 @@ packages:
 
   psl@1.10.0:
     resolution: {integrity: sha512-KSKHEbjAnpUuAUserOq0FxGXCUrzC3WniuSJhvdbs102rL55266ZcHBqLWOsG30spQMlPdpy7icATiAQehg/iA==}
-
-  psl@1.9.0:
-    resolution: {integrity: sha512-E/ZsdU4HLs/68gYzgGTkMicWTLPdAftJLfJFlLUAAKZGkStNU72sZjT66SnMDVOfOWY/YAoiD7Jxa9iHvngcag==}
 
   public-encrypt@4.0.3:
     resolution: {integrity: sha512-zVpa8oKZSz5bTMTFClc1fQOnyyEzpl5ozpi1B5YcvBrdohMjH2rfsBtyXcuNuwjsDIXmBYlF2N5FlJYhR29t8Q==}
@@ -35781,8 +35784,6 @@ snapshots:
     dependencies:
       punycode: 2.3.1
 
-  psl@1.9.0: {}
-
   public-encrypt@4.0.3:
     dependencies:
       bn.js: 4.12.0
@@ -37848,7 +37849,7 @@ snapshots:
 
   tough-cookie@2.5.0:
     dependencies:
-      psl: 1.9.0
+      psl: 1.10.0
       punycode: 2.3.1
 
   tough-cookie@4.1.4:

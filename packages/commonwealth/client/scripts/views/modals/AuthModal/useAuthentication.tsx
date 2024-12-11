@@ -3,13 +3,13 @@ import {
   addressSwapper,
   ChainBase,
   DEFAULT_NAME,
+  serializeCanvas,
   verifySession,
   WalletSsoSource,
 } from '@hicommonwealth/shared';
 import axios from 'axios';
 import {
   completeClientLogin,
-  createUserWithAddress,
   setActiveAccount,
   startLoginWithMagicLink,
   updateActiveAddresses,
@@ -32,6 +32,7 @@ import { Magic } from 'magic-sdk';
 import { useEffect, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import app, { initAppState } from 'state';
+import { useCreateAddressMutation } from 'state/api/communities/useCreateAddress';
 import { SERVER_URL } from 'state/api/config';
 import { DISCOURAGED_NONREACTIVE_fetchProfilesByAddress } from 'state/api/profiles/fetchProfilesByAddress';
 import { useUpdateUserMutation } from 'state/api/user';
@@ -97,6 +98,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
   });
 
   const { mutateAsync: updateUser } = useUpdateUserMutation();
+  const { createAddress } = useCreateAddressMutation();
 
   useEffect(() => {
     if (process.env.ETH_RPC === 'e2e-test') {
@@ -509,13 +511,15 @@ const useAuthentication = (props: UseAuthenticationProps) => {
         account: signingAccount,
         newlyCreated,
         joinedCommunity,
-      } = await createUserWithAddress(
+      } = await createAddress(session, {
         address,
-        wallet.name,
-        chainIdentifier,
-        session.publicKey,
-        validationBlockInfo,
-      );
+        community_id: chainIdentifier,
+        wallet_id: wallet.name,
+        block_info: validationBlockInfo
+          ? JSON.stringify(validationBlockInfo)
+          : null,
+        session: serializeCanvas(session),
+      });
 
       setIsNewlyCreated(newlyCreated);
       if (isMobile) {
@@ -549,18 +553,15 @@ const useAuthentication = (props: UseAuthenticationProps) => {
 
     // Start the create-user flow, so validationBlockInfo gets saved to the backend
     // This creates a new `Account` object with fields set up to be validated by verifyAddress.
-    const { account } = await createUserWithAddress(
+    const { account } = await createAddress(session, {
       address,
-      wallet.name,
-      chainIdentifier,
-      // TODO: I don't think we need this field in Account at all
-      session.publicKey,
-      validationBlockInfo,
-    );
-    account.setValidationBlockInfo(
-      // @ts-expect-error <StrictNullChecks>
-      validationBlockInfo ? JSON.stringify(validationBlockInfo) : null,
-    );
+      community_id: chainIdentifier,
+      wallet_id: wallet.name,
+      block_info: validationBlockInfo
+        ? JSON.stringify(validationBlockInfo)
+        : null,
+      session: serializeCanvas(session),
+    });
 
     await account.validate(session);
     await verifySession(session);

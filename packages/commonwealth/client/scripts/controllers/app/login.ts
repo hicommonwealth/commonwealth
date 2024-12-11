@@ -11,7 +11,6 @@ import {
   chainBaseToCanvasChainId,
   getSessionSigners,
   serializeCanvas,
-  WalletId,
   WalletSsoSource,
 } from '@hicommonwealth/shared';
 import { CosmosExtension } from '@magic-ext/cosmos';
@@ -19,7 +18,6 @@ import { FarcasterExtension } from '@magic-ext/farcaster';
 import { OAuthExtension } from '@magic-ext/oauth';
 import { OAuthExtension as OAuthExtensionV2 } from '@magic-ext/oauth2';
 import axios from 'axios';
-import { trpc } from 'client/scripts/utils/trpcClient';
 import { notifyError } from 'controllers/app/notifications';
 import { getMagicCosmosSessionSigner } from 'controllers/server/sessions';
 import { isSameAccount } from 'helpers';
@@ -37,7 +35,6 @@ import { userStore } from 'state/ui/user';
 import { z } from 'zod';
 import Account from '../../models/Account';
 import AddressInfo from '../../models/AddressInfo';
-import type BlockInfo from '../../models/BlockInfo';
 import { fetchCachedCustomDomain } from '../../state/api/configuration/index';
 
 // need to instantiate it early because the farcaster sdk has an async constructor which will cause a race condition
@@ -247,47 +244,6 @@ export function updateActiveUser(data) {
       isLoggedIn: true,
     });
   }
-}
-
-export async function createUserWithAddress(
-  address: string,
-  walletId: WalletId,
-  chain: string,
-  sessionPublicAddress?: string,
-  validationBlockInfo?: BlockInfo | null,
-): Promise<{
-  account: Account;
-  newlyCreated: boolean;
-  joinedCommunity: boolean;
-}> {
-  const created = await trpc.community.createAddress.useMutation().mutateAsync({
-    address,
-    community_id: chain,
-    wallet_id: walletId,
-    block_info: validationBlockInfo
-      ? JSON.stringify(validationBlockInfo)
-      : null,
-  });
-
-  const account = new Account({
-    addressId: created.id,
-    address,
-    community: {
-      id: created.community_id,
-      base: created.community_base,
-      ss58Prefix: created.community_ss58_prefix ?? undefined,
-    },
-    validationToken: created.verification_token,
-    walletId,
-    sessionPublicAddress: sessionPublicAddress,
-    validationBlockInfo: created.block_info ?? undefined,
-    ignoreProfile: false,
-  });
-  return {
-    account,
-    newlyCreated: created.newly_created,
-    joinedCommunity: created.joined_community,
-  };
 }
 
 async function constructMagic(isCosmos: boolean, chain?: string) {

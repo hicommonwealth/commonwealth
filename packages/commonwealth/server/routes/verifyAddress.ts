@@ -1,8 +1,11 @@
-import { Op } from 'sequelize';
-
 import { Session } from '@canvas-js/interfaces';
 import { AppError, logger } from '@hicommonwealth/core';
-import type { CommunityInstance, DB } from '@hicommonwealth/model';
+import {
+  assertAddressOwnership,
+  verifySessionSignature,
+  type CommunityInstance,
+  type DB,
+} from '@hicommonwealth/model';
 import {
   ChainBase,
   DynamicTemplate,
@@ -13,10 +16,9 @@ import {
 } from '@hicommonwealth/shared';
 import sgMail from '@sendgrid/mail';
 import type { NextFunction, Request, Response } from 'express';
+import { Op } from 'sequelize';
 import { MixpanelLoginEvent } from '../../shared/analytics/types';
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
-import assertAddressOwnership from '../util/assertAddressOwnership';
-import verifySessionSignature from '../util/verifySessionSignature';
 
 const log = logger(import.meta);
 
@@ -68,7 +70,6 @@ const processAddress = async (
   // verify the signature matches the session information = verify ownership
   try {
     await verifySessionSignature(
-      models,
       addressInstance,
       user ? user.id : null,
       session,
@@ -195,7 +196,7 @@ const verifyAddress = async (
   );
 
   // assertion check
-  await assertAddressOwnership(models, address);
+  await assertAddressOwnership(address);
 
   if (req.user) {
     // if user was already logged in, we're done
