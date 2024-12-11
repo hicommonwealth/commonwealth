@@ -16,7 +16,7 @@ import {
 import { SubscriptionPreference } from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
 import z from 'zod';
-import { config, models } from '..';
+import { config, generateUnsubscribeLink, models } from '..';
 
 const log = logger(import.meta);
 type AdditionalMetaData<Key extends keyof typeof EnrichedNotificationNames> = {
@@ -275,6 +275,7 @@ export function GetRecapEmailDataQuery(): Query<typeof GetRecapEmailData> {
       const enrichedDiscussion = await enrichDiscussionNotifications(
         notifications.discussion,
       );
+      const unSubscribeLink = await generateUnsubscribeLink(payload.user_id);
       return {
         discussion: enrichedDiscussion,
         ...enrichedGovernanceAndProtocol,
@@ -285,6 +286,7 @@ export function GetRecapEmailDataQuery(): Query<typeof GetRecapEmailData> {
         notifications_link: config.SERVER_URL,
         email_notifications_enabled:
           existingPreferences?.email_notifications_enabled || false,
+        unsubscribe_link: unSubscribeLink,
       };
     },
   };

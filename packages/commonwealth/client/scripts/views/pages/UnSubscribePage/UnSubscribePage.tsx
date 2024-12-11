@@ -15,24 +15,22 @@ const UnSubscribePage = () => {
     setModalOpen(false);
     navigate('/dashboard');
   };
-  const userId = splitAndDecodeURL(window.location.pathname);
+  const id = splitAndDecodeURL(window.location.pathname);
   const handleUnsubscribe = async () => {
-    const parseUserId = Number(userId);
-    if (parseUserId) {
+    if (id) {
       await unSubscribeEmail({
-        id: parseUserId,
+        id: id,
         email_notifications_enabled: false,
       }).catch(console.error);
       navigate('/dashboard');
       setModalOpen(false);
     }
-    setModalOpen(false);
   };
   useEffect(() => {
-    if (userId) {
+    if (id) {
       setModalOpen(true);
     }
-  }, [userId]);
+  }, [id]);
 
   return (
     <CWPageLayout>

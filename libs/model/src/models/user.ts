@@ -75,6 +75,7 @@ export default (sequelize: Sequelize.Sequelize): UserModelStatic =>
       profile: { type: Sequelize.JSONB, allowNull: false },
       xp_points: { type: Sequelize.INTEGER, defaultValue: 0, allowNull: true },
       referral_link: { type: Sequelize.STRING, allowNull: true },
+      unsubscribe_uuid: { type: Sequelize.STRING, allowNull: true },
     },
     {
       timestamps: true,
