@@ -1,3 +1,4 @@
+import { AminoConverter as AtomOneAminoConverter } from '@atomone/atomone-types-long/atomone/gov/v1beta1/tx.amino';
 import { AminoConverter } from '@atomone/govgen-types-long/govgen/gov/v1beta1/tx.amino';
 import { AminoMsg } from '@cosmjs/amino';
 import { AminoMsgSubmitProposal } from '@cosmjs/stargate';
@@ -17,6 +18,9 @@ export function isAminoMsgSubmitProposal(
   return msg.type === 'cosmos-sdk/MsgSubmitProposal';
 }
 export function createGovgenGovAminoConverters(): AminoConverters {
+  return AtomOneAminoConverter;
+}
+export function createAtomoneGovAminoConverters(): AminoConverters {
   return AminoConverter;
 }
 export function createAltGovAminoConverters(): AminoConverters {
