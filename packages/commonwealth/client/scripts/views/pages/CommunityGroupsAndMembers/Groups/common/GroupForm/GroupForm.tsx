@@ -184,9 +184,6 @@ const GroupForm = ({
   >([]);
   const [isProcessingProfileImage, setIsProcessingProfileImage] =
     useState(false);
-  const [groupImageUrl, setGroupImageUrl] = useState(
-    initialValues.groupImageUrl || '',
-  );
 
   useEffect(() => {
     if (initialValues.requirements) {
@@ -397,7 +394,7 @@ const GroupForm = ({
 
     const formValues = {
       ...values,
-      groupImageUrl: values.groupImageUrl || groupImageUrl || '',
+      groupImageUrl: values.groupImageUrl || '',
       topics: topicPermissionsSubForms.map((t) => ({
         id: t.topic.id,
         permissions: convertAccumulatedPermissionsToGranularPermissions(
@@ -515,9 +512,6 @@ const GroupForm = ({
                 label="Group Image (Accepts JPG and PNG files)"
                 onImageProcessingChange={({ isGenerating, isUploading }) => {
                   setIsProcessingProfileImage(isGenerating || isUploading);
-                }}
-                onImageUploaded={(url) => {
-                  setGroupImageUrl(url);
                 }}
                 name="groupImageUrl"
                 hookToForm
@@ -737,6 +731,7 @@ const GroupForm = ({
                 buttonWidth="wide"
                 disabled={
                   isNameTaken ||
+                  isProcessingProfileImage ||
                   (requirementSubForms.length === 0 &&
                     allowedAddresses.length === 0)
                 }

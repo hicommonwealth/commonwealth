@@ -9,12 +9,17 @@ import { CWTableState } from 'views/components/component_kit/new_designs/CWTable
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import './MembersSection.scss';
 
+type Group = {
+  name: string;
+  groupImageUrl: string;
+};
+
 export type Member = {
   userId: number;
   avatarUrl?: string | null;
   name: string;
   role: Role;
-  groups: string[];
+  groups: Group[];
   stakeBalance?: string;
   lastActive?: string;
   address?: string;
@@ -77,13 +82,21 @@ const MembersSection = ({
           },
           groups: {
             sortValue: member.groups
+              .map((group) => group.name)
               .sort((a, b) => a.localeCompare(b))
               .join(' ')
               .toLowerCase(),
             customElement: (
               <div className="table-cell">
                 {member.groups.map((group, index) => (
-                  <CWTag key={index} label={group} type="referendum" />
+                  <div key={index} className="group-item">
+                    <span className="group-name">{group.name}</span>
+                    <img
+                      src={group.groupImageUrl}
+                      alt={group.name}
+                      className="group-image"
+                    />
+                  </div>
                 ))}
               </div>
             ),
