@@ -34,6 +34,10 @@
     }
   }
 
+  .farcaster-embed-container {
+    flex: 1;
+  }
+
   @include extraSmall {
     flex-direction: column;
 

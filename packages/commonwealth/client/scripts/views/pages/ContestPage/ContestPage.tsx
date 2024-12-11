@@ -55,6 +55,10 @@ const ContestPage = ({ contestAddress }: ContestPageProps) => {
 
   const { end_time } = contest?.contests[0] || {};
 
+  const replyCasts = (farcasterCasts || []).reduce((acc, parentCast) => {
+    return acc.concat(parentCast.replies);
+  }, []);
+
   return (
     <CWPageLayout>
       <div className="ContestPage">
@@ -89,7 +93,7 @@ const ContestPage = ({ contestAddress }: ContestPageProps) => {
               <Skeleton height={300} width="100%" />
               <Skeleton height={300} width="100%" />
             </>
-          ) : !farcasterCasts?.[0]?.replies?.length ? (
+          ) : !replyCasts.length ? (
             <CWText>No entries for the contest yet</CWText>
           ) : (
             <>
@@ -106,14 +110,17 @@ const ContestPage = ({ contestAddress }: ContestPageProps) => {
                 />
               </div>
 
-              {farcasterCasts[0].replies?.map((entry) => {
+              {replyCasts.map((entry) => {
                 return (
                   <div key={entry.hash} className="cast-container">
-                    <CWUpvote disabled voteCount={entry.weightedVotes || '0'} />
+                    <CWUpvote
+                      disabled
+                      voteCount={entry.calculated_vote_weight || '0'}
+                    />
 
                     <div className="upvote-small">
                       <CWUpvoteSmall
-                        voteCount={entry.weightedVotes || '0'}
+                        voteCount={entry.calculated_vote_weight || '0'}
                         disabled
                         selected={false}
                         onClick={() => undefined}

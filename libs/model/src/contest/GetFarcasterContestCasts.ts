@@ -94,10 +94,10 @@ export function GetFarcasterContestCasts(): Query<
 
       const replyVoteSums = contents.reduce(
         (acc, content) => {
-          const [, , parentCastHash] = content.content_url!.split('/');
+          const [, , , replyCastHash] = content.content_url!.split('/');
           return {
             ...acc,
-            [parentCastHash]: content.voting_weights_sum || 0,
+            [replyCastHash]: content.voting_weights_sum || 0,
           };
         },
         {} as Record<string, number>,
@@ -115,8 +115,10 @@ export function GetFarcasterContestCasts(): Query<
         .filter((cast) => parentCastHashes.includes(cast.hash))
         .map((cast) => ({
           ...cast,
-          replies: replyCasts[cast.hash],
-          vote_weight_sums: replyVoteSums[cast.hash],
+          replies: replyCasts[cast.hash].map((reply) => ({
+            ...reply,
+            calculated_vote_weight: replyVoteSums[reply.hash],
+          })),
         }));
 
       return parentCasts;

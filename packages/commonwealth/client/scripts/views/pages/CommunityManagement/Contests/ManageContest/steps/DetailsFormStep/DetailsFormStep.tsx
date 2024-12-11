@@ -77,7 +77,7 @@ const DetailsFormStep = ({
 
   const [isProcessingProfileImage, setIsProcessingProfileImage] =
     useState(false);
-  const [multiplier, setMultiplier] = useState(1);
+  const [voteWeightMultiplier, setVoteWeightMultiplier] = useState(1);
 
   const { mutateAsync: updateContest } = useUpdateContestMutation();
 
@@ -207,6 +207,7 @@ const DetailsFormStep = ({
       payoutStructure,
       contestDuration,
       isFarcasterContest,
+      voteWeightMultiplier,
     };
 
     if (editMode) {
@@ -467,7 +468,7 @@ const DetailsFormStep = ({
                     name="fundingTokenAddress"
                   />
 
-                  <CWText type="h5">Vote weight multiplier</CWText>
+                  <CWText type="h5">Vote weight voteWeightMultiplier</CWText>
 
                   <div className="input-row">
                     <CWText type="b1" className="description">
@@ -478,8 +479,10 @@ const DetailsFormStep = ({
                       min={1}
                       defaultValue={1}
                       isCompact
-                      value={multiplier}
-                      onInput={(e) => setMultiplier(Number(e.target.value))}
+                      value={voteWeightMultiplier}
+                      onInput={(e) =>
+                        setVoteWeightMultiplier(Number(e.target.value))
+                      }
                     />
                     <CWText type="b1" className="description">
                       votes.
@@ -487,7 +490,7 @@ const DetailsFormStep = ({
                   </div>
                   <CWText type="b1" className="description">
                     Vote weight per token held by the user will be{' '}
-                    {multiplier || 0}.
+                    {voteWeightMultiplier || 0}.
                   </CWText>
                 </div>
               ) : (

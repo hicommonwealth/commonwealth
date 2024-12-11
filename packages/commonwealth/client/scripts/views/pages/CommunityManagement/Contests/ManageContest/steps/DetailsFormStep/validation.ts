@@ -59,5 +59,6 @@ export const detailsFormValidationSchema = (isFarcasterContest: boolean) => {
         },
       ),
     isFarcasterContest: z.boolean().default(false),
+    voteWeightMultiplier: z.coerce.number().optional().nullish(),
   });
 };
