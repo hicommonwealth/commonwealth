@@ -16,6 +16,7 @@ import {
 } from 'state/api/comments';
 import useUserStore from 'state/ui/user';
 import { CreateComment } from 'views/components/Comments/CreateComment';
+import { WithActiveStickyComment } from 'views/components/StickEditorContainer/context/WithActiveStickyComment';
 import {
   deserializeDelta,
   serializeDelta,
@@ -256,15 +257,20 @@ export const CommentTree = ({
         ],
       });
     } else {
-      setEdits((p) => ({
-        ...p,
-        [comment.id]: {
-          // @ts-expect-error <StrictNullChecks/>
-          ...(p[comment.id] || {}),
-          isEditing: false,
-          editDraft: '',
-        },
-      }));
+      setEdits((p) => {
+        if (!p) {
+          return;
+        }
+
+        return {
+          ...p,
+          [comment.id]: {
+            ...(p[comment.id] || {}),
+            isEditing: false,
+            editDraft: '',
+          },
+        };
+      });
       // @ts-expect-error <StrictNullChecks/>
       setIsGloballyEditing(false);
     }
@@ -533,18 +539,25 @@ export const CommentTree = ({
               />
             </div>
             {isReplying && parentCommentId === comment.id && (
-              <CreateComment
-                handleIsReplying={handleIsReplying}
-                parentCommentId={parentCommentId}
-                rootThread={thread}
-                canComment={canComment}
-                isReplying={isReplying}
-                tooltipText={
-                  !canComment && typeof disabledActionsTooltipText === 'string'
-                    ? disabledActionsTooltipText
-                    : ''
-                }
-              />
+              <WithActiveStickyComment>
+                <CreateComment
+                  handleIsReplying={handleIsReplying}
+                  parentCommentId={parentCommentId}
+                  rootThread={thread}
+                  canComment={canComment}
+                  isReplying={isReplying}
+                  replyingToAuthor={comment.profile.name}
+                  onCancel={() => {
+                    handleEditCancel(comment, false);
+                  }}
+                  tooltipText={
+                    !canComment &&
+                    typeof disabledActionsTooltipText === 'string'
+                      ? disabledActionsTooltipText
+                      : ''
+                  }
+                />
+              </WithActiveStickyComment>
             )}
           </div>
         );

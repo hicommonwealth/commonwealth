@@ -271,6 +271,7 @@ export const iconLookup = {
   star: Icons.CWStar,
   sun: Icons.CWSun,
   telegram: Icons.CWTelegram,
+  tiktok: Icons.CWTiktok,
   trophy: withPhosphorIcon(Trophy),
   timer: withPhosphorIcon(Timer),
   transfer: Icons.CWTransfer,

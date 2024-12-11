@@ -1,36 +1,17 @@
 import {
   HotShotsStats,
-  RabbitMQAdapter,
-  RascalConfigServices,
   ServiceKey,
-  buildRetryStrategy,
-  getRabbitMQConfig,
   startHealthCheckLoop,
 } from '@hicommonwealth/adapters';
-import {
-  Broker,
-  BrokerSubscriptions,
-  broker,
-  handleEvent,
-  logger,
-  stats,
-} from '@hicommonwealth/core';
-import {
-  Contest,
-  ContestWorker,
-  DiscordBotPolicy,
-  FarcasterWorker,
-} from '@hicommonwealth/model';
+import { handleEvent, logger, stats } from '@hicommonwealth/core';
+import { ContestWorker } from '@hicommonwealth/model';
 import { EventNames } from '@hicommonwealth/schemas';
+import { bootstrapBindings } from 'server/bindings/bootstrap';
 import { fileURLToPath } from 'url';
-import { config } from '../../config';
-import { ChainEventPolicy } from './policies/chainEventCreated/chainEventCreatedPolicy';
 
 const log = logger(import.meta);
 
-stats({
-  adapter: HotShotsStats(),
-});
+stats({ adapter: HotShotsStats() });
 
 let isServiceHealthy = false;
 
@@ -43,17 +24,6 @@ startHealthCheckLoop({
     }
   },
 });
-
-function checkSubscriptionResponse(
-  subRes: boolean,
-  topic: BrokerSubscriptions,
-) {
-  if (!subRes) {
-    log.fatal(`Failed to subscribe to ${topic}. Requires restart!`, undefined, {
-      topic,
-    });
-  }
-}
 
 // CommonwealthConsumer is a server that consumes (and processes) RabbitMQ messages
 // from external apps or services (like the Snapshot Service). It exists because we
@@ -166,7 +136,7 @@ function startRolloverLoop() {
 async function main() {
   try {
     log.info('Starting main consumer');
-    await setupCommonwealthConsumer();
+    await bootstrapBindings();
     isServiceHealthy = true;
     startRolloverLoop();
   } catch (error) {

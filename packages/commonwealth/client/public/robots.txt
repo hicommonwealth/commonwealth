@@ -1,5 +1,5 @@
 User-agent: *
 Disallow: /profile
 
-Sitemap: https://sitemap.commonwealth.im/sitemap-index.xml
+Sitemap: https://sitemap.common.xyz/sitemap-index.xml
 

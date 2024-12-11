@@ -18,6 +18,7 @@ env:
   ALCHEMY_PUBLIC_APP_KEY: ${{ secrets.ALCHEMY_PUBLIC_APP_KEY }}
 
 on:
+  workflow_dispatch:
   pull_request:
   merge_group:
   push:

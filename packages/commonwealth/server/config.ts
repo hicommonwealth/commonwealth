@@ -25,6 +25,7 @@ const {
   LIBP2P_PRIVATE_KEY,
   DISPATCHER_APP_ID,
   DISPATCHER_APP_PRIVATE_KEY,
+  DEV_MODULITH,
 } = process.env;
 
 const NO_PRERENDER = _NO_PRERENDER;
@@ -105,6 +106,7 @@ export const config = configure(
         : undefined,
       DISPATCHER_APP_PRIVATE_KEY,
     },
+    DEV_MODULITH: DEV_MODULITH === 'true',
   },
   z.object({
     NO_PRERENDER: z.boolean(),
@@ -187,5 +189,6 @@ export const config = configure(
           'The private key of the Common Workflow Dispatcher GitHub app',
         ),
     }),
+    DEV_MODULITH: z.boolean(),
   }),
 );
