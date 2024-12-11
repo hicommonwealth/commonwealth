@@ -56,7 +56,9 @@ export interface ICosmosTXData extends ITXData {
   // skip simulating the tx twice by saving the original estimated gas
   gas: number;
 }
-
+export const isAtomoneLCD = (lcd: LCD | AtomOneLCD): lcd is AtomOneLCD => {
+  return (lcd as AtomOneLCD).atomone !== undefined;
+};
 export type CosmosApiType = QueryClient &
   StakingExtension &
   GovExtension &

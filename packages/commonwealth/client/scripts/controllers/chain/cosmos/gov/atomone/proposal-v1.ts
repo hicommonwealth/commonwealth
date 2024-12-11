@@ -24,11 +24,10 @@ import {
 } from 'models/types';
 import { DepositVote } from 'models/votes';
 import moment from 'moment';
-import { AtomOneLCD } from 'shared/chain/types/cosmos';
 import CosmosAccount from '../../account';
 import type CosmosAccounts from '../../accounts';
 import type CosmosChain from '../../chain';
-import type { CosmosApiType } from '../../chain';
+import { isAtomoneLCD, type CosmosApiType } from '../../chain';
 import { CosmosVote } from '../v1beta1/proposal-v1beta1';
 import { encodeMsgVote } from '../v1beta1/utils-v1beta1';
 import CosmosGovernanceV1AtomOne from './governance-v1';
@@ -156,9 +155,9 @@ export class CosmosProposalV1AtomOne extends Proposal<
 
   public async fetchDeposits(): Promise<QueryDepositsResponseSDKType> {
     const proposalId = longify(this.data.identifier) as Long;
-    const deposits = await (
-      this._Chain.lcd as AtomOneLCD
-    ).atomone.gov.v1.deposits({
+    // @ts-expect-error StrictNullChecks
+    if (!isAtomoneLCD(this._Chain.lcd)) return;
+    const deposits = await this._Chain.lcd.atomone.gov.v1.deposits({
       proposalId,
     });
     this.setDeposits(deposits);
@@ -167,9 +166,9 @@ export class CosmosProposalV1AtomOne extends Proposal<
 
   public async fetchTally(): Promise<QueryTallyResultResponseSDKType> {
     const proposalId = longify(this.data.identifier) as Long;
-    const tally = await (
-      this._Chain.lcd as AtomOneLCD
-    ).atomone.gov.v1.tallyResult({
+    // @ts-expect-error StrictNullChecks
+    if (!isAtomoneLCD(this._Chain.lcd)) return;
+    const tally = await this._Chain.lcd.atomone.gov.v1.tallyResult({
       proposalId,
     });
     this.setTally(tally);
@@ -178,7 +177,9 @@ export class CosmosProposalV1AtomOne extends Proposal<
 
   public async fetchVotes(): Promise<QueryVotesResponseSDKType> {
     const proposalId = longify(this.data.identifier) as Long;
-    const votes = await (this._Chain.lcd as AtomOneLCD).atomone.gov.v1.votes({
+    // @ts-expect-error StrictNullChecks
+    if (!isAtomoneLCD(this._Chain.lcd)) return;
+    const votes = await this._Chain.lcd.atomone.gov.v1.votes({
       proposalId,
     });
     this.setVotes(votes);

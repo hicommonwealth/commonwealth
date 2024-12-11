@@ -5,11 +5,10 @@ import type {
 } from 'controllers/chain/cosmos/types';
 import ProposalModule from 'models/ProposalModule';
 import { ITXModalData } from 'models/interfaces';
-import { AtomOneLCD } from 'shared/chain/types/cosmos';
 import type CosmosAccount from '../../account';
 import type CosmosAccounts from '../../accounts';
 import type CosmosChain from '../../chain';
-import type { CosmosApiType } from '../../chain';
+import { isAtomoneLCD, type CosmosApiType } from '../../chain';
 import { CosmosProposalV1AtomOne } from './proposal-v1';
 import { encodeMsgSubmitProposalAtomOne, propToIProposal } from './utils-v1';
 
@@ -59,14 +58,16 @@ class CosmosGovernanceV1AtomOne extends ProposalModule<
     return this._initProposal(proposalId);
   }
 
-  // @ts-expect-error StrictNullChecks
-  private async _initProposal(proposalId: number): Promise<CosmosProposalV1> {
+  private async _initProposal(
+    proposalId: number,
+    // @ts-expect-error StrictNullChecks
+  ): Promise<CosmosProposalV1AtomOne> {
     try {
       // @ts-expect-error StrictNullChecks
       if (!proposalId) return;
-      const { proposal } = await (
-        this._Chain.lcd as AtomOneLCD
-      ).atomone.gov.v1.proposal({
+      // @ts-expect-error StrictNullChecks
+      if (!isAtomoneLCD(this._Chain.lcd)) return;
+      const { proposal } = await this._Chain.lcd.atomone.gov.v1.proposal({
         proposalId: numberToLong(proposalId),
       });
       const cosmosProposal = new CosmosProposalV1AtomOne(

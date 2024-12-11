@@ -1,6 +1,7 @@
 import { CosmosGovernanceVersion } from '@hicommonwealth/shared';
-import { AtomOneLCD, LCD } from 'shared/chain/types/cosmos';
+import { LCD } from 'shared/chain/types/cosmos';
 import Cosmos from '../adapter';
+import { isAtomoneLCD } from '../chain';
 import CosmosGovernanceV1AtomOne from './atomone/governance-v1';
 import { CosmosProposalV1AtomOne } from './atomone/proposal-v1';
 import {
@@ -44,10 +45,8 @@ export const getCompletedProposals = async (
     CosmosGovernanceVersion.v1beta1Failed;
 
   let cosmosProposals = [];
-  if (isAtomone) {
-    const v1proposals = await getCompletedProposalsV1AtomOne(
-      chain.lcd as AtomOneLCD,
-    );
+  if (isAtomone && isAtomoneLCD(chain.lcd)) {
+    const v1proposals = await getCompletedProposalsV1AtomOne(chain.lcd);
     // @ts-expect-error StrictNullChecks
     cosmosProposals = v1proposals.map(
       (p) =>
@@ -114,10 +113,8 @@ export const getActiveProposals = async (
     meta.ChainNode?.cosmosGovernanceVersion ===
     CosmosGovernanceVersion.v1beta1Failed;
   let cosmosProposals = [];
-  if (isAtomone) {
-    const v1Proposals = await getActiveProposalsV1AtomOne(
-      chain.lcd as AtomOneLCD,
-    );
+  if (isAtomone && isAtomoneLCD(chain.lcd)) {
+    const v1Proposals = await getActiveProposalsV1AtomOne(chain.lcd);
     // @ts-expect-error StrictNullChecks
     cosmosProposals = v1Proposals.map(
       (p) =>
@@ -135,7 +132,11 @@ export const getActiveProposals = async (
       (p) =>
         new CosmosProposal(chain, accounts, governance as CosmosGovernance, p),
     );
-  } else if (!isGovgen && (isV1 || betaAttemptFailed)) {
+  } else if (
+    !isGovgen &&
+    (isV1 || betaAttemptFailed) &&
+    !isAtomoneLCD(chain.lcd)
+  ) {
     const v1Proposals = await getActiveProposalsV1(chain.lcd);
     // @ts-expect-error StrictNullChecks
     cosmosProposals = v1Proposals.map(
