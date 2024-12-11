@@ -13,14 +13,14 @@ import {
   logger,
   notificationsProvider,
 } from '@hicommonwealth/core';
+import { SubscriptionPreference } from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
 import z from 'zod';
 import { config, models } from '..';
 
 const log = logger(import.meta);
-
 type AdditionalMetaData<Key extends keyof typeof EnrichedNotificationNames> = {
-  event_name: typeof EnrichedNotificationNames[Key];
+  event_name: (typeof EnrichedNotificationNames)[Key];
   inserted_at: string;
 };
 
@@ -53,7 +53,6 @@ async function getMessages(userId: string): Promise<{
   const sevenDaysAgo = new Date(new Date().getTime() - 604_800_000);
   let oldestFetched = new Date();
   let cursor: string | undefined;
-
   const provider = notificationsProvider();
   while (
     oldestFetched > sevenDaysAgo &&
@@ -123,11 +122,11 @@ async function getMessages(userId: string): Promise<{
 
 async function enrichDiscussionNotifications(
   discussion: DiscussionNotifications,
-): Promise<z.infer<typeof GetRecapEmailData['output']>['discussion']> {
+): Promise<z.infer<(typeof GetRecapEmailData)['output']>['discussion']> {
   if (!discussion.length) return [];
 
   const enrichedDiscussion: z.infer<
-    typeof GetRecapEmailData['output']
+    (typeof GetRecapEmailData)['output']
   >['discussion'] = [];
 
   const unfilteredIds: number[] = [];
@@ -186,17 +185,17 @@ async function enrichGovAndProtocolNotif({
   governance: GovernanceNotifications;
   protocol: ProtocolNotifications;
 }): Promise<{
-  governance: z.infer<typeof GetRecapEmailData['output']>['governance'];
-  protocol: z.infer<typeof GetRecapEmailData['output']>['protocol'];
+  governance: z.infer<(typeof GetRecapEmailData)['output']>['governance'];
+  protocol: z.infer<(typeof GetRecapEmailData)['output']>['protocol'];
 }> {
   if (!governance.length && !protocol.length)
     return { governance: [], protocol: [] };
 
   const enrichedGovernance: z.infer<
-    typeof GetRecapEmailData['output']
+    (typeof GetRecapEmailData)['output']
   >['governance'] = [];
   const enrichedProtocol: z.infer<
-    typeof GetRecapEmailData['output']
+    (typeof GetRecapEmailData)['output']
   >['protocol'] = [];
 
   const unfilteredCommunityIds: string[] = [];
@@ -260,6 +259,14 @@ export function GetRecapEmailDataQuery(): Query<typeof GetRecapEmailData> {
     secure: true,
     authStrategy: { name: 'authtoken', userId: ExternalServiceUserIds.Knock },
     body: async ({ payload }) => {
+      const existingPreferences: z.infer<typeof SubscriptionPreference> | null =
+        await models.SubscriptionPreference.findOne({
+          where: {
+            user_id: payload.user_id,
+          },
+          raw: true,
+        });
+
       const notifications = await getMessages(payload.user_id);
       const enrichedGovernanceAndProtocol = await enrichGovAndProtocolNotif({
         governance: notifications.governance,
@@ -276,6 +283,8 @@ export function GetRecapEmailDataQuery(): Query<typeof GetRecapEmailData> {
           enrichedGovernanceAndProtocol.governance.length +
           enrichedGovernanceAndProtocol.protocol.length,
         notifications_link: config.SERVER_URL,
+        email_notifications_enabled:
+          existingPreferences?.email_notifications_enabled || false,
       };
     },
   };

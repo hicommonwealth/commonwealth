@@ -44,6 +44,9 @@ export enum EventNames {
 
   // Referrals
   SignUpFlowCompleted = 'SignUpFlowCompleted',
+
+  //UnSubscribed email notifications
+  UnSubscribeEmail = 'UnSubscribeEmail',
 }
 
 export type EventPairs =
@@ -154,4 +157,8 @@ export type EventPairs =
   | {
       event_name: EventNames.SignUpFlowCompleted;
       event_payload: z.infer<typeof events.SignUpFlowCompleted>;
+    }
+  | {
+      event_name: EventNames.UnSubscribeEmail;
+      event_payload: z.infer<typeof events.SubscriptionPreferencesUpdated>;
     };
