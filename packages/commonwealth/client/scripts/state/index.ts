@@ -12,6 +12,7 @@ import { Configuration, fetchCustomDomainQuery } from 'state/api/configuration';
 import { fetchNodesQuery } from 'state/api/nodes';
 import { errorStore } from 'state/ui/error';
 import { EXCEPTION_CASE_VANILLA_getCommunityById } from './api/communities/getCommuityById';
+import { languageStore } from './ui/language/language';
 import { userStore } from './ui/user';
 
 export enum ApiStatus {
@@ -66,6 +67,9 @@ export async function initAppState(
   updateSelectedCommunity = true,
 ): Promise<void> {
   try {
+    // Initialize language settings first since it doesn't depend on API
+    languageStore.getState().initializeLanguage();
+
     const [{ data: statusRes }] = await Promise.all([
       axios.get(`${SERVER_URL}/status`),
     ]);
