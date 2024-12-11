@@ -24,6 +24,19 @@ module.exports = {
         },
         { transaction },
       );
+
+      await queryInterface.addConstraint('ContestActions', {
+        fields: ['contest_address'],
+        type: 'foreign key',
+        name: 'fk_contest_actions_contest_address',
+        references: {
+          table: 'ContestManagers',
+          field: 'contest_address',
+        },
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE',
+        transaction,
+      });
     });
   },
 
@@ -37,6 +50,12 @@ module.exports = {
       await queryInterface.removeColumn(
         'ContestActions',
         'calculated_voting_weight',
+        { transaction },
+      );
+
+      await queryInterface.removeConstraint(
+        'ContestActions',
+        'fk_contest_actions_contest_address',
         { transaction },
       );
     });
