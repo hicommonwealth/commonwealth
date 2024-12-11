@@ -339,3 +339,11 @@ export const PinToken = {
   output: PinnedToken,
   context: AuthContext,
 };
+
+export const UnpinToken = {
+  input: z.object({
+    community_id: z.string(),
+  }),
+  output: z.object({}),
+  context: AuthContext,
+};

@@ -130,4 +130,5 @@ export const trpcRouter = trpc.router({
   banAddress: trpc.command(Community.BanAddress, trpc.Tag.Community),
   getPinnedTokens: trpc.query(Community.GetPinnedTokens, trpc.Tag.Community),
   pinToken: trpc.command(Community.PinToken, trpc.Tag.Community),
+  unpinToken: trpc.command(Community.UnpinToken, trpc.Tag.Community),
 });

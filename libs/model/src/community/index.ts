@@ -20,6 +20,7 @@ export * from './RefreshCommunityMemberships.command';
 export * from './RefreshCustomDomain.query';
 export * from './SetCommunityStake.command';
 export * from './ToggleArchiveTopic.command';
+export * from './UnpinToken.command';
 export * from './UpdateCommunity.command';
 export * from './UpdateCustomDomain.command';
 export * from './UpdateGroup.command';
