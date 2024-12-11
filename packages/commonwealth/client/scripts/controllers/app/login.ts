@@ -19,6 +19,7 @@ import { FarcasterExtension } from '@magic-ext/farcaster';
 import { OAuthExtension } from '@magic-ext/oauth';
 import { OAuthExtension as OAuthExtensionV2 } from '@magic-ext/oauth2';
 import axios from 'axios';
+import { trpc } from 'client/scripts/utils/trpcClient';
 import { notifyError } from 'controllers/app/notifications';
 import { getMagicCosmosSessionSigner } from 'controllers/server/sessions';
 import { isSameAccount } from 'helpers';
@@ -259,41 +260,33 @@ export async function createUserWithAddress(
   newlyCreated: boolean;
   joinedCommunity: boolean;
 }> {
-  const response = await axios.post(`${SERVER_URL}/createAddress`, {
+  const created = await trpc.community.createAddress.useMutation().mutateAsync({
     address,
     community_id: chain,
-    jwt: userStore.getState().jwt,
     wallet_id: walletId,
     block_info: validationBlockInfo
       ? JSON.stringify(validationBlockInfo)
       : null,
   });
 
-  const id = response.data.result.id;
-
-  const communityInfo = await EXCEPTION_CASE_VANILLA_getCommunityById(
-    chain || '',
-    true,
-  );
-
   const account = new Account({
-    addressId: id,
+    addressId: created.id,
     address,
     community: {
-      id: communityInfo?.id || '',
-      base: communityInfo?.base,
-      ss58Prefix: communityInfo?.ss58_prefix || 0,
+      id: created.community_id,
+      base: created.community_base,
+      ss58Prefix: created.community_ss58_prefix ?? undefined,
     },
-    validationToken: response.data.result.verification_token,
+    validationToken: created.verification_token,
     walletId,
     sessionPublicAddress: sessionPublicAddress,
-    validationBlockInfo: response.data.result.block_info,
+    validationBlockInfo: created.block_info ?? undefined,
     ignoreProfile: false,
   });
   return {
     account,
-    newlyCreated: response.data.result.newly_created,
-    joinedCommunity: response.data.result.joined_community,
+    newlyCreated: created.newly_created,
+    joinedCommunity: created.joined_community,
   };
 }
 

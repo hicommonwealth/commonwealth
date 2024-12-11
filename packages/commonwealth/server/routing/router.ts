@@ -13,7 +13,6 @@ import {
 import { getRelatedCommunitiesHandler } from '../routes/communities/get_related_communities_handler';
 
 import communityStats from '../routes/communityStats';
-import createAddress from '../routes/createAddress';
 import deleteAddress from '../routes/deleteAddress';
 import domain from '../routes/domain';
 import finishUpdateEmail from '../routes/finishUpdateEmail';
@@ -156,12 +155,6 @@ function setupRouter(
   registerRoute(router, 'get', '/status', status.bind(this, models));
 
   // Creating and Managing Addresses
-  registerRoute(
-    router,
-    'post',
-    '/createAddress',
-    createAddress.bind(this, models),
-  );
   registerRoute(
     router,
     'post',
