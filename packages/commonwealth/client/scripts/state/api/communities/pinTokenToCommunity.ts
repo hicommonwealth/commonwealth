@@ -5,7 +5,7 @@ const usePinTokenToCommunityMutation = () => {
 
   return trpc.community.pinToken.useMutation({
     onSuccess: () => {
-      utils.community.getPinnedTokens.invalidate();
+      utils.community.getPinnedTokens.invalidate().catch(console.error);
     },
   });
 };

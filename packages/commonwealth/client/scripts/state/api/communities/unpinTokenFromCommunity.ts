@@ -11,7 +11,8 @@ const useUnpinTokenFromCommunityMutation = ({
 
   return trpc.community.unpinToken.useMutation({
     onSuccess: () => {
-      resetCacheOnSuccess && utils.community.getPinnedTokens.invalidate();
+      resetCacheOnSuccess &&
+        utils.community.getPinnedTokens.invalidate().catch(console.error);
     },
   });
 };
