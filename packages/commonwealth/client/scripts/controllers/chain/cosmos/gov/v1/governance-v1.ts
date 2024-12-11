@@ -62,6 +62,8 @@ class CosmosGovernanceV1 extends ProposalModule<
     try {
       // @ts-expect-error StrictNullChecks
       if (!proposalId) return;
+      // @ts-expect-error StrictNullChecks
+      if (isAtomoneLCD(this._Chain.lcd)) return;
       const { proposal } = await this._Chain.lcd.cosmos.gov.v1.proposal({
         proposalId: numberToLong(proposalId),
       });
