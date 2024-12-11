@@ -15,6 +15,7 @@ env:
   FEDERATION_POSTGRES_DB_URL: postgresql://commonwealth:edgeware@localhost/common_test
 
 on:
+  workflow_dispatch:
   pull_request_target:
   push:
     branches:
