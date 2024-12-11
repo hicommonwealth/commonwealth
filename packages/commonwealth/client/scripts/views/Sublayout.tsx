@@ -22,6 +22,7 @@ import { AdminOnboardingSlider } from './components/AdminOnboardingSlider';
 import { Breadcrumbs } from './components/Breadcrumbs';
 import MobileNavigation from './components/MobileNavigation';
 import AuthButtons from './components/SublayoutHeader/AuthButtons';
+import useJoinCommunity from './components/SublayoutHeader/useJoinCommunity';
 import { UserTrainingSlider } from './components/UserTrainingSlider';
 import { CWModal } from './components/component_kit/new_designs/CWModal';
 import CollapsableSidebarButton from './components/sidebar/CollapsableSidebarButton';
@@ -37,6 +38,7 @@ type SublayoutProps = {
 const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
   const { menuVisible, setMenu, menuName } = useSidebarStore();
   const [resizing, setResizing] = useState(false);
+  const { JoinCommunityModals, handleJoinCommunity } = useJoinCommunity();
 
   const location = useLocation();
 
@@ -80,7 +82,7 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
     user.isLoggedIn,
   ]);
 
-  useHandleInviteLink({ isInsideCommunity });
+  useHandleInviteLink({ isInsideCommunity, handleJoinCommunity });
 
   useWindowResize({
     setMenu,
@@ -207,6 +209,7 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
           open={!isWindowExtraSmall && isInviteLinkModalOpen}
           onClose={() => setIsInviteLinkModalOpen(false)}
         />
+        {JoinCommunityModals}
       </div>
       {isWindowExtraSmall && <MobileNavigation />}
     </div>

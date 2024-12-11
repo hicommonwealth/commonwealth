@@ -41,7 +41,7 @@ const InviteLinkModal = ({ onModalClose }: InviteLinkModalProps) => {
   const currentUrl = window.location.origin;
 
   const inviteLink = referralLink
-    ? `${currentUrl}${communityId ? `/${communityId}` : '/dashboard'}?refcode=${referralLink}`
+    ? `${currentUrl}${communityId ? `/${communityId}/discussions` : '/dashboard'}?refcode=${referralLink}`
     : '';
 
   useRunOnceOnCondition({
