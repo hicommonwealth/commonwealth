@@ -1,5 +1,8 @@
 import { beforeAll, beforeEach, describe, expect, it } from 'vitest';
-import { languageStore } from '../../../../../client/scripts/state/ui/language/language';
+import {
+  getBrowserLanguage,
+  languageStore,
+} from '../../../../../client/scripts/state/ui/language/language';
 
 // Mock localStorage
 const localStorageMock = (() => {
@@ -45,7 +48,7 @@ describe('Language Store', () => {
       // Set navigator language to German
       (global.navigator as any).language = 'de';
 
-      const browserLang = languageStore.getState().getBrowserLanguage();
+      const browserLang = getBrowserLanguage();
       expect(browserLang).toBe('de');
 
       // Reset navigator language
@@ -56,7 +59,7 @@ describe('Language Store', () => {
       // Set navigator language to unsupported language
       (global.navigator as any).language = 'fr';
 
-      const browserLang = languageStore.getState().getBrowserLanguage();
+      const browserLang = getBrowserLanguage();
       expect(browserLang).toBe('en');
 
       // Reset navigator language
@@ -81,7 +84,7 @@ describe('Language Store', () => {
       languageStore.setState({ currentLanguage: 'tr' });
       localStorage.setItem(
         'language-store',
-        JSON.stringify({ currentLanguage: 'tr' }),
+        JSON.stringify({ state: { currentLanguage: 'tr' } }),
       );
 
       // Set navigator language to German
