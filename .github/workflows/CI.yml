@@ -11,20 +11,25 @@ env:
   USES_DOCKER_PGSQL: true
   PORT: 8080
   REDIS_URL: redis://localhost:6379
-  ENTITIES_URL: ${{ secrets.ENTITIES_URL }}
   GITHUB_BASE_REF: ${{ github.base_ref }}
   FEDERATION_POSTGRES_DB_URL: postgresql://commonwealth:edgeware@localhost/common_test
-  ALCHEMY_PRIVATE_APP_KEY: ${{ secrets.ALCHEMY_PRIVATE_APP_KEY }}
-  ALCHEMY_PUBLIC_APP_KEY: ${{ secrets.ALCHEMY_PUBLIC_APP_KEY }}
 
 on:
-  pull_request:
-  merge_group:
+  pull_request_target:
   push:
     branches:
       - master
 
 jobs:
+  authorize:
+    environment:
+      ${{ github.event_name == 'pull_request_target' &&
+      github.event.pull_request.head.repo.full_name != github.repository &&
+      'external' || 'internal' }}
+    runs-on: ubuntu-latest
+    steps:
+      - run: true
+
   # These tests run slowly, so run them in a separate job. NOTE: if you change the name of this job, also change
   # Its references in this file
   e2e-tests-Parallel:
@@ -292,6 +297,7 @@ jobs:
   # These tests run quickly, so run them in a separate job
   commonwealth-integration-test:
     name: Commonwealth Integration Tests
+    needs: authorize
     runs-on: ubuntu-latest
     timeout-minutes: 20
     strategy:
@@ -327,6 +333,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.ref }}
       - uses: ./.github/actions/setup
         with:
           node-version: ${{ matrix.node }}
@@ -337,9 +345,13 @@ jobs:
 
       - name: Run integration tests
         run: pnpm -F commonwealth test-integration --allowOnly=false
+        env:
+          ALCHEMY_PRIVATE_APP_KEY: ${{ secrets.ALCHEMY_PRIVATE_APP_KEY }}
+          ALCHEMY_PUBLIC_APP_KEY: ${{ secrets.ALCHEMY_PUBLIC_APP_KEY }}
 
   commonwealth-unit-tests:
     name: Commonwealth Unit Tests
+    needs: authorize
     runs-on: ubuntu-latest
     timeout-minutes: 20
     strategy:
@@ -375,12 +387,17 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.ref }}
       - uses: ./.github/actions/setup
         with:
           node-version: ${{ matrix.node }}
 
       - name: Run unit tests
         run: pnpm -r test -- --allowOnly=false
+        env:
+          ALCHEMY_PRIVATE_APP_KEY: ${{ secrets.ALCHEMY_PRIVATE_APP_KEY }}
+          ALCHEMY_PUBLIC_APP_KEY: ${{ secrets.ALCHEMY_PUBLIC_APP_KEY }}
 
       - name: Change permissions of coverage files
         run: |
@@ -399,6 +416,7 @@ jobs:
 
   commonwealth-evm-tests:
     name: EVM Devnet Tests
+    needs: authorize
     runs-on: ubuntu-latest
     timeout-minutes: 10
     strategy:
@@ -427,6 +445,8 @@ jobs:
           - 6379:6379
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.ref }}
       - uses: ./.github/actions/setup
         with:
           node-version: ${{ matrix.node }}
@@ -436,6 +456,9 @@ jobs:
 
       - name: Run EVM Devnet tests
         run: pnpm -F commonwealth test-devnet:evm --allowOnly=false
+        env:
+          ALCHEMY_PRIVATE_APP_KEY: ${{ secrets.ALCHEMY_PRIVATE_APP_KEY }}
+          ALCHEMY_PUBLIC_APP_KEY: ${{ secrets.ALCHEMY_PUBLIC_APP_KEY }}
 
   report-coverage:
     name: Upload Test Coverage Report
