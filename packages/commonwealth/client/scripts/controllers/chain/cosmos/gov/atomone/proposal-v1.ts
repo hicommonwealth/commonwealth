@@ -105,6 +105,7 @@ export class CosmosProposalV1AtomOne extends Proposal<
     );
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private _metadata: any;
   public get metadata() {
     return this._metadata;
@@ -132,6 +133,7 @@ export class CosmosProposalV1AtomOne extends Proposal<
     throw new Error('unimplemented');
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public updateMetadata(metadata: any) {
     this._metadata = metadata;
     if (!this.data.title) {
@@ -143,6 +145,7 @@ export class CosmosProposalV1AtomOne extends Proposal<
     this._Governance.store.update(this);
   }
 
+  // eslint-disable-next-line @typescript-eslint/require-await
   public async init() {
     if (!this.initialized) {
       this._initialized = true;
