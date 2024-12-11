@@ -1,6 +1,7 @@
 import { commonProtocol as cp } from '@hicommonwealth/evm-protocols';
 import { models } from '@hicommonwealth/model';
 import { bootstrapBindings } from '../../../../server/bindings/bootstrap';
+// eslint-disable-next-line max-len
 import { up as outboxTriggerMigration } from '../../../../server/migrations/20240319234133-create-outbox-channel-trigger.js';
 import { up as outboxTriggerMigrationFix } from '../../../../server/migrations/20240620213513-fix-pg-notify-trigger.js';
 import { startMessageRelayer } from '../../../../server/workers/messageRelayer/messageRelayer';
