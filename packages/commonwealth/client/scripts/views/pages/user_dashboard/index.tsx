@@ -68,7 +68,7 @@ const UserDashboard = ({ type }: UserDashboardProps) => {
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
     const existingParams = searchParams.toString();
-    const additionalParams = existingParams ? `&${existingParams}` : '';
+    const additionalParams = existingParams ? `?${existingParams}` : '';
 
     if (!type) {
       navigate(

@@ -7,6 +7,7 @@ import app from 'state';
 import useSidebarStore from 'state/ui/sidebar';
 import { SublayoutHeader } from 'views/components/SublayoutHeader';
 import { Sidebar } from 'views/components/sidebar';
+import { useHandleInviteLink } from '../hooks/useHandleInviteLink';
 import useNecessaryEffect from '../hooks/useNecessaryEffect';
 import useStickyHeader from '../hooks/useStickyHeader';
 import {
@@ -37,11 +38,14 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
   const { menuVisible, setMenu, menuName } = useSidebarStore();
   const [resizing, setResizing] = useState(false);
 
+  const location = useLocation();
+
   useStickyHeader({
     elementId: 'mobile-auth-buttons',
     stickyBehaviourEnabled: true,
     zIndex: 70,
   });
+
   const { isWindowSmallInclusive, isWindowExtraSmall, isWindowSmallToMedium } =
     useBrowserWindow({
       onResize: () => setResizing(true),
@@ -76,7 +80,7 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
     user.isLoggedIn,
   ]);
 
-  const location = useLocation();
+  useHandleInviteLink({ isInsideCommunity });
 
   useWindowResize({
     setMenu,

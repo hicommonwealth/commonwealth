@@ -18,6 +18,7 @@ import {
   useCreateReferralLinkMutation,
   useGetReferralLinkQuery,
 } from 'state/api/user';
+import useUserStore from 'state/ui/user';
 
 import './InviteLinkModal.scss';
 
@@ -29,7 +30,9 @@ const InviteLinkModal = ({ onModalClose }: InviteLinkModalProps) => {
   const { data: refferalLinkData, isLoading: isLoadingReferralLink } =
     useGetReferralLinkQuery();
 
-  const communityId = app.activeChainId();
+  const user = useUserStore();
+  const hasJoinedCommunity = !!user.activeAccount;
+  const communityId = hasJoinedCommunity ? app.activeChainId() : '';
 
   const { mutate: createReferralLink, isLoading: isLoadingCreateReferralLink } =
     useCreateReferralLinkMutation();
@@ -37,7 +40,6 @@ const InviteLinkModal = ({ onModalClose }: InviteLinkModalProps) => {
   const referralLink = refferalLinkData?.referral_link;
   const currentUrl = window.location.origin;
 
-  // TODO modify dashboard route and community route so the refcode is not vanished
   const inviteLink = referralLink
     ? `${currentUrl}${communityId ? `/${communityId}` : '/dashboard'}?refcode=${referralLink}`
     : '';
