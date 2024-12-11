@@ -3,6 +3,7 @@ import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 import app from 'state';
 import { useGetPinnedTokenByCommunityId } from 'state/api/communities';
+import { useGetTokenByCommunityId } from 'state/api/tokens';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
@@ -13,6 +14,13 @@ const Token = () => {
   const communityId = app.activeChainId() || '';
   const navigate = useCommonNavigate();
 
+  const { data: communityLaunchpadToken, isLoading: isLoadingLaunchpadToken } =
+    useGetTokenByCommunityId({
+      community_id: communityId,
+      with_stats: true,
+      enabled: !!communityId,
+    });
+
   const { data: communityTokens } = useGetPinnedTokenByCommunityId({
     community_ids: [communityId],
     with_chain_node: true,
@@ -21,6 +29,8 @@ const Token = () => {
   const communityPinnedToken = communityTokens?.[0];
   const isExternalTokenLinked = communityPinnedToken;
   const canAddToken = app?.chain?.base === ChainBase.Ethereum; // only ethereum communities can add a token
+
+  if (communityLaunchpadToken || isLoadingLaunchpadToken) return <></>;
 
   const actionButton = (
     <CWButton
