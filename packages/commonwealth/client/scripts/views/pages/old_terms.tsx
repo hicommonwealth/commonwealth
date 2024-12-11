@@ -5,11 +5,6 @@ import { renderMultilineText } from 'helpers';
 
 import './privacy_and_terms.scss';
 
-<<<<<<< HEAD
-import { CWText } from '../components/component_kit/cw_text';
-=======
-import { PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
->>>>>>> 0021056465 (lint)
 import Sublayout from '../Sublayout';
 import { CWText } from '../components/component_kit/cw_text';
 
