@@ -40,6 +40,12 @@ export interface IApp {
   runWhenReady: (cb: () => any) => void;
   chainModuleReady: EventEmitter;
   isModuleReady: boolean;
+
+  // Toast notifications
+  showToast: (options: {
+    message: string;
+    type?: 'error' | 'success' | 'info';
+  }) => void;
 }
 
 // INITIALIZE MAIN APP

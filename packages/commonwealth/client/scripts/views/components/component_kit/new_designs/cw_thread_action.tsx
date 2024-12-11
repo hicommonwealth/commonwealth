@@ -5,6 +5,7 @@ import {
   ChatCenteredDots,
   Coins,
   DotsThree,
+  Translate,
 } from '@phosphor-icons/react';
 import React, { FC } from 'react';
 
@@ -24,7 +25,8 @@ export type ActionType =
   | 'overflow'
   | 'view-upvotes'
   | 'leaderboard'
-  | 'fund';
+  | 'fund'
+  | 'translate';
 
 const commonProps = (disabled: boolean) => {
   return {
@@ -61,6 +63,8 @@ const renderPhosphorIcon = (
       return <ArrowFatUp />;
     case 'fund':
       return <Coins />;
+    case 'translate':
+      return <Translate {...commonProps(disabled)} />;
     default:
       return null;
   }
