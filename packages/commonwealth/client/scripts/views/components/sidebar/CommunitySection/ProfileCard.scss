@@ -1,0 +1,48 @@
+.profile-card {
+  width: 100%;
+  height: 160px;
+  border-radius: 16px;
+  text-align: center;
+  background: #fff;
+  padding: 16px;
+
+  .background-cover {
+    width: 100%;
+    height: 85px;
+    background: linear-gradient(45deg, #f39c12, #9b59b6, #2980b9);
+    background-size: cover;
+    border-radius: 12px;
+
+    &--cover {
+      background-size: cover;
+    }
+
+    &--fill {
+      background-size: fill;
+    }
+  }
+
+  .profile-content {
+    position: relative;
+    padding: 10px;
+    background: #fff;
+
+    .profile-image {
+      width: 65px;
+      height: 65px;
+      border-radius: 50%;
+      border: 4px solid #fff;
+      position: absolute;
+      top: -40px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .profile-name {
+      margin-top: 20px;
+      font-size: 18px;
+      font-weight: bold;
+      color: #333;
+    }
+  }
+}

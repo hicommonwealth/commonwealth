@@ -30,6 +30,7 @@ import { ExternalLinksModule } from '../external_links_module';
 import { GovernanceSection } from '../governance_section';
 import './CommunitySection.scss';
 import { CommunitySectionSkeleton } from './CommunitySectionSkeleton';
+import ProfileCard from './ProfileCard';
 import { TokenTradeWidget } from './TokenTradeWidget';
 
 interface CommunitySectionProps {
@@ -89,6 +90,7 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
   return (
     <>
       <div className="community-menu">
+        <ProfileCard />
         {user.isLoggedIn && (
           <>
             <AccountConnectionIndicator
