@@ -5,12 +5,13 @@ import type {
 } from 'controllers/chain/cosmos/types';
 import ProposalModule from 'models/ProposalModule';
 import { ITXModalData } from 'models/interfaces';
+import { AtomOneLCD } from 'shared/chain/types/cosmos';
 import type CosmosAccount from '../../account';
 import type CosmosAccounts from '../../accounts';
 import type CosmosChain from '../../chain';
 import type { CosmosApiType } from '../../chain';
 import { CosmosProposalV1AtomOne } from './proposal-v1';
-import { encodeMsgSubmitProposal, propToIProposal } from './utils-v1';
+import { encodeMsgSubmitProposalAtomOne, propToIProposal } from './utils-v1';
 
 /** This file is a copy of controllers/chain/cosmos/governance.ts, modified for
  * gov module version v1. This is considered a patch to make sure v1-enabled chains
@@ -63,7 +64,9 @@ class CosmosGovernanceV1AtomOne extends ProposalModule<
     try {
       // @ts-expect-error StrictNullChecks
       if (!proposalId) return;
-      const { proposal } = await this._Chain.lcd.atomone.gov.v1.proposal({
+      const { proposal } = await (
+        this._Chain.lcd as AtomOneLCD
+      ).atomone.gov.v1.proposal({
         proposalId: numberToLong(proposalId),
       });
       const cosmosProposal = new CosmosProposalV1AtomOne(
@@ -97,7 +100,7 @@ class CosmosGovernanceV1AtomOne extends ProposalModule<
     initialDeposit: CosmosToken,
     content: Any,
   ): Promise<number> {
-    const msg = encodeMsgSubmitProposal(
+    const msg = encodeMsgSubmitProposalAtomOne(
       sender.address,
       initialDeposit,
       content,
