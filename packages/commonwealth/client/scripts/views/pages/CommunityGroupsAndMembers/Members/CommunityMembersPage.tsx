@@ -241,11 +241,11 @@ const CommunityMembersPage = () => {
         role: p.addresses[0].role,
         groups: (p.group_ids || [])
           .map((groupId) => {
-            const group = (groups || []).find((group) => group.id === groupId);
-            return group
+            const matchedGroup = (groups || []).find((g) => g.id === groupId);
+            return matchedGroup
               ? {
-                  name: group.name,
-                  groupImageUrl: group.groupImageUrl,
+                  name: matchedGroup.name,
+                  groupImageUrl: matchedGroup.groupImageUrl,
                 }
               : null;
           })
