@@ -1,6 +1,8 @@
 import { commonProtocol as cp } from '@hicommonwealth/evm-protocols';
 import { models } from '@hicommonwealth/model';
 import { bootstrapBindings } from '../../../../server/bindings/bootstrap';
+import { up as up1 } from '../../../../server/migrations/20240319234133-create-outbox-channel-trigger.js';
+import { up as up2 } from '../../../../server/migrations/20240620213513-fix-pg-notify-trigger.js';
 import { startMessageRelayer } from '../../../../server/workers/messageRelayer/messageRelayer';
 import { mineBlocks, setupAnvil } from './process-setup/setupAnvil';
 import { setupEvmCe } from './process-setup/setupEvmCe';
@@ -9,22 +11,9 @@ import { anvilAccounts, setupWeb3 } from './process-setup/setupWeb3';
 
 export async function setupCommonwealthE2E() {
   // setup outbox notifications
-  await models.sequelize.query(`
-  CREATE OR REPLACE FUNCTION notify_insert_outbox_function()
-    RETURNS TRIGGER AS $$
-    BEGIN
-      IF NEW.relayed = false THEN
-        PERFORM pg_notify('outbox_channel', NEW.event_id::TEXT);
-      END IF;
-      RETURN NEW;
-    END;
-  $$ LANGUAGE plpgsql;
-  DROP TRIGGER IF EXISTS notify_outbox_insert ON "Outbox";
-  CREATE TRIGGER notify_outbox_insert
-    AFTER INSERT ON "Outbox"
-    FOR EACH ROW
-    EXECUTE FUNCTION notify_insert_outbox_function();
-`);
+
+  await up1(models.sequelize.getQueryInterface(), models.sequelize);
+  await up2(models.sequelize.getQueryInterface(), models.sequelize);
 
   // need to set up anvil before we can run evmCE.
   // need to set up rmq before running consumer
