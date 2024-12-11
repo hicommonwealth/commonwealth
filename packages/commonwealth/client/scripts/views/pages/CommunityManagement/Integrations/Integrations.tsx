@@ -1,4 +1,5 @@
 import React from 'react';
+import app from 'state';
 import CommunityManagementLayout from '../common/CommunityManagementLayout';
 import CustomTOS from './CustomTOS';
 import CustomURL from './CustomURL';
@@ -10,6 +11,8 @@ import Stake from './Stake';
 import Webhooks from './Webhooks';
 
 const Integrations = () => {
+  const showSnapshotIntegration = app.chain.meta.base === 'ethereum';
+
   return (
     <CommunityManagementLayout
       title="Integrations"
@@ -25,7 +28,7 @@ const Integrations = () => {
       <section className="Integrations">
         <Directory />
         <Stake />
-        <Snapshots />
+        {showSnapshotIntegration && <Snapshots />}
         <Discord />
         <Webhooks />
         <CustomTOS />
