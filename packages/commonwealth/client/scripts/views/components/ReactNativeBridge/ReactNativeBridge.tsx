@@ -27,6 +27,7 @@ type TypedData<Data> = {
  */
 type UserInfo = {
   userId: number;
+  // darkMode: 'dark' | 'light';
 };
 
 /**
@@ -47,11 +48,7 @@ export const ReactNativeBridge = () => {
 
   useEffect(() => {
     if (user.id !== userInfo?.userId) {
-      if (user.id === 0) {
-        setUserInfo(null);
-      } else {
-        setUserInfo({ userId: user.id });
-      }
+      setUserInfo({ userId: user.id });
     }
   }, [user.id, userInfo?.userId]);
 
