@@ -16,10 +16,7 @@ export const MixpanelAnalytics = (): Analytics => {
       mixpanelNode = MixpanelLib.init(config.ANALYTICS.MIXPANEL_DEV_TOKEN!);
     }
   } catch (e) {
-    log.error(
-      'Unable to initialized the backend mixpanel client: ',
-      e as Error,
-    );
+    log.error('Unable to initialize the backend mixpanel: ', e as Error);
   }
 
   return {
@@ -29,7 +26,10 @@ export const MixpanelAnalytics = (): Analytics => {
       try {
         mixpanelNode?.track(event, payload);
       } catch (e) {
-        log.error(`Failed to track event, ${event.toString()}:`, e as Error);
+        log.error(
+          `Failed to track backend mixpanel event, ${event.toString()}:`,
+          e as Error,
+        );
       }
     },
   };

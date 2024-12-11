@@ -353,8 +353,8 @@ const EditProfile = () => {
               />
             </ProfileSection>
             <ProfileSection
-              title="Linked addresses"
-              description="Manage your addresses."
+              title="Manage your addresses"
+              description="Connect or disconnect your addresses and manage your community memberships here."
             >
               <LinkedAddresses
                 // @ts-expect-error <StrictNullChecks/>

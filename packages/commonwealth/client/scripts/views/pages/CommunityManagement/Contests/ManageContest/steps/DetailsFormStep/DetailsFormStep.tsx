@@ -25,7 +25,7 @@ import { MessageRow } from 'views/components/component_kit/new_designs/CWTextInp
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import CommunityManagementLayout from 'views/pages/CommunityManagement/common/CommunityManagementLayout';
 
-import { ZERO_ADDRESS } from '@hicommonwealth/shared';
+import { BLOG_SUBDOMAIN, ZERO_ADDRESS } from '@hicommonwealth/shared';
 import { CONTEST_FAQ_URL } from '../../../utils';
 import {
   ContestFeeType,
@@ -239,7 +239,7 @@ const DetailsFormStep = ({
           <>
             <CWText className="contest-description">
               Your contest is live and the smart contract settings cannot be
-              changed. <a href="https://blog.commonwealth.im">Learn more</a>
+              changed. <a href={BLOG_SUBDOMAIN}>Learn more</a>
             </CWText>
           </>
         ) : (

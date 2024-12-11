@@ -2,6 +2,7 @@ import {
   CacheDecorator,
   lookupKeyDurationInReq,
 } from '@hicommonwealth/adapters';
+import { PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
 import axios from 'axios';
 import type { Router } from 'express';
 import { registerRoute } from '../middleware/methodNotAllowed';
@@ -26,7 +27,7 @@ function setupIpfsProxy(router: Router, cacheDecorator: CacheDecorator) {
           `https://cloudflare-ipfs.com/ipfs/${hash}#x-ipfs-companion-no-redirect`,
           {
             headers: {
-              origin: 'https://commonwealth.im',
+              origin: `https://${PRODUCTION_DOMAIN}`,
             },
             timeout: 5000,
             responseType: isImageRequest ? 'arraybuffer' : 'json',

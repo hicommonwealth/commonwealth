@@ -22,6 +22,12 @@ export const DEFAULT_NAME = 'Anonymous';
 
 export const MAX_RECIPIENTS_PER_WORKFLOW_TRIGGER = 1_000;
 
+export const PRODUCTION_DOMAIN = 'common.xyz';
+
+export const BLOG_SUBDOMAIN = `blog.${PRODUCTION_DOMAIN}`;
+
+export const DOCS_SUBDOMAIN = `docs.${PRODUCTION_DOMAIN}`;
+
 export const S3_RAW_ASSET_BUCKET_DOMAIN =
   's3.us-east-1.amazonaws.com/assets.commonwealth.im';
 export const S3_ASSET_BUCKET_CDN = 'assets.commonwealth.im';

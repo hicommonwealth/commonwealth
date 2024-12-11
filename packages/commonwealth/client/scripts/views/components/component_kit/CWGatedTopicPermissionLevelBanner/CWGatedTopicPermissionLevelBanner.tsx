@@ -1,4 +1,5 @@
 import { PermissionEnum } from '@hicommonwealth/schemas';
+import { PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
@@ -49,7 +50,7 @@ const CWGatedTopicPermissionLevelBanner = ({
           label: 'Learn more about gating',
           onClick: () =>
             window.open(
-              `https://blog.commonwealth.im/introducing-common-groups/`,
+              `https://blog.${PRODUCTION_DOMAIN}/introducing-common-groups/`,
             ),
         },
       ]}

@@ -97,7 +97,7 @@ export const HeaderWithFilters = ({
   const contestAddress = searchParams.get('contest');
 
   const createButtonText =
-    activeContests.length || contestAddress ? 'Create' : 'Create thread';
+    activeContests?.length || contestAddress ? 'Create' : 'Create thread';
 
   const onFilterResize = () => {
     if (filterRowRef.current) {

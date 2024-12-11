@@ -58,9 +58,9 @@ export const UserMentioned = z.object({
 });
 
 export const CommunityCreated = z.object({
-  communityId: z.string(),
-  userId: z.string(),
-  referralLink: z.string().optional(),
+  community_id: z.string(),
+  user_id: z.number(),
+  referral_link: z.string().optional(),
   created_at: z.coerce.date(),
 });
 
@@ -278,7 +278,8 @@ export const FarcasterVoteCreated = FarcasterAction.extend({
 
 export const SignUpFlowCompleted = z.object({
   user_id: z.number(),
-  referral_link: z.string(),
+  created_at: z.coerce.date(),
+  referral_link: z.string().nullish(),
 });
 
 export const ContestRolloverTimerTicked = z.object({});

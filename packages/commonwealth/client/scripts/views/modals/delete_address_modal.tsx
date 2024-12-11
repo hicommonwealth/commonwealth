@@ -1,4 +1,3 @@
-import jdenticon from 'jdenticon';
 import React from 'react';
 
 import { SERVER_URL } from 'state/api/config';
@@ -7,9 +6,7 @@ import {
   notifySuccess,
 } from '../../controllers/app/notifications';
 import AddressInfo from '../../models/AddressInfo';
-import NewProfile from '../../models/NewProfile';
 import { CWText } from '../components/component_kit/cw_text';
-import { CWTruncatedAddress } from '../components/component_kit/cw_truncated_address';
 import { CWButton } from '../components/component_kit/new_designs/CWButton';
 import {
   CWModalBody,
@@ -17,13 +14,12 @@ import {
   CWModalHeader,
 } from '../components/component_kit/new_designs/CWModal';
 
-import { DEFAULT_NAME } from '@hicommonwealth/shared';
 import axios from 'axios';
+import { formatAddressShort } from 'client/scripts/helpers';
 import useUserStore from 'state/ui/user';
 import './delete_address_modal.scss';
 
 type DeleteAddressModalAttrs = {
-  profile: NewProfile;
   addresses: AddressInfo[];
   address: AddressInfo;
   chain: string;
@@ -35,7 +31,6 @@ export const DeleteAddressModal = ({
   addresses,
   chain,
   closeModal,
-  profile,
 }: DeleteAddressModalAttrs) => {
   const user = useUserStore();
 
@@ -75,7 +70,7 @@ export const DeleteAddressModal = ({
         notifySuccess('Address has been successfully removed.');
       }
     } catch (err) {
-      notifyError('Address was not successfully deleted, please try again.');
+      notifyError(err.response.data.error);
     }
 
     closeModal();
@@ -89,36 +84,19 @@ export const DeleteAddressModal = ({
       .catch(console.error);
   };
 
-  const { name } = profile;
-  const defaultAvatar = jdenticon.toSvg(profile.userId, 90);
-
   return (
     <div className="DeleteAddressModal">
       <CWModalHeader
-        label="Delete Address"
+        label={`Disconnect ${formatAddressShort(address.address)}`}
         icon="danger"
         onModalClose={closeModal}
       />
       <CWModalBody>
         <CWText>
-          Address will be removed from the following linked profile.
+          By removing this address you will be leaving the{' '}
+          {address.community.id}. Your contributions and comments will remain.
+          Don&apos;t worry, you can rejoin anytime.
         </CWText>
-        <div className="profile">
-          {profile?.avatarUrl ? (
-            <img src={profile.avatarUrl} />
-          ) : (
-            <img
-              src={`data:image/svg+xml;utf8,${encodeURIComponent(
-                defaultAvatar,
-              )}`}
-            />
-          )}
-          <CWText fontWeight="bold">{name || DEFAULT_NAME}</CWText>
-        </div>
-        <div className="confirmation">
-          <CWText>Are you sure you want to remove this address?</CWText>
-          <CWTruncatedAddress address={address.address} />
-        </div>
       </CWModalBody>
       <CWModalFooter>
         <CWButton
@@ -128,7 +106,7 @@ export const DeleteAddressModal = ({
           buttonHeight="sm"
         />
         <CWButton
-          label="Delete"
+          label="Disconnect Address"
           buttonType="destructive"
           onClick={handleDelete}
           buttonHeight="sm"
