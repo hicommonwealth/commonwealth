@@ -17,14 +17,14 @@ const InformationalCTAStep = ({
     <section className="InformationalCTAStep">
       <CWText type="h4">Do you want to connect an existing token?</CWText>
       <CWText className="description">
-        {/* TODO: 9898 - proper copy for this */}
+        {/* TODO: https://github.com/hicommonwealth/commonwealth/issues/10231 */}
         Something about connecting an existing token and enabling token
         features.
       </CWText>
       <CWText type="b1" fontWeight="semiBold" className="cta-link-container">
         Not sure?&nbsp;
         <a
-          href="#" // TODO: 9898 - add link
+          href="#" // TODO: https://github.com/hicommonwealth/commonwealth/issues/10234
           target="_blank"
           rel="noopener noreferrer"
         >
