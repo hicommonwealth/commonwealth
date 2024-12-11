@@ -65,7 +65,7 @@ const TokenIntegration = () => {
     <CWPageLayout>
       <section className="TokenIntegration">
         <CWText type="h2">
-          {isExternalTokenLinked ? 'Manage Connected token' : 'Connect token'}
+          {isExternalTokenLinked ? 'Manage connected token' : 'Connect token'}
         </CWText>
         <Status
           communityName={app.chain.meta.name || ''}
