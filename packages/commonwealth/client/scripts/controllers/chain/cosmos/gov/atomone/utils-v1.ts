@@ -49,7 +49,9 @@ export const fetchProposalsByStatusV1AtomOne = async (
           pagination: {
             // @ts-expect-error StrictNullChecks
             key: nextKey,
+            // @ts-expect-error StrictNullChecks
             limit: undefined,
+            // @ts-expect-error StrictNullChecks
             offset: undefined,
             countTotal: true,
             reverse: true,
