@@ -8,7 +8,7 @@ export const ETHEREUM_MAINNET_ID = '1';
 export const BASE_ID = '8453';
 export const OSMOSIS_ID = 'osmosis';
 export const BLAST_ID = '81457';
-export const SKALE_ID = '1564830818';
+export const SKALE_ID = '974399131';
 
 const removeTestCosmosNodes = (nodeInfo: NodeInfo): boolean => {
   return !(
