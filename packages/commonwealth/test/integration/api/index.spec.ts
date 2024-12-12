@@ -44,13 +44,15 @@ describe('API Tests', () => {
       const wallet_id = 'metamask';
       const res = await chai
         .request(server.app)
-        .post('/api/createAddress')
+        .post('/api/internal/CreateAddress')
         .set('Accept', 'application/json')
+        .set('address', address)
         .send({
           address,
           community_id: chain,
           wallet_id,
           block_info: TEST_BLOCK_INFO_STRING,
+          session: serializeCanvas(session),
         });
       expect(res.body).to.not.be.null;
       expect(res.body.status).to.equal('Success');
@@ -67,13 +69,15 @@ describe('API Tests', () => {
       const wallet_id = 'keplr';
       const res = await chai
         .request(server.app)
-        .post('/api/createAddress')
+        .post('/api/internal/CreateAddress')
         .set('Accept', 'application/json')
+        .set('address', address)
         .send({
           address,
           community_id,
           wallet_id,
           block_info: TEST_BLOCK_INFO_STRING,
+          session: '',
         });
       expect(res.body).to.not.be.null;
       expect(res.body.status).to.equal('Success');
@@ -95,13 +99,15 @@ describe('API Tests', () => {
       const wallet_id = 'metamask';
       let res = await chai
         .request(server.app)
-        .post('/api/createAddress')
+        .post('/api/internal/CreateAddress')
         .set('Accept', 'application/json')
+        .set('address', address)
         .send({
           address,
           community_id,
           wallet_id,
           block_info: TEST_BLOCK_INFO_STRING,
+          session: serializeCanvas(session),
         });
       res = await chai
         .request(server.app)

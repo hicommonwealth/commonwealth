@@ -31,13 +31,14 @@ describe('Verify Address Routes', () => {
 
     const res = await chai.request
       .agent(server.app)
-      .post('/api/createAddress')
+      .post('/api/internal/CreateAddress')
       .set('Accept', 'application/json')
       .send({
         address: walletAddress,
         community_id: chain,
         wallet_id,
         block_info: TEST_BLOCK_INFO_STRING,
+        session: serializeCanvas(session),
       });
 
     expect(res.body.status).to.be.equal('Success');

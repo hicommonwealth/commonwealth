@@ -87,11 +87,11 @@ async function validateAddress(
 }
 
 /**
-This may be called when:
-- When logged in, to link a new address for an existing user 
-  - TODO: isn't this the same as JoinCommunity?
-- When logged out, to create a new user by showing proof of an address 
-*/
+ * This may be called when:
+ * - When logged in, to link a new address for an existing user
+ *   - TODO: isn't this the same as JoinCommunity?
+ * - When logged out, to create a new user by showing proof of an address
+ */
 export function CreateAddress(): Command<typeof schemas.CreateAddress> {
   return {
     ...schemas.CreateAddress,
@@ -105,7 +105,6 @@ export function CreateAddress(): Command<typeof schemas.CreateAddress> {
       },
     },
     body: async ({ payload }) => {
-      const user_id = null; // dummy user
       const { community_id, address, wallet_id, block_info, session } = payload;
 
       // Injective special validation
@@ -132,23 +131,14 @@ export function CreateAddress(): Command<typeof schemas.CreateAddress> {
       const existing = await models.Address.scope('withPrivateData').findOne({
         where: { community_id, address: encodedAddress },
       });
-      if (existing) {
-        const expiration = existing.verification_token_expires;
-        const isExpired = expiration && +expiration <= +new Date();
-        const isDisowned = existing.user_id === null;
-        const isCurrUser = existing.user_id === user_id;
-
-        // if owned by someone else, unverified and expired, or disowned, generate a token but don't replace user until verification
-        // if owned by actor, or unverified, associate with address immediately
-        ((!existing.verified && isExpired) || isDisowned || isCurrUser) &&
-          (existing.user_id = user_id);
+      // update address if not disowed
+      if (existing && existing.user_id) {
         existing.verification_token = verification_token;
         existing.verification_token_expires = verification_token_expires;
         existing.last_active = new Date();
         existing.block_info = block_info;
         existing.hex = addressHex;
         existing.wallet_id = wallet_id;
-
         const updated = await existing.save();
         return {
           ...updated.toJSON(),
@@ -164,7 +154,7 @@ export function CreateAddress(): Command<typeof schemas.CreateAddress> {
         async (transaction) => {
           const created = await models.Address.create(
             {
-              user_id: existingWithHex?.user_id ?? user_id,
+              user_id: existingWithHex?.user_id ?? null,
               community_id,
               address: encodedAddress,
               hex: addressHex,
@@ -182,7 +172,7 @@ export function CreateAddress(): Command<typeof schemas.CreateAddress> {
           );
 
           // verify the session signature and create a new user
-          await verifySessionSignature(
+          const updated = await verifySessionSignature(
             deserializeCanvas(session),
             created,
             transaction,
@@ -208,7 +198,7 @@ export function CreateAddress(): Command<typeof schemas.CreateAddress> {
                 event_name: schemas.EventNames.CommunityJoined,
                 event_payload: {
                   community_id,
-                  user_id: created.user_id!,
+                  user_id: updated.user_id!,
                   created_at: created.created_at!,
                 },
               },
@@ -216,7 +206,7 @@ export function CreateAddress(): Command<typeof schemas.CreateAddress> {
             transaction,
           );
 
-          return { created, newly_created };
+          return { created: updated, newly_created };
         },
       );
 

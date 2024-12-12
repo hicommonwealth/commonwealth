@@ -278,13 +278,15 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
 
     let res = await chai.request
       .agent(app)
-      .post('/api/createAddress')
+      .post('/api/internal/CreateAddress')
       .set('Accept', 'application/json')
+      .set('address', walletAddress)
       .send({
         address: walletAddress,
         community_id: chain,
         wallet_id,
         block_info: TEST_BLOCK_INFO_STRING,
+        session: serializeCanvas(session),
       });
 
     const address_id = res.body.result.id;
