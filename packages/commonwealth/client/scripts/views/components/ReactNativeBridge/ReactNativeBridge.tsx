@@ -58,7 +58,7 @@ export const ReactNativeBridge = () => {
       data: userInfo,
     };
 
-    if (window.ReactNativeWebView) {
+    if (window.ReactNativeWebView && userInfo) {
       // send the user information to react native now.
       window.ReactNativeWebView.postMessage(JSON.stringify(message));
     }
