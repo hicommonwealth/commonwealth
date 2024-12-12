@@ -209,6 +209,7 @@ export enum BrokerSubscriptions {
   ContestWorkerPolicy = 'ContestWorkerPolicy',
   ContestProjection = 'ContestProjection',
   FarcasterWorkerPolicy = 'FarcasterWorkerPolicy',
+  XpProjection = 'XpProjection',
 }
 
 /**

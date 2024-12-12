@@ -13,4 +13,5 @@ export const trpcRouter = trpc.router({
   createReferralLink: trpc.command(User.CreateReferralLink, trpc.Tag.User),
   getReferralLink: trpc.query(User.GetReferralLink, trpc.Tag.User),
   getUserReferrals: trpc.query(User.GetUserReferrals, trpc.Tag.User),
+  getXps: trpc.query(User.GetXps, trpc.Tag.User),
 });

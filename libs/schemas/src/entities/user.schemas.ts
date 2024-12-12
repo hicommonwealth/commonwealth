@@ -112,14 +112,3 @@ export const CommunityMember = z.object({
   group_ids: z.array(PG_INT),
   last_active: z.any().nullish().describe('string or date'),
 });
-
-export const XpLog = z.object({
-  event_name: z.string(),
-  event_created_at: z.coerce.date(),
-  user_id: PG_INT,
-  xp_points: PG_INT,
-  action_meta_id: PG_INT.nullish(),
-  creator_user_id: PG_INT.nullish(),
-  creator_xp_points: PG_INT.nullish(),
-  created_at: z.coerce.date(),
-});
