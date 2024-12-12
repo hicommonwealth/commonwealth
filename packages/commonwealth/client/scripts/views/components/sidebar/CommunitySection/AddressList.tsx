@@ -1,19 +1,10 @@
-import { formatAddressShort } from 'helpers';
-import React from 'react';
-import { CWText } from 'views/components/component_kit/cw_text';
+import React, { useState } from 'react';
 
-import { WalletId } from '@hicommonwealth/shared';
 import AddressInfo from 'client/scripts/models/AddressInfo';
 import NewProfile from 'client/scripts/models/NewProfile';
-import {
-  handleMouseEnter,
-  handleMouseLeave,
-} from 'client/scripts/views/menus/utils';
-import useAuthentication from 'client/scripts/views/modals/AuthModal/useAuthentication';
-import { PopoverMenu } from '../../component_kit/CWPopoverMenu';
-import { CWIcon } from '../../component_kit/cw_icons/cw_icon';
-import CWIconButton from '../../component_kit/new_designs/CWIconButton';
-import { CWTooltip } from '../../component_kit/new_designs/CWTooltip';
+import { DeleteAddressModal } from 'client/scripts/views/modals/delete_address_modal';
+import { CWModal } from '../../component_kit/new_designs/CWModal';
+import AddressItem from './AddressItem';
 import './AddressList.scss';
 
 interface AddressListProps {
@@ -28,8 +19,13 @@ export const AddressList = ({
   address,
   addresses,
   username,
+  profile,
+  refreshProfiles,
 }: AddressListProps) => {
-  const { openMagicWallet } = useAuthentication({});
+  const [isRemoveModalOpen, setIsRemoveModalOpen] = useState(false);
+  const [currentAddress, setCurrentAddress] = useState<AddressInfo | null>(
+    null,
+  );
 
   if ((!address && !username) || !addresses) {
     return null;
@@ -40,68 +36,48 @@ export const AddressList = ({
   );
 
   return (
-    <div className="AddressList">
-      <div className="content-container">
-        {filteredAddresses &&
-          filteredAddresses.map((addr, index) => (
-            <div className="address-list" key={index}>
-              <div className="address-item">
-                <CWText
-                  className="address-label"
-                  type="b2"
-                  fontWeight="regular"
-                >
-                  {formatAddressShort(addr.address, 6)}
-                </CWText>
-              </div>
-              {addr.address === address && (
-                <CWIcon iconName="checkCircleFilled" />
-              )}
-              {addr.walletId == WalletId.Magic && (
-                <CWTooltip
-                  placement="top"
-                  content="Open wallet"
-                  renderTrigger={(handleInteraction, isTooltipOpen) => {
-                    return (
-                      <CWIconButton
-                        iconName="arrowSquareOut"
-                        onClick={() => {
-                          openMagicWallet().catch(console.error);
-                        }}
-                        onMouseEnter={(e) => {
-                          handleMouseEnter({
-                            e,
-                            isTooltipOpen,
-                            handleInteraction,
-                          });
-                        }}
-                        onMouseLeave={(e) => {
-                          handleMouseLeave({
-                            e,
-                            isTooltipOpen,
-                            handleInteraction,
-                          });
-                        }}
-                        className="open-wallet-icon"
-                      />
-                    );
-                  }}
-                />
-              )}
-              <PopoverMenu
-                menuItems={[
-                  {
-                    label: `Remove Address`,
-                    onClick: () => {},
-                  },
-                ]}
-                renderTrigger={(onclick) => (
-                  <CWIconButton iconName="dotsHorizontal" onClick={onclick} />
-                )}
+    <>
+      <div className="AddressList">
+        <div className="content-container">
+          {filteredAddresses &&
+            filteredAddresses.map((addr, index) => (
+              <AddressItem
+                key={index}
+                addressInfo={addr}
+                profile={profile}
+                toggleRemoveModal={(
+                  val: boolean,
+                  selectedAddress: AddressInfo,
+                ) => {
+                  setIsRemoveModalOpen(val);
+                  setCurrentAddress(selectedAddress);
+                }}
+                isSelected={addr.address === address}
               />
-            </div>
-          ))}
+            ))}
+        </div>
       </div>
-    </div>
+      <CWModal
+        size="small"
+        content={
+          currentAddress && (
+            <DeleteAddressModal
+              addresses={addresses}
+              address={currentAddress}
+              chain={currentAddress?.community?.id}
+              closeModal={() => {
+                setIsRemoveModalOpen(false);
+                refreshProfiles(currentAddress);
+              }}
+            />
+          )
+        }
+        onClose={() => {
+          setIsRemoveModalOpen(false);
+          setCurrentAddress(null);
+        }}
+        open={isRemoveModalOpen}
+      />
+    </>
   );
 };

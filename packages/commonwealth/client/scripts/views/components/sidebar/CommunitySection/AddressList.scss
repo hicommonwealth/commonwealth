@@ -21,20 +21,6 @@
     flex-direction: column;
     align-items: flex-start;
     max-width: 100%;
-
-    .address-list {
-      width: 180px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-
-      .address-item {
-        width: 120px;
-        background-color: $neutral-200;
-        padding: 2px 8px;
-        border-radius: 6px;
-      }
-    }
   }
 
   .label {
@@ -45,13 +31,5 @@
     max-width: 100%;
     letter-spacing: 0.2px;
     white-space: nowrap;
-  }
-
-  .address-label {
-    color: $neutral-600;
-    font-size: 14px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 100%;
   }
 }
