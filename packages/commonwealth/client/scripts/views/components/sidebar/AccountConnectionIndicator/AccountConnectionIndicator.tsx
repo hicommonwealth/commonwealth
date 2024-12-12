@@ -87,7 +87,7 @@ const AccountConnectionIndicator = ({
       );
       return;
     }
-  }, [data, isLoadingProfile, error, user.id]);
+  }, [data, isLoadingProfile, error, user.id, communityId]);
 
   if (error || !profile) {
     return null;
