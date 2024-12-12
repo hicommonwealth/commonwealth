@@ -1,7 +1,6 @@
 import { Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { NeynarAPIClient } from '@neynar/nodejs-sdk';
-import lo from 'lodash';
 import { QueryTypes } from 'sequelize';
 import { config } from '../config';
 import { models } from '../database';
@@ -24,7 +23,6 @@ export function GetFarcasterContestCasts(): Query<
       if (!contestManager.farcaster_frame_hashes?.length) {
         return [];
       }
-      const parentCastHashes = contestManager.farcaster_frame_hashes || [];
       const contents = await models.sequelize.query<{
         contest_address: string;
         contest_id: number;
@@ -74,6 +72,9 @@ export function GetFarcasterContestCasts(): Query<
           type: QueryTypes.SELECT,
         },
       );
+      if (!contents.length) {
+        return [];
+      }
 
       const replyCastHashes = contents.map((action) => {
         /*
@@ -82,15 +83,11 @@ export function GetFarcasterContestCasts(): Query<
         const [, , , replyCastHash] = action.content_url!.split('/');
         return replyCastHash;
       });
-      const frameHashesToFetch = [...parentCastHashes, ...replyCastHashes];
+      const frameHashesToFetch = [...replyCastHashes];
       const client = new NeynarAPIClient(config.CONTESTS.NEYNAR_API_KEY!);
       const castsResponse = await client.fetchBulkCasts(frameHashesToFetch);
 
       const { casts } = castsResponse.result;
-
-      const replyCasts = lo.groupBy(casts, (cast) => {
-        return cast.parent_hash;
-      });
 
       const replyVoteSums = contents.reduce(
         (acc, content) => {
@@ -103,25 +100,19 @@ export function GetFarcasterContestCasts(): Query<
         {} as Record<string, number>,
       );
 
-      console.log({
-        contest: payload.contest_address,
-        frames: frameHashesToFetch,
-        casts: casts.length,
-        replyCasts: Object.keys(replyCasts).length,
-        replyVoteSums: Object.keys(replyVoteSums).length,
-      });
-
-      const parentCasts = casts
-        .filter((cast) => parentCastHashes.includes(cast.hash))
+      return casts
         .map((cast) => ({
           ...cast,
-          replies: replyCasts[cast.hash].map((reply) => ({
-            ...reply,
-            calculated_vote_weight: replyVoteSums[reply.hash],
-          })),
-        }));
-
-      return parentCasts;
+          calculated_vote_weight: replyVoteSums[cast.hash],
+        }))
+        .sort((a, b) => {
+          if (payload.sort_by === 'upvotes') {
+            return b.calculated_vote_weight - a.calculated_vote_weight;
+          }
+          return (
+            new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+          );
+        });
     },
   };
 }
