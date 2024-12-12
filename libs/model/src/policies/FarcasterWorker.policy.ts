@@ -185,6 +185,9 @@ export function FarcasterWorker(): Policy<typeof inputs> {
         ]);
         mustExist('Farcaster User', users[0]);
 
+        const voterAddress = users[0].verified_addresses.eth_addresses.at(0);
+        mustExist('Farcaster Verified Address', voterAddress);
+
         const community = await models.Community.findByPk(
           contestManager.community_id,
           {
@@ -206,7 +209,7 @@ export function FarcasterWorker(): Policy<typeof inputs> {
 
         await createOnchainContestVote({
           contestManagers,
-          author_address: users[0].custody_address,
+          author_address: voterAddress,
           content_url,
         });
       },
