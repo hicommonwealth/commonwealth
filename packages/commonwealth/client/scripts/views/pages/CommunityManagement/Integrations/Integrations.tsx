@@ -1,4 +1,6 @@
+import { ChainBase } from '@hicommonwealth/shared';
 import React from 'react';
+import app from 'state';
 import CommunityManagementLayout from '../common/CommunityManagementLayout';
 import CustomTOS from './CustomTOS';
 import CustomURL from './CustomURL';
@@ -11,6 +13,8 @@ import Token from './Token';
 import Webhooks from './Webhooks';
 
 const Integrations = () => {
+  const showSnapshotIntegration = app.chain.meta.base === ChainBase.Ethereum;
+
   return (
     <CommunityManagementLayout
       title="Integrations"
@@ -27,7 +31,7 @@ const Integrations = () => {
         <Directory />
         <Token />
         <Stake />
-        <Snapshots />
+        {showSnapshotIntegration && <Snapshots />}
         <Discord />
         <Webhooks />
         <CustomTOS />
