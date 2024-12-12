@@ -1,3 +1,4 @@
+import { ChainBase } from '@hicommonwealth/shared';
 import React from 'react';
 import app from 'state';
 import CommunityManagementLayout from '../common/CommunityManagementLayout';
@@ -11,7 +12,7 @@ import Stake from './Stake';
 import Webhooks from './Webhooks';
 
 const Integrations = () => {
-  const showSnapshotIntegration = app.chain.meta.base === 'ethereum';
+  const showSnapshotIntegration = app.chain.meta.base === ChainBase.Ethereum;
 
   return (
     <CommunityManagementLayout
