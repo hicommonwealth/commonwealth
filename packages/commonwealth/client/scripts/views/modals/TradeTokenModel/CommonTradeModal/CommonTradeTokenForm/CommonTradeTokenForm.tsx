@@ -11,22 +11,23 @@ import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip'
 import {
   CustomAddressOption,
   CustomAddressOptionElement,
-} from '../../ManageCommunityStakeModal/StakeExchangeForm/CustomAddressOption';
+} from '../../../ManageCommunityStakeModal/StakeExchangeForm/CustomAddressOption';
+import { TradingMode } from '../../types';
 import AddressBalance from './AddressBalance';
 import BuyAmountSelection from './AmountSelections/BuyAmountSelection';
 import SellAmountSelection from './AmountSelections/SellAmountSelection';
+import './CommonTradeTokenForm.scss';
 import BuyReceipt from './ReceiptDetails/BuyReceipt';
 import SellReceipt from './ReceiptDetails/SellReceipt';
-import './TradeTokenForm.scss';
 import { convertAddressToDropdownOption } from './helpers';
-import { TradeTokenFormProps, TradingMode } from './types';
+import { CommonTradeTokenFormProps } from './types';
 
-const TradeTokenForm = ({
+const CommonTradeTokenForm = ({
   trading,
   addresses,
   onCTAClick,
   isActionPending,
-}: TradeTokenFormProps) => {
+}: CommonTradeTokenFormProps) => {
   const [isReceiptDetailOpen, setIsReceiptDetailOpen] = useState(false);
 
   const getCTADisabledTooltipText = () => {
@@ -78,14 +79,14 @@ const TradeTokenForm = ({
   };
 
   return (
-    <section className="TradeTokenForm">
+    <section className="CommonTradeTokenForm">
       <CWTabsRow>
-        {Object.keys(TradingMode).map((mode) => (
+        {[TradingMode.Buy, TradingMode.Sell].map((mode) => (
           <CWTab
             key={mode}
             label={mode}
-            onClick={() => trading.mode.onChange(TradingMode[mode])}
-            isSelected={trading.mode.value === TradingMode[mode]}
+            onClick={() => trading.mode.onChange(mode)}
+            isSelected={trading.mode.value === mode}
           />
         ))}
       </CWTabsRow>
@@ -181,4 +182,4 @@ const TradeTokenForm = ({
   );
 };
 
-export default TradeTokenForm;
+export default CommonTradeTokenForm;
