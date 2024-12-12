@@ -1,4 +1,5 @@
 import { InvalidState, logger, type Command } from '@hicommonwealth/core';
+import { commonProtocol as cp } from '@hicommonwealth/evm-protocols';
 import { config } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import { alchemyGetTokenPrices } from '@hicommonwealth/shared';
@@ -28,6 +29,29 @@ export function PinToken(): Command<typeof schemas.PinToken> {
         },
       );
       mustExist('ChainNode', chainNode);
+
+      if (chainNode.eth_chain_id !== cp.ValidChains.Base)
+        throw new InvalidState('Only Base (ETH) chain supported');
+
+      const community = await models.Community.findOne({
+        where: {
+          id: community_id,
+        },
+      });
+      mustExist('Community', community);
+
+      if (community.namespace) {
+        const launchpadToken = await models.LaunchpadToken.findOne({
+          where: {
+            namespace: community.namespace,
+          },
+        });
+
+        if (launchpadToken)
+          throw new InvalidState(
+            `Community ${community.name} has an attached launchpad token`,
+          );
+      }
 
       if (
         !chainNode.url.includes('alchemy') ||
