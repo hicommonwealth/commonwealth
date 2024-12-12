@@ -7,7 +7,7 @@
 
   position: relative;
   word-break: break-word;
-  white-space: pre-wrap;
+  // white-space: pre-wrap;
   @include formatted-text();
   @include collapsible();
   @include hidden-formatting();
