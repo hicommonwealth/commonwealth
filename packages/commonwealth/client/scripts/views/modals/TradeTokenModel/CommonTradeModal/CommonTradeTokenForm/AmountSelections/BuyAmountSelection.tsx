@@ -8,7 +8,7 @@ import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
-import TokenIcon from '../../TokenIcon';
+import TokenIcon from '../../../TokenIcon';
 import { BuyAmountSelectionProps } from '../types';
 import './AmountSelections.scss';
 

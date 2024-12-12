@@ -1,28 +1,14 @@
-import { ExtendedCommunity, TokenView } from '@hicommonwealth/schemas';
+import { ExtendedCommunity } from '@hicommonwealth/schemas';
 import { ChainBase } from '@hicommonwealth/shared';
 import { SupportedCurrencies } from 'helpers/currency';
 import NodeInfo from 'models/NodeInfo';
 import { z } from 'zod';
-import useTradeTokenForm from './useTradeTokenForm';
-
-export enum TradingMode {
-  Buy = 'buy',
-  Sell = 'sell',
-}
-
-export const TokenWithCommunity = TokenView.extend({
-  community_id: z.string(),
-});
-
-export type TradingConfig = {
-  mode: TradingMode;
-  token: z.infer<typeof TokenWithCommunity>;
-  addressType: ChainBase;
-};
+import { TradingConfig } from '../../types';
+import useCommonTradeTokenFormProps from './useCommonTradeTokenForm';
 
 export type TokenPresetAmounts = number | 'Max';
 
-export type UseTradeTokenFormProps = {
+export type UseCommonTradeTokenFormProps = {
   tradeConfig: TradingConfig & {
     currency: SupportedCurrencies;
     buyTokenPresetAmounts?: TokenPresetAmounts[];
@@ -32,7 +18,7 @@ export type UseTradeTokenFormProps = {
   onTradeComplete?: () => void;
 };
 
-export type UseBuyTradeProps = UseTradeTokenFormProps & {
+export type UseBuyTradeProps = UseCommonTradeTokenFormProps & {
   enabled: boolean;
   chainNode: NodeInfo;
   tokenCommunity?: z.infer<typeof ExtendedCommunity>;
@@ -42,24 +28,26 @@ export type UseBuyTradeProps = UseTradeTokenFormProps & {
 
 export type UseSellTradeProps = UseBuyTradeProps;
 
-export type TradeTokenFormProps = ReturnType<typeof useTradeTokenForm>;
+export type CommonTradeTokenFormProps = ReturnType<
+  typeof useCommonTradeTokenFormProps
+>;
 
 export type AddressBalanceProps = Pick<
-  ReturnType<typeof useTradeTokenForm>,
+  ReturnType<typeof useCommonTradeTokenFormProps>,
   'trading' | 'addresses'
 >;
 
 export type BuyAmountSelectionProps = Pick<
-  ReturnType<typeof useTradeTokenForm>,
+  ReturnType<typeof useCommonTradeTokenFormProps>,
   'trading'
 >;
 
 export type SellAmountSelectionProps = Pick<
-  ReturnType<typeof useTradeTokenForm>,
+  ReturnType<typeof useCommonTradeTokenFormProps>,
   'trading'
 >;
 
 export type ReceiptDetailsProps = Pick<
-  ReturnType<typeof useTradeTokenForm>,
+  ReturnType<typeof useCommonTradeTokenFormProps>,
   'trading'
 >;
