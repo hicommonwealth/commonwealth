@@ -18,9 +18,16 @@ const CustomNotificationCell = ({ item }: NotificationCellProps) => {
 
   return (
     <div className="container">
-      {item?.data?.author && (
+      {item?.data?.author ? (
         <div className="avatar">
           <Avatar name={item?.data?.author} />
+        </div>
+      ) : (
+        <div className="avatar">
+          <Avatar
+            name={item?.data?.community_name}
+            src={item?.data?.community_avatar}
+          />
         </div>
       )}
       <div className="content">

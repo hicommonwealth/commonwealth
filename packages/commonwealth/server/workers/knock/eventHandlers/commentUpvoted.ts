@@ -87,6 +87,7 @@ export const processCommentUpvoted: EventHandler<
     data: {
       community_id: thread.Community.id!,
       community_name: thread.Community.name,
+      community_avatar: thread.Community.icon_url,
       reaction: payload.reaction,
       comment_id: payload.comment_id,
       comment_body: safeTruncateBody(

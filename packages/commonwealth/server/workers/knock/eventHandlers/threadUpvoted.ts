@@ -58,13 +58,12 @@ export const processThreadUpvoted: EventHandler<
   }
 
   const community = await models.Community.findByPk(payload.community_id, {
-    attributes: ['name', 'custom_domain'],
+    attributes: ['name', 'custom_domain', 'icon_url'],
   });
   if (!community) {
     log.error('Community not found!', undefined, payload);
     return false;
   }
-
   const provider = notificationsProvider();
   const res = await provider.triggerWorkflow({
     key: WorkflowKeys.NewUpvotes,
@@ -72,6 +71,7 @@ export const processThreadUpvoted: EventHandler<
     data: {
       community_id: payload.community_id,
       community_name: community.name,
+      community_avatar: community.icon_url,
       reaction: payload.reaction,
       thread_id: payload.thread_id,
       thread_title: safeTruncateBody(getDecodedString(threadAndAuthor.title)),

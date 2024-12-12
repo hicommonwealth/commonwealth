@@ -111,6 +111,7 @@ export const BaseUpvoteNotification = z.object({
     .max(255)
     .describe('The ISO string date at which the reaction was created.'),
   object_url: z.string().describe('The url of the thread or comment'),
+  community_avatar: z.string().url().nullish(),
 });
 
 export const ThreadUpvoteNotification = BaseUpvoteNotification.extend({
