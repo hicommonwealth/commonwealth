@@ -1,9 +1,7 @@
 import { notifyInfo } from 'controllers/app/notifications';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect } from 'react';
-import app from 'state';
 import useUserStore from 'state/ui/user';
-import { PageLoading } from 'views/pages/loading';
 import { NewThreadForm } from '../components/NewThreadForm';
 
 const NewThreadPage = () => {
@@ -18,8 +16,6 @@ const NewThreadPage = () => {
       return;
     }
   }, [navigate, user.isLoggedIn]);
-
-  if (!app.chain) return <PageLoading />;
 
   return <NewThreadForm />;
 };

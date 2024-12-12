@@ -22,7 +22,7 @@ export const DEFAULT_NAME = 'Anonymous';
 
 export const MAX_RECIPIENTS_PER_WORKFLOW_TRIGGER = 1_000;
 
-export const PRODUCTION_DOMAIN = 'commonwealth.im';
+export const PRODUCTION_DOMAIN = 'common.xyz';
 
 export const BLOG_SUBDOMAIN = `blog.${PRODUCTION_DOMAIN}`;
 

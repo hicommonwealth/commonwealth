@@ -90,7 +90,7 @@ export const breadCrumbURLS = [
     breadcrumb: 'Contract Actions',
   },
   {
-    url: 'myCommunityStake',
-    breadcrumb: 'My Community Stake',
+    url: 'myTransactions',
+    breadcrumb: 'My Transactions',
   },
 ];
