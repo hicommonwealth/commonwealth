@@ -1,4 +1,5 @@
 import { Actor, command, dispose, query } from '@hicommonwealth/core';
+import { models } from '@hicommonwealth/model';
 import * as shared from '@hicommonwealth/shared';
 import {
   MockInstance,
@@ -11,7 +12,13 @@ import {
   test,
   vi,
 } from 'vitest';
-import { GetPinnedTokens, PinToken, PinTokenErrors } from '../../src/community';
+import {
+  GetPinnedTokens,
+  PinToken,
+  PinTokenErrors,
+  UnpinToken,
+  UnpinTokenErrors,
+} from '../../src/community';
 import { seed } from '../../src/tester';
 
 const adminAddress = '0x0b84092914abaA89dDCb9C788Ace0B1fD6Ea7d90';
@@ -21,6 +28,7 @@ const ethMainnetUSDT = '0xdac17f958d2ee523a2206206994597c13d831ec7';
 describe('Pinned token lifecycle', () => {
   let community_id: string | undefined;
   let second_community_id: string | undefined;
+  let third_community_id: string | undefined;
   let chain_node_id: number | undefined;
   let unsupported_chain_node_id: number | undefined;
   let adminActor: Actor;
@@ -29,18 +37,18 @@ describe('Pinned token lifecycle', () => {
 
   beforeAll(async () => {
     const [ethNode] = await seed('ChainNode', {
-      url: 'https://eth-mainnet.g.alchemy.com/v2/',
-      private_url: 'https://eth-mainnet.g.alchemy.com/v2/',
-      eth_chain_id: 1,
+      url: 'https://base-mainnet.g.alchemy.com/v2/',
+      private_url: 'https://base-mainnet.g.alchemy.com/v2/',
+      eth_chain_id: 8453,
       alchemy_metadata: {
-        network_id: 'eth-mainnet',
+        network_id: 'base-mainnet',
         price_api_supported: true,
         transfer_api_supported: true,
       },
     });
+    const [randomNode] = await seed('ChainNode', {});
     const [admin] = await seed('User', { isAdmin: false });
     const [user] = await seed('User', { isAdmin: false });
-    const [randomNode] = await seed('ChainNode', {});
     const [community] = await seed('Community', {
       chain_node_id: randomNode!.id!,
       base: shared.ChainBase.Ethereum,
@@ -81,6 +89,27 @@ describe('Pinned token lifecycle', () => {
         },
       ],
     });
+    const [thirdCommunity] = await seed('Community', {
+      chain_node_id: randomNode!.id!,
+      base: shared.ChainBase.Ethereum,
+      active: true,
+      profile_count: 2,
+      lifetime_thread_count: 0,
+      Addresses: [
+        {
+          role: 'admin',
+          user_id: admin!.id,
+          verified: new Date(),
+          address: adminAddress,
+        },
+        {
+          role: 'member',
+          user_id: user!.id,
+          verified: new Date(),
+        },
+      ],
+    });
+    third_community_id = thirdCommunity!.id!;
     second_community_id = secondCommunity!.id!;
     community_id = community!.id!;
     chain_node_id = ethNode!.id!;
@@ -159,7 +188,48 @@ describe('Pinned token lifecycle', () => {
           contract_address: ethMainnetUSDC,
         },
       }),
+    ).rejects.toThrow(PinTokenErrors.OnlyBaseSupport);
+
+    await models.ChainNode.update(
+      {
+        alchemy_metadata: {
+          network_id: 'base-mainnet',
+          price_api_supported: false,
+          transfer_api_supported: false,
+        },
+      },
+      {
+        where: {
+          id: chain_node_id!,
+        },
+      },
+    );
+
+    await expect(() =>
+      command(PinToken(), {
+        actor: adminActor,
+        payload: {
+          community_id: community_id!,
+          chain_node_id: chain_node_id!,
+          contract_address: ethMainnetUSDC,
+        },
+      }),
     ).rejects.toThrow(PinTokenErrors.NotSupported);
+
+    await models.ChainNode.update(
+      {
+        alchemy_metadata: {
+          network_id: 'base-mainnet',
+          price_api_supported: true,
+          transfer_api_supported: true,
+        },
+      },
+      {
+        where: {
+          id: chain_node_id!,
+        },
+      },
+    );
     expect(topSpy).toBeCalledTimes(0);
   });
 
@@ -343,5 +413,44 @@ describe('Pinned token lifecycle', () => {
         contract_address: ethMainnetUSDT,
       }),
     );
+  });
+
+  test('should fail to unpin a token if not admin', async () => {
+    await expect(() =>
+      command(UnpinToken(), {
+        actor: userActor,
+        payload: {
+          community_id: community_id!,
+        },
+      }),
+    ).rejects.toThrow('User is not admin in the community');
+  });
+
+  test('should fail to unpin a token if not pinned', async () => {
+    await expect(() =>
+      command(UnpinToken(), {
+        actor: adminActor,
+        payload: {
+          community_id: third_community_id!,
+        },
+      }),
+    ).rejects.toThrow(UnpinTokenErrors.NotFound);
+  });
+
+  test('should unpin a token', async () => {
+    const res = await query(UnpinToken(), {
+      actor: adminActor,
+      payload: {
+        community_id: community_id!,
+      },
+    });
+    expect(res).to.deep.equal({});
+
+    const pinnedToken = await models.PinnedToken.findOne({
+      where: {
+        community_id: community_id!,
+      },
+    });
+    expect(pinnedToken).toBeFalsy();
   });
 });

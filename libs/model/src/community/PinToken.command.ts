@@ -12,6 +12,7 @@ const log = logger(import.meta);
 export const PinTokenErrors = {
   NotSupported: 'Pinned tokens only supported on Alchemy supported chains',
   FailedToFetchPrice: 'Failed to fetch token price',
+  OnlyBaseSupport: 'Only Base (ETH) chain supported',
 };
 
 export function PinToken(): Command<typeof schemas.PinToken> {
@@ -31,7 +32,7 @@ export function PinToken(): Command<typeof schemas.PinToken> {
       mustExist('ChainNode', chainNode);
 
       if (chainNode.eth_chain_id !== cp.ValidChains.Base)
-        throw new InvalidState('Only Base (ETH) chain supported');
+        throw new InvalidState(PinTokenErrors.OnlyBaseSupport);
 
       const community = await models.Community.findOne({
         where: {
