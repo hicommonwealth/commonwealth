@@ -68,6 +68,7 @@ describe('Pinned token lifecycle', () => {
           verified: new Date(),
         },
       ],
+      namespace: null,
     });
     const [secondCommunity] = await seed('Community', {
       chain_node_id: randomNode!.id!,
@@ -88,6 +89,7 @@ describe('Pinned token lifecycle', () => {
           verified: new Date(),
         },
       ],
+      namespace: 'namespaceOne',
     });
     const [thirdCommunity] = await seed('Community', {
       chain_node_id: randomNode!.id!,
@@ -108,6 +110,13 @@ describe('Pinned token lifecycle', () => {
           verified: new Date(),
         },
       ],
+      namespace: 'namespaceTwo',
+    });
+    await seed('LaunchpadToken', {
+      namespace: 'namespaceTwo',
+      launchpad_liquidity: BigInt(1),
+      eth_market_cap_target: 1,
+      initial_supply: 1,
     });
     third_community_id = thirdCommunity!.id!;
     second_community_id = secondCommunity!.id!;
@@ -284,6 +293,20 @@ describe('Pinned token lifecycle', () => {
       }),
     ).rejects.toThrow(PinTokenErrors.FailedToFetchPrice);
     expect(spy).toBeCalledTimes(1);
+  });
+
+  test('should fail to pin a token if the community has a launchpad token', async () => {
+    await expect(() =>
+      command(PinToken(), {
+        actor: adminActor,
+        payload: {
+          community_id: third_community_id!,
+          chain_node_id: chain_node_id!,
+          contract_address: ethMainnetUSDC,
+        },
+      }),
+    ).rejects.toThrow(PinTokenErrors.LaunchpadTokenFound(third_community_id!));
+    expect(topSpy).toBeCalledTimes(0);
   });
 
   test('should pin a token', async () => {

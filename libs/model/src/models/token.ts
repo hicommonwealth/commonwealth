@@ -1,10 +1,10 @@
-import { Token } from '@hicommonwealth/schemas';
+import { LaunchpadToken } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 import { z } from 'zod';
 import type { ChainNodeAttributes, ChainNodeInstance } from './chain_node';
 import type { ModelInstance } from './types';
 
-export type LaunchpadTokenAttributes = z.infer<typeof Token> & {
+export type LaunchpadTokenAttributes = z.infer<typeof LaunchpadToken> & {
   // associations
   ChainNode?: ChainNodeAttributes;
 };

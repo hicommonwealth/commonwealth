@@ -13,6 +13,8 @@ export const PinTokenErrors = {
   NotSupported: 'Pinned tokens only supported on Alchemy supported chains',
   FailedToFetchPrice: 'Failed to fetch token price',
   OnlyBaseSupport: 'Only Base (ETH) chain supported',
+  LaunchpadTokenFound: (communityId: string) =>
+    `Community ${communityId} has an attached launchpad token`,
 };
 
 export function PinToken(): Command<typeof schemas.PinToken> {
@@ -50,7 +52,7 @@ export function PinToken(): Command<typeof schemas.PinToken> {
 
         if (launchpadToken)
           throw new InvalidState(
-            `Community ${community.name} has an attached launchpad token`,
+            PinTokenErrors.LaunchpadTokenFound(community_id),
           );
       }
 
