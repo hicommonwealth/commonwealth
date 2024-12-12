@@ -27,7 +27,7 @@ actual data to be displayed (rowData). These are to be passed in a data structur
       emp_count: 1000,
       avatars: {
         name: {
-          avatarUrl: 'https://assets.commonwealth.im/f5c5a0c6-0552-40be-bb4b-b25fbd0cfbe2.png',
+          avatarUrl: `https://${S3_ASSET_BUCKET_CDN}/f5c5a0c6-0552-40be-bb4b-b25fbd0cfbe2.png`,
           address: null,
         },
       },
@@ -291,11 +291,11 @@ export const CWTable = ({
                         </span>
 
                         {header.column.getCanSort()
-                          ? displaySortIcon(
+                          ? (displaySortIcon(
                               header.column.getIsSorted() as string,
                               // @ts-expect-error <StrictNullChecks/>
                               header.column.getToggleSortingHandler(),
-                            ) ?? null
+                            ) ?? null)
                           : null}
                       </div>
                     )}

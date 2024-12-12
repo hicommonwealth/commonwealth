@@ -24,5 +24,5 @@ export const GetToken = {
     community_id: z.string(),
     with_stats: z.boolean().optional(),
   }),
-  output: z.union([TokenView, z.undefined()]),
+  output: z.union([TokenView, z.null()]),
 };

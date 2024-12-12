@@ -91,7 +91,7 @@ const ManageContest = lazy(
 const Contests = lazy(() => import('views/pages/Contests'));
 const ContestPage = lazy(() => import('views/pages/ContestPage'));
 
-const MyCommunityStake = lazy(() => import('views/pages/MyCommunityStake'));
+const MyTransactions = lazy(() => import('views/pages/MyTransactions'));
 
 const SnapshotProposalPage = lazy(
   () => import('views/pages/Snapshots/SnapshotProposals'),
@@ -183,9 +183,9 @@ const CommonDomainRoutes = ({
     element={withLayout(SearchPage, { type: 'common' })}
   />,
   <Route
-    key="/myCommunityStake"
-    path="/myCommunityStake"
-    element={withLayout(MyCommunityStake, { type: 'common' })}
+    key="/myTransactions"
+    path="/myTransactions"
+    element={withLayout(MyTransactions, { type: 'common' })}
   />,
   // scoped
   <Route
@@ -341,6 +341,14 @@ const CommonDomainRoutes = ({
     path="/:scope/new/discussion"
     element={withLayout(NewThreadPage, {
       scoped: true,
+    })}
+  />,
+  <Route
+    key="/new/discussion"
+    path="/new/discussion"
+    element={withLayout(NewThreadPage, {
+      scoped: false,
+      type: 'common',
     })}
   />,
   <Route

@@ -1,4 +1,5 @@
 import { commonProtocol } from '@hicommonwealth/evm-protocols';
+import { PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
 import NodeInfo from 'models/NodeInfo';
 import { fetchCachedNodes } from 'state/api/nodes';
 
@@ -12,7 +13,7 @@ export const SKALE_ID = '974399131';
 
 const removeTestCosmosNodes = (nodeInfo: NodeInfo): boolean => {
   return !(
-    window.location.hostname.includes('commonwealth.im') &&
+    window.location.hostname.includes(PRODUCTION_DOMAIN) &&
     [
       'evmosdevci',
       'csdkv1',

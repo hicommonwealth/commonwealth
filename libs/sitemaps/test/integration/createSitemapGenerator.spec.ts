@@ -83,10 +83,10 @@ describe('createSitemapGenerator', { timeout: 10_000 }, function () {
 
   test('basic', async () => {
     const paginator = createDatabasePaginatorDefault(50);
-    const sitemapGenerator = createSitemapGenerator([
-      paginator.threads,
-      paginator.profiles,
-    ]);
+    const sitemapGenerator = createSitemapGenerator(
+      [paginator.threads, paginator.profiles],
+      undefined,
+    );
 
     const written = await sitemapGenerator.exec();
     expect(inMemoryBlobs.size).to.equal(2);
