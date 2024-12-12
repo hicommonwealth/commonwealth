@@ -132,13 +132,14 @@ export const trpcRouter = trpc.router({
   createAddress: trpc.command(
     Community.CreateAddress,
     trpc.Tag.Community,
-    async (_, output) => {
-      return output.joined_community
-        ? [
-            MixpanelUserSignupEvent.NEW_USER_SIGNUP,
-            { community_id: output.community_id },
-          ]
-        : undefined;
-    },
+    (_, output) =>
+      Promise.resolve(
+        output.joined_community
+          ? [
+              MixpanelUserSignupEvent.NEW_USER_SIGNUP,
+              { community_id: output.community_id },
+            ]
+          : undefined,
+      ),
   ),
 });
