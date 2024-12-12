@@ -1,9 +1,15 @@
-@import '../../../../styles/shared.scss';
+@import '../../../../../styles/shared.scss';
 
-.TradeTokenForm {
+.CommonTradeTokenForm {
   display: flex;
   flex-direction: column;
   gap: 12px;
+
+  .Tab {
+    .Text {
+      text-transform: capitalize;
+    }
+  }
 
   .balance-row {
     display: flex;
