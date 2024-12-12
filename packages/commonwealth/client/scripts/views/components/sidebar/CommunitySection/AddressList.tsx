@@ -4,6 +4,7 @@ import { CWText } from 'views/components/component_kit/cw_text';
 
 import { WalletId } from '@hicommonwealth/shared';
 import AddressInfo from 'client/scripts/models/AddressInfo';
+import NewProfile from 'client/scripts/models/NewProfile';
 import {
   handleMouseEnter,
   handleMouseLeave,
@@ -15,17 +16,19 @@ import CWIconButton from '../../component_kit/new_designs/CWIconButton';
 import { CWTooltip } from '../../component_kit/new_designs/CWTooltip';
 import './AddressList.scss';
 
-interface CWIdentificationTagProps {
+interface AddressListProps {
   address?: string;
-  addresses: AddressInfo[];
+  addresses: AddressInfo[] | undefined;
   username?: string;
+  profile: NewProfile;
+  refreshProfiles: (addressInfo: AddressInfo) => void;
 }
 
 export const AddressList = ({
   address,
   addresses,
   username,
-}: CWIdentificationTagProps) => {
+}: AddressListProps) => {
   const { openMagicWallet } = useAuthentication({});
 
   if ((!address && !username) || !addresses) {
