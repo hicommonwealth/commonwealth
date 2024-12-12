@@ -1,6 +1,6 @@
 import { ServerError, logger } from '@hicommonwealth/core';
 import { Op } from 'sequelize';
-import { models } from '../database';
+import { models } from '../../database';
 
 const log = logger(import.meta);
 

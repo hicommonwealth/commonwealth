@@ -1,6 +1,11 @@
 import { InvalidInput, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
-import { ChainBase, addressSwapper, bech32ToHex } from '@hicommonwealth/shared';
+import {
+  ChainBase,
+  addressSwapper,
+  bech32ToHex,
+  deserializeCanvas,
+} from '@hicommonwealth/shared';
 import { bech32 } from 'bech32';
 import crypto from 'crypto';
 import { Op } from 'sequelize';
@@ -8,7 +13,7 @@ import { config } from '../config';
 import { models } from '../database';
 import { mustExist } from '../middleware/guards';
 import { AddressInstance, CommunityInstance } from '../models';
-import { verifyAddress } from '../session/verifyAddress';
+import { verifySessionSignature } from '../services/session';
 import { emitEvent } from '../utils/utils';
 
 export const CreateAddressErrors = {
@@ -94,19 +99,14 @@ export function CreateAddress(): Command<typeof schemas.CreateAddress> {
     auth: [],
     authStrategy: {
       name: 'custom',
-      userResolver: async (input) => {
-        // creates new user if not found
-        return await verifyAddress(
-          input.community_id,
-          input.address,
-          input.wallet_id,
-          input.session,
-        );
+      userResolver: async () => {
+        // return a dummy user since we are creating it here
+        return { id: -1, email: '' };
       },
     },
-    body: async ({ actor, payload }) => {
-      const user_id = actor.user.id;
-      const { community_id, address, wallet_id, block_info } = payload;
+    body: async ({ payload }) => {
+      const user_id = null; // dummy user
+      const { community_id, address, wallet_id, block_info, session } = payload;
 
       // Injective special validation
       if (community_id === 'injective') {
@@ -181,6 +181,13 @@ export function CreateAddress(): Command<typeof schemas.CreateAddress> {
             { transaction },
           );
 
+          // verify the session signature and create a new user
+          await verifySessionSignature(
+            deserializeCanvas(session),
+            created,
+            transaction,
+          );
+
           const newly_created = !(
             !!existingWithHex ||
             (await models.Address.findOne({
@@ -194,30 +201,20 @@ export function CreateAddress(): Command<typeof schemas.CreateAddress> {
           );
 
           // this was missing in legacy
-          const events: schemas.EventPairs[] = [];
-          await models.Community.increment('profile_count', {
-            by: 1,
-            where: { id: community_id },
+          await emitEvent(
+            models.Outbox,
+            [
+              {
+                event_name: schemas.EventNames.CommunityJoined,
+                event_payload: {
+                  community_id,
+                  user_id: created.user_id!,
+                  created_at: created.created_at!,
+                },
+              },
+            ],
             transaction,
-          });
-          events.push({
-            event_name: schemas.EventNames.CommunityJoined,
-            event_payload: {
-              community_id,
-              user_id: created.user_id!,
-              created_at: created.created_at!,
-            },
-          });
-          // TODO: emit event signaling a new address was created
-          // newly_created && events.push({
-          //   event_name: schemas.EventNames.AddressCreated,
-          //   event_payload: {
-          //     community_id,
-          //     user_id: created.user_id,
-          //     address
-          //   }
-          // })
-          await emitEvent(models.Outbox, events);
+          );
 
           return { created, newly_created };
         },

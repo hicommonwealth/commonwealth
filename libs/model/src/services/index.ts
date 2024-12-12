@@ -1,5 +1,6 @@
 export * as commonProtocol from './commonProtocol';
 export * from './openai';
+export * from './session';
 export * from './snapshot';
 export * as stakeHelper from './stakeHelper';
 export * as tokenBalanceCache from './tokenBalanceCache';
