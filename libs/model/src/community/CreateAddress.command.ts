@@ -99,9 +99,9 @@ export function CreateAddress(): Command<typeof schemas.CreateAddress> {
     auth: [],
     authStrategy: {
       name: 'custom',
-      userResolver: async () => {
+      userResolver: () => {
         // return a dummy user since we are creating it here
-        return { id: -1, email: '' };
+        return Promise.resolve({ id: -1, email: '' });
       },
     },
     body: async ({ payload }) => {
@@ -152,7 +152,7 @@ export function CreateAddress(): Command<typeof schemas.CreateAddress> {
       // create new address
       const { created, newly_created } = await models.sequelize.transaction(
         async (transaction) => {
-          const created = await models.Address.create(
+          const new_address = await models.Address.create(
             {
               user_id: existingWithHex?.user_id ?? null,
               community_id,
@@ -174,11 +174,11 @@ export function CreateAddress(): Command<typeof schemas.CreateAddress> {
           // verify the session signature and create a new user
           const updated = await verifySessionSignature(
             deserializeCanvas(session),
-            created,
+            new_address,
             transaction,
           );
 
-          const newly_created = !(
+          const is_new = !(
             !!existingWithHex ||
             (await models.Address.findOne({
               where: {
@@ -199,14 +199,14 @@ export function CreateAddress(): Command<typeof schemas.CreateAddress> {
                 event_payload: {
                   community_id,
                   user_id: updated.user_id!,
-                  created_at: created.created_at!,
+                  created_at: new_address.created_at!,
                 },
               },
             ],
             transaction,
           );
 
-          return { created: updated, newly_created };
+          return { created: updated, newly_created: is_new };
         },
       );
 
