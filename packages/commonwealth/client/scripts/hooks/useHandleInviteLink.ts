@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import { matchRoutes, useSearchParams } from 'react-router-dom';
 import { setLocalStorageRefcode } from '../helpers/localStorage';
 import app from '../state';
@@ -14,21 +14,27 @@ export const useHandleInviteLink = ({
   handleJoinCommunity: () => Promise<boolean | undefined>;
 }) => {
   const [searchParams, setSearchParams] = useSearchParams();
+  const refcode = searchParams.get('refcode');
+
   const { setAuthModalType, authModalType } = useAuthModalStore();
   const user = useUserStore();
-  const refcode = searchParams.get('refcode');
+  const activeChainId = app.activeChainId();
 
   const generalInviteRoute = matchRoutes(
     [{ path: '/dashboard/global' }],
     location,
   );
+
   const communityInviteRoute =
     matchRoutes(
       [{ path: '/:scope' }, { path: '/:scope/discussions/*' }],
       location,
     ) && isInsideCommunity;
 
-  const activeChainId = app.activeChainId();
+  const removeRefcodeFromUrl = useCallback(() => {
+    searchParams.delete('refcode');
+    setSearchParams(searchParams);
+  }, [searchParams, setSearchParams]);
 
   useEffect(() => {
     if (!refcode) {
@@ -38,35 +44,28 @@ export const useHandleInviteLink = ({
     if (user.isLoggedIn) {
       if (generalInviteRoute) {
         // do nothing
+        removeRefcodeFromUrl();
       } else if (communityInviteRoute) {
         if (!activeChainId) {
           return;
         }
 
         setLocalStorageRefcode(refcode);
-
-        searchParams.delete('refcode');
-        setSearchParams(searchParams);
-
+        removeRefcodeFromUrl();
         handleJoinCommunity();
       }
     } else {
       if (generalInviteRoute) {
-        // do nothing
         setLocalStorageRefcode(refcode);
       } else if (communityInviteRoute) {
         if (!activeChainId) {
-          console.log('No active chain id');
           return;
         }
+
         setLocalStorageRefcode(refcode);
-        console.log('Active chain id', activeChainId);
-        // check if I joined community
-        // if not - join community automatically (OR display modal to join community)
       }
 
-      searchParams.delete('refcode');
-      setSearchParams(searchParams);
+      removeRefcodeFromUrl();
       setAuthModalType(AuthModalType.CreateAccount);
     }
   }, [
@@ -80,5 +79,6 @@ export const useHandleInviteLink = ({
     activeChainId,
     refcode,
     setSearchParams,
+    removeRefcodeFromUrl,
   ]);
 };
