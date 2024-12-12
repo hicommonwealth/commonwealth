@@ -2,7 +2,7 @@
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     await queryInterface.addColumn('Users', 'unsubscribe_uuid', {
-      type: Sequelize.UUID,
+      type: Sequelize.STRING,
       allowNull: true,
     });
   },
