@@ -41,16 +41,15 @@ describe('Verify Address Routes', () => {
         session: serializeCanvas(session),
       });
 
-    expect(res.body.status).to.be.equal('Success');
-    expect(res.body.result.role).to.be.equal('member');
+    expect(res.body.role).to.be.equal('member');
 
-    expect(res.body.result.address).to.be.equal(walletAddress);
-    expect(res.body.result.community_id).to.be.equal(chain);
-    expect(res.body.result.wallet_id).to.be.equal(wallet_id);
+    expect(res.body.address).to.be.equal(walletAddress);
+    expect(res.body.community_id).to.be.equal(chain);
+    expect(res.body.wallet_id).to.be.equal(wallet_id);
 
-    expect(res.body.result.verification_token).to.not.be.equal(null);
-    expect(res.body.result.verification_token_expires).to.not.be.equal(null);
-    expect(res.body.result.verified).to.be.equal(null);
+    expect(res.body.verification_token).to.not.be.equal(null);
+    expect(res.body.verification_token_expires).to.not.be.equal(null);
+    expect(res.body.verified).to.be.equal(null);
   });
 
   afterAll(async () => {

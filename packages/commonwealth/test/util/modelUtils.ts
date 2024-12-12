@@ -289,7 +289,7 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
         session: serializeCanvas(session),
       });
 
-    const address_id = res.body.result.id;
+    const address_id = res.body.id;
 
     res = await chai.request
       .agent(app)
