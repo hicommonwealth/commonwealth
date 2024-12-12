@@ -7,16 +7,11 @@ import { config, models } from '..';
  * @returns {Promise<string>} - The unsubscribe link
  */
 export async function generateUnsubscribeLink(userId: string): Promise<string> {
-  try {
-    const unsubscribeUuid = uuidv4();
-    await models.User.update(
-      { unsubscribe_uuid: unsubscribeUuid },
-      { where: { id: userId } },
-    );
-    const unsubscribeLink = `${config.SERVER_URL}/unsubscribe/${unsubscribeUuid}`;
-    return unsubscribeLink;
-  } catch (error) {
-    console.error('Error generating unsubscribe link:', error);
-    throw new Error('Failed to generate unsubscribe link.');
-  }
+  const unsubscribeUuid = uuidv4();
+  await models.User.update(
+    { unsubscribe_uuid: unsubscribeUuid },
+    { where: { id: userId } },
+  );
+  const unsubscribeLink = `${config.SERVER_URL}/unsubscribe/${unsubscribeUuid}`;
+  return unsubscribeLink;
 }

@@ -40,7 +40,7 @@ const UnSubscribePage = () => {
         content={
           <UnSubscribeModal
             label="Unsubscribe"
-            description="Are you sure you want to unsubscribe from CommonWealth?"
+            description="Are you sure you want to unsubscribe from recap emails ?"
             onModalClose={handleModalClose}
             // eslint-disable-next-line @typescript-eslint/no-misused-promises
             onUnsubscribe={handleUnsubscribe}

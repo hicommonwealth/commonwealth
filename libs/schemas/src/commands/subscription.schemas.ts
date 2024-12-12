@@ -95,7 +95,7 @@ export const UnregisterClientRegistrationToken = {
 export const UnSubscribeEmail = {
   input: z.object({
     id: z.string().uuid(),
-    email_notifications_enabled: z.boolean().optional(),
+    email_notifications_enabled: z.boolean(),
   }),
   output: SubscriptionPreference,
 };

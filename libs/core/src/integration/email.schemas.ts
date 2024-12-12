@@ -75,6 +75,7 @@ export const GetRecapEmailData = {
   input: z.object({
     user_id: z.string(),
   }),
+
   output: z.object({
     discussion: z.array(
       z.union([
@@ -91,7 +92,6 @@ export const GetRecapEmailData = {
     ),
     num_notifications: z.number(),
     notifications_link: z.string(),
-    email_notifications_enabled: z.boolean(),
     unsubscribe_link: z.string(),
   }),
 };

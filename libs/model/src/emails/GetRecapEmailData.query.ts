@@ -13,7 +13,6 @@ import {
   logger,
   notificationsProvider,
 } from '@hicommonwealth/core';
-import { SubscriptionPreference } from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
 import z from 'zod';
 import { config, generateUnsubscribeLink, models } from '..';
@@ -259,14 +258,6 @@ export function GetRecapEmailDataQuery(): Query<typeof GetRecapEmailData> {
     secure: true,
     authStrategy: { name: 'authtoken', userId: ExternalServiceUserIds.Knock },
     body: async ({ payload }) => {
-      const existingPreferences: z.infer<typeof SubscriptionPreference> | null =
-        await models.SubscriptionPreference.findOne({
-          where: {
-            user_id: payload.user_id,
-          },
-          raw: true,
-        });
-
       const notifications = await getMessages(payload.user_id);
       const enrichedGovernanceAndProtocol = await enrichGovAndProtocolNotif({
         governance: notifications.governance,
@@ -284,8 +275,6 @@ export function GetRecapEmailDataQuery(): Query<typeof GetRecapEmailData> {
           enrichedGovernanceAndProtocol.governance.length +
           enrichedGovernanceAndProtocol.protocol.length,
         notifications_link: config.SERVER_URL,
-        email_notifications_enabled:
-          existingPreferences?.email_notifications_enabled || false,
         unsubscribe_link: unSubscribeLink,
       };
     },
