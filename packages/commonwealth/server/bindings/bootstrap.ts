@@ -38,7 +38,9 @@ function checkSubscriptionResponse(
   }
 }
 
-export async function bootstrapBindings(): Promise<void> {
+export async function bootstrapBindings(
+  skipRmqAdapter?: boolean,
+): Promise<void> {
   let brokerInstance: Broker;
   try {
     const rmqAdapter = new RabbitMQAdapter(
@@ -48,9 +50,11 @@ export async function bootstrapBindings(): Promise<void> {
       ),
     );
     await rmqAdapter.init();
-    broker({
-      adapter: rmqAdapter,
-    });
+    if (!skipRmqAdapter) {
+      broker({
+        adapter: rmqAdapter,
+      });
+    }
     brokerInstance = rmqAdapter;
   } catch (e) {
     log.error(
