@@ -135,10 +135,6 @@ export function FarcasterWorker(): Policy<typeof inputs> {
         ];
 
         // create onchain content from reply cast
-        mustExist(
-          'Farcaster Author Custody Address',
-          payload.author?.custody_address,
-        );
         const content_url = buildFarcasterContentUrl(
           payload.parent_hash!,
           payload.hash,
@@ -146,7 +142,7 @@ export function FarcasterWorker(): Policy<typeof inputs> {
         await createOnchainContestContent({
           contestManagers,
           bypass_quota: true,
-          author_address: payload.author.custody_address,
+          author_address: payload.verified_address,
           content_url,
         });
       },
@@ -180,14 +176,6 @@ export function FarcasterWorker(): Policy<typeof inputs> {
           },
         });
 
-        const { users } = await client.fetchBulkUsers([
-          payload.untrustedData.fid,
-        ]);
-        mustExist('Farcaster User', users[0]);
-
-        const voterAddress = users[0].verified_addresses.eth_addresses.at(0);
-        mustExist('Farcaster Verified Address', voterAddress);
-
         const community = await models.Community.findByPk(
           contestManager.community_id,
           {
@@ -209,7 +197,7 @@ export function FarcasterWorker(): Policy<typeof inputs> {
 
         await createOnchainContestVote({
           contestManagers,
-          author_address: voterAddress,
+          author_address: payload.verified_address,
           content_url,
         });
       },
