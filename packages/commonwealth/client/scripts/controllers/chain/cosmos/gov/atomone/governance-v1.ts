@@ -9,9 +9,8 @@ import type CosmosAccount from '../../account';
 import type CosmosAccounts from '../../accounts';
 import type CosmosChain from '../../chain';
 import { isAtomoneLCD, type CosmosApiType } from '../../chain';
-import { encodeMsgSubmitProposal } from '../v1beta1/utils-v1beta1';
-import { CosmosProposalV1 } from './proposal-v1';
-import { propToIProposal } from './utils-v1';
+import { CosmosProposalV1AtomOne } from './proposal-v1';
+import { encodeMsgSubmitProposalAtomOne, propToIProposal } from './utils-v1';
 
 /** This file is a copy of controllers/chain/cosmos/governance.ts, modified for
  * gov module version v1. This is considered a patch to make sure v1-enabled chains
@@ -20,11 +19,11 @@ import { propToIProposal } from './utils-v1';
  *
  * - governance.ts uses cosmJS v1beta1 gov
  * - governance-v1.ts uses telescope-generated v1 gov  */
-class CosmosGovernanceV1 extends ProposalModule<
+class CosmosGovernanceV1AtomOne extends ProposalModule<
   CosmosApiType,
   ICosmosProposal,
   // @ts-expect-error StrictNullChecks
-  CosmosProposalV1
+  CosmosProposalV1AtomOne
 > {
   private _minDeposit: CosmosToken;
 
@@ -49,7 +48,9 @@ class CosmosGovernanceV1 extends ProposalModule<
     this._initialized = true;
   }
 
-  public async getProposal(proposalId: number): Promise<CosmosProposalV1> {
+  public async getProposal(
+    proposalId: number,
+  ): Promise<CosmosProposalV1AtomOne> {
     const existingProposal = this.store.getByIdentifier(proposalId);
     if (existingProposal) {
       return existingProposal;
@@ -57,17 +58,19 @@ class CosmosGovernanceV1 extends ProposalModule<
     return this._initProposal(proposalId);
   }
 
-  // @ts-expect-error StrictNullChecks
-  private async _initProposal(proposalId: number): Promise<CosmosProposalV1> {
+  private async _initProposal(
+    proposalId: number,
+    // @ts-expect-error StrictNullChecks
+  ): Promise<CosmosProposalV1AtomOne> {
     try {
       // @ts-expect-error StrictNullChecks
       if (!proposalId) return;
       // @ts-expect-error StrictNullChecks
-      if (isAtomoneLCD(this._Chain.lcd)) return;
-      const { proposal } = await this._Chain.lcd.cosmos.gov.v1.proposal({
+      if (!isAtomoneLCD(this._Chain.lcd)) return;
+      const { proposal } = await this._Chain.lcd.atomone.gov.v1.proposal({
         proposalId: numberToLong(proposalId),
       });
-      const cosmosProposal = new CosmosProposalV1(
+      const cosmosProposal = new CosmosProposalV1AtomOne(
         this._Chain,
         this._Accounts,
         this,
@@ -98,7 +101,7 @@ class CosmosGovernanceV1 extends ProposalModule<
     initialDeposit: CosmosToken,
     content: Any,
   ): Promise<number> {
-    const msg = encodeMsgSubmitProposal(
+    const msg = encodeMsgSubmitProposalAtomOne(
       sender.address,
       initialDeposit,
       content,
@@ -119,4 +122,4 @@ class CosmosGovernanceV1 extends ProposalModule<
   }
 }
 
-export default CosmosGovernanceV1;
+export default CosmosGovernanceV1AtomOne;

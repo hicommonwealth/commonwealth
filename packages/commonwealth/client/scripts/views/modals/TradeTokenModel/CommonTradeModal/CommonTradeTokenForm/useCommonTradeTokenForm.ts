@@ -7,17 +7,18 @@ import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { fetchCachedNodes } from 'state/api/nodes';
 import useUserStore from 'state/ui/user';
 import { z } from 'zod';
-import { TradingMode, UseTradeTokenFormProps } from './types';
+import { TradingMode } from '../../types';
+import { UseCommonTradeTokenFormProps } from './types';
 import useBuyTrade from './useBuyTrade';
 import useSellTrade from './useSellTrade';
 
 const COMMON_PLATFORM_FEE_PERCENTAGE = 5; // make configurable when needed
 
-const useTradeTokenForm = ({
+const useCommonTradeTokenForm = ({
   tradeConfig,
   addressType,
   onTradeComplete,
-}: UseTradeTokenFormProps) => {
+}: UseCommonTradeTokenFormProps) => {
   const [tradingMode, setTradingMode] = useState<TradingMode>(
     tradeConfig.mode || TradingMode.Buy,
   );
@@ -106,7 +107,7 @@ const useTradeTokenForm = ({
         handleTokenSell().catch(console.error);
         break;
       default:
-        console.error('Trading mode not selected');
+        console.error(`Trading mode:${tradingMode} not implemented.`);
         break;
     }
   };
@@ -145,4 +146,4 @@ const useTradeTokenForm = ({
   };
 };
 
-export default useTradeTokenForm;
+export default useCommonTradeTokenForm;

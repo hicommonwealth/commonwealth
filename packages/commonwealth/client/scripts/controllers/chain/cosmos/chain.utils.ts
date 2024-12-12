@@ -1,16 +1,21 @@
-import { OfflineSigner } from '@cosmjs/proto-signing';
+import { registry as atomoneRegistry } from '@atomone/atomone-types-long/atomone/gov/v1/tx.registry';
+import { registry as govgenRegistry } from '@atomone/govgen-types-long/govgen/gov/v1beta1/tx.registry';
+import { OfflineSigner, Registry } from '@cosmjs/proto-signing';
 import {
   AminoTypes,
   SigningStargateClient,
   createDefaultAminoConverters,
+  defaultRegistryTypes,
 } from '@cosmjs/stargate';
 import { Tendermint34Client } from '@cosmjs/tendermint-rpc';
-import { LCD } from '../../../../../shared/chain/types/cosmos';
+import { AtomOneLCD, LCD } from '../../../../../shared/chain/types/cosmos';
 import { CosmosApiType } from './chain';
 import {
   createAltGovAminoConverters,
+  createAtomoneGovAminoConverters,
   createGovgenGovAminoConverters,
 } from './gov/aminomessages';
+import { setupAtomOneExtension } from './gov/atomone/queries-v1';
 import { setupGovgenExtension } from './gov/govgen/queries-v1beta1';
 
 export const getTMClient = async (
@@ -29,6 +34,7 @@ export const getRPCClient = async (
     cosm.setupGovExtension,
     cosm.setupStakingExtension,
     setupGovgenExtension,
+    setupAtomOneExtension,
     cosm.setupBankExtension,
   );
   return client;
@@ -42,6 +48,15 @@ export const getLCDClient = async (lcdUrl: string): Promise<LCD> => {
   });
 };
 
+export const getAtomOneLCDClient = async (
+  lcdUrl: string,
+): Promise<AtomOneLCD> => {
+  const { createAtomOneLCDClient } = await import('@hicommonwealth/chains');
+
+  return await createAtomOneLCDClient({
+    restEndpoint: lcdUrl,
+  });
+};
 export const getSigningClient = async (
   url: string,
   signer: OfflineSigner,
@@ -50,9 +65,15 @@ export const getSigningClient = async (
     ...createDefaultAminoConverters(),
     ...createAltGovAminoConverters(),
     ...createGovgenGovAminoConverters(),
+    ...createAtomoneGovAminoConverters(),
   });
 
   return await SigningStargateClient.connectWithSigner(url, signer, {
+    registry: new Registry([
+      ...defaultRegistryTypes,
+      ...atomoneRegistry,
+      ...govgenRegistry,
+    ]),
     aminoTypes,
   });
 };
