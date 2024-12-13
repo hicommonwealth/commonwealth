@@ -302,8 +302,8 @@ const CustomDomainRoutes = ({
       })}
     />,
     <Route
-      key="/:scope/manage/integrations/token"
-      path="/:scope/manage/integrations/token"
+      key="/manage/integrations/token"
+      path="/manage/integrations/token"
       element={withLayout(CommunityTokenIntegration, {
         scoped: true,
       })}
