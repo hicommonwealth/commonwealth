@@ -51,10 +51,12 @@ export const groupValidationSchema = z.object({
     .optional()
     .default(''),
   groupImageUrl: z
-    .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
-    .url({ message: VALIDATION_MESSAGES.INVALID_URL })
-    .optional()
-    .default(''),
+    .union([
+      z.string().url({ message: VALIDATION_MESSAGES.INVALID_URL }),
+      z.string().optional().default(''),
+      z.null(), // Allows null
+    ])
+    .optional(),
   requirementsToFulfill: z
     .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
     .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT }),

@@ -501,11 +501,7 @@ const GroupForm = ({
                 placeholder="Add a description for your group"
                 instructionalMessage="Can be up to 250 characters long"
               />
-            </section>
 
-            <CWDivider />
-
-            <section className="form-section">
               <CWImageInput
                 label="Group Image (Accepts JPG and PNG files)"
                 onImageProcessingChange={({ isGenerating, isUploading }) => {

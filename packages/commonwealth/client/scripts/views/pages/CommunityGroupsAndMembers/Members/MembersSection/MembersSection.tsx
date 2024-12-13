@@ -7,6 +7,7 @@ import { CWCheckbox } from 'views/components/component_kit/cw_checkbox';
 import { CWTable } from 'views/components/component_kit/new_designs/CWTable';
 import { CWTableState } from 'views/components/component_kit/new_designs/CWTable/useCWTableState';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
+import { getFallbackImage } from '../helper';
 import './MembersSection.scss';
 
 export type Group = {
@@ -96,7 +97,7 @@ const MembersSection = ({
                   <div key={index} className="group-item">
                     <span className="group-name">{group.name}</span>
                     <img
-                      src={group.groupImageUrl}
+                      src={group.groupImageUrl || getFallbackImage()}
                       alt={group.name}
                       className="group-image"
                     />

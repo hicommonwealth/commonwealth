@@ -249,8 +249,13 @@ const CommunityMembersPage = () => {
                 }
               : null;
           })
-          .filter(Boolean)
-          .sort((a, b) => a!.name.localeCompare(b!.name)),
+          .filter(
+            (
+              group,
+            ): group is { name: string; groupImageUrl: string | undefined } =>
+              group !== null && group.name !== undefined,
+          )
+          .sort((a, b) => a.name.localeCompare(b.name)),
         stakeBalance: p.addresses[0].stake_balance,
         lastActive: p.last_active,
       }));
