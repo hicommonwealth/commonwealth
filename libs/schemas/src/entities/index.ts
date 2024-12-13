@@ -1,6 +1,7 @@
 export * from './chain.schemas';
 export * from './comment.schemas';
 export * from './community.schemas';
+export * from './contest-manager.schemas';
 export * from './contract.schemas';
 export * from './discordBotConfig.schemas';
 export * from './group-permission.schemas';
