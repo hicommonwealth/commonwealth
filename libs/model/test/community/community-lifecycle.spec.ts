@@ -51,6 +51,7 @@ function buildCreateGroupPayload(
     metadata: {
       name: chance.name(),
       description: chance.sentence(),
+      groupImageUrl: chance.url(),
       required_requirements: 1,
       membership_ttl: 100,
     },
