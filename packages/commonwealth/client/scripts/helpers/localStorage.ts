@@ -1,8 +1,11 @@
-const KEY_REFCODE = 'common-refcode';
-const REFCODE_EXPIRATION_DAYS = 7;
+export const REFCODE_EXPIRATION_MS = 14 * 24 * 60 * 60 * 1000; // 14 days
 
-export const getLocalStorageRefcode = () => {
-  const stored = localStorage.getItem(KEY_REFCODE);
+export enum LocalStorageKeys {
+  ReferralCode = 'common-refcode',
+}
+
+export const getLocalStorageItem = (key: LocalStorageKeys) => {
+  const stored = localStorage.getItem(key);
 
   if (!stored) {
     return null;
@@ -11,29 +14,32 @@ export const getLocalStorageRefcode = () => {
   const item = JSON.parse(stored);
 
   if (new Date().getTime() > item.expires) {
-    localStorage.removeItem(KEY_REFCODE);
+    localStorage.removeItem(key);
     return null;
   }
 
   return item.value;
 };
 
-export const setLocalStorageRefcode = (refcode: string) => {
-  const stored = getLocalStorageRefcode();
+export const setLocalStorageItem = (
+  key: LocalStorageKeys,
+  value: string,
+  expirationMs?: number,
+) => {
+  const stored = getLocalStorageItem(key);
 
-  if (stored) {
+  if (key === LocalStorageKeys.ReferralCode && stored) {
     console.log('Reflink already stored');
     return;
   }
 
-  const expirationDate = new Date();
-  expirationDate.setDate(expirationDate.getDate() + REFCODE_EXPIRATION_DAYS);
+  const item: { value: string; expires?: number } = { value };
 
-  localStorage.setItem(
-    KEY_REFCODE,
-    JSON.stringify({
-      value: refcode,
-      expires: expirationDate.getTime(),
-    }),
-  );
+  if (expirationMs) {
+    const expirationDate = new Date();
+    expirationDate.setTime(expirationDate.getTime() + expirationMs);
+    item.expires = expirationDate.getTime();
+  }
+
+  localStorage.setItem(key, JSON.stringify(item));
 };

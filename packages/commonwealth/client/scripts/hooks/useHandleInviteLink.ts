@@ -1,6 +1,10 @@
 import { useCallback, useEffect } from 'react';
 import { matchRoutes, useSearchParams } from 'react-router-dom';
-import { setLocalStorageRefcode } from '../helpers/localStorage';
+import {
+  LocalStorageKeys,
+  REFCODE_EXPIRATION_MS,
+  setLocalStorageItem,
+} from '../helpers/localStorage';
 import app from '../state';
 import { useAuthModalStore } from '../state/ui/modals';
 import { useUserStore } from '../state/ui/user/user';
@@ -50,19 +54,31 @@ export const useHandleInviteLink = ({
           return;
         }
 
-        setLocalStorageRefcode(refcode);
+        setLocalStorageItem(
+          LocalStorageKeys.ReferralCode,
+          refcode,
+          REFCODE_EXPIRATION_MS,
+        );
         removeRefcodeFromUrl();
         handleJoinCommunity().catch(console.error);
       }
     } else {
       if (generalInviteRoute) {
-        setLocalStorageRefcode(refcode);
+        setLocalStorageItem(
+          LocalStorageKeys.ReferralCode,
+          refcode,
+          REFCODE_EXPIRATION_MS,
+        );
       } else if (communityInviteRoute) {
         if (!activeChainId) {
           return;
         }
 
-        setLocalStorageRefcode(refcode);
+        setLocalStorageItem(
+          LocalStorageKeys.ReferralCode,
+          refcode,
+          REFCODE_EXPIRATION_MS,
+        );
       }
 
       removeRefcodeFromUrl();
