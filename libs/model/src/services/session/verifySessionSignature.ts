@@ -7,7 +7,7 @@ import {
 import assert from 'assert';
 import Sequelize, { Transaction } from 'sequelize';
 import { models } from '../../database';
-import { AddressInstance } from '../../models';
+import { AddressInstance, UserInstance } from '../../models';
 import { incrementProfileCount } from '../../utils';
 
 /**
@@ -19,7 +19,7 @@ export const verifySessionSignature = async (
   session: Session,
   addr: AddressInstance,
   transaction: Transaction,
-): Promise<AddressInstance> => {
+): Promise<{ addr: AddressInstance; user?: UserInstance }> => {
   // Re-encode BOTH address if needed for substrate verification, to ensure matching
   // between stored address (re-encoded based on community joined at creation time)
   // and address provided directly from wallet.
@@ -77,17 +77,15 @@ export const verifySessionSignature = async (
       );
       if (!user) throw new Error('Failed to create user');
       addr.user_id = user.id;
-      addr.User = user;
       const updated = await addr.save({ transaction });
       await incrementProfileCount(addr.community_id!, user.id!, transaction);
-      return updated;
+      return { addr: updated, user };
     }
-    // assign existing user
     addr.user_id = existing.user_id;
   }
 
   // save the newly verified address, incrementing the profile count (TODO: check this)
   const updated = await addr.save({ transaction });
   await incrementProfileCount(addr.community_id!, addr.user_id!, transaction);
-  return updated;
+  return { addr: updated };
 };

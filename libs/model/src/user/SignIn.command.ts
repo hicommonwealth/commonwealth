@@ -168,7 +168,7 @@ export function SignIn(): Command<typeof schemas.SignIn> {
             // if (expiration && +expiration <= +new Date())
             //  throw new InvalidInput(SignInErrors.ExpiredToken);
 
-            const verified = await verifySessionSignature(
+            const { addr: verified } = await verifySessionSignature(
               deserializeCanvas(session),
               existing,
               transaction,
@@ -211,12 +211,13 @@ export function SignIn(): Command<typeof schemas.SignIn> {
             { transaction },
           );
 
-          const verified = await verifySessionSignature(
+          const { addr: verified, user } = await verifySessionSignature(
             deserializeCanvas(session),
             new_address,
             transaction,
           );
 
+          // same address in different community?
           const is_new = !(
             !!existingWithHex ||
             (await models.Address.findOne({
@@ -230,7 +231,7 @@ export function SignIn(): Command<typeof schemas.SignIn> {
           );
 
           // TODO: emit events for
-          // - user creation
+          // - user creation (check if user exists)
           // - address creation (community joined)
           // - address transfer (community joined) -> to be used by email notifications
           // this was missing in legacy
@@ -250,7 +251,10 @@ export function SignIn(): Command<typeof schemas.SignIn> {
           );
 
           return {
-            addr: verified.toJSON(),
+            addr: {
+              ...verified.toJSON(),
+              User: verified.User ?? user?.toJSON(),
+            },
             newly_created: is_new,
             joined_community: true,
           };

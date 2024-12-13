@@ -290,8 +290,8 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
       });
 
     const address_id = res.body.id;
-    const user_id = res.body.user.id;
-    const email = res.body.user.email;
+    const user_id = res.body.user_id;
+    const email = res.body.User.email;
     return {
       address_id,
       address: session.did.split(':')[4],
