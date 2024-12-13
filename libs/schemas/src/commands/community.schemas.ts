@@ -330,7 +330,7 @@ export const BanAddress = {
   context: AuthContext,
 };
 
-export const CreateAddress = {
+export const SignIn = {
   input: z.object({
     address: z.string(),
     community_id: z.string(),

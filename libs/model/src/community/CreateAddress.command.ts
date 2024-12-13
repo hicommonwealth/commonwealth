@@ -87,26 +87,33 @@ async function validateAddress(
 }
 
 /**
- * This may be called when: TODO: should we call this Login instead of CreateAddress?
- * - When logged in, to link a new address for an existing user
- *   - TODO: isn't this the same as JoinCommunity?
- * - When logged out, to create a new user by showing proof of an address
+ * TODO: Describe signin flows here
+ * - When logged in:
+ *   - to link a new address for an existing user  - TODO: isn't this the same as JoinCommunity?
+ *   - to verify an existing address (refresh token)
+ * - When logged out
+ *   - to create a new user by showing proof of an address (verification and optional creation of new user and address)
+ *   - transferring ownership of an address to a new user
  */
-export function CreateAddress(): Command<typeof schemas.CreateAddress> {
+export function SignIn(): Command<typeof schemas.SignIn> {
   return {
-    ...schemas.CreateAddress,
+    ...schemas.SignIn,
     secure: true,
     auth: [],
     authStrategy: {
       name: 'custom',
       userResolver: () => {
-        // return a dummy user since we are creating it here
+        // TODO: session/address verification step should be in auth strategy
+        // - verify session signature
+        // - verify address format and ownership
+        // - SECURITY TEAM: this endpoint is only secured by this strategy, so we should stop attacks here
         return Promise.resolve({ id: -1, email: '' });
       },
     },
     body: async ({ payload }) => {
       const { community_id, address, wallet_id, block_info, session } = payload;
 
+      // TODO: Create abstraction to validate community rules
       // Injective special validation
       if (community_id === 'injective') {
         if (address.slice(0, 3) !== 'inj')
@@ -119,6 +126,7 @@ export function CreateAddress(): Command<typeof schemas.CreateAddress> {
       });
       mustExist('Community', community);
 
+      // TODO: this should be in the auth strategy
       const { encodedAddress, addressHex, existingWithHex } =
         await validateAddress(community, address.trim());
 
@@ -174,6 +182,7 @@ export function CreateAddress(): Command<typeof schemas.CreateAddress> {
             { transaction },
           );
 
+          // TODO: this should be in the auth strategy
           // verify the session signature and create a new user
           const updated = await verifySessionSignature(
             deserializeCanvas(session),
@@ -193,6 +202,10 @@ export function CreateAddress(): Command<typeof schemas.CreateAddress> {
             }))
           );
 
+          // TODO: we should also emit events for
+          // - user creation
+          // - address creation (community joined)
+          // - address transfer (community joined) -> to be used by email notifications
           // this was missing in legacy
           await emitEvent(
             models.Outbox,

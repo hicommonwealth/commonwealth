@@ -1,5 +1,5 @@
 import { Session } from '@canvas-js/interfaces';
-import { CreateAddress } from '@hicommonwealth/schemas';
+import { SignIn } from '@hicommonwealth/schemas';
 import { notifyError } from 'client/scripts/controllers/app/notifications';
 import Account from 'client/scripts/models/Account';
 import { trpc } from 'client/scripts/utils/trpcClient';
@@ -14,7 +14,7 @@ export function useCreateAddressMutation() {
 
   const createAddress = async (
     session: Session,
-    payload: z.infer<typeof CreateAddress.input>,
+    payload: z.infer<typeof SignIn.input>,
   ) => {
     const created = await mutation.mutateAsync(payload);
     const account = new Account({

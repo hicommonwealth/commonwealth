@@ -130,7 +130,7 @@ export const trpcRouter = trpc.router({
   ]),
   banAddress: trpc.command(Community.BanAddress, trpc.Tag.Community),
   createAddress: trpc.command(
-    Community.CreateAddress,
+    Community.SignIn,
     trpc.Tag.Community,
     (_, output) =>
       Promise.resolve(
