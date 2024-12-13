@@ -1,10 +1,10 @@
-import type { MsgDepositEncodeObject } from '@cosmjs/stargate';
-import { longify } from '@cosmjs/stargate/build/queryclient';
 import type {
   QueryDepositsResponseSDKType,
   QueryTallyResultResponseSDKType,
   QueryVotesResponseSDKType,
-} from '@hicommonwealth/chains';
+} from '@atomone/atomone-types-long/atomone/gov/v1/query';
+import { EncodeObject } from '@cosmjs/proto-signing';
+import { longify } from '@cosmjs/stargate/build/queryclient';
 import { ProposalType } from '@hicommonwealth/shared';
 import BN from 'bn.js';
 import type {
@@ -30,7 +30,7 @@ import type CosmosChain from '../../chain';
 import { isAtomoneLCD, type CosmosApiType } from '../../chain';
 import { CosmosVote } from '../v1beta1/proposal-v1beta1';
 import { encodeMsgVote } from '../v1beta1/utils-v1beta1';
-import type CosmosGovernanceV1 from './governance-v1';
+import CosmosGovernanceV1AtomOne from './governance-v1';
 import { marshalTallyV1 } from './utils-v1';
 
 const voteToEnumV1 = (voteOption: number | string): CosmosVoteChoice => {
@@ -49,7 +49,7 @@ const voteToEnumV1 = (voteOption: number | string): CosmosVoteChoice => {
   }
 };
 
-export class CosmosProposalV1 extends Proposal<
+export class CosmosProposalV1AtomOne extends Proposal<
   CosmosApiType,
   CosmosToken,
   ICosmosProposal,
@@ -105,6 +105,7 @@ export class CosmosProposalV1 extends Proposal<
     );
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private _metadata: any;
   public get metadata() {
     return this._metadata;
@@ -112,12 +113,12 @@ export class CosmosProposalV1 extends Proposal<
 
   private _Chain: CosmosChain;
   private _Accounts: CosmosAccounts;
-  private _Governance: CosmosGovernanceV1;
+  private _Governance: CosmosGovernanceV1AtomOne;
 
   constructor(
     ChainInfo: CosmosChain,
     Accounts: CosmosAccounts,
-    Governance: CosmosGovernanceV1,
+    Governance: CosmosGovernanceV1AtomOne,
     data: ICosmosProposal,
   ) {
     super(ProposalType.CosmosProposal, data);
@@ -132,6 +133,7 @@ export class CosmosProposalV1 extends Proposal<
     throw new Error('unimplemented');
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public updateMetadata(metadata: any) {
     this._metadata = metadata;
     if (!this.data.title) {
@@ -143,6 +145,7 @@ export class CosmosProposalV1 extends Proposal<
     this._Governance.store.update(this);
   }
 
+  // eslint-disable-next-line @typescript-eslint/require-await
   public async init() {
     if (!this.initialized) {
       this._initialized = true;
@@ -156,8 +159,8 @@ export class CosmosProposalV1 extends Proposal<
   public async fetchDeposits(): Promise<QueryDepositsResponseSDKType> {
     const proposalId = longify(this.data.identifier) as Long;
     // @ts-expect-error StrictNullChecks
-    if (isAtomoneLCD(this._Chain.lcd)) return;
-    const deposits = await this._Chain.lcd.cosmos.gov.v1.deposits({
+    if (!isAtomoneLCD(this._Chain.lcd)) return;
+    const deposits = await this._Chain.lcd.atomone.gov.v1.deposits({
       proposalId,
     });
     this.setDeposits(deposits);
@@ -167,8 +170,8 @@ export class CosmosProposalV1 extends Proposal<
   public async fetchTally(): Promise<QueryTallyResultResponseSDKType> {
     const proposalId = longify(this.data.identifier) as Long;
     // @ts-expect-error StrictNullChecks
-    if (isAtomoneLCD(this._Chain.lcd)) return;
-    const tally = await this._Chain.lcd.cosmos.gov.v1.tallyResult({
+    if (!isAtomoneLCD(this._Chain.lcd)) return;
+    const tally = await this._Chain.lcd.atomone.gov.v1.tallyResult({
       proposalId,
     });
     this.setTally(tally);
@@ -178,8 +181,10 @@ export class CosmosProposalV1 extends Proposal<
   public async fetchVotes(): Promise<QueryVotesResponseSDKType> {
     const proposalId = longify(this.data.identifier) as Long;
     // @ts-expect-error StrictNullChecks
-    if (isAtomoneLCD(this._Chain.lcd)) return;
-    const votes = await this._Chain.lcd.cosmos.gov.v1.votes({ proposalId });
+    if (!isAtomoneLCD(this._Chain.lcd)) return;
+    const votes = await this._Chain.lcd.atomone.gov.v1.votes({
+      proposalId,
+    });
     this.setVotes(votes);
     return votes;
   }
@@ -313,8 +318,8 @@ export class CosmosProposalV1 extends Proposal<
       throw new Error('proposal not in deposit period');
     }
     const cosm = await import('@cosmjs/stargate/build/queryclient');
-    const msg: MsgDepositEncodeObject = {
-      typeUrl: '/cosmos.gov.v1beta1.MsgDeposit',
+    const msg: EncodeObject = {
+      typeUrl: '/atomone.gov.v1beta1.MsgDeposit',
       value: {
         proposalId: cosm.longify(this.data.identifier),
         depositor: depositor.address,

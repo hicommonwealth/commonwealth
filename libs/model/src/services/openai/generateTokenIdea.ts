@@ -134,8 +134,9 @@ const generateTokenIdea = async function* ({
 
     // generate image url and send the generated url to the client (to save time on s3 upload)
     const imageResponse = await openai.images.generate({
+      model: 'dall-e-3',
       prompt: TOKEN_AI_PROMPTS_CONFIG.image(tokenIdea.name, tokenIdea.symbol),
-      size: '256x256',
+      size: '512x512',
       n: 1,
       response_format: 'url',
     });
