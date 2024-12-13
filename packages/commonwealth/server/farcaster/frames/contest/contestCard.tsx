@@ -16,7 +16,7 @@ export const contestCard = frames(async (ctx) => {
 
   if (!contestManager) {
     return {
-      title: 'N/A',
+      title: 'Contest not found',
       image: (
         <div
           style={{
@@ -35,7 +35,35 @@ export const contestCard = frames(async (ctx) => {
               fontSize: '56px',
             }}
           >
-            Not Found
+            Contest not found.
+          </p>
+        </div>
+      ),
+    };
+  }
+
+  if (!contestManager.ended) {
+    return {
+      title: 'Contest Ended',
+      image: (
+        <div
+          style={{
+            backgroundColor: '#2A2432',
+            color: 'white',
+            padding: '40px',
+            display: 'flex',
+            flexDirection: 'column',
+            width: '100%',
+            height: '100%',
+            lineHeight: '0.5',
+          }}
+        >
+          <p
+            style={{
+              fontSize: '56px',
+            }}
+          >
+            Contest ended. New entries will not be accepted.
           </p>
         </div>
       ),
