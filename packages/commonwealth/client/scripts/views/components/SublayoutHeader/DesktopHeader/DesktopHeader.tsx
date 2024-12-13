@@ -84,7 +84,7 @@ const DesktopHeader = ({ onMobile, onAuthModalOpen }: DesktopHeaderProps) => {
             })}
           >
             <CreateContentPopover />
-            {!isWindowSmallInclusive() && (
+            {!isWindowSmallInclusive(window.innerWidth) && (
               <CWTooltip
                 content="About Common"
                 placement="bottom"
