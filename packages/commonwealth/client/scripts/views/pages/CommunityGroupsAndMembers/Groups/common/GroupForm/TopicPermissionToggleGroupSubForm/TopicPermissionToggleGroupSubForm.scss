@@ -1,0 +1,58 @@
+.topic-permissions {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  .permissions-header {
+    display: flex;
+    align-items: center;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #e0e0e0;
+    font-weight: bold;
+
+    .header-title {
+      flex: 1;
+      text-align: left;
+      padding-right: 16px;
+    }
+
+    .header-item {
+      width: 150px;
+      flex: 0 0 135px;
+      text-align: center;
+      justify-content: center;
+    }
+
+    .header-permissions {
+      display: contents;
+    }
+  }
+
+  .permissions-row {
+    display: flex;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid #f0f0f0;
+
+    &:last-child {
+      border: none;
+    }
+
+    .topic-name {
+      flex: 1;
+      font-size: 14px;
+      text-align: left;
+      padding-right: 16px;
+    }
+
+    .toggle {
+      flex: 0 0 135px;
+      display: flex;
+      justify-content: center;
+    }
+
+    &.all-row {
+      font-weight: bold;
+    }
+  }
+}
