@@ -355,14 +355,14 @@ const ReactQuillEditor = ({
                 <Droppable droppableId="quillEditor">
                   {(provided) => (
                     <div
-                      className={`${isDraggingOver ? 'ondragover' : ''}`}
+                      className={`${isDraggingOver ? 'ondragover' : ''} ReactQuillDragParent`}
                       {...provided.droppableProps}
                       ref={provided.innerRef}
                       onDragOver={handleDragStart}
                       onDragLeave={handleDragStop}
                       onDrop={handleDragStop}
                     >
-                      <div data-text-editor="name">
+                      <div data-text-editor="name" className="ReactQuillParent">
                         <ReactQuill
                           // @ts-expect-error <StrictNullChecks/>
                           ref={editorRef}

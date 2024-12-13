@@ -11,6 +11,7 @@ import {
 } from 'state/api/configuration';
 import useErrorStore from 'state/ui/error';
 import useUserStore from 'state/ui/user';
+import { MobileScrollBuffer } from 'views/components/MobileNavigation/MobileScrollBuffer';
 import { PageNotFound } from 'views/pages/404';
 import ErrorPage from 'views/pages/error';
 import { z } from 'zod';
@@ -68,8 +69,8 @@ const LayoutComponent = ({
     }
   }, [isAddedToHomeScreen, user.isOnPWA, user]);
 
-  // If community id was updated ex: `commonwealth.im/{community-id}/**/*`
-  // redirect to new community id ex: `commonwealth.im/{new-community-id}/**/*`
+  // If community id was updated ex: `${PRODUCTION_DOMAIN}/{community-id}/**/*`
+  // redirect to new community id ex: `${PRODUCTION_DOMAIN}/{new-community-id}/**/*`
   useNecessaryEffect(() => {
     // @ts-expect-error <StrictNullChecks/>
     const redirectTo = configurationData?.redirects?.[providedCommunityScope];
@@ -197,6 +198,8 @@ const LayoutComponent = ({
         ) : (
           <SubLayout isInsideCommunity={type === 'community'}>
             {childToRender()}
+
+            <MobileScrollBuffer />
           </SubLayout>
         )}
       </div>

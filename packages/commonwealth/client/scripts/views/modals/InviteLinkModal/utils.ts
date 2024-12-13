@@ -23,54 +23,57 @@ interface ShareOption {
 
 export const getShareOptions = (
   isInsideCommunity: boolean,
-  inviteLink: string,
-): ShareOption[] => [
-  {
-    name: 'Messages',
-    icon: messagesImg,
-    onClick: () =>
-      window.open(
-        `sms:?&body=${encodeURIComponent(generatePermalink(isInsideCommunity, inviteLink))}`,
-      ),
-  },
-  {
-    name: 'Telegram',
-    icon: telegramImg,
-    onClick: () =>
-      window.open(
-        `https://t.me/share/url?url=${encodeURIComponent(
-          generatePermalink(isInsideCommunity, inviteLink),
-        )}`,
-      ),
-  },
-  {
-    name: 'X (Twitter)',
-    icon: twitterImg,
-    onClick: () =>
-      window.open(
-        `https://twitter.com/intent/tweet?url=${encodeURIComponent(
-          generatePermalink(isInsideCommunity, inviteLink),
-        )}`,
-      ),
-  },
-  {
-    name: 'Warpcast',
-    icon: warpcastImg,
-    onClick: () =>
-      window.open(
-        `https://warpcast.com/~/compose?text=${encodeURIComponent(
-          generatePermalink(isInsideCommunity, inviteLink),
-        )}`,
-      ),
-  },
-  {
-    name: 'Email',
-    icon: mailImg,
-    onClick: () =>
-      window.open(
-        `mailto:?body=${encodeURIComponent(
-          generatePermalink(isInsideCommunity, inviteLink),
-        )}`,
-      ),
-  },
-];
+  inviteLink?: string | null,
+): ShareOption[] =>
+  inviteLink
+    ? [
+        {
+          name: 'Messages',
+          icon: messagesImg,
+          onClick: () =>
+            window.open(
+              `sms:?&body=${encodeURIComponent(generatePermalink(isInsideCommunity, inviteLink))}`,
+            ),
+        },
+        {
+          name: 'Telegram',
+          icon: telegramImg,
+          onClick: () =>
+            window.open(
+              `https://t.me/share/url?url=${encodeURIComponent(
+                generatePermalink(isInsideCommunity, inviteLink),
+              )}`,
+            ),
+        },
+        {
+          name: 'X (Twitter)',
+          icon: twitterImg,
+          onClick: () =>
+            window.open(
+              `https://twitter.com/intent/tweet?url=${encodeURIComponent(
+                generatePermalink(isInsideCommunity, inviteLink),
+              )}`,
+            ),
+        },
+        {
+          name: 'Warpcast',
+          icon: warpcastImg,
+          onClick: () =>
+            window.open(
+              `https://warpcast.com/~/compose?text=${encodeURIComponent(
+                generatePermalink(isInsideCommunity, inviteLink),
+              )}`,
+            ),
+        },
+        {
+          name: 'Email',
+          icon: mailImg,
+          onClick: () =>
+            window.open(
+              `mailto:?body=${encodeURIComponent(
+                generatePermalink(isInsideCommunity, inviteLink),
+              )}`,
+            ),
+        },
+      ]
+    : [];

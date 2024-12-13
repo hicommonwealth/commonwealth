@@ -1,6 +1,6 @@
 import { config } from '@hicommonwealth/model';
 import { Community } from '@hicommonwealth/schemas';
-import { getDecodedString } from '@hicommonwealth/shared';
+import { getDecodedString, PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
 import z from 'zod';
 
 export const REGEX_IMAGE =
@@ -22,7 +22,7 @@ export function getPreviewImageUrl(
   if (community.icon_url) {
     const previewImageUrl = community.icon_url.match(`^(http|https)://`)
       ? community.icon_url
-      : `https://commonwealth.im${community.icon_url}`;
+      : `https://${PRODUCTION_DOMAIN}${community.icon_url}`;
     const previewImageAltText = `${community.name}`;
     return { previewImageUrl, previewImageAltText };
   }

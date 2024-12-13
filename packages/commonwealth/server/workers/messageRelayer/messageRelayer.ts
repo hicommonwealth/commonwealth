@@ -6,9 +6,8 @@ import {
   startHealthCheckLoop,
 } from '@hicommonwealth/adapters';
 import { broker, logger } from '@hicommonwealth/core';
+import { bootstrapRelayer } from 'server/bindings/bootstrap';
 import { config } from '../../config';
-import { setupListener } from './pgListener';
-import { incrementNumUnrelayedEvents, relayForever } from './relayForever';
 
 const log = logger(import.meta);
 
@@ -26,43 +25,16 @@ startHealthCheckLoop({
 });
 
 export async function startMessageRelayer(maxRelayIterations?: number) {
-  const { models } = await import('@hicommonwealth/model');
-
-  try {
-    const rmqAdapter = new RabbitMQAdapter(
-      getRabbitMQConfig(
-        config.BROKER.RABBITMQ_URI,
-        RascalConfigServices.CommonwealthService,
-      ),
-    );
-    await rmqAdapter.init();
-    broker({
-      adapter: rmqAdapter,
-    });
-  } catch (e) {
-    log.error(
-      'Rascal consumer setup failed. Please check the Rascal configuration',
-    );
-    throw e;
-  }
-
-  const count = await models.Outbox.count({
-    where: {
-      relayed: false,
-    },
-  });
-  incrementNumUnrelayedEvents(count);
-
-  const pgClient = await setupListener();
-
+  const rmqAdapter = new RabbitMQAdapter(
+    getRabbitMQConfig(
+      config.BROKER.RABBITMQ_URI,
+      RascalConfigServices.CommonwealthService,
+    ),
+  );
+  await rmqAdapter.init();
+  broker({ adapter: rmqAdapter });
+  const pgClient = await bootstrapRelayer(maxRelayIterations);
   isServiceHealthy = true;
-  relayForever(maxRelayIterations).catch((err) => {
-    log.fatal(
-      'Unknown error fatal requires immediate attention. Restart REQUIRED!',
-      err,
-    );
-  });
-
   return pgClient;
 }
 

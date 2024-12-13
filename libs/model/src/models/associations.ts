@@ -35,9 +35,11 @@ export const buildAssociations = (db: DB) => {
     .withMany(db.XpLog, {
       foreignKey: 'user_id',
       onDelete: 'CASCADE',
+      asOne: 'user',
     })
     .withMany(db.XpLog, {
       foreignKey: 'creator_user_id',
+      asOne: 'creator',
     });
 
   db.Quest.withMany(db.QuestActionMeta, {
@@ -50,6 +52,7 @@ export const buildAssociations = (db: DB) => {
     onDelete: 'CASCADE',
   }).withMany(db.XpLog, {
     foreignKey: 'action_meta_id',
+    asOne: 'quest_action_meta',
   });
 
   db.Address.withMany(db.Thread, {
@@ -150,6 +153,10 @@ export const buildAssociations = (db: DB) => {
   db.ContestManager.withMany(db.Contest, {
     foreignKey: 'contest_address',
     asMany: 'contests',
+    onDelete: 'CASCADE',
+  }).withMany(db.ContestAction, {
+    foreignKey: 'contest_address',
+    onUpdate: 'CASCADE',
     onDelete: 'CASCADE',
   });
 

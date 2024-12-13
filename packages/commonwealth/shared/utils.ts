@@ -1,3 +1,4 @@
+import { PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
 import { Dec, IntPretty } from '@keplr-wallet/unit';
 import { isHex, isU8a } from '@polkadot/util';
 import {
@@ -25,7 +26,7 @@ export const slugifyPreserveDashes = (str: string): string => {
 // WARN: Using process.env to avoid webpack failures
 export const getCommunityUrl = (community: string): string => {
   return process.env.NODE_ENV === 'production'
-    ? `https://commonwealth.im/${community}`
+    ? `https://${PRODUCTION_DOMAIN}/${community}`
     : `http://localhost:8080/${community}`;
 };
 

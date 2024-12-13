@@ -1,4 +1,8 @@
-import { ChainBase, ChainNetwork } from '@hicommonwealth/shared';
+import {
+  ChainBase,
+  ChainNetwork,
+  PRODUCTION_DOMAIN,
+} from '@hicommonwealth/shared';
 import { useFlag } from 'hooks/useFlag';
 import { uuidv4 } from 'lib/util';
 import { useCommonNavigate } from 'navigation/helpers';
@@ -134,7 +138,7 @@ const getCreateContentMenuItems = (
                     `${
                       !isCustomDomain
                         ? window.location.origin
-                        : 'https://commonwealth.im'
+                        : `https://${PRODUCTION_DOMAIN}`
                     }`,
                   )}/discord-callback&response_type=code&scope=bot&state=${encodeURI(
                     JSON.stringify({
