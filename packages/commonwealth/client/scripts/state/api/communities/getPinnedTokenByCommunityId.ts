@@ -4,7 +4,7 @@ import { z } from 'zod';
 
 const FETCH_PINNED_TOKEN_STALE_TIME = 60 * 3_000; // 3 mins
 
-type UseFetchTokensProps = Omit<
+type UseGetPinnedTokensByCommunityIdProps = Omit<
   z.infer<typeof GetPinnedTokens.input>,
   'community_ids'
 > & {
@@ -12,11 +12,11 @@ type UseFetchTokensProps = Omit<
   enabled?: boolean;
 };
 
-const useGetPinnedTokenByCommunityId = ({
+const useGetPinnedTokensByCommunityId = ({
   community_ids,
   with_chain_node,
   enabled,
-}: UseFetchTokensProps) => {
+}: UseGetPinnedTokensByCommunityIdProps) => {
   return trpc.community.getPinnedTokens.useQuery(
     {
       community_ids: community_ids.join(','),
@@ -29,4 +29,4 @@ const useGetPinnedTokenByCommunityId = ({
   );
 };
 
-export default useGetPinnedTokenByCommunityId;
+export default useGetPinnedTokensByCommunityId;

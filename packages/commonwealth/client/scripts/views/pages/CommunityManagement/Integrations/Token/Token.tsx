@@ -49,7 +49,7 @@ const Token = () => {
   );
 
   return (
-    <section className="Stake">
+    <section className="Token">
       <div className="header">
         <div className="flex-row">
           <CWText type="h4">
