@@ -82,7 +82,7 @@ const defaultMeta = {
   },
   'twitter:image': {
     name: 'twitter:image',
-    content: `https://${PRODUCTION_DOMAIN}/img/brand_assets/summary_large_image.png`,
+    content: `https://${PRODUCTION_DOMAIN}/img/brand_assets/common-social.png`,
   },
   'og:type': {
     property: 'og:type',
@@ -106,7 +106,7 @@ const defaultMeta = {
   },
   'og:image': {
     property: 'og:image',
-    content: `https://${PRODUCTION_DOMAIN}/img/brand_assets/summary_large_image.png`,
+    content: `https://${PRODUCTION_DOMAIN}/img/brand_assets/common-social.png`,
   },
 } as const;
 
