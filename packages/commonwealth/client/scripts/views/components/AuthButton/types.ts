@@ -9,7 +9,9 @@ export type AuthSSOs =
   | 'x'
   | 'github'
   | 'apple'
-  | 'email';
+  | 'email'
+  | 'farcaster'
+  | 'SMS';
 export type CosmosWallets = 'keplr' | 'leap';
 export type SubstrateWallets = 'polkadot';
 export type SolanaWallets = 'phantom';

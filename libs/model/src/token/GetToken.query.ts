@@ -1,4 +1,4 @@
-import { InvalidState, type Query } from '@hicommonwealth/core';
+import { type Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
 import { z } from 'zod';
@@ -21,7 +21,7 @@ export function GetToken(): Query<typeof schemas.GetToken> {
       mustExist('Community', community);
 
       if (!community.namespace) {
-        throw new InvalidState('Community namespace is not set');
+        return null;
       }
 
       const sql = `
@@ -57,7 +57,7 @@ export function GetToken(): Query<typeof schemas.GetToken> {
         },
         type: QueryTypes.SELECT,
       });
-      if (!token || !Array.isArray(token) || token.length !== 1) return;
+      if (!token || !Array.isArray(token) || token.length !== 1) return null;
 
       return token[0];
     },

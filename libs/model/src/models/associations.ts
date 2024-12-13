@@ -11,7 +11,6 @@ export const buildAssociations = (db: DB) => {
       onDelete: 'CASCADE',
     })
     .withMany(db.Wallets)
-    .withMany(db.XpLog, { onDelete: 'CASCADE' })
     .withOne(db.ApiKey, {
       targetKey: 'id',
       onDelete: 'CASCADE',
@@ -32,6 +31,15 @@ export const buildAssociations = (db: DB) => {
       asOne: 'referee',
       onUpdate: 'CASCADE',
       onDelete: 'CASCADE',
+    })
+    .withMany(db.XpLog, {
+      foreignKey: 'user_id',
+      onDelete: 'CASCADE',
+      asOne: 'user',
+    })
+    .withMany(db.XpLog, {
+      foreignKey: 'creator_user_id',
+      asOne: 'creator',
     });
 
   db.Quest.withMany(db.QuestActionMeta, {
@@ -42,6 +50,9 @@ export const buildAssociations = (db: DB) => {
   db.QuestActionMeta.withMany(db.QuestAction, {
     onUpdate: 'CASCADE',
     onDelete: 'CASCADE',
+  }).withMany(db.XpLog, {
+    foreignKey: 'action_meta_id',
+    asOne: 'quest_action_meta',
   });
 
   db.Address.withMany(db.Thread, {
@@ -61,7 +72,11 @@ export const buildAssociations = (db: DB) => {
 
   db.ChainNode.withMany(db.Community)
     .withMany(db.EvmEventSource)
-    .withOne(db.LastProcessedEvmBlock);
+    .withOne(db.LastProcessedEvmBlock)
+    .withMany(db.Topic, {
+      onUpdate: 'CASCADE',
+      onDelete: 'SET NULL',
+    });
 
   db.ContractAbi.withMany(db.EvmEventSource, { foreignKey: 'abi_id' });
 
@@ -119,10 +134,7 @@ export const buildAssociations = (db: DB) => {
       onUpdate: 'CASCADE',
       onDelete: 'CASCADE',
     })
-    .withMany(db.ContestManager, {
-      onUpdate: 'NO ACTION',
-      onDelete: 'NO ACTION',
-    });
+    .withMany(db.ContestManager, {});
 
   db.Thread.withMany(db.Poll)
     .withMany(db.ContestAction, {
@@ -233,6 +245,5 @@ export const buildAssociations = (db: DB) => {
 
   db.Token.withMany(db.LaunchpadTrade, {
     foreignKey: 'token_address',
-    onDelete: 'NO ACTION',
   });
 };

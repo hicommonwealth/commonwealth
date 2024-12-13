@@ -88,7 +88,7 @@ const ContestPage = ({ contestAddress }: ContestPageProps) => {
               <Skeleton height={300} width="100%" />
               <Skeleton height={300} width="100%" />
             </>
-          ) : !farcasterCasts?.length ? (
+          ) : !farcasterCasts?.[0]?.replies?.length ? (
             <CWText>No entries for the contest yet</CWText>
           ) : (
             <>

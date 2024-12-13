@@ -21,6 +21,7 @@ import {
   CaretUp,
   ChatCenteredDots,
   ChatDots,
+  ChatText,
   Chats,
   Check,
   CheckCircle,
@@ -46,6 +47,7 @@ import {
   House,
   Image,
   ImageSquare,
+  Kanban,
   Lightbulb,
   Link,
   LinkBreak,
@@ -269,6 +271,7 @@ export const iconLookup = {
   star: Icons.CWStar,
   sun: Icons.CWSun,
   telegram: Icons.CWTelegram,
+  tiktok: Icons.CWTiktok,
   trophy: withPhosphorIcon(Trophy),
   timer: withPhosphorIcon(Timer),
   transfer: Icons.CWTransfer,
@@ -295,6 +298,7 @@ export const iconLookup = {
   copySimple: withPhosphorIcon(CopySimple),
   viewAll: withPhosphorIcon(Rows),
   viewOverView: withPhosphorIcon(CirclesFour),
+  kanban: withPhosphorIcon(Kanban),
 };
 
 export const customIconLookup = {
@@ -324,6 +328,8 @@ export const customIconLookup = {
   coinbase: CustomIcons.CWCoinbase,
   x: CustomIcons.CWX, // twitter
   apple: CustomIcons.CWApple,
+  farcaster: CustomIcons.CWFarcaster,
+  SMS: withPhosphorIcon(ChatText),
 };
 
 export type IconName = keyof typeof iconLookup;

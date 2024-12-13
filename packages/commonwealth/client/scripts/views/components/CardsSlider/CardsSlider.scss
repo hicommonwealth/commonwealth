@@ -12,6 +12,9 @@
     display: flex;
     gap: 16px;
     flex-direction: column;
+    padding: 12px;
+    border-radius: 10px;
+    background-color: $primary-50;
 
     @include extraSmall {
       padding-top: 16px;
@@ -44,6 +47,11 @@
       gap: 16px;
       width: 100%;
       padding-bottom: 8px;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      ::-webkit-scrollbar {
+        display: none;
+      }
     }
   }
 

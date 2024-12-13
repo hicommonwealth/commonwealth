@@ -1,47 +1,42 @@
 import { dispose } from '@hicommonwealth/core';
-import { ContractAbiInstance, models, tester } from '@hicommonwealth/model';
-import sinon from 'sinon';
+import { ContractAbiInstance, models } from '@hicommonwealth/model';
 import {
+  Mock,
   afterAll,
   afterEach,
-  beforeAll,
   beforeEach,
   describe,
   expect,
   test,
+  vi,
 } from 'vitest';
 import { scheduleNodeProcessing } from '../../../server/workers/evmChainEvents/nodeProcessing';
 import { createAdditionalEventSources, createEventSources } from './util';
 
 describe('scheduleNodeProcessing', () => {
-  const sandbox = sinon.createSandbox();
-  let processChainStub: sinon.SinonSpy;
-  let clock: sinon.SinonFakeTimers;
+  let processChainStub: Mock;
   let singleSourceSuccess = false;
   let namespaceAbiInstance: ContractAbiInstance;
   let stakesAbiInstance: ContractAbiInstance;
-
-  beforeAll(async () => {
-    await tester.bootstrap_testing();
-  });
 
   afterAll(async () => {
     await dispose()();
   });
 
   beforeEach(() => {
-    processChainStub = sandbox.stub();
-    clock = sandbox.useFakeTimers();
+    vi.clearAllMocks();
+    processChainStub = vi.fn();
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
-    sandbox.restore();
+    vi.useRealTimers();
   });
 
   test('should not schedule anything if there are no event sources', async () => {
     await scheduleNodeProcessing(models, 1000, processChainStub);
-    clock.tick(1001);
-    expect(processChainStub.called).to.be.false;
+    vi.advanceTimersByTime(1000);
+    expect(processChainStub).not.toHaveBeenCalled();
   });
 
   test('should schedule processing for a single source', async () => {
@@ -52,10 +47,10 @@ describe('scheduleNodeProcessing', () => {
     const interval = 10_000;
     await scheduleNodeProcessing(models, interval, processChainStub);
 
-    expect(processChainStub.calledOnce).to.be.false;
+    expect(processChainStub).not.toHaveBeenCalledOnce();
 
-    clock.tick(1);
-    expect(processChainStub.calledOnce).to.be.true;
+    vi.advanceTimersByTime(1);
+    expect(processChainStub).toHaveBeenCalledOnce();
     singleSourceSuccess = true;
   });
 
@@ -69,11 +64,10 @@ describe('scheduleNodeProcessing', () => {
     const interval = 10_000;
     await scheduleNodeProcessing(models, interval, processChainStub);
 
-    expect(processChainStub.calledOnce).to.be.false;
-    clock.tick(1);
-    expect(processChainStub.calledOnce).to.be.true;
-
-    clock.tick(interval / 2);
-    expect(processChainStub.calledTwice).to.be.true;
+    expect(processChainStub).not.toHaveBeenCalledOnce();
+    vi.advanceTimersByTime(1);
+    expect(processChainStub).toHaveBeenCalledOnce();
+    vi.advanceTimersByTime(interval / 2);
+    expect(processChainStub).toHaveBeenCalledTimes(2);
   });
 });

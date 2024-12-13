@@ -4,7 +4,7 @@ import {
   ThreadInstance,
   UserAttributes,
 } from '@hicommonwealth/model';
-import { getThreadUrl } from '@hicommonwealth/shared';
+import { getThreadUrl, PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
 import { Op } from 'sequelize';
 
 export interface Link {
@@ -112,7 +112,7 @@ function createProfilesTableAdapter(): TableAdapter {
       return undefined;
     }
 
-    const url = `https://commonwealth.im/profile/id/${user.id}`;
+    const url = `https://${PRODUCTION_DOMAIN}/profile/id/${user.id}`;
     return {
       id: user.id,
       url,

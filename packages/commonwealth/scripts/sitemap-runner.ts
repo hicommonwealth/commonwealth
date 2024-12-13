@@ -1,5 +1,6 @@
 import { HotShotsStats, S3BlobStorage } from '@hicommonwealth/adapters';
 import { blobStorage, dispose, logger, stats } from '@hicommonwealth/core';
+import { PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
 import {
   createDatabasePaginatorDefault,
   createSitemapGenerator,
@@ -33,10 +34,12 @@ async function doExec() {
   log.info('Creating paginator... ');
   const paginator = createDatabasePaginatorDefault();
 
-  const { index } = await createSitemapGenerator([
-    paginator.threads,
-    paginator.profiles,
-  ]).exec();
+  const hostname = `sitemap.${PRODUCTION_DOMAIN}`;
+
+  const { index } = await createSitemapGenerator(
+    [paginator.threads, paginator.profiles],
+    hostname,
+  ).exec();
 
   log.info('Sitemap written to: ' + index.location);
 }

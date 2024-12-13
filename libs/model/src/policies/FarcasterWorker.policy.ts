@@ -1,4 +1,5 @@
-import { events, logger, Policy } from '@hicommonwealth/core';
+import { logger, Policy } from '@hicommonwealth/core';
+import { events } from '@hicommonwealth/schemas';
 import { NeynarAPIClient } from '@neynar/nodejs-sdk';
 import { Op } from 'sequelize';
 import { config, models } from '..';
@@ -117,7 +118,7 @@ export function FarcasterWorker(): Policy<typeof inputs> {
           {
             include: [
               {
-                model: models.ChainNode,
+                model: models.ChainNode.scope('withPrivateData'),
                 required: false,
               },
             ],
@@ -189,7 +190,7 @@ export function FarcasterWorker(): Policy<typeof inputs> {
           {
             include: [
               {
-                model: models.ChainNode,
+                model: models.ChainNode.scope('withPrivateData'),
                 required: false,
               },
             ],
@@ -198,7 +199,7 @@ export function FarcasterWorker(): Policy<typeof inputs> {
         mustExist('Community with Chain Node', community?.ChainNode);
 
         const contestManagers = contestActions.map((ca) => ({
-          url: community.ChainNode!.url! || community.ChainNode!.private_url!,
+          url: community.ChainNode!.private_url! || community.ChainNode!.url!,
           contest_address: contestManager.contest_address,
           content_id: ca.content_id,
         }));

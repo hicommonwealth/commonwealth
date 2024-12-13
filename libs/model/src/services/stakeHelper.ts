@@ -1,9 +1,9 @@
 import { InvalidState } from '@hicommonwealth/core';
 import { commonProtocol } from '@hicommonwealth/evm-protocols';
 import { TopicWeightedVoting } from '@hicommonwealth/schemas';
-import { BalanceSourceType } from '@hicommonwealth/shared';
+import { BalanceSourceType, ZERO_ADDRESS } from '@hicommonwealth/shared';
 import { BigNumber } from 'ethers';
-import { tokenBalanceCache } from '.';
+import { GetBalancesOptions, tokenBalanceCache } from '.';
 import { config } from '../config';
 import { models } from '../database';
 import { mustExist } from '../middleware/guards';
@@ -40,6 +40,10 @@ export async function getVotingWeight(
           },
         ],
       },
+      {
+        model: models.ChainNode.scope('withPrivateData'),
+        required: false,
+      },
     ],
   });
   mustExist('Topic', topic);
@@ -47,10 +51,10 @@ export async function getVotingWeight(
   const { community } = topic;
   mustExist('Community', community);
 
-  const chain_node = community.ChainNode;
+  const namespaceChainNode = community.ChainNode;
 
   if (topic.weighted_voting === TopicWeightedVoting.Stake) {
-    mustExist('Chain Node Eth Chain Id', chain_node?.eth_chain_id);
+    mustExist('Chain Node Eth Chain Id', namespaceChainNode?.eth_chain_id);
     mustExist('Community Namespace Address', community.namespace_address);
 
     const stake = topic.community?.CommunityStakes?.at(0);
@@ -59,7 +63,7 @@ export async function getVotingWeight(
     const stakeBalances = await contractHelpers.getNamespaceBalance(
       community.namespace_address,
       stake.stake_id,
-      chain_node.eth_chain_id,
+      namespaceChainNode.eth_chain_id,
       [address],
     );
     const stakeBalance = stakeBalances[address];
@@ -68,23 +72,39 @@ export async function getVotingWeight(
 
     return commonProtocol.calculateVoteWeight(stakeBalance, stake.vote_weight);
   } else if (topic.weighted_voting === TopicWeightedVoting.ERC20) {
-    mustExist('Chain Node Eth Chain Id', chain_node?.eth_chain_id);
-    const chainNodeUrl = chain_node!.private_url! || chain_node!.url!;
+    // if topic chain node is missing, fallback on community chain node
+    const chainNode = topic.ChainNode || community.ChainNode!;
+    const { eth_chain_id, private_url, url } = chainNode;
+    mustExist('Chain Node Eth Chain Id', eth_chain_id);
+    const chainNodeUrl = private_url! || url!;
     mustExist('Chain Node URL', chainNodeUrl);
+    mustExist('Topic Token Address', topic.token_address);
 
-    const balances = await tokenBalanceCache.getBalances({
-      balanceSourceType: BalanceSourceType.ERC20,
-      addresses: [address],
-      sourceOptions: {
-        evmChainId: chain_node.eth_chain_id,
-        contractAddress: topic.token_address!,
-      },
-      cacheRefresh: true,
-    });
+    const balanceOptions: GetBalancesOptions =
+      topic.token_address == ZERO_ADDRESS
+        ? {
+            balanceSourceType: BalanceSourceType.ETHNative,
+            addresses: [address],
+            sourceOptions: {
+              evmChainId: eth_chain_id,
+            },
+          }
+        : {
+            balanceSourceType: BalanceSourceType.ERC20,
+            addresses: [address],
+            sourceOptions: {
+              evmChainId: eth_chain_id,
+              contractAddress: topic.token_address,
+            },
+          };
+
+    balanceOptions.cacheRefresh = true;
+
+    const balances = await tokenBalanceCache.getBalances(balanceOptions);
 
     const tokenBalance = balances[address];
 
-    if (BigNumber.from(tokenBalance).lte(0))
+    if (BigNumber.from(tokenBalance || 0).lte(0))
       throw new InvalidState('Insufficient token balance');
 
     const result = commonProtocol.calculateVoteWeight(
@@ -99,7 +119,12 @@ export async function getVotingWeight(
     );
 
     // only count full ERC20 tokens
-    return result?.div(BigNumber.from(10).pow(decimals)) || null;
+    const numFullTokens = result?.div(BigNumber.from(10).pow(decimals)) || null;
+    if (!numFullTokens || numFullTokens.isZero()) {
+      // if the weighted value is not at least a full token, reject the action
+      throw new InvalidState('Insufficient token balance');
+    }
+    return numFullTokens;
   }
 
   // no weighted voting

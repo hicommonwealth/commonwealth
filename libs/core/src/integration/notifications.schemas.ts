@@ -1,5 +1,5 @@
+import { events } from '@hicommonwealth/schemas';
 import { z } from 'zod';
-import * as events from './events.schemas';
 
 /**
  * Schema descriptions in this file are intentionally verbose as they are
