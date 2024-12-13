@@ -52,7 +52,7 @@ export const useHandleInviteLink = ({
 
         setLocalStorageRefcode(refcode);
         removeRefcodeFromUrl();
-        handleJoinCommunity();
+        handleJoinCommunity().catch(console.error);
       }
     } else {
       if (generalInviteRoute) {
