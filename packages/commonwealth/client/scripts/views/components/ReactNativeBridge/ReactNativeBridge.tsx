@@ -54,7 +54,7 @@ export const ReactNativeBridge = () => {
         knockJWT: user.knockJWT,
       });
     }
-  }, [user.id, userInfo?.userId]);
+  }, [user.id, user.knockJWT, userInfo?.userId]);
 
   useEffect(() => {
     const message: TypedData<UserInfo | null> = {
