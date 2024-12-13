@@ -236,20 +236,8 @@ export const config = configure(
           return true;
         }),
       APP_KEYS: z.object({
-        PRIVATE: z
-          .string()
-          .optional()
-          .refine(
-            (data) => !(target.APP_ENV === 'production' && !data),
-            'ALCHEMY_PRIVATE_APP_KEY is required in production',
-          ),
-        PUBLIC: z
-          .string()
-          .optional()
-          .refine(
-            (data) => !(target.APP_ENV === 'production' && !data),
-            'ALCHEMY_PUBLIC_APP_KEY is required in production',
-          ),
+        PRIVATE: z.string(),
+        PUBLIC: z.string(),
       }),
     }),
     SITEMAP: z.object({
