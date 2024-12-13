@@ -26,7 +26,6 @@ import threadsUsersCountAndAvatars from '../routes/threadsUsersCountAndAvatars';
 import updateBanner from '../routes/updateBanner';
 import updateEmail from '../routes/updateEmail';
 import updateSiteAdmin from '../routes/updateSiteAdmin';
-import verifyAddress from '../routes/verifyAddress';
 import viewComments from '../routes/viewComments';
 
 import setDefaultRole from '../routes/setDefaultRole';
@@ -155,12 +154,6 @@ function setupRouter(
   registerRoute(router, 'get', '/status', status.bind(this, models));
 
   // Creating and Managing Addresses
-  registerRoute(
-    router,
-    'post',
-    '/verifyAddress',
-    verifyAddress.bind(this, models),
-  );
   registerRoute(
     router,
     'post',

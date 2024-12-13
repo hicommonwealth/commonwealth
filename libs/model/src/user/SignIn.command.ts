@@ -102,12 +102,46 @@ export function SignIn(): Command<typeof schemas.SignIn> {
     auth: [],
     authStrategy: {
       name: 'custom',
-      userResolver: () => {
+      userResolver: async (req) => {
         // TODO: session/address verification step should be in auth strategy
         // - verify session signature
         // - verify address format and ownership
         // - SECURITY TEAM: this endpoint is only secured by this strategy, so we should stop attacks here
-        return Promise.resolve({ id: -1, email: '' });
+
+        // TODO: some of this should be in the auth strategy (verifyAddress removed from client)
+        // await verifyAddress(
+        //   community_id,
+        //   address,
+        //   wallet_id,
+        //   session,
+        //   req.user as User,
+        // );
+
+        // TODO: this should be called here
+        const user = { id: -1, email: '' };
+        return await new Promise((resolve, reject) => {
+          // passport login flow
+          req.login(user, (err) => {
+            if (err) {
+              // serverAnalyticsController.track(
+              //   {
+              //     event: MixpanelLoginEvent.LOGIN_FAILED,
+              //   },
+              //   req,
+              // );
+              reject(err);
+            } else {
+              // serverAnalyticsController.track(
+              //   {
+              //     event: MixpanelLoginEvent.LOGIN_COMPLETED,
+              //     userId: user.id,
+              //   },
+              //   req,
+              // );
+              resolve(user);
+            }
+          });
+        });
       },
     },
     body: async ({ payload }) => {

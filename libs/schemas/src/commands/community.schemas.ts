@@ -11,7 +11,6 @@ import {
 import { z } from 'zod';
 import { AuthContext, TopicContext } from '../context';
 import {
-  Address,
   Community,
   Group,
   PermissionEnum,
@@ -327,22 +326,5 @@ export const BanAddress = {
     address: z.string(),
   }),
   output: z.object({}),
-  context: AuthContext,
-};
-
-export const SignIn = {
-  input: z.object({
-    address: z.string(),
-    community_id: z.string(),
-    wallet_id: z.nativeEnum(WalletId),
-    block_info: z.string().nullish(),
-    session: z.string(),
-  }),
-  output: Address.extend({
-    community_base: z.nativeEnum(ChainBase),
-    community_ss58_prefix: z.number().nullish(),
-    newly_created: z.boolean(),
-    joined_community: z.boolean(),
-  }),
   context: AuthContext,
 };

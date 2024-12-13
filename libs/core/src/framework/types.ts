@@ -13,14 +13,17 @@ export const ExternalServiceUserIds = {
   K6: -2,
 } as const;
 
-export type AuthStrategies<T> =
+export type AuthStrategies<Request, Payload> =
   | {
       name: 'jwt' | 'authtoken';
       userId?: (typeof ExternalServiceUserIds)[keyof typeof ExternalServiceUserIds];
     }
   | {
       name: 'custom';
-      userResolver: (payload: T) => Promise<User | undefined>;
+      userResolver: (
+        req: Request,
+        payload: Payload,
+      ) => Promise<User | undefined>;
     };
 
 /**
@@ -165,7 +168,10 @@ export type Metadata<
   readonly auth: Handler<Input, Output, _Context>[];
   readonly body: Handler<Input, Output, _Context>;
   readonly secure?: boolean;
-  readonly authStrategy?: AuthStrategies<z.infer<Input>>;
+  readonly authStrategy?: AuthStrategies<
+    { login: (user: User, callback: (err: any) => void) => void },
+    z.infer<Input>
+  >;
 };
 
 /**

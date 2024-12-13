@@ -1,5 +1,4 @@
 export * from './BanAddress.command';
-export * from './CreateAddress.command';
 export * from './CreateCommunity.command';
 export * from './CreateGroup.command';
 export * from './CreateStakeTransaction.command';

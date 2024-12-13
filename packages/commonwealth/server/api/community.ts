@@ -4,7 +4,6 @@ import { Community, models } from '@hicommonwealth/model';
 import {
   MixpanelCommunityCreationEvent,
   MixpanelCommunityInteractionEvent,
-  MixpanelUserSignupEvent,
 } from '../../shared/analytics/types';
 
 export const trpcRouter = trpc.router({
@@ -129,17 +128,4 @@ export const trpcRouter = trpc.router({
     }),
   ]),
   banAddress: trpc.command(Community.BanAddress, trpc.Tag.Community),
-  createAddress: trpc.command(
-    Community.SignIn,
-    trpc.Tag.Community,
-    (_, output) =>
-      Promise.resolve(
-        output.joined_community
-          ? [
-              MixpanelUserSignupEvent.NEW_USER_SIGNUP,
-              { community_id: output.community_id },
-            ]
-          : undefined,
-      ),
-  ),
 });

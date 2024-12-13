@@ -1,11 +1,6 @@
-import { Session } from '@canvas-js/interfaces';
 import type { ChainBase, WalletId } from '@hicommonwealth/shared';
-import { serializeCanvas } from '@hicommonwealth/shared';
-import axios from 'axios';
 import type momentType from 'moment';
 import moment from 'moment';
-import { SERVER_URL } from 'state/api/config';
-import { userStore } from 'state/ui/user';
 import NewProfilesController from '../controllers/server/newProfiles';
 import { DISCOURAGED_NONREACTIVE_fetchProfilesByAddress } from '../state/api/profiles/fetchProfilesByAddress';
 import MinimumProfile from './MinimumProfile';
@@ -162,18 +157,6 @@ class Account {
 
   public setSessionPublicAddress(sessionPublicAddress: string) {
     this._sessionPublicAddress = sessionPublicAddress;
-  }
-
-  public async validate(session: Session) {
-    const params = {
-      address: this.address,
-      community_id: this.community.id,
-      jwt: userStore.getState().jwt,
-      session: serializeCanvas(session),
-      wallet_id: this.walletId,
-    };
-
-    return await axios.post(`${SERVER_URL}/verifyAddress`, params);
   }
 }
 

@@ -3,7 +3,6 @@ import {
   addressSwapper,
   ChainBase,
   DEFAULT_NAME,
-  serializeCanvas,
   verifySession,
   WalletSsoSource,
 } from '@hicommonwealth/shared';
@@ -32,10 +31,9 @@ import { Magic } from 'magic-sdk';
 import { useEffect, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import app, { initAppState } from 'state';
-import { useCreateAddressMutation } from 'state/api/communities/useCreateAddress';
 import { SERVER_URL } from 'state/api/config';
 import { DISCOURAGED_NONREACTIVE_fetchProfilesByAddress } from 'state/api/profiles/fetchProfilesByAddress';
-import { useUpdateUserMutation } from 'state/api/user';
+import { useSignIn, useUpdateUserMutation } from 'state/api/user';
 import useUserStore from 'state/ui/user';
 import {
   BaseMixpanelPayload,
@@ -98,7 +96,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
   });
 
   const { mutateAsync: updateUser } = useUpdateUserMutation();
-  const { createAddress } = useCreateAddressMutation();
+  const { signIn } = useSignIn();
 
   useEffect(() => {
     if (process.env.ETH_RPC === 'e2e-test') {
@@ -295,7 +293,11 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     if (app.activeChainId() && user.isLoggedIn) {
       // @ts-expect-error StrictNullChecks
       const session = await getSessionFromWallet(walletToUse);
-      await account.validate(session);
+      await signIn(session, {
+        community_id: account.community.id,
+        address: account.address,
+        wallet_id: account.walletId!,
+      });
       await onLogInWithAccount(account, true, newlyCreated);
       return;
     }
@@ -320,7 +322,11 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       try {
         // @ts-expect-error StrictNullChecks
         const session = await getSessionFromWallet(walletToUse);
-        await account.validate(session);
+        await signIn(session, {
+          community_id: account.community.id,
+          address: account.address,
+          wallet_id: account.walletId!,
+        });
         await onLogInWithAccount(account, true, newlyCreated);
       } catch (e) {
         notifyError(`Error verifying account`);
@@ -511,14 +517,13 @@ const useAuthentication = (props: UseAuthenticationProps) => {
         account: signingAccount,
         newlyCreated,
         joinedCommunity,
-      } = await createAddress(session, {
+      } = await signIn(session, {
         address,
         community_id: chainIdentifier,
         wallet_id: wallet.name,
         block_info: validationBlockInfo
           ? JSON.stringify(validationBlockInfo)
           : null,
-        session: serializeCanvas(session),
       });
 
       setIsNewlyCreated(newlyCreated);
@@ -553,17 +558,14 @@ const useAuthentication = (props: UseAuthenticationProps) => {
 
     // Start the create-user flow, so validationBlockInfo gets saved to the backend
     // This creates a new `Account` object with fields set up to be validated by verifyAddress.
-    const { account } = await createAddress(session, {
+    const { account } = await signIn(session, {
       address,
       community_id: chainIdentifier,
       wallet_id: wallet.name,
       block_info: validationBlockInfo
         ? JSON.stringify(validationBlockInfo)
         : null,
-      session: serializeCanvas(session),
     });
-
-    await account.validate(session);
     await verifySession(session);
     console.log('Started new session for', wallet.chain, chainIdentifier);
 

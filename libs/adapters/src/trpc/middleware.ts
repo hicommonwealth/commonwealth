@@ -20,7 +20,7 @@ type Metadata<Input extends ZodSchema, Output extends ZodSchema> = {
   readonly output: Output;
   auth: unknown[];
   secure?: boolean;
-  authStrategy?: AuthStrategies<z.infer<Input>>;
+  authStrategy?: AuthStrategies<Request, z.infer<Input>>;
 };
 
 const isSecure = <Input extends ZodSchema, Output extends ZodSchema>(
@@ -223,7 +223,7 @@ export const buildproc = <Input extends ZodSchema, Output extends ZodSchema>({
 const authenticate = async <Input extends ZodSchema>(
   req: Request,
   rawInput: z.infer<Input>,
-  authStrategy: AuthStrategies<Input> = { name: 'jwt' },
+  authStrategy: AuthStrategies<Request, Input> = { name: 'jwt' },
 ) => {
   // User is already authenticated. Authentication overridden at router level e.g. external-router.ts
   if (req.user) return;
@@ -246,7 +246,7 @@ const authenticate = async <Input extends ZodSchema>(
           throw new Error('Not authenticated');
       }
     } else if (authStrategy.name === 'custom') {
-      req.user = await authStrategy.userResolver(rawInput);
+      req.user = await authStrategy.userResolver(req, rawInput);
     } else {
       await passport.authenticate(authStrategy.name, { session: false });
     }

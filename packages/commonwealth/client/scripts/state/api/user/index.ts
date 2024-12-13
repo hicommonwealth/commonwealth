@@ -8,6 +8,7 @@ import useUpdateUserActiveCommunityMutation from './updateActiveCommunity';
 import useUpdateUserEmailMutation from './updateEmail';
 import useUpdateUserEmailSettingsMutation from './updateEmailSettings';
 import useUpdateUserMutation from './updateUser';
+import { useSignIn } from './useSignIn';
 
 export {
   useCreateApiKeyMutation,
@@ -16,6 +17,7 @@ export {
   useGetApiKeyQuery,
   useGetNewContent,
   useGetReferralLinkQuery,
+  useSignIn,
   useUpdateUserActiveCommunityMutation,
   useUpdateUserEmailMutation,
   useUpdateUserEmailSettingsMutation,
