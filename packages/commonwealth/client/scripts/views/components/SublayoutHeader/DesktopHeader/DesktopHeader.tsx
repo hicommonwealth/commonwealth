@@ -84,22 +84,24 @@ const DesktopHeader = ({ onMobile, onAuthModalOpen }: DesktopHeaderProps) => {
             })}
           >
             <CreateContentPopover />
-            <CWTooltip
-              content="About Common"
-              placement="bottom"
-              renderTrigger={(handleInteraction) => (
-                <CWButton
-                  buttonType="secondary"
-                  buttonHeight="sm"
-                  label="About"
-                  onClick={() =>
-                    window.open('https://landing.common.xyz', '_blank')
-                  }
-                  onMouseEnter={handleInteraction}
-                  onMouseLeave={handleInteraction}
-                />
-              )}
-            />
+            {!isWindowSmallInclusive() && (
+              <CWTooltip
+                content="About Common"
+                placement="bottom"
+                renderTrigger={(handleInteraction) => (
+                  <CWButton
+                    buttonType="secondary"
+                    buttonHeight="sm"
+                    label="About"
+                    onClick={() =>
+                      window.open('https://landing.common.xyz', '_blank')
+                    }
+                    onMouseEnter={handleInteraction}
+                    onMouseLeave={handleInteraction}
+                  />
+                )}
+              />
+            )}
             <CWTooltip
               content="Explore communities"
               placement="bottom"
