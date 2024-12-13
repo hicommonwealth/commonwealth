@@ -42,7 +42,7 @@ export const contestCard = frames(async (ctx) => {
     };
   }
 
-  if (!contestManager.ended) {
+  if (!contestManager.ended || contestManager.cancelled) {
     return {
       title: 'Contest Ended',
       image: (
