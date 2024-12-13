@@ -87,7 +87,7 @@ async function validateAddress(
 }
 
 /**
- * This may be called when:
+ * This may be called when: TODO: should we call this Login instead of CreateAddress?
  * - When logged in, to link a new address for an existing user
  *   - TODO: isn't this the same as JoinCommunity?
  * - When logged out, to create a new user by showing proof of an address
@@ -133,6 +133,9 @@ export function CreateAddress(): Command<typeof schemas.CreateAddress> {
       });
       // update address if not disowed
       if (existing && existing.user_id) {
+        // TODO: should we verify session here again?
+        // TODO: should we refresh the token all the time?
+        // TODO: how to handle replay attacks on this open endpoint?
         existing.verification_token = verification_token;
         existing.verification_token_expires = verification_token_expires;
         existing.last_active = new Date();
