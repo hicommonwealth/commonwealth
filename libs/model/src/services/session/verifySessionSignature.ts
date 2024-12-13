@@ -19,7 +19,6 @@ export const verifySessionSignature = async (
   session: Session,
   addr: AddressInstance,
   transaction: Transaction,
-  user_id?: number | null,
 ): Promise<AddressInstance> => {
   // Re-encode BOTH address if needed for substrate verification, to ensure matching
   // between stored address (re-encoded based on community joined at creation time)
@@ -56,13 +55,19 @@ export const verifySessionSignature = async (
   - IMPORTANT: this is the only place to create a new user (when using wallets)
   - NOTE: magic strategy is the other place (when using email)
   */
-  addr.user_id = user_id;
   if (!addr.user_id) {
     const existing = await models.Address.findOne({
       where: {
         address: addr.address,
         user_id: { [Sequelize.Op.ne]: null },
       },
+      include: [
+        {
+          model: models.User,
+          required: true,
+          attributes: ['id', 'email', 'profile'],
+        },
+      ],
     });
     // create new user if none found for this address
     if (!existing) {
@@ -72,6 +77,7 @@ export const verifySessionSignature = async (
       );
       if (!user) throw new Error('Failed to create user');
       addr.user_id = user.id;
+      addr.User = user;
       const updated = await addr.save({ transaction });
       await incrementProfileCount(addr.community_id!, user.id!, transaction);
       return updated;

@@ -298,6 +298,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
         address: account.address,
         wallet_id: account.walletId!,
       });
+      console.log('signIn onAccountVerified');
       await onLogInWithAccount(account, true, newlyCreated);
       return;
     }
@@ -327,6 +328,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
           address: account.address,
           wallet_id: account.walletId!,
         });
+        console.log('signIn onAccountVerified again');
         await onLogInWithAccount(account, true, newlyCreated);
       } catch (e) {
         notifyError(`Error verifying account`);
@@ -525,6 +527,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
           ? JSON.stringify(validationBlockInfo)
           : null,
       });
+      console.log('signIn onNormalWalletLogin');
 
       setIsNewlyCreated(newlyCreated);
       if (isMobile) {
@@ -557,7 +560,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     );
 
     // Start the create-user flow, so validationBlockInfo gets saved to the backend
-    // This creates a new `Account` object with fields set up to be validated by verifyAddress.
+    // This creates a new `Account` object
     const { account } = await signIn(session, {
       address,
       community_id: chainIdentifier,
@@ -566,6 +569,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
         ? JSON.stringify(validationBlockInfo)
         : null,
     });
+    console.log('signIn onSessionKeyRevalidation');
     await verifySession(session);
     console.log('Started new session for', wallet.chain, chainIdentifier);
 

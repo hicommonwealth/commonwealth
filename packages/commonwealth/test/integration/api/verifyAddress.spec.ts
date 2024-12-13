@@ -31,7 +31,7 @@ describe('Verify Address Routes', () => {
 
     const res = await chai.request
       .agent(server.app)
-      .post('/api/internal/CreateAddress')
+      .post('/api/internal/SignIn')
       .set('Accept', 'application/json')
       .send({
         address: walletAddress,
@@ -57,11 +57,11 @@ describe('Verify Address Routes', () => {
     await dispose()();
   });
 
-  describe('/verifyAddress', () => {
-    test('should create a new user with createAddress, verifyAddress', async () => {
+  describe('/signIn', () => {
+    test('should create a new user with signIn', async () => {
       const res = await chai.request
         .agent(server.app)
-        .post('/api/verifyAddress')
+        .post('/api/internal/SignIn')
         .set('Accept', 'application/json')
         .send({
           address: walletAddress,
@@ -71,11 +71,9 @@ describe('Verify Address Routes', () => {
           session: serializeCanvas(session),
         });
 
-      expect(res.body.status).to.be.equal('Success');
-      expect(res.body.result.user.email).to.be.equal(null);
-      expect(res.body.result.user.emailVerified).to.be.equal(null);
-      expect(res.body.result.address).to.be.equal(walletAddress);
-      expect(res.body.result.message).to.be.equal('Signed in');
+      expect(res.body.user.email).to.be.equal(null);
+      expect(res.body.user.emailVerified).to.be.equal(null);
+      expect(res.body.address).to.be.equal(walletAddress);
     });
 
     test('should fail to create a new user if session is for wrong address', async () => {
@@ -88,7 +86,7 @@ describe('Verify Address Routes', () => {
 
       const res = await chai.request
         .agent(server.app)
-        .post('/api/verifyAddress')
+        .post('/api/internal/SignIn')
         .set('Accept', 'application/json')
         .send({
           address: walletAddress,
@@ -110,7 +108,7 @@ describe('Verify Address Routes', () => {
 
       const res = await chai.request
         .agent(server.app)
-        .post('/api/verifyAddress')
+        .post('/api/internal/SignIn')
         .set('Accept', 'application/json')
         .send({
           address: walletAddress,

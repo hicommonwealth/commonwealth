@@ -34,6 +34,12 @@ export function useSignIn() {
       walletId: address.wallet_id!,
       validationBlockInfo: address.block_info ?? undefined,
       ignoreProfile: false,
+      signedInProfile: {
+        userId: address.user_id!,
+        name: address.User?.profile?.name ?? undefined,
+        avatarUrl: address.User?.profile?.avatar_url ?? undefined,
+        lastActive: new Date(address.last_active!),
+      },
     });
     return {
       account,

@@ -278,7 +278,7 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
 
     let res = await chai.request
       .agent(app)
-      .post('/api/internal/CreateAddress')
+      .post('/api/internal/SignIn')
       .set('Accept', 'application/json')
       .set('address', walletAddress)
       .send({
@@ -290,21 +290,8 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
       });
 
     const address_id = res.body.id;
-
-    res = await chai.request
-      .agent(app)
-      .post('/api/verifyAddress')
-      .set('Accept', 'application/json')
-      .send({
-        address: walletAddress,
-        community_id: chain,
-        // @ts-expect-error <StrictNullChecks>
-        chain_id,
-        wallet_id,
-        session: serializeCanvas(session),
-      });
-    const user_id = res.body.result.user.id;
-    const email = res.body.result.user.email;
+    const user_id = res.body.user.id;
+    const email = res.body.user.email;
     return {
       address_id,
       address: session.did.split(':')[4],

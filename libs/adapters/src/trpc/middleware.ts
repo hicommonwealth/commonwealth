@@ -20,7 +20,7 @@ type Metadata<Input extends ZodSchema, Output extends ZodSchema> = {
   readonly output: Output;
   auth: unknown[];
   secure?: boolean;
-  authStrategy?: AuthStrategies<Request, z.infer<Input>>;
+  authStrategy?: AuthStrategies<Input>;
 };
 
 const isSecure = <Input extends ZodSchema, Output extends ZodSchema>(
@@ -152,6 +152,45 @@ export type BuildProcOptions<
   forceSecure?: boolean;
 };
 
+const authenticate = async <Input extends ZodSchema>(
+  req: Request,
+  rawInput: z.infer<Input>,
+  authStrategy: AuthStrategies<Input> = { type: 'jwt' },
+) => {
+  // User is already authenticated. Authentication overridden at router level e.g. external-router.ts
+  if (req.user) return;
+  try {
+    if (authStrategy.type === 'authtoken') {
+      switch (req.headers['authorization']) {
+        case config.NOTIFICATIONS.KNOCK_AUTH_TOKEN:
+          req.user = {
+            id: authStrategy.userId,
+            email: 'hello@knock.app',
+          };
+          break;
+        case config.LOAD_TESTING.AUTH_TOKEN:
+          req.user = {
+            id: authStrategy.userId,
+            email: 'info@grafana.com',
+          };
+          break;
+        default:
+          throw new Error('Not authenticated');
+      }
+    } else if (authStrategy.type === 'custom') {
+      req.user = await authStrategy.userResolver(rawInput);
+    } else {
+      await passport.authenticate(authStrategy.type, { session: false });
+    }
+    if (!req.user) throw new Error('Not authenticated');
+  } catch (error) {
+    throw new TRPCError({
+      message: error instanceof Error ? error.message : (error as string),
+      code: 'UNAUTHORIZED',
+    });
+  }
+};
+
 /**
  * tRPC procedure factory with authentication, traffic stats, and analytics middleware
  */
@@ -182,6 +221,23 @@ export const buildproc = <Input extends ZodSchema, Output extends ZodSchema>({
       const start = Date.now();
       const result = await next();
       const latency = Date.now() - start;
+
+      // TODO: this is a Friday night hack, let's rethink output middleware
+      if (
+        md.authStrategy?.type === 'custom' &&
+        md.authStrategy?.name === 'SignIn' &&
+        result.ok &&
+        result.data
+      ) {
+        const data = result.data as z.infer<typeof md.output>;
+        await new Promise((resolve, reject) => {
+          ctx.req.login(data.User, (err) => {
+            if (err) reject(err);
+            resolve(true);
+          });
+        });
+      }
+
       try {
         const path = `${ctx.req.method.toUpperCase()} ${ctx.req.path}`;
         stats().increment('cw.path.called', { path });
@@ -218,43 +274,4 @@ export const buildproc = <Input extends ZodSchema, Output extends ZodSchema>({
     })
     .input(md.input)
     .output(md.output);
-};
-
-const authenticate = async <Input extends ZodSchema>(
-  req: Request,
-  rawInput: z.infer<Input>,
-  authStrategy: AuthStrategies<Request, Input> = { name: 'jwt' },
-) => {
-  // User is already authenticated. Authentication overridden at router level e.g. external-router.ts
-  if (req.user) return;
-  try {
-    if (authStrategy.name === 'authtoken') {
-      switch (req.headers['authorization']) {
-        case config.NOTIFICATIONS.KNOCK_AUTH_TOKEN:
-          req.user = {
-            id: authStrategy.userId,
-            email: 'hello@knock.app',
-          };
-          break;
-        case config.LOAD_TESTING.AUTH_TOKEN:
-          req.user = {
-            id: authStrategy.userId,
-            email: 'info@grafana.com',
-          };
-          break;
-        default:
-          throw new Error('Not authenticated');
-      }
-    } else if (authStrategy.name === 'custom') {
-      req.user = await authStrategy.userResolver(req, rawInput);
-    } else {
-      await passport.authenticate(authStrategy.name, { session: false });
-    }
-    if (!req.user) throw new Error('Not authenticated');
-  } catch (error) {
-    throw new TRPCError({
-      message: error instanceof Error ? error.message : (error as string),
-      code: 'UNAUTHORIZED',
-    });
-  }
 };

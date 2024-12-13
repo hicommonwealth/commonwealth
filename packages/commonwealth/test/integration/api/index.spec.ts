@@ -44,7 +44,7 @@ describe('API Tests', () => {
       const wallet_id = 'metamask';
       const res = await chai
         .request(server.app)
-        .post('/api/internal/CreateAddress')
+        .post('/api/internal/SignIn')
         .set('Accept', 'application/json')
         .set('address', address)
         .send({
@@ -68,7 +68,7 @@ describe('API Tests', () => {
       const wallet_id = 'keplr';
       const res = await chai
         .request(server.app)
-        .post('/api/internal/CreateAddress')
+        .post('/api/internal/SignIn')
         .set('Accept', 'application/json')
         .set('address', address)
         .send({
@@ -97,7 +97,7 @@ describe('API Tests', () => {
       const wallet_id = 'metamask';
       let res = await chai
         .request(server.app)
-        .post('/api/internal/CreateAddress')
+        .post('/api/internal/SignIn')
         .set('Accept', 'application/json')
         .set('address', address)
         .send({
@@ -107,21 +107,8 @@ describe('API Tests', () => {
           block_info: TEST_BLOCK_INFO_STRING,
           session: serializeCanvas(session),
         });
-      res = await chai
-        .request(server.app)
-        .post('/api/verifyAddress')
-        .set('Accept', 'application/json')
-        .send({
-          address,
-          community_id,
-          wallet_id,
-          session: serializeCanvas(session),
-        });
       expect(res.body).to.not.be.null;
-      expect(res.body.status).to.equal('Success');
-      expect(res.body.result).to.be.not.null;
-      expect(res.body.result.user).to.be.not.null;
-      expect(res.body.result.message).to.be.equal('Signed in');
+      expect(res.body.user).to.be.not.null;
     });
   });
 });

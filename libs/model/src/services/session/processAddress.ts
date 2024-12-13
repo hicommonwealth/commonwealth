@@ -1,20 +1,10 @@
-import { type Session } from '@canvas-js/interfaces';
-import {
-  InvalidInput,
-  InvalidState,
-  logger,
-  type User,
-} from '@hicommonwealth/core';
-import {
-  DynamicTemplate,
-  PRODUCTION_DOMAIN,
-  WalletId,
-} from '@hicommonwealth/shared';
+import { InvalidState, logger } from '@hicommonwealth/core';
+import * as schemas from '@hicommonwealth/schemas';
+import { DynamicTemplate, PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
 import sgMail from '@sendgrid/mail';
 import { Op, Transaction } from 'sequelize';
-import { models, sequelize } from '../../database';
-import { AddressInstance, CommunityInstance } from '../../models';
-import { verifySessionSignature } from './verifySessionSignature';
+import { z } from 'zod';
+import { models } from '../../database';
 
 const log = logger(import.meta);
 
@@ -35,9 +25,9 @@ export const Errors = {
 /**
  * After verification, reassign users of transferred addresses = "transfer ownership".
  */
-async function transferOwnership(
-  addr: AddressInstance,
-  community: CommunityInstance,
+export async function transferOwnership(
+  addr: z.infer<typeof schemas.Address>,
+  community: z.infer<typeof schemas.Community>,
   transaction: Transaction,
 ) {
   const unverifed = await models.Address.findOne({
@@ -92,56 +82,57 @@ async function transferOwnership(
   }
 }
 
-/**
- * Processes an address, verifying the session signature and transferring ownership
- * to the user if necessary.
- * @param community community instance
- * @param address address to verify
- * @param wallet_id wallet id
- * @param session session to verify
- * @param user user to assign ownership to
- * @returns updated address instance
- */
-export async function processAddress(
-  community: CommunityInstance,
-  address: string,
-  wallet_id: WalletId,
-  session: Session,
-  user?: User,
-): Promise<AddressInstance> {
-  const addr = await models.Address.scope('withPrivateData').findOne({
-    where: { community_id: community.id, address },
-    include: [
-      {
-        model: models.Community,
-        required: true,
-        attributes: ['ss58_prefix'],
-      },
-    ],
-  });
-  if (!addr) throw new InvalidInput(Errors.AddressNF);
-  if (addr.wallet_id !== wallet_id) throw new InvalidInput(Errors.WrongWallet);
-  // check whether the token has expired
-  // (certain login methods e.g. jwt have no expiration token, so we skip the check in that case)
-  const expiration = addr.verification_token_expires;
-  if (expiration && +expiration <= +new Date())
-    throw new InvalidInput(Errors.ExpiredToken);
+// TODO: this can be deprecated since it's implemented in the signin command
+// /**
+//  * Processes an address, verifying the session signature and transferring ownership
+//  * to the user if necessary.
+//  * @param community community instance
+//  * @param address address to verify
+//  * @param wallet_id wallet id
+//  * @param session session to verify
+//  * @param user user to assign ownership to
+//  * @returns updated address instance
+//  */
+// export async function processAddress(
+//   community: z.infer<typeof schemas.Community>,
+//   address: string,
+//   wallet_id: WalletId,
+//   session: Session,
+//   user?: User,
+// ): Promise<z.infer<typeof schemas.Address>> {
+//   const addr = await models.Address.scope('withPrivateData').findOne({
+//     where: { community_id: community.id, address },
+//     include: [
+//       {
+//         model: models.Community,
+//         required: true,
+//         attributes: ['ss58_prefix'],
+//       },
+//     ],
+//   });
+//   if (!addr) throw new InvalidInput(Errors.AddressNF);
+//   if (addr.wallet_id !== wallet_id) throw new InvalidInput(Errors.WrongWallet);
+//   // check whether the token has expired
+//   // (certain login methods e.g. jwt have no expiration token, so we skip the check in that case)
+//   const expiration = addr.verification_token_expires;
+//   if (expiration && +expiration <= +new Date())
+//     throw new InvalidInput(Errors.ExpiredToken);
 
-  // Verify the signature matches the session information = verify ownership
-  // IMPORTANT: A new user is created if none exists for this address!
-  try {
-    return await sequelize.transaction(async (transaction) => {
-      const updated = await verifySessionSignature(
-        session,
-        addr,
-        transaction,
-        user?.id,
-      );
-      await transferOwnership(updated, community, transaction);
-      return updated;
-    });
-  } catch {
-    log.warn(`Failed to verify signature for ${address}`);
-    throw new InvalidInput(Errors.InvalidSignature);
-  }
-}
+//   // Verify the signature matches the session information = verify ownership
+//   // IMPORTANT: A new user is created if none exists for this address!
+//   try {
+//     return await sequelize.transaction(async (transaction) => {
+//       const updated = await verifySessionSignature(
+//         session,
+//         addr,
+//         transaction,
+//         user?.id,
+//       );
+//       await transferOwnership(updated, community, transaction);
+//       return updated.toJSON();
+//     });
+//   } catch {
+//     log.warn(`Failed to verify signature for ${address}`);
+//     throw new InvalidInput(Errors.InvalidSignature);
+//   }
+// }

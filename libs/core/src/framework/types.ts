@@ -13,17 +13,15 @@ export const ExternalServiceUserIds = {
   K6: -2,
 } as const;
 
-export type AuthStrategies<Request, Payload> =
+export type AuthStrategies<Input extends ZodSchema> =
   | {
-      name: 'jwt' | 'authtoken';
+      type: 'jwt' | 'authtoken';
       userId?: (typeof ExternalServiceUserIds)[keyof typeof ExternalServiceUserIds];
     }
   | {
-      name: 'custom';
-      userResolver: (
-        req: Request,
-        payload: Payload,
-      ) => Promise<User | undefined>;
+      type: 'custom';
+      name: string;
+      userResolver: (payload: z.infer<Input>) => Promise<User>;
     };
 
 /**
@@ -168,10 +166,7 @@ export type Metadata<
   readonly auth: Handler<Input, Output, _Context>[];
   readonly body: Handler<Input, Output, _Context>;
   readonly secure?: boolean;
-  readonly authStrategy?: AuthStrategies<
-    { login: (user: User, callback: (err: any) => void) => void },
-    z.infer<Input>
-  >;
+  readonly authStrategy?: AuthStrategies<Input>;
 };
 
 /**
