@@ -35,6 +35,7 @@ import {
 } from 'views/components/component_kit/new_designs/CWTabs';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import useAppStatus from '../../../../hooks/useAppStatus';
+import { PageNotFound } from '../../404';
 import './CommunityMembersPage.scss';
 import GroupsSection from './GroupsSection';
 import LeaderboardSection from './LeaderboardSection';
@@ -330,6 +331,10 @@ const CommunityMembersPage = () => {
   };
 
   const isAdmin = Permissions.isCommunityAdmin() || Permissions.isSiteAdmin();
+
+  if (!user.isLoggedIn || !isAdmin) {
+    return <PageNotFound />;
+  }
 
   const extraColumns = (member: Member) => {
     return {
