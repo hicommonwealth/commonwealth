@@ -276,7 +276,7 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
       await sessionSigner.newSession(CANVAS_TOPIC);
     const walletAddress = session.did.split(':')[4];
 
-    let res = await chai.request
+    const res = await chai.request
       .agent(app)
       .post('/api/internal/SignIn')
       .set('Accept', 'application/json')

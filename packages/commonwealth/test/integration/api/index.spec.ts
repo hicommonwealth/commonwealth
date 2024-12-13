@@ -95,7 +95,7 @@ describe('API Tests', () => {
 
       const community_id = 'ethereum';
       const wallet_id = 'metamask';
-      let res = await chai
+      const res = await chai
         .request(server.app)
         .post('/api/internal/SignIn')
         .set('Accept', 'application/json')
