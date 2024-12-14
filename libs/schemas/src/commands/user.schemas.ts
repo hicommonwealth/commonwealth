@@ -14,8 +14,19 @@ export const SignIn = {
   output: Address.extend({
     community_base: z.nativeEnum(ChainBase),
     community_ss58_prefix: z.number().nullish(),
-    newly_created: z.boolean(),
-    joined_community: z.boolean(),
+    user_created: z
+      .boolean()
+      .describe(
+        'True when a user is newly created for this address, equivalent to signing up',
+      ),
+    address_created: z
+      .boolean()
+      .describe(
+        'True when address is newly created, equivalent to joining a community',
+      ),
+    first_community: z
+      .boolean()
+      .describe('True when address joins the first community'),
   }),
   context: AuthContext,
 };

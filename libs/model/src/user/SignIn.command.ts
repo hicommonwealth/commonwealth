@@ -142,7 +142,7 @@ export function SignIn(): Command<typeof schemas.SignIn> {
       );
 
       // update or create address to sign it in
-      const { addr, newly_created, joined_community } =
+      const { addr, user_created, address_created, first_community } =
         await models.sequelize.transaction(async (transaction) => {
           const existing = await models.Address.scope(
             'withPrivateData',
@@ -158,6 +158,7 @@ export function SignIn(): Command<typeof schemas.SignIn> {
             transaction,
           });
           if (existing) {
+            // verify existing is equivalent to signing in
             if (existing.wallet_id !== wallet_id)
               throw new InvalidInput(SignInErrors.WrongWallet);
 
@@ -186,8 +187,9 @@ export function SignIn(): Command<typeof schemas.SignIn> {
             const updated = await verified.save({ transaction });
             return {
               addr: updated.toJSON(),
-              newly_created: false,
-              joined_community: false,
+              user_created: false,
+              address_created: false,
+              first_community: false,
             };
           }
 
@@ -217,8 +219,8 @@ export function SignIn(): Command<typeof schemas.SignIn> {
             transaction,
           );
 
-          // same address in different community?
-          const is_new = !(
+          // is same address found in a different community?
+          const is_first_community = !(
             !!existingWithHex ||
             (await models.Address.findOne({
               where: {
@@ -255,8 +257,9 @@ export function SignIn(): Command<typeof schemas.SignIn> {
               ...verified.toJSON(),
               User: verified.User ?? user?.toJSON(),
             },
-            newly_created: is_new,
-            joined_community: true,
+            user_created: user ? true : false,
+            address_created: true,
+            first_community: is_first_community,
           };
         });
 
@@ -264,8 +267,9 @@ export function SignIn(): Command<typeof schemas.SignIn> {
         ...addr,
         community_base: community!.base,
         community_ss58_prefix: community!.ss58_prefix,
-        newly_created,
-        joined_community,
+        user_created,
+        address_created,
+        first_community,
       };
     },
   };

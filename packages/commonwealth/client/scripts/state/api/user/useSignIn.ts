@@ -43,8 +43,8 @@ export function useSignIn() {
     });
     return {
       account,
-      newlyCreated: address.newly_created,
-      joinedCommunity: address.joined_community,
+      newlyCreated: address.first_community,
+      joinedCommunity: address.address_created,
     };
   };
 

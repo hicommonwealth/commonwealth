@@ -232,7 +232,10 @@ export const buildproc = <Input extends ZodSchema, Output extends ZodSchema>({
         const data = result.data as z.infer<typeof md.output>;
         await new Promise((resolve, reject) => {
           ctx.req.login(data.User, (err) => {
-            if (err) reject(err);
+            if (err) {
+              // TODO: track Mixpanel login failure
+              reject(err);
+            }
             resolve(true);
           });
         });

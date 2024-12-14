@@ -1,16 +1,25 @@
 import { trpc } from '@hicommonwealth/adapters';
 import { User } from '@hicommonwealth/model';
-import { MixpanelUserSignupEvent } from 'shared/analytics/types';
+import {
+  MixpanelLoginEvent,
+  MixpanelUserSignupEvent,
+} from 'shared/analytics/types';
 
 export const trpcRouter = trpc.router({
   signIn: trpc.command(User.SignIn, trpc.Tag.User, (_, output) =>
     Promise.resolve(
-      output.joined_community
+      output.user_created
         ? [
             MixpanelUserSignupEvent.NEW_USER_SIGNUP,
             { community_id: output.community_id },
           ]
-        : undefined,
+        : [
+            MixpanelLoginEvent.LOGIN_COMPLETED,
+            {
+              community_id: output.community_id,
+              userId: output.user_id,
+            },
+          ],
     ),
   ),
   updateUser: trpc.command(User.UpdateUser, trpc.Tag.User),

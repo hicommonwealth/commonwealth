@@ -71,8 +71,8 @@ describe('Verify Address Routes', () => {
           session: serializeCanvas(session),
         });
 
-      expect(res.body.user.email).to.be.equal(null);
-      expect(res.body.user.emailVerified).to.be.equal(null);
+      expect(res.body.User.profile.email).to.be.undefined;
+      expect(res.body.User.emailVerified).to.be.undefined;
       expect(res.body.address).to.be.equal(walletAddress);
     });
 
@@ -96,9 +96,9 @@ describe('Verify Address Routes', () => {
           session: serializeCanvas(altSession),
         });
 
-      expect(res.body.status).to.be.equal(400);
-      expect(res.body.error).to.be.equal(
-        'Invalid signature, please re-register',
+      expect(res.body.code).to.be.equal('INTERNAL_SERVER_ERROR');
+      expect(res.body.message).to.contain(
+        'does not match addressModel.address',
       );
     });
 
@@ -117,11 +117,10 @@ describe('Verify Address Routes', () => {
           wallet_id,
           session: serializeCanvas(altSession),
         });
+      console.log(res.body);
 
-      expect(res.body.status).to.be.equal(400);
-      expect(res.body.error).to.be.equal(
-        'Invalid signature, please re-register',
-      );
+      expect(res.body.code).to.be.equal('INTERNAL_SERVER_ERROR');
+      expect(res.body.message).to.contain(' invalid SIWE signature');
     });
   });
 });
