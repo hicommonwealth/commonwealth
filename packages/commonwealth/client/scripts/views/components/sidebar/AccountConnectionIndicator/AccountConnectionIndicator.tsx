@@ -2,12 +2,12 @@ import { useFlag } from 'client/scripts/hooks/useFlag';
 import AddressInfo from 'client/scripts/models/AddressInfo';
 import NewProfile from 'client/scripts/models/NewProfile';
 import { useFetchProfileByIdQuery } from 'client/scripts/state/api/profiles';
+import { AuthModalType } from 'client/scripts/views/modals/AuthModal';
 import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router';
 import { useInviteLinkModal } from 'state/ui/modals';
 import useUserStore from 'state/ui/user';
 import useJoinCommunity from 'views/components/SublayoutHeader/useJoinCommunity';
-import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { SharePopover } from '../../SharePopover';
 import { AddressList } from '../CommunitySection/AddressList';
@@ -16,11 +16,13 @@ import './AccountConnectionIndicator.scss';
 interface AccountConnectionIndicatorProps {
   connected: boolean;
   address: string;
+  onAuthModalOpen: (modalType?: AuthModalType) => void;
 }
 
 const AccountConnectionIndicator = ({
   connected,
   address,
+  onAuthModalOpen,
 }: AccountConnectionIndicatorProps) => {
   const [profile, setProfile] = useState<NewProfile>();
   const [addresses, setAddresses] = useState<AddressInfo[]>();
@@ -98,9 +100,6 @@ const AccountConnectionIndicator = ({
       <div className="AccountConnectionIndicator">
         {connected && (
           <div className="status-address">
-            <CWText fontWeight="medium" type="caption" className="status-text">
-              {connected ? 'Addresses' : 'Not connected'}
-            </CWText>
             <div className="status-row">
               <AddressList
                 address={address}
@@ -116,6 +115,7 @@ const AccountConnectionIndicator = ({
                     ),
                   });
                 }}
+                onAuthModalOpen={() => onAuthModalOpen()}
               />
             </div>
 

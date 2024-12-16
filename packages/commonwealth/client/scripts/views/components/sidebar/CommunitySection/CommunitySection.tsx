@@ -1,5 +1,7 @@
 import { TokenView } from '@hicommonwealth/schemas';
 import { PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
+import { useAuthModalStore } from 'client/scripts/state/ui/modals';
+import { AuthModalType } from 'client/scripts/views/modals/AuthModal';
 import { findDenominationString } from 'helpers/findDenomination';
 import { useFlag } from 'hooks/useFlag';
 import React from 'react';
@@ -39,6 +41,7 @@ interface CommunitySectionProps {
 
 export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
   const tokenizedCommunityEnabled = useFlag('tokenizedCommunity');
+  const { setAuthModalType } = useAuthModalStore();
 
   const user = useUserStore();
   const {
@@ -96,6 +99,9 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
             <AccountConnectionIndicator
               connected={!!user.activeAccount}
               address={user.activeAccount?.address || ''}
+              onAuthModalOpen={(modalType) =>
+                setAuthModalType(modalType || AuthModalType.SignIn)
+              }
             />
 
             {stakeEnabled && (
