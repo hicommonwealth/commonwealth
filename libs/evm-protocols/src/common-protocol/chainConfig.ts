@@ -63,18 +63,18 @@ export const factoryContracts = {
     chainId: 8453,
   },
   [ValidChains.Linea]: {
-    factory: '0xe3ae9569f4523161742414480f87967e991741bd',
-    communityStake: '0xcc752fd15a7dd0d5301b6a626316e7211352cf62',
+    factory: '0xE3AE9569f4523161742414480f87967e991741bd',
+    communityStake: '0xcc752fd15A7Dd0d5301b6A626316E7211352Cf62',
     chainId: 59144,
   },
   [ValidChains.Optimism]: {
-    factory: '0xe3ae9569f4523161742414480f87967e991741bd',
-    communityStake: '0xcc752fd15a7dd0d5301b6a626316e7211352cf62',
+    factory: '0xE3AE9569f4523161742414480f87967e991741bd',
+    communityStake: '0xcc752fd15A7Dd0d5301b6A626316E7211352Cf62',
     chainId: 10,
   },
   [ValidChains.Mainnet]: {
-    factory: '0x90aa47bf6e754f69ee53f05b5187b320e3118b0f',
-    communityStake: '0x9ed281e62db1b1d98af90106974891a4c1ca3a47',
+    factory: '0x90aa47bf6e754f69ee53F05b5187B320E3118B0f',
+    communityStake: '0x9ed281E62dB1b1d98aF90106974891a4c1cA3a47',
     chainId: 1,
   },
   [ValidChains.Arbitrum]: {
@@ -83,13 +83,13 @@ export const factoryContracts = {
     chainId: 42161,
   },
   [ValidChains.BSC]: {
-    factory: '0xe3ae9569f4523161742414480f87967e991741bd',
-    communityStake: '0xcc752fd15a7dd0d5301b6a626316e7211352cf62',
+    factory: '0xE3AE9569f4523161742414480f87967e991741bd',
+    communityStake: '0xcc752fd15A7Dd0d5301b6A626316E7211352Cf62',
     chainId: 56,
   },
   [ValidChains.SKALE_TEST]: {
-    factory: '0x16da329328d9816b5e68d96ec5944d939ed9727e',
-    communityStake: '0xc49eecf7af055c4dfa3e918662d9bbac45544bd6',
+    factory: '0x16da329328d9816b5e68D96Ec5944D939ed9727E',
+    communityStake: '0xC49eEcf7af055c4dfA3E918662D9BbAC45544BD6',
     chainId: 974399131,
   },
 } as const satisfies factoryContractsType;
