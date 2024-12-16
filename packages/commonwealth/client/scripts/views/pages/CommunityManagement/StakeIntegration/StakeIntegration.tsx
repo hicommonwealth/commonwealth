@@ -1,5 +1,6 @@
 import { commonProtocol } from '@hicommonwealth/evm-protocols';
 import { TopicWeightedVoting } from '@hicommonwealth/schemas';
+import Permissions from 'client/scripts/utils/Permissions';
 import clsx from 'clsx';
 import { notifyError } from 'controllers/app/notifications';
 import AddressInfo from 'models/AddressInfo';
@@ -47,6 +48,13 @@ const StakeIntegration = ({
     commonProtocol?.factoryContracts[app?.chain?.meta?.ChainNode?.eth_chain_id];
 
   if (!contractInfo) {
+    return <PageNotFound />;
+  }
+
+  if (
+    !user.isLoggedIn ||
+    !(Permissions.isSiteAdmin() || Permissions.isCommunityAdmin())
+  ) {
     return <PageNotFound />;
   }
 
