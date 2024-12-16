@@ -54,7 +54,9 @@ export const SharePopover = ({
           iconLeft: 'linkPhosphor',
           iconLeftSize: 'regular',
           label: 'Copy link',
-          onClick: handleCopy,
+          onClick: () => {
+            handleCopy().catch(console.error);
+          },
         },
         {
           iconLeft: 'twitterOutline',
