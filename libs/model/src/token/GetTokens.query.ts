@@ -4,7 +4,7 @@ import { QueryTypes } from 'sequelize';
 import { z } from 'zod';
 import { models } from '../database';
 
-export function GetTokens(): Query<typeof schemas.GetTokens> {
+export function GetLaunchpadTokens(): Query<typeof schemas.GetTokens> {
   return {
     ...schemas.GetTokens,
     auth: [],
@@ -66,7 +66,7 @@ export function GetTokens(): Query<typeof schemas.GetTokens> {
                  C.id as community_id,
                  ${includeStats ? 'trades.latest_price, trades.old_price,' : ''}
                          count(*) OVER () AS total
-          FROM "Tokens" as T
+          FROM "LaunchpadTokens" as T
               JOIN "Communities" as C
           ON T.namespace = C.namespace
               ${includeStats ? 'LEFT JOIN trades ON trades.token_address = T.token_address' : ''}
