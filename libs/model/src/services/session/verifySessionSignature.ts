@@ -8,7 +8,6 @@ import assert from 'assert';
 import Sequelize, { Transaction } from 'sequelize';
 import { models } from '../../database';
 import { AddressInstance, UserInstance } from '../../models';
-import { incrementProfileCount } from '../../utils';
 
 /**
  * Verifies that the session signature is valid for the address model
@@ -47,7 +46,7 @@ export const verifySessionSignature = async (
   await signer.verifySession(CANVAS_TOPIC, session);
 
   // mark the address as verified TODO: why are we setting expire to null?
-  addr.verification_token_expires = null;
+  // addr.verification_token_expires = null;
   addr.verified = new Date();
   addr.last_active = new Date();
 
@@ -78,7 +77,6 @@ export const verifySessionSignature = async (
       if (!user) throw new Error('Failed to create user');
       addr.user_id = user.id;
       const updated = await addr.save({ transaction });
-      await incrementProfileCount(addr.community_id!, user.id!, transaction);
       return { addr: updated, user };
     }
     addr.user_id = existing.user_id;
@@ -86,7 +84,5 @@ export const verifySessionSignature = async (
 
   // save the newly verified address
   const updated = await addr.save({ transaction });
-  // TODO: should we always increment the profile count?
-  await incrementProfileCount(addr.community_id!, addr.user_id!, transaction);
   return { addr: updated };
 };

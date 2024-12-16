@@ -53,7 +53,7 @@ export async function verifyAddress(
     };
 
   if (community.base === ChainBase.NEAR)
-    throw new InvalidInput('NEAR login not supported');
+    throw new InvalidInput('NEAR sign in not supported');
 
   if (community.base === ChainBase.Solana) {
     const { PublicKey } = await import('@solana/web3.js');

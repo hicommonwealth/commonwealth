@@ -1,9 +1,7 @@
 import { InvalidInput, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { deserializeCanvas } from '@hicommonwealth/shared';
-import crypto from 'crypto';
 import { Op } from 'sequelize';
-import { config } from '../config';
 import { models } from '../database';
 import {
   transferOwnership,
@@ -27,14 +25,12 @@ export const SignInErrors = {
  *
  * - When address-community link found in database:
  *   - Verifies existing address
- *     - same wallet
- *     - token is valid (not expired) TODO: refresh token
+ *     - same wallet?
  *     - session signature
  *   - Transfers ownership of unverified address links to user
  *
  *  - When address-community link not found in database:
- *   - Creates a new link to the community
- *     - TODO: same as JoinCommunity? redundant command?
+ *   - Creates a new link to the community with session/address verification (JoinCommunity is a secured route)
  *   - Verifies session signature (proof of address)
  *     - Creates a new user if none exists for this address
  */
@@ -50,22 +46,20 @@ export function SignIn(): Command<typeof schemas.SignIn> {
         const { community_id, address } = payload;
         // TODO: SECURITY TEAM: we should stop many attacks here!
         const auth = await verifyAddress(community_id, address.trim());
-        // await assertAddressOwnership(address); // TODO: remove this maintenance policy
         return { id: -1, email: '', auth };
       },
     },
     body: async ({ actor, payload }) => {
       if (!actor.user.auth) throw Error('Invalid address');
 
-      const { community_id, wallet_id, block_info, session, referral_link } =
-        payload;
+      const { community_id, wallet_id, session, referral_link } = payload;
       const { base, encodedAddress, ss58Prefix, hex, existingHexUserId } = actor
         .user.auth as VerifiedAddress;
 
-      const verification_token = crypto.randomBytes(18).toString('hex');
-      const verification_token_expires = new Date(
-        +new Date() + config.AUTH.ADDRESS_TOKEN_EXPIRES_IN * 60 * 1000,
-      );
+      // const verification_token = crypto.randomBytes(18).toString('hex');
+      // const verification_token_expires = new Date(
+      //   +new Date() + config.AUTH.ADDRESS_TOKEN_EXPIRES_IN * 60 * 1000,
+      // );
 
       // update or create address
       const { addr, user_created, address_created, first_community } =
@@ -84,6 +78,7 @@ export function SignIn(): Command<typeof schemas.SignIn> {
             transaction,
           });
           if (existing) {
+            // TODO: @timolegros - check if there are other rules involfing the wallet_id, otherwise remove this check
             // verify existing is equivalent to signing in
             if (existing.wallet_id !== wallet_id)
               throw new InvalidInput(SignInErrors.WrongWallet);
@@ -107,10 +102,11 @@ export function SignIn(): Command<typeof schemas.SignIn> {
             // if (expiration && +expiration <= +new Date())
             //  throw new InvalidInput(SignInErrors.ExpiredToken);
 
-            verified.verification_token = verification_token;
-            verified.verification_token_expires = verification_token_expires;
-            verified.last_active = new Date();
-            verified.block_info = block_info;
+            // verified.verification_token = verification_token;
+            // verified.verification_token_expires = verification_token_expires;
+            // verified.last_active = new Date();
+            // verified.block_info = block_info;
+
             verified.hex = hex;
             verified.wallet_id = wallet_id;
             const updated = await verified.save({ transaction });
@@ -149,9 +145,9 @@ export function SignIn(): Command<typeof schemas.SignIn> {
               community_id,
               address: encodedAddress,
               hex,
-              verification_token,
-              verification_token_expires,
-              block_info,
+              // verification_token,
+              // verification_token_expires,
+              // block_info,
               last_active: new Date(),
               wallet_id,
               role: 'member',

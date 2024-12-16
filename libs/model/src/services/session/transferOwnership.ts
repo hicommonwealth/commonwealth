@@ -19,6 +19,8 @@ export const Errors = {
 
 /**
  * Reassigns user to unverified addresses = "transfer ownership".
+ * TODO: @timolegros - check if we can transfer verified addresses, when user signs in with two different wallets (two users) and we want to
+ * consolidate them into one user.
  */
 export async function transferOwnership(
   addr: z.infer<typeof schemas.Address>,

@@ -8,7 +8,6 @@ export const SignIn = {
     address: z.string(),
     community_id: z.string(),
     wallet_id: z.nativeEnum(WalletId),
-    block_info: z.string().nullish(),
     session: z.string(),
     referral_link: z.string().optional(),
   }),

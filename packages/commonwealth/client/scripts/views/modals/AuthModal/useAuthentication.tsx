@@ -523,9 +523,6 @@ const useAuthentication = (props: UseAuthenticationProps) => {
         address,
         community_id: chainIdentifier,
         wallet_id: wallet.name,
-        block_info: validationBlockInfo
-          ? JSON.stringify(validationBlockInfo)
-          : null,
       });
       console.log('signIn onNormalWalletLogin');
 
@@ -565,9 +562,6 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       address,
       community_id: chainIdentifier,
       wallet_id: wallet.name,
-      block_info: validationBlockInfo
-        ? JSON.stringify(validationBlockInfo)
-        : null,
     });
     console.log('signIn onSessionKeyRevalidation');
     await verifySession(session);
