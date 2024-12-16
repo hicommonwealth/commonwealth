@@ -10,7 +10,7 @@ export type FormSubmitValues = {
   imageURL: string;
 };
 
-export type TokenInformationFormProps = {
+export type TokenInformationFormStepProps = {
   onSubmit: (values: FormSubmitValues) => void;
   onCancel: () => void;
   onFormUpdate?: (values: FormSubmitValues) => void;
