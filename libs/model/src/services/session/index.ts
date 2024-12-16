@@ -1,3 +1,3 @@
 export * from './assertAddressOwnership';
-export * from './processAddress';
+export * from './transferOwnership';
 export * from './verifySessionSignature';

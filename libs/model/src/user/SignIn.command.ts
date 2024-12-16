@@ -12,7 +12,7 @@ import { Op } from 'sequelize';
 import { config } from '../config';
 import { models } from '../database';
 import { mustExist } from '../middleware/guards';
-import { verifySessionSignature } from '../services/session';
+import { transferOwnership, verifySessionSignature } from '../services/session';
 import { emitEvent } from '../utils/utils';
 
 export const SignInErrors = {
@@ -177,8 +177,11 @@ export function SignIn(): Command<typeof schemas.SignIn> {
               transaction,
             );
 
-            // TODO: review when this is needed
-            // await transferOwnership(updated, community, transaction);
+            // transfer ownership on unverified addresses
+            const transferredUser = await transferOwnership(
+              verified,
+              transaction,
+            );
 
             verified.verification_token = verification_token;
             verified.verification_token_expires = verification_token_expires;
@@ -187,6 +190,26 @@ export function SignIn(): Command<typeof schemas.SignIn> {
             verified.hex = hex;
             verified.wallet_id = wallet_id;
             const updated = await verified.save({ transaction });
+
+            transferredUser &&
+              (await emitEvent(
+                models.Outbox,
+                [
+                  {
+                    event_name: schemas.EventNames.AddressOwnershipTransferred,
+                    event_payload: {
+                      community_id,
+                      address: addr.address,
+                      user_id: addr.user_id,
+                      old_user_id: transferredUser.id!,
+                      old_user_email: transferredUser.email,
+                      created_at: addr.created_at,
+                    },
+                  },
+                ],
+                transaction,
+              ));
+
             return {
               addr: updated.toJSON(),
               user_created: false,
@@ -234,25 +257,30 @@ export function SignIn(): Command<typeof schemas.SignIn> {
             }))
           );
 
-          // TODO: emit events for
-          // - user creation (check if user exists)
-          // - address creation (community joined)
-          // - address transfer (community joined) -> to be used by email notifications
-          // this was missing in legacy
-          await emitEvent(
-            models.Outbox,
-            [
-              {
-                event_name: schemas.EventNames.CommunityJoined,
-                event_payload: {
-                  community_id,
-                  user_id: verified.user_id!,
-                  created_at: new_address.created_at!,
-                },
+          // Emit the events that occurred here
+          const events: schemas.EventPairs[] = [
+            {
+              event_name: schemas.EventNames.CommunityJoined,
+              event_payload: {
+                community_id,
+                user_id: verified.user_id!,
+                created_at: new_address.created_at!,
               },
-            ],
-            transaction,
-          );
+            },
+          ];
+          user &&
+            events.push({
+              event_name: schemas.EventNames.UserCreated,
+              event_payload: {
+                community_id,
+                address: addr.address,
+                user_id: user.id!,
+                created_at: addr.created_at,
+                //  TODO: referral_link: ""
+              },
+            });
+
+          await emitEvent(models.Outbox, events, transaction);
 
           return {
             addr: {

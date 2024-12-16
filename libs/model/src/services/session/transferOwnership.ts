@@ -1,12 +1,7 @@
-import { InvalidState, logger } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
-import { DynamicTemplate, PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
-import sgMail from '@sendgrid/mail';
 import { Op, Transaction } from 'sequelize';
 import { z } from 'zod';
 import { models } from '../../database';
-
-const log = logger(import.meta);
 
 export const Errors = {
   InvalidCommunity: 'Invalid community',
@@ -23,11 +18,10 @@ export const Errors = {
 };
 
 /**
- * After verification, reassign users of transferred addresses = "transfer ownership".
+ * Reassigns user to unverified addresses = "transfer ownership".
  */
 export async function transferOwnership(
   addr: z.infer<typeof schemas.Address>,
-  community: z.infer<typeof schemas.Community>,
   transaction: Transaction,
 ) {
   const unverifed = await models.Address.findOne({
@@ -54,32 +48,35 @@ export async function transferOwnership(
       transaction,
     },
   );
-  if (updated > 0 && unverifed) {
-    // TODO: should this be fire and forget or await in transaction?
-    try {
-      // send email to the old user (should only ever be one)
-      if (!unverifed.User?.email) throw new InvalidState(Errors.NoEmail);
+  // TODO: should only ever be one user (but we are updating all)
+  return updated > 0 && unverifed ? unverifed.User : undefined;
 
-      const msg = {
-        to: unverifed.User.email,
-        from: `Commonwealth <no-reply@${PRODUCTION_DOMAIN}>`,
-        templateId: DynamicTemplate.VerifyAddress,
-        dynamic_template_data: {
-          address: addr.address,
-          chain: community.name,
-        },
-      };
-      await sgMail.send(msg);
-      log.info(
-        `Sent address move email: ${addr.address} transferred to a new account`,
-      );
-    } catch (e) {
-      log.error(
-        `Could not send address move email for: ${addr.address}`,
-        e as Error,
-      );
-    }
-  }
+  // TODO: subscribe to AddressOwnershipTransferred event
+  // if (updated > 0 && unverifed) {
+  //   try {
+  //     // send email to the old user (should only ever be one)
+  //     if (!unverifed.User?.email) throw new InvalidState(Errors.NoEmail);
+
+  //     const msg = {
+  //       to: unverifed.User.email,
+  //       from: `Commonwealth <no-reply@${PRODUCTION_DOMAIN}>`,
+  //       templateId: DynamicTemplate.VerifyAddress,
+  //       dynamic_template_data: {
+  //         address: addr.address,
+  //         chain: community.name,
+  //       },
+  //     };
+  //     await sgMail.send(msg);
+  //     log.info(
+  //       `Sent address move email: ${addr.address} transferred to a new account`,
+  //     );
+  //   } catch (e) {
+  //     log.error(
+  //       `Could not send address move email for: ${addr.address}`,
+  //       e as Error,
+  //     );
+  //   }
+  // }
 }
 
 // TODO: this can be deprecated since it's implemented in the signin command
