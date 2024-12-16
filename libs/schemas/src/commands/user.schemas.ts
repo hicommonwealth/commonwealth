@@ -10,6 +10,7 @@ export const SignIn = {
     wallet_id: z.nativeEnum(WalletId),
     block_info: z.string().nullish(),
     session: z.string(),
+    referral_link: z.string().optional(),
   }),
   output: Address.extend({
     community_base: z.nativeEnum(ChainBase),
