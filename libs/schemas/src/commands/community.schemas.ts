@@ -229,6 +229,7 @@ export const ToggleArchiveTopic = {
 const GroupMetadata = z.object({
   name: z.string(),
   description: z.string(),
+  groupImageUrl: z.string().nullish(),
   required_requirements: PG_INT.nullish(),
   membership_ttl: PG_INT.optional(),
 });

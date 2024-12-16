@@ -44,10 +44,10 @@ export const splitAndDecodeURL = (locationPathname: string) => {
   //this is to check for malformed urls on a topics page in /discussions
   const splitURLPath = locationPathname.split('/');
   if (splitURLPath[2] === 'discussions') {
-    return decodeURIComponent(splitURLPath[3]);
+    return splitURLPath[3] ? decodeURIComponent(splitURLPath[3]) : null;
   }
   splitURLPath[1] === 'discussions';
-  return decodeURIComponent(splitURLPath[2]);
+  return splitURLPath[2] ? decodeURIComponent(splitURLPath[2]) : null;
 };
 
 export const getThreadUrl = (
