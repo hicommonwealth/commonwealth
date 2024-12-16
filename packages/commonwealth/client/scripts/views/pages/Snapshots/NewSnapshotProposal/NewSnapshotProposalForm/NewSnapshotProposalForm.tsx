@@ -177,7 +177,7 @@ export const NewSnapshotProposalForm = ({
     );
 
   const minScoreFromSpace: number =
-    space?.validation?.params.minScore ?? space?.filters?.minScore ?? 0; // Fall back to 0
+    space?.validation?.params.minScore ?? space?.filters?.minScore ?? 0;
 
   const hasMinScore: boolean =
     typeof userScore === 'number' &&
