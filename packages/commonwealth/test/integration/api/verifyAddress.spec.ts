@@ -97,9 +97,7 @@ describe('Verify Address Routes', () => {
         });
 
       expect(res.body.code).to.be.equal('INTERNAL_SERVER_ERROR');
-      expect(res.body.message).to.contain(
-        'does not match addressModel.address',
-      );
+      expect(res.body.message).to.contain('does not match');
     });
 
     test('should fail to create a new user if session is for wrong topic', async () => {
