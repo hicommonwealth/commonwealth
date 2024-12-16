@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import React from 'react';
 import { CWText } from '../component_kit/cw_text';
 import CWIconButton from '../component_kit/new_designs/CWIconButton';
@@ -8,6 +9,7 @@ type PageCounterProps = {
   activePage?: number;
   onPageChange?: (pageNumber: number) => void;
   disabled?: boolean;
+  className?: string;
 };
 
 const PageCounter = ({
@@ -15,9 +17,10 @@ const PageCounter = ({
   totalPages,
   onPageChange,
   disabled,
+  className,
 }: PageCounterProps) => {
   return (
-    <div className="PageCounter">
+    <div className={clsx('PageCounter', className)}>
       {totalPages > 1 && (
         <CWIconButton
           type="button"

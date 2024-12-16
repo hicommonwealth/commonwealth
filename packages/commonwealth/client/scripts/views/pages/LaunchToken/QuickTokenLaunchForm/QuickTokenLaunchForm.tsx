@@ -433,6 +433,7 @@ export const QuickTokenLaunchForm = ({
               <div className="cta-elements">
                 {/* allows to switch b/w generated ideas */}
                 <PageCounter
+                  className="mr-auto"
                   activePage={activeTokenIdeaIndex + 1}
                   totalPages={
                     tokenIdeas.length == 0
