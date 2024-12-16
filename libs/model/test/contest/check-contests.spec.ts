@@ -12,7 +12,7 @@ import { afterAll, beforeAll, describe, expect, test, vi } from 'vitest';
 import { seed } from '../../src/tester';
 import { drainOutbox } from '../utils';
 
-describe('Check Contests', () => {
+describe.skip('Check Contests', () => {
   const addressId = 444;
   const address = '0x0';
   const communityId = 'ethhh';

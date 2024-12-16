@@ -9,6 +9,7 @@ import Discord from './Discord';
 import './Integrations.scss';
 import Snapshots from './Snapshots';
 import Stake from './Stake';
+import Token from './Token';
 import Webhooks from './Webhooks';
 
 const Integrations = () => {
@@ -28,6 +29,7 @@ const Integrations = () => {
     >
       <section className="Integrations">
         <Directory />
+        <Token />
         <Stake />
         {showSnapshotIntegration && <Snapshots />}
         <Discord />

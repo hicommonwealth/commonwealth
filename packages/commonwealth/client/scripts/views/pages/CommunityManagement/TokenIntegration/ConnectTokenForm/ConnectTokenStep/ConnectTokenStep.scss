@@ -1,0 +1,42 @@
+@import '../../../../../../styles/shared';
+
+.ConnectTokenStep {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
+  border-radius: 6px;
+
+  .chain-selector,
+  .token-finder-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+
+    .header {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      width: 100%;
+    }
+  }
+
+  .description {
+    color: $neutral-600;
+  }
+
+  .action-buttons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-top: 24px;
+    margin-bottom: 24px;
+    gap: 10px;
+
+    @include smallInclusive {
+      justify-content: flex-end;
+    }
+  }
+}
