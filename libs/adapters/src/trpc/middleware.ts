@@ -157,8 +157,10 @@ const authenticate = async <Input extends ZodSchema>(
   rawInput: z.infer<Input>,
   authStrategy: AuthStrategies<Input> = { type: 'jwt' },
 ) => {
-  // User is already authenticated. Authentication overridden at router level e.g. external-router.ts
-  if (req.user) return;
+  // Bypass when user is already authenticated via JWT or token
+  // Authentication overridden at router level e.g. external-router.ts
+  if (req.user && authStrategy.type !== 'custom') return;
+
   try {
     if (authStrategy.type === 'authtoken') {
       switch (req.headers['authorization']) {

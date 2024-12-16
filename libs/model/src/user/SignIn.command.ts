@@ -9,7 +9,6 @@ import {
 import { bech32 } from 'bech32';
 import crypto from 'crypto';
 import { Op } from 'sequelize';
-import { z } from 'zod';
 import { config } from '../config';
 import { models } from '../database';
 import { mustExist } from '../middleware/guards';
@@ -23,15 +22,18 @@ export const SignInErrors = {
   ExpiredToken: 'Token has expired, please re-register',
 };
 
+type ValidResult = {
+  base: ChainBase;
+  encodedAddress: string;
+  ss58Prefix?: number | null;
+  hex?: string;
+  existingHexUserId?: number | null;
+};
+
 async function validateAddress(
   community_id: string,
   address: string,
-): Promise<{
-  community: z.infer<typeof schemas.Community>;
-  encodedAddress: string;
-  addressHex?: string;
-  existingWithHex?: z.infer<typeof schemas.Address>;
-}> {
+): Promise<ValidResult> {
   // Injective special validation
   if (community_id === 'injective') {
     if (address.slice(0, 3) !== 'inj')
@@ -47,16 +49,17 @@ async function validateAddress(
   if (community.base === ChainBase.Ethereum) {
     const { isAddress } = await import('web3-validator');
     if (!isAddress(address)) throw new InvalidInput('Eth address is not valid');
-    return { community, encodedAddress: address };
+    return { base: community.base, encodedAddress: address };
   }
 
   if (community.base === ChainBase.Substrate)
     return {
-      community,
+      base: community.base,
       encodedAddress: addressSwapper({
         address,
         currentPrefix: community.ss58_prefix!,
       }),
+      ss58Prefix: community.ss58_prefix!,
     };
 
   if (community.base === ChainBase.NEAR)
@@ -67,7 +70,7 @@ async function validateAddress(
     const key = new PublicKey(address);
     if (key.toBase58() !== address)
       throw new InvalidInput(`Solana address is not valid: ${key.toBase58()}`);
-    return { community, encodedAddress: address };
+    return { base: community.base, encodedAddress: address };
   }
 
   try {
@@ -84,12 +87,12 @@ async function validateAddress(
         // sort by latest last_active
         return +b.dataValues.last_active! - +a.dataValues.last_active!;
       });
-      // use the latest active address with this hex to assign profile
+      // use the latest active user with this hex to assign profile
       return {
-        community,
+        base: community.base,
         encodedAddress,
-        addressHex,
-        existingWithHex: existingHexesSorted.at(0)?.toJSON(),
+        hex: addressHex,
+        existingHexUserId: existingHexesSorted.at(0)?.user_id,
       };
     }
     throw new InvalidInput(SignInErrors.InvalidAddress);
@@ -115,25 +118,24 @@ export function SignIn(): Command<typeof schemas.SignIn> {
     authStrategy: {
       type: 'custom',
       name: 'SignIn',
-      // TODO: session/address verification step should be in auth strategy
-      // - verify community rules
-      // - verify session signature
-      // - verify address format
-      // - SECURITY TEAM: this endpoint is only secured by this strategy, so we should stop attacks here
+      // Simple auth strategy that validates address format within community rules
+      // SECURITY TEAM: we should stop attacks here!
       userResolver: async (payload) => {
         const { community_id, address } = payload;
-        await validateAddress(community_id, address.trim());
-        // assertion check (TODO: this might be redundant)
+        const auth = await validateAddress(community_id, address.trim());
+        // TODO: this might be redundant, or should we check it?
         // await assertAddressOwnership(address);
-        return { id: -1, email: '' };
+
+        return { id: -1, email: '', auth };
       },
     },
-    body: async ({ payload }) => {
-      const { community_id, address, wallet_id, block_info, session } = payload;
+    body: async ({ actor, payload }) => {
+      if (!actor.user.auth) throw Error('Invalid address');
 
-      // TODO: can we avoid validating the address twice?
-      const { community, encodedAddress, addressHex, existingWithHex } =
-        await validateAddress(community_id, address.trim());
+      const { community_id, wallet_id, block_info, session } = payload;
+
+      const { base, encodedAddress, ss58Prefix, hex, existingHexUserId } = actor
+        .user.auth as ValidResult;
 
       // Generate a random expiring verification token
       const verification_token = crypto.randomBytes(18).toString('hex');
@@ -175,14 +177,14 @@ export function SignIn(): Command<typeof schemas.SignIn> {
               transaction,
             );
 
-            // TODO: review this
+            // TODO: review when this is needed
             // await transferOwnership(updated, community, transaction);
 
             verified.verification_token = verification_token;
             verified.verification_token_expires = verification_token_expires;
             verified.last_active = new Date();
             verified.block_info = block_info;
-            verified.hex = addressHex;
+            verified.hex = hex;
             verified.wallet_id = wallet_id;
             const updated = await verified.save({ transaction });
             return {
@@ -196,10 +198,10 @@ export function SignIn(): Command<typeof schemas.SignIn> {
           // create new address
           const new_address = await models.Address.create(
             {
-              user_id: existingWithHex?.user_id ?? null,
+              user_id: existingHexUserId ?? null,
               community_id,
               address: encodedAddress,
-              hex: addressHex,
+              hex,
               verification_token,
               verification_token_expires,
               block_info,
@@ -221,7 +223,7 @@ export function SignIn(): Command<typeof schemas.SignIn> {
 
           // is same address found in a different community?
           const is_first_community = !(
-            !!existingWithHex ||
+            !!existingHexUserId ||
             (await models.Address.findOne({
               where: {
                 community_id: { [Op.ne]: community_id },
@@ -265,8 +267,8 @@ export function SignIn(): Command<typeof schemas.SignIn> {
 
       return {
         ...addr,
-        community_base: community!.base,
-        community_ss58_prefix: community!.ss58_prefix,
+        community_base: base,
+        community_ss58_prefix: ss58Prefix,
         user_created,
         address_created,
         first_community,

@@ -42,6 +42,7 @@ export type User = {
   id?: number;
   emailVerified?: boolean;
   isAdmin?: boolean;
+  auth?: Record<string, unknown>; // custom auth payload
 };
 
 /**
