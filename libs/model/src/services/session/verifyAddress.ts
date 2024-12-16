@@ -1,9 +1,9 @@
 import { InvalidInput } from '@hicommonwealth/core';
 import { ChainBase, addressSwapper, bech32ToHex } from '@hicommonwealth/shared';
 import { bech32 } from 'bech32';
-import { models } from 'model/src/database';
-import { mustExist } from 'model/src/middleware/guards';
 import { Op } from 'sequelize';
+import { models } from '../../database';
+import { mustExist } from '../../middleware/guards';
 
 export type VerifiedAddress = {
   base: ChainBase;
