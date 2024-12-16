@@ -54,6 +54,7 @@ describe('API Tests', () => {
           block_info: TEST_BLOCK_INFO_STRING,
           session: serializeCanvas(session),
         });
+      console.log(res.body);
       expect(res.body).to.not.be.null;
       expect(res.body.address).to.be.equal(address);
       expect(res.body.community_id).to.equal(chain);

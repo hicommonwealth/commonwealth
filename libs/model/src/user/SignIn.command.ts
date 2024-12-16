@@ -199,11 +199,11 @@ export function SignIn(): Command<typeof schemas.SignIn> {
                     event_name: schemas.EventNames.AddressOwnershipTransferred,
                     event_payload: {
                       community_id,
-                      address: addr.address,
-                      user_id: addr.user_id,
+                      address: updated.address,
+                      user_id: updated.user_id!,
                       old_user_id: transferredUser.id!,
                       old_user_email: transferredUser.email,
-                      created_at: addr.created_at,
+                      created_at: new Date(),
                     },
                   },
                 ],
@@ -273,9 +273,9 @@ export function SignIn(): Command<typeof schemas.SignIn> {
               event_name: schemas.EventNames.UserCreated,
               event_payload: {
                 community_id,
-                address: addr.address,
+                address: verified.address,
                 user_id: user.id!,
-                created_at: addr.created_at,
+                created_at: user.created_at!,
                 //  TODO: referral_link: ""
               },
             });
