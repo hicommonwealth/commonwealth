@@ -15,35 +15,29 @@ import {
 
 export async function createContestEventSources(
   ethChainId: commonProtocol.ValidChains,
+  singleContestContractAddress: string,
+  recurringContestContractAddress: string,
 ): Promise<{
   evmEventSourceInstances: EvmEventSourceInstance[];
 }> {
   const evmEventSourceInstances = await models.EvmEventSource.bulkCreate([
     {
       eth_chain_id: ethChainId,
-      contract_address:
-        commonProtocol.factoryContracts[
-          commonProtocol.ValidChains.SepoliaBase
-        ].factory.toLowerCase(),
+      contract_address: singleContestContractAddress,
       event_signature: EvmEventSignatures.Contests.SingleContestStarted,
       contract_name: ChildContractNames.SingleContest,
       parent_contract_address:
-        commonProtocol.factoryContracts[
-          commonProtocol.ValidChains.SepoliaBase
-        ].factory.toLowerCase(),
+        commonProtocol.factoryContracts[commonProtocol.ValidChains.SepoliaBase]
+          .factory,
     },
     {
       eth_chain_id: ethChainId,
-      contract_address:
-        commonProtocol.factoryContracts[
-          commonProtocol.ValidChains.SepoliaBase
-        ].communityStake.toLowerCase(),
+      contract_address: recurringContestContractAddress,
       event_signature: EvmEventSignatures.Contests.RecurringContestStarted,
       contract_name: ChildContractNames.RecurringContest,
       parent_contract_address:
-        commonProtocol.factoryContracts[
-          commonProtocol.ValidChains.SepoliaBase
-        ].factory.toLowerCase(),
+        commonProtocol.factoryContracts[commonProtocol.ValidChains.SepoliaBase]
+          .factory,
     },
   ]);
 
