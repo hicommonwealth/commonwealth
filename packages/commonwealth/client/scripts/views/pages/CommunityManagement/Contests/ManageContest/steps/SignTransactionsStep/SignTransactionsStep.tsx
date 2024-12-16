@@ -160,6 +160,7 @@ const SignTransactionsStep = ({
         ticker: fundingTokenTicker,
         is_farcaster_contest: contestFormData.isFarcasterContest,
         decimals: fundingTokenDecimals,
+        vote_weight_multiplier: contestFormData.voteWeightMultiplier,
       });
 
       onSetLaunchContestStep('ContestLive');

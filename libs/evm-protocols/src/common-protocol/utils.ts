@@ -1,15 +1,12 @@
-import { BigNumber } from '@ethersproject/bignumber';
-
 export const calculateVoteWeight = (
   balance: string, // should be in wei
   voteWeight: number = 0,
-): BigNumber | null => {
+  precision: number = 10 ** 18, // precision factor for multiplying
+): bigint | null => {
   if (!balance || voteWeight <= 0) return null;
-  const bigBalance = BigNumber.from(balance);
-  const precision = 1e6;
-  const scaledVoteWeight = Math.floor(voteWeight * precision);
-  const result = bigBalance.mul(scaledVoteWeight).div(precision);
-  return result;
+  // solution to multiply BigInt with fractional vote weight
+  const scaledVoteWeight = BigInt(Math.round(voteWeight * precision));
+  return (BigInt(balance) * scaledVoteWeight) / BigInt(precision);
 };
 
 export enum Denominations {

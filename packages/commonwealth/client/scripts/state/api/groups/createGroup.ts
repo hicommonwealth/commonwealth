@@ -8,6 +8,7 @@ interface CreateGroupProps {
   groupName: string;
   topics: GroupFormTopicSubmitValues[];
   groupDescription?: string;
+  groupImageUrl?: string;
   requirementsToFulfill: number | undefined;
   requirements?: any[];
 }
@@ -16,6 +17,7 @@ export const buildCreateGroupInput = ({
   communityId,
   groupName,
   groupDescription,
+  groupImageUrl,
   topics,
   requirementsToFulfill,
   requirements = [],
@@ -27,6 +29,7 @@ export const buildCreateGroupInput = ({
     metadata: {
       name: groupName,
       description: groupDescription ?? '',
+      groupImageUrl: groupImageUrl ?? '',
       ...(finalRequirementsToFulfill && {
         required_requirements: finalRequirementsToFulfill,
       }),
