@@ -7,4 +7,5 @@ export * from './lpBondingCurveAbi';
 export * from './namespaceAbi';
 export * from './namespaceFactoryAbi';
 export * from './reservationHookAbi';
+export * from './singleContestAbi';
 export * from './tokenCommunityManagerAbi';

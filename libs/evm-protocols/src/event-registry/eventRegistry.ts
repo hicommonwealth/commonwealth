@@ -1,11 +1,12 @@
 import {
   communityStakesAbi,
-  contestAbi,
   launchpadFactoryAbi,
   lpBondingCurveAbi,
   namespaceFactoryAbi,
+  singleContestAbi,
   tokenCommunityManagerAbi,
 } from '../abis';
+import { recurringContestAbi } from '../abis/recurringContestAbi';
 import { ValidChains, factoryContracts } from '../common-protocol';
 import { EvmEventSignature, EvmEventSignatures } from './eventSignatures';
 
@@ -64,7 +65,7 @@ const namespaceFactorySource = {
   ],
   childContracts: {
     [ChildContractNames.RecurringContest]: {
-      abi: contestAbi,
+      abi: recurringContestAbi,
       eventSignatures: [
         EvmEventSignatures.Contests.ContentAdded,
         EvmEventSignatures.Contests.RecurringContestStarted,
@@ -72,7 +73,7 @@ const namespaceFactorySource = {
       ],
     },
     [ChildContractNames.SingleContest]: {
-      abi: contestAbi,
+      abi: singleContestAbi,
       eventSignatures: [
         EvmEventSignatures.Contests.ContentAdded,
         EvmEventSignatures.Contests.SingleContestStarted,

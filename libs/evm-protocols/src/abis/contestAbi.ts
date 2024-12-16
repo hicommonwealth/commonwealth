@@ -1,3 +1,4 @@
+// TODO: delete or remove unnecessary items
 export const contestAbi = [
   {
     inputs: [
