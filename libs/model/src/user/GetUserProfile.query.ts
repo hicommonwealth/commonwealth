@@ -8,7 +8,7 @@ export function GetUserProfile(): Query<typeof schemas.GetUserProfile> {
   return {
     ...schemas.GetUserProfile,
     auth: [],
-    secure: true,
+    secure: false,
     body: async ({ actor, payload }) => {
       const user_id = payload.userId ?? actor.user.id;
 
@@ -98,7 +98,7 @@ export function GetUserProfile(): Query<typeof schemas.GetUserProfile> {
         commentThreads: commentThreads.map(
           (c) => c.toJSON() as z.infer<typeof schemas.ThreadView>,
         ),
-        isOwner: actor.user.id === user_id,
+        isOwner: actor.user?.id === user_id,
         // ensure Tag is present in typed response
         tags: profileTags.map((t) => ({ id: t.Tag!.id!, name: t.Tag!.name })),
         xp_points: user!.xp_points ?? 0,
