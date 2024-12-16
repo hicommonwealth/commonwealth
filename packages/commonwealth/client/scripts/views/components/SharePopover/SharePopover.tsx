@@ -1,8 +1,10 @@
-import { notifySuccess } from 'client/scripts/controllers/app/notifications';
+import { useFlag } from 'hooks/useFlag';
 import React from 'react';
+import { saveToClipboard } from 'utils/clipboard';
 import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
 import { PopoverTriggerProps } from 'views/components/component_kit/new_designs/CWPopover';
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
+import useReferralLink from '../../modals/InviteLinkModal/useReferralLink';
 
 const TWITTER_SHARE_LINK_PREFIX = 'https://twitter.com/intent/tweet?text=';
 
@@ -16,6 +18,10 @@ export const SharePopover = ({
   linkToShare,
   buttonLabel,
 }: SharePopoverProps) => {
+  const referralsEnabled = useFlag('referrals');
+
+  const { getReferralLink } = useReferralLink();
+
   const defaultRenderTrigger = (
     onClick: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void,
   ) => (
@@ -30,6 +36,17 @@ export const SharePopover = ({
     />
   );
 
+  const handleCopy = async () => {
+    if (referralsEnabled) {
+      const referralLink = await getReferralLink();
+      const refLink =
+        linkToShare + (referralLink ? `?refcode=${referralLink}` : '');
+      await saveToClipboard(refLink, true);
+    } else {
+      await saveToClipboard(linkToShare, true);
+    }
+  };
+
   return (
     <PopoverMenu
       menuItems={[
@@ -37,14 +54,7 @@ export const SharePopover = ({
           iconLeft: 'linkPhosphor',
           iconLeftSize: 'regular',
           label: 'Copy link',
-          onClick: () => {
-            navigator.clipboard
-              .writeText(linkToShare)
-              .then(() => {
-                notifySuccess('Successfully copied! ');
-              })
-              .catch(console.error);
-          },
+          onClick: handleCopy,
         },
         {
           iconLeft: 'twitterOutline',
