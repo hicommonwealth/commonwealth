@@ -38,7 +38,7 @@ export const verifySessionSignature = async (
     : sessionRawAddress;
   assert(
     walletAddress === expectedAddress,
-    `session.did address (${walletAddress}) does not match addressModel.address (${expectedAddress})`,
+    `session.did address (${walletAddress}) does not match (${expectedAddress})`,
   );
 
   const signer = getSessionSignerForDid(session.did);
@@ -46,7 +46,7 @@ export const verifySessionSignature = async (
 
   await signer.verifySession(CANVAS_TOPIC, session);
 
-  // mark the address as verified
+  // mark the address as verified TODO: why are we setting expire to null?
   addr.verification_token_expires = null;
   addr.verified = new Date();
   addr.last_active = new Date();
@@ -84,8 +84,9 @@ export const verifySessionSignature = async (
     addr.user_id = existing.user_id;
   }
 
-  // save the newly verified address, incrementing the profile count (TODO: check this)
+  // save the newly verified address
   const updated = await addr.save({ transaction });
+  // TODO: should we always increment the profile count?
   await incrementProfileCount(addr.community_id!, addr.user_id!, transaction);
   return { addr: updated };
 };

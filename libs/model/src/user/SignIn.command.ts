@@ -102,13 +102,23 @@ async function validateAddress(
 }
 
 /**
- * TODO: Describe signin flows here
- * - When logged in:
- *   - to link a new address for an existing user  - TODO: isn't this the same as JoinCommunity?
- *   - to verify an existing address (refresh token)
- * - When logged out
- *   - to create a new user by showing proof of an address (verification and optional creation of new user and address)
- *   - transferring ownership of an address to a new user
+ * SignIn command for signing in to a community
+ *
+ * Before executing the body, it validates that the address is
+ * compatible with the community and has a valid signature.
+ *
+ * - When address-community link found in database:
+ *   - Verifies existing address
+ *     - same wallet
+ *     - token is valid (not expired) TODO: refresh token
+ *     - session signature
+ *   - Transfers ownership of unverified address links to user
+ *
+ *  - When address-community link not found in database:
+ *   - Creates a new link to the community
+ *     - TODO: same as JoinCommunity? redundant command?
+ *   - Verifies session signature (proof of address)
+ *     - Creates a new user if none exists for this address
  */
 export function SignIn(): Command<typeof schemas.SignIn> {
   return {
@@ -133,17 +143,15 @@ export function SignIn(): Command<typeof schemas.SignIn> {
       if (!actor.user.auth) throw Error('Invalid address');
 
       const { community_id, wallet_id, block_info, session } = payload;
-
       const { base, encodedAddress, ss58Prefix, hex, existingHexUserId } = actor
         .user.auth as ValidResult;
 
-      // Generate a random expiring verification token
       const verification_token = crypto.randomBytes(18).toString('hex');
       const verification_token_expires = new Date(
         +new Date() + config.AUTH.ADDRESS_TOKEN_EXPIRES_IN * 60 * 1000,
       );
 
-      // update or create address to sign it in
+      // update or create address
       const { addr, user_created, address_created, first_community } =
         await models.sequelize.transaction(async (transaction) => {
           const existing = await models.Address.scope(
@@ -164,13 +172,6 @@ export function SignIn(): Command<typeof schemas.SignIn> {
             if (existing.wallet_id !== wallet_id)
               throw new InvalidInput(SignInErrors.WrongWallet);
 
-            // TODO: review this
-            // check whether the token has expired
-            // (certain login methods e.g. jwt have no expiration token, so we skip the check in that case)
-            // const expiration = existing.verification_token_expires;
-            // if (expiration && +expiration <= +new Date())
-            //  throw new InvalidInput(SignInErrors.ExpiredToken);
-
             const { addr: verified } = await verifySessionSignature(
               deserializeCanvas(session),
               existing,
@@ -182,6 +183,13 @@ export function SignIn(): Command<typeof schemas.SignIn> {
               verified,
               transaction,
             );
+
+            // TODO: should we only update when token expired?
+            // check whether the token has expired
+            // (certain login methods e.g. jwt have no expiration token, so we skip the check in that case)
+            // const expiration = existing.verification_token_expires;
+            // if (expiration && +expiration <= +new Date())
+            //  throw new InvalidInput(SignInErrors.ExpiredToken);
 
             verified.verification_token = verification_token;
             verified.verification_token_expires = verification_token_expires;
