@@ -12,6 +12,9 @@ $breakpoint-small-max: 904;
 $breakpoint-small-min: 600;
 $breakpoint-extra-small-max: 599;
 
+$breakpoint-medium-max-New: 900;
+$breakpoint-small-max-New: 600;
+
 $breakpoint-height-small-max: 700;
 $breakpoint-medium-large-max: 1280;
 
@@ -27,6 +30,9 @@ $breakpoint-small-min-px: $breakpoint-small-min * 1px;
 $breakpoint-extra-small-max-px: $breakpoint-extra-small-max * 1px;
 $breakpoint-height-small-max: $breakpoint-height-small-max * 1px;
 $breakpoint-medium-large-max: $breakpoint-medium-large-max * 1px;
+
+$breakpoint-small-max-New-px: $breakpoint-small-max-New * 1px;
+$breakpoint-medium-max-New-px: $breakpoint-medium-max-New * 1px;
 
 :export {
   breakpointLargeMinPx: $breakpoint-large-min-px;
@@ -46,5 +52,9 @@ $breakpoint-medium-large-max: $breakpoint-medium-large-max * 1px;
   breakpointSmallMax: $breakpoint-small-max;
   breakpointSmallMin: $breakpoint-small-min;
   breakpointExtraSmallMax: $breakpoint-extra-small-max;
+
   breakpointMediumLargeMax: $breakpoint-medium-large-max;
+
+  breakpointsmallmaxNew: $breakpoint-small-max-New;
+  breakpointmediummaxNew: $breakpoint-medium-max-New;
 }

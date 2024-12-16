@@ -16,6 +16,7 @@ import './voting_actions.scss';
 import app from 'state';
 
 import { getChainDecimals } from 'client/scripts/controllers/app/webWallets/utils';
+import { CosmosProposalV1AtomOne } from 'client/scripts/controllers/chain/cosmos/gov/atomone/proposal-v1';
 import { CosmosProposalGovgen } from 'client/scripts/controllers/chain/cosmos/gov/govgen/proposal-v1beta1';
 import useUserStore from 'state/ui/user';
 import { naturalDenomToMinimal } from '../../../../../shared/utils';
@@ -62,7 +63,8 @@ export const VotingActions = ({
   if (
     proposal instanceof CosmosProposal ||
     proposal instanceof CosmosProposalV1 ||
-    proposal instanceof CosmosProposalGovgen
+    proposal instanceof CosmosProposalGovgen ||
+    proposal instanceof CosmosProposalV1AtomOne
   ) {
     user = userData.activeAccount as CosmosAccount;
   } else {
@@ -79,7 +81,9 @@ export const VotingActions = ({
 
     if (
       proposal instanceof CosmosProposal ||
-      proposal instanceof CosmosProposalV1
+      proposal instanceof CosmosProposalV1 ||
+      proposal instanceof CosmosProposalGovgen ||
+      proposal instanceof CosmosProposalV1AtomOne
     ) {
       if (proposal.status === 'DepositPeriod') {
         const chain = app.chain as Cosmos;
@@ -119,7 +123,9 @@ export const VotingActions = ({
 
     if (
       proposal instanceof CosmosProposal ||
-      proposal instanceof CosmosProposalV1
+      proposal instanceof CosmosProposalV1 ||
+      proposal instanceof CosmosProposalGovgen ||
+      proposal instanceof CosmosProposalV1AtomOne
     ) {
       try {
         await proposal.voteTx(new CosmosVote(user, 'No'));
@@ -143,7 +149,9 @@ export const VotingActions = ({
 
     if (
       proposal instanceof CosmosProposal ||
-      proposal instanceof CosmosProposalV1
+      proposal instanceof CosmosProposalV1 ||
+      proposal instanceof CosmosProposalGovgen ||
+      proposal instanceof CosmosProposalV1AtomOne
     ) {
       proposal
         .voteTx(new CosmosVote(user, 'Abstain'))
@@ -161,7 +169,9 @@ export const VotingActions = ({
 
     if (
       proposal instanceof CosmosProposal ||
-      proposal instanceof CosmosProposalV1
+      proposal instanceof CosmosProposalV1 ||
+      proposal instanceof CosmosProposalGovgen ||
+      proposal instanceof CosmosProposalV1AtomOne
     ) {
       proposal
         .voteTx(new CosmosVote(user, 'NoWithVeto'))

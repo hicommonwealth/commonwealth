@@ -1,4 +1,4 @@
-import { DEFAULT_NAME } from '@hicommonwealth/shared';
+import { DEFAULT_NAME, PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
 import React, { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useFetchProfileByIdQuery } from 'state/api/profiles';
@@ -11,8 +11,8 @@ import { PageNotFound } from '../../pages/404';
 import { ImageBehavior } from '../component_kit/CWImageInput';
 import CWCircleMultiplySpinner from '../component_kit/new_designs/CWCircleMultiplySpinner';
 import './Profile.scss';
-import type { CommentWithAssociatedThread } from './ProfileActivity';
 import ProfileActivity from './ProfileActivity';
+import type { CommentWithAssociatedThread } from './ProfileActivity/ProfileActivity';
 import ProfileHeader from './ProfileHeader';
 
 enum ProfileError {
@@ -119,7 +119,7 @@ const Profile = ({ userId }: ProfileProps) => {
           <Helmet>
             <link
               rel="canonical"
-              href={`https://commonwealth.im/profile/id/${userId}`}
+              href={`https://${PRODUCTION_DOMAIN}/profile/id/${userId}`}
             />
           </Helmet>
 

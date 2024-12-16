@@ -33,7 +33,8 @@ export const CreateContestManagerMetadata = {
       commonProtocol.WeiDecimals[commonProtocol.Denominations.ETH],
     ),
     topic_id: z.number().optional(),
-    is_farcaster_contest: z.boolean().nullish(),
+    is_farcaster_contest: z.boolean().optional(),
+    vote_weight_multiplier: z.number().optional().nullish(),
   }),
   output: z.object({
     contest_managers: z.array(ContestManager),

@@ -1,0 +1,45 @@
+@import '../../../../../../styles/shared';
+
+.InformationalCTAStep {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+
+  .description {
+    color: $neutral-600;
+  }
+
+  .cta-link-container {
+    margin-top: 12px;
+    color: $neutral-700 !important;
+
+    a {
+      color: $primary-600;
+      text-decoration: none;
+
+      &:focus,
+      &:active,
+      &:hover,
+      &:visited {
+        color: $primary-600;
+        outline: none;
+        text-decoration: none;
+      }
+    }
+  }
+
+  .action-buttons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-top: 24px;
+    margin-bottom: 24px;
+    gap: 10px;
+
+    @include smallInclusive {
+      justify-content: flex-end;
+    }
+  }
+}

@@ -12,6 +12,7 @@ import { models } from '../database';
 import { mustExist } from '../middleware/guards';
 import { EvmEventSourceAttributes } from '../models';
 import * as protocol from '../services/commonProtocol';
+import { getWeightedNumTokens } from '../services/stakeHelper';
 import {
   decodeThreadContentUrl,
   getChainNodeUrl,
@@ -315,8 +316,43 @@ export function Contests(): Projection<typeof inputs> {
             content_id: payload.content_id,
             action: 'added',
           },
-          raw: true,
+          include: [
+            {
+              model: models.ContestManager,
+              include: [
+                {
+                  model: models.Community,
+                  include: [
+                    {
+                      model: models.ChainNode.scope('withPrivateData'),
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
         });
+
+        let calculated_voting_weight: string | undefined;
+
+        if (
+          BigInt(payload.voting_power || 0) > BigInt(0) &&
+          add_action?.ContestManager?.vote_weight_multiplier
+        ) {
+          const { eth_chain_id, url, private_url } =
+            add_action!.ContestManager!.Community!.ChainNode!;
+          const { funding_token_address, vote_weight_multiplier } =
+            add_action!.ContestManager!;
+          const numTokens = await getWeightedNumTokens(
+            payload.voter_address,
+            funding_token_address!,
+            eth_chain_id!,
+            getChainNodeUrl({ url, private_url }),
+            vote_weight_multiplier!,
+          );
+          calculated_voting_weight = numTokens.toString();
+        }
+
         await models.ContestAction.upsert({
           ...payload,
           contest_id,
@@ -325,6 +361,7 @@ export function Contests(): Projection<typeof inputs> {
           thread_id: add_action!.thread_id,
           content_url: add_action!.content_url,
           created_at: new Date(),
+          calculated_voting_weight,
         });
 
         // eslint-disable-next-line @typescript-eslint/no-misused-promises

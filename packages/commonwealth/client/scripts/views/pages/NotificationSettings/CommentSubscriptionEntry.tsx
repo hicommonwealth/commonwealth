@@ -113,7 +113,7 @@ export const CommentSubscriptionEntry = (
       <div>
         <CWText type="h4" fontWeight="semiBold">
           <MarkdownViewerUsingQuillOrNewEditor
-            markdown={safeTruncateBody(decodeURI(comment.body))}
+            markdown={safeTruncateBody(comment.body)}
             cutoffLines={4}
             customShowMoreButton={<></>}
           />
