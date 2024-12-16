@@ -141,14 +141,14 @@
 
       .ql-container {
         min-height: 212px;
-        max-height: 512px;
+        max-height: calc(84vh - 250px);
         overflow: auto;
         border: none !important;
       }
 
       .ql-editor {
         min-height: 212px;
-        max-height: 512px;
+        max-height: calc(84vh - 250px);
 
         &.ql-blank::before {
           font-style: normal;

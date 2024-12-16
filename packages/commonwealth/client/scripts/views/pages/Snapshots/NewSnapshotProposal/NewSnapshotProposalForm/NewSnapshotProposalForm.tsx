@@ -32,6 +32,9 @@ type NewSnapshotProposalFormProps = {
   thread?: Thread;
   onSave?: (snapshotInfo: { id: string; snapshot_title: string }) => void;
   onModalClose?: () => void;
+  onPublish?: (publishing: boolean) => void;
+  onValidityChange?: (valid: boolean) => void;
+  hideButtons?: boolean;
 };
 
 export const NewSnapshotProposalForm = ({
@@ -39,6 +42,9 @@ export const NewSnapshotProposalForm = ({
   thread,
   onSave,
   onModalClose,
+  onPublish,
+  onValidityChange,
+  hideButtons,
 }: NewSnapshotProposalFormProps) => {
   const navigate = useCommonNavigate();
 
@@ -68,6 +74,7 @@ export const NewSnapshotProposalForm = ({
   const handlePublish = async () => {
     try {
       setIsSaving(true);
+      onPublish?.(true);
 
       const content = JSON.stringify(contentDelta);
       // @ts-expect-error <StrictNullChecks/>
@@ -83,7 +90,7 @@ export const NewSnapshotProposalForm = ({
       navigate(`/snapshot/${space.id}`);
 
       if (onSave) {
-        onSave({ id: response.id, snapshot_title: response.title }); // Pass relevant information
+        onSave({ id: response.id, snapshot_title: response.title });
       }
     } catch (err) {
       err.code === 'ACTION_REJECTED'
@@ -91,6 +98,7 @@ export const NewSnapshotProposalForm = ({
         : notifyError(_.capitalize(err.error_description) || err.message);
     } finally {
       setIsSaving(false);
+      onPublish?.(false);
     }
   };
 
@@ -160,25 +168,25 @@ export const NewSnapshotProposalForm = ({
       (member) => member.toLowerCase() === author.address.toLowerCase(),
     );
 
-  const minScoreFromSpace =
-    space?.validation?.params.minScore ?? space?.filters?.minScore; // Fall back to filters
+  const minScoreFromSpace: number =
+    space?.validation?.params.minScore ?? space?.filters?.minScore ?? 0; // Fall back to 0
 
   // @ts-expect-error <StrictNullChecks/>
-  const hasMinScore = userScore >= minScoreFromSpace;
+  const hasMinScore: boolean = userScore >= minScoreFromSpace;
 
-  const showScoreWarning =
-    // @ts-expect-error <StrictNullChecks/>
+  const showScoreWarning: boolean =
     minScoreFromSpace > 0 && !hasMinScore && !isMember && userScore !== null;
 
-  const isValid =
-    !!space &&
-    (!space.filters?.onlyMembers || (space.filters?.onlyMembers && isMember)) &&
-    (minScoreFromSpace === 0 ||
-      // @ts-expect-error <StrictNullChecks/>
-      (minScoreFromSpace > 0 && userScore >= minScoreFromSpace) ||
-      isMember);
+  const isValid: boolean =
+    Boolean(space) &&
+    Boolean(
+      !space?.filters?.onlyMembers || (space?.filters?.onlyMembers && isMember),
+    ) &&
+    Boolean(minScoreFromSpace === 0 || hasMinScore || isMember);
 
-  // Check if the space object is not null before rendering the form
+  useEffect(() => {
+    onValidityChange?.(isValid);
+  }, [isValid, onValidityChange]);
 
   return (
     <div className="NewSnapshotProposalForm">
@@ -194,7 +202,12 @@ export const NewSnapshotProposalForm = ({
           </div>
         )
       ) : (
-        <>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            void handlePublish();
+          }}
+        >
           {/* @ts-expect-error StrictNullChecks*/}
           {space.filters?.onlyMembers && !isMember && (
             <CWText>
@@ -293,24 +306,26 @@ export const NewSnapshotProposalForm = ({
             setContentDelta={setContentDelta}
             placeholder="What is your proposal?"
           />
-          <div className="footer">
-            {onModalClose && (
+          {!hideButtons && (
+            <div className="footer">
+              {onModalClose && (
+                <CWButton
+                  buttonHeight="sm"
+                  buttonType="secondary"
+                  label="Cancel"
+                  onClick={onModalClose}
+                />
+              )}
               <CWButton
                 buttonHeight="sm"
-                buttonType="secondary"
-                label="Cancel"
-                onClick={onModalClose}
+                label="Publish"
+                disabled={!author || isSaving || !isValid}
+                // eslint-disable-next-line @typescript-eslint/no-misused-promises
+                onClick={() => void handlePublish()}
               />
-            )}
-            <CWButton
-              buttonHeight="sm"
-              label="Publish"
-              disabled={!author || isSaving || !isValid}
-              // eslint-disable-next-line @typescript-eslint/no-misused-promises
-              onClick={handlePublish}
-            />
-          </div>
-        </>
+            </div>
+          )}
+        </form>
       )}
     </div>
   );
