@@ -5,6 +5,8 @@ import './proposal_extensions.scss';
 
 import app from 'state';
 
+import { CosmosProposalV1AtomOne } from 'client/scripts/controllers/chain/cosmos/gov/atomone/proposal-v1';
+import { CosmosProposalGovgen } from 'client/scripts/controllers/chain/cosmos/gov/govgen/proposal-v1beta1';
 import Cosmos from 'controllers/chain/cosmos/adapter';
 import { CosmosProposalV1 } from 'controllers/chain/cosmos/gov/v1/proposal-v1';
 import { CosmosProposal } from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
@@ -26,8 +28,17 @@ type ProposalExtensionsProps = {
 export const ProposalExtensions = (props: ProposalExtensionsProps) => {
   const { setCosmosDepositAmount, setDemocracyVoteAmount, proposal } = props;
   const { data: stakingDenom } = useStakingParamsQuery();
-  // @ts-expect-error <StrictNullChecks/>
-  const { data: cosmosDepositParams } = useDepositParamsQuery(stakingDenom);
+
+  let isGovgen = false;
+  if (proposal instanceof CosmosProposalGovgen) {
+    isGovgen = true;
+  }
+
+  const { data: cosmosDepositParams } = useDepositParamsQuery(
+    // @ts-expect-error <StrictNullChecks/>
+    stakingDenom,
+    isGovgen,
+  );
 
   useEffect(() => {
     if (setDemocracyVoteAmount) setDemocracyVoteAmount(0);
@@ -39,7 +50,9 @@ export const ProposalExtensions = (props: ProposalExtensionsProps) => {
 
   if (
     (proposal instanceof CosmosProposal ||
-      proposal instanceof CosmosProposalV1) &&
+      proposal instanceof CosmosProposalV1 ||
+      proposal instanceof CosmosProposalGovgen ||
+      proposal instanceof CosmosProposalV1AtomOne) &&
     proposal.status === 'DepositPeriod'
   ) {
     const cosmos = app.chain as Cosmos;

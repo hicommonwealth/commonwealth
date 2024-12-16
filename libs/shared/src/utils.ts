@@ -44,10 +44,10 @@ export const splitAndDecodeURL = (locationPathname: string) => {
   //this is to check for malformed urls on a topics page in /discussions
   const splitURLPath = locationPathname.split('/');
   if (splitURLPath[2] === 'discussions') {
-    return decodeURIComponent(splitURLPath[3]);
+    return splitURLPath[3] ? decodeURIComponent(splitURLPath[3]) : null;
   }
   splitURLPath[1] === 'discussions';
-  return decodeURIComponent(splitURLPath[2]);
+  return splitURLPath[2] ? decodeURIComponent(splitURLPath[2]) : null;
 };
 
 export const getThreadUrl = (
@@ -385,4 +385,44 @@ export function isWithinPeriod(
   const start = moment(refDate).startOf(period);
   const end = moment(refDate).endOf(period);
   return moment(targetDate).isBetween(start, end, null, '[]');
+}
+
+export async function alchemyGetTokenPrices({
+  alchemyApiKey,
+  tokenSources,
+}: {
+  alchemyApiKey: string;
+  tokenSources: {
+    contractAddress: string;
+    alchemyNetworkId: string;
+  }[];
+}): Promise<{
+  data: {
+    network: string;
+    address: string;
+    prices: { currency: string; value: string; lastUpdatedAt: string }[];
+    error: string | null;
+  }[];
+}> {
+  const options = {
+    method: 'POST',
+    headers: { accept: 'application/json', 'content-type': 'application/json' },
+    body: JSON.stringify({
+      addresses: tokenSources.map((x) => ({
+        network: x.alchemyNetworkId,
+        address: x.contractAddress,
+      })),
+    }),
+  };
+
+  const res = await fetch(
+    `https://api.g.alchemy.com/prices/v1/${alchemyApiKey}/tokens/by-address`,
+    options,
+  );
+
+  if (res.ok) return res.json();
+  else
+    throw new Error('Failed to fetch token prices', {
+      cause: { status: res.status, statusText: res.statusText },
+    });
 }

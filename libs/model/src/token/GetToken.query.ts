@@ -5,7 +5,7 @@ import { z } from 'zod';
 import { models } from '../database';
 import { mustExist } from '../middleware/guards';
 
-export function GetToken(): Query<typeof schemas.GetToken> {
+export function GetLaunchpadToken(): Query<typeof schemas.GetToken> {
   return {
     ...schemas.GetToken,
     auth: [],
@@ -44,7 +44,7 @@ export function GetToken(): Query<typeof schemas.GetToken> {
               : ''
           }
           SELECT T.*${with_stats ? ', trades.latest_price, trades.old_price' : ''}
-          FROM "Tokens" as T
+          FROM "LaunchpadTokens" as T
           ${with_stats ? 'LEFT JOIN trades ON trades.token_address = T.token_address' : ''}
           WHERE T.namespace = :namespace;
       `;

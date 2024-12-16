@@ -25,7 +25,7 @@ import { MessageRow } from 'views/components/component_kit/new_designs/CWTextInp
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import CommunityManagementLayout from 'views/pages/CommunityManagement/common/CommunityManagementLayout';
 
-import { BLOG_SUBDOMAIN } from '@hicommonwealth/shared';
+import { BLOG_SUBDOMAIN, ZERO_ADDRESS } from '@hicommonwealth/shared';
 import { CONTEST_FAQ_URL } from '../../../utils';
 import {
   ContestFeeType,
@@ -77,6 +77,7 @@ const DetailsFormStep = ({
 
   const [isProcessingProfileImage, setIsProcessingProfileImage] =
     useState(false);
+  const [voteWeightMultiplier, setVoteWeightMultiplier] = useState(1);
 
   const { mutateAsync: updateContest } = useUpdateContestMutation();
 
@@ -107,7 +108,7 @@ const DetailsFormStep = ({
   const totalPayoutPercentageError = totalPayoutPercentage !== 100;
 
   const weightedTopics = (topicsData || [])
-    .filter((t) => t?.weighted_voting)
+    .filter((t) => t?.weighted_voting && t.token_address !== ZERO_ADDRESS)
     .map((t) => ({
       value: t.id,
       label: t.name,
@@ -206,6 +207,7 @@ const DetailsFormStep = ({
       payoutStructure,
       contestDuration,
       isFarcasterContest,
+      voteWeightMultiplier,
     };
 
     if (editMode) {
@@ -270,6 +272,7 @@ const DetailsFormStep = ({
           validationSchema={schema}
           onSubmit={handleSubmit}
           initialValues={getInitialValues()}
+          onErrors={(err) => console.warn('FORM ERRORS: ', err)}
         >
           {({ watch, setValue }) => (
             <>
@@ -363,8 +366,7 @@ const DetailsFormStep = ({
 
               {weightedTopics.find(
                 (t) => t.value === watch('contestTopic')?.value,
-              )?.weightedVoting === TopicWeightedVoting.ERC20 ||
-              isFarcasterContest ? (
+              )?.weightedVoting === TopicWeightedVoting.ERC20 ? (
                 <>
                   <div className="contest-section contest-section-funding">
                     <CWText type="h4">Contest Funding</CWText>
@@ -438,6 +440,59 @@ const DetailsFormStep = ({
                     </div>
                   </div>
                 </>
+              ) : isFarcasterContest ? (
+                <div className="contest-section contest-section-farcaster-token">
+                  <CWText type="h4">Primary token</CWText>
+                  <CWText type="b1">
+                    Enter a token to fund the contest and for weighting upvotes
+                    on the contest.
+                  </CWText>
+                  <TokenFinder
+                    debouncedTokenValue={debouncedTokenValue}
+                    tokenMetadataLoading={tokenMetadataLoading}
+                    tokenMetadata={tokenMetadata}
+                    setTokenValue={setTokenValue}
+                    tokenValue={
+                      editMode
+                        ? contestFormData?.fundingTokenAddress || ''
+                        : tokenValue
+                    }
+                    containerClassName="token-input"
+                    disabled={editMode}
+                    fullWidth
+                    placeholder="Enter funding token address"
+                    tokenError={getTokenError(
+                      watch('contestRecurring') === ContestRecurringType.No,
+                    )}
+                    hookToForm
+                    name="fundingTokenAddress"
+                  />
+
+                  <CWText type="h5">Vote weight voteWeightMultiplier</CWText>
+
+                  <div className="input-row">
+                    <CWText type="b1" className="description">
+                      1 token is equal to
+                    </CWText>
+                    <CWTextInput
+                      type="number"
+                      min={1}
+                      defaultValue={1}
+                      isCompact
+                      value={voteWeightMultiplier}
+                      onInput={(e) =>
+                        setVoteWeightMultiplier(Number(e.target.value))
+                      }
+                    />
+                    <CWText type="b1" className="description">
+                      votes.
+                    </CWText>
+                  </div>
+                  <CWText type="b1" className="description">
+                    Vote weight per token held by the user will be{' '}
+                    {voteWeightMultiplier || 0}.
+                  </CWText>
+                </div>
               ) : (
                 <></>
               )}
