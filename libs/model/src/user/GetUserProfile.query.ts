@@ -10,7 +10,7 @@ export function GetUserProfile(): Query<typeof schemas.GetUserProfile> {
     auth: [],
     secure: false,
     body: async ({ actor, payload }) => {
-      const user_id = payload.userId ?? actor.user.id;
+      const user_id = payload.userId ?? actor.user?.id;
 
       const user = await models.User.findOne({
         where: { id: user_id },
