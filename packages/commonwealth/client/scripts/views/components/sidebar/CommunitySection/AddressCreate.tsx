@@ -42,7 +42,7 @@ const AddressCreate = ({ onAuthModalOpen }: AddressCreateProps) => {
           onClick={onClick}
         >
           <CWIcon
-            iconName={'plus'}
+            iconName="plus"
             iconSize="small"
             className="caret-icon"
             weight="bold"
