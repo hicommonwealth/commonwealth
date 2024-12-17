@@ -12,8 +12,8 @@ import {
   serializeCanvas,
 } from '@hicommonwealth/shared';
 import { bech32 } from 'bech32';
-import { SignIn } from 'model/src/user';
 import { afterAll, beforeAll, describe, expect, test } from 'vitest';
+import { SignIn } from '../../src/user/SignIn.command';
 import { seedCommunity } from '../utils';
 
 describe('SignIn Lifecycle', () => {
