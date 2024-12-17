@@ -167,14 +167,19 @@ export const useGenerateTokenIdea = ({
       notifyError(error.message);
       console.error('Error fetching token idea:', error.message);
     } finally {
-      setTokenIdeas((ti) => {
-        const temp = [...ti];
-        temp[ideaIndex] = {
-          ...(temp[ideaIndex] || {}),
-          isChunking: false,
-        };
-        return temp;
-      });
+      setTimeout(() => {
+        setTokenIdeas((ti) => {
+          const temp = [...ti];
+          temp[ideaIndex] = {
+            ...(temp[ideaIndex] || {}),
+            isChunking: false,
+          };
+          return temp;
+        });
+        // Note: Sometimes the final image takes time to load and if the form is submitted during that interval
+        // it sends the full image url (the one we get from chatgpt, which is non-s3) and this breaks the
+        // db image col validation, which in turn breaks the api. Adding a wait of 1 sec to avoid this secnario
+      }, 1000);
     }
   };
 
