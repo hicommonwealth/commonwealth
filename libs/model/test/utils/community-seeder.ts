@@ -1,6 +1,6 @@
 import { Actor } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
-import { ChainBase } from '@hicommonwealth/shared';
+import { ChainBase, WalletId } from '@hicommonwealth/shared';
 import { z } from 'zod';
 import { seed, seedRecord } from '../../src/tester';
 import { getSignersInfo } from './canvas-signers';
@@ -56,7 +56,7 @@ export async function seedCommunity({
     is_welcome_onboard_flow_complete: false,
   }));
 
-  // seed ethereum base community
+  // seed base community
   const [base] = await seed('Community', {
     chain_node_id: node!.id!,
     base: chain_base,
@@ -70,6 +70,7 @@ export async function seedCommunity({
         role: role === 'admin' ? 'admin' : 'member',
         is_banned: role === 'banned',
         verified: new Date(),
+        wallet_id: WalletId.Metamask,
       };
     }),
   });
@@ -89,6 +90,7 @@ export async function seedCommunity({
         role: role === 'admin' ? 'admin' : 'member',
         is_banned: role === 'banned',
         verified: new Date(),
+        wallet_id: WalletId.Metamask,
       };
     }),
     groups: groups.map(({ id }) => ({ id })),

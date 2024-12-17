@@ -13,9 +13,11 @@ export type VerifiedAddress = {
   existingHexUserId?: number | null;
 };
 
-export const VerifyAddressErrors = {
-  InvalidAddress: 'Invalid address',
-};
+export class InvalidAddress extends InvalidInput {
+  constructor(address: string, details: string) {
+    super(`Invalid address "${address}" (${details})`);
+  }
+}
 
 /**
  * Verifies that address is compatible with community and has a valid signature
@@ -27,43 +29,47 @@ export async function verifyAddress(
   // Injective special validation
   if (community_id === 'injective') {
     if (address.slice(0, 3) !== 'inj')
-      throw new InvalidInput('Must join with Injective address');
+      throw new InvalidAddress(address, 'Must join with Injective address');
   } else if (address.slice(0, 3) === 'inj')
-    throw new InvalidInput('Cannot join with an injective address');
+    throw new InvalidAddress(address, 'Cannot join with an Injective address');
 
   const community = await models.Community.findOne({
     where: { id: community_id },
   });
   mustExist('Community', community);
 
-  if (community.base === ChainBase.Ethereum) {
-    const { isAddress } = await import('web3-validator');
-    if (!isAddress(address)) throw new InvalidInput('Eth address is not valid');
-    return { base: community.base, encodedAddress: address };
-  }
-
-  if (community.base === ChainBase.Substrate)
-    return {
-      base: community.base,
-      encodedAddress: addressSwapper({
-        address,
-        currentPrefix: community.ss58_prefix!,
-      }),
-      ss58Prefix: community.ss58_prefix!,
-    };
-
-  if (community.base === ChainBase.NEAR)
-    throw new InvalidInput('NEAR sign in not supported');
-
-  if (community.base === ChainBase.Solana) {
-    const { PublicKey } = await import('@solana/web3.js');
-    const key = new PublicKey(address);
-    if (key.toBase58() !== address)
-      throw new InvalidInput(`Solana address is not valid: ${key.toBase58()}`);
-    return { base: community.base, encodedAddress: address };
-  }
-
   try {
+    if (community.base === ChainBase.Ethereum) {
+      const { isAddress } = await import('web3-validator');
+      if (!isAddress(address)) throw new InvalidAddress(address, 'Not Eth');
+      return { base: community.base, encodedAddress: address };
+    }
+
+    if (community.base === ChainBase.Substrate) {
+      // TODO: @raykyri should we check ss58 prefix here?
+      if (!community.ss58_prefix)
+        throw new InvalidAddress(address, 'No SS58 prefix');
+      return {
+        base: community.base,
+        encodedAddress: addressSwapper({
+          address,
+          currentPrefix: community.ss58_prefix!,
+        }),
+        ss58Prefix: community.ss58_prefix!,
+      };
+    }
+
+    if (community.base === ChainBase.NEAR)
+      throw new InvalidAddress(address, 'NEAR sign in not supported');
+
+    if (community.base === ChainBase.Solana) {
+      const { PublicKey } = await import('@solana/web3.js');
+      const key = new PublicKey(address);
+      if (key.toBase58() !== address)
+        throw new InvalidAddress(address, `Base58 ${key.toBase58()}`);
+      return { base: community.base, encodedAddress: address };
+    }
+
     // cosmos or injective
     if (community.bech32_prefix) {
       const { words } = bech32.decode(address, 50);
@@ -85,8 +91,11 @@ export async function verifyAddress(
         existingHexUserId: existingHexesSorted.at(0)?.user_id,
       };
     }
-    throw new InvalidInput(VerifyAddressErrors.InvalidAddress);
+
+    throw new InvalidAddress(address, 'Unknown base');
   } catch (e) {
-    throw new InvalidInput(VerifyAddressErrors.InvalidAddress);
+    if (e instanceof InvalidAddress) throw e;
+    const details = `${e instanceof Error ? e.message : e}`;
+    throw new InvalidAddress(address, details);
   }
 }
