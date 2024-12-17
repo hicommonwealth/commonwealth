@@ -3,7 +3,7 @@ import { NeynarAPIClient } from '@neynar/nodejs-sdk';
 
 export function validateFarcasterAction() {
   return async (req, _, next) => {
-    const sig = req.body.trustedData?.messageBytes || null;
+    const sig = req.body.trustedData?.messageBytes;
     if (!sig) {
       throw new Error('Neynar signature missing from request headers');
     }
