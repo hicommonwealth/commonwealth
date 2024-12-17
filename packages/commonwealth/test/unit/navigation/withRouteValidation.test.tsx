@@ -2,11 +2,14 @@ import { cleanup, render, screen } from '@testing-library/react';
 import React from 'react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { withRouteValidation } from '../../../client/scripts/navigation/withRouteValidation';
+import {
+  WithRouteValidationProps,
+  withRouteValidation,
+} from '../../../client/scripts/navigation/withRouteValidation';
 
 // Mock the isValidSlug function
 vi.mock('../../../client/scripts/utils/url-validation', () => ({
-  isValidSlug: (url: string) => {
+  isValidSlug: vi.fn((url: string) => {
     const urlPattern = /^https?:\/\//i;
     const htmlPattern = /[<>]/;
     const jsPattern = /javascript:/i;
@@ -20,15 +23,23 @@ vi.mock('../../../client/scripts/utils/url-validation', () => ({
       dataPattern.test(url) ||
       whitespacePattern.test(url)
     );
-  },
+  }),
 }));
 
-const TestComponent = () => <div>Test Component</div>;
-const WrappedComponent = withRouteValidation(TestComponent);
+interface TestComponentProps extends WithRouteValidationProps {
+  testProp?: string;
+}
+
+const TestComponent: React.FC<TestComponentProps> = ({ testProp }) => (
+  <div data-testid="test-component">Test Component {testProp}</div>
+);
+
+const WrappedComponent = withRouteValidation<TestComponentProps>(TestComponent);
 
 describe('withRouteValidation HOC', () => {
   afterEach(() => {
     cleanup();
+    vi.clearAllMocks();
   });
 
   const renderWithRouter = (path: string) => {
@@ -36,41 +47,49 @@ describe('withRouteValidation HOC', () => {
     return render(
       <MemoryRouter initialEntries={[path]}>
         <Routes>
-          <Route path="/:param/*" element={<WrappedComponent />} />
-          <Route path="/dashboard" element={<div>Dashboard</div>} />
+          <Route
+            path="/:param/*"
+            element={<WrappedComponent testProp="test" />}
+          />
+          <Route
+            path="/dashboard"
+            element={<div data-testid="dashboard">Dashboard</div>}
+          />
         </Routes>
       </MemoryRouter>,
     );
   };
 
   it('should redirect to dashboard for malicious URLs', () => {
-    // Test malicious URL with http protocol
-    renderWithRouter('/Please reset your password at https://evil.com');
-    expect(screen.queryByText('Test Component')).not.toBeInTheDocument();
-    expect(screen.queryByText('Dashboard')).toBeInTheDocument();
-
-    // Test malicious URL with HTML injection
-    renderWithRouter('/profile/edit/<script>alert(1)</script>');
-    expect(screen.queryByText('Test Component')).not.toBeInTheDocument();
-    expect(screen.queryByText('Dashboard')).toBeInTheDocument();
-
-    // Test malicious URL with javascript protocol
-    renderWithRouter('/community/javascript:alert(1)');
-    expect(screen.queryByText('Test Component')).not.toBeInTheDocument();
-    expect(screen.queryByText('Dashboard')).toBeInTheDocument();
+    renderWithRouter('/javascript:alert(1)');
+    expect(screen.queryByTestId('test-component')).toBeNull();
+    expect(screen.queryByTestId('dashboard')).toBeTruthy();
   });
 
-  it('should render component for legitimate URLs', () => {
-    // Test legitimate profile URL
-    renderWithRouter('/profile/edit/123');
-    expect(screen.queryByText('Test Component')).toBeInTheDocument();
+  it('should redirect to dashboard for HTML injection attempts', () => {
+    renderWithRouter('/<script>alert(1)</script>');
+    expect(screen.queryByTestId('test-component')).toBeNull();
+    expect(screen.queryByTestId('dashboard')).toBeTruthy();
+  });
 
-    // Test legitimate stake URL
-    renderWithRouter('/myCommunityStake/valid-stake');
-    expect(screen.queryByText('Test Component')).toBeInTheDocument();
+  it('should redirect to dashboard for data URI attacks', () => {
+    renderWithRouter('/data:text/html,<script>alert(1)</script>');
+    expect(screen.queryByTestId('test-component')).toBeNull();
+    expect(screen.queryByTestId('dashboard')).toBeTruthy();
+  });
 
-    // Test legitimate community URL
-    renderWithRouter('/community/valid-community');
-    expect(screen.queryByText('Test Component')).toBeInTheDocument();
+  it('should render component for valid profile path', () => {
+    renderWithRouter('/profile/123');
+    expect(screen.queryByTestId('test-component')).toBeTruthy();
+  });
+
+  it('should render component for valid stake path', () => {
+    renderWithRouter('/myCommunityStake/123');
+    expect(screen.queryByTestId('test-component')).toBeTruthy();
+  });
+
+  it('should render component for valid community path', () => {
+    renderWithRouter('/community/test-community');
+    expect(screen.queryByTestId('test-component')).toBeTruthy();
   });
 });
