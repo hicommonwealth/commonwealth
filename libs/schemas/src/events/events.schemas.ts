@@ -268,12 +268,13 @@ export const FarcasterCastCreated = FarcasterCast.describe(
   'When a farcaster contest cast has been posted',
 );
 
-export const FarcasterReplyCastCreated = FarcasterCast.describe(
-  'When a reply is posted to a farcaster contest cast',
-);
+export const FarcasterReplyCastCreated = FarcasterCast.extend({
+  verified_address: z.string(),
+}).describe('When a reply is posted to a farcaster contest cast');
 
 export const FarcasterVoteCreated = FarcasterAction.extend({
   contest_address: z.string(),
+  verified_address: z.string(),
 }).describe('When a farcaster action is initiated on a cast reply');
 
 export const SignUpFlowCompleted = z.object({

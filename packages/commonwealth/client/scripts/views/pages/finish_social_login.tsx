@@ -42,6 +42,7 @@ const validate = async (
       // @ts-expect-error <StrictNullChecks/>
       walletSsoSource,
       isLoggedIn,
+      isCustomDomain,
     });
 
     if (isMagicV1) {

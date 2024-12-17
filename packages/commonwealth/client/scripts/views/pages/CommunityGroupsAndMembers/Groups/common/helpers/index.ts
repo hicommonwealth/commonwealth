@@ -22,6 +22,7 @@ export const makeGroupDataBaseAPIPayload = (
     address: userStore.getState().activeAccount?.address || '',
     groupName: formSubmitValues.groupName.trim(),
     groupDescription: (formSubmitValues.groupDescription || '').trim(),
+    groupImageUrl: formSubmitValues.groupImageUrl || '',
     topics: formSubmitValues.topics,
     requirementsToFulfill:
       formSubmitValues.requirementsToFulfill === 'ALL'
