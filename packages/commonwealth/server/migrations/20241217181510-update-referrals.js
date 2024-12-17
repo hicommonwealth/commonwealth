@@ -36,7 +36,7 @@ module.exports = {
       );
 
       await queryInterface.addColumn(
-        'ReferralFees',
+        'Users',
         'referral_eth_earnings',
         {
           type: Sequelize.FLOAT,
@@ -51,6 +51,9 @@ module.exports = {
   async down(queryInterface, Sequelize) {
     await queryInterface.sequelize.transaction(async (transaction) => {
       await queryInterface.dropTable('ReferralFees', { transaction });
+      await queryInterface.removeColumn('Users', 'referral_eth_earnings', {
+        transaction,
+      });
     });
   },
 };
