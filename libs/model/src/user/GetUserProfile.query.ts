@@ -3,6 +3,7 @@ import * as schemas from '@hicommonwealth/schemas';
 import { Op } from 'sequelize';
 import { z } from 'zod';
 import { models } from '../database';
+import { mustExist } from '../middleware/guards';
 
 export function GetUserProfile(): Query<typeof schemas.GetUserProfile> {
   return {
@@ -16,6 +17,8 @@ export function GetUserProfile(): Query<typeof schemas.GetUserProfile> {
         where: { id: user_id },
         attributes: ['profile', 'xp_points', 'referral_link'],
       });
+
+      mustExist('User', user);
 
       const addresses = await models.Address.findAll({
         where: { user_id },
