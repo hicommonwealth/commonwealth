@@ -22,10 +22,6 @@ export const CommentCreatedNotification = z.object({
     .string()
     .max(255)
     .describe('The user-friendly name of the community'),
-  community_icon_url: z
-    .string()
-    .nullish()
-    .describe('The URL of the community icon'),
   comment_body: z
     .string()
     .max(255)
@@ -34,6 +30,10 @@ export const CommentCreatedNotification = z.object({
   comment_created_event: events.CommentCreated.describe(
     'The full comment record',
   ),
+  community_icon_url: z
+    .string()
+    .nullish()
+    .describe('The URL of the community icon'),
 });
 
 export const SnapshotProposalCreatedNotification = z.object({
