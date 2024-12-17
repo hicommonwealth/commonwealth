@@ -79,11 +79,13 @@ export function buildThreadContentUrl(communityId: string, threadId: number) {
 export function decodeThreadContentUrl(contentUrl: string): {
   communityId: string | null;
   threadId: number | null;
+  isFarcaster: boolean;
 } {
   if (contentUrl.startsWith('/farcaster/')) {
     return {
       communityId: null,
       threadId: null,
+      isFarcaster: true,
     };
   }
   if (!contentUrl.includes('/discussion/')) {
@@ -95,6 +97,7 @@ export function decodeThreadContentUrl(contentUrl: string): {
   return {
     communityId,
     threadId: parseInt(threadId, 10),
+    isFarcaster: false,
   };
 }
 
