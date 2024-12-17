@@ -16,6 +16,7 @@ import { MarkdownViewerWithFallback } from 'views/components/MarkdownViewerWithF
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import type NewProfile from '../../../../models/NewProfile';
 import { SharePopover } from '../../SharePopover';
+import { CWCommunityAvatar } from '../../component_kit/cw_community_avatar';
 import { CWText } from '../../component_kit/cw_text';
 import { SocialAccounts } from '../../social_accounts';
 
@@ -65,6 +66,17 @@ const ProfileHeader = ({ profile, isOwner }: ProfileHeaderProps) => {
               jdenticon.toSvg(profile.userId, 90),
             )}`}
           />
+        )}
+        {profile.communityId && (
+          <div className="community-logo">
+            <CWCommunityAvatar
+              community={{
+                name: profile.communityId,
+                iconUrl: profile.communityIconUrl,
+              }}
+              size="small"
+            />
+          </div>
         )}
       </div>
       <div className="profile-name-and-bio">

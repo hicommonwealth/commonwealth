@@ -24,12 +24,24 @@
     align-items: center;
     justify-content: center;
     margin-bottom: 16px;
+    position: relative;
 
     img {
       height: 160px;
       width: 160px;
       border-radius: 50%;
       object-fit: cover;
+    }
+
+    .community-logo {
+      position: absolute;
+      bottom: 0;
+      right: calc(50% - 80px);
+      z-index: 1;
+      background: white;
+      border-radius: 50%;
+      padding: 2px;
+      border: 1px solid $neutral-200;
     }
   }
 
