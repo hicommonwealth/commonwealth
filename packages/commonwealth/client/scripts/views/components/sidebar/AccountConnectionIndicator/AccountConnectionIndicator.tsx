@@ -15,7 +15,7 @@ interface AccountConnectionIndicatorProps {
   address: string;
   addresses: AddressInfo[] | undefined;
   profile: NewProfile | undefined;
-  refreshProfiles: (addressInfo: AddressInfo) => void;
+  refreshProfiles: () => void;
 }
 
 const AccountConnectionIndicator = ({

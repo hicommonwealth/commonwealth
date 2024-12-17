@@ -1,6 +1,5 @@
 import { TokenView } from '@hicommonwealth/schemas';
 import { PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
-import AddressInfo from 'client/scripts/models/AddressInfo';
 import NewProfile from 'client/scripts/models/NewProfile';
 import { useFetchProfileByIdQuery } from 'client/scripts/state/api/profiles';
 import { findDenominationString } from 'helpers/findDenomination';
@@ -42,7 +41,6 @@ interface CommunitySectionProps {
 
 export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
   const [profile, setProfile] = useState<NewProfile>();
-  const [addresses, setAddresses] = useState<AddressInfo[]>();
 
   const tokenizedCommunityEnabled = useFlag('tokenizedCommunity');
 
@@ -100,7 +98,6 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
 
     if (error) {
       setProfile(undefined);
-      setAddresses([]);
       return;
     }
 
@@ -111,29 +108,6 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
           userId: data.userId,
           isOwner: data.userId === user.id,
         }),
-      );
-      setAddresses(
-        // @ts-expect-error <StrictNullChecks/>
-        data.addresses
-          .filter((addr) => addr.community_id === communityId)
-          .map((a) => {
-            try {
-              return new AddressInfo({
-                userId: a.user_id!,
-                id: a.id!,
-                address: a.address,
-                community: {
-                  id: a.community_id!,
-                  // we don't get other community properties from api + they aren't needed here
-                },
-                walletId: a.wallet_id!,
-                ghostAddress: a.ghost_address,
-              });
-            } catch (err) {
-              console.error(`Could not return AddressInfo: "${err}"`);
-              return null;
-            }
-          }),
       );
       return;
     }
@@ -156,17 +130,12 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
             <AccountConnectionIndicator
               connected={!!user.activeAccount}
               address={user.activeAccount?.address || ''}
-              addresses={addresses}
+              addresses={user.addresses.filter(
+                (addr) => addr.community.id === communityId,
+              )}
               profile={profile}
-              refreshProfiles={(addressInfo) => {
+              refreshProfiles={() => {
                 refetch().catch(console.error);
-                user.setData({
-                  addresses: [...user.addresses].filter(
-                    (addr) =>
-                      addr.community.id !== addressInfo.community.id &&
-                      addr.address !== addressInfo.address,
-                  ),
-                });
               }}
             />
 

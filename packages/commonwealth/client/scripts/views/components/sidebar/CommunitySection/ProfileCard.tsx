@@ -2,6 +2,7 @@ import { useFetchProfileByIdQuery } from 'client/scripts/state/api/profiles';
 import useUserStore from 'client/scripts/state/ui/user';
 import clsx from 'clsx';
 import React from 'react';
+import { Link } from 'react-router-dom';
 import './ProfileCard.scss';
 
 const ProfileCard = () => {
@@ -17,24 +18,32 @@ const ProfileCard = () => {
 
   return (
     <div className="profile-card">
-      <div
-        className={clsx('background-cover', {
-          'background-cover--cover': backgroundBehavior === 'cover',
-          'background-cover--fill': backgroundBehavior === 'fill',
-        })}
-        style={{
-          backgroundImage: backgroundImageUrl
-            ? `url(${backgroundImageUrl})`
-            : undefined,
-        }}
-      ></div>
+      <Link to={`/profile/edit`} className="user-info">
+        <div
+          className={clsx('background-cover', {
+            'background-cover--cover': backgroundBehavior === 'cover',
+            'background-cover--fill': backgroundBehavior === 'fill',
+          })}
+          style={{
+            backgroundImage: backgroundImageUrl
+              ? `url(${backgroundImageUrl})`
+              : undefined,
+          }}
+        ></div>
+      </Link>
+
       <div className="profile-content">
-        <img
-          className="profile-image"
-          src={data?.profile?.avatar_url ?? ''}
-          alt="Profile"
-        />
-        <h3 className="profile-name">{data?.profile.name}</h3>
+        <Link to={`/profile/edit`} className="user-info">
+          <img
+            className="profile-image"
+            src={data?.profile?.avatar_url ?? ''}
+            alt="Profile"
+          />
+        </Link>
+
+        <Link to={`/profile/edit`} className="user-info">
+          <h3 className="profile-name">{data?.profile.name}</h3>
+        </Link>
       </div>
     </div>
   );

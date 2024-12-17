@@ -27,6 +27,13 @@
     padding: 10px;
     background: #fff;
 
+    .user-info {
+      text-decoration: none;
+      color: inherit;
+      background: transparent;
+      cursor: pointer;
+    }
+
     .profile-image {
       width: 65px;
       height: 65px;
