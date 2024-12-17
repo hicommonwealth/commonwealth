@@ -5,7 +5,7 @@ export function validateFarcasterAction() {
   return async (req, _, next) => {
     const sig = req.body.trustedData?.messageBytes;
     if (!sig) {
-      throw new Error('Neynar signature missing from request headers');
+      throw new Error('Signature missing from request headers');
     }
     const client = new NeynarAPIClient(config.CONTESTS.NEYNAR_API_KEY!);
     const result = await client.validateFrameAction(sig);
