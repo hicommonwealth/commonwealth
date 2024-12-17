@@ -24,7 +24,10 @@ const output = z.object({
  * @returns boolean or undefined - A boolean indicating if a workflow was triggered. Undefined is returned if the
  * author or community does not exist
  */
-export const processCommentCreated: EventHandler<'CommentCreated', typeof output> = async ({ payload }) => {
+export const processCommentCreated: EventHandler<
+  'CommentCreated',
+  typeof output
+> = async ({ payload }) => {
   const author = await models.Address.findOne({
     where: { id: payload.address_id },
     include: [{ model: models.User, required: true, attributes: ['profile'] }],
@@ -92,7 +95,8 @@ export const processCommentCreated: EventHandler<'CommentCreated', typeof output
         author: author.User.profile.name || author.address.substring(0, 8),
         comment_parent_name: payload.parent_id ? 'comment' : 'thread',
         community_name: community.name,
-        community_icon_url: community.icon_url || config.DEFAULT_COMMONWEALTH_LOGO,
+        community_icon_url:
+          community.icon_url || config.DEFAULT_COMMONWEALTH_LOGO,
         comment_body: commentSummary,
         comment_url: commentUrl,
         comment_created_event: payload,
@@ -129,7 +133,8 @@ export const processCommentCreated: EventHandler<'CommentCreated', typeof output
         sender_username: 'Common',
         sender_avatar_url: config.DEFAULT_COMMONWEALTH_LOGO,
         community_id: community.id!,
-        community_icon_url: community.icon_url || config.DEFAULT_COMMONWEALTH_LOGO,
+        community_icon_url:
+          community.icon_url || config.DEFAULT_COMMONWEALTH_LOGO,
         title_prefix: 'Comment on: ',
         preview_image_url: previewImg.previewImageUrl,
         preview_image_alt_text: previewImg.previewImageAltText,
@@ -145,3 +150,4 @@ export const processCommentCreated: EventHandler<'CommentCreated', typeof output
   }
 
   return { success: true };
+};
