@@ -1,5 +1,4 @@
 import { dispose, logger } from '@hicommonwealth/core';
-import { models } from '@hicommonwealth/model';
 import { config } from '../../config';
 import { processChainNode, scheduleNodeProcessing } from './nodeProcessing';
 
@@ -26,11 +25,10 @@ export async function startEvmPolling(
   log.info(
     `All chains will be polled for events every ${interval / 1000} seconds`,
   );
-  await scheduleNodeProcessing(models, interval, processChainNode);
+  await scheduleNodeProcessing(interval, processChainNode);
   return setInterval(
     scheduleNodeProcessing,
     interval,
-    models,
     interval,
     processChainNode,
   );

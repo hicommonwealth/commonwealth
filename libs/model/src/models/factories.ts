@@ -15,7 +15,6 @@ import CommunityTags from './community_tags';
 import Contest from './contest';
 import ContestAction from './contest_action';
 import ContestManager from './contest_manager';
-import ContractAbi from './contract_abi';
 import DiscordBotConfig from './discord_bot_config';
 import EmailUpdateToken from './email_update_token';
 import EvmEventSource from './evmEventSource';
@@ -62,7 +61,6 @@ export const Factories = {
   Contest,
   ContestAction,
   ContestManager,
-  ContractAbi,
   DiscordBotConfig,
   EmailUpdateToken,
   EvmEventSource,
