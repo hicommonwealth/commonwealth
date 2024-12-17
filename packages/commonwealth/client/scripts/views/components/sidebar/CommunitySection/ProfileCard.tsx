@@ -18,7 +18,7 @@ const ProfileCard = () => {
 
   return (
     <div className="profile-card">
-      <Link to={`/profile/edit`} className="user-info">
+      <Link to={`/profile/id/${userData.id}`} className="user-info">
         <div
           className={clsx('background-cover', {
             'background-cover--cover': backgroundBehavior === 'cover',
@@ -33,7 +33,7 @@ const ProfileCard = () => {
       </Link>
 
       <div className="profile-content">
-        <Link to={`/profile/edit`} className="user-info">
+        <Link to={`/profile/id/${userData.id}`} className="user-info">
           <img
             className="profile-image"
             src={data?.profile?.avatar_url ?? ''}
@@ -41,7 +41,7 @@ const ProfileCard = () => {
           />
         </Link>
 
-        <Link to={`/profile/edit`} className="user-info">
+        <Link to={`/profile/id/${userData.id}`} className="user-info">
           <h3 className="profile-name">{data?.profile.name}</h3>
         </Link>
       </div>

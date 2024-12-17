@@ -28,7 +28,6 @@ type DeleteAddressModalAttrs = {
 
 export const DeleteAddressModal = ({
   address,
-  addresses,
   chain,
   closeModal,
 }: DeleteAddressModalAttrs) => {
