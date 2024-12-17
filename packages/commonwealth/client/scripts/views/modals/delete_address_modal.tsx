@@ -71,6 +71,10 @@ export const DeleteAddressModal = ({
       }
     } catch (err) {
       notifyError(err.response.data.error);
+    } finally {
+      user.setData({
+        ...(user.accounts.length === 1 && { activeAccount: null }),
+      });
     }
 
     closeModal();
