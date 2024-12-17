@@ -35,6 +35,7 @@ export const verifySessionSignature = async (
         currentPrefix: 42,
       })
     : sessionRawAddress;
+  console.log({ expectedAddress, walletAddress });
   assert(
     walletAddress === expectedAddress,
     `session.did address (${walletAddress}) does not match (${expectedAddress})`,
