@@ -5,7 +5,11 @@ import * as path from 'path';
 const ATTACHMENTS_DIR = path.join(process.env.HOME!, 'attachments');
 
 async function uploadAvatars() {
-  const storage = R2BlobStorage();
+  const storage = new R2BlobStorage({
+    accountId: process.env.R2_ACCOUNT_ID!,
+    accessKeyId: process.env.R2_ACCESS_KEY_ID!,
+    secretAccessKey: process.env.R2_SECRET_ACCESS_KEY!,
+  });
   const files = fs
     .readdirSync(ATTACHMENTS_DIR)
     .filter((f) => f.startsWith('Frame+') && f.endsWith('.png'));

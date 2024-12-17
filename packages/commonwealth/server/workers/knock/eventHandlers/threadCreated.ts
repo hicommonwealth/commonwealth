@@ -13,11 +13,9 @@ import { getProfileUrl, getThreadUrl } from '../util';
 
 const log = logger(import.meta);
 
-const output = z.void().or(
-  z.object({
-    success: z.boolean(),
-  }),
-);
+const output = z.object({
+  success: z.boolean(),
+});
 
 export const processThreadCreated: EventHandler<
   'ThreadCreated',

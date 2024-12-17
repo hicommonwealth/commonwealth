@@ -13,11 +13,9 @@ import { getCommentUrl, getProfileUrl } from '../util';
 
 const log = logger(import.meta);
 
-const output = z.void().or(
-  z.object({
-    success: z.boolean(),
-  })
-);
+const output = z.object({
+  success: z.boolean(),
+});
 
 /**
  * This function takes a CommentCreated event and triggers a notifications provider workflow with the user +
