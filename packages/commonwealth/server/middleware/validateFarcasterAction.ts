@@ -14,7 +14,6 @@ export function validateFarcasterAction() {
       return;
     }
     req.body = result.action; // override body with validated payload
-    // console.log('req.body: ', JSON.stringify(req.body, null, 2));
     next();
   };
 }
