@@ -60,7 +60,9 @@ function build() {
 
     router.post(
       '/farcaster/CastUpvoteAction',
-      validateFarcasterAction(),
+      (req, _, next) => {
+        validateFarcasterAction()(req, _, next).catch(next);
+      },
       express.command(Contest.FarcasterUpvoteAction()),
     );
   }
