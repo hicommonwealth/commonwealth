@@ -40,6 +40,7 @@ describe('Verify Address Routes', () => {
         block_info: TEST_BLOCK_INFO_STRING,
         session: serializeCanvas(session),
       });
+    console.log(res.body);
 
     expect(res.body.role).to.be.equal('member');
 

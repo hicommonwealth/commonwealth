@@ -1,6 +1,7 @@
 import { InvalidInput, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { deserializeCanvas } from '@hicommonwealth/shared';
+import crypto from 'crypto';
 import { Op } from 'sequelize';
 import { models } from '../database';
 import {
@@ -56,7 +57,8 @@ export function SignIn(): Command<typeof schemas.SignIn> {
       const { base, encodedAddress, ss58Prefix, hex, existingHexUserId } = actor
         .user.auth as VerifiedAddress;
 
-      // const verification_token = crypto.randomBytes(18).toString('hex');
+      // TODO: should we remove verification token stuff?
+      const verification_token = crypto.randomBytes(18).toString('hex');
       // const verification_token_expires = new Date(
       //   +new Date() + config.AUTH.ADDRESS_TOKEN_EXPIRES_IN * 60 * 1000,
       // );
@@ -102,7 +104,7 @@ export function SignIn(): Command<typeof schemas.SignIn> {
             // if (expiration && +expiration <= +new Date())
             //  throw new InvalidInput(SignInErrors.ExpiredToken);
 
-            // verified.verification_token = verification_token;
+            verified.verification_token = verification_token;
             // verified.verification_token_expires = verification_token_expires;
             // verified.last_active = new Date();
             // verified.block_info = block_info;
@@ -145,7 +147,7 @@ export function SignIn(): Command<typeof schemas.SignIn> {
               community_id,
               address: encodedAddress,
               hex,
-              // verification_token,
+              verification_token,
               // verification_token_expires,
               // block_info,
               last_active: new Date(),
