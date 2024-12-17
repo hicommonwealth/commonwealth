@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { PG_ETH } from '../utils';
 
-export const Token = z.object({
+export const LaunchpadToken = z.object({
   // derivable from creation event
   token_address: z.string().describe('Address of the token'),
   namespace: z.string().describe('Namespace associated with the token'),

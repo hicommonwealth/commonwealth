@@ -15,7 +15,6 @@ describe('Snapshot Listener API', { timeout: 5_000 }, () => {
         name: 'Sepolia Testnet',
         eth_chain_id: 11155111,
         balance_type: BalanceType.Ethereum,
-        contracts: [],
       },
       { mock: false },
     );

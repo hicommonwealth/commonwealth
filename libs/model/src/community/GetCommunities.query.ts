@@ -127,8 +127,8 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
                             ? `
                            AND (
                             SELECT "community_id"
-                            FROM   "Tokens" AS "Tokens"
-                            WHERE  ( "Tokens"."community_id" = "Community"."id" )
+                            FROM   "LaunchpadTokens" AS "LaunchpadTokens"
+                            WHERE  ( "LaunchpadTokens"."community_id" = "Community"."id" )
                             LIMIT  1
                           ) IS ${community_type === CommunityType.Launchpad ? 'NOT' : ''} NULL
                           `

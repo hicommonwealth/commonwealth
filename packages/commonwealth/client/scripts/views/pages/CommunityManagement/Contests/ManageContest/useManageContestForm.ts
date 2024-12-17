@@ -54,6 +54,7 @@ const useManageContestForm = ({
         // @ts-expect-error StrictNullChecks
         prizePercentage: contestData.prize_percentage,
         payoutStructure: contestData.payout_structure,
+        voteWeightMultiplier: contestData.vote_weight_multiplier,
       });
     }
   }, [

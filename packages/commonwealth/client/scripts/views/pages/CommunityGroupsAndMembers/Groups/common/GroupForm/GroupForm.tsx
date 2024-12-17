@@ -1,4 +1,8 @@
 /* eslint-disable react/no-multi-comp */
+import {
+  CWImageInput,
+  ImageBehavior,
+} from 'client/scripts/views/components/component_kit/CWImageInput';
 import { weightedVotingValueToLabel } from 'helpers';
 import { isValidEthAddress } from 'helpers/validateTypes';
 import { useCommonNavigate } from 'navigation/helpers';
@@ -178,6 +182,8 @@ const GroupForm = ({
   const [topicPermissionsSubForms, setTopicPermissionsSubForms] = useState<
     TopicPermissionsSubFormsState[]
   >([]);
+  const [isProcessingProfileImage, setIsProcessingProfileImage] =
+    useState(false);
 
   useEffect(() => {
     if (initialValues.requirements) {
@@ -388,6 +394,7 @@ const GroupForm = ({
 
     const formValues = {
       ...values,
+      groupImageUrl: values.groupImageUrl || '',
       topics: topicPermissionsSubForms.map((t) => ({
         id: t.topic.id,
         permissions: convertAccumulatedPermissionsToGranularPermissions(
@@ -436,6 +443,7 @@ const GroupForm = ({
         initialValues={{
           groupName: initialValues.groupName || '',
           groupDescription: initialValues.groupDescription || '',
+          groupImageUrl: initialValues.groupImageUrl || '',
           requirementsToFulfill: initialValues.requirementsToFulfill
             ? initialValues.requirementsToFulfill ===
               REQUIREMENTS_TO_FULFILL.ALL_REQUIREMENTS
@@ -492,6 +500,17 @@ const GroupForm = ({
                 label="Description (optional)"
                 placeholder="Add a description for your group"
                 instructionalMessage="Can be up to 250 characters long"
+              />
+
+              <CWImageInput
+                label="Group Image (Accepts JPG and PNG files)"
+                onImageProcessingChange={({ isGenerating, isUploading }) => {
+                  setIsProcessingProfileImage(isGenerating || isUploading);
+                }}
+                name="groupImageUrl"
+                hookToForm
+                imageBehavior={ImageBehavior.Circle}
+                withAIImageGeneration
               />
             </section>
 
@@ -706,6 +725,7 @@ const GroupForm = ({
                 buttonWidth="wide"
                 disabled={
                   isNameTaken ||
+                  isProcessingProfileImage ||
                   (requirementSubForms.length === 0 &&
                     allowedAddresses.length === 0)
                 }

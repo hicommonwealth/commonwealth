@@ -38,12 +38,16 @@ type SublayoutProps = {
 const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
   const { menuVisible, setMenu, menuName } = useSidebarStore();
   const [resizing, setResizing] = useState(false);
+  const { JoinCommunityModals, handleJoinCommunity } = useJoinCommunity();
+
+  const location = useLocation();
 
   useStickyHeader({
     elementId: 'mobile-auth-buttons',
     stickyBehaviourEnabled: true,
     zIndex: 70,
   });
+
   const { isWindowSmallInclusive, isWindowExtraSmall, isWindowSmallToMedium } =
     useBrowserWindow({
       onResize: () => setResizing(true),
@@ -78,7 +82,7 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
     user.isLoggedIn,
   ]);
 
-  const location = useLocation();
+  useHandleInviteLink({ isInsideCommunity, handleJoinCommunity });
 
   useWindowResize({
     setMenu,
@@ -210,12 +214,12 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
           content={
             <InviteLinkModal
               onModalClose={() => setIsInviteLinkModalOpen(false)}
-              isInsideCommunity={!!isInsideCommunity}
             />
           }
           open={!isWindowExtraSmall && isInviteLinkModalOpen}
           onClose={() => setIsInviteLinkModalOpen(false)}
         />
+        {JoinCommunityModals}
       </div>
       {isWindowExtraSmall && <MobileNavigation />}
     </div>
