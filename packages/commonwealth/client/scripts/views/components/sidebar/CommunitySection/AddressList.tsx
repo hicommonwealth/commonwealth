@@ -17,7 +17,7 @@ interface AddressListProps {
   addresses: AddressInfo[] | undefined;
   username?: string;
   profile: NewProfile;
-  refreshProfiles: (addressInfo: AddressInfo) => void;
+  refreshProfiles: () => void;
   onAuthModalOpen: (modalType?: AuthModalType) => void;
 }
 
@@ -98,7 +98,7 @@ export const AddressList = ({
               chain={currentAddress?.community?.id}
               closeModal={() => {
                 setIsRemoveModalOpen(false);
-                refreshProfiles(currentAddress);
+                refreshProfiles();
               }}
             />
           )
