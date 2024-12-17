@@ -5,7 +5,10 @@ import {
   EvmEventSignatures,
   commonProtocol as cp,
 } from '@hicommonwealth/evm-protocols';
+import { config } from '@hicommonwealth/model';
 import { ContestScore, events } from '@hicommonwealth/schemas';
+import { buildContestLeaderboardUrl, getBaseUrl } from '@hicommonwealth/shared';
+import { NeynarAPIClient } from '@neynar/nodejs-sdk';
 import { QueryTypes } from 'sequelize';
 import { z } from 'zod';
 import { models } from '../database';
@@ -17,6 +20,7 @@ import {
   decodeThreadContentUrl,
   getChainNodeUrl,
   getDefaultContestImage,
+  parseFarcasterContentUrl,
 } from '../utils';
 
 const log = logger(import.meta);
@@ -295,7 +299,9 @@ export function Contests(): Projection<typeof inputs> {
       },
 
       ContestContentAdded: async ({ payload }) => {
-        const { threadId } = decodeThreadContentUrl(payload.content_url);
+        const { threadId, isFarcaster } = decodeThreadContentUrl(
+          payload.content_url,
+        );
         await models.ContestAction.create({
           ...payload,
           contest_id: payload.contest_id || 0,
@@ -306,6 +312,38 @@ export function Contests(): Projection<typeof inputs> {
           voting_power: '0',
           created_at: new Date(),
         });
+
+        // post confirmation via FC bot
+        if (isFarcaster) {
+          const contestManager = await models.ContestManager.findByPk(
+            payload.contest_address,
+          );
+          const client = new NeynarAPIClient(config.CONTESTS.NEYNAR_API_KEY!);
+          try {
+            const leaderboardUrl = buildContestLeaderboardUrl(
+              getBaseUrl(config.APP_ENV),
+              contestManager!.community_id,
+              contestManager!.contest_address,
+            );
+            const { replyCastHash } = parseFarcasterContentUrl(
+              payload.content_url,
+            );
+            const {
+              result: { casts },
+            } = await client.fetchBulkCasts([replyCastHash]);
+            const username = casts[0].author.username;
+            await client.publishCast(
+              config.CONTESTS.NEYNAR_BOT_UUID!,
+              `Hey @${username}, your entry has been submitted to the contest: ${leaderboardUrl}`,
+              {
+                replyTo: replyCastHash,
+              },
+            );
+            log.info(`FC bot published reply to ${replyCastHash}`);
+          } catch (err) {
+            log.error(`Failed to post as FC bot`, err as Error);
+          }
+        }
       },
 
       ContestContentUpvoted: async ({ payload }) => {

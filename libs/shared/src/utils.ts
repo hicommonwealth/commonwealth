@@ -426,3 +426,24 @@ export async function alchemyGetTokenPrices({
       cause: { status: res.status, statusText: res.statusText },
     });
 }
+
+export const getBaseUrl = (env: string) => {
+  switch (env) {
+    case 'local':
+      return 'http://localhost:8080';
+    case 'beta':
+      return 'https://qa.commonwealth.im';
+    case 'demo':
+      return 'https://demo.commonwealth.im';
+    default:
+      return `https://${PRODUCTION_DOMAIN}`;
+  }
+};
+
+export const buildContestLeaderboardUrl = (
+  baseUrl: string,
+  communityId: string,
+  contestAddress: string,
+) => {
+  return `${baseUrl}/${communityId}/contests/${contestAddress}`;
+};

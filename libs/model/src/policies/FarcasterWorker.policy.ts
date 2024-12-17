@@ -111,6 +111,7 @@ export function FarcasterWorker(): Policy<typeof inputs> {
             },
           },
         });
+
         mustExist('Contest Manager', contestManager);
 
         const community = await models.Community.findByPk(
