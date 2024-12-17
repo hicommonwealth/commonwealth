@@ -9,7 +9,6 @@ import {
   getTestSigner,
   serializeCanvas,
 } from '@hicommonwealth/shared';
-import { bech32 } from 'bech32';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { models } from '../../src/database';
 import { InvalidAddress, verifyAddress } from '../../src/services/session';
@@ -147,10 +146,6 @@ describe('SignIn Lifecycle', () => {
       cosmos_address = await cosmosSigner.getWalletAddress();
       const { payload } = await cosmosSigner.newSession(CANVAS_TOPIC);
       cosmos_session = payload;
-
-      const { words } = bech32.decode(cosmos_address, 50);
-      const encodedAddress = bech32.encode('cosmos', words);
-
       // actor with auth verification
       cosmos_actor = {
         user: {
