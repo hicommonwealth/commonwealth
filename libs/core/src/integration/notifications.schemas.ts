@@ -24,9 +24,8 @@ export const CommentCreatedNotification = z.object({
     .describe('The user-friendly name of the community'),
   comment_body: z
     .string()
-    .max(255)
-    .describe('A truncated version of the comment body'),
-  comment_url: z.string().describe('The url of the comment'),
+    .describe('The first 100 characters of the comment body'),
+  comment_url: z.string().describe('The url to the comment'),
   comment_created_event: events.CommentCreated.describe(
     'The full comment record',
   ),
@@ -49,6 +48,10 @@ export const SnapshotProposalCreatedNotification = z.object({
   snapshot_proposal_url: z
     .string()
     .describe('The url to the snapshot proposal on Common'),
+  community_icon_url: z
+    .string()
+    .nullish()
+    .describe('The URL of the community icon'),
 });
 
 export const UserMentionedNotification = z.object({
@@ -84,6 +87,10 @@ export const CommunityStakeNotification = z.object({
     .max(255)
     .describe('The user-friendly name of the community'),
   community_stakes_url: z.string().describe('The url to the community stakes'),
+  community_icon_url: z
+    .string()
+    .nullish()
+    .describe('The URL of the community icon'),
 });
 
 export const ChainProposalsNotification = z.object({
@@ -101,6 +108,10 @@ export const ChainProposalsNotification = z.object({
   proposal_url: z
     .string()
     .describe('The url to the snapshot proposal on Common'),
+  community_icon_url: z
+    .string()
+    .nullish()
+    .describe('The URL of the community icon'),
 });
 
 export const BaseUpvoteNotification = z.object({
