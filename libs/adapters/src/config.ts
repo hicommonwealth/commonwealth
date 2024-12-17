@@ -33,6 +33,9 @@ const {
   R2_ACCESS_KEY_ID,
   R2_SECRET_ACCESS_KEY,
   R2_ACCOUNT_ID,
+  AWS_REGION,
+  AWS_ACCESS_KEY_ID,
+  AWS_SECRET_ACCESS_KEY,
 } = process.env;
 
 export const config = configure(
@@ -85,6 +88,12 @@ export const config = configure(
         ACCESS_KEY_ID: R2_ACCESS_KEY_ID,
         SECRET_ACCESS_KEY: R2_SECRET_ACCESS_KEY,
       },
+    },
+    STORAGE: {
+      USE_S3: true,
+      AWS_REGION: AWS_REGION,
+      AWS_ACCESS_KEY_ID: AWS_ACCESS_KEY_ID,
+      AWS_SECRET_ACCESS_KEY: AWS_SECRET_ACCESS_KEY,
     },
   },
   z.object({
@@ -323,6 +332,21 @@ export const config = configure(
               data.ACCOUNT_ID && data.ACCESS_KEY_ID && data.SECRET_ACCESS_KEY
             );
         }),
+    }),
+    STORAGE: z.object({
+      USE_S3: z.boolean(),
+      AWS_REGION: z.string().refine((data) => {
+        if (target.APP_ENV === 'CI' || target.NODE_ENV === 'test') return true;
+        return !!data;
+      }, 'AWS_REGION is required in non-test environments'),
+      AWS_ACCESS_KEY_ID: z.string().refine((data) => {
+        if (target.APP_ENV === 'CI' || target.NODE_ENV === 'test') return true;
+        return !!data;
+      }, 'AWS_ACCESS_KEY_ID is required in non-test environments'),
+      AWS_SECRET_ACCESS_KEY: z.string().refine((data) => {
+        if (target.APP_ENV === 'CI' || target.NODE_ENV === 'test') return true;
+        return !!data;
+      }, 'AWS_SECRET_ACCESS_KEY is required in non-test environments'),
     }),
   }),
 );

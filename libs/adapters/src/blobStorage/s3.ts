@@ -28,7 +28,13 @@ function formatS3Url(
 }
 
 export const S3BlobStorage = (): BlobStorage => {
-  const client = new S3();
+  const client = new S3({
+    region: config.STORAGE.AWS_REGION,
+    credentials: {
+      accessKeyId: config.STORAGE.AWS_ACCESS_KEY_ID,
+      secretAccessKey: config.STORAGE.AWS_SECRET_ACCESS_KEY,
+    },
+  });
   const name = 'S3BlobStorage';
   return {
     name,
