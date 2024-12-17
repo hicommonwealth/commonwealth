@@ -40,3 +40,15 @@ export const ReferralSet = z.tuple([
   EVM_ADDRESS.describe('namespace address'),
   EVM_ADDRESS.describe('referer address'),
 ]);
+
+export const ReferralFeeDistributed = z.tuple([
+  EVM_ADDRESS.describe('namespace address'),
+  EVM_ADDRESS.describe('distributed token address'),
+  ETHERS_BIG_NUMBER.describe(
+    'total amount of the token that is distributed (includes protocol fee, referral fee, etc)',
+  ),
+  EVM_ADDRESS.describe("the referrer's address"),
+  ETHERS_BIG_NUMBER.describe(
+    'the amount of the token that is distributed to the referrer',
+  ),
+]);

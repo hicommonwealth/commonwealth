@@ -11,6 +11,7 @@ import {
   LaunchpadTokenCreated,
   LaunchpadTrade,
   NamespaceDeployed,
+  ReferralFeeDistributed,
   ReferralSet,
 } from './chain-event.schemas';
 import { EventMetadata } from './util.schemas';
@@ -208,6 +209,12 @@ export const ChainEventCreated = z.union([
       eventSignature: z.literal(EvmEventSignatures.Referrals.ReferralSet),
     }),
     parsedArgs: ReferralSet,
+  }),
+  ChainEventCreatedBase.extend({
+    eventSource: ChainEventCreatedBase.shape.eventSource.extend({
+      eventSignature: z.literal(EvmEventSignatures.Referrals.FeeDistributed),
+    }),
+    parsedArgs: ReferralFeeDistributed,
   }),
 ]);
 
