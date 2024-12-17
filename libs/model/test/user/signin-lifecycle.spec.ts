@@ -17,8 +17,12 @@ import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 import { seedCommunity } from '../utils';
 
 describe('SignIn Lifecycle', () => {
-  const [evmSigner, cosmosSigner, substrateSigner, solanaSigner] =
-    getSessionSigners();
+  const [
+    evmSigner,
+    cosmosSigner,
+    //, substrateSigner
+    //, solanaSigner
+  ] = getSessionSigners();
 
   afterAll(async () => {
     await dispose()();
