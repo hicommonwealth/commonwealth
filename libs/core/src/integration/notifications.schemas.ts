@@ -9,6 +9,7 @@ import { z } from 'zod';
 
 // TODO: make this stricter by adding max/min character length
 export const CommentCreatedNotification = z.object({
+  community_id: z.string().max(255).describe('The id of the community'),
   author: z
     .string()
     .describe('The profile name or first 8 characters of a users address'),
@@ -21,7 +22,6 @@ export const CommentCreatedNotification = z.object({
     .string()
     .max(255)
     .describe('The user-friendly name of the community'),
-  community_id: z.string().max(255).describe('The id of the community'),
   community_icon_url: z
     .string()
     .nullish()
