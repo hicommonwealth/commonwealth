@@ -65,16 +65,13 @@ export const DeleteAddressModal = ({
           accounts: user.accounts.filter(
             (a) => a.address !== address.address && a.community.id !== chain,
           ),
+          ...(user.accounts.length === 1 && { activeAccount: null }),
         });
 
         notifySuccess('Address has been successfully removed.');
       }
     } catch (err) {
       notifyError(err.response.data.error);
-    } finally {
-      user.setData({
-        ...(user.accounts.length === 1 && { activeAccount: null }),
-      });
     }
 
     closeModal();
