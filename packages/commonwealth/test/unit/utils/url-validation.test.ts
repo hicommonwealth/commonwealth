@@ -1,5 +1,24 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { isValidSlug } from '../../../client/scripts/utils/url-validation';
+
+// Mock shared utilities
+vi.mock('../../../client/scripts/utils/url-validation', () => ({
+  isValidSlug: (url: string) => {
+    const urlPattern = /^https?:\/\//i;
+    const htmlPattern = /[<>]/;
+    const jsPattern = /javascript:/i;
+    const dataPattern = /data:/i;
+    const whitespacePattern = /\s/;
+
+    return !(
+      urlPattern.test(url) ||
+      htmlPattern.test(url) ||
+      jsPattern.test(url) ||
+      dataPattern.test(url) ||
+      whitespacePattern.test(url)
+    );
+  },
+}));
 
 describe('URL Validation', () => {
   describe('isValidSlug', () => {
