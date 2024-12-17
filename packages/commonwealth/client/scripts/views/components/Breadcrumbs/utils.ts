@@ -1,5 +1,6 @@
 import { getDecodedString } from '@hicommonwealth/shared';
 import { To } from 'react-router-dom';
+import { isValidSlug } from '../../../utils/url-validation';
 import { breadCrumbURLS } from './data';
 
 type CurrentDiscussion = {
@@ -60,7 +61,11 @@ export const generateBreadcrumbs = (
 
   const pathSegments = locationPath
     .split('/')
-    .filter((segment) => segment.length > 0);
+    .filter((segment) => segment.length > 0)
+    .map((segment) => {
+      const decoded = getDecodedString(segment);
+      return isValidSlug(decoded) ? decoded : 'Invalid Path';
+    });
 
   const governanceSegment = segmentMapping[pathSegments[1]];
 
@@ -110,20 +115,22 @@ export const generateBreadcrumbs = (
     const splitLinks = link.split('/').filter((val) => val.length > 0);
 
     // Removed IDs from the breadcrumb
-    const removedThreadId = getDecodedString(pathSegments[index]).replace(
-      /^\d+-/,
-      '',
-    );
+    const decodedSegment = getDecodedString(pathSegments[index]);
+    const removedThreadId = decodedSegment.replace(/^\d+-/, '');
+    const sanitizedThreadId = isValidSlug(removedThreadId)
+      ? removedThreadId
+      : 'Invalid Path';
 
     //First pass of generating the label
     label =
-      // @ts-expect-error StrictNullChecks
-      index === pathSegments.length - 1 && !!currentDiscussion.currentThreadName
-        ? // @ts-expect-error StrictNullChecks
-          currentDiscussion.currentThreadName
+      index === pathSegments.length - 1 && currentDiscussion?.currentThreadName
+        ? // Validate thread name
+          isValidSlug(currentDiscussion.currentThreadName)
+          ? currentDiscussion.currentThreadName
+          : 'Invalid Path'
         : matchedBreadcrumb
           ? matchedBreadcrumb.breadcrumb
-          : removedThreadId;
+          : sanitizedThreadId;
 
     if (pathSegments[0] === 'profile' && index === 1) {
       label = 'Edit Profile';
@@ -217,16 +224,17 @@ export const generateBreadcrumbs = (
     };
   });
 
-  // @ts-expect-error StrictNullChecks
-  currentDiscussion.currentTopic &&
-    breadcrumbs.splice(1, 0, {
-      // @ts-expect-error StrictNullChecks
-      label: currentDiscussion.currentTopic,
-      // @ts-expect-error StrictNullChecks
-      path: currentDiscussion.topicURL,
-      navigate: (val: To) => navigate(val),
-      isParent: false,
-    });
+  // Validate current topic before adding to breadcrumbs
+  if (currentDiscussion?.currentTopic && currentDiscussion?.topicURL) {
+    if (isValidSlug(currentDiscussion.currentTopic)) {
+      breadcrumbs.splice(1, 0, {
+        label: currentDiscussion.currentTopic,
+        path: currentDiscussion.topicURL,
+        navigate: (val: To) => navigate(val),
+        isParent: false,
+      });
+    }
+  }
 
   return breadcrumbs.filter((val) => val !== undefined);
 };
