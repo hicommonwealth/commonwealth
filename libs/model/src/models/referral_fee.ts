@@ -6,11 +6,11 @@ import type { ModelInstance } from './types';
 export type ReferralFeesAttributes = z.infer<typeof schemas.ReferralFees>;
 export type ReferralFeesInstance = ModelInstance<ReferralFeesAttributes>;
 
-export const ReferralFees = (
+export const ReferralFee = (
   sequelize: Sequelize.Sequelize,
 ): Sequelize.ModelStatic<ReferralFeesInstance> =>
   sequelize.define<ReferralFeesInstance>(
-    'ReferralFees',
+    'ReferralFee',
     {
       eth_chain_id: {
         type: Sequelize.INTEGER,
@@ -36,11 +36,13 @@ export const ReferralFees = (
         type: Sequelize.FLOAT,
         allowNull: false,
       },
+      transaction_timestamp: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+      },
     },
     {
-      timestamps: true,
-      createdAt: 'created_at',
-      updatedAt: false,
+      timestamps: false,
       underscored: true,
       tableName: 'ReferralFees',
     },

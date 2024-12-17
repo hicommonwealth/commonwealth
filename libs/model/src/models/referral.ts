@@ -12,28 +12,40 @@ export const Referral = (
   sequelize.define<ReferralInstance>(
     'Referral',
     {
-      referrer_id: {
+      eth_chain_id: {
         type: Sequelize.INTEGER,
-        allowNull: false,
         primaryKey: true,
       },
-      referee_id: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
+      transaction_hash: {
+        type: Sequelize.STRING,
         primaryKey: true,
       },
-      event_name: {
+      referee_address: {
         type: Sequelize.STRING,
         allowNull: false,
-        primaryKey: true,
       },
-      event_payload: { type: Sequelize.JSONB, allowNull: false },
-      created_at: { type: Sequelize.DATE, allowNull: true, primaryKey: true },
+      referrer_address: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      referrer_received_eth_amount: {
+        type: Sequelize.FLOAT,
+        allowNull: false,
+        defaultValue: 0,
+      },
+      referral_created_timestamp: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+      },
+      updated_at: {
+        type: Sequelize.DATE,
+        allowNull: false,
+      },
     },
     {
       timestamps: true,
-      createdAt: 'created_at',
-      updatedAt: false,
+      createdAt: false,
+      updatedAt: 'updated_at',
       underscored: true,
       tableName: 'Referrals',
     },

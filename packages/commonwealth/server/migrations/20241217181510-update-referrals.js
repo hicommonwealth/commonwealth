@@ -31,6 +31,10 @@ module.exports = {
             type: Sequelize.FLOAT,
             allowNull: false,
           },
+          transaction_timestamp: {
+            type: Sequelize.INTEGER,
+            allowNull: false,
+          },
         },
         { transaction },
       );
@@ -42,6 +46,42 @@ module.exports = {
           type: Sequelize.FLOAT,
           allowNull: false,
           defaultValue: 0,
+        },
+        { transaction },
+      );
+
+      await queryInterface.createTable(
+        'Referrals',
+        {
+          eth_chain_id: {
+            type: Sequelize.INTEGER,
+            primaryKey: true,
+          },
+          transaction_hash: {
+            type: Sequelize.STRING,
+            primaryKey: true,
+          },
+          referee_address: {
+            type: Sequelize.STRING,
+            allowNull: false,
+          },
+          referrer_address: {
+            type: Sequelize.STRING,
+            allowNull: false,
+          },
+          referrer_received_eth_amount: {
+            type: Sequelize.FLOAT,
+            allowNull: false,
+            defaultValue: 0,
+          },
+          referral_created_timestamp: {
+            type: Sequelize.INTEGER,
+            allowNull: false,
+          },
+          updated_at: {
+            type: Sequelize.DATE,
+            allowNull: false,
+          },
         },
         { transaction },
       );
