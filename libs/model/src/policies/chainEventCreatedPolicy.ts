@@ -7,6 +7,7 @@ import { systemActor } from '../middleware';
 import { CreateLaunchpadToken } from '../token/CreateToken.command';
 import { handleCommunityStakeTrades } from './handleCommunityStakeTrades';
 import { handleLaunchpadTrade } from './handleLaunchpadTrade';
+import { handleReferralSet } from './handleReferralSet';
 
 const log = logger(import.meta);
 
@@ -45,6 +46,11 @@ export const processChainEventCreated: EventHandler<
     payload.eventSource.eventSignature === EvmEventSignatures.Launchpad.Trade
   ) {
     await handleLaunchpadTrade(payload);
+  } else if (
+    payload.eventSource.eventSignature ===
+    EvmEventSignatures.Referrals.ReferralSet
+  ) {
+    await handleReferralSet(payload);
   } else {
     log.error('Attempted to process an unsupported chain-event', undefined, {
       event: payload,

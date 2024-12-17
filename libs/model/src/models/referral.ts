@@ -20,6 +20,10 @@ export const Referral = (
         type: Sequelize.STRING,
         primaryKey: true,
       },
+      namespace_address: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
       referee_address: {
         type: Sequelize.STRING,
         allowNull: false,

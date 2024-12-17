@@ -1,3 +1,4 @@
+import { EvmEventSignatures } from '@hicommonwealth/evm-protocols';
 import { z } from 'zod';
 import { FarcasterAction, FarcasterCast } from '../commands/contest.schemas';
 import { Comment } from '../entities/comment.schemas';
@@ -10,6 +11,7 @@ import {
   LaunchpadTokenCreated,
   LaunchpadTrade,
   NamespaceDeployed,
+  ReferralSet,
 } from './chain-event.schemas';
 import { EventMetadata } from './util.schemas';
 
@@ -178,34 +180,34 @@ export const ChainEventCreated = z.union([
   ChainEventCreatedBase.extend({
     eventSource: ChainEventCreatedBase.shape.eventSource.extend({
       eventSignature: z.literal(
-        '0x8870ba2202802ce285ce6bead5ac915b6dc2d35c8a9d6f96fa56de9de12829d5',
+        EvmEventSignatures.NamespaceFactory.NamespaceDeployed,
       ),
     }),
     parsedArgs: NamespaceDeployed,
   }),
   ChainEventCreatedBase.extend({
     eventSource: ChainEventCreatedBase.shape.eventSource.extend({
-      eventSignature: z.literal(
-        '0xfc13c9a8a9a619ac78b803aecb26abdd009182411d51a986090f82519d88a89e',
-      ),
+      eventSignature: z.literal(EvmEventSignatures.CommunityStake.Trade),
     }),
     parsedArgs: CommunityStakeTrade,
   }),
   ChainEventCreatedBase.extend({
     eventSource: ChainEventCreatedBase.shape.eventSource.extend({
-      eventSignature: z.literal(
-        '0xd7ca5dc2f8c6bb37c3a4de2a81499b25f8ca8bbb3082010244fe747077d0f6cc',
-      ),
+      eventSignature: z.literal(EvmEventSignatures.Launchpad.TokenLaunched),
     }),
     parsedArgs: LaunchpadTokenCreated,
   }),
   ChainEventCreatedBase.extend({
     eventSource: ChainEventCreatedBase.shape.eventSource.extend({
-      eventSignature: z.literal(
-        '0x9adcf0ad0cda63c4d50f26a48925cf6405df27d422a39c456b5f03f661c82982',
-      ),
+      eventSignature: z.literal(EvmEventSignatures.Launchpad.Trade),
     }),
     parsedArgs: LaunchpadTrade,
+  }),
+  ChainEventCreatedBase.extend({
+    eventSource: ChainEventCreatedBase.shape.eventSource.extend({
+      eventSignature: z.literal(EvmEventSignatures.Referrals.ReferralSet),
+    }),
+    parsedArgs: ReferralSet,
   }),
 ]);
 

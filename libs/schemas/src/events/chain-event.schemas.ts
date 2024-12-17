@@ -1,4 +1,5 @@
-// TODO: temporary - will be deleted as part of chain-events removal
+// TODO: will be removed when finalizing transition to raw ChainEventCreated schema
+//  and consumer side ABI parsing with Viem/abi-types
 import { z } from 'zod';
 import { ETHERS_BIG_NUMBER, EVM_ADDRESS, zBoolean } from '../utils';
 
@@ -33,4 +34,9 @@ export const LaunchpadTrade = z.tuple([
   ETHERS_BIG_NUMBER.describe('ethAmount'),
   ETHERS_BIG_NUMBER.describe('protocolEthAmount'),
   ETHERS_BIG_NUMBER.describe('supply'),
+]);
+
+export const ReferralSet = z.tuple([
+  EVM_ADDRESS.describe('namespace address'),
+  EVM_ADDRESS.describe('referer address'),
 ]);

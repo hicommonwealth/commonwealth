@@ -14,6 +14,9 @@ export const Referral = z
     transaction_hash: z
       .string()
       .describe('The hash of the transaction in which the referral is created'),
+    namespace_address: EVM_ADDRESS.describe(
+      'The address of the namespace the referee created with the referral',
+    ),
     referrer_address: EVM_ADDRESS.describe(
       'The address of the user who referred',
     ),
