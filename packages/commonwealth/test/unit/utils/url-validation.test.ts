@@ -1,4 +1,5 @@
-import { isValidSlug } from './url-validation';
+import { describe, expect, it } from 'vitest';
+import { isValidSlug } from '../../../client/scripts/utils/url-validation';
 
 describe('URL Validation', () => {
   describe('isValidSlug', () => {
