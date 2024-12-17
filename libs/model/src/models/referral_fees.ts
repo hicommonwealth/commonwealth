@@ -33,7 +33,7 @@ export const ReferralFees = (
         allowNull: false,
       },
       referrer_received_eth_amount: {
-        type: Sequelize.DOUBLE,
+        type: Sequelize.FLOAT,
         allowNull: false,
       },
     },
