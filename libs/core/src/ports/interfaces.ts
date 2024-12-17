@@ -257,6 +257,7 @@ export const BlobBuckets = [
   'archives',
   'threads',
   'comments',
+  'communities',
 ] as const;
 export type BlobBucket = (typeof BlobBuckets)[number];
 

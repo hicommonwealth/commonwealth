@@ -8,6 +8,7 @@ import '@knocklabs/react-notification-feed/dist/index.css';
 import moment from 'moment';
 import React from 'react';
 import { CWText } from '../component_kit/cw_text';
+import './CustomNotificationCell.scss';
 
 const CustomNotificationCell = ({ item }: NotificationCellProps) => {
   const contentBlock = item.blocks[0];
@@ -18,11 +19,21 @@ const CustomNotificationCell = ({ item }: NotificationCellProps) => {
 
   return (
     <div className="container">
-      {item?.data?.author && (
-        <div className="avatar">
-          <Avatar name={item?.data?.author} />
-        </div>
-      )}
+      <div className="avatars">
+        {item?.data?.community_icon_url && (
+          <div className="community-avatar">
+            <Avatar
+              src={item?.data?.community_icon_url}
+              name={item?.data?.community_name}
+            />
+          </div>
+        )}
+        {item?.data?.author && (
+          <div className="author-avatar">
+            <Avatar name={item?.data?.author} />
+          </div>
+        )}
+      </div>
       <div className="content">
         {isRenderableBlock(contentBlock) && (
           <div

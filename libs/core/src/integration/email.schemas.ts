@@ -20,6 +20,7 @@ export const EnrichedCommentCreatedNotification =
   CommentCreatedNotification.extend({
     event_name: z.literal(EnrichedNotificationNames.CommentCreated),
     author_avatar_url: z.string(),
+    community_icon_url: z.string(), // Add required community icon
     inserted_at: z
       .string()
       .describe(
@@ -31,6 +32,7 @@ export const EnrichedUserMentionedNotification =
   UserMentionedNotification.extend({
     event_name: z.literal(EnrichedNotificationNames.UserMentioned),
     author_avatar_url: z.string().nullish(),
+    community_icon_url: z.string(), // Add required community icon
     inserted_at: z
       .string()
       .describe(
@@ -41,7 +43,7 @@ export const EnrichedUserMentionedNotification =
 export const EnrichedCommunityStakeNotification =
   CommunityStakeNotification.extend({
     event_name: z.literal(EnrichedNotificationNames.CommunityStakeTrade),
-    community_icon_url: z.string().nullish(),
+    community_icon_url: z.string(), // Make required instead of nullish
     inserted_at: z
       .string()
       .describe(
@@ -52,7 +54,7 @@ export const EnrichedCommunityStakeNotification =
 export const EnrichedChainProposalsNotification =
   ChainProposalsNotification.extend({
     event_name: z.literal(EnrichedNotificationNames.ChainProposal),
-    community_icon_url: z.string().nullish(),
+    community_icon_url: z.string(), // Make required instead of nullish
     inserted_at: z
       .string()
       .describe(
@@ -63,7 +65,7 @@ export const EnrichedChainProposalsNotification =
 export const EnrichedSnapshotProposalCreatedNotification =
   SnapshotProposalCreatedNotification.extend({
     event_name: z.literal(EnrichedNotificationNames.SnapshotProposalCreated),
-    community_icon_url: z.string().nullish(),
+    community_icon_url: z.string(), // Make required instead of nullish
     inserted_at: z
       .string()
       .describe(

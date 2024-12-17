@@ -197,6 +197,7 @@ export const ThreadCard = ({
               hidePublishDate={hidePublishDate}
               hideSpamTag={hideSpamTag}
               hideTrendingTag={hideTrendingTag}
+              community={community}
             />
             <div className="content-header-icons">
               {thread.pinned && <CWIcon iconName="pin" />}

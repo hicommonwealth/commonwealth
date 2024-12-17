@@ -3,7 +3,6 @@ import { threadStageToLabel } from 'helpers';
 import moment from 'moment';
 import React, { useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { ArchiveTrayWithTooltip } from 'views/components/ArchiveTrayWithTooltip';
 import { LockWithTooltip } from 'views/components/LockWithTooltip';
 import CommunityInfo from 'views/components/component_kit/CommunityInfo';
@@ -61,6 +60,11 @@ export type AuthorAndPublishInfoProps = {
   hidePublishDate?: boolean;
   hideSpamTag?: boolean;
   hideTrendingTag?: boolean;
+  community?: {
+    name: string;
+    icon_url: string;
+    id: string;
+  };
 };
 
 export const AuthorAndPublishInfo = ({
@@ -91,6 +95,7 @@ export const AuthorAndPublishInfo = ({
   hidePublishDate,
   hideSpamTag,
   hideTrendingTag,
+  community,
 }: AuthorAndPublishInfoProps) => {
   const popoverProps = usePopover();
   const containerRef = useRef(null);
@@ -124,28 +129,23 @@ export const AuthorAndPublishInfo = ({
   );
 
   const isCommunityFirstLayout = layoutType === 'community-first';
-  const { data: communtyInfo, isLoading: isLoadingCommunity } =
-    useGetCommunityByIdQuery({
-      id: authorCommunityId,
-      enabled: !!authorCommunityId,
-    });
 
   return (
     <div className="AuthorAndPublishInfo" ref={containerRef}>
       {isCommunityFirstLayout && (
         <>
-          {isLoadingCommunity ? (
-            <CWCircleMultiplySpinner />
-          ) : (
+          {community ? (
             <>
               <CommunityInfo
-                name={communtyInfo?.name || ''}
-                iconUrl={communtyInfo?.icon_url || ''}
+                name={community.name}
+                iconUrl={community.icon_url}
                 iconSize="regular"
-                communityId={authorCommunityId}
+                communityId={community.id}
               />
               {dotIndicator}
             </>
+          ) : (
+            <CWCircleMultiplySpinner />
           )}
         </>
       )}

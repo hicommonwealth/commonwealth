@@ -8,10 +8,12 @@ const s3Buckets: Partial<Record<BlobBucket, string>> =
     ? {
         threads: 'dev-threads',
         comments: 'dev-comments',
+        communities: 'dev-communities',
       }
     : {
         threads: 'threads',
         comments: 'comments',
+        communities: 'communities',
       };
 
 export const R2BlobStorage = (): BlobStorage => {

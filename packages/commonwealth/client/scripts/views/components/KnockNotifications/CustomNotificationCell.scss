@@ -1,0 +1,26 @@
+.container {
+  display: flex;
+  padding: 16px;
+  gap: 12px;
+
+  .avatars {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+
+    .community-avatar,
+    .author-avatar {
+      display: flex;
+      align-items: center;
+    }
+  }
+
+  .content {
+    flex: 1;
+    min-width: 0;
+
+    .main-container {
+      margin-bottom: 4px;
+    }
+  }
+}
