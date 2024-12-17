@@ -148,11 +148,7 @@ export function FarcasterWorker(): Policy<typeof inputs> {
         });
       },
       FarcasterVoteCreated: async ({ payload }) => {
-        const client = new NeynarAPIClient(config.CONTESTS.NEYNAR_API_KEY!);
-        const castsResponse = await client.fetchBulkCasts([
-          payload.untrustedData.castId.hash,
-        ]);
-        const { parent_hash, hash } = castsResponse.result.casts.at(0)!;
+        const { parent_hash, hash } = payload.cast;
         const content_url = buildFarcasterContentUrl(parent_hash!, hash);
 
         const contestManager = await models.ContestManager.findOne({
