@@ -31,3 +31,18 @@ export const Referral = z
       .optional(),
   })
   .describe('Projects referral events');
+
+export const ReferralFees = z.object({
+  eth_chain_id: PG_INT.describe('The ID of the EVM chain'),
+  transaction_hash: z.string().describe('The hash of the transaction'),
+  namespace_address: z.string().describe('The address of the namespace'),
+  distributed_token_address: z
+    .string()
+    .describe('The address of the distributed token'),
+  referrer_recipient_address: z
+    .string()
+    .describe('The address of the referrer recipient'),
+  referrer_received_eth_amount: z
+    .number()
+    .describe('The amount of ETH received by the referrer'),
+});
