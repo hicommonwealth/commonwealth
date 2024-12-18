@@ -1,6 +1,5 @@
 import { ReactNode } from 'react';
 import { IconSize } from 'views/components/component_kit/cw_icons/types';
-import { SupportedLanguage } from '../../../state/ui/language/constants';
 import type { IconName } from './cw_icons/cw_icon_lookup';
 
 export enum ComponentType {
@@ -123,7 +122,7 @@ export type SubmenuMenuItem = BaseMenuItem & {
   items: MenuItem[];
 };
 
-export type DropdownItemType<T extends string | number = SupportedLanguage> = {
+export type DropdownItemType<T extends string | number = string | number> = {
   label: string | JSX.Element;
   value: T;
   selected?: boolean;
