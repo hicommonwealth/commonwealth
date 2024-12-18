@@ -1,25 +1,24 @@
 import { createBoundedUseStore } from 'state/ui/utils';
 import { devtools, persist } from 'zustand/middleware';
 import { createStore } from 'zustand/vanilla';
-import { SUPPORTED_LANGUAGES } from './constants';
+import { type SupportedLanguage } from './constants';
 
 interface LanguageStore {
-  currentLanguage: keyof typeof SUPPORTED_LANGUAGES;
-  setLanguage: (lang: keyof typeof SUPPORTED_LANGUAGES) => void;
+  selectedLanguage: SupportedLanguage;
+  setSelectedLanguage: (lang: SupportedLanguage) => void;
 }
 
 export const languageStore = createStore<LanguageStore>()(
   devtools(
     persist(
       (set) => ({
-        currentLanguage: 'en',
-        setLanguage: (lang) => set({ currentLanguage: lang }),
+        selectedLanguage: 'en-us' as SupportedLanguage,
+        setSelectedLanguage: (lang) => set({ selectedLanguage: lang }),
       }),
       {
         name: 'language-store',
-        partialize: (state: LanguageStore): LanguageStore => ({
-          currentLanguage: state.currentLanguage,
-          setLanguage: state.setLanguage,
+        partialize: (state: LanguageStore): Partial<LanguageStore> => ({
+          selectedLanguage: state.selectedLanguage,
         }),
       },
     ),

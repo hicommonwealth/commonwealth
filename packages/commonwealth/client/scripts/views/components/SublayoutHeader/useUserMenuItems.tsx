@@ -20,7 +20,10 @@ import { EXCEPTION_CASE_VANILLA_getCommunityById } from 'state/api/communities/g
 import { SERVER_URL } from 'state/api/config';
 import useAdminOnboardingSliderMutationStore from 'state/ui/adminOnboardingCards';
 import useGroupMutationBannerStore from 'state/ui/group';
-import { SUPPORTED_LANGUAGES } from 'state/ui/language/constants';
+import {
+  SUPPORTED_LANGUAGES,
+  type SupportedLanguage,
+} from 'state/ui/language/constants';
 import useLanguageStore from 'state/ui/language/language';
 import {
   useAuthModalStore,
@@ -34,10 +37,19 @@ import {
   toggleDarkMode,
 } from 'views/components/component_kit/cw_toggle';
 import CWIconButton from 'views/components/component_kit/new_designs/CWIconButton';
+import {
+  DefaultMenuItem,
+  HeaderMenuItem,
+} from 'views/components/component_kit/types';
 import useAuthentication from '../../modals/AuthModal/useAuthentication';
 import { useCommunityStake } from '../CommunityStake';
 import UserMenuItem from './UserMenuItem';
 import useCheckAuthenticatedAddresses from './useCheckAuthenticatedAddresses';
+
+interface SubmenuItem extends PopoverMenuItem {
+  type: 'submenu';
+  items: PopoverMenuItem[];
+}
 
 const resetWalletConnectSession = async () => {
   /**
@@ -278,15 +290,15 @@ const useUserMenuItems = ({
           {
             type: 'header',
             label: 'Language',
-          } as PopoverMenuItem,
+          } as HeaderMenuItem,
           {
-            type: 'submenu',
+            type: 'submenu' as const,
             label: (
               <div className="UserMenuItem">
                 <div>Current Language</div>
                 <CWText>
                   {SUPPORTED_LANGUAGES[selectedLanguage].flag}{' '}
-                  {selectedLanguage.split('-')[0]}
+                  {selectedLanguage.split('-')[0].toUpperCase()}
                 </CWText>
               </div>
             ),
@@ -296,13 +308,13 @@ const useUserMenuItems = ({
                 <div className="UserMenuItem">
                   <div>{lang.name}</div>
                   <CWText>
-                    {lang.flag} {code.split('-')[0]}
+                    {lang.flag} {code.split('-')[0].toUpperCase()}
                   </CWText>
                 </div>
               ),
-              onClick: () => setSelectedLanguage(code),
-            })),
-          } as PopoverMenuItem,
+              onClick: () => setSelectedLanguage(code as SupportedLanguage),
+            })) as DefaultMenuItem[],
+          } as SubmenuItem,
         ]
       : []),
     ...(hasMagic

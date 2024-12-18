@@ -38,8 +38,27 @@
     height: 100%;
 
     .language-selector {
-      margin-left: 8px;
-      min-width: 48px;
+      max-width: 48px;
+      margin-right: 8px;
+
+      :global(.dropdown-item) {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 12px;
+        padding: 4px 8px;
+
+        .flag-abbr {
+          display: flex;
+          align-items: center;
+          gap: 4px;
+
+          .abbr {
+            font-size: 12px;
+            color: $neutral-600;
+          }
+        }
+      }
     }
 
     .header-loader {
@@ -67,19 +86,6 @@
       display: flex;
       gap: 12px;
       height: 40px;
-
-      .language-selector {
-        max-width: 80px;
-        margin-right: 12px;
-
-        :global(.dropdown-item) {
-          display: flex;
-          align-items: center;
-          gap: 4px;
-          font-size: 14px;
-          padding: 8px;
-        }
-      }
 
       & > div {
         display: flex;
