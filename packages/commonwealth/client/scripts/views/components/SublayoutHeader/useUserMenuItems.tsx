@@ -31,16 +31,11 @@ import {
 } from 'state/ui/modals';
 import useUserStore from 'state/ui/user';
 import { PopoverMenuItem } from 'views/components/component_kit/CWPopoverMenu';
-import { CWText } from 'views/components/component_kit/cw_text';
 import {
   CWToggle,
   toggleDarkMode,
 } from 'views/components/component_kit/cw_toggle';
 import CWIconButton from 'views/components/component_kit/new_designs/CWIconButton';
-import {
-  DefaultMenuItem,
-  HeaderMenuItem,
-} from 'views/components/component_kit/types';
 import useAuthentication from '../../modals/AuthModal/useAuthentication';
 import { useCommunityStake } from '../CommunityStake';
 import UserMenuItem from './UserMenuItem';
@@ -288,33 +283,30 @@ const useUserMenuItems = ({
     ...(languageEnabled
       ? [
           {
-            type: 'header',
-            label: 'Language',
-          } as HeaderMenuItem,
-          {
             type: 'submenu' as const,
             label: (
-              <div className="UserMenuItem">
-                <div>Current Language</div>
-                <CWText>
-                  {SUPPORTED_LANGUAGES[selectedLanguage].flag}{' '}
-                  {selectedLanguage.split('-')[0].toUpperCase()}
-                </CWText>
+              <div className="language-menu-item">
+                <span>{SUPPORTED_LANGUAGES[selectedLanguage].flag}</span>
+                <span className="abbr">
+                  {SUPPORTED_LANGUAGES[selectedLanguage].abbr}
+                </span>
               </div>
             ),
-            items: Object.entries(SUPPORTED_LANGUAGES).map(([code, lang]) => ({
-              type: 'default' as const,
-              label: (
-                <div className="UserMenuItem">
-                  <div>{lang.name}</div>
-                  <CWText>
-                    {lang.flag} {code.split('-')[0].toUpperCase()}
-                  </CWText>
-                </div>
-              ),
-              onClick: () => setSelectedLanguage(code as SupportedLanguage),
-            })) as DefaultMenuItem[],
+            items: Object.entries(SUPPORTED_LANGUAGES).map(
+              ([code, { flag, abbr }]) => ({
+                type: 'default' as const,
+                label: (
+                  <div className="flag-abbr">
+                    <span>{flag}</span>
+                    <span className="abbr">{abbr}</span>
+                  </div>
+                ),
+                onClick: () => setSelectedLanguage(code as SupportedLanguage),
+                selected: selectedLanguage === code,
+              }),
+            ),
           } as SubmenuItem,
+          { type: 'divider' },
         ]
       : []),
     ...(hasMagic

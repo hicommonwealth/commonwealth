@@ -14,7 +14,5 @@ export const typeToIconAndName = (
       return ['compassPhosphor', 'Explore'];
     case 'notifications':
       return ['bell', 'Notifications'];
-    case 'language':
-      return ['compassPhosphor', 'Language'];
   }
 };
