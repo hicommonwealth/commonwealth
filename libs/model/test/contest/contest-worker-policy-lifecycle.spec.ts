@@ -19,7 +19,7 @@ describe('Contest Worker Policy Lifecycle', () => {
   const topicId: number = 0;
 
   beforeAll(async () => {
-    const [chainNode] = await seed('ChainNode', { contracts: [] });
+    const [chainNode] = await seed('ChainNode');
     const [user] = await seed(
       'User',
       {

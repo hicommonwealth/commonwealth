@@ -152,6 +152,10 @@ export const ThreadView = Thread.extend({
   Comments: z.array(CommentView).optional(),
   ThreadVersionHistories: z.array(ThreadVersionHistoryView).nullish(),
   search: z.union([z.string(), z.record(z.any())]).nullish(),
+  total_num_thread_results: z
+    .number()
+    .nullish()
+    .describe('total number of thread results for the query'),
 });
 
 export const OrderByQueriesKeys = z.enum([

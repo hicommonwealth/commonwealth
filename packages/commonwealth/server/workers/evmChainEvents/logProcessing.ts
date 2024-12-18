@@ -113,7 +113,7 @@ export async function parseLogs(
   const events: EvmEvent[] = [];
   const interfaces = {};
   for (const log of logs) {
-    const address = ethers.utils.getAddress(log.address).toLowerCase();
+    const address = ethers.utils.getAddress(log.address);
     const data: AbiSignatures = sources[address];
     if (!data) {
       logger.error('Missing event source', undefined, {
@@ -148,12 +148,10 @@ export async function parseLogs(
     }
     stats().increment('ce.evm.event', {
       contractAddress: address,
-      kind: evmEventSource.kind,
     });
     events.push({
       eventSource: {
-        kind: evmEventSource.kind,
-        chainNodeId: evmEventSource.chain_node_id,
+        ethChainId: evmEventSource.eth_chain_id,
         eventSignature: evmEventSource.event_signature,
       },
       parsedArgs: parsedLog.args,
