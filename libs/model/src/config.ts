@@ -197,11 +197,41 @@ export const config = configure(
       MIN_USER_ETH: z.number(),
       MAX_USER_POSTS_PER_CONTEST: z.number().int(),
       FLAG_FARCASTER_CONTEST: z.boolean().nullish(),
-      NEYNAR_BOT_UUID: z.string().nullish(),
-      NEYNAR_API_KEY: z.string().nullish(),
-      NEYNAR_CAST_CREATED_WEBHOOK_SECRET: z.string().nullish(),
-      NEYNAR_REPLY_WEBHOOK_URL: z.string().nullish(),
-      FARCASTER_ACTION_URL: z.string().nullish(),
+      NEYNAR_BOT_UUID: z
+        .string()
+        .optional()
+        .refine(
+          (data) => !(target.APP_ENV === 'production' && !data),
+          'NEYNAR_BOT_UUID must be set to a non-default value in production.',
+        ),
+      NEYNAR_API_KEY: z
+        .string()
+        .optional()
+        .refine(
+          (data) => !(target.APP_ENV === 'production' && !data),
+          'NEYNAR_API_KEY must be set to a non-default value in production.',
+        ),
+      NEYNAR_CAST_CREATED_WEBHOOK_SECRET: z
+        .string()
+        .optional()
+        .refine(
+          (data) => !(target.APP_ENV === 'production' && !data),
+          'NEYNAR_CAST_CREATED_WEBHOOK_SECRET must be set to a non-default value in production.',
+        ),
+      NEYNAR_REPLY_WEBHOOK_URL: z
+        .string()
+        .optional()
+        .refine(
+          (data) => !(target.APP_ENV === 'production' && !data),
+          'NEYNAR_REPLY_WEBHOOK_URL must be set to a non-default value in production.',
+        ),
+      FARCASTER_ACTION_URL: z
+        .string()
+        .optional()
+        .refine(
+          (data) => !(target.APP_ENV === 'production' && !data),
+          'FARCASTER_ACTION_URL must be set to a non-default value in production.',
+        ),
     }),
     AUTH: z
       .object({
