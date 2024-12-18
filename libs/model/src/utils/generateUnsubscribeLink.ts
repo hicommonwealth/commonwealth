@@ -12,6 +12,5 @@ export async function generateUnsubscribeLink(userId: string): Promise<string> {
     { unsubscribe_uuid: unsubscribeUuid },
     { where: { id: userId } },
   );
-  const unsubscribeLink = `${config.SERVER_URL}/unsubscribe/${unsubscribeUuid}`;
-  return unsubscribeLink;
+  return `${config.SERVER_URL}/unsubscribe/${unsubscribeUuid}`;
 }

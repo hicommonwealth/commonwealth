@@ -95,7 +95,6 @@ export const GetRecapEmailData = {
     unsubscribe_link: z.string(),
   }),
 };
-
 export const EnrichedThread = Thread.extend({
   name: z
     .string()

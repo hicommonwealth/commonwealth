@@ -5,6 +5,7 @@ import { z } from 'zod';
 import { models } from '../database';
 import { mustExist } from '../middleware/guards';
 import { emitEvent } from './utils';
+
 function getDifferences(
   fullObject: Record<string, unknown>,
   subsetObject: Record<string, unknown>,
