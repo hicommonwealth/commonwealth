@@ -142,31 +142,36 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
       topicObj?.eth_chain_id || app?.chain.meta?.ChainNode?.eth_chain_id || 0,
   });
 
-  const { fetchNextPage, data, isInitialLoading, hasNextPage, threadCount } =
-    useFetchThreadsQuery({
-      communityId: communityId,
-      queryType: 'bulk',
-      page: 1,
-      limit: 20,
-      topicId,
-      stage: stageName ?? undefined,
-      includePinnedThreads: true,
-      ...(featuredFilter && {
-        orderBy: featuredFilter,
-      }),
-      ...(dateCursor.fromDate && {
-        toDate: dateCursor.toDate,
-        fromDate: dateCursor.fromDate,
-      }),
-      includeArchivedThreads: isOnArchivePage || includeArchivedThreads,
-      // @ts-expect-error <StrictNullChecks/>
-      contestAddress,
-      // @ts-expect-error <StrictNullChecks/>
-      contestStatus,
-      apiEnabled:
-        !!communityId &&
-        (selectedView === 'all' || selectedView === 'cardview'),
-    });
+  const {
+    fetchNextPage,
+    data,
+    isInitialLoading,
+    hasNextPage,
+    threadCount,
+    topicThreadCount,
+  } = useFetchThreadsQuery({
+    communityId: communityId,
+    queryType: 'bulk',
+    page: 1,
+    limit: 20,
+    topicId,
+    stage: stageName ?? undefined,
+    includePinnedThreads: true,
+    ...(featuredFilter && {
+      orderBy: featuredFilter,
+    }),
+    ...(dateCursor.fromDate && {
+      toDate: dateCursor.toDate,
+      fromDate: dateCursor.fromDate,
+    }),
+    includeArchivedThreads: isOnArchivePage || includeArchivedThreads,
+    // @ts-expect-error <StrictNullChecks/>
+    contestAddress,
+    // @ts-expect-error <StrictNullChecks/>
+    contestStatus,
+    apiEnabled:
+      !!communityId && (selectedView === 'all' || selectedView === 'cardview'),
+  });
 
   const threads = sortPinned(sortByFeaturedFilter(data || [], featuredFilter));
 
@@ -297,7 +302,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
             isOnArchivePage
               ? filteredThreads.length || 0
               : threads
-                ? threadCount || 0
+                ? topicThreadCount || threadCount || 0
                 : 0
           }
           isIncludingSpamThreads={includeSpamThreads}

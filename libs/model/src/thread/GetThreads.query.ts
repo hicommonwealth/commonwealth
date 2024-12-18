@@ -109,7 +109,8 @@ export function GetThreads(): Query<typeof schemas.GetThreads> {
                     'name', T.name,
                     'description', T.description,
                     'community_id', T.community_id,
-                    'telegram', T.telegram
+                    'telegram', T.telegram,
+                    'thread_count', T.thread_count
                 ) as topic,
                 json_build_object(
                     'id', A.id,
@@ -268,6 +269,7 @@ export function GetThreads(): Query<typeof schemas.GetThreads> {
         threads,
         numVotingThreads,
         threadCount: threads.at(0)?.total_num_thread_results || 0,
+        topicThreadCount: threads.at(0)?.topic?.thread_count || 0,
       };
     },
   };

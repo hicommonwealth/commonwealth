@@ -56,6 +56,7 @@ export const Thread = z.object({
     })
     .nullish(),
   comment_count: PG_INT.optional().optional(),
+  topic_thread_count: PG_INT.optional(),
 
   activity_rank_date: z.coerce.date().nullish(),
 
@@ -71,4 +72,13 @@ export const Thread = z.object({
   collaborators: Address.array().nullish(),
   reactions: Reaction.array().nullish(),
   ThreadVersionHistories: z.array(ThreadVersionHistory).nullish(),
+});
+
+export const GetThreadsResponse = z.object({
+  limit: z.number(),
+  page: z.number(),
+  threads: Thread.array(),
+  numVotingThreads: z.number(),
+  threadCount: z.number(),
+  topicThreadCount: z.number(),
 });

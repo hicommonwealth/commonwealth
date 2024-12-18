@@ -48,6 +48,8 @@ export const Topic = z.object({
     .nullish()
     .describe('vote weight multiplier, used for ERC20 topics'),
 
+  thread_count: PG_INT.default(0),
+
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional(),
   deleted_at: z.coerce.date().nullish(),

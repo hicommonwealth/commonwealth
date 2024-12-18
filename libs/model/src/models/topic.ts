@@ -55,6 +55,11 @@ export default (
       token_address: { type: Sequelize.STRING, allowNull: true },
       token_symbol: { type: Sequelize.STRING, allowNull: true },
       vote_weight_multiplier: { type: Sequelize.FLOAT, allowNull: true },
+      thread_count: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+      },
     },
     {
       timestamps: true,
