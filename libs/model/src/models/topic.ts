@@ -59,6 +59,9 @@ export default (
         type: Sequelize.INTEGER,
         allowNull: false,
         defaultValue: 0,
+        validate: {
+          min: 0,
+        },
       },
     },
     {

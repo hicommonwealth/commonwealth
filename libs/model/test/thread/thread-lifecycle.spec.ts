@@ -118,16 +118,22 @@ describe('Thread lifecycle', () => {
       topics: [
         {
           name: 'topic with permissions',
+          description: '',
           group_ids: [threadGroupId, commentGroupId],
           weighted_voting: TopicWeightedVoting.Stake,
+          thread_count: 0,
         },
         {
           name: 'topic without thread permissions',
+          description: '',
           group_ids: [emptyGroupId],
+          thread_count: 0,
         },
         {
           name: 'topic without groups',
+          description: '',
           group_ids: [],
+          thread_count: 0,
         },
       ],
       CommunityStakes: [
