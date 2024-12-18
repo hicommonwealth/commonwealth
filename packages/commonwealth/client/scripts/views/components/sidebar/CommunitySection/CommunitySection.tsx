@@ -166,19 +166,18 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
 
         <CreateCommunityButton />
 
-        {isAdmin && (
-          <>
-            <CWDivider />
-            <AdminSection />
-          </>
-        )}
-
         <CWDivider />
         <DiscussionSection
           // @ts-expect-error <StrictNullChecks/>
           topicIdsIncludedInContest={topicIdsIncludedInContest}
         />
         <CWDivider />
+        {isAdmin && (
+          <>
+            <AdminSection />
+            <CWDivider />
+          </>
+        )}
         <GovernanceSection isContestAvailable={isContestAvailable} />
         <CWDivider />
         <DirectoryMenuItem />

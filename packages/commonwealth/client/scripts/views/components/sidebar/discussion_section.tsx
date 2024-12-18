@@ -128,6 +128,7 @@ export const DiscussionSection = ({
         });
       },
       displayData: null,
+      rightIcon: <CWIcon iconName="squaresFour" iconSize="small" />,
     },
   ];
 
@@ -135,6 +136,15 @@ export const DiscussionSection = ({
     if (topic.featured_in_sidebar) {
       const topicInvolvedInActiveContest =
         topic?.id && topicIdsIncludedInContest.includes(topic.id);
+
+      let rightIcon;
+      if (topicInvolvedInActiveContest) {
+        rightIcon = <CWIcon iconName="trophy" iconSize="small" />;
+      } else if (topic.weighted_voting) {
+        rightIcon = <CWIcon iconName="lockedNew" iconSize="small" />;
+      } else {
+        rightIcon = <CWIcon iconName="hash" iconSize="small" />;
+      }
 
       const discussionSectionGroup: SectionGroupAttrs = {
         title: topic.name,
@@ -162,9 +172,7 @@ export const DiscussionSection = ({
           );
         },
         displayData: null,
-        ...(topicInvolvedInActiveContest
-          ? { rightIcon: <CWIcon iconName="trophy" iconSize="small" /> }
-          : {}),
+        rightIcon,
       };
       discussionsGroupData.push(discussionSectionGroup);
     }
