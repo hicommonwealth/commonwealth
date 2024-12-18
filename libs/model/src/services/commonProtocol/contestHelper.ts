@@ -1,11 +1,13 @@
 import { AppError } from '@hicommonwealth/core';
-import { ZERO_ADDRESS } from '@hicommonwealth/shared';
+import {
+  commonProtocol,
+  contestAbi,
+  feeManagerAbi,
+} from '@hicommonwealth/evm-protocols';
 import { Mutex } from 'async-mutex';
 import Web3, { PayableCallOptions } from 'web3';
 import { AbiItem } from 'web3-utils';
-import { config } from '../../config';
-import { contestABI } from './abi/contestAbi';
-import { feeManagerABI } from './abi/feeManagerAbi';
+import { createWeb3Provider } from './utils';
 
 const nonceMutex = new Mutex();
 
@@ -28,24 +30,7 @@ export type ContestScores = {
     winningAddress: string;
     voteCount: string;
   }[];
-  contestBalance: number;
-};
-
-/**
- * A helper for creating the web3 provider via an RPC, including private key import
- * @param rpc the rpc of the network to use helper with
- * @returns
- */
-// eslint-disable-next-line @typescript-eslint/require-await
-const createWeb3Provider = async (rpc: string): Promise<Web3> => {
-  if (!config.WEB3.PRIVATE_KEY) throw new AppError('WEB3 private key not set!');
-  const web3 = new Web3(rpc);
-  const account = web3.eth.accounts.privateKeyToAccount(
-    config.WEB3.PRIVATE_KEY,
-  );
-  web3.eth.accounts.wallet.add(account);
-  web3.eth.defaultAccount = account.address;
-  return web3;
+  contestBalance: string;
 };
 
 /**
@@ -69,7 +54,7 @@ const addContent = async (
     web3 = await createWeb3Provider(rpcNodeUrl);
   }
   const contestInstance = new web3.eth.Contract(
-    contestABI as AbiItem[],
+    contestAbi as AbiItem[],
     contest,
   );
 
@@ -131,7 +116,7 @@ const voteContent = async (
     web3 = await createWeb3Provider(rpcNodeUrl);
   }
   const contestInstance = new web3.eth.Contract(
-    contestABI as AbiItem[],
+    contestAbi as AbiItem[],
     contest,
   );
 
@@ -171,7 +156,7 @@ export const getContestStatus = async (
 ): Promise<ContestStatus> => {
   const web3 = new Web3(rpcNodeUrl);
   const contestInstance = new web3.eth.Contract(
-    contestABI as AbiItem[],
+    contestAbi as AbiItem[],
     contest,
   );
 
@@ -208,7 +193,7 @@ export const getContestScore = async (
 ): Promise<ContestScores> => {
   const web3 = new Web3(rpcNodeUrl);
   const contestInstance = new web3.eth.Contract(
-    contestABI as AbiItem[],
+    contestAbi as AbiItem[],
     contest,
   );
 
@@ -257,61 +242,23 @@ export const getContestBalance = async (
   rpcNodeUrl: string,
   contest: string,
   oneOff?: boolean,
-): Promise<number> => {
+): Promise<string> => {
   const web3 = new Web3(rpcNodeUrl);
+
   const contestInstance = new web3.eth.Contract(
-    contestABI as AbiItem[],
+    contestAbi as AbiItem[],
     contest,
   );
 
-  const promises = [contestInstance.methods.contestToken().call()];
-
-  if (!oneOff) {
-    promises.push(contestInstance.methods.FeeMangerAddress().call());
-  }
-
-  const results = await Promise.all(promises);
-
-  const balancePromises: Promise<number>[] = [];
-
-  if (!oneOff) {
-    const feeManager = new web3.eth.Contract(
-      feeManagerABI as AbiItem[],
-      String(results[1]),
-    );
-    balancePromises.push(
-      feeManager.methods.getBeneficiaryBalance(contest, results[0]).call(),
-    );
-  }
-  if (String(results[0]) === ZERO_ADDRESS) {
-    balancePromises.push(
-      web3.eth.getBalance(contest).then((v) => {
-        return Number(v);
-      }),
-    );
-  } else {
-    const calldata =
-      '0x70a08231' +
-      web3.eth.abi.encodeParameters(['address'], [contest]).substring(2);
-    balancePromises.push(
-      web3.eth
-        .call({
-          to: String(results[0]),
-          data: calldata,
-        })
-        .then((v) => {
-          return Number(web3.eth.abi.decodeParameter('uint256', v));
-        }),
-    );
-  }
-
-  const balanceResults = await Promise.all(balancePromises);
-
-  return Number(
-    balanceResults.length === 2
-      ? BigInt(balanceResults[0]) + BigInt(balanceResults[1])
-      : BigInt(balanceResults[0]),
+  const balance = await commonProtocol.getTotalContestBalance(
+    contestInstance,
+    contest,
+    web3,
+    feeManagerAbi,
+    oneOff,
   );
+
+  return balance;
 };
 
 export const addContentBatch = async (
@@ -392,7 +339,7 @@ export const rollOverContest = async (
   return nonceMutex.runExclusive(async () => {
     const web3 = await createWeb3Provider(rpcNodeUrl);
     const contestInstance = new web3.eth.Contract(
-      contestABI as AbiItem[],
+      contestAbi as AbiItem[],
       contest,
     );
 
@@ -400,15 +347,22 @@ export const rollOverContest = async (
       ? contestInstance.methods.endContest()
       : contestInstance.methods.newContest();
 
-    let gasResult;
+    let gasResult = BigInt(300000);
     try {
       gasResult = await contractCall.estimateGas({
         from: web3.eth.defaultAccount,
       });
     } catch {
-      return false;
+      //eslint-disable-next-line
+      //@ts-ignore no-empty
     }
+
     const maxFeePerGasEst = await estimateGas(web3);
+
+    if (gasResult < BigInt(100000)) {
+      gasResult = BigInt(300000);
+    }
+
     await contractCall.send({
       from: web3.eth.defaultAccount,
       gas: gasResult.toString(),

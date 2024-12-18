@@ -10,7 +10,7 @@ export type PaginationQueryParams = {
   limit?: string;
   page?: string;
   order_by?: string;
-  order_direction?: string;
+  order_direction?: 'ASC' | 'DESC';
 };
 
 export type TypedPaginatedResult<T> = {

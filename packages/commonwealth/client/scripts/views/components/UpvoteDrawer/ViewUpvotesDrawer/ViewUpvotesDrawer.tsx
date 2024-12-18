@@ -13,7 +13,6 @@ import CWDrawer, {
 import { CWTable } from '../../component_kit/new_designs/CWTable';
 import { CWTableColumnInfo } from '../../component_kit/new_designs/CWTable/CWTable';
 import { useCWTableState } from '../../component_kit/new_designs/CWTable/useCWTableState';
-import { QuillRenderer } from '../../react_quill_editor/quill_renderer';
 import './ViewUpvotesDrawer.scss';
 
 type Profile = Account | AddressInfo | MinimumProfile;
@@ -21,7 +20,6 @@ type Profile = Account | AddressInfo | MinimumProfile;
 type ViewUpvotesDrawerProps = {
   header: string;
   reactorData: any[];
-  contentBody: string;
   author: Profile;
   publishDate: moment.Moment;
   isOpen: boolean;
@@ -61,7 +59,6 @@ const columns: CWTableColumnInfo[] = [
 export const ViewUpvotesDrawer = ({
   header,
   reactorData,
-  contentBody,
   author,
   publishDate,
   isOpen,
@@ -141,9 +138,6 @@ export const ViewUpvotesDrawer = ({
                 profile={profile}
               />
             </div>
-            <div className="upvoted-content-body">
-              <QuillRenderer doc={contentBody} cutoffLines={10} />
-            </div>
           </div>
           {reactorData?.length > 0 && isOpen ? (
             <>
@@ -160,7 +154,7 @@ export const ViewUpvotesDrawer = ({
                       <User
                         avatarSize={20}
                         userAddress={reactor.avatars.name.address}
-                        userCommunityId={app?.chain?.id}
+                        userCommunityId={app?.chain?.id || ''}
                         shouldShowAsDeleted={
                           !reactor?.avatars?.name?.address && !app?.chain?.id
                         }

@@ -10,14 +10,13 @@ import { userStore } from 'state/ui/user';
 import { hexToNumber } from 'web3-utils';
 import { z } from 'zod';
 import BlockInfo from '../../../models/BlockInfo';
-import ChainInfo from '../../../models/ChainInfo';
 import IWebWallet from '../../../models/IWebWallet';
 
 class WalletConnectWebWalletController implements IWebWallet<string> {
   private _enabled: boolean;
   private _enabling = false;
   private _accounts: string[];
-  private _chainInfo: ChainInfo;
+  private _chainInfo: z.infer<typeof ExtendedCommunity>;
   private _provider;
   private _web3: Web3;
 
@@ -50,7 +49,7 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
   public getChainId() {
     // We need app.chain? because the app might not be on a page with a chain (e.g homepage),
     // and node? because the chain might not have a node provided
-    return this._chainInfo?.node?.ethChainId?.toString() || '1';
+    return this._chainInfo?.ChainNode?.eth_chain_id?.toString() || '1';
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -108,14 +107,10 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
         true,
       );
 
-      const chainInfo = ChainInfo.fromTRPCResponse(
-        communityInfo as z.infer<typeof ExtendedCommunity>,
-      );
-
-      this._chainInfo = chainInfo;
+      this._chainInfo = communityInfo as z.infer<typeof ExtendedCommunity>;
     }
 
-    const chainId = this._chainInfo?.node?.ethChainId || 1;
+    const chainId = this._chainInfo?.ChainNode?.eth_chain_id || 1;
     const EthereumProvider = (await import('@walletconnect/ethereum-provider'))
       .default;
     this._provider = await EthereumProvider.init({

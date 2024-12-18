@@ -1,0 +1,25 @@
+@import '../../../../styles/shared';
+
+.SnapshotProposals {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 16px;
+
+  .top-bar {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .SnapshotProposalStagesBar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .no-proposals-text.Text {
+    color: $neutral-500;
+  }
+}

@@ -3,7 +3,6 @@ import { extractDomain } from 'helpers';
 import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import { LinkSource } from 'models/Thread';
 import type { AnyProposal } from 'models/types';
-import 'pages/view_proposal/proposal_components.scss';
 import React, { useState } from 'react';
 import { SERVER_URL } from 'state/api/config';
 import { userStore } from 'state/ui/user';
@@ -13,6 +12,7 @@ import {
   getStatusText,
 } from '../../components/ProposalCard/helpers';
 import { CWText } from '../../components/component_kit/cw_text';
+import './proposal_components.scss';
 import { ThreadLink } from './proposal_header_links';
 
 type ProposalSubheaderProps = {

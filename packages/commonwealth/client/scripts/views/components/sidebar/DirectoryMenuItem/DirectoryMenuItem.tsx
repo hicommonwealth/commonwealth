@@ -18,9 +18,10 @@ const DirectoryMenuItem = () => {
     location,
   );
 
+  const communityId = app.activeChainId() || '';
   const { data: community, isLoading } = useGetCommunityByIdQuery({
-    id: app.activeChainId(),
-    enabled: !!app.activeChainId(),
+    id: communityId,
+    enabled: !!communityId,
   });
 
   if (isLoading || !community) return;

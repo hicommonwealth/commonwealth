@@ -1,12 +1,12 @@
 import { type Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../database';
-import { isCommunityAdminQuery } from '../middleware';
+import { authRoles } from '../middleware';
 
 export function GetWebhooks(): Query<typeof schemas.GetWebhooks> {
   return {
     ...schemas.GetWebhooks,
-    auth: [isCommunityAdminQuery],
+    auth: [authRoles('admin')],
     secure: true,
     body: async ({ payload }) => {
       const webhooks = await models.Webhook.findAll({

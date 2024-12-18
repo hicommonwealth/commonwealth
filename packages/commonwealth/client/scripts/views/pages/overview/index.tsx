@@ -1,42 +1,53 @@
-import useBrowserWindow from 'hooks/useBrowserWindow';
+import { splitAndDecodeURL } from '@hicommonwealth/shared';
+import useRunOnceOnCondition from 'client/scripts/hooks/useRunOnceOnCondition';
 import { useCommonNavigate } from 'navigation/helpers';
-import 'pages/discussions/index.scss';
-import 'pages/overview/index.scss';
 import React from 'react';
 import app from 'state';
 import { useFetchThreadsQuery } from 'state/api/threads';
 import { useFetchTopicsQuery } from 'state/api/topics';
-import useUserStore from 'state/ui/user';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
-import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import type Thread from '../../../models/Thread';
-import type Topic from '../../../models/Topic';
+import type { Topic } from '../../../models/Topic';
 import { CWDivider } from '../../components/component_kit/cw_divider';
 import { CWText } from '../../components/component_kit/cw_text';
+import '../discussions/DiscussionsPage.scss';
 import { PageLoading } from '../loading';
 import { TopicSummaryRow } from './TopicSummaryRow';
+import './index.scss';
 
 const OverviewPage = () => {
   const navigate = useCommonNavigate();
-  const { isWindowSmallInclusive } = useBrowserWindow({});
-  const user = useUserStore();
+  const topicNameFromURL = splitAndDecodeURL(location.pathname);
 
+  useRunOnceOnCondition({
+    callback: () => {
+      if (topicNameFromURL === 'overview') {
+        const params = new URLSearchParams();
+        params.set('tab', 'overview');
+        const url = `/discussions?${params.toString()}`;
+        navigate(url);
+      }
+    },
+    shouldRun: topicNameFromURL === 'overview',
+  });
+
+  const communityId = app.activeChainId() || '';
   const { data: recentlyActiveThreads, isLoading } = useFetchThreadsQuery({
     queryType: 'active',
-    communityId: app.activeChainId(),
+    communityId,
     topicsPerThread: 3,
     withXRecentComments: 3,
-    // TODO: ask for a pinned thread prop here to show pinned threads
+    apiEnabled: !!communityId,
   });
 
   const { data: topics = [] } = useFetchTopicsQuery({
-    communityId: app.activeChainId(),
+    communityId,
+    apiEnabled: !!communityId,
   });
 
-  const anyTopicsFeatured = topics.some((t) => t.featuredInSidebar);
+  const anyTopicsFeatured = topics.some((t) => t.featured_in_sidebar);
 
   const topicsFiltered = anyTopicsFeatured
-    ? topics.filter((t) => t.featuredInSidebar)
+    ? topics.filter((t) => t.featured_in_sidebar)
     : topics;
 
   const topicsSorted = anyTopicsFeatured
@@ -68,61 +79,35 @@ const OverviewPage = () => {
   return !topicSummaryRows.length ? (
     <PageLoading />
   ) : (
-    <CWPageLayout>
-      <div className="OverviewPage">
-        <div className="header-row">
-          <div className="header-row-left">
-            <CWText type="h3" fontWeight="semiBold">
-              Overview
-            </CWText>
-            <CWButton
-              className="latest-button"
-              buttonType="primary"
-              buttonHeight="sm"
-              label="Latest Threads"
-              iconLeft="home"
-              onClick={() => {
-                navigate('/discussions');
-              }}
-            />
-          </div>
-          {!isWindowSmallInclusive && (
-            <CWButton
-              buttonType="primary"
-              buttonHeight="sm"
-              label="Create thread"
-              iconLeft="plus"
-              onClick={() => {
-                navigate('/new/discussion');
-              }}
-              disabled={!user.activeAccount}
-            />
-          )}
-        </div>
-        <div className="column-headers-row">
+    <div className="OverviewPage">
+      <div className="column-headers-row">
+        <CWText
+          type="h5"
+          fontWeight="semiBold"
+          className="threads-header-row-text"
+        >
+          Topic
+        </CWText>
+        <div className="threads-header-container">
           <CWText
             type="h5"
             fontWeight="semiBold"
             className="threads-header-row-text"
           >
-            Topic
+            Recent threads
           </CWText>
-          <div className="threads-header-container">
-            <CWText
-              type="h5"
-              fontWeight="semiBold"
-              className="threads-header-row-text"
-            >
-              Recent threads
-            </CWText>
-          </div>
         </div>
-        <CWDivider />
-        {topicSummaryRows.map((row, i) => (
-          <TopicSummaryRow {...row} key={i} isLoading={isLoading} />
-        ))}
       </div>
-    </CWPageLayout>
+      <CWDivider />
+      {topicSummaryRows.map((row, i) => (
+        <TopicSummaryRow {...row} key={i} isLoading={isLoading} />
+      ))}
+      {!isLoading && topicSummaryRows.length === 0 && (
+        <CWText type="b1" className="empty-placeholder">
+          No threads available
+        </CWText>
+      )}
+    </div>
   );
 };
 

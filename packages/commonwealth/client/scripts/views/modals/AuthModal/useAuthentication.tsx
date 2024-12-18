@@ -14,7 +14,11 @@ import {
   startLoginWithMagicLink,
   updateActiveAddresses,
 } from 'controllers/app/login';
-import { notifyError, notifyInfo } from 'controllers/app/notifications';
+import {
+  notifyError,
+  notifyInfo,
+  notifySuccess,
+} from 'controllers/app/notifications';
 import WebWalletController from 'controllers/app/web_wallets';
 import TerraWalletConnectWebWalletController from 'controllers/app/webWallets/terra_walletconnect_web_wallet';
 import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
@@ -24,10 +28,12 @@ import {
   signSessionWithAccount,
 } from 'controllers/server/sessions';
 import _ from 'lodash';
-import React, { useEffect, useState } from 'react';
+import { Magic } from 'magic-sdk';
+import { useEffect, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import app, { initAppState } from 'state';
 import { SERVER_URL } from 'state/api/config';
+import { DISCOURAGED_NONREACTIVE_fetchProfilesByAddress } from 'state/api/profiles/fetchProfilesByAddress';
 import { useUpdateUserMutation } from 'state/api/user';
 import useUserStore from 'state/ui/user';
 import {
@@ -43,18 +49,17 @@ import useAppStatus from '../../../hooks/useAppStatus';
 import { useBrowserAnalyticsTrack } from '../../../hooks/useBrowserAnalyticsTrack';
 import Account from '../../../models/Account';
 import IWebWallet from '../../../models/IWebWallet';
-import { DISCOURAGED_NONREACTIVE_fetchProfilesByAddress } from '../../../state/api/profiles/fetchProfilesByAddress';
-import useAuthModalStore from '../../../state/ui/modals/authModal';
-import { openConfirmation } from '../confirmation_modal';
 
 type UseAuthenticationProps = {
   onSuccess?: (
     address?: string | null | undefined,
     isNewlyCreated?: boolean,
-  ) => void;
-  onModalClose: () => void;
+  ) => Promise<void>;
+  onModalClose?: () => void;
   withSessionKeyLoginFlow?: boolean;
 };
+
+const magic = new Magic(process.env.MAGIC_PUBLISHABLE_KEY!);
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Wallet = IWebWallet<any>;
@@ -62,6 +67,7 @@ type Wallet = IWebWallet<any>;
 const useAuthentication = (props: UseAuthenticationProps) => {
   const [username, setUsername] = useState<string>(DEFAULT_NAME);
   const [email, setEmail] = useState<string>();
+  const [SMS, setSMS] = useState<string>();
   const [wallets, setWallets] = useState<Array<Wallet>>();
   const [selectedWallet, setSelectedWallet] = useState<Wallet>();
   const [primaryAccount, setPrimaryAccount] = useState<Account>();
@@ -92,14 +98,12 @@ const useAuthentication = (props: UseAuthenticationProps) => {
 
   const { mutateAsync: updateUser } = useUpdateUserMutation();
 
-  const { sessionKeyValidationError } = useAuthModalStore();
-
   useEffect(() => {
     if (process.env.ETH_RPC === 'e2e-test') {
       import('../../../helpers/mockMetaMaskUtil')
         .then((f) => {
           window['ethereum'] = new f.MockMetaMaskProvider(
-            `https://eth-mainnet.g.alchemy.com/v2/${process.env.ETH_ALCHEMY_API_KEY}`,
+            `https://eth-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_PUBLIC_APP_KEY}`,
             '0x09187906d2ff8848c20050df632152b5b27d816ec62acd41d4498feb522ac5c3',
           );
         })
@@ -127,69 +131,11 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     }
   }, []);
 
-  const formatAddress = (address: string) => {
-    return `${address.slice(0, 8)}...${address.slice(-5)}`;
-  };
-
   const handleSuccess = async (
     authAddress?: string | null | undefined,
     isNew?: boolean,
   ) => {
-    props?.onSuccess?.(authAddress, isNew);
-
-    // show address mismatch message, if user revalidated session with unexpected address
-    if (props.withSessionKeyLoginFlow) {
-      // @ts-expect-error StrictNullChecks
-      const isSubstrate = user.accounts.find(
-        (addr) => addr.address === sessionKeyValidationError?.address,
-      ).community?.ss58Prefix;
-      if (
-        authAddress === sessionKeyValidationError?.address ||
-        (isSubstrate &&
-          addressSwapper({
-            address: sessionKeyValidationError?.address || '',
-            currentPrefix: 42,
-          }) === authAddress)
-      ) {
-        const updatedAddress = user.accounts.find(
-          (addr) => addr.address === sessionKeyValidationError?.address,
-        );
-        await setActiveAccount(updatedAddress!);
-      } else {
-        const signedAddressAccount = user.accounts.find(
-          (addr) => addr.address === authAddress,
-        );
-        await setActiveAccount(signedAddressAccount!);
-        openConfirmation({
-          title: 'Address Mismatch',
-          description: (
-            <>
-              You tried to sign in as
-              {formatAddress(sessionKeyValidationError?.address || '')} but your
-              wallet has the address {formatAddress(authAddress || '')}.
-              {signedAddressAccount ? (
-                <p>
-                  We&apos;ve switched your active address to the one in your
-                  wallet. You can switch it back in the user menu.
-                </p>
-              ) : (
-                <p>
-                  Select <strong>Connect a new address</strong> in the user menu
-                  to connect this as a new address, or switch addresses in your
-                  wallet to continue.
-                </p>
-              )}
-            </>
-          ),
-          buttons: [
-            {
-              label: 'Continue',
-              buttonType: 'primary',
-            },
-          ],
-        });
-      }
-    }
+    await props?.onSuccess?.(authAddress, isNew);
   };
 
   const trackLoginEvent = (loginOption: string, isSocialLogin: boolean) => {
@@ -206,6 +152,38 @@ const useAuthentication = (props: UseAuthenticationProps) => {
   };
 
   // Handles Magic Link Login
+  const onSMSLogin = async (phoneNumber = '') => {
+    const tempSMSToUse = phoneNumber || SMS;
+    setSMS(tempSMSToUse);
+
+    setIsMagicLoading(true);
+
+    if (!phoneNumber) {
+      notifyError('Please enter a valid phone number.');
+      setIsMagicLoading(false);
+      return;
+    }
+
+    try {
+      const isCosmos = app.chain?.base === ChainBase.CosmosSDK;
+      const { address: magicAddress } = await startLoginWithMagicLink({
+        phoneNumber: tempSMSToUse,
+        isCosmos,
+        chain: app.chain?.id,
+      });
+      setIsMagicLoading(false);
+
+      await handleSuccess(magicAddress, isNewlyCreated);
+      props?.onModalClose?.();
+
+      trackLoginEvent('SMS', true);
+    } catch (e) {
+      notifyError(`Error authenticating with SMS`);
+      console.error(`Error authenticating with SMS: ${e}`);
+      setIsMagicLoading(false);
+    }
+  };
+
   const onEmailLogin = async (emailToUse = '') => {
     const tempEmailToUse = emailToUse || email;
     setEmail(tempEmailToUse);
@@ -223,7 +201,6 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       const { address: magicAddress } = await startLoginWithMagicLink({
         email: tempEmailToUse,
         isCosmos,
-        redirectTo: document.location.pathname + document.location.search,
         chain: app.chain?.id,
       });
       setIsMagicLoading(false);
@@ -248,7 +225,6 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       const { address: magicAddress } = await startLoginWithMagicLink({
         provider,
         isCosmos,
-        redirectTo: document.location.pathname + document.location.search,
         chain: app.chain?.id,
       });
       setIsMagicLoading(false);
@@ -287,7 +263,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
         setDarkMode(true);
       }
       if (app.chain) {
-        await updateActiveAddresses(app.activeChainId());
+        await updateActiveAddresses(app.activeChainId() || '');
       }
     }
 
@@ -305,6 +281,8 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     wallet?: Wallet,
   ) => {
     if (props.withSessionKeyLoginFlow) {
+      await setActiveAccount(account);
+      notifySuccess('Account verified!');
       await handleSuccess(account.address, newlyCreated);
       return;
     }
@@ -353,7 +331,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
         // @ts-expect-error StrictNullChecks
         const session = await signSessionWithAccount(walletToUse, account);
         // Can't call authSession now, since chain.base is unknown, so we wait till action
-        props.onSuccess?.(account.address, newlyCreated);
+        await props.onSuccess?.(account.address, newlyCreated);
 
         // Create the account with default values
         // await onCreateNewAccount(walletToUse, session, account);
@@ -378,24 +356,22 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       // Important: when we first create an account and verify it, the user id
       // is initially null from api (reloading the page will update it), to correct
       // it we need to get the id from api
-      const updatedProfiles =
+      const userAddresses =
         await DISCOURAGED_NONREACTIVE_fetchProfilesByAddress(
-          // @ts-expect-error <StrictNullChecks>
-          account.profile.chain,
-          // @ts-expect-error <StrictNullChecks>
-          account.profile.address,
+          [account!.profile!.chain],
+          [account!.profile!.address],
         );
-      const currentUserUpdatedProfile = updatedProfiles[0];
-      if (!currentUserUpdatedProfile) {
+      const currentUserAddress = userAddresses[0];
+      if (!currentUserAddress) {
         console.log('No profile yet.');
       } else {
         account?.profile?.initialize(
-          currentUserUpdatedProfile.userId,
-          currentUserUpdatedProfile.name,
-          currentUserUpdatedProfile.address,
-          currentUserUpdatedProfile.avatarUrl,
+          currentUserAddress.userId,
+          currentUserAddress.name,
+          currentUserAddress.address,
+          currentUserAddress.avatarUrl ?? '',
           account?.profile?.chain,
-          currentUserUpdatedProfile.lastActive,
+          new Date(currentUserAddress.lastActive),
         );
       }
     } catch (e) {
@@ -495,7 +471,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
               ? addressSwapper({
                   address: address,
                   currentPrefix: parseInt(
-                    (app.chain as Substrate)?.meta.ss58Prefix,
+                    `${(app.chain as Substrate)?.meta.ss58_prefix || 0}`,
                     10,
                   ),
                 })
@@ -521,7 +497,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     }
 
     try {
-      const session = await getSessionFromWallet(wallet);
+      const session = await getSessionFromWallet(wallet, { newSession: true });
       const chainIdentifier = app.chain?.id || wallet.defaultNetwork;
 
       const validationBlockInfo = await getWalletRecentBlock(
@@ -536,8 +512,6 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       } = await createUserWithAddress(
         address,
         wallet.name,
-        // @ts-expect-error <StrictNullChecks>
-        null, // no sso source
         chainIdentifier,
         session.publicKey,
         validationBlockInfo,
@@ -578,8 +552,6 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     const { account } = await createUserWithAddress(
       address,
       wallet.name,
-      // @ts-expect-error <StrictNullChecks>
-      null, // no sso source?
       chainIdentifier,
       // TODO: I don't think we need this field in Account at all
       session.publicKey,
@@ -615,6 +587,14 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     props?.onModalClose?.();
   };
 
+  const openMagicWallet = async () => {
+    try {
+      await magic.wallet.showUI();
+    } catch (error) {
+      console.trace(error);
+    }
+  };
+
   return {
     wallets,
     isMagicLoading,
@@ -624,9 +604,12 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     onWalletSelect,
     onResetWalletConnect,
     onEmailLogin,
+    onSMSLogin,
     onSocialLogin,
     setEmail,
+    setSMS,
     onVerifyMobileWalletSignature,
+    openMagicWallet,
   };
 };
 

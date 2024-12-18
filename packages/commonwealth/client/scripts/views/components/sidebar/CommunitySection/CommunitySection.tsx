@@ -1,9 +1,11 @@
-import { CommunityAlert } from '@hicommonwealth/schemas';
-import 'components/sidebar/CommunitySection/CommunitySection.scss';
+import { TokenView } from '@hicommonwealth/schemas';
+import { PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
 import { findDenominationString } from 'helpers/findDenomination';
+import { useFlag } from 'hooks/useFlag';
 import React from 'react';
 import app from 'state';
 import { useFetchCustomDomainQuery } from 'state/api/configuration';
+import { useGetTokenByCommunityId } from 'state/api/tokens';
 import { useCommunityAlertsQuery } from 'state/api/trpc/subscription/useCommunityAlertsQuery';
 import useUserStore from 'state/ui/user';
 import {
@@ -26,13 +28,17 @@ import DirectoryMenuItem from '../DirectoryMenuItem';
 import { DiscussionSection } from '../discussion_section';
 import { ExternalLinksModule } from '../external_links_module';
 import { GovernanceSection } from '../governance_section';
+import './CommunitySection.scss';
 import { CommunitySectionSkeleton } from './CommunitySectionSkeleton';
+import { TokenTradeWidget } from './TokenTradeWidget';
 
 interface CommunitySectionProps {
   showSkeleton: boolean;
 }
 
 export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
+  const tokenizedCommunityEnabled = useFlag('tokenizedCommunity');
+
   const user = useUserStore();
   const {
     selectedAddress,
@@ -56,14 +62,21 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
 
   const { data: domain } = useFetchCustomDomainQuery();
 
-  const topicIdsIncludedInContest =
-    getUniqueTopicIdsIncludedInActiveContest(contestsData);
+  const communityId = app.activeChainId() || '';
+  const { data: communityToken, isLoading: isLoadingToken } =
+    useGetTokenByCommunityId({
+      community_id: communityId,
+      with_stats: true,
+      enabled: !!communityId,
+    });
 
-  const communityAlerts:
-    | ReadonlyArray<z.infer<typeof CommunityAlert>>
-    | undefined = useCommunityAlertsQuery({
+  const topicIdsIncludedInContest = getUniqueTopicIdsIncludedInActiveContest(
+    contestsData.all,
+  );
+
+  const communityAlerts = useCommunityAlertsQuery({
     enabled: user.isLoggedIn && !!app.chain,
-  }).data as unknown as ReadonlyArray<z.infer<typeof CommunityAlert>>;
+  }).data;
 
   if (showSkeleton || isLoading || isContestDataLoading)
     return <CommunitySectionSkeleton />;
@@ -85,7 +98,7 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
 
             {stakeEnabled && (
               <VoteWeightModule
-                voteWeight={currentVoteWeight}
+                voteWeight={currentVoteWeight?.toString() || '0'}
                 stakeNumber={stakeBalance}
                 stakeValue={stakeValue}
                 denomination={findDenominationString(activeChainId) || 'ETH'}
@@ -93,6 +106,13 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
               />
             )}
           </>
+        )}
+
+        {tokenizedCommunityEnabled && communityToken && (
+          <TokenTradeWidget
+            showSkeleton={isLoadingToken}
+            token={communityToken as z.infer<typeof TokenView>}
+          />
         )}
 
         <CreateCommunityButton />
@@ -106,12 +126,11 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
 
         <CWDivider />
         <DiscussionSection
-          isContestAvailable={stakeEnabled && isContestAvailable}
           // @ts-expect-error <StrictNullChecks/>
           topicIdsIncludedInContest={topicIdsIncludedInContest}
         />
         <CWDivider />
-        <GovernanceSection />
+        <GovernanceSection isContestAvailable={isContestAvailable} />
         <CWDivider />
         <DirectoryMenuItem />
         <CWDivider />
@@ -127,7 +146,7 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
             <div
               className="powered-by"
               onClick={() => {
-                window.open('https://commonwealth.im/');
+                window.open(`https://${PRODUCTION_DOMAIN}/`);
               }}
             />
           )}

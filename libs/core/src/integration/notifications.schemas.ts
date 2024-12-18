@@ -1,5 +1,11 @@
+import { events } from '@hicommonwealth/schemas';
 import { z } from 'zod';
-import * as events from './events.schemas';
+
+/**
+ * Schema descriptions in this file are intentionally verbose as they are
+ * intended to be used by external teams (Growth/Product) to determine what
+ * data is available to them in a notifications workflow (e.g. Knock).
+ */
 
 // TODO: make this stricter by adding max/min character length
 export const CommentCreatedNotification = z.object({
@@ -87,6 +93,50 @@ export const ChainProposalsNotification = z.object({
     .string()
     .describe('The url to the snapshot proposal on Common'),
 });
+
+export const BaseUpvoteNotification = z.object({
+  community_id: z
+    .string()
+    .max(255)
+    .describe('The community id in which the reaction was created'),
+  community_name: z
+    .string()
+    .max(255)
+    .describe('The user-friendly name of the community'),
+  reaction: z
+    .enum(['like'])
+    .describe('The type of reaction. Currently only like is supported.'),
+  created_at: z
+    .string()
+    .max(255)
+    .describe('The ISO string date at which the reaction was created.'),
+  object_url: z.string().describe('The url of the thread or comment'),
+});
+
+export const ThreadUpvoteNotification = BaseUpvoteNotification.extend({
+  thread_id: z
+    .number()
+    .describe('The id of the thread on which the reaction occurred'),
+  thread_title: z
+    .string()
+    .max(255)
+    .describe('A truncated version of the thread title'),
+});
+
+export const CommentUpvoteNotification = BaseUpvoteNotification.extend({
+  comment_id: z
+    .number()
+    .describe('The id of the comment on which the reaction occurred'),
+  comment_body: z
+    .string()
+    .max(255)
+    .describe('A truncated version of the comment body'),
+});
+
+export const UpvoteNotification = z.union([
+  ThreadUpvoteNotification,
+  CommentUpvoteNotification,
+]);
 
 export const WebhookNotification = z.object({
   sender_username: z.literal('Common'),

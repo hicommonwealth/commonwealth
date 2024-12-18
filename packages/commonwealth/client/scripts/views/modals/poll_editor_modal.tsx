@@ -20,7 +20,7 @@ import {
   CWModalHeader,
 } from '../components/component_kit/new_designs/CWModal';
 
-import '../../../styles/modals/poll_editor_modal.scss';
+import './poll_editor_modal.scss';
 
 const getPollDurationCopy = (
   customDuration: string,

@@ -1,6 +1,7 @@
-import { commonProtocol } from '@hicommonwealth/shared';
+import { commonProtocol as cp } from '@hicommonwealth/evm-protocols';
 import AddressInfo from 'models/AddressInfo';
 import { useState } from 'react';
+import { chainIdsWithStakeEnabled } from 'views/components/CommunityInformationForm/constants';
 import { SelectedCommunity } from 'views/components/component_kit/new_designs/CWCommunitySelector';
 import { CreateCommunityStep, handleChangeStep } from './utils';
 
@@ -11,9 +12,10 @@ const useCreateCommunity = () => {
     // @ts-expect-error StrictNullChecks
     { type: null, chainBase: null },
   );
+
   // @ts-expect-error StrictNullChecks
   const [selectedAddress, setSelectedAddress] = useState<AddressInfo>(null);
-  const [selectedChainId, setSelectedChainId] = useState(null);
+  const [selectedChainId, setSelectedChainId] = useState<string | null>(null);
   const [createdCommunityId, setCreatedCommunityId] = useState('');
   const [createdCommunityName, setCreatedCommunityName] = useState('');
 
@@ -26,7 +28,7 @@ const useCreateCommunity = () => {
     );
   };
 
-  const handleCompleteBasicInformationStep = (
+  const handleCompleteCommunityInformationStep = (
     communityId: string,
     communityName: string,
   ) => {
@@ -36,14 +38,13 @@ const useCreateCommunity = () => {
   };
 
   const isValidStepToShowCommunityStakeFormStep = [
-    CreateCommunityStep.BasicInformation,
+    CreateCommunityStep.CommunityInformation,
     CreateCommunityStep.CommunityStake,
   ].includes(createCommunityStep);
 
-  const isSupportedChainSelected = Object.values(
-    commonProtocol.ValidChains,
-    // @ts-expect-error StrictNullChecks
-  ).includes(parseInt(selectedChainId));
+  const isSupportedChainSelected = chainIdsWithStakeEnabled.includes(
+    parseInt(selectedChainId || '') as cp.ValidChains,
+  );
 
   const showCommunityStakeStep =
     isValidStepToShowCommunityStakeFormStep && isSupportedChainSelected;
@@ -57,7 +58,7 @@ const useCreateCommunity = () => {
     setSelectedChainId,
     createdCommunityId,
     createdCommunityName,
-    handleCompleteBasicInformationStep,
+    handleCompleteCommunityInformationStep,
     onChangeStep,
     showCommunityStakeStep,
     selectedChainId,

@@ -12,10 +12,27 @@ const validate = async (
   isLoggedIn: boolean,
   isCustomDomain?: boolean,
 ) => {
+  // localstorage for magic v2
+  let chain = localStorage.getItem('magic_chain');
+  let walletSsoSource = localStorage.getItem('magic_provider');
+  // this redirect_to contains the whole url
+  let redirectTo = localStorage.getItem('magic_redirect_to');
+
+  localStorage.removeItem('chain');
+  localStorage.removeItem('provider');
+  localStorage.removeItem('redirectTo');
+
+  // params for magic v1, only used for custom domains
   const params = new URLSearchParams(window.location.search);
-  const chain = params.get('chain');
-  const walletSsoSource = params.get('sso');
-  let redirectTo = params.get('redirectTo');
+  const isMagicV1 =
+    params.get('chain') || params.get('sso') || params.get('redirectTo');
+  if (isMagicV1) {
+    chain = params.get('chain');
+    walletSsoSource = params.get('sso');
+    // this redirect_to contains the only the path after the domain
+    redirectTo = params.get('redirectTo');
+  }
+
   if (redirectTo?.startsWith('/finishsociallogin')) redirectTo = null;
 
   try {
@@ -25,15 +42,28 @@ const validate = async (
       // @ts-expect-error <StrictNullChecks/>
       walletSsoSource,
       isLoggedIn,
+      isCustomDomain,
     });
-    await initAppState();
 
-    if (redirectTo) {
-      setRoute(redirectTo);
-    } else if (chain && !isCustomDomain) {
-      setRoute(`/${chain}`);
+    if (isMagicV1) {
+      await initAppState();
+
+      if (redirectTo) {
+        setRoute(redirectTo);
+      } else if (chain && !isCustomDomain) {
+        setRoute(`/${chain}`);
+      } else {
+        setRoute('/');
+      }
+    }
+
+    const redirectToUrl = new URL(redirectTo!);
+    if (!isCustomDomain) {
+      setRoute(redirectToUrl.pathname);
+    } else if (redirectTo) {
+      window.location.href = redirectTo;
     } else {
-      setRoute('/');
+      setRoute(`/${chain}`);
     }
   } catch (error) {
     return `Error: ${error.message}`;

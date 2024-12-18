@@ -1,7 +1,5 @@
 import { X } from '@phosphor-icons/react';
 import React from 'react';
-
-import ChainInfo from '../../../../models/ChainInfo';
 import { CWCommunityAvatar } from '../cw_community_avatar';
 import { CWIcon } from '../cw_icons/cw_icon';
 import type { IconName } from '../cw_icons/cw_icon_lookup';
@@ -9,7 +7,7 @@ import { CWText } from '../cw_text';
 import { getClasses } from '../helpers';
 import { ComponentType } from '../types';
 
-import 'components/component_kit/new_designs/CWTag.scss';
+import './CWTag.scss';
 
 type TagType =
   | 'passed'
@@ -27,16 +25,22 @@ type TagType =
   | 'input'
   | 'address'
   | 'group'
-  | 'contest';
+  | 'contest'
+  | 'filter'
+  | 'amount';
 
 export type TagProps = {
   iconName?: IconName;
   label: string;
   type: TagType;
   onClick?: (e?: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
+  onCloseClick?: () => void;
   trimAt?: number;
   classNames?: string;
-  community?: Pick<ChainInfo, 'iconUrl' | 'name'>;
+  community?: {
+    name: string;
+    iconUrl: string;
+  };
   onMouseEnter?: (e?: React.MouseEvent<HTMLElement>) => void;
   onMouseLeave?: (e: React.MouseEvent<HTMLElement>) => void;
 };
@@ -46,6 +50,7 @@ export const CWTag = ({
   label,
   type,
   onClick,
+  onCloseClick,
   trimAt,
   classNames,
   community,
@@ -63,9 +68,6 @@ export const CWTag = ({
 
     return label.slice(0, trimAt) + '...';
   };
-
-  // @ts-expect-error <StrictNullChecks/>
-  const handleClick = () => onClick();
 
   return (
     <div
@@ -93,8 +95,8 @@ export const CWTag = ({
       <CWText type="caption" fontWeight="medium" noWrap>
         {displayLabel()}
       </CWText>
-      {type === 'input' && (
-        <div className="close-container" onClick={handleClick}>
+      {(type === 'input' || type === 'filter') && (
+        <div className="close-container" onClick={onCloseClick}>
           <X
             className={getClasses({ action: true }, ComponentType.Tag)}
             size={16}

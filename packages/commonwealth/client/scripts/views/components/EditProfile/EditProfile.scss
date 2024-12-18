@@ -1,4 +1,4 @@
-@import '../../../../styles/shared';
+@import '../../../styles/shared';
 
 .EditProfile {
   &.full-height {
@@ -61,6 +61,10 @@
     .h5 {
       color: $neutral-500;
     }
+  }
+
+  .background-img-field {
+    padding-bottom: 24px;
   }
 
   .Divider {

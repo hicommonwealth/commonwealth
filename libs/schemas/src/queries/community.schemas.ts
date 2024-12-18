@@ -1,6 +1,7 @@
 import {
   ChainBase,
   ChainNetwork,
+  CommunityType,
   MAX_SCHEMA_INT,
   MIN_SCHEMA_INT,
 } from '@hicommonwealth/shared';
@@ -9,8 +10,12 @@ import {
   Community,
   CommunityMember,
   CommunityStake,
+  ContestManager,
   ExtendedCommunity,
+  PinnedToken,
+  Topic,
 } from '../entities';
+import * as projections from '../projections';
 import { PG_INT } from '../utils';
 import { PaginatedResultSchema, PaginationParamsSchema } from './pagination';
 
@@ -29,6 +34,9 @@ export const GetCommunities = {
       ),
     network: z.nativeEnum(ChainNetwork).optional(),
     base: z.nativeEnum(ChainBase).optional(),
+    eth_chain_id: z.number().optional(),
+    cosmos_chain_id: z.string().optional(),
+    community_type: z.nativeEnum(CommunityType).optional(),
     // NOTE 8/7/24: passing arrays in GET requests directly is not supported.
     //    Instead we support comma-separated strings of ids.
     tag_ids: z
@@ -45,11 +53,14 @@ export const GetCommunities = {
     include_last_30_day_thread_count: z.boolean().optional(),
     order_by: z
       .enum([
+        'created_at',
         'profile_count',
         'lifetime_thread_count',
         'last_30_day_thread_count',
+        // TODO: https://github.com/hicommonwealth/commonwealth/issues/9694 add price and market cap options
       ])
       .optional(),
+    order_direction: z.enum(['ASC', 'DESC']).optional(),
   }).refine(
     (data) => {
       // order_by can't be 'last_30_day_thread_count' if 'include_last_30_day_thread_count' is falsy
@@ -121,19 +132,19 @@ export const GetCommunityMembers = {
   }),
 };
 
-export const GetStakeTransaction = {
+export const GetTransactions = {
   input: z.object({
     addresses: z.string().optional(),
   }),
   output: z
     .object({
+      transaction_category: z.enum(['stake', 'launchpad']),
+      transaction_type: z.enum(['buy', 'sell']),
       transaction_hash: z.string(),
       address: z.string(),
-      stake_price: z.string(),
-      stake_amount: PG_INT,
-      vote_weight: PG_INT,
+      price: z.number(),
+      amount: z.union([z.string(), PG_INT]),
       timestamp: PG_INT,
-      stake_direction: z.string(),
       community: z.object({
         id: z.string(),
         default_symbol: z.string().nullish(),
@@ -158,4 +169,45 @@ export const GetStakeHistoricalPrice = {
       old_price: z.string().nullish(),
     })
     .array(),
+};
+
+export const ConstestManagerView = ContestManager.extend({
+  created_at: z.string(),
+  topics: z.undefined(),
+  contests: z.undefined(),
+  content: z.array(
+    projections.ContestAction.extend({
+      created_at: z.string(),
+    }),
+  ),
+});
+
+export const TopicView = Topic.extend({
+  created_at: z.string().nullish(),
+  updated_at: z.string().nullish(),
+  deleted_at: z.string().nullish(),
+  archived_at: z.string().nullish(),
+  contest_topics: z.undefined(),
+  total_threads: z.number().default(0),
+  active_contest_managers: z.array(ConstestManagerView).optional(),
+  chain_node_id: z.number().nullish().optional(),
+  chain_node_url: z.string().nullish().optional(),
+  eth_chain_id: z.number().nullish().optional(),
+});
+
+export const GetTopics = {
+  input: z.object({
+    community_id: z.string(),
+    with_contest_managers: z.boolean().optional(),
+    with_archived_topics: z.boolean().optional(),
+  }),
+  output: z.array(TopicView),
+};
+
+export const GetPinnedTokens = {
+  input: z.object({
+    community_ids: z.string(),
+    with_chain_node: z.boolean().optional(),
+  }),
+  output: PinnedToken.array(),
 };

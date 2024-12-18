@@ -2,9 +2,9 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-import 'pages/view_proposal/proposal_header_links.scss';
+import './proposal_header_links.scss';
 
-import { ProposalType } from '@hicommonwealth/shared';
+import { getDecodedString, ProposalType } from '@hicommonwealth/shared';
 import { getProposalUrlPath } from 'identifiers';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 
@@ -28,9 +28,7 @@ const threadLinkButton = (
 
   return (
     <div className="HeaderLink">
-      <Link to={path}>
-        {title ? decodeURIComponent(title) : 'Go to thread'}
-      </Link>
+      <Link to={path}>{title ? getDecodedString(title) : 'Go to thread'}</Link>
       <CWIcon iconName="externalLink" iconSize="small" />
     </div>
   );
@@ -56,7 +54,7 @@ export const SnapshotThreadLink = ({ thread }: SnapshotThreadLinkProps) => {
 
   return (
     <div className="HeaderLink">
-      <Link to={proposalLink}>{decodeURIComponent(thread.title)}</Link>
+      <Link to={proposalLink}>{getDecodedString(thread.title)}</Link>
       <CWIcon iconName="externalLink" iconSize="small" />
     </div>
   );

@@ -1,0 +1,23 @@
+@import '../../../../styles/shared';
+.RenderTextWithLink {
+  .mainText {
+    display: flex;
+    justify-items: start;
+    justify-content: flex-start;
+    gap: 4px;
+
+    .link {
+      color: $primary-500;
+      text-decoration: none;
+      margin-right: 2px;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+
+    .text {
+      margin-right: 2px;
+    }
+  }
+}

@@ -1,8 +1,10 @@
 import { ThreadVersionHistory } from '@hicommonwealth/schemas';
+import { MAX_TRUNCATED_CONTENT_LENGTH } from '@hicommonwealth/shared';
 import Sequelize from 'sequelize';
 import { z } from 'zod';
 import { ThreadAttributes } from './thread';
 import type { ModelInstance } from './types';
+import { beforeValidateBodyHook } from './utils';
 
 export type ThreadVersionHistoryAttributes = z.infer<
   typeof ThreadVersionHistory
@@ -23,12 +25,21 @@ export default (
       id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },
       thread_id: { type: Sequelize.INTEGER, allowNull: false },
       address: { type: Sequelize.STRING, allowNull: false },
-      body: { type: Sequelize.TEXT, allowNull: false },
+      body: {
+        type: Sequelize.STRING(MAX_TRUNCATED_CONTENT_LENGTH),
+        allowNull: false,
+      },
       timestamp: { type: Sequelize.DATE, allowNull: false },
+      content_url: { type: Sequelize.STRING, allowNull: true },
     },
     {
       tableName: 'ThreadVersionHistories',
       timestamps: false,
       indexes: [{ fields: ['thread_id'] }],
+      hooks: {
+        beforeValidate(instance: ThreadVersionHistoryInstance) {
+          beforeValidateBodyHook(instance);
+        },
+      },
     },
   );

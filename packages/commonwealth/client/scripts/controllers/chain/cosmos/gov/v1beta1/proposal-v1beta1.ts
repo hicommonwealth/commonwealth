@@ -142,11 +142,8 @@ export class CosmosProposal extends Proposal<
     this._Chain = ChainInfo;
     this._Accounts = Accounts;
     this._Governance = Governance;
+    this.createdAt = data.submitTime;
     this._Governance.store.add(this);
-  }
-
-  public update() {
-    throw new Error('unimplemented');
   }
 
   public init() {

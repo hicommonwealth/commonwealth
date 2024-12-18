@@ -40,8 +40,8 @@ _"There are only two hard things in Computer Science: cache invalidation and nam
 - Choosing a right TTL could be very important, as app data is highly transactional
 
 - **Caching Namespace:**
-  - Global - eg. /api/viewGlobalActivity
-  - User Specific - eg. /api/viewUserActivity or /api/status
+  - Global - eg. /api/internal/trpc/feed.GetGlobalActivity
+  - User Specific - eg. /api/internal/trpc/feed.GetUserActivity or /api/status
 
 - **Hybrid Request Handler** -> Fetch followed by tracking of user activity
   eg. get chain data & record current chain selected by user  - these kind of request handler can only utilize sequelize result caching
@@ -266,107 +266,7 @@ fn(args){
 `key` param of `cacheWrap` function can be a key to either return string, or `key(..args)` which returns either string or {cacheKey, cacheDuration}.
 Same arguments as wrapped fn will be passed to custom key generator function.
 
-### Background Task Runner - Pre-fetching/ Refreshing result periodically
-
-**Scenario:** Good candidate to be run in background.
-
-- We don't need to compute this for every user
-- Endpoint is not parameterized, we don't need user input to compute the result
-- eg. Global Activity - can be fetched periodically on schedule - to always serve seemingly fresh result to user
-
-Using `caheWrap` example from above:
-First parameter of `cacheWrap` is boolean, if we want to skip cache lookup and instead want to override result in cache
-
-**Prepare Function to run as background task**
-call `cacheWrap` with first parameter as `true`
-
-```js
-const wrapFnOverride = cacheDecorator.cacheWrap(
-  true,
-  slowGoodCachingCandidateFn,
-  key,
-  duration,
-  CacheNamespaces.Function_Response
-);
-```
-
-**Start a background task**
-
-- It adds function to run on fixed interval
-- It also run it immediately for the first time
-
-```js
-daemon.startTask(
-  'myWrapFnLabel',
-  async () => await this.wrapFnOverride(...args),
-  duration
-);
-```
-
-**Task Signature**
-Daemon can only accept function with no param
-
-- basically, args need to be bound in advance
-- change your function to format, here `..args` are bound from closure/context from where we call `daemon.startTask`
-
-```
-() => wrapOverrideFn(..args)
-```
-
-**Daemon Error Handling**
-It clears the task automatically in case of failure
-
-**Re-adding Daemon Task**
-Re-adding task with same label will cancel the old task & setup new task with same label
-
-**Cancel Task**
-Task can be cancelled using same label if required  `daemon.cancelTask(label)`
-
-**Constraints**
-
-- Running background task could be resource intensive, currently background task can be repeated with allowed interval of a 60 seconds or over
-
-### Activity - Decorator Helper class
-
-It hides both cache wrap & daemon from user, it declares both:
-
-- cacheWrap
-- cacheWrapOverride
-- startTask method - by internally calling daemon.startTask
-
-**Sample Usage:**
-**Method to Wrap**
-
-```
-const getChainStatus = async (models: DB) => {
-       body....
-}
-```
-
-**Generate Wrapper**
-
-```
-export const getChainActivity = new Activity(
-  'getChainStatus', //cache label
-  getChainStatus,//method to wrap
-  'getChainStatus', //cache key
-  60 * 5, // 5 minutes ttl
-  CacheNamespaces.Global_Response //namespace
-);
-```
-
-**Drop-In Wrapper**
-
-```js
-  getChainActivity.queryWithCache(models);
-```
-
-**Start Daemon Task**
-
-```js
-  getChainActivity.startTask(models);
-```
-
 ## Change Log
 
+- 2401031: Modified by Timothee Legros.
 - 230428: Authored by Nakul Manchanda.

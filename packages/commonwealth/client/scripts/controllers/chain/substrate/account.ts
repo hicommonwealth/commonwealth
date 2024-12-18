@@ -13,9 +13,23 @@ export class SubstrateAccount extends Account {
   constructor(app: IApp, Accounts: SubstrateAccounts, address: string) {
     if (!app.isModuleReady) {
       // defer chain initialization
-      super({ community: app.chain.meta, address });
+      super({
+        community: {
+          id: app.chain.meta.id || '',
+          base: app.chain.meta.base,
+          ss58Prefix: app.chain.meta.ss58_prefix || 0,
+        },
+        address,
+      });
     } else {
-      super({ community: app.chain.meta, address });
+      super({
+        community: {
+          id: app.chain.meta.id || '',
+          base: app.chain.meta.base,
+          ss58Prefix: app.chain.meta.ss58_prefix || 0,
+        },
+        address,
+      });
     }
     this._Accounts = Accounts;
     this._Accounts.store.add(this);

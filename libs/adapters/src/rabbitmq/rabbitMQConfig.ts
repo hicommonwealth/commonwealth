@@ -1,4 +1,5 @@
 import * as Rascal from 'rascal';
+import { config as EnvConfig } from '../config';
 import { getAllRascalConfigs } from './configuration/rascalConfig';
 import {
   RascalBindings,
@@ -8,11 +9,8 @@ import {
   RascalSubscriptions,
 } from './types';
 
-// TODO: Move configs to specific services
-
 export enum RascalConfigServices {
   CommonwealthService = 'commonwealth',
-  DiscobotService = 'discobot',
 }
 
 /**
@@ -31,7 +29,7 @@ export function getRabbitMQConfig(
     rabbitmq_uri.includes('127.0.0.1')
   ) {
     vhost = '/';
-    purge = true;
+    purge = !EnvConfig.BROKER.DISABLE_LOCAL_QUEUE_PURGE;
   } else {
     const count = (rabbitmq_uri.match(/\//g) || []).length;
     if (count == 3) {
@@ -73,14 +71,22 @@ export function getRabbitMQConfig(
     copyConfigs(allQueues, vhostConfig.queues, [
       RascalQueues.ChainEvent,
       RascalQueues.NotificationsProvider,
+      RascalQueues.NotificationsSettings,
       RascalQueues.ContestWorkerPolicy,
       RascalQueues.ContestProjection,
+      RascalQueues.XpProjection,
+      RascalQueues.FarcasterWorkerPolicy,
+      RascalQueues.DiscordBotPolicy,
     ]);
     copyConfigs(allBindings, vhostConfig.bindings, [
       RascalBindings.ChainEvent,
       RascalBindings.NotificationsProvider,
+      RascalBindings.NotificationsSettings,
       RascalBindings.ContestWorkerPolicy,
       RascalBindings.ContestProjection,
+      RascalBindings.XpProjection,
+      RascalBindings.FarcasterWorkerPolicy,
+      RascalBindings.DiscordBotPolicy,
     ]);
     copyConfigs(allPublications, vhostConfig.publications, [
       RascalPublications.MessageRelayer,
@@ -88,22 +94,12 @@ export function getRabbitMQConfig(
     copyConfigs(allSubscriptions, vhostConfig.subscriptions, [
       RascalSubscriptions.ChainEvent,
       RascalSubscriptions.NotificationsProvider,
+      RascalSubscriptions.NotificationsSettings,
       RascalSubscriptions.ContestWorkerPolicy,
       RascalSubscriptions.ContestProjection,
-    ]);
-  } else if (service === RascalConfigServices.DiscobotService) {
-    copyConfigs(allExchanges, vhostConfig.exchanges, [
-      RascalExchanges.Discobot,
-    ]);
-    copyConfigs(allQueues, vhostConfig.queues, [RascalQueues.DiscordListener]);
-    copyConfigs(allBindings, vhostConfig.bindings, [
-      RascalBindings.DiscordListener,
-    ]);
-    copyConfigs(allPublications, vhostConfig.publications, [
-      RascalPublications.DiscordListener,
-    ]);
-    copyConfigs(allSubscriptions, vhostConfig.subscriptions, [
-      RascalSubscriptions.DiscordListener,
+      RascalSubscriptions.XpProjection,
+      RascalSubscriptions.FarcasterWorkerPolicy,
+      RascalSubscriptions.DiscordBotPolicy,
     ]);
   }
 

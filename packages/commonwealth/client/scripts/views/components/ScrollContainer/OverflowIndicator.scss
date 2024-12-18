@@ -1,0 +1,48 @@
+@import '../../../styles/shared';
+
+.OverflowIndicator {
+  display: flex;
+  position: absolute;
+  width: 50px;
+  height: 100%;
+}
+
+.OverflowIndicator button {
+  margin-left: auto;
+  margin-top: auto;
+  margin-bottom: auto;
+  outline: none;
+  border: none;
+  cursor: pointer;
+
+  background-color: rgb(255, 255, 255);
+  color: $neutral-400;
+}
+
+.OverflowIndicator .Gradient {
+  width: 100%;
+}
+
+.OverflowIndicatorLeft .Gradient {
+  background: linear-gradient(
+    to left,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 1) 100%
+  );
+}
+
+.OverflowIndicatorLeft {
+  left: 0;
+}
+
+.OverflowIndicatorRight .Gradient {
+  background: linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 1) 100%
+  );
+}
+
+.OverflowIndicatorRight {
+  right: 0;
+}

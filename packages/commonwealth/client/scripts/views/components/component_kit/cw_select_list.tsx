@@ -2,16 +2,18 @@ import React from 'react';
 import type { GroupBase, OptionProps, Props } from 'react-select';
 import Select, { components } from 'react-select';
 
-import 'components/component_kit/cw_select_list.scss';
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
+import './cw_select_list.scss';
 
 const CustomOption = (
   props: OptionProps & { disabledOptionTooltipText?: string },
 ) => {
+  // eslint-disable-next-line react/destructuring-assignment
   if ((props.data as any)?.disabled) {
     return (
       <CWTooltip
         disablePortal
+        // eslint-disable-next-line react/destructuring-assignment
         content={props.disabledOptionTooltipText || 'Option not allowed'}
         placement="top"
         renderTrigger={(handleInteraction) => (
@@ -27,6 +29,7 @@ const CustomOption = (
               },
             }}
           >
+            {/* eslint-disable-next-line react/destructuring-assignment */}
             {props.children}
           </components.Option>
         )}
@@ -34,12 +37,14 @@ const CustomOption = (
     );
   }
 
+  // eslint-disable-next-line react/destructuring-assignment
   return <components.Option {...props}>{props.children}</components.Option>;
 };
 
 interface SelectListProps {
   disabledOptionTooltipText?: string;
 }
+// eslint-disable-next-line react/no-multi-comp
 export const SelectList = <
   Option,
   IsMulti extends boolean = false,
@@ -52,10 +57,12 @@ export const SelectList = <
       {...props}
       isOptionDisabled={(option) => (option as any)?.disabled}
       components={{
+        // eslint-disable-next-line react/no-multi-comp
         Option: (optionProps) => (
           // @ts-expect-error <StrictNullChecks/>
           <CustomOption
             {...optionProps}
+            // eslint-disable-next-line react/no-children-prop, react/destructuring-assignment
             children={optionProps.children}
             disabledOptionTooltipText={props.disabledOptionTooltipText}
           />
@@ -74,6 +81,7 @@ export const SelectList = <
           maxHeight: '300px',
         }),
       }}
+      // eslint-disable-next-line react/destructuring-assignment
       className={`SelectList ${props.className || ''}`}
     />
   );

@@ -3,12 +3,12 @@ import React from 'react';
 // TODO: remove formatCoin, only use coins.format()
 import { formatCoin } from 'adapters/currency';
 
-import 'components/proposals/vote_listing.scss';
 import { CosmosVote } from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
 import type { IVote } from '../../../models/interfaces';
 import type { AnyProposal } from '../../../models/types';
 import { VotingUnit } from '../../../models/types';
 import { DepositVote } from '../../../models/votes';
+import './vote_listing.scss';
 
 import Account from '../../../models/Account';
 import { User } from '../../components/user/user';

@@ -1,0 +1,17 @@
+@import '../../../../styles/shared';
+
+.NewSnapshotProposal {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 16px;
+
+  @include extraSmall {
+    width: 100%;
+  }
+
+  .date-range {
+    display: flex;
+    flex-direction: column;
+  }
+}

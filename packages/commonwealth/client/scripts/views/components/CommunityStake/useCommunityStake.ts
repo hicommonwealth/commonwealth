@@ -1,4 +1,4 @@
-import { commonProtocol } from '@hicommonwealth/shared';
+import { commonProtocol } from '@hicommonwealth/evm-protocols';
 import app from 'state';
 import {
   useFetchCommunityStakeQuery,
@@ -30,15 +30,17 @@ const useCommunityStake = (props: UseCommunityStakeProps = {}) => {
   const { community, stakeId = commonProtocol.STAKE_ID, walletAddress } = props;
   const user = useUserStore();
 
-  const activeCommunityId = community?.id || app?.chain?.id;
+  const activeCommunityId = community?.id || app?.chain?.id || '';
   const activeCommunityNamespace =
     community?.namespace || app?.chain?.meta?.namespace;
   const chainRpc =
-    community?.ChainNode?.url || app?.chain?.meta?.ChainNode?.url;
+    community?.ChainNode?.url || app?.chain?.meta?.ChainNode?.url || '';
   const ethChainId =
-    community?.ChainNode?.ethChainId || app?.chain?.meta?.ChainNode?.ethChainId;
+    community?.ChainNode?.ethChainId ||
+    app?.chain?.meta?.ChainNode?.eth_chain_id ||
+    0;
   const activeAccountAddress = user.activeAccount?.address || '';
-  const activeChainId = chainIds[app?.chain?.meta?.ChainNode?.id];
+  const activeChainId = chainIds[app?.chain?.meta?.ChainNode?.id || 0];
 
   const {
     isInitialLoading: communityStakeLoading,
@@ -70,7 +72,6 @@ const useCommunityStake = (props: UseCommunityStakeProps = {}) => {
     chainRpc,
     walletAddress: walletAddress || activeAccountAddress,
     keepPreviousData: true,
-    // @ts-expect-error StrictNullChecks
     ethChainId,
   });
 
@@ -82,7 +83,6 @@ const useCommunityStake = (props: UseCommunityStakeProps = {}) => {
       amount: Number(userStakeBalanceData),
       apiEnabled: apiEnabled && !isNaN(Number(userStakeBalanceData)),
       chainRpc,
-      // @ts-expect-error StrictNullChecks
       ethChainId,
       keepPreviousData: true,
     });

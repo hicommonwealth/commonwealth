@@ -3,7 +3,7 @@ import React from 'react';
 import { getClasses } from './helpers';
 import { ComponentType } from './types';
 
-import 'components/component_kit/cw_text.scss';
+import './cw_text.scss';
 
 type FontWeight =
   | 'regular'
@@ -34,7 +34,7 @@ type FontType =
   | 'monospace1'
   | 'monospace2';
 
-type TextStyleProps = {
+export type TextStyleProps = {
   className?: string;
   disabled?: boolean;
   fontStyle?: FontStyle;

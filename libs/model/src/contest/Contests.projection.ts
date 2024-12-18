@@ -1,18 +1,23 @@
+import { BigNumber } from '@ethersproject/bignumber';
+import { InvalidState, Projection, logger } from '@hicommonwealth/core';
 import {
+  ChildContractNames,
   EvmEventSignatures,
-  InvalidState,
-  Projection,
-  events,
-  logger,
-} from '@hicommonwealth/core';
-import { ContestScore } from '@hicommonwealth/schemas';
+  commonProtocol as cp,
+} from '@hicommonwealth/evm-protocols';
+import { ContestScore, events } from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
 import { z } from 'zod';
 import { models } from '../database';
 import { mustExist } from '../middleware/guards';
 import { EvmEventSourceAttributes } from '../models';
 import * as protocol from '../services/commonProtocol';
-import { decodeThreadContentUrl } from '../utils';
+import { getWeightedNumTokens } from '../services/stakeHelper';
+import {
+  decodeThreadContentUrl,
+  getChainNodeUrl,
+  getDefaultContestImage,
+} from '../utils';
 
 const log = logger(import.meta);
 
@@ -35,15 +40,6 @@ const inputs = {
   ContestContentUpvoted: events.ContestContentUpvoted,
 };
 
-// TODO: remove kind column from EvmEventSources
-const signatureToKind = {
-  [EvmEventSignatures.Contests.ContentAdded]: 'ContentAdded',
-  [EvmEventSignatures.Contests.RecurringContestStarted]: 'ContestStarted',
-  [EvmEventSignatures.Contests.RecurringContestVoterVoted]: 'VoterVoted',
-  [EvmEventSignatures.Contests.SingleContestStarted]: 'ContestStarted',
-  [EvmEventSignatures.Contests.SingleContestVoterVoted]: 'VoterVoted',
-};
-
 /**
  * Makes sure contest manager (off-chain metadata) record exists
  * - Alerts when not found and inserts default record to patch distributed transaction
@@ -62,13 +58,25 @@ async function updateOrCreateWithAlert(
     },
   });
   const url = community?.ChainNode?.private_url;
-  if (!url)
-    throw new InvalidState(
-      `Chain node url not found on namespace ${namespace}`,
+  if (!url) {
+    log.warn(`Chain node url not found on namespace ${namespace}`);
+    return;
+  }
+
+  const ethChainId = community!.ChainNode!.eth_chain_id!;
+  if (!cp.isValidChain(ethChainId)) {
+    log.error(
+      `Unsupported eth chain id: ${ethChainId} for namespace: ${namespace}`,
     );
+    return;
+  }
 
   const { ticker, decimals } =
-    await protocol.contractHelpers.getTokenAttributes(contest_address, url);
+    await protocol.contractHelpers.getTokenAttributes(
+      contest_address,
+      url,
+      true,
+    );
 
   const { startTime, endTime } = await protocol.contestHelper.getContestStatus(
     url,
@@ -93,22 +101,23 @@ async function updateOrCreateWithAlert(
         msg,
         new MissingContestManager(msg, namespace, contest_address),
       );
+      mustExist(`Community with namespace: ${namespace}`, community);
 
-      if (mustExist(`Community with namespace: ${namespace}`, community))
-        await models.ContestManager.create(
-          {
-            contest_address,
-            community_id: community.id!,
-            interval,
-            ticker,
-            decimals,
-            created_at: new Date(),
-            name: community.name,
-            image_url: 'http://default.image', // TODO: can we have a default image for this?
-            payout_structure: [],
-          },
-          { transaction },
-        );
+      await models.ContestManager.create(
+        {
+          contest_address,
+          community_id: community.id!,
+          interval,
+          ticker,
+          decimals,
+          created_at: new Date(),
+          name: community.name,
+          image_url: getDefaultContestImage(),
+          payout_structure: [],
+          is_farcaster_contest: false,
+        },
+        { transaction },
+      );
     }
 
     // create first contest instance
@@ -122,37 +131,34 @@ async function updateOrCreateWithAlert(
       { transaction },
     );
 
-    // TODO: move EVM concerns out of projection
-    // create EVM event sources so chain listener will listen to events on new contest contract
-    const abiNickname = isOneOff ? 'SingleContest' : 'RecurringContest';
-    const contestAbi = await models.ContractAbi.findOne({
-      where: { nickname: abiNickname },
-    });
-    if (mustExist(`Contest ABI with nickname "${abiNickname}"`, contestAbi)) {
-      const sigs = isOneOff
-        ? [
-            EvmEventSignatures.Contests.ContentAdded,
-            EvmEventSignatures.Contests.SingleContestStarted,
-            EvmEventSignatures.Contests.SingleContestVoterVoted,
-          ]
-        : [
-            EvmEventSignatures.Contests.ContentAdded,
-            EvmEventSignatures.Contests.RecurringContestStarted,
-            EvmEventSignatures.Contests.RecurringContestVoterVoted,
-          ];
-      const sourcesToCreate: EvmEventSourceAttributes[] = sigs.map(
-        (eventSignature) => {
-          return {
-            chain_node_id: community!.ChainNode!.id!,
-            contract_address: contest_address,
-            event_signature: eventSignature,
-            kind: signatureToKind[eventSignature],
-            abi_id: contestAbi.id,
-          };
-        },
-      );
-      await models.EvmEventSource.bulkCreate(sourcesToCreate, { transaction });
-    }
+    const childContractName = isOneOff
+      ? ChildContractNames.SingleContest
+      : ChildContractNames.RecurringContest;
+
+    const sigs = isOneOff
+      ? [
+          EvmEventSignatures.Contests.ContentAdded,
+          EvmEventSignatures.Contests.SingleContestStarted,
+          EvmEventSignatures.Contests.SingleContestVoterVoted,
+        ]
+      : [
+          EvmEventSignatures.Contests.ContentAdded,
+          EvmEventSignatures.Contests.RecurringContestStarted,
+          EvmEventSignatures.Contests.RecurringContestVoterVoted,
+        ];
+    const sourcesToCreate: EvmEventSourceAttributes[] = sigs.map(
+      (eventSignature) => {
+        return {
+          eth_chain_id: ethChainId,
+          contract_address: contest_address,
+          event_signature: eventSignature,
+          contract_name: childContractName,
+          parent_contract_address: cp.factoryContracts[ethChainId].factory,
+          // TODO: add created_at_block so EVM CE runs the migrateEvents func
+        };
+      },
+    );
+    await models.EvmEventSource.bulkCreate(sourcesToCreate, { transaction });
   });
 }
 
@@ -168,9 +174,12 @@ type ContestDetails = {
 async function getContestDetails(
   contest_address: string,
 ): Promise<ContestDetails | undefined> {
-  const [result] = await models.sequelize.query<ContestDetails>(
+  const [result] = await models.sequelize.query<
+    ContestDetails & { private_url: string }
+  >(
     `
-        select coalesce(cn.private_url, cn.url) as url,
+        select cn.private_url,
+               cn.url,
                cm.prize_percentage,
                cm.payout_structure
         from "ContestManagers" cm
@@ -184,7 +193,12 @@ async function getContestDetails(
       replacements: { contest_address },
     },
   );
-  return result;
+
+  return {
+    url: getChainNodeUrl(result),
+    prize_percentage: result.prize_percentage,
+    payout_structure: result.payout_structure,
+  };
 }
 
 /**
@@ -213,20 +227,19 @@ export async function updateScore(contest_address: string, contest_id: number) {
         oneOff,
       );
 
-    const prizePool =
-      (Number(contestBalance) *
-        Number(oneOff ? 100 : details.prize_percentage)) /
-      100;
+    const prizePool = BigNumber.from(contestBalance)
+      .mul(oneOff ? 100 : details.prize_percentage)
+      .div(100);
     const score: z.infer<typeof ContestScore> = scores.map((s, i) => ({
       content_id: s.winningContent.toString(),
       creator_address: s.winningAddress,
-      votes: Number(s.voteCount),
+      votes: BigNumber.from(s.voteCount).toString(),
       prize:
         i < Number(details.payout_structure.length)
-          ? (
-              (Number(prizePool) * Number(details.payout_structure[i])) /
-              100
-            ).toString()
+          ? BigNumber.from(prizePool)
+              .mul(details.payout_structure[i])
+              .div(100)
+              .toString()
           : '0',
     }));
     await models.Contest.update(
@@ -290,7 +303,7 @@ export function Contests(): Projection<typeof inputs> {
           action: 'added',
           content_url: payload.content_url,
           thread_id: threadId,
-          voting_power: 0,
+          voting_power: '0',
           created_at: new Date(),
         });
       },
@@ -303,16 +316,52 @@ export function Contests(): Projection<typeof inputs> {
             content_id: payload.content_id,
             action: 'added',
           },
-          attributes: ['thread_id'],
-          raw: true,
+          include: [
+            {
+              model: models.ContestManager,
+              include: [
+                {
+                  model: models.Community,
+                  include: [
+                    {
+                      model: models.ChainNode.scope('withPrivateData'),
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
         });
+
+        let calculated_voting_weight: string | undefined;
+
+        if (
+          BigInt(payload.voting_power || 0) > BigInt(0) &&
+          add_action?.ContestManager?.vote_weight_multiplier
+        ) {
+          const { eth_chain_id, url, private_url } =
+            add_action!.ContestManager!.Community!.ChainNode!;
+          const { funding_token_address, vote_weight_multiplier } =
+            add_action!.ContestManager!;
+          const numTokens = await getWeightedNumTokens(
+            payload.voter_address,
+            funding_token_address!,
+            eth_chain_id!,
+            getChainNodeUrl({ url, private_url }),
+            vote_weight_multiplier!,
+          );
+          calculated_voting_weight = numTokens.toString();
+        }
+
         await models.ContestAction.upsert({
           ...payload,
           contest_id,
           actor_address: payload.voter_address,
           action: 'upvoted',
           thread_id: add_action!.thread_id,
+          content_url: add_action!.content_url,
           created_at: new Date(),
+          calculated_voting_weight,
         });
 
         // eslint-disable-next-line @typescript-eslint/no-misused-promises

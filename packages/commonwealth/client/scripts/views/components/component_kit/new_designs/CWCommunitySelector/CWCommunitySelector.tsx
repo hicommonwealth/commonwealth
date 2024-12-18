@@ -6,6 +6,8 @@ import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 
 import { ChainBase } from '@hicommonwealth/shared';
+import clsx from 'clsx';
+import { CWRadioButton, RadioButtonProps } from '../cw_radio_button';
 import './CWCommunitySelector.scss';
 
 export enum CommunityType {
@@ -26,8 +28,9 @@ interface CWCommunitySelectorProps {
   img: string;
   title: string;
   isRecommended?: boolean;
-  description: string;
+  description?: string;
   onClick: () => void;
+  withRadioButton?: RadioButtonProps;
 }
 
 const CWCommunitySelector = ({
@@ -36,9 +39,21 @@ const CWCommunitySelector = ({
   isRecommended,
   description,
   onClick,
+  withRadioButton,
 }: CWCommunitySelectorProps) => {
   return (
-    <div className={ComponentType.CommunitySelector} onClick={onClick}>
+    <div
+      className={clsx(ComponentType.CommunitySelector, {
+        active: withRadioButton?.checked,
+        withRadio: !!withRadioButton,
+      })}
+      onClick={onClick}
+    >
+      {withRadioButton && (
+        <div className="radio-button">
+          <CWRadioButton {...withRadioButton} />
+        </div>
+      )}
       <div className="chain-logo-container">
         <img src={img} alt={title} />
       </div>
@@ -51,7 +66,7 @@ const CWCommunitySelector = ({
             <CWTag label="Recommended" type="stage" classNames="phase-7" />
           )}
         </div>
-        <CWText className="description">{description}</CWText>
+        {description && <CWText className="description">{description}</CWText>}
       </div>
     </div>
   );

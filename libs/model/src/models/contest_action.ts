@@ -1,9 +1,15 @@
 import { CONTEST_ACTIONS, ContestAction } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize';
 import { z } from 'zod';
+import { ContestManagerAttributes } from './contest_manager';
 import type { ModelInstance } from './types';
 
-type ContestAction = ModelInstance<z.infer<typeof ContestAction>>;
+export type ContestActionAttributes = z.infer<typeof ContestAction> & {
+  // associations
+  ContestManager?: ContestManagerAttributes;
+};
+
+type ContestAction = ModelInstance<ContestActionAttributes>;
 
 export default (
   sequelize: Sequelize.Sequelize,
@@ -36,8 +42,12 @@ export default (
       },
       thread_id: { type: Sequelize.INTEGER },
       voting_power: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.DECIMAL(78, 0),
         allowNull: false,
+      },
+      calculated_voting_weight: {
+        type: Sequelize.DECIMAL(78, 0),
+        allowNull: true,
       },
       created_at: { type: Sequelize.DATE, allowNull: false },
     },

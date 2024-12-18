@@ -1,7 +1,11 @@
-@import '../../../../../styles/shared';
+@import '../../../../styles/shared';
 
 .Topics {
   display: flex;
   gap: 32px;
   flex-direction: column;
+
+  .PageLayout.topic-stake {
+    padding-inline: 0;
+  }
 }

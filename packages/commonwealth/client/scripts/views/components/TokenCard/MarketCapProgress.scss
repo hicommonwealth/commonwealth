@@ -1,0 +1,54 @@
+@import '../../../styles/shared';
+
+.MarketCapProgress {
+  padding: 8px;
+  border-radius: $border-radius-corners;
+  background-color: $neutral-50;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+
+  progress {
+    height: 8px;
+    width: 100%;
+    border: 1px solid $neutral-100;
+
+    &::-webkit-progress-bar {
+      background-color: $neutral-200;
+      border-radius: $border-radius-corners;
+    }
+
+    &::-webkit-progress-value {
+      background-color: $primary-400;
+      border-radius: $border-radius-corners;
+    }
+
+    &.isCapped {
+      &::-webkit-progress-value {
+        background-color: $green-500 !important;
+      }
+    }
+  }
+
+  .prices {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+
+    .caps {
+      word-spacing: 2px;
+      width: fit-content;
+    }
+
+    .token-capped-icon {
+      border-radius: 50%;
+      background-color: $green-500;
+      color: $white;
+      padding: 3px;
+      height: 20px;
+      width: 20px;
+    }
+  }
+}

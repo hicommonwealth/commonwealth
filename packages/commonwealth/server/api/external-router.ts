@@ -1,31 +1,120 @@
 import { express, trpc } from '@hicommonwealth/adapters';
+import {
+  Comment,
+  Community,
+  Contest,
+  Feed,
+  Thread,
+} from '@hicommonwealth/model';
 import cors from 'cors';
 import { Router } from 'express';
+import { readFileSync } from 'fs';
 import passport from 'passport';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import { config } from '../config';
 import * as comment from './comment';
 import * as community from './community';
-import * as thread from './threads';
+import * as contest from './contest';
+import {
+  addRateLimiterMiddleware,
+  apiKeyAuthMiddleware,
+} from './external-router-middleware';
+import * as thread from './thread';
+import * as user from './user';
 
-const { createCommunity, getCommunities, getCommunity, getMembers } =
-  community.trpcRouter;
-const { createThread } = thread.trpcRouter;
-const { getComments } = comment.trpcRouter;
-//const { getBulkThreads } = thread.trpcRouter;
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const {
+  createCommunity,
+  updateCommunity,
+  createTopic,
+  updateTopic,
+  toggleArchiveTopic,
+  createGroup,
+  updateGroup,
+  deleteGroup,
+  joinCommunity,
+  banAddress,
+} = community.trpcRouter;
+const {
+  createThread,
+  updateThread,
+  createThreadReaction,
+  deleteReaction,
+  deleteThread,
+} = thread.trpcRouter;
+const { createComment, updateComment, deleteComment, createCommentReaction } =
+  comment.trpcRouter;
+const { getNewContent } = user.trpcRouter;
+const { createContestMetadata, updateContestMetadata, cancelContestMetadata } =
+  contest.trpcRouter;
 
 const api = {
+  getGlobalActivity: trpc.query(Feed.GetGlobalActivity, trpc.Tag.User, {
+    forceSecure: true,
+    ttlSecs: config.NO_GLOBAL_ACTIVITY_CACHE ? undefined : 60 * 5,
+  }),
+  getUserActivity: trpc.query(Feed.GetUserActivity, trpc.Tag.User, {
+    forceSecure: true,
+  }),
+  getNewContent,
+  getCommunities: trpc.query(Community.GetCommunities, trpc.Tag.Community, {
+    forceSecure: true,
+  }),
+  getCommunity: trpc.query(Community.GetCommunity, trpc.Tag.Community, {
+    forceSecure: true,
+  }),
+  getMembers: trpc.query(Community.GetMembers, trpc.Tag.Community, {
+    forceSecure: true,
+  }),
+  getComments: trpc.query(Comment.GetComments, trpc.Tag.Comment, {
+    forceSecure: true,
+  }),
+  getTopics: trpc.query(Community.GetTopics, trpc.Tag.Community, {
+    forceSecure: true,
+  }),
+  getThreads: trpc.query(Thread.GetThreads, trpc.Tag.Thread, {
+    forceSecure: true,
+  }),
+  getAllContests: trpc.query(Contest.GetAllContests, trpc.Tag.Contest, {
+    forceSecure: true,
+  }),
+  createContestMetadata,
+  updateContestMetadata,
+  cancelContestMetadata,
   createCommunity,
-  getCommunities,
-  getCommunity,
-  getMembers,
-  getComments,
+  updateCommunity,
+  createTopic,
+  updateTopic,
+  toggleArchiveTopic,
+  createGroup,
+  updateGroup,
+  deleteGroup,
   createThread,
-  //getBulkThreads,
+  updateThread,
+  deleteThread,
+  createComment,
+  updateComment,
+  deleteComment,
+  createThreadReaction,
+  createCommentReaction,
+  deleteReaction,
+  joinCommunity,
+  banAddress,
 };
 
 const PATH = '/api/v1';
 const router = Router();
-router.use(cors(), express.statsMiddleware);
+router.use(
+  cors({
+    origin: '*',
+    methods: ['GET', 'POST'],
+    allowedHeaders: ['Content-Type', 'api-key', 'address'],
+  }),
+  express.statsMiddleware,
+);
 
 // ===============================================================================
 /**
@@ -36,13 +125,27 @@ router.use(cors(), express.statsMiddleware);
  */
 if (config.NODE_ENV === 'test')
   router.use(passport.authenticate('jwt', { session: false }));
-// ===============================================================================
 
-const trpcRouter = trpc.router(api);
-trpc.useOAS(router, trpcRouter, {
+// ===============================================================================
+// eslint-disable-next-line @typescript-eslint/no-misused-promises
+if (config.NODE_ENV !== 'test') router.use(apiKeyAuthMiddleware);
+
+if (config.NODE_ENV !== 'test' && config.CACHE.REDIS_URL) {
+  addRateLimiterMiddleware();
+}
+
+const externalApiConfig = JSON.parse(
+  readFileSync(path.join(__dirname, '../external-api-config.json'), 'utf8'),
+);
+
+const oasOptions: trpc.OasOptions = {
   title: 'Common API',
   path: PATH,
-  version: '0.0.1',
-});
+  version: externalApiConfig.version,
+  securityScheme: 'apiKey',
+};
 
-export { PATH, router };
+const trpcRouter = trpc.router(api);
+trpc.useOAS(router, trpcRouter, oasOptions);
+
+export { PATH, oasOptions, router, trpcRouter };

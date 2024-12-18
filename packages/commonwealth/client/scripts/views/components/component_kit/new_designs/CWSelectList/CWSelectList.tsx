@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
-import type { GroupBase, Props } from 'react-select';
+import type { GroupBase, Props, SingleValueProps } from 'react-select';
 import Select from 'react-select';
 import { getClasses } from '../../helpers';
 import { ComponentType } from '../../types';
+import { CWSingleSelectItem } from '../CWSingleSelectItem/CWSingleSelectItem';
 import { MessageRow } from '../CWTextInput/MessageRow';
 import './CWSelectList.scss';
 import { DropdownIndicator } from './DropdownIndicator';
@@ -14,8 +15,18 @@ type CustomCWSelectListProps = {
   label?: string;
   hookToForm?: boolean;
   customError?: string;
+  // eslint-disable-next-line prettier/prettier
+  saveToClipboard?: (
+    id: string,
+    successNotification?: boolean,
+  ) => Promise<void>;
+  showCopyIcon?: boolean;
 };
 
+type OptionProps = {
+  value: string;
+  label: string;
+};
 export const CWSelectList = <
   Option,
   IsMulti extends boolean = false,
@@ -35,6 +46,8 @@ export const CWSelectList = <
     customError,
     components,
     isMulti,
+    showCopyIcon,
+    saveToClipboard,
   } = props;
   const formContext = useFormContext();
   const formFieldContext = hookToForm
@@ -124,6 +137,16 @@ export const CWSelectList = <
           DropdownIndicator,
           MultiValueRemove,
           Option: components?.Option || Option,
+          ...(showCopyIcon && {
+            // eslint-disable-next-line react/no-multi-comp
+            SingleValue: (singleValueProps: SingleValueProps<OptionProps>) => (
+              <CWSingleSelectItem
+                {...singleValueProps}
+                showCopyIcon={showCopyIcon}
+                saveToClipboard={saveToClipboard}
+              />
+            ),
+          }),
         }}
         className={getClasses<{
           className?: string;

@@ -6,6 +6,7 @@ import type { CommunityInstance, DB } from '@hicommonwealth/model';
 import {
   ChainBase,
   DynamicTemplate,
+  PRODUCTION_DOMAIN,
   WalletId,
   addressSwapper,
   deserializeCanvas,
@@ -134,7 +135,7 @@ const processAddress = async (
       }
       const msg = {
         to: user.email,
-        from: 'Commonwealth <no-reply@commonwealth.im>',
+        from: `Commonwealth <no-reply@${PRODUCTION_DOMAIN}>`,
         templateId: DynamicTemplate.VerifyAddress,
         dynamic_template_data: {
           address,

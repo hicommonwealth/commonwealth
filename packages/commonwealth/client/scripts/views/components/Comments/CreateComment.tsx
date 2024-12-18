@@ -1,4 +1,6 @@
 import { ContentType } from '@hicommonwealth/shared';
+import { buildCreateCommentInput } from 'client/scripts/state/api/comments/createComment';
+import { useAuthModalStore } from 'client/scripts/state/ui/modals';
 import { notifyError } from 'controllers/app/notifications';
 import { SessionKeyError } from 'controllers/server/sessions';
 import { useDraft } from 'hooks/useDraft';
@@ -8,29 +10,36 @@ import React, { useEffect, useMemo, useState } from 'react';
 import app from 'state';
 import { useCreateCommentMutation } from 'state/api/comments';
 import useUserStore from 'state/ui/user';
-import useAppStatus from '../../../hooks/useAppStatus';
+import { StickyEditorContainer } from 'views/components/StickEditorContainer';
 import Thread from '../../../models/Thread';
 import { useFetchProfilesByAddressesQuery } from '../../../state/api/profiles/index';
 import { jumpHighlightComment } from '../../pages/discussions/CommentTree/helpers';
 import { createDeltaFromText, getTextFromDelta } from '../react_quill_editor';
 import { serializeDelta } from '../react_quill_editor/utils';
 import { ArchiveMsg } from './ArchiveMsg';
-import { CommentEditor } from './CommentEditor';
 
 type CreateCommentProps = {
   handleIsReplying?: (isReplying: boolean, id?: number) => void;
   parentCommentId?: number;
+  parentCommentMsgId?: string | null;
   rootThread: Thread;
   canComment: boolean;
   tooltipText?: string;
+  isReplying?: boolean;
+  replyingToAuthor?: string;
+  onCancel?: (event: React.MouseEvent) => void;
 };
 
 export const CreateComment = ({
   handleIsReplying,
   parentCommentId,
+  parentCommentMsgId,
   rootThread,
   canComment,
   tooltipText = '',
+  isReplying,
+  replyingToAuthor,
+  onCancel,
 }: CreateCommentProps) => {
   const { saveDraft, restoreDraft, clearDraft } = useDraft<DeltaStatic>(
     !parentCommentId
@@ -38,8 +47,8 @@ export const CreateComment = ({
       : `new-comment-reply-${parentCommentId}`,
   );
 
-  const { isAddedToHomeScreen } = useAppStatus();
   const user = useUserStore();
+  const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
 
   // get restored draft on init
   const restoredDraft = useMemo(() => {
@@ -63,7 +72,7 @@ export const CreateComment = ({
     profileAddresses: user.activeAccount?.address
       ? [user.activeAccount?.address]
       : [],
-    currentChainId: app.activeChainId(),
+    currentChainId: app.activeChainId() || '',
     apiCallEnabled: !!user.activeAccount?.profile,
   });
   if (user.activeAccount) {
@@ -83,18 +92,20 @@ export const CreateComment = ({
     setErrorMsg(null);
     setSendingComment(true);
 
-    const communityId = app.activeChainId();
+    const communityId = app.activeChainId() || '';
     const asyncHandle = async () => {
       try {
-        const newComment = await createComment({
+        const input = await buildCreateCommentInput({
           communityId,
-          profile: user.activeAccount!.profile!.toUserProfile(),
+          address: user.activeAccount!.address,
           threadId: rootThread.id,
+          threadMsgId: rootThread.canvasMsgId ?? null,
           unescapedText: serializeDelta(contentDelta),
           parentCommentId: parentCommentId ?? null,
+          parentCommentMsgId: parentCommentMsgId ?? null,
           existingNumberOfComments: rootThread.numberOfComments || 0,
-          isPWA: isAddedToHomeScreen,
         });
+        const newComment = await createComment(input);
 
         setErrorMsg(null);
         setContentDelta(createDeltaFromText(''));
@@ -106,6 +117,7 @@ export const CreateComment = ({
         }, 100);
       } catch (err) {
         if (err instanceof SessionKeyError) {
+          checkForSessionKeyRevalidationErrors(err);
           return;
         }
         const errMsg = err?.responseJSON?.error || err?.message;
@@ -127,13 +139,18 @@ export const CreateComment = ({
 
   const disabled = editorValue.length === 0 || sendingComment;
 
-  const handleCancel = (e) => {
-    e.preventDefault();
+  const handleCancel = (event: React.MouseEvent) => {
+    if (event) {
+      event.preventDefault();
+    }
+
     setContentDelta(createDeltaFromText(''));
+
     if (handleIsReplying) {
       handleIsReplying(false);
     }
     clearDraft();
+    onCancel?.(event);
   };
 
   // on content updated, save draft
@@ -142,12 +159,11 @@ export const CreateComment = ({
   }, [handleIsReplying, saveDraft, contentDelta]);
 
   return rootThread.archivedAt === null ? (
-    <CommentEditor
+    <StickyEditorContainer
       parentType={parentType}
       canComment={canComment}
       handleSubmitComment={handleSubmitComment}
-      // @ts-expect-error <StrictNullChecks/>
-      errorMsg={errorMsg}
+      errorMsg={errorMsg ?? ''}
       contentDelta={contentDelta}
       setContentDelta={setContentDelta}
       disabled={disabled}
@@ -155,8 +171,10 @@ export const CreateComment = ({
       author={author as Account}
       editorValue={editorValue}
       tooltipText={tooltipText}
+      isReplying={isReplying}
+      replyingToAuthor={replyingToAuthor}
     />
   ) : (
-    <ArchiveMsg archivedAt={rootThread.archivedAt} />
+    <ArchiveMsg archivedAt={rootThread.archivedAt!} />
   );
 };

@@ -7,13 +7,14 @@ import CWPopover, {
 } from 'views/components/component_kit/new_designs/CWPopover';
 
 interface CWUpvoteSmallProps {
-  voteCount: number;
+  voteCount: string;
   disabled: boolean;
   selected: boolean;
   onClick: (e: React.MouseEvent<HTMLDivElement>) => void;
   popoverContent: JSX.Element;
   isThreadArchived?: boolean;
   tooltipText?: string;
+  reactors?: string[];
 }
 
 const CWUpvoteSmall = ({
@@ -24,6 +25,7 @@ const CWUpvoteSmall = ({
   popoverContent,
   tooltipText = '',
   isThreadArchived,
+  reactors = [],
 }: CWUpvoteSmallProps) => {
   const popoverProps = usePopover();
   const handleClick = (e) => {
@@ -41,24 +43,26 @@ const CWUpvoteSmall = ({
         onMouseEnter={popoverProps.handleInteraction}
         onMouseLeave={popoverProps.handleInteraction}
       >
-        {voteCount > 0 && !disabled ? (
+        {voteCount && !disabled ? (
           <>
             <CWThreadAction
               action="upvote"
               isThreadArchived={isThreadArchived}
               selected={selected}
-              label={String(voteCount)}
+              label={voteCount}
               disabled={disabled}
               onClick={handleClick}
             />
-            <CWPopover body={popoverContent} {...popoverProps} />
+            {reactors.length > 0 && (
+              <CWPopover body={popoverContent} {...popoverProps} />
+            )}
           </>
         ) : (
           <CWThreadAction
             action="upvote"
             isThreadArchived={isThreadArchived}
             selected={selected}
-            label={String(voteCount)}
+            label={voteCount}
             disabled={disabled}
             tooltipText={tooltipText}
             onClick={handleClick}

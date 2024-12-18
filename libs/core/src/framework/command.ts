@@ -1,9 +1,5 @@
 import { z, ZodError, ZodSchema } from 'zod';
-import {
-  InvalidInput,
-  type CommandContext,
-  type CommandMetadata,
-} from './types';
+import { InvalidInput, type Context, type Metadata } from './types';
 
 /**
  * Generic command handler that adapts external protocols to conventional command context flows
@@ -19,22 +15,21 @@ import {
 export const command = async <
   Input extends ZodSchema,
   Output extends ZodSchema,
+  _Context extends ZodSchema,
 >(
-  { input, auth, body }: CommandMetadata<Input, Output>,
-  { actor, payload }: CommandContext<Input>,
+  { input, auth, body }: Metadata<Input, Output, _Context>,
+  { actor, payload }: Context<Input, _Context>,
   validate = true,
-): Promise<Partial<z.infer<Output>> | undefined> => {
+): Promise<z.infer<Output> | undefined> => {
   try {
-    const context: CommandContext<Input> = {
+    const context: Context<Input, _Context> = {
       actor,
       payload: validate ? input.parse(payload) : payload,
     };
-    let state: Partial<z.infer<Output>> | undefined = undefined;
     for (const fn of auth) {
-      // can use deep clone to make it pure
-      state = (await fn(context, state)) ?? state;
+      await fn(context);
     }
-    return (await body(context, state)) ?? undefined;
+    return (await body(context)) ?? undefined;
   } catch (error) {
     if (error instanceof Error) {
       if (error.name === 'ZodError') {

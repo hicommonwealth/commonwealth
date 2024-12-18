@@ -2,12 +2,12 @@
 
 import { EthereumCoin } from 'adapters/chain/ethereum/types';
 
+import { ChainNode, ExtendedCommunity } from '@hicommonwealth/schemas';
 import moment from 'moment';
 import type { IApp } from 'state';
 import { ApiStatus } from 'state';
 import Web3, { Web3BaseProvider } from 'web3';
-import type ChainInfo from '../../../models/ChainInfo';
-import type NodeInfo from '../../../models/NodeInfo';
+import { z } from 'zod';
 import type { IChainModule, ITXModalData } from '../../../models/interfaces';
 import type EthereumAccount from './account';
 
@@ -54,7 +54,7 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
   private _api: Web3;
   private _metadataInitialized = false;
 
-  public async _initApi(node: NodeInfo): Promise<Web3> {
+  public _initApi(node: z.infer<typeof ChainNode>): Web3 {
     try {
       const provider =
         node.url.slice(0, 4) == 'http'
@@ -70,10 +70,9 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
     }
   }
 
-  public async initApi(node?: NodeInfo): Promise<Web3> {
+  public async initApi(node?: z.infer<typeof ChainNode>): Promise<Web3> {
     this.app.chain.block.duration = ETHEREUM_BLOCK_TIME;
-    // @ts-expect-error StrictNullChecks
-    await this._initApi(node);
+    node && this._initApi(node);
     this.app.chain.networkStatus = ApiStatus.Connected;
     console.log('getting block #');
     const blockNumber = Number(await this._api.eth.getBlockNumber());
@@ -81,8 +80,8 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
     const headers = await this._api.eth.getBlock(`${blockNumber}`);
     if (
       this.app.chain &&
-      this.app.chain.meta.node &&
-      this.app.chain.meta.node.ethChainId !== 1
+      this.app.chain.meta.ChainNode &&
+      this.app.chain.meta.ChainNode.eth_chain_id !== 1
     ) {
       this.app.chain.block.height = Number(headers.number);
       this.app.chain.block.lastTime = moment.unix(Number(headers.timestamp));
@@ -112,8 +111,8 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
     return this._api;
   }
 
-  public async resetApi(selectedChain: ChainInfo) {
-    await this.initApi(selectedChain.node);
+  public async resetApi(selectedChain: z.infer<typeof ExtendedCommunity>) {
+    await this.initApi(selectedChain.ChainNode as z.infer<typeof ChainNode>);
     return this._api;
   }
 

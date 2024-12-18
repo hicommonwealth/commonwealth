@@ -8,7 +8,7 @@ import * as schemas from '@hicommonwealth/schemas';
 import { getWebhookDestination } from '@hicommonwealth/shared';
 import fetch from 'node-fetch';
 import { models } from '../database';
-import { isCommunityAdmin } from '../middleware';
+import { authRoles } from '../middleware';
 
 const log = logger(import.meta);
 
@@ -25,7 +25,7 @@ const Errors = {
 export function CreateWebhook(): Command<typeof schemas.CreateWebhook> {
   return {
     ...schemas.CreateWebhook,
-    auth: [isCommunityAdmin],
+    auth: [authRoles('admin')],
     secure: true,
     body: async ({ payload }) => {
       const destination = getWebhookDestination(payload.webhookUrl);
@@ -35,7 +35,7 @@ export function CreateWebhook(): Command<typeof schemas.CreateWebhook> {
 
       const existingWebhook = await models.Webhook.findOne({
         where: {
-          community_id: payload.id,
+          community_id: payload.community_id,
           destination,
           url: payload.webhookUrl,
         },
@@ -61,7 +61,7 @@ export function CreateWebhook(): Command<typeof schemas.CreateWebhook> {
       }
 
       const webhook = await models.Webhook.create({
-        community_id: payload.id,
+        community_id: payload.community_id,
         url: payload.webhookUrl,
         destination,
         events: [],

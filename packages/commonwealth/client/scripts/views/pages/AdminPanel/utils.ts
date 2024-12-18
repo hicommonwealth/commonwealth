@@ -1,30 +1,25 @@
 import { BalanceType } from '@hicommonwealth/shared';
 import axios from 'axios';
+import NodeInfo from 'client/scripts/models/NodeInfo';
 import { SERVER_URL } from 'state/api/config';
 import { userStore } from 'state/ui/user';
 
 export const createChainNode = async ({
   url,
   name,
-  bech32,
   balance_type,
   eth_chain_id,
-  cosmos_chain_id,
 }: {
   url: string;
   name: string;
-  bech32: string;
   balance_type: BalanceType;
   eth_chain_id: number;
-  cosmos_chain_id: string;
 }) => {
   return await axios.post(`${SERVER_URL}/nodes`, {
     url,
     name,
-    bech32,
     balance_type,
     eth_chain_id,
-    cosmos_chain_id,
     jwt: userStore.getState().jwt,
   });
 };
@@ -54,14 +49,6 @@ export const updateChainNode = async ({
     eth_chain_id,
     cosmos_chain_id,
     jwt: userStore.getState().jwt,
-  });
-};
-
-export const deleteCommunity = async ({ id }: { id: string }) => {
-  await axios.delete(`${SERVER_URL}/communities/${id}`, {
-    data: {
-      jwt: userStore.getState().jwt,
-    },
   });
 };
 
@@ -149,3 +136,16 @@ export function downloadCSV(rows: CSVRow[], filename: string) {
   link.click();
   document.body.removeChild(link);
 }
+
+export const getSortedChains = (chainNodes: NodeInfo[] | undefined) => {
+  return (
+    chainNodes
+      ?.map((chain) => ({
+        label: chain.name,
+        value: chain.id,
+      }))
+      .sort((a, b) =>
+        (a?.label || '').toLowerCase().localeCompare(b?.label || ''),
+      ) || []
+  );
+};

@@ -1,8 +1,9 @@
 import React, { ReactNode } from 'react';
 import { useFormContext } from 'react-hook-form';
 
-import '../../../../../styles/components/component_kit/new_designs/cw_radio_button.scss';
+import clsx from 'clsx';
 import { CWText } from '../cw_text';
+import './cw_radio_button.scss';
 
 export type RadioButtonType = {
   label?: string | ReactNode;
@@ -20,9 +21,11 @@ type RadioButtoFormValidationProps = {
   hookToForm?: boolean;
 };
 
-type RadioButtonProps = {
+export type RadioButtonProps = {
   groupName?: string;
   onChange?: (e?: any) => void;
+  hideLabels?: boolean;
+  className?: string;
 } & Omit<RadioButtonType, 'disabled'> &
   RadioButtonStyleProps &
   RadioButtoFormValidationProps;
@@ -37,6 +40,8 @@ export const CWRadioButton = (props: RadioButtonProps) => {
     onChange,
     checked,
     value,
+    hideLabels,
+    className,
   } = props;
 
   const formContext = useFormContext();
@@ -50,7 +55,7 @@ export const CWRadioButton = (props: RadioButtonProps) => {
   //   hookToForm && (formContext?.formState?.errors?.[name]?.message as string);
 
   return (
-    <label className="container">
+    <label className={clsx('container', className)}>
       <input
         type="radio"
         className={`radio-button ${disabled ? 'disabled' : ''}`}
@@ -64,9 +69,11 @@ export const CWRadioButton = (props: RadioButtonProps) => {
           await onChange?.(e);
         }}
       />
-      <CWText className="label" type="b2" fontWeight="regular">
-        {label || value}
-      </CWText>
+      {!hideLabels && (
+        <CWText className="label" type="b2" fontWeight="regular">
+          {label || value}
+        </CWText>
+      )}
     </label>
   );
 };

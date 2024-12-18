@@ -6,7 +6,6 @@ const CONFIGURATION_STALE_TIME = 5 * 60 * 1_000; // 5 min
 const CONFIGURATION_CACHE_TIME = Infinity;
 
 export type Configuration = {
-  enforceSessionKeys: boolean;
   evmTestEnv: string;
   redirects: Record<string, string>;
 };

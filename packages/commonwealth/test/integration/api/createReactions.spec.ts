@@ -3,8 +3,7 @@ import { commonProtocol } from '@hicommonwealth/model';
 import chai, { assert } from 'chai';
 import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
-import Sinon from 'sinon';
-import { afterAll, beforeAll, describe, test } from 'vitest';
+import { afterAll, beforeAll, describe, test, vi } from 'vitest';
 import { TestServer, testServer } from '../../../server-test';
 import { config } from '../../../server/config';
 
@@ -13,37 +12,41 @@ chai.use(chaiHttp);
 describe('createReaction Integration Tests', () => {
   const communityId = 'ethereum';
   let userAddress;
+  let userDid;
   let userJWT;
   let userSession;
   let threadId: number;
+  let threadMsgId: string;
   let server: TestServer;
 
   const deleteReaction = async (reactionId, jwtToken, address) => {
     const validRequest = {
       jwt: jwtToken,
-      address: address.split(':')[2],
+      address,
       author_chain: 'ethereum',
       chain: 'ethereum',
+      community_id: 'ethereum',
+      reaction_id: reactionId,
     };
 
     const res = await chai
       .request(server.app)
-      .delete(`/api/reactions/${reactionId}`)
+      .post(`/api/v1/DeleteReaction`)
       .set('Accept', 'application/json')
+      .set('address', address)
       .send(validRequest);
     assert.equal((res as any).statusCode, 200);
-
-    return JSON.parse(res.text);
+    return res?.statusCode === 200;
   };
 
   const getUniqueCommentText = async () => {
     const time = new Date().getMilliseconds();
-    const text = `testCommentCreated at ${time}`;
+    const body = `testCommentCreated at ${time}`;
     const comment = await server.models.Comment.findOne({
-      where: { text },
+      where: { body },
     });
     chai.assert.isNull(comment);
-    return text;
+    return body;
   };
 
   beforeAll(async () => {
@@ -54,9 +57,11 @@ describe('createReaction Integration Tests', () => {
       'Alice',
     );
     userAddress = res.address;
-    Sinon.stub(commonProtocol.contractHelpers, 'getNamespaceBalance').value(
-      () => ({ [userAddress.split(':')[2]]: 300 }),
-    );
+    userDid = res.did;
+    vi.spyOn(
+      commonProtocol.contractHelpers,
+      'getNamespaceBalance',
+    ).mockResolvedValue({ [userAddress]: '300' });
     userJWT = jwt.sign(
       { id: res.user_id, email: res.email },
       config.AUTH.JWT_SECRET,
@@ -73,6 +78,7 @@ describe('createReaction Integration Tests', () => {
     const { result: thread } = await server.seeder.createThread({
       chainId: communityId,
       address: userAddress,
+      did: userDid,
       jwt: userJWT,
       title: 'test1',
       body: 'body1',
@@ -83,60 +89,63 @@ describe('createReaction Integration Tests', () => {
       session: userSession.session,
       sign: userSession.sign,
     });
-    // @ts-expect-error StrictNullChecks
-    threadId = thread.id;
+    if (!thread) throw new Error('Thread not created');
+    threadMsgId = thread.canvas_msg_id!;
+    threadId = thread.id!;
   });
 
   afterAll(async () => {
-    Sinon.restore();
+    vi.restoreAllMocks();
     await dispose()();
   });
 
   test('should create comment reactions and verify comment reaction count', async () => {
-    const text = await getUniqueCommentText();
+    const body = await getUniqueCommentText();
     const createCommentResponse = await server.seeder.createComment({
       chain: 'ethereum',
       address: userAddress,
+      did: userDid,
       jwt: userJWT,
-      text,
-      thread_id: threadId,
+      body,
+      threadId: threadId,
+      threadMsgId,
       session: userSession.session,
       sign: userSession.sign,
     });
 
     const comment = await server.models.Comment.findOne({
-      where: { text },
+      where: { body },
     });
 
-    // @ts-expect-error StrictNullChecks
-    const beforeReactionCount = comment.reaction_count;
-
     chai.assert.isNotNull(comment);
-    chai.assert.equal(createCommentResponse.status, 'Success');
+
+    const beforeReactionCount = comment!.reaction_count;
 
     const createReactionResponse = await server.seeder.createReaction({
       chain: communityId,
       address: userAddress,
+      did: userDid,
       jwt: userJWT,
       reaction: 'like',
-      comment_id: createCommentResponse.result.id,
+      comment_id: createCommentResponse.id,
+      comment_msg_id: createCommentResponse.canvas_msg_id,
       author_chain: communityId,
       session: userSession.session,
       sign: userSession.sign,
     });
 
-    chai.assert.equal(createReactionResponse.status, 'Success');
+    chai.assert.isNotNull(createReactionResponse);
 
     await comment!.reload();
     chai.assert.equal(comment!.reaction_count, beforeReactionCount + 1);
 
-    const reactionId = createReactionResponse.result.id;
+    const reactionId = createReactionResponse.id;
     const deleteReactionResponse = await deleteReaction(
       reactionId,
       userJWT,
       userAddress,
     );
-    chai.assert.equal(deleteReactionResponse.status, 'Success');
+    chai.assert.equal(deleteReactionResponse, true);
 
     await comment!.reload();
     chai.assert.equal(comment!.reaction_count, beforeReactionCount);
@@ -152,29 +161,31 @@ describe('createReaction Integration Tests', () => {
     const createReactionResponse = await server.seeder.createThreadReaction({
       chain: 'ethereum',
       address: userAddress,
+      did: userDid,
       jwt: userJWT,
       reaction: 'like',
       thread_id: thread!.id,
+      thread_msg_id: thread!.canvas_msg_id!,
       author_chain: 'ethereum',
       session: userSession.session,
       sign: userSession.sign,
     });
 
-    chai.assert.equal(createReactionResponse.status, 'Success');
+    chai.assert.isNotNull(createReactionResponse);
 
     await thread!.reload();
-    chai.assert.equal(thread!.reaction_count, beforeReactionCount + 1);
+    chai.assert.equal(thread!.reaction_count, beforeReactionCount! + 1);
 
-    const reactionId = createReactionResponse.result.id;
+    const reactionId = createReactionResponse.id;
     const deleteReactionResponse = await deleteReaction(
       reactionId,
       userJWT,
       userAddress,
     );
 
-    chai.assert.equal(deleteReactionResponse.status, 'Success');
+    chai.assert.equal(deleteReactionResponse, true);
 
     await thread!.reload();
-    chai.assert.equal(thread!.reaction_count, beforeReactionCount);
+    chai.assert.equal(thread!.reaction_count, beforeReactionCount!);
   });
 });

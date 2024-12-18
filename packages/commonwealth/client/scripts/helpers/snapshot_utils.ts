@@ -1,217 +1,10 @@
-import module from '@snapshot-labs/snapshot.js';
-import { notifyError } from '../controllers/app/notifications';
-let apolloClient = null;
-
-class SnapshotLazyLoader {
-  private static snapshot;
-  private static client;
-
-  private static async init() {
-    if (!this.snapshot) {
-      const { Client712 } = module;
-      const hub = 'https://hub.snapshot.org'; // or https://testnet.snapshot.org for testnet
-      this.client = new Client712(hub);
-      this.snapshot = module;
-    }
-  }
-
-  public static async getSnapshot() {
-    await this.init();
-    return this.snapshot;
-  }
-
-  public static async getClient() {
-    await this.init();
-    return this.client;
-  }
-}
-
-// Queries from: https://github.com/snapshot-labs/snapshot/blob/develop/src/helpers/queries.ts
-class GqlLazyLoader {
-  private static gql;
-
-  private static async init() {
-    if (!this.gql) {
-      this.gql = (await import('graphql-tag')).gql;
-    }
-  }
-
-  public static async SPACE_QUERY() {
-    await this.init();
-    return this.gql`
-  query Space($space: String!) {
-    space(id: $space) {
-      id
-      name
-      about
-      symbol
-      private
-      network
-      avatar
-      validation {
-        params
-      }
-      voting {
-        period
-        delay
-      }
-      filters {
-        minScore
-        onlyMembers
-      }
-      strategies {
-        name
-        network
-        params
-      }
-      members
-    }
-  }
-`;
-  }
-
-  public static async MULTIPLE_SPACE_QUERY() {
-    await this.init();
-    return this.gql`
- query Spaces($id_in: [String!]) {
-    spaces(
-      where: {
-        id_in: $id_in
-      }
-    ) {
-      id
-      name
-      about
-      network
-      symbol
-      strategies {
-        name
-        params
-      }
-      avatar
-      admins
-      members
-      filters {
-        minScore
-        onlyMembers
-      }
-      plugins
-    }
-  }
-`;
-  }
-
-  public static async PROPOSAL_QUERY() {
-    await this.init();
-    return this.gql`
-  query Proposals(
-    $id: Int!
-  ) {
-    proposals(
-      where: {
-        id: $id
-      }
-    ) {
-      id
-      title
-      space
-    }
-  }
-`;
-  }
-
-  public static async PROPOSALS_QUERY() {
-    await this.init();
-    return this.gql`
-  query Proposals(
-    $first: Int!
-    $skip: Int!
-    $state: String!
-    $space: String
-    $space_in: [String]
-    $author_in: [String]
-  ) {
-    proposals(
-      first: $first
-      skip: $skip
-      where: {
-        space: $space
-        state: $state
-        space_in: $space_in
-        author_in: $author_in
-      }
-    ) {
-      id
-      ipfs
-      title
-      body
-      choices
-      type
-      start
-      end
-      snapshot
-      state
-      scores
-      scores_total
-      author
-      created
-      strategies {
-        name
-        network
-        params
-      }
-    }
-  }
-`;
-  }
-
-  public static async PROPOSAL_VOTES_QUERY() {
-    await this.init();
-    return this.gql`
-  query Votes($proposalHash: String!) {
-    votes(
-      first: 1000
-      skip: 0
-      where: { proposal: $proposalHash }
-      orderBy: "created"
-      orderDirection: desc
-    ) {
-      id
-      voter
-      created
-      choice
-    }
-  }
-`;
-  }
-}
-
-async function getApolloClient() {
-  if (apolloClient) return apolloClient;
-
-  const { ApolloClient, createHttpLink, InMemoryCache } = await import(
-    '@apollo/client/core'
-  );
-  // HTTP connection to the API
-  const httpLink = createHttpLink({
-    // You should use an absolute URL here
-    uri: `${
-      process.env.SNAPSHOT_HUB_URL || 'https://hub.snapshot.org'
-    }/graphql`,
-  });
-  // Create the apollo client
-  // @ts-expect-error StrictNullChecks
-  apolloClient = new ApolloClient({
-    link: httpLink,
-    cache: new InMemoryCache(),
-    defaultOptions: {
-      query: {
-        fetchPolicy: 'no-cache',
-      },
-    },
-  });
-  return apolloClient;
-}
+import { notifyError } from 'controllers/app/notifications';
+import { ExternalEndpoints, queryClient } from 'state/api/config';
+import {
+  getSnapshotProposalsQuery,
+  getSnapshotSpaceQuery,
+} from 'state/api/snapshots';
+import { getSnapshotVotesQuery } from 'state/api/snapshots/getVotes';
 
 export interface SnapshotSpace {
   id: string;
@@ -237,6 +30,7 @@ export interface SnapshotSpace {
   strategies: Array<{
     name: string;
     network?: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     params: any;
   }>;
   members: string[];
@@ -260,6 +54,7 @@ export interface SnapshotProposal {
   strategies?: Array<{
     name: string;
     network?: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     params: any;
   }>;
 }
@@ -272,108 +67,61 @@ export type SnapshotProposalVote = {
   balance: number;
 };
 
-export async function getVersion(): Promise<string> {
-  return '0.1.3';
+class SnapshotLazyLoader {
+  private static snapshot;
+  private static client;
+
+  private static async init() {
+    if (!this.snapshot) {
+      const module = await import('@snapshot-labs/snapshot.js');
+      const hub = 'https://hub.snapshot.org'; // or https://testnet.snapshot.org for testnet
+      this.client = new module.default.Client712(hub);
+      this.snapshot = module.default;
+    }
+  }
+
+  public static async getSnapshot() {
+    await this.init();
+    return this.snapshot;
+  }
+
+  public static async getClient() {
+    await this.init();
+    return this.client;
+  }
 }
 
-export async function getSpace(space: string): Promise<SnapshotSpace> {
-  await getApolloClient();
-  // @ts-expect-error StrictNullChecks
-  const spaceObj = await apolloClient.query({
-    query: await GqlLazyLoader.SPACE_QUERY(),
-    variables: {
-      space,
-    },
-  });
-  return spaceObj.data.space;
-}
-
-export async function getMultipleSpaces(space: string): Promise<SnapshotSpace> {
-  await getApolloClient();
-  // @ts-expect-error StrictNullChecks
-  const spaceObj = await apolloClient.query({
-    query: await GqlLazyLoader.SPACE_QUERY(),
-    variables: {
-      space,
-    },
-  });
-
-  return spaceObj.data.space;
-}
-
-export async function getMultipleSpacesById(
-  id_in: Array<string>,
-): Promise<Array<SnapshotSpace>> {
-  await getApolloClient();
-  // @ts-expect-error StrictNullChecks
-  const spaceObj = await apolloClient.query({
-    query: await GqlLazyLoader.MULTIPLE_SPACE_QUERY(),
-    variables: {
-      id_in,
-    },
-  });
-
-  return spaceObj.data.spaces;
-}
-
-export async function getProposal(
-  id: string,
-): Promise<{ title: string; space: string }> {
-  await getApolloClient();
-  // @ts-expect-error StrictNullChecks
-  const proposalObj = await apolloClient.query({
-    query: await GqlLazyLoader.PROPOSAL_QUERY(),
-    variables: {
-      id: +id,
-    },
-  });
-  return proposalObj.data?.proposals[0];
-}
-
-export async function getProposals(space: string): Promise<SnapshotProposal[]> {
-  await getApolloClient();
-  // @ts-expect-error StrictNullChecks
-  const proposalsObj = await apolloClient.query({
-    query: await GqlLazyLoader.PROPOSALS_QUERY(),
-    variables: {
-      space,
-      state: 'all',
-      // TODO: pagination in UI
-      first: 1000,
-      skip: 0,
-    },
-  });
-  return proposalsObj.data.proposals;
-}
-
-export async function getVotes(
-  proposalHash: string,
-): Promise<SnapshotProposalVote[]> {
-  await getApolloClient();
-  // @ts-expect-error StrictNullChecks
-  const response = await apolloClient.query({
-    query: await GqlLazyLoader.PROPOSAL_VOTES_QUERY(),
-    variables: {
-      proposalHash,
-    },
-  });
-  return response.data.votes;
-}
-
-export async function castVote(address: string, payload: any) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export async function castVote(address: string, payload: any, spaceId: string) {
   const { Web3Provider } = await import('@ethersproject/providers');
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const web3 = new Web3Provider((window as any).ethereum);
   const client = await SnapshotLazyLoader.getClient();
   await client.vote(web3 as any, address, payload);
+  await queryClient.invalidateQueries({
+    queryKey: [ExternalEndpoints.snapshotHub.url, 'proposals', spaceId],
+  });
 }
 
-export async function createProposal(address: string, payload: any) {
+export async function createProposal(
+  address: string,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  payload: any,
+  spaceId: string,
+) {
   const { Web3Provider } = await import('@ethersproject/providers');
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const web3 = new Web3Provider((window as any).ethereum);
   const client = await SnapshotLazyLoader.getClient();
 
-  const receipt = await client.proposal(web3 as any, address, payload);
-  return receipt;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const res = await client.proposal(web3 as any, address, payload);
+
+  await queryClient.invalidateQueries({
+    queryKey: [ExternalEndpoints.snapshotHub.url, 'proposals', spaceId],
+  });
+
+  return res;
 }
 
 export async function getSpaceBlockNumber(network: string): Promise<number> {
@@ -381,7 +129,10 @@ export async function getSpaceBlockNumber(network: string): Promise<number> {
   return snapshot.utils.getBlockNumber(snapshot.utils.getProvider(network));
 }
 
-export async function getScore(space: SnapshotSpace, address: string) {
+export async function getScore(
+  space: SnapshotSpace,
+  address: string,
+): Promise<Array<{ [index: string]: number }>> {
   const snapshot = await SnapshotLazyLoader.getSnapshot();
   return snapshot.utils.getScores(
     space?.id,
@@ -410,7 +161,8 @@ export async function getResults(
   proposal: SnapshotProposal,
 ): Promise<VoteResults> {
   try {
-    let votes = await getVotes(proposal.id);
+    let votes = await getSnapshotVotesQuery({ proposalId: proposal.id });
+
     const strategies = proposal.strategies ?? space.strategies;
 
     if (proposal.state !== 'pending') {
@@ -427,10 +179,12 @@ export async function getResults(
             // provider,
           );
           votes = votes
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             .map((vote: any) => {
               vote.scores = strategies.map(
                 (strategy, i) => scores[i][vote.voter] || 0,
               );
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               vote.balance = vote.scores.reduce((a, b: any) => a + b, 0);
               return vote;
             })
@@ -461,7 +215,7 @@ export async function getResults(
       sumOfResultsBalance: votingClass.getScoresTotal(),
     };
 
-    return { votes, results };
+    return { votes, results } as VoteResults;
   } catch (e) {
     console.error(e);
     throw e;
@@ -515,8 +269,11 @@ export async function loadMultipleSpacesData(snapshot_spaces: string[]) {
       cleanSpaceId = spaceId.slice(spaceId.lastIndexOf('/') + 1).trim();
     }
     try {
-      const proposals = await getProposals(cleanSpaceId);
-      const space = await getSpace(cleanSpaceId);
+      const proposals = await getSnapshotProposalsQuery({
+        space: cleanSpaceId,
+      });
+
+      const space = await getSnapshotSpaceQuery({ space: cleanSpaceId });
       spacesData.push({ space, proposals });
     } catch (e) {
       console.error(`Failed to initialize snapshot: ${cleanSpaceId}.`);

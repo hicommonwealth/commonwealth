@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
-import 'components/snapshot_proposal_selector.scss';
 import type { SnapshotProposal } from 'helpers/snapshot_utils';
 import { loadMultipleSpacesData } from 'helpers/snapshot_utils';
+import './snapshot_proposal_selector.scss';
 
 import app from 'state';
 import { QueryList } from 'views/components/component_kit/cw_query_list';
@@ -37,7 +37,7 @@ export const SnapshotProposalSelector = ({
   useEffect(() => {
     if (allProposals.length === 0) {
       setLoading(true);
-      loadMultipleSpacesData(app.chain.meta?.snapshot)
+      loadMultipleSpacesData(app.chain.meta?.snapshot_spaces)
         .then((data = []) => {
           const loadedProposals = data.reduce(
             (acc, curr) => [...acc, ...curr.proposals],

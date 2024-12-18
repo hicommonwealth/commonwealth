@@ -1,16 +1,17 @@
 import { ArrowFatUp } from '@phosphor-icons/react';
 import React, { FC } from 'react';
 
-import { formatNumberShort } from 'adapters/currency';
+import { formatBigNumberShort } from 'adapters/currency';
 import { CWText } from '../cw_text';
 import { getClasses } from '../helpers';
 
-import 'components/component_kit/new_designs/cw_upvote.scss';
+import { BigNumber } from 'ethers';
 import { AnchorType } from 'views/components/component_kit/new_designs/CWPopover';
 import { ComponentType } from '../types';
+import './cw_upvote.scss';
 
 type CWUpvoteProps = {
-  voteCount: number;
+  voteCount: string;
   active?: boolean;
   disabled?: boolean;
   onClick?: (e) => void;
@@ -47,7 +48,7 @@ export const CWUpvote: FC<CWUpvoteProps> = ({
         weight={active ? 'fill' : 'regular'}
       />
       <CWText className={getClasses({ ...getParameters() })} type="caption">
-        {formatNumberShort(voteCount)}
+        {formatBigNumberShort(BigNumber.from(voteCount || 0))}
       </CWText>
     </button>
   );

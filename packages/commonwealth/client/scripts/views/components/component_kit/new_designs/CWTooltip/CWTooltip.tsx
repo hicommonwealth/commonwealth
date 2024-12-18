@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 
-import 'components/component_kit/new_designs/CWTooltip.scss';
+import './CWTooltip.scss';
 
 import { Placement } from '@popperjs/core/lib';
 import CWPopover, {
@@ -10,7 +10,7 @@ import CWPopover, {
 import { CWText } from '../../cw_text';
 import { TooltipContainer } from './TooltipContainer';
 
-type TooltipProps = {
+export type TooltipProps = {
   content: string | React.ReactNode;
   placement?: Placement;
   disablePortal?: boolean;

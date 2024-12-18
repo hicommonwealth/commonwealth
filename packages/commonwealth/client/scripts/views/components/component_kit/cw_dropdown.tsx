@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 
-import 'components/component_kit/cw_dropdown.scss';
+import './cw_dropdown.scss';
 import { CWText } from './cw_text';
 
 import { CWTextInput } from './cw_text_input';
 
 export type DropdownItemType = {
   label: string;
-  value: string;
+  value: string | number;
 };
 
 type DropdownProps = {
@@ -29,7 +29,7 @@ export const CWDropdown = ({
 }: DropdownProps) => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [selectedValue, setSelectedValue] = useState<DropdownItemType>(
-    initialValue ?? options[0]
+    initialValue ?? options[0],
   );
 
   return (

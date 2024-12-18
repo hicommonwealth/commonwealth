@@ -1,4 +1,4 @@
-import ChainInfo from 'models/ChainInfo';
+import { ChainBase } from '@hicommonwealth/shared';
 import React from 'react';
 import { useFetchCommunitiesQuery } from 'state/api/communities';
 import { useFetchProfileByIdQuery } from 'state/api/profiles';
@@ -24,7 +24,6 @@ const JoinCommunityStep = ({ onComplete }: JoinCommunityStepProps) => {
   const { data: profile, isLoading: isLoadingProfile } =
     useFetchProfileByIdQuery({
       apiCallEnabled: true,
-      shouldFetchSelfProfile: true,
     });
 
   const profileTagIds = (profile?.tags || [])
@@ -46,9 +45,12 @@ const JoinCommunityStep = ({ onComplete }: JoinCommunityStepProps) => {
 
   const suggestedCommunities = communitiesList?.pages?.[0].results || [];
 
-  const handleCommunityJoin = (
-    community: Pick<ChainInfo, 'id' | 'base' | 'iconUrl' | 'name'>,
-  ) => {
+  const handleCommunityJoin = (community: {
+    id: string;
+    base: ChainBase;
+    iconUrl: string;
+    name: string;
+  }) => {
     if (!community) return;
 
     linkSpecificAddressToSpecificCommunity({

@@ -1,0 +1,11 @@
+.ShareSkeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  .share-options {
+    display: flex;
+    gap: 16px;
+    justify-content: space-between;
+  }
+}

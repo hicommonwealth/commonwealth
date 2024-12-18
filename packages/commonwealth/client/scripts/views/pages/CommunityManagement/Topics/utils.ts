@@ -2,8 +2,11 @@ import { CWFormStepsProps } from 'views/components/component_kit/new_designs/CWF
 
 export enum CreateTopicStep {
   TopicDetails = 'TopicDetails',
+  WVMethodSelection = 'WVMethodSelection',
   WVConsent = 'WVConsent',
-  WVDetails = 'WVDetails',
+  WVNamespaceEnablement = 'WVNamespaceEnablement',
+  WVERC20Details = 'WVERC20Details',
+  WVStake = 'WVStake',
 }
 
 export const getCreateTopicSteps = (
@@ -21,7 +24,9 @@ export const getCreateTopicSteps = (
       label: 'Weighted voting',
       state:
         createTopicStep === CreateTopicStep.WVConsent ||
-        createTopicStep === CreateTopicStep.WVDetails
+        createTopicStep === CreateTopicStep.WVMethodSelection ||
+        createTopicStep === CreateTopicStep.WVERC20Details ||
+        createTopicStep === CreateTopicStep.WVStake
           ? 'active'
           : 'inactive',
     },

@@ -11,6 +11,7 @@ import type {
   TopicAttributes,
   UserInstance,
 } from '../../src';
+import { getCommentSearchVector, getThreadSearchVector } from '../models';
 
 export type E2E_TestEntities = {
   testThreads: ThreadInstance[];
@@ -126,7 +127,6 @@ export const e2eTestEntities = async function (
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           has_homepage: 'false' as any,
           collapsed_on_homepage: false,
-          has_chain_events_listener: false,
           directory_page_enabled: false,
         })),
       )),
@@ -190,13 +190,23 @@ export const e2eTestEntities = async function (
               await testDb.Thread.findOrCreate({
                 where: {
                   id: -i - 1,
+                },
+                defaults: {
                   address_id: -1,
                   title: `testThread Title ${-i - 1}`,
                   body: `testThread Body ${-i - 1}`,
                   community_id: 'cmntest',
                   topic_id: -1,
                   kind: 'discussion',
-                  plaintext: 'text',
+                  stage: 'discussion',
+                  view_count: 0,
+                  reaction_count: 0,
+                  reaction_weights_sum: '0',
+                  comment_count: 0,
+                  search: getThreadSearchVector(
+                    `testThread Title ${-i - 1}`,
+                    `testThread Body ${-i - 1}`,
+                  ),
                 },
               })
             )[0],
@@ -212,13 +222,23 @@ export const e2eTestEntities = async function (
               await testDb.Thread.findOrCreate({
                 where: {
                   id: -i - 1 - 2,
+                },
+                defaults: {
                   address_id: -2,
                   title: `testThread Title ${-i - 1 - 2}`,
                   body: `testThread Body ${-i - 1 - 2}`,
                   community_id: 'cmntest',
                   topic_id: -2,
                   kind: 'discussion',
-                  plaintext: 'text',
+                  stage: 'discussion',
+                  view_count: 0,
+                  reaction_count: 0,
+                  reaction_weights_sum: '0',
+                  comment_count: 0,
+                  search: getThreadSearchVector(
+                    `testThread Title ${-i - 1 - 2}`,
+                    `testThread Body ${-i - 1 - 2}`,
+                  ),
                 },
               })
             )[0],
@@ -250,10 +270,14 @@ export const e2eTestEntities = async function (
               await testDb.Comment.findOrCreate({
                 where: {
                   id: -i - 1,
+                },
+                defaults: {
                   address_id: -1,
-                  text: '',
+                  body: '',
                   thread_id: -1,
-                  plaintext: '',
+                  reaction_count: 0,
+                  reaction_weights_sum: '0',
+                  search: getCommentSearchVector(''),
                 },
               })
             )[0],
@@ -269,10 +293,14 @@ export const e2eTestEntities = async function (
               await testDb.Comment.findOrCreate({
                 where: {
                   id: -i - 1 - 2,
+                },
+                defaults: {
                   address_id: -2,
-                  text: '',
+                  body: '',
                   thread_id: -2,
-                  plaintext: '',
+                  reaction_count: 0,
+                  reaction_weights_sum: '0',
+                  search: getCommentSearchVector(''),
                 },
               })
             )[0],
@@ -315,33 +343,6 @@ export const e2eTestEntities = async function (
         ),
       )),
     );
-
-    const notificationCategories: [string, string][] = [
-      ['new-thread-creation', 'someone makes a new thread'],
-      ['new-comment-creation', 'someone makes a new comment'],
-      ['new-mention', 'someone @ mentions a user'],
-      ['new-reaction', 'someone reacts to a post'],
-      ['chain-event', 'a chain event occurs'],
-      ['new-collaboration', 'someone collaborates with a user'],
-      ['thread-edit', 'A thread is edited'],
-      ['comment-edit', 'A comment is edited'],
-      ['snapshot-proposal', 'Snapshot proposal notifications'],
-    ];
-
-    try {
-      await Promise.all(
-        notificationCategories.map(async (n) => {
-          await testDb.NotificationCategory.findOrCreate({
-            where: {
-              name: n[0],
-              description: n[1],
-            },
-          });
-        }),
-      );
-    } catch (e) {
-      console.log(e);
-    }
 
     return {
       testThreads,

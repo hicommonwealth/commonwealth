@@ -1,7 +1,7 @@
 export const truncate = (
   str: string,
   maxCharLength = 140,
-  ellipsisPadding = 4
+  ellipsisPadding = 4,
 ): string => {
   // Get the available width of the container or the window
   const availableWidth = window.innerWidth;
@@ -20,7 +20,7 @@ export const truncate = (
 
     // Calculate the maximum truncated length based on the available width and ellipsis width
     const truncatedLength = Math.floor(
-      (maxWidth - ellipsisWidth) / lengthModifier
+      (maxWidth - ellipsisWidth) / lengthModifier,
     );
 
     return str.substring(0, truncatedLength) + '...';
