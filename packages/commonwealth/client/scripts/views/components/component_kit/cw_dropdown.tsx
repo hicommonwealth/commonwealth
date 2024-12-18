@@ -12,8 +12,9 @@ export type DropdownItemType<T = string | number> = {
 
 type DropdownProps<T = string | number> = {
   initialValue?: DropdownItemType<T>;
+  value?: T;
   label?: string | JSX.Element;
-  onSelect?: (item: DropdownItemType<T>) => void;
+  onSelect: (item: DropdownItemType<T>) => void;
   options: Array<DropdownItemType<T>>;
   containerClassName?: string;
   disabled?: boolean;
@@ -25,11 +26,18 @@ export const CWDropdown = <T extends string | number>({
   onSelect,
   containerClassName,
   initialValue,
+  value,
   disabled = false,
 }: DropdownProps<T>) => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [selectedValue, setSelectedValue] = useState<DropdownItemType<T>>(
-    initialValue ?? options[0],
+    () => {
+      if (value !== undefined) {
+        const option = options.find((opt) => opt.value === value);
+        return option || initialValue || options[0];
+      }
+      return initialValue || options[0];
+    },
   );
 
   return (
