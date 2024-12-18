@@ -142,6 +142,7 @@ export function CreateCommunity(): Command<typeof schemas.CreateCommunity> {
             featured_in_sidebar: true,
             featured_in_new_post: false,
             group_ids: [],
+            thread_count: 0,
           },
           { transaction },
         );

@@ -26,7 +26,7 @@ export const Topic = z.object({
   default_offchain_template: z.string().optional().nullish(),
   order: PG_INT.nullish(),
   channel_id: z.string().max(255).nullish(),
-  group_ids: z.array(PG_INT).optional().nullish(),
+  group_ids: z.array(PG_INT).optional().default([]),
   default_offchain_template_backup: z.string().nullish(),
   weighted_voting: z.nativeEnum(TopicWeightedVoting).nullish(),
   chain_node_id: z
@@ -48,7 +48,7 @@ export const Topic = z.object({
     .nullish()
     .describe('vote weight multiplier, used for ERC20 topics'),
 
-  thread_count: PG_INT.nonnegative().optional().default(0),
+  thread_count: PG_INT.nonnegative().default(0),
 
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional(),

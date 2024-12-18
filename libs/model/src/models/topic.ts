@@ -15,6 +15,7 @@ export type TopicAttributes = z.infer<typeof Topic> & {
   featured_in_new_post?: boolean;
   group_ids?: number[];
   default_offchain_template?: string | null;
+  thread_count: number; // Required field since it's non-nullable in the database
 };
 export type TopicInstance = ModelInstance<TopicAttributes>;
 

@@ -37,6 +37,7 @@ export function CreateTopic(): Command<typeof schemas.CreateTopic> {
         default_offchain_template,
         community_id: community_id!,
         group_ids: [],
+        thread_count: 0,
       };
 
       const stake = await models.CommunityStake.findOne({
