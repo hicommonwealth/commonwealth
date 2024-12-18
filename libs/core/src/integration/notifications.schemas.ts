@@ -29,10 +29,10 @@ export const CommentCreatedNotification = z.object({
   comment_created_event: events.CommentCreated.describe(
     'The full comment record',
   ),
-  community_icon_url: z
+  author_avatar_url: z
     .string()
     .nullish()
-    .describe('The URL of the community icon'),
+    .describe('The URL of the author avatar'),
 });
 
 export const SnapshotProposalCreatedNotification = z.object({
@@ -63,10 +63,6 @@ export const UserMentionedNotification = z.object({
     .string()
     .max(255)
     .describe('The user-friendly name of the community'),
-  community_icon_url: z
-    .string()
-    .nullish()
-    .describe('The URL of the community icon'),
   author: z
     .string()
     .describe('The profile name or first 8 characters of a users address'),
@@ -75,6 +71,10 @@ export const UserMentionedNotification = z.object({
     .max(255)
     .describe('A truncated version of the comment body'),
   object_url: z.string().describe('The url of the comment'),
+  author_avatar_url: z
+    .string()
+    .nullish()
+    .describe('The URL of the author avatar'),
 });
 
 export const CommunityStakeNotification = z.object({
