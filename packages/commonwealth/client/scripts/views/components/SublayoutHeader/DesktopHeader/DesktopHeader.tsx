@@ -1,9 +1,10 @@
 import clsx from 'clsx';
 import React from 'react';
 
+import { useFlag } from 'hooks/useFlag';
 import { useCommonNavigate } from 'navigation/helpers';
 import { SUPPORTED_LANGUAGES } from 'state/ui/language/constants';
-import { languageStore } from 'state/ui/language/language';
+import useLanguageStore, { languageStore } from 'state/ui/language/language';
 import useSidebarStore from 'state/ui/sidebar';
 import KnockNotifications from 'views/components/KnockNotifications';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
@@ -34,6 +35,8 @@ const DesktopHeader = ({ onMobile, onAuthModalOpen }: DesktopHeaderProps) => {
     useSidebarStore();
   const user = useUserStore();
   const { data: domain } = useFetchCustomDomainQuery();
+  const languageEnabled = useFlag('languageSelector');
+  const { selectedLanguage, setSelectedLanguage } = useLanguageStore();
 
   const handleToggle = () => {
     const isVisible = !menuVisible;
@@ -42,6 +45,13 @@ const DesktopHeader = ({ onMobile, onAuthModalOpen }: DesktopHeaderProps) => {
       setUserToggledVisibility(isVisible ? 'open' : 'closed');
     }, 200);
   };
+
+  const languageOptions = Object.entries(SUPPORTED_LANGUAGES).map(
+    ([code, lang]) => ({
+      label: `${lang.flag} ${code.split('-')[0]}`,
+      value: code,
+    }),
+  );
 
   return (
     <div className="DesktopHeader">
@@ -85,6 +95,17 @@ const DesktopHeader = ({ onMobile, onAuthModalOpen }: DesktopHeaderProps) => {
               isLoggedIn: user.isLoggedIn,
             })}
           >
+            {languageEnabled && (
+              <CWDropdown
+                containerClassName="language-selector"
+                label={SUPPORTED_LANGUAGES[selectedLanguage].flag}
+                options={languageOptions}
+                initialValue={languageOptions.find(
+                  (opt) => opt.value === selectedLanguage,
+                )}
+                onSelect={(item) => setSelectedLanguage(item.value)}
+              />
+            )}
             <CreateContentPopover />
             <CWTooltip
               content="Explore communities"

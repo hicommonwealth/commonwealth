@@ -20,6 +20,8 @@ import { EXCEPTION_CASE_VANILLA_getCommunityById } from 'state/api/communities/g
 import { SERVER_URL } from 'state/api/config';
 import useAdminOnboardingSliderMutationStore from 'state/ui/adminOnboardingCards';
 import useGroupMutationBannerStore from 'state/ui/group';
+import { SUPPORTED_LANGUAGES } from 'state/ui/language/constants';
+import useLanguageStore from 'state/ui/language/language';
 import {
   useAuthModalStore,
   useManageCommunityStakeModalStore,
@@ -88,6 +90,8 @@ const useUserMenuItems = ({
   });
 
   const referralsEnabled = useFlag('referrals');
+  const languageEnabled = useFlag('languageSelector');
+  const { selectedLanguage, setSelectedLanguage } = useLanguageStore();
 
   const userData = useUserStore();
   const hasMagic = userData.addresses?.[0]?.walletId === WalletId.Magic;
@@ -222,110 +226,144 @@ const useUserMenuItems = ({
     },
   );
 
-  return {
-    userMenuItems: [
-      // if a user is in a stake enabled community without membership, show user addresses that
-      // match active chain base in the dropdown. This address should show be set to
-      // user.activeAccount of useUserStore().
-      ...(shouldShowAddressesSwitcherForNonMember
-        ? ([
-            {
-              type: 'header',
-              label: 'Addresses',
+  const userMenuItems: PopoverMenuItem[] = [
+    // if a user is in a stake enabled community without membership, show user addresses that
+    // match active chain base in the dropdown. This address should show be set to
+    // user.activeAccount of useUserStore().
+    ...(shouldShowAddressesSwitcherForNonMember
+      ? ([
+          {
+            type: 'header',
+            label: 'Addresses',
+          },
+          ...uniqueChainAddressOptions,
+          { type: 'divider' },
+        ] as PopoverMenuItem[])
+      : []),
+    ...(userData.accounts.length > 0
+      ? ([
+          {
+            type: 'header',
+            label: 'Addresses',
+          },
+          ...addresses,
+          {
+            type: 'default',
+            label: 'Connect a new address',
+            onClick: () => {
+              onAuthModalOpen();
+              onAddressItemClick?.();
             },
-            ...uniqueChainAddressOptions,
-            { type: 'divider' },
-          ] as PopoverMenuItem[])
-        : []),
-      ...(userData.accounts.length > 0
-        ? ([
-            {
-              type: 'header',
-              label: 'Addresses',
-            },
-            ...addresses,
-            {
-              type: 'default',
-              label: 'Connect a new address',
-              onClick: () => {
-                onAuthModalOpen();
-                onAddressItemClick?.();
-              },
-            },
-            { type: 'divider' },
-          ] as PopoverMenuItem[])
-        : []),
-      {
-        type: 'header',
-        label: 'Settings',
-      },
-      {
-        type: 'default',
-        label: 'View profile',
-        onClick: () => navigate(`/profile/id/${userData.id}`, {}, null),
-      },
-      {
-        type: 'default',
-        label: 'Edit profile',
-        onClick: () => navigate(`/profile/edit`, {}, null),
-      },
-      ...(hasMagic
-        ? [
-            {
-              type: 'default',
+          },
+          { type: 'divider' },
+        ] as PopoverMenuItem[])
+      : []),
+    {
+      type: 'header',
+      label: 'Settings',
+    },
+    {
+      type: 'default',
+      label: 'View profile',
+      onClick: () => navigate(`/profile/id/${userData.id}`, {}, null),
+    },
+    {
+      type: 'default',
+      label: 'Edit profile',
+      onClick: () => navigate(`/profile/edit`, {}, null),
+    },
+    ...(languageEnabled
+      ? [
+          {
+            type: 'header',
+            label: 'Language',
+          } as PopoverMenuItem,
+          {
+            type: 'submenu',
+            label: (
+              <div className="UserMenuItem">
+                <div>Current Language</div>
+                <CWText>
+                  {SUPPORTED_LANGUAGES[selectedLanguage].flag}{' '}
+                  {selectedLanguage.split('-')[0]}
+                </CWText>
+              </div>
+            ),
+            items: Object.entries(SUPPORTED_LANGUAGES).map(([code, lang]) => ({
+              type: 'default' as const,
               label: (
                 <div className="UserMenuItem">
-                  <div>Open wallet</div>
-                  <CWIconButton iconName="arrowSquareOut" />
+                  <div>{lang.name}</div>
+                  <CWText>
+                    {lang.flag} {code.split('-')[0]}
+                  </CWText>
                 </div>
               ),
-              onClick: () => openMagicWallet(),
+              onClick: () => setSelectedLanguage(code),
+            })),
+          } as PopoverMenuItem,
+        ]
+      : []),
+    ...(hasMagic
+      ? [
+          {
+            type: 'default',
+            label: (
+              <div className="UserMenuItem">
+                <div>Open wallet</div>
+                <CWIconButton iconName="arrowSquareOut" />
+              </div>
+            ),
+            onClick: () => openMagicWallet(),
+          } as PopoverMenuItem,
+        ]
+      : []),
+    ...(referralsEnabled
+      ? [
+          {
+            type: 'default',
+            label: 'Get referral link',
+            onClick: () => {
+              onReferralItemClick?.();
             },
-          ]
-        : []),
-      ...(referralsEnabled
-        ? [
-            {
-              type: 'default',
-              label: 'Get referral link',
-              onClick: () => {
-                onReferralItemClick?.();
-              },
-            },
-          ]
-        : []),
-      {
-        type: 'default',
-        label: 'My transactions',
-        onClick: () => navigate(`/myTransactions`, {}, null),
+          },
+        ]
+      : []),
+    {
+      type: 'default',
+      label: 'My transactions',
+      onClick: () => navigate(`/myTransactions`, {}, null),
+    },
+    {
+      type: 'default',
+      label: 'Notification settings',
+      onClick: () => navigate('/notification-settings', {}, null),
+    },
+    {
+      type: 'default',
+      label: (
+        <div className="UserMenuItem">
+          <div>Dark mode</div>
+          <CWToggle readOnly checked={isDarkModeOn} />
+        </div>
+      ),
+      preventClosing: true,
+      onClick: () => toggleDarkMode(!isDarkModeOn, setIsDarkModeOn),
+    },
+    {
+      type: 'default',
+      label: 'Sign out',
+      // eslint-disable-next-line @typescript-eslint/no-misused-promises
+      onClick: async () => {
+        clearSetGatingGroupBannerForCommunities();
+        clearSetAdminOnboardingCardVisibilityForCommunities();
+        await handleLogout();
       },
-      {
-        type: 'default',
-        label: 'Notification settings',
-        onClick: () => navigate('/notification-settings', {}, null),
-      },
-      {
-        type: 'default',
-        label: (
-          <div className="UserMenuItem">
-            <div>Dark mode</div>
-            <CWToggle readOnly checked={isDarkModeOn} />
-          </div>
-        ),
-        preventClosing: true,
-        onClick: () => toggleDarkMode(!isDarkModeOn, setIsDarkModeOn),
-      },
-      {
-        type: 'default',
-        label: 'Sign out',
-        // eslint-disable-next-line @typescript-eslint/no-misused-promises
-        onClick: async () => {
-          clearSetGatingGroupBannerForCommunities();
-          clearSetAdminOnboardingCardVisibilityForCommunities();
-          await handleLogout();
-        },
-      },
-    ] as PopoverMenuItem[],
+    },
+  ] as PopoverMenuItem[];
+
+  return {
+    userMenuItems,
   };
 };
 

@@ -68,6 +68,19 @@
       gap: 12px;
       height: 40px;
 
+      .language-selector {
+        max-width: 80px;
+        margin-right: 12px;
+
+        :global(.dropdown-item) {
+          display: flex;
+          align-items: center;
+          gap: 4px;
+          font-size: 14px;
+          padding: 8px;
+        }
+      }
+
       & > div {
         display: flex;
       }
