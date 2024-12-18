@@ -1,6 +1,7 @@
 import clsx from 'clsx';
 import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
+import { useLocation } from 'react-router-dom';
 import useSidebarStore from 'state/ui/sidebar';
 import useUserStore from 'state/ui/user';
 import { CWCommunityAvatar } from '../component_kit/cw_community_avatar';
@@ -18,6 +19,10 @@ export const SidebarQuickSwitcher = ({
   const navigate = useCommonNavigate();
   const { setMenu } = useSidebarStore();
   const user = useUserStore();
+
+  const location = useLocation();
+  const pathname = location.pathname;
+  const communityId = pathname.split('/')[1];
 
   return (
     <div
@@ -42,22 +47,50 @@ export const SidebarQuickSwitcher = ({
         />
       </div>
       <CWDivider />
+      {user.communities.filter((x) => x.isStarred).length !== 0 && (
+        <div className="scrollable-community-bar">
+          {user.communities
+            .filter((x) => x.isStarred)
+            .map((community) => (
+              <CWCommunityAvatar
+                key={community.id}
+                size="large"
+                selectedCommunity={communityId}
+                community={{
+                  id: community.id,
+                  iconUrl: community.iconUrl,
+                  name: community.name,
+                }}
+                onClick={() =>
+                  navigateToCommunity({
+                    navigate,
+                    path: '',
+                    chain: community.id,
+                  })
+                }
+              />
+            ))}
+        </div>
+      )}
+      {user.communities.filter((x) => x.isStarred).length !== 0 && (
+        <CWDivider />
+      )}
       <div className="scrollable-community-bar">
-        {user.communities
-          .filter((x) => x.isStarred)
-          .map((community) => (
-            <CWCommunityAvatar
-              key={community.id}
-              size="large"
-              community={{
-                iconUrl: community.iconUrl,
-                name: community.name,
-              }}
-              onClick={() =>
-                navigateToCommunity({ navigate, path: '', chain: community.id })
-              }
-            />
-          ))}
+        {user.communities.map((community) => (
+          <CWCommunityAvatar
+            key={community.id}
+            size="large"
+            selectedCommunity={communityId}
+            community={{
+              id: community.id,
+              iconUrl: community.iconUrl,
+              name: community.name,
+            }}
+            onClick={() =>
+              navigateToCommunity({ navigate, path: '', chain: community.id })
+            }
+          />
+        ))}
       </div>
     </div>
   );
