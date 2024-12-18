@@ -12,6 +12,8 @@ class NewProfile {
   private _socials: string[];
   private _isOwner: boolean;
   private _backgroundImage: z.infer<typeof Image>;
+  private _communityId: string;
+  private _communityIconUrl: string;
 
   get userId() {
     return this._userId;
@@ -53,6 +55,14 @@ class NewProfile {
     return this._backgroundImage;
   }
 
+  get communityId() {
+    return this._communityId;
+  }
+
+  get communityIconUrl() {
+    return this._communityIconUrl;
+  }
+
   constructor({
     userId,
     isOwner,
@@ -64,7 +74,14 @@ class NewProfile {
     slug,
     socials,
     background_image,
-  }: z.infer<typeof UserProfile> & { userId: number; isOwner: boolean }) {
+    community_id,
+    community_icon_url,
+  }: z.infer<typeof UserProfile> & {
+    userId: number;
+    isOwner: boolean;
+    community_id?: string;
+    community_icon_url?: string;
+  }) {
     this._userId = userId;
     this._isOwner = isOwner;
     this._name = name!;
@@ -75,6 +92,8 @@ class NewProfile {
     this._slug = slug!;
     this._socials = socials!;
     this._backgroundImage = background_image ?? { url: '', imageBehavior: '' };
+    this._communityId = community_id || '';
+    this._communityIconUrl = community_icon_url || '';
   }
 
   public static fromJSON(json) {
