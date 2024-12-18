@@ -93,6 +93,7 @@ export const processCommentCreated: EventHandler<
         author: author.User!.profile.name || author.address.substring(0, 8),
         comment_parent_name: payload.parent_id ? 'comment' : 'thread',
         community_name: community.name,
+        community_id: community.id!,
         community_icon_url:
           community.icon_url || config.DEFAULT_COMMONWEALTH_LOGO,
         comment_body: commentSummary,
