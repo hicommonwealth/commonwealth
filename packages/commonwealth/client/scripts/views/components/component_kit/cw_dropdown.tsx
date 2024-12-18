@@ -2,33 +2,33 @@ import React, { useState } from 'react';
 
 import './cw_dropdown.scss';
 import { CWText } from './cw_text';
-
 import { CWTextInput } from './cw_text_input';
 
-export type DropdownItemType = {
-  label: string;
-  value: string | number;
+export type DropdownItemType<T = string | number> = {
+  label: string | JSX.Element;
+  value: T;
+  selected?: boolean;
 };
 
-type DropdownProps = {
-  initialValue?: DropdownItemType;
-  label?: string;
-  onSelect?: (item: DropdownItemType) => void;
-  options: Array<DropdownItemType>;
+type DropdownProps<T = string | number> = {
+  initialValue?: DropdownItemType<T>;
+  label?: string | JSX.Element;
+  onSelect?: (item: DropdownItemType<T>) => void;
+  options: Array<DropdownItemType<T>>;
   containerClassName?: string;
   disabled?: boolean;
 };
 
-export const CWDropdown = ({
+export const CWDropdown = <T extends string | number>({
   label,
   options,
   onSelect,
   containerClassName,
   initialValue,
   disabled = false,
-}: DropdownProps) => {
+}: DropdownProps<T>) => {
   const [showDropdown, setShowDropdown] = useState(false);
-  const [selectedValue, setSelectedValue] = useState<DropdownItemType>(
+  const [selectedValue, setSelectedValue] = useState<DropdownItemType<T>>(
     initialValue ?? options[0],
   );
 
@@ -37,7 +37,13 @@ export const CWDropdown = ({
       <CWTextInput
         containerClassName={containerClassName}
         iconRight="chevronDown"
-        placeholder={selectedValue.label}
+        placeholder={
+          typeof selectedValue.label === 'string' ? (
+            selectedValue.label
+          ) : (
+            <div className="dropdown-jsx-label">{selectedValue.label}</div>
+          )
+        }
         displayOnly
         iconRightonClick={() => {
           // Only here because it makes TextInput display correctly
@@ -65,7 +71,11 @@ export const CWDropdown = ({
                   }
                 }}
               >
-                <CWText className="dropdown-item-text">{item.label}</CWText>
+                {typeof item.label === 'string' ? (
+                  <CWText className="dropdown-item-text">{item.label}</CWText>
+                ) : (
+                  <div className="dropdown-item-jsx">{item.label}</div>
+                )}
               </div>
             );
           })}

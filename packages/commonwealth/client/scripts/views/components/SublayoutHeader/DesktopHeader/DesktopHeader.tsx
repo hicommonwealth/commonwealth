@@ -16,6 +16,7 @@ import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { isWindowSmallInclusive } from 'views/components/component_kit/helpers';
 import { CWSearchBar } from 'views/components/component_kit/new_designs/CWSearchBar';
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
+import { DropdownItemType } from 'views/components/component_kit/types';
 import { CreateContentPopover } from 'views/menus/CreateContentMenu';
 import { HelpMenuPopover } from 'views/menus/help_menu';
 
@@ -105,11 +106,14 @@ const DesktopHeader = ({ onMobile, onAuthModalOpen }: DesktopHeaderProps) => {
             })}
           >
             {languageEnabled && (
-              <CWDropdown
+              <CWDropdown<SupportedLanguage>
                 containerClassName="language-selector"
                 label={
                   <div className="flag-abbr">
                     <span>{SUPPORTED_LANGUAGES[selectedLanguage].flag}</span>
+                    <span className="abbr">
+                      {SUPPORTED_LANGUAGES[selectedLanguage].abbr}
+                    </span>
                   </div>
                 }
                 options={languageOptions}

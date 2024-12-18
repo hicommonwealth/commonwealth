@@ -118,7 +118,7 @@ export type SubmenuMenuItem = {
   items: MenuItem[];
 };
 
-export type DropdownItemType<T = string> = {
+export type DropdownItemType<T = SupportedLanguage> = {
   label: string | JSX.Element;
   value: T;
   selected?: boolean;

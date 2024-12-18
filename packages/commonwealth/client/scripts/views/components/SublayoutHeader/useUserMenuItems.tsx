@@ -30,6 +30,7 @@ import {
   useManageCommunityStakeModalStore,
 } from 'state/ui/modals';
 import useUserStore from 'state/ui/user';
+import { PopoverMenuItem } from 'views/components/component_kit/CWPopoverMenu/CWPopoverMenu';
 import {
   CWToggle,
   toggleDarkMode,
@@ -48,9 +49,6 @@ type SubmenuItem = {
 };
 
 const resetWalletConnectSession = async () => {
-  /**
-   * Imp to reset wc session on logout as otherwise, subsequent login attempts will fail
-   */
   const walletConnectWallet = WebWalletController.Instance.getByName(
     WalletId.WalletConnect,
   );

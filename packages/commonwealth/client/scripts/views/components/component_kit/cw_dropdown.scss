@@ -3,6 +3,24 @@
 .dropdown-wrapper {
   position: relative;
 
+  .dropdown-jsx-label,
+  .dropdown-item-jsx {
+    align-items: center;
+    display: flex;
+    gap: 4px;
+
+    .flag-abbr {
+      align-items: center;
+      display: flex;
+      gap: 4px;
+
+      .abbr {
+        color: $neutral-600;
+        font-size: 14px;
+      }
+    }
+  }
+
   .dropdown-options-display {
     background-color: $white;
     border-radius: $border-radius-corners;
