@@ -86,16 +86,12 @@ export const GetUserAddresses = {
   ),
 };
 
-export const ReferralView = Referral.extend({
-  referrer: z.object({
-    id: PG_INT,
-    profile: UserProfile,
+export const ReferralView = z.array(
+  Referral.extend({
+    referee_user_id: PG_INT,
+    referee_profile: UserProfile,
   }),
-  referee: z.object({
-    id: PG_INT,
-    profile: UserProfile,
-  }),
-});
+);
 
 export const GetUserReferrals = {
   input: z.object({ user_id: PG_INT.optional() }),

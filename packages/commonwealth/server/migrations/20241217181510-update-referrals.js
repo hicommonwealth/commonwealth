@@ -27,7 +27,7 @@ module.exports = {
             type: Sequelize.STRING,
             allowNull: false,
           },
-          referrer_received_eth_amount: {
+          referrer_received_amount: {
             type: Sequelize.FLOAT,
             allowNull: false,
           },
@@ -89,12 +89,19 @@ module.exports = {
         },
         { transaction },
       );
+      await queryInterface.addIndex('Referrals', ['referee_address'], {
+        transaction,
+      });
+      await queryInterface.addIndex('Referrals', ['referrer_address'], {
+        transaction,
+      });
     });
   },
 
   async down(queryInterface, Sequelize) {
     await queryInterface.sequelize.transaction(async (transaction) => {
       await queryInterface.dropTable('ReferralFees', { transaction });
+      await queryInterface.dropTable('Referrals', { transaction });
       await queryInterface.removeColumn('Users', 'referral_eth_earnings', {
         transaction,
       });

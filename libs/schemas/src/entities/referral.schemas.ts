@@ -52,7 +52,7 @@ export const ReferralFees = z.object({
   referrer_recipient_address: z
     .string()
     .describe('The address of the referrer recipient'),
-  referrer_received_eth_amount: z
+  referrer_received_amount: z
     .number()
     .describe('The amount of ETH received by the referrer'),
   transaction_timestamp: z
