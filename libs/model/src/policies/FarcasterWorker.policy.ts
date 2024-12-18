@@ -4,11 +4,7 @@ import { NeynarAPIClient } from '@neynar/nodejs-sdk';
 import { Op } from 'sequelize';
 import { config, models } from '..';
 import { mustExist } from '../middleware/guards';
-import {
-  buildFarcasterContentUrl,
-  buildFarcasterWebhookName,
-  publishCast,
-} from '../utils';
+import { buildFarcasterContentUrl, buildFarcasterWebhookName } from '../utils';
 import {
   createOnchainContestContent,
   createOnchainContestVote,
@@ -104,20 +100,18 @@ export function FarcasterWorker(): Policy<typeof inputs> {
         // find associated contest manager by parent cast hash
         const contestManager = await models.ContestManager.findOne({
           where: {
+            cancelled: {
+              [Op.not]: true,
+            },
+            ended: {
+              [Op.not]: true,
+            },
             farcaster_frame_hashes: {
               [Op.contains]: [payload.parent_hash!],
             },
           },
         });
         mustExist('Contest Manager', contestManager);
-        if (contestManager.cancelled || contestManager.ended) {
-          await publishCast(
-            payload.hash,
-            ({ username }) =>
-              `Hey @${username}, this contest has already ended.`,
-          );
-          return;
-        }
 
         const community = await models.Community.findByPk(
           contestManager.community_id,
