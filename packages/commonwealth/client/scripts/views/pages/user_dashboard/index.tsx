@@ -6,10 +6,9 @@ import { notifyInfo } from 'controllers/app/notifications';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import { useFlag } from 'hooks/useFlag';
-import useStickyHeader from 'hooks/useStickyHeader';
 import { useCommonNavigate } from 'navigation/helpers';
-import 'pages/user_dashboard/index.scss';
 import React, { useEffect, useRef } from 'react';
+import { useLocation } from 'react-router-dom';
 import useUserStore from 'state/ui/user';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import {
@@ -25,6 +24,7 @@ import {
 } from '../../components/component_kit/new_designs/CWTabs';
 import { Feed } from '../../components/feed';
 import { TrendingCommunitiesPreview } from './TrendingCommunitiesPreview';
+import './index.scss';
 
 export enum DashboardViews {
   ForYou = 'For You',
@@ -34,17 +34,10 @@ export enum DashboardViews {
 type UserDashboardProps = {
   type?: string;
 };
-
 const UserDashboard = ({ type }: UserDashboardProps) => {
   const user = useUserStore();
   const { isWindowExtraSmall } = useBrowserWindow({});
-  useStickyHeader({
-    elementId: 'dashboard-header',
-    zIndex: 70,
-    // To account for new authentication buttons, shown in small screen sizes
-    top: !user.isLoggedIn ? 68 : 0,
-    stickyBehaviourEnabled: isWindowExtraSmall,
-  });
+  const location = useLocation();
 
   const [activePage, setActivePage] = React.useState<DashboardViews>(
     DashboardViews.Global,
@@ -60,11 +53,7 @@ const UserDashboard = ({ type }: UserDashboardProps) => {
       isPWA: isAddedToHomeScreen,
     },
   });
-
   const navigate = useCommonNavigate();
-
-  const [scrollElement, setScrollElement] = React.useState(null);
-
   const containerRef = useRef<HTMLDivElement>(null);
 
   useBrowserAnalyticsTrack({
@@ -75,13 +64,20 @@ const UserDashboard = ({ type }: UserDashboardProps) => {
       isPWA: isAddedToHomeScreen,
     },
   });
+
   useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const existingParams = searchParams.toString();
+    const additionalParams = existingParams ? `?${existingParams}` : '';
+
     if (!type) {
-      navigate(`/dashboard/${user.isLoggedIn ? 'for-you' : 'global'}`);
+      navigate(
+        `/dashboard/${user.isLoggedIn ? 'for-you' : 'global'}${additionalParams}`,
+      );
     } else if (type === 'for-you' && !user.isLoggedIn) {
-      navigate('/dashboard/global');
+      navigate(`/dashboard/global${additionalParams}`);
     }
-  }, [user.isLoggedIn, navigate, type]);
+  }, [user.isLoggedIn, navigate, type, location.search]);
 
   const subpage: DashboardViews =
     user.isLoggedIn && type !== 'global'
@@ -100,8 +96,7 @@ const UserDashboard = ({ type }: UserDashboardProps) => {
         <CWText type="h2" fontWeight="medium" className="page-header">
           Home
         </CWText>
-        {/*@ts-expect-error StrictNullChecks*/}
-        <div ref={setScrollElement} className="content">
+        <div className="content">
           <div className="user-dashboard-activity">
             <div className="dashboard-header" id="dashboard-header">
               <CWTabsRow>
@@ -130,12 +125,14 @@ const UserDashboard = ({ type }: UserDashboardProps) => {
             {activePage === DashboardViews.Global ? (
               <Feed
                 query={useFetchGlobalActivityQuery}
-                customScrollParent={scrollElement!}
+                // @ts-expect-error <StrictNullChecks/>
+                customScrollParent={containerRef.current}
               />
             ) : (
               <Feed
                 query={useFetchUserActivityQuery}
-                customScrollParent={scrollElement!}
+                // @ts-expect-error <StrictNullChecks/>
+                customScrollParent={containerRef.current}
               />
             )}
           </div>

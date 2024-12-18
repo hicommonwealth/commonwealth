@@ -1,6 +1,7 @@
 import { CacheDecorator, setupErrorHandlers } from '@hicommonwealth/adapters';
 import { logger } from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
+import { PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
 import sgMail from '@sendgrid/mail';
 import compression from 'compression';
 import SessionSequelizeStore from 'connect-session-sequelize';
@@ -26,7 +27,6 @@ import DatabaseValidationService from './server/middleware/databaseValidationSer
 import setupPassport from './server/passport';
 import setupAPI from './server/routing/router';
 import setupServer from './server/scripts/setupServer';
-import ViewCountCache from './server/util/viewCountCache';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -61,7 +61,6 @@ export async function main(
   const cacheDecorator = new CacheDecorator();
 
   const SequelizeStore = SessionSequelizeStore(session.Store);
-  const viewCountCache = new ViewCountCache(2 * 60, 10 * 60);
 
   const sessionStore = new SequelizeStore({
     db: db.sequelize,
@@ -84,10 +83,10 @@ export async function main(
   });
 
   const setupMiddleware = () => {
-    // redirect from commonwealthapp.herokuapp.com to commonwealth.im
+    // redirect from commonwealthapp.herokuapp.com to PRODUCTION_DOMAIN
     app.all(/.*/, (req, res, next) => {
       if (req.header('host')?.match(/commonwealthapp.herokuapp.com/i)) {
-        res.redirect(301, `https://commonwealth.im${req.url}`);
+        res.redirect(301, `https://${PRODUCTION_DOMAIN}{req.url}`);
       } else {
         next();
       }
@@ -156,14 +155,7 @@ export async function main(
   const dbValidationService: DatabaseValidationService =
     new DatabaseValidationService(db);
 
-  setupAPI(
-    '/api',
-    app,
-    db,
-    viewCountCache,
-    dbValidationService,
-    cacheDecorator,
-  );
+  setupAPI('/api', app, db, dbValidationService, cacheDecorator);
 
   app.use('/robots.txt', (req: Request, res: Response) => {
     res.sendFile(`${__dirname}/robots.txt`);

@@ -1,8 +1,8 @@
 import { dispose } from '@hicommonwealth/core';
 import { expect } from 'chai';
-import { bootstrap_testing, seed } from 'model/src/tester';
 import { afterAll, beforeAll, describe, test } from 'vitest';
 import { models } from '../../src/database';
+import { seed } from '../../src/tester';
 
 describe('Reactions lifecycle', () => {
   const addressId = 555;
@@ -10,8 +10,7 @@ describe('Reactions lifecycle', () => {
   const threadId = 999;
 
   beforeAll(async () => {
-    await bootstrap_testing();
-    const [chain] = await seed('ChainNode', { contracts: [] });
+    const [chain] = await seed('ChainNode');
     const [user] = await seed(
       'User',
       {
@@ -36,7 +35,7 @@ describe('Reactions lifecycle', () => {
           },
         ],
         // CommunityStakes: [],
-        topics: [],
+        topics: [{}],
         // groups: [],
         // contest_managers: [],
       },
@@ -49,7 +48,7 @@ describe('Reactions lifecycle', () => {
         Address: community?.Addresses?.at(0),
         id: threadId,
         address_id: community?.Addresses?.at(0)?.id,
-        topic_id: undefined,
+        topic_id: community!.topics!.at(0)!.id!,
         deleted_at: undefined, // so we can find it!
         pinned: false,
         read_only: false,

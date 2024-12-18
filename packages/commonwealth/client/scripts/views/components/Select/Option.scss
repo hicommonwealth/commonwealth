@@ -1,36 +1,36 @@
-@import '../../../../styles/shared';
+@import '../../../styles/shared';
 
 .select-option {
-    gap: 8px;
-    display: flex;
-    max-width: 34ch;
-    cursor: pointer;
-    overflow: hidden;
-    white-space: nowrap;
-    align-items: center;
-    flex-direction: row;
-    text-overflow: ellipsis;
-    height: auto !important;
-    border-radius: $border-radius-md  !important;
-    font-size: 14px !important;
-    min-height: 40px;
-    line-height: 20px;
-    letter-spacing: 1%;
+  gap: 8px;
+  display: flex;
+  max-width: 34ch;
+  cursor: pointer;
+  overflow: hidden;
+  white-space: nowrap;
+  align-items: center;
+  flex-direction: row;
+  text-overflow: ellipsis;
+  height: auto !important;
+  border-radius: $border-radius-md !important;
+  font-size: 14px !important;
+  min-height: 40px;
+  line-height: 20px;
+  letter-spacing: 1%;
 
-    &.size-default {
-        padding: 10px 12px !important;
-    }
+  &.size-default {
+    padding: 10px 12px !important;
+  }
 
-    &.size-compact {
-        padding: 6px 12px !important;
-    }
+  &.size-compact {
+    padding: 6px 12px !important;
+  }
 
-    &:hover,
-    &:active {
-        background-color: $neutral-100;
-    }
+  &:hover,
+  &:active {
+    background-color: $neutral-100;
+  }
 
-    &.isSelected {
-        background-color: $neutral-50;
-    }
+  &.isSelected {
+    background-color: $neutral-50;
+  }
 }

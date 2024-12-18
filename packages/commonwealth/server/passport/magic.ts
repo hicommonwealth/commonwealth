@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import type { Session } from '@canvas-js/interfaces';
-import { ServerError, logger } from '@hicommonwealth/core';
+import { AppError, ServerError, logger } from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
 import {
   AddressAttributes,
@@ -105,21 +105,33 @@ async function createNewMagicUser({
 }: MagicLoginContext): Promise<UserInstance> {
   // completely new user: create user, profile, addresses
   return sequelize.transaction(async (transaction) => {
-    const newUser = await models.User.create(
-      {
-        // we rely ONLY on the address as a canonical piece of login information (discourse import aside)
-        // so it is safe to set emails from magic as part of User data, even though they may be unverified.
-        // although not usable for login, this email (used for outreach) is still considered sensitive user data.
-        email: magicUserMetadata.email,
+    let newUser: UserInstance;
+    try {
+      newUser = await models.User.create(
+        {
+          // we rely ONLY on the address as a canonical piece of login information (discourse import aside)
+          // so it is safe to set emails from magic as part of User data, even though they may be unverified.
+          // although not usable for login, this email (used for outreach) is still considered sensitive user data.
+          email: magicUserMetadata.email,
 
-        // we mark email verified so that we are OK to send update emails, but we should note that
-        // just because an email comes from magic doesn't mean it's legitimately owned by the signing-in
-        // user, unless it's via the email flow (e.g. you can spoof an email on Discord)
-        emailVerified: !!magicUserMetadata.email,
-        profile: {},
-      },
-      { transaction },
-    );
+          // we mark email verified so that we are OK to send update emails, but we should note that
+          // just because an email comes from magic doesn't mean it's legitimately owned by the signing-in
+          // user, unless it's via the email flow (e.g. you can spoof an email on Discord)
+          emailVerified: !!magicUserMetadata.email,
+          profile: {},
+        },
+        { transaction },
+      );
+    } catch (e) {
+      if (e.name === 'SequelizeUniqueConstraintError') {
+        throw new AppError(
+          `The provided email address is already linked to a different provider.
+           Please use a different email or sign in with the associated provider.`,
+        );
+      }
+
+      throw e;
+    }
 
     // update profile with metadata if exists
     if (profileMetadata?.username) {

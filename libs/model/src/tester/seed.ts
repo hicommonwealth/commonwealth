@@ -11,8 +11,8 @@ import z, {
   ZodString,
   ZodUnknown,
 } from 'zod';
+import { models } from '../database';
 import type { State } from '../models';
-import { bootstrap_testing } from './bootstrap';
 
 /**
  * Seed options
@@ -62,10 +62,8 @@ export async function seed<T extends schemas.Aggregates>(
   values?: DeepPartial<z.infer<(typeof schemas)[T]>>,
   options: SeedOptions = { mock: true },
 ): Promise<[z.infer<(typeof schemas)[T]> | undefined, State[]]> {
-  const db = await bootstrap_testing();
-
   const records: State[] = [];
-  await _seed(db![name], values ?? {}, options, records, 0);
+  await _seed(models![name], values ?? {}, options, records, 0);
   return [records.at(0) as any, records];
 }
 

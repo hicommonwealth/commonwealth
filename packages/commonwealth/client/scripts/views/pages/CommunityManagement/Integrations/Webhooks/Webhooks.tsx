@@ -1,5 +1,5 @@
 import { Webhook, WebhookSupportedEvents } from '@hicommonwealth/schemas';
-import { getWebhookDestination } from '@hicommonwealth/shared';
+import { DOCS_SUBDOMAIN, getWebhookDestination } from '@hicommonwealth/shared';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { pluralizeWithoutNumberPrefix } from 'helpers';
 import { linkValidationSchema } from 'helpers/formValidations/common';
@@ -58,7 +58,7 @@ const Webhooks = () => {
 
   useNecessaryEffect(() => {
     if (!isLoadingWebhooks && existingWebhooks) {
-      const currentWebhooks = ([...existingWebhooks] || []).map((hookData) => ({
+      const currentWebhooks = [...existingWebhooks].map((hookData) => ({
         value: hookData.url,
         canDelete: true,
         canConfigure: true,
@@ -83,7 +83,7 @@ const Webhooks = () => {
       await Promise.all(
         webhooksToCreate.map(async (webhook) => {
           await createWebhook({
-            id: communityId,
+            community_id: communityId,
             webhookUrl: webhook.value.trim(),
           });
         }),
@@ -158,7 +158,9 @@ const Webhooks = () => {
             <p>
               Slack, Discord, and Telegram webhooks are supported. For more
               information and examples for setting these up, please view our{' '}
-              <a href="https://docs.commonwealth.im/commonwealth/for-admins-and-mods/capabilities/webhooks">
+              <a
+                href={`https://${DOCS_SUBDOMAIN}/commonwealth/for-admins-and-mods/capabilities/webhooks`}
+              >
                 documentation
               </a>
               .

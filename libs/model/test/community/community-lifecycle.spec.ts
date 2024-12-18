@@ -21,17 +21,18 @@ import {
   CreateGroupErrors,
   DeleteGroup,
   DeleteGroupErrors,
-  DeleteTopic,
   GetCommunities,
   GetMembers,
   GetTopics,
   JoinCommunity,
   JoinCommunityErrors,
   MAX_GROUPS_PER_COMMUNITY,
+  ToggleArchiveTopic,
   UpdateCommunity,
   UpdateCommunityErrors,
 } from '../../src/community';
 import { models } from '../../src/database';
+import { systemActor } from '../../src/middleware';
 import type {
   ChainNodeAttributes,
   CommunityAttributes,
@@ -50,6 +51,7 @@ function buildCreateGroupPayload(
     metadata: {
       name: chance.name(),
       description: chance.sentence(),
+      groupImageUrl: chance.url(),
       required_requirements: 1,
       membership_ttl: 100,
     },
@@ -544,7 +546,19 @@ describe('Community lifecycle', () => {
       expect(updatedTopic.description).to.eq('newDesc');
     });
 
-    test('should delete a topic', async () => {
+    test('should update a topic as a system actor', async () => {
+      const { topic: updatedTopic } = (await command(UpdateTopic(), {
+        actor: systemActor({}),
+        payload: {
+          topic_id: createdTopic.id!,
+          community_id: community.id,
+          description: 'newDesc by system actor',
+        },
+      }))!;
+      expect(updatedTopic.description).to.eq('newDesc by system actor');
+    });
+
+    test('should archive a topic', async () => {
       const { topic } = (await command(CreateTopic(), {
         actor: superAdminActor,
         payload: {
@@ -555,11 +569,21 @@ describe('Community lifecycle', () => {
           description: '',
         },
       }))!;
-      const response = await command(DeleteTopic(), {
+      const response = await command(ToggleArchiveTopic(), {
         actor: ethAdminActor,
-        payload: { community_id: community.id, topic_id: topic!.id! },
+        payload: {
+          community_id: community.id,
+          topic_id: topic!.id!,
+          archive: true,
+        },
       });
       expect(response?.topic_id).to.equal(topic.id);
+      const archivedTopic = await models.Topic.findOne({
+        where: {
+          id: topic!.id!,
+        },
+      });
+      expect(archivedTopic?.archived_at).toBeTruthy();
     });
 
     test('should throw if not authorized', async () => {
@@ -575,17 +599,46 @@ describe('Community lifecycle', () => {
       }))!;
 
       await expect(
-        command(DeleteTopic(), {
+        command(ToggleArchiveTopic(), {
           actor: ethActor,
-          payload: { community_id: community.id, topic_id: topic!.id! },
+          payload: {
+            community_id: community.id,
+            topic_id: topic!.id!,
+            archive: true,
+          },
         }),
       ).rejects.toThrow(InvalidActor);
     });
 
-    test('should get topics', async () => {
+    test("should throw error when topic doesn't exist", async () => {
+      await expect(
+        command(ToggleArchiveTopic(), {
+          actor: ethAdminActor,
+          payload: {
+            community_id: community.id,
+            topic_id: 123456789,
+            archive: false,
+          },
+        }),
+      ).rejects.toThrow(InvalidInput);
+    });
+
+    test("should get topics that aren't archived", async () => {
       const topics = await query(GetTopics(), {
         actor: superAdminActor,
         payload: { community_id: community.id, with_contest_managers: false },
+      });
+      expect(topics?.length).toBe(3);
+    });
+
+    test('should get all topics', async () => {
+      const topics = await query(GetTopics(), {
+        actor: superAdminActor,
+        payload: {
+          community_id: community.id,
+          with_contest_managers: false,
+          with_archived_topics: true,
+        },
       });
       expect(topics?.length).toBe(4);
     });
@@ -606,7 +659,7 @@ describe('Community lifecycle', () => {
         actor: ethAdminActor,
         payload: {
           ...baseRequest,
-          id: community.id,
+          community_id: community.id,
           chain_node_id: ethNode.id,
           directory_page_enabled: true,
           directory_page_chain_node_id: ethNode.id,
@@ -624,7 +677,7 @@ describe('Community lifecycle', () => {
         actor: ethAdminActor,
         payload: {
           ...baseRequest,
-          id: community.id,
+          community_id: community.id,
           chain_node_id: ethNode.id,
           directory_page_enabled: false,
           directory_page_chain_node_id: null,
@@ -643,7 +696,7 @@ describe('Community lifecycle', () => {
           actor: ethAdminActor,
           payload: {
             ...baseRequest,
-            id: community.id,
+            community_id: community.id,
             snapshot: ['not-found'],
           },
         }),
@@ -656,7 +709,7 @@ describe('Community lifecycle', () => {
           actor: ethAdminActor,
           payload: {
             ...baseRequest,
-            id: community.id,
+            community_id: community.id,
             namespace: 'tempNamespace',
             chain_node_id: 1263,
           },
@@ -670,7 +723,7 @@ describe('Community lifecycle', () => {
           actor: ethActor,
           payload: {
             ...baseRequest,
-            id: community.id,
+            community_id: community.id,
             namespace: 'tempNamespace',
             transactionHash: '0x1234',
             chain_node_id: edgewareNode!.id!,
@@ -684,7 +737,7 @@ describe('Community lifecycle', () => {
         actor: superAdminActor,
         payload: {
           ...baseRequest,
-          id: community.id,
+          community_id: community.id,
           chain_node_id: edgewareNode!.id!,
         },
       });
@@ -693,7 +746,7 @@ describe('Community lifecycle', () => {
           actor: superAdminActor,
           payload: {
             ...baseRequest,
-            id: community.id,
+            community_id: community.id,
             namespace: 'tempNamespace',
             transactionHash: '0x1234',
           },

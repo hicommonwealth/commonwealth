@@ -19,7 +19,5 @@ export const tokenInformationFormValidationSchema = z.object({
     .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
     .max(180, { message: VALIDATION_MESSAGES.MAX_CHAR_LIMIT_REACHED })
     .optional(),
-  imageURL: z
-    .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
-    .optional(),
+  imageURL: z.string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT }),
 });

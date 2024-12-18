@@ -1,4 +1,5 @@
-import { events, Policy } from '@hicommonwealth/core';
+import { Policy } from '@hicommonwealth/core';
+import { events } from '@hicommonwealth/schemas';
 import { processSubscriptionPreferencesUpdated } from './eventHandlers/subscriptionPreferencesUpdated';
 
 const notificationSettingsInputs = {

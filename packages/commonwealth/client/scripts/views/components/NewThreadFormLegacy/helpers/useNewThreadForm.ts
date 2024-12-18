@@ -33,16 +33,14 @@ const useNewThreadForm = (communityId: string, topicsForSelector: Topic[]) => {
   }, [restoreDraft, topicsForSelector, topicIdFromUrl]);
 
   const defaultTopic = useMemo(() => {
-    return (
-      topicsForSelector.find(
-        (t) =>
-          t.id === restoredDraft?.topicId ||
-          (topicIdFromUrl && t.id === topicIdFromUrl),
-      ) ||
-      topicsForSelector.find((t) => t.name.includes('General')) ||
-      null
-    );
-  }, [restoredDraft, topicsForSelector, topicIdFromUrl]);
+    if (topicIdFromUrl) {
+      return topicsForSelector.find((t) => t.id === topicIdFromUrl);
+    }
+    if (restoredDraft?.topicId) {
+      return topicsForSelector.find((t) => t.id === restoredDraft.topicId);
+    }
+    return topicsForSelector.find((t) => t.name.includes('General')) || null;
+  }, [topicIdFromUrl, restoredDraft, topicsForSelector]);
 
   const [threadKind, setThreadKind] = useState<ThreadKind>(
     ThreadKind.Discussion,
@@ -73,6 +71,12 @@ const useNewThreadForm = (communityId: string, topicsForSelector: Topic[]) => {
     linkContentMissing ||
     contentMissing;
 
+  useEffect(() => {
+    if (defaultTopic) {
+      setThreadTopic(defaultTopic);
+    }
+  }, [defaultTopic]);
+
   // on content updated, save draft
   useEffect(() => {
     const draft = {
@@ -88,7 +92,7 @@ const useNewThreadForm = (communityId: string, topicsForSelector: Topic[]) => {
     if (!threadContentDelta && threadTopic?.default_offchain_template) {
       try {
         const template = JSON.parse(
-          threadTopic.default_offchain_template,
+          decodeURIComponent(threadTopic.default_offchain_template),
         ) as DeltaStatic;
         setThreadContentDelta(template);
       } catch (e) {

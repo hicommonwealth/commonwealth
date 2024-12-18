@@ -1,6 +1,7 @@
 import { notifyError } from 'controllers/app/notifications';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import useNecessaryEffect from 'hooks/useNecessaryEffect';
+import { isEqual } from 'lodash';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import useGenerateImageMutation from 'state/api/general/generateImage';
@@ -13,6 +14,7 @@ export const useUploadControl = ({
   imageURL,
   withAIImageGeneration,
   disabled,
+  loading,
   processedImages: providedProcessedImages,
   onImageProcessingChange,
   onImageGenerated,
@@ -72,7 +74,7 @@ export const useUploadControl = ({
     onSuccess: onImageGenerated,
   });
 
-  const isLoading = isUploadingImage || isGeneratingImage;
+  const isLoading = isUploadingImage || isGeneratingImage || loading;
   const areActionsDisabled = disabled || !imageInputRef.current || isLoading;
 
   const openFilePicker = () => {
@@ -258,6 +260,12 @@ export const useUploadControl = ({
   }, [onProcessedImagesListChange]);
 
   useEffect(() => {
+    if (
+      processedImagesRef.current &&
+      isEqual(processedImagesRef.current, processedImages)
+    ) {
+      return;
+    }
     processedImagesRef.current = processedImages;
     setActiveImageIndex(processedImages.length - 1);
 
@@ -309,6 +317,14 @@ export const useUploadControl = ({
   useNecessaryEffect(() => {
     // this will override any current processing of images in local state
     if (providedProcessedImages) {
+      if (
+        processedImagesRef.current &&
+        isEqual(processedImagesRef.current, providedProcessedImages)
+      ) {
+        return;
+      }
+      processedImagesRef.current = processedImages;
+
       setProcessedImages(providedProcessedImages);
       setActiveImageIndex(providedProcessedImages.length - 1);
     }
@@ -318,11 +334,16 @@ export const useUploadControl = ({
   useEffect(() => {
     if (formFieldValue !== imageToRender && formFieldValue !== null) {
       if (formFieldValue) {
-        const shouldUpdate =
-          processedImagesRef.current.findIndex(
-            (i) => i.url === formFieldValue.trim(),
-          ) === -1;
-        if (shouldUpdate) {
+        const foundIndex = processedImagesRef.current.findIndex(
+          (i) => i.url === formFieldValue.trim(),
+        );
+
+        if (foundIndex >= 0) {
+          setActiveImageIndex(foundIndex);
+        }
+
+        const shouldUpdateImagesList = foundIndex === -1;
+        if (shouldUpdateImagesList) {
           setProcessedImages((images) => [
             ...images,
             {

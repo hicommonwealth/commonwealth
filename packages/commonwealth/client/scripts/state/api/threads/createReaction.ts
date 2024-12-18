@@ -27,13 +27,13 @@ export const buildCreateThreadReactionInput = async ({
   threadMsgId,
 }: CreateReactionProps) => {
   const canvasSignedData = await signThreadReaction(address, {
-    thread_id: threadMsgId,
+    thread_id: threadMsgId ?? null,
     like: reactionType === 'like',
   });
   return {
     author_community_id: userStore.getState().activeAccount?.community?.id,
     thread_id: threadId,
-    thread_msg_id: threadMsgId,
+    thread_msg_id: threadMsgId ?? null,
     community_id: app.chain.id,
     address,
     reaction: reactionType,
@@ -45,7 +45,12 @@ export const buildCreateThreadReactionInput = async ({
 const useCreateThreadReactionMutation = ({
   communityId,
   threadId,
-}: IUseCreateThreadReactionMutation) => {
+  currentReactionCount,
+  currentReactionWeightsSum,
+}: IUseCreateThreadReactionMutation & {
+  currentReactionCount: number;
+  currentReactionWeightsSum: string;
+}) => {
   const { markTrainingActionAsComplete } =
     useUserOnboardingSliderMutationStore();
 
@@ -68,6 +73,13 @@ const useCreateThreadReactionMutation = ({
         { associatedReactions: [reaction] },
         'combineAndRemoveDups',
       );
+      updateThreadInAllCaches(communityId, threadId, {
+        reactionCount: currentReactionCount + 1,
+        reactionWeightsSum: `${
+          parseInt(currentReactionWeightsSum) +
+          parseInt(newReaction.calculated_voting_weight || `0`)
+        }`,
+      });
 
       const userId = user.addresses?.[0]?.profile?.userId;
       userId &&

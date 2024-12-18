@@ -1,6 +1,5 @@
 import React, { useCallback, useMemo, useState } from 'react';
 
-import 'components/thread_selector.scss';
 import AddressInfo from 'models/AddressInfo';
 import app from 'state';
 import { useDebounce } from 'usehooks-ts';
@@ -13,6 +12,7 @@ import {
 import { useSearchThreadsQuery } from '../../../../scripts/state/api/threads';
 import Thread from '../../../models/Thread';
 import { CWTextInput } from '../component_kit/cw_text_input';
+import './thread_selector.scss';
 
 type ThreadSelectorProps = {
   linkedThreadsToSet: Array<Thread>;
@@ -47,6 +47,7 @@ export const ThreadSelector = ({
     const threads = threadsData?.pages?.[0]?.results || [];
     return threads.map(
       (t) =>
+        // @ts-expect-error <StrictNullChecks/>
         new Thread({
           id: t.id,
           title: t.title,

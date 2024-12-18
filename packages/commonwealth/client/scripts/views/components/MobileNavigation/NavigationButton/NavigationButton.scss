@@ -1,4 +1,4 @@
-@import '../../../../../styles/shared.scss';
+@import '../../../../styles/shared.scss';
 
 .NavigationButton {
   cursor: pointer;
@@ -14,7 +14,7 @@
   }
 
   .Text {
-    font-size: 8px;
+    font-size: 12px;
     color: $neutral-500;
     line-height: 16px;
   }

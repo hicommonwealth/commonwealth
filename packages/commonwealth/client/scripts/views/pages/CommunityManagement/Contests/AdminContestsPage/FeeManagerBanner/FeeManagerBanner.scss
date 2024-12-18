@@ -1,4 +1,4 @@
-@import '../../../../../../../styles/shared';
+@import '../../../../../../styles/shared';
 
 .FeeManagerBannerSkeleton {
   max-width: 600px;
@@ -15,26 +15,6 @@
   justify-content: space-between;
   max-width: 600px;
   margin-bottom: 16px;
-
-  .header {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    border-radius: 6px;
-    background-color: $yellow-100;
-    padding-right: 4px;
-
-    .Text {
-      color: $yellow-800;
-    }
-
-    svg {
-      padding: 4px;
-      border-radius: 6px;
-      background-color: $yellow-400;
-      fill: $yellow-800;
-    }
-  }
 
   .popover-row {
     display: flex;

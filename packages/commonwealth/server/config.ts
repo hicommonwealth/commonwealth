@@ -22,7 +22,10 @@ const {
   EVM_CE_POLL_INTERVAL,
   CF_ZONE_ID,
   CF_API_KEY,
-  PEER_ID,
+  LIBP2P_PRIVATE_KEY,
+  DISPATCHER_APP_ID,
+  DISPATCHER_APP_PRIVATE_KEY,
+  DEV_MODULITH,
 } = process.env;
 
 const NO_PRERENDER = _NO_PRERENDER;
@@ -95,8 +98,15 @@ export const config = configure(
         10,
       ),
     },
-    PEER_ID,
+    LIBP2P_PRIVATE_KEY,
     SNAPSHOT_WEBHOOK_SECRET,
+    GITHUB: {
+      DISPATCHER_APP_ID: DISPATCHER_APP_ID
+        ? parseInt(DISPATCHER_APP_ID)
+        : undefined,
+      DISPATCHER_APP_PRIVATE_KEY,
+    },
+    DEV_MODULITH: DEV_MODULITH === 'true',
   },
   z.object({
     NO_PRERENDER: z.boolean(),
@@ -157,7 +167,7 @@ export const config = configure(
       MESSAGE_RELAYER_PREFETCH: z.number().int().positive(),
       EVM_CE_POLL_INTERVAL_MS: z.number().int().positive(),
     }),
-    PEER_ID: z.string().optional(),
+    LIBP2P_PRIVATE_KEY: z.string().optional(),
     SNAPSHOT_WEBHOOK_SECRET: z
       .string()
       .optional()
@@ -165,5 +175,20 @@ export const config = configure(
         (data) => !(!['local', 'CI'].includes(model_config.APP_ENV) && !data),
         'SNAPSHOT_WEBHOOK_SECRET is required in public environments',
       ),
+    GITHUB: z.object({
+      DISPATCHER_APP_ID: z
+        .number()
+        .optional()
+        .refine((data) => !(model_config.APP_ENV === 'production' && !data))
+        .describe('The ID of the Common Workflow Dispatcher GitHub app'),
+      DISPATCHER_APP_PRIVATE_KEY: z
+        .string()
+        .optional()
+        .refine((data) => !(model_config.APP_ENV === 'production' && !data))
+        .describe(
+          'The private key of the Common Workflow Dispatcher GitHub app',
+        ),
+    }),
+    DEV_MODULITH: z.boolean(),
   }),
 );

@@ -1,11 +1,11 @@
 import { pluralizeWithoutNumberPrefix } from 'helpers';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import type { Topic } from '../../models/Topic';
 import { useCommonNavigate } from '../../navigation/helpers';
 import app from '../../state';
 import {
-  useDeleteTopicMutation,
   useEditTopicMutation,
+  useToggleArchiveTopicMutation,
 } from '../../state/api/topics';
 import { CWCheckbox } from '../components/component_kit/cw_checkbox';
 import { CWTextInput } from '../components/component_kit/cw_text_input';
@@ -18,11 +18,14 @@ import {
 } from '../components/component_kit/new_designs/CWModal';
 import { openConfirmation } from './confirmation_modal';
 
+import clsx from 'clsx';
 import { notifySuccess } from 'controllers/app/notifications';
 import { DeltaStatic } from 'quill';
-import '../../../styles/modals/edit_topic_modal.scss';
+import { MessageRow } from 'views/components/component_kit/new_designs/CWTextInput/MessageRow';
+import { CWText } from '../components/component_kit/cw_text';
 import { ReactQuillEditor } from '../components/react_quill_editor';
 import { createDeltaFromText } from '../components/react_quill_editor/utils';
+import './edit_topic_modal.scss';
 
 type EditTopicModalProps = {
   onModalClose: () => void;
@@ -44,16 +47,66 @@ export const EditTopicModal = ({
 
   const navigate = useCommonNavigate();
   const { mutateAsync: editTopic } = useEditTopicMutation();
-  const { mutateAsync: deleteTopic } = useDeleteTopicMutation();
+  const { mutateAsync: archiveTopic } = useToggleArchiveTopicMutation();
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [description, setDescription] = useState<DeltaStatic>(
     createDeltaFromText(descriptionProp),
   );
+  const [newPostTemplate, setNewPostTemplate] = useState<DeltaStatic>(
+    topic?.default_offchain_template
+      ? JSON.parse(decodeURIComponent(topic?.default_offchain_template))
+      : '',
+  );
+  const [newPostTemplateError, setNewPostTemplateError] = useState<
+    string | null
+  >(null);
   const [featuredInSidebar, setFeaturedInSidebar] = useState<boolean>(
     featuredInSidebarProp,
   );
+  const [featuredInNewPost, setFeaturedInNewPost] = useState<boolean>(
+    topic?.featured_in_new_post || false,
+  );
   const [name, setName] = useState<string>(nameProp);
+  const [characterCount, setCharacterCount] = useState(0);
+  const [descErrorMsg, setDescErrorMsg] = useState<string | null>(null);
+
+  const getCharacterCount = (delta) => {
+    if (!delta || !delta.ops) {
+      return 0;
+    }
+    return delta.ops.reduce((count, op) => {
+      if (typeof op.insert === 'string') {
+        const cleanedText = op.insert.replace(/\n$/, '');
+        return count + cleanedText.length;
+      }
+      return count;
+    }, 0);
+  };
+
+  useEffect(() => {
+    const count = getCharacterCount(description);
+    setCharacterCount(count);
+  }, [description]);
+
+  useEffect(() => {
+    if ((description?.ops || [])?.[0]?.insert?.length > 250) {
+      setDescErrorMsg('Description must be 250 characters or less');
+    } else {
+      setDescErrorMsg(null);
+    }
+  }, [description]);
+
+  useEffect(() => {
+    if (
+      featuredInNewPost &&
+      (newPostTemplate?.ops || [])?.[0]?.insert?.trim?.()?.length === 0
+    ) {
+      setNewPostTemplateError('Topic template is required');
+    } else {
+      setNewPostTemplateError(null);
+    }
+  }, [featuredInNewPost, newPostTemplate]);
 
   const handleSaveChanges = async () => {
     setIsSaving(true);
@@ -66,8 +119,11 @@ export const EditTopicModal = ({
         community_id: app.activeChainId()!,
         telegram: null,
         featured_in_sidebar: featuredInSidebar,
-        featured_in_new_post: false,
-        default_offchain_template: '',
+        featured_in_new_post: featuredInNewPost,
+        default_offchain_template:
+          featuredInNewPost && newPostTemplate
+            ? JSON.stringify(newPostTemplate)
+            : '',
       });
       if (noRedirect) {
         onModalClose();
@@ -82,10 +138,28 @@ export const EditTopicModal = ({
     }
   };
 
-  const handleDeleteTopic = async () => {
+  const handleArchiveTopic = () => {
     openConfirmation({
-      title: 'Warning',
-      description: <>Delete this topic?</>,
+      title: topic.archived_at
+        ? 'Unarchive this topic?'
+        : 'Archive this topic?',
+      description: (
+        <>
+          {topic.archived_at ? (
+            <CWText>
+              Unarchiving this topic will mark all of its threads as unarchived
+              (only those threads that were marked archived when this topic was
+              archived). Users will be able to interact with those threads
+              normally.
+            </CWText>
+          ) : (
+            <CWText>
+              Archiving this topic will mark all of its threads as archived.
+              Users can still see archived threads in the archived section.
+            </CWText>
+          )}
+        </>
+      ),
       buttons: [
         {
           label: 'Cancel',
@@ -93,14 +167,15 @@ export const EditTopicModal = ({
           buttonHeight: 'sm',
         },
         {
-          label: 'Delete',
-          buttonType: 'destructive',
+          label: topic.archived_at ? 'Unarchive' : 'Archive',
+          buttonType: topic.archived_at ? 'primary' : 'destructive',
           buttonHeight: 'sm',
           onClick: async () => {
-            await deleteTopic({
+            await archiveTopic({
               community_id: app.activeChainId() || '',
               topic_id: id!,
-            });
+              archive: !topic.archived_at,
+            }).catch(console.error);
             if (noRedirect) {
               onModalClose();
             } else {
@@ -119,6 +194,7 @@ export const EditTopicModal = ({
         <CWTextInput
           label="Name"
           value={name}
+          disabled={!!topic.archived_at}
           onInput={(e) => {
             setName(e.target.value);
           }}
@@ -149,7 +225,27 @@ export const EditTopicModal = ({
           contentDelta={description}
           setContentDelta={setDescription}
           fromManageTopic
+          {...(topic.archived_at && {
+            tooltipLabel: 'Cannot modify an archived topic',
+          })}
+          isDisabled={!!topic.archived_at}
         />
+        <div className="char-error-row">
+          <CWText type="caption">Character count: {characterCount}/250</CWText>
+          <MessageRow
+            statusMessage={descErrorMsg || ''}
+            hasFeedback={!!descErrorMsg}
+            validationStatus={descErrorMsg ? 'failure' : undefined}
+          />
+
+          {featuredInNewPost && (
+            <MessageRow
+              statusMessage={newPostTemplateError || ''}
+              hasFeedback={!!newPostTemplateError}
+              validationStatus={newPostTemplateError ? 'failure' : undefined}
+            />
+          )}
+        </div>
         <CWCheckbox
           label="Featured in Sidebar"
           checked={featuredInSidebar}
@@ -157,17 +253,49 @@ export const EditTopicModal = ({
             setFeaturedInSidebar(!featuredInSidebar);
           }}
           value=""
+          disabled={!!topic.archived_at}
         />
+        <div
+          className={clsx(
+            'new-topic-template-section',
+            featuredInNewPost && 'enabled',
+          )}
+        >
+          <CWCheckbox
+            className="sidebar-feature-checkbox"
+            label={
+              <div>
+                <CWText type="b2">Featured topic in new post</CWText>
+                <CWText type="caption" className="checkbox-label-caption">
+                  The topic template you add will be added as base text to every
+                  new post within the topic.
+                </CWText>
+              </div>
+            }
+            checked={featuredInNewPost}
+            onChange={() => {
+              setFeaturedInNewPost(!featuredInNewPost);
+            }}
+          />
+          {featuredInNewPost && (
+            <ReactQuillEditor
+              placeholder="Add a template for this topic (Limit of 250 characters)"
+              contentDelta={newPostTemplate}
+              setContentDelta={setNewPostTemplate}
+            />
+          )}
+        </div>
       </CWModalBody>
       <CWModalFooter className="EditTopicModalFooter">
         <div className="action-buttons">
           <div className="delete-topic">
             <CWButton
-              buttonType="destructive"
+              buttonType={topic.archived_at ? 'primary' : 'destructive'}
+              {...(topic.archived_at && { buttonAlt: 'green' })}
               buttonHeight="sm"
               disabled={isSaving}
-              onClick={handleDeleteTopic}
-              label="Delete topic"
+              onClick={handleArchiveTopic}
+              label={topic.archived_at ? 'Unarchive topic' : 'Archive topic'}
             />
           </div>
           <CWButton
@@ -175,12 +303,18 @@ export const EditTopicModal = ({
             buttonType="secondary"
             buttonHeight="sm"
             onClick={onModalClose}
+            disabled={!!topic.archived_at}
           />
           <CWButton
             buttonType="primary"
             buttonHeight="sm"
             onClick={handleSaveChanges}
             label="Save changes"
+            disabled={
+              !!topic.archived_at ||
+              !!descErrorMsg ||
+              (featuredInNewPost && !!newPostTemplateError)
+            }
           />
         </div>
         {errorMsg && (

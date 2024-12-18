@@ -2,15 +2,14 @@ import type { Command } from '@hicommonwealth/core';
 import { AppError, config } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../database';
-import { isSuperAdmin, type AuthContext } from '../middleware';
+import { isSuperAdmin } from '../middleware';
 
 /**
  * This function will add the custom domain to the database as well as add an entry in heroku.
  * @constructor
  */
 export function UpdateCustomDomain(): Command<
-  typeof schemas.UpdateCustomDomain,
-  AuthContext
+  typeof schemas.UpdateCustomDomain
 > {
   return {
     ...schemas.UpdateCustomDomain,
@@ -40,7 +39,7 @@ export function UpdateCustomDomain(): Command<
       }
 
       const magicRequestDomain = await fetch(
-        `https://api.magic.link/v1/api/magic_client/domain/allowlist/add`,
+        `https://api.magic.link/v2/api/magic_client/domain/allowlist/add`,
         {
           method: 'POST',
           headers: {
@@ -56,7 +55,7 @@ export function UpdateCustomDomain(): Command<
       );
 
       const magicRequestRedirectUrl = await fetch(
-        `https://api.magic.link/v1/api/magic_client/redirect_url/allowlist/add`,
+        `https://api.magic.link/v2/api/magic_client/redirect_url/allowlist/add`,
         {
           method: 'POST',
           headers: {
@@ -78,14 +77,14 @@ export function UpdateCustomDomain(): Command<
         magicResponseDomain.status === 'failed' &&
         magicResponseDomain.error_code != 'ALREADY_WHITELISTED_DOMAIN'
       ) {
-        throw new AppError(magicResponseDomain);
+        throw new AppError(magicResponseDomain.message);
       }
 
       if (
         magicResponseRedirectUrl.status === 'failed' &&
         magicResponseRedirectUrl.error_code != 'ALREADY_WHITELISTED_DOMAIN'
       ) {
-        throw new AppError(magicResponseRedirectUrl);
+        throw new AppError(magicResponseRedirectUrl.message);
       }
 
       response = await fetch(url, {

@@ -50,7 +50,6 @@ const PersonalInformationStep = ({
     useUpdateUserEmailSettingsMutation();
   const { refetch: refetchProfileData } = useFetchProfileByIdQuery({
     apiCallEnabled: true,
-    shouldFetchSelfProfile: true,
   });
 
   useNecessaryEffect(() => {
@@ -84,7 +83,7 @@ const PersonalInformationStep = ({
 
   const { data: profiles, isLoading: isCheckingUsernameUniqueness } =
     useSearchProfilesQuery({
-      limit: 1000,
+      limit: 50,
       searchTerm: debouncedSearchTerm,
       communityId: 'all_communities',
       orderBy: APIOrderBy.LastActive,

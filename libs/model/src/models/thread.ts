@@ -1,6 +1,8 @@
-import { EventNames } from '@hicommonwealth/core';
-import { Thread } from '@hicommonwealth/schemas';
-import { getDecodedString } from '@hicommonwealth/shared';
+import { EventNames, Thread } from '@hicommonwealth/schemas';
+import {
+  MAX_TRUNCATED_CONTENT_LENGTH,
+  getDecodedString,
+} from '@hicommonwealth/shared';
 import Sequelize from 'sequelize';
 import { z } from 'zod';
 import { emitEvent, getThreadContestManagers } from '../utils/utils';
@@ -8,6 +10,7 @@ import { AddressAttributes } from './address';
 import type { CommunityAttributes } from './community';
 import type { ThreadSubscriptionAttributes } from './thread_subscriptions';
 import type { ModelInstance } from './types';
+import { beforeValidateBodyHook } from './utils';
 
 export type ThreadAttributes = z.infer<typeof Thread> & {
   // associations
@@ -26,7 +29,10 @@ export default (
       address_id: { type: Sequelize.INTEGER, allowNull: true },
       created_by: { type: Sequelize.STRING, allowNull: true },
       title: { type: Sequelize.TEXT, allowNull: false },
-      body: { type: Sequelize.TEXT, allowNull: true },
+      body: {
+        type: Sequelize.STRING(MAX_TRUNCATED_CONTENT_LENGTH),
+        allowNull: false,
+      },
       kind: { type: Sequelize.STRING, allowNull: false },
       stage: {
         type: Sequelize.TEXT,
@@ -34,7 +40,7 @@ export default (
         defaultValue: 'discussion',
       },
       url: { type: Sequelize.TEXT, allowNull: true },
-      topic_id: { type: Sequelize.INTEGER, allowNull: true },
+      topic_id: { type: Sequelize.INTEGER, allowNull: false },
       pinned: {
         type: Sequelize.BOOLEAN,
         defaultValue: false,
@@ -116,6 +122,9 @@ export default (
         { fields: ['canvas_msg_id'] },
       ],
       hooks: {
+        beforeValidate(instance: ThreadInstance) {
+          beforeValidateBodyHook(instance);
+        },
         afterCreate: async (
           thread: ThreadInstance,
           options: Sequelize.CreateOptions<ThreadAttributes>,

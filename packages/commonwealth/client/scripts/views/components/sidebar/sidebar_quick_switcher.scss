@@ -1,0 +1,40 @@
+@import '../../../styles/shared.scss';
+
+.SidebarQuickSwitcher {
+  background: $neutral-50;
+  border-right: 1px solid $neutral-200;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  overflow: hidden;
+  width: $quick-switcher-width;
+
+  &:not(.isInsideCommunity) {
+    padding-top: 32px;
+  }
+
+  .community-nav-bar {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    justify-content: center;
+    padding: 12px 0;
+    width: 100%;
+
+    .collapsable-button-space {
+      padding-top: 20px;
+    }
+  }
+
+  .scrollable-community-bar {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    overflow-y: auto;
+    padding: 12px 0;
+    width: 100%;
+  }
+}

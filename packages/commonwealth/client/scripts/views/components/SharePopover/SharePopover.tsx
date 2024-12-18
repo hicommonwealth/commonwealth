@@ -1,3 +1,4 @@
+import { notifySuccess } from 'client/scripts/controllers/app/notifications';
 import React from 'react';
 import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
 import { PopoverTriggerProps } from 'views/components/component_kit/new_designs/CWPopover';
@@ -39,7 +40,9 @@ export const SharePopover = ({
           onClick: () => {
             navigator.clipboard
               .writeText(linkToShare)
-              .then()
+              .then(() => {
+                notifySuccess('Successfully copied! ');
+              })
               .catch(console.error);
           },
         },

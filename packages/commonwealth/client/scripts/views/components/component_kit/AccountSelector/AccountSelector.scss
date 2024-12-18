@@ -1,4 +1,4 @@
-@import '../../../../../styles/shared.scss';
+@import '../../../../styles/shared.scss';
 
 .AccountSelector {
   margin-bottom: 24px;
@@ -8,22 +8,29 @@
 
   .account-item {
     cursor: pointer;
-    padding: 16px 18px 9px;
-    border: 1px solid $neutral-50;
-    border-bottom: none;
+    padding: 6px 18px 9px;
     text-align: left;
     display: flex;
 
     .account-item-avatar {
-      width: 56px;
+      width: 54px;
     }
 
     .account-item-address {
+      margin-top: 2px;
       color: $neutral-500;
     }
 
     .account-item-left {
       flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .account-item-name {
+      flex: 1;
+      font-weight: 500;
     }
 
     .account-item-right {

@@ -1,10 +1,10 @@
-import 'modals/ArchiveThreadModal.scss';
 import React from 'react';
 import app from 'state';
 import { useEditThreadMutation } from 'state/api/threads';
 import type Thread from '../../models/Thread';
 import { CWText } from '../components/component_kit/cw_text';
 import { CWButton } from '../components/component_kit/new_designs/CWButton';
+import './ArchiveThreadModal.scss';
 
 import { buildUpdateThreadInput } from 'client/scripts/state/api/threads/editThread';
 import useUserStore from 'state/ui/user';
@@ -25,16 +25,16 @@ export const ArchiveThreadModal = ({
   const { mutateAsync: editThread } = useEditThreadMutation({
     communityId: app.activeChainId() || '',
     threadId: thread.id,
-    threadMsgId: thread.canvasMsgId,
+    threadMsgId: thread.canvasMsgId!,
     currentStage: thread.stage,
-    currentTopicId: thread.topic.id!,
+    currentTopicId: thread.topic!.id!,
   });
   const user = useUserStore();
 
   const handleArchiveThread = async () => {
     const input = await buildUpdateThreadInput({
       threadId: thread.id,
-      threadMsgId: thread.canvasMsgId,
+      threadMsgId: thread.canvasMsgId!,
       communityId: app.activeChainId() || '',
       archived: !thread.archivedAt,
       address: user.activeAccount?.address || '',

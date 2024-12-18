@@ -1,4 +1,4 @@
-import { notifySuccess } from 'controllers/app/notifications';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import React from 'react';
 import app from 'state';
@@ -87,7 +87,7 @@ const Snapshots = () => {
 
       notifySuccess('Snapshot links updated!');
     } catch {
-      notifySuccess('Failed to update snapshot links!');
+      notifyError('Failed to update snapshot links!');
     }
   };
 

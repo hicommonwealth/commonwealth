@@ -1,5 +1,10 @@
-@import '../../../../../../../styles/shared';
+@import '../../../../../../styles/shared';
 
 .ReactionButtonSkeleton {
-  border: none
+  border: none;
+}
+
+.popover-content {
+  max-height: 150px;
+  overflow: scroll;
 }

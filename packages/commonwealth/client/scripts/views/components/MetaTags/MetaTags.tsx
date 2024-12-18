@@ -1,6 +1,7 @@
-import 'Layout.scss';
+import { PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
+import '../../Layout.scss';
 
 type MetaTagName =
   | 'application-name'
@@ -81,7 +82,7 @@ const defaultMeta = {
   },
   'twitter:image': {
     name: 'twitter:image',
-    content: 'https://commonwealth.im/img/brand_assets/common.png',
+    content: `https://${PRODUCTION_DOMAIN}/img/brand_assets/common-social.png`,
   },
   'og:type': {
     property: 'og:type',
@@ -93,7 +94,7 @@ const defaultMeta = {
   },
   'og:url': {
     property: 'og:url',
-    content: 'https://commonwealth.im',
+    content: `https://${PRODUCTION_DOMAIN}`,
   },
   'og:title': {
     property: 'og:title',
@@ -105,7 +106,7 @@ const defaultMeta = {
   },
   'og:image': {
     property: 'og:image',
-    content: 'https://commonwealth.im/img/brand_assets/common.png',
+    content: `https://${PRODUCTION_DOMAIN}/img/brand_assets/common-social.png`,
   },
 } as const;
 

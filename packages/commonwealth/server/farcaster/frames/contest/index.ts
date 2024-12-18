@@ -1,5 +1,4 @@
-import { checkEligibility } from './checkEligibility';
 import { contestCard } from './contestCard';
-import { viewLeaderboard } from './viewLeaderboard';
+import { contestPrizes } from './contestPrizes';
 
-export { checkEligibility, contestCard, viewLeaderboard };
+export { contestCard, contestPrizes };

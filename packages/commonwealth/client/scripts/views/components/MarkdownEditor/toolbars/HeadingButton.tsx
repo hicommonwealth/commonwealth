@@ -8,8 +8,8 @@ import {
 } from 'commonwealth-mdxeditor';
 import { $createParagraphNode } from 'lexical';
 import React, { useCallback } from 'react';
+import { EditorTooltip } from 'views/components/MarkdownEditor/toolbars/EditorTooltip';
 import CWIconButton from 'views/components/component_kit/new_designs/CWIconButton';
-import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import './HeadingButton.scss';
 
 export type HeadingButtonProps = Readonly<{
@@ -37,6 +37,9 @@ export const HeadingButton = (props: HeadingButtonProps) => {
           case 'quote':
             convertSelectionToNode(() => $createQuoteNode());
             break;
+          case 'p':
+            convertSelectionToNode(() => $createParagraphNode());
+            break;
         }
       } else {
         convertSelectionToNode(() => $createParagraphNode());
@@ -48,7 +51,7 @@ export const HeadingButton = (props: HeadingButtonProps) => {
   );
 
   return (
-    <CWTooltip
+    <EditorTooltip
       content={`Change to ${blockType}`}
       renderTrigger={(handleInteraction) => (
         <CWIconButton

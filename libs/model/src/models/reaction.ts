@@ -1,5 +1,5 @@
-import { EventNames, stats } from '@hicommonwealth/core';
-import { Reaction } from '@hicommonwealth/schemas';
+import { stats } from '@hicommonwealth/core';
+import { EventNames, Reaction } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize';
 import { z } from 'zod';
 import type {

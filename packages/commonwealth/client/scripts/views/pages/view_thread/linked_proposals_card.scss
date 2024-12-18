@@ -1,0 +1,36 @@
+@import '../../../styles/shared.scss';
+
+.spinner-container {
+  margin: auto;
+}
+
+.LinkedProposalsCard {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px;
+  width: 100%;
+
+  .links-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+
+    .linked-proposals {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .snapshot-spinner-container {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+  }
+
+  .no-proposals-text.Text {
+    color: $neutral-500;
+  }
+}

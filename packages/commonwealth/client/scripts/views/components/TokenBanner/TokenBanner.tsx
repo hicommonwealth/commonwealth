@@ -47,10 +47,10 @@ const TokenBanner = ({
           <Avatar url={avatarUrl} size={40} />
         ) : (
           <div className="avatar-placeholder">
-            {(name || 'Token').charAt(0).toUpperCase()}
+            {(name || 'ETH').charAt(0).toUpperCase()}
           </div>
         )}
-        <CWText fontWeight="medium">{name}</CWText>
+        <CWText fontWeight="medium">{name || 'ETH'}</CWText>
         <CWText fontWeight="medium" className="ticker">
           {ticker}
         </CWText>
@@ -85,19 +85,18 @@ const TokenBanner = ({
       )}
 
       {popover && (
-        <>
-          <CWIconButton
-            iconName="infoEmpty"
-            buttonSize="sm"
-            onMouseEnter={popoverProps.handleInteraction}
-            onMouseLeave={popoverProps.handleInteraction}
-          />
+        <div
+          onMouseEnter={popoverProps.handleInteraction}
+          onMouseLeave={popoverProps.handleInteraction}
+        >
+          <CWIconButton iconName="infoEmpty" buttonSize="sm" />
           <CWPopover
+            className="TokenBannerPopover"
             title={<>{popover.title}</>}
             body={popover.body}
             {...popoverProps}
           />
-        </>
+        </div>
       )}
     </div>
   );

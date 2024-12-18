@@ -3,8 +3,7 @@ import { commonProtocol } from '@hicommonwealth/model';
 import chai, { assert } from 'chai';
 import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
-import Sinon from 'sinon';
-import { afterAll, beforeAll, describe, test } from 'vitest';
+import { afterAll, beforeAll, describe, test, vi } from 'vitest';
 import { TestServer, testServer } from '../../../server-test';
 import { config } from '../../../server/config';
 
@@ -37,18 +36,17 @@ describe('createReaction Integration Tests', () => {
       .set('address', address)
       .send(validRequest);
     assert.equal((res as any).statusCode, 200);
-
-    return JSON.parse(res.text);
+    return res?.statusCode === 200;
   };
 
   const getUniqueCommentText = async () => {
     const time = new Date().getMilliseconds();
-    const text = `testCommentCreated at ${time}`;
+    const body = `testCommentCreated at ${time}`;
     const comment = await server.models.Comment.findOne({
-      where: { text },
+      where: { body },
     });
     chai.assert.isNull(comment);
-    return text;
+    return body;
   };
 
   beforeAll(async () => {
@@ -60,9 +58,10 @@ describe('createReaction Integration Tests', () => {
     );
     userAddress = res.address;
     userDid = res.did;
-    Sinon.stub(commonProtocol.contractHelpers, 'getNamespaceBalance').value(
-      () => ({ [userAddress]: 300 }),
-    );
+    vi.spyOn(
+      commonProtocol.contractHelpers,
+      'getNamespaceBalance',
+    ).mockResolvedValue({ [userAddress]: '300' });
     userJWT = jwt.sign(
       { id: res.user_id, email: res.email },
       config.AUTH.JWT_SECRET,
@@ -96,18 +95,18 @@ describe('createReaction Integration Tests', () => {
   });
 
   afterAll(async () => {
-    Sinon.restore();
+    vi.restoreAllMocks();
     await dispose()();
   });
 
   test('should create comment reactions and verify comment reaction count', async () => {
-    const text = await getUniqueCommentText();
+    const body = await getUniqueCommentText();
     const createCommentResponse = await server.seeder.createComment({
       chain: 'ethereum',
       address: userAddress,
       did: userDid,
       jwt: userJWT,
-      text,
+      body,
       threadId: threadId,
       threadMsgId,
       session: userSession.session,
@@ -115,7 +114,7 @@ describe('createReaction Integration Tests', () => {
     });
 
     const comment = await server.models.Comment.findOne({
-      where: { text },
+      where: { body },
     });
 
     chai.assert.isNotNull(comment);
@@ -146,7 +145,7 @@ describe('createReaction Integration Tests', () => {
       userJWT,
       userAddress,
     );
-    chai.assert.equal(deleteReactionResponse.reaction_id, reactionId);
+    chai.assert.equal(deleteReactionResponse, true);
 
     await comment!.reload();
     chai.assert.equal(comment!.reaction_count, beforeReactionCount);
@@ -184,7 +183,7 @@ describe('createReaction Integration Tests', () => {
       userAddress,
     );
 
-    chai.assert.equal(deleteReactionResponse.reaction_id, reactionId);
+    chai.assert.equal(deleteReactionResponse, true);
 
     await thread!.reload();
     chai.assert.equal(thread!.reaction_count, beforeReactionCount!);

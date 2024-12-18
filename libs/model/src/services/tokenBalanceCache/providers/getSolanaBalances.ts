@@ -15,7 +15,7 @@ export async function getSolanaBalances(
   const chainNode = await models.ChainNode.scope('withPrivateData').findOne({
     where: {
       balance_type: 'solana',
-      name: 'Solana (Mainnet Beta)',
+      name: 'Solana Mainnet',
     },
   });
   if (!chainNode) {

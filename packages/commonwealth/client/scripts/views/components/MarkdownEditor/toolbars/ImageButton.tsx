@@ -1,12 +1,12 @@
 import React from 'react';
+import { EditorTooltip } from 'views/components/MarkdownEditor/toolbars/EditorTooltip';
 import { FileUploadButton } from 'views/components/MarkdownEditor/toolbars/FileUploadButton';
-import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 
 export const IMAGE_ACCEPT =
   '.jpg, .jpeg, .png, .gif, .webp, .svg, .apng, .avif';
 
 type ImageButtonProps = Readonly<{
-  onImage?: (file: File) => void;
+  onImage: (file: File) => void;
   text?: string;
 }>;
 
@@ -14,7 +14,7 @@ export const ImageButton = (props: ImageButtonProps) => {
   const { onImage } = props;
 
   return (
-    <CWTooltip
+    <EditorTooltip
       content="Upload image"
       renderTrigger={(handleInteraction) => (
         <FileUploadButton

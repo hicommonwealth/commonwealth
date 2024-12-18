@@ -8,7 +8,6 @@ import { CreateSnapshotProposal } from '../../src/snapshot';
 
 describe('Snapshot Listener API', { timeout: 5_000 }, () => {
   beforeAll(async () => {
-    await tester.bootstrap_testing(true);
     const [chainNode] = await tester.seed(
       'ChainNode',
       {
@@ -16,7 +15,6 @@ describe('Snapshot Listener API', { timeout: 5_000 }, () => {
         name: 'Sepolia Testnet',
         eth_chain_id: 11155111,
         balance_type: BalanceType.Ethereum,
-        contracts: [],
       },
       { mock: false },
     );
@@ -82,6 +80,9 @@ describe('Snapshot Listener API', { timeout: 5_000 }, () => {
       });
       expect.fail();
       // // eslint-disable-next-line no-empty
-    } catch (e) {}
+    } catch (e) {
+      // ignore error
+      console.warn(e);
+    }
   });
 });

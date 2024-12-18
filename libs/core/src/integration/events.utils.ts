@@ -1,15 +1,13 @@
-import { ETHERS_BIG_NUMBER, EVM_ADDRESS } from '@hicommonwealth/schemas';
+import { ChainEventSigs } from '@hicommonwealth/evm-protocols';
+import {
+  ETHERS_BIG_NUMBER,
+  EVM_ADDRESS,
+  EventNames,
+  events,
+} from '@hicommonwealth/schemas';
 import { BigNumber } from 'ethers';
 import type { Result } from 'ethers/lib/utils';
 import { ZodSchema, z } from 'zod';
-import { EventNames } from './events';
-import {
-  ContestContentAdded,
-  ContestContentUpvoted,
-  ContestStarted,
-  OneOffContestManagerDeployed,
-  RecurringContestManagerDeployed,
-} from './events.schemas';
 
 // TODO: delete this file when we transition from CE v2 to CE v3. It is superseded by chain-event.utils.ts
 
@@ -50,26 +48,12 @@ type EvmMapper<Input extends string, Output extends ZodSchema> = {
   };
 };
 
-export const ChainEventSigs = {
-  NewContest:
-    'address contest, address namespace, uint256 interval, bool oneOff' as const,
-  NewRecurringContestStarted:
-    'uint256 indexed contestId, uint256 startTime, uint256 endTime' as const,
-  NewSingleContestStarted: 'uint256 startTime, uint256 endTime' as const,
-  ContentAdded:
-    'uint256 indexed contentId, address indexed creator, string url' as const,
-  VoterVotedRecurring:
-    'address indexed voter, uint256 indexed contentId, uint256 contestId, uint256 votingPower' as const,
-  VoterVotedOneOff:
-    'address indexed voter, uint256 indexed contentId, uint256 votingPower' as const,
-};
-
 const RecurringContestManagerDeployedMapper: EvmMapper<
   typeof ChainEventSigs.NewContest,
-  typeof RecurringContestManagerDeployed
+  typeof events.RecurringContestManagerDeployed
 > = {
   signature: ChainEventSigs.NewContest,
-  output: RecurringContestManagerDeployed,
+  output: events.RecurringContestManagerDeployed,
   condition: (evmInput) => !evmInput.oneOff,
   mapEvmToSchema: (
     contestAddress,
@@ -86,10 +70,10 @@ const RecurringContestManagerDeployedMapper: EvmMapper<
 
 const OneOffContestManagerDeployedMapper: EvmMapper<
   typeof ChainEventSigs.NewContest,
-  typeof OneOffContestManagerDeployed
+  typeof events.OneOffContestManagerDeployed
 > = {
   signature: ChainEventSigs.NewContest,
-  output: OneOffContestManagerDeployed,
+  output: events.OneOffContestManagerDeployed,
   condition: (evmInput) => evmInput.oneOff,
   mapEvmToSchema: (
     contestAddress,
@@ -106,10 +90,10 @@ const OneOffContestManagerDeployedMapper: EvmMapper<
 
 const NewRecurringContestStartedMapper: EvmMapper<
   typeof ChainEventSigs.NewRecurringContestStarted,
-  typeof ContestStarted
+  typeof events.ContestStarted
 > = {
   signature: ChainEventSigs.NewRecurringContestStarted,
-  output: ContestStarted,
+  output: events.ContestStarted,
   mapEvmToSchema: (contestAddress, { contestId, startTime, endTime }) => ({
     event_name: EventNames.ContestStarted,
     event_payload: {
@@ -123,10 +107,10 @@ const NewRecurringContestStartedMapper: EvmMapper<
 
 const NewSingleContestStartedMapper: EvmMapper<
   typeof ChainEventSigs.NewSingleContestStarted,
-  typeof ContestStarted
+  typeof events.ContestStarted
 > = {
   signature: ChainEventSigs.NewSingleContestStarted,
-  output: ContestStarted,
+  output: events.ContestStarted,
   mapEvmToSchema: (contestAddress, { startTime, endTime }) => ({
     event_name: EventNames.ContestStarted,
     event_payload: {
@@ -140,10 +124,10 @@ const NewSingleContestStartedMapper: EvmMapper<
 
 const NewContestContentAddedMapper: EvmMapper<
   typeof ChainEventSigs.ContentAdded,
-  typeof ContestContentAdded
+  typeof events.ContestContentAdded
 > = {
   signature: ChainEventSigs.ContentAdded,
-  output: ContestContentAdded,
+  output: events.ContestContentAdded,
   mapEvmToSchema: (contestAddress, { contentId, creator, url }) => ({
     event_name: EventNames.ContestContentAdded,
     event_payload: {
@@ -157,10 +141,10 @@ const NewContestContentAddedMapper: EvmMapper<
 
 const ContestContentUpvotedRecurringMapper: EvmMapper<
   typeof ChainEventSigs.VoterVotedRecurring,
-  typeof ContestContentUpvoted
+  typeof events.ContestContentUpvoted
 > = {
   signature: ChainEventSigs.VoterVotedRecurring,
-  output: ContestContentUpvoted,
+  output: events.ContestContentUpvoted,
   mapEvmToSchema: (
     contestAddress,
     { contestId, contentId, voter, votingPower },
@@ -171,17 +155,17 @@ const ContestContentUpvotedRecurringMapper: EvmMapper<
       contest_id: BigNumber.from(contestId).toNumber(),
       content_id: BigNumber.from(contentId).toNumber(),
       voter_address: voter,
-      voting_power: BigNumber.from(votingPower).toNumber(),
+      voting_power: BigNumber.from(votingPower).toString(),
     },
   }),
 };
 
 const ContestContentUpvotedOneOffMapper: EvmMapper<
   typeof ChainEventSigs.VoterVotedOneOff,
-  typeof ContestContentUpvoted
+  typeof events.ContestContentUpvoted
 > = {
   signature: ChainEventSigs.VoterVotedOneOff,
-  output: ContestContentUpvoted,
+  output: events.ContestContentUpvoted,
   mapEvmToSchema: (contestAddress, { contentId, voter, votingPower }) => ({
     event_name: EventNames.ContestContentUpvoted,
     event_payload: {
@@ -189,7 +173,7 @@ const ContestContentUpvotedOneOffMapper: EvmMapper<
       contest_id: BigNumber.from(0).toNumber(),
       content_id: BigNumber.from(contentId).toNumber(),
       voter_address: voter,
-      voting_power: BigNumber.from(votingPower).toNumber(),
+      voting_power: BigNumber.from(votingPower).toString(),
     },
   }),
 };

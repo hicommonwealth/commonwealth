@@ -1,8 +1,7 @@
 import React from 'react';
-
-import 'components/sidebar/index.scss';
-import { useCommonNavigate } from 'navigation/helpers';
 import { matchRoutes, useLocation } from 'react-router-dom';
+
+import { useCommonNavigate } from 'navigation/helpers';
 import app from 'state';
 import { useFetchTopicsQuery } from 'state/api/topics';
 import { sidebarStore } from 'state/ui/sidebar';
@@ -17,6 +16,8 @@ import type {
   ToggleTree,
 } from './types';
 
+import './index.scss';
+
 const resetSidebarState = () => {
   if (isWindowSmallInclusive(window.innerWidth)) {
     sidebarStore.getState().setMenu({ name: 'default', isVisible: false });
@@ -24,7 +25,6 @@ const resetSidebarState = () => {
     sidebarStore.getState().setMenu({ name: 'default', isVisible: true });
   }
 };
-
 function setDiscussionsToggleTree(path: string, toggle: boolean) {
   let currentTree = JSON.parse(
     localStorage[`${app.activeChainId()}-discussions-toggle-tree`],
@@ -42,31 +42,19 @@ function setDiscussionsToggleTree(path: string, toggle: boolean) {
   localStorage[`${app.activeChainId()}-discussions-toggle-tree`] =
     JSON.stringify(newTree);
 }
-
 interface DiscussionSectionProps {
-  isContestAvailable: boolean;
   topicIdsIncludedInContest: number[];
 }
-
 export const DiscussionSection = ({
-  isContestAvailable,
   topicIdsIncludedInContest,
 }: DiscussionSectionProps) => {
   const navigate = useCommonNavigate();
   const location = useLocation();
-
   const matchesDiscussionsRoute = matchRoutes(
     [{ path: '/discussions' }, { path: ':scope/discussions' }],
     location,
   );
-  const matchesOverviewRoute = matchRoutes(
-    [{ path: '/overview' }, { path: ':scope/overview' }],
-    location,
-  );
-  const matchesContestsRoute = matchRoutes(
-    [{ path: '/contests' }, { path: ':scope/contests' }],
-    location,
-  );
+
   const matchesArchivedRoute = matchRoutes(
     [{ path: '/archived' }, { path: ':scope/archived' }],
     location,
@@ -124,7 +112,6 @@ export const DiscussionSection = ({
   const toggleTreeState = JSON.parse(
     localStorage[`${app.activeChainId()}-discussions-toggle-tree`],
   );
-
   const discussionsGroupData: SectionGroupAttrs[] = [
     {
       title: 'All',
@@ -138,51 +125,6 @@ export const DiscussionSection = ({
         resetSidebarState();
         handleRedirectClicks(navigate, e, `/discussions`, communityId, () => {
           setDiscussionsToggleTree(`children.All.toggledState`, toggle);
-        });
-      },
-      displayData: null,
-    },
-    ...(isContestAvailable
-      ? [
-          {
-            title: 'Contests',
-            containsChildren: false,
-            displayData: null,
-            hasDefaultToggle: false,
-            isActive: !!matchesContestsRoute,
-            isVisible: true,
-            isUpdated: true,
-            onClick: (e, toggle: boolean) => {
-              e.preventDefault();
-              resetSidebarState();
-              handleRedirectClicks(
-                navigate,
-                e,
-                `/contests`,
-                communityId,
-                () => {
-                  setDiscussionsToggleTree(
-                    `children.Contests.toggledState`,
-                    toggle,
-                  );
-                },
-              );
-            },
-          },
-        ]
-      : []),
-    {
-      title: 'Overview',
-      containsChildren: false,
-      hasDefaultToggle: false,
-      isVisible: true,
-      isUpdated: true,
-      isActive: !!matchesOverviewRoute,
-      onClick: (e, toggle: boolean) => {
-        e.preventDefault();
-        resetSidebarState();
-        handleRedirectClicks(navigate, e, `/overview`, communityId, () => {
-          setDiscussionsToggleTree(`children.Overview.toggledState`, toggle);
         });
       },
       displayData: null,

@@ -23,15 +23,18 @@ select
   cm.created_at,
   cm.name,
   cm.image_url,
+  cm.description,
   cm.funding_token_address,
   cm.prize_percentage,
   cm.payout_structure,
   cm.cancelled,
+  cm.topic_id,
+  cm.is_farcaster_contest,
   coalesce((
     select jsonb_agg(json_build_object('id', t.id, 'name', t.name) order by t.name)
-    from "ContestTopics" ct
-    left join "Topics" t on ct.topic_id = t.id
-    where cm.contest_address = ct.contest_address
+    from "ContestManagers" cm2
+    left join "Topics" t on cm2.topic_id = t.id
+    WHERE cm2.contest_address = cm.contest_address
   ), '[]'::jsonb) as topics,
   coalesce(c.contests, '[]'::jsonb) as contests
 from
@@ -66,13 +69,10 @@ from
     ${payload.contest_id ? `where c.contest_id = ${payload.contest_id}` : ''}
 	  group by c.contest_address
   ) as c on cm.contest_address = c.contest_address
-where
-  cm.community_id = :community_id
-  ${
-    payload.contest_address
-      ? `and cm.contest_address = '${payload.contest_address}'`
-      : ''
-  }
+${payload.community_id || payload.contest_address ? 'where' : ''}
+  ${payload.community_id ? 'cm.community_id = :community_id' : ''}
+  ${payload.community_id && payload.contest_address ? 'and' : ''}
+  ${payload.contest_address ? `cm.contest_address = :contest_address` : ''}
 group by
   cm.community_id,
   cm.contest_address,
@@ -82,6 +82,7 @@ group by
   cm.created_at,
   cm.name,
   cm.image_url,
+  cm.description,
   cm.funding_token_address,
   cm.prize_percentage,
   cm.payout_structure,
@@ -93,10 +94,13 @@ order by
         {
           type: QueryTypes.SELECT,
           raw: true,
-          replacements: { community_id: payload.community_id },
+          replacements: {
+            community_id: payload.community_id,
+            contest_address: payload.contest_address,
+          },
         },
       );
-      results.forEach((r) =>
+      results.forEach((r) => {
         r.contests.forEach((c) => {
           c.score?.forEach((w) => {
             w.tickerPrize = Number(w.prize) / 10 ** r.decimals;
@@ -106,8 +110,9 @@ order by
           c.score_updated_at =
             c.score_updated_at && new Date(c.score_updated_at);
           // c.actions.forEach((a) => (a.created_at = new Date(a.created_at)));
-        }),
-      );
+        });
+        r.topics = r.topics.filter((t) => !!t.id);
+      });
 
       return results;
     },

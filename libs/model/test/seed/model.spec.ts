@@ -2,20 +2,19 @@ import { dispose } from '@hicommonwealth/core';
 import { expect } from 'chai';
 import { Sequelize } from 'sequelize';
 import { afterAll, beforeAll, describe, test } from 'vitest';
+import { models } from '../../src/database';
 import { Factories } from '../../src/models/factories';
 import {
-  bootstrap_testing,
   create_db_from_migrations,
   get_info_schema,
   type TABLE_INFO,
 } from '../../src/tester';
 
 const generateSchemas = async () => {
-  const model = await bootstrap_testing();
   const migration = await create_db_from_migrations('common_migrated_test');
 
   // TODO: resolve remaining conflicts!!!
-  const model_schema = await get_info_schema(model.sequelize, {
+  const model_schema = await get_info_schema(models.sequelize, {
     ignore_columns: {
       GroupPermissions: ['allowed_actions'],
     },
@@ -28,8 +27,7 @@ const generateSchemas = async () => {
   const migration_schema = await get_info_schema(migration, {
     ignore_columns: {
       // Missing in model - migrations with backups
-      Comments: ['body_backup', 'text_backup', 'root_id'],
-      Threads: ['body_backup'],
+      Comments: ['root_id'],
       Topics: ['default_offchain_template_backup'],
       GroupPermissions: ['allowed_actions'],
     },
@@ -53,7 +51,7 @@ describe('Model schema', () => {
 
   beforeAll(async () => {
     schemas = await generateSchemas();
-  });
+  }, 20000);
 
   afterAll(async () => {
     await dispose()();
@@ -73,10 +71,11 @@ describe('Model schema', () => {
       //console.log(model.columns, migration.columns);
       expect(model.columns).deep.equals(migration.columns);
 
-      // model.table_name === 'Topics' &&
+      // ['Quests', 'Addresses'].includes(model.table_name) &&
       //   console.log(
-      //     [...model.constraints.values()],
-      //     [...migration.constraints.values()],
+      //     { model, migration },
+      //     //[...model.constraints.values()],
+      //     //[...migration.constraints.values()],
       //   );
       expect([...model.constraints.values()]).deep.equals([
         ...migration.constraints.values(),

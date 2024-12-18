@@ -1,17 +1,17 @@
 import { InvalidState, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../database';
-import { AuthContext, isAuthorized } from '../middleware';
+import { authRoles } from '../middleware';
 
 export const BanAddressErrors = {
   NotFound: 'Address not found',
   AlreadyExists: 'Ban for this address already exists',
 };
 
-export function BanAddress(): Command<typeof schemas.BanAddress, AuthContext> {
+export function BanAddress(): Command<typeof schemas.BanAddress> {
   return {
     ...schemas.BanAddress,
-    auth: [isAuthorized({ roles: ['admin'] })],
+    auth: [authRoles('admin')],
     body: async ({ payload }) => {
       const { community_id, address } = payload;
       const addressInstance = await models.Address.findOne({

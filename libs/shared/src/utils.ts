@@ -5,6 +5,12 @@ import {
   decodeAddress,
   encodeAddress,
 } from '@polkadot/util-crypto';
+import moment from 'moment';
+import {
+  PRODUCTION_DOMAIN,
+  S3_ASSET_BUCKET_CDN,
+  S3_RAW_ASSET_BUCKET_DOMAIN,
+} from './constants';
 
 /**
  * Decamelizes a string
@@ -38,10 +44,10 @@ export const splitAndDecodeURL = (locationPathname: string) => {
   //this is to check for malformed urls on a topics page in /discussions
   const splitURLPath = locationPathname.split('/');
   if (splitURLPath[2] === 'discussions') {
-    return decodeURIComponent(splitURLPath[3]);
+    return splitURLPath[3] ? decodeURIComponent(splitURLPath[3]) : null;
   }
   splitURLPath[1] === 'discussions';
-  return decodeURIComponent(splitURLPath[2]);
+  return splitURLPath[2] ? decodeURIComponent(splitURLPath[2]) : null;
 };
 
 export const getThreadUrl = (
@@ -69,7 +75,7 @@ export const getThreadUrl = (
   // - cannot use config util in libs/shared
   // - duplicate found in knock utils
   return process.env.NODE_ENV === 'production'
-    ? `https://commonwealth.im${relativePath}`
+    ? `https://${PRODUCTION_DOMAIN}${relativePath}`
     : `http://localhost:8080${relativePath}`;
 };
 
@@ -85,12 +91,38 @@ export function delay(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+/**
+ * Converts an S3 file URL from the raw bucket URL to the Cloudflare CDN format.
+ * This is most often used in combination with pre-signed S3 upload URLs.
+ * Ex Input: https://s3.us-east-1.amazonaws.com/${S3_ASSET_BUCKET_CDN}/f2e44ed9-2fb4-4746-8d7a-4a60fcd83b77.png
+ * Ex Output: https://${S3_ASSET_BUCKET_CDN}/f2e44ed9-2fb4-4746-8d7a-4a60fcd83b77.png
+ */
+export function formatBucketUrlToAssetCDN(uploadLocation: string) {
+  if (
+    process.env.APP_ENV &&
+    ['production', 'beta'].includes(process.env.APP_ENV)
+  ) {
+    const fileName = uploadLocation.split('/').pop() || '';
+    return `https://${S3_ASSET_BUCKET_CDN}/${fileName}`;
+  }
+  return uploadLocation;
+}
+
+/**
+ * Converts an S3 file URL from the CDN format to the raw assets bucket URL.
+ * This function should only be used server side when the raw S3 headers are
+ * required in the response (CloudFlare truncates headers).
+ * Ex Input: https://${S3_ASSET_BUCKET_CDN}/f2e44ed9-2fb4-4746-8d7a-4a60fcd83b77.png
+ * Ex Output: https://s3.us-east-1.amazonaws.com/${S3_ASSET_BUCKET_CDN}/f2e44ed9-2fb4-4746-8d7a-4a60fcd83b77.png
+ */
 export function formatAssetUrlToS3(uploadLocation: string): string {
-  const S3Domain = 's3.us-east-1.amazonaws.com/assets.commonwealth.im';
-  if (uploadLocation.includes(S3Domain)) {
+  if (uploadLocation.includes(S3_RAW_ASSET_BUCKET_DOMAIN)) {
     return uploadLocation;
   }
-  return uploadLocation.replace('assets.commonwealth.im', S3Domain);
+  return uploadLocation.replace(
+    S3_ASSET_BUCKET_CDN,
+    S3_RAW_ASSET_BUCKET_DOMAIN,
+  );
 }
 
 export async function getFileSizeBytes(url: string): Promise<number> {
@@ -338,4 +370,59 @@ export function bech32ToHex(address: string) {
   } catch (e) {
     console.log(`Error converting bech32 to hex: ${e}. Hex was not generated.`);
   }
+}
+
+export function buildFarcasterContestFrameUrl(contestAddress: string) {
+  return `/api/integration/farcaster/contests/${contestAddress}/contestCard`;
+}
+
+// Date utils
+export function isWithinPeriod(
+  refDate: Date,
+  targetDate: Date,
+  period: moment.unitOfTime.Base,
+): boolean {
+  const start = moment(refDate).startOf(period);
+  const end = moment(refDate).endOf(period);
+  return moment(targetDate).isBetween(start, end, null, '[]');
+}
+
+export async function alchemyGetTokenPrices({
+  alchemyApiKey,
+  tokenSources,
+}: {
+  alchemyApiKey: string;
+  tokenSources: {
+    contractAddress: string;
+    alchemyNetworkId: string;
+  }[];
+}): Promise<{
+  data: {
+    network: string;
+    address: string;
+    prices: { currency: string; value: string; lastUpdatedAt: string }[];
+    error: string | null;
+  }[];
+}> {
+  const options = {
+    method: 'POST',
+    headers: { accept: 'application/json', 'content-type': 'application/json' },
+    body: JSON.stringify({
+      addresses: tokenSources.map((x) => ({
+        network: x.alchemyNetworkId,
+        address: x.contractAddress,
+      })),
+    }),
+  };
+
+  const res = await fetch(
+    `https://api.g.alchemy.com/prices/v1/${alchemyApiKey}/tokens/by-address`,
+    options,
+  );
+
+  if (res.ok) return res.json();
+  else
+    throw new Error('Failed to fetch token prices', {
+      cause: { status: res.status, statusText: res.statusText },
+    });
 }

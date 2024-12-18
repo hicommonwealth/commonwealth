@@ -99,7 +99,6 @@ export const cacheTypes = {
   SINGLE_THREAD: 'single',
   BULK_THREADS: 'bulk',
   ACTIVE_THREADS: 'active',
-  COUNT_THREADS: 'count',
 };
 
 const updateCacheForBulkThreads = ({
@@ -231,6 +230,26 @@ const cacheUpdater = ({
   method,
   arrayManipulationMode = 'replaceArray',
 }: CacheUpdater) => {
+  // TODO: research a simpler cache invalidation strategy for tRPC queries
+  void queryClient.invalidateQueries({
+    predicate: (query) => {
+      const [path, args] = query.queryKey;
+      if (Array.isArray(path) && path.length === 2) {
+        const [entity, name] = path;
+        if (entity === 'thread' && name === 'getThreadsByIds') {
+          const { input } = args as {
+            input: { community_id: string; thread_ids: string };
+          };
+          return (
+            input.community_id === communityId &&
+            input.thread_ids?.split(',').includes(threadId.toString())
+          );
+        }
+      }
+      return false;
+    },
+  });
+
   const queryCache = queryClient.getQueryCache();
   const queryKeys = queryCache.getAll().map((cache) => cache.queryKey);
 
@@ -290,7 +309,9 @@ const cacheUpdater = ({
           }
           if (method === 'remove') {
             // @ts-expect-error StrictNullChecks
-            remainingCallbacks.push(() => queryClient.refetchQueries(cacheKey));
+            remainingCallbacks.push(() =>
+              queryClient.refetchQueries(cacheKey).catch(console.error),
+            );
             return [{}];
           }
         }
@@ -385,8 +406,8 @@ const updateThreadTopicInAllCaches = (
       }
       // and refetch new topic queries
       if (k[3] === newTopic.id || k[3] === undefined) {
-        queryClient.cancelQueries(k);
-        queryClient.refetchQueries(k);
+        queryClient.cancelQueries(k).catch(console.error);
+        queryClient.refetchQueries(k).catch(console.error);
       }
     }
   });
@@ -406,19 +427,33 @@ const addThreadInAllCaches = (communityId: string, newThread: Thread) => {
     // position the thread in cache
     if (
       (k[2] === cacheTypes.BULK_THREADS &&
-        (k[3] === newThread.topic.id || k[3] === undefined)) ||
+        (k[3] === newThread.topic?.id || k[3] === undefined)) ||
       k[2] === cacheTypes.ACTIVE_THREADS
     ) {
-      queryClient.cancelQueries(k);
-      queryClient.refetchQueries(k);
+      queryClient.cancelQueries(k).catch(console.error);
+      queryClient.refetchQueries(k).catch(console.error);
     }
     // TODO: for now single cache will fetch the thread - not adding its state, ideally we should
     // add the thread here
   });
 };
 
+const clearThreadCache = (communityId: string) => {
+  const queryCache = queryClient.getQueryCache();
+  const queryKeys = queryCache.getAll().map((cache) => cache.queryKey);
+  const keysForThreads = queryKeys.filter(
+    (x) => x[0] === ApiEndpoints.FETCH_THREADS && x[1] === communityId,
+  );
+
+  keysForThreads.map((k) => {
+    queryClient.cancelQueries(k).catch(console.error);
+    queryClient.refetchQueries(k).catch(console.error);
+  });
+};
+
 export {
   addThreadInAllCaches,
+  clearThreadCache,
   removeThreadFromAllCaches,
   updateThreadInAllCaches,
   updateThreadTopicInAllCaches,

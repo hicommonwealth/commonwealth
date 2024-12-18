@@ -1,6 +1,7 @@
-import { ChainBase, commonProtocol } from '@hicommonwealth/shared';
+import { ChainBase } from '@hicommonwealth/shared';
 import clsx from 'clsx';
 import { notifyError } from 'controllers/app/notifications';
+import { isS3URL } from 'helpers/awsHelpers';
 import useBeforeUnload from 'hooks/useBeforeUnload';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import React, { useRef, useState } from 'react';
@@ -14,12 +15,14 @@ import { useLaunchTokenMutation } from 'state/api/launchPad';
 import { useCreateTokenMutation } from 'state/api/tokens';
 import useUserStore from 'state/ui/user';
 import PageCounter from 'views/components/PageCounter';
+import { ImageProcessed } from 'views/components/component_kit/CWImageInput';
 import { CWText } from 'views/components/component_kit/cw_text';
 import CWBanner from 'views/components/component_kit/new_designs/CWBanner';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import TokenLaunchButton from 'views/components/sidebar/TokenLaunchButton';
+import { openConfirmation } from 'views/modals/confirmation_modal';
 import { generateCommunityNameFromToken } from '../../../LaunchToken/steps/CommunityInformationStep/utils';
 import SuccessStep from '../../../LaunchToken/steps/SuccessStep';
 import TokenInformationForm from '../../../LaunchToken/steps/TokenInformationStep/TokenInformationForm';
@@ -60,6 +63,12 @@ export const QuickTokenLaunchForm = ({
     createdCommunityIdsToTokenInfoMap,
     setCreatedCommunityIdsToTokenInfoMap,
   ] = useState({});
+  const [processedImagesPerIdea, setProcessedImagesPerIdea] = useState<
+    {
+      ideaIndex: number;
+      imagesProcessed: ImageProcessed[];
+    }[]
+  >([]);
 
   useRunOnceOnCondition({
     callback: () => {
@@ -90,7 +99,35 @@ export const QuickTokenLaunchForm = ({
 
   useBeforeUnload(isCreatingQuickToken);
 
-  const handleSubmit = (tokenInfo: FormSubmitValues) => {
+  const triggerDiscardExtraTokenDraftsConfirmation = (
+    onConfirm: () => void,
+  ) => {
+    openConfirmation({
+      title: `Proceed with active token form?`,
+      description: (
+        <CWText>
+          You currently have {tokenIdeas.length} token form drafts. Only the
+          active form will be used to create the token and the other drafts will
+          be discarded.
+        </CWText>
+      ),
+      buttons: [
+        {
+          label: 'Cancel',
+          buttonType: 'secondary',
+          buttonHeight: 'sm',
+        },
+        {
+          label: 'Proceed',
+          buttonType: 'primary',
+          buttonHeight: 'sm',
+          onClick: onConfirm,
+        },
+      ],
+    });
+  };
+
+  const handleTokenLaunch = (tokenInfo: FormSubmitValues) => {
     if (isCreatingQuickToken) return;
 
     const handleAsync = async () => {
@@ -204,7 +241,7 @@ export const QuickTokenLaunchForm = ({
         }
 
         // 2. attempt Launch token on chain
-        await launchToken({
+        const txReceipt = await launchToken({
           chainRpc: baseNode.url,
           ethChainId: baseNode.ethChainId,
           name: sanitizedTokenInfo.name,
@@ -217,17 +254,13 @@ export const QuickTokenLaunchForm = ({
           // this gets reset after creating token on api
           addressSelectorSelectedAddress: selectedAddress.address,
         });
-        await createToken({
-          base: ChainBase.Ethereum,
+
+        const token = await createToken({
+          transaction_hash: txReceipt.transactionHash,
           chain_node_id: baseNode.id,
-          name: sanitizedTokenInfo.name,
-          symbol: sanitizedTokenInfo.symbol,
+          community_id: communityId,
           icon_url: sanitizedTokenInfo.imageURL,
           description: sanitizedTokenInfo.description,
-          community_id: communityId,
-          launchpad_contract_address:
-            // this will always exist, adding 0 to avoid typescript issues
-            commonProtocol.factoryContracts[baseNode.ethChainId].launchpad,
         });
 
         // 4. update community to reference the created token
@@ -236,7 +269,9 @@ export const QuickTokenLaunchForm = ({
           addressSelectorSelectedAddress: selectedAddress.address,
         });
         await updateCommunity({
-          id: communityId,
+          community_id: communityId,
+          namespace: token.namespace,
+          transactionHash: txReceipt.transactionHash,
           token_name: sanitizedTokenInfo.name,
           ...(sanitizedTokenInfo.description && {
             description: sanitizedTokenInfo.description,
@@ -270,6 +305,18 @@ export const QuickTokenLaunchForm = ({
     handleAsync().catch(console.error);
   };
 
+  const handleSubmit = (tokenInfo: FormSubmitValues) => {
+    if (tokenIdeas.length > 1) {
+      // if there are multiple drafts, then confirm from user if they want to proceed with
+      // active draft and discard the others
+      triggerDiscardExtraTokenDraftsConfirmation(() =>
+        handleTokenLaunch(tokenInfo),
+      );
+    } else {
+      handleTokenLaunch(tokenInfo);
+    }
+  };
+
   const handleFormUpdates = (values: FormSubmitValues) => {
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
 
@@ -277,7 +324,8 @@ export const QuickTokenLaunchForm = ({
       const isSameValues =
         values.name === generatedTokenIdea?.token?.name &&
         values.symbol === generatedTokenIdea?.token?.symbol &&
-        values.description === generatedTokenIdea?.token?.description;
+        values.description === generatedTokenIdea?.token?.description &&
+        values.imageURL === generatedTokenIdea?.token?.imageURL;
       if (generatedTokenIdea?.isChunking || isSameValues) {
         timeoutRef.current = undefined;
         return;
@@ -296,6 +344,40 @@ export const QuickTokenLaunchForm = ({
       timeoutRef.current = undefined;
     }, 1000);
     timeoutRef.current = timeout;
+  };
+
+  const handleProcessedImagesListChange = (
+    processedImages: ImageProcessed[],
+  ) => {
+    setProcessedImagesPerIdea((ideas) => {
+      const temp = [...ideas];
+
+      const activeIdeaImages = temp.find(
+        (i) => i.ideaIndex === activeTokenIdeaIndex,
+      );
+
+      if (activeIdeaImages) {
+        // update existing record and remove non-s3 url if present, that one came from
+        // chunk 4 (non s3 url) of token generation response and is not the url we
+        // want to use for api payload
+        const shouldRemove0IndexURL =
+          processedImages.length === 2 &&
+          isS3URL(processedImages.at(-1)?.url || '') &&
+          !isS3URL(processedImages.at(-2)?.url || '');
+        const newProcessedImages = shouldRemove0IndexURL
+          ? [{ ...processedImages[1] }]
+          : processedImages;
+        activeIdeaImages.imagesProcessed = [...newProcessedImages];
+      } else {
+        // add new record
+        temp.push({
+          ideaIndex: activeTokenIdeaIndex,
+          imagesProcessed: [...processedImages],
+        });
+      }
+
+      return temp;
+    });
   };
 
   return (
@@ -329,6 +411,18 @@ export const QuickTokenLaunchForm = ({
           containerClassName={clsx('shortened-token-information-form', {
             'display-none': isCreatingQuickToken,
           })}
+          imageControlProps={{
+            loading:
+              generatedTokenIdea?.isChunking &&
+              !generatedTokenIdea?.chunkingField &&
+              !generatedTokenIdea?.token?.imageURL,
+            canSwitchBetweenProcessedImages: true,
+            onProcessedImagesListChange: handleProcessedImagesListChange,
+            processedImages:
+              processedImagesPerIdea.find(
+                (pi) => pi.ideaIndex === activeTokenIdeaIndex,
+              )?.imagesProcessed || undefined,
+          }}
           customFooter={({ isProcessingProfileImage }) => (
             <>
               <CWBanner
@@ -354,22 +448,25 @@ export const QuickTokenLaunchForm = ({
                     placement="bottom"
                     content={`You can only generate a max of ${MAX_IDEAS_LIMIT} ideas.`}
                     renderTrigger={(handleInteraction) => (
-                      <CWButton
-                        iconLeft="brain"
-                        label="Randomize"
-                        containerClassName="ml-auto"
-                        type="button"
-                        disabled={
-                          isProcessingProfileImage ||
-                          isCreatingQuickToken ||
-                          isMaxTokenIdeaLimitReached
-                        }
-                        onClick={() => {
-                          generateIdea().catch(console.error);
-                        }}
+                      <div
                         onMouseEnter={handleInteraction}
                         onMouseLeave={handleInteraction}
-                      />
+                      >
+                        <CWButton
+                          iconLeft="brain"
+                          label="Randomize"
+                          containerClassName="ml-auto"
+                          type="button"
+                          disabled={
+                            isProcessingProfileImage ||
+                            isCreatingQuickToken ||
+                            isMaxTokenIdeaLimitReached
+                          }
+                          onClick={() => {
+                            generateIdea().catch(console.error);
+                          }}
+                        />
+                      </div>
                     )}
                   />
                 ) : (
