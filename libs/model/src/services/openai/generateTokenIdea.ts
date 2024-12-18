@@ -8,7 +8,7 @@ import {
 import { v4 as uuidv4 } from 'uuid';
 import { config } from '../../config';
 import { models } from '../../database';
-import { TokenInstance } from '../../models/token';
+import { LaunchpadTokenInstance } from '../../models/token';
 
 type TokenIdea = {
   name: string;
@@ -104,14 +104,14 @@ const generateTokenIdea = async function* ({
 
   try {
     // generate a unique token name
-    let foundToken: TokenInstance | boolean | null = true;
+    let foundToken: LaunchpadTokenInstance | boolean | null = true;
     while (foundToken) {
       tokenIdea.name = await chatWithOpenAI(
         TOKEN_AI_PROMPTS_CONFIG.name(ideaPrompt),
         openai,
       );
 
-      foundToken = await models.Token.findOne({
+      foundToken = await models.LaunchpadToken.findOne({
         where: {
           name: tokenIdea.name,
         },
@@ -134,8 +134,9 @@ const generateTokenIdea = async function* ({
 
     // generate image url and send the generated url to the client (to save time on s3 upload)
     const imageResponse = await openai.images.generate({
+      model: 'dall-e-3',
       prompt: TOKEN_AI_PROMPTS_CONFIG.image(tokenIdea.name, tokenIdea.symbol),
-      size: '256x256',
+      size: '512x512',
       n: 1,
       response_format: 'url',
     });

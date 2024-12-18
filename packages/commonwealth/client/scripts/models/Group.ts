@@ -4,6 +4,7 @@ interface APIResponseFormat {
   metadata: {
     name: string;
     description?: string;
+    groupImageUrl?: string;
     required_requirements?: number;
   };
   requirements: {
@@ -37,6 +38,7 @@ class Group {
   public updatedAt: string; // ISO string
   public name: string;
   public description?: string;
+  public groupImageUrl?: string;
   public requirements: any[];
   public topics: any[];
   public members: any[];
@@ -58,6 +60,7 @@ class Group {
     this.updatedAt = updated_at;
     this.name = metadata.name;
     this.description = metadata.description;
+    this.groupImageUrl = metadata.groupImageUrl;
     this.requirements = requirements;
     this.topics = topics;
     this.members = memberships;

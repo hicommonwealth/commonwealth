@@ -1,14 +1,14 @@
 import {
   communityStakesAbi,
-  contestAbi,
-  EvmEventSignature,
-  EvmEventSignatures,
   launchpadFactoryAbi,
   lpBondingCurveAbi,
   namespaceFactoryAbi,
+  singleContestAbi,
   tokenCommunityManagerAbi,
-} from '@hicommonwealth/evm-protocols';
-import { factoryContracts, ValidChains } from '../common-protocol';
+} from '../abis';
+import { recurringContestAbi } from '../abis/recurringContestAbi';
+import { ValidChains, factoryContracts } from '../common-protocol';
+import { EvmEventSignature, EvmEventSignatures } from './eventSignatures';
 
 type ContractAddresses = {
   [key in ValidChains]:
@@ -37,7 +37,7 @@ export enum ChildContractNames {
   RecurringContest = 'RecurringContest',
 }
 
-type ContractSource = {
+export type ContractSource = {
   abi: Readonly<Array<unknown>>;
   eventSignatures: Array<EvmEventSignature>;
   // Runtime/user deployed contract sources
@@ -65,7 +65,7 @@ const namespaceFactorySource = {
   ],
   childContracts: {
     [ChildContractNames.RecurringContest]: {
-      abi: contestAbi,
+      abi: recurringContestAbi,
       eventSignatures: [
         EvmEventSignatures.Contests.ContentAdded,
         EvmEventSignatures.Contests.RecurringContestStarted,
@@ -73,7 +73,7 @@ const namespaceFactorySource = {
       ],
     },
     [ChildContractNames.SingleContest]: {
-      abi: contestAbi,
+      abi: singleContestAbi,
       eventSignatures: [
         EvmEventSignatures.Contests.ContentAdded,
         EvmEventSignatures.Contests.SingleContestStarted,
