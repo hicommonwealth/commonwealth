@@ -7,21 +7,19 @@ import {
 import { models, Webhook } from '@hicommonwealth/model';
 import { getDecodedString, safeTruncateBody } from '@hicommonwealth/shared';
 import { Op, WhereOptions } from 'sequelize';
-import z from 'zod';
+import { z } from 'zod';
 import { config } from '../../../config';
 import { getCommentUrl, getProfileUrl } from '../util';
 
 const log = logger(import.meta);
 
-const output = z.object({
-  success: z.boolean(),
-});
+const output = z.boolean();
 
 /**
  * This function takes a CommentCreated event and triggers a notifications provider workflow with the user +
  * comment data.
  * @param payload
- * @returns boolean or undefined - A boolean indicating if a workflow was triggered. Undefined is returned if the
+ * @returns boolean - A boolean indicating if a workflow was triggered. False is returned if the
  * author or community does not exist
  */
 export const processCommentCreated: EventHandler<
@@ -37,7 +35,7 @@ export const processCommentCreated: EventHandler<
     log.error('Full comment author with profile not found!', undefined, {
       payload,
     });
-    return { success: false };
+    return false;
   }
 
   const community = await models.Community.findOne({
@@ -48,7 +46,7 @@ export const processCommentCreated: EventHandler<
     log.error('Comment community not found!', undefined, {
       payload,
     });
-    return { success: false };
+    return false;
   }
 
   let users: { user_id: number }[] = [];
@@ -90,19 +88,16 @@ export const processCommentCreated: EventHandler<
       key: WorkflowKeys.CommentCreation,
       users: users.map((u) => ({ id: String(u.user_id) })),
       data: {
-        author: author.User!.profile.name || author.address.substring(0, 8),
+        community_id: String(community.id),
+        author: author.User?.profile.name || author.address.substring(0, 8),
         comment_parent_name: payload.parent_id ? 'comment' : 'thread',
         community_name: community.name,
-        community_icon_url: community.icon_url || undefined,
         comment_body: commentSummary,
         comment_url: commentUrl,
         comment_created_event: payload,
       },
-      actor: {
-        id: String(author.user_id),
-        email: author.User?.email ?? undefined,
-      },
-    } as const);
+      actor: { id: String(author.user_id) },
+    });
   }
 
   const webhooks = await models.Webhook.findAll({
@@ -125,29 +120,29 @@ export const processCommentCreated: EventHandler<
     await provider.triggerWorkflow({
       key: WorkflowKeys.Webhooks,
       users: webhooks.map((w) => ({
-        id: `webhook-${w.id}`,
+        id: String(w.id),
         webhook_url: w.url,
         destination: w.destination,
       })),
       data: {
         sender_username: 'Common',
         sender_avatar_url: config.DEFAULT_COMMONWEALTH_LOGO,
-        community_id: community.id!,
-        community_icon_url:
-          community.icon_url || config.DEFAULT_COMMONWEALTH_LOGO,
+        community_id: String(community.id),
         title_prefix: 'Comment on: ',
         preview_image_url: previewImg.previewImageUrl,
         preview_image_alt_text: previewImg.previewImageAltText,
         profile_name:
-          author.User!.profile.name || author.address.substring(0, 8),
+          author.User?.profile.name || author.address.substring(0, 8),
         profile_url: getProfileUrl(author.user_id, community.custom_domain),
-        profile_avatar_url: author.User!.profile.avatar_url ?? '',
-        object_title: Webhook.getRenderedTitle(thread!.title),
+        profile_avatar_url: author.User?.profile.avatar_url ?? '',
+        object_title: thread?.title
+          ? Webhook.getRenderedTitle(thread.title)
+          : '',
         object_url: commentUrl,
         object_summary: commentSummary,
       },
     });
   }
 
-  return { success: true };
+  return true;
 };
