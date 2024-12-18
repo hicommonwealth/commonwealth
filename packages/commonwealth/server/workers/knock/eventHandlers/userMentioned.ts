@@ -55,7 +55,8 @@ export const processUserMentioned: EventHandler<
       author_address: payload.authorAddress,
       community_id: payload.communityId,
       community_name: community.name,
-      community_icon_url: community.icon_url || config.DEFAULT_COMMONWEALTH_LOGO,
+      community_icon_url:
+        community.icon_url || config.DEFAULT_COMMONWEALTH_LOGO,
       author: user.profile.name || payload.authorAddress.substring(255),
       object_body:
         'thread' in payload
@@ -78,3 +79,4 @@ export const processUserMentioned: EventHandler<
   });
 
   return { success: !res.some((r) => r.status === 'rejected') };
+};
