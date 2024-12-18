@@ -28,6 +28,7 @@ import {
 } from 'state/ui/modals';
 import useUserStore from 'state/ui/user';
 import { PopoverMenuItem } from 'views/components/component_kit/CWPopoverMenu';
+import { CWText } from 'views/components/component_kit/cw_text';
 import {
   CWToggle,
   toggleDarkMode,
