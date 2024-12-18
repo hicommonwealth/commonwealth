@@ -36,6 +36,7 @@ import {
 } from 'views/components/component_kit/cw_toggle';
 import CWIconButton from 'views/components/component_kit/new_designs/CWIconButton';
 import {
+  DividerMenuItem,
   PopoverMenuItem,
   SubmenuMenuItem,
 } from 'views/components/component_kit/types';

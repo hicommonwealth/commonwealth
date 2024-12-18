@@ -1,16 +1,18 @@
 import React, { useState } from 'react';
 
+import { SupportedLanguage } from '../../../state/ui/language/constants';
 import './cw_dropdown.scss';
 import { CWText } from './cw_text';
 import { CWTextInput } from './cw_text_input';
 
-export type DropdownItemType<T = string | number> = {
+export type DropdownItemType<T extends string | number = SupportedLanguage> = {
   label: string | JSX.Element;
   value: T;
   selected?: boolean;
+  className?: string;
 };
 
-type DropdownProps<T = string | number> = {
+type DropdownProps<T extends string | number = SupportedLanguage> = {
   initialValue?: DropdownItemType<T>;
   value?: T;
   label?: string | JSX.Element;

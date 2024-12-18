@@ -14,12 +14,28 @@ import { CWIcon } from './cw_icons/cw_icon';
 import { CWText } from './cw_text';
 import { getClasses, isWindowSmallInclusive } from './helpers';
 import { CWButton } from './new_designs/CWButton';
-import type { MenuItem } from './types';
+import type {
+  CommunityMenuItem,
+  ComponentMenuItem,
+  DefaultMenuItem,
+  DividerMenuItem,
+  HeaderMenuItem,
+  NotificationMenuItem,
+  SubmenuMenuItem,
+} from './types';
 import { ComponentType } from './types';
 
 type CWSidebarMenuItemProps = {
   isStarred?: boolean;
-} & MenuItem;
+} & (
+  | DefaultMenuItem
+  | HeaderMenuItem
+  | DividerMenuItem
+  | ComponentMenuItem
+  | NotificationMenuItem
+  | CommunityMenuItem
+  | SubmenuMenuItem
+);
 
 const resetSidebarState = () => {
   if (
@@ -37,11 +53,9 @@ export const CWSidebarMenuItem = (props: CWSidebarMenuItemProps) => {
   const { setMenu } = useSidebarStore();
   const user = useUserStore();
 
-  // eslint-disable-next-line react/destructuring-assignment
   const [isStarred, setIsStarred] = useState<boolean>(!!props.isStarred);
   const { mutateAsync: toggleCommunityStar } = useToggleCommunityStarMutation();
 
-  /* eslint-disable-next-line react/destructuring-assignment */
   if (props.type === 'default') {
     const {
       disabled,
@@ -88,17 +102,13 @@ export const CWSidebarMenuItem = (props: CWSidebarMenuItemProps) => {
         {iconRight && <CWIcon iconName={iconRight} iconSize="small" />}
       </div>
     );
-    /* eslint-disable-next-line react/destructuring-assignment */
   } else if (props.type === 'header') {
     return (
       <div className="SidebarMenuItem header">
-        {/* eslint-disable-next-line react/destructuring-assignment */}
         <CWText type="caption">{props.label}</CWText>
       </div>
     );
-    /* eslint-disable-next-line react/destructuring-assignment */
   } else if (props.type === 'community') {
-    /* eslint-disable-next-line react/destructuring-assignment */
     const item = props.community;
     if (!item) return <></>;
 
@@ -139,16 +149,26 @@ export const CWSidebarMenuItem = (props: CWSidebarMenuItemProps) => {
         )}
       </div>
     );
+  } else if (props.type === 'divider') {
+    return <div className="SidebarMenuItem divider" />;
   }
+  return null;
 };
 
 type SidebarMenuProps = {
   className?: string;
   menuHeader?: { label: string; onClick: (e) => void };
-  menuItems: Array<MenuItem>;
+  menuItems: Array<
+    | DefaultMenuItem
+    | HeaderMenuItem
+    | DividerMenuItem
+    | ComponentMenuItem
+    | NotificationMenuItem
+    | CommunityMenuItem
+    | SubmenuMenuItem
+  >;
 };
 
-// eslint-disable-next-line react/no-multi-comp
 export const CWSidebarMenu = (props: SidebarMenuProps) => {
   const { className, menuHeader, menuItems } = props;
   const navigate = useCommonNavigate();
@@ -157,7 +177,6 @@ export const CWSidebarMenu = (props: SidebarMenuProps) => {
   return (
     <div
       className={getClasses<{ className: string }>(
-        // @ts-expect-error <StrictNullChecks/>
         { className },
         ComponentType.SidebarMenu,
       )}
@@ -224,8 +243,8 @@ export const CWSidebarMenu = (props: SidebarMenuProps) => {
               }
               navigate('/notification-settings');
             },
-          } as MenuItem,
-        ].map((item: MenuItem, i) => {
+          } as DefaultMenuItem,
+        ].map((item: DefaultMenuItem, i) => {
           if (item.type === 'element') return <></>;
 
           return (
