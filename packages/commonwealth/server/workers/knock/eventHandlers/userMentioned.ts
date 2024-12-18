@@ -7,11 +7,14 @@ import {
 import { models } from '@hicommonwealth/model';
 import { getDecodedString, safeTruncateBody } from '@hicommonwealth/shared';
 import z from 'zod';
+import { config } from '../../../config';
 import { getCommentUrl, getThreadUrl } from '../util';
 
 const log = logger(import.meta);
 
-const output = z.boolean();
+const output = z.object({
+  success: z.boolean(),
+});
 
 export const processUserMentioned: EventHandler<
   'UserMentioned',
@@ -29,7 +32,7 @@ export const processUserMentioned: EventHandler<
     log.error('Community not found', undefined, {
       payload,
     });
-    return false;
+    return { success: false };
   }
 
   const user = await models.User.findOne({
@@ -40,7 +43,7 @@ export const processUserMentioned: EventHandler<
 
   if (!user) {
     log.error('Author profile not found', undefined, payload);
-    return false;
+    return { success: false };
   }
 
   const res = await provider.triggerWorkflow({
@@ -52,6 +55,7 @@ export const processUserMentioned: EventHandler<
       author_address: payload.authorAddress,
       community_id: payload.communityId,
       community_name: community.name,
+      community_icon_url: community.icon_url || config.DEFAULT_COMMONWEALTH_LOGO,
       author: user.profile.name || payload.authorAddress.substring(255),
       object_body:
         'thread' in payload
@@ -73,5 +77,4 @@ export const processUserMentioned: EventHandler<
     },
   });
 
-  return !res.some((r) => r.status === 'rejected');
-};
+  return { success: !res.some((r) => r.status === 'rejected') };

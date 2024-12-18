@@ -6,14 +6,16 @@ import {
 } from '@hicommonwealth/core';
 import { models, Webhook } from '@hicommonwealth/model';
 import { getDecodedString, safeTruncateBody } from '@hicommonwealth/shared';
-import { Op } from 'sequelize';
+import { Op, WhereOptions } from 'sequelize';
 import z from 'zod';
 import { config } from '../../../config';
 import { getProfileUrl, getThreadUrl } from '../util';
 
 const log = logger(import.meta);
 
-const output = z.boolean();
+const output = z.object({
+  success: z.boolean(),
+});
 
 export const processThreadCreated: EventHandler<
   'ThreadCreated',
@@ -26,7 +28,7 @@ export const processThreadCreated: EventHandler<
     log.error('Thread community not found!', undefined, {
       payload,
     });
-    return false;
+    return { success: false };
   }
 
   const author = await models.Address.findOne({
@@ -38,14 +40,14 @@ export const processThreadCreated: EventHandler<
     log.error('Full thread author with profile not found!', undefined, {
       payload,
     });
-    return false;
+    return { success: false };
   }
 
   const webhooks = await models.Webhook.findAll({
     where: {
       community_id: community.id!,
       events: { [Op.contains]: ['ThreadCreated'] },
-    },
+    } as WhereOptions,
   });
 
   if (webhooks.length > 0) {
@@ -80,6 +82,8 @@ export const processThreadCreated: EventHandler<
         sender_username: 'Common',
         sender_avatar_url: config.DEFAULT_COMMONWEALTH_LOGO,
         community_id: community.id!,
+        community_icon_url:
+          community.icon_url || config.DEFAULT_COMMONWEALTH_LOGO,
         title_prefix: 'New thread: ',
         preview_image_url: previewImg.previewImageUrl,
         preview_image_alt_text: previewImg.previewImageAltText,
@@ -93,8 +97,8 @@ export const processThreadCreated: EventHandler<
       },
     });
 
-    return !res.some((r) => r.status === 'rejected');
+    return { success: !res.some((r) => r.status === 'rejected') };
   }
 
-  return true;
+  return { success: true };
 };

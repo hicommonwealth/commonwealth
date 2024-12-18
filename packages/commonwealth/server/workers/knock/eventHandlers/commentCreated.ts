@@ -6,14 +6,16 @@ import {
 } from '@hicommonwealth/core';
 import { models, Webhook } from '@hicommonwealth/model';
 import { getDecodedString, safeTruncateBody } from '@hicommonwealth/shared';
-import { Op } from 'sequelize';
+import { Op, WhereOptions } from 'sequelize';
 import z from 'zod';
 import { config } from '../../../config';
 import { getCommentUrl, getProfileUrl } from '../util';
 
 const log = logger(import.meta);
 
-const output = z.boolean();
+const output = z.object({
+  success: z.boolean(),
+});
 
 /**
  * This function takes a CommentCreated event and triggers a notifications provider workflow with the user +
@@ -35,7 +37,7 @@ export const processCommentCreated: EventHandler<
     log.error('Full comment author with profile not found!', undefined, {
       payload,
     });
-    return false;
+    return { success: false };
   }
 
   const community = await models.Community.findOne({
@@ -46,7 +48,7 @@ export const processCommentCreated: EventHandler<
     log.error('Comment community not found!', undefined, {
       payload,
     });
-    return false;
+    return { success: false };
   }
 
   let users: { user_id: number }[] = [];
@@ -58,7 +60,7 @@ export const processCommentCreated: EventHandler<
       where: {
         comment_id: Number(payload.parent_id),
         user_id: { [Op.notIn]: excludeUsers },
-      },
+      } as WhereOptions,
       attributes: ['user_id'],
       raw: true,
     })) as { user_id: number }[];
@@ -67,7 +69,7 @@ export const processCommentCreated: EventHandler<
       where: {
         thread_id: payload.thread_id,
         user_id: { [Op.notIn]: excludeUsers },
-      },
+      } as WhereOptions,
       attributes: ['user_id'],
       raw: true,
     })) as { user_id: number }[];
@@ -77,8 +79,7 @@ export const processCommentCreated: EventHandler<
   const commentUrl = getCommentUrl(
     payload.community_id,
     payload.thread_id,
-    // @ts-expect-error StrictNullChecks
-    payload.id,
+    payload.id!,
     community.custom_domain,
   );
 
@@ -89,10 +90,11 @@ export const processCommentCreated: EventHandler<
       key: WorkflowKeys.CommentCreation,
       users: users.map((u) => ({ id: String(u.user_id) })),
       data: {
-        // @ts-expect-error StrictNullChecks
-        author: author.User.profile.name || author.address.substring(0, 8),
+        author: author.User!.profile.name || author.address.substring(0, 8),
         comment_parent_name: payload.parent_id ? 'comment' : 'thread',
         community_name: community.name,
+        community_icon_url:
+          community.icon_url || config.DEFAULT_COMMONWEALTH_LOGO,
         comment_body: commentSummary,
         comment_url: commentUrl,
         comment_created_event: payload,
@@ -105,7 +107,7 @@ export const processCommentCreated: EventHandler<
     where: {
       community_id: community.id!,
       events: { [Op.contains]: ['CommentCreated'] },
-    },
+    } as WhereOptions,
   });
   if (webhooks.length > 0) {
     const thread = await models.Thread.findByPk(payload.thread_id, {
@@ -129,6 +131,8 @@ export const processCommentCreated: EventHandler<
         sender_username: 'Common',
         sender_avatar_url: config.DEFAULT_COMMONWEALTH_LOGO,
         community_id: community.id!,
+        community_icon_url:
+          community.icon_url || config.DEFAULT_COMMONWEALTH_LOGO,
         title_prefix: 'Comment on: ',
         preview_image_url: previewImg.previewImageUrl,
         preview_image_alt_text: previewImg.previewImageAltText,
@@ -143,5 +147,5 @@ export const processCommentCreated: EventHandler<
     });
   }
 
-  return true;
+  return { success: true };
 };

@@ -21,6 +21,10 @@ export const CommentCreatedNotification = z.object({
     .string()
     .max(255)
     .describe('The user-friendly name of the community'),
+  community_icon_url: z
+    .string()
+    .optional()
+    .describe('The URL of the community icon image'),
   comment_body: z
     .string()
     .max(255)
@@ -55,6 +59,10 @@ export const UserMentionedNotification = z.object({
     .string()
     .max(255)
     .describe('The user-friendly name of the community'),
+  community_icon_url: z
+    .string()
+    .optional()
+    .describe('The URL of the community icon image'),
   author: z
     .string()
     .describe('The profile name or first 8 characters of a users address'),
@@ -144,6 +152,10 @@ export const WebhookNotification = z.object({
     .string()
     .describe('The avatar url of the sender e.g. default commonwealth logo'),
   community_id: z.string().max(255).describe('The community id'),
+  community_icon_url: z
+    .string()
+    .optional()
+    .describe('The URL of the community icon image'),
   title_prefix: z
     .string()
     .max(255)
