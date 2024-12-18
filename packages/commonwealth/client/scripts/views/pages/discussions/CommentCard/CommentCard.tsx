@@ -1,6 +1,7 @@
 import type { DeltaStatic } from 'quill';
 import React, { useEffect, useState } from 'react';
 import app from 'state';
+import { useStore } from 'zustand';
 
 import {
   CanvasSignedData,
@@ -13,6 +14,8 @@ import { GetThreadActionTooltipTextResponse } from 'helpers/threads';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import type Comment from 'models/Comment';
 import useGetContentByUrlQuery from 'state/api/general/getContentByUrl';
+import { SUPPORTED_LANGUAGES } from 'state/ui/language/constants';
+import { translationStore } from 'state/ui/translation/translation';
 import useUserStore from 'state/ui/user';
 import { MarkdownViewerWithFallback } from 'views/components/MarkdownViewerWithFallback/MarkdownViewerWithFallback';
 import { CommentReactionButton } from 'views/components/ReactionButton/CommentReactionButton';
@@ -65,6 +68,9 @@ type CommentCardProps = {
   // other
   className?: string;
   shareURL: string;
+  // Translation
+  canTranslate?: boolean;
+  hideTranslateButton?: boolean;
 };
 
 export const CommentCard = ({
@@ -99,9 +105,17 @@ export const CommentCard = ({
   // other
   className,
   shareURL,
+  // translation
+  canTranslate = true,
+  hideTranslateButton = false,
 }: CommentCardProps) => {
   const user = useUserStore();
   const userOwnsComment = comment.profile.userId === user.id;
+  const translationStoreState = useStore(translationStore);
+  const [isTranslating, setIsTranslating] = useState<boolean>(false);
+  const [translatedContent, setTranslatedContent] = useState<string | null>(
+    null,
+  );
 
   const [commentText, setCommentText] = useState(comment.text);
   const commentBody = React.useMemo(() => {
@@ -119,7 +133,6 @@ export const CommentCard = ({
     useState<CanvasSignedData | null>(null);
   const [, setOnReaction] = useState<boolean>(false);
   const [isUpvoteDrawerOpen, setIsUpvoteDrawerOpen] = useState<boolean>(false);
-
   const [contentUrlBodyToFetch, setContentUrlBodyToFetch] = useState<
     string | null
   >(null);
@@ -264,7 +277,9 @@ export const CommentCard = ({
         <div className="comment-content">
           {isSpam && <CWTag label="SPAM" type="spam" />}
           <CWText className="comment-text">
-            <MarkdownViewerWithFallback markdown={commentText} />
+            <MarkdownViewerWithFallback
+              markdown={translatedContent || commentText}
+            />
           </CWText>
           {!comment.deleted && (
             <div className="comment-footer">
@@ -299,6 +314,53 @@ export const CommentCard = ({
 
               <SharePopover linkToShare={shareURL} buttonLabel="Share" />
 
+              {!hideTranslateButton && (
+                <CWThreadAction
+                  action="translate"
+                  disabled={!canTranslate || isTranslating}
+                  onClick={async () => {
+                    if (translatedContent) {
+                      setTranslatedContent(null);
+                      return;
+                    }
+                    try {
+                      setIsTranslating(true);
+                      const targetLanguage =
+                        translationStoreState.selectedLanguage;
+                      if (!SUPPORTED_LANGUAGES[targetLanguage]) {
+                        app.showToast({
+                          message: `Language ${targetLanguage} is not supported`,
+                          type: 'error',
+                        });
+                        return;
+                      }
+                      const translated =
+                        await translationStoreState.translateText(
+                          commentText,
+                          targetLanguage,
+                        );
+                      setTranslatedContent(translated);
+                    } catch (error) {
+                      console.error('Translation failed:', error);
+                      app.showToast({
+                        message:
+                          'Failed to translate content. Please try again.',
+                        type: 'error',
+                      });
+                    } finally {
+                      setIsTranslating(false);
+                    }
+                  }}
+                  label={
+                    isTranslating
+                      ? 'Translating...'
+                      : translatedContent
+                        ? 'Show Original'
+                        : 'Translate'
+                  }
+                />
+              )}
+
               {!isThreadArchived && replyBtnVisible && (
                 <CWThreadAction
                   action="reply"
@@ -327,7 +389,6 @@ export const CommentCard = ({
                   userOwnsComment={userOwnsComment}
                 />
               )}
-
               {!isThreadArchived && (canEdit || canDelete || canToggleSpam) && (
                 <PopoverMenu
                   className="CommentActions"

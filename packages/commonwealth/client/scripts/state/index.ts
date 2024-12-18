@@ -11,6 +11,7 @@ import { queryClient, QueryKeys, SERVER_URL } from 'state/api/config';
 import { Configuration, fetchCustomDomainQuery } from 'state/api/configuration';
 import { fetchNodesQuery } from 'state/api/nodes';
 import { errorStore } from 'state/ui/error';
+import { getBrowserLanguage, languageStore } from 'state/ui/language/language';
 import { EXCEPTION_CASE_VANILLA_getCommunityById } from './api/communities/getCommuityById';
 import { userStore } from './ui/user';
 
@@ -39,6 +40,12 @@ export interface IApp {
   runWhenReady: (cb: () => any) => void;
   chainModuleReady: EventEmitter;
   isModuleReady: boolean;
+
+  // Toast notifications
+  showToast: (options: {
+    message: string;
+    type?: 'error' | 'success' | 'info';
+  }) => void;
 }
 
 // INITIALIZE MAIN APP
@@ -66,6 +73,12 @@ export async function initAppState(
   updateSelectedCommunity = true,
 ): Promise<void> {
   try {
+    // Initialize language settings first since it doesn't depend on API
+    const browserLang = getBrowserLanguage();
+    if (!languageStore.getState().currentLanguage) {
+      languageStore.getState().setLanguage(browserLang);
+    }
+
     const [{ data: statusRes }] = await Promise.all([
       axios.get(`${SERVER_URL}/status`),
     ]);
