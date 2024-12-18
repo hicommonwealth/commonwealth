@@ -267,7 +267,7 @@ export function GetThreads(): Query<typeof schemas.GetThreads> {
         page: replacements.page,
         threads,
         numVotingThreads,
-        threadsCount: threads.at(0)?.total_num_thread_results || 0,
+        threadCount: threads.at(0)?.total_num_thread_results || 0,
       };
     },
   };
