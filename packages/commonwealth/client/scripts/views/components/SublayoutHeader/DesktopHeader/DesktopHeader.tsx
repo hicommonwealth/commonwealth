@@ -117,7 +117,15 @@ const DesktopHeader = ({ onMobile, onAuthModalOpen }: DesktopHeaderProps) => {
                   </div>
                 }
                 options={languageOptions}
-                onSelect={(item) => setSelectedLanguage(item.value)}
+                value={selectedLanguage}
+                onSelect={(item) => {
+                  if (
+                    typeof item.value === 'string' &&
+                    item.value in SUPPORTED_LANGUAGES
+                  ) {
+                    setSelectedLanguage(item.value as SupportedLanguage);
+                  }
+                }}
               />
             )}
             <CreateContentPopover />

@@ -1,5 +1,6 @@
 import { ReactNode } from 'react';
 import { IconSize } from 'views/components/component_kit/cw_icons/types';
+import { SupportedLanguage } from '../../../state/ui/language/constants';
 import type { IconName } from './cw_icons/cw_icon_lookup';
 
 export enum ComponentType {
@@ -72,15 +73,15 @@ export type HeaderMenuItem = {
 };
 
 export type DefaultMenuItem = {
+  type?: 'default';
   disabled?: boolean;
   iconLeft?: IconName;
   iconLeftWeight?: 'fill' | 'bold';
   iconLeftSize?: IconSize;
   iconRight?: IconName;
   isSecondary?: boolean;
-  label?: string | JSX.Element;
+  label: string | JSX.Element;
   onClick?: (e?: React.MouseEvent<HTMLElement>) => void;
-  type?: 'default';
   className?: string;
   preventClosing?: boolean;
   isButton?: boolean;
@@ -122,6 +123,15 @@ export type DropdownItemType<T = SupportedLanguage> = {
   label: string | JSX.Element;
   value: T;
   selected?: boolean;
+};
+
+export type PopoverMenuItem = {
+  label: string | JSX.Element;
+  iconLeft?: IconName;
+  iconRight?: IconName;
+  onClick?: () => void;
+  disabled?: boolean;
+  type?: 'default' | 'notification' | 'community';
 };
 
 export type MenuItem =
