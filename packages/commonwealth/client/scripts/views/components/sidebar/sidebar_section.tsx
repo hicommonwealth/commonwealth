@@ -137,10 +137,10 @@ export const SubSectionGroup = (props: SectionGroupAttrs) => {
         ) : (
           <div className="no-carat" />
         )}
+        <div className="left-icon">{rightIcon}</div>
         <CWText type="b2" className={`title-text ${titleTextClass}`}>
           {title}
         </CWText>
-        <div className="right-icon">{rightIcon}</div>
       </div>
       {containsChildren && toggled && (
         <div className="subsections">

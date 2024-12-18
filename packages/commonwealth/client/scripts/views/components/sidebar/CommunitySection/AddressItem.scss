@@ -1,0 +1,23 @@
+@import '../../../../styles/shared.scss';
+
+.AddressItem {
+  width: 180px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  .address {
+    width: 120px;
+    background-color: $neutral-200;
+    padding: 2px 8px;
+    border-radius: 6px;
+  }
+
+  .address-label {
+    color: $neutral-600;
+    font-size: 14px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+  }
+}
