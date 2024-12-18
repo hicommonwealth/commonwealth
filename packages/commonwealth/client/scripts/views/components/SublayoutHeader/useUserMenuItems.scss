@@ -1,0 +1,41 @@
+.language-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px;
+
+  .flag {
+    font-size: 16px;
+  }
+
+  .abbr {
+    font-size: 14px;
+    text-transform: uppercase;
+  }
+}
+
+.language-submenu-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px;
+
+  .flag {
+    font-size: 16px;
+  }
+
+  .abbr {
+    font-size: 14px;
+    text-transform: uppercase;
+  }
+
+  .name {
+    font-size: 14px;
+    color: var(--neutral-500);
+    margin-left: 4px;
+  }
+}
+
+.language-selector {
+  min-width: 180px;
+}

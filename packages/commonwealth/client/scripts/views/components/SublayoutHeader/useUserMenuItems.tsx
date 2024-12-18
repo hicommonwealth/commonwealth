@@ -40,6 +40,7 @@ import useAuthentication from '../../modals/AuthModal/useAuthentication';
 import { useCommunityStake } from '../CommunityStake';
 import UserMenuItem from './UserMenuItem';
 import useCheckAuthenticatedAddresses from './useCheckAuthenticatedAddresses';
+import './useUserMenuItems.scss';
 
 const resetWalletConnectSession = async () => {
   const walletConnectWallet = WebWalletController.Instance.getByName(
@@ -278,7 +279,9 @@ const useUserMenuItems = ({
             type: 'submenu' as const,
             label: (
               <div className="language-menu-item">
-                <span>{SUPPORTED_LANGUAGES[selectedLanguage].flag}</span>
+                <span className="flag">
+                  {SUPPORTED_LANGUAGES[selectedLanguage].flag}
+                </span>
                 <span className="abbr">
                   {SUPPORTED_LANGUAGES[selectedLanguage].abbr}
                 </span>

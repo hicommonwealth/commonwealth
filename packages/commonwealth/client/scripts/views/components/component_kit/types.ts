@@ -58,30 +58,10 @@ export enum ComponentType {
   SelectList = 'SelectList',
 }
 
-export type BaseMenuItem = {
-  label: string | JSX.Element;
-  type:
-    | 'default'
-    | 'header'
-    | 'divider'
-    | 'submenu'
-    | 'notification'
-    | 'community'
-    | 'component';
+export type MenuItem = {
+  type: 'default' | 'header' | 'divider' | 'submenu' | 'notification' | 'community' | 'component';
+  label?: string | JSX.Element;
   className?: string;
-  key?: string | number;
-};
-
-export type DividerMenuItem = BaseMenuItem & {
-  type: 'divider';
-};
-
-export type HeaderMenuItem = BaseMenuItem & {
-  type: 'header';
-};
-
-export type DefaultMenuItem = BaseMenuItem & {
-  type: 'default';
   disabled?: boolean;
   iconLeft?: IconName;
   iconLeftWeight?: 'fill' | 'bold';
@@ -92,35 +72,18 @@ export type DefaultMenuItem = BaseMenuItem & {
   preventClosing?: boolean;
   isButton?: boolean;
   selected?: boolean;
-};
-
-export type ComponentMenuItem = BaseMenuItem & {
-  type: 'component';
-  component: ReactNode;
-};
-
-export type NotificationMenuItem = BaseMenuItem & {
-  type: 'notification';
-  hasUnreads?: boolean;
-  iconLeft?: IconName;
-  iconRight?: IconName;
-  onClick?: (e?: React.MouseEvent<HTMLElement>) => void;
-};
-
-export type CommunityMenuItem = BaseMenuItem & {
-  type: 'community';
+  items?: MenuItem[]; // For submenu type
+  hasUnreads?: boolean; // For notification type
+  component?: ReactNode; // For component type
   community?: {
     id: string;
     name: string;
     iconUrl: string;
     isStarred: boolean;
-  };
+  }; // For community type
 };
 
-export type SubmenuMenuItem = BaseMenuItem & {
-  type: 'submenu';
-  items: MenuItem[];
-};
+export type PopoverMenuItem = MenuItem;
 
 export type DropdownItemType<T extends string | number = string | number> = {
   label: string | JSX.Element;
@@ -128,14 +91,3 @@ export type DropdownItemType<T extends string | number = string | number> = {
   selected?: boolean;
   className?: string;
 };
-
-export type PopoverMenuItem =
-  | DividerMenuItem
-  | HeaderMenuItem
-  | DefaultMenuItem
-  | ComponentMenuItem
-  | NotificationMenuItem
-  | CommunityMenuItem
-  | SubmenuMenuItem;
-
-export type MenuItem = PopoverMenuItem;

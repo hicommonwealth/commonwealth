@@ -38,15 +38,13 @@
     height: 100%;
 
     .language-selector {
-      max-width: 64px;
+      max-width: 72px;
       margin-right: 8px;
 
-      :global(.dropdown-item) {
-        display: flex;
-        align-items: center;
-        gap: 4px;
-        font-size: 12px;
-        padding: 4px 8px;
+      :global(.dropdown-trigger) {
+        padding: 4px;
+        min-height: 32px;
+        border-radius: 4px;
 
         .flag-abbr {
           display: flex;
@@ -55,6 +53,36 @@
 
           .abbr {
             font-size: 12px;
+            font-weight: 500;
+            text-transform: uppercase;
+            color: $neutral-600;
+          }
+        }
+      }
+
+      :global(.dropdown-menu) {
+        min-width: 72px;
+        max-width: 72px;
+        padding: 4px;
+        margin-top: 4px;
+      }
+
+      :global(.dropdown-item) {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 12px;
+        padding: 4px;
+        border-radius: 4px;
+
+        .flag-abbr {
+          display: flex;
+          align-items: center;
+          gap: 4px;
+
+          .abbr {
+            font-size: 12px;
+            font-weight: 500;
             text-transform: uppercase;
             color: $neutral-600;
           }
@@ -62,6 +90,11 @@
 
         &:hover {
           background-color: $neutral-50;
+        }
+
+        &.selected {
+          background-color: $neutral-100;
+          font-weight: 600;
         }
       }
     }
