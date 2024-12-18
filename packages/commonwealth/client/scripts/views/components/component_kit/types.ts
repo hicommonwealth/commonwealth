@@ -77,7 +77,6 @@ export type DefaultMenuItem = {
   iconLeftWeight?: 'fill' | 'bold';
   iconLeftSize?: IconSize;
   iconRight?: IconName;
-  iconRightWeight?: 'fill' | 'bold';
   isSecondary?: boolean;
   label?: string | JSX.Element;
   onClick?: (e?: React.MouseEvent<HTMLElement>) => void;
@@ -119,9 +118,9 @@ export type SubmenuMenuItem = {
   items: MenuItem[];
 };
 
-export type DropdownItemType = {
+export type DropdownItemType<T = string> = {
   label: string | JSX.Element;
-  value: SupportedLanguage;
+  value: T;
   selected?: boolean;
 };
 

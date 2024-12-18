@@ -30,18 +30,22 @@ import {
   useManageCommunityStakeModalStore,
 } from 'state/ui/modals';
 import useUserStore from 'state/ui/user';
-import { PopoverMenuItem } from 'views/components/component_kit/CWPopoverMenu';
 import {
   CWToggle,
   toggleDarkMode,
 } from 'views/components/component_kit/cw_toggle';
 import CWIconButton from 'views/components/component_kit/new_designs/CWIconButton';
+import { MenuItem } from 'views/components/component_kit/types';
 import useAuthentication from '../../modals/AuthModal/useAuthentication';
 import { useCommunityStake } from '../CommunityStake';
 import UserMenuItem from './UserMenuItem';
 import useCheckAuthenticatedAddresses from './useCheckAuthenticatedAddresses';
 
-type SubmenuItem = SubmenuMenuItem;
+type SubmenuItem = {
+  type: 'submenu';
+  label: string | JSX.Element;
+  items: MenuItem[];
+};
 
 const resetWalletConnectSession = async () => {
   /**

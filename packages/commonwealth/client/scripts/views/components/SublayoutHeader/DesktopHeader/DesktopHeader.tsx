@@ -3,7 +3,10 @@ import React from 'react';
 
 import { useFlag } from 'hooks/useFlag';
 import { useCommonNavigate } from 'navigation/helpers';
-import { SUPPORTED_LANGUAGES } from 'state/ui/language/constants';
+import {
+  SUPPORTED_LANGUAGES,
+  SupportedLanguage,
+} from 'state/ui/language/constants';
 import useLanguageStore from 'state/ui/language/language';
 import useSidebarStore from 'state/ui/sidebar';
 import KnockNotifications from 'views/components/KnockNotifications';
@@ -46,18 +49,18 @@ const DesktopHeader = ({ onMobile, onAuthModalOpen }: DesktopHeaderProps) => {
     }, 200);
   };
 
-  const languageOptions = Object.entries(SUPPORTED_LANGUAGES).map(
-    ([code, lang]) => ({
-      label: (
-        <div className="flag-abbr">
-          <span>{lang.flag}</span>
-          <span className="abbr">{lang.abbr}</span>
-        </div>
-      ),
-      value: code as SupportedLanguage,
-      selected: selectedLanguage === code,
-    }),
-  );
+  const languageOptions: DropdownItemType<SupportedLanguage>[] = Object.entries(
+    SUPPORTED_LANGUAGES,
+  ).map(([code, lang]) => ({
+    label: (
+      <div className="flag-abbr">
+        <span>{lang.flag}</span>
+        <span className="abbr">{lang.abbr}</span>
+      </div>
+    ),
+    value: code as SupportedLanguage,
+    selected: selectedLanguage === code,
+  }));
 
   return (
     <div className="DesktopHeader">
