@@ -188,7 +188,7 @@
     "ethereumjs-util": "7.1.0",
     "ethereumjs-wallet": "^1.0.2",
     "ethers": "5.7.2",
-    "express": "^4.20.0",
+    "express": "^4.21.2",
     "express-async-errors": "^3.1.1",
     "express-http-to-https": "^1.1.4",
     "express-rate-limit": "^7.4.0",
