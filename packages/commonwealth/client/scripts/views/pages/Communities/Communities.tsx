@@ -228,7 +228,7 @@ const CommunitiesPage = () => {
               type="h1"
               {...(tokenizedCommunityEnabled && { fontWeight: 'semiBold' })}
             >
-              Explore {tokenizedCommunityEnabled ? '' : 'Communities'}
+              Explore
             </CWText>
             {isWindowSmallInclusive ? communitiesCount : <></>}
             <div className="actions">
