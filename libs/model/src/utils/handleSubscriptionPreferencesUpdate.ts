@@ -25,30 +25,15 @@ function getDifferences(
 
 export async function handleSubscriptionPreferencesUpdate({
   userIdentifier,
-  isUnsubscribe = false,
   payload,
 }: {
-  userIdentifier: number | string;
-  isUnsubscribe: boolean;
+  userIdentifier: number;
   payload: Partial<z.infer<typeof SubscriptionPreference>>;
 }) {
-  let user;
-  if (isUnsubscribe) {
-    user = await models.User.findOne({
-      where: { unsubscribe_uuid: userIdentifier },
-    });
-  } else {
-    user = await models.User.findOne({
-      where: { id: userIdentifier },
-    });
-  }
-
-  mustExist('User', user);
-
   const existingPreferences: z.infer<typeof SubscriptionPreference> | null =
     await models.SubscriptionPreference.findOne({
       where: {
-        user_id: user.id,
+        user_id: userIdentifier,
       },
       raw: true,
     });
@@ -62,7 +47,7 @@ export async function handleSubscriptionPreferencesUpdate({
   let result;
   await models.sequelize.transaction(async (transaction) => {
     result = await models.SubscriptionPreference.update(payload, {
-      where: { user_id: user.id },
+      where: { user_id: userIdentifier },
       returning: true,
       transaction,
     });

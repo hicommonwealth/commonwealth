@@ -12,7 +12,6 @@ export function UpdateSubscriptionPreferences(): Command<
     body: async ({ payload, actor }) => {
       return await handleSubscriptionPreferencesUpdate({
         userIdentifier: Number(actor.user.id),
-        isUnsubscribe: false,
         payload,
       });
     },
