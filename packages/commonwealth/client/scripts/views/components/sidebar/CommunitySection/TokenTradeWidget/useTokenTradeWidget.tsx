@@ -35,29 +35,35 @@ export const useTokenTradeWidget = () => {
         !!(communityPinnedToken?.contract_address || '') &&
         tokenizedCommunityEnabled,
     });
-  const communityPinnedTokenWithMetadata = {
-    ...communityPinnedToken,
-    ...tokenMetadata,
-  };
+  const communityPinnedTokenWithMetadata =
+    communityPinnedToken && tokenMetadata
+      ? {
+          ...communityPinnedToken,
+          ...tokenMetadata,
+        }
+      : null;
 
   const isLoadingToken =
     isLoadingLaunchpadToken ||
     (isLoadingPinnedToken && !communityLaunchpadToken) ||
     (isLoadingTokenMetadata && communityPinnedToken);
 
-  const communityToken: LaunchpadToken | ExternalToken = communityLaunchpadToken
-    ? ({
-        ...communityLaunchpadToken,
-        community_id: communityId,
-      } as LaunchpadToken)
-    : ({
-        ...communityPinnedTokenWithMetadata,
-        logo:
-          communityPinnedTokenWithMetadata.logo ||
-          // TODO: points to common logo, adding this here as a fallback in
-          // case token metadata from alchemy doesn't include a token icon.
-          'https://assets.commonwealth.im/b531c73a-eb29-4348-96af-db1114346f90.jpeg',
-      } as ExternalToken);
+  const communityToken: LaunchpadToken | ExternalToken | undefined =
+    communityLaunchpadToken
+      ? ({
+          ...communityLaunchpadToken,
+          community_id: communityId,
+        } as LaunchpadToken)
+      : communityPinnedTokenWithMetadata
+        ? ({
+            ...communityPinnedTokenWithMetadata,
+            logo:
+              communityPinnedTokenWithMetadata.logo ||
+              // TODO: points to common logo, adding this here as a fallback in
+              // case token metadata from alchemy doesn't include a token icon.
+              'https://assets.commonwealth.im/b531c73a-eb29-4348-96af-db1114346f90.jpeg',
+          } as ExternalToken)
+        : undefined;
 
   return {
     isLoadingToken,

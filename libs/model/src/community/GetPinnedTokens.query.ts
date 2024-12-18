@@ -38,7 +38,7 @@ export function GetPinnedTokens(): Query<typeof schemas.GetPinnedTokens> {
       ).map((t) => t.get({ plain: true }));
 
       let prices: Awaited<ReturnType<typeof alchemyGetTokenPrices>> | undefined;
-      if (with_price) {
+      if (with_price && tokens.length > 0) {
         prices = await alchemyGetTokenPrices({
           alchemyApiKey: config.ALCHEMY.APP_KEYS.PRIVATE,
           tokenSources: tokens.map((t) => ({
@@ -59,7 +59,7 @@ export function GetPinnedTokens(): Query<typeof schemas.GetPinnedTokens> {
         }
       }
 
-      const finalTokens = tokens.map((t) => {
+      const finalTokens = (tokens || []).map((t) => {
         const temp: z.infer<typeof schemas.PinnedTokenWithPrices> = { ...t };
         if (!with_chain_node) {
           delete temp.ChainNode;

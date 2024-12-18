@@ -56,12 +56,13 @@ export const TokenTradeWidget = ({
   const ethToUsdRate = parseFloat(
     ethToCurrencyRateData?.data?.data?.amount || '0',
   );
-  const tokenPricing = !isPinnedToken
-    ? calculateTokenPricing(
-        communityToken as z.infer<typeof TokenView>,
-        ethToUsdRate,
-      )
-    : null;
+  const tokenPricing =
+    !isPinnedToken && communityToken
+      ? calculateTokenPricing(
+          communityToken as z.infer<typeof TokenView>,
+          ethToUsdRate,
+        )
+      : null;
 
   const openAuthModalOrTriggerCallback = () => {
     if (user.isLoggedIn) {
@@ -86,9 +87,11 @@ export const TokenTradeWidget = ({
     });
   };
 
-  if (isLoadingToken || isLoadingETHToCurrencyRate || !communityToken) {
+  if (isLoadingToken || isLoadingETHToCurrencyRate) {
     return <TokenTradeWidgetSkeleton />;
   }
+
+  if (!communityToken) return;
 
   return (
     <section className="TokenTradeWidget">
