@@ -33,6 +33,7 @@ import {
   CreateCommentErrors,
   CreateCommentReaction,
   DeleteComment,
+  GetComments,
   MAX_COMMENT_DEPTH,
   UpdateComment,
 } from '../../src/comment';
@@ -844,6 +845,44 @@ describe('Thread lifecycle', () => {
           },
         }),
       ).rejects.toThrowError(InvalidActor);
+    });
+
+    test('should get comments', async () => {
+      await command(CreateComment(), {
+        actor: actors.admin,
+        payload: {
+          parent_msg_id: thread!.canvas_msg_id,
+          thread_id: thread.id!,
+          body: 'hello',
+        },
+      });
+      await command(CreateComment(), {
+        actor: actors.member,
+        payload: {
+          parent_msg_id: thread!.canvas_msg_id,
+          thread_id: thread.id!,
+          body: 'world',
+        },
+      });
+      const response = await query(GetComments(), {
+        actor: actors.member,
+        payload: {
+          limit: 50,
+          cursor: 1,
+          thread_id: thread.id!,
+          include_user: true,
+          include_reactions: false,
+        },
+      });
+      expect(response!.results.length).to.equal(15);
+      const last = response!.results.at(-1)!;
+      const stl = response!.results.at(-2)!;
+      expect(last!.Address?.address).to.equal(actors.member.address);
+      expect(last!.Address?.User?.id).to.equal(actors.member.user.id);
+      expect(last!.body).to.equal('world');
+      expect(stl!.Address?.address).to.equal(actors.admin.address);
+      expect(stl!.Address?.User?.id).to.equal(actors.admin.user.id);
+      expect(stl!.body).to.equal('hello');
     });
   });
 
