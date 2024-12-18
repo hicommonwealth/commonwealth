@@ -38,7 +38,7 @@
     height: 100%;
 
     .language-selector {
-      max-width: 48px;
+      max-width: 64px;
       margin-right: 8px;
 
       :global(.dropdown-item) {
@@ -55,8 +55,13 @@
 
           .abbr {
             font-size: 12px;
+            text-transform: uppercase;
             color: $neutral-600;
           }
+        }
+
+        &:hover {
+          background-color: $neutral-50;
         }
       }
     }

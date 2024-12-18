@@ -1,9 +1,8 @@
 import { IconName } from 'views/components/component_kit/cw_icons/cw_icon_lookup';
-
-import { NavigationButtonProps } from '../NavigationButton';
+import { NavigationButtonType } from './NavigationButton';
 
 export const typeToIconAndName = (
-  type: NavigationButtonProps['type'],
+  type: NavigationButtonType,
 ): [IconName, string] => {
   switch (type) {
     case 'home':

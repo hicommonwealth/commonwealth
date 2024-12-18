@@ -59,79 +59,84 @@ export enum ComponentType {
   SelectList = 'SelectList',
 }
 
-export type BaseStyleProps = {
-  disabled?: boolean;
+export type BaseMenuItem = {
+  label: string | JSX.Element;
+  type:
+    | 'default'
+    | 'header'
+    | 'divider'
+    | 'submenu'
+    | 'notification'
+    | 'community'
+    | 'component';
   className?: string;
+  key?: string | number;
 };
 
-export type DividerMenuItem = { type: 'divider'; className?: string };
+export type DividerMenuItem = BaseMenuItem & {
+  type: 'divider';
+};
 
-export type HeaderMenuItem = {
+export type HeaderMenuItem = BaseMenuItem & {
   type: 'header';
-  label?: string | JSX.Element;
-  className?: string;
 };
 
-export type DefaultMenuItem = {
-  type?: 'default';
+export type DefaultMenuItem = BaseMenuItem & {
+  type: 'default';
   disabled?: boolean;
   iconLeft?: IconName;
   iconLeftWeight?: 'fill' | 'bold';
   iconLeftSize?: IconSize;
   iconRight?: IconName;
   isSecondary?: boolean;
-  label: string | JSX.Element;
   onClick?: (e?: React.MouseEvent<HTMLElement>) => void;
-  className?: string;
   preventClosing?: boolean;
   isButton?: boolean;
   selected?: boolean;
 };
 
-export type ComponentMenuItem = {
-  type: 'element';
-  element: ReactNode;
+export type ComponentMenuItem = BaseMenuItem & {
+  type: 'component';
+  component: ReactNode;
 };
 
-type NotificationMenuItem = {
+export type NotificationMenuItem = BaseMenuItem & {
+  type: 'notification';
   hasUnreads?: boolean;
   iconLeft?: IconName;
   iconRight?: IconName;
-  label?: string | JSX.Element;
   onClick?: (e?: React.MouseEvent<HTMLElement>) => void;
-  type?: 'notification';
 };
 
-export type CommunityMenuItem = {
+export type CommunityMenuItem = BaseMenuItem & {
+  type: 'community';
   community?: {
     id: string;
     name: string;
     iconUrl: string;
     isStarred: boolean;
   };
-  label?: string | JSX.Element;
-  type?: 'community';
 };
 
-export type SubmenuMenuItem = {
+export type SubmenuMenuItem = BaseMenuItem & {
   type: 'submenu';
-  label: string | JSX.Element;
-  items: (DefaultMenuItem | DividerMenuItem | HeaderMenuItem)[];
+  items: MenuItem[];
 };
 
-export type DropdownItemType<T = SupportedLanguage> = {
+export type DropdownItemType<T extends string | number = SupportedLanguage> = {
   label: string | JSX.Element;
   value: T;
   selected?: boolean;
+  className?: string;
 };
 
 export type PopoverMenuItem =
-  | (DividerMenuItem & { label: string | JSX.Element })
-  | (HeaderMenuItem & { label: string | JSX.Element })
-  | (DefaultMenuItem & { label: string | JSX.Element })
-  | (NotificationMenuItem & { label: string | JSX.Element })
-  | (CommunityMenuItem & { label: string | JSX.Element })
-  | (ComponentMenuItem & { label: string | JSX.Element })
-  | (SubmenuMenuItem & { label: string | JSX.Element });
+  | DividerMenuItem
+  | HeaderMenuItem
+  | DefaultMenuItem
+  | ComponentMenuItem
+  | NotificationMenuItem
+  | CommunityMenuItem
+  | SubmenuMenuItem;
 
 export type MenuItem = PopoverMenuItem;
