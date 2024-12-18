@@ -35,11 +35,7 @@ import {
   toggleDarkMode,
 } from 'views/components/component_kit/cw_toggle';
 import CWIconButton from 'views/components/component_kit/new_designs/CWIconButton';
-import {
-  DividerMenuItem,
-  PopoverMenuItem,
-  SubmenuMenuItem,
-} from 'views/components/component_kit/types';
+import { PopoverMenuItem } from 'views/components/component_kit/types';
 import useAuthentication from '../../modals/AuthModal/useAuthentication';
 import { useCommunityStake } from '../CommunityStake';
 import UserMenuItem from './UserMenuItem';
@@ -302,8 +298,9 @@ const useUserMenuItems = ({
                 className: 'language-submenu-item',
               }),
             ),
-          } as SubmenuMenuItem,
-          { type: 'divider' } as DividerMenuItem,
+            className: 'language-menu',
+          },
+          { type: 'divider' as const },
         ]
       : []),
     ...(hasMagic
