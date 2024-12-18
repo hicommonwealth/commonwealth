@@ -85,6 +85,7 @@ export type DefaultMenuItem = {
   className?: string;
   preventClosing?: boolean;
   isButton?: boolean;
+  selected?: boolean;
 };
 
 export type ComponentMenuItem = {
@@ -110,6 +111,12 @@ export type CommunityMenuItem = {
   };
   label?: string | JSX.Element;
   type?: 'community';
+};
+
+export type DropdownItemType = {
+  label: string | JSX.Element;
+  value: string;
+  selected?: boolean;
 };
 
 export type MenuItem =

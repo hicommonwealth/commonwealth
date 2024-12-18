@@ -1,13 +1,13 @@
 import { z } from 'zod';
 
 export const SUPPORTED_LANGUAGES = {
-  'en-us': { name: 'English (U.S.)', flag: '🇺🇸' },
-  'ru-ru': { name: 'Russian', flag: '🇷🇺' },
-  'uk-ua': { name: 'Ukrainian', flag: '🇺🇦' },
-  'zh-cn': { name: 'Chinese (Simplified)', flag: '🇨🇳' },
-  'hi-in': { name: 'Hindi', flag: '🇮🇳' },
-  'de-de': { name: 'German', flag: '🇩🇪' },
-  'tr-tr': { name: 'Turkish', flag: '🇹🇷' },
+  'en-us': { name: 'English (U.S.)', flag: '🇺🇸', abbr: 'EN' },
+  'ru-ru': { name: 'Russian', flag: '🇷🇺', abbr: 'RU' },
+  'uk-ua': { name: 'Ukrainian', flag: '🇺🇦', abbr: 'UA' },
+  'zh-cn': { name: 'Chinese (Simplified)', flag: '🇨🇳', abbr: 'CN' },
+  'hi-in': { name: 'Hindi', flag: '🇮🇳', abbr: 'HI' },
+  'de-de': { name: 'German', flag: '🇩🇪', abbr: 'DE' },
+  'tr-tr': { name: 'Turkish', flag: '🇹🇷', abbr: 'TR' },
 } as const;
 
 export type SupportedLanguage = keyof typeof SUPPORTED_LANGUAGES;
