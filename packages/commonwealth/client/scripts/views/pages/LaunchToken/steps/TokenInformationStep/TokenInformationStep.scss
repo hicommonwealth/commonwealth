@@ -1,0 +1,24 @@
+@import '../../../../../styles/shared';
+
+$form-width: 596px;
+
+.TokenInformationStep {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  position: relative;
+
+  .header {
+    margin-top: 8px;
+    width: 100%;
+
+    .description {
+      color: $neutral-500;
+    }
+  }
+
+  @include smallInclusive {
+    flex-direction: column;
+    gap: 16px;
+  }
+}

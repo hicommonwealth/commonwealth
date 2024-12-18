@@ -1,13 +1,15 @@
+import { trpc } from 'client/scripts/utils/trpcClient';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import 'pages/AdminPanel.scss';
 import React, { useState } from 'react';
 import { CWText } from '../../components/component_kit/cw_text';
 import { openConfirmation } from '../../modals/confirmation_modal';
+import './AdminPanel.scss';
 import CommunityFinder from './CommunityFinder';
-import { deleteCommunity } from './utils';
 
 const DeleteCommunityTask = () => {
   const [componentKey, setComponentKey] = useState(1);
+  const { mutateAsync: deleteCommunity } =
+    trpc.community.deleteCommunity.useMutation();
 
   const openConfirmationModal = (communityIdToDelete: string) => {
     openConfirmation({
@@ -23,12 +25,11 @@ const DeleteCommunityTask = () => {
           buttonHeight: 'sm',
           onClick: async () => {
             try {
-              await deleteCommunity({ id: communityIdToDelete });
+              await deleteCommunity({ community_id: communityIdToDelete });
               setComponentKey((key) => key + 1);
               notifySuccess('Community deleted');
             } catch (e) {
               notifyError('Error deleting community');
-
               console.error(e);
             }
           },

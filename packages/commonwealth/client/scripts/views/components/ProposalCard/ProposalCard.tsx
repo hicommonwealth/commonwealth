@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 
-import 'components/ProposalCard/ProposalCard.scss';
 import { getProposalUrlPath } from 'identifiers';
 import type { AnyProposal } from '../../../models/types';
+import './ProposalCard.scss';
 
 import { slugify } from '@hicommonwealth/shared';
 import { useCommonNavigate } from 'navigation/helpers';

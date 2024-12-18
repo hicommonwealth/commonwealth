@@ -9,7 +9,6 @@ const SignInModal = ({
   showWalletsFor,
   showAuthOptionFor,
   onSignInClick,
-  onChangeModalType,
 }: ModalVariantProps) => {
   return (
     <ModalBase
@@ -21,7 +20,6 @@ const SignInModal = ({
       showAuthOptionFor={showAuthOptionFor}
       bodyClassName="SignInModal"
       onSignInClick={onSignInClick}
-      onChangeModalType={onChangeModalType}
     />
   );
 };

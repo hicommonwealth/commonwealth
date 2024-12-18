@@ -12,14 +12,9 @@ export const syncDb = async (db: DB, log = false) => {
   const fks = Object.keys(Factories).flatMap(
     (k) => db[k as keyof typeof Factories]._fks,
   );
-  // eslint-disable-next-line @typescript-eslint/no-misused-promises
-  fks.forEach((fk) => dropFk(db.sequelize, fk));
-  await db.sequelize.sync({
-    force: true,
-    logging: log ? console.log : false,
-  });
-  // eslint-disable-next-line @typescript-eslint/no-misused-promises
-  fks.forEach((fk) => createFk(db.sequelize, fk));
+  await db.sequelize.query(fks.map(dropFk).join('\n'));
+  await db.sequelize.sync({ force: true, logging: log ? console.log : false });
+  await db.sequelize.query(fks.map(createFk).join('\n'));
 };
 
 /**
@@ -44,27 +39,23 @@ export const buildDb = (sequelize: Sequelize): DB => {
 
 // TODO: avoid legacy exports to /packages/commonwealth/server (keep db models encapsulated behind DB)
 export * from './address';
+export * from './api_key';
 export * from './chain_node';
 export * from './collaboration';
 export * from './comment';
 export * from './comment_subscriptions';
 export * from './comment_version_history';
 export * from './community';
-export * from './community_contract';
 export * from './community_role';
 export * from './community_stake';
 export * from './community_tags';
-export * from './contract';
-export * from './contract_abi';
 export * from './discord_bot_config';
 export * from './email_update_token';
 export * from './evmEventSource';
 export * from './group';
 export * from './lastProcessedEvmBlock';
+export * from './launchpad_trade';
 export * from './membership';
-export * from './notification';
-export * from './notification_category';
-export * from './notifications_read';
 export * from './outbox';
 export * from './poll';
 export * from './profile_tags';
@@ -74,7 +65,7 @@ export * from './role_assignment';
 export * from './sso_token';
 export * from './stake_transaction';
 export * from './starred_community';
-export * from './subscription';
+export * from './subscription_preference';
 export * from './tags';
 export * from './thread';
 export * from './thread_version_history';

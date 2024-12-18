@@ -1,60 +1,56 @@
 import { toCanvasSignedDataApiArgs } from '@hicommonwealth/shared';
-import { useMutation } from '@tanstack/react-query';
-import axios, { AxiosError } from 'axios';
+import { AxiosError } from 'axios';
 import { notifyError } from 'client/scripts/controllers/app/notifications';
+import { trpc } from 'client/scripts/utils/trpcClient';
 import { signThreadReaction } from 'controllers/server/sessions';
 import app from 'state';
-import { SERVER_URL } from 'state/api/config';
 import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
 import { UserTrainingCardTypes } from 'views/components/UserTrainingSlider/types';
 import { useAuthModalStore } from '../../ui/modals';
 import useUserStore, { userStore } from '../../ui/user';
 import { updateThreadInAllCaches } from './helpers/cache';
 
-interface IuseCreateThreadReactionMutation {
+interface IUseCreateThreadReactionMutation {
   threadId: number;
+  threadMsgId: string;
   communityId: string;
 }
-interface CreateReactionProps extends IuseCreateThreadReactionMutation {
+interface CreateReactionProps extends IUseCreateThreadReactionMutation {
   address: string;
   reactionType?: 'like';
-  isPWA?: boolean;
 }
 
-const createReaction = async ({
+export const buildCreateThreadReactionInput = async ({
   address,
   reactionType = 'like',
   threadId,
-  isPWA,
+  threadMsgId,
 }: CreateReactionProps) => {
   const canvasSignedData = await signThreadReaction(address, {
-    thread_id: threadId,
+    thread_id: threadMsgId ?? null,
     like: reactionType === 'like',
   });
-
-  return await axios.post(
-    `${SERVER_URL}/threads/${threadId}/reactions`,
-    {
-      author_community_id: userStore.getState().activeAccount?.community?.id,
-      thread_id: threadId,
-      community_id: app.chain.id,
-      address,
-      reaction: reactionType,
-      jwt: userStore.getState().jwt,
-      ...toCanvasSignedDataApiArgs(canvasSignedData),
-    },
-    {
-      headers: {
-        isPWA: isPWA?.toString(),
-      },
-    },
-  );
+  return {
+    author_community_id: userStore.getState().activeAccount?.community?.id,
+    thread_id: threadId,
+    thread_msg_id: threadMsgId ?? null,
+    community_id: app.chain.id,
+    address,
+    reaction: reactionType,
+    jwt: userStore.getState().jwt,
+    ...toCanvasSignedDataApiArgs(canvasSignedData),
+  };
 };
 
 const useCreateThreadReactionMutation = ({
   communityId,
   threadId,
-}: IuseCreateThreadReactionMutation) => {
+  currentReactionCount,
+  currentReactionWeightsSum,
+}: IUseCreateThreadReactionMutation & {
+  currentReactionCount: number;
+  currentReactionWeightsSum: string;
+}) => {
   const { markTrainingActionAsComplete } =
     useUserOnboardingSliderMutationStore();
 
@@ -62,15 +58,14 @@ const useCreateThreadReactionMutation = ({
 
   const user = useUserStore();
 
-  return useMutation({
-    mutationFn: createReaction,
-    onSuccess: async (response) => {
+  return trpc.thread.createThreadReaction.useMutation({
+    onSuccess: (newReaction) => {
       const reaction: any = {
-        id: response.data.result.id,
-        address: response.data.result.Address.address,
+        id: newReaction.id,
+        address: newReaction.Address!.address,
         type: 'like',
-        updated_at: response.data.result.updated_at,
-        voting_weight: response.data.result.calculated_voting_weight || 0,
+        updated_at: newReaction.updated_at,
+        voting_weight: newReaction.calculated_voting_weight || 0,
       };
       updateThreadInAllCaches(
         communityId,
@@ -78,6 +73,13 @@ const useCreateThreadReactionMutation = ({
         { associatedReactions: [reaction] },
         'combineAndRemoveDups',
       );
+      updateThreadInAllCaches(communityId, threadId, {
+        reactionCount: currentReactionCount + 1,
+        reactionWeightsSum: `${
+          parseInt(currentReactionWeightsSum) +
+          parseInt(newReaction.calculated_voting_weight || `0`)
+        }`,
+      });
 
       const userId = user.addresses?.[0]?.profile?.userId;
       userId &&

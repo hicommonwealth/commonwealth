@@ -1,75 +1,195 @@
-import { useCommonNavigate } from 'navigation/helpers';
+import { TopicWeightedVoting } from '@hicommonwealth/schemas';
 import React, { useState } from 'react';
-import FeatureHint from 'views/components/FeatureHint';
-import { CWText } from 'views/components/component_kit/cw_text';
+
+import app from 'state';
+import CWFormSteps from 'views/components/component_kit/new_designs/CWFormSteps';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
-import {
-  CWTab,
-  CWTabsRow,
-} from 'views/components/component_kit/new_designs/CWTabs';
-import CreateTopicSection from './CreateTopicsSection';
-import ManageTopicsSection from './ManageTopicsSection';
+import StakeIntegration from 'views/pages/CommunityManagement/StakeIntegration';
+
+import CommunityStakeStep from '../../CreateCommunity/steps/CommunityStakeStep';
+import TopicDetails from './TopicDetails';
+import WVConsent from './WVConsent';
+import WVERC20Details from './WVERC20Details';
+import WVMethodSelection from './WVMethodSelection';
+import { CreateTopicStep, getCreateTopicSteps } from './utils';
+
+import { notifyError } from 'controllers/app/notifications';
+import { useCommonNavigate } from 'navigation/helpers';
+import { useGetCommunityByIdQuery } from 'state/api/communities';
+import { useCreateTopicMutation } from 'state/api/topics';
+import useUserStore from 'state/ui/user';
+
+import Permissions from 'client/scripts/utils/Permissions';
+import { PageNotFound } from '../../404';
 import './Topics.scss';
 
-const TABS = [
-  { value: 'create-topic', label: 'Create Topic' },
-  { value: 'manage-topics', label: 'Manage Topics' },
-];
+interface TopicFormRegular {
+  name: string;
+  description?: string;
+  featuredInSidebar?: boolean;
+  featuredInNewPost?: boolean;
+  newPostTemplate?: string;
+}
+
+export interface TopicFormERC20 {
+  tokenAddress?: string;
+  tokenSymbol?: string;
+  voteWeightMultiplier?: number;
+  chainNodeId?: number;
+  weightedVoting?: TopicWeightedVoting | null;
+}
+
+export interface TopicFormStake {
+  weightedVoting?: TopicWeightedVoting | null;
+}
+
+export type HandleCreateTopicProps = {
+  erc20?: TopicFormERC20;
+  stake?: TopicFormStake;
+};
+
+export interface TopicForm extends TopicFormRegular, TopicFormERC20 {}
 
 export const Topics = () => {
-  const navigate = useCommonNavigate();
-  const [selectedTab, setSelectedTab] = useState(TABS[0].value);
+  const [topicFormData, setTopicFormData] = useState<TopicForm | null>(null);
+  const [createTopicStep, setCreateTopicStep] = useState(
+    CreateTopicStep.TopicDetails,
+  );
 
-  const updateActiveTab = (activeTab: string) => {
-    const params = new URLSearchParams();
-    params.set('tab', activeTab);
-    navigate(`${window.location.pathname}?${params.toString()}`, {}, null);
-    setSelectedTab(activeTab);
+  const navigate = useCommonNavigate();
+  const { mutateAsync: createTopic } = useCreateTopicMutation();
+
+  const { data: community } = useGetCommunityByIdQuery({
+    id: app.activeChainId() || '',
+    includeNodeInfo: true,
+  });
+
+  const user = useUserStore();
+
+  const selectedAddress = user.addresses.find(
+    (x) =>
+      x.address === user.activeAccount?.address &&
+      x.community?.id === community?.id,
+  );
+
+  const handleSetTopicFormData = (data: Partial<TopicForm>) => {
+    setTopicFormData((prevState) => ({ ...prevState, ...data }));
+  };
+
+  if (
+    !user.isLoggedIn ||
+    !(Permissions.isSiteAdmin() || Permissions.isCommunityAdmin())
+  ) {
+    return <PageNotFound />;
+  }
+
+  const handleCreateTopic = async ({
+    erc20,
+    stake,
+  }: HandleCreateTopicProps) => {
+    if (!topicFormData) {
+      return;
+    }
+
+    try {
+      await createTopic({
+        name: topicFormData.name,
+        description: topicFormData.description,
+        featured_in_sidebar: topicFormData.featuredInSidebar || false,
+        featured_in_new_post: topicFormData.featuredInNewPost || false,
+        default_offchain_template: topicFormData.newPostTemplate || '',
+        community_id: app.activeChainId() || '',
+        ...(erc20
+          ? {
+              token_address: erc20.tokenAddress,
+              token_symbol: erc20.tokenSymbol,
+              vote_weight_multiplier: erc20.voteWeightMultiplier,
+              chain_node_id: erc20.chainNodeId,
+              weighted_voting: erc20.weightedVoting,
+            }
+          : {}),
+        ...(stake
+          ? {
+              weighted_voting: stake.weightedVoting,
+            }
+          : {}),
+      });
+
+      navigate(`/discussions/${encodeURI(topicFormData.name.trim())}`);
+    } catch (err) {
+      notifyError('Failed to create topic');
+      console.error(err);
+    }
+  };
+
+  const goToMethodSelectionStep = () => {
+    setCreateTopicStep(CreateTopicStep.WVMethodSelection);
+  };
+
+  const getCurrentStep = () => {
+    switch (createTopicStep) {
+      case CreateTopicStep.TopicDetails:
+        return (
+          <TopicDetails
+            onStepChange={setCreateTopicStep}
+            onSetTopicFormData={handleSetTopicFormData}
+            topicFormData={topicFormData}
+          />
+        );
+      case CreateTopicStep.WVConsent:
+        return (
+          <WVConsent
+            onStepChange={setCreateTopicStep}
+            onCreateTopic={handleCreateTopic}
+          />
+        );
+      case CreateTopicStep.WVMethodSelection:
+        return (
+          <WVMethodSelection
+            onStepChange={setCreateTopicStep}
+            hasNamespace={!!community?.namespace}
+          />
+        );
+      case CreateTopicStep.WVNamespaceEnablement:
+        return (
+          <CommunityStakeStep
+            createdCommunityName={community?.name}
+            createdCommunityId={community?.id || ''}
+            selectedAddress={selectedAddress!}
+            chainId={String(community?.ChainNode?.eth_chain_id)}
+            onlyNamespace
+            isTopicFlow
+            onEnableStakeStepCancel={goToMethodSelectionStep}
+            onSignTransactionsStepReserveNamespaceSuccess={() =>
+              setCreateTopicStep(CreateTopicStep.WVERC20Details)
+            }
+            onSignTransactionsStepCancel={goToMethodSelectionStep}
+          />
+        );
+      case CreateTopicStep.WVERC20Details:
+        return (
+          <WVERC20Details
+            onStepChange={setCreateTopicStep}
+            onCreateTopic={handleCreateTopic}
+          />
+        );
+      case CreateTopicStep.WVStake:
+        return (
+          <StakeIntegration
+            isTopicFlow
+            onTopicFlowStepChange={setCreateTopicStep}
+            onCreateTopic={handleCreateTopic}
+          />
+        );
+    }
   };
 
   return (
     <CWPageLayout>
-      <div className="TopicsPage">
-        <header>
-          <CWText type="h2">Topics</CWText>
-          <CWText type="b1" className="subheader">
-            Create topics and sub-topics, and rearrange them in the sidebar
-          </CWText>
-        </header>
-        <div className="content-container">
-          <main>
-            <CWTabsRow>
-              {TABS.map((tab, index) => (
-                <CWTab
-                  key={index}
-                  label={tab.label}
-                  onClick={() => updateActiveTab(tab.value)}
-                  isSelected={selectedTab === tab.value}
-                />
-              ))}
-            </CWTabsRow>
-            {selectedTab === TABS[0].value ? (
-              <CreateTopicSection />
-            ) : (
-              <ManageTopicsSection />
-            )}
-          </main>
-          <aside>
-            {selectedTab === TABS[0].value ? (
-              <FeatureHint
-                title="Topics and Subtopics"
-                hint="Top level topics can act as parents to subtopics. Subtopics can not have additional subtopics."
-              />
-            ) : (
-              <FeatureHint
-                title="Topic Sorting"
-                hint="Drag the topics on the left to the order you want them to appear
-            on the side panel navigation of your community page. Tap the pencil
-            icon to edit the topic or delete the topic."
-              />
-            )}
-          </aside>
-        </div>
+      <div className="Topics">
+        <CWFormSteps steps={getCreateTopicSteps(createTopicStep)} />
+
+        {getCurrentStep()}
       </div>
     </CWPageLayout>
   );

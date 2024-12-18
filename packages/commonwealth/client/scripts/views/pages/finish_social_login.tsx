@@ -1,9 +1,8 @@
 import { handleSocialLoginCallback } from 'controllers/app/login';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useState } from 'react';
-import app, { initAppState } from 'state';
+import { initAppState } from 'state';
 import { useFetchCustomDomainQuery } from 'state/api/configuration';
-import { authModal } from 'state/ui/modals/authModal';
 import useUserStore from 'state/ui/user';
 import ErrorPage from 'views/pages/error';
 import { PageLoading } from 'views/pages/loading';
@@ -13,43 +12,58 @@ const validate = async (
   isLoggedIn: boolean,
   isCustomDomain?: boolean,
 ) => {
+  // localstorage for magic v2
+  let chain = localStorage.getItem('magic_chain');
+  let walletSsoSource = localStorage.getItem('magic_provider');
+  // this redirect_to contains the whole url
+  let redirectTo = localStorage.getItem('magic_redirect_to');
+
+  localStorage.removeItem('chain');
+  localStorage.removeItem('provider');
+  localStorage.removeItem('redirectTo');
+
+  // params for magic v1, only used for custom domains
   const params = new URLSearchParams(window.location.search);
-  const chain = params.get('chain');
-  const walletSsoSource = params.get('sso');
-  let redirectTo = params.get('redirectTo');
+  const isMagicV1 =
+    params.get('chain') || params.get('sso') || params.get('redirectTo');
+  if (isMagicV1) {
+    chain = params.get('chain');
+    walletSsoSource = params.get('sso');
+    // this redirect_to contains the only the path after the domain
+    redirectTo = params.get('redirectTo');
+  }
+
   if (redirectTo?.startsWith('/finishsociallogin')) redirectTo = null;
 
-  const authModalState = authModal.getState();
-
   try {
-    const isAttemptingToConnectAddressToCommunity =
-      isLoggedIn && app.activeChainId();
-    const { isAddressNew } = await handleSocialLoginCallback({
+    await handleSocialLoginCallback({
       // @ts-expect-error <StrictNullChecks/>
       chain,
       // @ts-expect-error <StrictNullChecks/>
       walletSsoSource,
-      returnEarlyIfNewAddress:
-        authModalState.shouldOpenGuidanceModalAfterMagicSSORedirect,
       isLoggedIn,
+      isCustomDomain,
     });
-    await initAppState();
 
-    if (redirectTo) {
-      setRoute(redirectTo);
-    } else if (chain && !isCustomDomain) {
-      setRoute(`/${chain}`);
-    } else {
-      setRoute('/');
+    if (isMagicV1) {
+      await initAppState();
+
+      if (redirectTo) {
+        setRoute(redirectTo);
+      } else if (chain && !isCustomDomain) {
+        setRoute(`/${chain}`);
+      } else {
+        setRoute('/');
+      }
     }
 
-    // if SSO account address is not already present in db,
-    // and `shouldOpenGuidanceModalAfterMagicSSORedirect` is `true`,
-    // and the user isn't trying to link address to community,
-    // then open the user auth type guidance modal
-    // else clear state of `shouldOpenGuidanceModalAfterMagicSSORedirect`
-    if (isAddressNew && !isAttemptingToConnectAddressToCommunity) {
-      authModalState.validateAndOpenAuthTypeGuidanceModalOnSSORedirectReceived();
+    const redirectToUrl = new URL(redirectTo!);
+    if (!isCustomDomain) {
+      setRoute(redirectToUrl.pathname);
+    } else if (redirectTo) {
+      window.location.href = redirectTo;
+    } else {
+      setRoute(`/${chain}`);
     }
   } catch (error) {
     return `Error: ${error.message}`;

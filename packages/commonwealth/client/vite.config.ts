@@ -32,7 +32,7 @@ export default defineConfig(({ mode }) => {
 
   // WARN: only used locally never in remote (Heroku) apps
   const featureFlags = {
-    'process.env.FLAG_CONTEST': JSON.stringify(env.FLAG_CONTEST),
+    'process.env.FLAG_NEW_EDITOR': JSON.stringify(env.FLAG_NEW_EDITOR),
     'process.env.FLAG_CONTEST_DEV': JSON.stringify(env.FLAG_CONTEST_DEV),
     'process.env.FLAG_KNOCK_PUSH_NOTIFICATIONS_ENABLED': JSON.stringify(
       env.FLAG_KNOCK_PUSH_NOTIFICATIONS_ENABLED,
@@ -40,6 +40,15 @@ export default defineConfig(({ mode }) => {
     'process.env.FLAG_FARCASTER_CONTEST': JSON.stringify(
       env.FLAG_FARCASTER_CONTEST,
     ),
+    'process.env.FLAG_TOKENIZED_COMMUNITY': JSON.stringify(
+      env.FLAG_TOKENIZED_COMMUNITY,
+    ),
+    'process.env.FLAG_MANAGE_API_KEYS': JSON.stringify(
+      env.FLAG_MANAGE_API_KEYS,
+    ),
+    'process.env.FLAG_REFERRALS': JSON.stringify(env.FLAG_REFERRALS),
+    'process.env.FLAG_STICKY_EDITOR': JSON.stringify(env.FLAG_STICKY_EDITOR),
+    'process.env.FLAG_NEW_MOBILE_NAV': JSON.stringify(env.FLAG_NEW_MOBILE_NAV),
   };
 
   const config = {
@@ -53,6 +62,10 @@ export default defineConfig(({ mode }) => {
     'process.env.KNOCK_IN_APP_FEED_ID': JSON.stringify(
       env.KNOCK_IN_APP_FEED_ID,
     ),
+    // FARCASTER_NGROK_DOMAIN should only be setup on local development
+    'process.env.FARCASTER_NGROK_DOMAIN': JSON.stringify(
+      env.FARCASTER_NGROK_DOMAIN,
+    ),
     'process.env.MIXPANEL_DEV_TOKEN':
       JSON.stringify(env.MIXPANEL_DEV_TOKEN) ||
       JSON.stringify('312b6c5fadb9a88d98dc1fb38de5d900'),
@@ -62,13 +75,14 @@ export default defineConfig(({ mode }) => {
       JSON.stringify('pk_live_EF89AABAFB87D6F4'),
     'process.env.DISCORD_CLIENT_ID':
       JSON.stringify(env.DISCORD_CLIENT_ID) ||
-      JSON.stringify('1034502265664454776'),
+      JSON.stringify('1027997517964644453'),
+    'process.env.SNAPSHOT_HUB_URL': JSON.stringify(env.SNAPSHOT_HUB_URL),
     'process.env.COSMOS_REGISTRY_API': JSON.stringify(env.COSMOS_REGISTRY_API),
     'process.env.ETH_RPC': JSON.stringify(env.ETH_RPC),
-    'process.env.ETH_ALCHEMY_API_KEY':
+    'process.env.ALCHEMY_PUBLIC_APP_KEY':
       (env.ETH_RPC || '').trim() === 'e2e-test' &&
       (env.NODE_ENV || '').trim() === 'test'
-        ? JSON.stringify(env.ETH_ALCHEMY_API_KEY)
+        ? JSON.stringify(env.ALCHEMY_PUBLIC_APP_KEY)
         : undefined,
   };
 
@@ -83,8 +97,51 @@ export default defineConfig(({ mode }) => {
       tsconfigPaths(),
       nodePolyfills(),
     ],
+    optimizeDeps: {
+      include: [
+        '@atomone/govgen-types-long/govgen/gov/v1beta1/gov',
+        '@atomone/govgen-types-long/govgen/gov/v1beta1/tx.amino',
+        '@atomone/govgen-types-long/govgen/gov/v1beta1/query',
+        'react-virtuoso',
+        'bn.js',
+        'commonwealth-mdxeditor',
+        'quill-magic-url',
+        'react-beautiful-dnd',
+        'react-quill',
+        '@tanstack/react-table',
+        'quill-image-drop-and-paste',
+        'quill-mention',
+        '@snapshot-labs/snapshot.js',
+        'graphql-request',
+        'is-ipfs',
+        '@cosmjs/stargate/build/queryclient',
+        'cosmjs-types/cosmos/distribution/v1beta1/distribution',
+        'cosmjs-types/cosmos/gov/v1beta1/gov',
+        'cosmjs-types/google/protobuf/any',
+        '@cosmjs/tendermint-rpc',
+        '@cosmjs/proto-signing',
+        '@cosmjs/utils',
+        'cosmjs-types/cosmos/crypto/secp256k1/keys.js',
+        'cosmjs-types/cosmos/tx/signing/v1beta1/signing.js',
+        'cosmjs-types/cosmos/tx/v1beta1/tx.js',
+        'long',
+        '@osmonauts/lcd',
+        'protobufjs/minimal',
+        'underscore',
+        'react-router',
+        '@lexical/rich-text',
+        'lexical',
+        'numeral',
+        'firebase/app',
+        'firebase/messaging',
+      ],
+    },
     build: {
       outDir: '../build',
+      // UNISWAP_WIDGET_HACK: this is needed by @uniswap to resolved multiple dependencies issues with peer-deps
+      commonjsOptions: {
+        transformMixedEsModules: true,
+      },
     },
     server: {
       port: 8080,
@@ -99,6 +156,31 @@ export default defineConfig(({ mode }) => {
     },
     resolve: {
       alias: [
+        {
+          // UNISWAP_WIDGET_HACK: 'jsbi' is needed by @uniswap pkg for pricing calculations, this is
+          // not documented by the uniswap pkg or atleast i couldn't find it.
+          // adding this here for internal uniswap widget import resolution
+          // see: https://github.com/Uniswap/sdk-core/issues/20 and
+          // https://github.com/Uniswap/widgets/issues/586#issuecomment-1777323003
+          // for more details
+          find: 'jsbi',
+          replacement: path.resolve(
+            __dirname,
+            '../node_modules/jsbi/dist/jsbi-cjs.js',
+          ),
+        },
+        {
+          // UNISWAP_WIDGET_HACK: needed by @uniswap pkg for path resolution
+          // see: https://github.com/Uniswap/widgets/issues/593#issuecomment-1777415001 for more details
+          find: '~@fontsource/ibm-plex-mono',
+          replacement: '@fontsource/ibm-plex-mono',
+        },
+        {
+          // UNISWAP_WIDGET_HACK: needed by @uniswap pkg for path resolution
+          // see: https://github.com/Uniswap/widgets/issues/593#issuecomment-1777415001 for more details
+          find: '~@fontsource/inter',
+          replacement: '@fontsource/inter',
+        },
         {
           // matches only non-relative paths that end with .scss
           find: /^([^.].*)\.scss$/,

@@ -1,10 +1,14 @@
+import { commonProtocol } from '@hicommonwealth/evm-protocols';
 import React, { useState } from 'react';
-
+import { useSearchParams } from 'react-router-dom';
+import app from 'state';
+import { useTokenMetadataQuery } from 'state/api/tokens';
 import useUserStore from 'state/ui/user';
 import Permissions from 'utils/Permissions';
 import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
 import { PageNotFound } from 'views/pages/404';
-
+import { ContestType } from '../types';
+import './ManageContest.scss';
 import {
   ContestLiveStep,
   DetailsFormStep,
@@ -12,8 +16,6 @@ import {
 } from './steps';
 import { LaunchContestStep } from './types';
 import useManageContestForm from './useManageContestForm';
-
-import './ManageContest.scss';
 
 interface ManageContestProps {
   contestAddress?: string;
@@ -24,26 +26,40 @@ const ManageContest = ({ contestAddress }: ManageContestProps) => {
     useState<LaunchContestStep>('DetailsForm');
   const [createdContestAddress, setCreatedContestAddress] = useState('');
 
+  const [searchParams] = useSearchParams();
+  const contestType = searchParams.get('type');
+  const isFarcasterContest = contestType === ContestType.Farcaster;
+
   const user = useUserStore();
 
   const {
     setContestFormData,
     contestFormData,
     isContestDataLoading,
-    stakeEnabled,
     contestNotFound,
   } = useManageContestForm({
     contestAddress,
   });
 
+  const nodeEthChainId = app.chain.meta.ChainNode?.eth_chain_id || 0;
+  const { data: tokenMetadata } = useTokenMetadataQuery({
+    tokenId: contestFormData?.fundingTokenAddress || '',
+    nodeEthChainId,
+    apiEnabled: !!contestFormData?.fundingTokenAddress,
+  });
+
   if (
     !user.isLoggedIn ||
-    !stakeEnabled ||
     !(Permissions.isSiteAdmin() || Permissions.isCommunityAdmin()) ||
     contestNotFound
   ) {
     return <PageNotFound />;
   }
+
+  const fundingTokenTicker =
+    tokenMetadata?.symbol || commonProtocol.Denominations.ETH;
+  const fundingTokenDecimals =
+    tokenMetadata?.decimals || commonProtocol.WeiDecimals.ETH;
 
   const getCurrentStep = () => {
     switch (launchContestStep) {
@@ -55,6 +71,7 @@ const ManageContest = ({ contestAddress }: ManageContestProps) => {
             // @ts-expect-error <StrictNullChecks/>
             contestFormData={contestFormData}
             onSetContestFormData={setContestFormData}
+            isFarcasterContest={isFarcasterContest}
           />
         );
 
@@ -65,6 +82,9 @@ const ManageContest = ({ contestAddress }: ManageContestProps) => {
             // @ts-expect-error <StrictNullChecks/>
             contestFormData={contestFormData}
             onSetCreatedContestAddress={setCreatedContestAddress}
+            fundingTokenTicker={fundingTokenTicker}
+            fundingTokenDecimals={fundingTokenDecimals}
+            isFarcasterContest={isFarcasterContest}
           />
         );
 
@@ -72,7 +92,9 @@ const ManageContest = ({ contestAddress }: ManageContestProps) => {
         return (
           <ContestLiveStep
             createdContestAddress={createdContestAddress}
-            isFarcasterContest={!!contestFormData?.farcasterContestDuration}
+            isFarcasterContest={isFarcasterContest}
+            fundingTokenTicker={fundingTokenTicker}
+            fundingTokenAddress={contestFormData?.fundingTokenAddress || ''}
           />
         );
     }

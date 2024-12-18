@@ -1,11 +1,10 @@
 import {
-  CommunityStakeTrade,
-  events,
   logger,
   notificationsProvider,
   WorkflowKeys,
 } from '@hicommonwealth/core';
 import { DB } from '@hicommonwealth/model';
+import { chainEvents, events } from '@hicommonwealth/schemas';
 import { QueryTypes } from 'sequelize';
 import { z } from 'zod';
 import { getCommunityUrl } from '../../../../../shared/utils';
@@ -17,7 +16,7 @@ export async function handleCommunityStakeTrades(
   event: z.infer<typeof events.ChainEventCreated>,
 ) {
   const { 1: namespaceAddress, 2: isBuy } = event.parsedArgs as z.infer<
-    typeof CommunityStakeTrade
+    typeof chainEvents.CommunityStakeTrade
   >;
 
   const community = await models.Community.findOne({
@@ -54,18 +53,17 @@ export async function handleCommunityStakeTrades(
 
   if (users.length) {
     const provider = notificationsProvider();
-    return await provider.triggerWorkflow({
+    const res = await provider.triggerWorkflow({
       key: WorkflowKeys.CommunityStake,
       users,
       data: {
-        // @ts-expect-error StrictNullChecks
         community_id: community.id,
         transaction_type: isBuy ? 'minted' : 'burned',
         community_name: community.name,
-        // @ts-expect-error StrictNullChecks
         community_stakes_url: getCommunityUrl(community.id),
       },
     });
+    return !res.some((r) => r.status === 'rejected');
   }
 
   return true;

@@ -7,10 +7,9 @@ import {
   dispose,
   query,
 } from '@hicommonwealth/core';
-import chai, { expect } from 'chai';
+import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import Sinon from 'sinon';
-import { afterAll, beforeAll, describe, test } from 'vitest';
+import { afterAll, beforeAll, describe, expect, test, vi } from 'vitest';
 import {
   GetCommunities,
   GetCommunityStake,
@@ -47,6 +46,8 @@ describe('Stake lifecycle', () => {
         {
           role: 'admin',
           user_id: user!.id,
+          is_banned: false,
+          verified: new Date(),
         },
       ],
       CommunityStakes: [
@@ -68,6 +69,8 @@ describe('Stake lifecycle', () => {
         {
           ...community_with_stake!.Addresses!.at(0)!,
           id: undefined,
+          is_banned: false,
+          verified: new Date(),
         },
       ],
     });
@@ -80,6 +83,8 @@ describe('Stake lifecycle', () => {
         {
           ...community_with_stake!.Addresses!.at(0)!,
           id: undefined,
+          is_banned: false,
+          verified: new Date(),
         },
       ],
     });
@@ -92,10 +97,10 @@ describe('Stake lifecycle', () => {
       address: community_with_stake!.Addresses!.at(0)!.address!,
     };
 
-    Sinon.stub(
+    vi.spyOn(
       commonProtocol.communityStakeConfigValidator,
       'validateCommunityStakeConfig',
-    ).callsFake((c) => {
+    ).mockImplementation((c) => {
       if (!c.namespace) throw new AppError('No namespace');
       if (c.id === id_without_stake_to_set) throw new AppError('No stake');
       return Promise.resolve(undefined);
@@ -104,7 +109,7 @@ describe('Stake lifecycle', () => {
 
   afterAll(async () => {
     await dispose()();
-    Sinon.restore();
+    vi.restoreAllMocks();
   });
 
   test('should query community that has stake enabled', async () => {
@@ -120,7 +125,7 @@ describe('Stake lifecycle', () => {
     expect(
       command(SetCommunityStake(), {
         actor,
-        payload: { ...payload, id: id_with_stake },
+        payload: { ...payload, community_id: id_with_stake },
       }),
     ).to.eventually.be.rejected;
   });
@@ -128,7 +133,7 @@ describe('Stake lifecycle', () => {
   test('should set and get community stake', async () => {
     const cr = await command(SetCommunityStake(), {
       actor,
-      payload: { ...payload, id: id_without_stake_to_set },
+      payload: { ...payload, community_id: id_without_stake_to_set },
     });
     expect(cr).to.deep.contains({
       CommunityStakes: [
@@ -158,7 +163,7 @@ describe('Stake lifecycle', () => {
     expect(
       command(SetCommunityStake(), {
         actor,
-        payload: { ...payload, id: 'does-not-exist' },
+        payload: { ...payload, community_id: 'does-not-exist' },
       }),
     ).to.eventually.be.rejectedWith(InvalidActor);
   });
@@ -170,7 +175,7 @@ describe('Stake lifecycle', () => {
     expect(
       command(SetCommunityStake(), {
         actor,
-        payload: { ...payload, id: id_with_stake },
+        payload: { ...payload, community_id: id_with_stake },
       }),
     ).to.eventually.be.rejectedWith(
       InvalidState,

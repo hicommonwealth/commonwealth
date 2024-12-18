@@ -82,7 +82,7 @@ class CosmosEvmWebWalletController implements IWebWallet<string> {
 
   public getSessionSigner() {
     return new CosmosSignerCW({
-      bech32Prefix: app.chain?.meta.bech32Prefix || 'inj',
+      bech32Prefix: app.chain?.meta.bech32_prefix || 'inj',
       signer: {
         type: 'ethereum',
         signEthereum: (
@@ -125,7 +125,7 @@ class CosmosEvmWebWalletController implements IWebWallet<string> {
       } else {
         for (const acc of this._ethAccounts) {
           this._accounts.push(
-            encodeEthAddress(app.chain?.meta.bech32Prefix || 'inj', acc),
+            encodeEthAddress(app.chain?.meta.bech32_prefix || 'inj', acc),
           );
         }
       }
@@ -154,7 +154,7 @@ class CosmosEvmWebWalletController implements IWebWallet<string> {
       'accountsChanged',
       async (accounts: string[]) => {
         const encodedAccounts = accounts.map((a) =>
-          encodeEthAddress(app.chain?.meta.bech32Prefix || 'inj', a),
+          encodeEthAddress(app.chain?.meta.bech32_prefix || 'inj', a),
         );
         const updatedAddress = userStore
           .getState()

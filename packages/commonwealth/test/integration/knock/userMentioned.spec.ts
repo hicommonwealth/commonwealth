@@ -1,9 +1,4 @@
 import {
-  EventNames,
-  ProviderError,
-  SpyNotificationsProvider,
-  ThrowingSpyNotificationsProvider,
-  UserMentioned,
   WorkflowKeys,
   dispose,
   disposeAdapter,
@@ -11,14 +6,28 @@ import {
 } from '@hicommonwealth/core';
 import { tester } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
+import { EventNames } from '@hicommonwealth/schemas';
 import { BalanceType, safeTruncateBody } from '@hicommonwealth/shared';
-import chai, { expect } from 'chai';
+import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import sinon from 'sinon';
-import { afterAll, afterEach, beforeAll, describe, test } from 'vitest';
+import {
+  Mock,
+  afterAll,
+  afterEach,
+  beforeAll,
+  describe,
+  expect,
+  test,
+  vi,
+} from 'vitest';
 import z from 'zod';
 import { processUserMentioned } from '../../../server/workers/knock/eventHandlers/userMentioned';
 import { getThreadUrl } from '../../../server/workers/knock/util';
+import {
+  ProviderError,
+  SpyNotificationsProvider,
+  ThrowingSpyNotificationsProvider,
+} from '../../util/mockedNotificationProvider';
 
 chai.use(chaiAsPromised);
 
@@ -26,7 +35,6 @@ describe('userMentioned Event Handler', () => {
   let community: z.infer<typeof schemas.Community> | undefined;
   let user, author: z.infer<typeof schemas.User> | undefined;
   let thread: z.infer<typeof schemas.Thread> | undefined;
-  let sandbox: sinon.SinonSandbox;
 
   beforeAll(async () => {
     const [chainNode] = await tester.seed(
@@ -36,7 +44,6 @@ describe('userMentioned Event Handler', () => {
         name: 'Sepolia Testnet',
         eth_chain_id: 11155111,
         balance_type: BalanceType.Ethereum,
-        contracts: [],
       },
       { mock: false },
     );
@@ -56,28 +63,24 @@ describe('userMentioned Event Handler', () => {
           user_id: user!.id,
         },
       ],
+      topics: [{}],
     });
     [thread] = await tester.seed('Thread', {
-      // @ts-expect-error StrictNullChecks
-      community_id: community.id,
-      // @ts-expect-error StrictNullChecks
-      address_id: community.Addresses[1].id,
-      topic_id: null,
+      community_id: community!.id!,
+      address_id: community!.Addresses![1].id!,
+      topic_id: community!.topics![0]!.id!,
       deleted_at: null,
       pinned: false,
       read_only: false,
-      version_history: [],
       body: 'some body',
+      reaction_weights_sum: '0',
     });
   });
 
   afterEach(() => {
     const provider = notificationsProvider();
     disposeAdapter(provider.name);
-
-    if (sandbox) {
-      sandbox.restore();
-    }
+    vi.restoreAllMocks();
   });
 
   afterAll(async () => {
@@ -89,14 +92,15 @@ describe('userMentioned Event Handler', () => {
       name: EventNames.UserMentioned,
       payload: {
         communityId: 'nonexistent',
-      } as z.infer<typeof UserMentioned>,
+      } as z.infer<typeof schemas.events.UserMentioned>,
     });
     expect(res).to.be.false;
   });
 
   test('should execute the triggerWorkflow function with the appropriate data', async () => {
-    sandbox = sinon.createSandbox();
-    const provider = notificationsProvider(SpyNotificationsProvider(sandbox));
+    const provider = notificationsProvider({
+      adapter: SpyNotificationsProvider(),
+    });
 
     const res = await processUserMentioned({
       name: EventNames.UserMentioned,
@@ -108,7 +112,6 @@ describe('userMentioned Event Handler', () => {
         // @ts-expect-error StrictNullChecks
         authorAddress: community!.Addresses[0].address,
         mentionedUserId: user!.id,
-        // @ts-expect-error StrictNullChecks
         communityId: community!.id,
         thread,
       },
@@ -117,13 +120,9 @@ describe('userMentioned Event Handler', () => {
       res,
       'The event handler should return true if it triggered a workflow',
     ).to.be.true;
-    expect(
-      (provider.triggerWorkflow as sinon.SinonStub).calledOnce,
-      'The event handler should trigger a workflow',
-    ).to.be.true;
-    expect(
-      (provider.triggerWorkflow as sinon.SinonStub).getCall(0).args[0],
-    ).to.deep.equal({
+    // The event handler should trigger a workflow
+    expect(provider.triggerWorkflow as Mock).toHaveBeenCalledOnce();
+    expect((provider.triggerWorkflow as Mock).mock.calls[0][0]).to.deep.equal({
       key: WorkflowKeys.UserMentioned,
       users: [{ id: String(user!.id) }],
       data: {
@@ -140,8 +139,9 @@ describe('userMentioned Event Handler', () => {
   });
 
   test('should throw if triggerWorkflow fails', async () => {
-    sandbox = sinon.createSandbox();
-    notificationsProvider(ThrowingSpyNotificationsProvider(sandbox));
+    notificationsProvider({
+      adapter: ThrowingSpyNotificationsProvider(),
+    });
 
     await expect(
       processUserMentioned({
@@ -154,7 +154,6 @@ describe('userMentioned Event Handler', () => {
           // @ts-expect-error StrictNullChecks
           authorAddress: community!.Addresses[0].address,
           mentionedUserId: user!.id,
-          // @ts-expect-error StrictNullChecks
           communityId: community!.id,
           thread,
         },

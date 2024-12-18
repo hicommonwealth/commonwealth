@@ -9,7 +9,6 @@ const RevalidateSessionModal = ({
   showWalletsFor,
   showAuthOptionFor,
   onSignInClick,
-  onChangeModalType,
 }: ModalVariantProps) => {
   return (
     <ModalBase
@@ -21,7 +20,6 @@ const RevalidateSessionModal = ({
       showAuthOptionFor={showAuthOptionFor}
       bodyClassName="RevalidateSessionModal"
       onSignInClick={onSignInClick}
-      onChangeModalType={onChangeModalType}
     />
   );
 };

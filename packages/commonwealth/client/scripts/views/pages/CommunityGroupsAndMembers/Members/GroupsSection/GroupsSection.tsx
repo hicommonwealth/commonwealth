@@ -28,10 +28,11 @@ const GroupsSection = ({
     .filter((r) => r[0]?.rule === 'allow') // Filter only the allowlist rules
     .flatMap((r) => r[0]?.data?.allow || []); // Flatten and aggregate all addresses
 
+  const communityId = app.activeChainId() || '';
   const { data: profiles } = useFetchProfilesByAddressesQuery({
-    currentChainId: app.activeChainId(),
+    currentChainId: communityId,
     profileAddresses,
-    profileChainIds: [app.activeChainId()],
+    profileChainIds: [communityId],
     apiCallEnabled: profileAddresses?.length > 0,
   });
 
@@ -91,6 +92,7 @@ const GroupsSection = ({
               topics={(group?.topics || []).map((x) => ({
                 id: x.id,
                 name: x.name,
+                permissions: x.permissions,
               }))}
               canEdit={canManageGroups}
               onEditClick={() => navigate(`/members/groups/${group.id}/update`)}

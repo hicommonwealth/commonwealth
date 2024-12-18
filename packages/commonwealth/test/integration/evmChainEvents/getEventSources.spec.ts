@@ -1,89 +1,84 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { dispose } from '@hicommonwealth/core';
-import { DB, tester } from '@hicommonwealth/model';
-import { expect } from 'chai';
-import { afterAll, beforeAll, describe, test } from 'vitest';
-import { getEventSources } from '../../../server/workers/evmChainEvents/getEventSources';
-import { localRpc } from '../../devnet/evm/evmChainEvents/util';
 import {
-  getTestAbi,
-  getTestCommunityContract,
-  getTestContract,
-  getTestSignatures,
-  getTestSubscription,
-} from './util';
+  ChildContractNames,
+  EventRegistry,
+  EvmEventSignatures,
+  commonProtocol,
+  commonProtocol as cp,
+} from '@hicommonwealth/evm-protocols';
+import { createEventRegistryChainNodes } from '@hicommonwealth/model';
+import { afterAll, beforeAll, describe, expect, test } from 'vitest';
+import { getEventSources } from '../../../server/workers/evmChainEvents/getEventSources';
+import { createContestEventSources } from '../../util/util';
+
+const singleContestAddress = '0x123';
+const recurringContestAddress = '0x321';
 
 describe('getEventSources', () => {
-  let models: DB;
-
   beforeAll(async () => {
-    const res = await import('@hicommonwealth/model');
-    models = res['models'];
-    await tester.seedDb();
+    await createEventRegistryChainNodes();
+    await createContestEventSources(
+      cp.ValidChains.SepoliaBase,
+      singleContestAddress,
+      recurringContestAddress,
+    );
   });
 
   afterAll(async () => {
     await dispose()();
   });
 
-  test('should not return sources that are not subscribed to', async () => {
-    const result = await getEventSources(models);
-    expect(result).to.deep.equal({});
-  });
+  test('should get Event-Registry and EvmEventSources', async () => {
+    const result = await getEventSources();
+    expect(Object.keys(result)).deep.equal(Object.keys(EventRegistry));
+    let flag = false;
+    for (const ethChainId in EventRegistry) {
+      expect(result[ethChainId]).haveOwnProperty('rpc');
+      expect(result[ethChainId]).to.haveOwnProperty('contracts');
+      expect(
+        result[ethChainId].contracts[cp.factoryContracts[ethChainId].factory],
+      ).to.haveOwnProperty('abi');
+      expect(
+        result[ethChainId].contracts[cp.factoryContracts[ethChainId].factory],
+      ).to.haveOwnProperty('sources');
 
-  test("should not return sources that don't have a community contract", async () => {
-    await getTestSubscription();
-    const result = await getEventSources(models);
-    expect(result).to.deep.equal({});
-  });
-
-  test("should not return sources that don't have an ABI", async () => {
-    await getTestCommunityContract();
-    const result = await getEventSources(models);
-    expect(result).to.deep.equal({});
-  });
-
-  test("should not return sources that don't have event signatures", async () => {
-    const abi = await getTestAbi();
-    const contract = await getTestContract();
-    contract.abi_id = abi.id;
-    await contract.save();
-
-    const result = await getEventSources(models);
-    expect(result).to.deep.equal({});
-  });
-
-  test('should return event sources organized by chain node', async () => {
-    const signatures = await getTestSignatures();
-    const abi = await getTestAbi();
-    const result = await getEventSources(models);
-
-    const chainNodeId = String(signatures[0].chain_node_id);
-    const contractAddress = signatures[0].contract_address;
-    expect(result).to.exist.and.to.haveOwnProperty(chainNodeId);
-    expect(result[chainNodeId].rpc).to.equal(localRpc);
-    expect(result[chainNodeId].contracts).to.exist.and.to.haveOwnProperty(
-      contractAddress,
-    );
-    expect(result[chainNodeId].contracts[contractAddress].abi).to.exist;
-    expect(
-      result[chainNodeId].contracts[contractAddress].sources,
-    ).exist.and.to.have.lengthOf(2);
-
-    const propCreatedSource = result[chainNodeId].contracts[
-      contractAddress
-    ].sources.find((s) => s.event_signature === signatures[0].event_signature);
-    expect(propCreatedSource).to.exist.and.to.haveOwnProperty(
-      'kind',
-      signatures[0].kind,
-    );
-
-    const propQueuedSource = result[chainNodeId].contracts[
-      contractAddress
-    ].sources.find((s) => s.event_signature === signatures[1].event_signature);
-    expect(propQueuedSource).to.exist.and.to.haveOwnProperty(
-      'kind',
-      signatures[1].kind,
-    );
+      if (ethChainId === String(cp.ValidChains.SepoliaBase)) {
+        expect(
+          result[ethChainId].contracts[singleContestAddress].sources,
+        ).to.deep.equal([
+          {
+            eth_chain_id: parseInt(ethChainId),
+            contract_address: singleContestAddress,
+            event_signature: EvmEventSignatures.Contests.SingleContestStarted,
+            contract_name: ChildContractNames.SingleContest,
+            parent_contract_address:
+              commonProtocol.factoryContracts[
+                commonProtocol.ValidChains.SepoliaBase
+              ].factory,
+            events_migrated: null,
+            created_at_block: null,
+          },
+        ]);
+        expect(
+          result[ethChainId].contracts[recurringContestAddress].sources,
+        ).to.deep.equal([
+          {
+            eth_chain_id: parseInt(ethChainId),
+            contract_address: recurringContestAddress,
+            event_signature:
+              EvmEventSignatures.Contests.RecurringContestStarted,
+            contract_name: ChildContractNames.RecurringContest,
+            parent_contract_address:
+              commonProtocol.factoryContracts[
+                commonProtocol.ValidChains.SepoliaBase
+              ].factory,
+            events_migrated: null,
+            created_at_block: null,
+          },
+        ]);
+        flag = true;
+      }
+    }
+    expect(flag).to.be.true;
   });
 });

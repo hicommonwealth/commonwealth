@@ -15,4 +15,5 @@
 **/eth/types
 **/eth/artifacts
 **/.eslintrc.js
-
+pnpm-lock.yaml
+external-api-config.json

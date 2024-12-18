@@ -1,3 +1,4 @@
+import { ReactNode } from 'react';
 import { IconSize } from 'views/components/component_kit/cw_icons/types';
 import type { IconName } from './cw_icons/cw_icon_lookup';
 
@@ -37,6 +38,7 @@ export enum ComponentType {
   ProgressBar = 'ProgressBar',
   RadioButton = 'RadioButton',
   RadioGroup = 'RadioGroup',
+  RadioPanel = 'RadioPanel',
   RelatedCommunityCard = 'RelatedCommunityCard',
   Searchbar = 'Searchbar',
   SidebarMenu = 'SidebarMenu',
@@ -85,6 +87,11 @@ export type DefaultMenuItem = {
   isButton?: boolean;
 };
 
+export type ComponentMenuItem = {
+  type: 'element';
+  element: ReactNode;
+};
+
 type NotificationMenuItem = {
   hasUnreads?: boolean;
   iconLeft?: IconName;
@@ -110,4 +117,5 @@ export type MenuItem =
   | HeaderMenuItem
   | DefaultMenuItem
   | NotificationMenuItem
-  | CommunityMenuItem;
+  | CommunityMenuItem
+  | ComponentMenuItem;

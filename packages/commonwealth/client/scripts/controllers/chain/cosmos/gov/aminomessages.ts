@@ -1,3 +1,5 @@
+import { AminoConverter as AtomOneAminoConverter } from '@atomone/atomone-types-long/atomone/gov/v1beta1/tx.amino';
+import { AminoConverter } from '@atomone/govgen-types-long/govgen/gov/v1beta1/tx.amino';
 import { AminoMsg } from '@cosmjs/amino';
 import { AminoMsgSubmitProposal } from '@cosmjs/stargate';
 import { AminoConverters } from '@cosmjs/stargate/build/aminotypes';
@@ -10,13 +12,17 @@ import { CommunityPoolSpendProposal } from 'cosmjs-types/cosmos/distribution/v1b
 import { TextProposal } from 'cosmjs-types/cosmos/gov/v1beta1/gov';
 import { MsgSubmitProposal } from 'cosmjs-types/cosmos/gov/v1beta1/tx';
 import { Any } from 'cosmjs-types/google/protobuf/any';
-
 export function isAminoMsgSubmitProposal(
   msg: AminoMsg,
 ): msg is AminoMsgSubmitProposal {
   return msg.type === 'cosmos-sdk/MsgSubmitProposal';
 }
-
+export function createGovgenGovAminoConverters(): AminoConverters {
+  return AtomOneAminoConverter;
+}
+export function createAtomoneGovAminoConverters(): AminoConverters {
+  return AminoConverter;
+}
 export function createAltGovAminoConverters(): AminoConverters {
   return {
     /** Modified AminoConverter to add support for CommunityPoolSpendProposal */

@@ -1,4 +1,5 @@
 import { DefaultPage } from '@hicommonwealth/shared';
+import { buildUpdateCommunityInput } from 'client/scripts/state/api/communities/updateCommunity';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { linkValidationSchema } from 'helpers/formValidations/common';
 import { getLinkType, isLinkValid } from 'helpers/link';
@@ -18,9 +19,9 @@ import {
   usePreferenceTags,
 } from 'views/components/PreferenceTags';
 import {
-  CWCoverImageUploader,
+  CWImageInput,
   ImageBehavior,
-} from 'views/components/component_kit/cw_cover_image_uploader';
+} from 'views/components/component_kit/CWImageInput';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTextArea } from 'views/components/component_kit/cw_text_area';
@@ -57,10 +58,11 @@ const CommunityProfileForm = () => {
     }[]
   >([]);
 
+  const communityId = app.activeChainId() || '';
   const { data: community, isLoading: isCommunityLoading } =
     useGetCommunityByIdQuery({
-      id: app.activeChainId(),
-      enabled: !!app.activeChainId(),
+      id: communityId,
+      enabled: !!communityId,
     });
 
   const { mutateAsync: editBanner } = useEditCommunityBannerMutation();
@@ -150,18 +152,20 @@ const CommunityProfileForm = () => {
         bannerText: values.communityBanner ?? '',
       });
 
-      await updateCommunity({
-        communityId: community.id,
-        name: values.communityName,
-        description: values.communityDescription,
-        socialLinks: links.map((link) => link.value.trim()),
-        stagesEnabled: values.hasStagesEnabled,
-        customStages: values.customStages
-          ? JSON.parse(values.customStages)
-          : [],
-        iconUrl: values.communityProfileImageURL,
-        defaultOverview: values.defaultPage === DefaultPage.Overview,
-      });
+      await updateCommunity(
+        buildUpdateCommunityInput({
+          communityId: community.id,
+          name: values.communityName,
+          description: values.communityDescription,
+          socialLinks: links.map((link) => link.value.trim()),
+          stagesEnabled: values.hasStagesEnabled,
+          customStages: values.customStages
+            ? JSON.parse(values.customStages)
+            : [],
+          iconUrl: values.communityProfileImageURL,
+          defaultOverview: values.defaultPage === DefaultPage.Overview,
+        }),
+      );
 
       setNameFieldDisabledState({
         isDisabled: true,
@@ -178,7 +182,6 @@ const CommunityProfileForm = () => {
       setFormKey((key) => key + 1);
 
       notifySuccess('Community updated!');
-      app.sidebarRedraw.emit('redraw');
     } catch {
       notifyError('Failed to update community!');
     } finally {
@@ -281,20 +284,22 @@ const CommunityProfileForm = () => {
             />
 
             <CWTextArea
+              charCount={250}
               hookToForm
               name="communityDescription"
               label="Community Description"
               placeholder="Enter a description of your community or project"
             />
-            <CWCoverImageUploader
+            <CWImageInput
               hookToForm
-              enableGenerativeAI
-              showUploadAndGenerateText
+              withAIImageGeneration
               name="communityProfileImageURL"
-              canSelectImageBehaviour={false}
-              defaultImageBehaviour={ImageBehavior.Circle}
-              onImageProcessStatusChange={setIsProcessingProfileImage}
-              subheaderText="Community Profile Image (Accepts JPG and PNG files)"
+              canSelectImageBehavior={false}
+              imageBehavior={ImageBehavior.Circle}
+              onImageProcessingChange={({ isGenerating, isUploading }) =>
+                setIsProcessingProfileImage(isGenerating || isUploading)
+              }
+              label="Community Profile Image (Accepts JPG and PNG files)"
             />
           </section>
 

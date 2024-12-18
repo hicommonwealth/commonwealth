@@ -1,4 +1,10 @@
-import { ChainBase, WalletId } from '@hicommonwealth/shared';
+import {
+  ChainBase,
+  WalletId,
+  chainBaseToCaip2,
+  chainBaseToCanvasChainId,
+  getSessionSigners,
+} from '@hicommonwealth/shared';
 import axios from 'axios';
 import { setActiveAccount } from 'controllers/app/login';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
@@ -6,9 +12,11 @@ import WebWalletController from 'controllers/app/web_wallets';
 import { SessionKeyError } from 'controllers/server/sessions';
 import { setDarkMode } from 'helpers/darkMode';
 import { getUniqueUserAddresses } from 'helpers/user';
+import { useFlag } from 'hooks/useFlag';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useCallback, useEffect, useState } from 'react';
 import app, { initAppState } from 'state';
+import { EXCEPTION_CASE_VANILLA_getCommunityById } from 'state/api/communities/getCommuityById';
 import { SERVER_URL } from 'state/api/config';
 import useAdminOnboardingSliderMutationStore from 'state/ui/adminOnboardingCards';
 import useGroupMutationBannerStore from 'state/ui/group';
@@ -16,23 +24,15 @@ import {
   useAuthModalStore,
   useManageCommunityStakeModalStore,
 } from 'state/ui/modals';
+import useUserStore from 'state/ui/user';
 import { PopoverMenuItem } from 'views/components/component_kit/CWPopoverMenu';
 import {
   CWToggle,
   toggleDarkMode,
 } from 'views/components/component_kit/cw_toggle';
-
-import {
-  chainBaseToCaip2,
-  chainBaseToCanvasChainId,
-  getSessionSigners,
-} from '@hicommonwealth/shared';
-import { useFetchConfigurationQuery } from 'state/api/configuration';
-
+import CWIconButton from 'views/components/component_kit/new_designs/CWIconButton';
+import useAuthentication from '../../modals/AuthModal/useAuthentication';
 import { useCommunityStake } from '../CommunityStake';
-
-import { EXCEPTION_CASE_VANILLA_getCommunityById } from 'state/api/communities/getCommuityById';
-import useUserStore from 'state/ui/user';
 import UserMenuItem from './UserMenuItem';
 import useCheckAuthenticatedAddresses from './useCheckAuthenticatedAddresses';
 
@@ -67,12 +67,14 @@ interface UseUserMenuItemsProps {
   onAuthModalOpen: () => void;
   isMenuOpen: boolean;
   onAddressItemClick?: () => void;
+  onReferralItemClick?: () => void;
 }
 
 const useUserMenuItems = ({
   onAuthModalOpen,
   isMenuOpen,
   onAddressItemClick,
+  onReferralItemClick,
 }: UseUserMenuItemsProps) => {
   const [isDarkModeOn, setIsDarkModeOn] = useState<boolean>(
     localStorage.getItem('dark-mode-state') === 'on',
@@ -85,8 +87,12 @@ const useUserMenuItems = ({
     recheck: isMenuOpen,
   });
 
+  const referralsEnabled = useFlag('referrals');
+
   const userData = useUserStore();
-  const { data: configurationData } = useFetchConfigurationQuery();
+  const hasMagic = userData.addresses?.[0]?.walletId === WalletId.Magic;
+
+  const { openMagicWallet } = useAuthentication({});
 
   const navigate = useCommonNavigate();
   const { stakeEnabled } = useCommunityStake();
@@ -94,6 +100,10 @@ const useUserMenuItems = ({
     useManageCommunityStakeModalStore();
 
   const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
+
+  const [canvasSignedAddresses, setCanvasSignedAddresses] = useState<string[]>(
+    [],
+  );
 
   const uniqueChainAddresses = getUniqueUserAddresses({
     forChain: app?.chain?.base,
@@ -121,10 +131,6 @@ const useUserMenuItems = ({
     setSelectedAddress,
   ]);
 
-  const [canvasSignedAddresses, setCanvasSignedAddresses] = useState<string[]>(
-    [],
-  );
-
   const updateCanvasSignedAddresses = useCallback(async () => {
     const signedAddresses: string[] = [];
 
@@ -150,9 +156,9 @@ const useUserMenuItems = ({
             // @ts-expect-error StrictNullChecks
             communityIdOrPrefix,
           );
-          const caip2Address = `${communityCaip2Prefix}:${communityCanvasChainId}:${account.address}`;
+          const did = `did:pkh:${communityCaip2Prefix}:${communityCanvasChainId}:${account.address}`;
 
-          const signed = authenticatedAddresses[caip2Address];
+          const signed = authenticatedAddresses[did];
           if (signed) signedAddresses.push(account.address);
         }
       }),
@@ -168,21 +174,18 @@ const useUserMenuItems = ({
   const addresses: PopoverMenuItem[] = userData.accounts.map((account) => {
     const signed = canvasSignedAddresses.includes(account.address);
     const isActive = userData.activeAccount?.address === account.address;
-    const walletSsoSource = userData.addresses.find(
-      (address) => address.address === account.address,
-    )?.walletSsoSource;
 
     return {
       type: 'default',
       label: (
         <UserMenuItem
-          isSignedIn={!configurationData?.enforceSessionKeys || signed}
+          isSignedIn={signed}
           hasJoinedCommunity={isActive}
           address={account.address}
         />
       ),
       onClick: async () => {
-        if (!configurationData?.enforceSessionKeys || signed) {
+        if (signed) {
           onAddressItemClick?.();
           return await setActiveAccount(account);
         }
@@ -193,7 +196,6 @@ const useUserMenuItems = ({
           new SessionKeyError({
             name: 'SessionKeyError',
             message: 'Session Key Expired',
-            ssoSource: walletSsoSource,
             address: account.address,
           }),
         );
@@ -267,10 +269,35 @@ const useUserMenuItems = ({
         label: 'Edit profile',
         onClick: () => navigate(`/profile/edit`, {}, null),
       },
+      ...(hasMagic
+        ? [
+            {
+              type: 'default',
+              label: (
+                <div className="UserMenuItem">
+                  <div>Open wallet</div>
+                  <CWIconButton iconName="arrowSquareOut" />
+                </div>
+              ),
+              onClick: () => openMagicWallet(),
+            },
+          ]
+        : []),
+      ...(referralsEnabled
+        ? [
+            {
+              type: 'default',
+              label: 'Get referral link',
+              onClick: () => {
+                onReferralItemClick?.();
+              },
+            },
+          ]
+        : []),
       {
         type: 'default',
-        label: 'My community stake',
-        onClick: () => navigate(`/myCommunityStake`, {}, null),
+        label: 'My transactions',
+        onClick: () => navigate(`/myTransactions`, {}, null),
       },
       {
         type: 'default',

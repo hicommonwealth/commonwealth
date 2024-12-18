@@ -2,10 +2,10 @@ import { DEFAULT_NAME } from '@hicommonwealth/shared';
 import { MagnifyingGlass } from '@phosphor-icons/react';
 import { formatAddressShort } from 'helpers';
 import { APIOrderDirection } from 'helpers/constants';
+import useTopicGating from 'hooks/useTopicGating';
 import React, { useMemo, useState } from 'react';
 import app from 'state';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
-import { useRefreshMembershipQuery } from 'state/api/groups';
 import useUserStore from 'state/ui/user';
 import { useDebounce } from 'usehooks-ts';
 import { OptionConfig, Select } from 'views/components/Select';
@@ -84,15 +84,16 @@ const Allowlist = ({
 
   const [currentPage, setCurrentPage] = useState<number>(1);
 
-  const { data: memberships } = useRefreshMembershipQuery({
-    communityId: app.activeChainId(),
-    address: user.activeAccount?.address || '',
+  const communityId = app.activeChainId() || '';
+  const { memberships } = useTopicGating({
+    communityId,
+    userAddress: user.activeAccount?.address || '',
     apiEnabled: !!user.activeAccount?.address,
   });
 
   const { data: community } = useGetCommunityByIdQuery({
-    id: app.activeChainId(),
-    enabled: !!app.activeChainId(),
+    id: communityId,
+    enabled: !!communityId,
   });
   const isStakedCommunity = !!community?.namespace;
 
@@ -134,14 +135,24 @@ const Allowlist = ({
         avatarUrl: p.avatar_url,
         name: p.profile_name || DEFAULT_NAME,
         role: p.addresses[0].role,
+        // Map group information as objects
         groups: (p.group_ids || [])
-          .map(
-            (groupId) =>
-              (groups || []).find((group) => group.id === groupId)?.name,
-          )
+          .map((groupId) => {
+            const group = (groups || []).find((g) => g.id === groupId);
+            return group
+              ? {
+                  name: group.name,
+                  groupImageUrl: group.groupImageUrl,
+                }
+              : null;
+          })
           .filter(Boolean)
-          // @ts-expect-error StrictNullChecks
-          .sort((a, b) => a.localeCompare(b)),
+          .sort((a, b) => {
+            if (a && b) {
+              return a.name.localeCompare(b.name);
+            }
+            return 0;
+          }),
         stakeBalance: p.addresses[0].stake_balance,
         address: p.addresses[0].address,
       })) as Member[]) || []

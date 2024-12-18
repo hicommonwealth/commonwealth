@@ -1,21 +1,21 @@
 import { InvalidState, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../database';
-import { isCommunityAdmin } from '../middleware';
+import { authRoles } from '../middleware';
 import { mustExist } from '../middleware/guards';
 import { commonProtocol } from '../services';
 
 export function SetCommunityStake(): Command<typeof schemas.SetCommunityStake> {
   return {
     ...schemas.SetCommunityStake,
-    auth: [isCommunityAdmin],
+    auth: [authRoles('admin')],
     body: async ({ payload }) => {
-      const { id, ...rest } = payload;
+      const { community_id, ...rest } = payload;
 
       // !load
       const community = (
         await models.Community.findOne({
-          where: { id },
+          where: { id: community_id },
           include: [
             {
               model: models.ChainNode,
@@ -30,13 +30,13 @@ export function SetCommunityStake(): Command<typeof schemas.SetCommunityStake> {
       )?.toJSON();
 
       // !domain logic - invariants on loaded state & payload
-      if (!mustExist('Community', community)) return;
+      mustExist('Community', community);
       if (
         community.CommunityStakes &&
         community.CommunityStakes.find((s) => s.stake_id === rest.stake_id)
       )
         throw new InvalidState(
-          `Stake ${rest.stake_id} already configured in community ${id}`,
+          `Stake ${rest.stake_id} already configured in community ${community_id}`,
         );
 
       // !domain, application, and infrastructure services (stateless, not related to entities or value objects)
@@ -48,7 +48,7 @@ export function SetCommunityStake(): Command<typeof schemas.SetCommunityStake> {
       // !side effects
       const [updated] = await models.CommunityStake.upsert({
         ...rest,
-        community_id: id.toString(),
+        community_id,
       });
 
       return {

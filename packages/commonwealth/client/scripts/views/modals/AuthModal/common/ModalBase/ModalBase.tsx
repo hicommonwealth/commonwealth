@@ -4,7 +4,6 @@ import clsx from 'clsx';
 import React, { Fragment, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import app from 'state';
-import useAuthModalStore from 'state/ui/modals/authModal';
 import AuthButton from 'views/components/AuthButton';
 import {
   AuthSSOs,
@@ -28,14 +27,9 @@ import { EVMWalletsSubModal } from './EVMWalletsSubModal';
 import { EmailForm } from './EmailForm';
 import { MobileWalletConfirmationSubModal } from './MobileWalletConfirmationSubModal';
 import './ModalBase.scss';
+import { SMSForm } from './SMSForm';
 
 const MODAL_COPY = {
-  [AuthModalType.AccountTypeGuidance]: {
-    title: '',
-    description: `We don't recognize the address you're trying to sign in with. \nWould you like to:`,
-    showFooter: false,
-    showExistingAccountSignInFooter: false,
-  },
   [AuthModalType.CreateAccount]: {
     title: 'Create account',
     description: `Common is built on web3 technology that utilizes wallets. \nHow would you like to sign up?`,
@@ -50,7 +44,8 @@ const MODAL_COPY = {
   },
   [AuthModalType.RevalidateSession]: {
     title: 'Session Expired',
-    description: 'To continue what you were doing, please sign in again',
+    description:
+      'To continue what you were doing with this address, please sign in again',
     showFooter: true,
     showExistingAccountSignInFooter: false,
   },
@@ -63,6 +58,8 @@ const SSO_OPTIONS: AuthSSOs[] = [
   'apple',
   'github',
   'email',
+  'farcaster',
+  'SMS',
 ] as const;
 
 /**
@@ -70,8 +67,6 @@ const SSO_OPTIONS: AuthSSOs[] = [
  * @param onClose callback triggered when the modal is closed or user is authenticated.
  * @param onSuccess callback triggered on successful user authentication.
  * @param layoutType specifies the layout type/variant of the modal.
- * @param hideDescription if `true`, hides the description after modal header.
- * @param customBody custom content to add before the modal body.
  * @param showAuthOptionFor determines the auth option to display.
  *                          Modal logic correctly displayed the correct options per page scope if prop is not provided.
  *                          Prop is ignored if internal modal state hides SSO options.
@@ -81,21 +76,17 @@ const SSO_OPTIONS: AuthSSOs[] = [
  * @param showWalletsFor specifies wallets to display for the specified chain.
  * @param bodyClassName custom class to apply to the modal body.
  * @param onSignInClick callback triggered when the user clicks on the `Sign in` link in the modal footer.
- * @param onChangeModalType callback triggered when `layoutType` change is requested from within the modal.
  * @returns {ReactNode}
  */
 const ModalBase = ({
   onClose,
   onSuccess,
   layoutType,
-  hideDescription,
-  customBody,
   showWalletsFor,
   showAuthOptionFor,
   showAuthOptionTypesFor,
   bodyClassName,
   onSignInClick,
-  onChangeModalType,
 }: ModalBaseProps) => {
   const copy = MODAL_COPY[layoutType];
 
@@ -109,9 +100,11 @@ const ModalBase = ({
     useState(false);
   const [isAuthenticatingWithEmail, setIsAuthenticatingWithEmail] =
     useState(false);
+  const [isAuthenticatingWithSMS, setIsAuthenticatingWithSMS] = useState(false);
 
   const handleClose = async () => {
     setIsAuthenticatingWithEmail(false);
+    setIsAuthenticatingWithSMS(false);
     setIsEVMWalletsModalVisible(false);
     isWalletConnectEnabled &&
       (await onResetWalletConnect().catch(console.error));
@@ -123,24 +116,6 @@ const ModalBase = ({
     await handleClose();
   };
 
-  const handleUnrecognizedAddressReceived = () => {
-    // if this is the `layoutType == SignIn | RevalidateSession` modal
-    // and we get an unrecognized address, then change modal type to `AccountTypeGuidance`
-    if (
-      layoutType === AuthModalType.SignIn ||
-      layoutType === AuthModalType.RevalidateSession
-    ) {
-      setActiveTabIndex(0); // reset tab state back to initial
-      onChangeModalType?.(AuthModalType.AccountTypeGuidance);
-      return false;
-    }
-
-    return true;
-  };
-
-  const { setShouldOpenGuidanceModalAfterMagicSSORedirect } =
-    useAuthModalStore();
-
   const {
     wallets = [],
     isMagicLoading,
@@ -148,6 +123,7 @@ const ModalBase = ({
     isMobileWalletVerificationStep,
     onResetWalletConnect,
     onEmailLogin,
+    onSMSLogin,
     onWalletSelect,
     onSocialLogin,
     onVerifyMobileWalletSignature,
@@ -157,7 +133,6 @@ const ModalBase = ({
     onModalClose: handleClose,
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     onSuccess: handleSuccess,
-    onUnrecognizedAddressReceived: handleUnrecognizedAddressReceived,
   });
 
   const filterWalletNames = (byChain: ChainBase) =>
@@ -266,11 +241,11 @@ const ModalBase = ({
 
   const onAuthMethodSelect = async (option: AuthTypes) => {
     if (option === 'email') {
-      if (layoutType === AuthModalType.SignIn) {
-        setShouldOpenGuidanceModalAfterMagicSSORedirect(true);
-      }
-
       setIsAuthenticatingWithEmail(true);
+      return;
+    }
+    if (option === 'SMS') {
+      setIsAuthenticatingWithSMS(true);
       return;
     }
 
@@ -288,10 +263,6 @@ const ModalBase = ({
 
     // if any SSO option is selected
     if (activeTabIndex === 1) {
-      if (layoutType === AuthModalType.SignIn) {
-        setShouldOpenGuidanceModalAfterMagicSSORedirect(true);
-      }
-
       // TODO: decide if twitter references are to be updated to 'x'
       await onSocialLogin(
         option === 'x' ? WalletSsoSource.Twitter : (option as WalletSsoSource),
@@ -329,7 +300,7 @@ const ModalBase = ({
           {copy.title}
         </CWText>
 
-        {copy.description && !hideDescription && (
+        {copy.description && (
           <CWText type="b1" className="description" isCentered>
             {...copy.description.split('\n').map((line, index) => (
               <Fragment key={index}>
@@ -341,8 +312,6 @@ const ModalBase = ({
         )}
 
         <CWModalBody className={clsx('content', bodyClassName)}>
-          {customBody}
-
           {/* @ts-expect-error StrictNullChecks*/}
           {showAuthOptionTypesFor?.length > 0 && (
             <>
@@ -371,11 +340,13 @@ const ModalBase = ({
                   )}
 
                 {/*
-                  If email option is selected don't render SSO's list,
+                  If email or SMS option is selected don't render SSO's list,
                   else render wallets/SSO's list based on activeTabIndex
                 */}
                 {(activeTabIndex === 0 ||
-                  (activeTabIndex === 1 && !isAuthenticatingWithEmail)) &&
+                  (activeTabIndex === 1 &&
+                    !isAuthenticatingWithEmail &&
+                    !isAuthenticatingWithSMS)) &&
                   tabsList[activeTabIndex].options.map(renderAuthButton)}
 
                 {/* If email option is selected from the SSO's list, show email form */}
@@ -385,6 +356,15 @@ const ModalBase = ({
                     onCancel={() => setIsAuthenticatingWithEmail(false)}
                     // eslint-disable-next-line @typescript-eslint/no-misused-promises
                     onSubmit={async ({ email }) => await onEmailLogin(email)}
+                  />
+                )}
+                {/* If SMS option is selected from the SSO's list, show SMS form */}
+                {activeTabIndex === 1 && isAuthenticatingWithSMS && (
+                  <SMSForm
+                    isLoading={isMagicLoading}
+                    onCancel={() => setIsAuthenticatingWithSMS(false)}
+                    // eslint-disable-next-line @typescript-eslint/no-misused-promises
+                    onSubmit={async ({ SMS }) => await onSMSLogin(SMS)}
                   />
                 )}
               </section>
@@ -398,9 +378,13 @@ const ModalBase = ({
               <CWText isCentered>
                 By connecting to Common you agree to our&nbsp;
                 <br />
-                <Link to="/terms">Terms of Service</Link>
+                <Link to="/terms" onClick={() => onClose()}>
+                  Terms of Service
+                </Link>
                 &nbsp;and&nbsp;
-                <Link to="/privacy">Privacy Policy</Link>
+                <Link to="/privacy" onClick={() => onClose()}>
+                  Privacy Policy
+                </Link>
               </CWText>
 
               {copy.showExistingAccountSignInFooter && (

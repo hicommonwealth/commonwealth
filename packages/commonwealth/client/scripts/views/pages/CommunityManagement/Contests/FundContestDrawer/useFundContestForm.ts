@@ -1,12 +1,15 @@
 import { useState } from 'react';
 
 import {
-  useFetchEthUsdRateQuery,
+  useFetchTokenUsdRateQuery,
   useGetUserEthBalanceQuery,
 } from 'state/api/communityStake';
 import { useGetContestBalanceQuery } from 'state/api/contests';
-import { convertEthToUsd } from 'views/modals/ManageCommunityStakeModal/utils';
-
+import {
+  useGetERC20BalanceQuery,
+  useTokenMetadataQuery,
+} from 'state/api/tokens';
+import { convertTokenAmountToUsd } from 'views/modals/ManageCommunityStakeModal/utils';
 import { calculateNewContractBalance, getAmountError } from './utils';
 
 export const INITIAL_AMOUNT = '0.0001';
@@ -16,6 +19,7 @@ interface UseFundContestFormProps {
   chainRpc: string;
   ethChainId: number;
   userAddress: string;
+  fundingTokenAddress?: string;
 }
 
 const useFundContestForm = ({
@@ -23,51 +27,71 @@ const useFundContestForm = ({
   chainRpc,
   ethChainId,
   userAddress,
+  fundingTokenAddress,
 }: UseFundContestFormProps) => {
-  const [amountEth, setAmountEth] = useState(INITIAL_AMOUNT);
-  const { data: ethUsdRateData } = useFetchEthUsdRateQuery();
-  const ethUsdRate = ethUsdRateData?.data?.data?.amount;
+  const [tokenAmount, setTokenAmount] = useState(INITIAL_AMOUNT);
+  const { data: tokenMetadata } = useTokenMetadataQuery({
+    nodeEthChainId: ethChainId,
+    tokenId: fundingTokenAddress || '',
+  });
+  const { data: tokenUsdRateData } = useFetchTokenUsdRateQuery({
+    tokenSymbol: tokenMetadata?.symbol || 'ETH',
+    enabled: fundingTokenAddress ? !!tokenMetadata : true,
+  });
+  const tokenUsdRate = tokenUsdRateData?.data?.data?.amount;
   // @ts-expect-error StrictNullChecks
-  const amountEthInUsd = convertEthToUsd(amountEth, ethUsdRate);
+  const tokenAmountInUsd = convertTokenAmountToUsd(tokenAmount, tokenUsdRate);
 
   const { data: userEthBalance } = useGetUserEthBalanceQuery({
     chainRpc,
     walletAddress: userAddress,
-    apiEnabled: !!userAddress,
+    apiEnabled: !!userAddress && !fundingTokenAddress,
     ethChainId,
   });
+
+  const { data: tokenBalance } = useGetERC20BalanceQuery({
+    tokenAddress: fundingTokenAddress || '',
+    userAddress,
+    nodeRpc: chainRpc,
+  });
+
+  const userTokenBalance = fundingTokenAddress ? tokenBalance : userEthBalance;
 
   const { data: contestBalanceData } = useGetContestBalanceQuery({
     contestAddress,
     chainRpc,
     ethChainId,
+    isOneOff: !!fundingTokenAddress,
   });
 
-  const contestEthBalance = String(contestBalanceData);
+  const contestTokenBalance =
+    tokenMetadata?.decimals && contestBalanceData
+      ? String(contestBalanceData / Math.pow(10, tokenMetadata?.decimals))
+      : String(contestBalanceData);
 
-  const newContestBalanceInEth = calculateNewContractBalance(
-    contestEthBalance,
-    amountEth,
+  const newContestTokenBalance = calculateNewContractBalance(
+    contestTokenBalance,
+    tokenAmount,
   );
 
-  const newContestBalanceInUsd = convertEthToUsd(
-    newContestBalanceInEth,
+  const newContestBalanceInUsd = convertTokenAmountToUsd(
+    newContestTokenBalance,
     // @ts-expect-error StrictNullChecks
-    ethUsdRate,
+    tokenUsdRate,
   );
 
   // @ts-expect-error StrictNullChecks
-  const amountError = getAmountError(userEthBalance, amountEth);
+  const amountError = getAmountError(userTokenBalance, tokenAmount);
 
   return {
-    amountEth,
-    amountEthInUsd,
-    setAmountEth,
+    tokenAmount,
+    tokenAmountInUsd,
+    setTokenAmount,
     amountError,
-    contestEthBalance,
+    contestTokenBalance,
     newContestBalanceInUsd,
-    newContestBalanceInEth,
-    userEthBalance,
+    newContestTokenBalance,
+    userTokenBalance,
   };
 };
 

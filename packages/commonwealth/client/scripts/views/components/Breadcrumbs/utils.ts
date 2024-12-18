@@ -1,3 +1,4 @@
+import { getDecodedString } from '@hicommonwealth/shared';
 import { To } from 'react-router-dom';
 import { breadCrumbURLS } from './data';
 
@@ -109,7 +110,7 @@ export const generateBreadcrumbs = (
     const splitLinks = link.split('/').filter((val) => val.length > 0);
 
     // Removed IDs from the breadcrumb
-    const removedThreadId = decodeURIComponent(pathSegments[index]).replace(
+    const removedThreadId = getDecodedString(pathSegments[index]).replace(
       /^\d+-/,
       '',
     );
@@ -121,8 +122,8 @@ export const generateBreadcrumbs = (
         ? // @ts-expect-error StrictNullChecks
           currentDiscussion.currentThreadName
         : matchedBreadcrumb
-        ? matchedBreadcrumb.breadcrumb
-        : removedThreadId;
+          ? matchedBreadcrumb.breadcrumb
+          : removedThreadId;
 
     if (pathSegments[0] === 'profile' && index === 1) {
       label = 'Edit Profile';
@@ -173,6 +174,22 @@ export const generateBreadcrumbs = (
       }
     }
 
+    if (pathSegments.includes('contests')) {
+      if (pathSegments.includes('manage')) {
+        if (index === 2 && pathSegment !== 'launch') {
+          label = 'Edit';
+        }
+      } else {
+        if (index === 1 && pathSegment === 'contests') {
+          link = 'contests';
+        }
+
+        if (index === 2) {
+          label = 'Leaderboard';
+        }
+      }
+    }
+
     if (
       pathSegments[pathSegments.length - 1] === 'contract' ||
       (['manage', 'analytics', 'contracts'].includes(pathSegments[1]) &&
@@ -186,13 +203,6 @@ export const generateBreadcrumbs = (
       }
 
       // handle contests
-      if (pathSegments.length === 3 && pathSegments[1] === 'contests') {
-        if (pathSegments[2] === 'launch') {
-          pathSegments[2] = 'Launch Contest';
-        } else {
-          pathSegments[2] = 'Edit Contest';
-        }
-      }
     }
 
     // Create the breadcrumb object.

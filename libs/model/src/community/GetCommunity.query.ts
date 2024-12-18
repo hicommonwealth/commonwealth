@@ -44,13 +44,9 @@ export function GetCommunity(): Query<typeof schemas.GetCommunity> {
         return;
       }
 
-      const [adminsAndMods, numVotingThreads, numTotalThreads] = await (<
+      const [adminsAndMods, numVotingThreads] = await (<
         Promise<
-          [
-            Array<{ address: string; role: 'admin' | 'moderator' }>,
-            number,
-            number,
-          ]
+          [Array<{ address: string; role: 'admin' | 'moderator' }>, number]
         >
       >Promise.all([
         models.Address.findAll({
@@ -66,23 +62,15 @@ export function GetCommunity(): Query<typeof schemas.GetCommunity> {
             stage: 'voting',
           },
         }),
-        models.Thread.count({
-          where: {
-            community_id: payload.id,
-            marked_as_spam_at: null,
-          },
-        }),
       ]));
 
       return {
         ...result.toJSON(),
         adminsAndMods,
         numVotingThreads,
-        numTotalThreads,
         communityBanner: result.banner_text,
       } as CommunityAttributes & {
         numVotingThreads: number;
-        numTotalThreads: number;
         adminsAndMods: Array<{
           address: string;
           role: 'admin' | 'moderator';

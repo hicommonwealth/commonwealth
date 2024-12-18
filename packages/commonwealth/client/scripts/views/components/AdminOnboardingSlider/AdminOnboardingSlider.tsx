@@ -1,16 +1,15 @@
-import { ChainBase, commonProtocol } from '@hicommonwealth/shared';
+import { commonProtocol } from '@hicommonwealth/evm-protocols';
+import { ChainBase } from '@hicommonwealth/shared';
 import shape1Url from 'assets/img/shapes/shape1.svg';
 import shape3Url from 'assets/img/shapes/shape3.svg';
 import shape4Url from 'assets/img/shapes/shape4.svg';
 import shape5Url from 'assets/img/shapes/shape5.svg';
 import shape6Url from 'assets/img/shapes/shape6.svg';
-import { useFlag } from 'hooks/useFlag';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useState } from 'react';
 import app from 'state';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { useFetchGroupsQuery } from 'state/api/groups';
-import { useFetchThreadsQuery } from 'state/api/threads';
 import { useFetchTopicsQuery } from 'state/api/topics';
 import useAdminOnboardingSliderMutationStore from 'state/ui/adminOnboardingCards';
 import Permissions from 'utils/Permissions';
@@ -53,14 +52,14 @@ const CARD_TYPES = {
 
 export const AdminOnboardingSlider = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const contestEnabled = useFlag('contest');
 
   const navigate = useCommonNavigate();
 
+  const communityId = app.activeChainId() || '';
   const { data: community, isLoading: isLoadingCommunity } =
     useGetCommunityByIdQuery({
-      id: app.activeChainId(),
-      enabled: !!app.activeChainId(),
+      id: communityId,
+      enabled: !!communityId,
     });
 
   const integrations = {
@@ -85,22 +84,14 @@ export const AdminOnboardingSlider = () => {
 
   const { data: topics = [], isLoading: isLoadingTopics = false } =
     useFetchTopicsQuery({
-      communityId: app.activeChainId(),
-      apiEnabled: !!app.activeChainId(),
+      communityId,
+      apiEnabled: !!communityId,
     });
 
   const { data: groups = [], isLoading: isLoadingGroups = false } =
     useFetchGroupsQuery({
-      communityId: app.activeChainId(),
-      enabled: !!app.activeChainId(),
-    });
-
-  const { data: threadCount = [], isLoading: isLoadingThreads = false } =
-    useFetchThreadsQuery({
-      communityId: app.activeChainId(),
-      queryType: 'count',
-      limit: 1,
-      apiEnabled: !!app.activeChainId(),
+      communityId,
+      enabled: !!communityId,
     });
 
   const redirectToPage = (
@@ -126,25 +117,24 @@ export const AdminOnboardingSlider = () => {
       commonProtocol.ValidChains.SepoliaBase,
     ].includes(community?.ChainNode?.eth_chain_id);
   const isContestActionCompleted =
-    contestEnabled && isCommunitySupported && contestsData?.length > 0;
+    isCommunitySupported && contestsData.all?.length > 0;
 
   const isSliderHidden =
-    !app.activeChainId() ||
+    !communityId ||
     isLoadingCommunity ||
     isContestDataLoading ||
     isLoadingTopics ||
     isLoadingGroups ||
-    isLoadingThreads ||
     (isContestActionCompleted &&
       topics.length > 0 &&
       groups.length > 0 &&
-      threadCount > 0 &&
+      (community.lifetime_thread_count ?? 0 > 0) &&
       hasAnyIntegration) ||
     !(Permissions.isSiteAdmin() || Permissions.isCommunityAdmin()) ||
     [
       ...shouldHideAdminCardsTemporary,
       ...shouldHideAdminCardsPermanently,
-    ].includes(app.activeChainId());
+    ].includes(communityId);
 
   useEffect(() => {
     setIsVisible(!isSliderHidden);
@@ -162,14 +152,14 @@ export const AdminOnboardingSlider = () => {
         headerText="Finish setting up your community"
         onDismiss={() => setIsModalVisible(true)}
       >
-        {contestEnabled && isCommunitySupported && (
+        {isCommunitySupported && (
           <ActionCard
             ctaText={CARD_TYPES['launch-contest'].ctaText}
             title={CARD_TYPES['launch-contest'].title}
             description={CARD_TYPES['launch-contest'].description}
             iconURL={CARD_TYPES['launch-contest'].iconURL}
             iconAlt="launch-contest-icon"
-            isActionCompleted={contestsData?.length > 0}
+            isActionCompleted={contestsData.all?.length > 0}
             onCTAClick={() => redirectToPage('launch-contest')}
           />
         )}
@@ -206,7 +196,7 @@ export const AdminOnboardingSlider = () => {
           description={CARD_TYPES['create-thread'].description}
           iconURL={CARD_TYPES['create-thread'].iconURL}
           iconAlt="create-thread-icon"
-          isActionCompleted={threadCount > 0}
+          isActionCompleted={(community?.lifetime_thread_count ?? 0) > 0}
           onCTAClick={() => redirectToPage('create-thread')}
         />
       </CardsSlider>
@@ -227,7 +217,7 @@ export const AdminOnboardingSlider = () => {
             onDismiss={(shouldDismissPermanently) => {
               setIsModalVisible(false);
               setShouldHideAdminOnboardingCardsForCommunity(
-                app.activeChainId(),
+                communityId,
                 shouldDismissPermanently,
               );
             }}

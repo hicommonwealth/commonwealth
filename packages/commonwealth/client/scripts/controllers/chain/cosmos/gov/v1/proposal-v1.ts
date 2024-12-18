@@ -27,7 +27,7 @@ import moment from 'moment';
 import CosmosAccount from '../../account';
 import type CosmosAccounts from '../../accounts';
 import type CosmosChain from '../../chain';
-import type { CosmosApiType } from '../../chain';
+import { isAtomoneLCD, type CosmosApiType } from '../../chain';
 import { CosmosVote } from '../v1beta1/proposal-v1beta1';
 import { encodeMsgVote } from '../v1beta1/utils-v1beta1';
 import type CosmosGovernanceV1 from './governance-v1';
@@ -124,6 +124,7 @@ export class CosmosProposalV1 extends Proposal<
     this._Chain = ChainInfo;
     this._Accounts = Accounts;
     this._Governance = Governance;
+    this.createdAt = data.submitTime;
     this._Governance.store.add(this);
   }
 
@@ -154,6 +155,8 @@ export class CosmosProposalV1 extends Proposal<
 
   public async fetchDeposits(): Promise<QueryDepositsResponseSDKType> {
     const proposalId = longify(this.data.identifier) as Long;
+    // @ts-expect-error StrictNullChecks
+    if (isAtomoneLCD(this._Chain.lcd)) return;
     const deposits = await this._Chain.lcd.cosmos.gov.v1.deposits({
       proposalId,
     });
@@ -163,6 +166,8 @@ export class CosmosProposalV1 extends Proposal<
 
   public async fetchTally(): Promise<QueryTallyResultResponseSDKType> {
     const proposalId = longify(this.data.identifier) as Long;
+    // @ts-expect-error StrictNullChecks
+    if (isAtomoneLCD(this._Chain.lcd)) return;
     const tally = await this._Chain.lcd.cosmos.gov.v1.tallyResult({
       proposalId,
     });
@@ -172,6 +177,8 @@ export class CosmosProposalV1 extends Proposal<
 
   public async fetchVotes(): Promise<QueryVotesResponseSDKType> {
     const proposalId = longify(this.data.identifier) as Long;
+    // @ts-expect-error StrictNullChecks
+    if (isAtomoneLCD(this._Chain.lcd)) return;
     const votes = await this._Chain.lcd.cosmos.gov.v1.votes({ proposalId });
     this.setVotes(votes);
     return votes;

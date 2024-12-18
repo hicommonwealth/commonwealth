@@ -1,3 +1,4 @@
+import { buildUpdateGroupInput } from 'client/scripts/state/api/groups/editGroup';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import Group from 'models/Group';
@@ -20,6 +21,7 @@ import {
 import { convertRequirementAmountFromWeiToTokens } from '../../common/helpers';
 import { DeleteGroupModal } from '../DeleteGroupModal';
 import { GroupForm } from '../common/GroupForm';
+import { convertGranularPermissionsToAccumulatedPermissions } from '../common/GroupForm/helpers';
 import { makeGroupDataBaseAPIPayload } from '../common/helpers';
 import './UpdateCommunityGroupPage.scss';
 
@@ -28,12 +30,15 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
   const user = useUserStore();
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+
+  const communityId = app.activeChainId() || '';
   const { mutateAsync: editGroup } = useEditGroupMutation({
-    communityId: app.activeChainId(),
+    communityId,
   });
   const { data: groups = [], isLoading } = useFetchGroupsQuery({
-    communityId: app.activeChainId(),
+    communityId,
     includeTopics: true,
+    enabled: !!communityId,
   });
   // @ts-expect-error <StrictNullChecks/>
   const foundGroup: Group = groups.find(
@@ -83,6 +88,7 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
         initialValues={{
           groupName: foundGroup.name,
           groupDescription: foundGroup.description,
+          groupImageUrl: foundGroup.groupImageUrl,
           // @ts-expect-error <StrictNullChecks/>
           requirements: foundGroup.requirements
             .filter((r) => r?.data?.source) // filter erc groups
@@ -127,20 +133,19 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
           topics: (foundGroup.topics || []).map((topic) => ({
             label: topic.name,
             value: topic.id,
+            permission: convertGranularPermissionsToAccumulatedPermissions(
+              topic.permissions || [],
+            ),
           })),
         }}
         onSubmit={(values) => {
-          const payload = makeGroupDataBaseAPIPayload(
-            values,
-            isAddedToHomeScreen,
-            allowedAddresses,
-          );
-          const finalPayload = {
+          const payload = makeGroupDataBaseAPIPayload(values, allowedAddresses);
+          const input = buildUpdateGroupInput({
             ...payload,
             groupId: groupId,
-          };
+          });
 
-          editGroup(finalPayload)
+          editGroup(input)
             .then(() => {
               notifySuccess('Group Updated');
               navigate(`/members?tab=groups`);

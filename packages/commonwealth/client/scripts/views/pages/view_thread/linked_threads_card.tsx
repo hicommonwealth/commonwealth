@@ -1,19 +1,18 @@
 import { slugify } from '@hicommonwealth/shared';
 import { filterLinks } from 'helpers/threads';
 import { getProposalUrlPath } from 'identifiers';
-import 'pages/view_thread/linked_threads_card.scss';
 import React, { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import app from 'state';
 import { useGetThreadsByIdQuery } from 'state/api/threads';
-import type Thread from '../../../models/Thread';
-import { LinkSource } from '../../../models/Thread';
+import Thread, { LinkSource } from '../../../models/Thread';
 import { CWContentPageCard } from '../../components/component_kit/CWContentPageCard';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWButton } from '../../components/component_kit/new_designs/CWButton';
 import CWCircleMultiplySpinner from '../../components/component_kit/new_designs/CWCircleMultiplySpinner';
 import { CWModal } from '../../components/component_kit/new_designs/CWModal';
 import { LinkedThreadModal } from '../../modals/linked_thread_modal';
+import './linked_threads_card.scss';
 
 type LinkedThreadsCardProps = {
   thread: Thread;
@@ -34,10 +33,11 @@ export const LinkedThreadsCard = ({
     [thread.links],
   );
 
+  const communityId = app.activeChainId() || '';
   const { data: linkedThreads, isLoading } = useGetThreadsByIdQuery({
-    communityId: app.activeChainId(),
-    ids: linkedThreadIds.map(Number),
-    apiCallEnabled: linkedThreadIds.length > 0, // only call the api if we have thread id
+    community_id: communityId,
+    thread_ids: linkedThreadIds.map(Number),
+    apiCallEnabled: linkedThreadIds.length > 0 && !!communityId, // only call the api if we have thread id
   });
 
   return (
@@ -53,11 +53,11 @@ export const LinkedThreadsCard = ({
             <div className="LinkedThreadsCard">
               {linkedThreadIds.length > 0 ? (
                 <div className="links-container">
-                  {/* @ts-expect-error StrictNullChecks*/}
-                  {linkedThreads.map((t) => {
+                  {linkedThreads!.map((t) => {
+                    const tt = new Thread(t);
                     const discussionLink = getProposalUrlPath(
-                      t.slug,
-                      `${t.identifier}-${slugify(t.title)}`,
+                      tt.slug,
+                      `${tt.identifier}-${slugify(t.title)}`,
                       false,
                     );
 

@@ -1,37 +1,30 @@
 import {
-  Events,
+  CacheNamespaces,
   INVALID_ACTOR_ERROR,
   INVALID_INPUT_ERROR,
+  INVALID_STATE_ERROR,
+  cache,
   command as coreCommand,
   query as coreQuery,
   handleEvent,
-  type CommandInput,
-  type CommandMetadata,
+  logger,
   type EventSchemas,
   type EventsHandlerMetadata,
-  type QueryMetadata,
-  type User,
+  type Metadata,
 } from '@hicommonwealth/core';
-import { TRPCError, initTRPC } from '@trpc/server';
-import { Request } from 'express';
-import { type OpenApiMeta } from 'trpc-swagger';
+import { Events } from '@hicommonwealth/schemas';
+import { TRPCError } from '@trpc/server';
 import { ZodSchema, ZodUndefined, z } from 'zod';
-import { OutputMiddleware, authenticate } from './middleware';
+import { Commit, Tag, Track, buildproc, procedure } from './middleware';
 
-export interface Context {
-  req: Request;
-}
-
-const trpc = initTRPC.meta<OpenApiMeta>().context<Context>().create();
-
-const isSecure = (md: { secure?: boolean; auth: unknown[] }) =>
-  md.secure !== false || md.auth.length > 0;
+const log = logger(import.meta);
 
 const trpcerror = (error: unknown): TRPCError => {
   if (error instanceof Error) {
     const { name, message, ...other } = error;
     switch (name) {
       case INVALID_INPUT_ERROR:
+      case INVALID_STATE_ERROR:
         return new TRPCError({ code: 'BAD_REQUEST', message, ...other });
 
       case INVALID_ACTOR_ERROR:
@@ -40,7 +33,7 @@ const trpcerror = (error: unknown): TRPCError => {
       default:
         return new TRPCError({
           code: 'INTERNAL_SERVER_ERROR',
-          message,
+          message: `[${name}] ${message}`,
           cause: error,
         });
     }
@@ -51,63 +44,119 @@ const trpcerror = (error: unknown): TRPCError => {
   });
 };
 
-export enum Tag {
-  User = 'User',
-  Community = 'Community',
-  Thread = 'Thread',
-  Comment = 'Comment',
-  Reaction = 'Reaction',
-  Integration = 'Integration',
-  Subscription = 'Subscription',
-  LoadTest = 'LoadTest',
-  Wallet = 'Wallet',
-  Webhook = 'Webhook',
-}
-
-export const command = <Input extends CommandInput, Output extends ZodSchema>(
-  factory: () => CommandMetadata<Input, Output>,
+/**
+ * Builds tRPC command POST endpoint
+ * @param factory command factory
+ * @param tag command tag used for OpenAPI spec grouping
+ * @param track analytics tracking middleware as:
+ * - tuple of `[event, output mapper]`
+ * - or `(input,output) => Promise<[event, data]|undefined>`
+ * @param commit output middleware (best effort), mainly used to commit actions to canvas
+ * - `(input,output,ctx) => Promise<Record<string,unknown>> | undefined | void`
+ * @returns tRPC mutation procedure
+ */
+export const command = <
+  Input extends ZodSchema,
+  Output extends ZodSchema,
+  Context extends ZodSchema,
+>(
+  factory: () => Metadata<Input, Output, Context>,
   tag: Tag,
-  outputMiddleware?: OutputMiddleware<z.infer<Output>>,
+  track?: Track<Input, Output>,
+  commit?: Commit<Input, Output>,
 ) => {
   const md = factory();
-  return trpc.procedure
-    .meta({
-      openapi: {
-        method: 'POST',
-        path: `/${factory.name}/{id}`,
-        tags: [tag],
-        headers: [
-          {
-            in: 'header',
-            name: 'address',
-            required: true,
-            schema: { type: 'string' },
-          },
-        ],
-        protect: isSecure(md),
-      },
-    })
-    .input(md.input)
-    .output(md.output)
-    .mutation(async ({ ctx, input }) => {
-      // md.secure must explicitly be false if the route requires no authentication
-      // if we provide any authorization method we force authentication as well
-      if (isSecure(md)) await authenticate(ctx.req, md.authStrategy);
-      try {
-        const _ctx = {
-          actor: {
-            user: ctx.req.user as User,
-            address: ctx.req.headers['address'] as string,
-          },
+  return buildproc({
+    method: 'POST',
+    name: factory.name,
+    md,
+    tag,
+    track,
+    commit,
+  }).mutation(async ({ ctx, input }) => {
+    try {
+      return await coreCommand(
+        md,
+        {
+          actor: ctx.actor,
           payload: input!,
-        };
-        const result = await coreCommand(md, _ctx, false);
-        outputMiddleware && (await outputMiddleware(_ctx, result!));
-        return result;
-      } catch (error) {
-        throw trpcerror(error);
+        },
+        false,
+      );
+    } catch (error) {
+      throw trpcerror(error);
+    }
+  });
+};
+
+/**
+ * Builds tRPC query GET endpoint
+ * @param factory query factory
+ * @param tag query tag used for OpenAPI spec grouping
+ * @param options An object with security and caching related configuration
+ * @param commit output middleware (best effort), mainly used to update statistics
+ * - `(input,output,ctx) => Promise<Record<string,unknown>> | undefined | void`
+ * @returns tRPC query procedure
+ */
+export const query = <
+  Input extends ZodSchema,
+  Output extends ZodSchema,
+  Context extends ZodSchema,
+>(
+  factory: () => Metadata<Input, Output, Context>,
+  tag: Tag,
+  options?: {
+    forceSecure?: boolean;
+    ttlSecs?: number;
+  },
+  commit?: Commit<Input, Output>,
+) => {
+  const md = factory();
+  return buildproc({
+    method: 'GET',
+    name: factory.name,
+    md,
+    tag,
+    commit,
+    forceSecure: options?.forceSecure,
+  }).query(async ({ ctx, input }) => {
+    try {
+      const cacheKey = options?.ttlSecs
+        ? `${factory.name}_${JSON.stringify(input)}`
+        : undefined;
+      if (cacheKey) {
+        const cachedReponse = await cache().getKey(
+          CacheNamespaces.Query_Response,
+          cacheKey,
+        );
+        if (cachedReponse) {
+          log.info(`Returning cached response for ${cacheKey}`);
+          return JSON.parse(cachedReponse);
+        }
       }
-    });
+      const response = await coreQuery(
+        md,
+        {
+          actor: ctx.actor,
+          payload: input!,
+        },
+        false,
+      );
+      if (cacheKey) {
+        void cache()
+          .setKey(
+            CacheNamespaces.Query_Response,
+            cacheKey,
+            JSON.stringify(response),
+            options?.ttlSecs,
+          )
+          .then(() => log.info(`Cached response for ${cacheKey}`));
+      }
+      return response;
+    } catch (error) {
+      throw trpcerror(error);
+    }
+  });
 };
 
 // TODO: add security options (API key, IP range, internal, etc)
@@ -119,7 +168,7 @@ export const event = <
   tag: Tag.Integration,
 ) => {
   const md = factory();
-  return trpc.procedure
+  return procedure
     .meta({
       openapi: {
         method: 'POST',
@@ -138,50 +187,3 @@ export const event = <
       }
     });
 };
-
-export const query = <Input extends ZodSchema, Output extends ZodSchema>(
-  factory: () => QueryMetadata<Input, Output>,
-  tag: Tag,
-) => {
-  const md = factory();
-  return trpc.procedure
-    .meta({
-      openapi: {
-        method: 'GET',
-        path: `/${factory.name}`,
-        tags: [tag],
-        headers: [
-          {
-            in: 'header',
-            name: 'address',
-            required: false,
-            schema: { type: 'string' },
-          },
-        ],
-      },
-      protect: isSecure(md),
-    })
-    .input(md.input)
-    .output(md.output)
-    .query(async ({ ctx, input }) => {
-      // enable secure by default
-      if (isSecure(md)) await authenticate(ctx.req, md.authStrategy);
-      try {
-        return await coreQuery(
-          md,
-          {
-            actor: {
-              user: ctx.req.user as User,
-              address: ctx.req.headers['address'] as string,
-            },
-            payload: input!,
-          },
-          false,
-        );
-      } catch (error) {
-        throw trpcerror(error);
-      }
-    });
-};
-
-export const router = trpc.router;

@@ -1,17 +1,17 @@
 import {
+  buildRetryStrategy,
+  getRabbitMQConfig,
   HotShotsStats,
   KnockProvider,
   RabbitMQAdapter,
   RascalConfigServices,
   ServiceKey,
-  buildRetryStrategy,
-  getRabbitMQConfig,
   startHealthCheckLoop,
 } from '@hicommonwealth/adapters';
 import {
   Broker,
-  BrokerSubscriptions,
   broker,
+  BrokerSubscriptions,
   dispose,
   logger,
   notificationsProvider,
@@ -20,10 +20,13 @@ import {
 import { fileURLToPath } from 'url';
 import { config } from '../../config';
 import { NotificationsPolicy } from './notificationsPolicy';
+import { NotificationsSettingsPolicy } from './notificationsSettingsPolicy';
 
 const log = logger(import.meta);
 
-stats(HotShotsStats());
+stats({
+  adapter: HotShotsStats(),
+});
 
 let isServiceHealthy = false;
 
@@ -49,7 +52,9 @@ async function startKnockWorker() {
       ),
     );
     await rmqAdapter.init();
-    broker(rmqAdapter);
+    broker({
+      adapter: rmqAdapter,
+    });
     brokerInstance = rmqAdapter;
   } catch (e) {
     log.error(
@@ -60,7 +65,9 @@ async function startKnockWorker() {
 
   // init Knock as notifications provider - this is necessary since the policies do not define the provider
   if (config.NOTIFICATIONS.FLAG_KNOCK_INTEGRATION_ENABLED)
-    notificationsProvider(KnockProvider());
+    notificationsProvider({
+      adapter: KnockProvider(),
+    });
   else notificationsProvider();
 
   const sub = await brokerInstance.subscribe(
@@ -81,6 +88,22 @@ async function startKnockWorker() {
   );
 
   if (!sub) {
+    log.fatal(
+      'Failed to subscribe to notifications. Requires restart!',
+      undefined,
+      {
+        topic: BrokerSubscriptions.NotificationsProvider,
+      },
+    );
+    await dispose()('ERROR', true);
+  }
+
+  const settingsSub = await brokerInstance.subscribe(
+    BrokerSubscriptions.NotificationsSettings,
+    NotificationsSettingsPolicy(),
+  );
+
+  if (!settingsSub) {
     log.fatal(
       'Failed to subscribe to notifications. Requires restart!',
       undefined,

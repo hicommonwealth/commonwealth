@@ -2,28 +2,27 @@ import {
   Actor,
   AppError,
   InvalidInput,
+  InvalidState,
   type Command,
 } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
-import {
-  BalanceSourceType,
-  renderQuillDeltaToText,
-} from '@hicommonwealth/shared';
+import { BalanceSourceType } from '@hicommonwealth/shared';
 import { BigNumber } from 'ethers';
-import moment from 'moment';
 import { z } from 'zod';
 import { config } from '../config';
 import { GetActiveContestManagers } from '../contest';
 import { models } from '../database';
-import { isCommunityAdminOrTopicMember } from '../middleware';
+import { authTopic } from '../middleware';
 import { verifyThreadSignature } from '../middleware/canvas';
-import { mustExist } from '../middleware/guards';
+import { mustBeAuthorized } from '../middleware/guards';
+import { getThreadSearchVector } from '../models/thread';
 import { tokenBalanceCache } from '../services';
 import {
+  decodeContent,
   emitMentions,
   parseUserMentions,
-  sanitizeQuillText,
   uniqueMentions,
+  uploadIfLarge,
 } from '../utils';
 
 export const CreateThreadErrors = {
@@ -36,21 +35,10 @@ export const CreateThreadErrors = {
   DiscussionMissingTitle: 'Discussion posts must include a title',
   NoBody: 'Thread body cannot be blank',
   PostLimitReached: 'Post limit reached',
+  ArchivedTopic: 'Cannot post in archived topic',
 };
 
 const getActiveContestManagersQuery = GetActiveContestManagers();
-
-function toPlainString(decodedBody: string) {
-  try {
-    const quillDoc = JSON.parse(decodedBody);
-    if (quillDoc.ops.length === 1 && quillDoc.ops[0].insert.trim() === '')
-      throw new InvalidInput(CreateThreadErrors.NoBody);
-    return renderQuillDeltaToText(quillDoc);
-  } catch {
-    // check always passes if the body isn't a Quill document
-  }
-  return decodedBody;
-}
 
 /**
  * Ensure that user has non-dust ETH value
@@ -99,18 +87,20 @@ export function CreateThread(): Command<typeof schemas.CreateThread> {
   return {
     ...schemas.CreateThread,
     auth: [
-      isCommunityAdminOrTopicMember(schemas.PermissionEnum.CREATE_THREAD),
+      authTopic({ action: schemas.PermissionEnum.CREATE_THREAD }),
       verifyThreadSignature,
     ],
-    body: async ({ actor, payload }) => {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { id, community_id, topic_id, kind, url, ...rest } = payload;
+    body: async ({ actor, payload, context }) => {
+      const { address } = mustBeAuthorized(actor, context);
+
+      const { community_id, topic_id, kind, url, ...rest } = payload;
 
       if (kind === 'link' && !url?.trim())
         throw new InvalidInput(CreateThreadErrors.LinkMissingTitleOrUrl);
 
-      const body = sanitizeQuillText(payload.body);
-      const plaintext = kind === 'discussion' ? toPlainString(body) : body;
+      const topic = await models.Topic.findOne({ where: { id: topic_id } });
+      if (topic?.archived_at)
+        throw new InvalidState(CreateThreadErrors.ArchivedTopic);
 
       // check contest invariants
       const activeContestManagers = await getActiveContestManagersQuery.body({
@@ -125,27 +115,10 @@ export function CreateThread(): Command<typeof schemas.CreateThread> {
         checkContestLimits(activeContestManagers, actor.address!);
       }
 
-      // New threads get an empty version history initialized, which is passed
-      // the thread's first version, formatted on the frontend with timestamps
-      const version_history = [
-        JSON.stringify({
-          timestamp: moment(),
-          author: { id: actor.addressId, address: actor.address },
-          body,
-        }),
-      ];
-
-      // Loading to update last_active
-      const address = await models.Address.findOne({
-        where: {
-          user_id: actor.user.id,
-          community_id,
-          address: actor.address,
-        },
-      });
-      if (!mustExist('Community address', address)) return;
-
+      const body = decodeContent(payload.body);
       const mentions = uniqueMentions(parseUserMentions(body));
+
+      const { contentUrl } = await uploadIfLarge('threads', body);
 
       // == mutation transaction boundary ==
       const new_thread_id = await models.sequelize.transaction(
@@ -158,13 +131,12 @@ export function CreateThread(): Command<typeof schemas.CreateThread> {
               topic_id,
               kind,
               body,
-              plaintext,
-              version_history,
               view_count: 0,
               comment_count: 0,
               reaction_count: 0,
-              reaction_weights_sum: 0,
-              max_notif_id: 0,
+              reaction_weights_sum: '0',
+              search: getThreadSearchVector(rest.title, body),
+              content_url: contentUrl,
             },
             {
               transaction,
@@ -177,16 +149,13 @@ export function CreateThread(): Command<typeof schemas.CreateThread> {
               body,
               address: address.address,
               timestamp: thread.created_at!,
+              content_url: contentUrl,
             },
             {
               transaction,
             },
           );
 
-          address.last_active = new Date();
-          await address.save({ transaction });
-
-          // subscribe author (@timolegros this is the user aggregate leak we are discussing)
           await models.ThreadSubscription.create(
             {
               user_id: actor.user.id!,
@@ -195,9 +164,8 @@ export function CreateThread(): Command<typeof schemas.CreateThread> {
             { transaction },
           );
 
-          // emit mention events = transactional outbox
           mentions.length &&
-            (await emitMentions(models, transaction, {
+            (await emitMentions(transaction, {
               authorAddressId: address.id!,
               authorUserId: actor.user.id!,
               authorAddress: address.address,
@@ -213,12 +181,12 @@ export function CreateThread(): Command<typeof schemas.CreateThread> {
 
       const thread = await models.Thread.findOne({
         where: { id: new_thread_id },
-        include: [
-          { model: models.Address, as: 'Address' },
-          { model: models.Topic, as: 'topic' },
-        ],
+        include: [{ model: models.Address, as: 'Address' }],
       });
-      return thread!.toJSON();
+      return {
+        ...thread!.toJSON(),
+        topic: topic!.toJSON(),
+      };
     },
   };
 }

@@ -1,7 +1,11 @@
 // Note, this login will not work for the homepage
-import { tester, type DB, type E2E_TestEntities } from '@hicommonwealth/model';
+import {
+  models,
+  tester,
+  type DB,
+  type E2E_TestEntities,
+} from '@hicommonwealth/model';
 import { expect } from '@playwright/test';
-import { config } from '../../../server/config';
 
 export type E2E_Seeder = E2E_TestEntities & {
   testDb: DB;
@@ -15,7 +19,8 @@ export type E2E_Seeder = E2E_TestEntities & {
 const buildSeeder = async (): Promise<E2E_Seeder> => {
   // This connection is used to speed up tests, so we don't need to load in all the models with the associated
   // imports. This can only be used with raw sql queries.
-  const testDb = await tester.bootstrap_testing(true);
+
+  const testDb = models;
   const testAddress = '0x0bad5AA8Adf8bA82198D133F9Bb5a48A638FCe88';
   const e2eEntities = await tester.e2eTestEntities(testDb);
 
@@ -62,11 +67,6 @@ const buildSeeder = async (): Promise<E2E_Seeder> => {
     ...e2eEntities,
 
     addAlchemyKey: async function () {
-      const apiKey = config.EVM.ETH_ALCHEMY_API_KEY;
-      if (!apiKey) {
-        throw Error('ETH_ALCHEMY_API_KEY not found');
-      }
-
       // If chainNode for eth doesn't exist, add it and add key.
       const ethChainNodeExists = await testDb.sequelize.query(
         'SELECT url FROM "ChainNodes" WHERE eth_chain_id = 1 OR id = 37',
@@ -78,8 +78,8 @@ const buildSeeder = async (): Promise<E2E_Seeder> => {
         try {
           await testDb.sequelize.query(`
         INSERT INTO "ChainNodes" (id, url, eth_chain_id, alt_wallet_url, balance_type, name, created_at, updated_at)
-        VALUES (37, 'https://eth-mainnet.g.alchemy.com/v2/${apiKey}', 1,
-         'https://eth-mainnet.g.alchemy.com/v2/pZsX6R3wGdnwhUJHlVmKg4QqsiS32Qm4',
+        VALUES (37, 'https://eth-mainnet.g.alchemy.com/v2/', 1,
+         'https://eth-mainnet.g.alchemy.com/v2/',
           'ethereum', 'Ethereum (Mainnet)', now(), now());
     `);
         } catch (e) {
@@ -90,8 +90,8 @@ const buildSeeder = async (): Promise<E2E_Seeder> => {
           try {
             await testDb.sequelize.query(`
         INSERT INTO "ChainNodes" (id, url, eth_chain_id, alt_wallet_url, balance_type, name, created_at, updated_at)
-        VALUES (56, 'https://polygon-mainnet.g.alchemy.com/v2/5yLkuoKshDbUJdebSAQgmQUPtqLe3LO8', 137,
-        'https://polygon-mainnet.g.alchemy.com/v2/5yLkuoKshDbUJdebSAQgmQUPtqLe3LO8', 'ethereum',
+        VALUES (56, 'https://polygon-mainnet.g.alchemy.com/v2/', 137,
+        'https://polygon-mainnet.g.alchemy.com/v2/', 'ethereum',
          'Polygon', now(), now());
     `);
           } catch (e) {
@@ -101,23 +101,6 @@ const buildSeeder = async (): Promise<E2E_Seeder> => {
 
         return;
       }
-
-      // If ethChainNode already has the apiKey, early return
-      // @ts-expect-error StrictNullChecks
-      if (ethChainNodeExists[0][0]['url'].includes(apiKey)) {
-        return;
-      }
-
-      // If it does exist, update the key
-      await testDb.sequelize.query(`
-  UPDATE "ChainNodes"
-  SET
-    url = 'https://eth-mainnet.g.alchemy.com/v2/${apiKey}',
-    alt_wallet_url = 'https://eth-mainnet.g.alchemy.com/v2/${apiKey}'
-  WHERE
-    eth_chain_id = 1
-    AND NOT EXISTS (select 1 from "ChainNodes" where url = 'https://eth-mainnet.g.alchemy.com/v2/${apiKey}')
-  `);
     },
 
     // removes default user from the db. Subsequent login will need to go through the profile creation screen
@@ -129,23 +112,11 @@ const buildSeeder = async (): Promise<E2E_Seeder> => {
       if (userExists[0].length === 0) return;
 
       const removeQuery = `
-    DELETE FROM "Subscriptions"
-    WHERE subscriber_id in (
-    SELECT user_id
-        FROM "Addresses"
-        WHERE address = '${testAddress}'
-    );
     DELETE FROM "Users"
     WHERE id IN (
         SELECT user_id
         FROM "Addresses"
         WHERE address = '${testAddress}'
-    );
-    DELETE FROM "Profiles"
-    WHERE user_id IN (
-      SELECT user_id
-      FROM "Addresses"
-      WHERE address = '${testAddress}'
     );
     DELETE FROM "Addresses"
     WHERE address = '${testAddress}';
@@ -181,22 +152,6 @@ const buildSeeder = async (): Promise<E2E_Seeder> => {
         NULL,
         'never'
       ) RETURNING id`);
-
-      await testDb.sequelize.query(`
-    INSERT INTO "Profiles" (
-        user_id,
-        created_at,
-        updated_at,
-        profile_name,
-        socials
-      ) VALUES (
-        ${userId[0][0]!['id']},
-        '2023-07-14 13:03:56.203-07',
-        '2023-07-14 13:03:56.415-07',
-        'TestAddress',
-        '{}'
-      ) RETURNING id
-    `);
 
       // @ts-expect-error StrictNullChecks
       await createAddress('ethereum', userId[0][0]['id']);

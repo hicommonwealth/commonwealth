@@ -18,7 +18,6 @@ If you add a new environment variable, you must add documentation here. Please d
 - [COSMOS_GOV_V1](#cosmos_gov_v1)
 - [COSMOS_PROXY_REFERER](#cosmos_proxy_referer)
 - [COSMOS_REGISTRY_API](#cosmos_registry_api)
-- [CW_BOT_KEY](#cw_bot_key)
 - [DATABASE_CLEAN_HOUR](#database_clean_hour)
 - [DATABASE_LOG_TRACE](#database_log_trace)
 - [DATABASE_URI](#database_uri)
@@ -32,12 +31,11 @@ If you add a new environment variable, you must add documentation here. Please d
 - [DD_LOG_LEVEL](#dd_log_level)
 - [DD_SITE](#dd_site)
 - [DISABLE_CACHE](#disable_cache)
-- [DISCORD_BOT_TOKEN](#discord_bot_token)
+- [DISCORD_TOKEN](#discord_token)
 - [DISCORD_BOT_URL](#discord_bot_url)
 - [DISCORD_CLIENT_ID](#discord_client_id)
 - [DISCORD_WEBHOOK_URL_DEV](#discord_webhook_url_dev)
 - [DL_BUILD](#dl_build)
-- [ENFORCE_SESSION_KEYS](#enforce_session_keys)
 - [ETH_ALCHEMY_API_KEY](#eth_alchemy_api_key)
 - [ETH_RPC](#eth_rpc)
 - [FALLBACK_NODE_DURATION_S](#fallback_node_duration_s)
@@ -71,8 +69,6 @@ If you add a new environment variable, you must add documentation here. Please d
 - [SENDGRID_API_KEY](#sendgrid_api_key)
 - [SERVER_URL](#server_url)
 - [SESSION_SECRET](#session_secret)
-- [SL_BUILD](#sl_build)
-- [SL_PORT](#sl_port)
 - [SLACK_WEBHOOK_URL_DEV](#slack_webhook_url_dev)
 - [SNAPSHOT_HUB_URL](#snapshot_hub_url)
 - [SUPER_ADMIN_EMAIL](#super_admin_email)
@@ -122,10 +118,6 @@ Owner: Mark Hagelberg.
 Community-maintained data source for Cosmos ecosystem blockchains. Pulls from a [GitHub repo](https://github.com/cosmos/chain-registry/) as its source of truth. As of 231212, this should be `https://cosmoschains.thesilverfox.pro` by default.
 
 Owner: Mark Hagelberg.
-
-## CW_BOT_KEY
-
-Required for Common bots, e.g. Discobot. In development, can be set to any random identifier string, but must match the value of `CW_BOT_KEY` set in Discobot's .env file.
 
 ## DATABASE_CLEAN_HOUR
 
@@ -183,7 +175,7 @@ DataDog configuration token in our Heroku pipeline, specifying our DataDog site 
 
 If `true`, disables Redis caching middleware.
 
-## DISCORD_BOT_TOKEN
+## DISCORD_TOKEN
 
 This value should mirror the value of `DISCORD_TOKEN` in the Discobot .env file.
 
@@ -203,12 +195,6 @@ Connects to the #webhook-testing Discord channel on the Commond Protocol Discord
 
 Boolean which ensures that Heroku only builds the Discobot package and related code when deploying.
 
-## ENFORCE_SESSION_KEYS
-
-Boolean feature flag for server-side enforcement of Canvas session keys; by default, `false`.
-
-Owner: Raymond Zhong.
-
 ## ETH_ALCHEMY_API_KEY
 
 Used in our CI/CD and stored in GitHub repo secrets. If set, the `load-db` package script will replace production Alchemy URLs with their locally supported variants. Only needed if doing work that involves querying Ethereum.
@@ -226,7 +212,6 @@ Owner: Ian Rowan
 Optional. Defaults to 5 minutes (300 seconds).
 This is number, in seconds. It configures the length of time we will use a community-maintained public endpoint if a given ChainNode fails.
 After this time, the server will try the original DB endpoint again.
-
 
 ## FLAG_NEW_CREATE_COMMUNITY
 
@@ -349,13 +334,6 @@ By default, this is set in our `commonwealth/server/config` file to `https://com
 
 Equivalent to JWT Secret, but used in testing.
 
-## SL_BUILD
-
-Boolean triggering our `snapshot-listener` package to build.
-
-## SL_PORT
-
-Port used for the `snapshot-listener` package. We use the default value `8001`.
 
 ## SLACK_WEBHOOK_URL_DEV
 

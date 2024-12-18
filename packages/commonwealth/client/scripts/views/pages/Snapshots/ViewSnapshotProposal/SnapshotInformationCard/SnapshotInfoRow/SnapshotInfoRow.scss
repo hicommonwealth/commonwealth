@@ -1,0 +1,22 @@
+@import '../../../../../../styles/shared';
+
+.SnapshotInfoRow {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 100%;
+
+  .snapshot-info-row-label.Text {
+    color: $neutral-500;
+  }
+
+  a {
+    align-items: center;
+    display: flex;
+
+    .snapshot-link {
+      color: $purple-400;
+      margin-right: 4px;
+    }
+  }
+}

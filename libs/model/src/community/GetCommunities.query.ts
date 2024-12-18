@@ -1,8 +1,10 @@
 import { type Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
+import { CommunityType } from '@hicommonwealth/shared';
 import { QueryTypes } from 'sequelize';
 import { z } from 'zod';
 import { models } from '../database';
+import { buildChainNodeUrl } from '../utils/utils';
 
 export function GetCommunities(): Query<typeof schemas.GetCommunities> {
   return {
@@ -23,6 +25,9 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
         limit,
         order_by,
         order_direction,
+        eth_chain_id,
+        cosmos_chain_id,
+        community_type,
       } = payload;
 
       // pagination configuration
@@ -32,7 +37,14 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
 
       // note that tags are queried based on the INTERSECTION of provided tags
       const filtering_tags = tag_ids && tag_ids.length > 0;
-      const replacements: { tag_ids?: number[]; user_id?: number } = {};
+      const replacements: {
+        tag_ids?: number[];
+        user_id?: number;
+        eth_chain_id?: number;
+        cosmos_chain_id?: string;
+      } = {};
+      if (eth_chain_id) replacements.eth_chain_id = eth_chain_id;
+      if (cosmos_chain_id) replacements.cosmos_chain_id = cosmos_chain_id;
       if (filtering_tags) replacements.tag_ids = tag_ids;
       if (relevance_by === 'membership')
         replacements.user_id = actor?.user?.id || 0;
@@ -59,7 +71,6 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
                   "Community"."block_explorer_ids",
                   "Community"."collapsed_on_homepage",
                   "Community"."type",
-                  "Community"."has_chain_events_listener",
                   "Community"."default_summary_view",
                   "Community"."default_page",
                   "Community"."has_homepage",
@@ -87,6 +98,17 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
                   }
           FROM    "Communities" AS "Community"
           WHERE  "Community"."active" = true
+                      ${
+                        relevance_by === 'membership'
+                          ? `
+                        AND name NOT LIKE '%<%'
+                        AND name NOT LIKE '%>%'
+                        AND name NOT LIKE '%\`%'
+                        AND name NOT LIKE '%"%'
+                        AND name NOT LIKE '%''%'
+                        `
+                          : ''
+                      }
                         ${
                           base
                             ? `
@@ -98,6 +120,18 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
                             ? `
                           AND "Community"."network" = '${network}'
                         `
+                            : ''
+                        }
+                        ${
+                          community_type
+                            ? `
+                           AND (
+                            SELECT "community_id"
+                            FROM   "LaunchpadTokens" AS "LaunchpadTokens"
+                            WHERE  ( "LaunchpadTokens"."community_id" = "Community"."id" )
+                            LIMIT  1
+                          ) IS ${community_type === CommunityType.Launchpad ? 'NOT' : ''} NULL
+                          `
                             : ''
                         }
                         ${
@@ -233,7 +267,10 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
         ${
           relevance_by === 'membership' && replacements.user_id
             ? // eslint-disable-next-line max-len
-              `LEFT OUTER JOIN "Addresses" authUserAddresses ON "community_CTE"."id" = authUserAddresses.community_id AND authUserAddresses.user_id = :user_id`
+              `LEFT OUTER JOIN 
+              (SELECT DISTINCT ON (community_id) * FROM "Addresses" WHERE user_id = :user_id) authUserAddresses 
+              ON "community_CTE"."id" = authUserAddresses.community_id 
+              AND authUserAddresses.user_id = :user_id`
             : ``
         }
         ${
@@ -242,8 +279,12 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
             : ''
         }
         ${
-          include_node_info
-            ? 'LEFT OUTER JOIN "ChainNodes" AS "ChainNode" ON "community_CTE"."chain_node_id" = "ChainNode"."id"'
+          include_node_info || eth_chain_id || cosmos_chain_id
+            ? `
+                LEFT OUTER JOIN "ChainNodes" AS "ChainNode" ON "community_CTE"."chain_node_id" = "ChainNode"."id"
+                ${eth_chain_id && !cosmos_chain_id ? `WHERE "ChainNode".eth_chain_id = :eth_chain_id` : ''}
+                ${cosmos_chain_id && !eth_chain_id ? `WHERE "ChainNode".cosmos_chain_id = :cosmos_chain_id` : ''}
+              `
             : ''
         }
         ORDER BY 
@@ -281,6 +322,15 @@ export function GetCommunities(): Query<typeof schemas.GetCommunities> {
         type: QueryTypes.SELECT,
         nest: true,
       });
+
+      if (include_node_info) {
+        for (const community of communities) {
+          community.ChainNode!.url = buildChainNodeUrl(
+            community.ChainNode!.url!,
+            'public',
+          );
+        }
+      }
 
       return schemas.buildPaginatedResponse(
         communities,

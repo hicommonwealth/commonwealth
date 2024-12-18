@@ -1,5 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 
+import NewSnapshotProposalForm from 'views/pages/Snapshots/NewSnapshotProposal/NewSnapshotProposalForm';
+
 import type Thread from '../../models/Thread';
 import app from '../../state';
 import { CWDropdown } from '../components/component_kit/cw_dropdown';
@@ -7,9 +9,8 @@ import {
   CWModalBody,
   CWModalHeader,
 } from '../components/component_kit/new_designs/CWModal';
-import { NewSnapshotProposalForm } from '../pages/new_snapshot_proposal';
 
-import '../../../styles/modals/new_snapshot_proposal_modal.scss';
+import './new_snapshot_proposal_modal.scss';
 
 type NewSnapshotProposalModalProps = {
   thread: Thread;
@@ -27,12 +28,11 @@ export const NewSnapshotProposalModal = ({
   );
   const handleSelect = async (item) => {
     setSelectedSnapshotId(item.value);
-    await app.snapshot.init(item.value);
   };
 
   const snapshotOptions = useMemo(
     () =>
-      app.chain?.meta.snapshot.map((snapshot) => ({
+      app.chain?.meta.snapshot_spaces.map((snapshot) => ({
         value: snapshot,
         label: snapshot,
       })) || [],

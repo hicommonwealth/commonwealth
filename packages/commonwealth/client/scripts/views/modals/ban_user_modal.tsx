@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { useBanProfileByAddressMutation } from 'state/api/profiles';
+import { useBanAddressMutation } from 'state/api/profiles';
 import { CWText } from 'views/components/component_kit/cw_text';
 import {
   notifyError,
@@ -20,7 +20,7 @@ type BanUserModalAttrs = {
 };
 
 export const BanUserModal = ({ address, onModalClose }: BanUserModalAttrs) => {
-  const { mutateAsync: banUser } = useBanProfileByAddressMutation();
+  const { mutateAsync: banUser } = useBanAddressMutation();
 
   const handleModalClose = (e) => {
     e.stopPropagation();
@@ -34,11 +34,17 @@ export const BanUserModal = ({ address, onModalClose }: BanUserModalAttrs) => {
       return;
     }
 
+    const community_id = app.activeChainId();
+    if (!community_id) {
+      notifyError('Must be in an active community to ban!');
+      return;
+    }
+
     try {
       handleModalClose(event);
       await banUser({
         address,
-        communityId: app.activeChainId(),
+        community_id,
       });
       notifySuccess('Banned Address');
     } catch (err) {

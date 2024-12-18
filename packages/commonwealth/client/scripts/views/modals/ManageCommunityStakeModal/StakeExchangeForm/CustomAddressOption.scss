@@ -1,0 +1,12 @@
+@import '../../../../styles/shared.scss';
+
+.CustomAddressOptionElement {
+  display: flex;
+  align-items: center;
+  font-weight: 500;
+
+  .check-icon {
+    fill: $green-600;
+    margin-right: 8px;
+  }
+}

@@ -1,0 +1,46 @@
+@import '../../../../../styles/shared';
+
+.WVConsent {
+  display: flex;
+
+  .header {
+    width: 100%;
+    display: flex;
+    gap: 16px;
+    flex-direction: column;
+    max-width: 596px;
+    margin-right: 110px;
+
+    .Text.h4 {
+      margin-top: 16px;
+    }
+
+    @include smallInclusive {
+      margin-right: unset;
+    }
+
+    .description {
+      color: $neutral-500;
+      margin-top: -8px;
+    }
+
+    .info {
+      display: inline-block;
+
+      a {
+        margin-left: 4px;
+        color: $primary-600;
+      }
+    }
+
+    .Divider {
+      margin-block: 8px;
+    }
+
+    .action-buttons {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+  }
+}

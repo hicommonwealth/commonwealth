@@ -1,13 +1,16 @@
 /* eslint-disable no-unused-expressions */
 import { SIWESigner } from '@canvas-js/chain-ethereum';
 import { dispose } from '@hicommonwealth/core';
-import { CANVAS_TOPIC, serializeCanvas } from '@hicommonwealth/shared';
+import {
+  CANVAS_TOPIC,
+  bech32ToHex,
+  serializeCanvas,
+} from '@hicommonwealth/shared';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
-import { bech32ToHex } from 'shared/utils';
 import { afterAll, beforeAll, describe, test } from 'vitest';
 import { TestServer, testServer } from '../../../server-test';
-import { TEST_BLOCK_INFO_STRING } from '../../../shared/adapters/chain/ethereum/keys';
+import { TEST_BLOCK_INFO_STRING } from '../../util/keys';
 
 chai.use(chaiHttp);
 const { expect } = chai;
@@ -35,7 +38,7 @@ describe('API Tests', () => {
     test('should create an ETH address', async () => {
       const wallet = new SIWESigner({ chainId: 1 });
       const { payload: session } = await wallet.newSession(CANVAS_TOPIC);
-      const address = session.address.split(':')[2];
+      const address = session.did.split(':')[4];
 
       const chain = 'ethereum';
       const wallet_id = 'metamask';
@@ -86,7 +89,7 @@ describe('API Tests', () => {
 
       const sessionSigner = new SIWESigner({ chainId: parseInt(chainId) });
       const { payload: session } = await sessionSigner.newSession(CANVAS_TOPIC);
-      const address = session.address.split(':')[2];
+      const address = session.did.split(':')[4];
 
       const community_id = 'ethereum';
       const wallet_id = 'metamask';

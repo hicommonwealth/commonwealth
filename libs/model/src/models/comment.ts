@@ -1,5 +1,9 @@
 import { stats } from '@hicommonwealth/core';
 import { Comment } from '@hicommonwealth/schemas';
+import {
+  getDecodedString,
+  MAX_TRUNCATED_CONTENT_LENGTH,
+} from '@hicommonwealth/shared';
 import Sequelize from 'sequelize';
 import { z } from 'zod';
 import type {
@@ -8,6 +12,7 @@ import type {
   ReactionAttributes,
   ThreadInstance,
 } from '.';
+import { beforeValidateBodyHook } from './utils';
 
 export type CommentAttributes = z.infer<typeof Comment> & {
   // associations
@@ -35,17 +40,14 @@ export default (
       parent_id: { type: Sequelize.STRING, allowNull: true },
       address_id: { type: Sequelize.INTEGER, allowNull: true },
       created_by: { type: Sequelize.STRING, allowNull: true },
-      text: { type: Sequelize.TEXT, allowNull: false },
-      plaintext: { type: Sequelize.TEXT, allowNull: true },
-      version_history: {
-        type: Sequelize.ARRAY(Sequelize.TEXT),
-        defaultValue: [],
+      body: {
+        type: Sequelize.STRING(MAX_TRUNCATED_CONTENT_LENGTH),
         allowNull: false,
       },
 
       // canvas-related columns
       canvas_signed_data: { type: Sequelize.JSONB, allowNull: true },
-      canvas_hash: { type: Sequelize.STRING, allowNull: true },
+      canvas_msg_id: { type: Sequelize.STRING, allowNull: true },
 
       // timestamps
       created_at: { type: Sequelize.DATE, allowNull: false },
@@ -61,18 +63,21 @@ export default (
         defaultValue: 0,
       },
       reaction_weights_sum: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.DECIMAL(78, 0),
         allowNull: false,
         defaultValue: 0,
       },
-      version_history_updated: {
-        type: Sequelize.BOOLEAN,
+      search: {
+        type: Sequelize.TSVECTOR,
         allowNull: false,
-        defaultValue: false,
       },
+      content_url: { type: Sequelize.STRING, allowNull: true },
     },
     {
       hooks: {
+        beforeValidate(instance: CommentInstance) {
+          beforeValidateBodyHook(instance);
+        },
         afterCreate: async (comment, options) => {
           await (
             sequelize.models.Thread as Sequelize.ModelStatic<ThreadInstance>
@@ -90,7 +95,6 @@ export default (
             thread_id: String(comment.thread_id),
           });
         },
-
         afterDestroy: async ({ thread_id }, options) => {
           await (
             sequelize.models.Thread as Sequelize.ModelStatic<ThreadInstance>
@@ -124,3 +128,7 @@ export default (
       ],
     },
   );
+
+export function getCommentSearchVector(body: string) {
+  return Sequelize.fn('to_tsvector', 'english', getDecodedString(body));
+}

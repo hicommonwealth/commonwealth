@@ -1,0 +1,75 @@
+@import '../../../styles/shared.scss';
+
+.ProgressBar {
+  border-radius: $border-radius-corners;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+
+  .progress-label {
+    align-items: flex-end;
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+
+    .label-wrapper {
+      display: flex;
+      flex-direction: column;
+
+      .label-display {
+        align-items: center;
+        display: flex;
+        flex-direction: row;
+        gap: 4px;
+      }
+
+      .subtext-text.Text {
+        color: $neutral-500;
+        margin-bottom: 4px;
+      }
+    }
+
+    .progress-percentage-text.Text {
+      color: $neutral-500;
+      margin-bottom: 4px;
+    }
+  }
+
+  progress {
+    height: 4px;
+    width: 100%;
+
+    &::-webkit-progress-bar {
+      background-color: $neutral-200;
+      border-radius: $border-radius-corners;
+    }
+
+    &::-webkit-progress-value {
+      border-radius: $border-radius-corners;
+    }
+
+    &.ongoing {
+      &::-webkit-progress-value {
+        background-color: $neutral-800;
+      }
+    }
+
+    &.passed {
+      &::-webkit-progress-value {
+        background-color: $green-500;
+      }
+    }
+
+    &.selected {
+      &::-webkit-progress-value {
+        background-color: $primary-300;
+      }
+    }
+
+    &.neutral {
+      &::-webkit-progress-value {
+        background-color: $neutral-500;
+      }
+    }
+  }
+}

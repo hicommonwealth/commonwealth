@@ -1,7 +1,5 @@
-import 'Sublayout.scss';
 import clsx from 'clsx';
 import useBrowserWindow from 'hooks/useBrowserWindow';
-import useForceRerender from 'hooks/useForceRerender';
 import useWindowResize from 'hooks/useWindowResize';
 import React, { useEffect, useState } from 'react';
 import { matchRoutes, useLocation } from 'react-router-dom';
@@ -9,18 +7,29 @@ import app from 'state';
 import useSidebarStore from 'state/ui/sidebar';
 import { SublayoutHeader } from 'views/components/SublayoutHeader';
 import { Sidebar } from 'views/components/sidebar';
+import twitterspaceGrowlImage from '../../assets/img/TwitterspaceGrowlImage.png';
+import { useHandleInviteLink } from '../hooks/useHandleInviteLink';
 import useNecessaryEffect from '../hooks/useNecessaryEffect';
 import useStickyHeader from '../hooks/useStickyHeader';
-import { useAuthModalStore, useWelcomeOnboardModal } from '../state/ui/modals';
+import {
+  useAuthModalStore,
+  useInviteLinkModal,
+  useWelcomeOnboardModal,
+} from '../state/ui/modals';
 import useUserStore from '../state/ui/user';
+import './Sublayout.scss';
 import { SublayoutBanners } from './SublayoutBanners';
 import { AdminOnboardingSlider } from './components/AdminOnboardingSlider';
 import { Breadcrumbs } from './components/Breadcrumbs';
 import MobileNavigation from './components/MobileNavigation';
 import AuthButtons from './components/SublayoutHeader/AuthButtons';
+import { CWGrowlTemplate } from './components/SublayoutHeader/GrowlTemplate/CWGrowlTemplate';
+import useJoinCommunity from './components/SublayoutHeader/useJoinCommunity';
 import { UserTrainingSlider } from './components/UserTrainingSlider';
+import { CWModal } from './components/component_kit/new_designs/CWModal';
 import CollapsableSidebarButton from './components/sidebar/CollapsableSidebarButton';
 import { AuthModal, AuthModalType } from './modals/AuthModal';
+import InviteLinkModal from './modals/InviteLinkModal';
 import { WelcomeOnboardModal } from './modals/WelcomeOnboardModal';
 
 type SublayoutProps = {
@@ -29,24 +38,31 @@ type SublayoutProps = {
 } & React.PropsWithChildren;
 
 const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
-  const forceRerender = useForceRerender();
   const { menuVisible, setMenu, menuName } = useSidebarStore();
   const [resizing, setResizing] = useState(false);
+  const { JoinCommunityModals, handleJoinCommunity } = useJoinCommunity();
+
+  const location = useLocation();
 
   useStickyHeader({
     elementId: 'mobile-auth-buttons',
     stickyBehaviourEnabled: true,
     zIndex: 70,
   });
-  const { isWindowSmallInclusive, isWindowExtraSmall } = useBrowserWindow({
-    onResize: () => setResizing(true),
-    resizeListenerUpdateDeps: [resizing],
-  });
+
+  const { isWindowSmallInclusive, isWindowExtraSmall, isWindowSmallToMedium } =
+    useBrowserWindow({
+      onResize: () => setResizing(true),
+      resizeListenerUpdateDeps: [resizing],
+    });
   const { authModalType, setAuthModalType } = useAuthModalStore();
   const user = useUserStore();
 
   const { isWelcomeOnboardModalOpen, setIsWelcomeOnboardModalOpen } =
     useWelcomeOnboardModal();
+
+  const { isInviteLinkModalOpen, setIsInviteLinkModalOpen } =
+    useInviteLinkModal();
 
   useNecessaryEffect(() => {
     if (
@@ -68,7 +84,7 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
     user.isLoggedIn,
   ]);
 
-  const location = useLocation();
+  useHandleInviteLink({ isInsideCommunity, handleJoinCommunity });
 
   useWindowResize({
     setMenu,
@@ -94,13 +110,10 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
     location,
   );
 
-  useEffect(() => {
-    app.sidebarRedraw.on('redraw', forceRerender);
-
-    return () => {
-      app.sidebarRedraw.off('redraw', forceRerender);
-    };
-  }, [forceRerender]);
+  const routesWithUserOnboardingSlider = matchRoutes(
+    [{ path: '/dashboard/for-you' }, { path: '/dashboard/global' }],
+    location,
+  );
 
   useEffect(() => {
     let timer: NodeJS.Timeout;
@@ -122,7 +135,7 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
 
   return (
     <div className="Sublayout">
-      {!isWindowSmallInclusive && (
+      {(!isWindowSmallInclusive || isWindowSmallToMedium) && (
         <CollapsableSidebarButton
           onMobile={isWindowExtraSmall}
           // @ts-expect-error StrictNullChecks
@@ -177,17 +190,38 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
               />
             </div>
             {!routesWithoutGenericBreadcrumbs && <Breadcrumbs />}
-            {!routesWithoutGenericSliders && <UserTrainingSlider />}
+            {routesWithUserOnboardingSlider && <UserTrainingSlider />}
             {isInsideCommunity && !routesWithoutGenericSliders && (
               <AdminOnboardingSlider />
             )}
             {children}
           </div>
+          <CWGrowlTemplate
+            growlType="twitterspace"
+            growlImage={twitterspaceGrowlImage}
+            headerText="Livestream with How To DAO this Thursday!"
+            bodyText="Join Dillon Chen (Common CEO) and Kevin Owocki (Gitcoin Co-Founder) on 12/19 at 11am ET to
+            shape the future of digital collaboration and community building"
+            buttonText="Reserve Your Spot!"
+            buttonLink="https://lu.ma/8nk6j7n4"
+            extraText='Exclusive bundle offer: "How To DAO" book + more!'
+          />
         </div>
         <WelcomeOnboardModal
           isOpen={isWelcomeOnboardModalOpen}
           onClose={() => setIsWelcomeOnboardModalOpen(false)}
         />
+        <CWModal
+          size="small"
+          content={
+            <InviteLinkModal
+              onModalClose={() => setIsInviteLinkModalOpen(false)}
+            />
+          }
+          open={!isWindowExtraSmall && isInviteLinkModalOpen}
+          onClose={() => setIsInviteLinkModalOpen(false)}
+        />
+        {JoinCommunityModals}
       </div>
       {isWindowExtraSmall && <MobileNavigation />}
     </div>

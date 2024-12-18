@@ -19,31 +19,13 @@
 
 “Discobot” refers to the set of entities and interactions that power the Commonwealth <> Discord integration. In particular, this is 3 things:
 
-1. Discord Listener (`/packages/discord-bot/discord-listener/discordListener.ts`), an app that handles incoming events from the Discord API and pushes these events to a RabbitMQ queue.
-2. Discord Consumer (`/packages/discord-bot/discord-consumer/discordConsumer.ts`), an app that handles events from the RabbitMQ queue and hits the CW API endpoint to create Threads and Comments.
+1. Discord Listener (`/packages/commonwealth/server/workers/discordBot/discordListener.ts`), an app that handles incoming events from the Discord API and pushes these events to a RabbitMQ queue.
+2. DiscordBotPolicy, a policy that handles events from the RabbitMQ queue to create Threads and Comments.
 3. RabbitMQ Instance: a queue has been set up called `discord-message`
 4. Commonwealth Manage Community Page (`/packages/commonwealth/…/community_metadata_rows.tsx`), where admins are able to add a bot connection and connect Forum Channels (in a connected Discord Server) to Topics (in the CW forum).
 
 The basic flow here:
 ![image (4)](./assets/Discobot-2.png)
-
-## Deployments
-
-### Production
-
-1. Discord Listener: deployed as a worker dyno on the [discobot-listener](https://dashboard.heroku.com/apps/discobot-listener/resources) Heroku app.
-2. Discord Consumer: deployed as a worker dyno on the [discobot-listener](https://dashboard.heroku.com/apps/discobot-listener/resources) Heroku app.
-
-### Staging
-
-1. Discord Listener: deployed as a worker dyno on the [discobot-listener-staging](https://dashboard.heroku.com/apps/discobot-listener-staging/resources) Heroku app.
-2. Discord Consumer: deployed as a worker dyno on the [discobot-listener-staging](https://dashboard.heroku.com/apps/discobot-listener-staging/resources) Heroku app.
-
-The staging Discobot app is used by the following environments for testing purposes:
-
-- `commonwealth-beta` Heroku app (i.e. QA)
-- `commonwealth-frick` Heroku app
-- `commonwealth-frack` Heroku app
 
 ## Discord Apps (Bots)
 
@@ -65,27 +47,22 @@ All redirect URLs that the bot should support need to be inserted/
 
 ### Environment Variables (Local)
 
-#### In `packages/discord-bot/.env` create the following environment variables
+#### In `.env` create the following environment variables
 
 - `DISCORD_TOKEN`:This is the token of the staging Discord bot.
   - This variable cannot be found on the Discord developer portal (once created it is hidden). To get this
   variable view the config vars of the [`discobot-listener-staging` Heroku app](https://dashboard.heroku.com/apps/discobot-listener-staging/settings)
   or contact one of the following: Jake, Timothee, Ian
-- `CW_BOT_KEY`: This can be any random string, but it must match `CW_BOT_KEY` in `packages/commonwealth/.env`
-
-#### In `packages/commonwealth/.env` create the following environment variables
-
 - `DISCORD_CLIENT_ID`: this is the client ID of the Discord app.
   - For local test we use the staging Discord app/bot. The client ID can therefore be found on the [developer dashboard](https://discord.com/developers/applications/1027997517964644453/oauth2/general)
-  or by contacting Jake or Timothee.
-- `DISCORD_BOT_TOKEN`: this is the same as the `DISCORD_TOKEN` in `/discord-bot/.env`
-- `CW_BOT_KEY`: this is the same as the `CW_BOT_KEY` in `/discord-bot/.env`
+    or by contacting Jake or Timothee.
 
 ### Startup
 
 1. Start a local RabbitMQ instance by executing `pnpm start-rmq` in the root directory (requires Docker).
-2. In a separate terminal execute `pnpm start` in `packages/discord-bot/` to start the Discord Listener
-3. In a separate terminal execute `pnpm start-consumer` in `packages/discord-bot/` to start the Discord Consumer
+2. In a separate terminal execute `pnpm start-discord-listener` in `packages/commonwealth/` to start the Discord Listener
+3. In a separate terminal execute `pnpm start-consumer` in `packages/commonwealth/` to start the Commonwealth Consumer
+4. In a separate terminal execute `pnpm start-message-relayer`
 
 ## Staging and Production Setup
 
@@ -102,14 +79,9 @@ connect to. For the staging environments this will be the `CLOUDAMQP_URL` enviro
 [`commonwealth-frick` Heroku app](https://dashboard.heroku.com/apps/commonwealth-frick/settings). For production this is
 the `CLOUDAMQP_URL` environment variable in the [`commonwealthapp` Heroku app](https://dashboard.heroku.com/apps/commonwealth-beta/settings).
 - `CLOUDAMQP_APIKEY`: Same principle as `CLOUDAMQP_URL`.
-- `CW_BOT_KEY`: A strong password that matches `CW_BOT_KEY` in the [`commonwealthapp` Heroku app](https://dashboard.heroku.com/apps/commonwealth-beta/settings).
 - `DATABASE_URL`: Same principles as `CLOUDAMQP_URL` and `CLOUDAMQP_APIKEY` (copy variable from the relevant app).
 - `DISCORD_TOKEN`: This is the token of the staging or production Discord bot.
   - This variable cannot be found on the Discord developer portal (once created it is hidden).
-- `DL_BUILD`: Should be set to 'true'.
-  - This ensures that Heroku only builds the Discobot package and related code when deploying.
-- `PROCFILE`: Should be set to `packages/discord-bot/Procfile`
-  - This tells Heroku which Procfile in the repository to use when deploying the app since we use multi-procfile setup.
 - `SERVER_URL`: This should be set to the URL of the Heroku app the Discobot is associated to. This will be
 `https://commonwealth.im` for the production.
 
@@ -119,8 +91,7 @@ the `CLOUDAMQP_URL` environment variable in the [`commonwealthapp` Heroku app](h
   - The client ID can be found on the developer dashboard for the [staging bot](https://discord.com/developers/applications/1027997517964644453/oauth2/general)
       or the [production bot](https://discord.com/developers/applications/1133050809412763719/oauth2/general).
   The client ID can also be retrieved by contacting Jake or Timothee.
-- `DISCORD_BOT_TOKEN`: this is the same as the `DISCORD_TOKEN` in the associated `Discobot app` above.
-- `CW_BOT_KEY`: this is the same as the `CW_BOT_KEY` in the associated `Discobot app` above.
+- `DISCORD_TOKEN`: this is the same as the `DISCORD_TOKEN` in the associated `Discobot app` above.
 
 ## Testing
 

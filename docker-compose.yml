@@ -1,4 +1,3 @@
-version: '3'
 services:
   cw_postgres:
     container_name: cw_postgres
@@ -46,6 +45,45 @@ services:
       - ./redis-data:/data
     networks:
       - cw-network
+
+  commonwealth:
+    profiles:
+      - with-app
+    container_name: commonwealth
+    build:
+      context: .
+      dockerfile: ./Dockerfile.web
+    ports:
+      - '8080:8080'
+    environment:
+      APP_ENV: local
+      SERVER_URL: http://localhost:8080
+      AWS_REGION: us-east-1
+      COSMOS_GOV_V1: kyve,csdk,csdk-v1,quicksilver-protocol,juno,regen
+      COSMOS_REGISTRY_API: https://cosmoschains.thesilverfox.pro
+      DATABASE_URL: postgresql://commonwealth:edgeware@cw_postgres/commonwealth
+      MAGIC_DEFAULT_CHAIN: ethereum
+      MAGIC_SUPPORTED_BASES: cosmos,ethereum
+      NODE_ENV: development
+      PGPASSWORD: edgeware
+      PORT: 8080
+      REDIS_URL: redis://local-redis:6379
+      SL_PORT: 8001
+    networks:
+      - cw-network
+    healthcheck:
+      test:
+        [
+          'CMD-SHELL',
+          'curl --silent --fail http://localhost:8080/api/health || exit 1',
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    depends_on:
+      - cw_postgres
+      - cw_rabbitmq
+      - local-redis
 
 networks:
   cw-network:

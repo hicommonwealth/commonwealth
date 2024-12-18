@@ -1,8 +1,8 @@
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import 'pages/AdminPanel.scss';
 import React, { useState } from 'react';
 import { CWText } from '../../components/component_kit/cw_text';
 import { openConfirmation } from '../../modals/confirmation_modal';
+import './AdminPanel.scss';
 import CommunityFinder from './CommunityFinder';
 import { downloadCSV, getCSVContent } from './utils';
 

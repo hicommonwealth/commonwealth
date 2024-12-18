@@ -1,13 +1,14 @@
-@import '../../../../styles/shared';
+@import '../../../styles/shared';
 
 .FeatureHint {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
 
   .title-row {
     display: flex;
     gap: 4px;
+    flex-wrap: wrap;
 
     svg {
       fill: $yellow-400;

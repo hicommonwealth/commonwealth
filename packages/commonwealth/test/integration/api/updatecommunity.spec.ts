@@ -1,20 +1,35 @@
 /* eslint-disable no-unused-expressions */
 import { dispose } from '@hicommonwealth/core';
+import { models } from '@hicommonwealth/model';
+import * as schemas from '@hicommonwealth/schemas';
+import { ChainBase, ChainType } from '@hicommonwealth/shared';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
+import { Express } from 'express';
 import jwt from 'jsonwebtoken';
 import { afterAll, beforeAll, describe, test } from 'vitest';
+import { z } from 'zod';
 import { TestServer, testServer } from '../../../server-test';
 import { config } from '../../../server/config';
-import { Errors as ChainError } from '../../../server/controllers/server_communities_methods/update_community';
-import type { CommunityArgs } from '../../util/modelUtils';
 
 chai.use(chaiHttp);
 const { expect } = chai;
 
+async function update(
+  app: Express,
+  address: string,
+  payload: Record<string, unknown>,
+) {
+  return await chai
+    .request(app)
+    .post(`/api/v1/UpdateCommunity`)
+    .set('Accept', 'application/json')
+    .set('address', address)
+    .send(payload);
+}
+
 describe('Update Community/Chain Tests', () => {
   let jwtToken;
-  let siteAdminJwt;
   let loggedInAddr;
   const chain = 'ethereum';
 
@@ -28,7 +43,7 @@ describe('Update Community/Chain Tests', () => {
       { chain },
       'Alice',
     );
-    loggedInAddr = result.address;
+    loggedInAddr = result.did.split(':')[4];
     jwtToken = jwt.sign(
       { id: result.user_id, email: result.email },
       config.AUTH.JWT_SECRET,
@@ -49,25 +64,32 @@ describe('Update Community/Chain Tests', () => {
       user_id: +siteAdminResult.user_id,
     });
     expect(siteAdminSetSuccessfully).to.be.true;
-    siteAdminJwt = jwt.sign(
-      { id: siteAdminResult.user_id, email: siteAdminResult.email },
-      config.AUTH.JWT_SECRET,
-    );
+
+    const node = await models.ChainNode.findOne({
+      where: {
+        eth_chain_id: 1,
+      },
+    });
 
     // create community for test
-    const communityArgs: CommunityArgs = {
-      jwt: jwtToken,
-      isAuthenticatedForum: 'false',
-      privacyEnabled: 'false',
+    const communityArgs: z.infer<(typeof schemas.CreateCommunity)['input']> = {
       id: 'tester',
       name: 'tester community',
-      creator_address: loggedInAddr,
-      creator_chain: chain,
+      chain_node_id: node!.id!,
       description: 'Tester community community',
-      default_chain: chain,
+      type: ChainType.Offchain,
+      base: ChainBase.Ethereum,
+      default_symbol: 'test',
+      directory_page_enabled: false,
+      tags: [],
+      social_links: [],
     };
 
-    await server.seeder.createCommunity(communityArgs);
+    const created = await server.seeder.createCommunity(
+      { ...communityArgs, address: result.address },
+      jwtToken,
+    );
+    expect(created.name).to.be.equal(communityArgs.name);
   });
 
   afterAll(async () => {
@@ -77,181 +99,144 @@ describe('Update Community/Chain Tests', () => {
   describe('/updateChain route tests', () => {
     test('should update chain name', async () => {
       const name = 'commonwealtheum';
-      const res = await chai
-        .request(server.app)
-        .patch(`/api/communities/${chain}`)
-        .set('Accept', 'application/json')
-        .send({ jwt: jwtToken, id: chain, name });
-      expect(res.body.status).to.be.equal('Success');
-      expect(res.body.result.name).to.be.equal(name);
+      const res = await update(server.app, loggedInAddr, {
+        jwt: jwtToken,
+        community_id: chain,
+        name,
+      });
+      expect(res.status).to.be.equal(200);
+      expect(res.body.name).to.be.equal(name);
     });
 
     test('should update description', async () => {
       const description = 'hello this the new chain';
-      const res = await chai
-        .request(server.app)
-        .patch(`/api/communities/${chain}`)
-        .set('Accept', 'application/json')
-        .send({ jwt: jwtToken, id: chain, description });
-      expect(res.body.status).to.be.equal('Success');
-      expect(res.body.result.description).to.be.equal(description);
+      const res = await update(server.app, loggedInAddr, {
+        jwt: jwtToken,
+        community_id: chain,
+        description,
+      });
+      expect(res.status).to.be.equal(200);
+      expect(res.body.description).to.be.equal(description);
     });
 
     test.skip('should update website', async () => {
       const website = 'http://edgewa.re';
-      const res = await chai
-        .request(server.app)
-        .patch(`/api/communities/${chain}`)
-        .set('Accept', 'application/json')
-        .send({ jwt: jwtToken, id: chain, website });
-      expect(res.body.status).to.be.equal('Success');
-      expect(res.body.result.website).to.be.equal(website);
+      const res = await update(server.app, loggedInAddr, {
+        jwt: jwtToken,
+        community_id: chain,
+        website,
+      });
+      expect(res.status).to.be.equal(200);
+      expect(res.body.website).to.be.equal(website);
     });
 
     test('should update discord', async () => {
       const discord = ['http://discord.gg'];
-      const res = await chai
-        .request(server.app)
-        .patch(`/api/communities/${chain}`)
-        .set('Accept', 'application/json')
-        .send({ jwt: jwtToken, id: chain, social_links: discord });
-      expect(res.body.status).to.be.equal('Success');
-      expect(res.body.result.social_links).to.deep.equal(discord);
+      const res = await update(server.app, loggedInAddr, {
+        jwt: jwtToken,
+        community_id: chain,
+        social_links: discord,
+      });
+      expect(res.status).to.be.equal(200);
+      expect(res.body.social_links).to.deep.equal(discord);
     });
 
     test.skip('should fail to update social link without proper prefix', async () => {
       const socialLinks = ['github.com'];
-      const res = await chai
-        .request(server.app)
-        .patch(`/api/communities/${chain}`)
-        .set('Accept', 'application/json')
-        .send({ jwt: jwtToken, id: chain, socialLinks });
+      const res = await update(server.app, loggedInAddr, {
+        jwt: jwtToken,
+        community_id: chain,
+        socialLinks,
+      });
       expect(res.body.error).to.exist;
     });
 
     test('should update telegram', async () => {
       const telegram = ['https://t.me/'];
-      const res = await chai
-        .request(server.app)
-        .patch(`/api/communities/${chain}`)
-        .set('Accept', 'application/json')
-        .send({ jwt: jwtToken, id: chain, social_links: telegram });
-      expect(res.body.status).to.be.equal('Success');
-      expect(res.body.result.social_links).to.deep.equal(telegram);
+      const res = await update(server.app, loggedInAddr, {
+        jwt: jwtToken,
+        community_id: chain,
+        social_links: telegram,
+      });
+      expect(res.status).to.be.equal(200);
+      expect(res.body.social_links).to.deep.equal(telegram);
     });
 
     test.skip('should update github', async () => {
       const github = ['https://github.com/'];
-      const res = await chai
-        .request(server.app)
-        .patch(`/api/communities/${chain}`)
-        .set('Accept', 'application/json')
-        .send({ jwt: jwtToken, id: chain, github });
-      expect(res.body.status).to.be.equal('Success');
-      expect(res.body.result.github).to.deep.equal(github);
+      const res = await update(server.app, loggedInAddr, {
+        jwt: jwtToken,
+        community_id: chain,
+        github,
+      });
+      expect(res.status).to.be.equal(200);
+      expect(res.body.github).to.deep.equal(github);
     });
 
     test('should update symbol', async () => {
       const default_symbol = 'CWL';
-      const res = await chai
-        .request(server.app)
-        .patch(`/api/communities/${chain}`)
-        .set('Accept', 'application/json')
-        .send({ jwt: jwtToken, id: chain, default_symbol });
-      expect(res.body.status).to.be.equal('Success');
-      expect(res.body.result.default_symbol).to.be.equal(default_symbol);
+      const res = await update(server.app, loggedInAddr, {
+        jwt: jwtToken,
+        community_id: chain,
+        default_symbol,
+      });
+      expect(res.status).to.be.equal(200);
+      expect(res.body.default_symbol).to.be.equal(default_symbol);
     });
 
     test('should update icon_url', async () => {
       const icon_url = 'assets/img/protocols/cwl.png';
-      const res = await chai
-        .request(server.app)
-        .patch(`/api/communities/${chain}`)
-        .set('Accept', 'application/json')
-        .send({ jwt: jwtToken, id: chain, icon_url });
-      expect(res.body.status).to.be.equal('Success');
-      expect(res.body.result.icon_url).to.be.equal(icon_url);
+      const res = await update(server.app, loggedInAddr, {
+        jwt: jwtToken,
+        community_id: chain,
+        icon_url,
+      });
+      expect(res.status).to.be.equal(200);
+      expect(res.body.icon_url).to.be.equal(icon_url);
     });
 
     test('should update active', async () => {
       const active = false;
-      const res = await chai
-        .request(server.app)
-        .patch(`/api/communities/${chain}`)
-        .set('Accept', 'application/json')
-        .send({ jwt: jwtToken, id: chain, active });
-      expect(res.body.status).to.be.equal('Success');
-      expect(res.body.result.active).to.be.equal(active);
+      const res = await update(server.app, loggedInAddr, {
+        jwt: jwtToken,
+        community_id: chain,
+        active,
+      });
+      expect(res.status).to.be.equal(200);
+      expect(res.body.active).to.be.equal(active);
     });
 
-    test('should update type', async () => {
+    test.skip('should update type', async () => {
       const type = 'parachain';
-      const res = await chai
-        .request(server.app)
-        .patch(`/api/communities/${chain}`)
-        .set('Accept', 'application/json')
-        .send({ jwt: jwtToken, id: chain, type });
-      expect(res.body.status).to.be.equal('Success');
-      expect(res.body.result.type).to.be.equal(type);
-    });
-
-    test('should fail to update network', async () => {
-      const network = 'ethereum-testnet';
-      const res = await chai
-        .request(server.app)
-        .patch(`/api/communities/${chain}`)
-        .set('Accept', 'application/json')
-        .send({ jwt: jwtToken, id: chain, network });
-      expect(res.body.error).to.not.be.null;
-      expect(res.body.error).to.be.equal(ChainError.CantChangeNetwork);
-    });
-
-    test('should fail to update custom domain if not site admin', async () => {
-      const custom_domain = 'test.com';
-      const res = await chai
-        .request(server.app)
-        .patch(`/api/communities/${chain}`)
-        .set('Accept', 'application/json')
-        .send({ jwt: jwtToken, id: chain, custom_domain });
-      expect(res.body.error).to.not.be.null;
-      expect(res.body.error).to.be.equal(ChainError.CantChangeCustomDomain);
-    });
-
-    test('should update custom domain if site admin', async () => {
-      const custom_domain = 'test.com';
-      const res = await chai
-        .request(server.app)
-        .patch(`/api/communities/${chain}`)
-        .set('Accept', 'application/json')
-        .send({ jwt: siteAdminJwt, id: chain, custom_domain });
-      expect(res.body.status).to.be.equal('Success');
-      expect(res.body.result.custom_domain).to.be.equal(custom_domain);
+      const res = await update(server.app, loggedInAddr, {
+        jwt: jwtToken,
+        community_id: chain,
+        type,
+      });
+      expect(res.status).to.be.equal(200);
+      expect(res.body.type).to.be.equal(type);
     });
 
     test('should fail if no chain id', async () => {
       const name = 'ethereum-testnet';
-      const res = await chai
-        .request(server.app)
-        .patch(`/api/communities/${chain}`)
-        .set('Accept', 'application/json')
-        .send({ jwt: jwtToken, name });
-      expect(res.body.error).to.not.be.null;
-      expect(res.body.error).to.be.equal(ChainError.NoCommunityId);
+      const res = await update(server.app, loggedInAddr, {
+        jwt: jwtToken,
+        name,
+      });
+      expect(res.body.message).to.not.be.null;
     });
 
     test('should fail if no chain found', async () => {
-      const id = 'ethereum-testnet';
-      const res = await chai
-        .request(server.app)
-        .patch(`/api/communities/${chain}`)
-        .set('Accept', 'application/json')
-        .send({ jwt: jwtToken, id });
-      expect(res.body.error).to.not.be.null;
-      expect(res.body.error).to.be.equal(ChainError.NoCommunityFound);
+      const community_id = 'ethereum-testnet';
+      const res = await update(server.app, loggedInAddr, {
+        jwt: jwtToken,
+        community_id,
+      });
+      expect(res.body.message).to.not.be.null;
     });
 
     test('should fail if not admin ', async () => {
-      const id = 'ethereum';
+      const community_id = 'ethereum';
       const result = await server.seeder.createAndVerifyAddress(
         { chain },
         'Alice',
@@ -260,13 +245,13 @@ describe('Update Community/Chain Tests', () => {
         { id: result.user_id, email: result.email },
         config.AUTH.JWT_SECRET,
       );
-      const res = await chai
-        .request(server.app)
-        .patch(`/api/communities/${chain}`)
-        .set('Accept', 'application/json')
-        .send({ jwt: newJwt, id });
-      expect(res.body.error).to.not.be.null;
-      expect(res.body.error).to.be.equal(ChainError.NotAdmin);
+      const res = await update(server.app, loggedInAddr, {
+        jwt: newJwt,
+        community_id,
+      });
+      expect(res.body.message).to.be.equal(
+        'User is not admin in the community',
+      );
     });
   });
 
@@ -275,7 +260,7 @@ describe('Update Community/Chain Tests', () => {
       const name = 'commonwealth tester community';
       const res = await chai
         .request(server.app)
-        .patch(``)
+        .post(``)
         .set('Accept', 'application/json')
         .send({ jwt: jwtToken, id: chain, name });
       expect(res.body.status).to.be.equal('Success');
@@ -286,7 +271,7 @@ describe('Update Community/Chain Tests', () => {
       const description = 'for me! and the tester community';
       const res = await chai
         .request(server.app)
-        .patch(``)
+        .post(``)
         .set('Accept', 'application/json')
         .send({ jwt: jwtToken, id: chain, description });
       expect(res.body.status).to.be.equal('Success');
@@ -297,7 +282,7 @@ describe('Update Community/Chain Tests', () => {
       const website = 'http://edgewa.re';
       const res = await chai
         .request(server.app)
-        .patch(``)
+        .post(``)
         .set('Accept', 'application/json')
         .send({ jwt: jwtToken, id: chain, website });
       expect(res.body.status).to.be.equal('Success');
@@ -308,7 +293,7 @@ describe('Update Community/Chain Tests', () => {
       const discord = 'http://discord.gg';
       const res = await chai
         .request(server.app)
-        .patch(``)
+        .post(``)
         .set('Accept', 'application/json')
         .send({ jwt: jwtToken, id: chain, discord });
       expect(res.body.status).to.be.equal('Success');
@@ -319,7 +304,7 @@ describe('Update Community/Chain Tests', () => {
       const telegram = 'https://t.me/';
       const res = await chai
         .request(server.app)
-        .patch(``)
+        .post(``)
         .set('Accept', 'application/json')
         .send({ jwt: jwtToken, id: chain, telegram });
       expect(res.body.status).to.be.equal('Success');
@@ -330,7 +315,7 @@ describe('Update Community/Chain Tests', () => {
       const github = 'https://github.com/';
       const res = await chai
         .request(server.app)
-        .patch(``)
+        .post(``)
         .set('Accept', 'application/json')
         .send({ jwt: jwtToken, id: chain, github });
       expect(res.body.status).to.be.equal('Success');

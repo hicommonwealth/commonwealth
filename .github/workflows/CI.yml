@@ -7,18 +7,23 @@ env:
   NODE_ENV: 'test'
   ROLLBAR_ENV: 'GitHubCI'
   TEST_WITHOUT_LOGS: 'true'
-  ALLOWED_EVENTS: 'ChainEventCreated,SnapshotProposalCreated,ThreadCreated,ThreadUpvoted,SubscriptionPreferencesUpdated,CommentCreated,UserMentioned'
-  PRIVATE_KEY: 'web3-pk'
+  PRIVATE_KEY: '0x83c65f24efbc8f4bc54ad425e897fc3ea01f760d5e71671a30eacb075ebe2313'
   USES_DOCKER_PGSQL: true
   PORT: 8080
   REDIS_URL: redis://localhost:6379
-  ETH_ALCHEMY_API_KEY: ${{ secrets.ETH_ALCHEMY_API_KEY }}
-  ENTITIES_URL: ${{ secrets.ENTITIES_URL }}
   GITHUB_BASE_REF: ${{ github.base_ref }}
+  FEDERATION_POSTGRES_DB_URL: postgresql://commonwealth:edgeware@localhost/common_test
+  ALCHEMY_PRIVATE_APP_KEY: ${{ secrets.ALCHEMY_PRIVATE_APP_KEY }}
+  ALCHEMY_PUBLIC_APP_KEY: ${{ secrets.ALCHEMY_PUBLIC_APP_KEY }}
 
 on:
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: "PR number to test (optional)"
+        required: false
+        type: number
   pull_request:
-  merge_group:
   push:
     branches:
       - master
@@ -32,7 +37,7 @@ jobs:
     timeout-minutes: 20
     strategy:
       matrix:
-        node: [ 20 ]
+        node: [ 22 ]
 
     services:
       postgres:
@@ -57,6 +62,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.pr_number && format('refs/pull/{0}/head', github.event.inputs.pr_number) || github.ref }}
       - uses: ./.github/actions/setup
         with:
           node-version: ${{ matrix.node }}
@@ -90,7 +97,7 @@ jobs:
     timeout-minutes: 30
     strategy:
       matrix:
-        node: [ 20 ]
+        node: [ 22 ]
 
     services:
       postgres:
@@ -117,6 +124,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          ref: ${{ github.event.inputs.pr_number && format('refs/pull/{0}/head', github.event.inputs.pr_number) || github.ref }}
       - uses: ./.github/actions/setup
         with:
           node-version: ${{ matrix.node }}
@@ -149,7 +157,7 @@ jobs:
     timeout-minutes: 10
     strategy:
       matrix:
-        node: [ 20 ]
+        node: [ 22 ]
 
     services:
       postgres:
@@ -174,6 +182,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.pr_number && format('refs/pull/{0}/head', github.event.inputs.pr_number) || github.ref }}
       - uses: ./.github/actions/setup
         with:
           node-version: ${{ matrix.node }}
@@ -186,7 +196,7 @@ jobs:
       - name: Run serial e2e tests
         run: |
           pnpm -F commonwealth bootstrap-test-db &&
-          (cd packages/commonwealth && NODE_OPTIONS=--max-old-space-size=$(../../scripts/get-max-old-space-size.sh) node --import=extensionless/register --enable-source-maps ./build/server.js) &
+          (cd packages/commonwealth && node --import=extensionless/register --enable-source-maps ./build/server.js) &
           (pnpm -F commonwealth wait-server && pnpm -F commonwealth test-e2e-serial --forbid-only)
 
       - name: Archive code coverage results
@@ -202,12 +212,13 @@ jobs:
     timeout-minutes: 10
     strategy:
       matrix:
-        node: [ 20 ]
+        node: [ 22 ]
 
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          ref: ${{ github.event.inputs.pr_number && format('refs/pull/{0}/head', github.event.inputs.pr_number) || github.ref }}
       - uses: ./.github/actions/setup
         with:
           node-version: ${{ matrix.node }}
@@ -222,12 +233,13 @@ jobs:
     timeout-minutes: 10
     strategy:
       matrix:
-        node: [ 20 ]
+        node: [ 22 ]
 
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          ref: ${{ github.event.inputs.pr_number && format('refs/pull/{0}/head', github.event.inputs.pr_number) || github.ref }}
       - uses: ./.github/actions/setup
         with:
           node-version: ${{ matrix.node }}
@@ -258,14 +270,45 @@ jobs:
       - name: Run linter
         run: pnpm lint-branch
 
+
+  detect-broken-ts-expect-error:
+    name: Detect Broken TS expect errors
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      matrix:
+        node: [ 22 ]
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.inputs.pr_number && format('refs/pull/{0}/head', github.event.inputs.pr_number) || github.ref }}
+      - uses: ./.github/actions/setup
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: Assert pnpm-lock.yaml is correct
+        run: |
+          if ! git diff --quiet; then
+            echo 'You need to update the pnpm-lock.yaml file (potentially after installing node-gyp)'
+            exit 1
+          fi
+
+      - name: build
+        run: pnpm -r build
+
+      - name: run detect-broken-ts-expect-error.sh
+        run: cd packages/commonwealth && ./scripts/detect-broken-ts-expect-error.sh
+
   # These tests run quickly, so run them in a separate job
-  commonwealth-unit-integration:
-    name: Commonwealth Unit And Integration Tests
+  commonwealth-integration-test:
+    name: Commonwealth Integration Tests
     runs-on: ubuntu-latest
     timeout-minutes: 20
     strategy:
       matrix:
-        node: [ 20 ]
+        node: [ 22 ]
 
     services:
       postgres:
@@ -296,6 +339,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.pr_number && format('refs/pull/{0}/head', github.event.inputs.pr_number) || github.ref }}
       - uses: ./.github/actions/setup
         with:
           node-version: ${{ matrix.node }}
@@ -304,8 +349,51 @@ jobs:
       - name: Build
         run: pnpm -r build
 
-      - name: build
-        run: pnpm -r lint
+      - name: Run integration tests
+        run: pnpm -F commonwealth test-integration --allowOnly=false
+
+  commonwealth-unit-tests:
+    name: Commonwealth Unit Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      matrix:
+        node: [ 22 ]
+
+    services:
+      postgres:
+        image: hicommonwealth/cw_postgres:latest
+        env:
+          POSTGRES_USER: commonwealth
+          POSTGRES_DB: common_test
+          POSTGRES_PASSWORD: edgeware
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          # Maps tcp port 5432 on service container to the host
+          - 5432:5432
+      redis:
+        image: redis:latest
+        ports:
+          - 6379:6379
+      rabbitmq:
+        image: rabbitmq:3.11-management
+        ports:
+          - 5672:5672
+          - 15672:15672
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.pr_number && format('refs/pull/{0}/head', github.event.inputs.pr_number) || github.ref }}
+      - uses: ./.github/actions/setup
+        with:
+          node-version: ${{ matrix.node }}
 
       - name: Run unit tests
         run: pnpm -r test -- --allowOnly=false
@@ -316,27 +404,14 @@ jobs:
           chmod -R 755 ./libs/core/coverage/lcov.info
           chmod -R 755 ./libs/model/coverage/lcov.info
           chmod -R 755 ./libs/sitemaps/coverage/lcov.info
-          chmod -R 755 ./packages/commonwealth/coverage/lcov.info
-          chmod -R 755 ./packages/discord-bot/coverage/lcov.info
-          chmod -R 755 ./packages/scripts/coverage/lcov.info
-          chmod -R 755 ./packages/snapshot-listener/coverage/lcov.info
 
       - name: Coveralls parallel
         uses: coverallsapp/github-action@v2
         with:
           flag-name: unit-test-coverage
           parallel: true
-          files: libs/adapters/coverage/lcov.info libs/core/coverage/lcov.info libs/model/coverage/lcov.info libs/sitemaps/coverage/lcov.info packages/commonwealth/coverage/lcov.info packages/discord-bot/coverage/lcov.info packages/scripts/coverage/lcov.info packages/snapshot-listener/coverage/lcov.info
+          files: libs/adapters/coverage/lcov.info libs/core/coverage/lcov.info libs/model/coverage/lcov.info libs/sitemaps/coverage/lcov.info
 
-      - name: Run integration tests
-        run: pnpm -F commonwealth test-integration --allowOnly=false
-
-      - name: Coveralls parallel
-        uses: coverallsapp/github-action@v2
-        with:
-          flag-name: integration-test-coverage
-          parallel: true
-          files: ./packages/commonwealth/coverage/lcov.info
 
   commonwealth-evm-tests:
     name: EVM Devnet Tests
@@ -344,7 +419,7 @@ jobs:
     timeout-minutes: 10
     strategy:
       matrix:
-        node: [ 20 ]
+        node: [ 22 ]
 
     services:
       postgres:
@@ -368,6 +443,8 @@ jobs:
           - 6379:6379
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.pr_number && format('refs/pull/{0}/head', github.event.inputs.pr_number) || github.ref }}
       - uses: ./.github/actions/setup
         with:
           node-version: ${{ matrix.node }}
@@ -378,111 +455,18 @@ jobs:
       - name: Run EVM Devnet tests
         run: pnpm -F commonwealth test-devnet:evm --allowOnly=false
 
-      - name: Coveralls parallel
-        uses: coverallsapp/github-action@v2
-        with:
-          flag-name: evm-devnet-test-coverage
-          parallel: true
-          files: packages/commonwealth/coverage/lcov.info
-
-  # These tests run slowly, so run them in a separate job
-  commonwealth-cosmos-tests:
-    name: Cosmos Devnet Tests
-    runs-on: ubuntu-latest
-    timeout-minutes: 25
-    strategy:
-      matrix:
-        node: [ 20 ]
-
-    services:
-      postgres:
-        image: hicommonwealth/cw_postgres:latest
-        env:
-          POSTGRES_USER: commonwealth
-          POSTGRES_DB: common_test
-          POSTGRES_PASSWORD: edgeware
-        # Set health checks to wait until postgres has started
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          # Maps tcp port 5432 on service container to the host
-          - 5432:5432
-      cosmos_test_app:
-        image: mhagel1/csdk-v1
-        ports:
-          - 5051:5051
-      cosmos_beta_test_app:
-        image: mhagel1/csdk-beta
-        ports:
-          - 5050:5050
-      evmos_test_app:
-        image: mhagel1/evmos-dev
-        ports:
-          - 5052:5052
-      redis:
-        image: redis:latest
-        ports:
-          - 6379:6379
-
-    steps:
-      - uses: actions/checkout@v4
-      - uses: ./.github/actions/setup
-        with:
-          node-version: ${{ matrix.node }}
-
-      ## Cosmos Section:
-      # We only run Cosmos devnet tests if any files in the following folders changes
-      - name: Get changed Cosmos devnet-related files
-        id: changed-files-specific
-        uses: tj-actions/changed-files@v35
-        with:
-          files: |
-            packages/commonwealth/test/devnet/cosmos/**/*
-            packages/commonwealth/server/cosmos-gov-notifications/**/*
-            packages/commonwealth/test/integration/cosmosGovNotifGenerator.spec.ts
-            packages/commonwealth/server/util/cosmosProxy.ts
-            packages/commonwealth/client/scripts/controllers/chain/cosmos/gov/**/*
-            packages/commonwealth/test/util/cosmos-chain-testing/**/*
-            libs/chains/src/cosmos-ts/**/*
-
-      - name: Run following steps if any file(s) in the Cosmos folders change
-        if: steps.changed-files-specific.outputs.all_changed_files
-        run: |
-          echo "One or more Cosmos Devnet-related files has changed."
-          echo "List all the files that have changed: ${{ steps.changed-files-specific.outputs.all_changed_files }}"
-
-      - name: Run Cosmos Devnet tests
-        if: steps.changed-files-specific.outputs.any_changed == 'true'
-        run: |
-          pnpm -F commonwealth start &
-          (pnpm -F commonwealth wait-server && pnpm -F commonwealth test-devnet:cosmos --allowOnly=false)
-
-      - name: Coveralls parallel
-        if: steps.changed-files-specific.outputs.all_changed_files
-        uses: coverallsapp/github-action@v2
-        with:
-          flag-name: cosmos-devnet-test-coverage
-          parallel: true
-          files: packages/commonwealth/coverage/lcov.info
-
   report-coverage:
     name: Upload Test Coverage Report
     runs-on: ubuntu-latest
     timeout-minutes: 5
-    needs: [ commonwealth-cosmos-tests, commonwealth-evm-tests, commonwealth-unit-integration, e2e-tests-serial, e2e-tests-Parallel, e2e-tests-Mature ]
+    needs: [ commonwealth-unit-tests ]
     if: always()
     strategy:
       matrix:
-        node: [ 20 ]
+        node: [ 22 ]
 
     steps:
       - name: Coveralls Finished
         uses: coverallsapp/github-action@v2
         with:
           parallel-finished: true
-          carryforward: "cosmos-devnet-test-coverage"
-
-

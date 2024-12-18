@@ -13,15 +13,19 @@ import CommonDomainRoutes from './CommonDomainRoutes';
 import GeneralRoutes from './GeneralRoutes';
 
 export type RouteFeatureFlags = {
-  contestEnabled: boolean;
+  tokenizedCommunityEnabled: boolean;
 };
 
 const Router = () => {
   const client = OpenFeature.getClient();
-  const contestEnabled = client.getBooleanValue('contest', false);
+
+  const tokenizedCommunityEnabled = client.getBooleanValue(
+    'tokenizedCommunity',
+    false,
+  );
 
   const flags = {
-    contestEnabled,
+    tokenizedCommunityEnabled,
   };
 
   const { isCustomDomain } = fetchCachedCustomDomain() || {};

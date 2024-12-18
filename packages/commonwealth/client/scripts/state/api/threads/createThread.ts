@@ -1,13 +1,13 @@
-import { toCanvasSignedDataApiArgs } from '@hicommonwealth/shared';
+import { ChainBase, toCanvasSignedDataApiArgs } from '@hicommonwealth/shared';
 import { signThread } from 'controllers/server/sessions';
-import Topic from 'models/Topic';
+import type { Topic } from 'models/Topic';
 import { ThreadStage } from 'models/types';
 import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
+import { trpc } from 'utils/trpcClient';
 import { UserTrainingCardTypes } from 'views/components/UserTrainingSlider/types';
-import { trpc } from '../../../utils/trpcClient';
 import { useAuthModalStore } from '../../ui/modals';
-import { EXCEPTION_CASE_threadCountersStore } from '../../ui/thread';
 import useUserStore from '../../ui/user';
+import { updateCommunityThreadCount } from '../communities/getCommuityById';
 import { addThreadInAllCaches } from './helpers/cache';
 
 interface CreateThreadProps {
@@ -15,10 +15,12 @@ interface CreateThreadProps {
   kind: 'discussion' | 'link';
   stage: string;
   communityId: string;
+  communityBase: ChainBase;
   title: string;
   topic: Topic;
   body?: string;
   url?: string;
+  ethChainIdOrBech32Prefix?: string | number;
 }
 
 export const buildCreateThreadInput = async ({
@@ -26,24 +28,27 @@ export const buildCreateThreadInput = async ({
   kind,
   stage,
   communityId,
+  communityBase,
   title,
   topic,
   body,
   url,
+  ethChainIdOrBech32Prefix,
 }: CreateThreadProps) => {
   const canvasSignedData = await signThread(address, {
     community: communityId,
+    base: communityBase,
     title,
     body,
     link: url,
     topic: topic.id,
+    ethChainIdOrBech32Prefix,
   });
   return {
-    id: 0,
     community_id: communityId,
-    topic_id: topic.id,
-    title: encodeURIComponent(title),
-    body: encodeURIComponent(body ?? ''),
+    topic_id: topic.id!,
+    title: title,
+    body: body ?? '',
     kind,
     stage,
     url,
@@ -55,6 +60,8 @@ export const buildCreateThreadInput = async ({
 const useCreateThreadMutation = ({
   communityId,
 }: Partial<CreateThreadProps>) => {
+  const utils = trpc.useUtils();
+
   const { markTrainingActionAsComplete } =
     useUserOnboardingSliderMutationStore();
 
@@ -67,16 +74,15 @@ const useCreateThreadMutation = ({
       // @ts-expect-error StrictNullChecks
       addThreadInAllCaches(communityId, newThread);
 
-      // Update community level thread counters variables
-      EXCEPTION_CASE_threadCountersStore.setState(
-        ({ totalThreadsInCommunity, totalThreadsInCommunityForVoting }) => ({
-          totalThreadsInCommunity: totalThreadsInCommunity + 1,
-          totalThreadsInCommunityForVoting:
-            newThread.stage === ThreadStage.Voting
-              ? totalThreadsInCommunityForVoting + 1
-              : totalThreadsInCommunityForVoting,
-        }),
-      );
+      // increment communities thread count
+      if (communityId) {
+        updateCommunityThreadCount(
+          communityId,
+          'increment',
+          newThread.stage === ThreadStage.Voting,
+          utils,
+        );
+      }
 
       const userId = user.addresses?.[0]?.profile?.userId;
       userId &&

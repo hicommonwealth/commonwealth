@@ -3,7 +3,7 @@ import * as schemas from '@hicommonwealth/schemas';
 import { DEFAULT_NAME } from '@hicommonwealth/shared';
 import { models } from '../database';
 import { mustExist } from '../middleware/guards';
-import { getDelta, sanitizeQuillText, updateTags } from '../utils';
+import { decodeContent, emitEvent, getDelta, updateTags } from '../utils';
 
 export function UpdateUser(): Command<typeof schemas.UpdateUser> {
   return {
@@ -14,7 +14,7 @@ export function UpdateUser(): Command<typeof schemas.UpdateUser> {
       if (actor.user.id != payload.id)
         throw new InvalidInput('Invalid user id');
 
-      const { id, profile, tag_ids } = payload;
+      const { id, profile, tag_ids, referral_link } = payload;
       const {
         slug,
         name,
@@ -34,12 +34,12 @@ export function UpdateUser(): Command<typeof schemas.UpdateUser> {
           },
         })
       )?.toJSON();
-      if (!mustExist('User', user)) return;
+      mustExist('User', user);
 
-      const is_welcome_onboard_flow_complete =
-        user.is_welcome_onboard_flow_complete || (name && name !== DEFAULT_NAME)
-          ? true
-          : false;
+      const is_welcome_onboard_flow_complete = !!(
+        user.is_welcome_onboard_flow_complete ||
+        (name && name !== DEFAULT_NAME)
+      );
 
       const promotional_emails_enabled =
         payload.promotional_emails_enabled ??
@@ -53,7 +53,7 @@ export function UpdateUser(): Command<typeof schemas.UpdateUser> {
           email,
           slug,
           name,
-          bio: rawBio && sanitizeQuillText(rawBio).toString(),
+          bio: rawBio && decodeContent(rawBio),
           website,
           avatar_url,
           socials,
@@ -62,9 +62,12 @@ export function UpdateUser(): Command<typeof schemas.UpdateUser> {
       });
 
       const tags_delta = tag_ids
-        ? getDelta({ tag_ids: user.ProfileTags?.map((t) => t.tag_id) } ?? [], {
-            tag_ids,
-          })
+        ? getDelta(
+            { tag_ids: user.ProfileTags?.map((t) => t.tag_id) },
+            {
+              tag_ids,
+            },
+          )
         : {};
 
       const update_user = Object.keys(user_delta).length;
@@ -74,13 +77,8 @@ export function UpdateUser(): Command<typeof schemas.UpdateUser> {
         const updated = await models.sequelize.transaction(
           async (transaction) => {
             if (update_tags)
-              await updateTags(
-                tag_ids!,
-                models,
-                user.id!,
-                'user_id',
-                transaction,
-              );
+              await updateTags(tag_ids!, user.id!, 'user_id', transaction);
+
             if (update_user) {
               // TODO: utility to deep merge deltas
               const updates = {
@@ -94,12 +92,34 @@ export function UpdateUser(): Command<typeof schemas.UpdateUser> {
                   },
                 },
               };
+              if (updates.profile.bio === '') {
+                updates.profile.bio = null;
+              }
               const [, rows] = await models.User.update(updates, {
                 where: { id: user.id },
                 returning: true,
                 transaction,
               });
-              return rows.at(0);
+              const updated_user = rows.at(0);
+
+              // emit sign-up flow completed event when:
+              if (updated_user && user_delta.is_welcome_onboard_flow_complete)
+                await emitEvent(
+                  models.Outbox,
+                  [
+                    {
+                      event_name: schemas.EventNames.SignUpFlowCompleted,
+                      event_payload: {
+                        user_id: id,
+                        referral_link,
+                        created_at: updated_user.created_at!,
+                      },
+                    },
+                  ],
+                  transaction,
+                );
+
+              return updated_user;
             } else return user;
           },
         );

@@ -6,7 +6,7 @@ import chaiHttp from 'chai-http';
 import { Wallet } from 'ethers';
 import { afterAll, beforeAll, describe, test } from 'vitest';
 import { TestServer, testServer } from '../../../server-test';
-import { TEST_BLOCK_INFO_STRING } from '../../../shared/adapters/chain/ethereum/keys';
+import { TEST_BLOCK_INFO_STRING } from '../../util/keys';
 
 chai.use(chaiHttp);
 const { expect } = chai;
@@ -27,7 +27,7 @@ describe('Verify Address Routes', () => {
     sessionSigner = new SIWESigner({ chainId: parseInt(chain_id) });
     const { payload } = await sessionSigner.newSession(CANVAS_TOPIC);
     session = payload;
-    walletAddress = session.address.split(':')[2];
+    walletAddress = session.did.split(':')[4];
 
     const res = await chai.request
       .agent(server.app)

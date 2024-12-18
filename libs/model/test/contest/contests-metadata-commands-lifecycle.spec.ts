@@ -5,7 +5,7 @@ import chaiAsPromised from 'chai-as-promised';
 import { afterAll, beforeAll, describe, test } from 'vitest';
 import z from 'zod';
 import { Contest, TopicAttributes } from '../../src/index';
-import { bootstrap_testing, seed } from '../../src/tester';
+import { seed } from '../../src/tester';
 
 chai.use(chaiAsPromised);
 
@@ -31,7 +31,6 @@ describe('Contests metadata commands lifecycle', () => {
   let communityMemberActor: Actor | null = null;
 
   beforeAll(async () => {
-    await bootstrap_testing();
     const [chain] = await seed('ChainNode', {});
 
     const [communityAdminUser] = await seed(
@@ -55,6 +54,7 @@ describe('Contests metadata commands lifecycle', () => {
       {
         id: community_id,
         namespace,
+        namespace_address: '0x123',
         chain_node_id: chain!.id,
         lifetime_thread_count: 0,
         profile_count: 2,
@@ -63,11 +63,15 @@ describe('Contests metadata commands lifecycle', () => {
             community_id,
             user_id: communityAdminUser!.id,
             role: 'admin',
+            is_banned: false,
+            verified: new Date(),
           },
           {
             community_id,
             user_id: memberUser!.id,
             role: 'member',
+            is_banned: false,
+            verified: new Date(),
           },
         ],
         topics: [{}, {}, {}],
@@ -95,6 +99,14 @@ describe('Contests metadata commands lifecycle', () => {
             funding_token_address,
             decimals,
             cancelled: false,
+          },
+        ],
+        CommunityStakes: [
+          {
+            stake_id: 1,
+            stake_token: 'XYZ',
+            vote_weight: 3,
+            stake_enabled: true,
           },
         ],
       },
@@ -135,7 +147,7 @@ describe('Contests metadata commands lifecycle', () => {
       const promise = command(Contest.CreateContestManagerMetadata(), {
         actor: communityMemberActor!,
         payload: {
-          id: community_id,
+          community_id,
           name,
           contest_address: '0x123',
           image_url,
@@ -145,7 +157,7 @@ describe('Contests metadata commands lifecycle', () => {
           interval,
           ticker,
           decimals,
-          topic_ids: [],
+          topic_id: topics[0].id,
         },
       });
       expect(promise).to.be.rejectedWith('User is not admin in the community');
@@ -155,7 +167,7 @@ describe('Contests metadata commands lifecycle', () => {
       const promise = command(Contest.CreateContestManagerMetadata(), {
         actor: communityAdminActor!,
         payload: {
-          id: 'does-not-exist',
+          community_id: 'does-not-exist',
           name,
           contest_address: '0x123',
           image_url,
@@ -165,7 +177,7 @@ describe('Contests metadata commands lifecycle', () => {
           interval,
           ticker,
           decimals,
-          topic_ids: [],
+          topic_id: topics[0].id,
         },
       });
       // the auth middleware fails to find address if community doesn't exist
@@ -180,7 +192,7 @@ describe('Contests metadata commands lifecycle', () => {
         {
           actor: communityAdminActor!,
           payload: {
-            id: community_id,
+            community_id,
             contest_address,
             name,
             image_url,
@@ -190,7 +202,7 @@ describe('Contests metadata commands lifecycle', () => {
             interval,
             ticker,
             decimals,
-            topic_ids: topics.map((t) => t.id!),
+            topic_id: topics[0].id,
           },
         },
       );
@@ -207,19 +219,7 @@ describe('Contests metadata commands lifecycle', () => {
         ticker,
         decimals,
         cancelled: false,
-      });
-
-      expect(createResult!.contest_managers![0].topics![0]).to.deep.contain({
-        id: topics[0].id,
-        name: topics[0].name,
-      });
-      expect(createResult!.contest_managers![0].topics![1]).to.deep.contain({
-        id: topics[1].id,
-        name: topics[1].name,
-      });
-      expect(createResult!.contest_managers![0].topics![2]).to.deep.contain({
-        id: topics[2].id,
-        name: topics[2].name,
+        topic_id: topics[0].id,
       });
     });
   });
@@ -231,7 +231,7 @@ describe('Contests metadata commands lifecycle', () => {
       const promise = command(Contest.UpdateContestManagerMetadata(), {
         actor: communityMemberActor!,
         payload: {
-          id: community_id,
+          community_id,
           contest_address,
           name: 'xxx',
           image_url: 'https://blah',
@@ -245,7 +245,7 @@ describe('Contests metadata commands lifecycle', () => {
       const promise = command(Contest.UpdateContestManagerMetadata(), {
         actor: communityAdminActor!,
         payload: {
-          id: community_id,
+          community_id,
           contest_address: 'contest-manager-not-exists',
           name: 'xxx',
         },
@@ -261,7 +261,7 @@ describe('Contests metadata commands lifecycle', () => {
         {
           actor: communityAdminActor!,
           payload: {
-            id: community_id,
+            community_id,
             contest_address,
             name: 'xxx',
             image_url: 'https://blah',
@@ -295,53 +295,16 @@ describe('Contests metadata commands lifecycle', () => {
           {
             actor: communityAdminActor!,
             payload: {
-              id: community_id,
+              community_id,
               contest_address,
-              topic_ids: [],
+              topic_id: topics[1].id,
             },
           },
         );
-        const metadata = updateResult?.contest_managers![0];
-        expect(metadata!.topics).to.have.length(0);
-      }
-
-      {
-        // add topic IDs
-        const updateResult = await command(
-          Contest.UpdateContestManagerMetadata(),
-          {
-            actor: communityAdminActor!,
-            payload: {
-              id: community_id,
-              contest_address,
-              topic_ids: [topics[0]!.id!, topics[1]!.id!],
-            },
-          },
+        console.log(updateResult);
+        expect(updateResult?.contest_managers.at(0)?.topic_id).to.eq(
+          topics[1].id!,
         );
-        const metadata = updateResult?.contest_managers![0];
-        expect(metadata!.topics).to.have.length(2);
-        const resultTopicIds = metadata!.topics!.map((t) => t.id);
-        expect(resultTopicIds).to.contain(topics[0]!.id!);
-        expect(resultTopicIds).to.contain(topics[1]!.id!);
-      }
-
-      {
-        // remove topic IDs
-        const updateResult = await command(
-          Contest.UpdateContestManagerMetadata(),
-          {
-            actor: communityAdminActor!,
-            payload: {
-              id: community_id,
-              contest_address,
-              topic_ids: [topics[0]!.id!],
-            },
-          },
-        );
-        const metadata = updateResult?.contest_managers![0];
-        expect(metadata!.topics).to.have.length(1);
-        const resultTopicIds = metadata!.topics!.map((t) => t.id);
-        expect(resultTopicIds[0]).to.eq(topics[0]!.id!);
       }
     });
   });
@@ -355,7 +318,7 @@ describe('Contests metadata commands lifecycle', () => {
       const promise = command(Contest.CancelContestManagerMetadata(), {
         actor: communityMemberActor!,
         payload: {
-          id: community_id,
+          community_id,
           contest_address,
         },
       });
@@ -366,7 +329,7 @@ describe('Contests metadata commands lifecycle', () => {
       const promise = command(Contest.CancelContestManagerMetadata(), {
         actor: communityAdminActor!,
         payload: {
-          id: community_id,
+          community_id,
           contest_address: 'does-not-exist',
         },
       });
@@ -384,7 +347,7 @@ describe('Contests metadata commands lifecycle', () => {
         {
           actor: communityAdminActor!,
           payload: {
-            id: community_id,
+            community_id,
             contest_address,
           },
         },

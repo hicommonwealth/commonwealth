@@ -1,1 +1,0 @@
-export { AuthTypeGuidanceModal } from './AuthTypeGuidanceModal';
