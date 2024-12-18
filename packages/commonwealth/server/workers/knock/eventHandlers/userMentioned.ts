@@ -47,7 +47,6 @@ export const processUserMentioned: EventHandler<
       author_address_id: payload.authorAddressId,
       author_user_id: payload.authorUserId,
       author_address: payload.authorAddress,
-      community_id: String(payload.communityId),
       community_name: community.name,
       author: user.profile?.name || payload.authorAddress.substring(0, 8),
       object_body:

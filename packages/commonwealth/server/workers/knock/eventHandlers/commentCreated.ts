@@ -88,7 +88,6 @@ export const processCommentCreated: EventHandler<
       key: WorkflowKeys.CommentCreation,
       users: users.map((u) => ({ id: String(u.user_id) })),
       data: {
-        community_id: String(community.id),
         author: author.User?.profile.name || author.address.substring(0, 8),
         comment_parent_name: payload.parent_id ? 'comment' : 'thread',
         community_name: community.name,

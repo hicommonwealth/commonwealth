@@ -13,9 +13,7 @@ import { getProfileUrl, getThreadUrl } from '../util';
 
 const log = logger(import.meta);
 
-const output = z.object({
-  success: z.boolean(),
-});
+const output = z.boolean();
 
 export const processThreadCreated: EventHandler<
   'ThreadCreated',
@@ -28,7 +26,7 @@ export const processThreadCreated: EventHandler<
     log.error('Thread community not found!', undefined, {
       payload,
     });
-    return { success: false };
+    return false;
   }
 
   const author = await models.Address.findOne({
@@ -40,7 +38,7 @@ export const processThreadCreated: EventHandler<
     log.error('Full thread author with profile not found!', undefined, {
       payload,
     });
-    return { success: false };
+    return false;
   }
 
   const webhooks = await models.Webhook.findAll({
@@ -81,9 +79,6 @@ export const processThreadCreated: EventHandler<
       data: {
         sender_username: 'Common',
         sender_avatar_url: config.DEFAULT_COMMONWEALTH_LOGO,
-        community_id: String(community.id!),
-        community_icon_url:
-          community.icon_url || config.DEFAULT_COMMONWEALTH_LOGO,
         title_prefix: 'New thread: ',
         preview_image_url: previewImg.previewImageUrl,
         preview_image_alt_text: previewImg.previewImageAltText,
@@ -95,10 +90,10 @@ export const processThreadCreated: EventHandler<
         object_url: threadURl,
         object_summary: threadSummary,
       },
-    } as const);
+    });
 
-    return { success: !res.some((r) => r.status === 'rejected') };
+    return !res.some((r) => r.status === 'rejected');
   }
 
-  return { success: true };
+  return true;
 };
