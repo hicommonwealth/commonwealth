@@ -25,6 +25,7 @@ type DeleteAddressModalAttrs = {
   chain: string;
   closeModal: () => void;
   isBulkDelete?: boolean;
+  communityName: string;
 };
 
 export const DeleteAddressModal = ({
@@ -33,6 +34,7 @@ export const DeleteAddressModal = ({
   chain,
   closeModal,
   isBulkDelete = false,
+  communityName,
 }: DeleteAddressModalAttrs) => {
   const user = useUserStore();
 
@@ -102,9 +104,9 @@ export const DeleteAddressModal = ({
       <CWModalBody>
         <CWText>
           {isBulkDelete
-            ? `By leaving ${address?.community.id} you will disconnect all 
+            ? `By leaving ${communityName} you will disconnect all 
             linked addresses. Your threads will remain intact.`
-            : `By removing this address you will be leaving the ${address?.community.id}. 
+            : `By removing this address you will be leaving the ${communityName}. 
             Your contributions and comments will remain. Don't worry, you can rejoin anytime.`}
         </CWText>
       </CWModalBody>
