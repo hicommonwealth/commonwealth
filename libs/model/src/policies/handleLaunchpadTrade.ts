@@ -22,7 +22,7 @@ export async function handleLaunchpadTrade(
     6: floatingSupply,
   } = event.parsedArgs as z.infer<typeof chainEvents.LaunchpadTrade>;
 
-  const token = await models.Token.findOne({
+  const token = await models.LaunchpadToken.findOne({
     where: {
       token_address: tokenAddress,
     },
@@ -34,7 +34,7 @@ export async function handleLaunchpadTrade(
 
   const chainNode = await models.ChainNode.scope('withPrivateData').findOne({
     where: {
-      id: event.eventSource.chainNodeId,
+      eth_chain_id: event.eventSource.ethChainId,
     },
   });
 
