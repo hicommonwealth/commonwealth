@@ -1,17 +1,18 @@
+import { TokenView } from '@hicommonwealth/schemas';
 import { ChainBase } from '@hicommonwealth/shared';
 import clsx from 'clsx';
 import { currencyNameToSymbolMap, SupportedCurrencies } from 'helpers/currency';
 import { calculateTokenPricing } from 'helpers/launchpad';
 import useDeferredConditionTriggerCallback from 'hooks/useDeferredConditionTriggerCallback';
 import React, { useState } from 'react';
-import app from 'state';
 import { useFetchTokenUsdRateQuery } from 'state/api/communityStake';
 import useUserStore from 'state/ui/user';
 import { AuthModal } from 'views/modals/AuthModal';
 import TradeTokenModal, {
-  TokenWithCommunity,
+  TradingConfig,
   TradingMode,
 } from 'views/modals/TradeTokenModel';
+import { ExternalToken } from 'views/modals/TradeTokenModel/UniswapTradeModal/types';
 import { z } from 'zod';
 import { CWDivider } from '../../../component_kit/cw_divider';
 import { CWIconButton } from '../../../component_kit/cw_icon_button';
@@ -34,16 +35,13 @@ export const TokenTradeWidget = ({
   const user = useUserStore();
   const currencySymbol = currencyNameToSymbolMap[currency];
 
-  const { communityToken, isLoadingToken } = useTokenTradeWidget();
+  const { communityToken, isLoadingToken, isPinnedToken } =
+    useTokenTradeWidget();
 
   const [isWidgetExpanded, setIsWidgetExpanded] = useState(true);
   const [tokenLaunchModalConfig, setTokenLaunchModalConfig] = useState<{
     isOpen: boolean;
-    tradeConfig?: {
-      mode: TradingMode;
-      token: z.infer<typeof TokenWithCommunity>;
-      addressType: ChainBase;
-    };
+    tradeConfig?: TradingConfig;
   }>({ isOpen: false, tradeConfig: undefined });
 
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
@@ -58,8 +56,11 @@ export const TokenTradeWidget = ({
   const ethToUsdRate = parseFloat(
     ethToCurrencyRateData?.data?.data?.amount || '0',
   );
-  const tokenPricing = communityToken
-    ? calculateTokenPricing(communityToken, ethToUsdRate)
+  const tokenPricing = !isPinnedToken
+    ? calculateTokenPricing(
+        communityToken as z.infer<typeof TokenView>,
+        ethToUsdRate,
+      )
     : null;
 
   const openAuthModalOrTriggerCallback = () => {
@@ -79,18 +80,13 @@ export const TokenTradeWidget = ({
       isOpen: true,
       tradeConfig: {
         mode,
-        token: { ...communityToken, community_id: app.activeChainId() || '' },
+        token: communityToken,
         addressType: ChainBase.Ethereum,
-      },
+      } as TradingConfig,
     });
   };
 
-  if (
-    isLoadingToken ||
-    isLoadingETHToCurrencyRate ||
-    !communityToken ||
-    !tokenPricing
-  ) {
+  if (isLoadingToken || isLoadingETHToCurrencyRate || !communityToken) {
     return <TokenTradeWidgetSkeleton />;
   }
 
@@ -116,33 +112,44 @@ export const TokenTradeWidget = ({
             <CWText type="h3" fontWeight="bold" className="ml-auto">
               {currencySymbol}
               <FractionalValue
-                value={tokenPricing.currentPrice}
+                value={
+                  (isPinnedToken
+                    ? parseFloat(
+                        (communityToken as ExternalToken)?.prices?.[0]?.value ||
+                          '0',
+                      )
+                    : tokenPricing?.currentPrice) || 0
+                }
                 type="h3"
                 fontWeight="bold"
               />
             </CWText>
           </CWText>
 
-          <PricePercentageChange
-            pricePercentage24HourChange={
-              tokenPricing.pricePercentage24HourChange
-            }
-            alignment="left"
-            className="pad-8"
-          />
-          <MarketCapProgress
-            marketCap={{
-              current: tokenPricing.marketCapCurrent,
-              goal: tokenPricing.marketCapGoal,
-              isCapped: tokenPricing.isMarketCapGoalReached,
-            }}
-          />
+          {!isPinnedToken && tokenPricing && (
+            <>
+              <PricePercentageChange
+                pricePercentage24HourChange={
+                  tokenPricing.pricePercentage24HourChange
+                }
+                alignment="left"
+                className="pad-8"
+              />
+              <MarketCapProgress
+                marketCap={{
+                  current: tokenPricing.marketCapCurrent,
+                  goal: tokenPricing.marketCapGoal,
+                  isCapped: tokenPricing.isMarketCapGoalReached,
+                }}
+              />
+            </>
+          )}
           <div
             className={clsx('action-btns', {
-              [`cols-${tokenPricing.isMarketCapGoalReached ? 1 : 2}`]: true,
+              [`cols-${isPinnedToken ? 1 : 2}`]: true,
             })}
           >
-            {!tokenPricing.isMarketCapGoalReached ? (
+            {!isPinnedToken ? (
               [TradingMode.Buy, TradingMode.Sell].map((mode) => (
                 <CWButton
                   key={mode}
@@ -188,7 +195,7 @@ export const TokenTradeWidget = ({
       {tokenLaunchModalConfig.tradeConfig && (
         <TradeTokenModal
           isOpen={tokenLaunchModalConfig.isOpen}
-          tradeConfig={tokenLaunchModalConfig.tradeConfig}
+          tradeConfig={tokenLaunchModalConfig.tradeConfig as any}
           onModalClose={() => setTokenLaunchModalConfig({ isOpen: false })}
         />
       )}
