@@ -1,4 +1,3 @@
-import { TokenView } from '@hicommonwealth/schemas';
 import { ChainBase } from '@hicommonwealth/shared';
 import clsx from 'clsx';
 import { currencyNameToSymbolMap, SupportedCurrencies } from 'helpers/currency';
@@ -23,20 +22,19 @@ import MarketCapProgress from '../../../TokenCard/MarketCapProgress';
 import PricePercentageChange from '../../../TokenCard/PricePercentageChange';
 import './TokenTradeWidget.scss';
 import { TokenTradeWidgetSkeleton } from './TokenTradeWidgetSkeleton';
+import { useTokenTradeWidget } from './useTokenTradeWidget';
 
 interface TokenTradeWidgetProps {
-  showSkeleton: boolean;
-  token: z.infer<typeof TokenView>;
   currency?: SupportedCurrencies;
 }
 
 export const TokenTradeWidget = ({
-  showSkeleton,
-  token,
   currency = SupportedCurrencies.USD,
 }: TokenTradeWidgetProps) => {
   const user = useUserStore();
   const currencySymbol = currencyNameToSymbolMap[currency];
+
+  const { communityToken, isLoadingToken } = useTokenTradeWidget();
 
   const [isWidgetExpanded, setIsWidgetExpanded] = useState(true);
   const [tokenLaunchModalConfig, setTokenLaunchModalConfig] = useState<{
@@ -60,7 +58,9 @@ export const TokenTradeWidget = ({
   const ethToUsdRate = parseFloat(
     ethToCurrencyRateData?.data?.data?.amount || '0',
   );
-  const tokenPricing = calculateTokenPricing(token, ethToUsdRate);
+  const tokenPricing = communityToken
+    ? calculateTokenPricing(communityToken, ethToUsdRate)
+    : null;
 
   const openAuthModalOrTriggerCallback = () => {
     if (user.isLoggedIn) {
@@ -79,13 +79,18 @@ export const TokenTradeWidget = ({
       isOpen: true,
       tradeConfig: {
         mode,
-        token: { ...token, community_id: app.activeChainId() || '' },
+        token: { ...communityToken, community_id: app.activeChainId() || '' },
         addressType: ChainBase.Ethereum,
       },
     });
   };
 
-  if (showSkeleton || isLoadingETHToCurrencyRate) {
+  if (
+    isLoadingToken ||
+    isLoadingETHToCurrencyRate ||
+    !communityToken ||
+    !tokenPricing
+  ) {
     return <TokenTradeWidgetSkeleton />;
   }
 
@@ -106,7 +111,7 @@ export const TokenTradeWidget = ({
         <>
           <CWText type="h3" fontWeight="bold" className="pad-8">
             <CWText type="h3" fontWeight="bold">
-              {token.symbol}
+              {communityToken.symbol}
             </CWText>
             <CWText type="h3" fontWeight="bold" className="ml-auto">
               {currencySymbol}
