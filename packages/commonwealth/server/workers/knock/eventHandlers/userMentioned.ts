@@ -7,7 +7,6 @@ import {
 import { models } from '@hicommonwealth/model';
 import { getDecodedString, safeTruncateBody } from '@hicommonwealth/shared';
 import z from 'zod';
-import { config } from '../../../config';
 import { getCommentUrl, getThreadUrl } from '../util';
 
 const log = logger(import.meta);
@@ -53,11 +52,10 @@ export const processUserMentioned: EventHandler<
       author_address_id: payload.authorAddressId,
       author_user_id: payload.authorUserId,
       author_address: payload.authorAddress,
-      community_id: payload.communityId,
+      community_id: String(payload.communityId),
       community_name: community.name,
-      community_icon_url:
-        community.icon_url || config.DEFAULT_COMMONWEALTH_LOGO,
-      author: user.profile.name || payload.authorAddress.substring(255),
+      community_icon_url: community.icon_url || undefined,
+      author: user.profile.name || payload.authorAddress.substring(0, 8),
       object_body:
         'thread' in payload
           ? safeTruncateBody(getDecodedString(payload.thread!.body || ''), 255)
@@ -76,7 +74,11 @@ export const processUserMentioned: EventHandler<
               community.custom_domain,
             ),
     },
-  });
+    actor: {
+      id: String(payload.authorUserId),
+      email: user?.email ?? undefined,
+    },
+  } as const);
 
   return { success: !res.some((r) => r.status === 'rejected') };
 };

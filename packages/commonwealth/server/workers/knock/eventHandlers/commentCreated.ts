@@ -93,15 +93,16 @@ export const processCommentCreated: EventHandler<
         author: author.User!.profile.name || author.address.substring(0, 8),
         comment_parent_name: payload.parent_id ? 'comment' : 'thread',
         community_name: community.name,
-        community_id: community.id!,
-        community_icon_url:
-          community.icon_url || config.DEFAULT_COMMONWEALTH_LOGO,
+        community_icon_url: community.icon_url || undefined,
         comment_body: commentSummary,
         comment_url: commentUrl,
         comment_created_event: payload,
       },
-      actor: { id: String(author.user_id) },
-    });
+      actor: {
+        id: String(author.user_id),
+        email: author.User?.email ?? undefined,
+      },
+    } as const);
   }
 
   const webhooks = await models.Webhook.findAll({

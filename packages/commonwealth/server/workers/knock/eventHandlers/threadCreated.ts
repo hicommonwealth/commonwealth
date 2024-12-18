@@ -81,7 +81,7 @@ export const processThreadCreated: EventHandler<
       data: {
         sender_username: 'Common',
         sender_avatar_url: config.DEFAULT_COMMONWEALTH_LOGO,
-        community_id: community.id!,
+        community_id: String(community.id!),
         community_icon_url:
           community.icon_url || config.DEFAULT_COMMONWEALTH_LOGO,
         title_prefix: 'New thread: ',
@@ -95,7 +95,7 @@ export const processThreadCreated: EventHandler<
         object_url: threadURl,
         object_summary: threadSummary,
       },
-    });
+    } as const);
 
     return { success: !res.some((r) => r.status === 'rejected') };
   }
