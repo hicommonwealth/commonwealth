@@ -1,5 +1,5 @@
 import { Actor, dispose, query } from '@hicommonwealth/core';
-import { Address } from '@hicommonwealth/schemas';
+import { Address, Topic } from '@hicommonwealth/schemas';
 import { expect } from 'chai';
 import { GetNewContent } from 'model/src/user';
 import { afterAll, beforeAll, describe, test } from 'vitest';
@@ -10,6 +10,7 @@ describe('New Content lifecycle', () => {
   let actor1: Actor;
   let actor2: Actor;
   let address1: z.infer<typeof Address>;
+  let topic: z.infer<typeof Topic>;
 
   beforeAll(async () => {
     const [node] = await seed('ChainNode', {});
@@ -34,6 +35,9 @@ describe('New Content lifecycle', () => {
         },
       ],
     });
+    [topic] = (await seed('Topic', {
+      community_id: community!.id,
+    })) as [z.infer<typeof Topic>, unknown];
 
     actor1 = {
       user: {
@@ -75,6 +79,7 @@ describe('New Content lifecycle', () => {
       read_only: false,
       body: 'Sample 1',
       reaction_weights_sum: '0',
+      topic_id: topic.id!,
     });
     await seed('Thread', {
       address_id: address1.id!,
@@ -83,6 +88,7 @@ describe('New Content lifecycle', () => {
       read_only: false,
       body: 'Sample 2',
       reaction_weights_sum: '0',
+      topic_id: topic.id!,
     });
 
     // now actor 2 should only get 1 entry for that community in new content array

@@ -19,6 +19,7 @@ export type ValidateGroupMembershipResponse = {
  * @param userAddress address of user
  * @param requirements An array of requirement types to be validated against
  * @param balances address balances
+ * @param numRequiredRequirements
  * @returns ValidateGroupMembershipResponse validity and messages on requirements that failed
  */
 export function validateGroupMembership(

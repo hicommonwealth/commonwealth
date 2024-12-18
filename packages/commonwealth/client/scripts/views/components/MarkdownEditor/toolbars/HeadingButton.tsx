@@ -37,6 +37,9 @@ export const HeadingButton = (props: HeadingButtonProps) => {
           case 'quote':
             convertSelectionToNode(() => $createQuoteNode());
             break;
+          case 'p':
+            convertSelectionToNode(() => $createParagraphNode());
+            break;
         }
       } else {
         convertSelectionToNode(() => $createParagraphNode());

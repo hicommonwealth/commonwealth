@@ -1,5 +1,10 @@
 // Note, this login will not work for the homepage
-import { tester, type DB, type E2E_TestEntities } from '@hicommonwealth/model';
+import {
+  models,
+  tester,
+  type DB,
+  type E2E_TestEntities,
+} from '@hicommonwealth/model';
 import { expect } from '@playwright/test';
 
 export type E2E_Seeder = E2E_TestEntities & {
@@ -14,7 +19,8 @@ export type E2E_Seeder = E2E_TestEntities & {
 const buildSeeder = async (): Promise<E2E_Seeder> => {
   // This connection is used to speed up tests, so we don't need to load in all the models with the associated
   // imports. This can only be used with raw sql queries.
-  const testDb = await tester.bootstrap_testing(true);
+
+  const testDb = models;
   const testAddress = '0x0bad5AA8Adf8bA82198D133F9Bb5a48A638FCe88';
   const e2eEntities = await tester.e2eTestEntities(testDb);
 

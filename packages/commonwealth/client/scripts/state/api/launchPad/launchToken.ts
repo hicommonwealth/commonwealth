@@ -1,4 +1,4 @@
-import { commonProtocol } from '@hicommonwealth/shared';
+import { commonProtocol } from '@hicommonwealth/evm-protocols';
 import { useMutation } from '@tanstack/react-query';
 import LaunchpadBondingCurve from 'helpers/ContractHelpers/Launchpad';
 
@@ -21,6 +21,7 @@ const launchToken = async ({
     commonProtocol.factoryContracts[ethChainId].lpBondingCurve,
     commonProtocol.factoryContracts[ethChainId].launchpad,
     '',
+    commonProtocol.factoryContracts[ethChainId].tokenCommunityManager,
     chainRpc,
   );
 

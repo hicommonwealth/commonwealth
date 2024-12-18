@@ -10,6 +10,7 @@ import {
 import { Op } from 'sequelize';
 import { models } from '../database';
 import { mustBeSuperAdmin, mustExist } from '../middleware/guards';
+import { emitEvent } from '../utils';
 import { findCompatibleAddress } from '../utils/findBaseAddress';
 
 export const CreateCommunityErrors = {
@@ -145,7 +146,7 @@ export function CreateCommunity(): Command<typeof schemas.CreateCommunity> {
           { transaction },
         );
 
-        await models.Address.create(
+        const created = await models.Address.create(
           {
             user_id: actor.user.id,
             address: admin_address.address,
@@ -166,6 +167,22 @@ export function CreateCommunity(): Command<typeof schemas.CreateCommunity> {
             is_banned: false,
           },
           { transaction },
+        );
+
+        await emitEvent(
+          models.Outbox,
+          [
+            {
+              event_name: schemas.EventNames.CommunityCreated,
+              event_payload: {
+                community_id: id,
+                user_id: actor.user.id!,
+                referral_link: payload.referral_link,
+                created_at: created.created_at!,
+              },
+            },
+          ],
+          transaction,
         );
       });
       // == end of command transaction boundary ==

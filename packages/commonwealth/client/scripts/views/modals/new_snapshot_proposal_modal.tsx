@@ -10,7 +10,7 @@ import {
   CWModalHeader,
 } from '../components/component_kit/new_designs/CWModal';
 
-import '../../../styles/modals/new_snapshot_proposal_modal.scss';
+import './new_snapshot_proposal_modal.scss';
 
 type NewSnapshotProposalModalProps = {
   thread: Thread;

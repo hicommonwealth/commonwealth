@@ -1,4 +1,5 @@
-import { Actor, Policy, command, events } from '@hicommonwealth/core';
+import { Actor, Policy, command } from '@hicommonwealth/core';
+import { events } from '@hicommonwealth/schemas';
 import { DISCORD_BOT_ADDRESS, DISCORD_BOT_EMAIL } from '@hicommonwealth/shared';
 import { z } from 'zod';
 import { CreateComment, DeleteComment, UpdateComment } from '../comment';
@@ -172,7 +173,7 @@ export function DiscordBotPolicy(): Policy<typeof inputs> {
           actor: await getActor(),
           payload: {
             thread_id: thread.id!,
-            text: payload.content,
+            body: payload.content,
             discord_meta: {
               user: {
                 id: payload.user.id,
@@ -192,7 +193,7 @@ export function DiscordBotPolicy(): Policy<typeof inputs> {
           actor: await getActor(),
           payload: {
             comment_id: comment.id!,
-            text: payload.content,
+            body: payload.content,
           },
         });
       },

@@ -68,8 +68,8 @@ const CommunityIntegrations = lazy(
 const CommunityStakeIntegration = lazy(
   () => import('views/pages/CommunityManagement/StakeIntegration'),
 );
-const CommunityTopicsOld = lazy(
-  () => import('views/pages/CommunityManagement/Topics/TopicsOld'),
+const CommunityTokenIntegration = lazy(
+  () => import('views/pages/CommunityManagement/TokenIntegration'),
 );
 const CommunityTopics = lazy(
   () => import('views/pages/CommunityManagement/Topics'),
@@ -83,7 +83,7 @@ const ManageContest = lazy(
 const Contests = lazy(() => import('views/pages/Contests'));
 const ContestPage = lazy(() => import('views/pages/ContestPage'));
 
-const MyCommunityStake = lazy(() => import('views/pages/MyCommunityStake'));
+const MyTransactions = lazy(() => import('views/pages/MyTransactions'));
 
 const SnapshotProposalPage = lazy(
   () => import('views/pages/Snapshots/SnapshotProposals'),
@@ -103,7 +103,6 @@ const EditNewProfilePage = lazy(() => import('views/pages/edit_new_profile'));
 const ProfilePageRedirect = lazy(() => import('views/pages/profile_redirect'));
 
 const CustomDomainRoutes = ({
-  weightedTopicsEnabled,
   tokenizedCommunityEnabled,
 }: RouteFeatureFlags) => {
   return [
@@ -174,9 +173,9 @@ const CustomDomainRoutes = ({
       element={withLayout(FinishSocialLoginPage, { type: 'common' })}
     />,
     <Route
-      key="/myCommunityStake"
-      path="/myCommunityStake"
-      element={withLayout(MyCommunityStake, { type: 'common' })}
+      key="/myTransactions"
+      path="/myTransactions"
+      element={withLayout(MyTransactions, { type: 'common' })}
     />,
 
     // NOTIFICATIONS
@@ -303,14 +302,18 @@ const CustomDomainRoutes = ({
       })}
     />,
     <Route
+      key="/manage/integrations/token"
+      path="/manage/integrations/token"
+      element={withLayout(CommunityTokenIntegration, {
+        scoped: true,
+      })}
+    />,
+    <Route
       key="/manage/topics"
       path="/manage/topics"
-      element={withLayout(
-        weightedTopicsEnabled ? CommunityTopics : CommunityTopicsOld,
-        {
-          scoped: true,
-        },
-      )}
+      element={withLayout(CommunityTopics, {
+        scoped: true,
+      })}
     />,
     <Route
       key="/manage/moderators"

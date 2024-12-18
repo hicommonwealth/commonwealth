@@ -1,0 +1,33 @@
+@import '../../../styles/shared.scss';
+
+.HeaderLink {
+  cursor: pointer;
+  display: flex;
+  max-width: 200px;
+  align-items: center;
+  background: $neutral-100;
+  border-radius: $border-radius-rounded-corners;
+  color: $neutral-500;
+  font-weight: 600;
+  overflow: hidden;
+  padding: 8px 16px;
+
+  &:hover {
+    background: $neutral-200;
+  }
+
+  a:link,
+  a:visited {
+    color: $purple-300;
+    display: inline-block;
+    overflow: hidden;
+    text-decoration: none;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  svg {
+    color: $purple-300;
+    margin-left: 8px;
+  }
+}

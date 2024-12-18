@@ -49,7 +49,7 @@ export const buildUpdateCommunityInput = ({
 }: UpdateCommunityProps) => {
   return {
     jwt: userStore.getState().jwt,
-    id: communityId,
+    community_id: communityId,
     ...(namespace && { namespace }),
     ...(typeof symbol !== 'undefined' && { default_symbol: symbol }),
     ...(typeof transactionHash !== 'undefined' && { transactionHash }),

@@ -1,0 +1,33 @@
+@import '../../../styles/shared.scss';
+
+.AvatarGroup {
+  display: flex;
+  align-items: center;
+
+  .avatar-group-icons {
+    display: inline-flex;
+    flex-direction: row-reverse;
+
+    .avatar-group-icon {
+      position: relative;
+      border: 2px solid #fff;
+      border-radius: 50%;
+      overflow: hidden;
+      width: 16px;
+      height: 16px;
+    }
+
+    .avatar-group-icon:not(:last-child) {
+      margin-left: -4px;
+    }
+
+    svg {
+      background: $white;
+      position: absolute;
+    }
+  }
+  .avatar-group-count {
+    margin-left: 8px;
+    color: $neutral-500;
+  }
+}

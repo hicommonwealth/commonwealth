@@ -1,10 +1,11 @@
-@import '../../../../../styles/shared.scss';
+@import '../../../../styles/shared.scss';
 
 .CommentEditor {
   display: flex;
   flex-direction: column;
   gap: 8px;
   margin-top: 16px;
+  flex-grow: 1;
 
   .attribution-row {
     display: flex;

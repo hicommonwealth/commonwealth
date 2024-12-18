@@ -1,7 +1,9 @@
+import { commonProtocol } from '@hicommonwealth/evm-protocols';
 import { TopicWeightedVoting } from '@hicommonwealth/schemas';
-import { commonProtocol } from '@hicommonwealth/shared';
+import Permissions from 'client/scripts/utils/Permissions';
 import clsx from 'clsx';
 import { notifyError } from 'controllers/app/notifications';
+import AddressInfo from 'models/AddressInfo';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 import app from 'state';
@@ -41,16 +43,18 @@ const StakeIntegration = ({
     includeNodeInfo: true,
   });
 
-  const handleStepChange = () => {
-    refetchStakeQuery().catch(console.error);
-    navigate(`/manage/integrations`);
-  };
-
   const contractInfo =
     // @ts-expect-error <StrictNullChecks/>
     commonProtocol?.factoryContracts[app?.chain?.meta?.ChainNode?.eth_chain_id];
 
   if (!contractInfo) {
+    return <PageNotFound />;
+  }
+
+  if (
+    !user.isLoggedIn ||
+    !(Permissions.isSiteAdmin() || Permissions.isCommunityAdmin())
+  ) {
     return <PageNotFound />;
   }
 
@@ -72,6 +76,16 @@ const StakeIntegration = ({
       notifyError('Failed to create topic');
       console.log(err);
     });
+  };
+
+  const goBack = () => {
+    isTopicFlow
+      ? onTopicFlowStepChange?.(CreateTopicStep.WVMethodSelection)
+      : navigate(`/manage/integrations`);
+  };
+
+  const handleSignTransactionsStepLaunchStakeSuccess = () => {
+    refetchStakeQuery().catch(console.error);
   };
 
   return (
@@ -120,19 +134,18 @@ const StakeIntegration = ({
           </>
         ) : (
           <CommunityStakeStep
-            refetchStakeQuery={() => {
-              refetchStakeQuery().catch(console.error);
-            }}
-            goToSuccessStep={handleStepChange}
-            onTopicFlowStepChange={onTopicFlowStepChange}
             createdCommunityName={community?.name}
             createdCommunityId={community?.id || ''}
             namespace={community?.namespace}
             symbol={community?.default_symbol}
-            // @ts-expect-error <StrictNullChecks/>
-            selectedAddress={selectedAddress}
+            selectedAddress={selectedAddress as AddressInfo}
             chainId={communityChainId}
             isTopicFlow={isTopicFlow}
+            onEnableStakeStepCancel={goBack}
+            onSignTransactionsStepLaunchStakeSuccess={
+              handleSignTransactionsStepLaunchStakeSuccess
+            }
+            onSignTransactionsStepCancel={goBack}
           />
         )}
       </section>

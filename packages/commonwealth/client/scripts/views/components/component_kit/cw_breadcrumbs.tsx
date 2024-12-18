@@ -2,8 +2,8 @@ import clsx from 'clsx';
 import React from 'react';
 import { CWTooltip } from '../component_kit/new_designs/CWTooltip';
 
-import 'components/component_kit/cw_breadcrumbs.scss';
 import { truncateText } from '../Breadcrumbs/utils';
+import './cw_breadcrumbs.scss';
 import { CWText } from './cw_text';
 
 import { ComponentType } from './types';

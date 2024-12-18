@@ -1,4 +1,4 @@
-import { ChainBase, commonProtocol } from '@hicommonwealth/shared';
+import { ChainBase } from '@hicommonwealth/shared';
 import clsx from 'clsx';
 import { notifyError } from 'controllers/app/notifications';
 import { isS3URL } from 'helpers/awsHelpers';
@@ -241,7 +241,7 @@ export const QuickTokenLaunchForm = ({
         }
 
         // 2. attempt Launch token on chain
-        await launchToken({
+        const txReceipt = await launchToken({
           chainRpc: baseNode.url,
           ethChainId: baseNode.ethChainId,
           name: sanitizedTokenInfo.name,
@@ -254,17 +254,13 @@ export const QuickTokenLaunchForm = ({
           // this gets reset after creating token on api
           addressSelectorSelectedAddress: selectedAddress.address,
         });
-        await createToken({
-          base: ChainBase.Ethereum,
+
+        const token = await createToken({
+          transaction_hash: txReceipt.transactionHash,
           chain_node_id: baseNode.id,
-          name: sanitizedTokenInfo.name,
-          symbol: sanitizedTokenInfo.symbol,
+          community_id: communityId,
           icon_url: sanitizedTokenInfo.imageURL,
           description: sanitizedTokenInfo.description,
-          community_id: communityId,
-          launchpad_contract_address:
-            // this will always exist, adding 0 to avoid typescript issues
-            commonProtocol.factoryContracts[baseNode.ethChainId].launchpad,
         });
 
         // 4. update community to reference the created token
@@ -273,7 +269,9 @@ export const QuickTokenLaunchForm = ({
           addressSelectorSelectedAddress: selectedAddress.address,
         });
         await updateCommunity({
-          id: communityId,
+          community_id: communityId,
+          namespace: token.namespace,
+          transactionHash: txReceipt.transactionHash,
           token_name: sanitizedTokenInfo.name,
           ...(sanitizedTokenInfo.description && {
             description: sanitizedTokenInfo.description,
@@ -308,7 +306,7 @@ export const QuickTokenLaunchForm = ({
   };
 
   const handleSubmit = (tokenInfo: FormSubmitValues) => {
-    if (tokenIdeas.length > 0) {
+    if (tokenIdeas.length > 1) {
       // if there are multiple drafts, then confirm from user if they want to proceed with
       // active draft and discard the others
       triggerDiscardExtraTokenDraftsConfirmation(() =>
@@ -450,22 +448,25 @@ export const QuickTokenLaunchForm = ({
                     placement="bottom"
                     content={`You can only generate a max of ${MAX_IDEAS_LIMIT} ideas.`}
                     renderTrigger={(handleInteraction) => (
-                      <CWButton
-                        iconLeft="brain"
-                        label="Randomize"
-                        containerClassName="ml-auto"
-                        type="button"
-                        disabled={
-                          isProcessingProfileImage ||
-                          isCreatingQuickToken ||
-                          isMaxTokenIdeaLimitReached
-                        }
-                        onClick={() => {
-                          generateIdea().catch(console.error);
-                        }}
+                      <div
                         onMouseEnter={handleInteraction}
                         onMouseLeave={handleInteraction}
-                      />
+                      >
+                        <CWButton
+                          iconLeft="brain"
+                          label="Randomize"
+                          containerClassName="ml-auto"
+                          type="button"
+                          disabled={
+                            isProcessingProfileImage ||
+                            isCreatingQuickToken ||
+                            isMaxTokenIdeaLimitReached
+                          }
+                          onClick={() => {
+                            generateIdea().catch(console.error);
+                          }}
+                        />
+                      </div>
                     )}
                   />
                 ) : (

@@ -1,7 +1,7 @@
 import { type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../database';
-import { isAuthorized, type AuthContext } from '../middleware';
+import { authComment } from '../middleware';
 import { mustBeAuthorizedComment } from '../middleware/guards';
 import { getCommentSearchVector } from '../models';
 import {
@@ -13,15 +13,12 @@ import {
   uploadIfLarge,
 } from '../utils';
 
-export function UpdateComment(): Command<
-  typeof schemas.UpdateComment,
-  AuthContext
-> {
+export function UpdateComment(): Command<typeof schemas.UpdateComment> {
   return {
     ...schemas.UpdateComment,
-    auth: [isAuthorized({ author: true })],
-    body: async ({ actor, payload, auth }) => {
-      const { address, comment } = mustBeAuthorizedComment(actor, auth);
+    auth: [authComment({ author: true })],
+    body: async ({ actor, payload, context }) => {
+      const { address, comment } = mustBeAuthorizedComment(actor, context);
 
       const thread = comment.Thread!;
       const currentVersion = await models.CommentVersionHistory.findOne({
@@ -29,22 +26,22 @@ export function UpdateComment(): Command<
         order: [['timestamp', 'DESC']],
       });
 
-      if (currentVersion?.text !== payload.text) {
-        const text = decodeContent(payload.text);
+      if (currentVersion?.body !== payload.body) {
+        const body = decodeContent(payload.body);
         const mentions = findMentionDiff(
-          parseUserMentions(currentVersion?.text),
-          uniqueMentions(parseUserMentions(text)),
+          parseUserMentions(currentVersion?.body),
+          uniqueMentions(parseUserMentions(body)),
         );
 
-        const { contentUrl } = await uploadIfLarge('comments', text);
+        const { contentUrl } = await uploadIfLarge('comments', body);
 
         // == mutation transaction boundary ==
         await models.sequelize.transaction(async (transaction) => {
           await models.Comment.update(
             // TODO: text should be set to truncatedBody once client renders content_url
             {
-              text,
-              search: getCommentSearchVector(text),
+              body,
+              search: getCommentSearchVector(body),
               content_url: contentUrl,
             },
             { where: { id: comment.id }, transaction },
@@ -54,7 +51,7 @@ export function UpdateComment(): Command<
             {
               comment_id: comment.id!,
               // TODO: text should be set to truncatedBody once client renders content_url
-              text,
+              body,
               timestamp: new Date(),
               content_url: contentUrl,
             },

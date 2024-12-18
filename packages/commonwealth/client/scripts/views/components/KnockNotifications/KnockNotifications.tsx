@@ -6,10 +6,10 @@ import {
   NotificationIconButton,
 } from '@knocklabs/react';
 import '@knocklabs/react-notification-feed/dist/index.css';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { memo, useEffect, useRef, useState } from 'react';
 import useUserStore from 'state/ui/user';
+import CustomNotificationCell from './CustomNotificationCell';
 import './KnockNotifications.scss';
-
 const KNOCK_PUBLIC_API_KEY =
   process.env.KNOCK_PUBLIC_API_KEY ||
   'pk_test_Hd4ZpzlVcz9bqepJQoo9BvZHokgEqvj4T79fPdKqpYM';
@@ -23,7 +23,7 @@ const getBrowserTimezone = (): string => {
   return Intl.DateTimeFormat().resolvedOptions().timeZone;
 };
 
-export const KnockNotifications = () => {
+export const KnockNotifications = memo(function KnockNotifications() {
   const user = useUserStore();
   const [isVisible, setIsVisible] = useState(false);
 
@@ -79,10 +79,11 @@ export const KnockNotifications = () => {
               buttonRef={notifButtonRef}
               isVisible={isVisible}
               onClose={() => setIsVisible(false)}
+              renderItem={CustomNotificationCell}
             />
           </div>
         </KnockFeedProvider>
       </KnockProvider>
     </div>
   );
-};
+});

@@ -1,18 +1,16 @@
 import { PermissionEnum, TopicWeightedVoting } from '@hicommonwealth/schemas';
 import { notifyError } from 'controllers/app/notifications';
-import { SessionKeyError } from 'controllers/server/sessions';
-import { parseCustomStages, weightedVotingValueToLabel } from 'helpers';
+import { weightedVotingValueToLabel } from 'helpers';
 import { detectURL, getThreadActionTooltipText } from 'helpers/threads';
 import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
 import useTopicGating from 'hooks/useTopicGating';
 import { useCommonNavigate } from 'navigation/helpers';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import app from 'state';
 import { useGetUserEthBalanceQuery } from 'state/api/communityStake';
 import { useFetchGroupsQuery } from 'state/api/groups';
 import { useCreateThreadMutation } from 'state/api/threads';
-import { buildCreateThreadInput } from 'state/api/threads/createThread';
 import { useFetchTopicsQuery } from 'state/api/topics';
 import { useAuthModalStore } from 'state/ui/modals';
 import useUserStore from 'state/ui/user';
@@ -29,7 +27,7 @@ import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextIn
 import { MessageRow } from 'views/components/component_kit/new_designs/CWTextInput/MessageRow';
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
 import useAppStatus from '../../../hooks/useAppStatus';
-import { ThreadKind, ThreadStage } from '../../../models/types';
+import { ThreadKind } from '../../../models/types';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWGatedTopicBanner } from '../component_kit/CWGatedTopicBanner';
 import { CWGatedTopicPermissionLevelBanner } from '../component_kit/CWGatedTopicPermissionLevelBanner';
@@ -39,15 +37,14 @@ import ContestTopicBanner from './ContestTopicBanner';
 import './NewThreadForm.scss';
 import { checkNewThreadErrors, useNewThreadForm } from './helpers';
 
-const MIN_ETH_FOR_CONTEST_THREAD = 0.0005;
+const MIN_ETH_FOR_CONTEST_THREAD = 0.0;
 
 export const NewThreadForm = () => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const navigate = useCommonNavigate();
   const location = useLocation();
 
   const markdownEditorMethodsRef = useRef<MarkdownEditorMethods | null>(null);
-
-  const [submitEntryChecked, setSubmitEntryChecked] = useState(false);
 
   useAppStatus();
 
@@ -75,6 +72,7 @@ export const NewThreadForm = () => {
     setEditorText,
     setIsSaving,
     isDisabled,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     clearDraft,
     canShowGatingBanner,
     setCanShowGatingBanner,
@@ -86,6 +84,7 @@ export const NewThreadForm = () => {
     threadTopic?.active_contest_managers?.length ?? 0 > 0;
 
   const user = useUserStore();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
 
   const contestTopicError = threadTopic?.active_contest_managers?.length
@@ -116,6 +115,7 @@ export const NewThreadForm = () => {
 
   const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { mutateAsync: createThread } = useCreateThreadMutation({
     communityId,
   });
@@ -141,6 +141,7 @@ export const NewThreadForm = () => {
     )
     .map((group) => group.name);
 
+  // eslint-disable-next-line @typescript-eslint/require-await
   const handleNewThreadCreation = async () => {
     const body = markdownEditorMethodsRef.current!.getMarkdown();
 
@@ -162,43 +163,43 @@ export const NewThreadForm = () => {
 
     setIsSaving(true);
 
-    try {
-      const input = await buildCreateThreadInput({
-        address: user.activeAccount?.address || '',
-        kind: threadKind,
-        stage: app.chain.meta?.custom_stages
-          ? parseCustomStages(app.chain.meta?.custom_stages)[0]
-          : ThreadStage.Discussion,
-        communityId,
-        title: threadTitle,
-        topic: threadTopic,
-        body,
-        url: threadUrl,
-      });
-      const thread = await createThread(input);
-
-      setEditorText('');
-      clearDraft();
-
-      navigate(`/discussion/${thread.id}`);
-    } catch (err) {
-      if (err instanceof SessionKeyError) {
-        checkForSessionKeyRevalidationErrors(err);
-        return;
-      }
-
-      if (err?.message?.includes('limit')) {
-        notifyError(
-          'Limit of submitted threads in selected contest has been exceeded.',
-        );
-        return;
-      }
-
-      console.error(err?.message);
-      notifyError('Failed to create thread');
-    } finally {
-      setIsSaving(false);
-    }
+    // try {
+    //   const input = await buildCreateThreadInput({
+    //     address: user.activeAccount?.address || '',
+    //     kind: threadKind,
+    //     stage: app.chain.meta?.custom_stages
+    //       ? parseCustomStages(app.chain.meta?.custom_stages)[0]
+    //       : ThreadStage.Discussion,
+    //     communityId,
+    //     title: threadTitle,
+    //     topic: threadTopic,
+    //     body,
+    //     url: threadUrl,
+    //   });
+    //   const thread = await createThread(input);
+    //
+    //   setEditorText('');
+    //   clearDraft();
+    //
+    //   navigate(`/discussion/${thread.id}`);
+    // } catch (err) {
+    //   if (err instanceof SessionKeyError) {
+    //     checkForSessionKeyRevalidationErrors(err);
+    //     return;
+    //   }
+    //
+    //   if (err?.message?.includes('limit')) {
+    //     notifyError(
+    //       'Limit of submitted threads in selected contest has been exceeded.',
+    //     );
+    //     return;
+    //   }
+    //
+    //   console.error(err?.message);
+    //   notifyError('Failed to create thread');
+    // } finally {
+    //   setIsSaving(false);
+    // }
   };
 
   const showBanner = !user.activeAccount && isBannerVisible;
@@ -216,15 +217,15 @@ export const NewThreadForm = () => {
 
   const contestThreadBannerVisible =
     isContestAvailable && hasTopicOngoingContest;
-  const isDisabledBecauseOfContestsConsent =
-    contestThreadBannerVisible && !submitEntryChecked;
 
   const contestTopicAffordanceVisible =
     isContestAvailable && hasTopicOngoingContest;
 
+  const isWalletBalanceErrorEnabled = false;
   const walletBalanceError =
     isContestAvailable &&
     hasTopicOngoingContest &&
+    isWalletBalanceErrorEnabled &&
     parseFloat(userEthBalance || '0') < MIN_ETH_FOR_CONTEST_THREAD;
 
   useEffect(() => {
@@ -286,7 +287,7 @@ export const NewThreadForm = () => {
                   {...(!!location.search &&
                     threadTopic?.name &&
                     threadTopic?.id && {
-                      defaultValue: {
+                      value: {
                         label: threadTopic?.name,
                         value: `${threadTopic?.id}`,
                       },
@@ -355,7 +356,6 @@ export const NewThreadForm = () => {
                       isDisabled ||
                       !user.activeAccount ||
                       !!disabledActionsTooltipText ||
-                      isDisabledBecauseOfContestsConsent ||
                       walletBalanceError ||
                       contestTopicError
                     }
@@ -366,12 +366,7 @@ export const NewThreadForm = () => {
                 )}
               />
 
-              {contestThreadBannerVisible && (
-                <ContestThreadBanner
-                  submitEntryChecked={submitEntryChecked}
-                  onSetSubmitEntryChecked={setSubmitEntryChecked}
-                />
-              )}
+              {contestThreadBannerVisible && <ContestThreadBanner />}
 
               <MessageRow
                 hasFeedback={!!walletBalanceError}

@@ -1,22 +1,18 @@
-import { DB, tester } from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model';
 import { delay } from '@hicommonwealth/shared';
 import { expect } from 'chai';
 import { Client } from 'pg';
-import { afterAll, afterEach, beforeAll, describe, test } from 'vitest';
-import { setupListener } from '../../../server/workers/messageRelayer/pgListener';
+import { setupListener } from 'server/bindings/pgListener';
 import {
   numUnrelayedEvents,
   resetNumUnrelayedEvents,
-} from '../../../server/workers/messageRelayer/relayForever';
+} from 'server/bindings/relayForever';
+import { afterAll, afterEach, beforeAll, describe, test } from 'vitest';
 
 describe.skip('pgListener', { timeout: 10_000 }, () => {
   let client: Client;
-  let models: DB;
 
   beforeAll(async () => {
-    const res = await import('@hicommonwealth/model');
-    models = res['models'];
-    await tester.bootstrap_testing(true);
     client = await setupListener();
   });
 

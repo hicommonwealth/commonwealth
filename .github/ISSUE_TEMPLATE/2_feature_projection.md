@@ -5,14 +5,14 @@ labels: projection, enhancement, needs estimate
 title: 🟩 <Projection Name>
 ---
 
-# Description
+## Description
 <!-- A clear and concise description of the feature. -->
 
 ## Stakeholders
 <!-- The main points of contact for questions relating to the scope of the feature. -->
 | Product   | Engineering |
 | --------- | ----------- |
-| @Jane     | @John       |
+| Jane     | John       |
 
 ## Model
 <!-- A screenshot or reference to the slice of the model in context. -->

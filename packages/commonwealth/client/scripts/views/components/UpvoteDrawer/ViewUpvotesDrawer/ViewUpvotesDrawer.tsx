@@ -4,7 +4,6 @@ import AddressInfo from 'models/AddressInfo';
 import MinimumProfile from 'models/MinimumProfile';
 import React, { Dispatch, SetStateAction } from 'react';
 import app from 'state';
-import { MarkdownViewerWithFallback } from 'views/components/MarkdownViewerWithFallback/MarkdownViewerWithFallback';
 import { User } from 'views/components/user/user';
 import { AuthorAndPublishInfo } from '../../../pages/discussions/ThreadCard/AuthorAndPublishInfo';
 import { CWText } from '../../component_kit/cw_text';
@@ -21,7 +20,6 @@ type Profile = Account | AddressInfo | MinimumProfile;
 type ViewUpvotesDrawerProps = {
   header: string;
   reactorData: any[];
-  contentBody: string;
   author: Profile;
   publishDate: moment.Moment;
   isOpen: boolean;
@@ -61,7 +59,6 @@ const columns: CWTableColumnInfo[] = [
 export const ViewUpvotesDrawer = ({
   header,
   reactorData,
-  contentBody,
   author,
   publishDate,
   isOpen,
@@ -139,12 +136,6 @@ export const ViewUpvotesDrawer = ({
                 showUserAddressWithInfo={false}
                 // @ts-expect-error <StrictNullChecks/>
                 profile={profile}
-              />
-            </div>
-            <div className="upvoted-content-body">
-              <MarkdownViewerWithFallback
-                markdown={contentBody}
-                cutoffLines={10}
               />
             </div>
           </div>

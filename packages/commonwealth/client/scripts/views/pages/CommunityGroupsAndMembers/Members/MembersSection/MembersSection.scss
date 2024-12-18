@@ -1,4 +1,4 @@
-@import '../../../../../../styles/shared';
+@import '../../../../../styles/shared';
 
 .MembersSection {
   display: flex;
@@ -10,37 +10,23 @@
 
   table {
     width: 100%;
+    @include table-cell;
+  }
 
-    .table-cell {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-      flex-wrap: wrap;
+  .group-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+    background-color: $neutral-200;
+    border-radius: 5px;
+    padding: 2px 8px 2px 8px;
+  }
 
-      .user-info {
-        text-decoration: none;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        color: black;
-
-        div {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-        }
-
-        :hover,
-        :focus,
-        :visited {
-          text-decoration: underline;
-        }
-      }
-
-      &.text-right {
-        display: block;
-        text-align: right;
-      }
-    }
+  .group-image {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    object-fit: cover;
   }
 }

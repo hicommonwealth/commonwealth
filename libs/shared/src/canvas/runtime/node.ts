@@ -10,7 +10,7 @@ export const CANVAS_TOPIC = contractTopic;
 
 export const startCanvasNode = async (config: {
   LIBP2P_PRIVATE_KEY?: string;
-}): Promise<{ app: Canvas; libp2p: Libp2p }> => {
+}): Promise<{ app: Canvas; libp2p: Libp2p | null }> => {
   const path =
     process.env.FEDERATION_POSTGRES_DB_URL ??
     (process.env.APP_ENV === 'local'
@@ -22,7 +22,9 @@ export const startCanvasNode = async (config: {
     process.env.FEDERATION_LISTEN_ADDRESS ?? '/ip4/127.0.0.1/tcp/8090/ws';
 
   const privateKey = config.LIBP2P_PRIVATE_KEY
-    ? privateKeyFromProtobuf(Buffer.from(config.LIBP2P_PRIVATE_KEY, 'base64'))
+    ? privateKeyFromProtobuf(
+        new Uint8Array(Buffer.from(config.LIBP2P_PRIVATE_KEY, 'base64')),
+      )
     : await generateKeyPair('Ed25519');
 
   let pgConnectionConfig: ConnectionConfig | undefined = undefined;
@@ -57,14 +59,18 @@ export const startCanvasNode = async (config: {
     signers: getSessionSigners(),
   });
 
-  const libp2p = await app.startLibp2p({
-    announce: [announce],
-    listen: [listen],
-    bootstrapList: [explorerNode],
-    denyDialMultiaddr: (multiaddr) => multiaddr.toString() !== explorerNode,
-    privateKey,
-    start: true,
-  });
+  const libp2p =
+    process.env.APP_ENV === 'production'
+      ? await app.startLibp2p({
+          announce: [announce],
+          listen: [listen],
+          bootstrapList: [explorerNode],
+          denyDialMultiaddr: (multiaddr) =>
+            multiaddr.toString() !== explorerNode,
+          privateKey,
+          start: true,
+        })
+      : null;
 
   return { app, libp2p };
 };

@@ -1,5 +1,5 @@
-import 'components/component_kit/CWSidebarHeader/CWSidebarHeader.scss';
 import React from 'react';
+import './CWSidebarHeader.scss';
 
 import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
 import app from 'state';

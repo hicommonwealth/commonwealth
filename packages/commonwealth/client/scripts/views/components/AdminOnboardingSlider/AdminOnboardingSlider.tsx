@@ -1,4 +1,5 @@
-import { ChainBase, commonProtocol } from '@hicommonwealth/shared';
+import { commonProtocol } from '@hicommonwealth/evm-protocols';
+import { ChainBase } from '@hicommonwealth/shared';
 import shape1Url from 'assets/img/shapes/shape1.svg';
 import shape3Url from 'assets/img/shapes/shape3.svg';
 import shape4Url from 'assets/img/shapes/shape4.svg';
@@ -116,7 +117,7 @@ export const AdminOnboardingSlider = () => {
       commonProtocol.ValidChains.SepoliaBase,
     ].includes(community?.ChainNode?.eth_chain_id);
   const isContestActionCompleted =
-    isCommunitySupported && contestsData?.length > 0;
+    isCommunitySupported && contestsData.all?.length > 0;
 
   const isSliderHidden =
     !communityId ||
@@ -158,7 +159,7 @@ export const AdminOnboardingSlider = () => {
             description={CARD_TYPES['launch-contest'].description}
             iconURL={CARD_TYPES['launch-contest'].iconURL}
             iconAlt="launch-contest-icon"
-            isActionCompleted={contestsData?.length > 0}
+            isActionCompleted={contestsData.all?.length > 0}
             onCTAClick={() => redirectToPage('launch-contest')}
           />
         )}

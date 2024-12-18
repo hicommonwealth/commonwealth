@@ -14,6 +14,8 @@ export type QuillRendererProps = {
   markdownCutoffLength?: number; // Sometimes necessary to prevent large markdown docs from slowing down pages
   customClass?: string;
   customShowMoreButton?: ReactNode;
+  onImageClick?: () => void;
+  isCardView?: boolean;
 };
 
 type RichTextDocInfo = { format: 'richtext'; content: DeltaStatic };
@@ -31,6 +33,7 @@ export const QuillRenderer = ({
   markdownCutoffLength,
   customClass,
   customShowMoreButton = null,
+  onImageClick,
 }: QuillRendererProps) => {
   const docInfo: DocInfo = useMemo(() => {
     let decodedText: string;
@@ -102,6 +105,7 @@ export const QuillRenderer = ({
             cutoffLines={cutoffLines}
             customClass={customClass}
             customShowMoreButton={customShowMoreButton}
+            onImageClick={onImageClick}
           />
         );
       default:
@@ -116,6 +120,7 @@ export const QuillRenderer = ({
     markdownCutoffLength,
     customClass,
     customShowMoreButton,
+    onImageClick,
   ]);
 
   if (containerClass) {

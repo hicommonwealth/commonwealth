@@ -17,8 +17,8 @@
     "build": "tsc -b ./tsconfig.build.json",
     "clean": "rm -rf build && rm -rf coverage && find . -type f -name '*.tsbuildinfo' -exec rm {} +",
     "check-types": "tsc --noEmit",
-    "test": "INIT_TEST_DB=true NODE_ENV=test vitest --config ../../vite.config.ts --fileParallelism=false --coverage run test",
-    "test-select": "INIT_TEST_DB=true NODE_ENV=test vitest --config ../../vite.config.ts --fileParallelism=false run",
+    "test": "NODE_ENV=test vitest --config ../../vite.config.ts --coverage run test",
+    "test-select": "NODE_ENV=test vitest --config ../../vite.config.ts run",
     "lint": "NODE_OPTIONS=\"--max-old-space-size=4096\" eslint -c ../../.eslintrc.cjs './src/**/*.{ts,tsx}'",
     "lint-diff": "NODE_OPTIONS=\"--max-old-space-size=4096\" eslint -c ../../.eslintrc-diff.cjs './src/**/*.{ts,tsx}'"
   },
@@ -36,6 +36,7 @@
     "@hicommonwealth/core": "workspace:*",
     "@hicommonwealth/schemas": "workspace:*",
     "@hicommonwealth/shared": "workspace:*",
+    "@hicommonwealth/evm-protocols": "workspace:*",
     "@neynar/nodejs-sdk": "^1.55.0",
     "@solana/spl-token": "^0.4.6",
     "@solana/web3.js": "^1.91.6",
@@ -63,10 +64,7 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
-    "@types/moment": "^2.13.0",
     "@types/node": "^20.11.25",
-    "@types/sinon": "^17.0.3",
-    "sinon": "^17.0.2",
     "tsx": "^4.7.2"
   }
 }

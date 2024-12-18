@@ -62,12 +62,12 @@ export const verifyComment = async (
   canvasSignedData: CanvasSignedDataOption,
   fields: {
     thread_id: string | null;
-    text: string;
+    body: string;
     address: string;
     parent_comment_id: string | null;
   },
 ) => {
-  const { thread_id, text, address, parent_comment_id } = fields;
+  const { thread_id, body, address, parent_comment_id } = fields;
 
   await verify(canvasSignedData);
   assert(isSigned(canvasSignedData));
@@ -80,7 +80,7 @@ export const verifyComment = async (
     'comment',
     'thread_id',
   );
-  assertMatches(text, actionMessage.payload.args.body, 'comment', 'text');
+  assertMatches(body, actionMessage.payload.args.body, 'comment', 'body');
   assertMatches(
     parent_comment_id ?? null,
     actionMessage.payload.args.parent_comment_id ?? null,

@@ -2,6 +2,7 @@ import { blobStorage, logger } from '@hicommonwealth/core';
 import { Paginator } from './createDatabasePaginator';
 import { createSitemap } from './createSitemap';
 import { createSitemapIndex } from './createSitemapIndex';
+import { rewriteURL } from './rewriteURL';
 
 const log = logger(import.meta);
 
@@ -20,6 +21,7 @@ export interface SitemapGenerator {
 
 export function createSitemapGenerator(
   paginators: ReadonlyArray<Paginator>,
+  hostname: string | undefined,
 ): SitemapGenerator {
   async function exec(): Promise<SitemapManifest> {
     let idx = 0;
@@ -44,10 +46,11 @@ export function createSitemapGenerator(
           content: sitemap,
           contentType: 'text/xml; charset=utf-8',
         });
-        const url = new URL(res.location);
-        const location = 'https://' + url.hostname + '/' + sitemapPath;
-        log.info(`Wrote sitemap: ${sitemapPath} to location ${location}`);
-        children.push({ location });
+
+        const url = rewriteURL(res.url, hostname);
+
+        log.info(`Wrote sitemap: ${sitemapPath} to location ${url}`);
+        children.push({ location: url });
       }
     }
 

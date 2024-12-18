@@ -1,6 +1,6 @@
 import React from 'react';
 
-import 'components/component_kit/cw_empty_state.scss';
+import './cw_empty_state.scss';
 
 import { AutomationTestProps } from '../../pages/error';
 import { CWIcon } from './cw_icons/cw_icon';

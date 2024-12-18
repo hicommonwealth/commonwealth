@@ -38,6 +38,12 @@ export enum ThreadFeaturedFilterTypes {
   LatestActivity = 'latestActivity',
 }
 
+export enum ThreadViewFilterTypes {
+  All = 'all',
+  Overview = 'overview',
+  CardView = 'cardview',
+}
+
 export enum CommentsFeaturedFilterTypes {
   Newest = 'newest',
   Oldest = 'oldest',

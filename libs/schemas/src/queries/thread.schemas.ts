@@ -1,5 +1,13 @@
 import { z } from 'zod';
-import { Comment, ContestManager, Thread } from '../entities';
+import {
+  Address,
+  Comment,
+  ContestManager,
+  ProfileTags,
+  Thread,
+  ThreadVersionHistory,
+  UserProfile,
+} from '../entities';
 import { ContestAction } from '../projections';
 import { PG_INT, paginationSchema } from '../utils';
 import { TopicView } from './community.schemas';
@@ -20,7 +28,7 @@ export const ContestView = z.object({
   score: z.array(
     z.object({
       prize: z.string(),
-      votes: z.number(),
+      votes: z.string(),
       content_id: z.string(),
       creator_address: z.string(),
     }),
@@ -39,15 +47,86 @@ export const ContestActionView = ContestAction.pick({
   Contest: ContestView,
 });
 
+export const ProfileTagsView = ProfileTags.extend({
+  created_at: z.date().or(z.string()).nullish(),
+  updated_at: z.date().or(z.string()).nullish(),
+});
+
+export const UserView = z.object({
+  id: PG_INT,
+  email: z.string().max(255).email().nullish(),
+  isAdmin: z.boolean().default(false).nullish(),
+  disableRichText: z.boolean().default(false).optional(),
+  emailVerified: z.boolean().default(false).nullish(),
+  selected_community_id: z.string().max(255).nullish(),
+  emailNotificationInterval: z
+    .enum(['weekly', 'never'])
+    .default('never')
+    .optional(),
+  promotional_emails_enabled: z.boolean().nullish(),
+  is_welcome_onboard_flow_complete: z.boolean().default(false).optional(),
+
+  profile: UserProfile,
+  xp_points: PG_INT.default(0).nullish(),
+  referral_link: z.string().nullish(),
+
+  created_at: z.date().or(z.string()).nullish(),
+  updated_at: z.date().or(z.string()).nullish(),
+  ProfileTags: z.array(ProfileTagsView).optional(),
+});
+
+export const AddressView = Address.extend({
+  id: PG_INT,
+  verified: z.date().or(z.string()).nullish(),
+  verification_token_expires: z.date().or(z.string()).nullish(),
+  last_active: z.date().or(z.string()).nullish(),
+  created_at: z.date().or(z.string()).nullish(),
+  updated_at: z.date().or(z.string()).nullish(),
+  User: UserView.optional(),
+});
+
 export const ReactionView = z.object({
   id: PG_INT,
-  type: z.literal('like'),
-  address: z.string(),
-  voting_weight: z.number(),
+  address_id: PG_INT,
+  reaction: z.enum(['like']),
+  thread_id: PG_INT.nullish(),
+  comment_id: PG_INT.nullish(),
+  proposal_id: z.number().nullish(),
+  calculated_voting_weight: z.string().nullish(),
+  canvas_signed_data: z.any().nullish(),
+  canvas_msg_id: z.string().max(255).nullish(),
+  created_at: z.date().or(z.string()).nullish(),
+  updated_at: z.date().or(z.string()).nullish(),
+  // associations
+  Address: AddressView.optional(),
+  // added by GetThreads query
+  address: z.string().optional(),
+  last_active: z.date().or(z.string()).nullish(),
   profile_name: z.string().optional(),
   avatar_url: z.string().optional(),
+});
+
+export const CommentView = Comment.extend({
+  id: PG_INT,
+  created_at: z.date().or(z.string()).nullish(),
   updated_at: z.date().or(z.string()).nullish(),
-  last_active: z.date().or(z.string()).nullish(),
+  deleted_at: z.date().or(z.string()).nullish(),
+  marked_as_spam_at: z.date().or(z.string()).nullish(),
+  Address: AddressView.nullish(),
+  Thread: z.undefined(),
+  Reaction: ReactionView.nullish(),
+  CommentVersionHistories: z.undefined(),
+  search: z.undefined(),
+  // this is returned by GetThreads
+  address: z.string(),
+  profile_name: z.string().optional(),
+  profile_avatar: z.string().optional(),
+  user_id: PG_INT,
+});
+
+export const ThreadVersionHistoryView = ThreadVersionHistory.extend({
+  id: PG_INT,
+  timestamp: z.date().or(z.string()),
 });
 
 export const ThreadView = Thread.extend({
@@ -61,11 +140,22 @@ export const ThreadView = Thread.extend({
   marked_as_spam_at: z.date().or(z.string()).nullish(),
   archived_at: z.date().or(z.string()).nullish(),
   locked_at: z.date().or(z.string()).nullish(),
-  associatedReactions: z.array(ReactionView).optional(),
-  associatedContests: z.array(ContestView).optional(),
+  activity_rank_date: z.date().or(z.string()).nullish(),
+  Address: AddressView.nullish(),
+  Reaction: ReactionView.nullish(),
+  collaborators: AddressView.array().nullish(),
+  reactions: ReactionView.array().nullish(),
+  associatedContests: z.array(ContestView).nullish(),
   topic: TopicView.optional(),
+  topic_id: PG_INT.optional(),
   ContestActions: z.array(ContestActionView).optional(),
-  Comments: z.array(Comment).optional(),
+  Comments: z.array(CommentView).optional(),
+  ThreadVersionHistories: z.array(ThreadVersionHistoryView).nullish(),
+  search: z.union([z.string(), z.record(z.any())]).nullish(),
+  total_num_thread_results: z
+    .number()
+    .nullish()
+    .describe('total number of thread results for the query'),
 });
 
 export const OrderByQueriesKeys = z.enum([
@@ -154,6 +244,7 @@ export const GetThreads = {
     limit: z.number(),
     numVotingThreads: z.number(),
     threads: z.array(ThreadView),
+    threadCount: z.number().optional(),
   }),
 };
 

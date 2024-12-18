@@ -1,6 +1,6 @@
 import React from 'react';
 
-import 'components/ProposalCard/ProposalTag.scss';
+import './ProposalTag.scss';
 
 import { CWText } from '../component_kit/cw_text';
 

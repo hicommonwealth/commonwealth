@@ -1,4 +1,4 @@
-@import '../../../../../styles/shared';
+@import '../../../../styles/shared';
 
 .ActionCard {
   display: flex;
@@ -74,7 +74,7 @@
   }
 
   &.scaled-down {
-    transform: scale(0.85);
+    transform: scale(0.92);
     transform-origin: left;
   }
 }

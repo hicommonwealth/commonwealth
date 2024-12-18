@@ -63,13 +63,12 @@ export async function __updateTopicChannel(
     // batch update threads to have new topic id
     await this.models.Thread.update(
       {
-        topic_id: channelId ? topic.id : null,
+        topic_id: topic.id!,
       },
       {
-        // @ts-expect-error StrictNullChecks
         where: {
           id: {
-            [Op.in]: threadsOnTopicFromDiscordBot.map((thread) => thread.id),
+            [Op.in]: threadsOnTopicFromDiscordBot.map((thread) => thread.id!),
           },
         },
       },

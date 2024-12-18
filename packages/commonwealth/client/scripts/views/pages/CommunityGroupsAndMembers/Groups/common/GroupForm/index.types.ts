@@ -66,6 +66,7 @@ export type GroupFormTopicSubmitValues = {
 export type GroupResponseValuesType = {
   groupName: string;
   groupDescription?: string;
+  groupImageUrl?: string;
   requirementsToFulfill: 'ALL' | number;
   requirements?: RequirementSubType[];
   topics: GroupFormTopicSubmitValues[];
@@ -75,6 +76,7 @@ export type GroupResponseValuesType = {
 export type GroupInitialValuesTypeWithLabel = {
   groupName: string;
   groupDescription?: string;
+  groupImageUrl?: string;
   requirements?: RequirementSubTypeWithLabel[];
   requirementsToFulfill?: 'ALL' | number;
   topics: (LabelType & { permission: TopicPermissions })[];
@@ -83,6 +85,7 @@ export type GroupInitialValuesTypeWithLabel = {
 export type FormSubmitValues = {
   groupName: string;
   groupDescription?: string;
+  groupImageUrl?: string;
   requirementsToFulfill: 'ALL' | 'N';
   topics: LabelType[];
 };
