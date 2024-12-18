@@ -357,8 +357,13 @@ const useAuthentication = (props: UseAuthenticationProps) => {
   // Handle Logic for creating a new account, including validating signature
   const onCreateNewAccount = async (session?: Session, account?: Account) => {
     try {
-      // @ts-expect-error StrictNullChecks
-      await account.validate(session);
+      if (session && account)
+        await signIn(session, {
+          address: account.address,
+          community_id: account.community.id,
+          wallet_id: account.walletId!,
+        });
+      console.log('signIn onCreateNewAccount');
       // @ts-expect-error StrictNullChecks
       await verifySession(session);
       // @ts-expect-error <StrictNullChecks>
