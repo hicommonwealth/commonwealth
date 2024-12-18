@@ -104,7 +104,7 @@ export const GetFarcasterUpvoteActionMetadata = {
 export const GetFarcasterContestCasts = {
   input: z.object({
     contest_address: z.string(),
-    sort_by: z.enum(['likes', 'recent']).optional().default('likes'),
+    sort_by: z.enum(['upvotes', 'recent']).optional().default('upvotes'),
   }),
   output: z.array(z.any()),
 };

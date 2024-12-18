@@ -135,10 +135,6 @@ export function FarcasterWorker(): Policy<typeof inputs> {
         ];
 
         // create onchain content from reply cast
-        mustExist(
-          'Farcaster Author Custody Address',
-          payload.author?.custody_address,
-        );
         const content_url = buildFarcasterContentUrl(
           payload.parent_hash!,
           payload.hash,
@@ -146,16 +142,12 @@ export function FarcasterWorker(): Policy<typeof inputs> {
         await createOnchainContestContent({
           contestManagers,
           bypass_quota: true,
-          author_address: payload.author.custody_address,
+          author_address: payload.verified_address,
           content_url,
         });
       },
       FarcasterVoteCreated: async ({ payload }) => {
-        const client = new NeynarAPIClient(config.CONTESTS.NEYNAR_API_KEY!);
-        const castsResponse = await client.fetchBulkCasts([
-          payload.untrustedData.castId.hash,
-        ]);
-        const { parent_hash, hash } = castsResponse.result.casts.at(0)!;
+        const { parent_hash, hash } = payload.cast;
         const content_url = buildFarcasterContentUrl(parent_hash!, hash);
 
         const contestManager = await models.ContestManager.findOne({
@@ -180,11 +172,6 @@ export function FarcasterWorker(): Policy<typeof inputs> {
           },
         });
 
-        const { users } = await client.fetchBulkUsers([
-          payload.untrustedData.fid,
-        ]);
-        mustExist('Farcaster User', users[0]);
-
         const community = await models.Community.findByPk(
           contestManager.community_id,
           {
@@ -206,7 +193,7 @@ export function FarcasterWorker(): Policy<typeof inputs> {
 
         await createOnchainContestVote({
           contestManagers,
-          author_address: users[0].custody_address,
+          author_address: payload.verified_address,
           content_url,
         });
       },

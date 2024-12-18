@@ -2,6 +2,7 @@ import { commonProtocol } from '@hicommonwealth/evm-protocols';
 import z from 'zod';
 import { AuthContext } from '../context';
 import { ContestManager } from '../entities/contest-manager.schemas';
+import { FarcasterAction } from '../entities/farcaster.schemas';
 import { PG_INT } from '../utils';
 
 export const CreateContestManagerMetadata = {
@@ -33,7 +34,8 @@ export const CreateContestManagerMetadata = {
       commonProtocol.WeiDecimals[commonProtocol.Denominations.ETH],
     ),
     topic_id: z.number().optional(),
-    is_farcaster_contest: z.boolean().nullish(),
+    is_farcaster_contest: z.boolean().optional(),
+    vote_weight_multiplier: z.number().optional().nullish(),
   }),
   output: z.object({
     contest_managers: z.array(ContestManager),
@@ -136,24 +138,6 @@ export const FarcasterCast = z.object({
   event_timestamp: z.string(),
 });
 
-export const FarcasterAction = z.object({
-  untrustedData: z.object({
-    fid: z.number(),
-    url: z.string().url(),
-    messageHash: z.string(),
-    timestamp: z.number(),
-    network: z.number(),
-    buttonIndex: z.number(),
-    castId: z.object({
-      fid: z.number(),
-      hash: z.string(),
-    }),
-  }),
-  trustedData: z.object({
-    messageBytes: z.string(),
-  }),
-});
-
 export const FarcasterCastCreatedWebhook = {
   input: z.object({
     created_at: z.number(),
@@ -166,23 +150,7 @@ export const FarcasterCastCreatedWebhook = {
 };
 
 export const FarcasterUpvoteAction = {
-  input: z.object({
-    untrustedData: z.object({
-      fid: z.number(),
-      url: z.string().url(),
-      messageHash: z.string(),
-      timestamp: z.number(),
-      network: z.number(),
-      buttonIndex: z.number(),
-      castId: z.object({
-        fid: z.number(),
-        hash: z.string(),
-      }),
-    }),
-    trustedData: z.object({
-      messageBytes: z.string(),
-    }),
-  }),
+  input: FarcasterAction,
   output: z.object({
     message: z.string(),
   }),
