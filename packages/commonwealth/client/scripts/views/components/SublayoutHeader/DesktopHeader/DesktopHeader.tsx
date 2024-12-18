@@ -51,10 +51,11 @@ const DesktopHeader = ({ onMobile, onAuthModalOpen }: DesktopHeaderProps) => {
       label: (
         <div className="flag-abbr">
           <span>{lang.flag}</span>
-          <span className="abbr">{code.split('-')[0].toUpperCase()}</span>
+          <span className="abbr">{lang.abbr}</span>
         </div>
       ),
-      value: code,
+      value: code as SupportedLanguage,
+      selected: selectedLanguage === code,
     }),
   );
 

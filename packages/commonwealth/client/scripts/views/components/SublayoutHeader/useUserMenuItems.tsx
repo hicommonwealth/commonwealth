@@ -41,10 +41,7 @@ import { useCommunityStake } from '../CommunityStake';
 import UserMenuItem from './UserMenuItem';
 import useCheckAuthenticatedAddresses from './useCheckAuthenticatedAddresses';
 
-interface SubmenuItem extends PopoverMenuItem {
-  type: 'submenu';
-  items: PopoverMenuItem[];
-}
+type SubmenuItem = SubmenuMenuItem;
 
 const resetWalletConnectSession = async () => {
   /**

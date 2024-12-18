@@ -113,9 +113,15 @@ export type CommunityMenuItem = {
   type?: 'community';
 };
 
+export type SubmenuMenuItem = {
+  type: 'submenu';
+  label: string | JSX.Element;
+  items: MenuItem[];
+};
+
 export type DropdownItemType = {
   label: string | JSX.Element;
-  value: string;
+  value: SupportedLanguage;
   selected?: boolean;
 };
 
@@ -125,4 +131,5 @@ export type MenuItem =
   | DefaultMenuItem
   | NotificationMenuItem
   | CommunityMenuItem
-  | ComponentMenuItem;
+  | ComponentMenuItem
+  | SubmenuMenuItem;
