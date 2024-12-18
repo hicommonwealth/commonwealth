@@ -1,45 +1,57 @@
-import { useQuery } from '@tanstack/react-query';
-import axios from 'axios';
+import { ViewComments } from '@hicommonwealth/schemas';
 import Comment from 'models/Comment';
-import app from 'state';
-import { ApiEndpoints, SERVER_URL } from 'state/api/config';
+import { trpc } from 'utils/trpcClient';
+import { z } from 'zod';
 
 const COMMENTS_STALE_TIME = 30 * 1_000; // 30 s
 
-interface FetchCommentsProps {
-  threadId: number;
-  communityId: string;
-  apiEnabled?: boolean;
-}
-
-const fetchComments = async ({ communityId, threadId }: FetchCommentsProps) => {
-  const response = await axios.get(
-    `${SERVER_URL}${ApiEndpoints.FETCH_COMMENTS}`,
-    {
-      params: {
-        community_id: communityId || app.activeChainId(),
-        thread_id: threadId,
-      },
-    },
-  );
-
-  // transform response
-  return response.data.result.map(
-    (c) => new Comment({ community_id: undefined, ...c }),
+/**
+ * @Deprecated
+ */
+const mapToLegacyCommentsModel = async (
+  comments: z.infer<typeof ViewComments.output>,
+) => {
+  return comments.map(
+    (c) =>
+      new Comment({
+        id: c.id,
+        text: c.text,
+        author: c.Address.address,
+        community_id: c.community_id,
+        Address: c.Address,
+        thread_id: c.thread_id,
+        parent_id: c.parent_id,
+        // TODO: why is this not plural
+        reactions: c.Reaction,
+        reaction_weights_sum: c.reaction_weights_sum,
+        created_at: c.created_at,
+        deleted_at: c.deleted_at,
+        authorChain: c.Thread.community_id,
+        last_edited: c.last_edited,
+        canvas_signed_data: c.canvas_signed_data,
+        canvas_msg_id: c.canvas_msg_id,
+        CommentVersionHistories: c.CommentVersionHistories,
+        marked_as_spam_at: c.marked_as_spam_at,
+        discord_meta: c.discord_meta,
+      }),
   );
 };
 
+type useViewCommentsProps = z.infer<typeof ViewComments.input> & {
+  apiEnabled?: boolean;
+};
+
 const useFetchCommentsQuery = ({
-  communityId,
-  threadId,
+  thread_id,
   apiEnabled = true,
-}: FetchCommentsProps) => {
-  return useQuery({
-    queryKey: [ApiEndpoints.FETCH_COMMENTS, communityId, threadId],
-    queryFn: () => fetchComments({ communityId, threadId }),
-    staleTime: COMMENTS_STALE_TIME,
-    enabled: apiEnabled,
-  });
+}: useViewCommentsProps) => {
+  return trpc.comment.viewComments.useQuery(
+    { thread_id },
+    {
+      enabled: apiEnabled,
+      staleTime: COMMENTS_STALE_TIME,
+    },
+  );
 };
 
 export default useFetchCommentsQuery;
