@@ -1,6 +1,8 @@
 import { useMemo } from 'react';
 import { useDebounce } from 'usehooks-ts';
 
+import { SearchUserProfilesView } from '@hicommonwealth/schemas';
+import { z } from 'zod';
 import { APIOrderBy, APIOrderDirection } from '../helpers/constants';
 import { SearchScope } from '../models/SearchQuery';
 import app from '../state';
@@ -9,7 +11,6 @@ import { SearchChainsResponse } from '../state/api/chains/searchChains';
 import { useSearchCommentsQuery } from '../state/api/comments';
 import { SearchCommentsResponse } from '../state/api/comments/searchComments';
 import { useSearchProfilesQuery } from '../state/api/profiles';
-import { SearchProfilesResponse } from '../state/api/profiles/searchProfiles';
 import { useSearchThreadsQuery } from '../state/api/threads';
 import { SearchThreadsResponse } from '../state/api/threads/searchThreads';
 
@@ -17,7 +18,7 @@ export type SearchResults = {
   [SearchScope.Threads]: SearchThreadsResponse['results'];
   [SearchScope.Replies]: SearchCommentsResponse['results'];
   [SearchScope.Communities]: SearchChainsResponse['results'];
-  [SearchScope.Members]: SearchProfilesResponse['results'];
+  [SearchScope.Members]: z.infer<typeof SearchUserProfilesView>[];
 };
 
 const NUM_RESULTS_PER_SECTION = 2;
@@ -33,7 +34,7 @@ const useSearchResults = (
 } => {
   const communityId = filters.includes('communities')
     ? 'all_communities'
-    : app.activeChainId();
+    : app.activeChainId() || '';
   const debouncedSearchTerm = useDebounce<string>(searchTerm, 500);
 
   const sharedQueryOptions = {
@@ -43,7 +44,7 @@ const useSearchResults = (
     orderBy: APIOrderBy.Rank,
     orderDirection: APIOrderDirection.Desc,
   };
-  const queryEnabled = debouncedSearchTerm.length > 0;
+  const queryEnabled = debouncedSearchTerm.length > 0 && !!communityId;
 
   const { data: threadsData } = useSearchThreadsQuery({
     ...sharedQueryOptions,

@@ -1,19 +1,11 @@
 import { Broker, successfulInMemoryBroker } from '@hicommonwealth/core';
-import { DB, tester } from '@hicommonwealth/model';
+import { models } from '@hicommonwealth/model';
 import { expect } from 'chai';
-import { afterEach, beforeAll, describe, test } from 'vitest';
-import { relay } from '../../../server/workers/messageRelayer/relay';
+import { relay } from 'server/bindings/relay';
+import { afterEach, describe, test } from 'vitest';
 import { testOutboxEvents } from './util';
 
 describe('relay', () => {
-  let models: DB;
-
-  beforeAll(async () => {
-    const res = await import('@hicommonwealth/model');
-    models = res['models'];
-    await tester.bootstrap_testing(true);
-  });
-
   afterEach(async () => {
     await models.Outbox.truncate();
   });

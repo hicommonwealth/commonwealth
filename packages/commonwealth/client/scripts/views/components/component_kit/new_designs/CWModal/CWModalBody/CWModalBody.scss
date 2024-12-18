@@ -10,4 +10,8 @@
   &.allowOverflow {
     overflow: unset;
   }
+
+  &.zero-gap {
+    gap: 0px;
+  }
 }

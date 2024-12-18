@@ -28,11 +28,15 @@ describe('User Dashboard API', () => {
   let userId;
   let userAddress;
   let userAddressId;
+  let userDid;
+
   let userJWT2;
   let userSession2;
   let userId2;
   let userAddress2;
   let userAddressId2;
+  let userDid2;
+
   let threadOne;
   let topicId: number;
   let topicId2: number;
@@ -54,6 +58,9 @@ describe('User Dashboard API', () => {
       name: 'Test Topic',
       description: 'A topic made for testing',
       community_id: chain2,
+      featured_in_sidebar: false,
+      featured_in_new_post: false,
+      group_ids: [],
     });
     // @ts-expect-error StrictNullChecks
     topicId2 = topic2.id;
@@ -66,6 +73,7 @@ describe('User Dashboard API', () => {
     userId = firstUser.user_id;
     userAddress = firstUser.address;
     userAddressId = firstUser.address_id;
+    userDid = firstUser.did;
     userJWT = jwt.sign(
       { id: userId, email: firstUser.email },
       config.AUTH.JWT_SECRET,
@@ -74,6 +82,7 @@ describe('User Dashboard API', () => {
     expect(userAddress).to.not.be.null;
     expect(userAddressId).to.not.be.null;
     expect(userJWT).to.not.be.null;
+    expect(userDid).to.not.be.null;
 
     const secondUser = await server.seeder.createAndVerifyAddress(
       { chain: chain2 },
@@ -82,6 +91,7 @@ describe('User Dashboard API', () => {
     userId2 = secondUser.user_id;
     userAddress2 = secondUser.address;
     userAddressId2 = secondUser.address_id;
+    userDid2 = secondUser.did;
     userJWT2 = jwt.sign(
       { id: userId2, email: secondUser.email },
       config.AUTH.JWT_SECRET,
@@ -91,14 +101,13 @@ describe('User Dashboard API', () => {
     expect(userAddress2).to.not.be.null;
     expect(userAddressId2).to.not.be.null;
     expect(userJWT2).to.not.be.null;
+    expect(userDid2).to.not.be.null;
 
     // make second user join alex community
     const communityArgs: JoinCommunityArgs = {
       jwt: userJWT2,
-      address_id: userAddressId2,
       address: userAddress2,
       chain,
-      originChain: chain2,
     };
     const res = await server.seeder.joinCommunity(communityArgs);
     expect(res).to.equal(true);
@@ -114,6 +123,7 @@ describe('User Dashboard API', () => {
     const threadOneArgs: ThreadArgs = {
       chainId: chain2,
       address: userAddress2,
+      did: userDid2,
       jwt: userJWT2,
       title,
       body,
@@ -130,6 +140,7 @@ describe('User Dashboard API', () => {
     const threadTwoArgs: ThreadArgs = {
       chainId: chain,
       address: userAddress2,
+      did: userDid2,
       jwt: userJWT2,
       title,
       body,
@@ -150,12 +161,15 @@ describe('User Dashboard API', () => {
     await dispose()();
   });
 
-  describe('/viewUserActivity', () => {
+  describe('/GetUserActivity', () => {
+    const apiUrl = '/api/v1/GetUserActivity';
+
     test('should fail without JWT', async () => {
       const res = await chai.request
         .agent(server.app)
-        .post('/api/viewUserActivity')
+        .get(apiUrl)
         .set('Accept', 'application/json')
+        .set('address', userAddress)
         .send({ chain });
       expect(res).to.not.be.null;
       expect(res.error).to.not.be.null;
@@ -164,16 +178,15 @@ describe('User Dashboard API', () => {
     test('should return user activity for joined communities only', async () => {
       const res = await chai.request
         .agent(server.app)
-        .post('/api/viewUserActivity')
+        .get(apiUrl)
         .set('Accept', 'application/json')
+        .set('address', userAddress)
         .send({ chain, jwt: userJWT });
 
       expect(res.status).to.be.equal(200);
-      expect(res.body.status).to.be.equal('Success');
-      expect(res.body).to.not.be.null;
-      expect(res.body.result).to.not.be.null;
-
-      const threadIds = res.body.result.map((a) => a.thread.id);
+      expect(res.text).to.not.be.null;
+      const resBody = JSON.parse(res.text);
+      const threadIds = resBody?.results?.map((a) => a.id);
       const chains = await server.models.Thread.findAll({
         attributes: attributesOf<ThreadAttributes>('community_id'),
         where: {
@@ -190,26 +203,24 @@ describe('User Dashboard API', () => {
       // make second user join alex community
       const communityArgs: JoinCommunityArgs = {
         jwt: userJWT,
-        address_id: userAddressId,
         address: userAddress,
         chain: chain2,
-        originChain: chain,
       };
       const communityCreated = await server.seeder.joinCommunity(communityArgs);
       expect(communityCreated).to.equal(true);
 
       const res = await chai.request
         .agent(server.app)
-        .post('/api/viewUserActivity')
+        .get(apiUrl)
         .set('Accept', 'application/json')
+        .set('address', userAddress)
         .send({ chain, jwt: userJWT });
 
       expect(res.status).to.be.equal(200);
-      expect(res.body.status).to.be.equal('Success');
-      expect(res.body).to.not.be.null;
-      expect(res.body.result).to.not.be.null;
+      expect(res.text).to.not.be.null;
 
-      const threadIds = res.body.result.map((a) => a.thread.id);
+      const resBody = JSON.parse(res.text);
+      const threadIds = resBody?.results.map((a) => a.id);
       const chains = await server.models.Thread.findAll({
         attributes: attributesOf<ThreadAttributes>('community_id'),
         where: {
@@ -231,6 +242,7 @@ describe('User Dashboard API', () => {
         const threadArgs: ThreadArgs = {
           chainId: chain,
           address: userAddress2,
+          did: userDid2,
           jwt: userJWT2,
           title,
           body,
@@ -247,16 +259,16 @@ describe('User Dashboard API', () => {
 
       const res = await chai.request
         .agent(server.app)
-        .post('/api/viewUserActivity')
+        .get(apiUrl)
         .set('Accept', 'application/json')
+        .set('address', userAddress)
         .send({ chain, jwt: userJWT });
 
       expect(res.status).to.be.equal(200);
-      expect(res.body.status).to.be.equal('Success');
-      expect(res.body).to.not.be.null;
-      expect(res.body.result).to.not.be.null;
+      expect(res.text).to.not.be.null;
 
-      const threadIds = res.body.result.map((a) => a.thread_id);
+      const resBody = JSON.parse(res.text);
+      const threadIds = resBody.results.map((a) => a.id);
       const chains = (
         await server.models.Thread.findAll({
           attributes: attributesOf<ThreadAttributes>('community_id'),
@@ -272,5 +284,5 @@ describe('User Dashboard API', () => {
     });
   });
 
-  describe.todo('/viewGlobalActivity', () => {});
+  describe.todo('/GetGlobalActivity', () => {});
 });

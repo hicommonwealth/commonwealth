@@ -1,0 +1,52 @@
+@import '../../../styles/shared';
+
+.ContestPage {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  .leaderboard-list {
+    max-width: 598px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+
+    .filter-section {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+  }
+}
+
+.cast-container {
+  display: flex;
+  gap: 8px;
+
+  .upvote-small {
+    display: none;
+    order: 1;
+    margin-bottom: 16px;
+    width: fit-content;
+
+    .MuiPopper-root {
+      display: none;
+    }
+  }
+
+  .farcaster-embed-container {
+    flex: 1;
+  }
+
+  @include extraSmall {
+    flex-direction: column;
+
+    .Upvote {
+      display: none;
+    }
+
+    .upvote-small {
+      display: block;
+    }
+  }
+}

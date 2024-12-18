@@ -27,18 +27,17 @@ export const Community = z.object({
   active: z.boolean(),
   type: z.nativeEnum(ChainType).default(ChainType.Chain),
   description: z.string().nullish(),
-  social_links: z.array(z.string().nullish()).default([]),
+  social_links: z.array(z.string().url().nullish()).default([]),
   ss58_prefix: PG_INT.nullish(),
   stages_enabled: z.boolean().default(true),
   custom_stages: z.array(z.string()).default([]),
   custom_domain: z.string().nullish(),
   block_explorer_ids: z.string().nullish(),
   collapsed_on_homepage: z.boolean().default(false),
-  has_chain_events_listener: z.boolean().default(false),
   default_summary_view: z.boolean().nullish(),
   default_page: z.nativeEnum(DefaultPage).nullish(),
   has_homepage: z.enum(['true', 'false']).default('false').nullish(),
-  terms: z.string().nullish(),
+  terms: z.string().trim().or(z.literal('')).or(z.string().url()).nullish(),
   admin_only_polling: z.boolean().nullish(),
   bech32_prefix: z.string().nullish(),
   hide_projects: z.boolean().nullish(),
@@ -78,7 +77,6 @@ export const Community = z.object({
 
 export const ExtendedCommunity = Community.extend({
   numVotingThreads: PG_INT,
-  numTotalThreads: PG_INT,
   adminsAndMods: z.array(
     z.object({
       address: z.string(),

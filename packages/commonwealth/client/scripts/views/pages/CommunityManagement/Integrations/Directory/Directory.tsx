@@ -1,5 +1,5 @@
+import { buildUpdateCommunityInput } from 'client/scripts/state/api/communities/updateCommunity';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import useAppStatus from 'hooks/useAppStatus';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useCallback, useState } from 'react';
@@ -27,10 +27,11 @@ const Directory = () => {
   const chainNodeOptionsSorted = (chainNodeOptions || []).sort((a, b) =>
     a.label.localeCompare(b.label),
   );
+  const communityId = app.activeChainId() || '';
   const { data: community, isLoading: isLoadingCommunity } =
     useGetCommunityByIdQuery({
-      id: app.activeChainId(),
-      enabled: !!app.activeChainId(),
+      id: communityId,
+      enabled: !!communityId,
       includeNodeInfo: true,
     });
 
@@ -52,8 +53,6 @@ const Directory = () => {
     shouldRun: !isLoadingCommunity && !!community,
   });
 
-  const { isAddedToHomeScreen } = useAppStatus();
-
   const defaultChainNodeId = chainNodeId ?? communityDefaultChainNodeId;
   const defaultOption = chainNodeOptionsSorted?.find(
     (option) => option.value === String(defaultChainNodeId),
@@ -71,15 +70,15 @@ const Directory = () => {
     try {
       setIsSaving(true);
 
-      await updateCommunity({
-        communityId: community?.id,
-        directoryPageChainNodeId: chainNodeId || undefined,
-        directoryPageEnabled: isEnabled,
-        isPWA: isAddedToHomeScreen,
-      });
+      await updateCommunity(
+        buildUpdateCommunityInput({
+          communityId: community?.id,
+          directoryPageChainNodeId: chainNodeId || undefined,
+          directoryPageEnabled: isEnabled,
+        }),
+      );
 
       notifySuccess('Updated community directory');
-      app.sidebarRedraw.emit('redraw');
     } catch {
       notifyError('Failed to update community directory!');
     } finally {
@@ -92,7 +91,6 @@ const Directory = () => {
     community?.directory_page_enabled,
     community?.directory_page_chain_node_id,
     isEnabled,
-    isAddedToHomeScreen,
     updateCommunity,
   ]);
 

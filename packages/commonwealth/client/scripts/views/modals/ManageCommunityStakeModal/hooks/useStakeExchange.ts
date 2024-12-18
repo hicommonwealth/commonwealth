@@ -1,7 +1,7 @@
-import { commonProtocol } from '@hicommonwealth/shared';
+import { commonProtocol } from '@hicommonwealth/evm-protocols';
 import app from 'state';
 import {
-  useFetchEthUsdRateQuery,
+  useFetchTokenUsdRateQuery,
   useGetBuyPriceQuery,
   useGetSellPriceQuery,
 } from 'state/api/communityStake';
@@ -30,16 +30,17 @@ const useStakeExchange = ({
   const activeCommunityNamespace =
     community?.namespace || app?.chain?.meta?.namespace;
   const chainRpc =
-    community?.ChainNode?.url || app?.chain?.meta?.ChainNode?.url;
+    community?.ChainNode?.url || app?.chain?.meta?.ChainNode?.url || '';
   const ethChainId =
-    community?.ChainNode?.ethChainId || app?.chain?.meta?.ChainNode?.ethChainId;
+    community?.ChainNode?.ethChainId ||
+    app?.chain?.meta?.ChainNode?.eth_chain_id ||
+    0;
 
   const { data: userEthBalance, isLoading: userEthBalanceLoading } =
     useGetUserEthBalanceQuery({
       chainRpc,
       walletAddress: address,
       apiEnabled: !!address,
-      // @ts-expect-error StrictNullChecks
       ethChainId,
     });
 
@@ -50,7 +51,6 @@ const useStakeExchange = ({
     amount: numberOfStakeToExchange,
     apiEnabled: mode === 'buy' && !!address,
     chainRpc,
-    // @ts-expect-error StrictNullChecks
     ethChainId,
   });
 
@@ -61,11 +61,12 @@ const useStakeExchange = ({
     amount: numberOfStakeToExchange,
     apiEnabled: mode === 'sell',
     chainRpc,
-    // @ts-expect-error StrictNullChecks
     ethChainId,
   });
 
-  const { data: ethUsdRateData } = useFetchEthUsdRateQuery();
+  const { data: ethUsdRateData } = useFetchTokenUsdRateQuery({
+    tokenSymbol: 'ETH',
+  });
   const ethUsdRate = ethUsdRateData?.data?.data?.amount;
 
   return {

@@ -17,12 +17,11 @@ export enum ContestRecurringType {
 }
 
 export type ContestFormValidationSubmitValues = z.infer<
-  typeof detailsFormValidationSchema
+  ReturnType<typeof detailsFormValidationSchema>
 >;
 
 export type ContestFormData = ContestFormValidationSubmitValues & {
   prizePercentage: number;
   payoutStructure: number[];
-  farcasterContestDuration?: number;
-  toggledTopicList: { name: string; id: number; checked: boolean }[];
+  contestDuration?: number;
 };

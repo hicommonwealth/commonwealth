@@ -17,8 +17,8 @@
     "build": "tsc -b ./tsconfig.build.json",
     "clean": "rm -rf build && rm -rf coverage && find . -type f -name '*.tsbuildinfo' -exec rm {} +",
     "check-types": "tsc --noEmit",
-    "test": "INIT_TEST_DB=true NODE_ENV=test vitest --config ../../vite.config.ts --fileParallelism=false --coverage run test",
-    "test-select": "INIT_TEST_DB=true NODE_ENV=test vitest --config ../../vite.config.ts --fileParallelism=false run",
+    "test": "NODE_ENV=test vitest --config ../../vite.config.ts --coverage run test",
+    "test-select": "NODE_ENV=test vitest --config ../../vite.config.ts run",
     "lint": "NODE_OPTIONS=\"--max-old-space-size=4096\" eslint -c ../../.eslintrc.cjs './src/**/*.{ts,tsx}'",
     "lint-diff": "NODE_OPTIONS=\"--max-old-space-size=4096\" eslint -c ../../.eslintrc-diff.cjs './src/**/*.{ts,tsx}'"
   },
@@ -30,11 +30,14 @@
     "@cosmjs/encoding": "0.32.3",
     "@cosmjs/stargate": "^0.31.3",
     "@cosmjs/tendermint-rpc": "^0.31.3",
+    "@ethersproject/bignumber": "^5.7.0",
     "@faker-js/faker": "^8.4.1",
     "@hicommonwealth/chains": "workspace:*",
     "@hicommonwealth/core": "workspace:*",
     "@hicommonwealth/schemas": "workspace:*",
     "@hicommonwealth/shared": "workspace:*",
+    "@hicommonwealth/evm-protocols": "workspace:*",
+    "@neynar/nodejs-sdk": "^1.55.0",
     "@solana/spl-token": "^0.4.6",
     "@solana/web3.js": "^1.91.6",
     "async-mutex": "^0.5.0",
@@ -46,7 +49,9 @@
     "moment": "^2.23.0",
     "node-fetch": "2",
     "node-object-hash": "^3.0.0",
+    "openai": "^4.0.0",
     "pg": "^8.11.3",
+    "quill-delta-to-markdown": "^0.6.0",
     "sequelize": "^6.32.1",
     "umzug": "^3.7.0",
     "uuid": "^9.0.1",
@@ -59,9 +64,7 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
-    "@types/moment": "^2.13.0",
-    "@types/sinon": "^17.0.3",
-    "sinon": "^17.0.2",
+    "@types/node": "^20.11.25",
     "tsx": "^4.7.2"
   }
 }

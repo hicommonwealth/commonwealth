@@ -10,7 +10,7 @@ import { CWButton } from '../../component_kit/new_designs/CWButton';
 import { ReactQuillEditor } from '../../react_quill_editor';
 import './CommentEditor.scss';
 
-type CommentEditorProps = {
+export type CommentEditorProps = {
   parentType: ContentType;
   canComment: boolean;
   handleSubmitComment: () => void;
@@ -18,11 +18,13 @@ type CommentEditorProps = {
   contentDelta: DeltaStatic;
   setContentDelta: React.Dispatch<React.SetStateAction<DeltaStatic>>;
   disabled: boolean;
-  onCancel: (e: any) => void;
+  onCancel: (e: React.MouseEvent) => void;
   author: Account;
   editorValue: string;
-  shouldFocus: boolean;
+  shouldFocus?: boolean;
   tooltipText?: string;
+  isReplying?: boolean;
+  replyingToAuthor?: string;
 };
 
 export const CommentEditor = ({
@@ -35,7 +37,6 @@ export const CommentEditor = ({
   disabled,
   onCancel,
   author,
-  editorValue,
   shouldFocus,
   tooltipText,
 }: CommentEditorProps) => {
@@ -72,14 +73,12 @@ export const CommentEditor = ({
       />
       <div className="form-bottom">
         <div className="form-buttons">
-          {editorValue.length > 0 && (
-            <CWButton buttonType="tertiary" onClick={onCancel} label="Cancel" />
-          )}
+          <CWButton buttonType="tertiary" onClick={onCancel} label="Cancel" />
           <CWButton
             buttonWidth="wide"
             disabled={disabled}
             onClick={handleSubmitComment}
-            label="Submit"
+            label="Post"
           />
         </div>
       </div>

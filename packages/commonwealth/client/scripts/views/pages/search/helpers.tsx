@@ -1,15 +1,11 @@
+import { SearchUserProfilesView } from '@hicommonwealth/schemas';
+import { getDecodedString } from '@hicommonwealth/shared';
 import moment from 'moment';
 import React, { useMemo } from 'react';
-
-import 'pages/search/index.scss';
-
-import { CommunityMember } from '@hicommonwealth/schemas';
 import app from 'state';
 import { useFetchCustomDomainQuery } from 'state/api/configuration';
 import { useFetchProfilesByAddressesQuery } from 'state/api/profiles';
 import { z } from 'zod';
-import CommunityInfo from '../../../models/ChainInfo';
-import type MinimumProfile from '../../../models/MinimumProfile';
 import { SearchScope } from '../../../models/SearchQuery';
 import { CommunityLabel } from '../../components/community_label';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
@@ -17,6 +13,7 @@ import { CWText } from '../../components/component_kit/cw_text';
 import { renderTruncatedHighlights } from '../../components/react_quill_editor/highlighter';
 import { QuillRenderer } from '../../components/react_quill_editor/quill_renderer';
 import { User } from '../../components/user/user';
+import './index.scss';
 
 export type ThreadResult = {
   id: number;
@@ -42,11 +39,7 @@ const ThreadResultRow = ({
   const { data: domain } = useFetchCustomDomainQuery();
 
   const title = useMemo(() => {
-    try {
-      return decodeURIComponent(thread.title);
-    } catch (error) {
-      return thread.title;
-    }
+    return getDecodedString(thread.title);
   }, [thread.title]);
 
   const handleClick = () => {
@@ -101,7 +94,7 @@ export type ReplyResult = {
   proposalid: number;
   community_id: string;
   title: string;
-  text: string;
+  body: string;
   address_id: number;
   address: string;
   address_community_id: string;
@@ -124,11 +117,7 @@ const ReplyResultRow = ({
   const { data: domain } = useFetchCustomDomainQuery();
 
   const title = useMemo(() => {
-    try {
-      return decodeURIComponent(comment.title);
-    } catch (error) {
-      return comment.title;
-    }
+    return getDecodedString(comment.title);
   }, [comment.title]);
 
   const handleClick = () => {
@@ -167,7 +156,7 @@ const ReplyResultRow = ({
           <QuillRenderer
             containerClass="SearchQuillRenderer"
             hideFormatting={true}
-            doc={comment.text}
+            doc={comment.body}
             searchTerm={searchTerm}
           />
         </CWText>
@@ -204,8 +193,6 @@ const CommunityResultRow = ({
     setRoute(community.id ? `/${community.id}` : '/', {}, null);
   };
 
-  const communityInfo = CommunityInfo.fromJSON(community as any);
-
   return (
     <div
       key={community.id}
@@ -213,14 +200,14 @@ const CommunityResultRow = ({
       onClick={handleClick}
     >
       <CommunityLabel
-        name={communityInfo?.name || ''}
-        iconUrl={communityInfo?.iconUrl || ''}
+        name={community?.name || ''}
+        iconUrl={community?.icon_url || ''}
       />
     </div>
   );
 };
 
-export type MemberResult = z.infer<typeof CommunityMember>;
+export type MemberResult = z.infer<typeof SearchUserProfilesView>;
 
 type MemberResultRowProps = {
   addr: MemberResult;
@@ -232,10 +219,10 @@ const MemberResultRow = ({ addr, setRoute }: MemberResultRowProps) => {
   const { data: users } = useFetchProfilesByAddressesQuery({
     profileChainIds: [community_id],
     profileAddresses: [address],
-    currentChainId: app.activeChainId(),
+    currentChainId: app.activeChainId() || '',
     apiCallEnabled: !!(community_id && address),
   });
-  const profile: MinimumProfile = users?.[0];
+  const profile = users?.[0];
 
   const { data: domain } = useFetchCustomDomainQuery();
 

@@ -8,7 +8,7 @@ import { ITXModalData } from 'models/interfaces';
 import type CosmosAccount from '../../account';
 import type CosmosAccounts from '../../accounts';
 import type CosmosChain from '../../chain';
-import type { CosmosApiType } from '../../chain';
+import { isAtomoneLCD, type CosmosApiType } from '../../chain';
 import { encodeMsgSubmitProposal } from '../v1beta1/utils-v1beta1';
 import { CosmosProposalV1 } from './proposal-v1';
 import { propToIProposal } from './utils-v1';
@@ -39,6 +39,7 @@ class CosmosGovernanceV1 extends ProposalModule<
   private _Chain: CosmosChain;
   private _Accounts: CosmosAccounts;
 
+  /* eslint-disable-next-line @typescript-eslint/require-await */
   public async init(
     ChainInfo: CosmosChain,
     Accounts: CosmosAccounts,
@@ -61,6 +62,8 @@ class CosmosGovernanceV1 extends ProposalModule<
     try {
       // @ts-expect-error StrictNullChecks
       if (!proposalId) return;
+      // @ts-expect-error StrictNullChecks
+      if (isAtomoneLCD(this._Chain.lcd)) return;
       const { proposal } = await this._Chain.lcd.cosmos.gov.v1.proposal({
         proposalId: numberToLong(proposalId),
       });

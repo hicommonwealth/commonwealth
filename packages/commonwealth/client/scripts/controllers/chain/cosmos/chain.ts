@@ -8,6 +8,7 @@ import type {
   StdFee,
 } from '@cosmjs/stargate';
 import type { Event, Tendermint34Client } from '@cosmjs/tendermint-rpc';
+import { ExtendedCommunity } from '@hicommonwealth/schemas';
 import {
   ChainNetwork,
   CosmosGovernanceVersion,
@@ -16,12 +17,12 @@ import {
 import BN from 'bn.js';
 import { CosmosToken } from 'controllers/chain/cosmos/types';
 import moment from 'moment';
-import { LCD } from 'shared/chain/types/cosmos';
+import { AtomOneLCD, LCD } from 'shared/chain/types/cosmos';
 import type { IApp } from 'state';
 import { ApiStatus } from 'state';
 import { SERVER_URL } from 'state/api/config';
 import { userStore } from 'state/ui/user';
-import ChainInfo from '../../../models/ChainInfo';
+import { z } from 'zod';
 import {
   IChainModule,
   ITXData,
@@ -35,12 +36,15 @@ import { getCosmosChains } from '../../app/webWallets/utils';
 import WebWalletController from '../../app/web_wallets';
 import type CosmosAccount from './account';
 import {
+  getAtomOneLCDClient,
   getLCDClient,
   getRPCClient,
   getSigningClient,
   getTMClient,
 } from './chain.utils';
 import EthSigningClient from './eth_signing_client';
+import type { AtomOneGovExtension } from './gov/atomone/queries-v1';
+import type { GovgenGovExtension } from './gov/govgen/queries-v1beta1';
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
@@ -52,15 +56,19 @@ export interface ICosmosTXData extends ITXData {
   // skip simulating the tx twice by saving the original estimated gas
   gas: number;
 }
-
+export const isAtomoneLCD = (lcd: LCD | AtomOneLCD): lcd is AtomOneLCD => {
+  return (lcd as AtomOneLCD).atomone !== undefined;
+};
 export type CosmosApiType = QueryClient &
   StakingExtension &
   GovExtension &
+  GovgenGovExtension &
+  AtomOneGovExtension &
   BankExtension;
 
 class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
   private _api: CosmosApiType;
-  private _lcd: LCD;
+  private _lcd: LCD | AtomOneLCD;
 
   public get api() {
     return this._api;
@@ -97,7 +105,7 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
 
   private _tmClient: Tendermint34Client;
 
-  public async init(chain: ChainInfo, reset = false) {
+  public async init(chain: z.infer<typeof ExtendedCommunity>, reset = false) {
     const url = `${window.location.origin}${SERVER_URL}/cosmosProxy/${chain.id}`;
 
     // TODO: configure broadcast mode
@@ -120,9 +128,8 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
     }
 
     if (
-      chain?.ChainNode?.cosmosGovernanceVersion ===
-        CosmosGovernanceVersion.v1 ||
-      chain?.ChainNode?.cosmosGovernanceVersion ===
+      chain?.ChainNode?.cosmos_gov_version === CosmosGovernanceVersion.v1 ||
+      chain?.ChainNode?.cosmos_gov_version ===
         CosmosGovernanceVersion.v1beta1Failed
     ) {
       try {
@@ -134,7 +141,18 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
         console.error('Error starting LCD client: ', e);
       }
     }
-
+    if (
+      chain?.ChainNode?.cosmos_gov_version === CosmosGovernanceVersion.v1atomone
+    ) {
+      try {
+        const lcdUrl = `${window.location.origin}${SERVER_URL}/cosmosProxy/v1/${chain.id}`;
+        console.log(`Starting LCD API at ${lcdUrl}...`);
+        const lcd = await getAtomOneLCDClient(lcdUrl);
+        this._lcd = lcd;
+      } catch (e) {
+        console.error('Error starting LCD client: ', e);
+      }
+    }
     await this.fetchBlock(); // Poll for new block immediately
   }
 
@@ -242,7 +260,7 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
       );
     } else {
       client = await getSigningClient(
-        chain?.meta?.node?.url,
+        chain?.meta?.ChainNode?.url || '',
         wallet.offlineSigner,
       );
     }
@@ -269,7 +287,7 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
       } else if (cosm.isDeliverTxSuccess(result)) {
         const txHash = result.transactionHash;
         const txResult = await this._tmClient.tx({
-          hash: Buffer.from(txHash, 'hex'),
+          hash: new Uint8Array(Buffer.from(txHash, 'hex')),
         });
         return txResult.result.events;
       } else {

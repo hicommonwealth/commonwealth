@@ -1,5 +1,19 @@
 import { CosmosGovernanceVersion } from '@hicommonwealth/shared';
+import { LCD } from 'shared/chain/types/cosmos';
 import Cosmos from '../adapter';
+import { isAtomoneLCD } from '../chain';
+import CosmosGovernanceV1AtomOne from './atomone/governance-v1';
+import { CosmosProposalV1AtomOne } from './atomone/proposal-v1';
+import {
+  getActiveProposalsV1AtomOne,
+  getCompletedProposalsV1AtomOne,
+} from './atomone/utils-v1';
+import CosmosGovernanceGovgen from './govgen/governance-v1beta1';
+import { CosmosProposalGovgen } from './govgen/proposal-v1beta1';
+import {
+  getActiveProposalsV1Beta1 as getActiveProposalsGovgen,
+  getCompletedProposalsV1Beta1 as getCompletedProposalsGovgen,
+} from './govgen/utils-v1beta1';
 import CosmosGovernanceV1 from './v1/governance-v1';
 import { CosmosProposalV1 } from './v1/proposal-v1';
 import { getActiveProposalsV1, getCompletedProposalsV1 } from './v1/utils-v1';
@@ -17,16 +31,45 @@ export const getCompletedProposals = async (
   cosmosChain: Cosmos,
 ): Promise<CosmosProposal[]> => {
   const { chain, accounts, governance, meta } = cosmosChain;
+  console.log(cosmosChain);
+  const isAtomone =
+    meta.ChainNode?.cosmos_gov_version === CosmosGovernanceVersion.v1atomone;
+  const isGovgen =
+    meta.ChainNode?.cosmos_gov_version ===
+    CosmosGovernanceVersion.v1beta1govgen;
   const isV1 =
-    meta.ChainNode?.cosmosGovernanceVersion === CosmosGovernanceVersion.v1;
+    meta.ChainNode?.cosmos_gov_version === CosmosGovernanceVersion.v1;
   const betaAttemptFailed =
-    meta.ChainNode?.cosmosGovernanceVersion ===
+    meta.ChainNode?.cosmos_gov_version ===
     CosmosGovernanceVersion.v1beta1Failed;
 
   let cosmosProposals = [];
-
-  if (isV1 || betaAttemptFailed) {
-    const v1Proposals = await getCompletedProposalsV1(chain.lcd);
+  if (isAtomone && isAtomoneLCD(chain.lcd)) {
+    const v1proposals = await getCompletedProposalsV1AtomOne(chain.lcd);
+    // @ts-expect-error StrictNullChecks
+    cosmosProposals = v1proposals.map(
+      (p) =>
+        new CosmosProposalV1AtomOne(
+          chain,
+          accounts,
+          governance as CosmosGovernanceV1AtomOne,
+          p,
+        ),
+    );
+  } else if (isGovgen) {
+    const v1Beta1Proposals = await getCompletedProposalsGovgen(chain.api);
+    // @ts-expect-error StrictNullChecks
+    cosmosProposals = v1Beta1Proposals.map(
+      (p) =>
+        new CosmosProposalGovgen(
+          chain,
+          accounts,
+          governance as CosmosGovernanceGovgen,
+          p,
+        ),
+    );
+  } else if (!isGovgen && (isV1 || betaAttemptFailed)) {
+    const v1Proposals = await getCompletedProposalsV1(chain.lcd as LCD);
 
     // @ts-expect-error StrictNullChecks
     cosmosProposals = v1Proposals.map(
@@ -57,14 +100,41 @@ export const getActiveProposals = async (
   cosmosChain: Cosmos,
 ): Promise<CosmosProposal[]> => {
   const { chain, accounts, governance, meta } = cosmosChain;
+  const isAtomone =
+    meta.ChainNode?.cosmos_gov_version === CosmosGovernanceVersion.v1atomone;
+  const isGovgen =
+    meta.ChainNode?.cosmos_gov_version ===
+    CosmosGovernanceVersion.v1beta1govgen;
   const isV1 =
-    meta.ChainNode?.cosmosGovernanceVersion === CosmosGovernanceVersion.v1;
+    meta.ChainNode?.cosmos_gov_version === CosmosGovernanceVersion.v1;
   const betaAttemptFailed =
-    meta.ChainNode?.cosmosGovernanceVersion ===
+    meta.ChainNode?.cosmos_gov_version ===
     CosmosGovernanceVersion.v1beta1Failed;
   let cosmosProposals = [];
-
-  if (isV1 || betaAttemptFailed) {
+  if (isAtomone && isAtomoneLCD(chain.lcd)) {
+    const v1Proposals = await getActiveProposalsV1AtomOne(chain.lcd);
+    // @ts-expect-error StrictNullChecks
+    cosmosProposals = v1Proposals.map(
+      (p) =>
+        new CosmosProposalV1AtomOne(
+          chain,
+          accounts,
+          governance as CosmosGovernanceV1AtomOne,
+          p,
+        ),
+    );
+  } else if (isGovgen) {
+    const v1Beta1Proposals = await getActiveProposalsGovgen(chain.api);
+    // @ts-expect-error StrictNullChecks
+    cosmosProposals = v1Beta1Proposals.map(
+      (p) =>
+        new CosmosProposal(chain, accounts, governance as CosmosGovernance, p),
+    );
+  } else if (
+    !isGovgen &&
+    (isV1 || betaAttemptFailed) &&
+    !isAtomoneLCD(chain.lcd)
+  ) {
     const v1Proposals = await getActiveProposalsV1(chain.lcd);
     // @ts-expect-error StrictNullChecks
     cosmosProposals = v1Proposals.map(

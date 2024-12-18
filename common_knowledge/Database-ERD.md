@@ -36,7 +36,7 @@ erDiagram
   CommunityStakes }|..|| Communities : CommunityStakes_community_id_fkey
   Notifications }|..|| Communities : Notifications_community_id_fkey
   ContestActions }|..|| Threads : ContestActions_threads_fkey
-  ContestTopics }|..|| Topics : ContestTopics_topics_fkey
+
   Topics }|..|| Communities : Topics_community_id_fkey
   Templates }|..|| Communities : Templates_created_for_community_fkey
   Groups }|..|| Communities : Groups_chain_id_fkey
@@ -62,7 +62,7 @@ erDiagram
   SsoTokens }|..|| Addresses : SsoTokens_address_id_fkey
   StarredCommunities }|..|| Communities : Starredcommunities_community_id_fkey
   StarredCommunities }|..|| Users : Starredcommunities_user_id_fkey
-  ContestTopics }|..|| ContestManagers : ContestTopics_contestmanagers_fkey
+
   Reactions }|..|| Addresses : Reactions_address_id_fkey
   Templates }|..|| ContractAbis : Templates_contractabi_id_fkey
   Templates }|..|| Communities : Templates_community_id_fkey
@@ -73,61 +73,61 @@ erDiagram
     integer template_id PK
   }
   Bans {
-    character-varying(255) address 
-    timestamp-with-time-zone created_at 
-    timestamp-with-time-zone updated_at 
+    character-varying(255) address
+    timestamp-with-time-zone created_at
+    timestamp-with-time-zone updated_at
     integer id PK
-    character-varying(255) community_id 
+    character-varying(255) community_id
   }
   Comments {
-    text text 
-    timestamp-with-time-zone created_at 
-    timestamp-with-time-zone updated_at 
-    timestamp-with-time-zone deleted_at 
+    text text
+    timestamp-with-time-zone created_at
+    timestamp-with-time-zone updated_at
+    timestamp-with-time-zone deleted_at
     integer id PK
-    character-varying(255) community_id 
-    character-varying(255) parent_id 
-    integer address_id 
-    text[] version_history 
-    character-varying(255) root_id 
-    text plaintext 
-    tsvector _search 
-    jsonb canvas_action 
-    jsonb canvas_session 
-    character-varying(255) canvas_hash 
-    integer thread_id 
-    jsonb discord_meta 
-    timestamp-with-time-zone marked_as_spam_at 
-    character-varying(255) created_by 
-    integer reaction_count 
-    text text_backup 
-    integer reaction_weights_sum 
+    character-varying(255) community_id
+    character-varying(255) parent_id
+    integer address_id
+    text[] version_history
+    character-varying(255) root_id
+    text plaintext
+    tsvector _search
+    jsonb canvas_action
+    jsonb canvas_session
+    character-varying(255) canvas_msg_id
+    integer thread_id
+    jsonb discord_meta
+    timestamp-with-time-zone marked_as_spam_at
+    character-varying(255) created_by
+    integer reaction_count
+    text text_backup
+    integer reaction_weights_sum
   }
   Contracts {
-    character-varying(255) address 
-    integer chain_node_id 
-    integer abi_id 
-    integer decimals 
-    character-varying(255) token_name 
-    character-varying(255) symbol 
-    character-varying(255) type 
-    timestamp-with-time-zone created_at 
-    timestamp-with-time-zone updated_at 
+    character-varying(255) address
+    integer chain_node_id
+    integer abi_id
+    integer decimals
+    character-varying(255) token_name
+    character-varying(255) symbol
+    character-varying(255) type
+    timestamp-with-time-zone created_at
+    timestamp-with-time-zone updated_at
     integer id PK
-    boolean is_factory 
-    character-varying(255) nickname 
+    boolean is_factory
+    character-varying(255) nickname
   }
   DiscordBotConfig {
-    character-varying(255) bot_id 
-    character-varying(255) guild_id 
-    character-varying(255) snapshot_channel_id 
-    character-varying(255) verification_token 
-    timestamp-with-time-zone token_expiration 
-    timestamp-with-time-zone created_at 
-    timestamp-with-time-zone updated_at 
+    character-varying(255) bot_id
+    character-varying(255) guild_id
+    character-varying(255) snapshot_channel_id
+    character-varying(255) verification_token
+    timestamp-with-time-zone token_expiration
+    timestamp-with-time-zone created_at
+    timestamp-with-time-zone updated_at
     integer id PK
-    boolean verified 
-    character-varying(255) community_id 
+    boolean verified
+    character-varying(255) community_id
   }
   ContestActions {
     character-varying(255) contest_address PK
@@ -135,10 +135,10 @@ erDiagram
     integer content_id PK
     character-varying(255) actor_address PK
     enum_ContestActions_action action PK
-    character-varying(255) content_url 
-    integer voting_power 
-    timestamp-with-time-zone created_at 
-    integer thread_id 
+    character-varying(255) content_url
+    integer voting_power
+    timestamp-with-time-zone created_at
+    integer thread_id
   }
   SequelizeMeta {
     character-varying(255) name PK
@@ -146,500 +146,495 @@ erDiagram
   CommunityStakes {
     character-varying(255) community_id PK
     integer stake_id PK
-    character-varying(255) stake_token 
-    boolean stake_enabled 
-    timestamp-with-time-zone created_at 
-    timestamp-with-time-zone updated_at 
-    integer vote_weight 
+    character-varying(255) stake_token
+    boolean stake_enabled
+    timestamp-with-time-zone created_at
+    timestamp-with-time-zone updated_at
+    integer vote_weight
   }
   NotificationsRead {
     integer notification_id PK
     integer subscription_id PK
-    boolean is_read 
-    integer user_id 
+    boolean is_read
+    integer user_id
   }
   Contests {
     character-varying(255) contest_address PK
     integer contest_id PK
-    timestamp-with-time-zone start_time 
-    timestamp-with-time-zone end_time 
-    jsonb[] winners 
+    timestamp-with-time-zone start_time
+    timestamp-with-time-zone end_time
+    jsonb[] winners
   }
   ContestManagers {
     character-varying(255) contest_address PK
-    character-varying(255) community_id 
-    integer interval 
-    timestamp-with-time-zone created_at 
-    character-varying(255) name 
-    character-varying(255) funding_token_address 
-    integer prize_percentage 
-    integer[] payout_structure 
-    boolean cancelled 
-    character-varying(255) image_url 
-    character-varying(255) ticker 
-    integer decimals 
+    character-varying(255) community_id
+    integer interval
+    timestamp-with-time-zone created_at
+    character-varying(255) name
+    character-varying(255) funding_token_address
+    integer prize_percentage
+    integer[] payout_structure
+    boolean cancelled
+    character-varying(255) image_url
+    character-varying(255) ticker
+    integer decimals
   }
   Votes {
-    character-varying(255) option 
-    character-varying(255) address 
-    timestamp-with-time-zone created_at 
-    timestamp-with-time-zone updated_at 
+    character-varying(255) option
+    character-varying(255) address
+    timestamp-with-time-zone created_at
+    timestamp-with-time-zone updated_at
     integer id PK
-    character-varying(255) community_id 
-    character-varying(255) author_community_id 
-    integer poll_id 
+    character-varying(255) community_id
+    character-varying(255) author_community_id
+    integer poll_id
   }
   Memberships {
     integer group_id PK
     integer address_id PK
-    timestamp-with-time-zone last_checked 
-    jsonb reject_reason 
+    timestamp-with-time-zone last_checked
+    jsonb reject_reason
   }
   ChainNodes {
-    character-varying(255) url 
+    character-varying(255) url
     integer id PK
-    integer eth_chain_id 
-    character-varying(255) alt_wallet_url 
-    character-varying(255) private_url 
-    character-varying(255) description 
-    character-varying(255) balance_type 
-    integer ss58 
-    character-varying(255) bech32 
-    timestamp-with-time-zone created_at 
-    timestamp-with-time-zone updated_at 
-    character-varying(255) name 
-    character-varying(255) cosmos_chain_id 
-    character-varying(255) health 
-    character-varying(64) cosmos_gov_version 
-    character-varying(255) block_explorer 
-    integer slip44 
+    integer eth_chain_id
+    character-varying(255) alt_wallet_url
+    character-varying(255) private_url
+    character-varying(255) description
+    character-varying(255) balance_type
+    integer ss58
+    character-varying(255) bech32
+    timestamp-with-time-zone created_at
+    timestamp-with-time-zone updated_at
+    character-varying(255) name
+    character-varying(255) cosmos_chain_id
+    character-varying(255) health
+    character-varying(64) cosmos_gov_version
+    character-varying(255) block_explorer
+    integer slip44
   }
   Reactions {
-    integer address_id 
-    timestamp-with-time-zone created_at 
-    timestamp-with-time-zone updated_at 
+    integer address_id
+    timestamp-with-time-zone created_at
+    timestamp-with-time-zone updated_at
     integer id PK
-    enum_Reactions_reaction reaction 
-    character-varying(255) community_id 
-    integer thread_id 
-    integer comment_id 
-    character-varying(255) proposal_id 
-    jsonb canvas_action 
-    jsonb canvas_session 
-    character-varying(255) canvas_hash 
-    integer calculated_voting_weight 
+    enum_Reactions_reaction reaction
+    character-varying(255) community_id
+    integer thread_id
+    integer comment_id
+    character-varying(255) proposal_id
+    jsonb canvas_action
+    jsonb canvas_session
+    character-varying(255) canvas_msg_id
+    integer calculated_voting_weight
   }
   Templates {
-    character-varying(255) created_by 
-    character-varying(255) description 
-    character-varying(255) created_for_community 
-    timestamp-with-time-zone created_at 
-    timestamp-with-time-zone updated_at 
-    integer abi_id 
-    character-varying(255) name 
-    jsonb template 
+    character-varying(255) created_by
+    character-varying(255) description
+    character-varying(255) created_for_community
+    timestamp-with-time-zone created_at
+    timestamp-with-time-zone updated_at
+    integer abi_id
+    character-varying(255) name
+    jsonb template
     integer id PK
   }
   StarredCommunities {
     integer user_id PK
-    timestamp-with-time-zone created_at 
-    timestamp-with-time-zone updated_at 
+    timestamp-with-time-zone created_at
+    timestamp-with-time-zone updated_at
     character-varying(255) community_id PK
   }
   Communities {
     character-varying(255) id PK
-    character-varying(255) name 
-    character-varying(255) icon_url 
-    boolean active 
-    character-varying(255) network 
-    character-varying(255) type 
-    character-varying(255) description 
-    boolean collapsed_on_homepage 
-    character-varying(255) base 
-    integer ss58_prefix 
-    boolean has_chain_events_listener 
-    character-varying(255) custom_domain 
-    character-varying(255) terms 
-    character-varying(255) bech32_prefix 
-    character-varying(255) block_explorer_ids 
-    boolean default_summary_view 
-    integer chain_node_id 
-    character-varying(255) token_name 
-    boolean admin_only_polling 
-    character-varying(255) default_symbol 
-    integer discord_config_id 
-    boolean hide_projects 
-    character-varying(255) default_page 
-    character-varying(255) has_homepage 
-    timestamp-with-time-zone created_at 
-    timestamp-with-time-zone updated_at 
-    jsonb category 
-    boolean discord_bot_webhooks_enabled 
-    boolean directory_page_enabled 
-    integer directory_page_chain_node_id 
-    character-varying(255)[] social_links 
-    character-varying(255) namespace 
-    text redirect 
-    integer lifetime_thread_count 
-    integer address_count 
-    boolean stages_enabled 
-    text[] custom_stages 
-    character-varying(255) namespace_address 
-    character-varying(255)[] snapshot_spaces 
+    character-varying(255) name
+    character-varying(255) icon_url
+    boolean active
+    character-varying(255) network
+    character-varying(255) type
+    character-varying(255) description
+    boolean collapsed_on_homepage
+    character-varying(255) base
+    integer ss58_prefix
+    boolean has_chain_events_listener
+    character-varying(255) custom_domain
+    character-varying(255) terms
+    character-varying(255) bech32_prefix
+    character-varying(255) block_explorer_ids
+    boolean default_summary_view
+    integer chain_node_id
+    character-varying(255) token_name
+    boolean admin_only_polling
+    character-varying(255) default_symbol
+    integer discord_config_id
+    boolean hide_projects
+    character-varying(255) default_page
+    character-varying(255) has_homepage
+    timestamp-with-time-zone created_at
+    timestamp-with-time-zone updated_at
+    jsonb category
+    boolean discord_bot_webhooks_enabled
+    boolean directory_page_enabled
+    integer directory_page_chain_node_id
+    character-varying(255)[] social_links
+    character-varying(255) namespace
+    text redirect
+    integer lifetime_thread_count
+    integer address_count
+    boolean stages_enabled
+    text[] custom_stages
+    character-varying(255) namespace_address
+    character-varying(255)[] snapshot_spaces
   }
   SsoTokens {
-    integer issued_at 
-    character-varying(255) issuer 
-    integer address_id 
-    character-varying(255) state_id 
-    timestamp-with-time-zone created_at 
-    timestamp-with-time-zone updated_at 
+    integer issued_at
+    character-varying(255) issuer
+    integer address_id
+    character-varying(255) state_id
+    timestamp-with-time-zone created_at
+    timestamp-with-time-zone updated_at
     integer id PK
-    integer profile_id 
+    integer profile_id
   }
   Polls {
-    character-varying(255) community_id 
-    integer thread_id 
-    character-varying(255) prompt 
-    character-varying(255) options 
-    timestamp-with-time-zone ends_at 
-    timestamp-with-time-zone created_at 
-    timestamp-with-time-zone updated_at 
+    character-varying(255) community_id
+    integer thread_id
+    character-varying(255) prompt
+    character-varying(255) options
+    timestamp-with-time-zone ends_at
+    timestamp-with-time-zone created_at
+    timestamp-with-time-zone updated_at
     integer id PK
   }
   Groups {
-    json metadata 
-    json requirements 
-    timestamp-with-time-zone created_at 
-    timestamp-with-time-zone updated_at 
+    json metadata
+    json requirements
+    timestamp-with-time-zone created_at
+    timestamp-with-time-zone updated_at
     integer id PK
-    character-varying(255) community_id 
-    boolean is_system_managed 
+    character-varying(255) community_id
+    boolean is_system_managed
   }
   CommunityAlerts {
     integer user_id PK
     character-varying(255) community_id PK
-    timestamp-with-time-zone created_at 
-    timestamp-with-time-zone updated_at 
+    timestamp-with-time-zone created_at
+    timestamp-with-time-zone updated_at
   }
   part_config_sub {
     text sub_parent PK
-    text sub_control 
-    text sub_partition_interval 
-    text sub_partition_type 
-    text sub_template_table 
-    text sub_retention 
-    text sub_retention_schema 
-    text[] sub_constraint_cols 
-    text sub_date_trunc_interval 
-    integer sub_maintenance_order 
-    integer sub_premake 
-    text sub_automatic_maintenance 
-    boolean sub_retention_keep_index 
-    boolean sub_retention_keep_table 
-    text sub_epoch 
-    integer sub_optimize_constraint 
-    boolean sub_infinite_time_partitions 
-    boolean sub_jobmon 
-    boolean sub_inherit_privileges 
-    boolean sub_constraint_valid 
-    boolean sub_ignore_default_data 
-    boolean sub_default_table 
-    boolean sub_retention_keep_publication 
+    text sub_control
+    text sub_partition_interval
+    text sub_partition_type
+    text sub_template_table
+    text sub_retention
+    text sub_retention_schema
+    text[] sub_constraint_cols
+    text sub_date_trunc_interval
+    integer sub_maintenance_order
+    integer sub_premake
+    text sub_automatic_maintenance
+    boolean sub_retention_keep_index
+    boolean sub_retention_keep_table
+    text sub_epoch
+    integer sub_optimize_constraint
+    boolean sub_infinite_time_partitions
+    boolean sub_jobmon
+    boolean sub_inherit_privileges
+    boolean sub_constraint_valid
+    boolean sub_ignore_default_data
+    boolean sub_default_table
+    boolean sub_retention_keep_publication
   }
   Addresses {
-    character-varying(255) address 
-    timestamp-with-time-zone created_at 
-    timestamp-with-time-zone updated_at 
-    character-varying(255) community_id 
+    character-varying(255) address
+    timestamp-with-time-zone created_at
+    timestamp-with-time-zone updated_at
+    character-varying(255) community_id
     integer id PK
-    integer user_id 
-    character-varying(255) verification_token 
-    timestamp-with-time-zone verification_token_expires 
-    timestamp-with-time-zone verified 
-    timestamp-with-time-zone last_active 
-    boolean ghost_address 
-    integer profile_id 
-    character-varying(255) wallet_id 
-    character-varying(255) block_info 
-    character-varying(64) hex 
-    boolean is_user_default 
-    enum_Addresses_role role 
-    character-varying(255) wallet_sso_source 
+    integer user_id
+    character-varying(255) verification_token
+    timestamp-with-time-zone verification_token_expires
+    timestamp-with-time-zone verified
+    timestamp-with-time-zone last_active
+    boolean ghost_address
+    integer profile_id
+    character-varying(255) wallet_id
+    character-varying(255) block_info
+    character-varying(64) hex
+    boolean is_user_default
+    enum_Addresses_role role
+    character-varying(255) wallet_sso_source
   }
   CommunityContracts {
-    integer contract_id 
-    timestamp-with-time-zone created_at 
-    timestamp-with-time-zone updated_at 
+    integer contract_id
+    timestamp-with-time-zone created_at
+    timestamp-with-time-zone updated_at
     integer id PK
-    character-varying(255) community_id 
+    character-varying(255) community_id
   }
   Threads {
-    text title 
-    timestamp-with-time-zone created_at 
-    timestamp-with-time-zone updated_at 
-    timestamp-with-time-zone deleted_at 
+    text title
+    timestamp-with-time-zone created_at
+    timestamp-with-time-zone updated_at
+    timestamp-with-time-zone deleted_at
     integer id PK
-    text body 
-    integer address_id 
-    boolean pinned 
-    character-varying(255) kind 
-    text url 
-    text[] version_history 
-    boolean read_only 
-    integer topic_id 
-    text plaintext 
-    text stage 
-    tsvector _search 
-    character-varying(255) community_id 
-    boolean has_poll 
-    timestamp-with-time-zone last_commented_on 
-    jsonb canvas_action 
-    jsonb canvas_session 
-    character-varying(255) canvas_hash 
-    timestamp-with-time-zone last_edited 
-    jsonb links 
-    jsonb discord_meta 
-    timestamp-with-time-zone locked_at 
-    timestamp-with-time-zone marked_as_spam_at 
-    character-varying(255) created_by 
-    timestamp-with-time-zone archived_at 
-    integer comment_count 
-    integer reaction_count 
-    integer max_notif_id 
-    integer view_count 
-    text body_backup 
-    integer reaction_weights_sum 
+    text body
+    integer address_id
+    boolean pinned
+    character-varying(255) kind
+    text url
+    text[] version_history
+    boolean read_only
+    integer topic_id
+    text plaintext
+    text stage
+    tsvector _search
+    character-varying(255) community_id
+    boolean has_poll
+    timestamp-with-time-zone last_commented_on
+    jsonb canvas_action
+    jsonb canvas_session
+    character-varying(255) canvas_msg_id
+    timestamp-with-time-zone last_edited
+    jsonb links
+    jsonb discord_meta
+    timestamp-with-time-zone locked_at
+    timestamp-with-time-zone marked_as_spam_at
+    character-varying(255) created_by
+    timestamp-with-time-zone archived_at
+    integer comment_count
+    integer reaction_count
+    integer max_notif_id
+    integer view_count
+    text body_backup
+    integer reaction_weights_sum
   }
   ThreadSubscriptions {
     integer user_id PK
     integer thread_id PK
-    timestamp-with-time-zone created_at 
-    timestamp-with-time-zone updated_at 
+    timestamp-with-time-zone created_at
+    timestamp-with-time-zone updated_at
   }
   template_public_outbox_relayed {
-    bigint id 
-    text event_name 
-    jsonb event_payload 
-    boolean relayed 
-    timestamp-with-time-zone created_at 
-    timestamp-with-time-zone updated_at 
+    bigint id
+    text event_name
+    jsonb event_payload
+    boolean relayed
+    timestamp-with-time-zone created_at
+    timestamp-with-time-zone updated_at
   }
   StakeTransactions {
     character-varying(255) transaction_hash PK
-    character-varying(255) community_id 
-    integer stake_id 
-    character-varying(255) address 
-    integer stake_amount 
-    bigint stake_price 
-    enum_StakeTransactions_stake_direction stake_direction 
-    integer timestamp 
+    character-varying(255) community_id
+    integer stake_id
+    character-varying(255) address
+    integer stake_amount
+    bigint stake_price
+    enum_StakeTransactions_stake_direction stake_direction
+    integer timestamp
   }
   Topics {
-    character-varying(255) name 
-    timestamp-with-time-zone created_at 
-    timestamp-with-time-zone updated_at 
-    timestamp-with-time-zone deleted_at 
+    character-varying(255) name
+    timestamp-with-time-zone created_at
+    timestamp-with-time-zone updated_at
+    timestamp-with-time-zone deleted_at
     integer id PK
-    character-varying(255) community_id 
-    text description 
-    character-varying(255) telegram 
-    boolean featured_in_sidebar 
-    boolean featured_in_new_post 
-    text default_offchain_template 
-    integer order 
-    character-varying(255) channel_id 
-    integer[] group_ids 
-    text default_offchain_template_backup 
+    character-varying(255) community_id
+    text description
+    character-varying(255) telegram
+    boolean featured_in_sidebar
+    boolean featured_in_new_post
+    text default_offchain_template
+    integer order
+    character-varying(255) channel_id
+    integer[] group_ids
+    text default_offchain_template_backup
   }
   LastProcessedEvmBlocks {
     integer chain_node_id PK
-    integer block_number 
+    integer block_number
   }
   NotificationCategories {
     character-varying(255) name PK
-    text description 
-    timestamp-with-time-zone created_at 
-    timestamp-with-time-zone updated_at 
+    text description
+    timestamp-with-time-zone created_at
+    timestamp-with-time-zone updated_at
   }
   Profiles {
-    integer user_id 
-    timestamp-with-time-zone created_at 
-    timestamp-with-time-zone updated_at 
-    character-varying(255) profile_name 
-    character-varying(255) email 
+    integer user_id
+    timestamp-with-time-zone created_at
+    timestamp-with-time-zone updated_at
+    character-varying(255) profile_name
+    character-varying(255) email
     integer id PK
-    character-varying(255) website 
-    text bio 
-    character-varying(255) avatar_url 
-    character-varying(255) slug 
-    character-varying(255)[] socials 
-    jsonb background_image 
-    text bio_backup 
-    character-varying(255) profile_name_backup 
+    character-varying(255) website
+    text bio
+    character-varying(255) avatar_url
+    character-varying(255) slug
+    character-varying(255)[] socials
+    jsonb background_image
+    text bio_backup
+    character-varying(255) profile_name_backup
   }
   EvmEventSources {
-    integer chain_node_id 
-    character-varying(255) contract_address 
-    character-varying(255) event_signature 
-    character-varying(255) kind 
+    integer chain_node_id
+    character-varying(255) contract_address
+    character-varying(255) event_signature
+    character-varying(255) kind
     integer id PK
-    integer abi_id 
-    integer created_at_block 
-    boolean events_migrated 
-    boolean active 
+    integer abi_id
+    integer created_at_block
+    boolean events_migrated
+    boolean active
   }
   Notifications {
-    text notification_data 
-    integer chain_event_id 
+    text notification_data
+    integer chain_event_id
     integer id PK
-    timestamp-with-time-zone created_at 
-    integer entity_id 
-    character-varying(255) community_id 
-    timestamp-with-time-zone updated_at 
-    character-varying(255) category_id 
-    integer thread_id 
+    timestamp-with-time-zone created_at
+    integer entity_id
+    character-varying(255) community_id
+    timestamp-with-time-zone updated_at
+    character-varying(255) category_id
+    integer thread_id
   }
   ContractAbis {
-    timestamp-with-time-zone created_at 
-    timestamp-with-time-zone updated_at 
+    timestamp-with-time-zone created_at
+    timestamp-with-time-zone updated_at
     integer id PK
-    jsonb abi 
-    boolean verified 
-    character-varying(255) nickname 
-    text abi_hash 
+    jsonb abi
+    boolean verified
+    character-varying(255) nickname
+    text abi_hash
   }
   CommentSubscriptions {
     integer user_id PK
     integer comment_id PK
-    timestamp-with-time-zone created_at 
-    timestamp-with-time-zone updated_at 
+    timestamp-with-time-zone created_at
+    timestamp-with-time-zone updated_at
   }
   Collaborations {
     integer thread_id PK
     integer address_id PK
-    timestamp-with-time-zone created_at 
-    timestamp-with-time-zone updated_at 
-  }
-  ContestTopics {
-    character-varying(255) contest_address PK
-    integer topic_id PK
-    timestamp-with-time-zone created_at 
+    timestamp-with-time-zone created_at
+    timestamp-with-time-zone updated_at
   }
   Users {
-    character-varying(255) email 
-    timestamp-with-time-zone created_at 
-    timestamp-with-time-zone updated_at 
+    character-varying(255) email
+    timestamp-with-time-zone created_at
+    timestamp-with-time-zone updated_at
     integer id PK
-    boolean isAdmin 
-    boolean disableRichText 
-    boolean emailVerified 
-    character-varying(255) emailNotificationInterval 
-    character-varying(255) selected_community_id 
+    boolean isAdmin
+    boolean disableRichText
+    boolean emailVerified
+    character-varying(255) emailNotificationInterval
+    character-varying(255) selected_community_id
   }
   Webhooks {
-    character-varying(255) community_id 
-    character-varying(255) url 
-    timestamp-with-time-zone created_at 
-    timestamp-with-time-zone updated_at 
+    character-varying(255) community_id
+    character-varying(255) url
+    timestamp-with-time-zone created_at
+    timestamp-with-time-zone updated_at
     integer id PK
-    character-varying(255)[] categories 
+    character-varying(255)[] categories
   }
   LoginTokens {
-    character-varying(255) token 
-    character-varying(255) email 
-    timestamp-with-time-zone expires 
-    timestamp-with-time-zone used 
-    timestamp-with-time-zone created_at 
-    timestamp-with-time-zone updated_at 
+    character-varying(255) token
+    character-varying(255) email
+    timestamp-with-time-zone expires
+    timestamp-with-time-zone used
+    timestamp-with-time-zone created_at
+    timestamp-with-time-zone updated_at
     integer id PK
-    character-varying(255) redirect_path 
-    character-varying(255) domain 
+    character-varying(255) redirect_path
+    character-varying(255) domain
   }
   Sessions {
     character-varying(255) sid PK
-    timestamp-with-time-zone expires 
-    text data 
-    timestamp-with-time-zone createdAt 
-    timestamp-with-time-zone updatedAt 
+    timestamp-with-time-zone expires
+    text data
+    timestamp-with-time-zone createdAt
+    timestamp-with-time-zone updatedAt
   }
   Subscriptions {
-    character-varying(255) snapshot_id 
-    integer thread_id 
-    integer comment_id 
-    character-varying(255) community_id 
+    character-varying(255) snapshot_id
+    integer thread_id
+    integer comment_id
+    character-varying(255) community_id
     integer id PK
-    timestamp-with-time-zone created_at 
-    timestamp-with-time-zone updated_at 
-    character-varying(255) category_id 
-    integer subscriber_id 
-    boolean is_active 
-    boolean immediate_email 
+    timestamp-with-time-zone created_at
+    timestamp-with-time-zone updated_at
+    character-varying(255) category_id
+    integer subscriber_id
+    boolean is_active
+    boolean immediate_email
   }
   part_config {
-    integer premake 
-    text automatic_maintenance 
+    integer premake
+    text automatic_maintenance
     text parent_table PK
-    text control 
-    text partition_interval 
-    text partition_type 
-    text template_table 
-    text retention 
-    text retention_schema 
-    text[] constraint_cols 
-    text datetime_string 
-    text date_trunc_interval 
-    integer maintenance_order 
-    timestamp-with-time-zone maintenance_last_run 
-    boolean retention_keep_index 
-    boolean retention_keep_table 
-    text epoch 
-    integer optimize_constraint 
-    boolean infinite_time_partitions 
-    boolean jobmon 
-    boolean sub_partition_set_full 
-    boolean undo_in_progress 
-    boolean inherit_privileges 
-    boolean constraint_valid 
-    boolean ignore_default_data 
-    boolean default_table 
-    boolean retention_keep_publication 
+    text control
+    text partition_interval
+    text partition_type
+    text template_table
+    text retention
+    text retention_schema
+    text[] constraint_cols
+    text datetime_string
+    text date_trunc_interval
+    integer maintenance_order
+    timestamp-with-time-zone maintenance_last_run
+    boolean retention_keep_index
+    boolean retention_keep_table
+    text epoch
+    integer optimize_constraint
+    boolean infinite_time_partitions
+    boolean jobmon
+    boolean sub_partition_set_full
+    boolean undo_in_progress
+    boolean inherit_privileges
+    boolean constraint_valid
+    boolean ignore_default_data
+    boolean default_table
+    boolean retention_keep_publication
   }
   CommunityContractTemplateMetadata {
-    character-varying(255) enabled_by 
-    timestamp-with-time-zone created_at 
-    timestamp-with-time-zone updated_at 
-    character-varying(255) slug 
-    character-varying(255) nickname 
-    character-varying(255) display_name 
+    character-varying(255) enabled_by
+    timestamp-with-time-zone created_at
+    timestamp-with-time-zone updated_at
+    character-varying(255) slug
+    character-varying(255) nickname
+    character-varying(255) display_name
     integer id PK
-    enum_CommunityContractTemplateMetadata_display_options display_options 
+    enum_CommunityContractTemplateMetadata_display_options display_options
   }
   Outbox {
-    text event_name 
-    jsonb event_payload 
-    timestamp-with-time-zone created_at 
-    timestamp-with-time-zone updated_at 
-    boolean relayed 
-    bigint event_id 
+    text event_name
+    jsonb event_payload
+    timestamp-with-time-zone created_at
+    timestamp-with-time-zone updated_at
+    boolean relayed
+    bigint event_id
   }
   CommunityBanners {
-    text banner_text 
-    timestamp-with-time-zone created_at 
-    timestamp-with-time-zone updated_at 
+    text banner_text
+    timestamp-with-time-zone created_at
+    timestamp-with-time-zone updated_at
     integer id PK
-    character-varying(255) community_id 
+    character-varying(255) community_id
   }
   SubscriptionPreferences {
-    integer user_id 
+    integer user_id
     integer id PK
-    boolean email_notifications_enabled 
-    boolean digest_email_enabled 
-    boolean recap_email_enabled 
-    boolean mobile_push_notifications_enabled 
-    boolean mobile_push_discussion_activity_enabled 
-    boolean mobile_push_admin_alerts_enabled 
-    timestamp-with-time-zone created_at 
-    timestamp-with-time-zone updated_at 
+    boolean email_notifications_enabled
+    boolean digest_email_enabled
+    boolean recap_email_enabled
+    boolean mobile_push_notifications_enabled
+    boolean mobile_push_discussion_activity_enabled
+    boolean mobile_push_admin_alerts_enabled
+    timestamp-with-time-zone created_at
+    timestamp-with-time-zone updated_at
   }
 ```

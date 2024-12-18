@@ -1,5 +1,5 @@
+import { communityStakesAbi } from '@hicommonwealth/evm-protocols';
 import { toBigInt } from 'web3-utils';
-import { communityStakesAbi } from './Abi/CommunityStakesAbi';
 import ContractBase from './ContractBase';
 import NamespaceFactory from './NamespaceFactory';
 

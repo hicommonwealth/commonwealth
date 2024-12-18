@@ -1,25 +1,5 @@
 import { DB } from '@hicommonwealth/model';
 import {
-  CreateTopicOptions,
-  CreateTopicResult,
-  __createTopic,
-} from './server_topics_methods/create_topic';
-import {
-  DeleteTopicOptions,
-  DeleteTopicResult,
-  __deleteTopic,
-} from './server_topics_methods/delete_topic';
-import {
-  GetTopicsOptions,
-  GetTopicsResult,
-  __getTopics,
-} from './server_topics_methods/get_topics';
-import {
-  UpdateTopicOptions,
-  UpdateTopicResult,
-  __updateTopic,
-} from './server_topics_methods/update_topic';
-import {
   UpdateTopicChannelOptions,
   UpdateTopicChannelResult,
   __updateTopicChannel,
@@ -35,22 +15,6 @@ import {
  */
 export class ServerTopicsController {
   constructor(public models: DB) {}
-
-  async getTopics(options: GetTopicsOptions): Promise<GetTopicsResult> {
-    return __getTopics.call(this, options);
-  }
-
-  async createTopic(options: CreateTopicOptions): Promise<CreateTopicResult> {
-    return __createTopic.call(this, options);
-  }
-
-  async updateTopic(options: UpdateTopicOptions): Promise<UpdateTopicResult> {
-    return __updateTopic.call(this, options);
-  }
-
-  async deleteTopic(options: DeleteTopicOptions): Promise<DeleteTopicResult> {
-    return __deleteTopic.call(this, options);
-  }
 
   async updateTopicsOrder(
     options: UpdateTopicsOrderOptions,

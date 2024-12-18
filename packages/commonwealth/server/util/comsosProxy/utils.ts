@@ -1,6 +1,10 @@
 import { logger } from '@hicommonwealth/core';
 import { ChainNodeInstance, models } from '@hicommonwealth/model';
-import { CosmosGovernanceVersion, NodeHealth } from '@hicommonwealth/shared';
+import {
+  CosmosGovernanceVersion,
+  NodeHealth,
+  PRODUCTION_DOMAIN,
+} from '@hicommonwealth/shared';
 import axios, { AxiosResponse } from 'axios';
 import { Request } from 'express';
 import _ from 'lodash';
@@ -78,9 +82,9 @@ export async function updateSlip44IfNeeded(
       `https://chains.cosmos.directory/${chainNode.cosmos_chain_id}`,
       {
         headers: {
-          origin: 'https://commonwealth.im',
+          origin: `https://${PRODUCTION_DOMAIN}`,
           Referer:
-            process.env.COSMOS_PROXY_REFERER || 'https://commonwealth.im',
+            process.env.COSMOS_PROXY_REFERER || `https://${PRODUCTION_DOMAIN}`,
         },
       },
     );
@@ -167,8 +171,9 @@ export async function queryExternalProxy(
   log.info(`Querying Cosmos node at ${url}`);
   return await axios.post(url, _.isEmpty(req.body) ? null : req.body, {
     headers: {
-      origin: 'https://commonwealth.im',
-      Referer: process.env.COSMOS_PROXY_REFERER || 'https://commonwealth.im',
+      origin: `https://${PRODUCTION_DOMAIN}`,
+      Referer:
+        process.env.COSMOS_PROXY_REFERER || `https://${PRODUCTION_DOMAIN}`,
     },
   });
 }

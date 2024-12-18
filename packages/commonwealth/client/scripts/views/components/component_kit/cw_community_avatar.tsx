@@ -1,14 +1,16 @@
-import 'components/component_kit/cw_community_avatar.scss';
 import React from 'react';
-import type ChainInfo from '../../../models/ChainInfo';
 import { Skeleton } from '../Skeleton';
+import './cw_community_avatar.scss';
 import type { IconSize } from './cw_icons/types';
 import { CWText } from './cw_text';
 import { getClasses } from './helpers';
 import { ComponentType } from './types';
 
 type CommunityAvatarProps = {
-  community: Pick<ChainInfo, 'iconUrl' | 'name'>;
+  community: {
+    name: string;
+    iconUrl: string;
+  };
   onClick?: () => void;
   size?: IconSize;
   showSkeleton?: boolean;

@@ -1,0 +1,15 @@
+@import '../../../../styles/shared.scss';
+
+.TokenIcon {
+  border-radius: 50%;
+
+  &.small {
+    height: 16px !important;
+    width: 16px !important;
+  }
+
+  &.large {
+    height: 24px !important;
+    width: 24px !important;
+  }
+}

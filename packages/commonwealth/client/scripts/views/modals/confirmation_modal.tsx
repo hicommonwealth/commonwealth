@@ -14,7 +14,7 @@ import {
   CWModalHeader,
 } from '../components/component_kit/new_designs/CWModal';
 
-import '../../../styles/modals/confirmation_modal.scss';
+import './confirmation_modal.scss';
 
 interface ConfirmationModalProps {
   title?: string;
@@ -22,6 +22,7 @@ interface ConfirmationModalProps {
   buttons: ButtonProps[];
   removeModal: () => void;
   className?: string;
+  hideWarning?: boolean;
 }
 
 const ConfirmationModal = ({
@@ -30,6 +31,7 @@ const ConfirmationModal = ({
   buttons,
   removeModal,
   className,
+  hideWarning,
 }: ConfirmationModalProps) => {
   const [open, setOpen] = useState(true);
 
@@ -54,7 +56,11 @@ const ConfirmationModal = ({
       size="small"
       content={
         <div className={clsx('ConfirmationModal', className)}>
-          <CWModalHeader label={title} icon="warning" onModalClose={onClose} />
+          <CWModalHeader
+            label={title}
+            icon={hideWarning ? undefined : 'warning'}
+            onModalClose={onClose}
+          />
           <CWModalBody>
             {description && (
               <CWText type="b1" className="description">
@@ -77,6 +83,7 @@ interface OpenConfirmationProps {
   buttons: ButtonProps[];
   className?: string;
   onClose?: () => void;
+  hideWarning?: boolean;
 }
 
 export const openConfirmation = (props: OpenConfirmationProps) => {

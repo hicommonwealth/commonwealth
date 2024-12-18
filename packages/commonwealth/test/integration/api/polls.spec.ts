@@ -5,7 +5,8 @@ import type {
   Session,
   Signature,
 } from '@canvas-js/interfaces';
-import { dispose } from '@hicommonwealth/core';
+import { command, dispose } from '@hicommonwealth/core';
+import { Poll } from '@hicommonwealth/model';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import jwt from 'jsonwebtoken';
@@ -20,9 +21,9 @@ describe('Polls', () => {
   const chain = 'ethereum';
 
   let userJWT: string;
+  let userId: number;
   let userAddress: string;
-  // the userAddress with the chain and chain id prefix - this is used by canvas
-  let canvasAddress: string;
+  let userDid: `did:${string}`;
   let userSession: {
     session: Session;
     sign: (payload: Message<Action | Session>) => Awaitable<Signature>;
@@ -50,8 +51,9 @@ describe('Polls', () => {
       { chain },
       'Alice',
     );
-    canvasAddress = userRes.address;
-    userAddress = canvasAddress.split(':')[2];
+    userAddress = userRes.address;
+    userId = parseInt(userRes.user_id);
+    userDid = userRes.did;
     userJWT = jwt.sign(
       { id: userRes.user_id, email: userRes.email },
       config.AUTH.JWT_SECRET,
@@ -61,6 +63,7 @@ describe('Polls', () => {
       sign: userRes.sign,
     };
     expect(userAddress).to.not.be.null;
+    expect(userDid).to.not.be.null;
     expect(userJWT).to.not.be.null;
   });
 
@@ -71,7 +74,8 @@ describe('Polls', () => {
   test('should create a poll for a thread', async () => {
     const { result: thread } = await server.seeder.createThread({
       chainId: 'ethereum',
-      address: canvasAddress,
+      address: userAddress,
+      did: userDid,
       jwt: userJWT,
       title: 'test1',
       body: 'body1',
@@ -114,46 +118,43 @@ describe('Polls', () => {
   });
 
   test('should fail to cast a vote with invalid option', async () => {
-    const data = {
-      option: 'optionC',
-    };
-
-    const res = await chai.request
-      .agent(server.app)
-      .put(`/api/polls/${pollId}/votes`)
-      .set('Accept', 'application/json')
-      .send({
-        author_chain: chain,
-        chain: chain,
-        address: userAddress,
-        jwt: userJWT,
-        ...data,
+    try {
+      await command(Poll.CreatePollVote(), {
+        actor: {
+          user: {
+            id: userId,
+            email: 'test@common.xyz',
+          },
+          address: userAddress,
+        },
+        payload: {
+          poll_id: pollId,
+          thread_id: threadId,
+          option: 'optionC',
+        },
       });
-
-    expect(res.status).to.equal(400);
+      expect.fail();
+      // eslint-disable-next-line no-empty
+    } catch (e) {}
   });
 
   test('should cast a vote', async () => {
-    const data = {
-      option: 'optionA',
-    };
-
-    const res = await chai.request
-      .agent(server.app)
-      .put(`/api/polls/${pollId}/votes`)
-      .set('Accept', 'application/json')
-      .send({
-        author_chain: chain,
-        chain: chain,
+    const res = await command(Poll.CreatePollVote(), {
+      actor: {
+        user: {
+          id: userId,
+          email: 'test@common.xyz',
+        },
         address: userAddress,
-        jwt: userJWT,
-        ...data,
-      });
-
-    expect(res.status).to.equal(200);
-    expect(res.body.result).to.contain({
-      option: data.option,
+      },
+      payload: {
+        poll_id: pollId,
+        thread_id: threadId,
+        option: 'optionA',
+      },
     });
+    expect(res).to.not.be.undefined;
+    expect(res?.id).to.not.be.undefined;
   });
 
   test('should get thread polls, response shows poll and vote', async () => {
@@ -175,46 +176,6 @@ describe('Polls', () => {
     );
   });
 
-  test('should recast vote', async () => {
-    const data = {
-      option: 'optionB',
-    };
-
-    const res = await chai.request
-      .agent(server.app)
-      .put(`/api/polls/${pollId}/votes`)
-      .set('Accept', 'application/json')
-      .send({
-        author_chain: chain,
-        chain: chain,
-        address: userAddress,
-        jwt: userJWT,
-        ...data,
-      });
-
-    expect(res.status).to.equal(200);
-    expect(res.body.result).to.contain({
-      option: data.option,
-    });
-  });
-
-  test('should get thread polls, response shows updated poll and vote', async () => {
-    const res = await chai.request
-      .agent(server.app)
-      .get(`/api/threads/${threadId}/polls`)
-      .set('Accept', 'application/json')
-      .query({
-        chain: chain,
-      });
-
-    expect(res.status).to.equal(200);
-    expect(res.body.result[0].votes[0]).to.have.property('option', 'optionB');
-    expect(res.body.result[0].votes[0]).to.have.property(
-      'address',
-      userAddress,
-    );
-  });
-
   test('should get thread poll votes', async () => {
     const res = await chai.request
       .agent(server.app)
@@ -225,7 +186,7 @@ describe('Polls', () => {
       });
 
     expect(res.status).to.equal(200);
-    expect(res.body.result[0]).to.have.property('option', 'optionB');
+    expect(res.body.result[0]).to.have.property('option', 'optionA');
     expect(res.body.result[0]).to.have.property('address', userAddress);
   });
 

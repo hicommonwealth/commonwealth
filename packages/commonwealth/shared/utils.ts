@@ -1,3 +1,4 @@
+import { PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
 import { Dec, IntPretty } from '@keplr-wallet/unit';
 import { isHex, isU8a } from '@polkadot/util';
 import {
@@ -25,11 +26,15 @@ export const slugifyPreserveDashes = (str: string): string => {
 // WARN: Using process.env to avoid webpack failures
 export const getCommunityUrl = (community: string): string => {
   return process.env.NODE_ENV === 'production'
-    ? `https://commonwealth.im/${community}`
+    ? `https://${PRODUCTION_DOMAIN}/${community}`
     : `http://localhost:8080/${community}`;
 };
 
-export const smartTrim = (text, maxLength = 200) => {
+export const smartTrim = (
+  text: string | undefined,
+  maxLength = 200,
+): string => {
+  if (!text) return '';
   if (text.length > maxLength) {
     const smartTrimmedText = text.slice(0, maxLength).replace(/\W+$/, '');
     if (smartTrimmedText.length === 0) return `${text.slice(0, maxLength)}...`;
@@ -62,6 +67,7 @@ export function formatAddressShort(
   includeEllipsis?: boolean,
   maxCharLength?: number,
   prefix?: string,
+  firstAndLastDigit?: boolean,
 ) {
   if (!address) return;
   if (chain === 'near') {
@@ -73,6 +79,8 @@ export function formatAddressShort(
       totalLength - 4,
       totalLength,
     )}`;
+  } else if (firstAndLastDigit) {
+    return `${address.slice(0, 4)}...${address.slice(-2)}`;
   } else {
     return `${address.slice(0, maxCharLength || 5)}${
       includeEllipsis ? '…' : ''
@@ -150,27 +158,4 @@ export function naturalDenomToMinimal(
 
   // 0 decimal places because this is max precision for the chain
   return intPretty.toDec().toString(0);
-}
-
-/**
- * Convert Cosmos bech32 address to a hexadecimal string
- * hex is used as a common identifier for addresses across chains.
- * This allows us to achieve One Signer, One Account
- *
- * Example:
- * bech32ToHex('osmo18q3tlnx8vguv2fadqslm7x59ejauvsmnhltgq6') => '3822bfccc76238c527ad043fbf1a85ccbbc64373'
- * bech32ToHex('cosmos18q3tlnx8vguv2fadqslm7x59ejauvsmnlycckg') => '3822bfccc76238c527ad043fbf1a85ccbbc64373' (same)
- *
- * Caveat: Ethermint addresses will share a hex, but it will differ from
- * their siblings on standard Cosmos derivation paths.
- * e.g. evmos hex != osmo hex, but evmos hex == inj hex
- */
-export async function bech32ToHex(address: string) {
-  const { toHex, fromBech32 } = await import('@cosmjs/encoding');
-  try {
-    const encodedData = fromBech32(address).data;
-    return toHex(encodedData);
-  } catch (e) {
-    console.log(`Error converting bech32 to hex: ${e}. Hex was not generated.`);
-  }
 }

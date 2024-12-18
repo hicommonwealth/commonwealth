@@ -3,6 +3,7 @@ import { useFlag } from 'hooks/useFlag';
 import React, { useState } from 'react';
 import { useCommunityAlertsQuery } from 'state/api/trpc/subscription/useCommunityAlertsQuery';
 import useUserStore from 'state/ui/user';
+import ScrollContainer from 'views/components/ScrollContainer';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import {
   CWTab,
@@ -20,7 +21,11 @@ import { CWText } from '../../components/component_kit/cw_text';
 import { PageLoading } from '../loading';
 import './index.scss';
 
-type NotificationSection = 'community-alerts' | 'threads' | 'comments';
+type NotificationSection =
+  | 'push-notifications'
+  | 'community-alerts'
+  | 'threads'
+  | 'comments';
 
 const NotificationSettings = () => {
   const supportsPushNotifications = useSupportsPushNotifications();
@@ -30,13 +35,11 @@ const NotificationSettings = () => {
   const user = useUserStore();
 
   const communityAlertsIndex = createIndexForCommunityAlerts(
-    (communityAlerts.data as unknown as ReadonlyArray<
-      z.infer<typeof CommunityAlert>
-    >) || [],
+    communityAlerts.data || [],
   );
 
   const [section, setSection] =
-    useState<NotificationSection>('community-alerts');
+    useState<NotificationSection>('push-notifications');
 
   if (threadSubscriptions.isLoading) {
     return <PageLoading />;
@@ -55,42 +58,33 @@ const NotificationSettings = () => {
           Manage the emails and alerts you receive about your activity
         </CWText>
 
-        {enableKnockPushNotifications && supportsPushNotifications && (
-          <div>
-            <CWText type="h5">Push Notifications</CWText>
+        <ScrollContainer>
+          <CWTabsRow>
+            {enableKnockPushNotifications && supportsPushNotifications && (
+              <CWTab
+                label="Push Notifications"
+                isSelected={section === 'push-notifications'}
+                onClick={() => setSection('push-notifications')}
+              />
+            )}
+            <CWTab
+              label="Community"
+              isSelected={section === 'community-alerts'}
+              onClick={() => setSection('community-alerts')}
+            />
+            <CWTab
+              label="Threads"
+              isSelected={section === 'threads'}
+              onClick={() => setSection('threads')}
+            />
 
-            <div className="setting-container">
-              <div className="setting-container-left">
-                <CWText className="text-muted">
-                  Turn on notifications to receive alerts on your device.
-                </CWText>
-              </div>
-
-              <div className="setting-container-right">
-                <PushNotificationsToggle />
-              </div>
-            </div>
-          </div>
-        )}
-
-        <CWTabsRow>
-          <CWTab
-            label="Community"
-            isSelected={section === 'community-alerts'}
-            onClick={() => setSection('community-alerts')}
-          />
-          <CWTab
-            label="Threads"
-            isSelected={section === 'threads'}
-            onClick={() => setSection('threads')}
-          />
-
-          <CWTab
-            label="Comments"
-            isSelected={section === 'comments'}
-            onClick={() => setSection('comments')}
-          />
-        </CWTabsRow>
+            <CWTab
+              label="Comments"
+              isSelected={section === 'comments'}
+              onClick={() => setSection('comments')}
+            />
+          </CWTabsRow>
+        </ScrollContainer>
 
         {!communityAlerts.isLoading && section === 'community-alerts' && (
           <>
@@ -114,6 +108,57 @@ const NotificationSettings = () => {
                 />
               );
             })}
+          </>
+        )}
+
+        {section === 'push-notifications' && (
+          <>
+            {enableKnockPushNotifications && supportsPushNotifications && (
+              <div className="mt-1">
+                <div className="setting-container">
+                  <div className="setting-container-left">
+                    <CWText type="h4">Turn push notifications on/off</CWText>
+
+                    <CWText className="text-muted">
+                      Turn off notifications to stop receiving any alerts on
+                      your device.
+                    </CWText>
+                  </div>
+
+                  <div className="setting-container-right">
+                    <PushNotificationsToggle pref="mobile_push_notifications_enabled" />
+                  </div>
+                </div>
+
+                <div className="setting-container">
+                  <div className="setting-container-left">
+                    <CWText type="h4">Discussion Activity</CWText>
+
+                    <CWText className="text-muted">
+                      Get notified when someone mentions you
+                    </CWText>
+                  </div>
+
+                  <div className="setting-container-right">
+                    <PushNotificationsToggle pref="mobile_push_discussion_activity_enabled" />
+                  </div>
+                </div>
+
+                <div className="setting-container">
+                  <div className="setting-container-left">
+                    <CWText type="h4">Admin Alerts</CWText>
+
+                    <CWText className="text-muted">
+                      Notifications for communities you are an admin for
+                    </CWText>
+                  </div>
+
+                  <div className="setting-container-right">
+                    <PushNotificationsToggle pref="mobile_push_admin_alerts_enabled" />
+                  </div>
+                </div>
+              </div>
+            )}
           </>
         )}
 

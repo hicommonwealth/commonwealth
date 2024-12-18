@@ -1,3 +1,4 @@
+import { S3_ASSET_BUCKET_CDN } from '@hicommonwealth/shared';
 import { APIOrderDirection } from 'helpers/constants';
 import React from 'react';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
@@ -49,8 +50,7 @@ const newCommunity = (): any => {
     ),
     avatars: {
       name: {
-        avatarUrl:
-          'https://assets.commonwealth.im/f5c5a0c6-0552-40be-bb4b-b25fbd0cfbe2.png',
+        avatarUrl: `https://${S3_ASSET_BUCKET_CDN}/f5c5a0c6-0552-40be-bb4b-b25fbd0cfbe2.png`,
       },
     },
   };

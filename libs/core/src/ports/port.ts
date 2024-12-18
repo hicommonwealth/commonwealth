@@ -1,4 +1,3 @@
-import { delay } from '@hicommonwealth/shared';
 import { config } from '../config';
 import { logger, rollbar } from '../logging';
 import { ExitCode } from './enums';
@@ -12,6 +11,7 @@ import {
   Cache,
   Disposable,
   Disposer,
+  IdentifyUserOptions,
   NotificationsProvider,
   NotificationsProviderSchedulesReturn,
   Stats,
@@ -25,19 +25,106 @@ const log = logger(import.meta);
 const adapters = new Map<string, Disposable>();
 
 /**
+ * Maps ports to default adapters aka factory names to adapter keys or names
+ */
+const defaultAdapters = new Map<string, string>();
+
+const InvalidKey = (key: string) => new Error(`Invalid adapter key: ${key}`);
+const ExistingDefaultAdapter = (key: string) =>
+  new Error(`Default adapter for ${key} port already exists`);
+
+/**
  * Wraps creation of adapters around factory functions
  * @param factory adapter of T factory function
  * @returns adapter instance
  */
 export function port<T extends Disposable>(factory: AdapterFactory<T>) {
-  return function (adapter?: T) {
-    if (!adapters.has(factory.name)) {
-      const instance = factory(adapter);
-      adapters.set(factory.name, instance);
-      log.info(`[binding adapter] ${instance.name || factory.name}`);
-      return instance;
+  return function (
+    options?:
+      | {
+          key: `${string}.${string}.${string}`;
+          adapter?: never;
+          isDefault?: never;
+        }
+      | {
+          key?: never;
+          adapter: T;
+          isDefault?: never;
+        }
+      | {
+          key: `${string}.${string}.${string}`;
+          adapter: T;
+          isDefault: boolean;
+        },
+  ) {
+    // If no option use default adapter or set in-memory adapter as default
+    if (!options) {
+      const defaultAdapterKey = defaultAdapters.get(factory.name);
+      if (defaultAdapterKey) return adapters.get(defaultAdapterKey) as T;
+
+      const adapterInstance = factory();
+      log.info(`[binding default adapter] ${adapterInstance.name}`);
+      defaultAdapters.set(factory.name, adapterInstance.name);
+      adapters.set(adapterInstance.name, adapterInstance);
+      return adapterInstance as T;
     }
-    return adapters.get(factory.name) as T;
+
+    // validate key at runtime to prevent confusing keys e.g.
+    // key = 'S3' for R2 adapter.
+    // skip key checks during tests to allow mocking adapters with specific keys
+    if (options.key && config.NODE_ENV !== 'test') {
+      const parts = options.key.split('.');
+      if (parts.length !== 3) throw InvalidKey(options.key);
+      if (parts[0] !== factory.name) throw InvalidKey(options.key);
+      if (options.adapter && parts[1] !== options.adapter.name)
+        throw InvalidKey(options.key);
+    }
+
+    // only key is given i.e. options = { key }
+    // return adapter associated with given key or throw if not found
+    if (options.key && !options.adapter && options.isDefault === undefined) {
+      const adapterInstance = adapters.get(options.key);
+      if (!adapterInstance)
+        throw new Error(`Adapter ${options.key} not found!`);
+      return adapterInstance as T;
+    }
+
+    // only adapter is given i.e. options = { adapter }
+    // set adapter as default for port or throw if default already exists
+    if (options.adapter && !options.key && options.isDefault === undefined) {
+      if (defaultAdapters.has(factory.name))
+        throw ExistingDefaultAdapter(factory.name);
+      const adapterInstance = factory(options.adapter);
+      defaultAdapters.set(factory.name, adapterInstance.name);
+      adapters.set(adapterInstance.name, adapterInstance);
+      return adapterInstance as T;
+    }
+
+    // all options provided i.e. options = { key, adapter, isDefault }
+    // prevent default overrides but return existing adapter for key if
+    // available instead of throwing
+    if (options.key && options.adapter && options.isDefault !== undefined) {
+      if (options.isDefault && defaultAdapters.has(factory.name)) {
+        throw ExistingDefaultAdapter(factory.name);
+      }
+
+      const existingAdapter = adapters.get(options.key);
+      if (existingAdapter) {
+        log.warn(`Adapter with ${options.key} already exists`);
+        return existingAdapter as T;
+      }
+
+      const adapterInstance = factory(options.adapter);
+      if (options.isDefault) {
+        defaultAdapters.set(factory.name, options.key);
+        log.info(`[binding default adapter] ${options.key}`);
+      } else log.info(`[binding adapter] ${options.key}`);
+
+      adapters.set(options.key, adapterInstance);
+      return adapterInstance as T;
+    }
+
+    throw new Error(`Adapter for the ${factory.name} port not found!`);
   };
 }
 
@@ -57,7 +144,7 @@ const disposeAndExit = async (
 ): Promise<void> => {
   // don't kill process when errors are caught in production
   if (code === 'ERROR' && config.NODE_ENV === 'production') {
-    if (forceExit) await delay(1_000);
+    if (forceExit) await new Promise((resolve) => setTimeout(resolve, 1_000));
     else return;
   }
 
@@ -70,6 +157,7 @@ const disposeAndExit = async (
     }),
   );
   adapters.clear();
+  defaultAdapters.clear();
 
   if (config.NODE_ENV !== 'test' && code !== 'UNIT_TEST') {
     rollbar.wait(() => {
@@ -81,10 +169,9 @@ const disposeAndExit = async (
 };
 
 export const disposeAdapter = (name: string): void => {
-  // eslint-disable-next-line @typescript-eslint/no-floating-promises
-  adapters.get(name)?.dispose();
-  adapters.delete(name);
+  void adapters.get(name)?.dispose();
   adapters.clear();
+  defaultAdapters.clear();
 };
 
 /**
@@ -124,9 +211,9 @@ process.once('unhandledRejection', async (arg?: any) => {
 /**
  * Stats port factory
  */
-export const stats = port(function stats(stats?: Stats) {
+export const stats = port(function statsFactory(statsAdapter?: Stats) {
   return (
-    stats || {
+    statsAdapter || {
       name: 'in-memory-stats',
       dispose: () => Promise.resolve(),
       histogram: (key, value, tags) => {
@@ -164,9 +251,9 @@ export const stats = port(function stats(stats?: Stats) {
 /**
  * Cache port factory
  */
-export const cache = port(function cache(cache?: Cache) {
+export const cache = port(function cacheFactory(cacheAdapter?: Cache) {
   return (
-    cache || {
+    cacheAdapter || {
       name: 'in-memory-cache',
       dispose: () => Promise.resolve(),
       ready: () => Promise.resolve(true),
@@ -190,9 +277,11 @@ export const cache = port(function cache(cache?: Cache) {
 /**
  * Analytics port factory
  */
-export const analytics = port(function analytics(analytics?: Analytics) {
+export const analytics = port(function analyticsFactory(
+  analyticsAdapter?: Analytics,
+) {
   return (
-    analytics || {
+    analyticsAdapter || {
       name: 'in-memory-analytics',
       dispose: () => Promise.resolve(),
       track: (event, payload) => {
@@ -205,32 +294,30 @@ export const analytics = port(function analytics(analytics?: Analytics) {
 /**
  * Broker port factory
  */
-export const broker = port(function broker(broker?: Broker) {
-  return broker || successfulInMemoryBroker;
+export const broker = port(function brokerFactory(brokerAdapter?: Broker) {
+  return brokerAdapter || successfulInMemoryBroker;
 });
 
 /**
  * External blob storage port factory
  */
-export const blobStorage = port(function blobStorage(
-  // eslint-disable-next-line @typescript-eslint/no-shadow
-  blobStorage?: BlobStorage,
+export const blobStorage = port(function blobStorageFactory(
+  blobStorageAdapter?: BlobStorage,
 ) {
-  return blobStorage || inMemoryBlobStorage;
+  return blobStorageAdapter || inMemoryBlobStorage;
 });
 
 /**
  * Notifications provider port factory
  */
-export const notificationsProvider = port(function notificationsProvider(
-  // eslint-disable-next-line @typescript-eslint/no-shadow
-  notificationsProvider?: NotificationsProvider,
+export const notificationsProvider = port(function notificationsProviderFactory(
+  notificationsProviderAdapter?: NotificationsProvider,
 ) {
   return (
-    notificationsProvider || {
+    notificationsProviderAdapter || {
       name: 'in-memory-notifications-provider',
       dispose: () => Promise.resolve(),
-      triggerWorkflow: () => Promise.resolve(true),
+      triggerWorkflow: () => Promise.resolve([]),
       getMessages: () => Promise.resolve([]),
       getSchedules: () =>
         Promise.resolve([] as NotificationsProviderSchedulesReturn),
@@ -238,6 +325,8 @@ export const notificationsProvider = port(function notificationsProvider(
         Promise.resolve([] as NotificationsProviderSchedulesReturn),
       deleteSchedules: ({ schedule_ids }) =>
         Promise.resolve(new Set(schedule_ids)),
+      identifyUser: (options: IdentifyUserOptions) =>
+        Promise.resolve({ id: options.user_id }),
       registerClientRegistrationToken: () => Promise.resolve(false),
       unregisterClientRegistrationToken: () => Promise.resolve(false),
     }

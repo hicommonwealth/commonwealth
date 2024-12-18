@@ -1,3 +1,4 @@
+import Knock from '@knocklabs/client';
 import {
   KnockFeedProvider,
   KnockProvider,
@@ -5,10 +6,10 @@ import {
   NotificationIconButton,
 } from '@knocklabs/react';
 import '@knocklabs/react-notification-feed/dist/index.css';
-import React, { useRef, useState } from 'react';
+import React, { memo, useEffect, useRef, useState } from 'react';
 import useUserStore from 'state/ui/user';
+import CustomNotificationCell from './CustomNotificationCell';
 import './KnockNotifications.scss';
-
 const KNOCK_PUBLIC_API_KEY =
   process.env.KNOCK_PUBLIC_API_KEY ||
   'pk_test_Hd4ZpzlVcz9bqepJQoo9BvZHokgEqvj4T79fPdKqpYM';
@@ -16,13 +17,43 @@ const KNOCK_PUBLIC_API_KEY =
 const KNOCK_IN_APP_FEED_ID =
   process.env.KNOCK_IN_APP_FEED_ID || 'fc6e68e5-b7b9-49c1-8fab-6dd7e3510ffb';
 
-export const KnockNotifications = () => {
+const knock = new Knock(KNOCK_PUBLIC_API_KEY);
+
+const getBrowserTimezone = (): string => {
+  return Intl.DateTimeFormat().resolvedOptions().timeZone;
+};
+
+export const KnockNotifications = memo(function KnockNotifications() {
   const user = useUserStore();
   const [isVisible, setIsVisible] = useState(false);
 
   const notifButtonRef = useRef(null);
 
-  if (user.id === 0) {
+  useEffect(() => {
+    if (!user.id || !user.isLoggedIn) {
+      return;
+    }
+
+    if (!user.knockJWT) {
+      console.warn('user knockJWT not set!  Will not attempt to identify.');
+      return;
+    }
+
+    const timezone = getBrowserTimezone();
+    async function doAsync() {
+      knock.authenticate(`${user.id}`, user.knockJWT);
+
+      await knock.user.identify({
+        id: user.id,
+        email: user.email,
+        timezone,
+      });
+    }
+
+    doAsync().catch(console.error);
+  }, [user.email, user.id, user.isLoggedIn, user.knockJWT]);
+
+  if (!user.id || !user.isLoggedIn) {
     return null;
   }
 
@@ -48,10 +79,11 @@ export const KnockNotifications = () => {
               buttonRef={notifButtonRef}
               isVisible={isVisible}
               onClose={() => setIsVisible(false)}
+              renderItem={CustomNotificationCell}
             />
           </div>
         </KnockFeedProvider>
       </KnockProvider>
     </div>
   );
-};
+});

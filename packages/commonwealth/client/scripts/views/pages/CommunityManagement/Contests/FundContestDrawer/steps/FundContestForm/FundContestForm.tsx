@@ -29,16 +29,17 @@ interface FundContestFormProps {
     value: string;
     label: string;
   }) => void;
-  userEthBalance: string;
+  userTokenBalance: string;
   contestAddress: string;
-  contestEthBalance: string;
-  amountEth: string;
-  handleChangeEthAmount: (e) => void;
+  contestTokenBalance: string;
+  tokenAmount: string;
+  handleChangeTokenAmount: (e) => void;
   amountError: string;
-  amountEthInUsd: string;
-  newContestBalanceInEth: string;
+  tokenAmountInUsd: string;
+  newContestTokenBalance: string;
   newContestBalanceInUsd: string;
   handleTransferFunds: () => void;
+  fundingTokenTicker: string;
 }
 
 const FundContestForm = ({
@@ -46,18 +47,19 @@ const FundContestForm = ({
   selectedAddress,
   addressOptions,
   onSetSelectedAddress,
-  userEthBalance,
+  userTokenBalance,
   contestAddress,
-  contestEthBalance,
-  amountEth,
-  handleChangeEthAmount,
+  contestTokenBalance,
+  tokenAmount,
+  handleChangeTokenAmount,
   amountError,
-  amountEthInUsd,
-  newContestBalanceInEth,
+  tokenAmountInUsd,
+  newContestTokenBalance,
   newContestBalanceInUsd,
   handleTransferFunds,
+  fundingTokenTicker,
 }: FundContestFormProps) => {
-  const amountEthValue = amountEth ? Number(amountEth) : '';
+  const tokenAmountValue = tokenAmount ? Number(tokenAmount) : '';
 
   return (
     <div className="FundContestForm">
@@ -84,7 +86,7 @@ const FundContestForm = ({
             Current Balance
           </CWText>
           <CWText type="caption" fontWeight="medium">
-            {displayAmount(userEthBalance)} ETH
+            {displayAmount(userTokenBalance)} {fundingTokenTicker}
           </CWText>
         </div>
 
@@ -98,14 +100,14 @@ const FundContestForm = ({
             Current Balance
           </CWText>
           <CWText type="caption" fontWeight="medium">
-            {displayAmount(contestEthBalance)} ETH
+            {displayAmount(contestTokenBalance)} {fundingTokenTicker}
           </CWText>
         </div>
 
         <CWTextInput
           placeholder="0.00"
-          value={amountEthValue}
-          onInput={handleChangeEthAmount}
+          value={tokenAmountValue}
+          onInput={handleChangeTokenAmount}
           label="Amount"
           type="number"
           containerClassName="eth-amount"
@@ -124,7 +126,7 @@ const FundContestForm = ({
           )}
 
           <CWText type="b2" fontWeight="medium">
-            {displayAmount(amountEthInUsd)} USD
+            {displayAmount(tokenAmountInUsd)} USD
           </CWText>
         </div>
 
@@ -132,7 +134,7 @@ const FundContestForm = ({
           <div className="first-row">
             <CWText type="caption">New Contest Balance:</CWText>
             <CWText type="caption" fontWeight="medium">
-              {displayAmount(newContestBalanceInEth)} ETH
+              {displayAmount(newContestTokenBalance)} {fundingTokenTicker}
             </CWText>
           </div>
           <CWText type="caption" fontWeight="medium">

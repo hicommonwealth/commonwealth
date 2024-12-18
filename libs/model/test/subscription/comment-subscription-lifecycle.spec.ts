@@ -2,7 +2,6 @@ import { Actor, command, dispose, query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { BalanceType } from '@hicommonwealth/shared';
 import { expect } from 'chai';
-import { bootstrap_testing, seed } from 'model/src/tester';
 import { afterAll, afterEach, beforeAll, describe, test } from 'vitest';
 import z from 'zod';
 import { models } from '../../src/database';
@@ -11,13 +10,14 @@ import {
   DeleteCommentSubscription,
   GetCommentSubscriptions,
 } from '../../src/subscription';
+import { seed } from '../../src/tester';
 
 describe('Comment subscription lifecycle', () => {
   let actor: Actor;
   let commentOne: z.infer<typeof schemas.Comment> | undefined;
   let commentTwo: z.infer<typeof schemas.Comment> | undefined;
+
   beforeAll(async () => {
-    await bootstrap_testing(true);
     const [user] = await seed('User', {
       isAdmin: false,
       selected_community_id: null,
@@ -38,6 +38,7 @@ describe('Comment subscription lifecycle', () => {
           user_id: user!.id,
         },
       ],
+      topics: [{}],
     });
 
     const [thread] = await seed('Thread', {
@@ -46,15 +47,18 @@ describe('Comment subscription lifecycle', () => {
       topic_id: community?.topics?.at(0)?.id,
       pinned: false,
       read_only: false,
+      reaction_weights_sum: '0',
     });
 
     [commentOne] = await seed('Comment', {
       address_id: community?.Addresses?.at(0)?.id,
       thread_id: thread!.id!,
+      reaction_weights_sum: '0',
     });
     [commentTwo] = await seed('Comment', {
       address_id: community?.Addresses?.at(0)?.id,
       thread_id: thread!.id!,
+      reaction_weights_sum: '0',
     });
     actor = {
       user: { id: user!.id!, email: user!.email! },

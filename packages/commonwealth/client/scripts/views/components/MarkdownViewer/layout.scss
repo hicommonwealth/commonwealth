@@ -1,0 +1,26 @@
+@import '../../../styles/shared';
+
+// Basic layout for the HTML content that is rendered.
+
+.mdxeditor-root-contenteditable {
+  table {
+    width: 100%;
+  }
+
+  th {
+    background-color: $neutral-100;
+    text-align: left;
+  }
+
+  table {
+    border-spacing: 0;
+    border-collapse: collapse;
+  }
+
+  th,
+  td {
+    padding: 8px;
+    border: 1px solid $neutral-300;
+    margin: 0;
+  }
+}

@@ -1,4 +1,4 @@
-import type { QueryMetadata, User } from '@hicommonwealth/core';
+import type { Metadata, User } from '@hicommonwealth/core';
 import * as core from '@hicommonwealth/core';
 import type { NextFunction, Request, RequestHandler, Response } from 'express';
 import { ZodSchema, z } from 'zod';
@@ -9,8 +9,12 @@ import { ZodSchema, z } from 'zod';
  * @returns express query handler
  */
 export const query =
-  <Input extends ZodSchema, Output extends ZodSchema>(
-    md: QueryMetadata<Input, Output>,
+  <
+    Input extends ZodSchema,
+    Output extends ZodSchema,
+    Context extends ZodSchema,
+  >(
+    md: Metadata<Input, Output, Context>,
   ): RequestHandler =>
   async (
     req: Request,

@@ -28,6 +28,11 @@ const {
   LOAD_TESTING_AUTH_TOKEN,
   SEND_WEBHOOKS,
   SEND_WEBHOOKS_CONFIRMATION_TIMESTAMP,
+  SEND_EMAILS,
+  DISABLE_LOCAL_QUEUE_PURGE,
+  R2_ACCESS_KEY_ID,
+  R2_SECRET_ACCESS_KEY,
+  R2_ACCOUNT_ID,
 } = process.env;
 
 export const config = configure(
@@ -41,6 +46,7 @@ export const config = configure(
     },
     BROKER: {
       RABBITMQ_URI: CLOUDAMQP_URL ?? DEFAULTS.RABBITMQ_URI,
+      DISABLE_LOCAL_QUEUE_PURGE: DISABLE_LOCAL_QUEUE_PURGE === 'true',
     },
     NOTIFICATIONS: {
       FLAG_KNOCK_INTEGRATION_ENABLED:
@@ -56,6 +62,7 @@ export const config = configure(
           SEND_WEBHOOKS_CONFIRMATION_TIMESTAMP ?? '0',
         ),
       },
+      SEND_EMAILS: SEND_EMAILS === 'true',
     },
     ANALYTICS: {
       MIXPANEL_PROD_TOKEN,
@@ -71,6 +78,13 @@ export const config = configure(
     },
     LOAD_TESTING: {
       AUTH_TOKEN: LOAD_TESTING_AUTH_TOKEN || DEFAULTS.LOAD_TESTING_AUTH_TOKEN,
+    },
+    CLOUDFLARE: {
+      R2: {
+        ACCOUNT_ID: R2_ACCOUNT_ID,
+        ACCESS_KEY_ID: R2_ACCESS_KEY_ID,
+        SECRET_ACCESS_KEY: R2_SECRET_ACCESS_KEY,
+      },
     },
   },
   z.object({
@@ -93,6 +107,11 @@ export const config = configure(
           data === DEFAULTS.RABBITMQ_URI
         );
       }, 'RABBITMQ_URI is require in production, beta (QA), demo, and frick Heroku apps'),
+      DISABLE_LOCAL_QUEUE_PURGE: z
+        .boolean()
+        .describe(
+          'Disable purging all messages in queues when a consumer starts up',
+        ),
     }),
     NOTIFICATIONS: z
       .object({
@@ -131,6 +150,7 @@ export const config = configure(
           .describe(
             'A flag indicating whether the Knock integration is enabled or disabled',
           ),
+        SEND_EMAILS: z.boolean(),
         WEBHOOKS: z
           .object({
             SEND: z
@@ -274,9 +294,7 @@ export const config = configure(
       })
       .refine(
         (data) => {
-          if (
-            !['local', 'CI', 'discobot', 'snapshot'].includes(target.APP_ENV)
-          ) {
+          if (!['local', 'CI'].includes(target.APP_ENV)) {
             return (
               !!LOAD_TESTING_AUTH_TOKEN &&
               data.AUTH_TOKEN !== DEFAULTS.LOAD_TESTING_AUTH_TOKEN
@@ -290,5 +308,21 @@ export const config = configure(
           path: ['AUTH_TOKEN'],
         },
       ),
+    CLOUDFLARE: z.object({
+      R2: z
+        .object({
+          ACCOUNT_ID: z.string().optional(),
+          ACCESS_KEY_ID: z.string().optional(),
+          SECRET_ACCESS_KEY: z.string().optional(),
+        })
+        .refine((data) => {
+          if (target.APP_ENV === 'CI' || target.NODE_ENV === 'test')
+            return true;
+          else
+            return (
+              data.ACCOUNT_ID && data.ACCESS_KEY_ID && data.SECRET_ACCESS_KEY
+            );
+        }),
+    }),
   }),
 );

@@ -1,9 +1,11 @@
-import { Policy, events } from '@hicommonwealth/core';
+import { Policy } from '@hicommonwealth/core';
+import { events } from '@hicommonwealth/schemas';
 import { processChainEventCreated } from './eventHandlers/chainEventCreated';
 import { processCommentCreated } from './eventHandlers/commentCreated';
+import { processCommentUpvoted } from './eventHandlers/commentUpvoted';
 import { processSnapshotProposalCreated } from './eventHandlers/snapshotProposalCreated';
-import { processSubscriptionPreferencesUpdated } from './eventHandlers/subscriptionPreferencesUpdated';
 import { processThreadCreated } from './eventHandlers/threadCreated';
+import { processThreadUpvoted } from './eventHandlers/threadUpvoted';
 import { processUserMentioned } from './eventHandlers/userMentioned';
 
 const notificationInputs = {
@@ -12,7 +14,8 @@ const notificationInputs = {
   ThreadCreated: events.ThreadCreated,
   CommentCreated: events.CommentCreated,
   UserMentioned: events.UserMentioned,
-  SubscriptionPreferencesUpdated: events.SubscriptionPreferencesUpdated,
+  ThreadUpvoted: events.ThreadUpvoted,
+  CommentUpvoted: events.CommentUpvoted,
 };
 
 export function NotificationsPolicy(): Policy<typeof notificationInputs> {
@@ -40,8 +43,12 @@ export function NotificationsPolicy(): Policy<typeof notificationInputs> {
         await processUserMentioned(event);
       },
       // eslint-disable-next-line @typescript-eslint/require-await
-      SubscriptionPreferencesUpdated: async (event) => {
-        await processSubscriptionPreferencesUpdated(event);
+      ThreadUpvoted: async (event) => {
+        await processThreadUpvoted(event);
+      },
+      // eslint-disable-next-line @typescript-eslint/require-await
+      CommentUpvoted: async (event) => {
+        await processCommentUpvoted(event);
       },
     },
   };

@@ -1,3 +1,7 @@
+import { ChainBase } from '@hicommonwealth/shared';
+import { setActiveAccount } from 'client/scripts/controllers/app/login';
+import Account from 'client/scripts/models/Account';
+import { buildUpdateCommunityInput } from 'client/scripts/state/api/communities/updateCommunity';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import { useState } from 'react';
 import {
@@ -16,6 +20,8 @@ interface UseReserveCommunityNamespaceProps {
   symbol: string;
   userAddress: string;
   chainId: string;
+  onSuccess?: () => void;
+  hasNamespaceReserved?: boolean;
 }
 
 const useReserveCommunityNamespace = ({
@@ -24,9 +30,14 @@ const useReserveCommunityNamespace = ({
   symbol,
   userAddress,
   chainId,
+  onSuccess,
+  hasNamespaceReserved,
 }: UseReserveCommunityNamespaceProps) => {
-  const [reserveNamespaceData, setReserveNamespaceData] =
-    useState<ActionState>(defaultActionState);
+  const [reserveNamespaceData, setReserveNamespaceData] = useState<ActionState>(
+    hasNamespaceReserved
+      ? { state: 'completed', errorText: '' }
+      : defaultActionState,
+  );
 
   const { namespaceFactory } = useNamespaceFactory(parseInt(chainId));
   const { mutateAsync: updateCommunity } = useUpdateCommunityMutation({
@@ -48,6 +59,17 @@ const useReserveCommunityNamespace = ({
         errorText: '',
       });
 
+      // set active account so that updateCommunity works
+      await setActiveAccount(
+        new Account({
+          community: {
+            id: communityId,
+            base: ChainBase.Ethereum, // namespaces only support EVM
+          },
+          address: userAddress,
+        }),
+      );
+
       const txReceipt = await namespaceFactory.deployNamespace(
         namespace,
         userAddress,
@@ -55,17 +77,21 @@ const useReserveCommunityNamespace = ({
         chainId,
       );
 
-      await updateCommunity({
-        communityId,
-        namespace,
-        symbol,
-        transactionHash: txReceipt.transactionHash,
-      });
+      await updateCommunity(
+        buildUpdateCommunityInput({
+          communityId,
+          namespace,
+          symbol,
+          transactionHash: txReceipt.transactionHash,
+        }),
+      );
 
       setReserveNamespaceData({
         state: 'completed',
         errorText: '',
       });
+
+      onSuccess?.();
 
       trackAnalytics({
         event: MixpanelCommunityStakeEvent.RESERVED_COMMUNITY_NAMESPACE,

@@ -1,0 +1,20 @@
+.MobileOverflowButton {
+  button {
+    outline: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+  }
+}
+
+.MobileOverflowButtonPopover {
+  padding: 4px;
+
+  margin-bottom: 8px;
+  margin-top: 8px;
+
+  button {
+    outline: none;
+    border: none;
+  }
+}

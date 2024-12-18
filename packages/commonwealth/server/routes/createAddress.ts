@@ -5,13 +5,12 @@ import {
   ChainBase,
   WalletId,
   addressSwapper,
-  type WalletSsoSource,
+  bech32ToHex,
 } from '@hicommonwealth/shared';
 import { bech32 } from 'bech32';
 import crypto from 'crypto';
 import { Op } from 'sequelize';
 import { MixpanelUserSignupEvent } from '../../shared/analytics/types';
-import { bech32ToHex } from '../../shared/utils';
 import { config } from '../config';
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
 import type { TypedRequestBody, TypedResponse } from '../types';
@@ -29,7 +28,6 @@ export type CreateAddressReq = {
   address: string;
   community_id?: string;
   wallet_id: WalletId;
-  wallet_sso_source: WalletSsoSource;
   block_info?: string;
 };
 
@@ -43,8 +41,7 @@ const createAddress = async (
   req: TypedRequestBody<CreateAddressReq>,
   res: TypedResponse<CreateAddressResp>,
 ) => {
-  // @ts-expect-error StrictNullChecks
-  const user = req.body.user;
+  const user = req.user;
 
   // start the process of creating a new address. this may be called
   // when logged in to link a new address for an existing user, or
@@ -80,7 +77,7 @@ const createAddress = async (
 
   // test / convert address as needed
   let encodedAddress = (req.body.address as string).trim();
-  let addressHex: string;
+  let addressHex: string | undefined;
   let existingAddressWithHex: AddressInstance;
   try {
     if (community.base === ChainBase.Substrate) {
@@ -93,8 +90,7 @@ const createAddress = async (
       // cosmos or injective
       const { words } = bech32.decode(req.body.address, 50);
       encodedAddress = bech32.encode(community.bech32_prefix, words);
-      // @ts-expect-error StrictNullChecks
-      addressHex = await bech32ToHex(req.body.address);
+      addressHex = bech32ToHex(req.body.address);
 
       // check all addresses for matching hex
       const existingHexes = await models.Address.scope(
@@ -170,12 +166,10 @@ const createAddress = async (
     existingAddress.last_active = new Date();
     existingAddress.block_info = req.body.block_info;
 
-    // @ts-expect-error StrictNullChecks
     existingAddress.hex = addressHex;
 
     // we update addresses with the wallet used to sign in
     existingAddress.wallet_id = req.body.wallet_id;
-    existingAddress.wallet_sso_source = req.body.wallet_sso_source;
 
     const updatedObj = await existingAddress.save();
 
@@ -199,26 +193,20 @@ const createAddress = async (
       user_id = existingAddressWithHex.user_id;
     }
 
-    const newObj = await models.sequelize.transaction(async (transaction) => {
-      return models.Address.create(
-        {
-          user_id,
-          community_id: req.body.community_id!,
-          address: encodedAddress,
-          hex: addressHex,
-          verification_token,
-          verification_token_expires,
-          block_info: req.body.block_info,
-          last_active,
-          wallet_id: req.body.wallet_id,
-          wallet_sso_source: req.body.wallet_sso_source,
-          role: 'member',
-          is_user_default: false,
-          ghost_address: false,
-          is_banned: false,
-        },
-        { transaction },
-      );
+    const newObj = await models.Address.create({
+      user_id,
+      community_id: req.body.community_id!,
+      address: encodedAddress,
+      hex: addressHex!,
+      verification_token,
+      verification_token_expires,
+      block_info: req.body.block_info,
+      last_active,
+      wallet_id: req.body.wallet_id,
+      role: 'member',
+      is_user_default: false,
+      ghost_address: false,
+      is_banned: false,
     });
 
     // eslint-disable-next-line @typescript-eslint/no-floating-promises

@@ -9,13 +9,13 @@ import {
 import React, { ReactNode } from 'react';
 
 import clsx from 'clsx';
-import 'components/component_kit/new_designs/CWBanner.scss';
 import { CWText } from 'views/components/component_kit/cw_text';
 import {
   ButtonProps,
   ButtonType,
   CWButton,
 } from 'views/components/component_kit/new_designs/CWButton';
+import './CWBanner.scss';
 
 const typeIconLookup: {
   [key in BannerType]: React.ForwardRefExoticComponent<IconProps>;
@@ -32,7 +32,7 @@ export type BannerType = 'default' | 'info' | 'success' | 'warning' | 'error';
 
 interface CWBannerProps {
   type?: BannerType;
-  title: string;
+  title?: string;
   body?: string | ReactNode;
   buttons?: ButtonProps[];
   className?: string;
@@ -74,9 +74,11 @@ const CWBanner = ({
       )}
       <div className="content-container">
         <div>
-          <CWText type="b1" fontWeight="medium" className="header">
-            {title}
-          </CWText>
+          {title && (
+            <CWText type="b1" fontWeight="medium" className="header">
+              {title}
+            </CWText>
+          )}
           {body && (
             <div>
               <CWText type="b2" className="body">

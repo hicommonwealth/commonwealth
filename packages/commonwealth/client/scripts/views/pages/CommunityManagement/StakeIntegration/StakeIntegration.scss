@@ -1,4 +1,4 @@
-@import '../../../../../styles/shared';
+@import '../../../../styles/shared';
 
 .StakeIntegration {
   display: flex;
@@ -6,4 +6,17 @@
   gap: 24px;
   width: 100%;
   align-items: flex-start;
+
+  .action-buttons {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 8px;
+
+    @include extraSmall {
+      justify-content: flex-end;
+    }
+  }
 }

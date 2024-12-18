@@ -1,0 +1,45 @@
+@import '../../../../../styles/shared.scss';
+
+.RadioPanel {
+  display: flex;
+  flex-direction: column;
+  width: 292px;
+  border: 1px solid $neutral-200;
+  border-radius: 6px;
+  padding: 16px;
+  cursor: pointer;
+
+  &:focus {
+    outline: none;
+  }
+
+  &.disabled {
+    cursor: not-allowed;
+    background-color: $neutral-100;
+
+    .Text {
+      color: $neutral-300;
+    }
+  }
+
+  &.selected {
+    background-color: $primary-50;
+    border-color: $primary-500;
+  }
+
+  .top-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+
+    .label {
+      font-size: 16px;
+      font-weight: 700;
+    }
+  }
+
+  .option-description {
+    margin-left: 24px;
+  }
+}

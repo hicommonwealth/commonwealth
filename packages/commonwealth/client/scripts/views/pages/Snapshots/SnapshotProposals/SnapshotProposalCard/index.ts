@@ -1,0 +1,1 @@
+export { SnapshotProposalCard } from './SnapshotProposalCard';

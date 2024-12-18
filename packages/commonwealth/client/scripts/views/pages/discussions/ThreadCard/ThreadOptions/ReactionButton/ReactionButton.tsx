@@ -1,6 +1,8 @@
+import { buildCreateThreadReactionInput } from 'client/scripts/state/api/threads/createReaction';
+import { buildDeleteThreadReactionInput } from 'client/scripts/state/api/threads/deleteReaction';
+import { useAuthModalStore } from 'client/scripts/state/ui/modals';
 import { notifyError } from 'controllers/app/notifications';
 import { SessionKeyError } from 'controllers/server/sessions';
-import useAppStatus from 'hooks/useAppStatus';
 import type Thread from 'models/Thread';
 import React, { useState } from 'react';
 import app from 'state';
@@ -37,16 +39,16 @@ export const ReactionButton = ({
   undoUpvoteDisabled,
 }: ReactionButtonProps) => {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
-  const reactors = thread?.associatedReactions?.map((t) => t.address);
+  const reactors = thread?.associatedReactions?.map((t) => t.address!);
 
-  const { isAddedToHomeScreen } = useAppStatus();
+  const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
   const user = useUserStore();
 
   const reactionWeightsSum =
-    thread?.associatedReactions?.reduce(
-      (acc, curr) => acc + (curr.voting_weight || 1),
-      0,
-    ) || 0;
+    BigInt(thread?.reactionWeightsSum || 0) > 0
+      ? thread?.reactionWeightsSum
+      : thread?.reactionCount?.toString() || '0';
+
   const activeAddress = user.activeAccount?.address;
   const thisUserReaction = thread?.associatedReactions?.filter(
     (r) => r.address === activeAddress,
@@ -56,16 +58,23 @@ export const ReactionButton = ({
     thisUserReaction?.length === 0 ? -1 : thisUserReaction?.[0]?.id;
   const popoverProps = usePopover();
 
+  const communityId = app.activeChainId() || '';
   const { mutateAsync: createThreadReaction, isLoading: isAddingReaction } =
     useCreateThreadReactionMutation({
-      communityId: app.activeChainId(),
+      communityId,
       threadId: thread.id,
+      threadMsgId: thread.canvasMsgId!,
+      currentReactionCount: thread.reactionCount || 0,
+      currentReactionWeightsSum: `${thread?.reactionWeightsSum || 0}`,
     });
   const { mutateAsync: deleteThreadReaction, isLoading: isDeletingReaction } =
     useDeleteThreadReactionMutation({
-      communityId: app.activeChainId(),
+      communityId,
       address: user.activeAccount?.address || '',
       threadId: thread.id,
+      threadMsgId: thread.canvasMsgId!,
+      currentReactionCount: thread.reactionCount || 0,
+      currentReactionWeightsSum: `${thread?.reactionWeightsSum || 0}`,
     });
 
   if (showSkeleton) return <ReactionButtonSkeleton />;
@@ -86,29 +95,42 @@ export const ReactionButton = ({
         return notifyError('Upvotes on contest entries cannot be removed');
       }
 
-      deleteThreadReaction({
-        communityId: app.activeChainId(),
+      const input = await buildDeleteThreadReactionInput({
+        communityId,
         address: user.activeAccount?.address,
-        threadId: thread.id,
-        reactionId: reactedId as number,
-      }).catch((e) => {
+        threadId: thread.id!,
+        threadMsgId: thread.canvasMsgId!,
+        reactionId: +reactedId,
+      });
+      deleteThreadReaction(input).catch((e) => {
         if (e instanceof SessionKeyError) {
+          checkForSessionKeyRevalidationErrors(e);
           return;
         }
-        console.error(e.response.data.error || e?.message);
+        notifyError('Failed to unvote');
+        console.error(e?.response?.data?.error || e?.message);
       });
     } else {
-      createThreadReaction({
-        communityId: app.activeChainId(),
+      const input = await buildCreateThreadReactionInput({
+        communityId,
         address: activeAddress || '',
         threadId: thread.id,
+        threadMsgId: thread.canvasMsgId!,
         reactionType: 'like',
-        isPWA: isAddedToHomeScreen,
-      }).catch((e) => {
+      });
+      createThreadReaction(input).catch((e) => {
         if (e instanceof SessionKeyError) {
+          checkForSessionKeyRevalidationErrors(e);
           return;
         }
-        console.error(e.response.data.error || e?.message);
+        if ((e.message as string)?.includes('Insufficient token balance')) {
+          notifyError(
+            'You must have the requisite tokens to upvote in this topic',
+          );
+        } else {
+          notifyError('Failed to upvote');
+        }
+        console.error(e?.response?.data?.error || e?.message);
       });
     }
   };
@@ -117,7 +139,7 @@ export const ReactionButton = ({
     <>
       {size === 'small' ? (
         <CWUpvoteSmall
-          voteCount={reactionWeightsSum}
+          voteCount={reactionWeightsSum.toString()}
           disabled={disabled}
           isThreadArchived={!!thread.archivedAt}
           selected={hasReacted}
@@ -126,12 +148,13 @@ export const ReactionButton = ({
             reactors,
           })}
           tooltipText={tooltipText}
+          reactors={reactors}
         />
       ) : tooltipText ? (
         <TooltipWrapper disabled={disabled} text={tooltipText}>
           <CWUpvote
             onClick={handleVoteClick}
-            voteCount={reactionWeightsSum}
+            voteCount={reactionWeightsSum.toString()}
             disabled={disabled}
             active={hasReacted}
           />
@@ -143,7 +166,7 @@ export const ReactionButton = ({
         >
           <CWUpvote
             onClick={handleVoteClick}
-            voteCount={reactionWeightsSum}
+            voteCount={reactionWeightsSum.toString()}
             disabled={disabled}
             active={hasReacted}
           />
@@ -153,6 +176,7 @@ export const ReactionButton = ({
               body={getDisplayedReactorsForPopup({
                 reactors,
               })}
+              className="popover-content"
               {...popoverProps}
             />
           )}

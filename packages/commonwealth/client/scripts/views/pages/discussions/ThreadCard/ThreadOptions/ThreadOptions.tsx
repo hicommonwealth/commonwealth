@@ -1,7 +1,16 @@
+import {
+  CanvasSignedData,
+  deserializeCanvas,
+  verify,
+} from '@hicommonwealth/shared';
+import { CWIcon } from 'client/scripts/views/components/component_kit/cw_icons/cw_icon';
+import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
+import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/CWButton';
+import { CWTooltip } from 'client/scripts/views/components/component_kit/new_designs/CWTooltip';
 import { pluralize } from 'helpers';
 import { GetThreadActionTooltipTextResponse } from 'helpers/threads';
 import Thread from 'models/Thread';
-import React, { Dispatch, SetStateAction } from 'react';
+import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import useUserStore from 'state/ui/user';
 import Permissions from 'utils/Permissions';
 import { downloadDataAsFile } from 'utils/downloadDataAsFile';
@@ -28,6 +37,10 @@ type OptionsProps = AdminActionsProps & {
   hideUpvoteDrawerButton?: boolean;
   setIsUpvoteDrawerOpen?: Dispatch<SetStateAction<boolean>>;
   editingDisabled?: boolean;
+  onCommentClick?: () => void;
+  expandCommentBtnVisible?: boolean;
+  showCommentVisible?: boolean;
+  toggleShowComments?: () => void;
 };
 
 export const ThreadOptions = ({
@@ -56,13 +69,35 @@ export const ThreadOptions = ({
   hideUpvoteDrawerButton = false,
   setIsUpvoteDrawerOpen,
   editingDisabled,
+  onCommentClick,
+  expandCommentBtnVisible,
+  showCommentVisible,
+  toggleShowComments,
 }: OptionsProps) => {
   const isCommunityMember = Permissions.isCommunityMember(thread.communityId);
   const userStore = useUserStore();
 
   const handleDownloadMarkdown = () => {
-    downloadDataAsFile(thread.plaintext, 'text/markdown', thread.title + '.md');
+    downloadDataAsFile(thread.body, 'text/markdown', thread.title + '.md');
   };
+
+  const [verifiedCanvasSignedData, setVerifiedCanvasSignedData] =
+    useState<CanvasSignedData | null>(null);
+  useEffect(() => {
+    try {
+      const canvasSignedData: CanvasSignedData = deserializeCanvas(
+        thread.canvasSignedData!,
+      );
+      if (!canvasSignedData) return;
+      verify(canvasSignedData)
+        .then(() => {
+          setVerifiedCanvasSignedData(canvasSignedData);
+        })
+        .catch(() => null);
+    } catch (error) {
+      // ignore errors or missing data
+    }
+  }, [thread.canvasSignedData]);
 
   return (
     <>
@@ -102,6 +137,7 @@ export const ThreadOptions = ({
               onClick={(e) => {
                 e.preventDefault();
                 onCommentBtnClick();
+                onCommentClick && onCommentClick();
               }}
               tooltipText={
                 typeof disabledActionsTooltipText === 'function'
@@ -119,6 +155,27 @@ export const ThreadOptions = ({
               thread={thread}
               isCommunityMember={isCommunityMember}
             />
+          )}
+
+          {verifiedCanvasSignedData && (
+            <CWText
+              type="caption"
+              fontWeight="medium"
+              className="verification-icon"
+            >
+              <CWTooltip
+                placement="top"
+                content="Signed by author"
+                renderTrigger={(handleInteraction) => (
+                  <span
+                    onMouseEnter={handleInteraction}
+                    onMouseLeave={handleInteraction}
+                  >
+                    <CWIcon iconName="check" iconSize="xs" />
+                  </span>
+                )}
+              ></CWTooltip>
+            </CWText>
           )}
 
           {thread && (
@@ -141,6 +198,20 @@ export const ThreadOptions = ({
             />
           )}
         </div>
+        {Boolean(thread?.numberOfComments) && expandCommentBtnVisible && (
+          <CWButton
+            className="latest-button"
+            buttonType="tertiary"
+            buttonHeight="sm"
+            label={showCommentVisible ? 'Hide comments' : 'Show comments'}
+            iconLeft={showCommentVisible ? 'chevronUp' : 'chevronDown'}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              toggleShowComments?.();
+            }}
+          />
+        )}
         {!hideUpvoteDrawerButton && upvoteDrawerBtnBelow && (
           <ViewUpvotesDrawerTrigger
             onClick={(e) => {

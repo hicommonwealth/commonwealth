@@ -91,10 +91,6 @@ export function getAllRascalConfigs(
   };
 
   const allExchanges: Record<keyof OmittedRascalExchanges, ExchangeConfig> = {
-    [RascalExchanges.Discobot]: {
-      type: 'fanout',
-      ...exchangeConfig,
-    },
     [RascalExchanges.MessageRelayer]: {
       type: 'topic',
       ...exchangeConfig,
@@ -102,7 +98,7 @@ export function getAllRascalConfigs(
   };
 
   const allQueues: Record<keyof OmittedRascalQueue, QueueConfig> = {
-    [RascalQueues.DiscordListener]: {
+    [RascalQueues.DiscordBotPolicy]: {
       ...queueConfig,
       options: {
         arguments: queueOptions,
@@ -120,6 +116,12 @@ export function getAllRascalConfigs(
         arguments: queueOptions,
       },
     },
+    [RascalQueues.NotificationsSettings]: {
+      ...queueConfig,
+      options: {
+        arguments: queueOptions,
+      },
+    },
     [RascalQueues.ContestWorkerPolicy]: {
       ...queueConfig,
       options: {
@@ -127,6 +129,18 @@ export function getAllRascalConfigs(
       },
     },
     [RascalQueues.ContestProjection]: {
+      ...queueConfig,
+      options: {
+        arguments: queueOptions,
+      },
+    },
+    [RascalQueues.XpProjection]: {
+      ...queueConfig,
+      options: {
+        arguments: queueOptions,
+      },
+    },
+    [RascalQueues.FarcasterWorkerPolicy]: {
       ...queueConfig,
       options: {
         arguments: queueOptions,
@@ -141,11 +155,19 @@ export function getAllRascalConfigs(
       destinationType: 'queue',
       bindingKey: RascalRoutingKeys.ChainEvent,
     },
-    [RascalBindings.DiscordListener]: {
-      source: RascalExchanges.Discobot,
-      destination: RascalQueues.DiscordListener,
+    [RascalBindings.DiscordBotPolicy]: {
+      source: RascalExchanges.MessageRelayer,
+      destination: RascalQueues.DiscordBotPolicy,
       destinationType: 'queue',
-      bindingKey: RascalRoutingKeys.DiscordListener,
+      bindingKeys: [
+        RascalRoutingKeys.DiscordThreadCreated,
+        RascalRoutingKeys.DiscordThreadTitleUpdated,
+        RascalRoutingKeys.DiscordThreadBodyUpdated,
+        RascalRoutingKeys.DiscordThreadDeleted,
+        RascalRoutingKeys.DiscordThreadCommentCreated,
+        RascalRoutingKeys.DiscordThreadCommentUpdated,
+        RascalRoutingKeys.DiscordThreadCommentDeleted,
+      ],
     },
     [RascalBindings.NotificationsProvider]: {
       source: RascalExchanges.MessageRelayer,
@@ -156,8 +178,15 @@ export function getAllRascalConfigs(
         RascalRoutingKeys.NotificationsProviderChainEventCreated,
         RascalRoutingKeys.NotificationsProviderSnapshotProposalCreated,
         RascalRoutingKeys.NotificationsProviderUserMentioned,
-        RascalRoutingKeys.NotificationsProviderPreferencesUpdated,
+        RascalRoutingKeys.NotificationsProviderCommentUpvoted,
+        RascalRoutingKeys.NotificationsProviderThreadUpvoted,
       ],
+    },
+    [RascalBindings.NotificationsSettings]: {
+      source: RascalExchanges.MessageRelayer,
+      destination: RascalQueues.NotificationsSettings,
+      destinationType: 'queue',
+      bindingKeys: [RascalRoutingKeys.NotificationsSettingsPreferencesUpdated],
     },
     [RascalBindings.ContestWorkerPolicy]: {
       source: RascalExchanges.MessageRelayer,
@@ -180,14 +209,34 @@ export function getAllRascalConfigs(
         RascalRoutingKeys.ContestProjectionContestContentUpvoted,
       ],
     },
+    [RascalBindings.XpProjection]: {
+      source: RascalExchanges.MessageRelayer,
+      destination: RascalQueues.XpProjection,
+      destinationType: 'queue',
+      bindingKeys: [
+        RascalRoutingKeys.XpProjectionSignUpFlowCompleted,
+        RascalRoutingKeys.XpProjectionCommunityCreated,
+        RascalRoutingKeys.XpProjectionCommunityJoined,
+        RascalRoutingKeys.XpProjectionThreadCreated,
+        RascalRoutingKeys.XpProjectionThreadUpvoted,
+        RascalRoutingKeys.XpProjectionCommentCreated,
+        RascalRoutingKeys.XpProjectionCommentUpvoted,
+        RascalRoutingKeys.XpProjectionUserMentioned,
+      ],
+    },
+    [RascalBindings.FarcasterWorkerPolicy]: {
+      source: RascalExchanges.MessageRelayer,
+      destination: RascalQueues.FarcasterWorkerPolicy,
+      destinationType: 'queue',
+      bindingKeys: [
+        RascalRoutingKeys.FarcasterWorkerPolicyCastCreated,
+        RascalRoutingKeys.FarcasterWorkerPolicyReplyCastCreated,
+        RascalRoutingKeys.FarcasterWorkerPolicyVoteCreated,
+      ],
+    },
   };
 
   const allPublications: Record<RascalPublications, PublicationConfig> = {
-    [RascalPublications.DiscordListener]: {
-      exchange: RascalExchanges.Discobot,
-      routingKey: RascalRoutingKeys.DiscordListener,
-      ...publicationConfig,
-    },
     [RascalPublications.MessageRelayer]: {
       exchange: RascalExchanges.MessageRelayer,
       ...publicationConfig,
@@ -195,10 +244,6 @@ export function getAllRascalConfigs(
   };
 
   const allSubscriptions: Record<RascalSubscriptions, SubscriptionConfig> = {
-    [RascalSubscriptions.DiscordListener]: {
-      queue: RascalQueues.DiscordListener,
-      ...subscriptionConfig,
-    },
     [RascalSubscriptions.ChainEvent]: {
       queue: RascalQueues.ChainEvent,
       ...subscriptionConfig,
@@ -213,6 +258,22 @@ export function getAllRascalConfigs(
     },
     [RascalSubscriptions.ContestProjection]: {
       queue: RascalQueues.ContestProjection,
+      ...subscriptionConfig,
+    },
+    [RascalSubscriptions.XpProjection]: {
+      queue: RascalQueues.XpProjection,
+      ...subscriptionConfig,
+    },
+    [RascalSubscriptions.FarcasterWorkerPolicy]: {
+      queue: RascalQueues.FarcasterWorkerPolicy,
+      ...subscriptionConfig,
+    },
+    [RascalSubscriptions.DiscordBotPolicy]: {
+      queue: RascalQueues.DiscordBotPolicy,
+      ...subscriptionConfig,
+    },
+    [RascalSubscriptions.NotificationsSettings]: {
+      queue: RascalQueues.NotificationsSettings,
       ...subscriptionConfig,
     },
   };

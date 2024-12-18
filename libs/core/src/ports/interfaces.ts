@@ -1,3 +1,4 @@
+import { EventNames, Events } from '@hicommonwealth/schemas';
 import { Readable } from 'stream';
 import { z } from 'zod';
 import {
@@ -6,12 +7,12 @@ import {
   EventsHandlerMetadata,
   InvalidInput,
 } from '../framework';
-import { EventNames, Events } from '../integration/events';
 import {
   ChainProposalsNotification,
   CommentCreatedNotification,
   CommunityStakeNotification,
   SnapshotProposalCreatedNotification,
+  UpvoteNotification,
   UserMentionedNotification,
   WebhookNotification,
 } from '../integration/notifications.schemas';
@@ -76,6 +77,8 @@ export enum CacheNamespaces {
   Token_Balance = 'token_balance',
   Activity_Cache = 'activity_cache',
   Rate_Limiter = 'rate_limiter',
+  Api_key_auth = 'api_key_auth',
+  Query_Response = 'query_response',
 }
 
 /**
@@ -199,11 +202,14 @@ export enum BrokerPublications {
 }
 
 export enum BrokerSubscriptions {
-  DiscordListener = 'DiscordMessage',
+  DiscordBotPolicy = 'DiscordBotPolicy',
   ChainEvent = 'ChainEvent',
   NotificationsProvider = 'NotificationsProvider',
+  NotificationsSettings = 'NotificationsSettings',
   ContestWorkerPolicy = 'ContestWorkerPolicy',
   ContestProjection = 'ContestProjection',
+  FarcasterWorkerPolicy = 'FarcasterWorkerPolicy',
+  XpProjection = 'XpProjection',
 }
 
 /**
@@ -245,7 +251,13 @@ export interface Broker extends Disposable {
 }
 
 export type BlobType = string | Uint8Array | Buffer | Readable;
-export const BlobBuckets = ['assets', 'sitemap', 'archives'] as const;
+export const BlobBuckets = [
+  'assets',
+  'sitemap',
+  'archives',
+  'threads',
+  'comments',
+] as const;
 export type BlobBucket = (typeof BlobBuckets)[number];
 
 /**
@@ -258,7 +270,9 @@ export interface BlobStorage extends Disposable {
     content: BlobType;
     contentType?: string;
   }): Promise<{ url: string; location: string }>;
+
   exists(options: { key: string; bucket: BlobBucket }): Promise<boolean>;
+
   getSignedUrl(options: {
     key: string;
     bucket: BlobBucket;
@@ -276,6 +290,7 @@ export enum WorkflowKeys {
   UserMentioned = 'user-mentioned',
   CommunityStake = 'community-stake',
   ChainProposals = 'chain-event-proposals',
+  NewUpvotes = 'new-upvote',
   EmailRecap = 'email-recap',
   EmailDigest = 'email-digest',
   Webhooks = 'webhooks',
@@ -295,7 +310,7 @@ export type NotificationsProviderRecipient =
     };
 
 type BaseNotifProviderOptions = {
-  users: { id: string; email?: string; webhook_url?: string }[];
+  users: { id: string; email?: string }[];
   actor?: { id: string; email?: string };
 };
 
@@ -327,6 +342,10 @@ export type NotificationsProviderTriggerOptions =
         | {
             data: z.infer<typeof ChainProposalsNotification>;
             key: WorkflowKeys.ChainProposals;
+          }
+        | {
+            data: z.infer<typeof UpvoteNotification>;
+            key: WorkflowKeys.NewUpvotes;
           }
       ))
   | WebhookProviderOptions;
@@ -400,13 +419,27 @@ export type NotificationsProviderSchedulesReturn = Array<{
   updated_at: string;
 }>;
 
+export type IdentifyUserOptions = {
+  user_id: string;
+  user_properties: {
+    email?: string;
+    avatar?: string;
+    phone_number?: string;
+    locale?: string;
+    timezone?: string;
+    mobile_push_notifications_enabled?: boolean;
+    mobile_push_discussion_activity_enabled?: boolean;
+    mobile_push_admin_alerts_enabled?: boolean;
+  };
+};
+
 /**
  * Notifications Provider Port
  */
 export interface NotificationsProvider extends Disposable {
   triggerWorkflow(
     options: NotificationsProviderTriggerOptions,
-  ): Promise<boolean>;
+  ): Promise<PromiseSettledResult<{ workflow_run_id: string }>[]>;
 
   getMessages(
     options: NotificationsProviderGetMessagesOptions,
@@ -429,6 +462,18 @@ export interface NotificationsProvider extends Disposable {
    * @returns A set containing the ids of the schedules that were successfully deleted
    */
   deleteSchedules(options: { schedule_ids: string[] }): Promise<Set<string>>;
+
+  identifyUser(options: IdentifyUserOptions): Promise<{
+    id: string;
+    name?: string;
+    email?: string;
+    phone_number?: string;
+    avatar?: string;
+    created_at?: string;
+    updated_at?: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    [key: string]: any;
+  }>;
 
   registerClientRegistrationToken(
     userId: number,

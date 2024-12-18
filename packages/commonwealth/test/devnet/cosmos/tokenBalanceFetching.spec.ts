@@ -102,7 +102,6 @@ describe('Token Balance Cache Cosmos Tests', { timeout: 30_000 }, function () {
         active: true,
         type: ChainType.Chain,
         base: ChainBase.CosmosSDK,
-        has_chain_events_listener: true,
         chain_node_id: stargazeNode.id,
         bech32_prefix: 'stars',
         collapsed_on_homepage: false,
@@ -138,7 +137,9 @@ describe('Token Balance Cache Cosmos Tests', { timeout: 30_000 }, function () {
 
   beforeAll(async () => {
     models = await tester.seedDb();
-    cache(new RedisCache('redis://localhost:6379'));
+    cache({
+      adapter: new RedisCache('redis://localhost:6379'),
+    });
     await cache().ready();
     await resetChainNodes();
   });

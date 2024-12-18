@@ -1,5 +1,4 @@
 import { CommunityInstance, UserInstance } from '@hicommonwealth/model';
-import { expect } from 'chai';
 import { ServerTopicsController } from 'server/controllers/server_topics_controller';
 import { describe, test } from 'vitest';
 
@@ -54,6 +53,9 @@ const createMockedTopicsController = (isAdmin: boolean = false) => {
       ],
       update: async () => {},
     },
+    CommunityStake: {
+      findOne: async () => {},
+    },
     sequelize: {
       transaction: async (callback) => {
         return callback({ transaction: {} });
@@ -76,61 +78,12 @@ const createMockedTopicsController = (isAdmin: boolean = false) => {
 };
 
 describe('ServerTopicsController', () => {
-  test('#createTopic', async () => {
-    const { controller, user, chain } = createMockedTopicsController(true);
-    const [topic] = await Promise.all(
-      await controller.createTopic({
-        user,
-        community: chain,
-        body: {
-          name: 'hhh',
-          description: 'ddd',
-          featured_in_new_post: false,
-          featured_in_sidebar: false,
-        },
-      }),
-    );
-
-    expect(topic.name).to.equal('hhh');
-    expect(topic.description).to.equal('ddd');
-    expect(topic.featured_in_new_post).to.equal(false);
-    expect(topic.featured_in_sidebar).to.equal(false);
-  });
-
-  test('#deleteTopic', async () => {
-    const { controller, user } = createMockedTopicsController(true);
-    await controller.deleteTopic({
-      user,
-      topicId: 1,
-    });
-  });
-
-  test('#getTopics', async () => {
-    const { controller, chain } = createMockedTopicsController();
-    const topics = await controller.getTopics({
-      community: chain,
-      with_contest_managers: false,
-    });
-    expect(topics).to.have.length(1);
-  });
-
   test('#updateTopicChannel', async () => {
     const { controller, user } = createMockedTopicsController(true);
     await controller.updateTopicChannel({
       user,
       topicId: 1,
       channelId: 'ccc',
-    });
-  });
-
-  test('#updateTopic', async () => {
-    const { controller, user } = createMockedTopicsController(true);
-    await controller.updateTopic({
-      user,
-      body: {
-        id: 1,
-        name: 'ddd',
-      },
     });
   });
 

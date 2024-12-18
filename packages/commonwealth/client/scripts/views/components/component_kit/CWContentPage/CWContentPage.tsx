@@ -1,12 +1,13 @@
+import { PermissionEnum } from '@hicommonwealth/schemas';
 import { getThreadActionTooltipText } from 'helpers/threads';
 import { truncate } from 'helpers/truncate';
+import useTopicGating from 'hooks/useTopicGating';
 import { IThreadCollaborator } from 'models/Thread';
 import moment from 'moment';
 import React, { ReactNode, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { useSearchParams } from 'react-router-dom';
 import app from 'state';
-import { useRefreshMembershipQuery } from 'state/api/groups';
 import useUserStore from 'state/ui/user';
 import Permissions from 'utils/Permissions';
 import { ThreadContestTagContainer } from 'views/components/ThreadContestTag';
@@ -78,8 +79,10 @@ type ContentPageProps = {
   showSkeleton?: boolean;
   isEditing?: boolean;
   sidebarComponentsSkeletonCount?: number;
-  setThreadBody?: (body: string) => void;
+  activeThreadVersionId?: number;
+  onChangeVersionHistoryNumber?: (id: number) => void;
   editingDisabled?: boolean;
+  onCommentClick?: () => void;
 };
 
 export const CWContentPage = ({
@@ -116,34 +119,26 @@ export const CWContentPage = ({
   showSkeleton,
   isEditing = false,
   sidebarComponentsSkeletonCount = 2,
-  setThreadBody,
+  activeThreadVersionId,
+  onChangeVersionHistoryNumber,
   editingDisabled,
+  onCommentClick,
 }: ContentPageProps) => {
   const navigate = useNavigate();
   const [urlQueryParams] = useSearchParams();
   const user = useUserStore();
   const [isUpvoteDrawerOpen, setIsUpvoteDrawerOpen] = useState<boolean>(false);
 
-  const { data: memberships = [] } = useRefreshMembershipQuery({
-    communityId: app.activeChainId(),
-    address: user.activeAccount?.address || '',
-    apiEnabled: !!user.activeAccount?.address,
+  const communityId = app.activeChainId() || '';
+
+  const { isRestrictedMembership, foundTopicPermissions } = useTopicGating({
+    communityId,
+    userAddress: user.activeAccount?.address || '',
+    apiEnabled: !!user.activeAccount?.address && !!communityId,
+    topicId: thread?.topic?.id || 0,
   });
 
-  const isTopicGated = !!(memberships || []).find((membership) =>
-    // @ts-expect-error <StrictNullChecks/>
-    membership.topicIds.includes(thread?.topic?.id),
-  );
-
-  const isActionAllowedInGatedTopic = !!(memberships || []).find(
-    (membership) =>
-      // @ts-expect-error <StrictNullChecks/>
-      membership.topicIds.includes(thread?.topic?.id) && membership.isAllowed,
-  );
-
   const isAdmin = Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
-  const isRestrictedMembership =
-    !isAdmin && isTopicGated && !isActionAllowedInGatedTopic;
 
   const tabSelected = useMemo(() => {
     const tab = Object.fromEntries(urlQueryParams.entries())?.tab;
@@ -209,8 +204,9 @@ export const CWContentPage = ({
         // @ts-expect-error <StrictNullChecks/>
         isHot={isHot(thread)}
         profile={thread?.profile}
-        versionHistory={thread?.versionHistory}
-        changeContentText={setThreadBody}
+        versionHistory={thread?.versionHistory || []}
+        activeThreadVersionId={activeThreadVersionId}
+        onChangeVersionHistoryNumber={onChangeVersionHistoryNumber}
       />
     </div>
   );
@@ -220,6 +216,31 @@ export const CWContentPage = ({
     isThreadArchived: !!thread?.archivedAt,
     isThreadLocked: !!thread?.lockedAt,
     isThreadTopicGated: isRestrictedMembership,
+  });
+
+  const disabledReactPermissionTooltipText = getThreadActionTooltipText({
+    isCommunityMember: !!user.activeAccount,
+    threadTopicInteractionRestrictions:
+      !isAdmin &&
+      !foundTopicPermissions?.permissions?.includes(
+        PermissionEnum.CREATE_COMMENT_REACTION,
+      ) &&
+      !foundTopicPermissions?.permissions?.includes(
+        PermissionEnum.CREATE_THREAD_REACTION,
+      )
+        ? foundTopicPermissions?.permissions
+        : undefined,
+  });
+
+  const disabledCommentPermissionTooltipText = getThreadActionTooltipText({
+    isCommunityMember: !!user.activeAccount,
+    threadTopicInteractionRestrictions:
+      !isAdmin &&
+      !foundTopicPermissions?.permissions?.includes(
+        PermissionEnum.CREATE_COMMENT,
+      )
+        ? foundTopicPermissions?.permissions
+        : undefined,
   });
 
   const mainBody = (
@@ -245,6 +266,7 @@ export const CWContentPage = ({
             upvoteBtnVisible={!thread?.readOnly}
             upvoteDrawerBtnBelow={true}
             commentBtnVisible={!thread?.readOnly}
+            onCommentClick={onCommentClick}
             // @ts-expect-error <StrictNullChecks/>
             thread={thread}
             totalComments={thread?.numberOfComments}
@@ -258,10 +280,22 @@ export const CWContentPage = ({
             onEditStart={onEditStart}
             canUpdateThread={canUpdateThread}
             hasPendingEdits={hasPendingEdits}
-            canReact={!disabledActionsTooltipText}
-            canComment={!disabledActionsTooltipText}
+            canReact={
+              disabledReactPermissionTooltipText
+                ? !disabledReactPermissionTooltipText
+                : !disabledActionsTooltipText
+            }
+            canComment={
+              disabledCommentPermissionTooltipText
+                ? !disabledCommentPermissionTooltipText
+                : !disabledActionsTooltipText
+            }
             onProposalStageChange={onProposalStageChange}
-            disabledActionsTooltipText={disabledActionsTooltipText}
+            disabledActionsTooltipText={
+              disabledReactPermissionTooltipText ||
+              disabledCommentPermissionTooltipText ||
+              disabledActionsTooltipText
+            }
             onSnapshotProposalFromThread={onSnapshotProposalFromThread}
             setIsUpvoteDrawerOpen={setIsUpvoteDrawerOpen}
             shareEndpoint={`${window.location.origin}${window.location.pathname}`}

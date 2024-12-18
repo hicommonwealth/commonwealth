@@ -1,5 +1,5 @@
-import { EventNames, stats } from '@hicommonwealth/core';
-import { Reaction } from '@hicommonwealth/schemas';
+import { stats } from '@hicommonwealth/core';
+import { EventNames, Reaction } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize';
 import { z } from 'zod';
 import type {
@@ -8,12 +8,9 @@ import type {
   ModelInstance,
   ThreadInstance,
 } from '.';
-import { emitEvent, getThreadContestManagers } from '../utils';
+import { emitEvent, getThreadContestManagers } from '../utils/utils';
 
-export type ReactionAttributes = z.infer<typeof Reaction> & {
-  Address?: AddressAttributes;
-};
-
+export type ReactionAttributes = z.infer<typeof Reaction>;
 export type ReactionInstance = ModelInstance<ReactionAttributes>;
 
 export default (
@@ -28,14 +25,18 @@ export default (
       comment_id: { type: Sequelize.INTEGER, allowNull: true },
       address_id: { type: Sequelize.INTEGER, allowNull: false },
       reaction: { type: Sequelize.ENUM('like'), allowNull: false },
-      calculated_voting_weight: { type: Sequelize.INTEGER, allowNull: true },
+      calculated_voting_weight: {
+        type: Sequelize.DECIMAL(78, 0),
+        allowNull: true,
+      },
       // canvas-related columns
       canvas_signed_data: { type: Sequelize.JSONB, allowNull: true },
-      canvas_hash: { type: Sequelize.STRING, allowNull: true },
+      canvas_msg_id: { type: Sequelize.STRING, allowNull: true },
     },
     {
       hooks: {
         afterCreate: async (reaction, options) => {
+          const { Outbox, Address } = sequelize.models;
           const { thread_id, comment_id } = reaction;
           if (thread_id) {
             const [, threads] = await (
@@ -64,14 +65,20 @@ export default (
                     thread.topic_id,
                     thread.community_id,
                   );
+
+              const address = (await Address.findByPk(
+                reaction.address_id,
+              )) as AddressAttributes | null;
+
               await emitEvent(
-                sequelize.models.Outbox,
+                Outbox,
                 [
                   {
                     event_name: EventNames.ThreadUpvoted,
                     event_payload: {
                       ...reaction.toJSON(),
-                      reaction: 'like',
+                      topic_id: thread.topic_id!,
+                      address: address?.address,
                       community_id: thread.community_id,
                       contestManagers,
                     },
@@ -101,6 +108,20 @@ export default (
                 transaction: options.transaction,
               },
             );
+            if (reaction.reaction === 'like') {
+              await emitEvent(
+                sequelize.models.Outbox,
+                [
+                  {
+                    event_name: EventNames.CommentUpvoted,
+                    event_payload: {
+                      ...reaction.toJSON(),
+                    },
+                  },
+                ],
+                options.transaction,
+              );
+            }
             stats().increment('cw.hook.reaction-count', {
               thread_id: String(comments.at(0)!.thread_id),
             });

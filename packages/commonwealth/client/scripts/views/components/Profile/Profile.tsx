@@ -1,5 +1,4 @@
-import { DEFAULT_NAME } from '@hicommonwealth/shared';
-import 'components/Profile/Profile.scss';
+import { DEFAULT_NAME, PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
 import React, { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useFetchProfileByIdQuery } from 'state/api/profiles';
@@ -9,10 +8,11 @@ import NewProfile from '../../../models/NewProfile';
 import Thread from '../../../models/Thread';
 import { CWText } from '../../components/component_kit/cw_text';
 import { PageNotFound } from '../../pages/404';
-import { ImageBehavior } from '../component_kit/cw_cover_image_uploader';
+import { ImageBehavior } from '../component_kit/CWImageInput';
 import CWCircleMultiplySpinner from '../component_kit/new_designs/CWCircleMultiplySpinner';
-import type { CommentWithAssociatedThread } from './ProfileActivity';
+import './Profile.scss';
 import ProfileActivity from './ProfileActivity';
+import type { CommentWithAssociatedThread } from './ProfileActivity/ProfileActivity';
 import ProfileHeader from './ProfileHeader';
 
 enum ProfileError {
@@ -30,7 +30,6 @@ const Profile = ({ userId }: ProfileProps) => {
   const [threads, setThreads] = useState<Thread[]>([]);
   const [isOwner, setIsOwner] = useState<boolean>();
   const [comments, setComments] = useState<CommentWithAssociatedThread[]>([]);
-
   const { data, error, isLoading } = useFetchProfileByIdQuery({
     userId,
     apiCallEnabled: !!userId,
@@ -49,17 +48,16 @@ const Profile = ({ userId }: ProfileProps) => {
       setProfile(
         new NewProfile({ ...data.profile, userId, isOwner: isOwner ?? false }),
       );
-      // @ts-expect-error <StrictNullChecks/>
       setThreads(data.threads.map((t) => new Thread(t)));
-
       // @ts-expect-error <StrictNullChecks/>
       const responseComments = data.comments.map((c) => new Comment(c));
+
       const commentsWithAssociatedThread = responseComments.map((c) => {
         const thread = data.commentThreads.find(
           // @ts-expect-error <StrictNullChecks/>
           (t) => t.id === parseInt(c.threadId, 10),
         );
-        return { ...c, thread };
+        return { ...c, thread, communityId: thread?.community_id };
       });
       // @ts-expect-error <StrictNullChecks/>
       setComments(commentsWithAssociatedThread);
@@ -121,7 +119,7 @@ const Profile = ({ userId }: ProfileProps) => {
           <Helmet>
             <link
               rel="canonical"
-              href={`https://commonwealth.im/profile/id/${userId}`}
+              href={`https://${PRODUCTION_DOMAIN}/profile/id/${userId}`}
             />
           </Helmet>
 
@@ -141,7 +139,11 @@ const Profile = ({ userId }: ProfileProps) => {
           >
             {/* @ts-expect-error StrictNullChecks*/}
             <ProfileHeader profile={profile} isOwner={isOwner} />
-            <ProfileActivity threads={threads} comments={comments} />
+            <ProfileActivity
+              threads={threads}
+              comments={comments}
+              isOwner={isOwner}
+            />
           </div>
         </CWPageLayout>
       </div>
@@ -153,7 +155,11 @@ const Profile = ({ userId }: ProfileProps) => {
           <div className="ProfilePageContainer">
             {/* @ts-expect-error StrictNullChecks*/}
             <ProfileHeader profile={profile} isOwner={isOwner} />
-            <ProfileActivity threads={threads} comments={comments} />
+            <ProfileActivity
+              threads={threads}
+              comments={comments}
+              isOwner={isOwner}
+            />
           </div>
         </div>
       </CWPageLayout>

@@ -27,17 +27,6 @@ export const TrendingCommunitiesPreview = () => {
   const trendingCommunities = (
     paginatedTrendingCommunities?.pages?.[0]?.results || []
   )
-    .filter((community) => {
-      // TODO: This XSS logic should be moved to API + we shouldn't allow users to choose community
-      // names with invalid chars
-      const name = community.name.toLowerCase();
-      //this filter is meant to not include any de facto communities that are actually xss attempts.
-      //It's a way of keeping the front facing parts of the app clean looking for users
-      return (
-        !['"', '>', '<', "'", '/', '`'].includes(name[0]) &&
-        !['"', '>', '<', "'", '/', '`'].includes(name[1])
-      );
-    })
     .map((community) => ({
       community,
       isMember: Permissions.isCommunityMember(community.id),
@@ -69,6 +58,8 @@ export const TrendingCommunitiesPreview = () => {
             community={{
               name: sortedCommunity.community.name || '',
               icon_url: sortedCommunity.community.icon_url || '',
+              id: sortedCommunity.community.id || '',
+              base: sortedCommunity.community.base || '',
             }}
             monthlyThreadCount={
               sortedCommunity.community.last_30_day_thread_count || 0

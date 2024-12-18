@@ -1,7 +1,9 @@
 import {
   LinkSource,
   MAX_COMMUNITY_IMAGE_SIZE_KB,
+  MAX_SCHEMA_ETH,
   MAX_SCHEMA_INT,
+  MIN_SCHEMA_ETH,
   MIN_SCHEMA_INT,
   getFileSizeBytes,
 } from '@hicommonwealth/shared';
@@ -37,6 +39,10 @@ export const linksSchema = {
 };
 
 export const PG_INT = z.number().int().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT);
+
+export const PG_ETH = z.bigint().min(MIN_SCHEMA_ETH).max(MAX_SCHEMA_ETH);
+
+export const zBoolean = z.preprocess((v) => v && v !== 'false', z.boolean());
 
 export const ETHERS_BIG_NUMBER = z.object({
   hex: z.string().regex(/^0x[0-9a-fA-F]+$/),

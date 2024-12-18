@@ -1,0 +1,45 @@
+@import '../../../../../styles/shared.scss';
+
+.TokenLaunchDrawer {
+  .Drawer.filter-drawer {
+    background: $white;
+
+    @include extraSmall {
+      padding-bottom: 0px !important;
+    }
+
+    .DrawerTopBar {
+      padding: 0;
+      margin-left: -36px;
+
+      @include mediumSmallMid {
+        margin-left: -26px;
+      }
+    }
+
+    @include mediumSmall {
+      > .QuickTokenLaunchForm {
+        padding: 0 16px;
+      }
+    }
+
+    .gradiant-container {
+      padding: 20px 52px;
+      height: 100%;
+      overflow-y: scroll;
+      padding-bottom: 60px !important;
+
+      @include mediumSmallMid {
+        padding: 20px 32px;
+        padding-bottom: 60px !important;
+      }
+
+      background: linear-gradient(
+        90deg,
+        rgba(255, 31, 0, 0.3) 0%,
+        rgba(255, 128, 215, 0.3) 50%,
+        rgba(0, 121, 204, 0.3) 100%
+      );
+    }
+  }
+}

@@ -7,8 +7,6 @@ export type Aggregates = Extract<
   | 'Comment'
   | 'CommentVersionHistory'
   | 'Community'
-  | 'NotificationCategory'
-  | 'Subscription'
   | 'Thread'
   | 'ThreadVersionHistory'
   | 'Reaction'
@@ -20,16 +18,18 @@ export type Aggregates = Extract<
   | 'Topic'
   | 'CommentSubscription'
   | 'ThreadSubscription'
-  | 'Contract'
-  | 'CommunityContract'
   | 'Wallets'
   | 'GroupPermission'
   | 'Tags'
   | 'CommunityTags'
+  | 'ContractAbi'
+  | 'LaunchpadToken'
 >;
 
 export * from './commands';
+export * from './context';
 export * from './entities';
+export * from './events';
 export * from './projections';
 export * from './queries';
 export * from './utils';

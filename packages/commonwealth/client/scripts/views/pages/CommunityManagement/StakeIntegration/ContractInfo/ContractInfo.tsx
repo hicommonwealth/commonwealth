@@ -10,16 +10,26 @@ interface ContractInfo {
   contractAddress: string;
   smartContractAddress?: string;
   voteWeightPerStake: string;
+  namespace?: string | null;
+  symbol?: string;
 }
 
 const ContractInfo = ({
   contractAddress,
   smartContractAddress,
   voteWeightPerStake,
+  namespace,
+  symbol,
 }: ContractInfo) => {
   return (
     <section className="ContractInfo">
       <CWText type="h4">Stake contract info</CWText>
+      <div className="row">
+        <CWText type="b2">Namespace</CWText>
+        <CWText type="b1" fontWeight="medium">
+          {namespace}
+        </CWText>
+      </div>
       <div className="row">
         <CWText type="b2">Namespace (1155) contract</CWText>
         <CWText type="b1" fontWeight="medium">
@@ -30,6 +40,12 @@ const ContractInfo = ({
             // eslint-disable-next-line @typescript-eslint/no-misused-promises
             onClick={async () => await saveToClipboard(contractAddress, true)}
           />
+        </CWText>
+      </div>
+      <div className="row">
+        <CWText type="b2">Symbol</CWText>
+        <CWText type="b1" fontWeight="medium">
+          {symbol}
         </CWText>
       </div>
       {smartContractAddress && (
