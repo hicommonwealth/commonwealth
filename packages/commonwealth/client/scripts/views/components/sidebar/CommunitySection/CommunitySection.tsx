@@ -1,8 +1,12 @@
 import { TokenView } from '@hicommonwealth/schemas';
 import { PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
+import NewProfile from 'client/scripts/models/NewProfile';
+import { useFetchProfileByIdQuery } from 'client/scripts/state/api/profiles';
+import { useAuthModalStore } from 'client/scripts/state/ui/modals';
+import { AuthModalType } from 'client/scripts/views/modals/AuthModal';
 import { findDenominationString } from 'helpers/findDenomination';
 import { useFlag } from 'hooks/useFlag';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import app from 'state';
 import { useFetchCustomDomainQuery } from 'state/api/configuration';
 import { useGetTokenByCommunityId } from 'state/api/tokens';
@@ -30,6 +34,7 @@ import { ExternalLinksModule } from '../external_links_module';
 import { GovernanceSection } from '../governance_section';
 import './CommunitySection.scss';
 import { CommunitySectionSkeleton } from './CommunitySectionSkeleton';
+import ProfileCard from './ProfileCard';
 import { TokenTradeWidget } from './TokenTradeWidget';
 
 interface CommunitySectionProps {
@@ -37,7 +42,10 @@ interface CommunitySectionProps {
 }
 
 export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
+  const [profile, setProfile] = useState<NewProfile>();
+
   const tokenizedCommunityEnabled = useFlag('tokenizedCommunity');
+  const { setAuthModalType } = useAuthModalStore();
 
   const user = useUserStore();
   const {
@@ -78,6 +86,36 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
     enabled: user.isLoggedIn && !!app.chain,
   }).data;
 
+  const {
+    data,
+    isLoading: isLoadingProfile,
+    error,
+    refetch,
+  } = useFetchProfileByIdQuery({
+    apiCallEnabled: user.isLoggedIn,
+    userId: user.id,
+  });
+
+  useEffect(() => {
+    if (isLoadingProfile) return;
+
+    if (error) {
+      setProfile(undefined);
+      return;
+    }
+
+    if (data) {
+      setProfile(
+        new NewProfile({
+          ...data.profile,
+          userId: data.userId,
+          isOwner: data.userId === user.id,
+        }),
+      );
+      return;
+    }
+  }, [data, isLoadingProfile, error, user.id, communityId]);
+
   if (showSkeleton || isLoading || isContestDataLoading)
     return <CommunitySectionSkeleton />;
 
@@ -89,11 +127,22 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
   return (
     <>
       <div className="community-menu">
+        <ProfileCard />
         {user.isLoggedIn && (
           <>
             <AccountConnectionIndicator
               connected={!!user.activeAccount}
               address={user.activeAccount?.address || ''}
+              onAuthModalOpen={(modalType) =>
+                setAuthModalType(modalType || AuthModalType.SignIn)
+              }
+              addresses={user.addresses.filter(
+                (addr) => addr.community.id === communityId,
+              )}
+              profile={profile}
+              refreshProfiles={() => {
+                refetch().catch(console.error);
+              }}
             />
 
             {stakeEnabled && (
