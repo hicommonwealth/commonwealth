@@ -30,7 +30,7 @@ export function GetDigestEmailDataQuery(): Query<typeof GetDigestEmailData> {
               SELECT *
               FROM "Threads" T
               WHERE T.community_id = communities.id
-                AND created_at > NOW() - INTERVAL '700 days'
+                AND created_at > NOW() - INTERVAL '7 days'
               ORDER BY T.view_count DESC
               LIMIT 2
               ) top_threads ON true
