@@ -11,6 +11,10 @@ export type TopicAttributes = z.infer<typeof Topic> & {
   community?: CommunityAttributes;
   threads?: ThreadAttributes[];
   ChainNode?: ChainNodeAttributes;
+  featured_in_sidebar?: boolean;
+  featured_in_new_post?: boolean;
+  group_ids?: number[];
+  default_offchain_template?: string | null;
 };
 export type TopicInstance = ModelInstance<TopicAttributes>;
 
