@@ -16,6 +16,7 @@ import RPCEndpointTask from './RPCEndpointTask';
 import RefreshCustomDomainTask from './RefreshCustomDomainTask';
 import TopUsers from './TopUsers';
 import TriggerNotificationsWorkflow from './TriggerNotificationsWorkflow';
+import EnableDigestEmail from './enableDigestEmail';
 
 const AdminPanelPage = () => {
   const navigate = useCommonNavigate();
@@ -44,6 +45,7 @@ const AdminPanelPage = () => {
         <MakeSiteAdminTask />
         <TopUsers />
         <TriggerNotificationsWorkflow />
+        <EnableDigestEmail />
       </div>
     </CWPageLayout>
   );
