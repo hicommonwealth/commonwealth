@@ -341,7 +341,7 @@ export const seedDb = async () => {
         ...t,
         featured_in_sidebar: false,
         featured_in_new_post: false,
-        group_ids: [],
+        group_ids: [] as number[],
         thread_count: 0,
       })),
     );

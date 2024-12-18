@@ -123,10 +123,9 @@ describe('Thread lifecycle', () => {
           featured_in_sidebar: false,
           featured_in_new_post: false,
           default_offchain_template: null,
-          group_ids:
-            threadGroupId && commentGroupId
-              ? [threadGroupId, commentGroupId]
-              : [],
+          group_ids: (threadGroupId && commentGroupId
+            ? [threadGroupId, commentGroupId]
+            : []) as number[],
           weighted_voting: TopicWeightedVoting.Stake,
           thread_count: 0,
         },
@@ -137,7 +136,7 @@ describe('Thread lifecycle', () => {
           featured_in_sidebar: false,
           featured_in_new_post: false,
           default_offchain_template: null,
-          group_ids: emptyGroupId ? [emptyGroupId] : [],
+          group_ids: (emptyGroupId ? [emptyGroupId] : []) as number[],
           thread_count: 0,
         },
         {
@@ -147,7 +146,7 @@ describe('Thread lifecycle', () => {
           featured_in_sidebar: false,
           featured_in_new_post: false,
           default_offchain_template: null,
-          group_ids: [],
+          group_ids: [] as number[],
           thread_count: 0,
         },
       ],
