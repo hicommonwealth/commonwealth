@@ -116,7 +116,7 @@ export type CommunityMenuItem = {
 export type SubmenuMenuItem = {
   type: 'submenu';
   label: string | JSX.Element;
-  items: MenuItem[];
+  items: (DefaultMenuItem | DividerMenuItem | HeaderMenuItem)[];
 };
 
 export type DropdownItemType<T = SupportedLanguage> = {
@@ -125,20 +125,13 @@ export type DropdownItemType<T = SupportedLanguage> = {
   selected?: boolean;
 };
 
-export type PopoverMenuItem = {
-  label: string | JSX.Element;
-  iconLeft?: IconName;
-  iconRight?: IconName;
-  onClick?: () => void;
-  disabled?: boolean;
-  type?: 'default' | 'notification' | 'community';
-};
+export type PopoverMenuItem =
+  | (DividerMenuItem & { label: string | JSX.Element })
+  | (HeaderMenuItem & { label: string | JSX.Element })
+  | (DefaultMenuItem & { label: string | JSX.Element })
+  | (NotificationMenuItem & { label: string | JSX.Element })
+  | (CommunityMenuItem & { label: string | JSX.Element })
+  | (ComponentMenuItem & { label: string | JSX.Element })
+  | (SubmenuMenuItem & { label: string | JSX.Element });
 
-export type MenuItem =
-  | DividerMenuItem
-  | HeaderMenuItem
-  | DefaultMenuItem
-  | NotificationMenuItem
-  | CommunityMenuItem
-  | ComponentMenuItem
-  | SubmenuMenuItem;
+export type MenuItem = PopoverMenuItem;

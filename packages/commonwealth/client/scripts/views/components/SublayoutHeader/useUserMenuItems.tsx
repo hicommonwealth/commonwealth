@@ -298,10 +298,11 @@ const useUserMenuItems = ({
                 ),
                 onClick: () => setSelectedLanguage(code as SupportedLanguage),
                 selected: selectedLanguage === code,
+                className: 'language-submenu-item',
               }),
             ),
           } as SubmenuMenuItem,
-          { type: 'divider' },
+          { type: 'divider' } as DividerMenuItem,
         ]
       : []),
     ...(hasMagic
