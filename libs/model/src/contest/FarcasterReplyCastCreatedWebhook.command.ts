@@ -4,7 +4,7 @@ import { NeynarAPIClient } from '@neynar/nodejs-sdk';
 import { config } from '../config';
 import { models } from '../database';
 import { mustExist } from '../middleware/guards';
-import { emitEvent } from '../utils';
+import { emitEvent, publishCast } from '../utils';
 
 const log = logger(import.meta);
 
@@ -21,12 +21,18 @@ export function FarcasterReplyCastCreatedWebhook(): Command<
       mustExist('Farcaster Cast Author FID', payload.data.author?.fid);
 
       const client = new NeynarAPIClient(config.CONTESTS.NEYNAR_API_KEY!);
+
       // get user verified address
       const { users } = await client.fetchBulkUsers([payload.data.author.fid]);
       const verified_address = users[0].verified_addresses.eth_addresses.at(0);
       if (!verified_address) {
         log.warn(
           'Farcaster verified address not found for reply cast created event- content will be ignored.',
+        );
+        await publishCast(
+          payload.data.hash,
+          ({ username }) =>
+            `Hey @${username}, you need a verified address to participate in the contest.`,
         );
         return;
       }

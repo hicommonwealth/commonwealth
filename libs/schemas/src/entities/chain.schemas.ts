@@ -5,7 +5,6 @@ import {
 } from '@hicommonwealth/shared';
 import z from 'zod';
 import { PG_INT } from '../utils';
-import { Contract } from './contract.schemas';
 
 export const ChainNode = z.object({
   id: PG_INT.optional().nullish(),
@@ -25,7 +24,6 @@ export const ChainNode = z.object({
     .nullish(),
   cosmos_gov_version: z.nativeEnum(CosmosGovernanceVersion).nullish(),
   health: z.nativeEnum(NodeHealth).default(NodeHealth.Healthy).nullish(),
-  contracts: z.array(Contract).nullish(),
   block_explorer: z.string().nullish(),
   max_ce_block_range: z.number().gte(-1).nullish(),
   alchemy_metadata: z
