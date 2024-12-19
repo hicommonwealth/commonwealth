@@ -16,8 +16,7 @@ export function GetDigestEmailDataQuery(): Query<typeof GetDigestEmailData> {
     secure: true,
     authStrategy: { name: 'authtoken', userId: ExternalServiceUserIds.Knock },
     body: async ({ payload }) => {
-      const sevenDaysAgo = new Date();
-      sevenDaysAgo.setDate(new Date().getDate() - 20);
+      // TODO User payload for unSubscribe once Recap email pr merge
       const threads = await models.sequelize.query<
         z.infer<typeof EnrichedThread>
       >(
@@ -46,7 +45,7 @@ export function GetDigestEmailDataQuery(): Query<typeof GetDigestEmailData> {
       return {
         threads: threads,
         numberOfThreads: threads.length,
-        // unsubscribe_link: TODO : will add once email recap pr got merged
+        // unsubscribe_link: TODO : will add once email recap PR got merged
       };
     },
   };
