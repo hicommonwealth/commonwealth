@@ -21,13 +21,13 @@ async function getUserId(payload: { address_id: number }) {
 
 async function getUserIdByAddress(payload: {
   referrer_address?: string;
-}): Promise<number | undefined | null> {
+}): Promise<number | undefined> {
   if (payload.referrer_address) {
     const referrer_user = await models.Address.findOne({
       where: { address: payload.referrer_address },
       attributes: ['user_id'],
     });
-    if (referrer_user) return referrer_user.user_id;
+    if (referrer_user) return referrer_user.user_id!;
   }
 }
 
@@ -86,9 +86,9 @@ async function recordXpsForQuest(
   creator_address?: string,
 ) {
   await sequelize.transaction(async (transaction) => {
-    const creator_user_id =
-      (await getUserIdByAddress({ referrer_address: creator_address })) ||
-      undefined;
+    const creator_user_id = await getUserIdByAddress({
+      referrer_address: creator_address,
+    });
 
     for (const action_meta of action_metas) {
       if (!action_meta) continue;
@@ -174,9 +174,9 @@ async function recordXpsForEvent(
   creator_reward_weight?: number, // referrer reward weight
 ) {
   await sequelize.transaction(async (transaction) => {
-    const creator_user_id =
-      (await getUserIdByAddress({ referrer_address: creator_address })) ||
-      undefined;
+    const creator_user_id = await getUserIdByAddress({
+      referrer_address: creator_address,
+    });
 
     // get logged actions for this user and event
     const log = await models.XpLog.findAll({
