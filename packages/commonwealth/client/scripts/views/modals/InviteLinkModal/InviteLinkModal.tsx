@@ -12,42 +12,29 @@ import { CWTextInput } from '../../components/component_kit/new_designs/CWTextIn
 import { ShareSkeleton } from './ShareSkeleton';
 import { getShareOptions } from './utils';
 
-import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import app from 'state';
-import {
-  useCreateReferralLinkMutation,
-  useGetReferralLinkQuery,
-} from 'state/api/user';
 import useUserStore from 'state/ui/user';
 
 import './InviteLinkModal.scss';
+import useReferralLink from './useReferralLink';
 
 interface InviteLinkModalProps {
   onModalClose: () => void;
 }
 
 const InviteLinkModal = ({ onModalClose }: InviteLinkModalProps) => {
-  const { data: refferalLinkData, isLoading: isLoadingReferralLink } =
-    useGetReferralLinkQuery();
-
   const user = useUserStore();
   const hasJoinedCommunity = !!user.activeAccount;
   const communityId = hasJoinedCommunity ? app.activeChainId() : '';
 
-  const { mutate: createReferralLink, isLoading: isLoadingCreateReferralLink } =
-    useCreateReferralLinkMutation();
+  const { referralLink, isLoadingReferralLink, isLoadingCreateReferralLink } =
+    useReferralLink({ autorun: true });
 
-  const referralLink = refferalLinkData?.referral_link;
   const currentUrl = window.location.origin;
 
   const inviteLink = referralLink
     ? `${currentUrl}${communityId ? `/${communityId}/discussions` : '/dashboard'}?refcode=${referralLink}`
     : '';
-
-  useRunOnceOnCondition({
-    callback: () => createReferralLink({}),
-    shouldRun: !isLoadingReferralLink && !referralLink,
-  });
 
   const handleCopy = () => {
     if (referralLink) {
