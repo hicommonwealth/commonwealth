@@ -26,6 +26,7 @@ const MobileNavigation = () => {
     [{ path: '/notifications' }],
     location,
   );
+  const matchesRewards = matchRoutes([{ path: '/rewards' }], location);
 
   const navigationConfig: NavigationButtonProps[] = [
     {
@@ -49,6 +50,11 @@ const MobileNavigation = () => {
     },
     ...(user.isLoggedIn
       ? [
+          {
+            type: 'rewards' as const,
+            onClick: () => navigate('/rewards', {}, null),
+            selected: !!matchesRewards,
+          },
           {
             type: 'notifications' as const,
             onClick: () => navigate('/notifications', {}, null),
