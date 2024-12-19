@@ -574,6 +574,9 @@ importers:
       '@canvas-js/interfaces':
         specifier: ^0.12.1
         version: 0.12.1
+      '@canvas-js/signatures':
+        specifier: ^0.12.1
+        version: 0.12.1
       '@cosmjs/cosmwasm-stargate':
         specifier: ^0.31.3
         version: 0.31.3(bufferutil@4.0.8)(utf-8-validate@5.0.10)
@@ -21362,7 +21365,7 @@ snapshots:
       '@cosmjs/utils': 0.32.3
       '@noble/hashes': 1.5.0
       bn.js: 5.2.1
-      elliptic: 6.5.7
+      elliptic: 6.6.1
       libsodium-wrappers-sumo: 0.7.13
 
   '@cosmjs/encoding@0.31.3':
@@ -24843,7 +24846,7 @@ snapshots:
     dependencies:
       '@noble/hashes': 1.5.0
       '@polkadot-api/utils': 0.0.1-492c132563ea6b40ae1fc5470dec4cd18768d182.1.0
-      '@scure/base': 1.1.6
+      '@scure/base': 1.1.9
       scale-ts: 1.6.0
     optional: true
 
@@ -24910,7 +24913,7 @@ snapshots:
       '@polkadot/util': 12.6.2
       '@polkadot/util-crypto': 12.6.2(@polkadot/util@12.6.2)
       '@polkadot/x-global': 12.6.2
-      tslib: 2.7.0
+      tslib: 2.8.1
     transitivePeerDependencies:
       - bufferutil
       - supports-color
@@ -24934,7 +24937,7 @@ snapshots:
     dependencies:
       '@polkadot/util': 12.6.2
       '@polkadot/util-crypto': 12.6.2(@polkadot/util@12.6.2)
-      tslib: 2.7.0
+      tslib: 2.8.1
 
   '@polkadot/keyring@7.9.2(@polkadot/util-crypto@7.9.2(@polkadot/util@7.9.2))(@polkadot/util@7.9.2)':
     dependencies:
@@ -24976,7 +24979,7 @@ snapshots:
       eventemitter3: 5.0.1
       mock-socket: 9.3.1
       nock: 13.5.4
-      tslib: 2.7.0
+      tslib: 2.8.1
     optionalDependencies:
       '@substrate/connect': 0.8.8(bufferutil@4.0.8)(utf-8-validate@5.0.10)
     transitivePeerDependencies:
@@ -25024,7 +25027,7 @@ snapshots:
       '@polkadot/types': 10.13.1
       '@polkadot/types-codec': 10.13.1
       '@polkadot/util': 12.6.2
-      tslib: 2.7.0
+      tslib: 2.8.1
 
   '@polkadot/types-augment@11.0.3':
     dependencies:
@@ -25037,7 +25040,7 @@ snapshots:
     dependencies:
       '@polkadot/util': 12.6.2
       '@polkadot/x-bigint': 12.6.2
-      tslib: 2.7.0
+      tslib: 2.8.1
 
   '@polkadot/types-codec@11.0.3':
     dependencies:
@@ -25049,7 +25052,7 @@ snapshots:
     dependencies:
       '@polkadot/types-codec': 10.13.1
       '@polkadot/util': 12.6.2
-      tslib: 2.7.0
+      tslib: 2.8.1
 
   '@polkadot/types-create@11.0.3':
     dependencies:
@@ -25067,7 +25070,7 @@ snapshots:
   '@polkadot/types-support@10.13.1':
     dependencies:
       '@polkadot/util': 12.6.2
-      tslib: 2.7.0
+      tslib: 2.8.1
 
   '@polkadot/types-support@11.0.3':
     dependencies:
@@ -25083,7 +25086,7 @@ snapshots:
       '@polkadot/util': 12.6.2
       '@polkadot/util-crypto': 12.6.2(@polkadot/util@12.6.2)
       rxjs: 7.8.1
-      tslib: 2.7.0
+      tslib: 2.8.1
 
   '@polkadot/types@11.0.3':
     dependencies:
@@ -27300,7 +27303,7 @@ snapshots:
 
   '@solana/web3.js@1.95.2(bufferutil@4.0.8)(encoding@0.1.13)(utf-8-validate@5.0.10)':
     dependencies:
-      '@babel/runtime': 7.25.7
+      '@babel/runtime': 7.26.0
       '@noble/curves': 1.6.0
       '@noble/hashes': 1.5.0
       '@solana/buffer-layout': 4.0.1
@@ -27575,7 +27578,7 @@ snapshots:
 
   '@swc/helpers@0.5.12':
     dependencies:
-      tslib: 2.7.0
+      tslib: 2.8.1
 
   '@swc/helpers@0.5.5':
     dependencies:
@@ -30461,7 +30464,7 @@ snapshots:
 
   ast-types@0.15.2:
     dependencies:
-      tslib: 2.7.0
+      tslib: 2.8.1
 
   astral-regex@1.0.0: {}
 
@@ -32317,7 +32320,7 @@ snapshots:
 
   elliptic@6.5.7:
     dependencies:
-      bn.js: 4.12.0
+      bn.js: 4.12.1
       brorand: 1.1.0
       hash.js: 1.1.7
       hmac-drbg: 1.0.1

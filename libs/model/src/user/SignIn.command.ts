@@ -1,9 +1,10 @@
-import { InvalidInput, type Command } from '@hicommonwealth/core';
+import { type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { deserializeCanvas } from '@hicommonwealth/shared';
 import crypto from 'crypto';
 import { Op } from 'sequelize';
 import { models } from '../database';
+import { mustExist } from '../middleware/guards';
 import {
   transferOwnership,
   verifyAddress,
@@ -13,7 +14,6 @@ import {
 import { emitEvent } from '../utils/utils';
 
 export const SignInErrors = {
-  InvalidCommunity: 'Invalid community',
   WrongWallet: 'Verified with different wallet than created',
   ExpiredToken: 'Token has expired, please re-register',
 };
@@ -43,132 +43,58 @@ export function SignIn(): Command<typeof schemas.SignIn> {
     authStrategy: {
       type: 'custom',
       name: 'SignIn',
-      userResolver: async (payload) => {
+      userResolver: async (payload, user) => {
         const { community_id, address } = payload;
         // TODO: SECURITY TEAM: we should stop many attacks here!
         const auth = await verifyAddress(community_id, address.trim());
-        return { id: -1, email: '', auth };
+        // return the signed in user or a dummy placeholder
+        return { id: user?.id ?? -1, email: user?.email ?? '', auth };
       },
     },
     body: async ({ actor, payload }) => {
       if (!actor.user.auth) throw Error('Invalid address');
 
-      const { community_id, wallet_id, session, referral_link } = payload;
+      const { community_id, wallet_id, referral_link, session } = payload;
       const { base, encodedAddress, ss58Prefix, hex, existingHexUserId } = actor
         .user.auth as VerifiedAddress;
+
+      let user_id =
+        (actor.user?.id ?? 0) > 0 ? actor.user.id : (existingHexUserId ?? null);
+
+      !user_id &&
+        (await verifySessionSignature(
+          deserializeCanvas(session),
+          encodedAddress,
+          ss58Prefix,
+        ));
 
       // TODO: should we remove verification token stuff?
       const verification_token = crypto.randomBytes(18).toString('hex');
       // const verification_token_expires = new Date(
       //   +new Date() + config.AUTH.ADDRESS_TOKEN_EXPIRES_IN * 60 * 1000,
       // );
+      // verified.verification_token_expires = verification_token_expires;
+      // verified.last_active = new Date();
+      // verified.block_info = block_info;
 
-      // update or create address
-      const { addr, user_created, address_created, first_community } =
+      // TODO: @timolegros - check if there are other rules involfing the wallet_id, otherwise remove this check
+      // verify existing is equivalent to signing in
+      //if (existing.wallet_id !== wallet_id)
+      //  throw new InvalidInput(SignInErrors.WrongWallet);
+
+      // TODO: should we only update when token expired?
+      // check whether the token has expired
+      // (certain login methods e.g. jwt have no expiration token, so we skip the check in that case)
+      // const expiration = existing.verification_token_expires;
+      // if (expiration && +expiration <= +new Date())
+      //  throw new InvalidInput(SignInErrors.ExpiredToken);
+
+      // upsert address, passing user_id if signed in
+      const { user_created, address_created, first_community } =
         await models.sequelize.transaction(async (transaction) => {
-          const existing = await models.Address.scope(
-            'withPrivateData',
-          ).findOne({
-            where: { community_id, address: encodedAddress },
-            include: [
-              {
-                model: models.User,
-                required: true,
-                attributes: ['id', 'email', 'profile'],
-              },
-            ],
-            transaction,
-          });
-          if (existing) {
-            // TODO: @timolegros - check if there are other rules involfing the wallet_id, otherwise remove this check
-            // verify existing is equivalent to signing in
-            if (existing.wallet_id !== wallet_id)
-              throw new InvalidInput(SignInErrors.WrongWallet);
-
-            const { addr: verified } = await verifySessionSignature(
-              deserializeCanvas(session),
-              existing,
-              transaction,
-            );
-
-            // transfer ownership on unverified addresses
-            const transferredUser = await transferOwnership(
-              verified,
-              transaction,
-            );
-
-            // TODO: should we only update when token expired?
-            // check whether the token has expired
-            // (certain login methods e.g. jwt have no expiration token, so we skip the check in that case)
-            // const expiration = existing.verification_token_expires;
-            // if (expiration && +expiration <= +new Date())
-            //  throw new InvalidInput(SignInErrors.ExpiredToken);
-
-            verified.verification_token = verification_token;
-            // verified.verification_token_expires = verification_token_expires;
-            // verified.last_active = new Date();
-            // verified.block_info = block_info;
-
-            verified.hex = hex;
-            verified.wallet_id = wallet_id;
-            const updated = await verified.save({ transaction });
-
-            transferredUser &&
-              (await emitEvent(
-                models.Outbox,
-                [
-                  {
-                    event_name: schemas.EventNames.AddressOwnershipTransferred,
-                    event_payload: {
-                      community_id,
-                      address: updated.address,
-                      user_id: updated.user_id!,
-                      old_user_id: transferredUser.id!,
-                      old_user_email: transferredUser.email,
-                      created_at: new Date(),
-                    },
-                  },
-                ],
-                transaction,
-              ));
-
-            return {
-              addr: updated.toJSON(),
-              user_created: false,
-              address_created: false,
-              first_community: false,
-            };
-          }
-
-          // create new address
-          const new_address = await models.Address.create(
-            {
-              user_id: existingHexUserId ?? null,
-              community_id,
-              address: encodedAddress,
-              hex,
-              verification_token,
-              // verification_token_expires,
-              // block_info,
-              last_active: new Date(),
-              wallet_id,
-              role: 'member',
-              is_user_default: false,
-              ghost_address: false,
-              is_banned: false,
-            },
-            { transaction },
-          );
-
-          const { addr: verified, user } = await verifySessionSignature(
-            deserializeCanvas(session),
-            new_address,
-            transaction,
-          );
-
           // is same address found in a different community?
           const is_first_community = !(
-            !!existingHexUserId ||
+            user_id ||
             (await models.Address.findOne({
               where: {
                 community_id: { [Op.ne]: community_id },
@@ -179,44 +105,113 @@ export function SignIn(): Command<typeof schemas.SignIn> {
             }))
           );
 
-          // emit link and user creation events
-          const events: schemas.EventPairs[] = [
-            {
+          /* If address doesn't have an associated user, create one!
+          - NOTE: magic strategy is the other place (when using email)
+          */
+          let user_created = false;
+          if (!user_id) {
+            const existing = await models.Address.findOne({
+              where: { address: encodedAddress, user_id: { [Op.ne]: null } },
+            });
+            if (!existing) {
+              const user = await models.User.create(
+                { email: null, profile: {} },
+                { transaction },
+              );
+              if (!user) throw new Error('Failed to create user');
+              user_id = user.id!;
+              user_created = true;
+            } else user_id = existing.user_id!;
+          }
+
+          const [addr, address_created] = await models.Address.findOrCreate({
+            where: { community_id, address: encodedAddress },
+            defaults: {
+              community_id,
+              address: encodedAddress,
+              user_id,
+              hex,
+              wallet_id,
+              verification_token,
+              // verification_token_expires,
+              // block_info,
+              last_active: new Date(),
+              verified: new Date(),
+              role: 'member',
+              is_user_default: false,
+              ghost_address: false,
+              is_banned: false,
+            },
+            transaction,
+          });
+          if (!address_created) {
+            addr.user_id = user_id;
+            addr.role = 'member';
+            addr.wallet_id = wallet_id;
+            addr.verification_token = verification_token;
+            addr.last_active = new Date();
+            addr.verified = new Date();
+            await addr.save({ transaction });
+          }
+
+          const transferredUser = await transferOwnership(addr, transaction);
+
+          const events: schemas.EventPairs[] = [];
+          address_created &&
+            events.push({
               event_name: schemas.EventNames.CommunityJoined,
               event_payload: {
                 community_id,
-                user_id: verified.user_id!,
-                created_at: new_address.created_at!,
+                user_id: addr.user_id!,
+                created_at: addr.created_at!,
                 referral_link,
               },
-            },
-          ];
-          user &&
+            });
+          user_created &&
             events.push({
               event_name: schemas.EventNames.UserCreated,
               event_payload: {
                 community_id,
-                address: verified.address,
-                user_id: user.id!,
-                created_at: user.created_at!,
+                address: addr.address,
+                user_id,
+                created_at: addr.created_at!,
                 referral_link,
+              },
+            });
+          transferredUser &&
+            events.push({
+              event_name: schemas.EventNames.AddressOwnershipTransferred,
+              event_payload: {
+                community_id,
+                address: addr.address,
+                user_id: addr.user_id!,
+                old_user_id: transferredUser.id!,
+                old_user_email: transferredUser.email,
+                created_at: new Date(),
               },
             });
           await emitEvent(models.Outbox, events, transaction);
 
           return {
-            addr: {
-              ...verified.toJSON(),
-              User: verified.User ?? user?.toJSON(),
-            },
-            user_created: user ? true : false,
-            address_created: true,
+            user_created,
+            address_created: !!address_created,
             first_community: is_first_community,
           };
         });
 
+      const addr = await models.Address.scope('withPrivateData').findOne({
+        where: { community_id, address: encodedAddress, user_id },
+        include: [
+          {
+            model: models.User,
+            required: true,
+            attributes: ['id', 'email', 'profile'],
+          },
+        ],
+      });
+      mustExist('Address', addr);
       return {
-        ...addr,
+        ...addr.toJSON(),
         community_base: base,
         community_ss58_prefix: ss58Prefix,
         user_created,

@@ -21,7 +21,7 @@ export type AuthStrategies<Input extends ZodSchema> =
   | {
       type: 'custom';
       name: string;
-      userResolver: (payload: z.infer<Input>) => Promise<User>;
+      userResolver: (payload: z.infer<Input>, user?: User) => Promise<User>;
     };
 
 /**

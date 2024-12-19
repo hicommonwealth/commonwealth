@@ -10,19 +10,21 @@ import {
   serializeCanvas,
 } from '@hicommonwealth/shared';
 import { afterAll, describe, expect, it } from 'vitest';
+import { tester } from '../../src';
 import { models } from '../../src/database';
 import { InvalidAddress, verifyAddress } from '../../src/services/session';
 import { SignIn } from '../../src/user/SignIn.command';
 import { CommunitySeedOptions, seedCommunity } from '../utils';
 
-describe('SignIn Lifecycle', () => {
+describe('SignIn Lifecycle', async () => {
   const [evmSigner, cosmosSigner, substrateSigner, solanaSigner] =
-    getSessionSigners();
+    await getSessionSigners();
 
   const refs = {} as Record<
     ChainBase,
     {
       community_id: string;
+      chain_node_id: number;
       address: string;
       session: Session;
       actor: Actor;
@@ -92,6 +94,7 @@ describe('SignIn Lifecycle', () => {
 
         const ref = (refs[seed.chain_base!] = {
           community_id: community!.id,
+          chain_node_id: community!.chain_node_id!,
           session: payload,
           address,
           actor: {
@@ -112,6 +115,7 @@ describe('SignIn Lifecycle', () => {
             session: serializeCanvas(ref.session),
           },
         });
+        ref.actor.user.id = addr!.user_id!;
 
         expect(addr).to.not.be.null;
         expect(addr!.address).to.be.equal(ref.address);
@@ -128,7 +132,13 @@ describe('SignIn Lifecycle', () => {
         expect(addr!.User).to.not.be.null;
         expect(addr!.User!.id).to.be.not.null;
         expect(addr!.User!.profile.email).to.be.undefined;
-        expect(addr!.User!.emailVerified).to.be.null;
+        expect(addr!.User!.emailVerified).to.be.undefined;
+
+        // check community profile count was incremented
+        const c = await models.Community.findOne({
+          where: { id: ref.community_id },
+        });
+        expect(c?.profile_count).to.be.equal(1);
       },
     );
   });
@@ -154,6 +164,12 @@ describe('SignIn Lifecycle', () => {
         expect(addr!.first_community).to.be.false;
         expect(addr!.user_created).to.be.false;
         expect(addr!.address_created).to.be.false;
+
+        // check community profile count is still 1
+        const c = await models.Community.findOne({
+          where: { id: ref.community_id },
+        });
+        expect(c?.profile_count).to.be.equal(1);
       },
     );
   });
@@ -199,7 +215,12 @@ describe('SignIn Lifecycle', () => {
       const { payload } = await altSessionSigner.newSession(CANVAS_TOPIC);
       expect(
         command(SignIn(), {
-          actor: refs[ChainBase.Ethereum].actor,
+          actor: {
+            user: {
+              ...refs[ChainBase.Ethereum].actor.user,
+              id: -1, // not signed in to verify session
+            },
+          },
           payload: {
             address: refs[ChainBase.Ethereum].address,
             community_id: refs[ChainBase.Ethereum].community_id,
@@ -214,7 +235,12 @@ describe('SignIn Lifecycle', () => {
       const { payload } = await evmSigner.newSession('FAKE_TOPIC');
       expect(
         command(SignIn(), {
-          actor: refs[ChainBase.Ethereum].actor,
+          actor: {
+            user: {
+              ...refs[ChainBase.Ethereum].actor.user,
+              id: -1, // not signed in to verify session
+            },
+          },
           payload: {
             address: refs[ChainBase.Ethereum].address,
             community_id: refs[ChainBase.Ethereum].community_id,
@@ -223,6 +249,111 @@ describe('SignIn Lifecycle', () => {
           },
         }),
       ).rejects.toThrow(/invalid SIWE signature/);
+    });
+  });
+
+  describe('transfer ownership', () => {
+    it.each(chains)(
+      'should transfer $seed.chain_base address ownership',
+      async ({ wallet, seed }) => {
+        const ref = refs[seed.chain_base!];
+
+        // create a second community and have ref.actor join it
+        const [community2] = await tester.seed('Community', {
+          chain_node_id: ref.chain_node_id,
+          base: seed.chain_base,
+          active: true,
+          profile_count: 0,
+          topics: [],
+        });
+        await tester.seed('Address', {
+          community_id: community2!.id,
+          address: ref.address,
+          user_id: ref.actor.user.id!,
+          role: 'member',
+          wallet_id: wallet,
+          hex: 'hex',
+        });
+
+        // create a second address/user combo
+        // using seeds b/c signer is not creating a new address
+        const address2 = ref.address
+          .split('')
+          .map((c, i) =>
+            i === ref.address.length - 1
+              ? String.fromCharCode(c.charCodeAt(0) + 1)
+              : c,
+          )
+          .join(''); // just increment last char of ref.address to keep format
+        const [user2] = await tester.seed('User', {
+          id: ref.actor.user.id! + 1000,
+          profile: { name: 'user2' },
+        });
+        const [addr2] = await tester.seed('Address', {
+          community_id: ref.community_id,
+          address: address2,
+          user_id: user2?.id,
+          role: 'member',
+          wallet_id: wallet,
+          hex: 'hex',
+        });
+
+        // have user 2 sign in with address of user 1
+        const actor2 = {
+          user: {
+            id: addr2!.user_id!, // simulated signed in
+            email: user2!.email!,
+            auth: await verifyAddress(ref.community_id, ref.address),
+          },
+        };
+        const transferred = await command(SignIn(), {
+          actor: actor2,
+          payload: {
+            address: ref.address,
+            community_id: ref.community_id,
+            wallet_id: wallet,
+            session: serializeCanvas(ref.session),
+          },
+        });
+        expect(transferred).to.not.be.null;
+        expect(transferred!.address).to.be.equal(ref.address);
+
+        // check that user 2 now owns 2 addresses from user 1
+        // the address from the second community was transferred
+        const addresses = await models.Address.findAll({
+          where: { address: ref.address },
+        });
+        expect(addresses.length).to.be.equal(2);
+        addresses.forEach((a) => {
+          expect(a.user_id).to.be.equal(addr2!.user_id);
+        });
+
+        // check community profile count is still 1
+        const c = await models.Community.findOne({
+          where: { id: ref.community_id },
+        });
+        expect(c?.profile_count).to.be.equal(1);
+      },
+    );
+  });
+
+  describe('assert all events in lifecycle', () => {
+    it('should assert all events in lifecycle', async () => {
+      const events = await models.Outbox.findAll({});
+      expect(events.map((e) => e.event_name)).toEqual([
+        'CommunityJoined',
+        'UserCreated',
+        'CommunityJoined',
+        'UserCreated',
+        'CommunityJoined',
+        'UserCreated',
+        'CommunityJoined',
+        'UserCreated',
+        'AddressOwnershipTransferred',
+        'AddressOwnershipTransferred',
+        'AddressOwnershipTransferred',
+        'AddressOwnershipTransferred',
+      ]);
     });
   });
 });

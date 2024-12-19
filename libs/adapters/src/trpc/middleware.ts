@@ -180,7 +180,7 @@ const authenticate = async <Input extends ZodSchema>(
           throw new Error('Not authenticated');
       }
     } else if (authStrategy.type === 'custom') {
-      req.user = await authStrategy.userResolver(rawInput);
+      req.user = await authStrategy.userResolver(rawInput, req.user as User);
     } else {
       await passport.authenticate(authStrategy.type, { session: false });
     }
