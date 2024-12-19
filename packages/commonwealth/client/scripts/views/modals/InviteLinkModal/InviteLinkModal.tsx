@@ -28,7 +28,9 @@ const InviteLinkModal = ({ onModalClose }: InviteLinkModalProps) => {
   const currentUrl = window.location.origin;
 
   // TODO: @Marcin to check address access (referral link creation) + related changes in this file
-  const inviteLink = `${currentUrl}${communityId ? `/${communityId}/discussions` : '/dashboard'}?refcode=${user.activeAccount?.address}`;
+  const inviteLink = `${currentUrl}${
+    communityId ? `/${communityId}/discussions` : '/dashboard'
+  }?refcode=${user.activeAccount?.address}`;
 
   const handleCopy = () => {
     saveToClipboard(inviteLink, true).catch(console.error);

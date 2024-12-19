@@ -34,7 +34,7 @@ export async function handleReferralFeeDistributed(
   const web3 = new Web3(chainNode.private_url! || chainNode.url!);
   const block = await web3.eth.getBlock(event.rawLog.blockHash);
 
-  let feeAmount =
+  const feeAmount =
     Number(BigNumber.from(referrerReceivedAmount).toBigInt()) / 1e18;
 
   await models.sequelize.transaction(async (transaction) => {
