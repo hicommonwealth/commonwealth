@@ -11,17 +11,23 @@ import CWPopover, {
   usePopover,
 } from 'views/components/component_kit/new_designs/CWPopover';
 import type {
+  CommunityMenuItem,
   ComponentMenuItem,
   DefaultMenuItem,
   DividerMenuItem,
   HeaderMenuItem,
+  NotificationMenuItem,
+  SubmenuMenuItem,
 } from '../types';
 
 export type PopoverMenuItem =
   | DividerMenuItem
   | HeaderMenuItem
   | DefaultMenuItem
-  | ComponentMenuItem;
+  | ComponentMenuItem
+  | NotificationMenuItem
+  | CommunityMenuItem
+  | SubmenuMenuItem;
 
 type PopoverMenuProps = {
   menuItems: Array<PopoverMenuItem>;

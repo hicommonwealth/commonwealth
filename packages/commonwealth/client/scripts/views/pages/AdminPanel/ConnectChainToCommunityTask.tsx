@@ -22,7 +22,9 @@ import { getSortedChains } from './utils';
 const ConnectChainToCommunityTask = () => {
   const [communityId, setCommunityId] = useState<string>('');
 
-  const [chainNameAndId, setChainNameAndId] = useState<DropdownItemType>({
+  const [chainNameAndId, setChainNameAndId] = useState<
+    DropdownItemType<number>
+  >({
     label: '',
     value: 0,
   });

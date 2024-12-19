@@ -21,25 +21,28 @@ import { SERVER_URL } from 'state/api/config';
 import useAdminOnboardingSliderMutationStore from 'state/ui/adminOnboardingCards';
 import useGroupMutationBannerStore from 'state/ui/group';
 import {
+  SUPPORTED_LANGUAGES,
+  type SupportedLanguage,
+} from 'state/ui/language/constants';
+import useLanguageStore from 'state/ui/language/language';
+import {
   useAuthModalStore,
   useManageCommunityStakeModalStore,
 } from 'state/ui/modals';
 import useUserStore from 'state/ui/user';
-import { PopoverMenuItem } from 'views/components/component_kit/CWPopoverMenu';
 import {
   CWToggle,
   toggleDarkMode,
 } from 'views/components/component_kit/cw_toggle';
 import CWIconButton from 'views/components/component_kit/new_designs/CWIconButton';
+import { PopoverMenuItem } from 'views/components/component_kit/types';
 import useAuthentication from '../../modals/AuthModal/useAuthentication';
 import { useCommunityStake } from '../CommunityStake';
 import UserMenuItem from './UserMenuItem';
 import useCheckAuthenticatedAddresses from './useCheckAuthenticatedAddresses';
+import './useUserMenuItems.scss';
 
 const resetWalletConnectSession = async () => {
-  /**
-   * Imp to reset wc session on logout as otherwise, subsequent login attempts will fail
-   */
   const walletConnectWallet = WebWalletController.Instance.getByName(
     WalletId.WalletConnect,
   );
@@ -88,6 +91,8 @@ const useUserMenuItems = ({
   });
 
   const referralsEnabled = useFlag('referrals');
+  const languageEnabled = useFlag('languageSelector');
+  const { selectedLanguage, setSelectedLanguage } = useLanguageStore();
 
   const userData = useUserStore();
   const hasMagic = userData.addresses?.[0]?.walletId === WalletId.Magic;
@@ -222,110 +227,145 @@ const useUserMenuItems = ({
     },
   );
 
+  const userMenuItems: PopoverMenuItem[] = [
+    // if a user is in a stake enabled community without membership, show user addresses that
+    // match active chain base in the dropdown. This address should show be set to
+    // user.activeAccount of useUserStore().
+    ...(shouldShowAddressesSwitcherForNonMember
+      ? ([
+          {
+            type: 'header',
+            label: 'Addresses',
+          },
+          ...uniqueChainAddressOptions,
+          { type: 'divider' },
+        ] as PopoverMenuItem[])
+      : []),
+    ...(userData.accounts.length > 0
+      ? ([
+          {
+            type: 'header',
+            label: 'Addresses',
+          },
+          ...addresses,
+          {
+            type: 'default',
+            label: 'Connect a new address',
+            onClick: () => {
+              onAuthModalOpen();
+              onAddressItemClick?.();
+            },
+          },
+          { type: 'divider' },
+        ] as PopoverMenuItem[])
+      : []),
+    {
+      type: 'header',
+      label: 'Settings',
+    },
+    {
+      type: 'default',
+      label: 'View profile',
+      onClick: () => navigate(`/profile/id/${userData.id}`, {}, null),
+    },
+    {
+      type: 'default',
+      label: 'Edit profile',
+      onClick: () => navigate(`/profile/edit`, {}, null),
+    },
+    ...(languageEnabled
+      ? [
+          {
+            type: 'submenu' as const,
+            label: (
+              <div className="language-menu-item">
+                <span className="flag">
+                  {SUPPORTED_LANGUAGES[selectedLanguage].flag}
+                </span>
+                <span className="abbr">
+                  {SUPPORTED_LANGUAGES[selectedLanguage].abbr}
+                </span>
+              </div>
+            ),
+            items: Object.entries(SUPPORTED_LANGUAGES).map(
+              ([code, { flag, abbr }]) => ({
+                type: 'default' as const,
+                label: (
+                  <div className="flag-abbr">
+                    <span>{flag}</span>
+                    <span className="abbr">{abbr}</span>
+                  </div>
+                ),
+                onClick: () => setSelectedLanguage(code as SupportedLanguage),
+                selected: selectedLanguage === code,
+                className: 'language-submenu-item',
+              }),
+            ),
+            className: 'language-menu',
+          },
+          { type: 'divider' as const },
+        ]
+      : []),
+    ...(hasMagic
+      ? [
+          {
+            type: 'default',
+            label: (
+              <div className="UserMenuItem">
+                <div>Open wallet</div>
+                <CWIconButton iconName="arrowSquareOut" />
+              </div>
+            ),
+            onClick: () => openMagicWallet(),
+          } as PopoverMenuItem,
+        ]
+      : []),
+    ...(referralsEnabled
+      ? [
+          {
+            type: 'default',
+            label: 'Get referral link',
+            onClick: () => {
+              onReferralItemClick?.();
+            },
+          },
+        ]
+      : []),
+    {
+      type: 'default',
+      label: 'My transactions',
+      onClick: () => navigate(`/myTransactions`, {}, null),
+    },
+    {
+      type: 'default',
+      label: 'Notification settings',
+      onClick: () => navigate('/notification-settings', {}, null),
+    },
+    {
+      type: 'default',
+      label: (
+        <div className="UserMenuItem">
+          <div>Dark mode</div>
+          <CWToggle readOnly checked={isDarkModeOn} />
+        </div>
+      ),
+      preventClosing: true,
+      onClick: () => toggleDarkMode(!isDarkModeOn, setIsDarkModeOn),
+    },
+    {
+      type: 'default',
+      label: 'Sign out',
+      // eslint-disable-next-line @typescript-eslint/no-misused-promises
+      onClick: async () => {
+        clearSetGatingGroupBannerForCommunities();
+        clearSetAdminOnboardingCardVisibilityForCommunities();
+        await handleLogout();
+      },
+    },
+  ] as PopoverMenuItem[];
+
   return {
-    userMenuItems: [
-      // if a user is in a stake enabled community without membership, show user addresses that
-      // match active chain base in the dropdown. This address should show be set to
-      // user.activeAccount of useUserStore().
-      ...(shouldShowAddressesSwitcherForNonMember
-        ? ([
-            {
-              type: 'header',
-              label: 'Addresses',
-            },
-            ...uniqueChainAddressOptions,
-            { type: 'divider' },
-          ] as PopoverMenuItem[])
-        : []),
-      ...(userData.accounts.length > 0
-        ? ([
-            {
-              type: 'header',
-              label: 'Addresses',
-            },
-            ...addresses,
-            {
-              type: 'default',
-              label: 'Connect a new address',
-              onClick: () => {
-                onAuthModalOpen();
-                onAddressItemClick?.();
-              },
-            },
-            { type: 'divider' },
-          ] as PopoverMenuItem[])
-        : []),
-      {
-        type: 'header',
-        label: 'Settings',
-      },
-      {
-        type: 'default',
-        label: 'View profile',
-        onClick: () => navigate(`/profile/id/${userData.id}`, {}, null),
-      },
-      {
-        type: 'default',
-        label: 'Edit profile',
-        onClick: () => navigate(`/profile/edit`, {}, null),
-      },
-      ...(hasMagic
-        ? [
-            {
-              type: 'default',
-              label: (
-                <div className="UserMenuItem">
-                  <div>Open wallet</div>
-                  <CWIconButton iconName="arrowSquareOut" />
-                </div>
-              ),
-              onClick: () => openMagicWallet(),
-            },
-          ]
-        : []),
-      ...(referralsEnabled
-        ? [
-            {
-              type: 'default',
-              label: 'Get referral link',
-              onClick: () => {
-                onReferralItemClick?.();
-              },
-            },
-          ]
-        : []),
-      {
-        type: 'default',
-        label: 'My transactions',
-        onClick: () => navigate(`/myTransactions`, {}, null),
-      },
-      {
-        type: 'default',
-        label: 'Notification settings',
-        onClick: () => navigate('/notification-settings', {}, null),
-      },
-      {
-        type: 'default',
-        label: (
-          <div className="UserMenuItem">
-            <div>Dark mode</div>
-            <CWToggle readOnly checked={isDarkModeOn} />
-          </div>
-        ),
-        preventClosing: true,
-        onClick: () => toggleDarkMode(!isDarkModeOn, setIsDarkModeOn),
-      },
-      {
-        type: 'default',
-        label: 'Sign out',
-        // eslint-disable-next-line @typescript-eslint/no-misused-promises
-        onClick: async () => {
-          clearSetGatingGroupBannerForCommunities();
-          clearSetAdminOnboardingCardVisibilityForCommunities();
-          await handleLogout();
-        },
-      },
-    ] as PopoverMenuItem[],
+    userMenuItems,
   };
 };
 

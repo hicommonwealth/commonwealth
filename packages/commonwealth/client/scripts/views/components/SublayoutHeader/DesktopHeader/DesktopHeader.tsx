@@ -1,14 +1,22 @@
 import clsx from 'clsx';
 import React from 'react';
 
+import { useFlag } from 'hooks/useFlag';
 import { useCommonNavigate } from 'navigation/helpers';
+import {
+  SUPPORTED_LANGUAGES,
+  SupportedLanguage,
+} from 'state/ui/language/constants';
+import useLanguageStore from 'state/ui/language/language';
 import useSidebarStore from 'state/ui/sidebar';
 import KnockNotifications from 'views/components/KnockNotifications';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
+import { CWDropdown } from 'views/components/component_kit/cw_dropdown';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { isWindowSmallInclusive } from 'views/components/component_kit/helpers';
 import { CWSearchBar } from 'views/components/component_kit/new_designs/CWSearchBar';
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
+import { DropdownItemType } from 'views/components/component_kit/types';
 import { CreateContentPopover } from 'views/menus/CreateContentMenu';
 import { HelpMenuPopover } from 'views/menus/help_menu';
 
@@ -31,6 +39,8 @@ const DesktopHeader = ({ onMobile, onAuthModalOpen }: DesktopHeaderProps) => {
     useSidebarStore();
   const user = useUserStore();
   const { data: domain } = useFetchCustomDomainQuery();
+  const languageEnabled = useFlag('languageSelector');
+  const { selectedLanguage, setSelectedLanguage } = useLanguageStore();
 
   const handleToggle = () => {
     const isVisible = !menuVisible;
@@ -39,6 +49,19 @@ const DesktopHeader = ({ onMobile, onAuthModalOpen }: DesktopHeaderProps) => {
       setUserToggledVisibility(isVisible ? 'open' : 'closed');
     }, 200);
   };
+
+  const languageOptions: DropdownItemType<SupportedLanguage>[] = Object.entries(
+    SUPPORTED_LANGUAGES,
+  ).map(([code, lang]) => ({
+    label: (
+      <div className="flag-abbr">
+        <span>{lang.flag}</span>
+        <span className="abbr">{lang.abbr}</span>
+      </div>
+    ),
+    value: code as SupportedLanguage,
+    selected: selectedLanguage === code,
+  }));
 
   return (
     <div className="DesktopHeader">
@@ -82,6 +105,29 @@ const DesktopHeader = ({ onMobile, onAuthModalOpen }: DesktopHeaderProps) => {
               isLoggedIn: user.isLoggedIn,
             })}
           >
+            {languageEnabled && (
+              <CWDropdown<SupportedLanguage>
+                containerClassName="language-selector"
+                label={
+                  <div className="flag-abbr">
+                    <span>{SUPPORTED_LANGUAGES[selectedLanguage].flag}</span>
+                    <span className="abbr">
+                      {SUPPORTED_LANGUAGES[selectedLanguage].abbr}
+                    </span>
+                  </div>
+                }
+                options={languageOptions}
+                value={selectedLanguage}
+                onSelect={(item) => {
+                  if (
+                    typeof item.value === 'string' &&
+                    item.value in SUPPORTED_LANGUAGES
+                  ) {
+                    setSelectedLanguage(item.value as SupportedLanguage);
+                  }
+                }}
+              />
+            )}
             <CreateContentPopover />
             <CWTooltip
               content="Explore communities"

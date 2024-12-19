@@ -58,64 +58,36 @@ export enum ComponentType {
   SelectList = 'SelectList',
 }
 
-export type BaseStyleProps = {
-  disabled?: boolean;
-  className?: string;
-};
-
-export type DividerMenuItem = { type: 'divider'; className?: string };
-
-export type HeaderMenuItem = {
-  type: 'header';
+export type MenuItem = {
+  type: 'default' | 'header' | 'divider' | 'submenu' | 'notification' | 'community' | 'component';
   label?: string | JSX.Element;
   className?: string;
-};
-
-export type DefaultMenuItem = {
   disabled?: boolean;
   iconLeft?: IconName;
   iconLeftWeight?: 'fill' | 'bold';
   iconLeftSize?: IconSize;
   iconRight?: IconName;
-  iconRightWeight?: 'fill' | 'bold';
   isSecondary?: boolean;
-  label?: string | JSX.Element;
   onClick?: (e?: React.MouseEvent<HTMLElement>) => void;
-  type?: 'default';
-  className?: string;
   preventClosing?: boolean;
   isButton?: boolean;
-};
-
-export type ComponentMenuItem = {
-  type: 'element';
-  element: ReactNode;
-};
-
-type NotificationMenuItem = {
-  hasUnreads?: boolean;
-  iconLeft?: IconName;
-  iconRight?: IconName;
-  label?: string | JSX.Element;
-  onClick?: (e?: React.MouseEvent<HTMLElement>) => void;
-  type?: 'notification';
-};
-
-export type CommunityMenuItem = {
+  selected?: boolean;
+  items?: MenuItem[]; // For submenu type
+  hasUnreads?: boolean; // For notification type
+  component?: ReactNode; // For component type
   community?: {
     id: string;
     name: string;
     iconUrl: string;
     isStarred: boolean;
-  };
-  label?: string | JSX.Element;
-  type?: 'community';
+  }; // For community type
 };
 
-export type MenuItem =
-  | DividerMenuItem
-  | HeaderMenuItem
-  | DefaultMenuItem
-  | NotificationMenuItem
-  | CommunityMenuItem
-  | ComponentMenuItem;
+export type PopoverMenuItem = MenuItem;
+
+export type DropdownItemType<T extends string | number = string | number> = {
+  label: string | JSX.Element;
+  value: T;
+  selected?: boolean;
+  className?: string;
+};

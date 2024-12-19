@@ -1,12 +1,8 @@
 import { IconName } from 'views/components/component_kit/cw_icons/cw_icon_lookup';
+import { NavigationButtonType } from './NavigationButton';
 
-import { NavigationButtonProps } from '../NavigationButton';
-
-// This util receives a type of the navigation button
-// and returns tuple, where first element is a (string) name of the icon
-// and second element is a (string) display text visible below the icon
 export const typeToIconAndName = (
-  type: NavigationButtonProps['type'],
+  type: NavigationButtonType,
 ): [IconName, string] => {
   switch (type) {
     case 'home':
