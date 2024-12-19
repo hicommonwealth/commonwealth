@@ -43,12 +43,16 @@ export function SignIn(): Command<typeof schemas.SignIn> {
     authStrategy: {
       type: 'custom',
       name: 'SignIn',
-      userResolver: async (payload, user) => {
+      userResolver: async (payload, signedInUser) => {
         const { community_id, address } = payload;
         // TODO: SECURITY TEAM: we should stop many attacks here!
         const auth = await verifyAddress(community_id, address.trim());
         // return the signed in user or a dummy placeholder
-        return { id: user?.id ?? -1, email: user?.email ?? '', auth };
+        return {
+          id: signedInUser?.id ?? -1,
+          email: signedInUser?.email ?? '',
+          auth,
+        };
       },
     },
     body: async ({ actor, payload }) => {
@@ -108,7 +112,7 @@ export function SignIn(): Command<typeof schemas.SignIn> {
           /* If address doesn't have an associated user, create one!
           - NOTE: magic strategy is the other place (when using email)
           */
-          let user_created = false;
+          let new_user = false;
           if (!user_id) {
             const existing = await models.Address.findOne({
               where: { address: encodedAddress, user_id: { [Op.ne]: null } },
@@ -120,11 +124,11 @@ export function SignIn(): Command<typeof schemas.SignIn> {
               );
               if (!user) throw new Error('Failed to create user');
               user_id = user.id!;
-              user_created = true;
+              new_user = true;
             } else user_id = existing.user_id!;
           }
 
-          const [addr, address_created] = await models.Address.findOrCreate({
+          const [addr, new_address] = await models.Address.findOrCreate({
             where: { community_id, address: encodedAddress },
             defaults: {
               community_id,
@@ -144,7 +148,7 @@ export function SignIn(): Command<typeof schemas.SignIn> {
             },
             transaction,
           });
-          if (!address_created) {
+          if (!new_address) {
             addr.user_id = user_id;
             addr.role = 'member';
             addr.wallet_id = wallet_id;
@@ -157,7 +161,7 @@ export function SignIn(): Command<typeof schemas.SignIn> {
           const transferredUser = await transferOwnership(addr, transaction);
 
           const events: schemas.EventPairs[] = [];
-          address_created &&
+          new_address &&
             events.push({
               event_name: schemas.EventNames.CommunityJoined,
               event_payload: {
@@ -167,7 +171,7 @@ export function SignIn(): Command<typeof schemas.SignIn> {
                 referral_link,
               },
             });
-          user_created &&
+          new_user &&
             events.push({
               event_name: schemas.EventNames.UserCreated,
               event_payload: {
@@ -193,8 +197,8 @@ export function SignIn(): Command<typeof schemas.SignIn> {
           await emitEvent(models.Outbox, events, transaction);
 
           return {
-            user_created,
-            address_created: !!address_created,
+            user_created: new_user,
+            address_created: !!new_address,
             first_community: is_first_community,
           };
         });
