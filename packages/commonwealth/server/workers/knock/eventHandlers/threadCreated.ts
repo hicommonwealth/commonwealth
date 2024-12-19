@@ -6,7 +6,7 @@ import {
 } from '@hicommonwealth/core';
 import { models, Webhook } from '@hicommonwealth/model';
 import { getDecodedString, safeTruncateBody } from '@hicommonwealth/shared';
-import { Op } from 'sequelize';
+import { Op, WhereOptions } from 'sequelize';
 import z from 'zod';
 import { config } from '../../../config';
 import { getProfileUrl, getThreadUrl } from '../util';
@@ -45,7 +45,7 @@ export const processThreadCreated: EventHandler<
     where: {
       community_id: community.id!,
       events: { [Op.contains]: ['ThreadCreated'] },
-    },
+    } as WhereOptions,
   });
 
   if (webhooks.length > 0) {
@@ -79,7 +79,6 @@ export const processThreadCreated: EventHandler<
       data: {
         sender_username: 'Common',
         sender_avatar_url: config.DEFAULT_COMMONWEALTH_LOGO,
-        community_id: community.id!,
         title_prefix: 'New thread: ',
         preview_image_url: previewImg.previewImageUrl,
         preview_image_alt_text: previewImg.previewImageAltText,
