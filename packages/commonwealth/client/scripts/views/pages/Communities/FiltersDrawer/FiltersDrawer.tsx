@@ -32,7 +32,7 @@ export const FiltersDrawer = ({
   onFiltersChange,
 }: FiltersDrawerProps) => {
   const { data: tags } = useFetchTagsQuery();
-  const tokenizedCommunityEnabled = useFlag('tokenizedCommunity');
+  const launchpadEnabled = useFlag('launchpad');
 
   const onStakeFilterChange = () => {
     onFiltersChange({
@@ -137,7 +137,7 @@ export const FiltersDrawer = ({
               />
             </div>
 
-            {tokenizedCommunityEnabled && (
+            {launchpadEnabled && (
               <>
                 <CWAccordion
                   header="Sort By"
@@ -247,7 +247,7 @@ export const FiltersDrawer = ({
                       }
                     />
                   ))}
-                  {tokenizedCommunityEnabled &&
+                  {launchpadEnabled &&
                     Object.keys(communityChains).map((chain) => (
                       <CWRadioButton
                         key={chain}

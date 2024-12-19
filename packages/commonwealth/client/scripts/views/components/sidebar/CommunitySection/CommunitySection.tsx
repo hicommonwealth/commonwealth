@@ -34,7 +34,7 @@ interface CommunitySectionProps {
 }
 
 export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
-  const tokenizedCommunityEnabled = useFlag('tokenizedCommunity');
+  const launchpadEnabled = useFlag('launchpad');
 
   const user = useUserStore();
   const {
@@ -97,7 +97,7 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
           </>
         )}
 
-        {tokenizedCommunityEnabled && <TokenTradeWidget />}
+        {launchpadEnabled && <TokenTradeWidget />}
 
         <CreateCommunityButton />
 

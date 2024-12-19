@@ -10,7 +10,7 @@ import TokenLaunchDrawer from './TokenLaunchDrawer';
 const IdeaLaunchpad = () => {
   const user = useUserStore();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  const tokenizedCommunityEnabled = useFlag('tokenizedCommunity');
+  const launchpadEnabled = useFlag('launchpad');
 
   const [initialIdeaPrompt, setInitialIdeaPrompt] = useState<string>();
   const [shouldGenerateIdeaOnDrawerOpen, setShouldGenerateIdeaOnDrawerOpen] =
@@ -29,7 +29,7 @@ const IdeaLaunchpad = () => {
     }
   };
 
-  if (!tokenizedCommunityEnabled) return <></>;
+  if (!launchpadEnabled) return <></>;
 
   return (
     <>

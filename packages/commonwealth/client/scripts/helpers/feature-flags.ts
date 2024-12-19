@@ -27,7 +27,7 @@ const featureFlags = {
   ),
   farcasterContest: buildFlag(process.env.FLAG_FARCASTER_CONTEST),
   newEditor: buildFlag(process.env.FLAG_NEW_EDITOR),
-  tokenizedCommunity: buildFlag(process.env.FLAG_TOKENIZED_COMMUNITY),
+  launchpad: buildFlag(process.env.FLAG_LAUNCHPAD),
   manageApiKeys: buildFlag(process.env.FLAG_MANAGE_API_KEYS),
   referrals: buildFlag(process.env.FLAG_REFERRALS),
   stickyEditor: buildFlag(process.env.FLAG_STICKY_EDITOR),

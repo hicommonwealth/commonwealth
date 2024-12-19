@@ -278,7 +278,7 @@ const TokenInformationForm = ({
             }}
             handleClickConnectNewWallet={handleClickConnectNewWallet}
             handleClickContinue={handleSelectedAddress}
-            isTokenizedCommunity
+            isLaunchpadCommunity
           />
         }
         onClose={() => setIsNewTokenCommunityAdminModalOpen(false)}
