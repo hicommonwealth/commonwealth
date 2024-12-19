@@ -847,7 +847,7 @@ describe('Thread lifecycle', () => {
       ).rejects.toThrowError(InvalidActor);
     });
 
-    test('should get comments', async () => {
+    test('should get comments with reactions', async () => {
       await command(CreateComment(), {
         actor: actors.admin,
         payload: {
@@ -870,19 +870,67 @@ describe('Thread lifecycle', () => {
           limit: 50,
           cursor: 1,
           thread_id: thread.id!,
-          include_user: true,
+          include_reactions: true,
+        },
+      });
+      expect(response!.results.length).to.equal(15);
+      const last = response!.results.at(-1)!;
+      const stl = response!.results.at(-2)!;
+      expect(last!.address).to.equal(actors.member.address);
+      expect(last!.user_id).to.equal(actors.member.user.id);
+      expect(last!.body).to.equal('world');
+      expect(stl!.address).to.equal(actors.admin.address);
+      expect(stl!.user_id).to.equal(actors.admin.user.id);
+      expect(stl!.body).to.equal('hello');
+
+      // get second comment with reactions
+      const response2 = await query(GetComments(), {
+        actor: actors.member,
+        payload: {
+          limit: 50,
+          cursor: 1,
+          thread_id: thread.id!,
+          comment_id: response?.results.at(1)!.id,
+          include_reactions: true,
+        },
+      });
+      const second = response2?.results.at(0)!;
+      expect(second!.reactions!.length).to.equal(1);
+    });
+
+    test('should get comments without reactions', async () => {
+      const response = await query(GetComments(), {
+        actor: actors.member,
+        payload: {
+          limit: 50,
+          cursor: 1,
+          thread_id: thread.id!,
           include_reactions: false,
         },
       });
       expect(response!.results.length).to.equal(15);
       const last = response!.results.at(-1)!;
       const stl = response!.results.at(-2)!;
-      expect(last!.Address?.address).to.equal(actors.member.address);
-      expect(last!.Address?.User?.id).to.equal(actors.member.user.id);
+      expect(last!.address).to.equal(actors.member.address);
+      expect(last!.user_id).to.equal(actors.member.user.id);
       expect(last!.body).to.equal('world');
-      expect(stl!.Address?.address).to.equal(actors.admin.address);
-      expect(stl!.Address?.User?.id).to.equal(actors.admin.user.id);
+      expect(stl!.address).to.equal(actors.admin.address);
+      expect(stl!.user_id).to.equal(actors.admin.user.id);
       expect(stl!.body).to.equal('hello');
+
+      // get second comment without reactions
+      const response2 = await query(GetComments(), {
+        actor: actors.member,
+        payload: {
+          limit: 50,
+          cursor: 1,
+          thread_id: thread.id!,
+          comment_id: response?.results.at(1)!.id,
+          include_reactions: false,
+        },
+      });
+      const second = response2?.results.at(0)!;
+      expect(second!.reactions).to.be.undefined;
     });
   });
 

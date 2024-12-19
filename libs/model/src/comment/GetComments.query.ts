@@ -1,8 +1,10 @@
 import { type Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
+import { CommentsView } from '@hicommonwealth/schemas';
+import { QueryTypes } from 'sequelize';
+import { z } from 'zod';
 import { models } from '../database';
-import { removeUndefined, sanitizeDeletedComment } from '../utils/index';
-import { formatSequelizePagination } from '../utils/paginationUtils';
+import { sanitizeDeletedComment } from '../utils/index';
 
 export function GetComments(): Query<typeof schemas.GetComments> {
   return {
@@ -10,64 +12,110 @@ export function GetComments(): Query<typeof schemas.GetComments> {
     auth: [],
     secure: false,
     body: async ({ payload }) => {
-      const { thread_id, comment_id, include_user, include_reactions } =
+      const { thread_id, comment_id, include_reactions, limit, cursor } =
         payload;
 
-      const include = [];
-      if (include_user) {
-        include.push({
-          model: models.Address,
-          required: true,
-          attributes: ['address', 'last_active'],
-          include: [
-            {
-              model: models.User,
-              required: true,
-              attributes: ['id', 'profile'],
-            },
-          ],
-        });
-      }
+      const sql = `
+ SELECT
+    C.id,
+    C.body,
+    C.created_at,
+    C.updated_at,
+    C.deleted_at,
+    C.marked_as_spam_at,
+    C.reaction_count,
+    CA.address,
+    CA.last_active,
+    CU.id AS "user_id",
+    CU.profile->>'name' AS "profile_name",
+    CU.profile->>'avatar_url' AS "avatar_url",
+    ${
+      include_reactions
+        ? `
+    json_agg(json_strip_nulls(json_build_object(
+        'id', R.id,
+        'address_id', R.address_id,
+        'reaction', R.reaction,
+        'created_at', R.created_at::text,
+        'updated_at', R.updated_at::text,
+        'calculated_voting_weight', R.calculated_voting_weight::text,
+        'address', RA.address,
+        'last_active', RA.last_active::text,
+        'profile_name', RU.profile->>'name',
+        'avatar_url', RU.profile->>'avatar_url'
+      ))) AS "reactions",
+        `
+        : ''
+    }
+    COUNT(*) OVER() AS total_count
+FROM
+    "Comments" AS C
+    JOIN "Addresses" AS CA ON C."address_id" = CA."id"
+    JOIN "Users" AS CU ON CA."user_id" = CU."id"
+    ${
+      include_reactions
+        ? `
+    LEFT JOIN "Reactions" AS R ON C."id" = R."comment_id"
+    LEFT JOIN "Addresses" AS RA ON R."address_id" = RA."id"
+    LEFT JOIN "Users" AS RU ON RA."user_id" = RU."id"
+    `
+        : ''
+    }
+WHERE
+    C."thread_id" = :thread_id
+    ${comment_id ? ' AND C."id" = :comment_id' : ''}
+${
+  include_reactions
+    ? `
+GROUP BY
+    C.id,
+    C.created_at,
+    C.updated_at,
+    C.deleted_at,
+    C.marked_as_spam_at,
+    CA.address,
+    CA.last_active,
+    CU.id,
+    CU.profile->>'name',
+    CU.profile->>'avatar_url'
+`
+    : ''
+}
+ORDER BY
+    C."created_at"
+LIMIT :limit OFFSET :offset;      
+      `;
 
-      // TODO: sequelize is broken here, find workaround
-      if (include_reactions) {
-        include.push({
-          model: models.Reaction,
-          as: 'reactions',
-          include: [
-            {
-              model: models.Address,
-              required: true,
-              attributes: ['address', 'last_active'],
-              include: [
-                {
-                  model: models.User,
-                  required: true,
-                  attributes: ['id', 'profile'],
-                },
-              ],
-            },
-          ],
-        });
-      }
-
-      const { count, rows: comments } = await models.Comment.findAndCountAll({
-        where: removeUndefined({ thread_id, id: comment_id }),
-        attributes: { exclude: ['search'] },
-        include,
-        ...formatSequelizePagination(payload),
-        paranoid: false,
+      const comments = await models.sequelize.query<
+        z.infer<typeof CommentsView> & {
+          total_count: number;
+        }
+      >(sql, {
+        replacements: {
+          thread_id,
+          comment_id,
+          limit,
+          offset: (cursor - 1) * limit,
+        },
+        type: QueryTypes.SELECT,
       });
 
+      const total_count = comments?.length ? comments!.at(0)!.total_count : 0;
       const sanitizedComments = comments.map((c) => {
-        const data = c.toJSON();
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { total_count, ...rest } = c;
         return {
-          ...sanitizeDeletedComment(data),
-          last_edited: data.updated_at,
-        };
+          ...sanitizeDeletedComment(
+            rest as unknown as z.infer<typeof schemas.Comment>,
+          ),
+        } as unknown as z.infer<typeof CommentsView>;
       });
 
-      return schemas.buildPaginatedResponse(sanitizedComments, count, payload);
+      return schemas.buildPaginatedResponse(
+        sanitizedComments,
+        total_count,
+        payload,
+      );
     },
   };
 }
