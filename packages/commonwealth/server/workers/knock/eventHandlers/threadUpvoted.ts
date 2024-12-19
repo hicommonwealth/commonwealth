@@ -58,7 +58,7 @@ export const processThreadUpvoted: EventHandler<
   }
 
   const community = await models.Community.findByPk(payload.community_id, {
-    attributes: ['name', 'custom_domain', 'icon_url'],
+    attributes: ['name', 'custom_domain'],
   });
   if (!community) {
     log.error('Community not found!', undefined, payload);
@@ -71,7 +71,6 @@ export const processThreadUpvoted: EventHandler<
     data: {
       community_id: payload.community_id,
       community_name: community.name,
-      community_avatar: community.icon_url,
       reaction: payload.reaction,
       thread_id: payload.thread_id,
       thread_title: safeTruncateBody(getDecodedString(threadAndAuthor.title)),
