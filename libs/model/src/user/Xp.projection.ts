@@ -298,7 +298,7 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
             {
               model: models.Address,
               as: 'Address',
-              attributes: ['user_id'],
+              attributes: ['address'],
               required: true,
             },
           ],
