@@ -1,3 +1,4 @@
+import { compressImage } from '@hicommonwealth/commonwealth/server/utils/ImageCompression.js';
 import { blobStorage } from '@hicommonwealth/core';
 import fetch from 'node-fetch';
 import { OpenAI } from 'openai';
@@ -135,7 +136,8 @@ const generateTokenIdea = async function* ({
     // generate image url and send the generated url to the client (to save time on s3 upload)
     const imageResponse = await openai.images.generate({
       prompt: TOKEN_AI_PROMPTS_CONFIG.image(tokenIdea.name, tokenIdea.symbol),
-      size: '256x256',
+      model: 'dall-e-3',
+      size: '1024x1024',
       n: 1,
       response_format: 'url',
     });
@@ -145,10 +147,11 @@ const generateTokenIdea = async function* ({
     // upload image to s3 and then send finalized imageURL
     const resp = await fetch(tokenIdea.imageURL);
     const buffer = await resp.buffer();
+    const compressedBuffer = await compressImage(buffer);
     const { url } = await blobStorage().upload({
       key: `${uuidv4()}.png`,
       bucket: 'assets',
-      content: buffer,
+      content: compressedBuffer,
       contentType: 'image/png',
     });
     tokenIdea.imageURL = url;
@@ -171,5 +174,3 @@ const generateTokenIdea = async function* ({
     yield { error };
   }
 };
-
-export { generateTokenIdea };

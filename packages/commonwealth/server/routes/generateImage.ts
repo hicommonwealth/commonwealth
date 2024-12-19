@@ -10,6 +10,7 @@ import { OpenAI } from 'openai';
 import { v4 as uuidv4 } from 'uuid';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
+import { compressImage } from '../utils/ImageCompression';
 
 let openai: OpenAI | undefined = undefined;
 
@@ -58,7 +59,8 @@ const generateImage = async (
   try {
     const response = await openai.images.generate({
       prompt: description,
-      size: '256x256',
+      model: 'dall-e-3',
+      size: '1024x1024',
       response_format: 'url',
     });
 
@@ -70,10 +72,11 @@ const generateImage = async (
   try {
     const resp = await fetch(image);
     const buffer = await resp.buffer();
+    const compressedBuffer = await compressImage(buffer);
     const { url } = await blobStorage().upload({
       key: `${uuidv4()}.png`,
       bucket: 'assets',
-      content: buffer,
+      content: compressedBuffer,
       contentType: 'image/png',
     });
     return success(res, { imageUrl: url });
