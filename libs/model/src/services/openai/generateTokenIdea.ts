@@ -1,5 +1,5 @@
-import { compressImage } from '@hicommonwealth/commonwealth/server/utils/ImageCompression.js';
 import { blobStorage } from '@hicommonwealth/core';
+import { compressImage } from '@hicommonwealth/shared';
 import fetch from 'node-fetch';
 import { OpenAI } from 'openai';
 import {
@@ -30,21 +30,21 @@ type GenerateTokenIdeaResponse = {
 const TOKEN_AI_PROMPTS_CONFIG = {
   name: (ideaPrompt?: string) => `
       Please ${ideaPrompt ? `use this prompt in quotation "${ideaPrompt}" to ` : ''}
-      create a random idea for a memecoin cryptocurrency, have the token name informed by current events, 
-      and historical internet based humor. Make it hyper opinionated and subversive or topical. Provide just the 
-      token name without any acronym or symbol. Make it either cringe or amazing. Restrict your answer to between 
+      create a random idea for a memecoin cryptocurrency, have the token name informed by current events,
+      and historical internet based humor. Make it hyper opinionated and subversive or topical. Provide just the
+      token name without any acronym or symbol. Make it either cringe or amazing. Restrict your answer to between
       6 and 25 characters.
     `,
   symbol: `
-      Create a symbol for this token (symbol) of 3-6 characters. The symbol should not include special characters 
+      Create a symbol for this token (symbol) of 3-6 characters. The symbol should not include special characters
       or emojis. Restrict your answer to between 3 and 6 characters.`,
   description: `
       Provide a description for the token. Make it funny and keep it in the vein of ironic, sardonic, twitter personae.
-      There are no emoji restrictions. Keep the description to 3 sentences. DO NOT BE OVERLY POSITIVE about global 
+      There are no emoji restrictions. Keep the description to 3 sentences. DO NOT BE OVERLY POSITIVE about global
       phenomenon, only the asset itself. Restrict your answer to between 1 and 3 sentences and less than 180 characters.
     `,
   image: (name: string, symbol: string) => `
-      Please create an image for a web3 token named "${name}", having a symbol of "${symbol}". 
+      Please create an image for a web3 token named "${name}", having a symbol of "${symbol}".
     `,
 };
 
@@ -76,7 +76,7 @@ const chatWithOpenAI = async (prompt = '', openai: OpenAI) => {
   );
 };
 
-const generateTokenIdea = async function* ({
+export const generateTokenIdea = async function* ({
   ideaPrompt,
 }: GenerateTokenIdeaProps): AsyncGenerator<
   GenerateTokenIdeaResponse,
