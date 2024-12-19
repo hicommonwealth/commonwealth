@@ -13,14 +13,15 @@ export function GetComments(): Query<typeof schemas.GetComments> {
       const { thread_id, comment_id, include_user, include_reactions } =
         payload;
 
-      const includeArray = [];
+      const include = [];
       if (include_user) {
-        includeArray.push({
+        include.push({
           model: models.Address,
+          required: true,
+          attributes: ['address', 'last_active'],
           include: [
             {
               model: models.User,
-              as: 'User',
               required: true,
               attributes: ['id', 'profile'],
             },
@@ -28,20 +29,19 @@ export function GetComments(): Query<typeof schemas.GetComments> {
         });
       }
 
+      // TODO: sequelize is broken here, find workaround
       if (include_reactions) {
-        includeArray.push({
+        include.push({
           model: models.Reaction,
           as: 'reactions',
           include: [
             {
               model: models.Address,
-              as: 'Address',
               required: true,
               attributes: ['address', 'last_active'],
               include: [
                 {
                   model: models.User,
-                  as: 'User',
                   required: true,
                   attributes: ['id', 'profile'],
                 },
@@ -53,7 +53,8 @@ export function GetComments(): Query<typeof schemas.GetComments> {
 
       const { count, rows: comments } = await models.Comment.findAndCountAll({
         where: removeUndefined({ thread_id, id: comment_id }),
-        include: includeArray,
+        attributes: { exclude: ['search'] },
+        include,
         ...formatSequelizePagination(payload),
         paranoid: false,
       });
