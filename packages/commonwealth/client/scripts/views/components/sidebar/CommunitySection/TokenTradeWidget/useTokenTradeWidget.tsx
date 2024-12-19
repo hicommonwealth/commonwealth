@@ -1,4 +1,7 @@
+import { generateBlobImageFromAlphabet } from 'helpers/image';
 import { useFlag } from 'hooks/useFlag';
+import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
+import { useState } from 'react';
 import app from 'state';
 import { useGetPinnedTokenByCommunityId } from 'state/api/communities';
 import {
@@ -10,6 +13,10 @@ import { ExternalToken } from 'views/modals/TradeTokenModel/UniswapTradeModal/ty
 
 export const useTokenTradeWidget = () => {
   const tokenizedCommunityEnabled = useFlag('tokenizedCommunity');
+  const [
+    generatedFallbackImageForPinnedToken,
+    setGeneratedFallbackImageForPinnedToken,
+  ] = useState('');
 
   const communityId = app.activeChainId() || '';
   const { data: communityLaunchpadToken, isLoading: isLoadingLaunchpadToken } =
@@ -59,11 +66,29 @@ export const useTokenTradeWidget = () => {
             ...communityPinnedTokenWithMetadata,
             logo:
               communityPinnedTokenWithMetadata.logo ||
-              // TODO: points to common logo, adding this here as a fallback in
-              // case token metadata from alchemy doesn't include a token icon.
+              generatedFallbackImageForPinnedToken ||
+              // this url points to common logo, adding this here as a fallback in
+              // case token metadata from alchemy doesn't include a token icon and we
+              // failed to generate one from `generateBlobImageFromAlphabet` util
               'https://assets.commonwealth.im/b531c73a-eb29-4348-96af-db1114346f90.jpeg',
           } as ExternalToken)
         : undefined;
+
+  useRunOnceOnCondition({
+    callback: () => {
+      if (communityPinnedTokenWithMetadata?.name) {
+        generateBlobImageFromAlphabet({
+          letter: communityPinnedTokenWithMetadata.name.charAt(0),
+        })
+          .then(setGeneratedFallbackImageForPinnedToken)
+          .catch(console.error);
+      }
+    },
+    shouldRun:
+      !!communityPinnedTokenWithMetadata &&
+      !communityPinnedTokenWithMetadata.logo &&
+      !!communityPinnedTokenWithMetadata.name,
+  });
 
   return {
     isLoadingToken,
