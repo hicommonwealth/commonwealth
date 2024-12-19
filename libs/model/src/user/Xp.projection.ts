@@ -9,7 +9,6 @@ import { Op, Transaction } from 'sequelize';
 import { z } from 'zod';
 import { models, sequelize } from '../database';
 import { mustExist } from '../middleware/guards';
-import { getReferrerId } from '../utils/referrals';
 
 async function getUserId(payload: { address_id: number }) {
   const address = await models.Address.findOne({
@@ -18,6 +17,18 @@ async function getUserId(payload: { address_id: number }) {
   });
   mustExist('Address not found', address);
   return address.user_id!;
+}
+
+async function getUserIdByAddress(payload: {
+  referrer_address?: string;
+}): Promise<number | undefined | null> {
+  if (payload.referrer_address) {
+    const referrer_user = await models.Address.findOne({
+      where: { address: payload.referrer_address },
+      attributes: ['user_id'],
+    });
+    if (referrer_user) return referrer_user.user_id;
+  }
 }
 
 /*
@@ -72,9 +83,13 @@ async function recordXpsForQuest(
   user_id: number,
   event_created_at: Date,
   action_metas: Array<z.infer<typeof schemas.QuestActionMeta> | undefined>,
-  creator_user_id?: number,
+  creator_address?: string,
 ) {
   await sequelize.transaction(async (transaction) => {
+    const creator_user_id =
+      (await getUserIdByAddress({ referrer_address: creator_address })) ||
+      undefined;
+
     for (const action_meta of action_metas) {
       if (!action_meta) continue;
       // get logged actions for this user and action meta
@@ -159,15 +174,9 @@ async function recordXpsForEvent(
   creator_reward_weight?: number, // referrer reward weight
 ) {
   await sequelize.transaction(async (transaction) => {
-    let creator_user_id: number | undefined;
-
-    if (creator_address) {
-      const referrer_user = await models.Address.findOne({
-        where: { address: creator_address },
-        attributes: ['user_id'],
-      });
-      if (referrer_user) creator_user_id = referrer_user.user_id!;
-    }
+    const creator_user_id =
+      (await getUserIdByAddress({ referrer_address: creator_address })) ||
+      undefined;
 
     // get logged actions for this user and event
     const log = await models.XpLog.findAll({
@@ -230,12 +239,11 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
           'CommunityCreated',
         );
         if (action_metas.length > 0) {
-          const referrer_id = getReferrerId(payload.referral_link);
           await recordXpsForQuest(
             payload.user_id,
             payload.created_at!,
             action_metas,
-            referrer_id,
+            payload.referrer_address,
           );
         }
       },
@@ -245,12 +253,11 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
           'CommunityJoined',
         );
         if (action_metas.length > 0) {
-          const referrer_id = getReferrerId(payload.referral_link);
           await recordXpsForQuest(
             payload.user_id,
             payload.created_at!,
             action_metas,
-            referrer_id,
+            payload.referrer_address,
           );
         }
       },
@@ -307,7 +314,7 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
           user_id,
           payload.created_at!,
           action_metas,
-          comment!.Address!.user_id!,
+          comment!.Address!.address,
         );
       },
       UserMentioned: async () => {

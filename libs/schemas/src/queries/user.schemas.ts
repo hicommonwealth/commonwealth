@@ -31,7 +31,6 @@ export const UserProfileView = z.object({
   isOwner: z.boolean(),
   tags: z.array(Tags.extend({ id: PG_INT })),
   xp_points: z.number().int(),
-  referral_link: z.string().nullish(),
 });
 
 export const GetUserProfile = {
