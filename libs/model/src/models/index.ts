@@ -60,6 +60,8 @@ export * from './outbox';
 export * from './poll';
 export * from './profile_tags';
 export * from './reaction';
+export * from './referral';
+export * from './referral_fee';
 export * from './role';
 export * from './role_assignment';
 export * from './sso_token';

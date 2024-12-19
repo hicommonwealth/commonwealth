@@ -28,6 +28,11 @@ type ContractAddresses = {
         ? 'tokenCommunityManager' extends keyof (typeof factoryContracts)[key]
           ? (typeof factoryContracts)[key]['tokenCommunityManager']
           : never
+        : never)
+    | (key extends keyof typeof factoryContracts
+        ? 'referralFeeManager' extends keyof (typeof factoryContracts)[key]
+          ? (typeof factoryContracts)[key]['referralFeeManager']
+          : never
         : never);
 };
 
@@ -103,6 +108,14 @@ const tokenCommunityManagerSource: ContractSource = {
   eventSignatures: [],
 } satisfies ContractSource;
 
+const referralFeeManagerSource: ContractSource = {
+  abi: tokenCommunityManagerAbi,
+  eventSignatures: [
+    EvmEventSignatures.Referrals.ReferralSet,
+    EvmEventSignatures.Referrals.ReferralSet,
+  ],
+};
+
 /**
  * Note that this object does not contain details for contracts deployed by users
  * at runtime. Those contracts remain in the EvmEventSources table.
@@ -121,6 +134,8 @@ export const EventRegistry = {
       lpBondingCurveSource,
     [factoryContracts[ValidChains.SepoliaBase].tokenCommunityManager]:
       tokenCommunityManagerSource,
+    [factoryContracts[ValidChains.SepoliaBase].referralFeeManager]:
+      referralFeeManagerSource,
   },
   [ValidChains.Sepolia]: {
     [factoryContracts[ValidChains.Sepolia].factory]: namespaceFactorySource,

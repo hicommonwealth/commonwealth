@@ -11,14 +11,7 @@ import { CreateComment, CreateCommentReaction } from '../../src/comment';
 import { models } from '../../src/database';
 import { CreateQuest, UpdateQuest } from '../../src/quest';
 import { CreateThread } from '../../src/thread';
-import {
-  CreateReferralLink,
-  GetReferralLink,
-  GetUserProfile,
-  GetXps,
-  UpdateUser,
-  Xp,
-} from '../../src/user';
+import { GetUserProfile, GetXps, UpdateUser, Xp } from '../../src/user';
 import { drainOutbox } from '../utils';
 import { seedCommunity } from '../utils/community-seeder';
 
@@ -43,32 +36,6 @@ describe('User lifecycle', () => {
 
   afterAll(async () => {
     await dispose()();
-  });
-
-  describe('referrals', () => {
-    it('should create referral link when user is created', async () => {
-      const response = await command(CreateReferralLink(), {
-        actor: member,
-        payload: {},
-      });
-      expect(response!.referral_link).toBeDefined();
-
-      // make sure it's saved
-      const response2 = await query(GetReferralLink(), {
-        actor: member,
-        payload: {},
-      });
-      expect(response2!.referral_link).to.eq(response?.referral_link);
-    });
-
-    it('should fail to create referral link when one already exists', async () => {
-      expect(
-        command(CreateReferralLink(), {
-          actor: member,
-          payload: {},
-        }),
-      ).rejects.toThrowError('Referral link already exists');
-    });
   });
 
   describe('xp', () => {
@@ -310,11 +277,6 @@ describe('User lifecycle', () => {
         },
       });
 
-      const referral_response = await query(GetReferralLink(), {
-        actor: member,
-        payload: {},
-      });
-
       // TODO: command to create a new user
       const new_user = await models.User.create({
         profile: {
@@ -348,7 +310,7 @@ describe('User lifecycle', () => {
         actor: new_actor,
         payload: {
           id: new_user.id!,
-          referral_link: referral_response?.referral_link,
+          referrer_address: member.address!,
           profile: {
             name: 'New User Updated',
           },
@@ -360,7 +322,7 @@ describe('User lifecycle', () => {
         actor: new_actor,
         payload: {
           community_id,
-          referral_link: referral_response?.referral_link,
+          referrer_address: member.address!,
         },
       });
 
@@ -396,7 +358,7 @@ describe('User lifecycle', () => {
       // - 28 from the first test
       // - 28 from the second test
       // - 10 from the referral when new user joined the community
-      // - 4 from the referral on a sign up flow completed
+      // - 4 from the referral on a sign-up flow completed
       expect(member_profile?.xp_points).to.equal(28 + 28 + 10 + 4);
 
       // expect xp points awarded to user joining the community

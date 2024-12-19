@@ -32,6 +32,7 @@ type factoryContractsType = {
     launchpad?: string;
     lpBondingCurve?: string;
     tokenCommunityManager?: string;
+    referralFeeManager?: string;
     chainId: number;
   };
 };
@@ -50,6 +51,7 @@ export const factoryContracts = {
     launchpad: '0xc6e7B0AdDf35AE4a5A65bb3bCb78D11Db6c8fB8F',
     lpBondingCurve: '0x2ECc0af0e4794F0Ab4797549a5a8cf97688D7D21',
     tokenCommunityManager: '0xC8fe1F23AbC4Eb55f4aa9E52dAFa3761111CF03a',
+    referralFeeManager: '0xdc07fEaf01666B7f5dED2F59D895543Ed3FAE1cA',
     chainId: 84532,
   },
   [ValidChains.Blast]: {

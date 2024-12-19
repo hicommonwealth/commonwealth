@@ -6,6 +6,7 @@ import Web3 from 'web3';
 import { z } from 'zod';
 import { models } from '../database';
 import { commonProtocol } from '../services';
+import { chainNodeMustExist } from './utils';
 
 const log = logger(import.meta);
 
@@ -32,16 +33,7 @@ export async function handleLaunchpadTrade(
     throw new Error('Token not found');
   }
 
-  const chainNode = await models.ChainNode.scope('withPrivateData').findOne({
-    where: {
-      eth_chain_id: event.eventSource.ethChainId,
-    },
-  });
-
-  if (!chainNode) {
-    // TODO: throw custom error with no retries -> straight to deadletter
-    throw new Error('Unsupported chain');
-  }
+  const chainNode = await chainNodeMustExist(event.eventSource.ethChainId);
 
   const trade = await models.LaunchpadTrade.findOne({
     where: {
