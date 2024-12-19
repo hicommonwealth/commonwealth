@@ -15,4 +15,15 @@
       grid-template-columns: 1fr;
     }
   }
+
+  .rewards-button-tabs {
+    display: none;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+
+    @include smallInclusive {
+      display: flex;
+    }
+  }
 }
