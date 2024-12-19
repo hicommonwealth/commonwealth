@@ -5,5 +5,5 @@ export const generateCommunityNameFromToken = ({
   tokenName: string;
   tokenSymbol: string;
 }) => {
-  return `${tokenName} (${tokenSymbol}) Community`;
+  return `${tokenName} (${tokenSymbol})`;
 };
