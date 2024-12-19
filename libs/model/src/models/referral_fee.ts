@@ -3,14 +3,14 @@ import Sequelize from 'sequelize';
 import { z } from 'zod';
 import type { ModelInstance } from './types';
 
-export type ReferralAttributes = z.infer<typeof schemas.Referral>;
-export type ReferralInstance = ModelInstance<ReferralAttributes>;
+export type ReferralFeesAttributes = z.infer<typeof schemas.ReferralFees>;
+export type ReferralFeesInstance = ModelInstance<ReferralFeesAttributes>;
 
-export const Referral = (
+export const ReferralFee = (
   sequelize: Sequelize.Sequelize,
-): Sequelize.ModelStatic<ReferralInstance> =>
-  sequelize.define<ReferralInstance>(
-    'Referral',
+): Sequelize.ModelStatic<ReferralFeesInstance> =>
+  sequelize.define<ReferralFeesInstance>(
+    'ReferralFee',
     {
       eth_chain_id: {
         type: Sequelize.INTEGER,
@@ -24,33 +24,26 @@ export const Referral = (
         type: Sequelize.STRING,
         allowNull: false,
       },
-      referee_address: {
+      distributed_token_address: {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      referrer_address: {
+      referrer_recipient_address: {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      referrer_received_eth_amount: {
+      referrer_received_amount: {
         type: Sequelize.FLOAT,
         allowNull: false,
-        defaultValue: 0,
       },
-      referral_created_timestamp: {
+      transaction_timestamp: {
         type: Sequelize.INTEGER,
-        allowNull: false,
-      },
-      updated_at: {
-        type: Sequelize.DATE,
         allowNull: false,
       },
     },
     {
-      timestamps: true,
-      createdAt: false,
-      updatedAt: 'updated_at',
+      timestamps: false,
       underscored: true,
-      tableName: 'Referrals',
+      tableName: 'ReferralFees',
     },
   );
