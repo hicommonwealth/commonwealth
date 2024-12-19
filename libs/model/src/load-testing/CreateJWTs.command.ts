@@ -10,7 +10,7 @@ export function CreateJWTs(): Command<typeof schemas.CreateJWTs> {
     ...schemas.CreateJWTs,
     auth: [],
     secure: true,
-    authStrategy: { name: 'authtoken', userId: ExternalServiceUserIds.K6 },
+    authStrategy: { type: 'authtoken', userId: ExternalServiceUserIds.K6 },
     body: async ({ payload }) => {
       const userIds = await models.sequelize.query<{ id: number }>(
         `

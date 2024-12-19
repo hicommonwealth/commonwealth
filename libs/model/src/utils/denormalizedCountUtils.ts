@@ -53,6 +53,7 @@ export const decrementProfileCount = async (
   );
 };
 
+// TODO: check if we need a maintenance policy for this
 export async function assertAddressOwnership(address: string) {
   const addressUsers = await models.Address.findAll({
     where: {
