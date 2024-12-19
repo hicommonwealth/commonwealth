@@ -75,6 +75,7 @@ export const GetRecapEmailData = {
   input: z.object({
     user_id: z.string(),
   }),
+
   output: z.object({
     discussion: z.array(
       z.union([
@@ -91,9 +92,9 @@ export const GetRecapEmailData = {
     ),
     num_notifications: z.number(),
     notifications_link: z.string(),
+    unsubscribe_link: z.string(),
   }),
 };
-
 export const EnrichedThread = Thread.extend({
   name: z
     .string()

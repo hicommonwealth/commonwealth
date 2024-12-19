@@ -101,6 +101,7 @@ const NewSnapshotProposalPage = lazy(
 const NewProfilePage = lazy(() => import('views/pages/new_profile'));
 const EditNewProfilePage = lazy(() => import('views/pages/edit_new_profile'));
 const ProfilePageRedirect = lazy(() => import('views/pages/profile_redirect'));
+const UnSubscribePage = lazy(() => import('views/pages/UnSubscribePage'));
 
 const CustomDomainRoutes = ({
   tokenizedCommunityEnabled,
@@ -118,6 +119,11 @@ const CustomDomainRoutes = ({
       key="/createCommunity"
       path="/createCommunity"
       element={withLayout(CreateCommunityPage, { type: 'common' })}
+    />,
+    <Route
+      key="/unSubscribe/:userId"
+      path="/unSubscribe/:userId"
+      element={withLayout(UnSubscribePage, { type: 'common' })}
     />,
     ...(tokenizedCommunityEnabled
       ? [
