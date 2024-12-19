@@ -65,12 +65,11 @@ export function SignIn(): Command<typeof schemas.SignIn> {
       let user_id =
         (actor.user?.id ?? 0) > 0 ? actor.user.id : (existingHexUserId ?? null);
 
-      !user_id &&
-        (await verifySessionSignature(
-          deserializeCanvas(session),
-          encodedAddress,
-          ss58Prefix,
-        ));
+      await verifySessionSignature(
+        deserializeCanvas(session),
+        encodedAddress,
+        ss58Prefix,
+      );
 
       // TODO: should we remove verification token stuff?
       const verification_token = crypto.randomBytes(18).toString('hex');
@@ -78,20 +77,18 @@ export function SignIn(): Command<typeof schemas.SignIn> {
       //   +new Date() + config.AUTH.ADDRESS_TOKEN_EXPIRES_IN * 60 * 1000,
       // );
       // verified.verification_token_expires = verification_token_expires;
-      // verified.last_active = new Date();
       // verified.block_info = block_info;
-
-      // TODO: @timolegros - check if there are other rules involfing the wallet_id, otherwise remove this check
-      // verify existing is equivalent to signing in
-      //if (existing.wallet_id !== wallet_id)
-      //  throw new InvalidInput(SignInErrors.WrongWallet);
-
       // TODO: should we only update when token expired?
       // check whether the token has expired
       // (certain login methods e.g. jwt have no expiration token, so we skip the check in that case)
       // const expiration = existing.verification_token_expires;
       // if (expiration && +expiration <= +new Date())
       //  throw new InvalidInput(SignInErrors.ExpiredToken);
+
+      // TODO: @timolegros - check if there are other rules involving the wallet_id, otherwise remove this check
+      // verify existing is equivalent to signing in
+      //if (existing.wallet_id !== wallet_id)
+      //  throw new InvalidInput(SignInErrors.WrongWallet);
 
       // upsert address, passing user_id if signed in
       const { user_created, address_created, first_community } =
