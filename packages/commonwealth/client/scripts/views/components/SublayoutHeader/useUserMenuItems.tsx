@@ -87,6 +87,7 @@ const useUserMenuItems = ({
     recheck: isMenuOpen,
   });
 
+  const rewardsEnabled = useFlag('rewardsPage');
   const referralsEnabled = useFlag('referrals');
 
   const userData = useUserStore();
@@ -297,7 +298,9 @@ const useUserMenuItems = ({
       {
         type: 'default',
         label: 'My transactions',
-        onClick: () => navigate(`/myTransactions`, {}, null),
+        onClick: () =>
+          // TODO add query param that will take user to Token Transactions Table
+          navigate(rewardsEnabled ? `/rewards` : `/myTransactions`, {}, null),
       },
       {
         type: 'default',

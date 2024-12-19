@@ -1,6 +1,18 @@
+@import '../../../styles/shared';
+
 .RewardsPage {
   display: flex;
   flex-direction: column;
   width: 100%;
   gap: 16px;
+
+  .rewards-card-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+
+    @include smallInclusive {
+      grid-template-columns: 1fr;
+    }
+  }
 }
