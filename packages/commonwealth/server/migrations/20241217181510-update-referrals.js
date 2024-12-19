@@ -53,17 +53,22 @@ module.exports = {
       await queryInterface.createTable(
         'Referrals',
         {
-          eth_chain_id: {
+          id: {
             type: Sequelize.INTEGER,
             primaryKey: true,
+            autoIncrement: true,
+          },
+          eth_chain_id: {
+            type: Sequelize.INTEGER,
+            allowNull: true,
           },
           transaction_hash: {
             type: Sequelize.STRING,
-            primaryKey: true,
+            allowNull: true,
           },
           namespace_address: {
             type: Sequelize.STRING,
-            allowNull: false,
+            allowNull: true,
           },
           referee_address: {
             type: Sequelize.STRING,
@@ -78,8 +83,12 @@ module.exports = {
             allowNull: false,
             defaultValue: 0,
           },
-          referral_created_timestamp: {
+          created_on_chain_timestamp: {
             type: Sequelize.INTEGER,
+            allowNull: true,
+          },
+          created_off_chain_at: {
+            type: Sequelize.DATE,
             allowNull: false,
           },
           updated_at: {
@@ -89,6 +98,15 @@ module.exports = {
         },
         { transaction },
       );
+      await queryInterface.addIndex(
+        'Referrals',
+        ['eth_chain_id', 'transaction_hash'],
+        {
+          unique: true,
+          transaction,
+        },
+      );
+
       await queryInterface.addIndex('Referrals', ['referee_address'], {
         transaction,
       });

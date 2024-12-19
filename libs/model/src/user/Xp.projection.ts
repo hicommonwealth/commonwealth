@@ -155,10 +155,20 @@ async function recordXpsForEvent(
   event_name: keyof typeof schemas.QuestEvents,
   event_created_at: Date,
   reward_amount: number,
-  creator_user_id?: number, // referrer user id
+  creator_address?: string, // referrer address
   creator_reward_weight?: number, // referrer reward weight
 ) {
   await sequelize.transaction(async (transaction) => {
+    let creator_user_id: number | undefined;
+
+    if (creator_address) {
+      const referrer_user = await models.Address.findOne({
+        where: { address: creator_address },
+        attributes: ['user_id'],
+      });
+      if (referrer_user) creator_user_id = referrer_user.user_id!;
+    }
+
     // get logged actions for this user and event
     const log = await models.XpLog.findAll({
       where: { user_id, event_name },
@@ -205,13 +215,12 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
         const reward_amount = 20;
         const creator_reward_weight = 0.2;
 
-        const referrer_id = getReferrerId(payload.referral_link);
         await recordXpsForEvent(
           payload.user_id,
           'SignUpFlowCompleted',
           payload.created_at!,
           reward_amount,
-          referrer_id,
+          payload.referrer_address,
           creator_reward_weight,
         );
       },

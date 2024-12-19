@@ -288,7 +288,8 @@ export const FarcasterVoteCreated = FarcasterAction.extend({
 export const SignUpFlowCompleted = z.object({
   user_id: z.number(),
   created_at: z.coerce.date(),
-  referral_link: z.string().nullish(),
+  referrer_address: z.string().optional(),
+  referee_address: z.string().optional(),
 });
 
 export const ContestRolloverTimerTicked = z.object({});
