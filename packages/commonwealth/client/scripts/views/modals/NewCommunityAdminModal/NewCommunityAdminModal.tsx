@@ -26,7 +26,7 @@ interface NewCommunityAdminModalProps {
   handleClickConnectNewWallet: () => void;
   handleClickContinue: (selectedAddress: string) => void;
   selectedCommunity: SelectedCommunity;
-  isTokenizedCommunity?: boolean;
+  isLaunchpadCommunity?: boolean;
 }
 
 const NewCommunityAdminModal = ({
@@ -34,7 +34,7 @@ const NewCommunityAdminModal = ({
   handleClickConnectNewWallet,
   handleClickContinue,
   selectedCommunity,
-  isTokenizedCommunity,
+  isLaunchpadCommunity,
 }: NewCommunityAdminModalProps) => {
   const user = useUserStore();
   const availableAddressesOnSelectedChain = user.addresses?.filter(
@@ -71,22 +71,22 @@ const NewCommunityAdminModal = ({
   return (
     <div className="NewCommunityAdminModal">
       <CWModalHeader
-        label={`New ${isTokenizedCommunity ? 'token and' : ''} community admin`}
+        label={`New ${isLaunchpadCommunity ? 'token and' : ''} community admin`}
         onModalClose={onModalClose}
       />
       <CWModalBody>
         <CWText type="b1" className="description">
           {walletsAvailable
-            ? `${isTokenizedCommunity ? 'Token creators and' : ''} Community admins are associated with a wallet. ` +
+            ? `${isLaunchpadCommunity ? 'Token creators and' : ''} Community admins are associated with a wallet. ` +
               `Which wallet would you like to serve as the ${
-                isTokenizedCommunity ? 'author/' : ''
+                isLaunchpadCommunity ? 'author/' : ''
               }admin of the new community?`
             : `In order to launch a ${
-                isTokenizedCommunity ? 'token and' : ''
+                isLaunchpadCommunity ? 'token and' : ''
               } community within ${
-                isTokenizedCommunity ? 'the BASE' : 'an'
+                isLaunchpadCommunity ? 'the BASE' : 'an'
               } ecosystem you must have a compatible wallet connected. ` +
-              `How would you like to create your ${isTokenizedCommunity ? 'token and' : ''} community?`}
+              `How would you like to create your ${isLaunchpadCommunity ? 'token and' : ''} community?`}
         </CWText>
         {walletsAvailable && (
           <CWSelectList

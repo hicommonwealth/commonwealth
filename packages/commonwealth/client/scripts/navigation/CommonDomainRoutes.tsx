@@ -117,9 +117,7 @@ const CommunityNotFoundPage = lazy(
   () => import('views/pages/CommunityNotFoundPage'),
 );
 
-const CommonDomainRoutes = ({
-  tokenizedCommunityEnabled,
-}: RouteFeatureFlags) => [
+const CommonDomainRoutes = ({ launchpadEnabled }: RouteFeatureFlags) => [
   <Route
     key="/_internal/quill"
     path="/_internal/quill"
@@ -154,7 +152,7 @@ const CommonDomainRoutes = ({
     path="/createCommunity"
     element={withLayout(CreateCommunityPage, { type: 'common' })}
   />,
-  ...(tokenizedCommunityEnabled
+  ...(launchpadEnabled
     ? [
         <Route
           key="/createTokenCommunity"

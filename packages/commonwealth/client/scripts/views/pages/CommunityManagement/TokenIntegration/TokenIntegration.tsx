@@ -19,7 +19,7 @@ import './TokenIntegration.scss';
 
 const TokenIntegration = () => {
   const communityId = app.activeChainId() || '';
-  const tokenizedCommunityEnabled = useFlag('tokenizedCommunity');
+  const uniswapTradeEnabled = useFlag('uniswapTrade');
 
   const { data: communityLaunchpadToken, isLoading: isLoadingLaunchpadToken } =
     useGetTokenByCommunityId({
@@ -52,7 +52,7 @@ const TokenIntegration = () => {
     ];
 
   if (
-    !tokenizedCommunityEnabled ||
+    !uniswapTradeEnabled ||
     !contractInfo ||
     // if a community already has a launchpad token, don't allow pinning
     communityLaunchpadToken

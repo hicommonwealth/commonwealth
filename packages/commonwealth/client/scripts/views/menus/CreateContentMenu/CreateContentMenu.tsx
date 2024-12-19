@@ -47,7 +47,7 @@ const getCreateContentMenuItems = (
     options?: NavigateOptions & { action?: string },
     prefix?: null | string,
   ) => void,
-  tokenizedCommunityEnabled: boolean,
+  launchpadEnabled: boolean,
   createDiscordBotConfig?: ReturnType<
     typeof useCreateDiscordBotConfigMutation
   >['mutateAsync'],
@@ -105,7 +105,7 @@ const getCreateContentMenuItems = (
         navigate('/createCommunity', {}, null);
       },
     },
-    ...(tokenizedCommunityEnabled
+    ...(launchpadEnabled
       ? [
           {
             type: 'element',
@@ -202,7 +202,7 @@ export const CreateContentSidebar = ({
   const { mutateAsync: createDiscordBotConfig } =
     useCreateDiscordBotConfigMutation();
 
-  const tokenizedCommunityEnabled = useFlag('tokenizedCommunity');
+  const launchpadEnabled = useFlag('launchpad');
 
   return (
     <CWSidebarMenu
@@ -230,7 +230,7 @@ export const CreateContentSidebar = ({
       }}
       menuItems={getCreateContentMenuItems(
         navigate,
-        tokenizedCommunityEnabled,
+        launchpadEnabled,
         createDiscordBotConfig,
       )}
     />
@@ -242,7 +242,7 @@ export const CreateContentPopover = () => {
   const navigate = useCommonNavigate();
   const user = useUserStore();
 
-  const tokenizedCommunityEnabled = useFlag('tokenizedCommunity');
+  const launchpadEnabled = useFlag('launchpad');
 
   if (
     !user.isLoggedIn ||
@@ -255,7 +255,7 @@ export const CreateContentPopover = () => {
 
   return (
     <PopoverMenu
-      menuItems={getCreateContentMenuItems(navigate, tokenizedCommunityEnabled)}
+      menuItems={getCreateContentMenuItems(navigate, launchpadEnabled)}
       className="create-content-popover"
       renderTrigger={(onClick, isMenuOpen) => (
         <CWTooltip
