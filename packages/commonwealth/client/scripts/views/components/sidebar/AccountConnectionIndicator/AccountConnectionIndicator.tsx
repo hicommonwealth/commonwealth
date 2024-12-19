@@ -2,7 +2,7 @@ import { WalletId } from '@hicommonwealth/shared';
 import { useFlag } from 'client/scripts/hooks/useFlag';
 import { saveToClipboard } from 'client/scripts/utils/clipboard';
 import clsx from 'clsx';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useInviteLinkModal } from 'state/ui/modals';
 import useUserStore from 'state/ui/user';
 import useJoinCommunity from 'views/components/SublayoutHeader/useJoinCommunity';
@@ -30,7 +30,15 @@ const AccountConnectionIndicator = ({
   const { setIsInviteLinkModalOpen } = useInviteLinkModal();
 
   const userData = useUserStore();
-  const hasMagic = userData.addresses?.[0]?.walletId === WalletId.Magic;
+  const [hasMagic, setHasMagic] = useState(false);
+
+  useEffect(() => {
+    const currentAddressInfo = userData.addresses?.find(
+      (addr) => addr.address === address,
+    );
+    const usingMagic = currentAddressInfo?.walletId === WalletId.Magic;
+    setHasMagic(usingMagic);
+  }, [userData.addresses, userData, hasMagic, address]);
 
   const { openMagicWallet } = useAuthentication({});
 

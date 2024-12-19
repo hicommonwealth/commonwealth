@@ -40,6 +40,7 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
   const tokenizedCommunityEnabled = useFlag('tokenizedCommunity');
 
   const user = useUserStore();
+
   const {
     selectedAddress,
     modeOfManageCommunityStakeModal,

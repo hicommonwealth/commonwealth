@@ -1,6 +1,6 @@
 import { WalletId } from '@hicommonwealth/shared';
 import { formatAddressShort } from 'helpers';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import useUserStore from 'state/ui/user';
 import useAuthentication from '../../../../modals/AuthModal/useAuthentication';
 import { CWIcon } from '../../../component_kit/cw_icons/cw_icon';
@@ -30,7 +30,16 @@ const TransactionsTab = ({ transactionsType }: TransactionsTabProps) => {
     selectedAddress: BASE_ADDRESS_FILTER,
   });
   const user = useUserStore();
-  const hasMagic = user.addresses?.[0]?.walletId === WalletId.Magic;
+
+  const [hasMagic, setHasMagic] = useState(false);
+
+  useEffect(() => {
+    const currentAddressInfo = user.addresses?.find(
+      (addr) => addr.address === user.activeAccount?.address,
+    );
+    const usingMagic = currentAddressInfo?.walletId === WalletId.Magic;
+    setHasMagic(usingMagic);
+  }, [user.addresses, user, hasMagic]);
 
   const ADDRESS_FILTERS = [
     BASE_ADDRESS_FILTER,
