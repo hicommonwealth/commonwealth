@@ -21,6 +21,7 @@ import {
   CanvasSignResult,
   CanvasSignedData,
   SubstrateSignerCW,
+  TEST_BLOCK_INFO_STRING,
   serializeCanvas,
   toCanvasSignedDataApiArgs,
   type Link,
@@ -31,7 +32,6 @@ import chai from 'chai';
 import { Wallet } from 'ethers';
 import type { Application } from 'express';
 import { z } from 'zod';
-import { TEST_BLOCK_INFO_STRING } from './keys';
 
 function createCanvasSignResult({ session, sign, action }): CanvasSignResult {
   const sessionMessage = {
@@ -276,33 +276,22 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
       await sessionSigner.newSession(CANVAS_TOPIC);
     const walletAddress = session.did.split(':')[4];
 
-    let res = await chai.request
+    const res = await chai.request
       .agent(app)
-      .post('/api/createAddress')
+      .post('/api/internal/SignIn')
       .set('Accept', 'application/json')
+      .set('address', walletAddress)
       .send({
         address: walletAddress,
         community_id: chain,
         wallet_id,
         block_info: TEST_BLOCK_INFO_STRING,
-      });
-
-    const address_id = res.body.result.id;
-
-    res = await chai.request
-      .agent(app)
-      .post('/api/verifyAddress')
-      .set('Accept', 'application/json')
-      .send({
-        address: walletAddress,
-        community_id: chain,
-        // @ts-expect-error <StrictNullChecks>
-        chain_id,
-        wallet_id,
         session: serializeCanvas(session),
       });
-    const user_id = res.body.result.user.id;
-    const email = res.body.result.user.email;
+
+    const address_id = res.body.id;
+    const user_id = res.body.user_id;
+    const email = res.body.User.email;
     return {
       address_id,
       address: session.did.split(':')[4],
