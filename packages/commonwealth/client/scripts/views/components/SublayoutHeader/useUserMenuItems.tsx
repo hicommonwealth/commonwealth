@@ -90,7 +90,16 @@ const useUserMenuItems = ({
   const referralsEnabled = useFlag('referrals');
 
   const userData = useUserStore();
-  const hasMagic = userData.addresses?.[0]?.walletId === WalletId.Magic;
+
+  const [hasMagic, setHasMagic] = useState(false);
+
+  useEffect(() => {
+    const currentAddressInfo = userData.addresses?.find(
+      (addr) => addr.address === userData.activeAccount?.address,
+    );
+    const usingMagic = currentAddressInfo?.walletId === WalletId.Magic;
+    setHasMagic(usingMagic);
+  }, [userData.addresses, userData, hasMagic]);
 
   const { openMagicWallet } = useAuthentication({});
 
