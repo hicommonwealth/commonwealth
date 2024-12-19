@@ -426,3 +426,31 @@ export async function alchemyGetTokenPrices({
       cause: { status: res.status, statusText: res.statusText },
     });
 }
+
+export const getBaseUrl = (
+  env: 'local' | 'CI' | 'frick' | 'frack' | 'beta' | 'demo' | 'production',
+) => {
+  switch (env) {
+    case 'local':
+    case 'CI':
+      return 'http://localhost:8080';
+    case 'beta':
+      return 'https://qa.commonwealth.im';
+    case 'demo':
+      return 'https://demo.commonwealth.im';
+    case 'frick':
+      return 'https://frick.commonwealth.im';
+    case 'frack':
+      return 'https://frack.commonwealth.im';
+    default:
+      return `https://${PRODUCTION_DOMAIN}`;
+  }
+};
+
+export const buildContestLeaderboardUrl = (
+  baseUrl: string,
+  communityId: string,
+  contestAddress: string,
+) => {
+  return `${baseUrl}/${communityId}/contests/${contestAddress}`;
+};

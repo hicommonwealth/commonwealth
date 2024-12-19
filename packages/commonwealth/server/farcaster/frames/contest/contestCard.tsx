@@ -3,7 +3,7 @@ import { Contest, config as modelConfig } from '@hicommonwealth/model';
 import { Button } from 'frames.js/express';
 import React from 'react';
 
-import { PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
+import { buildContestLeaderboardUrl, getBaseUrl } from '@hicommonwealth/shared';
 import { frames } from '../../config';
 
 export const contestCard = frames(async (ctx) => {
@@ -70,6 +70,12 @@ export const contestCard = frames(async (ctx) => {
     };
   }
 
+  const leaderboardUrl = buildContestLeaderboardUrl(
+    getBaseUrl(config.APP_ENV),
+    contestManager.community_id,
+    contestManager.contest_address,
+  );
+
   return {
     title: contestManager.name,
     image: (
@@ -109,11 +115,7 @@ export const contestCard = frames(async (ctx) => {
       </div>
     ),
     buttons: [
-      <Button
-        key="leaderboard"
-        action="link"
-        target={`${getBaseUrl()}/${contestManager.community_id}/contests/${contestManager.contest_address}`}
-      >
+      <Button key="leaderboard" action="link" target={leaderboardUrl}>
         Leaderboard
       </Button>,
       <Button
@@ -129,19 +131,6 @@ export const contestCard = frames(async (ctx) => {
     ],
   };
 });
-
-const getBaseUrl = () => {
-  switch (config.APP_ENV) {
-    case 'local':
-      return 'http://localhost:8080';
-    case 'beta':
-      return 'https://qa.commonwealth.im';
-    case 'demo':
-      return 'https://demo.commonwealth.im';
-    default:
-      return `https://${PRODUCTION_DOMAIN}`;
-  }
-};
 
 export const getActionInstallUrl = () => {
   // add environment to button label in non-prod environments
