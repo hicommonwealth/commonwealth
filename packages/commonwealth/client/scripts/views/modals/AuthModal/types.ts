@@ -21,6 +21,7 @@ export type ModalVariantProps = {
     | ChainBase.CosmosSDK
     | ChainBase.Solana
     | ChainBase.Substrate;
+
   showAuthOptionFor?: AuthWallets | AuthSSOs;
   onSignInClick?: () => void;
 };
