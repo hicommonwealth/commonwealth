@@ -39,6 +39,9 @@ module.exports = {
         { transaction },
       );
 
+      await queryInterface.removeColumn('Users', 'referral_link', {
+        transaction,
+      });
       await queryInterface.addColumn(
         'Users',
         'referral_eth_earnings',
@@ -122,6 +125,10 @@ module.exports = {
       await queryInterface.dropTable('Referrals', { transaction });
       await queryInterface.removeColumn('Users', 'referral_eth_earnings', {
         transaction,
+      });
+      await queryInterface.addColumn('Users', 'referral_link', {
+        type: Sequelize.STRING,
+        allowNull: true,
       });
     });
   },
