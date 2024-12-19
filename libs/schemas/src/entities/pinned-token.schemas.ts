@@ -10,3 +10,15 @@ export const PinnedToken = z.object({
   updated_at: z.coerce.date().optional(),
   ChainNode: ChainNode.optional(),
 });
+
+export const PinnedTokenWithPrices = PinnedToken.extend({
+  prices: z
+    .array(
+      z.object({
+        currency: z.string(),
+        value: z.string(),
+        lastUpdatedAt: z.string(),
+      }),
+    )
+    .optional(),
+});
