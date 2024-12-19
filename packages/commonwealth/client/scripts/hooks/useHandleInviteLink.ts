@@ -25,13 +25,17 @@ export const useHandleInviteLink = ({
   const activeChainId = app.activeChainId();
 
   const generalInviteRoute = matchRoutes(
-    [{ path: '/dashboard/global' }],
+    [{ path: '/dashboard/global' }, { path: '/profile/id/*' }],
     location,
   );
 
   const communityInviteRoute =
     matchRoutes(
-      [{ path: '/:scope' }, { path: '/:scope/discussions/*' }],
+      [
+        { path: '/:scope' },
+        { path: '/:scope/discussions/*' },
+        { path: '/:scope/discussion/*' },
+      ],
       location,
     ) && isInsideCommunity;
 
