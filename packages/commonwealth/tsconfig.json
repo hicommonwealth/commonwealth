@@ -7,11 +7,12 @@
     "jsx": "react",
     "sourceMap": true,
     "strictNullChecks": true,
+    "esModuleInterop": true,
     "paths": {
       "@hicommonwealth/*": ["../../libs/*/src/index.ts"],
       "*": ["./*", "shared/*", "client/scripts/*", "client/assets/*"]
     },
-    "types": ["vite/client"]
+    "types": ["vite/client", "vitest/globals", "node"]
   },
   "include": [
     "client",

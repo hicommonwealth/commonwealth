@@ -3,6 +3,7 @@ import React, { lazy } from 'react';
 import { Route } from 'react-router-dom';
 import { withLayout } from 'views/Layout';
 import { RouteFeatureFlags } from './Router';
+import { withRouteValidation } from './withRouteValidation';
 
 const QuillPage = lazy(() => import('views/pages/QuillPage'));
 const MarkdownEditorPage = lazy(() => import('views/pages/MarkdownEditorPage'));
@@ -194,21 +195,21 @@ const CommonDomainRoutes = ({
   <Route
     key="/:scope/overview"
     path="/:scope/overview"
-    element={withLayout(OverviewPage, {
+    element={withLayout(withRouteValidation(OverviewPage), {
       scoped: true,
     })}
   />,
   <Route
     key="/:scope/search"
     path="/:scope/search"
-    element={withLayout(SearchPage, {
+    element={withLayout(withRouteValidation(SearchPage), {
       scoped: true,
     })}
   />,
   <Route
     key="/:scope/members"
     path="/:scope/members"
-    element={withLayout(MembersPage, {
+    element={withLayout(withRouteValidation(MembersPage), {
       scoped: true,
     })}
   />,
@@ -275,14 +276,14 @@ const CommonDomainRoutes = ({
   <Route
     key="/:scope/proposal/:type/:identifier"
     path="/:scope/proposal/:type/:identifier"
-    element={withLayout(ViewProposalPage, {
+    element={withLayout(withRouteValidation(ViewProposalPage), {
       scoped: true,
     })}
   />,
   <Route
     key="/:scope/proposal/:identifier"
     path="/:scope/proposal/:identifier"
-    element={withLayout(ViewProposalPage, {
+    element={withLayout(withRouteValidation(ViewProposalPage), {
       scoped: true,
     })}
   />,
@@ -313,21 +314,21 @@ const CommonDomainRoutes = ({
   <Route
     key="/:scope/discussions"
     path="/:scope/discussions"
-    element={withLayout(DiscussionsPage, {
+    element={withLayout(withRouteValidation(DiscussionsPage), {
       scoped: true,
     })}
   />,
   <Route
     key="/:scope/discussions/:topicName"
     path="/:scope/discussions/:topicName"
-    element={withLayout(DiscussionsPage, {
+    element={withLayout(withRouteValidation(DiscussionsPage), {
       scoped: true,
     })}
   />,
   <Route
     key="/:scope/discussion/:identifier"
     path="/:scope/discussion/:identifier"
-    element={withLayout(ViewThreadPage, {
+    element={withLayout(withRouteValidation(ViewThreadPage), {
       scoped: true,
       renderDefaultMetatags: false,
     })}
@@ -335,7 +336,7 @@ const CommonDomainRoutes = ({
   <Route
     key="/discussion/:identifier"
     path="/discussion/:identifier"
-    element={withLayout(ThreadRedirectPage, {
+    element={withLayout(withRouteValidation(ThreadRedirectPage), {
       scoped: false,
     })}
   />,
@@ -368,7 +369,7 @@ const CommonDomainRoutes = ({
   <Route
     key="/:scope"
     path="/:scope"
-    element={withLayout(DiscussionsRedirectPage, {
+    element={withLayout(withRouteValidation(DiscussionsRedirectPage), {
       scoped: true,
     })}
   />,
@@ -392,14 +393,14 @@ const CommonDomainRoutes = ({
   <Route
     key="/:scope/manage/profile"
     path="/:scope/manage/profile"
-    element={withLayout(CommunityProfile, {
+    element={withLayout(withRouteValidation(CommunityProfile), {
       scoped: true,
     })}
   />,
   <Route
     key="/:scope/manage/integrations"
     path="/:scope/manage/integrations"
-    element={withLayout(CommunityIntegrations, {
+    element={withLayout(withRouteValidation(CommunityIntegrations), {
       scoped: true,
     })}
   />,
@@ -576,21 +577,21 @@ const CommonDomainRoutes = ({
   <Route
     key="/:scope/account/:address"
     path="/:scope/account/:address"
-    element={withLayout(ProfilePageRedirect, {
+    element={withLayout(withRouteValidation(ProfilePageRedirect), {
       scoped: true,
     })}
   />,
   <Route
     key="/:scope/account"
     path="/:scope/account"
-    element={withLayout(ProfilePageRedirect, {
+    element={withLayout(withRouteValidation(ProfilePageRedirect), {
       scoped: true,
     })}
   />,
   <Route
     key="/profile/id/:userId"
     path="/profile/id/:userId"
-    element={withLayout(NewProfilePage, {
+    element={withLayout(withRouteValidation(NewProfilePage), {
       scoped: true,
       type: 'common',
     })}
@@ -598,7 +599,7 @@ const CommonDomainRoutes = ({
   <Route
     key="/profile/edit"
     path="/profile/edit"
-    element={withLayout(EditNewProfilePage, {
+    element={withLayout(withRouteValidation(EditNewProfilePage), {
       scoped: true,
       type: 'common',
     })}
