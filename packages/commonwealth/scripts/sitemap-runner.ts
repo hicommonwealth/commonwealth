@@ -5,6 +5,7 @@ import {
   createDatabasePaginatorDefault,
   createSitemapGenerator,
 } from '@hicommonwealth/sitemaps';
+import { config } from '../server/config';
 
 const log = logger(import.meta);
 blobStorage({
@@ -15,17 +16,14 @@ stats({
 });
 
 async function doExec() {
-  if (process.env.SITEMAP_ENV !== 'production') {
-    throw new Error(
-      // eslint-disable-next-line max-len
-      'Define SITEMAP_ENV to signify you understand that this should only run in production to avoid breaking sitemaps.',
-    );
+  if (!['production', 'local'].includes(config.APP_ENV)) {
+    throw new Error('Must be in production or local environment');
   }
 
-  if (process.env.NODE_ENV !== 'production') {
-    // we have to enforce production because if we don't we will get localhost
-    // URLs and that might be very destructive to our SEO
-    throw new Error('Must run with NODE_ENV=production');
+  if (config.APP_ENV === 'local' && config.NODE_ENV === 'production') {
+    throw new Error(
+      'Cannot execute sitemap-runner locally with NODE_ENV=production',
+    );
   }
 
   stats().increment('cw.scheduler.email-digest');

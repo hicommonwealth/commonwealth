@@ -71,7 +71,6 @@ export const buildAssociations = (db: DB) => {
     });
 
   db.ChainNode.withMany(db.Community)
-    .withMany(db.EvmEventSource)
     .withOne(db.LastProcessedEvmBlock)
     .withMany(db.Topic, {
       onUpdate: 'CASCADE',
@@ -80,8 +79,6 @@ export const buildAssociations = (db: DB) => {
     .withMany(db.PinnedToken, {
       onDelete: 'CASCADE',
     });
-
-  db.ContractAbi.withMany(db.EvmEventSource, { foreignKey: 'abi_id' });
 
   db.Community.withMany(db.Group, { asMany: 'groups' })
     .withMany(db.Topic, {

@@ -23,10 +23,15 @@ export const processChainEventCreated: EventHandler<
     payload.eventSource.eventSignature ===
     EvmEventSignatures.Launchpad.TokenLaunched
   ) {
+    const chainNode = await models.ChainNode.findOne({
+      where: {
+        eth_chain_id: payload.eventSource.ethChainId,
+      },
+    });
     await command(CreateLaunchpadToken(), {
       actor: systemActor({}),
       payload: {
-        chain_node_id: payload.eventSource.chainNodeId,
+        chain_node_id: chainNode!.id!,
         community_id: '', // not required for system actors
         transaction_hash: payload.rawLog.transactionHash,
       },

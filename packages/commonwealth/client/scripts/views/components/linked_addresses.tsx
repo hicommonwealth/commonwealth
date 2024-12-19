@@ -23,7 +23,12 @@ type AddressProps = {
 type AddressDetailsProps = {
   profile: NewProfile;
   addressInfo: AddressInfo;
-  toggleRemoveModal: (val: boolean, address: AddressInfo) => void;
+  toggleRemoveModal: (
+    val: boolean,
+    address: AddressInfo,
+    isBulkDelete: boolean,
+    communityName: string,
+  ) => void;
 };
 
 type LinkedAddressesProps = {
@@ -54,6 +59,8 @@ const AddressDetails = (props: AddressDetailsProps) => {
     enabled: !!community.id,
   });
 
+  if (!fetchedCommunity) return null;
+
   return (
     <div className="AddressDetails">
       <CWTruncatedAddress
@@ -67,7 +74,18 @@ const AddressDetails = (props: AddressDetailsProps) => {
         menuItems={[
           {
             label: `Disconnect ${formatAddressShort(address)}`,
-            onClick: () => toggleRemoveModal(true, addressInfo),
+            onClick: () =>
+              toggleRemoveModal(
+                true,
+                addressInfo,
+                false,
+                fetchedCommunity.name,
+              ),
+          },
+          {
+            label: 'Delete All Addresses',
+            onClick: () =>
+              toggleRemoveModal(true, addressInfo, true, fetchedCommunity.name),
           },
         ]}
         renderTrigger={(onclick) => (
@@ -98,6 +116,10 @@ export const LinkedAddresses = (props: LinkedAddressesProps) => {
   const [currentAddress, setCurrentAddress] = useState<AddressInfo | null>(
     null,
   );
+  const [isBulkDeleteState, setIsBulkDeleteState] = useState(false);
+  const [selectedCommuinty, setSelectedCommunity] = useState<string | null>(
+    null,
+  );
 
   const { profile, addresses, refreshProfiles } = props;
 
@@ -123,9 +145,13 @@ export const LinkedAddresses = (props: LinkedAddressesProps) => {
                 toggleRemoveModal={(
                   val: boolean,
                   selectedAddress: AddressInfo,
+                  isBulkDelete: boolean = false,
+                  community,
                 ) => {
                   setIsRemoveModalOpen(val);
                   setCurrentAddress(selectedAddress);
+                  setIsBulkDeleteState(isBulkDelete);
+                  setSelectedCommunity(community);
                 }}
               />
             );
@@ -147,7 +173,8 @@ export const LinkedAddresses = (props: LinkedAddressesProps) => {
       <CWModal
         size="small"
         content={
-          currentAddress && (
+          currentAddress &&
+          selectedCommuinty && (
             <DeleteAddressModal
               addresses={addresses}
               address={currentAddress}
@@ -156,12 +183,15 @@ export const LinkedAddresses = (props: LinkedAddressesProps) => {
                 setIsRemoveModalOpen(false);
                 refreshProfiles(currentAddress);
               }}
+              isBulkDelete={isBulkDeleteState}
+              communityName={selectedCommuinty}
             />
           )
         }
         onClose={() => {
           setIsRemoveModalOpen(false);
           setCurrentAddress(null);
+          setSelectedCommunity(null);
         }}
         open={isRemoveModalOpen}
       />
