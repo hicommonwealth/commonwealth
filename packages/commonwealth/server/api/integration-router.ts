@@ -3,6 +3,7 @@ import { AppError } from '@hicommonwealth/core';
 import { ChainEvents, Contest, Snapshot, config } from '@hicommonwealth/model';
 import { Router, raw } from 'express';
 import farcasterRouter from 'server/farcaster/router';
+import { validateFarcasterAction } from 'server/middleware/validateFarcasterAction';
 import { validateNeynarWebhook } from 'server/middleware/validateNeynarWebhook';
 import { config as serverConfig } from '../config';
 
@@ -59,7 +60,9 @@ function build() {
 
     router.post(
       '/farcaster/CastUpvoteAction',
-      // TODO: create new validation middleware for actions
+      (req, _, next) => {
+        validateFarcasterAction()(req, _, next).catch(next);
+      },
       express.command(Contest.FarcasterUpvoteAction()),
     );
   }

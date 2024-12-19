@@ -23,13 +23,13 @@ import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import TokenLaunchButton from 'views/components/sidebar/TokenLaunchButton';
 import { openConfirmation } from 'views/modals/confirmation_modal';
-import { generateCommunityNameFromToken } from '../../../LaunchToken/steps/CommunityInformationStep/utils';
-import SuccessStep from '../../../LaunchToken/steps/SuccessStep';
-import TokenInformationForm from '../../../LaunchToken/steps/TokenInformationStep/TokenInformationForm';
-import { FormSubmitValues } from '../../../LaunchToken/steps/TokenInformationStep/TokenInformationForm/types';
-import useCreateTokenCommunity from '../../../LaunchToken/useCreateTokenCommunity';
+import useCreateTokenCommunity from '../useCreateTokenCommunity';
 import './QuickTokenLaunchForm.scss';
+import SuccessStep from './steps/SuccessStep';
+import TokenInformationFormStep from './steps/TokenInformationFormStep';
+import { FormSubmitValues } from './steps/TokenInformationFormStep/types';
 import { useGenerateTokenIdea } from './useGenerateTokenIdea';
+import { generateCommunityNameFromToken } from './utils';
 
 type QuickTokenLaunchFormProps = {
   onCancel: () => void;
@@ -393,7 +393,7 @@ export const QuickTokenLaunchForm = ({
       {createdCommunityId ? (
         <SuccessStep communityId={createdCommunityId} withToken />
       ) : (
-        <TokenInformationForm
+        <TokenInformationFormStep
           key={activeTokenIdeaIndex}
           selectedAddress={selectedAddress}
           onAddressSelected={setSelectedAddress}
@@ -433,6 +433,7 @@ export const QuickTokenLaunchForm = ({
               <div className="cta-elements">
                 {/* allows to switch b/w generated ideas */}
                 <PageCounter
+                  className="mr-auto"
                   activePage={activeTokenIdeaIndex + 1}
                   totalPages={
                     tokenIdeas.length == 0
