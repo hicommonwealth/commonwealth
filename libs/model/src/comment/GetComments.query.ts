@@ -100,7 +100,6 @@ LIMIT :limit OFFSET :offset;
         type: QueryTypes.SELECT,
       });
 
-      const total_count = comments?.length ? comments!.at(0)!.total_count : 0;
       const sanitizedComments = comments.map((c) => {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { total_count, ...rest } = c;
@@ -113,7 +112,7 @@ LIMIT :limit OFFSET :offset;
 
       return schemas.buildPaginatedResponse(
         sanitizedComments,
-        total_count,
+        comments?.length ? comments!.at(0)!.total_count : 0,
         payload,
       );
     },
