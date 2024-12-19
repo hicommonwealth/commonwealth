@@ -9,6 +9,7 @@ import { z } from 'zod';
 
 // TODO: make this stricter by adding max/min character length
 export const CommentCreatedNotification = z.object({
+  community_id: z.string().max(255).describe('The id of the community'),
   author: z
     .string()
     .describe('The profile name or first 8 characters of a users address'),
@@ -23,12 +24,15 @@ export const CommentCreatedNotification = z.object({
     .describe('The user-friendly name of the community'),
   comment_body: z
     .string()
-    .max(255)
-    .describe('A truncated version of the comment body'),
-  comment_url: z.string().describe('The url of the comment'),
+    .describe('The first 100 characters of the comment body'),
+  comment_url: z.string().describe('The url to the comment'),
   comment_created_event: events.CommentCreated.describe(
     'The full comment record',
   ),
+  author_avatar_url: z
+    .string()
+    .nullish()
+    .describe('The URL of the author avatar'),
 });
 
 export const SnapshotProposalCreatedNotification = z.object({
@@ -44,6 +48,10 @@ export const SnapshotProposalCreatedNotification = z.object({
   snapshot_proposal_url: z
     .string()
     .describe('The url to the snapshot proposal on Common'),
+  community_icon_url: z
+    .string()
+    .nullish()
+    .describe('The URL of the community icon'),
 });
 
 export const UserMentionedNotification = z.object({
@@ -63,6 +71,10 @@ export const UserMentionedNotification = z.object({
     .max(255)
     .describe('A truncated version of the comment body'),
   object_url: z.string().describe('The url of the comment'),
+  author_avatar_url: z
+    .string()
+    .nullish()
+    .describe('The URL of the author avatar'),
 });
 
 export const CommunityStakeNotification = z.object({
@@ -75,6 +87,10 @@ export const CommunityStakeNotification = z.object({
     .max(255)
     .describe('The user-friendly name of the community'),
   community_stakes_url: z.string().describe('The url to the community stakes'),
+  community_icon_url: z
+    .string()
+    .nullish()
+    .describe('The URL of the community icon'),
 });
 
 export const ChainProposalsNotification = z.object({
@@ -92,6 +108,10 @@ export const ChainProposalsNotification = z.object({
   proposal_url: z
     .string()
     .describe('The url to the snapshot proposal on Common'),
+  community_icon_url: z
+    .string()
+    .nullish()
+    .describe('The URL of the community icon'),
 });
 
 export const BaseUpvoteNotification = z.object({
