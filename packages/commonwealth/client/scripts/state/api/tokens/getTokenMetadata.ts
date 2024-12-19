@@ -41,7 +41,7 @@ const useTokenMetadataQuery = ({
   apiEnabled = true,
 }: UseTokenMetadataQueryProps) => {
   return useQuery({
-    queryKey: [tokenId, nodeEthChainId],
+    queryKey: [tokenId, nodeEthChainId, 'alchemy_getTokenMetadata'],
     queryFn: () => getTokenMetadata({ tokenId, nodeEthChainId }),
     enabled: !!tokenId && apiEnabled,
     retry: false,

@@ -9,11 +9,11 @@ import {
   CWModalHeader,
 } from '../../../components/component_kit/new_designs/CWModal';
 import TokenIcon from '../TokenIcon';
-import { TradeTokenModalProps } from '../types';
 import './CommonTradeModal.scss';
 import TradeTokenForm, {
   useCommonTradeTokenForm,
 } from './CommonTradeTokenForm';
+import { CommonTradeTokenModalProps } from './types';
 
 const TRADING_CURRENCY = SupportedCurrencies.USD; // make configurable when needed
 
@@ -21,7 +21,7 @@ const CommonTradeModal = ({
   isOpen,
   onModalClose,
   tradeConfig,
-}: TradeTokenModalProps) => {
+}: CommonTradeTokenModalProps) => {
   const { trading, addresses, isActionPending, onCTAClick } =
     useCommonTradeTokenForm({
       tradeConfig: {

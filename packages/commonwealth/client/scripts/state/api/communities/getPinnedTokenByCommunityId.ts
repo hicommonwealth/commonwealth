@@ -15,12 +15,14 @@ type UseGetPinnedTokensByCommunityIdProps = Omit<
 const useGetPinnedTokensByCommunityId = ({
   community_ids,
   with_chain_node,
+  with_price,
   enabled,
 }: UseGetPinnedTokensByCommunityIdProps) => {
   return trpc.community.getPinnedTokens.useQuery(
     {
       community_ids: community_ids.join(','),
       with_chain_node,
+      with_price,
     },
     {
       cacheTime: FETCH_PINNED_TOKEN_STALE_TIME,
