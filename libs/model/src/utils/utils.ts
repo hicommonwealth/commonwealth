@@ -5,6 +5,7 @@ import {
   safeTruncateBody,
   type AbiType,
 } from '@hicommonwealth/shared';
+import { NeynarAPIClient } from '@neynar/nodejs-sdk';
 import { createHash } from 'crypto';
 import { hasher } from 'node-object-hash';
 import {
@@ -79,11 +80,13 @@ export function buildThreadContentUrl(communityId: string, threadId: number) {
 export function decodeThreadContentUrl(contentUrl: string): {
   communityId: string | null;
   threadId: number | null;
+  isFarcaster: boolean;
 } {
   if (contentUrl.startsWith('/farcaster/')) {
     return {
       communityId: null,
       threadId: null,
+      isFarcaster: true,
     };
   }
   if (!contentUrl.includes('/discussion/')) {
@@ -95,6 +98,7 @@ export function decodeThreadContentUrl(contentUrl: string): {
   return {
     communityId,
     threadId: parseInt(threadId, 10),
+    isFarcaster: false,
   };
 }
 
@@ -255,4 +259,27 @@ export function getSaltedApiKeyHash(apiKey: string, salt: string): string {
 
 export function buildApiKeySaltCacheKey(address: string) {
   return `salt_${address.toLowerCase()}`;
+}
+
+export async function publishCast(
+  replyCastHash: string,
+  messageBuilder: ({ username }: { username: string }) => string,
+) {
+  const client = new NeynarAPIClient(config.CONTESTS.NEYNAR_API_KEY!);
+  try {
+    const {
+      result: { casts },
+    } = await client.fetchBulkCasts([replyCastHash]);
+    const username = casts[0].author.username!;
+    await client.publishCast(
+      config.CONTESTS.NEYNAR_BOT_UUID!,
+      messageBuilder({ username }),
+      {
+        replyTo: replyCastHash,
+      },
+    );
+    log.info(`FC bot published reply to ${replyCastHash}`);
+  } catch (err) {
+    log.error(`Failed to post as FC bot`, err as Error);
+  }
 }
