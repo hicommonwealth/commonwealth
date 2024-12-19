@@ -50,7 +50,6 @@ export const UserMentionedNotification = z.object({
   author_address_id: z.number().describe("The id of the author's address"),
   author_user_id: z.number().describe("The id of the author's user record"),
   author_address: z.string().max(255).describe('The address of the author'),
-  community_id: z.string().max(255).describe('The id of the community'),
   community_name: z
     .string()
     .max(255)
@@ -143,7 +142,6 @@ export const WebhookNotification = z.object({
   sender_avatar_url: z
     .string()
     .describe('The avatar url of the sender e.g. default commonwealth logo'),
-  community_id: z.string().max(255).describe('The community id'),
   title_prefix: z
     .string()
     .max(255)
