@@ -5,13 +5,35 @@ import './sidebar_section.scss';
 
 import { isNotUndefined } from 'helpers/typeGuards';
 import useSidebarStore from 'state/ui/sidebar';
+import { CWIconButton } from '../component_kit/cw_icon_button';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { CWText } from '../component_kit/cw_text';
+import { CWTooltip } from '../component_kit/new_designs/CWTooltip';
 import type {
   SectionGroupAttrs,
   SidebarSectionAttrs,
   SubSectionAttrs,
 } from './types';
+
+const AboutIcon = () => {
+  return (
+    <div className="about-icon-container">
+      <CWTooltip
+        content="About Common"
+        placement="bottom"
+        renderTrigger={(handleInteraction) => (
+          <CWIconButton
+            iconButtonTheme="neutral"
+            iconName="infoEmpty"
+            onClick={() => window.open('https://landing.common.xyz', '_blank')}
+            onMouseEnter={handleInteraction}
+            onMouseLeave={handleInteraction}
+          />
+        )}
+      />
+    </div>
+  );
+};
 
 const SubSection = (props: SubSectionAttrs) => {
   const { isActive, isUpdated, isVisible, onClick, rightIcon, rowIcon, title } =
@@ -226,6 +248,7 @@ export const SidebarSectionGroup = (props: SidebarSectionAttrs) => {
         </div>
       )}
       {extraComponents}
+      <AboutIcon />
     </div>
   );
 };

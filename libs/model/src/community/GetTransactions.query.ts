@@ -64,7 +64,7 @@ export function GetTransactions(): Query<typeof schemas.GetTransactions> {
               'chain_node_name', cn.name
             ) AS community
           FROM "LaunchpadTrades" lts
-          LEFT JOIN "Tokens" AS tkns ON tkns.token_address = lts.token_address
+          LEFT JOIN "LaunchpadTokens" AS tkns ON tkns.token_address = lts.token_address
           LEFT JOIN "Communities" AS c ON c.namespace = tkns.namespace
           LEFT JOIN "ChainNodes" AS cn ON cn.id = c.chain_node_id
           ${addressesList.length > 0 ? 'WHERE lts.trader_address IN (:addresses)' : ''}
