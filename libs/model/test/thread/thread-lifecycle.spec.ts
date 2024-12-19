@@ -894,7 +894,7 @@ describe('Thread lifecycle', () => {
           include_reactions: true,
         },
       });
-      const second = response2?.results.at(0)!;
+      const second = response2!.results.at(0)!;
       expect(second!.reactions!.length).to.equal(1);
     });
 
@@ -929,7 +929,7 @@ describe('Thread lifecycle', () => {
           include_reactions: false,
         },
       });
-      const second = response2?.results.at(0)!;
+      const second = response2!.results.at(0)!;
       expect(second!.reactions).to.be.undefined;
     });
   });
