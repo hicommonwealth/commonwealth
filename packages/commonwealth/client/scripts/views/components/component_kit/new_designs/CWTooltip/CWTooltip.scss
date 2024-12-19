@@ -69,14 +69,6 @@
 
     &.tipBottom {
       @include tip(-4px, auto, auto, calc(50% - 8px));
-
-      @include medium {
-        @include tip(-4px, auto, auto, calc(20% - 8px));
-      }
-    }
-
-    &.tipBottomSidebarHidden {
-      @include tip(-4px, auto, auto, calc(20% - 8px / 2));
     }
 
     &.tipLeft {
