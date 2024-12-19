@@ -14,7 +14,7 @@ import './Token.scss';
 const Token = () => {
   const communityId = app.activeChainId() || '';
   const navigate = useCommonNavigate();
-  const launchpadEnabled = useFlag('launchpad');
+  const uniswapTradeEnabled = useFlag('uniswapTrade');
 
   const { data: communityLaunchpadToken, isLoading: isLoadingLaunchpadToken } =
     useGetTokenByCommunityId({
@@ -32,7 +32,11 @@ const Token = () => {
   const isExternalTokenLinked = communityPinnedToken;
   const canAddToken = app?.chain?.base === ChainBase.Ethereum; // only ethereum communities can add a token
 
-  if (communityLaunchpadToken || isLoadingLaunchpadToken || !launchpadEnabled)
+  if (
+    communityLaunchpadToken ||
+    isLoadingLaunchpadToken ||
+    !uniswapTradeEnabled
+  )
     return <></>;
 
   const actionButton = (

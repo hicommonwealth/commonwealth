@@ -13,6 +13,7 @@ import { ExternalToken } from 'views/modals/TradeTokenModel/UniswapTradeModal/ty
 
 export const useTokenTradeWidget = () => {
   const launchpadEnabled = useFlag('launchpad');
+  const uniswapTradeEnabled = useFlag('uniswapTrade');
   const [
     generatedFallbackImageForPinnedToken,
     setGeneratedFallbackImageForPinnedToken,
@@ -31,7 +32,7 @@ export const useTokenTradeWidget = () => {
       community_ids: [communityId],
       with_chain_node: true,
       with_price: true,
-      enabled: !!communityId && launchpadEnabled,
+      enabled: !!communityId && uniswapTradeEnabled,
     });
   const communityPinnedToken = communityPinnedTokens?.[0];
   const { data: tokenMetadata, isLoading: isLoadingTokenMetadata } =
@@ -39,7 +40,7 @@ export const useTokenTradeWidget = () => {
       tokenId: communityPinnedToken?.contract_address || '',
       nodeEthChainId: communityPinnedToken?.ChainNode?.eth_chain_id || 0,
       apiEnabled:
-        !!(communityPinnedToken?.contract_address || '') && launchpadEnabled,
+        !!(communityPinnedToken?.contract_address || '') && uniswapTradeEnabled,
     });
   const communityPinnedTokenWithMetadata =
     communityPinnedToken && tokenMetadata
@@ -50,9 +51,10 @@ export const useTokenTradeWidget = () => {
       : null;
 
   const isLoadingToken =
-    isLoadingLaunchpadToken ||
-    (isLoadingPinnedToken && !communityLaunchpadToken) ||
-    (isLoadingTokenMetadata && communityPinnedToken);
+    (launchpadEnabled && isLoadingLaunchpadToken) ||
+    (uniswapTradeEnabled &&
+      ((isLoadingPinnedToken && !communityLaunchpadToken) ||
+        (isLoadingTokenMetadata && communityPinnedToken)));
 
   const communityToken: LaunchpadToken | ExternalToken | undefined =
     communityLaunchpadToken
