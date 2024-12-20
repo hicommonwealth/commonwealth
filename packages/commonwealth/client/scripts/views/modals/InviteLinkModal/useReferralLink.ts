@@ -7,7 +7,7 @@ import {
 
 const useReferralLink = ({ autorun = false }: { autorun?: boolean } = {}) => {
   const referralsEnabled = useFlag('referrals');
-  const { data: refferalLinkData, isLoading: isLoadingReferralLink } =
+  const { data: referralLinkData, isLoading: isLoadingReferralLink } =
     useGetReferralLinkQuery();
 
   const {
@@ -16,7 +16,7 @@ const useReferralLink = ({ autorun = false }: { autorun?: boolean } = {}) => {
     isLoading: isLoadingCreateReferralLink,
   } = useCreateReferralLinkMutation();
 
-  const referralLink = refferalLinkData?.referral_link;
+  const referralLink = referralLinkData?.referral_link;
 
   useRunOnceOnCondition({
     callback: () => createReferralLink({}),
