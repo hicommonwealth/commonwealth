@@ -17,5 +17,7 @@ export const typeToIconAndName = (
       return ['compassPhosphor', 'Explore'];
     case 'notifications':
       return ['bell', 'Notifications'];
+    case 'rewards':
+      return ['cardholder', 'Rewards'];
   }
 };

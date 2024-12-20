@@ -7,6 +7,12 @@ import {
 import '@knocklabs/react-notification-feed/dist/index.css';
 import React, { memo, useRef, useState } from 'react';
 import useUserStore from 'state/ui/user';
+import {
+  handleIconClick,
+  handleMouseEnter,
+  handleMouseLeave,
+} from '../../menus/utils';
+import { CWTooltip } from '../component_kit/new_designs/CWTooltip/CWTooltip';
 import CustomNotificationCell from './CustomNotificationCell';
 import './KnockNotifications.scss';
 const KNOCK_PUBLIC_API_KEY =
@@ -31,10 +37,43 @@ export const KnockNotifications = memo(function KnockNotifications() {
       >
         <KnockFeedProvider feedId={KNOCK_IN_APP_FEED_ID} colorMode="light">
           <div>
-            <NotificationIconButton
-              ref={notifButtonRef}
-              onClick={() => setIsVisible(!isVisible)}
+            <CWTooltip
+              content="Notifications"
+              placement="bottom"
+              renderTrigger={(handleInteraction, isTooltipOpen) => (
+                <div
+                  onClick={(e) =>
+                    handleIconClick({
+                      e,
+                      isMenuOpen: isVisible,
+                      isTooltipOpen,
+                      handleInteraction,
+                      onClick: () => setIsVisible(!isVisible),
+                    })
+                  }
+                  onMouseEnter={(e) => {
+                    handleMouseEnter({
+                      e,
+                      isMenuOpen: isVisible,
+                      handleInteraction,
+                    });
+                  }}
+                  onMouseLeave={(e) => {
+                    handleMouseLeave({
+                      e,
+                      isTooltipOpen,
+                      handleInteraction,
+                    });
+                  }}
+                >
+                  <NotificationIconButton
+                    ref={notifButtonRef}
+                    onClick={() => setIsVisible(!isVisible)}
+                  />
+                </div>
+              )}
             />
+
             <NotificationFeedPopover
               buttonRef={notifButtonRef}
               isVisible={isVisible}

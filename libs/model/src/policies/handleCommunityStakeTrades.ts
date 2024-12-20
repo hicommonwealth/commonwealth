@@ -4,6 +4,7 @@ import { BigNumber } from 'ethers';
 import Web3 from 'web3';
 import { z } from 'zod';
 import { DB } from '../models';
+import { chainNodeMustExist } from './utils';
 
 const log = logger(import.meta);
 
@@ -41,17 +42,7 @@ export async function handleCommunityStakeTrades(
     return;
   }
 
-  const chainNode = await models.ChainNode.scope('withPrivateData').findOne({
-    where: {
-      eth_chain_id: event.eventSource.ethChainId,
-    },
-  });
-  if (!chainNode) {
-    log.error('ChainNode associated to chain event not found!', undefined, {
-      event,
-    });
-    return;
-  }
+  const chainNode = await chainNodeMustExist(event.eventSource.ethChainId);
 
   if (!chainNode.private_url) {
     log.error('ChainNode is missing a private url', undefined, {
