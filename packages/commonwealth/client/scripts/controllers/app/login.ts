@@ -437,10 +437,12 @@ export async function handleSocialLoginCallback({
   bearer,
   chain,
   walletSsoSource,
+  isCustomDomain,
 }: {
   bearer?: string | null;
   chain?: string;
   walletSsoSource?: string;
+  isCustomDomain?: boolean;
 }): Promise<{ address: string }> {
   // desiredChain may be empty if social login was initialized from
   // a page without a chain, in which case we default to an eth login
@@ -476,7 +478,9 @@ export async function handleSocialLoginCallback({
       magicAddress = utils.getAddress(metadata.publicAddress);
     }
   } else {
-    const result = await magic.oauth2.getRedirectResult();
+    const result = isCustomDomain
+      ? await magic.oauth.getRedirectResult()
+      : await magic.oauth2.getRedirectResult();
 
     if (!bearer) {
       console.log('No bearer token found in magic redirect result');

@@ -240,12 +240,22 @@ const CommunityMembersPage = () => {
         name: p.profile_name || DEFAULT_NAME,
         role: p.addresses[0].role,
         groups: (p.group_ids || [])
-          .map(
-            (groupId) =>
-              (groups || []).find((group) => group.id === groupId)?.name,
+          .map((groupId) => {
+            const matchedGroup = (groups || []).find((g) => g.id === groupId);
+            return matchedGroup
+              ? {
+                  name: matchedGroup.name,
+                  groupImageUrl: matchedGroup.groupImageUrl,
+                }
+              : null;
+          })
+          .filter(
+            (
+              group,
+            ): group is { name: string; groupImageUrl: string | undefined } =>
+              group !== null && group.name !== undefined,
           )
-          .filter(Boolean)
-          .sort((a, b) => a!.localeCompare(b!)),
+          .sort((a, b) => a.name.localeCompare(b.name)),
         stakeBalance: p.addresses[0].stake_balance,
         lastActive: p.last_active,
       }));

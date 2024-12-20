@@ -31,7 +31,6 @@ export const UserProfileView = z.object({
   isOwner: z.boolean(),
   tags: z.array(Tags.extend({ id: PG_INT })),
   xp_points: z.number().int(),
-  referral_link: z.string().nullish(),
 });
 
 export const GetUserProfile = {
@@ -86,16 +85,12 @@ export const GetUserAddresses = {
   ),
 };
 
-export const ReferralView = Referral.extend({
-  referrer: z.object({
-    id: PG_INT,
-    profile: UserProfile,
+export const ReferralView = z.array(
+  Referral.extend({
+    referee_user_id: PG_INT,
+    referee_profile: UserProfile,
   }),
-  referee: z.object({
-    id: PG_INT,
-    profile: UserProfile,
-  }),
-});
+);
 
 export const GetUserReferrals = {
   input: z.object({ user_id: PG_INT.optional() }),
