@@ -3,6 +3,7 @@ import { useFlag } from 'client/scripts/hooks/useFlag';
 import { saveToClipboard } from 'client/scripts/utils/clipboard';
 import clsx from 'clsx';
 import React from 'react';
+import app from 'state';
 import { useInviteLinkModal } from 'state/ui/modals';
 import useUserStore from 'state/ui/user';
 import useJoinCommunity from 'views/components/SublayoutHeader/useJoinCommunity';
@@ -14,6 +15,7 @@ import useAuthentication from '../../../modals/AuthModal/useAuthentication';
 import { SharePopover } from '../../SharePopover';
 import CWIconButton from '../../component_kit/new_designs/CWIconButton';
 import { CWTooltip } from '../../component_kit/new_designs/CWTooltip';
+
 import './AccountConnectionIndicator.scss';
 
 interface AccountConnectionIndicatorProps {
@@ -121,7 +123,14 @@ const AccountConnectionIndicator = ({
             disabled={connected}
             onClick={handleJoinCommunity}
           />
-          <SharePopover linkToShare={window.location.href} />
+          <SharePopover
+            linkToShare={
+              window.location.origin +
+              '/' +
+              app.activeChainId() +
+              '/discussions'
+            }
+          />
         </div>
       </div>
       {JoinCommunityModals}

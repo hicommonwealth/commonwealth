@@ -8,6 +8,8 @@ import useUserStore from 'state/ui/user';
 import { CWCommunityAvatar } from '../component_kit/cw_community_avatar';
 import { CWDivider } from '../component_kit/cw_divider';
 import { CWIconButton } from '../component_kit/cw_icon_button';
+import { isWindowSmallInclusive } from '../component_kit/helpers';
+import { CWTooltip } from '../component_kit/new_designs/CWTooltip';
 import { calculateUnreadCount } from './helpers';
 import { SideBarNotificationIcon } from './sidebar_notification_icon';
 import './sidebar_quick_switcher.scss';
@@ -50,6 +52,23 @@ export const SidebarQuickSwitcher = ({
             setMenu({ name: 'exploreCommunities' });
           }}
         />
+        {isWindowSmallInclusive(window.innerWidth) && (
+          <CWTooltip
+            content="About Common"
+            placement="bottom"
+            renderTrigger={(handleInteraction) => (
+              <CWIconButton
+                iconButtonTheme="neutral"
+                iconName="infoEmpty"
+                onClick={() =>
+                  window.open('https://landing.common.xyz', '_blank')
+                }
+                onMouseEnter={handleInteraction}
+                onMouseLeave={handleInteraction}
+              />
+            )}
+          />
+        )}
       </div>
       <CWDivider />
       {user.communities.filter((x) => x.isStarred).length !== 0 && (
