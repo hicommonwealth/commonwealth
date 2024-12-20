@@ -1,3 +1,4 @@
+import { trpc } from '@hicommonwealth/adapters';
 import { logger } from '@hicommonwealth/core';
 import { CanvasSignedData, startCanvasNode } from '@hicommonwealth/shared';
 import { parse } from '@ipld/dag-json';
@@ -16,13 +17,12 @@ if (libp2p) {
   );
 }
 
-export const applyCanvasSignedDataMiddleware: (
-  input,
-  output,
-) => Promise<undefined> = async (input, output) => {
-  if (output.canvas_signed_data)
-    await applyCanvasSignedData(parse(output.canvas_signed_data));
-};
+export const signCanvas = trpc.fireAndForget(
+  async (_, output: { canvas_signed_data?: string }) => {
+    if (output.canvas_signed_data)
+      await applyCanvasSignedData(parse(output.canvas_signed_data));
+  },
+);
 
 export const applyCanvasSignedData = async (data: CanvasSignedData) => {
   let appliedSessionId: string | null = null;

@@ -2,64 +2,56 @@ import { trpc } from '@hicommonwealth/adapters';
 import { CacheNamespaces, cache } from '@hicommonwealth/core';
 import { Reaction, Thread } from '@hicommonwealth/model';
 import { MixpanelCommunityInteractionEvent } from '../../shared/analytics/types';
-import { applyCanvasSignedDataMiddleware } from '../federation';
+import { signCanvas } from '../federation';
 import { incrementThreadViewCount } from '../util/incrementThreadViewCount';
 
 export const trpcRouter = trpc.router({
-  createThread: trpc.command(
-    Thread.CreateThread,
-    trpc.Tag.Thread,
-    [
+  createThread: trpc.command(Thread.CreateThread, trpc.Tag.Thread, [
+    signCanvas,
+    trpc.trackAnalytics([
       MixpanelCommunityInteractionEvent.CREATE_THREAD,
       ({ community_id }) => ({ community: community_id }),
-    ],
-    applyCanvasSignedDataMiddleware,
-  ),
-  updateThread: trpc.command(
-    Thread.UpdateThread,
-    trpc.Tag.Thread,
-    (input) =>
+    ]),
+  ]),
+  updateThread: trpc.command(Thread.UpdateThread, trpc.Tag.Thread, [
+    signCanvas,
+    trpc.trackAnalytics((input) =>
       Promise.resolve(
         input.stage !== undefined
           ? [MixpanelCommunityInteractionEvent.UPDATE_STAGE, {}]
           : undefined,
       ),
-    applyCanvasSignedDataMiddleware,
-  ),
+    ),
+  ]),
   createThreadReaction: trpc.command(
     Thread.CreateThreadReaction,
     trpc.Tag.Reaction,
     [
-      MixpanelCommunityInteractionEvent.CREATE_REACTION,
-      ({ community_id }) => ({ community: community_id }),
+      signCanvas,
+      trpc.trackAnalytics([
+        MixpanelCommunityInteractionEvent.CREATE_REACTION,
+        ({ community_id }) => ({ community: community_id }),
+      ]),
     ],
-    applyCanvasSignedDataMiddleware,
   ),
-  deleteThread: trpc.command(
-    Thread.DeleteThread,
-    trpc.Tag.Thread,
-    async () => {
-      // Using track output middleware to invalidate global activity cache
-      // TODO: Generalize output middleware to cover (analytics, gac invalidation, canvas, etc)
+  deleteThread: trpc.command(Thread.DeleteThread, trpc.Tag.Thread, [
+    signCanvas,
+    () => {
+      // invalidate global activity cache
       void cache().deleteKey(
         CacheNamespaces.Query_Response,
         'GetGlobalActivity_{}', // this is the global activity cache key
       );
-      return Promise.resolve(undefined);
     },
-    applyCanvasSignedDataMiddleware,
-  ),
-  deleteReaction: trpc.command(
-    Reaction.DeleteReaction,
-    trpc.Tag.Reaction,
-    undefined,
-    applyCanvasSignedDataMiddleware,
-  ),
+  ]),
+  deleteReaction: trpc.command(Reaction.DeleteReaction, trpc.Tag.Reaction, [
+    signCanvas,
+  ]),
   getThreads: trpc.query(Thread.GetThreads, trpc.Tag.Thread),
   getThreadsByIds: trpc.query(
     Thread.GetThreadsByIds,
     trpc.Tag.Thread,
     undefined,
-    incrementThreadViewCount,
+    [incrementThreadViewCount],
   ),
 });

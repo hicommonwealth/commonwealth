@@ -54,40 +54,40 @@ export enum Tag {
   Poll = 'Poll',
 }
 
-export type Commit<Input extends ZodSchema, Output extends ZodSchema> = (
-  input: z.infer<Input>,
-  output: z.infer<Output>,
-  ctx: Context,
-) => Promise<[string, Record<string, unknown>] | undefined | void>;
+/**
+ * Fire and forget wrapper for async output middleware
+ */
+export function fireAndForget<
+  Input extends ZodSchema,
+  Output extends ZodSchema,
+>(
+  fn: (
+    input: z.infer<Input>,
+    output: z.infer<Output>,
+    ctx: Context,
+  ) => Promise<void>,
+): OutputMiddleware<Input, Output> {
+  const wrapper = (
+    input: z.infer<Input>,
+    output: z.infer<Output>,
+    ctx: Context,
+  ) => {
+    void fn(input, output, ctx).catch(log.error);
+  };
+  return wrapper;
+}
 
 /**
- * Supports two options to track analytics
- * 1. A declarative tuple with [event name, optional output mapper]
- * 2. A "general" async mapper that derives the tuple of [event name, data] from input/output
+ * Synchronous middleware that is applied to the output of a command
+ * before it is returned to the client.
+ * - This is useful for things like logging, analytics, and other side effects.
+ * - The middleware is applied in the order it is defined in the array.
+ * - Use `fireAndForget` wrapper for async I/O operations like committing to a canvas, tracking analytics, etc.
  */
-export type Track<Input extends ZodSchema, Output extends ZodSchema> =
-  | [string, mapper?: (output: z.infer<Output>) => Record<string, unknown>]
-  | ((
-      input: z.infer<Input>,
-      output: z.infer<Output>,
-    ) => Promise<[string, Record<string, unknown>] | undefined>);
-
-async function evalTrack<Input extends ZodSchema, Output extends ZodSchema>(
-  track: Track<Input, Output>,
-  input: z.infer<Input>,
-  output: z.infer<Output>,
-) {
-  if (typeof track === 'function') {
-    const tuple = await track(input, output);
-    return tuple
-      ? { event: tuple[0], data: tuple[1] }
-      : { event: undefined, data: undefined };
-  }
-  return {
-    event: track[0],
-    data: track[1] ? track[1](output) : {},
-  };
-}
+export type OutputMiddleware<
+  Input extends ZodSchema,
+  Output extends ZodSchema,
+> = (input: z.infer<Input>, output: z.infer<Output>, ctx: Context) => void;
 
 /**
  * Returns a record containing condensed browser info.
@@ -111,31 +111,53 @@ function getRequestBrowserInfo(
   return info;
 }
 
-async function trackAnalytics<
-  Input extends ZodSchema,
-  Output extends ZodSchema,
->(
+/**
+ * Supports two options to track analytics
+ * 1. A declarative tuple with [event name, optional output mapper]
+ * 2. A "general" async mapper that derives the tuple of [event name, data] from input/output
+ */
+export type Track<Input extends ZodSchema, Output extends ZodSchema> =
+  | [string, mapper?: (output: z.infer<Output>) => Record<string, unknown>]
+  | ((
+      input: z.infer<Input>,
+      output: z.infer<Output>,
+    ) => Promise<[string, Record<string, unknown>] | undefined>);
+
+async function resolveTrack<Input extends ZodSchema, Output extends ZodSchema>(
   track: Track<Input, Output>,
-  ctx: Context,
   input: z.infer<Input>,
   output: z.infer<Output>,
-) {
-  try {
-    const host = ctx.req.headers.host;
-    const { event, data } = await evalTrack(track, input, output);
-    if (event) {
-      const payload = {
-        ...data,
-        ...getRequestBrowserInfo(ctx.req),
-        ...(host && { isCustomDomain: config.SERVER_URL.includes(host) }),
-        userId: ctx.actor.user.id,
-        isPWA: ctx.req.headers?.['isPWA'] === 'true',
-      };
-      analytics().track(event, payload);
+): Promise<[string | undefined, Record<string, unknown>]> {
+  if (typeof track === 'function')
+    return (await track(input, output)) ?? [undefined, {}];
+  return [track[0], track[1] ? track[1](output) : {}];
+}
+
+export function trackAnalytics<
+  Input extends ZodSchema,
+  Output extends ZodSchema,
+>(track: Track<Input, Output>): OutputMiddleware<Input, Output> {
+  return (input, output, ctx) => {
+    try {
+      const host = ctx.req.headers.host;
+      void resolveTrack(track, input, output)
+        .then(([event, data]) => {
+          if (event) {
+            const payload = {
+              ...data,
+              ...getRequestBrowserInfo(ctx.req),
+              ...(host && { isCustomDomain: config.SERVER_URL.includes(host) }),
+              userId: ctx.actor.user.id,
+              isPWA: ctx.req.headers?.['isPWA'] === 'true',
+            };
+            analytics().track(event, payload);
+          }
+        })
+        .catch(log.error);
+    } catch (err) {
+      err instanceof Error && log.error(err.message, err);
     }
-  } catch (err) {
-    err instanceof Error && log.error(err.message, err);
-  }
+  };
 }
 
 export type BuildProcOptions<
@@ -146,8 +168,7 @@ export type BuildProcOptions<
   name: string;
   md: Metadata<Input, Output>;
   tag: Tag;
-  track?: Track<Input, Output>;
-  commit?: Commit<Input, Output>;
+  outMiddlewares?: Array<OutputMiddleware<Input, Output>>;
   forceSecure?: boolean;
 };
 
@@ -159,8 +180,7 @@ export const buildproc = <Input extends ZodSchema, Output extends ZodSchema>({
   name,
   md,
   tag,
-  track,
-  commit,
+  outMiddlewares,
   forceSecure,
 }: BuildProcOptions<Input, Output>) => {
   const secure = forceSecure ?? isSecure(md);
@@ -191,12 +211,8 @@ export const buildproc = <Input extends ZodSchema, Output extends ZodSchema>({
       } catch (err) {
         err instanceof Error && log.error(err.message, err);
       }
-      track &&
-        result.ok &&
-        void trackAnalytics(track, ctx, rawInput, result.data).catch(log.error);
-      commit &&
-        result.ok &&
-        void commit(rawInput, result.data, ctx).catch(log.error);
+      if (result.ok)
+        outMiddlewares?.forEach((omw) => omw(rawInput, result.data, ctx));
       return result;
     })
     .meta({
