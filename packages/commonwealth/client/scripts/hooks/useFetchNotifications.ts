@@ -15,7 +15,15 @@ const useFetchNotifications = () => {
   const { items } = useNotificationStore(feedClient);
 
   useEffect(() => {
-    feedClient.fetch();
+    const fetchNotifications = async () => {
+      try {
+        await feedClient.fetch();
+      } catch (error) {
+        console.error('Failed to fetch notifications:', error);
+      }
+    };
+
+    fetchNotifications();
   }, [feedClient]);
 
   return { items };
