@@ -10,6 +10,8 @@ import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
+import { SUPPORTED_LANGUAGES } from 'state/ui/language/constants';
+import { translationStore } from 'state/ui/translation/translation';
 import useUserStore from 'state/ui/user';
 import {
   default as MarkdownViewerUsingQuillOrNewEditor,
@@ -22,6 +24,8 @@ import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { getClasses } from 'views/components/component_kit/helpers';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
+import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
+import { useStore } from 'zustand';
 import useBrowserWindow from '../../../../hooks/useBrowserWindow';
 import { ThreadStage } from '../../../../models/types';
 import app from '../../../../state/index';
@@ -62,6 +66,8 @@ type CardProps = AdminActionsProps & {
   hidePublishDate?: boolean;
   hideTrendingTag?: boolean;
   hideSpamTag?: boolean;
+  canTranslate?: boolean;
+  hideTranslateButton?: boolean;
 };
 
 export const ThreadCard = ({
@@ -103,6 +109,8 @@ export const ThreadCard = ({
   hidePublishDate = false,
   hideTrendingTag = false,
   hideSpamTag = false,
+  canTranslate = true,
+  hideTranslateButton = false,
 }: CardProps) => {
   const navigate = useCommonNavigate();
   const user = useUserStore();
@@ -112,6 +120,11 @@ export const ThreadCard = ({
     useState<boolean>(showCommentState);
   const toggleShowComments = () => setShowCommentVisible((prev) => !prev);
   const showImage = useShowImage();
+  const [isTranslating, setIsTranslating] = useState<boolean>(false);
+  const [translatedContent, setTranslatedContent] = useState<string | null>(
+    null,
+  );
+  const translationStoreState = useStore(translationStore);
 
   useEffect(() => {
     if (localStorage.getItem('dark-mode-state') === 'on') {
@@ -234,20 +247,70 @@ export const ThreadCard = ({
               })}
             >
               {!isCardView ? (
-                <MarkdownViewerUsingQuillOrNewEditor
-                  markdown={
-                    !removeImagesFromMarkDown
-                      ? thread.body
-                      : removeImageFormMarkDown(thread.body)
-                  }
-                  cutoffLines={4}
-                  customShowMoreButton={
-                    <CWText type="b1" className="show-more-btn">
-                      Show more
-                    </CWText>
-                  }
-                  onImageClick={onImageClick}
-                />
+                <>
+                  <MarkdownViewerUsingQuillOrNewEditor
+                    markdown={
+                      !removeImagesFromMarkDown
+                        ? translatedContent || thread.body
+                        : removeImageFormMarkDown(
+                            translatedContent || thread.body,
+                          )
+                    }
+                    cutoffLines={4}
+                    customShowMoreButton={
+                      <CWText type="b1" className="show-more-btn">
+                        Show more
+                      </CWText>
+                    }
+                    onImageClick={onImageClick}
+                  />
+                  {!hideTranslateButton && (
+                    <CWThreadAction
+                      action="translate"
+                      disabled={!canTranslate || isTranslating}
+                      onClick={async () => {
+                        if (translatedContent) {
+                          setTranslatedContent(null);
+                          return;
+                        }
+                        try {
+                          setIsTranslating(true);
+                          const targetLanguage =
+                            translationStoreState.selectedLanguage;
+                          if (!SUPPORTED_LANGUAGES[targetLanguage]) {
+                            app.showToast({
+                              message: `Language ${targetLanguage} is not supported`,
+                              type: 'error',
+                            });
+                            return;
+                          }
+                          const translated =
+                            await translationStoreState.translateText(
+                              thread.body,
+                              targetLanguage,
+                            );
+                          setTranslatedContent(translated);
+                        } catch (error) {
+                          console.error('Translation failed:', error);
+                          app.showToast({
+                            message:
+                              'Failed to translate content. Please try again.',
+                            type: 'error',
+                          });
+                        } finally {
+                          setIsTranslating(false);
+                        }
+                      }}
+                      label={
+                        isTranslating
+                          ? 'Translating...'
+                          : translatedContent
+                            ? 'Show Original'
+                            : 'Translate'
+                      }
+                    />
+                  )}
+                </>
               ) : (
                 <MarkdownViewerWithFallback markdown={thread.body} />
               )}
