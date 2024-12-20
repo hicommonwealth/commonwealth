@@ -3,6 +3,7 @@ import React, { lazy } from 'react';
 import { Route } from 'react-router-dom';
 import { withLayout } from 'views/Layout';
 import { RouteFeatureFlags } from './Router';
+import { withRouteValidation } from './withRouteValidation';
 
 const SearchPage = lazy(() => import('views/pages/search'));
 
@@ -290,21 +291,21 @@ const CustomDomainRoutes = ({
     <Route
       key="/manage/profile"
       path="/manage/profile"
-      element={withLayout(CommunityProfile, {
+      element={withLayout(withRouteValidation(CommunityProfile), {
         scoped: true,
       })}
     />,
     <Route
       key="/manage/integrations"
       path="/manage/integrations"
-      element={withLayout(CommunityIntegrations, {
+      element={withLayout(withRouteValidation(CommunityIntegrations), {
         scoped: true,
       })}
     />,
     <Route
       key="/manage/integrations/stake"
       path="/manage/integrations/stake"
-      element={withLayout(CommunityStakeIntegration, {
+      element={withLayout(withRouteValidation(CommunityStakeIntegration), {
         scoped: true,
       })}
     />,
@@ -381,28 +382,28 @@ const CustomDomainRoutes = ({
     <Route
       key="/snapshot/:snapshotId"
       path="/snapshot/:snapshotId"
-      element={withLayout(SnapshotProposalPage, {
+      element={withLayout(withRouteValidation(SnapshotProposalPage), {
         scoped: true,
       })}
     />,
     <Route
       key="/multiple-snapshots"
       path="/multiple-snapshots"
-      element={withLayout(ViewMultipleSnapshotsPage, {
+      element={withLayout(withRouteValidation(ViewMultipleSnapshotsPage), {
         scoped: true,
       })}
     />,
     <Route
       key="/snapshot/:snapshotId/:identifier"
       path="/snapshot/:snapshotId/:identifier"
-      element={withLayout(ViewSnapshotsProposalPage, {
+      element={withLayout(withRouteValidation(ViewSnapshotsProposalPage), {
         scoped: true,
       })}
     />,
     <Route
       key="/new/snapshot/:snapshotId"
       path="/new/snapshot/:snapshotId"
-      element={withLayout(NewSnapshotProposalPage, {
+      element={withLayout(withRouteValidation(NewSnapshotProposalPage), {
         scoped: true,
       })}
     />,
@@ -412,7 +413,7 @@ const CustomDomainRoutes = ({
     <Route
       key="/account/:address"
       path="/account/:address"
-      element={withLayout(ProfilePageRedirect, {
+      element={withLayout(withRouteValidation(ProfilePageRedirect), {
         scoped: true,
         type: 'common',
       })}
@@ -420,7 +421,7 @@ const CustomDomainRoutes = ({
     <Route
       key="/account"
       path="/account"
-      element={withLayout(ProfilePageRedirect, {
+      element={withLayout(withRouteValidation(ProfilePageRedirect), {
         scoped: true,
         type: 'common',
       })}
@@ -428,7 +429,7 @@ const CustomDomainRoutes = ({
     <Route
       key="/profile/id/:userId"
       path="/profile/id/:userId"
-      element={withLayout(NewProfilePage, {
+      element={withLayout(withRouteValidation(NewProfilePage), {
         scoped: true,
         type: 'common',
       })}
@@ -436,7 +437,7 @@ const CustomDomainRoutes = ({
     <Route
       key="/profile/edit"
       path="/profile/edit"
-      element={withLayout(EditNewProfilePage, {
+      element={withLayout(withRouteValidation(EditNewProfilePage), {
         scoped: true,
         type: 'common',
       })}
@@ -649,9 +650,12 @@ const CustomDomainRoutes = ({
     <Route
       key="/link/snapshot-proposal/:identifier"
       path="/link/snapshot-proposal/:identifier"
-      element={withLayout(SnapshotProposalLinkRedirectPage, {
-        scoped: true,
-      })}
+      element={withLayout(
+        withRouteValidation(SnapshotProposalLinkRedirectPage),
+        {
+          scoped: true,
+        },
+      )}
     />,
   ];
 };
