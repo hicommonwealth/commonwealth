@@ -21,6 +21,7 @@ import {
   ETHEREUM_MAINNET_ID,
   OSMOSIS_ID,
   POLYGON_ETH_CHAIN_ID,
+  SKALE_ID,
   alphabeticallyStakeWiseSortedChains as sortedChains,
 } from './constants';
 import {
@@ -116,6 +117,8 @@ const CommunityInformationForm = ({
               return options?.find((o) => o.value === OSMOSIS_ID);
             case CommunityType.Blast:
               return options?.find((o) => o.value === BLAST_ID);
+            case CommunityType.Skale:
+              return options?.find((o) => o.value === SKALE_ID);
             case CommunityType.Polygon:
             case CommunityType.Solana:
               return options?.[0];

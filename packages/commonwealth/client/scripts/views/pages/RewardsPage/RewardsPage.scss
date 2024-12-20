@@ -1,0 +1,34 @@
+@import '../../../styles/shared';
+
+.RewardsPage {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 16px;
+
+  .rewards-card-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+
+    @include smallInclusive {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .rewards-button-tabs {
+    display: none;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+
+    @include smallInclusive {
+      display: flex;
+    }
+  }
+
+  .rewards-tab-container {
+    width: 100%;
+    overflow-x: auto;
+  }
+}

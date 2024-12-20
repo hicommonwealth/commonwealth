@@ -5,7 +5,9 @@ import {
   EvmEventSignatures,
   commonProtocol as cp,
 } from '@hicommonwealth/evm-protocols';
+import { config } from '@hicommonwealth/model';
 import { ContestScore, events } from '@hicommonwealth/schemas';
+import { buildContestLeaderboardUrl, getBaseUrl } from '@hicommonwealth/shared';
 import { QueryTypes } from 'sequelize';
 import { z } from 'zod';
 import { models } from '../database';
@@ -17,6 +19,8 @@ import {
   decodeThreadContentUrl,
   getChainNodeUrl,
   getDefaultContestImage,
+  parseFarcasterContentUrl,
+  publishCast,
 } from '../utils';
 
 const log = logger(import.meta);
@@ -295,7 +299,9 @@ export function Contests(): Projection<typeof inputs> {
       },
 
       ContestContentAdded: async ({ payload }) => {
-        const { threadId } = decodeThreadContentUrl(payload.content_url);
+        const { threadId, isFarcaster } = decodeThreadContentUrl(
+          payload.content_url,
+        );
         await models.ContestAction.create({
           ...payload,
           contest_id: payload.contest_id || 0,
@@ -306,6 +312,26 @@ export function Contests(): Projection<typeof inputs> {
           voting_power: '0',
           created_at: new Date(),
         });
+
+        // post confirmation via FC bot
+        if (isFarcaster) {
+          const contestManager = await models.ContestManager.findByPk(
+            payload.contest_address,
+          );
+          const leaderboardUrl = buildContestLeaderboardUrl(
+            getBaseUrl(config.APP_ENV),
+            contestManager!.community_id,
+            contestManager!.contest_address,
+          );
+          const { replyCastHash } = parseFarcasterContentUrl(
+            payload.content_url,
+          );
+          await publishCast(
+            replyCastHash,
+            ({ username }) =>
+              `Hey @${username}, your entry has been submitted to the contest: ${leaderboardUrl}`,
+          );
+        }
       },
 
       ContestContentUpvoted: async ({ payload }) => {
