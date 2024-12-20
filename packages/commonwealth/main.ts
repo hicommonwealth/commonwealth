@@ -145,7 +145,7 @@ export async function main(
 
     withPrerender &&
       app.use((req, res, next) => {
-        if (req.path.startsWith('/api/')) next();
+        if (req.path.startsWith(`${api.integration.PATH}/farcaster/`)) next();
         else prerenderNode(req, res, next);
       });
   };
