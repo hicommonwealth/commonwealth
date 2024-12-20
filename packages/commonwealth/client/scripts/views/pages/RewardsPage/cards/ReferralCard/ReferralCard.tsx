@@ -2,13 +2,13 @@ import React from 'react';
 
 import RewardsCard from '../../RewardsCard';
 
-import './RefferalCard.scss';
+import './ReferralCard.scss';
 
-interface RefferalCardProps {
+interface ReferralCardProps {
   onSeeAllClick: () => void;
 }
 
-const RefferalCard = ({ onSeeAllClick }: RefferalCardProps) => {
+const ReferralCard = ({ onSeeAllClick }: ReferralCardProps) => {
   return (
     <RewardsCard
       title="Referrals"
@@ -16,9 +16,9 @@ const RefferalCard = ({ onSeeAllClick }: RefferalCardProps) => {
       icon="userSwitch"
       onSeeAllClick={onSeeAllClick}
     >
-      <div className="RefferalCard">Referral Card Body</div>
+      <div className="ReferralCard">Referral Card Body</div>
     </RewardsCard>
   );
 };
 
-export default RefferalCard;
+export default ReferralCard;

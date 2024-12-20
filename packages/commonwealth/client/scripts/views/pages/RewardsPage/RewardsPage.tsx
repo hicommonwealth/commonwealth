@@ -14,16 +14,10 @@ import {
 } from '../../components/component_kit/new_designs/CWTabs';
 import { PageNotFound } from '../404';
 import RewardsTab from './RewardsTab';
-import { QuestCard, RefferalCard, WalletCard } from './cards';
+import { QuestCard, ReferralCard, WalletCard } from './cards';
 import { QuestTable, ReferralTable, WalletTable } from './tables';
-import {
-  MobileTabType,
-  TableType,
-  getInitialTab,
-  mobileTabParam,
-  tabToTable,
-  typeToIcon,
-} from './utils';
+import { MobileTabType, TableType } from './types';
+import { getInitialTab, mobileTabParam, tabToTable, typeToIcon } from './utils';
 
 import './RewardsPage.scss';
 
@@ -71,7 +65,7 @@ const RewardsPage = () => {
         <div className="rewards-card-container">
           {(!isWindowSmallInclusive ||
             mobileTab === MobileTabType.Referrals) && (
-            <RefferalCard
+            <ReferralCard
               onSeeAllClick={() => handleTabChange(MobileTabType.Referrals)}
             />
           )}

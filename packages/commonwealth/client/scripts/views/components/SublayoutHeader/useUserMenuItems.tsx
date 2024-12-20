@@ -32,7 +32,8 @@ import {
 } from 'views/components/component_kit/cw_toggle';
 import CWIconButton from 'views/components/component_kit/new_designs/CWIconButton';
 import useAuthentication from '../../modals/AuthModal/useAuthentication';
-import { MobileTabType, mobileTabParam } from '../../pages/RewardsPage/utils';
+import { MobileTabType } from '../../pages/RewardsPage/types';
+import { mobileTabParam } from '../../pages/RewardsPage/utils';
 import { useCommunityStake } from '../CommunityStake';
 import UserMenuItem from './UserMenuItem';
 import useCheckAuthenticatedAddresses from './useCheckAuthenticatedAddresses';

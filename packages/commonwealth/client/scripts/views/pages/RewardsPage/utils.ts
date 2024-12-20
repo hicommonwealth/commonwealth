@@ -1,20 +1,15 @@
-export enum MobileTabType {
-  Referrals = 'Refferal Earnings',
-  WalletBalance = 'Wallet Balance',
-  Quests = 'Quests',
-}
+import { MobileTabType, TableType, TabParam } from './types';
 
-export enum TableType {
-  Referrals = 'Referrals',
-  TokenTXHistory = 'Token TX History',
-  XPEarnings = 'XP Earnings',
-}
+export const getInitialTab = () => {
+  const params = new URLSearchParams(location.search);
+  const tabParam = params.get('tab');
 
-export const enum TabParam {
-  referrals = 'referrals',
-  wallet = 'wallet',
-  quests = 'quests',
-}
+  if (!tabParam) {
+    return MobileTabType.Referrals;
+  }
+
+  return tabParamToMobileTab[tabParam];
+};
 
 export const tabParamToMobileTab = {
   [TabParam.referrals]: MobileTabType.Referrals,
@@ -38,15 +33,4 @@ export const typeToIcon = {
   [MobileTabType.Referrals]: 'userSwitch',
   [MobileTabType.WalletBalance]: 'cardholder',
   [MobileTabType.Quests]: 'trophy',
-};
-
-export const getInitialTab = () => {
-  const params = new URLSearchParams(location.search);
-  const tabParam = params.get('tab');
-
-  if (!tabParam) {
-    return TabParam.referrals;
-  }
-
-  return tabParamToMobileTab[tabParam];
 };

@@ -1,5 +1,5 @@
 import QuestCard from './QuestCard';
-import RefferalCard from './RefferalCard';
+import ReferralCard from './ReferralCard';
 import WalletCard from './WalletCard';
 
-export { QuestCard, RefferalCard, WalletCard };
+export { QuestCard, ReferralCard, WalletCard };
