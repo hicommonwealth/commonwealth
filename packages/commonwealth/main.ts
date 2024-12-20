@@ -144,7 +144,11 @@ export async function main(
     app.use(passport.session());
 
     withPrerender &&
-      app.use(prerenderNode.set('prerenderToken', config.PRERENDER_TOKEN));
+      app.use(
+        prerenderNode
+          .set('prerenderToken', config.PRERENDER_TOKEN)
+          .blacklist('^/api/integration/farcaster/.*$'),
+      );
   };
 
   setupMiddleware();
