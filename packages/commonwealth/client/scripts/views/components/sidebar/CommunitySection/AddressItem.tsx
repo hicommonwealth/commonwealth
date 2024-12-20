@@ -33,6 +33,8 @@ const AddressItem = (props: AddressItemProps) => {
   const { addressInfo, toggleRemoveModal, isSelected } = props;
   const { address, walletId, community } = addressInfo;
 
+  const { openMagicWallet } = useAuthentication({});
+
   // user.addresses.community from user store don't have icon_url
   // and name, we make a new query to get them, ideally this should be returned
   // from api
@@ -42,8 +44,6 @@ const AddressItem = (props: AddressItemProps) => {
   });
 
   if (!fetchedCommunity) return null;
-
-  const { openMagicWallet } = useAuthentication({});
 
   return (
     <div className="AddressItem">
