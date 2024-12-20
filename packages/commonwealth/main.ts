@@ -143,11 +143,16 @@ export async function main(
     app.use(passport.initialize());
     app.use(passport.session());
 
-    withPrerender &&
+    if (withPrerender) {
+      const rendererInstance = prerenderNode.set(
+        'prerenderToken',
+        config.PRERENDER_TOKEN,
+      );
       app.use((req, res, next) => {
         if (req.path.startsWith(`${api.integration.PATH}/farcaster/`)) next();
-        else prerenderNode(req, res, next);
+        else rendererInstance(req, res, next);
       });
+    }
   };
 
   setupMiddleware();
