@@ -136,6 +136,7 @@ const generateTokenIdea = async function* ({
     const imageResponse = await openai.images.generate({
       prompt: TOKEN_AI_PROMPTS_CONFIG.image(tokenIdea.name, tokenIdea.symbol),
       size: '256x256',
+      model: 'dall-e-2',
       n: 1,
       response_format: 'url',
     });
