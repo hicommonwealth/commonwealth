@@ -15,6 +15,7 @@ import {
 import { PageNotFound } from '../404';
 import RewardsTab from './RewardsTab';
 import { QuestCard, RefferalCard, WalletCard } from './cards';
+import { QuestTable, ReferralTable, WalletTable } from './tables';
 import {
   MobileTabType,
   TableType,
@@ -98,11 +99,9 @@ const RewardsPage = () => {
           </CWTabsRow>
         </div>
 
-        {tableTab === TableType.Referrals && <div>Referrals table</div>}
-        {tableTab === TableType.TokenTXHistory && (
-          <div>TokenTXHistory table</div>
-        )}
-        {tableTab === TableType.XPEarnings && <div>XPEarnings table</div>}
+        {tableTab === TableType.Referrals && <ReferralTable />}
+        {tableTab === TableType.TokenTXHistory && <QuestTable />}
+        {tableTab === TableType.XPEarnings && <WalletTable />}
       </section>
     </CWPageLayout>
   );
