@@ -6,6 +6,15 @@ const { bech32 } = require('bech32');
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.sequelize.transaction(async (transaction) => {
+      const existingAtoneAddresses = await queryInterface.sequelize.query(
+        `
+          SELECT address, user_id
+          FROM "Addresses"
+          WHERE community_id = 'atomone' AND address LIKE 'atone%';
+      `,
+        { type: Sequelize.QueryTypes.SELECT, transaction },
+      );
+
       const addresses = await queryInterface.sequelize.query(
         `
           SELECT address, user_id
@@ -19,6 +28,9 @@ module.exports = {
         const { words } = bech32.decode(address.address);
         const encodedAddress = bech32.encode('atone', words);
 
+        if (existingAtoneAddresses.find((a) => a.address === encodedAddress))
+          continue;
+
         await queryInterface.sequelize.query(
           `
             UPDATE "Addresses"
@@ -28,6 +40,15 @@ module.exports = {
           { transaction },
         );
       }
+
+      await queryInterface.sequelize.query(
+        `
+          UPDATE "Addresses"
+          SET role = 'admin'
+          WHERE address = 'atone13zarqk8gm2sl6ctaxgc50sq6gvnew359fp3ecf' AND community_id = 'atomone';
+        `,
+        { transaction },
+      );
     });
   },
 
