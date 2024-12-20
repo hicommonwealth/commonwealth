@@ -9,13 +9,13 @@ export async function compressImage(file: File): Promise<File> {
 
     const options = {
       maxSizeMB: 10,
-      maxWidthOrHeight: 1000, // in pixels, due to cloudflare polish limit
-      useWebWorker: true, // allows compression to run in separate thread in browser
+      maxWidthOrHeight: 1000,
+      useWebWorker: true,
     };
 
     return imageCompression(file, options);
   } catch (e) {
     console.error(e);
-    throw new Error(e);
+    throw e;
   }
 }

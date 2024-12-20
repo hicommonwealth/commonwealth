@@ -1,6 +1,6 @@
 import sharp from 'sharp';
 
-export async function compressImage(buffer: Buffer): Promise<Buffer> {
+export async function compressServerImage(buffer: Buffer): Promise<Buffer> {
   try {
     return await sharp(buffer)
       .resize(1000, 1000, {

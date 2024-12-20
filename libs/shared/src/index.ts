@@ -4,4 +4,4 @@ export * from './errors';
 export * from './regex';
 export * from './types';
 export * from './utils';
-export * from './utils/image';
+export * from './utils/ImageCompression';

@@ -5,12 +5,12 @@ import {
   logger,
 } from '@hicommonwealth/core';
 import { DB } from '@hicommonwealth/model';
-import { compressImage } from '@hicommonwealth/shared';
 import fetch from 'node-fetch';
 import { OpenAI } from 'openai';
 import { v4 as uuidv4 } from 'uuid';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
+import { compressServerImage } from '../utils/ImageCompression';
 
 let openai: OpenAI | undefined = undefined;
 
@@ -72,7 +72,7 @@ const generateImage = async (
   try {
     const resp = await fetch(image);
     const buffer = await resp.buffer();
-    const compressedBuffer = await compressImage(buffer);
+    const compressedBuffer = await compressServerImage(buffer);
     const { url } = await blobStorage().upload({
       key: `${uuidv4()}.png`,
       bucket: 'assets',
