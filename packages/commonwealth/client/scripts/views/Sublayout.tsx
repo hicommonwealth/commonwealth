@@ -201,11 +201,11 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
             bodyText="You can now host contests directly on Farcaster to reach and engage your followers.
             They can submit entries,
             vote for their favorites, and earn rewards, all without leaving the page."
-            buttonText=""
-            buttonLink=""
+            buttonText="Enter $MOCHI Contest"
+            buttonLink="https://www.google.com/"
             growlType="farcasterContest"
             growlImage={farcasterContestImage}
-            extraText="Stay tuned! The first Farcaster contest starts Monday the 23rd!"
+            extraText="Enter the first Farcaster Contest hosted by our friends at Mochi"
           />
         </div>
         <WelcomeOnboardModal
