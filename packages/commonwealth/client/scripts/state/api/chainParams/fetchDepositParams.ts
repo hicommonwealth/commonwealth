@@ -1,6 +1,7 @@
 import { ChainBase } from '@hicommonwealth/shared';
 import { useQuery } from '@tanstack/react-query';
 import Cosmos from 'controllers/chain/cosmos/adapter';
+import { getDepositParams as getAtomOneDepositParams } from 'controllers/chain/cosmos/gov/atomone/utils-v1';
 import { getDepositParams as getGovgenDepositParams } from 'controllers/chain/cosmos/gov/govgen/utils-v1beta1';
 import {
   CosmosDepositParams,
@@ -13,22 +14,24 @@ const DEPOSIT_PARAMS_STALE_TIME = 1000 * 60 * 15;
 
 const fetchDepositParams = async (
   stakingDenom: string,
-  isGovgen: boolean = false,
+  chainTtype?: string,
 ): Promise<CosmosDepositParams> => {
-  return isGovgen
-    ? getGovgenDepositParams(app.chain as Cosmos, stakingDenom)
-    : getDepositParams(app.chain as Cosmos, stakingDenom);
+  switch (chainTtype) {
+    case 'govgen':
+      return getGovgenDepositParams(app.chain as Cosmos, stakingDenom);
+    case 'atomone':
+      return getAtomOneDepositParams(app.chain as Cosmos, stakingDenom);
+    default:
+      return getDepositParams(app.chain as Cosmos, stakingDenom);
+  }
 };
 
-const useDepositParamsQuery = (
-  stakingDenom: string,
-  isGovgen: boolean = false,
-) => {
+const useDepositParamsQuery = (stakingDenom: string, chainTtype?: string) => {
   const communityId = app.activeChainId();
   return useQuery({
     // fetchDepositParams depends on stakingDenom being defined
-    queryKey: ['depositParams', communityId, stakingDenom, isGovgen],
-    queryFn: () => fetchDepositParams(stakingDenom, isGovgen),
+    queryKey: ['depositParams', communityId, stakingDenom, chainTtype],
+    queryFn: () => fetchDepositParams(stakingDenom, chainTtype),
     enabled: app.chain?.base === ChainBase.CosmosSDK && !!stakingDenom,
     cacheTime: DEPOSIT_PARAMS_CACHE_TIME,
     staleTime: DEPOSIT_PARAMS_STALE_TIME,

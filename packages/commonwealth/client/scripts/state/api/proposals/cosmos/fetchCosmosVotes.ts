@@ -1,6 +1,9 @@
+import type { QueryVotesResponse as AtomOneQueryVotesResponse } from '@atomone/atomone-types-long/atomone/gov/v1/query';
 import type { QueryVotesResponseSDKType } from '@hicommonwealth/chains';
 import { ChainBase } from '@hicommonwealth/shared';
 import { useQuery } from '@tanstack/react-query';
+import { CosmosProposalV1AtomOne } from 'client/scripts/controllers/chain/cosmos/gov/atomone/proposal-v1';
+import { CosmosProposalGovgen } from 'client/scripts/controllers/chain/cosmos/gov/govgen/proposal-v1beta1';
 import { CosmosProposalV1 } from 'controllers/chain/cosmos/gov/v1/proposal-v1';
 import { CosmosProposal } from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
 import type { QueryVotesResponse } from 'cosmjs-types/cosmos/gov/v1beta1/query';
@@ -13,9 +16,13 @@ const VOTES_STALE_TIME = 1000 * 30;
 
 const fetchCosmosVotes = async (
   proposal: AnyProposal,
-): Promise<QueryVotesResponse | QueryVotesResponseSDKType> => {
+): Promise<
+  QueryVotesResponse | QueryVotesResponseSDKType | AtomOneQueryVotesResponse
+> => {
   if (
+    proposal instanceof CosmosProposalV1AtomOne ||
     proposal instanceof CosmosProposalV1 ||
+    proposal instanceof CosmosProposalGovgen ||
     proposal instanceof CosmosProposal
   ) {
     return proposal.fetchVotes();
