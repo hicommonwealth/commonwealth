@@ -5,12 +5,12 @@ import {
   logger,
 } from '@hicommonwealth/core';
 import { DB } from '@hicommonwealth/model';
+import { compressImage } from '@hicommonwealth/shared';
 import fetch from 'node-fetch';
 import { OpenAI } from 'openai';
 import { v4 as uuidv4 } from 'uuid';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
-import { compressImage } from '../utils/ImageCompression';
 
 let openai: OpenAI | undefined = undefined;
 
