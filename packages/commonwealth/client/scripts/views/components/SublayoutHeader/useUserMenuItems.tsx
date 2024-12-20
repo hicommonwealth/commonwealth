@@ -32,6 +32,7 @@ import {
 } from 'views/components/component_kit/cw_toggle';
 import CWIconButton from 'views/components/component_kit/new_designs/CWIconButton';
 import useAuthentication from '../../modals/AuthModal/useAuthentication';
+import { MobileTabType, mobileTabParam } from '../../pages/RewardsPage/utils';
 import { useCommunityStake } from '../CommunityStake';
 import UserMenuItem from './UserMenuItem';
 import useCheckAuthenticatedAddresses from './useCheckAuthenticatedAddresses';
@@ -299,8 +300,13 @@ const useUserMenuItems = ({
         type: 'default',
         label: 'My transactions',
         onClick: () =>
-          // TODO add query param that will take user to Token Transactions Table
-          navigate(rewardsEnabled ? `/rewards` : `/myTransactions`, {}, null),
+          navigate(
+            rewardsEnabled
+              ? `/rewards?tab=${mobileTabParam[MobileTabType.WalletBalance]}`
+              : `/myTransactions`,
+            {},
+            null,
+          ),
       },
       {
         type: 'default',
