@@ -34,6 +34,9 @@ export const AddressList = ({
     null,
   );
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [selectedCommuinty, setSelectedCommunity] = useState<string | null>(
+    null,
+  );
 
   const user = useUserStore();
 
@@ -80,9 +83,11 @@ export const AddressList = ({
                   toggleRemoveModal={(
                     val: boolean,
                     selectedAddress: AddressInfo,
+                    community,
                   ) => {
                     setIsRemoveModalOpen(val);
                     setCurrentAddress(selectedAddress);
+                    setSelectedCommunity(community);
                   }}
                   isSelected={addr.address === address}
                 />
@@ -93,7 +98,8 @@ export const AddressList = ({
       <CWModal
         size="small"
         content={
-          currentAddress && (
+          currentAddress &&
+          selectedCommuinty && (
             <DeleteAddressModal
               addresses={addresses}
               address={currentAddress}
@@ -102,6 +108,7 @@ export const AddressList = ({
                 setIsRemoveModalOpen(false);
                 refreshProfiles();
               }}
+              communityName={selectedCommuinty}
             />
           )
         }

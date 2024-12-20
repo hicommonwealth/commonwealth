@@ -14,19 +14,34 @@ import { CWIcon } from '../../component_kit/cw_icons/cw_icon';
 import { CWText } from '../../component_kit/cw_text';
 import { CWTooltip } from '../../component_kit/new_designs/CWTooltip';
 
+import { useGetCommunityByIdQuery } from 'client/scripts/state/api/communities';
 import { saveToClipboard } from 'client/scripts/utils/clipboard';
 import './AddressItem.scss';
 
 type AddressItemProps = {
   profile: NewProfile;
   addressInfo: AddressInfo;
-  toggleRemoveModal: (val: boolean, address: AddressInfo) => void;
+  toggleRemoveModal: (
+    val: boolean,
+    address: AddressInfo,
+    communityName: string,
+  ) => void;
   isSelected: boolean;
 };
 
 const AddressItem = (props: AddressItemProps) => {
   const { addressInfo, toggleRemoveModal, isSelected } = props;
-  const { address, walletId } = addressInfo;
+  const { address, walletId, community } = addressInfo;
+
+  // user.addresses.community from user store don't have icon_url
+  // and name, we make a new query to get them, ideally this should be returned
+  // from api
+  const { data: fetchedCommunity } = useGetCommunityByIdQuery({
+    id: community.id,
+    enabled: !!community.id,
+  });
+
+  if (!fetchedCommunity) return null;
 
   const { openMagicWallet } = useAuthentication({});
 
@@ -97,7 +112,8 @@ const AddressItem = (props: AddressItemProps) => {
           menuItems={[
             {
               label: `Remove Address`,
-              onClick: () => toggleRemoveModal(true, addressInfo),
+              onClick: () =>
+                toggleRemoveModal(true, addressInfo, fetchedCommunity.name),
             },
           ]}
           renderTrigger={(onClick) => (
