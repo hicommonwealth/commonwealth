@@ -54,7 +54,7 @@ export function SignIn(): Command<typeof schemas.SignIn> {
     body: async ({ actor, payload }) => {
       if (!actor.user.auth) throw Error('Invalid address');
 
-      const { community_id, wallet_id, referral_link, session, block_info } =
+      const { community_id, wallet_id, referrer_address, session, block_info } =
         payload;
       const { base, encodedAddress, ss58Prefix, hex, existingHexUserId } = actor
         .user.auth as VerifiedAddress;
@@ -150,7 +150,7 @@ export function SignIn(): Command<typeof schemas.SignIn> {
                 community_id,
                 user_id: addr.user_id!,
                 created_at: addr.created_at!,
-                referral_link,
+                referrer_address,
               },
             });
           new_user &&
@@ -161,7 +161,7 @@ export function SignIn(): Command<typeof schemas.SignIn> {
                 address: addr.address,
                 user_id,
                 created_at: addr.created_at!,
-                referral_link,
+                referrer_address,
               },
             });
           transferredUser &&

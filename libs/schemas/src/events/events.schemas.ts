@@ -22,7 +22,7 @@ export const UserCreated = z.object({
   address: z.string(),
   user_id: z.number(),
   created_at: z.coerce.date(),
-  referral_link: z.string().nullish(),
+  referrer_address: z.string().nullish(),
 });
 
 export const AddressOwnershipTransferred = z.object({
