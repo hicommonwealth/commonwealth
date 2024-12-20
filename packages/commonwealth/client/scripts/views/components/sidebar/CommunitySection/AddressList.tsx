@@ -49,13 +49,15 @@ export const AddressList = ({
     <>
       <div className="AddressList">
         <div className="header">
-          <div className="address-left">
+          <div
+            className="address-left"
+            onClick={() => setIsCollapsed(!isCollapsed)}
+          >
             <CWIcon
               iconName={isCollapsed ? 'caretDown' : 'caretUp'}
               iconSize="small"
               className="caret-icon"
               weight="bold"
-              onClick={() => setIsCollapsed(!isCollapsed)}
             />
             <CWText fontWeight="medium" type="caption" className="status-text">
               Addresses
