@@ -1,5 +1,11 @@
 import React, { useState } from 'react';
 
+import useBrowserWindow from 'hooks/useBrowserWindow';
+import { useFlag } from 'hooks/useFlag';
+import { useCommonNavigate } from 'navigation/helpers';
+import useUserStore from 'state/ui/user';
+import { IconName } from 'views/components/component_kit/cw_icons/cw_icon_lookup';
+
 import { CWText } from '../../components/component_kit/cw_text';
 import CWPageLayout from '../../components/component_kit/new_designs/CWPageLayout';
 import {
@@ -7,8 +13,8 @@ import {
   CWTabsRow,
 } from '../../components/component_kit/new_designs/CWTabs';
 import { PageNotFound } from '../404';
-import RewardsCard from './RewardsCard';
 import RewardsTab from './RewardsTab';
+import { QuestCard, RefferalCard, WalletCard } from './cards';
 import {
   MobileTabType,
   TableType,
@@ -17,12 +23,6 @@ import {
   tabToTable,
   typeToIcon,
 } from './utils';
-
-import useBrowserWindow from 'hooks/useBrowserWindow';
-import { useFlag } from 'hooks/useFlag';
-import { useCommonNavigate } from 'navigation/helpers';
-import useUserStore from 'state/ui/user';
-import { IconName } from 'views/components/component_kit/cw_icons/cw_icon_lookup';
 
 import './RewardsPage.scss';
 
@@ -70,22 +70,14 @@ const RewardsPage = () => {
         <div className="rewards-card-container">
           {(!isWindowSmallInclusive ||
             mobileTab === MobileTabType.Referrals) && (
-            <RewardsCard
-              title="Referrals"
-              description="Track your referral rewards"
-              icon="userSwitch"
+            <RefferalCard
               onSeeAllClick={() => handleTabChange(MobileTabType.Referrals)}
             />
           )}
           {(!isWindowSmallInclusive ||
-            mobileTab === MobileTabType.WalletBalance) && (
-            <RewardsCard title="Wallet Balance" icon="cardholder" />
-          )}
+            mobileTab === MobileTabType.WalletBalance) && <WalletCard />}
           {(!isWindowSmallInclusive || mobileTab === MobileTabType.Quests) && (
-            <RewardsCard
-              title="Quests"
-              description="XP and tokens earned from your contests, bounties, and posted threads"
-              icon="trophy"
+            <QuestCard
               onSeeAllClick={() => handleTabChange(MobileTabType.Quests)}
             />
           )}
