@@ -39,7 +39,7 @@ export const PageNotFound = (props: PageNotFoundProps) => {
         <CWButton
           buttonType="primary"
           label="Home"
-          onClick={() => navigate('/dashboard/for-you')}
+          onClick={() => navigate('/dashboard/for-you', {}, null)}
         />
       )}
       <AuthModal
