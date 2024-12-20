@@ -43,8 +43,6 @@ export const KnockFeedWrapper = ({ children }: KnockFeedWrapperProps) => {
     doAsync().catch(console.error);
   }, [user.email, user.id, user.isLoggedIn, user.knockJWT]);
 
-  if (!user.id || !user.isLoggedIn || !user.knockJWT) return null;
-
   return (
     <KnockProvider
       apiKey={KNOCK_PUBLIC_API_KEY}
