@@ -9,7 +9,7 @@ type SideBarNotificationIconProps = {
 export const SideBarNotificationIcon = ({
   unreadCount,
 }: SideBarNotificationIconProps) => (
-  <div className="sidebar-notification-icon">
+  <div className="SideBarNotificationIcon">
     <div className="notification-icon-container">
       <div className="notification-icon">
         <i className="bell-icon" />
