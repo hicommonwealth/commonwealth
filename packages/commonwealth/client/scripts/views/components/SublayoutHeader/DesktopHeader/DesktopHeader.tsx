@@ -7,6 +7,7 @@ import KnockNotifications from 'views/components/KnockNotifications';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { isWindowSmallInclusive } from 'views/components/component_kit/helpers';
+import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWSearchBar } from 'views/components/component_kit/new_designs/CWSearchBar';
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import { CreateContentPopover } from 'views/menus/CreateContentMenu';
@@ -87,6 +88,24 @@ const DesktopHeader = ({ onMobile, onAuthModalOpen }: DesktopHeaderProps) => {
             })}
           >
             <CreateContentPopover />
+            {!isWindowSmallInclusive(window.innerWidth) && (
+              <CWTooltip
+                content="About Common"
+                placement="bottom"
+                renderTrigger={(handleInteraction) => (
+                  <CWButton
+                    buttonType="secondary"
+                    buttonHeight="sm"
+                    label="About"
+                    onClick={() =>
+                      window.open('https://landing.common.xyz', '_blank')
+                    }
+                    onMouseEnter={handleInteraction}
+                    onMouseLeave={handleInteraction}
+                  />
+                )}
+              />
+            )}
             <CWTooltip
               content="Explore communities"
               placement="bottom"

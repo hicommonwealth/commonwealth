@@ -31,12 +31,12 @@ import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextIn
 import { AuthModal } from 'views/modals/AuthModal';
 import NewCommunityAdminModal from 'views/modals/NewCommunityAdminModal';
 import { communityTypeOptions } from 'views/pages/CreateCommunity/steps/CommunityTypeStep/helpers';
-import './TokenInformationForm.scss';
+import './TokenInformationFormStep.scss';
 import { triggerTokenLaunchFormAbort } from './helpers';
-import { FormSubmitValues, TokenInformationFormProps } from './types';
+import { FormSubmitValues, TokenInformationFormStepProps } from './types';
 import { tokenInformationFormValidationSchema } from './validation';
 
-const TokenInformationForm = ({
+const TokenInformationFormStep = ({
   onSubmit,
   onCancel,
   onFormUpdate,
@@ -49,7 +49,7 @@ const TokenInformationForm = ({
   formDisabled,
   openAddressSelectorOnMount = true,
   imageControlProps = {},
-}: TokenInformationFormProps) => {
+}: TokenInformationFormStepProps) => {
   const user = useUserStore();
   const [baseOption] = communityTypeOptions;
 
@@ -180,7 +180,7 @@ const TokenInformationForm = ({
       onSubmit={handleSubmit}
       onWatch={onFormUpdate}
       validationSchema={tokenInformationFormValidationSchema}
-      className={clsx('TokenInformationForm', containerClassName)}
+      className={clsx('TokenInformationFormStep', containerClassName)}
     >
       <div>
         <CWLabel label="Launching On" />
@@ -294,4 +294,4 @@ const TokenInformationForm = ({
   );
 };
 
-export default TokenInformationForm;
+export default TokenInformationFormStep;
