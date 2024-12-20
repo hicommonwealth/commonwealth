@@ -1,0 +1,31 @@
+.notification-icon-container {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: inline-block;
+}
+
+.notification-icon {
+  font-size: 24px;
+  color: #333;
+  position: relative;
+  cursor: pointer;
+}
+
+.notification-badge {
+  position: absolute;
+  top: 22px;
+  right: -5px;
+  background-color: red;
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 2px 6px;
+  border-radius: 12px;
+  line-height: 1;
+  border: 2px solid white;
+}
+
+.hidden-feed {
+  display: none;
+}

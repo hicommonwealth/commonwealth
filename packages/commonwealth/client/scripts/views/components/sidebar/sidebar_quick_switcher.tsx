@@ -1,3 +1,4 @@
+import useFetchNotifications from 'client/scripts/hooks/useFetchNotifications';
 import clsx from 'clsx';
 import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
@@ -7,6 +8,8 @@ import useUserStore from 'state/ui/user';
 import { CWCommunityAvatar } from '../component_kit/cw_community_avatar';
 import { CWDivider } from '../component_kit/cw_divider';
 import { CWIconButton } from '../component_kit/cw_icon_button';
+import { calculateUnreadCount } from './helpers';
+import { SideBarNotificationIcon } from './sidebar_notification_icon';
 import './sidebar_quick_switcher.scss';
 
 export const SidebarQuickSwitcher = ({
@@ -19,6 +22,8 @@ export const SidebarQuickSwitcher = ({
   const navigate = useCommonNavigate();
   const { setMenu } = useSidebarStore();
   const user = useUserStore();
+
+  const { items } = useFetchNotifications();
 
   const location = useLocation();
   const pathname = location.pathname;
@@ -52,23 +57,28 @@ export const SidebarQuickSwitcher = ({
           {user.communities
             .filter((x) => x.isStarred)
             .map((community) => (
-              <CWCommunityAvatar
-                key={community.id}
-                size="large"
-                selectedCommunity={communityId}
-                community={{
-                  id: community.id,
-                  iconUrl: community.iconUrl,
-                  name: community.name,
-                }}
-                onClick={() =>
-                  navigateToCommunity({
-                    navigate,
-                    path: '',
-                    chain: community.id,
-                  })
-                }
-              />
+              <div className="community-avatar-container" key={community.id}>
+                <CWCommunityAvatar
+                  key={community.id}
+                  size="large"
+                  selectedCommunity={communityId}
+                  community={{
+                    id: community.id,
+                    iconUrl: community.iconUrl,
+                    name: community.name,
+                  }}
+                  onClick={() =>
+                    navigateToCommunity({
+                      navigate,
+                      path: '',
+                      chain: community.id,
+                    })
+                  }
+                />
+                <SideBarNotificationIcon
+                  unreadCount={calculateUnreadCount(community.name, items)}
+                />
+              </div>
             ))}
         </div>
       )}
@@ -77,19 +87,24 @@ export const SidebarQuickSwitcher = ({
       )}
       <div className="scrollable-community-bar">
         {user.communities.map((community) => (
-          <CWCommunityAvatar
-            key={community.id}
-            size="large"
-            selectedCommunity={communityId}
-            community={{
-              id: community.id,
-              iconUrl: community.iconUrl,
-              name: community.name,
-            }}
-            onClick={() =>
-              navigateToCommunity({ navigate, path: '', chain: community.id })
-            }
-          />
+          <div className="community-avatar-container" key={community.id}>
+            <CWCommunityAvatar
+              key={community.id}
+              size="large"
+              selectedCommunity={communityId}
+              community={{
+                id: community.id,
+                iconUrl: community.iconUrl,
+                name: community.name,
+              }}
+              onClick={() =>
+                navigateToCommunity({ navigate, path: '', chain: community.id })
+              }
+            />
+            <SideBarNotificationIcon
+              unreadCount={calculateUnreadCount(community.name, items)}
+            />
+          </div>
         ))}
       </div>
     </div>
