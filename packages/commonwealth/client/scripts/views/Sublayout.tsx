@@ -7,6 +7,7 @@ import app from 'state';
 import useSidebarStore from 'state/ui/sidebar';
 import { SublayoutHeader } from 'views/components/SublayoutHeader';
 import { Sidebar } from 'views/components/sidebar';
+import farcasterContestImage from '../../assets/img/farcasterContestImage.png';
 import { useHandleInviteLink } from '../hooks/useHandleInviteLink';
 import useNecessaryEffect from '../hooks/useNecessaryEffect';
 import useStickyHeader from '../hooks/useStickyHeader';
@@ -22,6 +23,7 @@ import { AdminOnboardingSlider } from './components/AdminOnboardingSlider';
 import { Breadcrumbs } from './components/Breadcrumbs';
 import MobileNavigation from './components/MobileNavigation';
 import AuthButtons from './components/SublayoutHeader/AuthButtons';
+import { CWGrowlTemplate } from './components/SublayoutHeader/GrowlTemplate';
 import useJoinCommunity from './components/SublayoutHeader/useJoinCommunity';
 import { UserTrainingSlider } from './components/UserTrainingSlider';
 import { CWModal } from './components/component_kit/new_designs/CWModal';
@@ -194,6 +196,17 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
             )}
             {children}
           </div>
+          <CWGrowlTemplate
+            headerText="Launch Contests On Farcaster!"
+            bodyText="You can now host contests directly on Farcaster to reach and engage your followers.
+            They can submit entries,
+            vote for their favorites, and earn rewards, all without leaving the page."
+            buttonText=""
+            buttonLink=""
+            growlType="farcasterContest"
+            growlImage={farcasterContestImage}
+            extraText="Stay tuned! The first Farcaster contest starts Monday the 23rd!"
+          />
         </div>
         <WelcomeOnboardModal
           isOpen={isWelcomeOnboardModalOpen}
