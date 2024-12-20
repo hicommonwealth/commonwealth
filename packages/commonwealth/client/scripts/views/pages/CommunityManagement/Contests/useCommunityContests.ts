@@ -1,3 +1,4 @@
+import moment from 'moment';
 import { useMemo } from 'react';
 import app from 'state';
 import { useGetContestsQuery } from 'state/api/contests';
@@ -27,9 +28,10 @@ const useCommunityContests = (props?: UseCommunityContestsProps) => {
     const finished: Contest[] = [];
     const active: Contest[] = [];
 
-    (contestsData || []).map((contest) => {
+    (contestsData || []).forEach((contest) => {
       const tempFinishedContests: Pick<Contest, 'contests'>[] = [];
       const tempActiveContests: Pick<Contest, 'contests'>[] = [];
+
       (contest?.contests || []).map((c) => {
         const end_time = c.end_time || null;
 
@@ -42,7 +44,6 @@ const useCommunityContests = (props?: UseCommunityContestsProps) => {
             })
           : false;
 
-        // filters both recurring and 1-off contests
         if (!isActive) {
           tempFinishedContests.push(c as Pick<Contest, 'contests'>);
         } else {
@@ -50,17 +51,38 @@ const useCommunityContests = (props?: UseCommunityContestsProps) => {
         }
       });
 
-      if (tempFinishedContests.length > 0) {
-        finished.push({
-          ...contest,
-          contests: tempFinishedContests,
-        } as unknown as Contest);
-      }
+      // Sort active contests by end_date and prize amount
+      tempActiveContests.sort((a, b) => {
+        const aEndTime = moment(a.contests?.[0]?.end_time);
+        const bEndTime = moment(b.contests?.[0]?.end_time);
+
+        if (aEndTime.isSame(bEndTime)) {
+          const aAmount = Number(a.contests?.[0]?.score?.[0]?.prize) || 0;
+          const bAmount = Number(b.contests?.[0]?.score?.[0]?.prize) || 0;
+          return bAmount - aAmount;
+        }
+
+        return aEndTime.diff(bEndTime);
+      });
+
+      // Sort finished contests by end date (descending)
+      tempFinishedContests.sort((a, b) => {
+        const aEndTime = moment(a.contests?.[0]?.end_time);
+        const bEndTime = moment(b.contests?.[0]?.end_time);
+        return bEndTime.diff(aEndTime);
+      });
 
       if (tempActiveContests.length > 0) {
         active.push({
           ...contest,
           contests: tempActiveContests,
+        } as unknown as Contest);
+      }
+
+      if (tempFinishedContests.length > 0) {
+        finished.push({
+          ...contest,
+          contests: tempFinishedContests,
         } as unknown as Contest);
       }
     });
