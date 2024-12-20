@@ -9,6 +9,7 @@ interface EditGroupProps {
   address: string;
   groupName: string;
   groupDescription?: string;
+  groupImageUrl?: string;
   topics: GroupFormTopicSubmitValues[];
   requirementsToFulfill: number | undefined;
   requirements?: any[];
@@ -20,6 +21,7 @@ export const buildUpdateGroupInput = ({
   address,
   groupName,
   groupDescription,
+  groupImageUrl,
   topics,
   requirementsToFulfill,
   requirements,
@@ -33,6 +35,7 @@ export const buildUpdateGroupInput = ({
     metadata: {
       name: groupName,
       description: groupDescription ?? '',
+      groupImageUrl: groupImageUrl ?? '',
       ...(requirementsToFulfill && {
         required_requirements: requirementsToFulfill,
       }),
