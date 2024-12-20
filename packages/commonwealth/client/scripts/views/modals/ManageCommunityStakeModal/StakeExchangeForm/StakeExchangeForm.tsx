@@ -4,7 +4,7 @@ import { saveToClipboard } from 'client/scripts/utils/clipboard';
 import clsx from 'clsx';
 import { findDenominationIcon } from 'helpers/findDenomination';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import {
   BaseMixpanelPayload,
@@ -132,7 +132,16 @@ const StakeExchangeForm = ({
   const { isAddedToHomeScreen } = useAppStatus();
 
   const userData = useUserStore();
-  const hasMagic = userData.addresses?.[0]?.walletId === WalletId.Magic;
+
+  const [hasMagic, setHasMagic] = useState(false);
+
+  useEffect(() => {
+    const currentAddressInfo = userData.addresses?.find(
+      (addr) => addr.address === userData.activeAccount?.address,
+    );
+    const usingMagic = currentAddressInfo?.walletId === WalletId.Magic;
+    setHasMagic(usingMagic);
+  }, [userData.addresses, userData, hasMagic]);
 
   const { trackAnalytics } = useBrowserAnalyticsTrack<BaseMixpanelPayload>({
     onAction: true,
