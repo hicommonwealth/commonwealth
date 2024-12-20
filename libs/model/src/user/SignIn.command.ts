@@ -3,6 +3,7 @@ import * as schemas from '@hicommonwealth/schemas';
 import { deserializeCanvas } from '@hicommonwealth/shared';
 import crypto from 'crypto';
 import { Op } from 'sequelize';
+import { config } from '../config';
 import { models } from '../database';
 import { mustExist } from '../middleware/guards';
 import {
@@ -12,11 +13,6 @@ import {
   type VerifiedAddress,
 } from '../services/session';
 import { emitEvent } from '../utils/utils';
-
-export const SignInErrors = {
-  WrongWallet: 'Verified with different wallet than created',
-  ExpiredToken: 'Token has expired, please re-register',
-};
 
 /**
  * SignIn command for signing in to a community
@@ -58,7 +54,8 @@ export function SignIn(): Command<typeof schemas.SignIn> {
     body: async ({ actor, payload }) => {
       if (!actor.user.auth) throw Error('Invalid address');
 
-      const { community_id, wallet_id, referral_link, session } = payload;
+      const { community_id, wallet_id, referral_link, session, block_info } =
+        payload;
       const { base, encodedAddress, ss58Prefix, hex, existingHexUserId } = actor
         .user.auth as VerifiedAddress;
 
@@ -71,24 +68,10 @@ export function SignIn(): Command<typeof schemas.SignIn> {
         ss58Prefix,
       );
 
-      // TODO: should we remove verification token stuff?
       const verification_token = crypto.randomBytes(18).toString('hex');
-      // const verification_token_expires = new Date(
-      //   +new Date() + config.AUTH.ADDRESS_TOKEN_EXPIRES_IN * 60 * 1000,
-      // );
-      // verified.verification_token_expires = verification_token_expires;
-      // verified.block_info = block_info;
-      // TODO: should we only update when token expired?
-      // check whether the token has expired
-      // (certain login methods e.g. jwt have no expiration token, so we skip the check in that case)
-      // const expiration = existing.verification_token_expires;
-      // if (expiration && +expiration <= +new Date())
-      //  throw new InvalidInput(SignInErrors.ExpiredToken);
-
-      // TODO: @timolegros - check if there are other rules involving the wallet_id, otherwise remove this check
-      // verify existing is equivalent to signing in
-      //if (existing.wallet_id !== wallet_id)
-      //  throw new InvalidInput(SignInErrors.WrongWallet);
+      const verification_token_expires = new Date(
+        +new Date() + config.AUTH.ADDRESS_TOKEN_EXPIRES_IN * 60 * 1000,
+      );
 
       // upsert address, passing user_id if signed in
       const { user_created, address_created, first_community } =
@@ -134,8 +117,8 @@ export function SignIn(): Command<typeof schemas.SignIn> {
               hex,
               wallet_id,
               verification_token,
-              // verification_token_expires,
-              // block_info,
+              verification_token_expires,
+              block_info,
               last_active: new Date(),
               verified: new Date(),
               role: 'member',
@@ -150,6 +133,8 @@ export function SignIn(): Command<typeof schemas.SignIn> {
             addr.role = 'member';
             addr.wallet_id = wallet_id;
             addr.verification_token = verification_token;
+            addr.verification_token_expires = verification_token_expires;
+            addr.block_info = block_info;
             addr.last_active = new Date();
             addr.verified = new Date();
             await addr.save({ transaction });

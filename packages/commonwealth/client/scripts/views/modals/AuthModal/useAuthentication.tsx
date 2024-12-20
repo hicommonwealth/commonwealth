@@ -297,8 +297,8 @@ const useAuthentication = (props: UseAuthenticationProps) => {
         community_id: account.community.id,
         address: account.address,
         wallet_id: account.walletId!,
+        block_info: account.validationBlockInfo,
       });
-      console.log('signIn onAccountVerified');
       await onLogInWithAccount(account, true, newlyCreated);
       return;
     }
@@ -327,8 +327,8 @@ const useAuthentication = (props: UseAuthenticationProps) => {
           community_id: account.community.id,
           address: account.address,
           wallet_id: account.walletId!,
+          block_info: account.validationBlockInfo,
         });
-        console.log('signIn onAccountVerified again');
         await onLogInWithAccount(account, true, newlyCreated);
       } catch (e) {
         notifyError(`Error verifying account`);
@@ -362,8 +362,8 @@ const useAuthentication = (props: UseAuthenticationProps) => {
           address: account.address,
           community_id: account.community.id,
           wallet_id: account.walletId!,
+          block_info: account.validationBlockInfo,
         });
-      console.log('signIn onCreateNewAccount');
       // @ts-expect-error StrictNullChecks
       await verifySession(session);
       // @ts-expect-error <StrictNullChecks>
@@ -465,15 +465,15 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     }
   };
 
-  // const getWalletRecentBlock = async (wallet: Wallet, chain: string) => {
-  //   try {
-  //     if (!wallet.getRecentBlock) return;
-  //     return await wallet?.getRecentBlock?.(chain);
-  //   } catch (err) {
-  //     // if getRecentBlock fails, continue with null blockhash
-  //     console.error(`Error getting recent validation block: ${err}`);
-  //   }
-  // };
+  const getWalletRecentBlock = async (wallet: Wallet, chain: string) => {
+    try {
+      if (!wallet.getRecentBlock) return;
+      return await wallet?.getRecentBlock?.(chain);
+    } catch (err) {
+      // if getRecentBlock fails, continue with null blockhash
+      console.error(`Error getting recent validation block: ${err}`);
+    }
+  };
 
   const onNormalWalletLogin = async (wallet: Wallet, address: string) => {
     setSelectedWallet(wallet);
@@ -514,10 +514,10 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     try {
       const session = await getSessionFromWallet(wallet, { newSession: true });
       const chainIdentifier = app.chain?.id || wallet.defaultNetwork;
-      // const validationBlockInfo = await getWalletRecentBlock(
-      //   wallet,
-      //   chainIdentifier,
-      // );
+      const validationBlockInfo = await getWalletRecentBlock(
+        wallet,
+        chainIdentifier,
+      );
 
       const {
         account: signingAccount,
@@ -527,12 +527,10 @@ const useAuthentication = (props: UseAuthenticationProps) => {
         address,
         community_id: chainIdentifier,
         wallet_id: wallet.name,
-        // block_info: validationBlockInfo
-        //   ? JSON.stringify(validationBlockInfo)
-        //   : null,
+        block_info: validationBlockInfo
+          ? JSON.stringify(validationBlockInfo)
+          : null,
       });
-      console.log('signIn onNormalWalletLogin');
-
       setIsNewlyCreated(newlyCreated);
       if (isMobile) {
         setSignerAccount(signingAccount);
@@ -558,10 +556,10 @@ const useAuthentication = (props: UseAuthenticationProps) => {
   const onSessionKeyRevalidation = async (wallet: Wallet, address: string) => {
     const session = await getSessionFromWallet(wallet);
     const chainIdentifier = app.chain?.id || wallet.defaultNetwork;
-    // const validationBlockInfo = await getWalletRecentBlock(
-    //   wallet,
-    //   chainIdentifier,
-    // );
+    const validationBlockInfo = await getWalletRecentBlock(
+      wallet,
+      chainIdentifier,
+    );
 
     // Start the create-user flow, so validationBlockInfo gets saved to the backend
     // This creates a new `Account` object
@@ -569,11 +567,10 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       address,
       community_id: chainIdentifier,
       wallet_id: wallet.name,
-      // block_info: validationBlockInfo
-      //   ? JSON.stringify(validationBlockInfo)
-      //   : null,
+      block_info: validationBlockInfo
+        ? JSON.stringify(validationBlockInfo)
+        : null,
     });
-    console.log('signIn onSessionKeyRevalidation');
     await verifySession(session);
     console.log('Started new session for', wallet.chain, chainIdentifier);
 

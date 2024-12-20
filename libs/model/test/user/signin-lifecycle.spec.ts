@@ -123,7 +123,6 @@ describe('SignIn Lifecycle', async () => {
         expect(addr!.wallet_id).to.be.equal(wallet);
         expect(addr!.role).to.be.equal('member');
         expect(addr!.verification_token).to.be.not.null;
-        // expect(addr!.verification_token_expires).to.not.be.equal(null);
         expect(addr!.verified).to.be.not.null;
 
         expect(addr!.first_community).to.be.true;
