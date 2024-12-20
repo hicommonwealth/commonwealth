@@ -1,4 +1,4 @@
-import useFetchNotifications from 'client/scripts/hooks/useFetchNotifications';
+import useFetchNotifications from 'client/scripts/state/api/notifications/useFetchNotifications';
 import clsx from 'clsx';
 import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
@@ -10,8 +10,8 @@ import { CWDivider } from '../component_kit/cw_divider';
 import { CWIconButton } from '../component_kit/cw_icon_button';
 import { isWindowSmallInclusive } from '../component_kit/helpers';
 import { CWTooltip } from '../component_kit/new_designs/CWTooltip';
+import { SideBarNotificationIcon } from './SidebarNotificationIcon';
 import { calculateUnreadCount } from './helpers';
-import { SideBarNotificationIcon } from './sidebar_notification_icon';
 import './sidebar_quick_switcher.scss';
 
 export const SidebarQuickSwitcher = ({
