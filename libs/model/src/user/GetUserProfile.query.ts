@@ -15,7 +15,7 @@ export function GetUserProfile(): Query<typeof schemas.GetUserProfile> {
 
       const user = await models.User.findOne({
         where: { id: user_id },
-        attributes: ['profile', 'xp_points', 'referral_link'],
+        attributes: ['profile', 'xp_points'],
       });
 
       mustExist('User', user);
@@ -105,7 +105,6 @@ export function GetUserProfile(): Query<typeof schemas.GetUserProfile> {
         // ensure Tag is present in typed response
         tags: profileTags.map((t) => ({ id: t.Tag!.id!, name: t.Tag!.name })),
         xp_points: user!.xp_points ?? 0,
-        referral_link: user!.referral_link,
       };
     },
   };

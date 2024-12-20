@@ -1113,8 +1113,8 @@ importers:
         specifier: ^14.16.2
         version: 14.16.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       dompurify:
-        specifier: ^2.2.6
-        version: 2.5.2
+        specifier: ^2.5.8
+        version: 2.5.8
       dotenv:
         specifier: ^16.0.3
         version: 16.4.5
@@ -10216,8 +10216,8 @@ packages:
     resolution: {integrity: sha512-cgwlv/1iFQiFnU96XXgROh8xTeetsnJiDsTc7TYCLFd9+/WNkIqPTxiM/8pSd8VIrhXGTf1Ny1q1hquVqDJB5w==}
     engines: {node: '>= 4'}
 
-  dompurify@2.5.2:
-    resolution: {integrity: sha512-5vSyvxRAb45EoWwAktUT3AYqAwXK4FL7si22Cgj46U6ICsj/YJczCN+Bk7WNABIQmpWRymGfslMhrRUZkQNnqA==}
+  dompurify@2.5.8:
+    resolution: {integrity: sha512-o1vSNgrmYMQObbSSvF/1brBYEQPHhV1+gsmrusO7/GXtp1T9rCS8cXFqVxK/9crT1jA6Ccv+5MTSjBNqr7Sovw==}
 
   domutils@1.5.1:
     resolution: {integrity: sha512-gSu5Oi/I+3wDENBsOWBiRK1eoGxcywYSqg3rR960/+EfY0CF4EX1VPkgHOZ3WiS/Jg2DtliF6BhWcHlfpYUcGw==}
@@ -32192,7 +32192,7 @@ snapshots:
     dependencies:
       domelementtype: 2.3.0
 
-  dompurify@2.5.2: {}
+  dompurify@2.5.8: {}
 
   domutils@1.5.1:
     dependencies:

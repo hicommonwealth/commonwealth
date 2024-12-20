@@ -117,6 +117,8 @@ const CommunityNotFoundPage = lazy(
   () => import('views/pages/CommunityNotFoundPage'),
 );
 
+const RewardsPage = lazy(() => import('views/pages/RewardsPage'));
+
 const CommonDomainRoutes = ({
   tokenizedCommunityEnabled,
 }: RouteFeatureFlags) => [
@@ -179,6 +181,11 @@ const CommonDomainRoutes = ({
     element={withLayout(CommunitiesPage, {
       type: 'common',
     })}
+  />,
+  <Route
+    key="/rewards"
+    path="/rewards"
+    element={withLayout(RewardsPage, { type: 'common' })}
   />,
   <Route
     key="/search"
