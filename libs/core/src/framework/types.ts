@@ -13,16 +13,15 @@ export const ExternalServiceUserIds = {
   K6: -2,
 } as const;
 
-export type AuthStrategies =
+export type AuthStrategies<Input extends ZodSchema> =
   | {
-      name: 'jwt' | 'authtoken';
+      type: 'jwt' | 'authtoken';
       userId?: (typeof ExternalServiceUserIds)[keyof typeof ExternalServiceUserIds];
     }
   | {
-      name: 'custom';
-      userId?: (typeof ExternalServiceUserIds)[keyof typeof ExternalServiceUserIds];
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      customStrategyFn: (req: any) => void;
+      type: 'custom';
+      name: string;
+      userResolver: (payload: z.infer<Input>, user?: User) => Promise<User>;
     };
 
 /**
@@ -43,6 +42,7 @@ export type User = {
   id?: number;
   emailVerified?: boolean;
   isAdmin?: boolean;
+  auth?: Record<string, unknown>; // custom auth payload
 };
 
 /**
@@ -167,7 +167,7 @@ export type Metadata<
   readonly auth: Handler<Input, Output, _Context>[];
   readonly body: Handler<Input, Output, _Context>;
   readonly secure?: boolean;
-  readonly authStrategy?: AuthStrategies;
+  readonly authStrategy?: AuthStrategies<Input>;
 };
 
 /**
