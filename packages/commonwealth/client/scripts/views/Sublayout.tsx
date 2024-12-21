@@ -23,7 +23,6 @@ import { Breadcrumbs } from './components/Breadcrumbs';
 import MobileNavigation from './components/MobileNavigation';
 import AuthButtons from './components/SublayoutHeader/AuthButtons';
 import useJoinCommunity from './components/SublayoutHeader/useJoinCommunity';
-import { UserTrainingSlider } from './components/UserTrainingSlider';
 import { CWModal } from './components/component_kit/new_designs/CWModal';
 import CollapsableSidebarButton from './components/sidebar/CollapsableSidebarButton';
 import { AuthModal, AuthModalType } from './modals/AuthModal';
@@ -108,11 +107,6 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
     location,
   );
 
-  const routesWithUserOnboardingSlider = matchRoutes(
-    [{ path: '/dashboard/for-you' }, { path: '/dashboard/global' }],
-    location,
-  );
-
   useEffect(() => {
     let timer: NodeJS.Timeout;
 
@@ -188,7 +182,7 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
               />
             </div>
             {!routesWithoutGenericBreadcrumbs && <Breadcrumbs />}
-            {routesWithUserOnboardingSlider && <UserTrainingSlider />}
+
             {isInsideCommunity && !routesWithoutGenericSliders && (
               <AdminOnboardingSlider />
             )}
