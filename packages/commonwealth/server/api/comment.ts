@@ -5,20 +5,20 @@ import { signCanvas } from '../federation';
 
 export const trpcRouter = trpc.router({
   createComment: trpc.command(Comment.CreateComment, trpc.Tag.Comment, [
-    signCanvas,
+    signCanvas(),
     trpc.trackAnalytics([
       MixpanelCommunityInteractionEvent.CREATE_COMMENT,
       (output) => ({ community: output.community_id }),
     ]),
   ]),
   updateComment: trpc.command(Comment.UpdateComment, trpc.Tag.Comment, [
-    signCanvas,
+    signCanvas(),
   ]),
   createCommentReaction: trpc.command(
     Comment.CreateCommentReaction,
     trpc.Tag.Reaction,
     [
-      signCanvas,
+      signCanvas(),
       trpc.trackAnalytics([
         MixpanelCommunityInteractionEvent.CREATE_REACTION,
         (output) => ({ community: output.community_id }),

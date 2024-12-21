@@ -7,14 +7,14 @@ import { incrementThreadViewCount } from '../util/incrementThreadViewCount';
 
 export const trpcRouter = trpc.router({
   createThread: trpc.command(Thread.CreateThread, trpc.Tag.Thread, [
-    signCanvas,
+    signCanvas(),
     trpc.trackAnalytics([
       MixpanelCommunityInteractionEvent.CREATE_THREAD,
       ({ community_id }) => ({ community: community_id }),
     ]),
   ]),
   updateThread: trpc.command(Thread.UpdateThread, trpc.Tag.Thread, [
-    signCanvas,
+    signCanvas(),
     trpc.trackAnalytics((input) =>
       Promise.resolve(
         input.stage !== undefined
@@ -27,7 +27,7 @@ export const trpcRouter = trpc.router({
     Thread.CreateThreadReaction,
     trpc.Tag.Reaction,
     [
-      signCanvas,
+      signCanvas(),
       trpc.trackAnalytics([
         MixpanelCommunityInteractionEvent.CREATE_REACTION,
         ({ community_id }) => ({ community: community_id }),
@@ -35,23 +35,24 @@ export const trpcRouter = trpc.router({
     ],
   ),
   deleteThread: trpc.command(Thread.DeleteThread, trpc.Tag.Thread, [
-    signCanvas,
+    signCanvas(),
     () => {
       // invalidate global activity cache
       void cache().deleteKey(
         CacheNamespaces.Query_Response,
         'GetGlobalActivity_{}', // this is the global activity cache key
       );
+      return Promise.resolve();
     },
   ]),
   deleteReaction: trpc.command(Reaction.DeleteReaction, trpc.Tag.Reaction, [
-    signCanvas,
+    signCanvas(),
   ]),
   getThreads: trpc.query(Thread.GetThreads, trpc.Tag.Thread),
   getThreadsByIds: trpc.query(
     Thread.GetThreadsByIds,
     trpc.Tag.Thread,
     undefined,
-    [incrementThreadViewCount],
+    [incrementThreadViewCount()],
   ),
 });

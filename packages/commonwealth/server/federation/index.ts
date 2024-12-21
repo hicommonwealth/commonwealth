@@ -1,6 +1,8 @@
+import { trpc } from '@hicommonwealth/adapters';
 import { logger } from '@hicommonwealth/core';
 import { CanvasSignedData, startCanvasNode } from '@hicommonwealth/shared';
 import { parse } from '@ipld/dag-json';
+import { ZodSchema } from 'zod';
 import { config } from '../config';
 
 const log = logger(import.meta);
@@ -16,13 +18,16 @@ if (libp2p) {
   );
 }
 
-export function signCanvas() {
-  return (_, output: { canvas_signed_data?: string }) => {
-    if (output.canvas_signed_data)
-      void applyCanvasSignedData(parse(output.canvas_signed_data)).catch(
+export function signCanvas<
+  Input extends ZodSchema<{ canvas_signed_data?: string }>,
+  Output extends ZodSchema,
+>() {
+  return trpc.fireAndForget<Input, Output>(async (input) => {
+    if (input.canvas_signed_data)
+      await applyCanvasSignedData(parse(input.canvas_signed_data)).catch(
         log.error,
       );
-  };
+  });
 }
 
 export const applyCanvasSignedData = async (data: CanvasSignedData) => {

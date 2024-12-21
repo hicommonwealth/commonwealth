@@ -55,7 +55,7 @@ export enum Tag {
 }
 
 /**
- * Fire and forget wrapper for async output middleware
+ * Fire and forget wrapper for output middleware
  */
 export function fireAndForget<
   Input extends ZodSchema,
@@ -67,27 +67,26 @@ export function fireAndForget<
     ctx: Context,
   ) => Promise<void>,
 ): OutputMiddleware<Input, Output> {
-  const wrapper = (
-    input: z.infer<Input>,
-    output: z.infer<Output>,
-    ctx: Context,
-  ) => {
+  return (input: z.infer<Input>, output: z.infer<Output>, ctx: Context) => {
     void fn(input, output, ctx).catch(log.error);
+    return Promise.resolve();
   };
-  return wrapper;
 }
 
 /**
- * Synchronous middleware that is applied to the output of a command
- * before it is returned to the client.
+ * Middleware applied to the output before it is returned to the client.
  * - This is useful for things like logging, analytics, and other side effects.
- * - The middleware is applied in the order it is defined in the array.
- * - Use `fireAndForget` wrapper for async I/O operations like committing to a canvas, tracking analytics, etc.
+ * - Applied in the order it is defined in the array.
+ * - Use `fireAndForget` wrapper for I/O operations like committing to a canvas, tracking analytics, etc.
  */
 export type OutputMiddleware<
   Input extends ZodSchema,
   Output extends ZodSchema,
-> = (input: z.infer<Input>, output: z.infer<Output>, ctx: Context) => void;
+> = (
+  input: z.infer<Input>,
+  output: z.infer<Output>,
+  ctx: Context,
+) => Promise<void>;
 
 /**
  * Returns a record containing condensed browser info.
@@ -109,6 +108,17 @@ function getRequestBrowserInfo(
     info['browser'] = 'Brave';
   }
   return info;
+}
+
+function getAnalyticsPayload(ctx: Context, data: Record<string, unknown>) {
+  const host = ctx.req.headers.host;
+  return {
+    ...data,
+    ...getRequestBrowserInfo(ctx.req),
+    ...(host && { isCustomDomain: config.SERVER_URL.includes(host) }),
+    userId: ctx.actor.user.id,
+    isPWA: ctx.req.headers?.['isPWA'] === 'true',
+  };
 }
 
 /**
@@ -133,30 +143,50 @@ async function resolveTrack<Input extends ZodSchema, Output extends ZodSchema>(
   return [track[0], track[1] ? track[1](output) : {}];
 }
 
+/**
+ * Output middleware that tracks analytics in fire-and-forget mode
+ */
 export function trackAnalytics<
   Input extends ZodSchema,
   Output extends ZodSchema,
 >(track: Track<Input, Output>): OutputMiddleware<Input, Output> {
   return (input, output, ctx) => {
     try {
-      const host = ctx.req.headers.host;
       void resolveTrack(track, input, output)
         .then(([event, data]) => {
-          if (event) {
-            const payload = {
-              ...data,
-              ...getRequestBrowserInfo(ctx.req),
-              ...(host && { isCustomDomain: config.SERVER_URL.includes(host) }),
-              userId: ctx.actor.user.id,
-              isPWA: ctx.req.headers?.['isPWA'] === 'true',
-            };
-            analytics().track(event, payload);
-          }
+          event && analytics().track(event, getAnalyticsPayload(ctx, data));
         })
         .catch(log.error);
     } catch (err) {
       err instanceof Error && log.error(err.message, err);
     }
+    return Promise.resolve();
+  };
+}
+
+/**
+ * Login output middleware that logs in the user (passport)
+ */
+export function logIn<
+  Input extends ZodSchema,
+  Output extends ZodSchema,
+>(): OutputMiddleware<Input, Output> {
+  return async (input, __, ctx) => {
+    await new Promise((resolve, reject) => {
+      ctx.req.login(ctx.actor.user, (err) => {
+        if (err) {
+          analytics().track(
+            'Login Failed',
+            getAnalyticsPayload(ctx, {
+              community_id: input.community_id,
+              address: input.address,
+            }),
+          );
+          reject(err);
+        }
+        resolve(true);
+      });
+    });
   };
 }
 
@@ -211,8 +241,11 @@ export const buildproc = <Input extends ZodSchema, Output extends ZodSchema>({
       } catch (err) {
         err instanceof Error && log.error(err.message, err);
       }
-      if (result.ok)
-        outMiddlewares?.forEach((omw) => omw(rawInput, result.data, ctx));
+      if (result.ok && outMiddlewares?.length) {
+        for (const omw of outMiddlewares) {
+          await omw(rawInput, result.data, ctx);
+        }
+      }
       return result;
     })
     .meta({
