@@ -11,6 +11,7 @@ import Analytics from './Analytics';
 import ConnectChainToCommunity from './ConnectChainToCommunityTask';
 import DeleteChainTask from './DeleteChainTask';
 import DownloadMembersListTask from './DownloadMembersListTask';
+import EnableDigestEmail from './EnableDigestEmail';
 import MakeSiteAdminTask from './MakeSiteAdminTask';
 import RPCEndpointTask from './RPCEndpointTask';
 import RefreshCustomDomainTask from './RefreshCustomDomainTask';
@@ -44,6 +45,7 @@ const AdminPanelPage = () => {
         <MakeSiteAdminTask />
         <TopUsers />
         <TriggerNotificationsWorkflow />
+        <EnableDigestEmail />
       </div>
     </CWPageLayout>
   );
