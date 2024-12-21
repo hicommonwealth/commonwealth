@@ -5,8 +5,10 @@ import NewSnapshotProposalForm from 'views/pages/Snapshots/NewSnapshotProposal/N
 import type Thread from '../../models/Thread';
 import app from '../../state';
 import { CWDropdown } from '../components/component_kit/cw_dropdown';
+import { CWButton } from '../components/component_kit/new_designs/CWButton';
 import {
   CWModalBody,
+  CWModalFooter,
   CWModalHeader,
 } from '../components/component_kit/new_designs/CWModal';
 
@@ -26,6 +28,9 @@ export const NewSnapshotProposalModal = ({
   const [selectedSnapshotId, setSelectedSnapshotId] = useState<string | null>(
     null,
   );
+  const [isPublishing, setIsPublishing] = useState<boolean>(false);
+  const [isValid, setIsValid] = useState<boolean>(false);
+
   const handleSelect = async (item) => {
     setSelectedSnapshotId(item.value);
   };
@@ -58,23 +63,49 @@ export const NewSnapshotProposalModal = ({
             />
             {selectedSnapshotId && (
               <NewSnapshotProposalForm
-                snapshotId={selectedSnapshotId}
+                snapshotId={selectedSnapshotId || ''}
                 thread={thread}
                 onSave={onSave}
                 onModalClose={onModalClose}
+                onPublish={(publishing) => setIsPublishing(publishing)}
+                onValidityChange={(valid) => setIsValid(valid)}
+                hideButtons
               />
             )}
           </>
         ) : (
           <NewSnapshotProposalForm
-            // @ts-expect-error <StrictNullChecks/>
-            snapshotId={selectedSnapshotId}
+            snapshotId={selectedSnapshotId || ''}
             thread={thread}
             onSave={onSave}
             onModalClose={onModalClose}
+            onPublish={(publishing) => setIsPublishing(publishing)}
+            onValidityChange={(valid) => setIsValid(valid)}
+            hideButtons
           />
         )}
       </CWModalBody>
+      <CWModalFooter>
+        <CWButton
+          buttonHeight="sm"
+          buttonType="secondary"
+          label="Cancel"
+          onClick={onModalClose}
+        />
+        <CWButton
+          buttonHeight="sm"
+          label="Publish"
+          disabled={!isValid || isPublishing}
+          onClick={() => {
+            const formElement = document.querySelector(
+              '.NewSnapshotProposalForm form',
+            );
+            if (formElement) {
+              formElement.dispatchEvent(new Event('submit'));
+            }
+          }}
+        />
+      </CWModalFooter>
     </div>
   );
 };
