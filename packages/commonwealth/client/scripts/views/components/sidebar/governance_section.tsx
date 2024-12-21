@@ -232,6 +232,7 @@ export const GovernanceSection = ({ isContestAvailable }: AppSectionProps) => {
     isActive: !!matchesProposalRoute,
     displayData: null,
   };
+
   //Contests
   const contestData: SectionGroupAttrs = {
     title: 'Contests',
@@ -239,7 +240,7 @@ export const GovernanceSection = ({ isContestAvailable }: AppSectionProps) => {
     displayData: null,
     hasDefaultToggle: false,
     isActive: !!matchesContestsRoute,
-    isVisible: true,
+    isVisible: isContestAvailable,
     isUpdated: true,
     onClick: (e, toggle: boolean) => {
       e.preventDefault();
