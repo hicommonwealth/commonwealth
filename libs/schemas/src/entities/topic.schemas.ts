@@ -21,12 +21,12 @@ export const Topic = z.object({
   community_id: z.string().max(255),
   description: z.string().default(''),
   telegram: z.string().max(255).nullish(),
-  featured_in_sidebar: z.boolean().default(false),
-  featured_in_new_post: z.boolean().default(false),
-  default_offchain_template: z.string().nullish(),
+  featured_in_sidebar: z.boolean().optional().default(false),
+  featured_in_new_post: z.boolean().optional().default(false),
+  default_offchain_template: z.string().optional().nullish(),
   order: PG_INT.nullish(),
   channel_id: z.string().max(255).nullish(),
-  group_ids: z.array(PG_INT).default([]),
+  group_ids: z.array(PG_INT).optional().default([]),
   default_offchain_template_backup: z.string().nullish(),
   weighted_voting: z.nativeEnum(TopicWeightedVoting).nullish(),
   chain_node_id: z
@@ -47,6 +47,8 @@ export const Topic = z.object({
     .gt(0)
     .nullish()
     .describe('vote weight multiplier, used for ERC20 topics'),
+
+  thread_count: PG_INT.nonnegative().default(0),
 
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional(),

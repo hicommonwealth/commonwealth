@@ -137,6 +137,7 @@ const fetchBulkThreads = (props) => {
       page: number;
       threads: Thread[];
       threadCount: number;
+      topicThreadCount: number;
     };
     pageParam: number | undefined;
   }> => {
@@ -171,6 +172,7 @@ const fetchBulkThreads = (props) => {
       ...res.data.result,
       threads: res.data.result.threads.map((c) => new Thread(c)),
       threadCount: res.data.result.threadCount,
+      topicThreadCount: res.data.result.topicThreadCount,
     };
 
     return {
@@ -238,6 +240,7 @@ const useFetchThreadsQuery = (
       ...chosenQueryType,
       data: reducedData.threads,
       threadCount: chosenQueryType?.data?.pages[0].data.threadCount,
+      topicThreadCount: chosenQueryType?.data?.pages[0].data.topicThreadCount,
     };
     return formattedData;
   }
