@@ -1,0 +1,26 @@
+@import '../../../../styles/shared';
+
+.RewardsCard {
+  &.Card {
+    width: unset;
+  }
+  padding: 24px;
+
+  .rewards-card-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+
+    .see-all-text {
+      cursor: pointer;
+      margin-left: auto;
+      color: $primary-500;
+      white-space: nowrap;
+    }
+  }
+
+  .rewards-card-description {
+    color: $neutral-600;
+  }
+}

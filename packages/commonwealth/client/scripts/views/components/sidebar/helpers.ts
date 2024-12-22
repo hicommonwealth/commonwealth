@@ -1,5 +1,6 @@
 import _ from 'lodash';
 
+import { FeedItem } from '@knocklabs/client';
 import app from 'state';
 import { Contest } from 'views/pages/CommunityManagement/Contests/ContestsList';
 import { isContestActive } from 'views/pages/CommunityManagement/Contests/utils';
@@ -41,3 +42,11 @@ export const getUniqueTopicIdsIncludedInActiveContest = (
 
   return [...new Set(topicIds)];
 };
+
+export const calculateUnreadCount = (
+  communityName: string,
+  items: FeedItem[],
+) =>
+  items.filter(
+    (item) => !item.read_at && item?.data?.community_name === communityName,
+  ).length;

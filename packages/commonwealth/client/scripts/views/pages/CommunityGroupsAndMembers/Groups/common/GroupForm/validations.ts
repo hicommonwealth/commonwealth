@@ -4,6 +4,7 @@ export const VALIDATION_MESSAGES = {
   NO_INPUT: 'No input',
   MAX_CHAR_LIMIT_REACHED: 'Max character limit reached',
   INVALID_INPUT: 'Invalid input',
+  INVALID_URL: 'Invalid Url',
 };
 
 export const requirementSubFormValidationSchema = z.object({
@@ -49,6 +50,13 @@ export const groupValidationSchema = z.object({
     .max(250, { message: VALIDATION_MESSAGES.MAX_CHAR_LIMIT_REACHED })
     .optional()
     .default(''),
+  groupImageUrl: z
+    .union([
+      z.string().url({ message: VALIDATION_MESSAGES.INVALID_URL }),
+      z.string().optional().default(''),
+      z.null(), // Allows null
+    ])
+    .optional(),
   requirementsToFulfill: z
     .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
     .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT }),

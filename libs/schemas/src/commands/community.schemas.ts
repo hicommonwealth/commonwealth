@@ -14,6 +14,7 @@ import {
   Community,
   Group,
   PermissionEnum,
+  PinnedToken,
   Requirement,
   StakeTransaction,
   Topic,
@@ -47,7 +48,7 @@ export const CreateCommunity = {
 
     // hidden optional params
     token_name: z.string().optional(),
-    referral_link: z.string().optional(),
+    referrer_address: z.string().optional(),
 
     // deprecated params to be removed
     default_symbol: z.string().max(9),
@@ -229,6 +230,7 @@ export const ToggleArchiveTopic = {
 const GroupMetadata = z.object({
   name: z.string(),
   description: z.string(),
+  groupImageUrl: z.string().nullish(),
   required_requirements: PG_INT.nullish(),
   membership_ttl: PG_INT.optional(),
 });
@@ -308,7 +310,7 @@ export const RefreshCommunityMemberships = {
 export const JoinCommunity = {
   input: z.object({
     community_id: z.string(),
-    referral_link: z.string().nullish(),
+    referrer_address: z.string().optional(),
   }),
   output: z.object({
     community_id: z.string(),
@@ -324,6 +326,24 @@ export const BanAddress = {
   input: z.object({
     community_id: z.string(),
     address: z.string(),
+  }),
+  output: z.object({}),
+  context: AuthContext,
+};
+
+export const PinToken = {
+  input: z.object({
+    community_id: z.string(),
+    contract_address: z.string(),
+    chain_node_id: z.number(),
+  }),
+  output: PinnedToken,
+  context: AuthContext,
+};
+
+export const UnpinToken = {
+  input: z.object({
+    community_id: z.string(),
   }),
   output: z.object({}),
   context: AuthContext,

@@ -7,7 +7,7 @@ import chaiAsPromised from 'chai-as-promised';
 import { seed } from 'model/src/tester';
 import { afterAll, beforeAll, describe, test } from 'vitest';
 import { ChainNodeAttributes } from '../../src';
-import { CreateLaunchpadTrade, CreateToken } from '../../src/token';
+import { CreateLaunchpadToken, CreateLaunchpadTrade } from '../../src/token';
 
 chai.use(chaiAsPromised);
 
@@ -78,7 +78,7 @@ describe('Launchpad Lifecycle', () => {
       community_id: community_id!,
     };
 
-    const results = await command(CreateToken(), {
+    const results = await command(CreateLaunchpadToken(), {
       actor,
       payload,
     });
