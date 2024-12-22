@@ -15,7 +15,9 @@ import type {
 import { EncodeObject } from '@cosmjs/proto-signing';
 import { CosmosToken } from 'controllers/chain/cosmos/types';
 import { Any } from 'cosmjs-types/google/protobuf/any';
-import { isCompleted } from '../v1beta1/utils-v1beta1';
+import Cosmos from '../../adapter';
+import { CosmosDepositParams, isCompleted } from '../v1beta1/utils-v1beta1';
+import CosmosGovernanceV1AtomOne from './governance-v1';
 
 /* Governance helper methods for Cosmos chains with gov module v1 (as of Cosmos SDK v0.46.11) */
 
@@ -151,8 +153,7 @@ export const propToIProposal = (p: ProposalSDKType): ICosmosProposal | null => {
       // @ts-expect-error StrictNullChecks
       new Date(p.voting_start_time).valueOf() / 1000,
     ),
-    // @ts-expect-error StrictNullChecks
-    proposer: null,
+    proposer: p.proposer,
     state: {
       identifier,
       completed: isCompleted(status),
@@ -217,4 +218,33 @@ export const encodeMsgSubmitProposalAtomOne = (
       content,
     },
   };
+};
+
+export const getDepositParams = async (
+  cosmosChain: Cosmos,
+  stakingDenom?: string,
+): Promise<CosmosDepositParams> => {
+  const govController = cosmosChain.governance as CosmosGovernanceV1AtomOne;
+  let minDeposit;
+  const { depositParams } =
+    await cosmosChain.chain.api.atomone.params('deposit');
+
+  // TODO: support off-denom deposits
+  // @ts-expect-error StrictNullChecks
+  const depositCoins = depositParams.minDeposit.find(
+    ({ denom }) => denom === stakingDenom,
+  );
+  if (depositCoins) {
+    minDeposit = new CosmosToken(
+      depositCoins.denom,
+      new BN(depositCoins.amount),
+    );
+  } else {
+    throw new Error(
+      `Gov minDeposit in wrong denom (${minDeposit}) or stake denom not loaded: 
+      ${cosmosChain.chain.denom}`,
+    );
+  }
+  govController.setMinDeposit(minDeposit);
+  return { minDeposit };
 };
