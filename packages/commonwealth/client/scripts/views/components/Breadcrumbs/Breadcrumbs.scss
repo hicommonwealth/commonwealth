@@ -10,7 +10,7 @@
     background-color: $white;
     padding-block: 16px;
     position: fixed;
-    z-index: 3;
+    z-index: 3 !important;
     overflow: auto;
     width: 100%;
     max-width: 1040px;
