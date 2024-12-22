@@ -17,7 +17,7 @@ const ProfileCard = () => {
     data?.profile?.background_image?.imageBehavior || 'cover';
 
   return (
-    <div className="profile-card">
+    <div className="ProfileCard">
       <Link to={`/profile/id/${userData.id}`} className="user-info">
         <div
           className={clsx('background-cover', {

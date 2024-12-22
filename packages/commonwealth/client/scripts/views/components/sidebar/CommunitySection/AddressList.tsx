@@ -34,6 +34,9 @@ export const AddressList = ({
     null,
   );
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [selectedCommuinty, setSelectedCommunity] = useState<string | null>(
+    null,
+  );
 
   const user = useUserStore();
 
@@ -49,13 +52,15 @@ export const AddressList = ({
     <>
       <div className="AddressList">
         <div className="header">
-          <div className="address-left">
+          <div
+            className="address-left"
+            onClick={() => setIsCollapsed(!isCollapsed)}
+          >
             <CWIcon
               iconName={isCollapsed ? 'caretDown' : 'caretUp'}
               iconSize="small"
               className="caret-icon"
               weight="bold"
-              onClick={() => setIsCollapsed(!isCollapsed)}
             />
             <CWText fontWeight="medium" type="caption" className="status-text">
               Addresses
@@ -78,9 +83,11 @@ export const AddressList = ({
                   toggleRemoveModal={(
                     val: boolean,
                     selectedAddress: AddressInfo,
+                    community,
                   ) => {
                     setIsRemoveModalOpen(val);
                     setCurrentAddress(selectedAddress);
+                    setSelectedCommunity(community);
                   }}
                   isSelected={addr.address === address}
                 />
@@ -91,7 +98,8 @@ export const AddressList = ({
       <CWModal
         size="small"
         content={
-          currentAddress && (
+          currentAddress &&
+          selectedCommuinty && (
             <DeleteAddressModal
               addresses={addresses}
               address={currentAddress}
@@ -100,6 +108,7 @@ export const AddressList = ({
                 setIsRemoveModalOpen(false);
                 refreshProfiles();
               }}
+              communityName={selectedCommuinty}
             />
           )
         }
