@@ -15,7 +15,8 @@ import {
 import { Events } from '@hicommonwealth/schemas';
 import { TRPCError } from '@trpc/server';
 import { ZodSchema, ZodUndefined, z } from 'zod';
-import { OutputMiddleware, Tag, buildproc, procedure } from './middleware';
+import { buildproc, procedure } from './builder';
+import { Tag, type OutputMiddleware } from './types';
 
 const log = logger(import.meta);
 
