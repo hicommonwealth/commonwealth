@@ -26,6 +26,7 @@ type DeleteAddressModalAttrs = {
   closeModal: () => void;
   isBulkDelete?: boolean;
   communityName: string;
+  islastCommunityAddress: boolean;
 };
 
 export const DeleteAddressModal = ({
@@ -34,6 +35,7 @@ export const DeleteAddressModal = ({
   closeModal,
   isBulkDelete = false,
   communityName,
+  islastCommunityAddress,
 }: DeleteAddressModalAttrs) => {
   const user = useUserStore();
 
@@ -89,19 +91,25 @@ export const DeleteAddressModal = ({
     <div className="DeleteAddressModal">
       <CWModalHeader
         label={
-          isBulkDelete
-            ? 'Disconnect All Addresses'
-            : `Disconnect ${formatAddressShort(address?.address || '')}`
+          islastCommunityAddress
+            ? 'Are you sure you want to leave this community?'
+            : isBulkDelete
+              ? 'Disconnect All Addresses'
+              : `Disconnect ${formatAddressShort(address?.address || '')}`
         }
         icon="danger"
         onModalClose={closeModal}
       />
       <CWModalBody>
         <CWText>
-          {isBulkDelete
-            ? `By leaving ${communityName} you will disconnect all 
+          {islastCommunityAddress
+            ? `By removing the following address, ${formatAddressShort(
+                address?.address || '',
+              )}, you will be leaving ${communityName}. If you’d like to interact with this community in the future you can rejoin.`
+            : isBulkDelete
+              ? `By leaving ${communityName} you will disconnect all 
             linked addresses. Your threads will remain intact.`
-            : `By removing this address you will be leaving the ${communityName}. 
+              : `By removing this address you will be leaving the ${communityName}. 
             Your contributions and comments will remain. Don't worry, you can rejoin anytime.`}
         </CWText>
       </CWModalBody>
@@ -113,7 +121,13 @@ export const DeleteAddressModal = ({
           buttonHeight="sm"
         />
         <CWButton
-          label={isBulkDelete ? 'Disconnect All' : 'Disconnect Address'}
+          label={
+            islastCommunityAddress
+              ? 'Leave Community'
+              : isBulkDelete
+                ? 'Disconnect All'
+                : 'Disconnect Address'
+          }
           buttonType="destructive"
           onClick={handleDelete}
           buttonHeight="sm"
