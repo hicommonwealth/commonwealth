@@ -26,7 +26,7 @@ type DeleteAddressModalAttrs = {
   closeModal: () => void;
   isBulkDelete?: boolean;
   communityName: string;
-  islastCommunityAddress: boolean;
+  islastCommunityAddress?: boolean;
 };
 
 export const DeleteAddressModal = ({
@@ -35,7 +35,7 @@ export const DeleteAddressModal = ({
   closeModal,
   isBulkDelete = false,
   communityName,
-  islastCommunityAddress,
+  islastCommunityAddress = false,
 }: DeleteAddressModalAttrs) => {
   const user = useUserStore();
 
