@@ -105,7 +105,8 @@ export const DeleteAddressModal = ({
           {islastCommunityAddress
             ? `By removing the following address, ${formatAddressShort(
                 address?.address || '',
-              )}, you will be leaving ${communityName}. If you’d like to interact with this community in the future you can rejoin.`
+              )}, you will be leaving ${communityName}. 
+              If you’d like to interact with this community in the future you can rejoin.`
             : isBulkDelete
               ? `By leaving ${communityName} you will disconnect all 
             linked addresses. Your threads will remain intact.`
