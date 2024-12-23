@@ -130,7 +130,6 @@ export function SignIn(): Command<typeof schemas.SignIn> {
           });
           if (!new_address) {
             addr.user_id = user_id;
-            addr.role = 'member';
             addr.wallet_id = wallet_id;
             addr.verification_token = verification_token;
             addr.verification_token_expires = verification_token_expires;
