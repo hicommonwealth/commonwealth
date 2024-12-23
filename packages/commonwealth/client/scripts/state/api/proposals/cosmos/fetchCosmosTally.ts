@@ -1,6 +1,8 @@
 import type { QueryTallyResultResponseSDKType } from '@hicommonwealth/chains';
 import { ChainBase } from '@hicommonwealth/shared';
 import { useQuery } from '@tanstack/react-query';
+import { CosmosProposalV1AtomOne } from 'client/scripts/controllers/chain/cosmos/gov/atomone/proposal-v1';
+import { CosmosProposalGovgen } from 'client/scripts/controllers/chain/cosmos/gov/govgen/proposal-v1beta1';
 import { CosmosProposalV1 } from 'controllers/chain/cosmos/gov/v1/proposal-v1';
 import { CosmosProposal } from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
 import type { QueryTallyResultResponse } from 'cosmjs-types/cosmos/gov/v1beta1/query';
@@ -15,8 +17,10 @@ const fetchCosmosTally = async (
   proposal: AnyProposal,
 ): Promise<QueryTallyResultResponse | QueryTallyResultResponseSDKType> => {
   if (
+    proposal instanceof CosmosProposalV1AtomOne ||
     proposal instanceof CosmosProposalV1 ||
-    proposal instanceof CosmosProposal
+    proposal instanceof CosmosProposal ||
+    proposal instanceof CosmosProposalGovgen
   ) {
     return proposal.fetchTally();
   } else {

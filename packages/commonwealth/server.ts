@@ -77,7 +77,9 @@ const start = async () => {
   await main(app, models, {
     port: config.PORT,
     withLoggingMiddleware: true,
-    withPrerender: config.APP_ENV === 'production' && !config.NO_PRERENDER,
+    withPrerender:
+      (config.APP_ENV === 'production' || config.APP_ENV === 'frick') &&
+      !!config.PRERENDER_TOKEN,
   })
     .then(async () => {
       isServiceHealthy = true;

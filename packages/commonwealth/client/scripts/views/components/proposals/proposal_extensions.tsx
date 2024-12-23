@@ -29,15 +29,18 @@ export const ProposalExtensions = (props: ProposalExtensionsProps) => {
   const { setCosmosDepositAmount, setDemocracyVoteAmount, proposal } = props;
   const { data: stakingDenom } = useStakingParamsQuery();
 
-  let isGovgen = false;
+  let chainTtype;
   if (proposal instanceof CosmosProposalGovgen) {
-    isGovgen = true;
+    chainTtype = 'govgen';
   }
 
+  if (proposal instanceof CosmosProposalV1AtomOne) {
+    chainTtype = 'atomone';
+  }
   const { data: cosmosDepositParams } = useDepositParamsQuery(
     // @ts-expect-error <StrictNullChecks/>
     stakingDenom,
-    isGovgen,
+    chainTtype,
   );
 
   useEffect(() => {
