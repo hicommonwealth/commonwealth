@@ -2,12 +2,14 @@ import { useFlag } from 'client/scripts/hooks/useFlag';
 import AddressInfo from 'client/scripts/models/AddressInfo';
 import NewProfile from 'client/scripts/models/NewProfile';
 import React from 'react';
+import app from 'state';
 import { useInviteLinkModal } from 'state/ui/modals';
 import useJoinCommunity from 'views/components/SublayoutHeader/useJoinCommunity';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { SharePopover } from '../../SharePopover';
 import { AddressList } from '../CommunitySection/AddressList';
+
 import './AccountConnectionIndicator.scss';
 
 interface AccountConnectionIndicatorProps {
@@ -72,7 +74,14 @@ const AccountConnectionIndicator = ({
             disabled={connected}
             onClick={handleJoinCommunity}
           />
-          <SharePopover linkToShare={window.location.href} />
+          <SharePopover
+            linkToShare={
+              window.location.origin +
+              '/' +
+              app.activeChainId() +
+              '/discussions'
+            }
+          />
         </div>
       </div>
       {JoinCommunityModals}

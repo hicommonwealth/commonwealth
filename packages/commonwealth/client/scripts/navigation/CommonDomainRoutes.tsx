@@ -78,6 +78,9 @@ const CommunityIntegrations = lazy(
 const CommunityStakeIntegration = lazy(
   () => import('views/pages/CommunityManagement/StakeIntegration'),
 );
+const CommunityTokenIntegration = lazy(
+  () => import('views/pages/CommunityManagement/TokenIntegration'),
+);
 
 const CommunityTopics = lazy(
   () => import('views/pages/CommunityManagement/Topics'),
@@ -113,6 +116,8 @@ const ProfilePageRedirect = lazy(() => import('views/pages/profile_redirect'));
 const CommunityNotFoundPage = lazy(
   () => import('views/pages/CommunityNotFoundPage'),
 );
+
+const RewardsPage = lazy(() => import('views/pages/RewardsPage'));
 
 const CommonDomainRoutes = ({
   tokenizedCommunityEnabled,
@@ -176,6 +181,11 @@ const CommonDomainRoutes = ({
     element={withLayout(CommunitiesPage, {
       type: 'common',
     })}
+  />,
+  <Route
+    key="/rewards"
+    path="/rewards"
+    element={withLayout(RewardsPage, { type: 'common' })}
   />,
   <Route
     key="/search"
@@ -404,6 +414,14 @@ const CommonDomainRoutes = ({
     key="/:scope/manage/integrations/stake"
     path="/:scope/manage/integrations/stake"
     element={withLayout(CommunityStakeIntegration, {
+      scoped: true,
+    })}
+  />,
+
+  <Route
+    key="/:scope/manage/integrations/token"
+    path="/:scope/manage/integrations/token"
+    element={withLayout(CommunityTokenIntegration, {
       scoped: true,
     })}
   />,

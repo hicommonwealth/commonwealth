@@ -3,7 +3,7 @@ import { Contest, config as modelConfig } from '@hicommonwealth/model';
 import { Button } from 'frames.js/express';
 import React from 'react';
 
-import { PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
+import { buildContestLeaderboardUrl, getBaseUrl } from '@hicommonwealth/shared';
 import { frames } from '../../config';
 
 export const contestCard = frames(async (ctx) => {
@@ -16,7 +16,7 @@ export const contestCard = frames(async (ctx) => {
 
   if (!contestManager) {
     return {
-      title: 'N/A',
+      title: 'Contest not found',
       image: (
         <div
           style={{
@@ -35,12 +35,46 @@ export const contestCard = frames(async (ctx) => {
               fontSize: '56px',
             }}
           >
-            Not Found
+            Contest not found.
           </p>
         </div>
       ),
     };
   }
+
+  if (contestManager.ended || contestManager.cancelled) {
+    return {
+      title: 'Contest Ended',
+      image: (
+        <div
+          style={{
+            backgroundColor: '#2A2432',
+            color: 'white',
+            padding: '40px',
+            display: 'flex',
+            flexDirection: 'column',
+            width: '100%',
+            height: '100%',
+            lineHeight: '0.5',
+          }}
+        >
+          <p
+            style={{
+              fontSize: '56px',
+            }}
+          >
+            Contest ended. New entries will not be accepted.
+          </p>
+        </div>
+      ),
+    };
+  }
+
+  const leaderboardUrl = buildContestLeaderboardUrl(
+    getBaseUrl(config.APP_ENV),
+    contestManager.community_id,
+    contestManager.contest_address,
+  );
 
   return {
     title: contestManager.name,
@@ -81,11 +115,7 @@ export const contestCard = frames(async (ctx) => {
       </div>
     ),
     buttons: [
-      <Button
-        key="leaderboard"
-        action="link"
-        target={`${getBaseUrl()}/${contestManager.community_id}/contests/${contestManager.contest_address}`}
-      >
+      <Button key="leaderboard" action="link" target={leaderboardUrl}>
         Leaderboard
       </Button>,
       <Button
@@ -102,19 +132,12 @@ export const contestCard = frames(async (ctx) => {
   };
 });
 
-const getBaseUrl = () => {
-  switch (config.APP_ENV) {
-    case 'local':
-      return 'http://localhost:8080';
-    case 'beta':
-      return 'https://qa.commonwealth.im';
-    case 'demo':
-      return 'https://demo.commonwealth.im';
-    default:
-      return `https://${PRODUCTION_DOMAIN}`;
+export const getActionInstallUrl = () => {
+  // add environment to button label in non-prod environments
+  let buttonLabel = 'Upvote+Content';
+  if (config.APP_ENV !== 'production') {
+    buttonLabel += `+${config.APP_ENV}`;
   }
-};
-
-export const getActionInstallUrl = () =>
   // eslint-disable-next-line max-len
-  `https://warpcast.com/~/add-cast-action?actionType=post&name=Upvote+Content&icon=thumbsup&postUrl=${modelConfig.CONTESTS.FARCASTER_ACTION_URL}`;
+  return `https://warpcast.com/~/add-cast-action?actionType=post&name=${buttonLabel}&icon=thumbsup&postUrl=${modelConfig.CONTESTS.FARCASTER_ACTION_URL}`;
+};

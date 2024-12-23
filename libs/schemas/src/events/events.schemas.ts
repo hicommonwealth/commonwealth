@@ -1,6 +1,8 @@
+import { EvmEventSignatures } from '@hicommonwealth/evm-protocols';
 import { z } from 'zod';
-import { FarcasterAction, FarcasterCast } from '../commands/contest.schemas';
+import { FarcasterCast } from '../commands/contest.schemas';
 import { Comment } from '../entities/comment.schemas';
+import { FarcasterAction } from '../entities/farcaster.schemas';
 import { SubscriptionPreference } from '../entities/notification.schemas';
 import { Reaction } from '../entities/reaction.schemas';
 import { Thread } from '../entities/thread.schemas';
@@ -10,6 +12,8 @@ import {
   LaunchpadTokenCreated,
   LaunchpadTrade,
   NamespaceDeployed,
+  ReferralFeeDistributed,
+  ReferralSet,
 } from './chain-event.schemas';
 import { EventMetadata } from './util.schemas';
 
@@ -60,14 +64,14 @@ export const UserMentioned = z.object({
 export const CommunityCreated = z.object({
   community_id: z.string(),
   user_id: z.number(),
-  referral_link: z.string().optional(),
+  referrer_address: z.string().optional(),
   created_at: z.coerce.date(),
 });
 
 export const CommunityJoined = z.object({
   community_id: z.string(),
   user_id: z.number(),
-  referral_link: z.string().nullish(),
+  referrer_address: z.string().optional(),
   created_at: z.coerce.date(),
 });
 
@@ -156,8 +160,7 @@ export const DiscordThreadDeleted = DiscordEventBase.pick({
 
 const ChainEventCreatedBase = z.object({
   eventSource: z.object({
-    kind: z.string(),
-    chainNodeId: z.number(),
+    ethChainId: z.number(),
   }),
   rawLog: z.object({
     blockNumber: z.number(),
@@ -179,34 +182,40 @@ export const ChainEventCreated = z.union([
   ChainEventCreatedBase.extend({
     eventSource: ChainEventCreatedBase.shape.eventSource.extend({
       eventSignature: z.literal(
-        '0x8870ba2202802ce285ce6bead5ac915b6dc2d35c8a9d6f96fa56de9de12829d5',
+        EvmEventSignatures.NamespaceFactory.NamespaceDeployed,
       ),
     }),
     parsedArgs: NamespaceDeployed,
   }),
   ChainEventCreatedBase.extend({
     eventSource: ChainEventCreatedBase.shape.eventSource.extend({
-      eventSignature: z.literal(
-        '0xfc13c9a8a9a619ac78b803aecb26abdd009182411d51a986090f82519d88a89e',
-      ),
+      eventSignature: z.literal(EvmEventSignatures.CommunityStake.Trade),
     }),
     parsedArgs: CommunityStakeTrade,
   }),
   ChainEventCreatedBase.extend({
     eventSource: ChainEventCreatedBase.shape.eventSource.extend({
-      eventSignature: z.literal(
-        '0xd7ca5dc2f8c6bb37c3a4de2a81499b25f8ca8bbb3082010244fe747077d0f6cc',
-      ),
+      eventSignature: z.literal(EvmEventSignatures.Launchpad.TokenLaunched),
     }),
     parsedArgs: LaunchpadTokenCreated,
   }),
   ChainEventCreatedBase.extend({
     eventSource: ChainEventCreatedBase.shape.eventSource.extend({
-      eventSignature: z.literal(
-        '0x9adcf0ad0cda63c4d50f26a48925cf6405df27d422a39c456b5f03f661c82982',
-      ),
+      eventSignature: z.literal(EvmEventSignatures.Launchpad.Trade),
     }),
     parsedArgs: LaunchpadTrade,
+  }),
+  ChainEventCreatedBase.extend({
+    eventSource: ChainEventCreatedBase.shape.eventSource.extend({
+      eventSignature: z.literal(EvmEventSignatures.Referrals.ReferralSet),
+    }),
+    parsedArgs: ReferralSet,
+  }),
+  ChainEventCreatedBase.extend({
+    eventSource: ChainEventCreatedBase.shape.eventSource.extend({
+      eventSignature: z.literal(EvmEventSignatures.Referrals.FeeDistributed),
+    }),
+    parsedArgs: ReferralFeeDistributed,
   }),
 ]);
 
@@ -268,18 +277,20 @@ export const FarcasterCastCreated = FarcasterCast.describe(
   'When a farcaster contest cast has been posted',
 );
 
-export const FarcasterReplyCastCreated = FarcasterCast.describe(
-  'When a reply is posted to a farcaster contest cast',
-);
+export const FarcasterReplyCastCreated = FarcasterCast.extend({
+  verified_address: z.string(),
+}).describe('When a reply is posted to a farcaster contest cast');
 
 export const FarcasterVoteCreated = FarcasterAction.extend({
   contest_address: z.string(),
+  verified_address: z.string(),
 }).describe('When a farcaster action is initiated on a cast reply');
 
 export const SignUpFlowCompleted = z.object({
   user_id: z.number(),
   created_at: z.coerce.date(),
-  referral_link: z.string().nullish(),
+  referrer_address: z.string().optional(),
+  referee_address: z.string().optional(),
 });
 
 export const ContestRolloverTimerTicked = z.object({});

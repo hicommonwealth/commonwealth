@@ -1,6 +1,6 @@
 /* eslint-disable react/function-component-definition */
 import React, { useEffect } from 'react';
-import { NavigateOptions } from 'react-router-dom';
+import { NavigateOptions, useLocation } from 'react-router-dom';
 
 import { DefaultPage } from '@hicommonwealth/shared';
 import { useCommonNavigate } from 'navigation/helpers';
@@ -9,9 +9,16 @@ import { PageLoading } from './loading';
 
 export default function DiscussionsRedirect() {
   const navigate = useCommonNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     if (!app.chain) return;
+
+    const searchParams = new URLSearchParams(location.search);
+    // Remove 'tab' if it exists as we'll be setting it explicitly
+    searchParams.delete('tab');
+    const existingParams = searchParams.toString();
+    const additionalParams = existingParams ? `&${existingParams}` : '';
 
     const view = app.chain.meta?.default_summary_view
       ? DefaultPage.Overview
@@ -22,15 +29,15 @@ export default function DiscussionsRedirect() {
     const dontAddHistory: NavigateOptions = { replace: true };
     switch (view) {
       case DefaultPage.Overview:
-        navigate('/overview?tab=overview', dontAddHistory);
+        navigate(`/overview?tab=overview${additionalParams}`, dontAddHistory);
         break;
       case DefaultPage.Discussions:
-        navigate('/discussions?tab=all', dontAddHistory);
+        navigate(`/discussions?tab=all${additionalParams}`, dontAddHistory);
         break;
       default:
-        navigate('/discussions?tab=all', dontAddHistory);
+        navigate(`/discussions?tab=all${additionalParams}`, dontAddHistory);
     }
-  }, [navigate]);
+  }, [navigate, location.search]);
 
   return <PageLoading />;
 }

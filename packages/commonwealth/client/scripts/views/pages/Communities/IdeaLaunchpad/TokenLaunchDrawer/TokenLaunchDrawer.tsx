@@ -9,9 +9,9 @@ import {
 import CWDrawer, {
   CWDrawerTopBar,
 } from 'views/components/component_kit/new_designs/CWDrawer';
+import QuickTokenLaunchForm from '../../../LaunchToken/QuickTokenLaunchForm';
 // eslint-disable-next-line max-len
-import { triggerTokenLaunchFormAbort } from '../../../LaunchToken/steps/TokenInformationStep/TokenInformationForm/helpers';
-import QuickTokenLaunchForm from '../QuickTokenLaunchForm';
+import { triggerTokenLaunchFormAbort } from '../../../LaunchToken/QuickTokenLaunchForm/steps/TokenInformationFormStep/helpers';
 import './TokenLaunchDrawer.scss';
 
 type TokenLaunchDrawerProps = {

@@ -10,7 +10,6 @@ const {
   TELEGRAM_BOT_TOKEN_DEV,
   SESSION_SECRET,
   SNAPSHOT_WEBHOOK_SECRET,
-  NO_PRERENDER: _NO_PRERENDER,
   NO_GLOBAL_ACTIVITY_CACHE,
   PRERENDER_TOKEN,
   GENERATE_IMAGE_RATE_LIMIT,
@@ -28,8 +27,6 @@ const {
   DEV_MODULITH,
 } = process.env;
 
-const NO_PRERENDER = _NO_PRERENDER;
-
 const DEFAULTS = {
   GENERATE_IMAGE_RATE_LIMIT: '10',
   ACTIVE_COMMUNITIES_CACHE_TTL_SECONDS: '60',
@@ -44,7 +41,6 @@ const DEFAULTS = {
 export const config = configure(
   { ...model_config, ...adapters_config },
   {
-    NO_PRERENDER: NO_PRERENDER === 'true',
     NO_GLOBAL_ACTIVITY_CACHE: NO_GLOBAL_ACTIVITY_CACHE === 'true',
     PRERENDER_TOKEN,
     GENERATE_IMAGE_RATE_LIMIT: parseInt(
@@ -109,7 +105,6 @@ export const config = configure(
     DEV_MODULITH: DEV_MODULITH === 'true',
   },
   z.object({
-    NO_PRERENDER: z.boolean(),
     NO_GLOBAL_ACTIVITY_CACHE: z.boolean(),
     PRERENDER_TOKEN: z.string().optional(),
     GENERATE_IMAGE_RATE_LIMIT: z.number().int().positive(),
