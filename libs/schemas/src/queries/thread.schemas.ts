@@ -68,7 +68,6 @@ export const UserView = z.object({
 
   profile: UserProfile,
   xp_points: PG_INT.default(0).nullish(),
-  referral_link: z.string().nullish(),
 
   created_at: z.date().or(z.string()).nullish(),
   updated_at: z.date().or(z.string()).nullish(),
