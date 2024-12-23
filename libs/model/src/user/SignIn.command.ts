@@ -59,8 +59,8 @@ export function SignIn(): Command<typeof schemas.SignIn> {
       const { base, encodedAddress, ss58Prefix, hex, existingHexUserId } = actor
         .user.auth as VerifiedAddress;
 
-      const signed_in = actor.user.id > 0;
-      let user_id = signed_in ? actor.user.id : (existingHexUserId ?? null);
+      const was_signed_in = actor.user.id > 0;
+      let user_id = was_signed_in ? actor.user.id : (existingHexUserId ?? null);
 
       await verifySessionSignature(
         deserializeCanvas(session),
@@ -199,7 +199,7 @@ export function SignIn(): Command<typeof schemas.SignIn> {
         ...addr.toJSON(),
         community_base: base,
         community_ss58_prefix: ss58Prefix,
-        signed_in,
+        was_signed_in,
         user_created,
         address_created,
         first_community,

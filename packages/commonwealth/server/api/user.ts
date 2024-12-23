@@ -10,7 +10,10 @@ export const trpcRouter = trpc.router({
   signIn: trpc.command(User.SignIn, trpc.Tag.User, [
     async (input, output, ctx) => {
       await new Promise((resolve, reject) => {
-        if (output.signed_in) return resolve(true);
+        // no need to login if we're already signed in
+        if (output.was_signed_in) return resolve(true);
+
+        // complete passport login
         ctx.req.login(output.User as Express.User, (err) => {
           if (err) {
             analytics().track(
@@ -33,7 +36,7 @@ export const trpcRouter = trpc.router({
               MixpanelUserSignupEvent.NEW_USER_SIGNUP,
               { community_id: output.community_id },
             ]
-          : !output.signed_in
+          : !output.was_signed_in
             ? [
                 MixpanelLoginEvent.LOGIN_COMPLETED,
                 {

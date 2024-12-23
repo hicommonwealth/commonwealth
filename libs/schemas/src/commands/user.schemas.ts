@@ -15,7 +15,7 @@ export const SignIn = {
   output: Address.extend({
     community_base: z.nativeEnum(ChainBase),
     community_ss58_prefix: z.number().nullish(),
-    signed_in: z.boolean().describe('True when user was already signed in'),
+    was_signed_in: z.boolean().describe('True when user was already signed in'),
     user_created: z
       .boolean()
       .describe(
