@@ -105,26 +105,32 @@ export const SidebarQuickSwitcher = ({
         <CWDivider />
       )}
       <div className="scrollable-community-bar">
-        {user.communities.map((community) => (
-          <div className="community-avatar-container" key={community.id}>
-            <CWCommunityAvatar
-              key={community.id}
-              size="large"
-              selectedCommunity={communityId}
-              community={{
-                id: community.id,
-                iconUrl: community.iconUrl,
-                name: community.name,
-              }}
-              onClick={() =>
-                navigateToCommunity({ navigate, path: '', chain: community.id })
-              }
-            />
-            <SideBarNotificationIcon
-              unreadCount={calculateUnreadCount(community.name, items)}
-            />
-          </div>
-        ))}
+        {user.communities
+          .filter((x) => !x.isStarred)
+          .map((community) => (
+            <div className="community-avatar-container" key={community.id}>
+              <CWCommunityAvatar
+                key={community.id}
+                size="large"
+                selectedCommunity={communityId}
+                community={{
+                  id: community.id,
+                  iconUrl: community.iconUrl,
+                  name: community.name,
+                }}
+                onClick={() =>
+                  navigateToCommunity({
+                    navigate,
+                    path: '',
+                    chain: community.id,
+                  })
+                }
+              />
+              <SideBarNotificationIcon
+                unreadCount={calculateUnreadCount(community.name, items)}
+              />
+            </div>
+          ))}
       </div>
     </div>
   );

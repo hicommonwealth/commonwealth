@@ -17,6 +17,23 @@ import {
 } from './chain-event.schemas';
 import { EventMetadata } from './util.schemas';
 
+export const UserCreated = z.object({
+  community_id: z.string(),
+  address: z.string(),
+  user_id: z.number(),
+  created_at: z.coerce.date(),
+  referrer_address: z.string().nullish(),
+});
+
+export const AddressOwnershipTransferred = z.object({
+  community_id: z.string(),
+  address: z.string(),
+  user_id: z.number(),
+  old_user_id: z.number(),
+  old_user_email: z.string().nullish(),
+  created_at: z.coerce.date(),
+});
+
 export const ThreadCreated = Thread.omit({
   search: true,
 }).extend({
