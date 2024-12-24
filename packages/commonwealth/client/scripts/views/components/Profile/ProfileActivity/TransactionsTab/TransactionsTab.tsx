@@ -1,4 +1,3 @@
-import { WalletId } from '@hicommonwealth/shared';
 import { formatAddressShort } from 'helpers';
 import React, { useState } from 'react';
 import useUserStore from 'state/ui/user';
@@ -30,7 +29,7 @@ const TransactionsTab = ({ transactionsType }: TransactionsTabProps) => {
     selectedAddress: BASE_ADDRESS_FILTER,
   });
   const user = useUserStore();
-  const hasMagic = user.addresses?.[0]?.walletId === WalletId.Magic;
+  const hasMagic = user.hasMagicWallet;
 
   const ADDRESS_FILTERS = [
     BASE_ADDRESS_FILTER,

@@ -1,4 +1,3 @@
-import { WalletId } from '@hicommonwealth/shared';
 import { useFlag } from 'client/scripts/hooks/useFlag';
 import { saveToClipboard } from 'client/scripts/utils/clipboard';
 import clsx from 'clsx';
@@ -32,7 +31,7 @@ const AccountConnectionIndicator = ({
   const { setIsInviteLinkModalOpen } = useInviteLinkModal();
 
   const userData = useUserStore();
-  const hasMagic = userData.addresses?.[0]?.walletId === WalletId.Magic;
+  const hasMagic = userData.hasMagicWallet;
 
   const { openMagicWallet } = useAuthentication({});
 
