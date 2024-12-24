@@ -1,3 +1,4 @@
+import { useReactNativeWebView } from 'hooks/useReactNativeWebView';
 import React, { useEffect, useState } from 'react';
 import { AndroidPrompt } from './AndroidPrompt';
 import { IOSPrompt } from './IOSPrompt';
@@ -21,6 +22,8 @@ export const AddToHomeScreenPrompt = ({
   const [showPrompt, setShowPrompt] = useState(
     displayDelayMilliseconds ? false : true,
   );
+
+  const reactNativeWebView = useReactNativeWebView();
 
   useEffect(() => {
     let timeout;
@@ -55,6 +58,10 @@ export const AddToHomeScreenPrompt = ({
 
     setShowPrompt(false);
   };
+
+  if (reactNativeWebView) {
+    return null;
+  }
 
   if (isDev()) {
     return null;
