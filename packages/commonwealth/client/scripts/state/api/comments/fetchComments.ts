@@ -3,6 +3,7 @@ import axios from 'axios';
 import Comment from 'models/Comment';
 import app from 'state';
 import { ApiEndpoints, SERVER_URL } from 'state/api/config';
+import { trpc } from 'utils/trpcClient';
 
 const COMMENTS_STALE_TIME = 30 * 1_000; // 30 s
 
@@ -34,6 +35,15 @@ const useFetchCommentsQuery = ({
   threadId,
   apiEnabled = true,
 }: FetchCommentsProps) => {
+  const { data } = trpc.comment.getComments.useQuery({
+    thread_id: threadId,
+    include_reactions: true,
+    include_thread_ids: true, // TODO: removed usage in api and ui
+    include_version_history: true,
+    include_user: true,
+  });
+  console.log('data => ', data);
+
   return useQuery({
     queryKey: [ApiEndpoints.FETCH_COMMENTS, communityId, threadId],
     queryFn: () => fetchComments({ communityId, threadId }),

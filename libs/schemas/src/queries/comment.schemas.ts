@@ -23,10 +23,13 @@ export const GetComments = {
     comment_id: PG_INT.optional(),
     include_user: zBoolean.default(false),
     include_reactions: zBoolean.default(false),
+    include_thread_ids: zBoolean.default(false),
+    include_version_history: zBoolean.default(false),
   }),
-  output: PaginatedResultSchema.extend({
-    results: Comment.extend({
-      last_edited: z.coerce.date().optional(),
-    }).array(),
-  }),
+  output: z.any(), // TODO: fix
+  // PaginatedResultSchema.extend({
+  //   results: Comment.extend({
+  //     last_edited: z.coerce.date().optional(),
+  //   }).array(),
+  // }),
 };
