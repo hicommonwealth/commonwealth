@@ -2,7 +2,6 @@ import { type Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../database';
 import { removeUndefined, sanitizeDeletedComment } from '../utils/index';
-import { formatSequelizePagination } from '../utils/paginationUtils';
 
 export function GetComments(): Query<typeof schemas.GetComments> {
   return {
@@ -10,8 +9,14 @@ export function GetComments(): Query<typeof schemas.GetComments> {
     auth: [],
     secure: false,
     body: async ({ payload }) => {
-      const { thread_id, comment_id, include_user, include_reactions } =
-        payload;
+      const {
+        thread_id,
+        comment_id,
+        include_user,
+        include_reactions,
+        include_thread_ids,
+        include_version_history,
+      } = payload;
 
       const includeArray = [];
       if (include_user) {
@@ -25,6 +30,15 @@ export function GetComments(): Query<typeof schemas.GetComments> {
               attributes: ['id', 'profile'],
             },
           ],
+        });
+      }
+
+      if (include_thread_ids) {
+        includeArray.push({
+          model: models.Thread,
+          attributes: ['id'],
+          required: true,
+          where: { id: thread_id },
         });
       }
 
@@ -51,10 +65,17 @@ export function GetComments(): Query<typeof schemas.GetComments> {
         });
       }
 
+      if (include_version_history) {
+        includeArray.push({
+          model: models.CommentVersionHistory,
+        });
+      }
+
       const { count, rows: comments } = await models.Comment.findAndCountAll({
         where: removeUndefined({ thread_id, id: comment_id }),
         include: includeArray,
-        ...formatSequelizePagination(payload),
+        order: [['created_at', 'DESC']],
+        // ...formatSequelizePagination(payload), // TODO: fix
         paranoid: false,
       });
 
