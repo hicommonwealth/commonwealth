@@ -30,7 +30,6 @@ type DeleteAddressModalAttrs = {
 
 export const DeleteAddressModal = ({
   address,
-  addresses,
   chain,
   closeModal,
   isBulkDelete = false,
@@ -39,12 +38,6 @@ export const DeleteAddressModal = ({
   const user = useUserStore();
 
   const onDeleteAddress = async () => {
-    if (addresses.length === 1) {
-      notifyError(
-        'You must have at least one address linked to a profile. Please add another address before removing this one.',
-      );
-    }
-
     try {
       const payload = { address: address?.address, chain, jwt: user.jwt };
 
@@ -57,8 +50,11 @@ export const DeleteAddressModal = ({
       if (response?.data.status === 'Success') {
         const updatedAddresses = [...user.addresses].filter(
           (a) =>
-            a.addressId !== address.addressId &&
+            a.addressId !== address.addressId ||
             a.community?.id !== address.community?.id,
+        );
+        const updatedAccounts = user.accounts.filter(
+          (a) => a.address !== address.address && a.community.id !== chain,
         );
         const remainingJoinedCommunities = updatedAddresses.map(
           (a) => a.community.id,
@@ -68,9 +64,8 @@ export const DeleteAddressModal = ({
           communities: [...user.communities].filter((c) =>
             remainingJoinedCommunities.includes(c.id),
           ),
-          accounts: user.accounts.filter(
-            (a) => a.address !== address.address && a.community.id !== chain,
-          ),
+          accounts: updatedAccounts,
+          ...(user.accounts.length === 1 && { activeAccount: null }),
         });
 
         notifySuccess('Address has been successfully removed.');

@@ -1,0 +1,50 @@
+@import '../../../../styles/shared.scss';
+
+.AddressItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 210px;
+
+  .address-section {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+
+    .address {
+      background-color: $neutral-200;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: 14px;
+      color: $neutral-600;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      width: 110px;
+    }
+
+    .copy-icon {
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+    }
+
+    check-mark-icon {
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+    }
+
+    .open-wallet-icon {
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+    }
+  }
+
+  .popover-section {
+    margin-left: 2px;
+    display: flex;
+    align-items: center;
+  }
+}
