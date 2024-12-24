@@ -26,25 +26,20 @@ type DeleteAddressModalAttrs = {
   closeModal: () => void;
   isBulkDelete?: boolean;
   communityName: string;
+  islastCommunityAddress?: boolean;
 };
 
 export const DeleteAddressModal = ({
   address,
-  addresses,
   chain,
   closeModal,
   isBulkDelete = false,
   communityName,
+  islastCommunityAddress = false,
 }: DeleteAddressModalAttrs) => {
   const user = useUserStore();
 
   const onDeleteAddress = async () => {
-    if (addresses.length === 1) {
-      notifyError(
-        'You must have at least one address linked to a profile. Please add another address before removing this one.',
-      );
-    }
-
     try {
       const payload = { address: address?.address, chain, jwt: user.jwt };
 
@@ -57,8 +52,11 @@ export const DeleteAddressModal = ({
       if (response?.data.status === 'Success') {
         const updatedAddresses = [...user.addresses].filter(
           (a) =>
-            a.addressId !== address.addressId &&
+            a.addressId !== address.addressId ||
             a.community?.id !== address.community?.id,
+        );
+        const updatedAccounts = user.accounts.filter(
+          (a) => a.address !== address.address && a.community.id !== chain,
         );
         const remainingJoinedCommunities = updatedAddresses.map(
           (a) => a.community.id,
@@ -68,9 +66,8 @@ export const DeleteAddressModal = ({
           communities: [...user.communities].filter((c) =>
             remainingJoinedCommunities.includes(c.id),
           ),
-          accounts: user.accounts.filter(
-            (a) => a.address !== address.address && a.community.id !== chain,
-          ),
+          accounts: updatedAccounts,
+          ...(user.accounts.length === 1 && { activeAccount: null }),
         });
 
         notifySuccess('Address has been successfully removed.');
@@ -94,19 +91,26 @@ export const DeleteAddressModal = ({
     <div className="DeleteAddressModal">
       <CWModalHeader
         label={
-          isBulkDelete
-            ? 'Disconnect All Addresses'
-            : `Disconnect ${formatAddressShort(address?.address || '')}`
+          islastCommunityAddress
+            ? 'Are you sure you want to leave this community?'
+            : isBulkDelete
+              ? 'Disconnect All Addresses'
+              : `Disconnect ${formatAddressShort(address?.address || '')}`
         }
         icon="danger"
         onModalClose={closeModal}
       />
       <CWModalBody>
         <CWText>
-          {isBulkDelete
-            ? `By leaving ${communityName} you will disconnect all 
+          {islastCommunityAddress
+            ? `By removing the following address, ${formatAddressShort(
+                address?.address || '',
+              )}, you will be leaving ${communityName}. 
+              If you’d like to interact with this community in the future you can rejoin.`
+            : isBulkDelete
+              ? `By leaving ${communityName} you will disconnect all 
             linked addresses. Your threads will remain intact.`
-            : `By removing this address you will be leaving the ${communityName}. 
+              : `By removing this address you will be leaving the ${communityName}. 
             Your contributions and comments will remain. Don't worry, you can rejoin anytime.`}
         </CWText>
       </CWModalBody>
@@ -118,7 +122,13 @@ export const DeleteAddressModal = ({
           buttonHeight="sm"
         />
         <CWButton
-          label={isBulkDelete ? 'Disconnect All' : 'Disconnect Address'}
+          label={
+            islastCommunityAddress
+              ? 'Leave Community'
+              : isBulkDelete
+                ? 'Disconnect All'
+                : 'Disconnect Address'
+          }
           buttonType="destructive"
           onClick={handleDelete}
           buttonHeight="sm"
