@@ -25,6 +25,8 @@ export const UpdateComment = {
   input: z.object({
     comment_id: PG_INT,
     body: z.string().min(1),
+    canvas_signed_data: z.string().optional(),
+    canvas_msg_id: z.string().optional(),
   }),
   output: Comment.extend({ community_id: z.string() }),
   context: CommentContext,

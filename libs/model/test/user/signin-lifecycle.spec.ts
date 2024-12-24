@@ -125,6 +125,7 @@ describe('SignIn Lifecycle', async () => {
         expect(addr!.verification_token).to.be.not.null;
         expect(addr!.verified).to.be.not.null;
 
+        expect(addr!.was_signed_in).to.be.false;
         expect(addr!.first_community).to.be.true;
         expect(addr!.user_created).to.be.true;
         expect(addr!.address_created).to.be.true;
@@ -160,6 +161,7 @@ describe('SignIn Lifecycle', async () => {
 
         expect(addr!).to.not.be.null;
         expect(addr!.User).to.be.not.null;
+        expect(addr!.was_signed_in).to.be.true;
         expect(addr!.first_community).to.be.false;
         expect(addr!.user_created).to.be.false;
         expect(addr!.address_created).to.be.false;
@@ -315,6 +317,7 @@ describe('SignIn Lifecycle', async () => {
           },
         });
         expect(transferred).to.not.be.null;
+        expect(transferred!.was_signed_in).to.be.true;
         expect(transferred!.address).to.be.equal(ref.address);
 
         // check that user 2 now owns 2 addresses from user 1
