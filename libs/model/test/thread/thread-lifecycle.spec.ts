@@ -119,16 +119,36 @@ describe('Thread lifecycle', () => {
       topics: [
         {
           name: 'topic with permissions',
-          group_ids: [threadGroupId, commentGroupId],
+          community_id: community.id,
+          description: '',
+          featured_in_sidebar: false,
+          featured_in_new_post: false,
+          default_offchain_template: null,
+          group_ids: (threadGroupId && commentGroupId
+            ? [threadGroupId, commentGroupId]
+            : []) as number[],
           weighted_voting: TopicWeightedVoting.Stake,
+          thread_count: 0,
         },
         {
           name: 'topic without thread permissions',
-          group_ids: [emptyGroupId],
+          community_id: community.id,
+          description: '',
+          featured_in_sidebar: false,
+          featured_in_new_post: false,
+          default_offchain_template: null,
+          group_ids: (emptyGroupId ? [emptyGroupId] : []) as number[],
+          thread_count: 0,
         },
         {
           name: 'topic without groups',
-          group_ids: [],
+          community_id: community.id,
+          description: '',
+          featured_in_sidebar: false,
+          featured_in_new_post: false,
+          default_offchain_template: null,
+          group_ids: [] as number[],
+          thread_count: 0,
         },
       ],
       CommunityStakes: [

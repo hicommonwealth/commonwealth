@@ -11,6 +11,11 @@ export type TopicAttributes = z.infer<typeof Topic> & {
   community?: CommunityAttributes;
   threads?: ThreadAttributes[];
   ChainNode?: ChainNodeAttributes;
+  featured_in_sidebar?: boolean;
+  featured_in_new_post?: boolean;
+  group_ids?: number[];
+  default_offchain_template?: string | null;
+  thread_count: number; // Required field since it's non-nullable in the database
 };
 export type TopicInstance = ModelInstance<TopicAttributes>;
 
@@ -55,6 +60,14 @@ export default (
       token_address: { type: Sequelize.STRING, allowNull: true },
       token_symbol: { type: Sequelize.STRING, allowNull: true },
       vote_weight_multiplier: { type: Sequelize.FLOAT, allowNull: true },
+      thread_count: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+        validate: {
+          min: 0,
+        },
+      },
     },
     {
       timestamps: true,
