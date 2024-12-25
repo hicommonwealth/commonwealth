@@ -4,8 +4,14 @@ import {
   logger,
   type Actor,
 } from '@hicommonwealth/core';
-import type { AddressInstance, ThreadInstance } from '../models';
-import type { AuthContext } from './authorization';
+import {
+  AuthContext,
+  CommentContext,
+  PollContext,
+  ThreadContext,
+} from '@hicommonwealth/schemas';
+import moment from 'moment';
+import type { AddressInstance, PollInstance, ThreadInstance } from '../models';
 
 const log = logger(import.meta);
 
@@ -61,12 +67,12 @@ export function mustBeSuperAdmin(actor: Actor) {
 
 /**
  * Address authorization guard
- * @param auth auth context
+ * @param context auth context
  * @returns narrowed auth context
  */
-export function mustBeAuthorized(actor: Actor, auth?: AuthContext) {
-  if (!auth?.address) throw new InvalidActor(actor, 'Not authorized');
-  return auth as AuthContext & {
+export function mustBeAuthorized(actor: Actor, context?: AuthContext) {
+  if (!context?.address) throw new InvalidActor(actor, 'Not authorized');
+  return context as AuthContext & {
     address: AddressInstance;
     community_id: string;
   };
@@ -74,13 +80,13 @@ export function mustBeAuthorized(actor: Actor, auth?: AuthContext) {
 
 /**
  * Thread authorization guard
- * @param auth auth context
+ * @param context auth context
  * @returns narrowed auth context
  */
-export function mustBeAuthorizedThread(actor: Actor, auth?: AuthContext) {
-  if (!auth?.address) throw new InvalidActor(actor, 'Not authorized');
-  if (!auth?.thread) throw new InvalidActor(actor, 'Not authorized thread');
-  return auth as AuthContext & {
+export function mustBeAuthorizedThread(actor: Actor, context?: ThreadContext) {
+  if (!context?.address) throw new InvalidActor(actor, 'Not authorized');
+  if (!context?.thread) throw new InvalidActor(actor, 'Not authorized thread');
+  return context as AuthContext & {
     address: AddressInstance;
     thread: ThreadInstance;
     community_id: string;
@@ -91,13 +97,17 @@ export function mustBeAuthorizedThread(actor: Actor, auth?: AuthContext) {
 
 /**
  * Comment authorization guard
- * @param auth auth context
+ * @param context auth context
  * @returns narrowed auth context
  */
-export function mustBeAuthorizedComment(actor: Actor, auth?: AuthContext) {
-  if (!auth?.address) throw new InvalidActor(actor, 'Not authorized');
-  if (!auth?.comment) throw new InvalidActor(actor, 'Not authorized comment');
-  return auth as AuthContext & {
+export function mustBeAuthorizedComment(
+  actor: Actor,
+  context?: CommentContext,
+) {
+  if (!context?.address) throw new InvalidActor(actor, 'Not authorized');
+  if (!context?.comment)
+    throw new InvalidActor(actor, 'Not authorized comment');
+  return context as CommentContext & {
     address: AddressInstance;
     comment: ThreadInstance;
     community_id: string;
@@ -105,4 +115,64 @@ export function mustBeAuthorizedComment(actor: Actor, auth?: AuthContext) {
     thread_id: number;
     comment_id: number;
   };
+}
+
+export function mustBeAuthorizedPoll(actor: Actor, context?: PollContext) {
+  if (!context?.address) throw new InvalidActor(actor, 'Not authorized');
+  if (!context?.poll) throw new InvalidActor(actor, 'Not authorized poll');
+  return context as PollContext & {
+    address: AddressInstance;
+    poll: PollInstance;
+    thread: ThreadInstance;
+  };
+}
+
+/**
+ * Guards for starting and ending dates to be in a valid date range
+ * @param start_date start date
+ * @param end_date end date
+ * @param startDaysInTheFuture number of days in the future that the start date must be
+ * @param minDaysInRange
+ * @returns { start, end } start and end dates as moment objects
+ */
+export function mustBeValidDateRange(
+  start_date: Date,
+  end_date: Date,
+  startDaysInTheFuture = 1,
+  minDaysInRange = 1,
+) {
+  const today = moment(new Date());
+  const start = moment(start_date);
+  const end = moment(end_date);
+
+  // check if start date is in the future by more than startDaysInTheFuture
+  const firstValidStartDate = today.add(startDaysInTheFuture, 'days');
+  if (start.isBefore(firstValidStartDate))
+    throw new InvalidState(
+      `Start date ${start.format('YYYY-MM-DD')} must be at least ${startDaysInTheFuture} days in the future`,
+      { start_date, end_date },
+    );
+
+  // check that end date is after start date by more than minDaysInRange
+  const rangeInDays = end.diff(start, 'days');
+  if (rangeInDays < minDaysInRange)
+    throw new InvalidState(
+      `${start.format('YYYY-MM-DD')} - ${end.format('YYYY-MM-DD')} must be at least ${minDaysInRange} days apart.`,
+      { start_date, end_date },
+    );
+
+  return { start, end };
+}
+
+/**
+ * Guards for current date to be before date range
+ * @param start_date start date
+ */
+export function mustNotBeStarted(start_date: Date) {
+  const start = moment(start_date);
+  if (start.isBefore(new Date()))
+    throw new InvalidState(
+      `Start date ${start.format('YYYY-MM-DD')} already passed`,
+      { start_date },
+    );
 }

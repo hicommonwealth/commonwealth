@@ -10,7 +10,7 @@ import {
 import { TextFormatType } from 'lexical';
 import React, { useCallback } from 'react';
 import CWIconButton from 'views/components/component_kit/new_designs/CWIconButton';
-import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
+import { EditorTooltip } from 'views/components/MarkdownEditor/toolbars/EditorTooltip';
 import { formatToIconName } from 'views/components/MarkdownEditor/toolbars/formatToIconName';
 import './FormatButton.scss';
 
@@ -39,11 +39,11 @@ export const FormatButton = (props: HeadingButtonProps) => {
   );
 
   return (
-    <CWTooltip
+    <EditorTooltip
       content={`Change to ${formatName}`}
       renderTrigger={(handleInteraction) => (
         <CWIconButton
-          className={clsx({ FormatButtonActive: active })}
+          className={clsx('FormatButton', { FormatButtonActive: active })}
           buttonSize="lg"
           iconName={formatToIconName(format)}
           onMouseEnter={handleInteraction}

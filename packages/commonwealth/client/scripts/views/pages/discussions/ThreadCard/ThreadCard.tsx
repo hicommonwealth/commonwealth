@@ -1,4 +1,4 @@
-import { MIN_CHARS_TO_SHOW_MORE } from '@hicommonwealth/shared';
+import { useShowImage } from 'client/scripts/hooks/useShowImage';
 import clsx from 'clsx';
 import { isDefaultStage, threadStageToLabel } from 'helpers';
 import {
@@ -11,7 +11,10 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
 import useUserStore from 'state/ui/user';
-import MarkdownViewerUsingQuillOrNewEditor from 'views/components/MarkdownViewerWithFallback';
+import {
+  default as MarkdownViewerUsingQuillOrNewEditor,
+  default as MarkdownViewerWithFallback,
+} from 'views/components/MarkdownViewerWithFallback';
 import { ThreadContestTagContainer } from 'views/components/ThreadContestTag';
 import { ViewThreadUpvotesDrawer } from 'views/components/UpvoteDrawer';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
@@ -21,9 +24,10 @@ import { getClasses } from 'views/components/component_kit/helpers';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import useBrowserWindow from '../../../../hooks/useBrowserWindow';
 import { ThreadStage } from '../../../../models/types';
+import app from '../../../../state/index';
 import Permissions from '../../../../utils/Permissions';
 import { CommentCard } from '../CommentCard';
-import { isHot } from '../helpers';
+import { isHot, removeImageFormMarkDown } from '../helpers';
 import { AuthorAndPublishInfo } from './AuthorAndPublishInfo';
 import './ThreadCard.scss';
 import { CardSkeleton } from './ThreadCardSkeleton';
@@ -48,6 +52,18 @@ type CardProps = AdminActionsProps & {
   layoutType?: 'author-first' | 'community-first';
   customStages?: string[];
   editingDisabled?: boolean;
+  expandCommentBtnVisible?: boolean;
+  onImageClick?: () => void;
+  showCommentState?: boolean;
+  removeImagesFromMarkDown?: boolean;
+  hideThreadOptions?: boolean;
+  threadImage?: string | null;
+  isCardView?: boolean;
+  hidePublishDate?: boolean;
+  hideTrendingTag?: boolean;
+  hideSpamTag?: boolean;
+  maxChars?: number;
+  cutoffLines?: number;
 };
 
 export const ThreadCard = ({
@@ -79,11 +95,27 @@ export const ThreadCard = ({
   layoutType = 'author-first',
   customStages,
   editingDisabled,
+  expandCommentBtnVisible,
+  showCommentState = false,
+  onImageClick,
+  removeImagesFromMarkDown = false,
+  hideThreadOptions = false,
+  threadImage,
+  isCardView = false,
+  hidePublishDate = false,
+  hideTrendingTag = false,
+  hideSpamTag = false,
+  maxChars,
+  cutoffLines,
 }: CardProps) => {
   const navigate = useCommonNavigate();
   const user = useUserStore();
   const { isWindowSmallInclusive } = useBrowserWindow({});
   const [isUpvoteDrawerOpen, setIsUpvoteDrawerOpen] = useState<boolean>(false);
+  const [showCommentVisible, setShowCommentVisible] =
+    useState<boolean>(showCommentState);
+  const toggleShowComments = () => setShowCommentVisible((prev) => !prev);
+  const showImage = useShowImage();
 
   useEffect(() => {
     if (localStorage.getItem('dark-mode-state') === 'on') {
@@ -113,7 +145,7 @@ export const ThreadCard = ({
   const linkedSnapshots = filterLinks(thread.links, LinkSource.Snapshot);
   const linkedProposals = filterLinks(thread.links, LinkSource.Proposal);
 
-  const isStageDefault = isDefaultStage(thread.stage, customStages);
+  const isStageDefault = isDefaultStage(app, thread.stage, customStages);
   const isTagsRowVisible =
     (thread.stage && !isStageDefault) || linkedProposals?.length > 0;
   const stageLabel = threadStageToLabel(thread.stage);
@@ -161,11 +193,14 @@ export const ThreadCard = ({
                   thread.updatedAt
                 ).toISOString(),
               })}
-              discord_meta={thread.discord_meta}
+              discord_meta={thread.discord_meta!}
               // @ts-expect-error <StrictNullChecks/>
               archivedAt={thread.archivedAt}
               profile={thread?.profile}
               layoutType={layoutType}
+              hidePublishDate={hidePublishDate}
+              hideSpamTag={hideSpamTag}
+              hideTrendingTag={hideTrendingTag}
             />
             <div className="content-header-icons">
               {thread.pinned && <CWIcon iconName="pin" />}
@@ -196,17 +231,40 @@ export const ThreadCard = ({
                 />
               )}
             </div>
-            <CWText type="b1" className="content-body">
-              <MarkdownViewerUsingQuillOrNewEditor
-                markdown={thread.body}
-                cutoffLines={4}
-                maxChars={MIN_CHARS_TO_SHOW_MORE}
-                customShowMoreButton={
-                  <CWText type="b1" className="show-more-btn">
-                    Show more
-                  </CWText>
-                }
-              />
+            <CWText
+              type="b1"
+              className={clsx('content-body', {
+                'show-image': showImage || threadImage,
+              })}
+            >
+              {!isCardView ? (
+                <MarkdownViewerUsingQuillOrNewEditor
+                  markdown={
+                    !removeImagesFromMarkDown
+                      ? thread.body
+                      : removeImageFormMarkDown(thread.body)
+                  }
+                  maxChars={maxChars}
+                  cutoffLines={cutoffLines}
+                  customShowMoreButton={
+                    <CWText type="b1" className="show-more-btn">
+                      Show more
+                    </CWText>
+                  }
+                  onImageClick={onImageClick}
+                />
+              ) : (
+                <MarkdownViewerWithFallback
+                  markdown={thread.body}
+                  maxChars={maxChars}
+                  cutoffLines={cutoffLines}
+                />
+              )}
+              {threadImage && (
+                <div className="card-image-container">
+                  <img src={threadImage} alt="Thread content" />
+                </div>
+              )}
             </CWText>
           </div>
           {isTagsRowVisible && (
@@ -243,47 +301,59 @@ export const ThreadCard = ({
                 ))}
             </div>
           )}
-          <div
-            className="content-footer"
-            onClick={(e) => {
-              e.stopPropagation();
-            }}
-          >
-            <ThreadOptions
-              totalComments={thread.numberOfComments}
-              shareEndpoint={`${window.location.origin}${threadHref}`}
-              thread={thread}
-              upvoteBtnVisible={!hideReactionButton && isWindowSmallInclusive}
-              commentBtnVisible={!thread.readOnly}
-              canUpdateThread={
-                canUpdateThread &&
-                user.isLoggedIn &&
-                (isThreadAuthor || isThreadCollaborator || hasAdminPermissions)
-              }
-              canReact={canReact}
-              canComment={canComment}
-              onDelete={onDelete}
-              onSpamToggle={onSpamToggle}
-              onLockToggle={onLockToggle}
-              onPinToggle={onPinToggle}
-              onProposalStageChange={onProposalStageChange}
-              onSnapshotProposalFromThread={onSnapshotProposalFromThread}
-              onCollaboratorsEdit={onCollaboratorsEdit}
-              onEditStart={onEditStart}
-              onEditCancel={onEditCancel}
-              onEditConfirm={onEditConfirm}
-              hasPendingEdits={hasPendingEdits}
-              onCommentBtnClick={onCommentBtnClick}
-              disabledActionsTooltipText={disabledActionsTooltipText}
-              setIsUpvoteDrawerOpen={setIsUpvoteDrawerOpen}
-              hideUpvoteDrawerButton={hideUpvotesDrawer}
-              editingDisabled={editingDisabled}
-            />
-          </div>
+          {!hideThreadOptions && (
+            <div
+              className="content-footer"
+              onClick={(e) => {
+                e.stopPropagation();
+              }}
+            >
+              {!isCardView && (
+                <ThreadOptions
+                  totalComments={thread.numberOfComments}
+                  shareEndpoint={`${window.location.origin}${threadHref}`}
+                  thread={thread}
+                  upvoteBtnVisible={
+                    !hideReactionButton && isWindowSmallInclusive
+                  }
+                  commentBtnVisible={!thread.readOnly}
+                  canUpdateThread={
+                    canUpdateThread &&
+                    user.isLoggedIn &&
+                    (isThreadAuthor ||
+                      isThreadCollaborator ||
+                      hasAdminPermissions)
+                  }
+                  canReact={canReact}
+                  canComment={canComment}
+                  onDelete={onDelete}
+                  onSpamToggle={onSpamToggle}
+                  onLockToggle={onLockToggle}
+                  onPinToggle={onPinToggle}
+                  onProposalStageChange={onProposalStageChange}
+                  onSnapshotProposalFromThread={onSnapshotProposalFromThread}
+                  onCollaboratorsEdit={onCollaboratorsEdit}
+                  onEditStart={onEditStart}
+                  onEditCancel={onEditCancel}
+                  onEditConfirm={onEditConfirm}
+                  hasPendingEdits={hasPendingEdits}
+                  onCommentBtnClick={onCommentBtnClick}
+                  disabledActionsTooltipText={disabledActionsTooltipText}
+                  setIsUpvoteDrawerOpen={setIsUpvoteDrawerOpen}
+                  hideUpvoteDrawerButton={hideUpvotesDrawer}
+                  editingDisabled={editingDisabled}
+                  expandCommentBtnVisible={expandCommentBtnVisible}
+                  showCommentVisible={showCommentVisible}
+                  toggleShowComments={toggleShowComments}
+                />
+              )}
+            </div>
+          )}
         </div>
       </Link>
       {!hideRecentComments &&
       maxRecentCommentsToDisplay &&
+      showCommentVisible &&
       // @ts-expect-error <StrictNullChecks/>
       thread?.recentComments?.length > 0 ? (
         <div className={clsx('RecentComments', { hideReactionButton })}>

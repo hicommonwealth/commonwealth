@@ -1,4 +1,4 @@
-import { commonProtocol } from '@hicommonwealth/shared';
+import { commonProtocol } from '@hicommonwealth/evm-protocols';
 import app from 'state';
 import {
   useFetchTokenUsdRateQuery,

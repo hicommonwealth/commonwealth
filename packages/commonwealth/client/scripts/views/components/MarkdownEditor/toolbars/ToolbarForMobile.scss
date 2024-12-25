@@ -1,8 +1,9 @@
-@import '../../../../../styles/shared';
+@import '../../../../styles/shared';
 
 .ToolbarForMobile {
   display: flex;
   flex-grow: 1;
+  column-gap: 4px;
 
   * {
     margin-top: auto;

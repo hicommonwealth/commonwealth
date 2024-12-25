@@ -1,0 +1,18 @@
+@import '../../../styles/shared';
+
+.DesktopStickyInput {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  z-index: 70;
+  background: $white;
+
+  .DesktopStickyInputPending {
+    flex-grow: 1;
+    padding: 12px;
+    box-shadow: 2px 2px 4px $neutral-300;
+    border: 1px solid #ccc;
+    margin-bottom: 16px;
+    border-radius: 8px;
+  }
+}

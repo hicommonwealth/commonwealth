@@ -8,7 +8,7 @@ import {
 import { v4 as uuidv4 } from 'uuid';
 import { config } from '../../config';
 import { models } from '../../database';
-import { TokenInstance } from '../../models/token';
+import { LaunchpadTokenInstance } from '../../models/token';
 
 type TokenIdea = {
   name: string;
@@ -50,7 +50,7 @@ const TOKEN_AI_PROMPTS_CONFIG = {
 const TokenErrors = {
   OpenAINotConfigured: 'OpenAI key not configured',
   OpenAIInitFailed: 'OpenAI initialization failed',
-  RequestFailed: 'failed to generate complete token idea generation',
+  RequestFailed: 'failed to generate complete token idea',
   IdeaPromptVoilatesSecurityPolicy:
     'provided `ideaPrompt` voilates content security policy',
   ImageGenerationFailure: 'failed to generate image for token idea',
@@ -104,14 +104,14 @@ const generateTokenIdea = async function* ({
 
   try {
     // generate a unique token name
-    let foundToken: TokenInstance | boolean | null = true;
+    let foundToken: LaunchpadTokenInstance | boolean | null = true;
     while (foundToken) {
       tokenIdea.name = await chatWithOpenAI(
         TOKEN_AI_PROMPTS_CONFIG.name(ideaPrompt),
         openai,
       );
 
-      foundToken = await models.Token.findOne({
+      foundToken = await models.LaunchpadToken.findOne({
         where: {
           name: tokenIdea.name,
         },
@@ -136,6 +136,7 @@ const generateTokenIdea = async function* ({
     const imageResponse = await openai.images.generate({
       prompt: TOKEN_AI_PROMPTS_CONFIG.image(tokenIdea.name, tokenIdea.symbol),
       size: '256x256',
+      model: 'dall-e-2',
       n: 1,
       response_format: 'url',
     });

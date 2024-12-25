@@ -10,15 +10,12 @@ import SuccessStep from './steps/SuccessStep';
 import useCreateCommunity from './useCreateCommunity';
 import { CreateCommunityStep, getFormSteps } from './utils';
 
-import { useFlag } from 'hooks/useFlag';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import useAppStatus from '../../../hooks/useAppStatus';
 import './CreateCommunity.scss';
 import CommunityInformationStep from './steps/CommunityInformationStep';
 
 const CreateCommunity = () => {
-  const weightedTopicsEnabled = useFlag('weightedTopics');
-
   const {
     createCommunityStep,
     selectedCommunity,
@@ -45,6 +42,10 @@ const CreateCommunity = () => {
 
   const isSuccessStep = createCommunityStep === CreateCommunityStep.Success;
 
+  const goToSuccessStep = () => {
+    onChangeStep(true);
+  };
+
   const getCurrentStep = () => {
     switch (createCommunityStep) {
       case CreateCommunityStep.CommunityTypeSelection:
@@ -70,13 +71,14 @@ const CreateCommunity = () => {
       case CreateCommunityStep.CommunityStake:
         return (
           <CommunityStakeStep
-            goToSuccessStep={() => onChangeStep(true)}
             createdCommunityName={createdCommunityName}
             createdCommunityId={createdCommunityId}
             selectedAddress={selectedAddress}
-            // @ts-expect-error <StrictNullChecks/>
-            chainId={selectedChainId}
-            onlyNamespace={weightedTopicsEnabled}
+            chainId={selectedChainId || ''}
+            onlyNamespace
+            onEnableStakeStepCancel={goToSuccessStep}
+            onSignTransactionsStepReserveNamespaceSuccess={goToSuccessStep}
+            onSignTransactionsStepCancel={goToSuccessStep}
           />
         );
 
@@ -90,11 +92,7 @@ const CreateCommunity = () => {
       <div className="CreateCommunity">
         {!isSuccessStep && (
           <CWFormSteps
-            steps={getFormSteps(
-              createCommunityStep,
-              showCommunityStakeStep,
-              weightedTopicsEnabled,
-            )}
+            steps={getFormSteps(createCommunityStep, showCommunityStakeStep)}
           />
         )}
 

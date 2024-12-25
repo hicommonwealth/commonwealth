@@ -1,6 +1,5 @@
 import { ChainBase, DEFAULT_NAME } from '@hicommonwealth/shared';
 import ghostSvg from 'assets/img/ghost.svg';
-import 'components/user/user.scss';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import app from 'state';
@@ -18,6 +17,7 @@ import { CWText } from '../component_kit/cw_text';
 import { CWButton } from '../component_kit/new_designs/CWButton';
 import { CWModal } from '../component_kit/new_designs/CWModal';
 import { UserSkeleton } from './UserSkeleton';
+import './user.scss';
 import type { UserAttrsWithSkeletonProp } from './user.types';
 
 // TODO: When this is no longer used, this should be removed in favour of fullUser.tsx
@@ -64,7 +64,7 @@ export const User = ({
     );
   }
 
-  const profile = users?.[0] || {};
+  const profile = users?.at(0);
 
   const fullAddress = formatAddressShort(userAddress, userCommunityId);
   const redactedAddress = formatAddressShort(
@@ -124,7 +124,7 @@ export const User = ({
   const userFinal = shouldShowAvatarOnly ? (
     <div className="User avatar-only" key={profile?.address || '-'}>
       <Avatar
-        url={profile?.avatarUrl}
+        url={profile?.avatarUrl ?? ''}
         size={profile?.avatarUrl ? avatarSize : avatarSize - 4}
         address={profile?.userId}
       />
@@ -148,7 +148,7 @@ export const User = ({
           style={{ width: `${avatarSize}px`, height: `${avatarSize}px` }}
         >
           <Avatar
-            url={profile?.avatarUrl}
+            url={profile?.avatarUrl ?? ''}
             size={avatarSize}
             address={profile?.userId}
           />

@@ -4,6 +4,7 @@ import blastImg from 'assets/img/communitySelector/blast.png';
 import cosmosImg from 'assets/img/communitySelector/cosmos.svg';
 import ethereumImg from 'assets/img/communitySelector/ethereum.svg';
 import polygonImg from 'assets/img/communitySelector/polygon.svg';
+import skaleImg from 'assets/img/communitySelector/skale.svg';
 import solanaImg from 'assets/img/communitySelector/solana.svg';
 import { CommunityType } from 'views/components/component_kit/new_designs/CWCommunitySelector';
 
@@ -37,7 +38,19 @@ export const communityTypeOptions = [
       'Tokens built on the ERC20 protocol are fungible, meaning they are interchangeable. ' +
       'Select this community type if you have minted a token on the Ethereum blockchain.',
   },
-
+  {
+    type: CommunityType.Skale,
+    img: skaleImg,
+    chainBase: ChainBase.Ethereum,
+    title: 'Skale',
+    isRecommended: false,
+    isHidden: false,
+    description:
+      // eslint-disable-next-line max-len
+      'SKALE is an on-demand blockchain network with zero gas fees. ' +
+      // eslint-disable-next-line max-len
+      'Allowing quick deployment of interoperable EVM-compatible chains without compromising security or decentralization',
+  },
   {
     type: CommunityType.Cosmos,
     img: cosmosImg,

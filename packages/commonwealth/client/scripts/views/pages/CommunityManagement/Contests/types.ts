@@ -1,6 +1,7 @@
 export enum ContestView {
   List = 'List',
   TypeSelection = 'TypeSelection',
+  NamespaceEnablemenement = 'NamespaceEnablemement',
 }
 
 export enum ContestType {

@@ -16,6 +16,7 @@ export const UploadControl = ({
   imageURL,
   withAIImageGeneration,
   disabled,
+  loading,
   imageBehavior = ImageBehavior.Circle,
   uploadControlClassName,
   canSwitchBetweenProcessedImages,
@@ -53,6 +54,7 @@ export const UploadControl = ({
     imageURL,
     withAIImageGeneration,
     disabled,
+    loading,
     imageBehavior,
     uploadControlClassName,
     canSwitchBetweenProcessedImages,
@@ -201,6 +203,15 @@ export const UploadControl = ({
         <div
           className="generate-image-section"
           onClick={(e) => e.stopPropagation()}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && imagePrompt.trim()) {
+              e.preventDefault();
+              e.stopPropagation();
+              generateImage({ prompt: imagePrompt.trim() }).catch(
+                console.error,
+              );
+            }
+          }}
         >
           <CWIconButton
             onClick={(e) => {
@@ -245,7 +256,7 @@ export const UploadControl = ({
             containerClassName="btn-focus-styles"
             disabled={areActionsDisabled}
             onClick={() => {
-              imagePrompt &&
+              imagePrompt.trim() &&
                 generateImage({ prompt: imagePrompt.trim() }).catch(
                   console.error,
                 );

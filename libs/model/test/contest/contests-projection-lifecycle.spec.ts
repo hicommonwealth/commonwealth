@@ -1,18 +1,26 @@
+import { BigNumber } from '@ethersproject/bignumber';
 import {
   Actor,
   DeepPartial,
-  EventNames,
   dispose,
   handleEvent,
   query,
 } from '@hicommonwealth/core';
-import { models } from '@hicommonwealth/model';
-import { ContestResults } from '@hicommonwealth/schemas';
-import { AbiType, commonProtocol, delay } from '@hicommonwealth/shared';
-import chai, { expect } from 'chai';
+import { commonProtocol } from '@hicommonwealth/evm-protocols';
+import { createEventRegistryChainNodes, models } from '@hicommonwealth/model';
+import { ContestResults, EventNames } from '@hicommonwealth/schemas';
+import { delay } from '@hicommonwealth/shared';
+import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import Sinon from 'sinon';
-import { afterAll, afterEach, beforeAll, describe, test } from 'vitest';
+import {
+  afterAll,
+  afterEach,
+  beforeAll,
+  describe,
+  expect,
+  test,
+  vi,
+} from 'vitest';
 import { z } from 'zod';
 import { Contests } from '../../src/contest/Contests.projection';
 import { GetAllContests } from '../../src/contest/GetAllContests.query';
@@ -20,7 +28,7 @@ import {
   contestHelper,
   contractHelpers,
 } from '../../src/services/commonProtocol';
-import { bootstrap_testing, seed } from '../../src/tester';
+import { seed } from '../../src/tester';
 
 chai.use(chaiAsPromised);
 
@@ -38,9 +46,9 @@ describe('Contests projection lifecycle', () => {
   const voter1 = 'voter-address1';
   const voter2 = 'voter-address2';
   const voter3 = 'voter-address3';
-  const voting_power1 = 1;
-  const voting_power2 = 2;
-  const voting_power3 = 3;
+  const voting_power1 = '1';
+  const voting_power2 = '2';
+  const voting_power3 = '3';
   const created_at = new Date();
   const start_time = created_at;
   const end_time = new Date(start_time.getTime() + 1000);
@@ -55,43 +63,15 @@ describe('Contests projection lifecycle', () => {
   const thread_title = 'thread-in-contest';
   const ticker = commonProtocol.Denominations.ETH;
   const decimals = commonProtocol.WeiDecimals[commonProtocol.Denominations.ETH];
+  const topic_id = 100;
 
-  let getTokenAttributes: Sinon.SinonStub;
-  let getContestScore: Sinon.SinonStub;
-  let getContestStatus: Sinon.SinonStub;
+  const getTokenAttributes = vi.spyOn(contractHelpers, 'getTokenAttributes');
+  const getContestScore = vi.spyOn(contestHelper, 'getContestScore');
+  const getContestStatus = vi.spyOn(contestHelper, 'getContestStatus');
 
   beforeAll(async () => {
-    getTokenAttributes = Sinon.stub(contractHelpers, 'getTokenAttributes');
-    getContestScore = Sinon.stub(contestHelper, 'getContestScore');
-    getContestStatus = Sinon.stub(contestHelper, 'getContestStatus');
-
-    await bootstrap_testing();
-
     try {
-      const recurringContestAbi = await models.ContractAbi.create({
-        id: 700,
-        abi: [] as AbiType,
-        nickname: 'RecurringContest',
-        abi_hash: 'hash1',
-      });
-      const singleContestAbi = await models.ContractAbi.create({
-        id: 701,
-        abi: [] as AbiType,
-        nickname: 'SingleContest',
-        abi_hash: 'hash2',
-      });
-      const [chain] = await seed('ChainNode', {
-        contracts: [
-          {
-            abi_id: recurringContestAbi.id,
-          },
-          {
-            abi_id: singleContestAbi.id,
-          },
-        ],
-        url: 'https://test',
-        private_url: 'https://test',
-      });
+      const chainNodes = await createEventRegistryChainNodes();
       const [user] = await seed(
         'User',
         {
@@ -105,7 +85,7 @@ describe('Contests projection lifecycle', () => {
         {
           id: community_id,
           namespace_address: namespace,
-          chain_node_id: chain!.id,
+          chain_node_id: chainNodes[0]!.id,
           discord_config_id: undefined,
           lifetime_thread_count: 0,
           profile_count: 1,
@@ -116,14 +96,13 @@ describe('Contests projection lifecycle', () => {
             },
           ],
           CommunityStakes: [],
-          topics: [],
+          topics: [{ id: topic_id, name: 'test-topic' }],
           groups: [],
           contest_managers: [
             {
               contest_address: recurring,
               name: recurring,
               interval,
-              topics: [],
               contests: [],
               image_url,
               payout_structure,
@@ -131,12 +110,13 @@ describe('Contests projection lifecycle', () => {
               funding_token_address,
               created_at,
               cancelled,
+              topic_id,
+              is_farcaster_contest: true,
             },
             {
               contest_address: oneoff,
               name: oneoff,
               interval: 0,
-              topics: [],
               contests: [],
               image_url,
               payout_structure,
@@ -144,6 +124,8 @@ describe('Contests projection lifecycle', () => {
               funding_token_address,
               created_at,
               cancelled,
+              topics: [],
+              is_farcaster_contest: false,
             },
           ],
         },
@@ -158,7 +140,7 @@ describe('Contests projection lifecycle', () => {
           title: thread_title,
           address_id: community?.Addresses?.at(0)?.id,
           url: content_url,
-          topic_id: undefined,
+          topic_id: topic_id,
           view_count: 1,
           reaction_count: 1,
           reaction_weights_sum: '1',
@@ -181,7 +163,7 @@ describe('Contests projection lifecycle', () => {
   });
 
   afterEach(async () => {
-    Sinon.restore();
+    vi.restoreAllMocks();
   });
 
   test('should project events on multiple contests', async () => {
@@ -202,9 +184,9 @@ describe('Contests projection lifecycle', () => {
         prize: ((prizePool * BigInt(payout_structure[1])) / 100n).toString(),
       },
     ];
-    getTokenAttributes.resolves({ ticker, decimals });
-    getContestScore.resolves({
-      contestBalance,
+    getTokenAttributes.mockResolvedValue({ ticker, decimals });
+    getContestScore.mockResolvedValue({
+      contestBalance: contestBalance.toString(),
       scores: [
         {
           winningAddress: creator1,
@@ -218,11 +200,11 @@ describe('Contests projection lifecycle', () => {
         },
       ],
     });
-    getContestStatus.resolves({
+    getContestStatus.mockResolvedValue({
       startTime: 1,
       endTime: 100,
       contestInterval: 50,
-      lastContentId: 1,
+      lastContentId: '1',
     });
 
     await handleEvent(Contests(), {
@@ -346,12 +328,15 @@ describe('Contests projection lifecycle', () => {
         payout_structure,
         funding_token_address,
         image_url,
+        description: null,
         interval,
         ticker,
         decimals,
         cancelled,
         created_at,
-        topics: [],
+        topic_id: topic_id,
+        topics: [{ id: topic_id, name: 'test-topic' }],
+        is_farcaster_contest: true,
         contests: [
           {
             contest_id,
@@ -361,6 +346,7 @@ describe('Contests projection lifecycle', () => {
             score: score.map((s) => ({
               ...s,
               tickerPrize: Number(BigInt(s.prize)) / 10 ** decimals,
+              votes: BigNumber.from(s.votes).toString(),
             })),
             // actions: [
             //   {

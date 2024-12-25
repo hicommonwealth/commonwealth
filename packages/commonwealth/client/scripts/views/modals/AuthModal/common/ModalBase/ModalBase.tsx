@@ -27,6 +27,7 @@ import { EVMWalletsSubModal } from './EVMWalletsSubModal';
 import { EmailForm } from './EmailForm';
 import { MobileWalletConfirmationSubModal } from './MobileWalletConfirmationSubModal';
 import './ModalBase.scss';
+import { SMSForm } from './SMSForm';
 
 const MODAL_COPY = {
   [AuthModalType.CreateAccount]: {
@@ -57,6 +58,8 @@ const SSO_OPTIONS: AuthSSOs[] = [
   'apple',
   'github',
   'email',
+  'farcaster',
+  'SMS',
 ] as const;
 
 /**
@@ -97,9 +100,11 @@ const ModalBase = ({
     useState(false);
   const [isAuthenticatingWithEmail, setIsAuthenticatingWithEmail] =
     useState(false);
+  const [isAuthenticatingWithSMS, setIsAuthenticatingWithSMS] = useState(false);
 
   const handleClose = async () => {
     setIsAuthenticatingWithEmail(false);
+    setIsAuthenticatingWithSMS(false);
     setIsEVMWalletsModalVisible(false);
     isWalletConnectEnabled &&
       (await onResetWalletConnect().catch(console.error));
@@ -118,6 +123,7 @@ const ModalBase = ({
     isMobileWalletVerificationStep,
     onResetWalletConnect,
     onEmailLogin,
+    onSMSLogin,
     onWalletSelect,
     onSocialLogin,
     onVerifyMobileWalletSignature,
@@ -238,6 +244,10 @@ const ModalBase = ({
       setIsAuthenticatingWithEmail(true);
       return;
     }
+    if (option === 'SMS') {
+      setIsAuthenticatingWithSMS(true);
+      return;
+    }
 
     // if any wallet option is selected
     if (activeTabIndex === 0) {
@@ -330,11 +340,13 @@ const ModalBase = ({
                   )}
 
                 {/*
-                  If email option is selected don't render SSO's list,
+                  If email or SMS option is selected don't render SSO's list,
                   else render wallets/SSO's list based on activeTabIndex
                 */}
                 {(activeTabIndex === 0 ||
-                  (activeTabIndex === 1 && !isAuthenticatingWithEmail)) &&
+                  (activeTabIndex === 1 &&
+                    !isAuthenticatingWithEmail &&
+                    !isAuthenticatingWithSMS)) &&
                   tabsList[activeTabIndex].options.map(renderAuthButton)}
 
                 {/* If email option is selected from the SSO's list, show email form */}
@@ -344,6 +356,15 @@ const ModalBase = ({
                     onCancel={() => setIsAuthenticatingWithEmail(false)}
                     // eslint-disable-next-line @typescript-eslint/no-misused-promises
                     onSubmit={async ({ email }) => await onEmailLogin(email)}
+                  />
+                )}
+                {/* If SMS option is selected from the SSO's list, show SMS form */}
+                {activeTabIndex === 1 && isAuthenticatingWithSMS && (
+                  <SMSForm
+                    isLoading={isMagicLoading}
+                    onCancel={() => setIsAuthenticatingWithSMS(false)}
+                    // eslint-disable-next-line @typescript-eslint/no-misused-promises
+                    onSubmit={async ({ SMS }) => await onSMSLogin(SMS)}
                   />
                 )}
               </section>
@@ -357,9 +378,13 @@ const ModalBase = ({
               <CWText isCentered>
                 By connecting to Common you agree to our&nbsp;
                 <br />
-                <Link to="/terms">Terms of Service</Link>
+                <Link to="/terms" onClick={() => onClose()}>
+                  Terms of Service
+                </Link>
                 &nbsp;and&nbsp;
-                <Link to="/privacy">Privacy Policy</Link>
+                <Link to="/privacy" onClick={() => onClose()}>
+                  Privacy Policy
+                </Link>
               </CWText>
 
               {copy.showExistingAccountSignInFooter && (

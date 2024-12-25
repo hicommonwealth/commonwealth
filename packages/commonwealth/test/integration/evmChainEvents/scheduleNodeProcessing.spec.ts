@@ -1,79 +1,84 @@
 import { dispose } from '@hicommonwealth/core';
-import { ContractAbiInstance, models, tester } from '@hicommonwealth/model';
-import sinon from 'sinon';
 import {
+  Mock,
+  MockInstance,
   afterAll,
   afterEach,
-  beforeAll,
   beforeEach,
   describe,
   expect,
   test,
+  vi,
 } from 'vitest';
 import { scheduleNodeProcessing } from '../../../server/workers/evmChainEvents/nodeProcessing';
-import { createAdditionalEventSources, createEventSources } from './util';
+import { multipleEventSource, singleEventSource } from '../../util/util';
+
+vi.mock('../../../server/workers/evmChainEvents/getEventSources');
 
 describe('scheduleNodeProcessing', () => {
-  const sandbox = sinon.createSandbox();
-  let processChainStub: sinon.SinonSpy;
-  let clock: sinon.SinonFakeTimers;
-  let singleSourceSuccess = false;
-  let namespaceAbiInstance: ContractAbiInstance;
-  let stakesAbiInstance: ContractAbiInstance;
-
-  beforeAll(async () => {
-    await tester.bootstrap_testing(true);
-  });
+  let processChainStub: Mock;
 
   afterAll(async () => {
     await dispose()();
   });
 
   beforeEach(() => {
-    processChainStub = sandbox.stub();
-    clock = sandbox.useFakeTimers();
+    vi.clearAllMocks();
+    processChainStub = vi.fn();
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
-    sandbox.restore();
+    vi.useRealTimers();
+    vi.resetAllMocks();
   });
 
   test('should not schedule anything if there are no event sources', async () => {
-    await scheduleNodeProcessing(models, 1000, processChainStub);
-    clock.tick(1001);
-    expect(processChainStub.called).to.be.false;
+    const { getEventSources } = await import(
+      '../../../server/workers/evmChainEvents/getEventSources'
+    );
+    (getEventSources as unknown as MockInstance).mockImplementation(() =>
+      Promise.resolve({}),
+    );
+
+    await scheduleNodeProcessing(1000, processChainStub);
+    vi.advanceTimersByTime(1000);
+    expect(processChainStub).not.toHaveBeenCalled();
   });
 
   test('should schedule processing for a single source', async () => {
-    const res = await createEventSources();
-    namespaceAbiInstance = res.namespaceAbiInstance;
-    stakesAbiInstance = res.stakesAbiInstance;
+    // const res = await createContestEventSources();
+    const { getEventSources } = await import(
+      '../../../server/workers/evmChainEvents/getEventSources'
+    );
+    (getEventSources as unknown as MockInstance).mockImplementation(() =>
+      Promise.resolve(singleEventSource),
+    );
 
     const interval = 10_000;
-    await scheduleNodeProcessing(models, interval, processChainStub);
+    await scheduleNodeProcessing(interval, processChainStub);
 
-    expect(processChainStub.calledOnce).to.be.false;
+    expect(processChainStub).not.toHaveBeenCalledOnce();
 
-    clock.tick(1);
-    expect(processChainStub.calledOnce).to.be.true;
-    singleSourceSuccess = true;
+    vi.advanceTimersByTime(1);
+    expect(processChainStub).toHaveBeenCalledOnce();
   });
 
   test('should evenly schedule 2 sources per interval', async () => {
-    expect(singleSourceSuccess).to.be.true;
-    expect(namespaceAbiInstance).toBeTruthy();
-    expect(stakesAbiInstance).toBeTruthy();
-
-    await createAdditionalEventSources(namespaceAbiInstance, stakesAbiInstance);
+    const { getEventSources } = await import(
+      '../../../server/workers/evmChainEvents/getEventSources'
+    );
+    (getEventSources as unknown as MockInstance).mockImplementation(() =>
+      Promise.resolve(multipleEventSource),
+    );
 
     const interval = 10_000;
-    await scheduleNodeProcessing(models, interval, processChainStub);
+    await scheduleNodeProcessing(interval, processChainStub);
 
-    expect(processChainStub.calledOnce).to.be.false;
-    clock.tick(1);
-    expect(processChainStub.calledOnce).to.be.true;
-
-    clock.tick(interval / 2);
-    expect(processChainStub.calledTwice).to.be.true;
+    expect(processChainStub).not.toHaveBeenCalledOnce();
+    vi.advanceTimersByTime(1);
+    expect(processChainStub).toHaveBeenCalledOnce();
+    vi.advanceTimersByTime(interval / 2);
+    expect(processChainStub).toHaveBeenCalledTimes(2);
   });
 });

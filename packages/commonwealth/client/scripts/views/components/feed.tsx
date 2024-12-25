@@ -1,21 +1,18 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Virtuoso } from 'react-virtuoso';
 
-import 'components/feed.scss';
+import './feed.scss';
 
 import { PageNotFound } from '../pages/404';
 import { UserDashboardRowSkeleton } from '../pages/user_dashboard/user_dashboard_row';
 
-import {
-  ActivityComment,
-  ActivityThread,
-  PermissionEnum,
-} from '@hicommonwealth/schemas';
-import { slugify } from '@hicommonwealth/shared';
+import { ActivityThread, PermissionEnum } from '@hicommonwealth/schemas';
+import { MIN_CHARS_TO_SHOW_MORE, slugify } from '@hicommonwealth/shared';
+import { extractImages } from 'client/scripts/helpers/feed';
 import { getThreadActionTooltipText } from 'helpers/threads';
 import useTopicGating from 'hooks/useTopicGating';
 import { getProposalUrlPath } from 'identifiers';
-import { Thread, type RecentComment } from 'models/Thread';
+import { Thread } from 'models/Thread';
 import { ThreadKind, ThreadStage } from 'models/types';
 import { useCommonNavigate } from 'navigation/helpers';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
@@ -27,21 +24,27 @@ import {
 import useUserStore from 'state/ui/user';
 import Permissions from 'utils/Permissions';
 import { z } from 'zod';
+import ThreadPreviewModal from '../modals/ThreadPreviewModal';
 import { ThreadCard } from '../pages/discussions/ThreadCard';
+import { CWModal } from './component_kit/new_designs/CWModal';
 
 const DEFAULT_COUNT = 10;
 
-const FeedThread = ({ thread }: { thread: Thread }) => {
+type FeedThreadProps = {
+  thread: Thread;
+  onClick: () => void;
+};
+
+const FeedThread = ({ thread, onClick }: FeedThreadProps) => {
   const navigate = useCommonNavigate();
   const user = useUserStore();
-
   const { data: domain } = useFetchCustomDomainQuery();
 
   const discussionLink = getProposalUrlPath(
-    thread.slug,
-    `${thread.identifier}-${slugify(thread.title)}`,
+    thread?.slug,
+    `${thread?.identifier}-${slugify(thread.title)}`,
     false,
-    thread.communityId,
+    thread?.communityId,
   );
 
   const { data: community } = useGetCommunityByIdQuery({
@@ -116,6 +119,9 @@ const FeedThread = ({ thread }: { thread: Thread }) => {
       hideReactionButton
       hideUpvotesDrawer
       layoutType="community-first"
+      onImageClick={onClick}
+      maxChars={MIN_CHARS_TO_SHOW_MORE}
+      cutoffLines={4}
     />
   );
 };
@@ -124,8 +130,13 @@ const FeedThread = ({ thread }: { thread: Thread }) => {
 function mapThread(thread: z.infer<typeof ActivityThread>): Thread {
   return new Thread({
     Address: {
+      id: 0,
       address: thread.user_address,
       community_id: thread.community_id,
+      ghost_address: false,
+      is_user_default: false,
+      is_banned: false,
+      role: 'member',
     },
     title: thread.title,
     id: thread.id,
@@ -154,7 +165,7 @@ function mapThread(thread: z.infer<typeof ActivityThread>): Thread {
     archived_at: thread.archived_at ?? '',
     has_poll: thread.has_poll ?? false,
     marked_as_spam_at: thread.marked_as_spam_at ?? '',
-    discord_meta: thread.discord_meta,
+    discord_meta: thread.discord_meta!,
     profile_name: thread.profile_name ?? '',
     avatar_url: thread.profile_avatar ?? '',
     user_id: thread.user_id,
@@ -163,23 +174,25 @@ function mapThread(thread: z.infer<typeof ActivityThread>): Thread {
     last_commented_on: '',
     reaction_weights_sum: '0',
     address_last_active: '',
+    address_id: 0,
+    search: '',
     ContestActions: [],
     numberOfComments: thread.number_of_comments,
     recentComments:
-      thread.recent_comments?.map(
-        (c: z.infer<typeof ActivityComment>) =>
-          ({
-            id: c.id,
-            address: c.address,
-            user_id: c.user_id ?? '',
-            created_at: c.created_at,
-            updated_at: c.updated_at,
-            profile_avatar: c.profile_avatar,
-            profile_name: c.profile_name,
-            text: c.text,
-            content_url: c.content_url || null,
-          }) as RecentComment,
-      ) ?? [],
+      thread.recent_comments?.map((c) => ({
+        id: c.id,
+        address: c.address,
+        user_id: c.user_id ?? 0,
+        created_at: c.created_at,
+        updated_at: c.updated_at,
+        profile_avatar: c.profile_avatar ?? '',
+        profile_name: c.profile_name ?? '',
+        body: c.body,
+        content_url: c.content_url || null,
+        thread_id: 0,
+        address_id: 0,
+        reaction_count: 0,
+      })) ?? [],
   });
 }
 
@@ -191,9 +204,18 @@ type FeedProps = {
 
 // eslint-disable-next-line react/no-multi-comp
 export const Feed = ({ query, customScrollParent }: FeedProps) => {
-  const feed = query();
+  const {
+    data: feed,
+    isLoading,
+    hasNextPage,
+    fetchNextPage,
+    isError,
+  } = query({ limit: 10 });
 
-  if (feed.isLoading) {
+  const [isThreadModalOpen, setIsThreadModalOpen] = useState<boolean>(false);
+  const [selectedThread, setSelectedThread] = useState<Thread | null>(null);
+
+  if (isLoading) {
     return (
       <div className="Feed">
         <Virtuoso
@@ -206,11 +228,14 @@ export const Feed = ({ query, customScrollParent }: FeedProps) => {
     );
   }
 
-  if (feed.isError) {
+  if (isError) {
     return <PageNotFound message="There was an error rendering the feed." />;
   }
+  const allThreads = feed?.pages
+    ? feed.pages.flatMap((page) => page.results || [])
+    : [];
 
-  if (feed.data.length === 0) {
+  if (!allThreads?.length) {
     return (
       <div className="Feed">
         <div className="no-feed-message">
@@ -220,16 +245,50 @@ export const Feed = ({ query, customScrollParent }: FeedProps) => {
     );
   }
 
+  const openModal = (thread: z.infer<typeof ActivityThread>) => {
+    setSelectedThread(mapThread(thread));
+    setIsThreadModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsThreadModalOpen(false);
+    setSelectedThread(null);
+  };
+
   return (
     <div className="Feed">
       <Virtuoso
+        overscan={50}
         customScrollParent={customScrollParent}
-        totalCount={feed.data.length || DEFAULT_COUNT}
+        totalCount={allThreads?.length || DEFAULT_COUNT}
+        data={allThreads || []}
         style={{ height: '100%' }}
-        itemContent={(i) => (
-          <FeedThread key={i} thread={mapThread(feed.data[i])} />
+        itemContent={(i, thread) => (
+          <FeedThread
+            key={i}
+            thread={mapThread(thread)}
+            onClick={() => openModal(thread)}
+          />
         )}
+        endReached={() => {
+          hasNextPage && fetchNextPage().catch(console.error);
+        }}
       />
+      {selectedThread && (
+        <CWModal
+          size="large"
+          content={
+            <ThreadPreviewModal
+              isThreadModalOpen={isThreadModalOpen}
+              onClose={() => setIsThreadModalOpen(false)}
+              images={extractImages(selectedThread?.body)}
+              thread={selectedThread}
+            />
+          }
+          onClose={closeModal}
+          open={isThreadModalOpen}
+        />
+      )}
     </div>
   );
 };

@@ -4,7 +4,7 @@ import useBrowserWindow from 'hooks/useBrowserWindow';
 import moment from 'moment/moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useRef, useState } from 'react';
-import { matchRoutes, useLocation } from 'react-router-dom';
+import { matchRoutes, useLocation, useSearchParams } from 'react-router-dom';
 import app from 'state';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { useFetchTopicsQuery } from 'state/api/topics';
@@ -25,9 +25,21 @@ import {
   ThreadFeaturedFilterTypes,
   ThreadStage,
   ThreadTimelineFilterTypes,
+  ThreadViewFilterTypes,
 } from '../../../../models/types';
 import './HeaderWithFilters.scss';
 
+type TabsProps = {
+  label: string;
+  value: string;
+};
+
+type ViewType = {
+  id: number;
+  value: string;
+  label: string;
+  iconLeft: string;
+};
 type HeaderWithFiltersProps = {
   stage: string;
   topic: string;
@@ -40,6 +52,9 @@ type HeaderWithFiltersProps = {
   onIncludeArchivedThreads: (includeArchived: boolean) => any;
   isOnArchivePage?: boolean;
   activeContests: Contest[];
+  views?: TabsProps[];
+  selectedView?: string;
+  setSelectedView?: (tabValue: string) => void;
 };
 
 export const HeaderWithFilters = ({
@@ -54,6 +69,9 @@ export const HeaderWithFilters = ({
   onIncludeArchivedThreads,
   isOnArchivePage,
   activeContests,
+  views,
+  selectedView,
+  setSelectedView,
 }: HeaderWithFiltersProps) => {
   const navigate = useCommonNavigate();
   const location = useLocation();
@@ -74,6 +92,12 @@ export const HeaderWithFilters = ({
   });
 
   const user = useUserStore();
+
+  const [searchParams] = useSearchParams();
+  const contestAddress = searchParams.get('contest');
+
+  const createButtonText =
+    activeContests?.length || contestAddress ? 'Create' : 'Create thread';
 
   const onFilterResize = () => {
     if (filterRowRef.current) {
@@ -118,7 +142,7 @@ export const HeaderWithFilters = ({
 
   const selectedTopic = (topics || []).find((t) => topic && topic === t.name);
 
-  const contestNameOptions = (contestsData || []).map((contest) => ({
+  const contestNameOptions = (contestsData.all || []).map((contest) => ({
     label: contest?.name,
     value: contest?.contest_address,
     id: contest?.contest_address,
@@ -199,13 +223,44 @@ export const HeaderWithFilters = ({
   return (
     <div className="HeaderWithFilters">
       <div className="header-row">
-        <CWText type="h3" fontWeight="semiBold" className="header-text">
-          {isUndefined(topic)
-            ? isOnArchivePage
-              ? 'Archived'
-              : 'All Discussions'
-            : topic}
-        </CWText>
+        {!isOnArchivePage && views && views.length ? (
+          <div className="filter-section">
+            <Select
+              selected={selectedView || ThreadViewFilterTypes.All}
+              onSelect={(item) => {
+                setSelectedView?.((item as ViewType).value);
+              }}
+              options={[
+                {
+                  id: 1,
+                  value: ThreadViewFilterTypes.All,
+                  label: 'All',
+                  iconLeft: 'viewAll',
+                },
+                {
+                  id: 2,
+                  value: ThreadViewFilterTypes.Overview,
+                  label: 'Overview',
+                  iconLeft: 'viewOverView',
+                },
+                {
+                  id: 3,
+                  value: ThreadViewFilterTypes.CardView,
+                  label: 'CardView',
+                  iconLeft: 'kanban',
+                },
+              ]}
+            />
+          </div>
+        ) : (
+          <CWText type="h3" fontWeight="semiBold" className="header-text">
+            {isUndefined(topic)
+              ? isOnArchivePage
+                ? 'Archived'
+                : 'All Discussions'
+              : topic}
+          </CWText>
+        )}
         <div className="count-and-button">
           <CWText
             type="caption"
@@ -218,7 +273,7 @@ export const HeaderWithFilters = ({
             <CWButton
               buttonType="primary"
               buttonHeight="sm"
-              label="Create thread"
+              label={createButtonText}
               iconLeft="plus"
               onClick={() => {
                 navigate(
@@ -232,275 +287,284 @@ export const HeaderWithFilters = ({
           )}
         </div>
       </div>
-
-      {selectedTopic?.description && (
-        <MarkdownViewerUsingQuillOrNewEditor
-          markdown={selectedTopic.description}
-          className="subheader-text"
-        />
-      )}
-
-      {isOnArchivePage && (
-        <CWText className="subheader-text">
-          This section is for all archived posts. Archived posts will always be
-          visible here and can be linked to new thread posts, but they can’t be
-          upvoted or receive new comments.
-        </CWText>
-      )}
-
-      {app.chain?.meta && (
-        // @ts-expect-error <StrictNullChecks/>
-        <div className="filter-row" ref={filterRowRef}>
-          <div className="filter-section">
-            <p className="filter-label">Sort</p>
-            <Select
-              selected={featuredFilter || ThreadFeaturedFilterTypes.Newest}
-              onSelect={(item: any) => {
-                onFilterSelect({
-                  filterKey: 'featured',
-                  filterVal: item.value as ThreadFeaturedFilterTypes,
-                });
-              }}
-              options={[
-                {
-                  id: 1,
-                  value: ThreadFeaturedFilterTypes.Newest,
-                  label: 'Newest',
-                  iconLeft: 'sparkle',
-                },
-                {
-                  id: 2,
-                  value: ThreadFeaturedFilterTypes.Oldest,
-                  label: 'Oldest',
-                  iconLeft: 'clockCounterClockwise',
-                },
-                {
-                  id: 3,
-                  value: ThreadFeaturedFilterTypes.MostLikes,
-                  label: 'Upvotes',
-                  iconLeft: 'upvote',
-                },
-                {
-                  id: 4,
-                  value: ThreadFeaturedFilterTypes.MostComments,
-                  label: 'Comments',
-                  iconLeft: 'chatDots',
-                },
-                {
-                  id: 5,
-                  value: ThreadFeaturedFilterTypes.LatestActivity,
-                  label: 'Latest Activity',
-                  iconLeft: 'bellRinging',
-                },
-              ]}
+      {views && views[1].value !== selectedView ? (
+        <>
+          {selectedTopic?.description && (
+            <MarkdownViewerUsingQuillOrNewEditor
+              markdown={selectedTopic.description}
+              className="subheader-text"
             />
-          </div>
+          )}
 
-          <div className="filter-section filter-section-top">
-            <p className="filter-label">Filter</p>
-            <div className="filter-section filter-section-right">
-              {(topics || []).length > 0 && (
+          {isOnArchivePage && (
+            <CWText className="subheader-text">
+              This section is for all archived posts. Archived posts will always
+              be visible here and can be linked to new thread posts, but they
+              can’t be upvoted or receive new comments.
+            </CWText>
+          )}
+
+          {app.chain?.meta && (
+            // @ts-expect-error <StrictNullChecks/>
+            <div className="filter-row" ref={filterRowRef}>
+              <div className="filter-section">
+                {!isWindowExtraSmall && <p className="filter-label">Sort</p>}
                 <Select
-                  selected={
-                    matchesContestFilterRoute ||
-                    matchesDiscussionsTopicRoute?.[0]?.params?.topic ||
-                    'All Topics'
-                  }
-                  onSelect={(item) => {
-                    if (typeof item === 'string') {
-                      // All topics
-                      onFilterSelect({ pickedTopic: '' });
-                      return;
-                    }
-
-                    if (item.type === 'contest') {
-                      onFilterSelect({
-                        filterKey: 'contest',
-                        filterVal: item.value,
-                        pickedTopic: '',
-                      });
-                      return;
-                    }
-
-                    onFilterSelect({ pickedTopic: item.value });
+                  selected={featuredFilter || ThreadFeaturedFilterTypes.Newest}
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  onSelect={(item: any) => {
+                    onFilterSelect({
+                      filterKey: 'featured',
+                      filterVal: item.value as ThreadFeaturedFilterTypes,
+                    });
                   }}
                   options={[
-                    ...(isContestAvailable
-                      ? [{ type: 'header', label: 'Topics' }]
-                      : []),
-                    {
-                      id: 0,
-                      label: 'All Topics',
-                      value: 'All Topics',
-                    },
-                    ...[...featuredTopics, ...otherTopics].map((t) => ({
-                      id: t.id,
-                      value: t.name,
-                      label: t.name,
-                    })),
-                    ...(isContestAvailable
-                      ? [
-                          { type: 'header-divider', label: 'Contests' },
-                          ...contestNameOptions,
-                        ]
-                      : []),
-                  ]}
-                  dropdownPosition={rightFiltersDropdownPosition}
-                  canEditOption={Permissions.isCommunityAdmin()}
-                  onOptionEdit={(item: any) =>
-                    setTopicSelectedToEdit(
-                      [...featuredTopics, ...otherTopics].find(
-                        (x) => x.id === item.id,
-                      ),
-                    )
-                  }
-                />
-              )}
-              {matchesContestFilterRoute ? (
-                <Select
-                  selected={urlParams.status || 'all'}
-                  onSelect={(item: any) =>
-                    onFilterSelect({
-                      filterKey: 'status',
-                      filterVal: item.value === 'all' ? '' : item.value,
-                    })
-                  }
-                  options={[
-                    {
-                      id: 0,
-                      label: 'Active',
-                      value: 'active',
-                    },
                     {
                       id: 1,
-                      label: 'Past winners',
-                      value: 'pastWinners',
+                      value: ThreadFeaturedFilterTypes.Newest,
+                      label: 'Newest',
+                      iconLeft: 'sparkle',
                     },
                     {
                       id: 2,
-                      label: 'All Statuses',
-                      value: 'all',
+                      value: ThreadFeaturedFilterTypes.Oldest,
+                      label: 'Oldest',
+                      iconLeft: 'clockCounterClockwise',
+                    },
+                    {
+                      id: 3,
+                      value: ThreadFeaturedFilterTypes.MostLikes,
+                      label: 'Upvotes',
+                      iconLeft: 'upvote',
+                    },
+                    {
+                      id: 4,
+                      value: ThreadFeaturedFilterTypes.MostComments,
+                      label: 'Comments',
+                      iconLeft: 'chatDots',
+                    },
+                    {
+                      id: 5,
+                      value: ThreadFeaturedFilterTypes.LatestActivity,
+                      label: 'Latest Activity',
+                      iconLeft: 'bellRinging',
                     },
                   ]}
-                  dropdownPosition={rightFiltersDropdownPosition}
                 />
-              ) : (
-                stages_enabled && (
-                  <Select
-                    selected={selectedStage || 'All Stages'}
-                    onSelect={(item) =>
-                      onFilterSelect({
-                        filterKey: 'stage',
-                        filterVal:
-                          typeof item !== 'string'
-                            ? item.value === 'All Stages'
-                              ? ''
-                              : item.value
-                            : '',
-                      })
-                    }
-                    options={[
-                      {
-                        id: 0,
-                        label: 'All Stages',
-                        value: 'All Stages',
-                      },
-                      ...stages.map((s) => ({
-                        id: s,
-                        value: s,
-                        label: `${threadStageToLabel(s)} ${
-                          s === ThreadStage.Voting
-                            ? community?.numVotingThreads || 0
-                            : ''
-                        }`,
-                      })),
-                    ]}
-                    dropdownPosition={rightFiltersDropdownPosition}
-                  />
-                )
-              )}
-              <Select
-                selected={dateRange || ThreadTimelineFilterTypes.AllTime}
-                onSelect={(item: any) => {
-                  onFilterSelect({
-                    filterKey: 'dateRange',
-                    filterVal: item.value as ThreadTimelineFilterTypes,
-                  });
-                }}
-                options={[
-                  {
-                    id: 1,
-                    value: ThreadTimelineFilterTypes.AllTime,
-                    label: 'All Time',
-                  },
-                  {
-                    id: 2,
-                    value: ThreadTimelineFilterTypes.ThisMonth,
-                    label: 'Month',
-                  },
-                  {
-                    id: 3,
-                    value: ThreadTimelineFilterTypes.ThisWeek,
-                    label: 'Week',
-                  },
-                ]}
-                dropdownPosition={rightFiltersDropdownPosition}
-              />
+              </div>
+
+              <div className="filter-section filter-section-top">
+                {!isWindowExtraSmall && <p className="filter-label">Filter</p>}
+                <div className="filter-section filter-section-right">
+                  {(topics || []).length > 0 && (
+                    <Select
+                      selected={
+                        matchesContestFilterRoute ||
+                        matchesDiscussionsTopicRoute?.[0]?.params?.topic ||
+                        'All Topics'
+                      }
+                      onSelect={(item) => {
+                        if (typeof item === 'string') {
+                          // All topics
+                          onFilterSelect({ pickedTopic: '' });
+                          return;
+                        }
+
+                        if (item.type === 'contest') {
+                          onFilterSelect({
+                            filterKey: 'contest',
+                            filterVal: item.value,
+                            pickedTopic: '',
+                          });
+                          return;
+                        }
+
+                        onFilterSelect({ pickedTopic: item.value });
+                      }}
+                      options={[
+                        ...(isContestAvailable
+                          ? [{ type: 'header', label: 'Topics' }]
+                          : []),
+                        {
+                          id: 0,
+                          label: 'All Topics',
+                          value: 'All Topics',
+                        },
+                        ...[...featuredTopics, ...otherTopics].map((t) => ({
+                          id: t.id,
+                          value: t.name,
+                          label: t.name,
+                        })),
+                        ...(isContestAvailable
+                          ? [
+                              { type: 'header-divider', label: 'Contests' },
+                              ...contestNameOptions,
+                            ]
+                          : []),
+                      ]}
+                      dropdownPosition={rightFiltersDropdownPosition}
+                      canEditOption={Permissions.isCommunityAdmin()}
+                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                      onOptionEdit={(item: any) =>
+                        setTopicSelectedToEdit(
+                          [...featuredTopics, ...otherTopics].find(
+                            (x) => x.id === item.id,
+                          ),
+                        )
+                      }
+                    />
+                  )}
+                  {!isWindowExtraSmall && matchesContestFilterRoute ? (
+                    <Select
+                      selected={urlParams.status || 'all'}
+                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                      onSelect={(item: any) =>
+                        onFilterSelect({
+                          filterKey: 'status',
+                          filterVal: item.value === 'all' ? '' : item.value,
+                        })
+                      }
+                      options={[
+                        {
+                          id: 0,
+                          label: 'Active',
+                          value: 'active',
+                        },
+                        {
+                          id: 1,
+                          label: 'Past winners',
+                          value: 'pastWinners',
+                        },
+                        {
+                          id: 2,
+                          label: 'All Statuses',
+                          value: 'all',
+                        },
+                      ]}
+                      dropdownPosition={rightFiltersDropdownPosition}
+                    />
+                  ) : (
+                    stages_enabled &&
+                    !isWindowExtraSmall && (
+                      <Select
+                        selected={selectedStage || 'All Stages'}
+                        onSelect={(item) =>
+                          onFilterSelect({
+                            filterKey: 'stage',
+                            filterVal:
+                              typeof item !== 'string'
+                                ? item.value === 'All Stages'
+                                  ? ''
+                                  : item.value
+                                : '',
+                          })
+                        }
+                        options={[
+                          {
+                            id: 0,
+                            label: 'All Stages',
+                            value: 'All Stages',
+                          },
+                          ...stages.map((s) => ({
+                            id: s,
+                            value: s,
+                            label: `${threadStageToLabel(s)} ${
+                              s === ThreadStage.Voting
+                                ? community?.numVotingThreads || 0
+                                : ''
+                            }`,
+                          })),
+                        ]}
+                        dropdownPosition={rightFiltersDropdownPosition}
+                      />
+                    )
+                  )}
+                  {!isWindowExtraSmall && (
+                    <Select
+                      selected={dateRange || ThreadTimelineFilterTypes.AllTime}
+                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                      onSelect={(item: any) => {
+                        onFilterSelect({
+                          filterKey: 'dateRange',
+                          filterVal: item.value as ThreadTimelineFilterTypes,
+                        });
+                      }}
+                      options={[
+                        {
+                          id: 1,
+                          value: ThreadTimelineFilterTypes.AllTime,
+                          label: 'All Time',
+                        },
+                        {
+                          id: 2,
+                          value: ThreadTimelineFilterTypes.ThisMonth,
+                          label: 'Month',
+                        },
+                        {
+                          id: 3,
+                          value: ThreadTimelineFilterTypes.ThisWeek,
+                          label: 'Week',
+                        },
+                      ]}
+                      dropdownPosition={rightFiltersDropdownPosition}
+                    />
+                  )}
+                </div>
+              </div>
             </div>
+          )}
+
+          <div className="checkboxes">
+            <CWCheckbox
+              checked={isIncludingSpamThreads}
+              label="Include posts flagged as spam"
+              onChange={(e) => {
+                // @ts-expect-error <StrictNullChecks/>
+                onIncludeSpamThreads(e.target.checked);
+              }}
+            />
+
+            {!isOnArchivePage && (
+              <CWCheckbox
+                checked={isIncludingArchivedThreads}
+                label="Include archived posts"
+                onChange={(e) => {
+                  // @ts-expect-error <StrictNullChecks/>
+                  onIncludeArchivedThreads(e.target.checked);
+                }}
+              />
+            )}
           </div>
-        </div>
-      )}
 
-      <div className="checkboxes">
-        <CWCheckbox
-          checked={isIncludingSpamThreads}
-          label="Include posts flagged as spam"
-          onChange={(e) => {
-            // @ts-expect-error <StrictNullChecks/>
-            onIncludeSpamThreads(e.target.checked);
-          }}
-        />
-
-        {!isOnArchivePage && (
-          <CWCheckbox
-            checked={isIncludingArchivedThreads}
-            label="Include archived posts"
-            onChange={(e) => {
+          {(activeContests || []).map((contest) => {
+            const { end_time } =
               // @ts-expect-error <StrictNullChecks/>
-              onIncludeArchivedThreads(e.target.checked);
-            }}
-          />
-        )}
-      </div>
+              contest?.contests[0] || {};
 
-      {(activeContests || []).map((contest) => {
-        const { end_time } =
-          // @ts-expect-error <StrictNullChecks/>
-          contest?.contests[0] || {};
-
-        return (
-          <ContestCard
-            key={contest.contest_address}
-            isAdmin={false}
-            // @ts-expect-error <StrictNullChecks/>
-            address={contest.contest_address}
-            // @ts-expect-error <StrictNullChecks/>
-            name={contest.name}
-            imageUrl={contest.image_url}
-            // @ts-expect-error <StrictNullChecks/>
-            topics={contest.topics}
-            decimals={contest.decimals}
-            ticker={contest.ticker}
-            finishDate={end_time ? moment(end_time).toISOString() : ''}
-            isCancelled={contest.cancelled}
-            isRecurring={!contest.funding_token_address}
-            isHorizontal
-            showShareButton={false}
-            payoutStructure={contest.payout_structure}
-          />
-        );
-      })}
-
+            return (
+              <ContestCard
+                key={contest.contest_address}
+                isAdmin={false}
+                // @ts-expect-error <StrictNullChecks/>
+                address={contest.contest_address}
+                // @ts-expect-error <StrictNullChecks/>
+                name={contest.name}
+                imageUrl={contest.image_url}
+                // @ts-expect-error <StrictNullChecks/>
+                topics={contest.topics}
+                decimals={contest.decimals}
+                ticker={contest.ticker}
+                finishDate={end_time ? moment(end_time).toISOString() : ''}
+                isCancelled={contest.cancelled}
+                isRecurring={!contest.funding_token_address}
+                isHorizontal
+                showShareButton={false}
+                payoutStructure={contest.payout_structure}
+              />
+            );
+          })}
+        </>
+      ) : null}
       <CWModal
         size="medium"
         content={

@@ -1,5 +1,4 @@
 import { ExtendedCommunity } from '@hicommonwealth/schemas';
-import 'Layout.scss';
 import { deinitChainOrCommunity, loadCommunityChainInfo } from 'helpers/chain';
 import withRouter, { useCommonNavigate } from 'navigation/helpers';
 import React, { ReactNode, Suspense, useEffect, useState } from 'react';
@@ -12,6 +11,7 @@ import {
 } from 'state/api/configuration';
 import useErrorStore from 'state/ui/error';
 import useUserStore from 'state/ui/user';
+import { MobileScrollBuffer } from 'views/components/MobileNavigation/MobileScrollBuffer';
 import { PageNotFound } from 'views/pages/404';
 import ErrorPage from 'views/pages/error';
 import { z } from 'zod';
@@ -19,6 +19,7 @@ import useAppStatus from '../hooks/useAppStatus';
 import useNecessaryEffect from '../hooks/useNecessaryEffect';
 import { useGetCommunityByIdQuery } from '../state/api/communities';
 import { useUpdateUserActiveCommunityMutation } from '../state/api/user';
+import './Layout.scss';
 import SubLayout from './Sublayout';
 import MetaTags from './components/MetaTags';
 import { CWEmptyState } from './components/component_kit/cw_empty_state';
@@ -68,8 +69,8 @@ const LayoutComponent = ({
     }
   }, [isAddedToHomeScreen, user.isOnPWA, user]);
 
-  // If community id was updated ex: `commonwealth.im/{community-id}/**/*`
-  // redirect to new community id ex: `commonwealth.im/{new-community-id}/**/*`
+  // If community id was updated ex: `${PRODUCTION_DOMAIN}/{community-id}/**/*`
+  // redirect to new community id ex: `${PRODUCTION_DOMAIN}/{new-community-id}/**/*`
   useNecessaryEffect(() => {
     // @ts-expect-error <StrictNullChecks/>
     const redirectTo = configurationData?.redirects?.[providedCommunityScope];
@@ -197,6 +198,8 @@ const LayoutComponent = ({
         ) : (
           <SubLayout isInsideCommunity={type === 'community'}>
             {childToRender()}
+
+            <MobileScrollBuffer />
           </SubLayout>
         )}
       </div>

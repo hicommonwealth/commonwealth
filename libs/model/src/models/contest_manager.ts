@@ -1,9 +1,15 @@
 import { ContestManager } from '@hicommonwealth/schemas';
 import Sequelize from 'sequelize';
 import { z } from 'zod';
+import { CommunityAttributes } from './community';
 import type { ModelInstance } from './types';
 
-type ContestManager = ModelInstance<z.infer<typeof ContestManager>>;
+export type ContestManagerAttributes = z.infer<typeof ContestManager> & {
+  // associations
+  Community?: CommunityAttributes;
+};
+
+type ContestManager = ModelInstance<ContestManagerAttributes>;
 
 export default (
   sequelize: Sequelize.Sequelize,
@@ -22,6 +28,10 @@ export default (
       name: {
         type: Sequelize.STRING,
         allowNull: false,
+      },
+      description: {
+        type: Sequelize.STRING,
+        allowNull: true,
       },
       image_url: {
         type: Sequelize.STRING,
@@ -46,6 +56,10 @@ export default (
         allowNull: true,
       },
       neynar_webhook_id: { type: Sequelize.STRING, allowNull: true },
+      neynar_webhook_secret: { type: Sequelize.STRING, allowNull: true },
+      topic_id: { type: Sequelize.INTEGER, allowNull: true },
+      is_farcaster_contest: { type: Sequelize.BOOLEAN, allowNull: false },
+      vote_weight_multiplier: { type: Sequelize.FLOAT, allowNull: true },
     },
     {
       tableName: 'ContestManagers',

@@ -17,6 +17,7 @@ export enum CommunityType {
   Cosmos = 'cosmos',
   Polygon = 'polygon',
   Solana = 'solana',
+  Skale = 'skale',
 }
 
 export type SelectedCommunity = {

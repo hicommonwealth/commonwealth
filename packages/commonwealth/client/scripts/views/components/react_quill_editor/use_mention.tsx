@@ -1,14 +1,13 @@
 import moment from 'moment';
 import { RangeStatic } from 'quill';
 import QuillMention from 'quill-mention';
-import { MutableRefObject, useCallback, useMemo } from 'react';
+import { MutableRefObject, useCallback, useMemo, useRef } from 'react';
 import ReactQuill, { Quill } from 'react-quill';
-import { SERVER_URL } from 'state/api/config';
 import MinimumProfile from '../../../models/MinimumProfile';
 
-import axios from 'axios';
 import _ from 'lodash';
 import app from 'state';
+import { useSearchProfilesQuery } from 'state/api/profiles';
 import {
   APIOrderBy,
   APIOrderDirection,
@@ -26,6 +25,17 @@ export const useMention = ({
   editorRef,
   lastSelectionRef,
 }: UseMentionProps) => {
+  const mentionTerm = useRef('');
+
+  const { refetch } = useSearchProfilesQuery({
+    searchTerm: mentionTerm.current,
+    communityId: app.activeChainId() || '',
+    limit: 50,
+    enabled: mentionTerm.current.length >= 3 && !!app.activeChainId(),
+    orderBy: APIOrderBy.LastActive,
+    orderDirection: APIOrderDirection.Desc,
+  });
+
   const selectMention = useCallback(
     (item: QuillMention) => {
       const editor = editorRef.current?.getEditor();
@@ -92,21 +102,12 @@ export const useMention = ({
               },
             ];
           } else {
-            // try to get results from cache
-            const { data } = await axios.get(`${SERVER_URL}/profiles`, {
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              params: {
-                chain: app.activeChainId(),
-                search: searchTerm,
-                limit: '50',
-                page: '1',
-                order_by: APIOrderBy.LastActive,
-                order_direction: APIOrderDirection.Desc,
-              },
-            });
-            const profiles = data?.result?.results;
+            mentionTerm.current = searchTerm;
+
+            const { data } = await refetch();
+
+            const profiles = data?.pages?.[0]?.results || [];
+            // @ts-expect-error <StrictNullChecks/>
             formattedMatches = profiles.map((p: any) => {
               const userId = p.user_id;
               const profileAddress = p.addresses[0]?.address;

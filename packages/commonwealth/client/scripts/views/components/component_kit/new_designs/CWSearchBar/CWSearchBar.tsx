@@ -84,11 +84,15 @@ export const CWSearchBar: FC<SearchBarProps> = ({
 
   const resetSearchBar = () => setSearchTerm('');
 
-  const handleOnInput = (e: ChangeEvent<HTMLInputElement>) =>
+  const handleOnInput = (e: ChangeEvent<HTMLInputElement>) => {
+    e.stopPropagation();
     setSearchTerm(e.target.value);
+  };
 
   const handleOnKeyUp = (e) => {
+    e.stopPropagation();
     if (e.key === 'Enter') {
+      e.preventDefault();
       handleGoToSearchPage();
 
       if (size === 'small') {
@@ -112,6 +116,7 @@ export const CWSearchBar: FC<SearchBarProps> = ({
   };
 
   const handleOnKeyDown = (e: any) => {
+    e.stopPropagation();
     if (e.key === 'Backspace' && searchTerm.length === 0) {
       setShowTag(false);
     }

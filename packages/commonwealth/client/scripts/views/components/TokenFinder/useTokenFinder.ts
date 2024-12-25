@@ -1,3 +1,5 @@
+import { ZERO_ADDRESS } from '@hicommonwealth/shared';
+import { GetTokenMetadataResponse } from 'client/scripts/state/api/tokens/getTokenMetadata';
 import { useState } from 'react';
 import { useTokenMetadataQuery } from 'state/api/tokens';
 import { useDebounce } from 'usehooks-ts';
@@ -20,7 +22,21 @@ const useTokenFinder = ({
       nodeEthChainId,
     });
 
-  const getTokenError = () => {
+  const nativeTokenMetadata: GetTokenMetadataResponse = {
+    decimals: 18,
+    logo: '',
+    name: 'ETH', // TODO: get native eth name/symbol
+    symbol: 'ETH',
+  };
+
+  const getTokenError = (isOneOff?: boolean) => {
+    if (tokenValue === ZERO_ADDRESS) {
+      return;
+    }
+    if (isOneOff && !tokenValue) {
+      return 'You must enter a token address';
+    }
+
     if (debouncedTokenValue && !tokenMetadataLoading && !tokenMetadata?.name) {
       return 'You must enter a valid token address';
     }
@@ -30,7 +46,8 @@ const useTokenFinder = ({
     tokenValue,
     setTokenValue,
     debouncedTokenValue,
-    tokenMetadata,
+    tokenMetadata:
+      tokenValue === ZERO_ADDRESS ? nativeTokenMetadata : tokenMetadata,
     tokenMetadataLoading,
     getTokenError,
   };

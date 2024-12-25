@@ -43,7 +43,7 @@ const EditProfile = () => {
   const user = useUserStore();
 
   const [profile, setProfile] = useState<NewProfile>();
-  const [avatarUrl, setAvatarUrl] = useState();
+  const [avatarUrl, setAvatarUrl] = useState<string>();
   const [addresses, setAddresses] = useState<AddressInfo[]>();
   const [isUploadingProfileImage, setIsUploadingProfileImage] = useState(false);
   const [isUploadingCoverImage, setIsUploadingCoverImage] = useState(false);
@@ -84,7 +84,6 @@ const EditProfile = () => {
     refetch,
   } = useFetchProfileByIdQuery({
     apiCallEnabled: user.isLoggedIn,
-    shouldFetchSelfProfile: true,
   });
 
   useEffect(() => {
@@ -280,13 +279,9 @@ const EditProfile = () => {
                     uploadStartedCallback={() =>
                       setIsUploadingProfileImage(true)
                     }
-                    uploadCompleteCallback={(files) => {
+                    uploadCompleteCallback={(uploadUrl: string) => {
                       setIsUploadingProfileImage(false);
-                      files.forEach((f) => {
-                        if (!f.uploadURL) return;
-                        const url = f.uploadURL.replace(/\?.*/, '').trim();
-                        setAvatarUrl(url);
-                      });
+                      setAvatarUrl(uploadUrl);
                     }}
                   />
                 </div>
@@ -358,8 +353,8 @@ const EditProfile = () => {
               />
             </ProfileSection>
             <ProfileSection
-              title="Linked addresses"
-              description="Manage your addresses."
+              title="Manage your addresses"
+              description="Connect or disconnect your addresses and manage your community memberships here."
             >
               <LinkedAddresses
                 // @ts-expect-error <StrictNullChecks/>

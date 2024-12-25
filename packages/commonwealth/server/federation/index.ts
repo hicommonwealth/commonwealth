@@ -4,15 +4,17 @@ import { parse } from '@ipld/dag-json';
 import { config } from '../config';
 
 const log = logger(import.meta);
-export const canvas = await startCanvasNode(config);
+export const { app: canvas, libp2p } = await startCanvasNode(config);
 
-log.info(
-  'canvas: started libp2p with multiaddrs: ' +
-    canvas.libp2p
-      .getMultiaddrs()
-      .map((m) => m.toString())
-      .join(', '),
-);
+if (libp2p) {
+  log.info(
+    'canvas: started libp2p with multiaddrs: ' +
+      libp2p
+        .getMultiaddrs()
+        .map((m) => m.toString())
+        .join(', '),
+  );
+}
 
 export const applyCanvasSignedDataMiddleware: (
   input,
@@ -39,7 +41,7 @@ export const applyCanvasSignedData = async (data: CanvasSignedData) => {
       appliedSessionId = idSession;
     }
   } catch (err) {
-    log.warn('could not apply canvas session:', err);
+    log.warn(`could not apply canvas session: ${err.stack}`);
   }
 
   try {
@@ -55,7 +57,7 @@ export const applyCanvasSignedData = async (data: CanvasSignedData) => {
       appliedActionId = idAction;
     }
   } catch (err) {
-    log.warn('could not apply canvas action:', err);
+    log.warn(`could not apply canvas action: ${err.stack}`);
   }
 
   return { session: appliedSessionId, action: appliedActionId };

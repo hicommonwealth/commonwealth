@@ -1,8 +1,8 @@
 import React, { useMemo, useState } from 'react';
 
-import 'components/react_quill/quill_formatted_text.scss';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { getClasses } from '../component_kit/helpers';
+import './quill_formatted_text.scss';
 
 import { useCommonNavigate } from 'navigation/helpers';
 import { DeltaStatic } from 'quill';
@@ -10,7 +10,7 @@ import { CWTooltip } from '../component_kit/new_designs/CWTooltip';
 import { renderTruncatedHighlights } from './highlighter';
 import { QuillRendererProps } from './quill_renderer';
 import { renderQuillDelta } from './render_quill_delta';
-import { getTextFromDelta } from './utils';
+import { countLinesQuill, getTextFromDelta } from './utils';
 
 type QuillFormattedTextProps = Omit<QuillRendererProps, 'doc'> & {
   doc: DeltaStatic;
@@ -36,27 +36,44 @@ export const QuillFormattedText = ({
   searchTerm,
   customShowMoreButton,
   maxChars,
+  cutoffLines,
 }: QuillFormattedTextProps) => {
   const navigate = useCommonNavigate();
 
   const [userExpand, setUserExpand] = useState<boolean>(false);
 
   // @ts-expect-error <StrictNullChecks/>
+  // Determine if the content is truncated
   const isTruncated: boolean = useMemo(() => {
     if (userExpand) {
       return false;
     }
-    return maxChars && maxChars < doc.length;
-  }, [maxChars, doc, userExpand]);
+
+    const exceedsMaxChars = maxChars && maxChars < getTextFromDelta(doc).length;
+    const exceedsCutoffLines =
+      cutoffLines && cutoffLines < countLinesQuill(doc);
+
+    console.log({ exceedsMaxChars, exceedsCutoffLines });
+
+    return exceedsMaxChars || exceedsCutoffLines;
+  }, [maxChars, cutoffLines, doc, userExpand]);
 
   const truncatedDoc: DeltaStatic = useMemo(() => {
     if (isTruncated) {
-      return {
-        ops: [...((doc?.ops || []).slice(0, maxChars) + '...')],
-      } as DeltaStatic;
+      let truncatedOps = doc?.ops || [];
+
+      if (maxChars) {
+        truncatedOps = truncatedOps.slice(0, maxChars);
+      }
+
+      if (cutoffLines) {
+        truncatedOps = truncatedOps.slice(0, cutoffLines);
+      }
+
+      return { ops: truncatedOps } as DeltaStatic;
     }
     return doc;
-  }, [maxChars, doc, isTruncated]);
+  }, [doc, isTruncated, maxChars, cutoffLines]);
 
   const finalDoc = useMemo(() => {
     // if no search term, just render the doc normally

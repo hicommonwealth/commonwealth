@@ -1,6 +1,6 @@
 import { useMutation } from '@tanstack/react-query';
 
-import { commonProtocol } from '@hicommonwealth/shared';
+import { commonProtocol } from '@hicommonwealth/evm-protocols';
 import Contest from 'helpers/ContractHelpers/Contest';
 import { ContractMethods, queryClient } from 'state/api/config';
 

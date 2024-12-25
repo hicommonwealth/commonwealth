@@ -1,0 +1,19 @@
+@import '../../../../../../styles/shared.scss';
+
+.ReceiptDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+  background-color: $neutral-50;
+  padding: 12px;
+  border-radius: 2px;
+
+  .entry {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    border-bottom: 1px solid $neutral-200;
+  }
+}

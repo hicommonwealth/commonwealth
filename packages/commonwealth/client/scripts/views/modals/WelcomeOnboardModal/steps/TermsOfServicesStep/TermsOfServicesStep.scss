@@ -1,0 +1,58 @@
+@import '../../../../../styles/shared.scss';
+
+.TermsOfServicesStep {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 16px;
+
+  .h4 {
+    color: $neutral-600;
+
+    .b1 {
+      color: $neutral-500;
+    }
+  }
+
+  .logo {
+    height: auto;
+    margin: auto;
+    width: 227px;
+
+    @include extraSmall {
+      width: 175px;
+    }
+  }
+  .terms-container {
+    width: 100%;
+    max-height: 300px;
+    border: 1px solid #e0dfe1;
+    border-radius: 6px;
+    overflow: auto;
+  }
+
+  .notification-section {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 16px;
+    margin-bottom: 16px;
+  }
+
+  .button-container {
+    display: flex;
+    gap: 8px;
+  }
+
+  .footer {
+    display: block;
+
+    a,
+    a:visited,
+    a:active,
+    a:hover {
+      color: $primary-600;
+    }
+  }
+}

@@ -74,6 +74,11 @@ export default (sequelize: Sequelize.Sequelize): UserModelStatic =>
       selected_community_id: { type: Sequelize.STRING, allowNull: true },
       profile: { type: Sequelize.JSONB, allowNull: false },
       xp_points: { type: Sequelize.INTEGER, defaultValue: 0, allowNull: true },
+      referral_eth_earnings: {
+        type: Sequelize.FLOAT,
+        allowNull: false,
+        defaultValue: 0,
+      },
     },
     {
       timestamps: true,
@@ -98,14 +103,17 @@ export default (sequelize: Sequelize.Sequelize): UserModelStatic =>
       },
       validate: {
         definedAvatarUrl() {
-          if (!(this.profile as z.infer<typeof UserProfile>)?.avatar_url) {
+          if (
+            this.profile &&
+            !(this.profile as z.infer<typeof UserProfile>)?.avatar_url
+          ) {
             throw new Error('profile.avatar_url must be defined');
           }
         },
       },
       hooks: {
         beforeValidate(instance: UserInstance) {
-          if (!instance.profile.avatar_url) {
+          if (instance.profile && !instance.profile.avatar_url) {
             instance.profile.avatar_url = getRandomAvatar();
           }
         },

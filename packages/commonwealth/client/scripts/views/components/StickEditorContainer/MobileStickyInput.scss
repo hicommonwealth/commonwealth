@@ -1,0 +1,55 @@
+.MobileStickyInput {
+  display: flex;
+  flex-grow: 1;
+  bottom: 15px;
+
+  input {
+    border: none;
+    flex-grow: 1;
+    padding: 12px;
+    border-radius: 8px;
+  }
+}
+
+.MobileStickyInputFocused {
+  background: white;
+  z-index: 70;
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  flex-grow: 1;
+  height: 100%;
+  flex-direction: column;
+  width: 100vw;
+  padding: 8px;
+
+  .CommentEditor,
+  .CWEditor,
+  .QuillEditorContainer,
+  .editor-and-tabs-container,
+  .QuillEditor,
+  .QuillEditorWrapper,
+  .ReactQuillDragParent,
+  .ReactQuillParent,
+  .ql-container,
+  .ql-editor {
+    display: flex;
+    flex-grow: 1;
+    flex-direction: column;
+  }
+
+  .ql-container,
+  .ql-editor {
+    max-height: calc(100vh - 260px) !important;
+  }
+
+  .MarkdownPreview {
+    padding: 0 !important;
+  }
+
+  .MarkdownFormattedText {
+    overflow: auto;
+    max-height: calc(100vh - 160px) !important;
+  }
+}

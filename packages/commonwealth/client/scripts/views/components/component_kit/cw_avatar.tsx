@@ -1,7 +1,7 @@
-import 'components/component_kit/cw_avatar.scss';
 import React from 'react';
 import Jdenticon from 'react-jdenticon';
 import { Skeleton } from '../Skeleton';
+import './cw_avatar.scss';
 import { ComponentType } from './types';
 
 type BaseAvatarProps = {

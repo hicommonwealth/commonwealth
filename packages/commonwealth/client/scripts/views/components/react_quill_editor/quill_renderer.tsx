@@ -14,6 +14,9 @@ export type QuillRendererProps = {
   customClass?: string;
   customShowMoreButton?: ReactNode;
   maxChars?: number;
+  onImageClick?: () => void;
+  isCardView?: boolean;
+  cutoffLines?: number;
 };
 
 type RichTextDocInfo = { format: 'richtext'; content: DeltaStatic };
@@ -31,6 +34,8 @@ export const QuillRenderer = ({
   customClass,
   customShowMoreButton = null,
   maxChars,
+  onImageClick,
+  cutoffLines,
 }: QuillRendererProps) => {
   const docInfo: DocInfo = useMemo(() => {
     let decodedText: string;
@@ -87,6 +92,7 @@ export const QuillRenderer = ({
             searchTerm={searchTerm}
             customShowMoreButton={customShowMoreButton}
             maxChars={maxChars}
+            cutoffLines={cutoffLines}
           />
         );
       case 'markdown':
@@ -102,6 +108,8 @@ export const QuillRenderer = ({
             customClass={customClass}
             customShowMoreButton={customShowMoreButton}
             maxChars={maxChars}
+            onImageClick={onImageClick}
+            cutoffLines={cutoffLines}
           />
         );
       default:
@@ -116,6 +124,7 @@ export const QuillRenderer = ({
     customClass,
     customShowMoreButton,
     maxChars,
+    onImageClick,
   ]);
 
   if (containerClass) {

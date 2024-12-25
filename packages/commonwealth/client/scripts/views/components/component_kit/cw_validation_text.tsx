@@ -1,10 +1,10 @@
 import React from 'react';
 
 import { CWText } from './cw_text';
-import { ComponentType } from './types';
 import { getClasses } from './helpers';
+import { ComponentType } from './types';
 
-import 'components/component_kit/cw_validation_text.scss';
+import './cw_validation_text.scss';
 
 export type ValidationStatus = 'success' | 'failure';
 
@@ -23,7 +23,7 @@ export const CWValidationText = (props: ValidationTextProps) => {
       fontWeight="medium"
       className={getClasses(
         { status, className },
-        ComponentType.ValidationText
+        ComponentType.ValidationText,
       )}
     >
       {message}

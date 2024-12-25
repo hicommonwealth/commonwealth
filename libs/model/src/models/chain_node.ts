@@ -61,6 +61,7 @@ export default (
       block_explorer: { type: Sequelize.STRING, allowNull: true },
       slip44: { type: Sequelize.INTEGER, allowNull: true },
       max_ce_block_range: { type: Sequelize.INTEGER, allowNull: true },
+      alchemy_metadata: { type: Sequelize.JSONB, allowNull: true },
       created_at: { type: Sequelize.DATE, allowNull: false },
       updated_at: { type: Sequelize.DATE, allowNull: false },
     },

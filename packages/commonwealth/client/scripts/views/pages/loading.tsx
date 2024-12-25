@@ -1,7 +1,7 @@
-import 'pages/loading.scss';
 import React from 'react';
 import { CWText } from '../components/component_kit/cw_text';
 import CWCircleMultiplySpinner from '../components/component_kit/new_designs/CWCircleMultiplySpinner';
+import './loading.scss';
 
 type PageLoadingProps = {
   message?: string;
