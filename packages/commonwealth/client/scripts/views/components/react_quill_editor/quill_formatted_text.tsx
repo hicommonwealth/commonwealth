@@ -52,9 +52,6 @@ export const QuillFormattedText = ({
     const exceedsMaxChars = maxChars && maxChars < getTextFromDelta(doc).length;
     const exceedsCutoffLines =
       cutoffLines && cutoffLines < countLinesQuill(doc);
-
-    console.log({ exceedsMaxChars, exceedsCutoffLines });
-
     return exceedsMaxChars || exceedsCutoffLines;
   }, [maxChars, cutoffLines, doc, userExpand]);
 
