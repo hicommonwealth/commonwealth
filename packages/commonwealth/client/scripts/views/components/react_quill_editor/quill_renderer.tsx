@@ -125,6 +125,7 @@ export const QuillRenderer = ({
     customShowMoreButton,
     maxChars,
     onImageClick,
+    cutoffLines,
   ]);
 
   if (containerClass) {
