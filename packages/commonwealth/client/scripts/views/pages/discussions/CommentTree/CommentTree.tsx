@@ -95,8 +95,6 @@ export const CommentTree = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // const [highlightedComment, setHighlightedComment] = useState(false); // TODO: fix this
-
   const communityId = app.activeChainId() || '';
 
   const {
@@ -161,7 +159,12 @@ export const CommentTree = ({
 
   const isLocked = !!(thread instanceof Thread && thread.readOnly);
 
-  // TODO: figure out a way to focus comments from url since with pagination we wont have all the comments
+  // TODO: need to properly display deleted comment tree for comments having replies
+  // TODO: find a way to focus comments from url since with the newer pagination
+  // model, we wont have all the comments loaded initially, + with nested replies list
+  // having a pagination modal of their own, we won't be able to determine if this reply
+  // is a nested comment or a parent comment
+  // const [highlightedComment, setHighlightedComment] = useState(false);
   // available at start
   // useEffect(() => {
   //   if (comments?.length > 0 && !highlightedComment) {
@@ -492,8 +495,6 @@ export const CommentTree = ({
 
   if (allComments.length === 0) return <></>;
 
-  // TODO: need to properly display deleted comment tree for comments having replies
-
   return (
     <>
       <div
@@ -585,7 +586,13 @@ export const CommentTree = ({
                       canReply
                     }
                     maxReplyLimitReached={false}
-                    // maxReplyLimitReached={comment.maxReplyLimitReached} // TODO: get this from somewhere
+                    // TODO: both of these values will depend on the comment level
+                    // ex: if its a 8th level reply in a comment reply chain etc.
+                    // and the reply button should be hidden when a certain comment reply
+                    // level is reached. Previously it was 8, now this needs to come from
+                    // api.
+                    // maxReplyLimitReached={comment.maxReplyLimitReached}
+                    // replyBtnVisible={comment.replyBtnVisible}
                     canReact={
                       !thread.archivedAt &&
                       (!!user.activeAccount || isAdmin) &&
@@ -604,7 +611,6 @@ export const CommentTree = ({
                     isEditing={edits?.[comment.id]?.isEditing || false}
                     canDelete={!isLocked && (isCommentAuthor || isAdminOrMod)}
                     replyBtnVisible={true}
-                    // replyBtnVisible={comment.replyBtnVisible} TODO: get this from somewhere
                     onReply={() => {
                       setParentCommentId(comment.id);
                       setIsReplying(true);
