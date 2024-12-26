@@ -48,6 +48,9 @@ const NewProposalPage = lazy(() => import('views/pages/new_proposal/index'));
 const DiscussionsPage = lazy(
   () => import('views/pages/discussions/DiscussionsPage'),
 );
+const CommunityHomePage = lazy(
+  () => import('../views/pages/CommunityHome/CommunityHomePage'),
+);
 const ViewThreadPage = lazy(
   () => import('../views/pages/view_thread/ViewThreadPage'),
 );
@@ -317,6 +320,13 @@ const CommonDomainRoutes = ({
   // GOVERNANCE END
 
   // DISCUSSIONS
+  <Route
+    key="/:scope/community-home"
+    path="/:scope/community-home"
+    element={withLayout(CommunityHomePage, {
+      scoped: true,
+    })}
+  />,
   <Route
     key="/:scope/discussions"
     path="/:scope/discussions"
