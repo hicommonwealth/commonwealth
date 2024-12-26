@@ -7,7 +7,6 @@ import app from 'state';
 import useSidebarStore from 'state/ui/sidebar';
 import { SublayoutHeader } from 'views/components/SublayoutHeader';
 import { Sidebar } from 'views/components/sidebar';
-import twitterspaceGrowlImage from '../../assets/img/TwitterspaceGrowlImage.png';
 import { useHandleInviteLink } from '../hooks/useHandleInviteLink';
 import useNecessaryEffect from '../hooks/useNecessaryEffect';
 import useStickyHeader from '../hooks/useStickyHeader';
@@ -23,9 +22,7 @@ import { AdminOnboardingSlider } from './components/AdminOnboardingSlider';
 import { Breadcrumbs } from './components/Breadcrumbs';
 import MobileNavigation from './components/MobileNavigation';
 import AuthButtons from './components/SublayoutHeader/AuthButtons';
-import { CWGrowlTemplate } from './components/SublayoutHeader/GrowlTemplate/CWGrowlTemplate';
 import useJoinCommunity from './components/SublayoutHeader/useJoinCommunity';
-import { UserTrainingSlider } from './components/UserTrainingSlider';
 import { CWModal } from './components/component_kit/new_designs/CWModal';
 import CollapsableSidebarButton from './components/sidebar/CollapsableSidebarButton';
 import { AuthModal, AuthModalType } from './modals/AuthModal';
@@ -110,11 +107,6 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
     location,
   );
 
-  const routesWithUserOnboardingSlider = matchRoutes(
-    [{ path: '/dashboard/for-you' }, { path: '/dashboard/global' }],
-    location,
-  );
-
   useEffect(() => {
     let timer: NodeJS.Timeout;
 
@@ -190,22 +182,12 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
               />
             </div>
             {!routesWithoutGenericBreadcrumbs && <Breadcrumbs />}
-            {routesWithUserOnboardingSlider && <UserTrainingSlider />}
+
             {isInsideCommunity && !routesWithoutGenericSliders && (
               <AdminOnboardingSlider />
             )}
             {children}
           </div>
-          <CWGrowlTemplate
-            growlType="twitterspace"
-            growlImage={twitterspaceGrowlImage}
-            headerText="Livestream with How To DAO this Thursday!"
-            bodyText="Join Dillon Chen (Common CEO) and Kevin Owocki (Gitcoin Co-Founder) on 12/19 at 11am ET to
-            shape the future of digital collaboration and community building"
-            buttonText="Reserve Your Spot!"
-            buttonLink="https://lu.ma/8nk6j7n4"
-            extraText='Exclusive bundle offer: "How To DAO" book + more!'
-          />
         </div>
         <WelcomeOnboardModal
           isOpen={isWelcomeOnboardModalOpen}

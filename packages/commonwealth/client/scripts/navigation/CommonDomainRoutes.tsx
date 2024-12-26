@@ -118,6 +118,7 @@ const CommunityNotFoundPage = lazy(
 );
 
 const UnSubscribePage = lazy(() => import('views/pages/UnSubscribePage'));
+const RewardsPage = lazy(() => import('views/pages/RewardsPage'));
 
 const CommonDomainRoutes = ({
   tokenizedCommunityEnabled,
@@ -186,6 +187,11 @@ const CommonDomainRoutes = ({
     element={withLayout(CommunitiesPage, {
       type: 'common',
     })}
+  />,
+  <Route
+    key="/rewards"
+    path="/rewards"
+    element={withLayout(RewardsPage, { type: 'common' })}
   />,
   <Route
     key="/search"

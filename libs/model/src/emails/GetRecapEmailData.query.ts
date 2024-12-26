@@ -256,7 +256,7 @@ export function GetRecapEmailDataQuery(): Query<typeof GetRecapEmailData> {
     ...GetRecapEmailData,
     auth: [],
     secure: true,
-    authStrategy: { name: 'authtoken', userId: ExternalServiceUserIds.Knock },
+    authStrategy: { type: 'authtoken', userId: ExternalServiceUserIds.Knock },
     body: async ({ payload }) => {
       const notifications = await getMessages(payload.user_id);
       const enrichedGovernanceAndProtocol = await enrichGovAndProtocolNotif({

@@ -103,6 +103,8 @@ const EditNewProfilePage = lazy(() => import('views/pages/edit_new_profile'));
 const ProfilePageRedirect = lazy(() => import('views/pages/profile_redirect'));
 const UnSubscribePage = lazy(() => import('views/pages/UnSubscribePage'));
 
+const RewardsPage = lazy(() => import('views/pages/RewardsPage'));
+
 const CustomDomainRoutes = ({
   tokenizedCommunityEnabled,
 }: RouteFeatureFlags) => {
@@ -182,6 +184,11 @@ const CustomDomainRoutes = ({
       key="/myTransactions"
       path="/myTransactions"
       element={withLayout(MyTransactions, { type: 'common' })}
+    />,
+    <Route
+      key="/rewards"
+      path="/rewards"
+      element={withLayout(RewardsPage, { type: 'common' })}
     />,
 
     // NOTIFICATIONS
