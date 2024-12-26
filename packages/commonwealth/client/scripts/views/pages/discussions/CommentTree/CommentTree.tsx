@@ -66,7 +66,7 @@ export const CommentTree = ({
   const urlParams = new URLSearchParams(location.search);
   const focusCommentsParam = urlParams.get('focusComments') === 'true';
   // TODO: add these params to API
-  const [includeSpamThreads, setIncludeSpamThreads] = useState<boolean>(false);
+  const [includeSpam, setIncludeSpam] = useState<boolean>(false);
   const [commentSortType, setCommentSortType] =
     useState<CommentsFeaturedFilterTypes>(CommentsFeaturedFilterTypes.Newest);
 
@@ -105,6 +105,8 @@ export const CommentTree = ({
   } = useFetchCommentsQuery({
     thread_id: parseInt(`${thread.id}`) || 0,
     include_reactions: true,
+    include_spam_comments: includeSpam,
+    order_by: commentSortType,
     cursor: 1,
     limit: 10,
     apiEnabled: !!communityId && !!thread.id,
@@ -502,12 +504,18 @@ export const CommentTree = ({
               label: 'Oldest',
               iconLeft: 'clockCounterClockwise',
             },
+            {
+              id: 3,
+              value: CommentsFeaturedFilterTypes.MostLikes,
+              label: 'Upvotes',
+              iconLeft: 'upvote',
+            },
           ]}
         />
         <CWCheckbox
-          checked={includeSpamThreads}
+          checked={includeSpam}
           label="Include comments flagged as spam"
-          onChange={(e) => setIncludeSpamThreads(e?.target?.checked || false)}
+          onChange={(e) => setIncludeSpam(e?.target?.checked || false)}
         />
       </div>
       <div className="CommentsTree">

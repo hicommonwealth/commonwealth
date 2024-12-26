@@ -19,8 +19,16 @@ export function GetComments(): Query<typeof schemas.GetComments> {
         include_reactions,
         limit,
         cursor,
+        order_by,
+        include_spam_comments,
       } = payload;
       const offset = (cursor - 1) * limit;
+
+      const orderByQueries = {
+        newest: '"created_at" DESC',
+        oldest: '"created_at" ASC',
+        mostLikes: '"reaction_count" DESC',
+      };
 
       const sql = `
         SELECT
@@ -89,6 +97,7 @@ export function GetComments(): Query<typeof schemas.GetComments> {
             C."thread_id" = :thread_id
             AND C."parent_id" ${parent_id ? '= :parent_id' : 'IS NULL'}
             ${comment_id ? ' AND C."id" = :comment_id' : ''}
+            ${!include_spam_comments ? 'AND C."marked_as_spam_at" IS NULL' : ''}
         ${
           include_reactions
             ? `
@@ -108,7 +117,7 @@ export function GetComments(): Query<typeof schemas.GetComments> {
             : ''
         }
         ORDER BY
-            C."created_at"
+            C.${orderByQueries[order_by || 'newest']}
         LIMIT :limit OFFSET :offset;      
       `;
 

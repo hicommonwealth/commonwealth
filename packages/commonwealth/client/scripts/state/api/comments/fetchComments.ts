@@ -13,6 +13,8 @@ const useFetchCommentsQuery = ({
   comment_id,
   parent_id,
   include_reactions,
+  include_spam_comments,
+  order_by,
   apiEnabled = true,
 }: FetchCommentsProps) => {
   return trpc.comment.getComments.useInfiniteQuery(
@@ -20,7 +22,9 @@ const useFetchCommentsQuery = ({
       thread_id,
       comment_id,
       parent_id,
+      order_by,
       include_reactions,
+      include_spam_comments,
     },
     {
       staleTime: COMMENTS_STALE_TIME,
