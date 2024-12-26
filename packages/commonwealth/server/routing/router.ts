@@ -26,7 +26,6 @@ import threadsUsersCountAndAvatars from '../routes/threadsUsersCountAndAvatars';
 import updateBanner from '../routes/updateBanner';
 import updateEmail from '../routes/updateEmail';
 import updateSiteAdmin from '../routes/updateSiteAdmin';
-import viewComments from '../routes/viewComments';
 
 import setDefaultRole from '../routes/setDefaultRole';
 import upgradeMember, {
@@ -316,13 +315,6 @@ function setupRouter(
   );
 
   // comments
-  registerRoute(
-    router,
-    'get',
-    '/viewComments',
-    databaseValidationService.validateCommunity,
-    viewComments.bind(this, models),
-  );
   registerRoute(
     router,
     'get',
