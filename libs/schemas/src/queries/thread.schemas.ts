@@ -2,6 +2,7 @@ import { z } from 'zod';
 import {
   Address,
   Comment,
+  CommentVersionHistory,
   ContestManager,
   ProfileTags,
   Thread,
@@ -105,6 +106,11 @@ export const ReactionView = z.object({
   avatar_url: z.string().optional(),
 });
 
+export const CommentVersionHistoryView = CommentVersionHistory.extend({
+  id: PG_INT,
+  timestamp: z.date().or(z.string()),
+});
+
 export const CommentView = Comment.extend({
   id: PG_INT,
   created_at: z.date().or(z.string()).nullish(),
@@ -113,8 +119,9 @@ export const CommentView = Comment.extend({
   marked_as_spam_at: z.date().or(z.string()).nullish(),
   Address: AddressView.nullish(),
   Thread: z.undefined(),
+  address_id: z.undefined(),
+  community_id: z.string(),
   Reaction: ReactionView.nullish(),
-  CommentVersionHistories: z.undefined(),
   search: z.undefined(),
   // this is returned by GetThreads
   address: z.string(),

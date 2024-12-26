@@ -12,8 +12,14 @@ export function GetComments(): Query<typeof schemas.GetComments> {
     auth: [],
     secure: false,
     body: async ({ payload }) => {
-      const { thread_id, comment_id, include_reactions, limit, cursor } =
-        payload;
+      const {
+        thread_id,
+        comment_id,
+        parent_id,
+        include_reactions,
+        limit,
+        cursor,
+      } = payload;
       const offset = (cursor - 1) * limit;
 
       const sql = `
@@ -25,26 +31,42 @@ export function GetComments(): Query<typeof schemas.GetComments> {
             C.deleted_at,
             C.marked_as_spam_at,
             C.reaction_count,
+            C.parent_id,
+            C.thread_id,
             CA.address,
             CA.last_active,
+            CA.community_id,
             CU.id AS "user_id",
             CU.profile->>'name' AS "profile_name",
             CU.profile->>'avatar_url' AS "avatar_url",
+            CASE WHEN max(CVH.id) IS NOT NULL THEN
+              json_agg(json_strip_nulls(json_build_object(
+                  'id', CVH.id,
+                  'comment_id', CVH.comment_id,
+                  'body', CVH.body,
+                  'timestamp', CVH.timestamp,
+                  'content_url', CVH.content_url
+              )))
+            ELSE '[]'::json
+            END AS "CommentVersionHistories",
             ${
               include_reactions
                 ? `
-            json_agg(json_build_object(
-                'id', R.id,
-                'address_id', R.address_id,
-                'reaction', R.reaction,
-                'created_at', R.created_at::text,
-                'updated_at', R.updated_at::text,
-                'calculated_voting_weight', R.calculated_voting_weight::text,
-                'address', RA.address,
-                'last_active', RA.last_active::text,
-                'profile_name', RU.profile->>'name',
-                'avatar_url', RU.profile->>'avatar_url'
-              )) AS "reactions",
+            CASE WHEN max(R.id) IS NOT NULL THEN
+                json_agg(json_build_object(
+                  'id', R.id,
+                  'address_id', R.address_id,
+                  'reaction', R.reaction,
+                  'created_at', R.created_at::text,
+                  'updated_at', R.updated_at::text,
+                  'calculated_voting_weight', R.calculated_voting_weight::text,
+                  'address', RA.address,
+                  'last_active', RA.last_active::text,
+                  'profile_name', RU.profile->>'name',
+                  'avatar_url', RU.profile->>'avatar_url'
+                )) 
+              ELSE '[]'::json
+              END AS "reactions",
                 `
                 : ''
             }
@@ -53,6 +75,7 @@ export function GetComments(): Query<typeof schemas.GetComments> {
             "Comments" AS C
             JOIN "Addresses" AS CA ON C."address_id" = CA."id"
             JOIN "Users" AS CU ON CA."user_id" = CU."id"
+            LEFT JOIN "CommentVersionHistories" AS CVH ON CVH."comment_id" = C."id"
             ${
               include_reactions
                 ? `
@@ -64,6 +87,7 @@ export function GetComments(): Query<typeof schemas.GetComments> {
             }
         WHERE
             C."thread_id" = :thread_id
+            AND C."parent_id" ${parent_id ? '= :parent_id' : 'IS NULL'}
             ${comment_id ? ' AND C."id" = :comment_id' : ''}
         ${
           include_reactions
@@ -76,6 +100,7 @@ export function GetComments(): Query<typeof schemas.GetComments> {
             C.marked_as_spam_at,
             CA.address,
             CA.last_active,
+            CA.community_id,
             CU.id,
             CU.profile->>'name',
             CU.profile->>'avatar_url'
@@ -95,6 +120,7 @@ export function GetComments(): Query<typeof schemas.GetComments> {
         replacements: {
           thread_id,
           comment_id,
+          parent_id,
           limit,
           offset,
         },

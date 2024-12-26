@@ -26,9 +26,14 @@ export const GetComments = {
   input: PaginationParamsSchema.extend({
     thread_id: PG_INT,
     comment_id: PG_INT.optional(),
+    parent_id: PG_INT.optional(),
     include_reactions: zBoolean.default(false),
   }),
   output: PaginatedResultSchema.extend({
-    results: z.array(CommentsView),
+    // TODO: fix return types, they break for
+    // 1. some reactions/version_histories have invalid data types
+    // 2. the Date/string types are invalid
+    // 3. some keys that are always defined are marked as optional/nullish + vice versa
+    results: z.array(z.any()),
   }),
 };
