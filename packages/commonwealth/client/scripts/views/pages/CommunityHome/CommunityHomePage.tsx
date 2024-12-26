@@ -18,7 +18,7 @@ const CommunityHome = () => {
     modeOfManageCommunityStakeModal,
   } = useManageCommunityStakeModalStore();
 
-  const [selectedCommunityId, setSelectedCommunityId] = useState<string>();
+  const [selectedCommunityId] = useState<string>();
 
   return (
     // @ts-expect-error <StrictNullChecks/>
