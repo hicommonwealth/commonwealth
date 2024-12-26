@@ -96,6 +96,7 @@ export function GetComments(): Query<typeof schemas.GetComments> {
         WHERE
             C."thread_id" = :thread_id
             AND C."parent_id" ${parent_id ? '= :parent_id' : 'IS NULL'}
+            ${parent_id ? '' : 'AND C."deleted_at" IS NULL'}
             ${comment_id ? ' AND C."id" = :comment_id' : ''}
             ${!include_spam_comments ? 'AND C."marked_as_spam_at" IS NULL' : ''}
         ${
