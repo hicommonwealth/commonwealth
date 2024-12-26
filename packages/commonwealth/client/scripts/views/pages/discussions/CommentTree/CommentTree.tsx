@@ -35,7 +35,7 @@ import './CommentTree.scss';
 
 type CommentsTreeAttrs = {
   pageRef: React.MutableRefObject<HTMLDivElement | null>;
-  commentsRef: React.MutableRefObject<HTMLDivElement | undefined>;
+  commentsRef: React.MutableRefObject<HTMLDivElement | null>;
   thread: Thread;
   setIsGloballyEditing?: (status: boolean) => void;
   isReplying: boolean;

@@ -12,13 +12,7 @@ import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import useTopicGating from 'hooks/useTopicGating';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
-import React, {
-  MutableRefObject,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useSearchParams } from 'react-router-dom';
 import app from 'state';
@@ -97,7 +91,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const { handleJoinCommunity, JoinCommunityModals } = useJoinCommunity();
 
   const user = useUserStore();
-  const commentsRef = useRef<HTMLDivElement | null>(null);
+  const commentsRef = useRef<HTMLDivElement>(null);
   const pageRef = useRef<HTMLDivElement>(null);
 
   const { isAddedToHomeScreen } = useAppStatus();
@@ -688,10 +682,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
             <>
               <CommentTree
                 pageRef={pageRef}
-                commentsRef={
-                  // TODO: fix type
-                  commentsRef as MutableRefObject<HTMLDivElement | undefined>
-                }
+                commentsRef={commentsRef}
                 thread={thread!}
                 setIsGloballyEditing={setIsGloballyEditing}
                 isReplying={isReplying}
