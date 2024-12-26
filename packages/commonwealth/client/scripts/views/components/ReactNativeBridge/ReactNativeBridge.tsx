@@ -47,7 +47,7 @@ type NavigateBack = {
 };
 
 function isNavigateBack(data: object): data is NavigateBack {
-  return (data as any).type === 'navigate-backk';
+  return (data as any).type === 'navigate-back';
 }
 
 /**
