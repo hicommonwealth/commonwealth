@@ -91,6 +91,7 @@ export const GetRecapEmailData = {
     ),
     num_notifications: z.number(),
     notifications_link: z.string(),
+    unsubscribe_link: z.string(),
   }),
 };
 

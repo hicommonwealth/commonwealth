@@ -238,6 +238,7 @@ export async function uploadIfLarge(
   contentUrl: string | null;
   truncatedBody: string | null;
 }> {
+  console.log('in Upload file', { type });
   if (content.length > CONTENT_CHAR_LIMIT) {
     const { url } = await blobStorage({
       key: R2_ADAPTER_KEY,

@@ -104,6 +104,8 @@ const ProfilePageRedirect = lazy(() => import('views/pages/profile_redirect'));
 
 const RewardsPage = lazy(() => import('views/pages/RewardsPage'));
 
+const UnSubscribePage = lazy(() => import('views/pages/UnSubscribePage'));
+
 const CustomDomainRoutes = ({
   tokenizedCommunityEnabled,
 }: RouteFeatureFlags) => {
@@ -120,6 +122,11 @@ const CustomDomainRoutes = ({
       key="/createCommunity"
       path="/createCommunity"
       element={withLayout(CreateCommunityPage, { type: 'common' })}
+    />,
+    <Route
+      key="/unSubscribe/:userId"
+      path="/unSubscribe/:userId"
+      element={withLayout(UnSubscribePage, { type: 'common' })}
     />,
     ...(tokenizedCommunityEnabled
       ? [

@@ -57,6 +57,7 @@ export function CreateComment(): Command<typeof schemas.CreateComment> {
       const body = decodeContent(payload.body);
       const mentions = uniqueMentions(parseUserMentions(body));
 
+      console.log({ body });
       const { contentUrl } = await uploadIfLarge('comments', body);
 
       // == mutation transaction boundary ==

@@ -79,6 +79,7 @@ export default (sequelize: Sequelize.Sequelize): UserModelStatic =>
         allowNull: false,
         defaultValue: 0,
       },
+      unsubscribe_uuid: { type: Sequelize.STRING, allowNull: true },
     },
     {
       timestamps: true,
@@ -95,6 +96,7 @@ export default (sequelize: Sequelize.Sequelize): UserModelStatic =>
             'isAdmin',
             'created_at',
             'updated_at',
+            'unsubscribe_uuid',
           ],
         },
       },

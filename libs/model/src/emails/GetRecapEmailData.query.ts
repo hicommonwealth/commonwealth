@@ -15,7 +15,7 @@ import {
 } from '@hicommonwealth/core';
 import { QueryTypes } from 'sequelize';
 import z from 'zod';
-import { config, models } from '..';
+import { config, generateUnsubscribeLink, models } from '..';
 
 const log = logger(import.meta);
 
@@ -268,6 +268,8 @@ export function GetRecapEmailDataQuery(): Query<typeof GetRecapEmailData> {
       const enrichedDiscussion = await enrichDiscussionNotifications(
         notifications.discussion,
       );
+      const unSubscribeLink = await generateUnsubscribeLink(payload.user_id);
+
       return {
         discussion: enrichedDiscussion,
         ...enrichedGovernanceAndProtocol,
@@ -276,6 +278,7 @@ export function GetRecapEmailDataQuery(): Query<typeof GetRecapEmailData> {
           enrichedGovernanceAndProtocol.governance.length +
           enrichedGovernanceAndProtocol.protocol.length,
         notifications_link: config.SERVER_URL,
+        unsubscribe_link: unSubscribeLink,
       };
     },
   };

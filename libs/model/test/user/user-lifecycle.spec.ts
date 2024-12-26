@@ -84,7 +84,7 @@ describe('User lifecycle', () => {
         { start_date: moment().subtract(3, 'day').toDate() },
         { where: { id: quest!.id } },
       );
-
+      console.log({ member, community_id, topic_id });
       // act on community, triggering quest rewards
       const thread = await command(CreateThread(), {
         actor: member,
