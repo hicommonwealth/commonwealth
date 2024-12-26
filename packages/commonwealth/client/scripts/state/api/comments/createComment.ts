@@ -1,8 +1,6 @@
 import { toCanvasSignedDataApiArgs } from '@hicommonwealth/shared';
-import { useQueryClient } from '@tanstack/react-query';
 import { signComment } from 'controllers/server/sessions';
 import Comment from 'models/Comment';
-import { ApiEndpoints } from 'state/api/config';
 import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
 import { UserTrainingCardTypes } from 'views/components/UserTrainingSlider/types';
 import { trpc } from '../../../utils/trpcClient';
@@ -48,15 +46,11 @@ const useCreateCommentMutation = ({
   communityId,
   threadId,
   existingNumberOfComments = 0,
-}: Partial<CreateCommentProps>) => {
-  const queryClient = useQueryClient();
-  // TODO: fix cache updates
-  const comments = [];
-  // const { data: comments } = useFetchCommentsQuery({
-  //   communityId: communityId!,
-  //   threadId: threadId!,
-  // });
-
+}: Pick<
+  CreateCommentProps,
+  'communityId' | 'threadId' | 'existingNumberOfComments'
+>) => {
+  const utils = trpc.useUtils();
   const user = useUserStore();
 
   const { markTrainingActionAsComplete } =
@@ -69,15 +63,12 @@ const useCreateCommentMutation = ({
       // @ts-expect-error StrictNullChecks
       const comment = new Comment(newComment);
 
-      // update fetch comments query state
-      const key = [ApiEndpoints.FETCH_COMMENTS, communityId, threadId];
-      queryClient.cancelQueries({ queryKey: key });
-      queryClient.setQueryData(key, () => {
-        return [...comments, comment];
-      });
+      // TODO: #8015 - make a generic util to apply cache
+      // updates for comments in all possible key combinations
+      // present in cache.
+      utils.comment.getComments.invalidate();
 
-      // @ts-expect-error StrictNullChecks
-      updateThreadInAllCaches(communityId, threadId, {
+      updateThreadInAllCaches(communityId || '', threadId, {
         numberOfComments: existingNumberOfComments + 1,
       });
 

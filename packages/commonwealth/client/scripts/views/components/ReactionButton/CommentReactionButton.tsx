@@ -34,19 +34,11 @@ export const CommentReactionButton = ({
   const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
 
   const { mutateAsync: createCommentReaction } =
-    useCreateCommentReactionMutation({
-      threadId: comment.thread_id,
-      commentId: comment.id,
-      communityId: app.activeChainId(),
-    });
+    useCreateCommentReactionMutation();
 
   const communityId = app.activeChainId() || '';
   const { mutateAsync: deleteCommentReaction } =
-    useDeleteCommentReactionMutation({
-      commentId: comment.id,
-      communityId,
-      threadId: comment.thread_id,
-    });
+    useDeleteCommentReactionMutation();
 
   const activeAddress = user.activeAccount?.address || '';
   const hasReacted = !!(comment.reactions || []).find(

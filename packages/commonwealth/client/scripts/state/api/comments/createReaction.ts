@@ -1,10 +1,9 @@
 import { toCanvasSignedDataApiArgs } from '@hicommonwealth/shared';
-import { useQueryClient } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
-import { notifyError } from 'client/scripts/controllers/app/notifications';
-import { trpc } from 'client/scripts/utils/trpcClient';
+import { notifyError } from 'controllers/app/notifications';
 import { signCommentReaction } from 'controllers/server/sessions';
 import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
+import { trpc } from 'utils/trpcClient';
 import { UserTrainingCardTypes } from 'views/components/UserTrainingSlider/types';
 import { useAuthModalStore } from '../../ui/modals';
 import useUserStore, { userStore } from '../../ui/user';
@@ -42,20 +41,8 @@ export const buildCreateCommentReactionInput = async ({
   };
 };
 
-const useCreateCommentReactionMutation = ({
-  threadId,
-  commentId,
-  communityId,
-}: Partial<CreateReactionProps>) => {
-  const queryClient = useQueryClient();
-  // TODO: fix cache updates
-  const comments = [];
-  // const { data: comments } = useFetchCommentsQuery({
-  //   // @ts-expect-error StrictNullChecks
-  //   communityId,
-  //   // @ts-expect-error StrictNullChecks
-  //   threadId,
-  // });
+const useCreateCommentReactionMutation = () => {
+  const utils = trpc.useUtils();
   const user = useUserStore();
 
   const { markTrainingActionAsComplete } =
@@ -65,19 +52,10 @@ const useCreateCommentReactionMutation = ({
 
   return trpc.comment.createCommentReaction.useMutation({
     onSuccess: (newReaction) => {
-      // update fetch comments query state
-      // const key = [ApiEndpoints.FETCH_COMMENTS, communityId, threadId];
-      // queryClient.cancelQueries({ queryKey: key });
-      // queryClient.setQueryData(key, () => {
-      //   const tempComments = [...comments];
-      //   const commentToUpdate = tempComments.find((x) => x.id === commentId);
-      //   newReaction.Address!.User = {
-      //     profile: commentToUpdate.profile,
-      //   };
-      //   // @ts-expect-error StrictNullChecks
-      //   commentToUpdate.reactions.push(new Reaction(newReaction));
-      //   return tempComments;
-      // });
+      // TODO: #8015 - make a generic util to apply cache
+      // updates for comments in all possible key combinations
+      // present in cache.
+      utils.comment.getComments.invalidate();
 
       const userId = user.addresses?.[0]?.profile?.userId;
       userId &&

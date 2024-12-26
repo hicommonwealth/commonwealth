@@ -1,7 +1,11 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
+import Comment from 'models/Comment';
+import { IUniqueId } from 'models/interfaces';
 import { SERVER_URL } from 'state/api/config';
+import { trpc } from 'utils/trpcClient';
 import { userStore } from '../../ui/user';
+import { updateThreadInAllCaches } from '../threads/helpers/cache';
 
 interface ToggleCommentSpamStatusProps {
   communityId: string;
@@ -38,43 +42,27 @@ const useToggleCommentSpamStatusMutation = ({
   communityId,
   threadId,
 }: UseToggleCommentSpamStatusMutationProps) => {
-  const queryClient = useQueryClient();
-  // TODO: fix cache
-  const comments = [];
-  // const { data: comments } = useFetchCommentsQuery({
-  //   communityId,
-  //   threadId,
-  // });
+  const utils = trpc.useUtils();
 
   return useMutation({
     mutationFn: toggleCommentSpamStatus,
+    // TODO: check if the type of response format would work for all caches
+    // and wouldn't break anything
     onSuccess: async (response) => {
-      // // find the existing comment index and merge with existing comment
-      // const foundCommentIndex = comments.findIndex(
-      //   (x) => x.id === response.data.result.id,
-      // );
-      // const updatedComment = comments[foundCommentIndex];
-      // const { marked_as_spam_at } = response.data.result;
-      // updatedComment.markedAsSpamAt = marked_as_spam_at
-      //   ? moment(marked_as_spam_at)
-      //   : null;
-      // // update fetch comments query state with updated comment
-      // if (foundCommentIndex > -1) {
-      //   const key = [ApiEndpoints.FETCH_COMMENTS, communityId, threadId];
-      //   queryClient.cancelQueries({ queryKey: key });
-      //   queryClient.setQueryData([...key], () => {
-      //     const updatedComments = [...(comments || [])];
-      //     updatedComments[foundCommentIndex] = updatedComment;
-      //     return [...updatedComments];
-      //   });
-      // }
-      // updateThreadInAllCaches(
-      //   communityId,
-      //   threadId,
-      //   { recentComments: [updatedComment] },
-      //   'combineAndRemoveDups',
-      // );
-      // return updatedComment;
+      // @ts-expect-error StrictNullChecks
+      const comment = new Comment(response);
+
+      // TODO: #8015 - make a generic util to apply cache
+      // updates for comments in all possible key combinations
+      // present in cache.
+      utils.comment.getComments.invalidate();
+
+      updateThreadInAllCaches(
+        communityId,
+        threadId,
+        { recentComments: [comment as Comment<IUniqueId>] },
+        'combineAndRemoveDups',
+      );
     },
   });
 };
