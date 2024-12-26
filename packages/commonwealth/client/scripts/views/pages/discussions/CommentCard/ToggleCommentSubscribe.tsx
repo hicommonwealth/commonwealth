@@ -74,7 +74,7 @@ export const ToggleCommentSubscribe = (props: ToggleCommentSubscribeProps) => {
         <CWThreadAction
           action="subscribe"
           label="Subscribe"
-          selected={!hasCommentSubscription}
+          selected={hasCommentSubscription}
           onClick={handleToggleSubscribe}
         />
       )}
