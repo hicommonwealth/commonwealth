@@ -19,6 +19,7 @@ import { CreateComment } from 'views/components/Comments/CreateComment';
 import { Select } from 'views/components/Select';
 import { WithActiveStickyComment } from 'views/components/StickEditorContainer/context/WithActiveStickyComment';
 import { CWCheckbox } from 'views/components/component_kit/cw_checkbox';
+import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
 import {
   deserializeDelta,
   serializeDelta,
@@ -474,6 +475,10 @@ export const CommentTree = ({
       ],
     });
   };
+
+  if (isInitialCommentsLoading) {
+    return <CWCircleMultiplySpinner />;
+  }
 
   if (allComments.length === 0) return <></>;
 
