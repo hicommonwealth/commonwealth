@@ -31,7 +31,6 @@ export const ViewCommentUpvotesDrawer = ({
       }))}
       // @ts-expect-error <StrictNullChecks/>
       author={
-        // TODO: this needs fixing, it doesnt display correct data
         comment?.address ? app.chain.accounts.get(comment?.address) : null
       }
       // @ts-expect-error <StrictNullChecks/>
