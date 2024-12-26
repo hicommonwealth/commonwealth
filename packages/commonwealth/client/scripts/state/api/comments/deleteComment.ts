@@ -5,7 +5,6 @@ import { IUniqueId } from 'models/interfaces';
 import { ApiEndpoints } from 'state/api/config';
 import { useAuthModalStore } from '../../ui/modals';
 import { updateThreadInAllCaches } from '../threads/helpers/cache';
-import useFetchCommentsQuery from './fetchComments';
 
 interface UseDeleteCommentMutationProps {
   communityId: string;
@@ -19,10 +18,12 @@ const useDeleteCommentMutation = ({
   existingNumberOfComments,
 }: UseDeleteCommentMutationProps) => {
   const queryClient = useQueryClient();
-  const { data: comments } = useFetchCommentsQuery({
-    communityId,
-    threadId,
-  });
+  // TODO: fix cache updates
+  const comments = [];
+  // const { data: comments } = useFetchCommentsQuery({
+  //   communityId,
+  //   threadId,
+  // });
 
   const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
 

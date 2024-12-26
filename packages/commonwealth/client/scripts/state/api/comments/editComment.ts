@@ -8,7 +8,6 @@ import { UserProfile } from '../../../models/MinimumProfile';
 import { useAuthModalStore } from '../../ui/modals';
 import { userStore } from '../../ui/user';
 import { updateThreadInAllCaches } from '../threads/helpers/cache';
-import useFetchCommentsQuery from './fetchComments';
 
 interface EditCommentProps {
   profile: UserProfile;
@@ -51,10 +50,12 @@ const useEditCommentMutation = ({
   threadId,
 }: UseEditCommentMutationProps) => {
   const queryClient = useQueryClient();
-  const { data: comments } = useFetchCommentsQuery({
-    communityId,
-    threadId,
-  });
+  // TODO: fix cache updates
+  const comments = [];
+  // const { data: comments } = useFetchCommentsQuery({
+  //   communityId,
+  //   threadId,
+  // });
 
   const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
 

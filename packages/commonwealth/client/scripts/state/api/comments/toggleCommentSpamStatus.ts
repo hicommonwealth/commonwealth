@@ -4,7 +4,6 @@ import moment from 'moment';
 import { ApiEndpoints, SERVER_URL } from 'state/api/config';
 import { userStore } from '../../ui/user';
 import { updateThreadInAllCaches } from '../threads/helpers/cache';
-import useFetchCommentsQuery from './fetchComments';
 
 interface ToggleCommentSpamStatusProps {
   communityId: string;
@@ -42,10 +41,12 @@ const useToggleCommentSpamStatusMutation = ({
   threadId,
 }: UseToggleCommentSpamStatusMutationProps) => {
   const queryClient = useQueryClient();
-  const { data: comments } = useFetchCommentsQuery({
-    communityId,
-    threadId,
-  });
+  // TODO: fix cache
+  const comments = [];
+  // const { data: comments } = useFetchCommentsQuery({
+  //   communityId,
+  //   threadId,
+  // });
 
   return useMutation({
     mutationFn: toggleCommentSpamStatus,

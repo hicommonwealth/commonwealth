@@ -5,7 +5,6 @@ import { signDeleteCommentReaction } from 'controllers/server/sessions';
 import { ApiEndpoints } from 'state/api/config';
 import { useAuthModalStore } from '../../ui/modals';
 import { userStore } from '../../ui/user';
-import useFetchCommentsQuery from './fetchComments';
 
 interface DeleteReactionProps {
   address: string;
@@ -45,10 +44,12 @@ const useDeleteCommentReactionMutation = ({
   communityId,
 }: UseDeleteCommentReactionMutationProps) => {
   const queryClient = useQueryClient();
-  const { data: comments } = useFetchCommentsQuery({
-    communityId,
-    threadId,
-  });
+  // TODO: fix cache updates
+  const comments = [];
+  // const { data: comments } = useFetchCommentsQuery({
+  //   communityId,
+  //   threadId,
+  // });
 
   const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
 

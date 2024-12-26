@@ -10,7 +10,6 @@ import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
 import { UserTrainingCardTypes } from 'views/components/UserTrainingSlider/types';
 import { useAuthModalStore } from '../../ui/modals';
 import useUserStore, { userStore } from '../../ui/user';
-import useFetchCommentsQuery from './fetchComments';
 
 interface CreateReactionProps {
   address: string;
@@ -51,12 +50,14 @@ const useCreateCommentReactionMutation = ({
   communityId,
 }: Partial<CreateReactionProps>) => {
   const queryClient = useQueryClient();
-  const { data: comments } = useFetchCommentsQuery({
-    // @ts-expect-error StrictNullChecks
-    communityId,
-    // @ts-expect-error StrictNullChecks
-    threadId,
-  });
+  // TODO: fix cache updates
+  const comments = [];
+  // const { data: comments } = useFetchCommentsQuery({
+  //   // @ts-expect-error StrictNullChecks
+  //   communityId,
+  //   // @ts-expect-error StrictNullChecks
+  //   threadId,
+  // });
   const user = useUserStore();
 
   const { markTrainingActionAsComplete } =

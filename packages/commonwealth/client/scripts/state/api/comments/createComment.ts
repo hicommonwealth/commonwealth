@@ -9,7 +9,6 @@ import { trpc } from '../../../utils/trpcClient';
 import { useAuthModalStore } from '../../ui/modals';
 import useUserStore from '../../ui/user';
 import { updateThreadInAllCaches } from '../threads/helpers/cache';
-import useFetchCommentsQuery from './fetchComments';
 
 interface CreateCommentProps {
   communityId: string;
@@ -51,10 +50,12 @@ const useCreateCommentMutation = ({
   existingNumberOfComments = 0,
 }: Partial<CreateCommentProps>) => {
   const queryClient = useQueryClient();
-  const { data: comments } = useFetchCommentsQuery({
-    communityId: communityId!,
-    threadId: threadId!,
-  });
+  // TODO: fix cache updates
+  const comments = [];
+  // const { data: comments } = useFetchCommentsQuery({
+  //   communityId: communityId!,
+  //   threadId: threadId!,
+  // });
 
   const user = useUserStore();
 
