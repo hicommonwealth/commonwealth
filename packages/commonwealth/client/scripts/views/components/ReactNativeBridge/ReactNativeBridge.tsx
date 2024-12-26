@@ -69,9 +69,8 @@ export const ReactNativeBridge = () => {
 
   const handleMessage = useCallback(
     (message: MessageEvent) => {
-      const obj = JSON.parse(message.data);
-
-      if (typeof message.data === 'object') {
+      const obj = messageToObject(message.data);
+      if (obj && typeof message.data === 'object') {
         if (isNavigateToLink(obj)) {
           navigate(obj.link);
         }
@@ -115,3 +114,7 @@ export const ReactNativeBridge = () => {
 
   return null;
 };
+
+function messageToObject(message: string | object): object {
+  return typeof message === 'string' ? JSON.parse(message) : message;
+}
