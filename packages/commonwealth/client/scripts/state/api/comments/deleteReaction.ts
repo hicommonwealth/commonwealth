@@ -2,7 +2,6 @@ import { toCanvasSignedDataApiArgs } from '@hicommonwealth/shared';
 import { useQueryClient } from '@tanstack/react-query';
 import { trpc } from 'client/scripts/utils/trpcClient';
 import { signDeleteCommentReaction } from 'controllers/server/sessions';
-import { ApiEndpoints } from 'state/api/config';
 import { useAuthModalStore } from '../../ui/modals';
 import { userStore } from '../../ui/user';
 
@@ -55,25 +54,25 @@ const useDeleteCommentReactionMutation = ({
 
   return trpc.thread.deleteReaction.useMutation({
     onSuccess: async (deleted, variables) => {
-      // update fetch comments query state
-      if (deleted) {
-        const key = [ApiEndpoints.FETCH_COMMENTS, communityId, threadId];
-        await queryClient.cancelQueries({ queryKey: key });
-        queryClient.setQueryData(key, () => {
-          const tempComments = [...comments];
-          return tempComments.map((comment) => {
-            if (comment.id === commentId) {
-              return {
-                ...comment,
-                reactions: comment.reactions.filter(
-                  (r) => r.id !== variables.reaction_id,
-                ),
-              };
-            }
-            return comment;
-          });
-        });
-      }
+      // // update fetch comments query state
+      // if (deleted) {
+      //   const key = [ApiEndpoints.FETCH_COMMENTS, communityId, threadId];
+      //   await queryClient.cancelQueries({ queryKey: key });
+      //   queryClient.setQueryData(key, () => {
+      //     const tempComments = [...comments];
+      //     return tempComments.map((comment) => {
+      //       if (comment.id === commentId) {
+      //         return {
+      //           ...comment,
+      //           reactions: comment.reactions.filter(
+      //             (r) => r.id !== variables.reaction_id,
+      //           ),
+      //         };
+      //       }
+      //       return comment;
+      //     });
+      //   });
+      // }
     },
     onError: (error) => checkForSessionKeyRevalidationErrors(error),
   });

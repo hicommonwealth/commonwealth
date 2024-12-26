@@ -4,8 +4,6 @@ import { AxiosError } from 'axios';
 import { notifyError } from 'client/scripts/controllers/app/notifications';
 import { trpc } from 'client/scripts/utils/trpcClient';
 import { signCommentReaction } from 'controllers/server/sessions';
-import Reaction from 'models/Reaction';
-import { ApiEndpoints } from 'state/api/config';
 import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
 import { UserTrainingCardTypes } from 'views/components/UserTrainingSlider/types';
 import { useAuthModalStore } from '../../ui/modals';
@@ -68,18 +66,18 @@ const useCreateCommentReactionMutation = ({
   return trpc.comment.createCommentReaction.useMutation({
     onSuccess: (newReaction) => {
       // update fetch comments query state
-      const key = [ApiEndpoints.FETCH_COMMENTS, communityId, threadId];
-      queryClient.cancelQueries({ queryKey: key });
-      queryClient.setQueryData(key, () => {
-        const tempComments = [...comments];
-        const commentToUpdate = tempComments.find((x) => x.id === commentId);
-        newReaction.Address!.User = {
-          profile: commentToUpdate.profile,
-        };
-        // @ts-expect-error StrictNullChecks
-        commentToUpdate.reactions.push(new Reaction(newReaction));
-        return tempComments;
-      });
+      // const key = [ApiEndpoints.FETCH_COMMENTS, communityId, threadId];
+      // queryClient.cancelQueries({ queryKey: key });
+      // queryClient.setQueryData(key, () => {
+      //   const tempComments = [...comments];
+      //   const commentToUpdate = tempComments.find((x) => x.id === commentId);
+      //   newReaction.Address!.User = {
+      //     profile: commentToUpdate.profile,
+      //   };
+      //   // @ts-expect-error StrictNullChecks
+      //   commentToUpdate.reactions.push(new Reaction(newReaction));
+      //   return tempComments;
+      // });
 
       const userId = user.addresses?.[0]?.profile?.userId;
       userId &&

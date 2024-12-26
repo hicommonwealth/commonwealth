@@ -619,6 +619,7 @@ export const CommentTree = ({
             );
           }}
           endReached={() => {
+            // TODO: fix this, it is getting called infinitely
             hasNextPage && fetchMoreComments();
           }}
           overscan={50}
