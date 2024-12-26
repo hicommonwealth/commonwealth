@@ -121,6 +121,7 @@ export const CommentView = Comment.extend({
   Thread: z.undefined(),
   address_id: z.undefined(),
   community_id: z.string(),
+  last_active: z.date().or(z.string()).nullish(),
   Reaction: ReactionView.nullish(),
   search: z.undefined(),
   // this is returned by GetThreads

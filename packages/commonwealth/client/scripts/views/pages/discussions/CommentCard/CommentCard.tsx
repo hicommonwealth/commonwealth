@@ -220,19 +220,18 @@ export const CommentCard = ({
               avatarUrl: comment.profile_avatar || '',
               name: comment.profile_name || DEFAULT_NAME,
               userId: comment.user_id,
-              // TODO: doesn't get used by this component + the api doesn't return this or maybe it does?
-              lastActive: '',
+              lastActive: comment.last_active as unknown as string, // TODO: fix type from api
             }}
             versionHistory={(comment.CommentVersionHistories || []).map(
               (cvh) => ({
                 // TODO: no need to add fallbacks here, these values should exist
                 // if the array obj exists
-                id: cvh.id || 0, // TODO: fix type
-                thread_id: 10, // TODO: need to get this from somewhere
+                id: cvh.id || 0, // TODO: fix type from api
+                thread_id: comment.thread_id,
                 address: comment.address,
                 body: cvh.body,
-                timestamp: cvh.timestamp as unknown as string, // TODO: fix type
-                content_url: cvh.content_url || '', // TODO: fix type
+                timestamp: cvh.timestamp as unknown as string, // TODO: fix type from api
+                content_url: cvh.content_url || '',
               }),
             )}
             onChangeVersionHistoryNumber={handleVersionHistoryChange}
