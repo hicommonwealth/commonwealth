@@ -13,7 +13,6 @@ import useTopicGating from 'hooks/useTopicGating';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, {
-  LegacyRef,
   MutableRefObject,
   useEffect,
   useMemo,
@@ -99,7 +98,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   const user = useUserStore();
   const commentsRef = useRef<HTMLDivElement | null>(null);
-  const pageRef = useRef<HTMLDivElement>();
+  const pageRef = useRef<HTMLDivElement>(null);
 
   const { isAddedToHomeScreen } = useAppStatus();
 
@@ -443,7 +442,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     }
   };
   return (
-    // TODO: the editing experience can be improved (we can remove a stale code and make it smooth) - create a ticket
     <StickCommentProvider>
       <MetaTags
         customMeta={[
@@ -513,8 +511,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
         />
       </Helmet>
 
-      {/* TODO: fix type */}
-      <CWPageLayout ref={pageRef as LegacyRef<HTMLDivElement>}>
+      <CWPageLayout ref={pageRef}>
         <CWContentPage
           showTabs={isCollapsedSize && tabsShouldBePresent}
           contentBodyLabel="Thread"

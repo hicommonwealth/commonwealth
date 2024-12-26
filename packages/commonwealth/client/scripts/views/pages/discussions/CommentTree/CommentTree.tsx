@@ -33,7 +33,7 @@ import { clearEditingLocalStorage } from '../CommentTree/helpers';
 import './CommentTree.scss';
 
 type CommentsTreeAttrs = {
-  pageRef: React.MutableRefObject<HTMLDivElement | undefined>;
+  pageRef: React.MutableRefObject<HTMLDivElement | null>;
   commentsRef: React.MutableRefObject<HTMLDivElement | undefined>;
   thread: Thread;
   setIsGloballyEditing?: (status: boolean) => void;
@@ -522,7 +522,9 @@ export const CommentTree = ({
           className="comments-list"
           style={{ height: '100%', width: '100%' }}
           data={isInitialCommentsLoading ? [] : allComments}
-          customScrollParent={pageRef.current}
+          {...(pageRef.current && {
+            customScrollParent: pageRef.current,
+          })}
           itemContent={(index, comment) => {
             const isCommentAuthor =
               comment.address === user.activeAccount?.address;
