@@ -1,6 +1,7 @@
 import { ContentType } from '@hicommonwealth/shared';
 import { SessionKeyError } from 'controllers/server/sessions';
 import { GetThreadActionTooltipTextResponse } from 'helpers/threads';
+import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import { CommentsFeaturedFilterTypes } from 'models/types';
 import type { DeltaStatic } from 'quill';
 import React, { LegacyRef, useEffect, useRef, useState } from 'react';
@@ -102,6 +103,7 @@ export const CommentTree = ({
     fetchNextPage: fetchMoreComments,
     hasNextPage,
     isInitialLoading: isInitialCommentsLoading,
+    error: fetchCommentsError,
   } = useFetchCommentsQuery({
     thread_id: parseInt(`${thread.id}`) || 0,
     include_reactions: true,
@@ -114,7 +116,13 @@ export const CommentTree = ({
   const allComments = (paginatedComments?.pages || []).flatMap(
     (page) => page.results,
   ) as CommentViewParams[];
-  console.log('allComments => ', allComments);
+
+  useRunOnceOnCondition({
+    callback: () => {
+      notifyError('Failed to load comments list');
+    },
+    shouldRun: !!fetchCommentsError,
+  });
 
   const { mutateAsync: deleteComment } = useDeleteCommentMutation({
     communityId,
