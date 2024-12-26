@@ -8,12 +8,15 @@ import { config } from '../../config';
  * @returns
  */
 // eslint-disable-next-line @typescript-eslint/require-await
-export const createWeb3Provider = async (rpc: string): Promise<Web3> => {
-  if (!config.WEB3.PRIVATE_KEY)
+export const createWeb3Provider = async (
+  rpc: string,
+  keyOverride?: string,
+): Promise<Web3> => {
+  if (!keyOverride && !config.WEB3.PRIVATE_KEY)
     throw new ServerError('WEB3 private key not set!');
   const web3 = new Web3(rpc);
   const account = web3.eth.accounts.privateKeyToAccount(
-    config.WEB3.PRIVATE_KEY,
+    keyOverride ? keyOverride : config.WEB3.PRIVATE_KEY,
   );
   web3.eth.accounts.wallet.add(account);
   web3.eth.defaultAccount = account.address;

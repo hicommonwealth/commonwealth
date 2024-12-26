@@ -1,15 +1,19 @@
-import { AppError } from '@hicommonwealth/core';
+import { AppError, ServerError } from '@hicommonwealth/core';
 import {
   commonProtocol,
   contestAbi,
   feeManagerAbi,
+  namespaceFactoryAbi,
 } from '@hicommonwealth/evm-protocols';
 import { Mutex } from 'async-mutex';
+import { config } from 'model/src/config';
 import Web3, { PayableCallOptions } from 'web3';
 import { AbiItem } from 'web3-utils';
 import { createWeb3Provider } from './utils';
 
 const nonceMutex = new Mutex();
+const TOPIC_LOG =
+  '0x990f533044dbc89b838acde9cd2c72c400999871cf8f792d731edcae15ead693';
 
 export type AddContentResponse = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -372,6 +376,54 @@ export const rollOverContest = async (
     });
     return true;
   });
+};
+
+export const deployERC20Contest = async (
+  namespaceName: string,
+  contestInterval: number,
+  winnerShares: number[],
+  voteToken: string,
+  voterShare: number,
+  exchangeToken: string,
+  namespaceFactory: string,
+  rpcNodeUrl: string,
+): Promise<string> => {
+  if (!config.WEB3.CONTEST_BOT_PRIVATE_KEY)
+    throw new ServerError('Contest bot private key not set!');
+  const web3 = await createWeb3Provider(
+    rpcNodeUrl,
+    config.WEB3.CONTEST_BOT_PRIVATE_KEY,
+  );
+  const contract = new web3.eth.Contract(namespaceFactoryAbi, namespaceFactory);
+  const maxFeePerGasEst = await estimateGas(web3);
+  let txReceipt;
+  try {
+    txReceipt = await contract.methods
+      .newSingleERC20Contest(
+        namespaceName,
+        contestInterval,
+        winnerShares,
+        voteToken,
+        voterShare,
+        exchangeToken,
+      )
+      .send({
+        from: walletAddress,
+        type: '0x2',
+        maxFeePerGas: maxFeePerGasEst?.toString(),
+        maxPriorityFeePerGas: web3.utils.toWei('0.001', 'gwei'),
+      });
+  } catch {
+    throw new Error('New Contest Transaction failed');
+  }
+
+  const eventLog = txReceipt.logs.find((log) => log.topics![0] == TOPIC_LOG);
+  const newContestAddress = web3.eth.abi.decodeParameters(
+    ['address', 'address', 'uint256', 'bool'],
+    // @ts-expect-error StrictNullChecks
+    eventLog.data.toString(),
+  )['0'] as string;
+  return newContestAddress;
 };
 
 const estimateGas = async (web3: Web3): Promise<bigint | null> => {

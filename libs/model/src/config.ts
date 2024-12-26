@@ -41,6 +41,8 @@ const {
   FLAG_FARCASTER_CONTEST,
   OPENAI_API_KEY,
   OPENAI_ORGANIZATION,
+  CONTEST_BOT_PRIVATE_KEY,
+  CONTEST_BOT_NAMESPACE,
 } = process.env;
 
 const NAME = target.NODE_ENV === 'test' ? 'common_test' : 'commonwealth';
@@ -69,6 +71,7 @@ export const config = configure(
     },
     WEB3: {
       PRIVATE_KEY: PRIVATE_KEY || '',
+      CONTEST_BOT_PRIVATE_KEY: CONTEST_BOT_PRIVATE_KEY || '',
     },
     TBC: {
       TTL_SECS: TBC_BALANCE_TTL_SECONDS
@@ -156,6 +159,9 @@ export const config = configure(
       API_KEY: OPENAI_API_KEY,
       ORGANIZATION: OPENAI_ORGANIZATION || 'org-D0ty00TJDApqHYlrn1gge2Ql',
     },
+    BOT: {
+      CONTEST_BOT_NAMESPACE: CONTEST_BOT_NAMESPACE || '',
+    },
   },
   z.object({
     DB: z.object({
@@ -183,6 +189,7 @@ export const config = configure(
             !(target.APP_ENV === 'production' && data === DEFAULTS.PRIVATE_KEY),
           'PRIVATE_KEY must be set to a non-default value in production.',
         ),
+      CONTEST_BOT_PRIVATE_KEY: z.string(),
     }),
     TBC: z.object({
       TTL_SECS: z.number().int(),
@@ -316,6 +323,9 @@ export const config = configure(
     OPENAI: z.object({
       API_KEY: z.string().optional(),
       ORGANIZATION: z.string().optional(),
+    }),
+    BOT: z.object({
+      CONTEST_BOT_NAMESPACE: z.string().optional(),
     }),
   }),
 );
