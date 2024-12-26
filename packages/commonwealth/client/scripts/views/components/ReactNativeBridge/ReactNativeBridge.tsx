@@ -1,5 +1,6 @@
 import useUserStore from 'client/scripts/state/ui/user';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 interface ReactNativeWebView {
   // allows us to send messages to ReactNative.
@@ -31,6 +32,24 @@ type UserInfo = {
   // darkMode: 'dark' | 'light';
 };
 
+type NavigateToLink = {
+  type: 'navigate-to-link';
+  link: string;
+};
+
+function isNavigateToLink(data: object): data is NavigateToLink {
+  return (data as any).type === 'navigate-to-link';
+}
+
+type NavigateBack = {
+  type: 'navigate-back';
+  link: string;
+};
+
+function isNavigateBack(data: object): data is NavigateBack {
+  return (data as any).type === 'navigate-backk';
+}
+
 /**
  * This acts as a bridge between the react-native client (mobile app) and our
  * webapp.  Notifications only work with a userId and the react-native client
@@ -44,8 +63,34 @@ type UserInfo = {
  */
 export const ReactNativeBridge = () => {
   const user = useUserStore();
+  const navigate = useNavigate();
 
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
+
+  const handleMessage = useCallback(
+    (message: MessageEvent) => {
+      const obj = JSON.parse(message.data);
+
+      if (typeof message.data === 'object') {
+        if (isNavigateToLink(obj)) {
+          navigate(obj.link);
+        }
+
+        if (isNavigateBack(obj)) {
+          navigate(-1);
+        }
+      }
+    },
+    [navigate],
+  );
+
+  useEffect(() => {
+    window.addEventListener('message', handleMessage);
+
+    return () => {
+      window.removeEventListener('message', handleMessage);
+    };
+  }, [handleMessage]);
 
   useEffect(() => {
     if (user.id !== userInfo?.userId) {
