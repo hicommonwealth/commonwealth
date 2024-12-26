@@ -65,7 +65,6 @@ export const CommentTree = ({
 }: CommentsTreeAttrs) => {
   const urlParams = new URLSearchParams(location.search);
   const focusCommentsParam = urlParams.get('focusComments') === 'true';
-  // TODO: add these params to API
   const [includeSpam, setIncludeSpam] = useState<boolean>(false);
   const [commentSortType, setCommentSortType] =
     useState<CommentsFeaturedFilterTypes>(CommentsFeaturedFilterTypes.Newest);
