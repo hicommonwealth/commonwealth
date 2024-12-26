@@ -490,6 +490,8 @@ export const CommentTree = ({
 
   if (allComments.length === 0) return <></>;
 
+  // TODO: need to properly display deleted comment tree for comments having replies
+
   return (
     <>
       <div

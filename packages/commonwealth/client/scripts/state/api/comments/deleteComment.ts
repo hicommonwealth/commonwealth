@@ -20,7 +20,6 @@ const useDeleteCommentMutation = ({
   const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
 
   return trpc.comment.deleteComment.useMutation({
-    // TODO: need to properly display deleted comment tree in <CommentTree/>
     onSuccess: async (response) => {
       // Important: we render comments in a tree, if the deleted comment is a
       // leaf node, remove it, but if it has replies, then preserve it with
