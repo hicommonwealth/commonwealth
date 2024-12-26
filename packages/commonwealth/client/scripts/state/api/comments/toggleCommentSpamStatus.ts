@@ -46,11 +46,11 @@ const useToggleCommentSpamStatusMutation = ({
 
   return useMutation({
     mutationFn: toggleCommentSpamStatus,
-    // TODO: check if the type of response format would work for all caches
-    // and wouldn't break anything
     onSuccess: async (response) => {
-      // @ts-expect-error StrictNullChecks
-      const comment = new Comment(response);
+      const comment = new Comment({
+        ...response?.data?.result,
+        community_id: communityId,
+      });
 
       // TODO: #8015 - make a generic util to apply cache
       // updates for comments in all possible key combinations
