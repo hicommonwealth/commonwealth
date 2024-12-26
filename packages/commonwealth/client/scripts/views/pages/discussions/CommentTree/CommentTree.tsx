@@ -20,6 +20,7 @@ import { CreateComment } from 'views/components/Comments/CreateComment';
 import { Select } from 'views/components/Select';
 import { WithActiveStickyComment } from 'views/components/StickEditorContainer/context/WithActiveStickyComment';
 import { CWCheckbox } from 'views/components/component_kit/cw_checkbox';
+import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
 import {
   deserializeDelta,
@@ -103,6 +104,7 @@ export const CommentTree = ({
     fetchNextPage: fetchMoreComments,
     hasNextPage,
     isInitialLoading: isInitialCommentsLoading,
+    isLoading: isLoadingComments,
     error: fetchCommentsError,
   } = useFetchCommentsQuery({
     thread_id: parseInt(`${thread.id}`) || 0,
@@ -642,14 +644,22 @@ export const CommentTree = ({
               </div>
             );
           }}
-          endReached={() => {
-            // TODO: fix this, it is getting called infinitely
-            hasNextPage && fetchMoreComments();
-          }}
           overscan={50}
           components={{
             // eslint-disable-next-line react/no-multi-comp
             EmptyPlaceholder: () => <></>,
+            // eslint-disable-next-line react/no-multi-comp
+            Footer: () =>
+              hasNextPage ? (
+                <CWButton
+                  containerClassName="m-auto"
+                  label="Load more"
+                  disabled={isLoadingComments}
+                  onClick={() => !isLoadingComments && fetchMoreComments()}
+                />
+              ) : (
+                <></>
+              ),
           }}
         />
       </div>
