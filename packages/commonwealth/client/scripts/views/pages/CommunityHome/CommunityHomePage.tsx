@@ -8,6 +8,7 @@ import { CWModal } from '../../components/component_kit/new_designs/CWModal';
 import ManageCommunityStakeModal from '../../modals/ManageCommunityStakeModal/ManageCommunityStakeModal';
 import IdeaLaunchpad from '../Communities/IdeaLaunchpad';
 import './CommunityHomePage.scss';
+import TrendingTokensList from './TrendingTokensList';
 
 const CommunityHome = () => {
   const containerRef = useRef();
@@ -35,6 +36,7 @@ const CommunityHome = () => {
           </div>
           <IdeaLaunchpad />
         </div>
+        <TrendingTokensList />
         <CWModal
           size="small"
           content={
