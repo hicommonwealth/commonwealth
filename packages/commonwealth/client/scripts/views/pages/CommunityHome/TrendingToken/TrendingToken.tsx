@@ -1,6 +1,6 @@
+import PricePercentageChange from 'client/scripts/views/components/TokenCard/PricePercentageChange';
 import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
 import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/CWButton';
-import PricePercentageChange from 'client/scripts/views/components/TokenCard/PricePercentageChange';
 import { TradingMode } from 'client/scripts/views/modals/TradeTokenModel';
 import clsx from 'clsx';
 import { SupportedCurrencies } from 'helpers/currency';
@@ -21,15 +21,10 @@ interface TokenCardProps {
   onCardBodyClick?: () => void;
 }
 
-const MAX_CHARS_FOR_LABELS = 9;
-
 const TreandingToken = ({
   name,
   symbol,
   iconURL,
-  currency = SupportedCurrencies.USD,
-  marketCap,
-  price,
   pricePercentage24HourChange,
   mode,
   className,
