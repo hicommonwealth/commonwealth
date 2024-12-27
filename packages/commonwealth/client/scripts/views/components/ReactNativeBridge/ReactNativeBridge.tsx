@@ -72,7 +72,7 @@ export const ReactNativeBridge = () => {
       const obj = messageToObject(message.data);
       if (obj && typeof message.data === 'object') {
         if (isNavigateToLink(obj)) {
-          navigate(obj.link);
+          navigate(getPathAndQuery(obj.link));
         }
 
         if (isNavigateBack(obj)) {
@@ -117,4 +117,12 @@ export const ReactNativeBridge = () => {
 
 function messageToObject(message: string | object): object {
   return typeof message === 'string' ? JSON.parse(message) : message;
+}
+
+function getPathAndQuery(url: string): string {
+  // only navigate with the path and query because we don't want to include
+  // the host portion as a notification could be from the official common.xyz
+  // site but we might be using frack for testing.
+  const parsedUrl = new URL(url);
+  return `${parsedUrl.pathname}${parsedUrl.search}`;
 }
