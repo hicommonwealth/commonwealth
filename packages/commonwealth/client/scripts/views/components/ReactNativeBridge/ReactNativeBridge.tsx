@@ -38,6 +38,7 @@ type NavigateToLink = {
 };
 
 function isNavigateToLink(data: object): data is NavigateToLink {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (data as any).type === 'navigate-to-link';
 }
 
@@ -47,6 +48,7 @@ type NavigateBack = {
 };
 
 function isNavigateBack(data: object): data is NavigateBack {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (data as any).type === 'navigate-back';
 }
 
