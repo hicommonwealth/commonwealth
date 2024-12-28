@@ -1,4 +1,5 @@
 import {
+  AllowlistData,
   BalanceSourceType,
   Requirement,
   ThresholdData,
@@ -34,11 +35,36 @@ export function validateGroupMembership(
 
   let numRequirementsMet = 0;
 
+  // Check for allowlist first - if present and user is in it, they automatically pass
+  const allowlistRequirement = requirements.find((r) => r.rule === 'allow');
+  if (allowlistRequirement) {
+    const allowlistCheck = _allowlistCheck(
+      userAddress,
+      allowlistRequirement.data as AllowlistData,
+    );
+    if (allowlistCheck.result) {
+      // If user is in the allowlist, they automatically pass all requirements
+      return {
+        isValid: true,
+        messages: [],
+        numRequirementsMet: requirements.length,
+      };
+    }
+  }
+
   requirements.forEach((requirement) => {
     let checkResult: { result: boolean; message: string };
     switch (requirement.rule) {
       case 'threshold': {
         checkResult = _thresholdCheck(userAddress, requirement.data, balances);
+        break;
+      }
+      case 'allow': {
+        // Already checked above, skip here since we handle allowlist at the start
+        checkResult = _allowlistCheck(
+          userAddress,
+          requirement.data as AllowlistData,
+        );
         break;
       }
       default:
@@ -179,6 +205,24 @@ function _thresholdCheck(
       message: !result
         ? `User Balance of ${balance} below threshold ${thresholdData.threshold}`
         : 'pass',
+    };
+  } catch (error) {
+    return {
+      result: false,
+      message: `Error: ${error instanceof Error ? error.message : error}`,
+    };
+  }
+}
+
+function _allowlistCheck(
+  userAddress: string,
+  allowlistData: AllowlistData,
+): { result: boolean; message: string } {
+  try {
+    const result = allowlistData.allow.includes(userAddress);
+    return {
+      result,
+      message: !result ? 'User Address not in Allowlist' : 'pass',
     };
   } catch (error) {
     return {
