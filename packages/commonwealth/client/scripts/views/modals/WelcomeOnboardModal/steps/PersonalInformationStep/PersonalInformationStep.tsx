@@ -40,6 +40,8 @@ const PersonalInformationStep = ({
   const { mutateAsync: updateUser, isLoading: isUpdatingProfile } =
     useUpdateUserMutation();
   const [isEmailChangeDisabled, setIsEmailChangeDisabled] = useState(false);
+  const [isUserNameChangeDisabled, setIsUserNameChangeDisabled] =
+    useState(false);
 
   const [currentUsername, setCurrentUsername] = useState('');
   const debouncedSearchTerm = useDebounce<string>(currentUsername, 500);
@@ -76,6 +78,10 @@ const PersonalInformationStep = ({
         setIsEmailChangeDisabled(true); // we don't allow SSO users to update their email during onboard.
       }
     }
+
+    if (!defaultSSOUsername) {
+      handleGenerateUsername();
+    }
   }, []);
 
   const { mutateAsync: updateSubscriptionPreferences } =
@@ -106,6 +112,7 @@ const PersonalInformationStep = ({
     // @ts-expect-error <StrictNullChecks/>
     formMethodsRef.current.trigger('username').catch(console.error);
     setCurrentUsername(randomUsername);
+    setIsUserNameChangeDisabled(true);
   };
 
   const handleEmailChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -183,17 +190,18 @@ const PersonalInformationStep = ({
                 formState.isDirty &&
                 watch('username')?.trim() !== '' &&
                 isUsernameTaken
-                  ? 'Username already exists'
+                  ? 'Username already taken'
                   : ''
               }
+              disabled={isUserNameChangeDisabled}
             />
             <CWButton
-              label="Generate random username"
+              label="Make a custom username"
               buttonType="tertiary"
               buttonHeight="sm"
               type="button"
               containerClassName="random-generate-btn"
-              onClick={handleGenerateUsername}
+              onClick={() => setIsUserNameChangeDisabled(false)}
             />
           </div>
 

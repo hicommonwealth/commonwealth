@@ -118,6 +118,7 @@ const CommunityNotFoundPage = lazy(
 );
 
 const RewardsPage = lazy(() => import('views/pages/RewardsPage'));
+const OnBoardingPage = lazy(() => import('../views/pages/OnBoarding'));
 
 const CommonDomainRoutes = ({
   tokenizedCommunityEnabled,
@@ -145,7 +146,7 @@ const CommonDomainRoutes = ({
     path="/_internal/markdown-viewer"
     element={<MarkdownViewerPage />}
   />,
-
+  <Route key="/onboarding" path="/onboarding" element={<OnBoardingPage />} />,
   <Route
     key="/"
     path="/"

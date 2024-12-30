@@ -1,0 +1,92 @@
+.OnBoarding {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  padding-top: 54px;
+  justify-content: center;
+  overflow: hidden;
+
+  .swiper-container {
+    width: 100%;
+    height: 93vh;
+    text-align: center;
+    overflow: hidden;
+    justify-content: flex-start;
+    position: relative; // Added for pagination positioning
+
+    .swiper-pagination {
+      position: absolute;
+      bottom: 100px;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      z-index: 10;
+    }
+
+    .swiper-pagination-bullet {
+      width: 10px;
+      height: 10px;
+      background: #d9d9d9;
+      border-radius: 5px;
+      opacity: 1;
+      margin: 0 5px;
+
+      &.swiper-pagination-bullet-active {
+        background: #514e52;
+      }
+    }
+
+    .swiper-slide {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+
+      .slide-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+
+        .animation-container {
+          height: 70%;
+          max-width: 600px;
+          width: 94vw;
+          overflow: hidden;
+        }
+
+        .slide-title {
+          display: flex;
+          width: 100vw;
+          overflow: hidden;
+          padding: 10px;
+          .Text {
+            display: inline;
+            text-align: start;
+            font-size: 43px;
+            line-height: 46px;
+            font-weight: 400;
+          }
+          .onboarding-title {
+            span {
+              font-size: 43px;
+              font-weight: 700;
+              margin-right: 5px;
+            }
+          }
+        }
+      }
+    }
+  }
+  .next-button {
+    width: 90vw !important;
+    position: absolute;
+    bottom: 30px; /* Adjust distance from the bottom if needed */
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 99;
+    cursor: pointer;
+    border: 0px;
+  }
+}
