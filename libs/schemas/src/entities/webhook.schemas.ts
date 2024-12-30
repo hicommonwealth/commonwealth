@@ -9,12 +9,10 @@ export const WebhookSupportedEvents = z.union([
   z.literal('UserMentioned'),
 ]);
 
-export const WebhookDestination = z.nativeEnum(WebhookDestinations);
-
 export const Webhook = z.object({
   id: PG_INT.optional(),
   url: z.string(),
-  destination: WebhookDestination,
+  destination: z.nativeEnum(WebhookDestinations),
   events: z.array(WebhookSupportedEvents),
   community_id: z.string(),
   created_at: z.coerce.date().optional(),

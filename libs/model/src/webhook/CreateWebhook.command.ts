@@ -5,12 +5,14 @@ import {
   type Command,
 } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
+import { WebhookSupportedEvents } from '@hicommonwealth/schemas';
 import {
   WebhookDestinations,
   getElizaUserId,
   getWebhookDestination,
 } from '@hicommonwealth/shared';
 import fetch from 'node-fetch';
+import { z } from 'zod';
 import { models } from '../database';
 import { authRoles } from '../middleware';
 
@@ -66,6 +68,7 @@ export function CreateWebhook(): Command<typeof schemas.CreateWebhook> {
         }
       }
 
+      const events: z.infer<typeof WebhookSupportedEvents>[] = [];
       if (destination === WebhookDestinations.Eliza) {
         const elizaUserId = getElizaUserId(payload.webhookUrl);
         const elizaUser = await models.User.findOne({
@@ -88,13 +91,16 @@ export function CreateWebhook(): Command<typeof schemas.CreateWebhook> {
           elizaUser.Addresses.length > 0
         )
           throw new InvalidState(Errors.ElizaAddressNotFound);
+
+        // automatically add UserMentioned for Eliza Webhooks
+        events.push('UserMentioned');
       }
 
       const webhook = await models.Webhook.create({
         community_id: payload.community_id,
         url: payload.webhookUrl,
         destination,
-        events: [],
+        events,
       });
 
       return webhook.get({ plain: true });
