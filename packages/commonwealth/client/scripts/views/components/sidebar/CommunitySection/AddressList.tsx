@@ -47,7 +47,7 @@ export const AddressList = ({
   const filteredAddresses = Array.from(
     new Map(addresses.map((item) => [item.address, item])).values(),
   );
-  const islastCommunityAddress = filteredAddresses.length === 1;
+  const isLastCommunityAddress = filteredAddresses.length === 1;
 
   return (
     <>
@@ -110,7 +110,7 @@ export const AddressList = ({
                 refreshProfiles();
               }}
               communityName={selectedCommuinty}
-              islastCommunityAddress={islastCommunityAddress}
+              isLastCommunityAddress={isLastCommunityAddress}
             />
           )
         }
