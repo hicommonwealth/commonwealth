@@ -12,10 +12,6 @@ export const CommentTree = ({
   thread,
   setIsGloballyEditing,
   fromDiscordBot,
-  // isReplying, TODO: fix this flag
-  setIsReplying,
-  parentCommentId,
-  setParentCommentId,
   canReact = true,
   canReply = true,
   canComment,
@@ -32,15 +28,14 @@ export const CommentTree = ({
     handleEditStart,
     handleFlagMarkAsSpam,
     handleIsReplying,
-    handleScrollToComment,
+    handleCommentReplyStart,
     isLocked,
+    parentCommentId,
     onFiltersChange,
     isAdmin,
   } = useCommentTree({
     thread,
     setIsGloballyEditing,
-    setIsReplying,
-    setParentCommentId,
   });
 
   return (
@@ -65,15 +60,8 @@ export const CommentTree = ({
         onEditCancel={handleEditCancel}
         onSpamToggle={handleFlagMarkAsSpam}
         pageRef={pageRef}
-        isReplying={{
-          parentCommentId,
-          toComment: 1, // todo: this should refer to the comment that is supposed to get a reply.
-        }}
-        onCommentReplyStart={(commentId, index) => {
-          setParentCommentId(commentId);
-          setIsReplying(true);
-          handleScrollToComment(index);
-        }}
+        isReplyingToCommentId={parentCommentId}
+        onCommentReplyStart={handleCommentReplyStart}
         onCommentReplyEnd={handleIsReplying}
         commentEdits={edits}
         canComment={canComment}

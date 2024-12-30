@@ -26,10 +26,7 @@ type TreeHierarchyArgs = {
   parentCommentId?: number;
   isThreadLocked: boolean;
   isThreadArchived: boolean;
-  isReplying: {
-    toComment: number;
-    parentCommentId?: number;
-  };
+  isReplyingToCommentId?: number;
   isReplyButtonVisible: boolean;
   disabledActionsTooltipText?: GetThreadActionTooltipTextResponse;
   canReply: boolean;
@@ -62,7 +59,7 @@ export const TreeHierarchy = ({
   parentCommentId,
   isThreadLocked,
   isThreadArchived,
-  isReplying,
+  isReplyingToCommentId,
   isReplyButtonVisible,
   disabledActionsTooltipText,
   canReply,
@@ -204,7 +201,7 @@ export const TreeHierarchy = ({
                     onEditCancel={onEditCancel}
                     onSpamToggle={onSpamToggle}
                     pageRef={pageRef}
-                    isReplying={isReplying}
+                    isReplyingToCommentId={isReplyingToCommentId}
                     onCommentReplyStart={onCommentReplyStart}
                     onCommentReplyEnd={onCommentReplyEnd}
                     commentEdits={commentEdits}
@@ -216,15 +213,15 @@ export const TreeHierarchy = ({
                     parentCommentId={comment.id}
                   />
                 )}
-                {isReplying.toComment &&
-                  isReplying.parentCommentId === comment.id && (
+                {isReplyingToCommentId &&
+                  isReplyingToCommentId === comment.id && (
                     <WithActiveStickyComment>
                       <CreateComment
                         handleIsReplying={onCommentReplyEnd}
-                        parentCommentId={isReplying.parentCommentId}
+                        parentCommentId={isReplyingToCommentId}
                         rootThread={thread}
                         canComment={canComment}
-                        isReplying={!!isReplying.toComment}
+                        isReplying={!!isReplyingToCommentId}
                         replyingToAuthor={comment.profile_name}
                         onCancel={() => {
                           onEditCancel(comment, false);

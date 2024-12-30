@@ -81,9 +81,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const [shouldRestoreEdits, setShouldRestoreEdits] = useState(false);
   const [draftTitle, setDraftTitle] = useState('');
   const [isCollapsedSize, setIsCollapsedSize] = useState(false);
-  const [isReplying, setIsReplying] = useState(false);
-  // @ts-expect-error <StrictNullChecks/>
-  const [parentCommentId, setParentCommentId] = useState<number>(null);
 
   const [hideGatingBanner, setHideGatingBanner] = useState(false);
 
@@ -685,10 +682,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                 commentsRef={commentsRef}
                 thread={thread!}
                 setIsGloballyEditing={setIsGloballyEditing}
-                isReplying={isReplying}
-                setIsReplying={setIsReplying}
-                parentCommentId={parentCommentId}
-                setParentCommentId={setParentCommentId}
                 canComment={canComment}
                 canReact={!isRestrictedMembership}
                 canReply={!isRestrictedMembership}

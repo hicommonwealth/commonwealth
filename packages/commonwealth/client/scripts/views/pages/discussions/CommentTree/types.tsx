@@ -9,10 +9,6 @@ export type CommentsTreeProps = {
   commentsRef: React.MutableRefObject<HTMLDivElement | null>;
   thread: Thread;
   setIsGloballyEditing?: (status: boolean) => void;
-  isReplying: boolean;
-  setIsReplying: (status: boolean) => void;
-  parentCommentId: number;
-  setParentCommentId: (id: number) => void;
   fromDiscordBot?: boolean;
   canReact?: boolean;
   canReply?: boolean;
@@ -22,7 +18,7 @@ export type CommentsTreeProps = {
 
 export type UseCommentsTreeProps = Pick<
   CommentsTreeProps,
-  'thread' | 'setIsGloballyEditing' | 'setParentCommentId' | 'setIsReplying'
+  'thread' | 'setIsGloballyEditing'
 >;
 
 export type CommentFilters = {

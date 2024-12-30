@@ -32,8 +32,6 @@ import { CommentFilters, UseCommentsTreeProps } from './types';
 export const useCommentTree = ({
   thread,
   setIsGloballyEditing,
-  setIsReplying,
-  setParentCommentId,
 }: UseCommentsTreeProps) => {
   const urlParams = new URLSearchParams(location.search);
   const focusCommentsParam = urlParams.get('focusComments') === 'true';
@@ -41,6 +39,8 @@ export const useCommentTree = ({
     includeSpam: false,
     sortType: CommentsFeaturedFilterTypes.Newest,
   });
+  const [isReplying, setIsReplying] = useState(false);
+  const [parentCommentId, setParentCommentId] = useState<number>();
 
   const user = useUserStore();
   const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
@@ -141,11 +141,9 @@ export const useCommentTree = ({
   // eslint-disable-next-line @typescript-eslint/no-shadow
   const handleIsReplying = (isReplying: boolean, id?: number) => {
     if (isReplying) {
-      // @ts-expect-error <StrictNullChecks/>
       setParentCommentId(id);
       setIsReplying(true);
     } else {
-      // @ts-expect-error <StrictNullChecks/>
       setParentCommentId(undefined);
       setIsReplying(false);
     }
@@ -430,14 +428,22 @@ export const useCommentTree = ({
     setCommentFilters(newFilters);
   };
 
+  const handleCommentReplyStart = (commentId, index) => {
+    setParentCommentId(commentId);
+    setIsReplying(true);
+    handleScrollToComment(index);
+  };
+
   return {
+    parentCommentId,
     handleIsReplying,
     handleDeleteComment,
     handleEditCancel,
     handleEditStart,
     handleEditConfirm,
     handleFlagMarkAsSpam,
-    handleScrollToComment,
+    handleCommentReplyStart,
+    isReplying,
     isLocked,
     edits,
     isAdmin,
