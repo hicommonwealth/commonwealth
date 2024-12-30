@@ -1,6 +1,5 @@
 import useUserStore from 'client/scripts/state/ui/user';
 import { useCallback, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 
 interface ReactNativeWebView {
   // allows us to send messages to ReactNative.
@@ -65,25 +64,22 @@ function isNavigateBack(data: object): data is NavigateBack {
  */
 export const ReactNativeBridge = () => {
   const user = useUserStore();
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
 
-  const handleMessage = useCallback(
-    (message: MessageEvent) => {
-      const obj = messageToObject(message.data);
-      if (obj && typeof message.data === 'object') {
-        if (isNavigateToLink(obj)) {
-          navigate(getPathAndQuery(obj.link));
-        }
-
-        if (isNavigateBack(obj)) {
-          navigate(-1);
-        }
-      }
-    },
-    [navigate],
-  );
+  const handleMessage = useCallback((message: MessageEvent) => {
+    const obj = messageToObject(message.data);
+    // if (obj && typeof message.data === 'object') {
+    //   if (isNavigateToLink(obj)) {
+    //     navigate(getPathAndQuery(obj.link));
+    //   }
+    //
+    //   if (isNavigateBack(obj)) {
+    //     navigate(-1);
+    //   }
+    // }
+  }, []);
 
   useEffect(() => {
     window.addEventListener('message', handleMessage);
