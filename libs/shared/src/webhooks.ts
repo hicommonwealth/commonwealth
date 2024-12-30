@@ -7,7 +7,7 @@ export enum WebhookDestinations {
   Unknown = 'unknown',
 }
 
-const ElizaWebhookUrlRegex = /^https:\/\/[^\/]+\/eliza\/\d+$/;
+const ElizaWebhookUrlRegex = /^https:\/\/[^/]+\/eliza\/\d+$/;
 
 export function getWebhookDestination(webhookUrl = ''): WebhookDestinations {
   if (!/^https?:\/\/[^\s/$.?#].[^\s]*$/.test(webhookUrl))
