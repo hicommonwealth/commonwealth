@@ -3,7 +3,6 @@ import clsx from 'clsx';
 import { GetThreadActionTooltipTextResponse } from 'helpers/threads';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import Thread from 'models/Thread';
-import { CommentsFeaturedFilterTypes } from 'models/types';
 import type { DeltaStatic } from 'quill';
 import React, { useRef } from 'react';
 import { Virtuoso } from 'react-virtuoso';
@@ -19,6 +18,7 @@ import Permissions from '../../../../utils/Permissions';
 import { CommentCard } from '../CommentCard';
 import { CommentViewParams } from '../CommentCard/CommentCard';
 import './CommentTree.scss';
+import { CommentFilters } from './types';
 
 type TreeHierarchyArgs = {
   pageRef: React.MutableRefObject<HTMLDivElement | null>;
@@ -45,10 +45,7 @@ type TreeHierarchyArgs = {
   onSpamToggle: (comment: CommentViewParams) => void;
   onCommentReplyStart: (commentId: number, commentIndex: number) => void;
   onCommentReplyEnd: (isReplying: boolean, id?: number) => void;
-  commentFilters: {
-    includeSpam: boolean;
-    sortType: CommentsFeaturedFilterTypes;
-  };
+  commentFilters: CommentFilters;
   commentEdits?: {
     [commentId: number]: {
       isEditing?: boolean;
