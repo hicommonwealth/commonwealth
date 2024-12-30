@@ -35,7 +35,7 @@ export const useCommentTree = ({
   const focusCommentsParam = urlParams.get('focusComments') === 'true';
   const [commentFilters, setCommentFilters] = useState<CommentFilters>({
     includeSpam: false,
-    sortType: CommentsFeaturedFilterTypes.Newest,
+    sortType: CommentsFeaturedFilterTypes.MostLikes,
   });
   const [isReplying, setIsReplying] = useState(false);
   const [parentCommentId, setParentCommentId] = useState<number>();
