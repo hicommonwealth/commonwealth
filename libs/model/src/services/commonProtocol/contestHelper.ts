@@ -6,9 +6,9 @@ import {
   namespaceFactoryAbi,
 } from '@hicommonwealth/evm-protocols';
 import { Mutex } from 'async-mutex';
-import { config } from 'model/src/config';
 import Web3, { PayableCallOptions } from 'web3';
 import { AbiItem } from 'web3-utils';
+import { config } from '../../config';
 import { createWeb3Provider } from './utils';
 
 const nonceMutex = new Mutex();

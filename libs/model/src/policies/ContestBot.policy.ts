@@ -9,27 +9,10 @@ import { mustExist } from '../middleware/guards';
 import { TokenAttributes } from '../services';
 import { contractHelpers } from '../services/commonProtocol';
 import { deployERC20Contest } from '../services/commonProtocol/contestHelper';
-
-type ContestMetadataResponse = {
-  contestName: string;
-  payoutStructure: number[];
-  voterShare: number;
-  image_url: string;
-  tokenAddress: string;
-};
-
-const mockLLMCall = (prompt: string): ContestMetadataResponse => {
-  return {
-    contestName: 'test',
-    payoutStructure: [100],
-    voterShare: 20,
-    image_url: 'http://test.com/test.png',
-    tokenAddress: '0x0000000000000000000000000000000000000000',
-  };
-};
+import { parseBotCommand } from '../services/openai/parseBotCommand';
 
 export const ContestBot = async (prompt: string, chain_id: number) => {
-  const contestMetadata = mockLLMCall(prompt);
+  const contestMetadata = await parseBotCommand(prompt);
 
   const namespaceFactory = commonProtocol.factoryContracts[chain_id].factory;
   const botNamespace = config.BOT.CONTEST_BOT_NAMESPACE;
