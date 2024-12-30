@@ -62,7 +62,7 @@ export const processUserMentioned: EventHandler<
           community.custom_domain,
         );
 
-  const res = await provider.triggerWorkflow({
+  await provider.triggerWorkflow({
     key: WorkflowKeys.UserMentioned,
     users: [{ id: String(payload.mentionedUserId) }],
     data: {
@@ -145,5 +145,5 @@ export const processUserMentioned: EventHandler<
     });
   }
 
-  return !res.some((r) => r.status === 'rejected');
+  return true;
 };
