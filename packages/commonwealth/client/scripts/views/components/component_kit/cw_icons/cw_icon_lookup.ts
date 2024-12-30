@@ -13,6 +13,7 @@ import {
   BellSimpleSlash,
   BookOpenText,
   Brain,
+  Cardholder,
   CaretDoubleLeft,
   CaretDoubleRight,
   CaretDown,
@@ -21,6 +22,7 @@ import {
   CaretUp,
   ChatCenteredDots,
   ChatDots,
+  ChatText,
   Chats,
   Check,
   CheckCircle,
@@ -46,6 +48,7 @@ import {
   House,
   Image,
   ImageSquare,
+  Kanban,
   Lightbulb,
   Link,
   LinkBreak,
@@ -87,6 +90,7 @@ import {
   Trash,
   Trophy,
   TwitterLogo,
+  UserSwitch,
   Users,
   UsersThree,
   Warning,
@@ -145,6 +149,7 @@ export const iconLookup = {
   bellRinging: withPhosphorIcon(BellSimpleRinging),
   bellMuted: withPhosphorIcon(BellSimpleSlash),
   bookOpenText: withPhosphorIcon(BookOpenText),
+  cardholder: withPhosphorIcon(Cardholder),
   cautionCircle: Icons.CWCautionCircle,
   cautionTriangle: Icons.CWCautionTriangle,
   chatDots: withPhosphorIcon(ChatDots),
@@ -269,6 +274,7 @@ export const iconLookup = {
   star: Icons.CWStar,
   sun: Icons.CWSun,
   telegram: Icons.CWTelegram,
+  tiktok: Icons.CWTiktok,
   trophy: withPhosphorIcon(Trophy),
   timer: withPhosphorIcon(Timer),
   transfer: Icons.CWTransfer,
@@ -283,6 +289,7 @@ export const iconLookup = {
   unsubscribe: Icons.CWUnsubscribe,
   upvote: withPhosphorIcon(ArrowFatUp),
   users: withPhosphorIcon(Users),
+  userSwitch: withPhosphorIcon(UserSwitch),
   vote: Icons.CWVote,
   views: Icons.CWViews,
   wallet: Icons.CWWallet,
@@ -295,6 +302,7 @@ export const iconLookup = {
   copySimple: withPhosphorIcon(CopySimple),
   viewAll: withPhosphorIcon(Rows),
   viewOverView: withPhosphorIcon(CirclesFour),
+  kanban: withPhosphorIcon(Kanban),
 };
 
 export const customIconLookup = {
@@ -324,6 +332,8 @@ export const customIconLookup = {
   coinbase: CustomIcons.CWCoinbase,
   x: CustomIcons.CWX, // twitter
   apple: CustomIcons.CWApple,
+  farcaster: CustomIcons.CWFarcaster,
+  SMS: withPhosphorIcon(ChatText),
 };
 
 export type IconName = keyof typeof iconLookup;

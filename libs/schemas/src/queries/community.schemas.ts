@@ -12,6 +12,7 @@ import {
   CommunityStake,
   ContestManager,
   ExtendedCommunity,
+  PinnedToken,
   Topic,
 } from '../entities';
 import * as projections from '../projections';
@@ -131,19 +132,19 @@ export const GetCommunityMembers = {
   }),
 };
 
-export const GetStakeTransaction = {
+export const GetTransactions = {
   input: z.object({
     addresses: z.string().optional(),
   }),
   output: z
     .object({
+      transaction_category: z.enum(['stake', 'launchpad']),
+      transaction_type: z.enum(['buy', 'sell']),
       transaction_hash: z.string(),
       address: z.string(),
-      stake_price: z.string(),
-      stake_amount: PG_INT,
-      vote_weight: PG_INT,
+      price: z.number(),
+      amount: z.union([z.string(), PG_INT]),
       timestamp: PG_INT,
-      stake_direction: z.string(),
       community: z.object({
         id: z.string(),
         default_symbol: z.string().nullish(),
@@ -189,6 +190,9 @@ export const TopicView = Topic.extend({
   contest_topics: z.undefined(),
   total_threads: z.number().default(0),
   active_contest_managers: z.array(ConstestManagerView).optional(),
+  chain_node_id: z.number().nullish().optional(),
+  chain_node_url: z.string().nullish().optional(),
+  eth_chain_id: z.number().nullish().optional(),
 });
 
 export const GetTopics = {
@@ -198,4 +202,12 @@ export const GetTopics = {
     with_archived_topics: z.boolean().optional(),
   }),
   output: z.array(TopicView),
+};
+
+export const GetPinnedTokens = {
+  input: z.object({
+    community_ids: z.string(),
+    with_chain_node: z.boolean().optional(),
+  }),
+  output: PinnedToken.array(),
 };

@@ -13,7 +13,6 @@ import {
 import { getRelatedCommunitiesHandler } from '../routes/communities/get_related_communities_handler';
 
 import communityStats from '../routes/communityStats';
-import createAddress from '../routes/createAddress';
 import deleteAddress from '../routes/deleteAddress';
 import domain from '../routes/domain';
 import finishUpdateEmail from '../routes/finishUpdateEmail';
@@ -27,7 +26,6 @@ import threadsUsersCountAndAvatars from '../routes/threadsUsersCountAndAvatars';
 import updateBanner from '../routes/updateBanner';
 import updateEmail from '../routes/updateEmail';
 import updateSiteAdmin from '../routes/updateSiteAdmin';
-import verifyAddress from '../routes/verifyAddress';
 import viewComments from '../routes/viewComments';
 
 import setDefaultRole from '../routes/setDefaultRole';
@@ -72,6 +70,7 @@ import { ServerTagsController } from 'server/controllers/server_tags_controller'
 import { rateLimiterMiddleware } from 'server/middleware/rateLimiter';
 import { getTopUsersHandler } from 'server/routes/admin/get_top_users_handler';
 import { getNamespaceMetadata } from 'server/routes/communities/get_namespace_metadata';
+import deleteAllAddress from 'server/routes/deleteAllAddress';
 import { config } from '../config';
 import { getStatsHandler } from '../routes/admin/get_stats_handler';
 import { getCanvasClockHandler } from '../routes/canvas/get_canvas_clock_handler';
@@ -159,22 +158,18 @@ function setupRouter(
   registerRoute(
     router,
     'post',
-    '/createAddress',
-    createAddress.bind(this, models),
-  );
-  registerRoute(
-    router,
-    'post',
-    '/verifyAddress',
-    verifyAddress.bind(this, models),
-  );
-  registerRoute(
-    router,
-    'post',
     '/deleteAddress',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateCommunity,
     deleteAddress.bind(this, models),
+  );
+  registerRoute(
+    router,
+    'post',
+    '/deleteAllAddresses',
+    passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateCommunity,
+    deleteAllAddress.bind(this, models),
   );
   registerRoute(
     router,

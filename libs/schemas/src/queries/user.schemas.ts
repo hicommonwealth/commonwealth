@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { Referral } from '../entities';
 import { Tags } from '../entities/tag.schemas';
 import { UserProfile } from '../entities/user.schemas';
+import { XpLog } from '../entities/xp.schemas';
 import { PG_INT } from '../utils';
 import { PaginatedResultSchema, PaginationParamsSchema } from './pagination';
 import { AddressView, CommentView, ThreadView } from './thread.schemas';
@@ -29,6 +30,7 @@ export const UserProfileView = z.object({
   commentThreads: z.array(ThreadView),
   isOwner: z.boolean(),
   tags: z.array(Tags.extend({ id: PG_INT })),
+  xp_points: z.number().int(),
 });
 
 export const GetUserProfile = {
@@ -83,18 +85,41 @@ export const GetUserAddresses = {
   ),
 };
 
-export const ReferralView = Referral.extend({
-  referrer: z.object({
-    id: PG_INT,
-    profile: UserProfile,
+export const ReferralView = z.array(
+  Referral.extend({
+    referee_user_id: PG_INT,
+    referee_profile: UserProfile,
   }),
-  referee: z.object({
-    id: PG_INT,
-    profile: UserProfile,
-  }),
-});
+);
 
 export const GetUserReferrals = {
   input: z.object({ user_id: PG_INT.optional() }),
   output: z.array(ReferralView),
+};
+
+export const XpLogView = XpLog.extend({
+  user_profile: UserProfile,
+  creator_profile: UserProfile.nullish(),
+  quest_id: PG_INT.nullish(),
+  quest_action_meta_id: PG_INT.nullish(),
+});
+
+export const GetXps = {
+  input: z.object({
+    user_id: PG_INT.optional().describe('Filters events by user id'),
+    community_id: z
+      .string()
+      .optional()
+      .describe('Filters events by community id associated to quest'),
+    from: z.coerce
+      .date()
+      .optional()
+      .describe('Filters events after this date excluding'),
+    to: z.coerce
+      .date()
+      .optional()
+      .describe('Filters events before this date including'),
+    event_name: z.string().optional().describe('Filters events by event name'),
+  }),
+  output: z.array(XpLogView),
 };

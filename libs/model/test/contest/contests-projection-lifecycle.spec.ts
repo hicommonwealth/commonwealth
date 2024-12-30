@@ -2,19 +2,25 @@ import { BigNumber } from '@ethersproject/bignumber';
 import {
   Actor,
   DeepPartial,
-  EventNames,
   dispose,
   handleEvent,
   query,
 } from '@hicommonwealth/core';
 import { commonProtocol } from '@hicommonwealth/evm-protocols';
-import { models } from '@hicommonwealth/model';
-import { ContestResults } from '@hicommonwealth/schemas';
-import { AbiType, delay } from '@hicommonwealth/shared';
-import chai, { expect } from 'chai';
+import { createEventRegistryChainNodes, models } from '@hicommonwealth/model';
+import { ContestResults, EventNames } from '@hicommonwealth/schemas';
+import { delay } from '@hicommonwealth/shared';
+import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import Sinon from 'sinon';
-import { afterAll, afterEach, beforeAll, describe, test } from 'vitest';
+import {
+  afterAll,
+  afterEach,
+  beforeAll,
+  describe,
+  expect,
+  test,
+  vi,
+} from 'vitest';
 import { z } from 'zod';
 import { Contests } from '../../src/contest/Contests.projection';
 import { GetAllContests } from '../../src/contest/GetAllContests.query';
@@ -59,38 +65,13 @@ describe('Contests projection lifecycle', () => {
   const decimals = commonProtocol.WeiDecimals[commonProtocol.Denominations.ETH];
   const topic_id = 100;
 
-  let getTokenAttributes: Sinon.SinonStub;
-  let getContestScore: Sinon.SinonStub;
-  let getContestStatus: Sinon.SinonStub;
+  const getTokenAttributes = vi.spyOn(contractHelpers, 'getTokenAttributes');
+  const getContestScore = vi.spyOn(contestHelper, 'getContestScore');
+  const getContestStatus = vi.spyOn(contestHelper, 'getContestStatus');
 
   beforeAll(async () => {
-    getTokenAttributes = Sinon.stub(contractHelpers, 'getTokenAttributes');
-    getContestScore = Sinon.stub(contestHelper, 'getContestScore');
-    getContestStatus = Sinon.stub(contestHelper, 'getContestStatus');
-
     try {
-      const [recurringContestAbi] = await seed('ContractAbi', {
-        id: 700,
-        abi: [] as AbiType,
-        nickname: 'RecurringContest',
-        abi_hash: 'hash1',
-        verified: true,
-      });
-      const [singleContestAbi] = await seed('ContractAbi', {
-        id: 701,
-        abi: [] as AbiType,
-        nickname: 'SingleContest',
-        abi_hash: 'hash2',
-        verified: true,
-      });
-      const [chain] = await seed('ChainNode', {
-        contracts: [
-          { abi_id: recurringContestAbi!.id },
-          { abi_id: singleContestAbi!.id },
-        ],
-        url: 'https://test',
-        private_url: 'https://test',
-      });
+      const chainNodes = await createEventRegistryChainNodes();
       const [user] = await seed(
         'User',
         {
@@ -104,7 +85,7 @@ describe('Contests projection lifecycle', () => {
         {
           id: community_id,
           namespace_address: namespace,
-          chain_node_id: chain!.id,
+          chain_node_id: chainNodes[0]!.id,
           discord_config_id: undefined,
           lifetime_thread_count: 0,
           profile_count: 1,
@@ -182,7 +163,7 @@ describe('Contests projection lifecycle', () => {
   });
 
   afterEach(async () => {
-    Sinon.restore();
+    vi.restoreAllMocks();
   });
 
   test('should project events on multiple contests', async () => {
@@ -203,9 +184,9 @@ describe('Contests projection lifecycle', () => {
         prize: ((prizePool * BigInt(payout_structure[1])) / 100n).toString(),
       },
     ];
-    getTokenAttributes.resolves({ ticker, decimals });
-    getContestScore.resolves({
-      contestBalance,
+    getTokenAttributes.mockResolvedValue({ ticker, decimals });
+    getContestScore.mockResolvedValue({
+      contestBalance: contestBalance.toString(),
       scores: [
         {
           winningAddress: creator1,
@@ -219,11 +200,11 @@ describe('Contests projection lifecycle', () => {
         },
       ],
     });
-    getContestStatus.resolves({
+    getContestStatus.mockResolvedValue({
       startTime: 1,
       endTime: 100,
       contestInterval: 50,
-      lastContentId: 1,
+      lastContentId: '1',
     });
 
     await handleEvent(Contests(), {

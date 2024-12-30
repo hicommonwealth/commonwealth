@@ -12,4 +12,21 @@
     width: 100%;
     @include table-cell;
   }
+
+  .group-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+    background-color: $neutral-200;
+    border-radius: 5px;
+    padding: 2px 8px 2px 8px;
+  }
+
+  .group-image {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
 }

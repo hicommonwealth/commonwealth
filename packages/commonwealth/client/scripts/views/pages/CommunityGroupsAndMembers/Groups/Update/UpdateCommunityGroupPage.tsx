@@ -87,6 +87,7 @@ const UpdateCommunityGroupPage = ({ groupId }: { groupId: string }) => {
         initialValues={{
           groupName: foundGroup.name,
           groupDescription: foundGroup.description,
+          groupImageUrl: foundGroup.groupImageUrl,
           // @ts-expect-error <StrictNullChecks/>
           requirements: foundGroup.requirements
             .filter((r) => r?.data?.source) // filter erc groups

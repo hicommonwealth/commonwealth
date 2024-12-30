@@ -20,6 +20,7 @@ import {
   command,
   dispose,
   inMemoryBlobStorage,
+  query,
 } from '@hicommonwealth/core';
 import { AddressAttributes, R2_ADAPTER_KEY } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
@@ -32,6 +33,7 @@ import {
   CreateCommentErrors,
   CreateCommentReaction,
   DeleteComment,
+  GetComments,
   MAX_COMMENT_DEPTH,
   UpdateComment,
 } from '../../src/comment';
@@ -44,6 +46,7 @@ import {
   CreateThreadReaction,
   CreateThreadReactionErrors,
   DeleteThread,
+  GetThreads,
   UpdateThread,
   UpdateThreadErrors,
 } from '../../src/thread';
@@ -843,6 +846,92 @@ describe('Thread lifecycle', () => {
         }),
       ).rejects.toThrowError(InvalidActor);
     });
+
+    test('should get comments with reactions', async () => {
+      await command(CreateComment(), {
+        actor: actors.admin,
+        payload: {
+          parent_msg_id: thread!.canvas_msg_id,
+          thread_id: thread.id!,
+          body: 'hello',
+        },
+      });
+      await command(CreateComment(), {
+        actor: actors.member,
+        payload: {
+          parent_msg_id: thread!.canvas_msg_id,
+          thread_id: thread.id!,
+          body: 'world',
+        },
+      });
+      const response = await query(GetComments(), {
+        actor: actors.member,
+        payload: {
+          limit: 50,
+          cursor: 1,
+          thread_id: thread.id!,
+          include_reactions: true,
+        },
+      });
+      expect(response!.results.length).to.equal(15);
+      const last = response!.results.at(-1)!;
+      const stl = response!.results.at(-2)!;
+      expect(last!.address).to.equal(actors.member.address);
+      expect(last!.user_id).to.equal(actors.member.user.id);
+      expect(last!.body).to.equal('world');
+      expect(stl!.address).to.equal(actors.admin.address);
+      expect(stl!.user_id).to.equal(actors.admin.user.id);
+      expect(stl!.body).to.equal('hello');
+
+      // get second comment with reactions
+      const response2 = await query(GetComments(), {
+        actor: actors.member,
+        payload: {
+          limit: 50,
+          cursor: 1,
+          thread_id: thread.id!,
+          comment_id: response?.results.at(1)!.id,
+          include_reactions: true,
+        },
+      });
+      const second = response2!.results.at(0)!;
+      expect(second!.reactions!.length).to.equal(1);
+    });
+
+    test('should get comments without reactions', async () => {
+      const response = await query(GetComments(), {
+        actor: actors.member,
+        payload: {
+          limit: 50,
+          cursor: 1,
+          thread_id: thread.id!,
+          include_reactions: false,
+        },
+      });
+      expect(response!.results.length).to.equal(15);
+      const last = response!.results.at(-1)!;
+      const stl = response!.results.at(-2)!;
+      expect(last!.address).to.equal(actors.member.address);
+      expect(last!.user_id).to.equal(actors.member.user.id);
+      expect(last!.body).to.equal('world');
+      expect(stl!.address).to.equal(actors.admin.address);
+      expect(stl!.user_id).to.equal(actors.admin.user.id);
+      expect(stl!.body).to.equal('hello');
+
+      // get second comment without reactions
+      const response2 = await query(GetComments(), {
+        actor: actors.member,
+        payload: {
+          limit: 50,
+          cursor: 1,
+          thread_id: thread.id!,
+          comment_id: response?.results.at(1)!.id,
+          include_reactions: false,
+        },
+      });
+      const second = response2!.results.at(0)!;
+      expect(second!.reactions).to.be.undefined;
+    });
   });
 
   describe('thread reaction', () => {
@@ -943,6 +1032,44 @@ describe('Thread lifecycle', () => {
       const t = await models.Thread.findByPk(thread!.id);
       expect(`${t!.reaction_weights_sum}`).to.eq(`${expectedWeight}`);
     });
+
+    // test('should handle ERC20 topic weight vote', async () => {
+    //   const topic = await command(CreateTopic(), {
+    //     actor: actors.admin,
+    //     payload: {
+    //       community_id: community.id,
+    //       name: 'erc20 test topic',
+    //       description: '',
+    //       featured_in_sidebar: false,
+    //       featured_in_new_post: false,
+    //       weighted_voting: TopicWeightedVoting.ERC20,
+    //       token_address: '0x0000000000000000000000000000000000000123',
+    //       token_symbol: 'TEST',
+    //       vote_weight_multiplier: 2,
+    //       chain_node_id: community.chain_node_id,
+    //     },
+    //   });
+    //   const thread = await command(CreateThread(), {
+    //     actor: actors.admin,
+    //     payload: {
+    //       body: 'abc',
+    //       community_id: community.id,
+    //       topic_id: topic!.topic.id!,
+    //       title: 'test thread',
+    //       kind: 'discussion',
+    //       stage: '',
+    //       read_only: false,
+    //     },
+    //   });
+    //   const reaction = await command(CreateThreadReaction(), {
+    //     actor: actors.admin,
+    //     payload: {
+    //       thread_id: thread!.id!,
+    //       reaction: 'like',
+    //     },
+    //   });
+    //   expect(reaction?.calculated_voting_weight).to.eq('100');
+    // });
 
     test('should delete a reaction', async () => {
       const reaction = await command(CreateThreadReaction(), {
@@ -1115,6 +1242,24 @@ describe('Thread lifecycle', () => {
           },
         }),
       ).rejects.toThrow('Not the author of the entity');
+    });
+  });
+
+  describe('queries', () => {
+    test('should query threads', async () => {
+      // test GetThreads output schema validation
+      // TODO: include contests, votes, and other fields
+
+      const response = await query(GetThreads(), {
+        actor: actors.member,
+        payload: {
+          community_id: thread.community_id,
+          limit: 100,
+        },
+      });
+
+      // console.log(response);
+      expect(response!.threads.length).to.equal(7);
     });
   });
 });

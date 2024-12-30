@@ -15,6 +15,7 @@ export type QuillRendererProps = {
   customClass?: string;
   customShowMoreButton?: ReactNode;
   onImageClick?: () => void;
+  isCardView?: boolean;
 };
 
 type RichTextDocInfo = { format: 'richtext'; content: DeltaStatic };

@@ -7,6 +7,7 @@ import { commentsByDate } from 'helpers/dates';
 import { filterLinks, getThreadActionTooltipText } from 'helpers/threads';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import useBrowserWindow from 'hooks/useBrowserWindow';
+import { useFlag } from 'hooks/useFlag';
 import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import useTopicGating from 'hooks/useTopicGating';
@@ -29,6 +30,9 @@ import ExternalLink from 'views/components/ExternalLink';
 import JoinCommunityBanner from 'views/components/JoinCommunityBanner';
 import MarkdownViewerUsingQuillOrNewEditor from 'views/components/MarkdownViewerWithFallback';
 import { checkIsTopicInContest } from 'views/components/NewThreadFormLegacy/helpers';
+import { StickyCommentElementSelector } from 'views/components/StickEditorContainer/context';
+import { StickCommentProvider } from 'views/components/StickEditorContainer/context/StickCommentProvider';
+import { WithDefaultStickyComment } from 'views/components/StickEditorContainer/context/WithDefaultStickyComment';
 import useJoinCommunity from 'views/components/SublayoutHeader/useJoinCommunity';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { PageNotFound } from 'views/pages/404';
@@ -72,6 +76,7 @@ type ViewThreadPageProps = {
 };
 const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const threadId = identifier.split('-')[0];
+  const stickyEditor = useFlag('stickyEditor');
   const [searchParams] = useSearchParams();
   const isEdit = searchParams.get('isEdit') ?? undefined;
   const navigate = useCommonNavigate();
@@ -350,7 +355,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   const editsToSave = localStorage.getItem(
     `${app.activeChainId()}-edit-thread-${thread?.id}-storedText`,
   );
-  const isStageDefault = thread && isDefaultStage(thread.stage);
+  const isStageDefault = thread && isDefaultStage(app, thread.stage);
 
   const tabsShouldBePresent =
     showLinkedProposalOptions ||
@@ -454,7 +459,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
   };
   return (
     // TODO: the editing experience can be improved (we can remove a stale code and make it smooth) - create a ticket
-    <>
+    <StickCommentProvider>
       <MetaTags
         customMeta={[
           {
@@ -662,15 +667,18 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                   ) : thread && !isGloballyEditing && user.isLoggedIn ? (
                     <>
                       {threadOptionsComp}
-                      <CreateComment
-                        rootThread={thread}
-                        canComment={canComment}
-                        tooltipText={
-                          typeof disabledActionsTooltipText === 'function'
-                            ? disabledActionsTooltipText?.('comment')
-                            : disabledActionsTooltipText
-                        }
-                      />
+
+                      {!stickyEditor && (
+                        <CreateComment
+                          rootThread={thread}
+                          canComment={canComment}
+                          tooltipText={
+                            typeof disabledActionsTooltipText === 'function'
+                              ? disabledActionsTooltipText?.('comment')
+                              : disabledActionsTooltipText
+                          }
+                        />
+                      )}
                       {foundGatedTopic &&
                         !hideGatingBanner &&
                         isRestrictedMembership && (
@@ -743,6 +751,27 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                 commentSortType={commentSortType}
                 disabledActionsTooltipText={disabledActionsTooltipText}
               />
+
+              <WithDefaultStickyComment>
+                {stickyEditor &&
+                  thread &&
+                  !thread.readOnly &&
+                  !fromDiscordBot &&
+                  !isGloballyEditing &&
+                  user.isLoggedIn && (
+                    <CreateComment
+                      rootThread={thread}
+                      canComment={canComment}
+                      tooltipText={
+                        typeof disabledActionsTooltipText === 'function'
+                          ? disabledActionsTooltipText?.('comment')
+                          : disabledActionsTooltipText
+                      }
+                    />
+                  )}
+              </WithDefaultStickyComment>
+
+              <StickyCommentElementSelector />
             </>
           }
           editingDisabled={isTopicInContest}
@@ -843,7 +872,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
         />
       </CWPageLayout>
       {JoinCommunityModals}
-    </>
+    </StickCommentProvider>
   );
 };
 

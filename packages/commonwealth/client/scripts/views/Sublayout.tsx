@@ -7,6 +7,8 @@ import app from 'state';
 import useSidebarStore from 'state/ui/sidebar';
 import { SublayoutHeader } from 'views/components/SublayoutHeader';
 import { Sidebar } from 'views/components/sidebar';
+import farcasterContestImage from '../../assets/img/farcasterContestImage.png';
+import { useHandleInviteLink } from '../hooks/useHandleInviteLink';
 import useNecessaryEffect from '../hooks/useNecessaryEffect';
 import useStickyHeader from '../hooks/useStickyHeader';
 import {
@@ -21,7 +23,8 @@ import { AdminOnboardingSlider } from './components/AdminOnboardingSlider';
 import { Breadcrumbs } from './components/Breadcrumbs';
 import MobileNavigation from './components/MobileNavigation';
 import AuthButtons from './components/SublayoutHeader/AuthButtons';
-import { UserTrainingSlider } from './components/UserTrainingSlider';
+import { CWGrowlTemplate } from './components/SublayoutHeader/GrowlTemplate';
+import useJoinCommunity from './components/SublayoutHeader/useJoinCommunity';
 import { CWModal } from './components/component_kit/new_designs/CWModal';
 import CollapsableSidebarButton from './components/sidebar/CollapsableSidebarButton';
 import { AuthModal, AuthModalType } from './modals/AuthModal';
@@ -36,16 +39,21 @@ type SublayoutProps = {
 const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
   const { menuVisible, setMenu, menuName } = useSidebarStore();
   const [resizing, setResizing] = useState(false);
+  const { JoinCommunityModals, handleJoinCommunity } = useJoinCommunity();
+
+  const location = useLocation();
 
   useStickyHeader({
     elementId: 'mobile-auth-buttons',
     stickyBehaviourEnabled: true,
     zIndex: 70,
   });
-  const { isWindowSmallInclusive, isWindowExtraSmall } = useBrowserWindow({
-    onResize: () => setResizing(true),
-    resizeListenerUpdateDeps: [resizing],
-  });
+
+  const { isWindowSmallInclusive, isWindowExtraSmall, isWindowSmallToMedium } =
+    useBrowserWindow({
+      onResize: () => setResizing(true),
+      resizeListenerUpdateDeps: [resizing],
+    });
   const { authModalType, setAuthModalType } = useAuthModalStore();
   const user = useUserStore();
 
@@ -75,7 +83,7 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
     user.isLoggedIn,
   ]);
 
-  const location = useLocation();
+  useHandleInviteLink({ isInsideCommunity, handleJoinCommunity });
 
   useWindowResize({
     setMenu,
@@ -121,7 +129,7 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
 
   return (
     <div className="Sublayout">
-      {!isWindowSmallInclusive && (
+      {(!isWindowSmallInclusive || isWindowSmallToMedium) && (
         <CollapsableSidebarButton
           onMobile={isWindowExtraSmall}
           // @ts-expect-error StrictNullChecks
@@ -176,12 +184,23 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
               />
             </div>
             {!routesWithoutGenericBreadcrumbs && <Breadcrumbs />}
-            {!routesWithoutGenericSliders && <UserTrainingSlider />}
+
             {isInsideCommunity && !routesWithoutGenericSliders && (
               <AdminOnboardingSlider />
             )}
             {children}
           </div>
+          <CWGrowlTemplate
+            headerText="Launch Contests On Farcaster!"
+            bodyText="You can now host contests directly on Farcaster to reach and engage your followers.
+            They can submit entries,
+            vote for their favorites, and earn rewards, all without leaving the page."
+            buttonText="Enter $MOCHI Contest"
+            buttonLink="https://www.google.com/"
+            growlType="farcasterContest"
+            growlImage={farcasterContestImage}
+            extraText="Enter the first Farcaster Contest hosted by our friends at Mochi"
+          />
         </div>
         <WelcomeOnboardModal
           isOpen={isWelcomeOnboardModalOpen}
@@ -192,12 +211,12 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
           content={
             <InviteLinkModal
               onModalClose={() => setIsInviteLinkModalOpen(false)}
-              isInsideCommunity={!!isInsideCommunity}
             />
           }
           open={!isWindowExtraSmall && isInviteLinkModalOpen}
           onClose={() => setIsInviteLinkModalOpen(false)}
         />
+        {JoinCommunityModals}
       </div>
       {isWindowExtraSmall && <MobileNavigation />}
     </div>

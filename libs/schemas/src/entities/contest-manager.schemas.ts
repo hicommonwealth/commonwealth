@@ -10,6 +10,7 @@ export const ContestManager = z
     contest_address: z.string().describe('On-Chain contest manager address'),
     community_id: z.string(),
     name: z.string(),
+    description: z.string().nullish(),
     image_url: z.string().nullish(),
     funding_token_address: z
       .string()
@@ -46,9 +47,24 @@ export const ContestManager = z
       .describe(
         'Flags when the one-off contest has ended and rollover was completed',
       ),
-    topics: z.array(Topic).nullish(),
     contests: z.array(Contest).nullish(),
     farcaster_frame_url: z.string().nullish(),
     farcaster_frame_hashes: z.array(z.string()).nullish(),
+    neynar_webhook_id: z
+      .string()
+      .nullish()
+      .describe('Neynar ID of the ReplyCastCreated webhook'),
+    neynar_webhook_secret: z
+      .string()
+      .nullish()
+      .describe('Neynar secret for the ReplyCastCreated webhook'),
+    topic_id: PG_INT.nullish(),
+    topics: z.array(Topic).nullish(),
+    is_farcaster_contest: z.boolean(),
+    vote_weight_multiplier: z
+      .number()
+      .gt(0)
+      .nullish()
+      .describe('Vote weight multiplier'),
   })
   .describe('On-Chain Contest Manager');

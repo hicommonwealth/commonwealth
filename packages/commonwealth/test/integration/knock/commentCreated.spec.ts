@@ -1,9 +1,4 @@
 import {
-  CommentCreated,
-  EventNames,
-  ProviderError,
-  SpyNotificationsProvider,
-  ThrowingSpyNotificationsProvider,
   WorkflowKeys,
   dispose,
   disposeAdapter,
@@ -11,21 +6,29 @@ import {
 } from '@hicommonwealth/core';
 import { models, tester } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
+import { EventNames } from '@hicommonwealth/schemas';
 import { BalanceType } from '@hicommonwealth/shared';
-import chai, { expect } from 'chai';
+import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import sinon from 'sinon';
 import {
+  Mock,
   afterAll,
   afterEach,
   beforeAll,
   beforeEach,
   describe,
+  expect,
   test,
+  vi,
 } from 'vitest';
 import z from 'zod';
 import { processCommentCreated } from '../../../server/workers/knock/eventHandlers/commentCreated';
 import { getCommentUrl } from '../../../server/workers/knock/util';
+import {
+  ProviderError,
+  SpyNotificationsProvider,
+  ThrowingSpyNotificationsProvider,
+} from '../../util/mockedNotificationProvider';
 
 chai.use(chaiAsPromised);
 
@@ -37,8 +40,7 @@ describe('CommentCreated Event Handler', () => {
     thread: z.infer<typeof schemas.Thread> | undefined,
     rootComment: z.infer<typeof schemas.Comment> | undefined,
     replyComment: z.infer<typeof schemas.Comment> | undefined,
-    mentionedComment: z.infer<typeof schemas.Comment> | undefined,
-    sandbox: sinon.SinonSandbox;
+    mentionedComment: z.infer<typeof schemas.Comment> | undefined;
 
   const customDomain = 'random_custom_domain.com';
 
@@ -50,7 +52,6 @@ describe('CommentCreated Event Handler', () => {
         name: 'Sepolia Testnet',
         eth_chain_id: 11155111,
         balance_type: BalanceType.Ethereum,
-        contracts: [],
       },
       { mock: false },
     );
@@ -122,10 +123,7 @@ describe('CommentCreated Event Handler', () => {
   afterEach(() => {
     const provider = notificationsProvider();
     disposeAdapter(provider.name);
-
-    if (sandbox) {
-      sandbox.restore();
-    }
+    vi.restoreAllMocks();
   });
 
   afterAll(async () => {
@@ -135,7 +133,9 @@ describe('CommentCreated Event Handler', () => {
   test('should not throw if a valid author is not found', async () => {
     const res = await processCommentCreated({
       name: EventNames.CommentCreated,
-      payload: { address_id: -999999 } as z.infer<typeof CommentCreated>,
+      payload: { address_id: -999999 } as z.infer<
+        typeof schemas.events.CommentCreated
+      >,
     });
     expect(res).to.be.false;
   });
@@ -147,15 +147,14 @@ describe('CommentCreated Event Handler', () => {
         // @ts-expect-error StrictNullChecks
         address_id: rootComment.address_id,
         community_id: '2f92ekf2fjpe9svk23',
-      } as z.infer<typeof CommentCreated>,
+      } as z.infer<typeof schemas.events.CommentCreated>,
     });
     expect(res).to.be.false;
   });
 
   test('should do nothing if there are no relevant subscriptions', async () => {
-    sandbox = sinon.createSandbox();
     const provider = notificationsProvider({
-      adapter: SpyNotificationsProvider(sandbox),
+      adapter: SpyNotificationsProvider(),
     });
 
     const res = await processCommentCreated({
@@ -169,16 +168,15 @@ describe('CommentCreated Event Handler', () => {
         id: rootComment.id,
         // @ts-expect-error StrictNullChecks
         thread_id: rootComment.thread_id,
-      } as z.infer<typeof CommentCreated>,
+      } as z.infer<typeof schemas.events.CommentCreated>,
     });
     expect(res).to.be.true;
-    expect((provider.triggerWorkflow as sinon.SinonStub).notCalled).to.be.true;
+    expect(provider.triggerWorkflow as Mock).not.toHaveBeenCalled();
   });
 
   test('should execute the triggerWorkflow function with appropriate data for a root comment', async () => {
-    sandbox = sinon.createSandbox();
     const provider = notificationsProvider({
-      adapter: SpyNotificationsProvider(sandbox),
+      adapter: SpyNotificationsProvider(),
     });
 
     await tester.seed('ThreadSubscription', {
@@ -196,13 +194,9 @@ describe('CommentCreated Event Handler', () => {
       res,
       'The event handler should return true if it triggered a workflow',
     ).to.be.true;
-    expect(
-      (provider.triggerWorkflow as sinon.SinonStub).calledOnce,
-      'The event handler should trigger a workflow',
-    ).to.be.true;
-    expect(
-      (provider.triggerWorkflow as sinon.SinonStub).getCall(0).args[0],
-    ).to.deep.equal({
+    // The event handler should trigger a workflow
+    expect(provider.triggerWorkflow as Mock).toHaveBeenCalledOnce();
+    expect((provider.triggerWorkflow as Mock).mock.calls[0][0]).to.deep.equal({
       key: WorkflowKeys.CommentCreation,
       // @ts-expect-error StrictNullChecks
       users: [{ id: String(subscriber.id) }],
@@ -213,7 +207,10 @@ describe('CommentCreated Event Handler', () => {
         comment_body: rootComment?.body.substring(0, 255),
         comment_url: `https://${customDomain}/${community!
           .id!}/discussion/${thread!.id!}?comment=${rootComment!.id!}`,
-        comment_created_event: { ...rootComment, community_id: community!.id },
+        comment_created_event: {
+          ...rootComment,
+          community_id: community!.id,
+        },
       },
       // @ts-expect-error StrictNullChecks
       actor: { id: String(author.id) },
@@ -221,9 +218,8 @@ describe('CommentCreated Event Handler', () => {
   });
 
   test('should execute the triggerWorkflow function with appropriate data for a reply comment', async () => {
-    sandbox = sinon.createSandbox();
     const provider = notificationsProvider({
-      adapter: SpyNotificationsProvider(sandbox),
+      adapter: SpyNotificationsProvider(),
     });
 
     await tester.seed('CommentSubscription', {
@@ -241,13 +237,9 @@ describe('CommentCreated Event Handler', () => {
       res,
       'The event handler should return true if it triggered a workflow',
     ).to.be.true;
-    expect(
-      (provider.triggerWorkflow as sinon.SinonStub).calledOnce,
-      'The event handler should trigger a workflow',
-    ).to.be.true;
-    expect(
-      (provider.triggerWorkflow as sinon.SinonStub).getCall(0).args[0],
-    ).to.deep.equal({
+    // The event handler should trigger a workflow
+    expect(provider.triggerWorkflow as Mock).toHaveBeenCalledOnce();
+    expect((provider.triggerWorkflow as Mock).mock.calls[0][0]).to.deep.equal({
       key: WorkflowKeys.CommentCreation,
       // @ts-expect-error StrictNullChecks
       users: [{ id: String(subscriber.id) }],
@@ -262,7 +254,10 @@ describe('CommentCreated Event Handler', () => {
           replyComment!.id!,
           customDomain,
         ),
-        comment_created_event: { ...replyComment, community_id: community!.id },
+        comment_created_event: {
+          ...replyComment,
+          community_id: community!.id,
+        },
       },
       // @ts-expect-error StrictNullChecks
       actor: { id: String(author.id) },
@@ -270,9 +265,8 @@ describe('CommentCreated Event Handler', () => {
   });
 
   test('should throw if triggerWorkflow fails', async () => {
-    sandbox = sinon.createSandbox();
     notificationsProvider({
-      adapter: ThrowingSpyNotificationsProvider(sandbox),
+      adapter: ThrowingSpyNotificationsProvider(),
     });
 
     await tester.seed('ThreadSubscription', {
@@ -292,9 +286,8 @@ describe('CommentCreated Event Handler', () => {
   });
 
   test('should not trigger workflow for mentioned users', async () => {
-    sandbox = sinon.createSandbox();
     const provider = notificationsProvider({
-      adapter: SpyNotificationsProvider(sandbox),
+      adapter: SpyNotificationsProvider(),
     });
 
     await tester.seed('CommentSubscription', {
@@ -320,13 +313,9 @@ describe('CommentCreated Event Handler', () => {
       res,
       'The event handler should return true if it triggered a workflow',
     ).to.be.true;
-    expect(
-      (provider.triggerWorkflow as sinon.SinonStub).calledOnce,
-      'The event handler should trigger a workflow',
-    ).to.be.true;
-    expect(
-      (provider.triggerWorkflow as sinon.SinonStub).getCall(0).args[0],
-    ).to.deep.equal({
+    // The event handler should trigger a workflow
+    expect(provider.triggerWorkflow as Mock).toHaveBeenCalledOnce();
+    expect((provider.triggerWorkflow as Mock).mock.calls[0][0]).to.deep.equal({
       key: WorkflowKeys.CommentCreation,
       users: [{ id: String(subscriber!.id) }],
       data: {

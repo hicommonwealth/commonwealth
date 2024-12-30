@@ -25,6 +25,7 @@ import { MessageRow } from 'views/components/component_kit/new_designs/CWTextInp
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import CommunityManagementLayout from 'views/pages/CommunityManagement/common/CommunityManagementLayout';
 
+import { BLOG_SUBDOMAIN, ZERO_ADDRESS } from '@hicommonwealth/shared';
 import { CONTEST_FAQ_URL } from '../../../utils';
 import {
   ContestFeeType,
@@ -76,6 +77,7 @@ const DetailsFormStep = ({
 
   const [isProcessingProfileImage, setIsProcessingProfileImage] =
     useState(false);
+  const [voteWeightMultiplier, setVoteWeightMultiplier] = useState(1);
 
   const { mutateAsync: updateContest } = useUpdateContestMutation();
 
@@ -106,7 +108,7 @@ const DetailsFormStep = ({
   const totalPayoutPercentageError = totalPayoutPercentage !== 100;
 
   const weightedTopics = (topicsData || [])
-    .filter((t) => t?.weighted_voting)
+    .filter((t) => t?.weighted_voting && t.token_address !== ZERO_ADDRESS)
     .map((t) => ({
       value: t.id,
       label: t.name,
@@ -205,6 +207,7 @@ const DetailsFormStep = ({
       payoutStructure,
       contestDuration,
       isFarcasterContest,
+      voteWeightMultiplier,
     };
 
     if (editMode) {
@@ -236,7 +239,7 @@ const DetailsFormStep = ({
           <>
             <CWText className="contest-description">
               Your contest is live and the smart contract settings cannot be
-              changed. <a href="https://blog.commonwealth.im">Learn more</a>
+              changed. <a href={BLOG_SUBDOMAIN}>Learn more</a>
             </CWText>
           </>
         ) : (
@@ -244,8 +247,9 @@ const DetailsFormStep = ({
             <CWText className="contest-description">
               Launch a contest using the funds from your community wallet to
               create engagement incentives.{' '}
-              <CWText fontWeight="medium">Contests last 7 days</CWText> in
-              blockchain time.{' '}
+              <CWText fontWeight="medium">
+                Contests can be anywhere from 1 to 7 days in duration.
+              </CWText>{' '}
               <a
                 href={CONTEST_FAQ_URL}
                 rel="noopener noreferrer"
@@ -260,8 +264,7 @@ const DetailsFormStep = ({
       featureHint={{
         title: 'How do I fund my contest?',
         description:
-          'Contests are funded when community members purchase stake in the community. ' +
-          'Each transaction includes a small contribution to the community pool that can be used to fund contests.',
+          'Contests can be funded directly using any token that is on the same chain as your community.',
       }}
     >
       <div className="DetailsFormStep">
@@ -269,6 +272,7 @@ const DetailsFormStep = ({
           validationSchema={schema}
           onSubmit={handleSubmit}
           initialValues={getInitialValues()}
+          onErrors={(err) => console.warn('FORM ERRORS: ', err)}
         >
           {({ watch, setValue }) => (
             <>
@@ -276,9 +280,8 @@ const DetailsFormStep = ({
                 <div className="contest-section contest-section-topic">
                   <CWText type="h4">Choose a topic</CWText>
                   <CWText type="b1">
-                    Select which topic you would like to include in this
-                    contest. Only threads posted to this topic will be eligible
-                    for the contest prizes.
+                    Choose a topic for the contest to live in. Only threads
+                    posted to this topic will be part of the contest.
                   </CWText>
 
                   <CWSelectList
@@ -363,8 +366,7 @@ const DetailsFormStep = ({
 
               {weightedTopics.find(
                 (t) => t.value === watch('contestTopic')?.value,
-              )?.weightedVoting === TopicWeightedVoting.ERC20 ||
-              isFarcasterContest ? (
+              )?.weightedVoting === TopicWeightedVoting.ERC20 ? (
                 <>
                   <div className="contest-section contest-section-funding">
                     <CWText type="h4">Contest Funding</CWText>
@@ -438,6 +440,59 @@ const DetailsFormStep = ({
                     </div>
                   </div>
                 </>
+              ) : isFarcasterContest ? (
+                <div className="contest-section contest-section-farcaster-token">
+                  <CWText type="h4">Primary token</CWText>
+                  <CWText type="b1">
+                    Enter a token to fund the contest and for weighting upvotes
+                    on the contest.
+                  </CWText>
+                  <TokenFinder
+                    debouncedTokenValue={debouncedTokenValue}
+                    tokenMetadataLoading={tokenMetadataLoading}
+                    tokenMetadata={tokenMetadata}
+                    setTokenValue={setTokenValue}
+                    tokenValue={
+                      editMode
+                        ? contestFormData?.fundingTokenAddress || ''
+                        : tokenValue
+                    }
+                    containerClassName="token-input"
+                    disabled={editMode}
+                    fullWidth
+                    placeholder="Enter funding token address"
+                    tokenError={getTokenError(
+                      watch('contestRecurring') === ContestRecurringType.No,
+                    )}
+                    hookToForm
+                    name="fundingTokenAddress"
+                  />
+
+                  <CWText type="h5">Vote weight voteWeightMultiplier</CWText>
+
+                  <div className="input-row">
+                    <CWText type="b1" className="description">
+                      1 token is equal to
+                    </CWText>
+                    <CWTextInput
+                      type="number"
+                      min={1}
+                      defaultValue={1}
+                      isCompact
+                      value={voteWeightMultiplier}
+                      onInput={(e) =>
+                        setVoteWeightMultiplier(Number(e.target.value))
+                      }
+                    />
+                    <CWText type="b1" className="description">
+                      votes.
+                    </CWText>
+                  </div>
+                  <CWText type="b1" className="description">
+                    Vote weight per token held by the user will be{' '}
+                    {voteWeightMultiplier || 0}.
+                  </CWText>
+                </div>
               ) : (
                 <></>
               )}
@@ -468,10 +523,8 @@ const DetailsFormStep = ({
               <div className="contest-section contest-section-payout">
                 <CWText type="h4">Winners & payouts</CWText>
                 <CWText type="b1" className="winners-description">
-                  Set the number of winners and how much of the total prize pool
-                  they take{' '}
-                  <CWText fontWeight="medium">20% of each prize</CWText> will be
-                  split amongst the voters of the winning content.
+                  Set the number of winners and allocate the proportion of
+                  prizes for them.
                 </CWText>
                 <div className="payout-container">
                   {payoutStructure.map((payoutNumber, index) => (

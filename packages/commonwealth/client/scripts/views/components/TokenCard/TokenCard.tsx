@@ -1,6 +1,7 @@
 import clsx from 'clsx';
 import { currencyNameToSymbolMap, SupportedCurrencies } from 'helpers/currency';
 import React, { ReactNode } from 'react';
+import { TradingMode } from '../../modals/TradeTokenModel';
 import { CWText } from '../component_kit/cw_text';
 import { CWButton } from '../component_kit/new_designs/CWButton';
 import { CWTooltip } from '../component_kit/new_designs/CWTooltip';
@@ -14,12 +15,12 @@ interface TokenCardProps {
   symbol: string;
   iconURL: string;
   currency?: SupportedCurrencies;
-  marketCap: { current: number; goal: number };
+  marketCap: { current: number; goal: number; isCapped: boolean };
   price: number;
   pricePercentage24HourChange: number;
-  mode: 'buy' | 'swap';
+  mode: TradingMode.Buy | TradingMode.Swap;
   className?: string;
-  onCTAClick?: () => void;
+  onCTAClick?: (mode: TradingMode) => void;
   onCardBodyClick?: () => void;
 }
 
@@ -129,7 +130,7 @@ const TokenCard = ({
         buttonWidth="full"
         buttonType="secondary"
         buttonAlt="green"
-        onClick={onCTAClick}
+        onClick={() => onCTAClick?.(mode)}
       />
     </div>
   );

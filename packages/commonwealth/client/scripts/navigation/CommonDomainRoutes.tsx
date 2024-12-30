@@ -78,6 +78,9 @@ const CommunityIntegrations = lazy(
 const CommunityStakeIntegration = lazy(
   () => import('views/pages/CommunityManagement/StakeIntegration'),
 );
+const CommunityTokenIntegration = lazy(
+  () => import('views/pages/CommunityManagement/TokenIntegration'),
+);
 
 const CommunityTopics = lazy(
   () => import('views/pages/CommunityManagement/Topics'),
@@ -91,7 +94,7 @@ const ManageContest = lazy(
 const Contests = lazy(() => import('views/pages/Contests'));
 const ContestPage = lazy(() => import('views/pages/ContestPage'));
 
-const MyCommunityStake = lazy(() => import('views/pages/MyCommunityStake'));
+const MyTransactions = lazy(() => import('views/pages/MyTransactions'));
 
 const SnapshotProposalPage = lazy(
   () => import('views/pages/Snapshots/SnapshotProposals'),
@@ -113,6 +116,8 @@ const ProfilePageRedirect = lazy(() => import('views/pages/profile_redirect'));
 const CommunityNotFoundPage = lazy(
   () => import('views/pages/CommunityNotFoundPage'),
 );
+
+const RewardsPage = lazy(() => import('views/pages/RewardsPage'));
 
 const CommonDomainRoutes = ({
   tokenizedCommunityEnabled,
@@ -178,14 +183,19 @@ const CommonDomainRoutes = ({
     })}
   />,
   <Route
+    key="/rewards"
+    path="/rewards"
+    element={withLayout(RewardsPage, { type: 'common' })}
+  />,
+  <Route
     key="/search"
     path="/search"
     element={withLayout(SearchPage, { type: 'common' })}
   />,
   <Route
-    key="/myCommunityStake"
-    path="/myCommunityStake"
-    element={withLayout(MyCommunityStake, { type: 'common' })}
+    key="/myTransactions"
+    path="/myTransactions"
+    element={withLayout(MyTransactions, { type: 'common' })}
   />,
   // scoped
   <Route
@@ -344,6 +354,14 @@ const CommonDomainRoutes = ({
     })}
   />,
   <Route
+    key="/new/discussion"
+    path="/new/discussion"
+    element={withLayout(NewThreadPage, {
+      scoped: false,
+      type: 'common',
+    })}
+  />,
+  <Route
     key="/:scope/proposal/discussion/:identifier"
     path="/:scope/proposal/discussion/:identifier"
     element={
@@ -396,6 +414,14 @@ const CommonDomainRoutes = ({
     key="/:scope/manage/integrations/stake"
     path="/:scope/manage/integrations/stake"
     element={withLayout(CommunityStakeIntegration, {
+      scoped: true,
+    })}
+  />,
+
+  <Route
+    key="/:scope/manage/integrations/token"
+    path="/:scope/manage/integrations/token"
+    element={withLayout(CommunityTokenIntegration, {
       scoped: true,
     })}
   />,

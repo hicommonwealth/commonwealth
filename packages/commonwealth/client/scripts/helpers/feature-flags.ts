@@ -30,6 +30,9 @@ const featureFlags = {
   tokenizedCommunity: buildFlag(process.env.FLAG_TOKENIZED_COMMUNITY),
   manageApiKeys: buildFlag(process.env.FLAG_MANAGE_API_KEYS),
   referrals: buildFlag(process.env.FLAG_REFERRALS),
+  stickyEditor: buildFlag(process.env.FLAG_STICKY_EDITOR),
+  newMobileNav: buildFlag(process.env.FLAG_NEW_MOBILE_NAV),
+  rewardsPage: buildFlag(process.env.FLAG_REWARDS_PAGE),
 };
 
 export type AvailableFeatureFlag = keyof typeof featureFlags;

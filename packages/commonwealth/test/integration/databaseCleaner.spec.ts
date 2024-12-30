@@ -8,19 +8,19 @@ import {
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import { Sequelize } from 'sequelize';
-import sinon from 'sinon';
 import {
   afterAll,
   afterEach,
   beforeAll,
   beforeEach,
   describe,
+  expect,
   test,
+  vi,
 } from 'vitest';
 import { DatabaseCleaner } from '../../server/util/databaseCleaner';
 
 chai.use(chaiHttp);
-const { expect } = chai;
 
 describe('DatabaseCleaner Tests', async () => {
   let models: DB;
@@ -34,8 +34,6 @@ describe('DatabaseCleaner Tests', async () => {
   });
 
   describe('Tests when the cleaner runs', () => {
-    let clock: sinon.SinonFakeTimers;
-
     beforeEach(function () {
       const now = new Date();
       now.setUTCHours(8);
@@ -43,15 +41,14 @@ describe('DatabaseCleaner Tests', async () => {
       now.setUTCMilliseconds(0);
 
       // set clock to 8 AM UTC current year, month, and day
-      clock = sinon.useFakeTimers(now);
-    });
-
-    afterEach(function () {
-      clock.restore();
+      vi.useFakeTimers({
+        now,
+      });
     });
 
     afterEach(() => {
-      sinon.restore();
+      vi.restoreAllMocks();
+      vi.useRealTimers();
     });
 
     test('should not run if started before the correct hour', () => {
@@ -121,23 +118,21 @@ describe('DatabaseCleaner Tests', async () => {
   });
 
   describe('Tests what the cleaner cleans', () => {
-    let clock: sinon.SinonFakeTimers;
-
     beforeAll(function () {
       const now = new Date();
       now.setUTCHours(8);
       now.setUTCMinutes(0);
       now.setUTCMilliseconds(0);
       // set clock to 8 AM UTC current year, month, and day
-      // clock = sinon.useFakeTimers(new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 8)));
-      clock = sinon.useFakeTimers({
+      vi.useFakeTimers({
         now,
         shouldAdvanceTime: true,
       });
     });
 
     afterAll(function () {
-      clock.restore();
+      vi.restoreAllMocks();
+      vi.useRealTimers();
     });
 
     test('Should only delete subscriptions associated with users that have not logged-in in over 1 year', async () => {

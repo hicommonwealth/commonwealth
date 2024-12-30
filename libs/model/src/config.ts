@@ -1,4 +1,5 @@
 import { configure, config as target } from '@hicommonwealth/core';
+import { S3_ASSET_BUCKET_CDN } from '@hicommonwealth/shared';
 import { z } from 'zod';
 
 const {
@@ -32,6 +33,7 @@ const {
   ALCHEMY_PUBLIC_APP_KEY,
   MEMBERSHIP_REFRESH_BATCH_SIZE,
   MEMBERSHIP_REFRESH_TTL_SECONDS,
+  NEYNAR_BOT_UUID,
   NEYNAR_API_KEY,
   NEYNAR_CAST_CREATED_WEBHOOK_SECRET,
   NEYNAR_REPLY_WEBHOOK_URL,
@@ -48,8 +50,7 @@ const DEFAULTS = {
   ADDRESS_TOKEN_EXPIRES_IN: '10',
   PRIVATE_KEY: '',
   DATABASE_URL: `postgresql://commonwealth:edgeware@localhost/${NAME}`,
-  DEFAULT_COMMONWEALTH_LOGO:
-    'https://s3.amazonaws.com/assets.commonwealth.im/common-white.png',
+  DEFAULT_COMMONWEALTH_LOGO: `https://s3.amazonaws.com/${S3_ASSET_BUCKET_CDN}/common-white.png`,
   MEMBERSHIP_REFRESH_BATCH_SIZE: '1000',
   MEMBERSHIP_REFRESH_TTL_SECONDS: '120',
 };
@@ -85,12 +86,13 @@ export const config = configure(
         : null,
     },
     CONTESTS: {
-      MIN_USER_ETH: 0.0005,
+      MIN_USER_ETH: 0,
       MAX_USER_POSTS_PER_CONTEST: MAX_USER_POSTS_PER_CONTEST
         ? parseInt(MAX_USER_POSTS_PER_CONTEST, 10)
-        : 2,
+        : 5,
       FLAG_FARCASTER_CONTEST: FLAG_FARCASTER_CONTEST === 'true',
       NEYNAR_API_KEY: NEYNAR_API_KEY,
+      NEYNAR_BOT_UUID: NEYNAR_BOT_UUID,
       NEYNAR_CAST_CREATED_WEBHOOK_SECRET: NEYNAR_CAST_CREATED_WEBHOOK_SECRET,
       NEYNAR_REPLY_WEBHOOK_URL: NEYNAR_REPLY_WEBHOOK_URL,
       FARCASTER_ACTION_URL: FARCASTER_ACTION_URL,
@@ -195,10 +197,41 @@ export const config = configure(
       MIN_USER_ETH: z.number(),
       MAX_USER_POSTS_PER_CONTEST: z.number().int(),
       FLAG_FARCASTER_CONTEST: z.boolean().nullish(),
-      NEYNAR_API_KEY: z.string().nullish(),
-      NEYNAR_CAST_CREATED_WEBHOOK_SECRET: z.string().nullish(),
-      NEYNAR_REPLY_WEBHOOK_URL: z.string().nullish(),
-      FARCASTER_ACTION_URL: z.string().nullish(),
+      NEYNAR_BOT_UUID: z
+        .string()
+        .optional()
+        .refine(
+          (data) => !(target.APP_ENV === 'production' && !data),
+          'NEYNAR_BOT_UUID must be set to a non-default value in production.',
+        ),
+      NEYNAR_API_KEY: z
+        .string()
+        .optional()
+        .refine(
+          (data) => !(target.APP_ENV === 'production' && !data),
+          'NEYNAR_API_KEY must be set to a non-default value in production.',
+        ),
+      NEYNAR_CAST_CREATED_WEBHOOK_SECRET: z
+        .string()
+        .optional()
+        .refine(
+          (data) => !(target.APP_ENV === 'production' && !data),
+          'NEYNAR_CAST_CREATED_WEBHOOK_SECRET must be set to a non-default value in production.',
+        ),
+      NEYNAR_REPLY_WEBHOOK_URL: z
+        .string()
+        .optional()
+        .refine(
+          (data) => !(target.APP_ENV === 'production' && !data),
+          'NEYNAR_REPLY_WEBHOOK_URL must be set to a non-default value in production.',
+        ),
+      FARCASTER_ACTION_URL: z
+        .string()
+        .optional()
+        .refine(
+          (data) => !(target.APP_ENV === 'production' && !data),
+          'FARCASTER_ACTION_URL must be set to a non-default value in production.',
+        ),
     }),
     AUTH: z
       .object({

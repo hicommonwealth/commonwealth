@@ -1,4 +1,4 @@
-import { EventNames, InvalidInput, type Command } from '@hicommonwealth/core';
+import { InvalidInput, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { DEFAULT_NAME } from '@hicommonwealth/shared';
 import { models } from '../database';
@@ -14,7 +14,7 @@ export function UpdateUser(): Command<typeof schemas.UpdateUser> {
       if (actor.user.id != payload.id)
         throw new InvalidInput('Invalid user id');
 
-      const { id, profile, tag_ids, referral_link } = payload;
+      const { id, profile, tag_ids, referrer_address } = payload;
       const {
         slug,
         name,
@@ -80,19 +80,6 @@ export function UpdateUser(): Command<typeof schemas.UpdateUser> {
               await updateTags(tag_ids!, user.id!, 'user_id', transaction);
 
             if (update_user) {
-              // emit sign-up flow completed event when:
-              if (user_delta.is_welcome_onboard_flow_complete && referral_link)
-                await emitEvent(
-                  models.Outbox,
-                  [
-                    {
-                      event_name: EventNames.SignUpFlowCompleted,
-                      event_payload: { user_id: id, referral_link },
-                    },
-                  ],
-                  transaction,
-                );
-
               // TODO: utility to deep merge deltas
               const updates = {
                 ...user_delta,
@@ -113,7 +100,27 @@ export function UpdateUser(): Command<typeof schemas.UpdateUser> {
                 returning: true,
                 transaction,
               });
-              return rows.at(0);
+              const updated_user = rows.at(0);
+
+              // emit sign-up flow completed event when:
+              if (updated_user && user_delta.is_welcome_onboard_flow_complete) {
+                await emitEvent(
+                  models.Outbox,
+                  [
+                    {
+                      event_name: schemas.EventNames.SignUpFlowCompleted,
+                      event_payload: {
+                        user_id: id,
+                        created_at: updated_user.created_at!,
+                        referrer_address,
+                        referee_address: actor.address,
+                      },
+                    },
+                  ],
+                  transaction,
+                );
+              }
+              return updated_user;
             } else return user;
           },
         );

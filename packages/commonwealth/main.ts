@@ -1,6 +1,7 @@
 import { CacheDecorator, setupErrorHandlers } from '@hicommonwealth/adapters';
 import { logger } from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
+import { PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
 import sgMail from '@sendgrid/mail';
 import compression from 'compression';
 import SessionSequelizeStore from 'connect-session-sequelize';
@@ -82,10 +83,10 @@ export async function main(
   });
 
   const setupMiddleware = () => {
-    // redirect from commonwealthapp.herokuapp.com to commonwealth.im
+    // redirect from commonwealthapp.herokuapp.com to PRODUCTION_DOMAIN
     app.all(/.*/, (req, res, next) => {
       if (req.header('host')?.match(/commonwealthapp.herokuapp.com/i)) {
-        res.redirect(301, `https://commonwealth.im${req.url}`);
+        res.redirect(301, `https://${PRODUCTION_DOMAIN}{req.url}`);
       } else {
         next();
       }
@@ -142,8 +143,16 @@ export async function main(
     app.use(passport.initialize());
     app.use(passport.session());
 
-    withPrerender &&
-      app.use(prerenderNode.set('prerenderToken', config.PRERENDER_TOKEN));
+    if (withPrerender) {
+      const rendererInstance = prerenderNode.set(
+        'prerenderToken',
+        config.PRERENDER_TOKEN,
+      );
+      app.use((req, res, next) => {
+        if (req.path.startsWith(`${api.integration.PATH}/farcaster/`)) next();
+        else rendererInstance(req, res, next);
+      });
+    }
   };
 
   setupMiddleware();
