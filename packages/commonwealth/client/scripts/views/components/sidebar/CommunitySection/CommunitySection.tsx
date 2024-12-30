@@ -4,6 +4,7 @@ import NewProfile from 'client/scripts/models/NewProfile';
 import { useFetchProfileByIdQuery } from 'client/scripts/state/api/profiles';
 import { useAuthModalStore } from 'client/scripts/state/ui/modals';
 import { AuthModalType } from 'client/scripts/views/modals/AuthModal';
+import { PageNotFound } from 'client/scripts/views/pages/404';
 import { findDenominationString } from 'helpers/findDenomination';
 import { useFlag } from 'hooks/useFlag';
 import React, { useEffect, useState } from 'react';
@@ -41,8 +42,14 @@ interface CommunitySectionProps {
   showSkeleton: boolean;
 }
 
+enum ProfileError {
+  None,
+  NoProfileFound,
+}
+
 export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
   const [profile, setProfile] = useState<NewProfile>();
+  const [errorCode, setErrorCode] = useState<ProfileError>(ProfileError.None);
 
   const tokenizedCommunityEnabled = useFlag('tokenizedCommunity');
   const { setAuthModalType } = useAuthModalStore();
@@ -100,6 +107,7 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
     if (isLoadingProfile) return;
 
     if (error) {
+      setErrorCode(ProfileError.NoProfileFound);
       setProfile(undefined);
       return;
     }
@@ -119,6 +127,9 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
   if (showSkeleton || isLoading || isContestDataLoading)
     return <CommunitySectionSkeleton />;
 
+  if (errorCode === ProfileError.NoProfileFound)
+    return <PageNotFound message="We cannot find this profile." />;
+
   const isAdmin =
     Permissions.isSiteAdmin() ||
     Permissions.isCommunityAdmin() ||
@@ -127,7 +138,7 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
   return (
     <>
       <div className="community-menu">
-        <ProfileCard />
+        {user.isLoggedIn && <ProfileCard />}
         {user.isLoggedIn && (
           <>
             <AccountConnectionIndicator
