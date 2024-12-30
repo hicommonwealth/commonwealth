@@ -408,7 +408,7 @@ export const deployERC20Contest = async (
         exchangeToken,
       )
       .send({
-        from: walletAddress,
+        from: web3.eth.defaultAccount,
         type: '0x2',
         maxFeePerGas: maxFeePerGasEst?.toString(),
         maxPriorityFeePerGas: web3.utils.toWei('0.001', 'gwei'),
