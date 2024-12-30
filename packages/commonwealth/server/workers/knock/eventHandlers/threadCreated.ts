@@ -90,6 +90,7 @@ export const processThreadCreated: EventHandler<
         object_title: Webhook.getRenderedTitle(thread!.title),
         object_url: threadURl,
         object_summary: threadSummary,
+        content_url: payload.content_url,
       },
     });
 

@@ -156,4 +156,5 @@ export const WebhookNotification = z.object({
   object_title: z.string(),
   object_url: z.string(),
   object_summary: z.string(),
+  content_url: z.string().nullish(),
 });
