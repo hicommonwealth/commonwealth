@@ -320,7 +320,7 @@ export const CommentCard = ({
                       ? disabledActionsTooltipText?.('reply')
                       : disabledActionsTooltipText) ||
                     (canReply && maxReplyLimitReached
-                      ? 'Nested reply limit reached'
+                      ? 'Further replies not allowed'
                       : '')
                   }
                   onClick={async (e) => {

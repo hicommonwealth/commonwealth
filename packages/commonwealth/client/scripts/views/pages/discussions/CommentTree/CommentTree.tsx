@@ -49,7 +49,7 @@ export const CommentTree = ({
   commentsRef,
   thread,
   setIsGloballyEditing,
-  // fromDiscordBot, TODO: use this again
+  fromDiscordBot,
   // isReplying, TODO: fix this flag
   setIsReplying,
   parentCommentId,
@@ -504,6 +504,9 @@ export const CommentTree = ({
         }}
         isThreadArchived={!!thread.archivedAt}
         isThreadLocked={isLocked}
+        isReplyButtonVisible={
+          !!(!isLocked && !fromDiscordBot && user.isLoggedIn)
+        }
         onDelete={handleDeleteComment}
         onEditStart={handleEditStart}
         onEditConfirm={handleEditConfirm}
@@ -512,7 +515,7 @@ export const CommentTree = ({
         pageRef={pageRef}
         isReplying={{
           parentCommentId,
-          toComment: 1, //todo
+          toComment: 1, // todo: this should refer to the comment that is supposed to get a reply.
         }}
         onCommentReplyStart={(commentId, index) => {
           setParentCommentId(commentId);

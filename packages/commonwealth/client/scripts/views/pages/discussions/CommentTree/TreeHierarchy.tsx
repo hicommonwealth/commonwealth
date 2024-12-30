@@ -1,3 +1,4 @@
+import { MAX_COMMENT_DEPTH } from '@hicommonwealth/shared';
 import clsx from 'clsx';
 import { GetThreadActionTooltipTextResponse } from 'helpers/threads';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
@@ -31,6 +32,7 @@ type TreeHierarchyArgs = {
     toComment: number;
     parentCommentId?: number;
   };
+  isReplyButtonVisible: boolean;
   disabledActionsTooltipText?: GetThreadActionTooltipTextResponse;
   canReply: boolean;
   canReact: boolean;
@@ -66,6 +68,7 @@ export const TreeHierarchy = ({
   isThreadLocked,
   isThreadArchived,
   isReplying,
+  isReplyButtonVisible,
   disabledActionsTooltipText,
   canReply,
   canReact,
@@ -155,14 +158,10 @@ export const TreeHierarchy = ({
                     disabledActionsTooltipText={disabledActionsTooltipText}
                     isThreadArchived={isThreadArchived}
                     canReply={canReply}
-                    maxReplyLimitReached={false}
-                    // TODO: both of these values will depend on the comment level
-                    // ex: if its a 8th level reply in a comment reply chain etc.
-                    // and the reply button should be hidden when a certain comment reply
-                    // level is reached. Previously it was 8, now this needs to come from
-                    // api.
-                    // maxReplyLimitReached={comment.maxReplyLimitReached}
-                    // replyBtnVisible={comment.replyBtnVisible}
+                    maxReplyLimitReached={
+                      comment.comment_level >= MAX_COMMENT_DEPTH
+                    }
+                    replyBtnVisible={isReplyButtonVisible}
                     canReact={canReact}
                     canEdit={
                       !isThreadLocked && (isCommentAuthor || isAdminOrMod)
@@ -182,7 +181,6 @@ export const TreeHierarchy = ({
                     canDelete={
                       !isThreadLocked && (isCommentAuthor || isAdminOrMod)
                     }
-                    replyBtnVisible={true}
                     onReply={() => {
                       onCommentReplyStart(comment.id, index);
                     }}
@@ -201,6 +199,7 @@ export const TreeHierarchy = ({
                     commentFilters={commentFilters}
                     isThreadArchived={!!thread.archivedAt}
                     isThreadLocked={isThreadLocked}
+                    isReplyButtonVisible={isReplyButtonVisible}
                     onDelete={onDelete}
                     onEditStart={onEditStart}
                     onEditConfirm={onEditConfirm}

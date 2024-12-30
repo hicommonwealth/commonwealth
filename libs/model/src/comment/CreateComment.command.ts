@@ -6,6 +6,7 @@ import {
   uploadIfLarge,
 } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
+import { MAX_COMMENT_DEPTH } from '@hicommonwealth/shared';
 import { models } from '../database';
 import { authThread } from '../middleware';
 import { verifyCommentSignature } from '../middleware/canvas';
@@ -17,8 +18,6 @@ import {
   uniqueMentions,
 } from '../utils';
 import { getCommentDepth } from '../utils/getCommentDepth';
-
-export const MAX_COMMENT_DEPTH = 8;
 
 export const CreateCommentErrors = {
   CantCommentOnReadOnly: 'Cannot comment when thread is read_only',
