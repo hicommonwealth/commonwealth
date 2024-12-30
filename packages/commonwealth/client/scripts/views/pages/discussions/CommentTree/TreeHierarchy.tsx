@@ -20,8 +20,6 @@ import { CommentCard } from '../CommentCard';
 import { CommentViewParams } from '../CommentCard/CommentCard';
 import './CommentTree.scss';
 
-// TODO: show reply counts on comments
-
 type TreeHierarchyArgs = {
   pageRef: React.MutableRefObject<HTMLDivElement | null>;
   thread: Thread;
@@ -162,6 +160,9 @@ export const TreeHierarchy = ({
                       comment.comment_level >= MAX_COMMENT_DEPTH
                     }
                     replyBtnVisible={isReplyButtonVisible}
+                    {...(comment.reply_count > 0 && {
+                      repliesCount: comment.reply_count,
+                    })}
                     canReact={canReact}
                     canEdit={
                       !isThreadLocked && (isCommentAuthor || isAdminOrMod)

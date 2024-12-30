@@ -52,6 +52,7 @@ type CommentCardProps = {
   onDelete?: () => any;
   // Reply
   replyBtnVisible?: boolean;
+  repliesCount?: number;
   onReply?: () => any;
   canReply?: boolean;
   maxReplyLimitReached: boolean;
@@ -86,6 +87,7 @@ export const CommentCard = ({
   onDelete,
   // reply
   replyBtnVisible,
+  repliesCount,
   onReply,
   canReply,
   maxReplyLimitReached,
@@ -313,7 +315,7 @@ export const CommentCard = ({
               {!isThreadArchived && replyBtnVisible && (
                 <CWThreadAction
                   action="reply"
-                  label="Reply"
+                  label={`Reply${repliesCount ? ` (${repliesCount})` : ''}`}
                   disabled={maxReplyLimitReached || !canReply}
                   tooltipText={
                     (typeof disabledActionsTooltipText === 'function'
