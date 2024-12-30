@@ -55,6 +55,10 @@ export const convertGranularPermissionsToAccumulatedPermissions = (
     return TOPIC_PERMISSIONS[GroupTopicPermissionEnum.UPVOTE];
   }
 
+  if (permissions.includes(PermissionEnum.CREATE_COMMENT)) {
+    return TOPIC_PERMISSIONS[GroupTopicPermissionEnum.COMMENT];
+  }
+
   return TOPIC_PERMISSIONS.UPVOTE_AND_COMMENT_AND_POST;
 };
 

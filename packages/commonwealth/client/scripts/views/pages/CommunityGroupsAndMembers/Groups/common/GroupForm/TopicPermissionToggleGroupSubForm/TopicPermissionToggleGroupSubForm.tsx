@@ -81,7 +81,7 @@ const TopicPermissionToggleGroupSubForm = ({
   };
 
   return (
-    <div className="topic-permissions">
+    <div className="TopicPermissions">
       <div className="permissions-header">
         <CWText className="header-title" fontWeight="regular">
           Topic
