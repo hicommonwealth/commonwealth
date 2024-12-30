@@ -5,7 +5,7 @@ import {
   type Command,
 } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
-import { getWebhookDestination } from '@hicommonwealth/shared';
+import { getElizaUserId, getWebhookDestination } from '@hicommonwealth/shared';
 import fetch from 'node-fetch';
 import { models } from '../database';
 import { authRoles } from '../middleware';
@@ -20,6 +20,8 @@ const Errors = {
   MissingChannelIdTelegram: 'The Telegram url is missing a channel id',
   WebhookNotFound: 'The Webhook does not exist',
   UnauthorizedWebhooks: 'Cannot make requests to unauthorized webhooks',
+  ElizaUserNotFound: 'Eliza user not found',
+  ElizaAddressNotFound: 'Eliza address not found',
 };
 
 export function CreateWebhook(): Command<typeof schemas.CreateWebhook> {
@@ -58,6 +60,30 @@ export function CreateWebhook(): Command<typeof schemas.CreateWebhook> {
         } else if (res.status === 401) {
           throw new InvalidInput(Errors.UnauthorizedWebhooks);
         }
+      }
+
+      if (destination === 'eliza') {
+        const elizaUserId = getElizaUserId(payload.webhookUrl);
+        const elizaUser = await models.User.findOne({
+          where: {
+            id: elizaUserId,
+          },
+          include: [
+            {
+              model: models.Address,
+              required: false,
+              where: {
+                community_id: payload.community_id,
+              },
+            },
+          ],
+        });
+        if (!elizaUser) throw new InvalidState(Errors.ElizaUserNotFound);
+        if (
+          !Array.isArray(elizaUser.Addresses) ||
+          elizaUser.Addresses.length > 0
+        )
+          throw new InvalidState(Errors.ElizaAddressNotFound);
       }
 
       const webhook = await models.Webhook.create({

@@ -320,6 +320,8 @@ export const renderQuillDeltaToText = (
     .join(paragraphSeparator);
 };
 
+const ElizaWebhookUrlRegex = /^https:\/\/[^\/]+\/eliza\/\d+$/;
+
 export function getWebhookDestination(webhookUrl = ''): string {
   if (!/^https?:\/\/[^\s/$.?#].[^\s]*$/.test(webhookUrl)) return 'unknown';
 
@@ -337,9 +339,16 @@ export function getWebhookDestination(webhookUrl = ''): string {
     const [, channelId] = webhookUrl.split('/@');
     if (!channelId) destination = 'unknown';
     else destination = 'telegram';
-  }
+  } else if (ElizaWebhookUrlRegex.test(webhookUrl)) destination = 'eliza';
 
   return destination;
+}
+
+export function getElizaUserId(webhookUrl: string): number {
+  if (!ElizaWebhookUrlRegex.test(webhookUrl))
+    throw new Error('Invalid Eliza webhook URL');
+  const stringId = webhookUrl.split('/').pop()!;
+  return parseInt(stringId, 10);
 }
 
 export function getDecodedString(str: string) {
