@@ -139,18 +139,6 @@ export const CommentTree = ({
   //   }
   // }, [comments?.length, highlightedComment]);
 
-  // const commentsList = usePrepareCommentsList({
-  //   levelZeroComments: comments,
-  //   allComments,
-  //   threadId: thread.id,
-  //   includeSpams,
-  //   commentSortType,
-  //   isLocked,
-  //   // @ts-expect-error <StrictNullChecks/>
-  //   fromDiscordBot,
-  //   isLoggedIn: user.isLoggedIn,
-  // });
-
   const commentRefs = useRef<(HTMLDivElement | null)[]>([]);
   const [expandedComment, setExpandedComment] = useState<number | null>(null);
 
