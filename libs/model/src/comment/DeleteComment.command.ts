@@ -17,6 +17,19 @@ export function DeleteComment(): Command<typeof schemas.DeleteComment> {
           where: { comment_id: comment.id },
           transaction,
         });
+
+        if (comment.parent_id) {
+          const parent = await models.Comment.findOne({
+            where: { id: comment.parent_id },
+            include: [models.Address],
+          });
+
+          if (parent) {
+            parent.reply_count -= 1;
+            await parent.save({ transaction });
+          }
+        }
+
         await comment.destroy({ transaction });
       });
       // == end of transaction boundary ==

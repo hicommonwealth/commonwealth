@@ -44,6 +44,11 @@ export default (
         type: Sequelize.STRING(MAX_TRUNCATED_CONTENT_LENGTH),
         allowNull: false,
       },
+      comment_level: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+      },
 
       // canvas-related columns
       canvas_signed_data: { type: Sequelize.JSONB, allowNull: true },
@@ -57,6 +62,11 @@ export default (
       discord_meta: { type: Sequelize.JSONB, allowNull: true },
 
       //counts
+      reply_count: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+      },
       reaction_count: {
         type: Sequelize.INTEGER,
         allowNull: false,

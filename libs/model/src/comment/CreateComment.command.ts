@@ -1,5 +1,6 @@
 import { InvalidState, type Command } from '@hicommonwealth/core';
 import {
+  CommentInstance,
   decodeContent,
   getCommentSearchVector,
   uploadIfLarge,
@@ -43,8 +44,9 @@ export function CreateComment(): Command<typeof schemas.CreateComment> {
         throw new InvalidState(CreateCommentErrors.ThreadArchived);
 
       const { thread_id, parent_id, ...rest } = payload;
+      let parent: CommentInstance | null = null;
       if (parent_id) {
-        const parent = await models.Comment.findOne({
+        parent = await models.Comment.findOne({
           where: { id: parent_id, thread_id },
           include: [models.Address],
         });
@@ -74,11 +76,20 @@ export function CreateComment(): Command<typeof schemas.CreateComment> {
               created_by: '',
               search: getCommentSearchVector(body),
               content_url: contentUrl,
+              comment_level: parent ? parent.comment_level + 1 : 0,
+              reply_count: 0,
             },
             {
               transaction,
             },
           );
+
+          if (parent) {
+            await models.Comment.update(
+              { reply_count: parent.reply_count + 1 },
+              { where: { id: parent.id }, transaction },
+            );
+          }
 
           await models.CommentVersionHistory.create(
             {
