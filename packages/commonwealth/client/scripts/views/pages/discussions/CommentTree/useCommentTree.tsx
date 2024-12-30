@@ -1,5 +1,7 @@
 import { ContentType } from '@hicommonwealth/shared';
 import { SessionKeyError } from 'controllers/server/sessions';
+import { listenForDOMNodeApperance } from 'helpers/dom';
+import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import { CommentsFeaturedFilterTypes } from 'models/types';
 import type { DeltaStatic } from 'quill';
 import React, { useEffect, useRef, useState } from 'react';
@@ -22,8 +24,10 @@ import Thread from '../../../../models/Thread';
 import Permissions from '../../../../utils/Permissions';
 import { CommentViewParams } from '../CommentCard/CommentCard';
 import './CommentTree.scss';
-import { clearEditingLocalStorage } from './helpers';
+import { clearEditingLocalStorage, jumpHighlightComment } from './helpers';
 import { CommentFilters, UseCommentsTreeProps } from './types';
+
+// TODO: need to properly display deleted comment tree for comments having replies
 
 export const useCommentTree = ({
   thread,
@@ -93,21 +97,29 @@ export const useCommentTree = ({
 
   const isLocked = !!(thread instanceof Thread && thread.readOnly);
 
-  // TODO: need to properly display deleted comment tree for comments having replies
-  // TODO: https://github.com/hicommonwealth/commonwealth/issues/10459
-  // const [highlightedComment, setHighlightedComment] = useState(false);
-  // available at start
-  // useEffect(() => {
-  //   if (comments?.length > 0 && !highlightedComment) {
-  //     setHighlightedComment(true);
+  // TODO: https://github.com/hicommonwealth/commonwealth/issues/10459 - logic to highlight comments not loaded yet
+  // focus highlight any comment that needs to be highlighed provided a url param
+  useRunOnceOnCondition({
+    callback: () => {
+      const commentId = window.location.search.startsWith('?comment=')
+        ? window.location.search.replace('?comment=', '')
+        : null;
 
-  //     const commentId = window.location.search.startsWith('?comment=')
-  //       ? window.location.search.replace('?comment=', '')
-  //       : null;
-
-  //     if (commentId) jumpHighlightComment(Number(commentId));
-  //   }
-  // }, [comments?.length, highlightedComment]);
+      if (commentId) {
+        listenForDOMNodeApperance({
+          onAppear: () => {
+            setTimeout(() => {
+              jumpHighlightComment(Number(commentId));
+              // TODO: https://github.com/hicommonwealth/commonwealth/issues/10459 - timeout should be removed
+            }, 1000);
+          },
+          // TODO: https://github.com/hicommonwealth/commonwealth/issues/10459 - selector should be specific
+          selector: `.CommentsTree`,
+        });
+      }
+    },
+    shouldRun: true,
+  });
 
   const commentRefs = useRef<(HTMLDivElement | null)[]>([]);
   const [expandedComment, setExpandedComment] = useState<number | null>(null);
