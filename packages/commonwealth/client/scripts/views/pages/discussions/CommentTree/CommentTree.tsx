@@ -1,27 +1,20 @@
 import { ContentType } from '@hicommonwealth/shared';
 import { SessionKeyError } from 'controllers/server/sessions';
 import { GetThreadActionTooltipTextResponse } from 'helpers/threads';
-import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import { CommentsFeaturedFilterTypes } from 'models/types';
 import type { DeltaStatic } from 'quill';
 import React, { LegacyRef, useEffect, useRef, useState } from 'react';
-import { Virtuoso } from 'react-virtuoso';
 import app from 'state';
 import {
   useDeleteCommentMutation,
   useEditCommentMutation,
-  useFetchCommentsQuery,
   useToggleCommentSpamStatusMutation,
 } from 'state/api/comments';
 import { buildUpdateCommentInput } from 'state/api/comments/editComment';
 import { useAuthModalStore } from 'state/ui/modals';
 import useUserStore from 'state/ui/user';
-import { CreateComment } from 'views/components/Comments/CreateComment';
 import { Select } from 'views/components/Select';
-import { WithActiveStickyComment } from 'views/components/StickEditorContainer/context/WithActiveStickyComment';
 import { CWCheckbox } from 'views/components/component_kit/cw_checkbox';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
-import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
 import {
   deserializeDelta,
   serializeDelta,
@@ -30,10 +23,10 @@ import { openConfirmation } from 'views/modals/confirmation_modal';
 import { notifyError } from '../../../../controllers/app/notifications';
 import Thread from '../../../../models/Thread';
 import Permissions from '../../../../utils/Permissions';
-import { CommentCard } from '../CommentCard';
 import { CommentViewParams } from '../CommentCard/CommentCard';
 import { clearEditingLocalStorage } from '../CommentTree/helpers';
 import './CommentTree.scss';
+import { TreeHierarchy } from './TreeHierarchy';
 
 type CommentsTreeAttrs = {
   pageRef: React.MutableRefObject<HTMLDivElement | null>;
@@ -57,7 +50,7 @@ export const CommentTree = ({
   thread,
   setIsGloballyEditing,
   // fromDiscordBot, TODO: use this again
-  isReplying,
+  // isReplying, TODO: fix this flag
   setIsReplying,
   parentCommentId,
   setParentCommentId,
@@ -97,33 +90,6 @@ export const CommentTree = ({
 
   const communityId = app.activeChainId() || '';
 
-  const {
-    data: paginatedComments,
-    fetchNextPage: fetchMoreComments,
-    hasNextPage,
-    isInitialLoading: isInitialCommentsLoading,
-    isLoading: isLoadingComments,
-    error: fetchCommentsError,
-  } = useFetchCommentsQuery({
-    thread_id: parseInt(`${thread.id}`) || 0,
-    include_reactions: true,
-    include_spam_comments: includeSpam,
-    order_by: commentSortType,
-    cursor: 1,
-    limit: 10,
-    apiEnabled: !!communityId && !!thread.id,
-  });
-  const allComments = (paginatedComments?.pages || []).flatMap(
-    (page) => page.results,
-  ) as CommentViewParams[];
-
-  useRunOnceOnCondition({
-    callback: () => {
-      notifyError('Failed to load comments list');
-    },
-    shouldRun: !!fetchCommentsError,
-  });
-
   const { mutateAsync: deleteComment } = useDeleteCommentMutation({
     communityId,
     threadId: thread.id,
@@ -151,11 +117,6 @@ export const CommentTree = ({
       contentDelta?: DeltaStatic;
     };
   }>();
-
-  const isAdminOrMod =
-    Permissions.isSiteAdmin() ||
-    Permissions.isCommunityAdmin() ||
-    Permissions.isCommunityModerator();
 
   const isLocked = !!(thread instanceof Thread && thread.readOnly);
 
@@ -370,63 +331,68 @@ export const CommentTree = ({
     }
   };
 
-  const handleEditConfirm = async (
+  const handleEditConfirm = (
     comment: CommentViewParams,
     newDelta: DeltaStatic,
   ) => {
-    setEdits((p) => ({
-      ...p,
-      [comment.id]: {
+    const handleAsync = async () => {
+      setEdits((p) => ({
+        ...p,
+        [comment.id]: {
+          // @ts-expect-error <StrictNullChecks/>
+          ...(p[comment.id] || {}),
+          isSavingEdit: true,
+        },
+      }));
+
+      try {
+        const input = await buildUpdateCommentInput({
+          commentId: comment.id,
+          updatedBody: serializeDelta(newDelta) || comment.body,
+          commentMsgId: comment.canvas_msg_id || '',
+          communityId,
+          profile: {
+            userId: user.activeAccount?.profile?.userId || 0,
+            address: user.activeAccount?.address || '',
+            avatarUrl: user.activeAccount?.profile?.avatarUrl || '',
+            name: user.activeAccount?.profile?.name || '',
+            lastActive:
+              user.activeAccount?.profile?.lastActive?.toString() || '',
+          },
+        });
+        await editComment(input);
+        setEdits((p) => ({
+          ...p,
+          [comment.id]: {
+            // @ts-expect-error <StrictNullChecks/>
+            ...(p[comment.id] || {}),
+            isEditing: false,
+          },
+        }));
+
         // @ts-expect-error <StrictNullChecks/>
-        ...(p[comment.id] || {}),
-        isSavingEdit: true,
-      },
-    }));
-
-    try {
-      const input = await buildUpdateCommentInput({
-        commentId: comment.id,
-        updatedBody: serializeDelta(newDelta) || comment.body,
-        commentMsgId: comment.canvas_msg_id || '',
-        communityId,
-        profile: {
-          userId: user.activeAccount?.profile?.userId || 0,
-          address: user.activeAccount?.address || '',
-          avatarUrl: user.activeAccount?.profile?.avatarUrl || '',
-          name: user.activeAccount?.profile?.name || '',
-          lastActive: user.activeAccount?.profile?.lastActive?.toString() || '',
-        },
-      });
-      await editComment(input);
-      setEdits((p) => ({
-        ...p,
-        [comment.id]: {
-          // @ts-expect-error <StrictNullChecks/>
-          ...(p[comment.id] || {}),
-          isEditing: false,
-        },
-      }));
-
-      // @ts-expect-error <StrictNullChecks/>
-      setIsGloballyEditing(false);
-      clearEditingLocalStorage(comment.id, ContentType.Comment);
-    } catch (err) {
-      if (err instanceof SessionKeyError) {
-        checkForSessionKeyRevalidationErrors(err);
-        return;
+        setIsGloballyEditing(false);
+        clearEditingLocalStorage(comment.id, ContentType.Comment);
+      } catch (err) {
+        if (err instanceof SessionKeyError) {
+          checkForSessionKeyRevalidationErrors(err);
+          return;
+        }
+        console.error(err?.responseJSON?.error || err?.message);
+        notifyError('Failed to edit comment');
+      } finally {
+        setEdits((p) => ({
+          ...p,
+          [comment.id]: {
+            // @ts-expect-error <StrictNullChecks/>
+            ...(p[comment.id] || {}),
+            isSavingEdit: false,
+          },
+        }));
       }
-      console.error(err?.responseJSON?.error || err?.message);
-      notifyError('Failed to edit comment');
-    } finally {
-      setEdits((p) => ({
-        ...p,
-        [comment.id]: {
-          // @ts-expect-error <StrictNullChecks/>
-          ...(p[comment.id] || {}),
-          isSavingEdit: false,
-        },
-      }));
-    }
+    };
+
+    handleAsync().catch(console.error);
   };
 
   const handleFlagMarkAsSpam = (comment: CommentViewParams) => {
@@ -489,186 +455,85 @@ export const CommentTree = ({
     });
   };
 
-  if (isInitialCommentsLoading) {
-    return <CWCircleMultiplySpinner />;
-  }
-
-  if (allComments.length === 0) return <></>;
-
   return (
     <>
-      <div
-        className="comments-filter-row"
-        ref={commentsRef as LegacyRef<HTMLDivElement>}
-      >
-        <Select
-          key={commentSortType}
-          size="compact"
-          selected={commentSortType}
-          onSelect={(item: any) => {
-            setCommentSortType(item.value);
-          }}
-          options={[
-            {
-              id: 1,
-              value: CommentsFeaturedFilterTypes.Newest,
-              label: 'Newest',
-              iconLeft: 'sparkle',
-            },
-            {
-              id: 2,
-              value: CommentsFeaturedFilterTypes.Oldest,
-              label: 'Oldest',
-              iconLeft: 'clockCounterClockwise',
-            },
-            {
-              id: 3,
-              value: CommentsFeaturedFilterTypes.MostLikes,
-              label: 'Upvotes',
-              iconLeft: 'upvote',
-            },
-          ]}
-        />
-        <CWCheckbox
-          checked={includeSpam}
-          label="Include comments flagged as spam"
-          onChange={(e) => setIncludeSpam(e?.target?.checked || false)}
-        />
-      </div>
-      <div className="CommentsTree">
-        <Virtuoso
-          className="comments-list"
-          style={{ height: '100%', width: '100%' }}
-          data={isInitialCommentsLoading ? [] : allComments}
-          {...(pageRef.current && {
-            customScrollParent: pageRef.current,
-          })}
-          itemContent={(index, comment) => {
-            const isCommentAuthor =
-              comment.address === user.activeAccount?.address;
-
-            return (
-              <div
-                key={comment.id + '' + comment.marked_as_spam_at}
-                ref={(el) => {
-                  commentRefs.current[index] = el;
-                }}
-              >
-                <div className={`Comment comment-${comment.id}`}>
-                  {/* TODO: fix nested comments + their pagination */}
-                  {/* {comment.threadLevel > 0 && (
-                    <div className="thread-connectors-container">
-                      {Array(comment.threadLevel)
-                        .fill(undefined)
-                        .map((_, i) => (
-                          <div
-                            key={i}
-                            className={clsx('thread-connector', {
-                              replying:
-                                isReplying &&
-                                i === comment.threadLevel - 1 &&
-                                parentCommentId === comment.id,
-                              // vertical line is shorter when the thread is finished
-                              smaller: i >= nextCommentThreadLevel || !nextComment,
-                            })}
-                          />
-                        ))}
-                    </div>
-                  )} */}
-                  <CommentCard
-                    key={`${comment.id}-${comment.body}`}
-                    disabledActionsTooltipText={disabledActionsTooltipText}
-                    isThreadArchived={!!thread.archivedAt}
-                    canReply={
-                      !!user.activeAccount &&
-                      !thread.archivedAt &&
-                      !thread.lockedAt &&
-                      canReply
-                    }
-                    maxReplyLimitReached={false}
-                    // TODO: both of these values will depend on the comment level
-                    // ex: if its a 8th level reply in a comment reply chain etc.
-                    // and the reply button should be hidden when a certain comment reply
-                    // level is reached. Previously it was 8, now this needs to come from
-                    // api.
-                    // maxReplyLimitReached={comment.maxReplyLimitReached}
-                    // replyBtnVisible={comment.replyBtnVisible}
-                    canReact={
-                      !thread.archivedAt &&
-                      (!!user.activeAccount || isAdmin) &&
-                      canReact
-                    }
-                    canEdit={!isLocked && (isCommentAuthor || isAdminOrMod)}
-                    editDraft={edits?.[comment.id]?.editDraft || ''}
-                    onEditStart={() => handleEditStart(comment)}
-                    onEditCancel={(hasContentChanged: boolean) =>
-                      handleEditCancel(comment, hasContentChanged)
-                    }
-                    onEditConfirm={async (newDelta) =>
-                      await handleEditConfirm(comment, newDelta)
-                    }
-                    isSavingEdit={edits?.[comment.id]?.isSavingEdit || false}
-                    isEditing={edits?.[comment.id]?.isEditing || false}
-                    canDelete={!isLocked && (isCommentAuthor || isAdminOrMod)}
-                    replyBtnVisible={true}
-                    onReply={() => {
-                      setParentCommentId(comment.id);
-                      setIsReplying(true);
-                      handleScrollToComment(index);
-                    }}
-                    onDelete={() => handleDeleteComment(comment)}
-                    isSpam={!!comment.marked_as_spam_at}
-                    onSpamToggle={() => handleFlagMarkAsSpam(comment)}
-                    canToggleSpam={
-                      !isLocked && (isCommentAuthor || isAdminOrMod)
-                    }
-                    comment={comment}
-                    shareURL={`${window.location.origin}${window.location.pathname}?comment=${comment.id}`}
-                  />
-                </div>
-                {isReplying && parentCommentId === comment.id && (
-                  <WithActiveStickyComment>
-                    <CreateComment
-                      handleIsReplying={handleIsReplying}
-                      parentCommentId={parentCommentId}
-                      rootThread={thread}
-                      canComment={canComment}
-                      isReplying={isReplying}
-                      replyingToAuthor={comment.profile_name}
-                      onCancel={() => {
-                        handleEditCancel(comment, false);
-                      }}
-                      tooltipText={
-                        !canComment &&
-                        typeof disabledActionsTooltipText === 'string'
-                          ? disabledActionsTooltipText
-                          : ''
-                      }
-                    />
-                  </WithActiveStickyComment>
-                )}
-              </div>
-            );
-          }}
-          overscan={50}
-          components={{
-            // eslint-disable-next-line react/no-multi-comp
-            EmptyPlaceholder: () => <></>,
-            // eslint-disable-next-line react/no-multi-comp
-            Footer: () =>
-              hasNextPage ? (
-                <CWButton
-                  containerClassName="m-auto"
-                  label="Load more"
-                  disabled={isLoadingComments}
-                  onClick={() => !isLoadingComments && fetchMoreComments()}
-                />
-              ) : (
-                <></>
-              ),
-          }}
-        />
-      </div>
+      {thread?.numberOfComments > 0 && (
+        <div
+          className="comments-filter-row"
+          ref={commentsRef as LegacyRef<HTMLDivElement>}
+        >
+          <Select
+            key={commentSortType}
+            size="compact"
+            selected={commentSortType}
+            onSelect={(item: any) => {
+              setCommentSortType(item.value);
+            }}
+            options={[
+              {
+                id: 1,
+                value: CommentsFeaturedFilterTypes.Newest,
+                label: 'Newest',
+                iconLeft: 'sparkle',
+              },
+              {
+                id: 2,
+                value: CommentsFeaturedFilterTypes.Oldest,
+                label: 'Oldest',
+                iconLeft: 'clockCounterClockwise',
+              },
+              {
+                id: 3,
+                value: CommentsFeaturedFilterTypes.MostLikes,
+                label: 'Upvotes',
+                iconLeft: 'upvote',
+              },
+            ]}
+          />
+          <CWCheckbox
+            checked={includeSpam}
+            label="Include comments flagged as spam"
+            onChange={(e) => setIncludeSpam(e?.target?.checked || false)}
+          />
+        </div>
+      )}
+      <TreeHierarchy
+        commentFilters={{
+          includeSpam: includeSpam,
+          sortType: commentSortType,
+        }}
+        isThreadArchived={!!thread.archivedAt}
+        isThreadLocked={isLocked}
+        onDelete={handleDeleteComment}
+        onEditStart={handleEditStart}
+        onEditConfirm={handleEditConfirm}
+        onEditCancel={handleEditCancel}
+        onSpamToggle={handleFlagMarkAsSpam}
+        pageRef={pageRef}
+        isReplying={{
+          parentCommentId,
+          toComment: 1, //todo
+        }}
+        onCommentReplyStart={(commentId, index) => {
+          setParentCommentId(commentId);
+          setIsReplying(true);
+          handleScrollToComment(index);
+        }}
+        onCommentReplyEnd={handleIsReplying}
+        commentEdits={edits}
+        canComment={canComment}
+        thread={thread}
+        disabledActionsTooltipText={disabledActionsTooltipText}
+        canReact={
+          !thread.archivedAt && (!!user.activeAccount || isAdmin) && canReact
+        }
+        canReply={
+          !!user.activeAccount &&
+          !thread.archivedAt &&
+          !thread.lockedAt &&
+          canReply
+        }
+      />
     </>
   );
 };

@@ -132,7 +132,7 @@ export function GetComments(): Query<typeof schemas.GetComments> {
         replacements: {
           thread_id,
           comment_id,
-          parent_id,
+          ...(parent_id && { parent_id: `${parent_id}` }),
           limit,
           offset,
         },
