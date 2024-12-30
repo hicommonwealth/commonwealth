@@ -27,8 +27,6 @@ import './CommentTree.scss';
 import { clearEditingLocalStorage, jumpHighlightComment } from './helpers';
 import { CommentFilters, UseCommentsTreeProps } from './types';
 
-// TODO: need to properly display deleted comment tree for comments having replies
-
 export const useCommentTree = ({
   thread,
   setIsGloballyEditing,

@@ -1,9 +1,6 @@
 import { MAX_COMMENT_DEPTH } from '@hicommonwealth/shared';
 import clsx from 'clsx';
-import { GetThreadActionTooltipTextResponse } from 'helpers/threads';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
-import Thread from 'models/Thread';
-import type { DeltaStatic } from 'quill';
 import React, { useRef } from 'react';
 import { Virtuoso } from 'react-virtuoso';
 import app from 'state';
@@ -18,40 +15,7 @@ import Permissions from '../../../../utils/Permissions';
 import { CommentCard } from '../CommentCard';
 import { CommentViewParams } from '../CommentCard/CommentCard';
 import './CommentTree.scss';
-import { CommentFilters } from './types';
-
-type TreeHierarchyArgs = {
-  pageRef: React.MutableRefObject<HTMLDivElement | null>;
-  thread: Thread;
-  parentCommentId?: number;
-  isThreadLocked: boolean;
-  isThreadArchived: boolean;
-  isReplyingToCommentId?: number;
-  isReplyButtonVisible: boolean;
-  disabledActionsTooltipText?: GetThreadActionTooltipTextResponse;
-  canReply: boolean;
-  canReact: boolean;
-  canComment: boolean;
-  onEditStart: (comment: CommentViewParams) => void;
-  onEditConfirm: (comment: CommentViewParams, newDelta: DeltaStatic) => void;
-  onEditCancel: (
-    comment: CommentViewParams,
-    hasContentChanged: boolean,
-  ) => void;
-  onDelete: (comment: CommentViewParams) => void;
-  onSpamToggle: (comment: CommentViewParams) => void;
-  onCommentReplyStart: (commentId: number, commentIndex: number) => void;
-  onCommentReplyEnd: (isReplying: boolean, id?: number) => void;
-  commentFilters: CommentFilters;
-  commentEdits?: {
-    [commentId: number]: {
-      isEditing?: boolean;
-      editDraft?: string;
-      isSavingEdit?: boolean;
-      contentDelta?: any;
-    };
-  };
-};
+import { TreeHierarchyProps } from './types';
 
 export const TreeHierarchy = ({
   pageRef,
@@ -74,7 +38,7 @@ export const TreeHierarchy = ({
   onCommentReplyEnd,
   commentFilters,
   commentEdits,
-}: TreeHierarchyArgs) => {
+}: TreeHierarchyProps) => {
   const user = useUserStore();
   const communityId = app.activeChainId() || '';
 
