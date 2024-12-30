@@ -5,7 +5,11 @@ import {
   type Command,
 } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
-import { getElizaUserId, getWebhookDestination } from '@hicommonwealth/shared';
+import {
+  WebhookDestinations,
+  getElizaUserId,
+  getWebhookDestination,
+} from '@hicommonwealth/shared';
 import fetch from 'node-fetch';
 import { models } from '../database';
 import { authRoles } from '../middleware';
@@ -32,7 +36,7 @@ export function CreateWebhook(): Command<typeof schemas.CreateWebhook> {
     body: async ({ payload }) => {
       const destination = getWebhookDestination(payload.webhookUrl);
 
-      if (destination === 'unknown')
+      if (destination === WebhookDestinations.Unknown)
         throw new InvalidInput(Errors.InvalidWebhookUrl);
 
       const existingWebhook = await models.Webhook.findOne({
@@ -46,7 +50,7 @@ export function CreateWebhook(): Command<typeof schemas.CreateWebhook> {
       if (existingWebhook) throw new InvalidState(Errors.WebhookExists);
 
       // Telegram webhook urls are a workaround (all we need is the chat/group id)
-      if (destination !== 'telegram') {
+      if (destination !== WebhookDestinations.Telegram) {
         let res: fetch.Response;
         try {
           res = await fetch(payload.webhookUrl, { method: 'GET' });
@@ -62,7 +66,7 @@ export function CreateWebhook(): Command<typeof schemas.CreateWebhook> {
         }
       }
 
-      if (destination === 'eliza') {
+      if (destination === WebhookDestinations.Eliza) {
         const elizaUserId = getElizaUserId(payload.webhookUrl);
         const elizaUser = await models.User.findOne({
           where: {
