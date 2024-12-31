@@ -101,9 +101,6 @@ export function GetComments(): Query<typeof schemas.GetComments> {
             AND (C."deleted_at" IS NULL OR C."reply_count" > 0)
             ${comment_id ? ' AND C."id" = :comment_id' : ''}
             ${!include_spam_comments ? 'AND C."marked_as_spam_at" IS NULL' : ''}
-        ${
-          include_reactions
-            ? `
         GROUP BY
             C.id,
             C.created_at,
@@ -116,9 +113,6 @@ export function GetComments(): Query<typeof schemas.GetComments> {
             CU.id,
             CU.profile->>'name',
             CU.profile->>'avatar_url'
-        `
-            : ''
-        }
         ORDER BY
             C.${orderByQueries[order_by || 'newest']}
         LIMIT :limit OFFSET :offset;      
