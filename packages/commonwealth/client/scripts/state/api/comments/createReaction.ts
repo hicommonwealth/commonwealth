@@ -52,10 +52,10 @@ const useCreateCommentReactionMutation = () => {
 
   return trpc.comment.createCommentReaction.useMutation({
     onSuccess: (newReaction) => {
-      // TODO: #8015 - make a generic util to apply cache
-      // updates for comments in all possible key combinations
-      // present in cache.
-      utils.comment.getComments.invalidate();
+      // TODO: https://github.com/hicommonwealth/commonwealth/issues/10461
+      // make a generic util to apply cache updates for comments in all
+      // possible key combinations present in cache.
+      utils.comment.getComments.invalidate().catch(console.error);
 
       const userId = user.addresses?.[0]?.profile?.userId;
       userId &&

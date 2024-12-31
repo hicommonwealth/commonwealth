@@ -36,11 +36,11 @@ const useDeleteCommentReactionMutation = () => {
   const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
 
   return trpc.thread.deleteReaction.useMutation({
-    onSuccess: async () => {
-      // TODO: #8015 - make a generic util to apply cache
-      // updates for comments in all possible key combinations
-      // present in cache.
-      utils.comment.getComments.invalidate();
+    onSuccess: () => {
+      // TODO: https://github.com/hicommonwealth/commonwealth/issues/10461
+      // make a generic util to apply cache updates for comments in all
+      // possible key combinations present in cache.
+      utils.comment.getComments.invalidate().catch(console.error);
     },
     onError: (error) => checkForSessionKeyRevalidationErrors(error),
   });

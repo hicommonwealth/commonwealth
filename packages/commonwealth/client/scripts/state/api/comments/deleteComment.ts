@@ -33,10 +33,10 @@ const useDeleteCommentMutation = ({
         canvas_msg_id: response.canvas_msg_id,
       };
 
-      // TODO: #8015 - make a generic util to apply cache
-      // updates for comments in all possible key combinations
-      // present in cache.
-      utils.comment.getComments.invalidate();
+      // TODO: https://github.com/hicommonwealth/commonwealth/issues/10461
+      // make a generic util to apply cache updates for comments in all
+      // possible key combinations present in cache.
+      utils.comment.getComments.invalidate().catch(console.error);
 
       updateThreadInAllCaches(communityId, threadId, {
         numberOfComments: existingNumberOfComments - 1 || 0,

@@ -130,8 +130,8 @@ export const TreeHierarchy = ({
                     onEditCancel={(hasContentChanged: boolean) =>
                       onEditCancel(comment, hasContentChanged)
                     }
-                    onEditConfirm={async (newDelta) =>
-                      await onEditConfirm(comment, newDelta)
+                    onEditConfirm={(newDelta) =>
+                      onEditConfirm(comment, newDelta)
                     }
                     isSavingEdit={
                       commentEdits?.[comment.id]?.isSavingEdit || false

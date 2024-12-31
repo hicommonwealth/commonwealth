@@ -61,7 +61,7 @@ export type TreeHierarchyProps = Pick<
       isEditing?: boolean;
       editDraft?: string;
       isSavingEdit?: boolean;
-      contentDelta?: any;
+      contentDelta?: string | DeltaStatic;
     };
   };
 };

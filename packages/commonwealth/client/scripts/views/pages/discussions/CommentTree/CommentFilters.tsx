@@ -19,10 +19,13 @@ export const CommentFilters = ({
         key={filters.sortType}
         size="compact"
         selected={filters.sortType}
-        onSelect={(item: any) => {
+        onSelect={(item: {
+          label: string;
+          value: CommentsFeaturedFilterTypes;
+        }) => {
           onFiltersChange({
             ...filters,
-            sortType: item.value as CommentsFeaturedFilterTypes,
+            sortType: item.value,
           });
         }}
         options={[

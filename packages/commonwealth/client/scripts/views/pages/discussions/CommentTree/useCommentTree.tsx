@@ -156,17 +156,20 @@ export const useCommentTree = ({
           label: 'Delete',
           buttonType: 'destructive',
           buttonHeight: 'sm',
-          onClick: async () => {
-            try {
-              await deleteComment({ comment_id: comment.id });
-            } catch (err) {
-              if (err instanceof SessionKeyError) {
-                checkForSessionKeyRevalidationErrors(err);
-                return;
+          onClick: () => {
+            const handleAsync = async () => {
+              try {
+                await deleteComment({ comment_id: comment.id });
+              } catch (err) {
+                if (err instanceof SessionKeyError) {
+                  checkForSessionKeyRevalidationErrors(err);
+                  return;
+                }
+                console.error(err.message);
+                notifyError('Failed to delete comment');
               }
-              console.error(err.message);
-              notifyError('Failed to delete comment');
-            }
+            };
+            handleAsync().catch(console.error);
           },
         },
         {
@@ -405,17 +408,20 @@ export const useCommentTree = ({
           label: !comment.marked_as_spam_at ? 'Confirm' : 'Unflag as spam?',
           buttonType: 'destructive',
           buttonHeight: 'sm',
-          onClick: async () => {
-            try {
-              await toggleCommentSpamStatus({
-                communityId,
-                commentId: comment.id,
-                isSpam: !comment.marked_as_spam_at,
-                address: user.activeAccount?.address || '',
-              });
-            } catch (err) {
-              console.log(err);
-            }
+          onClick: () => {
+            const handleAsync = async () => {
+              try {
+                await toggleCommentSpamStatus({
+                  communityId,
+                  commentId: comment.id,
+                  isSpam: !comment.marked_as_spam_at,
+                  address: user.activeAccount?.address || '',
+                });
+              } catch (err) {
+                console.log(err);
+              }
+            };
+            handleAsync().catch(console.error);
           },
         },
       ],
