@@ -144,6 +144,7 @@ export const processUserMentioned: EventHandler<
         content_type: 'thread' in payload ? 'thread' : 'comment',
         object_id:
           'thread' in payload ? payload.thread!.id! : payload.comment!.id!,
+        author_user_id: user.id!,
       },
     });
   }

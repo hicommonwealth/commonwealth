@@ -142,6 +142,7 @@ export const processCommentCreated: EventHandler<
         content_url: payload.content_url,
         content_type: 'comment',
         object_id: payload.id!,
+        author_user_id: author.user_id,
       },
     });
   }

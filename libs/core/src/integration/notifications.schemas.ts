@@ -153,6 +153,7 @@ export const WebhookNotification = z.object({
   profile_name: z.string().max(255).describe('The profile name of the author'),
   profile_url: z.string(),
   profile_avatar_url: z.string(),
+  author_user_id: z.number().describe('The id of the author user record'),
   object_title: z.string(),
   object_url: z.string(),
   object_summary: z.string(),

@@ -93,6 +93,7 @@ export const processThreadCreated: EventHandler<
         content_url: payload.content_url,
         content_type: 'thread',
         object_id: payload.id!,
+        author_user_id: author.user_id,
       },
     });
 
