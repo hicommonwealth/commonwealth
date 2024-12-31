@@ -1,6 +1,6 @@
 import { ChainBase, Roles } from '@hicommonwealth/shared';
 import { z } from 'zod';
-import { Referral } from '../entities';
+import { Referral, User } from '../entities';
 import { Tags } from '../entities/tag.schemas';
 import { UserProfile } from '../entities/user.schemas';
 import { XpLog } from '../entities/xp.schemas';
@@ -38,6 +38,11 @@ export const GetUserProfile = {
     userId: PG_INT.optional(),
   }),
   output: UserProfileView,
+};
+
+export const GetUser = {
+  input: z.object({}),
+  output: z.union([User, z.object({})]),
 };
 
 export const SearchUserProfilesView = z.object({
