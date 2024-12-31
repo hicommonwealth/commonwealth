@@ -87,16 +87,17 @@ export function GetUserProfile(): Query<typeof schemas.GetUserProfile> {
           (t) => t.toJSON() as z.infer<typeof schemas.ThreadView>,
         ),
         comments: comments.map((c) => {
-          const comment = c.toJSON();
-          // ensure typed response
-          return {
-            ...comment,
+          const comment = {
+            ...c.toJSON(),
             user_id: c.Address!.user_id!,
             address: c.Address!.address!,
             Thread: undefined,
             search: undefined,
             community_id: c.Thread!.community_id,
-          } as z.infer<typeof schemas.UserProfileCommentView>;
+          };
+          return comment as unknown as z.infer<
+            typeof schemas.UserProfileCommentView
+          >;
         }),
         commentThreads: commentThreads.map(
           (c) => c.toJSON() as z.infer<typeof schemas.ThreadView>,
