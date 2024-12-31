@@ -157,4 +157,6 @@ export const WebhookNotification = z.object({
   object_url: z.string(),
   object_summary: z.string(),
   content_url: z.string().nullish(),
+  content_type: z.union([z.literal('thread'), z.literal('comment')]),
+  object_id: z.number().describe('A thread or comment id'),
 });

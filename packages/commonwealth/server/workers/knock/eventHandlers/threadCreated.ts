@@ -91,6 +91,8 @@ export const processThreadCreated: EventHandler<
         object_url: threadURl,
         object_summary: threadSummary,
         content_url: payload.content_url,
+        content_type: 'thread',
+        object_id: payload.id!,
       },
     });
 
