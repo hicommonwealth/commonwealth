@@ -36,10 +36,6 @@ export const GetComments = {
     order_direction: true,
   }),
   output: PaginatedResultSchema.extend({
-    // TODO: fix return types, they break for
-    // 1. some reactions/version_histories have invalid data types
-    // 2. the Date/string types are invalid
-    // 3. some keys that are always defined are marked as optional/nullish + vice versa
-    results: z.array(z.any()),
+    results: z.array(CommentsView),
   }),
 };

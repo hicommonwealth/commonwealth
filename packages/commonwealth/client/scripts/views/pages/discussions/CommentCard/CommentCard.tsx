@@ -222,17 +222,15 @@ export const CommentCard = ({
               avatarUrl: comment.profile_avatar || '',
               name: comment.profile_name || DEFAULT_NAME,
               userId: comment.user_id,
-              lastActive: comment.last_active as unknown as string, // TODO: fix type from api
+              lastActive: comment.last_active as unknown as string,
             }}
             versionHistory={(comment.CommentVersionHistories || []).map(
               (cvh) => ({
-                // TODO: no need to add fallbacks here, these values should exist
-                // if the array obj exists
-                id: cvh.id || 0, // TODO: fix type from api
+                id: cvh.id || 0,
                 thread_id: comment.thread_id,
                 address: comment.address,
                 body: cvh.body,
-                timestamp: cvh.timestamp as unknown as string, // TODO: fix type from api
+                timestamp: cvh.timestamp as unknown as string,
                 content_url: cvh.content_url || '',
               }),
             )}

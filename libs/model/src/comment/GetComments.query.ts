@@ -1,6 +1,7 @@
 import { type Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { CommentsView } from '@hicommonwealth/schemas';
+import { DEFAULT_NAME } from '@hicommonwealth/shared';
 import { QueryTypes } from 'sequelize';
 import { z } from 'zod';
 import { models } from '../database';
@@ -47,7 +48,7 @@ export function GetComments(): Query<typeof schemas.GetComments> {
             CA.last_active,
             CA.community_id,
             CU.id AS "user_id",
-            CU.profile->>'name' AS "profile_name",
+            COALESCE(CU.profile->>'name', '${DEFAULT_NAME}') AS "profile_name",
             CU.profile->>'avatar_url' AS "avatar_url",
             CASE WHEN max(CVH.id) IS NOT NULL THEN
               json_agg(json_strip_nulls(json_build_object(
