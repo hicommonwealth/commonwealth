@@ -337,11 +337,19 @@ export async function startLoginWithMagicLink({
           '/finishsociallogin' + params,
           window.location.origin,
         ).href,
+        options: {
+          // prompt forces Google to show the account picker.
+          prompt: 'select_account',
+        },
       });
     } else {
       await magic.oauth2.loginWithRedirect({
         provider,
         redirectURI: new URL('/finishsociallogin', window.location.origin).href,
+        options: {
+          // prompt forces Google to show the account picker.
+          prompt: 'select_account',
+        },
       });
     }
 
