@@ -49,6 +49,8 @@ describe('getCommentDepth', () => {
         body: String(i),
         search: getCommentSearchVector(String(i)),
         reaction_count: 0,
+        comment_level: 0,
+        reply_count: 0,
       });
       comments.push(result);
       comment = result;
