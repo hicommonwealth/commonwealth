@@ -1,10 +1,8 @@
 import { ServerError, type Command } from '@hicommonwealth/core';
+import { commonProtocol as cp } from '@hicommonwealth/evm-protocols';
+import { config } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
-import {
-  buildFarcasterContestFrameUrl,
-  commonProtocol,
-} from '@hicommonwealth/shared';
-import { config } from '../../build/config';
+import { buildFarcasterContestFrameUrl } from '@hicommonwealth/shared';
 import { models } from '../database';
 import { mustExist } from '../middleware/guards';
 import { TokenAttributes } from '../services';
@@ -20,8 +18,7 @@ export function CreateContest(): Command<typeof schemas.CreateBotContest> {
       const { prompt, chain_id } = payload;
       const contestMetadata = await parseBotCommand(prompt);
 
-      const namespaceFactory =
-        commonProtocol.factoryContracts[chain_id].factory;
+      const namespaceFactory = cp.factoryContracts[chain_id].factory;
       const botNamespace = config.BOT.CONTEST_BOT_NAMESPACE;
 
       if (botNamespace === '') {
