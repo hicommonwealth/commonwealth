@@ -7,6 +7,7 @@ import { CWText } from '../../components/component_kit/cw_text';
 import { CWModal } from '../../components/component_kit/new_designs/CWModal';
 import ManageCommunityStakeModal from '../../modals/ManageCommunityStakeModal/ManageCommunityStakeModal';
 import IdeaLaunchpad from '../Communities/IdeaLaunchpad';
+import ActiveContestList from './ActiveContestsList';
 import './CommunityHomePage.scss';
 
 const CommunityHome = () => {
@@ -35,6 +36,7 @@ const CommunityHome = () => {
           </div>
           <IdeaLaunchpad />
         </div>
+        <ActiveContestList />
         <CWModal
           size="small"
           content={
