@@ -20,7 +20,7 @@ export function CreateContest(): Command<typeof schemas.CreateBotContest> {
 
       const namespaceFactory =
         cp.factoryContracts[chain_id as cp.ValidChains].factory;
-      const botNamespace: string = config.BOT.CONTEST_BOT_NAMESPACE;
+      const botNamespace = config.BOT.CONTEST_BOT_NAMESPACE;
 
       if (!botNamespace || botNamespace === '') {
         new ServerError('bot not enabled on given chain');
@@ -29,7 +29,7 @@ export function CreateContest(): Command<typeof schemas.CreateBotContest> {
       const community = await models.Community.scope('withPrivateData').findOne(
         {
           where: {
-            namespace: botNamespace,
+            namespace: botNamespace as string,
           },
         },
       );
@@ -50,7 +50,7 @@ export function CreateContest(): Command<typeof schemas.CreateBotContest> {
       }
 
       const contestAddress = await deployERC20Contest(
-        botNamespace,
+        botNamespace as string,
         604800,
         contestMetadata.payoutStructure,
         contestMetadata.tokenAddress,
