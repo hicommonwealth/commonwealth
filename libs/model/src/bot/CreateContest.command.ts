@@ -22,7 +22,7 @@ export function CreateContest(): Command<typeof schemas.CreateBotContest> {
         cp.factoryContracts[chain_id as cp.ValidChains].factory;
       const botNamespace: string = config.BOT.CONTEST_BOT_NAMESPACE;
 
-      if (botNamespace === '') {
+      if (!botNamespace || botNamespace === '') {
         new ServerError('bot not enabled on given chain');
       }
 
