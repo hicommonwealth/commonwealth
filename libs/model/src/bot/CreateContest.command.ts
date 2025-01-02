@@ -18,8 +18,9 @@ export function CreateContest(): Command<typeof schemas.CreateBotContest> {
       const { prompt, chain_id } = payload;
       const contestMetadata = await parseBotCommand(prompt);
 
-      const namespaceFactory = cp.factoryContracts[chain_id].factory;
-      const botNamespace = config.BOT.CONTEST_BOT_NAMESPACE;
+      const namespaceFactory =
+        cp.factoryContracts[chain_id as cp.ValidChains].factory;
+      const botNamespace: string = config.BOT.CONTEST_BOT_NAMESPACE;
 
       if (botNamespace === '') {
         new ServerError('bot not enabled on given chain');
