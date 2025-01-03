@@ -32,7 +32,6 @@ export const contestCard = frames(async (ctx) => {
     payload: {
       contest_address,
       with_chain_node: true,
-      include_community: true,
     },
   });
 
@@ -134,52 +133,6 @@ export const contestCard = frames(async (ctx) => {
           >
             {contestManager.description}
           </p>
-        )}
-
-        {contestManager.created_at && (
-          <p
-            style={{
-              fontSize: '28px',
-              color: '#E6E6E6',
-              marginTop: '8px',
-            }}
-          >
-            {formatTimeRemaining(
-              new Date(contestManager.created_at),
-              contestManager.interval,
-            )}
-          </p>
-        )}
-
-        {contestManager.Community && (
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '12px',
-              marginTop: '8px',
-            }}
-          >
-            {contestManager.Community.icon_url && (
-              <img
-                src={contestManager.Community.icon_url}
-                alt={`${contestManager.Community.name} logo`}
-                style={{
-                  width: '32px',
-                  height: '32px',
-                  borderRadius: '50%',
-                }}
-              />
-            )}
-            <p
-              style={{
-                fontSize: '24px',
-                color: '#E6E6E6',
-              }}
-            >
-              {contestManager.Community.name}
-            </p>
-          </div>
         )}
 
         {contestManager.created_at && (
