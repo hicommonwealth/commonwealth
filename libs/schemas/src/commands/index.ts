@@ -5,7 +5,6 @@ export * from './chainNode.schemas';
 export * from './comment.schemas';
 export * from './community.schemas';
 export * from './contest.schemas';
-export * from './create-bot-contest.schemas';
 export * from './discord.schemas';
 export * from './load-testing.schemas';
 export * from './poll.schemas';
