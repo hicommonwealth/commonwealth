@@ -99,15 +99,16 @@ export const processUserMentioned: EventHandler<
       ),
     );
 
-    let threadTitle = payload.thread?.title;
-    if (!threadTitle) {
-      const thread = await models.Thread.findOne({
-        attributes: ['title'],
-        where: {
-          id: payload.comment!.thread_id,
-        },
-      });
-      threadTitle = thread?.title;
+    let thread = payload.thread;
+    if (!thread) {
+      thread = (
+        await models.Thread.findOne({
+          attributes: ['title'],
+          where: {
+            id: payload.comment!.thread_id,
+          },
+        })
+      )?.get({ plain: true })!;
     }
 
     await provider.triggerWorkflow({
@@ -131,7 +132,7 @@ export const processUserMentioned: EventHandler<
           community.custom_domain,
         ),
         profile_avatar_url: user.profile.avatar_url ?? '',
-        object_title: Webhook.getRenderedTitle(threadTitle!),
+        thread_title: Webhook.getRenderedTitle(thread.title!),
         object_url,
         object_summary: safeTruncateBody(
           'thread' in payload ? payload.thread!.body : payload.comment!.body,
@@ -142,8 +143,8 @@ export const processUserMentioned: EventHandler<
             ? payload.thread!.content_url
             : payload.comment!.content_url,
         content_type: 'thread' in payload ? 'thread' : 'comment',
-        object_id:
-          'thread' in payload ? payload.thread!.id! : payload.comment!.id!,
+        thread_id: thread.id!,
+        comment_id: payload.comment?.id,
         author_user_id: user.id!,
       },
     });

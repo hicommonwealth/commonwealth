@@ -154,10 +154,11 @@ export const WebhookNotification = z.object({
   profile_url: z.string(),
   profile_avatar_url: z.string(),
   author_user_id: z.number().describe('The id of the author user record'),
-  object_title: z.string(),
+  thread_title: z.string(),
   object_url: z.string(),
   object_summary: z.string(),
   content_url: z.string().nullish(),
   content_type: z.union([z.literal('thread'), z.literal('comment')]),
-  object_id: z.number().describe('A thread or comment id'),
+  thread_id: z.number().describe('The id of the thread'),
+  comment_id: z.number().optional().describe('The id of the comment'),
 });
