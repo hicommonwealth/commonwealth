@@ -58,30 +58,27 @@ export function CreateContest(): Command<typeof schemas.CreateBotContest> {
         community!.ChainNode!.private_url!,
       );
 
-      const contestManager = await models.sequelize.transaction(
-        async (transaction) => {
-          const manager = await models.ContestManager.create(
-            {
-              name: contestMetadata.contestName,
-              community_id: community!.id,
-              created_at: new Date(),
-              cancelled: false,
-              farcaster_frame_url:
-                buildFarcasterContestFrameUrl(contestAddress),
-              is_farcaster_contest: true,
-              image_url: contestMetadata.image_url,
-              interval: 604800,
-              funding_token_address: contestMetadata.tokenAddress,
-              payout_structure: contestMetadata.payoutStructure,
-              ticker: tokenMetadata.ticker,
-              decimals: tokenMetadata.decimals,
-              contest_address: contestAddress,
-            },
-            { transaction },
-          );
-          return manager;
-        },
-      );
+      await models.sequelize.transaction(async (transaction) => {
+        const manager = await models.ContestManager.create(
+          {
+            name: contestMetadata.contestName,
+            community_id: community!.id,
+            created_at: new Date(),
+            cancelled: false,
+            farcaster_frame_url: buildFarcasterContestFrameUrl(contestAddress),
+            is_farcaster_contest: true,
+            image_url: contestMetadata.image_url,
+            interval: 604800,
+            funding_token_address: contestMetadata.tokenAddress,
+            payout_structure: contestMetadata.payoutStructure,
+            ticker: tokenMetadata.ticker,
+            decimals: tokenMetadata.decimals,
+            contest_address: contestAddress,
+          },
+          { transaction },
+        );
+        return manager;
+      });
       return contestAddress;
     },
   };
