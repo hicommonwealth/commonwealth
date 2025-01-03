@@ -6,12 +6,34 @@ import React from 'react';
 import { buildContestLeaderboardUrl, getBaseUrl } from '@hicommonwealth/shared';
 import { frames } from '../../config';
 
+const formatTimeRemaining = (createdAt: Date, intervalDays: number): string => {
+  const endTime = new Date(createdAt);
+  endTime.setDate(endTime.getDate() + intervalDays);
+
+  const now = new Date();
+  const timeLeft = endTime.getTime() - now.getTime();
+
+  if (timeLeft <= 0) return 'Contest ended';
+
+  const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+  const hours = Math.floor(
+    (timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60),
+  );
+
+  if (days > 0) return `${days}d ${hours}h remaining`;
+  return `${hours}h remaining`;
+};
+
 export const contestCard = frames(async (ctx) => {
   const contest_address = ctx.url.pathname.split('/')[1];
 
   const contestManager = await query(Contest.GetContest(), {
     actor: { user: { email: '' } },
-    payload: { contest_address, with_chain_node: true },
+    payload: {
+      contest_address,
+      with_chain_node: true,
+      include_community: true,
+    },
   });
 
   if (!contestManager) {
@@ -82,13 +104,16 @@ export const contestCard = frames(async (ctx) => {
       <div
         style={{
           backgroundColor: '#2A2432',
+          background: 'linear-gradient(180deg, #2A2432 0%, #1F1A26 100%)',
           color: 'white',
           padding: '40px',
           display: 'flex',
           flexDirection: 'column',
           width: '100%',
           height: '100%',
-          lineHeight: '0.5',
+          borderRadius: '16px',
+          gap: '16px',
+          lineHeight: '1.2',
         }}
       >
         <p
@@ -111,7 +136,101 @@ export const contestCard = frames(async (ctx) => {
           </p>
         )}
 
-        <p style={{ fontSize: '42px' }}>Check prizes below 👇</p>
+        {contestManager.created_at && (
+          <p
+            style={{
+              fontSize: '28px',
+              color: '#E6E6E6',
+              marginTop: '8px',
+            }}
+          >
+            {formatTimeRemaining(
+              new Date(contestManager.created_at),
+              contestManager.interval,
+            )}
+          </p>
+        )}
+
+        {contestManager.Community && (
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              marginTop: '8px',
+            }}
+          >
+            {contestManager.Community.icon_url && (
+              <img
+                src={contestManager.Community.icon_url}
+                alt={`${contestManager.Community.name} logo`}
+                style={{
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: '50%',
+                }}
+              />
+            )}
+            <p
+              style={{
+                fontSize: '24px',
+                color: '#E6E6E6',
+              }}
+            >
+              {contestManager.Community.name}
+            </p>
+          </div>
+        )}
+
+        {contestManager.created_at && (
+          <p
+            style={{
+              fontSize: '28px',
+              color: '#E6E6E6',
+              marginTop: '8px',
+            }}
+          >
+            {formatTimeRemaining(
+              new Date(contestManager.created_at),
+              contestManager.interval,
+            )}
+          </p>
+        )}
+
+        {contestManager.Community && (
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              marginTop: '8px',
+            }}
+          >
+            {contestManager.Community.icon_url && (
+              <img
+                src={contestManager.Community.icon_url}
+                alt={`${contestManager.Community.name} logo`}
+                style={{
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: '50%',
+                }}
+              />
+            )}
+            <p
+              style={{
+                fontSize: '24px',
+                color: '#E6E6E6',
+              }}
+            >
+              {contestManager.Community.name}
+            </p>
+          </div>
+        )}
+
+        <p style={{ fontSize: '42px', marginTop: 'auto' }}>
+          Check prizes below 👇
+        </p>
       </div>
     ),
     buttons: [
