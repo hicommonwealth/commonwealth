@@ -325,7 +325,7 @@ export const config = configure(
       ORGANIZATION: z.string().optional(),
     }),
     BOT: z.object({
-      CONTEST_BOT_NAMESPACE: z.string().optional(),
+      CONTEST_BOT_NAMESPACE: z.string(),
     }),
   }),
 );

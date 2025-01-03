@@ -1,4 +1,4 @@
-import { ServerError, type Command } from '@hicommonwealth/core';
+import { InvalidState, type Command } from '@hicommonwealth/core';
 import { commonProtocol as cp } from '@hicommonwealth/evm-protocols';
 import { config } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
@@ -23,7 +23,7 @@ export function CreateContest(): Command<typeof schemas.CreateBotContest> {
       const botNamespace = config.BOT.CONTEST_BOT_NAMESPACE;
 
       if (!botNamespace || botNamespace === '') {
-        new ServerError('bot not enabled on given chain');
+        new InvalidState('bot not enabled on given chain');
       }
 
       const community = await models.Community.scope('withPrivateData').findOne(
@@ -34,9 +34,7 @@ export function CreateContest(): Command<typeof schemas.CreateBotContest> {
         },
       );
 
-      if (!community) {
-        new ServerError('Community not created for namespace');
-      }
+      mustExist('Community', community);
 
       let tokenMetadata: TokenAttributes;
       try {
@@ -46,7 +44,7 @@ export function CreateContest(): Command<typeof schemas.CreateBotContest> {
           false,
         );
       } catch {
-        new ServerError('invalid token address');
+        new InvalidState('invalid token address');
       }
 
       const contestAddress = await deployERC20Contest(
@@ -84,8 +82,7 @@ export function CreateContest(): Command<typeof schemas.CreateBotContest> {
           return manager;
         },
       );
-
-      mustExist('Contest Manager', contestManager);
+      return contestAddress;
     },
   };
 }

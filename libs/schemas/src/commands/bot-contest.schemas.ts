@@ -7,5 +7,5 @@ export const CreateBotContest = {
       .describe('The cast/post containing the prompt for contest creation'),
     chain_id: z.number().describe('The chain id to create contest for'),
   }),
-  output: z.object({}),
+  output: z.string().describe('New contest address'),
 };

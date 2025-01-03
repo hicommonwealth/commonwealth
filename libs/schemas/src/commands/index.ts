@@ -1,4 +1,5 @@
 export * from './address.schemas';
+export * from './bot-contest.schemas';
 export * from './chainEvent.schemas';
 export * from './chainNode.schemas';
 export * from './comment.schemas';
@@ -16,4 +17,3 @@ export * from './thread.schemas';
 export * from './token.schemas';
 export * from './user.schemas';
 export * from './wallet.schemas';
-export * from './webhook.schemas';

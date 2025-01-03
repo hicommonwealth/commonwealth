@@ -12,8 +12,6 @@ import { config } from '../../config';
 import { createWeb3Provider } from './utils';
 
 const nonceMutex = new Mutex();
-const TOPIC_LOG =
-  '0x990f533044dbc89b838acde9cd2c72c400999871cf8f792d731edcae15ead693';
 
 export type AddContentResponse = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -417,7 +415,9 @@ export const deployERC20Contest = async (
     throw new Error('New Contest Transaction failed');
   }
 
-  const eventLog = txReceipt.logs.find((log) => log.topics![0] == TOPIC_LOG);
+  const eventLog = txReceipt.logs.find(
+    (log) => log.topics![0] == commonProtocol.CREATE_CONTEST_TOPIC,
+  );
   const newContestAddress = web3.eth.abi.decodeParameters(
     ['address', 'address', 'uint256', 'bool'],
     // @ts-expect-error StrictNullChecks
