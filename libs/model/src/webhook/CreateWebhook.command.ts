@@ -93,7 +93,7 @@ export function CreateWebhook(): Command<typeof schemas.CreateWebhook> {
           throw new InvalidState(Errors.ElizaAddressNotFound);
 
         // automatically add UserMentioned for Eliza Webhooks
-        events.push('UserMentioned');
+        events.push('UserMentioned', 'CommentCreated');
       }
 
       const webhook = await models.Webhook.create({
