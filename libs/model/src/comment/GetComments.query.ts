@@ -73,7 +73,7 @@ export function GetComments(): Query<typeof schemas.GetComments> {
                   'calculated_voting_weight', R.calculated_voting_weight::text,
                   'address', RA.address,
                   'last_active', RA.last_active::text,
-                  'profile_name', RU.profile->>'name',
+                  'profile_name', COALESCE(RU.profile->>'name', '${DEFAULT_NAME}'),
                   'avatar_url', RU.profile->>'avatar_url'
                 )) 
               ELSE '[]'::json
