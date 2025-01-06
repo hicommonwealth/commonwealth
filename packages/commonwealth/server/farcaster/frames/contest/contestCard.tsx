@@ -19,26 +19,15 @@ export const contestCard = frames(async (ctx) => {
     return {
       title: 'Contest not found',
       image: (
-        <div
-          style={{
-            backgroundColor: '#2A2432',
-            color: 'white',
-            padding: '40px',
-            display: 'flex',
-            flexDirection: 'column',
-            width: '100%',
-            height: '100%',
-            lineHeight: '0.5',
-          }}
-        >
+        <FrameLayout header="Contest not found">
           <p
             style={{
-              fontSize: '56px',
+              fontSize: '32px',
             }}
           >
-            Contest not found.
+            Try to run the contest again.
           </p>
-        </div>
+        </FrameLayout>
       ),
     };
   }
@@ -47,26 +36,15 @@ export const contestCard = frames(async (ctx) => {
     return {
       title: 'Contest Ended',
       image: (
-        <div
-          style={{
-            backgroundColor: '#2A2432',
-            color: 'white',
-            padding: '40px',
-            display: 'flex',
-            flexDirection: 'column',
-            width: '100%',
-            height: '100%',
-            lineHeight: '0.5',
-          }}
-        >
+        <FrameLayout header="Contest Ended">
           <p
             style={{
-              fontSize: '56px',
+              fontSize: '32px',
             }}
           >
-            Contest ended. New entries will not be accepted.
+            New entries will not be accepted.
           </p>
-        </div>
+        </FrameLayout>
       ),
     };
   }
