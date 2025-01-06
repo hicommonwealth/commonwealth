@@ -12,6 +12,7 @@ export interface CommentVersionHistory {
   address: string;
   body: string;
   timestamp: Moment;
+  content_url: string;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -20,9 +21,8 @@ export class Comment<T extends IUniqueId> {
   public readonly author: string;
   public readonly Address: AddressInfo;
   public readonly text: string;
-  public readonly plaintext: string;
   public reactions: Reaction[];
-  public reactionWeightsSum: number;
+  public reactionWeightsSum: string;
   public readonly id: number;
   public readonly createdAt: momentType.Moment;
   public readonly authorChain?: string;
@@ -37,19 +37,22 @@ export class Comment<T extends IUniqueId> {
 
   public readonly canvasSignedData: string;
   public readonly canvasMsgId: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public readonly discord_meta: any;
 
   public readonly profile: UserProfile;
 
+  public contentUrl: string | null;
+
   constructor({
     id,
     text,
+    body,
     author,
-    community_id,
     Address,
+    community_id,
     thread_id,
     parent_id,
-    plaintext,
     reactions,
     reaction_weights_sum,
     created_at,
@@ -61,33 +64,62 @@ export class Comment<T extends IUniqueId> {
     CommentVersionHistories,
     marked_as_spam_at,
     discord_meta,
+    content_url,
+  }: {
+    id: number;
+    text?: string;
+    body?: string;
+    author: string;
+    community_id: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    Address: any;
+    thread_id: number;
+    parent_id?: number | null;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    reactions?: any[];
+    reaction_weights_sum: string;
+    created_at: Moment | null;
+    deleted_at?: string | null | Date;
+    authorChain?: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    last_edited?: any;
+    canvas_signed_data?: string | null;
+    canvas_msg_id?: string | null;
+    CommentVersionHistories?: CommentVersionHistory[];
+    marked_as_spam_at?: string | null | Date;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    discord_meta?: any;
+    content_url?: string | null;
   }) {
     const versionHistory = CommentVersionHistories;
     this.communityId = community_id;
     this.author = Address?.address || author;
-    this.text = deleted_at?.length > 0 ? '[deleted]' : getDecodedString(text);
-    this.plaintext = deleted_at?.length > 0 ? '[deleted]' : plaintext;
-    this.versionHistory = versionHistory;
+    if (deleted_at) this.text = '[deleted]';
+    // TODO: temporary - this model will be entirely replaced by tRPC soon
+    else this.text = text ? getDecodedString(text) : getDecodedString(body!);
+    this.versionHistory = versionHistory!;
     this.threadId = thread_id;
     this.id = id;
     this.createdAt = moment(created_at);
     // @ts-expect-error StrictNullChecks
     this.parentComment = Number(parent_id) || null;
     this.authorChain = Address?.community_id || authorChain;
-    this.lastEdited = last_edited
+    this.lastEdited = (last_edited
       ? moment(last_edited)
       : versionHistory && versionHistory?.length > 1
         ? versionHistory[0].timestamp
-        : null;
+        : null) as unknown as string;
     // @ts-expect-error StrictNullChecks
     this.markedAsSpamAt = marked_as_spam_at ? moment(marked_as_spam_at) : null;
-    this.deleted = deleted_at?.length > 0 ? true : false;
-    this.canvasSignedData = canvas_signed_data;
-    this.canvasMsgId = canvas_msg_id;
-    this.reactions = (reactions || []).map((r) => new Reaction(r));
+    this.deleted = !!deleted_at;
+    this.canvasSignedData = canvas_signed_data!;
+    this.canvasMsgId = canvas_msg_id!;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    this.reactions = (reactions || []).map((r) => new Reaction(r as any));
     this.reactionWeightsSum = reaction_weights_sum;
-    this.rootThread = thread_id;
+    this.rootThread = String(thread_id);
     this.discord_meta = discord_meta;
+    this.contentUrl = content_url!;
 
     this.profile = addressToUserProfile(Address);
   }

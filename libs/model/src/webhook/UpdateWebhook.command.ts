@@ -1,15 +1,12 @@
 import { InvalidState, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../database';
-import { isAuthorized, type AuthContext } from '../middleware';
+import { authRoles } from '../middleware';
 
-export function UpdateWebhook(): Command<
-  typeof schemas.UpdateWebhook,
-  AuthContext
-> {
+export function UpdateWebhook(): Command<typeof schemas.UpdateWebhook> {
   return {
     ...schemas.UpdateWebhook,
-    auth: [isAuthorized({ roles: ['admin'] })],
+    auth: [authRoles('admin')],
     secure: true,
     body: async ({ payload }) => {
       const webhook = await models.Webhook.findByPk(payload.id);

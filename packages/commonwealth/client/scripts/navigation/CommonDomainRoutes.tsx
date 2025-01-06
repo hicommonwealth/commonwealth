@@ -4,7 +4,12 @@ import { Route } from 'react-router-dom';
 import { withLayout } from 'views/Layout';
 import { RouteFeatureFlags } from './Router';
 
-const EditorPage = lazy(() => import('views/pages/EditorPage'));
+const QuillPage = lazy(() => import('views/pages/QuillPage'));
+const MarkdownEditorPage = lazy(() => import('views/pages/MarkdownEditorPage'));
+const MarkdownViewerPage = lazy(() => import('views/pages/MarkdownViewerPage'));
+const MarkdownHitHighlighterPage = lazy(
+  () => import('views/pages/MarkdownHitHighlighterPage'),
+);
 
 const DashboardPage = lazy(() => import('views/pages/user_dashboard'));
 const CommunitiesPage = lazy(() => import('views/pages/Communities'));
@@ -73,9 +78,10 @@ const CommunityIntegrations = lazy(
 const CommunityStakeIntegration = lazy(
   () => import('views/pages/CommunityManagement/StakeIntegration'),
 );
-const CommunityTopicsOld = lazy(
-  () => import('views/pages/CommunityManagement/Topics/TopicsOld'),
+const CommunityTokenIntegration = lazy(
+  () => import('views/pages/CommunityManagement/TokenIntegration'),
 );
+
 const CommunityTopics = lazy(
   () => import('views/pages/CommunityManagement/Topics'),
 );
@@ -86,8 +92,9 @@ const ManageContest = lazy(
   () => import('views/pages/CommunityManagement/Contests/ManageContest'),
 );
 const Contests = lazy(() => import('views/pages/Contests'));
+const ContestPage = lazy(() => import('views/pages/ContestPage'));
 
-const MyCommunityStake = lazy(() => import('views/pages/MyCommunityStake'));
+const MyTransactions = lazy(() => import('views/pages/MyTransactions'));
 
 const SnapshotProposalPage = lazy(
   () => import('views/pages/Snapshots/SnapshotProposals'),
@@ -110,12 +117,34 @@ const CommunityNotFoundPage = lazy(
   () => import('views/pages/CommunityNotFoundPage'),
 );
 
+const RewardsPage = lazy(() => import('views/pages/RewardsPage'));
+
 const CommonDomainRoutes = ({
-  contestEnabled,
-  farcasterContestEnabled,
   tokenizedCommunityEnabled,
 }: RouteFeatureFlags) => [
-  <Route key="/editor" path="/editor" element={<EditorPage />} />,
+  <Route
+    key="/_internal/quill"
+    path="/_internal/quill"
+    element={<QuillPage />}
+  />,
+
+  <Route
+    key="/_internal/markdown-editor"
+    path="/_internal/markdown-editor"
+    element={<MarkdownEditorPage />}
+  />,
+
+  <Route
+    key="/_internal/markdown-hit-highlighter"
+    path="/_internal/markdown-hit-highlighter"
+    element={<MarkdownHitHighlighterPage />}
+  />,
+
+  <Route
+    key="/_internal/markdown-viewer"
+    path="/_internal/markdown-viewer"
+    element={<MarkdownViewerPage />}
+  />,
 
   <Route
     key="/"
@@ -154,14 +183,19 @@ const CommonDomainRoutes = ({
     })}
   />,
   <Route
+    key="/rewards"
+    path="/rewards"
+    element={withLayout(RewardsPage, { type: 'common' })}
+  />,
+  <Route
     key="/search"
     path="/search"
     element={withLayout(SearchPage, { type: 'common' })}
   />,
   <Route
-    key="/myCommunityStake"
-    path="/myCommunityStake"
-    element={withLayout(MyCommunityStake, { type: 'common' })}
+    key="/myTransactions"
+    path="/myTransactions"
+    element={withLayout(MyTransactions, { type: 'common' })}
   />,
   // scoped
   <Route
@@ -320,6 +354,14 @@ const CommonDomainRoutes = ({
     })}
   />,
   <Route
+    key="/new/discussion"
+    path="/new/discussion"
+    element={withLayout(NewThreadPage, {
+      scoped: false,
+      type: 'common',
+    })}
+  />,
+  <Route
     key="/:scope/proposal/discussion/:identifier"
     path="/:scope/proposal/discussion/:identifier"
     element={
@@ -375,15 +417,20 @@ const CommonDomainRoutes = ({
       scoped: true,
     })}
   />,
+
+  <Route
+    key="/:scope/manage/integrations/token"
+    path="/:scope/manage/integrations/token"
+    element={withLayout(CommunityTokenIntegration, {
+      scoped: true,
+    })}
+  />,
   <Route
     key="/:scope/manage/topics"
     path="/:scope/manage/topics"
-    element={withLayout(
-      farcasterContestEnabled ? CommunityTopics : CommunityTopicsOld,
-      {
-        scoped: true,
-      },
-    )}
+    element={withLayout(CommunityTopics, {
+      scoped: true,
+    })}
   />,
   <Route
     key="/:scope/manage/moderators"
@@ -392,38 +439,41 @@ const CommonDomainRoutes = ({
       scoped: true,
     })}
   />,
-  ...(contestEnabled
-    ? [
-        <Route
-          key="/:scope/manage/contests"
-          path="/:scope/manage/contests"
-          element={withLayout(AdminContestsPage, {
-            scoped: true,
-          })}
-        />,
-        <Route
-          key="/:scope/manage/contests/launch"
-          path="/:scope/manage/contests/launch"
-          element={withLayout(ManageContest, {
-            scoped: true,
-          })}
-        />,
-        <Route
-          key="/:scope/manage/contests/:contestAddress"
-          path="/:scope/manage/contests/:contestAddress"
-          element={withLayout(ManageContest, {
-            scoped: true,
-          })}
-        />,
-        <Route
-          key="/:scope/contests"
-          path="/:scope/contests"
-          element={withLayout(Contests, {
-            scoped: true,
-          })}
-        />,
-      ]
-    : []),
+  <Route
+    key="/:scope/manage/contests"
+    path="/:scope/manage/contests"
+    element={withLayout(AdminContestsPage, {
+      scoped: true,
+    })}
+  />,
+  <Route
+    key="/:scope/manage/contests/launch"
+    path="/:scope/manage/contests/launch"
+    element={withLayout(ManageContest, {
+      scoped: true,
+    })}
+  />,
+  <Route
+    key="/:scope/manage/contests/:contestAddress"
+    path="/:scope/manage/contests/:contestAddress"
+    element={withLayout(ManageContest, {
+      scoped: true,
+    })}
+  />,
+  <Route
+    key="/:scope/contests"
+    path="/:scope/contests"
+    element={withLayout(Contests, {
+      scoped: true,
+    })}
+  />,
+  <Route
+    key="/:scope/contests/:contestAddress"
+    path="/:scope/contests/:contestAddress"
+    element={withLayout(ContestPage, {
+      scoped: true,
+    })}
+  />,
   <Route
     key="/:scope/analytics"
     path="/:scope/analytics"

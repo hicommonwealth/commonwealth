@@ -1,7 +1,7 @@
-import { commonProtocol } from '@hicommonwealth/shared';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 import app from 'state';
+import { chainIdsWithStakeEnabled } from 'views/components/CommunityInformationForm/constants';
 import { useCommunityStake } from 'views/components/CommunityStake';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -12,11 +12,10 @@ import './Stake.scss';
 const Stake = () => {
   const navigate = useCommonNavigate();
   const { stakeEnabled } = useCommunityStake();
-  const canEnableStake =
-    !!commonProtocol?.factoryContracts[
-      // @ts-expect-error <StrictNullChecks/>
-      app?.chain?.meta?.ChainNode?.eth_chain_id
-    ];
+  const canEnableStake = chainIdsWithStakeEnabled.includes(
+    // @ts-expect-error StrictNullChecks
+    app?.chain?.meta?.ChainNode?.eth_chain_id,
+  );
 
   const actionButton = (
     <CWButton

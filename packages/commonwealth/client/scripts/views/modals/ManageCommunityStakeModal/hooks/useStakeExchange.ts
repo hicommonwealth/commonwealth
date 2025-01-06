@@ -1,7 +1,7 @@
-import { commonProtocol } from '@hicommonwealth/shared';
+import { commonProtocol } from '@hicommonwealth/evm-protocols';
 import app from 'state';
 import {
-  useFetchEthUsdRateQuery,
+  useFetchTokenUsdRateQuery,
   useGetBuyPriceQuery,
   useGetSellPriceQuery,
 } from 'state/api/communityStake';
@@ -64,7 +64,9 @@ const useStakeExchange = ({
     ethChainId,
   });
 
-  const { data: ethUsdRateData } = useFetchEthUsdRateQuery();
+  const { data: ethUsdRateData } = useFetchTokenUsdRateQuery({
+    tokenSymbol: 'ETH',
+  });
   const ethUsdRate = ethUsdRateData?.data?.data?.amount;
 
   return {

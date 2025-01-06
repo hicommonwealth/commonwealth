@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 
+import moment from 'moment';
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
 import { ContestFeeType, ContestFormData, ContestRecurringType } from './types';
 
@@ -26,9 +27,22 @@ const useManageContestForm = ({
         return;
       }
 
+      const contestLengthInSeconds = moment(
+        contestData?.contests?.[0]?.end_time,
+      ).diff(contestData?.contests?.[0]?.start_time, 'seconds');
+
       setContestFormData({
         contestName: contestData.name,
         contestImage: contestData.image_url!,
+        contestDescription: contestData.description ?? '',
+        contestTopic: {
+          value: contestData.topics[0]?.id,
+          label: contestData.topics[0]?.name,
+        },
+        contestDuration:
+          contestData.interval === 0
+            ? contestLengthInSeconds
+            : contestData.interval,
         feeType: contestData.funding_token_address
           ? ContestFeeType.DirectDeposit
           : ContestFeeType.CommunityStake,
@@ -40,11 +54,7 @@ const useManageContestForm = ({
         // @ts-expect-error StrictNullChecks
         prizePercentage: contestData.prize_percentage,
         payoutStructure: contestData.payout_structure,
-        toggledTopicList: contestData.topics.map((topic) => ({
-          name: topic.name,
-          id: topic.id,
-          checked: true,
-        })),
+        voteWeightMultiplier: contestData.vote_weight_multiplier,
       });
     }
   }, [

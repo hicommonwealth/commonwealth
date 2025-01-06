@@ -9,11 +9,13 @@ import { HelmetProvider } from 'react-helmet-async';
 import { RouterProvider } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import { queryClient } from 'state/api/config';
+import { ReactNativeBridge } from 'views/components/ReactNativeBridge';
 import { Splash } from './Splash';
 import { openFeatureProvider } from './helpers/feature-flags';
 import useAppStatus from './hooks/useAppStatus';
 import { trpc, trpcClient } from './utils/trpcClient';
 import { AddToHomeScreenPrompt } from './views/components/AddToHomeScreenPrompt';
+import { KnockFeedWrapper } from './views/components/KnockNotifications/KnockFeedWrapper';
 import { Mava } from './views/components/Mava';
 
 OpenFeature.setProvider(openFeatureProvider);
@@ -30,22 +32,24 @@ const App = () => {
           <trpc.Provider client={trpcClient} queryClient={queryClient}>
             {/*@ts-expect-error StrictNullChecks*/}
             <OpenFeatureProvider client={undefined}>
-              {isLoading ? (
-                <Splash />
-              ) : (
-                <>
-                  <Mava />
-                  <RouterProvider router={router()} />
-                  {isAddedToHomeScreen || isMarketingPage ? null : (
-                    <AddToHomeScreenPrompt
-                      isIOS={isIOS}
-                      isAndroid={isAndroid}
-                      displayDelayMilliseconds={1000}
-                    />
-                  )}
-                </>
-              )}
-
+              <KnockFeedWrapper>
+                {isLoading ? (
+                  <Splash />
+                ) : (
+                  <>
+                    <Mava />
+                    <ReactNativeBridge />
+                    <RouterProvider router={router()} />
+                    {isAddedToHomeScreen || isMarketingPage ? null : (
+                      <AddToHomeScreenPrompt
+                        isIOS={isIOS}
+                        isAndroid={isAndroid}
+                        displayDelayMilliseconds={1000}
+                      />
+                    )}
+                  </>
+                )}
+              </KnockFeedWrapper>
               <ToastContainer />
               {import.meta.env.DEV && <ReactQueryDevtools />}
             </OpenFeatureProvider>

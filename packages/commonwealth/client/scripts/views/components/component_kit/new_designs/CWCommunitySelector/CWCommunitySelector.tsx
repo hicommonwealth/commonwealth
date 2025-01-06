@@ -17,6 +17,7 @@ export enum CommunityType {
   Cosmos = 'cosmos',
   Polygon = 'polygon',
   Solana = 'solana',
+  Skale = 'skale',
 }
 
 export type SelectedCommunity = {
@@ -66,7 +67,7 @@ const CWCommunitySelector = ({
             <CWTag label="Recommended" type="stage" classNames="phase-7" />
           )}
         </div>
-        <CWText className="description">{description}</CWText>
+        {description && <CWText className="description">{description}</CWText>}
       </div>
     </div>
   );

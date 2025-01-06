@@ -1,7 +1,7 @@
 import React from 'react';
 
-import 'components/component_kit/cw_icon.scss';
 import { ComponentType } from '../types';
+import './cw_icon.scss';
 import { iconLookup } from './cw_icon_lookup';
 import type { IconComponentProps } from './types';
 
@@ -14,6 +14,7 @@ export const CWIcon = (props: IconComponentProps) => {
     iconSize = 'medium',
     onClick,
     selected,
+    weight,
     ...otherProps
   } = props;
 
@@ -27,6 +28,7 @@ export const CWIcon = (props: IconComponentProps) => {
       iconSize={iconSize}
       onClick={onClick}
       selected={selected}
+      weight={weight}
       {...otherProps}
     />
   );

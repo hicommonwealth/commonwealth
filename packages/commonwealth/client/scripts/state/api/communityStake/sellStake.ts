@@ -1,4 +1,4 @@
-import { commonProtocol } from '@hicommonwealth/shared';
+import { commonProtocol } from '@hicommonwealth/evm-protocols';
 import { useMutation } from '@tanstack/react-query';
 import { ContractMethods, queryClient } from 'state/api/config';
 import { setActiveAccountOnTransactionSuccess } from 'views/modals/ManageCommunityStakeModal/utils';
@@ -49,6 +49,15 @@ const useSellStakeMutation = () => {
           variables.walletAddress,
         ],
       });
+
+      await queryClient.invalidateQueries({
+        queryKey: [ContractMethods.GET_CONTEST_BALANCE],
+      });
+
+      await queryClient.invalidateQueries({
+        queryKey: [ContractMethods.GET_FEE_MANAGER_BALANCE],
+      });
+
       await setActiveAccountOnTransactionSuccess(variables.walletAddress);
     },
   });

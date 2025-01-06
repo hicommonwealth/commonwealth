@@ -5,7 +5,7 @@ import {
   WorkflowKeys,
 } from '@hicommonwealth/core';
 import { models } from '@hicommonwealth/model';
-import { safeTruncateBody } from '@hicommonwealth/shared';
+import { getDecodedString, safeTruncateBody } from '@hicommonwealth/shared';
 import z from 'zod';
 import { getThreadUrl } from '../util';
 
@@ -64,7 +64,6 @@ export const processThreadUpvoted: EventHandler<
     log.error('Community not found!', undefined, payload);
     return false;
   }
-
   const provider = notificationsProvider();
   const res = await provider.triggerWorkflow({
     key: WorkflowKeys.NewUpvotes,
@@ -74,7 +73,7 @@ export const processThreadUpvoted: EventHandler<
       community_name: community.name,
       reaction: payload.reaction,
       thread_id: payload.thread_id,
-      thread_title: safeTruncateBody(decodeURIComponent(threadAndAuthor.title)),
+      thread_title: safeTruncateBody(getDecodedString(threadAndAuthor.title)),
       created_at: payload.created_at!.toISOString(),
       object_url: getThreadUrl(
         payload.community_id,

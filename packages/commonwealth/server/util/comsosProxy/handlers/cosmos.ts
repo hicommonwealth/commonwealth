@@ -1,6 +1,6 @@
 import { logger } from '@hicommonwealth/core';
 import { ChainNodeInstance, models } from '@hicommonwealth/model';
-import { NodeHealth } from '@hicommonwealth/shared';
+import { NodeHealth, PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
 import axios from 'axios';
 import type { Request, Response } from 'express';
 import _ from 'lodash';
@@ -75,7 +75,7 @@ export async function cosmosHandler(
         _.isEmpty(req.body) ? null : req.body,
         {
           headers: {
-            origin: 'https://commonwealth.im',
+            origin: `https://${PRODUCTION_DOMAIN}`,
           },
         },
       );

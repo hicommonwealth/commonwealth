@@ -1,9 +1,11 @@
+import {
+  namespaceAbi,
+  namespaceFactoryAbi,
+  reservationHookAbi,
+} from '@hicommonwealth/evm-protocols';
 import { ZERO_ADDRESS } from '@hicommonwealth/shared';
 import { TransactionReceipt } from 'web3';
 import { AbiItem } from 'web3-utils';
-import { NamespaceAbi } from './Abi/NamespaceAbi';
-import { namespaceFactoryAbi } from './Abi/NamespaceFactoryAbi';
-import { reservationHookAbi } from './Abi/ReservationHookAbi';
 import ContractBase from './ContractBase';
 
 /**
@@ -118,6 +120,49 @@ class NamespaceFactory extends ContractBase {
   }
 
   /**
+   * Deploys a new namespace. Note current wallet will be admin of namespace
+   * @param name New Namespace name
+   * @param walletAddress an active evm wallet addresss to send tx from
+   * @param feeManager wallet or contract address to send community fees
+   * @param referrer the address of the user who referred walletAddress(param)
+   * @param chainId The id of the EVM chain
+   * @returns txReceipt or Error if name is taken or tx fails
+   */
+  async deployNamespaceWithReferrer(
+    name: string,
+    walletAddress: string,
+    feeManager: string,
+    referrer: string,
+    chainId: string,
+  ): Promise<TransactionReceipt> {
+    if (!this.initialized || !this.walletEnabled) {
+      await this.initialize(true, chainId);
+    }
+    // Check if name is available
+    const namespaceStatus = await this.checkNamespaceReservation(name);
+    if (!namespaceStatus) {
+      throw new Error('Namespace already reserved');
+    }
+    const maxFeePerGasEst = await this.estimateGas();
+    let txReceipt;
+    try {
+      const uri = `${window.location.origin}/api/namespaceMetadata/${name}/{id}`;
+      txReceipt = await this.contract.methods
+        .deployNamespaceWithReferrer(name, uri, feeManager, referrer, [])
+        .send({
+          from: walletAddress,
+          type: '0x2',
+          maxFeePerGas: maxFeePerGasEst?.toString(),
+          maxPriorityFeePerGas: this.web3.utils.toWei('0.001', 'gwei'),
+        });
+    } catch (error) {
+      throw new Error('Transaction failed: ' + error);
+    }
+
+    return txReceipt;
+  }
+
+  /**
    * Configures a community stakes id on the given namespace
    * Note: current wallet address must be an admin on the namespace specified
    * @param name Namespace name
@@ -218,6 +263,42 @@ class NamespaceFactory extends ContractBase {
     return txReceipt;
   }
 
+  async newERC20Contest(
+    namespaceName: string,
+    contestInterval: number,
+    winnerShares: number[],
+    voteToken: string,
+    voterShare: number,
+    walletAddress: string,
+    exchangeToken: string,
+  ): Promise<TransactionReceipt> {
+    if (!this.initialized || !this.walletEnabled) {
+      await this.initialize(true);
+    }
+    const maxFeePerGasEst = await this.estimateGas();
+    let txReceipt;
+    try {
+      txReceipt = await this.contract.methods
+        .newSingleERC20Contest(
+          namespaceName,
+          contestInterval,
+          winnerShares,
+          voteToken,
+          voterShare,
+          exchangeToken,
+        )
+        .send({
+          from: walletAddress,
+          type: '0x2',
+          maxFeePerGas: maxFeePerGasEst?.toString(),
+          maxPriorityFeePerGas: this.web3.utils.toWei('0.001', 'gwei'),
+        });
+    } catch {
+      throw new Error('Transaction failed');
+    }
+    return txReceipt;
+  }
+
   async getFeeManagerBalance(
     namespace: string,
     token?: string,
@@ -287,7 +368,7 @@ class NamespaceFactory extends ContractBase {
     }
     const namespaceAddr = await this.getNamespaceAddress(namespace);
     const namespaceContract = new this.web3.eth.Contract(
-      NamespaceAbi,
+      namespaceAbi,
       namespaceAddr,
     );
     const balance = await namespaceContract.methods

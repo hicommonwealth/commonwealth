@@ -1,4 +1,4 @@
-@import '../../../../../styles/shared';
+@import '../../../../styles/shared';
 
 .ActionCard {
   display: flex;
@@ -71,5 +71,10 @@
     button {
       padding-left: 0 !important;
     }
+  }
+
+  &.scaled-down {
+    transform: scale(0.92);
+    transform-origin: left;
   }
 }

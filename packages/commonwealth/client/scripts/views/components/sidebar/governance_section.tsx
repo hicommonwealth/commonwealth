@@ -2,12 +2,13 @@ import React from 'react';
 
 import { ChainBase, ChainNetwork, ChainType } from '@hicommonwealth/shared';
 
-import 'components/sidebar/index.scss';
 import { handleRedirectClicks } from 'helpers';
+import './index.scss';
 
 import { useCommonNavigate } from 'navigation/helpers';
 import { matchRoutes, useLocation } from 'react-router-dom';
 import app from 'state';
+import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { sidebarStore } from 'state/ui/sidebar';
 import { isWindowSmallInclusive } from '../component_kit/helpers';
 import { verifyCachedToggleTree } from './helpers';
@@ -17,7 +18,9 @@ import type {
   SidebarSectionAttrs,
   ToggleTree,
 } from './types';
-
+interface AppSectionProps {
+  isContestAvailable: boolean;
+}
 const resetSidebarState = () => {
   if (isWindowSmallInclusive(window.innerWidth)) {
     sidebarStore.getState().setMenu({ name: 'default', isVisible: false });
@@ -49,21 +52,27 @@ function setGovernanceToggleTree(path: string, toggle: boolean) {
     JSON.stringify(newTree);
 }
 
-export const GovernanceSection = () => {
+export const GovernanceSection = ({ isContestAvailable }: AppSectionProps) => {
   const navigate = useCommonNavigate();
   const location = useLocation();
+
+  const communityId = app.activeChainId() || '';
+  const { data: community } = useGetCommunityByIdQuery({
+    id: communityId,
+    enabled: !!communityId,
+  });
 
   // Conditional Render Details
   const hasProposals =
     app.chain &&
     (app.chain.base === ChainBase.CosmosSDK ||
-      app.chain.meta?.snapshot_spaces?.length);
+      community?.snapshot_spaces?.length);
 
   const isNotOffchain = app.chain?.meta?.type !== ChainType.Offchain;
 
   const showSnapshotOptions =
     app.chain?.base === ChainBase.Ethereum &&
-    !!app.chain?.meta.snapshot_spaces?.length;
+    !!community?.snapshot_spaces?.length;
 
   const showProposals =
     isNotOffchain &&
@@ -86,6 +95,12 @@ export const GovernanceSection = () => {
       }),
       ...(showProposals && {
         Proposals: {
+          toggledState: false,
+          children: {},
+        },
+      }),
+      ...(isContestAvailable && {
+        Contests: {
           toggledState: false,
           children: {},
         },
@@ -122,9 +137,10 @@ export const GovernanceSection = () => {
     [{ path: '/members' }, { path: ':scope/members' }],
     location,
   );
-
-  const communityId = app.activeChainId() || '';
-
+  const matchesContestsRoute = matchRoutes(
+    [{ path: '/contests' }, { path: ':scope/contests' }],
+    location,
+  );
   // ---------- Build Section Props ---------- //
 
   // Members
@@ -160,7 +176,7 @@ export const GovernanceSection = () => {
       setGovernanceToggleTree('children.Snapshots.toggledState', toggle);
       resetSidebarState();
       // Check if we have multiple snapshots for conditional redirect
-      const snapshotSpaces = app.chain?.meta?.snapshot_spaces;
+      const snapshotSpaces = community?.snapshot_spaces || [];
       if (snapshotSpaces.length > 1) {
         handleRedirectClicks(
           navigate,
@@ -217,17 +233,38 @@ export const GovernanceSection = () => {
     displayData: null,
   };
 
+  //Contests
+  const contestData: SectionGroupAttrs = {
+    title: 'Contests',
+    containsChildren: false,
+    displayData: null,
+    hasDefaultToggle: false,
+    isActive: !!matchesContestsRoute,
+    isVisible: isContestAvailable,
+    isUpdated: true,
+    onClick: (e, toggle: boolean) => {
+      e.preventDefault();
+      resetSidebarState();
+      handleRedirectClicks(navigate, e, `/contests`, communityId, () => {
+        setGovernanceToggleTree('children.Contests.toggledState', toggle);
+      });
+    },
+  };
   let governanceGroupData: SectionGroupAttrs[] = [
     membersData,
     snapshotData,
     proposalsData,
+    contestData,
   ];
 
   if (!hasProposals) governanceGroupData = [membersData];
+  if (isContestAvailable) {
+    governanceGroupData.push(contestData);
+  }
 
   const sidebarSectionData: SidebarSectionAttrs = {
-    title: 'Governance',
-    className: 'GovernanceSection',
+    title: 'Apps',
+    className: 'AppsSection',
     hasDefaultToggle: toggleTreeState['toggledState'],
     onClick: (e, toggle: boolean) => {
       e.preventDefault();

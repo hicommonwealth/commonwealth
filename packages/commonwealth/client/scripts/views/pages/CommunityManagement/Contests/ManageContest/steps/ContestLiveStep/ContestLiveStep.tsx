@@ -10,16 +10,21 @@ import CopyAddressInput from '../../../CopyAddressInput';
 import FundContestDrawer from '../../../FundContestDrawer';
 
 import contestSuccess from 'assets/img/contestSuccess.png';
+import { copyFarcasterContestFrameUrl } from '../../../utils';
 import './ContestLiveStep.scss';
 
 interface ContestLiveStepProps {
   createdContestAddress: string;
   isFarcasterContest: boolean;
+  fundingTokenTicker: string;
+  fundingTokenAddress: string;
 }
 
 const ContestLiveStep = ({
   createdContestAddress,
   isFarcasterContest,
+  fundingTokenTicker,
+  fundingTokenAddress,
 }: ContestLiveStepProps) => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
@@ -47,16 +52,22 @@ const ContestLiveStep = ({
                 buttonType="secondary"
                 onClick={() => setIsDrawerOpen(true)}
               />
+              {isFarcasterContest && (
+                <CWButton
+                  containerClassName="cta-btn"
+                  label="Copy Farcaster Frame"
+                  onClick={() => {
+                    copyFarcasterContestFrameUrl(createdContestAddress).catch(
+                      console.log,
+                    );
+                  }}
+                />
+              )}
               <CWButton
+                buttonType={isFarcasterContest ? 'tertiary' : 'primary'}
                 containerClassName="cta-btn"
-                label={
-                  isFarcasterContest ? 'Copy Farcaster Frame' : 'Go to contests'
-                }
-                onClick={() =>
-                  isFarcasterContest
-                    ? console.log('Farcaster frame copied')
-                    : navigate('/manage/contests')
-                }
+                label="Go to contests list"
+                onClick={() => navigate('/manage/contests')}
               />
             </div>
           </div>
@@ -66,6 +77,8 @@ const ContestLiveStep = ({
         onClose={() => setIsDrawerOpen(false)}
         isOpen={isDrawerOpen}
         contestAddress={createdContestAddress}
+        fundingTokenTicker={fundingTokenTicker}
+        fundingTokenAddress={fundingTokenAddress}
       />
     </>
   );

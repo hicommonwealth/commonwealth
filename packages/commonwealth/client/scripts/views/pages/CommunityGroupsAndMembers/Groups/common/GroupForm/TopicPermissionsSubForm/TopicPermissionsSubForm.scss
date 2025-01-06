@@ -1,0 +1,23 @@
+@import '../../../../../../../styles/shared';
+
+.TopicPermissionsSubForm {
+  display: flex;
+  justify-content: space-between;
+  align-content: center;
+  padding: 0 12px;
+
+  @include extraSmall {
+    padding: 0 8px;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .Text.b1 {
+    color: $neutral-600;
+    margin: auto 0;
+  }
+
+  .CWSelectList {
+    min-width: 240px;
+  }
+}

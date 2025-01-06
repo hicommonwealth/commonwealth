@@ -16,4 +16,12 @@ export const trpcRouter = trpc.router({
     trpc.Tag.Community,
   ),
   getContestLog: trpc.query(Contest.GetContestLog, trpc.Tag.Community),
+  getFarcasterCasts: trpc.query(
+    Contest.GetFarcasterContestCasts,
+    trpc.Tag.Community,
+  ),
+  farcasterWebhook: trpc.command(
+    Contest.FarcasterCastCreatedWebhook,
+    trpc.Tag.Integration,
+  ),
 });

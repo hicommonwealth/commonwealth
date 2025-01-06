@@ -8,6 +8,7 @@ export const enum MixpanelPageViewEvent {
   GROUPS_CREATION_PAGE_VIEW = 'Create Group Page Viewed',
   GROUPS_EDIT_PAGE_VIEW = 'Edit Group Page Viewed',
   DIRECTORY_PAGE_VIEW = 'Directory Page Viewed',
+  LEADERBOARD_PAGE_VIEW = 'Leaderboard Page Viewed',
 }
 
 export const enum MixpanelCommunityInteractionEvent {
@@ -64,6 +65,7 @@ export const enum MixpanelCommunityCreationEvent {
   CREATE_COMMUNITY_VISITED = '/createCommunity Page Visited',
   CONNECT_NEW_WALLET_PRESSED = 'Connect New Wallet Button Pressed',
   NEW_COMMUNITY_CREATION = 'New Community Creation',
+  CREATE_TOKEN_BUTTON_PRESSED = 'Create Token Community Button Pressed',
   CREATE_COMMUNITY_CANCELLED = 'Create Community Cancel Button Pressed',
   CREATE_TOKEN_COMMUNITY_VISITED = '/createTokenCommunity Page Visited',
   CREATE_TOKEN_COMMUNITY_CANCELLED = 'Create Token Community Cancel Button Pressed',
@@ -77,11 +79,7 @@ export const enum MixpanelSnapshotEvents {
 }
 
 export const enum MixpanelGovernanceEvents {
-  AAVE_PROPOSAL_CREATED = 'Aave Proposal Created',
-  COMPOUND_PROPOSAL_CREATED = 'Compound Proposal Created',
   COSMOS_PROPOSAL_CREATED = 'Cosmos Proposal Created',
-  AAVE_VOTE_OCCURRED = 'Aave Vote Occurred',
-  COMPOUND_VOTE_OCCURRED = 'Compund Vote Occurred',
   COSMOS_VOTE_OCCURRED = 'Cosmos Vote Occurred',
 }
 

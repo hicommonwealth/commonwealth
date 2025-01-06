@@ -1,9 +1,7 @@
 import { toCanvasSignedDataApiArgs } from '@hicommonwealth/shared';
-import { useMutation } from '@tanstack/react-query';
-import axios from 'axios';
+import { trpc } from 'client/scripts/utils/trpcClient';
 import { signDeleteThreadReaction } from 'controllers/server/sessions';
 import app from 'state';
-import { SERVER_URL } from 'state/api/config';
 import { useAuthModalStore } from '../../ui/modals';
 import { userStore } from '../../ui/user';
 import { updateThreadInAllCaches } from './helpers/cache';
@@ -19,58 +17,65 @@ interface DeleteReactionProps extends UseDeleteThreadReactionMutationProps {
   reactionId: number;
 }
 
-const deleteReaction = async ({
+export const buildDeleteThreadReactionInput = async ({
   address,
   communityId,
   threadMsgId,
   reactionId,
-  threadId,
 }: DeleteReactionProps) => {
   const canvasSignedData = await signDeleteThreadReaction(address, {
-    thread_id: threadMsgId,
-  });
-
-  const response = await axios.delete(`${SERVER_URL}/reactions/${reactionId}`, {
-    data: {
-      author_community_id: communityId,
-      address: address,
-      community_id: app.chain.id,
-      jwt: userStore.getState().jwt,
-      ...toCanvasSignedDataApiArgs(canvasSignedData),
-    },
+    thread_id: threadMsgId ?? null,
   });
 
   return {
-    ...response,
-    data: {
-      ...response.data,
-      result: {
-        thread_id: threadId,
-        reaction_id: reactionId,
-      },
-    },
+    author_community_id: communityId,
+    address: address,
+    community_id: app.chain.id,
+    reaction_id: reactionId,
+    jwt: userStore.getState().jwt,
+    ...toCanvasSignedDataApiArgs(canvasSignedData),
   };
 };
 
 const useDeleteThreadReactionMutation = ({
   communityId,
   threadId,
-}: UseDeleteThreadReactionMutationProps) => {
+  currentReactionCount,
+  currentReactionWeightsSum,
+}: UseDeleteThreadReactionMutationProps & {
+  currentReactionCount: number;
+  currentReactionWeightsSum: string;
+}) => {
   const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
 
-  return useMutation({
-    mutationFn: deleteReaction,
-    onSuccess: async (response) => {
-      updateThreadInAllCaches(
-        communityId,
-        threadId,
-        {
-          associatedReactions: [
-            { id: response.data.result.reaction_id },
-          ] as any,
-        },
-        'removeFromExisting',
-      );
+  return trpc.thread.deleteReaction.useMutation({
+    onSuccess: (deletedReaction, variables) => {
+      if (deletedReaction) {
+        updateThreadInAllCaches(
+          communityId,
+          threadId,
+          {
+            associatedReactions: [
+              {
+                id: variables.reaction_id,
+                reaction: 'like',
+                address: '',
+                updated_at: '',
+                address_id: 0,
+              },
+            ],
+          },
+          'removeFromExisting',
+        );
+
+        updateThreadInAllCaches(communityId, threadId, {
+          reactionCount: currentReactionCount - 1,
+          reactionWeightsSum: `${
+            parseInt(currentReactionWeightsSum) -
+            parseInt(deletedReaction?.calculated_voting_weight || `0`)
+          }`,
+        });
+      }
     },
     onError: (error) => checkForSessionKeyRevalidationErrors(error),
   });

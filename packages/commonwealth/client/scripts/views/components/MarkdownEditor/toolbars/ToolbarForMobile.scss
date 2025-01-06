@@ -1,0 +1,28 @@
+@import '../../../../styles/shared';
+
+.ToolbarForMobile {
+  display: flex;
+  flex-grow: 1;
+  column-gap: 4px;
+
+  * {
+    margin-top: auto;
+    margin-bottom: auto;
+  }
+
+  select {
+    outline: none;
+    border: none;
+    color: #c6c6c6;
+  }
+
+  .end {
+    justify-content: flex-end;
+    flex-grow: 1;
+    display: flex;
+  }
+
+  .mdxeditor-toolbar {
+    height: inherit !important;
+  }
+}

@@ -1,15 +1,24 @@
-import { Actor, events, logger, Policy } from '@hicommonwealth/core';
+import { Actor, logger, Policy } from '@hicommonwealth/core';
+import { events } from '@hicommonwealth/schemas';
+import { NeynarAPIClient } from '@neynar/nodejs-sdk';
+import moment from 'moment';
 import { QueryTypes } from 'sequelize';
-import { config, Contest } from '..';
-import { models } from '../database';
-import { contestHelper } from '../services/commonProtocol';
-import { buildThreadContentUrl } from '../utils';
+import Web3 from 'web3';
+import { config, Contest, models } from '..';
+import { GetActiveContestManagers } from '../contest';
+import { rollOverContest } from '../services/commonProtocol/contestHelper';
+import { buildThreadContentUrl, getChainNodeUrl } from '../utils';
+import {
+  createOnchainContestContent,
+  createOnchainContestVote,
+} from './contest-utils';
 
 const log = logger(import.meta);
 
 const inputs = {
   ThreadCreated: events.ThreadCreated,
   ThreadUpvoted: events.ThreadUpvoted,
+  ContestRolloverTimerTicked: events.ContestRolloverTimerTicked,
 };
 
 export function ContestWorker(): Policy<typeof inputs> {
@@ -17,101 +26,35 @@ export function ContestWorker(): Policy<typeof inputs> {
     inputs,
     body: {
       ThreadCreated: async ({ payload }) => {
-        if (!payload.topic_id) {
-          log.warn('ThreadCreated: payload does not contain topic_id');
-          return;
-        }
-
-        const { address: userAddress } = (await models.Address.findByPk(
-          payload!.address_id,
-        ))!;
-
-        const contentUrl = buildThreadContentUrl(
-          payload.community_id!,
+        const content_url = buildThreadContentUrl(
+          payload.community_id,
           payload.id!,
         );
 
-        const activeContestManagers =
-          await Contest.GetActiveContestManagers().body({
-            actor: {} as Actor,
-            payload: {
-              community_id: payload.community_id,
-              topic_id: payload.topic_id,
-            },
-          });
-        if (!activeContestManagers?.length) {
+        const contestManagers = await Contest.GetActiveContestManagers().body({
+          actor: {} as Actor,
+          payload: {
+            community_id: payload.community_id!,
+            topic_id: payload.topic_id!,
+          },
+        });
+        if (!contestManagers?.length) {
           log.warn('ThreadCreated: no matching contest managers found');
           return;
         }
 
-        const chainNodeUrl = activeContestManagers[0]!.url;
-
-        const addressesToProcess = activeContestManagers
-          .filter((c) => {
-            // only process contest managers for which
-            // the user has not exceeded the post limit
-            // on the latest contest
-            const userPostsInContest = c.actions.filter(
-              (action) =>
-                action.actor_address === userAddress &&
-                action.action === 'added',
-            );
-            const quotaReached =
-              userPostsInContest.length >=
-              config.CONTESTS.MAX_USER_POSTS_PER_CONTEST;
-            if (quotaReached) {
-              log.warn(
-                `ThreadCreated: user reached post limit for contest ${c.contest_address} (ID ${c.max_contest_id})`,
-              );
-            }
-            return !quotaReached;
-          })
-          .map((c) => c.contest_address);
-
-        log.debug(
-          `ThreadCreated: addresses to process: ${JSON.stringify(
-            addressesToProcess,
-            null,
-            2,
-          )}`,
-        );
-
-        const results = await contestHelper.addContentBatch(
-          chainNodeUrl!,
-          addressesToProcess,
-          userAddress,
-          contentUrl,
-        );
-
-        const errors = results
-          .filter(({ status }) => status === 'rejected')
-          .map(
-            (result) =>
-              (result as PromiseRejectedResult).reason || '<unknown reason>',
-          );
-
-        if (errors.length > 0) {
-          // TODO: ignore duplicate content error
-          throw new Error(
-            `addContent failed with errors: ${errors.join(', ')}"`,
-          );
-        }
+        await createOnchainContestContent({
+          contestManagers,
+          bypass_quota: false,
+          content_url,
+          author_address: payload.address!,
+        });
       },
       ThreadUpvoted: async ({ payload }) => {
-        const { community_id, topic_id } = (await models.Thread.findByPk(
-          payload.thread_id!,
-          {
-            attributes: ['community_id', 'topic_id'],
-          },
-        ))!;
-        if (!topic_id) {
-          log.warn('ThreadUpvoted: thread does not contain topic_id');
-          return;
-        }
-
-        const { address: userAddress } = (await models.Address.findByPk(
-          payload!.address_id,
-        ))!;
+        const content_url = buildThreadContentUrl(
+          payload.community_id,
+          payload.thread_id,
+        );
 
         const activeContestManagersWithoutVote = await models.sequelize.query<{
           url: string;
@@ -120,11 +63,10 @@ export function ContestWorker(): Policy<typeof inputs> {
           content_id: number;
         }>(
           `
-            SELECT coalesce(cn.private_url, cn.url) as url, cm.contest_address, added.content_id
+            SELECT cn.private_url, cn.url, cm.contest_address, added.content_id
             FROM "Communities" c
             JOIN "ChainNodes" cn ON c.chain_node_id = cn.id
             JOIN "ContestManagers" cm ON cm.community_id = c.id
-            JOIN "ContestTopics" ct ON cm.contest_address = ct.contest_address
             JOIN "Contests" co ON cm.contest_address = co.contest_address
               AND co.contest_id = (
                 SELECT MAX(contest_id) AS max_id
@@ -132,9 +74,9 @@ export function ContestWorker(): Policy<typeof inputs> {
                 WHERE c1.contest_address = cm.contest_address
               )
             JOIN "ContestActions" added on co.contest_address = added.contest_address
-              AND added.thread_id = :thread_id
+              AND added.content_url = :content_url
               AND added.action = 'added'
-            WHERE ct.topic_id = :topic_id
+            WHERE cm.topic_id = :topic_id
             AND cm.community_id = :community_id
             AND cm.cancelled = false
             AND (
@@ -162,14 +104,13 @@ export function ContestWorker(): Policy<typeof inputs> {
           {
             type: QueryTypes.SELECT,
             replacements: {
-              thread_id: payload.thread_id!,
-              actor_address: userAddress,
-              topic_id: topic_id,
-              community_id,
+              content_url: content_url,
+              actor_address: payload.address,
+              topic_id: payload.topic_id,
+              community_id: payload.community_id,
             },
           },
         );
-
         if (!activeContestManagersWithoutVote?.length) {
           // throw to trigger retry in case the content is pending creation
           throw new Error(
@@ -177,38 +118,201 @@ export function ContestWorker(): Policy<typeof inputs> {
           );
         }
 
-        const chainNodeUrl = activeContestManagersWithoutVote[0]!.url;
-
-        log.debug(
-          `ThreadUpvoted: contest managers to process: ${JSON.stringify(
-            activeContestManagersWithoutVote,
-            null,
-            2,
-          )}`,
+        const chainNodeUrl = getChainNodeUrl(
+          activeContestManagersWithoutVote[0]!,
         );
 
-        const results = await contestHelper.voteContentBatch(
-          chainNodeUrl!,
-          userAddress,
-          activeContestManagersWithoutVote.map((m) => ({
-            contestAddress: m.contest_address,
-            contentId: m.content_id.toString(),
-          })),
+        const contestManagers = activeContestManagersWithoutVote.map(
+          ({ contest_address, content_id }) => ({
+            url: chainNodeUrl,
+            contest_address,
+            content_id,
+          }),
         );
 
-        const errors = results
-          .filter(({ status }) => status === 'rejected')
-          .map(
-            (result) =>
-              (result as PromiseRejectedResult).reason || '<unknown reason>',
-          );
-
-        if (errors.length > 0) {
-          throw new Error(
-            `voteContent failed ${errors.length} times: ${errors.join(', ')}"`,
-          );
+        await createOnchainContestVote({
+          contestManagers,
+          content_url,
+          author_address: payload.address!,
+        });
+      },
+      ContestRolloverTimerTicked: async () => {
+        try {
+          await checkContests();
+        } catch (err) {
+          log.error('error checking contests', err as Error);
+        }
+        try {
+          await rolloverContests();
+        } catch (err) {
+          log.error('error rolling over contests', err as Error);
         }
       },
     },
   };
 }
+
+const getPrivateWalletAddress = () => {
+  const web3 = new Web3();
+  const privateKey = config.WEB3.PRIVATE_KEY;
+  const account = web3.eth.accounts.privateKeyToAccount(privateKey);
+  const publicAddress = account.address;
+  return publicAddress;
+};
+
+const checkContests = async () => {
+  const activeContestManagers = await GetActiveContestManagers().body({
+    actor: {} as Actor,
+    payload: {},
+  });
+  // find active contests that have content with no upvotes and will end in one hour
+  const contestsWithoutVote = activeContestManagers!.filter(
+    (contestManager) =>
+      contestManager.actions.some((action) => action.action === 'added') &&
+      !contestManager.actions.some((action) => action.action === 'upvoted') &&
+      moment(contestManager.end_time).diff(moment(), 'minutes') < 60,
+  );
+
+  const promises = contestsWithoutVote.map(async (contestManager) => {
+    // add onchain vote to the first content
+    const firstContent = contestManager.actions.find(
+      (action) => action.action === 'added',
+    );
+
+    await createOnchainContestVote({
+      contestManagers: [
+        {
+          url: contestManager.url,
+          contest_address: contestManager.contest_address,
+          content_id: firstContent!.content_id,
+        },
+      ],
+      content_url: firstContent!.content_url!,
+      author_address: getPrivateWalletAddress(),
+    });
+  });
+
+  const promiseResults = await Promise.allSettled(promises);
+
+  const errors = promiseResults
+    .filter(({ status }) => status === 'rejected')
+    .map(
+      (result) =>
+        (result as PromiseRejectedResult).reason || '<unknown reason>',
+    );
+
+  if (errors.length > 0) {
+    log.error(`CheckContests: failed with errors: ${errors.join(', ')}"`);
+  }
+};
+
+const rolloverContests = async () => {
+  const contestManagersWithEndedContest = await models.sequelize.query<{
+    contest_address: string;
+    interval: number;
+    ended: boolean;
+    url: string;
+    private_url: string;
+    neynar_webhook_id?: string;
+  }>(
+    `
+            SELECT cm.contest_address,
+                   cm.interval,
+                   cm.ended,
+                   cm.neynar_webhook_id,
+                   co.end_time,
+                   cn.private_url,
+                   cn.url
+            FROM "ContestManagers" cm
+                     JOIN (SELECT *
+                           FROM "Contests"
+                           WHERE (contest_address, contest_id) IN (SELECT contest_address, MAX(contest_id) AS contest_id
+                                                                   FROM "Contests"
+                                                                   GROUP BY contest_address)) co
+                          ON co.contest_address = cm.contest_address
+                              AND (
+                                 (cm.interval = 0 AND cm.ended IS NOT TRUE)
+                                     OR
+                                 cm.interval > 0
+                                 )
+                              AND NOW() > co.end_time
+                              AND cm.cancelled IS NOT TRUE
+                     JOIN "Communities" cu ON cm.community_id = cu.id
+                     JOIN "ChainNodes" cn ON cu.chain_node_id = cn.id;
+        `,
+    {
+      type: QueryTypes.SELECT,
+      raw: true,
+    },
+  );
+
+  const contestRolloverPromises = contestManagersWithEndedContest.map(
+    async ({
+      url,
+      private_url,
+      contest_address,
+      interval,
+      ended,
+      neynar_webhook_id,
+    }) => {
+      log.info(`ROLLOVER: ${contest_address}`);
+
+      if (interval === 0 && !ended) {
+        // preemptively mark as ended so that rollover
+        // is not attempted again after failure
+        await models.ContestManager.update(
+          {
+            ended: true,
+          },
+          {
+            where: {
+              contest_address,
+            },
+          },
+        );
+      }
+
+      await rollOverContest(
+        getChainNodeUrl({ url, private_url }),
+        contest_address,
+        interval === 0,
+      );
+
+      // clean up neynar webhooks when farcaster contest ends
+      if (neynar_webhook_id) {
+        try {
+          const client = new NeynarAPIClient(config.CONTESTS.NEYNAR_API_KEY!);
+          await client.deleteWebhook(neynar_webhook_id);
+          await models.ContestManager.update(
+            {
+              neynar_webhook_id: null,
+              neynar_webhook_secret: null,
+            },
+            {
+              where: {
+                contest_address,
+              },
+            },
+          );
+        } catch (err) {
+          log.warn(`failed to delete neynar webhook: ${neynar_webhook_id}`);
+        }
+      }
+    },
+  );
+
+  const promiseResults = await Promise.allSettled(contestRolloverPromises);
+
+  const errors = promiseResults
+    .filter(({ status }) => status === 'rejected')
+    .map(
+      (result) =>
+        (result as PromiseRejectedResult).reason || '<unknown reason>',
+    );
+
+  if (errors.length > 0) {
+    log.error(
+      `PerformContestRollovers: failed with errors: ${errors.join(', ')}"`,
+    );
+  }
+};

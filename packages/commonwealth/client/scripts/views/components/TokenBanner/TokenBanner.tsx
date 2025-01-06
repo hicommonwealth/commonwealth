@@ -16,12 +16,12 @@ import './TokenBanner.scss';
 interface TokenBannerProps {
   avatarUrl?: string;
   name?: string;
-  ticker?: string;
+  ticker?: string | null;
   value?: number;
   change?: number;
   isLoading?: boolean;
   popover?: Pick<CWPopoverProps, 'title' | 'body'>;
-  voteWeight?: number;
+  voteWeight?: string;
 }
 
 const TokenBanner = ({
@@ -47,10 +47,10 @@ const TokenBanner = ({
           <Avatar url={avatarUrl} size={40} />
         ) : (
           <div className="avatar-placeholder">
-            {(name || 'Token').charAt(0).toUpperCase()}
+            {(name || 'ETH').charAt(0).toUpperCase()}
           </div>
         )}
-        <CWText fontWeight="medium">{name}</CWText>
+        <CWText fontWeight="medium">{name || 'ETH'}</CWText>
         <CWText fontWeight="medium" className="ticker">
           {ticker}
         </CWText>
@@ -76,7 +76,7 @@ const TokenBanner = ({
       )}
 
       {voteWeight && (
-        <div>
+        <div className="vote-weight">
           <CWText className="vote-weight-label" type="caption">
             Your vote weight
           </CWText>
@@ -85,19 +85,18 @@ const TokenBanner = ({
       )}
 
       {popover && (
-        <>
-          <CWIconButton
-            iconName="infoEmpty"
-            buttonSize="sm"
-            onMouseEnter={popoverProps.handleInteraction}
-            onMouseLeave={popoverProps.handleInteraction}
-          />
+        <div
+          onMouseEnter={popoverProps.handleInteraction}
+          onMouseLeave={popoverProps.handleInteraction}
+        >
+          <CWIconButton iconName="infoEmpty" buttonSize="sm" />
           <CWPopover
+            className="TokenBannerPopover"
             title={<>{popover.title}</>}
             body={popover.body}
             {...popoverProps}
           />
-        </>
+        </div>
       )}
     </div>
   );

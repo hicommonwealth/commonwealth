@@ -6,7 +6,11 @@
   },
   "include": ["src"],
   "references": [
-    { "path": "../schemas/tsconfig.build.json" },
-    { "path": "../shared/tsconfig.build.json" }
+    {
+      "path": "../schemas/tsconfig.build.json"
+    },
+    {
+      "path": "../evm-protocols/tsconfig.build.json"
+    }
   ]
 }

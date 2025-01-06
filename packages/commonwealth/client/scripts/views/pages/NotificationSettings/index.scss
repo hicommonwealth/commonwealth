@@ -1,11 +1,12 @@
-@import '../../../../styles/shared';
+@import '../../../styles/shared';
 
 .NotificationSettings {
   max-width: 650px;
 
   .setting-container {
     display: flex;
-    margin-block: 8px;
+    margin-top: 16px;
+    margin-bottom: 32px;
   }
 
   .setting-container-right {
@@ -28,6 +29,7 @@
 
   .page-subheader-text {
     color: $neutral-500;
+    margin-bottom: 8px;
   }
 
   .SubscriptionEntry {

@@ -1,4 +1,4 @@
-import { notifySuccess } from 'controllers/app/notifications';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import React from 'react';
 import app from 'state';
@@ -64,8 +64,7 @@ const Snapshots = () => {
             .map((x) => x.value)
             .map((link) => {
               const splitLink = link.split('/');
-              const sanitizedLink = splitLink[splitLink.length - 1];
-              return sanitizedLink;
+              return splitLink[splitLink.length - 1];
             }),
         ),
       ];
@@ -87,9 +86,8 @@ const Snapshots = () => {
       );
 
       notifySuccess('Snapshot links updated!');
-      app.sidebarRedraw.emit('redraw');
     } catch {
-      notifySuccess('Failed to update snapshot links!');
+      notifyError('Failed to update snapshot links!');
     }
   };
 

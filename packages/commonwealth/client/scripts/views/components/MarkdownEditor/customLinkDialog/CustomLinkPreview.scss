@@ -1,0 +1,24 @@
+.CustomLinkPreview {
+  display: flex;
+  gap: 4px;
+  flex-grow: 1;
+  .MainLink {
+    flex-grow: 1;
+  }
+}
+
+.mdxeditor-parent-mode-mobile .CustomLinkPreview .MainLink {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  // For some reason, width must be set for CSS text-overflow to work
+  width: 50px;
+}
+
+.CustomLinkDialogForDesktopPopover .MainLink {
+  margin-right: 16px;
+}
+
+.CustomLinkDialogForDesktopPopover .CustomLinkPreview {
+  gap: 8px;
+}

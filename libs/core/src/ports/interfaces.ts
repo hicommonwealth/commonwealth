@@ -1,3 +1,4 @@
+import { EventNames, Events } from '@hicommonwealth/schemas';
 import { Readable } from 'stream';
 import { z } from 'zod';
 import {
@@ -6,7 +7,6 @@ import {
   EventsHandlerMetadata,
   InvalidInput,
 } from '../framework';
-import { EventNames, Events } from '../integration/events';
 import {
   ChainProposalsNotification,
   CommentCreatedNotification,
@@ -77,6 +77,8 @@ export enum CacheNamespaces {
   Token_Balance = 'token_balance',
   Activity_Cache = 'activity_cache',
   Rate_Limiter = 'rate_limiter',
+  Api_key_auth = 'api_key_auth',
+  Query_Response = 'query_response',
 }
 
 /**
@@ -200,12 +202,14 @@ export enum BrokerPublications {
 }
 
 export enum BrokerSubscriptions {
-  DiscordListener = 'DiscordMessage',
+  DiscordBotPolicy = 'DiscordBotPolicy',
   ChainEvent = 'ChainEvent',
   NotificationsProvider = 'NotificationsProvider',
   NotificationsSettings = 'NotificationsSettings',
   ContestWorkerPolicy = 'ContestWorkerPolicy',
   ContestProjection = 'ContestProjection',
+  FarcasterWorkerPolicy = 'FarcasterWorkerPolicy',
+  XpProjection = 'XpProjection',
 }
 
 /**
@@ -247,7 +251,13 @@ export interface Broker extends Disposable {
 }
 
 export type BlobType = string | Uint8Array | Buffer | Readable;
-export const BlobBuckets = ['assets', 'sitemap', 'archives'] as const;
+export const BlobBuckets = [
+  'assets',
+  'sitemap',
+  'archives',
+  'threads',
+  'comments',
+] as const;
 export type BlobBucket = (typeof BlobBuckets)[number];
 
 /**

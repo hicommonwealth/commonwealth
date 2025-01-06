@@ -1,5 +1,5 @@
+import { Events, events } from '@hicommonwealth/schemas';
 import z, { ZodSchema, ZodUndefined } from 'zod';
-import { Events, events } from '../integration/events';
 
 /**
  * Error names as constants
@@ -13,16 +13,15 @@ export const ExternalServiceUserIds = {
   K6: -2,
 } as const;
 
-export type AuthStrategies =
+export type AuthStrategies<Input extends ZodSchema> =
   | {
-      name: 'jwt' | 'authtoken';
+      type: 'jwt' | 'authtoken';
       userId?: (typeof ExternalServiceUserIds)[keyof typeof ExternalServiceUserIds];
     }
   | {
-      name: 'custom';
-      userId?: (typeof ExternalServiceUserIds)[keyof typeof ExternalServiceUserIds];
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      customStrategyFn: (req: any) => void;
+      type: 'custom';
+      name: string;
+      userResolver: (payload: z.infer<Input>, user?: User) => Promise<User>;
     };
 
 /**
@@ -43,6 +42,7 @@ export type User = {
   id?: number;
   emailVerified?: boolean;
   isAdmin?: boolean;
+  auth?: Record<string, unknown>; // custom auth payload
 };
 
 /**
@@ -51,6 +51,7 @@ export type User = {
  * - Unique identification is established through the `user.id`
  * - Extends users with additional (optional) attributes that may include:
  *   - `address` for the active web wallet address
+ *   - `is_system_actor` for policy actors that are not real users
  *
  * Authorization for actors is facilitated through {@link CommandHandler} or {@link QueryHandler} middleware within the context of the invoked command or query.
  * - When executing a command, the `aggregate` may need loading before completing the authorization process.
@@ -58,6 +59,7 @@ export type User = {
 export type Actor = {
   readonly user: Readonly<User>;
   readonly address?: string;
+  readonly is_system_actor?: boolean;
 };
 
 /**
@@ -106,10 +108,10 @@ export class InvalidState extends Error {
  * - `payload`: validated command payload
  * - `auth`: authorization context
  */
-export type Context<Input extends ZodSchema, AuthContext> = {
+export type Context<Input extends ZodSchema, _Context extends ZodSchema> = {
   readonly actor: Actor;
   readonly payload: z.infer<Input>;
-  readonly auth?: AuthContext;
+  readonly context?: z.infer<_Context>;
 };
 
 /**
@@ -131,9 +133,9 @@ export type EventContext<Name extends Events> = {
 export type Handler<
   Input extends ZodSchema,
   Output extends ZodSchema,
-  AuthContext,
+  _Context extends ZodSchema,
 > = (
-  context: Context<Input, AuthContext>,
+  context: Context<Input, _Context>,
 ) => Promise<z.infer<Output> | undefined | void>;
 
 /**
@@ -157,14 +159,15 @@ export type EventHandler<
 export type Metadata<
   Input extends ZodSchema,
   Output extends ZodSchema,
-  AuthContext,
+  _Context extends ZodSchema,
 > = {
   readonly input: Input;
   readonly output: Output;
-  readonly auth: Handler<Input, Output, AuthContext>[];
-  readonly body: Handler<Input, Output, AuthContext>;
+  readonly context?: _Context;
+  readonly auth: Handler<Input, Output, _Context>[];
+  readonly body: Handler<Input, Output, _Context>;
   readonly secure?: boolean;
-  readonly authStrategy?: AuthStrategies;
+  readonly authStrategy?: AuthStrategies<Input>;
 };
 
 /**
@@ -192,25 +195,30 @@ export type EventsHandlerMetadata<
 };
 
 // =========== PUBLIC ARTIFACT FACTORY INTERFACE ===========
-export type Schemas<Input extends ZodSchema, Output extends ZodSchema> = {
+export type Schemas<
+  Input extends ZodSchema,
+  Output extends ZodSchema,
+  _Context extends ZodSchema,
+> = {
   input: Input;
   output: Output;
+  context?: _Context;
 };
 
 /**
  * Command metadata
  */
-export type Command<Schema, AuthContext = unknown> =
-  Schema extends Schemas<infer Input, infer Output>
-    ? Metadata<Input, Output, AuthContext>
+export type Command<Schema> =
+  Schema extends Schemas<infer Input, infer Output, infer _Context>
+    ? Metadata<Input, Output, _Context>
     : never;
 
 /**
  * Query metadata
  */
-export type Query<Schema, AuthContext = unknown> =
-  Schema extends Schemas<infer Input, infer Output>
-    ? Metadata<Input, Output, AuthContext>
+export type Query<Schema> =
+  Schema extends Schemas<infer Input, infer Output, infer _Context>
+    ? Metadata<Input, Output, _Context>
     : never;
 
 /**

@@ -1,8 +1,7 @@
-import { EventNames, events } from '@hicommonwealth/core';
-import { Comment, Thread } from '@hicommonwealth/schemas';
+import { Comment, EventNames, Thread, events } from '@hicommonwealth/schemas';
 import { Transaction } from 'sequelize';
 import z from 'zod';
-import { DB } from '../models';
+import { models } from '../database';
 import { emitEvent } from './utils';
 
 export type UserMention = {
@@ -96,7 +95,6 @@ type EmitMentionsData = {
 );
 
 export const emitMentions = async (
-  models: DB,
   transaction: Transaction,
   data: EmitMentionsData,
 ) => {

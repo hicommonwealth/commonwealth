@@ -1,16 +1,17 @@
-@import '../../../../styles/shared';
+@import '../../../styles/shared';
 
 .BreadcrumbsComponent {
   z-index: 0 !important;
 }
 
 .CommunitiesPageLayout {
-  overflow: auto;
   padding-top: 0;
   height: 100%;
+  overflow-y: auto;
 
   .layout-container {
     height: 100%;
+    margin-top: 10px;
   }
 }
 
@@ -18,16 +19,26 @@
   display: flex;
   flex: 1;
   flex-direction: column;
+  overflow: hidden;
 
   .header-section {
     display: flex;
     flex-direction: column;
-
     gap: 16px;
     position: sticky;
     top: 0;
     z-index: 1;
     background-color: $white;
+
+    .btn-border {
+      margin: 0 !important;
+      padding: 0 !important;
+
+      &:focus-within {
+        border-width: 1px !important;
+        padding: 0 !important;
+      }
+    }
 
     .description {
       display: flex;
@@ -40,14 +51,17 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
+        flex-wrap: wrap;
+        gap: 8px;
 
         .communities-count {
           color: $neutral-500;
           height: fit-content;
+          margin-right: 12px;
         }
 
         .CreateCommunityButton {
-          padding: 0 0 0 16px;
+          padding: 0;
         }
       }
     }
@@ -57,6 +71,19 @@
       align-items: center;
       flex-wrap: wrap;
       gap: 16px;
+      height: 0;
+      margin-top: -16px;
+
+      &.hasAppliedFilter {
+        margin-top: initial;
+        height: auto;
+      }
+
+      .Tag {
+        .Text {
+          text-transform: capitalize;
+        }
+      }
 
       @include extraSmall {
         gap: 12px;
@@ -97,6 +124,10 @@
         }
       }
     }
+  }
+
+  .my-16 {
+    margin: 16px 0;
   }
 
   .empty-placeholder {

@@ -32,7 +32,7 @@ export const getFormSteps = (
     ...((showCommunityStakeStep
       ? [
           {
-            label: 'Community Stake',
+            label: 'Namespace',
             state:
               createCommunityStep < CreateCommunityStep.CommunityStake
                 ? 'inactive'

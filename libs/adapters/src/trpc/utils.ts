@@ -36,7 +36,8 @@ export const toExpress = (router: OpenApiRouter) =>
       req,
       res,
     }),
-    onError: ({ path, error }) => logError(path, error),
+    onError: ({ path, error }: { path?: string; error: TRPCError }) =>
+      logError(path, error),
   });
 
 // used for REST like routes (External)
@@ -47,49 +48,64 @@ const toOpenApiExpress = (router: OpenApiRouter) =>
       req,
       res,
     }),
-    onError: ({ path, error }: { path: string; error: TRPCError }) =>
+    onError: ({ path, error }: { path?: string; error: TRPCError }) =>
       logError(path, error),
     responseMeta: undefined,
     maxBodySize: undefined,
   });
 
-const toOpenApiDocument = (
-  router: OpenApiRouter,
-  opts: GenerateOpenApiDocumentOptions,
-): OpenAPIV3.Document => generateOpenApiDocument(router, { ...opts });
-
-interface Options {
+export interface OasOptions {
   title: string;
   path: string;
   version: string;
+  securityScheme: 'apiKey' | 'jwt';
+}
+
+export function toOpenApiDocument(
+  router: OpenApiRouter,
+  host: string,
+  options: OasOptions,
+): OpenAPIV3.Document {
+  const securitySchemes: GenerateOpenApiDocumentOptions['securitySchemes'] =
+    options.securityScheme === 'apiKey'
+      ? {
+          apiKey: {
+            type: 'apiKey',
+            description: 'Create an API key on Common to use the Common API',
+            name: 'x-api-key',
+            in: 'header',
+          },
+        }
+      : {
+          apiKey: {
+            type: 'apiKey',
+            description:
+              'A JWT is required to authenticate with the internal API',
+            name: 'jwt',
+            in: 'header',
+          },
+        };
+
+  return generateOpenApiDocument(router, {
+    title: options.title,
+    version: options.version,
+    baseUrl: `${host}${options.path}`,
+    securitySchemes,
+  });
 }
 
 export function useOAS(
   router: Router,
   trpcRouter: OpenApiRouter,
-  { title, path, version }: Options,
+  options: OasOptions,
 ) {
   router.get('/openapi.json', (req, res) => {
-    const baseUrl = req.protocol + '://' + req.get('host') + path;
     return res.json(
-      toOpenApiDocument(trpcRouter, {
-        title,
-        version,
-        baseUrl,
-        securitySchemes: {
-          oauth2: {
-            type: 'oauth2',
-            flows: {
-              authorizationCode: {
-                authorizationUrl: 'https://example.com/oauth/authorize',
-                tokenUrl: 'https://example.com/oauth/token',
-                refreshUrl: 'https://example.com/oauth/refresh',
-                scopes: {},
-              },
-            },
-          },
-        },
-      }),
+      toOpenApiDocument(
+        trpcRouter,
+        req.protocol + '://' + req.get('host'),
+        options,
+      ),
     );
   });
   router.use('/docs', swaggerUi.serve);

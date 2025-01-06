@@ -1,6 +1,7 @@
+import clsx from 'clsx';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import { DeltaStatic } from 'quill';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import app from 'state';
 import { useFetchTopicsQuery } from 'state/api/topics';
 import { CWCheckbox } from 'views/components/component_kit/cw_checkbox';
@@ -13,28 +14,49 @@ import { MessageRow } from 'views/components/component_kit/new_designs/CWTextInp
 import {
   ReactQuillEditor,
   createDeltaFromText,
+  getTextFromDelta,
 } from 'views/components/react_quill_editor';
+import { TopicForm } from 'views/pages/CommunityManagement/Topics/Topics';
+import z from 'zod';
 import { CreateTopicStep } from '../../utils';
 import './CreateTopicSection.scss';
 import { topicCreationValidationSchema } from './validation';
 
 interface CreateTopicSectionProps {
-  onStepChange?: (step: CreateTopicStep) => void;
+  onStepChange: (step: CreateTopicStep) => void;
+  onSetTopicFormData: (data: Partial<TopicForm>) => void;
+  topicFormData: TopicForm | null;
 }
 
 export const CreateTopicSection = ({
   onStepChange,
+  onSetTopicFormData,
+  topicFormData,
 }: CreateTopicSectionProps) => {
+  const communityId = app.activeChainId() || '';
   const { data: topics } = useFetchTopicsQuery({
-    communityId: app.activeChainId() || '',
+    communityId: communityId,
+    includeArchivedTopics: true,
+    apiEnabled: !!communityId,
   });
 
   const [nameErrorMsg, setNameErrorMsg] = useState<string | null>(null);
   const [descErrorMsg, setDescErrorMsg] = useState<string | null>(null);
-  const [featuredInSidebar, setFeaturedInSidebar] = useState<boolean>(false);
-  const [name, setName] = useState<string>('');
+  const [newPostTemplateError, setNewPostTemplateError] = useState<
+    string | null
+  >(null);
+  const [featuredInSidebar, setFeaturedInSidebar] = useState<boolean>(
+    topicFormData?.featuredInSidebar || false,
+  );
+  const [featuredInNewPost, setFeaturedInNewPost] = useState<boolean>(
+    topicFormData?.featuredInNewPost || false,
+  );
+  const [name, setName] = useState<string>(topicFormData?.name || '');
   const [descriptionDelta, setDescriptionDelta] = useState<DeltaStatic>(
-    createDeltaFromText(''),
+    createDeltaFromText(topicFormData?.description || ''),
+  );
+  const [newPostTemplate, setNewPostTemplate] = useState<DeltaStatic>(
+    createDeltaFromText(topicFormData?.newPostTemplate || ''),
   );
   const [characterCount, setCharacterCount] = useState(0);
 
@@ -73,7 +95,7 @@ export const CreateTopicSection = ({
     return ['success', 'Valid topic name'];
   };
 
-  useMemo(() => {
+  useEffect(() => {
     if ((descriptionDelta?.ops || [])?.[0]?.insert?.length > 250) {
       setDescErrorMsg('Description must be 250 characters or less');
     } else {
@@ -81,8 +103,31 @@ export const CreateTopicSection = ({
     }
   }, [descriptionDelta]);
 
-  const handleSubmit = () => {
-    onStepChange?.(CreateTopicStep.WVConsent);
+  useEffect(() => {
+    if (
+      featuredInNewPost &&
+      (newPostTemplate?.ops || [])?.[0]?.insert?.trim?.()?.length === 0
+    ) {
+      setNewPostTemplateError('Topic template is required');
+    } else {
+      setNewPostTemplateError(null);
+    }
+  }, [featuredInNewPost, newPostTemplate]);
+
+  const handleSubmit = (
+    values: z.infer<typeof topicCreationValidationSchema>,
+  ) => {
+    onSetTopicFormData({
+      name: values.topicName,
+      description: getTextFromDelta(descriptionDelta),
+      featuredInSidebar,
+      featuredInNewPost,
+      newPostTemplate:
+        featuredInNewPost && newPostTemplate
+          ? JSON.stringify(newPostTemplate)
+          : '',
+    });
+    onStepChange(CreateTopicStep.WVConsent);
   };
 
   return (
@@ -117,9 +162,7 @@ export const CreateTopicSection = ({
               Character count: {characterCount}/250
             </CWText>
           </div>
-          <CWText type="caption">
-            Choose whether topic is featured in sidebar.
-          </CWText>
+          <CWText type="caption">Choose whether topic is featured</CWText>
           <CWCheckbox
             className="sidebar-feature-checkbox"
             label={
@@ -138,22 +181,61 @@ export const CreateTopicSection = ({
               setFeaturedInSidebar(!featuredInSidebar);
             }}
           />
+          <div
+            className={clsx(
+              'new-topic-template-section',
+              featuredInNewPost && 'enabled',
+            )}
+          >
+            <CWCheckbox
+              className="sidebar-feature-checkbox"
+              label={
+                <div>
+                  <CWText type="b2">Featured topic in new post</CWText>
+                  <CWText type="caption" className="checkbox-label-caption">
+                    The topic template you add will be added as base text to
+                    every new post within the topic.
+                  </CWText>
+                </div>
+              }
+              checked={featuredInNewPost}
+              onChange={() => {
+                setFeaturedInNewPost(!featuredInNewPost);
+              }}
+            />
+            {featuredInNewPost && (
+              <ReactQuillEditor
+                placeholder="Add a template for this topic (Limit of 250 characters)"
+                contentDelta={newPostTemplate}
+                setContentDelta={setNewPostTemplate}
+              />
+            )}
+          </div>
         </div>
         <div className="actions">
           <MessageRow
-            // @ts-expect-error <StrictNullChecks/>
-            statusMessage={descErrorMsg}
+            statusMessage={descErrorMsg || ''}
             hasFeedback={!!descErrorMsg}
             validationStatus={descErrorMsg ? 'failure' : undefined}
           />
+          {featuredInNewPost && (
+            <MessageRow
+              statusMessage={newPostTemplateError || ''}
+              hasFeedback={!!newPostTemplateError}
+              validationStatus={newPostTemplateError ? 'failure' : undefined}
+            />
+          )}
           <CWButton
             label="Next"
             buttonType="primary"
             buttonHeight="med"
             buttonWidth={isWindowExtraSmall ? 'full' : 'wide'}
-            disabled={!!nameErrorMsg || !!descErrorMsg}
+            disabled={
+              !!nameErrorMsg ||
+              !!descErrorMsg ||
+              (featuredInNewPost && !!newPostTemplateError)
+            }
             type="submit"
-            onClick={handleSubmit}
           />
         </div>
       </CWForm>

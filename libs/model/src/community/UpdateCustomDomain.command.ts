@@ -2,15 +2,14 @@ import type { Command } from '@hicommonwealth/core';
 import { AppError, config } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../database';
-import { isSuperAdmin, type AuthContext } from '../middleware';
+import { isSuperAdmin } from '../middleware';
 
 /**
  * This function will add the custom domain to the database as well as add an entry in heroku.
  * @constructor
  */
 export function UpdateCustomDomain(): Command<
-  typeof schemas.UpdateCustomDomain,
-  AuthContext
+  typeof schemas.UpdateCustomDomain
 > {
   return {
     ...schemas.UpdateCustomDomain,
@@ -39,8 +38,8 @@ export function UpdateCustomDomain(): Command<
         );
       }
 
-      const magicRequest = await fetch(
-        `https://api.magic.link/v1/api/magic_client/domain/allowlist/add`,
+      const magicRequestDomain = await fetch(
+        `https://api.magic.link/v2/api/magic_client/domain/allowlist/add`,
         {
           method: 'POST',
           headers: {
@@ -48,18 +47,44 @@ export function UpdateCustomDomain(): Command<
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
+            access_type: 'domain',
             target_client_id: config.MAGIC_CLIENT_ID!,
-            domain: `https://${custom_domain}`,
+            value: `https://${custom_domain}`,
           }),
         },
       );
-      const magicResponse = await magicRequest.json();
+
+      const magicRequestRedirectUrl = await fetch(
+        `https://api.magic.link/v2/api/magic_client/redirect_url/allowlist/add`,
+        {
+          method: 'POST',
+          headers: {
+            'X-Magic-Secret-Key': config.MAGIC_API_KEY!,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            access_type: 'redirect_url',
+            target_client_id: config.MAGIC_CLIENT_ID!,
+            value: `https://${custom_domain}/finishsociallogin`,
+          }),
+        },
+      );
+
+      const magicResponseDomain = await magicRequestDomain.json();
+      const magicResponseRedirectUrl = await magicRequestRedirectUrl.json();
 
       if (
-        magicResponse.status === 'failed' &&
-        magicResponse.error_code != 'ALREADY_WHITELISTED_DOMAIN'
+        magicResponseDomain.status === 'failed' &&
+        magicResponseDomain.error_code != 'ALREADY_WHITELISTED_DOMAIN'
       ) {
-        throw new AppError(magicResponse);
+        throw new AppError(magicResponseDomain.message);
+      }
+
+      if (
+        magicResponseRedirectUrl.status === 'failed' &&
+        magicResponseRedirectUrl.error_code != 'ALREADY_WHITELISTED_DOMAIN'
+      ) {
+        throw new AppError(magicResponseRedirectUrl.message);
       }
 
       response = await fetch(url, {

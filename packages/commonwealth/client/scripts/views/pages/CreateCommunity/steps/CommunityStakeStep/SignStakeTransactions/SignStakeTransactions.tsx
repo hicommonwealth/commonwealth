@@ -4,7 +4,6 @@ import useBeforeUnload from 'hooks/useBeforeUnload';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
-import { openConfirmation } from 'views/modals/confirmation_modal';
 
 import ActionSteps from '../../../components/ActionSteps';
 import { ActionStepsProps } from '../../../components/ActionSteps/types';
@@ -20,9 +19,11 @@ const SignStakeTransactions = ({
   selectedAddress,
   createdCommunityId,
   chainId,
-  isTopicFlow,
-  onSuccess,
-  onCancel,
+  onlyNamespace,
+  hasNamespaceReserved,
+  onReserveNamespaceSuccess,
+  onLaunchStakeSuccess,
+  backButton,
 }: SignStakeTransactionsProps) => {
   const { handleReserveCommunityNamespace, reserveNamespaceData } =
     useReserveCommunityNamespace({
@@ -31,13 +32,15 @@ const SignStakeTransactions = ({
       symbol: communityStakeData.symbol,
       userAddress: selectedAddress.address,
       chainId,
+      onSuccess: onReserveNamespaceSuccess,
+      hasNamespaceReserved,
     });
 
   const { handleLaunchCommunityStake, launchStakeData } =
     useLaunchCommunityStake({
       namespace: communityStakeData.namespace,
       communityId: createdCommunityId,
-      goToSuccessStep: onSuccess,
+      goToSuccessStep: onLaunchStakeSuccess,
       selectedAddress: selectedAddress.address,
       chainId,
     });
@@ -59,46 +62,27 @@ const SignStakeTransactions = ({
           onClick: handleReserveCommunityNamespace,
         },
       },
-      {
-        label: 'Launch community stake',
-        state: launchStakeData.state,
-        errorText: launchStakeData.errorText,
-        ...(reserveNamespaceData.state === 'completed'
-          ? {
-              actionButton: {
-                label: 'Sign',
-                disabled:
-                  launchStakeData.state === 'loading' ||
-                  launchStakeData.state === 'completed',
-                onClick: handleLaunchCommunityStake,
-              },
-            }
-          : {}),
-      },
+      ...(onlyNamespace
+        ? []
+        : [
+            {
+              label: 'Launch community stake',
+              state: launchStakeData.state,
+              errorText: launchStakeData.errorText,
+              ...(reserveNamespaceData.state === 'completed'
+                ? {
+                    actionButton: {
+                      label: 'Sign',
+                      disabled:
+                        launchStakeData.state === 'loading' ||
+                        launchStakeData.state === 'completed',
+                      onClick: handleLaunchCommunityStake,
+                    },
+                  }
+                : {}),
+            },
+          ]),
     ];
-  };
-
-  const handleCancel = () => {
-    isTopicFlow
-      ? onCancel()
-      : openConfirmation({
-          title: 'Are you sure you want to cancel?',
-          description:
-            'Community Stake has not been enabled for your community yet',
-          buttons: [
-            {
-              label: 'Cancel',
-              buttonType: 'destructive',
-              buttonHeight: 'sm',
-              onClick: onCancel,
-            },
-            {
-              label: 'Continue',
-              buttonType: 'primary',
-              buttonHeight: 'sm',
-            },
-          ],
-        });
   };
 
   const cancelDisabled =
@@ -108,12 +92,22 @@ const SignStakeTransactions = ({
   return (
     <div className="SignStakeTransactions">
       <section className="header">
-        <CWText type="h2">Sign transactions to launch stake?</CWText>
+        <CWText type="h2">
+          {onlyNamespace
+            ? 'Sign transactions to reserve namespace'
+            : 'Sign transactions to launch stake?'}
+        </CWText>
         <CWText type="b1" className="description">
-          In order to launch community stake you will need to sign two
-          transactions. The first launches your community namespace on the
-          blockchain, and the second launches your community stake. Both
-          transactions have associated gas fees.
+          {onlyNamespace ? (
+            'In order to reserve namespace you will need to sign one transaction.'
+          ) : (
+            <>
+              In order to launch community stake you will need to sign two
+              transactions. The first launches your community namespace on the
+              blockchain, and the second launches your community stake. Both
+              transactions have associated gas fees.
+            </>
+          )}
         </CWText>
 
         <Hint className="mobile" />
@@ -130,11 +124,11 @@ const SignStakeTransactions = ({
         <section className="action-buttons">
           <CWButton
             type="button"
-            label={isTopicFlow ? 'Back' : 'Cancel'}
+            label={backButton?.label}
             buttonWidth="wide"
             buttonType="secondary"
             disabled={cancelDisabled}
-            onClick={handleCancel}
+            onClick={backButton?.action}
           />
         </section>
       </section>

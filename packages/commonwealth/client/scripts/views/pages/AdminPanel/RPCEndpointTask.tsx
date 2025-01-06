@@ -2,7 +2,6 @@ import { BalanceType } from '@hicommonwealth/shared';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { detectURL } from 'helpers/threads';
 import NodeInfo from 'models/NodeInfo';
-import 'pages/AdminPanel.scss';
 import React, { useState } from 'react';
 import { getNodeByUrl } from 'state/api/nodes/utils';
 import useFetchNodesQuery from '../../../state/api/nodes/fetchNodes';
@@ -16,6 +15,7 @@ import {
 import { CWButton } from '../../components/component_kit/new_designs/CWButton';
 import { CWTextInput } from '../../components/component_kit/new_designs/CWTextInput';
 import { openConfirmation } from '../../modals/confirmation_modal';
+import './AdminPanel.scss';
 import { createChainNode } from './utils';
 
 const RPCEndpointTask = () => {

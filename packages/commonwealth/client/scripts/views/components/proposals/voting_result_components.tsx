@@ -1,11 +1,12 @@
 import React from 'react';
 
-import 'components/proposals/voting_result_components.scss';
 import type {
   CosmosProposal,
   CosmosVote,
 } from 'controllers/chain/cosmos/gov/v1beta1/proposal-v1beta1';
+import './voting_result_components.scss';
 
+import { CosmosProposalV1AtomOne } from 'client/scripts/controllers/chain/cosmos/gov/atomone/proposal-v1';
 import type { IVote } from '../../../models/interfaces';
 import type { AnyProposal } from '../../../models/types';
 import { CWText } from '../component_kit/cw_text';
@@ -147,21 +148,11 @@ export const YesNoAbstainVetoVotingResult = (
         <CWText type="h4" fontWeight="medium" className="results-header">
           {`Voted yes (${votes.filter((v) => v.choice === 'Yes').length})`}
         </CWText>
-        <VoteListing
-          // @ts-expect-error <StrictNullChecks/>
-          proposal={proposal}
-          votes={votes.filter((v) => v.choice === 'Yes')}
-        />
       </div>
       <div className="results-column">
         <CWText type="h4" fontWeight="medium" className="results-header">
           {`Voted no (${votes.filter((v) => v.choice === 'No').length})`}
         </CWText>
-        <VoteListing
-          // @ts-expect-error <StrictNullChecks/>
-          proposal={proposal}
-          votes={votes.filter((v) => v.choice === 'No')}
-        />
       </div>
       <div className="results-column">
         <CWText type="h4" fontWeight="medium" className="results-header">
@@ -169,24 +160,17 @@ export const YesNoAbstainVetoVotingResult = (
             votes.filter((v) => v.choice === 'Abstain').length
           })`}
         </CWText>
-        <VoteListing
-          // @ts-expect-error <StrictNullChecks/>
-          proposal={proposal}
-          votes={votes.filter((v) => v.choice === 'Abstain')}
-        />
       </div>
-      <div className="results-column">
-        <CWText type="h4" fontWeight="medium" className="results-header">
-          {`Voted veto (${
-            votes.filter((v) => v.choice === 'NoWithVeto').length
-          })`}
-        </CWText>
-        <VoteListing
-          // @ts-expect-error <StrictNullChecks/>
-          proposal={proposal}
-          votes={votes.filter((v) => v.choice === 'NoWithVeto')}
-        />
-      </div>
+
+      {!(proposal instanceof CosmosProposalV1AtomOne) && (
+        <div className="results-column">
+          <CWText type="h4" fontWeight="medium" className="results-header">
+            {`Voted veto (${
+              votes.filter((v) => v.choice === 'NoWithVeto').length
+            })`}
+          </CWText>
+        </div>
+      )}
     </div>
   );
 };

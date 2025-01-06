@@ -1,27 +1,28 @@
 import { type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../database';
-import { isAuthorized, type AuthContext } from '../middleware';
+import { authComment } from '../middleware';
 import { verifyReactionSignature } from '../middleware/canvas';
 import { mustBeAuthorizedComment } from '../middleware/guards';
 import { getVotingWeight } from '../services/stakeHelper';
 
 export function CreateCommentReaction(): Command<
-  typeof schemas.CreateCommentReaction,
-  AuthContext
+  typeof schemas.CreateCommentReaction
 > {
   return {
     ...schemas.CreateCommentReaction,
     auth: [
-      isAuthorized({ action: schemas.PermissionEnum.CREATE_COMMENT_REACTION }),
+      authComment({
+        action: schemas.PermissionEnum.CREATE_COMMENT_REACTION,
+      }),
       verifyReactionSignature,
     ],
-    body: async ({ payload, actor, auth }) => {
-      const { address, comment } = mustBeAuthorizedComment(actor, auth);
+    body: async ({ payload, actor, context }) => {
+      const { address, comment } = mustBeAuthorizedComment(actor, context);
       const thread = comment.Thread!;
 
       const calculated_voting_weight = await getVotingWeight(
-        thread.community_id,
+        thread.topic_id!,
         address.address,
       );
 
@@ -38,7 +39,7 @@ export function CreateCommentReaction(): Command<
               address_id: address.id!,
               comment_id: comment.id,
               reaction: payload.reaction,
-              calculated_voting_weight,
+              calculated_voting_weight: calculated_voting_weight?.toString(),
               canvas_msg_id: payload.canvas_msg_id,
               canvas_signed_data: payload.canvas_signed_data,
             },

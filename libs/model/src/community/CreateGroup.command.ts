@@ -1,63 +1,59 @@
-import { InvalidState, type Command } from '@hicommonwealth/core';
+import { InvalidInput, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
+import { PermissionEnum } from '@hicommonwealth/schemas';
 import { Op } from 'sequelize';
 import { models, sequelize } from '../database';
-import { isAuthorized, type AuthContext } from '../middleware';
+import { authRoles } from '../middleware';
 import { mustNotExist } from '../middleware/guards';
 import { GroupAttributes } from '../models';
 
 export const MAX_GROUPS_PER_COMMUNITY = 20;
-export const Errors = {
+
+export const CreateGroupErrors = {
   MaxGroups: 'Exceeded max number of groups',
   InvalidTopics: 'Invalid topics',
 };
 
-export function CreateGroup(): Command<
-  typeof schemas.CreateGroup,
-  AuthContext
-> {
+export function CreateGroup(): Command<typeof schemas.CreateGroup> {
   return {
     ...schemas.CreateGroup,
-    auth: [isAuthorized({ roles: ['admin', 'moderator'] })],
+    auth: [authRoles('admin')],
     body: async ({ payload }) => {
+      const { community_id } = payload;
+
+      const topics = await models.Topic.findAll({
+        where: {
+          id: { [Op.in]: payload.topics?.map((t) => t.id) || [] },
+          community_id,
+        },
+      });
+      if (payload.topics?.length !== topics.length)
+        throw new InvalidInput(CreateGroupErrors.InvalidTopics);
+
       const groups = await models.Group.findAll({
-        where: { community_id: payload.id },
+        where: { community_id },
         attributes: ['metadata'],
         raw: true,
       });
-
       mustNotExist(
         'Group',
         groups.find((g) => g.metadata.name === payload.metadata.name),
       );
-
       if (groups.length >= MAX_GROUPS_PER_COMMUNITY)
-        throw new InvalidState(Errors.MaxGroups);
-
-      const topicsToAssociate = await models.Topic.findAll({
-        where: {
-          id: {
-            [Op.in]: payload.topics || [],
-          },
-          community_id: payload.id,
-        },
-      });
-      if (payload.topics?.length !== topicsToAssociate.length)
-        throw new InvalidState(Errors.InvalidTopics);
+        throw new InvalidInput(CreateGroupErrors.MaxGroups);
 
       const newGroup = await models.sequelize.transaction(
         async (transaction) => {
-          // create group
           const group = await models.Group.create(
             {
-              community_id: payload.id,
+              community_id,
               metadata: payload.metadata,
               requirements: payload.requirements,
               is_system_managed: false,
             } as GroupAttributes,
             { transaction },
           );
-          if (topicsToAssociate.length > 0) {
+          if (topics.length > 0) {
             // add group to all specified topics
             await models.Topic.update(
               {
@@ -68,28 +64,38 @@ export function CreateGroup(): Command<
                 ),
               },
               {
-                where: {
-                  id: {
-                    [Op.in]: topicsToAssociate.map(({ id }) => id!),
-                  },
-                },
+                where: { id: { [Op.in]: topics.map(({ id }) => id!) } },
                 transaction,
               },
             );
+
+            if (group.id) {
+              // add topic level interaction permissions for current group
+              const groupPermissions = (payload.topics || []).map((t) => {
+                const permissions = t.permissions;
+                // Enable UPDATE_POLL by default for all group permissions
+                // TODO: remove once client supports selecting the UPDATE_POLL permission
+                permissions.push(PermissionEnum.UPDATE_POLL);
+                return {
+                  group_id: group.id!,
+                  topic_id: t.id,
+                  allowed_actions: sequelize.literal(
+                    `ARRAY[${permissions
+                      .map((p) => `'${p}'`)
+                      .join(', ')}]::"enum_GroupPermissions_allowed_actions"[]`,
+                  ) as unknown as schemas.PermissionEnum[],
+                };
+              });
+              await models.GroupPermission.bulkCreate(groupPermissions, {
+                transaction,
+              });
+            }
           }
           return group.toJSON();
         },
       );
 
-      // TODO: create domain service to refresh community memberships
-      // TODO: create integration policy to connect creation events (like groups) to service above
-      // TODO: creation integration test that validates this refresh flow
-      //.refreshCommunityMemberships({
-      //    communityId: id,
-      //    groupId: newGroup.id,
-      //  })
-
-      return { id: payload.id, groups: [newGroup] };
+      return { id: community_id, groups: [newGroup] };
     },
   };
 }

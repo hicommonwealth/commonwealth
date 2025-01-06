@@ -6,7 +6,6 @@ import type { ChainNodeAttributes, ChainNodeInstance } from './chain_node';
 import type { CommentAttributes } from './comment';
 import type { CommunityAlertAttributes } from './community_alerts';
 import type { CommunityTagsAttributes } from './community_tags';
-import type { ContractInstance } from './contract';
 import type { StarredCommunityAttributes } from './starred_community';
 import type { ThreadAttributes } from './thread';
 import type { TopicInstance } from './topic';
@@ -22,7 +21,6 @@ export type CommunityAttributes = z.infer<typeof Community> & {
   Comments?: CommentAttributes[] | CommentAttributes['id'][];
   Users?: UserAttributes[] | UserAttributes['id'][];
   ChainObjectVersion?: any; // TODO
-  Contract?: ContractInstance;
   lifetime_thread_count?: number;
   profile_count?: number;
   count_updated?: boolean;
@@ -42,7 +40,6 @@ export type CommunityInstance = ModelInstance<CommunityAttributes> & {
     TopicInstance,
     TopicInstance['id']
   >;
-  getContracts: Sequelize.BelongsToManyGetAssociationsMixin<ContractInstance>;
 };
 
 export default (
@@ -129,7 +126,7 @@ export default (
         allowNull: false,
         defaultValue: 0,
       },
-      namespace: { type: Sequelize.STRING, allowNull: true },
+      namespace: { type: Sequelize.STRING, allowNull: true, unique: true },
       namespace_address: {
         type: Sequelize.STRING,
         allowNull: true,

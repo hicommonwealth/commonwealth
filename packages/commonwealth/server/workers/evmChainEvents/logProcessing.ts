@@ -40,41 +40,39 @@ export async function getLogs({
   maxBlockRange: number;
   contractAddresses: string[];
   startingBlockNum: number;
-  endingBlockNum?: number;
+  endingBlockNum: number;
 }): Promise<{ logs: Log[]; lastBlockNum: number }> {
   let startBlock = startingBlockNum;
-  let endBlock = endingBlockNum;
   const provider = getProvider(rpc);
-  if (!endBlock) endBlock = (await provider.getBlockNumber()) - 1;
 
-  if (startBlock > endBlock) {
+  if (startBlock > endingBlockNum) {
     logger.error(
       'Starting block number is greater than the latest/current block number!',
       undefined,
       {
         startBlock,
-        endBlock,
+        endingBlockNum,
       },
     );
-    return { logs: [], lastBlockNum: endBlock };
+    return { logs: [], lastBlockNum: endingBlockNum };
   }
 
   if (contractAddresses.length === 0) {
     logger.error(`No contracts given`);
-    return { logs: [], lastBlockNum: endBlock };
+    return { logs: [], lastBlockNum: endingBlockNum };
   }
 
   // limit the number of blocks to fetch to avoid rate limiting on some public EVM nodes like Celo
   // maxBlockRange = -1 indicates there is no block range limit
-  if (maxBlockRange !== -1 && endBlock - startBlock > maxBlockRange) {
-    startBlock = endBlock - maxBlockRange;
+  if (maxBlockRange !== -1 && endingBlockNum - startBlock > maxBlockRange) {
+    startBlock = endingBlockNum - maxBlockRange;
     logger.error(
       'Block span too large. The number of fetch blocked is reduced to 500.',
       undefined,
       {
         contractAddresses,
         startBlock,
-        endBlock,
+        endingBlockNum,
       },
     );
   }
@@ -93,7 +91,7 @@ export async function getLogs({
   }> = await provider.send('eth_getLogs', [
     {
       fromBlock: decimalToHex(startBlock),
-      toBlock: decimalToHex(endBlock),
+      toBlock: decimalToHex(endingBlockNum),
       address: contractAddresses,
     },
   ]);
@@ -105,7 +103,7 @@ export async function getLogs({
     logIndex: parseInt(log.logIndex, 16),
   }));
 
-  return { logs: formattedLogs, lastBlockNum: endBlock };
+  return { logs: formattedLogs, lastBlockNum: endingBlockNum };
 }
 
 export async function parseLogs(
@@ -115,7 +113,7 @@ export async function parseLogs(
   const events: EvmEvent[] = [];
   const interfaces = {};
   for (const log of logs) {
-    const address = ethers.utils.getAddress(log.address).toLowerCase();
+    const address = ethers.utils.getAddress(log.address);
     const data: AbiSignatures = sources[address];
     if (!data) {
       logger.error('Missing event source', undefined, {
@@ -150,12 +148,10 @@ export async function parseLogs(
     }
     stats().increment('ce.evm.event', {
       contractAddress: address,
-      kind: evmEventSource.kind,
     });
     events.push({
       eventSource: {
-        kind: evmEventSource.kind,
-        chainNodeId: evmEventSource.chain_node_id,
+        ethChainId: evmEventSource.eth_chain_id,
         eventSignature: evmEventSource.event_signature,
       },
       parsedArgs: parsedLog.args,
@@ -169,7 +165,7 @@ export async function parseLogs(
 export async function getEvents(
   evmSource: EvmSource,
   startingBlockNum: number,
-  endingBlockNum?: number,
+  endingBlockNum: number,
 ): Promise<{ events: EvmEvent[]; lastBlockNum: number }> {
   const { logs, lastBlockNum } = await getLogs({
     rpc: evmSource.rpc,

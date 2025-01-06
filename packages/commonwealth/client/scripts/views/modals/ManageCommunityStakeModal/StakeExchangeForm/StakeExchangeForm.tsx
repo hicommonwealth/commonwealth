@@ -1,4 +1,6 @@
-import { commonProtocol } from '@hicommonwealth/shared';
+import { commonProtocol } from '@hicommonwealth/evm-protocols';
+import { WalletId } from '@hicommonwealth/shared';
+import { saveToClipboard } from 'client/scripts/utils/clipboard';
 import clsx from 'clsx';
 import { findDenominationIcon } from 'helpers/findDenomination';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
@@ -34,12 +36,13 @@ import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelec
 import { MessageRow } from 'views/components/component_kit/new_designs/CWTextInput/MessageRow';
 import useAppStatus from '../../../../hooks/useAppStatus';
 import { trpc } from '../../../../utils/trpcClient';
+import useAuthentication from '../../../modals/AuthModal/useAuthentication';
 import { useStakeExchange } from '../hooks';
 import {
   ManageCommunityStakeModalMode,
   ManageCommunityStakeModalState,
 } from '../types';
-import { capDecimals, convertEthToUsd } from '../utils';
+import { capDecimals, convertTokenAmountToUsd } from '../utils';
 import {
   CustomAddressOption,
   CustomAddressOptionElement,
@@ -128,10 +131,13 @@ const StakeExchangeForm = ({
 
   const { isAddedToHomeScreen } = useAppStatus();
 
+  const userData = useUserStore();
+  const hasMagic = userData.addresses?.[0]?.walletId === WalletId.Magic;
+
   const { trackAnalytics } = useBrowserAnalyticsTrack<BaseMixpanelPayload>({
     onAction: true,
   });
-
+  // eslint-disable-next-line @typescript-eslint/no-floating-promises
   const handleBuy = async () => {
     try {
       onSetModalState(ManageCommunityStakeModalState.Loading);
@@ -148,11 +154,12 @@ const StakeExchangeForm = ({
         }),
       });
 
+      user.setData({ addressSelectorSelectedAddress: selectedAddress?.value });
       await createStakeTransaction.mutateAsync({
-        id: '1',
         transaction_hash: txReceipt.transactionHash,
         community_id: communityId,
       });
+      user.setData({ addressSelectorSelectedAddress: undefined });
 
       onSetSuccessTransactionHash(txReceipt?.transactionHash);
       onSetModalState(ManageCommunityStakeModalState.Success);
@@ -201,7 +208,6 @@ const StakeExchangeForm = ({
       });
 
       await createStakeTransaction.mutateAsync({
-        id: '1',
         transaction_hash: txReceipt.transactionHash,
         community_id: communityId,
       });
@@ -237,7 +243,7 @@ const StakeExchangeForm = ({
     onSetNumberOfStakeToExchange((prevState) => prevState + 1);
   };
 
-  const handleInput = (e) => {
+  const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
     const numericValue = inputValue.replace(/[^0-9]/g, '');
     const parsed = parseInt(numericValue);
@@ -247,6 +253,8 @@ const StakeExchangeForm = ({
       onSetNumberOfStakeToExchange(0);
     }
   };
+
+  const { openMagicWallet } = useAuthentication({});
 
   const insufficientFunds = isBuyMode
     ? // @ts-expect-error <StrictNullChecks/>
@@ -267,9 +275,9 @@ const StakeExchangeForm = ({
 
   const pricePerUnitUsd = isBuyMode
     ? // @ts-expect-error <StrictNullChecks/>
-      convertEthToUsd(buyPriceData?.price, ethUsdRate)
+      convertTokenAmountToUsd(buyPriceData?.price, ethUsdRate)
     : // @ts-expect-error <StrictNullChecks/>
-      convertEthToUsd(sellPriceData?.price, ethUsdRate);
+      convertTokenAmountToUsd(sellPriceData?.price, ethUsdRate);
 
   const feesPriceEth = isBuyMode
     ? buyPriceData?.fees
@@ -278,9 +286,11 @@ const StakeExchangeForm = ({
 
   const feesPriceUsd = isBuyMode
     ? // @ts-expect-error <StrictNullChecks/>
-      convertEthToUsd(buyPriceData?.fees, ethUsdRate)
-    : // @ts-expect-error <StrictNullChecks/>
-      convertEthToUsd(Math.abs(parseFloat(sellPriceData?.fees)), ethUsdRate);
+      convertTokenAmountToUsd(buyPriceData?.fees, ethUsdRate)
+    : convertTokenAmountToUsd(
+        Math.abs(parseFloat(sellPriceData?.fees || '')),
+        ethUsdRate || '',
+      );
 
   const totalPriceEth = isBuyMode
     ? buyPriceData?.totalPrice
@@ -288,9 +298,9 @@ const StakeExchangeForm = ({
 
   const totalPriceUsd = isBuyMode
     ? // @ts-expect-error <StrictNullChecks/>
-      convertEthToUsd(buyPriceData?.totalPrice, ethUsdRate)
+      convertTokenAmountToUsd(buyPriceData?.totalPrice, ethUsdRate)
     : // @ts-expect-error <StrictNullChecks/>
-      convertEthToUsd(sellPriceData?.totalPrice, ethUsdRate);
+      convertTokenAmountToUsd(sellPriceData?.totalPrice, ethUsdRate);
 
   const minusDisabled = numberOfStakeToExchange <= 1;
 
@@ -325,24 +335,37 @@ const StakeExchangeForm = ({
           isSearchable={false}
           options={addressOptions}
           onChange={onSetSelectedAddress}
+          saveToClipboard={saveToClipboard}
+          showCopyIcon={true}
         />
-
         <div className="current-balance-row">
           <CWText type="caption">Current balance</CWText>
-          {userEthBalanceLoading ? (
-            <Skeleton className="price-skeleton" />
-          ) : (
-            <CWText
-              type="caption"
-              fontWeight="medium"
-              className={clsx({ error: insufficientFunds })}
-            >
-              {/* @ts-expect-error StrictNullChecks*/}
-              {capDecimals(userEthBalance)} {denomination}
-            </CWText>
-          )}
+          <div className="balance-and-magic">
+            {userEthBalanceLoading ? (
+              <Skeleton className="price-skeleton" />
+            ) : (
+              <CWText
+                type="caption"
+                fontWeight="medium"
+                className={clsx({ error: insufficientFunds })}
+              >
+                {/* @ts-expect-error StrictNullChecks*/}
+                {capDecimals(userEthBalance)} {denomination}
+              </CWText>
+            )}
+            {hasMagic && (
+              <CWText
+                className="wallet-btn"
+                type="caption"
+                onClick={() => {
+                  openMagicWallet().catch(console.error);
+                }}
+              >
+                Add Funds
+              </CWText>
+            )}
+          </div>
         </div>
-
         <CWDivider />
 
         <div className="stake-valued-row">
@@ -357,7 +380,7 @@ const StakeExchangeForm = ({
             </CWText>
           </div>
           <CWText type="caption" className="vote-weight">
-            Current vote weight {currentVoteWeight}
+            Current vote weight {currentVoteWeight?.toString()}
           </CWText>
         </div>
 
@@ -412,7 +435,7 @@ const StakeExchangeForm = ({
             Total weight
           </CWText>
           <CWText type="h3" fontWeight="bold" className="number">
-            {expectedVoteWeight}
+            {expectedVoteWeight?.toString()}
           </CWText>
         </div>
 

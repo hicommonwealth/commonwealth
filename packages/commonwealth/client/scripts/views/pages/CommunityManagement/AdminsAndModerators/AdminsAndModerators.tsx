@@ -35,7 +35,7 @@ const AdminsAndModerators = () => {
   const { data: searchResults, refetch } = useSearchProfilesQuery({
     communityId,
     searchTerm: debouncedSearchTerm,
-    limit: 100,
+    limit: 50,
     orderBy: APIOrderBy.LastActive,
     orderDirection: APIOrderDirection.Desc,
     enabled: !!communityId,

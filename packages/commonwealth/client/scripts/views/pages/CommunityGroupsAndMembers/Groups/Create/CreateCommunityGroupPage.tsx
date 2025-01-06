@@ -1,3 +1,4 @@
+import { buildCreateGroupInput } from 'client/scripts/state/api/groups/createGroup';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
 import { useCommonNavigate } from 'navigation/helpers';
@@ -49,13 +50,10 @@ const CreateCommunityGroupPage = () => {
         requirementsToFulfill: 'ALL',
       }}
       onSubmit={async (values) => {
-        const payload = makeGroupDataBaseAPIPayload(
-          values,
-          isAddedToHomeScreen,
-          allowedAddresses,
-        );
-
         try {
+          const payload = buildCreateGroupInput(
+            makeGroupDataBaseAPIPayload(values, allowedAddresses),
+          );
           await createGroup(payload);
           notifySuccess('Group Created');
           setShouldShowGroupMutationBannerForCommunity(communityId, true);

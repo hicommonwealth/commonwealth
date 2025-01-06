@@ -1,0 +1,69 @@
+name: Update Client SDK Version
+
+env:
+  APP_ENV: CI
+  ALCHEMY_PRIVATE_APP_KEY: ${{ secrets.ALCHEMY_PRIVATE_APP_KEY }}
+  ALCHEMY_PUBLIC_APP_KEY: ${{ secrets.ALCHEMY_PUBLIC_APP_KEY }}
+  FEDERATION_POSTGRES_DB_URL: postgresql://commonwealth:edgeware@localhost/common_test
+
+on:
+  pull_request:
+    branches:
+      - production
+
+jobs:
+  bump_version:
+    name: 'Bump Api Client Version'
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: hicommonwealth/cw_postgres:latest
+        env:
+          POSTGRES_USER: commonwealth
+          POSTGRES_DB: common_test
+          POSTGRES_PASSWORD: edgeware
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          # Maps tcp port 5432 on service container to the host
+          - 5432:5432
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          token: ${{ secrets.SERVICE_PERSON_ACCESS_TOKEN }}
+
+      - uses: ./.github/actions/setup
+        with:
+          node-version: 20
+
+#.     Openapi diff hanging. Blocks release. Commenting out for now
+#      - name: Bump external API version if necessary
+#        run: pnpm -F commonwealth validate-external-api-version
+
+      - name: Check if version was updated
+        run: |
+          if git diff --name-only | grep -q packages/commonwealth/server/external-api-config.json; then
+            echo "version_updated=true" >> $GITHUB_ENV
+          else
+            echo "version_updated=false" >> $GITHUB_ENV
+          fi
+
+      - name: Commit and Push
+        if: env.version_updated == 'true'
+        uses: EndBug/add-and-commit@v9
+        with:
+          add: 'packages/commonwealth/server/external-api-config.json'
+          push: true
+
+      # May need to add a `repo` scoped personal access token
+      # if we want to run checks for this new push
+      # https://github.com/peter-evans/create-pull-request/issues/48#issuecomment-536204092
+      # with:
+      #   token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}

@@ -1,4 +1,4 @@
-@import '../../../../../../styles/shared.scss';
+@import '../../../../../styles/shared.scss';
 
 .CWIconButton {
   border-radius: $border-radius-corners-wider;
@@ -26,6 +26,8 @@
   }
 
   &.disabled {
+    cursor: not-allowed;
+
     svg {
       color: $neutral-400;
     }

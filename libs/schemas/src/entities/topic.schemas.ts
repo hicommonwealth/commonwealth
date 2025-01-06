@@ -8,7 +8,16 @@ export enum TopicWeightedVoting {
 
 export const Topic = z.object({
   id: PG_INT.optional(),
-  name: z.string().max(255).default('General'),
+  name: z
+    .string()
+    .trim()
+    .min(1)
+    .max(255)
+    .default('General')
+    .refine(
+      (v) => !v.match(/["<>%{}|\\/^`]/g),
+      'Name must not contain special characters',
+    ),
   community_id: z.string().max(255),
   description: z.string().default(''),
   telegram: z.string().max(255).nullish(),
@@ -20,9 +29,11 @@ export const Topic = z.object({
   group_ids: z.array(PG_INT).default([]),
   default_offchain_template_backup: z.string().nullish(),
   weighted_voting: z.nativeEnum(TopicWeightedVoting).nullish(),
-  chain_node_id: PG_INT.nullish().describe(
-    'token chain node ID, used for ERC20 topics',
-  ),
+  chain_node_id: z
+    .number()
+    .int()
+    .nullish()
+    .describe('token chain node ID, used for ERC20 topics'),
   token_address: z
     .string()
     .nullish()
@@ -31,7 +42,14 @@ export const Topic = z.object({
     .string()
     .nullish()
     .describe('token symbol, used for ERC20 topics'),
-  vote_weight_multiplier: PG_INT.nullish().describe(
-    'vote weight multiplier, used for ERC20 topics',
-  ),
+  vote_weight_multiplier: z
+    .number()
+    .gt(0)
+    .nullish()
+    .describe('vote weight multiplier, used for ERC20 topics'),
+
+  created_at: z.coerce.date().optional(),
+  updated_at: z.coerce.date().optional(),
+  deleted_at: z.coerce.date().nullish(),
+  archived_at: z.coerce.date().nullish(),
 });

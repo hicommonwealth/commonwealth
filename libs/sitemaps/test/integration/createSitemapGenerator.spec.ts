@@ -1,4 +1,4 @@
-import { dispose } from '@hicommonwealth/core';
+import { dispose, inMemoryBlobUrl, inMemoryBlobs } from '@hicommonwealth/core';
 import { tester } from '@hicommonwealth/model';
 import { expect } from 'chai';
 import { afterAll, beforeAll, describe, test } from 'vitest';
@@ -67,10 +67,12 @@ describe('createSitemapGenerator', { timeout: 10_000 }, function () {
         canvas_signed_data: '',
         canvas_msg_id: '',
         reaction_count: 0,
-        reaction_weights_sum: 0,
+        reaction_weights_sum: '0',
         comment_count: 0,
         profile_name: 'foobar',
         topic_id: topic.id,
+        pinned: false,
+        read_only: false,
       });
     }
   });
@@ -79,14 +81,20 @@ describe('createSitemapGenerator', { timeout: 10_000 }, function () {
     await dispose()();
   });
 
-  test.skip('basic', async () => {
+  test('basic', async () => {
     const paginator = createDatabasePaginatorDefault(50);
-    const sitemapGenerator = createSitemapGenerator([
-      paginator.threads,
-      paginator.profiles,
-    ]);
+    const sitemapGenerator = createSitemapGenerator(
+      [paginator.threads, paginator.profiles],
+      undefined,
+    );
 
     const written = await sitemapGenerator.exec();
-    expect(written.children.length).to.equal(2);
+    expect(inMemoryBlobs.size).to.equal(2);
+    expect(written.index).to.deep.equal({
+      location: `${inMemoryBlobUrl}sitemap/sitemap-index.xml`,
+    });
+    expect(written.children).to.deep.equal([
+      { location: `${inMemoryBlobUrl}sitemap/sitemap-0.xml` },
+    ]);
   });
 });

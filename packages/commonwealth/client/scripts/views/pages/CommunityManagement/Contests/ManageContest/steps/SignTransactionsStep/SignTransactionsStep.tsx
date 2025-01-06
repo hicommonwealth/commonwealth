@@ -1,12 +1,21 @@
+import { commonProtocol } from '@hicommonwealth/evm-protocols';
+import { ZERO_ADDRESS } from '@hicommonwealth/shared';
+import useAppStatus from 'hooks/useAppStatus';
+import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
+import { useFlag } from 'hooks/useFlag';
 import React, { useState } from 'react';
-
-import { commonProtocol, ZERO_ADDRESS } from '@hicommonwealth/shared';
+import {
+  BaseMixpanelPayload,
+  MixpanelContestEvents,
+} from 'shared/analytics/types';
 import app from 'state';
 import {
   useCreateContestMutation,
   useDeployRecurringContestOnchainMutation,
-  useDeploySingleContestOnchainMutation,
+  useDeploySingleERC20ContestOnchainMutation,
 } from 'state/api/contests';
+import { DeploySingleERC20ContestOnchainProps } from 'state/api/contests/deploySingleERC20ContestOnchain';
+import useUserStore from 'state/ui/user';
 import { useCommunityStake } from 'views/components/CommunityStake';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -17,37 +26,31 @@ import {
   ActionStepProps,
   ActionStepsProps,
 } from 'views/pages/CreateCommunity/components/ActionSteps/types';
-
 import {
   ContestFeeType,
   ContestFormData,
   ContestRecurringType,
   LaunchContestStep,
 } from '../../types';
-
-import useAppStatus from 'client/scripts/hooks/useAppStatus';
-import { useBrowserAnalyticsTrack } from 'client/scripts/hooks/useBrowserAnalyticsTrack';
-import { useFlag } from 'hooks/useFlag';
-import {
-  BaseMixpanelPayload,
-  MixpanelContestEvents,
-} from 'shared/analytics/types';
-import useUserStore from 'state/ui/user';
 import './SignTransactionsStep.scss';
 
 interface SignTransactionsStepProps {
   onSetLaunchContestStep: (step: LaunchContestStep) => void;
   contestFormData: ContestFormData;
   onSetCreatedContestAddress: (address: string) => void;
+  fundingTokenTicker: string;
+  fundingTokenDecimals: number;
+  isFarcasterContest: boolean;
 }
 
-const SEVEN_DAYS_IN_SECONDS = 60 * 60 * 24 * 7;
 const ONE_HOUR_IN_SECONDS = 60 * 60;
 
 const SignTransactionsStep = ({
   onSetLaunchContestStep,
   contestFormData,
   onSetCreatedContestAddress,
+  fundingTokenTicker,
+  fundingTokenDecimals,
 }: SignTransactionsStepProps) => {
   const [launchContestData, setLaunchContestData] = useState({
     state: 'not-started' as ActionStepProps['state'],
@@ -55,10 +58,12 @@ const SignTransactionsStep = ({
   });
 
   const { stakeData } = useCommunityStake();
-  const { mutateAsync: deploySingleContestOnchainMutation } =
-    useDeploySingleContestOnchainMutation();
+
   const { mutateAsync: deployRecurringContestOnchainMutation } =
     useDeployRecurringContestOnchainMutation();
+  const { mutateAsync: deploySingleERC20ContestOnchainMutation } =
+    useDeploySingleERC20ContestOnchainMutation();
+
   const { mutateAsync: createContestMutation } = useCreateContestMutation();
   const user = useUserStore();
 
@@ -81,14 +86,15 @@ const SignTransactionsStep = ({
     const namespaceName = app?.chain?.meta?.namespace;
     const contestLength = devContest
       ? ONE_HOUR_IN_SECONDS
-      : SEVEN_DAYS_IN_SECONDS;
+      : contestFormData?.contestDuration;
+
     const stakeId = stakeData?.stake_id;
     const voterShare = commonProtocol.CONTEST_VOTER_SHARE;
     const feeShare = commonProtocol.CONTEST_FEE_SHARE;
     const weight = stakeData?.vote_weight;
     const contestInterval = devContest
       ? ONE_HOUR_IN_SECONDS
-      : SEVEN_DAYS_IN_SECONDS;
+      : contestFormData?.contestDuration;
     const prizeShare = contestFormData?.prizePercentage;
     const walletAddress = user.activeAccount?.address;
     const exchangeToken = isDirectDepositSelected
@@ -96,18 +102,17 @@ const SignTransactionsStep = ({
       : stakeData?.stake_token;
     const winnerShares = contestFormData?.payoutStructure;
 
-    const single = {
+    const singleERC20 = {
       ethChainId,
       chainRpc,
       namespaceName,
-      contestLength,
+      contestInterval: contestLength,
       winnerShares,
-      stakeId,
+      voteToken: exchangeToken,
       voterShare,
-      weight,
       walletAddress,
       exchangeToken,
-    };
+    } as DeploySingleERC20ContestOnchainProps;
 
     const recurring = {
       ethChainId,
@@ -136,23 +141,26 @@ const SignTransactionsStep = ({
             // @ts-expect-error <StrictNullChecks/>
             recurring,
           ))
-        : // @ts-expect-error <StrictNullChecks/>
-          (contestAddress = await deploySingleContestOnchainMutation(single));
+        : (contestAddress =
+            await deploySingleERC20ContestOnchainMutation(singleERC20));
 
       await createContestMutation({
         contest_address: contestAddress,
         name: contestFormData?.contestName,
-        id: app.activeChainId() || '',
+        description: contestFormData?.contestDescription,
+        community_id: app.activeChainId() || '',
         image_url: contestFormData?.contestImage,
         funding_token_address: exchangeToken,
         prize_percentage: isContestRecurring
           ? contestFormData?.prizePercentage
           : 0,
         payout_structure: contestFormData?.payoutStructure,
-        interval: isContestRecurring ? contestInterval : 0,
-        topic_ids: contestFormData?.toggledTopicList
-          .filter((t) => t.checked)
-          .map((t) => t.id),
+        interval: isContestRecurring ? contestInterval! : 0,
+        topic_id: contestFormData?.contestTopic?.value as number,
+        ticker: fundingTokenTicker,
+        is_farcaster_contest: contestFormData.isFarcasterContest,
+        decimals: fundingTokenDecimals,
+        vote_weight_multiplier: contestFormData.voteWeightMultiplier,
       });
 
       onSetLaunchContestStep('ContestLive');
@@ -203,9 +211,10 @@ const SignTransactionsStep = ({
       <div className="SignTransactionsStep">
         <CWText type="h2">Sign transactions to launch contest</CWText>
         <CWText type="b1" className="description">
-          You must sign two (2) transactions to launch your community contest.
-          The first is to route the fees generated from stake to the contest
-          address. The second is to launch the contest contract onchain.
+          You must sign this transaction to deploy the contest.{' '}
+          {isContestRecurring
+            ? 'It routes the fees generated from stake to the contest address and launchs the contest contract onchain.'
+            : 'It launchs the contest contract onchain.'}
         </CWText>
 
         <CWText fontWeight="medium" type="b1" className="description">

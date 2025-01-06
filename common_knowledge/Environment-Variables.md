@@ -18,7 +18,6 @@ If you add a new environment variable, you must add documentation here. Please d
 - [COSMOS_GOV_V1](#cosmos_gov_v1)
 - [COSMOS_PROXY_REFERER](#cosmos_proxy_referer)
 - [COSMOS_REGISTRY_API](#cosmos_registry_api)
-- [CW_BOT_KEY](#cw_bot_key)
 - [DATABASE_CLEAN_HOUR](#database_clean_hour)
 - [DATABASE_LOG_TRACE](#database_log_trace)
 - [DATABASE_URI](#database_uri)
@@ -54,7 +53,6 @@ If you add a new environment variable, you must add documentation here. Please d
 - [NEXT_PUBLIC_RSA_PRIVATE_KEY](#next_public_rsa_private_key)
 - [NEXT_PUBLIC_RSA_PUBLIC_KEY](#next_public_rsa_public_key)
 - [NO_GLOBAL_ACTIVITY_CACHE](#no_global_activity_cache)
-- [NO_PRERENDER](#no_prerender)
 - [NO_SSL](#no_ssl)
 - [NODE_ENV](#node_env)
 - [PGPASSWORD](#pgpassword)
@@ -70,8 +68,6 @@ If you add a new environment variable, you must add documentation here. Please d
 - [SENDGRID_API_KEY](#sendgrid_api_key)
 - [SERVER_URL](#server_url)
 - [SESSION_SECRET](#session_secret)
-- [SL_BUILD](#sl_build)
-- [SL_PORT](#sl_port)
 - [SLACK_WEBHOOK_URL_DEV](#slack_webhook_url_dev)
 - [SNAPSHOT_HUB_URL](#snapshot_hub_url)
 - [SUPER_ADMIN_EMAIL](#super_admin_email)
@@ -121,10 +117,6 @@ Owner: Mark Hagelberg.
 Community-maintained data source for Cosmos ecosystem blockchains. Pulls from a [GitHub repo](https://github.com/cosmos/chain-registry/) as its source of truth. As of 231212, this should be `https://cosmoschains.thesilverfox.pro` by default.
 
 Owner: Mark Hagelberg.
-
-## CW_BOT_KEY
-
-Required for Common bots, e.g. Discobot. In development, can be set to any random identifier string, but must match the value of `CW_BOT_KEY` set in Discobot's .env file.
 
 ## DATABASE_CLEAN_HOUR
 
@@ -273,10 +265,6 @@ Mixpanel analytics tracking token for our live production site.
 
 If `true`, disables the initialization of `globalActivityCache.ts` from server.
 
-## NO_PRERENDER
-
-In a production environment, prerender is only run from `commonwealth/server.ts` if this flag is false or blank.
-
 ## NO_SSL
 
 Used and defined on-the-fly for the `start-external-webpack` package.json script.
@@ -341,13 +329,6 @@ By default, this is set in our `commonwealth/server/config` file to `https://com
 
 Equivalent to JWT Secret, but used in testing.
 
-## SL_BUILD
-
-Boolean triggering our `snapshot-listener` package to build.
-
-## SL_PORT
-
-Port used for the `snapshot-listener` package. We use the default value `8001`.
 
 ## SLACK_WEBHOOK_URL_DEV
 

@@ -1,8 +1,8 @@
 import { toCanvasSignedDataApiArgs } from '@hicommonwealth/shared';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import axios from 'axios';
+import { useQueryClient } from '@tanstack/react-query';
+import { trpc } from 'client/scripts/utils/trpcClient';
 import { signDeleteCommentReaction } from 'controllers/server/sessions';
-import { ApiEndpoints, SERVER_URL } from 'state/api/config';
+import { ApiEndpoints } from 'state/api/config';
 import { useAuthModalStore } from '../../ui/modals';
 import { userStore } from '../../ui/user';
 import useFetchCommentsQuery from './fetchComments';
@@ -14,36 +14,23 @@ interface DeleteReactionProps {
   reactionId: number;
 }
 
-const deleteReaction = async ({
+export const buildDeleteCommentReactionInput = async ({
   address,
   communityId,
   commentMsgId,
   reactionId,
 }: DeleteReactionProps) => {
   const canvasSignedData = await signDeleteCommentReaction(address, {
-    comment_id: commentMsgId,
+    comment_id: commentMsgId ?? null,
   });
-
-  return await axios
-    .delete(`${SERVER_URL}/reactions/${reactionId}`, {
-      data: {
-        author_community_id: communityId,
-        address: address,
-        community_id: communityId,
-        jwt: userStore.getState().jwt,
-        ...toCanvasSignedDataApiArgs(canvasSignedData),
-      },
-    })
-    .then((r) => ({
-      ...r,
-      data: {
-        ...r.data,
-        result: {
-          ...(r.data.result || {}),
-          reactionId,
-        },
-      },
-    }));
+  return {
+    author_community_id: communityId,
+    address: address,
+    community_id: communityId,
+    reaction_id: reactionId,
+    jwt: userStore.getState().jwt,
+    ...toCanvasSignedDataApiArgs(canvasSignedData),
+  };
 };
 
 interface UseDeleteCommentReactionMutationProps {
@@ -65,26 +52,27 @@ const useDeleteCommentReactionMutation = ({
 
   const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
 
-  return useMutation({
-    mutationFn: deleteReaction,
-    onSuccess: async (response) => {
-      const { reactionId } = response.data.result;
-
+  return trpc.thread.deleteReaction.useMutation({
+    onSuccess: async (deleted, variables) => {
       // update fetch comments query state
-      const key = [ApiEndpoints.FETCH_COMMENTS, communityId, threadId];
-      queryClient.cancelQueries({ queryKey: key });
-      queryClient.setQueryData(key, () => {
-        const tempComments = [...comments];
-        return tempComments.map((comment) => {
-          if (comment.id === commentId) {
-            return {
-              ...comment,
-              reactions: comment.reactions.filter((r) => r.id !== reactionId),
-            };
-          }
-          return comment;
+      if (deleted) {
+        const key = [ApiEndpoints.FETCH_COMMENTS, communityId, threadId];
+        await queryClient.cancelQueries({ queryKey: key });
+        queryClient.setQueryData(key, () => {
+          const tempComments = [...comments];
+          return tempComments.map((comment) => {
+            if (comment.id === commentId) {
+              return {
+                ...comment,
+                reactions: comment.reactions.filter(
+                  (r) => r.id !== variables.reaction_id,
+                ),
+              };
+            }
+            return comment;
+          });
         });
-      });
+      }
     },
     onError: (error) => checkForSessionKeyRevalidationErrors(error),
   });

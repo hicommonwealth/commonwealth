@@ -13,7 +13,6 @@ import { GroupResponseValuesType } from '../GroupForm/index.types';
 // Makes create/edit group api payload from provided form submit values
 export const makeGroupDataBaseAPIPayload = (
   formSubmitValues: GroupResponseValuesType,
-  isAddedToHomeScreen: boolean,
   allowedAddresses?: string[],
 ) => {
   // @ts-expect-error StrictNullChecks
@@ -23,14 +22,14 @@ export const makeGroupDataBaseAPIPayload = (
     address: userStore.getState().activeAccount?.address || '',
     groupName: formSubmitValues.groupName.trim(),
     groupDescription: (formSubmitValues.groupDescription || '').trim(),
-    topicIds: formSubmitValues.topics.map((x) => parseInt(x.value)),
+    groupImageUrl: formSubmitValues.groupImageUrl || '',
+    topics: formSubmitValues.topics,
     requirementsToFulfill:
       formSubmitValues.requirementsToFulfill === 'ALL'
         ? // @ts-expect-error StrictNullChecks
           formSubmitValues.requirements.length + extraRequrirements
         : formSubmitValues.requirementsToFulfill,
     requirements: [],
-    isPWA: isAddedToHomeScreen,
   };
 
   // @ts-expect-error StrictNullChecks

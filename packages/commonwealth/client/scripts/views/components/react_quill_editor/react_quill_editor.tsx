@@ -21,12 +21,14 @@ import { RTFtoMD, SerializableDeltaStatic, getTextFromDelta } from './utils';
 
 import { useQuillPasteText } from './useQuillPasteText';
 
-import 'components/react_quill/react_quill_editor.scss';
 import { useFormContext } from 'react-hook-form';
 import 'react-quill/dist/quill.snow.css';
+import { CWModal } from '../component_kit/new_designs/CWModal';
 import { MessageRow } from '../component_kit/new_designs/CWTextInput/MessageRow';
 import { MarkdownPreview } from './MarkdownPreview';
+import './react_quill_editor.scss';
 
+import { LinkModal } from './LinkModal';
 Quill.register('modules/magicUrl', MagicUrl);
 
 type ReactQuillEditorFormValidationProps =
@@ -52,6 +54,7 @@ type ReactQuillEditorProps = {
   tooltipLabel?: string;
   shouldFocus?: boolean;
   cancelEditing?: () => void;
+  fromManageTopic?: boolean;
 } & ReactQuillEditorFormValidationProps;
 
 const TABS = [
@@ -73,18 +76,23 @@ const ReactQuillEditor = ({
   cancelEditing,
   hookToForm,
   name,
+  fromManageTopic = false,
 }: ReactQuillEditorProps) => {
   const toolbarId = useMemo(() => {
     return `cw-toolbar-${Date.now()}-${Math.floor(Math.random() * 1_000_000)}`;
   }, []);
 
   const editorRef = useRef<ReactQuill>();
-
+  type QuillRange = { index: number; length: number };
+  const childInputRef = useRef<QuillRange | null>(null);
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [isFocused, setIsFocused] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
   const [isDraggingOver, setIsDraggingOver] = useState(false);
   const [selectedTab, setSelectedTab] = useState(TABS[0].label);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [linkText, setLinkText] = useState<string>('');
+  const [linkUrl, setLinkUrl] = useState<string>('');
 
   const formContext = useFormContext();
   const formFieldContext =
@@ -92,8 +100,11 @@ const ReactQuillEditor = ({
   const formFieldErrorMessage =
     hookToForm &&
     name &&
-    (formContext?.formState?.errors?.[name] as SerializableDeltaStatic)
-      ?.ops?.[0]?.insert?.message;
+    (
+      formContext?.formState?.errors?.[
+        name
+      ] as unknown as SerializableDeltaStatic
+    )?.ops?.[0]?.insert?.message;
 
   const isHookedToFormProper = hookToForm && name && formContext;
 
@@ -147,6 +158,9 @@ const ReactQuillEditor = ({
     // @ts-expect-error <StrictNullChecks/>
     editorRef,
     setContentDeltaToUse,
+    isModalOpen,
+    setIsModalOpen,
+    childInputRef,
   });
 
   // handle keyboard shortcuts for markdown
@@ -172,7 +186,7 @@ const ReactQuillEditor = ({
 
     const editor = editorRef.current?.getEditor();
 
-    if (!contentDeltaToUse.___isMarkdown) {
+    if (!contentDeltaToUse.___isMarkdown && !fromManageTopic) {
       const isContentAvailable =
         getTextFromDelta(editor.getContents()).length > 0;
 
@@ -207,8 +221,7 @@ const ReactQuillEditor = ({
               buttonType: 'secondary',
               buttonHeight: 'sm',
               onClick: () => {
-                // @ts-expect-error <StrictNullChecks/>
-                cancelEditing();
+                cancelEditing?.();
               },
             },
           ],
@@ -246,7 +259,55 @@ const ReactQuillEditor = ({
   }, []);
 
   const showTooltip = isDisabled && isHovering;
+  const handleAddLink = () => {
+    if (linkText === '' || linkUrl === '') {
+      return;
+    }
+    const editor = editorRef?.current?.getEditor();
+    if (!editor) {
+      return;
+    }
+    // Retrieve the stored selection from childInputRef
+    const selection = childInputRef.current;
+    if (!selection) {
+      return;
+    }
+    // Format the link to ensure it has 'https://'
+    let newLink = linkUrl;
+    if (!linkUrl.startsWith('https://')) {
+      if (linkUrl.startsWith('http://')) {
+        newLink = `https://${linkUrl.substring('http://'.length)}`;
+      } else {
+        newLink = `https://${linkUrl}`;
+      }
+    }
+    const linkMarkdown = `[${linkText}](${newLink})`;
 
+    editor.deleteText(selection.index, selection.length);
+    editor.insertText(selection.index, linkMarkdown);
+    editor.setSelection(selection.index + linkMarkdown.length, 0);
+    setContentDeltaToUse({
+      ...editor.getContents(),
+      ___isMarkdown: true,
+    });
+    setIsModalOpen(false);
+    setLinkText('');
+    setLinkUrl('');
+  };
+  const handleLinkModalClose = () => {
+    const editor = editorRef?.current?.getEditor();
+    if (!editor) {
+      return;
+    }
+    const selection = childInputRef.current;
+    if (!selection) {
+      return;
+    }
+    editor.setSelection(selection.index, 0);
+    setIsModalOpen(false);
+    setLinkText('');
+    setLinkUrl('');
+  };
   return (
     <div className="CWEditor">
       {label && <MessageRow label={label} />}
@@ -287,19 +348,21 @@ const ReactQuillEditor = ({
               <CustomQuillToolbar
                 toolbarId={toolbarId}
                 isDisabled={isDisabled}
+                setIsModalOpen={setIsModalOpen}
+                isModalOpen={isModalOpen}
               />
               <DragDropContext onDragEnd={handleDragStop}>
                 <Droppable droppableId="quillEditor">
                   {(provided) => (
                     <div
-                      className={`${isDraggingOver ? 'ondragover' : ''}`}
+                      className={`${isDraggingOver ? 'ondragover' : ''} ReactQuillDragParent`}
                       {...provided.droppableProps}
                       ref={provided.innerRef}
                       onDragOver={handleDragStart}
                       onDragLeave={handleDragStop}
                       onDrop={handleDragStop}
                     >
-                      <div data-text-editor="name">
+                      <div data-text-editor="name" className="ReactQuillParent">
                         <ReactQuill
                           // @ts-expect-error <StrictNullChecks/>
                           ref={editorRef}
@@ -354,9 +417,27 @@ const ReactQuillEditor = ({
             </div>
           </div>
         ) : (
-          <MarkdownPreview doc={getTextFromDelta(contentDeltaToUse)} />
+          <MarkdownPreview
+            classNameProp={fromManageTopic ? 'preview' : ''}
+            doc={getTextFromDelta(contentDeltaToUse)}
+          />
         )}
       </div>
+      <CWModal
+        size="small"
+        content={
+          <LinkModal
+            linkText={linkText}
+            linkUrl={linkUrl}
+            onModalClose={handleLinkModalClose}
+            setLinkText={setLinkText}
+            setLinkUrl={setLinkUrl}
+            handleAddLink={handleAddLink}
+          />
+        }
+        onClose={handleLinkModalClose}
+        open={isModalOpen}
+      />
       {formFieldErrorMessage && (
         <div className="form-error-container">
           <div className="msg">

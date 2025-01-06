@@ -26,6 +26,7 @@ interface NewCommunityAdminModalProps {
   handleClickConnectNewWallet: () => void;
   handleClickContinue: (selectedAddress: string) => void;
   selectedCommunity: SelectedCommunity;
+  isTokenizedCommunity?: boolean;
 }
 
 const NewCommunityAdminModal = ({
@@ -33,6 +34,7 @@ const NewCommunityAdminModal = ({
   handleClickConnectNewWallet,
   handleClickContinue,
   selectedCommunity,
+  isTokenizedCommunity,
 }: NewCommunityAdminModalProps) => {
   const user = useUserStore();
   const availableAddressesOnSelectedChain = user.addresses?.filter(
@@ -68,14 +70,23 @@ const NewCommunityAdminModal = ({
 
   return (
     <div className="NewCommunityAdminModal">
-      <CWModalHeader label="New community admin" onModalClose={onModalClose} />
+      <CWModalHeader
+        label={`New ${isTokenizedCommunity ? 'token and' : ''} community admin`}
+        onModalClose={onModalClose}
+      />
       <CWModalBody>
         <CWText type="b1" className="description">
           {walletsAvailable
-            ? 'Community admins are associated with a wallet. ' +
-              'Which wallet would you like to serve as the admin of the new community?'
-            : 'In order to launch a community within an ecosystem you must have a compatible wallet connected. ' +
-              'How would you like to create your community?'}
+            ? `${isTokenizedCommunity ? 'Token creators and' : ''} Community admins are associated with a wallet. ` +
+              `Which wallet would you like to serve as the ${
+                isTokenizedCommunity ? 'author/' : ''
+              }admin of the new community?`
+            : `In order to launch a ${
+                isTokenizedCommunity ? 'token and' : ''
+              } community within ${
+                isTokenizedCommunity ? 'the BASE' : 'an'
+              } ecosystem you must have a compatible wallet connected. ` +
+              `How would you like to create your ${isTokenizedCommunity ? 'token and' : ''} community?`}
         </CWText>
         {walletsAvailable && (
           <CWSelectList

@@ -1,10 +1,9 @@
-import { decamelize } from '@hicommonwealth/shared';
 import {
-  Model,
-  Sequelize,
-  type ModelStatic,
-  type SyncOptions,
-} from 'sequelize';
+  decamelize,
+  MAX_TRUNCATED_CONTENT_LENGTH,
+  safeTruncateBody,
+} from '@hicommonwealth/shared';
+import { Model, type ModelStatic, type SyncOptions } from 'sequelize';
 import type {
   Associable,
   FkMap,
@@ -62,9 +61,10 @@ export function oneToOne<Source extends State, Target extends State>(
     onDelete: options?.onDelete ?? 'NO ACTION',
   });
 
-  options?.targeyKey &&
+  // TODO: why belongsTo iff targetKey is defined + why not hasOne() instead?
+  options?.targetKey &&
     this.belongsTo(target, {
-      foreignKey: options?.targeyKey,
+      foreignKey: options?.targetKey,
       onUpdate: 'NO ACTION',
       onDelete: 'NO ACTION',
     });
@@ -109,11 +109,11 @@ export function oneToMany<Parent extends State, Child extends State>(
         onDelete: options?.onDelete ?? 'NO ACTION',
       },
     );
-  // map fk when child has composite pk,
+  // map fk when child has a composite pk that includes the fk,
   // or when fk = pk (sequelize is not creating fk when fk = pk)
   else if (
     (child.primaryKeyAttributes.length > 1 &&
-      this.primaryKeyAttributes.length === 1) ||
+      child.primaryKeyAttributes.includes(foreignKey)) ||
     foreignKey === child.primaryKeyAttribute
   )
     mapFk(
@@ -221,9 +221,9 @@ export function mapFk<Source extends State, Target extends State>(
   },
   rules?: RuleOptions,
 ) {
-  const name = `${source.tableName}_${target.tableName.toLowerCase()}_fkey`;
   const pk = primaryKey.map((k) => target.getAttributes()[k].field!);
   const fk = foreignKey.map((k) => source.getAttributes()[k].field!);
+  const name = `${source.tableName}_${target.tableName.toLowerCase()}_${fk}_fkey`;
   // console.log(
   //   'mapFk:',
   //   `${name}(${fk.join(', ')}) -> ${target.tableName}(${pk.join(', ')})`,
@@ -241,24 +241,17 @@ export function mapFk<Source extends State, Target extends State>(
 /**
  * Creates composite FK constraints (not supported by sequelize)
  */
-export const createFk = (
-  sequelize: Sequelize,
-  { name, source, fk, target, pk, rules }: FkMap,
-) =>
-  sequelize?.query(`
-    ALTER TABLE "${source}" ADD CONSTRAINT "${name}"
-    FOREIGN KEY (${fk.join(',')}) REFERENCES "${target}"(${pk.join(',')})
-    ON UPDATE ${rules?.onUpdate ?? 'NO ACTION'} ON DELETE ${
-    rules?.onDelete ?? 'NO ACTION'
-  };`);
+export const createFk = ({ name, source, fk, target, pk, rules }: FkMap) => `
+ALTER TABLE IF EXISTS "${source}" ADD CONSTRAINT "${name}"
+FOREIGN KEY (${fk.join(',')}) REFERENCES "${target}"(${pk.join(',')})
+ON UPDATE ${rules?.onUpdate ?? 'NO ACTION'} ON DELETE ${rules?.onDelete ?? 'NO ACTION'};
+`;
 
 /**
  * Drops composite FK constraints (not supported by sequelize)
  */
-export const dropFk = (sequelize: Sequelize, { source, name }: FkMap) =>
-  sequelize?.query(
-    `ALTER TABLE IF EXISTS "${source}" DROP CONSTRAINT IF EXISTS "${name}";`,
-  );
+export const dropFk = ({ source, name }: FkMap) =>
+  `ALTER TABLE IF EXISTS "${source}" DROP CONSTRAINT IF EXISTS "${name}";`;
 
 /**
  * Model sync hooks that can be used to inspect sequelize generated scripts
@@ -276,4 +269,24 @@ export const syncHooks = {
   afterSync(options: SyncOptions) {
     options.logging = false;
   },
+};
+
+export const beforeValidateBodyHook = (instance: {
+  body: string;
+  content_url?: string | null | undefined;
+}) => {
+  if (!instance.body || instance.body.length <= MAX_TRUNCATED_CONTENT_LENGTH)
+    return;
+
+  if (!instance.content_url) {
+    throw new Error(
+      'content_url must be defined if body ' +
+        `length is greater than ${MAX_TRUNCATED_CONTENT_LENGTH}`,
+    );
+  } else
+    instance.body = safeTruncateBody(
+      instance.body,
+      MAX_TRUNCATED_CONTENT_LENGTH,
+    );
+  return instance;
 };

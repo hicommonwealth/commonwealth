@@ -1,16 +1,11 @@
-import type {
-  Action,
-  Message,
-  Session,
-  Signature,
-} from '@canvas-js/interfaces';
+import type { Session } from '@canvas-js/interfaces';
 import { ed25519 } from '@canvas-js/signatures';
 
 import assert from 'assert';
 
 import { contractTopic } from './runtime/contract';
 import { getSessionSignerForDid } from './signers';
-import { CanvasSignedData } from './types';
+import { CanvasSignedData, CanvasSignedDataOption } from './types';
 import { assertMatches } from './utils';
 
 export const verifySession = async (session: Session) => {
@@ -21,17 +16,20 @@ export const verifySession = async (session: Session) => {
   await signer.verifySession(contractTopic, session);
 };
 
-export const verify = async ({
-  actionMessage,
-  actionMessageSignature,
-  sessionMessage,
-  sessionMessageSignature,
-}: {
-  actionMessage: Message<Action>;
-  actionMessageSignature: Signature;
-  sessionMessage: Message<Session>;
-  sessionMessageSignature: Signature;
-}) => {
+const isSigned = (data: CanvasSignedDataOption): data is CanvasSignedData => {
+  return data !== undefined;
+};
+
+export const verify = async (canvasSignedData: CanvasSignedDataOption) => {
+  if (!canvasSignedData) throw new Error('No signed data provided');
+
+  const {
+    actionMessage,
+    actionMessageSignature,
+    sessionMessage,
+    sessionMessageSignature,
+  } = canvasSignedData;
+
   // verify the session
   await verifySession(sessionMessage.payload);
 
@@ -61,17 +59,18 @@ export const verify = async ({
 };
 
 export const verifyComment = async (
-  canvasSignedData: CanvasSignedData,
+  canvasSignedData: CanvasSignedDataOption,
   fields: {
     thread_id: string | null;
-    text: string;
+    body: string;
     address: string;
     parent_comment_id: string | null;
   },
 ) => {
-  const { thread_id, text, address, parent_comment_id } = fields;
+  const { thread_id, body, address, parent_comment_id } = fields;
 
   await verify(canvasSignedData);
+  assert(isSigned(canvasSignedData));
 
   const { actionMessage } = canvasSignedData;
   assertMatches(actionMessage.payload.name, 'comment', 'comment', 'call');
@@ -81,7 +80,7 @@ export const verifyComment = async (
     'comment',
     'thread_id',
   );
-  assertMatches(text, actionMessage.payload.args.body, 'comment', 'text');
+  assertMatches(body, actionMessage.payload.args.body, 'comment', 'body');
   assertMatches(
     parent_comment_id ?? null,
     actionMessage.payload.args.parent_comment_id ?? null,
@@ -99,7 +98,7 @@ export const verifyComment = async (
 };
 
 export const verifyDeleteComment = async (
-  canvasSignedData: CanvasSignedData,
+  canvasSignedData: CanvasSignedDataOption,
   fields: {
     comment_id: string;
   },
@@ -107,8 +106,10 @@ export const verifyDeleteComment = async (
   const { comment_id } = fields;
 
   await verify(canvasSignedData);
+  assert(isSigned(canvasSignedData));
 
   const { actionMessage } = canvasSignedData;
+  assert(isSigned(canvasSignedData));
   assertMatches(actionMessage.payload.name, 'deleteComment', 'comment', 'call');
   assertMatches(
     actionMessage.payload.args.comment_id,
@@ -121,7 +122,7 @@ export const verifyDeleteComment = async (
 };
 
 export const verifyThread = async (
-  canvasSignedData: CanvasSignedData,
+  canvasSignedData: CanvasSignedDataOption,
   fields: {
     title: string;
     body: string;
@@ -134,6 +135,7 @@ export const verifyThread = async (
   const topic = fields.topic ?? '';
 
   await verify(canvasSignedData);
+  assert(isSigned(canvasSignedData));
 
   const { actionMessage } = canvasSignedData;
   assertMatches(actionMessage.payload.name, 'thread', 'thread', 'call');
@@ -156,12 +158,13 @@ export const verifyThread = async (
 };
 
 export const verifyDeleteThread = async (
-  canvasSignedData: CanvasSignedData,
+  canvasSignedData: CanvasSignedDataOption,
   fields: {
     thread_id: string;
   },
 ) => {
   await verify(canvasSignedData);
+  assert(isSigned(canvasSignedData));
 
   const { actionMessage } = canvasSignedData;
   assertMatches(actionMessage.payload.name, 'deleteThread', 'thread', 'call');
@@ -176,7 +179,7 @@ export const verifyDeleteThread = async (
 };
 
 export const verifyReaction = async (
-  canvasSignedData: CanvasSignedData,
+  canvasSignedData: CanvasSignedDataOption,
   fields:
     | { comment_id: string | null; value: string; address: string }
     | { thread_id: string | null; value: string; address: string },
@@ -197,6 +200,7 @@ export const verifyReaction = async (
   ): f is { thread_id: string | null; value: string; address: string } => {
     return 'thread_id' in f && !('comment_id' in f) && !('proposal_id' in f);
   };
+  assert(isSigned(canvasSignedData));
 
   const { actionMessage } = canvasSignedData;
   assert(
@@ -225,10 +229,11 @@ export const verifyReaction = async (
 };
 
 export const verifyDeleteReaction = async (
-  canvasSignedData: CanvasSignedData,
+  canvasSignedData: CanvasSignedDataOption,
   fields: { comment_id: string } | { thread_id: string },
 ) => {
   await verify(canvasSignedData);
+  assert(isSigned(canvasSignedData));
 
   const isComment = (
     f: { comment_id: string } | { thread_id: string },

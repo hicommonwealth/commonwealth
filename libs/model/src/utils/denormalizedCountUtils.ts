@@ -1,8 +1,10 @@
-import { Transaction } from 'sequelize';
+import { ServerError, logger } from '@hicommonwealth/core';
+import { Op, Transaction } from 'sequelize';
+import { models } from '../database';
+
+const log = logger(import.meta);
 
 export const incrementProfileCount = async (
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  models: any,
   community_id: string,
   user_id: number,
   transaction?: Transaction,
@@ -26,8 +28,6 @@ export const incrementProfileCount = async (
 };
 
 export const decrementProfileCount = async (
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  models: any,
   community_id: string,
   user_id: number,
   transaction: Transaction,
@@ -52,3 +52,19 @@ export const decrementProfileCount = async (
     },
   );
 };
+
+// TODO: check if we need a maintenance policy for this
+export async function assertAddressOwnership(address: string) {
+  const addressUsers = await models.Address.findAll({
+    where: {
+      address,
+      verified: { [Op.ne]: null },
+    },
+  });
+  const numUserIds = new Set(addressUsers.map((au) => au.user_id)).size;
+  if (numUserIds !== 1) {
+    log.error(`Address ${address} is not owned by a single user!`);
+    if (process.env.NODE_ENV !== 'production')
+      throw new ServerError('Address failed assertion check');
+  }
+}

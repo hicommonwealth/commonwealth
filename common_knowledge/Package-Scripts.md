@@ -85,7 +85,7 @@ Definition: `chmod u+x scripts/heroku-build.sh && ./scripts/heroku-build.sh`
 
 Description:
 
-- Builds project on Heroku by calling application build script (above), using configuration variables (CW_BUILD, SL_BUILD, DL_BUILD)
+- Builds project on Heroku by calling application build script (above), using configuration variables (CW_BUILD)
 - Cleans other apps and unnecessary code in the monorepo
 
 ## CI/CD
@@ -299,31 +299,31 @@ See `test-unit`.
 
 ### test-api
 
-Definition: `INIT_TEST_DB=true NODE_ENV=test vitest --config ../../vite.config.ts --fileParallelism=false run ./test/integration/api`
+Definition: `NODE_ENV=test vitest --config ../../vite.config.ts run ./test/integration/api`
 
 Description: Runs all tests in the /api subfolder of the /integration directory.
 
 ### test-integration
 
-Definition: `INIT_TEST_DB=true NODE_ENV=test vitest --config ../../vite.config.ts --fileParallelism=false run ./test/integration`
+Definition: `NODE_ENV=test vitest --config ../../vite.config.ts run ./test/integration`
 
 Description: Runs all tests in the /test/integration folder (includes API tests).
 
 ### test-devnet:evm
 
-Definition: `INIT_TEST_DB=true NODE_ENV=test vitest --config ../../vite.config.ts --fileParallelism=false run ./test/devnet/evm`
+Definition: `NODE_ENV=test vitest --config ../../vite.config.ts run ./test/devnet/evm`
 
 Description: Runs all tests in our `/devnet/evm` folder.
 
 ### test-devnet:cosmos
 
-Definition: `INIT_TEST_DB=true NODE_ENV=test vitest --config ../../vite.config.ts --fileParallelism=false run ./test/devnet/cosmos`
+Definition: `NODE_ENV=test vitest --config ../../vite.config.ts run ./test/devnet/cosmos`
 
 Description: Runs all tests in our `/devnet/cosmos` folder.
 
 ### test-select
 
-Definition: `INIT_TEST_DB=true NODE_ENV=test vitest --config ../../vite.config.ts --fileParallelism=false run`
+Definition: `NODE_ENV=test vitest --config ../../vite.config.ts run`
 
 Description: Append a path to run specific test files or folders.
 
@@ -335,7 +335,7 @@ Description: Tests all .spec files within the `./test/unit` sub-directory of tes
 
 ### test-select:watch
 
-Definition: `INIT_TEST_DB=true NODE_ENV=test vitest --config ../../vite.config.ts --fileParallelism=false`
+Definition: `NODE_ENV=test vitest --config ../../vite.config.ts`
 
 Description: Watches for changes to any .spec files within the given path and automatically runs test when they are updated.
 

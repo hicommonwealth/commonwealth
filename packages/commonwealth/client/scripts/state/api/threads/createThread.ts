@@ -1,6 +1,6 @@
-import { toCanvasSignedDataApiArgs } from '@hicommonwealth/shared';
+import { ChainBase, toCanvasSignedDataApiArgs } from '@hicommonwealth/shared';
 import { signThread } from 'controllers/server/sessions';
-import Topic from 'models/Topic';
+import type { Topic } from 'models/Topic';
 import { ThreadStage } from 'models/types';
 import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
 import { trpc } from 'utils/trpcClient';
@@ -15,10 +15,12 @@ interface CreateThreadProps {
   kind: 'discussion' | 'link';
   stage: string;
   communityId: string;
+  communityBase: ChainBase;
   title: string;
   topic: Topic;
   body?: string;
   url?: string;
+  ethChainIdOrBech32Prefix?: string | number;
 }
 
 export const buildCreateThreadInput = async ({
@@ -26,21 +28,25 @@ export const buildCreateThreadInput = async ({
   kind,
   stage,
   communityId,
+  communityBase,
   title,
   topic,
   body,
   url,
+  ethChainIdOrBech32Prefix,
 }: CreateThreadProps) => {
   const canvasSignedData = await signThread(address, {
     community: communityId,
+    base: communityBase,
     title,
     body,
     link: url,
     topic: topic.id,
+    ethChainIdOrBech32Prefix,
   });
   return {
     community_id: communityId,
-    topic_id: topic.id,
+    topic_id: topic.id!,
     title: title,
     body: body ?? '',
     kind,

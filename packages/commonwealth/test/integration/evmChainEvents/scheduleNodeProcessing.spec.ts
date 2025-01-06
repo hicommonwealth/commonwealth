@@ -1,88 +1,84 @@
 import { dispose } from '@hicommonwealth/core';
-import { DB, tester } from '@hicommonwealth/model';
-import { expect } from 'chai';
-import sinon from 'sinon';
 import {
+  Mock,
+  MockInstance,
   afterAll,
   afterEach,
-  beforeAll,
   beforeEach,
   describe,
+  expect,
   test,
+  vi,
 } from 'vitest';
 import { scheduleNodeProcessing } from '../../../server/workers/evmChainEvents/nodeProcessing';
-import {
-  getTestAbi,
-  getTestCommunityContract,
-  getTestContract,
-  getTestSignatures,
-} from './util';
+import { multipleEventSource, singleEventSource } from '../../util/util';
+
+vi.mock('../../../server/workers/evmChainEvents/getEventSources');
 
 describe('scheduleNodeProcessing', () => {
-  const sandbox = sinon.createSandbox();
-  let processChainStub: sinon.SinonSpy;
-  let clock: sinon.SinonFakeTimers;
-  let singleSourceSuccess = false;
-  let models: DB;
-
-  beforeAll(async () => {
-    await tester.seedDb();
-    const res = await import('@hicommonwealth/model');
-    models = res['models'];
-  });
+  let processChainStub: Mock;
 
   afterAll(async () => {
     await dispose()();
   });
 
   beforeEach(() => {
-    processChainStub = sandbox.stub();
-    clock = sandbox.useFakeTimers();
+    vi.clearAllMocks();
+    processChainStub = vi.fn();
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
-    sandbox.restore();
+    vi.useRealTimers();
+    vi.resetAllMocks();
   });
 
   test('should not schedule anything if there are no event sources', async () => {
-    await scheduleNodeProcessing(models, 1000, processChainStub);
-    clock.tick(1001);
-    expect(processChainStub.called).to.be.false;
+    const { getEventSources } = await import(
+      '../../../server/workers/evmChainEvents/getEventSources'
+    );
+    (getEventSources as unknown as MockInstance).mockImplementation(() =>
+      Promise.resolve({}),
+    );
+
+    await scheduleNodeProcessing(1000, processChainStub);
+    vi.advanceTimersByTime(1000);
+    expect(processChainStub).not.toHaveBeenCalled();
   });
 
   test('should schedule processing for a single source', async () => {
-    await getTestCommunityContract();
-    const abi = await getTestAbi();
-    const contract = await getTestContract();
-    await contract.update({ abi_id: abi.id });
-    await getTestSignatures();
+    // const res = await createContestEventSources();
+    const { getEventSources } = await import(
+      '../../../server/workers/evmChainEvents/getEventSources'
+    );
+    (getEventSources as unknown as MockInstance).mockImplementation(() =>
+      Promise.resolve(singleEventSource),
+    );
 
     const interval = 10_000;
-    await scheduleNodeProcessing(models, interval, processChainStub);
+    await scheduleNodeProcessing(interval, processChainStub);
 
-    expect(processChainStub.calledOnce).to.be.false;
+    expect(processChainStub).not.toHaveBeenCalledOnce();
 
-    clock.tick(1);
-    expect(processChainStub.calledOnce).to.be.true;
-    singleSourceSuccess = true;
+    vi.advanceTimersByTime(1);
+    expect(processChainStub).toHaveBeenCalledOnce();
   });
 
   test('should evenly schedule 2 sources per interval', async () => {
-    expect(singleSourceSuccess).to.be.true;
-    await getTestCommunityContract('v2');
-    const abi = await getTestAbi('v2');
-    const contract = await getTestContract('v2');
-    await contract.update({ abi_id: abi.id });
-    await getTestSignatures('v2');
+    const { getEventSources } = await import(
+      '../../../server/workers/evmChainEvents/getEventSources'
+    );
+    (getEventSources as unknown as MockInstance).mockImplementation(() =>
+      Promise.resolve(multipleEventSource),
+    );
 
     const interval = 10_000;
-    await scheduleNodeProcessing(models, interval, processChainStub);
+    await scheduleNodeProcessing(interval, processChainStub);
 
-    expect(processChainStub.calledOnce).to.be.false;
-    clock.tick(1);
-    expect(processChainStub.calledOnce).to.be.true;
-
-    clock.tick(interval / 2);
-    expect(processChainStub.calledTwice).to.be.true;
+    expect(processChainStub).not.toHaveBeenCalledOnce();
+    vi.advanceTimersByTime(1);
+    expect(processChainStub).toHaveBeenCalledOnce();
+    vi.advanceTimersByTime(interval / 2);
+    expect(processChainStub).toHaveBeenCalledTimes(2);
   });
 });

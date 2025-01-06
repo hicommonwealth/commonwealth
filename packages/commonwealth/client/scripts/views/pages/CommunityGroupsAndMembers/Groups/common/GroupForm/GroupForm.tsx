@@ -1,4 +1,9 @@
 /* eslint-disable react/no-multi-comp */
+import {
+  CWImageInput,
+  ImageBehavior,
+} from 'client/scripts/views/components/component_kit/CWImageInput';
+import { weightedVotingValueToLabel } from 'helpers';
 import { isValidEthAddress } from 'helpers/validateTypes';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useMemo, useState } from 'react';
@@ -25,22 +30,26 @@ import {
 import Allowlist from './Allowlist';
 import './GroupForm.scss';
 import RequirementSubForm from './RequirementSubForm';
+import TopicPermissionsSubForm from './TopicPermissionsSubForm';
+import {
+  REQUIREMENTS_TO_FULFILL,
+  REVERSED_TOPIC_PERMISSIONS,
+  TOPIC_PERMISSIONS,
+} from './constants';
+import { convertAccumulatedPermissionsToGranularPermissions } from './helpers';
 import {
   FormSubmitValues,
   GroupFormProps,
   RequirementSubFormsState,
   RequirementSubType,
+  TopicPermissions,
+  TopicPermissionsSubFormsState,
 } from './index.types';
 import {
   VALIDATION_MESSAGES,
   groupValidationSchema,
   requirementSubFormValidationSchema,
 } from './validations';
-
-const REQUIREMENTS_TO_FULFILL = {
-  ALL_REQUIREMENTS: 'ALL',
-  N_REQUIREMENTS: 'N',
-};
 
 type CWRequirementsRadioButtonProps = {
   maxRequirements: number;
@@ -170,6 +179,11 @@ const GroupForm = ({
   const [requirementSubForms, setRequirementSubForms] = useState<
     RequirementSubFormsState[]
   >([]);
+  const [topicPermissionsSubForms, setTopicPermissionsSubForms] = useState<
+    TopicPermissionsSubFormsState[]
+  >([]);
+  const [isProcessingProfileImage, setIsProcessingProfileImage] =
+    useState(false);
 
   useEffect(() => {
     if (initialValues.requirements) {
@@ -201,6 +215,15 @@ const GroupForm = ({
     ) {
       setCwRequiremenetsLabelInputValue(
         `${initialValues.requirementsToFulfill}`,
+      );
+    }
+
+    if (initialValues.topics) {
+      setTopicPermissionsSubForms(
+        initialValues.topics.map((t) => ({
+          permission: t.permission,
+          topic: { id: parseInt(`${t.value}`), name: t.label },
+        })),
       );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -371,11 +394,43 @@ const GroupForm = ({
 
     const formValues = {
       ...values,
+      groupImageUrl: values.groupImageUrl || '',
+      topics: topicPermissionsSubForms.map((t) => ({
+        id: t.topic.id,
+        permissions: convertAccumulatedPermissionsToGranularPermissions(
+          REVERSED_TOPIC_PERMISSIONS[t.permission],
+        ),
+      })),
       requirementsToFulfill,
       requirements: requirementSubForms.map((x) => x.values),
     };
 
     await onSubmit(formValues);
+  };
+
+  const handleWatchForm = (values: FormSubmitValues) => {
+    if (values?.topics?.length > 0) {
+      setTopicPermissionsSubForms(
+        values.topics.map((topic) => ({
+          topic: {
+            id: parseInt(`${topic.value}`),
+            name: topic.label,
+          },
+          permission: TOPIC_PERMISSIONS.UPVOTE_AND_COMMENT_AND_POST,
+        })),
+      );
+    } else {
+      setTopicPermissionsSubForms([]);
+    }
+  };
+
+  const updateTopicPermissionByIndex = (
+    index: number,
+    newPermission: TopicPermissions,
+  ) => {
+    const updatedTopicPermissionsSubForms = [...topicPermissionsSubForms];
+    updatedTopicPermissionsSubForms[index].permission = newPermission;
+    setTopicPermissionsSubForms([...updatedTopicPermissionsSubForms]);
   };
 
   // + 1 for allowlists
@@ -388,17 +443,23 @@ const GroupForm = ({
         initialValues={{
           groupName: initialValues.groupName || '',
           groupDescription: initialValues.groupDescription || '',
+          groupImageUrl: initialValues.groupImageUrl || '',
           requirementsToFulfill: initialValues.requirementsToFulfill
             ? initialValues.requirementsToFulfill ===
               REQUIREMENTS_TO_FULFILL.ALL_REQUIREMENTS
               ? REQUIREMENTS_TO_FULFILL.ALL_REQUIREMENTS
               : REQUIREMENTS_TO_FULFILL.N_REQUIREMENTS
             : '',
-          topics: initialValues.topics || '',
+          topics:
+            initialValues?.topics?.map((t) => ({
+              label: t.label,
+              value: t.value,
+            })) || '',
         }}
         validationSchema={groupValidationSchema}
         onSubmit={handleSubmit}
         onErrors={validateSubForms}
+        onWatch={handleWatchForm}
       >
         {({ formState }) => (
           <>
@@ -439,6 +500,17 @@ const GroupForm = ({
                 label="Description (optional)"
                 placeholder="Add a description for your group"
                 instructionalMessage="Can be up to 250 characters long"
+              />
+
+              <CWImageInput
+                label="Group Image (Accepts JPG and PNG files)"
+                onImageProcessingChange={({ isGenerating, isUploading }) => {
+                  setIsProcessingProfileImage(isGenerating || isUploading);
+                }}
+                name="groupImageUrl"
+                hookToForm
+                imageBehavior={ImageBehavior.Circle}
+                withAIImageGeneration
               />
             </section>
 
@@ -564,9 +636,52 @@ const GroupForm = ({
                   options={sortedTopics.map((topic) => ({
                     label: topic.name,
                     value: topic.id,
+                    helpText: weightedVotingValueToLabel(
+                      topic.weighted_voting!,
+                    ),
                   }))}
                 />
               </section>
+
+              {/* Sub-section: Gated topic permissions */}
+              {topicPermissionsSubForms?.length > 0 && (
+                <section className="form-section">
+                  <div className="header-row">
+                    <CWText
+                      type="h4"
+                      fontWeight="semiBold"
+                      className="header-text"
+                    >
+                      Topic Permissions
+                    </CWText>
+                    <CWText type="b2">
+                      Select which topics this group can create threads and
+                      within.
+                    </CWText>
+                  </div>
+
+                  <CWText type="b2" className="topic-permission-header">
+                    Topic
+                  </CWText>
+
+                  {topicPermissionsSubForms.map((topicPermission, index) => (
+                    <>
+                      <CWDivider className="divider-spacing" />
+                      <TopicPermissionsSubForm
+                        key={topicPermission.topic.id}
+                        topic={topicPermission.topic}
+                        defaultPermission={topicPermission.permission}
+                        onPermissionChange={(newPermission) =>
+                          updateTopicPermissionByIndex(index, newPermission)
+                        }
+                      />
+                      {index === topicPermissionsSubForms.length - 1 && (
+                        <CWDivider className="divider-spacing" />
+                      )}
+                    </>
+                  ))}
+                </section>
+              )}
             </section>
 
             <Allowlist
@@ -610,6 +725,7 @@ const GroupForm = ({
                 buttonWidth="wide"
                 disabled={
                   isNameTaken ||
+                  isProcessingProfileImage ||
                   (requirementSubForms.length === 0 &&
                     allowedAddresses.length === 0)
                 }

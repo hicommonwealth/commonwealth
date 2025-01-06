@@ -1,4 +1,5 @@
-import { commonProtocol } from '@hicommonwealth/shared';
+import { commonProtocol } from '@hicommonwealth/evm-protocols';
+import { PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
 import NodeInfo from 'models/NodeInfo';
 import { fetchCachedNodes } from 'state/api/nodes';
 
@@ -8,10 +9,11 @@ export const ETHEREUM_MAINNET_ID = '1';
 export const BASE_ID = '8453';
 export const OSMOSIS_ID = 'osmosis';
 export const BLAST_ID = '81457';
+export const SKALE_ID = '974399131';
 
 const removeTestCosmosNodes = (nodeInfo: NodeInfo): boolean => {
   return !(
-    window.location.hostname.includes('commonwealth.im') &&
+    window.location.hostname.includes(PRODUCTION_DOMAIN) &&
     [
       'evmosdevci',
       'csdkv1',
@@ -37,15 +39,19 @@ const particularChainNodes = (nodeInfo: NodeInfo) => {
   );
 };
 
-const chainIdsWithStakeEnabled = Object.values(
+export const chainIdsWithStakeEnabled = Object.values(
   commonProtocol.factoryContracts,
-).map((c) => c.chainId);
+)
+  // we don't support stake on Blast anymore as of 23 Sept, 2024 (#9196)
+  .filter((chain) => chain.chainId !== commonProtocol.ValidChains.Blast)
+  .map((c) => c.chainId);
 
 // Get chain id's from the fetchCachedNodes for all eth and cosmos chains
 export const chainTypes =
   fetchCachedNodes()
     ?.filter(particularChainNodes)
     ?.map((chain) => ({
+      id: chain.id,
       chainBase: chain.ethChainId
         ? 'ethereum'
         : chain.cosmosChainId
@@ -58,6 +64,7 @@ export const chainTypes =
       bech32Prefix: chain.bech32,
       // @ts-expect-error StrictNullChecks
       hasStakeEnabled: chainIdsWithStakeEnabled.includes(chain.ethChainId),
+      chainNodeId: chain.id,
     })) || [];
 
 // Sort chains alphabetically by labels

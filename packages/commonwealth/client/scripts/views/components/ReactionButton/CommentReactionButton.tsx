@@ -1,7 +1,9 @@
 import { buildCreateCommentReactionInput } from 'client/scripts/state/api/comments/createReaction';
+import { buildDeleteCommentReactionInput } from 'client/scripts/state/api/comments/deleteReaction';
 import { useAuthModalStore } from 'client/scripts/state/ui/modals';
 import { notifyError } from 'controllers/app/notifications';
 import { SessionKeyError } from 'controllers/server/sessions';
+import { BigNumber } from 'ethers';
 import React, { useState } from 'react';
 import app from 'state';
 import useUserStore from 'state/ui/user';
@@ -51,8 +53,8 @@ export const CommentReactionButton = ({
     (x) => x?.author === activeAddress,
   );
   const reactionWeightsSum = comment.reactions.reduce(
-    (acc, curr) => acc + (curr.calculatedVotingWeight || 1),
-    0,
+    (acc, reaction) => acc.add(reaction.calculatedVotingWeight || 1),
+    BigNumber.from(0),
   );
 
   const handleVoteClick = async (e) => {
@@ -76,17 +78,18 @@ export const CommentReactionButton = ({
         notifyError('Failed to update reaction count');
         return;
       }
-      deleteCommentReaction({
+      const input = await buildDeleteCommentReactionInput({
         communityId,
         address: user.activeAccount?.address,
         commentMsgId: comment.canvasMsgId,
         reactionId: foundReaction.id,
-      }).catch((err) => {
+      });
+      deleteCommentReaction(input).catch((err) => {
         if (err instanceof SessionKeyError) {
           checkForSessionKeyRevalidationErrors(err);
           return;
         }
-        console.error(err.response.data.error || err?.message);
+        console.error(err?.message);
         notifyError('Failed to update reaction count');
       });
     } else {
@@ -102,8 +105,14 @@ export const CommentReactionButton = ({
           checkForSessionKeyRevalidationErrors(err);
           return;
         }
-        console.error(err?.responseJSON?.error || err?.message);
-        notifyError('Failed to save reaction');
+        if ((err.message as string)?.includes('Insufficient token balance')) {
+          notifyError(
+            'You must have the requisite tokens to upvote in this topic',
+          );
+        } else {
+          notifyError('Failed to save reaction');
+        }
+        console.error(err?.message);
       });
     }
   };
@@ -115,7 +124,7 @@ export const CommentReactionButton = ({
         isOpen={isAuthModalOpen}
       />
       <CWUpvoteSmall
-        voteCount={reactionWeightsSum}
+        voteCount={reactionWeightsSum.toString()}
         disabled={!user.activeAccount || disabled}
         selected={hasReacted}
         onClick={handleVoteClick}

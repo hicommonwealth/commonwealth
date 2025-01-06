@@ -15,11 +15,13 @@ import type {
   DB,
   ThreadAttributes,
 } from '@hicommonwealth/model';
+import * as schemas from '@hicommonwealth/schemas';
 import {
   CANVAS_TOPIC,
   CanvasSignResult,
   CanvasSignedData,
   SubstrateSignerCW,
+  TEST_BLOCK_INFO_STRING,
   serializeCanvas,
   toCanvasSignedDataApiArgs,
   type Link,
@@ -27,8 +29,9 @@ import {
   type Role,
 } from '@hicommonwealth/shared';
 import chai from 'chai';
+import { Wallet } from 'ethers';
 import type { Application } from 'express';
-import { TEST_BLOCK_INFO_STRING } from '../../shared/adapters/chain/ethereum/keys';
+import { z } from 'zod';
 
 function createCanvasSignResult({ session, sign, action }): CanvasSignResult {
   const sessionMessage = {
@@ -103,7 +106,8 @@ export interface CommentArgs {
   address: string;
   did: `did:${string}`;
   jwt: any;
-  text: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  body: any;
   parentCommentId?: any;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   threadId?: any;
@@ -176,24 +180,10 @@ export interface SubscriptionArgs {
   community_id: string;
 }
 
-export interface CommunityArgs {
-  jwt: any;
-  id: string;
-  name: string;
-  creator_address: string;
-  creator_chain: string;
-  description: string;
-  default_chain: string;
-  isAuthenticatedForum: string;
-  privacyEnabled: string;
-}
-
 export interface JoinCommunityArgs {
   jwt: string;
-  address_id: number;
   address: string;
   chain: string;
-  originChain: string;
 }
 
 export interface SetSiteAdminArgs {
@@ -241,7 +231,12 @@ export type ModelSeeder = {
   updateRole: (args: AssignRoleArgs) => Promise<any>;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   createSubscription: (args: SubscriptionArgs) => Promise<any>;
-  createCommunity: (args: CommunityArgs) => Promise<CommunityAttributes>;
+  createCommunity: (
+    args: z.infer<(typeof schemas.CreateCommunity)['input']> & {
+      address: string;
+    },
+    jwt: string,
+  ) => Promise<CommunityAttributes>;
   joinCommunity: (args: JoinCommunityArgs) => Promise<boolean>;
   setSiteAdmin: (args: SetSiteAdminArgs) => Promise<boolean>;
 };
@@ -266,7 +261,10 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
     if (chain === 'ethereum' || chain === 'alex') {
       wallet_id = 'metamask';
       chain_id = chain === 'alex' ? '3' : '1'; // use ETH mainnet for testing except alex
-      sessionSigner = new SIWESigner({ chainId: parseInt(chain_id) });
+      sessionSigner = new SIWESigner({
+        chainId: parseInt(chain_id),
+        signer: Wallet.createRandom(),
+      });
     } else if (chain === 'edgeware') {
       wallet_id = 'polkadot';
       sessionSigner = new SubstrateSignerCW();
@@ -278,33 +276,22 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
       await sessionSigner.newSession(CANVAS_TOPIC);
     const walletAddress = session.did.split(':')[4];
 
-    let res = await chai.request
+    const res = await chai.request
       .agent(app)
-      .post('/api/createAddress')
+      .post('/api/internal/SignIn')
       .set('Accept', 'application/json')
+      .set('address', walletAddress)
       .send({
         address: walletAddress,
         community_id: chain,
         wallet_id,
         block_info: TEST_BLOCK_INFO_STRING,
-      });
-
-    const address_id = res.body.result.id;
-
-    res = await chai.request
-      .agent(app)
-      .post('/api/verifyAddress')
-      .set('Accept', 'application/json')
-      .send({
-        address: walletAddress,
-        community_id: chain,
-        // @ts-expect-error <StrictNullChecks>
-        chain_id,
-        wallet_id,
         session: serializeCanvas(session),
       });
-    const user_id = res.body.result.user.id;
-    const email = res.body.result.user.email;
+
+    const address_id = res.body.id;
+    const user_id = res.body.user_id;
+    const email = res.body.User.email;
     return {
       address_id,
       address: session.did.split(':')[4],
@@ -421,7 +408,7 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
       address,
       did,
       jwt,
-      text,
+      body,
       parentCommentId,
       threadId,
       threadMsgId,
@@ -434,7 +421,7 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
       did,
       name: 'comment',
       args: {
-        body: text,
+        body,
         thread_id: threadMsgId,
         parent_comment_id: parentCommentId || null,
       },
@@ -460,7 +447,7 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
         parent_id: parentCommentId || null,
         thread_id: threadId,
         thread_msg_id: threadMsgId,
-        text,
+        body,
         jwt,
         ...toCanvasSignedDataApiArgs(canvasSignResult),
       });
@@ -638,36 +625,30 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
     return subscription;
   },
 
-  createCommunity: async (args: CommunityArgs) => {
+  createCommunity: async (args, jwt: string) => {
     const res = await chai
       .request(app)
       .post(`/api/v1/CreateCommunity`)
       .set('Accept', 'application/json')
-      .set('address', args.creator_address)
+      .set('address', args.address)
       .send({
+        jwt,
         ...args,
-        type: 'offchain',
-        base: 'ethereum',
-        eth_chain_id: 2,
-        user_address: args.creator_address,
-        node_url: 'http://chain.url',
-        network: 'network',
-        default_symbol: 'test',
       });
     return res.body.community;
   },
 
   joinCommunity: async (args: JoinCommunityArgs) => {
-    const { jwt, address, chain, originChain } = args;
+    const { jwt, address, chain } = args;
     try {
       await chai.request
         .agent(app)
-        .post('/api/linkExistingAddressToCommunity')
+        .post('/api/v1/JoinCommunity')
         .set('Accept', 'application/json')
+        .set('address', address)
         .send({
-          address,
           community_id: chain,
-          originChain,
+          address,
           jwt,
         });
     } catch (e) {

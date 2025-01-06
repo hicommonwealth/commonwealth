@@ -1,4 +1,4 @@
-@import '../../../../../../styles/shared';
+@import '../../../../../styles/shared';
 
 .WVConsent {
   display: flex;
@@ -40,6 +40,7 @@
     .action-buttons {
       display: flex;
       justify-content: space-between;
+      flex-wrap: wrap;
     }
   }
 }

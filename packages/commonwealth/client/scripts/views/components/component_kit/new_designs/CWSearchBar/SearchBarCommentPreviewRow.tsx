@@ -1,13 +1,14 @@
 import moment from 'moment';
 import React, { FC } from 'react';
 
+import { getDecodedString } from '@hicommonwealth/shared';
+// eslint-disable-next-line max-len
+import { MarkdownHitHighlighterWithFallback } from 'views/components/MarkdownHitHighlighterWithFallback/MarkdownHitHighlighterWithFallback';
 import { useCommonNavigate } from '../../../../../navigation/helpers';
 import { ReplyResult } from '../../../../pages/search/helpers';
 import { renderTruncatedHighlights } from '../../../react_quill_editor/highlighter';
-import { QuillRenderer } from '../../../react_quill_editor/quill_renderer';
 import { CWText } from '../../cw_text';
 
-import { getDecodedString } from '@hicommonwealth/shared';
 import './SearchBarCommentPreviewRow.scss';
 
 interface SearchBarCommentPreviewRowProps {
@@ -22,7 +23,7 @@ export const SearchBarCommentPreviewRow: FC<
   const navigate = useCommonNavigate();
 
   const title = getDecodedString(searchResult.title);
-  const content = searchResult.text;
+  const content = searchResult.body;
 
   const handleClick = () => {
     const path = `/${searchResult.community_id}/discussion/${searchResult.proposalid}?comment=${searchResult.id}`;
@@ -40,11 +41,10 @@ export const SearchBarCommentPreviewRow: FC<
         {renderTruncatedHighlights(searchTerm, title)}
       </CWText>
       <CWText type="caption" className="excerpt-text">
-        <QuillRenderer
-          hideFormatting={true}
-          doc={content}
-          searchTerm={searchTerm}
-          containerClass="SearchQuillRenderer"
+        <MarkdownHitHighlighterWithFallback
+          markdown={content}
+          searchTerm={searchTerm ?? ''}
+          className="SearchQuillRenderer"
         />
       </CWText>
     </div>

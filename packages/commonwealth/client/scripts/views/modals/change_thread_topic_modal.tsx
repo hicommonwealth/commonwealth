@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { buildUpdateThreadInput } from 'client/scripts/state/api/threads/editThread';
 import useUserStore from 'state/ui/user';
 import type Thread from '../../models/Thread';
-import type Topic from '../../models/Topic';
+import type { Topic } from '../../models/Topic';
 import app from '../../state';
 import { useEditThreadMutation } from '../../state/api/threads';
 import { useFetchTopicsQuery } from '../../state/api/topics';
@@ -24,7 +24,7 @@ export const ChangeThreadTopicModal = ({
   onModalClose,
   thread,
 }: ChangeThreadTopicModalProps) => {
-  const [activeTopic, setActiveTopic] = useState<Topic>(thread.topic);
+  const [activeTopic, setActiveTopic] = useState<Topic>(thread.topic!);
   const { data: topics } = useFetchTopicsQuery({
     communityId: app.activeChainId() || '',
     apiEnabled: !!app.activeChainId(),
@@ -43,9 +43,9 @@ export const ChangeThreadTopicModal = ({
   const { mutateAsync: editThread } = useEditThreadMutation({
     communityId: app.activeChainId() || '',
     threadId: thread.id,
-    threadMsgId: thread.canvasMsgId,
+    threadMsgId: thread.canvasMsgId!,
     currentStage: thread.stage,
-    currentTopicId: thread.topic.id,
+    currentTopicId: thread.topic!.id!,
   });
 
   const handleSaveChanges = async () => {
@@ -53,7 +53,7 @@ export const ChangeThreadTopicModal = ({
       const input = await buildUpdateThreadInput({
         communityId: app.activeChainId() || '',
         address: user.activeAccount?.address || '',
-        threadMsgId: thread.canvasMsgId,
+        threadMsgId: thread.canvasMsgId!,
         threadId: thread.id,
         topicId: activeTopic.id,
       });

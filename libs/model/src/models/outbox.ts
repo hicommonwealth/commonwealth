@@ -1,13 +1,9 @@
-import { EventContext, Events, Outbox } from '@hicommonwealth/core';
+import { Outbox } from '@hicommonwealth/core';
 import Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 import { z } from 'zod';
 import { ModelInstance } from './types';
 
 export type OutboxAttributes = z.infer<typeof Outbox>;
-
-export type InsertOutboxEvent = EventContext<Events> & {
-  created_at?: Date;
-};
 
 export type OutboxInstance = ModelInstance<OutboxAttributes>;
 

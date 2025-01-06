@@ -1,7 +1,8 @@
-@import '../../../../styles/shared';
+@import '../../../styles/shared';
 
 .LaunchToken {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  max-width: 596px;
 }

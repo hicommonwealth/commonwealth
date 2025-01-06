@@ -25,7 +25,6 @@ import {
   MixpanelCommunityInteractionEvent,
   MixpanelCommunityInteractionEventPayload,
 } from '../../../../shared/analytics/types';
-import '../../../styles/pages/UpdateProposalStatusModal.scss';
 import useAppStatus from '../../hooks/useAppStatus';
 import { ThreadStage } from '../../models/types';
 import { CosmosProposalSelector } from '../components/CosmosProposalSelector';
@@ -38,6 +37,7 @@ import {
   CWModalHeader,
 } from '../components/component_kit/new_designs/CWModal';
 import { SnapshotProposalSelector } from '../components/snapshot_proposal_selector';
+import './UpdateProposalStatusModal.scss';
 
 const getInitialSnapshots = (thread: Thread) =>
   filterLinks(thread.links, LinkSource.Snapshot).map((l) => ({
@@ -90,9 +90,9 @@ export const UpdateProposalStatusModal = ({
   const { mutateAsync: editThread } = useEditThreadMutation({
     communityId: app.activeChainId() || '',
     threadId: thread.id,
-    threadMsgId: thread.canvasMsgId,
+    threadMsgId: thread.canvasMsgId!,
     currentStage: thread.stage,
-    currentTopicId: thread.topic.id,
+    currentTopicId: thread.topic!.id!,
   });
 
   const { mutateAsync: addThreadLinks } = useAddThreadLinksMutation({
@@ -116,7 +116,7 @@ export const UpdateProposalStatusModal = ({
       address: user.activeAccount?.address || '',
       communityId: app.activeChainId() || '',
       threadId: thread.id,
-      threadMsgId: thread.canvasMsgId,
+      threadMsgId: thread.canvasMsgId!,
       stage: tempStage!,
     })
       .then((input) => {
@@ -144,7 +144,6 @@ export const UpdateProposalStatusModal = ({
                       title: enrichedSnapshot.title,
                     },
                   ],
-                  isPWA: isAddedToHomeScreen,
                 }).then((updatedThread) => {
                   links = updatedThread.links;
                   return { toDelete, links };
@@ -175,7 +174,6 @@ export const UpdateProposalStatusModal = ({
                           title: enrichedSnapshot.title,
                         },
                       ],
-                      isPWA: isAddedToHomeScreen,
                     });
                   })
                   .then((updatedThread) => {
@@ -228,7 +226,6 @@ export const UpdateProposalStatusModal = ({
                   identifier: identifier,
                   title: title,
                 })),
-                isPWA: isAddedToHomeScreen,
               }).then((updatedThread) => {
                 // eslint-disable-next-line no-param-reassign
                 links = updatedThread.links;

@@ -6,9 +6,19 @@ import {
   ChainType,
   MAX_SCHEMA_INT,
   MIN_SCHEMA_INT,
+  WalletId,
 } from '@hicommonwealth/shared';
 import { z } from 'zod';
-import { Community, Group, StakeTransaction } from '../entities';
+import { AuthContext, TopicContext } from '../context';
+import {
+  Community,
+  Group,
+  PermissionEnum,
+  PinnedToken,
+  Requirement,
+  StakeTransaction,
+  Topic,
+} from '../entities';
 import { PG_INT, checkIconSize } from '../utils';
 
 export const CreateCommunity = {
@@ -23,7 +33,7 @@ export const CreateCommunity = {
       .refine((data) => !data.includes(ALL_COMMUNITIES), {
         message: `String must not contain '${ALL_COMMUNITIES}'`,
       }),
-    chain_node_id: PG_INT.optional(), // corresponds to the chain field
+    chain_node_id: PG_INT,
     description: z.string().optional(),
     icon_url: z
       .string()
@@ -35,20 +45,12 @@ export const CreateCommunity = {
     directory_page_enabled: z.boolean().default(false),
     type: z.nativeEnum(ChainType).default(ChainType.Offchain),
     base: z.nativeEnum(ChainBase),
-    user_address: z.string(), // why not use actor's address?
 
     // hidden optional params
-    alt_wallet_url: z.string().url().optional(),
-    eth_chain_id: PG_INT.optional(),
-    cosmos_chain_id: z.string().optional(),
-    address: z.string().optional(), // address for the contract of the chain
-    decimals: PG_INT.optional(),
-    bech32_prefix: z.string().optional(), // required for cosmos communities
     token_name: z.string().optional(),
+    referrer_address: z.string().optional(),
 
     // deprecated params to be removed
-    node_url: z.string().url(),
-    network: z.string(),
     default_symbol: z.string().max(9),
     website: z.string().url().optional(),
     github: z.string().url().startsWith('https://github.com/').optional(),
@@ -64,7 +66,7 @@ export const CreateCommunity = {
 
 export const SetCommunityStake = {
   input: z.object({
-    id: z.string(),
+    community_id: z.string(),
     stake_id: z.coerce.number().int().min(MIN_SCHEMA_INT).max(MAX_SCHEMA_INT),
     stake_token: z.string().default(''),
     vote_weight: z.coerce
@@ -76,15 +78,16 @@ export const SetCommunityStake = {
     stake_enabled: z.coerce.boolean().default(true),
   }),
   output: Community,
+  context: AuthContext,
 };
 
 export const CreateStakeTransaction = {
   input: z.object({
-    id: z.string(), // should be id instead of community_id
-    transaction_hash: z.string().length(66),
     community_id: z.string(),
+    transaction_hash: z.string().length(66),
   }),
   output: StakeTransaction,
+  context: AuthContext,
 };
 
 export const RefreshCustomDomain = {
@@ -121,15 +124,16 @@ export const UpdateCustomDomain = {
     updated_at: z.string().datetime(),
     sni_endpoint: z.null(),
   }),
+  context: AuthContext,
 };
 
 const Snapshot = z.string().regex(/.+\.(eth|xyz)$/);
 
 export const UpdateCommunity = {
-  input: Community.omit({ network: true, custom_domain: true })
+  input: Community.omit({ id: true, network: true, custom_domain: true })
     .partial()
     .extend({
-      id: z.string(),
+      community_id: z.string(),
       name: z
         .string()
         .max(255)
@@ -145,6 +149,7 @@ export const UpdateCommunity = {
       transactionHash: z.string().optional(),
     }),
   output: Community,
+  context: AuthContext,
 };
 
 export const GenerateStakeholderGroups = {
@@ -159,13 +164,187 @@ export const GenerateStakeholderGroups = {
     .partial(),
 };
 
-export const DeleteTopic = {
+export const CreateTopic = {
+  input: z
+    .object({
+      community_id: z.string(),
+    })
+    .merge(
+      Topic.pick({
+        name: true,
+        description: true,
+        featured_in_sidebar: true,
+        featured_in_new_post: true,
+        default_offchain_template: true,
+        weighted_voting: true,
+        token_address: true,
+        token_symbol: true,
+        vote_weight_multiplier: true,
+        chain_node_id: true,
+      }),
+    ),
+  output: z.object({
+    topic: Topic.partial(),
+    user_id: z.number(),
+  }),
+  context: AuthContext,
+};
+
+export const UpdateTopic = {
+  input: z
+    .object({
+      topic_id: z.number(),
+      community_id: z.string(),
+    })
+    .merge(
+      Topic.pick({
+        name: true,
+        description: true,
+        group_ids: true,
+        telegram: true,
+        featured_in_sidebar: true,
+        featured_in_new_post: true,
+        default_offchain_template: true,
+      }).partial(),
+    ),
+  output: z.object({
+    topic: Topic.partial(),
+    user_id: z.number(),
+  }),
+  context: TopicContext,
+};
+
+export const ToggleArchiveTopic = {
   input: z.object({
     community_id: z.string(),
     topic_id: PG_INT,
+    archive: z.boolean(),
   }),
   output: z.object({
     community_id: z.string(),
     topic_id: PG_INT,
   }),
+  context: TopicContext,
+};
+
+const GroupMetadata = z.object({
+  name: z.string(),
+  description: z.string(),
+  groupImageUrl: z.string().nullish(),
+  required_requirements: PG_INT.nullish(),
+  membership_ttl: PG_INT.optional(),
+});
+
+export const CreateGroup = {
+  input: z.object({
+    community_id: z.string(),
+    metadata: GroupMetadata,
+    requirements: z.array(Requirement).optional(),
+    topics: z
+      .array(
+        z.object({
+          id: PG_INT,
+          permissions: z.array(z.nativeEnum(PermissionEnum)),
+        }),
+      )
+      .optional(),
+  }),
+  output: Community.extend({ groups: z.array(Group).optional() }).partial(),
+  context: AuthContext,
+};
+
+export const UpdateGroup = {
+  input: z.object({
+    community_id: z.string(),
+    group_id: PG_INT,
+    metadata: GroupMetadata.optional(),
+    requirements: z.array(Requirement).optional(),
+    topics: z
+      .array(
+        z.object({
+          id: PG_INT,
+          permissions: z.array(z.nativeEnum(PermissionEnum)),
+        }),
+      )
+      .optional(),
+  }),
+  output: Group.partial(),
+  context: AuthContext,
+};
+
+export const DeleteGroup = {
+  input: z.object({
+    community_id: z.string(),
+    group_id: PG_INT,
+  }),
+  output: z.object({
+    community_id: z.string(),
+    group_id: PG_INT,
+  }),
+  context: AuthContext,
+};
+
+export const DeleteCommunity = {
+  input: z.object({
+    community_id: z.string(),
+  }),
+  output: z.object({
+    community_id: z.string(),
+  }),
+  context: AuthContext,
+};
+
+export const RefreshCommunityMemberships = {
+  input: z.object({
+    community_id: z.string(),
+    group_id: PG_INT.optional(),
+  }),
+  output: z.object({
+    community_id: z.string(),
+    created: z.number(),
+    updated: z.number(),
+  }),
+  context: AuthContext,
+};
+
+export const JoinCommunity = {
+  input: z.object({
+    community_id: z.string(),
+    referrer_address: z.string().optional(),
+  }),
+  output: z.object({
+    community_id: z.string(),
+    base: z.nativeEnum(ChainBase),
+    address_id: z.number(),
+    address: z.string(),
+    wallet_id: z.nativeEnum(WalletId).optional(),
+    ss58Prefix: z.number().optional(),
+  }),
+};
+
+export const BanAddress = {
+  input: z.object({
+    community_id: z.string(),
+    address: z.string(),
+  }),
+  output: z.object({}),
+  context: AuthContext,
+};
+
+export const PinToken = {
+  input: z.object({
+    community_id: z.string(),
+    contract_address: z.string(),
+    chain_node_id: z.number(),
+  }),
+  output: PinnedToken,
+  context: AuthContext,
+};
+
+export const UnpinToken = {
+  input: z.object({
+    community_id: z.string(),
+  }),
+  output: z.object({}),
+  context: AuthContext,
 };
