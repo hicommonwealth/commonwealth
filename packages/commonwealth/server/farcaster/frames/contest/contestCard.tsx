@@ -49,6 +49,8 @@ export const contestCard = frames(async (ctx) => {
     };
   }
 
+  console.log('contestManager conntests', contestManager.contests);
+
   const leaderboardUrl = buildContestLeaderboardUrl(
     getBaseUrl(config.APP_ENV),
     contestManager.community_id,
