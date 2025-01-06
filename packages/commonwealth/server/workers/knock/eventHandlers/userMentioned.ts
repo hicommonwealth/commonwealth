@@ -101,14 +101,14 @@ export const processUserMentioned: EventHandler<
 
     let thread = payload.thread;
     if (!thread) {
-      thread = (
-        await models.Thread.findOne({
-          attributes: ['title'],
-          where: {
-            id: payload.comment!.thread_id,
-          },
-        })
-      )?.get({ plain: true })!;
+      const threadInstance = await models.Thread.findOne({
+        attributes: ['title'],
+        where: {
+          id: payload.comment!.thread_id,
+        },
+      });
+      if (!threadInstance) throw new Error('Thread not found');
+      thread = threadInstance.get({ plain: true });
     }
 
     await provider.triggerWorkflow({
