@@ -70,6 +70,41 @@
       margin-bottom: 32px;
     }
 
+    .contest-section-farcaster-token {
+      margin-bottom: 32px;
+
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      max-width: 596px;
+
+      .description {
+        color: $neutral-500;
+        margin-top: -8px;
+      }
+
+      .token-input {
+        .MessageRow:first-child {
+          display: none;
+        }
+      }
+
+      .input-row {
+        display: flex;
+        align-items: baseline;
+
+        gap: 8px;
+
+        .Text:first-child {
+          white-space: nowrap;
+        }
+
+        .input-and-icon-container {
+          width: 64px;
+        }
+      }
+    }
+
     .contest-section-duration {
       margin-bottom: 64px;
       display: flex;

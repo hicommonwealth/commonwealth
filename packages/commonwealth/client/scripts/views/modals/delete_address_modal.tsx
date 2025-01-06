@@ -24,6 +24,8 @@ type DeleteAddressModalAttrs = {
   address: AddressInfo;
   chain: string;
   closeModal: () => void;
+  isBulkDelete?: boolean;
+  communityName: string;
 };
 
 export const DeleteAddressModal = ({
@@ -31,6 +33,8 @@ export const DeleteAddressModal = ({
   addresses,
   chain,
   closeModal,
+  isBulkDelete = false,
+  communityName,
 }: DeleteAddressModalAttrs) => {
   const user = useUserStore();
 
@@ -42,11 +46,13 @@ export const DeleteAddressModal = ({
     }
 
     try {
-      const response = await axios.post(`${SERVER_URL}/deleteAddress`, {
-        address: address.address,
-        chain,
-        jwt: user.jwt,
-      });
+      const payload = { address: address?.address, chain, jwt: user.jwt };
+
+      const endpoint = isBulkDelete
+        ? `${SERVER_URL}/deleteAllAddresses`
+        : `${SERVER_URL}/deleteAddress`;
+
+      const response = await axios.post(endpoint, payload);
 
       if (response?.data.status === 'Success') {
         const updatedAddresses = [...user.addresses].filter(
@@ -87,15 +93,21 @@ export const DeleteAddressModal = ({
   return (
     <div className="DeleteAddressModal">
       <CWModalHeader
-        label={`Disconnect ${formatAddressShort(address.address)}`}
+        label={
+          isBulkDelete
+            ? 'Disconnect All Addresses'
+            : `Disconnect ${formatAddressShort(address?.address || '')}`
+        }
         icon="danger"
         onModalClose={closeModal}
       />
       <CWModalBody>
         <CWText>
-          By removing this address you will be leaving the{' '}
-          {address.community.id}. Your contributions and comments will remain.
-          Don&apos;t worry, you can rejoin anytime.
+          {isBulkDelete
+            ? `By leaving ${communityName} you will disconnect all 
+            linked addresses. Your threads will remain intact.`
+            : `By removing this address you will be leaving the ${communityName}. 
+            Your contributions and comments will remain. Don't worry, you can rejoin anytime.`}
         </CWText>
       </CWModalBody>
       <CWModalFooter>
@@ -106,7 +118,7 @@ export const DeleteAddressModal = ({
           buttonHeight="sm"
         />
         <CWButton
-          label="Disconnect Address"
+          label={isBulkDelete ? 'Disconnect All' : 'Disconnect Address'}
           buttonType="destructive"
           onClick={handleDelete}
           buttonHeight="sm"

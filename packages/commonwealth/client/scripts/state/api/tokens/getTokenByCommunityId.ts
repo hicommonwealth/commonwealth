@@ -4,7 +4,7 @@ import { z } from 'zod';
 
 const FETCH_TOKEN_STALE_TIME = 60 * 3_000; // 3 mins
 
-type UseFetchTokensProps = z.infer<typeof GetToken.input> & {
+type UseGetTokenByCommunityIdProps = z.infer<typeof GetToken.input> & {
   enabled?: boolean;
 };
 
@@ -12,8 +12,8 @@ const useGetTokenByCommunityId = ({
   community_id,
   with_stats = true,
   enabled,
-}: UseFetchTokensProps) => {
-  return trpc.token.getToken.useQuery(
+}: UseGetTokenByCommunityIdProps) => {
+  return trpc.launchpadToken.getToken.useQuery(
     {
       community_id,
       with_stats,

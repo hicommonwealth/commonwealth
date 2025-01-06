@@ -11,6 +11,7 @@ import './CWGrowlTemplate.scss';
 
 interface CWGrowlTemplateProps {
   discordLink?: boolean;
+  discordLinkText?: boolean;
   headerText?: string;
   bodyText?: string;
   buttonText?: string;
@@ -25,6 +26,7 @@ interface CWGrowlTemplateProps {
 
 export const CWGrowlTemplate = ({
   discordLink = false,
+  discordLinkText,
   headerText,
   bodyText,
   buttonText,
@@ -106,7 +108,9 @@ export const CWGrowlTemplate = ({
                 isCentered
                 className="body"
               >
-                Have more feedback? Reach out to us on Discord!
+                {discordLinkText
+                  ? 'Have more feedback? Reach out to us on Discord!'
+                  : ''}
               </CWText>
               <a
                 href="https://discord.com/channels/799041511165394986/1099034105997426709"

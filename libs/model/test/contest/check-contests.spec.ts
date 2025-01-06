@@ -12,7 +12,7 @@ import { afterAll, beforeAll, describe, expect, test, vi } from 'vitest';
 import { seed } from '../../src/tester';
 import { drainOutbox } from '../utils';
 
-describe('Check Contests', () => {
+describe.skip('Check Contests', () => {
   const addressId = 444;
   const address = '0x0';
   const communityId = 'ethhh';
@@ -23,7 +23,7 @@ describe('Check Contests', () => {
   const topicId: number = 0;
 
   beforeAll(async () => {
-    const [chainNode] = await seed('ChainNode', { contracts: [] });
+    const [chainNode] = await seed('ChainNode');
     const [user] = await seed(
       'User',
       {

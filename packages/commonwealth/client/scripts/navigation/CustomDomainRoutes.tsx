@@ -68,6 +68,9 @@ const CommunityIntegrations = lazy(
 const CommunityStakeIntegration = lazy(
   () => import('views/pages/CommunityManagement/StakeIntegration'),
 );
+const CommunityTokenIntegration = lazy(
+  () => import('views/pages/CommunityManagement/TokenIntegration'),
+);
 const CommunityTopics = lazy(
   () => import('views/pages/CommunityManagement/Topics'),
 );
@@ -98,6 +101,8 @@ const NewSnapshotProposalPage = lazy(
 const NewProfilePage = lazy(() => import('views/pages/new_profile'));
 const EditNewProfilePage = lazy(() => import('views/pages/edit_new_profile'));
 const ProfilePageRedirect = lazy(() => import('views/pages/profile_redirect'));
+
+const RewardsPage = lazy(() => import('views/pages/RewardsPage'));
 
 const CustomDomainRoutes = ({
   tokenizedCommunityEnabled,
@@ -173,6 +178,11 @@ const CustomDomainRoutes = ({
       key="/myTransactions"
       path="/myTransactions"
       element={withLayout(MyTransactions, { type: 'common' })}
+    />,
+    <Route
+      key="/rewards"
+      path="/rewards"
+      element={withLayout(RewardsPage, { type: 'common' })}
     />,
 
     // NOTIFICATIONS
@@ -295,6 +305,13 @@ const CustomDomainRoutes = ({
       key="/manage/integrations/stake"
       path="/manage/integrations/stake"
       element={withLayout(CommunityStakeIntegration, {
+        scoped: true,
+      })}
+    />,
+    <Route
+      key="/manage/integrations/token"
+      path="/manage/integrations/token"
+      element={withLayout(CommunityTokenIntegration, {
         scoped: true,
       })}
     />,

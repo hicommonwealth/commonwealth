@@ -251,7 +251,8 @@ export const getDepositParams = async (
 ): Promise<CosmosDepositParams> => {
   const govController = cosmosChain.governance as CosmosGovernanceGovgen;
   let minDeposit;
-  const { depositParams } = await cosmosChain.chain.api.gov.params('deposit');
+  const { depositParams } =
+    await cosmosChain.chain.api.govgen.params('deposit');
 
   // TODO: support off-denom deposits
   // @ts-expect-error StrictNullChecks

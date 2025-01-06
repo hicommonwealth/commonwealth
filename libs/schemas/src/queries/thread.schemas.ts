@@ -68,7 +68,6 @@ export const UserView = z.object({
 
   profile: UserProfile,
   xp_points: PG_INT.default(0).nullish(),
-  referral_link: z.string().nullish(),
 
   created_at: z.date().or(z.string()).nullish(),
   updated_at: z.date().or(z.string()).nullish(),
@@ -152,6 +151,10 @@ export const ThreadView = Thread.extend({
   Comments: z.array(CommentView).optional(),
   ThreadVersionHistories: z.array(ThreadVersionHistoryView).nullish(),
   search: z.union([z.string(), z.record(z.any())]).nullish(),
+  total_num_thread_results: z
+    .number()
+    .nullish()
+    .describe('total number of thread results for the query'),
 });
 
 export const OrderByQueriesKeys = z.enum([
