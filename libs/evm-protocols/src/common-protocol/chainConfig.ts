@@ -96,11 +96,11 @@ export const factoryContracts = {
     chainId: 974399131,
   },
   [ValidChains.Anvil]: {
-    factory: '', //TODO: Fix, this is incorrect
-    communityStake: 'temp', //TODO: Fix, this is incorrect
-    launchpad: '0x7a2088a1bfc9d81c55368ae168c2c02570cb814f',
-    lpBondingCurve: '0xdc17c27ae8be831af07cc38c02930007060020f4',
-    tokenCommunityManager: '0x84ea74d481ee0a5332c457a4d796187f6ba67feb',
+    factory: '0xc6e7DF5E7b4f2A278906862b61205850344D4e7d', //TODO: Double check this address
+    communityStake: '0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9', //TODO: Double check this address
+    launchpad: '0x7a2088a1bFc9d81c55368AE168C2C02570cB814F',
+    lpBondingCurve: '0xDC17C27Ae8bE831AF07CC38C02930007060020F4',
+    tokenCommunityManager: '0x84eA74d481Ee0A5332c457a4d796187F6Ba67fEB',
     chainId: 31337,
   },
 } as const satisfies factoryContractsType;

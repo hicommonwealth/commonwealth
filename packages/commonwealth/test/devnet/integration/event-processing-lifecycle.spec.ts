@@ -35,12 +35,12 @@ describe('End to end event tests', () => {
 
       await mineBlocks(1);
 
-      let token = await models.Token.findOne({
+      let token = await models.LaunchpadToken.findOne({
         where: { name: 'testToken' },
       });
       await vi.waitFor(
         async () => {
-          token = await models.Token.findOne({
+          token = await models.LaunchpadToken.findOne({
             where: { name: 'testToken' },
           });
           expect(token).toBeTruthy();

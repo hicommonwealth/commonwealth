@@ -1,8 +1,6 @@
 import { models } from '@hicommonwealth/model';
 import { GenericContainer } from 'testcontainers';
 import Web3 from 'web3';
-import { contractAbiSql } from '../chain-info/contractAbis';
-import { evmEventSources } from '../chain-info/evmEventSources';
 
 export const imageUrl = 'public.ecr.aws/f8g0x5p7/commonwealth-anvil:72bdcb7';
 
@@ -55,10 +53,6 @@ export async function setupAnvil() {
         NOW()
       )
     `);
-
-    // populate with ABIs
-    await models.sequelize.query(contractAbiSql);
-    await models.sequelize.query(evmEventSources);
 
     await models.sequelize.query(`
         INSERT INTO "LastProcessedEvmBlocks" (chain_node_id, block_number)
