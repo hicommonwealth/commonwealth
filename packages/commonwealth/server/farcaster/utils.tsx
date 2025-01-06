@@ -124,3 +124,52 @@ export const commonLogo = (
     </svg>
   </div>
 );
+
+export const FrameLayout = ({
+  header,
+  children,
+}: {
+  header: React.ReactNode;
+  children: React.ReactNode;
+}) => {
+  return (
+    <div
+      style={{
+        backgroundColor: '#F1CB00',
+        color: 'black',
+        padding: '40px',
+        display: 'flex',
+        flexDirection: 'column',
+        width: '100%',
+        height: '100%',
+        lineHeight: '0.5',
+      }}
+    >
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          flexDirection: 'row',
+          marginRight: '40px',
+          gap: '20px',
+        }}
+      >
+        <p
+          style={{
+            lineHeight: '1.2',
+            fontSize: '56px',
+            marginRight: '20px',
+          }}
+        >
+          {header}
+        </p>
+
+        <div style={{ display: 'flex', width: '50px', height: '50px' }}>
+          {commonLogo}
+        </div>
+      </div>
+
+      {children}
+    </div>
+  );
+};
