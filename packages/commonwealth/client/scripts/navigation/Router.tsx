@@ -36,9 +36,7 @@ const Router = () => {
       ...(isCustomDomain
         ? CustomDomainRoutes(flags)
         : CommonDomainRoutes(flags)),
-      <>
-        <Route key="routes" path="*" element={withLayout(PageNotFound, {})} />,
-      </>,
+      <Route key="routes" path="*" element={withLayout(PageNotFound, {})} />,
     ]),
   );
 };
