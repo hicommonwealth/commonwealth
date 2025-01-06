@@ -110,6 +110,7 @@ export const processUserMentioned: EventHandler<
       if (!threadInstance) throw new Error('Thread not found');
       thread = threadInstance.get({ plain: true });
     }
+    if (!thread.id) throw new Error('Missing thread id');
 
     await provider.triggerWorkflow({
       key: WorkflowKeys.Webhooks,
@@ -143,7 +144,7 @@ export const processUserMentioned: EventHandler<
             ? payload.thread!.content_url
             : payload.comment!.content_url,
         content_type: 'thread' in payload ? 'thread' : 'comment',
-        thread_id: thread.id!,
+        thread_id: thread.id,
         comment_id: payload.comment?.id,
         author_user_id: user.id!,
       },
