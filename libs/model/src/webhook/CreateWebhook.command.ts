@@ -21,7 +21,7 @@ const log = logger(import.meta);
 const Errors = {
   InvalidWebhookUrl:
     'Invalid Webhook url. Must be one of: https://api.telegram.org/*, ' +
-    'https://hooks.slack.com/services/*, https://hooks.zapier.com/hooks/*, https://discord.com/api/webhooks/*',
+    'https://hooks.slack.com/services/*, https://hooks.zapier.com/hooks/*, https://discord.com/api/webhooks/*, https://*/eliza/[user-id]',
   WebhookExists: 'The provided webhook already exists for this community',
   MissingChannelIdTelegram: 'The Telegram url is missing a channel id',
   WebhookNotFound: 'The Webhook does not exist',
@@ -88,7 +88,7 @@ export function CreateWebhook(): Command<typeof schemas.CreateWebhook> {
         if (!elizaUser) throw new InvalidState(Errors.ElizaUserNotFound);
         if (
           !Array.isArray(elizaUser.Addresses) ||
-          elizaUser.Addresses.length > 0
+          elizaUser.Addresses.length < 1
         )
           throw new InvalidState(Errors.ElizaAddressNotFound);
 
