@@ -5,6 +5,7 @@ import React from 'react';
 
 import { buildContestLeaderboardUrl, getBaseUrl } from '@hicommonwealth/shared';
 import { frames } from '../../config';
+import { commonLogo } from '../../utils';
 
 export const contestCard = frames(async (ctx) => {
   const contest_address = ctx.url.pathname.split('/')[1];
@@ -81,8 +82,8 @@ export const contestCard = frames(async (ctx) => {
     image: (
       <div
         style={{
-          backgroundColor: '#2A2432',
-          color: 'white',
+          backgroundColor: '#F1CB00',
+          color: 'black',
           padding: '40px',
           display: 'flex',
           flexDirection: 'column',
@@ -91,14 +92,29 @@ export const contestCard = frames(async (ctx) => {
           lineHeight: '0.5',
         }}
       >
-        <p
+        <div
           style={{
-            lineHeight: '1.2',
-            fontSize: '56px',
+            display: 'flex',
+            justifyContent: 'space-between',
+            flexDirection: 'row',
+            marginRight: '40px',
+            gap: '20px',
           }}
         >
-          {contestManager.name}
-        </p>
+          <p
+            style={{
+              lineHeight: '1.2',
+              fontSize: '56px',
+              marginRight: '20px',
+            }}
+          >
+            {contestManager.name}
+          </p>
+
+          <div style={{ display: 'flex', width: '50px', height: '50px' }}>
+            {commonLogo}
+          </div>
+        </div>
 
         {contestManager.description && (
           <p
@@ -111,7 +127,28 @@ export const contestCard = frames(async (ctx) => {
           </p>
         )}
 
-        <p style={{ fontSize: '42px' }}>Check prizes below 👇</p>
+        <p
+          style={{
+            fontSize: '42px',
+            display: 'flex',
+            justifyContent: 'flex-end',
+            alignItems: 'center',
+          }}
+        >
+          Contest by {contestManager.Community?.name}
+          {contestManager.Community?.icon_url && (
+            <img
+              src={contestManager.Community?.icon_url}
+              alt=""
+              style={{
+                width: '64px',
+                height: '64px',
+                borderRadius: '50%',
+                marginLeft: '10px',
+              }}
+            />
+          )}
+        </p>
       </div>
     ),
     buttons: [
