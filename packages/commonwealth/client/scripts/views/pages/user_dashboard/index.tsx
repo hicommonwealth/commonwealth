@@ -98,7 +98,7 @@ const UserDashboard = ({ type }: UserDashboardProps) => {
         <CWText type="h2" fontWeight="medium" className="page-header">
           Home
         </CWText>
-        <div className="content">
+        <div className="contentContainer">
           <div className="user-dashboard-activity">
             <div className="dashboard-header" id="dashboard-header">
               <CWTabsRow>
