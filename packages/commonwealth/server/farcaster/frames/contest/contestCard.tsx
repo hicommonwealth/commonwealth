@@ -5,7 +5,7 @@ import React from 'react';
 
 import { buildContestLeaderboardUrl, getBaseUrl } from '@hicommonwealth/shared';
 import { frames } from '../../config';
-import { commonLogo } from '../../utils';
+import { FrameLayout } from '../../utils';
 
 export const contestCard = frames(async (ctx) => {
   const contest_address = ctx.url.pathname.split('/')[1];
@@ -80,76 +80,50 @@ export const contestCard = frames(async (ctx) => {
   return {
     title: contestManager.name,
     image: (
-      <div
-        style={{
-          backgroundColor: '#F1CB00',
-          color: 'black',
-          padding: '40px',
-          display: 'flex',
-          flexDirection: 'column',
-          width: '100%',
-          height: '100%',
-          lineHeight: '0.5',
-        }}
-      >
+      <FrameLayout header={contestManager.name}>
         <div
           style={{
             display: 'flex',
+            flexDirection: 'column',
             justifyContent: 'space-between',
-            flexDirection: 'row',
-            marginRight: '40px',
-            gap: '20px',
+            flexGrow: 1,
           }}
         >
-          <p
-            style={{
-              lineHeight: '1.2',
-              fontSize: '56px',
-              marginRight: '20px',
-            }}
-          >
-            {contestManager.name}
-          </p>
-
-          <div style={{ display: 'flex', width: '50px', height: '50px' }}>
-            {commonLogo}
-          </div>
-        </div>
-
-        {contestManager.description && (
-          <p
-            style={{
-              fontSize: '32px',
-              lineHeight: '1.2',
-            }}
-          >
-            {contestManager.description}
-          </p>
-        )}
-
-        <p
-          style={{
-            fontSize: '42px',
-            display: 'flex',
-            justifyContent: 'flex-end',
-            alignItems: 'center',
-          }}
-        >
-          Contest by {contestManager.Community?.name}
-          {contestManager.Community?.icon_url && (
-            <img
-              src={contestManager.Community?.icon_url}
-              alt=""
+          {contestManager.description && (
+            <p
               style={{
-                width: '64px',
-                height: '64px',
-                borderRadius: '50%',
-                marginLeft: '10px',
+                fontSize: '32px',
+                lineHeight: '1.2',
               }}
-            />
+            >
+              {contestManager.description}
+            </p>
           )}
-        </p>
-      </div>
+
+          <p
+            style={{
+              fontSize: '42px',
+              display: 'flex',
+              justifyContent: 'flex-end',
+              alignItems: 'center',
+            }}
+          >
+            Contest by {contestManager.Community?.name}
+            {contestManager.Community?.icon_url && (
+              <img
+                src={contestManager.Community?.icon_url}
+                alt=""
+                style={{
+                  width: '80px',
+                  height: '80px',
+                  borderRadius: '50%',
+                  marginLeft: '16px',
+                }}
+              />
+            )}
+          </p>
+        </div>
+      </FrameLayout>
     ),
     buttons: [
       <Button key="leaderboard" action="link" target={leaderboardUrl}>
