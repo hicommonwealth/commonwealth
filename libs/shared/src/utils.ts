@@ -320,28 +320,6 @@ export const renderQuillDeltaToText = (
     .join(paragraphSeparator);
 };
 
-export function getWebhookDestination(webhookUrl = ''): string {
-  if (!/^https?:\/\/[^\s/$.?#].[^\s]*$/.test(webhookUrl)) return 'unknown';
-
-  let destination = 'unknown';
-  if (
-    webhookUrl.startsWith('https://discord.com/api/webhooks/') ||
-    webhookUrl.startsWith('https://discordapp.com/api/webhooks/')
-  )
-    destination = 'discord';
-  else if (webhookUrl.startsWith('https://hooks.slack.com/'))
-    destination = 'slack';
-  else if (webhookUrl.startsWith('https://hooks.zapier.com/'))
-    destination = 'zapier';
-  else if (webhookUrl.startsWith('https://api.telegram.org/@')) {
-    const [, channelId] = webhookUrl.split('/@');
-    if (!channelId) destination = 'unknown';
-    else destination = 'telegram';
-  }
-
-  return destination;
-}
-
 export function getDecodedString(str: string) {
   try {
     return decodeURIComponent(str);

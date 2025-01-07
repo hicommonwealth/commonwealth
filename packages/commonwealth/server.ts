@@ -91,7 +91,11 @@ const start = async () => {
       }
 
       // checking the DYNO env var ensures this only runs on one dyno
-      if (config.APP_ENV === 'production' && process.env.DYNO === 'web.1') {
+      if (
+        config.APP_ENV === 'production' &&
+        process.env.DYNO === 'web.1' &&
+        config.ENABLE_CLIENT_PUBLISHING
+      ) {
         const { dispatchSDKPublishWorkflow } = await import(
           './server/util/dispatchSDKPublishWorkflow'
         );

@@ -1,16 +1,6 @@
 import useUserStore from 'client/scripts/state/ui/user';
+import { useReactNativeWebView } from 'hooks/useReactNativeWebView';
 import { useEffect, useState } from 'react';
-
-interface ReactNativeWebView {
-  // allows us to send messages to ReactNative.
-  postMessage: (message: string) => void;
-}
-
-declare global {
-  interface Window {
-    ReactNativeWebView?: ReactNativeWebView;
-  }
-}
 
 /**
  * Typed message so that the react-native client knows how to handel this message.
@@ -44,6 +34,7 @@ type UserInfo = {
  */
 export const ReactNativeBridgeUser = () => {
   const user = useUserStore();
+  const reactNativeWebView = useReactNativeWebView();
 
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
 
@@ -62,11 +53,11 @@ export const ReactNativeBridgeUser = () => {
       data: userInfo,
     };
 
-    if (window.ReactNativeWebView && userInfo) {
+    if (reactNativeWebView && userInfo) {
       // send the user information to react native now.
-      window.ReactNativeWebView.postMessage(JSON.stringify(message));
+      reactNativeWebView.postMessage(JSON.stringify(message));
     }
-  }, [userInfo]);
+  }, [reactNativeWebView, userInfo]);
 
   return null;
 };
