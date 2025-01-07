@@ -22,6 +22,8 @@
     "lint-diff": "NODE_OPTIONS=\"--max-old-space-size=4096\" eslint -c ../../.eslintrc-diff.cjs './src/**/*.{ts,tsx}'"
   },
   "dependencies": {
+    "@alchemy/aa-alchemy": "^3.17.0",
+    "@alchemy/aa-core": "^3.16.0",
     "@ethersproject/bignumber": "^5.7.0",
     "@hicommonwealth/shared": "workspace:*",
     "moment": "^2.23.0",

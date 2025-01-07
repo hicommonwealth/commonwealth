@@ -1,3 +1,5 @@
+import Web3 from 'web3';
+
 export const calculateVoteWeight = (
   balance: string, // should be in wei
   voteWeight: number = 0,
@@ -12,6 +14,15 @@ export const calculateVoteWeight = (
 export enum Denominations {
   'ETH' = 'ETH',
 }
+
 export const WeiDecimals: Record<Denominations, number> = {
   ETH: 18,
+};
+
+export const getAddressFromSignedMessage = (
+  message: string,
+  signature: string,
+): string => {
+  const web3 = new Web3();
+  return web3.eth.accounts.recover(message, signature);
 };
