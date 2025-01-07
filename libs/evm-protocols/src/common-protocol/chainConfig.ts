@@ -10,6 +10,7 @@ export enum ValidChains {
   Arbitrum = 42161,
   BSC = 56,
   SKALE_TEST = 974399131,
+  Anvil = 31337,
 }
 
 /**
@@ -95,5 +96,13 @@ export const factoryContracts = {
     factory: '0x16da329328d9816b5e68D96Ec5944D939ed9727E',
     communityStake: '0xC49eEcf7af055c4dfA3E918662D9BbAC45544BD6',
     chainId: 974399131,
+  },
+  [ValidChains.Anvil]: {
+    factory: '0xc6e7DF5E7b4f2A278906862b61205850344D4e7d', //TODO: Double check this address
+    communityStake: '0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9', //TODO: Double check this address
+    launchpad: '0x7a2088a1bFc9d81c55368AE168C2C02570cB814F',
+    lpBondingCurve: '0xDC17C27Ae8bE831AF07CC38C02930007060020F4',
+    tokenCommunityManager: '0x84eA74d481Ee0A5332c457a4d796187F6Ba67fEB',
+    chainId: 31337,
   },
 } as const satisfies factoryContractsType;
