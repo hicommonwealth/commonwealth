@@ -6,7 +6,9 @@ import { mustBeAuthorizedComment } from '../middleware/guards';
 export function SetCommentSpam(): Command<typeof schemas.SetCommentSpam> {
   return {
     ...schemas.SetCommentSpam,
-    auth: [authComment({ author: true })],
+    auth: [
+      authComment({ author: true, roles: ['admin', 'moderator', 'member'] }),
+    ],
     body: async ({ actor, payload, context }) => {
       const { comment } = mustBeAuthorizedComment(actor, context);
 
