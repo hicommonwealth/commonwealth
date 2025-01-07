@@ -68,14 +68,6 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
 
-
-      - name: Install Heroku CLI
-        run: |
-          curl https://cli-assets.heroku.com/install.sh | sh
-
-      - name: Verify Heroku CLI Installation
-        run: heroku --version
-
       - uses: ./.github/actions/e2e
 
       - name: Run e2e tests
