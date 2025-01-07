@@ -119,7 +119,6 @@ export const CommentView = Comment.extend({
   marked_as_spam_at: z.date().or(z.string()).nullish(),
   Address: AddressView.nullish(),
   Thread: z.undefined(),
-  address_id: z.undefined(),
   community_id: z.string(),
   last_active: z.date().or(z.string()).nullish(),
   Reaction: ReactionView.nullish(),

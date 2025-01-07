@@ -91,13 +91,12 @@ export function GetUserProfile(): Query<typeof schemas.GetUserProfile> {
             ...c.toJSON(),
             user_id: c.Address!.user_id!,
             address: c.Address!.address!,
+            last_active: c.Address!.last_active!,
             Thread: undefined,
             search: undefined,
             community_id: c.Thread!.community_id,
           };
-          return comment as unknown as z.infer<
-            typeof schemas.UserProfileCommentView
-          >;
+          return comment as unknown as z.infer<typeof schemas.CommentView>;
         }),
         commentThreads: commentThreads.map(
           (c) => c.toJSON() as z.infer<typeof schemas.ThreadView>,

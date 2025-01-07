@@ -44,6 +44,7 @@ export function GetComments(): Query<typeof schemas.GetComments> {
             C.thread_id,
             C.comment_level,
             C.reply_count,
+            C.address_id,
             CA.address,
             CA.last_active,
             CA.community_id,
