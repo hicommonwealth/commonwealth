@@ -4,6 +4,7 @@
 module.exports = {
   async up(queryInterface, Sequelize) {
     return queryInterface.sequelize.transaction(async (t) => {
+      console.time('add-columns');
       await queryInterface.addColumn(
         'Comments',
         'comment_level',
@@ -25,8 +26,10 @@ module.exports = {
         },
         { transaction: t },
       );
+      console.timeEnd('add-columns');
 
       // set comment levels
+      console.time('set-comment-levels');
       await queryInterface.sequelize.query(
         `
           WITH RECURSIVE comment_hierarchy AS (
@@ -50,27 +53,29 @@ module.exports = {
           transaction: t,
         },
       );
-
-      await queryInterface.addIndex(
-        'Comments',
-        { fields: ['parent_id'] },
-        { transaction: t },
-      );
+      console.timeEnd('set-comment-levels');
 
       // set reply counts
+      console.time('set-reply-counts');
       await queryInterface.sequelize.query(
         `
-          UPDATE "Comments" C1
-          SET reply_count = (
-              SELECT COUNT(id)
-              FROM "Comments" C2
-              WHERE C2.parent_id IS NOT NULL AND CAST(C2.parent_id AS INTEGER) = C1.id
-          );
+            WITH reply_counts AS (
+                SELECT CAST(parent_id AS INTEGER) AS parent_id_int,
+                       COUNT(*) AS total_replies
+                FROM "Comments"
+                WHERE parent_id IS NOT NULL
+                GROUP BY CAST(parent_id AS INTEGER)
+            )
+            UPDATE "Comments" AS C1
+            SET reply_count = COALESCE(rc.total_replies, 0)
+            FROM reply_counts rc
+            WHERE C1.id = rc.parent_id_int;
         `,
         {
           transaction: t,
         },
       );
+      console.timeEnd('set-reply-counts');
     });
   },
 
