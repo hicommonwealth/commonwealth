@@ -1,10 +1,9 @@
 import { commonProtocol } from '@hicommonwealth/evm-protocols';
-import { WalletId } from '@hicommonwealth/shared';
 import { saveToClipboard } from 'client/scripts/utils/clipboard';
 import clsx from 'clsx';
 import { findDenominationIcon } from 'helpers/findDenomination';
 import { useBrowserAnalyticsTrack } from 'hooks/useBrowserAnalyticsTrack';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { isMobile } from 'react-device-detect';
 import {
   BaseMixpanelPayload,
@@ -133,15 +132,7 @@ const StakeExchangeForm = ({
 
   const userData = useUserStore();
 
-  const [hasMagic, setHasMagic] = useState(false);
-
-  useEffect(() => {
-    const currentAddressInfo = userData.addresses?.find(
-      (addr) => addr.address === userData.activeAccount?.address,
-    );
-    const usingMagic = currentAddressInfo?.walletId === WalletId.Magic;
-    setHasMagic(usingMagic);
-  }, [userData.addresses, userData, hasMagic]);
+  const hasMagic = userData.hasMagicWallet;
 
   const { trackAnalytics } = useBrowserAnalyticsTrack<BaseMixpanelPayload>({
     onAction: true,
