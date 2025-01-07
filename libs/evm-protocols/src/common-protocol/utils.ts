@@ -1,4 +1,4 @@
-import Web3 from 'web3';
+import Web3, { AbiInput, TransactionReceipt } from 'web3';
 
 export const calculateVoteWeight = (
   balance: string, // should be in wei
@@ -25,4 +25,26 @@ export const getAddressFromSignedMessage = (
 ): string => {
   const web3 = new Web3();
   return web3.eth.accounts.recover(message, signature);
+};
+
+export const getTransactionReceipt = async ({
+  rpc,
+  txHash,
+}: {
+  rpc: string;
+  txHash: string;
+}): Promise<TransactionReceipt> => {
+  const web3 = new Web3(rpc);
+  return await web3.eth.getTransactionReceipt(txHash);
+};
+
+export const decodeParameters = ({
+  abiInput,
+  data,
+}: {
+  abiInput: AbiInput[];
+  data: string;
+}) => {
+  const web3 = new Web3();
+  return web3.eth.abi.decodeParameters(abiInput, data);
 };

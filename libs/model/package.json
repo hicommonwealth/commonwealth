@@ -23,8 +23,6 @@
     "lint-diff": "NODE_OPTIONS=\"--max-old-space-size=4096\" eslint -c ../../.eslintrc-diff.cjs './src/**/*.{ts,tsx}'"
   },
   "dependencies": {
-    "@alchemy/aa-alchemy": "^3.17.0",
-    "@alchemy/aa-core": "^3.16.0",
     "@anatine/zod-mock": "^3.13.3",
     "@canvas-js/interfaces": "^0.12.1",
     "@canvas-js/signatures": "^0.12.1",
