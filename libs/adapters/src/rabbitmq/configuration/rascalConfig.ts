@@ -72,7 +72,7 @@ export function getAllRascalConfigs(
     retry: {
       delay: 1000,
     },
-    prefetch: 1,
+    prefetch: 10,
   };
 
   const publicationConfig = {
