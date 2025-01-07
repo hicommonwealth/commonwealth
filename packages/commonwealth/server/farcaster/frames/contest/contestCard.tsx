@@ -12,7 +12,7 @@ export const contestCard = frames(async (ctx) => {
 
   const contestManager = await query(Contest.GetContest(), {
     actor: { user: { email: '' } },
-    payload: { contest_address, with_chain_node: true },
+    payload: { contest_address, with_chain_node: true, with_contests: true },
   });
 
   if (!contestManager) {
@@ -49,13 +49,13 @@ export const contestCard = frames(async (ctx) => {
     };
   }
 
-  console.log('contestManager conntests', contestManager.contests);
-
   const leaderboardUrl = buildContestLeaderboardUrl(
     getBaseUrl(config.APP_ENV),
     contestManager.community_id,
     contestManager.contest_address,
   );
+
+  const endTime = contestManager.contests?.[0]?.end_time;
 
   return {
     title: contestManager.name,
@@ -72,11 +72,22 @@ export const contestCard = frames(async (ctx) => {
           {contestManager.description && (
             <p
               style={{
-                fontSize: '32px',
+                fontSize: '36px',
                 lineHeight: '1.2',
               }}
             >
               {contestManager.description}
+            </p>
+          )}
+
+          {endTime && (
+            <p
+              style={{
+                fontSize: '30px',
+                lineHeight: '1.2',
+              }}
+            >
+              Submit entries by replying below until {endTime.toLocaleString()}
             </p>
           )}
 
