@@ -38,7 +38,7 @@ export function GetContest(): Query<typeof schemas.GetContest> {
       });
 
       if (contestManager?.contests) {
-        contestManager.contests.forEach((contest: any) => {
+        contestManager.contests.forEach((contest) => {
           contest.start_time = new Date(contest.start_time);
           contest.end_time = new Date(contest.end_time);
         });
