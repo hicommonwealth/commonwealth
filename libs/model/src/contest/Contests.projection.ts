@@ -4,6 +4,7 @@ import {
   ChildContractNames,
   EvmEventSignatures,
   commonProtocol as cp,
+  getTokenAttributes,
 } from '@hicommonwealth/evm-protocols';
 import { config } from '@hicommonwealth/model';
 import { ContestScore, events } from '@hicommonwealth/schemas';
@@ -75,12 +76,11 @@ async function updateOrCreateWithAlert(
     return;
   }
 
-  const { ticker, decimals } =
-    await protocol.contractHelpers.getTokenAttributes(
-      contest_address,
-      url,
-      true,
-    );
+  const { ticker, decimals } = await getTokenAttributes(
+    contest_address,
+    url,
+    true,
+  );
 
   const { startTime, endTime } = await protocol.contestHelper.getContestStatus(
     url,

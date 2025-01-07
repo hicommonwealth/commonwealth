@@ -1,12 +1,14 @@
 import { InvalidState, type Command } from '@hicommonwealth/core';
-import { commonProtocol as cp } from '@hicommonwealth/evm-protocols';
+import {
+  commonProtocol as cp,
+  getTokenAttributes,
+} from '@hicommonwealth/evm-protocols';
 import { config } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import { buildFarcasterContestFrameUrl } from '@hicommonwealth/shared';
 import { models } from '../database';
 import { mustExist } from '../middleware/guards';
 import { TokenAttributes } from '../services';
-import { contractHelpers } from '../services/commonProtocol';
 import { deployERC20Contest } from '../services/commonProtocol/contestHelper';
 import { parseBotCommand } from '../services/openai/parseBotCommand';
 
@@ -38,7 +40,7 @@ export function CreateContest(): Command<typeof schemas.CreateBotContest> {
 
       let tokenMetadata: TokenAttributes;
       try {
-        tokenMetadata = await contractHelpers.getTokenAttributes(
+        tokenMetadata = await getTokenAttributes(
           contestMetadata.tokenAddress,
           community!.ChainNode!.private_url!,
           false,
