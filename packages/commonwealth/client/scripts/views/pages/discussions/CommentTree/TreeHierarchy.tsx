@@ -213,7 +213,9 @@ export const TreeHierarchy = ({
                   containerClassName="m-auto"
                   label="Load more"
                   disabled={isLoadingComments}
-                  onClick={() => !isLoadingComments && fetchMoreComments()}
+                  onClick={() => {
+                    !isLoadingComments && fetchMoreComments();
+                  }}
                 />
               ) : (
                 <></>
