@@ -3,6 +3,7 @@ import { Button } from 'frames.js/express';
 import moment from 'moment';
 import React from 'react';
 import { frames } from '../../config';
+import { FrameLayout } from '../../utils';
 
 const PrizeRow = ({
   index,
@@ -62,26 +63,15 @@ export const contestPrizes = frames(async (ctx) => {
     return {
       title: 'N/A',
       image: (
-        <div
-          style={{
-            backgroundColor: '#2A2432',
-            color: 'white',
-            padding: '40px',
-            display: 'flex',
-            flexDirection: 'column',
-            width: '100%',
-            height: '100%',
-            lineHeight: '0.5',
-          }}
-        >
+        <FrameLayout header="Contest not found">
           <p
             style={{
-              fontSize: '56px',
+              fontSize: '32px',
             }}
           >
-            Not Found
+            Try to run the contest again.
           </p>
-        </div>
+        </FrameLayout>
       ),
     };
   }
@@ -106,20 +96,7 @@ export const contestPrizes = frames(async (ctx) => {
   return {
     title: contestManager.name,
     image: (
-      <div
-        style={{
-          backgroundColor: '#2A2432',
-          color: 'white',
-          padding: '40px',
-          display: 'flex',
-          flexDirection: 'column',
-          width: '100%',
-          height: '100%',
-          lineHeight: '0.5',
-        }}
-      >
-        <p style={{ fontSize: '42px' }}>Current Prizes</p>
-
+      <FrameLayout header="Current Prizes">
         {prizes.length ? (
           prizes.map((prize, index) => (
             <PrizeRow
@@ -131,8 +108,8 @@ export const contestPrizes = frames(async (ctx) => {
           ))
         ) : (
           <p style={{ fontSize: '32px' }}>Contest has no prizes yet.</p>
-        )}
-      </div>
+        )}{' '}
+      </FrameLayout>
     ),
     buttons: [
       <Button

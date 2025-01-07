@@ -30,6 +30,7 @@ export const GetContest = {
   input: z.object({
     contest_address: z.string(),
     with_chain_node: z.boolean().optional(),
+    with_contests: z.boolean().optional(),
   }),
   output: ContestManager.extend({
     Community: Community.extend({
