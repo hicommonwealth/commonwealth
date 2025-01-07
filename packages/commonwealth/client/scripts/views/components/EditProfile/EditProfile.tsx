@@ -18,10 +18,7 @@ import { AvatarUpload } from '../Avatar';
 import { LinksArray, useLinksArray } from '../LinksArray';
 import { PreferenceTags, usePreferenceTags } from '../PreferenceTags';
 import { UserTrainingCardTypes } from '../UserTrainingSlider/types';
-import {
-  CWCoverImageUploader,
-  ImageBehavior,
-} from '../component_kit/cw_cover_image_uploader';
+import { CWImageInput, ImageBehavior } from '../component_kit/CWImageInput';
 import { CWDivider } from '../component_kit/cw_divider';
 import { CWText } from '../component_kit/cw_text';
 import { CWButton } from '../component_kit/new_designs/CWButton';
@@ -46,12 +43,11 @@ const EditProfile = () => {
   const user = useUserStore();
 
   const [profile, setProfile] = useState<NewProfile>();
-  const [avatarUrl, setAvatarUrl] = useState();
+  const [avatarUrl, setAvatarUrl] = useState<string>();
   const [addresses, setAddresses] = useState<AddressInfo[]>();
   const [isUploadingProfileImage, setIsUploadingProfileImage] = useState(false);
   const [isUploadingCoverImage, setIsUploadingCoverImage] = useState(false);
-  const [backgroundImageBehaviour, setBackgroundImageBehaviour] =
-    useState<ImageBehavior>();
+  const [imageBehavior, setImageBehavior] = useState<ImageBehavior>();
 
   const {
     areLinksValid,
@@ -88,7 +84,6 @@ const EditProfile = () => {
     refetch,
   } = useFetchProfileByIdQuery({
     apiCallEnabled: user.isLoggedIn,
-    shouldFetchSelfProfile: true,
   });
 
   useEffect(() => {
@@ -124,6 +119,10 @@ const EditProfile = () => {
           canUpdate: true,
           canDelete: true,
         })),
+      );
+      setImageBehavior(
+        (data?.profile?.background_image?.imageBehavior as ImageBehavior) ||
+          ImageBehavior.Fill,
       );
       setAddresses(
         // @ts-expect-error <StrictNullChecks/>
@@ -174,7 +173,7 @@ const EditProfile = () => {
       const backgroundImage = values.backgroundImg.trim()
         ? JSON.stringify({
             url: values.backgroundImg.trim(),
-            imageBehavior: backgroundImageBehaviour,
+            imageBehavior: imageBehavior,
           })
         : null;
 
@@ -280,13 +279,9 @@ const EditProfile = () => {
                     uploadStartedCallback={() =>
                       setIsUploadingProfileImage(true)
                     }
-                    uploadCompleteCallback={(files) => {
+                    uploadCompleteCallback={(uploadUrl: string) => {
                       setIsUploadingProfileImage(false);
-                      files.forEach((f) => {
-                        if (!f.uploadURL) return;
-                        const url = f.uploadURL.replace(/\?.*/, '').trim();
-                        setAvatarUrl(url);
-                      });
+                      setAvatarUrl(uploadUrl);
                     }}
                   />
                 </div>
@@ -341,23 +336,25 @@ const EditProfile = () => {
               description="Express yourself through imagery."
             >
               <CWText fontWeight="medium">Add a background image </CWText>
-              {/* TODO: add option to remove existing image */}
-              <CWCoverImageUploader
+              {/* can add option to remove existing image if needed */}
+              <CWImageInput
                 name="backgroundImg"
                 hookToForm
-                enableGenerativeAI
-                showUploadAndGenerateText
-                defaultImageBehaviour={
-                  (data?.profile?.background_image
-                    ?.imageBehavior as ImageBehavior) || ImageBehavior.Fill
+                withAIImageGeneration
+                imageBehavior={imageBehavior}
+                onImageProcessingChange={({ isGenerating, isUploading }) =>
+                  setIsUploadingCoverImage(isGenerating || isUploading)
                 }
-                onImageProcessStatusChange={setIsUploadingCoverImage}
-                onImageBehaviourChange={setBackgroundImageBehaviour}
+                onImageUploaded={console.log}
+                onImageBehaviorChange={setImageBehavior}
+                allowedImageBehaviours={['Fill', 'Tiled']}
+                canSelectImageBehavior
+                containerClassname="background-img-field"
               />
             </ProfileSection>
             <ProfileSection
-              title="Linked addresses"
-              description="Manage your addresses."
+              title="Manage your addresses"
+              description="Connect or disconnect your addresses and manage your community memberships here."
             >
               <LinkedAddresses
                 // @ts-expect-error <StrictNullChecks/>

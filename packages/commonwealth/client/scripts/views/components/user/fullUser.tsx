@@ -1,7 +1,7 @@
 import { ChainBase, DEFAULT_NAME } from '@hicommonwealth/shared';
 import ghostSvg from 'assets/img/ghost.svg';
+import { saveToClipboard } from 'client/scripts/utils/clipboard';
 import clsx from 'clsx';
-import 'components/user/user.scss';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import app from 'state';
@@ -15,9 +15,12 @@ import CWPopover, {
 import { formatAddressShort } from '../../../../../shared/utils';
 import Permissions from '../../../utils/Permissions';
 import { BanUserModal } from '../../modals/ban_user_modal';
+import { CWIconButton } from '../component_kit/cw_icon_button';
 import { CWText } from '../component_kit/cw_text';
 import { CWModal } from '../component_kit/new_designs/CWModal';
+import { CWTooltip } from '../component_kit/new_designs/CWTooltip';
 import { UserSkeleton } from './UserSkeleton';
+import './user.scss';
 import { FullUserAttrsWithSkeletonProp } from './user.types';
 
 // TODO: When we remove all usages of User component (user.tsx). We should rename this file and component to User
@@ -57,7 +60,6 @@ export const FullUser = ({
       />
     );
   }
-
   const fullAddress = formatAddressShort(userAddress, userCommunityId);
   const redactedAddress = formatAddressShort(
     userAddress,
@@ -65,6 +67,7 @@ export const FullUser = ({
     true,
     undefined,
     app.chain?.meta?.bech32_prefix || '',
+    true,
   );
   const showAvatar = profile ? !shouldHideAvatar : false;
   const loggedInUserIsAdmin =
@@ -172,7 +175,6 @@ export const FullUser = ({
       }
     </div>
   );
-
   const userPopover = (
     <>
       {profile && (
@@ -208,9 +210,43 @@ export const FullUser = ({
               </Link>
             )}
           </div>
-          {profile?.address && (
-            <div className="user-address">{redactedAddress}</div>
+          {profile?.name && (
+            <Link
+              className="user-address"
+              to={`/profile/id/${profile?.userId}`}
+            >
+              {profile?.name}
+            </Link>
           )}
+          {profile?.address && (
+            <div className="address-container">
+              <div className="user-address">
+                {redactedAddress}
+                <CWTooltip
+                  placement="top"
+                  content="address copied!"
+                  renderTrigger={(handleInteraction, isTooltipOpen) => {
+                    return (
+                      <CWIconButton
+                        iconName="copySimple"
+                        onClick={(event) => {
+                          saveToClipboard(userAddress).catch(console.error);
+                          handleInteraction(event);
+                        }}
+                        onMouseLeave={(e) => {
+                          if (isTooltipOpen) {
+                            handleInteraction(e);
+                          }
+                        }}
+                        className="copy-icon"
+                      />
+                    );
+                  }}
+                />
+              </div>
+            </div>
+          )}
+
           {friendlyCommunityName && (
             <div className="user-chain">{friendlyCommunityName}</div>
           )}

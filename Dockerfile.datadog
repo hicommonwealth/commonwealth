@@ -1,4 +1,4 @@
-FROM node:20-slim AS datadog-base
+FROM node:22-slim AS datadog-base
 
 # Install Datadog dependencies
 RUN apt-get update && apt-get install -y gnupg apt-transport-https gpg-agent curl ca-certificates

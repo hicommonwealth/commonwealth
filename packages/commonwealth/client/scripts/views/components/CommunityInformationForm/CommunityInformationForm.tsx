@@ -3,9 +3,9 @@ import { slugifyPreserveDashes } from 'utils';
 
 import { useFetchConfigurationQuery } from 'state/api/configuration';
 import {
-  CWCoverImageUploader,
+  CWImageInput,
   ImageBehavior,
-} from 'views/components/component_kit/cw_cover_image_uploader';
+} from 'views/components/component_kit/CWImageInput';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTextArea } from 'views/components/component_kit/cw_text_area';
@@ -21,6 +21,7 @@ import {
   ETHEREUM_MAINNET_ID,
   OSMOSIS_ID,
   POLYGON_ETH_CHAIN_ID,
+  SKALE_ID,
   alphabeticallyStakeWiseSortedChains as sortedChains,
 } from './constants';
 import {
@@ -116,6 +117,8 @@ const CommunityInformationForm = ({
               return options?.find((o) => o.value === OSMOSIS_ID);
             case CommunityType.Blast:
               return options?.find((o) => o.value === BLAST_ID);
+            case CommunityType.Skale:
+              return options?.find((o) => o.value === SKALE_ID);
             case CommunityType.Polygon:
             case CommunityType.Solana:
               return options?.[0];
@@ -187,15 +190,16 @@ const CommunityInformationForm = ({
         charCount={250}
       />
 
-      <CWCoverImageUploader
-        subheaderText="Community Profile Image (Accepts JPG and PNG files)"
-        canSelectImageBehaviour={false}
-        showUploadAndGenerateText
-        onImageProcessStatusChange={setIsProcessingProfileImage}
+      <CWImageInput
+        label="Community Profile Image (Accepts JPG and PNG files)"
+        canSelectImageBehavior={false}
+        onImageProcessingChange={({ isGenerating, isUploading }) =>
+          setIsProcessingProfileImage(isGenerating || isUploading)
+        }
         name="communityProfileImageURL"
         hookToForm
-        defaultImageBehaviour={ImageBehavior.Circle}
-        enableGenerativeAI
+        imageBehavior={ImageBehavior.Circle}
+        withAIImageGeneration
       />
 
       {withSocialLinks ? (

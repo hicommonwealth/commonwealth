@@ -7,6 +7,14 @@ export function GetGlobalActivity(): Query<typeof schemas.ActivityFeed> {
     ...schemas.ActivityFeed,
     auth: [],
     secure: false,
-    body: async () => await getUserActivityFeed({}),
+    body: async ({ payload }) => {
+      const { comment_limit = 3, limit = 10, cursor = 1 } = payload;
+      return await getUserActivityFeed({
+        user_id: 0,
+        comment_limit,
+        limit,
+        cursor,
+      });
+    },
   };
 }

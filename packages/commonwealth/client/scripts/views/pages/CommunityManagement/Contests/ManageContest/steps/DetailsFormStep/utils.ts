@@ -1,5 +1,4 @@
-import { TopicWeightedVoting } from '@hicommonwealth/schemas';
-import colors from '../../../../../../../../styles/mixins/colors.module.scss';
+import colors from '../../../../../../../styles/mixins/colors.module.scss';
 
 export const INITIAL_PERCENTAGE_VALUE = 10;
 export const MAX_WINNERS = 10;
@@ -57,17 +56,3 @@ export const contestDurationOptions = Array.from({ length: 7 }, (_, i) => {
 });
 
 export const initialContestDuration = contestDurationOptions[6].value;
-
-export const weightedVotingValueToLabel = (
-  weightedVoting: TopicWeightedVoting,
-) => {
-  if (weightedVoting === TopicWeightedVoting.Stake) {
-    return 'Community Stake';
-  }
-
-  if (weightedVoting === TopicWeightedVoting.ERC20) {
-    return 'ERC20';
-  }
-
-  return '';
-};

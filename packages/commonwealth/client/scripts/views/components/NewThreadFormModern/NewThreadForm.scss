@@ -1,4 +1,4 @@
-@import '../../../../styles/shared';
+@import '../../../styles/shared';
 
 .NewThreadForm {
   display: flex;
@@ -140,5 +140,9 @@
 
   .JoinCommunityBanner {
     margin-top: 8px;
+  }
+
+  .help-text-container {
+    margin-left: auto;
   }
 }

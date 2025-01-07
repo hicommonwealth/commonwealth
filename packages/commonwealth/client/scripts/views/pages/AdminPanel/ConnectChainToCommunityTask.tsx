@@ -1,7 +1,6 @@
 import { ChainType } from '@hicommonwealth/shared';
 import { buildUpdateCommunityInput } from 'client/scripts/state/api/communities/updateCommunity';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import 'pages/AdminPanel.scss';
 import React, { useState } from 'react';
 import {
   useGetCommunityByIdQuery,
@@ -17,6 +16,7 @@ import { CWText } from '../../components/component_kit/cw_text';
 import { CWButton } from '../../components/component_kit/new_designs/CWButton';
 import { CWTextInput } from '../../components/component_kit/new_designs/CWTextInput';
 import { openConfirmation } from '../../modals/confirmation_modal';
+import './AdminPanel.scss';
 import { getSortedChains } from './utils';
 
 const ConnectChainToCommunityTask = () => {

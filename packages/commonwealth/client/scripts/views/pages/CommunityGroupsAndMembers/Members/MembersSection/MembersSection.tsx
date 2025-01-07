@@ -1,3 +1,4 @@
+import { Role } from '@hicommonwealth/shared';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import Permissions from 'utils/Permissions';
@@ -6,17 +7,27 @@ import { CWCheckbox } from 'views/components/component_kit/cw_checkbox';
 import { CWTable } from 'views/components/component_kit/new_designs/CWTable';
 import { CWTableState } from 'views/components/component_kit/new_designs/CWTable/useCWTableState';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
+import { getFallbackImage } from '../helper';
 import './MembersSection.scss';
+
+export type Group = {
+  name: string;
+  groupImageUrl: string;
+};
 
 export type Member = {
   userId: number;
-  avatarUrl: string;
+  avatarUrl?: string | null;
   name: string;
-  role: 'admin' | 'moderator' | '';
-  groups: string[];
+  role: Role;
+  groups: Group[];
   stakeBalance?: string;
   lastActive?: string;
   address?: string;
+};
+
+export type MemberWithGroups = Omit<Member, 'groups'> & {
+  groups: Group[];
 };
 
 type MembersSectionProps = {
@@ -59,7 +70,7 @@ const MembersSection = ({
                 )}
                 <Link to={`/profile/id/${member.userId}`} className="user-info">
                   <Avatar
-                    url={member.avatarUrl}
+                    url={member.avatarUrl ?? ''}
                     size={24}
                     address={member.userId}
                   />
@@ -76,13 +87,21 @@ const MembersSection = ({
           },
           groups: {
             sortValue: member.groups
+              .map((group) => group.name)
               .sort((a, b) => a.localeCompare(b))
               .join(' ')
               .toLowerCase(),
             customElement: (
               <div className="table-cell">
                 {member.groups.map((group, index) => (
-                  <CWTag key={index} label={group} type="referendum" />
+                  <div key={index} className="group-item">
+                    <span className="group-name">{group.name}</span>
+                    <img
+                      src={group.groupImageUrl || getFallbackImage()}
+                      alt={group.name}
+                      className="group-image"
+                    />
+                  </div>
                 ))}
               </div>
             ),

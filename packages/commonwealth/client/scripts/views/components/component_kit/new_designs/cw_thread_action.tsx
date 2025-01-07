@@ -2,7 +2,6 @@ import {
   ArrowBendUpRight,
   ArrowFatUp,
   BellSimple,
-  BellSimpleSlash,
   ChatCenteredDots,
   Coins,
   DotsThree,
@@ -14,7 +13,7 @@ import { CWText } from '../cw_text';
 import { getClasses } from '../helpers';
 import { ComponentType } from '../types';
 
-import 'components/component_kit/new_designs/cw_thread_action.scss';
+import './cw_thread_action.scss';
 
 export type ActionType =
   | 'upvote'
@@ -55,11 +54,7 @@ const renderPhosphorIcon = (
     case 'share':
       return <ArrowBendUpRight {...commonProps(disabled)} />;
     case 'subscribe':
-      return selected ? (
-        <BellSimple {...commonProps(disabled)} />
-      ) : (
-        <BellSimpleSlash {...commonProps(disabled)} />
-      );
+      return <BellSimple {...commonProps(disabled)} />;
     case 'overflow':
       return <DotsThree {...commonProps(disabled)} />;
     case 'leaderboard':

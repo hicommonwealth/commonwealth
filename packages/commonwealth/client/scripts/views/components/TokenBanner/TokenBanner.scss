@@ -1,8 +1,9 @@
-@import '../../../../styles/shared';
+@import '../../../styles/shared';
 
 .TokenBanner {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   padding: 24px;
   border-radius: 6px;
   border: 1px solid $neutral-200;
@@ -52,8 +53,24 @@
       }
     }
   }
+  .vote-weight {
+    margin-left: 8px;
+    .vote-weight-label {
+      color: $neutral-500;
+    }
+  }
+}
 
-  .vote-weight-label {
-    color: $neutral-500;
+.TokenBannerPopover {
+  .token-description {
+    display: inline-block;
+    line-height: 2;
+    align-items: center;
+
+    .token-address {
+      word-break: break-all;
+      font-weight: 500;
+      margin-right: 8px;
+    }
   }
 }

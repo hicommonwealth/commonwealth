@@ -1,15 +1,12 @@
 import { type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../database';
-import { isAuthorized, type AuthContext } from '../middleware';
+import { authRoles } from '../middleware';
 
-export function DeleteWebhook(): Command<
-  typeof schemas.DeleteWebhook,
-  AuthContext
-> {
+export function DeleteWebhook(): Command<typeof schemas.DeleteWebhook> {
   return {
     ...schemas.DeleteWebhook,
-    auth: [isAuthorized({ roles: ['admin'] })],
+    auth: [authRoles('admin')],
     secure: true,
     body: async ({ payload }) => {
       const res = await models.Webhook.destroy({

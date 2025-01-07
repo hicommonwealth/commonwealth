@@ -56,7 +56,11 @@ export type AuthorAndPublishInfoProps = {
   popoverPlacement?: PopperPlacementType;
   profile?: UserProfile;
   versionHistory?: ThreadVersionHistory[] | CommentVersionHistory[];
-  changeContentText?: (text: string) => void;
+  activeThreadVersionId?: number;
+  onChangeVersionHistoryNumber?: (id: number) => void;
+  hidePublishDate?: boolean;
+  hideSpamTag?: boolean;
+  hideTrendingTag?: boolean;
 };
 
 export const AuthorAndPublishInfo = ({
@@ -82,7 +86,11 @@ export const AuthorAndPublishInfo = ({
   popoverPlacement,
   profile,
   versionHistory,
-  changeContentText,
+  activeThreadVersionId,
+  onChangeVersionHistoryNumber,
+  hidePublishDate,
+  hideSpamTag,
+  hideTrendingTag,
 }: AuthorAndPublishInfoProps) => {
   const popoverProps = usePopover();
   const containerRef = useRef(null);
@@ -95,20 +103,25 @@ export const AuthorAndPublishInfo = ({
 
   const collaboratorLookupInfo: Record<string, string> =
     collaboratorsInfo?.reduce((acc, collaborator) => {
-      acc[collaborator.address] = collaborator.User.profile.name;
+      acc[collaborator.address] = collaborator.User?.profile.name ?? '';
       return acc;
     }, {}) ?? {};
 
   const fromDiscordBot = discord_meta !== null && discord_meta !== undefined;
-  const versionHistoryOptions = versionHistory?.map((v) => ({
-    value: v.body || v.text,
-    label: formatVersionText(
-      moment(v.timestamp),
-      v.address,
-      collaboratorLookupInfo,
-      profile?.name,
-    ),
-  }));
+  const versionHistoryOptions = versionHistory
+    ?.map((v) => ({
+      value: v.id as number,
+      label: formatVersionText(
+        moment(v.timestamp),
+        v.address,
+        collaboratorLookupInfo,
+        profile?.name,
+      ),
+    }))
+    .sort((a, b) => b.value - a.value);
+  const versionHistorySelectedValue = (versionHistoryOptions || [])?.find(
+    (option) => option.value === activeThreadVersionId,
+  );
 
   const isCommunityFirstLayout = layoutType === 'community-first';
   const { data: communtyInfo, isLoading: isLoadingCommunity } =
@@ -225,15 +238,16 @@ export const AuthorAndPublishInfo = ({
                   ?.utc?.()
                   ?.local?.()
                   ?.format('DD/MM/YYYY')}`}
-                // @ts-expect-error <StrictNullChecks>
-                onChange={({ value }) => {
-                  // @ts-expect-error <StrictNullChecks>
-                  changeContentText(value);
+                onChange={({ value }: { value: number; label: string }) => {
+                  onChangeVersionHistoryNumber?.(value);
                 }}
                 formatOptionLabel={(option) => {
                   return option.label.split('\n')[0];
                 }}
                 isSearchable={false}
+                {...(versionHistorySelectedValue && {
+                  value: versionHistorySelectedValue,
+                })}
               />
             </div>
           ) : (
@@ -297,11 +311,15 @@ export const AuthorAndPublishInfo = ({
         </>
       )}
 
-      <NewThreadTag threadCreatedAt={moment(publishDate)} />
+      {!hidePublishDate && (
+        <NewThreadTag threadCreatedAt={moment(publishDate)} />
+      )}
 
-      {isHot && <CWTag iconName="trendUp" label="Trending" type="trending" />}
+      {!hideTrendingTag && isHot && (
+        <CWTag iconName="trendUp" label="Trending" type="trending" />
+      )}
 
-      {isSpamThread && <CWTag label="SPAM" type="disabled" />}
+      {!hideSpamTag && isSpamThread && <CWTag label="SPAM" type="disabled" />}
 
       {isLocked && lockedAt && lastUpdated && (
         <LockWithTooltip

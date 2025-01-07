@@ -1,27 +1,28 @@
 import { InvalidState, type Command } from '@hicommonwealth/core';
-
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '..';
-import { AuthContext, isAuthorized } from '../middleware';
-import { mustBeAuthorized, mustExist } from '../middleware/guards';
+import { authTopic } from '../middleware';
+import { mustExist } from '../middleware/guards';
 import { decodeContent, sanitizeQuillText } from '../utils';
 
 const Errors = {
   DefaultTemplateRequired: 'Default Template required',
 };
 
-export function UpdateTopic(): Command<
-  typeof schemas.UpdateTopic,
-  AuthContext
-> {
+export function UpdateTopic(): Command<typeof schemas.UpdateTopic> {
   return {
     ...schemas.UpdateTopic,
-    auth: [isAuthorized({ roles: ['admin'] })],
-    body: async ({ actor, payload, auth }) => {
-      const { topic_id } = mustBeAuthorized(actor, auth);
+    auth: [authTopic({ roles: ['admin'] })],
+    body: async ({ actor, payload }) => {
+      const { topic_id } = payload;
 
+      // TODO: can use topic in auth
       const topic = await models.Topic.findByPk(topic_id!);
       mustExist('Topic', topic);
+
+      if (topic.archived_at) {
+        throw new InvalidState('Cannot update archived topic');
+      }
 
       const {
         name,

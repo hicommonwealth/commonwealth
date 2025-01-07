@@ -1,19 +1,29 @@
-import { InvalidState, type Command } from '@hicommonwealth/core';
+import { InvalidInput, InvalidState, type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
+import { WebhookDestinations } from '@hicommonwealth/shared';
 import { models } from '../database';
-import { isAuthorized, type AuthContext } from '../middleware';
+import { authRoles } from '../middleware';
 
-export function UpdateWebhook(): Command<
-  typeof schemas.UpdateWebhook,
-  AuthContext
-> {
+export const UpdateWebhookErrors = {
+  CannotUpdateElizaWebhooks: 'Cannot update Eliza Webhooks',
+  UnsupportedUserMentioned:
+    'UserMentioned not supported for non-Eliza webhooks',
+};
+
+export function UpdateWebhook(): Command<typeof schemas.UpdateWebhook> {
   return {
     ...schemas.UpdateWebhook,
-    auth: [isAuthorized({ roles: ['admin'] })],
+    auth: [authRoles('admin')],
     secure: true,
     body: async ({ payload }) => {
       const webhook = await models.Webhook.findByPk(payload.id);
       if (!webhook) throw new InvalidState('Webhook does not exist');
+
+      if (webhook.destination === WebhookDestinations.Eliza) {
+        throw new InvalidInput(UpdateWebhookErrors.CannotUpdateElizaWebhooks);
+      } else if (payload.events.includes('UserMentioned')) {
+        throw new InvalidInput(UpdateWebhookErrors.UnsupportedUserMentioned);
+      }
 
       webhook.events = payload.events;
       await webhook.save();

@@ -7,7 +7,7 @@ import { CWText } from '../cw_text';
 import { getClasses } from '../helpers';
 import { ComponentType } from '../types';
 
-import 'components/component_kit/new_designs/CWTag.scss';
+import './CWTag.scss';
 
 type TagType =
   | 'passed'
@@ -26,13 +26,15 @@ type TagType =
   | 'address'
   | 'group'
   | 'contest'
-  | 'filter';
+  | 'filter'
+  | 'amount';
 
 export type TagProps = {
   iconName?: IconName;
   label: string;
   type: TagType;
   onClick?: (e?: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
+  onCloseClick?: () => void;
   trimAt?: number;
   classNames?: string;
   community?: {
@@ -48,6 +50,7 @@ export const CWTag = ({
   label,
   type,
   onClick,
+  onCloseClick,
   trimAt,
   classNames,
   community,
@@ -65,8 +68,6 @@ export const CWTag = ({
 
     return label.slice(0, trimAt) + '...';
   };
-
-  const handleClick = () => onClick?.();
 
   return (
     <div
@@ -95,7 +96,7 @@ export const CWTag = ({
         {displayLabel()}
       </CWText>
       {(type === 'input' || type === 'filter') && (
-        <div className="close-container" onClick={handleClick}>
+        <div className="close-container" onClick={onCloseClick}>
           <X
             className={getClasses({ action: true }, ComponentType.Tag)}
             size={16}

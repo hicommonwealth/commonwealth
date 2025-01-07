@@ -1,14 +1,15 @@
 import axios from 'axios';
-import useNecessaryEffect from 'hooks/useNecessaryEffect';
-import 'pages/stats.scss';
-import React, { useState } from 'react';
+import Permissions from 'client/scripts/utils/Permissions';
+import React, { useEffect, useState } from 'react';
 import app from 'state';
 import { SERVER_URL } from 'state/api/config';
-import { userStore } from 'state/ui/user';
+import useUserStore, { userStore } from 'state/ui/user';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import ErrorPage from 'views/pages/error';
 import { PageLoading } from 'views/pages/loading';
 import { CWText } from '../components/component_kit/cw_text';
+import { PageNotFound } from './404';
+import './stats.scss';
 
 type Batchable = {
   date: string;
@@ -94,7 +95,9 @@ const StatsPage = () => {
   const [totalData, setTotalData] = useState<TotalDataType>();
   const [error, setError] = useState('');
 
-  useNecessaryEffect(() => {
+  const user = useUserStore();
+
+  useEffect(() => {
     const fetch = async () => {
       try {
         const response = await axios.get(`${SERVER_URL}/communityStats`, {
@@ -143,6 +146,13 @@ const StatsPage = () => {
       fetch();
     }
   }, []);
+
+  if (
+    !user.isLoggedIn ||
+    !(Permissions.isSiteAdmin() || Permissions.isCommunityAdmin())
+  ) {
+    return <PageNotFound />;
+  }
 
   if (!batchedData) {
     return <PageLoading message="Loading analytics" />;

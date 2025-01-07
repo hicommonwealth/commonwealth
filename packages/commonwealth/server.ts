@@ -74,18 +74,45 @@ const start = async () => {
 
   const { main } = await import('./main');
 
-  main(app, models, {
+  await main(app, models, {
     port: config.PORT,
     withLoggingMiddleware: true,
-    withPrerender: config.APP_ENV === 'production' && !config.NO_PRERENDER,
+    withPrerender:
+      (config.APP_ENV === 'production' || config.APP_ENV === 'frick') &&
+      !!config.PRERENDER_TOKEN,
   })
-    .then(() => {
+    .then(async () => {
       isServiceHealthy = true;
       // database clean-up jobs (should be run after the API so, we don't affect start-up time
       // TODO: evaluate other options for maintenance jobs
       if (typeof config.DB.CLEAN_HOUR !== 'undefined') {
         const databaseCleaner = new DatabaseCleaner();
         databaseCleaner.initLoop(models, config.DB.CLEAN_HOUR);
+      }
+
+      // checking the DYNO env var ensures this only runs on one dyno
+      if (
+        config.APP_ENV === 'production' &&
+        process.env.DYNO === 'web.1' &&
+        config.ENABLE_CLIENT_PUBLISHING
+      ) {
+        const { dispatchSDKPublishWorkflow } = await import(
+          './server/util/dispatchSDKPublishWorkflow'
+        );
+        dispatchSDKPublishWorkflow().catch((e) =>
+          log.error(
+            `Failed to dispatch publishing workflow ${JSON.stringify(e)}`,
+          ),
+        );
+      }
+
+      // bootstrap bindings when in dev mode and DEV_MODULITH is true
+      if (config.NODE_ENV === 'development' && config.DEV_MODULITH) {
+        const { bootstrapBindings, bootstrapRelayer } = await import(
+          './server/bindings/bootstrap'
+        );
+        await bootstrapBindings();
+        await bootstrapRelayer();
       }
     })
     .catch((e) => log.error(e.message, e));

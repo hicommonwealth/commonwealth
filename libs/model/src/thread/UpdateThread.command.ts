@@ -5,10 +5,10 @@ import {
   type Command,
 } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
-import { Op, Sequelize } from 'sequelize';
+import { Op } from 'sequelize';
 import { z } from 'zod';
 import { models } from '../database';
-import { isAuthorized, type AuthContext } from '../middleware';
+import { authThread } from '../middleware';
 import { mustBeAuthorizedThread, mustExist } from '../middleware/guards';
 import {
   ThreadAttributes,
@@ -61,7 +61,7 @@ function getContentPatch(
 
 async function getCollaboratorsPatch(
   actor: Actor,
-  auth: AuthContext,
+  context: schemas.ThreadContext,
   { collaborators }: z.infer<typeof schemas.UpdateThread.input>,
 ) {
   const removeSet = new Set(collaborators?.toRemove ?? []);
@@ -75,7 +75,7 @@ async function getCollaboratorsPatch(
   if (add.length > 0) {
     const addresses = await models.Address.findAll({
       where: {
-        community_id: auth.community_id!,
+        community_id: context.community_id!,
         id: {
           [Op.in]: add,
         },
@@ -86,7 +86,7 @@ async function getCollaboratorsPatch(
   }
 
   if (add.length > 0 || remove.length > 0) {
-    const authorized = actor.user.isAdmin || auth.is_author;
+    const authorized = actor.user.isAdmin || context.is_author;
     if (!authorized)
       throw new InvalidActor(actor, 'Must be super admin or author');
   }
@@ -96,7 +96,7 @@ async function getCollaboratorsPatch(
 
 function getAdminOrModeratorPatch(
   actor: Actor,
-  auth: AuthContext,
+  context: schemas.ThreadContext,
   { pinned, spam }: z.infer<typeof schemas.UpdateThread.input>,
 ) {
   const patch: Partial<ThreadAttributes> = {};
@@ -108,7 +108,8 @@ function getAdminOrModeratorPatch(
 
   if (Object.keys(patch).length > 0) {
     const authorized =
-      actor.user.isAdmin || ['admin', 'moderator'].includes(auth.address!.role);
+      actor.user.isAdmin ||
+      ['admin', 'moderator'].includes(context.address!.role);
     if (!authorized)
       throw new InvalidActor(actor, 'Must be admin or moderator');
   }
@@ -117,7 +118,7 @@ function getAdminOrModeratorPatch(
 
 async function getAdminOrModeratorOrOwnerPatch(
   actor: Actor,
-  auth: AuthContext,
+  context: schemas.ThreadContext,
   {
     locked,
     archived,
@@ -136,7 +137,7 @@ async function getAdminOrModeratorOrOwnerPatch(
     (patch.archived_at = archived ? new Date() : null);
 
   if (typeof stage !== 'undefined') {
-    const community = await models.Community.findByPk(auth.community_id!);
+    const community = await models.Community.findByPk(context.community_id!);
     mustExist('Community', community);
 
     const custom_stages =
@@ -152,7 +153,7 @@ async function getAdminOrModeratorOrOwnerPatch(
 
   if (typeof topic_id !== 'undefined') {
     const topic = await models.Topic.findOne({
-      where: { id: topic_id, community_id: auth.community_id! },
+      where: { id: topic_id, community_id: context.community_id! },
     });
     mustExist('Topic', topic);
 
@@ -162,37 +163,34 @@ async function getAdminOrModeratorOrOwnerPatch(
   if (Object.keys(patch).length > 0) {
     const authorized =
       actor.user.isAdmin ||
-      ['admin', 'moderator'].includes(auth.address!.role) ||
-      auth.is_author;
+      ['admin', 'moderator'].includes(context.address!.role) ||
+      context.is_author;
     if (!authorized)
       throw new InvalidActor(actor, 'Must be admin, moderator, or author');
   }
   return patch;
 }
 
-export function UpdateThread(): Command<
-  typeof schemas.UpdateThread,
-  AuthContext
-> {
+export function UpdateThread(): Command<typeof schemas.UpdateThread> {
   return {
     ...schemas.UpdateThread,
-    auth: [isAuthorized({ collaborators: true })],
-    body: async ({ actor, payload, auth }) => {
+    auth: [authThread({ collaborators: true })],
+    body: async ({ actor, payload, context }) => {
       const { address, thread, thread_id } = mustBeAuthorizedThread(
         actor,
-        auth,
+        context,
       );
 
       const content = getContentPatch(thread, payload);
-      const adminPatch = getAdminOrModeratorPatch(actor, auth!, payload);
+      const adminPatch = getAdminOrModeratorPatch(actor, context!, payload);
       const ownerPatch = await getAdminOrModeratorOrOwnerPatch(
         actor,
-        auth!,
+        context!,
         payload,
       );
       const collaboratorsPatch = await getCollaboratorsPatch(
         actor,
-        auth!,
+        context!,
         payload,
       );
 
@@ -203,7 +201,7 @@ export function UpdateThread(): Command<
         collaboratorsPatch.add.length > 0 ||
         collaboratorsPatch.remove.length > 0
       ) {
-        const found = await models.ContestTopic.findOne({
+        const found = await models.ContestManager.findOne({
           where: { topic_id: thread.topic_id! },
         });
         if (found) throw new InvalidInput(UpdateThreadErrors.ContestLock);
@@ -232,7 +230,7 @@ export function UpdateThread(): Command<
             ...content,
             ...adminPatch,
             ...ownerPatch,
-            last_edited: Sequelize.literal('CURRENT_TIMESTAMP'),
+            last_edited: new Date(),
             ...searchUpdate,
             content_url: contentUrl,
           },
@@ -351,7 +349,7 @@ export function UpdateThread(): Command<
               attributes: [
                 'id',
                 'address_id',
-                'text',
+                'body',
                 'created_at',
                 'updated_at',
                 'deleted_at',

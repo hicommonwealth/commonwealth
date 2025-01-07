@@ -55,7 +55,7 @@ export function SearchComments(): Query<typeof schemas.SearchComments> {
     SELECT
       "Comments".id,
       "Threads".title,
-      "Comments".text,
+      "Comments".body,
       "Comments".thread_id as proposalId,
       'comment' as type,
       "Addresses".id as address_id,

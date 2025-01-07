@@ -3,10 +3,11 @@ import React from 'react';
 
 import { renderMultilineText } from 'helpers';
 
-import 'pages/privacy_and_terms.scss';
+import './privacy_and_terms.scss';
 
-import { CWText } from '../components/component_kit/cw_text';
+import { PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
 import Sublayout from '../Sublayout';
+import { CWText } from '../components/component_kit/cw_text';
 
 const TermsOfService = `
 PLEASE READ THE BELOW GOVERNANCE PLATFORM SERVICES AGREEMENT VERY CAREFULLY. THE BELOW GOVERNANCE PLATFORM SERVICES AGREEMENT IS A LEGALLY BINDING CONTRACT BETWEEN YOU AND COMMONWEALTH LABS THAT SETS FORTH AND DETERMINES, AMONG OTHER THINGS:
@@ -21,7 +22,7 @@ BY DISCUSSING ISSUES, VOTING ON ISSUES, OR USING THE GOVERNANCE INTERFACE TO DEL
 IF YOU DO NOT AGREE TO ALL OF THE TERMS AND CONDITIONS OF THE GOVERNANCE PLATFORM SERVICES AGREEMENT, OR IF ANY OF THE REPRESENTATIONS AND WARRANTIES SET FORTH THE GOVERNANCE PLATFORM SERVICES AGREEMENT IS INACCURATE AS APPLIED TO YOU, YOU MUST NOT USE THE COMMONWEALTH GOVERNANCE PLATFORM.
 
 
-Please contact us at hello@commonwealth.im for any questions or issues.
+Please contact us at hello@${PRODUCTION_DOMAIN} for any questions or issues.
 
 
 GOVERNANCE PLATFORM SERVICES AGREEMENT

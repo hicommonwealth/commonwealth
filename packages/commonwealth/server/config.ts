@@ -10,7 +10,6 @@ const {
   TELEGRAM_BOT_TOKEN_DEV,
   SESSION_SECRET,
   SNAPSHOT_WEBHOOK_SECRET,
-  NO_PRERENDER: _NO_PRERENDER,
   NO_GLOBAL_ACTIVITY_CACHE,
   PRERENDER_TOKEN,
   GENERATE_IMAGE_RATE_LIMIT,
@@ -22,10 +21,12 @@ const {
   EVM_CE_POLL_INTERVAL,
   CF_ZONE_ID,
   CF_API_KEY,
-  PEER_ID,
+  LIBP2P_PRIVATE_KEY,
+  DISPATCHER_APP_ID,
+  DISPATCHER_APP_PRIVATE_KEY,
+  DEV_MODULITH,
+  ENABLE_CLIENT_PUBLISHING,
 } = process.env;
-
-const NO_PRERENDER = _NO_PRERENDER;
 
 const DEFAULTS = {
   GENERATE_IMAGE_RATE_LIMIT: '10',
@@ -41,7 +42,6 @@ const DEFAULTS = {
 export const config = configure(
   { ...model_config, ...adapters_config },
   {
-    NO_PRERENDER: NO_PRERENDER === 'true',
     NO_GLOBAL_ACTIVITY_CACHE: NO_GLOBAL_ACTIVITY_CACHE === 'true',
     PRERENDER_TOKEN,
     GENERATE_IMAGE_RATE_LIMIT: parseInt(
@@ -95,11 +95,18 @@ export const config = configure(
         10,
       ),
     },
-    PEER_ID,
+    LIBP2P_PRIVATE_KEY,
     SNAPSHOT_WEBHOOK_SECRET,
+    GITHUB: {
+      DISPATCHER_APP_ID: DISPATCHER_APP_ID
+        ? parseInt(DISPATCHER_APP_ID)
+        : undefined,
+      DISPATCHER_APP_PRIVATE_KEY,
+    },
+    DEV_MODULITH: DEV_MODULITH === 'true',
+    ENABLE_CLIENT_PUBLISHING: ENABLE_CLIENT_PUBLISHING === 'true',
   },
   z.object({
-    NO_PRERENDER: z.boolean(),
     NO_GLOBAL_ACTIVITY_CACHE: z.boolean(),
     PRERENDER_TOKEN: z.string().optional(),
     GENERATE_IMAGE_RATE_LIMIT: z.number().int().positive(),
@@ -157,7 +164,7 @@ export const config = configure(
       MESSAGE_RELAYER_PREFETCH: z.number().int().positive(),
       EVM_CE_POLL_INTERVAL_MS: z.number().int().positive(),
     }),
-    PEER_ID: z.string().optional(),
+    LIBP2P_PRIVATE_KEY: z.string().optional(),
     SNAPSHOT_WEBHOOK_SECRET: z
       .string()
       .optional()
@@ -165,5 +172,21 @@ export const config = configure(
         (data) => !(!['local', 'CI'].includes(model_config.APP_ENV) && !data),
         'SNAPSHOT_WEBHOOK_SECRET is required in public environments',
       ),
+    GITHUB: z.object({
+      DISPATCHER_APP_ID: z
+        .number()
+        .optional()
+        .refine((data) => !(model_config.APP_ENV === 'production' && !data))
+        .describe('The ID of the Common Workflow Dispatcher GitHub app'),
+      DISPATCHER_APP_PRIVATE_KEY: z
+        .string()
+        .optional()
+        .refine((data) => !(model_config.APP_ENV === 'production' && !data))
+        .describe(
+          'The private key of the Common Workflow Dispatcher GitHub app',
+        ),
+    }),
+    DEV_MODULITH: z.boolean(),
+    ENABLE_CLIENT_PUBLISHING: z.boolean(),
   }),
 );

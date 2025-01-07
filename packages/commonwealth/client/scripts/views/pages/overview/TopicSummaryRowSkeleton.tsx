@@ -1,8 +1,8 @@
-import 'pages/overview/TopicSummaryRow.scss';
 import React from 'react';
 import { Skeleton } from '../../components/Skeleton';
 import { CWDivider } from '../../components/component_kit/cw_divider';
 import { getClasses } from '../../components/component_kit/helpers';
+import './TopicSummaryRow.scss';
 
 export const TopicSummaryRowSkeleton = () => {
   return (
@@ -20,7 +20,7 @@ export const TopicSummaryRowSkeleton = () => {
               <div
                 className={getClasses<{ isLoading?: boolean }>(
                   { isLoading: true },
-                  'recent-thread-row'
+                  'recent-thread-row',
                 )}
               >
                 <Skeleton count={4} />

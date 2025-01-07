@@ -1,0 +1,86 @@
+@import '../../../styles/shared.scss';
+
+.UserDashboard {
+  padding-top: 20px;
+  overflow: auto;
+  height: 100%;
+
+  @include extraSmall {
+    padding-top: 0; // because of the breadcrumbs being in static position on mobile
+  }
+
+  .page-header {
+    padding-bottom: 24px;
+  }
+
+  .contentContainer {
+    display: grid;
+    width: 100%;
+    grid-template-columns: 1fr 392px;
+
+    @include small {
+      grid-template-columns: 1fr 180px;
+    }
+
+    @include extraSmall {
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+
+    .user-dashboard-activity {
+      order: unset;
+      min-height: 20px;
+
+      @include extraSmall {
+        order: 2;
+        padding-right: 0;
+        min-height: 20vh;
+      }
+
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      min-width: 0;
+      padding-right: 56px;
+
+      .dashboard-header {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+        width: 100%;
+        margin-bottom: 16px;
+        background-color: white;
+
+        @include smallInclusive {
+          position: sticky;
+          top: 0;
+          z-index: 70;
+        }
+
+        @include small {
+          margin-top: 12px;
+          position: sticky;
+          top: 0;
+          z-index: 70;
+        }
+      }
+    }
+
+    .featured-cards {
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+    }
+
+    .Divider {
+      margin-top: 8px;
+      min-width: 100%;
+      max-width: 0;
+    }
+  }
+}
+
+.dashboard-filter-items.Card {
+  background: $white;
+  width: 100%;
+}

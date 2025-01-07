@@ -1,58 +1,76 @@
 import { trpc } from '@hicommonwealth/adapters';
-import { CacheNamespaces, cache } from '@hicommonwealth/core';
-import { Reaction, Thread } from '@hicommonwealth/model';
+import { CacheNamespaces, cache, logger } from '@hicommonwealth/core';
+import { Reaction, Thread, models } from '@hicommonwealth/model';
 import { MixpanelCommunityInteractionEvent } from '../../shared/analytics/types';
-import { applyCanvasSignedDataMiddleware } from '../federation';
+import { applyCanvasSignedData } from '../federation';
+
+const log = logger(import.meta);
 
 export const trpcRouter = trpc.router({
-  createThread: trpc.command(
-    Thread.CreateThread,
-    trpc.Tag.Thread,
-    [
+  createThread: trpc.command(Thread.CreateThread, trpc.Tag.Thread, [
+    trpc.fireAndForget(async (input, _, ctx) => {
+      await applyCanvasSignedData(ctx.req.path, input.canvas_signed_data);
+    }),
+    trpc.trackAnalytics([
       MixpanelCommunityInteractionEvent.CREATE_THREAD,
       ({ community_id }) => ({ community: community_id }),
-    ],
-    applyCanvasSignedDataMiddleware,
-  ),
-  updateThread: trpc.command(
-    Thread.UpdateThread,
-    trpc.Tag.Thread,
-    (input) =>
+    ]),
+  ]),
+  updateThread: trpc.command(Thread.UpdateThread, trpc.Tag.Thread, [
+    trpc.fireAndForget(async (input, _, ctx) => {
+      await applyCanvasSignedData(ctx.req.path, input.canvas_signed_data);
+    }),
+    trpc.trackAnalytics((input) =>
       Promise.resolve(
         input.stage !== undefined
           ? [MixpanelCommunityInteractionEvent.UPDATE_STAGE, {}]
           : undefined,
       ),
-    applyCanvasSignedDataMiddleware,
-  ),
+    ),
+  ]),
   createThreadReaction: trpc.command(
     Thread.CreateThreadReaction,
     trpc.Tag.Reaction,
     [
-      MixpanelCommunityInteractionEvent.CREATE_REACTION,
-      ({ community_id }) => ({ community: community_id }),
+      trpc.fireAndForget(async (input, _, ctx) => {
+        await applyCanvasSignedData(ctx.req.path, input.canvas_signed_data);
+      }),
+      trpc.trackAnalytics([
+        MixpanelCommunityInteractionEvent.CREATE_REACTION,
+        ({ community_id }) => ({ community: community_id }),
+      ]),
     ],
-    applyCanvasSignedDataMiddleware,
   ),
-  deleteThread: trpc.command(
-    Thread.DeleteThread,
-    trpc.Tag.Thread,
-    async () => {
-      // Using track output middleware to invalidate global activity cache
-      // TODO: Generalize output middleware to cover (analytics, gac invalidation, canvas, etc)
-      void cache().deleteKey(
+  deleteThread: trpc.command(Thread.DeleteThread, trpc.Tag.Thread, [
+    trpc.fireAndForget(async (input, _, ctx) => {
+      await applyCanvasSignedData(ctx.req.path, input.canvas_signed_data);
+    }),
+    trpc.fireAndForget(async () => {
+      await cache().deleteKey(
         CacheNamespaces.Query_Response,
         'GetGlobalActivity_{}', // this is the global activity cache key
       );
-      return Promise.resolve(undefined);
-    },
-    applyCanvasSignedDataMiddleware,
-  ),
-  deleteReaction: trpc.command(
-    Reaction.DeleteReaction,
-    trpc.Tag.Reaction,
-    undefined,
-    applyCanvasSignedDataMiddleware,
-  ),
+    }),
+  ]),
+  deleteReaction: trpc.command(Reaction.DeleteReaction, trpc.Tag.Reaction, [
+    trpc.fireAndForget(async (input, _, ctx) => {
+      await applyCanvasSignedData(ctx.req.path, input.canvas_signed_data);
+    }),
+  ]),
   getThreads: trpc.query(Thread.GetThreads, trpc.Tag.Thread),
+  getThreadsByIds: trpc.query(
+    Thread.GetThreadsByIds,
+    trpc.Tag.Thread,
+    undefined,
+    [
+      trpc.fireAndForget(async (input) => {
+        log.trace('incrementing thread view count', { ids: input.thread_ids });
+        const ids = input.thread_ids.split(',').map((x) => parseInt(x, 10));
+        await models.Thread.increment(
+          { view_count: 1 },
+          { where: { id: ids } },
+        );
+      }),
+    ],
+  ),
 });

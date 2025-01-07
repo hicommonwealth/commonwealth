@@ -7,6 +7,7 @@ export * as DiscordBot from './discordBot';
 export * as Email from './emails';
 export * as Feed from './feed';
 export * as LoadTest from './load-testing';
+export * as Poll from './poll';
 export * as Reaction from './reaction';
 export * as Snapshot from './snapshot';
 export * as Subscription from './subscription';
@@ -27,8 +28,9 @@ export * from './policies';
 export * as tester from './tester';
 export type { E2E_TestEntities } from './tester';
 
+export * as middleware from './middleware';
+
 // Internals - Should not be exported once we finish the migrations to models
-export * from './chainEventSignatures';
 export * from './config';
 export * from './database';
 export * from './models';

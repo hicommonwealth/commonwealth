@@ -1,24 +1,17 @@
-import { disposeAdapter, EventNames } from '@hicommonwealth/core';
-import { DB, tester } from '@hicommonwealth/model';
+import { disposeAdapter } from '@hicommonwealth/core';
+import { models } from '@hicommonwealth/model';
+import { EventNames } from '@hicommonwealth/schemas';
 import { delay } from '@hicommonwealth/shared';
 import { expect } from 'chai';
-import { afterEach, beforeAll, describe, test } from 'vitest';
-import { startMessageRelayer } from '../../../server/workers/messageRelayer/messageRelayer';
 import {
   numUnrelayedEvents,
   resetNumUnrelayedEvents,
-} from '../../../server/workers/messageRelayer/relayForever';
+} from 'server/bindings/relayForever';
+import { afterEach, describe, test } from 'vitest';
+import { startMessageRelayer } from '../../../server/workers/messageRelayer/messageRelayer';
 import { testOutboxEvents } from './util';
 
 describe('messageRelayer', { timeout: 20_000 }, () => {
-  let models: DB;
-
-  beforeAll(async () => {
-    const res = await import('@hicommonwealth/model');
-    models = res['models'];
-    await tester.bootstrap_testing(true);
-  });
-
   afterEach(async () => {
     await models.Outbox.truncate();
     disposeAdapter('brokerFactory');

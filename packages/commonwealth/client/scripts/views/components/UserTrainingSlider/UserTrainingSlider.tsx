@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useState } from 'react';
 import { useFetchProfileByIdQuery } from 'state/api/profiles';
@@ -22,7 +23,6 @@ export const UserTrainingSlider = () => {
   const { data: profile, isLoading: isLoadingProfile } =
     useFetchProfileByIdQuery({
       apiCallEnabled: user.isLoggedIn,
-      shouldFetchSelfProfile: true,
     });
 
   const { isVisible: isAdminSliderVisible } = useAdminActionCardsStore();
@@ -152,7 +152,7 @@ export const UserTrainingSlider = () => {
     <>
       <CardsSlider
         containerClassName="UserTrainingSliderPageLayout"
-        className="UserTrainingSlider"
+        className={clsx('UserTrainingSlider', 'narrow-gap')}
         headerText="Welcome to Common!"
         subHeaderText="Get the most out of your experience by completing these steps"
         dismissBtnLabel="Dismiss all"
@@ -173,6 +173,7 @@ export const UserTrainingSlider = () => {
               UserTrainingCardTypes.GiveUpvote,
             )}
             onCTAClick={() => redirectToPage(UserTrainingCardTypes.GiveUpvote)}
+            className="scaled-down"
           />
         )}
         {isCardVisible(UserTrainingCardTypes.CreateContent) && (
@@ -194,6 +195,7 @@ export const UserTrainingSlider = () => {
             onCTAClick={() =>
               redirectToPage(UserTrainingCardTypes.CreateContent)
             }
+            className="scaled-down"
           />
         )}
         {isCardVisible(UserTrainingCardTypes.FinishProfile) && (
@@ -215,6 +217,7 @@ export const UserTrainingSlider = () => {
             onCTAClick={() =>
               redirectToPage(UserTrainingCardTypes.FinishProfile)
             }
+            className="scaled-down"
           />
         )}
         {isCardVisible(UserTrainingCardTypes.ExploreCommunities) && (
@@ -245,6 +248,7 @@ export const UserTrainingSlider = () => {
                 userId,
               );
             }}
+            className="scaled-down"
           />
         )}
       </CardsSlider>

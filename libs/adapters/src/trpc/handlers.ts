@@ -1,6 +1,5 @@
 import {
   CacheNamespaces,
-  Events,
   INVALID_ACTOR_ERROR,
   INVALID_INPUT_ERROR,
   INVALID_STATE_ERROR,
@@ -13,9 +12,11 @@ import {
   type EventsHandlerMetadata,
   type Metadata,
 } from '@hicommonwealth/core';
+import { Events } from '@hicommonwealth/schemas';
 import { TRPCError } from '@trpc/server';
 import { ZodSchema, ZodUndefined, z } from 'zod';
-import { Commit, Tag, Track, buildproc, procedure } from './middleware';
+import { buildproc, procedure } from './builder';
+import { Tag, type OutputMiddleware } from './types';
 
 const log = logger(import.meta);
 
@@ -48,22 +49,17 @@ const trpcerror = (error: unknown): TRPCError => {
  * Builds tRPC command POST endpoint
  * @param factory command factory
  * @param tag command tag used for OpenAPI spec grouping
- * @param track analytics tracking middleware as:
- * - tuple of `[event, output mapper]`
- * - or `(input,output) => Promise<[event, data]|undefined>`
- * @param commit output middleware (best effort), mainly used to commit actions to canvas
- * - `(input,output,ctx) => Promise<Record<string,unknown>> | undefined | void`
+ * @param outMiddlewares output middlewares (best effort), mainly used to commit actions to canvas
  * @returns tRPC mutation procedure
  */
 export const command = <
   Input extends ZodSchema,
   Output extends ZodSchema,
-  AuthContext,
+  Context extends ZodSchema,
 >(
-  factory: () => Metadata<Input, Output, AuthContext>,
+  factory: () => Metadata<Input, Output, Context>,
   tag: Tag,
-  track?: Track<Input, Output>,
-  commit?: Commit<Input, Output>,
+  outMiddlewares?: Array<OutputMiddleware<Input, Output>>,
 ) => {
   const md = factory();
   return buildproc({
@@ -71,8 +67,7 @@ export const command = <
     name: factory.name,
     md,
     tag,
-    track,
-    commit,
+    outMiddlewares,
   }).mutation(async ({ ctx, input }) => {
     try {
       return await coreCommand(
@@ -93,21 +88,22 @@ export const command = <
  * Builds tRPC query GET endpoint
  * @param factory query factory
  * @param tag query tag used for OpenAPI spec grouping
- * @param forceSecure whether to force secure requests for rate-limited external-router
- * @param ttlSecs cache response ttl in seconds
+ * @param options An object with security and caching related configuration
+ * @param outMiddlewares output middlewares (best effort), mainly used to update statistics
  * @returns tRPC query procedure
  */
 export const query = <
   Input extends ZodSchema,
   Output extends ZodSchema,
-  AuthContext,
+  Context extends ZodSchema,
 >(
-  factory: () => Metadata<Input, Output, AuthContext>,
+  factory: () => Metadata<Input, Output, Context>,
   tag: Tag,
   options?: {
     forceSecure?: boolean;
     ttlSecs?: number;
   },
+  outMiddlewares?: Array<OutputMiddleware<Input, Output>>,
 ) => {
   const md = factory();
   return buildproc({
@@ -115,6 +111,7 @@ export const query = <
     name: factory.name,
     md,
     tag,
+    outMiddlewares,
     forceSecure: options?.forceSecure,
   }).query(async ({ ctx, input }) => {
     try {

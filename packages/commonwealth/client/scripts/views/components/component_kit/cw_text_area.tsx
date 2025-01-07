@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 
-import 'components/component_kit/cw_text_area.scss';
+import './cw_text_area.scss';
 
 import { useFormContext } from 'react-hook-form';
 import { CWLabel } from './cw_label';
@@ -50,7 +50,23 @@ export const CWTextArea = (props: TextAreaProps) => {
     instructionalMessage,
   } = props;
 
+  const formContext = useFormContext();
+  const isHookedToForm = hookToForm && name;
+  const formFieldContext = isHookedToForm ? formContext.register(name) : null;
+  const formFieldValue: string | null = isHookedToForm
+    ? formContext?.watch?.(name)
+    : null;
+  const formFieldErrorMessage =
+    // @ts-expect-error <StrictNullChecks/>
+    hookToForm && (formContext?.formState?.errors?.[name]?.message as string);
+
   const [characterCount, setCharacterCount] = useState(0);
+
+  useEffect(() => {
+    if (typeof formFieldValue == 'string') {
+      setCharacterCount(formFieldValue.length);
+    }
+  }, [formFieldValue]);
 
   useEffect(() => {
     if (resizeWithText) {
@@ -64,15 +80,6 @@ export const CWTextArea = (props: TextAreaProps) => {
       textareaRef.current.style.maxHeight = '512px';
     }
   }, [value, resizeWithText]);
-
-  const formContext = useFormContext();
-  const formFieldContext = hookToForm
-    ? // @ts-expect-error <StrictNullChecks/>
-      formContext.register(name)
-    : ({} as any);
-  const formFieldErrorMessage =
-    // @ts-expect-error <StrictNullChecks/>
-    hookToForm && (formContext?.formState?.errors?.[name]?.message as string);
 
   return (
     <div className={ComponentType.TextArea}>
@@ -97,11 +104,14 @@ export const CWTextArea = (props: TextAreaProps) => {
         disabled={disabled}
         tabIndex={tabIndex}
         maxLength={maxLength}
-        name={name}
         placeholder={placeholder}
-        ref={textareaRef}
         value={value}
-        {...formFieldContext}
+        {...(formFieldContext
+          ? formFieldContext
+          : {
+              name: name,
+              ref: textareaRef,
+            })}
         onInput={(e) => {
           if (onInput) onInput(e);
 

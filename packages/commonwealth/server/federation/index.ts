@@ -4,28 +4,32 @@ import { parse } from '@ipld/dag-json';
 import { config } from '../config';
 
 const log = logger(import.meta);
-export const canvas = await startCanvasNode(config);
+export const { app: canvas, libp2p } = await startCanvasNode(config);
 
-log.info(
-  'canvas: started libp2p with multiaddrs: ' +
-    canvas.libp2p
-      .getMultiaddrs()
-      .map((m) => m.toString())
-      .join(', '),
-);
+if (libp2p) {
+  log.info(
+    'canvas: started libp2p with multiaddrs: ' +
+      libp2p
+        .getMultiaddrs()
+        .map((m) => m.toString())
+        .join(', '),
+  );
+}
 
-export const applyCanvasSignedDataMiddleware: (
-  input,
-  output,
-) => Promise<undefined> = async (input, output) => {
-  if (output.canvas_signed_data)
-    await applyCanvasSignedData(parse(output.canvas_signed_data));
-};
+export const applyCanvasSignedData = async (
+  path: string,
+  canvas_signed_data?: string,
+) => {
+  if (!canvas_signed_data) return;
+  const data = parse(canvas_signed_data) as CanvasSignedData;
 
-export const applyCanvasSignedData = async (data: CanvasSignedData) => {
   let appliedSessionId: string | null = null;
   let appliedActionId: string | null = null;
 
+  log.trace('applying canvas signed data', {
+    path,
+    publicKey: data.sessionMessage.payload.publicKey,
+  });
   try {
     const encodedSessionMessage = canvas.messageLog.encode(
       data.sessionMessageSignature,
@@ -39,7 +43,7 @@ export const applyCanvasSignedData = async (data: CanvasSignedData) => {
       appliedSessionId = idSession;
     }
   } catch (err) {
-    log.warn('could not apply canvas session:', err);
+    log.warn(`could not apply canvas session: ${err.stack}`);
   }
 
   try {
@@ -55,7 +59,7 @@ export const applyCanvasSignedData = async (data: CanvasSignedData) => {
       appliedActionId = idAction;
     }
   } catch (err) {
-    log.warn('could not apply canvas action:', err);
+    log.warn(`could not apply canvas action: ${err.stack}`);
   }
 
   return { session: appliedSessionId, action: appliedActionId };

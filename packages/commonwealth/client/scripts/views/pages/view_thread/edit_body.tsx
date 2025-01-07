@@ -3,7 +3,6 @@ import { buildUpdateThreadInput } from 'client/scripts/state/api/threads/editThr
 import { useAuthModalStore } from 'client/scripts/state/ui/modals';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { SessionKeyError } from 'controllers/server/sessions';
-import 'pages/view_thread/edit_body.scss';
 import type { DeltaStatic } from 'quill';
 import React from 'react';
 import app from 'state';
@@ -15,14 +14,17 @@ import { CWButton } from '../../components/component_kit/new_designs/CWButton';
 import { ReactQuillEditor } from '../../components/react_quill_editor';
 import { deserializeDelta } from '../../components/react_quill_editor/utils';
 import { clearEditingLocalStorage } from '../discussions/CommentTree/helpers';
+import './edit_body.scss';
 
 type EditBodyProps = {
   title: string;
   savedEdits: string;
   shouldRestoreEdits: boolean;
-  thread: Thread;
+  thread: Omit<Thread, 'body'>;
+  activeThreadBody: string; // body of the active/selected thread version
   cancelEditing: () => void;
   threadUpdatedCallback: (title: string, body: string) => void;
+  isDisabled?: boolean;
 };
 
 export const EditBody = (props: EditBodyProps) => {
@@ -31,14 +33,16 @@ export const EditBody = (props: EditBodyProps) => {
     shouldRestoreEdits,
     savedEdits,
     thread,
+    activeThreadBody,
     cancelEditing,
     threadUpdatedCallback,
+    isDisabled = false,
   } = props;
 
   const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
 
   const threadBody =
-    shouldRestoreEdits && savedEdits ? savedEdits : thread.body;
+    shouldRestoreEdits && savedEdits ? savedEdits : activeThreadBody;
   const body = deserializeDelta(threadBody);
 
   const [contentDelta, setContentDelta] = React.useState<DeltaStatic>(body);
@@ -47,11 +51,11 @@ export const EditBody = (props: EditBodyProps) => {
   const user = useUserStore();
 
   const { mutateAsync: editThread } = useEditThreadMutation({
-    threadMsgId: thread.canvasMsgId,
+    threadMsgId: thread.canvasMsgId!,
     communityId: app.activeChainId() || '',
     threadId: thread.id,
     currentStage: thread.stage,
-    currentTopicId: thread.topic.id!,
+    currentTopicId: thread.topic!.id!,
   });
 
   const cancel = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
@@ -98,10 +102,10 @@ export const EditBody = (props: EditBodyProps) => {
       try {
         const newBody = JSON.stringify(contentDelta);
         const input = await buildUpdateThreadInput({
-          newBody: JSON.stringify(contentDelta) || thread.body,
+          newBody: JSON.stringify(contentDelta),
           newTitle: title || thread.title,
           threadId: thread.id,
-          threadMsgId: thread.canvasMsgId,
+          threadMsgId: thread.canvasMsgId!,
           authorProfile: user.activeAccount?.profile,
           address: user.activeAccount?.address || '',
           communityId: app.activeChainId() || '',
@@ -142,7 +146,7 @@ export const EditBody = (props: EditBodyProps) => {
         <CWButton
           label="Save"
           buttonWidth="wide"
-          disabled={saving}
+          disabled={saving || isDisabled}
           onClick={save}
         />
       </div>

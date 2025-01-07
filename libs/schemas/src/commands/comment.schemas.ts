@@ -1,11 +1,12 @@
 import { z } from 'zod';
+import { CommentContext, ThreadContext } from '../context';
 import { Comment, Reaction } from '../entities';
 import { DiscordMetaSchema, PG_INT } from '../utils';
 
 export const CanvasComment = z.object({
   thread_id: PG_INT,
   thread_msg_id: z.string().nullish(),
-  text: z.string().min(1),
+  body: z.string().min(1),
   parent_id: PG_INT.optional(),
   parent_msg_id: z.string().nullish(),
   canvas_signed_data: z.string().optional(),
@@ -17,14 +18,18 @@ export const CreateComment = {
     discord_meta: DiscordMetaSchema.optional(),
   }),
   output: Comment.extend({ community_id: z.string() }),
+  context: ThreadContext,
 };
 
 export const UpdateComment = {
   input: z.object({
     comment_id: PG_INT,
-    text: z.string().min(1),
+    body: z.string().min(1),
+    canvas_signed_data: z.string().optional(),
+    canvas_msg_id: z.string().optional(),
   }),
   output: Comment.extend({ community_id: z.string() }),
+  context: CommentContext,
 };
 
 export const CommentCanvasReaction = z.object({
@@ -38,6 +43,7 @@ export const CommentCanvasReaction = z.object({
 export const CreateCommentReaction = {
   input: CommentCanvasReaction,
   output: Reaction.extend({ community_id: z.string() }),
+  context: CommentContext,
 };
 
 export const DeleteComment = {
@@ -49,6 +55,7 @@ export const DeleteComment = {
     canvas_signed_data: z.string().nullish(),
     canvas_msg_id: z.string().nullish(),
   }),
+  context: CommentContext,
 };
 
 export const SetCommentSpam = {

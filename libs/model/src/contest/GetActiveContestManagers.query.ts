@@ -20,6 +20,7 @@ export function GetActiveContestManagers(): Query<
         url: string;
         private_url: string;
         contest_address: string;
+        end_time: string;
         max_contest_id: number;
         actions: Array<z.infer<typeof schemas.ContestAction>>;
       }>(
@@ -29,11 +30,11 @@ export function GetActiveContestManagers(): Query<
                    cn.url,
                    cm.contest_address,
                    co.max_contest_id,
+                   co.end_time,
                    COALESCE(JSON_AGG(ca) FILTER (WHERE ca IS NOT NULL), '[]'::json) as actions
             FROM "Communities" c
                      JOIN "ChainNodes" cn ON c.chain_node_id = cn.id
                      JOIN "ContestManagers" cm ON cm.community_id = c.id
-                     JOIN "ContestTopics" ct ON cm.contest_address = ct.contest_address
                      JOIN (SELECT contest_address,
                                   MAX(contest_id) AS max_contest_id,
                                   MAX(start_time) as start_time,
@@ -41,24 +42,26 @@ export function GetActiveContestManagers(): Query<
                            FROM "Contests"
                            GROUP BY contest_address) co ON cm.contest_address = co.contest_address
                      LEFT JOIN "ContestActions" ca on (
-                ca.contest_address = cm.contest_address AND
-                ca.created_at > co.start_time AND
-                ca.created_at < co.end_time
-                )
-            WHERE ct.topic_id = :topic_id
-              AND cm.community_id = :community_id
-              AND cm.cancelled = false
+                      ca.contest_address = cm.contest_address AND
+                      ca.created_at > co.start_time AND
+                      ca.created_at < co.end_time
+                     )
+            WHERE
+              cm.cancelled IS NOT TRUE
+              AND cm.ended IS NOT TRUE
+              ${payload.topic_id ? 'AND cm.topic_id = :topic_id' : ''}
+              ${payload.community_id ? 'AND cm.community_id = :community_id' : ''}
               AND (
                 cm.interval = 0 AND NOW() < co.end_time
                     OR
                 cm.interval > 0
                 )
-            GROUP BY cn.eth_chain_id, cn.private_url, cn.url, cm.contest_address, co.max_contest_id
+            GROUP BY cn.eth_chain_id, cn.private_url, cn.url, cm.contest_address, co.max_contest_id, co.end_time
         `,
         {
           type: QueryTypes.SELECT,
           replacements: {
-            topic_id: payload.topic_id!,
+            topic_id: payload.topic_id,
             community_id: payload.community_id,
           },
         },
@@ -68,6 +71,7 @@ export function GetActiveContestManagers(): Query<
         eth_chain_id: r.eth_chain_id,
         url: getChainNodeUrl(r),
         contest_address: r.contest_address,
+        end_time: new Date(r.end_time),
         max_contest_id: r.max_contest_id,
         actions: r.actions,
       }));

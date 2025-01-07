@@ -3,7 +3,8 @@ import {
   ServiceKey,
   startHealthCheckLoop,
 } from '@hicommonwealth/adapters';
-import { EventNames, logger, stats } from '@hicommonwealth/core';
+import { logger, stats } from '@hicommonwealth/core';
+import { EventNames } from '@hicommonwealth/schemas';
 import {
   Client,
   IntentsBitField,

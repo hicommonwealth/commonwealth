@@ -1,0 +1,34 @@
+@import '../../../../styles/shared';
+
+.TooltipIndicator {
+  // cover the parent
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+
+  // needed so that drag operations don't get hijacked by the indicator which
+  // would prevent dropping images and markdown files into the editor.
+  pointer-events: none;
+
+  // the z-index is needed because the 'select' in MDXEditor has its own z-index
+  // which we have to sit on top of.
+  z-index: 10;
+
+  // needed so that the .inner progress indicator can be centered
+  display: flex;
+
+  .inner {
+    // center the contnts
+    margin: auto auto;
+
+    font-size: 12px;
+    letter-spacing: 0.24px;
+    border-radius: 4px;
+    background-color: $neutral-900;
+    padding: 4px 8px;
+    color: $white;
+    text-align: center;
+  }
+}

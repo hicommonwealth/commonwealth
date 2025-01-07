@@ -1,4 +1,4 @@
-@import '../../../../../styles/shared';
+@import '../../../../styles/shared';
 
 .FileUploadButton {
   display: flex;
@@ -13,14 +13,15 @@
 
   .FilePickerInput {
     visibility: hidden;
-    width: 0;
-    height: 0;
+    width: 1px;
+    height: 1px;
   }
 
   .FilePickerButton {
     cursor: pointer;
     border: none;
     color: $neutral-500;
+    padding: 0;
   }
 
   .IconAndText {
