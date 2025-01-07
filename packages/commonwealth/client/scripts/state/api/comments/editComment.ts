@@ -57,9 +57,7 @@ const useEditCommentMutation = ({
       // @ts-expect-error StrictNullChecks
       const comment = new Comment(updatedComment);
 
-      // TODO: https://github.com/hicommonwealth/commonwealth/issues/10461
-      // make a generic util to apply cache updates for comments in all
-      // possible key combinations present in cache.
+      // reset comments cache state
       utils.comment.getComments.invalidate().catch(console.error);
 
       updateThreadInAllCaches(
