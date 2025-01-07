@@ -1,36 +1,9 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import axios from 'axios';
+import { useQueryClient } from '@tanstack/react-query';
+import { trpc } from 'client/scripts/utils/trpcClient';
 import moment from 'moment';
-import { ApiEndpoints, SERVER_URL } from 'state/api/config';
-import { userStore } from '../../ui/user';
+import { ApiEndpoints } from 'state/api/config';
 import { updateThreadInAllCaches } from '../threads/helpers/cache';
 import useFetchCommentsQuery from './fetchComments';
-
-interface ToggleCommentSpamStatusProps {
-  communityId: string;
-  commentId: number;
-  isSpam: boolean;
-  address: string;
-}
-
-const toggleCommentSpamStatus = async ({
-  communityId,
-  commentId,
-  isSpam,
-  address,
-}: ToggleCommentSpamStatusProps) => {
-  const method = isSpam ? 'put' : 'delete';
-  const body = {
-    jwt: userStore.getState().jwt,
-    chain_id: communityId,
-    address: address,
-    author_chain: communityId,
-  };
-  return await axios[method](
-    `${SERVER_URL}/comments/${commentId}/spam`,
-    isSpam ? body : ({ data: { ...body } } as any),
-  );
-};
 
 interface UseToggleCommentSpamStatusMutationProps {
   communityId: string;
@@ -47,15 +20,12 @@ const useToggleCommentSpamStatusMutation = ({
     threadId,
   });
 
-  return useMutation({
-    mutationFn: toggleCommentSpamStatus,
+  return trpc.comment.setCommentSpam.useMutation({
     onSuccess: async (response) => {
       // find the existing comment index and merge with existing comment
-      const foundCommentIndex = comments.findIndex(
-        (x) => x.id === response.data.result.id,
-      );
+      const foundCommentIndex = comments.findIndex((x) => x.id === response.id);
       const updatedComment = comments[foundCommentIndex];
-      const { marked_as_spam_at } = response.data.result;
+      const { marked_as_spam_at } = response;
       updatedComment.markedAsSpamAt = marked_as_spam_at
         ? moment(marked_as_spam_at)
         : null;

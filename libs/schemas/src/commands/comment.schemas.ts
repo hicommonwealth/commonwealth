@@ -64,4 +64,5 @@ export const SetCommentSpam = {
     spam: z.boolean(),
   }),
   output: Comment,
+  context: CommentContext,
 };

@@ -1,27 +1,14 @@
-import { InvalidState, type Command } from '@hicommonwealth/core';
+import { type Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
-import { models } from '../database';
-import { isAuthorized, type AuthContext } from '../middleware';
+import { authComment } from '../middleware';
+import { mustBeAuthorizedComment } from '../middleware/guards';
 
-export const MarkCommentAsSpamErrors = {
-  CommentNotFound: 'Could not find Comment',
-};
-
-export function SetCommentSpam(): Command<
-  typeof schemas.SetCommentSpam,
-  AuthContext
-> {
+export function SetCommentSpam(): Command<typeof schemas.SetCommentSpam> {
   return {
     ...schemas.SetCommentSpam,
-    auth: [isAuthorized({ roles: ['admin', 'moderator'] })],
-    body: async ({ payload }) => {
-      const comment = await models.Comment.findOne({
-        where: { id: payload.comment_id },
-        include: [{ model: models.Thread, attributes: ['community_id'] }],
-      });
-      if (!comment) {
-        throw new InvalidState(MarkCommentAsSpamErrors.CommentNotFound);
-      }
+    auth: [authComment({ author: true })],
+    body: async ({ actor, payload, context }) => {
+      const { comment } = mustBeAuthorizedComment(actor, context);
 
       if (payload.spam && !comment.marked_as_spam_at) {
         comment.marked_as_spam_at = new Date();
