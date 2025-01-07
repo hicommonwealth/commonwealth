@@ -96,7 +96,7 @@ export function GetUserProfile(): Query<typeof schemas.GetUserProfile> {
             search: undefined,
             community_id: c.Thread!.community_id,
           };
-          return comment as unknown as z.infer<typeof schemas.CommentView>;
+          return comment as z.infer<typeof schemas.CommentView>;
         }),
         commentThreads: commentThreads.map(
           (c) => c.toJSON() as z.infer<typeof schemas.ThreadView>,
