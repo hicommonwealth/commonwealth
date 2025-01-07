@@ -214,7 +214,8 @@ export const TreeHierarchy = ({
                   label="Load more"
                   disabled={isLoadingComments}
                   onClick={() => {
-                    !isLoadingComments && fetchMoreComments();
+                    !isLoadingComments &&
+                      fetchMoreComments().catch(console.error);
                   }}
                 />
               ) : (
