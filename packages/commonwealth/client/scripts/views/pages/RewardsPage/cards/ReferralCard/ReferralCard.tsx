@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import {
@@ -8,8 +7,8 @@ import {
 } from 'views/components/component_kit/new_designs/CWTabs';
 
 import RewardsCard from '../../RewardsCard';
+import Trend from '../Trend';
 
-import clsx from 'clsx';
 import './ReferralCard.scss';
 
 enum ReferralTabs {
@@ -26,7 +25,7 @@ const ReferralCard = ({ onSeeAllClick }: ReferralCardProps) => {
     ReferralTabs.Total,
   );
 
-  const trendValue = 1;
+  const trendValue = 10;
 
   return (
     <RewardsCard
@@ -52,27 +51,7 @@ const ReferralCard = ({ onSeeAllClick }: ReferralCardProps) => {
               <CWText fontWeight="bold" type="h4">
                 ${(1234.56).toLocaleString()}
               </CWText>
-              {(trendValue || trendValue === 0) && (
-                <div
-                  className={clsx('trend', {
-                    'trend-up': trendValue > 0,
-                    'trend-down': trendValue < 0,
-                  })}
-                >
-                  <CWIcon
-                    iconName="triangle"
-                    weight="fill"
-                    className="trend-icon"
-                    iconSize="small"
-                  />
-                  <CWText type="b2" fontWeight="medium" className="percentage">
-                    {trendValue}%
-                  </CWText>
-                  <CWText type="b2" className="from-last-month">
-                    from last month
-                  </CWText>
-                </div>
-              )}
+              {(trendValue || trendValue === 0) && <Trend value={trendValue} />}
             </div>
           )}
           {currentTab === ReferralTabs.XP && (
@@ -80,27 +59,7 @@ const ReferralCard = ({ onSeeAllClick }: ReferralCardProps) => {
               <CWText fontWeight="bold" type="h4">
                 {123456} XP
               </CWText>
-              {(trendValue || trendValue === 0) && (
-                <div
-                  className={clsx('trend', {
-                    'trend-up': trendValue > 0,
-                    'trend-down': trendValue < 0,
-                  })}
-                >
-                  <CWIcon
-                    iconName="triangle"
-                    weight="fill"
-                    className="trend-icon"
-                    iconSize="small"
-                  />
-                  <CWText type="b2" fontWeight="medium" className="percentage">
-                    {trendValue}%
-                  </CWText>
-                  <CWText type="b2" className="from-last-month">
-                    from last month
-                  </CWText>
-                </div>
-              )}
+              {(trendValue || trendValue === 0) && <Trend value={trendValue} />}
             </div>
           )}
         </div>
