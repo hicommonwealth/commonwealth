@@ -67,7 +67,7 @@ export function CreateComment(): Command<typeof schemas.CreateComment> {
             {
               ...rest,
               thread_id,
-              parent_id: parent_id ? parent_id.toString() : null, // TODO: change parent_id from string to number
+              parent_id,
               body,
               address_id: address.id!,
               reaction_count: 0,

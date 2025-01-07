@@ -17,7 +17,7 @@ export const Comment = z.object({
   thread_id: PG_INT,
   address_id: PG_INT,
   body: z.string(),
-  parent_id: z.string().nullish(),
+  parent_id: PG_INT.nullish(),
   content_url: z.string().nullish(),
   comment_level: PG_INT,
 

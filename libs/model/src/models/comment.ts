@@ -37,7 +37,7 @@ export default (
           key: 'id',
         },
       },
-      parent_id: { type: Sequelize.STRING, allowNull: true },
+      parent_id: { type: Sequelize.INTEGER, allowNull: true },
       address_id: { type: Sequelize.INTEGER, allowNull: true },
       created_by: { type: Sequelize.STRING, allowNull: true },
       body: {
