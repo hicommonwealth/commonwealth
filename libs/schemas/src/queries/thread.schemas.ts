@@ -128,6 +128,7 @@ export const CommentView = Comment.extend({
   profile_name: z.string().optional(),
   profile_avatar: z.string().optional(),
   user_id: PG_INT,
+  CommentVersionHistories: z.array(CommentVersionHistoryView).nullish(),
 });
 
 export const ThreadVersionHistoryView = ThreadVersionHistory.extend({
