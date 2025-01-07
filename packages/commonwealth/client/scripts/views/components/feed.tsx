@@ -190,6 +190,9 @@ function mapThread(thread: z.infer<typeof ActivityThread>): Thread {
         thread_id: 0,
         address_id: 0,
         reaction_count: 0,
+        comment_level: 0,
+        reply_count: 0,
+        community_id: thread.community_id,
       })) ?? [],
   });
 }
