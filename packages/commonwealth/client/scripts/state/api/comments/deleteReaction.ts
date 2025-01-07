@@ -3,6 +3,7 @@ import { signDeleteCommentReaction } from 'controllers/server/sessions';
 import { trpc } from 'utils/trpcClient';
 import { useAuthModalStore } from '../../ui/modals';
 import { userStore } from '../../ui/user';
+import { queryClient } from '../config';
 
 interface DeleteReactionProps {
   address: string;
@@ -31,16 +32,42 @@ export const buildDeleteCommentReactionInput = async ({
 };
 
 const useDeleteCommentReactionMutation = () => {
-  const utils = trpc.useUtils();
-
   const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
 
   return trpc.thread.deleteReaction.useMutation({
-    onSuccess: () => {
-      // TODO: https://github.com/hicommonwealth/commonwealth/issues/10461
-      // make a generic util to apply cache updates for comments in all
-      // possible key combinations present in cache.
-      utils.comment.getComments.invalidate().catch(console.error);
+    onSuccess: (_, variables) => {
+      // update all comment caches and remove this reaction
+      const queryCache = queryClient.getQueryCache();
+      const commentKeys = queryCache
+        .getAll()
+        .map((cache) => cache.queryKey)
+        .filter(
+          (key) =>
+            Array.isArray(key[0]) &&
+            key[0][0] === 'comment' &&
+            key[0][1] === 'getComments',
+        );
+      commentKeys.map((key) => {
+        const data: any = queryClient.getQueryData(key);
+
+        data.pages = [...data.pages].map((p) => {
+          const tempPage = { ...p };
+          tempPage.results = [...tempPage.results];
+          const foundComment = tempPage.results.find((c) =>
+            c.reactions.find((r) => r.id === variables.reaction_id),
+          );
+          if (foundComment) {
+            foundComment.reactions = [...foundComment.reactions].filter(
+              (r) => r.id !== variables.reaction_id,
+            );
+          }
+          return tempPage;
+        });
+
+        queryClient.setQueryData(key, () => {
+          return data;
+        });
+      });
     },
     onError: (error) => checkForSessionKeyRevalidationErrors(error),
   });
