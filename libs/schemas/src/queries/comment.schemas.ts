@@ -1,5 +1,5 @@
 import z from 'zod';
-import { Address, Comment, Thread, User } from '../entities';
+import { Comment } from '../entities';
 import { PG_INT, zBoolean } from '../utils';
 import { PaginatedResultSchema, PaginationParamsSchema } from './pagination';
 import { CommentView, ReactionView } from './thread.schemas';
@@ -31,19 +31,4 @@ export const GetComments = {
   output: PaginatedResultSchema.extend({
     results: z.array(CommentsView),
   }),
-};
-
-// Similar to GetComments but used exclusively in our client (LEGACY)
-export const ViewComments = {
-  input: z.object({
-    thread_id: PG_INT,
-  }),
-  output: Comment.extend({
-    last_edited: z.string().nullish(),
-    community_id: z.string(),
-    Address: Address.extend({
-      User: User,
-    }),
-    Thread: Thread,
-  }).array(),
 };
