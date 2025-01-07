@@ -51,21 +51,26 @@ module.exports = {
         },
       );
 
-      // TODO: this takes a lot of time and hangs the system. Needs optimization.
+      await queryInterface.addIndex(
+        'Comments',
+        { fields: ['parent_id'] },
+        { transaction: t },
+      );
+
       // set reply counts
-      // await queryInterface.sequelize.query(
-      //   `
-      //     UPDATE "Comments" C1
-      //     SET reply_count = (
-      //         SELECT COUNT(id)
-      //         FROM "Comments" C2
-      //         WHERE CAST(C2.parent_id AS INTEGER) = C1.id
-      //     );
-      //   `,
-      //   {
-      //     transaction: t,
-      //   },
-      // );
+      await queryInterface.sequelize.query(
+        `
+          UPDATE "Comments" C1
+          SET reply_count = (
+              SELECT COUNT(id)
+              FROM "Comments" C2
+              WHERE C2.parent_id IS NOT NULL AND CAST(C2.parent_id AS INTEGER) = C1.id
+          );
+        `,
+        {
+          transaction: t,
+        },
+      );
     });
   },
 
@@ -77,6 +82,7 @@ module.exports = {
       await queryInterface.removeColumn('Comments', 'reply_count', {
         transaction: t,
       });
+      await queryInterface.removeIndex('Comments', 'parent_id');
     });
   },
 };
