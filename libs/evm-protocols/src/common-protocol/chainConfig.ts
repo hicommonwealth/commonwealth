@@ -24,6 +24,8 @@ export function isValidChain(chainId: number): chainId is ValidChains {
 export const STAKE_ID = 2;
 export const CONTEST_VOTER_SHARE = 0;
 export const CONTEST_FEE_SHARE = 100;
+export const CREATE_CONTEST_TOPIC =
+  '0x990f533044dbc89b838acde9cd2c72c400999871cf8f792d731edcae15ead693';
 
 type factoryContractsType = {
   [key in ValidChains]: {
