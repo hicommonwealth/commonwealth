@@ -20,18 +20,6 @@ export const buildAssociations = (db: DB) => {
       onUpdate: 'CASCADE',
       onDelete: 'CASCADE',
     })
-    .withMany(db.Referral, {
-      foreignKey: 'referrer_id',
-      asOne: 'referrer',
-      onUpdate: 'CASCADE',
-      onDelete: 'CASCADE',
-    })
-    .withMany(db.Referral, {
-      foreignKey: 'referee_id',
-      asOne: 'referee',
-      onUpdate: 'CASCADE',
-      onDelete: 'CASCADE',
-    })
     .withMany(db.XpLog, {
       foreignKey: 'user_id',
       onDelete: 'CASCADE',

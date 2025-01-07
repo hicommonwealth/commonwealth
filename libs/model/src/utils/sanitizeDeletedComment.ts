@@ -1,8 +1,9 @@
-import { CommentAttributes } from '../models/comment';
+import { Comment } from '@hicommonwealth/schemas';
+import { z } from 'zod';
 
 export function sanitizeDeletedComment(
-  comment: CommentAttributes,
-): CommentAttributes {
+  comment: z.infer<typeof Comment>,
+): z.infer<typeof Comment> {
   if (!comment.deleted_at) {
     return comment;
   }

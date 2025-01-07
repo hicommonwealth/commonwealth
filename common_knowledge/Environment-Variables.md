@@ -53,7 +53,6 @@ If you add a new environment variable, you must add documentation here. Please d
 - [NEXT_PUBLIC_RSA_PRIVATE_KEY](#next_public_rsa_private_key)
 - [NEXT_PUBLIC_RSA_PUBLIC_KEY](#next_public_rsa_public_key)
 - [NO_GLOBAL_ACTIVITY_CACHE](#no_global_activity_cache)
-- [NO_PRERENDER](#no_prerender)
 - [NO_SSL](#no_ssl)
 - [NODE_ENV](#node_env)
 - [PGPASSWORD](#pgpassword)
@@ -265,10 +264,6 @@ Mixpanel analytics tracking token for our live production site.
 ## NO_GLOBAL_ACTIVITY_CACHE
 
 If `true`, disables the initialization of `globalActivityCache.ts` from server.
-
-## NO_PRERENDER
-
-In a production environment, prerender is only run from `commonwealth/server.ts` if this flag is false or blank.
 
 ## NO_SSL
 
