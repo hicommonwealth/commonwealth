@@ -25,6 +25,7 @@
     "@ethersproject/bignumber": "^5.7.0",
     "@hicommonwealth/shared": "workspace:*",
     "moment": "^2.23.0",
-    "web3": "^4.7.0"
+    "web3": "^4.7.0",
+    "web3-utils": "^4.2.2"
   }
 }

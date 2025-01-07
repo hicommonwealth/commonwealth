@@ -2,6 +2,7 @@ import { AppError, ServerError } from '@hicommonwealth/core';
 import {
   EvmEventSignatures,
   commonProtocol,
+  getNamespace,
 } from '@hicommonwealth/evm-protocols';
 import { models } from '@hicommonwealth/model';
 import { BalanceSourceType } from '@hicommonwealth/shared';
@@ -9,7 +10,6 @@ import Web3 from 'web3';
 import { CommunityAttributes } from '../../models';
 import { equalEvmAddresses } from '../../utils';
 import { getBalances } from '../tokenBalanceCache';
-import { getNamespace } from './contractHelpers';
 
 /**
  * Validate if an attested new namespace is valid on-chain Checks:
