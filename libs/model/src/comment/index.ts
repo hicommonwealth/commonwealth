@@ -5,4 +5,3 @@ export * from './GetComments.query';
 export * from './SearchComments.query';
 export * from './SetCommentSpam.command';
 export * from './UpdateComment.command';
-export * from './ViewComments.query';
