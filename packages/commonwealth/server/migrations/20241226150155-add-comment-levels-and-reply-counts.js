@@ -28,6 +28,12 @@ module.exports = {
       );
       console.timeEnd('add-columns');
 
+      console.time('add-index');
+      await queryInterface.addIndex('Comments', ['parent_id'], {
+        transaction: t,
+      });
+      console.timeEnd('add-index');
+
       // set comment levels
       console.time('set-comment-levels');
       await queryInterface.sequelize.query(
