@@ -1,2 +1,48 @@
+@import '../../../../../styles/shared';
+
 .ReferralCard {
+  width: 100%;
+
+  .referral-card-body {
+    margin-block: 16px;
+
+    .trend {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 8px;
+
+      .trend-icon {
+        display: none;
+      }
+
+      .percentage {
+        color: $neutral-500;
+      }
+
+      &.trend-up {
+        .trend-icon,
+        .percentage {
+          color: $green-500;
+          display: block;
+        }
+      }
+
+      &.trend-down {
+        .trend-icon,
+        .percentage {
+          color: $rorange-500;
+          display: block;
+        }
+
+        .trend-icon {
+          transform: rotate(180deg);
+        }
+      }
+
+      .from-last-month {
+        color: $neutral-500;
+      }
+    }
+  }
 }
