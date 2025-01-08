@@ -5,7 +5,7 @@ import {
   getTransactionReceipt,
 } from '@hicommonwealth/evm-protocols';
 import Web3, { AbiFunctionFragment } from 'web3';
-import { factoryContracts, ValidChains } from '../chainConfig';
+import { ValidChains, factoryContracts } from '../chainConfig';
 
 export const checkCommunityStakeWhitelist = async ({
   eth_chain_id,
@@ -56,6 +56,38 @@ export const checkCommunityStakeWhitelist = async ({
   return !!web3.eth.abi.decodeParameter('bool', whitelistResponse);
 };
 
+export const getStakeTradeInfo = async ({
+  rpc,
+  txHash,
+  blockHash,
+}: {
+  rpc: string;
+  txHash: string;
+  blockHash: string;
+}) => {
+  const [{ txReceipt: tradeTxReceipt }, { block }] = await Promise.all([
+    getTransactionReceipt({
+      rpc,
+      txHash,
+    }),
+    getBlock({
+      rpc,
+      blockHash,
+    }),
+  ]);
+
+  const { 0: stakeId, 1: stakeAmount } = decodeParameters({
+    abiInput: ['uint256', 'uint256'],
+    data: String(tradeTxReceipt.logs[0].data),
+  });
+
+  return {
+    stakeId: parseInt(stakeId as string),
+    stakeAmount: parseInt(stakeAmount as string),
+    timestamp: Number(block.timestamp),
+  };
+};
+
 export const getAndVerifyStakeTrade = async ({
   ethChainId,
   rpc,
@@ -103,7 +135,6 @@ export const getAndVerifyStakeTrade = async ({
     throw new Error('No logs returned from transaction');
   }
   const { 0: stakeId, 1: value } = decodeParameters({
-    evmClient,
     abiInput: ['uint256', 'uint256'],
     data: txReceipt.logs[0].data.toString(),
   });
@@ -115,7 +146,6 @@ export const getAndVerifyStakeTrade = async ({
     data: '0x06fdde03', // name function selector
   });
   const { 0: name } = decodeParameters({
-    evmClient,
     abiInput: ['string'],
     data: response,
   });
@@ -132,7 +162,6 @@ export const getAndVerifyStakeTrade = async ({
     // 5: protocolEthAmount,
     // 6: nameSpaceEthAmount,
   } = decodeParameters({
-    evmClient,
     abiInput: [
       'address',
       'address',

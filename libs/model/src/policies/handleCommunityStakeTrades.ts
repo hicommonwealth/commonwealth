@@ -1,9 +1,5 @@
 import { logger } from '@hicommonwealth/core';
-import {
-  decodeParameters,
-  getBlock,
-  getTransactionReceipt,
-} from '@hicommonwealth/evm-protocols';
+import { getStakeTradeInfo } from '@hicommonwealth/evm-protocols';
 import { chainEvents, events } from '@hicommonwealth/schemas';
 import { BigNumber } from 'ethers';
 import { z } from 'zod';
@@ -53,6 +49,7 @@ export async function handleCommunityStakeTrades(
       event,
       chainNode: chainNode.toJSON(),
     });
+    return;
   }
 
   if (community.chain_node_id != chainNode.id) {
@@ -66,32 +63,20 @@ export async function handleCommunityStakeTrades(
     return;
   }
 
-  const [{ evmClient, txReceipt: tradeTxReceipt }, { block }] =
-    await Promise.all([
-      getTransactionReceipt({
-        rpc: chainNode.private_url!,
-        txHash: event.rawLog.transactionHash,
-      }),
-      getBlock({
-        rpc: chainNode.private_url!,
-        blockHash: event.rawLog.blockHash,
-      }),
-    ]);
-
-  const { 0: stakeId, 1: stakeAmount } = decodeParameters({
-    evmClient,
-    abiInput: ['uint256', 'uint256'],
-    data: String(tradeTxReceipt.logs[0].data),
+  const stakeInfo = await getStakeTradeInfo({
+    rpc: chainNode.private_url,
+    txHash: event.rawLog.transactionHash,
+    blockHash: event.rawLog.blockHash,
   });
 
   await models.StakeTransaction.create({
     transaction_hash: event.rawLog.transactionHash,
     community_id: community.id,
-    stake_id: parseInt(stakeId as string),
-    stake_amount: parseInt(stakeAmount as string),
+    stake_id: stakeInfo.stakeId,
+    stake_amount: stakeInfo.stakeAmount,
     stake_price: BigNumber.from(ethAmount).toString(),
     address: trader,
     stake_direction: isBuy ? 'buy' : 'sell',
-    timestamp: Number(block.timestamp),
+    timestamp: stakeInfo.timestamp,
   });
 }

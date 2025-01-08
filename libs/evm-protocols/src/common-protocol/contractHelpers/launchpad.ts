@@ -182,7 +182,6 @@ export async function getLaunchpadTradeTransaction({
     5: protocolEthAmount,
     6: floatingSupply,
   } = decodeParameters({
-    evmClient,
     abiInput: [
       'address',
       'address',

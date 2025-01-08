@@ -1,8 +1,11 @@
 import { HttpBatchClient, Tendermint34Client } from '@cosmjs/tendermint-rpc';
 import { logger } from '@hicommonwealth/core';
+import {
+  decodeParameters,
+  encodeParameters,
+} from '@hicommonwealth/evm-protocols';
 import { ZERO_ADDRESS } from '@hicommonwealth/shared';
 import { ethers } from 'ethers';
-import * as AbiCoder from 'web3-eth-abi';
 import { ChainNodeAttributes } from '../../models/chain_node';
 import { Balances, GetTendermintClientOptions } from './types';
 
@@ -22,7 +25,6 @@ export async function evmOffChainRpcBatching(
   rpc: {
     method: 'eth_call' | 'eth_getBalance';
     getParams: (
-      abiCoder: typeof AbiCoder,
       address: string,
       contractAddress?: string,
     ) => string | Record<string, string>;
@@ -49,10 +51,7 @@ export async function evmOffChainRpcBatching(
     for (const address of batchAddresses) {
       rpcRequests.push({
         method: rpc.method,
-        params: [
-          rpc.getParams(AbiCoder, address, source.contractAddress),
-          'latest',
-        ],
+        params: [rpc.getParams(address, source.contractAddress), 'latest'],
         id,
         jsonrpc: '2.0',
       });
@@ -115,9 +114,16 @@ export async function evmOffChainRpcBatching(
     }
 
     const address = idAddressMap[data.id];
-    balances[address] = source.contractAddress
-      ? String(AbiCoder.decodeParameter('uint256', data.result))
-      : ethers.BigNumber.from(data.result).toString();
+    if (source.contractAddress) {
+      balances[address] = String(
+        decodeParameters({
+          abiInput: ['uint256'],
+          data: data.result,
+        }),
+      );
+    } else {
+      balances[address] = ethers.BigNumber.from(data.result).toString();
+    }
   }
 
   return { balances, failedAddresses };
@@ -157,10 +163,10 @@ export async function evmBalanceFetcherBatching(
 
     const calldata =
       '0xf0002ea9' +
-      AbiCoder.encodeParameters(
-        ['address[]', 'address[]'],
-        [batchAddresses, [source.contractAddress]],
-      ).substring(2);
+      encodeParameters({
+        abiInput: ['address[]', 'address[]'],
+        data: [batchAddresses, [source.contractAddress]],
+      }).substring(2);
 
     rpcRequests.push({
       method: 'eth_call',
@@ -213,12 +219,12 @@ export async function evmBalanceFetcherBatching(
         continue;
       }
 
-      const balances = AbiCoder.decodeParameter(
-        'uint256[]',
-        data.result,
-      ) as number[];
+      const { 0: balances } = decodeParameters({
+        abiInput: ['uint256[]'],
+        data: data.result,
+      });
       relevantAddresses.forEach(
-        (key, i) => (addressBalanceMap[key] = String(balances[i])),
+        (key, i) => (addressBalanceMap[key] = String((<number[]>balances)[i])),
       );
     }
   }

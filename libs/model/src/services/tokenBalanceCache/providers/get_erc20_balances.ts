@@ -1,5 +1,8 @@
 import { logger } from '@hicommonwealth/core';
-import * as AbiCoder from 'web3-eth-abi';
+import {
+  decodeParameters,
+  encodeParameters,
+} from '@hicommonwealth/evm-protocols';
 import { ChainNodeInstance } from '../../../models/chain_node';
 import { Balances } from '../types';
 import {
@@ -95,10 +98,13 @@ async function getOffChainBatchErc20Balances(
     },
     {
       method: 'eth_call',
-      getParams: (abiCoder, address, tokenAddress) => {
+      getParams: (address, tokenAddress) => {
         const calldata =
           '0x70a08231' +
-          abiCoder.encodeParameters(['address'], [address]).substring(2);
+          encodeParameters({
+            abiInput: ['address'],
+            data: [address],
+          }).substring(2);
         return {
           to: tokenAddress,
           data: calldata,
@@ -119,7 +125,7 @@ async function getErc20Balance(
 ): Promise<Balances> {
   const calldata =
     '0x70a08231' +
-    AbiCoder.encodeParameters(['address'], [address]).substring(2);
+    encodeParameters({ abiInput: ['address'], data: [address] }).substring(2);
   const requestBody = {
     method: 'eth_call',
     params: [
@@ -145,7 +151,9 @@ async function getErc20Balance(
     return {};
   } else {
     return {
-      [address]: String(AbiCoder.decodeParameter('uint256', data.result)),
+      [address]: String(
+        decodeParameters({ abiInput: ['uint256'], data: data.result }),
+      ),
     };
   }
 }

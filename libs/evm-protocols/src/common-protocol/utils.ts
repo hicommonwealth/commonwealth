@@ -1,4 +1,5 @@
 import Web3, { AbiInput, TransactionReceipt, Web3 as Web3Type } from 'web3';
+import * as AbiCoder from 'web3-eth-abi';
 import { isAddress } from 'web3-validator';
 
 export type EvmClientType = Web3Type;
@@ -101,16 +102,23 @@ export const getTransactionCount = async ({
 };
 
 export const decodeParameters = ({
-  evmClient,
   abiInput,
   data,
 }: {
-  evmClient?: EvmClientType;
   abiInput: AbiInput[];
   data: string;
 }) => {
-  const web3 = evmClient || new Web3();
-  return web3.eth.abi.decodeParameters(abiInput, data);
+  return AbiCoder.decodeParameters(abiInput, data);
+};
+
+export const encodeParameters = ({
+  abiInput,
+  data,
+}: {
+  abiInput: ReadonlyArray<AbiInput>;
+  data: unknown[];
+}) => {
+  return AbiCoder.encodeParameters(abiInput, data);
 };
 
 export const createPrivateEvmClient = ({
