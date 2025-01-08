@@ -1,5 +1,6 @@
 import Comment from 'models/Comment';
 import { IUniqueId } from 'models/interfaces';
+import moment from 'moment';
 import { trpc } from 'utils/trpcClient';
 import { updateThreadInAllCaches } from '../threads/helpers/cache';
 
@@ -17,8 +18,14 @@ const useToggleCommentSpamStatusMutation = ({
   return trpc.comment.setCommentSpam.useMutation({
     onSuccess: async (response) => {
       const comment = new Comment({
-        ...response?.data?.result,
+        ...response,
+        id: response.id!,
+        Address: response.Address!,
+        author: response.Address!.address,
         community_id: communityId,
+        reaction_weights_sum: response.reaction_weights_sum || '0',
+        created_at: moment(response.created_at!),
+        CommentVersionHistories: undefined,
       });
 
       // reset comments cache state
