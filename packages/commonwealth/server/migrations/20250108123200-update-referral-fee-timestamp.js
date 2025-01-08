@@ -2,14 +2,13 @@
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
-  async up(queryInterface, Sequelize) {
+  async up(queryInterface) {
     await queryInterface.sequelize.transaction(async (transaction) => {
-      Sequelize.models.ReferralFee.update(
-        { transaction_timestamp: Sequelize.BIGINT },
-        { transaction },
-      );
-      Sequelize.models.Referrals.update(
-        { created_on_chain_timestamp: Sequelize.BIGINT },
+      await queryInterface.sequelize.query(
+        `
+        ALTER TABLE "Referrals" ALTER COLUMN "created_on_chain_timestamp" TYPE BIGINT;
+        ALTER TABLE "ReferralFees" ALTER COLUMN "transaction_timestamp" TYPE BIGINT;
+        `,
         { transaction },
       );
     });
