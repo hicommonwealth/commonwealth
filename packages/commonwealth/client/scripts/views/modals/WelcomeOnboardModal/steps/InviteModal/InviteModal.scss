@@ -1,0 +1,112 @@
+@import '../../../../../styles/shared.scss';
+
+.InviteModal {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  .logo {
+    height: auto;
+    margin: auto;
+    width: 227px;
+
+    @include extraSmall {
+      width: 175px;
+    }
+  }
+  .referral_logo {
+    height: auto;
+    margin: auto;
+    width: 250px;
+
+    @include extraSmall {
+      width: 100%;
+      max-width: 266px;
+    }
+  }
+
+  .share_container {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin-top: 2rem;
+    .share_content {
+      gap: 1rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      .icon_container {
+        cursor: pointer;
+        border-radius: 100%;
+        padding: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 55px;
+        height: 55px;
+        .Icon.large {
+          color: white;
+        }
+      }
+      .label {
+        font-size: 14px;
+        font-weight: 500;
+        line-height: 24px;
+        color: #000000;
+      }
+    }
+  }
+  .buttons_container {
+    margin-top: 20px;
+    display: flex;
+    gap: 1rem;
+    width: 100%;
+    position: relative;
+    align-items: center;
+    justify-content: space-between;
+    .skip-button {
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      width: auto !important;
+      position: relative !important;
+      transform: translate(0%);
+
+      .primary {
+        padding-left: 2rem;
+        padding-right: 2rem;
+        border: 1px solid #0079cc;
+        background-color: transparent !important;
+
+        .button-text {
+          color: #0079cc !important;
+        }
+      }
+    }
+
+    .next-button {
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      transform: translate(0%);
+      width: auto !important;
+      position: relative !important;
+      .primary {
+        padding-left: 2rem;
+        padding-right: 2rem;
+        border: 1px solid #0079cc;
+        background-color: #0079cc;
+        .button-text {
+          color: white !important;
+        }
+      }
+    }
+  }
+}

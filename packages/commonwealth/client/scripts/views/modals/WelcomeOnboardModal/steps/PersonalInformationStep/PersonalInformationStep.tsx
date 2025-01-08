@@ -233,26 +233,27 @@ const PersonalInformationStep = ({
               disabled={watch('email')?.trim() === '' || !formState.isDirty}
             />
           </div>
+          <div className="footerContainer">
+            <CWButton
+              label="Next"
+              buttonWidth="full"
+              type="submit"
+              disabled={
+                isUpdatingProfile ||
+                isCheckingUsernameUniqueness ||
+                !formState.isDirty ||
+                watch('username')?.trim() === ''
+              }
+            />
 
-          <CWButton
-            label="Next"
-            buttonWidth="full"
-            type="submit"
-            disabled={
-              isUpdatingProfile ||
-              isCheckingUsernameUniqueness ||
-              !formState.isDirty ||
-              watch('username')?.trim() === ''
-            }
-          />
-
-          <CWText isCentered className="footer">
-            We will never share your contact information with third party
-            services.
-            <br />
-            For questions please review our&nbsp;
-            <Link to="/privacy">Privacy Policy</Link>
-          </CWText>
+            <CWText isCentered className="footer">
+              We will never share your contact information with third party
+              services.
+              <br />
+              For questions please review our&nbsp;
+              <Link to="/privacy">Privacy Policy</Link>
+            </CWText>
+          </div>
         </>
       )}
     </CWForm>

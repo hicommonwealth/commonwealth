@@ -9,6 +9,8 @@ const SignInModal = ({
   showWalletsFor,
   showAuthOptionFor,
   onSignInClick,
+  openEVMWalletsSubModal,
+  isUserFromWebView,
 }: ModalVariantProps) => {
   return (
     <ModalBase
@@ -20,6 +22,8 @@ const SignInModal = ({
       showAuthOptionFor={showAuthOptionFor}
       bodyClassName="SignInModal"
       onSignInClick={onSignInClick}
+      openEVMWalletsSubModal={openEVMWalletsSubModal}
+      isUserFromWebView={isUserFromWebView}
     />
   );
 };

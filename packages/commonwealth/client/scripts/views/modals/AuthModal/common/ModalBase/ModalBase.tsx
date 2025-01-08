@@ -87,17 +87,21 @@ const ModalBase = ({
   showAuthOptionTypesFor,
   bodyClassName,
   onSignInClick,
+  openEVMWalletsSubModal,
+  isUserFromWebView = false,
 }: ModalBaseProps) => {
   const copy = MODAL_COPY[layoutType];
-
   const [activeTabIndex, setActiveTabIndex] = useState<number>(
     showAuthOptionTypesFor?.includes('sso') &&
       showAuthOptionTypesFor.length === 1
       ? 1
       : 0,
   );
-  const [isEVMWalletsModalVisible, setIsEVMWalletsModalVisible] =
-    useState(false);
+  const [isEVMWalletsModalVisible, setIsEVMWalletsModalVisible] = useState(
+    () => {
+      return openEVMWalletsSubModal ? openEVMWalletsSubModal : false;
+    },
+  );
   const [isAuthenticatingWithEmail, setIsAuthenticatingWithEmail] =
     useState(false);
   const [isAuthenticatingWithSMS, setIsAuthenticatingWithSMS] = useState(false);
@@ -111,8 +115,8 @@ const ModalBase = ({
     await onClose();
   };
 
-  const handleSuccess = async (_, isNewlyCreated) => {
-    await onSuccess?.(isNewlyCreated);
+  const handleSuccess = async (_, isNewlyCreated, isFromWebView) => {
+    await onSuccess?.(isNewlyCreated, isFromWebView);
     await handleClose();
   };
 
@@ -133,6 +137,7 @@ const ModalBase = ({
     onModalClose: handleClose,
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     onSuccess: handleSuccess,
+    isFromWebView: isUserFromWebView,
   });
 
   const filterWalletNames = (byChain: ChainBase) =>
@@ -248,7 +253,6 @@ const ModalBase = ({
       setIsAuthenticatingWithSMS(true);
       return;
     }
-
     // if any wallet option is selected
     if (activeTabIndex === 0) {
       // if wallet connect option is selected, open the EVM wallet list modal
@@ -256,7 +260,6 @@ const ModalBase = ({
         setIsEVMWalletsModalVisible(true);
         return;
       }
-
       // @ts-expect-error <StrictNullChecks>
       await onWalletSelect(wallets.find((wallet) => wallet.name === option));
     }
@@ -293,13 +296,10 @@ const ModalBase = ({
     <>
       <section className="ModalBase">
         <CWIcon iconName="close" onClick={onClose} className="close-btn" />
-
         <img src={commonLogo} className="logo" />
-
         <CWText type="h2" className="header" isCentered>
           {copy.title}
         </CWText>
-
         {copy.description && (
           <CWText type="b1" className="description" isCentered>
             {...copy.description.split('\n').map((line, index) => (
@@ -310,7 +310,6 @@ const ModalBase = ({
             ))}
           </CWText>
         )}
-
         <CWModalBody className={clsx('content', bodyClassName)}>
           {/* @ts-expect-error StrictNullChecks*/}
           {showAuthOptionTypesFor?.length > 0 && (
@@ -371,7 +370,6 @@ const ModalBase = ({
             </>
           )}
         </CWModalBody>
-
         <CWModalFooter className="footer">
           {copy.showFooter && (
             <>
@@ -418,6 +416,8 @@ const ModalBase = ({
         canResetWalletConnect={isWalletConnectEnabled}
         // eslint-disable-next-line @typescript-eslint/no-misused-promises
         onResetWalletConnect={onResetWalletConnect}
+        isUserFromWebView={isUserFromWebView}
+        handleNextOrSkip={handleSuccess}
       />
       {/* Signature verification modal is only displayed on mobile */}
       <MobileWalletConfirmationSubModal
