@@ -108,10 +108,12 @@ async function getErc721Balance(
     log.error(errorMsg, data.error);
     return {};
   } else {
+    const { 0: balance } = decodeParameters({
+      abiInput: ['uint256'],
+      data: data.result,
+    });
     return {
-      [address]: String(
-        decodeParameters({ abiInput: ['uint256'], data: data.result }),
-      ),
+      [address]: String(balance),
     };
   }
 }
