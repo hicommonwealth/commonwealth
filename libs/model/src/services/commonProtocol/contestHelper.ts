@@ -1,141 +1,20 @@
-import { AppError, ServerError } from '@hicommonwealth/core';
+import { ServerError } from '@hicommonwealth/core';
 import {
+  AddContentResponse,
+  addContent,
   commonProtocol,
-  contestAbi,
+  estimateGas,
+  getTransactionCount,
   namespaceFactoryAbi,
+  recurringContestAbi,
+  singleContestAbi,
+  voteContent,
 } from '@hicommonwealth/evm-protocols';
 import { Mutex } from 'async-mutex';
-import Web3, { PayableCallOptions } from 'web3';
-import { AbiItem } from 'web3-utils';
 import { config } from '../../config';
 import { createWeb3Provider } from './utils';
 
 const nonceMutex = new Mutex();
-
-export type AddContentResponse = {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  txReceipt: any;
-  contentId: string;
-};
-
-export type ContestScores = {
-  scores: {
-    winningContent: string;
-    winningAddress: string;
-    voteCount: string;
-  }[];
-  contestBalance: string;
-};
-
-/**
- * Adds content to an active contest. Includes validation of contest state
- * @param rpcNodeUrl the rpc node url
- * @param contest the address of the contest
- * @param creator the address of the user to create content on behalf of
- * @param url the common/commonwealth url of the content
- * @returns txReceipt and contentId of new content (NOTE: this should be saved for future voting)
- */
-const addContent = async (
-  rpcNodeUrl: string,
-  contest: string,
-  creator: string,
-  url: string,
-  web3?: Web3,
-  nonce?: number,
-): Promise<AddContentResponse> => {
-  if (!web3) {
-    // eslint-disable-next-line no-param-reassign
-    web3 = await createWeb3Provider(rpcNodeUrl);
-  }
-  const contestInstance = new web3.eth.Contract(
-    contestAbi as AbiItem[],
-    contest,
-  );
-
-  const maxFeePerGasEst = await estimateGas(web3);
-  let txReceipt;
-  try {
-    const txDetails: PayableCallOptions = {
-      from: web3.eth.defaultAccount,
-      gas: '1000000',
-      type: '0x2',
-      maxFeePerGas: maxFeePerGasEst?.toString(),
-      maxPriorityFeePerGas: web3.utils.toWei('0.001', 'gwei'),
-    };
-    if (nonce) {
-      txDetails.nonce = nonce.toString();
-    }
-    txReceipt = await contestInstance.methods
-      .addContent(creator, url, [])
-      .send(txDetails);
-  } catch (error) {
-    throw new AppError('Failed to push content to chain: ' + error);
-  }
-
-  if (!txReceipt.events?.ContentAdded) {
-    throw new AppError('Event not included in receipt');
-  }
-
-  const event = txReceipt.events['ContentAdded'];
-
-  if (!event) {
-    throw new AppError('Content not added on-chain');
-  }
-
-  return {
-    txReceipt,
-    contentId: String(event.returnValues.contentId),
-  };
-};
-
-/**
- * Adds a vote to content if voting power is available and user hasnt voted
- * @param rpcNodeUrl the rpc node url
- * @param contest the address of the contest
- * @param voter the address of the voter
- * @param contentId The contentId on the contest to vote
- * @returns a tx receipt
- */
-const voteContent = async (
-  rpcNodeUrl: string,
-  contest: string,
-  voter: string,
-  contentId: string,
-  web3?: Web3,
-  nonce?: number,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-): Promise<any> => {
-  if (!web3) {
-    // eslint-disable-next-line no-param-reassign
-    web3 = await createWeb3Provider(rpcNodeUrl);
-  }
-  const contestInstance = new web3.eth.Contract(
-    contestAbi as AbiItem[],
-    contest,
-  );
-
-  const maxFeePerGasEst = await estimateGas(web3);
-  let txReceipt;
-  try {
-    const txDetails: PayableCallOptions = {
-      from: web3.eth.defaultAccount,
-      gas: '1000000',
-      type: '0x2',
-      maxFeePerGas: maxFeePerGasEst?.toString(),
-      maxPriorityFeePerGas: web3.utils.toWei('0.001', 'gwei'),
-    };
-    if (nonce) {
-      txDetails.nonce = nonce.toString();
-    }
-    txReceipt = await contestInstance.methods
-      .voteContent(voter, contentId)
-      .send(txDetails);
-  } catch (error) {
-    throw new AppError('Failed to push content to chain: ' + error);
-  }
-
-  return txReceipt;
-};
 
 export const addContentBatch = async (
   rpcNodeUrl: string,
@@ -144,15 +23,17 @@ export const addContentBatch = async (
   url: string,
 ): Promise<PromiseSettledResult<AddContentResponse>[]> => {
   return nonceMutex.runExclusive(async () => {
-    const web3 = await createWeb3Provider(rpcNodeUrl);
-    let currNonce = Number(
-      await web3.eth.getTransactionCount(web3.eth.defaultAccount!),
-    );
+    const web3 = createWeb3Provider(rpcNodeUrl);
+    let currNonce = await getTransactionCount({
+      evmClient: web3,
+      rpc: rpcNodeUrl,
+      address: web3.eth.defaultAccount!,
+    });
 
     const promises: Promise<AddContentResponse>[] = [];
 
     contest.forEach((c) => {
-      promises.push(addContent(rpcNodeUrl, c, creator, url, web3, currNonce));
+      promises.push(addContent(c, creator, url, web3, currNonce));
       currNonce++;
     });
 
@@ -171,24 +52,19 @@ export const voteContentBatch = async (
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): Promise<PromiseSettledResult<any>[]> => {
   return nonceMutex.runExclusive(async () => {
-    const web3 = await createWeb3Provider(rpcNodeUrl);
-    let currNonce = Number(
-      await web3.eth.getTransactionCount(web3.eth.defaultAccount!),
-    );
+    const web3 = createWeb3Provider(rpcNodeUrl);
+    let currNonce = await getTransactionCount({
+      evmClient: web3,
+      rpc: rpcNodeUrl,
+      address: web3.eth.defaultAccount!,
+    });
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const promises: Promise<any>[] = [];
 
     entries.forEach(({ contestAddress, contentId }) => {
       promises.push(
-        voteContent(
-          rpcNodeUrl,
-          contestAddress,
-          voter,
-          contentId,
-          web3,
-          currNonce,
-        ),
+        voteContent(contestAddress, voter, contentId, web3, currNonce),
       );
       currNonce++;
     });
@@ -213,9 +89,9 @@ export const rollOverContest = async (
   oneOff: boolean,
 ): Promise<boolean> => {
   return nonceMutex.runExclusive(async () => {
-    const web3 = await createWeb3Provider(rpcNodeUrl);
+    const web3 = createWeb3Provider(rpcNodeUrl);
     const contestInstance = new web3.eth.Contract(
-      contestAbi as AbiItem[],
+      oneOff ? singleContestAbi : recurringContestAbi,
       contest,
     );
 
@@ -262,7 +138,7 @@ export const deployERC20Contest = async (
 ): Promise<string> => {
   if (!config.WEB3.CONTEST_BOT_PRIVATE_KEY)
     throw new ServerError('Contest bot private key not set!');
-  const web3 = await createWeb3Provider(
+  const web3 = createWeb3Provider(
     rpcNodeUrl,
     config.WEB3.CONTEST_BOT_PRIVATE_KEY,
   );
@@ -298,19 +174,4 @@ export const deployERC20Contest = async (
     eventLog.data.toString(),
   )['0'] as string;
   return newContestAddress;
-};
-
-const estimateGas = async (web3: Web3): Promise<bigint | null> => {
-  try {
-    const latestBlock = await web3.eth.getBlock('latest');
-
-    // Calculate maxFeePerGas and maxPriorityFeePerGas
-    const baseFeePerGas = latestBlock.baseFeePerGas;
-    const maxPriorityFeePerGas = web3.utils.toWei('0.001', 'gwei');
-    const maxFeePerGas =
-      baseFeePerGas! * BigInt(2) + BigInt(parseInt(maxPriorityFeePerGas));
-    return maxFeePerGas;
-  } catch {
-    return null;
-  }
 };

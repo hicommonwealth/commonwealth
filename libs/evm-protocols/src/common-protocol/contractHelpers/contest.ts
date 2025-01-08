@@ -1,9 +1,10 @@
 import { BigNumber } from '@ethersproject/bignumber';
-import { feeManagerAbi } from '@hicommonwealth/evm-protocols';
 import { ZERO_ADDRESS } from '@hicommonwealth/shared';
-import Web3 from 'web3';
+import Web3, { PayableCallOptions, TransactionReceipt } from 'web3';
+import { feeManagerAbi } from '../../abis/feeManagerAbi';
 import { recurringContestAbi } from '../../abis/recurringContestAbi';
 import { singleContestAbi } from '../../abis/singleContestAbi';
+import { estimateGas } from '../utils';
 
 export const getTotalContestBalance = async (
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -194,4 +195,104 @@ export const getContestScore = async (
     }),
     contestBalance: contestData[1],
   };
+};
+
+export type AddContentResponse = {
+  txReceipt: TransactionReceipt;
+  contentId: string;
+};
+
+/**
+ * Adds content to an active contest. Includes validation of contest state
+ * @param contest the address of the contest
+ * @param creator the address of the user to create content on behalf of
+ * @param url the common/commonwealth url of the content
+ * @param web3 A web3 instance instantiated with a private key
+ * @param nonce The nonce of the transaction
+ * @returns txReceipt and contentId of new content (NOTE: this should be saved for future voting)
+ */
+export const addContent = async (
+  contest: string,
+  creator: string,
+  url: string,
+  web3: Web3,
+  nonce?: number,
+): Promise<AddContentResponse> => {
+  const contestInstance = new web3.eth.Contract(singleContestAbi, contest);
+
+  const maxFeePerGasEst = await estimateGas(web3);
+  let txReceipt: TransactionReceipt;
+  try {
+    const txDetails: PayableCallOptions = {
+      from: web3.eth.defaultAccount,
+      gas: '1000000',
+      type: '0x2',
+      maxFeePerGas: maxFeePerGasEst?.toString(),
+      maxPriorityFeePerGas: web3.utils.toWei('0.001', 'gwei'),
+    };
+    if (nonce) {
+      txDetails.nonce = nonce.toString();
+    }
+    txReceipt = await contestInstance.methods
+      .addContent(creator, url, [])
+      .send(txDetails);
+  } catch (error) {
+    throw new Error('Failed to push content to chain: ' + error);
+  }
+
+  if (!txReceipt.events?.ContentAdded) {
+    throw new Error('Event not included in receipt');
+  }
+
+  const event = txReceipt.events['ContentAdded'];
+
+  if (!event) {
+    throw new Error('Content not added on-chain');
+  }
+
+  return {
+    txReceipt,
+    contentId: String(event.returnValues.contentId),
+  };
+};
+
+/**
+ * Adds a vote to content if voting power is available and user hasnt voted
+ * @param contest the address of the contest
+ * @param voter the address of the voter
+ * @param contentId The contentId on the contest to vote
+ * @param web3 A web3 instance instantiated with a private key
+ * @param nonce The nonce of the transaction
+ * @returns a tx receipt
+ */
+export const voteContent = async (
+  contest: string,
+  voter: string,
+  contentId: string,
+  web3: Web3,
+  nonce?: number,
+): Promise<TransactionReceipt> => {
+  const contestInstance = new web3.eth.Contract(singleContestAbi, contest);
+
+  const maxFeePerGasEst = await estimateGas(web3);
+  let txReceipt;
+  try {
+    const txDetails: PayableCallOptions = {
+      from: web3.eth.defaultAccount,
+      gas: '1000000',
+      type: '0x2',
+      maxFeePerGas: maxFeePerGasEst?.toString(),
+      maxPriorityFeePerGas: web3.utils.toWei('0.001', 'gwei'),
+    };
+    if (nonce) {
+      txDetails.nonce = nonce.toString();
+    }
+    txReceipt = await contestInstance.methods
+      .voteContent(voter, contentId)
+      .send(txDetails);
+  } catch (error) {
+    throw new Error('Failed to push content to chain: ' + error);
+  }
+
+  return txReceipt;
 };
