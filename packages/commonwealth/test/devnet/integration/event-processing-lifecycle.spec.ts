@@ -34,6 +34,7 @@ describe('End to end event tests', () => {
       async function launchAndBuyToken(name, symbol) {
         console.log(`launching token ${nonce}`);
 
+        // temp
         nonce += BigInt(1);
         try {
           await cp.launchToken(
