@@ -1,5 +1,8 @@
 import { Log } from '@ethersproject/providers';
-import { EvmEventSource } from '@hicommonwealth/schemas';
+import {
+  events as EventSchemas,
+  EvmEventSource,
+} from '@hicommonwealth/schemas';
 import { AbiType } from '@hicommonwealth/shared';
 import { ethers } from 'ethers';
 import { z } from 'zod';
@@ -11,6 +14,7 @@ export type EvmEvent = {
   };
   parsedArgs: ethers.utils.Result;
   rawLog: Log;
+  block?: z.infer<typeof EventSchemas.BlockDetails>;
 };
 
 const sourceType = EvmEventSource.extend({

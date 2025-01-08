@@ -175,6 +175,13 @@ export const DiscordThreadDeleted = DiscordEventBase.pick({
   parent_channel_id: true,
 });
 
+export const BlockDetails = z.object({
+  timestamp: z.number(),
+  miner: z.string(),
+  gasLimit: z.number(),
+  gasUsed: z.number(),
+});
+
 const ChainEventCreatedBase = z.object({
   eventSource: z.object({
     ethChainId: z.number(),
@@ -190,6 +197,7 @@ const ChainEventCreatedBase = z.object({
     transactionHash: z.string(),
     logIndex: z.number(),
   }),
+  block: BlockDetails,
 });
 
 /**

@@ -1,6 +1,8 @@
 import { Log } from '@ethersproject/providers';
 import { logger as _logger, stats } from '@hicommonwealth/core';
+import { events as EventSchemas } from '@hicommonwealth/schemas';
 import { ethers } from 'ethers';
+import { z } from 'zod';
 import { AbiSignatures, ContractSources, EvmEvent, EvmSource } from './types';
 
 const logger = _logger(import.meta);
@@ -41,7 +43,11 @@ export async function getLogs({
   contractAddresses: string[];
   startingBlockNum: number;
   endingBlockNum: number;
-}): Promise<{ logs: Log[]; lastBlockNum: number }> {
+}): Promise<{
+  logs: Log[];
+  lastBlockNum: number;
+  blockDetails: Record<number, z.infer<typeof EventSchemas.BlockDetails>>;
+}> {
   let startBlock = startingBlockNum;
   const provider = getProvider(rpc);
 
@@ -54,12 +60,12 @@ export async function getLogs({
         endingBlockNum,
       },
     );
-    return { logs: [], lastBlockNum: endingBlockNum };
+    return { logs: [], lastBlockNum: endingBlockNum, blockDetails: {} };
   }
 
   if (contractAddresses.length === 0) {
     logger.error(`No contracts given`);
-    return { logs: [], lastBlockNum: endingBlockNum };
+    return { logs: [], lastBlockNum: endingBlockNum, blockDetails: {} };
   }
 
   // limit the number of blocks to fetch to avoid rate limiting on some public EVM nodes like Celo
@@ -96,6 +102,23 @@ export async function getLogs({
     },
   ]);
 
+  const blockNumbers = [...new Set(logs.map((l) => l.blockNumber))];
+  const blockDetails = await Promise.all(
+    blockNumbers.map(async (blockNumber) => {
+      const block = await provider.send('eth_getBlockByNumber', [
+        blockNumber,
+        false,
+      ]);
+      return {
+        number: parseInt(block.number, 16),
+        timestamp: parseInt(block.timestamp, 16),
+        miner: block.miner,
+        gasLimit: parseInt(block.gasLimit, 16),
+        gasUsed: parseInt(block.gasUsed, 16),
+      };
+    }),
+  );
+
   const formattedLogs: Log[] = logs.map((log) => ({
     ...log,
     blockNumber: parseInt(log.blockNumber, 16),
@@ -103,7 +126,14 @@ export async function getLogs({
     logIndex: parseInt(log.logIndex, 16),
   }));
 
-  return { logs: formattedLogs, lastBlockNum: endingBlockNum };
+  return {
+    logs: formattedLogs,
+    lastBlockNum: endingBlockNum,
+    blockDetails: blockDetails.reduce((map, details) => {
+      map[details.number] = details;
+      return map;
+    }, {}),
+  };
 }
 
 export async function parseLogs(
@@ -167,15 +197,22 @@ export async function getEvents(
   startingBlockNum: number,
   endingBlockNum: number,
 ): Promise<{ events: EvmEvent[]; lastBlockNum: number }> {
-  const { logs, lastBlockNum } = await getLogs({
+  const { logs, lastBlockNum, blockDetails } = await getLogs({
     rpc: evmSource.rpc,
     maxBlockRange: evmSource.maxBlockRange,
     contractAddresses: Object.keys(evmSource.contracts),
     startingBlockNum,
     endingBlockNum,
   });
+
   const events = await parseLogs(evmSource.contracts, logs);
-  return { events, lastBlockNum };
+  return {
+    events: events.map((e) => ({
+      ...e,
+      block: blockDetails[e.rawLog.blockNumber],
+    })),
+    lastBlockNum,
+  };
 }
 
 /**
