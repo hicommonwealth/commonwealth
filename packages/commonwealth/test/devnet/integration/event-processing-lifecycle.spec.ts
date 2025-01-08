@@ -21,56 +21,95 @@ describe('End to end event tests', () => {
         contractAddresses.launchpad,
       ) as unknown as Contract<typeof launchpadFactoryAbi>;
 
-      await cp.launchToken(
-        launchpadFactory,
-        'testToken',
-        'test',
-        [],
-        [],
-        web3.utils.toWei(1e9, 'ether'),
-        anvilAccounts[0].address,
-        830000,
-        contractAddresses.tokenCommunityManager,
-      );
-
-      await mineBlocks(1);
-
-      let token = await models.LaunchpadToken.findOne({
-        where: { name: 'testToken' },
-      });
-      await vi.waitFor(
-        async () => {
-          token = await models.LaunchpadToken.findOne({
-            where: { name: 'testToken' },
-          });
-          expect(token).toBeTruthy();
-        },
-        {
-          timeout: 100000,
-          interval: 500,
-        },
-      );
-
       const lpBondingCurveFactory = new web3.eth.Contract(
-        lpBondingCurveAbi as AbiItem[],
+        lpBondingCurveAbi,
         contractAddresses.lpBondingCurve,
-      ) as unknown as Contract<typeof lpBondingCurveAbi>;
-
-      await cp.buyToken(
-        lpBondingCurveFactory,
-        token!.token_address,
-        anvilAccounts[0].address,
-        100,
       );
 
-      await mineBlocks(1);
+      const baseNonce = await web3.eth.getTransactionCount(
+        anvilAccounts[0].address,
+      );
+      let nonce = baseNonce;
+
+      async function launchAndBuyToken(name, symbol) {
+        console.log(`launching token ${nonce}`);
+
+        nonce += BigInt(1);
+        try {
+          await cp.launchToken(
+            launchpadFactory,
+            name,
+            symbol,
+            [],
+            [],
+            web3.utils.toWei(1e9, 'ether'),
+            anvilAccounts[0].address,
+            830000,
+            contractAddresses.tokenCommunityManager,
+            Number(nonce),
+          );
+        } catch (e) {
+          console.log(e);
+        }
+
+        console.log(`launched token ${nonce}`);
+
+        await mineBlocks(1);
+
+        let token = await models.LaunchpadToken.findOne({
+          where: { name },
+        });
+
+        await vi.waitFor(
+          async () => {
+            token = await models.LaunchpadToken.findOne({
+              where: { name },
+            });
+            if (!token) {
+              throw new Error('Token not found yet');
+            }
+          },
+          {
+            timeout: 100000,
+            interval: 500,
+          },
+        );
+
+        await cp.buyToken(
+          lpBondingCurveFactory,
+          token.token_address,
+          anvilAccounts[0].address,
+          100,
+        );
+
+        console.log(`bought token ${nonce}`);
+
+        await mineBlocks(1);
+      }
+
+      const tokenLaunchPromises = [
+        { name: 'testToken1', symbol: 'TT1', nonce: 1 },
+        { name: 'testToken2', symbol: 'TT2', nonce: 2 },
+        { name: 'testToken3', symbol: 'TT3', nonce: 3 },
+        { name: 'testToken4', symbol: 'TT4', nonce: 4 },
+        { name: 'testToken5', symbol: 'TT5', nonce: 5 },
+        { name: 'testToken6', symbol: 'TT6', nonce: 6 },
+        { name: 'testToken7', symbol: 'TT7', nonce: 7 },
+        { name: 'testToken8', symbol: 'TT8', nonce: 8 },
+        { name: 'testToken9', symbol: 'TT9', nonce: 9 },
+        { name: 'testToken10', symbol: 'TT10', nonce: 10 },
+      ];
+
+      await Promise.all(
+        tokenLaunchPromises.map(({ name, symbol }) =>
+          launchAndBuyToken(name, symbol),
+        ),
+      );
 
       await vi.waitFor(
         async () => {
-          const launchpadTrade = await models.LaunchpadTrade.findOne({
-            where: { token_address: token!.token_address, is_buy: true },
-          });
-          expect(launchpadTrade).toBeTruthy();
+          const launchpadTrades = await models.LaunchpadTrade.findAll();
+          expect(launchpadTrades.length).toEqual(10);
         },
         {
           timeout: 100000,

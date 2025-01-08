@@ -13,14 +13,18 @@ import { anvilAccounts, setupWeb3 } from './process-setup/setupWeb3';
 export async function setupCommonwealthE2E() {
   // setup outbox notifications
 
-  await outboxTriggerMigration(
-    models.sequelize.getQueryInterface(),
-    models.sequelize,
-  );
-  await outboxTriggerMigrationFix(
-    models.sequelize.getQueryInterface(),
-    models.sequelize,
-  );
+  try {
+    await outboxTriggerMigration(
+      models.sequelize.getQueryInterface(),
+      models.sequelize,
+    );
+    await outboxTriggerMigrationFix(
+      models.sequelize.getQueryInterface(),
+      models.sequelize,
+    );
+  } catch (e) {
+    // triggers already exist
+  }
 
   // need to set up anvil before we can run evmCE.
   // need to set up rmq before running consumer
