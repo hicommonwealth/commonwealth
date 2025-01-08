@@ -58,8 +58,8 @@ const UniswapTradeModal = ({
                     uniswapWidget.defaultTokenAddress.output
                   }
                   hideConnectionUI={true}
-                  {...(uniswapWidget.evmClient && {
-                    evmClient: uniswapWidget.evmClient,
+                  {...(uniswapWidget.provider && {
+                    provider: uniswapWidget.provider,
                   })}
                   onError={console.error}
                   onTxFail={console.error}

@@ -332,7 +332,7 @@ export async function startLoginWithMagicLink({
         redirectTo ? encodeURIComponent(redirectTo) : ''
       }&chain=${chain || ''}&sso=${provider}`;
       await magic.oauth.loginWithRedirect({
-        provider: evmClient,
+        provider,
         redirectURI: new URL(
           '/finishsociallogin' + params,
           window.location.origin,
@@ -340,7 +340,7 @@ export async function startLoginWithMagicLink({
       });
     } else {
       await magic.oauth2.loginWithRedirect({
-        provider: evmClient,
+        provider,
         redirectURI: new URL('/finishsociallogin', window.location.origin).href,
       });
     }

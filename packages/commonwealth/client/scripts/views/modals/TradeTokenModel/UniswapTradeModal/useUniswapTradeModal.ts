@@ -148,7 +148,7 @@ const useUniswapTradeModal = ({ tradeConfig }: UseUniswapTradeModalProps) => {
   return {
     uniswapWidget: {
       isReady: !isLoadingInitialState,
-      evmClient: uniswapProvider,
+      provider: uniswapProvider,
       theme: uniswapWidgetTheme,
       tokensList: uniswapTokensList,
       defaultTokenAddress: {
