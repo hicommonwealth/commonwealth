@@ -1,4 +1,5 @@
-import { commonProtocol, models } from '@hicommonwealth/model';
+import { getContestBalance } from '@hicommonwealth/evm-protocols';
+import { models } from '@hicommonwealth/model';
 import { Button } from 'frames.js/express';
 import moment from 'moment';
 import React from 'react';
@@ -78,7 +79,7 @@ export const contestPrizes = frames(async (ctx) => {
 
   const chainNode = contestManager.Community!.ChainNode!;
   const chainNodeUrl = chainNode.private_url! || chainNode.url!;
-  const contestBalance = await commonProtocol.contestHelper.getContestBalance(
+  const contestBalance = await getContestBalance(
     chainNodeUrl,
     contestManager.contest_address,
     contestManager.interval === 0,

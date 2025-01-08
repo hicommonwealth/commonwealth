@@ -2,7 +2,6 @@ import { AppError, ServerError } from '@hicommonwealth/core';
 import {
   commonProtocol,
   contestAbi,
-  feeManagerAbi,
   namespaceFactoryAbi,
 } from '@hicommonwealth/evm-protocols';
 import { Mutex } from 'async-mutex';
@@ -17,13 +16,6 @@ export type AddContentResponse = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   txReceipt: any;
   contentId: string;
-};
-
-export type ContestStatus = {
-  startTime: number;
-  endTime: number;
-  contestInterval: number;
-  lastContentId: string;
 };
 
 export type ContestScores = {
@@ -143,124 +135,6 @@ const voteContent = async (
   }
 
   return txReceipt;
-};
-
-/**
- * Gets relevant contest state information
- * @param rpcNodeUrl the rpc node url
- * @param contest the address of the contest
- * @returns Contest Status object
- */
-export const getContestStatus = async (
-  rpcNodeUrl: string,
-  contest: string,
-  oneOff?: boolean,
-): Promise<ContestStatus> => {
-  const web3 = new Web3(rpcNodeUrl);
-  const contestInstance = new web3.eth.Contract(
-    contestAbi as AbiItem[],
-    contest,
-  );
-
-  const promise = await Promise.all([
-    contestInstance.methods.startTime().call(),
-    contestInstance.methods.endTime().call(),
-    oneOff
-      ? contestInstance.methods.contestLength().call()
-      : contestInstance.methods.contestInterval().call(),
-    contestInstance.methods.currentContentId().call(),
-  ]);
-
-  return {
-    startTime: Number(promise[0]),
-    endTime: Number(promise[1]),
-    contestInterval: Number(promise[2]),
-    lastContentId: String(promise[3]),
-  };
-};
-
-/**
- * Gets vote and more information about winners of a given contest
- * @param rpcNodeUrl the rpc node url
- * @param contest the address of the contest
- * @param contestId the id of the contest for data within the contest contract.
- * No contest id will return current winners
- * @returns ContestScores object containing eqaul indexed content ids, addresses, and votes
- */
-export const getContestScore = async (
-  rpcNodeUrl: string,
-  contest: string,
-  contestId?: number,
-  oneOff?: boolean,
-): Promise<ContestScores> => {
-  const web3 = new Web3(rpcNodeUrl);
-  const contestInstance = new web3.eth.Contract(
-    contestAbi as AbiItem[],
-    contest,
-  );
-
-  const contestData = await Promise.all([
-    contestId
-      ? contestInstance.methods.getPastWinners(contestId).call()
-      : contestInstance.methods.getWinnerIds().call(),
-    getContestBalance(rpcNodeUrl, contest, oneOff),
-  ]);
-
-  const winnerIds: string[] = contestData[0] as string[];
-
-  if (winnerIds.length == 0) {
-    throw new Error(
-      `getContestScore ERROR: No winners found for contest ID (${contestId}) on contest address: ${contest}`,
-    );
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const votePromises: any[] = [];
-  winnerIds.forEach((w) => {
-    votePromises.push(contestInstance.methods.content(w).call());
-  });
-
-  const contentMeta = await Promise.all(votePromises);
-
-  return {
-    scores: winnerIds.map((v, i) => {
-      return {
-        winningContent: v,
-        winningAddress: contentMeta[i]['creator'],
-        voteCount: contentMeta[i]['cumulativeVotes'],
-      };
-    }),
-    contestBalance: contestData[1],
-  };
-};
-
-/**
- * Get the total balance of a given contest
- * @param rpcNodeUrl the rpc node url
- * @param contest the address of contest to get the balance of
- * @returns a numeric contest balance of the contestToken in wei(ie / 1e18 for decimal value)
- */
-export const getContestBalance = async (
-  rpcNodeUrl: string,
-  contest: string,
-  oneOff?: boolean,
-): Promise<string> => {
-  const web3 = new Web3(rpcNodeUrl);
-
-  const contestInstance = new web3.eth.Contract(
-    contestAbi as AbiItem[],
-    contest,
-  );
-
-  const balance = await commonProtocol.getTotalContestBalance(
-    contestInstance,
-    contest,
-    web3,
-    feeManagerAbi,
-    oneOff,
-  );
-
-  return balance;
 };
 
 export const addContentBatch = async (

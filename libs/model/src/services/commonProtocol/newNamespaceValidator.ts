@@ -63,7 +63,7 @@ export const validateNamespace = async (
   }
 
   //tx data validation
-  const txReceipt = await getTransactionReceipt({
+  const { txReceipt } = await getTransactionReceipt({
     rpc: chainNode.private_url,
     txHash,
   });

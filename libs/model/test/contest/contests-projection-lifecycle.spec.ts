@@ -24,7 +24,6 @@ import {
 import { z } from 'zod';
 import { Contests } from '../../src/contest/Contests.projection';
 import { GetAllContests } from '../../src/contest/GetAllContests.query';
-import { contestHelper } from '../../src/services/commonProtocol';
 import { seed } from '../../src/tester';
 
 chai.use(chaiAsPromised);
@@ -65,8 +64,8 @@ describe('Contests projection lifecycle', () => {
   const topic_id = 100;
 
   const getTokenAttributes = vi.spyOn(evm, 'getTokenAttributes');
-  const getContestScore = vi.spyOn(contestHelper, 'getContestScore');
-  const getContestStatus = vi.spyOn(contestHelper, 'getContestStatus');
+  const getContestScore = vi.spyOn(evm, 'getContestScore');
+  const getContestStatus = vi.spyOn(evm, 'getContestStatus');
 
   beforeAll(async () => {
     try {
