@@ -13,7 +13,7 @@ export const getTotalContestBalance = async (
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   web3: any,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  feeManagerAbi: any[],
+  _feeManagerAbi: any[],
   oneOff?: boolean,
 ): Promise<string> => {
   const promises = [contestContract.methods.contestToken().call()];
@@ -27,7 +27,10 @@ export const getTotalContestBalance = async (
   const balancePromises: Promise<string>[] = [];
 
   if (!oneOff) {
-    const feeManager = new web3.eth.Contract(feeManagerAbi, String(results[1]));
+    const feeManager = new web3.eth.Contract(
+      _feeManagerAbi,
+      String(results[1]),
+    );
     balancePromises.push(
       feeManager.methods
         .getBeneficiaryBalance(contestAddress, results[0])
