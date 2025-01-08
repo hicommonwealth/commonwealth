@@ -15,7 +15,8 @@ import {
 import { Events } from '@hicommonwealth/schemas';
 import { TRPCError } from '@trpc/server';
 import { ZodSchema, ZodUndefined, z } from 'zod';
-import { Commit, Tag, Track, buildproc, procedure } from './middleware';
+import { buildproc, procedure } from './builder';
+import { Tag, type OutputMiddleware } from './types';
 
 const log = logger(import.meta);
 
@@ -48,11 +49,7 @@ const trpcerror = (error: unknown): TRPCError => {
  * Builds tRPC command POST endpoint
  * @param factory command factory
  * @param tag command tag used for OpenAPI spec grouping
- * @param track analytics tracking middleware as:
- * - tuple of `[event, output mapper]`
- * - or `(input,output) => Promise<[event, data]|undefined>`
- * @param commit output middleware (best effort), mainly used to commit actions to canvas
- * - `(input,output,ctx) => Promise<Record<string,unknown>> | undefined | void`
+ * @param outMiddlewares output middlewares (best effort), mainly used to commit actions to canvas
  * @returns tRPC mutation procedure
  */
 export const command = <
@@ -62,8 +59,7 @@ export const command = <
 >(
   factory: () => Metadata<Input, Output, Context>,
   tag: Tag,
-  track?: Track<Input, Output>,
-  commit?: Commit<Input, Output>,
+  outMiddlewares?: Array<OutputMiddleware<Input, Output>>,
 ) => {
   const md = factory();
   return buildproc({
@@ -71,8 +67,7 @@ export const command = <
     name: factory.name,
     md,
     tag,
-    track,
-    commit,
+    outMiddlewares,
   }).mutation(async ({ ctx, input }) => {
     try {
       return await coreCommand(
@@ -94,8 +89,7 @@ export const command = <
  * @param factory query factory
  * @param tag query tag used for OpenAPI spec grouping
  * @param options An object with security and caching related configuration
- * @param commit output middleware (best effort), mainly used to update statistics
- * - `(input,output,ctx) => Promise<Record<string,unknown>> | undefined | void`
+ * @param outMiddlewares output middlewares (best effort), mainly used to update statistics
  * @returns tRPC query procedure
  */
 export const query = <
@@ -109,7 +103,7 @@ export const query = <
     forceSecure?: boolean;
     ttlSecs?: number;
   },
-  commit?: Commit<Input, Output>,
+  outMiddlewares?: Array<OutputMiddleware<Input, Output>>,
 ) => {
   const md = factory();
   return buildproc({
@@ -117,7 +111,7 @@ export const query = <
     name: factory.name,
     md,
     tag,
-    commit,
+    outMiddlewares,
     forceSecure: options?.forceSecure,
   }).query(async ({ ctx, input }) => {
     try {

@@ -373,7 +373,30 @@ export const ThreadCard = ({
                   canReply={!disabledActionsTooltipText}
                   replyBtnVisible
                   hideReactButton
-                  comment={recentComment}
+                  comment={{
+                    address: recentComment.author,
+                    body: recentComment.text,
+                    comment_level: 0,
+                    community_id: thread.communityId,
+                    id: recentComment.id,
+                    reply_count: 0,
+                    reaction_count: parseInt(recentComment.reactionWeightsSum),
+                    thread_id: thread.id,
+                    user_id: recentComment?.profile?.userId ?? 0,
+                    content_url: recentComment.contentUrl,
+                    created_at: recentComment.createdAt.toISOString(),
+                    discord_meta: recentComment.discord_meta,
+                    marked_as_spam_at:
+                      recentComment?.markedAsSpamAt?.toISOString(),
+                    profile_name: recentComment?.profile?.name,
+                    profile_avatar: recentComment?.profile?.avatarUrl,
+                    reactions: recentComment.reactions.map((x) => ({
+                      address_id: 0, // not needed here
+                      id: x.id,
+                      reaction: 'like',
+                    })),
+                    address_id: recentComment?.Address?.addressId || 0,
+                  }}
                   isThreadArchived={!!thread.archivedAt}
                   isSpam={!!recentComment.markedAsSpamAt}
                   maxReplyLimitReached={false}

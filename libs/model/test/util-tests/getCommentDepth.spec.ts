@@ -44,11 +44,13 @@ describe('getCommentDepth', () => {
     for (let i = 0; i < maxDepth; i++) {
       const result = await models.Comment.create({
         thread_id: thread.id!,
-        parent_id: comment ? String(comment.id) : undefined,
+        parent_id: comment ? comment.id : undefined,
         address_id: address!.id!,
         body: String(i),
         search: getCommentSearchVector(String(i)),
         reaction_count: 0,
+        comment_level: 0,
+        reply_count: 0,
       });
       comments.push(result);
       comment = result;
