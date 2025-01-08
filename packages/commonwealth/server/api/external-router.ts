@@ -51,7 +51,7 @@ const {
   updateComment,
   deleteComment,
   createCommentReaction,
-  setCommentSpam,
+  toggleCommentSpam,
 } = comment.trpcRouter;
 const { getNewContent } = user.trpcRouter;
 const { createContestMetadata, updateContestMetadata, cancelContestMetadata } =
@@ -112,7 +112,7 @@ const api = {
   deleteReaction,
   joinCommunity,
   banAddress,
-  setCommentSpam,
+  toggleCommentSpam,
 };
 
 const PATH = '/api/v1';

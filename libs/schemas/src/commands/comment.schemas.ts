@@ -58,7 +58,7 @@ export const DeleteComment = {
   context: CommentContext,
 };
 
-export const SetCommentSpam = {
+export const ToggleCommentSpam = {
   input: z.object({
     comment_id: PG_INT,
     spam: z.boolean(),

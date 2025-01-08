@@ -34,5 +34,5 @@ export const trpcRouter = trpc.router({
   searchComments: trpc.query(Comment.SearchComments, trpc.Tag.Comment),
   getComments: trpc.query(Comment.GetComments, trpc.Tag.Comment),
   deleteComment: trpc.command(Comment.DeleteComment, trpc.Tag.Comment),
-  setCommentSpam: trpc.command(Comment.SetCommentSpam, trpc.Tag.Comment),
+  toggleCommentSpam: trpc.command(Comment.ToggleCommentSpam, trpc.Tag.Comment),
 });

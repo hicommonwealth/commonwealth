@@ -4,9 +4,9 @@ import * as schemas from '@hicommonwealth/schemas';
 import { authComment } from '../middleware';
 import { mustBeAuthorizedComment } from '../middleware/guards';
 
-export function SetCommentSpam(): Command<typeof schemas.SetCommentSpam> {
+export function ToggleCommentSpam(): Command<typeof schemas.ToggleCommentSpam> {
   return {
-    ...schemas.SetCommentSpam,
+    ...schemas.ToggleCommentSpam,
     auth: [
       authComment({ author: true, roles: ['admin', 'moderator', 'member'] }),
     ],

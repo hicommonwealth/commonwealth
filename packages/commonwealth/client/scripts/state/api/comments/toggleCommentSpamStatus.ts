@@ -15,7 +15,7 @@ const useToggleCommentSpamStatusMutation = ({
 }: UseToggleCommentSpamStatusMutationProps) => {
   const utils = trpc.useUtils();
 
-  return trpc.comment.setCommentSpam.useMutation({
+  return trpc.comment.toggleCommentSpam.useMutation({
     onSuccess: async (response) => {
       const comment = new Comment({
         ...response,
