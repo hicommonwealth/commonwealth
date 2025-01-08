@@ -3,12 +3,15 @@ import {
   commonProtocol,
   contestAbi,
   feeManagerAbi,
+  namespaceAbi,
   namespaceFactoryAbi,
 } from '@hicommonwealth/evm-protocols';
+import { ZERO_ADDRESS } from '@hicommonwealth/shared';
 import { Mutex } from 'async-mutex';
 import Web3, { PayableCallOptions } from 'web3';
 import { AbiItem } from 'web3-utils';
 import { config } from '../../config';
+import { getNamespace } from './contractHelpers';
 import { createWeb3Provider } from './utils';
 
 const nonceMutex = new Mutex();
@@ -424,6 +427,59 @@ export const deployERC20Contest = async (
     eventLog.data.toString(),
   )['0'] as string;
   return newContestAddress;
+};
+
+export const deployNamespace = async (
+  namespaceFactory: string,
+  name: string,
+  walletAddress: string,
+  feeManager: string,
+  rpcNodeUrl: string,
+): Promise<string> => {
+  if (!config.WEB3.CONTEST_BOT_PRIVATE_KEY)
+    throw new ServerError('Contest bot private key not set!');
+  const web3 = await createWeb3Provider(
+    rpcNodeUrl,
+    config.WEB3.CONTEST_BOT_PRIVATE_KEY,
+  );
+  const namespaceCheck = await getNamespace(rpcNodeUrl, name, namespaceFactory);
+  if (namespaceCheck === ZERO_ADDRESS) {
+    throw new ServerError('Namespace already reserved');
+  }
+  const contract = new web3.eth.Contract(namespaceFactoryAbi, namespaceFactory);
+
+  const maxFeePerGasEst = await estimateGas(web3);
+
+  try {
+    const uri = `https://common.xyz/api/namespaceMetadata/${name}/{id}`;
+    await contract.methods.deployNamespace(name, uri, feeManager, []).send({
+      from: web3.eth.defaultAccount,
+      type: '0x2',
+      maxFeePerGas: maxFeePerGasEst?.toString(),
+      maxPriorityFeePerGas: web3.utils.toWei('0.001', 'gwei'),
+    });
+  } catch (error) {
+    throw new Error('Transaction failed: ' + error);
+  }
+  const namespaceAddress = await getNamespace(
+    rpcNodeUrl,
+    name,
+    namespaceFactory,
+  );
+  const namespaceContract = new web3.eth.Contract(
+    namespaceAbi,
+    namespaceAddress,
+  );
+
+  try {
+    await namespaceContract.methods
+      .mintId(walletAddress, 1, 1, '0x')
+      .send({ from: web3.eth.defaultAccount });
+  } catch (error) {
+    throw new Error('Transaction failed: ' + error);
+  }
+
+  return namespaceAddress;
 };
 
 const estimateGas = async (web3: Web3): Promise<bigint | null> => {
