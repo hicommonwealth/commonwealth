@@ -87,9 +87,13 @@ export const processThreadCreated: EventHandler<
           author.User!.profile.name || author.address.substring(0, 8),
         profile_url: getProfileUrl(author.user_id, community.custom_domain),
         profile_avatar_url: author.User!.profile.avatar_url ?? '',
-        object_title: Webhook.getRenderedTitle(thread!.title),
+        thread_title: Webhook.getRenderedTitle(thread!.title),
         object_url: threadURl,
         object_summary: threadSummary,
+        content_url: payload.content_url,
+        content_type: 'thread',
+        thread_id: payload.id!,
+        author_user_id: author.user_id,
       },
     });
 

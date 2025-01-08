@@ -13,7 +13,6 @@ import {
 import { getRelatedCommunitiesHandler } from '../routes/communities/get_related_communities_handler';
 
 import communityStats from '../routes/communityStats';
-import createAddress from '../routes/createAddress';
 import deleteAddress from '../routes/deleteAddress';
 import domain from '../routes/domain';
 import finishUpdateEmail from '../routes/finishUpdateEmail';
@@ -27,8 +26,6 @@ import threadsUsersCountAndAvatars from '../routes/threadsUsersCountAndAvatars';
 import updateBanner from '../routes/updateBanner';
 import updateEmail from '../routes/updateEmail';
 import updateSiteAdmin from '../routes/updateSiteAdmin';
-import verifyAddress from '../routes/verifyAddress';
-import viewComments from '../routes/viewComments';
 
 import setDefaultRole from '../routes/setDefaultRole';
 import upgradeMember, {
@@ -157,18 +154,6 @@ function setupRouter(
   registerRoute(router, 'get', '/status', status.bind(this, models));
 
   // Creating and Managing Addresses
-  registerRoute(
-    router,
-    'post',
-    '/createAddress',
-    createAddress.bind(this, models),
-  );
-  registerRoute(
-    router,
-    'post',
-    '/verifyAddress',
-    verifyAddress.bind(this, models),
-  );
   registerRoute(
     router,
     'post',
@@ -330,13 +315,6 @@ function setupRouter(
   );
 
   // comments
-  registerRoute(
-    router,
-    'get',
-    '/viewComments',
-    databaseValidationService.validateCommunity,
-    viewComments.bind(this, models),
-  );
   registerRoute(
     router,
     'get',

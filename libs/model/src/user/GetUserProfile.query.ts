@@ -15,7 +15,7 @@ export function GetUserProfile(): Query<typeof schemas.GetUserProfile> {
 
       const user = await models.User.findOne({
         where: { id: user_id },
-        attributes: ['profile', 'xp_points', 'referral_link'],
+        attributes: ['profile', 'xp_points'],
       });
 
       mustExist('User', user);
@@ -87,16 +87,16 @@ export function GetUserProfile(): Query<typeof schemas.GetUserProfile> {
           (t) => t.toJSON() as z.infer<typeof schemas.ThreadView>,
         ),
         comments: comments.map((c) => {
-          const comment = c.toJSON();
-          // ensure typed response
-          return {
-            ...comment,
+          const comment = {
+            ...c.toJSON(),
             user_id: c.Address!.user_id!,
             address: c.Address!.address!,
+            last_active: c.Address!.last_active!,
             Thread: undefined,
             search: undefined,
             community_id: c.Thread!.community_id,
-          } as z.infer<typeof schemas.UserProfileCommentView>;
+          };
+          return comment as z.infer<typeof schemas.CommentView>;
         }),
         commentThreads: commentThreads.map(
           (c) => c.toJSON() as z.infer<typeof schemas.ThreadView>,
@@ -105,7 +105,6 @@ export function GetUserProfile(): Query<typeof schemas.GetUserProfile> {
         // ensure Tag is present in typed response
         tags: profileTags.map((t) => ({ id: t.Tag!.id!, name: t.Tag!.name })),
         xp_points: user!.xp_points ?? 0,
-        referral_link: user!.referral_link,
       };
     },
   };
