@@ -1,9 +1,13 @@
 import { Log } from '@ethersproject/providers';
 import { logger as _logger, stats } from '@hicommonwealth/core';
-import { events as EventSchemas } from '@hicommonwealth/schemas';
 import { ethers } from 'ethers';
-import { z } from 'zod';
-import { AbiSignatures, ContractSources, EvmEvent, EvmSource } from './types';
+import {
+  AbiSignatures,
+  ContractSources,
+  EvmBlockDetails,
+  EvmEvent,
+  EvmSource,
+} from './types';
 
 const logger = _logger(import.meta);
 
@@ -46,7 +50,7 @@ export async function getLogs({
 }): Promise<{
   logs: Log[];
   lastBlockNum: number;
-  blockDetails: Record<number, z.infer<typeof EventSchemas.BlockDetails>>;
+  blockDetails: Record<number, EvmBlockDetails>;
 }> {
   let startBlock = startingBlockNum;
   const provider = getProvider(rpc);

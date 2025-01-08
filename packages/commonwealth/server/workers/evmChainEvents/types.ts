@@ -1,11 +1,15 @@
 import { Log } from '@ethersproject/providers';
-import {
-  events as EventSchemas,
-  EvmEventSource,
-} from '@hicommonwealth/schemas';
+import { EvmEventSource } from '@hicommonwealth/schemas';
 import { AbiType } from '@hicommonwealth/shared';
 import { ethers } from 'ethers';
 import { z } from 'zod';
+
+export type EvmBlockDetails = {
+  timestamp: number;
+  miner: string;
+  gasLimit: number;
+  gasUsed: number;
+};
 
 export type EvmEvent = {
   eventSource: {
@@ -14,7 +18,7 @@ export type EvmEvent = {
   };
   parsedArgs: ethers.utils.Result;
   rawLog: Log;
-  block?: z.infer<typeof EventSchemas.BlockDetails>;
+  block?: EvmBlockDetails;
 };
 
 const sourceType = EvmEventSource.extend({
