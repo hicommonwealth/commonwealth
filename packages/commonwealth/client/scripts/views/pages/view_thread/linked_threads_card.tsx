@@ -54,7 +54,17 @@ export const LinkedThreadsCard = ({
               {linkedThreadIds.length > 0 ? (
                 <div className="links-container">
                   {linkedThreads!.map((t) => {
-                    const tt = new Thread(t);
+                    const tt = new Thread({
+                      address_id: t.address_id,
+                      body: t.body,
+                      community_id: t.community_id,
+                      id: t.id,
+                      kind: t.kind,
+                      stage: t.stage,
+                      title: t.title,
+                      created_at: t.created_at,
+                      updated_at: t.updated_at,
+                    });
                     const discussionLink = getProposalUrlPath(
                       tt.slug,
                       `${tt.identifier}-${slugify(t.title)}`,
