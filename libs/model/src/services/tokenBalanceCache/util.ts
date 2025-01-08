@@ -115,12 +115,11 @@ export async function evmOffChainRpcBatching(
 
     const address = idAddressMap[data.id];
     if (source.contractAddress) {
-      balances[address] = String(
-        decodeParameters({
-          abiInput: ['uint256'],
-          data: data.result,
-        }),
-      );
+      const { 0: balance } = decodeParameters({
+        abiInput: ['uint256'],
+        data: data.result,
+      });
+      balances[address] = String(balance);
     } else {
       balances[address] = ethers.BigNumber.from(data.result).toString();
     }
@@ -223,6 +222,7 @@ export async function evmBalanceFetcherBatching(
         abiInput: ['uint256[]'],
         data: data.result,
       });
+      console.log('>>>>>>>>>>>>>>>>>>', balances);
       relevantAddresses.forEach(
         (key, i) => (addressBalanceMap[key] = String((<number[]>balances)[i])),
       );
