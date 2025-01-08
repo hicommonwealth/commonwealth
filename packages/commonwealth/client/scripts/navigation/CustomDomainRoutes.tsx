@@ -31,6 +31,7 @@ const NotificationsPage = lazy(() => import('views/pages/notifications'));
 const NotificationSettings = lazy(
   () => import('views/pages/NotificationSettings'),
 );
+const LeaderboardPage = lazy(() => import('views/pages/Leaderboard'));
 
 const ProposalsPage = lazy(() => import('views/pages/proposals'));
 const ViewProposalPage = lazy(() => import('views/pages/view_proposal/index'));
@@ -106,6 +107,7 @@ const RewardsPage = lazy(() => import('views/pages/RewardsPage'));
 
 const CustomDomainRoutes = ({
   tokenizedCommunityEnabled,
+  xpEnabled,
 }: RouteFeatureFlags) => {
   return [
     <Route
@@ -127,6 +129,15 @@ const CustomDomainRoutes = ({
             key="/createTokenCommunity"
             path="/createTokenCommunity"
             element={withLayout(LaunchTokenPage, { type: 'common' })}
+          />,
+        ]
+      : []),
+    ...(xpEnabled
+      ? [
+          <Route
+            key="/leaderboard"
+            path="/leaderboard"
+            element={withLayout(LeaderboardPage, { type: 'common' })}
           />,
         ]
       : []),

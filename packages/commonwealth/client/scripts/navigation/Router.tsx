@@ -14,6 +14,7 @@ import GeneralRoutes from './GeneralRoutes';
 
 export type RouteFeatureFlags = {
   tokenizedCommunityEnabled: boolean;
+  xpEnabled: boolean;
 };
 
 const Router = () => {
@@ -24,8 +25,11 @@ const Router = () => {
     false,
   );
 
+  const xpEnabled = client.getBooleanValue('xp', false);
+
   const flags = {
     tokenizedCommunityEnabled,
+    xpEnabled,
   };
 
   const { isCustomDomain } = fetchCachedCustomDomain() || {};

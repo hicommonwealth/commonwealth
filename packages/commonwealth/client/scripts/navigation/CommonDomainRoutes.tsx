@@ -36,6 +36,7 @@ const FinishSocialLoginPage = lazy(
 );
 
 const NotificationsPage = lazy(() => import('views/pages/notifications'));
+const LeaderboardPage = lazy(() => import('views/pages/Leaderboard'));
 
 const NotificationSettings = lazy(
   () => import('views/pages/NotificationSettings'),
@@ -121,6 +122,7 @@ const RewardsPage = lazy(() => import('views/pages/RewardsPage'));
 
 const CommonDomainRoutes = ({
   tokenizedCommunityEnabled,
+  xpEnabled,
 }: RouteFeatureFlags) => [
   <Route
     key="/_internal/quill"
@@ -162,6 +164,15 @@ const CommonDomainRoutes = ({
           key="/createTokenCommunity"
           path="/createTokenCommunity"
           element={withLayout(LaunchToken, { type: 'common' })}
+        />,
+      ]
+    : []),
+  ...(xpEnabled
+    ? [
+        <Route
+          key="/leaderboard"
+          path="/leaderboard"
+          element={withLayout(LeaderboardPage, { type: 'common' })}
         />,
       ]
     : []),

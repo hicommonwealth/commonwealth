@@ -50,6 +50,7 @@ export default defineConfig(({ mode }) => {
     'process.env.FLAG_REWARDS_PAGE': JSON.stringify(env.FLAG_REWARDS_PAGE),
     'process.env.FLAG_STICKY_EDITOR': JSON.stringify(env.FLAG_STICKY_EDITOR),
     'process.env.FLAG_NEW_MOBILE_NAV': JSON.stringify(env.FLAG_NEW_MOBILE_NAV),
+    'process.env.FLAG_XP': JSON.stringify(env.FLAG_XP),
   };
 
   const config = {
