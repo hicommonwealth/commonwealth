@@ -191,6 +191,11 @@ const ChainEventCreatedBase = z.object({
     logIndex: z.number(),
   }),
   block: z.object({
+    number: z.number(),
+    hash: z.string(),
+    logsBloom: z.string(),
+    nonce: z.string().optional(),
+    parentHash: z.string(),
     timestamp: z.number(),
     miner: z.string(),
     gasLimit: z.number(),

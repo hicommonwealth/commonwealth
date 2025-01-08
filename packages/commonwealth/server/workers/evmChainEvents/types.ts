@@ -5,6 +5,11 @@ import { ethers } from 'ethers';
 import { z } from 'zod';
 
 export type EvmBlockDetails = {
+  number: number;
+  hash: string;
+  logsBloom: string;
+  nonce?: string;
+  parentHash: string;
   timestamp: number;
   miner: string;
   gasLimit: number;

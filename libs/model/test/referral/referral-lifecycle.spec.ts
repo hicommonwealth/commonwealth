@@ -39,6 +39,10 @@ function chainEvent(
       },
       block: {
         number: 1,
+        hash: '0x1',
+        logsBloom: '0x1',
+        nonce: '0x1',
+        parentHash: '0x1',
         timestamp: new Date().getTime(),
         miner: '0x1',
         gasLimit: 1,

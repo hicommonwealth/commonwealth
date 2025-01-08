@@ -62,6 +62,11 @@ async function processValidStakeTransaction() {
           '0xfc13c9a8a9a619ac78b803aecb26abdd009182411d51a986090f82519d88a89e',
       },
       block: {
+        number: 0x1,
+        hash: '0x1',
+        logsBloom: '0x1',
+        nonce: '0x1',
+        parentHash: '0x1',
         timestamp: 1673369600,
         miner: '0x0000000000000000000000000000000000000000',
         gasLimit: 0,

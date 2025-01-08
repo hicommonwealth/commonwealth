@@ -115,11 +115,15 @@ export async function getLogs({
       ]);
       return {
         number: parseInt(block.number, 16),
-        timestamp: parseInt(block.timestamp, 16),
+        hash: block.hash,
+        logsBloom: block.logsBloom,
+        parentHash: block.parentHash,
         miner: block.miner,
+        nonce: block.nonce ? block.nonce.toString() : undefined,
+        timestamp: parseInt(block.timestamp, 16),
         gasLimit: parseInt(block.gasLimit, 16),
         gasUsed: parseInt(block.gasUsed, 16),
-      };
+      } as EvmBlockDetails;
     }),
   );
 
