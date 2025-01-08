@@ -51,6 +51,7 @@ export default async (models: DB, req: Request, res: Response) => {
     where: {
       id: comment.id,
     },
+    include: [{ model: models.Address, include: [models.User] }],
   });
 
   return success(res, updatedComment);

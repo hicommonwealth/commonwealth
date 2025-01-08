@@ -48,7 +48,13 @@ const Profile = ({ userId }: ProfileProps) => {
       setProfile(
         new NewProfile({ ...data.profile, userId, isOwner: isOwner ?? false }),
       );
-      setThreads(data.threads.map((t) => new Thread(t)));
+      setThreads(
+        data.threads.map((t) => {
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          const { Comments, ...rest } = t; // comments aren't needed for display here
+          return new Thread({ ...rest });
+        }),
+      );
       // @ts-expect-error <StrictNullChecks/>
       const responseComments = data.comments.map((c) => new Comment(c));
 
