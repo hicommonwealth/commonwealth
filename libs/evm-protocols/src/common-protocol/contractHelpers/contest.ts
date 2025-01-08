@@ -1,10 +1,18 @@
 import { BigNumber } from '@ethersproject/bignumber';
 import { ZERO_ADDRESS } from '@hicommonwealth/shared';
+import { Mutex } from 'async-mutex';
 import Web3, { PayableCallOptions, TransactionReceipt } from 'web3';
 import { feeManagerAbi } from '../../abis/feeManagerAbi';
+import { namespaceFactoryAbi } from '../../abis/namespaceFactoryAbi';
 import { recurringContestAbi } from '../../abis/recurringContestAbi';
 import { singleContestAbi } from '../../abis/singleContestAbi';
-import { estimateGas } from '../utils';
+import { CREATE_CONTEST_TOPIC } from '../chainConfig';
+import {
+  createPrivateEvmClient,
+  decodeParameters,
+  estimateGas,
+  getTransactionCount,
+} from '../utils';
 
 export const getTotalContestBalance = async (
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -298,4 +306,189 @@ export const voteContent = async (
   }
 
   return txReceipt;
+};
+
+const nonceMutex = new Mutex();
+
+export const addContentBatch = async ({
+  privateKey,
+  rpc,
+  contest,
+  creator,
+  url,
+}: {
+  privateKey: string;
+  rpc: string;
+  contest: string[];
+  creator: string;
+  url: string;
+}): Promise<PromiseSettledResult<AddContentResponse>[]> => {
+  return nonceMutex.runExclusive(async () => {
+    const web3 = createPrivateEvmClient({ rpc, privateKey });
+    let currNonce = await getTransactionCount({
+      evmClient: web3,
+      rpc,
+      address: web3.eth.defaultAccount!,
+    });
+
+    const promises: Promise<AddContentResponse>[] = [];
+
+    contest.forEach((c) => {
+      promises.push(addContent(c, creator, url, web3, currNonce));
+      currNonce++;
+    });
+
+    return Promise.allSettled(promises);
+  });
+};
+
+export const voteContentBatch = async ({
+  privateKey,
+  rpc,
+  voter,
+  entries,
+}: {
+  privateKey: string;
+  rpc: string;
+  voter: string;
+  entries: {
+    contestAddress: string;
+    contentId: string;
+  }[];
+}) => {
+  return nonceMutex.runExclusive(async () => {
+    const web3 = createPrivateEvmClient({ rpc, privateKey });
+    let currNonce = await getTransactionCount({
+      evmClient: web3,
+      rpc,
+      address: web3.eth.defaultAccount!,
+    });
+
+    const promises: Promise<TransactionReceipt>[] = [];
+
+    entries.forEach(({ contestAddress, contentId }) => {
+      promises.push(
+        voteContent(contestAddress, voter, contentId, web3, currNonce),
+      );
+      currNonce++;
+    });
+
+    return Promise.allSettled(promises);
+  });
+};
+
+/**
+ * attempts to rollover and payout a provided contest. Returns false and does not attempt
+ * transaction if contest is still active
+ * @param rpcNodeUrl the chain node to use
+ * @param contest the address of the contest
+ * @param oneOff indicate if the contest is oneOff
+ * @returns boolean indicating if contest was rolled over
+ * NOTE: A false return does not indicate an error, rather that the contest was still ongoing
+ * errors will still be throw for other issues
+ */
+export const rollOverContest = async ({
+  privateKey,
+  rpc,
+  contest,
+  oneOff,
+}: {
+  privateKey: string;
+  rpc: string;
+  contest: string;
+  oneOff: boolean;
+}): Promise<boolean> => {
+  return nonceMutex.runExclusive(async () => {
+    const web3 = createPrivateEvmClient({ rpc, privateKey });
+    const contestInstance = new web3.eth.Contract(
+      oneOff ? singleContestAbi : recurringContestAbi,
+      contest,
+    );
+
+    const contractCall = oneOff
+      ? contestInstance.methods.endContest()
+      : contestInstance.methods.newContest();
+
+    let gasResult = BigInt(300000);
+    try {
+      gasResult = await contractCall.estimateGas({
+        from: web3.eth.defaultAccount,
+      });
+    } catch {
+      //eslint-disable-next-line
+      //@ts-ignore no-empty
+    }
+
+    const maxFeePerGasEst = await estimateGas(web3);
+
+    if (gasResult < BigInt(100000)) {
+      gasResult = BigInt(300000);
+    }
+
+    await contractCall.send({
+      from: web3.eth.defaultAccount,
+      gas: gasResult.toString(),
+      type: '0x2',
+      maxFeePerGas: maxFeePerGasEst?.toString(),
+      maxPriorityFeePerGas: web3.utils.toWei('0.001', 'gwei'),
+    });
+    return true;
+  });
+};
+
+export const deployERC20Contest = async ({
+  privateKey,
+  namespaceName,
+  contestInterval,
+  winnerShares,
+  voteToken,
+  voterShare,
+  exchangeToken,
+  namespaceFactory,
+  rpc,
+}: {
+  privateKey: string;
+  namespaceName: string;
+  contestInterval: number;
+  winnerShares: number[];
+  voteToken: string;
+  voterShare: number;
+  exchangeToken: string;
+  namespaceFactory: string;
+  rpc: string;
+}) => {
+  const web3 = createPrivateEvmClient({ rpc, privateKey });
+  const contract = new web3.eth.Contract(namespaceFactoryAbi, namespaceFactory);
+  const maxFeePerGasEst = await estimateGas(web3);
+  let txReceipt: TransactionReceipt;
+  try {
+    txReceipt = await contract.methods
+      .newSingleERC20Contest(
+        namespaceName,
+        contestInterval,
+        winnerShares,
+        voteToken,
+        voterShare,
+        exchangeToken,
+      )
+      .send({
+        from: web3.eth.defaultAccount,
+        type: '0x2',
+        maxFeePerGas: maxFeePerGasEst?.toString(),
+        maxPriorityFeePerGas: web3.utils.toWei('0.001', 'gwei'),
+      });
+  } catch {
+    throw new Error('New Contest Transaction failed');
+  }
+
+  const eventLog = txReceipt.logs.find(
+    (log) => log.topics![0] == CREATE_CONTEST_TOPIC,
+  );
+  if (!eventLog || !eventLog.data) throw new Error('No event data');
+
+  const { 0: address } = decodeParameters({
+    abiInput: ['address', 'address', 'uint256', 'bool'],
+    data: eventLog.data.toString(),
+  });
+  return address as string;
 };
