@@ -8,16 +8,16 @@ import React, { useState } from 'react';
 import app from 'state';
 import useUserStore from 'state/ui/user';
 import CWUpvoteSmall from 'views/components/component_kit/new_designs/CWUpvoteSmall';
-import type Comment from '../../../models/Comment';
 import {
   useCreateCommentReactionMutation,
   useDeleteCommentReactionMutation,
 } from '../../../state/api/comments';
 import { AuthModal } from '../../modals/AuthModal';
+import { CommentViewParams } from '../../pages/discussions/CommentCard/CommentCard';
 import { getDisplayedReactorsForPopup } from './helpers';
 
 type CommentReactionButtonProps = {
-  comment: Comment<any>;
+  comment: CommentViewParams;
   disabled: boolean;
   tooltipText?: string;
   onReaction?: () => void;
@@ -34,26 +34,18 @@ export const CommentReactionButton = ({
   const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
 
   const { mutateAsync: createCommentReaction } =
-    useCreateCommentReactionMutation({
-      threadId: comment.threadId,
-      commentId: comment.id,
-      communityId: app.activeChainId(),
-    });
+    useCreateCommentReactionMutation();
 
   const communityId = app.activeChainId() || '';
   const { mutateAsync: deleteCommentReaction } =
-    useDeleteCommentReactionMutation({
-      commentId: comment.id,
-      communityId,
-      threadId: comment.threadId,
-    });
+    useDeleteCommentReactionMutation();
 
   const activeAddress = user.activeAccount?.address || '';
   const hasReacted = !!(comment.reactions || []).find(
-    (x) => x?.author === activeAddress,
+    (x) => x?.address === activeAddress,
   );
-  const reactionWeightsSum = comment.reactions.reduce(
-    (acc, reaction) => acc.add(reaction.calculatedVotingWeight || 1),
+  const reactionWeightsSum = (comment.reactions || []).reduce(
+    (acc, reaction) => acc.add(reaction.calculated_voting_weight || 1),
     BigNumber.from(0),
   );
 
@@ -70,8 +62,8 @@ export const CommentReactionButton = ({
     onReaction();
 
     if (hasReacted) {
-      const foundReaction = comment.reactions.find((r) => {
-        return r.author === activeAddress;
+      const foundReaction = (comment.reactions || []).find((r) => {
+        return r.address === activeAddress;
       });
       if (!foundReaction) {
         console.error('missing reaction');
@@ -81,7 +73,7 @@ export const CommentReactionButton = ({
       const input = await buildDeleteCommentReactionInput({
         communityId,
         address: user.activeAccount?.address,
-        commentMsgId: comment.canvasMsgId,
+        commentMsgId: comment.canvas_msg_id || '',
         reactionId: foundReaction.id,
       });
       deleteCommentReaction(input).catch((err) => {
@@ -97,8 +89,8 @@ export const CommentReactionButton = ({
         address: activeAddress,
         commentId: comment.id,
         communityId,
-        threadId: comment.threadId,
-        commentMsgId: comment.canvasMsgId,
+        threadId: comment.thread_id,
+        commentMsgId: comment.canvas_msg_id || '',
       });
       createCommentReaction(input).catch((err) => {
         if (err instanceof SessionKeyError) {
@@ -129,7 +121,9 @@ export const CommentReactionButton = ({
         selected={hasReacted}
         onClick={handleVoteClick}
         popoverContent={getDisplayedReactorsForPopup({
-          reactors: (comment.reactions || []).map((r) => r.author),
+          reactors: (comment.reactions || [])
+            .map((r) => r.address || '')
+            .filter(Boolean), // TODO: fix type, address should be defined
         })}
         tooltipText={tooltipText}
       />

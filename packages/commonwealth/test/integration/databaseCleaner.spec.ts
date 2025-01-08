@@ -204,6 +204,8 @@ describe('DatabaseCleaner Tests', async () => {
         body: 'Testing',
         reaction_count: 0,
         reaction_weights_sum: '0',
+        comment_level: 0,
+        reply_count: 0,
         search: getCommentSearchVector('Testing'),
       });
 
