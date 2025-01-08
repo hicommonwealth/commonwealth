@@ -36,6 +36,7 @@ const {
   NEYNAR_BOT_UUID,
   NEYNAR_API_KEY,
   NEYNAR_CAST_CREATED_WEBHOOK_SECRET,
+  NEYNAR_CONTEST_BOT_MENTIONED_WEBHOOK_SECRET,
   NEYNAR_REPLY_WEBHOOK_URL,
   FARCASTER_ACTION_URL,
   FLAG_FARCASTER_CONTEST,
@@ -97,6 +98,8 @@ export const config = configure(
       NEYNAR_API_KEY: NEYNAR_API_KEY,
       NEYNAR_BOT_UUID: NEYNAR_BOT_UUID,
       NEYNAR_CAST_CREATED_WEBHOOK_SECRET: NEYNAR_CAST_CREATED_WEBHOOK_SECRET,
+      NEYNAR_CONTEST_BOT_MENTIONED_WEBHOOK_SECRET:
+        NEYNAR_CONTEST_BOT_MENTIONED_WEBHOOK_SECRET,
       NEYNAR_REPLY_WEBHOOK_URL: NEYNAR_REPLY_WEBHOOK_URL,
       FARCASTER_ACTION_URL: FARCASTER_ACTION_URL,
     },
@@ -189,7 +192,13 @@ export const config = configure(
             !(target.APP_ENV === 'production' && data === DEFAULTS.PRIVATE_KEY),
           'PRIVATE_KEY must be set to a non-default value in production.',
         ),
-      CONTEST_BOT_PRIVATE_KEY: z.string(),
+      CONTEST_BOT_PRIVATE_KEY: z
+        .string()
+        .optional()
+        .refine(
+          (data) => !(target.APP_ENV === 'production' && !data),
+          'CONTEST_BOT_PRIVATE_KEY must be set to a non-default value in production.',
+        ),
     }),
     TBC: z.object({
       TTL_SECS: z.number().int(),
@@ -224,6 +233,13 @@ export const config = configure(
         .refine(
           (data) => !(target.APP_ENV === 'production' && !data),
           'NEYNAR_CAST_CREATED_WEBHOOK_SECRET must be set to a non-default value in production.',
+        ),
+      NEYNAR_CONTEST_BOT_MENTIONED_WEBHOOK_SECRET: z
+        .string()
+        .optional()
+        .refine(
+          (data) => !(target.APP_ENV === 'production' && !data),
+          'NEYNAR_CONTEST_BOT_MENTIONED_WEBHOOK_SECRET must be set to a non-default value in production.',
         ),
       NEYNAR_REPLY_WEBHOOK_URL: z
         .string()
@@ -325,7 +341,13 @@ export const config = configure(
       ORGANIZATION: z.string().optional(),
     }),
     BOT: z.object({
-      CONTEST_BOT_NAMESPACE: z.string(),
+      CONTEST_BOT_NAMESPACE: z
+        .string()
+        .optional()
+        .refine(
+          (data) => !(target.APP_ENV === 'production' && !data),
+          'CONTEST_BOT_NAMESPACE must be set to a non-default value in production.',
+        ),
     }),
   }),
 );

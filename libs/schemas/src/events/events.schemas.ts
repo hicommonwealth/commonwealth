@@ -298,6 +298,10 @@ export const FarcasterReplyCastCreated = FarcasterCast.extend({
   verified_address: z.string(),
 }).describe('When a reply is posted to a farcaster contest cast');
 
+export const FarcasterContestBotMentioned = FarcasterCast.extend({
+  verified_address: z.string(),
+}).describe('When contest bot is mentioned on farcaster');
+
 export const FarcasterVoteCreated = FarcasterAction.extend({
   contest_address: z.string(),
   verified_address: z.string(),

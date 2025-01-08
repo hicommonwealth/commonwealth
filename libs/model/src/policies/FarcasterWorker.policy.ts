@@ -1,8 +1,10 @@
-import { logger, Policy } from '@hicommonwealth/core';
+import { command, logger, Policy } from '@hicommonwealth/core';
 import { events } from '@hicommonwealth/schemas';
 import { NeynarAPIClient } from '@neynar/nodejs-sdk';
 import { Op } from 'sequelize';
 import { config, models } from '..';
+import { CreateBotContest } from '../bot/CreateBotContest.command';
+import { systemActor } from '../middleware';
 import { mustExist } from '../middleware/guards';
 import { buildFarcasterContentUrl, buildFarcasterWebhookName } from '../utils';
 import {
@@ -16,6 +18,7 @@ const inputs = {
   FarcasterCastCreated: events.FarcasterCastCreated,
   FarcasterReplyCastCreated: events.FarcasterReplyCastCreated,
   FarcasterVoteCreated: events.FarcasterVoteCreated,
+  FarcasterContestBotMentioned: events.FarcasterContestBotMentioned,
 };
 
 export function FarcasterWorker(): Policy<typeof inputs> {
@@ -196,6 +199,15 @@ export function FarcasterWorker(): Policy<typeof inputs> {
           author_address: payload.verified_address,
           content_url,
         });
+      },
+      FarcasterContestBotMentioned: async ({ payload }) => {
+        const contestAddress = await command(CreateBotContest(), {
+          actor: systemActor({}),
+          payload: {
+            prompt: payload.text,
+          },
+        });
+        log.debug(`launched contest: ${contestAddress}`);
       },
     },
   };

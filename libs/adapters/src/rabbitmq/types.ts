@@ -92,4 +92,5 @@ export enum RascalRoutingKeys {
   FarcasterWorkerPolicyCastCreated = EventNames.FarcasterCastCreated,
   FarcasterWorkerPolicyReplyCastCreated = EventNames.FarcasterReplyCastCreated,
   FarcasterWorkerPolicyVoteCreated = EventNames.FarcasterVoteCreated,
+  FarcasterWorkerPolicyContestBotMentioned = EventNames.FarcasterContestBotMentioned,
 }

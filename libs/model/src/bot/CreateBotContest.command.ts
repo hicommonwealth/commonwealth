@@ -10,16 +10,14 @@ import { contractHelpers } from '../services/commonProtocol';
 import { deployERC20Contest } from '../services/commonProtocol/contestHelper';
 import { parseBotCommand } from '../services/openai/parseBotCommand';
 
-export function CreateContest(): Command<typeof schemas.CreateBotContest> {
+export function CreateBotContest(): Command<typeof schemas.CreateBotContest> {
   return {
     ...schemas.CreateBotContest,
     auth: [],
     body: async ({ payload }) => {
-      const { prompt, chain_id } = payload;
+      const { prompt } = payload;
       const contestMetadata = await parseBotCommand(prompt);
 
-      const namespaceFactory =
-        cp.factoryContracts[chain_id as cp.ValidChains].factory;
       const botNamespace = config.BOT.CONTEST_BOT_NAMESPACE;
 
       if (!botNamespace || botNamespace === '') {
@@ -47,9 +45,20 @@ export function CreateContest(): Command<typeof schemas.CreateBotContest> {
         new InvalidState('invalid token address');
       }
 
+      // use short duration for testnet contests
+      const contestDurationSecs =
+        community.ChainNode!.eth_chain_id === cp.ValidChains.SepoliaBase
+          ? 60 * 60
+          : 60 * 60 * 24 * 7;
+
+      const namespaceFactory =
+        cp.factoryContracts[
+          community!.ChainNode!.eth_chain_id as cp.ValidChains
+        ].factory;
+
       const contestAddress = await deployERC20Contest(
         botNamespace as string,
-        604800,
+        contestDurationSecs,
         contestMetadata.payoutStructure,
         contestMetadata.tokenAddress,
         contestMetadata.voterShare,
@@ -68,7 +77,7 @@ export function CreateContest(): Command<typeof schemas.CreateBotContest> {
             farcaster_frame_url: buildFarcasterContestFrameUrl(contestAddress),
             is_farcaster_contest: true,
             image_url: contestMetadata.image_url,
-            interval: 604800,
+            interval: contestDurationSecs,
             funding_token_address: contestMetadata.tokenAddress,
             payout_structure: contestMetadata.payoutStructure,
             ticker: tokenMetadata.ticker,

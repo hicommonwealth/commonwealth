@@ -48,6 +48,16 @@ function build() {
     router.post(
       '/farcaster/ReplyCastCreated',
       (req, _, next) => {
+        validateNeynarWebhook(
+          config.CONTESTS.NEYNAR_CONTEST_BOT_MENTIONED_WEBHOOK_SECRET,
+        )(req, _, next).catch(next);
+      },
+      express.command(Contest.FarcasterContestBotMentionedWebhook()),
+    );
+
+    router.post(
+      '/farcaster/ContestBotMentioned',
+      (req, _, next) => {
         validateNeynarWebhook(null)(req, _, next).catch(next);
       },
       express.command(Contest.FarcasterReplyCastCreatedWebhook()),

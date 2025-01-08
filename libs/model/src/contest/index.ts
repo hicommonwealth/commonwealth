@@ -2,6 +2,7 @@ export * from './CancelContestManagerMetadata.command';
 export * from './Contests.projection';
 export * from './CreateContestManagerMetadata.command';
 export * from './FarcasterCastCreatedWebhook.command';
+export * from './FarcasterContestBotMentioned.command';
 export * from './FarcasterReplyCastCreatedWebhook.command';
 export * from './FarcasterUpvoteAction.command';
 export * from './GetActiveContestManagers.query';
