@@ -68,6 +68,25 @@ export const getTransactionReceipt = async ({
   };
 };
 
+export const getTransaction = async ({
+  evmClient,
+  rpc,
+  txHash,
+}: {
+  evmClient?: EvmClientType;
+  rpc: string;
+  txHash: string;
+}): Promise<{
+  tx: Awaited<ReturnType<typeof web3.eth.getTransaction>>;
+  evmClient: EvmClientType;
+}> => {
+  const web3 = evmClient || new Web3(rpc);
+  return {
+    tx: await web3.eth.getTransaction(txHash),
+    evmClient: web3,
+  };
+};
+
 export const getTransactionCount = async ({
   evmClient,
   rpc,
@@ -123,4 +142,22 @@ export const estimateGas = async (web3: Web3): Promise<bigint | null> => {
 
 export const isEvmAddress = (address: string): boolean => {
   return isAddress(address);
+};
+
+export const arbitraryEvmCall = async ({
+  evmClient,
+  rpc,
+  to,
+  data,
+}: {
+  evmClient?: EvmClientType;
+  rpc: string;
+  to: string;
+  data: string;
+}) => {
+  const web3 = evmClient || new Web3(rpc);
+  return await web3.eth.call({
+    to,
+    data,
+  });
 };

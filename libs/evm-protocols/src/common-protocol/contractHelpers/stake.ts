@@ -1,3 +1,9 @@
+import {
+  arbitraryEvmCall,
+  decodeParameters,
+  getBlock,
+  getTransactionReceipt,
+} from '@hicommonwealth/evm-protocols';
 import Web3, { AbiFunctionFragment } from 'web3';
 import { factoryContracts, ValidChains } from '../chainConfig';
 
@@ -48,4 +54,103 @@ export const checkCommunityStakeWhitelist = async ({
     data: calldata,
   });
   return !!web3.eth.abi.decodeParameter('bool', whitelistResponse);
+};
+
+export const getAndVerifyStakeTrade = async ({
+  ethChainId,
+  rpc,
+  txHash,
+  namespace,
+}: {
+  ethChainId: ValidChains;
+  rpc: string;
+  txHash: string;
+  namespace: string;
+}): Promise<{
+  stakeId: number;
+  value: number;
+  ethAmount: string;
+  traderAddress: string;
+  stakeDirection: 'buy' | 'sell';
+  timestamp: number;
+}> => {
+  const communityStakeAddress = factoryContracts[ethChainId].communityStake;
+
+  const { evmClient, txReceipt } = await getTransactionReceipt({
+    rpc,
+    txHash,
+  });
+  const { block } = await getBlock({
+    rpc,
+    blockHash: txReceipt.blockHash.toString(),
+  });
+  const timestamp: number = Number(block.timestamp);
+
+  if (
+    ![txReceipt.from, txReceipt.to].includes(
+      communityStakeAddress.toLowerCase(),
+    )
+  ) {
+    throw new Error(
+      'This transaction is not associated with a community stake',
+    );
+  }
+  if (
+    !txReceipt.logs[0].data ||
+    !txReceipt.logs[0].address ||
+    !txReceipt.logs[1].data
+  ) {
+    throw new Error('No logs returned from transaction');
+  }
+  const { 0: stakeId, 1: value } = decodeParameters({
+    evmClient,
+    abiInput: ['uint256', 'uint256'],
+    data: txReceipt.logs[0].data.toString(),
+  });
+
+  const response = await arbitraryEvmCall({
+    evmClient,
+    rpc,
+    to: txReceipt.logs[0].address, // src of Transfer single
+    data: '0x06fdde03', // name function selector
+  });
+  const { 0: name } = decodeParameters({
+    evmClient,
+    abiInput: ['string'],
+    data: response,
+  });
+  if (name !== namespace) {
+    throw new Error('Transaction is not associated with provided community');
+  }
+
+  const {
+    0: trader,
+    // 1: namespace,
+    2: isBuy,
+    // 3: communityTokenAmount,
+    4: ethAmount,
+    // 5: protocolEthAmount,
+    // 6: nameSpaceEthAmount,
+  } = decodeParameters({
+    evmClient,
+    abiInput: [
+      'address',
+      'address',
+      'bool',
+      'uint256',
+      'uint256',
+      'uint256',
+      'uint256',
+    ],
+    data: txReceipt.logs[1].data.toString(),
+  });
+
+  return {
+    stakeId: Number(stakeId),
+    value: Number(value),
+    ethAmount: Number(ethAmount).toString(),
+    traderAddress: String(trader),
+    stakeDirection: isBuy ? 'buy' : 'sell',
+    timestamp,
+  };
 };
