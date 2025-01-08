@@ -1,11 +1,8 @@
-import { useQueryClient } from '@tanstack/react-query';
-import { trpc } from 'client/scripts/utils/trpcClient';
 import Comment from 'models/Comment';
 import { IUniqueId } from 'models/interfaces';
-import { ApiEndpoints } from 'state/api/config';
+import { trpc } from 'utils/trpcClient';
 import { useAuthModalStore } from '../../ui/modals';
 import { updateThreadInAllCaches } from '../threads/helpers/cache';
-import useFetchCommentsQuery from './fetchComments';
 
 interface UseDeleteCommentMutationProps {
   communityId: string;
@@ -18,11 +15,7 @@ const useDeleteCommentMutation = ({
   threadId,
   existingNumberOfComments,
 }: UseDeleteCommentMutationProps) => {
-  const queryClient = useQueryClient();
-  const { data: comments } = useFetchCommentsQuery({
-    communityId,
-    threadId,
-  });
+  const utils = trpc.useUtils();
 
   const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
 
@@ -40,26 +33,9 @@ const useDeleteCommentMutation = ({
         canvas_msg_id: response.canvas_msg_id,
       };
 
-      // find the existing comment index
-      const foundCommentIndex = comments.findIndex(
-        (x) => x.id === softDeleted.id,
-      );
+      // reset comments cache state
+      utils.comment.getComments.invalidate().catch(console.error);
 
-      if (foundCommentIndex > -1) {
-        const softDeletedComment = Object.assign(
-          { ...comments[foundCommentIndex] },
-          { ...softDeleted },
-        );
-
-        // update fetch comments query state
-        const key = [ApiEndpoints.FETCH_COMMENTS, communityId, threadId];
-        queryClient.cancelQueries({ queryKey: key });
-        queryClient.setQueryData(key, () => {
-          const updatedComments = [...(comments || [])];
-          updatedComments[foundCommentIndex] = softDeletedComment;
-          return [...updatedComments];
-        });
-      }
       updateThreadInAllCaches(communityId, threadId, {
         numberOfComments: existingNumberOfComments - 1 || 0,
       });

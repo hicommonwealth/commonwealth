@@ -25,7 +25,10 @@ import {
 import { AddressAttributes, R2_ADAPTER_KEY } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import { TopicWeightedVoting } from '@hicommonwealth/schemas';
-import { MAX_TRUNCATED_CONTENT_LENGTH } from '@hicommonwealth/shared';
+import {
+  MAX_COMMENT_DEPTH,
+  MAX_TRUNCATED_CONTENT_LENGTH,
+} from '@hicommonwealth/shared';
 import { Chance } from 'chance';
 import { z } from 'zod';
 import {
@@ -34,7 +37,6 @@ import {
   CreateCommentReaction,
   DeleteComment,
   GetComments,
-  MAX_COMMENT_DEPTH,
   UpdateComment,
 } from '../../src/comment';
 import { models } from '../../src/database';
@@ -871,9 +873,11 @@ describe('Thread lifecycle', () => {
           cursor: 1,
           thread_id: thread.id!,
           include_reactions: true,
+          include_spam_comments: true,
+          order_by: 'oldest',
         },
       });
-      expect(response!.results.length).to.equal(15);
+      expect(response!.results.length).to.equal(5);
       const last = response!.results.at(-1)!;
       const stl = response!.results.at(-2)!;
       expect(last!.address).to.equal(actors.member.address);
@@ -884,14 +888,27 @@ describe('Thread lifecycle', () => {
       expect(stl!.body).to.equal('hello');
 
       // get second comment with reactions
+      getNamespaceBalanceSpy.mockResolvedValue({
+        [actors.member.address!]: '50',
+      });
+      await command(CreateCommentReaction(), {
+        actor: actors.member,
+        payload: {
+          comment_id: last.id!,
+          reaction: 'like',
+          comment_msg_id: last!.canvas_msg_id || '',
+        },
+      });
       const response2 = await query(GetComments(), {
         actor: actors.member,
         payload: {
           limit: 50,
           cursor: 1,
           thread_id: thread.id!,
-          comment_id: response?.results.at(1)!.id,
+          comment_id: last!.id,
           include_reactions: true,
+          include_spam_comments: true,
+          order_by: 'oldest',
         },
       });
       const second = response2!.results.at(0)!;
@@ -906,9 +923,11 @@ describe('Thread lifecycle', () => {
           cursor: 1,
           thread_id: thread.id!,
           include_reactions: false,
+          include_spam_comments: true,
+          order_by: 'oldest',
         },
       });
-      expect(response!.results.length).to.equal(15);
+      expect(response!.results.length).to.equal(5);
       const last = response!.results.at(-1)!;
       const stl = response!.results.at(-2)!;
       expect(last!.address).to.equal(actors.member.address);
@@ -927,6 +946,8 @@ describe('Thread lifecycle', () => {
           thread_id: thread.id!,
           comment_id: response?.results.at(1)!.id,
           include_reactions: false,
+          include_spam_comments: true,
+          order_by: 'newest',
         },
       });
       const second = response2!.results.at(0)!;

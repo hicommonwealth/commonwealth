@@ -82,7 +82,7 @@ export const CreateComment = ({
 
   const { mutateAsync: createComment } = useCreateCommentMutation({
     threadId: rootThread.id,
-    communityId: app.activeChainId(),
+    communityId: app.activeChainId() || '',
     existingNumberOfComments: rootThread.numberOfComments || 0,
   });
 
