@@ -1,13 +1,13 @@
 import { logger } from '@hicommonwealth/core';
 import {
   commonProtocol as cp,
+  getBlock,
   getLaunchpadToken,
   transferLaunchpadLiquidityToUniswap,
 } from '@hicommonwealth/evm-protocols';
 import { config } from '@hicommonwealth/model';
 import { chainEvents, events } from '@hicommonwealth/schemas';
 import { BigNumber } from 'ethers';
-import Web3 from 'web3';
 import { z } from 'zod';
 import { models } from '../database';
 import { chainNodeMustExist } from './utils';
@@ -39,8 +39,10 @@ export async function handleLaunchpadTrade(
 
   const chainNode = await chainNodeMustExist(event.eventSource.ethChainId);
 
-  const web3 = new Web3(chainNode.private_url! || chainNode.url!);
-  const block = await web3.eth.getBlock(event.rawLog.blockHash);
+  const { block } = await getBlock({
+    rpc: chainNode.private_url! || chainNode.url!,
+    blockHash: event.rawLog.blockHash,
+  });
 
   await models.LaunchpadTrade.findOrCreate({
     where: {

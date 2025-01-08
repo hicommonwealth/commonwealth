@@ -1,7 +1,11 @@
 import { logger } from '@hicommonwealth/core';
+import {
+  decodeParameters,
+  getBlock,
+  getTransactionReceipt,
+} from '@hicommonwealth/evm-protocols';
 import { chainEvents, events } from '@hicommonwealth/schemas';
 import { BigNumber } from 'ethers';
-import Web3 from 'web3';
 import { z } from 'zod';
 import { DB } from '../models';
 import { chainNodeMustExist } from './utils';
@@ -62,17 +66,23 @@ export async function handleCommunityStakeTrades(
     return;
   }
 
-  const web3 = new Web3(chainNode.private_url!);
+  const [{ evmClient, txReceipt: tradeTxReceipt }, { block }] =
+    await Promise.all([
+      getTransactionReceipt({
+        rpc: chainNode.private_url!,
+        txHash: event.rawLog.transactionHash,
+      }),
+      getBlock({
+        rpc: chainNode.private_url!,
+        blockHash: event.rawLog.blockHash,
+      }),
+    ]);
 
-  const [tradeTxReceipt, block] = await Promise.all([
-    web3.eth.getTransactionReceipt(event.rawLog.transactionHash),
-    web3.eth.getBlock(event.rawLog.blockHash),
-  ]);
-
-  const { 0: stakeId, 1: stakeAmount } = web3.eth.abi.decodeParameters(
-    ['uint256', 'uint256'],
-    String(tradeTxReceipt.logs[0].data),
-  );
+  const { 0: stakeId, 1: stakeAmount } = decodeParameters({
+    evmClient,
+    abiInput: ['uint256', 'uint256'],
+    data: String(tradeTxReceipt.logs[0].data),
+  });
 
   await models.StakeTransaction.create({
     transaction_hash: event.rawLog.transactionHash,

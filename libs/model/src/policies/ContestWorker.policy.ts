@@ -1,9 +1,9 @@
 import { Actor, logger, Policy } from '@hicommonwealth/core';
+import { createPrivateEvmClient } from '@hicommonwealth/evm-protocols';
 import { events } from '@hicommonwealth/schemas';
 import { NeynarAPIClient } from '@neynar/nodejs-sdk';
 import moment from 'moment';
 import { QueryTypes } from 'sequelize';
-import Web3 from 'web3';
 import { config, Contest, models } from '..';
 import { GetActiveContestManagers } from '../contest';
 import { rollOverContest } from '../services/commonProtocol/contestHelper';
@@ -152,12 +152,9 @@ export function ContestWorker(): Policy<typeof inputs> {
   };
 }
 
-const getPrivateWalletAddress = () => {
-  const web3 = new Web3();
-  const privateKey = config.WEB3.PRIVATE_KEY;
-  const account = web3.eth.accounts.privateKeyToAccount(privateKey);
-  const publicAddress = account.address;
-  return publicAddress;
+const getPrivateWalletAddress = (): string => {
+  const web3 = createPrivateEvmClient({ privateKey: config.WEB3.PRIVATE_KEY });
+  return web3.eth.defaultAccount!;
 };
 
 const checkContests = async () => {
