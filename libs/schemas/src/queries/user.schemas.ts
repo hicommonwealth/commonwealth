@@ -16,17 +16,13 @@ export const UserProfileAddressView = AddressView.extend({
   }),
 });
 
-export const UserProfileCommentView = CommentView.extend({
-  community_id: z.string(),
-});
-
 export const UserProfileView = z.object({
   userId: PG_INT,
   profile: UserProfile,
   totalUpvotes: z.number().int(),
   addresses: z.array(UserProfileAddressView),
   threads: z.array(ThreadView),
-  comments: z.array(UserProfileCommentView),
+  comments: z.array(CommentView),
   commentThreads: z.array(ThreadView),
   isOwner: z.boolean(),
   tags: z.array(Tags.extend({ id: PG_INT })),
