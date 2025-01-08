@@ -24,10 +24,5 @@ beforeAll(async ({ name }) => {
 
   // Single point of test bootstrapping!
   // Only when running tests in libs/model and legacy commonwealth
-  if (
-    ['@hicommonwealth/model', 'commonwealth'].includes(
-      process.env.npm_package_name ?? '',
-    )
-  )
-    await bootstrap_testing();
+  await bootstrap_testing();
 }, 20_000);
