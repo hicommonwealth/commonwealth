@@ -64,6 +64,7 @@ export const processThreadUpvoted: EventHandler<
     log.error('Community not found!', undefined, payload);
     return false;
   }
+
   const provider = notificationsProvider();
   const res = await provider.triggerWorkflow({
     key: WorkflowKeys.NewUpvotes,
