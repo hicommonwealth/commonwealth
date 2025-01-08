@@ -1,5 +1,5 @@
 import { PermissionEnum } from '@hicommonwealth/schemas';
-import { MAIDEN_CHARS_TO_SHOW_MORE, slugify } from '@hicommonwealth/shared';
+import { MIN_CHARS_TO_SHOW_MORE, slugify } from '@hicommonwealth/shared';
 import { extractImages } from 'client/scripts/helpers/feed';
 import { getThreadActionTooltipText } from 'client/scripts/helpers/threads';
 import { getProposalUrlPath } from 'client/scripts/identifiers';
@@ -147,7 +147,7 @@ export const RenderThreadCard = ({
       hideTrendingTag={hideTrendingTag}
       hideSpamTag={hideSpamTag}
       cutoffLines={6}
-      maxChars={MAIDEN_CHARS_TO_SHOW_MORE}
+      maxChars={MIN_CHARS_TO_SHOW_MORE}
     />
   );
 };

@@ -1,7 +1,7 @@
 import { PermissionEnum } from '@hicommonwealth/schemas';
 import {
   ContentType,
-  MAX_CHARS_TO_SHOW_MORE,
+  MIN_CHARS_TO_SHOW_MORE,
   getThreadUrl,
 } from '@hicommonwealth/shared';
 import { Thread, ThreadView } from 'client/scripts/models/Thread';
@@ -641,7 +641,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                     key={threadBody}
                     markdown={threadBody || ''}
                     cutoffLines={50}
-                    maxChars={MAX_CHARS_TO_SHOW_MORE}
+                    maxChars={MIN_CHARS_TO_SHOW_MORE}
                   />
 
                   {thread?.readOnly || fromDiscordBot ? (
