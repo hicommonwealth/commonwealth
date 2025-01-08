@@ -7,7 +7,7 @@ import { PageNotFound } from '../pages/404';
 import { UserDashboardRowSkeleton } from '../pages/user_dashboard/user_dashboard_row';
 
 import { ActivityThread, PermissionEnum } from '@hicommonwealth/schemas';
-import { slugify } from '@hicommonwealth/shared';
+import { MIN_CHARS_TO_SHOW_MORE, slugify } from '@hicommonwealth/shared';
 import { extractImages } from 'client/scripts/helpers/feed';
 import { getThreadActionTooltipText } from 'helpers/threads';
 import useTopicGating from 'hooks/useTopicGating';
@@ -120,6 +120,8 @@ const FeedThread = ({ thread, onClick }: FeedThreadProps) => {
       hideUpvotesDrawer
       layoutType="community-first"
       onImageClick={onClick}
+      maxChars={MIN_CHARS_TO_SHOW_MORE}
+      cutoffLines={4}
     />
   );
 };
