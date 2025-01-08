@@ -1,4 +1,8 @@
-import { commonProtocol, contestAbi } from '@hicommonwealth/evm-protocols';
+import {
+  commonProtocol,
+  contestAbi,
+  erc20Abi,
+} from '@hicommonwealth/evm-protocols';
 import { ZERO_ADDRESS } from '@hicommonwealth/shared';
 import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
@@ -67,3 +71,24 @@ export const getTokenAttributes = async (
     decimals: parseInt(String(decimals)),
   };
 };
+
+export async function getErc20TokenInfo({
+  rpc,
+  tokenAddress,
+}: {
+  rpc: string;
+  tokenAddress: string;
+}): Promise<{ name: string; symbol: string; totalSupply: bigint }> {
+  const web3 = new Web3(rpc);
+  const erc20Contract = new web3.eth.Contract(erc20Abi, tokenAddress);
+  const [name, symbol, totalSupply] = await Promise.all([
+    erc20Contract.methods.name().call(),
+    erc20Contract.methods.symbol().call(),
+    erc20Contract.methods.totalSupply().call(),
+  ]);
+  return {
+    name,
+    symbol,
+    totalSupply: totalSupply as bigint,
+  };
+}

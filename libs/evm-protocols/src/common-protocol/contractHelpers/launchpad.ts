@@ -1,3 +1,14 @@
+import {
+  commonProtocol,
+  createPrivateEvmClient,
+  decodeParameters,
+  EvmEventSignatures,
+  getBlock,
+  getTransactionReceipt,
+  lpBondingCurveAbi,
+} from '@hicommonwealth/evm-protocols';
+import { Web3 } from 'web3';
+
 export const launchToken = async (
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   contract: any,
@@ -132,3 +143,196 @@ export const getTargetMarketCap = (
   const price = x * y;
   return price * totalSupply;
 };
+
+export async function getLaunchpadTradeTransaction({
+  rpc,
+  transactionHash,
+}: {
+  rpc: string;
+  transactionHash: string;
+}) {
+  const { evmClient, txReceipt } = await getTransactionReceipt({
+    rpc,
+    txHash: transactionHash,
+  });
+  if (!txReceipt) {
+    return;
+  }
+
+  const { block } = await getBlock({
+    evmClient: evmClient,
+    rpc,
+    blockHash: txReceipt.blockHash.toString(),
+  });
+
+  const tradeLog = txReceipt.logs.find((l) => {
+    if (l.topics && l.topics.length > 0) {
+      return l.topics[0].toString() === EvmEventSignatures.Launchpad.Trade;
+    }
+    return false;
+  });
+  if (!tradeLog) return;
+
+  const {
+    0: traderAddress,
+    1: tokenAddress,
+    2: isBuy,
+    3: communityTokenAmount,
+    4: ethAmount,
+    5: protocolEthAmount,
+    6: floatingSupply,
+  } = decodeParameters({
+    evmClient,
+    abiInput: [
+      'address',
+      'address',
+      'bool',
+      'uint256',
+      'uint256',
+      'uint256',
+      'uint256',
+    ],
+    data: txReceipt.logs[1].data!.toString(),
+  });
+
+  return {
+    txReceipt,
+    block,
+    parsedArgs: {
+      traderAddress: traderAddress as string,
+      tokenAddress: tokenAddress as string,
+      isBuy: isBuy as boolean,
+      communityTokenAmount: communityTokenAmount as bigint,
+      ethAmount: ethAmount as bigint,
+      protocolEthAmount: protocolEthAmount as bigint,
+      floatingSupply: floatingSupply as bigint,
+    },
+  };
+}
+
+export async function getLaunchpadTokenCreatedTransaction({
+  rpc,
+  transactionHash,
+}: {
+  rpc: string;
+  transactionHash: string;
+}) {
+  const web3 = new Web3(rpc);
+
+  const txReceipt = await web3.eth.getTransactionReceipt(transactionHash);
+  if (!txReceipt) {
+    return;
+  }
+
+  const block = await web3.eth.getBlock(txReceipt.blockHash.toString());
+
+  const deployedNamespaceLog = txReceipt.logs.find((l) => {
+    if (l.topics && l.topics.length > 0) {
+      return (
+        l.topics[0].toString() ===
+        EvmEventSignatures.NamespaceFactory.NamespaceDeployed
+      );
+    }
+    return false;
+  });
+  if (!deployedNamespaceLog) {
+    return;
+  }
+  const {
+    0: namespace,
+    // 1: feeManager,
+    // 2: signature,
+    // 3: namespaceDeployed,
+  } = web3.eth.abi.decodeParameters(
+    ['string', 'address', 'bytes', 'address'],
+    deployedNamespaceLog.data!.toString(),
+  );
+
+  const tokenRegisteredLog = txReceipt.logs.find((l) => {
+    if (l.topics && l.topics.length > 0) {
+      return (
+        l.topics[0].toString() === EvmEventSignatures.Launchpad.TokenRegistered
+      );
+    }
+    return false;
+  });
+  if (!tokenRegisteredLog) {
+    return;
+  }
+  const {
+    0: curveId,
+    1: totalSupply,
+    2: launchpadLiquidity,
+    3: reserveRatio,
+    4: initialPurchaseEthAmount,
+  } = web3.eth.abi.decodeParameters(
+    ['uint256', 'uint256', 'uint256', 'uint256', 'uint256'],
+    tokenRegisteredLog.data!.toString(),
+  );
+  const tokenAddress = web3.eth.abi.decodeParameter(
+    'address',
+    tokenRegisteredLog.topics![1].toString(),
+  );
+
+  return {
+    txReceipt,
+    block,
+    parsedArgs: {
+      namespace: namespace as string,
+      tokenAddress: tokenAddress as string,
+      curveId: curveId as bigint,
+      totalSupply: totalSupply as bigint,
+      launchpadLiquidity: launchpadLiquidity as bigint,
+      reserveRation: reserveRatio as bigint,
+      initialPurchaseEthAmount: initialPurchaseEthAmount as bigint,
+    },
+  };
+}
+
+export async function getLaunchpadToken({
+  rpc,
+  lpBondingCurveAddress,
+  tokenAddress,
+}: {
+  rpc: string;
+  lpBondingCurveAddress: string;
+  tokenAddress: string;
+}): Promise<{
+  launchpadLiquidity: bigint;
+  poolLiquidity: bigint;
+  curveId: bigint;
+  scalar: bigint;
+  reserveRation: bigint;
+  LPhook: string;
+  funded: boolean;
+}> {
+  const web3 = new Web3(rpc);
+  const contract = new web3.eth.Contract(
+    lpBondingCurveAbi,
+    lpBondingCurveAddress,
+  );
+  return await contract.methods.tokens(tokenAddress).call();
+}
+
+export async function transferLaunchpadLiquidityToUniswap({
+  rpc,
+  lpBondingCurveAddress,
+  tokenAddress,
+  privateKey,
+}: {
+  rpc: string;
+  lpBondingCurveAddress: string;
+  tokenAddress: string;
+  privateKey: string;
+}) {
+  const web3 = createPrivateEvmClient({ rpc, privateKey });
+  const contract = new web3.eth.Contract(
+    lpBondingCurveAbi,
+    lpBondingCurveAddress,
+  );
+  await commonProtocol.transferLiquidity(
+    contract,
+    tokenAddress,
+    web3.eth.defaultAccount!,
+  );
+}

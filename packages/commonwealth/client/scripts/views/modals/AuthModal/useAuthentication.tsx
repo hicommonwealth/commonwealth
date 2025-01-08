@@ -223,7 +223,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     try {
       const isCosmos = app?.chain?.base === ChainBase.CosmosSDK;
       const { address: magicAddress } = await startLoginWithMagicLink({
-        provider,
+        provider: evmClient,
         isCosmos,
         chain: app.chain?.id,
       });

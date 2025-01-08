@@ -31,7 +31,7 @@ export async function attachSigner<CT extends Contract>(
     signingWallet instanceof WalletConnectWebWalletController
   ) {
     const walletProvider = new ethers.providers.Web3Provider(
-      signingWallet.provider as any,
+      signingWallet.evmClient as any,
     );
     // 12s minute polling interval (default is 4s)
     walletProvider.pollingInterval = 12000;

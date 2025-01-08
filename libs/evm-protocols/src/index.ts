@@ -1,6 +1,7 @@
 export * from './abis';
 export * as commonProtocol from './common-protocol';
 export * from './common-protocol/accountAbstraction';
+export * from './common-protocol/contractHelpers/launchpad';
 export * from './common-protocol/contractHelpers/namespace';
 export * from './common-protocol/contractHelpers/stake';
 export * from './common-protocol/contractHelpers/tokens';
