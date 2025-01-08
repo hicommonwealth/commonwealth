@@ -17,6 +17,7 @@
     overflow: hidden;
     max-height: 52px !important;
     min-height: 52px !important;
+    padding-bottom: 2px !important;
 
     @include extraSmall {
       position: static;
