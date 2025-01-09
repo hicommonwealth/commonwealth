@@ -25,6 +25,7 @@ import { MessageRow } from 'views/components/component_kit/new_designs/CWTextInp
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import CommunityManagementLayout from 'views/pages/CommunityManagement/common/CommunityManagementLayout';
 
+import { getDefaultContestImage } from '@hicommonwealth/model';
 import { BLOG_SUBDOMAIN } from '@hicommonwealth/shared';
 import { CONTEST_FAQ_URL } from '../../../utils';
 import {
@@ -122,7 +123,7 @@ const DetailsFormStep = ({
         (t) => t.value === contestFormData?.contestTopic?.value,
       ),
       contestDescription: contestFormData?.contestDescription,
-      contestImage: contestFormData?.contestImage,
+      contestImage: contestFormData?.contestImage || getDefaultContestImage(),
       feeType:
         contestFormData?.feeType ||
         (isFarcasterContest
