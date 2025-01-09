@@ -91,6 +91,7 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
     apiCallEnabled: user.isLoggedIn,
     userId: user.id,
   });
+  const communityId = app.activeChainId() || '';
 
   useEffect(() => {
     if (isLoadingProfile) return;
