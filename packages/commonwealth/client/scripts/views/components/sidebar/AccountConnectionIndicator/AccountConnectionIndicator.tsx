@@ -33,11 +33,6 @@ const AccountConnectionIndicator = ({
   const referralsEnabled = useFlag('referrals');
   const { setIsInviteLinkModalOpen } = useInviteLinkModal();
 
-  const userData = useUserStore();
-  const hasMagic = userData.hasMagicWallet;
-
-  const { openMagicWallet } = useAuthentication({});
-
   if (!profile) {
     return null;
   }
