@@ -47,17 +47,23 @@ export function CreateLaunchpadToken(): Command<typeof schemas.CreateToken> {
         );
       }
 
-      const token = await models.LaunchpadToken.create({
-        token_address: tokenData.parsedArgs.tokenAddress.toLowerCase(),
-        namespace: tokenData.parsedArgs.namespace,
-        name: tokenInfo.name,
-        symbol: tokenInfo.symbol,
-        initial_supply: Number(tokenInfo.totalSupply / BigInt(1e18)),
-        liquidity_transferred: false,
-        launchpad_liquidity: tokenData.parsedArgs.launchpadLiquidity,
-        eth_market_cap_target: commonProtocol.getTargetMarketCap(),
-        description: description ?? null,
-        icon_url: icon_url ?? null,
+      const [token] = await models.LaunchpadToken.findOrCreate({
+        where: {
+          token_address: tokenData.parsedArgs.tokenAddress.toLowerCase(),
+          namespace: tokenData.parsedArgs.namespace,
+        },
+        defaults: {
+          token_address: tokenData.parsedArgs.tokenAddress.toLowerCase(),
+          namespace: tokenData.parsedArgs.namespace,
+          name: tokenInfo.name,
+          symbol: tokenInfo.symbol,
+          initial_supply: Number(tokenInfo.totalSupply / BigInt(1e18)),
+          liquidity_transferred: false,
+          launchpad_liquidity: tokenData.parsedArgs.launchpadLiquidity,
+          eth_market_cap_target: commonProtocol.getTargetMarketCap(),
+          description: description ?? null,
+          icon_url: icon_url ?? null,
+        },
       });
 
       return token!.toJSON() as unknown as z.infer<typeof TokenView>;

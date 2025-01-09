@@ -9,6 +9,8 @@ export { chainEvents, events };
 
 export enum EventNames {
   ChainEventCreated = 'ChainEventCreated',
+  UserCreated = 'UserCreated',
+  AddressOwnershipTransferred = 'AddressOwnershipTransferred',
   CommentCreated = 'CommentCreated',
   CommentUpvoted = 'CommentUpvoted',
   CommunityCreated = 'CommunityCreated',
@@ -47,6 +49,14 @@ export enum EventNames {
 }
 
 export type EventPairs =
+  | {
+      event_name: EventNames.UserCreated;
+      event_payload: z.infer<typeof events.UserCreated>;
+    }
+  | {
+      event_name: EventNames.AddressOwnershipTransferred;
+      event_payload: z.infer<typeof events.AddressOwnershipTransferred>;
+    }
   | {
       event_name: EventNames.CommunityCreated;
       event_payload: z.infer<typeof events.CommunityCreated>;

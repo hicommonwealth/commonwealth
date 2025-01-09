@@ -25,6 +25,8 @@ export const UpdateComment = {
   input: z.object({
     comment_id: PG_INT,
     body: z.string().min(1),
+    canvas_signed_data: z.string().optional(),
+    canvas_msg_id: z.string().optional(),
   }),
   output: Comment.extend({ community_id: z.string() }),
   context: CommentContext,
@@ -53,5 +55,14 @@ export const DeleteComment = {
     canvas_signed_data: z.string().nullish(),
     canvas_msg_id: z.string().nullish(),
   }),
+  context: CommentContext,
+};
+
+export const ToggleCommentSpam = {
+  input: z.object({
+    comment_id: PG_INT,
+    spam: z.boolean(),
+  }),
+  output: Comment,
   context: CommentContext,
 };

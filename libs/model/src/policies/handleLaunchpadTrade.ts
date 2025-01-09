@@ -25,7 +25,7 @@ export async function handleLaunchpadTrade(
 
   const token = await models.LaunchpadToken.findOne({
     where: {
-      token_address: tokenAddress,
+      token_address: tokenAddress.toLowerCase(),
     },
   });
 
@@ -35,18 +35,15 @@ export async function handleLaunchpadTrade(
 
   const chainNode = await chainNodeMustExist(event.eventSource.ethChainId);
 
-  const trade = await models.LaunchpadTrade.findOne({
+  const web3 = new Web3(chainNode.private_url! || chainNode.url!);
+  const block = await web3.eth.getBlock(event.rawLog.blockHash);
+
+  await models.LaunchpadTrade.findOrCreate({
     where: {
       eth_chain_id: chainNode.eth_chain_id!,
       transaction_hash: event.rawLog.transactionHash,
     },
-  });
-
-  if (!trade) {
-    const web3 = new Web3(chainNode.private_url! || chainNode.url!);
-    const block = await web3.eth.getBlock(event.rawLog.blockHash);
-
-    await models.LaunchpadTrade.create({
+    defaults: {
       eth_chain_id: chainNode.eth_chain_id!,
       transaction_hash: event.rawLog.transactionHash,
       token_address: tokenAddress.toLowerCase(),
@@ -60,13 +57,13 @@ export async function handleLaunchpadTrade(
         ) / 1e18,
       floating_supply: BigNumber.from(floatingSupply).toBigInt(),
       timestamp: Number(block.timestamp),
-    });
-  }
+    },
+  });
 
   const contracts =
     cp.factoryContracts[chainNode!.eth_chain_id as cp.ValidChains];
   let lpBondingCurveAddress: string;
-  if ('lpBondingCurve' in contracts) {
+  if (contracts && 'lpBondingCurve' in contracts) {
     lpBondingCurveAddress = contracts.lpBondingCurve;
   } else {
     log.error('No lpBondingCurve address found for chain', undefined, {
