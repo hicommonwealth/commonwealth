@@ -1,37 +1,8 @@
-import { useMutation } from '@tanstack/react-query';
-import axios from 'axios';
 import Comment from 'models/Comment';
 import { IUniqueId } from 'models/interfaces';
-import { SERVER_URL } from 'state/api/config';
+import moment from 'moment';
 import { trpc } from 'utils/trpcClient';
-import { userStore } from '../../ui/user';
 import { updateThreadInAllCaches } from '../threads/helpers/cache';
-
-interface ToggleCommentSpamStatusProps {
-  communityId: string;
-  commentId: number;
-  isSpam: boolean;
-  address: string;
-}
-
-const toggleCommentSpamStatus = async ({
-  communityId,
-  commentId,
-  isSpam,
-  address,
-}: ToggleCommentSpamStatusProps) => {
-  const method = isSpam ? 'put' : 'delete';
-  const body = {
-    jwt: userStore.getState().jwt,
-    chain_id: communityId,
-    address: address,
-    author_chain: communityId,
-  };
-  return await axios[method](
-    `${SERVER_URL}/comments/${commentId}/spam`,
-    isSpam ? body : ({ data: { ...body } } as any),
-  );
-};
 
 interface UseToggleCommentSpamStatusMutationProps {
   communityId: string;
@@ -44,12 +15,17 @@ const useToggleCommentSpamStatusMutation = ({
 }: UseToggleCommentSpamStatusMutationProps) => {
   const utils = trpc.useUtils();
 
-  return useMutation({
-    mutationFn: toggleCommentSpamStatus,
+  return trpc.comment.toggleCommentSpam.useMutation({
     onSuccess: async (response) => {
       const comment = new Comment({
-        ...response?.data?.result,
+        ...response,
+        id: response.id!,
+        Address: response.Address!,
+        author: response.Address!.address,
         community_id: communityId,
+        reaction_weights_sum: response.reaction_weights_sum || '0',
+        created_at: moment(response.created_at!),
+        CommentVersionHistories: undefined,
       });
 
       // reset comments cache state
