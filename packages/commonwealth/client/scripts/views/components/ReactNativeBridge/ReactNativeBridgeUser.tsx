@@ -1,6 +1,7 @@
 import useUserStore from 'client/scripts/state/ui/user';
+import { handleSocialLoginCallback } from 'controllers/app/login';
 import { useReactNativeWebView } from 'hooks/useReactNativeWebView';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 /**
  * Typed message so that the react-native client knows how to handel this message.
@@ -59,5 +60,41 @@ export const ReactNativeBridgeUser = () => {
     }
   }, [reactNativeWebView, userInfo]);
 
+  const handleMessage = useCallback((message: MessageEvent) => {
+    const obj = messageToObject(message.data);
+    if (obj && typeof message.data === 'object') {
+      if (isAuthRequest(obj)) {
+        console.log('Handling auth request from react-native: ', obj);
+        handleSocialLoginCallback({ bearer: obj.bearer }).catch(console.error);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    window.addEventListener('message', handleMessage);
+
+    if (reactNativeWebView) {
+      reactNativeWebView.postMessage(JSON.stringify({ type: 'auth-ready' }));
+    }
+
+    return () => {
+      window.removeEventListener('message', handleMessage);
+    };
+  }, [handleMessage, reactNativeWebView]);
+
   return null;
 };
+
+type AuthRequest = {
+  type: 'navigate-to-link';
+  bearer: string;
+};
+
+function isAuthRequest(data: object): data is AuthRequest {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (data as any).type === 'auth-request';
+}
+
+function messageToObject(message: string | object): object {
+  return typeof message === 'string' ? JSON.parse(message) : message;
+}

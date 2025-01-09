@@ -331,6 +331,7 @@ export async function startLoginWithMagicLink({
       const params = `?redirectTo=${
         redirectTo ? encodeURIComponent(redirectTo) : ''
       }&chain=${chain || ''}&sso=${provider}`;
+
       await magic.oauth.loginWithRedirect({
         provider,
         redirectURI: new URL(
