@@ -1,5 +1,5 @@
 import { ChainBase, Roles } from '@hicommonwealth/shared';
-import { z } from 'zod';
+import { ZodType, z } from 'zod';
 import { Referral, User } from '../entities';
 import { Tags } from '../entities/tag.schemas';
 import { UserProfile } from '../entities/user.schemas';
@@ -16,11 +16,18 @@ export const UserProfileAddressView = AddressView.extend({
   }),
 });
 
+// Type annotation is needed to avoid:
+// The inferred type of this node exceeds the maximum length the compiler will serialize.
+// An explicit type annotation is needed.ts(7056)
+type UserProfileAddressView = z.infer<typeof UserProfileAddressView>;
+
 export const UserProfileView = z.object({
   userId: PG_INT,
   profile: UserProfile,
   totalUpvotes: z.number().int(),
-  addresses: z.array(UserProfileAddressView),
+  addresses: z.array(UserProfileAddressView) as ZodType<
+    UserProfileAddressView[]
+  >,
   threads: z.array(ThreadView),
   comments: z.array(CommentView),
   commentThreads: z.array(ThreadView),
