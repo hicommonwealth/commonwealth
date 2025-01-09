@@ -1,6 +1,9 @@
 import React from 'react';
 
+import axios from 'axios';
+import { formatAddressShort } from 'client/scripts/helpers';
 import { SERVER_URL } from 'state/api/config';
+import useUserStore from 'state/ui/user';
 import {
   notifyError,
   notifySuccess,
@@ -13,10 +16,6 @@ import {
   CWModalFooter,
   CWModalHeader,
 } from '../components/component_kit/new_designs/CWModal';
-
-import axios from 'axios';
-import { formatAddressShort } from 'client/scripts/helpers';
-import useUserStore from 'state/ui/user';
 import './delete_address_modal.scss';
 
 type DeleteAddressModalAttrs = {
@@ -26,6 +25,7 @@ type DeleteAddressModalAttrs = {
   closeModal: () => void;
   isBulkDelete?: boolean;
   communityName: string;
+  isLastCommunityAddress?: boolean;
 };
 
 export const DeleteAddressModal = ({
@@ -34,6 +34,7 @@ export const DeleteAddressModal = ({
   closeModal,
   isBulkDelete = false,
   communityName,
+  isLastCommunityAddress = false,
 }: DeleteAddressModalAttrs) => {
   const user = useUserStore();
 
@@ -50,11 +51,13 @@ export const DeleteAddressModal = ({
       if (response?.data.status === 'Success') {
         const updatedAddresses = [...user.addresses].filter(
           (a) =>
-            a.addressId !== address.addressId ||
-            a.community?.id !== address.community?.id,
+            !(
+              a.addressId === address.addressId &&
+              a.community?.id === address.community?.id
+            ),
         );
         const updatedAccounts = user.accounts.filter(
-          (a) => a.address !== address.address && a.community.id !== chain,
+          (a) => !(a.address === address.address && a.community.id === chain),
         );
         const remainingJoinedCommunities = updatedAddresses.map(
           (a) => a.community.id,
@@ -89,19 +92,26 @@ export const DeleteAddressModal = ({
     <div className="DeleteAddressModal">
       <CWModalHeader
         label={
-          isBulkDelete
-            ? 'Disconnect All Addresses'
-            : `Disconnect ${formatAddressShort(address?.address || '')}`
+          isLastCommunityAddress
+            ? 'Are you sure you want to leave this community?'
+            : isBulkDelete
+              ? 'Disconnect All Addresses'
+              : `Disconnect ${formatAddressShort(address?.address || '')}`
         }
         icon="danger"
         onModalClose={closeModal}
       />
       <CWModalBody>
         <CWText>
-          {isBulkDelete
-            ? `By leaving ${communityName} you will disconnect all 
+          {isLastCommunityAddress
+            ? `By removing the following address, ${formatAddressShort(
+                address?.address || '',
+              )}, you will be leaving ${communityName}. 
+              If you’d like to interact with this community in the future you can rejoin.`
+            : isBulkDelete
+              ? `By leaving ${communityName} you will disconnect all 
             linked addresses. Your threads will remain intact.`
-            : `By removing this address you will be leaving the ${communityName}. 
+              : `By removing this address you will be disconnecting from ${communityName}. 
             Your contributions and comments will remain. Don't worry, you can rejoin anytime.`}
         </CWText>
       </CWModalBody>
@@ -113,7 +123,13 @@ export const DeleteAddressModal = ({
           buttonHeight="sm"
         />
         <CWButton
-          label={isBulkDelete ? 'Disconnect All' : 'Disconnect Address'}
+          label={
+            isLastCommunityAddress
+              ? 'Leave Community'
+              : isBulkDelete
+                ? 'Disconnect All'
+                : 'Disconnect Address'
+          }
           buttonType="destructive"
           onClick={handleDelete}
           buttonHeight="sm"

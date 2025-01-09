@@ -4,7 +4,9 @@ import { MixpanelCommunityInteractionEvent } from '../../shared/analytics/types'
 
 export const trpcRouter = trpc.router({
   createPollVote: trpc.command(Poll.CreatePollVote, trpc.Tag.Poll, [
-    MixpanelCommunityInteractionEvent.SUBMIT_VOTE,
-    ({ community_id }) => ({ community_id }),
+    trpc.trackAnalytics([
+      MixpanelCommunityInteractionEvent.SUBMIT_VOTE,
+      ({ community_id }) => ({ community_id }),
+    ]),
   ]),
 });
