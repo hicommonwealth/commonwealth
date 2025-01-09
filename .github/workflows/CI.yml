@@ -87,7 +87,7 @@ jobs:
         uses: actions/upload-artifact@v4
         if: ${{ failure() }}
         with:
-          name: Recordings
+          name: E2eParallelRecordings
           path: packages/commonwealth/test-results/
 
   # The tests that this job runs should not be flaky. If they are, move them back into the regular suite.
@@ -148,7 +148,7 @@ jobs:
         uses: actions/upload-artifact@v4
         if: ${{ failure() }}
         with:
-          name: Recordings
+          name: E2eMatureRecordings
           path: packages/commonwealth/test-results/
 
   e2e-tests-serial:
