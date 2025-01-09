@@ -11,6 +11,7 @@ import {
   getElizaUserId,
   getWebhookDestination,
 } from '@hicommonwealth/shared';
+import { randomBytes } from 'crypto';
 import fetch from 'node-fetch';
 import { z } from 'zod';
 import { models } from '../database';
@@ -101,6 +102,7 @@ export function CreateWebhook(): Command<typeof schemas.CreateWebhook> {
         url: payload.webhookUrl,
         destination,
         events,
+        signing_key: randomBytes(32).toString('hex'),
       });
 
       return webhook.get({ plain: true });

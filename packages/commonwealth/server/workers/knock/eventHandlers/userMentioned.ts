@@ -84,7 +84,7 @@ export const processUserMentioned: EventHandler<
   // Comment mentions of Eliza are handled in `commentCreated` handler
   if (!payload.thread) return true;
 
-  const webhooks = await models.Webhook.findAll({
+  const webhooks = await models.Webhook.scope('withPrivateData').findAll({
     where: {
       community_id: community.id!,
       events: { [Op.contains]: ['UserMentioned'] },
@@ -120,6 +120,7 @@ export const processUserMentioned: EventHandler<
         id: `webhook-${w.id}`,
         webhook_url: w.url,
         destination: w.destination,
+        signing_key: w.signing_key,
       })),
       data: {
         sender_username: 'Common',

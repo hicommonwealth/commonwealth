@@ -113,7 +113,7 @@ export const processCommentCreated: EventHandler<
 
   let parentComment: CommentInstance | null = null;
 
-  const allWebhooks = await models.Webhook.findAll({
+  const allWebhooks = await models.Webhook.scope('withPrivateData').findAll({
     where: {
       community_id: community.id!,
       events: { [Op.contains]: ['CommentCreated'] },
@@ -171,6 +171,7 @@ export const processCommentCreated: EventHandler<
       id: `webhook-${w.id}`,
       webhook_url: w.url,
       destination: w.destination,
+      signing_key: w.signing_key,
     })),
     data: {
       sender_username: 'Common',

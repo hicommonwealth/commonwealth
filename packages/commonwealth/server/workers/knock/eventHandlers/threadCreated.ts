@@ -41,7 +41,7 @@ export const processThreadCreated: EventHandler<
     return false;
   }
 
-  const webhooks = await models.Webhook.findAll({
+  const webhooks = await models.Webhook.scope('withPrivateData').findAll({
     where: {
       community_id: community.id!,
       events: { [Op.contains]: ['ThreadCreated'] },
@@ -75,6 +75,7 @@ export const processThreadCreated: EventHandler<
         id: `webhook-${w.id}`,
         webhook_url: w.url,
         destination: w.destination,
+        signing_key: w.signing_key,
       })),
       data: {
         sender_username: 'Common',

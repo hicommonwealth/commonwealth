@@ -17,5 +17,6 @@ export const Webhook = z.object({
   community_id: z.string(),
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional(),
+  signing_key: z.string(),
   Community: Community.optional(),
 });
