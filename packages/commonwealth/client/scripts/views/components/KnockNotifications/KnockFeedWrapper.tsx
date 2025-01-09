@@ -1,6 +1,6 @@
 import Knock from '@knocklabs/client';
 import { KnockFeedProvider, KnockProvider } from '@knocklabs/react';
-import React, { ReactNode, useEffect } from 'react';
+import React, { ReactNode, memo, useEffect } from 'react';
 import useUserStore from 'state/ui/user';
 
 const KNOCK_PUBLIC_API_KEY =
@@ -20,10 +20,13 @@ interface KnockFeedWrapperProps {
   children: ReactNode;
 }
 
-export const KnockFeedWrapper = ({ children }: KnockFeedWrapperProps) => {
+export const KnockFeedWrapper = memo(function KnockFeedWrapper({
+  children,
+}: KnockFeedWrapperProps) {
   const user = useUserStore();
 
   useEffect(() => {
+    console.log('FIXME 1');
     if (!user.id || !user.isLoggedIn) return;
     if (!user.knockJWT) {
       console.warn('user knockJWT not set! Will not attempt to identify.');
@@ -54,4 +57,4 @@ export const KnockFeedWrapper = ({ children }: KnockFeedWrapperProps) => {
       </KnockFeedProvider>
     </KnockProvider>
   );
-};
+});
