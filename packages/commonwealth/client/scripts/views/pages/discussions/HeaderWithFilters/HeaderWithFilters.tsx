@@ -361,7 +361,7 @@ export const HeaderWithFilters = ({
               <div className="filter-section filter-section-top">
                 {!isWindowExtraSmall && <p className="filter-label">Filter</p>}
                 <div className="filter-section filter-section-right">
-                  {(topics || []).length > 0 && (
+                  {((selectedView !== 'all' && topics) || []).length > 0 && (
                     <Select
                       selected={
                         matchesContestFilterRoute ||
