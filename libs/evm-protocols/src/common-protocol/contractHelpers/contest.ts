@@ -1,5 +1,4 @@
 import { BigNumber } from '@ethersproject/bignumber';
-import { ServerError } from '@hicommonwealth/core';
 import { ZERO_ADDRESS } from '@hicommonwealth/shared';
 import { Mutex } from 'async-mutex';
 import Web3, { PayableCallOptions, TransactionReceipt } from 'web3';
@@ -507,7 +506,7 @@ export const deployNamespace = async (
   const web3 = createPrivateEvmClient({ rpc: rpcNodeUrl, privateKey });
   const namespaceCheck = await getNamespace(rpcNodeUrl, name, namespaceFactory);
   if (namespaceCheck === ZERO_ADDRESS) {
-    throw new ServerError('Namespace already reserved');
+    throw new Error('Namespace already reserved');
   }
   const contract = new web3.eth.Contract(namespaceFactoryAbi, namespaceFactory);
 
