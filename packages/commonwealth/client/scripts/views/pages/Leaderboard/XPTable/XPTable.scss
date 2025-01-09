@@ -7,4 +7,13 @@
     justify-content: center;
     align-items: center;
   }
+
+  tr {
+    td,
+    th {
+      &:first-of-type {
+        width: 80px;
+      }
+    }
+  }
 }

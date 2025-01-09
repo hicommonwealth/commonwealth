@@ -11,7 +11,7 @@ const columns: CWTableColumnInfo[] = [
   {
     key: 'rank',
     header: 'Rank',
-    numeric: true,
+    numeric: false,
     sortable: true,
   },
   {
@@ -27,7 +27,7 @@ const columns: CWTableColumnInfo[] = [
         <CWIcon iconName="help" iconSize="regular" /> XP
       </CWText>
     ),
-    numeric: false,
+    numeric: true,
     sortable: true,
   },
 ];
