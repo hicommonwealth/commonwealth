@@ -1,25 +1,23 @@
 import { ServerError } from '@hicommonwealth/core';
-import Web3 from 'web3';
+import { createPrivateEvmClient } from '@hicommonwealth/evm-protocols';
 import { config } from '../../config';
 
 /**
  * A helper for creating the web3 provider via an RPC, including private key import
  * @param rpc the rpc of the network to use helper with
+ * @param keyOverride An optional private key override
  * @returns
  */
 
-export const createWeb3Provider = async (
+export const createWeb3Provider = (
   rpc: string,
   keyOverride?: string,
-  // eslint-disable-next-line @typescript-eslint/require-await
-): Promise<Web3> => {
+): ReturnType<typeof createPrivateEvmClient> => {
   if (!keyOverride && !config.WEB3.PRIVATE_KEY)
     throw new ServerError('WEB3 private key not set!');
-  const web3 = new Web3(rpc);
-  const account = web3.eth.accounts.privateKeyToAccount(
-    keyOverride ? keyOverride : config.WEB3.PRIVATE_KEY,
-  );
-  web3.eth.accounts.wallet.add(account);
-  web3.eth.defaultAccount = account.address;
-  return web3;
+
+  return createPrivateEvmClient({
+    rpc,
+    privateKey: keyOverride || config.WEB3.PRIVATE_KEY,
+  });
 };
