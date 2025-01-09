@@ -12,7 +12,7 @@ import {
   CommunityStake,
   ContestManager,
   ExtendedCommunity,
-  PinnedToken,
+  PinnedTokenWithPrices,
   Topic,
 } from '../entities';
 import * as projections from '../projections';
@@ -210,6 +210,7 @@ export const GetPinnedTokens = {
   input: z.object({
     community_ids: z.string(),
     with_chain_node: z.boolean().optional(),
+    with_price: z.boolean().optional(),
   }),
-  output: PinnedToken.array(),
+  output: PinnedTokenWithPrices.array(),
 };

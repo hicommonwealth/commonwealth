@@ -1,4 +1,5 @@
 import { InvalidInput } from '@hicommonwealth/core';
+import { isEvmAddress } from '@hicommonwealth/evm-protocols';
 import { ChainBase, addressSwapper, bech32ToHex } from '@hicommonwealth/shared';
 import { bech32 } from 'bech32';
 import { Op } from 'sequelize';
@@ -40,8 +41,7 @@ export async function verifyAddress(
 
   try {
     if (community.base === ChainBase.Ethereum) {
-      const { isAddress } = await import('web3-validator');
-      if (!isAddress(address)) throw new InvalidAddress(address, 'Not Eth');
+      if (!isEvmAddress(address)) throw new InvalidAddress(address, 'Not Eth');
       return { base: community.base, encodedAddress: address };
     }
 

@@ -11,15 +11,16 @@ const BuyReceipt = ({ trading }: ReceiptDetailsProps) => {
   const { invest, gain } = trading.amounts.buy;
   const baseCurrencyName = invest.baseCurrency.name;
   const baseCurrencySymbol = currencyNameToSymbolMap[baseCurrencyName];
+  const ethBuyCurrency = trading.amounts.buy.invest.ethBuyCurrency;
   const isLeftSymbolCurrency =
-    currencySymbolPlacements.onLeft.includes(baseCurrencyName);
+    currencySymbolPlacements.onLeft.includes(ethBuyCurrency);
   const isRightSymbolCurrency =
-    currencySymbolPlacements.onRight.includes(baseCurrencyName);
+    currencySymbolPlacements.onRight.includes(ethBuyCurrency);
 
   return (
     <div className="ReceiptDetails">
       <div className="entry">
-        <CWText type="caption">{baseCurrencyName} to ETH rate</CWText>
+        <CWText type="caption">{ethBuyCurrency} to ETH rate</CWText>
         <CWText type="caption">
           {isLeftSymbolCurrency ? baseCurrencySymbol : ''}{' '}
           {invest.baseCurrency.unitEthExchangeRate.toFixed(18)}
@@ -32,12 +33,6 @@ const BuyReceipt = ({ trading }: ReceiptDetailsProps) => {
           {isLeftSymbolCurrency ? baseCurrencySymbol : ''}{' '}
           {invest.baseCurrency.amount}
           {isRightSymbolCurrency ? baseCurrencySymbol : ''}
-        </CWText>
-      </div>
-      <div className="entry">
-        <CWText type="caption">ETH bought from invested amount</CWText>
-        <CWText type="caption">
-          {invest.baseCurrency.toEth.toFixed(18)} ETH
         </CWText>
       </div>
       <div className="entry">

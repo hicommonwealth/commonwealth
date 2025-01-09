@@ -234,19 +234,24 @@ export const HeaderWithFilters = ({
                 {
                   id: 1,
                   value: ThreadViewFilterTypes.All,
-                  label: 'All',
+                  label: 'Row',
                   iconLeft: 'viewAll',
                 },
-                {
-                  id: 2,
-                  value: ThreadViewFilterTypes.Overview,
-                  label: 'Overview',
-                  iconLeft: 'viewOverView',
-                },
+                ...(!matchesContestFilterRoute &&
+                !matchesDiscussionsTopicRoute?.[0]?.params?.topic
+                  ? [
+                      {
+                        id: 2,
+                        value: ThreadViewFilterTypes.Overview,
+                        label: 'Overview',
+                        iconLeft: 'viewOverView',
+                      },
+                    ]
+                  : []),
                 {
                   id: 3,
                   value: ThreadViewFilterTypes.CardView,
-                  label: 'CardView',
+                  label: 'ImageView',
                   iconLeft: 'kanban',
                 },
               ]}
@@ -356,7 +361,7 @@ export const HeaderWithFilters = ({
               <div className="filter-section filter-section-top">
                 {!isWindowExtraSmall && <p className="filter-label">Filter</p>}
                 <div className="filter-section filter-section-right">
-                  {(topics || []).length > 0 && (
+                  {((selectedView !== 'all' && topics) || []).length > 0 && (
                     <Select
                       selected={
                         matchesContestFilterRoute ||
@@ -513,28 +518,29 @@ export const HeaderWithFilters = ({
               </div>
             </div>
           )}
-
-          <div className="checkboxes">
-            <CWCheckbox
-              checked={isIncludingSpamThreads}
-              label="Include posts flagged as spam"
-              onChange={(e) => {
-                // @ts-expect-error <StrictNullChecks/>
-                onIncludeSpamThreads(e.target.checked);
-              }}
-            />
-
-            {!isOnArchivePage && (
+          {!isWindowExtraSmall && (
+            <div className="checkboxes">
               <CWCheckbox
-                checked={isIncludingArchivedThreads}
-                label="Include archived posts"
+                checked={isIncludingSpamThreads}
+                label="Include posts flagged as spam"
                 onChange={(e) => {
                   // @ts-expect-error <StrictNullChecks/>
-                  onIncludeArchivedThreads(e.target.checked);
+                  onIncludeSpamThreads(e.target.checked);
                 }}
               />
-            )}
-          </div>
+
+              {!isOnArchivePage && (
+                <CWCheckbox
+                  checked={isIncludingArchivedThreads}
+                  label="Include archived posts"
+                  onChange={(e) => {
+                    // @ts-expect-error <StrictNullChecks/>
+                    onIncludeArchivedThreads(e.target.checked);
+                  }}
+                />
+              )}
+            </div>
+          )}
 
           {(activeContests || []).map((contest) => {
             const { end_time } =
