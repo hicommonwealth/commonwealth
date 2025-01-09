@@ -33,9 +33,9 @@ class LaunchpadBondingCurve extends ContractBase {
   ): Promise<void> {
     await super.initialize(withWallet, chainId);
     this.launchpadFactory = new this.web3.eth.Contract(
-      launchpadFactoryAbi as AbiItem[],
+      launchpadFactoryAbi,
       this.launchpadFactoryAddress,
-    ) as unknown as Contract<typeof launchpadFactoryAbi>;
+    );
   }
 
   async launchToken(

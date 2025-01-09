@@ -40,9 +40,8 @@ export default defineConfig(({ mode }) => {
     'process.env.FLAG_FARCASTER_CONTEST': JSON.stringify(
       env.FLAG_FARCASTER_CONTEST,
     ),
-    'process.env.FLAG_TOKENIZED_COMMUNITY': JSON.stringify(
-      env.FLAG_TOKENIZED_COMMUNITY,
-    ),
+    'process.env.FLAG_LAUNCHPAD': JSON.stringify(env.FLAG_LAUNCHPAD),
+    'process.env.FLAG_UNISWAP_TRADE': JSON.stringify(env.FLAG_UNISWAP_TRADE),
     'process.env.FLAG_MANAGE_API_KEYS': JSON.stringify(
       env.FLAG_MANAGE_API_KEYS,
     ),

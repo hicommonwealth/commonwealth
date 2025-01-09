@@ -1,7 +1,7 @@
 import { BigNumber } from '@ethersproject/bignumber';
 import { ZERO_ADDRESS } from '@hicommonwealth/shared';
 import { Mutex } from 'async-mutex';
-import Web3, { PayableCallOptions, TransactionReceipt } from 'web3';
+import Web3, { Contract, PayableCallOptions, TransactionReceipt } from 'web3';
 import { feeManagerAbi } from '../../abis/feeManagerAbi';
 import { namespaceFactoryAbi } from '../../abis/namespaceFactoryAbi';
 import { recurringContestAbi } from '../../abis/recurringContestAbi';
@@ -15,13 +15,11 @@ import {
 } from '../utils';
 
 export const getTotalContestBalance = async (
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  contestContract: any,
+  contestContract: Contract<
+    Readonly<typeof singleContestAbi> | Readonly<typeof recurringContestAbi>
+  >,
   contestAddress: string,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  web3: any,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  _feeManagerAbi: any[],
+  web3: Web3,
   oneOff?: boolean,
 ): Promise<string> => {
   const promises = [contestContract.methods.contestToken().call()];
@@ -35,10 +33,7 @@ export const getTotalContestBalance = async (
   const balancePromises: Promise<string>[] = [];
 
   if (!oneOff) {
-    const feeManager = new web3.eth.Contract(
-      _feeManagerAbi,
-      String(results[1]),
-    );
+    const feeManager = new web3.eth.Contract(feeManagerAbi, String(results[1]));
     balancePromises.push(
       feeManager.methods
         .getBeneficiaryBalance(contestAddress, results[0])
@@ -47,7 +42,7 @@ export const getTotalContestBalance = async (
   }
   if (String(results[0]) === ZERO_ADDRESS) {
     balancePromises.push(
-      web3.eth.getBalance(contestAddress).then((v: string) => {
+      web3.eth.getBalance(contestAddress).then((v: bigint) => {
         return v.toString();
       }),
     );
@@ -62,7 +57,7 @@ export const getTotalContestBalance = async (
           data: calldata,
         })
         .then((v: string) => {
-          return web3.eth.abi.decodeParameter('uint256', v);
+          return String(web3.eth.abi.decodeParameter('uint256', v));
         }),
     );
   }
@@ -136,13 +131,7 @@ export const getContestBalance = async (
     contest,
   );
 
-  return await getTotalContestBalance(
-    contestInstance,
-    contest,
-    web3,
-    feeManagerAbi,
-    oneOff,
-  );
+  return await getTotalContestBalance(contestInstance, contest, web3, oneOff);
 };
 
 /**
