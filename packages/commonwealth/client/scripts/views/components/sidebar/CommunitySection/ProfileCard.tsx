@@ -21,6 +21,8 @@ const ProfileCard = () => {
   const backgroundBehavior =
     data?.profile?.background_image?.imageBehavior || ImageBehavior.Fill;
 
+  if (!data) return null;
+
   return (
     <div className="ProfileCard">
       <Link to={`/profile/id/${userData.id}`} className="user-info">
