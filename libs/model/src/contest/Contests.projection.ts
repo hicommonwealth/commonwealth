@@ -231,9 +231,10 @@ export async function updateScore(contest_address: string, contest_id: number) {
       oneOff,
     );
 
-    const prizePool = BigNumber.from(contestBalance)
+    let prizePool = BigNumber.from(contestBalance)
       .mul(oneOff ? 100 : details.prize_percentage)
       .div(100);
+    prizePool = prizePool.mul(90).div(100); // deduct 10% fee
     const score: z.infer<typeof ContestScore> = scores.map((s, i) => ({
       content_id: s.winningContent.toString(),
       creator_address: s.winningAddress,
