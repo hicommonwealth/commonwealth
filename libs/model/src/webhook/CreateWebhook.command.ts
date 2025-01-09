@@ -25,7 +25,7 @@ const Errors = {
     'https://hooks.slack.com/services/*, https://hooks.zapier.com/hooks/*, https://discord.com/api/webhooks/*, https://*/eliza/[user-id]',
   WebhookExists: 'The provided webhook already exists for this community',
   MissingChannelIdTelegram: 'The Telegram url is missing a channel id',
-  WebhookNotFound: 'The Webhook does not exist',
+  WebhookNotFound: 'The Webhook endpoint was not found (404 Not Found)',
   UnauthorizedWebhooks: 'Cannot make requests to unauthorized webhooks',
   ElizaUserNotFound: 'Eliza user not found',
   ElizaAddressNotFound: 'Eliza address not found',
