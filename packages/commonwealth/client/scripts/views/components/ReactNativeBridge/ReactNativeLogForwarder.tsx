@@ -40,8 +40,10 @@ export const ReactNativeLogForwarder = memo(function ReactNativeLogForwarder() {
       reactNativeWebView.postMessage(
         JSON.stringify({
           type: 'log',
-          level,
-          args,
+          data: {
+            level,
+            args,
+          },
         }),
       );
     };
