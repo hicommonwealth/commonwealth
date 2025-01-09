@@ -1,13 +1,11 @@
-import { Session } from '@canvas-js/interfaces';
-import type { ChainBase, WalletId } from '@hicommonwealth/shared';
-import { serializeCanvas } from '@hicommonwealth/shared';
-import axios from 'axios';
+import {
+  DEFAULT_NAME,
+  type ChainBase,
+  type WalletId,
+} from '@hicommonwealth/shared';
 import type momentType from 'moment';
 import moment from 'moment';
-import { SERVER_URL } from 'state/api/config';
-import { userStore } from 'state/ui/user';
 import NewProfilesController from '../controllers/server/newProfiles';
-import { DISCOURAGED_NONREACTIVE_fetchProfilesByAddress } from '../state/api/profiles/fetchProfilesByAddress';
 import MinimumProfile from './MinimumProfile';
 
 export type AccountCommunity = {
@@ -51,6 +49,7 @@ class Account {
     sessionPublicAddress,
     validationBlockInfo,
     profile,
+    signedInProfile,
     ignoreProfile = true,
     lastActive,
   }: {
@@ -66,6 +65,12 @@ class Account {
     validationBlockInfo?: string;
     profile?: MinimumProfile;
     lastActive?: string | momentType.Moment;
+    signedInProfile?: {
+      userId: number;
+      name?: string;
+      avatarUrl?: string;
+      lastActive?: Date;
+    };
 
     // flags
     ghostAddress?: boolean;
@@ -86,40 +91,18 @@ class Account {
     this.lastActive = lastActive ? moment(lastActive) : null;
     if (profile) {
       this._profile = profile;
-    } else if (!ignoreProfile && community?.id) {
+    } else if (!ignoreProfile && community?.id && signedInProfile) {
       const updatedProfile = new MinimumProfile(address, community?.id);
-      // the `ignoreProfile` var tells that we have to refetch any profile data related to provided
-      // address and chain. This method mimic react query for non-react files and as the name suggests
-      // its discouraged to use and should be avoided at all costs. Its used here because we have some
-      // wallet related code and a lot of other code that depends on the `new Account(...)` instance.
-      // As an effort to gradually migrate, this method is used. After this account controller is
-      // de-side-effected (all api calls removed from here). Then we would be in a better position to
-      // remove this discouraged method
-      DISCOURAGED_NONREACTIVE_fetchProfilesByAddress([community?.id], [address])
-        .then((res) => {
-          const data = res?.[0];
-          if (!data) {
-            console.log(
-              'No profile data found for address',
-              address,
-              'on chain',
-              community?.id,
-            );
-          } else {
-            updatedProfile.initialize(
-              data?.userId,
-              data?.name,
-              data.address,
-              data?.avatarUrl ?? '',
-              updatedProfile.chain,
-              data.lastActive ? new Date(data.lastActive) : null,
-            );
-          }
-          // manually trigger an update signal when data is fetched
-          NewProfilesController.Instance.isFetched.emit('redraw');
-        })
-        .catch(console.error);
-
+      updatedProfile.initialize(
+        signedInProfile.userId,
+        signedInProfile.name ?? DEFAULT_NAME,
+        address,
+        signedInProfile.avatarUrl ?? '',
+        updatedProfile.chain,
+        signedInProfile.lastActive ?? null,
+      );
+      // manually trigger an update signal when data is fetched
+      NewProfilesController.Instance.isFetched.emit('redraw');
       this._profile = updatedProfile;
     }
   }
@@ -162,18 +145,6 @@ class Account {
 
   public setSessionPublicAddress(sessionPublicAddress: string) {
     this._sessionPublicAddress = sessionPublicAddress;
-  }
-
-  public async validate(session: Session) {
-    const params = {
-      address: this.address,
-      community_id: this.community.id,
-      jwt: userStore.getState().jwt,
-      session: serializeCanvas(session),
-      wallet_id: this.walletId,
-    };
-
-    return await axios.post(`${SERVER_URL}/verifyAddress`, params);
   }
 }
 

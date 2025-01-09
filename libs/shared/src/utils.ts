@@ -320,28 +320,6 @@ export const renderQuillDeltaToText = (
     .join(paragraphSeparator);
 };
 
-export function getWebhookDestination(webhookUrl = ''): string {
-  if (!/^https?:\/\/[^\s/$.?#].[^\s]*$/.test(webhookUrl)) return 'unknown';
-
-  let destination = 'unknown';
-  if (
-    webhookUrl.startsWith('https://discord.com/api/webhooks/') ||
-    webhookUrl.startsWith('https://discordapp.com/api/webhooks/')
-  )
-    destination = 'discord';
-  else if (webhookUrl.startsWith('https://hooks.slack.com/'))
-    destination = 'slack';
-  else if (webhookUrl.startsWith('https://hooks.zapier.com/'))
-    destination = 'zapier';
-  else if (webhookUrl.startsWith('https://api.telegram.org/@')) {
-    const [, channelId] = webhookUrl.split('/@');
-    if (!channelId) destination = 'unknown';
-    else destination = 'telegram';
-  }
-
-  return destination;
-}
-
 export function getDecodedString(str: string) {
   try {
     return decodeURIComponent(str);
@@ -426,3 +404,31 @@ export async function alchemyGetTokenPrices({
       cause: { status: res.status, statusText: res.statusText },
     });
 }
+
+export const getBaseUrl = (
+  env: 'local' | 'CI' | 'frick' | 'frack' | 'beta' | 'demo' | 'production',
+) => {
+  switch (env) {
+    case 'local':
+    case 'CI':
+      return 'http://localhost:8080';
+    case 'beta':
+      return 'https://qa.commonwealth.im';
+    case 'demo':
+      return 'https://demo.commonwealth.im';
+    case 'frick':
+      return 'https://frick.commonwealth.im';
+    case 'frack':
+      return 'https://frack.commonwealth.im';
+    default:
+      return `https://${PRODUCTION_DOMAIN}`;
+  }
+};
+
+export const buildContestLeaderboardUrl = (
+  baseUrl: string,
+  communityId: string,
+  contestAddress: string,
+) => {
+  return `${baseUrl}/${communityId}/contests/${contestAddress}`;
+};

@@ -198,6 +198,7 @@ export const TokenTradeWidget = ({
       {tokenLaunchModalConfig.tradeConfig && (
         <TradeTokenModal
           isOpen={tokenLaunchModalConfig.isOpen}
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           tradeConfig={tokenLaunchModalConfig.tradeConfig as any}
           onModalClose={() => setTokenLaunchModalConfig({ isOpen: false })}
         />

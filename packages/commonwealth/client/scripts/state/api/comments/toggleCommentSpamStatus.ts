@@ -1,36 +1,8 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import axios from 'axios';
+import Comment from 'models/Comment';
+import { IUniqueId } from 'models/interfaces';
 import moment from 'moment';
-import { ApiEndpoints, SERVER_URL } from 'state/api/config';
-import { userStore } from '../../ui/user';
+import { trpc } from 'utils/trpcClient';
 import { updateThreadInAllCaches } from '../threads/helpers/cache';
-import useFetchCommentsQuery from './fetchComments';
-
-interface ToggleCommentSpamStatusProps {
-  communityId: string;
-  commentId: number;
-  isSpam: boolean;
-  address: string;
-}
-
-const toggleCommentSpamStatus = async ({
-  communityId,
-  commentId,
-  isSpam,
-  address,
-}: ToggleCommentSpamStatusProps) => {
-  const method = isSpam ? 'put' : 'delete';
-  const body = {
-    jwt: userStore.getState().jwt,
-    chain_id: communityId,
-    address: address,
-    author_chain: communityId,
-  };
-  return await axios[method](
-    `${SERVER_URL}/comments/${commentId}/spam`,
-    isSpam ? body : ({ data: { ...body } } as any),
-  );
-};
 
 interface UseToggleCommentSpamStatusMutationProps {
   communityId: string;
@@ -41,44 +13,30 @@ const useToggleCommentSpamStatusMutation = ({
   communityId,
   threadId,
 }: UseToggleCommentSpamStatusMutationProps) => {
-  const queryClient = useQueryClient();
-  const { data: comments } = useFetchCommentsQuery({
-    communityId,
-    threadId,
-  });
+  const utils = trpc.useUtils();
 
-  return useMutation({
-    mutationFn: toggleCommentSpamStatus,
+  return trpc.comment.toggleCommentSpam.useMutation({
     onSuccess: async (response) => {
-      // find the existing comment index and merge with existing comment
-      const foundCommentIndex = comments.findIndex(
-        (x) => x.id === response.data.result.id,
-      );
-      const updatedComment = comments[foundCommentIndex];
-      const { marked_as_spam_at } = response.data.result;
-      updatedComment.markedAsSpamAt = marked_as_spam_at
-        ? moment(marked_as_spam_at)
-        : null;
+      const comment = new Comment({
+        ...response,
+        id: response.id!,
+        Address: response.Address!,
+        author: response.Address!.address,
+        community_id: communityId,
+        reaction_weights_sum: response.reaction_weights_sum || '0',
+        created_at: moment(response.created_at!),
+        CommentVersionHistories: undefined,
+      });
 
-      // update fetch comments query state with updated comment
-      if (foundCommentIndex > -1) {
-        const key = [ApiEndpoints.FETCH_COMMENTS, communityId, threadId];
-        queryClient.cancelQueries({ queryKey: key });
-        queryClient.setQueryData([...key], () => {
-          const updatedComments = [...(comments || [])];
-          updatedComments[foundCommentIndex] = updatedComment;
-          return [...updatedComments];
-        });
-      }
+      // reset comments cache state
+      utils.comment.getComments.invalidate().catch(console.error);
 
       updateThreadInAllCaches(
         communityId,
         threadId,
-        { recentComments: [updatedComment] },
+        { recentComments: [comment as Comment<IUniqueId>] },
         'combineAndRemoveDups',
       );
-
-      return updatedComment;
     },
   });
 };

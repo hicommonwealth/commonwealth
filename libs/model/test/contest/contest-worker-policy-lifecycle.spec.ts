@@ -1,8 +1,9 @@
 import { dispose, handleEvent } from '@hicommonwealth/core';
+import * as evm from '@hicommonwealth/evm-protocols';
 import { EventNames } from '@hicommonwealth/schemas';
 import { literal } from 'sequelize';
 import { afterAll, beforeAll, describe, expect, test, vi } from 'vitest';
-import { commonProtocol, emitEvent, models } from '../../src';
+import { emitEvent, models } from '../../src';
 import { Contests } from '../../src/contest';
 import { ContestWorker } from '../../src/policies';
 import { seed } from '../../src/tester';
@@ -19,7 +20,7 @@ describe('Contest Worker Policy Lifecycle', () => {
   const topicId: number = 0;
 
   beforeAll(async () => {
-    const [chainNode] = await seed('ChainNode', { contracts: [] });
+    const [chainNode] = await seed('ChainNode');
     const [user] = await seed(
       'User',
       {
@@ -88,7 +89,7 @@ describe('Contest Worker Policy Lifecycle', () => {
 
   test('Handle ThreadCreated, ThreadUpvoted and Rollover', async () => {
     const addContentStub = vi
-      .spyOn(commonProtocol.contestHelper, 'addContentBatch')
+      .spyOn(evm, 'addContentBatch')
       .mockResolvedValue([]);
 
     await emitEvent(models.Outbox, [
@@ -127,7 +128,7 @@ describe('Contest Worker Policy Lifecycle', () => {
     expect(addContentStub).toHaveBeenCalled();
 
     const voteContentStub = vi
-      .spyOn(commonProtocol.contestHelper, 'voteContentBatch')
+      .spyOn(evm, 'voteContentBatch')
       .mockResolvedValue([]);
 
     await emitEvent(models.Outbox, [

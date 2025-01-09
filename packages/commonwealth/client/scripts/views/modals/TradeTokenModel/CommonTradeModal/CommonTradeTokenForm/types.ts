@@ -10,7 +10,7 @@ export type TokenPresetAmounts = number | 'Max';
 
 export type UseCommonTradeTokenFormProps = {
   tradeConfig: CommonTradingConfig & {
-    currency: SupportedCurrencies;
+    ethBuyCurrency: SupportedCurrencies;
     buyTokenPresetAmounts?: TokenPresetAmounts[];
     sellTokenPresetAmounts?: TokenPresetAmounts[]; // we could also do 25%, 50% etc
   };

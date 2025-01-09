@@ -26,7 +26,7 @@ const CommonTradeModal = ({
     useCommonTradeTokenForm({
       tradeConfig: {
         ...tradeConfig,
-        currency: TRADING_CURRENCY,
+        ethBuyCurrency: TRADING_CURRENCY,
         buyTokenPresetAmounts: [100, 300, 1000],
         sellTokenPresetAmounts: ['Max'],
       },

@@ -9,15 +9,9 @@ import {
   CWModalHeader,
 } from '../../components/component_kit/new_designs/CWModal';
 import { CWTextInput } from '../../components/component_kit/new_designs/CWTextInput';
-import { ShareSkeleton } from './ShareSkeleton';
 import { getShareOptions } from './utils';
 
-import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import app from 'state';
-import {
-  useCreateReferralLinkMutation,
-  useGetReferralLinkQuery,
-} from 'state/api/user';
 import useUserStore from 'state/ui/user';
 
 import './InviteLinkModal.scss';
@@ -27,32 +21,19 @@ interface InviteLinkModalProps {
 }
 
 const InviteLinkModal = ({ onModalClose }: InviteLinkModalProps) => {
-  const { data: refferalLinkData, isLoading: isLoadingReferralLink } =
-    useGetReferralLinkQuery();
-
   const user = useUserStore();
   const hasJoinedCommunity = !!user.activeAccount;
   const communityId = hasJoinedCommunity ? app.activeChainId() : '';
 
-  const { mutate: createReferralLink, isLoading: isLoadingCreateReferralLink } =
-    useCreateReferralLinkMutation();
-
-  const referralLink = refferalLinkData?.referral_link;
   const currentUrl = window.location.origin;
 
-  const inviteLink = referralLink
-    ? `${currentUrl}${communityId ? `/${communityId}/discussions` : '/dashboard'}?refcode=${referralLink}`
-    : '';
-
-  useRunOnceOnCondition({
-    callback: () => createReferralLink({}),
-    shouldRun: !isLoadingReferralLink && !referralLink,
-  });
+  // TODO: @Marcin to check address access (referral link creation) + related changes in this file
+  const inviteLink = `${currentUrl}${
+    communityId ? `/${communityId}/discussions` : '/dashboard'
+  }?refcode=${user.activeAccount?.address}`;
 
   const handleCopy = () => {
-    if (referralLink) {
-      saveToClipboard(inviteLink, true).catch(console.error);
-    }
+    saveToClipboard(inviteLink, true).catch(console.error);
   };
 
   const shareOptions = getShareOptions(!!communityId, inviteLink);
@@ -73,41 +54,32 @@ const InviteLinkModal = ({ onModalClose }: InviteLinkModalProps) => {
               : `When you refer your friends to Common, you'll get a portion of any fees they pay to 
               Common over their lifetime engaging with web 3 native forums.`}
           </CWText>
+          <>
+            <CWTextInput
+              fullWidth
+              type="text"
+              value={inviteLink}
+              readOnly
+              onClick={handleCopy}
+              iconRight={<CWIcon iconName="copy" />}
+            />
 
-          {isLoadingReferralLink || isLoadingCreateReferralLink ? (
-            <ShareSkeleton />
-          ) : (
-            <>
-              <CWTextInput
-                fullWidth
-                type="text"
-                value={inviteLink}
-                readOnly
-                onClick={handleCopy}
-                iconRight={<CWIcon iconName="copy" />}
-              />
-
-              <div className="share-section">
-                <CWText fontWeight="bold">Share to</CWText>
-                <div className="share-options">
-                  {shareOptions.map((option) => (
-                    <div
-                      key={option.name}
-                      className="share-option"
-                      onClick={option.onClick}
-                    >
-                      <img
-                        src={option.icon}
-                        alt={option.name}
-                        className="icon"
-                      />
-                      <CWText type="caption">{option.name}</CWText>
-                    </div>
-                  ))}
-                </div>
+            <div className="share-section">
+              <CWText fontWeight="bold">Share to</CWText>
+              <div className="share-options">
+                {shareOptions.map((option) => (
+                  <div
+                    key={option.name}
+                    className="share-option"
+                    onClick={option.onClick}
+                  >
+                    <img src={option.icon} alt={option.name} className="icon" />
+                    <CWText type="caption">{option.name}</CWText>
+                  </div>
+                ))}
               </div>
-            </>
-          )}
+            </div>
+          </>
         </div>
       </CWModalBody>
       <CWModalFooter>

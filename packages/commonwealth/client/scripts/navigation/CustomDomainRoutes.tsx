@@ -102,6 +102,8 @@ const NewProfilePage = lazy(() => import('views/pages/new_profile'));
 const EditNewProfilePage = lazy(() => import('views/pages/edit_new_profile'));
 const ProfilePageRedirect = lazy(() => import('views/pages/profile_redirect'));
 
+const RewardsPage = lazy(() => import('views/pages/RewardsPage'));
+
 const CustomDomainRoutes = ({ launchpadEnabled }: RouteFeatureFlags) => {
   return [
     <Route
@@ -174,6 +176,11 @@ const CustomDomainRoutes = ({ launchpadEnabled }: RouteFeatureFlags) => {
       key="/myTransactions"
       path="/myTransactions"
       element={withLayout(MyTransactions, { type: 'common' })}
+    />,
+    <Route
+      key="/rewards"
+      path="/rewards"
+      element={withLayout(RewardsPage, { type: 'common' })}
     />,
 
     // NOTIFICATIONS

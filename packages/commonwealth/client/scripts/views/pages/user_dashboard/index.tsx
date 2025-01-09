@@ -17,6 +17,7 @@ import {
 } from '../../../../../shared/analytics/types';
 import useAppStatus from '../../../hooks/useAppStatus';
 import LaunchTokenCard from '../../components/LaunchTokenCard';
+import { UserTrainingSlider } from '../../components/UserTrainingSlider';
 import { CWText } from '../../components/component_kit/cw_text';
 import {
   CWTab,
@@ -92,11 +93,12 @@ const UserDashboard = ({ type }: UserDashboardProps) => {
 
   return (
     <CWPageLayout ref={containerRef} className="UserDashboard">
+      <UserTrainingSlider />
       <div key={`${user.isLoggedIn}`}>
         <CWText type="h2" fontWeight="medium" className="page-header">
           Home
         </CWText>
-        <div className="content">
+        <div className="contentContainer">
           <div className="user-dashboard-activity">
             <div className="dashboard-header" id="dashboard-header">
               <CWTabsRow>

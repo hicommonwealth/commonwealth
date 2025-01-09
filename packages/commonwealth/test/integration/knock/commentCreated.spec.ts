@@ -52,7 +52,6 @@ describe('CommentCreated Event Handler', () => {
         name: 'Sepolia Testnet',
         eth_chain_id: 11155111,
         balance_type: BalanceType.Ethereum,
-        contracts: [],
       },
       { mock: false },
     );
@@ -98,7 +97,7 @@ describe('CommentCreated Event Handler', () => {
       reaction_weights_sum: '0',
     });
     [replyComment] = await tester.seed('Comment', {
-      parent_id: String(rootComment!.id),
+      parent_id: rootComment!.id,
       thread_id: thread!.id!,
       address_id: community!.Addresses![0].id,
       deleted_at: null,
@@ -108,7 +107,7 @@ describe('CommentCreated Event Handler', () => {
       body: `Hi [@${mentionedUser!.profile.name}](/profile/id/${
         mentionedUser!.id
       }).`,
-      parent_id: String(rootComment!.id),
+      parent_id: rootComment!.id,
       thread_id: thread!.id!,
       address_id: community!.Addresses![0].id,
       deleted_at: null,

@@ -33,6 +33,7 @@ const featureFlags = {
   referrals: buildFlag(process.env.FLAG_REFERRALS),
   stickyEditor: buildFlag(process.env.FLAG_STICKY_EDITOR),
   newMobileNav: buildFlag(process.env.FLAG_NEW_MOBILE_NAV),
+  rewardsPage: buildFlag(process.env.FLAG_REWARDS_PAGE),
 };
 
 export type AvailableFeatureFlag = keyof typeof featureFlags;
