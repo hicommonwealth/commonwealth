@@ -125,7 +125,9 @@ export const GetCommunityMembers = {
     include_group_ids: z.coerce.boolean().optional(),
     include_stake_balances: z.coerce.boolean().optional(),
     allowedAddresses: z.string().optional(),
-    order_by: z.enum(['last_active', 'name']).optional(),
+    order_by: z
+      .enum(['last_active', 'name', 'referrals', 'earnings'])
+      .optional(),
   }),
   output: PaginatedResultSchema.extend({
     results: CommunityMember.array(),

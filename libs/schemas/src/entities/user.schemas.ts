@@ -53,6 +53,9 @@ export const User = z.object({
 
   profile: UserProfile,
   xp_points: PG_INT.default(0).nullish(),
+  referral_count: PG_INT.default(0)
+    .nullish()
+    .describe('Number of referrals that have earned ETH'),
   referral_eth_earnings: z.number().optional(),
 
   ProfileTags: z.array(ProfileTags).optional(),
@@ -71,6 +74,7 @@ export const Address = z.object({
   verification_token_expires: z.date().nullish(),
   verified: z.date().nullish(),
   last_active: z.date().nullish(),
+  referred_by_address: z.string().max(255).nullish(),
   ghost_address: z.boolean().default(false),
   wallet_id: z.nativeEnum(WalletId).nullish(),
   block_info: z.string().max(255).nullish(),
@@ -110,4 +114,13 @@ export const CommunityMember = z.object({
   ),
   group_ids: z.array(PG_INT),
   last_active: z.any().nullish().describe('string or date'),
+  referral_count: PG_INT.default(0).nullish(),
+  referral_eth_earnings: z.number().nullish(),
+  referred_by: z
+    .object({
+      user_id: PG_INT,
+      profile_name: z.string().nullish(),
+      avatar_url: z.string().nullish(),
+    })
+    .nullish(),
 });
