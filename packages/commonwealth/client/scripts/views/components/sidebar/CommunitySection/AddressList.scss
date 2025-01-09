@@ -1,0 +1,50 @@
+@import '../../../../styles/shared.scss';
+
+.AddressList {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 2px 8px;
+  border-radius: 6px;
+  cursor: default;
+  width: 100%;
+
+  .header {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    justify-content: space-between;
+    cursor: pointer;
+  }
+
+  .address-left {
+    display: flex;
+    align-items: center;
+  }
+
+  .address-right {
+    margin-left: auto;
+  }
+
+  .content-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    max-width: 100%;
+    margin-top: 8px;
+  }
+
+  .label {
+    color: $neutral-600;
+    overflow: hidden;
+    display: inline-block;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    letter-spacing: 0.2px;
+    white-space: nowrap;
+  }
+
+  .caret-icon {
+    color: $neutral-400;
+  }
+}

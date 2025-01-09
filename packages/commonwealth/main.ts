@@ -169,6 +169,10 @@ export async function main(
     res.sendFile(`${__dirname}/robots.txt`);
   });
 
+  app.use('/blank.html', (req: Request, res: Response) => {
+    res.sendFile(`${__dirname}/blank.html`);
+  });
+
   app.use('/manifest.json', (req: Request, res: Response) => {
     res.sendFile(`${__dirname}/manifest.json`);
   });

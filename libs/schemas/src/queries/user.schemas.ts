@@ -1,6 +1,6 @@
 import { ChainBase, Roles } from '@hicommonwealth/shared';
 import { z } from 'zod';
-import { Referral } from '../entities';
+import { Referral, User } from '../entities';
 import { Tags } from '../entities/tag.schemas';
 import { UserProfile } from '../entities/user.schemas';
 import { XpLog } from '../entities/xp.schemas';
@@ -22,17 +22,13 @@ export const UserProfileAddressView = AddressView.extend({
   }),
 }) as z.ZodType<UserProfileAddressViewType>;
 
-export const UserProfileCommentView = CommentView.extend({
-  community_id: z.string(),
-});
-
 export const UserProfileView = z.object({
   userId: PG_INT,
   profile: UserProfile,
   totalUpvotes: z.number().int(),
   addresses: z.array(UserProfileAddressView),
   threads: z.array(ThreadView),
-  comments: z.array(UserProfileCommentView),
+  comments: z.array(CommentView),
   commentThreads: z.array(ThreadView),
   isOwner: z.boolean(),
   tags: z.array(Tags.extend({ id: PG_INT })),
@@ -44,6 +40,11 @@ export const GetUserProfile = {
     userId: PG_INT.optional(),
   }),
   output: UserProfileView,
+};
+
+export const GetUser = {
+  input: z.object({}),
+  output: z.union([User, z.object({})]),
 };
 
 export const SearchUserProfilesView = z.object({

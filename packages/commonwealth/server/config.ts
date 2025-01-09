@@ -25,6 +25,7 @@ const {
   DISPATCHER_APP_ID,
   DISPATCHER_APP_PRIVATE_KEY,
   DEV_MODULITH,
+  ENABLE_CLIENT_PUBLISHING,
 } = process.env;
 
 const DEFAULTS = {
@@ -103,6 +104,7 @@ export const config = configure(
       DISPATCHER_APP_PRIVATE_KEY,
     },
     DEV_MODULITH: DEV_MODULITH === 'true',
+    ENABLE_CLIENT_PUBLISHING: ENABLE_CLIENT_PUBLISHING === 'true',
   },
   z.object({
     NO_GLOBAL_ACTIVITY_CACHE: z.boolean(),
@@ -185,5 +187,6 @@ export const config = configure(
         ),
     }),
     DEV_MODULITH: z.boolean(),
+    ENABLE_CLIENT_PUBLISHING: z.boolean(),
   }),
 );

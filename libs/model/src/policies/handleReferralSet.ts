@@ -1,6 +1,6 @@
+import { getBlock } from '@hicommonwealth/evm-protocols';
 import { models } from '@hicommonwealth/model';
 import { chainEvents, events } from '@hicommonwealth/schemas';
-import Web3 from 'web3';
 import { z } from 'zod';
 import { chainNodeMustExist } from './utils';
 
@@ -36,8 +36,10 @@ export async function handleReferralSet(
 
   const chainNode = await chainNodeMustExist(event.eventSource.ethChainId);
 
-  const web3 = new Web3(chainNode.private_url! || chainNode.url!);
-  const block = await web3.eth.getBlock(event.rawLog.blockHash);
+  const { block } = await getBlock({
+    rpc: chainNode.private_url! || chainNode.url!,
+    blockHash: event.rawLog.blockHash,
+  });
 
   // Triggered when an incomplete Referral (off-chain only) was created during user sign up
   if (existingReferral && existingReferral?.eth_chain_id === null) {
