@@ -8,7 +8,6 @@ import { namespaceAbi } from '../../abis/namespaceAbi';
 import { namespaceFactoryAbi } from '../../abis/namespaceFactoryAbi';
 import { recurringContestAbi } from '../../abis/recurringContestAbi';
 import { singleContestAbi } from '../../abis/singleContestAbi';
-import { config } from '../../config';
 import { CREATE_CONTEST_TOPIC } from '../chainConfig';
 import {
   createPrivateEvmClient,
@@ -17,7 +16,6 @@ import {
   getTransactionCount,
 } from '../utils';
 import { getNamespace } from './contractHelpers';
-import { createWeb3Provider } from './utils';
 
 export const getTotalContestBalance = async (
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -504,13 +502,9 @@ export const deployNamespace = async (
   walletAddress: string,
   feeManager: string,
   rpcNodeUrl: string,
+  privateKey: string,
 ): Promise<string> => {
-  if (!config.WEB3.CONTEST_BOT_PRIVATE_KEY)
-    throw new ServerError('Contest bot private key not set!');
-  const web3 = await createWeb3Provider(
-    rpcNodeUrl,
-    config.WEB3.CONTEST_BOT_PRIVATE_KEY,
-  );
+  const web3 = createPrivateEvmClient({ rpcNodeUrl, privateKey });
   const namespaceCheck = await getNamespace(rpcNodeUrl, name, namespaceFactory);
   if (namespaceCheck === ZERO_ADDRESS) {
     throw new ServerError('Namespace already reserved');
@@ -549,19 +543,4 @@ export const deployNamespace = async (
   }
 
   return namespaceAddress;
-};
-
-const estimateGas = async (web3: Web3): Promise<bigint | null> => {
-  try {
-    const latestBlock = await web3.eth.getBlock('latest');
-
-    // Calculate maxFeePerGas and maxPriorityFeePerGas
-    const baseFeePerGas = latestBlock.baseFeePerGas;
-    const maxPriorityFeePerGas = web3.utils.toWei('0.001', 'gwei');
-    const maxFeePerGas =
-      baseFeePerGas! * BigInt(2) + BigInt(parseInt(maxPriorityFeePerGas));
-    return maxFeePerGas;
-  } catch {
-    return null;
-  }
 };

@@ -1,5 +1,9 @@
-import { type Command } from '@hicommonwealth/core';
-import { commonProtocol as cp } from '@hicommonwealth/evm-protocols';
+import { ServerError, type Command } from '@hicommonwealth/core';
+import {
+  commonProtocol as cp,
+  deployNamespace,
+} from '@hicommonwealth/evm-protocols';
+import { config } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import {
   ChainBase,
@@ -9,7 +13,6 @@ import {
 } from '@hicommonwealth/shared';
 import { models } from '../database';
 import { mustExist } from '../middleware/guards';
-import { deployNamespace } from '../services/commonProtocol/contestHelper';
 
 export function CreateContest(): Command<typeof schemas.CreateBotNamespace> {
   return {
@@ -27,12 +30,16 @@ export function CreateContest(): Command<typeof schemas.CreateBotNamespace> {
       });
       mustExist('chainNode', node);
 
+      if (!config.WEB3.CONTEST_BOT_PRIVATE_KEY)
+        throw new ServerError('Contest bot private key not set!');
+
       const namespaceAddress = await deployNamespace(
         namespaceFactory,
         name,
         admin_address,
         admin_address,
         node?.private_url!,
+        config.WEB3.CONTEST_BOT_PRIVATE_KEY,
       );
 
       const base = ChainBase.Ethereum;
