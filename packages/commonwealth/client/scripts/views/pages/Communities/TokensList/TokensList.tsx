@@ -38,7 +38,7 @@ type TokensListProps = {
 const TokensList = ({ filters }: TokensListProps) => {
   const user = useUserStore();
   const navigate = useCommonNavigate();
-  const tokenizedCommunityEnabled = useFlag('tokenizedCommunity');
+  const launchpadEnabled = useFlag('launchpad');
 
   const [tokenLaunchModalConfig, setTokenLaunchModalConfig] = useState<{
     isOpen: boolean;
@@ -75,7 +75,7 @@ const TokensList = ({ filters }: TokensListProps) => {
 
       return undefined;
     })(),
-    enabled: tokenizedCommunityEnabled,
+    enabled: launchpadEnabled,
   });
   const tokens = (tokensList?.pages || []).flatMap((page) => page.results);
 
@@ -115,7 +115,7 @@ const TokensList = ({ filters }: TokensListProps) => {
     });
   };
 
-  if (!tokenizedCommunityEnabled) return <></>;
+  if (!launchpadEnabled) return <></>;
 
   return (
     <div className="TokensList">
@@ -125,7 +125,7 @@ const TokensList = ({ filters }: TokensListProps) => {
       ) : tokens.length === 0 ? (
         <div
           className={clsx('empty-placeholder', {
-            'my-16': tokenizedCommunityEnabled,
+            'my-16': launchpadEnabled,
           })}
         >
           <CWText type="h2">

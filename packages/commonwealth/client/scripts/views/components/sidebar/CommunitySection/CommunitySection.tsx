@@ -45,10 +45,11 @@ enum ProfileError {
 }
 
 export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
+  const launchpadEnabled = useFlag('launchpad');
+  const uniswapTradeEnabled = useFlag('uniswapTrade');
   const [profile, setProfile] = useState<NewProfile>();
   const [errorCode, setErrorCode] = useState<ProfileError>(ProfileError.None);
 
-  const tokenizedCommunityEnabled = useFlag('tokenizedCommunity');
   const { setAuthModalType } = useAuthModalStore();
 
   const user = useUserStore();
@@ -158,7 +159,7 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
           </>
         )}
 
-        {tokenizedCommunityEnabled && <TokenTradeWidget />}
+        {(launchpadEnabled || uniswapTradeEnabled) && <TokenTradeWidget />}
 
         <CreateCommunityButton />
 
