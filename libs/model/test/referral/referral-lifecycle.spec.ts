@@ -3,6 +3,7 @@ import { Actor, command, dispose, query } from '@hicommonwealth/core';
 import { EvmEventSignatures } from '@hicommonwealth/evm-protocols';
 import * as schemas from '@hicommonwealth/schemas';
 import { ZERO_ADDRESS } from '@hicommonwealth/shared';
+import { JoinCommunity } from 'model/src/community';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { z } from 'zod';
 import { models } from '../../src/database';
@@ -58,9 +59,10 @@ describe('Referral lifecycle', () => {
   let admin: Actor;
   let member: Actor;
   let nonMember: Actor;
+  let community_id: string;
 
   beforeAll(async () => {
-    const { actors, base } = await seedCommunity({
+    const { actors, base, community } = await seedCommunity({
       roles: ['admin', 'member'],
     });
     admin = actors.admin;
@@ -84,6 +86,7 @@ describe('Referral lifecycle', () => {
       },
       address: nonMemberAddress!.address!,
     };
+    community_id = community!.id!;
   });
 
   afterAll(async () => {
@@ -148,6 +151,28 @@ describe('Referral lifecycle', () => {
       payload: {},
     });
     expect(referrals).toMatchObject(expectedReferrals);
+
+    // member user joins the community using referrals
+    await command(JoinCommunity(), {
+      actor: member,
+      payload: {
+        community_id,
+        referrer_address: admin.address,
+      },
+    });
+
+    // counts the referral for the referrer
+    await drainOutbox(['CommunityJoined'], UserReferrals);
+
+    const referrerUser = await models.User.findOne({
+      where: { id: admin.user.id },
+    });
+    expect(referrerUser?.referral_count).toBe(1);
+
+    const refereeAddress = await models.Address.findOne({
+      where: { user_id: member.user.id, community_id },
+    });
+    expect(refereeAddress?.referred_by_address).toBe(admin.address);
 
     // simulate on-chain transactions that occur when referees
     // deploy a new namespace with a referral link (ReferralSet)

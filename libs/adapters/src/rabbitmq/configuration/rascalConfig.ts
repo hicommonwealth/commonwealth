@@ -234,7 +234,10 @@ export function getAllRascalConfigs(
       source: RascalExchanges.MessageRelayer,
       destination: RascalQueues.UserReferrals,
       destinationType: 'queue',
-      bindingKeys: [RascalRoutingKeys.UserReferralsSignUpFlowCompleted],
+      bindingKeys: [
+        RascalRoutingKeys.UserReferralsSignUpFlowCompleted,
+        RascalRoutingKeys.UserReferralsCommunityJoined,
+      ],
     },
     [RascalBindings.FarcasterWorkerPolicy]: {
       source: RascalExchanges.MessageRelayer,
