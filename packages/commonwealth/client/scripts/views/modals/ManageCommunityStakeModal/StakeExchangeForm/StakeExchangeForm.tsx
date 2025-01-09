@@ -1,5 +1,4 @@
 import { commonProtocol } from '@hicommonwealth/evm-protocols';
-import { WalletId } from '@hicommonwealth/shared';
 import { saveToClipboard } from 'client/scripts/utils/clipboard';
 import clsx from 'clsx';
 import { findDenominationIcon } from 'helpers/findDenomination';
@@ -132,7 +131,8 @@ const StakeExchangeForm = ({
   const { isAddedToHomeScreen } = useAppStatus();
 
   const userData = useUserStore();
-  const hasMagic = userData.addresses?.[0]?.walletId === WalletId.Magic;
+
+  const hasMagic = userData.hasMagicWallet;
 
   const { trackAnalytics } = useBrowserAnalyticsTrack<BaseMixpanelPayload>({
     onAction: true,

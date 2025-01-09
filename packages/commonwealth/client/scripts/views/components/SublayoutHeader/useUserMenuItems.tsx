@@ -93,7 +93,7 @@ const useUserMenuItems = ({
   const referralsEnabled = useFlag('referrals');
 
   const userData = useUserStore();
-  const hasMagic = userData.addresses?.[0]?.walletId === WalletId.Magic;
+  const hasMagic = userData.hasMagicWallet;
 
   const { openMagicWallet } = useAuthentication({});
 

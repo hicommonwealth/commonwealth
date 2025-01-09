@@ -1,8 +1,8 @@
-import { TradingConfig } from '../types';
-
-export type UseUniswapTradeModalProps = {
-  tradeConfig: TradingConfig;
-};
+import { PinnedTokenWithPrices } from '@hicommonwealth/schemas';
+import { ChainBase } from '@hicommonwealth/shared';
+import { GetTokenMetadataResponse } from 'state/api/tokens/getTokenMetadata';
+import { z } from 'zod';
+import { TradingMode } from '../types';
 
 export type UniswapToken = {
   name: string;
@@ -11,4 +11,23 @@ export type UniswapToken = {
   decimals: number;
   chainId: number;
   logoURI: string;
+};
+
+export type ExternalToken = z.infer<typeof PinnedTokenWithPrices> &
+  GetTokenMetadataResponse;
+
+export type UniswapTradingConfig = {
+  mode: TradingMode.Swap;
+  token: ExternalToken;
+  addressType: ChainBase;
+};
+
+export type UniswapTradeTokenModalProps = {
+  isOpen: boolean;
+  onModalClose?: () => void;
+  tradeConfig: UniswapTradingConfig;
+};
+
+export type UseUniswapTradeModalProps = {
+  tradeConfig: UniswapTradingConfig;
 };

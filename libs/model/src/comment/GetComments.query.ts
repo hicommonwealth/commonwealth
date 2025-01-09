@@ -5,7 +5,7 @@ import { DEFAULT_NAME } from '@hicommonwealth/shared';
 import { QueryTypes } from 'sequelize';
 import { z } from 'zod';
 import { models } from '../database';
-import { sanitizeDeletedComment } from '../utils/index';
+import { getRandomAvatar, sanitizeDeletedComment } from '../utils/index';
 
 export function GetComments(): Query<typeof schemas.GetComments> {
   return {
@@ -50,7 +50,7 @@ export function GetComments(): Query<typeof schemas.GetComments> {
             CA.community_id,
             CU.id AS "user_id",
             COALESCE(CU.profile->>'name', '${DEFAULT_NAME}') AS "profile_name",
-            CU.profile->>'avatar_url' AS "avatar_url",
+            COALESCE(CU.profile->>'avatar_url', '${getRandomAvatar()}') AS "avatar_url",
             CASE WHEN max(CVH.id) IS NOT NULL THEN
               json_agg(json_strip_nulls(json_build_object(
                   'id', CVH.id,
@@ -75,7 +75,7 @@ export function GetComments(): Query<typeof schemas.GetComments> {
                   'address', RA.address,
                   'last_active', RA.last_active::text,
                   'profile_name', COALESCE(RU.profile->>'name', '${DEFAULT_NAME}'),
-                  'avatar_url', RU.profile->>'avatar_url'
+                  'avatar_url', COALESCE(RU.profile->>'avatar_url', '${getRandomAvatar()}')
                 )) 
               ELSE '[]'::json
               END AS "reactions",

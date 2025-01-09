@@ -5,6 +5,7 @@ export * from './GetNewContent.query';
 export * from './GetUser.query';
 export * from './GetUserAddresses.query';
 export * from './GetUserProfile.query';
+export * from './GetUserReferralFees.query';
 export * from './GetUserReferrals.query';
 export * from './GetXps.query';
 export * from './SearchUserProfiles.query';

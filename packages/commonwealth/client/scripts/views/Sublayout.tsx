@@ -7,6 +7,7 @@ import app from 'state';
 import useSidebarStore from 'state/ui/sidebar';
 import { SublayoutHeader } from 'views/components/SublayoutHeader';
 import { Sidebar } from 'views/components/sidebar';
+import farcasterContestImage from '../../assets/img/farcasterContestImage.png';
 import { useHandleInviteLink } from '../hooks/useHandleInviteLink';
 import useNecessaryEffect from '../hooks/useNecessaryEffect';
 import useStickyHeader from '../hooks/useStickyHeader';
@@ -22,6 +23,7 @@ import { AdminOnboardingSlider } from './components/AdminOnboardingSlider';
 import { Breadcrumbs } from './components/Breadcrumbs';
 import MobileNavigation from './components/MobileNavigation';
 import AuthButtons from './components/SublayoutHeader/AuthButtons';
+import { CWGrowlTemplate } from './components/SublayoutHeader/GrowlTemplate';
 import useJoinCommunity from './components/SublayoutHeader/useJoinCommunity';
 import { CWModal } from './components/component_kit/new_designs/CWModal';
 import CollapsableSidebarButton from './components/sidebar/CollapsableSidebarButton';
@@ -188,6 +190,18 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
             )}
             {children}
           </div>
+          {/* Growl should be added here when in place*/}
+          <CWGrowlTemplate
+            headerText="Launch Contests On Farcaster!"
+            bodyText="You can now host contests directly on Farcaster to reach and engage your followers.
+            They can submit entries,
+            vote for their favorites, and earn rewards, all without leaving the page."
+            buttonText="Enter $MOCHI Contest"
+            buttonLink="https://www.google.com/"
+            growlType="farcasterContest"
+            growlImage={farcasterContestImage}
+            extraText="Enter the first Farcaster Contest hosted by our friends at Mochi"
+          />
         </div>
         <WelcomeOnboardModal
           isOpen={isWelcomeOnboardModalOpen}
