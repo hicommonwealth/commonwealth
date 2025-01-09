@@ -1,2 +1,9 @@
+@import '../../../../../styles/shared';
+
 .ReferralCard {
+  width: 100%;
+
+  .referral-card-body {
+    margin-block: 16px;
+  }
 }

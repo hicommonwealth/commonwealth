@@ -140,9 +140,6 @@ async function findAddress(
   if (!actor.address)
     throw new InvalidActor(actor, 'Must provide an address to authorize');
 
-  if (!community_id)
-    throw new InvalidInput('Must provide a valid community id to authorize');
-
   // Policies as system actors behave like super admins
   // TODO: we can check if there is an address to load or fake it
   if (actor.is_system_actor) {
@@ -151,6 +148,9 @@ async function findAddress(
       is_author: false,
     };
   }
+
+  if (!community_id)
+    throw new InvalidInput('Must provide a valid community id to authorize');
 
   // Loads and tracks real user's address activity
   const address = await models.Address.findOne({
@@ -282,6 +282,7 @@ async function mustBeAuthorized(
     };
     author?: boolean;
     collaborators?: z.infer<typeof Address>[];
+    roles?: Role[];
   },
 ) {
   // System actors are always allowed
@@ -295,6 +296,12 @@ async function mustBeAuthorized(
 
   // Author is always allowed to act on their own entity, unless banned
   if (context.is_author) return;
+
+  if (
+    check.roles?.includes('moderator') &&
+    context.address.role === 'moderator'
+  )
+    return;
 
   // Allows when actor has group permissions in topic
   if (check.permissions)
@@ -389,9 +396,10 @@ type AggregateAuthOptions = {
  * Validates if actor's address is authorized to perform actions on a comment
  * @param action specific group permission action
  * @param author when true, rejects members that are not the author
+ * @param roles the roles that are authorized
  * @throws InvalidActor when not authorized
  */
-export function authComment({ action, author }: AggregateAuthOptions) {
+export function authComment({ action, author, roles }: AggregateAuthOptions) {
   return async (
     ctx: Context<typeof CommentContextInput, typeof CommentContext>,
   ) => {
@@ -399,7 +407,7 @@ export function authComment({ action, author }: AggregateAuthOptions) {
     const { address, is_author } = await findAddress(
       ctx.actor,
       auth.community_id,
-      ['admin', 'moderator', 'member'],
+      roles ?? ['admin', 'moderator', 'member'],
       auth.author_address_id,
     );
 
@@ -412,6 +420,7 @@ export function authComment({ action, author }: AggregateAuthOptions) {
     await mustBeAuthorized(ctx, {
       permissions: action ? { action, topic_id: auth.topic_id! } : undefined,
       author,
+      roles,
     });
   };
 }

@@ -1,8 +1,8 @@
+import { getBlock } from '@hicommonwealth/evm-protocols';
 import { models } from '@hicommonwealth/model';
 import { chainEvents, events } from '@hicommonwealth/schemas';
 import { ZERO_ADDRESS } from '@hicommonwealth/shared';
 import { BigNumber } from 'ethers';
-import Web3 from 'web3';
 import { z } from 'zod';
 import { chainNodeMustExist } from './utils';
 
@@ -31,8 +31,10 @@ export async function handleReferralFeeDistributed(
 
   const chainNode = await chainNodeMustExist(event.eventSource.ethChainId);
 
-  const web3 = new Web3(chainNode.private_url! || chainNode.url!);
-  const block = await web3.eth.getBlock(event.rawLog.blockHash);
+  const { block } = await getBlock({
+    rpc: chainNode.private_url! || chainNode.url!,
+    blockHash: event.rawLog.blockHash,
+  });
 
   const feeAmount =
     Number(BigNumber.from(referrerReceivedAmount).toBigInt()) / 1e18;
