@@ -15,7 +15,7 @@ import {
   estimateGas,
   getTransactionCount,
 } from '../utils';
-import { getNamespace } from './contractHelpers';
+import { getNamespace } from './namespace';
 
 export const getTotalContestBalance = async (
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -504,7 +504,7 @@ export const deployNamespace = async (
   rpcNodeUrl: string,
   privateKey: string,
 ): Promise<string> => {
-  const web3 = createPrivateEvmClient({ rpcNodeUrl, privateKey });
+  const web3 = createPrivateEvmClient({ rpc: rpcNodeUrl, privateKey });
   const namespaceCheck = await getNamespace(rpcNodeUrl, name, namespaceFactory);
   if (namespaceCheck === ZERO_ADDRESS) {
     throw new ServerError('Namespace already reserved');
