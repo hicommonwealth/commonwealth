@@ -402,6 +402,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
   ) => {
     try {
       if (username && account?.profile) {
+        console.log('3. useauthentication');
         await updateUser({
           id: account.profile.userId,
           profile: {

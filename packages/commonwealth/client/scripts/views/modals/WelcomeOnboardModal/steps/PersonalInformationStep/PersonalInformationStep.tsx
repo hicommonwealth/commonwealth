@@ -1,5 +1,6 @@
 import { DEFAULT_NAME, WalletId } from '@hicommonwealth/shared';
 import { APIOrderBy, APIOrderDirection } from 'helpers/constants';
+import { LocalStorageKeys, getLocalStorageItem } from 'helpers/localStorage';
 import useNecessaryEffect from 'hooks/useNecessaryEffect';
 import React, { ChangeEvent, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -121,9 +122,14 @@ const PersonalInformationStep = ({
   ) => {
     if (isUsernameTaken || isCheckingUsernameUniqueness) return;
 
+    const refcode = getLocalStorageItem(LocalStorageKeys.ReferralCode);
+
+    console.log('Used refcode', refcode);
+    console.log('2. personal information step');
     await updateUser({
       id: user.id,
       promotional_emails_enabled: values.enableProductUpdates,
+      ...(refcode ? { referrer_address: refcode } : {}),
       profile: {
         name: values.username.trim(),
       },

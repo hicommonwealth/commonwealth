@@ -25,7 +25,7 @@ export const useHandleInviteLink = ({
   const activeChainId = app.activeChainId();
 
   const generalInviteRoute = matchRoutes(
-    [{ path: '/dashboard/global' }, { path: '/profile/id/*' }],
+    [{ path: '/dashboard/*' }, { path: '/profile/id/*' }],
     location,
   );
 

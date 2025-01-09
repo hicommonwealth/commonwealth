@@ -29,7 +29,7 @@ export const setLocalStorageItem = (
   const stored = getLocalStorageItem(key);
 
   if (key === LocalStorageKeys.ReferralCode && stored) {
-    console.log('Reflink already stored');
+    console.log('@@@Reflink already stored');
     return;
   }
 
@@ -41,5 +41,6 @@ export const setLocalStorageItem = (
     item.expires = expirationDate.getTime();
   }
 
+  console.log('@@@Setting refcode', item);
   localStorage.setItem(key, JSON.stringify(item));
 };
