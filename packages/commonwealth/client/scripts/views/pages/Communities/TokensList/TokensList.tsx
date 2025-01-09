@@ -14,7 +14,10 @@ import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
 import { AuthModal } from 'views/modals/AuthModal';
-import TradeTokenModal, { TradingMode } from 'views/modals/TradeTokenModel';
+import TradeTokenModal, {
+  TradingConfig,
+  TradingMode,
+} from 'views/modals/TradeTokenModel';
 import { z } from 'zod';
 import TokenCard from '../../../components/TokenCard';
 import {
@@ -39,11 +42,7 @@ const TokensList = ({ filters }: TokensListProps) => {
 
   const [tokenLaunchModalConfig, setTokenLaunchModalConfig] = useState<{
     isOpen: boolean;
-    tradeConfig?: {
-      mode: TradingMode;
-      token: z.infer<typeof TokenWithCommunity>;
-      addressType: ChainBase;
-    };
+    tradeConfig?: TradingConfig;
   }>({ isOpen: false, tradeConfig: undefined });
 
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
@@ -112,7 +111,7 @@ const TokensList = ({ filters }: TokensListProps) => {
         mode: mode,
         token: token,
         addressType: ChainBase.Ethereum,
-      },
+      } as TradingConfig,
     });
   };
 
@@ -208,7 +207,8 @@ const TokensList = ({ filters }: TokensListProps) => {
       {tokenLaunchModalConfig.tradeConfig && (
         <TradeTokenModal
           isOpen={tokenLaunchModalConfig.isOpen}
-          tradeConfig={tokenLaunchModalConfig.tradeConfig}
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          tradeConfig={tokenLaunchModalConfig.tradeConfig as any}
           onModalClose={() => setTokenLaunchModalConfig({ isOpen: false })}
         />
       )}
