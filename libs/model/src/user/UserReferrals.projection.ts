@@ -31,23 +31,23 @@ export function UserReferrals(): Projection<typeof inputs> {
         const { referrer_address } = payload;
         if (!referrer_address) return;
 
-        const address = await models.Address.findOne({
+        const refereeAddress = await models.Address.findOne({
           where: {
             user_id: payload.user_id,
             community_id: payload.community_id,
           },
-          attributes: ['id', 'user_id', 'address'],
+          attributes: ['id', 'address'],
         });
-        if (!address) return;
+        if (!refereeAddress) return;
 
         await models.sequelize.transaction(async (transaction) => {
           await models.Referral.findOrCreate({
             where: {
-              referee_address: address.address,
+              referee_address: refereeAddress.address,
               referrer_address,
             },
             defaults: {
-              referee_address: address.address,
+              referee_address: refereeAddress.address,
               referrer_address,
               referrer_received_eth_amount: 0,
             },
@@ -55,11 +55,11 @@ export function UserReferrals(): Projection<typeof inputs> {
           });
 
           // increment the referral count of referrer in this community
-          await models.User.increment('referral_count', {
-            by: 1,
+          const referrerUser = await models.User.findOne({
             include: [
               {
                 model: models.Address,
+                attributes: ['id', 'address'],
                 where: {
                   address: referrer_address,
                   community_id: payload.community_id,
@@ -68,13 +68,17 @@ export function UserReferrals(): Projection<typeof inputs> {
             ],
             transaction,
           });
+          if (referrerUser)
+            await referrerUser.increment('referral_count', {
+              by: 1,
+              transaction,
+            });
 
           // set the referred_by_address of the address to the address that referred them
-          await models.Address.update({
-            values: { referred_by_address: address.address },
-            where: { id: address.id },
-            transaction,
-          });
+          await models.Address.update(
+            { referred_by_address: referrer_address },
+            { where: { id: refereeAddress.id }, transaction },
+          );
         });
       },
     },
