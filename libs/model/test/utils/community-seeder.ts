@@ -54,6 +54,9 @@ export async function seedCommunity({
     profile: { name: role },
     isAdmin: role === 'admin',
     is_welcome_onboard_flow_complete: false,
+    referral_count: 0,
+    referral_eth_earnings: 0,
+    xp_points: 0,
   }));
 
   // seed base community

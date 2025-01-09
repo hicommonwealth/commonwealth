@@ -69,10 +69,14 @@ export function UserReferrals(): Projection<typeof inputs> {
             transaction,
           });
           if (referrerUser)
-            await referrerUser.increment('referral_count', {
-              by: 1,
-              transaction,
-            });
+            await referrerUser.update(
+              {
+                referral_count: models.sequelize.literal(
+                  'coalesce(referral_count, 0) + 1',
+                ),
+              },
+              { transaction },
+            );
 
           // set the referred_by_address of the address to the address that referred them
           await models.Address.update(

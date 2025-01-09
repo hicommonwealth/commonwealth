@@ -3,9 +3,9 @@ import { Actor, command, dispose, query } from '@hicommonwealth/core';
 import { EvmEventSignatures } from '@hicommonwealth/evm-protocols';
 import * as schemas from '@hicommonwealth/schemas';
 import { ZERO_ADDRESS } from '@hicommonwealth/shared';
-import { JoinCommunity } from 'model/src/community';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { z } from 'zod';
+import { JoinCommunity } from '../../src/community';
 import { models } from '../../src/database';
 import { ChainEventPolicy } from '../../src/policies';
 import { seed } from '../../src/tester';
@@ -152,9 +152,9 @@ describe('Referral lifecycle', () => {
     });
     expect(referrals).toMatchObject(expectedReferrals);
 
-    // member user joins the community using referrals
+    // nonMember joins the community using referrals
     await command(JoinCommunity(), {
-      actor: member,
+      actor: nonMember,
       payload: {
         community_id,
         referrer_address: admin.address,
@@ -170,7 +170,7 @@ describe('Referral lifecycle', () => {
     expect(referrerUser?.referral_count).toBe(1);
 
     const refereeAddress = await models.Address.findOne({
-      where: { user_id: member.user.id, community_id },
+      where: { user_id: nonMember.user.id, community_id },
     });
     expect(refereeAddress?.referred_by_address).toBe(admin.address);
 
