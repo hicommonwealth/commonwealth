@@ -117,11 +117,11 @@ const useUniswapTradeModal = ({ tradeConfig }: UseUniswapTradeModalProps) => {
             ?.list || []),
           {
             name: tradeConfig.token.name,
-            address: tradeConfig.token.token_address,
+            address: tradeConfig.token.contract_address,
             symbol: tradeConfig.token.symbol,
-            decimals: 18,
+            decimals: tradeConfig.token.decimals,
             chainId: baseNode.ethChainId,
-            logoURI: tradeConfig.token.icon_url || '',
+            logoURI: tradeConfig.token.logo || '',
           },
         ]);
 
@@ -153,7 +153,7 @@ const useUniswapTradeModal = ({ tradeConfig }: UseUniswapTradeModalProps) => {
       tokensList: uniswapTokensList,
       defaultTokenAddress: {
         input: 'NATIVE', // special address for native token of default chain
-        output: tradeConfig.token.token_address,
+        output: tradeConfig.token.contract_address,
       },
       routerURLs: uniswapRouterURLs,
     },

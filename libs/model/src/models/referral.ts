@@ -43,7 +43,7 @@ export const Referral = (
         defaultValue: 0,
       },
       created_on_chain_timestamp: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.BIGINT,
         allowNull: true,
       },
       created_off_chain_at: {

@@ -105,9 +105,7 @@ const UnSubscribePage = lazy(() => import('views/pages/UnSubscribePage'));
 
 const RewardsPage = lazy(() => import('views/pages/RewardsPage'));
 
-const CustomDomainRoutes = ({
-  tokenizedCommunityEnabled,
-}: RouteFeatureFlags) => {
+const CustomDomainRoutes = ({ launchpadEnabled }: RouteFeatureFlags) => {
   return [
     <Route
       key="/"
@@ -127,7 +125,7 @@ const CustomDomainRoutes = ({
       path="/unSubscribe/:userId"
       element={withLayout(UnSubscribePage, { type: 'common' })}
     />,
-    ...(tokenizedCommunityEnabled
+    ...(launchpadEnabled
       ? [
           <Route
             key="/createTokenCommunity"

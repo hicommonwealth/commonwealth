@@ -1,10 +1,8 @@
-import { getBlock } from '@hicommonwealth/evm-protocols';
 import { models } from '@hicommonwealth/model';
 import { chainEvents, events } from '@hicommonwealth/schemas';
 import { ZERO_ADDRESS } from '@hicommonwealth/shared';
 import { BigNumber } from 'ethers';
 import { z } from 'zod';
-import { chainNodeMustExist } from './utils';
 
 export async function handleReferralFeeDistributed(
   event: z.infer<typeof events.ChainEventCreated>,
@@ -29,13 +27,6 @@ export async function handleReferralFeeDistributed(
     return;
   } else if (existingFee) return;
 
-  const chainNode = await chainNodeMustExist(event.eventSource.ethChainId);
-
-  const { block } = await getBlock({
-    rpc: chainNode.private_url! || chainNode.url!,
-    blockHash: event.rawLog.blockHash,
-  });
-
   const feeAmount =
     Number(BigNumber.from(referrerReceivedAmount).toBigInt()) / 1e18;
 
@@ -48,7 +39,7 @@ export async function handleReferralFeeDistributed(
         distributed_token_address: tokenAddress,
         referrer_recipient_address: referrerAddress,
         referrer_received_amount: feeAmount,
-        transaction_timestamp: Number(block.timestamp),
+        transaction_timestamp: Number(event.block.timestamp),
       },
       { transaction },
     );
