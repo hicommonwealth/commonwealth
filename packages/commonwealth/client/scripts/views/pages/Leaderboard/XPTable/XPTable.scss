@@ -1,6 +1,11 @@
 @import '../../../../styles/shared';
 
 .XPTable {
+  @include smallInclusive {
+    max-height: 300px;
+    overflow: scroll;
+  }
+
   .table-header {
     display: flex;
     gap: 4px;

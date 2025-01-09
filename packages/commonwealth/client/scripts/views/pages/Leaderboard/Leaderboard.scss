@@ -3,13 +3,14 @@
 .Leaderboard {
   .body {
     display: grid;
-    gap: 36px;
+    gap: 56px;
     grid-template-columns: 3fr 2fr;
     width: 100%;
     padding-top: 12px;
 
-    @include small {
+    @include smallInclusive {
       grid-template-columns: 1fr;
+      gap: 24px;
     }
 
     .right {
