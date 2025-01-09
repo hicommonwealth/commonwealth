@@ -2,6 +2,7 @@ import { z } from 'zod';
 import {
   Address,
   Comment,
+  CommentVersionHistory,
   ContestManager,
   ProfileTags,
   Thread,
@@ -68,7 +69,6 @@ export const UserView = z.object({
 
   profile: UserProfile,
   xp_points: PG_INT.default(0).nullish(),
-  referral_link: z.string().nullish(),
 
   created_at: z.date().or(z.string()).nullish(),
   updated_at: z.date().or(z.string()).nullish(),
@@ -106,6 +106,11 @@ export const ReactionView = z.object({
   avatar_url: z.string().optional(),
 });
 
+export const CommentVersionHistoryView = CommentVersionHistory.extend({
+  id: PG_INT,
+  timestamp: z.date().or(z.string()),
+});
+
 export const CommentView = Comment.extend({
   id: PG_INT,
   created_at: z.date().or(z.string()).nullish(),
@@ -114,14 +119,16 @@ export const CommentView = Comment.extend({
   marked_as_spam_at: z.date().or(z.string()).nullish(),
   Address: AddressView.nullish(),
   Thread: z.undefined(),
+  community_id: z.string(),
+  last_active: z.date().or(z.string()).nullish(),
   Reaction: ReactionView.nullish(),
-  CommentVersionHistories: z.undefined(),
   search: z.undefined(),
   // this is returned by GetThreads
   address: z.string(),
   profile_name: z.string().optional(),
   profile_avatar: z.string().optional(),
   user_id: PG_INT,
+  CommentVersionHistories: z.array(CommentVersionHistoryView).nullish(),
 });
 
 export const ThreadVersionHistoryView = ThreadVersionHistory.extend({
@@ -152,6 +159,10 @@ export const ThreadView = Thread.extend({
   Comments: z.array(CommentView).optional(),
   ThreadVersionHistories: z.array(ThreadVersionHistoryView).nullish(),
   search: z.union([z.string(), z.record(z.any())]).nullish(),
+  total_num_thread_results: z
+    .number()
+    .nullish()
+    .describe('total number of thread results for the query'),
 });
 
 export const OrderByQueriesKeys = z.enum([

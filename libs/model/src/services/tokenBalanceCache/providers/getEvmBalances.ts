@@ -1,6 +1,6 @@
 import { logger } from '@hicommonwealth/core';
+import { isEvmAddress } from '@hicommonwealth/evm-protocols';
 import { BalanceSourceType } from '@hicommonwealth/shared';
-import Web3 from 'web3';
 import { models } from '../../../database';
 import { Balances, GetEvmBalancesOptions } from '../types';
 import { cacheBalances, getCachedBalances } from './cacheBalances';
@@ -17,7 +17,7 @@ export async function getEvmBalances(
 ) {
   const validatedAddresses: string[] = [];
   for (const address of options.addresses) {
-    if (Web3.utils.isAddress(address)) {
+    if (isEvmAddress(address)) {
       validatedAddresses.push(address);
     } else {
       log.info(`Skipping non-address ${address}`);

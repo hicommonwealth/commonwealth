@@ -1,10 +1,12 @@
-import type {
+import {
   QueryDepositsResponseSDKType,
   QueryTallyResultResponseSDKType,
-  QueryVotesResponseSDKType,
+  QueryVotesRequest,
+  QueryVotesResponse,
 } from '@atomone/atomone-types-long/atomone/gov/v1/query';
 import { EncodeObject } from '@cosmjs/proto-signing';
 import { longify } from '@cosmjs/stargate/build/queryclient';
+import { QueryTallyResultResponseSDKType as DefaultQueryTallyResultResponseSDKType } from '@hicommonwealth/chains';
 import { ProposalType } from '@hicommonwealth/shared';
 import BN from 'bn.js';
 import type {
@@ -24,6 +26,7 @@ import {
 } from 'models/types';
 import { DepositVote } from 'models/votes';
 import moment from 'moment';
+import { PageRequest } from 'node_modules/@atomone/atomone-types-long/cosmos/base/query/v1beta1/pagination';
 import CosmosAccount from '../../account';
 import type CosmosAccounts from '../../accounts';
 import type CosmosChain from '../../chain';
@@ -35,14 +38,12 @@ import { marshalTallyV1 } from './utils-v1';
 
 const voteToEnumV1 = (voteOption: number | string): CosmosVoteChoice => {
   switch (voteOption) {
-    case 'VOTE_OPTION_YES':
+    case 1:
       return 'Yes';
-    case 'VOTE_OPTION_NO':
+    case 3:
       return 'No';
-    case 'VOTE_OPTION_ABSTAIN':
+    case 2:
       return 'Abstain';
-    case 'VOTE_OPTION_NO_WITH_VETO':
-      return 'NoWithVeto';
     default:
       // @ts-expect-error StrictNullChecks
       return null;
@@ -75,7 +76,7 @@ export class CosmosProposalV1AtomOne extends Proposal<
   public get author() {
     return this.data.proposer
       ? this._Accounts.fromAddress(this.data.proposer)
-      : null;
+      : this.data.proposer;
   }
 
   public get votingType() {
@@ -167,7 +168,7 @@ export class CosmosProposalV1AtomOne extends Proposal<
     return deposits;
   }
 
-  public async fetchTally(): Promise<QueryTallyResultResponseSDKType> {
+  public async fetchTally(): Promise<DefaultQueryTallyResultResponseSDKType> {
     const proposalId = longify(this.data.identifier) as Long;
     // @ts-expect-error StrictNullChecks
     if (!isAtomoneLCD(this._Chain.lcd)) return;
@@ -175,16 +176,38 @@ export class CosmosProposalV1AtomOne extends Proposal<
       proposalId,
     });
     this.setTally(tally);
-    return tally;
+    return tally as DefaultQueryTallyResultResponseSDKType;
   }
 
-  public async fetchVotes(): Promise<QueryVotesResponseSDKType> {
+  public async fetchVotes(): Promise<QueryVotesResponse> {
     const proposalId = longify(this.data.identifier) as Long;
     // @ts-expect-error StrictNullChecks
     if (!isAtomoneLCD(this._Chain.lcd)) return;
-    const votes = await this._Chain.lcd.atomone.gov.v1.votes({
-      proposalId,
-    });
+    const q = QueryVotesRequest.fromPartial({ proposalId });
+    const query = QueryVotesRequest.encode(q).finish();
+    const resp = await this._Chain.api.queryAbci(
+      '/atomone.gov.v1.Query/Votes',
+      query,
+    );
+    const votes = QueryVotesResponse.decode(resp.value);
+    let nextKey = votes.pagination?.nextKey;
+    while (nextKey && nextKey?.byteLength != 0) {
+      const moreq = QueryVotesRequest.fromPartial({
+        proposalId,
+        pagination: {
+          key: nextKey,
+          limit: longify(500),
+        } as unknown as PageRequest,
+      });
+      const morequery = QueryVotesRequest.encode(moreq).finish();
+      const moreresp = await this._Chain.api.queryAbci(
+        '/atomone.gov.v1.Query/Votes',
+        morequery,
+      );
+      const moreVotes = QueryVotesResponse.decode(moreresp.value);
+      votes.votes = [...votes.votes, ...moreVotes.votes];
+      nextKey = moreVotes.pagination?.nextKey;
+    }
     this.setVotes(votes);
     return votes;
   }
@@ -208,7 +231,7 @@ export class CosmosProposalV1AtomOne extends Proposal<
     }
   }
 
-  public setVotes(votesResp: QueryVotesResponseSDKType) {
+  public setVotes(votesResp: QueryVotesResponse) {
     if (votesResp) {
       for (const voter of votesResp.votes) {
         const vote = voteToEnumV1(voter.options[0].option);
@@ -298,7 +321,7 @@ export class CosmosProposalV1AtomOne extends Proposal<
       case 'Rejected':
         return ProposalStatus.Failed;
       case 'VotingPeriod':
-        return +this.support > 0.5 && this.veto <= 1 / 3
+        return +this.support > 0.667 && this.veto <= 1 / 3
           ? ProposalStatus.Passing
           : ProposalStatus.Failing;
       case 'DepositPeriod':

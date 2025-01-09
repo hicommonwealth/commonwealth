@@ -20,18 +20,6 @@ export const buildAssociations = (db: DB) => {
       onUpdate: 'CASCADE',
       onDelete: 'CASCADE',
     })
-    .withMany(db.Referral, {
-      foreignKey: 'referrer_id',
-      asOne: 'referrer',
-      onUpdate: 'CASCADE',
-      onDelete: 'CASCADE',
-    })
-    .withMany(db.Referral, {
-      foreignKey: 'referee_id',
-      asOne: 'referee',
-      onUpdate: 'CASCADE',
-      onDelete: 'CASCADE',
-    })
     .withMany(db.XpLog, {
       foreignKey: 'user_id',
       onDelete: 'CASCADE',
@@ -71,7 +59,6 @@ export const buildAssociations = (db: DB) => {
     });
 
   db.ChainNode.withMany(db.Community)
-    .withMany(db.EvmEventSource)
     .withOne(db.LastProcessedEvmBlock)
     .withMany(db.Topic, {
       onUpdate: 'CASCADE',
@@ -80,8 +67,6 @@ export const buildAssociations = (db: DB) => {
     .withMany(db.PinnedToken, {
       onDelete: 'CASCADE',
     });
-
-  db.ContractAbi.withMany(db.EvmEventSource, { foreignKey: 'abi_id' });
 
   db.Community.withMany(db.Group, { asMany: 'groups' })
     .withMany(db.Topic, {
