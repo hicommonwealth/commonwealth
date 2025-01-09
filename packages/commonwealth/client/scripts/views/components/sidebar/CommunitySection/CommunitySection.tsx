@@ -53,6 +53,7 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
   const { setAuthModalType } = useAuthModalStore();
 
   const user = useUserStore();
+
   const {
     selectedAddress,
     modeOfManageCommunityStakeModal,
