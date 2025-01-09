@@ -119,7 +119,15 @@ function membersSqlWithoutSearch(
           'address', A.address,
           'community_id', A.community_id,
           'role', A.role,
-          'stake_balance', 0 -- TODO: project stake balance here
+          'stake_balance', 0, -- TODO: project stake balance here
+          'referred_by', (SELECT 
+            JSON_BUILD_OBJECT(
+              'user_id', RU.id,
+              'profile_name', RU.profile->>'name',
+              'avatar_url', RU.profile->>'avatar_url'
+            )
+              FROM "Addresses" RA JOIN "Users" RU on RA.user_id = RU.id 
+              WHERE RA.address = A.referred_by_address LIMIT 1)
         )) AS addresses,
         COALESCE(ARRAY_AGG(M.group_id) FILTER (WHERE M.group_id IS NOT NULL), '{}') AS group_ids
       FROM "Addresses" A
@@ -148,18 +156,21 @@ function membersSqlWithSearch(
         U.created_at,
         COALESCE(U.referral_count, 0) AS referral_count,
         COALESCE(U.referral_eth_earnings, 0) AS referral_eth_earnings,
-        JSON_BUILD_OBJECT(
-          'user_id', U.id,
-          'profile_name', U.profile->>'name',
-          'avatar_url', U.profile->>'avatar_url'
-        ) AS referred_by,
         MAX(COALESCE(A.last_active, U.created_at)) AS last_active,
         JSONB_AGG(JSON_BUILD_OBJECT(
           'id', A.id,
           'address', A.address,
           'community_id', A.community_id,
           'role', A.role,
-          'stake_balance', 0 -- TODO: project stake balance here
+          'stake_balance', 0, -- TODO: project stake balance here
+          'referred_by', (SELECT 
+            JSON_BUILD_OBJECT(
+              'user_id', RU.id,
+              'profile_name', RU.profile->>'name',
+              'avatar_url', RU.profile->>'avatar_url'
+            )
+              FROM "Addresses" RA JOIN "Users" RU on RA.user_id = RU.id 
+              WHERE RA.address = A.referred_by_address LIMIT 1)
         )) AS addresses,
         COALESCE(ARRAY_AGG(M.group_id) FILTER (WHERE M.group_id IS NOT NULL), '{}') AS group_ids, T.total
       FROM F 
@@ -216,8 +227,6 @@ export function GetMembers(): Query<typeof schemas.GetCommunityMembers> {
               offset,
             )
           : membersSqlWithoutSearch(orderBy, limit, offset);
-
-      console.log(sql);
 
       const members = await models.sequelize.query<
         z.infer<typeof schemas.CommunityMember> & { total?: number }

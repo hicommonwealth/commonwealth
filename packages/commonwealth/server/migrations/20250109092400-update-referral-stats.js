@@ -27,7 +27,10 @@ module.exports = {
 
   async down(queryInterface) {
     await queryInterface.sequelize.transaction(async (transaction) => {
-      await queryInterface.removeColumn('Users', 'referral_eth_earnings', {
+      await queryInterface.removeColumn('Users', 'referral_count', {
+        transaction,
+      });
+      await queryInterface.removeColumn('Addresses', 'referred_by_address', {
         transaction,
       });
     });

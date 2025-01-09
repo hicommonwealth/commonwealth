@@ -110,17 +110,17 @@ export const CommunityMember = z.object({
       address: z.string(),
       stake_balance: z.number().nullish(),
       role: z.enum(Roles),
+      referred_by: z
+        .object({
+          user_id: PG_INT,
+          profile_name: z.string().nullish(),
+          avatar_url: z.string().nullish(),
+        })
+        .nullish(),
     }),
   ),
   group_ids: z.array(PG_INT),
   last_active: z.any().nullish().describe('string or date'),
   referral_count: PG_INT.default(0).nullish(),
   referral_eth_earnings: z.number().nullish(),
-  referred_by: z
-    .object({
-      user_id: PG_INT,
-      profile_name: z.string().nullish(),
-      avatar_url: z.string().nullish(),
-    })
-    .nullish(),
 });
