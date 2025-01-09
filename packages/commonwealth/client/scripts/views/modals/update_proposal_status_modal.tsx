@@ -369,7 +369,7 @@ export const UpdateProposalStatusModal = ({
             />
           </>
         ) : (
-          <CWText>Please connect your Snapshot space </CWText>
+          !isCosmos && <CWText>Please connect your Snapshot space </CWText>
         )}
         {isCosmos && (
           <CosmosProposalSelector
@@ -397,14 +397,12 @@ export const UpdateProposalStatusModal = ({
               buttonHeight="sm"
               onClick={onModalClose}
             />
-            {showSnapshot && (
-              <CWButton
-                buttonType="primary"
-                buttonHeight="sm"
-                label="Save changes"
-                onClick={handleSaveChanges}
-              />
-            )}
+            <CWButton
+              buttonType="primary"
+              buttonHeight="sm"
+              label="Save changes"
+              onClick={handleSaveChanges}
+            />
           </div>
         </div>
       </CWModalFooter>
