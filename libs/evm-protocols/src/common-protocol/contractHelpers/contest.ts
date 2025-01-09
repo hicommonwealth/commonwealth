@@ -1,13 +1,11 @@
 import { BigNumber } from '@ethersproject/bignumber';
 import { ServerError } from '@hicommonwealth/core';
-import {
-  feeManagerAbi,
-  namespaceAbi,
-  namespaceFactoryAbi,
-} from '@hicommonwealth/evm-protocols';
 import { ZERO_ADDRESS } from '@hicommonwealth/shared';
 import { Mutex } from 'async-mutex';
 import Web3, { PayableCallOptions, TransactionReceipt } from 'web3';
+import { feeManagerAbi } from '../../abis/feeManagerAbi';
+import { namespaceAbi } from '../../abis/namespaceAbi';
+import { namespaceFactoryAbi } from '../../abis/namespaceFactoryAbi';
 import { recurringContestAbi } from '../../abis/recurringContestAbi';
 import { singleContestAbi } from '../../abis/singleContestAbi';
 import { config } from '../../config';
