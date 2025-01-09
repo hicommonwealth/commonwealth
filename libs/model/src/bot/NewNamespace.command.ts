@@ -73,7 +73,6 @@ export function CreateContest(): Command<typeof schemas.CreateBotNamespace> {
         directory_page_enabled: false,
         snapshot_spaces: [],
         stages_enabled: true,
-        has_chain_events_listener: true,
       });
       return {
         community,
