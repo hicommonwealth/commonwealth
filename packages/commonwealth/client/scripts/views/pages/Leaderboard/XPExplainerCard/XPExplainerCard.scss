@@ -1,0 +1,18 @@
+@import '../../../../styles/shared';
+
+.XPExplainerCard {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  .b2 {
+    color: $neutral-800;
+    display: inline;
+
+    .link {
+      text-decoration: none !important;
+      font-weight: 500;
+      color: $primary-500;
+    }
+  }
+}
