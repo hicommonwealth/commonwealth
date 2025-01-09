@@ -1,4 +1,5 @@
 import React from 'react';
+import { useMobileLoginTrigger } from 'views/components/ReactNativeBridge';
 import { AuthModalType } from '../../modals/AuthModal';
 import { CWButton } from '../component_kit/new_designs/CWButton';
 
@@ -14,6 +15,16 @@ const AuthButtons = ({
   smallHeightButtons = false,
 }: AuthButtonsProps) => {
   const isDisabled = location.pathname.includes('/finishsociallogin');
+
+  const mobileLoginTrigger = useMobileLoginTrigger();
+
+  function handleSignIn() {
+    if (mobileLoginTrigger.enabled) {
+      mobileLoginTrigger.trigger();
+    } else {
+      onButtonClick(AuthModalType.SignIn);
+    }
+  }
 
   return (
     <>
@@ -35,7 +46,7 @@ const AuthButtons = ({
         })}
         buttonWidth={fullWidthButtons ? 'full' : 'narrow'}
         disabled={isDisabled}
-        onClick={() => onButtonClick(AuthModalType.SignIn)}
+        onClick={handleSignIn}
       />
     </>
   );
