@@ -26,7 +26,6 @@ export const KnockFeedWrapper = memo(function KnockFeedWrapper({
   const user = useUserStore();
 
   useEffect(() => {
-    console.log('FIXME 1');
     if (!user.id || !user.isLoggedIn) return;
     if (!user.knockJWT) {
       console.warn('user knockJWT not set! Will not attempt to identify.');
