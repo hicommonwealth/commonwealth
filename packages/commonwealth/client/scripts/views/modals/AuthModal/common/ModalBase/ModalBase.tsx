@@ -1,5 +1,6 @@
 import { ChainBase, WalletId, WalletSsoSource } from '@hicommonwealth/shared';
 import commonLogo from 'assets/img/branding/common-logo.svg';
+import useBrowserWindow from 'client/scripts/hooks/useBrowserWindow';
 import clsx from 'clsx';
 import React, { Fragment, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -91,12 +92,16 @@ const ModalBase = ({
   isUserFromWebView = false,
 }: ModalBaseProps) => {
   const copy = MODAL_COPY[layoutType];
-  const [activeTabIndex, setActiveTabIndex] = useState<number>(
-    showAuthOptionTypesFor?.includes('sso') &&
+  const { isWindowSmallInclusive } = useBrowserWindow({});
+  const [activeTabIndex, setActiveTabIndex] = useState<number>(() => {
+    if (isWindowSmallInclusive) {
+      return 1;
+    }
+    return showAuthOptionTypesFor?.includes('sso') &&
       showAuthOptionTypesFor.length === 1
       ? 1
-      : 0,
-  );
+      : 0;
+  });
   const [isEVMWalletsModalVisible, setIsEVMWalletsModalVisible] = useState(
     () => {
       return openEVMWalletsSubModal ? openEVMWalletsSubModal : false;

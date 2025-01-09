@@ -1,4 +1,3 @@
-import commonLogo from 'assets/img/branding/common-logo.svg';
 import referralImage from 'assets/img/referral-background-mobile.png';
 import useUserStore from 'client/scripts/state/ui/user';
 import { saveToClipboard } from 'client/scripts/utils/clipboard';
@@ -60,8 +59,6 @@ const InviteModal = ({ onComplete }: InviteModalProps) => {
 
   return (
     <section className="InviteModal">
-      <img src={commonLogo} className="logo" />
-
       <img src={referralImage} className="referral_logo" />
 
       <CWText type="h2" className="title" isCentered>

@@ -1,3 +1,4 @@
+import { useCommonNavigate } from 'client/scripts/navigation/helpers';
 import Lottie from 'lottie-react';
 import React, { useRef, useState } from 'react';
 import 'swiper/css';
@@ -34,13 +35,13 @@ const slides = [
   },
 ];
 const OnBoarding = () => {
+  const navigate = useCommonNavigate();
   const swiperRef = useRef<SwiperClass>();
   const [isLastSlide, setIsLastSlide] = useState(false);
   const handleNextSlide = () => {
-    console.log('qwerty', swiperRef);
     if (swiperRef.current) {
       if (isLastSlide) {
-        alert('hello');
+        navigate(`/discussions`);
       }
       swiperRef.current.slideNext(); // Use slideNext method
     }
@@ -48,7 +49,7 @@ const OnBoarding = () => {
   const handleSlideChange = () => {
     if (swiperRef.current) {
       const swiper = swiperRef.current;
-      const isLast = swiper.activeIndex === swiper.slides.length - 1; // Check if it's the last slide
+      const isLast = swiper.activeIndex === swiper.slides.length - 1;
       setIsLastSlide(isLast);
     }
   };

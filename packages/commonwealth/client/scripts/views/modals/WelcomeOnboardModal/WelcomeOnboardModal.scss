@@ -21,6 +21,9 @@
   }
 
   .content {
+    @include extraSmall {
+      height: 100%;
+    }
     .logo {
       display: flex;
       height: auto;
