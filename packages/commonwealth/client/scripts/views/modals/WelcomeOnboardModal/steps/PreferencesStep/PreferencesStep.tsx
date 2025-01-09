@@ -16,6 +16,7 @@ type PreferencesStepProps = {
 const PreferencesStep = ({ onComplete }: PreferencesStepProps) => {
   const { preferenceTags, toggleTagFromSelection } = usePreferenceTags();
   const user = useUserStore();
+  console.log({ preferenceTags });
 
   const { mutateAsync: updateUser, isLoading: isUpdatingProfile } =
     useUpdateUserMutation();

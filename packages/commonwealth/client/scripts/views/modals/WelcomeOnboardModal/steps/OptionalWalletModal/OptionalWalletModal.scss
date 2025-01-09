@@ -1,0 +1,67 @@
+@import '../../../../../styles/shared.scss';
+.OptionalWalletModal {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  .logo {
+    height: auto;
+    margin: auto;
+    width: 227px;
+
+    @include extraSmall {
+      width: 175px;
+    }
+  }
+
+  .buttons_container {
+    margin-top: 20px;
+    display: flex;
+    gap: 1rem;
+    width: 100%;
+    position: relative;
+    align-items: center;
+    justify-content: space-between;
+    .skip-button {
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      width: auto !important;
+      position: relative !important;
+      transform: translate(0%);
+
+      .primary {
+        padding-left: 2rem;
+        padding-right: 2rem;
+        border: 1px solid #0079cc;
+        background-color: transparent !important;
+
+        .button-text {
+          color: #0079cc !important;
+        }
+      }
+    }
+
+    .next-button {
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      transform: translate(0%);
+      width: auto !important;
+      position: relative !important;
+      .primary {
+        padding-left: 2rem;
+        padding-right: 2rem;
+        border: 1px solid #0079cc;
+        background-color: #0079cc;
+        .button-text {
+          color: white !important;
+        }
+      }
+    }
+  }
+}
