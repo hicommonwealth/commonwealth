@@ -48,11 +48,14 @@ const ExploreContestCard = ({
       ),
     });
 
+  // 10% fee deducted from prize pool
+  const netContestBalance = (contestBalance || 0) * 0.9;
+
   const prizes =
-    contestBalance && contest.payout_structure
+    netContestBalance && contest.payout_structure
       ? contest.payout_structure.map(
           (percentage) =>
-            (contestBalance * (percentage / 100)) /
+            (netContestBalance * (percentage / 100)) /
             Math.pow(10, contest.decimals || 18),
         )
       : [];

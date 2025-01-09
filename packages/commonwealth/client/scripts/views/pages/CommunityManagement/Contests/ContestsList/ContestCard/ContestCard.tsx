@@ -103,11 +103,14 @@ const ContestCard = ({
       isOneOff: !isRecurring,
     });
 
+  // 10% fee deducted from prize pool
+  const netContestBalance = (contestBalance || 0) * 0.9;
+
   const prizes =
-    contestBalance && payoutStructure
+    netContestBalance && payoutStructure
       ? payoutStructure.map(
           (percentage) =>
-            (contestBalance * (percentage / 100)) /
+            (netContestBalance * (percentage / 100)) /
             Math.pow(10, decimals || 18),
         )
       : [];

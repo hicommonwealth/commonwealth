@@ -85,11 +85,14 @@ export const contestPrizes = frames(async (ctx) => {
     contestManager.interval === 0,
   );
 
+  // 10% fee deducted from prize pool
+  const netContestBalance = (Number(contestBalance) || 0) * 0.9;
+
   const prizes =
-    contestBalance && contestBalance !== '0' && contestManager.payout_structure
+    netContestBalance && contestManager.payout_structure
       ? contestManager.payout_structure.map(
           (percentage) =>
-            (Number(contestBalance) * (percentage / 100)) /
+            (Number(netContestBalance) * (percentage / 100)) /
             Math.pow(10, contestManager.decimals || 18),
         )
       : [];
