@@ -4,7 +4,10 @@ import { QueryTypes } from 'sequelize';
 import { z } from 'zod';
 import { models } from '../database';
 
-const buildOrderBy = (by: string, direction: 'ASC' | 'DESC') => {
+const buildOrderBy = (
+  by: 'name' | 'referrals' | 'earnings' | string,
+  direction: 'ASC' | 'DESC',
+) => {
   switch (by) {
     case 'name':
       return `profile_name ${direction}`;
@@ -13,6 +16,12 @@ const buildOrderBy = (by: string, direction: 'ASC' | 'DESC') => {
     // - Project stake balances in separate process
     // case 'stakeBalance': // TODO: fix when stake balance is available
     //   return `addresses[0].stake_balance ${direction}`;
+
+    case 'referrals':
+      return `referral_count ${direction}`;
+
+    case 'earnings':
+      return `referral_eth_earnings ${direction}`;
 
     default:
       return `last_active ${direction}`;
@@ -91,74 +100,6 @@ const buildFilteredQuery = (
   `;
 };
 
-export function GetMembers(): Query<typeof schemas.GetCommunityMembers> {
-  return {
-    ...schemas.GetCommunityMembers,
-    auth: [],
-    secure: false,
-    body: async ({ payload }) => {
-      const {
-        community_id,
-        search,
-        allowedAddresses,
-        memberships,
-        cursor,
-        limit,
-        order_by,
-        order_direction,
-      } = payload;
-
-      const offset = limit * (cursor - 1);
-      const addresses = allowedAddresses?.split(',').map((a) => a.trim()) ?? [];
-
-      const replacements = {
-        community_id,
-        search: search ? `%${search}%` : '',
-        addresses,
-      };
-
-      const cte = buildFilteredQuery(
-        search ?? '',
-        buildFilters(memberships ?? '', addresses),
-      );
-
-      const orderBy = buildOrderBy(
-        order_by ?? 'name',
-        order_direction ?? 'DESC',
-      );
-
-      const sql =
-        search || memberships || addresses.length > 0
-          ? membersSqlWithSearch(cte, orderBy, limit, offset)
-          : membersSqlWithoutSearch(orderBy, limit, offset);
-
-      const members = await models.sequelize.query<
-        z.infer<typeof schemas.CommunityMember> & { total?: number }
-      >(sql, {
-        replacements,
-        type: QueryTypes.SELECT,
-      });
-
-      if (!search) {
-        const total = await models.Community.findOne({
-          where: { id: community_id },
-          attributes: ['profile_count'],
-        });
-        members.forEach((m) => (m.total = total?.profile_count));
-      }
-
-      return schemas.buildPaginatedResponse(
-        members,
-        members.at(0)?.total ?? 0,
-        {
-          limit,
-          offset,
-        },
-      );
-    },
-  };
-}
-
 function membersSqlWithoutSearch(
   orderBy: string,
   limit: number,
@@ -170,13 +111,23 @@ function membersSqlWithoutSearch(
         U.profile->>'name' AS profile_name,
         U.profile->>'avatar_url' AS avatar_url,
         U.created_at,
+        COALESCE(U.referral_count, 0) AS referral_count,
+        COALESCE(U.referral_eth_earnings, 0) AS referral_eth_earnings,
         MAX(COALESCE(A.last_active, U.created_at)) AS last_active,
         JSONB_AGG(JSON_BUILD_OBJECT(
           'id', A.id,
           'address', A.address,
           'community_id', A.community_id,
           'role', A.role,
-          'stake_balance', 0 -- TODO: project stake balance here
+          'stake_balance', 0, -- TODO: project stake balance here
+          'referred_by', (SELECT 
+            JSON_BUILD_OBJECT(
+              'user_id', RU.id,
+              'profile_name', RU.profile->>'name',
+              'avatar_url', RU.profile->>'avatar_url'
+            )
+              FROM "Addresses" RA JOIN "Users" RU on RA.user_id = RU.id 
+              WHERE RA.address = A.referred_by_address LIMIT 1)
         )) AS addresses,
         COALESCE(ARRAY_AGG(M.group_id) FILTER (WHERE M.group_id IS NOT NULL), '{}') AS group_ids
       FROM "Addresses" A
@@ -203,16 +154,27 @@ function membersSqlWithSearch(
         U.profile->>'name' AS profile_name,
         U.profile->>'avatar_url' AS avatar_url,
         U.created_at,
+        COALESCE(U.referral_count, 0) AS referral_count,
+        COALESCE(U.referral_eth_earnings, 0) AS referral_eth_earnings,
         MAX(COALESCE(A.last_active, U.created_at)) AS last_active,
         JSONB_AGG(JSON_BUILD_OBJECT(
           'id', A.id,
           'address', A.address,
           'community_id', A.community_id,
           'role', A.role,
-          'stake_balance', 0 -- TODO: project stake balance here
+          'stake_balance', 0, -- TODO: project stake balance here
+          'referred_by', (SELECT 
+            JSON_BUILD_OBJECT(
+              'user_id', RU.id,
+              'profile_name', RU.profile->>'name',
+              'avatar_url', RU.profile->>'avatar_url'
+            )
+              FROM "Addresses" RA JOIN "Users" RU on RA.user_id = RU.id 
+              WHERE RA.address = A.referred_by_address LIMIT 1)
         )) AS addresses,
         COALESCE(ARRAY_AGG(M.group_id) FILTER (WHERE M.group_id IS NOT NULL), '{}') AS group_ids, T.total
-      FROM F JOIN "Addresses" A ON F.id = A.id
+      FROM F 
+        JOIN "Addresses" A ON F.id = A.id
         JOIN "Users" U ON A.user_id = U.id
         LEFT JOIN "Memberships" M ON A.id = M.address_id AND M.reject_reason IS NULL
         JOIN T ON TRUE
@@ -220,4 +182,76 @@ function membersSqlWithSearch(
       ORDER BY ${orderBy}
       LIMIT ${limit} OFFSET ${offset};
      `;
+}
+
+export function GetMembers(): Query<typeof schemas.GetCommunityMembers> {
+  return {
+    ...schemas.GetCommunityMembers,
+    auth: [],
+    secure: false,
+    body: async ({ payload }) => {
+      const {
+        community_id,
+        search,
+        allowedAddresses,
+        memberships,
+        cursor,
+        limit,
+        order_by,
+        order_direction,
+      } = payload;
+
+      const offset = limit * (cursor - 1);
+      const addresses = allowedAddresses?.split(',').map((a) => a.trim()) ?? [];
+
+      const replacements = {
+        community_id,
+        search: search ? `%${search}%` : '',
+        addresses,
+      };
+
+      const orderBy = buildOrderBy(
+        order_by ?? 'name',
+        order_direction ?? 'DESC',
+      );
+
+      const sql =
+        search || memberships || addresses.length > 0
+          ? membersSqlWithSearch(
+              buildFilteredQuery(
+                search ?? '',
+                buildFilters(memberships ?? '', addresses),
+              ),
+              orderBy,
+              limit,
+              offset,
+            )
+          : membersSqlWithoutSearch(orderBy, limit, offset);
+
+      const members = await models.sequelize.query<
+        z.infer<typeof schemas.CommunityMember> & { total?: number }
+      >(sql, {
+        replacements,
+        type: QueryTypes.SELECT,
+      });
+
+      if (!search) {
+        // TODO: @kurtisassad if we have a query for this case, why not include the total in the query to avoid this extra step?
+        const total = await models.Community.findOne({
+          where: { id: community_id },
+          attributes: ['profile_count'],
+        });
+        members.forEach((m) => (m.total = total?.profile_count));
+      }
+
+      return schemas.buildPaginatedResponse(
+        members,
+        members.at(0)?.total ?? 0,
+        {
+          limit,
+          offset,
+        },
+      );
+    },
+  };
 }
