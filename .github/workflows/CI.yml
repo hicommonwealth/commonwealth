@@ -78,13 +78,13 @@ jobs:
           pnpm -F commonwealth test-e2e --forbid-only
 
       - name: Archive test status
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: FlakySuiteStatus
           path: packages/commonwealth/summary.json
 
       - name: Upload e2e recordings on failure
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: ${{ failure() }}
         with:
           name: Recordings
@@ -139,13 +139,13 @@ jobs:
           pnpm -F commonwealth test-e2e-mature --forbid-only
 
       - name: Archive test status
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: MatureSuiteStatus
           path: packages/commonwealth/summary.json
 
       - name: Upload e2e recordings on failure
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: ${{ failure() }}
         with:
           name: Recordings
@@ -200,7 +200,7 @@ jobs:
           (pnpm -F commonwealth wait-server && pnpm -F commonwealth test-e2e-serial --forbid-only)
 
       - name: Archive code coverage results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: code-coverage-report
           path: coverage
