@@ -41,7 +41,7 @@ export const processThreadCreated: EventHandler<
     return false;
   }
 
-  const webhooks = await models.Webhook.scope('withPrivateData').findAll({
+  const webhooks = await models.Webhook.findAll({
     where: {
       community_id: community.id!,
       events: { [Op.contains]: ['ThreadCreated'] },

@@ -29,14 +29,6 @@ export default (
       signing_key: { type: Sequelize.STRING, allowNull: false },
     },
     {
-      defaultScope: {
-        attributes: {
-          exclude: ['signing_key'],
-        },
-      },
-      scopes: {
-        withPrivateData: {},
-      },
       tableName: 'Webhooks',
       underscored: true,
       createdAt: 'created_at',
