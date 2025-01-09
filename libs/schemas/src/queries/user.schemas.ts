@@ -7,20 +7,14 @@ import { XpLog } from '../entities/xp.schemas';
 import { PG_INT } from '../utils';
 import { PaginatedResultSchema, PaginationParamsSchema } from './pagination';
 import { AddressView, CommentView, ThreadView } from './thread.schemas';
-interface UserProfileAddressViewType {
-  Community: {
-    id: string;
-    base: ChainBase;
-    ss58_prefix?: number | null;
-  };
-}
+
 export const UserProfileAddressView = AddressView.extend({
   Community: z.object({
     id: z.string(),
     base: z.nativeEnum(ChainBase),
     ss58_prefix: PG_INT.nullish(),
   }),
-}) as z.ZodType<UserProfileAddressViewType>;
+});
 
 export const UserProfileView = z.object({
   userId: PG_INT,
