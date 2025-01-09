@@ -1,6 +1,6 @@
 import { ChainBase, Roles } from '@hicommonwealth/shared';
 import { z } from 'zod';
-import { Referral, User } from '../entities';
+import { Referral, ReferralFees, User } from '../entities';
 import { Tags } from '../entities/tag.schemas';
 import { UserProfile } from '../entities/user.schemas';
 import { XpLog } from '../entities/xp.schemas';
@@ -16,17 +16,13 @@ export const UserProfileAddressView = AddressView.extend({
   }),
 });
 
-export const UserProfileCommentView = CommentView.extend({
-  community_id: z.string(),
-});
-
 export const UserProfileView = z.object({
   userId: PG_INT,
   profile: UserProfile,
   totalUpvotes: z.number().int(),
   addresses: z.array(UserProfileAddressView),
   threads: z.array(ThreadView),
-  comments: z.array(UserProfileCommentView),
+  comments: z.array(CommentView),
   commentThreads: z.array(ThreadView),
   isOwner: z.boolean(),
   tags: z.array(Tags.extend({ id: PG_INT })),
@@ -90,16 +86,21 @@ export const GetUserAddresses = {
   ),
 };
 
-export const ReferralView = z.array(
-  Referral.extend({
-    referee_user_id: PG_INT,
-    referee_profile: UserProfile,
-  }),
-);
+export const ReferralView = Referral.extend({
+  referee_user_id: PG_INT,
+  referee_profile: UserProfile,
+});
 
 export const GetUserReferrals = {
   input: z.object({ user_id: PG_INT.optional() }),
   output: z.array(ReferralView),
+};
+
+export const ReferralFeesView = ReferralFees;
+
+export const GetUserReferralFees = {
+  input: z.object({}),
+  output: z.array(ReferralFeesView),
 };
 
 export const XpLogView = XpLog.extend({

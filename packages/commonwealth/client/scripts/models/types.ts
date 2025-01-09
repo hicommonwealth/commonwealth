@@ -47,6 +47,7 @@ export enum ThreadViewFilterTypes {
 export enum CommentsFeaturedFilterTypes {
   Newest = 'newest',
   Oldest = 'oldest',
+  MostLikes = 'mostLikes',
 }
 
 export enum ThreadTimelineFilterTypes {

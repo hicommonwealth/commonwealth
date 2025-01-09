@@ -1,4 +1,5 @@
 import { blobStorage, logger } from '@hicommonwealth/core';
+import { isEvmAddress } from '@hicommonwealth/evm-protocols';
 import { EventPairs } from '@hicommonwealth/schemas';
 import {
   getThreadUrl,
@@ -16,7 +17,6 @@ import {
   Transaction,
 } from 'sequelize';
 import { v4 as uuidv4 } from 'uuid';
-import { isAddress } from 'web3-validator';
 import { config } from '../config';
 import type { OutboxAttributes } from '../models/outbox';
 
@@ -114,7 +114,7 @@ export function equalEvmAddresses(
   address2: string | unknown,
 ): boolean {
   const isRealAddress = (address: string | unknown) => {
-    if (!address || typeof address !== 'string' || !isAddress(address)) {
+    if (!address || typeof address !== 'string' || !isEvmAddress(address)) {
       throw new Error(`Invalid address ${address}`);
     }
     return address;

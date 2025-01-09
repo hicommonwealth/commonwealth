@@ -37,7 +37,7 @@ export const ReferralFee = (
         allowNull: false,
       },
       transaction_timestamp: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.BIGINT,
         allowNull: false,
       },
     },

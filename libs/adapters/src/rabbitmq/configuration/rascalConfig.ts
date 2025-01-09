@@ -72,7 +72,7 @@ export function getAllRascalConfigs(
     retry: {
       delay: 1000,
     },
-    prefetch: 1,
+    prefetch: 10,
   };
 
   const publicationConfig = {
@@ -135,6 +135,12 @@ export function getAllRascalConfigs(
       },
     },
     [RascalQueues.XpProjection]: {
+      ...queueConfig,
+      options: {
+        arguments: queueOptions,
+      },
+    },
+    [RascalQueues.UserReferrals]: {
       ...queueConfig,
       options: {
         arguments: queueOptions,
@@ -224,6 +230,12 @@ export function getAllRascalConfigs(
         RascalRoutingKeys.XpProjectionUserMentioned,
       ],
     },
+    [RascalBindings.UserReferrals]: {
+      source: RascalExchanges.MessageRelayer,
+      destination: RascalQueues.UserReferrals,
+      destinationType: 'queue',
+      bindingKeys: [RascalRoutingKeys.UserReferralsSignUpFlowCompleted],
+    },
     [RascalBindings.FarcasterWorkerPolicy]: {
       source: RascalExchanges.MessageRelayer,
       destination: RascalQueues.FarcasterWorkerPolicy,
@@ -262,6 +274,10 @@ export function getAllRascalConfigs(
     },
     [RascalSubscriptions.XpProjection]: {
       queue: RascalQueues.XpProjection,
+      ...subscriptionConfig,
+    },
+    [RascalSubscriptions.UserReferrals]: {
+      queue: RascalQueues.UserReferrals,
       ...subscriptionConfig,
     },
     [RascalSubscriptions.FarcasterWorkerPolicy]: {

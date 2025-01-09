@@ -1,45 +1,42 @@
-import { useQuery } from '@tanstack/react-query';
-import axios from 'axios';
-import Comment from 'models/Comment';
-import app from 'state';
-import { ApiEndpoints, SERVER_URL } from 'state/api/config';
+import { GetComments } from '@hicommonwealth/schemas';
+import { trpc } from 'utils/trpcClient';
+import { z } from 'zod';
 
 const COMMENTS_STALE_TIME = 30 * 1_000; // 30 s
 
-interface FetchCommentsProps {
-  threadId: number;
-  communityId: string;
+type FetchCommentsProps = z.infer<typeof GetComments.input> & {
   apiEnabled?: boolean;
-}
-
-const fetchComments = async ({ communityId, threadId }: FetchCommentsProps) => {
-  const response = await axios.get(
-    `${SERVER_URL}${ApiEndpoints.FETCH_COMMENTS}`,
-    {
-      params: {
-        community_id: communityId || app.activeChainId(),
-        thread_id: threadId,
-      },
-    },
-  );
-
-  // transform response
-  return response.data.result.map(
-    (c) => new Comment({ community_id: undefined, ...c }),
-  );
 };
 
 const useFetchCommentsQuery = ({
-  communityId,
-  threadId,
+  thread_id,
+  comment_id,
+  parent_id,
+  include_reactions,
+  include_spam_comments,
+  order_by,
   apiEnabled = true,
 }: FetchCommentsProps) => {
-  return useQuery({
-    queryKey: [ApiEndpoints.FETCH_COMMENTS, communityId, threadId],
-    queryFn: () => fetchComments({ communityId, threadId }),
-    staleTime: COMMENTS_STALE_TIME,
-    enabled: apiEnabled,
-  });
+  return trpc.comment.getComments.useInfiniteQuery(
+    {
+      thread_id,
+      comment_id,
+      parent_id,
+      order_by,
+      include_reactions,
+      include_spam_comments,
+    },
+    {
+      staleTime: COMMENTS_STALE_TIME,
+      enabled: apiEnabled,
+      initialCursor: 1,
+      getNextPageParam: (lastPage) => {
+        const nextPageNum = lastPage.page + 1;
+        if (nextPageNum <= lastPage.totalPages) return nextPageNum;
+        return undefined;
+      },
+    },
+  );
 };
 
 export default useFetchCommentsQuery;

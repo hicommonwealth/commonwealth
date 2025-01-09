@@ -190,6 +190,7 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
             )}
             {children}
           </div>
+          {/* Growl should be added here when in place*/}
           <CWGrowlTemplate
             headerText="Launch Contests On Farcaster!"
             bodyText="You can now host contests directly on Farcaster to reach and engage your followers.
