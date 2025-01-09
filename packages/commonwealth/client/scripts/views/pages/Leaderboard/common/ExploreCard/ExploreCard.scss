@@ -9,10 +9,13 @@
   gap: 8px;
 
   .right {
-    display: flex;
-    flex-direction: row;
-    align-items: flex-end;
-    padding-bottom: 16px;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: flex-end !important;
+
+    .featured-icon {
+      margin-bottom: 16px;
+    }
 
     .featured-img {
       width: 100px;
