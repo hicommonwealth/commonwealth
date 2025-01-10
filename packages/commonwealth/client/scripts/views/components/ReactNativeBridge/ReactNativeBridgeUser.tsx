@@ -74,6 +74,7 @@ export const ReactNativeBridgeUser = () => {
     window.addEventListener('message', handleMessage);
 
     if (reactNativeWebView) {
+      console.log('Sending auth-ready message to react-native');
       reactNativeWebView.postMessage(JSON.stringify({ type: 'auth-ready' }));
     }
 
