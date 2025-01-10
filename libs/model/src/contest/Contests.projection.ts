@@ -10,7 +10,11 @@ import {
 } from '@hicommonwealth/evm-protocols';
 import { config } from '@hicommonwealth/model';
 import { ContestScore, events } from '@hicommonwealth/schemas';
-import { buildContestLeaderboardUrl, getBaseUrl } from '@hicommonwealth/shared';
+import {
+  CONTEST_FEE_PERCENT,
+  buildContestLeaderboardUrl,
+  getBaseUrl,
+} from '@hicommonwealth/shared';
 import { QueryTypes } from 'sequelize';
 import { z } from 'zod';
 import { models } from '../database';
@@ -234,7 +238,7 @@ export async function updateScore(contest_address: string, contest_id: number) {
     let prizePool = BigNumber.from(contestBalance)
       .mul(oneOff ? 100 : details.prize_percentage)
       .div(100);
-    prizePool = prizePool.mul(90).div(100); // deduct 10% fee
+    prizePool = prizePool.mul(100 - CONTEST_FEE_PERCENT).div(100); // deduct contest fee from prize pool
     const score: z.infer<typeof ContestScore> = scores.map((s, i) => ({
       content_id: s.winningContent.toString(),
       creator_address: s.winningAddress,
