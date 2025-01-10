@@ -128,7 +128,7 @@ export const DiscussionSection = ({
         });
       },
       displayData: null,
-      rightIcon: <CWIcon iconName="squaresFour" iconSize="small" />,
+      leftIcon: <CWIcon iconName="squaresFour" iconSize="small" />,
     },
   ];
 
@@ -137,13 +137,13 @@ export const DiscussionSection = ({
       const topicInvolvedInActiveContest =
         topic?.id && topicIdsIncludedInContest.includes(topic.id);
 
-      let rightIcon;
+      let leftIcon: React.ReactNode;
       if (topicInvolvedInActiveContest) {
-        rightIcon = <CWIcon iconName="trophy" iconSize="small" />;
+        leftIcon = <CWIcon iconName="trophy" iconSize="small" />;
       } else if (topic.weighted_voting) {
-        rightIcon = <CWIcon iconName="lockedNew" iconSize="small" />;
+        leftIcon = <CWIcon iconName="lockedNew" iconSize="small" />;
       } else {
-        rightIcon = <CWIcon iconName="hash" iconSize="small" />;
+        leftIcon = <CWIcon iconName="hash" iconSize="small" />;
       }
 
       const discussionSectionGroup: SectionGroupAttrs = {
@@ -172,7 +172,7 @@ export const DiscussionSection = ({
           );
         },
         displayData: null,
-        rightIcon,
+        leftIcon,
       };
       discussionsGroupData.push(discussionSectionGroup);
     }
@@ -180,7 +180,7 @@ export const DiscussionSection = ({
 
   const archivedSectionGroup: SectionGroupAttrs = {
     title: 'Archived',
-    rightIcon: <CWIcon iconName="archiveTray" iconSize="small" />,
+    leftIcon: <CWIcon iconName="archiveTray" iconSize="small" />,
     containsChildren: false,
     hasDefaultToggle: false,
     isVisible: true,

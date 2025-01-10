@@ -48,6 +48,8 @@
     }
 
     .left-icon {
+      display: flex;
+      justify-content: center;
       margin-right: 8px;
 
       svg {

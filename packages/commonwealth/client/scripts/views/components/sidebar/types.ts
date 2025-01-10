@@ -4,7 +4,7 @@ export type BaseSidebarAttrs = {
   isVisible?: boolean; // Is this section shown as an option
   onClick?: any;
   onhover?: () => void;
-  rightIcon?: React.ReactNode;
+  leftIcon?: React.ReactNode;
   title?: string;
   className?: string;
 };
