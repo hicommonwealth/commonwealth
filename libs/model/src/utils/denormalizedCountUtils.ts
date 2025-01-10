@@ -30,7 +30,7 @@ export const incrementProfileCount = async (
 export const decrementProfileCount = async (
   community_id: string,
   user_id: number,
-  transaction: Transaction,
+  transaction?: Transaction,
 ) => {
   await models.sequelize.query(
     `

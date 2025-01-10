@@ -1,6 +1,10 @@
 import { trpc } from '@hicommonwealth/adapters';
 import { command } from '@hicommonwealth/core';
-import { Community, models } from '@hicommonwealth/model';
+import {
+  Community,
+  decrementProfileCount,
+  models,
+} from '@hicommonwealth/model';
 import {
   MixpanelCommunityCreationEvent,
   MixpanelCommunityInteractionEvent,
@@ -116,6 +120,20 @@ export const trpcRouter = trpc.router({
     trpc.Tag.Community,
   ),
   deleteGroup: trpc.command(Community.DeleteGroup, trpc.Tag.Community),
+  deleteAddress: trpc.command(Community.DeleteAddress, trpc.Tag.Community, [
+    trpc.fireAndForget(async (_, output, ctx) => {
+      await decrementProfileCount(output.community_id, ctx.actor.user.id!);
+    }),
+  ]),
+  deleteAllAddresses: trpc.command(
+    Community.DeleteAllAddresses,
+    trpc.Tag.Community,
+    [
+      trpc.fireAndForget(async (_, output, ctx) => {
+        await decrementProfileCount(output.community_id, ctx.actor.user.id!);
+      }),
+    ],
+  ),
   deleteCommunity: trpc.command(Community.DeleteCommunity, trpc.Tag.Community),
   refreshCommunityMemberships: trpc.command(
     Community.RefreshCommunityMemberships,

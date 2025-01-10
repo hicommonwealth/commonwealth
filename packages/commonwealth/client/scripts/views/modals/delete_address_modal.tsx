@@ -1,13 +1,10 @@
 import React from 'react';
 
-import axios from 'axios';
 import { formatAddressShort } from 'client/scripts/helpers';
-import { SERVER_URL } from 'state/api/config';
-import useUserStore from 'state/ui/user';
 import {
-  notifyError,
-  notifySuccess,
-} from '../../controllers/app/notifications';
+  useDeleteAddressMutation,
+  useDeleteAllAddressesMutation,
+} from 'client/scripts/state/api/communities/deleteAddress';
 import AddressInfo from '../../models/AddressInfo';
 import { CWText } from '../components/component_kit/cw_text';
 import { CWButton } from '../components/component_kit/new_designs/CWButton';
@@ -36,47 +33,17 @@ export const DeleteAddressModal = ({
   communityName,
   isLastCommunityAddress = false,
 }: DeleteAddressModalAttrs) => {
-  const user = useUserStore();
+  const { mutate: deleteAddress } = useDeleteAddressMutation();
+  const { mutate: deleteAllAddresses } = useDeleteAllAddressesMutation();
 
   const onDeleteAddress = async () => {
-    try {
-      const payload = { address: address?.address, chain, jwt: user.jwt };
-
-      const endpoint = isBulkDelete
-        ? `${SERVER_URL}/deleteAllAddresses`
-        : `${SERVER_URL}/deleteAddress`;
-
-      const response = await axios.post(endpoint, payload);
-
-      if (response?.data.status === 'Success') {
-        const updatedAddresses = [...user.addresses].filter(
-          (a) =>
-            !(
-              a.addressId === address.addressId &&
-              a.community?.id === address.community?.id
-            ),
-        );
-        const updatedAccounts = user.accounts.filter(
-          (a) => !(a.address === address.address && a.community.id === chain),
-        );
-        const remainingJoinedCommunities = updatedAddresses.map(
-          (a) => a.community.id,
-        );
-        user.setData({
-          addresses: updatedAddresses,
-          communities: [...user.communities].filter((c) =>
-            remainingJoinedCommunities.includes(c.id),
-          ),
-          accounts: updatedAccounts,
-          ...(user.accounts.length === 1 && { activeAccount: null }),
-        });
-
-        notifySuccess('Address has been successfully removed.');
-      }
-    } catch (err) {
-      notifyError(err.response.data.error);
-    }
-
+    if (isBulkDelete)
+      await deleteAllAddresses({
+        community_id: chain,
+        address: address?.address,
+      });
+    else
+      await deleteAddress({ community_id: chain, address: address?.address });
     closeModal();
   };
 
