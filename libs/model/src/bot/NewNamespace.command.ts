@@ -38,7 +38,7 @@ export function NewNamespace(): Command<typeof schemas.CreateBotNamespace> {
         name,
         admin_address,
         admin_address,
-        node?.private_url!,
+        node.private_url!,
         config.WEB3.CONTEST_BOT_PRIVATE_KEY,
       );
 

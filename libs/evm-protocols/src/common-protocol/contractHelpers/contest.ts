@@ -324,6 +324,7 @@ export const addContentBatch = async ({
   contest: string[];
   creator: string;
   url: string;
+  // eslint-disable-next-line @typescript-eslint/require-await
 }): Promise<PromiseSettledResult<AddContentResponse>[]> => {
   return nonceMutex.runExclusive(async () => {
     const web3 = createPrivateEvmClient({ rpc, privateKey });
@@ -357,6 +358,7 @@ export const voteContentBatch = async ({
     contestAddress: string;
     contentId: string;
   }[];
+  // eslint-disable-next-line @typescript-eslint/require-await
 }) => {
   return nonceMutex.runExclusive(async () => {
     const web3 = createPrivateEvmClient({ rpc, privateKey });
@@ -399,6 +401,7 @@ export const rollOverContest = async ({
   rpc: string;
   contest: string;
   oneOff: boolean;
+  // eslint-disable-next-line @typescript-eslint/require-await
 }): Promise<boolean> => {
   return nonceMutex.runExclusive(async () => {
     const web3 = createPrivateEvmClient({ rpc, privateKey });
