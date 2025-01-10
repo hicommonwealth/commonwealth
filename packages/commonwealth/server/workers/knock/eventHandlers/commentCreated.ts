@@ -171,6 +171,7 @@ export const processCommentCreated: EventHandler<
       id: `webhook-${w.id}`,
       webhook_url: w.url,
       destination: w.destination,
+      signing_key: w.signing_key,
     })),
     data: {
       sender_username: 'Common',

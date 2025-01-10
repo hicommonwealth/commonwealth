@@ -11,6 +11,7 @@ import {
   getElizaUserId,
   getWebhookDestination,
 } from '@hicommonwealth/shared';
+import { randomBytes } from 'crypto';
 import fetch from 'node-fetch';
 import { z } from 'zod';
 import { models } from '../database';
@@ -24,7 +25,7 @@ const Errors = {
     'https://hooks.slack.com/services/*, https://hooks.zapier.com/hooks/*, https://discord.com/api/webhooks/*, https://*/eliza/[user-id]',
   WebhookExists: 'The provided webhook already exists for this community',
   MissingChannelIdTelegram: 'The Telegram url is missing a channel id',
-  WebhookNotFound: 'The Webhook does not exist',
+  WebhookNotFound: 'The Webhook endpoint was not found (404 Not Found)',
   UnauthorizedWebhooks: 'Cannot make requests to unauthorized webhooks',
   ElizaUserNotFound: 'Eliza user not found',
   ElizaAddressNotFound: 'Eliza address not found',
@@ -101,6 +102,7 @@ export function CreateWebhook(): Command<typeof schemas.CreateWebhook> {
         url: payload.webhookUrl,
         destination,
         events,
+        signing_key: randomBytes(32).toString('hex'),
       });
 
       return webhook.get({ plain: true });
