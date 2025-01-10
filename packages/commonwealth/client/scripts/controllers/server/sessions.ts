@@ -104,9 +104,13 @@ function getDidForCurrentAddress(
 }
 
 async function getClockFromAPI(): Promise<[number, string[]]> {
-  const response = await axios.get(`${SERVER_URL}/getCanvasClock`);
-  const { clock, heads: parents } = response.data.result;
-  return [clock, parents];
+  try {
+    const response = await axios.get(`${SERVER_URL}/getCanvasClock`);
+    const { clock, heads: parents } = response.data.result;
+    return [clock, parents];
+  } catch (err) {
+    return [1, []];
+  }
 }
 
 // Public signer methods
