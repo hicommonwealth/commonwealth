@@ -44,8 +44,8 @@ export function LaunchToken(): Command<typeof schemas.LaunchToken> {
         symbol,
         [],
         [],
-        web3.utils.toWei(totalSupply.toString(), 'ether'),
-        web3.eth.defaultAccount,
+        web3.utils.toWei(totalSupply.toString(), 'ether') as string,
+        web3.eth.defaultAccount as string,
         830000,
         cp.factoryContracts[chain_id as cp.ValidChains.SepoliaBase]
           .tokenCommunityManager,
