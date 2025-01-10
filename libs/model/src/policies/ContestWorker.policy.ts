@@ -1,12 +1,14 @@
-import { Actor, logger, Policy } from '@hicommonwealth/core';
+import { Actor, logger, Policy, ServerError } from '@hicommonwealth/core';
+import {
+  createPrivateEvmClient,
+  rollOverContest,
+} from '@hicommonwealth/evm-protocols';
 import { events } from '@hicommonwealth/schemas';
 import { NeynarAPIClient } from '@neynar/nodejs-sdk';
 import moment from 'moment';
 import { QueryTypes } from 'sequelize';
-import Web3 from 'web3';
 import { config, Contest, models } from '..';
 import { GetActiveContestManagers } from '../contest';
-import { rollOverContest } from '../services/commonProtocol/contestHelper';
 import { buildThreadContentUrl, getChainNodeUrl } from '../utils';
 import {
   createOnchainContestContent,
@@ -63,44 +65,37 @@ export function ContestWorker(): Policy<typeof inputs> {
           content_id: number;
         }>(
           `
-            SELECT cn.private_url, cn.url, cm.contest_address, added.content_id
-            FROM "Communities" c
-            JOIN "ChainNodes" cn ON c.chain_node_id = cn.id
-            JOIN "ContestManagers" cm ON cm.community_id = c.id
-            JOIN "Contests" co ON cm.contest_address = co.contest_address
-              AND co.contest_id = (
-                SELECT MAX(contest_id) AS max_id
-                FROM "Contests" c1
-                WHERE c1.contest_address = cm.contest_address
-              )
-            JOIN "ContestActions" added on co.contest_address = added.contest_address
-              AND added.content_url = :content_url
-              AND added.action = 'added'
-            WHERE cm.topic_id = :topic_id
-            AND cm.community_id = :community_id
-            AND cm.cancelled = false
-            AND (
-              cm.interval = 0 AND NOW() < co.end_time
-              OR
-              cm.interval > 0
-            )
-          -- content cannot be a winner in a previous contest
-          AND NOT EXISTS (
-            WITH max_contest AS (
-              SELECT MAX(contest_id) AS max_id
-              FROM "Contests" c1
-              WHERE c1.contest_address = cm.contest_address
-            )
-            SELECT c2.score
-            FROM "Contests" c2,
-                jsonb_array_elements(c2.score) AS score_result
-            WHERE
-                c2.contest_address = cm.contest_address AND
-                (score_result->>'content_id')::int = added.content_id::int AND
-                (score_result->>'prize')::float > 0 AND
-                c2.contest_id != (SELECT max_id FROM max_contest)
-          )
-        `,
+              SELECT cn.private_url, cn.url, cm.contest_address, added.content_id
+              FROM "Communities" c
+                       JOIN "ChainNodes" cn ON c.chain_node_id = cn.id
+                       JOIN "ContestManagers" cm ON cm.community_id = c.id
+                       JOIN "Contests" co ON cm.contest_address = co.contest_address
+                  AND co.contest_id = (SELECT MAX(contest_id) AS max_id
+                                       FROM "Contests" c1
+                                       WHERE c1.contest_address = cm.contest_address)
+                       JOIN "ContestActions" added on co.contest_address = added.contest_address
+                  AND added.content_url = :content_url
+                  AND added.action = 'added'
+              WHERE cm.topic_id = :topic_id
+                AND cm.community_id = :community_id
+                AND cm.cancelled = false
+                AND (
+                  cm.interval = 0 AND NOW() < co.end_time
+                      OR
+                  cm.interval > 0
+                  )
+                -- content cannot be a winner in a previous contest
+                AND NOT EXISTS (WITH max_contest AS (SELECT MAX(contest_id) AS max_id
+                                                     FROM "Contests" c1
+                                                     WHERE c1.contest_address = cm.contest_address)
+                                SELECT c2.score
+                                FROM "Contests" c2,
+                                     jsonb_array_elements(c2.score) AS score_result
+                                WHERE c2.contest_address = cm.contest_address
+                                  AND (score_result ->> 'content_id')::int = added.content_id::int
+                                  AND (score_result ->> 'prize')::float > 0
+                                  AND c2.contest_id != (SELECT max_id FROM max_contest))
+          `,
           {
             type: QueryTypes.SELECT,
             replacements: {
@@ -152,12 +147,9 @@ export function ContestWorker(): Policy<typeof inputs> {
   };
 }
 
-const getPrivateWalletAddress = () => {
-  const web3 = new Web3();
-  const privateKey = config.WEB3.PRIVATE_KEY;
-  const account = web3.eth.accounts.privateKeyToAccount(privateKey);
-  const publicAddress = account.address;
-  return publicAddress;
+const getPrivateWalletAddress = (): string => {
+  const web3 = createPrivateEvmClient({ privateKey: config.WEB3.PRIVATE_KEY });
+  return web3.eth.defaultAccount!;
 };
 
 const checkContests = async () => {
@@ -216,30 +208,30 @@ const rolloverContests = async () => {
     neynar_webhook_id?: string;
   }>(
     `
-            SELECT cm.contest_address,
-                   cm.interval,
-                   cm.ended,
-                   cm.neynar_webhook_id,
-                   co.end_time,
-                   cn.private_url,
-                   cn.url
-            FROM "ContestManagers" cm
-                     JOIN (SELECT *
-                           FROM "Contests"
-                           WHERE (contest_address, contest_id) IN (SELECT contest_address, MAX(contest_id) AS contest_id
-                                                                   FROM "Contests"
-                                                                   GROUP BY contest_address)) co
-                          ON co.contest_address = cm.contest_address
-                              AND (
-                                 (cm.interval = 0 AND cm.ended IS NOT TRUE)
-                                     OR
-                                 cm.interval > 0
-                                 )
-                              AND NOW() > co.end_time
-                              AND cm.cancelled IS NOT TRUE
-                     JOIN "Communities" cu ON cm.community_id = cu.id
-                     JOIN "ChainNodes" cn ON cu.chain_node_id = cn.id;
-        `,
+        SELECT cm.contest_address,
+               cm.interval,
+               cm.ended,
+               cm.neynar_webhook_id,
+               co.end_time,
+               cn.private_url,
+               cn.url
+        FROM "ContestManagers" cm
+                 JOIN (SELECT *
+                       FROM "Contests"
+                       WHERE (contest_address, contest_id) IN (SELECT contest_address, MAX(contest_id) AS contest_id
+                                                               FROM "Contests"
+                                                               GROUP BY contest_address)) co
+                      ON co.contest_address = cm.contest_address
+                          AND (
+                             (cm.interval = 0 AND cm.ended IS NOT TRUE)
+                                 OR
+                             cm.interval > 0
+                             )
+                          AND NOW() > co.end_time
+                          AND cm.cancelled IS NOT TRUE
+                 JOIN "Communities" cu ON cm.community_id = cu.id
+                 JOIN "ChainNodes" cn ON cu.chain_node_id = cn.id;
+    `,
     {
       type: QueryTypes.SELECT,
       raw: true,
@@ -272,11 +264,15 @@ const rolloverContests = async () => {
         );
       }
 
-      await rollOverContest(
-        getChainNodeUrl({ url, private_url }),
-        contest_address,
-        interval === 0,
-      );
+      if (!config.WEB3.PRIVATE_KEY)
+        throw new ServerError('WEB3 private key not set!');
+
+      await rollOverContest({
+        privateKey: config.WEB3.PRIVATE_KEY,
+        rpc: getChainNodeUrl({ url, private_url }),
+        contest: contest_address,
+        oneOff: interval === 0,
+      });
 
       // clean up neynar webhooks when farcaster contest ends
       if (neynar_webhook_id) {

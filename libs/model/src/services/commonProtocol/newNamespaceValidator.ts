@@ -2,14 +2,15 @@ import { AppError, ServerError } from '@hicommonwealth/core';
 import {
   EvmEventSignatures,
   commonProtocol,
+  decodeParameters,
+  getNamespace,
+  getTransactionReceipt,
 } from '@hicommonwealth/evm-protocols';
 import { models } from '@hicommonwealth/model';
 import { BalanceSourceType } from '@hicommonwealth/shared';
-import Web3 from 'web3';
 import { CommunityAttributes } from '../../models';
 import { equalEvmAddresses } from '../../utils';
 import { getBalances } from '../tokenBalanceCache';
-import { getNamespace } from './contractHelpers';
 
 /**
  * Validate if an attested new namespace is valid on-chain Checks:
@@ -60,10 +61,12 @@ export const validateNamespace = async (
   if (!factoryData) {
     throw new AppError('Namespace not supported on selected chain');
   }
-  const web3 = new Web3(chainNode.private_url);
 
   //tx data validation
-  const txReceipt = await web3.eth.getTransactionReceipt(txHash);
+  const { txReceipt } = await getTransactionReceipt({
+    rpc: chainNode.private_url,
+    txHash,
+  });
   if (!txReceipt.status) {
     throw new AppError('tx failed');
   }
@@ -91,10 +94,10 @@ export const validateNamespace = async (
     return false;
   });
   if (communityNamespaceCreatedLog) {
-    const { 0: _namespaceAddress } = web3.eth.abi.decodeParameters(
-      ['address', 'address'],
-      communityNamespaceCreatedLog.data!.toString(),
-    );
+    const { 0: _namespaceAddress } = decodeParameters({
+      abiInput: ['address', 'address'],
+      data: communityNamespaceCreatedLog.data!.toString(),
+    });
     namespaceAddress = _namespaceAddress as string;
   } else {
     // default namespace deployment tx
