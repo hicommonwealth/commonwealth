@@ -317,7 +317,12 @@ type BaseNotifProviderOptions = {
 
 type WebhookProviderOptions = {
   key: WorkflowKeys.Webhooks;
-  users: { id: string; webhook_url: string; destination: string }[];
+  users: {
+    id: string;
+    webhook_url: string;
+    destination: string;
+    signing_key: string;
+  }[];
   data: z.infer<typeof WebhookNotification>;
 };
 
