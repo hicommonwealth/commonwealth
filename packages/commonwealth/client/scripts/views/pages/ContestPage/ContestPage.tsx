@@ -13,6 +13,8 @@ import { PageNotFound } from 'views/pages/404';
 import ContestCard from 'views/pages/CommunityManagement/Contests/ContestsList/ContestCard';
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
 
+import FundContestDrawer from '../CommunityManagement/Contests/FundContestDrawer';
+
 import './ContestPage.scss';
 
 export enum SortType {
@@ -39,6 +41,7 @@ const ContestPage = ({ contestAddress }: ContestPageProps) => {
   const { getContestByAddress, isContestDataLoading } = useCommunityContests();
   const contest = getContestByAddress(contestAddress);
 
+  const [fundDrawerContest, setFundDrawerContest] = useState<Contest>();
   const [selectedSort, setSelectedSort] = useState<SortType>(
     sortOptions[0].value,
   );
@@ -80,6 +83,7 @@ const ContestPage = ({ contestAddress }: ContestPageProps) => {
             showLeaderboardButton={false}
             payoutStructure={contest?.payout_structure}
             isFarcaster={contest?.is_farcaster_contest}
+            onFund={() => setFundDrawerContest(contest)}
           />
         )}
 
@@ -137,6 +141,13 @@ const ContestPage = ({ contestAddress }: ContestPageProps) => {
           )}
         </div>
       </div>
+      <FundContestDrawer
+        onClose={() => setFundDrawerContest(undefined)}
+        isOpen={!!fundDrawerContest}
+        contestAddress={fundDrawerContest?.contest_address || ''}
+        fundingTokenAddress={fundDrawerContest?.funding_token_address}
+        fundingTokenTicker={fundDrawerContest?.ticker || 'ETH'}
+      />
     </CWPageLayout>
   );
 };
