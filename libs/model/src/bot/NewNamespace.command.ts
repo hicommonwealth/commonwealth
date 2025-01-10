@@ -14,7 +14,7 @@ import {
 import { models } from '../database';
 import { mustExist } from '../middleware/guards';
 
-export function CreateContest(): Command<typeof schemas.CreateBotNamespace> {
+export function NewNamespace(): Command<typeof schemas.CreateBotNamespace> {
   return {
     ...schemas.CreateBotNamespace,
     auth: [],

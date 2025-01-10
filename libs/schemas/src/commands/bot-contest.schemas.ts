@@ -5,6 +5,7 @@ import {
 } from '@hicommonwealth/shared';
 import { z } from 'zod';
 import { Community } from '../entities';
+import { TokenView } from '../queries';
 import { checkIconSize } from '../utils';
 
 export const CreateBotContest = {
@@ -42,3 +43,15 @@ export const CreateBotNamespace = {
     namespaceAddress: z.string().optional(),
   }),
 };
+
+export const LaunchToken = z.object({
+  input: z.object({
+    name: z.string().describe('The name of the token'),
+    symbol: z.string().describe('The symbol of the token'),
+    totalSupply: z.number().describe('The total supply of the token'),
+    chain_id: z.number().describe('The chain id to create token for'),
+    icon_url: z.string().optional().describe('The icon url of the token'),
+    description: z.string().optional().describe('The description of the token'),
+  }),
+  output: TokenView,
+});
