@@ -15,7 +15,7 @@ export function UnsubscribeEmail(): Command<typeof schemas.UnsubscribeEmail> {
       mustExist('User', user);
 
       return await handleSubscriptionPreferencesUpdate({
-        userIdentifier: user.id as number,
+        userIdentifier: user.id!,
         payload,
       });
     },
