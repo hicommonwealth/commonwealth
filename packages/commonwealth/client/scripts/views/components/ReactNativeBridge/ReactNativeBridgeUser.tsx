@@ -62,11 +62,11 @@ export const ReactNativeBridgeUser = () => {
 
   const handleMessage = useCallback((message: MessageEvent) => {
     const obj = messageToObject(message.data);
-    if (obj && typeof message.data === 'object') {
-      if (isAuthRequest(obj)) {
-        console.log('Handling auth request from react-native: ', obj);
-        handleSocialLoginCallback({ bearer: obj.bearer }).catch(console.error);
-      }
+    if (obj && isAuthRequest(obj)) {
+      console.log('Handling auth request from react-native: ', obj);
+      handleSocialLoginCallback({ bearer: obj.bearer }).catch(console.error);
+    } else {
+      console.warn('Unable to handle message: ', obj);
     }
   }, []);
 
