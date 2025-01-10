@@ -36,23 +36,15 @@ export const DeleteAddressModal = ({
   const { mutate: deleteAddress } = useDeleteAddressMutation();
   const { mutate: deleteAllAddresses } = useDeleteAllAddressesMutation();
 
-  const onDeleteAddress = async () => {
+  const handleDelete = (e: React.MouseEvent) => {
+    e.preventDefault();
     if (isBulkDelete)
-      await deleteAllAddresses({
+      deleteAllAddresses({
         community_id: chain,
         address: address?.address,
       });
-    else
-      await deleteAddress({ community_id: chain, address: address?.address });
+    else deleteAddress({ community_id: chain, address: address?.address });
     closeModal();
-  };
-
-  const handleDelete = (e: React.MouseEvent) => {
-    e.preventDefault();
-
-    onDeleteAddress()
-      .then(() => undefined)
-      .catch(console.error);
   };
 
   return (
