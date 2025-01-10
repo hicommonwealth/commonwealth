@@ -1,17 +1,9 @@
-import {
-  commonProtocol,
-  contestAbi,
-  erc20Abi,
-} from '@hicommonwealth/evm-protocols';
 import { ZERO_ADDRESS } from '@hicommonwealth/shared';
 import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
+import { erc20Abi } from '../../abis/erc20Abi';
+import { singleContestAbi } from '../../abis/singleContestAbi';
 import { Denominations, WeiDecimals } from '../utils';
-
-export type TokenAttributes = {
-  ticker: string | commonProtocol.Denominations;
-  decimals: number;
-};
 
 /**
  * Gets token ticker and decimal places to wei
@@ -23,11 +15,14 @@ export const getTokenAttributes = async (
   address: string,
   rpcNodeUrl: string,
   fetchFromContest: boolean,
-): Promise<TokenAttributes> => {
+): Promise<{
+  ticker: string | Denominations;
+  decimals: number;
+}> => {
   const web3 = new Web3(rpcNodeUrl);
   let addr = address;
   if (fetchFromContest) {
-    const contest = new web3.eth.Contract(contestAbi as AbiItem[], address);
+    const contest = new web3.eth.Contract(singleContestAbi, address);
     addr = await contest.methods.contestToken().call();
   }
   if (addr === ZERO_ADDRESS) {
