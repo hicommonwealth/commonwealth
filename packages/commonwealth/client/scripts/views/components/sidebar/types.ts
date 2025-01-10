@@ -5,6 +5,7 @@ export type BaseSidebarAttrs = {
   onClick?: any;
   onhover?: () => void;
   leftIcon?: React.ReactNode;
+  rightIcon?: React.ReactNode;
   title?: string;
   className?: string;
 };
