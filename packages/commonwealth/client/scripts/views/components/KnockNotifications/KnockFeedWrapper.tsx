@@ -33,7 +33,8 @@ export const KnockFeedWrapper = ({ children }: KnockFeedWrapperProps) => {
       const timezone = getBrowserTimezone();
 
       try {
-        await knock.authenticate(`${user.id}`, user.knockJWT);
+        // eslint-disable-next-line @typescript-eslint/await-thenable
+        knock.authenticate(`${user.id}`, user.knockJWT);
         await knock.user.identify({
           id: user.id,
           email: user.email,
