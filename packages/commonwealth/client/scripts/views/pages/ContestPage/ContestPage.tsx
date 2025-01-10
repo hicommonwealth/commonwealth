@@ -41,7 +41,9 @@ const ContestPage = ({ contestAddress }: ContestPageProps) => {
   const { getContestByAddress, isContestDataLoading } = useCommunityContests();
   const contest = getContestByAddress(contestAddress);
 
-  const [fundDrawerContest, setFundDrawerContest] = useState<Contest>();
+  const [fundDrawerContest, setFundDrawerContest] = useState<
+    typeof contest | null
+  >();
   const [selectedSort, setSelectedSort] = useState<SortType>(
     sortOptions[0].value,
   );
@@ -145,7 +147,7 @@ const ContestPage = ({ contestAddress }: ContestPageProps) => {
         onClose={() => setFundDrawerContest(undefined)}
         isOpen={!!fundDrawerContest}
         contestAddress={fundDrawerContest?.contest_address || ''}
-        fundingTokenAddress={fundDrawerContest?.funding_token_address}
+        fundingTokenAddress={fundDrawerContest?.funding_token_address || ''}
         fundingTokenTicker={fundDrawerContest?.ticker || 'ETH'}
       />
     </CWPageLayout>
