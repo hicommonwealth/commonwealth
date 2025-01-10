@@ -44,7 +44,7 @@ export const CreateBotNamespace = {
   }),
 };
 
-export const LaunchToken = z.object({
+export const LaunchToken = {
   input: z.object({
     name: z.string().describe('The name of the token'),
     symbol: z.string().describe('The symbol of the token'),
@@ -54,4 +54,4 @@ export const LaunchToken = z.object({
     description: z.string().optional().describe('The description of the token'),
   }),
   output: TokenView,
-});
+};

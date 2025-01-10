@@ -34,7 +34,7 @@ export function LaunchToken(): Command<typeof schemas.LaunchToken> {
         rpc: chainNode.private_url!,
         privateKey: config.WEB3.CONTEST_BOT_PRIVATE_KEY,
       });
-      const launchpadContract = web3.eth.Contract(
+      const launchpadContract = new web3.eth.Contract(
         launchpadFactoryAbi,
         cp.factoryContracts[chain_id as cp.ValidChains.SepoliaBase].launchpad,
       );
@@ -44,7 +44,7 @@ export function LaunchToken(): Command<typeof schemas.LaunchToken> {
         symbol,
         [],
         [],
-        totalSupply,
+        web3.utils.toWei(totalSupply.toString(), 'ether'),
         web3.eth.defaultAccount,
         830000,
         cp.factoryContracts[chain_id as cp.ValidChains.SepoliaBase]
