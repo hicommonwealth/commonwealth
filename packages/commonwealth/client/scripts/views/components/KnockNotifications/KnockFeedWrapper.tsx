@@ -33,7 +33,7 @@ export const KnockFeedWrapper = ({ children }: KnockFeedWrapperProps) => {
       const timezone = getBrowserTimezone();
 
       try {
-        knock.authenticate(`${user.id}`, user.knockJWT);
+        await knock.authenticate(`${user.id}`, user.knockJWT);
         await knock.user.identify({
           id: user.id,
           email: user.email,
@@ -45,7 +45,9 @@ export const KnockFeedWrapper = ({ children }: KnockFeedWrapperProps) => {
       }
     };
 
-    initializeKnock();
+    initializeKnock().catch((error) => {
+      console.error('Error during Knock initialization:', error);
+    });
 
     return () => knock.teardown();
   }, [user.id, user.email, user.isLoggedIn, user.knockJWT]);
