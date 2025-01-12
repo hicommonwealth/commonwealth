@@ -31,6 +31,9 @@ export const SidebarQuickSwitcher = ({
   const pathname = location.pathname;
   const communityId = pathname.split('/')[1];
 
+  const starredCommunities = user.communities.filter((x) => x.isStarred);
+  const unstarredCommunities = user.communities.filter((x) => !x.isStarred);
+
   return (
     <div
       className={clsx('SidebarQuickSwitcher', { onMobile, isInsideCommunity })}
@@ -71,14 +74,12 @@ export const SidebarQuickSwitcher = ({
         )}
       </div>
       <CWDivider />
-      {user.communities.filter((x) => x.isStarred).length !== 0 && (
-        <div className="scrollable-community-bar">
-          {user.communities
-            .filter((x) => x.isStarred)
-            .map((community) => (
+      <div className="scrollable-community-bar">
+        {starredCommunities.length > 0 && (
+          <>
+            {starredCommunities.map((community) => (
               <div className="community-avatar-container" key={community.id}>
                 <CWCommunityAvatar
-                  key={community.id}
                   size="large"
                   selectedCommunity={communityId}
                   community={{
@@ -99,16 +100,16 @@ export const SidebarQuickSwitcher = ({
                 />
               </div>
             ))}
+          </>
+        )}
+        <div className="seprator">
+          {user.communities.filter((x) => x.isStarred).length !== 0 && (
+            <CWDivider />
+          )}
         </div>
-      )}
-      {user.communities.filter((x) => x.isStarred).length !== 0 && (
-        <CWDivider />
-      )}
-      <div className="scrollable-community-bar">
-        {user.communities.map((community) => (
+        {unstarredCommunities.map((community) => (
           <div className="community-avatar-container" key={community.id}>
             <CWCommunityAvatar
-              key={community.id}
               size="large"
               selectedCommunity={communityId}
               community={{
@@ -117,7 +118,11 @@ export const SidebarQuickSwitcher = ({
                 name: community.name,
               }}
               onClick={() =>
-                navigateToCommunity({ navigate, path: '', chain: community.id })
+                navigateToCommunity({
+                  navigate,
+                  path: '',
+                  chain: community.id,
+                })
               }
             />
             <SideBarNotificationIcon

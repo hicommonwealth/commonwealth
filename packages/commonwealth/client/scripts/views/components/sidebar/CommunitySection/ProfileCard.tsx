@@ -5,6 +5,11 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import './ProfileCard.scss';
 
+enum ImageBehavior {
+  Cover = 'cover',
+  Fill = 'fill',
+}
+
 const ProfileCard = () => {
   const userData = useUserStore();
 
@@ -14,10 +19,12 @@ const ProfileCard = () => {
 
   const backgroundImageUrl = data?.profile?.background_image?.url || '';
   const backgroundBehavior =
-    data?.profile?.background_image?.imageBehavior || 'cover';
+    data?.profile?.background_image?.imageBehavior || ImageBehavior.Fill;
+
+  if (!data) return null;
 
   return (
-    <div className="profile-card">
+    <div className="ProfileCard">
       <Link to={`/profile/id/${userData.id}`} className="user-info">
         <div
           className={clsx('background-cover', {

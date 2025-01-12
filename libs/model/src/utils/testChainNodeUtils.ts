@@ -35,6 +35,8 @@ export function createTestRpc(
       return buildChainNodeUrl('https://bnb-mainnet.g.alchemy.com/v2/', scope);
     case cp.ValidChains.SKALE_TEST:
       return 'https://testnet.skalenodes.com/v1/giant-half-dual-testnet';
+    case cp.ValidChains.Anvil:
+      return 'http://localhost:5502';
     default:
       throw new Error(`Eth chain id ${ethChainId} not supported`);
   }

@@ -13,6 +13,7 @@ import { PageNotFound } from 'views/pages/404';
 import { CommentSubscriptions } from 'views/pages/NotificationSettings/CommentSubscriptions';
 import { CommunityEntry } from 'views/pages/NotificationSettings/CommunityEntry';
 import { PushNotificationsToggle } from 'views/pages/NotificationSettings/PushNotificationsToggle';
+import { ReactNativeAboutSection } from 'views/pages/NotificationSettings/ReactNativeAboutSection';
 import { ThreadSubscriptions } from 'views/pages/NotificationSettings/ThreadSubscriptions';
 import { useSupportsPushNotifications } from 'views/pages/NotificationSettings/useSupportsPushNotifications';
 import { useThreadSubscriptions } from 'views/pages/NotificationSettings/useThreadSubscriptions';
@@ -174,6 +175,7 @@ const NotificationSettings = () => {
           </>
         )}
       </div>
+      <ReactNativeAboutSection />
     </CWPageLayout>
   );
 };

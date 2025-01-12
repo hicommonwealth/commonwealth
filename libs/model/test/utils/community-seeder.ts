@@ -1,6 +1,6 @@
 import { Actor } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
-import { ChainBase } from '@hicommonwealth/shared';
+import { ChainBase, WalletId } from '@hicommonwealth/shared';
 import { z } from 'zod';
 import { seed, seedRecord } from '../../src/tester';
 import { getSignersInfo } from './canvas-signers';
@@ -8,6 +8,9 @@ import { getSignersInfo } from './canvas-signers';
 export type CommunitySeedOptions = {
   roles: Array<'admin' | 'member' | 'nonmember' | 'banned' | 'rejected'>;
   chain_node?: Partial<z.infer<typeof schemas.ChainNode>>;
+  chain_base?: ChainBase;
+  bech32_prefix?: string;
+  ss58_prefix?: number;
   groups?: {
     id: number;
     permissions: schemas.PermissionEnum[];
@@ -28,6 +31,9 @@ export type CommunitySeedOptions = {
 export async function seedCommunity({
   roles,
   chain_node = { eth_chain_id: 1 },
+  chain_base = ChainBase.Ethereum,
+  bech32_prefix = undefined,
+  ss58_prefix = undefined,
   groups = [],
   custom_stages,
   namespace_address,
@@ -48,12 +54,15 @@ export async function seedCommunity({
     profile: { name: role },
     isAdmin: role === 'admin',
     is_welcome_onboard_flow_complete: false,
+    referral_count: 0,
+    referral_eth_earnings: 0,
+    xp_points: 0,
   }));
 
-  // seed ethereum base community
+  // seed base community
   const [base] = await seed('Community', {
     chain_node_id: node!.id!,
-    base: ChainBase.Ethereum,
+    base: chain_base,
     active: true,
     lifetime_thread_count: 0,
     profile_count: 1,
@@ -64,13 +73,16 @@ export async function seedCommunity({
         role: role === 'admin' ? 'admin' : 'member',
         is_banned: role === 'banned',
         verified: new Date(),
+        wallet_id: WalletId.Metamask,
       };
     }),
   });
 
   const [community] = await seed('Community', {
     chain_node_id: node!.id!,
-    base: ChainBase.Ethereum,
+    base: chain_base,
+    bech32_prefix,
+    ss58_prefix,
     namespace_address,
     active: true,
     profile_count: 1,
@@ -81,6 +93,7 @@ export async function seedCommunity({
         role: role === 'admin' ? 'admin' : 'member',
         is_banned: role === 'banned',
         verified: new Date(),
+        wallet_id: WalletId.Metamask,
       };
     }),
     groups: groups.map(({ id }) => ({ id })),

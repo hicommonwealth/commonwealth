@@ -26,6 +26,7 @@ export default (
         allowNull: false,
         defaultValue: [],
       },
+      signing_key: { type: Sequelize.STRING, allowNull: false },
     },
     {
       tableName: 'Webhooks',

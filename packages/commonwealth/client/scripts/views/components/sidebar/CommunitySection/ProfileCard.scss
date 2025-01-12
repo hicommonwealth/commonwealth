@@ -1,9 +1,11 @@
-.profile-card {
+@import '../../../../styles/shared.scss';
+
+.ProfileCard {
   width: 100%;
   height: 160px;
   border-radius: 16px;
   text-align: center;
-  background: #fff;
+  background: $white;
   padding: 16px;
 
   .background-cover {
@@ -25,7 +27,7 @@
   .profile-content {
     position: relative;
     padding: 10px;
-    background: #fff;
+    background: $white;
 
     .user-info {
       text-decoration: none;
@@ -38,7 +40,7 @@
       width: 65px;
       height: 65px;
       border-radius: 50%;
-      border: 4px solid #fff;
+      border: 4px solid $white;
       position: absolute;
       top: -40px;
       left: 50%;
@@ -50,6 +52,10 @@
       font-size: 18px;
       font-weight: bold;
       color: #333;
+
+      &:hover {
+        color: $neutral-600;
+      }
     }
   }
 }

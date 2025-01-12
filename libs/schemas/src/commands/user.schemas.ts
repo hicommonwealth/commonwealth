@@ -1,5 +1,37 @@
+import { ChainBase, WalletId } from '@hicommonwealth/shared';
 import { z } from 'zod';
-import { User } from '../entities';
+import { AuthContext } from '../context';
+import { Address, User } from '../entities';
+
+export const SignIn = {
+  input: z.object({
+    address: z.string(),
+    community_id: z.string(),
+    wallet_id: z.nativeEnum(WalletId),
+    session: z.string(),
+    block_info: z.string().nullish(),
+    referrer_address: z.string().optional(),
+  }),
+  output: Address.extend({
+    community_base: z.nativeEnum(ChainBase),
+    community_ss58_prefix: z.number().nullish(),
+    was_signed_in: z.boolean().describe('True when user was already signed in'),
+    user_created: z
+      .boolean()
+      .describe(
+        'True when a user is newly created for this address, equivalent to signing up',
+      ),
+    address_created: z
+      .boolean()
+      .describe(
+        'True when address is newly created, equivalent to joining a community',
+      ),
+    first_community: z
+      .boolean()
+      .describe('True when address joins the first community'),
+  }),
+  context: AuthContext,
+};
 
 export const UpdateUser = {
   input: User.omit({ is_welcome_onboard_flow_complete: true }).extend({

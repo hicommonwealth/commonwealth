@@ -1,11 +1,15 @@
 import { logger } from '@hicommonwealth/core';
-import { commonProtocol as cp } from '@hicommonwealth/evm-protocols';
+import {
+  commonProtocol as cp,
+  getBlock,
+  getLaunchpadToken,
+  transferLaunchpadLiquidityToUniswap,
+} from '@hicommonwealth/evm-protocols';
+import { config } from '@hicommonwealth/model';
 import { chainEvents, events } from '@hicommonwealth/schemas';
 import { BigNumber } from 'ethers';
-import Web3 from 'web3';
 import { z } from 'zod';
 import { models } from '../database';
-import { commonProtocol } from '../services';
 import { chainNodeMustExist } from './utils';
 
 const log = logger(import.meta);
@@ -25,7 +29,7 @@ export async function handleLaunchpadTrade(
 
   const token = await models.LaunchpadToken.findOne({
     where: {
-      token_address: tokenAddress,
+      token_address: tokenAddress.toLowerCase(),
     },
   });
 
@@ -35,18 +39,17 @@ export async function handleLaunchpadTrade(
 
   const chainNode = await chainNodeMustExist(event.eventSource.ethChainId);
 
-  const trade = await models.LaunchpadTrade.findOne({
+  const { block } = await getBlock({
+    rpc: chainNode.private_url! || chainNode.url!,
+    blockHash: event.rawLog.blockHash,
+  });
+
+  await models.LaunchpadTrade.findOrCreate({
     where: {
       eth_chain_id: chainNode.eth_chain_id!,
       transaction_hash: event.rawLog.transactionHash,
     },
-  });
-
-  if (!trade) {
-    const web3 = new Web3(chainNode.private_url! || chainNode.url!);
-    const block = await web3.eth.getBlock(event.rawLog.blockHash);
-
-    await models.LaunchpadTrade.create({
+    defaults: {
       eth_chain_id: chainNode.eth_chain_id!,
       transaction_hash: event.rawLog.transactionHash,
       token_address: tokenAddress.toLowerCase(),
@@ -60,13 +63,13 @@ export async function handleLaunchpadTrade(
         ) / 1e18,
       floating_supply: BigNumber.from(floatingSupply).toBigInt(),
       timestamp: Number(block.timestamp),
-    });
-  }
+    },
+  });
 
   const contracts =
     cp.factoryContracts[chainNode!.eth_chain_id as cp.ValidChains];
   let lpBondingCurveAddress: string;
-  if ('lpBondingCurve' in contracts) {
+  if (contracts && 'lpBondingCurve' in contracts) {
     lpBondingCurveAddress = contracts.lpBondingCurve;
   } else {
     log.error('No lpBondingCurve address found for chain', undefined, {
@@ -80,17 +83,18 @@ export async function handleLaunchpadTrade(
     BigNumber.from(floatingSupply).toBigInt() ===
       BigInt(token.launchpad_liquidity)
   ) {
-    const onChainTokenData = await commonProtocol.launchpadHelpers.getToken({
+    const onChainTokenData = await getLaunchpadToken({
       rpc: chainNode.private_url!,
       tokenAddress,
       lpBondingCurveAddress,
     });
 
     if (!onChainTokenData.funded) {
-      await commonProtocol.launchpadHelpers.transferLiquidityToUniswap({
+      await transferLaunchpadLiquidityToUniswap({
         rpc: chainNode.private_url!,
         tokenAddress,
         lpBondingCurveAddress,
+        privateKey: config.WEB3.PRIVATE_KEY,
       });
     }
 

@@ -4,16 +4,22 @@ import {
   ChildContractNames,
   EvmEventSignatures,
   commonProtocol as cp,
+  getContestScore,
+  getContestStatus,
+  getTokenAttributes,
 } from '@hicommonwealth/evm-protocols';
 import { config } from '@hicommonwealth/model';
 import { ContestScore, events } from '@hicommonwealth/schemas';
-import { buildContestLeaderboardUrl, getBaseUrl } from '@hicommonwealth/shared';
+import {
+  CONTEST_FEE_PERCENT,
+  buildContestLeaderboardUrl,
+  getBaseUrl,
+} from '@hicommonwealth/shared';
 import { QueryTypes } from 'sequelize';
 import { z } from 'zod';
 import { models } from '../database';
 import { mustExist } from '../middleware/guards';
 import { EvmEventSourceAttributes } from '../models';
-import * as protocol from '../services/commonProtocol';
 import { getWeightedNumTokens } from '../services/stakeHelper';
 import {
   decodeThreadContentUrl,
@@ -75,14 +81,13 @@ async function updateOrCreateWithAlert(
     return;
   }
 
-  const { ticker, decimals } =
-    await protocol.contractHelpers.getTokenAttributes(
-      contest_address,
-      url,
-      true,
-    );
+  const { ticker, decimals } = await getTokenAttributes(
+    contest_address,
+    url,
+    true,
+  );
 
-  const { startTime, endTime } = await protocol.contestHelper.getContestStatus(
+  const { startTime, endTime } = await getContestStatus(
     url,
     contest_address,
     isOneOff,
@@ -223,17 +228,17 @@ export async function updateScore(contest_address: string, contest_id: number) {
         `Chain node url not found on contest ${contest_address}`,
       );
 
-    const { scores, contestBalance } =
-      await protocol.contestHelper.getContestScore(
-        details.url,
-        contest_address,
-        undefined,
-        oneOff,
-      );
+    const { scores, contestBalance } = await getContestScore(
+      details.url,
+      contest_address,
+      undefined,
+      oneOff,
+    );
 
-    const prizePool = BigNumber.from(contestBalance)
+    let prizePool = BigNumber.from(contestBalance)
       .mul(oneOff ? 100 : details.prize_percentage)
       .div(100);
+    prizePool = prizePool.mul(100 - CONTEST_FEE_PERCENT).div(100); // deduct contest fee from prize pool
     const score: z.infer<typeof ContestScore> = scores.map((s, i) => ({
       content_id: s.winningContent.toString(),
       creator_address: s.winningAddress,

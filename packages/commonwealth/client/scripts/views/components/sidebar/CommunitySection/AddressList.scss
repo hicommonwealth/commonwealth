@@ -2,18 +2,28 @@
 
 .AddressList {
   display: flex;
+  flex-direction: column;
   align-items: flex-start;
   padding: 2px 8px;
   border-radius: 6px;
   cursor: default;
+  width: 100%;
 
-  .icon-left {
-    margin-right: 6px;
-    fill: none;
+  .header {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    justify-content: space-between;
+    cursor: pointer;
   }
 
-  .icon-right {
-    margin-left: 4px;
+  .address-left {
+    display: flex;
+    align-items: center;
+  }
+
+  .address-right {
+    margin-left: auto;
   }
 
   .content-container {
@@ -21,6 +31,7 @@
     flex-direction: column;
     align-items: flex-start;
     max-width: 100%;
+    margin-top: 8px;
   }
 
   .label {
@@ -31,5 +42,9 @@
     max-width: 100%;
     letter-spacing: 0.2px;
     white-space: nowrap;
+  }
+
+  .caret-icon {
+    color: $neutral-400;
   }
 }
