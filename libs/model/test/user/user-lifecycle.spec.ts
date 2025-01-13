@@ -3,15 +3,28 @@ import {
   QuestParticipationLimit,
   QuestParticipationPeriod,
 } from '@hicommonwealth/schemas';
+import {
+  CANVAS_TOPIC,
+  WalletId,
+  getSessionSigners,
+  serializeCanvas,
+} from '@hicommonwealth/shared';
 import Chance from 'chance';
-import { JoinCommunity } from 'model/src/community';
 import moment from 'moment';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { CreateComment, CreateCommentReaction } from '../../src/comment';
 import { models } from '../../src/database';
 import { CreateQuest, UpdateQuest } from '../../src/quest';
+import { verifyAddress } from '../../src/services/session';
 import { CreateThread } from '../../src/thread';
-import { GetUserProfile, GetXps, UpdateUser, Xp } from '../../src/user';
+import {
+  GetUserProfile,
+  GetXps,
+  SignIn,
+  UpdateUser,
+  UserReferrals,
+  Xp,
+} from '../../src/user';
 import { drainOutbox } from '../utils';
 import { seedCommunity } from '../utils/community-seeder';
 
@@ -277,56 +290,56 @@ describe('User lifecycle', () => {
         },
       });
 
-      // TODO: command to create a new user
-      const new_user = await models.User.create({
-        profile: {
-          name: 'New User',
-          email: 'newuser@hi.com',
+      // user signs in a referral link, creating a new user and address
+      const [evmSigner] = await getSessionSigners();
+      const { payload } = await evmSigner.newSession(CANVAS_TOPIC);
+      const address = payload.did.split(':')[4];
+      const new_user = await command(SignIn(), {
+        actor: {
+          address,
+          user: {
+            id: -1,
+            email: '',
+            auth: await verifyAddress(community_id, address),
+          },
         },
-        isAdmin: false,
-        is_welcome_onboard_flow_complete: false,
-        emailVerified: true,
+        payload: {
+          address,
+          community_id,
+          referrer_address: member.address!,
+          wallet_id: WalletId.Metamask,
+          session: serializeCanvas(payload),
+        },
       });
+
+      // complete the sign up flow
       new_actor = {
-        address: '0x9000000000000000000000000000000000000000',
+        address,
         user: {
-          id: new_user.id,
-          email: new_user.profile.email!,
+          id: new_user!.user_id!,
+          email: '',
         },
       };
-      await models.Address.create({
-        community_id: base_id,
-        user_id: new_user.id,
-        address: new_actor.address!,
-        role: 'member',
-        is_banned: false,
-        verified: new Date(),
-        ghost_address: false,
-        is_user_default: false,
-        verification_token: '1234',
-      });
-      // user signs up for the community with a referral link
       await command(UpdateUser(), {
-        actor: new_actor,
+        actor: {
+          address,
+          user: {
+            id: new_user!.user_id!,
+            email: '',
+          },
+        },
         payload: {
-          id: new_user.id!,
-          referrer_address: member.address!,
+          id: new_user!.user_id!,
           profile: {
-            name: 'New User Updated',
+            name: 'new_user_updated',
+            email: 'new_user@email.com',
           },
         },
       });
 
-      // the new user joins the community with a referral link
-      await command(JoinCommunity(), {
-        actor: new_actor,
-        payload: {
-          community_id,
-          referrer_address: member.address!,
-        },
-      });
-
-      // drain the outbox
+      // drain the outbox to set referred_by_address
+      await drainOutbox(['CommunityJoined'], UserReferrals);
+      // drain the outbox to award xp points
       await drainOutbox(
         [
           'CommunityJoined',
@@ -365,8 +378,8 @@ describe('User lifecycle', () => {
       const new_user_profile = await query(GetUserProfile(), {
         actor: {
           user: {
-            id: new_user.id,
-            email: new_user.profile.email!,
+            id: new_user!.user_id!,
+            email: '',
           },
         },
         payload: {},
@@ -416,23 +429,23 @@ describe('User lifecycle', () => {
           created_at: last[2].created_at,
         },
         {
-          event_name: 'SignUpFlowCompleted',
-          event_created_at: last[3].event_created_at,
-          user_id: new_user.id,
-          xp_points: 16,
-          action_meta_id: null, // this is a site event and not a quest action
-          creator_user_id: member.user.id,
-          creator_xp_points: 4,
-          created_at: last[3].created_at,
-        },
-        {
           event_name: 'CommunityJoined',
-          event_created_at: last[4].event_created_at,
-          user_id: new_user.id,
+          event_created_at: last[3].event_created_at,
+          user_id: new_user!.user_id!,
           xp_points: 10,
           action_meta_id: updated!.action_metas![3].id,
           creator_user_id: member.user.id,
           creator_xp_points: 10,
+          created_at: last[3].created_at,
+        },
+        {
+          event_name: 'SignUpFlowCompleted',
+          event_created_at: last[4].event_created_at,
+          user_id: new_user!.user_id!,
+          xp_points: 16,
+          action_meta_id: null, // this is a site event and not a quest action
+          creator_user_id: member.user.id,
+          creator_xp_points: 4,
           created_at: last[4].created_at,
         },
       ]);
