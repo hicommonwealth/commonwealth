@@ -21,6 +21,7 @@ import axios from 'axios';
 import { notifyError } from 'controllers/app/notifications';
 import { getMagicCosmosSessionSigner } from 'controllers/server/sessions';
 import { isSameAccount } from 'helpers';
+import { isMobileApp } from 'hooks/useReactNativeWebView';
 import { Magic } from 'magic-sdk';
 import app, { initAppState } from 'state';
 import { EXCEPTION_CASE_VANILLA_getCommunityById } from 'state/api/communities/getCommuityById';
@@ -334,10 +335,7 @@ export async function startLoginWithMagicLink({
 
       await magic.oauth.loginWithRedirect({
         provider,
-        redirectURI: new URL(
-          '/finishsociallogin' + params,
-          window.location.origin,
-        ).href,
+        redirectURI: createRedirectURI(params),
         options: {
           // prompt forces Google to show the account picker.
           prompt: 'select_account',
@@ -346,7 +344,7 @@ export async function startLoginWithMagicLink({
     } else {
       await magic.oauth2.loginWithRedirect({
         provider,
-        redirectURI: new URL('/finishsociallogin', window.location.origin).href,
+        redirectURI: createRedirectURI(),
         options: {
           // prompt forces Google to show the account picker.
           prompt: 'select_account',
@@ -575,5 +573,16 @@ export async function handleSocialLoginCallback({
     return { address: magicAddress };
   } else {
     throw new Error(`Social auth unsuccessful: ${response.status}`);
+  }
+}
+
+function createRedirectURI(params: string = '') {
+  const url = new URL('/finishsociallogin' + params, window.location.origin);
+  const href = url.href;
+
+  if (isMobileApp()) {
+    return href.replace(/^https:\/\//, 'commonxyz://');
+  } else {
+    return href;
   }
 }
