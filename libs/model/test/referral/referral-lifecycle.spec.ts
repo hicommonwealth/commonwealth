@@ -57,7 +57,6 @@ function chainEvent(
 
 describe('Referral lifecycle', () => {
   let admin: Actor;
-  let member: Actor;
   let nonMember: Actor;
   let community_id: string;
 
@@ -66,7 +65,6 @@ describe('Referral lifecycle', () => {
       roles: ['admin', 'member'],
     });
     admin = actors.admin;
-    member = actors.member;
     const [nonMemberUser] = await seed('User', {
       profile: {
         name: 'non-member',
