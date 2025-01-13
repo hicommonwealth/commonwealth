@@ -4,7 +4,7 @@ import { useCallback, useMemo } from 'react';
 export function useMobileLoginTrigger() {
   const reactNativeWebView = useReactNativeWebView();
 
-  const enabled = reactNativeWebView !== null;
+  const enabled = !!reactNativeWebView;
 
   const trigger = useCallback(() => {
     reactNativeWebView?.postMessage(

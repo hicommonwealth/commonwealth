@@ -20,6 +20,7 @@ const AuthButtons = ({
 
   function handleSignIn() {
     if (mobileLoginTrigger.enabled) {
+      console.log('Triggering auth in native app.');
       mobileLoginTrigger.trigger();
     } else {
       onButtonClick(AuthModalType.SignIn);
