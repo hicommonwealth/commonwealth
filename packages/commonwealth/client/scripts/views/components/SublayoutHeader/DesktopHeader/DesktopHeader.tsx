@@ -22,6 +22,7 @@ import AuthButtons from 'views/components/SublayoutHeader/AuthButtons';
 import { AuthModalType } from 'views/modals/AuthModal';
 import { capDecimals } from 'views/modals/ManageCommunityStakeModal/utils';
 import { CWText } from '../../component_kit/cw_text';
+import XPProgressIndicator from '../XPProgressIndicator';
 import './DesktopHeader.scss';
 
 interface DesktopHeaderProps {
@@ -32,6 +33,7 @@ interface DesktopHeaderProps {
 const DesktopHeader = ({ onMobile, onAuthModalOpen }: DesktopHeaderProps) => {
   const navigate = useCommonNavigate();
   const rewardsEnabled = useFlag('rewardsPage');
+  const xpEnabled = useFlag('xp');
   const { menuVisible, setMenu, menuName, setUserToggledVisibility } =
     useSidebarStore();
   const user = useUserStore();
@@ -87,6 +89,7 @@ const DesktopHeader = ({ onMobile, onAuthModalOpen }: DesktopHeaderProps) => {
               isLoggedIn: user.isLoggedIn,
             })}
           >
+            {xpEnabled && <XPProgressIndicator />}
             <CreateContentPopover />
             {!isWindowSmallInclusive(window.innerWidth) && (
               <CWTooltip

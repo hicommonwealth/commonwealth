@@ -1,0 +1,53 @@
+@import '../../../../styles/shared';
+
+.XPProgressIndicator {
+  all: unset;
+  min-width: 150px;
+  width: 200px;
+  max-width: 200px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+  padding: 4px;
+
+  &:focus,
+  &:focus-within {
+    outline: none !important;
+  }
+
+  &:hover {
+    background-color: $neutral-100;
+    cursor: pointer;
+    border-radius: 6px;
+  }
+
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 0 4px;
+
+    .caption {
+      font-size: 10px !important;
+      color: $primary-500 !important;
+    }
+  }
+
+  .progress-bar {
+    height: 10px;
+    width: 100%;
+    border: 1px solid $neutral-100;
+
+    &::-webkit-progress-bar {
+      background-color: $neutral-200;
+      border-radius: $border-radius-corners;
+    }
+
+    &::-webkit-progress-value {
+      background-color: $primary-400;
+      border-radius: $border-radius-corners;
+    }
+  }
+}
