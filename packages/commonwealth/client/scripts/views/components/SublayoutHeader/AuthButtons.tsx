@@ -1,5 +1,4 @@
 import React from 'react';
-import { useMobileLoginTrigger } from 'views/components/ReactNativeBridge';
 import { AuthModalType } from '../../modals/AuthModal';
 import { CWButton } from '../component_kit/new_designs/CWButton';
 
@@ -16,15 +15,8 @@ const AuthButtons = ({
 }: AuthButtonsProps) => {
   const isDisabled = location.pathname.includes('/finishsociallogin');
 
-  const mobileLoginTrigger = useMobileLoginTrigger();
-
   function handleSignIn() {
-    if (mobileLoginTrigger.enabled) {
-      console.log('Triggering auth in native app.');
-      mobileLoginTrigger.trigger();
-    } else {
-      onButtonClick(AuthModalType.SignIn);
-    }
+    onButtonClick(AuthModalType.SignIn);
   }
 
   return (
