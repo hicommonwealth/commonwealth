@@ -107,6 +107,15 @@ export async function bootstrapBindings(
     BrokerSubscriptions.XpProjection,
   );
 
+  const userReferralsProjectionSubRes = await brokerInstance.subscribe(
+    BrokerSubscriptions.UserReferrals,
+    User.UserReferrals(),
+  );
+  checkSubscriptionResponse(
+    userReferralsProjectionSubRes,
+    BrokerSubscriptions.UserReferrals,
+  );
+
   const farcasterWorkerSubRes = await brokerInstance.subscribe(
     BrokerSubscriptions.FarcasterWorkerPolicy,
     FarcasterWorker(),

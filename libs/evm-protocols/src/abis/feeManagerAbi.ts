@@ -23,4 +23,4 @@ export const feeManagerAbi = [
     stateMutability: 'view',
     type: 'function',
   },
-];
+] as const;

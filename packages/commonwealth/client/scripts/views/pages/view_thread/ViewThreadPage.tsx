@@ -1,5 +1,9 @@
 import { PermissionEnum } from '@hicommonwealth/schemas';
-import { ContentType, getThreadUrl } from '@hicommonwealth/shared';
+import {
+  ContentType,
+  MIN_CHARS_TO_SHOW_MORE,
+  getThreadUrl,
+} from '@hicommonwealth/shared';
 import { Thread, ThreadView } from 'client/scripts/models/Thread';
 import { notifyError } from 'controllers/app/notifications';
 import { extractDomain, isDefaultStage } from 'helpers';
@@ -611,6 +615,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                     key={threadBody}
                     markdown={threadBody || ''}
                     cutoffLines={50}
+                    maxChars={MIN_CHARS_TO_SHOW_MORE}
                   />
 
                   {thread?.readOnly || fromDiscordBot ? (

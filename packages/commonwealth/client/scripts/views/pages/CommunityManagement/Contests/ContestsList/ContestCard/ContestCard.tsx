@@ -27,6 +27,7 @@ import { copyFarcasterContestFrameUrl, isContestActive } from '../../utils';
 import ContestAlert from '../ContestAlert';
 import ContestCountdown from '../ContestCountdown';
 
+import { buildContestPrizes } from '@hicommonwealth/shared';
 import './ContestCard.scss';
 
 const noFundsProps = {
@@ -103,14 +104,11 @@ const ContestCard = ({
       isOneOff: !isRecurring,
     });
 
-  const prizes =
-    contestBalance && payoutStructure
-      ? payoutStructure.map(
-          (percentage) =>
-            (contestBalance * (percentage / 100)) /
-            Math.pow(10, decimals || 18),
-        )
-      : [];
+  const prizes = buildContestPrizes(
+    Number(contestBalance),
+    payoutStructure,
+    decimals,
+  );
 
   const handleCancel = () => {
     cancelContest({

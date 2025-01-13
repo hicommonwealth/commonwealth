@@ -7,6 +7,7 @@ import {
 } from '@polkadot/util-crypto';
 import moment from 'moment';
 import {
+  CONTEST_FEE_PERCENT,
   PRODUCTION_DOMAIN,
   S3_ASSET_BUCKET_CDN,
   S3_RAW_ASSET_BUCKET_DOMAIN,
@@ -431,4 +432,27 @@ export const buildContestLeaderboardUrl = (
   contestAddress: string,
 ) => {
   return `${baseUrl}/${communityId}/contests/${contestAddress}`;
+};
+
+// returns balance with fee deducted
+export const calculateNetContestBalance = (originalBalance: number) => {
+  const multiplier = (100 - CONTEST_FEE_PERCENT) / 100;
+  return (originalBalance || 0) * multiplier;
+};
+
+// returns array of prize amounts
+export const buildContestPrizes = (
+  contestBalance: number,
+  payoutStructure?: number[],
+  decimals?: number,
+): number[] => {
+  // 10% fee deducted from prize pool
+  const netContestBalance = calculateNetContestBalance(Number(contestBalance));
+  return netContestBalance && payoutStructure
+    ? payoutStructure.map(
+        (percentage) =>
+          (Number(netContestBalance) * (percentage / 100)) /
+          Math.pow(10, decimals || 18),
+      )
+    : [];
 };

@@ -1,13 +1,15 @@
-import { InvalidState, type Command } from '@hicommonwealth/core';
-import { commonProtocol as cp } from '@hicommonwealth/evm-protocols';
+import { InvalidState, ServerError, type Command } from '@hicommonwealth/core';
+import {
+  commonProtocol as cp,
+  deployERC20Contest,
+  getTokenAttributes,
+} from '@hicommonwealth/evm-protocols';
 import { config } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import { buildFarcasterContestFrameUrl } from '@hicommonwealth/shared';
 import { models } from '../database';
 import { mustExist } from '../middleware/guards';
 import { TokenAttributes } from '../services';
-import { contractHelpers } from '../services/commonProtocol';
-import { deployERC20Contest } from '../services/commonProtocol/contestHelper';
 import { parseBotCommand } from '../services/openai/parseBotCommand';
 
 export function CreateContest(): Command<typeof schemas.CreateBotContest> {
@@ -38,7 +40,7 @@ export function CreateContest(): Command<typeof schemas.CreateBotContest> {
 
       let tokenMetadata: TokenAttributes;
       try {
-        tokenMetadata = await contractHelpers.getTokenAttributes(
+        tokenMetadata = await getTokenAttributes(
           contestMetadata.tokenAddress,
           community!.ChainNode!.private_url!,
           false,
@@ -47,16 +49,20 @@ export function CreateContest(): Command<typeof schemas.CreateBotContest> {
         new InvalidState('invalid token address');
       }
 
-      const contestAddress = await deployERC20Contest(
-        botNamespace as string,
-        604800,
-        contestMetadata.payoutStructure,
-        contestMetadata.tokenAddress,
-        contestMetadata.voterShare,
-        contestMetadata.tokenAddress,
+      if (!config.WEB3.CONTEST_BOT_PRIVATE_KEY)
+        throw new ServerError('Contest bot private key not set!');
+
+      const contestAddress = await deployERC20Contest({
+        privateKey: config.WEB3.CONTEST_BOT_PRIVATE_KEY,
+        namespaceName: botNamespace,
+        contestInterval: 604800,
+        winnerShares: contestMetadata.payoutStructure,
+        voteToken: contestMetadata.tokenAddress,
+        voterShare: contestMetadata.voterShare,
+        exchangeToken: contestMetadata.tokenAddress,
         namespaceFactory,
-        community!.ChainNode!.private_url!,
-      );
+        rpc: community!.ChainNode!.private_url!,
+      });
 
       await models.sequelize.transaction(async (transaction) => {
         const manager = await models.ContestManager.create(

@@ -62,6 +62,8 @@ type CardProps = AdminActionsProps & {
   hidePublishDate?: boolean;
   hideTrendingTag?: boolean;
   hideSpamTag?: boolean;
+  maxChars?: number;
+  cutoffLines?: number;
 };
 
 export const ThreadCard = ({
@@ -103,6 +105,8 @@ export const ThreadCard = ({
   hidePublishDate = false,
   hideTrendingTag = false,
   hideSpamTag = false,
+  maxChars,
+  cutoffLines,
 }: CardProps) => {
   const navigate = useCommonNavigate();
   const user = useUserStore();
@@ -240,7 +244,8 @@ export const ThreadCard = ({
                       ? thread.body
                       : removeImageFormMarkDown(thread.body)
                   }
-                  cutoffLines={4}
+                  maxChars={maxChars}
+                  cutoffLines={cutoffLines}
                   customShowMoreButton={
                     <CWText type="b1" className="show-more-btn">
                       Show more
@@ -249,7 +254,11 @@ export const ThreadCard = ({
                   onImageClick={onImageClick}
                 />
               ) : (
-                <MarkdownViewerWithFallback markdown={thread.body} />
+                <MarkdownViewerWithFallback
+                  markdown={thread.body}
+                  maxChars={maxChars}
+                  cutoffLines={cutoffLines}
+                />
               )}
               {threadImage && (
                 <div className="card-image-container">

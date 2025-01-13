@@ -2,7 +2,6 @@ import {
   commonProtocol,
   contestAbi,
   erc20Abi,
-  feeManagerAbi,
 } from '@hicommonwealth/evm-protocols';
 import { ZERO_ADDRESS } from '@hicommonwealth/shared';
 import { AbiItem, TransactionReceipt } from 'web3';
@@ -247,7 +246,6 @@ class Contest extends ContractBase {
       this.contract,
       this.contractAddress,
       this.web3,
-      feeManagerAbi,
       oneOff,
     );
     return parseInt(contestBalance, 10);

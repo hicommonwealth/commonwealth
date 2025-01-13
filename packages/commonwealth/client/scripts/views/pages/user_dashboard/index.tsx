@@ -46,7 +46,7 @@ const UserDashboard = ({ type }: UserDashboardProps) => {
 
   const { isAddedToHomeScreen } = useAppStatus();
 
-  const tokenizedCommunityEnabled = useFlag('tokenizedCommunity');
+  const launchpadEnabled = useFlag('launchpad');
 
   useBrowserAnalyticsTrack({
     payload: {
@@ -140,12 +140,12 @@ const UserDashboard = ({ type }: UserDashboardProps) => {
           </div>
           {isWindowExtraSmall ? (
             <>
-              {tokenizedCommunityEnabled && <LaunchTokenCard />}
+              {launchpadEnabled && <LaunchTokenCard />}
               <TrendingCommunitiesPreview />
             </>
           ) : (
             <div className="featured-cards">
-              {tokenizedCommunityEnabled && <LaunchTokenCard />}
+              {launchpadEnabled && <LaunchTokenCard />}
               <TrendingCommunitiesPreview />
             </div>
           )}
