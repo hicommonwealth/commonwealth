@@ -4,12 +4,12 @@ import React from 'react';
 import useUserStore from 'state/ui/user';
 import { CWText } from '../../component_kit/cw_text';
 import './XPProgressIndicator.scss';
+import { XPProgressIndicatorMode, XPProgressIndicatorProps } from './types';
 
-type XPProgressIndicatorProps = {
-  className?: string;
-};
-
-const XPProgressIndicator = ({ className }: XPProgressIndicatorProps) => {
+const XPProgressIndicator = ({
+  mode = XPProgressIndicatorMode.Detailed,
+  className,
+}: XPProgressIndicatorProps) => {
   const sampleData = {
     weeklyGoal: {
       current: 170,
@@ -28,8 +28,8 @@ const XPProgressIndicator = ({ className }: XPProgressIndicatorProps) => {
 
   if (!user.isLoggedIn) return;
 
-  return (
-    <button className={clsx('XPProgressIndicator', className)}>
+  const weeklyProgress = (
+    <div className={clsx('weekly-progress', className)}>
       <div className="header">
         <CWText type="caption" fontWeight="semiBold">
           Weekly XP Goal
@@ -39,6 +39,18 @@ const XPProgressIndicator = ({ className }: XPProgressIndicatorProps) => {
         </CWText>
       </div>
       <progress className="progress-bar" value={currentProgress} max={100} />
+    </div>
+  );
+
+  return (
+    <button className={clsx('XPProgressIndicator', className, mode)}>
+      {mode === XPProgressIndicatorMode.Compact ? (
+        <CWText type="b2" fontWeight="semiBold">
+          XP
+        </CWText>
+      ) : (
+        weeklyProgress
+      )}
     </button>
   );
 };
