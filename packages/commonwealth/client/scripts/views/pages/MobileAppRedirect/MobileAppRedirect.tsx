@@ -1,4 +1,6 @@
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
+
+const TARGET_URL = 'common_xyz://test';
 
 /**
  * Test redirecting to the mobile app and that it loads and switches to
@@ -6,8 +8,11 @@ import { useEffect } from 'react';
  */
 export const MobileAppRedirect = () => {
   useEffect(() => {
-    document.location.href = 'common_xyz://test';
+    setTimeout(() => {
+      console.log('Redirecting to mobile app: ' + TARGET_URL);
+      document.location.href = TARGET_URL;
+    }, 5000);
   });
 
-  return null;
+  return <div>Redirecting to mobile app in 5 seconds via ${TARGET_URL}</div>;
 };
