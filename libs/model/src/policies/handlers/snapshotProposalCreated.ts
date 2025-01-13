@@ -4,11 +4,11 @@ import {
   notificationsProvider,
   WorkflowKeys,
 } from '@hicommonwealth/core';
-import { models } from '@hicommonwealth/model';
 import { SnapshotEventType } from '@hicommonwealth/shared';
 import { QueryTypes } from 'sequelize';
 import z from 'zod';
-import { getSnapshotUrl } from '../util';
+import { models } from '../../database';
+import { getSnapshotUrl } from '../utils/utils';
 
 const log = logger(import.meta);
 

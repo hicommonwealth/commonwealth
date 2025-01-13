@@ -5,10 +5,9 @@ import {
   notificationsProvider,
 } from '@hicommonwealth/core';
 import { EvmEventSignatures } from '@hicommonwealth/evm-protocols';
-import { models, tester } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import { EventNames, events } from '@hicommonwealth/schemas';
-import { BalanceType } from '@hicommonwealth/shared';
+import { BalanceType, getCommunityUrl } from '@hicommonwealth/shared';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import {
@@ -23,13 +22,12 @@ import {
   vi,
 } from 'vitest';
 import z from 'zod';
-import { processChainEventCreated } from '../../../server/workers/knock/eventHandlers/chainEventCreated';
-import { getCommunityUrl } from '../../../shared/utils';
+import { models, processChainEventCreated, tester } from '../../src';
 import {
   ProviderError,
   SpyNotificationsProvider,
   ThrowingSpyNotificationsProvider,
-} from '../../util/mockedNotificationProvider';
+} from '../utils/mockedNotificationProvider';
 
 chai.use(chaiAsPromised);
 

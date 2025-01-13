@@ -9,7 +9,7 @@ import { models, SubscriptionPreferenceInstance } from '@hicommonwealth/model';
 import { events } from '@hicommonwealth/schemas';
 import { DaysOfWeek } from '@knocklabs/node';
 import z from 'zod';
-import { config } from '../../../config';
+import { config } from '../../config';
 
 const log = logger(import.meta);
 

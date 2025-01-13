@@ -5,12 +5,6 @@ import {
   WorkflowKeys,
 } from '@hicommonwealth/core';
 import {
-  CommentInstance,
-  models,
-  Webhook,
-  WebhookInstance,
-} from '@hicommonwealth/model';
-import {
   getDecodedString,
   getElizaUserId,
   safeTruncateBody,
@@ -18,8 +12,11 @@ import {
 } from '@hicommonwealth/shared';
 import { Op } from 'sequelize';
 import z from 'zod';
-import { config } from '../../../config';
-import { getCommentUrl, getProfileUrl } from '../util';
+import { config } from '../../config';
+import { models } from '../../database';
+import { CommentInstance, WebhookInstance } from '../../models';
+import { getPreviewImageUrl, getRenderedTitle } from '../../webhook/util';
+import { getCommentUrl, getProfileUrl } from '../utils/utils';
 
 const log = logger(import.meta);
 
@@ -158,7 +155,7 @@ export const processCommentCreated: EventHandler<
   const thread = await models.Thread.findByPk(payload.thread_id);
   if (!thread) throw new Error('Thread not found');
 
-  const previewImg = Webhook.getPreviewImageUrl(
+  const previewImg = getPreviewImageUrl(
     community,
     getDecodedString(payload.body),
   );
@@ -183,7 +180,7 @@ export const processCommentCreated: EventHandler<
       profile_name: author.User!.profile.name || author.address.substring(0, 8),
       profile_url: getProfileUrl(author.user_id, community.custom_domain),
       profile_avatar_url: author.User!.profile.avatar_url ?? '',
-      thread_title: Webhook.getRenderedTitle(thread.title),
+      thread_title: getRenderedTitle(thread.title),
       object_url: commentUrl,
       object_summary: commentSummary,
       content_url: payload.content_url,

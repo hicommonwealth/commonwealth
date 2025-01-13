@@ -23,8 +23,8 @@ import {
 } from 'vitest';
 import z from 'zod';
 // eslint-disable-next-line max-len
-import { processSubscriptionPreferencesUpdated } from '../../../server/workers/knock/eventHandlers/subscriptionPreferencesUpdated';
-import { SpyNotificationsProvider } from '../../util/mockedNotificationProvider';
+import { SpyNotificationsProvider } from 'test/util/mockedNotificationProvider';
+import { processSubscriptionPreferencesUpdated } from '../../../server/workers/knock/subscriptionPreferencesUpdated';
 
 chai.use(chaiAsPromised);
 

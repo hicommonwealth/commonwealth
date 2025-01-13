@@ -4,7 +4,6 @@ import {
   disposeAdapter,
   notificationsProvider,
 } from '@hicommonwealth/core';
-import { models, tester } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import { EventNames } from '@hicommonwealth/schemas';
 import { BalanceType } from '@hicommonwealth/shared';
@@ -22,13 +21,14 @@ import {
   vi,
 } from 'vitest';
 import z from 'zod';
-import { processCommentCreated } from '../../../server/workers/knock/eventHandlers/commentCreated';
-import { getCommentUrl } from '../../../server/workers/knock/util';
+import { models, tester } from '../../src';
+import { processCommentCreated } from '../../src/policies/handlers/commentCreated';
+import { getCommentUrl } from '../../src/policies/utils/utils';
 import {
   ProviderError,
   SpyNotificationsProvider,
   ThrowingSpyNotificationsProvider,
-} from '../../util/mockedNotificationProvider';
+} from '../utils/mockedNotificationProvider';
 
 chai.use(chaiAsPromised);
 

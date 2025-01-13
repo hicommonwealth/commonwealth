@@ -4,7 +4,6 @@ import {
   notificationsProvider,
   WorkflowKeys,
 } from '@hicommonwealth/core';
-import { models, Webhook } from '@hicommonwealth/model';
 import {
   getDecodedString,
   safeTruncateBody,
@@ -12,8 +11,10 @@ import {
 } from '@hicommonwealth/shared';
 import { Op } from 'sequelize';
 import z from 'zod';
-import { config } from '../../../config';
-import { getCommentUrl, getProfileUrl, getThreadUrl } from '../util';
+import { config } from '../../config';
+import { models } from '../../database';
+import { getPreviewImageUrl, getRenderedTitle } from '../../webhook/util';
+import { getCommentUrl, getProfileUrl, getThreadUrl } from '../utils/utils';
 
 const log = logger(import.meta);
 
@@ -96,7 +97,7 @@ export const processUserMentioned: EventHandler<
   });
 
   if (webhooks.length > 0) {
-    const previewImg = Webhook.getPreviewImageUrl(
+    const previewImg = getPreviewImageUrl(
       community,
       getDecodedString(
         'thread' in payload ? payload.thread!.body : payload.comment!.body,
@@ -136,7 +137,7 @@ export const processUserMentioned: EventHandler<
           community.custom_domain,
         ),
         profile_avatar_url: user.profile.avatar_url ?? '',
-        thread_title: Webhook.getRenderedTitle(thread.title!),
+        thread_title: getRenderedTitle(thread.title!),
         object_url,
         object_summary: safeTruncateBody(
           'thread' in payload ? payload.thread!.body : payload.comment!.body,

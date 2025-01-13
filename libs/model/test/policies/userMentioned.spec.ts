@@ -21,13 +21,13 @@ import {
   vi,
 } from 'vitest';
 import z from 'zod';
-import { processUserMentioned } from '../../../server/workers/knock/eventHandlers/userMentioned';
-import { getThreadUrl } from '../../../server/workers/knock/util';
+import { processUserMentioned } from '../../src/policies/handlers/userMentioned';
+import { getThreadUrl } from '../../src/policies/utils/utils';
 import {
   ProviderError,
   SpyNotificationsProvider,
   ThrowingSpyNotificationsProvider,
-} from '../../util/mockedNotificationProvider';
+} from '../utils/mockedNotificationProvider';
 
 chai.use(chaiAsPromised);
 

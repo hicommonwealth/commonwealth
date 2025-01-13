@@ -1,8 +1,8 @@
 import { EventHandler, logger } from '@hicommonwealth/core';
 import { EvmEventSignatures } from '@hicommonwealth/evm-protocols';
-import { models } from '@hicommonwealth/model';
 import z from 'zod';
-import { handleCommunityStakeTrades } from './chainEvents/handleCommunityStakeTrades';
+import { models } from '../../database';
+import { handleCommunityStakeTrades } from './handleCommunityStakeTrades';
 
 const log = logger(import.meta);
 

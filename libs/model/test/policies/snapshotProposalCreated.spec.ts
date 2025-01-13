@@ -4,7 +4,6 @@ import {
   disposeAdapter,
   notificationsProvider,
 } from '@hicommonwealth/core';
-import { models, tester } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import { EventNames } from '@hicommonwealth/schemas';
 import { SnapshotEventType } from '@hicommonwealth/shared';
@@ -22,13 +21,14 @@ import {
   vi,
 } from 'vitest';
 import z from 'zod';
-import { processSnapshotProposalCreated } from '../../../server/workers/knock/eventHandlers/snapshotProposalCreated';
-import { getSnapshotUrl } from '../../../server/workers/knock/util';
+import { models, tester } from '../../src';
+import { processSnapshotProposalCreated } from '../../src/policies/handlers/snapshotProposalCreated';
+import { getSnapshotUrl } from '../../src/policies/utils/utils';
 import {
   ProviderError,
   SpyNotificationsProvider,
   ThrowingSpyNotificationsProvider,
-} from '../../util/mockedNotificationProvider';
+} from '../utils/mockedNotificationProvider';
 
 chai.use(chaiAsPromised);
 

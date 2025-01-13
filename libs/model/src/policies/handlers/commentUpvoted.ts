@@ -4,10 +4,10 @@ import {
   notificationsProvider,
   WorkflowKeys,
 } from '@hicommonwealth/core';
-import { models } from '@hicommonwealth/model';
 import { getDecodedString, safeTruncateBody } from '@hicommonwealth/shared';
 import z from 'zod';
-import { getCommentUrl } from '../util';
+import { models } from '../../database';
+import { getCommentUrl } from '../utils/utils';
 
 const log = logger(import.meta);
 const output = z.boolean();

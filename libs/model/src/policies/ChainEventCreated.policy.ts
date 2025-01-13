@@ -5,10 +5,10 @@ import { ZodUndefined } from 'zod';
 import { models } from '../database';
 import { systemActor } from '../middleware';
 import { CreateLaunchpadToken } from '../token/CreateToken.command';
-import { handleCommunityStakeTrades } from './handleCommunityStakeTrades';
-import { handleLaunchpadTrade } from './handleLaunchpadTrade';
-import { handleReferralFeeDistributed } from './handleReferralFeeDistributed';
-import { handleReferralSet } from './handleReferralSet';
+import { handleCommunityStakeTrades } from './handlers/handleCommunityStakeTrades';
+import { handleLaunchpadTrade } from './handlers/handleLaunchpadTrade';
+import { handleReferralFeeDistributed } from './handlers/handleReferralFeeDistributed';
+import { handleReferralSet } from './handlers/handleReferralSet';
 
 const log = logger(import.meta);
 
