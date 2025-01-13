@@ -1,5 +1,5 @@
 import { Roles, WalletId } from '@hicommonwealth/shared';
-import { z } from 'zod';
+import { ZodType, z } from 'zod';
 import { PG_INT } from '../utils';
 import { Tags } from './tag.schemas';
 
@@ -65,6 +65,10 @@ export const User = z.object({
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional(),
 });
+// Type annotation is needed to avoid:
+// The inferred type of this node exceeds the maximum length the compiler will serialize.
+// An explicit type annotation is needed.ts(7056)
+type User = z.infer<typeof User>;
 
 export const Address = z.object({
   id: PG_INT.optional(),
@@ -84,7 +88,7 @@ export const Address = z.object({
   is_banned: z.boolean().default(false),
   hex: z.string().max(64).nullish(),
 
-  User: User.optional(),
+  User: User.optional() as ZodType<User>,
 
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional(),
