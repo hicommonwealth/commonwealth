@@ -9,7 +9,7 @@ import { JoinCommunity } from '../../src/community';
 import { models } from '../../src/database';
 import { ChainEventPolicy } from '../../src/policies';
 import { seed } from '../../src/tester';
-import { GetUserReferralFees, UpdateUser, UserReferrals } from '../../src/user';
+import { GetUserReferralFees, UserReferrals } from '../../src/user';
 import { GetUserReferrals } from '../../src/user/GetUserReferrals.query';
 import { drainOutbox, seedCommunity } from '../utils';
 
@@ -93,43 +93,20 @@ describe('Referral lifecycle', () => {
     await dispose()();
   });
 
-  it('should create a referral when signing up with a referral link', async () => {
-    // member signs up with the referral link
-    await command(UpdateUser(), {
-      actor: member,
-      payload: {
-        id: member.user.id!,
-        referrer_address: admin.address,
-        profile: { name: 'member' }, // this flags is_welcome_onboard_flow_complete
-      },
-    });
-
-    await command(UpdateUser(), {
+  it('should create a referral when signing in with a referral link', async () => {
+    // non-member joins with referral link
+    await command(JoinCommunity(), {
       actor: nonMember,
       payload: {
-        id: nonMember.user.id!,
+        community_id,
         referrer_address: admin.address,
-        profile: { name: 'non-member' }, // this flags is_welcome_onboard_flow_complete
       },
     });
 
     // creates "partial" platform entries for referrals
-    await drainOutbox(['SignUpFlowCompleted'], UserReferrals);
+    await drainOutbox(['CommunityJoined'], UserReferrals);
 
     const expectedReferrals: z.infer<typeof schemas.ReferralView>[] = [
-      {
-        eth_chain_id: null,
-        transaction_hash: null,
-        namespace_address: null,
-        referee_address: member.address!,
-        referrer_address: admin.address!,
-        referrer_received_eth_amount: 0,
-        created_on_chain_timestamp: null,
-        created_off_chain_at: expect.any(Date),
-        updated_at: expect.any(Date),
-        referee_user_id: member.user.id!,
-        referee_profile: { name: 'member' },
-      },
       {
         eth_chain_id: null,
         transaction_hash: null,
@@ -152,18 +129,6 @@ describe('Referral lifecycle', () => {
     });
     expect(referrals).toMatchObject(expectedReferrals);
 
-    // nonMember joins the community using referrals
-    await command(JoinCommunity(), {
-      actor: nonMember,
-      payload: {
-        community_id,
-        referrer_address: admin.address,
-      },
-    });
-
-    // counts the referral for the referrer
-    await drainOutbox(['CommunityJoined'], UserReferrals);
-
     const referrerUser = await models.User.findOne({
       where: { id: admin.user.id },
     });
@@ -178,15 +143,6 @@ describe('Referral lifecycle', () => {
     // deploy a new namespace with a referral link (ReferralSet)
     const namespaceAddress = '0x0000000000000000000000000000000000000001';
     const chainEvents1 = [
-      chainEvent(
-        '0x1',
-        member.address!, // referee
-        EvmEventSignatures.Referrals.ReferralSet,
-        [
-          namespaceAddress,
-          admin.address, // referrer
-        ],
-      ),
       chainEvent(
         '0x2',
         nonMember.address!, // referee
@@ -203,15 +159,10 @@ describe('Referral lifecycle', () => {
     await drainOutbox(['ChainEventCreated'], ChainEventPolicy);
 
     expectedReferrals[0].eth_chain_id = 1;
-    expectedReferrals[0].transaction_hash = '0x1';
+    expectedReferrals[0].transaction_hash = '0x2';
     expectedReferrals[0].namespace_address = namespaceAddress;
     expectedReferrals[0].created_on_chain_timestamp =
       chainEvents1[0].event_payload.block.timestamp;
-    expectedReferrals[1].eth_chain_id = 1;
-    expectedReferrals[1].transaction_hash = '0x2';
-    expectedReferrals[1].namespace_address = namespaceAddress;
-    expectedReferrals[1].created_on_chain_timestamp =
-      chainEvents1[1].event_payload.block.timestamp;
 
     // get referrals again with tx attributes
     const referrals2 = await query(GetUserReferrals(), {
@@ -223,24 +174,10 @@ describe('Referral lifecycle', () => {
     // simulate on-chain transactions that occur when
     // referral fees are distributed to the referrer
     const checkpoint = new Date();
-    const fee1 = 1;
-    const fee2 = 2;
+    const fee = 1;
     const ethMul = BigNumber.from(10).pow(18);
-    const hex1 = BigNumber.from(fee1).mul(ethMul).toHexString();
-    const hex2 = BigNumber.from(fee2).mul(ethMul).toHexString();
+    const hex = BigNumber.from(fee).mul(ethMul).toHexString();
     await models.Outbox.bulkCreate([
-      chainEvent(
-        '0x3',
-        member.address!,
-        EvmEventSignatures.Referrals.FeeDistributed,
-        [
-          namespaceAddress,
-          ZERO_ADDRESS,
-          { hex: hex1, type: 'BigNumber' }, // total amount distributed
-          admin.address, // referrer address
-          { hex: hex1, type: 'BigNumber' }, // referrer received amount
-        ],
-      ),
       chainEvent(
         '0x4',
         nonMember.address!,
@@ -248,9 +185,9 @@ describe('Referral lifecycle', () => {
         [
           namespaceAddress,
           ZERO_ADDRESS,
-          { hex: hex2, type: 'BigNumber' }, // total amount distributed
+          { hex, type: 'BigNumber' }, // total amount distributed
           admin.address, // referrer address
-          { hex: hex2, type: 'BigNumber' }, // referrer received amount
+          { hex, type: 'BigNumber' }, // referrer received amount
         ],
       ),
     ]);
@@ -258,8 +195,7 @@ describe('Referral lifecycle', () => {
     // syncs referral fees
     await drainOutbox(['ChainEventCreated'], ChainEventPolicy, checkpoint);
 
-    expectedReferrals[0].referrer_received_eth_amount = fee1;
-    expectedReferrals[1].referrer_received_eth_amount = fee2;
+    expectedReferrals[0].referrer_received_eth_amount = fee;
 
     // get referrals again with fees
     const referrals3 = await query(GetUserReferrals(), {
@@ -272,20 +208,11 @@ describe('Referral lifecycle', () => {
     const expectedReferralFees = [
       {
         eth_chain_id: 1,
-        transaction_hash: '0x3',
-        namespace_address: namespaceAddress,
-        distributed_token_address: ZERO_ADDRESS,
-        referrer_recipient_address: admin.address,
-        referrer_received_amount: fee1,
-        transaction_timestamp: expect.any(Number),
-      },
-      {
-        eth_chain_id: 1,
         transaction_hash: '0x4',
         namespace_address: namespaceAddress,
         distributed_token_address: ZERO_ADDRESS,
         referrer_recipient_address: admin.address,
-        referrer_received_amount: fee2,
+        referrer_received_amount: fee,
         transaction_timestamp: expect.any(Number),
       },
     ];

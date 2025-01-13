@@ -3,30 +3,23 @@ import {
   QuestParticipationLimit,
   QuestParticipationPeriod,
 } from '@hicommonwealth/schemas';
-import {
-  CANVAS_TOPIC,
-  WalletId,
-  getSessionSigners,
-  serializeCanvas,
-} from '@hicommonwealth/shared';
 import Chance from 'chance';
 import moment from 'moment';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { CreateComment, CreateCommentReaction } from '../../src/comment';
 import { models } from '../../src/database';
 import { CreateQuest, UpdateQuest } from '../../src/quest';
-import { verifyAddress } from '../../src/services/session';
 import { CreateThread } from '../../src/thread';
 import {
   GetUserProfile,
   GetXps,
-  SignIn,
   UpdateUser,
   UserReferrals,
   Xp,
 } from '../../src/user';
 import { drainOutbox } from '../utils';
 import { seedCommunity } from '../utils/community-seeder';
+import { signIn } from '../utils/sign-in';
 
 const chance = new Chance();
 
@@ -36,7 +29,7 @@ describe('User lifecycle', () => {
   let topic_id: number;
 
   beforeAll(async () => {
-    const { base, community, actors } = await seedCommunity({
+    const { community, actors } = await seedCommunity({
       roles: ['admin', 'member'],
     });
     community_id = community!.id;
@@ -289,45 +282,20 @@ describe('User lifecycle', () => {
       });
 
       // user signs in a referral link, creating a new user and address
-      const [evmSigner] = await getSessionSigners();
-      const { payload } = await evmSigner.newSession(CANVAS_TOPIC);
-      const address = payload.did.split(':')[4];
-      const new_user = await command(SignIn(), {
-        actor: {
-          address,
-          user: {
-            id: -1,
-            email: '',
-            auth: await verifyAddress(community_id, address),
-          },
-        },
-        payload: {
-          address,
-          community_id,
-          referrer_address: member.address!,
-          wallet_id: WalletId.Metamask,
-          session: serializeCanvas(payload),
-        },
-      });
-
-      // complete the sign up flow
+      const new_address = await signIn(community_id, member.address);
       new_actor = {
-        address,
+        address: new_address!.address,
         user: {
-          id: new_user!.user_id!,
+          id: new_address!.user_id!,
           email: '',
         },
       };
+
+      // complete the sign up flow
       await command(UpdateUser(), {
-        actor: {
-          address,
-          user: {
-            id: new_user!.user_id!,
-            email: '',
-          },
-        },
+        actor: new_actor,
         payload: {
-          id: new_user!.user_id!,
+          id: new_address!.user_id!,
           profile: {
             name: 'new_user_updated',
             email: 'new_user@email.com',
@@ -376,7 +344,7 @@ describe('User lifecycle', () => {
       const new_user_profile = await query(GetUserProfile(), {
         actor: {
           user: {
-            id: new_user!.user_id!,
+            id: new_address!.user_id!,
             email: '',
           },
         },
@@ -429,7 +397,7 @@ describe('User lifecycle', () => {
         {
           event_name: 'CommunityJoined',
           event_created_at: last[3].event_created_at,
-          user_id: new_user!.user_id!,
+          user_id: new_address!.user_id!,
           xp_points: 10,
           action_meta_id: updated!.action_metas![3].id,
           creator_user_id: member.user.id,
@@ -439,7 +407,7 @@ describe('User lifecycle', () => {
         {
           event_name: 'SignUpFlowCompleted',
           event_created_at: last[4].event_created_at,
-          user_id: new_user!.user_id!,
+          user_id: new_address!.user_id!,
           xp_points: 16,
           action_meta_id: null, // this is a site event and not a quest action
           creator_user_id: member.user.id,
