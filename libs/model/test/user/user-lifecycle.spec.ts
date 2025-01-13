@@ -34,13 +34,11 @@ describe('User lifecycle', () => {
   let admin: Actor, member: Actor, new_actor: Actor;
   let community_id: string;
   let topic_id: number;
-  let base_id: string;
 
   beforeAll(async () => {
     const { base, community, actors } = await seedCommunity({
       roles: ['admin', 'member'],
     });
-    base_id = base!.id;
     community_id = community!.id;
     topic_id = community!.topics!.at(0)!.id!;
     admin = actors.admin;
