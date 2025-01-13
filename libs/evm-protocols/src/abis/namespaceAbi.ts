@@ -21,4 +21,4 @@ export const namespaceAbi = [
     outputs: [],
     stateMutability: 'nonpayable',
   },
-];
+] as const;

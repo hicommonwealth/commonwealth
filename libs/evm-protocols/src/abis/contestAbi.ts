@@ -572,4 +572,4 @@ export const contestAbi = [
     name: 'OwnableUnauthorizedAccount',
     inputs: [{ name: 'account', type: 'address', internalType: 'address' }],
   },
-];
+] as const;
