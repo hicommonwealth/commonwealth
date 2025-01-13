@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 
-const TARGET_URL = 'common_xyz://test';
+const TARGET_URL = 'commonxyz://test';
 
 /**
  * Test redirecting to the mobile app and that it loads and switches to
