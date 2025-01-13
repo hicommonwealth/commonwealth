@@ -581,6 +581,7 @@ function createRedirectURI(params: string = '') {
   const href = url.href;
 
   if (isMobileApp()) {
+    console.log("Using 'commonxyz://' in redirect URI");
     return href.replace(/^https:\/\//, 'commonxyz://');
   } else {
     return href;
