@@ -9,7 +9,7 @@ import {
 import * as evm from '@hicommonwealth/evm-protocols';
 import { createEventRegistryChainNodes, models } from '@hicommonwealth/model';
 import { ContestResults, EventNames } from '@hicommonwealth/schemas';
-import { delay } from '@hicommonwealth/shared';
+import { CONTEST_FEE_PERCENT, delay } from '@hicommonwealth/shared';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import {
@@ -166,20 +166,21 @@ describe('Contests projection lifecycle', () => {
 
   test('should project events on multiple contests', async () => {
     const contestBalance = 10000000000;
+    const multiplier = (100 - CONTEST_FEE_PERCENT) / 100;
     const prizePool =
-      (BigInt(contestBalance) * BigInt(prize_percentage)) / 100n;
+      ((Number(contestBalance) * Number(prize_percentage)) / 100) * multiplier;
     const score = [
       {
         creator_address: creator1,
         content_id: content_id.toString(),
         votes: 1,
-        prize: ((prizePool * BigInt(payout_structure[0])) / 100n).toString(),
+        prize: ((prizePool * Number(payout_structure[0])) / 100).toString(),
       },
       {
         creator_address: creator2,
         content_id: content_id.toString(),
         votes: 2,
-        prize: ((prizePool * BigInt(payout_structure[1])) / 100n).toString(),
+        prize: ((prizePool * Number(payout_structure[1])) / 100).toString(),
       },
     ];
     getTokenAttributes.mockResolvedValue({ ticker, decimals });

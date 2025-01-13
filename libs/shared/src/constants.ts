@@ -43,3 +43,5 @@ export const TEST_BLOCK_INFO_STRING =
 export const MIN_CHARS_TO_SHOW_MORE = 500;
 
 export const MAX_COMMENT_DEPTH = 8;
+
+export const CONTEST_FEE_PERCENT = 10;
