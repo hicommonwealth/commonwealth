@@ -1,13 +1,17 @@
 import { Role } from '@hicommonwealth/shared';
-import React from 'react';
+import { formatAddressShort } from 'client/scripts/helpers';
+import AddressInfo from 'client/scripts/models/AddressInfo';
+import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/CWButton';
+import { CWModal } from 'client/scripts/views/components/component_kit/new_designs/CWModal';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import Permissions from 'utils/Permissions';
 import { Avatar } from 'views/components/Avatar';
 import { CWCheckbox } from 'views/components/component_kit/cw_checkbox';
 import { CWTable } from 'views/components/component_kit/new_designs/CWTable';
 import { CWTableState } from 'views/components/component_kit/new_designs/CWTable/useCWTableState';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import { getFallbackImage } from '../helper';
+import { ManageOnchainModal } from './ManageOnchainModal';
 import './MembersSection.scss';
 
 export type Group = {
@@ -24,6 +28,7 @@ export type Member = {
   stakeBalance?: string;
   lastActive?: string;
   address?: string;
+  addresses?: AddressInfo[];
 };
 
 export type MemberWithGroups = Omit<Member, 'groups'> & {
@@ -49,6 +54,8 @@ const MembersSection = ({
   handleCheckboxChange,
   extraColumns,
 }: MembersSectionProps) => {
+  const [isRoleModalOpen, setIsRoleModalOpen] = useState(false);
+
   return (
     <div className="MembersSection">
       <CWTable
@@ -76,12 +83,6 @@ const MembersSection = ({
                   />
                   <p>{member.name}</p>
                 </Link>
-                {member.role === Permissions.ROLES.ADMIN && (
-                  <CWTag label="Admin" type="referendum" />
-                )}
-                {member.role === Permissions.ROLES.MODERATOR && (
-                  <CWTag label="Moderator" type="referendum" />
-                )}
               </div>
             ),
           },
@@ -112,11 +113,52 @@ const MembersSection = ({
               <div className="table-cell text-right">{member.stakeBalance}</div>
             ),
           },
+          addresses: {
+            sortValue: member.address?.length || 0,
+            customElement: (
+              <div className="table-cell">
+                {member.addresses?.map((address, index) => {
+                  return (
+                    <div key={index} className="address-item">
+                      <CWTag
+                        label={formatAddressShort(address.address)}
+                        type="address"
+                        iconName="ethereum"
+                      />
+                    </div>
+                  );
+                })}
+              </div>
+            ),
+          },
+          actions: {
+            customElement: (
+              <CWButton
+                label="Manage On Chain Role Privileges"
+                buttonType="secondary"
+                onClick={() => setIsRoleModalOpen(true)}
+              />
+            ),
+          },
           // @ts-expect-error <StrictNullChecks/>
           ...extraColumns(member),
         }))}
         onScrollEnd={onLoadMoreMembers}
         isLoadingMoreRows={isLoadingMoreMembers}
+      />
+      <CWModal
+        size="small"
+        content={
+          <ManageOnchainModal
+            onClose={() => {
+              setIsRoleModalOpen(false);
+            }}
+          />
+        }
+        onClose={() => {
+          setIsRoleModalOpen(false);
+        }}
+        open={isRoleModalOpen}
       />
     </div>
   );
