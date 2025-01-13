@@ -104,9 +104,7 @@ const ProfilePageRedirect = lazy(() => import('views/pages/profile_redirect'));
 
 const RewardsPage = lazy(() => import('views/pages/RewardsPage'));
 
-const CustomDomainRoutes = ({
-  tokenizedCommunityEnabled,
-}: RouteFeatureFlags) => {
+const CustomDomainRoutes = ({ launchpadEnabled }: RouteFeatureFlags) => {
   return [
     <Route
       key="/"
@@ -121,7 +119,7 @@ const CustomDomainRoutes = ({
       path="/createCommunity"
       element={withLayout(CreateCommunityPage, { type: 'common' })}
     />,
-    ...(tokenizedCommunityEnabled
+    ...(launchpadEnabled
       ? [
           <Route
             key="/createTokenCommunity"

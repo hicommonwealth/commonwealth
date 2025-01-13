@@ -7,6 +7,7 @@ import {
 } from '@polkadot/util-crypto';
 import moment from 'moment';
 import {
+  CONTEST_FEE_PERCENT,
   PRODUCTION_DOMAIN,
   S3_ASSET_BUCKET_CDN,
   S3_RAW_ASSET_BUCKET_DOMAIN,
@@ -320,28 +321,6 @@ export const renderQuillDeltaToText = (
     .join(paragraphSeparator);
 };
 
-export function getWebhookDestination(webhookUrl = ''): string {
-  if (!/^https?:\/\/[^\s/$.?#].[^\s]*$/.test(webhookUrl)) return 'unknown';
-
-  let destination = 'unknown';
-  if (
-    webhookUrl.startsWith('https://discord.com/api/webhooks/') ||
-    webhookUrl.startsWith('https://discordapp.com/api/webhooks/')
-  )
-    destination = 'discord';
-  else if (webhookUrl.startsWith('https://hooks.slack.com/'))
-    destination = 'slack';
-  else if (webhookUrl.startsWith('https://hooks.zapier.com/'))
-    destination = 'zapier';
-  else if (webhookUrl.startsWith('https://api.telegram.org/@')) {
-    const [, channelId] = webhookUrl.split('/@');
-    if (!channelId) destination = 'unknown';
-    else destination = 'telegram';
-  }
-
-  return destination;
-}
-
 export function getDecodedString(str: string) {
   try {
     return decodeURIComponent(str);
@@ -453,4 +432,27 @@ export const buildContestLeaderboardUrl = (
   contestAddress: string,
 ) => {
   return `${baseUrl}/${communityId}/contests/${contestAddress}`;
+};
+
+// returns balance with fee deducted
+export const calculateNetContestBalance = (originalBalance: number) => {
+  const multiplier = (100 - CONTEST_FEE_PERCENT) / 100;
+  return (originalBalance || 0) * multiplier;
+};
+
+// returns array of prize amounts
+export const buildContestPrizes = (
+  contestBalance: number,
+  payoutStructure?: number[],
+  decimals?: number,
+): number[] => {
+  // 10% fee deducted from prize pool
+  const netContestBalance = calculateNetContestBalance(Number(contestBalance));
+  return netContestBalance && payoutStructure
+    ? payoutStructure.map(
+        (percentage) =>
+          (Number(netContestBalance) * (percentage / 100)) /
+          Math.pow(10, decimals || 18),
+      )
+    : [];
 };

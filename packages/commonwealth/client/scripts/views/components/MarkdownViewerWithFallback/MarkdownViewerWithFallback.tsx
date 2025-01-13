@@ -8,6 +8,7 @@ type MarkdownViewerWithFallbackProps = {
   readonly cutoffLines?: number;
   readonly customShowMoreButton?: ReactNode;
   readonly className?: string;
+  readonly maxChars?: number;
   onImageClick?: () => void;
 };
 
@@ -22,11 +23,11 @@ export const MarkdownViewerWithFallback = (
     cutoffLines,
     customShowMoreButton,
     className,
+    maxChars,
     onImageClick,
   } = props;
 
   const newEditor = useFlag('newEditor');
-
   if (newEditor) {
     return (
       <MarkdownViewer
@@ -42,9 +43,10 @@ export const MarkdownViewerWithFallback = (
     <QuillRenderer
       customClass={className}
       doc={markdown ?? ''}
-      cutoffLines={cutoffLines}
+      maxChars={maxChars}
       customShowMoreButton={customShowMoreButton}
       onImageClick={onImageClick}
+      cutoffLines={cutoffLines}
     />
   );
 };

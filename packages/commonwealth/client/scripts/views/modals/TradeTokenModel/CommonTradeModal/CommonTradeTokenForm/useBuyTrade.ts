@@ -38,9 +38,8 @@ const useBuyTrade = ({
   const ethToCurrencyRate = parseFloat(
     ethToCurrencyRateData?.data?.data?.amount || '0.00',
   );
-  const ethBuyAmount = baseCurrencyBuyAmountDecimals / ethToCurrencyRate;
   const commonPlatformFeeForBuyTradeInEth =
-    (commonFeePercentage / 100) * ethBuyAmount;
+    (commonFeePercentage / 100) * baseCurrencyBuyAmountDecimals;
 
   // imp: this query uses CommunityStakes helper to get eth price, but its
   // a generic query so no need to initiate a separate Launchpad helper
@@ -88,7 +87,9 @@ const useBuyTrade = ({
     change: React.ChangeEvent<HTMLInputElement> | TokenPresetAmounts,
   ) => {
     if (typeof change == 'number') {
-      setBaseCurrencyBuyAmountString(`${change}`);
+      // preset amounts are in tradeConfig.ethBuyCurrency
+      const ethToBuyFromUSDPresetAmount = change / ethToCurrencyRate;
+      setBaseCurrencyBuyAmountString(`${ethToBuyFromUSDPresetAmount}`);
     } else if (typeof change == 'string') {
       // not handling string type preset amounts atm
     } else {
@@ -120,7 +121,7 @@ const useBuyTrade = ({
       const payload = {
         chainRpc: chainNode.url,
         ethChainId: chainNode.ethChainId,
-        amountEth: ethBuyAmount * 1e18, // amount in wei
+        amountEth: baseCurrencyBuyAmountDecimals * 1e18, // amount in wei
         walletAddress: selectedAddress,
         tokenAddress: tradeConfig.token.token_address,
       };
@@ -171,15 +172,18 @@ const useBuyTrade = ({
     // Note: not exporting state setters directly, all "buy token" business logic should be done in this hook
     amounts: {
       invest: {
+        ethBuyCurrency: tradeConfig.ethBuyCurrency,
         baseCurrency: {
-          name: tradeConfig.currency, // USD/GBP etc
+          // eth will be the currency used to buy token, and eth will be bought with tradeConfig.ethBuyCurrency
+          name: 'ETH',
           amount: baseCurrencyBuyAmountString,
           onAmountChange: onBaseCurrencyBuyAmountChange,
           presetAmounts: tradeConfig.buyTokenPresetAmounts,
           unitEthExchangeRate: ethToCurrencyRate,
-          toEth: ethBuyAmount,
+          toEth: baseCurrencyBuyAmountDecimals,
         },
-        insufficientFunds: ethBuyAmount > parseFloat(selectedAddressEthBalance),
+        insufficientFunds:
+          baseCurrencyBuyAmountDecimals > parseFloat(selectedAddressEthBalance),
         commonPlatformFee: {
           percentage: `${commonFeePercentage}%`,
           eth: commonPlatformFeeForBuyTradeInEth,
@@ -188,7 +192,7 @@ const useBuyTrade = ({
       gain: {
         token:
           unitEthToTokenBuyExchangeRate *
-          (ethBuyAmount - commonPlatformFeeForBuyTradeInEth),
+          (baseCurrencyBuyAmountDecimals - commonPlatformFeeForBuyTradeInEth),
       },
     },
     selectedAddressEthBalance: {

@@ -1,8 +1,6 @@
 import { models } from '@hicommonwealth/model';
 import { chainEvents, events } from '@hicommonwealth/schemas';
-import Web3 from 'web3';
 import { z } from 'zod';
-import { chainNodeMustExist } from './utils';
 
 export async function handleReferralSet(
   event: z.infer<typeof events.ChainEventCreated>,
@@ -34,18 +32,13 @@ export async function handleReferralSet(
     return;
   }
 
-  const chainNode = await chainNodeMustExist(event.eventSource.ethChainId);
-
-  const web3 = new Web3(chainNode.private_url! || chainNode.url!);
-  const block = await web3.eth.getBlock(event.rawLog.blockHash);
-
   // Triggered when an incomplete Referral (off-chain only) was created during user sign up
   if (existingReferral && existingReferral?.eth_chain_id === null) {
     await existingReferral.update({
       eth_chain_id: event.eventSource.ethChainId,
       transaction_hash: event.rawLog.transactionHash,
       namespace_address: namespaceAddress,
-      created_on_chain_timestamp: Number(block.timestamp),
+      created_on_chain_timestamp: Number(event.block.timestamp),
     });
   }
   // Triggered when the referral was set on-chain only (user didn't sign up i.e. no incomplete Referral)
@@ -63,7 +56,7 @@ export async function handleReferralSet(
       referee_address: event.rawLog.address,
       referrer_address: referrerAddress,
       referrer_received_eth_amount: 0,
-      created_on_chain_timestamp: Number(block.timestamp),
+      created_on_chain_timestamp: Number(event.block.timestamp),
     });
   }
 }

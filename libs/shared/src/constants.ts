@@ -39,3 +39,9 @@ export const MAX_TRUNCATED_CONTENT_LENGTH = 2_000;
 
 export const TEST_BLOCK_INFO_STRING =
   '{"number":1,"hash":"0x0f927bde6fb00940895178da0d32948714ea6e76f6374f03ffbbd7e0787e15bf","timestamp":1665083987891}';
+
+export const MIN_CHARS_TO_SHOW_MORE = 500;
+
+export const MAX_COMMENT_DEPTH = 8;
+
+export const CONTEST_FEE_PERCENT = 10;
