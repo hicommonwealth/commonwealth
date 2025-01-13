@@ -19,7 +19,6 @@ import finishUpdateEmail from '../routes/finishUpdateEmail';
 import getAddressStatus from '../routes/getAddressStatus';
 import { healthHandler } from '../routes/health';
 import reactionsCounts from '../routes/reactionsCounts';
-import selectCommunity from '../routes/selectCommunity';
 import starCommunity from '../routes/starCommunity';
 import { status } from '../routes/status';
 import threadsUsersCountAndAvatars from '../routes/threadsUsersCountAndAvatars';
@@ -174,13 +173,6 @@ function setupRouter(
     '/getAddressStatus',
     passport.authenticate('jwt', { session: false }),
     getAddressStatus.bind(this, models),
-  );
-  registerRoute(
-    router,
-    'post',
-    '/selectCommunity',
-    passport.authenticate('jwt', { session: false }),
-    selectCommunity.bind(this, models),
   );
 
   // communities
