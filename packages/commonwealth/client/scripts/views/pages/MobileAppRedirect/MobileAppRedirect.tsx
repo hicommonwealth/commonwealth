@@ -14,5 +14,5 @@ export const MobileAppRedirect = () => {
     }, 5000);
   });
 
-  return <div>Redirecting to mobile app in 5 seconds via ${TARGET_URL}</div>;
+  return <div>Redirecting to mobile app in 5 seconds via {TARGET_URL}</div>;
 };
