@@ -25,7 +25,7 @@ import {
   ProviderError,
   SpyNotificationsProvider,
   ThrowingSpyNotificationsProvider,
-} from '../../src/tester';
+} from '../utils/mockedNotificationProvider';
 
 const namespaceAddress = '0x123';
 

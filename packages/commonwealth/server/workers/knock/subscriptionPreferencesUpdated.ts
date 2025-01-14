@@ -166,6 +166,7 @@ async function handleEmailPreferenceUpdates(
   }
 }
 
+// TODO: this should be in libs/model, but currently depending on libs/adapter for config
 export const processSubscriptionPreferencesUpdated: EventHandler<
   'SubscriptionPreferencesUpdated',
   typeof output

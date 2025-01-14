@@ -1,7 +1,10 @@
 import {
   dispose,
   disposeAdapter,
+  NotificationsProvider,
   notificationsProvider,
+  NotificationsProviderGetMessagesReturn,
+  NotificationsProviderSchedulesReturn,
   RepeatFrequency,
   WorkflowKeys,
 } from '@hicommonwealth/core';
@@ -27,6 +30,42 @@ import { processSubscriptionPreferencesUpdated } from '../../../server/workers/k
 
 chai.use(chaiAsPromised);
 
+function SpyNotificationsProvider(stubs?: {
+  triggerWorkflowStub?: Mock<
+    [],
+    Promise<PromiseSettledResult<{ workflow_run_id: string }>[]>
+  >;
+  getMessagesStub?: Mock<[], Promise<NotificationsProviderGetMessagesReturn>>;
+  getSchedulesStub?: Mock<[], Promise<NotificationsProviderSchedulesReturn>>;
+  createSchedulesStub?: Mock<[], Promise<NotificationsProviderSchedulesReturn>>;
+  deleteSchedulesStub?: Mock<[], Promise<Set<string>>>;
+  identifyUserStub?: Mock<[], Promise<{ id: string }>>;
+  registerClientRegistrationToken?: Mock<[], Promise<boolean>>;
+  unregisterClientRegistrationToken?: Mock<[], Promise<boolean>>;
+}): NotificationsProvider {
+  return {
+    name: 'SpyNotificationsProvider',
+    dispose: vi.fn(() => Promise.resolve()),
+    triggerWorkflow:
+      stubs?.triggerWorkflowStub || vi.fn(() => Promise.resolve([])),
+    getMessages: stubs?.getMessagesStub || vi.fn(() => Promise.resolve([])),
+    getSchedules: stubs?.getSchedulesStub || vi.fn(() => Promise.resolve([])),
+    createSchedules:
+      stubs?.createSchedulesStub || vi.fn(() => Promise.resolve([])),
+    deleteSchedules:
+      stubs?.deleteSchedulesStub || vi.fn(() => Promise.resolve(new Set())),
+    identifyUser:
+      stubs?.identifyUserStub || vi.fn(() => Promise.resolve({ id: '' })),
+    registerClientRegistrationToken:
+      stubs?.registerClientRegistrationToken ||
+      vi.fn(() => Promise.resolve(true)),
+    unregisterClientRegistrationToken:
+      stubs?.unregisterClientRegistrationToken ||
+      vi.fn(() => Promise.resolve(true)),
+  };
+}
+
+// TODO: this should be in libs/model, but currently depending on libs/adapter for config
 describe('subscriptionPreferencesUpdated', () => {
   let user: z.infer<typeof schemas.User> | undefined;
 
@@ -65,7 +104,7 @@ describe('subscriptionPreferencesUpdated', () => {
 
   test('should delete all exiting email schedules if emails are disabled', async () => {
     const provider = notificationsProvider({
-      adapter: tester.SpyNotificationsProvider({
+      adapter: SpyNotificationsProvider({
         getSchedulesStub: vi.fn().mockResolvedValue([
           { id: '1', workflow: WorkflowKeys.EmailRecap },
           { id: '2', workflow: WorkflowKeys.EmailDigest },
@@ -109,7 +148,7 @@ describe('subscriptionPreferencesUpdated', () => {
     );
 
     const provider = notificationsProvider({
-      adapter: tester.SpyNotificationsProvider({
+      adapter: SpyNotificationsProvider({
         getSchedulesStub: vi.fn().mockResolvedValue([]),
         createSchedulesStub: vi.fn().mockResolvedValue({}),
       }),
@@ -161,7 +200,7 @@ describe('subscriptionPreferencesUpdated', () => {
     );
 
     const provider = notificationsProvider({
-      adapter: tester.SpyNotificationsProvider({
+      adapter: SpyNotificationsProvider({
         getSchedulesStub: vi
           .fn()
           .mockResolvedValue([{ id: '1', workflow: WorkflowKeys.EmailRecap }]),
@@ -199,7 +238,7 @@ describe('subscriptionPreferencesUpdated', () => {
     );
 
     const provider = notificationsProvider({
-      adapter: tester.SpyNotificationsProvider({
+      adapter: SpyNotificationsProvider({
         getSchedulesStub: vi
           .fn()
           .mockResolvedValue([{ id: '1', workflow: WorkflowKeys.EmailRecap }]),
@@ -241,7 +280,7 @@ describe('subscriptionPreferencesUpdated', () => {
     );
 
     const provider = notificationsProvider({
-      adapter: tester.SpyNotificationsProvider({
+      adapter: SpyNotificationsProvider({
         getSchedulesStub: vi.fn().mockResolvedValue([]),
         createSchedulesStub: vi.fn().mockResolvedValue({}),
         deleteSchedulesStub: vi.fn().mockResolvedValue(new Set(['1'])),
