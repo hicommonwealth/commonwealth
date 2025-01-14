@@ -106,6 +106,7 @@ function membersSqlWithoutSearch(
   offset: number,
 ) {
   return `
+      WITH T AS (SELECT profile_count as total FROM "Communities" WHERE id = :community_id)
       SELECT
         U.id AS user_id,
         U.profile->>'name' AS profile_name,
@@ -129,13 +130,15 @@ function membersSqlWithoutSearch(
               FROM "Addresses" RA JOIN "Users" RU on RA.user_id = RU.id 
               WHERE RA.address = A.referred_by_address LIMIT 1)
         )) AS addresses,
-        COALESCE(ARRAY_AGG(M.group_id) FILTER (WHERE M.group_id IS NOT NULL), '{}') AS group_ids
+        COALESCE(ARRAY_AGG(M.group_id) FILTER (WHERE M.group_id IS NOT NULL), '{}') AS group_ids,
+        T.total
       FROM "Addresses" A
         JOIN "Users" U ON A.user_id = U.id
         LEFT JOIN "Memberships" M ON A.id = M.address_id AND M.reject_reason IS NULL
+        JOIN T ON TRUE
       WHERE
         A.community_id = :community_id
-      GROUP BY U.id
+      GROUP BY U.id, T.total
       ORDER BY ${orderBy}
       LIMIT ${limit} OFFSET ${offset};
      `;
@@ -172,7 +175,8 @@ function membersSqlWithSearch(
               FROM "Addresses" RA JOIN "Users" RU on RA.user_id = RU.id 
               WHERE RA.address = A.referred_by_address LIMIT 1)
         )) AS addresses,
-        COALESCE(ARRAY_AGG(M.group_id) FILTER (WHERE M.group_id IS NOT NULL), '{}') AS group_ids, T.total
+        COALESCE(ARRAY_AGG(M.group_id) FILTER (WHERE M.group_id IS NOT NULL), '{}') AS group_ids,
+        T.total
       FROM F 
         JOIN "Addresses" A ON F.id = A.id
         JOIN "Users" U ON A.user_id = U.id
@@ -234,15 +238,6 @@ export function GetMembers(): Query<typeof schemas.GetCommunityMembers> {
         replacements,
         type: QueryTypes.SELECT,
       });
-
-      if (!search) {
-        // TODO: @kurtisassad if we have a query for this case, why not include the total in the query to avoid this extra step?
-        const total = await models.Community.findOne({
-          where: { id: community_id },
-          attributes: ['profile_count'],
-        });
-        members.forEach((m) => (m.total = total?.profile_count));
-      }
 
       return schemas.buildPaginatedResponse(
         members,
