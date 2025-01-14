@@ -20,7 +20,9 @@ import {
   vi,
 } from 'vitest';
 import z from 'zod';
-import { models, processChainEventCreated, tester } from '../../src';
+import { tester } from '../../src';
+import { models } from '../../src/database';
+import { notifyChainEventCreated } from '../../src/policies/handlers/notifyChainEventCreated';
 import {
   ProviderError,
   SpyNotificationsProvider,
@@ -74,7 +76,7 @@ describe('chainEventCreated Event Handler', () => {
   });
 
   test('should do nothing if the event signature is unsupported', async () => {
-    await processChainEventCreated({
+    await notifyChainEventCreated({
       name: EventNames.ChainEventCreated,
       payload: {
         eventSource: {
@@ -86,7 +88,7 @@ describe('chainEventCreated Event Handler', () => {
 
   describe('Community Stakes', () => {
     test('should not throw if the community is invalid', async () => {
-      await processChainEventCreated({
+      await notifyChainEventCreated({
         name: EventNames.ChainEventCreated,
         payload: {
           eventSource: {
@@ -102,7 +104,7 @@ describe('chainEventCreated Event Handler', () => {
         adapter: SpyNotificationsProvider(),
       });
 
-      await processChainEventCreated({
+      await notifyChainEventCreated({
         name: EventNames.ChainEventCreated,
         payload: {
           eventSource: {
@@ -125,7 +127,7 @@ describe('chainEventCreated Event Handler', () => {
         user_id: user!.id,
       });
 
-      await processChainEventCreated({
+      await notifyChainEventCreated({
         name: EventNames.ChainEventCreated,
         payload: {
           eventSource: {
@@ -161,7 +163,7 @@ describe('chainEventCreated Event Handler', () => {
       });
 
       await expect(
-        processChainEventCreated({
+        notifyChainEventCreated({
           name: EventNames.ChainEventCreated,
           payload: {
             eventSource: {
