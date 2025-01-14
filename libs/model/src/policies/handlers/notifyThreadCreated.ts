@@ -16,7 +16,7 @@ const log = logger(import.meta);
 
 const output = z.boolean();
 
-export const processThreadCreated: EventHandler<
+export const notifyThreadCreated: EventHandler<
   'ThreadCreated',
   typeof output
 > = async ({ payload }) => {

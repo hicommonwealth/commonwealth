@@ -1,12 +1,12 @@
 import { Policy } from '@hicommonwealth/core';
 import { events } from '@hicommonwealth/schemas';
-import { processChainEventCreated } from './handlers/chainEventCreated';
-import { processCommentCreated } from './handlers/commentCreated';
-import { processCommentUpvoted } from './handlers/commentUpvoted';
-import { processSnapshotProposalCreated } from './handlers/snapshotProposalCreated';
-import { processThreadCreated } from './handlers/threadCreated';
-import { processThreadUpvoted } from './handlers/threadUpvoted';
-import { processUserMentioned } from './handlers/userMentioned';
+import { notifyChainEventCreated } from './handlers/notifyChainEventCreated';
+import { notifyCommentCreated } from './handlers/notifyCommentCreated';
+import { notifyCommentUpvoted } from './handlers/notifyCommentUpvoted';
+import { notifySnapshotProposalCreated } from './handlers/notifySnapshotProposalCreated';
+import { notifyThreadCreated } from './handlers/notifyThreadCreated';
+import { notifyThreadUpvoted } from './handlers/notifyThreadUpvoted';
+import { notifyUserMentioned } from './handlers/notifyUserMentioned';
 
 const notificationInputs = {
   SnapshotProposalCreated: events.SnapshotProposalCreated,
@@ -23,25 +23,25 @@ export function NotificationsPolicy(): Policy<typeof notificationInputs> {
     inputs: notificationInputs,
     body: {
       SnapshotProposalCreated: async (event) => {
-        await processSnapshotProposalCreated(event);
+        await notifySnapshotProposalCreated(event);
       },
       ChainEventCreated: async (event) => {
-        await processChainEventCreated(event);
+        await notifyChainEventCreated(event);
       },
       ThreadCreated: async (event) => {
-        await processThreadCreated(event);
+        await notifyThreadCreated(event);
       },
       CommentCreated: async (event) => {
-        await processCommentCreated(event);
+        await notifyCommentCreated(event);
       },
       UserMentioned: async (event) => {
-        await processUserMentioned(event);
+        await notifyUserMentioned(event);
       },
       ThreadUpvoted: async (event) => {
-        await processThreadUpvoted(event);
+        await notifyThreadUpvoted(event);
       },
       CommentUpvoted: async (event) => {
-        await processCommentUpvoted(event);
+        await notifyCommentUpvoted(event);
       },
     },
   };

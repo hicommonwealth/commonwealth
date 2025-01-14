@@ -12,7 +12,7 @@ import { getCommentUrl } from '../utils/utils';
 const log = logger(import.meta);
 const output = z.boolean();
 
-export const processCommentUpvoted: EventHandler<
+export const notifyCommentUpvoted: EventHandler<
   'CommentUpvoted',
   typeof output
 > = async ({ payload }) => {

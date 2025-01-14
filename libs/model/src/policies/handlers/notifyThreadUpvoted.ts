@@ -12,7 +12,7 @@ import { getThreadUrl } from '../utils/utils';
 const log = logger(import.meta);
 const output = z.boolean();
 
-export const processThreadUpvoted: EventHandler<
+export const notifyThreadUpvoted: EventHandler<
   'ThreadUpvoted',
   typeof output
 > = async ({ payload }) => {

@@ -22,7 +22,7 @@ import {
 } from 'vitest';
 import z from 'zod';
 import { models, tester } from '../../src';
-import { processSnapshotProposalCreated } from '../../src/policies/handlers/snapshotProposalCreated';
+import { notifySnapshotProposalCreated } from '../../src/policies/handlers/notifySnapshotProposalCreated';
 import { getSnapshotUrl } from '../../src/policies/utils/utils';
 import {
   ProviderError,
@@ -70,7 +70,7 @@ describe('snapshotProposalCreated Event Handler', () => {
   });
 
   test('should not throw if the proposal event is not supported', async () => {
-    const res = await processSnapshotProposalCreated({
+    const res = await notifySnapshotProposalCreated({
       name: EventNames.SnapshotProposalCreated,
       payload: { event: 'ranndommmm' } as z.infer<
         typeof schemas.events.SnapshotProposalCreated
@@ -80,7 +80,7 @@ describe('snapshotProposalCreated Event Handler', () => {
   });
 
   test('should not throw if the proposal space or id is not provided', async () => {
-    const res = await processSnapshotProposalCreated({
+    const res = await notifySnapshotProposalCreated({
       name: EventNames.SnapshotProposalCreated,
       payload: {
         event: SnapshotEventType.Created,
@@ -94,7 +94,7 @@ describe('snapshotProposalCreated Event Handler', () => {
       adapter: SpyNotificationsProvider(),
     });
 
-    const res = await processSnapshotProposalCreated({
+    const res = await notifySnapshotProposalCreated({
       name: EventNames.SnapshotProposalCreated,
       payload: {
         event: SnapshotEventType.Created,
@@ -117,7 +117,7 @@ describe('snapshotProposalCreated Event Handler', () => {
       user_id: user!.id,
     });
 
-    const res = await processSnapshotProposalCreated({
+    const res = await notifySnapshotProposalCreated({
       name: EventNames.SnapshotProposalCreated,
       payload: {
         event: SnapshotEventType.Created,
@@ -155,7 +155,7 @@ describe('snapshotProposalCreated Event Handler', () => {
     });
 
     await expect(
-      processSnapshotProposalCreated({
+      notifySnapshotProposalCreated({
         name: EventNames.SnapshotProposalCreated,
         payload: {
           event: SnapshotEventType.Created,

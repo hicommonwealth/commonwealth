@@ -21,7 +21,7 @@ import {
 } from 'vitest';
 import z from 'zod';
 import { tester } from '../../src';
-import { processUserMentioned } from '../../src/policies/handlers/userMentioned';
+import { notifyUserMentioned } from '../../src/policies/handlers/notifyUserMentioned';
 import { getThreadUrl } from '../../src/policies/utils/utils';
 import {
   ProviderError,
@@ -88,7 +88,7 @@ describe('userMentioned Event Handler', () => {
   });
 
   test('should not throw if relevant community is not found', async () => {
-    const res = await processUserMentioned({
+    const res = await notifyUserMentioned({
       name: EventNames.UserMentioned,
       payload: {
         communityId: 'nonexistent',
@@ -102,7 +102,7 @@ describe('userMentioned Event Handler', () => {
       adapter: SpyNotificationsProvider(),
     });
 
-    const res = await processUserMentioned({
+    const res = await notifyUserMentioned({
       name: EventNames.UserMentioned,
       payload: {
         // @ts-expect-error StrictNullChecks
@@ -144,7 +144,7 @@ describe('userMentioned Event Handler', () => {
     });
 
     await expect(
-      processUserMentioned({
+      notifyUserMentioned({
         name: EventNames.UserMentioned,
         payload: {
           // @ts-expect-error StrictNullChecks

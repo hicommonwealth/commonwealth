@@ -14,7 +14,7 @@ const log = logger(import.meta);
 
 const output = z.boolean();
 
-export const processSnapshotProposalCreated: EventHandler<
+export const notifySnapshotProposalCreated: EventHandler<
   'SnapshotProposalCreated',
   typeof output
 > = async ({ payload }) => {

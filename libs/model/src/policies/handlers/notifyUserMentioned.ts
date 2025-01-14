@@ -20,7 +20,7 @@ const log = logger(import.meta);
 
 const output = z.boolean();
 
-export const processUserMentioned: EventHandler<
+export const notifyUserMentioned: EventHandler<
   'UserMentioned',
   typeof output
 > = async ({ payload }) => {

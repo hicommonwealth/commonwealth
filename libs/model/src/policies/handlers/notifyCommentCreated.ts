@@ -29,7 +29,7 @@ const output = z.boolean();
  * @returns boolean or undefined - A boolean indicating if a workflow was triggered. Undefined is returned if the
  * author or community does not exist
  */
-export const processCommentCreated: EventHandler<
+export const notifyCommentCreated: EventHandler<
   'CommentCreated',
   typeof output
 > = async ({ payload }) => {
