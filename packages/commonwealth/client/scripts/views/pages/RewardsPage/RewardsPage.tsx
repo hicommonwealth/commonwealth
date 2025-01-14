@@ -25,6 +25,7 @@ const RewardsPage = () => {
   const navigate = useCommonNavigate();
   const user = useUserStore();
   const rewardsEnabled = useFlag('rewardsPage');
+  const xpEnabled = useFlag('xp');
 
   const [mobileTab, setMobileTab] = useState<MobileTabType>(getInitialTab());
   const [tableTab, setTableTab] = useState(tabToTable[getInitialTab()]);
@@ -80,22 +81,26 @@ const RewardsPage = () => {
 
         <div className="rewards-tab-container">
           <CWTabsRow>
-            {Object.values(TableType).map((type) => (
-              <CWTab
-                key={type}
-                label={type}
-                isSelected={tableTab === type}
-                onClick={() => {
-                  setTableTab(type);
-                }}
-              />
-            ))}
+            {Object.values(TableType).map((type) =>
+              type === TableType.XPEarnings && !xpEnabled ? (
+                <></>
+              ) : (
+                <CWTab
+                  key={type}
+                  label={type}
+                  isSelected={tableTab === type}
+                  onClick={() => {
+                    setTableTab(type);
+                  }}
+                />
+              ),
+            )}
           </CWTabsRow>
         </div>
 
         {tableTab === TableType.Referrals && <ReferralTable />}
         {tableTab === TableType.TokenTXHistory && <QuestTable />}
-        {tableTab === TableType.XPEarnings && <WalletTable />}
+        {tableTab === TableType.XPEarnings && xpEnabled && <WalletTable />}
       </section>
     </CWPageLayout>
   );
