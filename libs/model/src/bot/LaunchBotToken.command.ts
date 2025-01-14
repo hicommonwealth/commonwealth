@@ -12,7 +12,7 @@ import { z } from 'zod';
 import { models } from '../database';
 import { mustExist } from '../middleware/guards';
 
-export function LaunchToken(): Command<typeof schemas.LaunchToken> {
+export function LaunchBotToken(): Command<typeof schemas.LaunchToken> {
   return {
     ...schemas.LaunchToken,
     auth: [],
