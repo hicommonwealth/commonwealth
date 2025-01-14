@@ -63,6 +63,17 @@ const ViewProposalPage = ({ identifier }: ViewProposalPageAttrs) => {
   // @ts-expect-error <StrictNullChecks/>
   useCosmosProposalDepositsQuery(proposal, +poolData);
 
+  // Move all hooks to the top level
+  useManageDocumentTitle('View proposal', proposal?.title);
+
+  useNecessaryEffect(() => {
+    if (!isAdapterLoaded) {
+      app.chainAdapterReady.on('ready', () => {
+        setIsAdapterLoaded(true);
+      });
+    }
+  }, [isAdapterLoaded, proposalId]);
+
   useEffect(() => {
     if (cosmosProposal) {
       // Cast to AnyProposal since we know it's a valid proposal type
@@ -82,6 +93,30 @@ const ViewProposalPage = ({ identifier }: ViewProposalPageAttrs) => {
     }
   }, [metadata]);
 
+  useEffect(() => {
+    if (proposal) {
+      proposal.isFetched.once('redraw', forceRerender);
+      return () => {
+        proposal.isFetched.removeAllListeners();
+      };
+    }
+  }, [proposal, forceRerender]);
+
+  // Early returns for various states
+  if (!app.chain?.apiInitialized || !app.chain?.base) {
+    return <PageLoading message="Initializing chain..." />;
+  }
+
+  if (app.chain.base !== ChainBase.CosmosSDK) {
+    return (
+      <PageNotFound message="This proposal type is not supported for the current chain." />
+    );
+  }
+
+  if (isFetchingProposal || !isAdapterLoaded) {
+    return <PageLoading message="Loading proposal..." />;
+  }
+
   // Show not found if we have no data but we're not loading or errored
   if (!cosmosProposal && !isFetchingProposal && !cosmosError) {
     return (
@@ -89,23 +124,11 @@ const ViewProposalPage = ({ identifier }: ViewProposalPageAttrs) => {
     );
   }
 
-  useEffect(() => {
-    proposal?.isFetched.once('redraw', forceRerender);
-
-    return () => {
-      proposal?.isFetched.removeAllListeners();
-    };
-  }, [proposal, forceRerender]);
-
-  useManageDocumentTitle('View proposal', proposal?.title);
-
-  useNecessaryEffect(() => {
-    if (!isAdapterLoaded) {
-      app.chainAdapterReady.on('ready', () => {
-        setIsAdapterLoaded(true);
-      });
-    }
-  }, [isAdapterLoaded, proposalId]);
+  if (cosmosError) {
+    return (
+      <PageNotFound message="We couldn't find what you searched for. Try searching again." />
+    );
+  }
 
   // Check chain initialization and type before proceeding
   if (!app.chain?.apiInitialized || !app.chain?.base) {
