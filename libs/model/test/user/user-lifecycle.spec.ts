@@ -6,7 +6,6 @@ import {
 import Chance from 'chance';
 import moment from 'moment';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { CreateComment, CreateCommentReaction } from '../../src/comment';
 import { models } from '../../src/database';
 import { CreateQuest, UpdateQuest } from '../../src/quest';
 import { CreateThread } from '../../src/thread';
