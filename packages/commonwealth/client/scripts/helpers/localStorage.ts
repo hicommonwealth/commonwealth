@@ -44,3 +44,7 @@ export const setLocalStorageItem = (
   console.log('@@@Setting refcode', item);
   localStorage.setItem(key, JSON.stringify(item));
 };
+
+export const removeLocalStorageItem = (key: LocalStorageKeys) => {
+  localStorage.removeItem(key);
+};

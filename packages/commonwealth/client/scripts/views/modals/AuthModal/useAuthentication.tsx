@@ -26,6 +26,11 @@ import {
   getSessionFromWallet,
   signSessionWithAccount,
 } from 'controllers/server/sessions';
+import {
+  getLocalStorageItem,
+  LocalStorageKeys,
+  removeLocalStorageItem,
+} from 'helpers/localStorage';
 import _ from 'lodash';
 import { Magic } from 'magic-sdk';
 import { useEffect, useState } from 'react';
@@ -97,6 +102,8 @@ const useAuthentication = (props: UseAuthenticationProps) => {
 
   const { mutateAsync: updateUser } = useUpdateUserMutation();
   const { signIn } = useSignIn();
+
+  const refcode = getLocalStorageItem(LocalStorageKeys.ReferralCode);
 
   useEffect(() => {
     if (process.env.ETH_RPC === 'e2e-test') {
@@ -267,6 +274,8 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       }
     }
 
+    removeLocalStorageItem(LocalStorageKeys.ReferralCode);
+
     if (exitOnComplete) {
       props?.onModalClose?.();
       await handleSuccess(account.address, newelyCreated);
@@ -298,6 +307,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
         address: account.address,
         wallet_id: account.walletId!,
         block_info: account.validationBlockInfo,
+        referrer_address: refcode,
       });
       await onLogInWithAccount(account, true, newlyCreated);
       return;
@@ -328,6 +338,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
           address: account.address,
           wallet_id: account.walletId!,
           block_info: account.validationBlockInfo,
+          referrer_address: refcode,
         });
         await onLogInWithAccount(account, true, newlyCreated);
       } catch (e) {
@@ -363,6 +374,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
           community_id: account.community.id,
           wallet_id: account.walletId!,
           block_info: account.validationBlockInfo,
+          referrer_address: refcode,
         });
       // @ts-expect-error StrictNullChecks
       await verifySession(session);
@@ -531,6 +543,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
         block_info: validationBlockInfo
           ? JSON.stringify(validationBlockInfo)
           : null,
+        referrer_address: refcode,
       });
       setIsNewlyCreated(newlyCreated);
       if (isMobile) {
@@ -568,6 +581,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       address,
       community_id: chainIdentifier,
       wallet_id: wallet.name,
+      referrer_address: refcode,
       block_info: validationBlockInfo
         ? JSON.stringify(validationBlockInfo)
         : null,
