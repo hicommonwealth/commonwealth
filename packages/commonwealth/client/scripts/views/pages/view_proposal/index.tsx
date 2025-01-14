@@ -126,32 +126,7 @@ const ViewProposalPage = ({ identifier }: ViewProposalPageAttrs) => {
 
   if (cosmosError) {
     return (
-      <PageNotFound message="We couldn't find what you searched for. Try searching again." />
-    );
-  }
-
-  // Check chain initialization and type before proceeding
-  if (!app.chain?.apiInitialized || !app.chain?.base) {
-    return <PageLoading message="Initializing chain..." />;
-  }
-
-  if (app.chain.base !== ChainBase.CosmosSDK) {
-    return (
-      <PageNotFound
-        message={'This proposal type is not supported for the current chain.'}
-      />
-    );
-  }
-
-  if (isFetchingProposal || !isAdapterLoaded) {
-    return <PageLoading message="Loading proposal..." />;
-  }
-
-  if (cosmosError) {
-    return (
-      <PageNotFound
-        message={"We couldn't find what you searched for. Try searching again."}
-      />
+      <PageNotFound message="We couldn't find what you searched for. Try searching again" />
     );
   }
 
