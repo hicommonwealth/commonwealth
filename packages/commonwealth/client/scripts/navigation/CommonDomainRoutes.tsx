@@ -116,6 +116,8 @@ const ProfilePageRedirect = lazy(() => import('views/pages/profile_redirect'));
 const CommunityNotFoundPage = lazy(
   () => import('views/pages/CommunityNotFoundPage'),
 );
+
+const UnSubscribePage = lazy(() => import('views/pages/UnSubscribePage'));
 const RewardsPage = lazy(() => import('views/pages/RewardsPage'));
 
 const CommonDomainRoutes = ({ launchpadEnabled }: RouteFeatureFlags) => [
@@ -152,6 +154,11 @@ const CommonDomainRoutes = ({ launchpadEnabled }: RouteFeatureFlags) => [
     key="/createCommunity"
     path="/createCommunity"
     element={withLayout(CreateCommunityPage, { type: 'common' })}
+  />,
+  <Route
+    key="/unSubscribe/:userId"
+    path="/unSubscribe/:userId"
+    element={withLayout(UnSubscribePage, { type: 'common' })}
   />,
   ...(launchpadEnabled
     ? [

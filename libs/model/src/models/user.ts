@@ -74,6 +74,7 @@ export default (sequelize: Sequelize.Sequelize): UserModelStatic =>
       selected_community_id: { type: Sequelize.STRING, allowNull: true },
       profile: { type: Sequelize.JSONB, allowNull: false },
       xp_points: { type: Sequelize.INTEGER, defaultValue: 0, allowNull: true },
+      unsubscribe_uuid: { type: Sequelize.STRING, allowNull: true },
       referral_count: {
         type: Sequelize.INTEGER,
         defaultValue: 0,
@@ -100,6 +101,7 @@ export default (sequelize: Sequelize.Sequelize): UserModelStatic =>
             'isAdmin',
             'created_at',
             'updated_at',
+            'unsubscribe_uuid',
           ],
         },
       },
