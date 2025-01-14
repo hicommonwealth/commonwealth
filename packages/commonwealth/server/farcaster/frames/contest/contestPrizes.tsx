@@ -1,4 +1,6 @@
-import { commonProtocol, models } from '@hicommonwealth/model';
+import { getContestBalance } from '@hicommonwealth/evm-protocols';
+import { models } from '@hicommonwealth/model';
+import { buildContestPrizes } from '@hicommonwealth/shared';
 import { Button } from 'frames.js/express';
 import moment from 'moment';
 import React from 'react';
@@ -78,20 +80,17 @@ export const contestPrizes = frames(async (ctx) => {
 
   const chainNode = contestManager.Community!.ChainNode!;
   const chainNodeUrl = chainNode.private_url! || chainNode.url!;
-  const contestBalance = await commonProtocol.contestHelper.getContestBalance(
+  const contestBalance = await getContestBalance(
     chainNodeUrl,
     contestManager.contest_address,
     contestManager.interval === 0,
   );
 
-  const prizes =
-    contestBalance && contestBalance !== '0' && contestManager.payout_structure
-      ? contestManager.payout_structure.map(
-          (percentage) =>
-            (Number(contestBalance) * (percentage / 100)) /
-            Math.pow(10, contestManager.decimals || 18),
-        )
-      : [];
+  const prizes = buildContestPrizes(
+    Number(contestBalance),
+    contestManager.payout_structure,
+    contestManager.decimals,
+  );
 
   return {
     title: contestManager.name,

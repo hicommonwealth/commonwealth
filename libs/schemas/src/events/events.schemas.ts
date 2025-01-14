@@ -190,6 +190,17 @@ const ChainEventCreatedBase = z.object({
     transactionHash: z.string(),
     logIndex: z.number(),
   }),
+  block: z.object({
+    number: z.number(),
+    hash: z.string(),
+    logsBloom: z.string(),
+    nonce: z.string().optional(),
+    parentHash: z.string(),
+    timestamp: z.number(),
+    miner: z.string(),
+    gasLimit: z.number(),
+    gasUsed: z.number(),
+  }),
 });
 
 /**
@@ -309,9 +320,8 @@ export const FarcasterVoteCreated = FarcasterAction.extend({
 
 export const SignUpFlowCompleted = z.object({
   user_id: z.number(),
+  address: z.string(),
   created_at: z.coerce.date(),
-  referrer_address: z.string().optional(),
-  referee_address: z.string().optional(),
 });
 
 export const ContestRolloverTimerTicked = z.object({});

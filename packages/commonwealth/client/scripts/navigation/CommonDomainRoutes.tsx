@@ -117,11 +117,10 @@ const CommunityNotFoundPage = lazy(
   () => import('views/pages/CommunityNotFoundPage'),
 );
 
+const UnSubscribePage = lazy(() => import('views/pages/UnSubscribePage'));
 const RewardsPage = lazy(() => import('views/pages/RewardsPage'));
 
-const CommonDomainRoutes = ({
-  tokenizedCommunityEnabled,
-}: RouteFeatureFlags) => [
+const CommonDomainRoutes = ({ launchpadEnabled }: RouteFeatureFlags) => [
   <Route
     key="/_internal/quill"
     path="/_internal/quill"
@@ -156,7 +155,12 @@ const CommonDomainRoutes = ({
     path="/createCommunity"
     element={withLayout(CreateCommunityPage, { type: 'common' })}
   />,
-  ...(tokenizedCommunityEnabled
+  <Route
+    key="/unSubscribe/:userId"
+    path="/unSubscribe/:userId"
+    element={withLayout(UnSubscribePage, { type: 'common' })}
+  />,
+  ...(launchpadEnabled
     ? [
         <Route
           key="/createTokenCommunity"

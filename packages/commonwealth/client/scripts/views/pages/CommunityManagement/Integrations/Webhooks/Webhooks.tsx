@@ -223,7 +223,7 @@ const Webhooks = () => {
         )}
       </section>
       <CWModal
-        size="small"
+        size="medium"
         content={
           <WebhookSettingsModal
             onModalClose={() => setWebhookToConfigure(null)}

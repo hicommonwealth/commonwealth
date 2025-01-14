@@ -284,6 +284,31 @@ export const DeleteGroup = {
   context: AuthContext,
 };
 
+export const DeleteAddress = {
+  input: z.object({
+    community_id: z.string(),
+    address: z.string(),
+  }),
+  output: z.object({
+    community_id: z.string(),
+    address: z.string(),
+  }),
+  context: AuthContext,
+};
+
+export const DeleteAllAddresses = {
+  input: z.object({
+    community_id: z.string(),
+    address: z.string(),
+  }),
+  output: z.object({
+    community_id: z.string(),
+    address: z.string(),
+    deleted: z.number(),
+  }),
+  context: AuthContext,
+};
+
 export const DeleteCommunity = {
   input: z.object({
     community_id: z.string(),
@@ -305,6 +330,13 @@ export const RefreshCommunityMemberships = {
     updated: z.number(),
   }),
   context: AuthContext,
+};
+
+export const SelectCommunity = {
+  input: z.object({
+    community_id: z.string(),
+  }),
+  output: z.object({}),
 };
 
 export const JoinCommunity = {

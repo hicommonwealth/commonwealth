@@ -61,5 +61,6 @@ export const trpcRouter = trpc.router({
   getUserAddresses: trpc.query(User.GetUserAddresses, trpc.Tag.User),
   searchUserProfiles: trpc.query(User.SearchUserProfiles, trpc.Tag.User),
   getUserReferrals: trpc.query(User.GetUserReferrals, trpc.Tag.User),
+  getUserReferralFees: trpc.query(User.GetUserReferralFees, trpc.Tag.User),
   getXps: trpc.query(User.GetXps, trpc.Tag.User),
 });

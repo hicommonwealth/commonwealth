@@ -54,4 +54,8 @@ export const trpcRouter = trpc.router({
     Subscription.UnregisterClientRegistrationToken,
     trpc.Tag.Subscription,
   ),
+  unSubscribeEmail: trpc.command(
+    Subscription.UnsubscribeEmail,
+    trpc.Tag.Subscription,
+  ),
 });

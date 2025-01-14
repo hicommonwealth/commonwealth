@@ -38,7 +38,6 @@ export const UpdateUser = {
     id: z.number(),
     promotional_emails_enabled: z.boolean().nullish(),
     tag_ids: z.number().array().nullish(),
-    referrer_address: z.string().optional(),
   }),
   output: User,
 };
