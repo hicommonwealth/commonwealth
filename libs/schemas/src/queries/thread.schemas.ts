@@ -76,6 +76,7 @@ export const UserView = z.object({
   unsubscribe_uuid: z.string().uuid().nullish().optional(),
 });
 type UserView = z.infer<typeof UserView>;
+
 export const AddressView = Address.extend({
   id: PG_INT,
   verified: z.date().or(z.string()).nullish(),
@@ -83,7 +84,7 @@ export const AddressView = Address.extend({
   last_active: z.date().or(z.string()).nullish(),
   created_at: z.date().or(z.string()).nullish(),
   updated_at: z.date().or(z.string()).nullish(),
-  User: UserView.optional() as ZodType<UserView>,
+  User: UserView.optional().nullish() as ZodType<UserView | null | undefined>,
 });
 
 export const ReactionView = z.object({

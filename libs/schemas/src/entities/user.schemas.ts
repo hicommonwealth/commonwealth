@@ -65,9 +65,6 @@ export const User = z.object({
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional(),
 });
-// Type annotation is needed to avoid:
-// The inferred type of this node exceeds the maximum length the compiler will serialize.
-// An explicit type annotation is needed.ts(7056)
 
 export const Address = z.object({
   id: PG_INT.optional(),
@@ -87,7 +84,7 @@ export const Address = z.object({
   is_banned: z.boolean().default(false),
   hex: z.string().max(64).nullish(),
 
-  User: User.optional(),
+  User: User.optional().nullish(),
 
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional(),
