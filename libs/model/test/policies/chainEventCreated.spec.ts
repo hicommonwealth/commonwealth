@@ -141,6 +141,7 @@ describe('chainEventCreated Event Handler', () => {
           parsedArgs: ['0x1', namespaceAddress, true],
         } as unknown as z.infer<typeof events.ChainEventCreated>,
       });
+      console.log({ res });
       expect(res).to.be.true;
       expect(provider.triggerWorkflow as Mock).toHaveBeenCalledOnce();
       expect((provider.triggerWorkflow as Mock).mock.calls[0][0]).to.deep.equal(
