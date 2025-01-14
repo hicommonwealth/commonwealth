@@ -3,9 +3,9 @@
     "relation": ["delegate_permission/common.handle_all_urls"],
     "target": {
       "namespace": "android_app",
-      "package_name": "xyz.commonxyz.mobile",
+      "package_name": "com.kevin_common_xyz.commonxyz",
       "sha256_cert_fingerprints": [
-        "14:6D:E9:83:51:7F:66:01:84:93:4F:2F:5E:E0:8F:3A:D6:F4:CA:41:1A:CF:45:BF:8D:10:76:76:CD"
+        "55:9F:D8:46:85:90:D5:C2:E6:46:88:A4:7F:10:5F:CD:73:15:1C:5A:12:41:08:3A:3A:65:9F:4C:15:69:5B:9A"
       ]
     }
   }
