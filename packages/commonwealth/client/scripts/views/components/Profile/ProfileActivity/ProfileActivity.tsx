@@ -79,7 +79,10 @@ const ProfileActivity = ({
           )}
         </CWTabsRow>
       </div>
-      <div className="activity-content">
+      <div
+        // eslint-disable-next-line max-len
+        className={`activity-content ${selectedActivity === ProfileActivityType.Comments || selectedActivity === ProfileActivityType.Threads ? 'removePadding' : ''}`}
+      >
         <ProfileActivityContent
           option={selectedActivity}
           threads={threads}

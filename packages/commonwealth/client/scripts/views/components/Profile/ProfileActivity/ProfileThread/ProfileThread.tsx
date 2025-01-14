@@ -2,6 +2,7 @@ import React from 'react';
 
 import { PermissionEnum } from '@hicommonwealth/schemas';
 import { slugify } from '@hicommonwealth/shared';
+import { ThreadCard } from 'client/scripts/views/pages/discussions/ThreadCard';
 import { getThreadActionTooltipText } from 'helpers/threads';
 import useTopicGating from 'hooks/useTopicGating';
 import { getProposalUrlPath } from 'identifiers';
@@ -11,7 +12,7 @@ import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { useFetchCustomDomainQuery } from 'state/api/configuration';
 import useUserStore from 'state/ui/user';
 import Permissions from 'utils/Permissions';
-import { ThreadCard } from '../../../pages/discussions/ThreadCard';
+import './ProfileThread.scss';
 
 type ProfileThreadProps = {
   thread: Thread;
@@ -71,28 +72,33 @@ export const ProfileThread = ({ thread }: ProfileThreadProps) => {
   });
 
   return (
-    <ThreadCard
-      thread={thread}
-      canReact={!disabledActionsTooltipText}
-      canComment={!disabledCommentActionTooltipText}
-      canUpdateThread={false} // we dont want user to update thread from here, even if they have permissions
-      onStageTagClick={() => {
-        navigate(
-          `${
-            domain?.isCustomDomain ? '' : `/${thread.communityId}`
-          }/discussions?stage=${thread.stage}`,
-        );
-      }}
-      threadHref={discussionLink}
-      onCommentBtnClick={() => navigate(`${discussionLink}?focusComments=true`)}
-      disabledActionsTooltipText={
-        disabledCommentActionTooltipText
-          ? disabledCommentActionTooltipText
-          : disabledActionsTooltipText
-      }
-      hideReactionButton={false}
-      hideUpvotesDrawer
-      layoutType="community-first"
-    />
+    <div className="ProfileThread">
+      <ThreadCard
+        thread={thread}
+        canReact={!disabledActionsTooltipText}
+        canComment={!disabledCommentActionTooltipText}
+        canUpdateThread={false} // we dont want user to update thread from here, even if they have permissions
+        onStageTagClick={() => {
+          navigate(
+            `${
+              domain?.isCustomDomain ? '' : `/${thread.communityId}`
+            }/discussions?stage=${thread.stage}`,
+          );
+        }}
+        threadHref={discussionLink}
+        onCommentBtnClick={() =>
+          navigate(`${discussionLink}?focusComments=true`)
+        }
+        disabledActionsTooltipText={
+          disabledCommentActionTooltipText
+            ? disabledCommentActionTooltipText
+            : disabledActionsTooltipText
+        }
+        hideReactionButton={false}
+        hideUpvotesDrawer
+        layoutType="community-first"
+        maxChars={100}
+      />
+    </div>
   );
 };

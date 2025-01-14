@@ -7,7 +7,13 @@
   min-width: 100%;
   flex-direction: column;
   border-bottom: 1px solid #dddddd;
+  padding: 15px 60px 0px 60px;
 
+  @include extraSmall {
+    min-height: 150px;
+    max-height: 250px;
+    padding-bottom: 10px;
+  }
   .ProfileActivityRowContainer {
     display: flex;
     justify-content: space-between;
@@ -158,9 +164,17 @@
     overflow: auto;
     align-items: center;
     justify-content: space-between;
+
     .MarkdownFormattedText {
       div {
-        max-height: max-content;
+        max-height: 80px !important;
+        min-height: 30px !important;
+        padding-bottom: 8px;
+        @include extraSmall {
+          max-height: 108px !important;
+          overflow: hidden;
+          padding-bottom: 2px;
+        }
       }
 
       width: 90%;
@@ -185,5 +199,8 @@
         line-height: 14px !important;
       }
     }
+  }
+  .show-more-button-wrapper {
+    display: none !important;
   }
 }

@@ -79,6 +79,7 @@ const ProfileActivityRow = ({ activity }: ProfileActivityRowProps) => {
         <MarkdownViewerUsingQuillOrNewEditor
           markdown={comment?.text}
           cutoffLines={2}
+          maxChars={100}
         />
       </div>
     </div>

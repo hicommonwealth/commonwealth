@@ -6,7 +6,7 @@ import Thread from 'models/Thread';
 import { CWText } from '../../component_kit/cw_text';
 import type { CommentWithAssociatedThread } from './ProfileActivity';
 import ProfileActivityRow from './ProfileActivityRow';
-import { ProfileThread } from './ProfileThread';
+import ProfileThread from './ProfileThread';
 import ReferralsTab from './ReferralsTab';
 import { TransactionsTab } from './TransactionsTab/TransactionsTab';
 
