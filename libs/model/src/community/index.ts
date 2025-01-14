@@ -18,6 +18,7 @@ export * from './JoinCommunity.command';
 export * from './PinToken.command';
 export * from './RefreshCommunityMemberships.command';
 export * from './RefreshCustomDomain.query';
+export * from './SelectCommunity.command';
 export * from './SetCommunityStake.command';
 export * from './ToggleArchiveTopic.command';
 export * from './UnpinToken.command';

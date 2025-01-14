@@ -307,6 +307,13 @@ export const RefreshCommunityMemberships = {
   context: AuthContext,
 };
 
+export const SelectCommunity = {
+  input: z.object({
+    community_id: z.string(),
+  }),
+  output: z.object({}),
+};
+
 export const JoinCommunity = {
   input: z.object({
     community_id: z.string(),
