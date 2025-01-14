@@ -7,20 +7,34 @@
     <meta
       name="fc:frame"
       content='{
-    "version": "next",
-    "imageUrl": "https://commonwealth.im/favicon.ico",
-    "button": {
-      "title": "View Contest",
-      "action": {
-        "type": "launch_frame",
-        "name": "Commonwealth Contest",
-        "url": "https://commonwealth.im/api/integration/farcaster/contests/frame"
+    "version": "vNext",
+    "image": {
+      "src": "https://commonwealth.im/favicon.ico",
+      "aspectRatio": "1.91:1"
+    },
+    "buttons": [
+      {
+        "label": "View Contest",
+        "action": "link",
+        "target": "https://commonwealth.im/contests"
+      },
+      {
+        "label": "View Prizes",
+        "action": "post",
+        "target": "https://farcaster-frame-spike-tunnel-ojuvirf6.devinapps.com/frame/prizes"
+      },
+      {
+        "label": "Upvote",
+        "action": "post",
+        "target": "https://farcaster-frame-spike-tunnel-ojuvirf6.devinapps.com/frame/upvote"
       }
-    }
+    ],
+    "postUrl": "https://farcaster-frame-spike-tunnel-ojuvirf6.devinapps.com/frame"
   }'
     />
   </head>
   <body>
     <div id="root"></div>
+    <script src="https://unpkg.com/@farcaster/frame-sdk@0.1.0/dist/index.global.js"></script>
   </body>
 </html>
