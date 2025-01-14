@@ -23,7 +23,6 @@ import {
 } from 'vitest';
 import z from 'zod';
 // eslint-disable-next-line max-len
-import { SpyNotificationsProvider } from 'test/util/mockedNotificationProvider';
 import { processSubscriptionPreferencesUpdated } from '../../../server/workers/knock/subscriptionPreferencesUpdated';
 
 chai.use(chaiAsPromised);
@@ -66,7 +65,7 @@ describe('subscriptionPreferencesUpdated', () => {
 
   test('should delete all exiting email schedules if emails are disabled', async () => {
     const provider = notificationsProvider({
-      adapter: SpyNotificationsProvider({
+      adapter: tester.SpyNotificationsProvider({
         getSchedulesStub: vi.fn().mockResolvedValue([
           { id: '1', workflow: WorkflowKeys.EmailRecap },
           { id: '2', workflow: WorkflowKeys.EmailDigest },
@@ -110,7 +109,7 @@ describe('subscriptionPreferencesUpdated', () => {
     );
 
     const provider = notificationsProvider({
-      adapter: SpyNotificationsProvider({
+      adapter: tester.SpyNotificationsProvider({
         getSchedulesStub: vi.fn().mockResolvedValue([]),
         createSchedulesStub: vi.fn().mockResolvedValue({}),
       }),
@@ -162,7 +161,7 @@ describe('subscriptionPreferencesUpdated', () => {
     );
 
     const provider = notificationsProvider({
-      adapter: SpyNotificationsProvider({
+      adapter: tester.SpyNotificationsProvider({
         getSchedulesStub: vi
           .fn()
           .mockResolvedValue([{ id: '1', workflow: WorkflowKeys.EmailRecap }]),
@@ -200,7 +199,7 @@ describe('subscriptionPreferencesUpdated', () => {
     );
 
     const provider = notificationsProvider({
-      adapter: SpyNotificationsProvider({
+      adapter: tester.SpyNotificationsProvider({
         getSchedulesStub: vi
           .fn()
           .mockResolvedValue([{ id: '1', workflow: WorkflowKeys.EmailRecap }]),
@@ -242,7 +241,7 @@ describe('subscriptionPreferencesUpdated', () => {
     );
 
     const provider = notificationsProvider({
-      adapter: SpyNotificationsProvider({
+      adapter: tester.SpyNotificationsProvider({
         getSchedulesStub: vi.fn().mockResolvedValue([]),
         createSchedulesStub: vi.fn().mockResolvedValue({}),
         deleteSchedulesStub: vi.fn().mockResolvedValue(new Set(['1'])),

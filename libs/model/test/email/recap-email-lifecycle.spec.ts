@@ -20,12 +20,12 @@ import {
 } from 'vitest';
 import { z } from 'zod';
 import { GetRecapEmailDataQuery } from '../../src/emails';
-import { seed } from '../../src/tester';
 import {
   ProviderError,
   SpyNotificationsProvider,
   ThrowingSpyNotificationsProvider,
-} from '../utils/mockedNotificationProvider';
+  seed,
+} from '../../src/tester';
 import {
   generateDiscussionData,
   generateGovernanceData,

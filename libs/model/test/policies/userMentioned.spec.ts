@@ -4,7 +4,6 @@ import {
   disposeAdapter,
   notificationsProvider,
 } from '@hicommonwealth/core';
-import { tester } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import { EventNames } from '@hicommonwealth/schemas';
 import { BalanceType, safeTruncateBody } from '@hicommonwealth/shared';
@@ -21,13 +20,9 @@ import {
   vi,
 } from 'vitest';
 import z from 'zod';
+import { tester } from '../../src';
 import { processUserMentioned } from '../../src/policies/handlers/userMentioned';
 import { getThreadUrl } from '../../src/policies/utils/utils';
-import {
-  ProviderError,
-  SpyNotificationsProvider,
-  ThrowingSpyNotificationsProvider,
-} from '../utils/mockedNotificationProvider';
 
 chai.use(chaiAsPromised);
 
@@ -99,7 +94,7 @@ describe('userMentioned Event Handler', () => {
 
   test('should execute the triggerWorkflow function with the appropriate data', async () => {
     const provider = notificationsProvider({
-      adapter: SpyNotificationsProvider(),
+      adapter: tester.SpyNotificationsProvider(),
     });
 
     const res = await processUserMentioned({
@@ -140,7 +135,7 @@ describe('userMentioned Event Handler', () => {
 
   test('should throw if triggerWorkflow fails', async () => {
     notificationsProvider({
-      adapter: ThrowingSpyNotificationsProvider(),
+      adapter: tester.ThrowingSpyNotificationsProvider(),
     });
 
     await expect(
@@ -158,6 +153,6 @@ describe('userMentioned Event Handler', () => {
           thread,
         },
       }),
-    ).to.eventually.be.rejectedWith(ProviderError);
+    ).to.eventually.be.rejectedWith(tester.ProviderError);
   });
 });

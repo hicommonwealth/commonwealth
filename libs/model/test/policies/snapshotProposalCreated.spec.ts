@@ -28,7 +28,7 @@ import {
   ProviderError,
   SpyNotificationsProvider,
   ThrowingSpyNotificationsProvider,
-} from '../utils/mockedNotificationProvider';
+} from '../../src/tester';
 
 chai.use(chaiAsPromised);
 
