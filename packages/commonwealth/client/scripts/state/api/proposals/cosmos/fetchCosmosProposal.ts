@@ -11,9 +11,17 @@ const PROPOSAL_STALE_TIME = 1000 * 10;
 
 const fetchCosmosProposal = async (
   proposalId: string,
-): Promise<CosmosProposal | CosmosProposalV1 | CosmosProposalGovgen> => {
-  const { governance } = app.chain as Cosmos;
-  return governance.getProposal(+proposalId);
+): Promise<
+  CosmosProposal | CosmosProposalV1 | CosmosProposalGovgen | undefined
+> => {
+  try {
+    const { governance } = app.chain as Cosmos;
+    const proposal = await governance.getProposal(+proposalId);
+    return proposal;
+  } catch (err) {
+    console.error('Failed to fetch cosmos proposal:', err);
+    return undefined;
+  }
 };
 
 interface CosmosProposalQueryProps {
@@ -28,10 +36,17 @@ const useCosmosProposalQuery = ({
   const communityId = app.activeChainId();
   return useQuery({
     queryKey: ['proposal', { communityId, proposalId }],
-    queryFn: () => fetchCosmosProposal(proposalId),
+    queryFn: async () => {
+      const result = await fetchCosmosProposal(proposalId);
+      if (!result) {
+        throw new Error(`Proposal ${proposalId} not found or failed to load`);
+      }
+      return result;
+    },
     enabled: app.chain?.base === ChainBase.CosmosSDK && isApiReady,
     staleTime: PROPOSAL_STALE_TIME,
     cacheTime: PROPOSAL_CACHE_TIME,
+    retry: false, // Don't retry if proposal not found
   });
 };
 

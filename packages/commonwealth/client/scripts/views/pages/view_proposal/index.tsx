@@ -1,4 +1,4 @@
-import { slugify } from '@hicommonwealth/shared';
+import { ChainBase, slugify } from '@hicommonwealth/shared';
 import useForceRerender from 'hooks/useForceRerender';
 import { useInitChainIfNeeded } from 'hooks/useInitChainIfNeeded';
 import useNecessaryEffect from 'hooks/useNecessaryEffect';
@@ -64,18 +64,30 @@ const ViewProposalPage = ({ identifier }: ViewProposalPageAttrs) => {
   useCosmosProposalDepositsQuery(proposal, +poolData);
 
   useEffect(() => {
-    // @ts-expect-error <StrictNullChecks/>
-    setProposal(cosmosProposal);
-    // @ts-expect-error <StrictNullChecks/>
-    setTitle(cosmosProposal?.title);
-    setDescription(cosmosProposal?.description);
-  }, [cosmosProposal]);
+    if (cosmosProposal) {
+      // Cast to AnyProposal since we know it's a valid proposal type
+      setProposal(cosmosProposal as unknown as AnyProposal);
+      setTitle(cosmosProposal.title);
+      setDescription(cosmosProposal.description);
+    } else if (!isFetchingProposal && !cosmosError) {
+      // If we're not loading and there's no error, but we still don't have data
+      console.warn('No proposal data available after successful fetch');
+    }
+  }, [cosmosProposal, isFetchingProposal, cosmosError]);
 
   useEffect(() => {
-    if (_.isEmpty(metadata)) return;
-    setTitle(metadata?.title);
-    setDescription(metadata?.description || metadata?.summary);
+    if (!_.isEmpty(metadata)) {
+      setTitle(metadata.title);
+      setDescription(metadata.description || metadata.summary);
+    }
   }, [metadata]);
+
+  // Show not found if we have no data but we're not loading or errored
+  if (!cosmosProposal && !isFetchingProposal && !cosmosError) {
+    return (
+      <PageNotFound message="Proposal data unavailable. Please try again later." />
+    );
+  }
 
   useEffect(() => {
     proposal?.isFetched.once('redraw', forceRerender);
@@ -95,8 +107,21 @@ const ViewProposalPage = ({ identifier }: ViewProposalPageAttrs) => {
     }
   }, [isAdapterLoaded, proposalId]);
 
+  // Check chain initialization and type before proceeding
+  if (!app.chain?.apiInitialized || !app.chain?.base) {
+    return <PageLoading message="Initializing chain..." />;
+  }
+
+  if (app.chain.base !== ChainBase.CosmosSDK) {
+    return (
+      <PageNotFound
+        message={'This proposal type is not supported for the current chain.'}
+      />
+    );
+  }
+
   if (isFetchingProposal || !isAdapterLoaded) {
-    return <PageLoading message="Loading..." />;
+    return <PageLoading message="Loading proposal..." />;
   }
 
   if (cosmosError) {
