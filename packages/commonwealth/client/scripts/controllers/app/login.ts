@@ -21,7 +21,6 @@ import axios from 'axios';
 import { notifyError } from 'controllers/app/notifications';
 import { getMagicCosmosSessionSigner } from 'controllers/server/sessions';
 import { isSameAccount } from 'helpers';
-import { isMobileApp } from 'hooks/useReactNativeWebView';
 import { Magic } from 'magic-sdk';
 import app, { initAppState } from 'state';
 import { EXCEPTION_CASE_VANILLA_getCommunityById } from 'state/api/communities/getCommuityById';
@@ -578,12 +577,5 @@ export async function handleSocialLoginCallback({
 
 function createRedirectURI(params: string = '') {
   const url = new URL('/finishsociallogin' + params, window.location.origin);
-  const href = url.href;
-
-  if (isMobileApp()) {
-    console.log("Using 'commonxyz://' in redirect URI");
-    return href.replace(/^https:\/\//, 'commonxyz://');
-  } else {
-    return href;
-  }
+  return url.href;
 }
