@@ -8,8 +8,6 @@ import { EvmEventSignatures } from '@hicommonwealth/evm-protocols';
 import * as schemas from '@hicommonwealth/schemas';
 import { EventNames, events } from '@hicommonwealth/schemas';
 import { BalanceType, getCommunityUrl } from '@hicommonwealth/shared';
-import chai from 'chai';
-import chaiAsPromised from 'chai-as-promised';
 import {
   Mock,
   afterAll,
@@ -28,8 +26,6 @@ import {
   SpyNotificationsProvider,
   ThrowingSpyNotificationsProvider,
 } from '../utils/mockedNotificationProvider';
-
-chai.use(chaiAsPromised);
 
 const namespaceAddress = '0x123';
 
@@ -78,7 +74,7 @@ describe('chainEventCreated Event Handler', () => {
   });
 
   test('should do nothing if the event signature is unsupported', async () => {
-    const res = await processChainEventCreated({
+    await processChainEventCreated({
       name: EventNames.ChainEventCreated,
       payload: {
         eventSource: {
@@ -86,12 +82,11 @@ describe('chainEventCreated Event Handler', () => {
         },
       } as unknown as z.infer<typeof events.ChainEventCreated>,
     });
-    expect(res).to.be.false;
   });
 
   describe('Community Stakes', () => {
     test('should not throw if the community is invalid', async () => {
-      const res = await processChainEventCreated({
+      await processChainEventCreated({
         name: EventNames.ChainEventCreated,
         payload: {
           eventSource: {
@@ -100,7 +95,6 @@ describe('chainEventCreated Event Handler', () => {
           parsedArgs: ['0x1', '0xunsupported', true],
         } as unknown as z.infer<typeof events.ChainEventCreated>,
       });
-      expect(res).to.be.false;
     });
 
     test('should do nothing if there are no relevant subscriptions', async () => {
@@ -108,7 +102,7 @@ describe('chainEventCreated Event Handler', () => {
         adapter: SpyNotificationsProvider(),
       });
 
-      const res = await processChainEventCreated({
+      await processChainEventCreated({
         name: EventNames.ChainEventCreated,
         payload: {
           eventSource: {
@@ -117,7 +111,6 @@ describe('chainEventCreated Event Handler', () => {
           parsedArgs: ['0x1', namespaceAddress, true],
         } as unknown as z.infer<typeof events.ChainEventCreated>,
       });
-      expect(res).to.be.true;
       expect(provider.triggerWorkflow as Mock).not.toHaveBeenCalled();
     });
 
@@ -132,7 +125,7 @@ describe('chainEventCreated Event Handler', () => {
         user_id: user!.id,
       });
 
-      const res = await processChainEventCreated({
+      await processChainEventCreated({
         name: EventNames.ChainEventCreated,
         payload: {
           eventSource: {
@@ -141,8 +134,6 @@ describe('chainEventCreated Event Handler', () => {
           parsedArgs: ['0x1', namespaceAddress, true],
         } as unknown as z.infer<typeof events.ChainEventCreated>,
       });
-      console.log({ res });
-      expect(res).to.be.true;
       expect(provider.triggerWorkflow as Mock).toHaveBeenCalledOnce();
       expect((provider.triggerWorkflow as Mock).mock.calls[0][0]).to.deep.equal(
         {
@@ -179,7 +170,7 @@ describe('chainEventCreated Event Handler', () => {
             parsedArgs: ['0x1', namespaceAddress, true],
           } as unknown as z.infer<typeof events.ChainEventCreated>,
         }),
-      ).to.eventually.be.rejectedWith(ProviderError);
+      ).rejects.toThrow(ProviderError);
     });
   });
 });

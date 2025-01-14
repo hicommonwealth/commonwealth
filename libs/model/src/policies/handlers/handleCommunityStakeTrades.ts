@@ -49,8 +49,6 @@ export async function handleCommunityStakeTrades(
     },
   );
 
-  console.log(users);
-
   if (users.length) {
     const provider = notificationsProvider();
     const res = await provider.triggerWorkflow({
