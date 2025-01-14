@@ -1,0 +1,10 @@
+@import '../../../../../styles/shared';
+
+.TaskList {
+  width: 300px;
+  background-color: $white;
+  border: 1px solid $neutral-200;
+  border-radius: 8px;
+  box-shadow: $elevation-4 !important;
+  margin-top: 4px;
+}

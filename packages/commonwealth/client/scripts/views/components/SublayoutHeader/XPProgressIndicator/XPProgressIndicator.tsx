@@ -1,8 +1,14 @@
-import clsx from 'clsx';
 import React from 'react';
 
+import ClickAwayListener from '@mui/base/ClickAwayListener';
+import clsx from 'clsx';
 import useUserStore from 'state/ui/user';
 import { CWText } from '../../component_kit/cw_text';
+import CWPopover, {
+  usePopover,
+} from '../../component_kit/new_designs/CWPopover';
+import TaskList from './TaskList';
+import WeeklyProgressGoal from './WeeklyProgressGoal';
 import './XPProgressIndicator.scss';
 import { XPProgressIndicatorMode, XPProgressIndicatorProps } from './types';
 
@@ -17,41 +23,39 @@ const XPProgressIndicator = ({
     },
   };
 
-  const currentProgress = parseInt(
-    (
-      (sampleData.weeklyGoal.current / sampleData.weeklyGoal.target) *
-      100
-    ).toFixed(0),
-  );
-
   const user = useUserStore();
+
+  const popoverProps = usePopover();
 
   if (!user.isLoggedIn) return;
 
-  const weeklyProgress = (
-    <div className={clsx('weekly-progress', className)}>
-      <div className="header">
-        <CWText type="caption" fontWeight="semiBold">
-          Weekly XP Goal
-        </CWText>
-        <CWText type="caption" fontWeight="semiBold">
-          {sampleData.weeklyGoal.current} / {sampleData.weeklyGoal.target} XP
-        </CWText>
-      </div>
-      <progress className="progress-bar" value={currentProgress} max={100} />
-    </div>
-  );
-
   return (
-    <button className={clsx('XPProgressIndicator', className, mode)}>
-      {mode === XPProgressIndicatorMode.Compact ? (
-        <CWText type="b2" fontWeight="semiBold">
-          XP
-        </CWText>
-      ) : (
-        weeklyProgress
-      )}
-    </button>
+    <ClickAwayListener onClickAway={() => popoverProps.setAnchorEl(null)}>
+      <>
+        <button
+          className={clsx('XPProgressIndicator', className, mode)}
+          onClick={popoverProps.handleInteraction}
+        >
+          {mode === XPProgressIndicatorMode.Compact ? (
+            <CWText type="b2" fontWeight="semiBold">
+              XP
+            </CWText>
+          ) : (
+            <WeeklyProgressGoal
+              progress={{
+                current: sampleData.weeklyGoal.current,
+                target: sampleData.weeklyGoal.target,
+              }}
+            />
+          )}
+        </button>
+        <CWPopover
+          content={<TaskList />}
+          placement="bottom"
+          {...popoverProps}
+        />
+      </>
+    </ClickAwayListener>
   );
 };
 
