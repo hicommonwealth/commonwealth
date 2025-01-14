@@ -22,7 +22,7 @@ const Quests = ({ className }: QuestsProps) => {
         'https://cdn.pixabay.com/photo/2023/01/08/14/22/sample-7705350_640.jpg',
       title: 'UniLend Airdrop',
       xpPoints: 100,
-      endsOn: new Date(),
+      daysLeftBeforeEnd: 4,
     },
     {
       id: 2,
@@ -30,7 +30,7 @@ const Quests = ({ className }: QuestsProps) => {
         'https://cdn.pixabay.com/photo/2023/01/08/14/22/sample-7705350_640.jpg',
       title: 'Plasm Twitter Launch',
       xpPoints: 500,
-      endsOn: new Date(),
+      daysLeftBeforeEnd: 5,
     },
     {
       id: 3,
@@ -38,7 +38,7 @@ const Quests = ({ className }: QuestsProps) => {
         'https://cdn.pixabay.com/photo/2023/01/08/14/22/sample-7705350_640.jpg',
       title: 'Blackbird Quests',
       xpPoints: 200,
-      endsOn: new Date(),
+      daysLeftBeforeEnd: 8,
     },
   ];
 

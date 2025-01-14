@@ -12,7 +12,7 @@ type QuestTaskProps = {
     imageURL: string;
     title: string;
     xpPoints: number;
-    endsOn: Date;
+    daysLeftBeforeEnd: number;
   };
 };
 
@@ -26,8 +26,8 @@ const QuestTask = ({ className, quest, onClick }: QuestTaskProps) => {
         <CWText type="b1">{quest.title}</CWText>
         <div className="xp-row">
           <CWTag label={`${quest.xpPoints} XP`} type="proposal" />
-          <CWText type="caption" className="days-left">
-            {4} days left
+          <CWText type="caption" className="days-left" fontWeight="semiBold">
+            {quest.daysLeftBeforeEnd} days left
           </CWText>
         </div>
       </div>
