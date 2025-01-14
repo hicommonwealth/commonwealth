@@ -3,7 +3,6 @@ import { AppError } from '@hicommonwealth/core';
 import { ChainEvents, Contest, Snapshot, config } from '@hicommonwealth/model';
 import { Router, raw } from 'express';
 import farcasterRouter from 'server/farcaster/router';
-import { validateFarcasterAction } from 'server/middleware/validateFarcasterAction';
 import { validateNeynarWebhook } from 'server/middleware/validateNeynarWebhook';
 import { config as serverConfig } from '../config';
 
@@ -48,6 +47,14 @@ function build() {
     router.post(
       '/farcaster/ReplyCastCreated',
       (req, _, next) => {
+        validateNeynarWebhook(null)(req, _, next).catch(next);
+      },
+      express.command(Contest.FarcasterReplyCastCreatedWebhook()),
+    );
+
+    router.post(
+      '/farcaster/ContestBotMentioned',
+      (req, _, next) => {
         validateNeynarWebhook(
           config.CONTESTS.NEYNAR_CONTEST_BOT_MENTIONED_WEBHOOK_SECRET,
         )(req, _, next).catch(next);
@@ -55,25 +62,9 @@ function build() {
       express.command(Contest.FarcasterContestBotMentionedWebhook()),
     );
 
-    router.post(
-      '/farcaster/ContestBotMentioned',
-      (req, _, next) => {
-        validateNeynarWebhook(null)(req, _, next).catch(next);
-      },
-      express.command(Contest.FarcasterReplyCastCreatedWebhook()),
-    );
-
     router.get(
       '/farcaster/CastUpvoteAction',
       express.query(Contest.GetFarcasterUpvoteActionMetadata()),
-    );
-
-    router.post(
-      '/farcaster/CastUpvoteAction',
-      (req, _, next) => {
-        validateFarcasterAction()(req, _, next).catch(next);
-      },
-      express.command(Contest.FarcasterUpvoteAction()),
     );
   }
 

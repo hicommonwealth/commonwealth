@@ -4,7 +4,7 @@ import * as schemas from '@hicommonwealth/schemas';
 import { NeynarAPIClient } from '@neynar/nodejs-sdk';
 import { models } from '../database';
 import { mustExist } from '../middleware/guards';
-import { emitEvent } from '../utils';
+import { emitEvent, publishCast } from '../utils';
 
 const log = logger(import.meta);
 
@@ -27,11 +27,11 @@ export function FarcasterContestBotMentionedWebhook(): Command<
         log.warn(
           'Farcaster verified address not found for contest bot mentioned event- will be ignored.',
         );
-        // await publishCast(
-        //   payload.data.hash,
-        //   ({ username }) =>
-        //     `Hey @${username}, you need a verified address to participate in the contest.`,
-        // );
+        await publishCast(
+          payload.data.hash,
+          ({ username }) =>
+            `Hey @${username}, you need a verified address for me to perform an action.`,
+        );
         return;
       }
 

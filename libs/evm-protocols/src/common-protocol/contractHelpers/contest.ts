@@ -446,38 +446,44 @@ export const deployERC20Contest = async ({
   namespaceFactory: string;
   rpc: string;
 }) => {
-  const web3 = createPrivateEvmClient({ rpc, privateKey });
-  const contract = new web3.eth.Contract(namespaceFactoryAbi, namespaceFactory);
-  const maxFeePerGasEst = await estimateGas(web3);
-  let txReceipt: TransactionReceipt;
-  try {
-    txReceipt = await contract.methods
-      .newSingleERC20Contest(
-        namespaceName,
-        contestInterval,
-        winnerShares,
-        voteToken,
-        voterShare,
-        exchangeToken,
-      )
-      .send({
-        from: web3.eth.defaultAccount,
-        type: '0x2',
-        maxFeePerGas: maxFeePerGasEst?.toString(),
-        maxPriorityFeePerGas: web3.utils.toWei('0.001', 'gwei'),
-      });
-  } catch {
-    throw new Error('New Contest Transaction failed');
-  }
+  return nonceMutex.runExclusive(async () => {
+    const web3 = createPrivateEvmClient({ rpc, privateKey });
+    const contract = new web3.eth.Contract(
+      namespaceFactoryAbi,
+      namespaceFactory,
+    );
+    const maxFeePerGasEst = await estimateGas(web3);
+    let txReceipt: TransactionReceipt;
+    try {
+      txReceipt = await contract.methods
+        .newSingleERC20Contest(
+          namespaceName,
+          contestInterval,
+          winnerShares,
+          voteToken,
+          voterShare,
+          exchangeToken,
+        )
+        .send({
+          from: web3.eth.defaultAccount,
+          type: '0x2',
+          maxFeePerGas: maxFeePerGasEst?.toString(),
+          maxPriorityFeePerGas: web3.utils.toWei('0.001', 'gwei'),
+        });
+    } catch (err) {
+      console.warn('New Contest Transaction failed', err);
+      return;
+    }
 
-  const eventLog = txReceipt.logs.find(
-    (log) => log.topics![0] == CREATE_CONTEST_TOPIC,
-  );
-  if (!eventLog || !eventLog.data) throw new Error('No event data');
+    const eventLog = txReceipt.logs.find(
+      (log) => log.topics![0] == CREATE_CONTEST_TOPIC,
+    );
+    if (!eventLog || !eventLog.data) throw new Error('No event data');
 
-  const { 0: address } = decodeParameters({
-    abiInput: ['address', 'address', 'uint256', 'bool'],
-    data: eventLog.data.toString(),
+    const { 0: address } = decodeParameters({
+      abiInput: ['address', 'address', 'uint256', 'bool'],
+      data: eventLog.data.toString(),
+    });
+    return address as string;
   });
-  return address as string;
 };

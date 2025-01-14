@@ -40,6 +40,7 @@ const {
   NEYNAR_REPLY_WEBHOOK_URL,
   FARCASTER_ACTION_URL,
   FLAG_FARCASTER_CONTEST,
+  FARCASTER_NGROK_DOMAIN,
   OPENAI_API_KEY,
   OPENAI_ORGANIZATION,
   CONTEST_BOT_PRIVATE_KEY,
@@ -95,6 +96,7 @@ export const config = configure(
         ? parseInt(MAX_USER_POSTS_PER_CONTEST, 10)
         : 5,
       FLAG_FARCASTER_CONTEST: FLAG_FARCASTER_CONTEST === 'true',
+      FARCASTER_NGROK_DOMAIN: FARCASTER_NGROK_DOMAIN,
       NEYNAR_API_KEY: NEYNAR_API_KEY,
       NEYNAR_BOT_UUID: NEYNAR_BOT_UUID,
       NEYNAR_CAST_CREATED_WEBHOOK_SECRET: NEYNAR_CAST_CREATED_WEBHOOK_SECRET,
@@ -213,6 +215,7 @@ export const config = configure(
       MIN_USER_ETH: z.number(),
       MAX_USER_POSTS_PER_CONTEST: z.number().int(),
       FLAG_FARCASTER_CONTEST: z.boolean().nullish(),
+      FARCASTER_NGROK_DOMAIN: z.string().nullish(),
       NEYNAR_BOT_UUID: z
         .string()
         .optional()

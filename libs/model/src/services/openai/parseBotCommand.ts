@@ -16,8 +16,8 @@ export type ContestMetadataResponse = {
 const system_prompt: ChatCompletionMessage = {
   role: 'assistant',
   content: `you are a data extraction system to understand intents of the following style of message: \n
-    "hey @contestbot create a contest with the token 0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913, 
-    with 20% of prize amount allocated to voters and the rest going to one winner. 
+    "hey @contestbot create a contest with the token 0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913,
+    with 20% of prize amount allocated to voters and the rest going to one winner.
     The contest title is “Submit your best artwork for our token”.
     Use the following image https://test.com/test.png" \n
     This message should result in the following parameters: \n
@@ -75,7 +75,7 @@ export const parseBotCommand = async (
 
   return {
     contestName: data.contestName,
-    payoutStructure: data.payoutStructure,
+    payoutStructure: data.payoutStructure.map((n: number) => Math.floor(n)),
     voterShare: data.voterShare,
     image_url: data.image_url,
     tokenAddress: data.tokenAddress,

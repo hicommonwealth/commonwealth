@@ -1,12 +1,20 @@
 import { command, logger, Policy } from '@hicommonwealth/core';
 import { events } from '@hicommonwealth/schemas';
+import {
+  buildFarcasterContestFrameUrl,
+  getBaseUrl,
+} from '@hicommonwealth/shared';
 import { NeynarAPIClient } from '@neynar/nodejs-sdk';
 import { Op } from 'sequelize';
 import { config, models } from '..';
 import { CreateBotContest } from '../bot/CreateBotContest.command';
 import { systemActor } from '../middleware';
 import { mustExist } from '../middleware/guards';
-import { buildFarcasterContentUrl, buildFarcasterWebhookName } from '../utils';
+import {
+  buildFarcasterContentUrl,
+  buildFarcasterWebhookName,
+  publishCast,
+} from '../utils';
 import {
   createOnchainContestContent,
   createOnchainContestVote,
@@ -204,10 +212,20 @@ export function FarcasterWorker(): Policy<typeof inputs> {
         const contestAddress = await command(CreateBotContest(), {
           actor: systemActor({}),
           payload: {
+            castHash: payload.hash!,
             prompt: payload.text,
           },
         });
-        log.debug(`launched contest: ${contestAddress}`);
+        if (contestAddress) {
+          await publishCast(
+            payload.hash,
+            ({ username }) =>
+              `Hey @${username}, your contest has been created.`,
+            {
+              embed: `${getBaseUrl(config.APP_ENV, config.CONTESTS.FARCASTER_NGROK_DOMAIN!)}${buildFarcasterContestFrameUrl(contestAddress)}`,
+            },
+          );
+        }
       },
     },
   };

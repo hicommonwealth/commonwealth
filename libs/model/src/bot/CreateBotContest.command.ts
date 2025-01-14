@@ -1,16 +1,26 @@
-import { InvalidState, ServerError, type Command } from '@hicommonwealth/core';
+import {
+  InvalidState,
+  logger,
+  ServerError,
+  type Command,
+} from '@hicommonwealth/core';
 import {
   commonProtocol as cp,
   deployERC20Contest,
   getTokenAttributes,
 } from '@hicommonwealth/evm-protocols';
-import { config } from '@hicommonwealth/model';
+import { config, publishCast } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import { buildFarcasterContestFrameUrl } from '@hicommonwealth/shared';
 import { models } from '../database';
 import { mustExist } from '../middleware/guards';
 import { TokenAttributes } from '../services';
-import { parseBotCommand } from '../services/openai/parseBotCommand';
+import {
+  ContestMetadataResponse,
+  parseBotCommand,
+} from '../services/openai/parseBotCommand';
+
+const log = logger(import.meta);
 
 export function CreateBotContest(): Command<typeof schemas.CreateBotContest> {
   return {
@@ -18,7 +28,21 @@ export function CreateBotContest(): Command<typeof schemas.CreateBotContest> {
     auth: [],
     body: async ({ payload }) => {
       const { prompt } = payload;
-      const contestMetadata = await parseBotCommand(prompt);
+      let contestMetadata: ContestMetadataResponse | null = null;
+      try {
+        contestMetadata = await parseBotCommand(prompt);
+      } catch (err) {
+        log.warn(`failed to parse bot command: ${(err as Error).message}`);
+        if (payload.castHash) {
+          await publishCast(
+            payload.castHash,
+            ({ username }) =>
+              `Hey @${username}, something went wrong. Please check your prompt and try again.`,
+          );
+        }
+        return;
+      }
+      mustExist('Parsed Contest Metadata', contestMetadata);
 
       const botNamespace = config.BOT.CONTEST_BOT_NAMESPACE;
 
@@ -26,13 +50,17 @@ export function CreateBotContest(): Command<typeof schemas.CreateBotContest> {
         new InvalidState('bot not enabled on given chain');
       }
 
-      const community = await models.Community.scope('withPrivateData').findOne(
-        {
-          where: {
-            namespace: botNamespace as string,
-          },
+      const community = await models.Community.findOne({
+        where: {
+          namespace: botNamespace as string,
         },
-      );
+        include: [
+          {
+            model: models.ChainNode.scope('withPrivateData'),
+            required: true,
+          },
+        ],
+      });
 
       mustExist('Community', community);
 
@@ -64,7 +92,7 @@ export function CreateBotContest(): Command<typeof schemas.CreateBotContest> {
       const contestAddress = await deployERC20Contest({
         privateKey: config.WEB3.CONTEST_BOT_PRIVATE_KEY,
         namespaceName: botNamespace!,
-        contestInterval: 604800,
+        contestInterval: contestDurationSecs,
         winnerShares: contestMetadata.payoutStructure,
         voteToken: contestMetadata.tokenAddress,
         voterShare: contestMetadata.voterShare,
