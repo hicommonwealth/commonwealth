@@ -1,0 +1,13 @@
+{
+  "accountAssociation": {
+    "header": "",
+    "payload": "",
+    "signature": ""
+  },
+  "frame": {
+    "name": "Commonwealth",
+    "version": "0.0.1",
+    "homeUrl": "https://commonwealth.im",
+    "iconUrl": "https://commonwealth.im/favicon.ico"
+  }
+}
