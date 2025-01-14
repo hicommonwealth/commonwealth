@@ -41,7 +41,7 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
   const { menuVisible, setMenu, menuName } = useSidebarStore();
   const [resizing, setResizing] = useState(false);
   const { JoinCommunityModals, handleJoinCommunity } = useJoinCommunity();
-  const farcasterContestEnabled = useFlag('farcasterContest');
+  const growlEnabled = useFlag('growl');
 
   const location = useLocation();
 
@@ -193,7 +193,7 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
             {children}
           </div>
           {/* Growl should be added here when in place*/}
-          {farcasterContestEnabled && (
+          {growlEnabled && (
             <CWGrowlTemplate
               headerText="Launch Contests On Farcaster!"
               bodyText="You can now host contests directly on Farcaster to reach and engage your followers.
