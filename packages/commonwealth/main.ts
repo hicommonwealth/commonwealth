@@ -165,6 +165,10 @@ export async function main(
 
   setupAPI('/api', app, db, dbValidationService, cacheDecorator);
 
+  app.use('/.well-known/assetlinks.json', (req: Request, res: Response) => {
+    res.sendFile(`${__dirname}/.well-known/assetlinks.json`);
+  });
+
   app.use('/robots.txt', (req: Request, res: Response) => {
     res.sendFile(`${__dirname}/robots.txt`);
   });
