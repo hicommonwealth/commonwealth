@@ -14,7 +14,9 @@ import {
 import { models } from '../database';
 import { mustExist } from '../middleware/guards';
 
-export function NewBotNamespace(): Command<typeof schemas.CreateBotNamespace> {
+export function CreateBotNamespace(): Command<
+  typeof schemas.CreateBotNamespace
+> {
   return {
     ...schemas.CreateBotNamespace,
     auth: [],
