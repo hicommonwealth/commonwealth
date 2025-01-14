@@ -60,12 +60,6 @@ export function UserReferrals(): Projection<typeof inputs> {
               },
               { transaction },
             );
-
-          // set the referred_by_address of the address to the address that referred them
-          await models.Address.update(
-            { referred_by_address: referrer_address },
-            { where: { id: refereeAddress.id }, transaction },
-          );
         });
       },
     },
