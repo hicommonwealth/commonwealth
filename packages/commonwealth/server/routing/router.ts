@@ -19,7 +19,6 @@ import finishUpdateEmail from '../routes/finishUpdateEmail';
 import getAddressStatus from '../routes/getAddressStatus';
 import { healthHandler } from '../routes/health';
 import reactionsCounts from '../routes/reactionsCounts';
-import selectCommunity from '../routes/selectCommunity';
 import starCommunity from '../routes/starCommunity';
 import { status } from '../routes/status';
 import threadsUsersCountAndAvatars from '../routes/threadsUsersCountAndAvatars';
@@ -52,8 +51,6 @@ import * as controllers from '../controller';
 import addThreadLink from '../routes/linking/addThreadLinks';
 import deleteThreadLinks from '../routes/linking/deleteThreadLinks';
 import getLinks from '../routes/linking/getLinks';
-import markCommentAsSpam from '../routes/spam/markCommentAsSpam';
-import unmarkCommentAsSpam from '../routes/spam/unmarkCommentAsSpam';
 
 import { ServerAdminController } from '../controllers/server_admin_controller';
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
@@ -176,13 +173,6 @@ function setupRouter(
     '/getAddressStatus',
     passport.authenticate('jwt', { session: false }),
     getAddressStatus.bind(this, models),
-  );
-  registerRoute(
-    router,
-    'post',
-    '/selectCommunity',
-    passport.authenticate('jwt', { session: false }),
-    selectCommunity.bind(this, models),
   );
 
   // communities
@@ -538,22 +528,6 @@ function setupRouter(
     'post',
     '/linking/getLinks',
     getLinks.bind(this, models),
-  );
-
-  // thread spam
-  registerRoute(
-    router,
-    'put',
-    '/comments/:id/spam',
-    passport.authenticate('jwt', { session: false }),
-    markCommentAsSpam.bind(this, models),
-  );
-  registerRoute(
-    router,
-    'delete',
-    '/comments/:id/spam',
-    passport.authenticate('jwt', { session: false }),
-    unmarkCommentAsSpam.bind(this, models),
   );
 
   // login

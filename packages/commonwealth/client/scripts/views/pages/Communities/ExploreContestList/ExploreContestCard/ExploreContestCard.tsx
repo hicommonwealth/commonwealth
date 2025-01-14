@@ -16,6 +16,7 @@ import { CWThreadAction } from '../../../../components/component_kit/new_designs
 import { Contest } from '../../../CommunityManagement/Contests/ContestsList';
 import ContestCountdown from '../../../CommunityManagement/Contests/ContestsList/ContestCountdown';
 
+import { buildContestPrizes } from '@hicommonwealth/shared';
 import './ExploreContestCard.scss';
 
 interface ExploreContestCardProps {
@@ -48,14 +49,11 @@ const ExploreContestCard = ({
       ),
     });
 
-  const prizes =
-    contestBalance && contest.payout_structure
-      ? contest.payout_structure.map(
-          (percentage) =>
-            (contestBalance * (percentage / 100)) /
-            Math.pow(10, contest.decimals || 18),
-        )
-      : [];
+  const prizes = buildContestPrizes(
+    Number(contestBalance),
+    contest.payout_structure,
+    contest.decimals,
+  );
 
   const handleGoToContest = () => {
     const path = contest.is_farcaster_contest

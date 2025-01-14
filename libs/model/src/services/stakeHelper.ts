@@ -1,5 +1,8 @@
 import { InvalidState } from '@hicommonwealth/core';
-import { commonProtocol } from '@hicommonwealth/evm-protocols';
+import {
+  commonProtocol,
+  getTokenAttributes,
+} from '@hicommonwealth/evm-protocols';
 import { TopicWeightedVoting } from '@hicommonwealth/schemas';
 import { BalanceSourceType, ZERO_ADDRESS } from '@hicommonwealth/shared';
 import { GetBalancesOptions, tokenBalanceCache } from '.';
@@ -7,7 +10,6 @@ import { config } from '../config';
 import { models } from '../database';
 import { mustExist } from '../middleware/guards';
 import { contractHelpers } from '../services/commonProtocol';
-import { getTokenAttributes } from './commonProtocol/contractHelpers';
 
 /**
  * Calculates voting weight of address based on the topic

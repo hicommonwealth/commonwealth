@@ -412,10 +412,8 @@ export const useCommentTree = ({
             const handleAsync = async () => {
               try {
                 await toggleCommentSpamStatus({
-                  communityId,
-                  commentId: comment.id,
-                  isSpam: !comment.marked_as_spam_at,
-                  address: user.activeAccount?.address || '',
+                  comment_id: comment.id,
+                  spam: !comment.marked_as_spam_at,
                 });
               } catch (err) {
                 console.log(err);

@@ -140,6 +140,12 @@ export function getAllRascalConfigs(
         arguments: queueOptions,
       },
     },
+    [RascalQueues.UserReferrals]: {
+      ...queueConfig,
+      options: {
+        arguments: queueOptions,
+      },
+    },
     [RascalQueues.FarcasterWorkerPolicy]: {
       ...queueConfig,
       options: {
@@ -224,6 +230,15 @@ export function getAllRascalConfigs(
         RascalRoutingKeys.XpProjectionUserMentioned,
       ],
     },
+    [RascalBindings.UserReferrals]: {
+      source: RascalExchanges.MessageRelayer,
+      destination: RascalQueues.UserReferrals,
+      destinationType: 'queue',
+      bindingKeys: [
+        RascalRoutingKeys.UserReferralsSignUpFlowCompleted,
+        RascalRoutingKeys.UserReferralsCommunityJoined,
+      ],
+    },
     [RascalBindings.FarcasterWorkerPolicy]: {
       source: RascalExchanges.MessageRelayer,
       destination: RascalQueues.FarcasterWorkerPolicy,
@@ -262,6 +277,10 @@ export function getAllRascalConfigs(
     },
     [RascalSubscriptions.XpProjection]: {
       queue: RascalQueues.XpProjection,
+      ...subscriptionConfig,
+    },
+    [RascalSubscriptions.UserReferrals]: {
+      queue: RascalQueues.UserReferrals,
       ...subscriptionConfig,
     },
     [RascalSubscriptions.FarcasterWorkerPolicy]: {

@@ -18,9 +18,8 @@ const MarketCapProgress = ({
   onBodyClick,
 }: MarketCapProgressProps) => {
   const currencySymbol = currencyNameToSymbolMap[currency];
-  const progressPercentage = Math.floor(
-    (marketCap.current / marketCap.goal) * 100,
-  );
+  const progressPercentage =
+    Math.floor((marketCap.current / marketCap.goal) * 100) || 0;
 
   return (
     <div className="MarketCapProgress" onClick={onBodyClick}>
