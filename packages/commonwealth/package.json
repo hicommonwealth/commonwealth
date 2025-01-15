@@ -106,6 +106,7 @@
     "@ethersproject/strings": "^5.7.0",
     "@ethersproject/units": "^5.7.0",
     "@ethersproject/wallet": "^5.7.0",
+    "@farcaster/frame-sdk": "^0.0.26",
     "@glidejs/glide": "^3.6.0",
     "@hicommonwealth/adapters": "workspace:*",
     "@hicommonwealth/chains": "workspace:*",
