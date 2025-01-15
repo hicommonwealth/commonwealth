@@ -8,7 +8,6 @@ import { z } from 'zod';
 import { GetDigestEmailDataQuery } from '../../src/emails';
 import { seed } from '../../src/tester';
 import { generateThreads } from './util';
-
 describe('Digest email lifecycle', () => {
   let communityOne: z.infer<typeof Community> | undefined;
   let communityTwo: z.infer<typeof Community> | undefined;
@@ -95,10 +94,13 @@ describe('Digest email lifecycle', () => {
         user_id: String(recipientUser!.id),
       },
     });
+    const unsubscribe_link = res?.unsubscribe_link;
     expect(res).to.deep.equal({
       threads: [],
       numberOfThreads: 0,
+      unsubscribe_link: unsubscribe_link,
     });
+
     await models.Community.update(
       {
         include_in_digest_email: false,
@@ -134,9 +136,11 @@ describe('Digest email lifecycle', () => {
         user_id: String(recipientUser!.id),
       },
     });
+    const unsubscribe_link = res?.unsubscribe_link;
     expect(res).to.deep.equal({
       threads: [],
       numberOfThreads: 0,
+      unsubscribe_link: unsubscribe_link,
     });
   });
 
