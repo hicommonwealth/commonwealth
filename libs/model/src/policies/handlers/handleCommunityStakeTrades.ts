@@ -3,8 +3,8 @@ import { getStakeTradeInfo } from '@hicommonwealth/evm-protocols';
 import { chainEvents, events } from '@hicommonwealth/schemas';
 import { BigNumber } from 'ethers';
 import { z } from 'zod';
-import { DB } from '../models';
-import { chainNodeMustExist } from './utils';
+import { DB } from '../../models';
+import { chainNodeMustExist } from '../utils/utils';
 
 const log = logger(import.meta);
 
