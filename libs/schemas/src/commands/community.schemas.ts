@@ -48,7 +48,7 @@ export const CreateCommunity = {
 
     // hidden optional params
     token_name: z.string().optional(),
-    referral_link: z.string().optional(),
+    referrer_address: z.string().optional(),
 
     // deprecated params to be removed
     default_symbol: z.string().max(9),
@@ -284,6 +284,31 @@ export const DeleteGroup = {
   context: AuthContext,
 };
 
+export const DeleteAddress = {
+  input: z.object({
+    community_id: z.string(),
+    address: z.string(),
+  }),
+  output: z.object({
+    community_id: z.string(),
+    address: z.string(),
+  }),
+  context: AuthContext,
+};
+
+export const DeleteAllAddresses = {
+  input: z.object({
+    community_id: z.string(),
+    address: z.string(),
+  }),
+  output: z.object({
+    community_id: z.string(),
+    address: z.string(),
+    deleted: z.number(),
+  }),
+  context: AuthContext,
+};
+
 export const DeleteCommunity = {
   input: z.object({
     community_id: z.string(),
@@ -307,10 +332,17 @@ export const RefreshCommunityMemberships = {
   context: AuthContext,
 };
 
+export const SelectCommunity = {
+  input: z.object({
+    community_id: z.string(),
+  }),
+  output: z.object({}),
+};
+
 export const JoinCommunity = {
   input: z.object({
     community_id: z.string(),
-    referral_link: z.string().nullish(),
+    referrer_address: z.string().optional(),
   }),
   output: z.object({
     community_id: z.string(),

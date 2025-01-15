@@ -15,7 +15,6 @@ import CommunityTags from './community_tags';
 import Contest from './contest';
 import ContestAction from './contest_action';
 import ContestManager from './contest_manager';
-import ContractAbi from './contract_abi';
 import DiscordBotConfig from './discord_bot_config';
 import EmailUpdateToken from './email_update_token';
 import EvmEventSource from './evmEventSource';
@@ -31,6 +30,7 @@ import ProfileTags from './profile_tags';
 import { Quest, QuestAction, QuestActionMeta } from './quest';
 import Reaction from './reaction';
 import { Referral } from './referral';
+import { ReferralFee } from './referral_fee';
 import SsoToken from './sso_token';
 import StakeTransaction from './stake_transaction';
 import StarredCommunity from './starred_community';
@@ -62,7 +62,6 @@ export const Factories = {
   Contest,
   ContestAction,
   ContestManager,
-  ContractAbi,
   DiscordBotConfig,
   EmailUpdateToken,
   EvmEventSource,
@@ -80,6 +79,7 @@ export const Factories = {
   QuestActionMeta,
   Reaction,
   Referral,
+  ReferralFee,
   SsoToken,
   StakeTransaction,
   StarredCommunity,

@@ -9,7 +9,6 @@ import { Op, Transaction } from 'sequelize';
 import { z } from 'zod';
 import { models, sequelize } from '../database';
 import { mustExist } from '../middleware/guards';
-import { getReferrerId } from '../utils/referrals';
 
 async function getUserId(payload: { address_id: number }) {
   const address = await models.Address.findOne({
@@ -18,6 +17,18 @@ async function getUserId(payload: { address_id: number }) {
   });
   mustExist('Address not found', address);
   return address.user_id!;
+}
+
+async function getUserIdByAddress(payload: {
+  referrer_address?: string | null;
+}): Promise<number | undefined> {
+  if (payload.referrer_address) {
+    const referrer_user = await models.Address.findOne({
+      where: { address: payload.referrer_address },
+      attributes: ['user_id'],
+    });
+    if (referrer_user) return referrer_user.user_id!;
+  }
 }
 
 /*
@@ -72,9 +83,13 @@ async function recordXpsForQuest(
   user_id: number,
   event_created_at: Date,
   action_metas: Array<z.infer<typeof schemas.QuestActionMeta> | undefined>,
-  creator_user_id?: number,
+  creator_address?: string | null,
 ) {
   await sequelize.transaction(async (transaction) => {
+    const creator_user_id = await getUserIdByAddress({
+      referrer_address: creator_address,
+    });
+
     for (const action_meta of action_metas) {
       if (!action_meta) continue;
       // get logged actions for this user and action meta
@@ -155,10 +170,14 @@ async function recordXpsForEvent(
   event_name: keyof typeof schemas.QuestEvents,
   event_created_at: Date,
   reward_amount: number,
-  creator_user_id?: number, // referrer user id
+  creator_address?: string, // referrer address
   creator_reward_weight?: number, // referrer reward weight
 ) {
   await sequelize.transaction(async (transaction) => {
+    const creator_user_id = await getUserIdByAddress({
+      referrer_address: creator_address,
+    });
+
     // get logged actions for this user and event
     const log = await models.XpLog.findAll({
       where: { user_id, event_name },
@@ -205,15 +224,19 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
         const reward_amount = 20;
         const creator_reward_weight = 0.2;
 
-        const referrer_id = getReferrerId(payload.referral_link);
-        await recordXpsForEvent(
-          payload.user_id,
-          'SignUpFlowCompleted',
-          payload.created_at!,
-          reward_amount,
-          referrer_id,
-          creator_reward_weight,
-        );
+        const referee_address = await models.Address.findOne({
+          where: { address: payload.address, user_id: payload.user_id },
+        });
+        referee_address &&
+          referee_address.referred_by_address &&
+          (await recordXpsForEvent(
+            payload.user_id,
+            'SignUpFlowCompleted',
+            payload.created_at!,
+            reward_amount,
+            referee_address.referred_by_address,
+            creator_reward_weight,
+          ));
       },
       CommunityCreated: async ({ payload }) => {
         const action_metas = await getQuestActionMetas(
@@ -221,12 +244,11 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
           'CommunityCreated',
         );
         if (action_metas.length > 0) {
-          const referrer_id = getReferrerId(payload.referral_link);
           await recordXpsForQuest(
             payload.user_id,
             payload.created_at!,
             action_metas,
-            referrer_id,
+            payload.referrer_address,
           );
         }
       },
@@ -236,12 +258,11 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
           'CommunityJoined',
         );
         if (action_metas.length > 0) {
-          const referrer_id = getReferrerId(payload.referral_link);
           await recordXpsForQuest(
             payload.user_id,
             payload.created_at!,
             action_metas,
-            referrer_id,
+            payload.referrer_address,
           );
         }
       },
@@ -282,7 +303,7 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
             {
               model: models.Address,
               as: 'Address',
-              attributes: ['user_id'],
+              attributes: ['address'],
               required: true,
             },
           ],
@@ -298,7 +319,7 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
           user_id,
           payload.created_at!,
           action_metas,
-          comment!.Address!.user_id!,
+          comment!.Address!.address,
         );
       },
       UserMentioned: async () => {

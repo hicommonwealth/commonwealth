@@ -32,31 +32,45 @@ type LinkProps = {
 export const QuillFormattedText = ({
   doc,
   hideFormatting,
-  cutoffLines,
   openLinksInNewTab,
   searchTerm,
   customShowMoreButton,
+  maxChars,
+  cutoffLines,
 }: QuillFormattedTextProps) => {
   const navigate = useCommonNavigate();
 
   const [userExpand, setUserExpand] = useState<boolean>(false);
 
   // @ts-expect-error <StrictNullChecks/>
+  // Determine if the content is truncated
   const isTruncated: boolean = useMemo(() => {
     if (userExpand) {
       return false;
     }
-    return cutoffLines && cutoffLines < countLinesQuill(doc);
-  }, [cutoffLines, doc, userExpand]);
+
+    const exceedsMaxChars = maxChars && maxChars < getTextFromDelta(doc).length;
+    const exceedsCutoffLines =
+      cutoffLines && cutoffLines < countLinesQuill(doc);
+    return exceedsMaxChars || exceedsCutoffLines;
+  }, [maxChars, cutoffLines, doc, userExpand]);
 
   const truncatedDoc: DeltaStatic = useMemo(() => {
     if (isTruncated) {
-      return {
-        ops: [...(doc?.ops || []).slice(0, cutoffLines)],
-      } as DeltaStatic;
+      let truncatedOps = doc?.ops || [];
+
+      if (maxChars) {
+        truncatedOps = truncatedOps.slice(0, maxChars);
+      }
+
+      if (cutoffLines) {
+        truncatedOps = truncatedOps.slice(0, cutoffLines);
+      }
+
+      return { ops: truncatedOps } as DeltaStatic;
     }
     return doc;
-  }, [cutoffLines, doc, isTruncated]);
+  }, [doc, isTruncated, maxChars, cutoffLines]);
 
   const finalDoc = useMemo(() => {
     // if no search term, just render the doc normally

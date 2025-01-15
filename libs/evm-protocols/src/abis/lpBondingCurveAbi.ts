@@ -340,4 +340,4 @@ export const lpBondingCurveAbi = [
     ],
     anonymous: false,
   },
-];
+] as const;

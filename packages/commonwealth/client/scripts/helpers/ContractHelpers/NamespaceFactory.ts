@@ -5,7 +5,6 @@ import {
 } from '@hicommonwealth/evm-protocols';
 import { ZERO_ADDRESS } from '@hicommonwealth/shared';
 import { TransactionReceipt } from 'web3';
-import { AbiItem } from 'web3-utils';
 import ContractBase from './ContractBase';
 
 /**
@@ -34,7 +33,7 @@ class NamespaceFactory extends ContractBase {
     const addr = await this.contract.methods.reservationHook().call();
     if (addr.toLowerCase() !== ZERO_ADDRESS) {
       this.reservationHook = new this.web3.eth.Contract(
-        reservationHookAbi as AbiItem[],
+        reservationHookAbi,
         addr,
       );
     }

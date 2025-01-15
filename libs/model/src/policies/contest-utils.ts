@@ -1,8 +1,11 @@
-import { logger } from '@hicommonwealth/core';
+import { logger, ServerError } from '@hicommonwealth/core';
+import {
+  addContentBatch,
+  voteContentBatch,
+} from '@hicommonwealth/evm-protocols';
 import { ContestAction } from '@hicommonwealth/schemas';
 import { z } from 'zod';
 import { config } from '..';
-import { contestHelper } from '../services/commonProtocol';
 
 const log = logger(import.meta);
 
@@ -60,12 +63,16 @@ export async function createOnchainContestContent(payload: {
 
   console.log(JSON.stringify(payload.contestManagers[0]));
 
-  const results = await contestHelper.addContentBatch(
-    payload.contestManagers[0].url,
-    addressesToProcess,
-    payload.author_address!,
-    payload.content_url,
-  );
+  if (!config.WEB3.PRIVATE_KEY)
+    throw new ServerError('WEB3 private key not set!');
+
+  const results = await addContentBatch({
+    privateKey: config.WEB3.PRIVATE_KEY,
+    rpc: payload.contestManagers[0].url,
+    contest: addressesToProcess,
+    creator: payload.author_address!,
+    url: payload.content_url,
+  });
 
   const errors = results
     .filter(({ status }) => status === 'rejected')
@@ -96,14 +103,18 @@ export async function createOnchainContestVote(payload: {
     )}`,
   );
 
-  const results = await contestHelper.voteContentBatch(
-    payload.contestManagers[0].url,
-    payload.author_address,
-    payload.contestManagers.map((m) => ({
+  if (!config.WEB3.PRIVATE_KEY)
+    throw new ServerError('WEB3 private key not set!');
+
+  const results = await voteContentBatch({
+    privateKey: config.WEB3.PRIVATE_KEY,
+    rpc: payload.contestManagers[0].url,
+    voter: payload.author_address,
+    entries: payload.contestManagers.map((m) => ({
       contestAddress: m.contest_address,
       contentId: m.content_id.toString(),
     })),
-  );
+  });
 
   const errors = results
     .filter(({ status }) => status === 'rejected')

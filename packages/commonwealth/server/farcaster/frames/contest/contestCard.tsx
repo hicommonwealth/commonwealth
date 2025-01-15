@@ -3,41 +3,31 @@ import { Contest, config as modelConfig } from '@hicommonwealth/model';
 import { Button } from 'frames.js/express';
 import React from 'react';
 
-import { PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
+import { buildContestLeaderboardUrl, getBaseUrl } from '@hicommonwealth/shared';
 import { frames } from '../../config';
+import { FrameLayout } from '../../utils';
 
 export const contestCard = frames(async (ctx) => {
   const contest_address = ctx.url.pathname.split('/')[1];
 
   const contestManager = await query(Contest.GetContest(), {
     actor: { user: { email: '' } },
-    payload: { contest_address, with_chain_node: true },
+    payload: { contest_address, with_chain_node: true, with_contests: true },
   });
 
   if (!contestManager) {
     return {
       title: 'Contest not found',
       image: (
-        <div
-          style={{
-            backgroundColor: '#2A2432',
-            color: 'white',
-            padding: '40px',
-            display: 'flex',
-            flexDirection: 'column',
-            width: '100%',
-            height: '100%',
-            lineHeight: '0.5',
-          }}
-        >
+        <FrameLayout header="Contest not found">
           <p
             style={{
-              fontSize: '56px',
+              fontSize: '32px',
             }}
           >
-            Contest not found.
+            Try to run the contest again.
           </p>
-        </div>
+        </FrameLayout>
       ),
     };
   }
@@ -46,74 +36,88 @@ export const contestCard = frames(async (ctx) => {
     return {
       title: 'Contest Ended',
       image: (
-        <div
-          style={{
-            backgroundColor: '#2A2432',
-            color: 'white',
-            padding: '40px',
-            display: 'flex',
-            flexDirection: 'column',
-            width: '100%',
-            height: '100%',
-            lineHeight: '0.5',
-          }}
-        >
+        <FrameLayout header="Contest Ended">
           <p
             style={{
-              fontSize: '56px',
+              fontSize: '32px',
             }}
           >
-            Contest ended. New entries will not be accepted.
+            New entries will not be accepted.
           </p>
-        </div>
+        </FrameLayout>
       ),
     };
   }
 
+  const leaderboardUrl = buildContestLeaderboardUrl(
+    getBaseUrl(config.APP_ENV),
+    contestManager.community_id,
+    contestManager.contest_address,
+  );
+
+  const endTime = contestManager.contests?.[0]?.end_time;
+
   return {
     title: contestManager.name,
     image: (
-      <div
-        style={{
-          backgroundColor: '#2A2432',
-          color: 'white',
-          padding: '40px',
-          display: 'flex',
-          flexDirection: 'column',
-          width: '100%',
-          height: '100%',
-          lineHeight: '0.5',
-        }}
-      >
-        <p
+      <FrameLayout header={contestManager.name}>
+        <div
           style={{
-            lineHeight: '1.2',
-            fontSize: '56px',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            flexGrow: 1,
           }}
         >
-          {contestManager.name}
-        </p>
+          {contestManager.description && (
+            <p
+              style={{
+                fontSize: '36px',
+                lineHeight: '1.2',
+              }}
+            >
+              {contestManager.description}
+            </p>
+          )}
 
-        {contestManager.description && (
+          {endTime && (
+            <p
+              style={{
+                fontSize: '30px',
+                lineHeight: '1.2',
+              }}
+            >
+              Submit entries by replying below until {endTime.toLocaleString()}
+            </p>
+          )}
+
           <p
             style={{
-              fontSize: '32px',
-              lineHeight: '1.2',
+              fontSize: '42px',
+              display: 'flex',
+              justifyContent: 'flex-end',
+              alignItems: 'center',
             }}
           >
-            {contestManager.description}
+            Contest by {contestManager.Community?.name}
+            {contestManager.Community?.icon_url && (
+              <img
+                src={contestManager.Community?.icon_url}
+                alt=""
+                style={{
+                  width: '80px',
+                  height: '80px',
+                  borderRadius: '50%',
+                  marginLeft: '16px',
+                }}
+              />
+            )}
           </p>
-        )}
-
-        <p style={{ fontSize: '42px' }}>Check prizes below 👇</p>
-      </div>
+        </div>
+      </FrameLayout>
     ),
     buttons: [
-      <Button
-        key="leaderboard"
-        action="link"
-        target={`${getBaseUrl()}/${contestManager.community_id}/contests/${contestManager.contest_address}`}
-      >
+      <Button key="leaderboard" action="link" target={leaderboardUrl}>
         Leaderboard
       </Button>,
       <Button
@@ -129,19 +133,6 @@ export const contestCard = frames(async (ctx) => {
     ],
   };
 });
-
-const getBaseUrl = () => {
-  switch (config.APP_ENV) {
-    case 'local':
-      return 'http://localhost:8080';
-    case 'beta':
-      return 'https://qa.commonwealth.im';
-    case 'demo':
-      return 'https://demo.commonwealth.im';
-    default:
-      return `https://${PRODUCTION_DOMAIN}`;
-  }
-};
 
 export const getActionInstallUrl = () => {
   // add environment to button label in non-prod environments

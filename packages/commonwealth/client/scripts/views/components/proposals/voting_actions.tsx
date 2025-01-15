@@ -170,8 +170,7 @@ export const VotingActions = ({
     if (
       proposal instanceof CosmosProposal ||
       proposal instanceof CosmosProposalV1 ||
-      proposal instanceof CosmosProposalGovgen ||
-      proposal instanceof CosmosProposalV1AtomOne
+      proposal instanceof CosmosProposalGovgen
     ) {
       proposal
         .voteTx(new CosmosVote(user, 'NoWithVeto'))
@@ -253,18 +252,32 @@ export const VotingActions = ({
       </>
     );
   } else if (proposal.votingType === VotingType.YesNoAbstainVeto) {
-    votingActionObj = (
-      <>
-        <div className="button-row">
-          {yesButton}
-          {noButton}
-          {abstainButton}
-          {noWithVetoButton}
-        </div>
-        {/* @ts-expect-error StrictNullChecks*/}
-        <ProposalExtensions proposal={proposal} />
-      </>
-    );
+    if (!(proposal instanceof CosmosProposalV1AtomOne)) {
+      votingActionObj = (
+        <>
+          <div className="button-row">
+            {yesButton}
+            {noButton}
+            {abstainButton}
+            {noWithVetoButton}
+          </div>
+          {/* @ts-expect-error StrictNullChecks*/}
+          <ProposalExtensions proposal={proposal} />
+        </>
+      );
+    } else {
+      votingActionObj = (
+        <>
+          <div className="button-row">
+            {yesButton}
+            {noButton}
+            {abstainButton}
+          </div>
+          {/* @ts-expect-error StrictNullChecks*/}
+          <ProposalExtensions proposal={proposal} />
+        </>
+      );
+    }
   } else {
     votingActionObj = <CannotVote label="Unsupported proposal type" />;
   }

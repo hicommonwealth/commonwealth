@@ -1,9 +1,10 @@
 import { logger } from '@hicommonwealth/core';
+import { getStakeTradeInfo } from '@hicommonwealth/evm-protocols';
 import { chainEvents, events } from '@hicommonwealth/schemas';
 import { BigNumber } from 'ethers';
-import Web3 from 'web3';
 import { z } from 'zod';
 import { DB } from '../models';
+import { chainNodeMustExist } from './utils';
 
 const log = logger(import.meta);
 
@@ -41,23 +42,14 @@ export async function handleCommunityStakeTrades(
     return;
   }
 
-  const chainNode = await models.ChainNode.scope('withPrivateData').findOne({
-    where: {
-      id: event.eventSource.chainNodeId,
-    },
-  });
-  if (!chainNode) {
-    log.error('ChainNode associated to chain event not found!', undefined, {
-      event,
-    });
-    return;
-  }
+  const chainNode = await chainNodeMustExist(event.eventSource.ethChainId);
 
   if (!chainNode.private_url) {
     log.error('ChainNode is missing a private url', undefined, {
       event,
       chainNode: chainNode.toJSON(),
     });
+    return;
   }
 
   if (community.chain_node_id != chainNode.id) {
@@ -71,26 +63,20 @@ export async function handleCommunityStakeTrades(
     return;
   }
 
-  const web3 = new Web3(chainNode.private_url!);
-
-  const [tradeTxReceipt, block] = await Promise.all([
-    web3.eth.getTransactionReceipt(event.rawLog.transactionHash),
-    web3.eth.getBlock(event.rawLog.blockHash),
-  ]);
-
-  const { 0: stakeId, 1: stakeAmount } = web3.eth.abi.decodeParameters(
-    ['uint256', 'uint256'],
-    String(tradeTxReceipt.logs[0].data),
-  );
+  const stakeInfo = await getStakeTradeInfo({
+    rpc: chainNode.private_url,
+    txHash: event.rawLog.transactionHash,
+    blockHash: event.rawLog.blockHash,
+  });
 
   await models.StakeTransaction.create({
     transaction_hash: event.rawLog.transactionHash,
     community_id: community.id,
-    stake_id: parseInt(stakeId as string),
-    stake_amount: parseInt(stakeAmount as string),
+    stake_id: stakeInfo.stakeId,
+    stake_amount: stakeInfo.stakeAmount,
     stake_price: BigNumber.from(ethAmount).toString(),
     address: trader,
     stake_direction: isBuy ? 'buy' : 'sell',
-    timestamp: Number(block.timestamp),
+    timestamp: stakeInfo.timestamp,
   });
 }

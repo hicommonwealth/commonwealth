@@ -1,39 +1,5 @@
 @import '../../../../styles/shared';
 
-.thread-connectors-container {
-  display: flex;
-  gap: 24px;
-  margin-right: 24px;
-
-  @include extraSmall {
-    gap: 12px;
-    margin-right: 12px;
-  }
-
-  .thread-connector {
-    background-color: $neutral-200;
-    height: 100%;
-    left: 36px;
-    position: relative;
-    top: 16px;
-    width: 1px;
-    z-index: -1;
-
-    &.smaller {
-      height: calc(100% - 40px);
-    }
-
-    @include extraSmall {
-      left: 24px;
-    }
-
-    &.replying {
-      background-color: $neutral-300;
-      width: 2px;
-    }
-  }
-}
-
 .Comment {
   display: flex;
 

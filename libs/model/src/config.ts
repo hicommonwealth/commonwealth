@@ -33,6 +33,7 @@ const {
   ALCHEMY_PUBLIC_APP_KEY,
   MEMBERSHIP_REFRESH_BATCH_SIZE,
   MEMBERSHIP_REFRESH_TTL_SECONDS,
+  NEYNAR_BOT_UUID,
   NEYNAR_API_KEY,
   NEYNAR_CAST_CREATED_WEBHOOK_SECRET,
   NEYNAR_REPLY_WEBHOOK_URL,
@@ -40,6 +41,8 @@ const {
   FLAG_FARCASTER_CONTEST,
   OPENAI_API_KEY,
   OPENAI_ORGANIZATION,
+  CONTEST_BOT_PRIVATE_KEY,
+  CONTEST_BOT_NAMESPACE,
 } = process.env;
 
 const NAME = target.NODE_ENV === 'test' ? 'common_test' : 'commonwealth';
@@ -68,6 +71,7 @@ export const config = configure(
     },
     WEB3: {
       PRIVATE_KEY: PRIVATE_KEY || '',
+      CONTEST_BOT_PRIVATE_KEY: CONTEST_BOT_PRIVATE_KEY || '',
     },
     TBC: {
       TTL_SECS: TBC_BALANCE_TTL_SECONDS
@@ -91,6 +95,7 @@ export const config = configure(
         : 5,
       FLAG_FARCASTER_CONTEST: FLAG_FARCASTER_CONTEST === 'true',
       NEYNAR_API_KEY: NEYNAR_API_KEY,
+      NEYNAR_BOT_UUID: NEYNAR_BOT_UUID,
       NEYNAR_CAST_CREATED_WEBHOOK_SECRET: NEYNAR_CAST_CREATED_WEBHOOK_SECRET,
       NEYNAR_REPLY_WEBHOOK_URL: NEYNAR_REPLY_WEBHOOK_URL,
       FARCASTER_ACTION_URL: FARCASTER_ACTION_URL,
@@ -154,6 +159,9 @@ export const config = configure(
       API_KEY: OPENAI_API_KEY,
       ORGANIZATION: OPENAI_ORGANIZATION || 'org-D0ty00TJDApqHYlrn1gge2Ql',
     },
+    BOT: {
+      CONTEST_BOT_NAMESPACE: CONTEST_BOT_NAMESPACE || '',
+    },
   },
   z.object({
     DB: z.object({
@@ -181,6 +189,7 @@ export const config = configure(
             !(target.APP_ENV === 'production' && data === DEFAULTS.PRIVATE_KEY),
           'PRIVATE_KEY must be set to a non-default value in production.',
         ),
+      CONTEST_BOT_PRIVATE_KEY: z.string(),
     }),
     TBC: z.object({
       TTL_SECS: z.number().int(),
@@ -195,10 +204,41 @@ export const config = configure(
       MIN_USER_ETH: z.number(),
       MAX_USER_POSTS_PER_CONTEST: z.number().int(),
       FLAG_FARCASTER_CONTEST: z.boolean().nullish(),
-      NEYNAR_API_KEY: z.string().nullish(),
-      NEYNAR_CAST_CREATED_WEBHOOK_SECRET: z.string().nullish(),
-      NEYNAR_REPLY_WEBHOOK_URL: z.string().nullish(),
-      FARCASTER_ACTION_URL: z.string().nullish(),
+      NEYNAR_BOT_UUID: z
+        .string()
+        .optional()
+        .refine(
+          (data) => !(target.APP_ENV === 'production' && !data),
+          'NEYNAR_BOT_UUID must be set to a non-default value in production.',
+        ),
+      NEYNAR_API_KEY: z
+        .string()
+        .optional()
+        .refine(
+          (data) => !(target.APP_ENV === 'production' && !data),
+          'NEYNAR_API_KEY must be set to a non-default value in production.',
+        ),
+      NEYNAR_CAST_CREATED_WEBHOOK_SECRET: z
+        .string()
+        .optional()
+        .refine(
+          (data) => !(target.APP_ENV === 'production' && !data),
+          'NEYNAR_CAST_CREATED_WEBHOOK_SECRET must be set to a non-default value in production.',
+        ),
+      NEYNAR_REPLY_WEBHOOK_URL: z
+        .string()
+        .optional()
+        .refine(
+          (data) => !(target.APP_ENV === 'production' && !data),
+          'NEYNAR_REPLY_WEBHOOK_URL must be set to a non-default value in production.',
+        ),
+      FARCASTER_ACTION_URL: z
+        .string()
+        .optional()
+        .refine(
+          (data) => !(target.APP_ENV === 'production' && !data),
+          'FARCASTER_ACTION_URL must be set to a non-default value in production.',
+        ),
     }),
     AUTH: z
       .object({
@@ -283,6 +323,9 @@ export const config = configure(
     OPENAI: z.object({
       API_KEY: z.string().optional(),
       ORGANIZATION: z.string().optional(),
+    }),
+    BOT: z.object({
+      CONTEST_BOT_NAMESPACE: z.string(),
     }),
   }),
 );

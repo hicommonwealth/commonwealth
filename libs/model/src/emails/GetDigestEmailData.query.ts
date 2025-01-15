@@ -5,7 +5,7 @@ import {
   GetDigestEmailData,
   Query,
 } from '@hicommonwealth/core';
-import { models } from '@hicommonwealth/model';
+import { generateUnsubscribeLink, models } from '@hicommonwealth/model';
 import { QueryTypes } from 'sequelize';
 import { z } from 'zod';
 
@@ -14,7 +14,7 @@ export function GetDigestEmailDataQuery(): Query<typeof GetDigestEmailData> {
     ...GetDigestEmailData,
     auth: [],
     secure: true,
-    authStrategy: { name: 'authtoken', userId: ExternalServiceUserIds.Knock },
+    authStrategy: { type: 'authtoken', userId: ExternalServiceUserIds.Knock },
     body: async ({ payload }) => {
       // TODO User payload for unSubscribe once Recap email pr merge
       const threads = await models.sequelize.query<
@@ -41,11 +41,11 @@ export function GetDigestEmailDataQuery(): Query<typeof GetDigestEmailData> {
           raw: true,
         },
       );
-
+      const unSubscribeLink = await generateUnsubscribeLink(payload.user_id);
       return {
         threads: threads,
         numberOfThreads: threads.length,
-        // unsubscribe_link: TODO : will add once email recap PR got merged
+        unsubscribe_link: unSubscribeLink,
       };
     },
   };

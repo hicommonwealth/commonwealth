@@ -14,7 +14,7 @@ export function UpdateUser(): Command<typeof schemas.UpdateUser> {
       if (actor.user.id != payload.id)
         throw new InvalidInput('Invalid user id');
 
-      const { id, profile, tag_ids, referral_link } = payload;
+      const { id, profile, tag_ids } = payload;
       const {
         slug,
         name,
@@ -103,7 +103,7 @@ export function UpdateUser(): Command<typeof schemas.UpdateUser> {
               const updated_user = rows.at(0);
 
               // emit sign-up flow completed event when:
-              if (updated_user && user_delta.is_welcome_onboard_flow_complete)
+              if (updated_user && user_delta.is_welcome_onboard_flow_complete) {
                 await emitEvent(
                   models.Outbox,
                   [
@@ -111,14 +111,14 @@ export function UpdateUser(): Command<typeof schemas.UpdateUser> {
                       event_name: schemas.EventNames.SignUpFlowCompleted,
                       event_payload: {
                         user_id: id,
-                        referral_link,
+                        address: actor.address!,
                         created_at: updated_user.created_at!,
                       },
                     },
                   ],
                   transaction,
                 );
-
+              }
               return updated_user;
             } else return user;
           },

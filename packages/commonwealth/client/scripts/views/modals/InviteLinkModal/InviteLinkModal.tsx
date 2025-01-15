@@ -1,4 +1,5 @@
-import React from 'react';
+import { uniqBy } from 'lodash';
+import React, { useState } from 'react';
 
 import { saveToClipboard } from 'utils/clipboard';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
@@ -8,16 +9,12 @@ import {
   CWModalFooter,
   CWModalHeader,
 } from '../../components/component_kit/new_designs/CWModal';
+import { CWSelectList } from '../../components/component_kit/new_designs/CWSelectList';
 import { CWTextInput } from '../../components/component_kit/new_designs/CWTextInput';
-import { ShareSkeleton } from './ShareSkeleton';
 import { getShareOptions } from './utils';
 
-import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
+import { formatAddressShort } from 'helpers';
 import app from 'state';
-import {
-  useCreateReferralLinkMutation,
-  useGetReferralLinkQuery,
-} from 'state/api/user';
 import useUserStore from 'state/ui/user';
 
 import './InviteLinkModal.scss';
@@ -27,32 +24,31 @@ interface InviteLinkModalProps {
 }
 
 const InviteLinkModal = ({ onModalClose }: InviteLinkModalProps) => {
-  const { data: refferalLinkData, isLoading: isLoadingReferralLink } =
-    useGetReferralLinkQuery();
-
   const user = useUserStore();
   const hasJoinedCommunity = !!user.activeAccount;
   const communityId = hasJoinedCommunity ? app.activeChainId() : '';
 
-  const { mutate: createReferralLink, isLoading: isLoadingCreateReferralLink } =
-    useCreateReferralLinkMutation();
+  const availableAddresses = uniqBy(user.addresses, 'address');
 
-  const referralLink = refferalLinkData?.referral_link;
+  const addressOptions = availableAddresses.map((addressInfo) => ({
+    value: addressInfo.address,
+    label: formatAddressShort(addressInfo.address, 6),
+  }));
+
+  const refAddress = communityId
+    ? user.activeAccount?.address
+    : addressOptions?.[0]?.value;
+
+  const [refCode, setRefCode] = useState(refAddress);
+
   const currentUrl = window.location.origin;
 
-  const inviteLink = referralLink
-    ? `${currentUrl}${communityId ? `/${communityId}/discussions` : '/dashboard'}?refcode=${referralLink}`
-    : '';
-
-  useRunOnceOnCondition({
-    callback: () => createReferralLink({}),
-    shouldRun: !isLoadingReferralLink && !referralLink,
-  });
+  const inviteLink = `${currentUrl}${
+    communityId ? `/${communityId}/discussions` : '/dashboard'
+  }?refcode=${refCode}`;
 
   const handleCopy = () => {
-    if (referralLink) {
-      saveToClipboard(inviteLink, true).catch(console.error);
-    }
+    saveToClipboard(inviteLink, true).catch(console.error);
   };
 
   const shareOptions = getShareOptions(!!communityId, inviteLink);
@@ -73,41 +69,43 @@ const InviteLinkModal = ({ onModalClose }: InviteLinkModalProps) => {
               : `When you refer your friends to Common, you'll get a portion of any fees they pay to 
               Common over their lifetime engaging with web 3 native forums.`}
           </CWText>
+          <>
+            <CWSelectList
+              label="Select Address"
+              placeholder="Select a wallet"
+              isClearable={false}
+              isSearchable={false}
+              value={addressOptions.find((option) => option.value === refCode)}
+              defaultValue={addressOptions[0]}
+              options={addressOptions}
+              onChange={(option) => setRefCode(option?.value)}
+            />
 
-          {isLoadingReferralLink || isLoadingCreateReferralLink ? (
-            <ShareSkeleton />
-          ) : (
-            <>
-              <CWTextInput
-                fullWidth
-                type="text"
-                value={inviteLink}
-                readOnly
-                onClick={handleCopy}
-                iconRight={<CWIcon iconName="copy" />}
-              />
+            <CWTextInput
+              fullWidth
+              type="text"
+              value={inviteLink}
+              readOnly
+              onClick={handleCopy}
+              iconRight={<CWIcon iconName="copy" />}
+            />
 
-              <div className="share-section">
-                <CWText fontWeight="bold">Share to</CWText>
-                <div className="share-options">
-                  {shareOptions.map((option) => (
-                    <div
-                      key={option.name}
-                      className="share-option"
-                      onClick={option.onClick}
-                    >
-                      <img
-                        src={option.icon}
-                        alt={option.name}
-                        className="icon"
-                      />
-                      <CWText type="caption">{option.name}</CWText>
-                    </div>
-                  ))}
-                </div>
+            <div className="share-section">
+              <CWText fontWeight="bold">Share to</CWText>
+              <div className="share-options">
+                {shareOptions.map((option) => (
+                  <div
+                    key={option.name}
+                    className="share-option"
+                    onClick={option.onClick}
+                  >
+                    <img src={option.icon} alt={option.name} className="icon" />
+                    <CWText type="caption">{option.name}</CWText>
+                  </div>
+                ))}
               </div>
-            </>
-          )}
+            </div>
+          </>
         </div>
       </CWModalBody>
       <CWModalFooter>

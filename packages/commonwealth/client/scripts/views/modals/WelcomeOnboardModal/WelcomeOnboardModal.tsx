@@ -21,7 +21,6 @@ const WelcomeOnboardModal = ({ isOpen, onClose }: WelcomeOnboardModalProps) => {
   );
 
   const user = useUserStore();
-  // const hasMagic = user.addresses?.[0]?.walletId === WalletId.Magic;
 
   const [hasMagic, setHasMagic] = useState(false);
 

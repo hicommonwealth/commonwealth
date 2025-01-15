@@ -101,10 +101,11 @@ const NewSnapshotProposalPage = lazy(
 const NewProfilePage = lazy(() => import('views/pages/new_profile'));
 const EditNewProfilePage = lazy(() => import('views/pages/edit_new_profile'));
 const ProfilePageRedirect = lazy(() => import('views/pages/profile_redirect'));
+const UnSubscribePage = lazy(() => import('views/pages/UnSubscribePage'));
 
-const CustomDomainRoutes = ({
-  tokenizedCommunityEnabled,
-}: RouteFeatureFlags) => {
+const RewardsPage = lazy(() => import('views/pages/RewardsPage'));
+
+const CustomDomainRoutes = ({ launchpadEnabled }: RouteFeatureFlags) => {
   return [
     <Route
       key="/"
@@ -119,7 +120,12 @@ const CustomDomainRoutes = ({
       path="/createCommunity"
       element={withLayout(CreateCommunityPage, { type: 'common' })}
     />,
-    ...(tokenizedCommunityEnabled
+    <Route
+      key="/unSubscribe/:userId"
+      path="/unSubscribe/:userId"
+      element={withLayout(UnSubscribePage, { type: 'common' })}
+    />,
+    ...(launchpadEnabled
       ? [
           <Route
             key="/createTokenCommunity"
@@ -176,6 +182,11 @@ const CustomDomainRoutes = ({
       key="/myTransactions"
       path="/myTransactions"
       element={withLayout(MyTransactions, { type: 'common' })}
+    />,
+    <Route
+      key="/rewards"
+      path="/rewards"
+      element={withLayout(RewardsPage, { type: 'common' })}
     />,
 
     // NOTIFICATIONS

@@ -1,0 +1,39 @@
+@import '../../../../../styles/shared.scss';
+
+.Trend {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 8px;
+  .trend-icon {
+    display: none;
+  }
+
+  &.trend-up {
+    color: $green-500;
+    .percentage {
+      color: $green-500;
+    }
+    .trend-icon {
+      display: block;
+      transform: rotate(0deg);
+    }
+  }
+
+  &.trend-down {
+    color: $rorange-500;
+    .percentage {
+      color: $rorange-500;
+    }
+
+    .trend-icon {
+      display: block;
+      transform: rotate(180deg);
+    }
+  }
+
+  .from-last-month {
+    color: $neutral-500;
+    margin-left: 4px;
+  }
+}

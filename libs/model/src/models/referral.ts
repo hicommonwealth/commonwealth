@@ -12,29 +12,62 @@ export const Referral = (
   sequelize.define<ReferralInstance>(
     'Referral',
     {
-      referrer_id: {
+      id: {
         type: Sequelize.INTEGER,
-        allowNull: false,
         primaryKey: true,
+        autoIncrement: true,
       },
-      referee_id: {
+      eth_chain_id: {
         type: Sequelize.INTEGER,
-        allowNull: false,
-        primaryKey: true,
+        allowNull: true,
       },
-      event_name: {
+      transaction_hash: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      namespace_address: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      referee_address: {
         type: Sequelize.STRING,
         allowNull: false,
-        primaryKey: true,
       },
-      event_payload: { type: Sequelize.JSONB, allowNull: false },
-      created_at: { type: Sequelize.DATE, allowNull: true, primaryKey: true },
+      referrer_address: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      referrer_received_eth_amount: {
+        type: Sequelize.FLOAT,
+        allowNull: false,
+        defaultValue: 0,
+      },
+      created_on_chain_timestamp: {
+        type: Sequelize.BIGINT,
+        allowNull: true,
+      },
+      created_off_chain_at: {
+        type: Sequelize.DATE,
+        allowNull: false,
+      },
+      updated_at: {
+        type: Sequelize.DATE,
+        allowNull: false,
+      },
     },
     {
       timestamps: true,
-      createdAt: 'created_at',
-      updatedAt: false,
+      createdAt: 'created_off_chain_at',
+      updatedAt: 'updated_at',
       underscored: true,
       tableName: 'Referrals',
+      indexes: [
+        { fields: ['referee_address'] },
+        { fields: ['referrer_address'] },
+        {
+          fields: ['eth_chain_id', 'transaction_hash'],
+          unique: true,
+        },
+      ],
     },
   );
