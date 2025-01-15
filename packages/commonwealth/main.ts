@@ -19,6 +19,7 @@ import passport from 'passport';
 import path, { dirname } from 'path';
 import pinoHttp from 'pino-http';
 import prerenderNode from 'prerender-node';
+import { buildFarcasterManifest } from 'server/util/buildFarcasterManifest';
 import { fileURLToPath } from 'url';
 import * as v8 from 'v8';
 import * as api from './server/api';
@@ -177,6 +178,11 @@ export async function main(
     res.sendFile(`${__dirname}/manifest.json`);
   });
 
+  app.use('/.well-known/farcaster.json', (req, res) => {
+    // res.json(123);
+    res.json(buildFarcasterManifest());
+  });
+
   app.use('/firebase-messaging-sw.js', (req: Request, res: Response) => {
     res.sendFile(`${__dirname}/firebase-messaging-sw.js`);
   });
@@ -200,6 +206,7 @@ export async function main(
   );
 
   app.get('*', (req: Request, res: Response) => {
+    console.log('hello');
     res.sendFile(`${__dirname}/index.html`);
   });
 

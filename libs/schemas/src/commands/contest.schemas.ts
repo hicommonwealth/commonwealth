@@ -155,3 +155,8 @@ export const FarcasterUpvoteAction = {
     message: z.string(),
   }),
 };
+
+export const FarcasterNotificationsWebhook = {
+  input: z.any(),
+  output: z.any(),
+};

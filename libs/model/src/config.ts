@@ -39,6 +39,10 @@ const {
   NEYNAR_REPLY_WEBHOOK_URL,
   FARCASTER_ACTION_URL,
   FLAG_FARCASTER_CONTEST,
+  FARCASTER_MANIFEST_HEADER,
+  FARCASTER_MANIFEST_PAYLOAD,
+  FARCASTER_MANIFEST_SIGNATURE,
+  FARCASTER_MANIFEST_DOMAIN,
   OPENAI_API_KEY,
   OPENAI_ORGANIZATION,
   CONTEST_BOT_PRIVATE_KEY,
@@ -99,6 +103,10 @@ export const config = configure(
       NEYNAR_CAST_CREATED_WEBHOOK_SECRET: NEYNAR_CAST_CREATED_WEBHOOK_SECRET,
       NEYNAR_REPLY_WEBHOOK_URL: NEYNAR_REPLY_WEBHOOK_URL,
       FARCASTER_ACTION_URL: FARCASTER_ACTION_URL,
+      FARCASTER_MANIFEST_HEADER: FARCASTER_MANIFEST_HEADER,
+      FARCASTER_MANIFEST_PAYLOAD: FARCASTER_MANIFEST_PAYLOAD,
+      FARCASTER_MANIFEST_SIGNATURE: FARCASTER_MANIFEST_SIGNATURE,
+      FARCASTER_MANIFEST_DOMAIN: FARCASTER_MANIFEST_DOMAIN,
     },
     AUTH: {
       JWT_SECRET: JWT_SECRET || DEFAULTS.JWT_SECRET,
@@ -238,6 +246,34 @@ export const config = configure(
         .refine(
           (data) => !(target.APP_ENV === 'production' && !data),
           'FARCASTER_ACTION_URL must be set to a non-default value in production.',
+        ),
+      FARCASTER_MANIFEST_HEADER: z
+        .string()
+        .optional()
+        .refine(
+          (data) => !(target.APP_ENV === 'production' && !data),
+          'FARCASTER_MANIFEST_DOMAIN must be set to a non-default value in production.',
+        ),
+      FARCASTER_MANIFEST_PAYLOAD: z
+        .string()
+        .optional()
+        .refine(
+          (data) => !(target.APP_ENV === 'production' && !data),
+          'FARCASTER_MANIFEST_PAYLOAD must be set to a non-default value in production.',
+        ),
+      FARCASTER_MANIFEST_SIGNATURE: z
+        .string()
+        .optional()
+        .refine(
+          (data) => !(target.APP_ENV === 'production' && !data),
+          'FARCASTER_MANIFEST_SIGNATURE must be set to a non-default value in production.',
+        ),
+      FARCASTER_MANIFEST_DOMAIN: z
+        .string()
+        .optional()
+        .refine(
+          (data) => !(target.APP_ENV === 'production' && !data),
+          'FARCASTER_MANIFEST_DOMAIN must be set to a non-default value in production.',
         ),
     }),
     AUTH: z
