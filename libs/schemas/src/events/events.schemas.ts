@@ -88,7 +88,7 @@ export const CommunityCreated = z.object({
 export const CommunityJoined = z.object({
   community_id: z.string(),
   user_id: z.number(),
-  referrer_address: z.string().optional(),
+  referrer_address: z.string().nullish(),
   created_at: z.coerce.date(),
 });
 

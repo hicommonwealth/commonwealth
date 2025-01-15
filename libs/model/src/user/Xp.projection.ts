@@ -20,7 +20,7 @@ async function getUserId(payload: { address_id: number }) {
 }
 
 async function getUserIdByAddress(payload: {
-  referrer_address?: string;
+  referrer_address?: string | null;
 }): Promise<number | undefined> {
   if (payload.referrer_address) {
     const referrer_user = await models.Address.findOne({
@@ -83,7 +83,7 @@ async function recordXpsForQuest(
   user_id: number,
   event_created_at: Date,
   action_metas: Array<z.infer<typeof schemas.QuestActionMeta> | undefined>,
-  creator_address?: string,
+  creator_address?: string | null,
 ) {
   await sequelize.transaction(async (transaction) => {
     const creator_user_id = await getUserIdByAddress({
