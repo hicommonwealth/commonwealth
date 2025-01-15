@@ -490,7 +490,9 @@ const CommunityMembersPage = () => {
             isLoadingMoreMembers={isLoadingMembers}
             tableState={tableState}
             extraColumns={extraColumns}
-            refetch={refetchMembers}
+            refetch={() => {
+              refetchMembers().catch(console.error);
+            }}
           />
         )}
       </section>
