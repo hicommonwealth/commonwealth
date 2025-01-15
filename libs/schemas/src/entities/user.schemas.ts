@@ -53,6 +53,7 @@ export const User = z.object({
 
   profile: UserProfile,
   xp_points: PG_INT.default(0).nullish(),
+  unsubscribe_uuid: z.string().uuid().nullish(),
   referral_count: PG_INT.default(0)
     .nullish()
     .describe('Number of referrals that have earned ETH'),
@@ -83,7 +84,7 @@ export const Address = z.object({
   is_banned: z.boolean().default(false),
   hex: z.string().max(64).nullish(),
 
-  User: User.optional(),
+  User: User.optional().nullish(),
 
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional(),

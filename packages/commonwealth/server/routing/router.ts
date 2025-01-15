@@ -13,13 +13,11 @@ import {
 import { getRelatedCommunitiesHandler } from '../routes/communities/get_related_communities_handler';
 
 import communityStats from '../routes/communityStats';
-import deleteAddress from '../routes/deleteAddress';
 import domain from '../routes/domain';
 import finishUpdateEmail from '../routes/finishUpdateEmail';
 import getAddressStatus from '../routes/getAddressStatus';
 import { healthHandler } from '../routes/health';
 import reactionsCounts from '../routes/reactionsCounts';
-import selectCommunity from '../routes/selectCommunity';
 import starCommunity from '../routes/starCommunity';
 import { status } from '../routes/status';
 import threadsUsersCountAndAvatars from '../routes/threadsUsersCountAndAvatars';
@@ -67,7 +65,6 @@ import { ServerTagsController } from 'server/controllers/server_tags_controller'
 import { rateLimiterMiddleware } from 'server/middleware/rateLimiter';
 import { getTopUsersHandler } from 'server/routes/admin/get_top_users_handler';
 import { getNamespaceMetadata } from 'server/routes/communities/get_namespace_metadata';
-import deleteAllAddress from 'server/routes/deleteAllAddress';
 import { config } from '../config';
 import { getStatsHandler } from '../routes/admin/get_stats_handler';
 import { getCanvasClockHandler } from '../routes/canvas/get_canvas_clock_handler';
@@ -155,32 +152,9 @@ function setupRouter(
   registerRoute(
     router,
     'post',
-    '/deleteAddress',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateCommunity,
-    deleteAddress.bind(this, models),
-  );
-  registerRoute(
-    router,
-    'post',
-    '/deleteAllAddresses',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateCommunity,
-    deleteAllAddress.bind(this, models),
-  );
-  registerRoute(
-    router,
-    'post',
     '/getAddressStatus',
     passport.authenticate('jwt', { session: false }),
     getAddressStatus.bind(this, models),
-  );
-  registerRoute(
-    router,
-    'post',
-    '/selectCommunity',
-    passport.authenticate('jwt', { session: false }),
-    selectCommunity.bind(this, models),
   );
 
   // communities

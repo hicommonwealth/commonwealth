@@ -1,11 +1,6 @@
 import z from 'zod';
 import { EVM_ADDRESS, PG_INT } from '../utils';
 
-export const REFERRAL_EVENTS = [
-  'CommunityCreated',
-  'SignUpFlowCompleted',
-] as const;
-
 export const Referral = z
   .object({
     id: PG_INT.optional(),
