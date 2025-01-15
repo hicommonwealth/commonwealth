@@ -179,7 +179,6 @@ export async function main(
   });
 
   app.use('/.well-known/farcaster.json', (req, res) => {
-    // res.json(123);
     res.json(buildFarcasterManifest());
   });
 
