@@ -22,6 +22,7 @@ interface UseReserveCommunityNamespaceProps {
   chainId: string;
   onSuccess?: () => void;
   hasNamespaceReserved?: boolean;
+  referrerAddress?: string | null;
 }
 
 const useReserveCommunityNamespace = ({
@@ -32,6 +33,7 @@ const useReserveCommunityNamespace = ({
   chainId,
   onSuccess,
   hasNamespaceReserved,
+  referrerAddress,
 }: UseReserveCommunityNamespaceProps) => {
   const [reserveNamespaceData, setReserveNamespaceData] = useState<ActionState>(
     hasNamespaceReserved
@@ -70,12 +72,20 @@ const useReserveCommunityNamespace = ({
         }),
       );
 
-      const txReceipt = await namespaceFactory.deployNamespace(
-        namespace,
-        userAddress,
-        userAddress,
-        chainId,
-      );
+      const txReceipt = referrerAddress
+        ? await namespaceFactory.deployNamespaceWithReferrer(
+            namespace,
+            userAddress,
+            userAddress,
+            referrerAddress,
+            chainId,
+          )
+        : await namespaceFactory.deployNamespace(
+            namespace,
+            userAddress,
+            userAddress,
+            chainId,
+          );
 
       await updateCommunity(
         buildUpdateCommunityInput({
