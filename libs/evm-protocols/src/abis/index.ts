@@ -1,3 +1,5 @@
+export * from './MomBotCandidateManagerAbi';
+export * from './MomBotLaunchpadAbi';
 export * from './communityStakesAbi';
 export * from './contestAbi';
 export * from './erc20Abi';

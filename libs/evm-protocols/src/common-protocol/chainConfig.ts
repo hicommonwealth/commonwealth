@@ -1,3 +1,5 @@
+import { ZERO_ADDRESS } from '@hicommonwealth/shared';
+
 // Chains with deployed namespace factories. As new chains are enabled, add here.
 export enum ValidChains {
   Base = 8453,
@@ -27,6 +29,8 @@ export const CONTEST_VOTER_SHARE = 0;
 export const CONTEST_FEE_SHARE = 100;
 export const CREATE_CONTEST_TOPIC =
   '0x990f533044dbc89b838acde9cd2c72c400999871cf8f792d731edcae15ead693';
+export const CREATE_TOKEN_TOPIC =
+  '0xb9c0b7cfa02f69a492d2df0a4555a03757f4e17d24590bc9dbb9d9e24fefcd45';
 
 type factoryContractsType = {
   [key in ValidChains]: {
@@ -36,6 +40,8 @@ type factoryContractsType = {
     lpBondingCurve?: string;
     tokenCommunityManager?: string;
     referralFeeManager?: string;
+    momBotLaunchpad?: string;
+    momBotCandiateManager?: string;
     chainId: number;
   };
 };
@@ -55,6 +61,8 @@ export const factoryContracts = {
     lpBondingCurve: '0x2ECc0af0e4794F0Ab4797549a5a8cf97688D7D21',
     tokenCommunityManager: '0xC8fe1F23AbC4Eb55f4aa9E52dAFa3761111CF03a',
     referralFeeManager: '0xdc07fEaf01666B7f5dED2F59D895543Ed3FAE1cA',
+    momBotLaunchpad: ZERO_ADDRESS,
+    momBotCandiateManager: ZERO_ADDRESS,
     chainId: 84532,
   },
   [ValidChains.Blast]: {
