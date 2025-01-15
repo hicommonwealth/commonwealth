@@ -100,6 +100,7 @@ export function CreateBotContest(): Command<typeof schemas.CreateBotContest> {
         namespaceFactory,
         rpc: community!.ChainNode!.private_url!,
       });
+      mustExist('Deployed Contest', contestAddress);
 
       await models.sequelize.transaction(async (transaction) => {
         const manager = await models.ContestManager.create(
