@@ -169,6 +169,7 @@ const CommunityMembersPage = () => {
     data: members,
     fetchNextPage,
     isLoading: isLoadingMembers,
+    refetch: refetchMembers,
   } = trpc.community.getMembers.useInfiniteQuery(
     {
       limit: 30,
@@ -489,6 +490,7 @@ const CommunityMembersPage = () => {
             isLoadingMoreMembers={isLoadingMembers}
             tableState={tableState}
             extraColumns={extraColumns}
+            refetch={refetchMembers}
           />
         )}
       </section>

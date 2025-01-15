@@ -1,5 +1,35 @@
 @import '../../../../../styles/shared.scss';
 
 .ManageOnchainModal {
-  width: 100%;
+  .address-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .address-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px;
+    border: 1px solid $neutral-300;
+    border-radius: 6px;
+
+    .address-info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .role-selection {
+      display: flex;
+      gap: 12px;
+
+      label {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 14px;
+      }
+    }
+  }
 }

@@ -1,6 +1,5 @@
 import { Role } from '@hicommonwealth/shared';
 import { formatAddressShort } from 'client/scripts/helpers';
-import AddressInfo from 'client/scripts/models/AddressInfo';
 import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/CWButton';
 import { CWModal } from 'client/scripts/views/components/component_kit/new_designs/CWModal';
 import React, { useState } from 'react';
@@ -35,6 +34,15 @@ export type MemberWithGroups = Omit<Member, 'groups'> & {
   groups: Group[];
 };
 
+export type AddressInfo = {
+  id: number;
+  community_id: string;
+  address: string;
+  stake_balance: number;
+  role: string;
+  referred_by: string | null;
+};
+
 type MembersSectionProps = {
   filteredMembers: Member[];
   onLoadMoreMembers?: () => unknown;
@@ -42,6 +50,7 @@ type MembersSectionProps = {
   tableState: CWTableState;
   selectedAccounts?: string[];
   handleCheckboxChange?: (address: string) => void;
+  refetch: () => void;
   extraColumns?: (member: Member) => object;
 };
 
@@ -52,9 +61,33 @@ const MembersSection = ({
   tableState,
   selectedAccounts,
   handleCheckboxChange,
+  refetch,
   extraColumns,
 }: MembersSectionProps) => {
   const [isRoleModalOpen, setIsRoleModalOpen] = useState(false);
+
+  const [selectedUserAddresses, setSelectedUserAddresses] = useState<
+    AddressInfo[] | undefined
+  >(undefined);
+
+  const handleManageOnchainClick = (Addresses: AddressInfo[] | undefined) => {
+    setSelectedUserAddresses(Addresses);
+    setIsRoleModalOpen(true);
+  };
+
+  const removeDuplicateAddresses = (members: Member[]) => {
+    return members.map((member) => ({
+      ...member,
+      addresses: member.addresses
+        ? [
+            ...new Map(
+              member.addresses.map((address) => [address.id, address]),
+            ).values(),
+          ]
+        : [],
+    }));
+  };
+  const filteredMember = removeDuplicateAddresses(filteredMembers);
 
   return (
     <div className="MembersSection">
@@ -62,7 +95,7 @@ const MembersSection = ({
         columnInfo={tableState.columns}
         sortingState={tableState.sorting}
         setSortingState={tableState.setSorting}
-        rowData={filteredMembers.map((member) => ({
+        rowData={filteredMember.map((member) => ({
           name: {
             sortValue: member.name + (member.role || ''),
             customElement: (
@@ -136,7 +169,7 @@ const MembersSection = ({
               <CWButton
                 label="Manage On Chain Role Privileges"
                 buttonType="secondary"
-                onClick={() => setIsRoleModalOpen(true)}
+                onClick={() => handleManageOnchainClick(member?.addresses)}
               />
             ),
           },
@@ -153,6 +186,8 @@ const MembersSection = ({
             onClose={() => {
               setIsRoleModalOpen(false);
             }}
+            Addresses={selectedUserAddresses}
+            refetch={refetch}
           />
         }
         onClose={() => {
