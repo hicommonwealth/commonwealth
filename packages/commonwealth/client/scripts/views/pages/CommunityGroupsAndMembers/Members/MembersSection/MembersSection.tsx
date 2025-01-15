@@ -50,7 +50,7 @@ type MembersSectionProps = {
   tableState: CWTableState;
   selectedAccounts?: string[];
   handleCheckboxChange?: (address: string) => void;
-  refetch: () => void;
+  refetch?: () => void;
   extraColumns?: (member: Member) => object;
 };
 

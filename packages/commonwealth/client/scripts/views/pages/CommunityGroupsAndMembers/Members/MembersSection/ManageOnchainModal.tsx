@@ -22,7 +22,7 @@ import { AddressInfo } from './MembersSection';
 type ManageOnchainModalProps = {
   onClose: () => void;
   Addresses: AddressInfo[] | undefined;
-  refetch: () => void;
+  refetch?: () => void;
 };
 
 export const ManageOnchainModal = ({
@@ -75,7 +75,7 @@ export const ManageOnchainModal = ({
           notifyError('Update failed');
         }
       });
-      refetch();
+      if (refetch) refetch();
       onClose();
     } catch (error) {
       console.error('Error upgrading members:', error);
