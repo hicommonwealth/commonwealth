@@ -98,6 +98,7 @@ export function JoinCommunity(): Command<typeof schemas.JoinCommunity> {
               is_user_default: false,
               ghost_address: false,
               is_banned: false,
+              referred_by_address: payload.referrer_address,
             },
             { transaction },
           );

@@ -51,6 +51,13 @@ export const splitAndDecodeURL = (locationPathname: string) => {
   return splitURLPath[2] ? decodeURIComponent(splitURLPath[2]) : null;
 };
 
+// WARN: Using process.env to avoid webpack failures
+export const getCommunityUrl = (community: string): string => {
+  return process.env.NODE_ENV === 'production'
+    ? `https://${PRODUCTION_DOMAIN}/${community}`
+    : `http://localhost:8080/${community}`;
+};
+
 export const getThreadUrl = (
   thread: {
     chain: string;

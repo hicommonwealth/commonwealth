@@ -1,6 +1,6 @@
-import { models } from '@hicommonwealth/model';
 import { chainEvents, events } from '@hicommonwealth/schemas';
 import { z } from 'zod';
+import { models } from '../../database';
 
 export async function handleReferralSet(
   event: z.infer<typeof events.ChainEventCreated>,

@@ -10,13 +10,7 @@ import { CreateComment, CreateCommentReaction } from '../../src/comment';
 import { models } from '../../src/database';
 import { CreateQuest, UpdateQuest } from '../../src/quest';
 import { CreateThread } from '../../src/thread';
-import {
-  GetUserProfile,
-  GetXps,
-  UpdateUser,
-  UserReferrals,
-  Xp,
-} from '../../src/user';
+import { GetUserProfile, GetXps, UpdateUser, Xp } from '../../src/user';
 import { drainOutbox } from '../utils';
 import { seedCommunity } from '../utils/community-seeder';
 import { signIn } from '../utils/sign-in';
@@ -303,8 +297,6 @@ describe('User lifecycle', () => {
         },
       });
 
-      // drain the outbox to set referred_by_address
-      await drainOutbox(['CommunityJoined'], UserReferrals);
       // drain the outbox to award xp points
       await drainOutbox(
         [
