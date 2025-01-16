@@ -1,6 +1,10 @@
+import FrameSDK from '@farcaster/frame-sdk';
 import { ChainBase, WalletId, WalletSsoSource } from '@hicommonwealth/shared';
 import commonLogo from 'assets/img/branding/common-logo.svg';
+import { notifySuccess } from 'client/scripts/controllers/app/notifications';
+import useFarcasterStore from 'client/scripts/state/ui/farcaster';
 import clsx from 'clsx';
+import { useFarcasterSignIn } from 'hooks/useFarcasterSignIn';
 import React, { Fragment, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import app from 'state';
@@ -28,6 +32,8 @@ import { EmailForm } from './EmailForm';
 import { MobileWalletConfirmationSubModal } from './MobileWalletConfirmationSubModal';
 import './ModalBase.scss';
 import { SMSForm } from './SMSForm';
+
+type SignInResultType = Awaited<ReturnType<typeof FrameSDK.actions.signIn>>;
 
 const MODAL_COPY = {
   [AuthModalType.CreateAccount]: {
@@ -89,6 +95,12 @@ const ModalBase = ({
   onSignInClick,
 }: ModalBaseProps) => {
   const copy = MODAL_COPY[layoutType];
+
+  const { farcasterContext } = useFarcasterStore();
+  console.log('@@context in modal base', farcasterContext);
+  const [signInResult, setSignInResult] = useState<SignInResultType | null>(
+    null,
+  );
 
   const [activeTabIndex, setActiveTabIndex] = useState<number>(
     showAuthOptionTypesFor?.includes('sso') &&
@@ -289,6 +301,9 @@ const ModalBase = ({
     );
   };
 
+  const { signIn } = useFarcasterSignIn();
+  const { isSigningIn, error } = useFarcasterStore();
+
   return (
     <>
       <section className="ModalBase">
@@ -338,6 +353,85 @@ const ModalBase = ({
                   tabsList[activeTabIndex].options.length === 0 && (
                     <AuthButton type="NO_WALLETS_FOUND" />
                   )}
+
+                {farcasterContext && (
+                  <button
+                    style={{ padding: '10px' }}
+                    disabled={isSigningIn}
+                    onClick={async () => {
+                      try {
+                        const result = await signIn();
+                        console.log('Sign in successful:', result);
+
+                        notifySuccess('Sign in successful!');
+                        setSignInResult(result);
+                      } catch (err) {
+                        // Error is already handled in the store
+                        console.error('Sign in failed:', err);
+                      }
+                    }}
+                  >
+                    {isSigningIn ? 'Signing in...' : 'Farcaster sign in'}
+                  </button>
+                )}
+                {error && <div style={{ color: 'red' }}>{error}</div>}
+                {signInResult && (
+                  <div
+                    style={{
+                      padding: '10px',
+                      background: '#f5f5f5',
+                      borderRadius: '4px',
+                      marginTop: '10px',
+                    }}
+                  >
+                    <div style={{ marginBottom: '10px' }}>
+                      <strong>Signature:</strong>
+                      <pre
+                        style={{
+                          color: 'green',
+                          overflowX: 'auto',
+                          whiteSpace: 'pre-wrap',
+                          padding: '10px',
+                          background: '#fff',
+                          borderRadius: '4px',
+                          marginTop: '5px',
+                        }}
+                      >
+                        {signInResult.signature}
+                      </pre>
+                    </div>
+
+                    <div>
+                      <strong>Message:</strong>
+                      <pre
+                        style={{
+                          color: 'green',
+                          overflowX: 'auto',
+                          whiteSpace: 'pre-wrap',
+                          padding: '10px',
+                          background: '#fff',
+                          borderRadius: '4px',
+                          marginTop: '5px',
+                        }}
+                      >
+                        {signInResult.message
+                          .split('\\n')
+                          .map((line, i) => {
+                            // Add extra line break before sections
+                            if (line.endsWith(':')) {
+                              return `\n${line}`;
+                            }
+                            // Indent resources
+                            if (line.startsWith('-')) {
+                              return `  ${line}`;
+                            }
+                            return line;
+                          })
+                          .join('\n')}
+                      </pre>
+                    </div>
+                  </div>
+                )}
 
                 {/*
                   If email or SMS option is selected don't render SSO's list,
