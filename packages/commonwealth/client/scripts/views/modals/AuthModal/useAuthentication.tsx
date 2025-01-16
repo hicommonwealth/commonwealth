@@ -1,10 +1,13 @@
+import { SIWESigner } from '@canvas-js/chain-ethereum';
 import type { Session } from '@canvas-js/interfaces';
 import {
-  addressSwapper,
+  CANVAS_TOPIC,
   ChainBase,
   DEFAULT_NAME,
-  verifySession,
+  WalletId,
   WalletSsoSource,
+  addressSwapper,
+  verifySession,
 } from '@hicommonwealth/shared';
 import axios from 'axios';
 import {
@@ -18,9 +21,9 @@ import {
   notifyInfo,
   notifySuccess,
 } from 'controllers/app/notifications';
-import WebWalletController from 'controllers/app/web_wallets';
 import TerraWalletConnectWebWalletController from 'controllers/app/webWallets/terra_walletconnect_web_wallet';
 import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
+import WebWalletController from 'controllers/app/web_wallets';
 import type Substrate from 'controllers/chain/substrate/adapter';
 import {
   getSessionFromWallet,
@@ -603,6 +606,54 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     }
   };
 
+  const onFarcasterLogin = async (signature: string, message: string) => {
+    try {
+      // Extract the Ethereum address from the SIWE message
+      const addressMatch = message.match(
+        /^.*wants you to sign in with your Ethereum account:\n(0x[a-fA-F0-9]{40})/,
+      );
+      if (!addressMatch) {
+        throw new Error('Could not extract Ethereum address from message');
+      }
+      const address = addressMatch[1];
+
+      const sessionSigner = new SIWESigner({
+        signer: {
+          getAddress: () => address,
+          signMessage: () => Promise.resolve(signature),
+        },
+        chainId: 1, // Ethereum mainnet
+      });
+
+      const sessionObject = await sessionSigner.newSession(CANVAS_TOPIC);
+      const session = sessionObject.payload;
+
+      const chainIdentifier = app.chain?.id || ChainBase.Ethereum; // Farcaster uses Ethereum
+
+      const { account, newlyCreated, joinedCommunity } = await signIn(session, {
+        address,
+        community_id: chainIdentifier,
+        wallet_id: WalletId.Farcaster,
+        block_info: null,
+      });
+
+      setIsNewlyCreated(newlyCreated);
+      await onAccountVerified(account, newlyCreated, false);
+
+      if (joinedCommunity) {
+        trackAnalytics({
+          event: MixpanelCommunityInteractionEvent.JOIN_COMMUNITY,
+          isPWA: isAddedToHomeScreen,
+        });
+      }
+
+      trackLoginEvent('farcaster', true);
+    } catch (err) {
+      notifyError('Error authenticating with Farcaster');
+      console.error('Error authenticating with Farcaster:', err);
+    }
+  };
+
   return {
     wallets,
     isMagicLoading,
@@ -614,6 +665,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     onEmailLogin,
     onSMSLogin,
     onSocialLogin,
+    onFarcasterLogin,
     setEmail,
     setSMS,
     onVerifyMobileWalletSignature,

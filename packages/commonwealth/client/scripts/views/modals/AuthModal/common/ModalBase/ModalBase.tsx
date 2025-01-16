@@ -1,7 +1,6 @@
 import FrameSDK from '@farcaster/frame-sdk';
 import { ChainBase, WalletId, WalletSsoSource } from '@hicommonwealth/shared';
 import commonLogo from 'assets/img/branding/common-logo.svg';
-import { notifySuccess } from 'client/scripts/controllers/app/notifications';
 import useFarcasterStore from 'client/scripts/state/ui/farcaster';
 import clsx from 'clsx';
 import { useFarcasterSignIn } from 'hooks/useFarcasterSignIn';
@@ -128,6 +127,8 @@ const ModalBase = ({
     await handleClose();
   };
 
+  const { signIn } = useFarcasterSignIn();
+  const { isSigningIn, error } = useFarcasterStore();
   const {
     wallets = [],
     isMagicLoading,
@@ -138,12 +139,11 @@ const ModalBase = ({
     onSMSLogin,
     onWalletSelect,
     onSocialLogin,
+    onFarcasterLogin,
     onVerifyMobileWalletSignature,
   } = useAuthentication({
     withSessionKeyLoginFlow: layoutType === AuthModalType.RevalidateSession,
-    // eslint-disable-next-line @typescript-eslint/no-misused-promises
     onModalClose: handleClose,
-    // eslint-disable-next-line @typescript-eslint/no-misused-promises
     onSuccess: handleSuccess,
   });
 
@@ -301,9 +301,6 @@ const ModalBase = ({
     );
   };
 
-  const { signIn } = useFarcasterSignIn();
-  const { isSigningIn, error } = useFarcasterStore();
-
   return (
     <>
       <section className="ModalBase">
@@ -362,9 +359,13 @@ const ModalBase = ({
                       try {
                         const result = await signIn();
                         console.log('Sign in successful:', result);
-
-                        notifySuccess('Sign in successful!');
                         setSignInResult(result);
+
+                        // Use the existing authentication infrastructure
+                        await onFarcasterLogin(
+                          result.signature,
+                          result.message,
+                        );
                       } catch (err) {
                         // Error is already handled in the store
                         console.error('Sign in failed:', err);
