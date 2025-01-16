@@ -164,18 +164,17 @@ export async function processChainNode(
       });
 
       if (records.length) {
-        // map record counts by event name
-        const eventCounts = records.reduce((map, record) => {
-          map.set(record.event_name, (map.get(record.event_name) ?? 0) + 1);
-          return map;
-        }, new Map<string, number>());
         log.info(
-          `>>> ethChainId ${ethChainId}: ${[...eventCounts]
-            .map(([name, count]) => `${name}:${count}`)
-            .join(`, `)}`,
+          `>>> ethChainId ${ethChainId}: ${Object.fromEntries(
+            records.reduce(
+              (map, { event_name }) =>
+                map.set(event_name, (map.get(event_name) ?? 0) + 1),
+              new Map(),
+            ),
+          )}`,
         );
+        await emitEvent(models.Outbox, records, transaction);
       }
-      await emitEvent(models.Outbox, records, transaction);
     });
   } catch (e) {
     const msg = `Error occurred while processing ethChainId ${ethChainId}`;
