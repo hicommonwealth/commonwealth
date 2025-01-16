@@ -54,7 +54,7 @@ export function LaunchMomToken(): Command<typeof schemas.LaunchMomToken> {
         data: eventLog.data.toString(),
       });
 
-      return address;
+      return address as string;
     },
   };
 }
