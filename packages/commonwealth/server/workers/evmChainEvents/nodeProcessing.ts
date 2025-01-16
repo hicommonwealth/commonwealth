@@ -165,11 +165,13 @@ export async function processChainNode(
 
       if (records.length) {
         log.info(
-          `>>> ethChainId ${ethChainId}: ${Object.fromEntries(
-            records.reduce(
-              (map, { event_name }) =>
-                map.set(event_name, (map.get(event_name) ?? 0) + 1),
-              new Map(),
+          `>>> ethChainId ${ethChainId}: ${JSON.stringify(
+            Object.fromEntries(
+              records.reduce(
+                (map, { event_name }) =>
+                  map.set(event_name, (map.get(event_name) ?? 0) + 1),
+                new Map(),
+              ),
             ),
           )}`,
         );
