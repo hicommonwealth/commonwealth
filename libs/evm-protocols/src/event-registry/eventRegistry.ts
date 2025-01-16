@@ -7,6 +7,7 @@ import {
   tokenCommunityManagerAbi,
 } from '../abis';
 import { recurringContestAbi } from '../abis/recurringContestAbi';
+import { referralFeeManager } from '../abis/referralFeeManager';
 import { ValidChains, factoryContracts } from '../common-protocol';
 import { EvmEventSignature, EvmEventSignatures } from './eventSignatures';
 
@@ -109,10 +110,10 @@ const tokenCommunityManagerSource: ContractSource = {
 } satisfies ContractSource;
 
 const referralFeeManagerSource: ContractSource = {
-  abi: tokenCommunityManagerAbi,
+  abi: referralFeeManager,
   eventSignatures: [
     EvmEventSignatures.Referrals.ReferralSet,
-    EvmEventSignatures.Referrals.ReferralSet,
+    EvmEventSignatures.Referrals.FeeDistributed,
   ],
 };
 

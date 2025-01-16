@@ -11,6 +11,7 @@ import { emitEvent, models } from '@hicommonwealth/model';
 import { EventNames, events as coreEvents } from '@hicommonwealth/schemas';
 import { ethers } from 'ethers';
 import { z } from 'zod';
+import { config } from '../../config';
 import { getEventSources } from './getEventSources';
 import { getEvents, getProvider, migrateEvents } from './logProcessing';
 import { EvmEvent, EvmSource } from './types';
@@ -27,11 +28,12 @@ export async function processChainNode(
   evmSource: EvmSource,
 ): Promise<void> {
   try {
-    log.info(
-      'Processing:\n' +
-        `\tchainNodeId: ${ethChainId}\n` +
-        `\tcontracts: ${JSON.stringify(Object.keys(evmSource.contracts))}`,
-    );
+    config.WORKERS.EVM_CE_TRACE &&
+      log.warn(
+        'Processing:\n' +
+          `\tchainNodeId: ${ethChainId}\n` +
+          `\tcontracts: ${JSON.stringify(Object.keys(evmSource.contracts))}`,
+      );
     stats().increment('ce.evm.chain_node_id', {
       chainNodeId: String(ethChainId),
     });
@@ -99,7 +101,7 @@ export async function processChainNode(
       }
 
       if (allEvents.length === 0) {
-        log.info(`Processed 0 events for chainNodeId ${ethChainId}`);
+        // log.info(`Processed 0 events for chainNodeId ${ethChainId}`);
         return;
       }
 
@@ -161,12 +163,21 @@ export async function processChainNode(
         };
       });
 
-      await emitEvent(models.Outbox, records, transaction);
+      if (records.length) {
+        log.info(
+          `>>> ethChainId ${ethChainId}: ${JSON.stringify(
+            Object.fromEntries(
+              records.reduce(
+                (map, { event_name }) =>
+                  map.set(event_name, (map.get(event_name) ?? 0) + 1),
+                new Map(),
+              ),
+            ),
+          )}`,
+        );
+        await emitEvent(models.Outbox, records, transaction);
+      }
     });
-
-    log.info(
-      `Processed ${allEvents.length} events for ethChainId ${ethChainId}`,
-    );
   } catch (e) {
     const msg = `Error occurred while processing ethChainId ${ethChainId}`;
     log.error(msg, e);

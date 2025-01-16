@@ -1,6 +1,7 @@
 import { Log } from '@ethersproject/providers';
 import { logger as _logger, stats } from '@hicommonwealth/core';
 import { ethers } from 'ethers';
+import { config } from '../../config';
 import {
   AbiSignatures,
   ContractSources,
@@ -267,14 +268,15 @@ export async function migrateEvents(
       oldestBlock,
       endingBlockNum,
     );
-    logger.info('Events migrated', {
-      // @ts-expect-error StrictNullChecks
-      startingBlockNum: oldestBlock,
-      endingBlockNum,
-    });
+    config.WORKERS.EVM_CE_TRACE &&
+      logger.warn('Events migrated', {
+        // @ts-expect-error StrictNullChecks
+        startingBlockNum: oldestBlock,
+        endingBlockNum,
+      });
     return result;
   } else {
-    logger.info('No events to migrate');
+    // logger.info('No events to migrate');
     return;
   }
 }
