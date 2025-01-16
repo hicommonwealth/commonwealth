@@ -1,7 +1,5 @@
-import { SIWESigner } from '@canvas-js/chain-ethereum';
 import type { Session } from '@canvas-js/interfaces';
 import {
-  CANVAS_TOPIC,
   ChainBase,
   DEFAULT_NAME,
   WalletId,
@@ -21,6 +19,7 @@ import {
   notifyInfo,
   notifySuccess,
 } from 'controllers/app/notifications';
+import FarcasterWebWalletController from 'controllers/app/webWallets/farcaster_web_wallet';
 import TerraWalletConnectWebWalletController from 'controllers/app/webWallets/terra_walletconnect_web_wallet';
 import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
 import WebWalletController from 'controllers/app/web_wallets';
@@ -608,30 +607,17 @@ const useAuthentication = (props: UseAuthenticationProps) => {
 
   const onFarcasterLogin = async (signature: string, message: string) => {
     try {
-      // Extract the Ethereum address from the SIWE message
-      const addressMatch = message.match(
-        /^.*wants you to sign in with your Ethereum account:\n(0x[a-fA-F0-9]{40})/,
+      const farcasterWallet = new FarcasterWebWalletController(
+        signature,
+        message,
       );
-      if (!addressMatch) {
-        throw new Error('Could not extract Ethereum address from message');
-      }
-      const address = addressMatch[1];
+      await farcasterWallet.enable();
 
-      const sessionSigner = new SIWESigner({
-        signer: {
-          getAddress: () => address,
-          signMessage: () => Promise.resolve(signature),
-        },
-        chainId: 1, // Ethereum mainnet
-      });
-
-      const sessionObject = await sessionSigner.newSession(CANVAS_TOPIC);
-      const session = sessionObject.payload;
-
-      const chainIdentifier = app.chain?.id || ChainBase.Ethereum; // Farcaster uses Ethereum
+      const session = await getSessionFromWallet(farcasterWallet);
+      const chainIdentifier = app.chain?.id || ChainBase.Ethereum;
 
       const { account, newlyCreated, joinedCommunity } = await signIn(session, {
-        address,
+        address: farcasterWallet.accounts[0],
         community_id: chainIdentifier,
         wallet_id: WalletId.Farcaster,
         block_info: null,
