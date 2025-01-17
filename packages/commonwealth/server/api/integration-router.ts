@@ -59,7 +59,7 @@ function build() {
           config.CONTESTS.NEYNAR_CONTEST_BOT_MENTIONED_WEBHOOK_SECRET,
         )(req, _, next).catch(next);
       },
-      express.command(Contest.FarcasterContestBotMentionedWebhook()),
+      express.command(Contest.RelayFarcasterContestBotMentioned()),
     );
 
     router.get(

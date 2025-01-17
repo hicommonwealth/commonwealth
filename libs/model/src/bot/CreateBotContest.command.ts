@@ -80,6 +80,7 @@ export function CreateBotContest(): Command<typeof schemas.CreateBotContest> {
           await publishCast(
             payload.castHash,
             ({ username }) =>
+              // eslint-disable-next-line max-len
               `Hey @${username}. Failed to create contest. Unable to fetch the correct token. Check the address of the token and try again.`,
           );
         }

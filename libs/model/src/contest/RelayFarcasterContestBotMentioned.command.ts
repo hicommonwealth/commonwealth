@@ -10,11 +10,11 @@ const log = logger(import.meta);
 
 // This webhook processes the "cast.created" event
 // triggered when the contest bot is mentioned on farcaster
-export function FarcasterContestBotMentionedWebhook(): Command<
-  typeof schemas.FarcasterContestBotMentionedWebhook
+export function RelayFarcasterContestBotMentioned(): Command<
+  typeof schemas.RelayFarcasterContestBotMentioned
 > {
   return {
-    ...schemas.FarcasterContestBotMentionedWebhook,
+    ...schemas.RelayFarcasterContestBotMentioned,
     auth: [],
     body: async ({ payload }) => {
       mustExist('Farcaster Cast Author FID', payload.data.author?.fid);

@@ -222,6 +222,7 @@ export function FarcasterWorker(): Policy<typeof inputs> {
             ({ username }) =>
               `Hey @${username}, your contest has been created.`,
             {
+              // eslint-disable-next-line max-len
               embed: `${getBaseUrl(config.APP_ENV, config.CONTESTS.FARCASTER_NGROK_DOMAIN!)}${buildFarcasterContestFrameUrl(contestAddress)}`,
             },
           );
