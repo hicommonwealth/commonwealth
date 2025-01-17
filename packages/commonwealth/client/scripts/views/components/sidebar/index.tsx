@@ -5,6 +5,7 @@ import app from 'state';
 import useSidebarStore from 'state/ui/sidebar';
 import { CreateContentSidebar } from '../../menus/CreateContentMenu';
 import { SidebarHeader } from '../component_kit/CWSidebarHeader';
+import { KnockFeedWrapper } from '../KnockNotifications/KnockFeedWrapper';
 import { CommunitySection } from './CommunitySection';
 
 import { ExploreCommunitiesSidebar } from './explore_sidebar';
@@ -65,10 +66,12 @@ export const Sidebar = ({
         )
       )}
       <div className="sidebar-default-menu">
-        <SidebarQuickSwitcher
-          isInsideCommunity={isInsideCommunity}
-          onMobile={onMobile}
-        />
+        <KnockFeedWrapper>
+          <SidebarQuickSwitcher
+            isInsideCommunity={isInsideCommunity}
+            onMobile={onMobile}
+          />
+        </KnockFeedWrapper>
         {isInsideCommunity ? (
           <CommunitySection showSkeleton={!app.activeChainId()} />
         ) : (

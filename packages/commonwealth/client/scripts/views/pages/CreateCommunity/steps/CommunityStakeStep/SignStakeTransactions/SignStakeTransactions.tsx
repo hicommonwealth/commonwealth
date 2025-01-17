@@ -1,10 +1,12 @@
 import React from 'react';
 
 import useBeforeUnload from 'hooks/useBeforeUnload';
+import { useFetchProfileByIdQuery } from 'state/api/profiles';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 
+import useUserStore from 'state/ui/user';
 import ActionSteps from '../../../components/ActionSteps';
 import { ActionStepsProps } from '../../../components/ActionSteps/types';
 import Hint from '../../../components/Hint';
@@ -25,6 +27,16 @@ const SignStakeTransactions = ({
   onLaunchStakeSuccess,
   backButton,
 }: SignStakeTransactionsProps) => {
+  const user = useUserStore();
+
+  const { data: profile } = useFetchProfileByIdQuery({
+    apiCallEnabled: user.isLoggedIn,
+  });
+
+  const referrerAddress = profile?.addresses.find(
+    (address) => address.address === selectedAddress.address,
+  )?.referred_by_address;
+
   const { handleReserveCommunityNamespace, reserveNamespaceData } =
     useReserveCommunityNamespace({
       communityId: createdCommunityId,
@@ -34,6 +46,7 @@ const SignStakeTransactions = ({
       chainId,
       onSuccess: onReserveNamespaceSuccess,
       hasNamespaceReserved,
+      referrerAddress,
     });
 
   const { handleLaunchCommunityStake, launchStakeData } =

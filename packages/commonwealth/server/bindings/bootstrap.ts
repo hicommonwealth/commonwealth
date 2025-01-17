@@ -8,6 +8,7 @@ import {
   Broker,
   BrokerSubscriptions,
   broker,
+  handleEvent,
   logger,
   stats,
 } from '@hicommonwealth/core';
@@ -20,6 +21,7 @@ import {
   User,
   models,
 } from '@hicommonwealth/model';
+import { EventNames } from '@hicommonwealth/schemas';
 import { Client } from 'pg';
 import { config } from 'server/config';
 import { setupListener } from './pgListener';
@@ -154,4 +156,24 @@ export async function bootstrapRelayer(
   });
 
   return pgClient;
+}
+
+export function bootstrapContestRolloverLoop() {
+  log.info('Starting rollover loop');
+
+  const loop = async () => {
+    try {
+      await handleEvent(ContestWorker(), {
+        name: EventNames.ContestRolloverTimerTicked,
+        payload: {},
+      });
+    } catch (err) {
+      log.error(err);
+    }
+  };
+
+  // TODO: move to external service triggered via scheduler?
+  setInterval(() => {
+    loop().catch(console.error);
+  }, 1_000 * 60);
 }

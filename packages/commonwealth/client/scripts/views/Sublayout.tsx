@@ -1,5 +1,6 @@
 import clsx from 'clsx';
 import useBrowserWindow from 'hooks/useBrowserWindow';
+import { useFlag } from 'hooks/useFlag';
 import useWindowResize from 'hooks/useWindowResize';
 import React, { useEffect, useState } from 'react';
 import { matchRoutes, useLocation } from 'react-router-dom';
@@ -40,6 +41,7 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
   const { menuVisible, setMenu, menuName } = useSidebarStore();
   const [resizing, setResizing] = useState(false);
   const { JoinCommunityModals, handleJoinCommunity } = useJoinCommunity();
+  const growlEnabled = useFlag('growl');
 
   const location = useLocation();
 
@@ -191,17 +193,19 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
             {children}
           </div>
           {/* Growl should be added here when in place*/}
-          <CWGrowlTemplate
-            headerText="Launch Contests On Farcaster!"
-            bodyText="You can now host contests directly on Farcaster to reach and engage your followers.
+          {growlEnabled && (
+            <CWGrowlTemplate
+              headerText="Launch Contests On Farcaster!"
+              bodyText="You can now host contests directly on Farcaster to reach and engage your followers.
             They can submit entries,
             vote for their favorites, and earn rewards, all without leaving the page."
-            buttonText="Enter $MOCHI Contest"
-            buttonLink="https://www.google.com/"
-            growlType="farcasterContest"
-            growlImage={farcasterContestImage}
-            extraText="Enter the first Farcaster Contest hosted by our friends at Mochi"
-          />
+              buttonText="Enter $MOCHI Contest"
+              buttonLink="https://www.google.com/"
+              growlType="farcasterContest"
+              growlImage={farcasterContestImage}
+              extraText="Enter the first Farcaster Contest hosted by our friends at Mochi"
+            />
+          )}
         </div>
         <WelcomeOnboardModal
           isOpen={isWelcomeOnboardModalOpen}
