@@ -37,6 +37,14 @@
     gap: 8px;
     height: 100%;
 
+    .language-selector {
+      margin-right: 8px;
+
+      .dropdown-wrapper {
+        min-width: 140px;
+      }
+    }
+
     .header-loader {
       padding: 0 20px;
     }

@@ -14,9 +14,16 @@ import { HelpMenuPopover } from 'views/menus/help_menu';
 
 import UserDropdown from './UserDropdown';
 
+import {
+  SUPPORTED_LANGUAGES,
+  getLanguageLabel,
+  getLanguagePreference,
+  setLanguagePreference,
+} from 'helpers/languagePreference';
 import { useFetchCustomDomainQuery } from 'state/api/configuration';
 import useUserStore from 'state/ui/user';
 import AuthButtons from 'views/components/SublayoutHeader/AuthButtons';
+import { CWDropdown } from 'views/components/component_kit/cw_dropdown';
 import { AuthModalType } from 'views/modals/AuthModal';
 import './DesktopHeader.scss';
 
@@ -102,6 +109,18 @@ const DesktopHeader = ({ onMobile, onAuthModalOpen }: DesktopHeaderProps) => {
           {user.isLoggedIn && <KnockNotifications />}
         </div>
 
+        <div className="language-selector">
+          <CWDropdown
+            options={SUPPORTED_LANGUAGES}
+            initialValue={{
+              label: getLanguageLabel(getLanguagePreference()),
+              value: getLanguagePreference(),
+            }}
+            onSelect={(item) => {
+              setLanguagePreference(item.value);
+            }}
+          />
+        </div>
         {user.isLoggedIn && (
           <UserDropdown onAuthModalOpen={() => onAuthModalOpen()} />
         )}

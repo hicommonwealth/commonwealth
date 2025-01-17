@@ -1,11 +1,18 @@
 import React, { useState } from 'react';
 
+import {
+  SUPPORTED_LANGUAGES,
+  getLanguageLabel,
+  getLanguagePreference,
+  setLanguagePreference,
+} from 'helpers/languagePreference';
 import { useInviteLinkModal } from 'state/ui/modals';
 import useSidebarStore from 'state/ui/sidebar';
 import useUserStore from 'state/ui/user';
 import { PopoverMenuItem } from 'views/components/component_kit/CWPopoverMenu';
 import MenuContent from 'views/components/component_kit/CWPopoverMenu/MenuContent';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
+import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import CWDrawer from 'views/components/component_kit/new_designs/CWDrawer';
 import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
@@ -33,6 +40,7 @@ const MobileHeader = ({
 }: MobileHeaderProps) => {
   const [isUserDrawerOpen, setIsUserDrawerOpen] = useState(false);
   const [isModalOpen, isSetModalOpen] = useState(false);
+  const [isLanguageDrawerOpen, setIsLanguageDrawerOpen] = useState(false);
   const { menuVisible } = useSidebarStore();
   const userData = useUserStore();
   const user = userData.addresses?.[0];
@@ -55,6 +63,19 @@ const MobileHeader = ({
   });
 
   const mobileItems = [
+    {
+      type: 'default',
+      label: (
+        <div className="language-menu-item">
+          <span>Language</span>
+          <span>{getLanguageLabel(getLanguagePreference())}</span>
+        </div>
+      ),
+      onClick: () => {
+        setIsUserDrawerOpen(false);
+        setIsLanguageDrawerOpen(true);
+      },
+    },
     ...userMenuItems,
     { type: 'divider' },
     {
@@ -153,6 +174,39 @@ const MobileHeader = ({
         onClose={() => isSetModalOpen(false)}
         open={isModalOpen}
       />
+
+      <CWDrawer
+        open={isLanguageDrawerOpen}
+        onClose={() => setIsLanguageDrawerOpen(false)}
+        direction="bottom"
+      >
+        <div className="LanguageDrawer">
+          <div className="header">
+            <CWIconButton
+              iconName="close"
+              onClick={() => setIsLanguageDrawerOpen(false)}
+            />
+            <CWText type="h4">Select Language</CWText>
+          </div>
+          <div className="language-options">
+            {SUPPORTED_LANGUAGES.map((lang) => (
+              <div
+                key={lang.value}
+                className="language-option"
+                onClick={() => {
+                  setLanguagePreference(lang.value);
+                  setIsLanguageDrawerOpen(false);
+                }}
+              >
+                <CWText>{lang.label}</CWText>
+                {getLanguagePreference() === lang.value && (
+                  <CWIcon iconName="check" iconSize="small" />
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </CWDrawer>
     </>
   );
 };
