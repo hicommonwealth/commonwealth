@@ -2,6 +2,7 @@ import { chainEvents, events } from '@hicommonwealth/schemas';
 import { z } from 'zod';
 import { models } from '../../database';
 
+// TODO: remove this handler since it's redundant with handleNamespaceDeployed
 export async function handleReferralSet(
   event: z.infer<typeof events.ChainEventCreated>,
 ) {

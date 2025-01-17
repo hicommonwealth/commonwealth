@@ -103,7 +103,12 @@ export const GetUserReferrals = {
   output: z.array(ReferralView),
 };
 
-export const ReferralFeesView = ReferralFees;
+export const ReferralFeesView = ReferralFees.extend({
+  referee_profile: UserProfile.nullish(),
+  community_id: z.string().nullish(),
+  community_name: z.string().nullish(),
+  community_icon_url: z.string().nullish(),
+});
 
 export const GetUserReferralFees = {
   input: z.object({}),

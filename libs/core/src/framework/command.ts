@@ -24,7 +24,7 @@ export const command = async <
   try {
     const context: Context<Input, _Context> = {
       actor,
-      payload: validate ? input.parse(payload) : payload,
+      payload: validate ? await input.parseAsync(payload) : payload,
     };
     for (const fn of auth) {
       await fn(context);

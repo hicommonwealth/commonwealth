@@ -16,10 +16,11 @@ export const CommunityStakeTrade = z.tuple([
 ]);
 
 export const NamespaceDeployed = z.tuple([
-  z.string().describe('name'),
-  EVM_ADDRESS.describe('_feeManger'),
-  z.string().describe('_signature'),
-  EVM_ADDRESS.describe('_namespaceDeployer'),
+  z.string().describe('Namespace Address'),
+  EVM_ADDRESS.describe('Fee Manager Address (referee address)'),
+  z.string().describe('Signature'),
+  EVM_ADDRESS.describe('Namespace Deployer Address (referee address)'),
+  EVM_ADDRESS.describe('Referrer Address'),
 ]);
 
 export const LaunchpadTokenCreated = z.tuple([
@@ -45,13 +46,14 @@ export const ReferralSet = z.tuple([
 ]);
 
 export const ReferralFeeDistributed = z.tuple([
-  EVM_ADDRESS.describe('namespace address'),
-  EVM_ADDRESS.describe('distributed token address'),
+  EVM_ADDRESS.describe('Namespace Address'),
+  EVM_ADDRESS.describe('Distributed Token Address'),
   ETHERS_BIG_NUMBER.describe(
-    'total amount of the token that is distributed (includes protocol fee, referral fee, etc)',
+    'Total amount of the token that is distributed (includes protocol fee, referral fee, etc)',
   ),
-  EVM_ADDRESS.describe("the referrer's address"),
+  EVM_ADDRESS.describe('Referrer Address'),
   ETHERS_BIG_NUMBER.describe(
-    'the amount of the token that is distributed to the referrer',
+    'The amount of the token that is distributed to the referrer',
   ),
+  EVM_ADDRESS.describe('Referee Address'),
 ]);
