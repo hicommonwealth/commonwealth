@@ -182,6 +182,12 @@ const testFailureCase = async (
 
 describe('Parse Bot Command', () => {
   test('Expected failure cases', async () => {
+    if (!process.env.TEST_LLM) {
+      console.warn(
+        'LLM test is skipped. Add env TEST_LLM=true to run the test.',
+      );
+      return;
+    }
     await testFailureCase(
       `hey wasup @contestbot make me breakfast`,
       ParseBotCommandError.ERRORS.NoResponse,
