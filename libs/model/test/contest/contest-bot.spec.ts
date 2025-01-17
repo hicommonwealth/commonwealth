@@ -191,7 +191,7 @@ describe('Parse Bot Command', () => {
       ParseBotCommandError.ERRORS.InvalidParams,
     );
   });
-  test.skip('Expected happy cases', async () => {
+  test('Expected happy cases', async () => {
     if (!process.env.TEST_LLM) {
       console.warn(
         'LLM test is skipped. Add env TEST_LLM=true to run the test.',
