@@ -15,6 +15,7 @@ import { config } from '@hicommonwealth/model';
 import { NeynarAPIClient } from '@neynar/nodejs-sdk';
 import axios from 'axios';
 import { sleep } from 'client/scripts/helpers';
+import { exit } from 'process';
 import readline from 'readline';
 
 const log = logger(import.meta);
@@ -57,16 +58,13 @@ async function checkProd() {
     input: process.stdin,
     output: process.stdout,
   });
-  rl.question(
-    'Cleanup unused webhooks? Enter "y" to proceed: ',
-    async (answer) => {
-      rl.close();
-      if (answer.toLowerCase().trim() === 'y') {
-        const ids = unusedWebhooks.map((w) => w.webhook_id);
-        await deleteWebhooks(ids);
-      }
-    },
-  );
+  rl.question('Cleanup unused webhooks? Enter "y" to proceed: ', (answer) => {
+    rl.close();
+    if (answer.toLowerCase().trim() === 'y') {
+      const ids = unusedWebhooks.map((w) => w.webhook_id);
+      deleteWebhooks(ids).catch(console.error);
+    }
+  });
 }
 
 function buildFrameUrl(contestAddress: string) {
@@ -85,4 +83,7 @@ async function deleteWebhooks(webhookIds: string[]) {
   }
 }
 
-checkProd();
+checkProd().catch((err) => {
+  console.error(err);
+  exit(1);
+});
