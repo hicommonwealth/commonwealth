@@ -57,6 +57,32 @@ const tools: ChatCompletionTool[] = [
   },
 ];
 
+// Custom error type that returns a human-readable error intended for end users
+export class ParseBotCommandError extends Error {
+  static ERRORS = {
+    NoResponse: 'Failed to create contest. Verify your prompt or try again.',
+    InvalidParams:
+      'Failed to create contest. Specify all contest parameters: winners, prize distribution to voters, title, image and token address.',
+  } as const;
+
+  constructor(message: keyof typeof ParseBotCommandError.ERRORS) {
+    super(message);
+    this.name = this.constructor.name;
+
+    if (Error.captureStackTrace) {
+      Error.captureStackTrace(this, this.constructor);
+    }
+  }
+
+  getPrettyError(): string {
+    return (
+      ParseBotCommandError.ERRORS[
+        this.message as keyof typeof ParseBotCommandError.ERRORS
+      ] || 'An unknown error occurred.'
+    );
+  }
+}
+
 export const parseBotCommand = async (
   command: string,
 ): Promise<ContestMetadataResponse> => {
@@ -77,11 +103,19 @@ export const parseBotCommand = async (
     tools,
   });
 
-  const data = JSON.parse(
-    response.choices[0].message.tool_calls![0].function.arguments,
-  );
+  let data = null;
+  try {
+    data = JSON.parse(
+      response.choices[0].message.tool_calls![0].function.arguments,
+    );
+  } catch (err) {
+    throw new ParseBotCommandError('NoResponse');
+  }
 
   // if payout structure has any remainder under 100, give it to first winner
+  if (!data.payoutStructure.length) {
+    throw new ParseBotCommandError('InvalidParams');
+  }
   const payoutStructure: Array<number> = data.payoutStructure.map((n: number) =>
     Math.floor(n),
   );
@@ -89,6 +123,10 @@ export const parseBotCommand = async (
   if (sum < 100) {
     const remainder = 100 - sum;
     payoutStructure[0] += remainder;
+  }
+
+  if (!data.contestName || !data.image_url || !data.tokenAddress) {
+    throw new ParseBotCommandError('InvalidParams');
   }
 
   return {

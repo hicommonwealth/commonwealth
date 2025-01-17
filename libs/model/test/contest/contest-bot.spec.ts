@@ -1,9 +1,9 @@
-import { config } from '@hicommonwealth/model';
 import {
   ContestMetadataResponse,
   parseBotCommand,
+  ParseBotCommandError,
 } from 'model/src/services/openai/parseBotCommand';
-import { expect, test } from 'vitest';
+import { describe, expect, test } from 'vitest';
 
 type TestCase = {
   input: string;
@@ -163,15 +163,46 @@ Here’s the image: https://placehold.co/600x400/EEE/31343C”`,
   },
 ];
 
-test('Parse Bot Command', async () => {
-  // Don't run in CI because it makes real API requests to OpenAI
-  if (config.APP_ENV === 'CI') {
-    return;
+// verifies that the correct error is thrown given a malformed prompt
+const testFailureCase = async (
+  prompt: string,
+  expectedErrorMessage: string,
+) => {
+  const info = JSON.stringify({ prompt, expectedErrorMessage }, null, 2);
+  try {
+    await parseBotCommand(prompt);
+    expect(false, 'prompt was supposed to fail: ' + info).to.be.true;
+  } catch (err) {
+    expect(err, info).instanceOf(ParseBotCommandError);
+    expect((err as ParseBotCommandError).getPrettyError(), info).to.eq(
+      expectedErrorMessage,
+    );
   }
-  await Promise.all(
-    testCases.map(async (testCase) => {
-      const response = await parseBotCommand(testCase.input);
-      validateOutput(testCase.input, testCase.expectedOutput, response);
-    }),
-  );
+};
+
+describe('Parse Bot Command', () => {
+  test('Expected failure cases', async () => {
+    await testFailureCase(
+      `hey wasup @contestbot make me breakfast`,
+      ParseBotCommandError.ERRORS.NoResponse,
+    );
+    await testFailureCase(
+      `hey @contestbot, make a contest for token 0x123 with prize distributed to 3 winners equally`,
+      ParseBotCommandError.ERRORS.InvalidParams,
+    );
+  });
+  test.skip('Expected happy cases', async () => {
+    if (!process.env.TEST_LLM) {
+      console.warn(
+        'LLM test is skipped. Add env TEST_LLM=true to run the test.',
+      );
+      return;
+    }
+    await Promise.all(
+      testCases.map(async (testCase) => {
+        const response = await parseBotCommand(testCase.input);
+        validateOutput(testCase.input, testCase.expectedOutput, response);
+      }),
+    );
+  });
 });

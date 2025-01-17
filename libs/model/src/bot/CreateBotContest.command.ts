@@ -18,6 +18,7 @@ import { TokenAttributes } from '../services';
 import {
   ContestMetadataResponse,
   parseBotCommand,
+  ParseBotCommandError,
 } from '../services/openai/parseBotCommand';
 
 const log = logger(import.meta);
@@ -34,10 +35,13 @@ export function CreateBotContest(): Command<typeof schemas.CreateBotContest> {
       } catch (err) {
         log.warn(`failed to parse bot command: ${(err as Error).message}`);
         if (payload.castHash) {
+          const prettyError =
+            err instanceof ParseBotCommandError
+              ? err.getPrettyError()
+              : 'Failed to create contest. Please check your prompt and try again.';
           await publishCast(
             payload.castHash,
-            ({ username }) =>
-              `Hey @${username}, something went wrong. Please check your prompt and try again.`,
+            ({ username }) => `Hey @${username}. ${prettyError}`,
           );
         }
         return;
@@ -71,8 +75,16 @@ export function CreateBotContest(): Command<typeof schemas.CreateBotContest> {
           community!.ChainNode!.private_url!,
           false,
         );
-      } catch {
-        new InvalidState('invalid token address');
+      } catch (err) {
+        if (payload.castHash) {
+          await publishCast(
+            payload.castHash,
+            ({ username }) =>
+              `Hey @${username}. Failed to create contest. Unable to fetch the correct token. Check the address of the token and try again.`,
+          );
+        }
+        log.warn(`token validation failed: ${(err as Error).message}`);
+        return;
       }
 
       // use short duration for testnet contests
