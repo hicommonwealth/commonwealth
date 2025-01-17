@@ -1,3 +1,4 @@
+import useUserStore from 'client/scripts/state/ui/user';
 import clsx from 'clsx';
 import React, { useEffect, useMemo } from 'react';
 import app from 'state';
@@ -5,9 +6,11 @@ import useSidebarStore from 'state/ui/sidebar';
 import { CreateContentSidebar } from '../../menus/CreateContentMenu';
 import { SidebarHeader } from '../component_kit/CWSidebarHeader';
 import { CommunitySection } from './CommunitySection';
+
 import { ExploreCommunitiesSidebar } from './explore_sidebar';
 import './index.scss';
 import { SidebarQuickSwitcher } from './sidebar_quick_switcher';
+import { SidebarProfileSection } from './SidebarProfileSection';
 
 export type SidebarMenuName =
   | 'default'
@@ -28,6 +31,8 @@ export const Sidebar = ({
     recentlyUpdatedVisibility,
   } = useSidebarStore();
 
+  const user = useUserStore();
+
   useEffect(() => {
     setRecentlyUpdatedVisibility(false);
   }, [setRecentlyUpdatedVisibility]);
@@ -42,21 +47,37 @@ export const Sidebar = ({
 
   return (
     <div className={sidebarClass}>
-      {isInsideCommunity && (
+      {isInsideCommunity ? (
         <div className="sidebar-header-wrapper">
           <SidebarHeader
             isInsideCommunity={isInsideCommunity}
             onMobile={onMobile}
           />
         </div>
+      ) : (
+        user.isLoggedIn && (
+          <div className="sidebar-header-wrapper">
+            <SidebarHeader
+              isInsideCommunity={isInsideCommunity}
+              onMobile={onMobile}
+            />
+          </div>
+        )
       )}
       <div className="sidebar-default-menu">
         <SidebarQuickSwitcher
           isInsideCommunity={isInsideCommunity}
           onMobile={onMobile}
         />
-        {isInsideCommunity && (
+        {isInsideCommunity ? (
           <CommunitySection showSkeleton={!app.activeChainId()} />
+        ) : (
+          user.isLoggedIn && (
+            <SidebarProfileSection
+              showSkeleton={false}
+              isInsideCommunity={isInsideCommunity}
+            />
+          )
         )}
         {menuName === 'createContent' && (
           <CreateContentSidebar isInsideCommunity={isInsideCommunity} />
