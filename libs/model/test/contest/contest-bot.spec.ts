@@ -1,5 +1,5 @@
 /* eslint-disable max-len */
-/* eslint-disable no-floating-promises */
+
 import {
   ContestMetadataResponse,
   parseBotCommand,
