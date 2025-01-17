@@ -6,7 +6,7 @@ export type SupportedLanguage =
   | 'vi'
   | 'tr'
   | 'hi'
-  | 'zh';
+  | 'cn';
 
 export const SUPPORTED_LANGUAGES = [
   { label: 'English 🇺🇸', value: 'en' },
@@ -16,7 +16,7 @@ export const SUPPORTED_LANGUAGES = [
   { label: 'Tiếng Việt 🇻🇳', value: 'vi' },
   { label: 'Türkçe 🇹🇷', value: 'tr' },
   { label: 'हिन्दी 🇮🇳', value: 'hi' },
-  { label: '繁體中文 🇹🇼', value: 'zh' },
+  { label: '简体中文 🇨🇳', value: 'cn' },
 ] as const;
 
 const STORAGE_KEY = 'user-language-preference';
