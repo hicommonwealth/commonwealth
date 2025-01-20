@@ -2,6 +2,7 @@ import { useCreateApiKeyMutation } from './createApiKey';
 import { useDeleteApiKeyMutation } from './deleteApiKey';
 import { useGetApiKeyQuery } from './getApiKey';
 import useGetNewContent from './getNewContent';
+import useGetXPs from './getXPs';
 import useUpdateUserActiveCommunityMutation from './updateActiveCommunity';
 import useUpdateUserEmailMutation from './updateEmail';
 import useUpdateUserEmailSettingsMutation from './updateEmailSettings';
@@ -13,6 +14,7 @@ export {
   useDeleteApiKeyMutation,
   useGetApiKeyQuery,
   useGetNewContent,
+  useGetXPs,
   useSignIn,
   useUpdateUserActiveCommunityMutation,
   useUpdateUserEmailMutation,
