@@ -38,37 +38,34 @@ export function UpdateCustomDomain(): Command<
         );
       }
 
-      const magicRequestDomain = await fetch(
-        `https://api.magic.link/v2/api/magic_client/domain/allowlist/add`,
-        {
-          method: 'POST',
-          headers: {
-            'X-Magic-Secret-Key': config.MAGIC_API_KEY!,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            access_type: 'domain',
-            target_client_id: config.MAGIC_CLIENT_ID!,
-            value: `https://${custom_domain}`,
-          }),
-        },
-      );
+      const magicUrl =
+        'https://api.magic.link/v2/api/magic_client/allowlist/add';
 
-      const magicRequestRedirectUrl = await fetch(
-        `https://api.magic.link/v2/api/magic_client/redirect_url/allowlist/add`,
-        {
-          method: 'POST',
-          headers: {
-            'X-Magic-Secret-Key': config.MAGIC_API_KEY!,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            access_type: 'redirect_url',
-            target_client_id: config.MAGIC_CLIENT_ID!,
-            value: `https://${custom_domain}/finishsociallogin`,
-          }),
+      const magicRequestDomain = await fetch(magicUrl, {
+        method: 'POST',
+        headers: {
+          'X-Magic-Secret-Key': config.MAGIC_API_KEY!,
+          'Content-Type': 'application/json',
         },
-      );
+        body: JSON.stringify({
+          access_type: 'domain',
+          target_client_id: config.MAGIC_CLIENT_ID!,
+          value: `https://${custom_domain}`,
+        }),
+      });
+
+      const magicRequestRedirectUrl = await fetch(magicUrl, {
+        method: 'POST',
+        headers: {
+          'X-Magic-Secret-Key': config.MAGIC_API_KEY!,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          access_type: 'redirect_url',
+          target_client_id: config.MAGIC_CLIENT_ID!,
+          value: `https://${custom_domain}/finishsociallogin`,
+        }),
+      });
 
       const magicResponseDomain = await magicRequestDomain.json();
       const magicResponseRedirectUrl = await magicRequestRedirectUrl.json();

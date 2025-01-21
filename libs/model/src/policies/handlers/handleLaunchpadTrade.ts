@@ -5,12 +5,12 @@ import {
   getLaunchpadToken,
   transferLaunchpadLiquidityToUniswap,
 } from '@hicommonwealth/evm-protocols';
-import { config } from '@hicommonwealth/model';
 import { chainEvents, events } from '@hicommonwealth/schemas';
 import { BigNumber } from 'ethers';
 import { z } from 'zod';
-import { models } from '../database';
-import { chainNodeMustExist } from './utils';
+import { config } from '../../config';
+import { models } from '../../database';
+import { chainNodeMustExist } from '../utils/utils';
 
 const log = logger(import.meta);
 

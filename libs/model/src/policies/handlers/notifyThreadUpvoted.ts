@@ -4,15 +4,15 @@ import {
   notificationsProvider,
   WorkflowKeys,
 } from '@hicommonwealth/core';
-import { models } from '@hicommonwealth/model';
 import { getDecodedString, safeTruncateBody } from '@hicommonwealth/shared';
 import z from 'zod';
-import { getThreadUrl } from '../util';
+import { models } from '../../database';
+import { getThreadUrl } from '../utils/utils';
 
 const log = logger(import.meta);
 const output = z.boolean();
 
-export const processThreadUpvoted: EventHandler<
+export const notifyThreadUpvoted: EventHandler<
   'ThreadUpvoted',
   typeof output
 > = async ({ payload }) => {

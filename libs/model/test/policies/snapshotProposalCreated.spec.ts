@@ -4,7 +4,6 @@ import {
   disposeAdapter,
   notificationsProvider,
 } from '@hicommonwealth/core';
-import { models, tester } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import { EventNames } from '@hicommonwealth/schemas';
 import { SnapshotEventType } from '@hicommonwealth/shared';
@@ -22,13 +21,14 @@ import {
   vi,
 } from 'vitest';
 import z from 'zod';
-import { processSnapshotProposalCreated } from '../../../server/workers/knock/eventHandlers/snapshotProposalCreated';
-import { getSnapshotUrl } from '../../../server/workers/knock/util';
+import { models, tester } from '../../src';
+import { notifySnapshotProposalCreated } from '../../src/policies/handlers/notifySnapshotProposalCreated';
+import { getSnapshotUrl } from '../../src/policies/utils/utils';
 import {
   ProviderError,
   SpyNotificationsProvider,
   ThrowingSpyNotificationsProvider,
-} from '../../util/mockedNotificationProvider';
+} from '../utils/mockedNotificationProvider';
 
 chai.use(chaiAsPromised);
 
@@ -70,7 +70,7 @@ describe('snapshotProposalCreated Event Handler', () => {
   });
 
   test('should not throw if the proposal event is not supported', async () => {
-    const res = await processSnapshotProposalCreated({
+    const res = await notifySnapshotProposalCreated({
       name: EventNames.SnapshotProposalCreated,
       payload: { event: 'ranndommmm' } as z.infer<
         typeof schemas.events.SnapshotProposalCreated
@@ -80,7 +80,7 @@ describe('snapshotProposalCreated Event Handler', () => {
   });
 
   test('should not throw if the proposal space or id is not provided', async () => {
-    const res = await processSnapshotProposalCreated({
+    const res = await notifySnapshotProposalCreated({
       name: EventNames.SnapshotProposalCreated,
       payload: {
         event: SnapshotEventType.Created,
@@ -94,7 +94,7 @@ describe('snapshotProposalCreated Event Handler', () => {
       adapter: SpyNotificationsProvider(),
     });
 
-    const res = await processSnapshotProposalCreated({
+    const res = await notifySnapshotProposalCreated({
       name: EventNames.SnapshotProposalCreated,
       payload: {
         event: SnapshotEventType.Created,
@@ -117,7 +117,7 @@ describe('snapshotProposalCreated Event Handler', () => {
       user_id: user!.id,
     });
 
-    const res = await processSnapshotProposalCreated({
+    const res = await notifySnapshotProposalCreated({
       name: EventNames.SnapshotProposalCreated,
       payload: {
         event: SnapshotEventType.Created,
@@ -155,7 +155,7 @@ describe('snapshotProposalCreated Event Handler', () => {
     });
 
     await expect(
-      processSnapshotProposalCreated({
+      notifySnapshotProposalCreated({
         name: EventNames.SnapshotProposalCreated,
         payload: {
           event: SnapshotEventType.Created,

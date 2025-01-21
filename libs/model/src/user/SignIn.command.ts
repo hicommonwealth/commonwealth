@@ -125,6 +125,7 @@ export function SignIn(): Command<typeof schemas.SignIn> {
               is_user_default: false,
               ghost_address: false,
               is_banned: false,
+              referred_by_address: referrer_address,
             },
             transaction,
           });

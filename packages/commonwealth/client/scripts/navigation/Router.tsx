@@ -19,7 +19,7 @@ export type RouteFeatureFlags = {
 const Router = () => {
   const client = OpenFeature.getClient();
 
-  const launchpadEnabled = client.getBooleanValue('launchpadEnabled', false);
+  const launchpadEnabled = client.getBooleanValue('launchpad', false);
 
   const flags = {
     launchpadEnabled,

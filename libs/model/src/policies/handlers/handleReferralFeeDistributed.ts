@@ -1,8 +1,8 @@
-import { models } from '@hicommonwealth/model';
 import { chainEvents, events } from '@hicommonwealth/schemas';
 import { ZERO_ADDRESS } from '@hicommonwealth/shared';
 import { BigNumber } from 'ethers';
 import { z } from 'zod';
+import { models } from '../../database';
 
 export async function handleReferralFeeDistributed(
   event: z.infer<typeof events.ChainEventCreated>,

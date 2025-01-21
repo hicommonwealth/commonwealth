@@ -3,15 +3,15 @@ import {
   notificationsProvider,
   WorkflowKeys,
 } from '@hicommonwealth/core';
-import { DB } from '@hicommonwealth/model';
 import { chainEvents, events } from '@hicommonwealth/schemas';
+import { getCommunityUrl } from '@hicommonwealth/shared';
 import { QueryTypes } from 'sequelize';
 import { z } from 'zod';
-import { getCommunityUrl } from '../../../../../shared/utils';
+import { DB } from '../../models';
 
 const log = logger(import.meta);
 
-export async function handleCommunityStakeTrades(
+export async function notifyCommunityStakeTrades(
   models: DB,
   event: z.infer<typeof events.ChainEventCreated>,
 ) {
@@ -48,8 +48,6 @@ export async function handleCommunityStakeTrades(
       },
     },
   );
-
-  console.log(users);
 
   if (users.length) {
     const provider = notificationsProvider();
