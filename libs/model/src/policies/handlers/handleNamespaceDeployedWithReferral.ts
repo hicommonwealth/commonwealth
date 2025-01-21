@@ -48,16 +48,19 @@ async function setReferral(
     });
 }
 
-export async function handleNamespaceDeployed(
+export async function handleNamespaceDeployedWithReferral(
   event: z.infer<typeof events.ChainEventCreated>,
 ) {
   const {
     0: namespace_address,
-    1: fee_manager_address, // referee address
-    // 2: signature,
-    // 3: namespace_deployer_address, // referee address
-    4: referrer_address,
-  } = event.parsedArgs as z.infer<typeof chainEvents.NamespaceDeployed>;
+    // 1: fee_manager_address,
+    2: referrer_address,
+    // 3: referral_fee_manager_contract_address,
+    // 4: signature,
+    5: referee_address,
+  } = event.parsedArgs as z.infer<
+    typeof chainEvents.NamespaceDeployedWithReferral
+  >;
 
   if (referrer_address)
     await setReferral(
@@ -65,7 +68,7 @@ export async function handleNamespaceDeployed(
       event.eventSource.ethChainId,
       event.rawLog.transactionHash,
       namespace_address,
-      fee_manager_address,
+      referee_address,
       referrer_address,
       event.rawLog.removed,
     );

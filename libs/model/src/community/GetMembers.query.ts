@@ -112,6 +112,15 @@ function membersSqlWithoutSearch(
         U.profile->>'name' AS profile_name,
         U.profile->>'avatar_url' AS avatar_url,
         U.created_at,
+        'referred_by', (
+          SELECT JSON_BUILD_OBJECT(
+            'user_id', RU.id,
+            'profile_name', RU.profile->>'name',
+            'avatar_url', RU.profile->>'avatar_url'
+          )
+          FROM "Addresses" RA JOIN "Users" RU ON RA.user_id = RU.id
+          WHERE RA.address = U.referred_by_address LIMIT 1
+        ),
         COALESCE(U.referral_count, 0) AS referral_count,
         COALESCE(U.referral_eth_earnings, 0) AS referral_eth_earnings,
         MAX(COALESCE(A.last_active, U.created_at)) AS last_active,
@@ -120,15 +129,7 @@ function membersSqlWithoutSearch(
           'address', A.address,
           'community_id', A.community_id,
           'role', A.role,
-          'stake_balance', 0, -- TODO: project stake balance here
-          'referred_by', (SELECT 
-            JSON_BUILD_OBJECT(
-              'user_id', RU.id,
-              'profile_name', RU.profile->>'name',
-              'avatar_url', RU.profile->>'avatar_url'
-            )
-              FROM "Addresses" RA JOIN "Users" RU on RA.user_id = RU.id 
-              WHERE RA.address = A.referred_by_address LIMIT 1)
+          'stake_balance', 0 -- TODO: project stake balance here
         )) AS addresses,
         COALESCE(ARRAY_AGG(M.group_id) FILTER (WHERE M.group_id IS NOT NULL), '{}') AS group_ids,
         T.total
@@ -157,6 +158,15 @@ function membersSqlWithSearch(
         U.profile->>'name' AS profile_name,
         U.profile->>'avatar_url' AS avatar_url,
         U.created_at,
+        'referred_by', (
+          SELECT JSON_BUILD_OBJECT(
+            'user_id', RU.id,
+            'profile_name', RU.profile->>'name',
+            'avatar_url', RU.profile->>'avatar_url'
+          )
+          FROM "Addresses" RA JOIN "Users" RU ON RA.user_id = RU.id
+          WHERE RA.address = U.referred_by_address LIMIT 1
+        ),
         COALESCE(U.referral_count, 0) AS referral_count,
         COALESCE(U.referral_eth_earnings, 0) AS referral_eth_earnings,
         MAX(COALESCE(A.last_active, U.created_at)) AS last_active,
@@ -165,15 +175,7 @@ function membersSqlWithSearch(
           'address', A.address,
           'community_id', A.community_id,
           'role', A.role,
-          'stake_balance', 0, -- TODO: project stake balance here
-          'referred_by', (SELECT 
-            JSON_BUILD_OBJECT(
-              'user_id', RU.id,
-              'profile_name', RU.profile->>'name',
-              'avatar_url', RU.profile->>'avatar_url'
-            )
-              FROM "Addresses" RA JOIN "Users" RU on RA.user_id = RU.id 
-              WHERE RA.address = A.referred_by_address LIMIT 1)
+          'stake_balance', 0 -- TODO: project stake balance here
         )) AS addresses,
         COALESCE(ARRAY_AGG(M.group_id) FILTER (WHERE M.group_id IS NOT NULL), '{}') AS group_ids,
         T.total

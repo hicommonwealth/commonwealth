@@ -10,10 +10,9 @@ export async function handleReferralFeeDistributed(
   const {
     0: namespace_address,
     1: distributed_token_address,
-    // 2: totalAmountDistributed,
+    // 2: total_amount_distributed,
     3: referrer_address,
     4: fee_amount,
-    5: referee_address,
   } = event.parsedArgs as z.infer<typeof chainEvents.ReferralFeeDistributed>;
 
   const existingFee = await models.ReferralFee.findOne({
@@ -27,6 +26,15 @@ export async function handleReferralFeeDistributed(
     return;
   }
 
+  // find the referral (already mapped to a namespace)
+  const referral = await models.Referral.findOne({
+    where: {
+      referrer_address,
+      namespace_address,
+    },
+  });
+  if (!referral) return; // we must guarantee the order of chain events here
+
   const referrer_received_amount =
     Number(BigNumber.from(fee_amount).toBigInt()) / 1e18;
 
@@ -39,7 +47,7 @@ export async function handleReferralFeeDistributed(
         distributed_token_address,
         referrer_recipient_address: referrer_address,
         referrer_received_amount,
-        referee_address,
+        referee_address: referral.referee_address,
         transaction_timestamp: Number(event.block.timestamp),
       },
       { transaction },
@@ -59,9 +67,8 @@ export async function handleReferralFeeDistributed(
         });
       }
 
-      await models.Referral.increment('referrer_received_eth_amount', {
+      await referral.increment('referrer_received_eth_amount', {
         by: referrer_received_amount,
-        where: { referrer_address, referee_address },
         transaction,
       });
     }

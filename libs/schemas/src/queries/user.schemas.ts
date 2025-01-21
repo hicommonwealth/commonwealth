@@ -33,7 +33,10 @@ export const UserProfileView = z.object({
   commentThreads: z.array(ThreadView),
   isOwner: z.boolean(),
   tags: z.array(Tags.extend({ id: PG_INT })),
-  xp_points: z.number().int(),
+  referred_by_address: z.string().nullish(),
+  referral_count: PG_INT.default(0),
+  referral_eth_earnings: z.number().optional(),
+  xp_points: PG_INT.default(0),
 });
 
 export const GetUserProfile = {

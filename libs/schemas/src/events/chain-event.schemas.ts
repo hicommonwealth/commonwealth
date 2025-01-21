@@ -16,11 +16,19 @@ export const CommunityStakeTrade = z.tuple([
 ]);
 
 export const NamespaceDeployed = z.tuple([
-  z.string().describe('Namespace Address'),
-  EVM_ADDRESS.describe('Fee Manager Address (referee address)'),
-  z.string().describe('Signature'),
-  EVM_ADDRESS.describe('Namespace Deployer Address (referee address)'),
-  EVM_ADDRESS.describe('Referrer Address'),
+  EVM_ADDRESS.describe('Namespace address'),
+  EVM_ADDRESS.describe('Fee manager address of new namespace'),
+  z.string().describe('Signature for name reservation validation'),
+  EVM_ADDRESS.describe('Namespace deployer address'),
+]);
+
+export const NamespaceDeployedWithReferral = z.tuple([
+  EVM_ADDRESS.describe('Namespace address'),
+  EVM_ADDRESS.describe('Fee manager address of new namespace'),
+  EVM_ADDRESS.describe('Referrer address (receiving referral fees)'),
+  EVM_ADDRESS.describe('Referral fee manager contract address'),
+  z.string().describe('Optional signature for name reservation validation'),
+  EVM_ADDRESS.describe('Namespace deployer address (referee)'),
 ]);
 
 export const LaunchpadTokenCreated = z.tuple([
@@ -41,19 +49,18 @@ export const LaunchpadTrade = z.tuple([
 ]);
 
 export const ReferralSet = z.tuple([
-  EVM_ADDRESS.describe('namespace address'),
-  EVM_ADDRESS.describe('referer address'),
+  EVM_ADDRESS.describe('Namespace address'),
+  EVM_ADDRESS.describe('Referer address'),
 ]);
 
 export const ReferralFeeDistributed = z.tuple([
-  EVM_ADDRESS.describe('Namespace Address'),
-  EVM_ADDRESS.describe('Distributed Token Address'),
+  EVM_ADDRESS.describe('Namespace address'),
+  EVM_ADDRESS.describe('Distributed token address'),
   ETHERS_BIG_NUMBER.describe(
     'Total amount of the token that is distributed (includes protocol fee, referral fee, etc)',
   ),
-  EVM_ADDRESS.describe('Referrer Address'),
+  EVM_ADDRESS.describe('Referrer address (recipient)'),
   ETHERS_BIG_NUMBER.describe(
-    'The amount of the token that is distributed to the referrer',
+    'The amount of the token distributed to the referrer',
   ),
-  EVM_ADDRESS.describe('Referee Address'),
 ]);

@@ -71,6 +71,7 @@ describe('Referral lifecycle', () => {
       profile: {
         name: 'non-member',
       },
+      referred_by_address: admin.address, // referrer
       isAdmin: false,
       is_welcome_onboard_flow_complete: false,
     });
@@ -108,7 +109,6 @@ describe('Referral lifecycle', () => {
         type: ChainType.Offchain,
         chain_node_id,
         directory_page_enabled: true,
-        referrer_address: admin.address,
         social_links: [],
         tags: [],
       },
@@ -149,11 +149,6 @@ describe('Referral lifecycle', () => {
     });
     expect(referrerUser?.referral_count).toBe(1);
 
-    const refereeAddress = await models.Address.findOne({
-      where: { user_id: nonMember.user.id, community_id },
-    });
-    expect(refereeAddress?.referred_by_address).toBe(admin.address);
-
     // simulate namespace creation on-chain (From the UI)
     const namespaceAddress = '0x0000000000000000000000000000000000000001';
     const transactionHash = '0x2';
@@ -161,13 +156,14 @@ describe('Referral lifecycle', () => {
       chainEvent(
         transactionHash,
         '0x0000000000000000000000000000000000000002',
-        EvmEventSignatures.NamespaceFactory.NamespaceDeployed,
+        EvmEventSignatures.NamespaceFactory.NamespaceDeployedWithReferral,
         [
           namespaceAddress,
-          nonMember.address!, // referee
-          '0x0', // signature
-          '0x0000000000000000000000000000000000000003', // namespace_deployer_address
+          '0x0000000000000000000000000000000000000004', // fee manager address
           admin.address, // referrer
+          '0x0000000000000000000000000000000000000003', // referral fee contract
+          '0x0', // signature
+          nonMember.address!, // referee
         ],
       ),
     ];
@@ -221,7 +217,6 @@ describe('Referral lifecycle', () => {
           { hex, type: 'BigNumber' }, // total amount distributed
           admin.address, // referrer address
           { hex, type: 'BigNumber' }, // referrer received amount
-          nonMember.address!, // referee address
         ],
       ),
     ]);

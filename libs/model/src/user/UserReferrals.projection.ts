@@ -4,7 +4,6 @@ import { models } from '../database';
 
 const inputs = {
   CommunityCreated: events.CommunityCreated,
-  CommunityJoined: events.CommunityJoined,
 };
 
 async function setReferral(
@@ -56,11 +55,6 @@ export function UserReferrals(): Projection<typeof inputs> {
     inputs,
     body: {
       CommunityCreated: async ({ payload }) => {
-        const { user_id, community_id, referrer_address } = payload;
-        if (!referrer_address) return;
-        await setReferral(user_id, community_id, referrer_address);
-      },
-      CommunityJoined: async ({ payload }) => {
         const { user_id, community_id, referrer_address } = payload;
         if (!referrer_address) return;
         await setReferral(user_id, community_id, referrer_address);

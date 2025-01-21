@@ -7,7 +7,7 @@ import { systemActor } from '../middleware';
 import { CreateLaunchpadToken } from '../token/CreateToken.command';
 import { handleCommunityStakeTrades } from './handlers/handleCommunityStakeTrades';
 import { handleLaunchpadTrade } from './handlers/handleLaunchpadTrade';
-import { handleNamespaceDeployed } from './handlers/handleNamespaceDeployed';
+import { handleNamespaceDeployedWithReferral } from './handlers/handleNamespaceDeployedWithReferral';
 import { handleReferralFeeDistributed } from './handlers/handleReferralFeeDistributed';
 
 const log = logger(import.meta);
@@ -17,8 +17,8 @@ export const processChainEventCreated: EventHandler<
   ZodUndefined
 > = async ({ payload }) => {
   switch (payload.eventSource.eventSignature) {
-    case EvmEventSignatures.NamespaceFactory.NamespaceDeployed:
-      await handleNamespaceDeployed(payload);
+    case EvmEventSignatures.NamespaceFactory.NamespaceDeployedWithReferral:
+      await handleNamespaceDeployedWithReferral(payload);
       break;
 
     case EvmEventSignatures.CommunityStake.Trade:
