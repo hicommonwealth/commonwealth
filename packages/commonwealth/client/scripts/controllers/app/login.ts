@@ -577,6 +577,5 @@ export async function handleSocialLoginCallback({
 
 function createRedirectURI(params: string = '') {
   const url = new URL('/finishsociallogin' + params, window.location.origin);
-  console.log('Using redirect URL: ' + url.href);
   return url.href;
 }
