@@ -14,7 +14,7 @@ export function UpdateUser(): Command<typeof schemas.UpdateUser> {
       if (actor.user.id != payload.id)
         throw new InvalidInput('Invalid user id');
 
-      const { id, profile, tag_ids, referrer_address } = payload;
+      const { id, profile, tag_ids } = payload;
       const {
         slug,
         name,
@@ -111,9 +111,8 @@ export function UpdateUser(): Command<typeof schemas.UpdateUser> {
                       event_name: schemas.EventNames.SignUpFlowCompleted,
                       event_payload: {
                         user_id: id,
+                        address: actor.address!,
                         created_at: updated_user.created_at!,
-                        referrer_address,
-                        referee_address: actor.address,
                       },
                     },
                   ],

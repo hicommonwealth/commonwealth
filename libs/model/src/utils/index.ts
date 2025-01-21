@@ -3,6 +3,7 @@ export * from './decodeContent';
 export * from './defaultAvatar';
 export * from './denormalizedCountUtils';
 export * from './farcasterUtils';
+export * from './generateUnsubscribeLink';
 export * from './getDefaultContestImage';
 export * from './getDelta';
 export * from './makeGetBalancesOptions';
