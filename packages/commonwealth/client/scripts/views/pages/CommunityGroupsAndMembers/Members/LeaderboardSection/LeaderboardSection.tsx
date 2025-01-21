@@ -10,6 +10,12 @@ import { useCWTableState } from 'views/components/component_kit/new_designs/CWTa
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 
 import { S3_ASSET_BUCKET_CDN } from '@hicommonwealth/shared';
+import { trpc } from 'client/scripts/utils/trpcClient';
+import app from 'state';
+import { useDebounce } from 'usehooks-ts';
+import { MemberResultsOrderBy } from '../index.types';
+
+import { useUserStore } from 'client/scripts/state/ui/user/user';
 import './LeaderboardSection.scss';
 
 const fakeData = [
@@ -99,9 +105,46 @@ const LeaderboardSection = () => {
 
   const tableState = useCWTableState({
     columns,
-    initialSortColumn: 'rank',
+    initialSortColumn: 'earnings',
     initialSortDirection: APIOrderDirection.Asc,
   });
+
+  const user = useUserStore();
+
+  const debouncedSearchTerm = useDebounce<string | undefined>(searchText, 500);
+
+  const communityId = app.activeChainId() || '';
+
+  const {
+    data: members,
+    fetchNextPage,
+    isLoading: isLoadingMembers,
+  } = trpc.community.getMembers.useInfiniteQuery(
+    {
+      limit: 30,
+      order_by: (tableState.orderBy === 'lastActive'
+        ? 'last_active'
+        : tableState.orderBy) as MemberResultsOrderBy,
+      order_direction: tableState.orderDirection as APIOrderDirection,
+      ...(debouncedSearchTerm && {
+        search: debouncedSearchTerm,
+      }),
+      community_id: communityId,
+    },
+    {
+      initialCursor: 1,
+      getNextPageParam: (lastPage) => {
+        const nextPageNum = lastPage.page + 1;
+        if (nextPageNum <= lastPage.totalPages) {
+          return nextPageNum;
+        }
+        return undefined;
+      },
+      enabled: !!user.activeAccount?.address,
+    },
+  );
+
+  console.log(members);
 
   const filteredData = fakeData.filter((item) =>
     item.user.name.toLowerCase().includes(searchText.toLowerCase()),
