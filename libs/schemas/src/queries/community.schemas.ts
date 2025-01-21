@@ -12,6 +12,7 @@ import {
   CommunityStake,
   ContestManager,
   ExtendedCommunity,
+  PinnedTokenWithPrices,
   Topic,
 } from '../entities';
 import * as projections from '../projections';
@@ -124,7 +125,9 @@ export const GetCommunityMembers = {
     include_group_ids: z.coerce.boolean().optional(),
     include_stake_balances: z.coerce.boolean().optional(),
     allowedAddresses: z.string().optional(),
-    order_by: z.enum(['last_active', 'name']).optional(),
+    order_by: z
+      .enum(['last_active', 'name', 'referrals', 'earnings'])
+      .optional(),
   }),
   output: PaginatedResultSchema.extend({
     results: CommunityMember.array(),
@@ -201,4 +204,13 @@ export const GetTopics = {
     with_archived_topics: z.boolean().optional(),
   }),
   output: z.array(TopicView),
+};
+
+export const GetPinnedTokens = {
+  input: z.object({
+    community_ids: z.string(),
+    with_chain_node: z.boolean().optional(),
+    with_price: z.boolean().optional(),
+  }),
+  output: PinnedTokenWithPrices.array(),
 };

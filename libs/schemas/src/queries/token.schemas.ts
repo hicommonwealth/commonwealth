@@ -1,8 +1,8 @@
 import { z } from 'zod';
-import { Token } from '../entities';
+import { LaunchpadToken } from '../entities';
 import { PaginatedResultSchema, PaginationParamsSchema } from './pagination';
 
-export const TokenView = Token.extend({
+export const TokenView = LaunchpadToken.extend({
   launchpad_liquidity: z.string(),
   latest_price: z.number().nullish(),
   old_price: z.number().nullish(),
@@ -24,5 +24,5 @@ export const GetToken = {
     community_id: z.string(),
     with_stats: z.boolean().optional(),
   }),
-  output: z.union([TokenView, z.undefined()]),
+  output: z.union([TokenView, z.null()]),
 };

@@ -159,7 +159,6 @@ const MobileHeader = ({
         }}
       >
         <InviteLinkModal
-          isInsideCommunity={isInsideCommunity}
           onModalClose={() => {
             setIsInviteLinkModalOpen(false);
           }}

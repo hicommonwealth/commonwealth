@@ -1,17 +1,32 @@
 import { BigNumber } from '@ethersproject/bignumber';
 import { InvalidState, Projection, logger } from '@hicommonwealth/core';
-import { EvmEventSignatures } from '@hicommonwealth/evm-protocols';
+import {
+  ChildContractNames,
+  EvmEventSignatures,
+  commonProtocol as cp,
+  getContestScore,
+  getContestStatus,
+  getTokenAttributes,
+} from '@hicommonwealth/evm-protocols';
+import { config } from '@hicommonwealth/model';
 import { ContestScore, events } from '@hicommonwealth/schemas';
+import {
+  CONTEST_FEE_PERCENT,
+  buildContestLeaderboardUrl,
+  getBaseUrl,
+} from '@hicommonwealth/shared';
 import { QueryTypes } from 'sequelize';
 import { z } from 'zod';
 import { models } from '../database';
 import { mustExist } from '../middleware/guards';
 import { EvmEventSourceAttributes } from '../models';
-import * as protocol from '../services/commonProtocol';
+import { getWeightedNumTokens } from '../services/stakeHelper';
 import {
   decodeThreadContentUrl,
   getChainNodeUrl,
   getDefaultContestImage,
+  parseFarcasterContentUrl,
+  publishCast,
 } from '../utils';
 
 const log = logger(import.meta);
@@ -33,15 +48,6 @@ const inputs = {
   ContestStarted: events.ContestStarted,
   ContestContentAdded: events.ContestContentAdded,
   ContestContentUpvoted: events.ContestContentUpvoted,
-};
-
-// TODO: remove kind column from EvmEventSources
-const signatureToKind = {
-  [EvmEventSignatures.Contests.ContentAdded]: 'ContentAdded',
-  [EvmEventSignatures.Contests.RecurringContestStarted]: 'ContestStarted',
-  [EvmEventSignatures.Contests.RecurringContestVoterVoted]: 'VoterVoted',
-  [EvmEventSignatures.Contests.SingleContestStarted]: 'ContestStarted',
-  [EvmEventSignatures.Contests.SingleContestVoterVoted]: 'VoterVoted',
 };
 
 /**
@@ -67,14 +73,21 @@ async function updateOrCreateWithAlert(
     return;
   }
 
-  const { ticker, decimals } =
-    await protocol.contractHelpers.getTokenAttributes(
-      contest_address,
-      url,
-      true,
+  const ethChainId = community!.ChainNode!.eth_chain_id!;
+  if (!cp.isValidChain(ethChainId)) {
+    log.error(
+      `Unsupported eth chain id: ${ethChainId} for namespace: ${namespace}`,
     );
+    return;
+  }
 
-  const { startTime, endTime } = await protocol.contestHelper.getContestStatus(
+  const { ticker, decimals } = await getTokenAttributes(
+    contest_address,
+    url,
+    true,
+  );
+
+  const { startTime, endTime } = await getContestStatus(
     url,
     contest_address,
     isOneOff,
@@ -127,13 +140,9 @@ async function updateOrCreateWithAlert(
       { transaction },
     );
 
-    // TODO: move EVM concerns out of projection
-    // create EVM event sources so chain listener will listen to events on new contest contract
-    const abiNickname = isOneOff ? 'SingleContest' : 'RecurringContest';
-    const contestAbi = await models.ContractAbi.findOne({
-      where: { nickname: abiNickname },
-    });
-    mustExist(`Contest ABI with nickname "${abiNickname}"`, contestAbi);
+    const childContractName = isOneOff
+      ? ChildContractNames.SingleContest
+      : ChildContractNames.RecurringContest;
 
     const sigs = isOneOff
       ? [
@@ -149,11 +158,12 @@ async function updateOrCreateWithAlert(
     const sourcesToCreate: EvmEventSourceAttributes[] = sigs.map(
       (eventSignature) => {
         return {
-          chain_node_id: community!.ChainNode!.id!,
+          eth_chain_id: ethChainId,
           contract_address: contest_address,
           event_signature: eventSignature,
-          kind: signatureToKind[eventSignature],
-          abi_id: contestAbi.id!,
+          contract_name: childContractName,
+          parent_contract_address: cp.factoryContracts[ethChainId].factory,
+          // TODO: add created_at_block so EVM CE runs the migrateEvents func
         };
       },
     );
@@ -218,17 +228,17 @@ export async function updateScore(contest_address: string, contest_id: number) {
         `Chain node url not found on contest ${contest_address}`,
       );
 
-    const { scores, contestBalance } =
-      await protocol.contestHelper.getContestScore(
-        details.url,
-        contest_address,
-        undefined,
-        oneOff,
-      );
+    const { scores, contestBalance } = await getContestScore(
+      details.url,
+      contest_address,
+      undefined,
+      oneOff,
+    );
 
-    const prizePool = BigNumber.from(contestBalance)
+    let prizePool = BigNumber.from(contestBalance)
       .mul(oneOff ? 100 : details.prize_percentage)
       .div(100);
+    prizePool = prizePool.mul(100 - CONTEST_FEE_PERCENT).div(100); // deduct contest fee from prize pool
     const score: z.infer<typeof ContestScore> = scores.map((s, i) => ({
       content_id: s.winningContent.toString(),
       creator_address: s.winningAddress,
@@ -294,7 +304,9 @@ export function Contests(): Projection<typeof inputs> {
       },
 
       ContestContentAdded: async ({ payload }) => {
-        const { threadId } = decodeThreadContentUrl(payload.content_url);
+        const { threadId, isFarcaster } = decodeThreadContentUrl(
+          payload.content_url,
+        );
         await models.ContestAction.create({
           ...payload,
           contest_id: payload.contest_id || 0,
@@ -305,6 +317,26 @@ export function Contests(): Projection<typeof inputs> {
           voting_power: '0',
           created_at: new Date(),
         });
+
+        // post confirmation via FC bot
+        if (isFarcaster) {
+          const contestManager = await models.ContestManager.findByPk(
+            payload.contest_address,
+          );
+          const leaderboardUrl = buildContestLeaderboardUrl(
+            getBaseUrl(config.APP_ENV),
+            contestManager!.community_id,
+            contestManager!.contest_address,
+          );
+          const { replyCastHash } = parseFarcasterContentUrl(
+            payload.content_url,
+          );
+          await publishCast(
+            replyCastHash,
+            ({ username }) =>
+              `Hey @${username}, your entry has been submitted to the contest: ${leaderboardUrl}`,
+          );
+        }
       },
 
       ContestContentUpvoted: async ({ payload }) => {
@@ -315,8 +347,43 @@ export function Contests(): Projection<typeof inputs> {
             content_id: payload.content_id,
             action: 'added',
           },
-          raw: true,
+          include: [
+            {
+              model: models.ContestManager,
+              include: [
+                {
+                  model: models.Community,
+                  include: [
+                    {
+                      model: models.ChainNode.scope('withPrivateData'),
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
         });
+
+        let calculated_voting_weight: string | undefined;
+
+        if (
+          BigInt(payload.voting_power || 0) > BigInt(0) &&
+          add_action?.ContestManager?.vote_weight_multiplier
+        ) {
+          const { eth_chain_id, url, private_url } =
+            add_action!.ContestManager!.Community!.ChainNode!;
+          const { funding_token_address, vote_weight_multiplier } =
+            add_action!.ContestManager!;
+          const numTokens = await getWeightedNumTokens(
+            payload.voter_address,
+            funding_token_address!,
+            eth_chain_id!,
+            getChainNodeUrl({ url, private_url }),
+            vote_weight_multiplier!,
+          );
+          calculated_voting_weight = numTokens.toString();
+        }
+
         await models.ContestAction.upsert({
           ...payload,
           contest_id,
@@ -325,6 +392,7 @@ export function Contests(): Projection<typeof inputs> {
           thread_id: add_action!.thread_id,
           content_url: add_action!.content_url,
           created_at: new Date(),
+          calculated_voting_weight,
         });
 
         // eslint-disable-next-line @typescript-eslint/no-misused-promises

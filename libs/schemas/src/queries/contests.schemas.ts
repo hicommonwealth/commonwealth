@@ -30,6 +30,7 @@ export const GetContest = {
   input: z.object({
     contest_address: z.string(),
     with_chain_node: z.boolean().optional(),
+    with_contests: z.boolean().optional(),
   }),
   output: ContestManager.extend({
     Community: Community.extend({
@@ -104,7 +105,7 @@ export const GetFarcasterUpvoteActionMetadata = {
 export const GetFarcasterContestCasts = {
   input: z.object({
     contest_address: z.string(),
-    sort_by: z.enum(['likes', 'recent']).optional().default('likes'),
+    sort_by: z.enum(['upvotes', 'recent']).optional().default('upvotes'),
   }),
   output: z.array(z.any()),
 };

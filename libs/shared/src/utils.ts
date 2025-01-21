@@ -7,6 +7,7 @@ import {
 } from '@polkadot/util-crypto';
 import moment from 'moment';
 import {
+  CONTEST_FEE_PERCENT,
   PRODUCTION_DOMAIN,
   S3_ASSET_BUCKET_CDN,
   S3_RAW_ASSET_BUCKET_DOMAIN,
@@ -44,10 +45,17 @@ export const splitAndDecodeURL = (locationPathname: string) => {
   //this is to check for malformed urls on a topics page in /discussions
   const splitURLPath = locationPathname.split('/');
   if (splitURLPath[2] === 'discussions') {
-    return decodeURIComponent(splitURLPath[3]);
+    return splitURLPath[3] ? decodeURIComponent(splitURLPath[3]) : null;
   }
   splitURLPath[1] === 'discussions';
-  return decodeURIComponent(splitURLPath[2]);
+  return splitURLPath[2] ? decodeURIComponent(splitURLPath[2]) : null;
+};
+
+// WARN: Using process.env to avoid webpack failures
+export const getCommunityUrl = (community: string): string => {
+  return process.env.NODE_ENV === 'production'
+    ? `https://${PRODUCTION_DOMAIN}/${community}`
+    : `http://localhost:8080/${community}`;
 };
 
 export const getThreadUrl = (
@@ -320,28 +328,6 @@ export const renderQuillDeltaToText = (
     .join(paragraphSeparator);
 };
 
-export function getWebhookDestination(webhookUrl = ''): string {
-  if (!/^https?:\/\/[^\s/$.?#].[^\s]*$/.test(webhookUrl)) return 'unknown';
-
-  let destination = 'unknown';
-  if (
-    webhookUrl.startsWith('https://discord.com/api/webhooks/') ||
-    webhookUrl.startsWith('https://discordapp.com/api/webhooks/')
-  )
-    destination = 'discord';
-  else if (webhookUrl.startsWith('https://hooks.slack.com/'))
-    destination = 'slack';
-  else if (webhookUrl.startsWith('https://hooks.zapier.com/'))
-    destination = 'zapier';
-  else if (webhookUrl.startsWith('https://api.telegram.org/@')) {
-    const [, channelId] = webhookUrl.split('/@');
-    if (!channelId) destination = 'unknown';
-    else destination = 'telegram';
-  }
-
-  return destination;
-}
-
 export function getDecodedString(str: string) {
   try {
     return decodeURIComponent(str);
@@ -386,3 +372,101 @@ export function isWithinPeriod(
   const end = moment(refDate).endOf(period);
   return moment(targetDate).isBetween(start, end, null, '[]');
 }
+
+export async function alchemyGetTokenPrices({
+  alchemyApiKey,
+  tokenSources,
+}: {
+  alchemyApiKey: string;
+  tokenSources: {
+    contractAddress: string;
+    alchemyNetworkId: string;
+  }[];
+}): Promise<{
+  data: {
+    network: string;
+    address: string;
+    prices: { currency: string; value: string; lastUpdatedAt: string }[];
+    error: string | null;
+  }[];
+}> {
+  const options = {
+    method: 'POST',
+    headers: { accept: 'application/json', 'content-type': 'application/json' },
+    body: JSON.stringify({
+      addresses: tokenSources.map((x) => ({
+        network: x.alchemyNetworkId,
+        address: x.contractAddress,
+      })),
+    }),
+  };
+
+  const res = await fetch(
+    `https://api.g.alchemy.com/prices/v1/${alchemyApiKey}/tokens/by-address`,
+    options,
+  );
+
+  if (res.ok) return res.json();
+  else
+    throw new Error('Failed to fetch token prices', {
+      cause: { status: res.status, statusText: res.statusText },
+    });
+}
+
+export const getBaseUrl = (
+  env: 'local' | 'CI' | 'frick' | 'frack' | 'beta' | 'demo' | 'production',
+) => {
+  switch (env) {
+    case 'local':
+    case 'CI':
+      return 'http://localhost:8080';
+    case 'beta':
+      return 'https://qa.commonwealth.im';
+    case 'demo':
+      return 'https://demo.commonwealth.im';
+    case 'frick':
+      return 'https://frick.commonwealth.im';
+    case 'frack':
+      return 'https://frack.commonwealth.im';
+    default:
+      return `https://${PRODUCTION_DOMAIN}`;
+  }
+};
+
+export const buildContestLeaderboardUrl = (
+  baseUrl: string,
+  communityId: string,
+  contestAddress: string,
+) => {
+  return `${baseUrl}/${communityId}/contests/${contestAddress}`;
+};
+
+export const smallNumberFormatter = new Intl.NumberFormat('en-US', {
+  notation: 'standard',
+  maximumFractionDigits: 20, // Allow up to 22 decimal places for small numbers
+});
+
+// returns balance with fee deducted
+export const calculateNetContestBalance = (originalBalance: number) => {
+  const multiplier = (100 - CONTEST_FEE_PERCENT) / 100;
+  return (originalBalance || 0) * multiplier;
+};
+
+// returns array of prize amounts
+export const buildContestPrizes = (
+  contestBalance: number,
+  payoutStructure?: number[],
+  decimals?: number,
+): string[] => {
+  // 10% fee deducted from prize pool
+  const netContestBalance = calculateNetContestBalance(Number(contestBalance));
+  return netContestBalance && payoutStructure
+    ? payoutStructure.map((percentage) => {
+        const prize =
+          (Number(netContestBalance) * (percentage / 100)) /
+          Math.pow(10, decimals || 18);
+
+        return smallNumberFormatter.format(prize);
+      })
+    : [];
+};

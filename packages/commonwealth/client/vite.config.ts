@@ -40,13 +40,13 @@ export default defineConfig(({ mode }) => {
     'process.env.FLAG_FARCASTER_CONTEST': JSON.stringify(
       env.FLAG_FARCASTER_CONTEST,
     ),
-    'process.env.FLAG_TOKENIZED_COMMUNITY': JSON.stringify(
-      env.FLAG_TOKENIZED_COMMUNITY,
-    ),
+    'process.env.FLAG_LAUNCHPAD': JSON.stringify(env.FLAG_LAUNCHPAD),
+    'process.env.FLAG_UNISWAP_TRADE': JSON.stringify(env.FLAG_UNISWAP_TRADE),
     'process.env.FLAG_MANAGE_API_KEYS': JSON.stringify(
       env.FLAG_MANAGE_API_KEYS,
     ),
     'process.env.FLAG_REFERRALS': JSON.stringify(env.FLAG_REFERRALS),
+    'process.env.FLAG_REWARDS_PAGE': JSON.stringify(env.FLAG_REWARDS_PAGE),
     'process.env.FLAG_STICKY_EDITOR': JSON.stringify(env.FLAG_STICKY_EDITOR),
     'process.env.FLAG_NEW_MOBILE_NAV': JSON.stringify(env.FLAG_NEW_MOBILE_NAV),
   };
@@ -138,6 +138,10 @@ export default defineConfig(({ mode }) => {
     },
     build: {
       outDir: '../build',
+      // UNISWAP_WIDGET_HACK: this is needed by @uniswap to resolved multiple dependencies issues with peer-deps
+      commonjsOptions: {
+        transformMixedEsModules: true,
+      },
     },
     server: {
       port: 8080,
@@ -152,6 +156,31 @@ export default defineConfig(({ mode }) => {
     },
     resolve: {
       alias: [
+        {
+          // UNISWAP_WIDGET_HACK: 'jsbi' is needed by @uniswap pkg for pricing calculations, this is
+          // not documented by the uniswap pkg or atleast i couldn't find it.
+          // adding this here for internal uniswap widget import resolution
+          // see: https://github.com/Uniswap/sdk-core/issues/20 and
+          // https://github.com/Uniswap/widgets/issues/586#issuecomment-1777323003
+          // for more details
+          find: 'jsbi',
+          replacement: path.resolve(
+            __dirname,
+            '../node_modules/jsbi/dist/jsbi-cjs.js',
+          ),
+        },
+        {
+          // UNISWAP_WIDGET_HACK: needed by @uniswap pkg for path resolution
+          // see: https://github.com/Uniswap/widgets/issues/593#issuecomment-1777415001 for more details
+          find: '~@fontsource/ibm-plex-mono',
+          replacement: '@fontsource/ibm-plex-mono',
+        },
+        {
+          // UNISWAP_WIDGET_HACK: needed by @uniswap pkg for path resolution
+          // see: https://github.com/Uniswap/widgets/issues/593#issuecomment-1777415001 for more details
+          find: '~@fontsource/inter',
+          replacement: '@fontsource/inter',
+        },
         {
           // matches only non-relative paths that end with .scss
           find: /^([^.].*)\.scss$/,

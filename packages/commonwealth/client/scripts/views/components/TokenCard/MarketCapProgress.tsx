@@ -8,7 +8,7 @@ import './MarketCapProgress.scss';
 
 interface MarketCapProgressProps {
   currency?: SupportedCurrencies;
-  marketCap: { current: number; goal: number };
+  marketCap: { current: number; goal: number; isCapped: boolean };
   onBodyClick?: (e: React.MouseEvent) => void;
 }
 
@@ -18,15 +18,13 @@ const MarketCapProgress = ({
   onBodyClick,
 }: MarketCapProgressProps) => {
   const currencySymbol = currencyNameToSymbolMap[currency];
-  const isCapped = marketCap.current === marketCap.goal;
-  const progressPercentage = Math.floor(
-    (marketCap.current / marketCap.goal) * 100,
-  );
+  const progressPercentage =
+    Math.floor((marketCap.current / marketCap.goal) * 100) || 0;
 
   return (
     <div className="MarketCapProgress" onClick={onBodyClick}>
       <progress
-        className={clsx('goal-progress', { isCapped })}
+        className={clsx('goal-progress', { isCapped: marketCap.isCapped })}
         value={progressPercentage}
         max={100}
       />
@@ -36,7 +34,7 @@ const MarketCapProgress = ({
           {numeral(marketCap.current).format('0.0a')} | Goal {currencySymbol}
           {numeral(marketCap.goal).format('0.0a')}
         </CWText>
-        {isCapped && (
+        {marketCap.isCapped && (
           <CWIcon iconName="rocketLaunch" className="token-capped-icon" />
         )}
       </div>

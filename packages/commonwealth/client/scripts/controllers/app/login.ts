@@ -11,7 +11,6 @@ import {
   chainBaseToCanvasChainId,
   getSessionSigners,
   serializeCanvas,
-  WalletId,
   WalletSsoSource,
 } from '@hicommonwealth/shared';
 import { CosmosExtension } from '@magic-ext/cosmos';
@@ -36,7 +35,6 @@ import { userStore } from 'state/ui/user';
 import { z } from 'zod';
 import Account from '../../models/Account';
 import AddressInfo from '../../models/AddressInfo';
-import type BlockInfo from '../../models/BlockInfo';
 import { fetchCachedCustomDomain } from '../../state/api/configuration/index';
 
 // need to instantiate it early because the farcaster sdk has an async constructor which will cause a race condition
@@ -248,55 +246,6 @@ export function updateActiveUser(data) {
   }
 }
 
-export async function createUserWithAddress(
-  address: string,
-  walletId: WalletId,
-  chain: string,
-  sessionPublicAddress?: string,
-  validationBlockInfo?: BlockInfo | null,
-): Promise<{
-  account: Account;
-  newlyCreated: boolean;
-  joinedCommunity: boolean;
-}> {
-  const response = await axios.post(`${SERVER_URL}/createAddress`, {
-    address,
-    community_id: chain,
-    jwt: userStore.getState().jwt,
-    wallet_id: walletId,
-    block_info: validationBlockInfo
-      ? JSON.stringify(validationBlockInfo)
-      : null,
-  });
-
-  const id = response.data.result.id;
-
-  const communityInfo = await EXCEPTION_CASE_VANILLA_getCommunityById(
-    chain || '',
-    true,
-  );
-
-  const account = new Account({
-    addressId: id,
-    address,
-    community: {
-      id: communityInfo?.id || '',
-      base: communityInfo?.base,
-      ss58Prefix: communityInfo?.ss58_prefix || 0,
-    },
-    validationToken: response.data.result.verification_token,
-    walletId,
-    sessionPublicAddress: sessionPublicAddress,
-    validationBlockInfo: response.data.result.block_info,
-    ignoreProfile: false,
-  });
-  return {
-    account,
-    newlyCreated: response.data.result.newly_created,
-    joinedCommunity: response.data.result.joined_community,
-  };
-}
-
 async function constructMagic(isCosmos: boolean, chain?: string) {
   if (!isCosmos) {
     return defaultMagic;
@@ -437,10 +386,12 @@ export async function handleSocialLoginCallback({
   bearer,
   chain,
   walletSsoSource,
+  isCustomDomain,
 }: {
   bearer?: string | null;
   chain?: string;
   walletSsoSource?: string;
+  isCustomDomain?: boolean;
 }): Promise<{ address: string }> {
   // desiredChain may be empty if social login was initialized from
   // a page without a chain, in which case we default to an eth login
@@ -476,7 +427,9 @@ export async function handleSocialLoginCallback({
       magicAddress = utils.getAddress(metadata.publicAddress);
     }
   } else {
-    const result = await magic.oauth2.getRedirectResult();
+    const result = isCustomDomain
+      ? await magic.oauth.getRedirectResult()
+      : await magic.oauth2.getRedirectResult();
 
     if (!bearer) {
       console.log('No bearer token found in magic redirect result');

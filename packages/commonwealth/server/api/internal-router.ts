@@ -9,12 +9,12 @@ import * as discordBot from './discordBot';
 import * as email from './emails';
 import * as feed from './feed';
 import * as integrations from './integrations';
+import * as launchpadToken from './launchpadToken';
 import * as loadTest from './load-test';
 import * as poll from './poll';
 import * as subscription from './subscription';
 import * as superAdmin from './super-admin';
 import * as thread from './thread';
-import * as token from './token';
 import * as user from './user';
 import * as wallet from './wallet';
 import * as webhook from './webhook';
@@ -32,7 +32,7 @@ const api = {
   webhook: webhook.trpcRouter,
   superAdmin: superAdmin.trpcRouter,
   discordBot: discordBot.trpcRouter,
-  token: token.trpcRouter,
+  launchpadToken: launchpadToken.trpcRouter,
   poll: poll.trpcRouter,
 };
 

@@ -2,17 +2,22 @@ import { TokenView } from '@hicommonwealth/schemas';
 import { ChainBase } from '@hicommonwealth/shared';
 import clsx from 'clsx';
 import { calculateTokenPricing } from 'helpers/launchpad';
+import useDeferredConditionTriggerCallback from 'hooks/useDeferredConditionTriggerCallback';
 import { useFlag } from 'hooks/useFlag';
 import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useFetchTokenUsdRateQuery } from 'state/api/communityStake';
 import { useFetchTokensQuery } from 'state/api/tokens';
+import useUserStore from 'state/ui/user';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
-import TradeTokenModal from 'views/modals/TradeTokenModel';
-import { TradingMode } from 'views/modals/TradeTokenModel/TradeTokenForm/types';
+import { AuthModal } from 'views/modals/AuthModal';
+import TradeTokenModal, {
+  TradingConfig,
+  TradingMode,
+} from 'views/modals/TradeTokenModel';
 import { z } from 'zod';
 import TokenCard from '../../../components/TokenCard';
 import {
@@ -31,16 +36,19 @@ type TokensListProps = {
 };
 
 const TokensList = ({ filters }: TokensListProps) => {
+  const user = useUserStore();
   const navigate = useCommonNavigate();
-  const tokenizedCommunityEnabled = useFlag('tokenizedCommunity');
+  const launchpadEnabled = useFlag('launchpad');
+
   const [tokenLaunchModalConfig, setTokenLaunchModalConfig] = useState<{
     isOpen: boolean;
-    tradeConfig?: {
-      mode: TradingMode;
-      token: z.infer<typeof TokenWithCommunity>;
-      addressType: ChainBase;
-    };
+    tradeConfig?: TradingConfig;
   }>({ isOpen: false, tradeConfig: undefined });
+
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const { register, trigger } = useDeferredConditionTriggerCallback({
+    shouldRunTrigger: user.isLoggedIn,
+  });
 
   const {
     data: tokensList,
@@ -67,7 +75,7 @@ const TokensList = ({ filters }: TokensListProps) => {
 
       return undefined;
     })(),
-    enabled: tokenizedCommunityEnabled,
+    enabled: launchpadEnabled,
   });
   const tokens = (tokensList?.pages || []).flatMap((page) => page.results);
 
@@ -85,7 +93,29 @@ const TokensList = ({ filters }: TokensListProps) => {
     }
   };
 
-  if (!tokenizedCommunityEnabled) return <></>;
+  const openAuthModalOrTriggerCallback = () => {
+    if (user.isLoggedIn) {
+      trigger();
+    } else {
+      setIsAuthModalOpen(!user.isLoggedIn);
+    }
+  };
+
+  const handleCTAClick = (
+    mode: TradingMode,
+    token: z.infer<typeof TokenWithCommunity>,
+  ) => {
+    setTokenLaunchModalConfig({
+      isOpen: true,
+      tradeConfig: {
+        mode: mode,
+        token: token,
+        addressType: ChainBase.Ethereum,
+      } as TradingConfig,
+    });
+  };
+
+  if (!launchpadEnabled) return <></>;
 
   return (
     <div className="TokensList">
@@ -95,7 +125,7 @@ const TokensList = ({ filters }: TokensListProps) => {
       ) : tokens.length === 0 ? (
         <div
           className={clsx('empty-placeholder', {
-            'my-16': tokenizedCommunityEnabled,
+            'my-16': launchpadEnabled,
           })}
         >
           <CWText type="h2">
@@ -124,20 +154,24 @@ const TokensList = ({ filters }: TokensListProps) => {
                 marketCap={{
                   current: pricing.marketCapCurrent,
                   goal: pricing.marketCapGoal,
+                  isCapped: pricing.isMarketCapGoalReached,
                 }}
-                mode={pricing.isMarketCapGoalReached ? 'swap' : 'buy'}
+                mode={
+                  pricing.isMarketCapGoalReached
+                    ? TradingMode.Swap
+                    : TradingMode.Buy
+                }
                 iconURL={token.icon_url || ''}
-                onCTAClick={() => {
-                  if (pricing.isMarketCapGoalReached) return;
-
-                  setTokenLaunchModalConfig({
-                    isOpen: true,
-                    tradeConfig: {
-                      mode: TradingMode.Buy,
-                      token: token as z.infer<typeof TokenWithCommunity>,
-                      addressType: ChainBase.Ethereum,
+                onCTAClick={(mode) => {
+                  register({
+                    cb: () => {
+                      handleCTAClick(
+                        mode,
+                        token as z.infer<typeof TokenWithCommunity>,
+                      );
                     },
                   });
+                  openAuthModalOrTriggerCallback();
                 }}
                 onCardBodyClick={() =>
                   navigateToCommunity({
@@ -165,10 +199,16 @@ const TokensList = ({ filters }: TokensListProps) => {
       ) : (
         <></>
       )}
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        showWalletsFor={ChainBase.Ethereum}
+      />
       {tokenLaunchModalConfig.tradeConfig && (
         <TradeTokenModal
           isOpen={tokenLaunchModalConfig.isOpen}
-          tradeConfig={tokenLaunchModalConfig.tradeConfig}
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          tradeConfig={tokenLaunchModalConfig.tradeConfig as any}
           onModalClose={() => setTokenLaunchModalConfig({ isOpen: false })}
         />
       )}

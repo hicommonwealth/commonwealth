@@ -135,14 +135,24 @@ const Allowlist = ({
         avatarUrl: p.avatar_url,
         name: p.profile_name || DEFAULT_NAME,
         role: p.addresses[0].role,
+        // Map group information as objects
         groups: (p.group_ids || [])
-          .map(
-            (groupId) =>
-              (groups || []).find((group) => group.id === groupId)?.name,
-          )
+          .map((groupId) => {
+            const group = (groups || []).find((g) => g.id === groupId);
+            return group
+              ? {
+                  name: group.name,
+                  groupImageUrl: group.groupImageUrl,
+                }
+              : null;
+          })
           .filter(Boolean)
-          // @ts-expect-error StrictNullChecks
-          .sort((a, b) => a.localeCompare(b)),
+          .sort((a, b) => {
+            if (a && b) {
+              return a.name.localeCompare(b.name);
+            }
+            return 0;
+          }),
         stakeBalance: p.addresses[0].stake_balance,
         address: p.addresses[0].address,
       })) as Member[]) || []

@@ -78,6 +78,9 @@ const CommunityIntegrations = lazy(
 const CommunityStakeIntegration = lazy(
   () => import('views/pages/CommunityManagement/StakeIntegration'),
 );
+const CommunityTokenIntegration = lazy(
+  () => import('views/pages/CommunityManagement/TokenIntegration'),
+);
 
 const CommunityTopics = lazy(
   () => import('views/pages/CommunityManagement/Topics'),
@@ -114,9 +117,10 @@ const CommunityNotFoundPage = lazy(
   () => import('views/pages/CommunityNotFoundPage'),
 );
 
-const CommonDomainRoutes = ({
-  tokenizedCommunityEnabled,
-}: RouteFeatureFlags) => [
+const UnSubscribePage = lazy(() => import('views/pages/UnSubscribePage'));
+const RewardsPage = lazy(() => import('views/pages/RewardsPage'));
+
+const CommonDomainRoutes = ({ launchpadEnabled }: RouteFeatureFlags) => [
   <Route
     key="/_internal/quill"
     path="/_internal/quill"
@@ -151,7 +155,12 @@ const CommonDomainRoutes = ({
     path="/createCommunity"
     element={withLayout(CreateCommunityPage, { type: 'common' })}
   />,
-  ...(tokenizedCommunityEnabled
+  <Route
+    key="/unSubscribe/:userId"
+    path="/unSubscribe/:userId"
+    element={withLayout(UnSubscribePage, { type: 'common' })}
+  />,
+  ...(launchpadEnabled
     ? [
         <Route
           key="/createTokenCommunity"
@@ -176,6 +185,11 @@ const CommonDomainRoutes = ({
     element={withLayout(CommunitiesPage, {
       type: 'common',
     })}
+  />,
+  <Route
+    key="/rewards"
+    path="/rewards"
+    element={withLayout(RewardsPage, { type: 'common' })}
   />,
   <Route
     key="/search"
@@ -404,6 +418,14 @@ const CommonDomainRoutes = ({
     key="/:scope/manage/integrations/stake"
     path="/:scope/manage/integrations/stake"
     element={withLayout(CommunityStakeIntegration, {
+      scoped: true,
+    })}
+  />,
+
+  <Route
+    key="/:scope/manage/integrations/token"
+    path="/:scope/manage/integrations/token"
+    element={withLayout(CommunityTokenIntegration, {
       scoped: true,
     })}
   />,

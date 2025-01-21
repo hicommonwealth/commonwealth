@@ -98,6 +98,7 @@ export function JoinCommunity(): Command<typeof schemas.JoinCommunity> {
               is_user_default: false,
               ghost_address: false,
               is_banned: false,
+              referred_by_address: payload.referrer_address,
             },
             { transaction },
           );
@@ -114,7 +115,7 @@ export function JoinCommunity(): Command<typeof schemas.JoinCommunity> {
               event_payload: {
                 community_id,
                 user_id: actor.user.id!,
-                referral_link: payload.referral_link,
+                referrer_address: payload.referrer_address,
                 created_at: created.created_at!,
               },
             },

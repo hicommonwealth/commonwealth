@@ -1,14 +1,15 @@
 import {
   communityStakesAbi,
-  contestAbi,
-  EvmEventSignature,
-  EvmEventSignatures,
   launchpadFactoryAbi,
   lpBondingCurveAbi,
   namespaceFactoryAbi,
+  singleContestAbi,
   tokenCommunityManagerAbi,
-} from '@hicommonwealth/evm-protocols';
-import { factoryContracts, ValidChains } from '../common-protocol';
+} from '../abis';
+import { recurringContestAbi } from '../abis/recurringContestAbi';
+import { referralFeeManager } from '../abis/referralFeeManager';
+import { ValidChains, factoryContracts } from '../common-protocol';
+import { EvmEventSignature, EvmEventSignatures } from './eventSignatures';
 
 type ContractAddresses = {
   [key in ValidChains]:
@@ -28,6 +29,11 @@ type ContractAddresses = {
         ? 'tokenCommunityManager' extends keyof (typeof factoryContracts)[key]
           ? (typeof factoryContracts)[key]['tokenCommunityManager']
           : never
+        : never)
+    | (key extends keyof typeof factoryContracts
+        ? 'referralFeeManager' extends keyof (typeof factoryContracts)[key]
+          ? (typeof factoryContracts)[key]['referralFeeManager']
+          : never
         : never);
 };
 
@@ -37,7 +43,7 @@ export enum ChildContractNames {
   RecurringContest = 'RecurringContest',
 }
 
-type ContractSource = {
+export type ContractSource = {
   abi: Readonly<Array<unknown>>;
   eventSignatures: Array<EvmEventSignature>;
   // Runtime/user deployed contract sources
@@ -65,7 +71,7 @@ const namespaceFactorySource = {
   ],
   childContracts: {
     [ChildContractNames.RecurringContest]: {
-      abi: contestAbi,
+      abi: recurringContestAbi,
       eventSignatures: [
         EvmEventSignatures.Contests.ContentAdded,
         EvmEventSignatures.Contests.RecurringContestStarted,
@@ -73,7 +79,7 @@ const namespaceFactorySource = {
       ],
     },
     [ChildContractNames.SingleContest]: {
-      abi: contestAbi,
+      abi: singleContestAbi,
       eventSignatures: [
         EvmEventSignatures.Contests.ContentAdded,
         EvmEventSignatures.Contests.SingleContestStarted,
@@ -103,6 +109,14 @@ const tokenCommunityManagerSource: ContractSource = {
   eventSignatures: [],
 } satisfies ContractSource;
 
+const referralFeeManagerSource: ContractSource = {
+  abi: referralFeeManager,
+  eventSignatures: [
+    EvmEventSignatures.Referrals.ReferralSet,
+    EvmEventSignatures.Referrals.FeeDistributed,
+  ],
+};
+
 /**
  * Note that this object does not contain details for contracts deployed by users
  * at runtime. Those contracts remain in the EvmEventSources table.
@@ -121,6 +135,8 @@ export const EventRegistry = {
       lpBondingCurveSource,
     [factoryContracts[ValidChains.SepoliaBase].tokenCommunityManager]:
       tokenCommunityManagerSource,
+    [factoryContracts[ValidChains.SepoliaBase].referralFeeManager]:
+      referralFeeManagerSource,
   },
   [ValidChains.Sepolia]: {
     [factoryContracts[ValidChains.Sepolia].factory]: namespaceFactorySource,
@@ -158,5 +174,13 @@ export const EventRegistry = {
     [factoryContracts[ValidChains.SKALE_TEST].factory]: namespaceFactorySource,
     [factoryContracts[ValidChains.SKALE_TEST].communityStake]:
       communityStakesSource,
+  },
+  [ValidChains.Anvil]: {
+    [factoryContracts[ValidChains.Anvil].factory]: namespaceFactorySource,
+    [factoryContracts[ValidChains.Anvil].communityStake]: communityStakesSource,
+    [factoryContracts[ValidChains.Anvil].launchpad]: launchpadSource,
+    [factoryContracts[ValidChains.Anvil].lpBondingCurve]: lpBondingCurveSource,
+    [factoryContracts[ValidChains.Anvil].tokenCommunityManager]:
+      tokenCommunityManagerSource,
   },
 } as const satisfies EventRegistryType;

@@ -9,7 +9,6 @@ import {
 import axios from 'axios';
 import {
   completeClientLogin,
-  createUserWithAddress,
   setActiveAccount,
   startLoginWithMagicLink,
   updateActiveAddresses,
@@ -27,6 +26,11 @@ import {
   getSessionFromWallet,
   signSessionWithAccount,
 } from 'controllers/server/sessions';
+import {
+  getLocalStorageItem,
+  LocalStorageKeys,
+  removeLocalStorageItem,
+} from 'helpers/localStorage';
 import _ from 'lodash';
 import { Magic } from 'magic-sdk';
 import { useEffect, useState } from 'react';
@@ -34,7 +38,7 @@ import { isMobile } from 'react-device-detect';
 import app, { initAppState } from 'state';
 import { SERVER_URL } from 'state/api/config';
 import { DISCOURAGED_NONREACTIVE_fetchProfilesByAddress } from 'state/api/profiles/fetchProfilesByAddress';
-import { useUpdateUserMutation } from 'state/api/user';
+import { useSignIn, useUpdateUserMutation } from 'state/api/user';
 import useUserStore from 'state/ui/user';
 import {
   BaseMixpanelPayload,
@@ -97,6 +101,9 @@ const useAuthentication = (props: UseAuthenticationProps) => {
   });
 
   const { mutateAsync: updateUser } = useUpdateUserMutation();
+  const { signIn } = useSignIn();
+
+  const refcode = getLocalStorageItem(LocalStorageKeys.ReferralCode);
 
   useEffect(() => {
     if (process.env.ETH_RPC === 'e2e-test') {
@@ -267,6 +274,8 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       }
     }
 
+    removeLocalStorageItem(LocalStorageKeys.ReferralCode);
+
     if (exitOnComplete) {
       props?.onModalClose?.();
       await handleSuccess(account.address, newelyCreated);
@@ -293,7 +302,13 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     if (app.activeChainId() && user.isLoggedIn) {
       // @ts-expect-error StrictNullChecks
       const session = await getSessionFromWallet(walletToUse);
-      await account.validate(session);
+      await signIn(session, {
+        community_id: account.community.id,
+        address: account.address,
+        wallet_id: account.walletId!,
+        block_info: account.validationBlockInfo,
+        referrer_address: refcode,
+      });
       await onLogInWithAccount(account, true, newlyCreated);
       return;
     }
@@ -318,7 +333,13 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       try {
         // @ts-expect-error StrictNullChecks
         const session = await getSessionFromWallet(walletToUse);
-        await account.validate(session);
+        await signIn(session, {
+          community_id: account.community.id,
+          address: account.address,
+          wallet_id: account.walletId!,
+          block_info: account.validationBlockInfo,
+          referrer_address: refcode,
+        });
         await onLogInWithAccount(account, true, newlyCreated);
       } catch (e) {
         notifyError(`Error verifying account`);
@@ -347,8 +368,14 @@ const useAuthentication = (props: UseAuthenticationProps) => {
   // Handle Logic for creating a new account, including validating signature
   const onCreateNewAccount = async (session?: Session, account?: Account) => {
     try {
-      // @ts-expect-error StrictNullChecks
-      await account.validate(session);
+      if (session && account)
+        await signIn(session, {
+          address: account.address,
+          community_id: account.community.id,
+          wallet_id: account.walletId!,
+          block_info: account.validationBlockInfo,
+          referrer_address: refcode,
+        });
       // @ts-expect-error StrictNullChecks
       await verifySession(session);
       // @ts-expect-error <StrictNullChecks>
@@ -499,7 +526,6 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     try {
       const session = await getSessionFromWallet(wallet, { newSession: true });
       const chainIdentifier = app.chain?.id || wallet.defaultNetwork;
-
       const validationBlockInfo = await getWalletRecentBlock(
         wallet,
         chainIdentifier,
@@ -509,14 +535,15 @@ const useAuthentication = (props: UseAuthenticationProps) => {
         account: signingAccount,
         newlyCreated,
         joinedCommunity,
-      } = await createUserWithAddress(
+      } = await signIn(session, {
         address,
-        wallet.name,
-        chainIdentifier,
-        session.publicKey,
-        validationBlockInfo,
-      );
-
+        community_id: chainIdentifier,
+        wallet_id: wallet.name,
+        block_info: validationBlockInfo
+          ? JSON.stringify(validationBlockInfo)
+          : null,
+        referrer_address: refcode,
+      });
       setIsNewlyCreated(newlyCreated);
       if (isMobile) {
         setSignerAccount(signingAccount);
@@ -548,21 +575,16 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     );
 
     // Start the create-user flow, so validationBlockInfo gets saved to the backend
-    // This creates a new `Account` object with fields set up to be validated by verifyAddress.
-    const { account } = await createUserWithAddress(
+    // This creates a new `Account` object
+    const { account } = await signIn(session, {
       address,
-      wallet.name,
-      chainIdentifier,
-      // TODO: I don't think we need this field in Account at all
-      session.publicKey,
-      validationBlockInfo,
-    );
-    account.setValidationBlockInfo(
-      // @ts-expect-error <StrictNullChecks>
-      validationBlockInfo ? JSON.stringify(validationBlockInfo) : null,
-    );
-
-    await account.validate(session);
+      community_id: chainIdentifier,
+      wallet_id: wallet.name,
+      referrer_address: refcode,
+      block_info: validationBlockInfo
+        ? JSON.stringify(validationBlockInfo)
+        : null,
+    });
     await verifySession(session);
     console.log('Started new session for', wallet.chain, chainIdentifier);
 

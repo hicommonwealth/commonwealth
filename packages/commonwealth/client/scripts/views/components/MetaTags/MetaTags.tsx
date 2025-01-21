@@ -82,7 +82,7 @@ const defaultMeta = {
   },
   'twitter:image': {
     name: 'twitter:image',
-    content: `https://${PRODUCTION_DOMAIN}/img/brand_assets/common.png`,
+    content: `https://${PRODUCTION_DOMAIN}/brand_assets/common.png`,
   },
   'og:type': {
     property: 'og:type',
@@ -106,7 +106,7 @@ const defaultMeta = {
   },
   'og:image': {
     property: 'og:image',
-    content: `https://${PRODUCTION_DOMAIN}/img/brand_assets/common.png`,
+    content: `https://${PRODUCTION_DOMAIN}/brand_assets/common.png`,
   },
 } as const;
 
@@ -129,7 +129,7 @@ const MetaTags = ({ customMeta }: MetaTagsProps) => {
   })();
 
   return (
-    <Helmet>
+    <Helmet prioritizeSeoTags>
       {finalMeta.map((meta: MetaTag, index) => (
         <meta
           key={index}

@@ -1,10 +1,12 @@
 import { blobStorage, logger } from '@hicommonwealth/core';
+import { isEvmAddress } from '@hicommonwealth/evm-protocols';
 import { EventPairs } from '@hicommonwealth/schemas';
 import {
   getThreadUrl,
   safeTruncateBody,
   type AbiType,
 } from '@hicommonwealth/shared';
+import { NeynarAPIClient } from '@neynar/nodejs-sdk';
 import { createHash } from 'crypto';
 import { hasher } from 'node-object-hash';
 import {
@@ -15,7 +17,6 @@ import {
   Transaction,
 } from 'sequelize';
 import { v4 as uuidv4 } from 'uuid';
-import { isAddress } from 'web3-validator';
 import { config } from '../config';
 import type { OutboxAttributes } from '../models/outbox';
 
@@ -51,7 +52,7 @@ export async function emitEvent(
     } else {
       log.warn(
         `Event not inserted into outbox! ` +
-          `The event "${event.event_name}" is blacklisted. 
+          `The event "${event.event_name}" is blacklisted.
           Remove it from BLACKLISTED_EVENTS env in order to allow emitting this event.`,
         {
           event_name: event.event_name,
@@ -79,11 +80,13 @@ export function buildThreadContentUrl(communityId: string, threadId: number) {
 export function decodeThreadContentUrl(contentUrl: string): {
   communityId: string | null;
   threadId: number | null;
+  isFarcaster: boolean;
 } {
   if (contentUrl.startsWith('/farcaster/')) {
     return {
       communityId: null,
       threadId: null,
+      isFarcaster: true,
     };
   }
   if (!contentUrl.includes('/discussion/')) {
@@ -95,6 +98,7 @@ export function decodeThreadContentUrl(contentUrl: string): {
   return {
     communityId,
     threadId: parseInt(threadId, 10),
+    isFarcaster: false,
   };
 }
 
@@ -110,7 +114,7 @@ export function equalEvmAddresses(
   address2: string | unknown,
 ): boolean {
   const isRealAddress = (address: string | unknown) => {
-    if (!address || typeof address !== 'string' || !isAddress(address)) {
+    if (!address || typeof address !== 'string' || !isEvmAddress(address)) {
       throw new Error(`Invalid address ${address}`);
     }
     return address;
@@ -206,7 +210,7 @@ export function getChainNodeUrl({
   private_url,
 }: {
   url: string;
-  private_url?: string;
+  private_url?: string | null | undefined;
 }) {
   if (!private_url || private_url === '')
     return buildChainNodeUrl(url, 'public');
@@ -255,4 +259,27 @@ export function getSaltedApiKeyHash(apiKey: string, salt: string): string {
 
 export function buildApiKeySaltCacheKey(address: string) {
   return `salt_${address.toLowerCase()}`;
+}
+
+export async function publishCast(
+  replyCastHash: string,
+  messageBuilder: ({ username }: { username: string }) => string,
+) {
+  const client = new NeynarAPIClient(config.CONTESTS.NEYNAR_API_KEY!);
+  try {
+    const {
+      result: { casts },
+    } = await client.fetchBulkCasts([replyCastHash]);
+    const username = casts[0].author.username!;
+    await client.publishCast(
+      config.CONTESTS.NEYNAR_BOT_UUID!,
+      messageBuilder({ username }),
+      {
+        replyTo: replyCastHash,
+      },
+    );
+    log.info(`FC bot published reply to ${replyCastHash}`);
+  } catch (err) {
+    log.error(`Failed to post as FC bot`, err as Error);
+  }
 }

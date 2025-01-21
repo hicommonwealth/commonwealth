@@ -8,6 +8,7 @@ import useBrowserWindow from 'hooks/useBrowserWindow';
 import { useFlag } from 'hooks/useFlag';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useRef } from 'react';
+import { useLocation } from 'react-router-dom';
 import useUserStore from 'state/ui/user';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import {
@@ -16,6 +17,7 @@ import {
 } from '../../../../../shared/analytics/types';
 import useAppStatus from '../../../hooks/useAppStatus';
 import LaunchTokenCard from '../../components/LaunchTokenCard';
+import { UserTrainingSlider } from '../../components/UserTrainingSlider';
 import { CWText } from '../../components/component_kit/cw_text';
 import {
   CWTab,
@@ -36,6 +38,7 @@ type UserDashboardProps = {
 const UserDashboard = ({ type }: UserDashboardProps) => {
   const user = useUserStore();
   const { isWindowExtraSmall } = useBrowserWindow({});
+  const location = useLocation();
 
   const [activePage, setActivePage] = React.useState<DashboardViews>(
     DashboardViews.Global,
@@ -43,7 +46,7 @@ const UserDashboard = ({ type }: UserDashboardProps) => {
 
   const { isAddedToHomeScreen } = useAppStatus();
 
-  const tokenizedCommunityEnabled = useFlag('tokenizedCommunity');
+  const launchpadEnabled = useFlag('launchpad');
 
   useBrowserAnalyticsTrack({
     payload: {
@@ -62,13 +65,20 @@ const UserDashboard = ({ type }: UserDashboardProps) => {
       isPWA: isAddedToHomeScreen,
     },
   });
+
   useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const existingParams = searchParams.toString();
+    const additionalParams = existingParams ? `?${existingParams}` : '';
+
     if (!type) {
-      navigate(`/dashboard/${user.isLoggedIn ? 'for-you' : 'global'}`);
+      navigate(
+        `/dashboard/${user.isLoggedIn ? 'for-you' : 'global'}${additionalParams}`,
+      );
     } else if (type === 'for-you' && !user.isLoggedIn) {
-      navigate('/dashboard/global');
+      navigate(`/dashboard/global${additionalParams}`);
     }
-  }, [user.isLoggedIn, navigate, type]);
+  }, [user.isLoggedIn, navigate, type, location.search]);
 
   const subpage: DashboardViews =
     user.isLoggedIn && type !== 'global'
@@ -83,11 +93,12 @@ const UserDashboard = ({ type }: UserDashboardProps) => {
 
   return (
     <CWPageLayout ref={containerRef} className="UserDashboard">
+      <UserTrainingSlider />
       <div key={`${user.isLoggedIn}`}>
         <CWText type="h2" fontWeight="medium" className="page-header">
           Home
         </CWText>
-        <div className="content">
+        <div className="contentContainer">
           <div className="user-dashboard-activity">
             <div className="dashboard-header" id="dashboard-header">
               <CWTabsRow>
@@ -129,12 +140,12 @@ const UserDashboard = ({ type }: UserDashboardProps) => {
           </div>
           {isWindowExtraSmall ? (
             <>
-              {tokenizedCommunityEnabled && <LaunchTokenCard />}
+              {launchpadEnabled && <LaunchTokenCard />}
               <TrendingCommunitiesPreview />
             </>
           ) : (
             <div className="featured-cards">
-              {tokenizedCommunityEnabled && <LaunchTokenCard />}
+              {launchpadEnabled && <LaunchTokenCard />}
               <TrendingCommunitiesPreview />
             </div>
           )}

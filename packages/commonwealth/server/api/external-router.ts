@@ -5,6 +5,7 @@ import {
   Contest,
   Feed,
   Thread,
+  User,
 } from '@hicommonwealth/model';
 import cors from 'cors';
 import { Router } from 'express';
@@ -45,8 +46,13 @@ const {
   deleteReaction,
   deleteThread,
 } = thread.trpcRouter;
-const { createComment, updateComment, deleteComment, createCommentReaction } =
-  comment.trpcRouter;
+const {
+  createComment,
+  updateComment,
+  deleteComment,
+  createCommentReaction,
+  toggleCommentSpam,
+} = comment.trpcRouter;
 const { getNewContent } = user.trpcRouter;
 const { createContestMetadata, updateContestMetadata, cancelContestMetadata } =
   contest.trpcRouter;
@@ -57,6 +63,9 @@ const api = {
     ttlSecs: config.NO_GLOBAL_ACTIVITY_CACHE ? undefined : 60 * 5,
   }),
   getUserActivity: trpc.query(Feed.GetUserActivity, trpc.Tag.User, {
+    forceSecure: true,
+  }),
+  getUser: trpc.query(User.GetUser, trpc.Tag.User, {
     forceSecure: true,
   }),
   getNewContent,
@@ -103,6 +112,7 @@ const api = {
   deleteReaction,
   joinCommunity,
   banAddress,
+  toggleCommentSpam,
 };
 
 const PATH = '/api/v1';
@@ -148,4 +158,4 @@ const oasOptions: trpc.OasOptions = {
 const trpcRouter = trpc.router(api);
 trpc.useOAS(router, trpcRouter, oasOptions);
 
-export { PATH, oasOptions, router, trpcRouter };
+export { oasOptions, PATH, router, trpcRouter };

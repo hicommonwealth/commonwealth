@@ -4,7 +4,10 @@ import { QueryTypes } from 'sequelize';
 import { z } from 'zod';
 import { models } from '../database';
 
-const buildOrderBy = (by: string, direction: 'ASC' | 'DESC') => {
+const buildOrderBy = (
+  by: 'name' | 'referrals' | 'earnings' | string,
+  direction: 'ASC' | 'DESC',
+) => {
   switch (by) {
     case 'name':
       return `profile_name ${direction}`;
@@ -13,6 +16,12 @@ const buildOrderBy = (by: string, direction: 'ASC' | 'DESC') => {
     // - Project stake balances in separate process
     // case 'stakeBalance': // TODO: fix when stake balance is available
     //   return `addresses[0].stake_balance ${direction}`;
+
+    case 'referrals':
+      return `referral_count ${direction}`;
+
+    case 'earnings':
+      return `referral_eth_earnings ${direction}`;
 
     default:
       return `last_active ${direction}`;
@@ -91,6 +100,94 @@ const buildFilteredQuery = (
   `;
 };
 
+function membersSqlWithoutSearch(
+  orderBy: string,
+  limit: number,
+  offset: number,
+) {
+  return `
+      WITH T AS (SELECT profile_count as total FROM "Communities" WHERE id = :community_id)
+      SELECT
+        U.id AS user_id,
+        U.profile->>'name' AS profile_name,
+        U.profile->>'avatar_url' AS avatar_url,
+        U.created_at,
+        COALESCE(U.referral_count, 0) AS referral_count,
+        COALESCE(U.referral_eth_earnings, 0) AS referral_eth_earnings,
+        MAX(COALESCE(A.last_active, U.created_at)) AS last_active,
+        JSONB_AGG(JSON_BUILD_OBJECT(
+          'id', A.id,
+          'address', A.address,
+          'community_id', A.community_id,
+          'role', A.role,
+          'stake_balance', 0, -- TODO: project stake balance here
+          'referred_by', (SELECT 
+            JSON_BUILD_OBJECT(
+              'user_id', RU.id,
+              'profile_name', RU.profile->>'name',
+              'avatar_url', RU.profile->>'avatar_url'
+            )
+              FROM "Addresses" RA JOIN "Users" RU on RA.user_id = RU.id 
+              WHERE RA.address = A.referred_by_address LIMIT 1)
+        )) AS addresses,
+        COALESCE(ARRAY_AGG(M.group_id) FILTER (WHERE M.group_id IS NOT NULL), '{}') AS group_ids,
+        T.total
+      FROM "Addresses" A
+        JOIN "Users" U ON A.user_id = U.id
+        LEFT JOIN "Memberships" M ON A.id = M.address_id AND M.reject_reason IS NULL
+        JOIN T ON TRUE
+      WHERE
+        A.community_id = :community_id
+      GROUP BY U.id, T.total
+      ORDER BY ${orderBy}
+      LIMIT ${limit} OFFSET ${offset};
+     `;
+}
+
+function membersSqlWithSearch(
+  cte: string,
+  orderBy: string,
+  limit: number,
+  offset: number,
+) {
+  return `
+      WITH F AS (${cte}), T AS (SELECT COUNT(*)::INTEGER AS total FROM F)
+      SELECT
+        U.id AS user_id,
+        U.profile->>'name' AS profile_name,
+        U.profile->>'avatar_url' AS avatar_url,
+        U.created_at,
+        COALESCE(U.referral_count, 0) AS referral_count,
+        COALESCE(U.referral_eth_earnings, 0) AS referral_eth_earnings,
+        MAX(COALESCE(A.last_active, U.created_at)) AS last_active,
+        JSONB_AGG(JSON_BUILD_OBJECT(
+          'id', A.id,
+          'address', A.address,
+          'community_id', A.community_id,
+          'role', A.role,
+          'stake_balance', 0, -- TODO: project stake balance here
+          'referred_by', (SELECT 
+            JSON_BUILD_OBJECT(
+              'user_id', RU.id,
+              'profile_name', RU.profile->>'name',
+              'avatar_url', RU.profile->>'avatar_url'
+            )
+              FROM "Addresses" RA JOIN "Users" RU on RA.user_id = RU.id 
+              WHERE RA.address = A.referred_by_address LIMIT 1)
+        )) AS addresses,
+        COALESCE(ARRAY_AGG(M.group_id) FILTER (WHERE M.group_id IS NOT NULL), '{}') AS group_ids,
+        T.total
+      FROM F 
+        JOIN "Addresses" A ON F.id = A.id
+        JOIN "Users" U ON A.user_id = U.id
+        LEFT JOIN "Memberships" M ON A.id = M.address_id AND M.reject_reason IS NULL
+        JOIN T ON TRUE
+      GROUP BY U.id, T.total
+      ORDER BY ${orderBy}
+      LIMIT ${limit} OFFSET ${offset};
+     `;
+}
+
 export function GetMembers(): Query<typeof schemas.GetCommunityMembers> {
   return {
     ...schemas.GetCommunityMembers,
@@ -117,11 +214,6 @@ export function GetMembers(): Query<typeof schemas.GetCommunityMembers> {
         addresses,
       };
 
-      const cte = buildFilteredQuery(
-        search ?? '',
-        buildFilters(memberships ?? '', addresses),
-      );
-
       const orderBy = buildOrderBy(
         order_by ?? 'name',
         order_direction ?? 'DESC',
@@ -129,7 +221,15 @@ export function GetMembers(): Query<typeof schemas.GetCommunityMembers> {
 
       const sql =
         search || memberships || addresses.length > 0
-          ? membersSqlWithSearch(cte, orderBy, limit, offset)
+          ? membersSqlWithSearch(
+              buildFilteredQuery(
+                search ?? '',
+                buildFilters(memberships ?? '', addresses),
+              ),
+              orderBy,
+              limit,
+              offset,
+            )
           : membersSqlWithoutSearch(orderBy, limit, offset);
 
       const members = await models.sequelize.query<
@@ -138,14 +238,6 @@ export function GetMembers(): Query<typeof schemas.GetCommunityMembers> {
         replacements,
         type: QueryTypes.SELECT,
       });
-
-      if (!search) {
-        const total = await models.Community.findOne({
-          where: { id: community_id },
-          attributes: ['profile_count'],
-        });
-        members.forEach((m) => (m.total = total?.profile_count));
-      }
 
       return schemas.buildPaginatedResponse(
         members,
@@ -157,67 +249,4 @@ export function GetMembers(): Query<typeof schemas.GetCommunityMembers> {
       );
     },
   };
-}
-
-function membersSqlWithoutSearch(
-  orderBy: string,
-  limit: number,
-  offset: number,
-) {
-  return `
-      SELECT
-        U.id AS user_id,
-        U.profile->>'name' AS profile_name,
-        U.profile->>'avatar_url' AS avatar_url,
-        U.created_at,
-        MAX(COALESCE(A.last_active, U.created_at)) AS last_active,
-        JSONB_AGG(JSON_BUILD_OBJECT(
-          'id', A.id,
-          'address', A.address,
-          'community_id', A.community_id,
-          'role', A.role,
-          'stake_balance', 0 -- TODO: project stake balance here
-        )) AS addresses,
-        COALESCE(ARRAY_AGG(M.group_id) FILTER (WHERE M.group_id IS NOT NULL), '{}') AS group_ids
-      FROM "Addresses" A
-        JOIN "Users" U ON A.user_id = U.id
-        LEFT JOIN "Memberships" M ON A.id = M.address_id AND M.reject_reason IS NULL
-      WHERE
-        A.community_id = :community_id
-      GROUP BY U.id
-      ORDER BY ${orderBy}
-      LIMIT ${limit} OFFSET ${offset};
-     `;
-}
-
-function membersSqlWithSearch(
-  cte: string,
-  orderBy: string,
-  limit: number,
-  offset: number,
-) {
-  return `
-      WITH F AS (${cte}), T AS (SELECT COUNT(*)::INTEGER AS total FROM F)
-      SELECT
-        U.id AS user_id,
-        U.profile->>'name' AS profile_name,
-        U.profile->>'avatar_url' AS avatar_url,
-        U.created_at,
-        MAX(COALESCE(A.last_active, U.created_at)) AS last_active,
-        JSONB_AGG(JSON_BUILD_OBJECT(
-          'id', A.id,
-          'address', A.address,
-          'community_id', A.community_id,
-          'role', A.role,
-          'stake_balance', 0 -- TODO: project stake balance here
-        )) AS addresses,
-        COALESCE(ARRAY_AGG(M.group_id) FILTER (WHERE M.group_id IS NOT NULL), '{}') AS group_ids, T.total
-      FROM F JOIN "Addresses" A ON F.id = A.id
-        JOIN "Users" U ON A.user_id = U.id
-        LEFT JOIN "Memberships" M ON A.id = M.address_id AND M.reject_reason IS NULL
-        JOIN T ON TRUE
-      GROUP BY U.id, T.total
-      ORDER BY ${orderBy}
-      LIMIT ${limit} OFFSET ${offset};
-     `;
 }

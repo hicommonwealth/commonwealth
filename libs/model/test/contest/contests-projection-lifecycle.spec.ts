@@ -6,10 +6,10 @@ import {
   handleEvent,
   query,
 } from '@hicommonwealth/core';
-import { commonProtocol } from '@hicommonwealth/evm-protocols';
-import { models } from '@hicommonwealth/model';
+import * as evm from '@hicommonwealth/evm-protocols';
+import { createEventRegistryChainNodes, models } from '@hicommonwealth/model';
 import { ContestResults, EventNames } from '@hicommonwealth/schemas';
-import { AbiType, delay } from '@hicommonwealth/shared';
+import { CONTEST_FEE_PERCENT, delay } from '@hicommonwealth/shared';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import {
@@ -24,13 +24,11 @@ import {
 import { z } from 'zod';
 import { Contests } from '../../src/contest/Contests.projection';
 import { GetAllContests } from '../../src/contest/GetAllContests.query';
-import {
-  contestHelper,
-  contractHelpers,
-} from '../../src/services/commonProtocol';
 import { seed } from '../../src/tester';
 
 chai.use(chaiAsPromised);
+
+const { commonProtocol } = evm;
 
 // TODO: re-enable test
 describe('Contests projection lifecycle', () => {
@@ -65,34 +63,13 @@ describe('Contests projection lifecycle', () => {
   const decimals = commonProtocol.WeiDecimals[commonProtocol.Denominations.ETH];
   const topic_id = 100;
 
-  const getTokenAttributes = vi.spyOn(contractHelpers, 'getTokenAttributes');
-  const getContestScore = vi.spyOn(contestHelper, 'getContestScore');
-  const getContestStatus = vi.spyOn(contestHelper, 'getContestStatus');
+  const getTokenAttributes = vi.spyOn(evm, 'getTokenAttributes');
+  const getContestScore = vi.spyOn(evm, 'getContestScore');
+  const getContestStatus = vi.spyOn(evm, 'getContestStatus');
 
   beforeAll(async () => {
     try {
-      const [recurringContestAbi] = await seed('ContractAbi', {
-        id: 700,
-        abi: [] as AbiType,
-        nickname: 'RecurringContest',
-        abi_hash: 'hash1',
-        verified: true,
-      });
-      const [singleContestAbi] = await seed('ContractAbi', {
-        id: 701,
-        abi: [] as AbiType,
-        nickname: 'SingleContest',
-        abi_hash: 'hash2',
-        verified: true,
-      });
-      const [chain] = await seed('ChainNode', {
-        contracts: [
-          { abi_id: recurringContestAbi!.id },
-          { abi_id: singleContestAbi!.id },
-        ],
-        url: 'https://test',
-        private_url: 'https://test',
-      });
+      const chainNodes = await createEventRegistryChainNodes();
       const [user] = await seed(
         'User',
         {
@@ -106,7 +83,7 @@ describe('Contests projection lifecycle', () => {
         {
           id: community_id,
           namespace_address: namespace,
-          chain_node_id: chain!.id,
+          chain_node_id: chainNodes[0]!.id,
           discord_config_id: undefined,
           lifetime_thread_count: 0,
           profile_count: 1,
@@ -189,20 +166,21 @@ describe('Contests projection lifecycle', () => {
 
   test('should project events on multiple contests', async () => {
     const contestBalance = 10000000000;
+    const multiplier = (100 - CONTEST_FEE_PERCENT) / 100;
     const prizePool =
-      (BigInt(contestBalance) * BigInt(prize_percentage)) / 100n;
+      ((Number(contestBalance) * Number(prize_percentage)) / 100) * multiplier;
     const score = [
       {
         creator_address: creator1,
         content_id: content_id.toString(),
         votes: 1,
-        prize: ((prizePool * BigInt(payout_structure[0])) / 100n).toString(),
+        prize: ((prizePool * Number(payout_structure[0])) / 100).toString(),
       },
       {
         creator_address: creator2,
         content_id: content_id.toString(),
         votes: 2,
-        prize: ((prizePool * BigInt(payout_structure[1])) / 100n).toString(),
+        prize: ((prizePool * Number(payout_structure[1])) / 100).toString(),
       },
     ];
     getTokenAttributes.mockResolvedValue({ ticker, decimals });

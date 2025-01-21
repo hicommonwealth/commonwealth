@@ -25,7 +25,10 @@ import {
 import { AddressAttributes, R2_ADAPTER_KEY } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import { TopicWeightedVoting } from '@hicommonwealth/schemas';
-import { MAX_TRUNCATED_CONTENT_LENGTH } from '@hicommonwealth/shared';
+import {
+  MAX_COMMENT_DEPTH,
+  MAX_TRUNCATED_CONTENT_LENGTH,
+} from '@hicommonwealth/shared';
 import { Chance } from 'chance';
 import { z } from 'zod';
 import {
@@ -33,7 +36,7 @@ import {
   CreateCommentErrors,
   CreateCommentReaction,
   DeleteComment,
-  MAX_COMMENT_DEPTH,
+  GetComments,
   UpdateComment,
 } from '../../src/comment';
 import { models } from '../../src/database';
@@ -844,6 +847,111 @@ describe('Thread lifecycle', () => {
           },
         }),
       ).rejects.toThrowError(InvalidActor);
+    });
+
+    test('should get comments with reactions', async () => {
+      await command(CreateComment(), {
+        actor: actors.admin,
+        payload: {
+          parent_msg_id: thread!.canvas_msg_id,
+          thread_id: thread.id!,
+          body: 'hello',
+        },
+      });
+      await command(CreateComment(), {
+        actor: actors.member,
+        payload: {
+          parent_msg_id: thread!.canvas_msg_id,
+          thread_id: thread.id!,
+          body: 'world',
+        },
+      });
+      const response = await query(GetComments(), {
+        actor: actors.member,
+        payload: {
+          limit: 50,
+          cursor: 1,
+          thread_id: thread.id!,
+          include_reactions: true,
+          include_spam_comments: true,
+          order_by: 'oldest',
+        },
+      });
+      expect(response!.results.length).to.equal(5);
+      const last = response!.results.at(-1)!;
+      const stl = response!.results.at(-2)!;
+      expect(last!.address).to.equal(actors.member.address);
+      expect(last!.user_id).to.equal(actors.member.user.id);
+      expect(last!.body).to.equal('world');
+      expect(stl!.address).to.equal(actors.admin.address);
+      expect(stl!.user_id).to.equal(actors.admin.user.id);
+      expect(stl!.body).to.equal('hello');
+
+      // get second comment with reactions
+      getNamespaceBalanceSpy.mockResolvedValue({
+        [actors.member.address!]: '50',
+      });
+      await command(CreateCommentReaction(), {
+        actor: actors.member,
+        payload: {
+          comment_id: last.id!,
+          reaction: 'like',
+          comment_msg_id: last!.canvas_msg_id || '',
+        },
+      });
+      const response2 = await query(GetComments(), {
+        actor: actors.member,
+        payload: {
+          limit: 50,
+          cursor: 1,
+          thread_id: thread.id!,
+          comment_id: last!.id,
+          include_reactions: true,
+          include_spam_comments: true,
+          order_by: 'oldest',
+        },
+      });
+      const second = response2!.results.at(0)!;
+      expect(second!.reactions!.length).to.equal(1);
+    });
+
+    test('should get comments without reactions', async () => {
+      const response = await query(GetComments(), {
+        actor: actors.member,
+        payload: {
+          limit: 50,
+          cursor: 1,
+          thread_id: thread.id!,
+          include_reactions: false,
+          include_spam_comments: true,
+          order_by: 'oldest',
+        },
+      });
+      expect(response!.results.length).to.equal(5);
+      const last = response!.results.at(-1)!;
+      const stl = response!.results.at(-2)!;
+      expect(last!.address).to.equal(actors.member.address);
+      expect(last!.user_id).to.equal(actors.member.user.id);
+      expect(last!.body).to.equal('world');
+      expect(stl!.address).to.equal(actors.admin.address);
+      expect(stl!.user_id).to.equal(actors.admin.user.id);
+      expect(stl!.body).to.equal('hello');
+
+      // get second comment without reactions
+      const response2 = await query(GetComments(), {
+        actor: actors.member,
+        payload: {
+          limit: 50,
+          cursor: 1,
+          thread_id: thread.id!,
+          comment_id: response?.results.at(1)!.id,
+          include_reactions: false,
+          include_spam_comments: true,
+          order_by: 'newest',
+        },
+      });
+      const second = response2!.results.at(0)!;
+      expect(second!.reactions).to.be.undefined;
     });
   });
 

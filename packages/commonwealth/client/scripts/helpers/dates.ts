@@ -1,6 +1,4 @@
 import { pluralize } from 'helpers/index';
-import type Comment from 'models/Comment';
-import { CommentsFeaturedFilterTypes } from 'models/types';
 import moment from 'moment';
 
 export const getRelativeTimestamp = (date: number | string | moment.Moment) => {
@@ -30,14 +28,4 @@ export const getRelativeTimestamp = (date: number | string | moment.Moment) => {
   } else {
     return `${pluralize(yearsDiff, 'year')} ago`;
   }
-};
-
-export const commentsByDate = (
-  a: Comment<any>,
-  b: Comment<any>,
-  commentSortType: CommentsFeaturedFilterTypes,
-) => {
-  return commentSortType === CommentsFeaturedFilterTypes.Oldest
-    ? moment(a.createdAt).diff(moment(b.createdAt))
-    : moment(b.createdAt).diff(moment(a.createdAt));
 };

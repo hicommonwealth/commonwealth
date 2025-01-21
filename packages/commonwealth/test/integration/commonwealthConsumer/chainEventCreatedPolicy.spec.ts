@@ -1,9 +1,20 @@
 import { EventContext, dispose } from '@hicommonwealth/core';
-import { DB, processChainEventCreated, tester } from '@hicommonwealth/model';
+import {
+  EvmEventSignatures,
+  commonProtocol as cp,
+} from '@hicommonwealth/evm-protocols';
+import {
+  createTestRpc,
+  models,
+  processChainEventCreated,
+  tester,
+} from '@hicommonwealth/model';
+import { Community } from '@hicommonwealth/schemas';
 import { BalanceType } from '@hicommonwealth/shared';
 import { expect } from 'chai';
 import { BigNumber } from 'ethers';
 import { afterAll, afterEach, beforeAll, describe, test } from 'vitest';
+import { z } from 'zod';
 
 // These are all values for a real txn on the Ethereum Sepolia Testnet
 const transactionHash =
@@ -16,7 +27,7 @@ const stakeAmount = 1;
 const stakeId = 2;
 const blockTimestamp = 1712247912;
 
-async function processValidStakeTransaction(chainNodeId) {
+async function processValidStakeTransaction() {
   const context: EventContext<'ChainEventCreated'> = {
     name: 'ChainEventCreated',
     payload: {
@@ -26,8 +37,12 @@ async function processValidStakeTransaction(chainNodeId) {
         transactionHash,
         blockHash:
           '0xdf3b5cd44ea1a9f22a86f678b2e6d596238fe1d75b638cb5326415f293df32f5',
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } as any,
+        transactionIndex: 0,
+        logIndex: 0,
+        removed: false,
+        data: '0x',
+        topics: [],
+      },
       parsedArgs: [
         traderAddress,
         namespaceAddress,
@@ -49,10 +64,19 @@ async function processValidStakeTransaction(chainNodeId) {
         '0x0000000000000000000000000000000000000000',
       ],
       eventSource: {
-        kind: 'Trade',
-        chainNodeId,
-        eventSignature:
-          '0xfc13c9a8a9a619ac78b803aecb26abdd009182411d51a986090f82519d88a89e',
+        ethChainId: cp.ValidChains.Sepolia,
+        eventSignature: EvmEventSignatures.CommunityStake.Trade,
+      },
+      block: {
+        number: 0x1,
+        hash: '0x1',
+        logsBloom: '0x1',
+        nonce: '0x1',
+        parentHash: '0x1',
+        timestamp: 1673369600,
+        miner: '0x0000000000000000000000000000000000000000',
+        gasLimit: 0,
+        gasUsed: 0,
       },
     },
   };
@@ -60,21 +84,17 @@ async function processValidStakeTransaction(chainNodeId) {
 }
 
 describe('ChainEventCreated Policy', () => {
-  let models: DB;
-  let chainNode, community;
+  let community: z.infer<typeof Community> | undefined;
 
   beforeAll(async () => {
-    const res = await import('@hicommonwealth/model');
-    models = res['models'];
-    [chainNode] = await tester.seed(
+    const [chainNode] = await tester.seed(
       'ChainNode',
       {
-        url: 'https://ethereum-sepolia.publicnode.com',
-        private_url: 'https://ethereum-sepolia.publicnode.com',
+        url: createTestRpc(cp.ValidChains.Sepolia),
+        private_url: createTestRpc(cp.ValidChains.Sepolia, 'private'),
         name: 'Sepolia Testnet',
-        eth_chain_id: 11155111,
+        eth_chain_id: cp.ValidChains.Sepolia,
         balance_type: BalanceType.Ethereum,
-        contracts: [],
       },
       { mock: false },
     );
@@ -114,12 +134,12 @@ describe('ChainEventCreated Policy', () => {
   });
 
   test("should save stake transactions that don't exist", async () => {
-    await processValidStakeTransaction(chainNode.id);
+    await processValidStakeTransaction();
     const txns = await models.StakeTransaction.findAll();
     expect(txns.length).to.equal(1);
     expect(txns[0].toJSON()).to.deep.equal({
       transaction_hash: transactionHash,
-      community_id: community.id,
+      community_id: community!.id,
       stake_id: stakeId,
       address: traderAddress,
       stake_amount: stakeAmount,
@@ -132,7 +152,7 @@ describe('ChainEventCreated Policy', () => {
   test('should ignore stake transactions that already exist', async () => {
     await tester.seed('StakeTransaction', {
       transaction_hash: transactionHash,
-      community_id: community.id,
+      community_id: community!.id,
       stake_id: stakeId,
       address: traderAddress,
       stake_amount: stakeAmount,
@@ -144,7 +164,7 @@ describe('ChainEventCreated Policy', () => {
     const initialCount = await models.StakeTransaction.count();
     expect(initialCount).to.equal(1);
 
-    await processValidStakeTransaction(chainNode.id);
+    await processValidStakeTransaction();
 
     const postCount = await models.StakeTransaction.count();
     expect(postCount).to.equal(1);

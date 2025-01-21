@@ -13,7 +13,7 @@ export function GetDigestEmailDataQuery(): Query<typeof GetDigestEmailData> {
     ...GetDigestEmailData,
     auth: [],
     secure: true,
-    authStrategy: { name: 'authtoken', userId: ExternalServiceUserIds.Knock },
+    authStrategy: { type: 'authtoken', userId: ExternalServiceUserIds.Knock },
     body: async () => {
       const sevenDaysAgo = new Date();
       sevenDaysAgo.setDate(new Date().getDate() - 7);
@@ -42,7 +42,7 @@ export function GetDigestEmailDataQuery(): Query<typeof GetDigestEmailData> {
 
       if (!threads.length) return {};
 
-      const result: z.infer<typeof GetDigestEmailData['output']> = {};
+      const result: z.infer<(typeof GetDigestEmailData)['output']> = {};
       for (const thread of threads) {
         if (!result[thread.community_id]) {
           result[thread.community_id] = [thread];
