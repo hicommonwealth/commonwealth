@@ -19,7 +19,6 @@ import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
 import { SharePopoverOld } from 'views/components/share_popover_old';
-import { capDecimals } from 'views/modals/ManageCommunityStakeModal/utils';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 
 import { ContestType } from '../../types';
@@ -27,6 +26,7 @@ import { copyFarcasterContestFrameUrl, isContestActive } from '../../utils';
 import ContestAlert from '../ContestAlert';
 import ContestCountdown from '../ContestCountdown';
 
+import { buildContestPrizes } from '@hicommonwealth/shared';
 import './ContestCard.scss';
 
 const noFundsProps = {
@@ -103,14 +103,11 @@ const ContestCard = ({
       isOneOff: !isRecurring,
     });
 
-  const prizes =
-    contestBalance && payoutStructure
-      ? payoutStructure.map(
-          (percentage) =>
-            (contestBalance * (percentage / 100)) /
-            Math.pow(10, decimals || 18),
-        )
-      : [];
+  const prizes = buildContestPrizes(
+    Number(contestBalance),
+    payoutStructure,
+    decimals,
+  );
 
   const handleCancel = () => {
     cancelContest({
@@ -251,7 +248,7 @@ const ContestCard = ({
                         {moment.localeData().ordinal(index + 1)} Prize
                       </CWText>
                       <CWText fontWeight="bold">
-                        {capDecimals(String(prize))} {ticker}
+                        {prize} {ticker}
                       </CWText>
                     </div>
                   ))

@@ -1,5 +1,6 @@
 import { getContestBalance } from '@hicommonwealth/evm-protocols';
 import { models } from '@hicommonwealth/model';
+import { buildContestPrizes } from '@hicommonwealth/shared';
 import { Button } from 'frames.js/express';
 import moment from 'moment';
 import React from 'react';
@@ -12,7 +13,7 @@ const PrizeRow = ({
   ticker = 'ETH',
 }: {
   index: number;
-  prize: number;
+  prize: string;
   ticker?: string;
 }) => {
   return (
@@ -85,14 +86,11 @@ export const contestPrizes = frames(async (ctx) => {
     contestManager.interval === 0,
   );
 
-  const prizes =
-    contestBalance && contestBalance !== '0' && contestManager.payout_structure
-      ? contestManager.payout_structure.map(
-          (percentage) =>
-            (Number(contestBalance) * (percentage / 100)) /
-            Math.pow(10, contestManager.decimals || 18),
-        )
-      : [];
+  const prizes = buildContestPrizes(
+    Number(contestBalance),
+    contestManager.payout_structure,
+    contestManager.decimals,
+  );
 
   return {
     title: contestManager.name,

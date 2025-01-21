@@ -1,2 +1,45 @@
+@import '../../../../../styles/shared';
+
 .ReferralTable {
+  table {
+    width: 100%;
+    @include table-cell;
+  }
+
+  .loading-state {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 200px;
+  }
+
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 24px;
+  }
+
+  .table-cell {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    &.text-right {
+      justify-content: flex-end;
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      color: inherit;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
 }

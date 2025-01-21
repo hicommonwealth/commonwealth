@@ -1,8 +1,9 @@
 import { BigNumber } from '@ethersproject/bignumber';
 import { ZERO_ADDRESS } from '@hicommonwealth/shared';
 import { Mutex } from 'async-mutex';
-import Web3, { PayableCallOptions, TransactionReceipt } from 'web3';
+import Web3, { Contract, PayableCallOptions, TransactionReceipt } from 'web3';
 import { feeManagerAbi } from '../../abis/feeManagerAbi';
+import { namespaceAbi } from '../../abis/namespaceAbi';
 import { namespaceFactoryAbi } from '../../abis/namespaceFactoryAbi';
 import { recurringContestAbi } from '../../abis/recurringContestAbi';
 import { singleContestAbi } from '../../abis/singleContestAbi';
@@ -13,15 +14,14 @@ import {
   estimateGas,
   getTransactionCount,
 } from '../utils';
+import { getNamespace } from './namespace';
 
 export const getTotalContestBalance = async (
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  contestContract: any,
+  contestContract: Contract<
+    Readonly<typeof singleContestAbi> | Readonly<typeof recurringContestAbi>
+  >,
   contestAddress: string,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  web3: any,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  _feeManagerAbi: any[],
+  web3: Web3,
   oneOff?: boolean,
 ): Promise<string> => {
   const promises = [contestContract.methods.contestToken().call()];
@@ -35,10 +35,7 @@ export const getTotalContestBalance = async (
   const balancePromises: Promise<string>[] = [];
 
   if (!oneOff) {
-    const feeManager = new web3.eth.Contract(
-      _feeManagerAbi,
-      String(results[1]),
-    );
+    const feeManager = new web3.eth.Contract(feeManagerAbi, String(results[1]));
     balancePromises.push(
       feeManager.methods
         .getBeneficiaryBalance(contestAddress, results[0])
@@ -47,7 +44,7 @@ export const getTotalContestBalance = async (
   }
   if (String(results[0]) === ZERO_ADDRESS) {
     balancePromises.push(
-      web3.eth.getBalance(contestAddress).then((v: string) => {
+      web3.eth.getBalance(contestAddress).then((v: bigint) => {
         return v.toString();
       }),
     );
@@ -62,7 +59,7 @@ export const getTotalContestBalance = async (
           data: calldata,
         })
         .then((v: string) => {
-          return web3.eth.abi.decodeParameter('uint256', v);
+          return String(web3.eth.abi.decodeParameter('uint256', v));
         }),
     );
   }
@@ -136,13 +133,7 @@ export const getContestBalance = async (
     contest,
   );
 
-  return await getTotalContestBalance(
-    contestInstance,
-    contest,
-    web3,
-    feeManagerAbi,
-    oneOff,
-  );
+  return await getTotalContestBalance(contestInstance, contest, web3, oneOff);
 };
 
 /**
@@ -322,6 +313,7 @@ export const addContentBatch = async ({
   contest: string[];
   creator: string;
   url: string;
+  // eslint-disable-next-line @typescript-eslint/require-await
 }): Promise<PromiseSettledResult<AddContentResponse>[]> => {
   return nonceMutex.runExclusive(async () => {
     const web3 = createPrivateEvmClient({ rpc, privateKey });
@@ -355,6 +347,7 @@ export const voteContentBatch = async ({
     contestAddress: string;
     contentId: string;
   }[];
+  // eslint-disable-next-line @typescript-eslint/require-await
 }) => {
   return nonceMutex.runExclusive(async () => {
     const web3 = createPrivateEvmClient({ rpc, privateKey });
@@ -397,6 +390,7 @@ export const rollOverContest = async ({
   rpc: string;
   contest: string;
   oneOff: boolean;
+  // eslint-disable-next-line @typescript-eslint/require-await
 }): Promise<boolean> => {
   return nonceMutex.runExclusive(async () => {
     const web3 = createPrivateEvmClient({ rpc, privateKey });
@@ -491,4 +485,53 @@ export const deployERC20Contest = async ({
     data: eventLog.data.toString(),
   });
   return address as string;
+};
+
+export const deployNamespace = async (
+  namespaceFactory: string,
+  name: string,
+  walletAddress: string,
+  feeManager: string,
+  rpcNodeUrl: string,
+  privateKey: string,
+): Promise<string> => {
+  const web3 = createPrivateEvmClient({ rpc: rpcNodeUrl, privateKey });
+  const namespaceCheck = await getNamespace(rpcNodeUrl, name, namespaceFactory);
+  if (namespaceCheck === ZERO_ADDRESS) {
+    throw new Error('Namespace already reserved');
+  }
+  const contract = new web3.eth.Contract(namespaceFactoryAbi, namespaceFactory);
+
+  const maxFeePerGasEst = await estimateGas(web3);
+
+  try {
+    const uri = `https://common.xyz/api/namespaceMetadata/${name}/{id}`;
+    await contract.methods.deployNamespace(name, uri, feeManager, []).send({
+      from: web3.eth.defaultAccount,
+      type: '0x2',
+      maxFeePerGas: maxFeePerGasEst?.toString(),
+      maxPriorityFeePerGas: web3.utils.toWei('0.001', 'gwei'),
+    });
+  } catch (error) {
+    throw new Error('Transaction failed: ' + error);
+  }
+  const namespaceAddress = await getNamespace(
+    rpcNodeUrl,
+    name,
+    namespaceFactory,
+  );
+  const namespaceContract = new web3.eth.Contract(
+    namespaceAbi,
+    namespaceAddress,
+  );
+
+  try {
+    await namespaceContract.methods
+      .mintId(walletAddress, 1, 1, '0x')
+      .send({ from: web3.eth.defaultAccount });
+  } catch (error) {
+    throw new Error('Transaction failed: ' + error);
+  }
+
+  return namespaceAddress;
 };

@@ -145,4 +145,4 @@ export const launchpadFactoryAbi = [
     ],
     anonymous: false,
   },
-];
+] as const;
