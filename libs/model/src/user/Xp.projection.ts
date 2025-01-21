@@ -257,11 +257,15 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
           payload,
           'CommunityJoined',
         );
+        const user = await models.User.findOne({
+          where: { id: payload.user_id },
+        });
         if (action_metas.length > 0) {
           await recordXpsForQuest(
             payload.user_id,
             payload.created_at!,
             action_metas,
+            user?.referred_by_address,
           );
         }
       },
