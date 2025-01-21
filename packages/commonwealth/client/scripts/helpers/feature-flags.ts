@@ -35,6 +35,9 @@ const featureFlags = {
   newMobileNav: buildFlag(process.env.FLAG_NEW_MOBILE_NAV),
   rewardsPage: buildFlag(process.env.FLAG_REWARDS_PAGE),
   growl: buildFlag(process.env.FLAG_GROWL),
+  languageSelectorEnabled: buildFlag(
+    process.env.FLAG_LANGUAGE_SELECTOR_ENABLED,
+  ),
 };
 
 export type AvailableFeatureFlag = keyof typeof featureFlags;

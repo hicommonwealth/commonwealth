@@ -1,6 +1,8 @@
 import clsx from 'clsx';
-import React from 'react';
+import React, { useState } from 'react';
 
+import ClickAwayListener from '@mui/base/ClickAwayListener';
+import { useFlag } from 'hooks/useFlag';
 import { useCommonNavigate } from 'navigation/helpers';
 import useSidebarStore from 'state/ui/sidebar';
 import KnockNotifications from 'views/components/KnockNotifications';
@@ -21,7 +23,6 @@ import {
   getLanguagePreference,
   setLanguagePreference,
 } from 'helpers/languagePreference';
-import { useFlag } from 'hooks/useFlag';
 import { useFetchCustomDomainQuery } from 'state/api/configuration';
 import useUserStore from 'state/ui/user';
 import AuthButtons from 'views/components/SublayoutHeader/AuthButtons';
@@ -43,6 +44,7 @@ const DesktopHeader = ({ onMobile, onAuthModalOpen }: DesktopHeaderProps) => {
     useSidebarStore();
   const user = useUserStore();
   const { data: domain } = useFetchCustomDomainQuery();
+  const [showDropdown, setShowDropdown] = useState(false);
 
   const handleToggle = () => {
     const isVisible = !menuVisible;
@@ -166,18 +168,27 @@ const DesktopHeader = ({ onMobile, onAuthModalOpen }: DesktopHeaderProps) => {
           )}
         </div>
 
-        <div className="language-selector">
-          <CWDropdown
-            options={SUPPORTED_LANGUAGES}
-            initialValue={{
-              label: getLanguageLabel(getLanguagePreference()),
-              value: getLanguagePreference(),
-            }}
-            onSelect={(item) => {
-              setLanguagePreference(item.value);
-            }}
-          />
-        </div>
+        {useFlag('languageSelectorEnabled') && (
+          <ClickAwayListener onClickAway={() => setShowDropdown(false)}>
+            <div className="language-selector">
+              <CWDropdown
+                options={
+                  [...SUPPORTED_LANGUAGES] as Array<{
+                    label: string;
+                    value: string;
+                  }>
+                }
+                initialValue={{
+                  label: getLanguageLabel(getLanguagePreference()),
+                  value: getLanguagePreference(),
+                }}
+                onSelect={(item) => {
+                  setLanguagePreference(item.value as SupportedLanguage);
+                }}
+              />
+            </div>
+          </ClickAwayListener>
+        )}
         {user.isLoggedIn && (
           <UserDropdown onAuthModalOpen={() => onAuthModalOpen()} />
         )}

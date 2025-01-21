@@ -1,18 +1,20 @@
 import React, { useState } from 'react';
 
 import {
-  SUPPORTED_LANGUAGES,
   getLanguageLabel,
   getLanguagePreference,
   setLanguagePreference,
+  SUPPORTED_LANGUAGES,
+  SupportedLanguage,
 } from 'helpers/languagePreference';
+import { useFlag } from 'hooks/useFlag';
 import { useInviteLinkModal } from 'state/ui/modals';
 import useSidebarStore from 'state/ui/sidebar';
 import useUserStore from 'state/ui/user';
 import { PopoverMenuItem } from 'views/components/component_kit/CWPopoverMenu';
 import MenuContent from 'views/components/component_kit/CWPopoverMenu/MenuContent';
+import { CWDropdown } from 'views/components/component_kit/cw_dropdown';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
-import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import CWDrawer from 'views/components/component_kit/new_designs/CWDrawer';
 import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
@@ -59,6 +61,10 @@ const MobileHeader = ({
     onReferralItemClick: () => {
       setIsUserDrawerOpen(false);
       setIsInviteLinkModalOpen(true);
+    },
+    onLanguageClick: () => {
+      setIsUserDrawerOpen(false);
+      setIsLanguageDrawerOpen(true);
     },
   });
 
@@ -174,38 +180,42 @@ const MobileHeader = ({
         open={isModalOpen}
       />
 
-      <CWDrawer
-        open={isLanguageDrawerOpen}
-        onClose={() => setIsLanguageDrawerOpen(false)}
-        direction="bottom"
-      >
-        <div className="LanguageDrawer">
-          <div className="header">
-            <CWIconButton
-              iconName="close"
-              onClick={() => setIsLanguageDrawerOpen(false)}
-            />
-            <CWText type="h4">Select Language</CWText>
-          </div>
-          <div className="language-options">
-            {SUPPORTED_LANGUAGES.map((lang) => (
-              <div
-                key={lang.value}
-                className="language-option"
-                onClick={() => {
-                  setLanguagePreference(lang.value);
+      {useFlag('languageSelectorEnabled') && (
+        <CWDrawer
+          open={isLanguageDrawerOpen}
+          onClose={() => setIsLanguageDrawerOpen(false)}
+          direction="right"
+          className="LanguageDrawer"
+        >
+          <div className="drawer-content">
+            <div className="header">
+              <CWIconButton
+                iconName="close"
+                onClick={() => setIsLanguageDrawerOpen(false)}
+              />
+              <CWText type="h4">Select Language</CWText>
+            </div>
+            <div className="language-options">
+              <CWDropdown
+                options={
+                  [...SUPPORTED_LANGUAGES] as Array<{
+                    label: string;
+                    value: string;
+                  }>
+                }
+                initialValue={{
+                  label: getLanguageLabel(getLanguagePreference()),
+                  value: getLanguagePreference(),
+                }}
+                onSelect={(item) => {
+                  setLanguagePreference(item.value as SupportedLanguage);
                   setIsLanguageDrawerOpen(false);
                 }}
-              >
-                <CWText>{lang.label}</CWText>
-                {getLanguagePreference() === lang.value && (
-                  <CWIcon iconName="check" iconSize="small" />
-                )}
-              </div>
-            ))}
+              />
+            </div>
           </div>
-        </div>
-      </CWDrawer>
+        </CWDrawer>
+      )}
     </>
   );
 };
