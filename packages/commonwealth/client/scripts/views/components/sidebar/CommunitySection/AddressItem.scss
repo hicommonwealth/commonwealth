@@ -29,10 +29,11 @@
       cursor: pointer;
     }
 
-    check-mark-icon {
+    .check-mark-icon {
       width: 20px;
       height: 20px;
       cursor: pointer;
+      fill: $green-600;
     }
 
     .open-wallet-icon {
