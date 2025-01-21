@@ -73,7 +73,10 @@ export const Sidebar = ({
           />
         </KnockFeedWrapper>
         {isInsideCommunity ? (
-          <CommunitySection showSkeleton={!app.activeChainId()} />
+          <CommunitySection
+            showSkeleton={!app.activeChainId()}
+            isInsideCommunity={isInsideCommunity}
+          />
         ) : (
           user.isLoggedIn && (
             <SidebarProfileSection
