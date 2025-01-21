@@ -441,6 +441,11 @@ export const buildContestLeaderboardUrl = (
   return `${baseUrl}/${communityId}/contests/${contestAddress}`;
 };
 
+export const smallNumberFormatter = new Intl.NumberFormat('en-US', {
+  notation: 'standard',
+  maximumFractionDigits: 20, // Allow up to 22 decimal places for small numbers
+});
+
 // returns balance with fee deducted
 export const calculateNetContestBalance = (originalBalance: number) => {
   const multiplier = (100 - CONTEST_FEE_PERCENT) / 100;
@@ -452,14 +457,16 @@ export const buildContestPrizes = (
   contestBalance: number,
   payoutStructure?: number[],
   decimals?: number,
-): number[] => {
+): string[] => {
   // 10% fee deducted from prize pool
   const netContestBalance = calculateNetContestBalance(Number(contestBalance));
   return netContestBalance && payoutStructure
-    ? payoutStructure.map(
-        (percentage) =>
+    ? payoutStructure.map((percentage) => {
+        const prize =
           (Number(netContestBalance) * (percentage / 100)) /
-          Math.pow(10, decimals || 18),
-      )
+          Math.pow(10, decimals || 18);
+
+        return smallNumberFormatter.format(prize);
+      })
     : [];
 };
