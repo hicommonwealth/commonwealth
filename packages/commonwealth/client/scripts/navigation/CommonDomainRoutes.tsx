@@ -16,6 +16,7 @@ const CommunitiesPage = lazy(() => import('views/pages/Communities'));
 const SearchPage = lazy(() => import('views/pages/search'));
 
 const CreateCommunityPage = lazy(() => import('views/pages/CreateCommunity'));
+const CreateQuestPage = lazy(() => import('views/pages/CreateQuest'));
 const LaunchToken = lazy(() => import('views/pages/LaunchToken'));
 const OverviewPage = lazy(() => import('views/pages/overview'));
 const MembersPage = lazy(
@@ -120,7 +121,10 @@ const CommunityNotFoundPage = lazy(
 const UnSubscribePage = lazy(() => import('views/pages/UnSubscribePage'));
 const RewardsPage = lazy(() => import('views/pages/RewardsPage'));
 
-const CommonDomainRoutes = ({ launchpadEnabled }: RouteFeatureFlags) => [
+const CommonDomainRoutes = ({
+  launchpadEnabled,
+  xpEnabled,
+}: RouteFeatureFlags) => [
   <Route
     key="/_internal/quill"
     path="/_internal/quill"
@@ -155,6 +159,15 @@ const CommonDomainRoutes = ({ launchpadEnabled }: RouteFeatureFlags) => [
     path="/createCommunity"
     element={withLayout(CreateCommunityPage, { type: 'common' })}
   />,
+  ...(xpEnabled
+    ? [
+        <Route
+          key="/createQuest"
+          path="/createQuest"
+          element={withLayout(CreateQuestPage, { type: 'common' })}
+        />,
+      ]
+    : []),
   <Route
     key="/unSubscribe/:userId"
     path="/unSubscribe/:userId"

@@ -1,0 +1,75 @@
+@import '../../../../styles/shared';
+
+.CreateQuestForm {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+
+  @include extraSmall {
+    gap: 18px;
+  }
+
+  .quest-period-section,
+  .basic-information-section,
+  .reward-section,
+  .actions-section {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    width: 100%;
+
+    @include extraSmall {
+      gap: 18px;
+    }
+
+    > .b1 {
+      color: $neutral-600 !important;
+    }
+  }
+
+  .quest-period-section {
+    .repeatition-selector {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      width: 100%;
+
+      .b1 {
+        color: $neutral-600 !important;
+      }
+
+      .radio-btn .Text {
+        color: $neutral-800 !important;
+      }
+    }
+  }
+
+  .actions-section {
+    .header {
+      .b2 {
+        margin-top: 8px;
+      }
+    }
+
+    .add-action-btn {
+      border: 1px solid $black;
+    }
+  }
+
+  .action-btns {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+
+    @include extraSmall {
+      .btn-border {
+        width: 100% !important;
+
+        > button {
+          width: 100% !important;
+        }
+      }
+    }
+  }
+}
