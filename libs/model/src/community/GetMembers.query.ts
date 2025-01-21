@@ -4,10 +4,10 @@ import { QueryTypes } from 'sequelize';
 import { z } from 'zod';
 import { models } from '../database';
 
-const buildOrderBy = (
-  by: 'name' | 'referrals' | 'earnings' | string,
-  direction: 'ASC' | 'DESC',
-) => {
+type OrderBy = 'name' | 'last_active' | 'referrals' | 'earnings';
+type OrderDirection = 'ASC' | 'DESC';
+
+const buildOrderBy = (by: OrderBy, direction: OrderDirection) => {
   switch (by) {
     case 'name':
       return `profile_name ${direction}`;
@@ -101,7 +101,8 @@ const buildFilteredQuery = (
 };
 
 function membersSqlWithoutSearch(
-  orderBy: string,
+  by: OrderBy,
+  direction: OrderDirection,
   limit: number,
   offset: number,
 ) {
@@ -112,7 +113,7 @@ function membersSqlWithoutSearch(
         U.profile->>'name' AS profile_name,
         U.profile->>'avatar_url' AS avatar_url,
         U.created_at,
-        'referred_by', (
+        (
           SELECT JSON_BUILD_OBJECT(
             'user_id', RU.id,
             'profile_name', RU.profile->>'name',
@@ -120,7 +121,7 @@ function membersSqlWithoutSearch(
           )
           FROM "Addresses" RA JOIN "Users" RU ON RA.user_id = RU.id
           WHERE RA.address = U.referred_by_address LIMIT 1
-        ),
+        ) as referred_by,
         COALESCE(U.referral_count, 0) AS referral_count,
         COALESCE(U.referral_eth_earnings, 0) AS referral_eth_earnings,
         MAX(COALESCE(A.last_active, U.created_at)) AS last_active,
@@ -139,15 +140,21 @@ function membersSqlWithoutSearch(
         JOIN T ON TRUE
       WHERE
         A.community_id = :community_id
+        ${
+          by === 'referrals' || by === 'earnings'
+            ? 'AND COALESCE(U.referral_count, 0) + COALESCE(U.referral_eth_earnings, 0) > 0'
+            : ''
+        }
       GROUP BY U.id, T.total
-      ORDER BY ${orderBy}
+      ORDER BY ${buildOrderBy(by, direction)}
       LIMIT ${limit} OFFSET ${offset};
      `;
 }
 
 function membersSqlWithSearch(
   cte: string,
-  orderBy: string,
+  by: OrderBy,
+  direction: OrderDirection,
   limit: number,
   offset: number,
 ) {
@@ -158,7 +165,7 @@ function membersSqlWithSearch(
         U.profile->>'name' AS profile_name,
         U.profile->>'avatar_url' AS avatar_url,
         U.created_at,
-        'referred_by', (
+        (
           SELECT JSON_BUILD_OBJECT(
             'user_id', RU.id,
             'profile_name', RU.profile->>'name',
@@ -166,7 +173,7 @@ function membersSqlWithSearch(
           )
           FROM "Addresses" RA JOIN "Users" RU ON RA.user_id = RU.id
           WHERE RA.address = U.referred_by_address LIMIT 1
-        ),
+        ) AS referred_by,
         COALESCE(U.referral_count, 0) AS referral_count,
         COALESCE(U.referral_eth_earnings, 0) AS referral_eth_earnings,
         MAX(COALESCE(A.last_active, U.created_at)) AS last_active,
@@ -184,8 +191,13 @@ function membersSqlWithSearch(
         JOIN "Users" U ON A.user_id = U.id
         LEFT JOIN "Memberships" M ON A.id = M.address_id AND M.reject_reason IS NULL
         JOIN T ON TRUE
+      ${
+        by === 'referrals' || by === 'earnings'
+          ? 'WHERE COALESCE(U.referral_count, 0) + COALESCE(U.referral_eth_earnings, 0) > 0'
+          : ''
+      }
       GROUP BY U.id, T.total
-      ORDER BY ${orderBy}
+      ORDER BY ${buildOrderBy(by, direction)}
       LIMIT ${limit} OFFSET ${offset};
      `;
 }
@@ -216,10 +228,8 @@ export function GetMembers(): Query<typeof schemas.GetCommunityMembers> {
         addresses,
       };
 
-      const orderBy = buildOrderBy(
-        order_by ?? 'name',
-        order_direction ?? 'DESC',
-      );
+      const by = order_by ?? 'name';
+      const direction = order_direction ?? 'DESC';
 
       const sql =
         search || memberships || addresses.length > 0
@@ -228,11 +238,12 @@ export function GetMembers(): Query<typeof schemas.GetCommunityMembers> {
                 search ?? '',
                 buildFilters(memberships ?? '', addresses),
               ),
-              orderBy,
+              by,
+              direction,
               limit,
               offset,
             )
-          : membersSqlWithoutSearch(orderBy, limit, offset);
+          : membersSqlWithoutSearch(by, direction, limit, offset);
 
       const members = await models.sequelize.query<
         z.infer<typeof schemas.CommunityMember> & { total?: number }
