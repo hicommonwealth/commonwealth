@@ -7,7 +7,7 @@ import useUserStore from 'state/ui/user';
 import ErrorPage from 'views/pages/error';
 import { PageLoading } from 'views/pages/loading';
 
-export const validateSocialLogin = async (
+const validate = async (
   setRoute: (route: string) => void,
   isLoggedIn: boolean,
   isCustomDomain?: boolean,
@@ -77,24 +77,22 @@ const FinishSocialLogin = () => {
   const { data: domain } = useFetchCustomDomainQuery();
 
   useEffect(() => {
-    validateSocialLogin(
-      navigate,
-      user.isLoggedIn,
-      domain?.isCustomDomain,
-    ).catch((error) => {
-      // useEffect will be called twice in development because of React strict mode,
-      // causing an error to be displayed until validate() finishes
-      if (document.location.host === 'localhost:8080') {
-        return;
-      }
-      if (typeof error === 'string') {
-        setValidationError(error);
-      } else if (error && typeof error.message === 'string') {
-        setValidationError(error.message);
-      } else {
-        setValidationError('Error logging in, please try again');
-      }
-    });
+    validate(navigate, user.isLoggedIn, domain?.isCustomDomain).catch(
+      (error) => {
+        // useEffect will be called twice in development because of React strict mode,
+        // causing an error to be displayed until validate() finishes
+        if (document.location.host === 'localhost:8080') {
+          return;
+        }
+        if (typeof error === 'string') {
+          setValidationError(error);
+        } else if (error && typeof error.message === 'string') {
+          setValidationError(error.message);
+        } else {
+          setValidationError('Error logging in, please try again');
+        }
+      },
+    );
   }, [domain?.isCustomDomain, navigate, user.isLoggedIn]);
 
   if (validationError) {

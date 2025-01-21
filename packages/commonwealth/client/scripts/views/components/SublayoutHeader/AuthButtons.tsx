@@ -15,10 +15,6 @@ const AuthButtons = ({
 }: AuthButtonsProps) => {
   const isDisabled = location.pathname.includes('/finishsociallogin');
 
-  function handleSignIn() {
-    onButtonClick(AuthModalType.SignIn);
-  }
-
   return (
     <>
       <CWButton
@@ -39,7 +35,7 @@ const AuthButtons = ({
         })}
         buttonWidth={fullWidthButtons ? 'full' : 'narrow'}
         disabled={isDisabled}
-        onClick={handleSignIn}
+        onClick={() => onButtonClick(AuthModalType.SignIn)}
       />
     </>
   );

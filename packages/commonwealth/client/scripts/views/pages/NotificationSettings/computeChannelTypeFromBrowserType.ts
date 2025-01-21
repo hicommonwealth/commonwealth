@@ -2,7 +2,7 @@ import { BrowserType } from 'helpers/browser';
 
 const SAFARI_USES_FCM = true;
 
-const isReactNative = !!window.ReactNativeWebView;
+const isMobileApp = !!window.ReactNativeWebView;
 
 /**
  * Compute the channel for Knock notifications.  Firebase cloud messaging or
@@ -11,7 +11,7 @@ const isReactNative = !!window.ReactNativeWebView;
 export function computeChannelTypeFromBrowserType(
   browserType: BrowserType | undefined,
 ): 'FCM' | 'APNS' | undefined {
-  if (isReactNative) {
+  if (isMobileApp) {
     return undefined;
   }
 
