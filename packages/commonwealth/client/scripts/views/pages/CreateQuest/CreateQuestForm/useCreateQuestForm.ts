@@ -1,10 +1,11 @@
+import { QuestEvents } from '@hicommonwealth/schemas';
 import { z } from 'zod';
 import './CreateQuestForm.scss';
 import { useQuestActionMultiFormsState } from './QuestActionSubForm/useMultipleQuestActionForms';
 import { questFormValidationSchema } from './validation';
 
 const MIN_ACTIONS_LIMIT = 1;
-const MAX_ACTIONS_LIMIT = 8;
+const MAX_ACTIONS_LIMIT = Object.values(QuestEvents).length; // = 8 max actions
 
 const useCreateQuestForm = () => {
   const {

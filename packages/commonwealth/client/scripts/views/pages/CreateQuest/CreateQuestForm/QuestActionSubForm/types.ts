@@ -18,6 +18,7 @@ export type QuestActionSubFormProps = {
   onChange?: ({ action, questLink }: QuestActionSubFormFields) => void;
   isRemoveable?: boolean;
   onRemove?: () => void;
+  hiddenActions?: QuestAction[];
 };
 
 export type QuestActionSubFormState = {

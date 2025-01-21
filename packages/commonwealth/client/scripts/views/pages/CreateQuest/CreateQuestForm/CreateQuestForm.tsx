@@ -8,7 +8,7 @@ import { CWForm } from 'views/components/component_kit/new_designs/CWForm';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import { CWRadioButton } from 'views/components/component_kit/new_designs/cw_radio_button';
 import './CreateQuestForm.scss';
-import QuestActionSubForm from './QuestActionSubForm';
+import QuestActionSubForm, { QuestAction } from './QuestActionSubForm';
 import useCreateQuestForm from './useCreateQuestForm';
 import { questFormValidationSchema } from './validation';
 
@@ -127,6 +127,11 @@ const CreateQuestForm = () => {
             onChange={(updateBody) => updateSubFormByIndex(updateBody, index)}
             isRemoveable={questActionSubForms.length !== MIN_ACTIONS_LIMIT}
             onRemove={() => removeSubFormByIndex(index)}
+            hiddenActions={
+              questActionSubForms
+                .filter((form) => !!form.values.action)
+                .map((form) => form.values.action) as QuestAction[]
+            }
           />
         ))}
 

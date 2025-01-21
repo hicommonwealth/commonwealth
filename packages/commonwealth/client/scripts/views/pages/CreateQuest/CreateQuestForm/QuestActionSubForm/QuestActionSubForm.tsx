@@ -14,11 +14,14 @@ const QuestActionSubForm = ({
   errors,
   defaultValues,
   onChange,
+  hiddenActions,
 }: QuestActionSubFormProps) => {
-  const actionOptions = Object.keys(QuestEvents).map((event) => ({
-    value: event as QuestAction,
-    label: splitCamelOrPascalCase(event),
-  }));
+  const actionOptions = Object.keys(QuestEvents)
+    .map((event) => ({
+      value: event as QuestAction,
+      label: splitCamelOrPascalCase(event),
+    }))
+    .filter((action) => !(hiddenActions || []).includes(action.value));
 
   return (
     <div className={clsx('QuestActionSubForm', { isRemoveable })}>
