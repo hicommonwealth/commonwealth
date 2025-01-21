@@ -36,6 +36,7 @@ export const ReactNativeLogForwarder = memo(function ReactNativeLogForwarder() {
     };
 
     // Function to forward logs
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const forwardLog = (level: string, args: any[]) => {
       reactNativeWebView.postMessage(
         JSON.stringify({
