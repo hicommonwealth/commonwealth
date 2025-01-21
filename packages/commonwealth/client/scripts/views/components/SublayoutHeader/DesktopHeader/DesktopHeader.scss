@@ -42,6 +42,20 @@
 
       .dropdown-wrapper {
         min-width: 140px;
+
+        .dropdown-options-display {
+          max-height: 250px;
+          overflow-y: auto;
+          @include visibleScrollbar(light);
+        }
+      }
+    }
+
+    .language-selector {
+      margin-right: 8px;
+
+      .dropdown-wrapper {
+        min-width: 140px;
       }
     }
 

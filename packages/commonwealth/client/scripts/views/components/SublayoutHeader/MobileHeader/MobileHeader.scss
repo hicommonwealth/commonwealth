@@ -55,44 +55,50 @@
 }
 
 .LanguageDrawer {
-  padding: 16px;
-
-  .header {
-    display: flex;
-    align-items: center;
-    margin-bottom: 24px;
-
-    h4 {
-      flex: 1;
-      text-align: center;
-    }
-  }
-
-  .language-options {
+  .drawer-content {
+    padding: 16px;
+    height: 100%;
     display: flex;
     flex-direction: column;
-    gap: 8px;
 
-    .language-option {
+    .header {
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      padding: 12px;
-      cursor: pointer;
-      border-radius: 4px;
+      margin-bottom: 24px;
 
-      &:hover {
-        background-color: $neutral-50;
+      h4 {
+        @include b1;
+        flex: 1;
+        text-align: center;
+        font-weight: $font-weight-medium;
+      }
+    }
+
+    .language-options {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0 16px;
+
+      .dropdown-wrapper {
+        min-width: 140px;
+
+        .dropdown-options-display {
+          max-height: 250px;
+          overflow-y: auto;
+          @include visibleScrollbar(light);
+        }
       }
     }
   }
 }
 
 .language-menu-item {
+  @include b2;
   display: flex;
   justify-content: space-between;
   align-items: center;
   width: 100%;
+  color: $neutral-900;
 }
 
 .InviteLinkDrawer {
