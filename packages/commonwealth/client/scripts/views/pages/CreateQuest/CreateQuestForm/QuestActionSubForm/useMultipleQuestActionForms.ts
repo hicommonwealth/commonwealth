@@ -45,7 +45,7 @@ const useQuestActionMultiFormsState = ({
     let errors = {};
     try {
       questSubFormValidationSchema.parse(values);
-    } catch (e: any) {
+    } catch (e) {
       const zodError = e as ZodError;
       zodError.errors.map((error) => {
         errors = {
