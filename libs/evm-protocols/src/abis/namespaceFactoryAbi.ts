@@ -56,9 +56,9 @@ export const namespaceFactoryAbi = [
     inputs: [
       {
         indexed: false,
-        internalType: 'address',
-        name: 'namespaceAdress',
-        type: 'address',
+        internalType: 'string',
+        name: 'name',
+        type: 'string',
       },
       {
         indexed: true,
