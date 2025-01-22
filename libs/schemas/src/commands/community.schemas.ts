@@ -127,7 +127,7 @@ export const UpdateCustomDomain = {
   context: AuthContext,
 };
 
-const Snapshot = z.string().regex(/.+\.(eth|xyz)$/);
+const Snapshot = z.string().regex(/.+\.(eth|xyz|io)$/);
 
 export const UpdateCommunity = {
   input: Community.omit({ id: true, network: true, custom_domain: true })
