@@ -29,41 +29,51 @@ const SidebarHeader = ({
 
   return (
     <div className="SidebarHeader">
-      <CWCommunityAvatar
-        showSkeleton={!app?.chain?.meta}
-        community={{
-          iconUrl: community?.icon_url || '',
-          name: community?.name || '',
-        }}
-        onClick={() =>
-          app.chain.id &&
-          navigateToCommunity({ navigate, path: '', chain: app.chain.id })
-        }
-      />
-      <CWTooltip
-        content={
-          community?.name && community.name.length > 17 ? community.name : null
-        }
-        placement="top"
-        renderTrigger={(handleInteraction, isTooltipOpen) => (
-          <CWText
-            className="header"
-            type="h5"
+      {isInsideCommunity && (
+        <>
+          <CWCommunityAvatar
+            showSkeleton={!app?.chain?.meta}
+            community={{
+              iconUrl: community?.icon_url || '',
+              name: community?.name || '',
+            }}
             onClick={() =>
               app.chain.id &&
               navigateToCommunity({ navigate, path: '', chain: app.chain.id })
             }
-            onMouseEnter={(e) => {
-              handleMouseEnter({ e, isTooltipOpen, handleInteraction });
-            }}
-            onMouseLeave={(e) => {
-              handleMouseLeave({ e, isTooltipOpen, handleInteraction });
-            }}
-          >
-            {smartTrim(community?.name, 17) || <Skeleton width="70%" />}
-          </CWText>
-        )}
-      />
+          />
+          <CWTooltip
+            content={
+              community?.name && community.name.length > 17
+                ? community.name
+                : null
+            }
+            placement="top"
+            renderTrigger={(handleInteraction, isTooltipOpen) => (
+              <CWText
+                className="header"
+                type="h5"
+                onClick={() =>
+                  app.chain.id &&
+                  navigateToCommunity({
+                    navigate,
+                    path: '',
+                    chain: app.chain.id,
+                  })
+                }
+                onMouseEnter={(e) => {
+                  handleMouseEnter({ e, isTooltipOpen, handleInteraction });
+                }}
+                onMouseLeave={(e) => {
+                  handleMouseLeave({ e, isTooltipOpen, handleInteraction });
+                }}
+              >
+                {smartTrim(community?.name, 17) || <Skeleton width="70%" />}
+              </CWText>
+            )}
+          />
+        </>
+      )}
       {isInsideCommunity && (
         <CollapsableSidebarButton
           isInsideCommunity={isInsideCommunity}

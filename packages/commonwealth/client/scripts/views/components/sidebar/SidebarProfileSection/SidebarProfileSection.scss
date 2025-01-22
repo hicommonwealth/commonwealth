@@ -1,0 +1,82 @@
+@import '../../../../styles/shared.scss';
+
+.SidebarProfileSection {
+  background-color: $neutral-25;
+  display: flex;
+  flex-direction: column;
+  height: auto;
+  min-width: $sidebar-width;
+  overflow-y: auto;
+  width: $sidebar-width;
+
+  .status-address {
+    padding-top: 16px;
+    border-bottom: 1px solid $neutral-200;
+
+    .status-text {
+      padding-inline: 2px;
+      color: $neutral-400;
+      line-height: 16px;
+      letter-spacing: 0.24px;
+      text-transform: uppercase;
+    }
+
+    .status-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 8px 12px 16px;
+
+      .status-light {
+        width: 8px;
+        height: 8px;
+        margin-right: 8px;
+        background-color: $neutral-300;
+        border-radius: 50%;
+
+        &.connected {
+          background-color: $green-600;
+        }
+      }
+    }
+
+    .referral-link-button {
+      .Text {
+        font-weight: 400 !important;
+      }
+    }
+  }
+
+  @include isWindowSmallToMediumInclusive {
+    width: calc(100vw - $quick-switcher-width);
+  }
+
+  .home-button {
+    align-items: center;
+    display: flex;
+    padding: 8px;
+    cursor: pointer;
+
+    &:hover {
+      background-color: $primary-50;
+    }
+
+    &.active {
+      background-color: $primary-100;
+    }
+
+    svg {
+      margin-right: 4px;
+    }
+  }
+
+  .buttons-container {
+    margin-top: 24px;
+
+    .subscription-button {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 16px;
+    }
+  }
+}
