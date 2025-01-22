@@ -57,6 +57,7 @@ export const ReferralFees = z.object({
   referrer_received_amount: z
     .number()
     .describe('The amount of ETH received by the referrer'),
+  referee_address: z.string().describe('The address of the referee'),
   transaction_timestamp: z
     .number()
     .describe('The timestamp when the referral fee was distributed'),

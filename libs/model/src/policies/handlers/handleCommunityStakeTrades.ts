@@ -3,13 +3,12 @@ import { getStakeTradeInfo } from '@hicommonwealth/evm-protocols';
 import { chainEvents, events } from '@hicommonwealth/schemas';
 import { BigNumber } from 'ethers';
 import { z } from 'zod';
-import { DB } from '../../models';
+import { models } from '../../database';
 import { chainNodeMustExist } from '../utils/utils';
 
 const log = logger(import.meta);
 
 export async function handleCommunityStakeTrades(
-  models: DB,
   event: z.infer<typeof events.ChainEventCreated>,
 ) {
   const {

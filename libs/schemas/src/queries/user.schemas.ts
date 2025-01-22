@@ -33,7 +33,10 @@ export const UserProfileView = z.object({
   commentThreads: z.array(ThreadView),
   isOwner: z.boolean(),
   tags: z.array(Tags.extend({ id: PG_INT })),
-  xp_points: z.number().int(),
+  referred_by_address: z.string().nullish(),
+  referral_count: PG_INT.default(0),
+  referral_eth_earnings: z.number().optional(),
+  xp_points: PG_INT.default(0),
 });
 
 export const GetUserProfile = {
@@ -96,6 +99,9 @@ export const GetUserAddresses = {
 export const ReferralView = Referral.extend({
   referee_user_id: PG_INT,
   referee_profile: UserProfile,
+  community_id: z.string().nullish(),
+  community_name: z.string().nullish(),
+  community_icon_url: z.string().nullish(),
 });
 
 export const GetUserReferrals = {
@@ -103,7 +109,12 @@ export const GetUserReferrals = {
   output: z.array(ReferralView),
 };
 
-export const ReferralFeesView = ReferralFees;
+export const ReferralFeesView = ReferralFees.extend({
+  referee_profile: UserProfile.nullish(),
+  community_id: z.string().nullish(),
+  community_name: z.string().nullish(),
+  community_icon_url: z.string().nullish(),
+});
 
 export const GetUserReferralFees = {
   input: z.object({}),

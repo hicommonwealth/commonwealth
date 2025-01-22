@@ -43,10 +43,15 @@ referee_addresses AS (
 SELECT 
   R.*,
   U.id as referee_user_id, 
-  U.profile as referee_profile
+  U.profile as referee_profile,
+  C.id as community_id,
+  C.name as community_name,
+  C.icon_url as community_icon_url
 FROM referrals R
   JOIN referee_addresses RA ON RA.address = R.referee_address
-  JOIN "Users" U ON U.id = RA.user_id;
+  JOIN "Users" U ON U.id = RA.user_id
+  LEFT JOIN "Communities" C ON C.namespace = R.namespace_address
+  ;
         `,
         {
           type: QueryTypes.SELECT,
