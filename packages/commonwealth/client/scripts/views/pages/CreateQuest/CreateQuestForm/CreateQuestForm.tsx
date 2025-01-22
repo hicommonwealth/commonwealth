@@ -136,6 +136,7 @@ const CreateQuestForm = () => {
         ))}
 
         <CWButton
+          containerClassName="add-action-btn-outline"
           className="add-action-btn"
           label="Add action"
           buttonWidth="full"
@@ -154,8 +155,14 @@ const CreateQuestForm = () => {
           buttonType="secondary"
           buttonWidth="wide"
           type="button"
+          containerClassName="btn"
         />
-        <CWButton label="Create Quest" buttonWidth="wide" type="submit" />
+        <CWButton
+          label="Create Quest"
+          buttonWidth="wide"
+          type="submit"
+          containerClassName="btn"
+        />
       </div>
     </CWForm>
   );
