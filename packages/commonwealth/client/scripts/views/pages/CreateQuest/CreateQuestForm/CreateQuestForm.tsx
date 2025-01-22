@@ -96,7 +96,7 @@ const CreateQuestForm = () => {
         />
 
         <CWTextArea
-          label="Description (Optional)"
+          label="Description"
           placeholder="Add a description for your Quest"
           name="description"
           hookToForm
