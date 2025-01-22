@@ -1,4 +1,5 @@
-import React from 'react';
+import { uniqBy } from 'lodash';
+import React, { useState } from 'react';
 
 import { saveToClipboard } from 'utils/clipboard';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
@@ -8,9 +9,11 @@ import {
   CWModalFooter,
   CWModalHeader,
 } from '../../components/component_kit/new_designs/CWModal';
+import { CWSelectList } from '../../components/component_kit/new_designs/CWSelectList';
 import { CWTextInput } from '../../components/component_kit/new_designs/CWTextInput';
 import { getShareOptions } from './utils';
 
+import { formatAddressShort } from 'helpers';
 import app from 'state';
 import useUserStore from 'state/ui/user';
 
@@ -25,12 +28,24 @@ const InviteLinkModal = ({ onModalClose }: InviteLinkModalProps) => {
   const hasJoinedCommunity = !!user.activeAccount;
   const communityId = hasJoinedCommunity ? app.activeChainId() : '';
 
+  const availableAddresses = uniqBy(user.addresses, 'address');
+
+  const addressOptions = availableAddresses.map((addressInfo) => ({
+    value: addressInfo.address,
+    label: formatAddressShort(addressInfo.address, 6),
+  }));
+
+  const refAddress = communityId
+    ? user.activeAccount?.address
+    : addressOptions?.[0]?.value;
+
+  const [refCode, setRefCode] = useState(refAddress);
+
   const currentUrl = window.location.origin;
 
-  // TODO: @Marcin to check address access (referral link creation) + related changes in this file
   const inviteLink = `${currentUrl}${
     communityId ? `/${communityId}/discussions` : '/dashboard'
-  }?refcode=${user.activeAccount?.address}`;
+  }?refcode=${refCode}`;
 
   const handleCopy = () => {
     saveToClipboard(inviteLink, true).catch(console.error);
@@ -55,6 +70,17 @@ const InviteLinkModal = ({ onModalClose }: InviteLinkModalProps) => {
               Common over their lifetime engaging with web 3 native forums.`}
           </CWText>
           <>
+            <CWSelectList
+              label="Select Address"
+              placeholder="Select a wallet"
+              isClearable={false}
+              isSearchable={false}
+              value={addressOptions.find((option) => option.value === refCode)}
+              defaultValue={addressOptions[0]}
+              options={addressOptions}
+              onChange={(option) => setRefCode(option?.value)}
+            />
+
             <CWTextInput
               fullWidth
               type="text"

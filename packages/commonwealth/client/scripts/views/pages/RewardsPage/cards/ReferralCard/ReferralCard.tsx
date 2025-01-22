@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useInviteLinkModal } from 'state/ui/modals';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import {
@@ -24,6 +25,8 @@ const ReferralCard = ({ onSeeAllClick }: ReferralCardProps) => {
   const [currentTab, setCurrentTab] = useState<ReferralTabs>(
     ReferralTabs.Total,
   );
+
+  const { setIsInviteLinkModalOpen } = useInviteLinkModal();
 
   const trendValue = 10;
 
@@ -65,7 +68,7 @@ const ReferralCard = ({ onSeeAllClick }: ReferralCardProps) => {
         </div>
         <div className="referral-card-footer">
           <CWButton
-            onClick={onSeeAllClick}
+            onClick={() => setIsInviteLinkModalOpen(true)}
             buttonWidth="full"
             label="Share Referral Link"
             buttonHeight="sm"

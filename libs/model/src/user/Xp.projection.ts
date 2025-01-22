@@ -20,7 +20,7 @@ async function getUserId(payload: { address_id: number }) {
 }
 
 async function getUserIdByAddress(payload: {
-  referrer_address?: string;
+  referrer_address?: string | null;
 }): Promise<number | undefined> {
   if (payload.referrer_address) {
     const referrer_user = await models.Address.findOne({
@@ -83,7 +83,7 @@ async function recordXpsForQuest(
   user_id: number,
   event_created_at: Date,
   action_metas: Array<z.infer<typeof schemas.QuestActionMeta> | undefined>,
-  creator_address?: string,
+  creator_address?: string | null,
 ) {
   await sequelize.transaction(async (transaction) => {
     const creator_user_id = await getUserIdByAddress({
@@ -224,14 +224,19 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
         const reward_amount = 20;
         const creator_reward_weight = 0.2;
 
-        await recordXpsForEvent(
-          payload.user_id,
-          'SignUpFlowCompleted',
-          payload.created_at!,
-          reward_amount,
-          payload.referrer_address,
-          creator_reward_weight,
-        );
+        const referee_address = await models.Address.findOne({
+          where: { address: payload.address, user_id: payload.user_id },
+        });
+        referee_address &&
+          referee_address.referred_by_address &&
+          (await recordXpsForEvent(
+            payload.user_id,
+            'SignUpFlowCompleted',
+            payload.created_at!,
+            reward_amount,
+            referee_address.referred_by_address,
+            creator_reward_weight,
+          ));
       },
       CommunityCreated: async ({ payload }) => {
         const action_metas = await getQuestActionMetas(

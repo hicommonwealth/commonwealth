@@ -41,4 +41,8 @@
       margin-bottom: 16px;
     }
   }
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }

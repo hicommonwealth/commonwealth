@@ -108,11 +108,14 @@ const start = async () => {
 
       // bootstrap bindings when in dev mode and DEV_MODULITH is true
       if (config.NODE_ENV === 'development' && config.DEV_MODULITH) {
-        const { bootstrapBindings, bootstrapRelayer } = await import(
-          './server/bindings/bootstrap'
-        );
+        const {
+          bootstrapBindings,
+          bootstrapRelayer,
+          bootstrapContestRolloverLoop,
+        } = await import('./server/bindings/bootstrap');
         await bootstrapBindings();
         await bootstrapRelayer();
+        bootstrapContestRolloverLoop();
       }
     })
     .catch((e) => log.error(e.message, e));
