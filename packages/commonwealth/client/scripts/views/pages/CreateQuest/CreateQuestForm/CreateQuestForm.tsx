@@ -36,9 +36,18 @@ const CreateQuestForm = () => {
       onSubmit={handleSubmit}
       onErrors={validateSubForms}
       className="CreateQuestForm"
+      // TODO: remove initial values, only added for quick testing
       initialValues={{
+        name: `Quest-${Math.random()}`,
+        description: `Quest-description-${Math.random()}`,
+        image:
+          // eslint-disable-next-line max-len
+          'https://media.istockphoto.com/id/1973365581/vector/sample-ink-rubber-stamp.jpg?s=612x612&w=0&k=20&c=_m6hNbFtLdulg3LK5LRjJiH6boCb_gcxPvRLytIz0Ws=',
+        reward_amount: '500',
         // TODO: this will be updated via a date/calender selector component in #TODO-TICKET
-        start_date: new Date().toISOString(),
+        start_date: new Date(
+          Date.now() + 2 * 24 * 60 * 60 * 1000,
+        ).toISOString(), // 2 days from now
         end_date: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(), // 5 days from now
       }}
     >
