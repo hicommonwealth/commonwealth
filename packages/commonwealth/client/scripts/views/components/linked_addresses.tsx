@@ -158,7 +158,7 @@ export const LinkedAddresses = (props: LinkedAddressesProps) => {
     ([address, communities]) => {
       const addressInfo = addresses.find((addr) => addr.address === address);
       return {
-        address: addressInfo ? <Address address={addressInfo} /> : null,
+        address: addressInfo ? <Address addressInfo={addressInfo} /> : null,
         communities: (
           <div>
             {communities.map((addr, index) => {
