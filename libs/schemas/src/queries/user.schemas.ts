@@ -99,6 +99,9 @@ export const GetUserAddresses = {
 export const ReferralView = Referral.extend({
   referee_user_id: PG_INT,
   referee_profile: UserProfile,
+  community_id: z.string().nullish(),
+  community_name: z.string().nullish(),
+  community_icon_url: z.string().nullish(),
 });
 
 export const GetUserReferrals = {

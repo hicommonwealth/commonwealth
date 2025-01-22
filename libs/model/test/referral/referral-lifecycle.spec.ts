@@ -134,6 +134,9 @@ describe('Referral lifecycle', () => {
         updated_at: expect.any(Date),
         referee_user_id: nonMember.user.id!,
         referee_profile: { name: 'non-member' },
+        community_id: null,
+        community_name: null,
+        community_icon_url: null,
       },
     ];
 
@@ -192,6 +195,9 @@ describe('Referral lifecycle', () => {
     expectedReferrals[0].namespace_address = namespaceAddress;
     expectedReferrals[0].created_on_chain_timestamp =
       chainEvents1[0].event_payload.block.timestamp;
+    expectedReferrals[0].community_id = community!.id;
+    expectedReferrals[0].community_name = community!.name;
+    expectedReferrals[0].community_icon_url = community!.icon_url;
 
     // get referrals again with tx attributes
     const referrals2 = await query(GetUserReferrals(), {
