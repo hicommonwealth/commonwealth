@@ -17,6 +17,7 @@ const MobileNavigation = () => {
   const location = useLocation();
   const user = useUserStore();
   const newMobileNav = useFlag('newMobileNav');
+  const rewardsEnabled = useFlag('rewardsPage');
 
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
@@ -53,6 +54,15 @@ const MobileNavigation = () => {
             type: 'notifications' as const,
             onClick: () => navigate('/notifications', {}, null),
             selected: !!matchesNotifications,
+          },
+        ]
+      : []),
+    ...(user.isLoggedIn && rewardsEnabled
+      ? [
+          {
+            type: 'rewards' as const,
+            onClick: () => navigate('/rewards', {}, null),
+            selected: !!matchRoutes([{ path: '/rewards' }], location),
           },
         ]
       : []),

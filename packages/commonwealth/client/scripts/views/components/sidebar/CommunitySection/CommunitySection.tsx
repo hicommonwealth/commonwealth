@@ -1,11 +1,14 @@
-import { TokenView } from '@hicommonwealth/schemas';
 import { PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
+import NewProfile from 'client/scripts/models/NewProfile';
+import { useFetchProfileByIdQuery } from 'client/scripts/state/api/profiles';
+import { useAuthModalStore } from 'client/scripts/state/ui/modals';
+import { AuthModalType } from 'client/scripts/views/modals/AuthModal';
+import { PageNotFound } from 'client/scripts/views/pages/404';
 import { findDenominationString } from 'helpers/findDenomination';
 import { useFlag } from 'hooks/useFlag';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import app from 'state';
 import { useFetchCustomDomainQuery } from 'state/api/configuration';
-import { useGetTokenByCommunityId } from 'state/api/tokens';
 import { useCommunityAlertsQuery } from 'state/api/trpc/subscription/useCommunityAlertsQuery';
 import useUserStore from 'state/ui/user';
 import {
@@ -18,7 +21,6 @@ import { getUniqueTopicIdsIncludedInActiveContest } from 'views/components/sideb
 import { SubscriptionButton } from 'views/components/subscription_button';
 import ManageCommunityStakeModal from 'views/modals/ManageCommunityStakeModal/ManageCommunityStakeModal';
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
-import { z } from 'zod';
 import useManageCommunityStakeModalStore from '../../../../state/ui/modals/manageCommunityStakeModal';
 import Permissions from '../../../../utils/Permissions';
 import AccountConnectionIndicator from '../AccountConnectionIndicator';
@@ -30,16 +32,32 @@ import { ExternalLinksModule } from '../external_links_module';
 import { GovernanceSection } from '../governance_section';
 import './CommunitySection.scss';
 import { CommunitySectionSkeleton } from './CommunitySectionSkeleton';
+import ProfileCard from './ProfileCard';
 import { TokenTradeWidget } from './TokenTradeWidget';
 
 interface CommunitySectionProps {
   showSkeleton: boolean;
+  isInsideCommunity?: boolean;
 }
 
-export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
-  const tokenizedCommunityEnabled = useFlag('tokenizedCommunity');
+enum ProfileError {
+  None,
+  NoProfileFound,
+}
+
+export const CommunitySection = ({
+  showSkeleton,
+  isInsideCommunity,
+}: CommunitySectionProps) => {
+  const launchpadEnabled = useFlag('launchpad');
+  const uniswapTradeEnabled = useFlag('uniswapTrade');
+  const [profile, setProfile] = useState<NewProfile>();
+  const [errorCode, setErrorCode] = useState<ProfileError>(ProfileError.None);
+
+  const { setAuthModalType } = useAuthModalStore();
 
   const user = useUserStore();
+
   const {
     selectedAddress,
     modeOfManageCommunityStakeModal,
@@ -62,14 +80,6 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
 
   const { data: domain } = useFetchCustomDomainQuery();
 
-  const communityId = app.activeChainId() || '';
-  const { data: communityToken, isLoading: isLoadingToken } =
-    useGetTokenByCommunityId({
-      community_id: communityId,
-      with_stats: true,
-      enabled: !!communityId,
-    });
-
   const topicIdsIncludedInContest = getUniqueTopicIdsIncludedInActiveContest(
     contestsData.all,
   );
@@ -78,8 +88,43 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
     enabled: user.isLoggedIn && !!app.chain,
   }).data;
 
+  const {
+    data,
+    isLoading: isLoadingProfile,
+    error,
+    refetch,
+  } = useFetchProfileByIdQuery({
+    apiCallEnabled: user.isLoggedIn,
+    userId: user.id,
+  });
+  const communityId = app.activeChainId() || '';
+
+  useEffect(() => {
+    if (isLoadingProfile) return;
+
+    if (error) {
+      setErrorCode(ProfileError.NoProfileFound);
+      setProfile(undefined);
+      return;
+    }
+
+    if (data) {
+      setProfile(
+        new NewProfile({
+          ...data.profile,
+          userId: data.userId,
+          isOwner: data.userId === user.id,
+        }),
+      );
+      return;
+    }
+  }, [data, isLoadingProfile, error, user.id, communityId]);
+
   if (showSkeleton || isLoading || isContestDataLoading)
     return <CommunitySectionSkeleton />;
+
+  if (errorCode === ProfileError.NoProfileFound)
+    return <PageNotFound message="We cannot find this profile." />;
 
   const isAdmin =
     Permissions.isSiteAdmin() ||
@@ -89,11 +134,23 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
   return (
     <>
       <div className="community-menu">
+        {user.isLoggedIn && <ProfileCard />}
         {user.isLoggedIn && (
           <>
             <AccountConnectionIndicator
               connected={!!user.activeAccount}
               address={user.activeAccount?.address || ''}
+              onAuthModalOpen={(modalType) =>
+                setAuthModalType(modalType || AuthModalType.SignIn)
+              }
+              addresses={user.addresses.filter(
+                (addr) => addr.community.id === communityId,
+              )}
+              profile={profile}
+              refreshProfiles={() => {
+                refetch().catch(console.error);
+              }}
+              isInsideCommunity={isInsideCommunity}
             />
 
             {stakeEnabled && (
@@ -108,21 +165,9 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
           </>
         )}
 
-        {tokenizedCommunityEnabled && communityToken && (
-          <TokenTradeWidget
-            showSkeleton={isLoadingToken}
-            token={communityToken as z.infer<typeof TokenView>}
-          />
-        )}
+        {(launchpadEnabled || uniswapTradeEnabled) && <TokenTradeWidget />}
 
         <CreateCommunityButton />
-
-        {isAdmin && (
-          <>
-            <CWDivider />
-            <AdminSection />
-          </>
-        )}
 
         <CWDivider />
         <DiscussionSection
@@ -130,6 +175,12 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
           topicIdsIncludedInContest={topicIdsIncludedInContest}
         />
         <CWDivider />
+        {isAdmin && (
+          <>
+            <AdminSection />
+            <CWDivider />
+          </>
+        )}
         <GovernanceSection isContestAvailable={isContestAvailable} />
         <CWDivider />
         <DirectoryMenuItem />

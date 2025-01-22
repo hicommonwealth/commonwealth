@@ -9,6 +9,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { config } from '../../config';
 import { models } from '../../database';
 import { LaunchpadTokenInstance } from '../../models/token';
+import { compressServerImage } from '../../utils/imageCompression';
 
 type TokenIdea = {
   name: string;
@@ -134,9 +135,9 @@ const generateTokenIdea = async function* ({
 
     // generate image url and send the generated url to the client (to save time on s3 upload)
     const imageResponse = await openai.images.generate({
-      model: 'dall-e-3',
       prompt: TOKEN_AI_PROMPTS_CONFIG.image(tokenIdea.name, tokenIdea.symbol),
-      size: '512x512',
+      size: '1024x1024',
+      model: 'dall-e-3',
       n: 1,
       response_format: 'url',
     });
@@ -146,10 +147,11 @@ const generateTokenIdea = async function* ({
     // upload image to s3 and then send finalized imageURL
     const resp = await fetch(tokenIdea.imageURL);
     const buffer = await resp.buffer();
+    const compressedBuffer = await compressServerImage(buffer);
     const { url } = await blobStorage().upload({
       key: `${uuidv4()}.png`,
       bucket: 'assets',
-      content: buffer,
+      content: compressedBuffer,
       contentType: 'image/png',
     });
     tokenIdea.imageURL = url;

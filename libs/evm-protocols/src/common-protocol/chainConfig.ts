@@ -10,6 +10,7 @@ export enum ValidChains {
   Arbitrum = 42161,
   BSC = 56,
   SKALE_TEST = 974399131,
+  Anvil = 31337,
 }
 
 /**
@@ -24,6 +25,8 @@ export function isValidChain(chainId: number): chainId is ValidChains {
 export const STAKE_ID = 2;
 export const CONTEST_VOTER_SHARE = 0;
 export const CONTEST_FEE_SHARE = 100;
+export const CREATE_CONTEST_TOPIC =
+  '0x990f533044dbc89b838acde9cd2c72c400999871cf8f792d731edcae15ead693';
 
 type factoryContractsType = {
   [key in ValidChains]: {
@@ -32,6 +35,7 @@ type factoryContractsType = {
     launchpad?: string;
     lpBondingCurve?: string;
     tokenCommunityManager?: string;
+    referralFeeManager?: string;
     chainId: number;
   };
 };
@@ -50,6 +54,7 @@ export const factoryContracts = {
     launchpad: '0xc6e7B0AdDf35AE4a5A65bb3bCb78D11Db6c8fB8F',
     lpBondingCurve: '0x2ECc0af0e4794F0Ab4797549a5a8cf97688D7D21',
     tokenCommunityManager: '0xC8fe1F23AbC4Eb55f4aa9E52dAFa3761111CF03a',
+    referralFeeManager: '0xdc07fEaf01666B7f5dED2F59D895543Ed3FAE1cA',
     chainId: 84532,
   },
   [ValidChains.Blast]: {
@@ -91,5 +96,13 @@ export const factoryContracts = {
     factory: '0x16da329328d9816b5e68D96Ec5944D939ed9727E',
     communityStake: '0xC49eEcf7af055c4dfA3E918662D9BbAC45544BD6',
     chainId: 974399131,
+  },
+  [ValidChains.Anvil]: {
+    factory: '0xc6e7DF5E7b4f2A278906862b61205850344D4e7d', //TODO: Double check this address
+    communityStake: '0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9', //TODO: Double check this address
+    launchpad: '0x7a2088a1bFc9d81c55368AE168C2C02570cB814F',
+    lpBondingCurve: '0xDC17C27Ae8bE831AF07CC38C02930007060020F4',
+    tokenCommunityManager: '0x84eA74d481Ee0A5332c457a4d796187F6Ba67fEB',
+    chainId: 31337,
   },
 } as const satisfies factoryContractsType;

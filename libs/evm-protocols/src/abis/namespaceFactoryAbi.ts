@@ -51,6 +51,49 @@ export const namespaceFactoryAbi = [
     inputs: [
       {
         indexed: false,
+        internalType: 'address',
+        name: 'namespaceAdress',
+        type: 'address',
+      },
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'feeManager',
+        type: 'address',
+      },
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'referrer',
+        type: 'address',
+      },
+      {
+        indexed: false,
+        internalType: 'address',
+        name: 'referralFeeManager',
+        type: 'address',
+      },
+      {
+        indexed: false,
+        internalType: 'bytes',
+        name: 'signature',
+        type: 'bytes',
+      },
+      {
+        indexed: false,
+        internalType: 'address',
+        name: 'namespaceDeployer',
+        type: 'address',
+      },
+    ],
+    name: 'DeployedNamespaceWithReferral',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
         internalType: 'uint64',
         name: 'version',
         type: 'uint64',

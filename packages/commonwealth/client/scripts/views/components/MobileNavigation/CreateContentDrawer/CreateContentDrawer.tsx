@@ -20,7 +20,7 @@ const CreateContentDrawer = ({ onClose }: CreateContentDrawerProps) => {
   const user = useUserStore();
   const scopedPage = app.activeChainId();
 
-  const tokenizedCommunityEnabled = useFlag('tokenizedCommunity');
+  const launchpadEnabled = useFlag('launchpad');
 
   const handleCreateThread = () => {
     navigate('/new/discussion');
@@ -58,7 +58,7 @@ const CreateContentDrawer = ({ onClose }: CreateContentDrawerProps) => {
           <CWIcon iconName="peopleNew" />
           <CWText>Create community</CWText>
         </div>
-        {tokenizedCommunityEnabled && (
+        {launchpadEnabled && (
           <div className="item" onClick={handleCreateTokenCommunity}>
             <CWIcon iconName="rocketLaunch" />
             <CWText>Launch Token</CWText>

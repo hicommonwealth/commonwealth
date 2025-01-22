@@ -1,42 +1,63 @@
 import { Projection } from '@hicommonwealth/core';
 import { events } from '@hicommonwealth/schemas';
 import { models } from '../database';
-import { getReferrerId } from '../utils/referrals';
 
 const inputs = {
   CommunityCreated: events.CommunityCreated,
-  SignUpFlowCompleted: events.SignUpFlowCompleted,
 };
+
+async function setReferral(
+  user_id: number,
+  community_id: string,
+  referrer_address: string,
+) {
+  const referee = await models.Address.findOne({
+    where: { user_id, community_id },
+    attributes: ['id', 'address'],
+  });
+  if (!referee) return;
+
+  await models.sequelize.transaction(async (transaction) => {
+    await models.Referral.findOrCreate({
+      where: { referee_address: referee.address, referrer_address },
+      defaults: {
+        referee_address: referee.address,
+        referrer_address,
+        referrer_received_eth_amount: 0,
+      },
+      transaction,
+    });
+
+    // increment the referral count of referrer in this community
+    const referrer = await models.User.findOne({
+      include: [
+        {
+          model: models.Address,
+          where: { address: referrer_address },
+        },
+      ],
+      transaction,
+    });
+    referrer &&
+      (await referrer.update(
+        {
+          referral_count: models.sequelize.literal(
+            'coalesce(referral_count, 0) + 1',
+          ),
+        },
+        { transaction },
+      ));
+  });
+}
 
 export function UserReferrals(): Projection<typeof inputs> {
   return {
     inputs,
     body: {
       CommunityCreated: async ({ payload }) => {
-        const referral_link = payload.referral_link;
-        const referrer_id = getReferrerId(referral_link);
-        if (referrer_id) {
-          await models.Referral.create({
-            referrer_id,
-            referee_id: payload.user_id,
-            event_name: 'CommunityCreated',
-            event_payload: payload,
-            created_at: new Date(),
-          });
-        }
-      },
-      SignUpFlowCompleted: async ({ payload }) => {
-        const referral_link = payload.referral_link;
-        const referrer_id = getReferrerId(referral_link);
-        if (referrer_id) {
-          await models.Referral.create({
-            referrer_id,
-            referee_id: payload.user_id,
-            event_name: 'SignUpFlowCompleted',
-            event_payload: payload,
-            created_at: new Date(),
-          });
-        }
+        const { user_id, community_id, referrer_address } = payload;
+        if (!referrer_address) return;
+        await setReferral(user_id, community_id, referrer_address);
       },
     },
   };

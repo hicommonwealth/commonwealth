@@ -18,6 +18,7 @@ export enum RascalSubscriptions {
   ContestWorkerPolicy = BrokerSubscriptions.ContestWorkerPolicy,
   ContestProjection = BrokerSubscriptions.ContestProjection,
   XpProjection = BrokerSubscriptions.XpProjection,
+  UserReferrals = BrokerSubscriptions.UserReferrals,
   FarcasterWorkerPolicy = BrokerSubscriptions.FarcasterWorkerPolicy,
 }
 
@@ -35,6 +36,7 @@ export enum RascalQueues {
   ContestWorkerPolicy = 'ContestWorkerPolicyQueue',
   ContestProjection = 'ContestProjection',
   XpProjection = 'XpProjection',
+  UserReferrals = 'UserReferrals',
   FarcasterWorkerPolicy = 'FarcasterWorkerPolicyQueue',
 }
 
@@ -47,6 +49,7 @@ export enum RascalBindings {
   ContestWorkerPolicy = 'ContestWorkerPolicy',
   ContestProjection = 'ContestProjection',
   XpProjection = 'XpProjection',
+  UserReferrals = 'UserReferrals',
   FarcasterWorkerPolicy = 'FarcasterWorkerPolicy',
 }
 
@@ -83,11 +86,13 @@ export enum RascalRoutingKeys {
   XpProjectionSignUpFlowCompleted = EventNames.SignUpFlowCompleted,
   XpProjectionCommunityCreated = EventNames.CommunityCreated,
   XpProjectionCommunityJoined = EventNames.CommunityJoined,
-  XpProjectionThreadCreated = `${EventNames.ThreadCreated}.${RoutingKeyTags.Contest}.#`,
-  XpProjectionThreadUpvoted = `${EventNames.ThreadUpvoted}.${RoutingKeyTags.Contest}.#`,
+  XpProjectionThreadCreated = `${EventNames.ThreadCreated}.#`,
+  XpProjectionThreadUpvoted = `${EventNames.ThreadUpvoted}.#`,
   XpProjectionCommentCreated = EventNames.CommentCreated,
   XpProjectionCommentUpvoted = EventNames.CommentUpvoted,
   XpProjectionUserMentioned = EventNames.UserMentioned,
+
+  UserReferralsCommunityCreated = EventNames.CommunityCreated,
 
   FarcasterWorkerPolicyCastCreated = EventNames.FarcasterCastCreated,
   FarcasterWorkerPolicyReplyCastCreated = EventNames.FarcasterReplyCastCreated,

@@ -1,5 +1,6 @@
 import clsx from 'clsx';
 import useBrowserWindow from 'hooks/useBrowserWindow';
+import { useFlag } from 'hooks/useFlag';
 import useWindowResize from 'hooks/useWindowResize';
 import React, { useEffect, useState } from 'react';
 import { matchRoutes, useLocation } from 'react-router-dom';
@@ -7,7 +8,7 @@ import app from 'state';
 import useSidebarStore from 'state/ui/sidebar';
 import { SublayoutHeader } from 'views/components/SublayoutHeader';
 import { Sidebar } from 'views/components/sidebar';
-import twitterspaceGrowlImage from '../../assets/img/TwitterspaceGrowlImage.png';
+import farcasterContestImage from '../../assets/img/farcasterContestImage.png';
 import { useHandleInviteLink } from '../hooks/useHandleInviteLink';
 import useNecessaryEffect from '../hooks/useNecessaryEffect';
 import useStickyHeader from '../hooks/useStickyHeader';
@@ -23,9 +24,8 @@ import { AdminOnboardingSlider } from './components/AdminOnboardingSlider';
 import { Breadcrumbs } from './components/Breadcrumbs';
 import MobileNavigation from './components/MobileNavigation';
 import AuthButtons from './components/SublayoutHeader/AuthButtons';
-import { CWGrowlTemplate } from './components/SublayoutHeader/GrowlTemplate/CWGrowlTemplate';
+import { CWGrowlTemplate } from './components/SublayoutHeader/GrowlTemplate';
 import useJoinCommunity from './components/SublayoutHeader/useJoinCommunity';
-import { UserTrainingSlider } from './components/UserTrainingSlider';
 import { CWModal } from './components/component_kit/new_designs/CWModal';
 import CollapsableSidebarButton from './components/sidebar/CollapsableSidebarButton';
 import { AuthModal, AuthModalType } from './modals/AuthModal';
@@ -41,6 +41,7 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
   const { menuVisible, setMenu, menuName } = useSidebarStore();
   const [resizing, setResizing] = useState(false);
   const { JoinCommunityModals, handleJoinCommunity } = useJoinCommunity();
+  const growlEnabled = useFlag('growl');
 
   const location = useLocation();
 
@@ -107,11 +108,6 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
       { path: '/archived' },
       { path: ':scope/archived' },
     ],
-    location,
-  );
-
-  const routesWithUserOnboardingSlider = matchRoutes(
-    [{ path: '/dashboard/for-you' }, { path: '/dashboard/global' }],
     location,
   );
 
@@ -190,22 +186,26 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
               />
             </div>
             {!routesWithoutGenericBreadcrumbs && <Breadcrumbs />}
-            {routesWithUserOnboardingSlider && <UserTrainingSlider />}
+
             {isInsideCommunity && !routesWithoutGenericSliders && (
               <AdminOnboardingSlider />
             )}
             {children}
           </div>
-          <CWGrowlTemplate
-            growlType="twitterspace"
-            growlImage={twitterspaceGrowlImage}
-            headerText="Livestream with How To DAO this Thursday!"
-            bodyText="Join Dillon Chen (Common CEO) and Kevin Owocki (Gitcoin Co-Founder) on 12/19 at 11am ET to
-            shape the future of digital collaboration and community building"
-            buttonText="Reserve Your Spot!"
-            buttonLink="https://lu.ma/8nk6j7n4"
-            extraText='Exclusive bundle offer: "How To DAO" book + more!'
-          />
+          {/* Growl should be added here when in place*/}
+          {growlEnabled && (
+            <CWGrowlTemplate
+              headerText="Launch Contests On Farcaster!"
+              bodyText="You can now host contests directly on Farcaster to reach and engage your followers.
+            They can submit entries,
+            vote for their favorites, and earn rewards, all without leaving the page."
+              buttonText="Enter $MOCHI Contest"
+              buttonLink="https://www.google.com/"
+              growlType="farcasterContest"
+              growlImage={farcasterContestImage}
+              extraText="Enter the first Farcaster Contest hosted by our friends at Mochi"
+            />
+          )}
         </div>
         <WelcomeOnboardModal
           isOpen={isWelcomeOnboardModalOpen}

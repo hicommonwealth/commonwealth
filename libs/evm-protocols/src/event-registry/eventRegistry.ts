@@ -7,6 +7,7 @@ import {
   tokenCommunityManagerAbi,
 } from '../abis';
 import { recurringContestAbi } from '../abis/recurringContestAbi';
+import { referralFeeManager } from '../abis/referralFeeManager';
 import { ValidChains, factoryContracts } from '../common-protocol';
 import { EvmEventSignature, EvmEventSignatures } from './eventSignatures';
 
@@ -27,6 +28,11 @@ type ContractAddresses = {
     | (key extends keyof typeof factoryContracts
         ? 'tokenCommunityManager' extends keyof (typeof factoryContracts)[key]
           ? (typeof factoryContracts)[key]['tokenCommunityManager']
+          : never
+        : never)
+    | (key extends keyof typeof factoryContracts
+        ? 'referralFeeManager' extends keyof (typeof factoryContracts)[key]
+          ? (typeof factoryContracts)[key]['referralFeeManager']
           : never
         : never);
 };
@@ -62,6 +68,7 @@ const namespaceFactorySource = {
   eventSignatures: [
     EvmEventSignatures.NamespaceFactory.ContestManagerDeployed,
     EvmEventSignatures.NamespaceFactory.NamespaceDeployed,
+    EvmEventSignatures.NamespaceFactory.NamespaceDeployedWithReferral,
   ],
   childContracts: {
     [ChildContractNames.RecurringContest]: {
@@ -103,6 +110,14 @@ const tokenCommunityManagerSource: ContractSource = {
   eventSignatures: [],
 } satisfies ContractSource;
 
+const referralFeeManagerSource: ContractSource = {
+  abi: referralFeeManager,
+  eventSignatures: [
+    EvmEventSignatures.Referrals.ReferralSet,
+    EvmEventSignatures.Referrals.FeeDistributed,
+  ],
+};
+
 /**
  * Note that this object does not contain details for contracts deployed by users
  * at runtime. Those contracts remain in the EvmEventSources table.
@@ -121,6 +136,8 @@ export const EventRegistry = {
       lpBondingCurveSource,
     [factoryContracts[ValidChains.SepoliaBase].tokenCommunityManager]:
       tokenCommunityManagerSource,
+    [factoryContracts[ValidChains.SepoliaBase].referralFeeManager]:
+      referralFeeManagerSource,
   },
   [ValidChains.Sepolia]: {
     [factoryContracts[ValidChains.Sepolia].factory]: namespaceFactorySource,
@@ -158,5 +175,13 @@ export const EventRegistry = {
     [factoryContracts[ValidChains.SKALE_TEST].factory]: namespaceFactorySource,
     [factoryContracts[ValidChains.SKALE_TEST].communityStake]:
       communityStakesSource,
+  },
+  [ValidChains.Anvil]: {
+    [factoryContracts[ValidChains.Anvil].factory]: namespaceFactorySource,
+    [factoryContracts[ValidChains.Anvil].communityStake]: communityStakesSource,
+    [factoryContracts[ValidChains.Anvil].launchpad]: launchpadSource,
+    [factoryContracts[ValidChains.Anvil].lpBondingCurve]: lpBondingCurveSource,
+    [factoryContracts[ValidChains.Anvil].tokenCommunityManager]:
+      tokenCommunityManagerSource,
   },
 } as const satisfies EventRegistryType;

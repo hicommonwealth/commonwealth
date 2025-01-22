@@ -18,7 +18,7 @@ import { z } from 'zod';
 import useAppStatus from '../hooks/useAppStatus';
 import useNecessaryEffect from '../hooks/useNecessaryEffect';
 import { useGetCommunityByIdQuery } from '../state/api/communities';
-import { useUpdateUserActiveCommunityMutation } from '../state/api/user';
+import { useSelectCommunityMutation } from '../state/api/communities/selectCommunity';
 import './Layout.scss';
 import SubLayout from './Sublayout';
 import MetaTags from './components/MetaTags';
@@ -56,8 +56,7 @@ const LayoutComponent = ({
   const [communityToLoad, setCommunityToLoad] = useState<string>();
   const [isLoading, setIsLoading] = useState<boolean>();
 
-  const { mutateAsync: updateActiveCommunity } =
-    useUpdateUserActiveCommunityMutation();
+  const { mutateAsync: selectCommunity } = useSelectCommunityMutation();
   const { data: configurationData } = useFetchConfigurationQuery();
 
   const { isAddedToHomeScreen } = useAppStatus();
@@ -111,10 +110,7 @@ const LayoutComponent = ({
         if (await loadCommunityChainInfo(communityFromTRPCResponse)) {
           // Update default community on server and app, if logged in
           if (user.isLoggedIn) {
-            await updateActiveCommunity({
-              communityId: community?.id || '',
-            });
-
+            await selectCommunity({ community_id: community?.id || '' });
             user.setData({
               activeCommunity: communityFromTRPCResponse,
             });

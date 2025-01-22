@@ -47,7 +47,6 @@ const App = () => {
                   )}
                 </>
               )}
-
               <ToastContainer />
               {import.meta.env.DEV && <ReactQueryDevtools />}
             </OpenFeatureProvider>

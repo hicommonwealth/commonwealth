@@ -114,7 +114,6 @@ export function JoinCommunity(): Command<typeof schemas.JoinCommunity> {
               event_payload: {
                 community_id,
                 user_id: actor.user.id!,
-                referral_link: payload.referral_link,
                 created_at: created.created_at!,
               },
             },

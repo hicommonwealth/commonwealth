@@ -77,7 +77,9 @@ const start = async () => {
   await main(app, models, {
     port: config.PORT,
     withLoggingMiddleware: true,
-    withPrerender: config.APP_ENV === 'production' && !config.NO_PRERENDER,
+    withPrerender:
+      (config.APP_ENV === 'production' || config.APP_ENV === 'frick') &&
+      !!config.PRERENDER_TOKEN,
   })
     .then(async () => {
       isServiceHealthy = true;
@@ -89,7 +91,11 @@ const start = async () => {
       }
 
       // checking the DYNO env var ensures this only runs on one dyno
-      if (config.APP_ENV === 'production' && process.env.DYNO === 'web.1') {
+      if (
+        config.APP_ENV === 'production' &&
+        process.env.DYNO === 'web.1' &&
+        config.ENABLE_CLIENT_PUBLISHING
+      ) {
         const { dispatchSDKPublishWorkflow } = await import(
           './server/util/dispatchSDKPublishWorkflow'
         );
@@ -102,11 +108,14 @@ const start = async () => {
 
       // bootstrap bindings when in dev mode and DEV_MODULITH is true
       if (config.NODE_ENV === 'development' && config.DEV_MODULITH) {
-        const { bootstrapBindings, bootstrapRelayer } = await import(
-          './server/bindings/bootstrap'
-        );
+        const {
+          bootstrapBindings,
+          bootstrapRelayer,
+          bootstrapContestRolloverLoop,
+        } = await import('./server/bindings/bootstrap');
         await bootstrapBindings();
         await bootstrapRelayer();
+        bootstrapContestRolloverLoop();
       }
     })
     .catch((e) => log.error(e.message, e));

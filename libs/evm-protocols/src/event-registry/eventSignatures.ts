@@ -17,6 +17,8 @@ export const EvmEventSignatures = {
   NamespaceFactory: {
     NamespaceDeployed:
       '0x8870ba2202802ce285ce6bead5ac915b6dc2d35c8a9d6f96fa56de9de12829d5',
+    NamespaceDeployedWithReferral:
+      '0x2f5d04158abd2b403eb3b099bf1257e7949197015ef7d19db38b2c45f9e0d164',
     ContestManagerDeployed:
       '0x990f533044dbc89b838acde9cd2c72c400999871cf8f792d731edcae15ead693',
     CommunityNamespaceCreated:
@@ -39,10 +41,16 @@ export const EvmEventSignatures = {
   },
   Launchpad: {
     TokenLaunched:
-      '0xd7ca5dc2f8c6bb37c3a4de2a81499b25f8ca8bbb3082010244fe747077d0f6cc',
+      '0xacba89c290ec5301484c0453f480dc9b83ab3a739c6b6e345ecd1b0525787d23',
     Trade: '0x9adcf0ad0cda63c4d50f26a48925cf6405df27d422a39c456b5f03f661c82982',
     TokenRegistered:
       '0xc2fe88a1a3c1957424571593960b97f158a519d0aa4cef9e13a247c64f1f4c35',
+  },
+  Referrals: {
+    ReferralSet:
+      '0xdf63218877cb126f6c003f2b7f77327674cd6a0b53ad51deac392548ec12b0ed',
+    FeeDistributed:
+      '0xadecf9f6e10f953395058158f0e6e399835cf1d045bbed7ecfa82947ecc0a368',
   },
 } as const;
 

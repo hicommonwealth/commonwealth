@@ -52,8 +52,13 @@ export const User = z.object({
   is_welcome_onboard_flow_complete: z.boolean().default(false).optional(),
 
   profile: UserProfile,
+  unsubscribe_uuid: z.string().uuid().nullish(),
+  referred_by_address: z.string().max(255).nullish(),
+  referral_count: PG_INT.default(0)
+    .nullish()
+    .describe('Number of referrals that have earned ETH'),
+  referral_eth_earnings: z.number().optional(),
   xp_points: PG_INT.default(0).nullish(),
-  referral_link: z.string().nullish(),
 
   ProfileTags: z.array(ProfileTags).optional(),
   ApiKey: ApiKey.optional(),
@@ -79,7 +84,7 @@ export const Address = z.object({
   is_banned: z.boolean().default(false),
   hex: z.string().max(64).nullish(),
 
-  User: User.optional(),
+  User: User.optional().nullish(),
 
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional(),
@@ -110,4 +115,13 @@ export const CommunityMember = z.object({
   ),
   group_ids: z.array(PG_INT),
   last_active: z.any().nullish().describe('string or date'),
+  referred_by: z
+    .object({
+      user_id: PG_INT,
+      profile_name: z.string().nullish(),
+      avatar_url: z.string().nullish(),
+    })
+    .nullish(),
+  referral_count: PG_INT.default(0).nullish(),
+  referral_eth_earnings: z.number().nullish(),
 });

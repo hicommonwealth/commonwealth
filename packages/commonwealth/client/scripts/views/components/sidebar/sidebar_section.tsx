@@ -14,7 +14,7 @@ import type {
 } from './types';
 
 const SubSection = (props: SubSectionAttrs) => {
-  const { isActive, isUpdated, isVisible, onClick, rightIcon, rowIcon, title } =
+  const { isActive, isUpdated, isVisible, onClick, leftIcon, rowIcon, title } =
     props;
 
   if (!isVisible) {
@@ -42,9 +42,7 @@ const SubSection = (props: SubSectionAttrs) => {
       <div className={titleTextClass} title={title}>
         {title}
       </div>
-      {isNotUndefined(rightIcon) && (
-        <div className="right-icon">{rightIcon}</div>
-      )}
+      {isNotUndefined(leftIcon) && <div className="left-icon">{leftIcon}</div>}
     </div>
   );
 };
@@ -59,7 +57,7 @@ export const SubSectionGroup = (props: SectionGroupAttrs) => {
     isUpdated,
     isVisible,
     onClick,
-    rightIcon,
+    leftIcon,
     title,
     className,
   } = props;
@@ -137,10 +135,10 @@ export const SubSectionGroup = (props: SectionGroupAttrs) => {
         ) : (
           <div className="no-carat" />
         )}
+        <div className="left-icon">{leftIcon}</div>
         <CWText type="b2" className={`title-text ${titleTextClass}`}>
           {title}
         </CWText>
-        <div className="right-icon">{rightIcon}</div>
       </div>
       {containsChildren && toggled && (
         <div className="subsections">

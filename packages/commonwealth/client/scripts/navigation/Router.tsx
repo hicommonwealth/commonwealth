@@ -13,19 +13,16 @@ import CommonDomainRoutes from './CommonDomainRoutes';
 import GeneralRoutes from './GeneralRoutes';
 
 export type RouteFeatureFlags = {
-  tokenizedCommunityEnabled: boolean;
+  launchpadEnabled: boolean;
 };
 
 const Router = () => {
   const client = OpenFeature.getClient();
 
-  const tokenizedCommunityEnabled = client.getBooleanValue(
-    'tokenizedCommunity',
-    false,
-  );
+  const launchpadEnabled = client.getBooleanValue('launchpad', false);
 
   const flags = {
-    tokenizedCommunityEnabled,
+    launchpadEnabled,
   };
 
   const { isCustomDomain } = fetchCachedCustomDomain() || {};

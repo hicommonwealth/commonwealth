@@ -1,8 +1,4 @@
-import {
-  currencyNameToSymbolMap,
-  currencySymbolPlacements,
-  getAmountWithCurrencySymbol,
-} from 'helpers/currency';
+import { getAmountWithCurrencySymbol } from 'helpers/currency';
 import React from 'react';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -15,17 +11,12 @@ import './AmountSelections.scss';
 const BuyAmountSelection = ({ trading }: BuyAmountSelectionProps) => {
   const baseCurrencyName = trading.amounts.buy.invest.baseCurrency.name;
 
-  const buyAmountCurrenySymbol = (
-    <CWText className="amount-symbol">
-      {currencyNameToSymbolMap[baseCurrencyName]}
-    </CWText>
-  );
-
   return (
     <div className="AmountSelections">
       <div className="amount-input-with-currency-symbol">
-        {currencySymbolPlacements.onLeft.includes(baseCurrencyName) &&
-          buyAmountCurrenySymbol}
+        <CWText className="amount-symbol">
+          <CWIcon iconName="ethereum" iconSize="medium" /> {baseCurrencyName}
+        </CWText>
         <CWTextInput
           containerClassName="amount-input"
           placeholder="0"
@@ -34,14 +25,10 @@ const BuyAmountSelection = ({ trading }: BuyAmountSelectionProps) => {
             trading.amounts.buy.invest.baseCurrency.onAmountChange(e)
           }
         />
-        {currencySymbolPlacements.onRight.includes(baseCurrencyName) &&
-          buyAmountCurrenySymbol}
       </div>
 
       <CWText type="caption" className="invest-to-gain-amounts">
-        <CWIcon iconName="ethereum" iconSize="small" />
-        {trading.amounts.buy.invest.baseCurrency.toEth} ETH =
-        {trading.token.icon_url && <TokenIcon url={trading.token.icon_url} />}
+        = {trading.token.icon_url && <TokenIcon url={trading.token.icon_url} />}
         {trading.amounts.buy.gain.token} {trading.token.symbol}
       </CWText>
 
@@ -54,7 +41,7 @@ const BuyAmountSelection = ({ trading }: BuyAmountSelectionProps) => {
                 type="amount"
                 label={getAmountWithCurrencySymbol(
                   presetAmount as number,
-                  baseCurrencyName,
+                  trading.amounts.buy.invest.ethBuyCurrency,
                 )}
                 onClick={() =>
                   trading.amounts.buy.invest.baseCurrency.onAmountChange(
