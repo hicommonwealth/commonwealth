@@ -36,15 +36,8 @@ const CreateQuestForm = () => {
       onSubmit={handleSubmit}
       onErrors={validateSubForms}
       className="CreateQuestForm"
-      // TODO: remove initial values, only added for quick testing
       initialValues={{
-        name: `Quest-${Math.random()}`,
-        description: `Quest-description-${Math.random()}`,
-        image:
-          // eslint-disable-next-line max-len
-          'https://media.istockphoto.com/id/1973365581/vector/sample-ink-rubber-stamp.jpg?s=612x612&w=0&k=20&c=_m6hNbFtLdulg3LK5LRjJiH6boCb_gcxPvRLytIz0Ws=',
-        reward_amount: '500',
-        // TODO: this will be updated via a date/calender selector component in #TODO-TICKET
+        // TODO: this will be updated via a date/calender selector component in #10674
         start_date: new Date(
           Date.now() + 2 * 24 * 60 * 60 * 1000,
         ).toISOString(), // 2 days from now
@@ -74,7 +67,7 @@ const CreateQuestForm = () => {
             checked
           />
         </div>
-        {/* TODO: need a proper input for dates */}
+        {/* TODO: proper component for picking dates in #10674 */}
         <CWTextInput
           label="Start Date"
           placeholder="TODO"

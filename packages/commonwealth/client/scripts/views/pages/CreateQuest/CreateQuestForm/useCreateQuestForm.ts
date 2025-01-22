@@ -40,19 +40,13 @@ const useCreateQuestForm = () => {
 
     const handleAsync = async () => {
       try {
-        console.log('submit values => ', {
-          ...values,
-          subForms: questActionSubForms.map((f) => f.values),
-        });
-
         const quest = await createQuest({
-          community_id: 'dydx', // TBD: do we need this if super admin is creating quest?,
-          // adding sample community for now
+          community_id: 'dydx', // TODO: API logic will update in #10673 to not require community id
           description: values.description.trim(),
           end_date: new Date(values.end_date),
           start_date: new Date(values.start_date),
           name: values.name.trim(),
-          // TODO: add image support
+          // TODO: add image support in api (needs ticketing).
         });
 
         if (quest && quest.id && quest.community_id) {

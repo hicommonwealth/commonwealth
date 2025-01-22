@@ -7,7 +7,6 @@ export const questFormValidationSchema = z.object({
   participation_limit: z.nativeEnum(QuestParticipationLimit, {
     invalid_type_error: VALIDATION_MESSAGES.NO_INPUT,
   }),
-  // TODO: start/end dates must be a string
   start_date: z
     .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
     .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT }),
