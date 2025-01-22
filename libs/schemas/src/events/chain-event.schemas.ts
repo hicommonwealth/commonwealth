@@ -16,10 +16,10 @@ export const CommunityStakeTrade = z.tuple([
 ]);
 
 export const NamespaceDeployed = z.tuple([
-  EVM_ADDRESS.describe('Namespace address'),
-  EVM_ADDRESS.describe('Fee manager address of new namespace'),
-  z.string().describe('Signature for name reservation validation'),
-  EVM_ADDRESS.describe('Namespace deployer address'),
+  z.string().describe('name'),
+  EVM_ADDRESS.describe('_feeManager'),
+  z.string().describe('_signature'),
+  EVM_ADDRESS.describe('_namespaceDeployer'),
 ]);
 
 export const NamespaceDeployedWithReferral = z.tuple([
@@ -49,8 +49,8 @@ export const LaunchpadTrade = z.tuple([
 ]);
 
 export const ReferralSet = z.tuple([
-  EVM_ADDRESS.describe('Namespace address'),
-  EVM_ADDRESS.describe('Referer address'),
+  EVM_ADDRESS.describe('namespace address'),
+  EVM_ADDRESS.describe('referer address'),
 ]);
 
 export const ReferralFeeDistributed = z.tuple([
