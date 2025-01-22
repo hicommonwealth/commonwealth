@@ -144,8 +144,9 @@ const CreateQuestForm = () => {
 
         {questActionSubForms.map((subForm, index) => (
           <QuestActionSubForm
-            key={index}
+            key={subForm.id}
             errors={subForm.errors}
+            defaultValues={subForm.values}
             onChange={(updateBody) => updateSubFormByIndex(updateBody, index)}
             isRemoveable={questActionSubForms.length !== MIN_ACTIONS_LIMIT}
             onRemove={() => removeSubFormByIndex(index)}

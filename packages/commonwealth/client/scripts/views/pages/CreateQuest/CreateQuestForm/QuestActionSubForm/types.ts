@@ -22,6 +22,7 @@ export type QuestActionSubFormProps = {
 };
 
 export type QuestActionSubFormState = {
+  id: number;
   values: QuestActionSubFormFields;
   errors?: QuestActionSubFormErrors;
 };

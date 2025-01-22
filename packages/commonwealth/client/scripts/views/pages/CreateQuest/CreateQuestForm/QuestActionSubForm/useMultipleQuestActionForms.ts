@@ -26,8 +26,9 @@ const useQuestActionMultiFormsState = ({
     callback: () => {
       if (minSubForms) {
         setQuestActionSubForms(
-          Array.from({ length: minSubForms }, (_) => ({
+          Array.from({ length: minSubForms }, (_, index) => ({
             values: {},
+            id: index + 1,
           })),
         );
       }
@@ -38,7 +39,10 @@ const useQuestActionMultiFormsState = ({
   const addSubForm = () => {
     if (maxSubForms && questActionSubForms.length >= maxSubForms) return;
 
-    setQuestActionSubForms((a) => [...a, { values: {} }]);
+    setQuestActionSubForms((a) => [
+      ...a,
+      { values: {}, id: questActionSubForms.length + 1 },
+    ]);
   };
 
   const validateFormValues = (values: QuestActionSubFormFields) => {
