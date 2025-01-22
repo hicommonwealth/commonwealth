@@ -1,19 +1,11 @@
 import React, { useState } from 'react';
 
-import {
-  getLanguageLabel,
-  getLanguagePreference,
-  setLanguagePreference,
-  SUPPORTED_LANGUAGES,
-  SupportedLanguage,
-} from 'helpers/languagePreference';
 import { useFlag } from 'hooks/useFlag';
 import { useInviteLinkModal } from 'state/ui/modals';
 import useSidebarStore from 'state/ui/sidebar';
 import useUserStore from 'state/ui/user';
 import { PopoverMenuItem } from 'views/components/component_kit/CWPopoverMenu';
 import MenuContent from 'views/components/component_kit/CWPopoverMenu/MenuContent';
-import { CWDropdown } from 'views/components/component_kit/cw_dropdown';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { CWText } from 'views/components/component_kit/cw_text';
 import CWDrawer from 'views/components/component_kit/new_designs/CWDrawer';
@@ -62,10 +54,6 @@ const MobileHeader = ({
       setIsUserDrawerOpen(false);
       setIsInviteLinkModalOpen(true);
     },
-    onLanguageClick: () => {
-      setIsUserDrawerOpen(false);
-      setIsLanguageDrawerOpen(true);
-    },
   });
 
   const mobileItems = [
@@ -74,7 +62,7 @@ const MobileHeader = ({
       label: (
         <div className="language-menu-item">
           <span>Language</span>
-          <span>{getLanguageLabel(getLanguagePreference())}</span>
+          {/* <span>{getLanguageLabel(getLanguagePreference())}</span> */}
         </div>
       ),
       onClick: () => {
@@ -196,7 +184,7 @@ const MobileHeader = ({
               <CWText type="h4">Select Language</CWText>
             </div>
             <div className="language-options">
-              <CWDropdown
+              {/* <CWDropdown
                 options={
                   [...SUPPORTED_LANGUAGES] as Array<{
                     label: string;
@@ -211,7 +199,7 @@ const MobileHeader = ({
                   setLanguagePreference(item.value as SupportedLanguage);
                   setIsLanguageDrawerOpen(false);
                 }}
-              />
+              /> */}
             </div>
           </div>
         </CWDrawer>

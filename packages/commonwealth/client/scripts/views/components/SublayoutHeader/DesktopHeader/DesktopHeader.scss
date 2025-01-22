@@ -51,14 +51,6 @@
       }
     }
 
-    .language-selector {
-      margin-right: 8px;
-
-      .dropdown-wrapper {
-        min-width: 140px;
-      }
-    }
-
     .header-loader {
       padding: 0 20px;
     }
@@ -134,5 +126,49 @@
         margin-right: 2px;
       }
     }
+  }
+}
+
+.LanguageSelector {
+  width: 160px;
+
+  .language-menu-item {
+    justify-content: space-between;
+  }
+}
+
+.LanguageSelectorTriggerButton {
+  width: 80px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: 1px solid $neutral-200;
+  background-color: $white;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 700;
+
+  .Text {
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  &:hover {
+    background-color: $neutral-50;
+  }
+
+  &.isOpen {
+    background-color: $neutral-100;
+  }
+
+  &:focus {
+    outline: none;
+  }
+
+  .caret-icon {
+    fill: $neutral-500;
+    margin-left: 8px;
   }
 }

@@ -48,6 +48,9 @@ export default defineConfig(({ mode }) => {
     'process.env.FLAG_REFERRALS': JSON.stringify(env.FLAG_REFERRALS),
     'process.env.FLAG_REWARDS_PAGE': JSON.stringify(env.FLAG_REWARDS_PAGE),
     'process.env.FLAG_STICKY_EDITOR': JSON.stringify(env.FLAG_STICKY_EDITOR),
+    'process.env.FLAG_LANGUAGE_SELECTOR_ENABLED': JSON.stringify(
+      env.FLAG_LANGUAGE_SELECTOR_ENABLED,
+    ),
     'process.env.FLAG_NEW_MOBILE_NAV': JSON.stringify(env.FLAG_NEW_MOBILE_NAV),
   };
 

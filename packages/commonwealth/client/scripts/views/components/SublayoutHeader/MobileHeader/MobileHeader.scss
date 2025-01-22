@@ -70,7 +70,6 @@
         @include b1;
         flex: 1;
         text-align: center;
-        font-weight: $font-weight-medium;
       }
     }
 
@@ -90,15 +89,6 @@
       }
     }
   }
-}
-
-.language-menu-item {
-  @include b2;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-  color: $neutral-900;
 }
 
 .InviteLinkDrawer {

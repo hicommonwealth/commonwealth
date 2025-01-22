@@ -11,10 +11,6 @@ import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import WebWalletController from 'controllers/app/web_wallets';
 import { SessionKeyError } from 'controllers/server/sessions';
 import { setDarkMode } from 'helpers/darkMode';
-import {
-  getLanguageLabel,
-  getLanguagePreference,
-} from 'helpers/languagePreference';
 import { getUniqueUserAddresses } from 'helpers/user';
 import { useFlag } from 'hooks/useFlag';
 import { useCommonNavigate } from 'navigation/helpers';
@@ -74,7 +70,6 @@ interface UseUserMenuItemsProps {
   isMenuOpen: boolean;
   onAddressItemClick?: () => void;
   onReferralItemClick?: () => void;
-  onLanguageClick?: () => void;
 }
 
 const useUserMenuItems = ({
@@ -82,7 +77,6 @@ const useUserMenuItems = ({
   isMenuOpen,
   onAddressItemClick,
   onReferralItemClick,
-  onLanguageClick,
 }: UseUserMenuItemsProps) => {
   const [isDarkModeOn, setIsDarkModeOn] = useState<boolean>(
     localStorage.getItem('dark-mode-state') === 'on',
@@ -331,20 +325,6 @@ const useUserMenuItems = ({
         preventClosing: true,
         onClick: () => toggleDarkMode(!isDarkModeOn, setIsDarkModeOn),
       },
-      ...(useFlag('languageSelectorEnabled')
-        ? [
-            {
-              type: 'default',
-              label: (
-                <div className="UserMenuItem">
-                  <div>Language</div>
-                  <div>{getLanguageLabel(getLanguagePreference())}</div>
-                </div>
-              ),
-              onClick: () => onLanguageClick?.(),
-            },
-          ]
-        : []),
       {
         type: 'default',
         label: 'Sign out',
