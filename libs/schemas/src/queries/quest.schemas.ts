@@ -12,14 +12,12 @@ export const QuestView = Quest.extend({
 });
 
 export const GetQuest = {
-  input: z.object({ community_id: z.string(), quest_id: PG_INT }),
+  input: z.object({ quest_id: PG_INT }),
   output: QuestView.optional(),
   context: AuthContext,
 };
 
 export const GetQuests = {
-  input: z.object({
-    community_id: z.string(),
-  }),
+  input: z.object({}), // TODO: filter options
   output: z.array(QuestView),
 };
