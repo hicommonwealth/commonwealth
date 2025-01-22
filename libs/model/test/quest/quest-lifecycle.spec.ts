@@ -21,15 +21,13 @@ import { seedCommunity } from '../utils/community-seeder';
 const chance = new Chance();
 
 describe('Quest lifecycle', () => {
-  let admin: Actor;
   let superadmin: Actor;
   let community_id: string;
 
   beforeAll(async () => {
     const { community, actors } = await seedCommunity({
-      roles: ['admin', 'member', 'superadmin'],
+      roles: ['superadmin'],
     });
-    admin = actors.admin;
     superadmin = actors.superadmin;
     community_id = community!.id;
   });
