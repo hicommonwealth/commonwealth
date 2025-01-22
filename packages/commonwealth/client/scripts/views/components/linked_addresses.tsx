@@ -19,7 +19,7 @@ import { CWTooltip } from './component_kit/new_designs/CWTooltip';
 /* eslint-disable react/no-multi-comp */
 
 type AddressProps = {
-  address: AddressInfo;
+  addressInfo: AddressInfo;
 };
 
 type AddressDetailsProps = {
@@ -39,8 +39,8 @@ type LinkedAddressesProps = {
   refreshProfiles: (addressInfo: AddressInfo) => void;
 };
 
-const Address = (props: AddressProps) => {
-  const { address, walletId, community } = props.address;
+const Address = ({ addressInfo }: AddressProps) => {
+  const { address, walletId, community } = addressInfo;
 
   return (
     <div className="AddressContainer">
