@@ -13,11 +13,13 @@ import { CWTruncatedAddress } from './component_kit/cw_truncated_address';
 import { CWModal } from './component_kit/new_designs/CWModal';
 import { CWTable } from './component_kit/new_designs/CWTable';
 import { CWTableColumnInfo } from './component_kit/new_designs/CWTable/CWTable';
+import { CWTag } from './component_kit/new_designs/CWTag';
+import { CWTooltip } from './component_kit/new_designs/CWTooltip';
 
 /* eslint-disable react/no-multi-comp */
 
 type AddressProps = {
-  address: string;
+  address: AddressInfo;
 };
 
 type AddressDetailsProps = {
@@ -38,11 +40,32 @@ type LinkedAddressesProps = {
 };
 
 const Address = (props: AddressProps) => {
-  const { address } = props;
+  const { address, walletId, community } = props.address;
 
   return (
     <div className="AddressContainer">
-      <CWTruncatedAddress address={address} />
+      <div className="address">
+        <CWTooltip
+          placement="top"
+          content={`${community.id} \u2022 ${walletId} \u2022 ${formatAddressShort(address)}`}
+          renderTrigger={(handleInteraction, isTooltipOpen) => (
+            <div
+              onMouseEnter={(e) => handleInteraction(e)}
+              onMouseLeave={(e) => {
+                if (isTooltipOpen) {
+                  handleInteraction(e);
+                }
+              }}
+            >
+              <CWTag
+                label={`${walletId} \u2022 ${formatAddressShort(address)}`}
+                type="address"
+                iconName="ethereum"
+              />
+            </div>
+          )}
+        />
+      </div>
     </div>
   );
 };
@@ -132,33 +155,36 @@ export const LinkedAddresses = (props: LinkedAddressesProps) => {
   }, [addresses]);
 
   const rowData = Object.entries(groupedAddresses).map(
-    ([address, communities]) => ({
-      address: <Address address={address} />,
-      communities: (
-        <div>
-          {communities.map((addr, index) => {
-            return (
-              <AddressDetails
-                key={index}
-                profile={profile}
-                addressInfo={addr}
-                toggleRemoveModal={(
-                  val: boolean,
-                  selectedAddress: AddressInfo,
-                  isBulkDelete: boolean = false,
-                  community,
-                ) => {
-                  setIsRemoveModalOpen(val);
-                  setCurrentAddress(selectedAddress);
-                  setIsBulkDeleteState(isBulkDelete);
-                  setSelectedCommunity(community);
-                }}
-              />
-            );
-          })}
-        </div>
-      ),
-    }),
+    ([address, communities]) => {
+      const addressInfo = addresses.find((addr) => addr.address === address);
+      return {
+        address: addressInfo ? <Address address={addressInfo} /> : null,
+        communities: (
+          <div>
+            {communities.map((addr, index) => {
+              return (
+                <AddressDetails
+                  key={index}
+                  profile={profile}
+                  addressInfo={addr}
+                  toggleRemoveModal={(
+                    val: boolean,
+                    selectedAddress: AddressInfo,
+                    isBulkDelete: boolean = false,
+                    community,
+                  ) => {
+                    setIsRemoveModalOpen(val);
+                    setCurrentAddress(selectedAddress);
+                    setIsBulkDeleteState(isBulkDelete);
+                    setSelectedCommunity(community);
+                  }}
+                />
+              );
+            })}
+          </div>
+        ),
+      };
+    },
   );
 
   // Memoize CWTable to prevent unnecessary re-renders.

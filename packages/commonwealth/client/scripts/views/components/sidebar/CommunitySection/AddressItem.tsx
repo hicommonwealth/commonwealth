@@ -1,5 +1,4 @@
 import { WalletId } from '@hicommonwealth/shared';
-import { formatAddressShort } from 'client/scripts/helpers';
 import AddressInfo from 'client/scripts/models/AddressInfo';
 import NewProfile from 'client/scripts/models/NewProfile';
 import {
@@ -15,6 +14,7 @@ import { CWTooltip } from '../../component_kit/new_designs/CWTooltip';
 
 import { useGetCommunityByIdQuery } from 'client/scripts/state/api/communities';
 import { saveToClipboard } from 'client/scripts/utils/clipboard';
+import { formatAddressShort } from 'shared/utils';
 import { CWTag } from '../../component_kit/new_designs/CWTag';
 import './AddressItem.scss';
 
@@ -51,10 +51,25 @@ const AddressItem = (props: AddressItemProps) => {
     <div className="AddressItem">
       <div className="address-section">
         <div className="address">
-          <CWTag
-            label={formatAddressShort(address)}
-            type="address"
-            iconName="ethereum"
+          <CWTooltip
+            placement="top"
+            content={`${community.id} \u2022 ${walletId} \u2022 ${formatAddressShort(address)}`}
+            renderTrigger={(handleInteraction, isTooltipOpen) => (
+              <div
+                onMouseEnter={(e) => handleInteraction(e)}
+                onMouseLeave={(e) => {
+                  if (isTooltipOpen) {
+                    handleInteraction(e);
+                  }
+                }}
+              >
+                <CWTag
+                  label={`${walletId} \u2022 ${formatAddressShort(address)}`}
+                  type="address"
+                  iconName="ethereum"
+                />
+              </div>
+            )}
           />
         </div>
         <CWTooltip
