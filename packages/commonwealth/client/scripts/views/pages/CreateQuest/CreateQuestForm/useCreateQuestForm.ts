@@ -1,4 +1,5 @@
 import { QuestEvents } from '@hicommonwealth/schemas';
+import { useState } from 'react';
 import { z } from 'zod';
 import './CreateQuestForm.scss';
 import { useQuestActionMultiFormsState } from './QuestActionSubForm/useMultipleQuestActionForms';
@@ -18,6 +19,8 @@ const useCreateQuestForm = () => {
     minSubForms: MIN_ACTIONS_LIMIT,
     maxSubForms: MAX_ACTIONS_LIMIT,
   });
+
+  const [isProcessingQuestImage, setIsProcessingQuestImage] = useState(false);
 
   const handleSubmit = (values: z.infer<typeof questFormValidationSchema>) => {
     const hasErrors = validateSubForms();
@@ -41,6 +44,8 @@ const useCreateQuestForm = () => {
     validateSubForms,
     // main form specific fields
     handleSubmit,
+    isProcessingQuestImage,
+    setIsProcessingQuestImage,
   };
 };
 

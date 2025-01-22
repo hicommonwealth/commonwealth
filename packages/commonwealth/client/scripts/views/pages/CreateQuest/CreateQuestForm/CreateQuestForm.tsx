@@ -1,5 +1,9 @@
 import { QuestParticipationLimit } from '@hicommonwealth/schemas';
 import React from 'react';
+import {
+  CWImageInput,
+  ImageBehavior,
+} from 'views/components/component_kit/CWImageInput';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTextArea } from 'views/components/component_kit/cw_text_area';
@@ -22,6 +26,8 @@ const CreateQuestForm = () => {
     MIN_ACTIONS_LIMIT,
     validateSubForms,
     handleSubmit,
+    isProcessingQuestImage,
+    setIsProcessingQuestImage,
   } = useCreateQuestForm();
 
   return (
@@ -30,6 +36,11 @@ const CreateQuestForm = () => {
       onSubmit={handleSubmit}
       onErrors={validateSubForms}
       className="CreateQuestForm"
+      initialValues={{
+        // TODO: this will be updated via a date/calender selector component in #TODO-TICKET
+        start_date: new Date().toISOString(),
+        end_date: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(), // 5 days from now
+      }}
     >
       <div className="quest-period-section">
         <div className="repeatition-selector">
@@ -89,6 +100,17 @@ const CreateQuestForm = () => {
           placeholder="Add a description for your Quest"
           name="description"
           hookToForm
+        />
+
+        <CWImageInput
+          label="Quest Image (Accepts JPG and PNG files)"
+          onImageProcessingChange={({ isGenerating, isUploading }) => {
+            setIsProcessingQuestImage(isGenerating || isUploading);
+          }}
+          name="image"
+          hookToForm
+          imageBehavior={ImageBehavior.Fill}
+          withAIImageGeneration
         />
       </div>
 
@@ -162,6 +184,7 @@ const CreateQuestForm = () => {
           buttonWidth="wide"
           type="submit"
           containerClassName="btn"
+          disabled={isProcessingQuestImage}
         />
       </div>
     </CWForm>
