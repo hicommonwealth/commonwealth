@@ -3,10 +3,13 @@ import { APIOrderDirection } from 'helpers/constants';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import app from 'state';
+import { useInviteLinkModal } from 'state/ui/modals';
 import { useDebounce } from 'usehooks-ts';
 import { trpc } from 'utils/trpcClient';
 import { Avatar } from 'views/components/Avatar';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
+import { CWText } from 'views/components/component_kit/cw_text';
+import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWTable } from 'views/components/component_kit/new_designs/CWTable';
 import { useCWTableState } from 'views/components/component_kit/new_designs/CWTable/useCWTableState';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
@@ -44,6 +47,7 @@ const LeaderboardSection = () => {
   const [searchText, setSearchText] = useState('');
   const debouncedSearchTerm = useDebounce<string>(searchText, 500);
   const communityId = app.activeChainId();
+  const { setIsInviteLinkModalOpen } = useInviteLinkModal();
 
   const tableState = useCWTableState({
     columns,
@@ -112,6 +116,9 @@ const LeaderboardSection = () => {
       },
     })) || [];
 
+  const showReferralButton = formattedMembers.length < 5;
+  const hasNoMembers = formattedMembers.length === 0;
+
   return (
     <div className="LeaderboardSection">
       <CWTextInput
@@ -123,12 +130,37 @@ const LeaderboardSection = () => {
         iconLeft={<CWIcon iconName="search" className="search-icon" />}
         onInput={(e) => setSearchText(e.target.value?.trim())}
       />
-      <CWTable
-        columnInfo={tableState.columns}
-        rowData={formattedMembers}
-        sortingState={tableState.sorting}
-        setSortingState={tableState.setSorting}
-      />
+      {hasNoMembers ? (
+        <div className="empty-state">
+          <CWText type="b1" className="empty-state-text">
+            No referrals in this community yet. Be the first to invite new
+            members!
+          </CWText>
+          <CWButton
+            label="Share Referral Link"
+            buttonHeight="sm"
+            onClick={() => setIsInviteLinkModalOpen(true)}
+          />
+        </div>
+      ) : (
+        <>
+          <CWTable
+            columnInfo={tableState.columns}
+            rowData={formattedMembers}
+            sortingState={tableState.sorting}
+            setSortingState={tableState.setSorting}
+          />
+          {showReferralButton && (
+            <div className="referral-button-container">
+              <CWButton
+                label="Share Referral Link"
+                buttonHeight="sm"
+                onClick={() => setIsInviteLinkModalOpen(true)}
+              />
+            </div>
+          )}
+        </>
+      )}
     </div>
   );
 };
