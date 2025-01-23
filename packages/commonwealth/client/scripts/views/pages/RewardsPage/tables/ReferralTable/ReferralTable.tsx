@@ -1,3 +1,4 @@
+import { smallNumberFormatter } from '@hicommonwealth/shared';
 import React from 'react';
 import { Link } from 'react-router-dom';
 
@@ -11,6 +12,7 @@ import { CWTable } from 'views/components/component_kit/new_designs/CWTable';
 import { useCWTableState } from 'views/components/component_kit/new_designs/CWTable/useCWTableState';
 
 import { columns } from './columns';
+
 import './ReferralTable.scss';
 
 export const ReferralTable = () => {
@@ -75,7 +77,10 @@ export const ReferralTable = () => {
                 ),
                 customElement: (
                   <div className="table-cell text-right">
-                    USD {parseFloat(String(item.referrer_received_eth_amount))}
+                    ETH{' '}
+                    {smallNumberFormatter.format(
+                      item.referrer_received_eth_amount,
+                    )}
                   </div>
                 ),
               },
