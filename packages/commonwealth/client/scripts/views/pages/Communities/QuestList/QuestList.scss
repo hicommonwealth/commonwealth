@@ -1,0 +1,34 @@
+@import '../../../../styles/shared';
+
+.QuestList {
+  margin: 16px 0;
+  width: 100%;
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .list {
+    max-width: 100%;
+    overflow-x: hidden;
+    display: grid;
+    gap: 16px;
+    margin: 16px 0;
+    grid-template-columns: 1fr 1fr 1fr 1fr !important;
+
+    @include extraSmall {
+      grid-template-columns: 1fr !important;
+    }
+
+    @include small {
+      grid-template-columns: 1fr 1fr !important;
+    }
+
+    @include mediumSmall {
+      grid-template-columns: 1fr 1fr 1fr !important;
+    }
+  }
+}
