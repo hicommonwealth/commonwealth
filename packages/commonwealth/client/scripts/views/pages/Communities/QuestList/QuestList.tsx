@@ -13,13 +13,25 @@ const QuestList = () => {
   const navigate = useCommonNavigate();
   const xpEnabled = useFlag('xp');
 
-  const { data: questsList, isInitialLoading } = useFetchQuestsQuery({
+  const {
+    data: questsList,
+    isInitialLoading,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+  } = useFetchQuestsQuery({
     cursor: 1,
     limit: 4,
     community_id: 'dydx', // TODO: need to change this.
     enabled: xpEnabled,
   });
   const quests = (questsList?.pages || []).flatMap((page) => page.results);
+
+  const handleFetchMoreQuests = () => {
+    if (hasNextPage && !isFetchingNextPage) {
+      fetchNextPage().catch(console.error);
+    }
+  };
 
   const handleCTAClick = () => {
     // TODO: navigate to quest details
@@ -29,25 +41,11 @@ const QuestList = () => {
     navigate('/leaderboard');
   };
 
-  const handleSeeAllQuestsClick = () => {
-    // TODO: navigate to quests list page
-  };
-
   if (!xpEnabled) return <></>;
 
   return (
     <div className="QuestList">
-      <div className="header">
-        <CWText type="h2">Quests</CWText>
-        <CWButton
-          label="See all Quests"
-          iconRight="arrowRightPhosphor"
-          buttonWidth="narrow"
-          buttonHeight="sm"
-          buttonType="tertiary"
-          onClick={handleSeeAllQuestsClick}
-        />
-      </div>
+      <CWText type="h2">Quests</CWText>
       {isInitialLoading ? (
         <CWCircleMultiplySpinner />
       ) : quests.length === 0 ? (
@@ -84,6 +82,20 @@ const QuestList = () => {
             );
           })}
         </div>
+      )}
+      {isFetchingNextPage ? (
+        <div className="m-auto">
+          <CWCircleMultiplySpinner />
+        </div>
+      ) : hasNextPage && quests.length > 0 ? (
+        <CWButton
+          label="See more"
+          buttonType="tertiary"
+          containerClassName="ml-auto"
+          onClick={handleFetchMoreQuests}
+        />
+      ) : (
+        <></>
       )}
     </div>
   );
