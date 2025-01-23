@@ -94,7 +94,7 @@ export const ProfileThread = ({ thread }: ProfileThreadProps) => {
             ? disabledCommentActionTooltipText
             : disabledActionsTooltipText
         }
-        hideReactionButton={false}
+        hideReactionButton={true}
         hideUpvotesDrawer
         layoutType="community-first"
         maxChars={100}
