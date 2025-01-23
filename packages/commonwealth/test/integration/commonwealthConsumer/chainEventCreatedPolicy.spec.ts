@@ -1,5 +1,8 @@
 import { EventContext, dispose } from '@hicommonwealth/core';
-import { commonProtocol as cp } from '@hicommonwealth/evm-protocols';
+import {
+  EvmEventSignatures,
+  commonProtocol as cp,
+} from '@hicommonwealth/evm-protocols';
 import {
   createTestRpc,
   models,
@@ -34,8 +37,12 @@ async function processValidStakeTransaction() {
         transactionHash,
         blockHash:
           '0xdf3b5cd44ea1a9f22a86f678b2e6d596238fe1d75b638cb5326415f293df32f5',
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } as any,
+        transactionIndex: 0,
+        logIndex: 0,
+        removed: false,
+        data: '0x',
+        topics: [],
+      },
       parsedArgs: [
         traderAddress,
         namespaceAddress,
@@ -58,8 +65,7 @@ async function processValidStakeTransaction() {
       ],
       eventSource: {
         ethChainId: cp.ValidChains.Sepolia,
-        eventSignature:
-          '0xfc13c9a8a9a619ac78b803aecb26abdd009182411d51a986090f82519d88a89e',
+        eventSignature: EvmEventSignatures.CommunityStake.Trade,
       },
       block: {
         number: 0x1,

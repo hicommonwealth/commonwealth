@@ -13,7 +13,7 @@ import { buildThreadContentUrl, getChainNodeUrl } from '../utils';
 import {
   createOnchainContestContent,
   createOnchainContestVote,
-} from './contest-utils';
+} from './utils/contest-utils';
 
 const log = logger(import.meta);
 

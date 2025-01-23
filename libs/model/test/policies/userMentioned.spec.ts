@@ -4,7 +4,6 @@ import {
   disposeAdapter,
   notificationsProvider,
 } from '@hicommonwealth/core';
-import { tester } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import { EventNames } from '@hicommonwealth/schemas';
 import { BalanceType, safeTruncateBody } from '@hicommonwealth/shared';
@@ -21,13 +20,14 @@ import {
   vi,
 } from 'vitest';
 import z from 'zod';
-import { processUserMentioned } from '../../../server/workers/knock/eventHandlers/userMentioned';
-import { getThreadUrl } from '../../../server/workers/knock/util';
+import { tester } from '../../src';
+import { notifyUserMentioned } from '../../src/policies/handlers/notifyUserMentioned';
+import { getThreadUrl } from '../../src/policies/utils/utils';
 import {
   ProviderError,
   SpyNotificationsProvider,
   ThrowingSpyNotificationsProvider,
-} from '../../util/mockedNotificationProvider';
+} from '../utils/mockedNotificationProvider';
 
 chai.use(chaiAsPromised);
 
@@ -88,7 +88,7 @@ describe('userMentioned Event Handler', () => {
   });
 
   test('should not throw if relevant community is not found', async () => {
-    const res = await processUserMentioned({
+    const res = await notifyUserMentioned({
       name: EventNames.UserMentioned,
       payload: {
         communityId: 'nonexistent',
@@ -102,7 +102,7 @@ describe('userMentioned Event Handler', () => {
       adapter: SpyNotificationsProvider(),
     });
 
-    const res = await processUserMentioned({
+    const res = await notifyUserMentioned({
       name: EventNames.UserMentioned,
       payload: {
         // @ts-expect-error StrictNullChecks
@@ -144,7 +144,7 @@ describe('userMentioned Event Handler', () => {
     });
 
     await expect(
-      processUserMentioned({
+      notifyUserMentioned({
         name: EventNames.UserMentioned,
         payload: {
           // @ts-expect-error StrictNullChecks

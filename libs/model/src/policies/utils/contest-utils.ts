@@ -5,7 +5,7 @@ import {
 } from '@hicommonwealth/evm-protocols';
 import { ContestAction } from '@hicommonwealth/schemas';
 import { z } from 'zod';
-import { config } from '..';
+import { config } from '../../config';
 
 const log = logger(import.meta);
 

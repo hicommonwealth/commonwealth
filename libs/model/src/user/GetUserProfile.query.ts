@@ -1,4 +1,4 @@
-import { type Query } from '@hicommonwealth/core';
+import { InvalidInput, type Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { Op } from 'sequelize';
 import { z } from 'zod';
@@ -12,6 +12,7 @@ export function GetUserProfile(): Query<typeof schemas.GetUserProfile> {
     secure: false,
     body: async ({ actor, payload }) => {
       const user_id = payload.userId ?? actor.user?.id;
+      if (!user_id) throw new InvalidInput('Missing user id');
 
       const user = await models.User.findOne({
         where: { id: user_id },
