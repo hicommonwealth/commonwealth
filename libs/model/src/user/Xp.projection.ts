@@ -224,8 +224,8 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
         const reward_amount = 20;
         const creator_reward_weight = 0.2;
 
-        const referee_address = await models.Address.findOne({
-          where: { address: payload.address, user_id: payload.user_id },
+        const referee_address = await models.User.findOne({
+          where: { id: payload.user_id },
         });
         referee_address &&
           referee_address.referred_by_address &&
@@ -257,12 +257,15 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
           payload,
           'CommunityJoined',
         );
+        const user = await models.User.findOne({
+          where: { id: payload.user_id },
+        });
         if (action_metas.length > 0) {
           await recordXpsForQuest(
             payload.user_id,
             payload.created_at!,
             action_metas,
-            payload.referrer_address,
+            user?.referred_by_address,
           );
         }
       },

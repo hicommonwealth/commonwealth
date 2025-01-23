@@ -33,9 +33,7 @@ const SignStakeTransactions = ({
     apiCallEnabled: user.isLoggedIn,
   });
 
-  const referrerAddress = profile?.addresses.find(
-    (address) => address.address === selectedAddress.address,
-  )?.referred_by_address;
+  const referrerAddress = profile?.referred_by_address;
 
   const { handleReserveCommunityNamespace, reserveNamespaceData } =
     useReserveCommunityNamespace({

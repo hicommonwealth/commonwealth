@@ -19,15 +19,16 @@ interface AddressListProps {
   profile: NewProfile;
   refreshProfiles: () => void;
   onAuthModalOpen: (modalType?: AuthModalType) => void;
+  isInsideCommunity?: boolean;
 }
 
 export const AddressList = ({
   address,
   addresses,
-  username,
   profile,
   refreshProfiles,
   onAuthModalOpen,
+  isInsideCommunity,
 }: AddressListProps) => {
   const [isRemoveModalOpen, setIsRemoveModalOpen] = useState(false);
   const [currentAddress, setCurrentAddress] = useState<AddressInfo | null>(
@@ -40,7 +41,7 @@ export const AddressList = ({
 
   const user = useUserStore();
 
-  if ((!address && !username) || !addresses) {
+  if (!addresses) {
     return null;
   }
 
@@ -67,7 +68,7 @@ export const AddressList = ({
               Addresses
             </CWText>
           </div>
-          {user.isLoggedIn && (
+          {user.isLoggedIn && isInsideCommunity && (
             <div className="address-right">
               <AddressCreate onAuthModalOpen={() => onAuthModalOpen()} />
             </div>
@@ -91,6 +92,7 @@ export const AddressList = ({
                     setSelectedCommunity(community);
                   }}
                   isSelected={addr.address === address}
+                  isInsideCommunity={isInsideCommunity}
                 />
               ))}
           </div>

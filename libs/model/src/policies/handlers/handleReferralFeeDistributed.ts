@@ -8,11 +8,11 @@ export async function handleReferralFeeDistributed(
   event: z.infer<typeof events.ChainEventCreated>,
 ) {
   const {
-    0: namespaceAddress,
-    1: tokenAddress,
-    // 2: totalAmountDistributed,
-    3: referrerAddress,
-    4: referrerReceivedAmount,
+    0: namespace_address,
+    1: distributed_token_address,
+    // 2: total_amount_distributed,
+    3: referrer_address,
+    4: fee_amount,
   } = event.parsedArgs as z.infer<typeof chainEvents.ReferralFeeDistributed>;
 
   const existingFee = await models.ReferralFee.findOne({
@@ -21,53 +21,54 @@ export async function handleReferralFeeDistributed(
       transaction_hash: event.rawLog.transactionHash,
     },
   });
-
-  if (event.rawLog.removed && existingFee) {
-    await existingFee.destroy();
+  if (existingFee) {
+    event.rawLog.removed && (await existingFee.destroy());
     return;
-  } else if (existingFee) return;
+  }
 
-  const feeAmount =
-    Number(BigNumber.from(referrerReceivedAmount).toBigInt()) / 1e18;
+  // find the referral (already mapped to a namespace)
+  const referral = await models.Referral.findOne({
+    where: {
+      referrer_address,
+      namespace_address,
+    },
+  });
+  if (!referral) return; // we must guarantee the order of chain events here
+
+  const referrer_received_amount =
+    Number(BigNumber.from(fee_amount).toBigInt()) / 1e18;
 
   await models.sequelize.transaction(async (transaction) => {
     await models.ReferralFee.create(
       {
         eth_chain_id: event.eventSource.ethChainId,
         transaction_hash: event.rawLog.transactionHash,
-        namespace_address: namespaceAddress,
-        distributed_token_address: tokenAddress,
-        referrer_recipient_address: referrerAddress,
-        referrer_received_amount: feeAmount,
+        namespace_address,
+        distributed_token_address,
+        referrer_recipient_address: referrer_address,
+        referrer_received_amount,
+        referee_address: referral.referee_address,
         transaction_timestamp: Number(event.block.timestamp),
       },
       { transaction },
     );
 
     // if native token i.e. ETH
-    if (tokenAddress === ZERO_ADDRESS) {
-      const userAddress = await models.Address.findOne({
-        where: {
-          address: referrerAddress,
-        },
+    if (distributed_token_address === ZERO_ADDRESS) {
+      const referrer = await models.Address.findOne({
+        where: { address: referrer_address },
         transaction,
       });
-      if (userAddress) {
+      if (referrer) {
         await models.User.increment('referral_eth_earnings', {
-          by: feeAmount,
-          where: {
-            id: userAddress.user_id!,
-          },
+          by: referrer_received_amount,
+          where: { id: referrer.user_id! },
           transaction,
         });
       }
 
-      await models.Referral.increment('referrer_received_eth_amount', {
-        by: feeAmount,
-        where: {
-          referrer_address: referrerAddress,
-          referee_address: event.rawLog.address,
-        },
+      await referral.increment('referrer_received_eth_amount', {
+        by: referrer_received_amount,
         transaction,
       });
     }

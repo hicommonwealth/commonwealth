@@ -14,15 +14,18 @@ import GeneralRoutes from './GeneralRoutes';
 
 export type RouteFeatureFlags = {
   launchpadEnabled: boolean;
+  xpEnabled: boolean;
 };
 
 const Router = () => {
   const client = OpenFeature.getClient();
 
   const launchpadEnabled = client.getBooleanValue('launchpad', false);
+  const xpEnabled = client.getBooleanValue('xp', false);
 
   const flags = {
     launchpadEnabled,
+    xpEnabled,
   };
 
   const { isCustomDomain } = fetchCachedCustomDomain() || {};
