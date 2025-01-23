@@ -1,10 +1,10 @@
+import { ReferralView } from '@hicommonwealth/schemas';
 import { smallNumberFormatter } from '@hicommonwealth/shared';
 import React from 'react';
 import { Link } from 'react-router-dom';
+import type { z } from 'zod';
 
 import { APIOrderDirection } from 'helpers/constants';
-import { useGetUserReferralsQuery } from 'state/api/user';
-import useUserStore from 'state/ui/user';
 import { Avatar } from 'views/components/Avatar';
 import { CWText } from 'views/components/component_kit/cw_text';
 import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
@@ -15,14 +15,14 @@ import { columns } from './columns';
 
 import './ReferralTable.scss';
 
-export const ReferralTable = () => {
-  const user = useUserStore();
+type Referral = z.infer<typeof ReferralView>;
 
-  const { data: referrals, isLoading } = useGetUserReferralsQuery({
-    userId: user?.id,
-    apiCallEnabled: !!user?.id,
-  });
+interface ReferralTableProps {
+  referrals?: Referral[];
+  isLoading?: boolean;
+}
 
+export const ReferralTable = ({ referrals, isLoading }: ReferralTableProps) => {
   const tableState = useCWTableState({
     columns,
     initialSortColumn: 'earnings',
