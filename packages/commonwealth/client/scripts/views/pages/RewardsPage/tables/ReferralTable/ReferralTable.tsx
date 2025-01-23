@@ -1,8 +1,6 @@
-import { ReferralView } from '@hicommonwealth/schemas';
 import { smallNumberFormatter } from '@hicommonwealth/shared';
 import React from 'react';
 import { Link } from 'react-router-dom';
-import type { z } from 'zod';
 
 import { APIOrderDirection } from 'helpers/constants';
 import { Avatar } from 'views/components/Avatar';
@@ -10,12 +8,11 @@ import { CWText } from 'views/components/component_kit/cw_text';
 import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
 import { CWTable } from 'views/components/component_kit/new_designs/CWTable';
 import { useCWTableState } from 'views/components/component_kit/new_designs/CWTable/useCWTableState';
+import { Referral } from '../../types';
 
 import { columns } from './columns';
 
 import './ReferralTable.scss';
-
-type Referral = z.infer<typeof ReferralView>;
 
 interface ReferralTableProps {
   referrals?: Referral[];

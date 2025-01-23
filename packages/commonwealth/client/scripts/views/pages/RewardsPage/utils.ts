@@ -1,8 +1,5 @@
-import { ReferralView } from '@hicommonwealth/schemas';
-import type { z } from 'zod';
-import { MobileTabType, TableType, TabParam } from './types';
-
-type Referral = z.infer<typeof ReferralView>;
+import moment from 'moment';
+import { MobileTabType, Referral, TabParam, TableType } from './types';
 
 export const calculateTotalEarnings = (referrals: Referral[]) => {
   if (!referrals?.length) return 0;
@@ -12,34 +9,26 @@ export const calculateTotalEarnings = (referrals: Referral[]) => {
   );
 };
 
+const getMonthEarnings = (referrals: Referral[], targetDate: moment.Moment) => {
+  return referrals
+    .filter((ref) => {
+      const refDate = moment(ref.updated_at);
+      return (
+        refDate.month() === targetDate.month() &&
+        refDate.year() === targetDate.year()
+      );
+    })
+    .reduce((sum, ref) => sum + (ref.referrer_received_eth_amount || 0), 0);
+};
+
 export const calculateReferralTrend = (referrals: Referral[]) => {
   if (!referrals?.length) return 0;
 
-  const now = new Date();
-  const currentMonth = now.getMonth();
-  const currentYear = now.getFullYear();
-  const lastMonth = currentMonth === 0 ? 11 : currentMonth - 1;
-  const lastMonthYear = currentMonth === 0 ? currentYear - 1 : currentYear;
+  const now = moment();
+  const lastMonth = moment(now).subtract(1, 'month');
 
-  const currentMonthEarnings = referrals
-    .filter((ref) => {
-      const refDate = new Date(ref.updated_at || '');
-      return (
-        refDate.getMonth() === currentMonth &&
-        refDate.getFullYear() === currentYear
-      );
-    })
-    .reduce((sum, ref) => sum + (ref.referrer_received_eth_amount || 0), 0);
-
-  const lastMonthEarnings = referrals
-    .filter((ref) => {
-      const refDate = new Date(ref.updated_at || '');
-      return (
-        refDate.getMonth() === lastMonth &&
-        refDate.getFullYear() === lastMonthYear
-      );
-    })
-    .reduce((sum, ref) => sum + (ref.referrer_received_eth_amount || 0), 0);
+  const currentMonthEarnings = getMonthEarnings(referrals, now);
+  const lastMonthEarnings = getMonthEarnings(referrals, lastMonth);
 
   if (lastMonthEarnings === 0) return currentMonthEarnings > 0 ? 100 : 0;
 

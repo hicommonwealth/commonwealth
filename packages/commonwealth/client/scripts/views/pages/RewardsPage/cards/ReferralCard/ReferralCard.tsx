@@ -57,7 +57,7 @@ const ReferralCard = ({
           {currentTab === ReferralTabs.Total && (
             <div className="total-body">
               <CWText fontWeight="bold" type="h4">
-                ${totalEarnings.toLocaleString()}
+                ETH {totalEarnings.toLocaleString()}
               </CWText>
               {!isLoading && (trendValue || trendValue === 0) && (
                 <Trend value={trendValue} />
