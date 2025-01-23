@@ -1,0 +1,54 @@
+@import '../../../../../../../styles/shared';
+
+.QuestTask {
+  all: unset;
+  display: grid;
+  grid-template-columns: 1fr 5fr;
+  width: 100%;
+  gap: 12px;
+  cursor: pointer;
+  border-radius: 8px;
+
+  &:hover {
+    background-color: $neutral-100;
+  }
+
+  &:focus,
+  &:focus-within {
+    outline: none;
+  }
+
+  .left {
+    padding: 16px 4px 16px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+
+    img {
+      width: 44px;
+      height: 44px;
+      object-fit: cover;
+      border-radius: 6px;
+    }
+  }
+
+  .right {
+    padding: 12px 16px 12px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    justify-content: center;
+    width: 100%;
+
+    .xp-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      .days-left {
+        color: $primary-300 !important;
+      }
+    }
+  }
+}
