@@ -21,7 +21,7 @@ const QuestList = () => {
     fetchNextPage,
   } = useFetchQuestsQuery({
     cursor: 1,
-    limit: 4,
+    limit: 8,
     community_id: 'dydx', // TODO: need to change this.
     enabled: xpEnabled,
   });
