@@ -20,7 +20,6 @@ const QuestList = () => {
     enabled: xpEnabled,
   });
   const quests = (questsList?.pages || []).flatMap((page) => page.results);
-  console.log('quests => ', quests);
 
   const handleCTAClick = () => {
     // TODO: navigate to quest details
@@ -62,6 +61,14 @@ const QuestList = () => {
       ) : (
         <div className="list">
           {(quests || []).map((quest) => {
+            const totalXP =
+              (quest.action_metas || [])
+                ?.map((action) => action.reward_amount)
+                .reduce(
+                  (accumulator, currentValue) => accumulator + currentValue,
+                  0,
+                ) || 0;
+
             return (
               <QuestCard
                 key={quest.name}
@@ -69,7 +76,7 @@ const QuestList = () => {
                 description={quest.description}
                 // TODO: quests should support images
                 iconURL="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR4dGWQgdRtlbW5aRFnN5K5pjTRSFsVWuGf7A&s"
-                xpPoints={100} // TOOD: get this from api
+                xpPoints={totalXP}
                 endDate={new Date(quest.end_date)}
                 onCTAClick={handleCTAClick}
                 onLeaderboardClick={handleLeaderboardClick}

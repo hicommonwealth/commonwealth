@@ -28,9 +28,26 @@ export function GetQuests(): Query<typeof schemas.GetQuests> {
           Q.end_date, 
           Q.updated_at, 
           Q.created_at,
-          count(*) OVER () AS total
+          count(*) OVER () AS total,
+          CASE WHEN max(QAS.id) IS NOT NULL THEN
+            json_agg(json_strip_nulls(json_build_object(
+                'id', QAS.id,
+                'quest_id', QAS.quest_id,
+                'event_name', QAS.event_name,
+                'reward_amount', QAS.reward_amount,
+                'creator_reward_weight', QAS.creator_reward_weight,
+                'participation_limit', QAS.participation_limit,
+                'participation_period', QAS.participation_period,
+                'participation_times_per_period', QAS.participation_times_per_period,
+                'created_at', QAS.created_at,
+                'updated_at', QAS.updated_at
+            )))
+          ELSE '[]'::json
+          END AS "action_metas"
         FROM 
           "Quests" as Q
+        LEFT JOIN "QuestActionMetas" QAS on QAS.quest_id = Q.id
+        GROUP BY Q.id
         ORDER BY Q.${order} ${direction}
         LIMIT :limit OFFSET :offset
       `;
