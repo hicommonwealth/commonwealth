@@ -1,1 +1,3 @@
-export * from './ReactNativeBridge';
+export * from './ReactNativeBridgeRouter';
+export * from './ReactNativeBridgeUser';
+export * from './ReactNativeLogForwarder';

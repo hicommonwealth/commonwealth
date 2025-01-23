@@ -32,7 +32,7 @@ type UserInfo = {
  * Note that NOTHING will happen in our normal app otherwise.  It will track
  * the userInfo but not send it.
  */
-export const ReactNativeBridge = () => {
+export const ReactNativeBridgeUser = () => {
   const user = useUserStore();
   const reactNativeWebView = useReactNativeWebView();
 
