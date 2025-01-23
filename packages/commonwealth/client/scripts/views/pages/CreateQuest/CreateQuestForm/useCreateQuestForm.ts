@@ -41,17 +41,15 @@ const useCreateQuestForm = () => {
     const handleAsync = async () => {
       try {
         const quest = await createQuest({
-          community_id: 'dydx', // TODO: API logic will update in #10673 to not require community id
+          name: values.name.trim(),
           description: values.description.trim(),
           end_date: new Date(values.end_date),
           start_date: new Date(values.start_date),
-          name: values.name.trim(),
           // TODO: add image support in api (needs ticketing).
         });
 
         if (quest && quest.id && quest.community_id) {
           await updateQuest({
-            community_id: quest.community_id,
             quest_id: quest.id,
             action_metas: questActionSubForms.map((subForm) => ({
               event_name: subForm.values.action as QuestAction,

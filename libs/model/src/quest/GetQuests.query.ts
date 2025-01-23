@@ -7,10 +7,9 @@ export function GetQuests(): Query<typeof schemas.GetQuests> {
     ...schemas.GetQuests,
     auth: [],
     secure: false,
-    body: async ({ payload }) => {
-      const { community_id } = payload;
+    body: async () => {
       const quests = await models.Quest.findAll({
-        where: { community_id },
+        // where: {  }, // TODO: filter options
         include: { model: models.QuestActionMeta, as: 'action_metas' },
       });
       return (

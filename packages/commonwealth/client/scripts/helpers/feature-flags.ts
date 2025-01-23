@@ -36,7 +36,6 @@ const featureFlags = {
   rewardsPage: buildFlag(process.env.FLAG_REWARDS_PAGE),
   xp: buildFlag(process.env.FLAG_XP),
   growl: buildFlag(process.env.FLAG_GROWL),
-  xp: buildFlag(process.env.FLAG_XP),
 };
 
 export type AvailableFeatureFlag = keyof typeof featureFlags;

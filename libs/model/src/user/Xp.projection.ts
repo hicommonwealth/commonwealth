@@ -33,6 +33,8 @@ async function getUserIdByAddress(payload: {
 
 /*
  * Finds all active quest action metas for a given event
+ * - Global quests are not filtered by community
+ * - Local quests are filtered by community
  */
 async function getQuestActionMetas(
   event_payload: { community_id: string; created_at?: Date },
@@ -41,7 +43,7 @@ async function getQuestActionMetas(
   // make sure quest was active when event was created
   const quests = await models.Quest.findAll({
     where: {
-      community_id: event_payload.community_id,
+      community_id: { [Op.or]: [null, event_payload.community_id] },
       start_date: { [Op.lte]: event_payload.created_at },
       end_date: { [Op.gte]: event_payload.created_at },
     },
