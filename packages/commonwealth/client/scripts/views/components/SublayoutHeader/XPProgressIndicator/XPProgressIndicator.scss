@@ -1,0 +1,21 @@
+@import '../../../../styles/shared';
+
+.XPProgressIndicator {
+  all: unset;
+  padding: 4px;
+
+  .b2 {
+    color: $primary-500 !important;
+  }
+
+  &:focus,
+  &:focus-within {
+    outline: none !important;
+  }
+
+  &:hover {
+    background-color: $neutral-100;
+    cursor: pointer;
+    border-radius: 6px;
+  }
+}
