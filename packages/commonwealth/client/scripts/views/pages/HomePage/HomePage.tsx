@@ -1,3 +1,4 @@
+import { AvailableFeatureFlag } from 'client/scripts/helpers/feature-flags';
 import { findDenominationString } from 'helpers/findDenomination';
 import { useFlag } from 'hooks/useFlag';
 import React, { useRef, useState } from 'react';
@@ -11,7 +12,9 @@ import './HomePage.scss';
 
 const HomePage = () => {
   const containerRef = useRef();
-  const tokenizedCommunityEnabled = useFlag('tokenizedCommunity');
+  const tokenizedCommunityEnabled = useFlag(
+    'tokenizedCommunity' as AvailableFeatureFlag,
+  );
 
   const {
     setModeOfManageCommunityStakeModal,
