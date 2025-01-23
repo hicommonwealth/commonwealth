@@ -34,7 +34,7 @@ const searchChains = async ({
   const {
     data: { result },
   } = await axios.get<{ result: SearchChainsResponse }>(
-    `${SERVER_URL}/communities`,
+    `${SERVER_URL}/explore`,
     {
       headers: {
         'Content-Type': 'application/json',
