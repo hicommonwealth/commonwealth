@@ -1,6 +1,7 @@
 import { command, logger, Policy } from '@hicommonwealth/core';
 import { commonProtocol } from '@hicommonwealth/evm-protocols';
 import { config } from '@hicommonwealth/model';
+import * as schemas from '@hicommonwealth/schemas';
 import {
   ClankerToken,
   CommunityIndexer as CommunityIndexerSchema,
@@ -65,7 +66,7 @@ async function fetchClankerTokens(
   let pageNum = 1;
 
   // eslint-disable-next-line no-constant-condition
-  while (pageNum < 3) {
+  while (true) {
     const url = `https://www.clanker.world/api/tokens?sort=desc&page=${pageNum}&pair=all&partner=all&presale=all`;
     log.debug(`fetching: ${url}`);
 
@@ -124,13 +125,18 @@ export function CommunityIndexer(): Policy<typeof inputs> {
     body: {
       CommunityIndexerTimerTicked: async ({ payload }) => {
         log.debug(`CommunityIndexerTimerTicked`);
-        const indexers = await models.CommunityIndexer.findAll({
-          where: {
-            status: 'idle',
-          },
-        });
+        const indexers = await models.CommunityIndexer.findAll({});
 
-        for (const indexer of indexers) {
+        const pendingIndexers = indexers.filter(
+          (idx) => idx.status === 'pending',
+        );
+        if (pendingIndexers.length > 0) {
+          return;
+        }
+
+        const idleIndexers = indexers.filter((idx) => idx.status === 'idle');
+
+        for (const indexer of idleIndexers) {
           try {
             log.debug(`starting community indexer ${indexer.id}`);
             await setIndexerStatus(indexer.id, 'pending');
@@ -160,6 +166,18 @@ export function CommunityIndexer(): Policy<typeof inputs> {
       ClankerTokenFound: async ({ payload }) => {
         const id = lo.kebabCase(payload.name);
 
+        // let uploadedImageUrl: string | null = null;
+        // if (payload.img_url) {
+        //   const filename = `${uuidv4()}.jpeg`;
+        //   const content = await axios.get(payload.img_url!);
+        //   const { url } = await blobStorage().upload({
+        //     key: filename,
+        //     bucket: 'assets',
+        //     content: content.data,
+        //   });
+        //   uploadedImageUrl = url;
+        // }
+
         const chainNode = await models.ChainNode.scope(
           'withPrivateData',
         ).findOne({
@@ -174,7 +192,6 @@ export function CommunityIndexer(): Policy<typeof inputs> {
           rpc: chainNode.private_url!,
           privateKey: config.WEB3.PRIVATE_KEY,
         });
-
         const adminAddress = await models.Address.findOne({
           where: {
             address: web3.eth.defaultAccount!,
@@ -182,25 +199,32 @@ export function CommunityIndexer(): Policy<typeof inputs> {
         });
         mustExist('Admin Address', adminAddress);
 
+        const createCommunityPayload: z.infer<
+          typeof schemas.CreateCommunity.input
+        > = {
+          id,
+          type: ChainType.Token,
+          name: payload.name,
+          default_symbol: payload.symbol,
+          base: ChainBase.Ethereum,
+          social_links: [],
+          website: `https://www.clanker.world/clanker/${payload.contract_address}`,
+          directory_page_enabled: false,
+          tags: [],
+          chain_node_id: chainNode!.id!,
+          indexer: 'clanker',
+          token_address: payload.contract_address,
+        };
+        // if (uploadedImageUrl) {
+        //   createCommunityPayload.icon_url = uploadedImageUrl;
+        // }
+
         await command(CreateCommunity(), {
           actor: systemActor({
             id: adminAddress.user_id!,
             address: adminAddress.address,
           }),
-          payload: {
-            id,
-            type: ChainType.Token,
-            name: payload.name,
-            default_symbol: payload.symbol,
-            base: ChainBase.Ethereum,
-            social_links: [],
-            website: `https://www.clanker.world/clanker/${payload.contract_address}`,
-            directory_page_enabled: false,
-            tags: [],
-            chain_node_id: chainNode!.id!,
-            indexer: 'clanker',
-            token_address: payload.contract_address,
-          },
+          payload: createCommunityPayload,
         });
 
         log.debug(`created clanker community: ${id}`);
