@@ -249,7 +249,7 @@ const ModalBase = ({
         return 1;
       }
 
-      return 1;
+      return 0;
     });
   }, [showAuthOptionTypesFor, showAuthOptionFor, shouldShowSSOOptions]);
 
@@ -358,7 +358,6 @@ const ModalBase = ({
                   else render wallets/SSO's list based on activeTabIndex
                 */}
 
-                {/*FIXME: Wallet and SSO auth is here.*/}
                 {(activeTabIndex === 0 ||
                   (activeTabIndex === 1 &&
                     !isAuthenticatingWithEmail &&
