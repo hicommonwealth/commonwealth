@@ -285,7 +285,6 @@ export const CWTable = ({
           {table.getHeaderGroups().map((headerGroup) => (
             <tr key={headerGroup.id}>
               {headerGroup.headers.map((header) => {
-                console.log(header, 'header');
                 return (
                   <th key={header.id} colSpan={header.colSpan}>
                     {header.isPlaceholder ? null : (
@@ -327,10 +326,7 @@ export const CWTable = ({
                               }
                               body={
                                 <div className="explanation-container">
-                                  <CWText
-                                    type="b2"
-                                    className="multiline-content"
-                                  >
+                                  <CWText type="b2">
                                     {
                                       (
                                         header.column
