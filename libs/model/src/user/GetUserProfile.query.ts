@@ -1,4 +1,4 @@
-import { type Query } from '@hicommonwealth/core';
+import { InvalidInput, type Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { Op } from 'sequelize';
 import { z } from 'zod';
@@ -12,10 +12,17 @@ export function GetUserProfile(): Query<typeof schemas.GetUserProfile> {
     secure: false,
     body: async ({ actor, payload }) => {
       const user_id = payload.userId ?? actor.user?.id;
+      if (!user_id) throw new InvalidInput('Missing user id');
 
       const user = await models.User.findOne({
         where: { id: user_id },
-        attributes: ['profile', 'xp_points'],
+        attributes: [
+          'profile',
+          'referred_by_address',
+          'referral_count',
+          'referral_eth_earnings',
+          'xp_points',
+        ],
       });
 
       mustExist('User', user);
@@ -87,16 +94,16 @@ export function GetUserProfile(): Query<typeof schemas.GetUserProfile> {
           (t) => t.toJSON() as z.infer<typeof schemas.ThreadView>,
         ),
         comments: comments.map((c) => {
-          const comment = c.toJSON();
-          // ensure typed response
-          return {
-            ...comment,
+          const comment = {
+            ...c.toJSON(),
             user_id: c.Address!.user_id!,
             address: c.Address!.address!,
+            last_active: c.Address!.last_active!,
             Thread: undefined,
             search: undefined,
             community_id: c.Thread!.community_id,
-          } as z.infer<typeof schemas.UserProfileCommentView>;
+          };
+          return comment as z.infer<typeof schemas.CommentView>;
         }),
         commentThreads: commentThreads.map(
           (c) => c.toJSON() as z.infer<typeof schemas.ThreadView>,
@@ -104,6 +111,9 @@ export function GetUserProfile(): Query<typeof schemas.GetUserProfile> {
         isOwner: actor.user?.id === user_id,
         // ensure Tag is present in typed response
         tags: profileTags.map((t) => ({ id: t.Tag!.id!, name: t.Tag!.name })),
+        referred_by_address: user!.referred_by_address,
+        referral_count: user!.referral_count ?? 0,
+        referral_eth_earnings: user!.referral_eth_earnings ?? 0,
         xp_points: user!.xp_points ?? 0,
       };
     },

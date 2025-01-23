@@ -1,5 +1,8 @@
 import { logger } from '@hicommonwealth/core';
-import * as AbiCoder from 'web3-eth-abi';
+import {
+  decodeParameters,
+  encodeParameters,
+} from '@hicommonwealth/evm-protocols';
 import { ChainNodeInstance } from '../../../models/chain_node';
 import { Balances } from '../types';
 import { evmRpcRequest } from '../util';
@@ -60,10 +63,10 @@ async function getOnChainBatchErc1155Balances(
 
     const calldata =
       '0x4e1273f4' +
-      AbiCoder.encodeParameters(
-        ['address[]', 'uint256[]'],
-        [batchAddresses, Array(batchAddresses.length).fill(tokenId)],
-      ).substring(2);
+      encodeParameters({
+        abiInput: ['address[]', 'uint256[]'],
+        data: [batchAddresses, Array(batchAddresses.length).fill(tokenId)],
+      }).substring(2);
 
     rpcRequests.push({
       method: 'eth_call',
@@ -98,16 +101,16 @@ async function getOnChainBatchErc1155Balances(
         log.error(msg, data.error);
         continue;
       }
-      const balances = AbiCoder.decodeParameter(
-        'uint256[]',
-        data.result,
-      ) as number[];
+      const { 0: balances } = decodeParameters({
+        abiInput: ['uint256[]'],
+        data: data.result,
+      });
       // this replicates the batches used when creating the requests
       // note -> data.id is the startIndex defined in the loop above
       const endIndex = Math.min(data.id + batchSize, addresses.length);
       const relevantAddresses = addresses.slice(data.id, endIndex);
       relevantAddresses.forEach(
-        (key, i) => (addressBalanceMap[key] = String(balances[i])),
+        (key, i) => (addressBalanceMap[key] = String((<number[]>balances)[i])),
       );
     }
   }
@@ -124,10 +127,10 @@ async function getErc1155Balance(
 ): Promise<Balances> {
   const calldata =
     '0x00fdd58e' +
-    AbiCoder.encodeParameters(
-      ['address', 'uint256'],
-      [address, tokenId],
-    ).substring(2);
+    encodeParameters({
+      abiInput: ['address', 'uint256'],
+      data: [address, tokenId],
+    }).substring(2);
   const requestBody = {
     method: 'eth_call',
     params: [
@@ -152,8 +155,12 @@ async function getErc1155Balance(
     log.error(errorMsg, data.error);
     return {};
   } else {
+    const { 0: balance } = decodeParameters({
+      abiInput: ['uint256'],
+      data: data.result,
+    });
     return {
-      [address]: String(AbiCoder.decodeParameter('uint256', data.result)),
+      [address]: String(balance),
     };
   }
 }

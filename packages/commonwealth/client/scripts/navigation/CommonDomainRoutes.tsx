@@ -2,6 +2,7 @@ import { Navigate } from 'navigation/helpers';
 import React, { lazy } from 'react';
 import { Route } from 'react-router-dom';
 import { withLayout } from 'views/Layout';
+import { MobileAppRedirect } from 'views/pages/MobileAppRedirect/MobileAppRedirect';
 import { RouteFeatureFlags } from './Router';
 
 const QuillPage = lazy(() => import('views/pages/QuillPage'));
@@ -118,11 +119,16 @@ const CommunityNotFoundPage = lazy(
   () => import('views/pages/CommunityNotFoundPage'),
 );
 
+const UnSubscribePage = lazy(() => import('views/pages/UnSubscribePage'));
 const RewardsPage = lazy(() => import('views/pages/RewardsPage'));
 
-const CommonDomainRoutes = ({
-  tokenizedCommunityEnabled,
-}: RouteFeatureFlags) => [
+const CommonDomainRoutes = ({ launchpadEnabled }: RouteFeatureFlags) => [
+  <Route
+    key="mobile-app-redirect"
+    path="/_internal/mobile-app-redirect"
+    element={<MobileAppRedirect />}
+  />,
+
   <Route
     key="/_internal/quill"
     path="/_internal/quill"
@@ -162,7 +168,12 @@ const CommonDomainRoutes = ({
     path="/createCommunity"
     element={withLayout(CreateCommunityPage, { type: 'common' })}
   />,
-  ...(tokenizedCommunityEnabled
+  <Route
+    key="/unSubscribe/:userId"
+    path="/unSubscribe/:userId"
+    element={withLayout(UnSubscribePage, { type: 'common' })}
+  />,
+  ...(launchpadEnabled
     ? [
         <Route
           key="/createTokenCommunity"

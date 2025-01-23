@@ -14,7 +14,7 @@ import './Token.scss';
 const Token = () => {
   const communityId = app.activeChainId() || '';
   const navigate = useCommonNavigate();
-  const tokenizedCommunityEnabled = useFlag('tokenizedCommunity');
+  const uniswapTradeEnabled = useFlag('uniswapTrade');
 
   const { data: communityLaunchpadToken, isLoading: isLoadingLaunchpadToken } =
     useGetTokenByCommunityId({
@@ -35,7 +35,7 @@ const Token = () => {
   if (
     communityLaunchpadToken ||
     isLoadingLaunchpadToken ||
-    !tokenizedCommunityEnabled
+    !uniswapTradeEnabled
   )
     return <></>;
 

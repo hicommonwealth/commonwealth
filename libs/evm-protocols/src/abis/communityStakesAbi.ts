@@ -498,4 +498,4 @@ export const communityStakesAbi = [
     stateMutability: 'view',
     type: 'function',
   },
-];
+] as const;

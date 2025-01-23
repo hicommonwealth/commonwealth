@@ -1,4 +1,4 @@
-import { Projection, handleEvent } from '@hicommonwealth/core';
+import { Policy, Projection, handleEvent } from '@hicommonwealth/core';
 import { Events, events } from '@hicommonwealth/schemas';
 import { Op } from 'sequelize';
 import { ZodUndefined } from 'zod';
@@ -12,7 +12,9 @@ type EventSchemas = typeof events;
  */
 export async function drainOutbox<E extends Events>(
   events: E[],
-  factory: () => Projection<{ [Name in E]: EventSchemas[Name] }, ZodUndefined>,
+  factory: () =>
+    | Projection<{ [Name in E]: EventSchemas[Name] }, ZodUndefined>
+    | Policy<{ [Name in E]: EventSchemas[Name] }, ZodUndefined>,
   from?: Date,
 ) {
   const drained = await models.Outbox.findAll({
@@ -26,12 +28,12 @@ export async function drainOutbox<E extends Events>(
     },
     order: [['created_at', 'ASC']],
   });
-  const projection = factory();
+  const handler = factory();
   for (const { event_name, event_payload } of drained) {
     console.log(
       `>>> ${event_name} >>> ${factory.name} >>> ${JSON.stringify(event_payload)}`,
     );
-    await handleEvent(projection, {
+    await handleEvent(handler, {
       name: event_name,
       payload: event_payload,
     });

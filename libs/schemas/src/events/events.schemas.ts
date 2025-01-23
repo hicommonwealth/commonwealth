@@ -12,6 +12,7 @@ import {
   LaunchpadTokenCreated,
   LaunchpadTrade,
   NamespaceDeployed,
+  NamespaceDeployedWithReferral,
   ReferralFeeDistributed,
   ReferralSet,
 } from './chain-event.schemas';
@@ -88,7 +89,6 @@ export const CommunityCreated = z.object({
 export const CommunityJoined = z.object({
   community_id: z.string(),
   user_id: z.number(),
-  referrer_address: z.string().optional(),
   created_at: z.coerce.date(),
 });
 
@@ -190,6 +190,17 @@ const ChainEventCreatedBase = z.object({
     transactionHash: z.string(),
     logIndex: z.number(),
   }),
+  block: z.object({
+    number: z.number(),
+    hash: z.string(),
+    logsBloom: z.string(),
+    nonce: z.string().optional(),
+    parentHash: z.string(),
+    timestamp: z.number(),
+    miner: z.string(),
+    gasLimit: z.number(),
+    gasUsed: z.number(),
+  }),
 });
 
 /**
@@ -203,6 +214,14 @@ export const ChainEventCreated = z.union([
       ),
     }),
     parsedArgs: NamespaceDeployed,
+  }),
+  ChainEventCreatedBase.extend({
+    eventSource: ChainEventCreatedBase.shape.eventSource.extend({
+      eventSignature: z.literal(
+        EvmEventSignatures.NamespaceFactory.NamespaceDeployedWithReferral,
+      ),
+    }),
+    parsedArgs: NamespaceDeployedWithReferral,
   }),
   ChainEventCreatedBase.extend({
     eventSource: ChainEventCreatedBase.shape.eventSource.extend({
@@ -305,9 +324,8 @@ export const FarcasterVoteCreated = FarcasterAction.extend({
 
 export const SignUpFlowCompleted = z.object({
   user_id: z.number(),
+  address: z.string(),
   created_at: z.coerce.date(),
-  referrer_address: z.string().optional(),
-  referee_address: z.string().optional(),
 });
 
 export const ContestRolloverTimerTicked = z.object({});

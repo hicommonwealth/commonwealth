@@ -42,7 +42,7 @@ const useTokenBalanceQuery = ({
   chainId,
 }: UseTokenBalanceQueryProps) => {
   return useQuery({
-    queryKey: [tokenId, chainId],
+    queryKey: [tokenId, chainId, 'alchemy_getTokenBalances'],
     queryFn: () => getTokenBalance({ tokenId, chainId }),
     enabled: !!tokenId,
     retry: false,

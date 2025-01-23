@@ -28,4 +28,4 @@ export const reservationHookAbi = [
     stateMutability: 'view',
     type: 'function',
   },
-];
+] as const;

@@ -10,13 +10,14 @@
     background-color: $white;
     padding-block: 16px;
     position: fixed;
-    z-index: 3;
+    z-index: 3 !important;
     overflow: auto;
     width: 100%;
     max-width: 1040px;
     overflow: hidden;
     max-height: 52px !important;
     min-height: 52px !important;
+    padding-bottom: 2px !important;
 
     @include extraSmall {
       position: static;

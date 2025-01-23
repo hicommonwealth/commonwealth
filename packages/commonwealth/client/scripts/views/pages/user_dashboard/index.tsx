@@ -46,7 +46,7 @@ const UserDashboard = ({ type }: UserDashboardProps) => {
 
   const { isAddedToHomeScreen } = useAppStatus();
 
-  const tokenizedCommunityEnabled = useFlag('tokenizedCommunity');
+  const launchpadEnabled = useFlag('launchpad');
 
   useBrowserAnalyticsTrack({
     payload: {
@@ -98,7 +98,7 @@ const UserDashboard = ({ type }: UserDashboardProps) => {
         <CWText type="h2" fontWeight="medium" className="page-header">
           Home
         </CWText>
-        <div className="content">
+        <div className="contentContainer">
           <div className="user-dashboard-activity">
             <div className="dashboard-header" id="dashboard-header">
               <CWTabsRow>
@@ -140,12 +140,12 @@ const UserDashboard = ({ type }: UserDashboardProps) => {
           </div>
           {isWindowExtraSmall ? (
             <>
-              {tokenizedCommunityEnabled && <LaunchTokenCard />}
+              {launchpadEnabled && <LaunchTokenCard />}
               <TrendingCommunitiesPreview />
             </>
           ) : (
             <div className="featured-cards">
-              {tokenizedCommunityEnabled && <LaunchTokenCard />}
+              {launchpadEnabled && <LaunchTokenCard />}
               <TrendingCommunitiesPreview />
             </div>
           )}

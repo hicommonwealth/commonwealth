@@ -2,6 +2,7 @@ import {
   ArrowBendUpRight,
   ArrowFatUp,
   BellSimple,
+  BellSlash,
   ChatCenteredDots,
   Coins,
   DotsThree,
@@ -54,7 +55,11 @@ const renderPhosphorIcon = (
     case 'share':
       return <ArrowBendUpRight {...commonProps(disabled)} />;
     case 'subscribe':
-      return <BellSimple {...commonProps(disabled)} />;
+      return selected ? (
+        <BellSlash {...commonProps(disabled)} />
+      ) : (
+        <BellSimple {...commonProps(disabled)} />
+      );
     case 'overflow':
       return <DotsThree {...commonProps(disabled)} />;
     case 'leaderboard':
