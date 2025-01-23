@@ -14,6 +14,7 @@ import {
 } from '@hicommonwealth/core';
 import {
   ChainEventPolicy,
+  CommunityIndexer,
   Contest,
   ContestWorker,
   DiscordBotPolicy,
@@ -176,4 +177,26 @@ export function bootstrapContestRolloverLoop() {
   setInterval(() => {
     loop().catch(console.error);
   }, 1_000 * 60);
+}
+
+export function bootstrapCommunityIndexerLoop() {
+  log.info('Starting community indexer loop');
+
+  const loop = async () => {
+    try {
+      await handleEvent(CommunityIndexer(), {
+        name: EventNames.CommunityIndexerTimerTicked,
+        payload: {},
+      });
+    } catch (err) {
+      log.error(err);
+    }
+  };
+
+  setInterval(
+    () => {
+      loop().catch(console.error);
+    },
+    1_000 * 60 * 10,
+  );
 }

@@ -6,6 +6,7 @@ import {
 import { logger, stats } from '@hicommonwealth/core';
 import {
   bootstrapBindings,
+  bootstrapCommunityIndexerLoop,
   bootstrapContestRolloverLoop,
 } from 'server/bindings/bootstrap';
 import { fileURLToPath } from 'url';
@@ -39,6 +40,7 @@ async function main() {
     await bootstrapBindings();
     isServiceHealthy = true;
     bootstrapContestRolloverLoop();
+    bootstrapCommunityIndexerLoop();
   } catch (error) {
     log.fatal('Consumer setup failed', error);
   }
