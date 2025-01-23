@@ -92,8 +92,7 @@ export enum RascalRoutingKeys {
   XpProjectionCommentUpvoted = EventNames.CommentUpvoted,
   XpProjectionUserMentioned = EventNames.UserMentioned,
 
-  UserReferralsSignUpFlowCompleted = EventNames.SignUpFlowCompleted,
-  UserReferralsCommunityJoined = EventNames.CommunityJoined,
+  UserReferralsCommunityCreated = EventNames.CommunityCreated,
 
   FarcasterWorkerPolicyCastCreated = EventNames.FarcasterCastCreated,
   FarcasterWorkerPolicyReplyCastCreated = EventNames.FarcasterReplyCastCreated,

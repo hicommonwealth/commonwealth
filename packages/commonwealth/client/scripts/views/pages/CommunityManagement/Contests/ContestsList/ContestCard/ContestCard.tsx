@@ -19,7 +19,6 @@ import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
 import { SharePopoverOld } from 'views/components/share_popover_old';
-import { capDecimals } from 'views/modals/ManageCommunityStakeModal/utils';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 
 import { ContestType } from '../../types';
@@ -249,7 +248,7 @@ const ContestCard = ({
                         {moment.localeData().ordinal(index + 1)} Prize
                       </CWText>
                       <CWText fontWeight="bold">
-                        {capDecimals(String(prize))} {ticker}
+                        {prize} {ticker}
                       </CWText>
                     </div>
                   ))

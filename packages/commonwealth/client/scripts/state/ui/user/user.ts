@@ -9,7 +9,7 @@ import { createBoundedUseStore } from '../utils';
 
 export type EmailNotificationInterval = 'weekly' | 'never';
 
-type UserCommunities = {
+export type UserCommunities = {
   id: string;
   name: string;
   iconUrl: string;
@@ -38,7 +38,7 @@ type CommonProps = {
   hasMagicWallet: boolean;
 };
 
-type UserStoreProps = CommonProps & {
+export type UserStoreProps = CommonProps & {
   setData: (data: Partial<CommonProps>) => void;
 };
 

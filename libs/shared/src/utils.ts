@@ -51,6 +51,13 @@ export const splitAndDecodeURL = (locationPathname: string) => {
   return splitURLPath[2] ? decodeURIComponent(splitURLPath[2]) : null;
 };
 
+// WARN: Using process.env to avoid webpack failures
+export const getCommunityUrl = (community: string): string => {
+  return process.env.NODE_ENV === 'production'
+    ? `https://${PRODUCTION_DOMAIN}/${community}`
+    : `http://localhost:8080/${community}`;
+};
+
 export const getThreadUrl = (
   thread: {
     chain: string;
@@ -434,6 +441,11 @@ export const buildContestLeaderboardUrl = (
   return `${baseUrl}/${communityId}/contests/${contestAddress}`;
 };
 
+export const smallNumberFormatter = new Intl.NumberFormat('en-US', {
+  notation: 'standard',
+  maximumFractionDigits: 20, // Allow up to 22 decimal places for small numbers
+});
+
 // returns balance with fee deducted
 export const calculateNetContestBalance = (originalBalance: number) => {
   const multiplier = (100 - CONTEST_FEE_PERCENT) / 100;
@@ -445,14 +457,16 @@ export const buildContestPrizes = (
   contestBalance: number,
   payoutStructure?: number[],
   decimals?: number,
-): number[] => {
+): string[] => {
   // 10% fee deducted from prize pool
   const netContestBalance = calculateNetContestBalance(Number(contestBalance));
   return netContestBalance && payoutStructure
-    ? payoutStructure.map(
-        (percentage) =>
+    ? payoutStructure.map((percentage) => {
+        const prize =
           (Number(netContestBalance) * (percentage / 100)) /
-          Math.pow(10, decimals || 18),
-      )
+          Math.pow(10, decimals || 18);
+
+        return smallNumberFormatter.format(prize);
+      })
     : [];
 };
