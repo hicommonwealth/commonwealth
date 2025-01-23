@@ -394,7 +394,7 @@ const CommunityMembersPage = () => {
           )}
 
         {/* Filter section */}
-        {selectedTab === TabValues.Leaderboard && groups?.length === 0 ? (
+        {selectedTab === TabValues.Leaderboard || groups?.length === 0 ? (
           <></>
         ) : (
           <section
