@@ -5,6 +5,7 @@
   align-items: center;
   justify-content: space-between;
   width: 210px;
+  margin-top: 5px;
 
   .address-section {
     display: flex;
@@ -13,14 +14,13 @@
 
     .address {
       background-color: $neutral-200;
-      padding: 2px 8px;
       border-radius: 6px;
       font-size: 14px;
       color: $neutral-600;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
-      width: 110px;
+      width: 120px;
     }
 
     .copy-icon {
@@ -29,10 +29,11 @@
       cursor: pointer;
     }
 
-    check-mark-icon {
+    .check-mark-icon {
       width: 20px;
       height: 20px;
       cursor: pointer;
+      fill: $green-600;
     }
 
     .open-wallet-icon {

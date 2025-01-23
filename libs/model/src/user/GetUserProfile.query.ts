@@ -16,7 +16,13 @@ export function GetUserProfile(): Query<typeof schemas.GetUserProfile> {
 
       const user = await models.User.findOne({
         where: { id: user_id },
-        attributes: ['profile', 'xp_points'],
+        attributes: [
+          'profile',
+          'referred_by_address',
+          'referral_count',
+          'referral_eth_earnings',
+          'xp_points',
+        ],
       });
 
       mustExist('User', user);
@@ -105,6 +111,9 @@ export function GetUserProfile(): Query<typeof schemas.GetUserProfile> {
         isOwner: actor.user?.id === user_id,
         // ensure Tag is present in typed response
         tags: profileTags.map((t) => ({ id: t.Tag!.id!, name: t.Tag!.name })),
+        referred_by_address: user!.referred_by_address,
+        referral_count: user!.referral_count ?? 0,
+        referral_eth_earnings: user!.referral_eth_earnings ?? 0,
         xp_points: user!.xp_points ?? 0,
       };
     },

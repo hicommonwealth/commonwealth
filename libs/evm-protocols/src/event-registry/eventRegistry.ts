@@ -68,6 +68,7 @@ const namespaceFactorySource = {
   eventSignatures: [
     EvmEventSignatures.NamespaceFactory.ContestManagerDeployed,
     EvmEventSignatures.NamespaceFactory.NamespaceDeployed,
+    EvmEventSignatures.NamespaceFactory.NamespaceDeployedWithReferral,
   ],
   childContracts: {
     [ChildContractNames.RecurringContest]: {

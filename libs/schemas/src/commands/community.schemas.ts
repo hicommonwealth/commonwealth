@@ -48,7 +48,6 @@ export const CreateCommunity = {
 
     // hidden optional params
     token_name: z.string().optional(),
-    referrer_address: z.string().optional(),
 
     // deprecated params to be removed
     default_symbol: z.string().max(9),
@@ -342,7 +341,6 @@ export const SelectCommunity = {
 export const JoinCommunity = {
   input: z.object({
     community_id: z.string(),
-    referrer_address: z.string().optional(),
   }),
   output: z.object({
     community_id: z.string(),
