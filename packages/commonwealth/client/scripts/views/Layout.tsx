@@ -12,6 +12,7 @@ import {
 import useErrorStore from 'state/ui/error';
 import useUserStore from 'state/ui/user';
 import { MobileScrollBuffer } from 'views/components/MobileNavigation/MobileScrollBuffer';
+import { ReactNativeBridgeRouter } from 'views/components/ReactNativeBridge';
 import { PageNotFound } from 'views/pages/404';
 import ErrorPage from 'views/pages/error';
 import { z } from 'zod';
@@ -188,6 +189,7 @@ const LayoutComponent = ({
       )}
     >
       {renderDefaultMetatags && <MetaTags />}
+      <ReactNativeBridgeRouter />
       <div className="Layout">
         {type === 'blank' ? (
           childToRender()

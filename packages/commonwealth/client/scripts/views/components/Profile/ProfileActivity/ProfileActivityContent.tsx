@@ -6,8 +6,7 @@ import Thread from 'models/Thread';
 import { CWText } from '../../component_kit/cw_text';
 import type { CommentWithAssociatedThread } from './ProfileActivity';
 import ProfileActivityRow from './ProfileActivityRow';
-import ProfileThread from './ProfileThread';
-import ReferralsTab from './ReferralsTab';
+import { ProfileThread } from './ProfileThread/ProfileThread';
 import { TransactionsTab } from './TransactionsTab/TransactionsTab';
 
 export enum ProfileActivityType {
@@ -15,7 +14,6 @@ export enum ProfileActivityType {
   Comments,
   Communities,
   Threads,
-  Referrals,
   MyTokens,
 }
 
@@ -24,7 +22,6 @@ type ProfileActivityContentProps = {
   threads: Thread[];
   comments: CommentWithAssociatedThread[];
   mapProfileThread: (thread: Thread) => Thread;
-  isOwner: boolean | undefined;
 };
 
 const ProfileActivityContent = ({
@@ -32,7 +29,6 @@ const ProfileActivityContent = ({
   comments,
   threads,
   mapProfileThread,
-  isOwner,
 }: ProfileActivityContentProps) => {
   if (option === ProfileActivityType.Threads) {
     if (threads.length === 0) {
@@ -59,10 +55,6 @@ const ProfileActivityContent = ({
           ))}
       </>
     );
-  }
-
-  if (option === ProfileActivityType.Referrals) {
-    return <ReferralsTab isOwner={isOwner} />;
   }
 
   if (option === ProfileActivityType.MyTokens) {

@@ -11,9 +11,12 @@ const LaunchTokenCard = () => {
         <br />
         right on common!
       </CWText>
-      <CWText fontWeight="semiBold" isCentered>
-        No developers or technical skills required. Easily crowdfund liquidity.
-        Auto-launch on Uniswap when market cap is reached.
+      <CWText isCentered>
+        1. Add an image and a name
+        <br />
+        2. Share the link
+        <br />
+        3. Hit the fundraise target
       </CWText>
       <TokenLaunchButton />
     </section>

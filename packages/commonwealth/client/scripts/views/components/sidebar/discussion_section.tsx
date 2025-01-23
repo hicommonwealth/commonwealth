@@ -1,6 +1,8 @@
 import React from 'react';
 import { matchRoutes, useLocation } from 'react-router-dom';
 
+import { useRefreshMembershipQuery } from 'client/scripts/state/api/groups';
+import useUserStore from 'client/scripts/state/ui/user';
 import { useCommonNavigate } from 'navigation/helpers';
 import app from 'state';
 import { useFetchTopicsQuery } from 'state/api/topics';
@@ -9,14 +11,13 @@ import { handleRedirectClicks } from '../../../helpers';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { isWindowSmallInclusive } from '../component_kit/helpers';
 import { verifyCachedToggleTree } from './helpers';
+import './index.scss';
 import { SidebarSectionGroup } from './sidebar_section';
 import type {
   SectionGroupAttrs,
   SidebarSectionAttrs,
   ToggleTree,
 } from './types';
-
-import './index.scss';
 
 const resetSidebarState = () => {
   if (isWindowSmallInclusive(window.innerWidth)) {
@@ -64,11 +65,22 @@ export const DiscussionSection = ({
     location,
   );
 
+  const user = useUserStore();
   const communityId = app.activeChainId() || '';
   const { data: topicsData } = useFetchTopicsQuery({
     communityId,
     apiEnabled: !!communityId,
   });
+
+  const { data: memberships = [] } = useRefreshMembershipQuery({
+    communityId,
+    address: user.activeAccount?.address || '',
+    apiEnabled: !!communityId,
+  });
+  const isTopicGated = (topicId: number) =>
+    !!memberships.find((membership) =>
+      membership.topics.find((t) => t.id === topicId),
+    );
 
   const topics = (topicsData || [])
     .filter((t) => t.featured_in_sidebar)
@@ -128,6 +140,7 @@ export const DiscussionSection = ({
         });
       },
       displayData: null,
+      leftIcon: <CWIcon iconName="squaresFour" iconSize="small" />,
     },
   ];
 
@@ -135,6 +148,15 @@ export const DiscussionSection = ({
     if (topic.featured_in_sidebar) {
       const topicInvolvedInActiveContest =
         topic?.id && topicIdsIncludedInContest.includes(topic.id);
+
+      let leftIcon: React.ReactNode;
+      if (topic.id && isTopicGated(topic.id)) {
+        leftIcon = <CWIcon iconName="lockedNew" iconSize="small" />;
+      } else if (topicInvolvedInActiveContest) {
+        leftIcon = <CWIcon iconName="trophy" iconSize="small" />;
+      } else {
+        leftIcon = <CWIcon iconName="hash" iconSize="small" />;
+      }
 
       const discussionSectionGroup: SectionGroupAttrs = {
         title: topic.name,
@@ -162,9 +184,7 @@ export const DiscussionSection = ({
           );
         },
         displayData: null,
-        ...(topicInvolvedInActiveContest
-          ? { rightIcon: <CWIcon iconName="trophy" iconSize="small" /> }
-          : {}),
+        leftIcon,
       };
       discussionsGroupData.push(discussionSectionGroup);
     }
@@ -172,7 +192,7 @@ export const DiscussionSection = ({
 
   const archivedSectionGroup: SectionGroupAttrs = {
     title: 'Archived',
-    rightIcon: <CWIcon iconName="archiveTray" iconSize="small" />,
+    leftIcon: <CWIcon iconName="archiveTray" iconSize="small" />,
     containsChildren: false,
     hasDefaultToggle: false,
     isVisible: true,

@@ -11,11 +11,11 @@ import React from 'react';
 import { PopoverMenu } from '../../component_kit/CWPopoverMenu';
 import { CWIconButton } from '../../component_kit/cw_icon_button';
 import { CWIcon } from '../../component_kit/cw_icons/cw_icon';
-import { CWText } from '../../component_kit/cw_text';
 import { CWTooltip } from '../../component_kit/new_designs/CWTooltip';
 
 import { useGetCommunityByIdQuery } from 'client/scripts/state/api/communities';
 import { saveToClipboard } from 'client/scripts/utils/clipboard';
+import { CWTag } from '../../component_kit/new_designs/CWTag';
 import './AddressItem.scss';
 
 type AddressItemProps = {
@@ -27,10 +27,12 @@ type AddressItemProps = {
     communityName: string,
   ) => void;
   isSelected: boolean;
+  isInsideCommunity?: boolean;
 };
 
 const AddressItem = (props: AddressItemProps) => {
-  const { addressInfo, toggleRemoveModal, isSelected } = props;
+  const { addressInfo, toggleRemoveModal, isSelected, isInsideCommunity } =
+    props;
   const { address, walletId, community } = addressInfo;
 
   const { openMagicWallet } = useAuthentication({});
@@ -49,9 +51,11 @@ const AddressItem = (props: AddressItemProps) => {
     <div className="AddressItem">
       <div className="address-section">
         <div className="address">
-          <CWText className="address-label" type="b2" fontWeight="regular">
-            {formatAddressShort(address, 6)}
-          </CWText>
+          <CWTag
+            label={formatAddressShort(address)}
+            type="address"
+            iconName="ethereum"
+          />
         </div>
         <CWTooltip
           placement="top"
@@ -107,20 +111,22 @@ const AddressItem = (props: AddressItemProps) => {
           />
         )}
       </div>
-      <div className="popover-section">
-        <PopoverMenu
-          menuItems={[
-            {
-              label: `Remove Address`,
-              onClick: () =>
-                toggleRemoveModal(true, addressInfo, fetchedCommunity.name),
-            },
-          ]}
-          renderTrigger={(onClick) => (
-            <CWIconButton iconName="dotsHorizontal" onClick={onClick} />
-          )}
-        />
-      </div>
+      {isInsideCommunity && (
+        <div className="popover-section">
+          <PopoverMenu
+            menuItems={[
+              {
+                label: `Remove Address`,
+                onClick: () =>
+                  toggleRemoveModal(true, addressInfo, fetchedCommunity.name),
+              },
+            ]}
+            renderTrigger={(onClick) => (
+              <CWIconButton iconName="dotsHorizontal" onClick={onClick} />
+            )}
+          />
+        </div>
+      )}
     </div>
   );
 };
