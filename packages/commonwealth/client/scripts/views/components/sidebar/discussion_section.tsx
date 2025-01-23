@@ -55,11 +55,6 @@ export const DiscussionSection = ({
     location,
   );
 
-  const matchesCommunityHomeRoute = matchRoutes(
-    [{ path: ':scope/community-home' }],
-    location,
-  );
-
   const matchesArchivedRoute = matchRoutes(
     [{ path: '/archived' }, { path: ':scope/archived' }],
     location,
@@ -118,31 +113,6 @@ export const DiscussionSection = ({
     localStorage[`${app.activeChainId()}-discussions-toggle-tree`],
   );
   const discussionsGroupData: SectionGroupAttrs[] = [
-    {
-      title: 'Community Home',
-      containsChildren: false,
-      hasDefaultToggle: false,
-      isVisible: true,
-      isUpdated: true,
-      isActive: !!matchesCommunityHomeRoute,
-      onClick: (e, toggle: boolean) => {
-        e.preventDefault();
-        resetSidebarState();
-        handleRedirectClicks(
-          navigate,
-          e,
-          `/community-home`,
-          communityId,
-          () => {
-            setDiscussionsToggleTree(
-              `children.CommunityHome.toggledState`,
-              toggle,
-            );
-          },
-        );
-      },
-      displayData: null,
-    },
     {
       title: 'All',
       containsChildren: false,

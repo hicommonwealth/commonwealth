@@ -14,6 +14,7 @@ const MarkdownHitHighlighterPage = lazy(
 const DashboardPage = lazy(() => import('views/pages/user_dashboard'));
 const CommunitiesPage = lazy(() => import('views/pages/Communities'));
 const SearchPage = lazy(() => import('views/pages/search'));
+const HomePage = lazy(() => import('views/pages/HomePage/HomePage'));
 
 const CreateCommunityPage = lazy(() => import('views/pages/CreateCommunity'));
 const LaunchToken = lazy(() => import('views/pages/LaunchToken'));
@@ -47,9 +48,6 @@ const NewProposalPage = lazy(() => import('views/pages/new_proposal/index'));
 
 const DiscussionsPage = lazy(
   () => import('views/pages/discussions/DiscussionsPage'),
-);
-const CommunityHomePage = lazy(
-  () => import('../views/pages/CommunityHome/CommunityHomePage'),
 );
 const ViewThreadPage = lazy(
   () => import('../views/pages/view_thread/ViewThreadPage'),
@@ -153,6 +151,11 @@ const CommonDomainRoutes = ({
     key="/"
     path="/"
     element={withLayout(DashboardPage, { type: 'common' })}
+  />,
+  <Route
+    key="/home"
+    path="/home"
+    element={withLayout(HomePage, { type: 'common' })}
   />,
   <Route
     key="/createCommunity"
@@ -320,13 +323,6 @@ const CommonDomainRoutes = ({
   // GOVERNANCE END
 
   // DISCUSSIONS
-  <Route
-    key="/:scope/community-home"
-    path="/:scope/community-home"
-    element={withLayout(CommunityHomePage, {
-      scoped: true,
-    })}
-  />,
   <Route
     key="/:scope/discussions"
     path="/:scope/discussions"
