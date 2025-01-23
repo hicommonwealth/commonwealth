@@ -2,12 +2,13 @@ import { BigNumber } from '@ethersproject/bignumber';
 import { Actor, command, dispose, query } from '@hicommonwealth/core';
 import { EvmEventSignatures } from '@hicommonwealth/evm-protocols';
 import * as schemas from '@hicommonwealth/schemas';
-import { ZERO_ADDRESS } from '@hicommonwealth/shared';
-import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { ChainBase, ChainType, ZERO_ADDRESS } from '@hicommonwealth/shared';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import { z } from 'zod';
-import { JoinCommunity } from '../../src/community';
+import { CreateCommunity, UpdateCommunity } from '../../src/community';
 import { models } from '../../src/database';
 import { ChainEventPolicy } from '../../src/policies';
+import { commonProtocol } from '../../src/services';
 import { seed } from '../../src/tester';
 import { GetUserReferralFees, UserReferrals } from '../../src/user';
 import { GetUserReferrals } from '../../src/user/GetUserReferrals.query';
@@ -58,23 +59,27 @@ function chainEvent(
 describe('Referral lifecycle', () => {
   let admin: Actor;
   let nonMember: Actor;
-  let community_id: string;
+  let nonMemberUser: z.infer<typeof schemas.User> | undefined;
+  let chain_node_id: number;
 
   beforeAll(async () => {
     const { actors, base, community } = await seedCommunity({
       roles: ['admin', 'member'],
     });
     admin = actors.admin;
-    const [nonMemberUser] = await seed('User', {
+    [nonMemberUser] = await seed('User', {
       profile: {
         name: 'non-member',
       },
+      referred_by_address: admin.address, // referrer
       isAdmin: false,
       is_welcome_onboard_flow_complete: false,
     });
     const [nonMemberAddress] = await seed('Address', {
       community_id: base!.id!,
       user_id: nonMemberUser!.id!,
+      address: '0x0000000000000000000000000000000000001234',
+      verified: true, // must be verified to update community as admin
     });
     nonMember = {
       user: {
@@ -84,25 +89,37 @@ describe('Referral lifecycle', () => {
       },
       address: nonMemberAddress!.address!,
     };
-    community_id = community!.id!;
+    chain_node_id = community!.chain_node_id!;
   });
 
   afterAll(async () => {
     await dispose()();
   });
 
-  it('should create a referral when signing in with a referral link', async () => {
-    // non-member joins with referral link
-    await command(JoinCommunity(), {
+  it('should create referral/fees when referred user creates a community', async () => {
+    // non-member creates a community with a referral link from admin
+    const result = await command(CreateCommunity(), {
       actor: nonMember,
       payload: {
-        community_id,
-        referrer_address: admin.address,
+        id: 'referred-community',
+        name: 'Referred Community',
+        description: 'Referred Community Description',
+        default_symbol: 'RC',
+        base: ChainBase.Ethereum,
+        type: ChainType.Offchain,
+        chain_node_id,
+        directory_page_enabled: true,
+        social_links: [],
+        tags: [],
       },
     });
+    expect(result).toBeTruthy();
+    const community = result?.community;
+    expect(community).toBeTruthy();
+    const community_id = community!.id!;
 
     // creates "partial" platform entries for referrals
-    await drainOutbox(['CommunityJoined'], UserReferrals);
+    await drainOutbox(['CommunityCreated'], UserReferrals);
 
     const expectedReferrals: z.infer<typeof schemas.ReferralView>[] = [
       {
@@ -117,6 +134,9 @@ describe('Referral lifecycle', () => {
         updated_at: expect.any(Date),
         referee_user_id: nonMember.user.id!,
         referee_profile: { name: 'non-member' },
+        community_id: null,
+        community_name: null,
+        community_icon_url: null,
       },
     ];
 
@@ -132,26 +152,40 @@ describe('Referral lifecycle', () => {
     });
     expect(referrerUser?.referral_count).toBe(1);
 
-    const refereeAddress = await models.Address.findOne({
-      where: { user_id: nonMember.user.id, community_id },
-    });
-    expect(refereeAddress?.referred_by_address).toBe(admin.address);
-
-    // simulate on-chain transactions that occur when referees
-    // deploy a new namespace with a referral link (ReferralSet)
+    // simulate namespace creation on-chain (From the UI)
     const namespaceAddress = '0x0000000000000000000000000000000000000001';
+    const transactionHash = '0x2';
     const chainEvents1 = [
       chainEvent(
-        '0x2',
-        nonMember.address!, // referee
-        EvmEventSignatures.Referrals.ReferralSet,
+        transactionHash,
+        '0x0000000000000000000000000000000000000002',
+        EvmEventSignatures.NamespaceFactory.NamespaceDeployedWithReferral,
         [
           namespaceAddress,
+          '0x0000000000000000000000000000000000000004', // fee manager address
           admin.address, // referrer
+          '0x0000000000000000000000000000000000000003', // referral fee contract
+          '0x0', // signature
+          nonMember.address!, // referee
         ],
       ),
     ];
     await models.Outbox.bulkCreate(chainEvents1);
+
+    // simulate UI updating the namespace address
+    vi.spyOn(
+      commonProtocol.newNamespaceValidator,
+      'validateNamespace',
+    ).mockResolvedValue(namespaceAddress);
+    await command(UpdateCommunity(), {
+      actor: nonMember,
+      payload: {
+        community_id,
+        transactionHash,
+        namespace: namespaceAddress,
+      },
+    });
+    vi.restoreAllMocks();
 
     // syncs "partial" platform entries for referrals with on-chain transactions
     await drainOutbox(['ChainEventCreated'], ChainEventPolicy);
@@ -161,6 +195,9 @@ describe('Referral lifecycle', () => {
     expectedReferrals[0].namespace_address = namespaceAddress;
     expectedReferrals[0].created_on_chain_timestamp =
       chainEvents1[0].event_payload.block.timestamp;
+    expectedReferrals[0].community_id = community!.id;
+    expectedReferrals[0].community_name = community!.name;
+    expectedReferrals[0].community_icon_url = community!.icon_url;
 
     // get referrals again with tx attributes
     const referrals2 = await query(GetUserReferrals(), {
@@ -212,6 +249,14 @@ describe('Referral lifecycle', () => {
         referrer_recipient_address: admin.address,
         referrer_received_amount: fee,
         transaction_timestamp: expect.any(Number),
+        referee_address: nonMember.address!,
+        referee_profile: {
+          name: nonMemberUser?.profile.name,
+          avatar_url: nonMemberUser?.profile.avatar_url,
+        },
+        community_id,
+        community_name: community!.name,
+        community_icon_url: community!.icon_url,
       },
     ];
     const referralFees = await query(GetUserReferralFees(), {

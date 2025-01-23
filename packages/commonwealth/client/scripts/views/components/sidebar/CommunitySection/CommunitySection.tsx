@@ -37,6 +37,7 @@ import { TokenTradeWidget } from './TokenTradeWidget';
 
 interface CommunitySectionProps {
   showSkeleton: boolean;
+  isInsideCommunity?: boolean;
 }
 
 enum ProfileError {
@@ -44,7 +45,10 @@ enum ProfileError {
   NoProfileFound,
 }
 
-export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
+export const CommunitySection = ({
+  showSkeleton,
+  isInsideCommunity,
+}: CommunitySectionProps) => {
   const launchpadEnabled = useFlag('launchpad');
   const uniswapTradeEnabled = useFlag('uniswapTrade');
   const [profile, setProfile] = useState<NewProfile>();
@@ -146,6 +150,7 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
               refreshProfiles={() => {
                 refetch().catch(console.error);
               }}
+              isInsideCommunity={isInsideCommunity}
             />
 
             {stakeEnabled && (
@@ -164,19 +169,18 @@ export const CommunitySection = ({ showSkeleton }: CommunitySectionProps) => {
 
         <CreateCommunityButton />
 
-        {isAdmin && (
-          <>
-            <CWDivider />
-            <AdminSection />
-          </>
-        )}
-
         <CWDivider />
         <DiscussionSection
           // @ts-expect-error <StrictNullChecks/>
           topicIdsIncludedInContest={topicIdsIncludedInContest}
         />
         <CWDivider />
+        {isAdmin && (
+          <>
+            <AdminSection />
+            <CWDivider />
+          </>
+        )}
         <GovernanceSection isContestAvailable={isContestAvailable} />
         <CWDivider />
         <DirectoryMenuItem />

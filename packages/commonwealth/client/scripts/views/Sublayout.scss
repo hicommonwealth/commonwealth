@@ -26,11 +26,15 @@
       }
 
       &.menu-visible {
-        margin-left: calc(#{$quick-switcher-width} + 1px);
+        margin-left: calc(#{$quick-switcher-width} + #{$sidebar-width} + 1px);
 
         transition: margin-left 0.2s ease-in-out;
 
         width: calc(100% - (#{$quick-switcher-width} + 1px));
+
+        @include isWindowSmallToMediumInclusive {
+          margin-left: 100vw;
+        }
       }
 
       &.quick-switcher-visible {

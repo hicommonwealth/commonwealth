@@ -99,7 +99,11 @@ export function SignIn(): Command<typeof schemas.SignIn> {
             });
             if (!existing) {
               const user = await models.User.create(
-                { email: null, profile: {} },
+                {
+                  email: null,
+                  profile: {},
+                  referred_by_address: referrer_address,
+                },
                 { transaction },
               );
               if (!user) throw new Error('Failed to create user');
@@ -125,7 +129,6 @@ export function SignIn(): Command<typeof schemas.SignIn> {
               is_user_default: false,
               ghost_address: false,
               is_banned: false,
-              referred_by_address: referrer_address,
             },
             transaction,
           });
@@ -150,7 +153,6 @@ export function SignIn(): Command<typeof schemas.SignIn> {
                 community_id,
                 user_id: addr.user_id!,
                 created_at: addr.created_at!,
-                referrer_address,
               },
             });
           new_user &&
