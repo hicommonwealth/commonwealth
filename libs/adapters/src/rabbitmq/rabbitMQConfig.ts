@@ -78,6 +78,7 @@ export function getRabbitMQConfig(
       RascalQueues.UserReferrals,
       RascalQueues.FarcasterWorkerPolicy,
       RascalQueues.DiscordBotPolicy,
+      RascalQueues.CommunityIndexerPolicy,
     ]);
     copyConfigs(allBindings, vhostConfig.bindings, [
       RascalBindings.ChainEvent,
@@ -89,6 +90,7 @@ export function getRabbitMQConfig(
       RascalBindings.UserReferrals,
       RascalBindings.FarcasterWorkerPolicy,
       RascalBindings.DiscordBotPolicy,
+      RascalBindings.CommunityIndexerPolicy,
     ]);
     copyConfigs(allPublications, vhostConfig.publications, [
       RascalPublications.MessageRelayer,
@@ -103,6 +105,7 @@ export function getRabbitMQConfig(
       RascalSubscriptions.UserReferrals,
       RascalSubscriptions.FarcasterWorkerPolicy,
       RascalSubscriptions.DiscordBotPolicy,
+      RascalSubscriptions.CommunityIndexerPolicy,
     ]);
   }
 

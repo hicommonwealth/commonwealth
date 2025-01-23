@@ -92,6 +92,15 @@ export async function bootstrapBindings(
     BrokerSubscriptions.ContestWorkerPolicy,
   );
 
+  const communityIndexerSubRes = await brokerInstance.subscribe(
+    BrokerSubscriptions.CommunityIndexerPolicy,
+    CommunityIndexer(),
+  );
+  checkSubscriptionResponse(
+    communityIndexerSubRes,
+    BrokerSubscriptions.CommunityIndexerPolicy,
+  );
+
   const contestProjectionsSubRes = await brokerInstance.subscribe(
     BrokerSubscriptions.ContestProjection,
     Contest.Contests(),
@@ -195,5 +204,5 @@ export function bootstrapCommunityIndexerLoop() {
 
   setInterval(() => {
     loop().catch(console.error);
-  }, 1000 * config.COMMUNITY_INDEXER.INTERVAL_SECONDS!);
+  }, 1_000 * config.COMMUNITY_INDEXER.INTERVAL_SECONDS!);
 }

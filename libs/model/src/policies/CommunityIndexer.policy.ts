@@ -1,4 +1,6 @@
 import { command, logger, Policy } from '@hicommonwealth/core';
+import { commonProtocol } from '@hicommonwealth/evm-protocols';
+import { config } from '@hicommonwealth/model';
 import {
   ClankerToken,
   CommunityIndexer as CommunityIndexerSchema,
@@ -8,14 +10,14 @@ import {
 } from '@hicommonwealth/schemas';
 import { ChainBase, ChainType } from '@hicommonwealth/shared';
 import axios from 'axios';
-import { ValidChains } from 'evm-protocols/src/common-protocol';
-import { kebabCase } from 'lodash';
+import lo from 'lodash';
 import moment from 'moment';
 import { Literal } from 'sequelize/lib/utils';
 import { z } from 'zod';
 import { CreateCommunity } from '../community';
 import { models, sequelize } from '../database';
 import { systemActor } from '../middleware';
+import { mustExist } from '../middleware/guards';
 import { emitEvent } from '../utils';
 
 const log = logger(import.meta);
@@ -63,8 +65,9 @@ async function fetchClankerTokens(
   let pageNum = 1;
 
   // eslint-disable-next-line no-constant-condition
-  while (true) {
+  while (pageNum < 3) {
     const url = `https://www.clanker.world/api/tokens?sort=desc&page=${pageNum}&pair=all&partner=all&presale=all`;
+    log.debug(`fetching: ${url}`);
 
     try {
       const res = await axios.get<{
@@ -120,6 +123,7 @@ export function CommunityIndexer(): Policy<typeof inputs> {
     inputs,
     body: {
       CommunityIndexerTimerTicked: async ({ payload }) => {
+        log.debug(`CommunityIndexerTimerTicked`);
         const indexers = await models.CommunityIndexer.findAll({
           where: {
             status: 'idle',
@@ -128,6 +132,7 @@ export function CommunityIndexer(): Policy<typeof inputs> {
 
         for (const indexer of indexers) {
           try {
+            log.debug(`starting community indexer ${indexer.id}`);
             await setIndexerStatus(indexer.id, 'pending');
 
             if (indexer.id === 'clanker') {
@@ -153,17 +158,35 @@ export function CommunityIndexer(): Policy<typeof inputs> {
         }
       },
       ClankerTokenFound: async ({ payload }) => {
-        const id = kebabCase(payload.name);
+        const id = lo.kebabCase(payload.name);
 
-        const chainNode = await models.ChainNode.findOne({
+        const chainNode = await models.ChainNode.scope(
+          'withPrivateData',
+        ).findOne({
           where: {
             name: 'Base',
-            eth_chain_id: ValidChains.Base,
+            eth_chain_id: commonProtocol.ValidChains.Base,
           },
         });
+        mustExist('Chain Node', chainNode);
+
+        const web3 = commonProtocol.createPrivateEvmClient({
+          rpc: chainNode.private_url!,
+          privateKey: config.WEB3.PRIVATE_KEY,
+        });
+
+        const adminAddress = await models.Address.findOne({
+          where: {
+            address: web3.eth.defaultAccount!,
+          },
+        });
+        mustExist('Admin Address', adminAddress);
 
         await command(CreateCommunity(), {
-          actor: systemActor({}),
+          actor: systemActor({
+            id: adminAddress.user_id!,
+            address: adminAddress.address,
+          }),
           payload: {
             id,
             type: ChainType.Token,
@@ -179,6 +202,8 @@ export function CommunityIndexer(): Policy<typeof inputs> {
             token_address: payload.contract_address,
           },
         });
+
+        log.debug(`created clanker community: ${id}`);
       },
     },
   };

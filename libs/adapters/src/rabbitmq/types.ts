@@ -20,6 +20,7 @@ export enum RascalSubscriptions {
   XpProjection = BrokerSubscriptions.XpProjection,
   UserReferrals = BrokerSubscriptions.UserReferrals,
   FarcasterWorkerPolicy = BrokerSubscriptions.FarcasterWorkerPolicy,
+  CommunityIndexerPolicy = BrokerSubscriptions.CommunityIndexerPolicy,
 }
 
 export enum RascalExchanges {
@@ -38,6 +39,7 @@ export enum RascalQueues {
   XpProjection = 'XpProjection',
   UserReferrals = 'UserReferrals',
   FarcasterWorkerPolicy = 'FarcasterWorkerPolicyQueue',
+  CommunityIndexerPolicy = 'CommunityIndexerPolicyQueue',
 }
 
 export enum RascalBindings {
@@ -51,6 +53,7 @@ export enum RascalBindings {
   XpProjection = 'XpProjection',
   UserReferrals = 'UserReferrals',
   FarcasterWorkerPolicy = 'FarcasterWorkerPolicy',
+  CommunityIndexerPolicy = 'CommunityIndexerPolicy',
 }
 
 export enum RascalRoutingKeys {
@@ -97,4 +100,6 @@ export enum RascalRoutingKeys {
   FarcasterWorkerPolicyCastCreated = EventNames.FarcasterCastCreated,
   FarcasterWorkerPolicyReplyCastCreated = EventNames.FarcasterReplyCastCreated,
   FarcasterWorkerPolicyVoteCreated = EventNames.FarcasterVoteCreated,
+
+  CommunityIndexerClankerTokenFound = EventNames.ClankerTokenFound,
 }
