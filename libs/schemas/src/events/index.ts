@@ -49,7 +49,7 @@ export enum EventNames {
 
   // Community Indexer
   CommunityIndexerTimerTicked = 'CommunityIndexerTimerTicked',
-  ClankerCommunityFound = 'ClankerCommunityFound',
+  ClankerTokenFound = 'ClankerTokenFound',
 }
 
 export type EventPairs =
@@ -174,6 +174,6 @@ export type EventPairs =
       event_payload: z.infer<typeof events.CommunityIndexerTimerTicked>;
     }
   | {
-      event_name: EventNames.ClankerCommunityFound;
-      event_payload: z.infer<typeof events.ClankerCommunityFound>;
+      event_name: EventNames.ClankerTokenFound;
+      event_payload: z.infer<typeof events.ClankerTokenFound>;
     };

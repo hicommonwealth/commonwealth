@@ -193,10 +193,7 @@ export function bootstrapCommunityIndexerLoop() {
     }
   };
 
-  setInterval(
-    () => {
-      loop().catch(console.error);
-    },
-    1_000 * 60 * 10,
-  );
+  setInterval(() => {
+    loop().catch(console.error);
+  }, 1000 * config.COMMUNITY_INDEXER.INTERVAL_SECONDS!);
 }

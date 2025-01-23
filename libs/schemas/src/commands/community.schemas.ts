@@ -57,6 +57,8 @@ export const CreateCommunity = {
     telegram: z.string().url().startsWith('https://t.me/').optional(),
     element: z.string().url().startsWith('https://matrix.to/').optional(),
     discord: z.string().url().startsWith('https://discord.com/').optional(),
+    indexer: z.string().optional(),
+    token_address: z.string().optional(),
   }),
   output: z.object({
     community: Community,

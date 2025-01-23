@@ -63,6 +63,8 @@ export function CreateCommunity(): Command<typeof schemas.CreateCommunity> {
         base,
         token_name,
         chain_node_id,
+        indexer,
+        token_address,
       } = payload;
       const community = await models.Community.findOne({
         where: { [Op.or]: [{ name }, { id }, { redirect: id }] },
@@ -130,6 +132,8 @@ export function CreateCommunity(): Command<typeof schemas.CreateCommunity> {
             directory_page_enabled: false,
             snapshot_spaces: [],
             stages_enabled: true,
+            indexer,
+            token_address,
           },
           { transaction },
         );

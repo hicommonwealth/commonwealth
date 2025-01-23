@@ -24,8 +24,8 @@ export default (
         allowNull: false,
       },
       last_checked: {
-        type: Sequelize.BOOLEAN,
-        allowNull: false,
+        type: Sequelize.DATE,
+        allowNull: true,
       },
       created_at: { type: Sequelize.DATE, allowNull: false },
       updated_at: { type: Sequelize.DATE, allowNull: false },

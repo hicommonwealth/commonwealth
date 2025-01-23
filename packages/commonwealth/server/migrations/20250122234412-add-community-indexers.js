@@ -17,8 +17,8 @@ module.exports = {
             allowNull: false,
           },
           last_checked: {
-            type: Sequelize.BOOLEAN,
-            allowNull: false,
+            type: Sequelize.DATE,
+            allowNull: true,
           },
           created_at: {
             type: Sequelize.DATE,
@@ -38,7 +38,7 @@ module.exports = {
           {
             id: 'clanker',
             status: 'idle',
-            last_checked: true,
+            last_checked: null,
             created_at: new Date(),
             updated_at: new Date(),
           },
