@@ -1,18 +1,18 @@
 {
   "accountAssociation": {
-    "header": "eyJmaWQiOjc3MzMxMywidHlwZSI6ImN1c3RvZHkiLCJrZXkiOiIweGYwZDdiODZCOERBRUEzNTkwM2U1ZWNiMUM5MGRGQWM0MUNCRUM5REYifQ",
-    "payload": "eyJkb21haW4iOiJpbW11bmUtaGFkZG9jay1jb21wbGV0ZWx5Lm5ncm9rLWZyZWUuYXBwIn0",
-    "signature": "MHgzZDkxOGMyNDU3MDllZDVjODc5N2M2ODgzZDk5MTc1ZmFjYWNkNTMxNzViNGZiNDRjNWIyNTBjMjMwNzg1OGY3NzhiNWNhMzBmMTQ3MGJjZWE5ODQxNWJlYjUwMTJjZTExMmZlZTQzN2VkMzdhNDliYWJhYTU5OGI3ODFiNTNkMjFj"
+    "header": "eyJmaWQiOjE0NCwidHlwZSI6ImN1c3RvZHkiLCJrZXkiOiIweDJiYmFFZTg5MDBiYjE2NjRCMUM4M2EzQTRGMTQyY0RCRjIyMjRmYjgifQ",
+    "payload": "eyJkb21haW4iOiI0MzllNzY4NjJlY2Mubmdyb2suYXBwIn0",
+    "signature": "MHgxNDZmM2UxNDljODNjY2ZjOTk4M2IwMGU1YTlhYzc0OGVmYzI2ZDgwYWFiN2Q3Y2NhZGYxYTRhNGRjYjJhY2RmNzQzYzRjMzI3ZmFiYTJlMGJlNTZkMGExYTRjNDM2N2NmOGU0MWMzZGJlNzZjZDZkNTc2ZjA0ZjgyMWZlNTZlZjFi"
   },
   "frame": {
     "version": "1",
-    "name": "Common example",
-    "iconUrl": "https://immune-haddock-completely.ngrok-free.app/brand_assets/common-white.png",
-    "homeUrl": "https://immune-haddock-completely.ngrok-free.app",
-    "imageUrl": "https://immune-haddock-completely.ngrok-free.app/brand_assets/common-white.png",
+    "name": "Example Frame",
+    "iconUrl": "https://439e76862ecc.ngrok.app/icon.png",
+    "homeUrl": "https://439e76862ecc.ngrok.app",
+    "imageUrl": "https://439e76862ecc.ngrok.app/image.png",
     "buttonTitle": "Check this out",
-    "splashImageUrl": "https://immune-haddock-completely.ngrok-free.app/brand_assets/favicon.ico",
-    "splashBackgroundColor": "#eeccf0",
-    "webhookUrl": "https://immune-haddock-completely.ngrok-free.app/api/webhook"
+    "splashImageUrl": "https://439e76862ecc.ngrok.app/splash.png",
+    "splashBackgroundColor": "#eeccff",
+    "webhookUrl": "https://439e76862ecc.ngrok.app/api/webhook"
   }
 }
