@@ -1,0 +1,40 @@
+@import '../../../../styles/shared';
+
+.TokensList {
+  margin: 16px 0;
+  width: 100%;
+
+  .heading-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+
+    .link-right {
+      display: flex;
+      gap: 4px;
+    }
+  }
+
+  .blue-text {
+    color: $primary-500;
+  }
+
+  .list {
+    max-width: 100%;
+    overflow-x: auto;
+    display: flex;
+    gap: 16px;
+    margin: 16px 0;
+    padding: 8px;
+  }
+
+  .list::-webkit-scrollbar {
+    display: none;
+  }
+
+  .list {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}

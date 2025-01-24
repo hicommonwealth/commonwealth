@@ -1,0 +1,59 @@
+@import '../../../../styles/shared';
+
+.Trendingtoken {
+  border-radius: $border-radius-corners;
+  padding: 8px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background-color: $white;
+  width: 250px;
+  border: 1px solid $neutral-300;
+  cursor: pointer;
+
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+
+    .image {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+    }
+
+    .info {
+      display: flex;
+      flex-direction: column;
+
+      .name {
+        color: $neutral-600;
+      }
+
+      .detail {
+        display: flex;
+        gap: 4px;
+      }
+
+      .creator {
+        color: $neutral-500;
+      }
+    }
+
+    .price-change {
+      color: $primary-500;
+    }
+  }
+
+  .action-buttons {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+
+    .CWButton {
+      flex: 1;
+      text-transform: capitalize;
+    }
+  }
+}
