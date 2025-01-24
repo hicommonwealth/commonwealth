@@ -1,5 +1,6 @@
 import { QuestEvents, QuestParticipationPeriod } from '@hicommonwealth/schemas';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import { calculatePercentageChangeFractional } from 'helpers/number';
 import { useCommonNavigate } from 'navigation/helpers';
 import { useState } from 'react';
 import {
@@ -50,16 +51,16 @@ const useCreateQuestForm = () => {
           // TODO: add image support in api (needs ticketing).
         });
 
-        if (quest && quest.id && quest.community_id) {
+        if (quest && quest.id) {
           await updateQuest({
             quest_id: quest.id,
             action_metas: questActionSubForms.map((subForm) => ({
               event_name: subForm.values.action as QuestAction,
               reward_amount: parseInt(`${subForm.values.rewardAmount}`, 10),
               ...(subForm.values.creatorRewardAmount && {
-                creator_reward_weight: parseInt(
-                  `${subForm.values.creatorRewardAmount}`,
-                  10,
+                creator_reward_weight: calculatePercentageChangeFractional(
+                  parseInt(`${subForm.values.rewardAmount}`, 10),
+                  parseInt(`${subForm.values.creatorRewardAmount}`, 10),
                 ),
               }),
               participation_limit: values.participation_limit,
@@ -71,8 +72,7 @@ const useCreateQuestForm = () => {
 
         notifySuccess('Quest created!');
 
-        // TODO: quests exploration will come in https://github.com/hicommonwealth/commonwealth/issues/9348
-        navigate('/communities');
+        navigate('/explore');
       } catch (e) {
         console.error(e);
 
