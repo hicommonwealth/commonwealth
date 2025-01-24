@@ -1,5 +1,6 @@
 import {
   linkValidationSchema,
+  numberGTZeroValidationSchema,
   numberValidationSchema,
 } from 'helpers/formValidations/common';
 import { VALIDATION_MESSAGES } from 'helpers/formValidations/messages';
@@ -9,7 +10,7 @@ export const questSubFormValidationSchema = z.object({
   action: z
     .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
     .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT }),
-  rewardAmount: numberValidationSchema,
+  rewardAmount: numberGTZeroValidationSchema,
   questLink: linkValidationSchema.optional,
 });
 

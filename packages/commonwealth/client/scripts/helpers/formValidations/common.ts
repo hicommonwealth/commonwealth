@@ -43,3 +43,12 @@ export const numberValidationSchema = z
     },
     { message: VALIDATION_MESSAGES.INVALID_INPUT },
   );
+
+// number greater than 0
+export const numberGTZeroValidationSchema = numberValidationSchema.refine(
+  (value) => {
+    const intVal = parseInt(value, 10);
+    return intVal > 0;
+  },
+  { message: VALIDATION_MESSAGES.MUST_BE_GREATER(0) },
+);
