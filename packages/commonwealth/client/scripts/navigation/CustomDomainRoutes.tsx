@@ -7,6 +7,7 @@ import { RouteFeatureFlags } from './Router';
 const SearchPage = lazy(() => import('views/pages/search'));
 
 const CreateCommunityPage = lazy(() => import('views/pages/CreateCommunity'));
+const CreateQuestPage = lazy(() => import('views/pages/CreateQuest'));
 const LaunchTokenPage = lazy(() => import('views/pages/LaunchToken'));
 const OverviewPage = lazy(() => import('views/pages/overview'));
 const MembersPage = lazy(
@@ -105,7 +106,10 @@ const UnSubscribePage = lazy(() => import('views/pages/UnSubscribePage'));
 
 const RewardsPage = lazy(() => import('views/pages/RewardsPage'));
 
-const CustomDomainRoutes = ({ launchpadEnabled }: RouteFeatureFlags) => {
+const CustomDomainRoutes = ({
+  launchpadEnabled,
+  xpEnabled,
+}: RouteFeatureFlags) => {
   return [
     <Route
       key="/"
@@ -120,6 +124,15 @@ const CustomDomainRoutes = ({ launchpadEnabled }: RouteFeatureFlags) => {
       path="/createCommunity"
       element={withLayout(CreateCommunityPage, { type: 'common' })}
     />,
+    ...(xpEnabled
+      ? [
+          <Route
+            key="/createQuest"
+            path="/createQuest"
+            element={withLayout(CreateQuestPage, { type: 'common' })}
+          />,
+        ]
+      : []),
     <Route
       key="/unSubscribe/:userId"
       path="/unSubscribe/:userId"

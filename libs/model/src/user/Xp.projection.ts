@@ -33,6 +33,8 @@ async function getUserIdByAddress(payload: {
 
 /*
  * Finds all active quest action metas for a given event
+ * - Global quests are not filtered by community
+ * - Local quests are filtered by community
  */
 async function getQuestActionMetas(
   event_payload: { community_id: string; created_at?: Date },
@@ -41,7 +43,7 @@ async function getQuestActionMetas(
   // make sure quest was active when event was created
   const quests = await models.Quest.findAll({
     where: {
-      community_id: event_payload.community_id,
+      community_id: { [Op.or]: [null, event_payload.community_id] },
       start_date: { [Op.lte]: event_payload.created_at },
       end_date: { [Op.gte]: event_payload.created_at },
     },
@@ -224,8 +226,8 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
         const reward_amount = 20;
         const creator_reward_weight = 0.2;
 
-        const referee_address = await models.Address.findOne({
-          where: { address: payload.address, user_id: payload.user_id },
+        const referee_address = await models.User.findOne({
+          where: { id: payload.user_id },
         });
         referee_address &&
           referee_address.referred_by_address &&
@@ -257,12 +259,15 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
           payload,
           'CommunityJoined',
         );
+        const user = await models.User.findOne({
+          where: { id: payload.user_id },
+        });
         if (action_metas.length > 0) {
           await recordXpsForQuest(
             payload.user_id,
             payload.created_at!,
             action_metas,
-            payload.referrer_address,
+            user?.referred_by_address,
           );
         }
       },

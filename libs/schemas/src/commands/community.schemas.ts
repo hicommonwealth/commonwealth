@@ -129,7 +129,7 @@ export const UpdateCustomDomain = {
   context: AuthContext,
 };
 
-const Snapshot = z.string().regex(/.+\.(eth|xyz)$/);
+const Snapshot = z.string().regex(/.+\.(eth|xyz|io)$/);
 
 export const UpdateCommunity = {
   input: Community.omit({ id: true, network: true, custom_domain: true })
@@ -344,7 +344,6 @@ export const SelectCommunity = {
 export const JoinCommunity = {
   input: z.object({
     community_id: z.string(),
-    referrer_address: z.string().optional(),
   }),
   output: z.object({
     community_id: z.string(),

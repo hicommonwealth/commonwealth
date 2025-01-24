@@ -13,16 +13,7 @@ import { Op } from 'sequelize';
 const log = logger(import.meta);
 
 async function main() {
-  await models.CommunityIndexer.update(
-    {
-      last_checked: new Date(),
-    },
-    {
-      where: {
-        id: 'clanker',
-      },
-    },
-  );
+  const startedAt = new Date();
 
   let numTokensFound = 0;
   let numCommunitiesCreated = 0;
@@ -61,6 +52,17 @@ async function main() {
 
   log.info(`found ${numTokensFound} tokens`);
   log.info(`created ${numCommunitiesCreated} clanker communities`);
+
+  await models.CommunityIndexer.update(
+    {
+      last_checked: startedAt,
+    },
+    {
+      where: {
+        id: 'clanker',
+      },
+    },
+  );
 }
 
 main().catch((err) => {

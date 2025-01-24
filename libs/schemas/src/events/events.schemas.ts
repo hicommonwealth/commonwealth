@@ -13,6 +13,7 @@ import {
   LaunchpadTokenCreated,
   LaunchpadTrade,
   NamespaceDeployed,
+  NamespaceDeployedWithReferral,
   ReferralFeeDistributed,
   ReferralSet,
 } from './chain-event.schemas';
@@ -89,7 +90,6 @@ export const CommunityCreated = z.object({
 export const CommunityJoined = z.object({
   community_id: z.string(),
   user_id: z.number(),
-  referrer_address: z.string().nullish(),
   created_at: z.coerce.date(),
 });
 
@@ -218,6 +218,14 @@ export const ChainEventCreated = z.union([
   }),
   ChainEventCreatedBase.extend({
     eventSource: ChainEventCreatedBase.shape.eventSource.extend({
+      eventSignature: z.literal(
+        EvmEventSignatures.NamespaceFactory.NamespaceDeployedWithReferral,
+      ),
+    }),
+    parsedArgs: NamespaceDeployedWithReferral,
+  }),
+  ChainEventCreatedBase.extend({
+    eventSource: ChainEventCreatedBase.shape.eventSource.extend({
       eventSignature: z.literal(EvmEventSignatures.CommunityStake.Trade),
     }),
     parsedArgs: CommunityStakeTrade,
@@ -309,6 +317,10 @@ export const FarcasterCastCreated = FarcasterCast.describe(
 export const FarcasterReplyCastCreated = FarcasterCast.extend({
   verified_address: z.string(),
 }).describe('When a reply is posted to a farcaster contest cast');
+
+export const FarcasterContestBotMentioned = FarcasterCast.extend({
+  verified_address: z.string(),
+}).describe('When contest bot is mentioned on farcaster');
 
 export const FarcasterVoteCreated = FarcasterAction.extend({
   contest_address: z.string(),
