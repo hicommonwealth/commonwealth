@@ -4,7 +4,7 @@ import { events } from '@hicommonwealth/schemas';
 import { ZodUndefined } from 'zod';
 import { models } from '../database';
 import { systemActor } from '../middleware';
-import { CreateLaunchpadToken } from '../token/CreateToken.command';
+import { CreateToken } from '../token/CreateToken.command';
 import { handleCommunityStakeTrades } from './handlers/handleCommunityStakeTrades';
 import { handleLaunchpadTrade } from './handlers/handleLaunchpadTrade';
 import { handleNamespaceDeployedWithReferral } from './handlers/handleNamespaceDeployedWithReferral';
@@ -31,7 +31,7 @@ export const processChainEventCreated: EventHandler<
           eth_chain_id: payload.eventSource.ethChainId,
         },
       });
-      await command(CreateLaunchpadToken(), {
+      await command(CreateToken(), {
         actor: systemActor({}),
         payload: {
           chain_node_id: chainNode!.id!,
