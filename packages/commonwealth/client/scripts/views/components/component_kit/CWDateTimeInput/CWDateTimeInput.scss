@@ -91,5 +91,9 @@
       background-color: $neutral-50;
       border-radius: 4px;
     }
+
+    .react-datepicker__day--disabled {
+      cursor: not-allowed !important;
+    }
   }
 }
