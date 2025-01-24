@@ -84,12 +84,12 @@ export const CWDateTimeInput = ({
           ? {
               ...formFieldContext,
               onBlur: (e) => {
-                formFieldContext.onBlur(e);
+                formFieldContext.onBlur(e).catch(console.error);
                 datePickerProps?.onBlur?.(e);
               },
               onChange: (value, event) => {
                 setStartDate(value);
-                event && formFieldContext.onChange(event);
+                event && formFieldContext.onChange(event).catch(console.error);
                 isHookedToForm &&
                   formContext.setValue(
                     name,
