@@ -54,6 +54,12 @@ const useCreateQuestForm = () => {
             action_metas: questActionSubForms.map((subForm) => ({
               event_name: subForm.values.action as QuestAction,
               reward_amount: parseInt(`${subForm.values.rewardAmount}`, 10),
+              ...(subForm.values.creatorRewardAmount && {
+                creator_reward_weight: parseInt(
+                  `${subForm.values.creatorRewardAmount}`,
+                  10,
+                ),
+              }),
               participation_limit: values.participation_limit,
               participation_period: QuestParticipationPeriod.Daily,
               participation_times_per_period: 1,

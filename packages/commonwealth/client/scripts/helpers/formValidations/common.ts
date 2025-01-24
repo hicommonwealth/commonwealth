@@ -32,3 +32,14 @@ export const quillValidationSchema = z.object({
     .length(1),
   ___isMarkdown: z.boolean(),
 });
+
+export const numberValidationSchema = z
+  .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
+  .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT })
+  .refine(
+    (value) => {
+      const intVal = parseInt(value, 10);
+      return !isNaN(intVal) && intVal.toString() === value.trim();
+    },
+    { message: VALIDATION_MESSAGES.INVALID_INPUT },
+  );

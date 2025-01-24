@@ -13,6 +13,7 @@ const QuestActionSubForm = ({
   onRemove,
   errors,
   defaultValues,
+  config,
   onChange,
   hiddenActions,
 }: QuestActionSubFormProps) => {
@@ -61,6 +62,23 @@ const QuestActionSubForm = ({
         name="rewardAmount"
         customError={errors?.rewardAmount}
       />
+
+      {config?.requires_creator_points && (
+        <CWTextInput
+          label="Creater Reward Share"
+          placeholder="Points Earned"
+          fullWidth
+          {...(defaultValues?.creatorRewardAmount && {
+            defaultValue: defaultValues?.creatorRewardAmount,
+          })}
+          onInput={(e) =>
+            onChange?.({ creatorRewardAmount: e?.target?.value?.trim() })
+          }
+          name="creatorRewardAmount"
+          customError={errors?.creatorRewardAmount}
+          instructionalMessage="Number of reward points the action creator would get."
+        />
+      )}
 
       <CWTextInput
         label="Relevant Quest Link (optional)"
