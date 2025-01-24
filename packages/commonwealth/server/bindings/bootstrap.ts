@@ -169,7 +169,8 @@ export async function bootstrapRelayer(
 }
 
 export function bootstrapContestRolloverLoop() {
-  log.info('Starting rollover loop');
+  const intervalSeconds = 60;
+  log.info(`Starting rollover loop (every ${intervalSeconds}s)`);
 
   const loop = async () => {
     try {
@@ -185,11 +186,17 @@ export function bootstrapContestRolloverLoop() {
   // TODO: move to external service triggered via scheduler?
   setInterval(() => {
     loop().catch(console.error);
-  }, 1_000 * 60);
+  }, 1_000 * intervalSeconds);
 }
 
 export function bootstrapCommunityIndexerLoop() {
-  log.info('Starting community indexer loop');
+  const intervalSeconds = config.COMMUNITY_INDEXER.INTERVAL_SECONDS!;
+  if (intervalSeconds === -1) {
+    log.warn('Skipping community indexer loop');
+    return;
+  }
+
+  log.info(`Starting community indexer loop (every ${intervalSeconds}s)`);
 
   const loop = async () => {
     try {
@@ -204,5 +211,5 @@ export function bootstrapCommunityIndexerLoop() {
 
   setInterval(() => {
     loop().catch(console.error);
-  }, 1_000 * config.COMMUNITY_INDEXER.INTERVAL_SECONDS!);
+  }, 1_000 * intervalSeconds);
 }
