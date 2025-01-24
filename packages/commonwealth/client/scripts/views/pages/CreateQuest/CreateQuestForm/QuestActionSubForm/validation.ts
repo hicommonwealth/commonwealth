@@ -15,6 +15,29 @@ export const questSubFormValidationSchema = z.object({
 });
 
 export const questSubFormValidationSchemaWithCreatorPoints =
-  questSubFormValidationSchema.extend({
-    creatorRewardAmount: numberValidationSchema,
-  });
+  questSubFormValidationSchema
+    .extend({
+      creatorRewardAmount: numberValidationSchema,
+    })
+    .refine(
+      (data) => {
+        try {
+          const creatorRewardAmount = numberValidationSchema.parse(
+            data.creatorRewardAmount,
+          );
+          const rewardAmount = numberGTZeroValidationSchema.parse(
+            data.rewardAmount,
+          );
+          // verify creatorRewardAmount is less or equal to rewardAmount
+          return (
+            parseInt(creatorRewardAmount, 10) <= parseInt(rewardAmount, 10)
+          );
+        } catch {
+          return false;
+        }
+      },
+      {
+        message: VALIDATION_MESSAGES.MUST_BE_LESS_OR_EQUAL('reward points'),
+        path: ['creatorRewardAmount'],
+      },
+    );

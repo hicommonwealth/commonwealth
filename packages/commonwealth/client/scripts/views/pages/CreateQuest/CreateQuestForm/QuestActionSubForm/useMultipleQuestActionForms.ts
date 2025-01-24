@@ -5,6 +5,7 @@ import './QuestActionSubForm.scss';
 import { doesActionRequireCreatorReward } from './helpers';
 import {
   QuestActionSubFormConfig,
+  QuestActionSubFormErrors,
   QuestActionSubFormFields,
   QuestActionSubFormState,
   useQuestActionMultiFormsStateProps,
@@ -54,7 +55,7 @@ const useQuestActionMultiFormsState = ({
     values: QuestActionSubFormFields,
     config?: QuestActionSubFormConfig,
   ) => {
-    let errors = {};
+    let errors: QuestActionSubFormErrors = {};
     try {
       const schema = config?.requires_creator_points
         ? questSubFormValidationSchemaWithCreatorPoints
@@ -65,7 +66,7 @@ const useQuestActionMultiFormsState = ({
       zodError.errors.map((error) => {
         errors = {
           ...errors,
-          [error.path[0]]: error.message,
+          [error.path[0] as keyof QuestActionSubFormErrors]: error.message,
         };
       });
     }
