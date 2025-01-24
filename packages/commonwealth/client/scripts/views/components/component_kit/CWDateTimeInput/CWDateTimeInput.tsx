@@ -68,12 +68,18 @@ export const CWDateTimeInput = ({
     >
       {label && <MessageRow label={label} />}
       <DatePicker
-        closeOnScroll
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         {...(datePickerProps as any)} // Note: internal component type isn't correctly defined
+        closeOnScroll
         calendarClassName="calender"
         selected={startDate}
-        icon={<CWIcon iconName="caretLeft" />}
+        icon={
+          <CWIcon
+            iconName="calenderBlank"
+            iconSize={size === 'small' ? 'small' : 'regular'}
+          />
+        }
+        showIcon
         {...(formFieldContext
           ? {
               ...formFieldContext,

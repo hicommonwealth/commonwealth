@@ -25,6 +25,11 @@
   }
 
   &.small {
+    .react-datepicker__calendar-icon {
+      height: 32px;
+      padding: 0 0px 0px 8px !important;
+    }
+
     .react-datepicker__input-container {
       input {
         font-size: 14px;
@@ -32,11 +37,17 @@
         line-height: 20px;
         padding: 6px 8px;
         border-radius: 4px;
+        padding-left: 30px; // for calender icon
       }
     }
   }
 
   &.large {
+    .react-datepicker__calendar-icon {
+      height: 40px;
+      padding: 0 0px 0px 10px !important;
+    }
+
     .react-datepicker__input-container {
       input {
         font-size: 14px;
@@ -45,6 +56,7 @@
         line-height: 24px;
         padding: 10px 12px;
         border-radius: 6px;
+        padding-left: 36px; // for calender icon
       }
     }
   }
