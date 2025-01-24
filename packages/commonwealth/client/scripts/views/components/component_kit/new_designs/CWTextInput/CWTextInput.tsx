@@ -9,7 +9,7 @@ import { useTextInputWithValidation } from './useTextInputWithValidation';
 
 import './CWTextInput.scss';
 
-type TextInputSize = 'small' | 'large';
+export type TextInputSize = 'small' | 'large';
 
 const AVG_CHAR_WIDTH = 8; // in px
 const PADDING_FOR_ADDON = 12; // in px
