@@ -2,6 +2,7 @@
 
 import { logger } from '@hicommonwealth/core';
 import {
+  config,
   createCommunityFromClankerToken,
   models,
   paginateClankerTokens,
@@ -23,7 +24,12 @@ async function main() {
     },
   );
 
+  let numTokensFound = 0;
+  let numCommunitiesCreated = 0;
+
   for await (const tokens of paginateClankerTokens(new Date(0))) {
+    numTokensFound += tokens.length;
+
     const existingCommunities = await models.Community.findAll({
       where: {
         token_address: {
@@ -31,6 +37,7 @@ async function main() {
         },
       },
     });
+
     for (const token of tokens) {
       const existingCommunity = existingCommunities.find(
         (c) => c.token_address === token.contract_address,
@@ -41,9 +48,19 @@ async function main() {
         );
       } else {
         await createCommunityFromClankerToken(token);
+        numCommunitiesCreated++;
       }
     }
+
+    const max = config.COMMUNITY_INDEXER.MAX_CLANKER_BACKFILL!;
+    if (max > 0 && numTokensFound >= max) {
+      log.info(`reached limit of ${max} clanker communities created`);
+      break;
+    }
   }
+
+  log.info(`found ${numTokensFound} tokens`);
+  log.info(`created ${numCommunitiesCreated} clanker communities`);
 }
 
 main().catch((err) => {

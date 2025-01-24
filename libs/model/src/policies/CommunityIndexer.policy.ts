@@ -26,10 +26,10 @@ async function setIndexerStatus(
   indexerId: string,
   {
     status,
-    timestamp,
+    last_checked: timestamp,
   }: {
     status: CommunityIndexerStatus;
-    timestamp?: Date;
+    last_checked?: Date;
   },
 ) {
   const toUpdate: {
@@ -68,14 +68,20 @@ export function CommunityIndexer(): Policy<typeof inputs> {
         for (const indexer of idleIndexers) {
           try {
             log.debug(`starting community indexer ${indexer.id}`);
+
+            if (!indexer.last_checked) {
+              throw new Error(`${indexer.id} indexer must be backfilled`);
+            }
+
             await setIndexerStatus(indexer.id, { status: 'pending' });
 
             const startedAt = new Date();
 
             if (indexer.id === 'clanker') {
-              // start fetching tokens where indexer last left off, or at the beginning
-              const cutoffDate = indexer.last_checked || new Date(0);
-              for await (const tokens of paginateClankerTokens(cutoffDate)) {
+              // start fetching tokens where indexer last left off
+              for await (const tokens of paginateClankerTokens(
+                indexer.last_checked,
+              )) {
                 const eventsToEmit: Array<EventPairs> = tokens.map((token) => ({
                   event_name: EventNames.ClankerTokenFound,
                   event_payload: token,
@@ -83,11 +89,10 @@ export function CommunityIndexer(): Policy<typeof inputs> {
                 await emitEvent(models.Outbox, eventsToEmit);
               }
 
-              // after all fetching is done, save the
-              // set timestamp for next run
+              // after all fetching is done, save timestamp for next run
               await setIndexerStatus(indexer.id, {
                 status: 'idle',
-                timestamp: startedAt,
+                last_checked: startedAt,
               });
             } else {
               throw new Error(`indexer not implemented: ${indexer.id}`);

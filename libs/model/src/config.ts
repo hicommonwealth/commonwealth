@@ -44,6 +44,7 @@ const {
   CONTEST_BOT_PRIVATE_KEY,
   CONTEST_BOT_NAMESPACE,
   COMMUNITY_INDEXER_INTERVAL_SECONDS,
+  MAX_CLANKER_BACKFILL,
 } = process.env;
 
 const NAME = target.NODE_ENV === 'test' ? 'common_test' : 'commonwealth';
@@ -57,6 +58,7 @@ const DEFAULTS = {
   MEMBERSHIP_REFRESH_BATCH_SIZE: '1000',
   MEMBERSHIP_REFRESH_TTL_SECONDS: '120',
   COMMUNITY_INDEXER_INTERVAL_SECONDS: '3600',
+  MAX_CLANKER_BACKFILL: '0',
 };
 
 export const config = configure(
@@ -168,6 +170,10 @@ export const config = configure(
       INTERVAL_SECONDS: parseInt(
         COMMUNITY_INDEXER_INTERVAL_SECONDS ??
           DEFAULTS.COMMUNITY_INDEXER_INTERVAL_SECONDS,
+        10,
+      ),
+      MAX_CLANKER_BACKFILL: parseInt(
+        MAX_CLANKER_BACKFILL ?? DEFAULTS.MAX_CLANKER_BACKFILL,
         10,
       ),
     },
@@ -338,6 +344,7 @@ export const config = configure(
     }),
     COMMUNITY_INDEXER: z.object({
       INTERVAL_SECONDS: z.coerce.number().optional(),
+      MAX_CLANKER_BACKFILL: z.coerce.number().optional(),
     }),
   }),
 );
