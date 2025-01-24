@@ -23,14 +23,4 @@ export const questFormValidationSchema = z.object({
     .max(250, { message: VALIDATION_MESSAGES.MAX_CHAR_LIMIT_REACHED })
     .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT }),
   image: linkValidationSchema.required,
-  reward_amount: z
-    .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
-    .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT })
-    .refine(
-      (value) => {
-        const intVal = parseInt(value, 10);
-        return !isNaN(intVal) && intVal.toString() === value.trim();
-      },
-      { message: VALIDATION_MESSAGES.INVALID_INPUT },
-    ),
 });

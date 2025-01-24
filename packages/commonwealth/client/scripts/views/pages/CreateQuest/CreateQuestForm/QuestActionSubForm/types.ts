@@ -5,17 +5,19 @@ export type QuestAction = keyof typeof QuestEvents;
 export type QuestActionSubFormErrors = {
   action?: string;
   questLink?: string;
+  rewardAmount?: string;
 };
 
 export type QuestActionSubFormFields = {
   action?: QuestAction;
   questLink?: string;
+  rewardAmount?: string | number;
 };
 
 export type QuestActionSubFormProps = {
   errors?: QuestActionSubFormErrors;
   defaultValues?: QuestActionSubFormFields;
-  onChange?: ({ action, questLink }: QuestActionSubFormFields) => void;
+  onChange?: (params: QuestActionSubFormFields) => void;
   isRemoveable?: boolean;
   onRemove?: () => void;
   hiddenActions?: QuestAction[];

@@ -51,6 +51,18 @@ const QuestActionSubForm = ({
       />
 
       <CWTextInput
+        label="Reward Points"
+        placeholder="Points Earned"
+        fullWidth
+        {...(defaultValues?.rewardAmount && {
+          defaultValue: defaultValues?.rewardAmount,
+        })}
+        onInput={(e) => onChange?.({ rewardAmount: e?.target?.value?.trim() })}
+        name="rewardAmount"
+        customError={errors?.rewardAmount}
+      />
+
+      <CWTextInput
         label="Relevant Quest Link (optional)"
         name="questLink"
         placeholder="https://example.com"

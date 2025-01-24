@@ -118,22 +118,6 @@ const CreateQuestForm = () => {
 
       <CWDivider />
 
-      <div className="reward-section">
-        <CWText type="b1" fontWeight="semiBold">
-          Reward
-        </CWText>
-
-        <CWTextInput
-          label="Points Earned"
-          placeholder="Amount per action"
-          fullWidth
-          name="reward_amount"
-          hookToForm
-        />
-      </div>
-
-      <CWDivider />
-
       <div className="actions-section">
         <div className="header">
           <CWText type="b1" fontWeight="semiBold">
