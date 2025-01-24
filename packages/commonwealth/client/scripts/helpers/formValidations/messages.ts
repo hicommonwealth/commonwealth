@@ -7,4 +7,6 @@ export const VALIDATION_MESSAGES = {
   MUST_BE_GREATER: (value: string | number) => `Must be greater than ${value}`,
   MUST_BE_LESS_OR_EQUAL: (fieldName: string) =>
     `Must be less or equal to ${fieldName}`,
+  MUST_HAVE_DIFFERENCE: (fieldName: string, differenceValue: string | number) =>
+    `Must have difference of atleast ${differenceValue} from ${fieldName}`,
 };
