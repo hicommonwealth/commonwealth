@@ -136,6 +136,12 @@ const SignTransactionsStep = ({
         state: 'loading',
       }));
 
+      console.log(
+        isContestRecurring
+          ? 'deployRecurringContestOnchainMutation with payload:'
+          : 'deploySingleERC20ContestOnchainMutation with payload:',
+      );
+      console.log(isContestRecurring ? '' : { singleERC20 });
       isContestRecurring
         ? (contestAddress = await deployRecurringContestOnchainMutation(
             // @ts-expect-error <StrictNullChecks/>

@@ -146,6 +146,16 @@ class Contest extends ContractBase {
       await this.initialize(true);
     }
 
+    console.log('newSingleERC20Contest with payload:', {
+      namespaceName,
+      contestInterval,
+      winnerShares,
+      voteToken,
+      voterShare,
+      walletAddress,
+      exchangeToken,
+    });
+
     try {
       const txReceipt = await this.namespaceFactory.newERC20Contest(
         namespaceName,
