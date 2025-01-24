@@ -3,14 +3,12 @@ import { commonProtocol } from '@hicommonwealth/evm-protocols';
 import { config } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import {
-  ClankerToken,
   CommunityIndexer as CommunityIndexerSchema,
   EventNames,
   EventPairs,
   events,
 } from '@hicommonwealth/schemas';
 import { ChainBase, ChainType } from '@hicommonwealth/shared';
-import axios from 'axios';
 import lo from 'lodash';
 import moment from 'moment';
 import { Literal } from 'sequelize/lib/utils';
@@ -20,6 +18,7 @@ import { models, sequelize } from '../database';
 import { systemActor } from '../middleware';
 import { mustExist } from '../middleware/guards';
 import { emitEvent } from '../utils';
+import { fetchClankerTokens } from './utils/community-indexer-utils';
 
 const log = logger(import.meta);
 
@@ -30,9 +29,16 @@ const inputs = {
 
 type CommunityIndexerStatus = z.infer<typeof CommunityIndexerSchema>['status'];
 
+type SetIndexerStatusParams =
+  | { status: 'pending'; lastTokenTimestamp?: Date }
+  | {
+      status: Exclude<CommunityIndexerStatus, 'pending'>;
+      lastTokenTimestamp?: never;
+    };
+
 async function setIndexerStatus(
   indexerId: string,
-  status: CommunityIndexerStatus,
+  { status, lastTokenTimestamp }: SetIndexerStatusParams,
 ) {
   const toUpdate: {
     status: CommunityIndexerStatus;
@@ -40,7 +46,7 @@ async function setIndexerStatus(
   } = {
     status,
   };
-  if (status === 'pending') {
+  if (lastTokenTimestamp) {
     toUpdate.last_checked = sequelize.literal('NOW()');
   }
   return await models.CommunityIndexer.update(toUpdate, {
@@ -50,80 +56,11 @@ async function setIndexerStatus(
   });
 }
 
-const sleepAsync = (delay: number) =>
-  new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(null);
-    }, delay);
-  });
-
-async function fetchClankerTokens(
-  cutoffDate: Date,
-  onPage: (tokens: Array<z.infer<typeof ClankerToken>>) => Promise<void>,
-) {
-  let numRetries = 3;
-  let backoff = 5000;
-  let pageNum = 1;
-
-  // eslint-disable-next-line no-constant-condition
-  while (true) {
-    const url = `https://www.clanker.world/api/tokens?sort=desc&page=${pageNum}&pair=all&partner=all&presale=all`;
-    log.debug(`fetching: ${url}`);
-
-    try {
-      const res = await axios.get<{
-        data: Array<z.infer<typeof ClankerToken>>;
-      }>(url);
-
-      // Stop fetching if no more tokens
-      if (res.data.data.length === 0) {
-        log.debug('No more tokens found');
-        break;
-      }
-
-      // Filter tokens by cutoffDate
-      const validTokens = res.data.data.filter((t) =>
-        moment(t.created_at).isAfter(cutoffDate),
-      );
-
-      if (validTokens.length > 0) {
-        await onPage(validTokens);
-      }
-
-      // Check if the oldest token is older than the cutoffDate
-      const oldestToken = res.data.data[res.data.data.length - 1];
-      if (moment(oldestToken.created_at).isBefore(cutoffDate)) {
-        break;
-      }
-
-      // Reset retries and move to the next page
-      numRetries = 3;
-      backoff = 5000;
-      pageNum++;
-    } catch (err: any) {
-      // Retry if rated limited
-      if (err.response?.status === 429) {
-        log.warn('Encountered clanker API rate limiting');
-        if (numRetries <= 0) {
-          throw new Error('Max retries reached due to rate limiting');
-        }
-        await sleepAsync(backoff);
-        numRetries--;
-        backoff *= 2;
-        continue;
-      }
-
-      log.error(`Error fetching clanker tokens: ${err.message}`);
-      throw err;
-    }
-  }
-}
-
 export function CommunityIndexer(): Policy<typeof inputs> {
   return {
     inputs,
     body: {
-      CommunityIndexerTimerTicked: async ({ payload }) => {
+      CommunityIndexerTimerTicked: async () => {
         log.debug(`CommunityIndexerTimerTicked`);
         const indexers = await models.CommunityIndexer.findAll({});
 
@@ -139,7 +76,7 @@ export function CommunityIndexer(): Policy<typeof inputs> {
         for (const indexer of idleIndexers) {
           try {
             log.debug(`starting community indexer ${indexer.id}`);
-            await setIndexerStatus(indexer.id, 'pending');
+            await setIndexerStatus(indexer.id, { status: 'pending' });
 
             if (indexer.id === 'clanker') {
               // start fetching tokens where indexer last left off, or at the beginning
@@ -150,14 +87,23 @@ export function CommunityIndexer(): Policy<typeof inputs> {
                   event_payload: token,
                 }));
                 await emitEvent(models.Outbox, eventsToEmit);
+                // update indexer last_checked timestamp so that
+                // old tokens are not refetched
+                const lastTokenTimestamp = moment(
+                  tokens.at(-1)!.created_at,
+                ).toDate();
+                await setIndexerStatus(indexer.id, {
+                  status: 'pending',
+                  lastTokenTimestamp,
+                });
               });
             } else {
               throw new Error(`indexer not implemented: ${indexer.id}`);
             }
 
-            await setIndexerStatus(indexer.id, 'idle');
+            await setIndexerStatus(indexer.id, { status: 'idle' });
           } catch (err) {
-            await setIndexerStatus(indexer.id, 'error');
+            await setIndexerStatus(indexer.id, { status: 'error' });
             log.error(`failed to index for ${indexer.id}`, err as Error);
             throw err;
           }
@@ -210,7 +156,7 @@ export function CommunityIndexer(): Policy<typeof inputs> {
           social_links: [],
           website: `https://www.clanker.world/clanker/${payload.contract_address}`,
           directory_page_enabled: false,
-          tags: [],
+          tags: ['clanker'],
           chain_node_id: chainNode!.id!,
           indexer: 'clanker',
           token_address: payload.contract_address,

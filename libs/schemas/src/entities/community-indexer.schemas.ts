@@ -3,7 +3,10 @@ import { z } from 'zod';
 export const CommunityIndexer = z.object({
   id: z.string(),
   status: z.enum(['idle', 'pending', 'error']),
-  last_checked: z.coerce.date().optional(),
+  last_checked: z.coerce
+    .date()
+    .optional()
+    .describe('timestamp of the most recently checked token'),
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional(),
 });
