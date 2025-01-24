@@ -13,6 +13,7 @@
     "async-migrate-thread-version-history": "tsx ./scripts/async-migrate-thread-version-history.ts",
     "add-component-showcase": "tsx ./scripts/add-component-showcase.ts",
     "archive-outbox": "node --import=extensionless/register build/scripts/archive-outbox.js",
+    "backfill-clanker-tokens": "tsx ./scripts/backfill-clanker-tokens.ts",
     "build": "tsc -b ./tsconfig.build.json && tsc-alias -p ./tsconfig.build.json",
     "build-contracts": "npx hardhat compile",
     "bundle": "vite -c ./client/vite.config.ts build",
