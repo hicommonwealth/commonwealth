@@ -105,7 +105,18 @@ export function CommunityIndexer(): Policy<typeof inputs> {
         }
       },
       ClankerTokenFound: async ({ payload }) => {
-        await createCommunityFromClankerToken(payload);
+        const existingCommunity = await models.Community.findOne({
+          where: {
+            token_address: payload.contract_address,
+          },
+        });
+        if (existingCommunity) {
+          log.warn(
+            `token already has community: ${payload.contract_address}="${existingCommunity.name}"`,
+          );
+        } else {
+          await createCommunityFromClankerToken(payload);
+        }
       },
     },
   };
