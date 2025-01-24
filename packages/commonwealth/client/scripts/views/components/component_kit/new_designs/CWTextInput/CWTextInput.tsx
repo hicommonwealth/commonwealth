@@ -36,7 +36,7 @@ export type BaseTextInputProps = {
   tabIndex?: number;
   instructionalMessage?: string;
   manualStatusMessage?: string;
-  inputRef?: any;
+  inputRef?: React.MutableRefObject<HTMLInputElement | null>;
   rightTextAddon?: string;
   type?: 'text' | 'number';
   min?: number;
@@ -115,13 +115,11 @@ const CWTextInput = (props: TextInputProps) => {
   } = props;
 
   const formContext = useFormContext();
-  const formFieldContext = hookToForm
-    ? // @ts-expect-error <StrictNullChecks/>
-      formContext.register(name)
-    : ({} as any);
+  const isHookedToForm = hookToForm && name;
+  const formFieldContext = isHookedToForm ? formContext.register(name) : null;
   const formFieldErrorMessage =
-    // @ts-expect-error <StrictNullChecks/>
-    hookToForm && (formContext?.formState?.errors?.[name]?.message as string);
+    isHookedToForm &&
+    (formContext?.formState?.errors?.[name]?.message as string);
 
   const validateValue = (inputVal: string) => {
     if (inputValidationFn) {
@@ -193,12 +191,12 @@ const CWTextInput = (props: TextInputProps) => {
           maxLength={maxLength || formFieldContext?.maxLength}
           name={name}
           placeholder={placeholder}
-          onInput={(e: any) => {
+          onInput={(e: React.FormEvent<HTMLInputElement>) => {
             if (onInput) onInput(e);
 
             e.stopPropagation();
 
-            validateValue(e.target.value);
+            validateValue((e.target as HTMLInputElement).value);
           }}
           onBlur={(e) => {
             if (hookToForm) formFieldContext?.onBlur?.(e);
@@ -212,7 +210,7 @@ const CWTextInput = (props: TextInputProps) => {
           }}
           value={value}
           defaultValue={defaultValue}
-          style={{ paddingRight: rightPaddingForAddon }}
+          style={{ paddingRight: rightPaddingForAddon || 0 }}
           type={type}
           min={min}
           step={step}
