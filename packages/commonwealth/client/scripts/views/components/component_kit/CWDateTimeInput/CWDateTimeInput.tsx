@@ -1,7 +1,7 @@
+import clsx from 'clsx';
+import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import React, { useState } from 'react';
 import DatePicker, { DatePickerProps } from 'react-datepicker';
-
-import clsx from 'clsx';
 import 'react-datepicker/dist/react-datepicker.css';
 import { useFormContext } from 'react-hook-form';
 import { CWIcon } from '../cw_icons/cw_icon';
@@ -44,6 +44,13 @@ export const CWDateTimeInput = ({
   const formFieldErrorMessage =
     isHookedToForm &&
     (formContext?.formState?.errors?.[name]?.message as string);
+
+  useRunOnceOnCondition({
+    callback: () => {
+      isHookedToForm && formContext.setValue(name, datePickerProps.selected);
+    },
+    shouldRun: !!(isHookedToForm && formFieldContext),
+  });
 
   return (
     <div
