@@ -67,11 +67,12 @@ export function CommunityIndexer(): Policy<typeof inputs> {
 
         for (const indexer of idleIndexers) {
           try {
-            log.debug(`starting community indexer ${indexer.id}`);
-
             if (!indexer.last_checked) {
-              throw new Error(`${indexer.id} indexer must be backfilled`);
+              log.warn(`${indexer.id} indexer must be backfilled`);
+              continue;
             }
+
+            log.debug(`starting community indexer ${indexer.id}`);
 
             await setIndexerStatus(indexer.id, { status: 'pending' });
 
@@ -98,7 +99,7 @@ export function CommunityIndexer(): Policy<typeof inputs> {
               throw new Error(`indexer not implemented: ${indexer.id}`);
             }
           } catch (err) {
-            await setIndexerStatus(indexer.id, { status: 'error' });
+            // await setIndexerStatus(indexer.id, { status: 'error' });
             log.error(`failed to index for ${indexer.id}`, err as Error);
             throw err;
           }
