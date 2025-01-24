@@ -31,14 +31,27 @@ const CWDateTimeInputShowCase = () => {
       <div className="flex-row">
         <CWForm
           validationSchema={validation}
-          onSubmit={console.log}
+          onSubmit={(values) => console.log(values)}
           onErrors={console.error}
         >
           <CWDateTimeInput name="date" hookToForm />
           <CWButton label="Submit" type="submit" />
         </CWForm>
       </div>
-
+      <CWText type="h5">DateTime picker with default form values</CWText>
+      <div className="flex-row">
+        <CWForm
+          validationSchema={validation}
+          onSubmit={(values) => console.log(values)}
+          onErrors={console.error}
+          initialValues={{
+            date: new Date(new Date().getTime() + 4 * 24 * 60 * 60 * 1000),
+          }}
+        >
+          <CWDateTimeInput name="date" hookToForm />
+          <CWButton label="Submit" type="submit" />
+        </CWForm>
+      </div>
       <CWText type="h5">DateTime picker with min/max dates</CWText>
       <div className="flex-row">
         <CWDateTimeInput

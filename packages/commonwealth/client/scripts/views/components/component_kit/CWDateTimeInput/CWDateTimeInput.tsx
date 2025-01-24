@@ -23,7 +23,8 @@ type CWDateTimeInputProps = DatePickerProps & {
 // - In case of form validation
 //   - only date selection (without time) is supported, other things like range
 //     selection and multi value selection is not supported
-//   - dates are in ISO formats
+//   - form submit dates are in ISO formats
+//   - dates provided via form context can be in any date format
 export const CWDateTimeInput = ({
   hookToForm,
   name,
@@ -47,7 +48,13 @@ export const CWDateTimeInput = ({
 
   useRunOnceOnCondition({
     callback: () => {
-      isHookedToForm && formContext.setValue(name, datePickerProps.selected);
+      const foundFormValue = isHookedToForm && formContext.getValues(name);
+      const dateValueToUse = foundFormValue || datePickerProps.selected;
+      const finalStartDate = dateValueToUse
+        ? new Date(dateValueToUse).toISOString()
+        : null;
+      isHookedToForm && formContext.setValue(name, finalStartDate);
+      setStartDate(finalStartDate ? new Date(finalStartDate) : null);
     },
     shouldRun: !!(isHookedToForm && formFieldContext),
   });
