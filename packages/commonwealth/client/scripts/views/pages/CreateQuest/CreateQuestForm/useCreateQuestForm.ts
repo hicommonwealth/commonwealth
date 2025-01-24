@@ -27,6 +27,8 @@ const useCreateQuestForm = () => {
     maxSubForms: MAX_ACTIONS_LIMIT,
   });
 
+  const minStartDate = new Date(new Date().getTime() + 1 * 24 * 60 * 60 * 1000); // 1 day date in future
+
   const [isProcessingQuestImage, setIsProcessingQuestImage] = useState(false);
 
   const { mutateAsync: createQuest } = useCreateQuestMutation();
@@ -93,6 +95,7 @@ const useCreateQuestForm = () => {
     handleSubmit,
     isProcessingQuestImage,
     setIsProcessingQuestImage,
+    minStartDate,
   };
 };
 

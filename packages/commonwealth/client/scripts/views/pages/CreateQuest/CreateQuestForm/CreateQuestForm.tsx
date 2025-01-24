@@ -1,5 +1,6 @@
 import { QuestParticipationLimit } from '@hicommonwealth/schemas';
 import React from 'react';
+import CWDateTimeInput from 'views/components/component_kit/CWDateTimeInput';
 import {
   CWImageInput,
   ImageBehavior,
@@ -28,6 +29,7 @@ const CreateQuestForm = () => {
     handleSubmit,
     isProcessingQuestImage,
     setIsProcessingQuestImage,
+    minStartDate,
   } = useCreateQuestForm();
 
   return (
@@ -36,13 +38,6 @@ const CreateQuestForm = () => {
       onSubmit={handleSubmit}
       onErrors={validateSubForms}
       className="CreateQuestForm"
-      initialValues={{
-        // TODO: this will be updated via a date/calender selector component in #10674
-        start_date: new Date(
-          Date.now() + 2 * 24 * 60 * 60 * 1000,
-        ).toISOString(), // 2 days from now
-        end_date: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(), // 5 days from now
-      }}
     >
       <div className="quest-period-section">
         <div className="repeatition-selector">
@@ -67,18 +62,19 @@ const CreateQuestForm = () => {
             checked
           />
         </div>
-        {/* TODO: proper component for picking dates in #10674 */}
-        <CWTextInput
+        <CWDateTimeInput
           label="Start Date"
-          placeholder="TODO"
           hookToForm
           name="start_date"
+          minDate={minStartDate}
+          selected={minStartDate}
         />
-        <CWTextInput
+        <CWDateTimeInput
           label="End Date"
-          placeholder="TODO"
           hookToForm
           name="end_date"
+          minDate={minStartDate}
+          selected={null}
         />
       </div>
 
