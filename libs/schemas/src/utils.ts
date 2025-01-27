@@ -56,7 +56,7 @@ export async function checkIconSize(val: string, ctx: z.RefinementCtx) {
   if (fileSizeBytes === 0) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
-      message: "Image url provided doesn't exist",
+      message: `Image url provided doesn't exist: ${val}`,
     });
     return;
   }

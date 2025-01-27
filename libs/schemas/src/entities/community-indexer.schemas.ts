@@ -19,7 +19,7 @@ export const ClankerToken = z.object({
   requestor_fid: z.number().nullish(),
   name: z.string(),
   symbol: z.string(),
-  img_url: z.string().url().nullish(),
+  img_url: z.string().nullish(),
   pool_address: z.string().nullish(),
   cast_hash: z.string().nullish(),
   type: z.string().nullish(),

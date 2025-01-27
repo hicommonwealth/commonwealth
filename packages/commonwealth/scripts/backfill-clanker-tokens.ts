@@ -12,6 +12,10 @@ import { Op } from 'sequelize';
 
 const log = logger(import.meta);
 
+/*
+  This script fetches *all* tokens from the clanker API and
+  directly creates a community for each, skipping the outbox.
+*/
 async function main() {
   const startedAt = new Date();
 

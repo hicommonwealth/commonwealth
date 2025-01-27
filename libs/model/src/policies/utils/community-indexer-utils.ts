@@ -1,4 +1,4 @@
-import { command, logger } from '@hicommonwealth/core';
+import { blobStorage, command, logger } from '@hicommonwealth/core';
 import { commonProtocol } from '@hicommonwealth/evm-protocols';
 import { config } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
@@ -8,11 +8,13 @@ import axios from 'axios';
 import axiosRetry from 'axios-retry';
 import lo from 'lodash';
 import moment from 'moment';
+import { uuidV4 } from 'web3-utils';
 import { z } from 'zod';
 import { CreateCommunity } from '../../community';
 import { models } from '../../database';
 import { systemActor } from '../../middleware';
 import { mustExist } from '../../middleware/guards';
+import { compressServerImage } from '../../utils/imageCompression';
 
 const log = logger(import.meta);
 
@@ -82,6 +84,8 @@ function formatCommunityName(input: string) {
   ); // Trim leading and trailing spaces
 }
 
+// generates a unique community ID based on the community name
+// by adding a numerical suffix if a collision is found
 export async function generateUniqueId(
   name: string,
 ): Promise<
@@ -124,6 +128,33 @@ export async function generateUniqueId(
   };
 }
 
+async function uploadTokenImage(
+  imageUrl?: string | null | undefined,
+): Promise<string | null> {
+  if (!imageUrl?.length) {
+    return null;
+  }
+  try {
+    const res = await axios.get(imageUrl, {
+      responseType: 'arraybuffer',
+    });
+    const buffer = Buffer.from(res.data);
+    const compressedBuffer = await compressServerImage(buffer);
+    const { url } = await blobStorage().upload({
+      key: `${uuidV4()}.png`,
+      bucket: 'assets',
+      content: compressedBuffer,
+      contentType: 'image/jpeg',
+    });
+    return url;
+  } catch (err) {
+    log.error(
+      `failed to download cranker token image: ${(err as Error).message}`,
+    );
+    return null;
+  }
+}
+
 export async function createCommunityFromClankerToken(
   payload: z.infer<typeof ClankerToken>,
 ) {
@@ -152,17 +183,7 @@ export async function createCommunityFromClankerToken(
   });
   mustExist('Admin Address', adminAddress);
 
-  // let uploadedImageUrl: string | null = null;
-  // if (payload.img_url) {
-  //   const filename = `${uuidv4()}.jpeg`;
-  //   const content = await axios.get(payload.img_url!);
-  //   const { url } = await blobStorage().upload({
-  //     key: filename,
-  //     bucket: 'assets',
-  //     content: content.data,
-  //   });
-  //   uploadedImageUrl = url;
-  // }
+  const uploadedImageUrl = await uploadTokenImage(payload.img_url);
 
   const createCommunityPayload: z.infer<typeof schemas.CreateCommunity.input> =
     {
@@ -174,14 +195,14 @@ export async function createCommunityFromClankerToken(
       social_links: [],
       website: `https://www.clanker.world/clanker/${payload.contract_address}`,
       directory_page_enabled: false,
-      tags: ['clanker'],
+      tags: ['Clanker'],
       chain_node_id: chainNode!.id!,
       indexer: 'clanker',
       token_address: payload.contract_address,
     };
-  // if (uploadedImageUrl) {
-  //   createCommunityPayload.icon_url = uploadedImageUrl;
-  // }
+  if (uploadedImageUrl) {
+    createCommunityPayload.icon_url = uploadedImageUrl;
+  }
 
   await command(CreateCommunity(), {
     actor: systemActor({
