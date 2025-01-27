@@ -127,8 +127,10 @@ const useCreateQuestForm = () => {
   });
 
   const handleSubmit = (values: z.infer<typeof questFormValidationSchema>) => {
-    const hasErrors = validateSubForms();
-    if (hasErrors) return;
+    const subFormErrors = validateSubForms();
+    const repetitionCycleRadioBtnError =
+      triggerRepetitionCycleRadioValidation();
+    if (subFormErrors || repetitionCycleRadioBtnError) return;
 
     const handleAsync = async () => {
       try {

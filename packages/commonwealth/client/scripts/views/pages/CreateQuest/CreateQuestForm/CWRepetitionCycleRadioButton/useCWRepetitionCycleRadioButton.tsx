@@ -27,6 +27,7 @@ const useCWRepetitionCycleRadioButton = ({
       },
     });
     setError(tempError);
+    return tempError;
   };
 
   const handleCycleInputValueChange = (value: string | number) => {
