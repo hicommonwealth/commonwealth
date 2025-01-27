@@ -4,6 +4,7 @@ import { ZodError } from 'zod';
 import './QuestActionSubForm.scss';
 import { doesActionRequireCreatorReward } from './helpers';
 import {
+  QuestAction,
   QuestActionSubFormConfig,
   QuestActionSubFormErrors,
   QuestActionSubFormFields,
@@ -106,7 +107,7 @@ const useQuestActionMultiFormsState = ({
 
     if (updatedSubForms[index].values.action) {
       const requiresCreatorPoints = doesActionRequireCreatorReward(
-        updatedSubForms[index].values.action,
+        updatedSubForms[index].values.action as QuestAction,
       );
 
       // update config based on chosen action
