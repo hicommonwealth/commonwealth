@@ -1,0 +1,17 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appID": "M7RA9XJ52W.commonwealth-mobile2",
+        "paths": ["/*"]
+      }
+    ]
+  },
+  "activitycontinuation": {
+    "apps": ["M7RA9XJ52W.commonwealth-mobile2"]
+  },
+  "webcredentials": {
+    "apps": ["M7RA9XJ52W.commonwealth-mobile2"]
+  }
+}

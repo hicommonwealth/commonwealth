@@ -415,9 +415,13 @@ export async function alchemyGetTokenPrices({
 
 export const getBaseUrl = (
   env: 'local' | 'CI' | 'frick' | 'frack' | 'beta' | 'demo' | 'production',
+  localOverride?: string,
 ) => {
   switch (env) {
     case 'local':
+      if (localOverride) {
+        return localOverride;
+      }
     case 'CI':
       return 'http://localhost:8080';
     case 'beta':

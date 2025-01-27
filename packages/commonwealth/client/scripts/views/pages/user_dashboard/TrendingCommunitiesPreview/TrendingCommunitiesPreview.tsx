@@ -72,7 +72,7 @@ export const TrendingCommunitiesPreview = () => {
         <CommunityPreviewCard
           isExploreMode
           onClick={() => {
-            navigate('/communities');
+            navigate('/explore');
           }}
         />
       </div>

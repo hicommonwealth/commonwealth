@@ -5,12 +5,14 @@ export const linkValidationSchema = {
   required: z.string().url({
     message: VALIDATION_MESSAGES.INVALID_INPUT,
   }),
-  optional: z.union([
-    z.literal(''),
-    z.string().url({
-      message: VALIDATION_MESSAGES.INVALID_INPUT,
-    }),
-  ]),
+  optional: z
+    .union([
+      z.literal(''),
+      z.string().url({
+        message: VALIDATION_MESSAGES.INVALID_INPUT,
+      }),
+    ])
+    .nullish(),
 };
 
 export const emailValidationSchema = z.union([

@@ -18,18 +18,19 @@ import { signIn } from '../utils/sign-in';
 const chance = new Chance();
 
 describe('User lifecycle', () => {
-  let admin: Actor, member: Actor, new_actor: Actor;
+  let admin: Actor, member: Actor, new_actor: Actor, superadmin: Actor;
   let community_id: string;
   let topic_id: number;
 
   beforeAll(async () => {
     const { community, actors } = await seedCommunity({
-      roles: ['admin', 'member'],
+      roles: ['admin', 'member', 'superadmin'],
     });
     community_id = community!.id;
     topic_id = community!.topics!.at(0)!.id!;
     admin = actors.admin;
     member = actors.member;
+    superadmin = actors.superadmin;
   });
 
   afterAll(async () => {
@@ -40,7 +41,7 @@ describe('User lifecycle', () => {
     it('should project xp points', async () => {
       // setup quest
       const quest = await command(CreateQuest(), {
-        actor: admin,
+        actor: superadmin,
         payload: {
           name: chance.name(),
           description: chance.sentence(),
@@ -51,9 +52,8 @@ describe('User lifecycle', () => {
       });
       // setup quest actions
       const updated = await command(UpdateQuest(), {
-        actor: admin,
+        actor: superadmin,
         payload: {
-          community_id,
           quest_id: quest!.id!,
           action_metas: [
             {
@@ -187,23 +187,21 @@ describe('User lifecycle', () => {
       ]);
     });
 
-    it('should project xp points with participation limits', async () => {
+    it('should project xp points with participation limits in a global quest', async () => {
       // setup quest
       const quest = await command(CreateQuest(), {
-        actor: admin,
+        actor: superadmin,
         payload: {
           name: chance.name(),
           description: chance.sentence(),
-          community_id,
           start_date: moment().add(2, 'day').toDate(),
           end_date: moment().add(3, 'day').toDate(),
         },
       });
       // setup quest actions
       const updated = await command(UpdateQuest(), {
-        actor: admin,
+        actor: superadmin,
         payload: {
-          community_id,
           quest_id: quest!.id!,
           action_metas: [
             {
@@ -410,15 +408,17 @@ describe('User lifecycle', () => {
     });
 
     it('should query previous xp logs', async () => {
-      // 8 events (by community id)
+      // 8 events
       const xps1 = await query(GetXps(), {
         actor: admin,
-        payload: { community_id },
+        payload: {},
       });
-      expect(xps1!.length).to.equal(8);
+      expect(xps1!.length).to.equal(9);
       xps1?.forEach((xp) => {
-        expect(xp.quest_id).to.be.a('number');
-        expect(xp.quest_action_meta_id).to.be.a('number');
+        if (xp.event_name !== 'SignUpFlowCompleted') {
+          expect(xp.quest_id).to.be.a('number');
+          expect(xp.quest_action_meta_id).to.be.a('number');
+        }
       });
 
       // 2 CommentUpvoted events (by event name)
