@@ -45,7 +45,7 @@ const {
   OPENAI_ORGANIZATION,
   CONTEST_BOT_PRIVATE_KEY,
   CONTEST_BOT_NAMESPACE,
-  COMMUNITY_INDEXER_INTERVAL_SECONDS,
+  COMMUNITY_INDEXER_CRON,
   MAX_CLANKER_BACKFILL,
 } = process.env;
 
@@ -59,7 +59,6 @@ const DEFAULTS = {
   DEFAULT_COMMONWEALTH_LOGO: `https://s3.amazonaws.com/${S3_ASSET_BUCKET_CDN}/common-white.png`,
   MEMBERSHIP_REFRESH_BATCH_SIZE: '1000',
   MEMBERSHIP_REFRESH_TTL_SECONDS: '120',
-  COMMUNITY_INDEXER_INTERVAL_SECONDS: '-1',
   MAX_CLANKER_BACKFILL: '0',
 };
 
@@ -172,11 +171,7 @@ export const config = configure(
       CONTEST_BOT_NAMESPACE: CONTEST_BOT_NAMESPACE || '',
     },
     COMMUNITY_INDEXER: {
-      INTERVAL_SECONDS: parseInt(
-        COMMUNITY_INDEXER_INTERVAL_SECONDS ??
-          DEFAULTS.COMMUNITY_INDEXER_INTERVAL_SECONDS,
-        10,
-      ),
+      CRON: COMMUNITY_INDEXER_CRON,
       MAX_CLANKER_BACKFILL: parseInt(
         MAX_CLANKER_BACKFILL ?? DEFAULTS.MAX_CLANKER_BACKFILL,
         10,
@@ -368,7 +363,7 @@ export const config = configure(
         ),
     }),
     COMMUNITY_INDEXER: z.object({
-      INTERVAL_SECONDS: z.coerce.number().optional(),
+      CRON: z.coerce.string().optional(),
       MAX_CLANKER_BACKFILL: z.coerce.number().optional(),
     }),
   }),
