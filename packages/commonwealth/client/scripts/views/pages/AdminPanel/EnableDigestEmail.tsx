@@ -44,7 +44,7 @@ const EnableDigestEmail = () => {
   const update = () => {
     if (Object.keys(communityLookupData || {}).length > 0) {
       try {
-        triggerEnableDigestEmail({ communityId });
+        triggerEnableDigestEmail({ communityId }).catch(console.error);
         notifySuccess('Success');
       } catch (error) {
         notifyError('Error');
