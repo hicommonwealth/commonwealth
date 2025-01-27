@@ -4,9 +4,9 @@ import { models } from '../database';
 import { isSuperAdmin } from '../middleware';
 import { mustExist } from '../middleware/guards';
 
-export function EnableDigestEmail(): Command<any> {
+export function EnableDigestEmail(): Command<typeof schemas.EnableDigestEmail> {
   return {
-    ...schemas.enableEmailDigest,
+    ...schemas.EnableDigestEmail,
     auth: [isSuperAdmin],
     body: async ({ payload }) => {
       const community = await models.Community.findOne({

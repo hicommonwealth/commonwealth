@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   EnrichedThread,
   ExternalServiceUserIds,
@@ -16,7 +15,6 @@ export function GetDigestEmailDataQuery(): Query<typeof GetDigestEmailData> {
     secure: true,
     authStrategy: { type: 'authtoken', userId: ExternalServiceUserIds.Knock },
     body: async ({ payload }) => {
-      // TODO User payload for unSubscribe once Recap email pr merge
       const threads = await models.sequelize.query<
         z.infer<typeof EnrichedThread>
       >(

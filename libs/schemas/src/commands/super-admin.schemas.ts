@@ -17,7 +17,7 @@ export const TriggerNotificationsWorkflow = {
   }),
 };
 
-export const enableEmailDigest = {
+export const EnableDigestEmail = {
   input: z.object({
     communityId: z.string(),
   }),
