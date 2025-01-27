@@ -2,19 +2,19 @@ import React, { useMemo, useState } from 'react';
 
 import './linked_addresses.scss';
 
-import { formatAddressShort } from 'client/scripts/helpers';
+import { formatAddressShort } from 'shared/utils';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
 import type AddressInfo from '../../models/AddressInfo';
 import type NewProfile from '../../models/NewProfile';
 import { DeleteAddressModal } from '../modals/delete_address_modal';
 import { CWIconButton } from './component_kit/cw_icon_button';
+import { CWIcon } from './component_kit/cw_icons/cw_icon';
 import { CWTruncatedAddress } from './component_kit/cw_truncated_address';
+import { CWIdentificationTag } from './component_kit/new_designs/CWIdentificationTag';
 import { CWModal } from './component_kit/new_designs/CWModal';
 import { CWTable } from './component_kit/new_designs/CWTable';
 import { CWTableColumnInfo } from './component_kit/new_designs/CWTable/CWTable';
-import { CWTag } from './component_kit/new_designs/CWTag';
-import { CWTooltip } from './component_kit/new_designs/CWTooltip';
 
 /* eslint-disable react/no-multi-comp */
 
@@ -45,25 +45,10 @@ const Address = ({ addressInfo }: AddressProps) => {
   return (
     <div className="AddressContainer">
       <div className="address">
-        <CWTooltip
-          placement="top"
-          content={`${community.id} \u2022 ${walletId} \u2022 ${formatAddressShort(address)}`}
-          renderTrigger={(handleInteraction, isTooltipOpen) => (
-            <div
-              onMouseEnter={(e) => handleInteraction(e)}
-              onMouseLeave={(e) => {
-                if (isTooltipOpen) {
-                  handleInteraction(e);
-                }
-              }}
-            >
-              <CWTag
-                label={`${walletId} \u2022 ${formatAddressShort(address)}`}
-                type="address"
-                iconName="ethereum"
-              />
-            </div>
-          )}
+        <CWIcon iconName="ethereum" iconSize="small" />
+        <CWIdentificationTag
+          iconLeft={walletId}
+          address={`\u2022 ${formatAddressShort(address)}`}
         />
       </div>
     </div>
