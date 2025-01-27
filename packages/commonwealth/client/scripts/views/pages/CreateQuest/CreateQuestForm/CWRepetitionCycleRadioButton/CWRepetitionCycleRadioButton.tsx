@@ -14,6 +14,8 @@ const CWRepetitionCycleRadioButton = ({
   repetitionCycleInputProps,
   ...radioButtonProps
 }: CWRepetitionCycleRadioButtonProps) => {
+  const stopPropogation = (e) => e?.stopPropogation?.();
+
   const RepetitionCycleLabel = (
     <span
       className={clsx('repetition-cycle-label', {
@@ -29,7 +31,13 @@ const CWRepetitionCycleRadioButton = ({
         value={repetitionCycleInputProps?.value}
         placeholder={repetitionCycleInputProps?.placeholder}
         disabled={repetitionCycleInputProps?.isDisabled}
-        onInput={(e) => repetitionCycleInputProps?.onChange?.(e.target.value)}
+        onFocus={stopPropogation}
+        onClick={stopPropogation}
+        onKeyDown={stopPropogation}
+        onInput={(e) => {
+          stopPropogation(e);
+          repetitionCycleInputProps?.onChange?.(e.target.value);
+        }}
         onBlur={repetitionCycleInputProps.onBlur}
       />
       <CWText type="b2">
@@ -45,6 +53,9 @@ const CWRepetitionCycleRadioButton = ({
           options={repetitionCycleSelectListProps.options}
           value={repetitionCycleSelectListProps.selected}
           placeholder={repetitionCycleSelectListProps.placeholder}
+          onFocus={stopPropogation}
+          onBlur={stopPropogation}
+          onKeyDown={stopPropogation}
           onChange={repetitionCycleSelectListProps.onChange}
         />
       </div>

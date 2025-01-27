@@ -53,7 +53,7 @@ const CreateQuestForm = () => {
             {...repetitionCycleRadio.props}
             className="radio-btn"
             value={QuestParticipationLimit.OncePerPeriod}
-            groupName="quest"
+            groupName="participation_limit"
             name="participation_limit"
             hookToForm
           />
@@ -61,7 +61,7 @@ const CreateQuestForm = () => {
             className="radio-btn"
             value={QuestParticipationLimit.OncePerQuest}
             label="One time only"
-            groupName="quest"
+            groupName="participation_limit"
             name="participation_limit"
             hookToForm
             checked
