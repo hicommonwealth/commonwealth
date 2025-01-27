@@ -2,8 +2,7 @@ import { ExternalServiceUserIds, dispose, query } from '@hicommonwealth/core';
 import { models } from '@hicommonwealth/model';
 import { Community, User } from '@hicommonwealth/schemas';
 
-import { expect } from 'chai';
-import { afterAll, afterEach, beforeAll, describe, test } from 'vitest';
+import { afterAll, afterEach, beforeAll, describe, expect, test } from 'vitest';
 import { z } from 'zod';
 import { GetDigestEmailDataQuery } from '../../src/emails';
 import { seed } from '../../src/tester';
