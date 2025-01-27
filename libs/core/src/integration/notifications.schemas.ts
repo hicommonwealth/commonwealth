@@ -138,6 +138,15 @@ export const UpvoteNotification = z.union([
   CommentUpvoteNotification,
 ]);
 
+export const AddressOwnershipTransferredNotification = z.object({
+  community_id: z.string(),
+  address: z.string(),
+  user_id: z.number(),
+  old_user_id: z.number(),
+  old_user_email: z.string().optional(),
+  created_at: z.string(),
+});
+
 export const WebhookNotification = z.object({
   sender_username: z.literal('Common'),
   sender_avatar_url: z
