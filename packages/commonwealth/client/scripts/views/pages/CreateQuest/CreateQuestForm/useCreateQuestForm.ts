@@ -8,6 +8,7 @@ import {
   useUpdateQuestMutation,
 } from 'state/api/quests';
 import { z } from 'zod';
+import { useCWRepetitionCycleRadioButton } from './CWRepetitionCycleRadioButton';
 import './CreateQuestForm.scss';
 import { QuestAction } from './QuestActionSubForm';
 import { useQuestActionMultiFormsState } from './QuestActionSubForm/useMultipleQuestActionForms';
@@ -37,6 +38,22 @@ const useCreateQuestForm = () => {
 
   const navigate = useCommonNavigate();
 
+  const repetitionCycleOptions = Object.keys(QuestParticipationPeriod).map(
+    (k) => ({
+      label: k,
+      value: k,
+    }),
+  );
+  const repetitionCycleRadioProps = useCWRepetitionCycleRadioButton({
+    repetitionCycleInputProps: {
+      value: 1,
+    },
+    repetitionCycleSelectListProps: {
+      options: repetitionCycleOptions,
+      selected: repetitionCycleOptions[0],
+    },
+  });
+
   const handleSubmit = (values: z.infer<typeof questFormValidationSchema>) => {
     const hasErrors = validateSubForms();
     if (hasErrors) return;
@@ -64,8 +81,12 @@ const useCreateQuestForm = () => {
                 ),
               }),
               participation_limit: values.participation_limit,
-              participation_period: QuestParticipationPeriod.Daily,
-              participation_times_per_period: 1,
+              participation_period: repetitionCycleRadioProps
+                .repetitionCycleSelectListProps.selected
+                ?.value as QuestParticipationPeriod,
+              participation_times_per_period: parseInt(
+                `${repetitionCycleRadioProps.repetitionCycleInputProps.value}`,
+              ),
             })),
           });
         }
@@ -96,6 +117,15 @@ const useCreateQuestForm = () => {
     isProcessingQuestImage,
     setIsProcessingQuestImage,
     minStartDate,
+    // custom radio button props
+    repetitionCycleRadioProps: {
+      repetitionCycleInputProps: {
+        ...repetitionCycleRadioProps.repetitionCycleInputProps,
+      },
+      repetitionCycleSelectListProps: {
+        ...repetitionCycleRadioProps.repetitionCycleSelectListProps,
+      },
+    },
   };
 };
 

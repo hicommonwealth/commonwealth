@@ -12,6 +12,7 @@ import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWForm } from 'views/components/component_kit/new_designs/CWForm';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import { CWRadioButton } from 'views/components/component_kit/new_designs/cw_radio_button';
+import CWRepetitionCycleRadioButton from './CWRepetitionCycleRadioButton';
 import './CreateQuestForm.scss';
 import QuestActionSubForm, { QuestAction } from './QuestActionSubForm';
 import useCreateQuestForm from './useCreateQuestForm';
@@ -30,6 +31,7 @@ const CreateQuestForm = () => {
     isProcessingQuestImage,
     setIsProcessingQuestImage,
     minStartDate,
+    repetitionCycleRadioProps,
   } = useCreateQuestForm();
 
   return (
@@ -42,12 +44,12 @@ const CreateQuestForm = () => {
       <div className="quest-period-section">
         <div className="repeatition-selector">
           <CWText type="b1" fontWeight="semiBold">
-            Quests can be completed by members
+            Quests timeline
           </CWText>
-          <CWRadioButton
+          <CWRepetitionCycleRadioButton
+            {...repetitionCycleRadioProps}
             className="radio-btn"
             value={QuestParticipationLimit.OncePerPeriod}
-            label="Repeatable daily"
             groupName="quest"
             name="participation_limit"
             hookToForm
