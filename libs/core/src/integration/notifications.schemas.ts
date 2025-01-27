@@ -140,10 +140,11 @@ export const UpvoteNotification = z.union([
 
 export const AddressOwnershipTransferredNotification = z.object({
   community_id: z.string(),
+  community_name: z.string(),
   address: z.string(),
   user_id: z.number(),
   old_user_id: z.number(),
-  old_user_email: z.string().optional(),
+  old_user_email: z.string(),
   created_at: z.string(),
 });
 
