@@ -199,7 +199,8 @@ const CWTextInput = (props: TextInputProps) => {
             validateValue((e.target as HTMLInputElement).value);
           }}
           onBlur={(e) => {
-            if (isHookedToForm) formFieldContext?.onBlur?.(e);
+            if (isHookedToForm)
+              formFieldContext?.onBlur?.(e).catch(console.error);
 
             validateValue(e.target.value);
           }}
