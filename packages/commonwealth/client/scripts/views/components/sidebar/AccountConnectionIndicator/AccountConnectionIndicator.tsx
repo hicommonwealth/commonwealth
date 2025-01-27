@@ -19,6 +19,7 @@ interface AccountConnectionIndicatorProps {
   profile: NewProfile | undefined;
   refreshProfiles: () => void;
   onAuthModalOpen: (modalType?: AuthModalType) => void;
+  isInsideCommunity?: boolean;
 }
 
 const AccountConnectionIndicator = ({
@@ -28,6 +29,7 @@ const AccountConnectionIndicator = ({
   addresses,
   refreshProfiles,
   onAuthModalOpen,
+  isInsideCommunity,
 }: AccountConnectionIndicatorProps) => {
   const { handleJoinCommunity, JoinCommunityModals } = useJoinCommunity();
   const referralsEnabled = useFlag('referrals');
@@ -49,6 +51,7 @@ const AccountConnectionIndicator = ({
                 profile={profile}
                 refreshProfiles={refreshProfiles}
                 onAuthModalOpen={() => onAuthModalOpen()}
+                isInsideCommunity={isInsideCommunity}
               />
             </div>
 

@@ -30,6 +30,7 @@ export enum Tag {
   Token = 'Token',
   Contest = 'Contest',
   Poll = 'Poll',
+  Quest = 'Quest',
 }
 
 /**

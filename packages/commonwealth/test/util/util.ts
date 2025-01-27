@@ -1,17 +1,16 @@
 import {
   ChildContractNames,
-  commonProtocol,
   EvmEventSignatures,
-} from '@hicommonwealth/evm-protocols';
-import {
+  commonProtocol,
   communityStakesAbi,
   namespaceFactoryAbi,
-} from '@hicommonwealth/evm-testing';
+} from '@hicommonwealth/evm-protocols';
 import {
-  createTestRpc,
   EvmEventSourceInstance,
+  createTestRpc,
   models,
 } from '@hicommonwealth/model';
+import { AbiType } from '@hicommonwealth/shared';
 
 export async function createContestEventSources(
   ethChainId: commonProtocol.ValidChains,
@@ -68,7 +67,7 @@ export const singleEventSource = {
       [commonProtocol.factoryContracts[
         commonProtocol.ValidChains.SepoliaBase
       ].factory.toLowerCase()]: {
-        abi: namespaceFactoryAbi,
+        abi: namespaceFactoryAbi as unknown as AbiType,
         sources: [
           {
             eth_chain_id: commonProtocol.ValidChains.SepoliaBase,

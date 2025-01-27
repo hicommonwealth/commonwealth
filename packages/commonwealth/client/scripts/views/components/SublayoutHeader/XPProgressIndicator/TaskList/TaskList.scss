@@ -1,0 +1,22 @@
+@import '../../../../../styles/shared';
+
+.TaskList {
+  width: 300px;
+  background-color: $white;
+  border: 1px solid $neutral-200;
+  border-radius: 8px;
+  box-shadow: $elevation-4 !important;
+  margin-top: 4px;
+  z-index: 999;
+
+  .weekly-progress-bar {
+    width: 100% !important;
+    min-width: unset;
+    max-width: unset;
+    padding: 16px 12px 8px 12px;
+  }
+
+  @include extraSmall {
+    width: 100%;
+  }
+}

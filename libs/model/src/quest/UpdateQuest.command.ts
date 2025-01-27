@@ -1,7 +1,7 @@
 import { Command } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../database';
-import { authRoles } from '../middleware';
+import { isSuperAdmin } from '../middleware';
 import {
   mustBeValidDateRange,
   mustExist,
@@ -13,11 +13,10 @@ import { getDelta } from '../utils';
 export function UpdateQuest(): Command<typeof schemas.UpdateQuest> {
   return {
     ...schemas.UpdateQuest,
-    auth: [authRoles('admin')],
+    auth: [isSuperAdmin],
     secure: true,
     body: async ({ payload }) => {
       const {
-        community_id,
         quest_id,
         name,
         description,
@@ -26,18 +25,16 @@ export function UpdateQuest(): Command<typeof schemas.UpdateQuest> {
         action_metas,
       } = payload;
 
-      const quest = await models.Quest.findOne({
-        where: { community_id, id: quest_id },
-      });
+      const quest = await models.Quest.findOne({ where: { id: quest_id } });
       mustExist(`Quest with id "${quest_id}`, quest);
 
       if (name) {
         const existingName = await models.Quest.findOne({
-          where: { community_id, name },
+          where: { community_id: quest.community_id, name },
           attributes: ['id'],
         });
         mustNotExist(
-          `Quest named "${name}" in community "${community_id}"`,
+          `Quest named "${name}" in community "${quest.community_id}"`,
           existingName,
         );
       }

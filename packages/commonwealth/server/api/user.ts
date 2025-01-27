@@ -1,6 +1,6 @@
 import { trpc } from '@hicommonwealth/adapters';
 import { analytics } from '@hicommonwealth/core';
-import { User, incrementProfileCount } from '@hicommonwealth/model';
+import { User, refreshProfileCount } from '@hicommonwealth/model';
 import {
   MixpanelLoginEvent,
   MixpanelUserSignupEvent,
@@ -48,8 +48,7 @@ export const trpcRouter = trpc.router({
       ),
     ),
     trpc.fireAndForget(async (_, output) => {
-      if (output.user_created)
-        await incrementProfileCount(output.community_id, output.user_id!);
+      if (output.user_created) await refreshProfileCount(output.community_id);
     }),
   ]),
   updateUser: trpc.command(User.UpdateUser, trpc.Tag.User),

@@ -234,10 +234,7 @@ export function getAllRascalConfigs(
       source: RascalExchanges.MessageRelayer,
       destination: RascalQueues.UserReferrals,
       destinationType: 'queue',
-      bindingKeys: [
-        RascalRoutingKeys.UserReferralsSignUpFlowCompleted,
-        RascalRoutingKeys.UserReferralsCommunityJoined,
-      ],
+      bindingKeys: [RascalRoutingKeys.UserReferralsCommunityCreated],
     },
     [RascalBindings.FarcasterWorkerPolicy]: {
       source: RascalExchanges.MessageRelayer,
@@ -247,6 +244,7 @@ export function getAllRascalConfigs(
         RascalRoutingKeys.FarcasterWorkerPolicyCastCreated,
         RascalRoutingKeys.FarcasterWorkerPolicyReplyCastCreated,
         RascalRoutingKeys.FarcasterWorkerPolicyVoteCreated,
+        RascalRoutingKeys.FarcasterWorkerPolicyContestBotMentioned,
       ],
     },
   };
