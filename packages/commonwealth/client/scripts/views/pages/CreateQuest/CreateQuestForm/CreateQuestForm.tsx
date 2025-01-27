@@ -31,11 +31,13 @@ const CreateQuestForm = () => {
     isProcessingQuestImage,
     setIsProcessingQuestImage,
     minStartDate,
-    repetitionCycleRadioProps,
+    repetitionCycleRadio,
+    formMethodsRef,
   } = useCreateQuestForm();
 
   return (
     <CWForm
+      ref={formMethodsRef}
       validationSchema={questFormValidationSchema}
       onSubmit={handleSubmit}
       onErrors={validateSubForms}
@@ -47,7 +49,8 @@ const CreateQuestForm = () => {
             Quests timeline
           </CWText>
           <CWRepetitionCycleRadioButton
-            {...repetitionCycleRadioProps}
+            customError={repetitionCycleRadio.error}
+            {...repetitionCycleRadio.props}
             className="radio-btn"
             value={QuestParticipationLimit.OncePerPeriod}
             groupName="quest"

@@ -1,14 +1,21 @@
-import { QuestEvents, QuestParticipationPeriod } from '@hicommonwealth/schemas';
+import {
+  QuestEvents,
+  QuestParticipationLimit,
+  QuestParticipationPeriod,
+} from '@hicommonwealth/schemas';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import { numberGTZeroValidationSchema } from 'helpers/formValidations/common';
 import { calculatePercentageChangeFractional } from 'helpers/number';
 import { useCommonNavigate } from 'navigation/helpers';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import {
   useCreateQuestMutation,
   useUpdateQuestMutation,
 } from 'state/api/quests';
+import { CWFormRef } from 'views/components/component_kit/new_designs/CWForm';
 import { z } from 'zod';
 import { useCWRepetitionCycleRadioButton } from './CWRepetitionCycleRadioButton';
+import { ValidationFnProps } from './CWRepetitionCycleRadioButton/types';
 import './CreateQuestForm.scss';
 import { QuestAction } from './QuestActionSubForm';
 import { useQuestActionMultiFormsState } from './QuestActionSubForm/useMultipleQuestActionForms';
@@ -16,6 +23,12 @@ import { questFormValidationSchema } from './validation';
 
 const MIN_ACTIONS_LIMIT = 1;
 const MAX_ACTIONS_LIMIT = Object.values(QuestEvents).length; // = 8 max actions
+// these restrictions are only on client side, update per future requirements
+const MAX_REPETITION_COUNTS = {
+  PER_DAY: 4,
+  PER_WEEK: 28,
+  PER_MONTH: 120,
+};
 
 const useCreateQuestForm = () => {
   const {
@@ -38,13 +51,72 @@ const useCreateQuestForm = () => {
 
   const navigate = useCommonNavigate();
 
+  const formMethodsRef = useRef<CWFormRef>(null);
   const repetitionCycleOptions = Object.keys(QuestParticipationPeriod).map(
     (k) => ({
       label: k,
-      value: k,
+      value: QuestParticipationPeriod[k],
     }),
   );
-  const repetitionCycleRadioProps = useCWRepetitionCycleRadioButton({
+
+  const repetitionCycleValidatorFn = (props: ValidationFnProps) => {
+    const participation_limit = formMethodsRef.current?.getValues(
+      'participation_limit',
+    );
+    const { input, selectList } = props.values;
+
+    // clear errors if participation timeline is not a repeatable
+    if (participation_limit !== QuestParticipationLimit.OncePerPeriod) {
+      return { error: undefined };
+    }
+
+    // validate repetition cycle value
+    if (
+      !Object.values(QuestParticipationPeriod).includes(
+        selectList?.value as QuestParticipationPeriod,
+      )
+    ) {
+      return { error: 'Invalid value for reptition cycle' };
+    }
+
+    // validate repetition count value
+    try {
+      numberGTZeroValidationSchema.parse(input);
+
+      const count = parseInt(`${input}`);
+
+      // verify repetition counts fall within a certain range
+      if (
+        (selectList?.value === QuestParticipationPeriod.Daily &&
+          count > MAX_REPETITION_COUNTS.PER_DAY) ||
+        (selectList?.value === QuestParticipationPeriod.Weekly &&
+          count > MAX_REPETITION_COUNTS.PER_WEEK) ||
+        (selectList?.value === QuestParticipationPeriod.Monthly &&
+          count > MAX_REPETITION_COUNTS.PER_MONTH)
+      ) {
+        const allowedCount =
+          selectList?.value === QuestParticipationPeriod.Daily
+            ? MAX_REPETITION_COUNTS.PER_DAY
+            : selectList?.value === QuestParticipationPeriod.Weekly
+              ? MAX_REPETITION_COUNTS.PER_WEEK
+              : MAX_REPETITION_COUNTS.PER_MONTH;
+        return {
+          error: `Cannot repeat more than ${allowedCount} times ${selectList?.value}`,
+        };
+      }
+    } catch {
+      return { error: 'Invalid value for repetition count' };
+    }
+
+    return { error: undefined };
+  };
+
+  const {
+    error: repetitionCycleRadioError,
+    triggerValidation: triggerRepetitionCycleRadioValidation,
+    ...repetitionCycleRadioProps
+  } = useCWRepetitionCycleRadioButton({
+    validatorFn: repetitionCycleValidatorFn,
     repetitionCycleInputProps: {
       value: 1,
     },
@@ -118,14 +190,19 @@ const useCreateQuestForm = () => {
     setIsProcessingQuestImage,
     minStartDate,
     // custom radio button props
-    repetitionCycleRadioProps: {
-      repetitionCycleInputProps: {
-        ...repetitionCycleRadioProps.repetitionCycleInputProps,
-      },
-      repetitionCycleSelectListProps: {
-        ...repetitionCycleRadioProps.repetitionCycleSelectListProps,
+    repetitionCycleRadio: {
+      error: repetitionCycleRadioError,
+      triggerValidation: triggerRepetitionCycleRadioValidation,
+      props: {
+        repetitionCycleInputProps: {
+          ...repetitionCycleRadioProps.repetitionCycleInputProps,
+        },
+        repetitionCycleSelectListProps: {
+          ...repetitionCycleRadioProps.repetitionCycleSelectListProps,
+        },
       },
     },
+    formMethodsRef,
   };
 };
 

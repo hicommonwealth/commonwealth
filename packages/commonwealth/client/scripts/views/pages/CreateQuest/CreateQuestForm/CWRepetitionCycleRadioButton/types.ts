@@ -10,9 +10,22 @@ export type CWRepetitionCycleRadioButtonProps = Omit<
   RadioButtonProps,
   'label' | 'hideLabels'
 > &
-  ReturnType<typeof useCWRepetitionCycleRadioButton>;
+  Omit<
+    ReturnType<typeof useCWRepetitionCycleRadioButton>,
+    'error' | 'triggerValidation'
+  > & {
+    customError?: string;
+  };
+
+export type ValidationFnProps = {
+  values: {
+    input?: string | number;
+    selectList?: RepetitionCycleOption;
+  };
+};
 
 export type UseCWRepetitionCycleRadioButtonProps = {
+  validatorFn: (props: ValidationFnProps) => { error?: string };
   repetitionCycleSelectListProps: {
     options: RepetitionCycleOption[];
     selected?: RepetitionCycleOption;

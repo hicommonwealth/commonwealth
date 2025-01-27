@@ -3,11 +3,13 @@ import React from 'react';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
+import { MessageRow } from 'views/components/component_kit/new_designs/CWTextInput/MessageRow';
 import { CWRadioButton } from 'views/components/component_kit/new_designs/cw_radio_button';
 import './CWRepetitionCycleRadioButton.scss';
 import { CWRepetitionCycleRadioButtonProps } from './types';
 
 const CWRepetitionCycleRadioButton = ({
+  customError,
   repetitionCycleSelectListProps,
   repetitionCycleInputProps,
   ...radioButtonProps
@@ -50,14 +52,23 @@ const CWRepetitionCycleRadioButton = ({
   );
 
   return (
-    <CWRadioButton
-      {...radioButtonProps}
-      className={clsx(
-        'CWRepetitionCycleRadioButton',
-        radioButtonProps.className,
+    <div>
+      <CWRadioButton
+        {...radioButtonProps}
+        className={clsx(
+          'CWRepetitionCycleRadioButton',
+          radioButtonProps.className,
+        )}
+        label={RepetitionCycleLabel}
+      />
+      {customError && (
+        <MessageRow
+          hasFeedback
+          statusMessage={customError}
+          validationStatus="failure"
+        />
       )}
-      label={RepetitionCycleLabel}
-    />
+    </div>
   );
 };
 
