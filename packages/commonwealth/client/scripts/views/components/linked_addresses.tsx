@@ -40,7 +40,7 @@ type LinkedAddressesProps = {
 };
 
 const Address = ({ addressInfo }: AddressProps) => {
-  const { address, walletId, community } = addressInfo;
+  const { address, walletId } = addressInfo;
 
   return (
     <div className="AddressContainer">
