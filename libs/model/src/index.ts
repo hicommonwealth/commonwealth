@@ -8,6 +8,7 @@ export * as Email from './emails';
 export * as Feed from './feed';
 export * as LoadTest from './load-testing';
 export * as Poll from './poll';
+export * as Quest from './quest';
 export * as Reaction from './reaction';
 export * as Snapshot from './snapshot';
 export * as Subscription from './subscription';

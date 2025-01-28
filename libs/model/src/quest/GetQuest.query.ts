@@ -1,12 +1,12 @@
 import { Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../database';
-import { authRoles } from '../middleware';
+import { isSuperAdmin } from '../middleware';
 
 export function GetQuest(): Query<typeof schemas.GetQuest> {
   return {
     ...schemas.GetQuest,
-    auth: [authRoles()],
+    auth: [isSuperAdmin],
     secure: true,
     body: async ({ payload }) => {
       const { quest_id } = payload;

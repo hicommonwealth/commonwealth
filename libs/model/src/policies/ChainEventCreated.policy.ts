@@ -4,11 +4,11 @@ import { events } from '@hicommonwealth/schemas';
 import { ZodUndefined } from 'zod';
 import { models } from '../database';
 import { systemActor } from '../middleware';
-import { CreateLaunchpadToken } from '../token/CreateToken.command';
+import { CreateToken } from '../token/CreateToken.command';
 import { handleCommunityStakeTrades } from './handlers/handleCommunityStakeTrades';
 import { handleLaunchpadTrade } from './handlers/handleLaunchpadTrade';
+import { handleNamespaceDeployedWithReferral } from './handlers/handleNamespaceDeployedWithReferral';
 import { handleReferralFeeDistributed } from './handlers/handleReferralFeeDistributed';
-import { handleReferralSet } from './handlers/handleReferralSet';
 
 const log = logger(import.meta);
 
@@ -17,8 +17,12 @@ export const processChainEventCreated: EventHandler<
   ZodUndefined
 > = async ({ payload }) => {
   switch (payload.eventSource.eventSignature) {
+    case EvmEventSignatures.NamespaceFactory.NamespaceDeployedWithReferral:
+      await handleNamespaceDeployedWithReferral(payload);
+      break;
+
     case EvmEventSignatures.CommunityStake.Trade:
-      await handleCommunityStakeTrades(models, payload);
+      await handleCommunityStakeTrades(payload);
       break;
 
     case EvmEventSignatures.Launchpad.TokenLaunched: {
@@ -27,7 +31,7 @@ export const processChainEventCreated: EventHandler<
           eth_chain_id: payload.eventSource.ethChainId,
         },
       });
-      await command(CreateLaunchpadToken(), {
+      await command(CreateToken(), {
         actor: systemActor({}),
         payload: {
           chain_node_id: chainNode!.id!,
@@ -43,7 +47,7 @@ export const processChainEventCreated: EventHandler<
       break;
 
     case EvmEventSignatures.Referrals.ReferralSet:
-      await handleReferralSet(payload);
+      // await handleReferralSet(payload);
       break;
 
     case EvmEventSignatures.Referrals.FeeDistributed:

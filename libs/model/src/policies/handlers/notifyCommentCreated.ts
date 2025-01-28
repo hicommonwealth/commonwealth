@@ -96,15 +96,21 @@ export const notifyCommentCreated: EventHandler<
       key: WorkflowKeys.CommentCreation,
       users: users.map((u) => ({ id: String(u.user_id) })),
       data: {
-        // @ts-expect-error StrictNullChecks
-        author: author.User.profile.name || author.address.substring(0, 8),
+        author: author.User?.profile.name || author.address.substring(0, 8),
         comment_parent_name: payload.parent_id ? 'comment' : 'thread',
         community_name: community.name,
         comment_body: commentSummary,
         comment_url: commentUrl,
         comment_created_event: payload,
       },
-      actor: { id: String(author.user_id) },
+      actor: {
+        id: String(author.user_id),
+        profile_name:
+          author.User?.profile.name || author.address.substring(0, 8),
+        profile_url: getProfileUrl(author.user_id, community.custom_domain),
+        email: author.User?.profile.email ?? undefined,
+        profile_avatar_url: author.User?.profile.avatar_url ?? undefined,
+      },
     });
   }
 
