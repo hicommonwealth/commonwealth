@@ -44,15 +44,21 @@ const Quests = ({ className, quests }: QuestsProps) => {
           onClick={handleSeeAllQuests}
         />
       </div>
-      <div className="list">
-        {quests.map((quest) => (
-          <QuestTask
-            key={quest.id}
-            quest={quest}
-            onClick={handleQuestCTAClick}
-          />
-        ))}
-      </div>
+      {quests.length === 0 ? (
+        <div className="empty-task-list">
+          <CWText type="b1">No more quests available</CWText>{' '}
+        </div>
+      ) : (
+        <div className="list">
+          {quests.map((quest) => (
+            <QuestTask
+              key={quest.id}
+              quest={quest}
+              onClick={handleQuestCTAClick}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 };
