@@ -55,6 +55,10 @@ const useCreateCommentReactionMutation = () => {
       // reset comments cache state
       utils.comment.getComments.invalidate().catch(console.error);
 
+      // reset xp cache
+      utils.quest.getQuests.invalidate();
+      utils.user.getXps.invalidate();
+
       const userId = user.addresses?.[0]?.profile?.userId;
       userId &&
         markTrainingActionAsComplete(UserTrainingCardTypes.GiveUpvote, userId);

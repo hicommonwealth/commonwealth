@@ -57,9 +57,14 @@ const useCreateThreadReactionMutation = ({
   const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
 
   const user = useUserStore();
+  const utils = trpc.useUtils();
 
   return trpc.thread.createThreadReaction.useMutation({
     onSuccess: (newReaction) => {
+      // reset xp cache
+      utils.quest.getQuests.invalidate();
+      utils.user.getXps.invalidate();
+
       const reaction: any = {
         id: newReaction.id,
         address: newReaction.Address!.address,

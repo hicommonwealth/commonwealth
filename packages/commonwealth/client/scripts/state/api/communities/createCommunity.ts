@@ -41,9 +41,15 @@ export const buildCreateCommunityInput = ({
 
 const useCreateCommunityMutation = () => {
   const user = useUserStore();
+  const utils = trpc.useUtils();
   return trpc.community.createCommunity.useMutation({
     onSuccess: async () => {
       user.setData({ addressSelectorSelectedAddress: undefined });
+
+      // reset xp cache
+      utils.quest.getQuests.invalidate();
+      utils.user.getXps.invalidate();
+
       await initAppState(false);
     },
   });
