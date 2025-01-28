@@ -10,3 +10,4 @@ export * from './recurringContestAbi';
 export * from './reservationHookAbi';
 export * from './singleContestAbi';
 export * from './tokenCommunityManagerAbi';
+export * from './tokenStakingAbi';

@@ -5,6 +5,7 @@ import {
   namespaceFactoryAbi,
   singleContestAbi,
   tokenCommunityManagerAbi,
+  tokenStakingAbi,
 } from '../abis';
 import { recurringContestAbi } from '../abis/recurringContestAbi';
 import { referralFeeManager } from '../abis/referralFeeManager';
@@ -33,6 +34,11 @@ type ContractAddresses = {
     | (key extends keyof typeof factoryContracts
         ? 'referralFeeManager' extends keyof (typeof factoryContracts)[key]
           ? (typeof factoryContracts)[key]['referralFeeManager']
+          : never
+        : never)
+    | (key extends keyof typeof factoryContracts
+        ? 'tokenStaking' extends keyof (typeof factoryContracts)[key]
+          ? (typeof factoryContracts)[key]['tokenStaking']
           : never
         : never);
 };
@@ -118,6 +124,19 @@ const referralFeeManagerSource: ContractSource = {
   ],
 };
 
+const tokenStakingSource: ContractSource = {
+  abi: tokenStakingAbi,
+  eventSignatures: [
+    EvmEventSignatures.TokenStaking.TokenLocked,
+    EvmEventSignatures.TokenStaking.TokenLockDurationIncreased,
+    EvmEventSignatures.TokenStaking.TokenUnlocked,
+    EvmEventSignatures.TokenStaking.TokenPermanentConverted,
+    EvmEventSignatures.TokenStaking.TokenDelegated,
+    EvmEventSignatures.TokenStaking.TokenUndelegated,
+    EvmEventSignatures.TokenStaking.TokenMerged,
+  ],
+};
+
 /**
  * Note that this object does not contain details for contracts deployed by users
  * at runtime. Those contracts remain in the EvmEventSources table.
@@ -138,6 +157,8 @@ export const EventRegistry = {
       tokenCommunityManagerSource,
     [factoryContracts[ValidChains.SepoliaBase].referralFeeManager]:
       referralFeeManagerSource,
+    [factoryContracts[ValidChains.SepoliaBase].tokenStaking]:
+      tokenStakingSource,
   },
   [ValidChains.Sepolia]: {
     [factoryContracts[ValidChains.Sepolia].factory]: namespaceFactorySource,

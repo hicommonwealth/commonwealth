@@ -9,6 +9,7 @@ import { handleCommunityStakeTrades } from './handlers/handleCommunityStakeTrade
 import { handleLaunchpadTrade } from './handlers/handleLaunchpadTrade';
 import { handleNamespaceDeployedWithReferral } from './handlers/handleNamespaceDeployedWithReferral';
 import { handleReferralFeeDistributed } from './handlers/handleReferralFeeDistributed';
+import { handleTokenStaking } from './handlers/handleTokenStaking';
 
 const log = logger(import.meta);
 
@@ -52,6 +53,16 @@ export const processChainEventCreated: EventHandler<
 
     case EvmEventSignatures.Referrals.FeeDistributed:
       await handleReferralFeeDistributed(payload);
+      break;
+
+    case EvmEventSignatures.TokenStaking.TokenLocked:
+    case EvmEventSignatures.TokenStaking.TokenLockDurationIncreased:
+    case EvmEventSignatures.TokenStaking.TokenUnlocked:
+    case EvmEventSignatures.TokenStaking.TokenPermanentConverted:
+    case EvmEventSignatures.TokenStaking.TokenDelegated:
+    case EvmEventSignatures.TokenStaking.TokenUndelegated:
+    case EvmEventSignatures.TokenStaking.TokenMerged:
+      await handleTokenStaking(payload);
       break;
 
     default:
