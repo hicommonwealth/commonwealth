@@ -200,8 +200,8 @@ const CommonDomainRoutes = ({
     element={withLayout(DashboardPage, { type: 'common' })}
   />,
   <Route
-    key="/communities"
-    path="/communities"
+    key="/explore"
+    path="/explore"
     element={withLayout(CommunitiesPage, {
       type: 'common',
     })}

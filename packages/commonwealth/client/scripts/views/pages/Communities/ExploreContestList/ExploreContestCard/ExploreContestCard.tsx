@@ -78,6 +78,10 @@ const ExploreContestCard = ({
     });
   };
 
+  if (!isContestBalanceLoading && (!prizes || prizes.length === 0)) {
+    return null;
+  }
+
   return (
     <div className="ExploreContestCard">
       <div className="contest-banner">

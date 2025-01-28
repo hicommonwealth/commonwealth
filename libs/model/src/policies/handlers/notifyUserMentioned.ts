@@ -79,6 +79,13 @@ export const notifyUserMentioned: EventHandler<
           : safeTruncateBody(getDecodedString(payload.comment!.body), 255),
       object_url,
     },
+    actor: {
+      id: String(user.id),
+      profile_name: user.profile.name || payload.authorAddress.substring(0, 8),
+      profile_url: getProfileUrl(user.id!, community.custom_domain),
+      email: user.profile.email ?? undefined,
+      profile_avatar_url: user.profile.avatar_url ?? undefined,
+    },
   });
 
   // Don't send Eliza webhooks for mentions in comments

@@ -244,6 +244,7 @@ export function getAllRascalConfigs(
         RascalRoutingKeys.FarcasterWorkerPolicyCastCreated,
         RascalRoutingKeys.FarcasterWorkerPolicyReplyCastCreated,
         RascalRoutingKeys.FarcasterWorkerPolicyVoteCreated,
+        RascalRoutingKeys.FarcasterWorkerPolicyContestBotMentioned,
       ],
     },
   };

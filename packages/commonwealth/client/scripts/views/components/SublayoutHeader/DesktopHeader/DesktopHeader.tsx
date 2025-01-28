@@ -110,13 +110,13 @@ const DesktopHeader = ({ onMobile, onAuthModalOpen }: DesktopHeaderProps) => {
               />
             )}
             <CWTooltip
-              content="Explore communities"
+              content="Explore"
               placement="bottom"
               renderTrigger={(handleInteraction) => (
                 <CWIconButton
                   iconButtonTheme="black"
                   iconName="compassPhosphor"
-                  onClick={() => navigate('/communities', {}, null)}
+                  onClick={() => navigate('/explore', {}, null)}
                   onMouseEnter={handleInteraction}
                   onMouseLeave={handleInteraction}
                 />

@@ -13,14 +13,14 @@ export const QuestView = Quest.extend({
 });
 
 export const GetQuest = {
-  input: z.object({ community_id: z.string(), quest_id: PG_INT }),
+  input: z.object({ quest_id: PG_INT }),
   output: QuestView.optional(),
   context: AuthContext,
 };
 
 export const GetQuests = {
   input: PaginationParamsSchema.extend({
-    community_id: z.string(),
+    community_id: z.string().optional(),
   }),
   output: PaginatedResultSchema.extend({
     results: z.array(QuestView),

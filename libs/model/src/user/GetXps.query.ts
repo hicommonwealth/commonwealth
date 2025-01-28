@@ -25,22 +25,27 @@ export function GetXps(): Query<typeof schemas.GetXps> {
           required: false,
           attributes: ['profile'],
         },
-      ];
-      if (community_id) {
-        include.push({
+        {
           model: models.QuestActionMeta,
-          required: true,
           as: 'quest_action_meta',
-          include: [
-            {
-              model: models.Quest,
-              required: true,
-              attributes: ['id', 'name'],
-              where: { community_id },
-            },
-          ],
-        });
-      }
+          include: community_id
+            ? [
+                {
+                  model: models.Quest,
+                  required: true,
+                  attributes: ['id', 'name'],
+                  where: { community_id },
+                },
+              ]
+            : [
+                {
+                  model: models.Quest,
+                  required: true,
+                  attributes: ['id', 'name'],
+                },
+              ],
+        },
+      ];
 
       const where: WhereOptions<XpLogInstance> = {};
       user_id && (where.user_id = user_id);

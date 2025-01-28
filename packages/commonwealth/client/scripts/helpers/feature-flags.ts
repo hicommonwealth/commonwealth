@@ -34,8 +34,8 @@ const featureFlags = {
   stickyEditor: buildFlag(process.env.FLAG_STICKY_EDITOR),
   newMobileNav: buildFlag(process.env.FLAG_NEW_MOBILE_NAV),
   rewardsPage: buildFlag(process.env.FLAG_REWARDS_PAGE),
-  growl: buildFlag(process.env.FLAG_GROWL),
   xp: buildFlag(process.env.FLAG_XP),
+  growl: buildFlag(process.env.FLAG_GROWL),
 };
 
 export type AvailableFeatureFlag = keyof typeof featureFlags;
