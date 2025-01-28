@@ -34,7 +34,7 @@ const QuestList = () => {
   };
 
   const handleCTAClick = () => {
-    // TODO: navigate to quest details
+    // TODO: navigate to quest details in #10732
   };
 
   const handleLeaderboardClick = () => {
