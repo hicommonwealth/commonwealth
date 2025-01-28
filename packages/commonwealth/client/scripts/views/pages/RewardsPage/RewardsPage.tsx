@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import { useFlag } from 'hooks/useFlag';
 import { useCommonNavigate } from 'navigation/helpers';
+import { useGetUserReferralsQuery } from 'state/api/user';
 import useUserStore from 'state/ui/user';
 import { IconName } from 'views/components/component_kit/cw_icons/cw_icon_lookup';
 
@@ -13,13 +14,19 @@ import {
   CWTabsRow,
 } from '../../components/component_kit/new_designs/CWTabs';
 import { PageNotFound } from '../404';
+import './RewardsPage.scss';
 import RewardsTab from './RewardsTab';
 import { QuestCard, ReferralCard, WalletCard } from './cards';
 import { QuestTable, ReferralTable, WalletTable } from './tables';
 import { MobileTabType, TableType } from './types';
-import { getInitialTab, mobileTabParam, tabToTable, typeToIcon } from './utils';
-
-import './RewardsPage.scss';
+import {
+  calculateReferralTrend,
+  calculateTotalEarnings,
+  getInitialTab,
+  mobileTabParam,
+  tabToTable,
+  typeToIcon,
+} from './utils';
 
 const RewardsPage = () => {
   const navigate = useCommonNavigate();
@@ -28,6 +35,15 @@ const RewardsPage = () => {
 
   const [mobileTab, setMobileTab] = useState<MobileTabType>(getInitialTab());
   const [tableTab, setTableTab] = useState(tabToTable[getInitialTab()]);
+
+  const { data: referrals, isLoading: isReferralsLoading } =
+    useGetUserReferralsQuery({
+      userId: user?.id,
+      apiCallEnabled: !!user?.id,
+    });
+
+  const trendValue = calculateReferralTrend(referrals || []);
+  const totalEarnings = calculateTotalEarnings(referrals || []);
 
   const handleTabChange = (type: MobileTabType) => {
     setMobileTab(type);
@@ -67,6 +83,9 @@ const RewardsPage = () => {
             mobileTab === MobileTabType.Referrals) && (
             <ReferralCard
               onSeeAllClick={() => handleTabChange(MobileTabType.Referrals)}
+              trendValue={trendValue}
+              totalEarnings={totalEarnings}
+              isLoading={isReferralsLoading}
             />
           )}
           {(!isWindowSmallInclusive ||
@@ -93,7 +112,9 @@ const RewardsPage = () => {
           </CWTabsRow>
         </div>
 
-        {tableTab === TableType.Referrals && <ReferralTable />}
+        {tableTab === TableType.Referrals && (
+          <ReferralTable referrals={referrals} isLoading={isReferralsLoading} />
+        )}
         {tableTab === TableType.TokenTXHistory && <QuestTable />}
         {tableTab === TableType.XPEarnings && <WalletTable />}
       </section>
