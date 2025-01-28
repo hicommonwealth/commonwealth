@@ -12,10 +12,10 @@ import {
   useCreateQuestMutation,
   useUpdateQuestMutation,
 } from 'state/api/quests';
+import { useCWRepetitionCycleRadioButton } from 'views/components/component_kit/CWRepetitionCycleRadioButton';
+import { ValidationFnProps } from 'views/components/component_kit/CWRepetitionCycleRadioButton/types';
 import { CWFormRef } from 'views/components/component_kit/new_designs/CWForm';
 import { z } from 'zod';
-import { useCWRepetitionCycleRadioButton } from './CWRepetitionCycleRadioButton';
-import { ValidationFnProps } from './CWRepetitionCycleRadioButton/types';
 import './CreateQuestForm.scss';
 import { QuestAction } from './QuestActionSubForm';
 import { useQuestActionMultiFormsState } from './QuestActionSubForm/useMultipleQuestActionForms';
