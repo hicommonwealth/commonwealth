@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import { useFlag } from 'hooks/useFlag';
 import { useCommonNavigate } from 'navigation/helpers';
-import React from 'react';
+import React, { useState } from 'react';
 import { useFetchQuestsQuery } from 'state/api/quest';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
@@ -12,6 +12,7 @@ import './QuestList.scss';
 const QuestList = () => {
   const navigate = useCommonNavigate();
   const xpEnabled = useFlag('xp');
+  const [startDate] = useState(new Date());
 
   const {
     data: questsList,
@@ -22,6 +23,7 @@ const QuestList = () => {
   } = useFetchQuestsQuery({
     cursor: 1,
     limit: 8,
+    start_after: startDate,
     enabled: xpEnabled,
   });
   const quests = (questsList?.pages || []).flatMap((page) => page.results);

@@ -10,13 +10,33 @@ export function GetQuests(): Query<typeof schemas.GetQuests> {
     auth: [],
     secure: false,
     body: async ({ payload }) => {
-      const { community_id, cursor, limit, order_by, order_direction } =
-        payload;
+      const {
+        community_id,
+        cursor,
+        limit,
+        order_by,
+        order_direction,
+        end_before,
+        start_after,
+      } = payload;
 
       const direction = order_direction || 'DESC';
       const order = order_by || 'created_at';
       const offset = limit! * (cursor! - 1);
-      const replacements = { direction, community_id, order, limit, offset };
+      const replacements = {
+        direction,
+        community_id,
+        order,
+        limit,
+        offset,
+        end_before: end_before ? new Date(end_before) : null,
+        start_after: start_after ? new Date(start_after) : null,
+      };
+      const filterConditions = [
+        community_id ? `Q.community_id = :community_id` : '',
+        start_after ? `Q.start_date >= :start_after` : '',
+        end_before ? `Q.end_date <= :end_before` : '',
+      ].filter(Boolean);
 
       const sql = `
         SELECT 
@@ -48,6 +68,7 @@ export function GetQuests(): Query<typeof schemas.GetQuests> {
         FROM 
           "Quests" as Q
         LEFT JOIN "QuestActionMetas" QAS on QAS.quest_id = Q.id
+        ${filterConditions.length > 0 ? `WHERE ${filterConditions.join(' AND ')}` : ''}
         GROUP BY Q.id
         ORDER BY Q.${order} ${direction}
         LIMIT :limit OFFSET :offset
