@@ -18,6 +18,10 @@ export function useRegisterPushNotificationSubscriptionCallback() {
     const channelType = computeChannelTypeFromBrowserType(browserType);
     if (!channelType) return;
 
+    console.log(
+      'Registering push notifications for channelType: ' + channelType,
+    );
+
     const permission = await Notification.requestPermission();
     if (permission === 'granted') {
       console.log(

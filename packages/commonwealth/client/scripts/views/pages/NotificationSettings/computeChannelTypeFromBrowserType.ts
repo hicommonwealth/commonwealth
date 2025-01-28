@@ -12,6 +12,7 @@ export function computeChannelTypeFromBrowserType(
   browserType: BrowserType | undefined,
 ): 'FCM' | 'APNS' | undefined {
   if (isMobileApp) {
+    console.log('Within the mobile app. No channelType.');
     return undefined;
   }
 
