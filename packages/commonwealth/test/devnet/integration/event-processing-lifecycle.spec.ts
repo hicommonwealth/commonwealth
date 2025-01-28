@@ -5,8 +5,6 @@ import {
 } from '@hicommonwealth/evm-protocols';
 import { models } from '@hicommonwealth/model';
 import { describe, expect, test, vi } from 'vitest';
-import { Contract } from 'web3';
-import { AbiItem } from 'web3-utils';
 import { setupCommonwealthE2E } from './integrationUtils/mainSetup';
 
 describe('End to end event tests', () => {
@@ -17,9 +15,9 @@ describe('End to end event tests', () => {
         await setupCommonwealthE2E();
 
       const launchpadFactory = new web3.eth.Contract(
-        launchpadFactoryAbi as AbiItem[],
+        launchpadFactoryAbi,
         contractAddresses.launchpad,
-      ) as unknown as Contract<typeof launchpadFactoryAbi>;
+      );
 
       await cp.launchToken(
         launchpadFactory,
@@ -52,9 +50,9 @@ describe('End to end event tests', () => {
       );
 
       const lpBondingCurveFactory = new web3.eth.Contract(
-        lpBondingCurveAbi as AbiItem[],
+        lpBondingCurveAbi,
         contractAddresses.lpBondingCurve,
-      ) as unknown as Contract<typeof lpBondingCurveAbi>;
+      );
 
       await cp.buyToken(
         lpBondingCurveFactory,

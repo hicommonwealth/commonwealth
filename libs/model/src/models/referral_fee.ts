@@ -36,8 +36,12 @@ export const ReferralFee = (
         type: Sequelize.FLOAT,
         allowNull: false,
       },
+      referee_address: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
       transaction_timestamp: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.BIGINT,
         allowNull: false,
       },
     },

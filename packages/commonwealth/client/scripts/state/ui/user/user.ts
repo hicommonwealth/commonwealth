@@ -1,4 +1,5 @@
 import { ExtendedCommunity } from '@hicommonwealth/schemas';
+import { WalletId } from '@hicommonwealth/shared';
 import Account from 'models/Account';
 import AddressInfo from 'models/AddressInfo';
 import { z } from 'zod';
@@ -8,7 +9,7 @@ import { createBoundedUseStore } from '../utils';
 
 export type EmailNotificationInterval = 'weekly' | 'never';
 
-type UserCommunities = {
+export type UserCommunities = {
   id: string;
   name: string;
   iconUrl: string;
@@ -34,9 +35,10 @@ type CommonProps = {
   isWelcomeOnboardFlowComplete: boolean;
   isLoggedIn: boolean;
   addressSelectorSelectedAddress: string | undefined;
+  hasMagicWallet: boolean;
 };
 
-type UserStoreProps = CommonProps & {
+export type UserStoreProps = CommonProps & {
   setData: (data: Partial<CommonProps>) => void;
 };
 
@@ -60,13 +62,25 @@ export const userStore = createStore<UserStoreProps>()(
     isWelcomeOnboardFlowComplete: false,
     isLoggedIn: false,
     addressSelectorSelectedAddress: undefined,
+    hasMagicWallet: false,
     // when logged-in, set the auth-user values
     setData: (data) => {
       if (Object.keys(data).length > 0) {
-        set((state) => ({
-          ...state,
-          ...data,
-        }));
+        set((state) => {
+          const newState = { ...state, ...data };
+
+          // Compute hasMagicWallet whenever addresses or activeAccount changes
+          const currentAddressInfo = newState.addresses?.find(
+            (addr) => addr.address === newState.activeAccount?.address,
+          );
+          const hasMagicWallet =
+            currentAddressInfo?.walletId === WalletId.Magic;
+
+          return {
+            ...newState,
+            hasMagicWallet,
+          };
+        });
       }
     },
   })),

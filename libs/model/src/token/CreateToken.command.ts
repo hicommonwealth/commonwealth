@@ -1,17 +1,17 @@
 import { InvalidState, type Command } from '@hicommonwealth/core';
-import { commonProtocol } from '@hicommonwealth/evm-protocols';
+import {
+  commonProtocol,
+  getErc20TokenInfo,
+  getLaunchpadTokenCreatedTransaction,
+} from '@hicommonwealth/evm-protocols';
 import * as schemas from '@hicommonwealth/schemas';
 import { TokenView } from '@hicommonwealth/schemas';
 import z from 'zod';
 import { models } from '../database';
 import { authRoles } from '../middleware';
 import { mustExist } from '../middleware/guards';
-import {
-  getErc20TokenInfo,
-  getTokenCreatedTransaction,
-} from '../services/commonProtocol/launchpadHelpers';
 
-export function CreateLaunchpadToken(): Command<typeof schemas.CreateToken> {
+export function CreateToken(): Command<typeof schemas.CreateToken> {
   return {
     ...schemas.CreateToken,
     auth: [authRoles('admin')],
@@ -26,11 +26,10 @@ export function CreateLaunchpadToken(): Command<typeof schemas.CreateToken> {
 
       mustExist('Chain Node', chainNode);
 
-      const tokenData = await getTokenCreatedTransaction({
+      const tokenData = await getLaunchpadTokenCreatedTransaction({
         rpc: chainNode.private_url! || chainNode.url!,
         transactionHash: transaction_hash,
       });
-
       if (!tokenData) {
         throw new InvalidState('Transaction not found');
       }

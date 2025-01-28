@@ -18,6 +18,7 @@ export enum RascalSubscriptions {
   ContestWorkerPolicy = BrokerSubscriptions.ContestWorkerPolicy,
   ContestProjection = BrokerSubscriptions.ContestProjection,
   XpProjection = BrokerSubscriptions.XpProjection,
+  UserReferrals = BrokerSubscriptions.UserReferrals,
   FarcasterWorkerPolicy = BrokerSubscriptions.FarcasterWorkerPolicy,
 }
 
@@ -35,6 +36,7 @@ export enum RascalQueues {
   ContestWorkerPolicy = 'ContestWorkerPolicyQueue',
   ContestProjection = 'ContestProjection',
   XpProjection = 'XpProjection',
+  UserReferrals = 'UserReferrals',
   FarcasterWorkerPolicy = 'FarcasterWorkerPolicyQueue',
 }
 
@@ -47,6 +49,7 @@ export enum RascalBindings {
   ContestWorkerPolicy = 'ContestWorkerPolicy',
   ContestProjection = 'ContestProjection',
   XpProjection = 'XpProjection',
+  UserReferrals = 'UserReferrals',
   FarcasterWorkerPolicy = 'FarcasterWorkerPolicy',
 }
 
@@ -89,7 +92,10 @@ export enum RascalRoutingKeys {
   XpProjectionCommentUpvoted = EventNames.CommentUpvoted,
   XpProjectionUserMentioned = EventNames.UserMentioned,
 
+  UserReferralsCommunityCreated = EventNames.CommunityCreated,
+
   FarcasterWorkerPolicyCastCreated = EventNames.FarcasterCastCreated,
   FarcasterWorkerPolicyReplyCastCreated = EventNames.FarcasterReplyCastCreated,
   FarcasterWorkerPolicyVoteCreated = EventNames.FarcasterVoteCreated,
+  FarcasterWorkerPolicyContestBotMentioned = EventNames.FarcasterContestBotMentioned,
 }

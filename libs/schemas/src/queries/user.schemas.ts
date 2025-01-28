@@ -1,6 +1,6 @@
 import { ChainBase, Roles } from '@hicommonwealth/shared';
-import { z } from 'zod';
-import { Referral, User } from '../entities';
+import { ZodType, z } from 'zod';
+import { Referral, ReferralFees, User } from '../entities';
 import { Tags } from '../entities/tag.schemas';
 import { UserProfile } from '../entities/user.schemas';
 import { XpLog } from '../entities/xp.schemas';
@@ -16,17 +16,27 @@ export const UserProfileAddressView = AddressView.extend({
   }),
 });
 
+// Type annotation is needed to avoid:
+// The inferred type of this node exceeds the maximum length the compiler will serialize.
+// An explicit type annotation is needed.ts(7056)
+type UserProfileAddressView = z.infer<typeof UserProfileAddressView>;
+
 export const UserProfileView = z.object({
   userId: PG_INT,
   profile: UserProfile,
   totalUpvotes: z.number().int(),
-  addresses: z.array(UserProfileAddressView),
+  addresses: z.array(UserProfileAddressView) as ZodType<
+    UserProfileAddressView[]
+  >,
   threads: z.array(ThreadView),
   comments: z.array(CommentView),
   commentThreads: z.array(ThreadView),
   isOwner: z.boolean(),
   tags: z.array(Tags.extend({ id: PG_INT })),
-  xp_points: z.number().int(),
+  referred_by_address: z.string().nullish(),
+  referral_count: PG_INT.default(0),
+  referral_eth_earnings: z.number().optional(),
+  xp_points: PG_INT.default(0),
 });
 
 export const GetUserProfile = {
@@ -86,16 +96,29 @@ export const GetUserAddresses = {
   ),
 };
 
-export const ReferralView = z.array(
-  Referral.extend({
-    referee_user_id: PG_INT,
-    referee_profile: UserProfile,
-  }),
-);
+export const ReferralView = Referral.extend({
+  referee_user_id: PG_INT,
+  referee_profile: UserProfile,
+  community_id: z.string().nullish(),
+  community_name: z.string().nullish(),
+  community_icon_url: z.string().nullish(),
+});
 
 export const GetUserReferrals = {
   input: z.object({ user_id: PG_INT.optional() }),
   output: z.array(ReferralView),
+};
+
+export const ReferralFeesView = ReferralFees.extend({
+  referee_profile: UserProfile.nullish(),
+  community_id: z.string().nullish(),
+  community_name: z.string().nullish(),
+  community_icon_url: z.string().nullish(),
+});
+
+export const GetUserReferralFees = {
+  input: z.object({}),
+  output: z.array(ReferralFeesView),
 };
 
 export const XpLogView = XpLog.extend({

@@ -1,55 +1,17 @@
 import { ServerError, logger } from '@hicommonwealth/core';
-import { Op, Transaction } from 'sequelize';
+import { Op } from 'sequelize';
 import { models } from '../database';
 
 const log = logger(import.meta);
 
-export const incrementProfileCount = async (
-  community_id: string,
-  user_id: number,
-  transaction?: Transaction,
-) => {
+export const refreshProfileCount = async (community_id: string) => {
   await models.sequelize.query(
     `
-      UPDATE "Communities" as c
-      SET profile_count = profile_count + 1
-      WHERE c.id = :community_id
-      AND NOT EXISTS (
-        SELECT 1
-        FROM "Addresses" as a
-        WHERE a.community_id = c.id AND a.user_id = :user_id AND a.verified IS NOT NULL
-      );
+UPDATE "Communities" C
+SET profile_count = (SELECT COUNT(*) FROM "Addresses" A WHERE A.community_id = C.id AND A.user_id IS NOT NULL AND A.verified IS NOT NULL)
+WHERE C.id = :community_id;
     `,
-    {
-      replacements: { community_id, user_id },
-      transaction,
-    },
-  );
-};
-
-export const decrementProfileCount = async (
-  community_id: string,
-  user_id: number,
-  transaction: Transaction,
-) => {
-  await models.sequelize.query(
-    `
-      UPDATE "Communities" as c
-      SET profile_count = profile_count - 1
-      WHERE c.id = :community_id
-      AND NOT EXISTS (
-        SELECT 1
-        FROM "Addresses" as a
-        WHERE a.community_id = c.id AND a.user_id = :user_id AND a.verified IS NOT NULL
-      );
-    `,
-    {
-      replacements: {
-        community_id: community_id,
-        user_id: user_id,
-      },
-      transaction: transaction,
-    },
+    { replacements: { community_id } },
   );
 };
 

@@ -13,22 +13,18 @@ import CommonDomainRoutes from './CommonDomainRoutes';
 import GeneralRoutes from './GeneralRoutes';
 
 export type RouteFeatureFlags = {
-  tokenizedCommunityEnabled: boolean;
+  launchpadEnabled: boolean;
   xpEnabled: boolean;
 };
 
 const Router = () => {
   const client = OpenFeature.getClient();
 
-  const tokenizedCommunityEnabled = client.getBooleanValue(
-    'tokenizedCommunity',
-    false,
-  );
-
+  const launchpadEnabled = client.getBooleanValue('launchpad', false);
   const xpEnabled = client.getBooleanValue('xp', false);
 
   const flags = {
-    tokenizedCommunityEnabled,
+    launchpadEnabled,
     xpEnabled,
   };
 

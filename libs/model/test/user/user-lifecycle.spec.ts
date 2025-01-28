@@ -4,7 +4,6 @@ import {
   QuestParticipationPeriod,
 } from '@hicommonwealth/schemas';
 import Chance from 'chance';
-import { JoinCommunity } from 'model/src/community';
 import moment from 'moment';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { CreateComment, CreateCommentReaction } from '../../src/comment';
@@ -14,24 +13,24 @@ import { CreateThread } from '../../src/thread';
 import { GetUserProfile, GetXps, UpdateUser, Xp } from '../../src/user';
 import { drainOutbox } from '../utils';
 import { seedCommunity } from '../utils/community-seeder';
+import { signIn } from '../utils/sign-in';
 
 const chance = new Chance();
 
 describe('User lifecycle', () => {
-  let admin: Actor, member: Actor, new_actor: Actor;
+  let admin: Actor, member: Actor, new_actor: Actor, superadmin: Actor;
   let community_id: string;
   let topic_id: number;
-  let base_id: string;
 
   beforeAll(async () => {
-    const { base, community, actors } = await seedCommunity({
-      roles: ['admin', 'member'],
+    const { community, actors } = await seedCommunity({
+      roles: ['admin', 'member', 'superadmin'],
     });
-    base_id = base!.id;
     community_id = community!.id;
     topic_id = community!.topics!.at(0)!.id!;
     admin = actors.admin;
     member = actors.member;
+    superadmin = actors.superadmin;
   });
 
   afterAll(async () => {
@@ -42,7 +41,7 @@ describe('User lifecycle', () => {
     it('should project xp points', async () => {
       // setup quest
       const quest = await command(CreateQuest(), {
-        actor: admin,
+        actor: superadmin,
         payload: {
           name: chance.name(),
           description: chance.sentence(),
@@ -53,9 +52,8 @@ describe('User lifecycle', () => {
       });
       // setup quest actions
       const updated = await command(UpdateQuest(), {
-        actor: admin,
+        actor: superadmin,
         payload: {
-          community_id,
           quest_id: quest!.id!,
           action_metas: [
             {
@@ -189,23 +187,21 @@ describe('User lifecycle', () => {
       ]);
     });
 
-    it('should project xp points with participation limits', async () => {
+    it('should project xp points with participation limits in a global quest', async () => {
       // setup quest
       const quest = await command(CreateQuest(), {
-        actor: admin,
+        actor: superadmin,
         payload: {
           name: chance.name(),
           description: chance.sentence(),
-          community_id,
           start_date: moment().add(2, 'day').toDate(),
           end_date: moment().add(3, 'day').toDate(),
         },
       });
       // setup quest actions
       const updated = await command(UpdateQuest(), {
-        actor: admin,
+        actor: superadmin,
         payload: {
-          community_id,
           quest_id: quest!.id!,
           action_metas: [
             {
@@ -277,56 +273,29 @@ describe('User lifecycle', () => {
         },
       });
 
-      // TODO: command to create a new user
-      const new_user = await models.User.create({
-        profile: {
-          name: 'New User',
-          email: 'newuser@hi.com',
-        },
-        isAdmin: false,
-        is_welcome_onboard_flow_complete: false,
-        emailVerified: true,
-      });
+      // user signs in a referral link, creating a new user and address
+      const new_address = await signIn(community_id, member.address);
       new_actor = {
-        address: '0x9000000000000000000000000000000000000000',
+        address: new_address!.address,
         user: {
-          id: new_user.id,
-          email: new_user.profile.email!,
+          id: new_address!.user_id!,
+          email: '',
         },
       };
-      await models.Address.create({
-        community_id: base_id,
-        user_id: new_user.id,
-        address: new_actor.address!,
-        role: 'member',
-        is_banned: false,
-        verified: new Date(),
-        ghost_address: false,
-        is_user_default: false,
-        verification_token: '1234',
-      });
-      // user signs up for the community with a referral link
+
+      // complete the sign up flow
       await command(UpdateUser(), {
         actor: new_actor,
         payload: {
-          id: new_user.id!,
-          referrer_address: member.address!,
+          id: new_address!.user_id!,
           profile: {
-            name: 'New User Updated',
+            name: 'new_user_updated',
+            email: 'new_user@email.com',
           },
         },
       });
 
-      // the new user joins the community with a referral link
-      await command(JoinCommunity(), {
-        actor: new_actor,
-        payload: {
-          community_id,
-          referrer_address: member.address!,
-        },
-      });
-
-      // drain the outbox
+      // drain the outbox to award xp points
       await drainOutbox(
         [
           'CommunityJoined',
@@ -365,8 +334,8 @@ describe('User lifecycle', () => {
       const new_user_profile = await query(GetUserProfile(), {
         actor: {
           user: {
-            id: new_user.id,
-            email: new_user.profile.email!,
+            id: new_address!.user_id!,
+            email: '',
           },
         },
         payload: {},
@@ -416,38 +385,40 @@ describe('User lifecycle', () => {
           created_at: last[2].created_at,
         },
         {
-          event_name: 'SignUpFlowCompleted',
-          event_created_at: last[3].event_created_at,
-          user_id: new_user.id,
-          xp_points: 16,
-          action_meta_id: null, // this is a site event and not a quest action
-          creator_user_id: member.user.id,
-          creator_xp_points: 4,
-          created_at: last[3].created_at,
-        },
-        {
           event_name: 'CommunityJoined',
-          event_created_at: last[4].event_created_at,
-          user_id: new_user.id,
+          event_created_at: last[3].event_created_at,
+          user_id: new_address!.user_id!,
           xp_points: 10,
           action_meta_id: updated!.action_metas![3].id,
           creator_user_id: member.user.id,
           creator_xp_points: 10,
+          created_at: last[3].created_at,
+        },
+        {
+          event_name: 'SignUpFlowCompleted',
+          event_created_at: last[4].event_created_at,
+          user_id: new_address!.user_id!,
+          xp_points: 16,
+          action_meta_id: null, // this is a site event and not a quest action
+          creator_user_id: member.user.id,
+          creator_xp_points: 4,
           created_at: last[4].created_at,
         },
       ]);
     });
 
     it('should query previous xp logs', async () => {
-      // 8 events (by community id)
+      // 8 events
       const xps1 = await query(GetXps(), {
         actor: admin,
-        payload: { community_id },
+        payload: {},
       });
-      expect(xps1!.length).to.equal(8);
+      expect(xps1!.length).to.equal(9);
       xps1?.forEach((xp) => {
-        expect(xp.quest_id).to.be.a('number');
-        expect(xp.quest_action_meta_id).to.be.a('number');
+        if (xp.event_name !== 'SignUpFlowCompleted') {
+          expect(xp.quest_id).to.be.a('number');
+          expect(xp.quest_action_meta_id).to.be.a('number');
+        }
       });
 
       // 2 CommentUpvoted events (by event name)

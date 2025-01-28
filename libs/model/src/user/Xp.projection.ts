@@ -20,7 +20,7 @@ async function getUserId(payload: { address_id: number }) {
 }
 
 async function getUserIdByAddress(payload: {
-  referrer_address?: string;
+  referrer_address?: string | null;
 }): Promise<number | undefined> {
   if (payload.referrer_address) {
     const referrer_user = await models.Address.findOne({
@@ -33,6 +33,8 @@ async function getUserIdByAddress(payload: {
 
 /*
  * Finds all active quest action metas for a given event
+ * - Global quests are not filtered by community
+ * - Local quests are filtered by community
  */
 async function getQuestActionMetas(
   event_payload: { community_id: string; created_at?: Date },
@@ -41,7 +43,7 @@ async function getQuestActionMetas(
   // make sure quest was active when event was created
   const quests = await models.Quest.findAll({
     where: {
-      community_id: event_payload.community_id,
+      community_id: { [Op.or]: [null, event_payload.community_id] },
       start_date: { [Op.lte]: event_payload.created_at },
       end_date: { [Op.gte]: event_payload.created_at },
     },
@@ -83,7 +85,7 @@ async function recordXpsForQuest(
   user_id: number,
   event_created_at: Date,
   action_metas: Array<z.infer<typeof schemas.QuestActionMeta> | undefined>,
-  creator_address?: string,
+  creator_address?: string | null,
 ) {
   await sequelize.transaction(async (transaction) => {
     const creator_user_id = await getUserIdByAddress({
@@ -224,14 +226,19 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
         const reward_amount = 20;
         const creator_reward_weight = 0.2;
 
-        await recordXpsForEvent(
-          payload.user_id,
-          'SignUpFlowCompleted',
-          payload.created_at!,
-          reward_amount,
-          payload.referrer_address,
-          creator_reward_weight,
-        );
+        const referee_address = await models.User.findOne({
+          where: { id: payload.user_id },
+        });
+        referee_address &&
+          referee_address.referred_by_address &&
+          (await recordXpsForEvent(
+            payload.user_id,
+            'SignUpFlowCompleted',
+            payload.created_at!,
+            reward_amount,
+            referee_address.referred_by_address,
+            creator_reward_weight,
+          ));
       },
       CommunityCreated: async ({ payload }) => {
         const action_metas = await getQuestActionMetas(
@@ -252,12 +259,15 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
           payload,
           'CommunityJoined',
         );
+        const user = await models.User.findOne({
+          where: { id: payload.user_id },
+        });
         if (action_metas.length > 0) {
           await recordXpsForQuest(
             payload.user_id,
             payload.created_at!,
             action_metas,
-            payload.referrer_address,
+            user?.referred_by_address,
           );
         }
       },

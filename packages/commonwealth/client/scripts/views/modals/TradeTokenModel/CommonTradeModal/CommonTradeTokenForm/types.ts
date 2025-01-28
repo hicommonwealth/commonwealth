@@ -3,14 +3,14 @@ import { ChainBase } from '@hicommonwealth/shared';
 import { SupportedCurrencies } from 'helpers/currency';
 import NodeInfo from 'models/NodeInfo';
 import { z } from 'zod';
-import { TradingConfig } from '../../types';
+import { CommonTradingConfig } from '../types';
 import useCommonTradeTokenFormProps from './useCommonTradeTokenForm';
 
 export type TokenPresetAmounts = number | 'Max';
 
 export type UseCommonTradeTokenFormProps = {
-  tradeConfig: TradingConfig & {
-    currency: SupportedCurrencies;
+  tradeConfig: CommonTradingConfig & {
+    ethBuyCurrency: SupportedCurrencies;
     buyTokenPresetAmounts?: TokenPresetAmounts[];
     sellTokenPresetAmounts?: TokenPresetAmounts[]; // we could also do 25%, 50% etc
   };

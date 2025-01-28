@@ -1,0 +1,26 @@
+@import '../../../../../../styles/shared';
+
+.Quests {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 8px 0px;
+
+  .header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 4px 4px 18px;
+
+    .b1 {
+      color: $neutral-400 !important;
+    }
+  }
+
+  .list {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+}
