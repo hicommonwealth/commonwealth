@@ -1,15 +1,24 @@
 @import '../../../../../styles/shared.scss';
 
 .ProfileActivityRow {
+  // display: none;
   display: flex;
   position: relative;
+  gap: 4px;
   padding: 20px 0 0 0;
+  cursor: pointer;
   min-width: 100%;
   flex-direction: column;
   border-bottom: 1px solid #dddddd;
-  padding: 15px 60px 0px 60px;
+  padding: 16px 60px 16px 60px;
   @include extraSmall {
     padding: 0px 30px 0px 30px;
+  }
+
+  &:hover {
+    background: $neutral-50;
+    text-decoration: none;
+    color: unset;
   }
 
   @include extraSmall {
@@ -40,7 +49,7 @@
     .heading {
       width: 100%;
       display: flex;
-      margin-bottom: 10px;
+      margin-bottom: 5px;
       max-width: 90%;
 
       @include isWindowSmallToMediumInclusive {
@@ -55,8 +64,9 @@
         color: $neutral-900;
       }
       .Text {
-        font-size: 20px;
-        line-height: 20px;
+        font-size: 18px;
+        font-weight: 400;
+        line-height: 18px;
         color: $neutral-700;
         word-spacing: 0.1cap;
 
@@ -172,11 +182,10 @@
       div {
         max-height: 80px !important;
         min-height: 30px !important;
-        padding-bottom: 8px;
+        overflow: hidden;
         @include extraSmall {
           max-height: 108px !important;
           overflow: hidden;
-          padding-bottom: 2px;
         }
       }
 
@@ -203,7 +212,12 @@
       }
     }
   }
+
   .show-more-button-wrapper {
     display: none !important;
+  }
+  .footer {
+    display: flex;
+    gap: 10px;
   }
 }
