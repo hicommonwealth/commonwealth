@@ -22,7 +22,6 @@ const QuestList = () => {
   } = useFetchQuestsQuery({
     cursor: 1,
     limit: 8,
-    community_id: 'dydx', // TODO: need to change this.
     enabled: xpEnabled,
   });
   const quests = (questsList?.pages || []).flatMap((page) => page.results);
@@ -72,8 +71,7 @@ const QuestList = () => {
                 key={quest.name}
                 name={quest.name}
                 description={quest.description}
-                // TODO: quests should support images
-                iconURL="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR4dGWQgdRtlbW5aRFnN5K5pjTRSFsVWuGf7A&s"
+                iconURL={quest.image_url}
                 xpPoints={totalXP}
                 endDate={new Date(quest.end_date)}
                 onCTAClick={handleCTAClick}

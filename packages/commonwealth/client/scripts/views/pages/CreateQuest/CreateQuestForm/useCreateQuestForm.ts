@@ -47,7 +47,7 @@ const useCreateQuestForm = () => {
           description: values.description.trim(),
           end_date: new Date(values.end_date),
           start_date: new Date(values.start_date),
-          // TODO: add image support in api (needs ticketing).
+          image_url: values.image,
         });
 
         if (quest && quest.id && quest.community_id) {
@@ -65,8 +65,7 @@ const useCreateQuestForm = () => {
 
         notifySuccess('Quest created!');
 
-        // TODO: quests exploration will come in https://github.com/hicommonwealth/commonwealth/issues/9348
-        navigate('/communities');
+        navigate('/explore');
       } catch (e) {
         console.error(e);
 

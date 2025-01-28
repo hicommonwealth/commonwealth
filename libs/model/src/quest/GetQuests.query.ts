@@ -23,6 +23,7 @@ export function GetQuests(): Query<typeof schemas.GetQuests> {
           Q.id, 
           Q.name,
           Q.description, 
+          Q.image_url, 
           Q.community_id, 
           Q.start_date, 
           Q.end_date, 
