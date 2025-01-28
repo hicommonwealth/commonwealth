@@ -5,6 +5,7 @@ import {
   CWImageInput,
   ImageBehavior,
 } from 'views/components/component_kit/CWImageInput';
+import CWRepetitionCycleRadioButton from 'views/components/component_kit/CWRepetitionCycleRadioButton';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTextArea } from 'views/components/component_kit/cw_text_area';
@@ -12,7 +13,6 @@ import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWForm } from 'views/components/component_kit/new_designs/CWForm';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
 import { CWRadioButton } from 'views/components/component_kit/new_designs/cw_radio_button';
-import CWRepetitionCycleRadioButton from './CWRepetitionCycleRadioButton';
 import './CreateQuestForm.scss';
 import QuestActionSubForm, { QuestAction } from './QuestActionSubForm';
 import useCreateQuestForm from './useCreateQuestForm';
