@@ -15,7 +15,7 @@ export type GetMembersProps = {
   apiEnabled?: boolean;
 };
 
-export const useGetMembersQuery = ({
+const useGetMembersQuery = ({
   limit = 30,
   order_by,
   order_direction,
@@ -52,3 +52,5 @@ export const useGetMembersQuery = ({
     },
   );
 };
+
+export default useGetMembersQuery;
