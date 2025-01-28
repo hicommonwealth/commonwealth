@@ -8,11 +8,6 @@ import './XPProgressIndicator.scss';
 const WEEKLY_XP_GOAL = 400; // Hardcoded in client per product spec.
 
 const useXPProgress = () => {
-  const weeklyGoal = {
-    current: 0,
-    target: WEEKLY_XP_GOAL,
-  };
-
   const xpEnabled = useFlag('xp');
   const user = useUserStore();
   const { data: xpProgressions = [], isLoading: isLoadingXPProgression } =
@@ -36,6 +31,16 @@ const useXPProgress = () => {
   const pendingWeeklyQuests = allWeeklyQuests.filter(
     (q) => !xpProgressions.find((p) => p.quest_id === q.id),
   );
+  const weeklyGoal = {
+    current: Math.min(
+      xpProgressions
+        .map((x) => x.xp_points)
+        .reduce((accumulator, currentValue) => accumulator + currentValue, 0) ||
+        0,
+      WEEKLY_XP_GOAL,
+    ),
+    target: WEEKLY_XP_GOAL,
+  };
 
   return {
     weeklyGoal,
