@@ -50,7 +50,7 @@ const useCreateQuestForm = () => {
           image_url: values.image,
         });
 
-        if (quest && quest.id && quest.community_id) {
+        if (quest && quest.id) {
           await updateQuest({
             quest_id: quest.id,
             action_metas: questActionSubForms.map((subForm) => ({
