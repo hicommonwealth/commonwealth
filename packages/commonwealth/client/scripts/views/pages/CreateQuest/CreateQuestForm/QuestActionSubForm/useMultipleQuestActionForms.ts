@@ -2,12 +2,19 @@ import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import { useState } from 'react';
 import { ZodError } from 'zod';
 import './QuestActionSubForm.scss';
+import { doesActionRequireCreatorReward } from './helpers';
 import {
+  QuestAction,
+  QuestActionSubFormConfig,
+  QuestActionSubFormErrors,
   QuestActionSubFormFields,
   QuestActionSubFormState,
   useQuestActionMultiFormsStateProps,
 } from './types';
-import { questSubFormValidationSchema } from './validation';
+import {
+  questSubFormValidationSchema,
+  questSubFormValidationSchemaWithCreatorPoints,
+} from './validation';
 
 const useQuestActionMultiFormsState = ({
   minSubForms,
@@ -45,16 +52,22 @@ const useQuestActionMultiFormsState = ({
     ]);
   };
 
-  const validateFormValues = (values: QuestActionSubFormFields) => {
-    let errors = {};
+  const validateFormValues = (
+    values: QuestActionSubFormFields,
+    config?: QuestActionSubFormConfig,
+  ) => {
+    let errors: QuestActionSubFormErrors = {};
     try {
-      questSubFormValidationSchema.parse(values);
+      const schema = config?.requires_creator_points
+        ? questSubFormValidationSchemaWithCreatorPoints
+        : questSubFormValidationSchema;
+      schema.parse(values);
     } catch (e) {
       const zodError = e as ZodError;
       zodError.errors.map((error) => {
         errors = {
           ...errors,
-          [error.path[0]]: error.message,
+          [error.path[0] as keyof QuestActionSubFormErrors]: error.message,
         };
       });
     }
@@ -65,6 +78,7 @@ const useQuestActionMultiFormsState = ({
     const updatedSubForms = [...questActionSubForms];
     updatedSubForms[index].errors = validateFormValues(
       updatedSubForms[index].values,
+      updatedSubForms[index].config,
     );
     setQuestActionSubForms([...updatedSubForms]);
   };
@@ -72,7 +86,7 @@ const useQuestActionMultiFormsState = ({
   const validateSubForms = (): boolean => {
     const updatedSubForms = [...questActionSubForms];
     updatedSubForms.map((form) => {
-      form.errors = validateFormValues(form.values);
+      form.errors = validateFormValues(form.values, form.config);
     });
     setQuestActionSubForms([...updatedSubForms]);
     const hasErrors = updatedSubForms.find(
@@ -90,6 +104,27 @@ const useQuestActionMultiFormsState = ({
       ...updatedSubForms[index].values,
       ...updateBody,
     };
+
+    if (updatedSubForms[index].values.action) {
+      const requiresCreatorPoints = doesActionRequireCreatorReward(
+        updatedSubForms[index].values.action as QuestAction,
+      );
+
+      // update config based on chosen action
+      updatedSubForms[index].config = {
+        requires_creator_points: requiresCreatorPoints,
+      };
+
+      // reset errors/values if action doesn't require creator points
+      if (!requiresCreatorPoints) {
+        updatedSubForms[index].values.creatorRewardAmount = undefined;
+        updatedSubForms[index].errors = {
+          ...updatedSubForms[index].errors,
+          creatorRewardAmount: undefined,
+        };
+      }
+    }
+
     setQuestActionSubForms([...updatedSubForms]);
 
     if (validateAfterUpdate) validateSubFormByIndex(index);
