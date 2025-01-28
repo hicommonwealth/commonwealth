@@ -272,7 +272,7 @@ describe('Quest lifecycle', () => {
         actor: superadmin,
         payload: { community_id, cursor: 1, limit: 10 },
       });
-      expect(retrieved?.results?.length).toBe(9);
+      expect(retrieved?.results?.length).toBe(8);
       quests
         .at(-1)
         ?.action_metas?.forEach((meta, index) =>
