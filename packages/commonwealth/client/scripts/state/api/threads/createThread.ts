@@ -72,8 +72,8 @@ const useCreateThreadMutation = ({
   return trpc.thread.createThread.useMutation({
     onSuccess: async (newThread) => {
       // reset xp cache
-      utils.quest.getQuests.invalidate();
-      utils.user.getXps.invalidate();
+      utils.quest.getQuests.invalidate().catch(console.error);
+      utils.user.getXps.invalidate().catch(console.error);
 
       // @ts-expect-error StrictNullChecks
       addThreadInAllCaches(communityId, newThread);

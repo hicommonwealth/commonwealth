@@ -62,8 +62,8 @@ const useCreateThreadReactionMutation = ({
   return trpc.thread.createThreadReaction.useMutation({
     onSuccess: (newReaction) => {
       // reset xp cache
-      utils.quest.getQuests.invalidate();
-      utils.user.getXps.invalidate();
+      utils.quest.getQuests.invalidate().catch(console.error);
+      utils.user.getXps.invalidate().catch(console.error);
 
       const reaction: any = {
         id: newReaction.id,
