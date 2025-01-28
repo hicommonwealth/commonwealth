@@ -11,7 +11,7 @@ import { models } from '../database';
 import { authRoles } from '../middleware';
 import { mustExist } from '../middleware/guards';
 
-export function CreateLaunchpadToken(): Command<typeof schemas.CreateToken> {
+export function CreateToken(): Command<typeof schemas.CreateToken> {
   return {
     ...schemas.CreateToken,
     auth: [authRoles('admin')],
@@ -30,7 +30,6 @@ export function CreateLaunchpadToken(): Command<typeof schemas.CreateToken> {
         rpc: chainNode.private_url! || chainNode.url!,
         transactionHash: transaction_hash,
       });
-
       if (!tokenData) {
         throw new InvalidState('Transaction not found');
       }

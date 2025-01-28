@@ -91,6 +91,7 @@ const useUserMenuItems = ({
 
   const rewardsEnabled = useFlag('rewardsPage');
   const referralsEnabled = useFlag('referrals');
+  const xpEnabled = useFlag('xp');
 
   const userData = useUserStore();
   const hasMagic = userData.hasMagicWallet;
@@ -309,6 +310,15 @@ const useUserMenuItems = ({
             null,
           ),
       },
+      ...(xpEnabled
+        ? [
+            {
+              type: 'default',
+              label: 'Leaderboard',
+              onClick: () => navigate(`/leaderboard`, {}, null),
+            },
+          ]
+        : []),
       {
         type: 'default',
         label: 'Notification settings',

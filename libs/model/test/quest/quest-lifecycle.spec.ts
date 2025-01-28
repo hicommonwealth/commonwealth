@@ -262,9 +262,9 @@ describe('Quest lifecycle', () => {
       });
       const retrieved = await query(GetQuests(), {
         actor: superadmin,
-        payload: {},
+        payload: { community_id, cursor: 1, limit: 10 },
       });
-      expect(retrieved?.length).toBe(9);
+      expect(retrieved?.results?.length).toBe(9);
       quests
         .at(-1)
         ?.action_metas?.forEach((meta, index) =>
