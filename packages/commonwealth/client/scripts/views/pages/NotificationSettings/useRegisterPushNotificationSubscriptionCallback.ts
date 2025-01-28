@@ -7,7 +7,6 @@ import { computeChannelTypeFromBrowserType } from 'views/pages/NotificationSetti
 // eslint-disable-next-line max-len
 import useUserStore from 'state/ui/user';
 
-// FIXME use a dynamic async import for this?? ?
 export function useRegisterPushNotificationSubscriptionCallback() {
   const registerClientRegistrationToken =
     useRegisterClientRegistrationTokenMutation();
