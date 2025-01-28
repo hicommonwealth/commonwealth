@@ -46,6 +46,7 @@ const QuestCard = ({
     : description;
 
   const endHoursRemaining = moment(endDate).diff(moment(), 'hours');
+  const endDaysRemaining = moment(endDate).diff(moment(), 'days');
 
   const withOptionalTooltip = (
     children: ReactNode,
@@ -95,7 +96,10 @@ const QuestCard = ({
         </div>
         {/* hours left label */}
         <CWText className="hours-left-label" type="b1" fontWeight="semiBold">
-          Ends in {endHoursRemaining} hours
+          Ends in{' '}
+          {endHoursRemaining <= 24
+            ? `${endHoursRemaining} hours`
+            : `${endDaysRemaining} days`}
         </CWText>
         {/* ends on row */}
         <div className="xp-row">
