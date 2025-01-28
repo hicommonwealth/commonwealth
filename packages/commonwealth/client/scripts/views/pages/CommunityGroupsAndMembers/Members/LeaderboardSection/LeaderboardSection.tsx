@@ -1,11 +1,11 @@
 import { smallNumberFormatter } from '@hicommonwealth/shared';
+import { useGetMembersQuery } from 'client/scripts/state/api/communities';
 import { APIOrderDirection } from 'helpers/constants';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import app from 'state';
 import { useInviteLinkModal } from 'state/ui/modals';
 import { useDebounce } from 'usehooks-ts';
-import { trpc } from 'utils/trpcClient';
 import { Avatar } from 'views/components/Avatar';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -13,6 +13,7 @@ import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWTable } from 'views/components/component_kit/new_designs/CWTable';
 import { useCWTableState } from 'views/components/component_kit/new_designs/CWTable/useCWTableState';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
+import { MemberResultsOrderBy } from '../index.types';
 
 import './LeaderboardSection.scss';
 
@@ -55,28 +56,16 @@ const LeaderboardSection = () => {
     initialSortDirection: APIOrderDirection.Desc,
   });
 
-  const { data: members } = trpc.community.getMembers.useInfiniteQuery(
-    {
-      limit: 30,
-      community_id: communityId || '',
-      include_roles: true,
-      order_by: 'earnings',
-      order_direction: APIOrderDirection.Desc,
-      ...(debouncedSearchTerm && {
-        search: debouncedSearchTerm,
-      }),
-    },
-    {
-      initialCursor: 1,
-      getNextPageParam: (lastPage) => {
-        const nextPageNum = lastPage.page + 1;
-        if (nextPageNum <= lastPage.totalPages) {
-          return nextPageNum;
-        }
-        return undefined;
-      },
-    },
-  );
+  const { data: members } = useGetMembersQuery({
+    limit: 30,
+    community_id: communityId || '',
+    include_roles: true,
+    order_by: 'earnings' as MemberResultsOrderBy,
+    order_direction: APIOrderDirection.Desc,
+    ...(debouncedSearchTerm && {
+      search: debouncedSearchTerm,
+    }),
+  });
 
   const formattedMembers =
     members?.pages?.[0]?.results.map((member, index) => ({

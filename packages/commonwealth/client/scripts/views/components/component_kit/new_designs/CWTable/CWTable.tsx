@@ -95,6 +95,7 @@ import CWPopover, { usePopover } from '../CWPopover';
 
 import './CWTable.scss';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type CustomColumnDef<T> = ColumnDef<T, any> & {
   headerInfo?: {
     title: string;
