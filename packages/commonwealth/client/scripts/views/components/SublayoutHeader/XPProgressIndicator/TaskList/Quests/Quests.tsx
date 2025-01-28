@@ -1,8 +1,9 @@
 import clsx from 'clsx';
 import React from 'react';
 
-import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
-import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/CWButton';
+import { useCommonNavigate } from 'navigation/helpers';
+import { CWText } from 'views/components/component_kit/cw_text';
+import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import QuestTask from './QuestTask';
 import './Quests.scss';
 
@@ -18,8 +19,14 @@ type QuestsProps = {
 };
 
 const Quests = ({ className, quests }: QuestsProps) => {
+  const navigate = useCommonNavigate();
+
   const handleSeeAllQuests = () => {
-    // TODO: navigate to quests page
+    navigate('/explore');
+  };
+
+  const handleQuestCTAClick = () => {
+    // TODO: navigate to quest details in #10732
   };
 
   return (
@@ -39,7 +46,11 @@ const Quests = ({ className, quests }: QuestsProps) => {
       </div>
       <div className="list">
         {quests.map((quest) => (
-          <QuestTask key={quest.id} quest={quest} onClick={() => {}} />
+          <QuestTask
+            key={quest.id}
+            quest={quest}
+            onClick={handleQuestCTAClick}
+          />
         ))}
       </div>
     </div>

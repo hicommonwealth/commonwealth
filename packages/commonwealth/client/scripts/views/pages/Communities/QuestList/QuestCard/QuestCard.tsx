@@ -20,7 +20,7 @@ interface QuestCardProps {
 }
 
 const MAX_CHARS_FOR_LABELS = 14;
-const MAX_CHARS_FOR_DESCRIPTIONS = 28;
+const MAX_CHARS_FOR_DESCRIPTIONS = 24;
 
 const QuestCard = ({
   name,

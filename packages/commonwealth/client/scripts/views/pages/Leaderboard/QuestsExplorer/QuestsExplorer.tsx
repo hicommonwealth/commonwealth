@@ -1,6 +1,7 @@
 import { useFlag } from 'hooks/useFlag';
+import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
-import React, { useState } from 'react';
+import React from 'react';
 import { useFetchQuestsQuery } from 'state/api/quest';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
@@ -11,12 +12,11 @@ import './QuestsExplorer.scss';
 const QuestsExplorer = () => {
   const navigate = useCommonNavigate();
   const xpEnabled = useFlag('xp');
-  const [startDate] = useState(new Date());
 
   const { data: questsList, isInitialLoading } = useFetchQuestsQuery({
     cursor: 1,
     limit: 2,
-    start_after: startDate,
+    start_after: moment().startOf('day').toDate(),
     enabled: xpEnabled,
   });
   const quests = (questsList?.pages || []).flatMap((page) => page.results);

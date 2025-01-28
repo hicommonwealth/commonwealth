@@ -2,9 +2,12 @@ import clsx from 'clsx';
 import React from 'react';
 
 import useBrowserWindow from 'hooks/useBrowserWindow';
+import { useFlag } from 'hooks/useFlag';
 import moment from 'moment';
+import { useFetchQuestsQuery } from 'state/api/quest';
 import { useGetXPs } from 'state/api/user';
 import useUserStore from 'state/ui/user';
+import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
 import WeeklyProgressGoal from '../WeeklyProgressGoal';
 import Quests from './Quests';
 import './TaskList.scss';
@@ -23,13 +26,25 @@ const TaskList = ({ className }: TaskListProps) => {
     },
   };
 
+  const xpEnabled = useFlag('xp');
   const user = useUserStore();
-  const { data = [], isLoading } = useGetXPs({
+  const { data: xpProgressions = [], isLoading } = useGetXPs({
     user_id: user.id,
     from: moment().startOf('week').toDate(),
     to: moment().endOf('week').toDate(),
-    enabled: user.isLoggedIn,
+    enabled: user.isLoggedIn && xpEnabled,
   });
+  const { data: questsList, isInitialLoading } = useFetchQuestsQuery({
+    cursor: 1,
+    limit: 4,
+    start_after: moment().startOf('week').toDate(),
+    end_before: moment().endOf('week').toDate(),
+    enabled: user.isLoggedIn && xpEnabled,
+  });
+  const quests = (questsList?.pages || []).flatMap((page) => page.results);
+  const pendingQuests = quests.filter(
+    (q) => !xpProgressions.find((p) => p.quest_id === q.id),
+  );
 
   if (isLoading) return;
 
@@ -41,19 +56,25 @@ const TaskList = ({ className }: TaskListProps) => {
           progress={sampleData.weeklyGoal}
         />
       )}
-      <Quests
-        quests={data
-          .filter((task) => task.quest_id)
-          .map((task) => ({
-            daysLeftBeforeEnd: 4, // TODO: where to get time diff from
-            id: task.quest_id || 0,
-            // TODO: where to get this url from
-            imageURL:
-              'https://cdn.pixabay.com/photo/2023/01/08/14/22/sample-7705350_640.jpg',
-            title: task.event_name,
-            xpPoints: task.xp_points,
+      {isInitialLoading ? (
+        <CWCircleMultiplySpinner />
+      ) : (
+        <Quests
+          quests={pendingQuests.map((quest) => ({
+            daysLeftBeforeEnd: moment(quest.end_date).diff(moment(), 'days'),
+            id: quest.id,
+            imageURL: quest.image_url,
+            title: quest.name,
+            xpPoints:
+              (quest.action_metas || [])
+                ?.map((action) => action.reward_amount)
+                .reduce(
+                  (accumulator, currentValue) => accumulator + currentValue,
+                  0,
+                ) || 0,
           }))}
-      />
+        />
+      )}
     </div>
   );
 };
