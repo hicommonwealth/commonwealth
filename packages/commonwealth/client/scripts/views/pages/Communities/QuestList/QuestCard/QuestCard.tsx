@@ -78,46 +78,48 @@ const QuestCard = ({
       onClick={handleBodyClick}
     >
       <img src={iconURL} className="image" onClick={handleBodyClick} />
-      <div className="basic-info" onClick={handleBodyClick}>
-        {withOptionalTooltip(
-          <CWText className="text-dark" type="h4" fontWeight="regular">
-            {trimmedName}
-          </CWText>,
-          name,
-          isNameTrimmed,
-        )}
-        {withOptionalTooltip(
-          <CWText className="text-light">{trimmedDescription}</CWText>,
-          description,
-          isDescriptionTrimmed,
-        )}
-      </div>
-      {/* hours left label */}
-      <CWText className="hours-left-label" type="b1" fontWeight="semiBold">
-        Ends in {endHoursRemaining} hours
-      </CWText>
-      {/* ends on row */}
-      <div className="xp-row">
-        <CWTag type="proposal" label={`${xpPoints} XP`} />
+      <div className="content">
+        <div className="basic-info" onClick={handleBodyClick}>
+          {withOptionalTooltip(
+            <CWText className="text-dark" type="h4" fontWeight="regular">
+              {trimmedName}
+            </CWText>,
+            name,
+            isNameTrimmed,
+          )}
+          {withOptionalTooltip(
+            <CWText className="text-light">{trimmedDescription}</CWText>,
+            description,
+            isDescriptionTrimmed,
+          )}
+        </div>
+        {/* hours left label */}
+        <CWText className="hours-left-label" type="b1" fontWeight="semiBold">
+          Ends in {endHoursRemaining} hours
+        </CWText>
+        {/* ends on row */}
+        <div className="xp-row">
+          <CWTag type="proposal" label={`${xpPoints} XP`} />
+          <CWButton
+            iconLeft="upvote"
+            label="Leaderboard"
+            onClick={onLeaderboardClick}
+            containerClassName="leaderboard-btn"
+            buttonWidth="narrow"
+            buttonType="secondary"
+            buttonHeight="sm"
+          />
+        </div>
+        {/* action cta */}
         <CWButton
-          iconLeft="upvote"
-          label="Leaderboard"
-          onClick={onLeaderboardClick}
-          containerClassName="leaderboard-btn"
-          buttonWidth="narrow"
+          label="See Details"
+          containerClassName="action-btn"
+          buttonWidth="full"
           buttonType="secondary"
-          buttonHeight="sm"
+          buttonAlt="green"
+          onClick={() => onCTAClick?.()}
         />
       </div>
-      {/* action cta */}
-      <CWButton
-        label="See Details"
-        containerClassName="action-btn"
-        buttonWidth="full"
-        buttonType="secondary"
-        buttonAlt="green"
-        onClick={() => onCTAClick?.()}
-      />
     </div>
   );
 };
