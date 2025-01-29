@@ -1,6 +1,5 @@
 import clsx from 'clsx';
 import useBrowserWindow from 'hooks/useBrowserWindow';
-import moment from 'moment';
 import React from 'react';
 import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
 import WeeklyProgressGoal from '../WeeklyProgressGoal';
@@ -35,21 +34,43 @@ const TaskList = ({ className }: TaskListProps) => {
       {isLoadingQuestsList ? (
         <CWCircleMultiplySpinner />
       ) : (
-        <Quests
-          quests={pendingWeeklyQuests.map((quest) => ({
-            daysLeftBeforeEnd: moment(quest.end_date).diff(moment(), 'days'),
-            id: quest.id,
-            imageURL: quest.image_url,
-            title: quest.name,
-            xpPoints:
-              (quest.action_metas || [])
-                ?.map((action) => action.reward_amount)
-                .reduce(
-                  (accumulator, currentValue) => accumulator + currentValue,
-                  0,
-                ) || 0,
-          }))}
-        />
+        <>
+          <Quests
+            headerLabel="Weekly Quests"
+            quests={pendingWeeklyQuests.activeWeeklyQuests.map((quest) => ({
+              endDate: new Date(quest.end_date),
+              startDate: new Date(quest.start_date),
+              id: quest.id,
+              imageURL: quest.image_url,
+              title: quest.name,
+              xpPoints:
+                (quest.action_metas || [])
+                  ?.map((action) => action.reward_amount)
+                  .reduce(
+                    (accumulator, currentValue) => accumulator + currentValue,
+                    0,
+                  ) || 0,
+            }))}
+          />
+          <Quests
+            headerLabel="Later this week"
+            hideSeeAllBtn
+            quests={pendingWeeklyQuests.upcomingWeeklyQuests.map((quest) => ({
+              endDate: new Date(quest.end_date),
+              startDate: new Date(quest.start_date),
+              id: quest.id,
+              imageURL: quest.image_url,
+              title: quest.name,
+              xpPoints:
+                (quest.action_metas || [])
+                  ?.map((action) => action.reward_amount)
+                  .reduce(
+                    (accumulator, currentValue) => accumulator + currentValue,
+                    0,
+                  ) || 0,
+            }))}
+          />
+        </>
       )}
     </div>
   );

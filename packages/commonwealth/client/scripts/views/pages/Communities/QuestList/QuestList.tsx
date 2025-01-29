@@ -75,6 +75,7 @@ const QuestList = () => {
                 description={quest.description}
                 iconURL={quest.image_url}
                 xpPoints={totalXP}
+                startDate={new Date(quest.start_date)}
                 endDate={new Date(quest.end_date)}
                 onCTAClick={handleCTAClick}
                 onLeaderboardClick={handleLeaderboardClick}

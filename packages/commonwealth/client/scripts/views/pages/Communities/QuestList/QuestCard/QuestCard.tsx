@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import moment from 'moment';
+import { calculateQuestTimelineLabel } from 'helpers/quest';
 import React, { ReactNode } from 'react';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
@@ -12,6 +12,7 @@ interface QuestCardProps {
   description: string;
   iconURL: string;
   xpPoints: number;
+  startDate: Date;
   endDate: Date;
   className?: string;
   onCTAClick?: () => void;
@@ -27,6 +28,7 @@ const QuestCard = ({
   description,
   iconURL,
   xpPoints,
+  startDate,
   endDate,
   className,
   onCardBodyClick,
@@ -44,9 +46,6 @@ const QuestCard = ({
   const trimmedDescription = isDescriptionTrimmed
     ? description.slice(0, MAX_CHARS_FOR_DESCRIPTIONS) + '...'
     : description;
-
-  const endHoursRemaining = moment(endDate).diff(moment(), 'hours');
-  const endDaysRemaining = moment(endDate).diff(moment(), 'days');
 
   const withOptionalTooltip = (
     children: ReactNode,
@@ -94,12 +93,9 @@ const QuestCard = ({
             isDescriptionTrimmed,
           )}
         </div>
-        {/* hours left label */}
-        <CWText className="hours-left-label" type="b1" fontWeight="semiBold">
-          Ends in{' '}
-          {endHoursRemaining <= 24
-            ? `${endHoursRemaining} hours`
-            : `${endDaysRemaining} days`}
+        {/* time label */}
+        <CWText className="time-label" type="b1" fontWeight="semiBold">
+          {calculateQuestTimelineLabel({ startDate, endDate })}
         </CWText>
         {/* ends on row */}
         <div className="xp-row">

@@ -9,16 +9,24 @@ import './Quests.scss';
 
 type QuestsProps = {
   className?: string;
+  hideSeeAllBtn?: boolean;
+  headerLabel: string;
   quests: {
     id: number;
     imageURL: string;
     xpPoints: number;
     title: string;
-    daysLeftBeforeEnd: number;
+    endDate: Date;
+    startDate: Date;
   }[];
 };
 
-const Quests = ({ className, quests }: QuestsProps) => {
+const Quests = ({
+  className,
+  hideSeeAllBtn = false,
+  headerLabel,
+  quests,
+}: QuestsProps) => {
   const navigate = useCommonNavigate();
 
   const handleSeeAllQuests = () => {
@@ -33,20 +41,22 @@ const Quests = ({ className, quests }: QuestsProps) => {
     <div className={clsx('Quests', className)}>
       <div className="header">
         <CWText type="b1" fontWeight="semiBold">
-          Weekly Quests
+          {headerLabel}
         </CWText>
-        <CWButton
-          label="See all"
-          iconRight="arrowRight"
-          buttonHeight="sm"
-          buttonWidth="narrow"
-          buttonType="tertiary"
-          onClick={handleSeeAllQuests}
-        />
+        {!hideSeeAllBtn && (
+          <CWButton
+            label="See all"
+            iconRight="arrowRight"
+            buttonHeight="sm"
+            buttonWidth="narrow"
+            buttonType="tertiary"
+            onClick={handleSeeAllQuests}
+          />
+        )}
       </div>
       {quests.length === 0 ? (
         <div className="empty-task-list">
-          <CWText type="b1">No more quests available</CWText>{' '}
+          <CWText type="b1">No quests available</CWText>{' '}
         </div>
       ) : (
         <div className="list">
