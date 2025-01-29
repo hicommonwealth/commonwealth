@@ -11,17 +11,13 @@ import TaskList from './TaskList';
 import WeeklyProgressGoal from './WeeklyProgressGoal';
 import './XPProgressIndicator.scss';
 import { XPProgressIndicatorMode, XPProgressIndicatorProps } from './types';
+import useXPProgress from './useXPProgress';
 
 const XPProgressIndicator = ({
   mode = XPProgressIndicatorMode.Detailed,
   className,
 }: XPProgressIndicatorProps) => {
-  const sampleData = {
-    weeklyGoal: {
-      current: 170,
-      target: 400,
-    },
-  };
+  const { weeklyGoal } = useXPProgress();
 
   const user = useUserStore();
 
@@ -43,8 +39,8 @@ const XPProgressIndicator = ({
           ) : (
             <WeeklyProgressGoal
               progress={{
-                current: sampleData.weeklyGoal.current,
-                target: sampleData.weeklyGoal.target,
+                current: weeklyGoal.current,
+                target: weeklyGoal.target,
               }}
             />
           )}
