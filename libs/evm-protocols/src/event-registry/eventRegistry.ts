@@ -5,7 +5,7 @@ import {
   namespaceFactoryAbi,
   singleContestAbi,
   tokenCommunityManagerAbi,
-  tokenStakingAbi,
+  veBridgeAbi,
 } from '../abis';
 import { recurringContestAbi } from '../abis/recurringContestAbi';
 import { referralFeeManager } from '../abis/referralFeeManager';
@@ -125,7 +125,7 @@ const referralFeeManagerSource: ContractSource = {
 };
 
 const tokenStakingSource: ContractSource = {
-  abi: tokenStakingAbi,
+  abi: veBridgeAbi,
   eventSignatures: [
     EvmEventSignatures.TokenStaking.TokenLocked,
     EvmEventSignatures.TokenStaking.TokenLockDurationIncreased,
