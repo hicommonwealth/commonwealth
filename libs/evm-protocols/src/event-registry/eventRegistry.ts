@@ -37,8 +37,8 @@ type ContractAddresses = {
           : never
         : never)
     | (key extends keyof typeof factoryContracts
-        ? 'tokenStaking' extends keyof (typeof factoryContracts)[key]
-          ? (typeof factoryContracts)[key]['tokenStaking']
+        ? 'veBridge' extends keyof (typeof factoryContracts)[key]
+          ? (typeof factoryContracts)[key]['veBridge']
           : never
         : never);
 };
@@ -157,8 +157,7 @@ export const EventRegistry = {
       tokenCommunityManagerSource,
     [factoryContracts[ValidChains.SepoliaBase].referralFeeManager]:
       referralFeeManagerSource,
-    [factoryContracts[ValidChains.SepoliaBase].tokenStaking]:
-      tokenStakingSource,
+    [factoryContracts[ValidChains.SepoliaBase].veBridge]: tokenStakingSource,
   },
   [ValidChains.Sepolia]: {
     [factoryContracts[ValidChains.Sepolia].factory]: namespaceFactorySource,
