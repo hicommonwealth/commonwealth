@@ -1,0 +1,93 @@
+.OnBoarding {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  padding-top: 0.6rem;
+  justify-content: center;
+  overflow: hidden;
+
+  .swiper-container {
+    width: 100%;
+    height: 94vh;
+    text-align: center;
+    overflow: hidden;
+    justify-content: flex-start;
+    position: relative;
+    .swiper-pagination {
+      position: absolute;
+      bottom: 5rem;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      z-index: 10;
+    }
+
+    .swiper-pagination-bullet {
+      width: 10px;
+      height: 10px;
+      background: #d9d9d9;
+      border-radius: 5px;
+      opacity: 1;
+      margin: 0 5px;
+
+      &.swiper-pagination-bullet-active {
+        background: #514e52;
+      }
+    }
+
+    .swiper-slide {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+
+      .slide-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+
+        .animation-container {
+          height: 60%;
+          max-height: 65%;
+
+          overflow: hidden;
+        }
+
+        .slide-title {
+          display: flex;
+          width: 100vw;
+          overflow: hidden;
+          padding: 10px;
+          max-height: 20%;
+          overflow: auto;
+          .Text {
+            display: inline;
+            text-align: start;
+            font-size: 2rem;
+            line-height: 2rem;
+            font-weight: 400;
+          }
+          .onboarding-title {
+            span {
+              font-size: 2rem;
+              font-weight: 700;
+              margin-right: 5px;
+            }
+          }
+        }
+      }
+    }
+  }
+  .next-button {
+    width: 90vw !important;
+    position: absolute;
+    bottom: 1rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 99;
+    cursor: pointer;
+    border: 0px;
+  }
+}
