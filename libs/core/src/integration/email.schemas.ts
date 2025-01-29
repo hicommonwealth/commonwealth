@@ -102,9 +102,16 @@ export const EnrichedThread = Thread.extend({
   icon_url: z
     .string()
     .describe('The icon url of the community that the thread belongs to'),
+  author: z.string().nullish().optional(),
 });
 
 export const GetDigestEmailData = {
-  input: z.object({}),
-  output: z.record(z.string(), z.array(EnrichedThread)),
+  input: z.object({
+    user_id: z.string(),
+  }),
+  output: z.object({
+    threads: z.array(EnrichedThread),
+    numberOfThreads: z.number(),
+    unsubscribe_link: z.string(),
+  }),
 };

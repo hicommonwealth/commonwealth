@@ -23,7 +23,7 @@ import {
 import z from 'zod';
 import { models, tester } from '../../src';
 import { notifyCommentCreated } from '../../src/policies/handlers/notifyCommentCreated';
-import { getCommentUrl } from '../../src/policies/utils/utils';
+import { getCommentUrl, getProfileUrl } from '../../src/policies/utils/utils';
 import {
   ProviderError,
   SpyNotificationsProvider,
@@ -198,8 +198,7 @@ describe('CommentCreated Event Handler', () => {
     expect(provider.triggerWorkflow as Mock).toHaveBeenCalledOnce();
     expect((provider.triggerWorkflow as Mock).mock.calls[0][0]).to.deep.equal({
       key: WorkflowKeys.CommentCreation,
-      // @ts-expect-error StrictNullChecks
-      users: [{ id: String(subscriber.id) }],
+      users: [{ id: String(subscriber!.id) }],
       data: {
         author: author?.profile.name,
         comment_parent_name: 'thread',
@@ -212,8 +211,13 @@ describe('CommentCreated Event Handler', () => {
           community_id: community!.id,
         },
       },
-      // @ts-expect-error StrictNullChecks
-      actor: { id: String(author.id) },
+      actor: {
+        id: String(author!.id),
+        email: author!.profile.email,
+        profile_name: author!.profile.name,
+        profile_url: getProfileUrl(author!.id!, customDomain),
+        profile_avatar_url: author!.profile.avatar_url,
+      },
     });
   });
 
@@ -259,8 +263,13 @@ describe('CommentCreated Event Handler', () => {
           community_id: community!.id,
         },
       },
-      // @ts-expect-error StrictNullChecks
-      actor: { id: String(author.id) },
+      actor: {
+        id: String(author!.id),
+        email: author!.profile.email,
+        profile_name: author!.profile.name,
+        profile_url: getProfileUrl(author!.id!, customDomain),
+        profile_avatar_url: author!.profile.avatar_url,
+      },
     });
   });
 
@@ -335,7 +344,13 @@ describe('CommentCreated Event Handler', () => {
           community_id: community!.id,
         },
       },
-      actor: { id: String(author!.id) },
+      actor: {
+        id: String(author!.id),
+        email: author!.profile.email,
+        profile_name: author!.profile.name,
+        profile_url: getProfileUrl(author!.id!, customDomain),
+        profile_avatar_url: author!.profile.avatar_url,
+      },
     });
   });
 });

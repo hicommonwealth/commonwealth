@@ -1,26 +1,25 @@
+import { smallNumberFormatter } from '@hicommonwealth/shared';
 import React from 'react';
 import { Link } from 'react-router-dom';
 
 import { APIOrderDirection } from 'helpers/constants';
-import { useGetUserReferralsQuery } from 'state/api/user';
-import useUserStore from 'state/ui/user';
 import { Avatar } from 'views/components/Avatar';
 import { CWText } from 'views/components/component_kit/cw_text';
 import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
 import { CWTable } from 'views/components/component_kit/new_designs/CWTable';
 import { useCWTableState } from 'views/components/component_kit/new_designs/CWTable/useCWTableState';
+import { Referral } from '../../types';
 
 import { columns } from './columns';
+
 import './ReferralTable.scss';
 
-export const ReferralTable = () => {
-  const user = useUserStore();
+interface ReferralTableProps {
+  referrals?: Referral[];
+  isLoading?: boolean;
+}
 
-  const { data: referrals, isLoading } = useGetUserReferralsQuery({
-    userId: user?.id,
-    apiCallEnabled: !!user?.id,
-  });
-
+export const ReferralTable = ({ referrals, isLoading }: ReferralTableProps) => {
   const tableState = useCWTableState({
     columns,
     initialSortColumn: 'earnings',
@@ -75,7 +74,10 @@ export const ReferralTable = () => {
                 ),
                 customElement: (
                   <div className="table-cell text-right">
-                    USD {parseFloat(String(item.referrer_received_eth_amount))}
+                    ETH{' '}
+                    {smallNumberFormatter.format(
+                      item.referrer_received_eth_amount,
+                    )}
                   </div>
                 ),
               },
