@@ -50,6 +50,7 @@ const ReferralCard = ({
               label={tab}
               isSelected={currentTab === tab}
               onClick={() => setCurrentTab(tab)}
+              isDisabled={tab === ReferralTabs.XP}
             />
           ))}
         </CWTabsRow>
