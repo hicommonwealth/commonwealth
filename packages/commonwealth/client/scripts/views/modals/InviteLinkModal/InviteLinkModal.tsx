@@ -82,6 +82,7 @@ const InviteLinkModal = ({ onModalClose }: InviteLinkModalProps) => {
             />
 
             <CWTextInput
+              inputClassName="invite-link-input"
               fullWidth
               type="text"
               value={inviteLink}

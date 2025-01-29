@@ -25,7 +25,7 @@ import { MessageRow } from 'views/components/component_kit/new_designs/CWTextInp
 import { openConfirmation } from 'views/modals/confirmation_modal';
 import CommunityManagementLayout from 'views/pages/CommunityManagement/common/CommunityManagementLayout';
 
-import { BLOG_SUBDOMAIN, ZERO_ADDRESS } from '@hicommonwealth/shared';
+import { BLOG_SUBDOMAIN } from '@hicommonwealth/shared';
 import { CONTEST_FAQ_URL } from '../../../utils';
 import {
   ContestFeeType,
@@ -108,7 +108,7 @@ const DetailsFormStep = ({
   const totalPayoutPercentageError = totalPayoutPercentage !== 100;
 
   const weightedTopics = (topicsData || [])
-    .filter((t) => t?.weighted_voting && t.token_address !== ZERO_ADDRESS)
+    .filter((t) => t?.weighted_voting)
     .map((t) => ({
       value: t.id,
       label: t.name,
