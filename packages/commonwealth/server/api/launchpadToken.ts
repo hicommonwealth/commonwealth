@@ -6,4 +6,5 @@ export const trpcRouter = trpc.router({
   createToken: trpc.command(Token.CreateToken, trpc.Tag.Token),
   getTokens: trpc.query(Token.GetLaunchpadTokens, trpc.Tag.Token),
   getToken: trpc.query(Token.GetLaunchpadToken, trpc.Tag.Token),
+  getLaunchpadTrades: trpc.query(Token.GetLaunchpadTrades, trpc.Tag.Token),
 });

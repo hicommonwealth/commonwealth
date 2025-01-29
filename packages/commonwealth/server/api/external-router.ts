@@ -57,7 +57,8 @@ const {
 const { getNewContent } = user.trpcRouter;
 const { createContestMetadata, updateContestMetadata, cancelContestMetadata } =
   contest.trpcRouter;
-const { createToken, createTrade, getTokens } = launchpad.trpcRouter;
+const { createToken, createTrade, getTokens, getLaunchpadTrades } =
+  launchpad.trpcRouter;
 
 const api = {
   getGlobalActivity: trpc.query(Feed.GetGlobalActivity, trpc.Tag.User, {
@@ -118,6 +119,7 @@ const api = {
   createToken,
   createTrade,
   getTokens,
+  getLaunchpadTrades,
 };
 
 const PATH = '/api/v1';
