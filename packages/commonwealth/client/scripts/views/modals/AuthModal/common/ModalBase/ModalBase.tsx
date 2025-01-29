@@ -1,5 +1,6 @@
 import { ChainBase, WalletId, WalletSsoSource } from '@hicommonwealth/shared';
 import commonLogo from 'assets/img/branding/common-logo.svg';
+import useBrowserWindow from 'client/scripts/hooks/useBrowserWindow';
 import clsx from 'clsx';
 import { isMobileApp } from 'hooks/useReactNativeWebView';
 import React, { Fragment, useEffect, useState } from 'react';
@@ -99,17 +100,22 @@ const ModalBase = ({
   showAuthOptionTypesFor,
   bodyClassName,
   onSignInClick,
+  openEVMWalletsSubModal,
+  isUserFromWebView = false,
 }: ModalBaseProps) => {
   const copy = MODAL_COPY[layoutType];
-
+  const { isWindowSmallInclusive } = useBrowserWindow({});
   const [activeTabIndex, setActiveTabIndex] = useState<number>(
     showAuthOptionTypesFor?.includes('sso') &&
       showAuthOptionTypesFor.length === 1
       ? 1
       : 0,
   );
-  const [isEVMWalletsModalVisible, setIsEVMWalletsModalVisible] =
-    useState(false);
+  const [isEVMWalletsModalVisible, setIsEVMWalletsModalVisible] = useState(
+    () => {
+      return openEVMWalletsSubModal ? openEVMWalletsSubModal : false;
+    },
+  );
   const [isAuthenticatingWithEmail, setIsAuthenticatingWithEmail] =
     useState(false);
   const [isAuthenticatingWithSMS, setIsAuthenticatingWithSMS] = useState(false);
@@ -123,8 +129,8 @@ const ModalBase = ({
     await onClose();
   };
 
-  const handleSuccess = async (_, isNewlyCreated) => {
-    await onSuccess?.(isNewlyCreated);
+  const handleSuccess = async (_, isNewlyCreated, isFromWebView) => {
+    await onSuccess?.(isNewlyCreated, isFromWebView);
     await handleClose();
   };
 
@@ -145,6 +151,7 @@ const ModalBase = ({
     onModalClose: handleClose,
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     onSuccess: handleSuccess,
+    isFromWebView: isUserFromWebView,
   });
 
   const filterWalletNames = (byChain: ChainBase) =>
@@ -433,6 +440,8 @@ const ModalBase = ({
         canResetWalletConnect={isWalletConnectEnabled}
         // eslint-disable-next-line @typescript-eslint/no-misused-promises
         onResetWalletConnect={onResetWalletConnect}
+        isUserFromWebView={isUserFromWebView}
+        handleNextOrSkip={handleSuccess}
       />
       {/* Signature verification modal is only displayed on mobile */}
       <MobileWalletConfirmationSubModal

@@ -21,7 +21,7 @@
     .random-generate-btn {
       padding: 0;
       margin: 0;
-      margin-left: auto;
+      margin-right: auto;
 
       button {
         padding-top: 0;
@@ -34,6 +34,36 @@
       }
     }
   }
+  .footerContainer {
+    bottom: 40px;
+    align-self: center;
+    display: flex;
+    flex-direction: column;
+    width: 90vw;
+    max-width: 400px;
+    @include extraSmall {
+      position: absolute;
+    }
+    .primary {
+      padding-left: 2rem;
+      padding-right: 2rem;
+      background-color: #0079cc !important;
+    }
+    .footer {
+      display: block;
+
+      a,
+      a:visited,
+      a:active,
+      a:hover {
+        color: $primary-600;
+      }
+    }
+    .button-container {
+      display: flex;
+      gap: 8px;
+    }
+  }
 
   .notification-section {
     width: 100%;
@@ -42,16 +72,5 @@
     gap: 8px;
     margin-top: 16px;
     margin-bottom: 16px;
-  }
-
-  .footer {
-    display: block;
-
-    a,
-    a:visited,
-    a:active,
-    a:hover {
-      color: $primary-600;
-    }
   }
 }

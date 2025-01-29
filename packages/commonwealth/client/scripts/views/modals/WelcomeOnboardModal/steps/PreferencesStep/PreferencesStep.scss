@@ -23,11 +23,11 @@
   }
 
   .action-btns {
-    margin-top: 12px;
-    display: grid;
-    grid-template-columns: 1fr 3fr;
-    align-items: center;
-    gap: 24px;
+    width: 80%;
+    justify-content: space-between;
+    display: flex;
+    position: absolute;
+    bottom: 80px;
 
     @include extraSmall {
       grid-template-columns: 1fr 1fr;

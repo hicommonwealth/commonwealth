@@ -5,8 +5,14 @@
     border-radius: 24px;
     box-shadow: none;
     background: transparent;
+    &.forMobile {
+      background: white !important;
+      height: 100vh;
+    }
   }
-
+  &.forMobile {
+    background-color: $white !important;
+  }
   .container {
     border-radius: 24px;
     display: flex;
@@ -15,7 +21,9 @@
     min-width: 370px;
     padding: 24px 12px;
     gap: 24px;
-
+    &.forMobile {
+      background-color: $white !important;
+    }
     @include extraSmall {
       min-width: auto;
     }
@@ -41,6 +49,9 @@
       flex-direction: column;
       gap: 8px;
       width: 100%;
+      &.forMobile {
+        height: 50vh;
+      }
 
       .wallet-connect-reset-btn {
         margin-left: auto;
@@ -51,6 +62,63 @@
         font-size: 14px;
         margin-bottom: 16px;
         cursor: pointer;
+      }
+    }
+    .buttons_container {
+      display: flex;
+      gap: 1rem;
+      width: 100%;
+      position: relative;
+      align-items: center;
+      justify-content: space-between;
+      .skip-button {
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: auto !important;
+        position: relative !important;
+        transform: translate(0%);
+
+        .primary {
+          padding-left: 2rem;
+          padding-right: 2rem;
+          border: 1px solid #0079cc;
+          background-color: transparent !important;
+
+          .button-text {
+            color: #0079cc !important;
+          }
+        }
+      }
+
+      .next-button {
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        transform: translate(0%);
+        width: auto !important;
+        position: relative !important;
+        .primary {
+          padding-left: 2rem;
+          padding-right: 2rem;
+          border: 1px solid #0079cc;
+          background-color: #0079cc;
+          .button-text {
+            color: white !important;
+          }
+        }
+      }
+    }
+    .footer {
+      display: block;
+
+      a,
+      a:visited,
+      a:active,
+      a:hover {
+        color: $primary-600;
       }
     }
   }

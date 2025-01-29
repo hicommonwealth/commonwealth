@@ -21,6 +21,21 @@
   }
 
   .content {
+    @include extraSmall {
+      height: 100%;
+    }
+    .logo {
+      display: flex;
+      height: auto;
+      margin: auto;
+      width: 227px;
+      margin-top: 20px;
+      @include extraSmall {
+        width: 175px;
+        display: flex;
+        gap: 20px;
+      }
+    }
     .close-btn {
       position: absolute;
       right: 0;

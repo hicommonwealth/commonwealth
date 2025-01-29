@@ -58,9 +58,11 @@ type UseAuthenticationProps = {
   onSuccess?: (
     address?: string | null | undefined,
     isNewlyCreated?: boolean,
+    isFromWebView?: boolean,
   ) => Promise<void>;
   onModalClose?: () => void;
   withSessionKeyLoginFlow?: boolean;
+  isFromWebView?: boolean;
 };
 
 const magic = new Magic(process.env.MAGIC_PUBLISHABLE_KEY!);
@@ -141,8 +143,9 @@ const useAuthentication = (props: UseAuthenticationProps) => {
   const handleSuccess = async (
     authAddress?: string | null | undefined,
     isNew?: boolean,
+    isFromWebView?: boolean,
   ) => {
-    await props?.onSuccess?.(authAddress, isNew);
+    await props?.onSuccess?.(authAddress, isNew, isFromWebView);
   };
 
   const trackLoginEvent = (loginOption: string, isSocialLogin: boolean) => {
@@ -252,6 +255,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     account: Account,
     exitOnComplete: boolean,
     newelyCreated = false,
+    isFromWebView = false,
   ) => {
     const profile = account.profile;
 
@@ -278,7 +282,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
 
     if (exitOnComplete) {
       props?.onModalClose?.();
-      await handleSuccess(account.address, newelyCreated);
+      await handleSuccess(account.address, newelyCreated, isFromWebView);
     }
   };
 
@@ -292,7 +296,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     if (props.withSessionKeyLoginFlow) {
       await setActiveAccount(account);
       notifySuccess('Account verified!');
-      await handleSuccess(account.address, newlyCreated);
+      await handleSuccess(account.address, newlyCreated, props.isFromWebView);
       return;
     }
 
@@ -309,7 +313,12 @@ const useAuthentication = (props: UseAuthenticationProps) => {
         block_info: account.validationBlockInfo,
         referrer_address: refcode,
       });
-      await onLogInWithAccount(account, true, newlyCreated);
+      await onLogInWithAccount(
+        account,
+        true,
+        newlyCreated,
+        props.isFromWebView,
+      );
       return;
     }
 
@@ -340,7 +349,12 @@ const useAuthentication = (props: UseAuthenticationProps) => {
           block_info: account.validationBlockInfo,
           referrer_address: refcode,
         });
-        await onLogInWithAccount(account, true, newlyCreated);
+        await onLogInWithAccount(
+          account,
+          true,
+          newlyCreated,
+          props.isFromWebView,
+        );
       } catch (e) {
         notifyError(`Error verifying account`);
         console.error(`Error verifying account: ${e}`);

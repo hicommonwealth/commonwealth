@@ -1,0 +1,200 @@
+@import '../../../../../styles/shared.scss';
+.NotificationModal {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  flex-direction: column;
+  gap: 60px;
+  .logo {
+    height: auto;
+    margin: auto;
+    width: 227px;
+    margin-top: 20px;
+
+    @include extraSmall {
+      width: 175px;
+    }
+  }
+  .header {
+    margin-top: 20px;
+    color: $neutral-500 !important;
+  }
+
+  .notificationButton {
+    display: flex;
+    align-items: center;
+    border-radius: 6px;
+    gap: 12px;
+    padding: 12px;
+    width: 100%;
+    outline: none !important;
+    cursor: pointer;
+    border: 2px solid $neutral-200; // Default gray border
+    transition:
+      border 0.3s ease,
+      box-shadow 0.3s ease; // Smooth animation for border and shadow
+
+    // Hover state
+    &:hover {
+      border: 2px solid $neutral-400; // Lighter gray on hover
+      box-shadow: 0 0 8px rgba(0, 0, 0, 0.2); // Optional shadow
+    }
+
+    // Active state
+    &:active {
+      border: 2px solid $neutral-600; // Darker border on click
+    }
+
+    // Animation when notifications are enabled
+    &.enabled {
+      animation: borderHighlight 0.5s ease-in-out;
+      border: 2px solid green; // Final green border
+      box-shadow: 0 0 10px rgba(0, 128, 0, 0.5); // Optional glow effect
+    }
+
+    .Checkbox .check input[type='checkbox'] + .checkbox-control:after {
+      border-radius: 100%;
+    }
+    .Checkbox .check input[type='checkbox']:checked + .checkbox-control:after {
+      border-radius: 100%;
+      background-color: green;
+      border-color: green;
+    }
+    .icon {
+      width: 36px;
+      height: 36px;
+      min-width: 36px;
+      min-height: 36px;
+    }
+
+    .info {
+      display: flex;
+      align-items: center;
+      gap: 0px;
+      width: 100%;
+      .container {
+        gap: 0.2rem;
+        max-width: 90%;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+
+        .label {
+          margin: 0;
+          width: 100%;
+          font-size: 17px;
+          font-weight: 600;
+          margin-right: auto;
+          color: $neutral-700;
+        }
+
+        .description {
+          width: 100%;
+          margin: 0;
+          font-size: 14px;
+          font-weight: 400;
+          color: $neutral-400;
+          background-color: transparent;
+        }
+      }
+    }
+  }
+  .footerContainer {
+    position: relative;
+    bottom: 40px;
+    align-self: center;
+    display: flex;
+    flex-direction: column;
+    @include extraSmall {
+      position: absolute;
+    }
+    .footer {
+      display: block;
+
+      a,
+      a:visited,
+      a:active,
+      a:hover {
+        color: $primary-600;
+      }
+    }
+    .buttons_container {
+      display: flex;
+      gap: 1rem;
+      width: 100%;
+      position: relative;
+      align-items: center;
+      justify-content: space-between;
+      .skip-button {
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: auto !important;
+        position: relative !important;
+        transform: translate(0%);
+
+        .primary {
+          padding-left: 2rem;
+          padding-right: 2rem;
+          border: 1px solid #0079cc;
+          background-color: transparent !important;
+
+          .button-text {
+            color: #0079cc !important;
+          }
+        }
+      }
+
+      .next-button {
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        transform: translate(0%);
+        width: auto !important;
+        position: relative !important;
+        .primary {
+          padding-left: 2rem;
+          padding-right: 2rem;
+          border: 1px solid #0079cc;
+          background-color: #0079cc;
+          .button-text {
+            color: white !important;
+          }
+        }
+      }
+    }
+  }
+  // Keyframes for the animation
+  @keyframes borderHighlight {
+    0% {
+      border: 2px solid $neutral-200; // Start with gray
+      box-shadow: 0 0 4px rgba(0, 128, 0, 0.3);
+    }
+    50% {
+      border: 2px solid rgba(0, 255, 0, 0.5); // Midway to green
+      box-shadow: 0 0 12px rgba(0, 255, 0, 0.5);
+    }
+    100% {
+      border: 2px solid green; // Final green
+      box-shadow: 0 0 10px rgba(0, 128, 0, 0.5);
+    }
+  }
+
+  // Keyframes for the animation
+  @keyframes borderHighlight {
+    0% {
+      border: 2px solid $neutral-200; // Start with gray
+      box-shadow: 0 0 4px rgba(0, 128, 0, 0.3);
+    }
+    50% {
+      border: 2px solid rgba(0, 255, 0, 0.5); // Midway to green
+      box-shadow: 0 0 12px rgba(0, 255, 0, 0.5);
+    }
+    100% {
+      border: 2px solid green; // Final green
+      box-shadow: 0 0 10px rgba(0, 128, 0, 0.5);
+    }
+  }
+}
