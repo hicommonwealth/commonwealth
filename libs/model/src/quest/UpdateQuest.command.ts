@@ -20,6 +20,7 @@ export function UpdateQuest(): Command<typeof schemas.UpdateQuest> {
         quest_id,
         name,
         description,
+        image_url,
         start_date,
         end_date,
         action_metas,
@@ -64,6 +65,7 @@ export function UpdateQuest(): Command<typeof schemas.UpdateQuest> {
         const delta = getDelta(quest, {
           name,
           description,
+          image_url,
           start_date,
           end_date,
         });

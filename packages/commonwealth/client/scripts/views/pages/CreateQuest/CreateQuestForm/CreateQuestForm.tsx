@@ -1,9 +1,11 @@
 import { QuestParticipationLimit } from '@hicommonwealth/schemas';
 import React from 'react';
+import CWDateTimeInput from 'views/components/component_kit/CWDateTimeInput';
 import {
   CWImageInput,
   ImageBehavior,
 } from 'views/components/component_kit/CWImageInput';
+import CWRepetitionCycleRadioButton from 'views/components/component_kit/CWRepetitionCycleRadioButton';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTextArea } from 'views/components/component_kit/cw_text_area';
@@ -28,32 +30,30 @@ const CreateQuestForm = () => {
     handleSubmit,
     isProcessingQuestImage,
     setIsProcessingQuestImage,
+    minStartDate,
+    repetitionCycleRadio,
+    formMethodsRef,
   } = useCreateQuestForm();
 
   return (
     <CWForm
+      ref={formMethodsRef}
       validationSchema={questFormValidationSchema}
       onSubmit={handleSubmit}
       onErrors={validateSubForms}
       className="CreateQuestForm"
-      initialValues={{
-        // TODO: this will be updated via a date/calender selector component in #10674
-        start_date: new Date(
-          Date.now() + 2 * 24 * 60 * 60 * 1000,
-        ).toISOString(), // 2 days from now
-        end_date: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(), // 5 days from now
-      }}
     >
       <div className="quest-period-section">
         <div className="repeatition-selector">
           <CWText type="b1" fontWeight="semiBold">
-            Quests can be completed by members
+            Quests timeline
           </CWText>
-          <CWRadioButton
+          <CWRepetitionCycleRadioButton
+            customError={repetitionCycleRadio.error}
+            {...repetitionCycleRadio.props}
             className="radio-btn"
             value={QuestParticipationLimit.OncePerPeriod}
-            label="Repeatable daily"
-            groupName="quest"
+            groupName="participation_limit"
             name="participation_limit"
             hookToForm
           />
@@ -61,24 +61,25 @@ const CreateQuestForm = () => {
             className="radio-btn"
             value={QuestParticipationLimit.OncePerQuest}
             label="One time only"
-            groupName="quest"
+            groupName="participation_limit"
             name="participation_limit"
             hookToForm
             checked
           />
         </div>
-        {/* TODO: proper component for picking dates in #10674 */}
-        <CWTextInput
+        <CWDateTimeInput
           label="Start Date"
-          placeholder="TODO"
           hookToForm
           name="start_date"
+          minDate={minStartDate}
+          selected={minStartDate}
         />
-        <CWTextInput
+        <CWDateTimeInput
           label="End Date"
-          placeholder="TODO"
           hookToForm
           name="end_date"
+          minDate={minStartDate}
+          selected={null}
         />
       </div>
 
@@ -118,22 +119,6 @@ const CreateQuestForm = () => {
 
       <CWDivider />
 
-      <div className="reward-section">
-        <CWText type="b1" fontWeight="semiBold">
-          Reward
-        </CWText>
-
-        <CWTextInput
-          label="Points Earned"
-          placeholder="Amount per action"
-          fullWidth
-          name="reward_amount"
-          hookToForm
-        />
-      </div>
-
-      <CWDivider />
-
       <div className="actions-section">
         <div className="header">
           <CWText type="b1" fontWeight="semiBold">
@@ -149,6 +134,7 @@ const CreateQuestForm = () => {
             key={subForm.id}
             errors={subForm.errors}
             defaultValues={subForm.values}
+            config={subForm.config}
             onChange={(updateBody) => updateSubFormByIndex(updateBody, index)}
             isRemoveable={questActionSubForms.length !== MIN_ACTIONS_LIMIT}
             onRemove={() => removeSubFormByIndex(index)}

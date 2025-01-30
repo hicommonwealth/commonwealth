@@ -16,7 +16,7 @@ export const ChainEventSigs = {
 export const EvmEventSignatures = {
   NamespaceFactory: {
     NamespaceDeployed:
-      '0x8870ba2202802ce285ce6bead5ac915b6dc2d35c8a9d6f96fa56de9de12829d5',
+      '0x19f6e5e5cacacc3d28a64882bc2c54bd3006e1d0cda33538d197f298c7dff1f0',
     NamespaceDeployedWithReferral:
       '0x2f5d04158abd2b403eb3b099bf1257e7949197015ef7d19db38b2c45f9e0d164',
     ContestManagerDeployed:

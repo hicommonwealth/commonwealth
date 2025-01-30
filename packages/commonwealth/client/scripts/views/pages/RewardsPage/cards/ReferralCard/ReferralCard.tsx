@@ -19,16 +19,21 @@ enum ReferralTabs {
 
 interface ReferralCardProps {
   onSeeAllClick: () => void;
+  trendValue: number;
+  totalEarnings: number;
+  isLoading?: boolean;
 }
 
-const ReferralCard = ({ onSeeAllClick }: ReferralCardProps) => {
+const ReferralCard = ({
+  onSeeAllClick,
+  trendValue,
+  totalEarnings,
+  isLoading = false,
+}: ReferralCardProps) => {
   const [currentTab, setCurrentTab] = useState<ReferralTabs>(
     ReferralTabs.Total,
   );
-
   const { setIsInviteLinkModalOpen } = useInviteLinkModal();
-
-  const trendValue = 10;
 
   return (
     <RewardsCard
@@ -52,9 +57,11 @@ const ReferralCard = ({ onSeeAllClick }: ReferralCardProps) => {
           {currentTab === ReferralTabs.Total && (
             <div className="total-body">
               <CWText fontWeight="bold" type="h4">
-                ${(1234.56).toLocaleString()}
+                ETH {totalEarnings.toLocaleString()}
               </CWText>
-              {(trendValue || trendValue === 0) && <Trend value={trendValue} />}
+              {!isLoading && (trendValue || trendValue === 0) && (
+                <Trend value={trendValue} />
+              )}
             </div>
           )}
           {currentTab === ReferralTabs.XP && (
@@ -62,7 +69,9 @@ const ReferralCard = ({ onSeeAllClick }: ReferralCardProps) => {
               <CWText fontWeight="bold" type="h4">
                 {123456} XP
               </CWText>
-              {(trendValue || trendValue === 0) && <Trend value={trendValue} />}
+              {!isLoading && (trendValue || trendValue === 0) && (
+                <Trend value={trendValue} />
+              )}
             </div>
           )}
         </div>

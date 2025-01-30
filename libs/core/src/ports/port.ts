@@ -317,7 +317,12 @@ export const notificationsProvider = port(function notificationsProviderFactory(
     notificationsProviderAdapter || {
       name: 'in-memory-notifications-provider',
       dispose: () => Promise.resolve(),
-      triggerWorkflow: () => Promise.resolve([]),
+      triggerWorkflow: (options) => {
+        log.info('triggerWorkflow', options);
+        return Promise.resolve([
+          { status: 'fulfilled', value: { workflow_run_id: '123' } },
+        ]);
+      },
       getMessages: () => Promise.resolve([]),
       getSchedules: () =>
         Promise.resolve([] as NotificationsProviderSchedulesReturn),
