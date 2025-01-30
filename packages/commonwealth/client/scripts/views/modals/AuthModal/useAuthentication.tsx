@@ -390,7 +390,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
           [account!.profile!.chain],
           [account!.profile!.address],
         );
-      const currentUserAddress = userAddresses[0];
+      const currentUserAddress = userAddresses?.[0];
       if (!currentUserAddress) {
         console.log('No profile yet.');
       } else {
@@ -643,7 +643,7 @@ const useAuthentication = (props: UseAuthenticationProps) => {
       });
 
       setIsNewlyCreated(newlyCreated);
-      await onAccountVerified(account, newlyCreated, false);
+      await onAccountVerified(account, newlyCreated, false, farcasterWallet);
 
       if (joinedCommunity) {
         trackAnalytics({
