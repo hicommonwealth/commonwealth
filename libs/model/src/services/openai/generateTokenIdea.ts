@@ -11,13 +11,6 @@ import { models } from '../../database';
 import { LaunchpadTokenInstance } from '../../models/token';
 import { compressServerImage } from '../../utils/imageCompression';
 
-type TokenIdea = {
-  name: string;
-  symbol: string;
-  description: string;
-  imageURL: string;
-};
-
 type GenerateTokenIdeaProps = {
   ideaPrompt?: string;
 };
