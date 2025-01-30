@@ -31,10 +31,24 @@ export interface PermissionResponse {
 }
 
 export class MobileNotifications {
+  public static async getPermissionsAsync(): Promise<PermissionResponse> {
+    const response = await execWithinMobileApp<any, any>({
+      type: 'Notifications.getPermissionsAsync',
+    });
+
+    console.log('response: ', response);
+
+    return {
+      status: response.status,
+    };
+  }
+
   public static async requestPermissionsAsync(): Promise<PermissionResponse> {
     const response = await execWithinMobileApp<any, any>({
       type: 'Notifications.requestPermissionsAsync',
     });
+
+    console.log('response: ', response);
 
     return {
       status: response.status,
