@@ -21,6 +21,7 @@ import {
   addRateLimiterMiddleware,
   apiKeyAuthMiddleware,
 } from './external-router-middleware';
+import * as launchpad from './launchpadToken';
 import * as thread from './thread';
 import * as user from './user';
 
@@ -56,6 +57,7 @@ const {
 const { getNewContent } = user.trpcRouter;
 const { createContestMetadata, updateContestMetadata, cancelContestMetadata } =
   contest.trpcRouter;
+const { createToken, createTrade, getTokens } = launchpad.trpcRouter;
 
 const api = {
   getGlobalActivity: trpc.query(Feed.GetGlobalActivity, trpc.Tag.User, {
@@ -113,6 +115,9 @@ const api = {
   joinCommunity,
   banAddress,
   toggleCommentSpam,
+  createToken,
+  createTrade,
+  getTokens,
 };
 
 const PATH = '/api/v1';

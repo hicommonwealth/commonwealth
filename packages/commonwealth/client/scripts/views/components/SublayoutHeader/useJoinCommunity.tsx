@@ -19,8 +19,15 @@ const useJoinCommunity = () => {
   const [isTOSModalOpen, setIsTOSModalOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const { mutateAsync: toggleCommunityStar } = useToggleCommunityStarMutation();
+  const utils = trpc.useUtils();
   const { mutateAsync: joinCommunity } =
-    trpc.community.joinCommunity.useMutation();
+    trpc.community.joinCommunity.useMutation({
+      onSuccess: () => {
+        // reset xp cache
+        utils.quest.getQuests.invalidate().catch(console.error);
+        utils.user.getXps.invalidate().catch(console.error);
+      },
+    });
 
   const user = useUserStore();
 

@@ -22,7 +22,7 @@ import {
 import z from 'zod';
 import { tester } from '../../src';
 import { notifyUserMentioned } from '../../src/policies/handlers/notifyUserMentioned';
-import { getThreadUrl } from '../../src/policies/utils/utils';
+import { getProfileUrl, getThreadUrl } from '../../src/policies/utils/utils';
 import {
   ProviderError,
   SpyNotificationsProvider,
@@ -134,6 +134,13 @@ describe('userMentioned Event Handler', () => {
         author: author?.profile.name,
         object_body: safeTruncateBody(thread!.body!, 255),
         object_url: getThreadUrl(community!.id!, thread!.id!),
+      },
+      actor: {
+        id: String(author!.id),
+        profile_name: author!.profile.name,
+        profile_url: getProfileUrl(author!.id!, community!.custom_domain),
+        email: author!.profile.email,
+        profile_avatar_url: author!.profile.avatar_url,
       },
     });
   });
