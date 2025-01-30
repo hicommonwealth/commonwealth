@@ -1,18 +1,18 @@
 {
   "accountAssociation": {
     "header": "eyJmaWQiOjE0NCwidHlwZSI6ImN1c3RvZHkiLCJrZXkiOiIweDJiYmFFZTg5MDBiYjE2NjRCMUM4M2EzQTRGMTQyY0RCRjIyMjRmYjgifQ",
-    "payload": "eyJkb21haW4iOiI0MzllNzY4NjJlY2Mubmdyb2suYXBwIn0",
-    "signature": "MHgxNDZmM2UxNDljODNjY2ZjOTk4M2IwMGU1YTlhYzc0OGVmYzI2ZDgwYWFiN2Q3Y2NhZGYxYTRhNGRjYjJhY2RmNzQzYzRjMzI3ZmFiYTJlMGJlNTZkMGExYTRjNDM2N2NmOGU0MWMzZGJlNzZjZDZkNTc2ZjA0ZjgyMWZlNTZlZjFi"
+    "payload": "eyJkb21haW4iOiI2OGFhNmMyYmMzYmMubmdyb2suYXBwIn0",
+    "signature": "MHg5YWU3M2YwY2RhYWVjOTIwNGMxNGRiMmNiMTFlZmNhN2NiN2UzMWU0ODJhN2VmNTZmMTNmMjkxMGZiZWNiOWIzNDE1NTViN2RmMzYyMzRjMWFhMzU0ZmRiMzUwNzU1MzhmMTI0ZmIyY2Y5NGM4MDYxNGI3ZmZlNGZlMTRkNzI2YzFj"
   },
   "frame": {
     "version": "1",
     "name": "Example Frame",
-    "iconUrl": "https://439e76862ecc.ngrok.app/icon.png",
-    "homeUrl": "https://439e76862ecc.ngrok.app",
-    "imageUrl": "https://439e76862ecc.ngrok.app/image.png",
+    "iconUrl": "https://68aa6c2bc3bc.ngrok.app/icon.png",
+    "homeUrl": "https://68aa6c2bc3bc.ngrok.app",
+    "imageUrl": "https://68aa6c2bc3bc.ngrok.app/image.png",
     "buttonTitle": "Check this out",
-    "splashImageUrl": "https://439e76862ecc.ngrok.app/splash.png",
+    "splashImageUrl": "https://68aa6c2bc3bc.ngrok.app/splash.png",
     "splashBackgroundColor": "#eeccff",
-    "webhookUrl": "https://439e76862ecc.ngrok.app/api/webhook"
+    "webhookUrl": "https://68aa6c2bc3bc.ngrok.app/api/webhook"
   }
 }
