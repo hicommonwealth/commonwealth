@@ -45,6 +45,7 @@ describe('User lifecycle', () => {
         payload: {
           name: chance.name(),
           description: chance.sentence(),
+          image_url: chance.url(),
           community_id,
           start_date: moment().add(2, 'day').toDate(),
           end_date: moment().add(3, 'day').toDate(),
@@ -194,6 +195,7 @@ describe('User lifecycle', () => {
         payload: {
           name: chance.name(),
           description: chance.sentence(),
+          image_url: chance.url(),
           start_date: moment().add(2, 'day').toDate(),
           end_date: moment().add(3, 'day').toDate(),
         },
