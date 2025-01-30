@@ -1,66 +1,56 @@
+import { useFlag } from 'client/scripts/hooks/useFlag';
+import { useCommonNavigate } from 'client/scripts/navigation/helpers';
+import { useFetchQuestsQuery } from 'client/scripts/state/api/quest';
+import { CWIcon } from 'client/scripts/views/components/component_kit/cw_icons/cw_icon';
+import moment from 'moment';
 import React from 'react';
-import { trpc } from 'utils/trpcClient';
+import { Link } from 'react-router-dom';
 import { Skeleton } from 'views/components/Skeleton';
 import { CWText } from 'views/components/component_kit/cw_text';
-import useCommunityContests from '../../CommunityManagement/Contests/useCommunityContests';
 
-import { CWIcon } from 'client/scripts/views/components/component_kit/cw_icons/cw_icon';
-import { Link } from 'react-router-dom';
 import XpQuestCard from '../XpQuestCard/XpQuestCard';
-import './ActiveContestList.scss';
+import './XpQuestList.scss';
 
 const XpQuestList = () => {
-  const {
-    contestsData: { active: activeContests },
-    isContestDataLoading,
-  } = useCommunityContests({
-    fetchAll: true,
+  const navigate = useCommonNavigate();
+  const xpEnabled = useFlag('xp');
+
+  const { data: questsList, isInitialLoading } = useFetchQuestsQuery({
+    cursor: 1,
+    limit: 3,
+    start_after: moment().startOf('day').toDate(),
+    enabled: xpEnabled,
   });
+  const quests = (questsList?.pages || []).flatMap((page) => page.results);
 
-  const communityIds = [
-    ...new Set(activeContests.map((contest) => contest.community_id)),
-  ];
+  const handleCTAClick = () => {
+    // TODO: navigate to quest details in #10732
+  };
 
-  const communityQueries = trpc.useQueries((t) =>
-    communityIds.map((id) =>
-      t.community.getCommunity({ id: id!, include_node_info: true }),
-    ),
-  );
+  const handleLeaderboardClick = () => {
+    navigate('/leaderboard');
+  };
 
-  const community = communityIds.reduce((acc, id, index) => {
-    const communityData = communityQueries[index].data;
-    return {
-      ...acc,
-      [id as string]: {
-        name: communityData?.name || '',
-        iconUrl: communityData?.icon_url || '',
-        chainNodeUrl: communityData?.ChainNode?.url,
-        ethChainId: communityData?.ChainNode?.eth_chain_id,
-      },
-    };
-  }, {});
+  if (!xpEnabled) return <></>;
 
   return (
-    <div className="ActiveContestList">
-      {/* <CWText type="h2">XP Quests</CWText> */}
+    <div className="XpQuestList">
       <div className="heading-container">
-        <CWText type="h2">Tokens</CWText>
+        <CWText type="h2">XP Quests</CWText>
         <Link to="/explore">
           <div className="link-right">
-            <CWText type="h5" className="blue-text">
-              Tokens
-            </CWText>
+            <CWText className="link">See all quests</CWText>
             <CWIcon iconName="arrowRightPhosphor" className="blue-icon" />
           </div>
         </Link>
       </div>
       <>
-        {!isContestDataLoading && activeContests.length === 0 && (
-          <CWText type="h2" className="empty-contests">
+        {!isInitialLoading && quests.length === 0 && (
+          <CWText type="h2" className="empty-quests">
             No quests found
           </CWText>
         )}
-        {isContestDataLoading ? (
+        {isInitialLoading ? (
           <div className="content">
             <>
               <Skeleton height="300px" />
@@ -69,13 +59,30 @@ const XpQuestList = () => {
           </div>
         ) : (
           <div className="content">
-            {activeContests.map((contest) => (
-              <XpQuestCard
-                key={contest.contest_address}
-                contest={contest}
-                community={community[contest.community_id as string]}
-              />
-            ))}
+            {quests.map((quest) => {
+              const totalXP =
+                (quest.action_metas || [])
+                  ?.map((action) => action.reward_amount)
+                  .reduce(
+                    (accumulator, currentValue) => accumulator + currentValue,
+                    0,
+                  ) || 0;
+
+              return (
+                <XpQuestCard
+                  key={quest.name}
+                  name={quest.name}
+                  description={quest.description}
+                  community_id={quest.community_id}
+                  iconURL={quest.image_url}
+                  xpPoints={totalXP}
+                  startDate={new Date(quest.start_date)}
+                  endDate={new Date(quest.end_date)}
+                  onCTAClick={handleCTAClick}
+                  onLeaderboardClick={handleLeaderboardClick}
+                />
+              );
+            })}
           </div>
         )}
       </>

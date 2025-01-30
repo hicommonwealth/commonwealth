@@ -1,171 +1,119 @@
-import clsx from 'clsx';
-import moment from 'moment';
-import React from 'react';
-
 import commonLogo from 'assets/img/branding/common.svg';
-import farcasterUrl from 'assets/img/farcaster.svg';
-import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
-import { useGetContestBalanceQuery } from 'state/api/contests';
-import { Skeleton } from 'views/components/Skeleton';
-import { CWCommunityAvatar } from 'views/components/component_kit/cw_community_avatar';
-import { capDecimals } from 'views/modals/ManageCommunityStakeModal/utils';
-
-import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
-import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/CWButton';
-import { CWThreadAction } from 'client/scripts/views/components/component_kit/new_designs/cw_thread_action';
-import { Contest } from '../../CommunityManagement/Contests/ContestsList';
+import { CWDivider } from 'client/scripts/views/components/component_kit/cw_divider';
+import clsx from 'clsx';
+import React, { ReactNode } from 'react';
+import { CWText } from 'views/components/component_kit/cw_text';
+import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
+import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import ContestCountdown from '../../CommunityManagement/Contests/ContestsList/ContestCountdown';
-import './ActiveContestCard.scss';
+import './XpQuestCard.scss';
 
-interface XpQuestCardProps {
-  contest: Contest;
-  community: {
-    name: string;
-    iconUrl: string;
-    chainNodeUrl: string;
-    ethChainId: number;
-  };
+interface QuestCardProps {
+  name: string;
+  community_id?: string | undefined | null;
+  description: string;
+  iconURL: string;
+  xpPoints: number;
+  startDate: Date;
+  endDate: Date;
+  className?: string;
+  onCTAClick?: () => void;
+  onLeaderboardClick?: () => void;
+  onCardBodyClick?: () => void;
 }
 
-const XpQuestCard = ({ contest, community }: XpQuestCardProps) => {
-  const navigate = useCommonNavigate();
-  const finishDate = moment(contest.contests?.[0].end_time).toISOString();
+const MAX_CHARS_FOR_LABELS = 14;
 
-  const { data: contestBalance, isLoading: isContestBalanceLoading } =
-    useGetContestBalanceQuery({
-      contestAddress: contest.contest_address || '',
-      chainRpc: community.chainNodeUrl,
-      ethChainId: community.ethChainId,
-      isOneOff: !!contest.funding_token_address,
-      apiEnabled: Boolean(
-        contest.contest_address &&
-          community.chainNodeUrl &&
-          community.ethChainId,
-      ),
-    });
+const QuestCard = ({
+  name,
+  iconURL,
+  xpPoints,
+  endDate,
+  className,
+  onCardBodyClick,
+  onLeaderboardClick,
+  onCTAClick,
+}: QuestCardProps) => {
+  const handleBodyClick = (e: React.MouseEvent) =>
+    e.target === e.currentTarget && onCardBodyClick?.();
 
-  const prizes =
-    contestBalance && contest.payout_structure
-      ? contest.payout_structure.map(
-          (percentage) =>
-            (contestBalance * (percentage / 100)) /
-            Math.pow(10, contest.decimals || 18),
-        )
-      : [];
+  const isNameTrimmed = name.length > MAX_CHARS_FOR_LABELS;
+  const trimmedName = isNameTrimmed
+    ? name.slice(0, MAX_CHARS_FOR_LABELS) + '...'
+    : name;
 
-  const handleGoToContest = () => {
-    const path = contest.is_farcaster_contest
-      ? `/contests/${contest.contest_address}`
-      : `/discussions/${contest.topics?.[0]?.name}`;
+  const withOptionalTooltip = (
+    children: ReactNode,
+    content: string,
+    shouldDisplay,
+  ) => {
+    if (!shouldDisplay) return children;
 
-    navigateToCommunity({
-      navigate,
-      path,
-      chain: contest.community_id || '',
-    });
-  };
-
-  const handleLeaderboardClick = () => {
-    const path = contest.is_farcaster_contest
-      ? `/contests/${contest.contest_address}`
-      : `/discussions?featured=mostLikes&contest=${contest.contest_address}`;
-
-    navigateToCommunity({
-      navigate,
-      path,
-      chain: contest.community_id || '',
-    });
+    return (
+      <CWTooltip
+        placement="bottom"
+        content={content}
+        renderTrigger={(handleInteraction) => (
+          <span
+            onMouseEnter={handleInteraction}
+            onMouseLeave={handleInteraction}
+          >
+            {children}
+          </span>
+        )}
+      />
+    );
   };
 
   return (
-    <div className="ActiveContestCard">
-      <div className="contest-banner">
-        <img
-          src={contest.image_url}
-          alt="Contest banner"
-          className="banner-image"
-        />
-      </div>
-
-      <div className="contest-content">
-        <div className="contest-header">
-          <CWCommunityAvatar
-            onClick={() => {
-              navigateToCommunity({
-                navigate,
-                path: '',
-                chain: contest.community_id || '',
-              });
-            }}
-            community={{
-              name: community.name,
-              iconUrl: community.iconUrl,
-            }}
-          />
-
-          <CWText type="h3" fontWeight="medium" className="contest-title">
-            {contest.name}
-            <div className="contest-icon-container">
-              <img
-                className={clsx(
-                  'contest-icon',
-                  !contest.is_farcaster_contest && 'common-icon',
-                )}
-                src={contest.is_farcaster_contest ? farcasterUrl : commonLogo}
-              />
-            </div>
-          </CWText>
-        </div>
-
-        <div className="contest-timing">
-          <ContestCountdown finishTime={finishDate} isActive />
-        </div>
-
-        <div className="prizes-section">
-          <CWText type="b2" fontWeight="medium">
-            Current Prizes
-          </CWText>
-          <div className="prize-list">
-            {isContestBalanceLoading ? (
-              <>
-                <Skeleton width="100%" height="20px" />
-                <Skeleton width="100%" height="20px" />
-                <Skeleton width="100%" height="20px" />
-              </>
-            ) : prizes.length > 0 ? (
-              prizes?.map((prize, index) => (
-                <div className="prize-row" key={index}>
-                  <CWText className="label">
-                    {moment.localeData().ordinal(index + 1)} Prize
-                  </CWText>
-                  <CWText fontWeight="bold">
-                    {capDecimals(String(prize))} {contest.ticker}
-                  </CWText>
-                </div>
-              ))
-            ) : (
-              <CWText type="b2">No prizes available</CWText>
+    <div
+      role="button"
+      tabIndex={0}
+      className={clsx('QuestCard', className)}
+      onClick={handleBodyClick}
+    >
+      <img src={iconURL} className="image" onClick={handleBodyClick} />
+      <div className="content">
+        <div className="heading">
+          <img src={commonLogo} alt="icon" className="info-icon" />
+          <div className="basic-info" onClick={handleBodyClick}>
+            {withOptionalTooltip(
+              <CWText className="text-dark" type="h4" fontWeight="regular">
+                {trimmedName}
+              </CWText>,
+              name,
+              isNameTrimmed,
             )}
+          </div>
+          <ContestCountdown finishTime={endDate.toISOString()} isActive />
+        </div>
+
+        <CWDivider />
+        <CWText type="h5" fontWeight="semiBold">
+          Quest Rewards
+        </CWText>
+
+        <div className="quest-list">
+          <div className="quest">
+            <CWText fontWeight="medium">Complete All Tasks</CWText>
+            <CWText fontWeight="medium">{xpPoints} XP</CWText>
           </div>
         </div>
 
-        <div className="contest-actions">
-          <CWThreadAction
-            action="leaderboard"
-            label="Leaderboard"
-            onClick={handleLeaderboardClick}
-          />
-        </div>
-
-        <div className="cta-button-container">
+        <div className="xp-row">
           <CWButton
-            buttonHeight="sm"
+            label="Leaderboard"
+            onClick={onLeaderboardClick}
             buttonWidth="full"
-            label="Go to contest"
             buttonType="secondary"
-            buttonAlt="green"
-            className="cta-button"
-            onClick={handleGoToContest}
+            buttonHeight="sm"
+          />
+          <CWButton
+            label="Go to Quests"
+            buttonWidth="full"
+            buttonType="primary"
+            buttonHeight="sm"
+            onClick={() => onCTAClick?.()}
           />
         </div>
       </div>
@@ -173,4 +121,4 @@ const XpQuestCard = ({ contest, community }: XpQuestCardProps) => {
   );
 };
 
-export default XpQuestCard;
+export default QuestCard;

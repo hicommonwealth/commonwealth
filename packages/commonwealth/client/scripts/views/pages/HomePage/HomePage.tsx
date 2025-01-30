@@ -9,6 +9,7 @@ import { CWModal } from '../../components/component_kit/new_designs/CWModal';
 import ManageCommunityStakeModal from '../../modals/ManageCommunityStakeModal/ManageCommunityStakeModal';
 import IdeaLaunchpad from '../Communities/IdeaLaunchpad';
 import './HomePage.scss';
+import XpQuestList from './XpQuestList/XpQuestList';
 
 const HomePage = () => {
   const containerRef = useRef();
@@ -37,6 +38,7 @@ const HomePage = () => {
             </CWText>
           </div>
           <IdeaLaunchpad />
+          <XpQuestList />
         </div>
         <CWModal
           size="small"
