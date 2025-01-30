@@ -1,19 +1,8 @@
+import { SIWFSigner } from '@canvas-js/chain-ethereum';
 import FrameSDK from '@farcaster/frame-sdk';
+import { contractTopic } from '@hicommonwealth/shared';
 import { useCallback } from 'react';
 import useFarcasterStore from 'state/ui/farcaster';
-
-// Helper function to generate a valid Farcaster nonce
-const generateNonce = (length = 32) => {
-  const charset =
-    'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-  let nonce = '';
-  const array = new Uint8Array(length);
-  crypto.getRandomValues(array);
-  for (let i = 0; i < length; i++) {
-    nonce += charset[array[i] % charset.length];
-  }
-  return nonce;
-};
 
 export const useFarcasterSignIn = () => {
   const { setIsSigningIn, setSignInResult, setError } = useFarcasterStore();
@@ -24,7 +13,8 @@ export const useFarcasterSignIn = () => {
       setError(null);
 
       // Generate a valid alphanumeric nonce
-      const nonce = generateNonce();
+      const { nonce, privateKey } =
+        SIWFSigner.newSIWFRequestNonce(contractTopic);
 
       // Current time and expiration (10 minutes from now)
       const now = new Date();
@@ -37,7 +27,7 @@ export const useFarcasterSignIn = () => {
       });
 
       setSignInResult(result);
-      return result;
+      return { result, privateKey };
     } catch (error) {
       if (error.name === 'SignIn.RejectedByUser') {
         setError('Sign in was rejected by user');

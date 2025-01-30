@@ -1,19 +1,36 @@
-import { SIWESigner } from '@canvas-js/chain-ethereum';
+import { SIWFSigner } from '@canvas-js/chain-ethereum';
+import { Session, Signer } from '@canvas-js/interfaces';
 import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/shared';
 import type BlockInfo from '../../../models/BlockInfo';
 import type IWebWallet from '../../../models/IWebWallet';
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function isFarcasterWallet(
+  wallet: IWebWallet<any>,
+): wallet is FarcasterWebWalletController {
+  return wallet.name === WalletId.Farcaster;
+}
 
 class FarcasterWebWalletController implements IWebWallet<string> {
   // GETTERS/SETTERS
   private _enabled: boolean;
   private _enabling = false;
   private _accounts: string[] = [];
-  private _signature = '';
-  private _message = '';
+  private _signature: string;
+  private _message: string;
+  private _sessionPrivateKey: Uint8Array;
 
-  constructor(signature: string, message: string) {
+  public sessionPayload?: Session;
+  public delegateSigner?: Signer;
+
+  constructor(
+    signature: string,
+    message: string,
+    sessionPrivateKey: Uint8Array,
+  ) {
     this._signature = signature;
     this._message = message;
+    this._sessionPrivateKey = sessionPrivateKey;
     this._enabled = false;
   }
 
@@ -46,18 +63,35 @@ class FarcasterWebWalletController implements IWebWallet<string> {
     return null; // Farcaster doesn't need block info
   }
 
-  public getSessionSigner() {
-    if (!this._accounts[0] || !this._signature || !this._message) {
+  public async getSessionSigner() {
+    if (
+      !this._accounts[0] ||
+      !this._signature ||
+      !this._message ||
+      !this._sessionPrivateKey
+    ) {
       throw new Error('Farcaster wallet not properly initialized');
     }
 
-    return new SIWESigner({
-      signer: {
-        getAddress: () => this._accounts[0],
-        signMessage: () => Promise.resolve(this._signature),
-      },
-      chainId: parseInt(this.getChainId()),
-    });
+    const message = this._message;
+    const signature = this._signature;
+    const privateKey = Buffer.from(this._sessionPrivateKey).toString('hex');
+    const { authorizationData, topic, custodyAddress } =
+      SIWFSigner.parseSIWFMessage(message, signature);
+
+    const signer = new SIWFSigner({ custodyAddress, privateKey });
+    const timestamp = new Date(authorizationData.siweIssuedAt).valueOf();
+
+    const { payload, signer: delegateSigner } = await signer.newSIWFSession(
+      topic,
+      authorizationData,
+      timestamp,
+      this._sessionPrivateKey,
+    );
+    this.sessionPayload = payload;
+    this.delegateSigner = delegateSigner;
+
+    return signer;
   }
 
   public async enable() {
