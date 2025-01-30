@@ -357,7 +357,7 @@ const ModalBase = ({
                     disabled={isSigningIn}
                     onClick={async () => {
                       try {
-                        const result = await signIn();
+                        const { result, privateKey } = await signIn();
                         console.log('Sign in successful:', result);
                         setSignInResult(result);
 
@@ -365,6 +365,7 @@ const ModalBase = ({
                         await onFarcasterLogin(
                           result.signature,
                           result.message,
+                          privateKey,
                         );
                       } catch (err) {
                         // Error is already handled in the store
