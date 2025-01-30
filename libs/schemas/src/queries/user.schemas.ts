@@ -135,6 +135,10 @@ export const GetXps = {
       .string()
       .optional()
       .describe('Filters events by community id associated to quest'),
+    quest_id: z
+      .number()
+      .optional()
+      .describe('Filters events by a specific quest id'),
     from: z.coerce
       .date()
       .optional()
