@@ -8,6 +8,7 @@ const SearchPage = lazy(() => import('views/pages/search'));
 
 const CreateCommunityPage = lazy(() => import('views/pages/CreateCommunity'));
 const CreateQuestPage = lazy(() => import('views/pages/CreateQuest'));
+const QuestDetailsPage = lazy(() => import('views/pages/QuestDetails'));
 const LaunchTokenPage = lazy(() => import('views/pages/LaunchToken'));
 const OverviewPage = lazy(() => import('views/pages/overview'));
 const MembersPage = lazy(
@@ -131,6 +132,11 @@ const CustomDomainRoutes = ({
             key="/createQuest"
             path="/createQuest"
             element={withLayout(CreateQuestPage, { type: 'common' })}
+          />,
+          <Route
+            key="/quest/:id"
+            path="/quest/:id"
+            element={withLayout(QuestDetailsPage, { type: 'common' })}
           />,
         ]
       : []),
