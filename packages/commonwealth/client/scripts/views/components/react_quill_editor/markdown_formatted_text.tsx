@@ -20,7 +20,12 @@ import { getClasses } from '../component_kit/helpers';
 import { renderTruncatedHighlights } from './highlighter';
 import './markdown_formatted_text.scss';
 import { QuillRendererProps } from './quill_renderer';
-import { countLinesMarkdown, fetchTwitterEmbedInfo } from './utils';
+import {
+  countLinesMarkdown,
+  dompurifyConfig,
+  dompurifyConfigForHTML,
+  fetchTwitterEmbedInfo,
+} from './utils';
 
 const OPEN_LINKS_IN_NEW_TAB = true;
 
@@ -104,101 +109,8 @@ export const MarkdownFormattedText = ({
 
   const sanitizedHTML: string = useMemo(() => {
     return hideFormatting || searchTerm
-      ? DOMPurify.sanitize(unsanitizedHTML, {
-          ALLOWED_TAGS:
-            hideFormatting || searchTerm
-              ? ['a', 'img']
-              : [
-                  'p',
-                  'h1',
-                  'h2',
-                  'h3',
-                  'h4',
-                  'h5',
-                  'h6',
-                  'br',
-                  'b',
-                  'i',
-                  'strong',
-                  'em',
-                  'a',
-                  'pre',
-                  'code',
-                  'img',
-                  'tt',
-                  'div',
-                  'ins',
-                  'del',
-                  'sup',
-                  'sub',
-                  'p',
-                  'ol',
-                  'ul',
-                  'table',
-                  'thead',
-                  'tbody',
-                  'tfoot',
-                  'tr',
-                  'td',
-                  'th',
-                  'li',
-                  'blockquote',
-                  'hr',
-                ],
-          ALLOWED_ATTR: ['href', 'src', 'alt', 'title', 'target'],
-          FORBID_ATTR: ['onclick', 'onmouseover', 'onload', 'onerror', 'style'],
-          FORBID_TAGS: ['script', 'style', 'custom-element'],
-          ADD_TAGS: [],
-          ADD_ATTR: ['target'],
-        })
-      : DOMPurify.sanitize(unsanitizedHTML, {
-          USE_PROFILES: { html: true },
-          ALLOWED_TAGS:
-            hideFormatting || searchTerm
-              ? ['a', 'img']
-              : [
-                  'p',
-                  'h1',
-                  'h2',
-                  'h3',
-                  'h4',
-                  'h5',
-                  'h6',
-                  'br',
-                  'b',
-                  'i',
-                  'strong',
-                  'em',
-                  'a',
-                  'pre',
-                  'code',
-                  'img',
-                  'tt',
-                  'div',
-                  'ins',
-                  'del',
-                  'sup',
-                  'sub',
-                  'p',
-                  'ol',
-                  'ul',
-                  'table',
-                  'thead',
-                  'tbody',
-                  'tfoot',
-                  'tr',
-                  'td',
-                  'th',
-                  'li',
-                  'blockquote',
-                  'hr',
-                ],
-          ALLOWED_ATTR: ['href', 'src', 'alt', 'title', 'target'],
-          FORBID_ATTR: ['onclick', 'onmouseover', 'onload', 'onerror', 'style'],
-          FORBID_TAGS: ['script', 'style', 'custom-element'],
-          ADD_TAGS: [],
-          ADD_ATTR: ['target'],
-        });
+      ? DOMPurify.sanitize(unsanitizedHTML, dompurifyConfig)
+      : DOMPurify.sanitize(unsanitizedHTML, dompurifyConfigForHTML);
   }, [hideFormatting, searchTerm, unsanitizedHTML]);
   // finalDoc is the rendered content which may include search term highlights
   const finalDoc = useMemo(() => {
