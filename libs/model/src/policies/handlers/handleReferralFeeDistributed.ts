@@ -30,7 +30,6 @@ export async function handleReferralFeeDistributed(
   // find the referral (already mapped to a namespace)
   const referral = await models.Referral.findOne({
     where: {
-      // referee_address, // TODO: how to find this from the event?
       referrer_address,
       namespace_address,
     },
@@ -63,6 +62,7 @@ export async function handleReferralFeeDistributed(
         attributes: ['user_id'],
         transaction,
       });
+
       if (referrer) {
         await models.User.increment('referral_eth_earnings', {
           by: referrer_received_amount,
