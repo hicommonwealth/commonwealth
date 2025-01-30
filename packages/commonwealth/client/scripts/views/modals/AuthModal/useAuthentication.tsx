@@ -619,11 +619,16 @@ const useAuthentication = (props: UseAuthenticationProps) => {
     }
   };
 
-  const onFarcasterLogin = async (signature: string, message: string) => {
+  const onFarcasterLogin = async (
+    signature: string,
+    message: string,
+    sessionPrivateKey: Uint8Array,
+  ) => {
     try {
       const farcasterWallet = new FarcasterWebWalletController(
         signature,
         message,
+        sessionPrivateKey,
       );
       await farcasterWallet.enable();
 
