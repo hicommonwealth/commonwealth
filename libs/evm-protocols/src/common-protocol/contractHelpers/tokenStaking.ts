@@ -6,7 +6,7 @@ export const lockTokens = async (
   amount: string,
   duration: string,
   isPermanent: boolean,
-): Promise<any> => {
+): Promise<unknown> => {
   return await contract.methods.lockTokens(amount, duration, isPermanent).send({
     from: address,
   });
