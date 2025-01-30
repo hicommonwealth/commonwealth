@@ -17,6 +17,7 @@ const CommunitiesPage = lazy(() => import('views/pages/Communities'));
 const SearchPage = lazy(() => import('views/pages/search'));
 
 const CreateCommunityPage = lazy(() => import('views/pages/CreateCommunity'));
+const CreateQuestPage = lazy(() => import('views/pages/CreateQuest'));
 const LaunchToken = lazy(() => import('views/pages/LaunchToken'));
 const OverviewPage = lazy(() => import('views/pages/overview'));
 const MembersPage = lazy(
@@ -37,6 +38,7 @@ const FinishSocialLoginPage = lazy(
 );
 
 const NotificationsPage = lazy(() => import('views/pages/notifications'));
+const LeaderboardPage = lazy(() => import('views/pages/Leaderboard'));
 
 const NotificationSettings = lazy(
   () => import('views/pages/NotificationSettings'),
@@ -121,7 +123,10 @@ const CommunityNotFoundPage = lazy(
 const UnSubscribePage = lazy(() => import('views/pages/UnSubscribePage'));
 const RewardsPage = lazy(() => import('views/pages/RewardsPage'));
 
-const CommonDomainRoutes = ({ launchpadEnabled }: RouteFeatureFlags) => [
+const CommonDomainRoutes = ({
+  launchpadEnabled,
+  xpEnabled,
+}: RouteFeatureFlags) => [
   <Route
     key="mobile-app-redirect"
     path="/_internal/mobile-app-redirect"
@@ -162,6 +167,15 @@ const CommonDomainRoutes = ({ launchpadEnabled }: RouteFeatureFlags) => [
     path="/createCommunity"
     element={withLayout(CreateCommunityPage, { type: 'common' })}
   />,
+  ...(xpEnabled
+    ? [
+        <Route
+          key="/createQuest"
+          path="/createQuest"
+          element={withLayout(CreateQuestPage, { type: 'common' })}
+        />,
+      ]
+    : []),
   <Route
     key="/unSubscribe/:userId"
     path="/unSubscribe/:userId"
@@ -176,6 +190,15 @@ const CommonDomainRoutes = ({ launchpadEnabled }: RouteFeatureFlags) => [
         />,
       ]
     : []),
+  ...(xpEnabled
+    ? [
+        <Route
+          key="/leaderboard"
+          path="/leaderboard"
+          element={withLayout(LeaderboardPage, { type: 'common' })}
+        />,
+      ]
+    : []),
   <Route
     key="/dashboard"
     path="/dashboard"
@@ -187,8 +210,8 @@ const CommonDomainRoutes = ({ launchpadEnabled }: RouteFeatureFlags) => [
     element={withLayout(DashboardPage, { type: 'common' })}
   />,
   <Route
-    key="/communities"
-    path="/communities"
+    key="/explore"
+    path="/explore"
     element={withLayout(CommunitiesPage, {
       type: 'common',
     })}

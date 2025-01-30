@@ -1,4 +1,41 @@
-import { MobileTabType, TableType, TabParam } from './types';
+import moment from 'moment';
+import { MobileTabType, Referral, TabParam, TableType } from './types';
+
+export const calculateTotalEarnings = (referrals: Referral[]) => {
+  if (!referrals?.length) return 0;
+  return referrals.reduce(
+    (sum, ref) => sum + (ref.referrer_received_eth_amount || 0),
+    0,
+  );
+};
+
+const getMonthEarnings = (referrals: Referral[], targetDate: moment.Moment) => {
+  return referrals
+    .filter((ref) => {
+      const refDate = moment(ref.updated_at);
+      return (
+        refDate.month() === targetDate.month() &&
+        refDate.year() === targetDate.year()
+      );
+    })
+    .reduce((sum, ref) => sum + (ref.referrer_received_eth_amount || 0), 0);
+};
+
+export const calculateReferralTrend = (referrals: Referral[]) => {
+  if (!referrals?.length) return 0;
+
+  const now = moment();
+  const lastMonth = moment(now).subtract(1, 'month');
+
+  const currentMonthEarnings = getMonthEarnings(referrals, now);
+  const lastMonthEarnings = getMonthEarnings(referrals, lastMonth);
+
+  if (lastMonthEarnings === 0) return currentMonthEarnings > 0 ? 100 : 0;
+
+  const percentageChange =
+    ((currentMonthEarnings - lastMonthEarnings) / lastMonthEarnings) * 100;
+  return Math.round(percentageChange);
+};
 
 export const getInitialTab = () => {
   const params = new URLSearchParams(location.search);

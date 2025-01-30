@@ -1,15 +1,11 @@
 import { Actor, command, dispose } from '@hicommonwealth/core';
-import { commonProtocol } from '@hicommonwealth/evm-protocols';
+import * as protocols from '@hicommonwealth/evm-protocols';
 import { config, equalEvmAddresses } from '@hicommonwealth/model';
 import { BalanceType } from '@hicommonwealth/shared';
-import chai, { expect } from 'chai';
-import chaiAsPromised from 'chai-as-promised';
 import { seed } from 'model/src/tester';
-import { afterAll, beforeAll, describe, test } from 'vitest';
+import { afterAll, beforeAll, describe, expect, test, vi } from 'vitest';
 import { ChainNodeAttributes } from '../../src';
-import { CreateLaunchpadToken, CreateLaunchpadTrade } from '../../src/token';
-
-chai.use(chaiAsPromised);
+import { CreateLaunchpadTrade, CreateToken } from '../../src/token';
 
 const CREATE_TOKEN_TXN_HASH =
   '0x735a6ec2a5d1b71634e74183f2436f4b76855e613e97fc008f2df486d9eb73db';
@@ -27,7 +23,7 @@ describe('Launchpad Lifecycle', () => {
       url: `https://base-sepolia.g.alchemy.com/v2/${config.ALCHEMY.APP_KEYS.PUBLIC}`,
       private_url: `https://base-sepolia.g.alchemy.com/v2/${config.ALCHEMY.APP_KEYS.PUBLIC}`,
       name: 'Base Sepolia Testnet',
-      eth_chain_id: commonProtocol.ValidChains.SepoliaBase,
+      eth_chain_id: protocols.commonProtocol.ValidChains.SepoliaBase,
       balance_type: BalanceType.Ethereum,
     })) as ChainNodeAttributes[];
 
@@ -63,9 +59,60 @@ describe('Launchpad Lifecycle', () => {
       address: community!.Addresses![0].address,
       user: { email: '', id: user!.id },
     };
+
+    vi.spyOn(
+      protocols,
+      'getLaunchpadTokenCreatedTransaction',
+    ).mockResolvedValue({
+      txReceipt: {
+        blockNumber: 1,
+        transactionHash: CREATE_TOKEN_TXN_HASH,
+        transactionIndex: 1,
+        blockHash: '0x123',
+        from: '123',
+        to: '456',
+        cumulativeGasUsed: 1,
+        gasUsed: 1,
+        logs: [],
+        status: 1,
+        logsBloom: '0x123',
+        root: '0x123',
+      },
+      parsedArgs: {
+        namespace: community!.namespace!,
+        tokenAddress: TOKEN_ADDRESS,
+        launchpadLiquidity: 1000n,
+        curveId: 1n,
+        totalSupply: 1000n,
+        reserveRation: 1n,
+        initialPurchaseEthAmount: 1n,
+      },
+      block: {
+        number: 1n,
+        parentHash: '0x123',
+        timestamp: 1n,
+        transactions: [],
+        transactionsRoot: '0x123',
+        stateRoot: '0x123',
+        receiptsRoot: '0x123',
+        miner: '0x123',
+        difficulty: 1n,
+        totalDifficulty: 1n,
+        extraData: '0x123',
+        size: 1n,
+        gasLimit: 1n,
+        gasUsed: 1n,
+        baseFeePerGas: 1n,
+        sha3Uncles: '0x123',
+        uncles: [],
+        nonce: 1n,
+        mixHash: '0x123',
+      },
+    });
   });
 
   afterAll(async () => {
+    vi.restoreAllMocks();
     await dispose()();
   });
 
@@ -78,7 +125,7 @@ describe('Launchpad Lifecycle', () => {
       community_id: community_id!,
     };
 
-    const results = await command(CreateLaunchpadToken(), {
+    const results = await command(CreateToken(), {
       actor,
       payload,
     });
@@ -90,14 +137,14 @@ describe('Launchpad Lifecycle', () => {
   test('Get a launchpad trade txn and project it', async () => {
     const payload = {
       transaction_hash: TRADE_TOKEN_TXN_HASH,
-      eth_chain_id: commonProtocol.ValidChains.SepoliaBase,
+      eth_chain_id: protocols.commonProtocol.ValidChains.SepoliaBase,
     };
     const results = await command(CreateLaunchpadTrade(), {
       actor,
       payload,
     });
     expect(results).to.deep.equal({
-      eth_chain_id: commonProtocol.ValidChains.SepoliaBase,
+      eth_chain_id: protocols.commonProtocol.ValidChains.SepoliaBase,
       transaction_hash: TRADE_TOKEN_TXN_HASH,
       token_address: TOKEN_ADDRESS.toLowerCase(),
       trader_address: '0x2cE1F5d4f84B583Ab320cAc0948AddE52a131FBE',
