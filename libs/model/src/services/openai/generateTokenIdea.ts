@@ -22,11 +22,6 @@ type GenerateTokenIdeaProps = {
   ideaPrompt?: string;
 };
 
-type GenerateTokenIdeaResponse = {
-  tokenIdea?: TokenIdea;
-  error?: string;
-};
-
 const TOKEN_AI_PROMPTS_CONFIG = {
   name: (ideaPrompt?: string) => `
       Please ${ideaPrompt ? `use this prompt in quotation "${ideaPrompt}" to ` : ''}
@@ -78,11 +73,7 @@ const chatWithOpenAI = async (prompt = '', openai: OpenAI) => {
 
 const generateTokenIdea = async function* ({
   ideaPrompt,
-}: GenerateTokenIdeaProps): AsyncGenerator<
-  GenerateTokenIdeaResponse,
-  void,
-  unknown
-> {
+}: GenerateTokenIdeaProps): AsyncGenerator {
   if (!config.OPENAI.API_KEY) {
     yield { error: TokenErrors.OpenAINotConfigured };
   }
@@ -96,56 +87,54 @@ const generateTokenIdea = async function* ({
     yield { error: TokenErrors.OpenAIInitFailed };
   }
 
-  const tokenIdea = {
-    name: '',
-    symbol: '',
-    description: '',
-    imageURL: '',
-  };
-
+  let tokenName = '';
   try {
     // generate a unique token name
     let foundToken: LaunchpadTokenInstance | boolean | null = true;
     while (foundToken) {
-      tokenIdea.name = await chatWithOpenAI(
+      tokenName = await chatWithOpenAI(
         TOKEN_AI_PROMPTS_CONFIG.name(ideaPrompt),
         openai,
       );
 
       foundToken = await models.LaunchpadToken.findOne({
         where: {
-          name: tokenIdea.name,
+          name: tokenName,
         },
       });
-      if (!foundToken) break;
     }
-    yield { tokenIdea };
 
-    tokenIdea.symbol = await chatWithOpenAI(
+    yield 'event: name\n';
+    yield `data: ${tokenName}\n\n`;
+
+    const tokenSymbol = await chatWithOpenAI(
       TOKEN_AI_PROMPTS_CONFIG.symbol,
       openai,
     );
-    yield { tokenIdea };
 
-    tokenIdea.description = await chatWithOpenAI(
+    yield 'event: symbol\n';
+    yield `data: ${tokenSymbol}\n\n`;
+
+    const tokenDescription = await chatWithOpenAI(
       TOKEN_AI_PROMPTS_CONFIG.description,
       openai,
     );
-    yield { tokenIdea };
+
+    yield 'event: description\n';
+    yield `data: ${tokenDescription}\n\n`;
 
     // generate image url and send the generated url to the client (to save time on s3 upload)
     const imageResponse = await openai.images.generate({
-      prompt: TOKEN_AI_PROMPTS_CONFIG.image(tokenIdea.name, tokenIdea.symbol),
+      prompt: TOKEN_AI_PROMPTS_CONFIG.image(tokenName, tokenSymbol),
       size: '1024x1024',
       model: 'dall-e-3',
       n: 1,
       response_format: 'url',
     });
-    tokenIdea.imageURL = imageResponse.data[0].url || '';
-    yield { tokenIdea };
+    const imageUrl = imageResponse.data[0].url || '';
 
     // upload image to s3 and then send finalized imageURL
-    const resp = await fetch(tokenIdea.imageURL);
+    const resp = await fetch(imageUrl);
     const buffer = await resp.buffer();
     const compressedBuffer = await compressServerImage(buffer);
     const { url } = await blobStorage().upload({
@@ -154,8 +143,8 @@ const generateTokenIdea = async function* ({
       content: compressedBuffer,
       contentType: 'image/png',
     });
-    tokenIdea.imageURL = url;
-    yield { tokenIdea };
+    yield 'event: imageURL\n';
+    yield `data: ${url}\n\n`;
   } catch (e) {
     let error = TokenErrors.RequestFailed;
 
@@ -163,7 +152,7 @@ const generateTokenIdea = async function* ({
       e instanceof OpenAI.APIError &&
       e?.code === 'content_policy_violation'
     ) {
-      if (ideaPrompt && !tokenIdea.name) {
+      if (ideaPrompt && !tokenName) {
         error = TokenErrors.IdeaPromptVoilatesSecurityPolicy;
       } else {
         // this usually happens in the image generation calls
