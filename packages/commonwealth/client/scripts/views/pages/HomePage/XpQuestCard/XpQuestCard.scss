@@ -1,0 +1,99 @@
+@import '../../../../styles/shared.scss';
+
+.XpQuestCard {
+  border-radius: 6px;
+  padding: 16px;
+  border: 1px solid $neutral-100;
+  background: $white;
+  display: flex;
+  flex-direction: column;
+
+  &:hover {
+    box-shadow: $elevation-2;
+  }
+
+  .contest-banner {
+    border-radius: 6px;
+    height: 160px;
+
+    .banner-image {
+      border-radius: 6px;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  .contest-content {
+    padding-block: 4px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+
+    .contest-header {
+      display: flex;
+      align-items: center;
+
+      gap: 8px;
+      margin-bottom: 8px;
+      position: relative;
+
+      .contest-title {
+        @include multiline-text-ellipsis(1);
+      }
+
+      .contest-icon-container {
+        position: absolute;
+        background: $white;
+        border-radius: 50%;
+        right: 8px;
+        top: -20px;
+        width: 30px;
+        height: 30px;
+
+        .contest-icon {
+          width: 100%;
+          height: 100%;
+
+          &.common-icon {
+            padding: 2px;
+          }
+        }
+      }
+    }
+
+    .contest-timing {
+      margin-bottom: 16px;
+    }
+
+    .prizes-section {
+      margin-bottom: 16px;
+
+      .prize-list {
+        margin-top: 8px;
+
+        .prize-row {
+          display: flex;
+          justify-content: space-between;
+
+          .label {
+            color: $neutral-600;
+          }
+        }
+      }
+    }
+
+    .contest-actions {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .cta-button-container {
+      display: flex;
+      align-items: center;
+      height: 40px;
+      margin-top: auto;
+    }
+  }
+}

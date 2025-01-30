@@ -1,0 +1,36 @@
+@import '../../../../styles/shared';
+
+.XpQuestList {
+  margin: 16px 0;
+
+  .heading-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+
+    .link-right {
+      display: flex;
+      gap: 4px;
+    }
+  }
+
+  .content {
+    display: grid;
+    grid-gap: 28px;
+    grid-template-columns: 1fr 1fr;
+    justify-content: center;
+    margin: 24px 0;
+
+    @include extraSmall {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .empty-contests {
+    margin: 24px auto;
+    display: flex;
+    justify-content: center;
+    text-align: center;
+  }
+}
