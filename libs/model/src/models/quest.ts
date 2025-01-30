@@ -13,11 +13,12 @@ export const Quest = (
     'Quest',
     {
       id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },
-      community_id: { type: Sequelize.STRING, allowNull: false },
       name: { type: Sequelize.STRING, allowNull: false },
       description: { type: Sequelize.STRING, allowNull: false },
+      image_url: { type: Sequelize.STRING, allowNull: false },
       start_date: { type: Sequelize.DATE, allowNull: false },
       end_date: { type: Sequelize.DATE, allowNull: false },
+      community_id: { type: Sequelize.STRING, allowNull: true },
     },
     {
       timestamps: true,

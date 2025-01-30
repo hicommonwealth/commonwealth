@@ -4,6 +4,7 @@ import commonLogo from 'assets/img/branding/common-logo.svg';
 import useFarcasterStore from 'client/scripts/state/ui/farcaster';
 import clsx from 'clsx';
 import { useFarcasterSignIn } from 'hooks/useFarcasterSignIn';
+import { isMobileApp } from 'hooks/useReactNativeWebView';
 import React, { Fragment, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import app from 'state';
@@ -56,7 +57,9 @@ const MODAL_COPY = {
   },
 };
 
-const SSO_OPTIONS: AuthSSOs[] = [
+const mobileApp = isMobileApp();
+
+const SSO_OPTIONS_DEFAULT: AuthSSOs[] = [
   'google',
   'discord',
   'x',
@@ -66,6 +69,15 @@ const SSO_OPTIONS: AuthSSOs[] = [
   'farcaster',
   'SMS',
 ] as const;
+
+const SSO_OPTIONS_MOBILE: AuthSSOs[] = [
+  'google',
+  'apple',
+  'email',
+  'SMS',
+] as const;
+
+const SSO_OPTIONS = mobileApp ? SSO_OPTIONS_MOBILE : SSO_OPTIONS_DEFAULT;
 
 /**
  * AuthModal base component with customizable options, callbacks, layouts and auth options display strategy.
@@ -234,6 +246,8 @@ const ModalBase = ({
   useEffect(() => {
     setActiveTabIndex((prevActiveTab) => {
       if (!shouldShowSSOOptions && prevActiveTab === 1) return 0;
+
+      if (isMobileApp()) return 1;
 
       if (showAuthOptionFor) {
         return SSO_OPTIONS.includes(showAuthOptionFor as AuthSSOs) ? 1 : 0;
@@ -438,6 +452,7 @@ const ModalBase = ({
                   If email or SMS option is selected don't render SSO's list,
                   else render wallets/SSO's list based on activeTabIndex
                 */}
+
                 {(activeTabIndex === 0 ||
                   (activeTabIndex === 1 &&
                     !isAuthenticatingWithEmail &&

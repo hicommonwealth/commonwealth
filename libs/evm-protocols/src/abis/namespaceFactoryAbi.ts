@@ -23,7 +23,12 @@ export const namespaceFactoryAbi = [
   {
     anonymous: false,
     inputs: [
-      { indexed: false, internalType: 'string', name: 'name', type: 'string' },
+      {
+        indexed: false,
+        internalType: 'address',
+        name: 'namespaceAdress',
+        type: 'address',
+      },
       {
         indexed: false,
         internalType: 'address',
@@ -44,6 +49,49 @@ export const namespaceFactoryAbi = [
       },
     ],
     name: 'DeployedNamespace',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: 'address',
+        name: 'namespaceAdress',
+        type: 'address',
+      },
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'feeManager',
+        type: 'address',
+      },
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'referrer',
+        type: 'address',
+      },
+      {
+        indexed: false,
+        internalType: 'address',
+        name: 'referralFeeManager',
+        type: 'address',
+      },
+      {
+        indexed: false,
+        internalType: 'bytes',
+        name: 'signature',
+        type: 'bytes',
+      },
+      {
+        indexed: false,
+        internalType: 'address',
+        name: 'namespaceDeployer',
+        type: 'address',
+      },
+    ],
+    name: 'DeployedNamespaceWithReferral',
     type: 'event',
   },
   {

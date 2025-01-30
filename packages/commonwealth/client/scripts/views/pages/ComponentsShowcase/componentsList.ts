@@ -9,6 +9,7 @@ import CardsShowcase from 'views/pages/ComponentsShowcase/components/Cards.showc
 import CheckboxesShowcase from 'views/pages/ComponentsShowcase/components/Checkboxes.showcase';
 import CollapsiblesShowcase from 'views/pages/ComponentsShowcase/components/Collapsibles.showcase';
 import ColorsShowcase from 'views/pages/ComponentsShowcase/components/Colors.showcase';
+import DateTimeInputShowCase from 'views/pages/ComponentsShowcase/components/DateTimeInput.showcase';
 import DividersShowcase from 'views/pages/ComponentsShowcase/components/Dividers.showcase';
 import DrawersShowcase from 'views/pages/ComponentsShowcase/components/Drawers.showcase';
 import DropdownsShowcase from 'views/pages/ComponentsShowcase/components/Dropdowns.showcase';
@@ -66,6 +67,7 @@ export const ComponentPageName = {
   Inputs: 'Inputs',
   Paginations: 'Paginations',
   ImageInput: 'ImageInput',
+  DateTimeInput: 'DateTimeInput',
 };
 
 export const ComponentType = {
@@ -127,6 +129,11 @@ export const componentItems = [
   {
     ComponentPage: ImageInputShowCase,
     displayName: ComponentPageName.ImageInput,
+    type: ComponentType.Components,
+  },
+  {
+    ComponentPage: DateTimeInputShowCase,
+    displayName: ComponentPageName.DateTimeInput,
     type: ComponentType.Components,
   },
   {

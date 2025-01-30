@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useInviteLinkModal } from 'state/ui/modals';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import {
@@ -18,14 +19,21 @@ enum ReferralTabs {
 
 interface ReferralCardProps {
   onSeeAllClick: () => void;
+  trendValue: number;
+  totalEarnings: number;
+  isLoading?: boolean;
 }
 
-const ReferralCard = ({ onSeeAllClick }: ReferralCardProps) => {
+const ReferralCard = ({
+  onSeeAllClick,
+  trendValue,
+  totalEarnings,
+  isLoading = false,
+}: ReferralCardProps) => {
   const [currentTab, setCurrentTab] = useState<ReferralTabs>(
     ReferralTabs.Total,
   );
-
-  const trendValue = 10;
+  const { setIsInviteLinkModalOpen } = useInviteLinkModal();
 
   return (
     <RewardsCard
@@ -49,9 +57,11 @@ const ReferralCard = ({ onSeeAllClick }: ReferralCardProps) => {
           {currentTab === ReferralTabs.Total && (
             <div className="total-body">
               <CWText fontWeight="bold" type="h4">
-                ${(1234.56).toLocaleString()}
+                ETH {totalEarnings.toLocaleString()}
               </CWText>
-              {(trendValue || trendValue === 0) && <Trend value={trendValue} />}
+              {!isLoading && (trendValue || trendValue === 0) && (
+                <Trend value={trendValue} />
+              )}
             </div>
           )}
           {currentTab === ReferralTabs.XP && (
@@ -59,13 +69,15 @@ const ReferralCard = ({ onSeeAllClick }: ReferralCardProps) => {
               <CWText fontWeight="bold" type="h4">
                 {123456} XP
               </CWText>
-              {(trendValue || trendValue === 0) && <Trend value={trendValue} />}
+              {!isLoading && (trendValue || trendValue === 0) && (
+                <Trend value={trendValue} />
+              )}
             </div>
           )}
         </div>
         <div className="referral-card-footer">
           <CWButton
-            onClick={onSeeAllClick}
+            onClick={() => setIsInviteLinkModalOpen(true)}
             buttonWidth="full"
             label="Share Referral Link"
             buttonHeight="sm"

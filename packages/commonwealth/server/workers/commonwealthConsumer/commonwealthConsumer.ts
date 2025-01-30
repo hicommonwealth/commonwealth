@@ -3,10 +3,11 @@ import {
   ServiceKey,
   startHealthCheckLoop,
 } from '@hicommonwealth/adapters';
-import { handleEvent, logger, stats } from '@hicommonwealth/core';
-import { ContestWorker } from '@hicommonwealth/model';
-import { EventNames } from '@hicommonwealth/schemas';
-import { bootstrapBindings } from 'server/bindings/bootstrap';
+import { logger, stats } from '@hicommonwealth/core';
+import {
+  bootstrapBindings,
+  bootstrapContestRolloverLoop,
+} from 'server/bindings/bootstrap';
 import { fileURLToPath } from 'url';
 
 const log = logger(import.meta);
@@ -32,33 +33,12 @@ startHealthCheckLoop({
 // to the CommonwealthConsumer and you want to ensure that the CommonwealthConsumer is
 // properly handling/processing those messages. Using the script is rarely necessary in
 // local development.
-
-function startRolloverLoop() {
-  log.info('Starting rollover loop');
-
-  const loop = async () => {
-    try {
-      await handleEvent(ContestWorker(), {
-        name: EventNames.ContestRolloverTimerTicked,
-        payload: {},
-      });
-    } catch (err) {
-      log.error(err);
-    }
-  };
-
-  // TODO: move to external service triggered via scheduler?
-  setInterval(() => {
-    loop().catch(console.error);
-  }, 1_000 * 60);
-}
-
 async function main() {
   try {
     log.info('Starting main consumer');
     await bootstrapBindings();
     isServiceHealthy = true;
-    startRolloverLoop();
+    bootstrapContestRolloverLoop();
   } catch (error) {
     log.fatal('Consumer setup failed', error);
   }

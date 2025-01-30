@@ -331,17 +331,23 @@ export async function startLoginWithMagicLink({
       const params = `?redirectTo=${
         redirectTo ? encodeURIComponent(redirectTo) : ''
       }&chain=${chain || ''}&sso=${provider}`;
+
       await magic.oauth.loginWithRedirect({
         provider,
-        redirectURI: new URL(
-          '/finishsociallogin' + params,
-          window.location.origin,
-        ).href,
+        redirectURI: createRedirectURI(params),
+        options: {
+          // prompt forces Google to show the account picker.
+          prompt: 'select_account',
+        },
       });
     } else {
       await magic.oauth2.loginWithRedirect({
         provider,
-        redirectURI: new URL('/finishsociallogin', window.location.origin).href,
+        redirectURI: createRedirectURI(),
+        options: {
+          // prompt forces Google to show the account picker.
+          prompt: 'select_account',
+        },
       });
     }
 
@@ -567,4 +573,9 @@ export async function handleSocialLoginCallback({
   } else {
     throw new Error(`Social auth unsuccessful: ${response.status}`);
   }
+}
+
+function createRedirectURI(params: string = '') {
+  const url = new URL('/finishsociallogin' + params, window.location.origin);
+  return url.href;
 }

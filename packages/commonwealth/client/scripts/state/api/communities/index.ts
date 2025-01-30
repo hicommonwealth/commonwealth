@@ -3,6 +3,7 @@ import useEditCommunityTagsMutation from './editCommunityTags';
 import useFetchCommunitiesQuery from './fetchCommunities';
 import useFetchRelatedCommunitiesQuery from './fetchRelatedCommunities';
 import useGetCommunityByIdQuery from './getCommuityById';
+import useGetMembersQuery from './getMembers';
 import useGetPinnedTokenByCommunityId from './getPinnedTokenByCommunityId';
 import usePinTokenToCommunityMutation from './pinTokenToCommunity';
 import useRefreshCustomDomainQuery from './refreshCustomDomain';
@@ -17,6 +18,7 @@ export {
   useFetchCommunitiesQuery,
   useFetchRelatedCommunitiesQuery,
   useGetCommunityByIdQuery,
+  useGetMembersQuery,
   useGetPinnedTokenByCommunityId,
   usePinTokenToCommunityMutation,
   useRefreshCustomDomainQuery,
