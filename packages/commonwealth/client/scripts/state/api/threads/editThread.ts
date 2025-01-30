@@ -67,7 +67,7 @@ export const buildUpdateThreadInput = async ({
   collaborators,
 }: EditThreadProps) => {
   let canvasSignedData;
-  if (newBody || newTitle) {
+  if ((newBody || newTitle) && threadMsgId) {
     canvasSignedData = await signUpdateThread(address, {
       thread_id: threadMsgId,
       title: newTitle,

@@ -13,7 +13,7 @@ const PrizeRow = ({
   ticker = 'ETH',
 }: {
   index: number;
-  prize: number;
+  prize: string;
   ticker?: string;
 }) => {
   return (

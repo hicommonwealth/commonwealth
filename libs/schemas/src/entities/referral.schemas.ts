@@ -1,11 +1,6 @@
 import z from 'zod';
 import { EVM_ADDRESS, PG_INT } from '../utils';
 
-export const REFERRAL_EVENTS = [
-  'CommunityCreated',
-  'SignUpFlowCompleted',
-] as const;
-
 export const Referral = z
   .object({
     id: PG_INT.optional(),
@@ -62,6 +57,7 @@ export const ReferralFees = z.object({
   referrer_received_amount: z
     .number()
     .describe('The amount of ETH received by the referrer'),
+  referee_address: z.string().describe('The address of the referee'),
   transaction_timestamp: z
     .number()
     .describe('The timestamp when the referral fee was distributed'),

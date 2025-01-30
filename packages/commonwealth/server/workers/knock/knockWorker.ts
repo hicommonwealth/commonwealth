@@ -17,10 +17,10 @@ import {
   notificationsProvider,
   stats,
 } from '@hicommonwealth/core';
+import { NotificationsPolicy } from '@hicommonwealth/model';
 import { fileURLToPath } from 'url';
 import { config } from '../../config';
-import { NotificationsPolicy } from './notificationsPolicy';
-import { NotificationsSettingsPolicy } from './notificationsSettingsPolicy';
+import { NotificationsSettingsPolicy } from './NotificationsSettings.policy';
 
 const log = logger(import.meta);
 
