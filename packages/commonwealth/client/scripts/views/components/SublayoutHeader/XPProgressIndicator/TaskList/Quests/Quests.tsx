@@ -33,8 +33,8 @@ const Quests = ({
     navigate('/explore');
   };
 
-  const handleQuestCTAClick = () => {
-    // TODO: navigate to quest details in #10732
+  const handleQuestCTAClick = (questId: number) => {
+    navigate(`/quest/${questId}`);
   };
 
   return (
@@ -64,7 +64,7 @@ const Quests = ({
             <QuestTask
               key={quest.id}
               quest={quest}
-              onClick={handleQuestCTAClick}
+              onClick={() => handleQuestCTAClick(quest.id)}
             />
           ))}
         </div>

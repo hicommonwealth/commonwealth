@@ -34,8 +34,8 @@ const QuestList = () => {
     }
   };
 
-  const handleCTAClick = () => {
-    // TODO: navigate to quest details in #10732
+  const handleCTAClick = (questId: number) => {
+    navigate(`/quest/${questId}`);
   };
 
   const handleLeaderboardClick = () => {
@@ -77,7 +77,7 @@ const QuestList = () => {
                 xpPoints={totalXP}
                 startDate={new Date(quest.start_date)}
                 endDate={new Date(quest.end_date)}
-                onCTAClick={handleCTAClick}
+                onCTAClick={() => handleCTAClick(quest.id)}
                 onLeaderboardClick={handleLeaderboardClick}
               />
             );

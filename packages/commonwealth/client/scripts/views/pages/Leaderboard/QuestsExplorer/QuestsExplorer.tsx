@@ -21,8 +21,8 @@ const QuestsExplorer = () => {
   });
   const quests = (questsList?.pages || []).flatMap((page) => page.results);
 
-  const handleCTAClick = () => {
-    // TODO: navigate to quest details in #10732
+  const handleCTAClick = (questId: number) => {
+    navigate(`/quest/${questId}`);
   };
 
   const handleSeeAllClick = () => {
@@ -63,7 +63,7 @@ const QuestsExplorer = () => {
                 description={quest.description}
                 xpPoints={totalXP}
                 featuredImgURL={quest.image_url}
-                onExploreClick={handleCTAClick}
+                onExploreClick={() => handleCTAClick(quest.id)}
               />
             );
           })}
