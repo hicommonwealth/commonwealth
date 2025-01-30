@@ -16,26 +16,19 @@ import { isMobileApp } from 'client/scripts/hooks/useReactNativeWebView';
 import './WelcomeOnboardModal.scss';
 import { InviteModal } from './steps/InviteModal';
 import { NotificationModal } from './steps/NotificationModal';
-import { OptionalWalletModal } from './steps/OptionalWalletModal/OptionalWalletModal';
 const WelcomeOnboardModal = ({ isOpen, onClose }: WelcomeOnboardModalProps) => {
   const { isWindowSmallInclusive } = useBrowserWindow({});
-  const [isUserFirstTime, SetIsUserFirstTime] = useState(true);
-  const [isUserFromWebView, setIsUserFromWebView] = useState(true);
   const [activeStep, setActiveStep] = useState<WelcomeOnboardModalSteps>(
     WelcomeOnboardModalSteps.OptionalWalletModal,
   );
   const mobileApp = isMobileApp();
 
   useEffect(() => {
-    if (isUserFirstTime) {
-      setActiveStep(
-        mobileApp
-          ? WelcomeOnboardModalSteps.Notifications
-          : WelcomeOnboardModalSteps.TermsOfServices,
-      );
-    } else {
-      setActiveStep(WelcomeOnboardModalSteps.TermsOfServices);
-    }
+    setActiveStep(
+      mobileApp
+        ? WelcomeOnboardModalSteps.Notifications
+        : WelcomeOnboardModalSteps.TermsOfServices,
+    );
   }, []);
 
   const user = useUserStore();
@@ -58,26 +51,6 @@ const WelcomeOnboardModal = ({ isOpen, onClose }: WelcomeOnboardModalProps) => {
 
   const getCurrentStep = () => {
     switch (activeStep) {
-      case WelcomeOnboardModalSteps.OptionalWalletModal: {
-        if (isUserFirstTime && isUserFromWebView) {
-          return {
-            index: 1,
-            title: 'Connect Wallet',
-            component: (
-              <OptionalWalletModal
-                onComplete={() => {
-                  setActiveStep(WelcomeOnboardModalSteps.Notifications);
-                }}
-                SetIsUserFirstTime={SetIsUserFirstTime}
-                isUserFirstTime={isUserFirstTime}
-                isUserFromWebView={isUserFromWebView}
-                setIsUserFromWebView={setIsUserFromWebView}
-              />
-            ),
-          };
-        }
-        break;
-      }
       case WelcomeOnboardModalSteps.Notifications: {
         return {
           index: 2,
@@ -172,7 +145,7 @@ const WelcomeOnboardModal = ({ isOpen, onClose }: WelcomeOnboardModalProps) => {
 
   return (
     <CWModal
-      open={true}
+      open={isOpen}
       onClose={handleClose}
       size="medium"
       className="WelcomeOnboardModal"
