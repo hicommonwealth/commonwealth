@@ -5,6 +5,7 @@ import {
   Contest,
   Feed,
   Thread,
+  Token,
   User,
 } from '@hicommonwealth/model';
 import cors from 'cors';
@@ -118,7 +119,9 @@ const api = {
   toggleCommentSpam,
   createToken,
   createTrade,
-  getTokens,
+  getTokens: trpc.query(Token.GetLaunchpadTokens, trpc.Tag.Token, {
+    forceSecure: true,
+  }),
   getLaunchpadTrades,
 };
 
