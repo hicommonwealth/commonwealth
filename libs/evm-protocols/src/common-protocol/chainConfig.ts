@@ -105,6 +105,7 @@ export const factoryContracts = {
     launchpad: '0x7a2088a1bFc9d81c55368AE168C2C02570cB814F',
     lpBondingCurve: '0xDC17C27Ae8bE831AF07CC38C02930007060020F4',
     tokenCommunityManager: '0x84eA74d481Ee0A5332c457a4d796187F6Ba67fEB',
+    veBridge: '0xF481D80E5cC35fd55A4B68145C4DA0EFCf2687aE', // TODO: Double check this address
     chainId: 31337,
   },
 } as const satisfies factoryContractsType;
