@@ -27,10 +27,11 @@ export function isMobileApp(): boolean {
   return !!window.ReactNativeWebView;
 }
 
-type MessageWithResponseID = {
-  id: string;
-  type: string;
-};
+/**
+ * Basic type representing a function to call with an id for the response and a
+ * name for the function.
+ */
+type MessageWithResponseID = {};
 
 class Latch<T> {
   promise: Promise<T>;
@@ -58,17 +59,24 @@ export async function execWithinMobileApp<
     throw new Error('Not within mobile app');
   }
 
+  const __requestID = Math.random() * 100000;
+
   const latch = new Latch<Output>();
 
   function handler(message: MessageEvent<any>) {
-    if (message.data.id === input.id) {
+    if (message.data.__requestID === __requestID) {
       latch.resolve(message.data as Output);
     }
   }
 
   addEventListener('message', handler);
 
-  window.ReactNativeWebView!.postMessage(JSON.stringify(input));
+  window.ReactNativeWebView!.postMessage(
+    JSON.stringify({
+      ...input,
+      __requestID,
+    }),
+  );
 
   // the event listener we just registered will keep listening until the
   // latch is revolved and gets the response.
