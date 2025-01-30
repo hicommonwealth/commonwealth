@@ -137,11 +137,11 @@
         .primary {
           padding-left: 2rem;
           padding-right: 2rem;
-          border: 1px solid #0079cc;
+          border: 1px solid $primary-600;
           background-color: transparent !important;
 
           .button-text {
-            color: #0079cc !important;
+            color: $primary-600 !important;
           }
         }
       }
@@ -157,8 +157,8 @@
         .primary {
           padding-left: 2rem;
           padding-right: 2rem;
-          border: 1px solid #0079cc;
-          background-color: #0079cc;
+          border: 1px solid $primary-600;
+          background-color: $primary-600;
           .button-text {
             color: white !important;
           }

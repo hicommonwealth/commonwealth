@@ -2,6 +2,7 @@ import referralImage from 'assets/img/referral-background-mobile.png';
 import useUserStore from 'client/scripts/state/ui/user';
 import { saveToClipboard } from 'client/scripts/utils/clipboard';
 import { CWIcon } from 'client/scripts/views/components/component_kit/cw_icons/cw_icon';
+import { IconName } from 'client/scripts/views/components/component_kit/cw_icons/cw_icon_lookup';
 import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
 import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/CWButton';
 import React from 'react';
@@ -9,11 +10,24 @@ import './InviteModal.scss';
 type InviteModalProps = {
   onComplete: () => void;
 };
-
+type ReferralShare = {
+  id: number;
+  title: string;
+  icon: IconName;
+  iconStyle: {
+    backgroundColor: string;
+  };
+  onClick: () => void;
+};
 const InviteModal = ({ onComplete }: InviteModalProps) => {
   const user = useUserStore();
   const currentUrl = window.location.origin;
-  const inviteLink = `${currentUrl}/dashboard?refcode=${user.activeAccount?.address}`;
+  const userAddress = user.activeAccount
+    ? user.activeAccount?.address
+    : user?.addresses[0].address;
+  const inviteLink = `${currentUrl}/dashboard?refcode=${userAddress}`;
+
+  console.log({ user });
   const handleCopy = () => {
     saveToClipboard(inviteLink, true).catch(console.error);
   };
@@ -21,7 +35,7 @@ const InviteModal = ({ onComplete }: InviteModalProps) => {
     const message = 'Hey, check out Common!';
     return `${message} \n${link}`;
   };
-  const referrals_Share = [
+  const referrals_Share: ReferralShare[] = [
     {
       id: 1,
       title: 'Share On X',
@@ -65,17 +79,15 @@ const InviteModal = ({ onComplete }: InviteModalProps) => {
         Get a referral bonus for inviting friends to common!{' '}
       </CWText>
       <div className="share_container">
-        {referrals_Share.map((referral: any, index: any) => {
-          console.log('referral.style', referral.style);
+        {referrals_Share.map((referral: ReferralShare, index: number) => {
           return (
-            // eslint-disable-next-line react/jsx-key
             <div
               className="share_content"
               key={index.toString()}
               onClick={referral.onClick}
             >
               <div className="icon_container" style={referral.iconStyle}>
-                <CWIcon iconSize="large" iconName={referral.icon} />
+                <CWIcon iconSize="large" iconName={referral?.icon} />
               </div>
               <CWText type="h5" className="label">
                 {referral.title}
@@ -84,7 +96,10 @@ const InviteModal = ({ onComplete }: InviteModalProps) => {
           );
         })}
       </div>
-
+      <div className="address_container">
+        <CWText className="label">{inviteLink}</CWText>
+        <CWIcon iconSize="large" iconName="linkPhosphor" />
+      </div>
       <div className="buttons_container">
         <CWButton
           label={'Skip'}

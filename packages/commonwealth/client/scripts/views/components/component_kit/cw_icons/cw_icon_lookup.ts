@@ -309,6 +309,8 @@ export const iconLookup = {
   viewAll: withPhosphorIcon(Rows),
   viewOverView: withPhosphorIcon(CirclesFour),
   kanban: withPhosphorIcon(Kanban),
+  xTwitter: withPhosphorIcon(XLogo),
+  discordLogo: withPhosphorIcon(DiscordLogo),
 };
 
 export const customIconLookup = {
@@ -340,8 +342,6 @@ export const customIconLookup = {
   apple: CustomIcons.CWApple,
   farcaster: CustomIcons.CWFarcaster,
   SMS: withPhosphorIcon(ChatText),
-  xTwitter: withPhosphorIcon(XLogo),
-  discordLogo: withPhosphorIcon(DiscordLogo),
 };
 
 export type IconName = keyof typeof iconLookup;

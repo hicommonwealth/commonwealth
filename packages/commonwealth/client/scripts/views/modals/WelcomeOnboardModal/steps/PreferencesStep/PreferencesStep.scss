@@ -27,9 +27,10 @@
     justify-content: space-between;
     display: flex;
     position: absolute;
-    bottom: 80px;
-
+    bottom: 2px;
+    margin-top: 10px;
     @include extraSmall {
+      bottom: 80px;
       grid-template-columns: 1fr 1fr;
       gap: 16px;
     }

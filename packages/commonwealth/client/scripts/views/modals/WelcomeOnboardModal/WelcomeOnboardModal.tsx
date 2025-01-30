@@ -12,6 +12,7 @@ import { TermsOfServicesStep } from './steps/TermsOfServicesStep';
 import { WelcomeOnboardModalProps, WelcomeOnboardModalSteps } from './types';
 
 import useBrowserWindow from 'client/scripts/hooks/useBrowserWindow';
+import { isMobileApp } from 'client/scripts/hooks/useReactNativeWebView';
 import './WelcomeOnboardModal.scss';
 import { InviteModal } from './steps/InviteModal';
 import { NotificationModal } from './steps/NotificationModal';
@@ -23,15 +24,13 @@ const WelcomeOnboardModal = ({ isOpen, onClose }: WelcomeOnboardModalProps) => {
   const [activeStep, setActiveStep] = useState<WelcomeOnboardModalSteps>(
     WelcomeOnboardModalSteps.OptionalWalletModal,
   );
-  // const mobileApp = isMobileApp();
-  const mobileApp = true;
+  const mobileApp = isMobileApp();
 
   useEffect(() => {
-    setIsUserFromWebView(true);
     if (isUserFirstTime) {
       setActiveStep(
         mobileApp
-          ? WelcomeOnboardModalSteps.OptionalWalletModal
+          ? WelcomeOnboardModalSteps.Notifications
           : WelcomeOnboardModalSteps.TermsOfServices,
       );
     } else {
@@ -173,7 +172,7 @@ const WelcomeOnboardModal = ({ isOpen, onClose }: WelcomeOnboardModalProps) => {
 
   return (
     <CWModal
-      open={isOpen}
+      open={true}
       onClose={handleClose}
       size="medium"
       className="WelcomeOnboardModal"

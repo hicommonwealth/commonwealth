@@ -6,9 +6,6 @@
   width: 100%;
   gap: 16px;
 
-  @include extraSmall {
-    height: 90vh !important;
-  }
   .h4 {
     color: $neutral-600;
 
@@ -25,8 +22,29 @@
     max-height: 270px;
     overflow-y: scroll;
     @include extraSmall {
-      height: 65vh !important;
+      height: 40vh !important;
       max-height: 65vh;
+    }
+    &::-webkit-scrollbar {
+      display: none;
+    }
+
+    /* Hide scrollbar for Firefox */
+    scrollbar-width: none;
+
+    /* Hide scrollbar for Internet Explorer and Edge */
+    -ms-overflow-style: none;
+  }
+
+  .footer-container {
+    width: 90%;
+    position: relative;
+    align-self: center;
+    display: flex;
+    flex-direction: column;
+    @include extraSmall {
+      position: absolute;
+      bottom: 40px;
     }
   }
 }

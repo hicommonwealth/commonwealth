@@ -77,7 +77,7 @@ const PersonalInformationStep = ({
         setIsEmailChangeDisabled(true); // we don't allow SSO users to update their email during onboard.
       }
     }
-    if (!defaultSSOUsername) {
+    if (!defaultSSOUsername || defaultSSOUsername === DEFAULT_NAME) {
       handleGenerateUsername();
     }
   }, []);
@@ -110,7 +110,7 @@ const PersonalInformationStep = ({
     // @ts-expect-error <StrictNullChecks/>
     formMethodsRef.current.trigger('username').catch(console.error);
     setCurrentUsername(randomUsername);
-    setIsUserNameChangeDisabled(true);
+    setIsUserNameChangeDisabled(false);
   };
 
   const handleEmailChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -191,6 +191,7 @@ const PersonalInformationStep = ({
                   ? 'Username already taken'
                   : ''
               }
+              disabled={isUserNameChangeDisabled}
             />
             <CWButton
               label="Make a custom username"
