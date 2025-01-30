@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 import './ProfileActivity.scss';
 
 import { mapProfileThread } from 'client/scripts/utils/mapProfileThread';
-import { useFlag } from 'hooks/useFlag';
 import type Comment from 'models/Comment';
 import type Thread from 'models/Thread';
 import type { IUniqueId } from 'models/interfaces';
@@ -19,19 +18,12 @@ export type CommentWithAssociatedThread = Comment<IUniqueId> & {
 type ProfileActivityProps = {
   comments: CommentWithAssociatedThread[];
   threads: Thread[];
-  isOwner: boolean | undefined;
 };
 
-const ProfileActivity = ({
-  comments,
-  threads,
-  isOwner,
-}: ProfileActivityProps) => {
+const ProfileActivity = ({ comments, threads }: ProfileActivityProps) => {
   const [selectedActivity, setSelectedActivity] = useState(
     ProfileActivityType.Comments,
   );
-
-  const referralsEnabled = useFlag('referrals');
 
   return (
     <div className="ProfileActivity">
@@ -63,20 +55,6 @@ const ProfileActivity = ({
             }}
             isSelected={selectedActivity === ProfileActivityType.MyTokens}
           />
-          {referralsEnabled && (
-            <CWTab
-              isSelected={selectedActivity === ProfileActivityType.Referrals}
-              label={
-                <div className="tab-header">
-                  Referrals
-                  <div className="count">5</div>
-                </div>
-              }
-              onClick={() => {
-                setSelectedActivity(ProfileActivityType.Referrals);
-              }}
-            />
-          )}
         </CWTabsRow>
       </div>
       <div className="activity-content">
@@ -85,7 +63,6 @@ const ProfileActivity = ({
           threads={threads}
           comments={comments}
           mapProfileThread={mapProfileThread}
-          isOwner={isOwner}
         />
       </div>
     </div>

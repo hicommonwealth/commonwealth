@@ -12,6 +12,7 @@ import * as integrations from './integrations';
 import * as launchpadToken from './launchpadToken';
 import * as loadTest from './load-test';
 import * as poll from './poll';
+import * as quest from './quest';
 import * as subscription from './subscription';
 import * as superAdmin from './super-admin';
 import * as thread from './thread';
@@ -34,6 +35,7 @@ const api = {
   discordBot: discordBot.trpcRouter,
   launchpadToken: launchpadToken.trpcRouter,
   poll: poll.trpcRouter,
+  quest: quest.trpcRouter,
 };
 
 if (config.NOTIFICATIONS.FLAG_KNOCK_INTEGRATION_ENABLED) {

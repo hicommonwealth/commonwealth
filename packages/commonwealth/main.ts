@@ -166,6 +166,18 @@ export async function main(
 
   setupAPI('/api', app, db, dbValidationService, cacheDecorator);
 
+  app.use('/.well-known/assetlinks.json', (req: Request, res: Response) => {
+    res.sendFile(`${__dirname}/.well-known/assetlinks.json`);
+  });
+
+  app.use(
+    '/.well-known/apple-app-site-association',
+    (req: Request, res: Response) => {
+      res.setHeader('Content-Type', 'application/json');
+      res.sendFile(`${__dirname}/.well-known/apple-app-site-association`);
+    },
+  );
+
   app.use('/robots.txt', (req: Request, res: Response) => {
     res.sendFile(`${__dirname}/robots.txt`);
   });

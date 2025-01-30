@@ -88,7 +88,7 @@ export const FarcasterAction = z.object({
         }),
       }),
     ),
-    channel: z.string().nullable(),
+    channel: z.any().nullable(),
     reactions: z.object({
       likes_count: z.number(),
       recasts_count: z.number(),

@@ -8,7 +8,6 @@ import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
 import { useGetContestBalanceQuery } from 'state/api/contests';
 import { Skeleton } from 'views/components/Skeleton';
 import { CWCommunityAvatar } from 'views/components/component_kit/cw_community_avatar';
-import { capDecimals } from 'views/modals/ManageCommunityStakeModal/utils';
 
 import { CWText } from '../../../../components/component_kit/cw_text';
 import { CWButton } from '../../../../components/component_kit/new_designs/CWButton/CWButton';
@@ -79,6 +78,10 @@ const ExploreContestCard = ({
     });
   };
 
+  if (!isContestBalanceLoading && (!prizes || prizes.length === 0)) {
+    return null;
+  }
+
   return (
     <div className="ExploreContestCard">
       <div className="contest-banner">
@@ -141,7 +144,7 @@ const ExploreContestCard = ({
                     {moment.localeData().ordinal(index + 1)} Prize
                   </CWText>
                   <CWText fontWeight="bold">
-                    {capDecimals(String(prize))} {contest.ticker}
+                    {prize} {contest.ticker}
                   </CWText>
                 </div>
               ))

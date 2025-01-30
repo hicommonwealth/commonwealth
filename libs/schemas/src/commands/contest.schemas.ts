@@ -149,6 +149,17 @@ export const FarcasterCastCreatedWebhook = {
   }),
 };
 
+export const RelayFarcasterContestBotMentioned = {
+  input: z.object({
+    created_at: z.number(),
+    type: z.string(),
+    data: FarcasterCast,
+  }),
+  output: z.object({
+    status: z.literal('ok'),
+  }),
+};
+
 export const FarcasterUpvoteAction = {
   input: FarcasterAction,
   output: z.object({

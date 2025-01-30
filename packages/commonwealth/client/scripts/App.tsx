@@ -9,7 +9,8 @@ import { HelmetProvider } from 'react-helmet-async';
 import { RouterProvider } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import { queryClient } from 'state/api/config';
-import { ReactNativeBridge } from 'views/components/ReactNativeBridge';
+import { ReactNativeBridgeUser } from 'views/components/ReactNativeBridge';
+import { ReactNativeLogForwarder } from 'views/components/ReactNativeBridge/ReactNativeLogForwarder';
 import { Splash } from './Splash';
 import { openFeatureProvider } from './helpers/feature-flags';
 import useAppStatus from './hooks/useAppStatus';
@@ -36,7 +37,8 @@ const App = () => {
               ) : (
                 <>
                   <Mava />
-                  <ReactNativeBridge />
+                  <ReactNativeBridgeUser />
+                  <ReactNativeLogForwarder />
                   <RouterProvider router={router()} />
                   {isAddedToHomeScreen || isMarketingPage ? null : (
                     <AddToHomeScreenPrompt

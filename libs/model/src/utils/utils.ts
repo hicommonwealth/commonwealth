@@ -264,6 +264,7 @@ export function buildApiKeySaltCacheKey(address: string) {
 export async function publishCast(
   replyCastHash: string,
   messageBuilder: ({ username }: { username: string }) => string,
+  options?: { embed: string },
 ) {
   const client = new NeynarAPIClient(config.CONTESTS.NEYNAR_API_KEY!);
   try {
@@ -276,6 +277,7 @@ export async function publishCast(
       messageBuilder({ username }),
       {
         replyTo: replyCastHash,
+        embeds: options?.embed ? [{ url: options.embed }] : undefined,
       },
     );
     log.info(`FC bot published reply to ${replyCastHash}`);

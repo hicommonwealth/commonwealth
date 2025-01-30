@@ -29,7 +29,6 @@ export const setLocalStorageItem = (
   const stored = getLocalStorageItem(key);
 
   if (key === LocalStorageKeys.ReferralCode && stored) {
-    console.log('Reflink already stored');
     return;
   }
 
@@ -42,4 +41,8 @@ export const setLocalStorageItem = (
   }
 
   localStorage.setItem(key, JSON.stringify(item));
+};
+
+export const removeLocalStorageItem = (key: LocalStorageKeys) => {
+  localStorage.removeItem(key);
 };
