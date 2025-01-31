@@ -7,6 +7,7 @@ import { useUpdateSubscriptionPreferencesMutation } from 'state/api/trpc/subscri
 import { usePushNotificationActivated } from 'views/pages/NotificationSettings/usePushNotificationActivated';
 // eslint-disable-next-line max-len
 import { MobileNotifications } from 'client/scripts/utils/MobileNotifications';
+import { isMobileApp } from 'hooks/useReactNativeWebView';
 import useUserStore from 'state/ui/user';
 import { usePushNotificationToggleCallback } from 'views/pages/NotificationSettings/usePushNotificationToggleCallback';
 
@@ -47,21 +48,25 @@ export function useSubscriptionPreferenceSettingCallback(
         if (activate) {
           // *** we have to first request permissions if we're activating.
 
-          const existingPermissions =
-            await MobileNotifications.getPermissionsAsync();
+          // FIXME: this is only needed on mobile...
 
-          if (existingPermissions.status !== 'granted') {
-            console.log(
-              'Requesting permissions due to existing permissions: ',
-              existingPermissions.status,
-            );
+          if (isMobileApp()) {
+            const existingPermissions =
+              await MobileNotifications.getPermissionsAsync();
 
-            const permissions =
-              await MobileNotifications.requestPermissionsAsync();
+            if (existingPermissions.status !== 'granted') {
+              console.log(
+                'Requesting permissions due to existing permissions: ',
+                existingPermissions.status,
+              );
 
-            if (permissions.status !== 'granted') {
-              console.log('Permissions not granted.');
-              return;
+              const permissions =
+                await MobileNotifications.requestPermissionsAsync();
+
+              if (permissions.status !== 'granted') {
+                console.log('Permissions not granted.');
+                return;
+              }
             }
           }
         }
