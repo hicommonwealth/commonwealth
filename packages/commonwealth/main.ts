@@ -19,6 +19,8 @@ import passport from 'passport';
 import path, { dirname } from 'path';
 import pinoHttp from 'pino-http';
 import prerenderNode from 'prerender-node';
+import { buildFarcasterManifest } from 'server/util/buildFarcasterManifest';
+import { renderIndex } from 'server/util/renderIndex';
 import { fileURLToPath } from 'url';
 import * as v8 from 'v8';
 import * as api from './server/api';
@@ -189,6 +191,10 @@ export async function main(
     res.sendFile(`${__dirname}/manifest.json`);
   });
 
+  app.use('/.well-known/farcaster.json', (req, res) => {
+    res.json(buildFarcasterManifest());
+  });
+
   app.use('/firebase-messaging-sw.js', (req: Request, res: Response) => {
     res.sendFile(`${__dirname}/firebase-messaging-sw.js`);
   });
@@ -211,8 +217,14 @@ export async function main(
     }),
   );
 
-  app.get('*', (req: Request, res: Response) => {
-    res.sendFile(`${__dirname}/index.html`);
+  app.get('*', async (req: Request, res: Response) => {
+    try {
+      const html = await renderIndex();
+      res.send(html);
+    } catch (err) {
+      console.error(err);
+      res.status(500).send('Server Error');
+    }
   });
 
   setupErrorHandlers(app);
