@@ -70,16 +70,10 @@ export async function execWithinMobileApp<
   function handler(message: MessageEvent<any>) {
     const dataObj = messageToObject(message.data);
 
-    console.log('FIXME: execWithinMobileApp: got message data obj', dataObj);
     if (dataObj.__requestID === __requestID) {
-      console.log(
-        "FIXME: execWithinMobileApp: got response message so we're resolving the latch",
-      );
       latch.resolve(dataObj as Output);
     }
   }
-
-  console.log('FIXME: execWithinMobileApp added message  handler');
 
   addEventListener('message', handler);
 
@@ -93,8 +87,6 @@ export async function execWithinMobileApp<
   // the event listener we just registered will keep listening until the
   // latch is revolved and gets the response.
   await latch.promise;
-
-  console.log('FIXME: execWithinMobileApp promise resolved');
 
   // now we have to remove the event listener before we return the latch and
   // clean up after ourselves.
