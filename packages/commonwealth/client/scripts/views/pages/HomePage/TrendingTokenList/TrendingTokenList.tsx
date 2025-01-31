@@ -66,6 +66,7 @@ const TrendingTokensList = ({
       ) {
         return communitySortOptionsLabelToKeysMap[
           filters.withCommunitySortBy
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
         ] as any;
       }
 
