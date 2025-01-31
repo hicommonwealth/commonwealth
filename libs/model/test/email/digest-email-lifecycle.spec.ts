@@ -1,19 +1,23 @@
 import { ExternalServiceUserIds, dispose, query } from '@hicommonwealth/core';
 import { models } from '@hicommonwealth/model';
-import { Community } from '@hicommonwealth/schemas';
-import { expect } from 'chai';
-import { afterAll, afterEach, beforeAll, describe, test } from 'vitest';
+import { Community, User } from '@hicommonwealth/schemas';
+
+import { afterAll, afterEach, beforeAll, describe, expect, test } from 'vitest';
 import { z } from 'zod';
 import { GetDigestEmailDataQuery } from '../../src/emails';
 import { seed } from '../../src/tester';
 import { generateThreads } from './util';
-
 describe('Digest email lifecycle', () => {
   let communityOne: z.infer<typeof Community> | undefined;
   let communityTwo: z.infer<typeof Community> | undefined;
   let communityThree: z.infer<typeof Community> | undefined;
+  let recipientUser: z.infer<typeof User> | undefined;
 
   beforeAll(async () => {
+    [recipientUser] = await seed('User', {
+      isAdmin: false,
+      selected_community_id: null,
+    });
     const [authorUser] = await seed('User', {
       isAdmin: false,
       selected_community_id: null,
@@ -85,9 +89,17 @@ describe('Digest email lifecycle', () => {
           email: 'hello@knock.app',
         },
       },
-      payload: {},
+      payload: {
+        user_id: String(recipientUser!.id),
+      },
     });
-    expect(res).to.deep.equal({});
+    const unsubscribe_link = res?.unsubscribe_link;
+    expect(res).to.deep.equal({
+      threads: [],
+      numberOfThreads: 0,
+      unsubscribe_link: unsubscribe_link,
+    });
+
     await models.Community.update(
       {
         include_in_digest_email: false,
@@ -119,9 +131,16 @@ describe('Digest email lifecycle', () => {
           email: 'hello@knock.app',
         },
       },
-      payload: {},
+      payload: {
+        user_id: String(recipientUser!.id),
+      },
     });
-    expect(res).to.deep.equal({});
+    const unsubscribe_link = res?.unsubscribe_link;
+    expect(res).to.deep.equal({
+      threads: [],
+      numberOfThreads: 0,
+      unsubscribe_link: unsubscribe_link,
+    });
   });
 
   test('should return enriched threads for each community', async () => {
@@ -148,11 +167,20 @@ describe('Digest email lifecycle', () => {
           email: 'hello@knock.app',
         },
       },
-      payload: {},
+      payload: {
+        user_id: String(recipientUser!.id),
+      },
     });
 
-    expect(res![communityOne!.id!]!.length).to.equal(2);
-    expect(res![communityTwo!.id!]!.length).to.equal(1);
+    const filtercommunityOne = res?.threads.filter(
+      (thread) => thread.community_id == communityOne!.id,
+    );
+    const filtercommunityTwo = res?.threads.filter(
+      (thread) => thread.community_id == communityTwo!.id,
+    );
+
+    expect(filtercommunityOne!.length).to.equal(2);
+    expect(filtercommunityTwo!.length).to.equal(1);
 
     delete threadOne?.Address;
     delete threadOne?.collaborators;
@@ -167,20 +195,30 @@ describe('Digest email lifecycle', () => {
     delete threadFour?.reactions;
     delete threadFour?.ThreadVersionHistories;
 
-    expect(res![communityOne!.id!]![0]!).to.deep.equal({
-      name: communityOne!.name,
-      icon_url: communityOne!.icon_url,
-      ...threadOne,
-    });
-    expect(res![communityOne!.id!]![1]!).to.deep.equal({
-      name: communityOne!.name,
-      icon_url: communityOne!.icon_url,
-      ...threadTwo,
-    });
-    expect(res![communityTwo!.id!]![0]!).to.deep.equal({
-      name: communityTwo!.name,
-      icon_url: communityTwo!.icon_url,
-      ...threadFour,
-    });
+    if (filtercommunityOne && filtercommunityOne.length > 0) {
+      expect(filtercommunityOne[0]).to.deep.equal({
+        name: communityOne!.name,
+        icon_url: communityOne!.icon_url,
+        author: null,
+        ...threadOne,
+      });
+    }
+
+    if (filtercommunityOne && filtercommunityOne.length >= 1) {
+      expect(filtercommunityOne[1]).to.deep.equal({
+        name: communityOne!.name,
+        icon_url: communityOne!.icon_url,
+        author: null,
+        ...threadTwo,
+      });
+    }
+    if (filtercommunityTwo && filtercommunityTwo.length > 0) {
+      expect(filtercommunityTwo[0]).to.deep.equal({
+        name: communityTwo!.name,
+        icon_url: communityTwo!.icon_url,
+        author: null,
+        ...threadFour,
+      });
+    }
   });
 });

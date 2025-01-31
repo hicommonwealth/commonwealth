@@ -39,6 +39,7 @@ const FinishSocialLoginPage = lazy(
 );
 
 const NotificationsPage = lazy(() => import('views/pages/notifications'));
+const LeaderboardPage = lazy(() => import('views/pages/Leaderboard'));
 
 const NotificationSettings = lazy(
   () => import('views/pages/NotificationSettings'),
@@ -192,6 +193,15 @@ const CommonDomainRoutes = ({
           key="/createTokenCommunity"
           path="/createTokenCommunity"
           element={withLayout(LaunchToken, { type: 'common' })}
+        />,
+      ]
+    : []),
+  ...(xpEnabled
+    ? [
+        <Route
+          key="/leaderboard"
+          path="/leaderboard"
+          element={withLayout(LeaderboardPage, { type: 'common' })}
         />,
       ]
     : []),
@@ -664,7 +674,6 @@ const CommonDomainRoutes = ({
     path="/discussions"
     element={<Navigate to="/" />}
   />,
-  <Route key="/home" path="/home" element={<Navigate to="/" />} />,
   <Route
     key="/:scope/home"
     path="/:scope/home"

@@ -6,4 +6,9 @@ export const trpcRouter = trpc.router({
     SuperAdmin.TriggerNotificationsWorkflow,
     trpc.Tag.SuperAdmin,
   ),
+
+  enableDigestEmail: trpc.command(
+    SuperAdmin.EnableDigestEmail,
+    trpc.Tag.SuperAdmin,
+  ),
 });

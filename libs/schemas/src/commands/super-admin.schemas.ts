@@ -17,4 +17,13 @@ export const TriggerNotificationsWorkflow = {
   }),
 };
 
+export const EnableDigestEmail = {
+  input: z.object({
+    communityId: z.string(),
+  }),
+  output: z.object({
+    success: z.boolean(),
+  }),
+};
+
 export type Type1 = z.infer<typeof TriggerNotificationsWorkflow.input>;
