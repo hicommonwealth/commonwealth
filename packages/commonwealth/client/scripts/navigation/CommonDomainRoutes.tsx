@@ -15,6 +15,7 @@ const MarkdownHitHighlighterPage = lazy(
 const DashboardPage = lazy(() => import('views/pages/user_dashboard'));
 const CommunitiesPage = lazy(() => import('views/pages/Communities'));
 const SearchPage = lazy(() => import('views/pages/search'));
+const HomePage = lazy(() => import('views/pages/HomePage/HomePage'));
 
 const CreateCommunityPage = lazy(() => import('views/pages/CreateCommunity'));
 const CreateQuestPage = lazy(() => import('views/pages/CreateQuest'));
@@ -161,6 +162,11 @@ const CommonDomainRoutes = ({
     key="/"
     path="/"
     element={withLayout(DashboardPage, { type: 'common' })}
+  />,
+  <Route
+    key="/home"
+    path="/home"
+    element={withLayout(HomePage, { type: 'common' })}
   />,
   <Route
     key="/createCommunity"
@@ -668,7 +674,6 @@ const CommonDomainRoutes = ({
     path="/discussions"
     element={<Navigate to="/" />}
   />,
-  <Route key="/home" path="/home" element={<Navigate to="/" />} />,
   <Route
     key="/:scope/home"
     path="/:scope/home"

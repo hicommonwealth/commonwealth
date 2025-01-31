@@ -1,5 +1,4 @@
 import { WalletId } from '@hicommonwealth/shared';
-import { formatAddressShort } from 'client/scripts/helpers';
 import AddressInfo from 'client/scripts/models/AddressInfo';
 import NewProfile from 'client/scripts/models/NewProfile';
 import {
@@ -15,7 +14,8 @@ import { CWTooltip } from '../../component_kit/new_designs/CWTooltip';
 
 import { useGetCommunityByIdQuery } from 'client/scripts/state/api/communities';
 import { saveToClipboard } from 'client/scripts/utils/clipboard';
-import { CWTag } from '../../component_kit/new_designs/CWTag';
+import { formatAddressShort } from 'shared/utils';
+import { CWIdentificationTag } from '../../component_kit/new_designs/CWIdentificationTag';
 import './AddressItem.scss';
 
 type AddressItemProps = {
@@ -51,10 +51,10 @@ const AddressItem = (props: AddressItemProps) => {
     <div className="AddressItem">
       <div className="address-section">
         <div className="address">
-          <CWTag
-            label={formatAddressShort(address)}
-            type="address"
-            iconName="ethereum"
+          <CWIcon iconName="ethereum" iconSize="small" />
+          <CWIdentificationTag
+            iconLeft={walletId}
+            address={`\u2022 ${formatAddressShort(address)}`}
           />
         </div>
         <CWTooltip

@@ -10,6 +10,8 @@ type UseFetchQuestsProps = z.infer<typeof GetQuests.input> & {
 
 const useFetchQuestsQuery = ({
   community_id,
+  end_before,
+  start_after,
   limit,
   order_by,
   order_direction,
@@ -18,6 +20,8 @@ const useFetchQuestsQuery = ({
   return trpc.quest.getQuests.useInfiniteQuery(
     {
       community_id,
+      end_before,
+      start_after,
       limit,
       order_by,
       order_direction,

@@ -66,6 +66,10 @@ const useCreateCommentMutation = ({
       // reset comments cache state
       utils.comment.getComments.invalidate().catch(console.error);
 
+      // reset xp cache
+      utils.quest.getQuests.invalidate().catch(console.error);
+      utils.user.getXps.invalidate().catch(console.error);
+
       updateThreadInAllCaches(communityId || '', threadId, {
         numberOfComments: existingNumberOfComments + 1,
       });
