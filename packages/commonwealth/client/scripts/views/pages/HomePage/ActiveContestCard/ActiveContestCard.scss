@@ -1,12 +1,16 @@
 @import '../../../../styles/shared.scss';
 
 .ActiveContestCard {
-  border-radius: 6px;
-  padding: 16px;
-  border: 1px solid $neutral-100;
-  background: $white;
+  border-radius: $border-radius-corners;
+  padding: 12px;
   display: flex;
   flex-direction: column;
+  gap: 14px;
+  background-color: $white;
+  width: 335px;
+  min-height: 360px;
+  border: 1px solid $neutral-300;
+  cursor: pointer;
 
   &:hover {
     box-shadow: $elevation-2;
@@ -25,40 +29,21 @@
   }
 
   .contest-content {
-    padding-block: 4px;
-    flex: 1;
     display: flex;
     flex-direction: column;
+    gap: 12px;
+    padding-top: 0px;
+    flex-grow: 1;
 
-    .contest-header {
+    .heading {
       display: flex;
-      align-items: center;
 
-      gap: 8px;
-      margin-bottom: 8px;
-      position: relative;
-
-      .contest-title {
-        @include multiline-text-ellipsis(1);
-      }
-
-      .contest-icon-container {
-        position: absolute;
-        background: $white;
-        border-radius: 50%;
-        right: 8px;
-        top: -20px;
-        width: 30px;
-        height: 30px;
-
-        .contest-icon {
-          width: 100%;
-          height: 100%;
-
-          &.common-icon {
-            padding: 2px;
-          }
-        }
+      .basic-info {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        width: 100%;
+        margin-left: 8px;
       }
     }
 
@@ -66,20 +51,19 @@
       margin-bottom: 16px;
     }
 
-    .prizes-section {
-      margin-bottom: 16px;
+    .prize-list {
+      display: flex;
+      flex-direction: column;
+      padding: 0 2px;
+      margin-bottom: 10px;
 
-      .prize-list {
-        margin-top: 8px;
-
-        .prize-row {
-          display: flex;
-          justify-content: space-between;
-
-          .label {
-            color: $neutral-600;
-          }
-        }
+      .prize {
+        display: flex;
+        justify-content: space-between;
+        background-color: rgba(0, 0, 0, 0.05);
+        border-radius: 8px;
+        padding: 5px 15px;
+        margin-bottom: 5px;
       }
     }
 
@@ -93,6 +77,27 @@
       display: flex;
       align-items: center;
       height: 40px;
+      margin-top: auto;
+    }
+
+    .contest-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      margin-top: auto;
+    }
+
+    .action-btn {
+      button {
+        text-transform: capitalize;
+      }
+
+      &:focus-within {
+        border-width: 1px !important;
+        padding: 0 !important;
+      }
+
+      margin: 0 !important;
       margin-top: auto;
     }
   }

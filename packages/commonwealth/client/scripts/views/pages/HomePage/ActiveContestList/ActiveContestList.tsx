@@ -6,7 +6,9 @@ import useCommunityContests from '../../CommunityManagement/Contests/useCommunit
 
 import { CWIcon } from 'client/scripts/views/components/component_kit/cw_icons/cw_icon';
 import { Link } from 'react-router-dom';
-import ActiveContestCard from '../ActiveContestCard/ActiveContestCard';
+import ActiveContestCard, {
+  ActiveContest,
+} from '../ActiveContestCard/ActiveContestCard';
 import './ActiveContestList.scss';
 
 const ActiveContestList = () => {
@@ -16,9 +18,10 @@ const ActiveContestList = () => {
   } = useCommunityContests({
     fetchAll: true,
   });
+  const activeContestsLimited = activeContests.slice(0, 3);
 
   const communityIds = [
-    ...new Set(activeContests.map((contest) => contest.community_id)),
+    ...new Set(activeContestsLimited.map((contest) => contest.community_id)),
   ];
 
   const communityQueries = trpc.useQueries((t) =>
@@ -52,7 +55,7 @@ const ActiveContestList = () => {
         </Link>
       </div>
       <>
-        {!isContestDataLoading && activeContests.length === 0 && (
+        {!isContestDataLoading && activeContestsLimited.length === 0 && (
           <CWText type="h2" className="empty-contests">
             No active contests found
           </CWText>
@@ -66,10 +69,10 @@ const ActiveContestList = () => {
           </div>
         ) : (
           <div className="content">
-            {activeContests.map((contest) => (
+            {activeContestsLimited.map((contest) => (
               <ActiveContestCard
                 key={contest.contest_address}
-                contest={contest}
+                contest={contest as ActiveContest}
                 community={community[contest.community_id as string]}
               />
             ))}

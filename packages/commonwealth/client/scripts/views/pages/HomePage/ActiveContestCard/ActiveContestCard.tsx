@@ -1,24 +1,24 @@
-import clsx from 'clsx';
 import moment from 'moment';
-import React from 'react';
+import React, { ReactNode } from 'react';
 
-import commonLogo from 'assets/img/branding/common.svg';
-import farcasterUrl from 'assets/img/farcaster.svg';
 import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
 import { useGetContestBalanceQuery } from 'state/api/contests';
 import { Skeleton } from 'views/components/Skeleton';
-import { CWCommunityAvatar } from 'views/components/component_kit/cw_community_avatar';
-import { capDecimals } from 'views/modals/ManageCommunityStakeModal/utils';
 
+import { CWCommunityAvatar } from 'client/scripts/views/components/component_kit/cw_community_avatar';
+import { CWDivider } from 'client/scripts/views/components/component_kit/cw_divider';
 import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
 import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/CWButton';
-import { CWThreadAction } from 'client/scripts/views/components/component_kit/new_designs/cw_thread_action';
+import { CWTooltip } from 'client/scripts/views/components/component_kit/new_designs/CWTooltip';
+import { capDecimals } from 'client/scripts/views/modals/ManageCommunityStakeModal/utils';
 import { Contest } from '../../CommunityManagement/Contests/ContestsList';
 import ContestCountdown from '../../CommunityManagement/Contests/ContestsList/ContestCountdown';
 import './ActiveContestCard.scss';
 
+export type ActiveContest = Omit<Contest, 'name'> & { name: string };
+
 interface ActiveContestCardProps {
-  contest: Contest;
+  contest: ActiveContest;
   community: {
     name: string;
     iconUrl: string;
@@ -27,9 +27,17 @@ interface ActiveContestCardProps {
   };
 }
 
+const MAX_CHARS_FOR_LABELS = 14;
+
 const ActiveContestCard = ({ contest, community }: ActiveContestCardProps) => {
   const navigate = useCommonNavigate();
   const finishDate = moment(contest.contests?.[0].end_time).toISOString();
+
+  const { name } = contest;
+  const isNameTrimmed = name.length > MAX_CHARS_FOR_LABELS;
+  const trimmedName = isNameTrimmed
+    ? name.slice(0, MAX_CHARS_FOR_LABELS) + '...'
+    : name;
 
   const { data: contestBalance, isLoading: isContestBalanceLoading } =
     useGetContestBalanceQuery({
@@ -77,6 +85,29 @@ const ActiveContestCard = ({ contest, community }: ActiveContestCardProps) => {
     });
   };
 
+  const withOptionalTooltip = (
+    children: ReactNode,
+    content: string,
+    shouldDisplay,
+  ) => {
+    if (!shouldDisplay) return children;
+
+    return (
+      <CWTooltip
+        placement="bottom"
+        content={content}
+        renderTrigger={(handleInteraction) => (
+          <span
+            onMouseEnter={handleInteraction}
+            onMouseLeave={handleInteraction}
+          >
+            {children}
+          </span>
+        )}
+      />
+    );
+  };
+
   return (
     <div className="ActiveContestCard">
       <div className="contest-banner">
@@ -88,7 +119,7 @@ const ActiveContestCard = ({ contest, community }: ActiveContestCardProps) => {
       </div>
 
       <div className="contest-content">
-        <div className="contest-header">
+        <div className="heading">
           <CWCommunityAvatar
             onClick={() => {
               navigateToCommunity({
@@ -102,30 +133,25 @@ const ActiveContestCard = ({ contest, community }: ActiveContestCardProps) => {
               iconUrl: community.iconUrl,
             }}
           />
-
-          <CWText type="h3" fontWeight="medium" className="contest-title">
-            {contest.name}
-            <div className="contest-icon-container">
-              <img
-                className={clsx(
-                  'contest-icon',
-                  !contest.is_farcaster_contest && 'common-icon',
-                )}
-                src={contest.is_farcaster_contest ? farcasterUrl : commonLogo}
-              />
-            </div>
-          </CWText>
-        </div>
-
-        <div className="contest-timing">
+          <div className="basic-info" onClick={() => {}}>
+            {withOptionalTooltip(
+              <CWText className="text-dark" type="h4" fontWeight="regular">
+                {trimmedName}
+              </CWText>,
+              name,
+              isNameTrimmed,
+            )}
+          </div>
           <ContestCountdown finishTime={finishDate} isActive />
         </div>
 
-        <div className="prizes-section">
-          <CWText type="b2" fontWeight="medium">
-            Current Prizes
-          </CWText>
-          <div className="prize-list">
+        <CWDivider />
+        <CWText type="h5" fontWeight="semiBold">
+          Current Prizes
+        </CWText>
+
+        <div className="prize-list">
+          <div>
             {isContestBalanceLoading ? (
               <>
                 <Skeleton width="100%" height="20px" />
@@ -134,11 +160,11 @@ const ActiveContestCard = ({ contest, community }: ActiveContestCardProps) => {
               </>
             ) : prizes.length > 0 ? (
               prizes?.map((prize, index) => (
-                <div className="prize-row" key={index}>
-                  <CWText className="label">
+                <div className="prize">
+                  <CWText fontWeight="medium">
                     {moment.localeData().ordinal(index + 1)} Prize
                   </CWText>
-                  <CWText fontWeight="bold">
+                  <CWText fontWeight="medium">
                     {capDecimals(String(prize))} {contest.ticker}
                   </CWText>
                 </div>
@@ -149,23 +175,20 @@ const ActiveContestCard = ({ contest, community }: ActiveContestCardProps) => {
           </div>
         </div>
 
-        <div className="contest-actions">
-          <CWThreadAction
-            action="leaderboard"
+        <div className="contest-row">
+          <CWButton
             label="Leaderboard"
             onClick={handleLeaderboardClick}
-          />
-        </div>
-
-        <div className="cta-button-container">
-          <CWButton
-            buttonHeight="sm"
             buttonWidth="full"
-            label="Go to contest"
             buttonType="secondary"
-            buttonAlt="green"
-            className="cta-button"
-            onClick={handleGoToContest}
+            buttonHeight="sm"
+          />
+          <CWButton
+            label="Go to Contest"
+            buttonWidth="full"
+            buttonType="primary"
+            buttonHeight="sm"
+            onClick={() => handleGoToContest}
           />
         </div>
       </div>
