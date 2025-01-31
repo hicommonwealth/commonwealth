@@ -1,4 +1,3 @@
-import { AvailableFeatureFlag } from 'client/scripts/helpers/feature-flags';
 import { findDenominationString } from 'helpers/findDenomination';
 import { useFlag } from 'hooks/useFlag';
 import React, { useRef, useState } from 'react';
@@ -10,12 +9,12 @@ import ManageCommunityStakeModal from '../../modals/ManageCommunityStakeModal/Ma
 import IdeaLaunchpad from '../Communities/IdeaLaunchpad';
 import ActiveContestList from './ActiveContestList/ActiveContestList';
 import './HomePage.scss';
+import TrendingTokensList from './TrendingTokenList/TrendingTokenList';
+import XpQuestList from './XpQuestList/XpQuestList';
 
 const HomePage = () => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const tokenizedCommunityEnabled = useFlag(
-    'tokenizedCommunity' as AvailableFeatureFlag,
-  );
+  const homePageEnabled = useFlag('homePage');
 
   const {
     setModeOfManageCommunityStakeModal,
@@ -31,13 +30,15 @@ const HomePage = () => {
           <div className="description">
             <CWText
               type="h1"
-              {...(tokenizedCommunityEnabled && { fontWeight: 'semiBold' })}
+              {...(homePageEnabled && { fontWeight: 'semiBold' })}
             >
               Home
             </CWText>
           </div>
           <IdeaLaunchpad />
+          <TrendingTokensList />
           <ActiveContestList />
+          <XpQuestList />
         </div>
         <CWModal
           size="small"
