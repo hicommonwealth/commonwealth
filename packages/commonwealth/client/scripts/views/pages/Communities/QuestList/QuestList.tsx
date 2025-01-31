@@ -23,7 +23,8 @@ const QuestList = () => {
   } = useFetchQuestsQuery({
     cursor: 1,
     limit: 8,
-    start_after: moment().startOf('day').toDate(),
+    start_after: moment().startOf('week').toDate(),
+    end_before: moment().endOf('week').toDate(),
     enabled: xpEnabled,
   });
   const quests = (questsList?.pages || []).flatMap((page) => page.results);
