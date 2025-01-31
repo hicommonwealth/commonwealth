@@ -151,3 +151,18 @@ export const GetXps = {
   }),
   output: z.array(XpLogView),
 };
+
+export const RandomResourceIdsView = z.object({
+  community_id: z.string(),
+  thread_id: z.number(),
+  comment_id: z.number(),
+});
+
+export const GetRandomResourceIds = {
+  input: PaginationParamsSchema.extend({
+    exclude_joined_communities: z.boolean().optional(),
+  }),
+  output: PaginatedResultSchema.extend({
+    results: z.array(RandomResourceIdsView),
+  }),
+};
