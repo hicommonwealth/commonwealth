@@ -1,3 +1,4 @@
+import { commonProtocol } from '@hicommonwealth/evm-protocols';
 import colors from '../../../../../../../styles/mixins/colors.module.scss';
 
 export const INITIAL_PERCENTAGE_VALUE = 10;
@@ -62,4 +63,12 @@ export const createNewTopicOption = {
   label: 'Create new topic',
   helpText: '',
   weightedVoting: null,
+};
+
+export const getChainName = (chainId: number): string => {
+  return (
+    Object.entries(commonProtocol.ValidChains).find(
+      ([_, value]) => value === chainId,
+    )?.[0] ?? 'Unknown'
+  );
 };

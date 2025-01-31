@@ -34,6 +34,7 @@ import {
   ContestRecurringType,
   LaunchContestStep,
 } from '../../types';
+import ContestTopicDescription from './ContestTopicDescription';
 import CustomContestTopicOption from './CustomContestTopicOption';
 import './DetailsFormStep.scss';
 import PayoutRow from './PayoutRow';
@@ -318,13 +319,17 @@ const DetailsFormStep = ({
                       }
                     }}
                   />
+                  <ContestTopicDescription
+                    topic={watch('contestTopic')}
+                    topicsData={topicsData}
+                  />
                 </div>
               )}
 
               <div className="contest-section contest-section-name">
                 <CWText type="h4">Name your contest</CWText>
                 <CWText type="b1">
-                  We recommend naming your contest if you’re going to have
+                  We recommend naming your contest if you&apos;re going to have
                   multiple contest
                 </CWText>
                 <CWTextInput
