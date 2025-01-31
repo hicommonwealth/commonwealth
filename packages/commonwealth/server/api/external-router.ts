@@ -5,6 +5,7 @@ import {
   Contest,
   Feed,
   Thread,
+  Token,
   User,
 } from '@hicommonwealth/model';
 import cors from 'cors';
@@ -57,7 +58,7 @@ const {
 const { getNewContent } = user.trpcRouter;
 const { createContestMetadata, updateContestMetadata, cancelContestMetadata } =
   contest.trpcRouter;
-const { createToken, createTrade, getTokens } = launchpad.trpcRouter;
+const { createToken, createTrade, getLaunchpadTrades } = launchpad.trpcRouter;
 
 const api = {
   getGlobalActivity: trpc.query(Feed.GetGlobalActivity, trpc.Tag.User, {
@@ -117,7 +118,10 @@ const api = {
   toggleCommentSpam,
   createToken,
   createTrade,
-  getTokens,
+  getTokens: trpc.query(Token.GetLaunchpadTokens, trpc.Tag.Token, {
+    forceSecure: true,
+  }),
+  getLaunchpadTrades,
 };
 
 const PATH = '/api/v1';
