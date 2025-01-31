@@ -24,8 +24,6 @@ const QuestList = () => {
     cursor: 1,
     limit: 8,
     end_after: moment().startOf('week').toDate(),
-    start_before: moment().endOf('week').toDate(),
-    end_before: moment().endOf('week').toDate(),
     enabled: xpEnabled,
   });
   const quests = (questsList?.pages || []).flatMap((page) => page.results);
