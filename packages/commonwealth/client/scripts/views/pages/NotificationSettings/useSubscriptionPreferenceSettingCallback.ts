@@ -48,8 +48,6 @@ export function useSubscriptionPreferenceSettingCallback(
         if (activate) {
           // *** we have to first request permissions if we're activating.
 
-          // FIXME: this is only needed on mobile...
-
           if (isMobileApp()) {
             const existingPermissions =
               await MobileNotifications.getPermissionsAsync();
