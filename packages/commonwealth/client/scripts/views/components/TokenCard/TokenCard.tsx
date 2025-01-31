@@ -1,10 +1,10 @@
 import clsx from 'clsx';
 import { currencyNameToSymbolMap, SupportedCurrencies } from 'helpers/currency';
-import React, { ReactNode } from 'react';
-import { TradingMode } from '../../modals/TradeTokenModel';
-import { CWText } from '../component_kit/cw_text';
-import { CWButton } from '../component_kit/new_designs/CWButton';
-import { CWTooltip } from '../component_kit/new_designs/CWTooltip';
+import React from 'react';
+import { CWText } from 'views/components/component_kit/cw_text';
+import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
+import { withTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
+import { TradingMode } from 'views/modals/TradeTokenModel';
 import FractionalValue from '../FractionalValue';
 import MarketCapProgress from './MarketCapProgress';
 import PricePercentageChange from './PricePercentageChange';
@@ -53,29 +53,6 @@ const TokenCard = ({
     ? symbol.slice(0, MAX_CHARS_FOR_LABELS) + '...'
     : symbol;
 
-  const withOptionalTooltip = (
-    children: ReactNode,
-    content: string,
-    shouldDisplay,
-  ) => {
-    if (!shouldDisplay) return children;
-
-    return (
-      <CWTooltip
-        placement="bottom"
-        content={content}
-        renderTrigger={(handleInteraction) => (
-          <span
-            onMouseEnter={handleInteraction}
-            onMouseLeave={handleInteraction}
-          >
-            {children}
-          </span>
-        )}
-      />
-    );
-  };
-
   return (
     <div
       role="button"
@@ -87,14 +64,14 @@ const TokenCard = ({
       {/* name and price row */}
       <div className="basic-info" onClick={handleBodyClick}>
         <div className="col">
-          {withOptionalTooltip(
+          {withTooltip(
             <CWText className="text-dark" type="h4" fontWeight="regular">
               {trimmedName}
             </CWText>,
             name,
             isNameTrimmed,
           )}
-          {withOptionalTooltip(
+          {withTooltip(
             <CWText className="text-light">{trimmedSymbol}</CWText>,
             symbol,
             isSymbolTrimmed,
