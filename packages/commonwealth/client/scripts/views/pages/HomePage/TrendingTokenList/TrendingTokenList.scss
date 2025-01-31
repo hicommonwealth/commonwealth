@@ -13,6 +13,10 @@
     .link-right {
       display: flex;
       gap: 4px;
+
+      &:hover {
+        filter: brightness(1.2);
+      }
     }
   }
 
