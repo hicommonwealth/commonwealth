@@ -1,4 +1,5 @@
 import { AvailableFeatureFlag } from 'client/scripts/helpers/feature-flags';
+import { useFetchGlobalActivityQuery } from 'client/scripts/state/api/feeds/fetchUserActivity';
 import { findDenominationString } from 'helpers/findDenomination';
 import { useFlag } from 'hooks/useFlag';
 import React, { useRef, useState } from 'react';
@@ -9,6 +10,7 @@ import { CWModal } from '../../components/component_kit/new_designs/CWModal';
 import ManageCommunityStakeModal from '../../modals/ManageCommunityStakeModal/ManageCommunityStakeModal';
 import IdeaLaunchpad from '../Communities/IdeaLaunchpad';
 import './HomePage.scss';
+import TrendingThreadList from './TrendingThreadList/TrendingThreadList';
 
 const HomePage = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -36,6 +38,7 @@ const HomePage = () => {
             </CWText>
           </div>
           <IdeaLaunchpad />
+          <TrendingThreadList query={useFetchGlobalActivityQuery} />
         </div>
         <CWModal
           size="small"
