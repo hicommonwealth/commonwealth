@@ -36,6 +36,7 @@ type MessageWithResponseID = {};
 class Latch<T> {
   promise: Promise<T>;
   resolve!: (value: T | PromiseLike<T>) => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   reject!: (reason?: any) => void;
 
   constructor() {
@@ -63,10 +64,12 @@ export async function execWithinMobileApp<
 
   const latch = new Latch<Output>();
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   function messageToObject(message: string | object): any {
     return typeof message === 'string' ? JSON.parse(message) : message;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   function handler(message: MessageEvent<any>) {
     const dataObj = messageToObject(message.data);
 

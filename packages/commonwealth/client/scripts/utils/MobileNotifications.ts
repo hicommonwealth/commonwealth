@@ -32,6 +32,7 @@ export interface PermissionResponse {
 
 export class MobileNotifications {
   public static async getPermissionsAsync(): Promise<PermissionResponse> {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const response = await execWithinMobileApp<any, any>({
       type: 'Notifications.getPermissionsAsync',
     });
@@ -44,6 +45,7 @@ export class MobileNotifications {
   }
 
   public static async requestPermissionsAsync(): Promise<PermissionResponse> {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const response = await execWithinMobileApp<any, any>({
       type: 'Notifications.requestPermissionsAsync',
     });
