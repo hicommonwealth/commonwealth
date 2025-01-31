@@ -1,7 +1,8 @@
 @import '../../../../styles/shared';
 
-.XpQuestList {
+.TokensList {
   margin: 16px 0;
+  width: 100%;
 
   .heading-container {
     display: flex;
@@ -19,23 +20,30 @@
     }
   }
 
-  .content {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 15px;
-    justify-content: start;
-    margin: 10px 0;
-
-    @include extraSmall {
-      flex-direction: column;
-      flex-wrap: nowrap;
-    }
+  .blue-text {
+    color: $primary-500;
   }
 
-  .empty-quests {
-    margin: 24px auto;
+  .list {
+    max-width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin: 16px 0;
+    padding: 8px;
+  }
+
+  .list::-webkit-scrollbar {
+    display: none;
+  }
+
+  .list {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .empty-placeholder {
     display: flex;
     justify-content: center;
-    text-align: center;
   }
 }

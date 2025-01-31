@@ -111,6 +111,7 @@ const RewardsPage = lazy(() => import('views/pages/RewardsPage'));
 const CustomDomainRoutes = ({
   launchpadEnabled,
   xpEnabled,
+  homePageEnable,
 }: RouteFeatureFlags) => {
   return [
     <Route
@@ -158,11 +159,15 @@ const CustomDomainRoutes = ({
           />,
         ]
       : []),
-    <Route
-      key="/home"
-      path="/home"
-      element={withLayout(HomePage, { type: 'common' })}
-    />,
+    ...(homePageEnable
+      ? [
+          <Route
+            key="/home"
+            path="/home"
+            element={withLayout(HomePage, { type: 'common' })}
+          />,
+        ]
+      : []),
     <Route
       key="/search"
       path="/search"
