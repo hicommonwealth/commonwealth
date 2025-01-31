@@ -31,6 +31,7 @@ export function buildFarcasterManifest() {
       buttonTitle: `Check out Commonwealth`,
       splashImageUrl: `https://${config.CONTESTS.FARCASTER_MANIFEST_DOMAIN}/public/brand_assets/common-white.png`,
       splashBackgroundColor: `#ffffff`,
+      // eslint-disable-next-line max-len
       webhookUrl: `https://${config.CONTESTS.FARCASTER_MANIFEST_DOMAIN}/api/integration/farcaster/contests/NotificationsWebhook`,
     },
   };
