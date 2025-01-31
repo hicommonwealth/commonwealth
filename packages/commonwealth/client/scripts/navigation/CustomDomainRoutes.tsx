@@ -5,6 +5,7 @@ import { withLayout } from 'views/Layout';
 import { RouteFeatureFlags } from './Router';
 
 const SearchPage = lazy(() => import('views/pages/search'));
+const HomePage = lazy(() => import('views/pages/HomePage/HomePage'));
 
 const CreateCommunityPage = lazy(() => import('views/pages/CreateCommunity'));
 const CreateQuestPage = lazy(() => import('views/pages/CreateQuest'));
@@ -32,6 +33,7 @@ const NotificationsPage = lazy(() => import('views/pages/notifications'));
 const NotificationSettings = lazy(
   () => import('views/pages/NotificationSettings'),
 );
+const LeaderboardPage = lazy(() => import('views/pages/Leaderboard'));
 
 const ProposalsPage = lazy(() => import('views/pages/proposals'));
 const ViewProposalPage = lazy(() => import('views/pages/view_proposal/index'));
@@ -147,7 +149,20 @@ const CustomDomainRoutes = ({
           />,
         ]
       : []),
-    <Route key="/home" path="/home" element={<Navigate to="/overview" />} />,
+    ...(xpEnabled
+      ? [
+          <Route
+            key="/leaderboard"
+            path="/leaderboard"
+            element={withLayout(LeaderboardPage, { type: 'common' })}
+          />,
+        ]
+      : []),
+    <Route
+      key="/home"
+      path="/home"
+      element={withLayout(HomePage, { type: 'common' })}
+    />,
     <Route
       key="/search"
       path="/search"

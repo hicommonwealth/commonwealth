@@ -473,20 +473,21 @@ function setupRouter(
 
       for await (const chunk of ideaGenerator) {
         // generation error
-        if (chunk.error) {
+        if ((chunk as { error?: string }).error) {
           return res.end(
-            JSON.stringify({ status: 'failure', message: chunk.error }) + '\n',
+            JSON.stringify({
+              status: 'failure',
+              message: (chunk as { error?: string }).error,
+            }) + '\n',
           );
         }
 
         // stream chunks as they are generated
-        res.write(JSON.stringify(chunk.tokenIdea) + '\n');
+        res.write(chunk);
         res.flush();
       }
 
-      return res.end(
-        JSON.stringify({ status: 'success', message: 'stream ended' }) + '\n',
-      );
+      return res.end();
     },
   );
 

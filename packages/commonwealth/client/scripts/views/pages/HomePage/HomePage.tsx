@@ -12,7 +12,7 @@ import ActiveContestList from './ActiveContestList/ActiveContestList';
 import './HomePage.scss';
 
 const HomePage = () => {
-  const containerRef = useRef();
+  const containerRef = useRef<HTMLDivElement>(null);
   const tokenizedCommunityEnabled = useFlag(
     'tokenizedCommunity' as AvailableFeatureFlag,
   );
@@ -25,7 +25,6 @@ const HomePage = () => {
   const [selectedCommunityId] = useState<string>();
 
   return (
-    // @ts-expect-error <StrictNullChecks/>
     <CWPageLayout ref={containerRef} className="CommunitiesPageLayout">
       <div className="HomePage">
         <div className="header-section">
