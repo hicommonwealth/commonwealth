@@ -17,12 +17,14 @@
 
   .content {
     display: flex;
+    flex-wrap: wrap;
     gap: 15px;
     justify-content: start;
     margin: 10px 0;
 
     @include extraSmall {
       flex-direction: column;
+      flex-wrap: nowrap;
     }
   }
 
