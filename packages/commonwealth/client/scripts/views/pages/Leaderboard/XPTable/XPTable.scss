@@ -1,6 +1,8 @@
 @import '../../../../styles/shared';
 
 .XPTable {
+  @include table-cell;
+
   @include smallInclusive {
     max-height: 300px;
     overflow: scroll;

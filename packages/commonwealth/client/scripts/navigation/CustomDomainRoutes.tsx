@@ -5,6 +5,7 @@ import { withLayout } from 'views/Layout';
 import { RouteFeatureFlags } from './Router';
 
 const SearchPage = lazy(() => import('views/pages/search'));
+const HomePage = lazy(() => import('views/pages/HomePage/HomePage'));
 
 const CreateCommunityPage = lazy(() => import('views/pages/CreateCommunity'));
 const CreateQuestPage = lazy(() => import('views/pages/CreateQuest'));
@@ -110,6 +111,7 @@ const RewardsPage = lazy(() => import('views/pages/RewardsPage'));
 const CustomDomainRoutes = ({
   launchpadEnabled,
   xpEnabled,
+  homePageEnable,
 }: RouteFeatureFlags) => {
   return [
     <Route
@@ -157,7 +159,15 @@ const CustomDomainRoutes = ({
           />,
         ]
       : []),
-    <Route key="/home" path="/home" element={<Navigate to="/overview" />} />,
+    ...(homePageEnable
+      ? [
+          <Route
+            key="/home"
+            path="/home"
+            element={withLayout(HomePage, { type: 'common' })}
+          />,
+        ]
+      : []),
     <Route
       key="/search"
       path="/search"

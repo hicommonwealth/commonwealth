@@ -58,6 +58,7 @@ export const Quest = z
     id: PG_INT.nullish(),
     name: z.string().max(255),
     description: z.string().max(1000),
+    image_url: z.string(),
     start_date: z.coerce.date(),
     end_date: z.coerce.date(),
     created_at: z.coerce.date().optional(),

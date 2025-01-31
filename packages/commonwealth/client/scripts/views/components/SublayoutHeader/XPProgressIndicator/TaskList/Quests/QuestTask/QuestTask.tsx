@@ -1,6 +1,6 @@
 import clsx from 'clsx';
+import { calculateQuestTimelineLabel } from 'helpers/quest';
 import React from 'react';
-
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import './QuestTask.scss';
@@ -12,7 +12,8 @@ type QuestTaskProps = {
     imageURL: string;
     title: string;
     xpPoints: number;
-    daysLeftBeforeEnd: number;
+    endDate: Date;
+    startDate: Date;
   };
 };
 
@@ -26,8 +27,15 @@ const QuestTask = ({ className, quest, onClick }: QuestTaskProps) => {
         <CWText type="b1">{quest.title}</CWText>
         <div className="xp-row">
           <CWTag label={`${quest.xpPoints} XP`} type="proposal" />
-          <CWText type="caption" className="days-left" fontWeight="semiBold">
-            {quest.daysLeftBeforeEnd} days left
+          <CWText
+            type="caption"
+            className="timeline-label"
+            fontWeight="semiBold"
+          >
+            {calculateQuestTimelineLabel({
+              startDate: quest.startDate,
+              endDate: quest.endDate,
+            })}
           </CWText>
         </div>
       </div>
