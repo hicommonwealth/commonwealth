@@ -5,9 +5,11 @@
   padding: 8px 16px;
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
   gap: 12px;
   background-color: $white;
-  width: 250px;
+  width: 330px;
+  height: 130px;
   border: 1px solid $neutral-300;
   cursor: pointer;
 
@@ -16,6 +18,13 @@
     align-items: center;
     justify-content: space-between;
     gap: 12px;
+
+    .token-details {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 9px;
+    }
 
     .image {
       width: 40px;
@@ -28,7 +37,9 @@
       flex-direction: column;
 
       .name {
+        font-weight: 600;
         color: $neutral-600;
+        font-size: 14px;
       }
 
       .detail {

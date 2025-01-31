@@ -38,18 +38,18 @@ const TreandingToken = ({
       onClick={handleBodyClick}
     >
       <div className="header">
-        <img src={iconURL} className="image" alt={name} />
-        <div className="info">
-          <CWText className="name" type="h5" fontWeight="semiBold">
-            {name}
-          </CWText>
-          <div className="detail">
-            <CWText className="creator" type="caption">
-              by
-            </CWText>
-            <CWText className="link" type="caption">
-              {symbol}
-            </CWText>
+        <div className="token-details">
+          <img src={iconURL} className="image" alt={name} />
+          <div className="info">
+            <div className="name">{name}</div>
+            <div className="detail">
+              <CWText className="creator" type="caption">
+                by
+              </CWText>
+              <CWText className="link" type="caption">
+                {symbol}
+              </CWText>
+            </div>
           </div>
         </div>
         <CWText className="price-change" type="h5" fontWeight="bold">

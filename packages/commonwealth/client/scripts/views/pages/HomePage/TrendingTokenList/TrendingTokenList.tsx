@@ -55,7 +55,7 @@ const TrendingTokensList = ({
 
   const { data: tokensList, isInitialLoading } = useFetchTokensQuery({
     cursor: 1,
-    limit: 4,
+    limit: 3,
     with_stats: true,
     order_by: (() => {
       if (
@@ -74,7 +74,9 @@ const TrendingTokensList = ({
     })(),
     enabled: launchpadEnabled,
   });
-  const tokens = (tokensList?.pages || []).flatMap((page) => page.results);
+  const tokens = (tokensList?.pages || [])
+    .flatMap((page) => page.results)
+    .slice(0, 3);
 
   const { data: ethToCurrencyRateData, isLoading: isLoadingETHToCurrencyRate } =
     useFetchTokenUsdRateQuery({

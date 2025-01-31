@@ -22,8 +22,8 @@
 
   .list {
     max-width: 100%;
-    overflow-x: auto;
     display: flex;
+    flex-wrap: wrap;
     gap: 16px;
     margin: 16px 0;
     padding: 8px;
