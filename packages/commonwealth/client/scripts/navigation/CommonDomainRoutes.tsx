@@ -123,10 +123,14 @@ const CommunityNotFoundPage = lazy(
 
 const UnSubscribePage = lazy(() => import('views/pages/UnSubscribePage'));
 const RewardsPage = lazy(() => import('views/pages/RewardsPage'));
+const CommunityHomePage = lazy(
+  () => import('../views/pages/CommunityHome/CommunityHomePage'),
+);
 
 const CommonDomainRoutes = ({
   launchpadEnabled,
   xpEnabled,
+  communityHomeEnabled,
 }: RouteFeatureFlags) => [
   <Route
     key="mobile-app-redirect"
@@ -357,6 +361,17 @@ const CommonDomainRoutes = ({
   // GOVERNANCE END
 
   // DISCUSSIONS
+  ...(communityHomeEnabled
+    ? [
+        <Route
+          key="/:scope/community-home"
+          path="/:scope/community-home"
+          element={withLayout(CommunityHomePage, {
+            scoped: true,
+          })}
+        />,
+      ]
+    : []),
   <Route
     key="/:scope/discussions"
     path="/:scope/discussions"

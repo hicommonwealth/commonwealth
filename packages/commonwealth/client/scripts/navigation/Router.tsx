@@ -15,6 +15,7 @@ import GeneralRoutes from './GeneralRoutes';
 export type RouteFeatureFlags = {
   launchpadEnabled: boolean;
   xpEnabled: boolean;
+  communityHomeEnabled: boolean;
 };
 
 const Router = () => {
@@ -22,10 +23,12 @@ const Router = () => {
 
   const launchpadEnabled = client.getBooleanValue('launchpad', false);
   const xpEnabled = client.getBooleanValue('xp', false);
+  const communityHomeEnabled = client.getBooleanValue('communityHome', false);
 
   const flags = {
     launchpadEnabled,
     xpEnabled,
+    communityHomeEnabled,
   };
 
   const { isCustomDomain } = fetchCachedCustomDomain() || {};
