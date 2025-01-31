@@ -56,3 +56,10 @@ export const contestDurationOptions = Array.from({ length: 7 }, (_, i) => {
 });
 
 export const initialContestDuration = contestDurationOptions[6].value;
+
+export const createNewTopicOption = {
+  value: 'create-new',
+  label: 'Create new topic',
+  helpText: '',
+  weightedVoting: null,
+};
