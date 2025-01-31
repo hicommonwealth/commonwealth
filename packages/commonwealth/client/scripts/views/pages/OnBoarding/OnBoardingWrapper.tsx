@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react';
 
-const OnBoardingWrapper = ({ children }: any) => {
+interface OnBoardingWrapperProps {
+  children: React.ReactNode;
+}
+const OnBoardingWrapper = ({ children }: OnBoardingWrapperProps) => {
   const [isWebView, setIsWebView] = useState(false);
   useEffect(() => {
     const isRNWebView = !!window.ReactNativeWebView;
