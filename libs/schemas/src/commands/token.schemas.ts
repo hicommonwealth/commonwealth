@@ -27,3 +27,15 @@ export const CreateLaunchpadTrade = {
   }),
   output: LaunchpadTradeView,
 };
+
+export const GetLaunchpadTrades = {
+  input: z.object({
+    token_address: z.string(),
+  }),
+  output: LaunchpadTrade.extend({
+    community_token_amount: z.string(),
+    floating_supply: z.string(),
+  })
+    .array()
+    .nullish(),
+};
