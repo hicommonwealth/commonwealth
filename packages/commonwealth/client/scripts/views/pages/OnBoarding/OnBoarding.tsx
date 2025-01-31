@@ -15,23 +15,27 @@ import CWPageLayout from '../../components/component_kit/new_designs/CWPageLayou
 import './OnBoarding.scss';
 const slides = [
   {
+    id: 1,
     title: '',
     animation: animation1,
   },
   {
+    id: 2,
     intro: 'Launch',
-    title: ' your own coin and grow it with friends',
+    title: ' your own coin and share it with friends',
     animation: animation2,
   },
   {
-    intro: 'Earn rewards for every',
-    title: 'post and upvote you create',
-    animation: animation3,
+    id: 3,
+    intro: ['Buy', 'and', 'sell'],
+    title: ' your favourite memes and tokens',
+    animation: animation4,
   },
   {
-    intro: 'Buy, sell, and follow',
-    title: 'memes and tokens you like',
-    animation: animation4,
+    id: 4,
+    intro: 'Earn rewards for every ',
+    title: 'post and upvote you create',
+    animation: animation3,
   },
 ];
 const OnBoarding = () => {
@@ -72,18 +76,32 @@ const OnBoarding = () => {
               <div className="animation-container">
                 <Lottie
                   animationData={slide.animation}
-                  loop={true} // Enable looping if desired
-                  autoPlay={true} // Automatically start the animation
+                  loop={true}
+                  autoPlay={true}
                   style={{ width: '100%', height: '100%' }}
                 />
               </div>
-              <div className="slide-title">
+              <div
+                className={`slide-title ${slide.id === 4 ? 'top' : 'bottom'}`}
+              >
                 <CWText
                   type="h2"
                   fontWeight="medium"
                   className="onboarding-title"
                 >
-                  <span>{slide.intro}</span>
+                  {Array.isArray(slide.intro) ? (
+                    slide.intro.map((word) =>
+                      word === 'and' ? (
+                        <CWText key={word}> {word} &nbsp;</CWText>
+                      ) : (
+                        <span key={index} style={{ fontWeight: 'bold' }}>
+                          {word}
+                        </span>
+                      ),
+                    )
+                  ) : (
+                    <span>{slide.intro}</span>
+                  )}
                   {slide.title}
                 </CWText>
               </div>

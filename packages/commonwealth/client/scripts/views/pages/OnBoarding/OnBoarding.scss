@@ -1,8 +1,8 @@
+@import '../../../styles/shared.scss';
 .OnBoarding {
   display: flex;
   height: 100vh;
   width: 100vw;
-  padding-top: 0.6rem;
   justify-content: center;
   overflow: hidden;
 
@@ -15,7 +15,7 @@
     position: relative;
     .swiper-pagination {
       position: absolute;
-      bottom: 5rem;
+      bottom: 94px;
       width: 100%;
       display: flex;
       justify-content: center;
@@ -49,31 +49,39 @@
         gap: 20px;
 
         .animation-container {
-          height: 60%;
-          max-height: 65%;
-
           overflow: hidden;
         }
 
         .slide-title {
+          position: absolute;
+
           display: flex;
           width: 100vw;
           overflow: hidden;
           padding: 10px;
           max-height: 20%;
           overflow: auto;
+          margin-left: 2%;
+          &.bottom {
+            bottom: 146px;
+          }
+          &.top {
+            top: 120px;
+          }
           .Text {
             display: inline;
             text-align: start;
-            font-size: 2rem;
-            line-height: 2rem;
-            font-weight: 400;
+            font-size: 43px;
+            line-height: 43px;
+            font-family: MDNichromeRegular;
+            width: 91%;
           }
           .onboarding-title {
             span {
-              font-size: 2rem;
+              font-size: 43px;
               font-weight: 700;
-              margin-right: 5px;
+              margin-right: 2px;
+              font-family: MDNichrome;
             }
           }
         }
@@ -89,5 +97,13 @@
     z-index: 99;
     cursor: pointer;
     border: 0px;
+    height: 48px !important;
+    .primary {
+      background-color: $primary-600 !important;
+      font-family: MDNichromeRegular;
+      .btn-border .Button.primary:hover .Text.button-text {
+        font-family: MDNichromeRegular !important;
+      }
+    }
   }
 }

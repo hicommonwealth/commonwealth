@@ -4,7 +4,6 @@ const OnBoardingWrapper = ({ children }: any) => {
   const [isWebView, setIsWebView] = useState(false);
   useEffect(() => {
     const isRNWebView = !!window.ReactNativeWebView;
-    console.log({ isRNWebView });
     setIsWebView(isRNWebView);
   }, []);
 
