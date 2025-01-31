@@ -10,7 +10,7 @@ import MarketCapProgress from './MarketCapProgress';
 import PricePercentageChange from './PricePercentageChange';
 import './TokenCard.scss';
 
-interface TokenCardProps {
+export interface TokenCardProps {
   name: string;
   symbol: string;
   iconURL: string;

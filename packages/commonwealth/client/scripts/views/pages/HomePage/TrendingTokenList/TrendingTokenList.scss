@@ -37,4 +37,9 @@
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
+
+  .empty-placeholder {
+    display: flex;
+    justify-content: center;
+  }
 }

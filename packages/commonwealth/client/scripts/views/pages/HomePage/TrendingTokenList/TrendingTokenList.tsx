@@ -12,7 +12,6 @@ import { useFetchTokenUsdRateQuery } from 'state/api/communityStake';
 import { useFetchTokensQuery } from 'state/api/tokens';
 import useUserStore from 'state/ui/user';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
 import { AuthModal } from 'views/modals/AuthModal';
 import TradeTokenModal, { TradingMode } from 'views/modals/TradeTokenModel';
@@ -54,15 +53,9 @@ const TrendingTokensList = ({
     shouldRunTrigger: user.isLoggedIn,
   });
 
-  const {
-    data: tokensList,
-    isInitialLoading,
-    isFetchingNextPage,
-    hasNextPage,
-    fetchNextPage,
-  } = useFetchTokensQuery({
+  const { data: tokensList, isInitialLoading } = useFetchTokensQuery({
     cursor: 1,
-    limit: 8,
+    limit: 4,
     with_stats: true,
     order_by: (() => {
       if (
@@ -73,7 +66,6 @@ const TrendingTokensList = ({
       ) {
         return communitySortOptionsLabelToKeysMap[
           filters.withCommunitySortBy
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
         ] as any;
       }
 
@@ -90,12 +82,6 @@ const TrendingTokensList = ({
   const ethToUsdRate = parseFloat(
     ethToCurrencyRateData?.data?.data?.amount || '0',
   );
-
-  const handleFetchMoreTokens = () => {
-    if (hasNextPage && !isFetchingNextPage) {
-      fetchNextPage().catch(console.error);
-    }
-  };
 
   const openAuthModalOrTriggerCallback = () => {
     if (user.isLoggedIn) {
@@ -138,14 +124,11 @@ const TrendingTokensList = ({
         <CWCircleMultiplySpinner />
       ) : tokens.length === 0 ? (
         <div
-          className={clsx('empty-placeholder', {
-            'my-16': launchpadEnabled,
-          })}
+          className={clsx('empty-placeholder', { 'my-16': launchpadEnabled })}
         >
           <CWText type="h2">
-            No tokens found
-            <br />
-            Launch a new token <Link to="/createTokenCommunity">here</Link>.
+            No tokens found Launch a new token&nbsp;
+            <Link to="/createTokenCommunity">here</Link>.
           </CWText>
         </div>
       ) : (
@@ -199,20 +182,6 @@ const TrendingTokensList = ({
             );
           })}
         </div>
-      )}
-      {isFetchingNextPage ? (
-        <div className="m-auto">
-          <CWCircleMultiplySpinner />
-        </div>
-      ) : hasNextPage && tokens.length > 0 ? (
-        <CWButton
-          label="See more"
-          buttonType="tertiary"
-          containerClassName="ml-auto"
-          onClick={handleFetchMoreTokens}
-        />
-      ) : (
-        <></>
       )}
       <AuthModal
         isOpen={isAuthModalOpen}

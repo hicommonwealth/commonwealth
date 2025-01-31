@@ -3,27 +3,15 @@ import {
   useCommonNavigate,
 } from 'client/scripts/navigation/helpers';
 import PricePercentageChange from 'client/scripts/views/components/TokenCard/PricePercentageChange';
+import { TokenCardProps } from 'client/scripts/views/components/TokenCard/TokenCard';
 import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
 import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/CWButton';
-import { TradingMode } from 'client/scripts/views/modals/TradeTokenModel';
 import clsx from 'clsx';
-import { SupportedCurrencies } from 'helpers/currency';
 import React from 'react';
 import './TrendingToken.scss';
 
-interface TokenCardProps {
+interface TrendingTokenCardProps extends TokenCardProps {
   communityId: string;
-  name: string;
-  symbol: string;
-  iconURL: string;
-  currency?: SupportedCurrencies;
-  marketCap: { current: number; goal: number; isCapped: boolean };
-  price: number;
-  pricePercentage24HourChange: number;
-  mode: TradingMode.Buy | TradingMode.Swap;
-  className?: string;
-  onCTAClick?: (mode: TradingMode) => void;
-  onCardBodyClick?: () => void;
 }
 
 const TreandingToken = ({
@@ -36,7 +24,7 @@ const TreandingToken = ({
   className,
   onCardBodyClick,
   onCTAClick,
-}: TokenCardProps) => {
+}: TrendingTokenCardProps) => {
   const navigate = useCommonNavigate();
 
   const handleBodyClick = (e: React.MouseEvent) =>
