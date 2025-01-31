@@ -4,14 +4,41 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, 160px);
   grid-gap: 30px;
-
-  .AddressContainer {
-    display: flex;
-    align-items: center;
-  }
 }
 
 .AddressDetails {
   display: flex;
   justify-content: space-between;
+}
+
+.AddressContainer {
+  display: flex;
+  align-items: center;
+
+  .address {
+    background-color: $neutral-200;
+    border-radius: 6px;
+    color: $neutral-600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: 140px;
+    gap: 4px;
+    padding-left: 2px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    .Icon {
+      width: 16px;
+      height: 16px;
+    }
+
+    .CWIdentificationTag {
+      svg {
+        width: 16px;
+        height: 16px;
+      }
+    }
+  }
 }
