@@ -64,6 +64,7 @@ type CardProps = AdminActionsProps & {
   hideSpamTag?: boolean;
   maxChars?: number;
   cutoffLines?: number;
+  showOnlyThreadActionIcons?: boolean;
 };
 
 export const ThreadCard = ({
@@ -107,6 +108,7 @@ export const ThreadCard = ({
   hideSpamTag = false,
   maxChars,
   cutoffLines,
+  showOnlyThreadActionIcons = false,
 }: CardProps) => {
   const navigate = useCommonNavigate();
   const user = useUserStore();
@@ -345,6 +347,7 @@ export const ThreadCard = ({
                   expandCommentBtnVisible={expandCommentBtnVisible}
                   showCommentVisible={showCommentVisible}
                   toggleShowComments={toggleShowComments}
+                  showOnlyThreadActionIcons={showOnlyThreadActionIcons}
                 />
               )}
             </div>

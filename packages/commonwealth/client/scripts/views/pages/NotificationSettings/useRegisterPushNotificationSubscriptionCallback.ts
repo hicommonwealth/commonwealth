@@ -6,7 +6,6 @@ import { useRegisterClientRegistrationTokenMutation } from 'state/api/trpc/subsc
 import { computeChannelTypeFromBrowserType } from 'views/pages/NotificationSettings/computeChannelTypeFromBrowserType';
 // eslint-disable-next-line max-len
 import useUserStore from 'state/ui/user';
-import { getFirebaseMessagingToken } from 'views/pages/NotificationSettings/getFirebaseMessagingToken';
 
 export function useRegisterPushNotificationSubscriptionCallback() {
   const registerClientRegistrationToken =
@@ -18,11 +17,23 @@ export function useRegisterPushNotificationSubscriptionCallback() {
     const channelType = computeChannelTypeFromBrowserType(browserType);
     if (!channelType) return;
 
+    console.log(
+      'Registering push notifications for channelType: ' + channelType,
+    );
+
     const permission = await Notification.requestPermission();
     if (permission === 'granted') {
       console.log(
         'Notification permission granted for channelType: ' + channelType,
       );
+
+      // this needs to be an async import so that it's not required inside the
+      // PWA thereby breaking the mobile app since navigator.serviceWorker is
+      // undefined there.
+      const { getFirebaseMessagingToken } = await import(
+        'views/pages/NotificationSettings/getFirebaseMessagingToken'
+      );
+
       const token = await getFirebaseMessagingToken();
       await registerClientRegistrationToken.mutateAsync({
         id: user.id,
