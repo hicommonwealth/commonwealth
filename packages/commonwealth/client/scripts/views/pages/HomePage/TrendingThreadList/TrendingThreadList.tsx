@@ -27,7 +27,7 @@ import { ThreadCard } from '../../discussions/ThreadCard';
 import { UserDashboardRowSkeleton } from '../../user_dashboard/user_dashboard_row';
 import './TrendingThreadList.scss';
 
-const DEFAULT_COUNT = 4;
+const DEFAULT_COUNT = 3;
 
 type TrendingThreadListProps = {
   query: typeof useFetchGlobalActivityQuery | typeof useFetchUserActivityQuery;
