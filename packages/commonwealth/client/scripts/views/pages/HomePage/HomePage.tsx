@@ -1,3 +1,4 @@
+import { useFetchGlobalActivityQuery } from 'client/scripts/state/api/feeds/fetchUserActivity';
 import { findDenominationString } from 'helpers/findDenomination';
 import { useFlag } from 'hooks/useFlag';
 import React, { useRef, useState } from 'react';
@@ -8,6 +9,7 @@ import { CWModal } from '../../components/component_kit/new_designs/CWModal';
 import ManageCommunityStakeModal from '../../modals/ManageCommunityStakeModal/ManageCommunityStakeModal';
 import IdeaLaunchpad from '../Communities/IdeaLaunchpad';
 import './HomePage.scss';
+import TrendingThreadList from './TrendingThreadList/TrendingThreadList';
 import TrendingTokensList from './TrendingTokenList/TrendingTokenList';
 import XpQuestList from './XpQuestList/XpQuestList';
 
@@ -35,9 +37,10 @@ const HomePage = () => {
             </CWText>
           </div>
           <IdeaLaunchpad />
+          <TrendingTokensList />
+          <XpQuestList />
+          <TrendingThreadList query={useFetchGlobalActivityQuery} />
         </div>
-        <TrendingTokensList />
-        <XpQuestList />
         <CWModal
           size="small"
           content={
