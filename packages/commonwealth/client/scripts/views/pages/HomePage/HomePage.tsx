@@ -8,6 +8,7 @@ import { CWText } from '../../components/component_kit/cw_text';
 import { CWModal } from '../../components/component_kit/new_designs/CWModal';
 import ManageCommunityStakeModal from '../../modals/ManageCommunityStakeModal/ManageCommunityStakeModal';
 import IdeaLaunchpad from '../Communities/IdeaLaunchpad';
+import ActiveContestList from './ActiveContestList/ActiveContestList';
 import './HomePage.scss';
 import TrendingThreadList from './TrendingThreadList/TrendingThreadList';
 import TrendingTokensList from './TrendingTokenList/TrendingTokenList';
@@ -37,10 +38,11 @@ const HomePage = () => {
             </CWText>
           </div>
           <IdeaLaunchpad />
-          <TrendingTokensList />
-          <XpQuestList />
-          <TrendingThreadList query={useFetchGlobalActivityQuery} />
         </div>
+        <TrendingTokensList />
+        <ActiveContestList />
+        <XpQuestList />
+        <TrendingThreadList query={useFetchGlobalActivityQuery} />
         <CWModal
           size="small"
           content={
