@@ -527,7 +527,6 @@ export async function handleSocialLoginCallback({
           magicAddress,
           session: session && serializeCanvas(session),
           walletSsoSource,
-          telegramData,
         },
       },
       {
