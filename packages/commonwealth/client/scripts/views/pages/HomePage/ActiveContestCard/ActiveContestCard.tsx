@@ -160,7 +160,7 @@ const ActiveContestCard = ({ contest, community }: ActiveContestCardProps) => {
               </>
             ) : prizes.length > 0 ? (
               prizes?.map((prize, index) => (
-                <div className="prize">
+                <div key={index} className="prize">
                   <CWText fontWeight="medium">
                     {moment.localeData().ordinal(index + 1)} Prize
                   </CWText>
