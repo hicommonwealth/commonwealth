@@ -71,7 +71,6 @@ const SSO_OPTIONS_MOBILE: AuthSSOs[] = [
   'apple',
   'email',
   'SMS',
-  'telegram',
 ] as const;
 
 const SSO_OPTIONS = mobileApp ? SSO_OPTIONS_MOBILE : SSO_OPTIONS_DEFAULT;
