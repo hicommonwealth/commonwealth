@@ -23,7 +23,8 @@ const QuestList = () => {
   } = useFetchQuestsQuery({
     cursor: 1,
     limit: 8,
-    start_after: moment().startOf('week').toDate(),
+    end_after: moment().startOf('week').toDate(),
+    start_before: moment().endOf('week').toDate(),
     end_before: moment().endOf('week').toDate(),
     enabled: xpEnabled,
   });

@@ -16,7 +16,8 @@ const QuestsExplorer = () => {
   const { data: questsList, isInitialLoading } = useFetchQuestsQuery({
     cursor: 1,
     limit: 2,
-    start_after: moment().startOf('week').toDate(),
+    end_after: moment().startOf('week').toDate(),
+    start_before: moment().endOf('week').toDate(),
     end_before: moment().endOf('week').toDate(),
     enabled: xpEnabled,
   });

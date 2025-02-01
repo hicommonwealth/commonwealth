@@ -23,7 +23,8 @@ const useXPProgress = () => {
     useFetchQuestsQuery({
       cursor: 1,
       limit: 40,
-      start_after: moment().startOf('week').toDate(),
+      end_after: moment().startOf('week').toDate(),
+      start_before: moment().endOf('week').toDate(),
       end_before: moment().endOf('week').toDate(),
       enabled: user.isLoggedIn && xpEnabled,
     });
@@ -37,8 +38,10 @@ const useXPProgress = () => {
   const upcomingWeeklyQuests = allPendingWeeklyQuests.filter((q) =>
     moment().isBefore(moment(q.start_date)),
   );
-  const activeWeeklyQuests = allPendingWeeklyQuests.filter((q) =>
-    moment().isSameOrAfter(moment(q.start_date)),
+  const activeWeeklyQuests = allPendingWeeklyQuests.filter(
+    (q) =>
+      moment().isSameOrAfter(moment(q.start_date)) &&
+      moment().isBefore(moment(q.end_date)),
   );
   const pendingWeeklyQuests = {
     upcomingWeeklyQuests,
