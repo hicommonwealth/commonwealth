@@ -383,6 +383,9 @@ function getProfileMetadata({ provider, userInfo }): {
     return { username: userInfo.name, avatarUrl: userInfo.profile };
   } else if (provider === 'google') {
     return { username: userInfo.name, avatarUrl: userInfo.picture };
+  } else if (provider === 'telegram') {
+    // Telegram Mini App provides user data in a specific format
+    return { username: userInfo.name, avatarUrl: userInfo.picture };
   }
   return {};
 }
@@ -442,6 +445,11 @@ export async function handleSocialLoginCallback({
       bearer = result.magic.idToken;
       console.log('Magic redirect result:', result);
     }
+
+    if (walletSsoSource === WalletSsoSource.Telegram) {
+      console.log('Telegram auth data:', result.oauth.userInfo);
+    }
+
     // Get magic metadata
     profileMetadata = getProfileMetadata(result.oauth);
     if (isCosmos) {
@@ -519,6 +527,7 @@ export async function handleSocialLoginCallback({
           magicAddress,
           session: session && serializeCanvas(session),
           walletSsoSource,
+          telegramData,
         },
       },
       {

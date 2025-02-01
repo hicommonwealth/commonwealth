@@ -166,4 +166,11 @@ export const AUTH_TYPES: AuthTypesList = {
     },
     label: 'Farcaster',
   },
+  telegram: {
+    icon: {
+      name: 'telegram',
+      isCustom: false,
+    },
+    label: 'Telegram',
+  },
 };
