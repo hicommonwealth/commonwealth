@@ -188,7 +188,7 @@ const ActiveContestCard = ({ contest, community }: ActiveContestCardProps) => {
             buttonWidth="full"
             buttonType="primary"
             buttonHeight="sm"
-            onClick={() => handleGoToContest}
+            onClick={handleGoToContest}
           />
         </div>
       </div>
