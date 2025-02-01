@@ -131,6 +131,7 @@ const CommonDomainRoutes = ({
   launchpadEnabled,
   xpEnabled,
   communityHomeEnabled,
+  homePageEnable,
 }: RouteFeatureFlags) => [
   <Route
     key="mobile-app-redirect"
@@ -161,12 +162,21 @@ const CommonDomainRoutes = ({
     path="/_internal/markdown-viewer"
     element={<MarkdownViewerPage />}
   />,
-
-  <Route
-    key="/"
-    path="/"
-    element={withLayout(DashboardPage, { type: 'common' })}
-  />,
+  ...(homePageEnable
+    ? [
+        <Route
+          key="/"
+          path="/"
+          element={withLayout(HomePage, { type: 'common' })}
+        />,
+      ]
+    : [
+        <Route
+          key="/"
+          path="/"
+          element={withLayout(DashboardPage, { type: 'common' })}
+        />,
+      ]),
   <Route
     key="/home"
     path="/home"
@@ -209,16 +219,36 @@ const CommonDomainRoutes = ({
         />,
       ]
     : []),
-  <Route
-    key="/dashboard"
-    path="/dashboard"
-    element={withLayout(DashboardPage, { type: 'common' })}
-  />,
-  <Route
-    key="/dashboard/:type"
-    path="/dashboard/:type"
-    element={withLayout(DashboardPage, { type: 'common' })}
-  />,
+  ...(homePageEnable
+    ? [
+        <Route
+          key="/dashboard"
+          path="/dashboard"
+          element={withLayout(HomePage, { type: 'common' })}
+        />,
+      ]
+    : [
+        <Route
+          key="/dashboard"
+          path="/dashboard"
+          element={withLayout(DashboardPage, { type: 'common' })}
+        />,
+      ]),
+  ...(homePageEnable
+    ? [
+        <Route
+          key="/dashboard/:type"
+          path="/dashboard/:type"
+          element={withLayout(HomePage, { type: 'common' })}
+        />,
+      ]
+    : [
+        <Route
+          key="/dashboard/:type"
+          path="/dashboard/:type"
+          element={withLayout(DashboardPage, { type: 'common' })}
+        />,
+      ]),
   <Route
     key="/explore"
     path="/explore"

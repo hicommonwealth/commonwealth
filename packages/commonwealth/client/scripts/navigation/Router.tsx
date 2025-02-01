@@ -13,6 +13,7 @@ import CommonDomainRoutes from './CommonDomainRoutes';
 import GeneralRoutes from './GeneralRoutes';
 
 export type RouteFeatureFlags = {
+  homePageEnable: boolean;
   launchpadEnabled: boolean;
   xpEnabled: boolean;
   communityHomeEnabled: boolean;
@@ -21,11 +22,13 @@ export type RouteFeatureFlags = {
 const Router = () => {
   const client = OpenFeature.getClient();
 
+  const homePageEnable = client.getBooleanValue('homePage', false);
   const launchpadEnabled = client.getBooleanValue('launchpad', false);
   const xpEnabled = client.getBooleanValue('xp', false);
   const communityHomeEnabled = client.getBooleanValue('communityHome', false);
 
   const flags = {
+    homePageEnable,
     launchpadEnabled,
     xpEnabled,
     communityHomeEnabled,

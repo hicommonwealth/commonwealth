@@ -75,6 +75,12 @@ function build() {
       },
       express.command(Contest.FarcasterUpvoteAction()),
     );
+
+    router.post(
+      '/farcaster/NotificationsWebhook',
+      // TODO: add validation middleware
+      express.command(Contest.FarcasterNotificationsWebhook()),
+    );
   }
 
   router.post(
