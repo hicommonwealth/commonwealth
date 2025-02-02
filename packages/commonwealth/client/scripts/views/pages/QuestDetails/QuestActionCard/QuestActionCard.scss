@@ -1,0 +1,61 @@
+@import '../../../../styles/shared';
+
+.QuestActionCard {
+  display: flex;
+  border: 1px solid $neutral-200;
+  border-radius: 12px;
+  gap: 12px;
+
+  .counter {
+    background-color: $green-50;
+    border-top-left-radius: 12px;
+    border-bottom-left-radius: 12px;
+    padding: 12px 16px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    .b1 {
+      color: $neutral-700;
+    }
+  }
+
+  .content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    width: 100%;
+
+    .total-xp-container {
+      display: flex;
+      align-items: center;
+    }
+
+    .left {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+
+      .b1 {
+        color: $neutral-700;
+      }
+
+      .points {
+        display: flex;
+        gap: 12px;
+      }
+
+      .xp-shares {
+        display: inline;
+        margin-top: -4px;
+
+        .creator-share {
+          color: $neutral-600;
+          font-weight: bold;
+        }
+      }
+    }
+  }
+}

@@ -1,4 +1,8 @@
-import { EventNames, QuestParticipationLimit } from '@hicommonwealth/schemas';
+import {
+  EventNames,
+  QuestActionMeta,
+  QuestParticipationLimit,
+} from '@hicommonwealth/schemas';
 import { questParticipationPeriodToCopyMap } from 'helpers/quest';
 import { useFlag } from 'hooks/useFlag';
 import moment from 'moment';
@@ -10,39 +14,16 @@ import { useAuthModalStore } from 'state/ui/modals';
 import useUserStore from 'state/ui/user';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import { withTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import { AuthModalType } from 'views/modals/AuthModal';
+import { z } from 'zod';
 import { PageNotFound } from '../404';
 import { QuestAction } from '../CreateQuest/CreateQuestForm/QuestActionSubForm';
-import { doesActionRequireCreatorReward } from '../CreateQuest/CreateQuestForm/QuestActionSubForm/helpers';
+import QuestActionCard from './QuestActionCard';
 import './QuestDetails.scss';
-
-const actionCopies = {
-  title: {
-    [EventNames.SignUpFlowCompleted]: 'Signup on Common',
-    [EventNames.CommunityCreated]: 'Create a community',
-    [EventNames.CommunityJoined]: 'Join a community',
-    [EventNames.ThreadCreated]: 'Create a thread',
-    [EventNames.ThreadUpvoted]: 'Upvote a thread',
-    [EventNames.CommentCreated]: 'Create a comment',
-    [EventNames.CommentUpvoted]: 'Upvote a comment',
-    [EventNames.UserMentioned]: 'Mention a user',
-  },
-  shares: {
-    [EventNames.SignUpFlowCompleted]: '',
-    [EventNames.CommunityCreated]: 'referrer',
-    [EventNames.CommunityJoined]: 'referrer',
-    [EventNames.ThreadCreated]: '',
-    [EventNames.ThreadUpvoted]: '',
-    [EventNames.CommentCreated]: '',
-    [EventNames.CommentUpvoted]: 'comment owner',
-    [EventNames.UserMentioned]: '',
-  },
-};
 
 const QuestDetails = ({ id }: { id: number }) => {
   const questId = parseInt(`${id}`) || 0;
@@ -158,101 +139,96 @@ const QuestDetails = ({ id }: { id: number }) => {
         <CWDivider />
         <div className="content">
           <div className="header">
-            <CWText type="h4">{quest.name}</CWText>
-            <CWText type="b1">{quest.description}</CWText>
-            <CWTag
-              type="active"
-              label={`From ${moment(quest.start_date).format(
-                'DD/MM/YYYY',
-              )} to ${moment(quest.end_date).format('DD/MM/YYYY')}`}
-            />
-            {isRepeatableQuest && (
-              <CWTag
-                type="active"
-                label={`Users can participate ${
-                  questParticipationLimitPerCycle
-                } times every ${questParticipationPeriodToCopyMap[questRepeatitionCycle || '']}}`}
-              />
-            )}
-            {isCompleted && <CWTag type="active" label="Completed" />}
-          </div>
-          <CWDivider />
-          <div className="grid">
             <img
               className="featured-img"
               src={quest.image_url}
               alt="featured-image"
             />
-            <div className="quest-actions">
-              <div className="header">
-                <CWText type="b1" fontWeight="semiBold" fontStyle="uppercase">
-                  Actions to take!
+            <div className="quest-meta">
+              <CWText type="h3">
+                {quest.name}{' '}
+                {isCompleted && <CWTag type="active" label="Completed" />}
+              </CWText>
+              <CWText type="b1">{quest.description}</CWText>
+              <CWText className="timeline">
+                From&ensp;
+                {withTooltip(
+                  <CWTag
+                    type="group"
+                    label={moment(quest.start_date).format('DD/MM/YYYY')}
+                    classNames="cursor-pointer"
+                  />,
+                  moment(quest.start_date).toLocaleString(),
+                  true,
+                )}
+                &ensp;to&ensp;
+                {withTooltip(
+                  <CWTag
+                    type="group"
+                    label={moment(quest.end_date).format('DD/MM/YYYY')}
+                    classNames="cursor-pointer"
+                  />,
+                  moment(quest.start_date).toLocaleString(),
+                  true,
+                )}
+              </CWText>
+              {isRepeatableQuest && (
+                <CWText className="timeline">
+                  Users can participate&ensp;
+                  <CWTag
+                    type="group"
+                    label={`${questParticipationLimitPerCycle}`}
+                  />
+                  &ensp;time{questParticipationLimitPerCycle > 1 ? 's' : ''}{' '}
+                  every&ensp;
+                  <CWTag
+                    type="group"
+                    label={
+                      questParticipationPeriodToCopyMap[
+                        questRepeatitionCycle || ''
+                      ]
+                    }
+                  />
                 </CWText>
-                <CWTag
-                  label={`${gainedXP > 0 ? `${gainedXP} / ` : ''}${totalXP} XP`}
-                  type="proposal"
+              )}
+            </div>
+          </div>
+          <CWDivider />
+          <div className="quest-actions">
+            <div className="header">
+              <CWText type="h4" fontWeight="semiBold">
+                Complete tasks to earn XP
+              </CWText>
+              <CWTag
+                label={`${gainedXP > 0 ? `${gainedXP} / ` : ''}${totalXP} XP`}
+                type="proposal"
+              />
+            </div>
+            <CWDivider />
+            <div className="list">
+              {(quest.action_metas || [])?.map((action, index) => (
+                <QuestActionCard
+                  key={action.id}
+                  actionNumber={index + 1}
+                  onActionStart={handleActionStart}
+                  questAction={action as z.infer<typeof QuestActionMeta>}
+                  isActionCompleted={
+                    !!xpProgressions.find((p) => p.action_meta_id === action.id)
+                  }
+                  {...(user?.isLoggedIn &&
+                    action.event_name === 'SignUpFlowCompleted' && {
+                      isActionInEligible: true,
+                      inEligibilityReason:
+                        'You are already signed up with Common',
+                    })}
+                  canStartAction={isStarted && !isEnded}
+                  {...((!isStarted || isEnded) && {
+                    actionStartBlockedReason: !isStarted
+                      ? 'Only available when quest starts'
+                      : 'Unavailable, quest has ended',
+                  })}
                 />
-              </div>
-              <CWDivider />
-              <div className="list">
-                {(quest.action_metas || [])?.map((action, index) => (
-                  <div className="action-details" key={action.id}>
-                    <div className="counter">
-                      <CWText type="b1" fontWeight="semiBold">
-                        #{index + 1}
-                      </CWText>
-                    </div>
-                    <div className="content">
-                      <div className="left">
-                        <CWText type="b1" fontWeight="semiBold">
-                          {actionCopies.title[action.event_name]}
-                        </CWText>
-                        {doesActionRequireCreatorReward(action.event_name) && (
-                          <CWText type="caption" className="xp-shares">
-                            <span className="creator-share">
-                              {action.creator_reward_weight}%
-                            </span>
-                            &nbsp; shared with{' '}
-                            {actionCopies.shares[action.event_name]}
-                          </CWText>
-                        )}
-                        <div className="points">
-                          <CWTag
-                            label={`${action.reward_amount} XP`}
-                            type="proposal"
-                          />
-                          {/* TODO: helper link here */}
-                        </div>
-                      </div>
-                      {user?.isLoggedIn &&
-                      action.event_name === 'SignUpFlowCompleted' ? (
-                        <CWTag label="Not eligible" type="address" />
-                      ) : xpProgressions.find(
-                          (p) => p.action_meta_id === action.id,
-                        ) ? (
-                        <CWTag label="Completed" type="address" />
-                      ) : (
-                        withTooltip(
-                          <CWButton
-                            buttonType="secondary"
-                            buttonAlt="green"
-                            label="Start"
-                            buttonHeight="sm"
-                            buttonWidth="narrow"
-                            iconRight="arrowRightPhosphor"
-                            onClick={() => handleActionStart(action.event_name)}
-                            disabled={!isStarted || isEnded}
-                          />,
-                          !isStarted
-                            ? 'Only available when quest starts'
-                            : 'Unavailable, quest has ended',
-                          !isStarted || isEnded,
-                        )
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
+              ))}
             </div>
           </div>
         </div>
