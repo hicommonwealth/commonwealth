@@ -29,11 +29,28 @@ const useXPProgress = () => {
       enabled: user.isLoggedIn && xpEnabled,
     });
 
-  const allWeeklyQuests = (questsList?.pages || []).flatMap(
-    (page) => page.results,
-  );
+  const allWeeklyQuests = (questsList?.pages || [])
+    .flatMap((page) => page.results)
+    .map((quest) => ({
+      ...quest,
+      gainedXP:
+        xpProgressions
+          .filter((p) => p.quest_id === quest.id)
+          .map((p) => p.xp_points)
+          .reduce(
+            (accumulator, currentValue) => accumulator + currentValue,
+            0,
+          ) || 0,
+      totalXP:
+        (quest.action_metas || [])
+          ?.map((action) => action.reward_amount)
+          .reduce(
+            (accumulator, currentValue) => accumulator + currentValue,
+            0,
+          ) || 0,
+    }));
   const allPendingWeeklyQuests = allWeeklyQuests.filter(
-    (q) => !xpProgressions.find((p) => p.quest_id === q.id),
+    (q) => q.totalXP !== q.gainedXP,
   );
   const upcomingWeeklyQuests = allPendingWeeklyQuests.filter((q) =>
     moment().isBefore(moment(q.start_date)),
@@ -49,8 +66,8 @@ const useXPProgress = () => {
   };
   const weeklyGoal = {
     current: Math.min(
-      xpProgressions
-        .map((x) => x.xp_points)
+      allWeeklyQuests
+        .map((x) => x.gainedXP)
         .reduce((accumulator, currentValue) => accumulator + currentValue, 0) ||
         0,
       WEEKLY_XP_GOAL,
