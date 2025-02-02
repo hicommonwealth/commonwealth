@@ -59,6 +59,19 @@ export class CommonBot {
     // Initialize bot
     this.bot = new Bot(env.TELEGRAM_BOT_TOKEN);
 
+    // Set the menu button to open the mini app
+    this.bot.api
+      .setChatMenuButton({
+        menu_button: {
+          type: 'web_app',
+          text: 'Open Common',
+          web_app: { url: env.MINI_APP_URL },
+        },
+      })
+      .catch((error) => {
+        console.error('Failed to set menu button:', error);
+      });
+
     // Setup session storage with initial data
     this.bot.use(
       session({
@@ -72,6 +85,8 @@ export class CommonBot {
 
     // Setup menu
     this.menu = new Menu('main-menu')
+      .webApp('🚀 Open Mini App', env.MINI_APP_URL)
+      .row()
       .text('🎯 Start Raid', (ctx) =>
         ctx.reply('Use /raid to start a new raid'),
       )
@@ -90,29 +105,37 @@ export class CommonBot {
     // Start command - introduces the bot and shows menu
     this.bot.command('start', async (ctx) => {
       await ctx.reply(
-        'Welcome to Common! I can help you engage with your community through raids and contests.\n\n' +
-          'Use /help to see available commands or tap the menu button below.',
+        'Welcome to Common! 👋\n\n' +
+          'Use the menu button below to open our mini app and engage with the community.\n\n' +
+          'Additional commands:\n' +
+          '/raid - Start a new raid\n' +
+          '/contest - Start a new contest\n' +
+          '/help - Show all commands',
         { reply_markup: this.menu },
       );
     });
 
     // Help command - shows available commands
     this.bot.command('help', async (ctx) => {
-      await ctx.reply(
-        'Available commands:\n\n' +
-          '/start - Start the bot and show menu\n' +
-          '/help - Show this help message\n' +
-          '/open - Open the Commonwealth mini app\n' +
-          '/url - Show the mini app URL\n' +
-          '/raid <link> <likes> <retweets> <replies> <bookmarks> - Start a new raid\n' +
-          '/contest <description> <criteria> <splits> <duration> - Start a new contest',
-      );
+      const commands = [
+        '/start - Open the mini app and show menu',
+        '/open - Open the Common mini app',
+        '/raid <link> <likes> <retweets> <replies> <bookmarks> - Start a new raid',
+        '/contest <description> <criteria> <splits> <duration> - Start a new contest',
+      ];
+
+      // Only show debug commands in development
+      if (process.env.NODE_ENV !== 'production') {
+        commands.push('/url - Show mini app URL and debug info');
+      }
+
+      await ctx.reply('Available commands:\n\n' + commands.join('\n'));
     });
 
     // Open command - launches the mini app
     this.bot.command('open', async (ctx) => {
       const webAppUrl = envSchema.parse(process.env).MINI_APP_URL;
-      await ctx.reply('Open Common', {
+      await ctx.reply('Open Common Mini App', {
         reply_markup: {
           inline_keyboard: [
             [
@@ -126,10 +149,26 @@ export class CommonBot {
       });
     });
 
-    // Open command - launches the mini app
+    // URL command - for debugging (only works in development)
     this.bot.command('url', async (ctx) => {
-      const webAppUrl = envSchema.parse(process.env).MINI_APP_URL;
-      await ctx.reply(`Mini App URL: ${webAppUrl}`);
+      if (process.env.NODE_ENV === 'production') {
+        await ctx.reply('This command is only available in development mode.');
+        return;
+      }
+
+      const env = envSchema.parse(process.env);
+      await ctx.reply(
+        '🔧 Debug Information:\n\n' +
+          `Mini App URL: ${env.MINI_APP_URL}\n` +
+          `Environment: ${process.env.NODE_ENV || 'development'}\n` +
+          `Global Channel: ${env.GLOBAL_CHANNEL_ID}\n` +
+          `\nTroubleshooting Tips:\n` +
+          `1. Make sure ngrok is running and the URL is up to date in .env\n` +
+          `2. Check if the mini app loads outside Telegram first\n` +
+          `3. Verify BotFather menu button settings\n` +
+          `4. Clear Telegram web app cache if needed\n\n` +
+          'Note: This command is only available in development mode.',
+      );
     });
 
     // Raid command
