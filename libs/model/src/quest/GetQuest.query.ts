@@ -6,7 +6,7 @@ export function GetQuest(): Query<typeof schemas.GetQuest> {
   return {
     ...schemas.GetQuest,
     auth: [],
-    secure: true,
+    secure: false,
     body: async ({ payload }) => {
       const { quest_id } = payload;
       const quest = await models.Quest.findOne({
