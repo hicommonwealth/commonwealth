@@ -1,6 +1,7 @@
 // backfills all clanker tokens
 
-import { logger } from '@hicommonwealth/core';
+import { S3BlobStorage } from '@hicommonwealth/adapters';
+import { blobStorage, logger } from '@hicommonwealth/core';
 import {
   config,
   createCommunityFromClankerToken,
@@ -12,9 +13,15 @@ import { Op } from 'sequelize';
 
 const log = logger(import.meta);
 
+blobStorage({
+  adapter: S3BlobStorage(),
+});
+
 /*
   This script fetches *all* tokens from the clanker API and
   directly creates a community for each, skipping the outbox.
+  It starts from oldest token to newest so that the suffix
+  numbers for duplicate names will increment properly.
 */
 async function main() {
   const startedAt = new Date();
@@ -22,7 +29,10 @@ async function main() {
   let numTokensFound = 0;
   let numCommunitiesCreated = 0;
 
-  for await (const tokens of paginateClankerTokens(new Date(0))) {
+  for await (const tokens of paginateClankerTokens({
+    cutoffDate: new Date(0),
+    desc: false,
+  })) {
     numTokensFound += tokens.length;
 
     const existingCommunities = await models.Community.findAll({

@@ -52,6 +52,7 @@ export const CreateCommunity = {
     referrer_address: z.string().optional(),
     indexer: z.string().optional(),
     token_address: z.string().optional(),
+    token_created_at: z.coerce.date().optional(),
     website: z.string().url().optional(),
 
     // deprecated params to be removed

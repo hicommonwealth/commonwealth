@@ -14,7 +14,7 @@ import {
 } from '@hicommonwealth/core';
 import {
   ChainEventPolicy,
-  CommunityIndexer,
+  CommunityIndexerWorker,
   Contest,
   ContestWorker,
   DiscordBotPolicy,
@@ -95,7 +95,7 @@ export async function bootstrapBindings(
 
   const communityIndexerSubRes = await brokerInstance.subscribe(
     BrokerSubscriptions.CommunityIndexerPolicy,
-    CommunityIndexer(),
+    CommunityIndexerWorker(),
   );
   checkSubscriptionResponse(
     communityIndexerSubRes,
@@ -202,7 +202,7 @@ export function bootstrapCommunityIndexerLoop() {
     cronTime: cronFrequency,
     onTick: async () => {
       try {
-        await handleEvent(CommunityIndexer(), {
+        await handleEvent(CommunityIndexerWorker(), {
           name: EventNames.CommunityIndexerTimerTicked,
           payload: {},
         });

@@ -1,9 +1,10 @@
 import {
   HotShotsStats,
+  S3BlobStorage,
   ServiceKey,
   startHealthCheckLoop,
 } from '@hicommonwealth/adapters';
-import { logger, stats } from '@hicommonwealth/core';
+import { blobStorage, logger, stats } from '@hicommonwealth/core';
 import {
   bootstrapBindings,
   bootstrapCommunityIndexerLoop,
@@ -14,6 +15,9 @@ import { fileURLToPath } from 'url';
 const log = logger(import.meta);
 
 stats({ adapter: HotShotsStats() });
+blobStorage({
+  adapter: S3BlobStorage(),
+});
 
 let isServiceHealthy = false;
 

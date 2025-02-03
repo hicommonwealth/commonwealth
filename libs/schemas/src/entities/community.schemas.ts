@@ -75,6 +75,7 @@ export const Community = z.object({
   contest_managers: z.array(ContestManager).optional(),
   indexer: z.string().nullish(),
   token_address: z.string().nullish(),
+  token_created_at: z.coerce.date().nullish(),
 });
 
 export const ExtendedCommunity = Community.extend({

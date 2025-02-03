@@ -1,5 +1,5 @@
 export * from './ChainEventCreated.policy';
-export * from './CommunityIndexer.policy';
+export * from './CommunityIndexerWorker.policy';
 export * from './ContestWorker.policy';
 export * from './DiscordBot.policy';
 export * from './FarcasterWorker.policy';

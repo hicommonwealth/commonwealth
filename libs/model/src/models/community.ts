@@ -155,6 +155,10 @@ export default (
         type: Sequelize.STRING,
         allowNull: true,
       },
+      token_created_at: {
+        type: Sequelize.DATE,
+        allowNull: true,
+      },
     },
     {
       tableName: 'Communities',

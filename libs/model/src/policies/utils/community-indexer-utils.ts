@@ -18,9 +18,32 @@ import { compressServerImage } from '../../utils/imageCompression';
 
 const log = logger(import.meta);
 
-export async function* paginateClankerTokens(
-  cutoffDate: Date,
-): AsyncGenerator<Array<z.infer<typeof ClankerToken>>, void, unknown> {
+/**
+ * Asynchronously paginates through Clanker tokens.
+ *
+ * This function fetches tokens from the Clanker API in pages and yields batches of tokens that were
+ * created after the specified cutoff date. It continues fetching pages until one of the following conditions is met:
+ *
+ * - The API indicates there are no more pages available.
+ * - A fetched page returns no tokens.
+ * - The oldest token in the fetched page is older than the cutoff date.
+ *
+ * An axios instance with retry logic is used to handle rate limits (HTTP 429) and server errors (HTTP status >= 500).
+ *
+ * @param {Object} params - The function parameters.
+ * @param {Date} params.cutoffDate - The cutoff date; only tokens created after this date are yielded.
+ * @param {boolean} params.desc - If true, tokens are fetched in descending order; if false, in ascending order.
+ * @returns {AsyncGenerator<Array<z.infer<typeof ClankerToken>>, void, unknown>} An async generator that yields arrays of tokens meeting the cutoff criteria.
+ *
+ * @throws Will throw an error if the token fetching fails after retrying.
+ */
+export async function* paginateClankerTokens({
+  cutoffDate,
+  desc,
+}: {
+  cutoffDate: Date;
+  desc: boolean;
+}): AsyncGenerator<Array<z.infer<typeof ClankerToken>>, void, unknown> {
   const axiosInstance = axios.create();
   axiosRetry(axiosInstance, {
     retries: 3,
@@ -33,7 +56,7 @@ export async function* paginateClankerTokens(
 
   // eslint-disable-next-line no-constant-condition
   while (true) {
-    const url = `https://www.clanker.world/api/tokens?sort=desc&page=${pageNum}&pair=all&partner=all&presale=all`;
+    const url = `https://www.clanker.world/api/tokens?sort=${desc ? 'desc' : 'asc'}&page=${pageNum}&pair=all&partner=all&presale=all`;
     log.debug(`fetching: ${url}`);
 
     try {
@@ -84,8 +107,15 @@ function formatCommunityName(input: string) {
   ); // Trim leading and trailing spaces
 }
 
-// generates a unique community ID based on the community name
-// by adding a numerical suffix if a collision is found
+/**
+ * Generates a compliant community name and unique ID based on the provided community name.
+ *
+ * @param {string} name - The original community name.
+ * @returns {Promise<
+ *   | { id: string; name: string; error: null }
+ *   | { id: null; name: null; error: string }
+ * >}
+ */
 export async function generateUniqueId(
   name: string,
 ): Promise<
@@ -102,28 +132,39 @@ export async function generateUniqueId(
   }
   const baseId = lo.kebabCase(communityName);
   let idCandidate = baseId;
-  let counter = 0;
-  // eslint-disable-next-line no-constant-condition
-  while (true) {
-    counter++;
-    if (counter >= 100) {
-      return {
-        id: null,
-        name: null,
-        error: `too many conflicting community IDs for: ${baseId} (found ${counter})`,
-      };
-    }
+
+  const existingBase = await models.Community.findOne({
+    where: { id: idCandidate },
+  });
+  if (!existingBase) {
+    return {
+      id: idCandidate,
+      name: communityName,
+      error: null,
+    };
+  }
+
+  let counter = 2;
+  while (counter < 100) {
+    idCandidate = `${baseId}-${counter}`;
     const existing = await models.Community.findOne({
       where: { id: idCandidate },
     });
     if (!existing) {
       break;
     }
-    idCandidate = `${baseId}-${counter}`;
+    counter++;
+  }
+  if (counter >= 100) {
+    return {
+      id: null,
+      name: null,
+      error: `too many conflicting community IDs for: ${baseId} (found ${counter})`,
+    };
   }
   return {
     id: idCandidate,
-    name: counter === 1 ? communityName : `${communityName} (${counter})`,
+    name: `${communityName} (${counter})`,
     error: null,
   };
 }
@@ -155,10 +196,20 @@ async function uploadTokenImage(
   }
 }
 
+/**
+ * Creates a community based on the provided Clanker token payload.
+ *
+ * @param {z.infer<typeof ClankerToken>} payload - The Clanker token payload containing the details required to create the community.
+ * @returns {Promise<void>} A promise that resolves when the community creation process is complete.
+ *
+ * @throws Error for missing chain node or admin address
+ */
 export async function createCommunityFromClankerToken(
   payload: z.infer<typeof ClankerToken>,
 ) {
-  const { id, name, error } = await generateUniqueId(payload.name);
+  const { id, name, error } = await generateUniqueId(
+    `Clanker - ${payload.name}`,
+  );
   if (error) {
     log.warn(error);
     return;
@@ -199,6 +250,7 @@ export async function createCommunityFromClankerToken(
       chain_node_id: chainNode!.id!,
       indexer: 'clanker',
       token_address: payload.contract_address,
+      token_created_at: moment(payload.created_at).toDate(),
     };
   if (uploadedImageUrl) {
     createCommunityPayload.icon_url = uploadedImageUrl;
@@ -212,5 +264,5 @@ export async function createCommunityFromClankerToken(
     payload: createCommunityPayload,
   });
 
-  log.debug(`created clanker community: ${id} –– ${name}`);
+  log.debug(`created clanker community: ${id} = '${name}'`);
 }
