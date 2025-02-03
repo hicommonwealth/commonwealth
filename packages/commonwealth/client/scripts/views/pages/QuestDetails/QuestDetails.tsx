@@ -105,27 +105,29 @@ const QuestDetails = ({ id }: { id: number }) => {
         break;
       }
       case EventNames.CommunityCreated: {
-        navigate(`/createCommunity`);
+        navigate(`/createCommunity`, {}, null);
         break;
       }
       case EventNames.ThreadCreated: {
-        navigate(`/${randomResourceId?.community_id}/new/discussion`);
+        navigate(`/${randomResourceId?.community_id}/new/discussion`, {}, null);
         break;
       }
       case EventNames.CommunityJoined: {
-        navigate(`/${randomResourceId?.community_id}/discussions`);
+        navigate(`/${randomResourceId?.community_id}/discussions`, {}, null);
         break;
       }
       case EventNames.ThreadUpvoted:
       case EventNames.CommentCreated: {
-        navigate(`/discussion/${`${randomResourceId?.thread_id}`}`);
+        navigate(`/discussion/${`${randomResourceId?.thread_id}`}`, {}, null);
         break;
       }
       case EventNames.CommentUpvoted: {
         navigate(
-          `discussion/${
+          `/discussion/${
             randomResourceId?.thread_id
           }?comment=${randomResourceId?.comment_id}`,
+          {},
+          null,
         );
         break;
       }

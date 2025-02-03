@@ -18,7 +18,11 @@ const ThreadRedirect = ({ identifier }: { identifier: string }) => {
     callback: () => {
       !foundThread || error
         ? navigate('/error')
-        : navigate(`/discussion/${identifier}`, {}, foundThread?.community_id);
+        : navigate(
+            `/discussion/${identifier}${window.location.search}`,
+            {},
+            foundThread?.community_id,
+          );
     },
     shouldRun: !!(foundThread || error),
   });
