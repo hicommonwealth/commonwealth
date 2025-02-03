@@ -219,7 +219,8 @@ export async function main(
 
   app.get('*', async (req: Request, res: Response) => {
     try {
-      const html = await renderIndex();
+      const indexFilePath = path.join(__dirname, 'index.html');
+      const html = await renderIndex(indexFilePath);
       res.send(html);
     } catch (err) {
       console.error(err);
