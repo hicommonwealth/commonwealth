@@ -1,0 +1,82 @@
+@import '../../../styles/shared';
+
+.QuestDetails {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 16px;
+
+  > .content {
+    all: inherit;
+    gap: 12px;
+
+    > .header {
+      display: grid;
+      grid-template-columns: 200px 8fr;
+      gap: 16px;
+
+      @include smallInclusive {
+        grid-template-columns: 1fr;
+      }
+
+      .quest-meta {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+
+        .h3 {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+        }
+
+        .b1 {
+          color: $neutral-700;
+        }
+
+        .timeline {
+          margin-top: 6px;
+          font-size: 14px;
+          color: $neutral-700;
+        }
+      }
+    }
+
+    .featured-img {
+      border-radius: 6px;
+      width: 100%;
+      max-width: 100%;
+      max-height: 420px;
+      min-height: 200px;
+      object-fit: cover;
+    }
+
+    .quest-actions {
+      display: flex;
+      flex-direction: column;
+      border-radius: 6px;
+      width: 100%;
+      gap: 8px;
+      background-color: $white;
+
+      .header {
+        padding: 16px 0px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        .b1 {
+          color: $black;
+          letter-spacing: 1px;
+        }
+      }
+
+      .list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        width: 100%;
+      }
+    }
+  }
+}

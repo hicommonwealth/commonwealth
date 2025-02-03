@@ -12,6 +12,7 @@ const useGetXPs = ({
   from,
   to,
   user_id,
+  quest_id,
   enabled = true,
 }: UseGetXPsProps) => {
   return trpc.user.getXps.useQuery(
@@ -21,6 +22,7 @@ const useGetXPs = ({
       from,
       to,
       user_id,
+      quest_id,
     },
     {
       enabled,

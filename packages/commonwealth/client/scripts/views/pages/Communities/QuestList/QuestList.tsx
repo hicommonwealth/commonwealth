@@ -1,5 +1,6 @@
 import clsx from 'clsx';
 import { useFlag } from 'hooks/useFlag';
+import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 import { useFetchQuestsQuery } from 'state/api/quest';
@@ -22,7 +23,7 @@ const QuestList = () => {
   } = useFetchQuestsQuery({
     cursor: 1,
     limit: 8,
-    community_id: 'dydx', // TODO: need to change this.
+    end_after: moment().startOf('week').toDate(),
     enabled: xpEnabled,
   });
   const quests = (questsList?.pages || []).flatMap((page) => page.results);
@@ -33,8 +34,8 @@ const QuestList = () => {
     }
   };
 
-  const handleCTAClick = () => {
-    // TODO: navigate to quest details
+  const handleCTAClick = (questId: number) => {
+    navigate(`/quest/${questId}`, {}, null);
   };
 
   const handleLeaderboardClick = () => {
@@ -72,11 +73,11 @@ const QuestList = () => {
                 key={quest.name}
                 name={quest.name}
                 description={quest.description}
-                // TODO: quests should support images
-                iconURL="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR4dGWQgdRtlbW5aRFnN5K5pjTRSFsVWuGf7A&s"
+                iconURL={quest.image_url}
                 xpPoints={totalXP}
+                startDate={new Date(quest.start_date)}
                 endDate={new Date(quest.end_date)}
-                onCTAClick={handleCTAClick}
+                onCTAClick={() => handleCTAClick(quest.id)}
                 onLeaderboardClick={handleLeaderboardClick}
               />
             );

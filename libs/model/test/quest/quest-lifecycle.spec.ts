@@ -47,6 +47,7 @@ describe('Quest lifecycle', () => {
           community_id,
           name: 'test quest',
           description: 'test description',
+          image_url: chance.url(),
           start_date,
           end_date,
         },
@@ -60,6 +61,7 @@ describe('Quest lifecycle', () => {
         payload: {
           name: 'test quest global',
           description: 'test description',
+          image_url: chance.url(),
           start_date,
           end_date,
         },
@@ -75,6 +77,7 @@ describe('Quest lifecycle', () => {
             community_id,
             name: 'test quest',
             description: 'test description',
+            image_url: chance.url(),
             start_date: new Date(
               new Date().getTime() + 1000 * 60 * 60 * 24 * 3,
             ),
@@ -95,6 +98,7 @@ describe('Quest lifecycle', () => {
           community_id,
           name: chance.name(),
           description: chance.sentence(),
+          image_url: chance.url(),
           start_date,
           end_date,
         },
@@ -149,6 +153,7 @@ describe('Quest lifecycle', () => {
           community_id,
           name,
           description: 'test description',
+          image_url: chance.url(),
           start_date,
           end_date,
         },
@@ -174,6 +179,7 @@ describe('Quest lifecycle', () => {
           community_id,
           name: chance.name() + Math.random(),
           description: 'test description',
+          image_url: chance.url(),
           start_date,
           end_date,
         },
@@ -207,6 +213,7 @@ describe('Quest lifecycle', () => {
           community_id,
           name: chance.name(),
           description: chance.sentence(),
+          image_url: chance.url(),
           start_date,
           end_date,
         },
@@ -247,6 +254,7 @@ describe('Quest lifecycle', () => {
               community_id,
               name: chance.name() + Math.random(),
               description: chance.sentence(),
+              image_url: chance.url(),
               start_date,
               end_date,
             },
@@ -264,7 +272,7 @@ describe('Quest lifecycle', () => {
         actor: superadmin,
         payload: { community_id, cursor: 1, limit: 10 },
       });
-      expect(retrieved?.results?.length).toBe(9);
+      expect(retrieved?.results?.length).toBe(8);
       quests
         .at(-1)
         ?.action_metas?.forEach((meta, index) =>
@@ -281,6 +289,7 @@ describe('Quest lifecycle', () => {
           community_id,
           name: chance.name() + Math.random(),
           description: chance.sentence(),
+          image_url: chance.url(),
           start_date,
           end_date,
         },
@@ -305,6 +314,7 @@ describe('Quest lifecycle', () => {
           community_id,
           name: chance.name(),
           description: chance.sentence(),
+          image_url: chance.url(),
           start_date,
           end_date,
         },
