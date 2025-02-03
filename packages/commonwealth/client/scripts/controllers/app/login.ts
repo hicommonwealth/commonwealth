@@ -447,11 +447,19 @@ export async function handleSocialLoginCallback({
     }
 
     if (walletSsoSource === WalletSsoSource.Telegram) {
-      console.log('Telegram auth data:', result.oauth.userInfo);
+      // Handle both Magic OAuth and direct Telegram Mini App auth
+      const telegramUserData = result.oauth?.userInfo || result.telegramUser;
+      console.log('Telegram auth data:', telegramUserData);
+
+      // Extract profile metadata from Telegram user data
+      profileMetadata = {
+        username:
+          telegramUserData.username ||
+          `${telegramUserData.first_name}${telegramUserData.last_name ? ` ${telegramUserData.last_name}` : ''}`,
+        avatarUrl: telegramUserData.photo_url,
+      };
     }
 
-    // Get magic metadata
-    profileMetadata = getProfileMetadata(result.oauth);
     if (isCosmos) {
       magicAddress = result.magic.userMetadata.publicAddress;
     } else {
