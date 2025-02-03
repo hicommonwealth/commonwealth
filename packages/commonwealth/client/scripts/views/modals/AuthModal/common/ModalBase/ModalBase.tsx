@@ -377,7 +377,7 @@ const ModalBase = ({
                   <AuthButton
                     type="farcaster"
                     onClick={() => {
-                      handleFarcasterFrameSignIn().catch(console.error);
+                      void handleFarcasterFrameSignIn().catch(console.error);
                     }}
                   />
                 ) : (
