@@ -80,16 +80,7 @@ export function CommunityIndexerWorker(): Policy<typeof inputs> {
             const startedAt = new Date();
 
             if (indexer.id === 'clanker') {
-              // start fetching tokens where indexer last left off
-              const oldestIndexedClankerCommunity =
-                await models.Community.findOne({
-                  where: {
-                    indexer: 'clanker',
-                  },
-                  order: [['token_created_at', 'ASC']],
-                });
-              const cutoffDate =
-                oldestIndexedClankerCommunity!.token_created_at || new Date(0);
+              const cutoffDate = moment(indexer.last_checked).toDate();
 
               // fetch pages descending and add to buffer
               // so they can be inserted in ascending order
@@ -102,10 +93,10 @@ export function CommunityIndexerWorker(): Policy<typeof inputs> {
                 tokensBuffer.push(...tokens);
               }
 
+              // sort from oldest to newest,
+              // id reflects website sorting better than created timestamp
               tokensBuffer.sort(
-                (a, b) =>
-                  moment(a.created_at!).valueOf() -
-                  moment(b.created_at!).valueOf(),
+                (a, b) => moment(a.id!).valueOf() - moment(b.id!).valueOf(),
               );
 
               const eventsBuffer = tokensBuffer.map((token) => ({

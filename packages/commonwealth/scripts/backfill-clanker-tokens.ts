@@ -24,8 +24,6 @@ blobStorage({
   numbers for duplicate names will increment properly.
 */
 async function main() {
-  const startedAt = new Date();
-
   let numTokensFound = 0;
   let numCommunitiesCreated = 0;
 
@@ -67,9 +65,11 @@ async function main() {
   log.info(`found ${numTokensFound} tokens`);
   log.info(`created ${numCommunitiesCreated} clanker communities`);
 
+  // since tokens are fetched ascending, then assume
+  // we've fetched all the latest tokens
   await models.CommunityIndexer.update(
     {
-      last_checked: startedAt,
+      last_checked: new Date(),
     },
     {
       where: {
