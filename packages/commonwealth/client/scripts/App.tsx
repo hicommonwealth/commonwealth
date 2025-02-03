@@ -17,7 +17,7 @@ import useAppStatus from './hooks/useAppStatus';
 import { trpc, trpcClient } from './utils/trpcClient';
 import { AddToHomeScreenPrompt } from './views/components/AddToHomeScreenPrompt';
 import { Mava } from './views/components/Mava';
-import OnBoardingWrapper from './views/pages/OnBoarding/OnBoardingWrapper';
+import OnBoardingWrapperForMobile from './views/pages/OnBoarding/OnBoardingWrapperForMobile';
 
 OpenFeature.setProvider(openFeatureProvider);
 
@@ -37,7 +37,7 @@ const App = () => {
                 <Splash />
               ) : (
                 <>
-                  <OnBoardingWrapper>
+                  <OnBoardingWrapperForMobile>
                     <Mava />
                     <ReactNativeBridgeUser />
                     <ReactNativeLogForwarder />
@@ -49,7 +49,7 @@ const App = () => {
                         displayDelayMilliseconds={1000}
                       />
                     )}
-                  </OnBoardingWrapper>
+                  </OnBoardingWrapperForMobile>
                 </>
               )}
               <ToastContainer />

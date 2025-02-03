@@ -74,7 +74,7 @@
             text-align: start;
             font-size: 43px;
             line-height: 43px;
-            font-family: MDNichromeRegular;
+            font-family: $MDNichromeRegular;
             width: 91%;
           }
           .onboarding-title {
@@ -82,7 +82,7 @@
               font-size: 43px;
               font-weight: 700;
               margin-right: 2px;
-              font-family: MDNichrome;
+              font-family: $MDNichrome;
             }
           }
         }

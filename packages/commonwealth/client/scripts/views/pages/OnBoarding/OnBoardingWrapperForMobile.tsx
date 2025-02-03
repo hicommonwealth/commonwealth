@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
 
-interface OnBoardingWrapperProps {
+interface OnBoardingWrapperForMobileProps {
   children: React.ReactNode;
 }
-const OnBoardingWrapper = ({ children }: OnBoardingWrapperProps) => {
+const OnBoardingWrapperForMobile = ({
+  children,
+}: OnBoardingWrapperForMobileProps) => {
   const [isWebView, setIsWebView] = useState(false);
   useEffect(() => {
     const isRNWebView = !!window.ReactNativeWebView;
@@ -20,4 +22,4 @@ const OnBoardingWrapper = ({ children }: OnBoardingWrapperProps) => {
 
   return <>{children}</>;
 };
-export default OnBoardingWrapper;
+export default OnBoardingWrapperForMobile;

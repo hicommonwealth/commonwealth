@@ -1,4 +1,5 @@
 import { useCommonNavigate } from 'client/scripts/navigation/helpers';
+import clsx from 'clsx';
 import Lottie from 'lottie-react';
 import React, { useRef, useState } from 'react';
 import 'swiper/css';
@@ -47,7 +48,7 @@ const OnBoarding = () => {
       if (isLastSlide) {
         navigate(`/discussions`);
       }
-      swiperRef.current.slideNext(); // Use slideNext method
+      swiperRef.current.slideNext();
     }
   };
   const handleSlideChange = () => {
@@ -82,7 +83,10 @@ const OnBoarding = () => {
                 />
               </div>
               <div
-                className={`slide-title ${slide.id === 4 ? 'top' : 'bottom'}`}
+                className={clsx(
+                  'slide-title',
+                  slide.id === 4 ? 'top' : 'bottom',
+                )}
               >
                 <CWText
                   type="h2"

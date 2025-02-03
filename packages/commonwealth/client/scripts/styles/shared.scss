@@ -41,6 +41,9 @@ $font-family-neue-haas-unica: NeueHaasUnica, 'Segoe UI', sans-serif,
 $font-family-monospace: 'DM Mono', monospace;
 $font-family-roboto: 'Roboto', sans-serif;
 
+$MDNichrome: 'MDNichrome';
+$MDNichromeRegular: 'MDNichromeRegular';
+
 @mixin visibleScrollbar($theme) {
   &::-webkit-scrollbar {
     -webkit-appearance: none;
