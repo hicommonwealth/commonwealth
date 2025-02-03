@@ -63,7 +63,6 @@ export function GetXps(): Query<typeof schemas.GetXps> {
       const finalXps = xps
         .map((xp) => {
           const { user, creator, quest_action_meta, ...rest } = xp.toJSON();
-          if (!quest_action_meta?.quest_id) return false;
           return {
             ...rest,
             user_profile: user!.profile,
@@ -72,7 +71,7 @@ export function GetXps(): Query<typeof schemas.GetXps> {
             quest_action_meta_id: quest_action_meta?.id,
           };
         })
-        .filter((x) => !!x);
+        .filter((x) => x.quest_id);
 
       return finalXps;
     },
