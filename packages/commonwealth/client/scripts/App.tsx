@@ -17,8 +17,13 @@ import useAppStatus from './hooks/useAppStatus';
 import { trpc, trpcClient } from './utils/trpcClient';
 import { AddToHomeScreenPrompt } from './views/components/AddToHomeScreenPrompt';
 import { Mava } from './views/components/Mava';
+import { TelegramAuthWrapper } from './views/components/TelegramAuthWrapper';
 
 OpenFeature.setProvider(openFeatureProvider);
+
+const isTelegramWebApp = () => {
+  return window.Telegram?.WebApp != null;
+};
 
 const App = () => {
   const { isLoading } = useInitApp();
@@ -39,6 +44,8 @@ const App = () => {
                   <Mava />
                   <ReactNativeBridgeUser />
                   <ReactNativeLogForwarder />
+                  {/* Telegram WebApp integration alongside other core components */}
+                  {isTelegramWebApp() && <TelegramAuthWrapper />}
                   <RouterProvider router={router()} />
                   {isAddedToHomeScreen || isMarketingPage ? null : (
                     <AddToHomeScreenPrompt

@@ -37,6 +37,10 @@ type SublayoutProps = {
   isInsideCommunity?: boolean;
 } & React.PropsWithChildren;
 
+const isTelegramWebApp = () => {
+  return window.Telegram?.WebApp != null;
+};
+
 const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
   const { menuVisible, setMenu, menuName } = useSidebarStore();
   const [resizing, setResizing] = useState(false);
@@ -125,36 +129,47 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
     };
   }, [resizing]);
 
+  // Keep auth modal open in Telegram WebApp context until user is logged in
+  useEffect(() => {
+    if (isTelegramWebApp() && !user.isLoggedIn && !authModalType) {
+      setAuthModalType(AuthModalType.SignIn);
+    }
+  }, [authModalType, user.isLoggedIn, setAuthModalType]);
+
   const chain = app.chain ? app.chain.meta : null;
   const terms = app.chain ? chain?.terms : null;
   const banner = app.chain ? chain?.communityBanner : null;
 
   return (
     <div className="Sublayout">
-      {(!isWindowSmallInclusive || isWindowSmallToMedium) && (
-        <CollapsableSidebarButton
-          onMobile={isWindowExtraSmall}
-          // @ts-expect-error StrictNullChecks
-          isInsideCommunity={isInsideCommunity}
-        />
-      )}
+      {/* Hide auth buttons in Telegram WebApp context */}
+      {(!isWindowSmallInclusive || isWindowSmallToMedium) &&
+        !isTelegramWebApp() && (
+          <CollapsableSidebarButton
+            onMobile={isWindowExtraSmall}
+            isInsideCommunity={!!isInsideCommunity}
+          />
+        )}
       <SublayoutHeader
         onMobile={isWindowExtraSmall}
-        // @ts-expect-error StrictNullChecks
-        isInsideCommunity={isInsideCommunity}
+        isInsideCommunity={!!isInsideCommunity}
         onAuthModalOpen={(modalType) =>
           setAuthModalType(modalType || AuthModalType.SignIn)
         }
       />
       <AuthModal
         type={authModalType}
-        onClose={() => setAuthModalType(undefined)}
+        onClose={() => {
+          // Prevent closing auth modal in Telegram WebApp context unless user is logged in
+          if (!isTelegramWebApp() || user.isLoggedIn) {
+            setAuthModalType(undefined);
+          }
+        }}
         isOpen={!!authModalType}
       />
       <div className="sidebar-and-body-container">
         <Sidebar
-          // @ts-expect-error StrictNullChecks
-          isInsideCommunity={isInsideCommunity}
+          isInsideCommunity={!!isInsideCommunity}
           onMobile={isWindowExtraSmall}
         />
         <div
@@ -174,17 +189,22 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
           <SublayoutBanners banner={banner || ''} terms={terms || ''} />
 
           <div className="Body">
-            <div
-              className={clsx('mobile-auth-buttons', {
-                isVisible: !user.isLoggedIn && isWindowExtraSmall,
-              })}
-              id="mobile-auth-buttons"
-            >
-              <AuthButtons
-                fullWidthButtons
-                onButtonClick={(selectedType) => setAuthModalType(selectedType)}
-              />
-            </div>
+            {/* Hide mobile auth buttons in Telegram WebApp context */}
+            {!isTelegramWebApp() && (
+              <div
+                className={clsx('mobile-auth-buttons', {
+                  isVisible: !user.isLoggedIn && isWindowExtraSmall,
+                })}
+                id="mobile-auth-buttons"
+              >
+                <AuthButtons
+                  fullWidthButtons
+                  onButtonClick={(selectedType) =>
+                    setAuthModalType(selectedType)
+                  }
+                />
+              </div>
+            )}
             {!routesWithoutGenericBreadcrumbs && <Breadcrumbs />}
 
             {isInsideCommunity && !routesWithoutGenericSliders && (
@@ -192,7 +212,6 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
             )}
             {children}
           </div>
-          {/* Growl should be added here when in place*/}
           {growlEnabled && (
             <CWGrowlTemplate
               headerText="Launch Contests On Farcaster!"

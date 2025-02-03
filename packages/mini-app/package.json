@@ -1,0 +1,33 @@
+{
+  "name": "@hicommonwealth/mini-app",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Commonwealth Mini App for community engagement via Telegram",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsx watch src/dev.ts",
+    "clean": "rm -rf dist",
+    "lint": "eslint 'src/**/*.ts'",
+    "test": "vitest"
+  },
+  "dependencies": {
+    "@grammyjs/conversations": "^1.2.0",
+    "@grammyjs/menu": "^1.2.1",
+    "@grammyjs/storage-redis": "^2.4.0",
+    "@vercel/kv": "^1.0.1",
+    "dotenv": "^16.4.5",
+    "grammy": "^1.21.1",
+    "redis": "^4.6.13",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.24",
+    "eslint": "^8.57.0",
+    "tsx": "^4.7.0",
+    "typescript": "^5.0.0",
+    "vitest": "^1.6.0"
+  }
+}

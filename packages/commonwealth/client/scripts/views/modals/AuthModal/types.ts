@@ -7,6 +7,12 @@ export enum AuthModalType {
   RevalidateSession = 'revalidate-session',
 }
 
+export enum WalletSsoSource {
+  Telegram = 'telegram',
+  Discord = 'discord',
+  Farcaster = 'farcaster',
+}
+
 export type ModalBaseTabs = {
   name: string;
   options: AuthWallets[] | AuthSSOs[];
