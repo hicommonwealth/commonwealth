@@ -1,12 +1,13 @@
 import React from 'react';
 
-import { EventNames } from '@hicommonwealth/schemas';
+import { EventNames, QuestParticipationLimit } from '@hicommonwealth/schemas';
 import { slugify } from '@hicommonwealth/shared';
-import { useGetThreadsByIdQuery } from 'client/scripts/state/api/threads';
+import { questParticipationPeriodToCopyMap } from 'helpers/quest';
 import { useFlag } from 'hooks/useFlag';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import { useGetQuestByIdQuery } from 'state/api/quest';
+import { useGetThreadsByIdQuery } from 'state/api/threads';
 import { useGetRandomResourceIds, useGetXPs } from 'state/api/user';
 import { useAuthModalStore } from 'state/ui/modals';
 import useUserStore from 'state/ui/user';
@@ -154,6 +155,13 @@ const QuestDetails = ({ id }: { id: number }) => {
     }
   };
 
+  const isRepeatableQuest =
+    quest.action_metas?.[0]?.participation_limit ===
+    QuestParticipationLimit.OncePerPeriod;
+  const questRepeatitionCycle = quest.action_metas?.[0]?.participation_period;
+  const questParticipationLimitPerCycle =
+    quest.action_metas?.[0]?.participation_times_per_period || 0;
+
   return (
     <CWPageLayout>
       <section className="QuestDetails">
@@ -171,6 +179,14 @@ const QuestDetails = ({ id }: { id: number }) => {
                 'DD/MM/YYYY',
               )} to ${moment(quest.end_date).format('DD/MM/YYYY')}`}
             />
+            {isRepeatableQuest && (
+              <CWTag
+                type="active"
+                label={`Users can participate ${
+                  questParticipationLimitPerCycle
+                } times every ${questParticipationPeriodToCopyMap[questRepeatitionCycle || '']}}`}
+              />
+            )}
             {isCompleted && <CWTag type="active" label="Completed" />}
             {/* TODO: quest repetition cycle for repeteable quests */}
           </div>

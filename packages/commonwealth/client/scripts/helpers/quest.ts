@@ -1,3 +1,4 @@
+import { QuestParticipationPeriod } from '@hicommonwealth/schemas';
 import moment from 'moment';
 
 export const calculateQuestTimelineLabel = ({
@@ -34,4 +35,10 @@ export const calculateQuestTimelineLabel = ({
       ? `${startHoursRemaining} hours`
       : `${startDaysRemaining} day${startDaysRemaining > 1 ? 's' : ''}`
   }`;
+};
+
+export const questParticipationPeriodToCopyMap = {
+  [QuestParticipationPeriod.Daily]: 'day',
+  [QuestParticipationPeriod.Weekly]: 'week',
+  [QuestParticipationPeriod.Monthly]: 'month',
 };
