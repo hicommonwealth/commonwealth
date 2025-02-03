@@ -1,9 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import { createPortal } from 'react-dom';
-import {
-  CommentEditor,
-  CommentEditorProps,
-} from 'views/components/Comments/CommentEditor/CommentEditor';
+import { CommentEditor } from 'views/components/Comments/CommentEditor';
+import type { CommentEditorProps } from 'views/components/Comments/CommentEditor/CommentEditor';
 import { MobileInput } from 'views/components/StickEditorContainer/MobileInput';
 import './MobileStickyInput.scss';
 
@@ -11,9 +9,9 @@ import './MobileStickyInput.scss';
  * This mobile version uses a portal to add itself to the bottom nav.
  */
 export const MobileStickyInput = (props: CommentEditorProps) => {
-  const { handleSubmitComment } = props;
-
+  const { handleSubmitComment, replyingToAuthor } = props;
   const [focused, setFocused] = useState(false);
+  const [useAiStreaming, setUseAiStreaming] = useState(false);
 
   const handleFocused = useCallback(() => {
     setFocused(true);
@@ -36,13 +34,14 @@ export const MobileStickyInput = (props: CommentEditorProps) => {
   }
 
   if (focused) {
-    // return the full editor for the mobile device full screen...
     return (
       <div className="MobileStickyInputFocused">
         <CommentEditor
           {...props}
           shouldFocus={true}
           onCancel={handleCancel}
+          useAiStreaming={useAiStreaming}
+          setUseAiStreaming={setUseAiStreaming}
           handleSubmitComment={customHandleSubmitComment}
         />
       </div>
@@ -50,11 +49,14 @@ export const MobileStickyInput = (props: CommentEditorProps) => {
   }
 
   return createPortal(
-    <>
-      <div className="MobileStickyInput">
-        <MobileInput {...props} onFocus={handleFocused} />
-      </div>
-    </>,
+    <div className="MobileStickyInput">
+      <MobileInput
+        {...props}
+        onFocus={handleFocused}
+        useAiStreaming={useAiStreaming}
+        setUseAiStreaming={setUseAiStreaming}
+      />
+    </div>,
     parent,
   );
 };

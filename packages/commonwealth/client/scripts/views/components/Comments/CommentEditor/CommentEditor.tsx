@@ -7,6 +7,7 @@ import { User } from 'views/components/user/user';
 import { CWText } from '../../component_kit/cw_text';
 import { CWValidationText } from '../../component_kit/cw_validation_text';
 import { CWButton } from '../../component_kit/new_designs/CWButton';
+import { CWToggle } from '../../component_kit/new_designs/cw_toggle';
 import { ReactQuillEditor } from '../../react_quill_editor';
 import './CommentEditor.scss';
 
@@ -25,6 +26,8 @@ export type CommentEditorProps = {
   tooltipText?: string;
   isReplying?: boolean;
   replyingToAuthor?: string;
+  useAiStreaming?: boolean;
+  setUseAiStreaming?: (value: boolean) => void;
 };
 
 export const CommentEditor = ({
@@ -39,6 +42,9 @@ export const CommentEditor = ({
   author,
   shouldFocus,
   tooltipText,
+  replyingToAuthor,
+  useAiStreaming,
+  setUseAiStreaming,
 }: CommentEditorProps) => {
   return (
     <div className="CommentEditor">
@@ -60,6 +66,18 @@ export const CommentEditor = ({
               shouldLinkProfile
             />
           </CWText>
+        </div>
+        <div className="attribution-right-content">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+            <CWToggle
+              checked={useAiStreaming}
+              onChange={() => setUseAiStreaming?.(!useAiStreaming)}
+              icon="sparkle"
+              size="xs"
+              iconColor="#757575"
+            />
+            <span style={{ fontSize: '12px', color: '#757575' }}>AI</span>
+          </div>
         </div>
         {errorMsg && <CWValidationText message={errorMsg} status="failure" />}
       </div>

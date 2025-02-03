@@ -10,10 +10,13 @@
   .attribution-row {
     display: flex;
     justify-content: space-between;
+    align-items: center;
+    width: 100%;
 
     .attribution-left-content {
       display: flex;
       gap: 4px;
+      align-items: center;
 
       .caption {
         display: inline-block;
@@ -27,6 +30,12 @@
           }
         }
       }
+    }
+
+    .attribution-right-content {
+      display: flex;
+      align-items: center;
+      margin-left: auto;
     }
   }
 

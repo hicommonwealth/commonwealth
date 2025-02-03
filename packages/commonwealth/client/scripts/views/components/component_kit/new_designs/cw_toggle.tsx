@@ -4,6 +4,8 @@ import './cw_toggle.scss';
 
 import { useFormContext } from 'react-hook-form';
 import { setDarkMode } from '../../../../helpers/darkMode';
+import { CWIcon } from '../cw_icons/cw_icon';
+import type { IconName } from '../cw_icons/cw_icon_lookup';
 import { getClasses } from '../helpers';
 import type { BaseStyleProps } from '../types';
 import { ComponentType } from '../types';
@@ -22,12 +24,15 @@ type FormFieldValidationProps = {
 
 export type ToggleStyleProps = {
   checked?: boolean;
-  size: 'small' | 'large';
+  size?: 'xs' | 'small' | 'large';
 } & BaseStyleProps &
   FormFieldValidationProps;
 
 export type ToggleProps = {
   onChange?: (e?: any) => void;
+  icon?: IconName;
+  label?: string;
+  iconColor?: string;
 } & ToggleStyleProps;
 
 export const CWToggle = (props: ToggleProps) => {
@@ -36,9 +41,12 @@ export const CWToggle = (props: ToggleProps) => {
     disabled = false,
     onChange,
     checked,
-    size,
+    size = 'small',
     name,
     hookToForm,
+    icon,
+    label,
+    iconColor,
   } = props;
 
   const params = {
@@ -82,7 +90,14 @@ export const CWToggle = (props: ToggleProps) => {
           })}
         className="toggle-input"
       />
-      <div className="slider" />
+      <div className="slider">
+        {icon && checked && (
+          <div className="icon-container">
+            <CWIcon iconName={icon} iconSize={size} iconColor={iconColor} />
+          </div>
+        )}
+      </div>
+      {label && <span className="toggle-label">{label}</span>}
     </label>
   );
 };

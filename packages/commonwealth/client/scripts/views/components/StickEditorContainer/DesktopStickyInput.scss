@@ -6,6 +6,7 @@
   display: flex;
   z-index: 70;
   background: $white;
+  width: 100%;
 
   .DesktopStickyInputPending {
     flex-grow: 1;
@@ -14,5 +15,18 @@
     border: 1px solid #ccc;
     margin-bottom: 16px;
     border-radius: 8px;
+  }
+
+  .DesktopStickyInputCollapsed {
+    width: 100%;
+    margin-bottom: 16px;
+  }
+
+  .DesktopStickyInputExpanded {
+    width: 100%;
+    background: #ffffff;
+    border-radius: 8px;
+    border: 1px solid #e5e5e5;
+    padding: 16px;
   }
 }
