@@ -24,7 +24,7 @@ const Quests = ({
   const navigate = useCommonNavigate();
 
   const handleSeeAllQuests = () => {
-    navigate('/explore');
+    navigate('/explore', {}, null);
   };
 
   const handleQuestCTAClick = (questId: number) => {
