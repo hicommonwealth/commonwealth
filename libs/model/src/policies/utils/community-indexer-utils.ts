@@ -90,8 +90,8 @@ export async function* paginateClankerTokens({
 
       // Move to the next page
       pageNum++;
-    } catch (err: any) {
-      log.error(`Error fetching clanker tokens: ${err.message}`);
+    } catch (err: unknown) {
+      log.error(`Error fetching clanker tokens: ${(err as Error).message}`);
       throw err;
     }
   }
