@@ -28,10 +28,11 @@ export function GetRandomResourceIds(): Query<
           C.active IS true 
           AND C.lifetime_thread_count > 0
           AND T.id IS NOT NULL
-          AND T.deleted_at IS NOT NULL
-          AND COM.deleted_at IS NOT NULL
-          AND COM.marked_as_spam_at IS NULL
           AND COM.id IS NOT NULL
+          AND T.deleted_at IS NULL
+          AND COM.deleted_at IS NULL
+          AND T.marked_as_spam_at IS NULL
+          AND COM.marked_as_spam_at IS NULL
           ${exclude_joined_communities ? 'AND C.id NOT IN (SELECT id FROM UserJoinedCommunities)' : ''}
         ORDER BY random()
         LIMIT :limit;

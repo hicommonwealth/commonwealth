@@ -1,33 +1,27 @@
-import axios from 'axios';
+import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import { useCommonNavigate } from 'navigation/helpers';
-import React, { useEffect } from 'react';
-import { SERVER_URL } from 'state/api/config';
+import React from 'react';
+import { useGetThreadsByIdQuery } from 'state/api/threads';
 import { PageLoading } from './loading';
 
 const ThreadRedirect = ({ identifier }: { identifier: string }) => {
   const navigate = useCommonNavigate();
 
-  useEffect(() => {
-    const getThreadCommunity = async () => {
-      const threadId = identifier.split('-')[0];
+  const threadId = parseInt(identifier.split('-')[0]);
+  const { data: threads, error } = useGetThreadsByIdQuery({
+    thread_ids: [threadId],
+    apiCallEnabled: !!threadId,
+  });
+  const foundThread = threads?.[0];
 
-      const response = await axios
-        .get(`${SERVER_URL}/getThreads`, {
-          params: {
-            ids: [threadId],
-          },
-        })
-        .then((r) => r['data']['result'][0])
-        .catch(() => null);
-
-      if (response && response.chain) {
-        navigate(`/discussion/${identifier}`, {}, response.chain);
-      } else {
-        navigate('/error');
-      }
-    };
-    getThreadCommunity();
-  }, [navigate, identifier]);
+  useRunOnceOnCondition({
+    callback: () => {
+      !foundThread || error
+        ? navigate('/error')
+        : navigate(`/discussion/${identifier}`, {}, foundThread?.community_id);
+    },
+    shouldRun: !!(foundThread || error),
+  });
 
   return <PageLoading />;
 };

@@ -1,13 +1,10 @@
-import React from 'react';
-
 import { EventNames, QuestParticipationLimit } from '@hicommonwealth/schemas';
-import { slugify } from '@hicommonwealth/shared';
 import { questParticipationPeriodToCopyMap } from 'helpers/quest';
 import { useFlag } from 'hooks/useFlag';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
+import React from 'react';
 import { useGetQuestByIdQuery } from 'state/api/quest';
-import { useGetThreadsByIdQuery } from 'state/api/threads';
 import { useGetRandomResourceIds, useGetXPs } from 'state/api/user';
 import { useAuthModalStore } from 'state/ui/modals';
 import useUserStore from 'state/ui/user';
@@ -72,14 +69,6 @@ const QuestDetails = ({ id }: { id: number }) => {
     });
   const randomResourceId = randomResourceIds?.results?.[0];
 
-  const { data: threads } = useGetThreadsByIdQuery({
-    community_id: randomResourceId?.community_id || '',
-    thread_ids: [randomResourceId?.thread_id || 0],
-    apiCallEnabled: !!(
-      randomResourceId?.community_id && randomResourceId?.thread_id
-    ),
-  });
-
   const { setAuthModalType } = useAuthModalStore();
 
   if (!xpEnabled || !questId) {
@@ -127,23 +116,16 @@ const QuestDetails = ({ id }: { id: number }) => {
         navigate(`/${randomResourceId?.community_id}/discussions`);
         break;
       }
-      // TODO: fix comment/thread ids
       case EventNames.ThreadUpvoted:
       case EventNames.CommentCreated: {
-        navigate(
-          `/${
-            randomResourceId?.community_id
-          }/discussion/${`${threads?.[0]?.id}-${slugify(threads?.[0]?.title || '')}`}`,
-        );
+        navigate(`/discussion/${`${randomResourceId?.thread_id}`}`);
         break;
       }
       case EventNames.CommentUpvoted: {
         navigate(
-          `/${randomResourceId?.community_id}/discussion/${
-            threads?.[0]?.id
-          }-${slugify(
-            threads?.[0]?.title || '',
-          )}?comment=${randomResourceId?.comment_id}`,
+          `discussion/${
+            randomResourceId?.thread_id
+          }?comment=${randomResourceId?.comment_id}`,
         );
         break;
       }
