@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { AuthContext } from '../context';
 import { Quest } from '../entities';
 import { PG_INT } from '../utils';
+import { PaginatedResultSchema, PaginationParamsSchema } from './pagination';
 
 export const QuestView = Quest.extend({
   id: PG_INT,
@@ -18,6 +19,14 @@ export const GetQuest = {
 };
 
 export const GetQuests = {
-  input: z.object({}), // TODO: filter options
-  output: z.array(QuestView),
+  input: PaginationParamsSchema.extend({
+    community_id: z.string().optional(),
+    start_after: z.coerce.date().optional(),
+    start_before: z.coerce.date().optional(),
+    end_after: z.coerce.date().optional(),
+    end_before: z.coerce.date().optional(),
+  }),
+  output: PaginatedResultSchema.extend({
+    results: z.array(QuestView),
+  }),
 };

@@ -5,12 +5,14 @@ import {
   CWImageInput,
   ImageBehavior,
 } from 'views/components/component_kit/CWImageInput';
+import CWRepetitionCycleRadioButton from 'views/components/component_kit/CWRepetitionCycleRadioButton';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTextArea } from 'views/components/component_kit/cw_text_area';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWForm } from 'views/components/component_kit/new_designs/CWForm';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
+import { withTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import { CWRadioButton } from 'views/components/component_kit/new_designs/cw_radio_button';
 import './CreateQuestForm.scss';
 import QuestActionSubForm, { QuestAction } from './QuestActionSubForm';
@@ -30,10 +32,13 @@ const CreateQuestForm = () => {
     isProcessingQuestImage,
     setIsProcessingQuestImage,
     minStartDate,
+    repetitionCycleRadio,
+    formMethodsRef,
   } = useCreateQuestForm();
 
   return (
     <CWForm
+      ref={formMethodsRef}
       validationSchema={questFormValidationSchema}
       onSubmit={handleSubmit}
       onErrors={validateSubForms}
@@ -42,13 +47,14 @@ const CreateQuestForm = () => {
       <div className="quest-period-section">
         <div className="repeatition-selector">
           <CWText type="b1" fontWeight="semiBold">
-            Quests can be completed by members
+            Quests timeline
           </CWText>
-          <CWRadioButton
+          <CWRepetitionCycleRadioButton
+            customError={repetitionCycleRadio.error}
+            {...repetitionCycleRadio.props}
             className="radio-btn"
             value={QuestParticipationLimit.OncePerPeriod}
-            label="Repeatable daily"
-            groupName="quest"
+            groupName="participation_limit"
             name="participation_limit"
             hookToForm
           />
@@ -56,7 +62,7 @@ const CreateQuestForm = () => {
             className="radio-btn"
             value={QuestParticipationLimit.OncePerQuest}
             label="One time only"
-            groupName="quest"
+            groupName="participation_limit"
             name="participation_limit"
             hookToForm
             checked
@@ -114,22 +120,6 @@ const CreateQuestForm = () => {
 
       <CWDivider />
 
-      <div className="reward-section">
-        <CWText type="b1" fontWeight="semiBold">
-          Reward
-        </CWText>
-
-        <CWTextInput
-          label="Points Earned"
-          placeholder="Amount per action"
-          fullWidth
-          name="reward_amount"
-          hookToForm
-        />
-      </div>
-
-      <CWDivider />
-
       <div className="actions-section">
         <div className="header">
           <CWText type="b1" fontWeight="semiBold">
@@ -145,6 +135,7 @@ const CreateQuestForm = () => {
             key={subForm.id}
             errors={subForm.errors}
             defaultValues={subForm.values}
+            config={subForm.config}
             onChange={(updateBody) => updateSubFormByIndex(updateBody, index)}
             isRemoveable={questActionSubForms.length !== MIN_ACTIONS_LIMIT}
             onRemove={() => removeSubFormByIndex(index)}
@@ -156,16 +147,20 @@ const CreateQuestForm = () => {
           />
         ))}
 
-        <CWButton
-          containerClassName="add-action-btn-outline"
-          className="add-action-btn"
-          label="Add action"
-          buttonWidth="full"
-          type="button"
-          buttonAlt="green"
-          onClick={addSubForm}
-          disabled={questActionSubForms.length >= MAX_ACTIONS_LIMIT}
-        />
+        {withTooltip(
+          <CWButton
+            containerClassName="add-action-btn-outline"
+            className="add-action-btn"
+            label="Add action"
+            buttonWidth="full"
+            type="button"
+            buttonAlt="green"
+            onClick={addSubForm}
+            disabled={questActionSubForms.length >= MAX_ACTIONS_LIMIT}
+          />,
+          'Cannot add more actions',
+          questActionSubForms.length >= MAX_ACTIONS_LIMIT,
+        )}
       </div>
 
       <CWDivider />
