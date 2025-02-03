@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { AuthContext } from '../context';
 import { Quest } from '../entities';
 import { PG_INT } from '../utils';
+import { PaginatedResultSchema, PaginationParamsSchema } from './pagination';
 
 export const QuestView = Quest.extend({
   id: PG_INT,
@@ -12,14 +13,20 @@ export const QuestView = Quest.extend({
 });
 
 export const GetQuest = {
-  input: z.object({ community_id: z.string(), quest_id: PG_INT }),
+  input: z.object({ quest_id: PG_INT }),
   output: QuestView.optional(),
   context: AuthContext,
 };
 
 export const GetQuests = {
-  input: z.object({
-    community_id: z.string(),
+  input: PaginationParamsSchema.extend({
+    community_id: z.string().optional(),
+    start_after: z.coerce.date().optional(),
+    start_before: z.coerce.date().optional(),
+    end_after: z.coerce.date().optional(),
+    end_before: z.coerce.date().optional(),
   }),
-  output: z.array(QuestView),
+  output: PaginatedResultSchema.extend({
+    results: z.array(QuestView),
+  }),
 };

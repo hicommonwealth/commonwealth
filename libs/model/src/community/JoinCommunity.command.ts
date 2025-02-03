@@ -3,8 +3,8 @@ import * as schemas from '@hicommonwealth/schemas';
 import { ChainBase, addressSwapper } from '@hicommonwealth/shared';
 import { models } from '../database';
 import { mustExist } from '../middleware/guards';
-import { incrementProfileCount } from '../utils';
 import { findCompatibleAddress } from '../utils/findBaseAddress';
+import { emitEvent } from '../utils/utils';
 
 export const JoinCommunityErrors = {
   NotVerifiedAddressOrUser: 'Not verified address or user',
@@ -102,11 +102,22 @@ export function JoinCommunity(): Command<typeof schemas.JoinCommunity> {
             { transaction },
           );
 
-          await incrementProfileCount(
-            community.id,
-            actor.user.id!,
+          await models.Community.increment('profile_count', {
+            by: 1,
+            where: { id: community_id },
             transaction,
-          );
+          });
+
+          await emitEvent(models.Outbox, [
+            {
+              event_name: schemas.EventNames.CommunityJoined,
+              event_payload: {
+                community_id,
+                user_id: actor.user.id!,
+                created_at: created.created_at!,
+              },
+            },
+          ]);
 
           return created.id!;
         },

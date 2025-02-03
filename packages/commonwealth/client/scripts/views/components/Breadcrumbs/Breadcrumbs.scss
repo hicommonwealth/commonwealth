@@ -1,4 +1,4 @@
-@import '../../../../styles/shared';
+@import '../../../styles/shared';
 
 .BreadcrumbsPageLayout {
   padding-block: 0;
@@ -10,18 +10,18 @@
     background-color: $white;
     padding-block: 16px;
     position: fixed;
-    z-index: 3;
+    z-index: 1 !important;
     overflow: auto;
     width: 100%;
-    max-width: 1000px;
+    max-width: 1040px;
     overflow: hidden;
     max-height: 52px !important;
     min-height: 52px !important;
+    padding-bottom: 2px !important;
 
     @include extraSmall {
       position: static;
     }
-
     .disable-active-cursor {
       &:hover {
         cursor: default;
@@ -31,7 +31,7 @@
 
   .BreadcrumbsBlockContentArea {
     width: 100%;
-    max-width: 1000px;
+    max-width: 1040px;
     max-height: 52px !important;
     min-height: 52px !important;
     @include extraSmall {

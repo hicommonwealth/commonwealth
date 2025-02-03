@@ -10,6 +10,7 @@ import {
 import { Op } from 'sequelize';
 import { models } from '../database';
 import { mustBeSuperAdmin, mustExist } from '../middleware/guards';
+import { emitEvent } from '../utils';
 import { findCompatibleAddress } from '../utils/findBaseAddress';
 
 export const CreateCommunityErrors = {
@@ -105,6 +106,12 @@ export function CreateCommunity(): Command<typeof schemas.CreateCommunity> {
       else if (base === ChainBase.CosmosSDK && !node.cosmos_chain_id)
         throw new InvalidInput(CreateCommunityErrors.CosmosChainNameRequired);
 
+      const user = await models.User.findOne({
+        where: { id: actor.user.id },
+        attributes: ['id', 'referred_by_address'],
+      });
+      mustExist('User', user);
+
       // == command transaction boundary ==
       await models.sequelize.transaction(async (transaction) => {
         await models.Community.create(
@@ -145,9 +152,9 @@ export function CreateCommunity(): Command<typeof schemas.CreateCommunity> {
           { transaction },
         );
 
-        await models.Address.create(
+        const created = await models.Address.create(
           {
-            user_id: actor.user.id,
+            user_id: user.id,
             address: admin_address.address,
             community_id: id,
             hex:
@@ -166,6 +173,22 @@ export function CreateCommunity(): Command<typeof schemas.CreateCommunity> {
             is_banned: false,
           },
           { transaction },
+        );
+
+        await emitEvent(
+          models.Outbox,
+          [
+            {
+              event_name: schemas.EventNames.CommunityCreated,
+              event_payload: {
+                community_id: id,
+                user_id: user.id!,
+                referrer_address: user.referred_by_address ?? undefined,
+                created_at: created.created_at!,
+              },
+            },
+          ],
+          transaction,
         );
       });
       // == end of command transaction boundary ==

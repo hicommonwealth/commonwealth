@@ -1,6 +1,6 @@
 import { isBoolean, isNotNil } from 'helpers/typeGuards';
 
-import breakpoints from '../../../../styles/mixins/breakpoints.module.scss';
+import breakpoints from '../../../styles/mixins/breakpoints.module.scss';
 
 export const getClasses = <T>(
   styleAttrs: T,
@@ -47,6 +47,13 @@ export const isWindowSmall = (width: number) =>
 
 export const isWindowExtraSmall = (width: number) =>
   width < parseInt(breakpoints.breakpointExtraSmallMax);
+
+export const isWindowSmallToMedium = (width: number) =>
+  width < parseInt(breakpoints.breakpointmediummaxNew) &&
+  width > parseInt(breakpoints.breakpointsmallmaxNew);
+
+export const isWindowSmallToMediumInclusive = (width: number) =>
+  width < parseInt(breakpoints.breakpointSmallMaxNew);
 
 export const breakpointFnValidator = (
   widthState: boolean,

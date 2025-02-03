@@ -1,4 +1,4 @@
-@import '../../../../../styles/shared';
+@import '../../../../styles/shared';
 
 .ThreadCard {
   cursor: pointer;
@@ -10,6 +10,8 @@
   gap: 16px;
   text-decoration: none;
   color: unset !important;
+  overflow: hidden;
+  min-width: 100%;
 
   @include smallInclusive {
     padding: 12px;
@@ -163,7 +165,6 @@
         display: flex;
         flex-wrap: wrap;
         gap: 8px;
-        padding-right: 72px; // hack to be removed on completion of discussion listings
 
         @include extraSmall {
           padding-right: 0;
@@ -198,6 +199,7 @@
     .content-footer {
       display: flex;
       justify-content: space-between;
+      margin-top: auto;
 
       .content-footer-btn {
         outline: 0;
@@ -263,4 +265,128 @@
 
 .ThreadDivider {
   margin-top: 0 !important;
+}
+
+.virtuoso-grid-list {
+  row-gap: 5px !important;
+  display: flex !important;
+  flex-wrap: wrap !important;
+  justify-content: space-between;
+  align-items: flex-start !important;
+  justify-content: start !important;
+}
+
+.virtuoso-grid-item {
+  border-radius: 6px;
+  width: 33% !important;
+  display: flex !important;
+  border: 1px solid $neutral-100 !important;
+  align-items: flex-start !important;
+
+  @include mediumToLarge {
+    width: 49% !important;
+  }
+
+  @include smallInclusive {
+    width: 100% !important;
+    max-height: 280px !important;
+    min-height: 200px !important;
+  }
+
+  .ThreadCard {
+    max-width: 100%;
+    overflow: hidden !important;
+    padding: 10px !important;
+    gap: 10px !important;
+
+    .content-wrapper {
+      max-width: 100%;
+      gap: 16px !important;
+      font-size: 14px !important;
+      overflow: hidden !important;
+      max-height: 250px;
+      min-height: 250px;
+      .content-body-wrapper {
+        min-height: 100% !important;
+        overflow: hidden;
+        position: relative;
+        gap: 2px !important;
+        .show-more-btn {
+          display: none;
+        }
+        .content-body.show-image {
+          display: flex;
+          align-items: flex-start;
+          justify-content: space-between;
+          .card-image-container {
+            max-width: 100px !important;
+            width: 100%;
+            object-fit: cover;
+            padding: 5px 0px;
+            img {
+              object-fit: contain;
+              max-width: 100%;
+              max-height: 100%;
+            }
+          }
+          .card-view {
+            display: flex;
+            .MarkdownFormattedText {
+              max-width: 100%;
+            }
+          }
+        }
+        .content-body {
+          .card-view {
+            width: 100%;
+            display: flex;
+            position: relative;
+            flex-direction: row;
+            padding: 5px 0px !important;
+            .card-image-container {
+              width: 100px !important;
+              height: 100px !important;
+              object-fit: cover;
+              margin-top: 20px;
+              img {
+                object-fit: contain;
+                max-width: 100%;
+                max-height: 100%;
+              }
+            }
+          }
+          .show-more-btn {
+            display: none;
+          }
+          .MarkdownFormattedText {
+            img {
+              display: none !important;
+            }
+            p {
+              font-size: 14px !important;
+            }
+          }
+        }
+        .content-title {
+          padding-right: 0 !important;
+          .Text {
+            font-size: 14px !important;
+          }
+        }
+      }
+    }
+  }
+
+  .AuthorAndPublishInfo {
+    gap: 4px !important;
+  }
+  .User .id-short {
+    display: none;
+  }
+  .dot-indicator {
+    display: none !important;
+  }
+  .publish-date {
+    margin: 0 !important;
+  }
 }

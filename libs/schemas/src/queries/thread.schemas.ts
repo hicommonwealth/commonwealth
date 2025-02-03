@@ -1,12 +1,13 @@
-import { z } from 'zod';
+import { ZodType, z } from 'zod';
 import {
   Address,
   Comment,
+  CommentVersionHistory,
   ContestManager,
   ProfileTags,
   Thread,
   ThreadVersionHistory,
-  User,
+  UserProfile,
 } from '../entities';
 import { ContestAction } from '../projections';
 import { PG_INT, paginationSchema } from '../utils';
@@ -52,13 +53,29 @@ export const ProfileTagsView = ProfileTags.extend({
   updated_at: z.date().or(z.string()).nullish(),
 });
 
-export const UserView = User.extend({
+export const UserView = z.object({
   id: PG_INT,
+  email: z.string().max(255).email().nullish(),
+  isAdmin: z.boolean().default(false).nullish(),
+  disableRichText: z.boolean().default(false).optional(),
+  emailVerified: z.boolean().default(false).nullish(),
+  selected_community_id: z.string().max(255).nullish(),
+  emailNotificationInterval: z
+    .enum(['weekly', 'never'])
+    .default('never')
+    .optional(),
+  promotional_emails_enabled: z.boolean().nullish(),
+  is_welcome_onboard_flow_complete: z.boolean().default(false).optional(),
+
+  profile: UserProfile,
+  xp_points: PG_INT.default(0).nullish(),
+
   created_at: z.date().or(z.string()).nullish(),
   updated_at: z.date().or(z.string()).nullish(),
   ProfileTags: z.array(ProfileTagsView).optional(),
-  ApiKey: z.undefined(),
+  unsubscribe_uuid: z.string().uuid().nullish().optional(),
 });
+type UserView = z.infer<typeof UserView>;
 
 export const AddressView = Address.extend({
   id: PG_INT,
@@ -67,7 +84,7 @@ export const AddressView = Address.extend({
   last_active: z.date().or(z.string()).nullish(),
   created_at: z.date().or(z.string()).nullish(),
   updated_at: z.date().or(z.string()).nullish(),
-  User: UserView.optional(),
+  User: UserView.optional().nullish() as ZodType<UserView | null | undefined>,
 });
 
 export const ReactionView = z.object({
@@ -91,6 +108,11 @@ export const ReactionView = z.object({
   avatar_url: z.string().optional(),
 });
 
+export const CommentVersionHistoryView = CommentVersionHistory.extend({
+  id: PG_INT,
+  timestamp: z.date().or(z.string()),
+});
+
 export const CommentView = Comment.extend({
   id: PG_INT,
   created_at: z.date().or(z.string()).nullish(),
@@ -99,14 +121,16 @@ export const CommentView = Comment.extend({
   marked_as_spam_at: z.date().or(z.string()).nullish(),
   Address: AddressView.nullish(),
   Thread: z.undefined(),
+  community_id: z.string(),
+  last_active: z.date().or(z.string()).nullish(),
   Reaction: ReactionView.nullish(),
-  CommentVersionHistories: z.undefined(),
   search: z.undefined(),
   // this is returned by GetThreads
   address: z.string(),
   profile_name: z.string().optional(),
   profile_avatar: z.string().optional(),
   user_id: PG_INT,
+  CommentVersionHistories: z.array(CommentVersionHistoryView).nullish(),
 });
 
 export const ThreadVersionHistoryView = ThreadVersionHistory.extend({
@@ -130,12 +154,17 @@ export const ThreadView = Thread.extend({
   Reaction: ReactionView.nullish(),
   collaborators: AddressView.array().nullish(),
   reactions: ReactionView.array().nullish(),
-  associatedContests: z.array(ContestView).optional(),
+  associatedContests: z.array(ContestView).nullish(),
   topic: TopicView.optional(),
   topic_id: PG_INT.optional(),
   ContestActions: z.array(ContestActionView).optional(),
   Comments: z.array(CommentView).optional(),
   ThreadVersionHistories: z.array(ThreadVersionHistoryView).nullish(),
+  search: z.union([z.string(), z.record(z.any())]).nullish(),
+  total_num_thread_results: z
+    .number()
+    .nullish()
+    .describe('total number of thread results for the query'),
 });
 
 export const OrderByQueriesKeys = z.enum([
@@ -224,6 +253,7 @@ export const GetThreads = {
     limit: z.number(),
     numVotingThreads: z.number(),
     threads: z.array(ThreadView),
+    threadCount: z.number().optional(),
   }),
 };
 
@@ -254,7 +284,7 @@ export const DEPRECATED_GetBulkThreads = z.object({
 
 export const GetThreadsByIds = {
   input: z.object({
-    community_id: z.string(),
+    community_id: z.string().optional(),
     thread_ids: z.string(),
   }),
   output: z.array(ThreadView),

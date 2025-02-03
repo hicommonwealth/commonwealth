@@ -1,8 +1,8 @@
 import { configure, config as target } from '@hicommonwealth/core';
+import { S3_ASSET_BUCKET_CDN } from '@hicommonwealth/shared';
 import { z } from 'zod';
 
 const {
-  TEST_DB_NAME,
   DATABASE_URL,
   DATABASE_CLEAN_HOUR,
   DATABASE_LOG_TRACE,
@@ -13,7 +13,6 @@ const {
   PRIVATE_KEY,
   TBC_BALANCE_TTL_SECONDS,
   BLACKLISTED_EVENTS,
-  INIT_TEST_DB,
   MAX_USER_POSTS_PER_CONTEST,
   JWT_SECRET,
   ADDRESS_TOKEN_EXPIRES_IN,
@@ -34,25 +33,32 @@ const {
   ALCHEMY_PUBLIC_APP_KEY,
   MEMBERSHIP_REFRESH_BATCH_SIZE,
   MEMBERSHIP_REFRESH_TTL_SECONDS,
+  NEYNAR_BOT_UUID,
   NEYNAR_API_KEY,
   NEYNAR_CAST_CREATED_WEBHOOK_SECRET,
+  NEYNAR_CONTEST_BOT_MENTIONED_WEBHOOK_SECRET,
   NEYNAR_REPLY_WEBHOOK_URL,
   FARCASTER_ACTION_URL,
   FLAG_FARCASTER_CONTEST,
+  FARCASTER_MANIFEST_HEADER,
+  FARCASTER_MANIFEST_PAYLOAD,
+  FARCASTER_MANIFEST_SIGNATURE,
+  FARCASTER_MANIFEST_DOMAIN,
+  FARCASTER_NGROK_DOMAIN,
   OPENAI_API_KEY,
   OPENAI_ORGANIZATION,
+  CONTEST_BOT_PRIVATE_KEY,
+  CONTEST_BOT_NAMESPACE,
 } = process.env;
 
-const NAME =
-  target.NODE_ENV === 'test' ? TEST_DB_NAME || 'common_test' : 'commonwealth';
+const NAME = target.NODE_ENV === 'test' ? 'common_test' : 'commonwealth';
 
 const DEFAULTS = {
   JWT_SECRET: 'my secret',
   ADDRESS_TOKEN_EXPIRES_IN: '10',
   PRIVATE_KEY: '',
   DATABASE_URL: `postgresql://commonwealth:edgeware@localhost/${NAME}`,
-  DEFAULT_COMMONWEALTH_LOGO:
-    'https://s3.amazonaws.com/assets.commonwealth.im/common-white.png',
+  DEFAULT_COMMONWEALTH_LOGO: `https://s3.amazonaws.com/${S3_ASSET_BUCKET_CDN}/common-white.png`,
   MEMBERSHIP_REFRESH_BATCH_SIZE: '1000',
   MEMBERSHIP_REFRESH_TTL_SECONDS: '120',
 };
@@ -67,11 +73,11 @@ export const config = configure(
       CLEAN_HOUR: DATABASE_CLEAN_HOUR
         ? parseInt(DATABASE_CLEAN_HOUR, 10)
         : undefined,
-      INIT_TEST_DB: INIT_TEST_DB === 'true',
       TRACE: DATABASE_LOG_TRACE === 'true',
     },
     WEB3: {
       PRIVATE_KEY: PRIVATE_KEY || '',
+      CONTEST_BOT_PRIVATE_KEY: CONTEST_BOT_PRIVATE_KEY || '',
     },
     TBC: {
       TTL_SECS: TBC_BALANCE_TTL_SECONDS
@@ -89,15 +95,23 @@ export const config = configure(
         : null,
     },
     CONTESTS: {
-      MIN_USER_ETH: 0.0005,
+      MIN_USER_ETH: 0,
       MAX_USER_POSTS_PER_CONTEST: MAX_USER_POSTS_PER_CONTEST
         ? parseInt(MAX_USER_POSTS_PER_CONTEST, 10)
-        : 2,
+        : 5,
       FLAG_FARCASTER_CONTEST: FLAG_FARCASTER_CONTEST === 'true',
+      FARCASTER_NGROK_DOMAIN: FARCASTER_NGROK_DOMAIN,
       NEYNAR_API_KEY: NEYNAR_API_KEY,
+      NEYNAR_BOT_UUID: NEYNAR_BOT_UUID,
       NEYNAR_CAST_CREATED_WEBHOOK_SECRET: NEYNAR_CAST_CREATED_WEBHOOK_SECRET,
+      NEYNAR_CONTEST_BOT_MENTIONED_WEBHOOK_SECRET:
+        NEYNAR_CONTEST_BOT_MENTIONED_WEBHOOK_SECRET,
       NEYNAR_REPLY_WEBHOOK_URL: NEYNAR_REPLY_WEBHOOK_URL,
       FARCASTER_ACTION_URL: FARCASTER_ACTION_URL,
+      FARCASTER_MANIFEST_HEADER: FARCASTER_MANIFEST_HEADER,
+      FARCASTER_MANIFEST_PAYLOAD: FARCASTER_MANIFEST_PAYLOAD,
+      FARCASTER_MANIFEST_SIGNATURE: FARCASTER_MANIFEST_SIGNATURE,
+      FARCASTER_MANIFEST_DOMAIN: FARCASTER_MANIFEST_DOMAIN,
     },
     AUTH: {
       JWT_SECRET: JWT_SECRET || DEFAULTS.JWT_SECRET,
@@ -158,6 +172,9 @@ export const config = configure(
       API_KEY: OPENAI_API_KEY,
       ORGANIZATION: OPENAI_ORGANIZATION || 'org-D0ty00TJDApqHYlrn1gge2Ql',
     },
+    BOT: {
+      CONTEST_BOT_NAMESPACE: CONTEST_BOT_NAMESPACE || '',
+    },
   },
   z.object({
     DB: z.object({
@@ -175,7 +192,6 @@ export const config = configure(
       NAME: z.string(),
       NO_SSL: z.boolean(),
       CLEAN_HOUR: z.coerce.number().int().min(0).max(24).optional(),
-      INIT_TEST_DB: z.boolean(),
       TRACE: z.boolean(),
     }),
     WEB3: z.object({
@@ -185,6 +201,13 @@ export const config = configure(
           (data) =>
             !(target.APP_ENV === 'production' && data === DEFAULTS.PRIVATE_KEY),
           'PRIVATE_KEY must be set to a non-default value in production.',
+        ),
+      CONTEST_BOT_PRIVATE_KEY: z
+        .string()
+        .optional()
+        .refine(
+          (data) => !(target.APP_ENV === 'production' && !data),
+          'CONTEST_BOT_PRIVATE_KEY must be set to a non-default value in production.',
         ),
     }),
     TBC: z.object({
@@ -200,10 +223,77 @@ export const config = configure(
       MIN_USER_ETH: z.number(),
       MAX_USER_POSTS_PER_CONTEST: z.number().int(),
       FLAG_FARCASTER_CONTEST: z.boolean().nullish(),
-      NEYNAR_API_KEY: z.string().nullish(),
-      NEYNAR_CAST_CREATED_WEBHOOK_SECRET: z.string().nullish(),
-      NEYNAR_REPLY_WEBHOOK_URL: z.string().nullish(),
-      FARCASTER_ACTION_URL: z.string().nullish(),
+      FARCASTER_NGROK_DOMAIN: z.string().nullish(),
+      NEYNAR_BOT_UUID: z
+        .string()
+        .optional()
+        .refine(
+          (data) => !(target.APP_ENV === 'production' && !data),
+          'NEYNAR_BOT_UUID must be set to a non-default value in production.',
+        ),
+      NEYNAR_API_KEY: z
+        .string()
+        .optional()
+        .refine(
+          (data) => !(target.APP_ENV === 'production' && !data),
+          'NEYNAR_API_KEY must be set to a non-default value in production.',
+        ),
+      NEYNAR_CAST_CREATED_WEBHOOK_SECRET: z
+        .string()
+        .optional()
+        .refine(
+          (data) => !(target.APP_ENV === 'production' && !data),
+          'NEYNAR_CAST_CREATED_WEBHOOK_SECRET must be set to a non-default value in production.',
+        ),
+      NEYNAR_CONTEST_BOT_MENTIONED_WEBHOOK_SECRET: z
+        .string()
+        .optional()
+        .refine(
+          (data) => !(target.APP_ENV === 'production' && !data),
+          'NEYNAR_CONTEST_BOT_MENTIONED_WEBHOOK_SECRET must be set to a non-default value in production.',
+        ),
+      NEYNAR_REPLY_WEBHOOK_URL: z
+        .string()
+        .optional()
+        .refine(
+          (data) => !(target.APP_ENV === 'production' && !data),
+          'NEYNAR_REPLY_WEBHOOK_URL must be set to a non-default value in production.',
+        ),
+      FARCASTER_ACTION_URL: z
+        .string()
+        .optional()
+        .refine(
+          (data) => !(target.APP_ENV === 'production' && !data),
+          'FARCASTER_ACTION_URL must be set to a non-default value in production.',
+        ),
+      FARCASTER_MANIFEST_HEADER: z
+        .string()
+        .optional()
+        .refine(
+          (data) => !(target.APP_ENV === 'production' && !data),
+          'FARCASTER_MANIFEST_DOMAIN must be set to a non-default value in production.',
+        ),
+      FARCASTER_MANIFEST_PAYLOAD: z
+        .string()
+        .optional()
+        .refine(
+          (data) => !(target.APP_ENV === 'production' && !data),
+          'FARCASTER_MANIFEST_PAYLOAD must be set to a non-default value in production.',
+        ),
+      FARCASTER_MANIFEST_SIGNATURE: z
+        .string()
+        .optional()
+        .refine(
+          (data) => !(target.APP_ENV === 'production' && !data),
+          'FARCASTER_MANIFEST_SIGNATURE must be set to a non-default value in production.',
+        ),
+      FARCASTER_MANIFEST_DOMAIN: z
+        .string()
+        .optional()
+        .refine(
+          (data) => !(target.APP_ENV === 'production' && !data),
+          'FARCASTER_MANIFEST_DOMAIN must be set to a non-default value in production.',
+        ),
     }),
     AUTH: z
       .object({
@@ -288,6 +378,15 @@ export const config = configure(
     OPENAI: z.object({
       API_KEY: z.string().optional(),
       ORGANIZATION: z.string().optional(),
+    }),
+    BOT: z.object({
+      CONTEST_BOT_NAMESPACE: z
+        .string()
+        .optional()
+        .refine(
+          (data) => !(target.APP_ENV === 'production' && !data),
+          'CONTEST_BOT_NAMESPACE must be set to a non-default value in production.',
+        ),
     }),
   }),
 );

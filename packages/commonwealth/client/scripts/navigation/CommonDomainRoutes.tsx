@@ -2,6 +2,7 @@ import { Navigate } from 'navigation/helpers';
 import React, { lazy } from 'react';
 import { Route } from 'react-router-dom';
 import { withLayout } from 'views/Layout';
+import { MobileAppRedirect } from 'views/pages/MobileAppRedirect/MobileAppRedirect';
 import { RouteFeatureFlags } from './Router';
 
 const QuillPage = lazy(() => import('views/pages/QuillPage'));
@@ -14,8 +15,11 @@ const MarkdownHitHighlighterPage = lazy(
 const DashboardPage = lazy(() => import('views/pages/user_dashboard'));
 const CommunitiesPage = lazy(() => import('views/pages/Communities'));
 const SearchPage = lazy(() => import('views/pages/search'));
+const HomePage = lazy(() => import('views/pages/HomePage/HomePage'));
 
 const CreateCommunityPage = lazy(() => import('views/pages/CreateCommunity'));
+const CreateQuestPage = lazy(() => import('views/pages/CreateQuest'));
+const QuestDetailsPage = lazy(() => import('views/pages/QuestDetails'));
 const LaunchToken = lazy(() => import('views/pages/LaunchToken'));
 const OverviewPage = lazy(() => import('views/pages/overview'));
 const MembersPage = lazy(
@@ -36,6 +40,7 @@ const FinishSocialLoginPage = lazy(
 );
 
 const NotificationsPage = lazy(() => import('views/pages/notifications'));
+const LeaderboardPage = lazy(() => import('views/pages/Leaderboard'));
 
 const NotificationSettings = lazy(
   () => import('views/pages/NotificationSettings'),
@@ -78,6 +83,9 @@ const CommunityIntegrations = lazy(
 const CommunityStakeIntegration = lazy(
   () => import('views/pages/CommunityManagement/StakeIntegration'),
 );
+const CommunityTokenIntegration = lazy(
+  () => import('views/pages/CommunityManagement/TokenIntegration'),
+);
 
 const CommunityTopics = lazy(
   () => import('views/pages/CommunityManagement/Topics'),
@@ -91,7 +99,7 @@ const ManageContest = lazy(
 const Contests = lazy(() => import('views/pages/Contests'));
 const ContestPage = lazy(() => import('views/pages/ContestPage'));
 
-const MyCommunityStake = lazy(() => import('views/pages/MyCommunityStake'));
+const MyTransactions = lazy(() => import('views/pages/MyTransactions'));
 
 const SnapshotProposalPage = lazy(
   () => import('views/pages/Snapshots/SnapshotProposals'),
@@ -114,9 +122,20 @@ const CommunityNotFoundPage = lazy(
   () => import('views/pages/CommunityNotFoundPage'),
 );
 
+const UnSubscribePage = lazy(() => import('views/pages/UnSubscribePage'));
+const RewardsPage = lazy(() => import('views/pages/RewardsPage'));
+
 const CommonDomainRoutes = ({
-  tokenizedCommunityEnabled,
+  launchpadEnabled,
+  xpEnabled,
+  homePageEnable,
 }: RouteFeatureFlags) => [
+  <Route
+    key="mobile-app-redirect"
+    path="/_internal/mobile-app-redirect"
+    element={<MobileAppRedirect />}
+  />,
+
   <Route
     key="/_internal/quill"
     path="/_internal/quill"
@@ -140,18 +159,51 @@ const CommonDomainRoutes = ({
     path="/_internal/markdown-viewer"
     element={<MarkdownViewerPage />}
   />,
-
+  ...(homePageEnable
+    ? [
+        <Route
+          key="/"
+          path="/"
+          element={withLayout(HomePage, { type: 'common' })}
+        />,
+      ]
+    : [
+        <Route
+          key="/"
+          path="/"
+          element={withLayout(DashboardPage, { type: 'common' })}
+        />,
+      ]),
   <Route
-    key="/"
-    path="/"
-    element={withLayout(DashboardPage, { type: 'common' })}
+    key="/home"
+    path="/home"
+    element={withLayout(HomePage, { type: 'common' })}
   />,
   <Route
     key="/createCommunity"
     path="/createCommunity"
     element={withLayout(CreateCommunityPage, { type: 'common' })}
   />,
-  ...(tokenizedCommunityEnabled
+  ...(xpEnabled
+    ? [
+        <Route
+          key="/createQuest"
+          path="/createQuest"
+          element={withLayout(CreateQuestPage, { type: 'common' })}
+        />,
+        <Route
+          key="/quest/:id"
+          path="/quest/:id"
+          element={withLayout(QuestDetailsPage, { type: 'common' })}
+        />,
+      ]
+    : []),
+  <Route
+    key="/unSubscribe/:userId"
+    path="/unSubscribe/:userId"
+    element={withLayout(UnSubscribePage, { type: 'common' })}
+  />,
+  ...(launchpadEnabled
     ? [
         <Route
           key="/createTokenCommunity"
@@ -160,22 +212,56 @@ const CommonDomainRoutes = ({
         />,
       ]
     : []),
+  ...(xpEnabled
+    ? [
+        <Route
+          key="/leaderboard"
+          path="/leaderboard"
+          element={withLayout(LeaderboardPage, { type: 'common' })}
+        />,
+      ]
+    : []),
+  ...(homePageEnable
+    ? [
+        <Route
+          key="/dashboard"
+          path="/dashboard"
+          element={withLayout(HomePage, { type: 'common' })}
+        />,
+      ]
+    : [
+        <Route
+          key="/dashboard"
+          path="/dashboard"
+          element={withLayout(DashboardPage, { type: 'common' })}
+        />,
+      ]),
+  ...(homePageEnable
+    ? [
+        <Route
+          key="/dashboard/:type"
+          path="/dashboard/:type"
+          element={withLayout(HomePage, { type: 'common' })}
+        />,
+      ]
+    : [
+        <Route
+          key="/dashboard/:type"
+          path="/dashboard/:type"
+          element={withLayout(DashboardPage, { type: 'common' })}
+        />,
+      ]),
   <Route
-    key="/dashboard"
-    path="/dashboard"
-    element={withLayout(DashboardPage, { type: 'common' })}
-  />,
-  <Route
-    key="/dashboard/:type"
-    path="/dashboard/:type"
-    element={withLayout(DashboardPage, { type: 'common' })}
-  />,
-  <Route
-    key="/communities"
-    path="/communities"
+    key="/explore"
+    path="/explore"
     element={withLayout(CommunitiesPage, {
       type: 'common',
     })}
+  />,
+  <Route
+    key="/rewards"
+    path="/rewards"
+    element={withLayout(RewardsPage, { type: 'common' })}
   />,
   <Route
     key="/search"
@@ -183,9 +269,9 @@ const CommonDomainRoutes = ({
     element={withLayout(SearchPage, { type: 'common' })}
   />,
   <Route
-    key="/myCommunityStake"
-    path="/myCommunityStake"
-    element={withLayout(MyCommunityStake, { type: 'common' })}
+    key="/myTransactions"
+    path="/myTransactions"
+    element={withLayout(MyTransactions, { type: 'common' })}
   />,
   // scoped
   <Route
@@ -344,6 +430,14 @@ const CommonDomainRoutes = ({
     })}
   />,
   <Route
+    key="/new/discussion"
+    path="/new/discussion"
+    element={withLayout(NewThreadPage, {
+      scoped: false,
+      type: 'common',
+    })}
+  />,
+  <Route
     key="/:scope/proposal/discussion/:identifier"
     path="/:scope/proposal/discussion/:identifier"
     element={
@@ -396,6 +490,14 @@ const CommonDomainRoutes = ({
     key="/:scope/manage/integrations/stake"
     path="/:scope/manage/integrations/stake"
     element={withLayout(CommunityStakeIntegration, {
+      scoped: true,
+    })}
+  />,
+
+  <Route
+    key="/:scope/manage/integrations/token"
+    path="/:scope/manage/integrations/token"
+    element={withLayout(CommunityTokenIntegration, {
       scoped: true,
     })}
   />,
@@ -608,7 +710,6 @@ const CommonDomainRoutes = ({
     path="/discussions"
     element={<Navigate to="/" />}
   />,
-  <Route key="/home" path="/home" element={<Navigate to="/" />} />,
   <Route
     key="/:scope/home"
     path="/:scope/home"

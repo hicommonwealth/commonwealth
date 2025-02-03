@@ -1,4 +1,4 @@
-@import '../../../../styles/shared';
+@import '../../../styles/shared';
 
 .BreadcrumbsComponent {
   z-index: 0 !important;
@@ -11,6 +11,7 @@
 
   .layout-container {
     height: 100%;
+    margin-top: 10px;
   }
 }
 
@@ -18,11 +19,11 @@
   display: flex;
   flex: 1;
   flex-direction: column;
+  overflow: hidden;
 
   .header-section {
     display: flex;
     flex-direction: column;
-
     gap: 16px;
     position: sticky;
     top: 0;

@@ -1,0 +1,68 @@
+@import '../../../../../styles/shared';
+
+.LeaderboardSection {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+
+  .search-input-container {
+    margin-block: 4px;
+    margin-bottom: 8px;
+    .text-input-left-icon {
+      position: absolute;
+    }
+  }
+
+  .search-input {
+    padding-left: 48px !important;
+  }
+
+  .search-icon {
+    position: relative;
+    left: 16px !important;
+    color: $neutral-400;
+  }
+
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 48px;
+    text-align: center;
+  }
+
+  .referral-button-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 24px;
+  }
+
+  table {
+    width: 100%;
+    @include table-cell;
+  }
+
+  .table-cell {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    &.text-right {
+      justify-content: flex-end;
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      color: inherit;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+}

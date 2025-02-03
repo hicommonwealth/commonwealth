@@ -1,4 +1,4 @@
-@import '../../../../../styles/shared.scss';
+@import '../../../../styles/shared.scss';
 
 .StakeExchangeForm {
   display: flex;
@@ -20,22 +20,23 @@
     z-index: 10;
   }
 
-  // address dropdown items
-  .text-container {
-    display: flex;
-    align-items: center;
-    font-weight: 500;
-
-    .check-icon {
-      fill: $green-600;
-      margin-right: 8px;
-    }
-  }
-
   .current-balance-row {
     display: flex;
     justify-content: space-between;
     color: $neutral-500;
+
+    .balance-and-magic {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+
+      .wallet-btn {
+        padding-top: 4px;
+        text-decoration: none;
+        color: $primary-600;
+        cursor: pointer;
+      }
+    }
 
     .Text {
       color: $neutral-500;

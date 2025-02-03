@@ -1,4 +1,4 @@
-@import '../../../../styles/shared';
+@import '../../../styles/shared';
 
 .CardsSliderPageLayout {
   padding-top: 20px;
@@ -10,11 +10,15 @@
   .CardsSlider {
     width: 100%;
     display: flex;
-    gap: 16px;
+    gap: 4px;
     flex-direction: column;
+    padding: 12px;
+    border-radius: 10px;
+    background-color: $primary-50;
 
     @include extraSmall {
       padding-top: 16px;
+      padding: 8px;
     }
 
     .header {
@@ -23,6 +27,10 @@
       align-items: center;
       gap: 32px;
       width: 100%;
+      @include extraSmall {
+        gap: 4px;
+        align-items: baseline;
+      }
 
       .left-section {
         display: flex;
@@ -41,9 +49,14 @@
       display: flex;
       overflow: scroll;
       margin: 0 auto;
-      gap: 16px;
+      gap: 4px;
       width: 100%;
       padding-bottom: 8px;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      ::-webkit-scrollbar {
+        display: none;
+      }
     }
   }
 

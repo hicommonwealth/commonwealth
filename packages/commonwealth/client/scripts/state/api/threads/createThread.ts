@@ -1,4 +1,4 @@
-import { toCanvasSignedDataApiArgs } from '@hicommonwealth/shared';
+import { ChainBase, toCanvasSignedDataApiArgs } from '@hicommonwealth/shared';
 import { signThread } from 'controllers/server/sessions';
 import type { Topic } from 'models/Topic';
 import { ThreadStage } from 'models/types';
@@ -15,10 +15,12 @@ interface CreateThreadProps {
   kind: 'discussion' | 'link';
   stage: string;
   communityId: string;
+  communityBase: ChainBase;
   title: string;
   topic: Topic;
   body?: string;
   url?: string;
+  ethChainIdOrBech32Prefix?: string | number;
 }
 
 export const buildCreateThreadInput = async ({
@@ -26,17 +28,21 @@ export const buildCreateThreadInput = async ({
   kind,
   stage,
   communityId,
+  communityBase,
   title,
   topic,
   body,
   url,
+  ethChainIdOrBech32Prefix,
 }: CreateThreadProps) => {
   const canvasSignedData = await signThread(address, {
     community: communityId,
+    base: communityBase,
     title,
     body,
     link: url,
     topic: topic.id,
+    ethChainIdOrBech32Prefix,
   });
   return {
     community_id: communityId,
@@ -65,6 +71,10 @@ const useCreateThreadMutation = ({
 
   return trpc.thread.createThread.useMutation({
     onSuccess: async (newThread) => {
+      // reset xp cache
+      utils.quest.getQuests.invalidate().catch(console.error);
+      utils.user.getXps.invalidate().catch(console.error);
+
       // @ts-expect-error StrictNullChecks
       addThreadInAllCaches(communityId, newThread);
 

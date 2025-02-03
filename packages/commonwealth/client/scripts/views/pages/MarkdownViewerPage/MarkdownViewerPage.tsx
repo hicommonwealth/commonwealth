@@ -2,7 +2,7 @@ import React from 'react';
 import { useSearchParams } from 'react-router-dom';
 import MarkdownViewer from 'views/components/MarkdownViewer';
 import { QuillRenderer } from 'views/components/react_quill_editor/quill_renderer';
-import '../../../../styles/index.scss';
+import '../../../styles/index.scss';
 import './MarkdownViewerPage.scss';
 
 import supported from 'views/components/MarkdownEditor/markdown/supported.md?raw';
@@ -22,7 +22,6 @@ function useParams() {
  */
 export const MarkdownViewerPage = () => {
   const { cutoffLines, quill } = useParams();
-
   return (
     <section className="MarkdownViewerPage">
       {!quill && (
@@ -33,7 +32,7 @@ export const MarkdownViewerPage = () => {
 
       {quill && (
         <div className="inner">
-          <QuillRenderer doc={supported} cutoffLines={cutoffLines} />
+          <QuillRenderer doc={supported} />
         </div>
       )}
     </section>

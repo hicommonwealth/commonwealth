@@ -1,7 +1,9 @@
 import { ChainBase, Roles } from '@hicommonwealth/shared';
-import { z } from 'zod';
+import { ZodType, z } from 'zod';
+import { Referral, ReferralFees, User } from '../entities';
 import { Tags } from '../entities/tag.schemas';
 import { UserProfile } from '../entities/user.schemas';
+import { XpLog } from '../entities/xp.schemas';
 import { PG_INT } from '../utils';
 import { PaginatedResultSchema, PaginationParamsSchema } from './pagination';
 import { AddressView, CommentView, ThreadView } from './thread.schemas';
@@ -14,20 +16,27 @@ export const UserProfileAddressView = AddressView.extend({
   }),
 });
 
-export const UserProfileCommentView = CommentView.extend({
-  community_id: z.string(),
-});
+// Type annotation is needed to avoid:
+// The inferred type of this node exceeds the maximum length the compiler will serialize.
+// An explicit type annotation is needed.ts(7056)
+type UserProfileAddressView = z.infer<typeof UserProfileAddressView>;
 
 export const UserProfileView = z.object({
   userId: PG_INT,
   profile: UserProfile,
   totalUpvotes: z.number().int(),
-  addresses: z.array(UserProfileAddressView),
+  addresses: z.array(UserProfileAddressView) as ZodType<
+    UserProfileAddressView[]
+  >,
   threads: z.array(ThreadView),
-  comments: z.array(UserProfileCommentView),
+  comments: z.array(CommentView),
   commentThreads: z.array(ThreadView),
   isOwner: z.boolean(),
   tags: z.array(Tags.extend({ id: PG_INT })),
+  referred_by_address: z.string().nullish(),
+  referral_count: PG_INT.default(0),
+  referral_eth_earnings: z.number().optional(),
+  xp_points: PG_INT.default(0),
 });
 
 export const GetUserProfile = {
@@ -35,6 +44,11 @@ export const GetUserProfile = {
     userId: PG_INT.optional(),
   }),
   output: UserProfileView,
+};
+
+export const GetUser = {
+  input: z.object({}),
+  output: z.union([User, z.object({})]),
 };
 
 export const SearchUserProfilesView = z.object({
@@ -80,4 +94,75 @@ export const GetUserAddresses = {
       avatarUrl: z.string().nullish(),
     }),
   ),
+};
+
+export const ReferralView = Referral.extend({
+  referee_user_id: PG_INT,
+  referee_profile: UserProfile,
+  community_id: z.string().nullish(),
+  community_name: z.string().nullish(),
+  community_icon_url: z.string().nullish(),
+});
+
+export const GetUserReferrals = {
+  input: z.object({ user_id: PG_INT.optional() }),
+  output: z.array(ReferralView),
+};
+
+export const ReferralFeesView = ReferralFees.extend({
+  referee_profile: UserProfile.nullish(),
+  community_id: z.string().nullish(),
+  community_name: z.string().nullish(),
+  community_icon_url: z.string().nullish(),
+});
+
+export const GetUserReferralFees = {
+  input: z.object({}),
+  output: z.array(ReferralFeesView),
+};
+
+export const XpLogView = XpLog.extend({
+  user_profile: UserProfile,
+  creator_profile: UserProfile.nullish(),
+  quest_id: PG_INT.nullish(),
+  quest_action_meta_id: PG_INT.nullish(),
+});
+
+export const GetXps = {
+  input: z.object({
+    user_id: PG_INT.optional().describe('Filters events by user id'),
+    community_id: z
+      .string()
+      .optional()
+      .describe('Filters events by community id associated to quest'),
+    quest_id: z
+      .number()
+      .optional()
+      .describe('Filters events by a specific quest id'),
+    from: z.coerce
+      .date()
+      .optional()
+      .describe('Filters events after this date excluding'),
+    to: z.coerce
+      .date()
+      .optional()
+      .describe('Filters events before this date including'),
+    event_name: z.string().optional().describe('Filters events by event name'),
+  }),
+  output: z.array(XpLogView),
+};
+
+export const RandomResourceIdsView = z.object({
+  community_id: z.string(),
+  thread_id: z.number(),
+  comment_id: z.number(),
+});
+
+export const GetRandomResourceIds = {
+  input: PaginationParamsSchema.extend({
+    exclude_joined_communities: z.boolean().optional(),
+  }),
+  output: PaginatedResultSchema.extend({
+    results: z.array(RandomResourceIdsView),
+  }),
 };

@@ -1,16 +1,17 @@
 import type { DeltaStatic } from 'quill';
 import React, { useEffect, useState } from 'react';
-import app from 'state';
 
+import { CommentsView } from '@hicommonwealth/schemas';
 import {
   CanvasSignedData,
+  DEFAULT_NAME,
   deserializeCanvas,
   verify,
 } from '@hicommonwealth/shared';
 import clsx from 'clsx';
 import { GetThreadActionTooltipTextResponse } from 'helpers/threads';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
-import type Comment from 'models/Comment';
+import moment from 'moment';
 import useGetContentByUrlQuery from 'state/api/general/getContentByUrl';
 import useUserStore from 'state/ui/user';
 import { MarkdownViewerWithFallback } from 'views/components/MarkdownViewerWithFallback/MarkdownViewerWithFallback';
@@ -29,9 +30,12 @@ import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip'
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
 import { ReactQuillEditor } from 'views/components/react_quill_editor';
 import { deserializeDelta } from 'views/components/react_quill_editor/utils';
-import { ToggleCommentSubscribe } from 'views/pages/discussions/CommentCard/ToggleCommentSubscribe';
+import { z } from 'zod';
 import { AuthorAndPublishInfo } from '../ThreadCard/AuthorAndPublishInfo';
 import './CommentCard.scss';
+import { ToggleCommentSubscribe } from './ToggleCommentSubscribe';
+
+export type CommentViewParams = z.infer<typeof CommentsView>;
 
 type CommentCardProps = {
   disabledActionsTooltipText?: GetThreadActionTooltipTextResponse;
@@ -48,6 +52,7 @@ type CommentCardProps = {
   onDelete?: () => any;
   // Reply
   replyBtnVisible?: boolean;
+  repliesCount?: number;
   onReply?: () => any;
   canReply?: boolean;
   maxReplyLimitReached: boolean;
@@ -60,7 +65,7 @@ type CommentCardProps = {
   onSpamToggle?: () => any;
   canToggleSpam?: boolean;
   // actual comment
-  comment: Comment<any>;
+  comment: CommentViewParams;
   isThreadArchived: boolean;
   // other
   className?: string;
@@ -82,6 +87,7 @@ export const CommentCard = ({
   onDelete,
   // reply
   replyBtnVisible,
+  repliesCount,
   onReply,
   canReply,
   maxReplyLimitReached,
@@ -101,18 +107,15 @@ export const CommentCard = ({
   shareURL,
 }: CommentCardProps) => {
   const user = useUserStore();
-  const userOwnsComment = comment.profile.userId === user.id;
+  const userOwnsComment = comment.user_id === user.id;
 
-  const [commentText, setCommentText] = useState(comment.text);
-  const commentBody = deserializeDelta(
-    (editDraft || commentText) ?? comment.text,
-  );
+  const [commentText, setCommentText] = useState(comment.body);
+  const commentBody = React.useMemo(() => {
+    const rawContent = editDraft || commentText || comment.body;
+    const deserializedContent = deserializeDelta(rawContent);
+    return deserializedContent;
+  }, [editDraft, commentText, comment.body]);
   const [commentDelta, setCommentDelta] = useState<DeltaStatic>(commentBody);
-  const author =
-    comment?.author && app?.chain?.accounts
-      ? app.chain.accounts.get(comment?.author)
-      : null;
-
   const [verifiedCanvasSignedData, setVerifiedCanvasSignedData] =
     useState<CanvasSignedData | null>(null);
   const [, setOnReaction] = useState<boolean>(false);
@@ -121,12 +124,14 @@ export const CommentCard = ({
   const [contentUrlBodyToFetch, setContentUrlBodyToFetch] = useState<
     string | null
   >(null);
-
+  useEffect(() => {
+    setCommentDelta(commentBody);
+  }, [commentBody]);
   useRunOnceOnCondition({
     callback: () => {
-      comment.contentUrl && setContentUrlBodyToFetch(comment.contentUrl);
+      comment.content_url && setContentUrlBodyToFetch(comment.content_url);
     },
-    shouldRun: !!comment.contentUrl,
+    shouldRun: !!comment.content_url,
   });
 
   const { data: contentUrlBody, isLoading: isLoadingContentBody } =
@@ -138,13 +143,13 @@ export const CommentCard = ({
   useEffect(() => {
     if (
       contentUrlBodyToFetch &&
-      contentUrlBodyToFetch !== comment.contentUrl &&
+      contentUrlBodyToFetch !== comment.content_url &&
       contentUrlBody
     ) {
       setCommentText(contentUrlBody);
       setCommentDelta(contentUrlBody);
     }
-  }, [contentUrlBody, contentUrlBodyToFetch, comment.contentUrl]);
+  }, [contentUrlBody, contentUrlBodyToFetch, comment.content_url]);
 
   useRunOnceOnCondition({
     callback: () => {
@@ -154,13 +159,13 @@ export const CommentCard = ({
       }
     },
     shouldRun:
-      !isLoadingContentBody && !!comment.contentUrl && !!contentUrlBody,
+      !isLoadingContentBody && !!comment.content_url && !!contentUrlBody,
   });
 
   useEffect(() => {
     try {
       const canvasSignedData: CanvasSignedData = deserializeCanvas(
-        comment.canvasSignedData,
+        comment.canvas_signed_data || '',
       );
       if (!canvasSignedData) return;
       verify(canvasSignedData)
@@ -171,14 +176,14 @@ export const CommentCard = ({
     } catch (error) {
       // ignore errors or missing data
     }
-  }, [comment.canvasSignedData]);
+  }, [comment.canvas_signed_data]);
 
   const handleReaction = () => {
     setOnReaction((prevOnReaction) => !prevOnReaction);
   };
 
   const handleVersionHistoryChange = (versionId: number) => {
-    const foundVersion = (comment?.versionHistory || []).find(
+    const foundVersion = (comment?.CommentVersionHistories || []).find(
       (version) => version.id === versionId,
     );
 
@@ -200,25 +205,35 @@ export const CommentCard = ({
   return (
     <div className={clsx('comment-body', className)}>
       <div className="comment-header">
-        {comment.deleted ? (
+        {comment.deleted_at ? (
           <span>[deleted]</span>
         ) : (
           <AuthorAndPublishInfo
-            // @ts-expect-error <StrictNullChecks/>
-            authorAddress={app.chain ? author?.address : comment?.author}
-            // @ts-expect-error <StrictNullChecks/>
-            authorCommunityId={
-              author?.community?.id ||
-              author?.profile?.chain ||
-              comment?.communityId ||
-              comment?.authorChain
+            authorAddress={comment?.address}
+            authorCommunityId={comment.community_id}
+            publishDate={
+              comment.created_at ? moment(comment.created_at) : undefined
             }
-            publishDate={comment.createdAt}
-            discord_meta={comment.discord_meta}
+            discord_meta={comment.discord_meta || undefined}
             popoverPlacement="top"
             showUserAddressWithInfo={false}
-            profile={comment.profile}
-            versionHistory={comment.versionHistory}
+            profile={{
+              address: comment.address,
+              avatarUrl: comment.profile_avatar || '',
+              name: comment.profile_name || DEFAULT_NAME,
+              userId: comment.user_id,
+              lastActive: comment.last_active as unknown as string,
+            }}
+            versionHistory={(comment.CommentVersionHistories || []).map(
+              (cvh) => ({
+                id: cvh.id || 0,
+                thread_id: comment.thread_id,
+                address: comment.address,
+                body: cvh.body,
+                timestamp: cvh.timestamp as unknown as string,
+                content_url: cvh.content_url || '',
+              }),
+            )}
             onChangeVersionHistoryNumber={handleVersionHistoryChange}
           />
         )}
@@ -262,7 +277,7 @@ export const CommentCard = ({
           <CWText className="comment-text">
             <MarkdownViewerWithFallback markdown={commentText} />
           </CWText>
-          {!comment.deleted && (
+          {!comment.deleted_at && (
             <div className="comment-footer">
               {!hideReactButton && (
                 <CommentReactionButton
@@ -298,14 +313,14 @@ export const CommentCard = ({
               {!isThreadArchived && replyBtnVisible && (
                 <CWThreadAction
                   action="reply"
-                  label="Reply"
+                  label={`Reply${repliesCount ? ` (${repliesCount})` : ''}`}
                   disabled={maxReplyLimitReached || !canReply}
                   tooltipText={
                     (typeof disabledActionsTooltipText === 'function'
                       ? disabledActionsTooltipText?.('reply')
                       : disabledActionsTooltipText) ||
                     (canReply && maxReplyLimitReached
-                      ? 'Nested reply limit reached'
+                      ? 'Further replies not allowed'
                       : '')
                   }
                   onClick={async (e) => {

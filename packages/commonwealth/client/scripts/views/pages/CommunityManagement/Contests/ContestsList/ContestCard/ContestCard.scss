@@ -1,4 +1,4 @@
-@import '../../../../../../../styles/shared';
+@import '../../../../../../styles/shared';
 
 .ContestCard {
   max-width: 600px;
@@ -71,9 +71,14 @@
       .prize-row {
         display: flex;
         justify-content: space-between;
+        gap: 8px;
 
         .label {
           color: $neutral-600;
+        }
+
+        .bold {
+          word-break: break-word;
         }
       }
     }

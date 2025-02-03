@@ -1,0 +1,54 @@
+@import '../../../../../styles/shared';
+
+.TokenTradeWidget {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px;
+
+  .header {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    align-items: center;
+    color: $neutral-500 !important;
+
+    .Text {
+      color: $neutral-500 !important;
+      letter-spacing: 0.5Øpx;
+    }
+  }
+
+  .pad-8 {
+    padding: 0px 8px;
+  }
+
+  .action-btns {
+    display: grid;
+    gap: 8px;
+    width: 100%;
+    padding: 8px;
+
+    &.cols-1 {
+      grid-template-columns: 1fr;
+    }
+
+    &.cols-2 {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    button {
+      text-transform: capitalize;
+    }
+
+    .btn-border {
+      &:focus-within {
+        border-width: 1px !important;
+        padding: 0 !important;
+      }
+
+      margin: 0 !important;
+      margin-top: auto;
+    }
+  }
+}

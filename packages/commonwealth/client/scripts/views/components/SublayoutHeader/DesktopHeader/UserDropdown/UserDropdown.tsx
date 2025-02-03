@@ -1,13 +1,14 @@
 import clsx from 'clsx';
 import React, { useState } from 'react';
 
+import useInviteLinkModal from 'state/ui/modals/inviteLinkModal';
+import useUserStore from 'state/ui/user';
 import { PopoverMenu } from 'views/components/component_kit/CWPopoverMenu';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { User } from 'views/components/user/user';
 
 import useUserMenuItems from '../../useUserMenuItems';
 
-import useUserStore from 'state/ui/user';
 import './UserDropdown.scss';
 
 interface UserDropdownProps {
@@ -16,10 +17,12 @@ interface UserDropdownProps {
 
 const UserDropdown = ({ onAuthModalOpen }: UserDropdownProps) => {
   const [isOpen, setIsOpen] = useState(false);
+  const { setIsInviteLinkModalOpen } = useInviteLinkModal();
 
   const { userMenuItems } = useUserMenuItems({
     onAuthModalOpen,
     isMenuOpen: isOpen,
+    onReferralItemClick: () => setIsInviteLinkModalOpen(true),
   });
 
   const userData = useUserStore();

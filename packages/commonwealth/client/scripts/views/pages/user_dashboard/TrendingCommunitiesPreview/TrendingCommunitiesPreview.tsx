@@ -58,6 +58,8 @@ export const TrendingCommunitiesPreview = () => {
             community={{
               name: sortedCommunity.community.name || '',
               icon_url: sortedCommunity.community.icon_url || '',
+              id: sortedCommunity.community.id || '',
+              base: sortedCommunity.community.base || '',
             }}
             monthlyThreadCount={
               sortedCommunity.community.last_30_day_thread_count || 0
@@ -70,7 +72,7 @@ export const TrendingCommunitiesPreview = () => {
         <CommunityPreviewCard
           isExploreMode
           onClick={() => {
-            navigate('/communities');
+            navigate('/explore');
           }}
         />
       </div>

@@ -1,10 +1,12 @@
-import { EventNames, InvalidState, type Command } from '@hicommonwealth/core';
+import { InvalidState, type Command } from '@hicommonwealth/core';
 import {
+  CommentInstance,
   decodeContent,
   getCommentSearchVector,
   uploadIfLarge,
 } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
+import { MAX_COMMENT_DEPTH } from '@hicommonwealth/shared';
 import { models } from '../database';
 import { authThread } from '../middleware';
 import { verifyCommentSignature } from '../middleware/canvas';
@@ -16,8 +18,6 @@ import {
   uniqueMentions,
 } from '../utils';
 import { getCommentDepth } from '../utils/getCommentDepth';
-
-export const MAX_COMMENT_DEPTH = 8;
 
 export const CreateCommentErrors = {
   CantCommentOnReadOnly: 'Cannot comment when thread is read_only',
@@ -43,8 +43,9 @@ export function CreateComment(): Command<typeof schemas.CreateComment> {
         throw new InvalidState(CreateCommentErrors.ThreadArchived);
 
       const { thread_id, parent_id, ...rest } = payload;
+      let parent: CommentInstance | null = null;
       if (parent_id) {
-        const parent = await models.Comment.findOne({
+        parent = await models.Comment.findOne({
           where: { id: parent_id, thread_id },
           include: [models.Address],
         });
@@ -66,7 +67,7 @@ export function CreateComment(): Command<typeof schemas.CreateComment> {
             {
               ...rest,
               thread_id,
-              parent_id: parent_id ? parent_id.toString() : null, // TODO: change parent_id from string to number
+              parent_id,
               body,
               address_id: address.id!,
               reaction_count: 0,
@@ -74,11 +75,20 @@ export function CreateComment(): Command<typeof schemas.CreateComment> {
               created_by: '',
               search: getCommentSearchVector(body),
               content_url: contentUrl,
+              comment_level: parent ? parent.comment_level + 1 : 0,
+              reply_count: 0,
             },
             {
               transaction,
             },
           );
+
+          if (parent) {
+            await models.Comment.update(
+              { reply_count: parent.reply_count + 1 },
+              { where: { id: parent.id }, transaction },
+            );
+          }
 
           await models.CommentVersionHistory.create(
             {
@@ -107,7 +117,7 @@ export function CreateComment(): Command<typeof schemas.CreateComment> {
             models.Outbox,
             [
               {
-                event_name: EventNames.CommentCreated,
+                event_name: schemas.EventNames.CommentCreated,
                 event_payload: {
                   ...comment.toJSON(),
                   community_id: thread.community_id,

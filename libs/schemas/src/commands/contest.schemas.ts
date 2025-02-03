@@ -1,7 +1,8 @@
-import { commonProtocol } from '@hicommonwealth/shared';
+import { commonProtocol } from '@hicommonwealth/evm-protocols';
 import z from 'zod';
 import { AuthContext } from '../context';
-import { ContestManager } from '../entities';
+import { ContestManager } from '../entities/contest-manager.schemas';
+import { FarcasterAction } from '../entities/farcaster.schemas';
 import { PG_INT } from '../utils';
 
 export const CreateContestManagerMetadata = {
@@ -9,6 +10,7 @@ export const CreateContestManagerMetadata = {
     community_id: z.string(),
     contest_address: z.string().describe('On-Chain contest manager address'),
     name: z.string(),
+    description: z.string().nullish(),
     image_url: z.string().optional(),
     funding_token_address: z
       .string()
@@ -32,7 +34,8 @@ export const CreateContestManagerMetadata = {
       commonProtocol.WeiDecimals[commonProtocol.Denominations.ETH],
     ),
     topic_id: z.number().optional(),
-    is_farcaster_contest: z.boolean().nullish(),
+    is_farcaster_contest: z.boolean().optional(),
+    vote_weight_multiplier: z.number().optional().nullish(),
   }),
   output: z.object({
     contest_managers: z.array(ContestManager),
@@ -45,11 +48,14 @@ export const UpdateContestManagerMetadata = {
     community_id: z.string(),
     contest_address: z.string().describe('On-Chain contest manager address'),
     name: z.string().optional(),
+    description: z.string().optional(),
     image_url: z.string().optional(),
     topic_id: PG_INT.optional(),
   }),
   output: z.object({
-    contest_managers: z.array(ContestManager),
+    contest_managers: z.array(
+      ContestManager.extend({ topic_id: PG_INT.nullish() }),
+    ),
   }),
   context: AuthContext,
 };
@@ -74,11 +80,6 @@ export const ResumeContestManagerMetadata = {
     contest_managers: z.array(ContestManager),
   }),
   context: AuthContext,
-};
-
-export const PerformContestRollovers = {
-  input: z.object({ id: z.string() }),
-  output: z.object({}),
 };
 
 export const FarcasterCast = z.object({
@@ -132,27 +133,9 @@ export const FarcasterCast = z.object({
   replies: z.object({
     count: z.number(),
   }),
-  channel: z.string().nullable(),
+  channel: z.any().nullable(),
   mentioned_profiles: z.array(z.unknown()),
   event_timestamp: z.string(),
-});
-
-export const FarcasterAction = z.object({
-  untrustedData: z.object({
-    fid: z.number(),
-    url: z.string().url(),
-    messageHash: z.string(),
-    timestamp: z.number(),
-    network: z.number(),
-    buttonIndex: z.number(),
-    castId: z.object({
-      fid: z.number(),
-      hash: z.string(),
-    }),
-  }),
-  trustedData: z.object({
-    messageBytes: z.string(),
-  }),
 });
 
 export const FarcasterCastCreatedWebhook = {
@@ -166,25 +149,25 @@ export const FarcasterCastCreatedWebhook = {
   }),
 };
 
-export const FarcasterUpvoteAction = {
+export const RelayFarcasterContestBotMentioned = {
   input: z.object({
-    untrustedData: z.object({
-      fid: z.number(),
-      url: z.string().url(),
-      messageHash: z.string(),
-      timestamp: z.number(),
-      network: z.number(),
-      buttonIndex: z.number(),
-      castId: z.object({
-        fid: z.number(),
-        hash: z.string(),
-      }),
-    }),
-    trustedData: z.object({
-      messageBytes: z.string(),
-    }),
+    created_at: z.number(),
+    type: z.string(),
+    data: FarcasterCast,
   }),
+  output: z.object({
+    status: z.literal('ok'),
+  }),
+};
+
+export const FarcasterUpvoteAction = {
+  input: FarcasterAction,
   output: z.object({
     message: z.string(),
   }),
+};
+
+export const FarcasterNotificationsWebhook = {
+  input: z.any(),
+  output: z.any(),
 };

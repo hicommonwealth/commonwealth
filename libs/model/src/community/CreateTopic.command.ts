@@ -1,5 +1,4 @@
 import { InvalidInput, InvalidState, type Command } from '@hicommonwealth/core';
-
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../database';
 import { authRoles } from '../middleware';
@@ -52,7 +51,6 @@ export function CreateTopic(): Command<typeof schemas.CreateTopic> {
         throw new InvalidState(Errors.StakeNotAllowed);
       }
 
-      // new path: stake or ERC20
       if (payload.weighted_voting) {
         options = {
           ...options,
@@ -60,6 +58,7 @@ export function CreateTopic(): Command<typeof schemas.CreateTopic> {
           token_address: payload.token_address || undefined,
           token_symbol: payload.token_symbol || undefined,
           vote_weight_multiplier: payload.vote_weight_multiplier || undefined,
+          chain_node_id: payload.chain_node_id || undefined,
         };
       }
 

@@ -13,17 +13,19 @@ const useFetchTokensQuery = ({
   order_by,
   order_direction,
   search,
+  with_stats = false,
   enabled = true,
 }: UseFetchTokensProps) => {
-  return trpc.token.getTokens.useInfiniteQuery(
+  return trpc.launchpadToken.getTokens.useInfiniteQuery(
     {
       limit,
       order_by,
       order_direction,
       search,
+      with_stats,
     },
     {
-      staleTime: FETCH_TOKENS_STALE_TIME,
+      cacheTime: FETCH_TOKENS_STALE_TIME,
       enabled,
       initialCursor: 1,
       getNextPageParam: (lastPage) => {

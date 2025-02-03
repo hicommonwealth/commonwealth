@@ -57,6 +57,8 @@ const generateImage = async (
   let image;
   try {
     const response = await openai.images.generate({
+      model: 'dall-e-2',
+      n: 1,
       prompt: description,
       size: '256x256',
       response_format: 'url',

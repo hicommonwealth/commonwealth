@@ -1,4 +1,4 @@
-@import '../../../../../styles/shared';
+@import '../../../../styles/shared';
 
 .DesktopHeader {
   align-items: center;
@@ -54,6 +54,31 @@
         margin-top: auto;
         margin-bottom: auto;
         margin-left: 5px;
+      }
+
+      .rewards-button {
+        margin-left: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        svg {
+          fill: $neutral-500;
+        }
+
+        .rewards-button-container {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+
+          .earnings {
+            margin-left: 4px;
+            font-family: $font-family-roboto;
+            color: $neutral-500;
+            white-space: nowrap;
+          }
+        }
       }
     }
 

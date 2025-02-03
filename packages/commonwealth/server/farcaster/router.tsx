@@ -1,20 +1,11 @@
 import express from 'express';
-import {
-  checkEligibility,
-  contestCard,
-  viewLeaderboard,
-} from './frames/contest';
-import { resultGame, startGame } from './frames/gameExample';
+import { contestCard, contestPrizes } from './frames/contest';
 
 const farcasterRouter = express.Router();
 
+// WARNING: do not change these paths because cloudflare may route to it
 farcasterRouter.get('/:contest_address/contestCard', contestCard);
 farcasterRouter.post('/:contest_address/contestCard', contestCard);
-farcasterRouter.post('/:contest_address/viewLeaderboard', viewLeaderboard);
-farcasterRouter.post('/:contest_address/checkEligibility', checkEligibility);
-
-farcasterRouter.get('/:contest_address/game', startGame);
-farcasterRouter.post('/:contest_address/game', startGame);
-farcasterRouter.post('/:contest_address/result', resultGame);
+farcasterRouter.post('/:contest_address/contestPrizes', contestPrizes);
 
 export default farcasterRouter;

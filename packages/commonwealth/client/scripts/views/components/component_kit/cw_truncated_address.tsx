@@ -1,27 +1,31 @@
 import React from 'react';
 
-import 'components/component_kit/cw_truncated_address.scss';
+import './cw_truncated_address.scss';
 
+import clsx from 'clsx';
 import { formatAddressShort } from '../../../helpers';
 import { CWCommunityAvatar } from './cw_community_avatar';
 
 type TruncatedAddressProps = {
-  address: string;
+  address?: string;
   communityInfo?: {
     iconUrl: string;
     name: string;
   };
+  showCommunityname?: boolean;
 };
 
 export const CWTruncatedAddress = ({
   address,
   communityInfo,
+  showCommunityname,
 }: TruncatedAddressProps) => {
   return (
     <div
-      className={
-        communityInfo ? 'TruncatedAddress with-community' : 'TruncatedAddress'
-      }
+      className={clsx('TruncatedAddress', {
+        'with-community': communityInfo,
+        'no-background': showCommunityname,
+      })}
     >
       {communityInfo && (
         <CWCommunityAvatar
@@ -32,7 +36,8 @@ export const CWTruncatedAddress = ({
           size="small"
         />
       )}
-      {formatAddressShort(address)}
+      {showCommunityname && communityInfo?.name}
+      {address && formatAddressShort(address)}
     </div>
   );
 };

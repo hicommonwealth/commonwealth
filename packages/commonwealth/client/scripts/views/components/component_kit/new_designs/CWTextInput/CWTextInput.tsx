@@ -9,7 +9,7 @@ import { useTextInputWithValidation } from './useTextInputWithValidation';
 
 import './CWTextInput.scss';
 
-type TextInputSize = 'small' | 'large';
+export type TextInputSize = 'small' | 'large';
 
 const AVG_CHAR_WIDTH = 8; // in px
 const PADDING_FOR_ADDON = 12; // in px
@@ -36,11 +36,12 @@ export type BaseTextInputProps = {
   tabIndex?: number;
   instructionalMessage?: string;
   manualStatusMessage?: string;
-  inputRef?: any;
+  inputRef?: React.MutableRefObject<HTMLInputElement | null>;
   rightTextAddon?: string;
   type?: 'text' | 'number';
   min?: number;
   step?: number;
+  readOnly?: boolean;
 };
 
 type InputStyleProps = {
@@ -110,16 +111,15 @@ const CWTextInput = (props: TextInputProps) => {
     type = 'text',
     min,
     step,
+    readOnly,
   } = props;
 
   const formContext = useFormContext();
-  const formFieldContext = hookToForm
-    ? // @ts-expect-error <StrictNullChecks/>
-      formContext.register(name)
-    : ({} as any);
+  const isHookedToForm = hookToForm && name;
+  const formFieldContext = isHookedToForm ? formContext.register(name) : null;
   const formFieldErrorMessage =
-    // @ts-expect-error <StrictNullChecks/>
-    hookToForm && (formContext?.formState?.errors?.[name]?.message as string);
+    isHookedToForm &&
+    (formContext?.formState?.errors?.[name]?.message as string);
 
   const validateValue = (inputVal: string) => {
     if (inputValidationFn) {
@@ -171,6 +171,7 @@ const CWTextInput = (props: TextInputProps) => {
         <input
           ref={inputRef}
           {...formFieldContext}
+          readOnly={readOnly}
           autoFocus={autoFocus}
           autoComplete={autoComplete}
           className={getClasses<InputStyleProps & InputInternalStyleProps>({
@@ -190,15 +191,16 @@ const CWTextInput = (props: TextInputProps) => {
           maxLength={maxLength || formFieldContext?.maxLength}
           name={name}
           placeholder={placeholder}
-          onInput={(e: any) => {
+          onInput={(e: React.FormEvent<HTMLInputElement>) => {
             if (onInput) onInput(e);
 
             e.stopPropagation();
 
-            validateValue(e.target.value);
+            validateValue((e.target as HTMLInputElement).value);
           }}
           onBlur={(e) => {
-            if (hookToForm) formFieldContext?.onBlur?.(e);
+            if (isHookedToForm)
+              formFieldContext?.onBlur?.(e).catch(console.error);
 
             validateValue(e.target.value);
           }}
@@ -209,7 +211,7 @@ const CWTextInput = (props: TextInputProps) => {
           }}
           value={value}
           defaultValue={defaultValue}
-          style={{ paddingRight: rightPaddingForAddon }}
+          style={{ paddingRight: rightPaddingForAddon || 0 }}
           type={type}
           min={min}
           step={step}

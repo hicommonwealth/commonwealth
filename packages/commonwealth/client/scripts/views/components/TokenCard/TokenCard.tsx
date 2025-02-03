@@ -1,28 +1,28 @@
 import clsx from 'clsx';
-import React, { ReactNode } from 'react';
-import { CWIcon } from '../component_kit/cw_icons/cw_icon';
-import { CWText } from '../component_kit/cw_text';
-import { CWButton } from '../component_kit/new_designs/CWButton';
-import { CWTooltip } from '../component_kit/new_designs/CWTooltip';
+import { currencyNameToSymbolMap, SupportedCurrencies } from 'helpers/currency';
+import React from 'react';
+import { CWText } from 'views/components/component_kit/cw_text';
+import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
+import { withTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
+import { TradingMode } from 'views/modals/TradeTokenModel';
+import FractionalValue from '../FractionalValue';
+import MarketCapProgress from './MarketCapProgress';
+import PricePercentageChange from './PricePercentageChange';
 import './TokenCard.scss';
 
-interface TokenCardProps {
+export interface TokenCardProps {
   name: string;
   symbol: string;
   iconURL: string;
-  currency?: 'USD';
-  marketCap: { current: number; goal: number };
-  price: string;
+  currency?: SupportedCurrencies;
+  marketCap: { current: number; goal: number; isCapped: boolean };
+  price: number;
   pricePercentage24HourChange: number;
-  mode: 'buy' | 'swap';
+  mode: TradingMode.Buy | TradingMode.Swap;
   className?: string;
-  onCTAClick?: () => void;
+  onCTAClick?: (mode: TradingMode) => void;
   onCardBodyClick?: () => void;
 }
-
-const currentNameToSymbol = {
-  USD: '$',
-};
 
 const MAX_CHARS_FOR_LABELS = 9;
 
@@ -30,7 +30,7 @@ const TokenCard = ({
   name,
   symbol,
   iconURL,
-  currency = 'USD',
+  currency = SupportedCurrencies.USD,
   marketCap,
   price,
   pricePercentage24HourChange,
@@ -39,11 +39,7 @@ const TokenCard = ({
   onCardBodyClick,
   onCTAClick,
 }: TokenCardProps) => {
-  const currencySymbol = currentNameToSymbol[currency];
-  const isCapped = marketCap.current === marketCap.goal;
-  const progressPercentage = Math.floor(
-    (marketCap.current / marketCap.goal) * 100,
-  );
+  const currencySymbol = currencyNameToSymbolMap[currency];
 
   const handleBodyClick = (e: React.MouseEvent) =>
     e.target === e.currentTarget && onCardBodyClick?.();
@@ -57,29 +53,6 @@ const TokenCard = ({
     ? symbol.slice(0, MAX_CHARS_FOR_LABELS) + '...'
     : symbol;
 
-  const withOptionalTooltip = (
-    children: ReactNode,
-    content: string,
-    shouldDisplay,
-  ) => {
-    if (!shouldDisplay) return children;
-
-    return (
-      <CWTooltip
-        placement="bottom"
-        content={content}
-        renderTrigger={(handleInteraction) => (
-          <span
-            onMouseEnter={handleInteraction}
-            onMouseLeave={handleInteraction}
-          >
-            {children}
-          </span>
-        )}
-      />
-    );
-  };
-
   return (
     <div
       role="button"
@@ -91,14 +64,14 @@ const TokenCard = ({
       {/* name and price row */}
       <div className="basic-info" onClick={handleBodyClick}>
         <div className="col">
-          {withOptionalTooltip(
+          {withTooltip(
             <CWText className="text-dark" type="h4" fontWeight="regular">
               {trimmedName}
             </CWText>,
             name,
             isNameTrimmed,
           )}
-          {withOptionalTooltip(
+          {withTooltip(
             <CWText className="text-light">{trimmedSymbol}</CWText>,
             symbol,
             isSymbolTrimmed,
@@ -107,42 +80,26 @@ const TokenCard = ({
         <div className="col">
           <CWText className="text-dark ml-auto" type="h4" fontWeight="regular">
             {currencySymbol}
-            {price}
+            <FractionalValue
+              value={price}
+              type="h4"
+              fontWeight="regular"
+              className="text-dark"
+            />
           </CWText>
           <CWText className="ml-auto text-light" type="caption">
-            <CWText
-              className={clsx(
-                'price-change',
-                { negative: pricePercentage24HourChange < 0 },
-                { positive: pricePercentage24HourChange >= 0 },
-              )}
-              type="caption"
-            >
-              {pricePercentage24HourChange >= 0 ? '+' : ''}
-              {pricePercentage24HourChange}%
-            </CWText>{' '}
-            &nbsp;24hr
+            <PricePercentageChange
+              pricePercentage24HourChange={pricePercentage24HourChange}
+            />
           </CWText>
         </div>
       </div>
       {/* market cap row */}
-      <div className="market-cap" onClick={handleBodyClick}>
-        <progress
-          className={clsx('goal-progress', { isCapped })}
-          value={progressPercentage}
-          max={100}
-        />
-        <div className="prices">
-          <CWText className="text-dark caps" type="caption">
-            MCAP {currencySymbol}
-            {marketCap.current} | Goal {currencySymbol}
-            {marketCap.goal}
-          </CWText>
-          {isCapped && (
-            <CWIcon iconName="rocketLaunch" className="token-capped-icon" />
-          )}
-        </div>
-      </div>
+      <MarketCapProgress
+        marketCap={marketCap}
+        currency={currency}
+        onBodyClick={handleBodyClick}
+      />
       {/* action cta */}
       <CWButton
         label={mode}
@@ -150,7 +107,7 @@ const TokenCard = ({
         buttonWidth="full"
         buttonType="secondary"
         buttonAlt="green"
-        onClick={onCTAClick}
+        onClick={() => onCTAClick?.(mode)}
       />
     </div>
   );

@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 
+import { useInviteLinkModal } from 'state/ui/modals';
 import useSidebarStore from 'state/ui/sidebar';
-
+import useUserStore from 'state/ui/user';
 import { PopoverMenuItem } from 'views/components/component_kit/CWPopoverMenu';
 import MenuContent from 'views/components/component_kit/CWPopoverMenu/MenuContent';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
@@ -10,12 +11,17 @@ import CWDrawer from 'views/components/component_kit/new_designs/CWDrawer';
 import { CWModal } from 'views/components/component_kit/new_designs/CWModal';
 import CollapsableSidebarButton from 'views/components/sidebar/CollapsableSidebarButton';
 import { User } from 'views/components/user/user';
+import { AuthModalType } from 'views/modals/AuthModal';
+import InviteLinkModal from 'views/modals/InviteLinkModal';
 import MobileSearchModal from 'views/modals/MobileSearchModal';
 
 import useUserMenuItems from '../useUserMenuItems';
 
-import useUserStore from 'state/ui/user';
-import { AuthModalType } from 'views/modals/AuthModal';
+import { DOCS_SUBDOMAIN } from '@hicommonwealth/shared';
+import { useFlag } from 'hooks/useFlag';
+import XPProgressIndicator, {
+  XPProgressIndicatorMode,
+} from '../XPProgressIndicator';
 import './MobileHeader.scss';
 
 interface MobileHeaderProps {
@@ -33,7 +39,10 @@ const MobileHeader = ({
   const [isModalOpen, isSetModalOpen] = useState(false);
   const { menuVisible } = useSidebarStore();
   const userData = useUserStore();
+  const xpEnabled = useFlag('xp');
   const user = userData.addresses?.[0];
+  const { isInviteLinkModalOpen, setIsInviteLinkModalOpen } =
+    useInviteLinkModal();
 
   const magnifyingGlassVisible = true;
   const shouldShowCollapsableSidebarButton = isInsideCommunity
@@ -44,6 +53,10 @@ const MobileHeader = ({
     onAuthModalOpen,
     isMenuOpen: isUserDrawerOpen,
     onAddressItemClick: () => setIsUserDrawerOpen(false),
+    onReferralItemClick: () => {
+      setIsUserDrawerOpen(false);
+      setIsInviteLinkModalOpen(true);
+    },
   });
 
   const mobileItems = [
@@ -55,7 +68,7 @@ const MobileHeader = ({
     },
     {
       label: 'Help documentation',
-      onClick: () => window.open('https://docs.commonwealth.im/commonwealth/'),
+      onClick: () => window.open(`https://${DOCS_SUBDOMAIN}/commonwealth/`),
     },
   ] as PopoverMenuItem[];
 
@@ -70,6 +83,10 @@ const MobileHeader = ({
         )}
 
         <div className="right-side">
+          {xpEnabled && (
+            <XPProgressIndicator mode={XPProgressIndicatorMode.Compact} />
+          )}
+
           {magnifyingGlassVisible && (
             <CWIconButton
               iconName="magnifyingGlass"
@@ -118,6 +135,22 @@ const MobileHeader = ({
 
           <MenuContent menuItems={mobileItems} />
         </div>
+      </CWDrawer>
+
+      <CWDrawer
+        size="auto"
+        direction="bottom"
+        className="InviteLinkDrawer"
+        open={isInviteLinkModalOpen}
+        onClose={() => {
+          setIsInviteLinkModalOpen(false);
+        }}
+      >
+        <InviteLinkModal
+          onModalClose={() => {
+            setIsInviteLinkModalOpen(false);
+          }}
+        />
       </CWDrawer>
 
       <CWModal

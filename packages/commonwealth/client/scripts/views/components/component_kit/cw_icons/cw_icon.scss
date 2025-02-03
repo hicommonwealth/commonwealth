@@ -1,0 +1,21 @@
+@import '../../../../styles/shared.scss';
+
+.Icon {
+  @include baseIconStyles;
+
+  &.disabled {
+    color: $neutral-200;
+    pointer-events: none;
+  }
+}
+
+.CustomIcon {
+  @include baseIconStyles;
+
+  fill: unset; // they will be brand assets should we shouldn't alter their colors
+}
+
+.blue-icon {
+  color: $primary-500;
+  fill: $primary-500;
+}

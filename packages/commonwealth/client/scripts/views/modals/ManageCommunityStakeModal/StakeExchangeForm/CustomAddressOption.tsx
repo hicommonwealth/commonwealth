@@ -3,6 +3,7 @@ import { components, OptionProps } from 'react-select';
 
 import { formatAddressShort } from 'helpers';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
+import './CustomAddressOption.scss';
 
 interface CustomAddressOptionElement {
   value: string;
@@ -16,11 +17,12 @@ const CustomAddressOptionElement = ({
   selectedAddressValue,
 }: CustomAddressOptionElement) => {
   return (
-    <div className="text-container">
+    <div className="CustomAddressOptionElement">
       {value === selectedAddressValue && (
         <CWIcon
           className="check-icon"
           iconSize="small"
+          weight="fill"
           iconName="checkCircleFilled"
         />
       )}

@@ -7,195 +7,28 @@ env:
   NODE_ENV: 'test'
   ROLLBAR_ENV: 'GitHubCI'
   TEST_WITHOUT_LOGS: 'true'
-  PRIVATE_KEY: 'web3-pk'
+  PRIVATE_KEY: '0x83c65f24efbc8f4bc54ad425e897fc3ea01f760d5e71671a30eacb075ebe2313'
   USES_DOCKER_PGSQL: true
   PORT: 8080
   REDIS_URL: redis://localhost:6379
-  ENTITIES_URL: ${{ secrets.ENTITIES_URL }}
   GITHUB_BASE_REF: ${{ github.base_ref }}
   FEDERATION_POSTGRES_DB_URL: postgresql://commonwealth:edgeware@localhost/common_test
   ALCHEMY_PRIVATE_APP_KEY: ${{ secrets.ALCHEMY_PRIVATE_APP_KEY }}
   ALCHEMY_PUBLIC_APP_KEY: ${{ secrets.ALCHEMY_PUBLIC_APP_KEY }}
 
 on:
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: "PR number to test (optional)"
+        required: false
+        type: number
   pull_request:
-  merge_group:
   push:
     branches:
       - master
 
 jobs:
-  # These tests run slowly, so run them in a separate job. NOTE: if you change the name of this job, also change
-  # Its references in this file
-  e2e-tests-Parallel:
-    name: Commonwealth E2E Tests
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    strategy:
-      matrix:
-        node: [ 20 ]
-
-    services:
-      postgres:
-        image: hicommonwealth/cw_postgres:latest
-        env:
-          POSTGRES_USER: commonwealth
-          POSTGRES_DB: common_test
-          POSTGRES_PASSWORD: edgeware
-        # Set health checks to wait until postgres has started
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          # Maps tcp port 5432 on service container to the host
-          - 5432:5432
-      redis:
-        image: redis:latest
-        ports:
-          - 6379:6379
-
-    steps:
-      - uses: actions/checkout@v4
-      - uses: ./.github/actions/setup
-        with:
-          node-version: ${{ matrix.node }}
-
-      - uses: ./.github/actions/e2e
-
-      - name: Run e2e tests
-        run: |
-          sudo local-ssl-proxy --source 443 --target 8080 &
-          pnpm -F commonwealth e2e-start-server --forbid-only &
-          pnpm -F commonwealth wait-server &&
-          pnpm -F commonwealth test-e2e --forbid-only
-
-      - name: Archive test status
-        uses: actions/upload-artifact@v3
-        with:
-          name: FlakySuiteStatus
-          path: packages/commonwealth/summary.json
-
-      - name: Upload e2e recordings on failure
-        uses: actions/upload-artifact@v3
-        if: ${{ failure() }}
-        with:
-          name: Recordings
-          path: packages/commonwealth/test-results/
-
-  # The tests that this job runs should not be flaky. If they are, move them back into the regular suite.
-  e2e-tests-Mature:
-    name: Commonwealth Mature E2E Tests
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    strategy:
-      matrix:
-        node: [ 20 ]
-
-    services:
-      postgres:
-        image: hicommonwealth/cw_postgres:latest
-        env:
-          POSTGRES_USER: commonwealth
-          POSTGRES_DB: common_test
-          POSTGRES_PASSWORD: edgeware
-        # Set health checks to wait until postgres has started
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          # Maps tcp port 5432 on service container to the host
-          - 5432:5432
-      redis:
-        image: redis:latest
-        ports:
-          - 6379:6379
-
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - uses: ./.github/actions/setup
-        with:
-          node-version: ${{ matrix.node }}
-
-      - uses: ./.github/actions/e2e
-
-      - name: Run e2e tests
-        run: |
-          sudo local-ssl-proxy --source 443 --target 8080 &
-          pnpm -F commonwealth e2e-start-server --forbid-only &
-          pnpm -F commonwealth wait-server &&
-          pnpm -F commonwealth test-e2e-mature --forbid-only
-
-      - name: Archive test status
-        uses: actions/upload-artifact@v3
-        with:
-          name: MatureSuiteStatus
-          path: packages/commonwealth/summary.json
-
-      - name: Upload e2e recordings on failure
-        uses: actions/upload-artifact@v3
-        if: ${{ failure() }}
-        with:
-          name: Recordings
-          path: packages/commonwealth/test-results/
-
-  e2e-tests-serial:
-    name: Commonwealth E2E Tests Serial
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    strategy:
-      matrix:
-        node: [ 20 ]
-
-    services:
-      postgres:
-        image: hicommonwealth/cw_postgres:latest
-        env:
-          POSTGRES_USER: commonwealth
-          POSTGRES_DB: common_test
-          POSTGRES_PASSWORD: edgeware
-        # Set health checks to wait until postgres has started
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          # Maps tcp port 5432 on service container to the host
-          - 5432:5432
-      redis:
-        image: redis:latest
-        ports:
-          - 6379:6379
-
-    steps:
-      - uses: actions/checkout@v4
-      - uses: ./.github/actions/setup
-        with:
-          node-version: ${{ matrix.node }}
-
-      - uses: ./.github/actions/e2e
-
-      - name: Build server
-        run: pnpm -F commonwealth build
-
-      - name: Run serial e2e tests
-        run: |
-          pnpm -F commonwealth bootstrap-test-db &&
-          (cd packages/commonwealth && node --import=extensionless/register --enable-source-maps ./build/server.js) &
-          (pnpm -F commonwealth wait-server && pnpm -F commonwealth test-e2e-serial --forbid-only)
-
-      - name: Archive code coverage results
-        uses: actions/upload-artifact@v3
-        with:
-          name: code-coverage-report
-          path: coverage
-
   # Lint with recommendations
   commonwealth-code-quality-recommendations:
     name: Code Quality Recommendations
@@ -203,12 +36,13 @@ jobs:
     timeout-minutes: 10
     strategy:
       matrix:
-        node: [ 20 ]
+        node: [ 22 ]
 
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          ref: ${{ github.event.inputs.pr_number && format('refs/pull/{0}/head', github.event.inputs.pr_number) || github.ref }}
       - uses: ./.github/actions/setup
         with:
           node-version: ${{ matrix.node }}
@@ -223,12 +57,13 @@ jobs:
     timeout-minutes: 10
     strategy:
       matrix:
-        node: [ 20 ]
+        node: [ 22 ]
 
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          ref: ${{ github.event.inputs.pr_number && format('refs/pull/{0}/head', github.event.inputs.pr_number) || github.ref }}
       - uses: ./.github/actions/setup
         with:
           node-version: ${{ matrix.node }}
@@ -266,12 +101,13 @@ jobs:
     timeout-minutes: 10
     strategy:
       matrix:
-        node: [ 20 ]
+        node: [ 22 ]
 
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          ref: ${{ github.event.inputs.pr_number && format('refs/pull/{0}/head', github.event.inputs.pr_number) || github.ref }}
       - uses: ./.github/actions/setup
         with:
           node-version: ${{ matrix.node }}
@@ -296,7 +132,7 @@ jobs:
     timeout-minutes: 20
     strategy:
       matrix:
-        node: [ 20 ]
+        node: [ 22 ]
 
     services:
       postgres:
@@ -327,6 +163,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.pr_number && format('refs/pull/{0}/head', github.event.inputs.pr_number) || github.ref }}
       - uses: ./.github/actions/setup
         with:
           node-version: ${{ matrix.node }}
@@ -344,7 +182,7 @@ jobs:
     timeout-minutes: 20
     strategy:
       matrix:
-        node: [ 20 ]
+        node: [ 22 ]
 
     services:
       postgres:
@@ -375,6 +213,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.pr_number && format('refs/pull/{0}/head', github.event.inputs.pr_number) || github.ref }}
       - uses: ./.github/actions/setup
         with:
           node-version: ${{ matrix.node }}
@@ -403,7 +243,7 @@ jobs:
     timeout-minutes: 10
     strategy:
       matrix:
-        node: [ 20 ]
+        node: [ 22 ]
 
     services:
       postgres:
@@ -427,6 +267,8 @@ jobs:
           - 6379:6379
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.pr_number && format('refs/pull/{0}/head', github.event.inputs.pr_number) || github.ref }}
       - uses: ./.github/actions/setup
         with:
           node-version: ${{ matrix.node }}
@@ -437,6 +279,44 @@ jobs:
       - name: Run EVM Devnet tests
         run: pnpm -F commonwealth test-devnet:evm --allowOnly=false
 
+#  Removed until we get image caching set up otherwise it will fail due to dockerhub rate limiting
+#  commonwealth-e2e-evm-tests:
+#    name: EVM devnet integration Tests
+#    runs-on: ubuntu-latest
+#    timeout-minutes: 10
+#    strategy:
+#      matrix:
+#        node: [ 22 ]
+#
+#    services:
+#      postgres:
+#        image: hicommonwealth/cw_postgres:latest
+#        env:
+#          POSTGRES_USER: commonwealth
+#          POSTGRES_DB: common_test
+#          POSTGRES_PASSWORD: edgeware
+#        # Set health checks to wait until postgres has started
+#        options: >-
+#          --health-cmd pg_isready
+#          --health-interval 10s
+#          --health-timeout 5s
+#          --health-retries 5
+#        ports:
+#          # Maps tcp port 5432 on service container to the host
+#          - 5432:5432
+#      redis:
+#        image: redis:latest
+#        ports:
+#          - 6379:6379
+#    steps:
+#      - uses: actions/checkout@v4
+#      - uses: ./.github/actions/setup
+#        with:
+#          node-version: ${{ matrix.node }}
+#
+#      - name: Run EVM devnet integration tests
+#        run: pnpm -F commonwealth test-devnet:integration --allowOnly=false
+
   report-coverage:
     name: Upload Test Coverage Report
     runs-on: ubuntu-latest
@@ -445,7 +325,7 @@ jobs:
     if: always()
     strategy:
       matrix:
-        node: [ 20 ]
+        node: [ 22 ]
 
     steps:
       - name: Coveralls Finished

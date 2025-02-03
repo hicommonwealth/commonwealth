@@ -34,6 +34,7 @@ const useManageContestForm = ({
       setContestFormData({
         contestName: contestData.name,
         contestImage: contestData.image_url!,
+        contestDescription: contestData.description ?? '',
         contestTopic: {
           value: contestData.topics[0]?.id,
           label: contestData.topics[0]?.name,
@@ -53,6 +54,7 @@ const useManageContestForm = ({
         // @ts-expect-error StrictNullChecks
         prizePercentage: contestData.prize_percentage,
         payoutStructure: contestData.payout_structure,
+        voteWeightMultiplier: contestData.vote_weight_multiplier,
       });
     }
   }, [

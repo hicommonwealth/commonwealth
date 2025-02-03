@@ -1,34 +1,35 @@
 import moment from 'moment';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { FarcasterEmbed } from 'react-farcaster-embed/dist/client';
 import 'react-farcaster-embed/dist/styles.css';
-import { useInView } from 'react-intersection-observer';
-
+import useFetchFarcasterCastsQuery from 'state/api/contests/getFarcasterCasts';
 import { Select } from 'views/components/Select';
+import { Skeleton } from 'views/components/Skeleton';
 import { CWText } from 'views/components/component_kit/cw_text';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
+import CWUpvoteSmall from 'views/components/component_kit/new_designs/CWUpvoteSmall';
+import { CWUpvote } from 'views/components/component_kit/new_designs/cw_upvote';
 import { PageNotFound } from 'views/pages/404';
 import ContestCard from 'views/pages/CommunityManagement/Contests/ContestsList/ContestCard';
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
 
-import { useFetchFarcasterCastsQuery } from 'state/api/contests';
-import { Skeleton } from 'views/components/Skeleton';
-import CWCircleRingSpinner from 'views/components/component_kit/new_designs/CWCircleRingSpinner';
+import FundContestDrawer from '../CommunityManagement/Contests/FundContestDrawer';
+
 import './ContestPage.scss';
 
 export enum SortType {
-  DESC = 'desc',
-  ASC = 'asc',
+  Upvotes = 'upvotes',
+  Recent = 'recent',
 }
 
 const sortOptions = [
   {
-    value: SortType.DESC,
-    label: 'Descending',
+    value: SortType.Upvotes,
+    label: 'Most Upvoted',
   },
   {
-    value: SortType.ASC,
-    label: 'Ascending',
+    value: SortType.Recent,
+    label: 'Most Recent',
   },
 ];
 
@@ -40,21 +41,18 @@ const ContestPage = ({ contestAddress }: ContestPageProps) => {
   const { getContestByAddress, isContestDataLoading } = useCommunityContests();
   const contest = getContestByAddress(contestAddress);
 
-  const [ref, inView] = useInView();
+  const [fundDrawerContest, setFundDrawerContest] = useState<
+    typeof contest | null
+  >();
+  const [selectedSort, setSelectedSort] = useState<SortType>(
+    sortOptions[0].value,
+  );
 
-  const [selectedSort, setSelectedSort] = useState(sortOptions[0].value);
-
-  const { data, isLoading, isFetchingNextPage, fetchNextPage, hasNextPage } =
+  const { data: farcasterCasts, isLoading: isFarcasterCastsLoading } =
     useFetchFarcasterCastsQuery({
-      contestAddress,
+      contest_address: contestAddress,
       selectedSort,
     });
-
-  useEffect(() => {
-    if (inView && !isFetchingNextPage && hasNextPage) {
-      fetchNextPage().catch(console.log);
-    }
-  }, [fetchNextPage, hasNextPage, inView, isFetchingNextPage]);
 
   if (!isContestDataLoading && !contest) {
     return <PageNotFound />;
@@ -87,16 +85,17 @@ const ContestPage = ({ contestAddress }: ContestPageProps) => {
             showLeaderboardButton={false}
             payoutStructure={contest?.payout_structure}
             isFarcaster={contest?.is_farcaster_contest}
+            onFund={() => setFundDrawerContest(contest)}
           />
         )}
 
         <div className="leaderboard-list">
-          {isLoading ? (
+          {isFarcasterCastsLoading ? (
             <>
               <Skeleton height={300} width="100%" />
               <Skeleton height={300} width="100%" />
             </>
-          ) : data?.pages?.[0].data?.length === 0 ? (
+          ) : !farcasterCasts?.length ? (
             <CWText>No entries for the contest yet</CWText>
           ) : (
             <>
@@ -113,24 +112,44 @@ const ContestPage = ({ contestAddress }: ContestPageProps) => {
                 />
               </div>
 
-              {data?.pages.map((page) => (
-                <React.Fragment key={page.currentPage}>
-                  {page.data.map((entry) => (
-                    <div key={entry.id}>
-                      <CWText>Likes: {entry.like}</CWText>
-                      <FarcasterEmbed url={entry.url} />
+              {farcasterCasts.map((entry) => {
+                return (
+                  <div key={entry.hash} className="cast-container">
+                    <CWUpvote
+                      disabled
+                      voteCount={entry.calculated_vote_weight || '0'}
+                    />
+
+                    <div className="upvote-small">
+                      <CWUpvoteSmall
+                        voteCount={entry.calculated_vote_weight || '0'}
+                        disabled
+                        selected={false}
+                        onClick={() => undefined}
+                        popoverContent={<></>}
+                        tooltipText="Farcaster Upvotes"
+                      />
                     </div>
-                  ))}
-                </React.Fragment>
-              ))}
 
-              {isFetchingNextPage && <CWCircleRingSpinner />}
-
-              <div ref={ref} />
+                    <FarcasterEmbed
+                      key={entry.hash}
+                      hash={entry.hash}
+                      username={entry.author.username}
+                    />
+                  </div>
+                );
+              })}
             </>
           )}
         </div>
       </div>
+      <FundContestDrawer
+        onClose={() => setFundDrawerContest(undefined)}
+        isOpen={!!fundDrawerContest}
+        contestAddress={fundDrawerContest?.contest_address || ''}
+        fundingTokenAddress={fundDrawerContest?.funding_token_address || ''}
+        fundingTokenTicker={fundDrawerContest?.ticker || 'ETH'}
+      />
     </CWPageLayout>
   );
 };

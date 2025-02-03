@@ -1,6 +1,7 @@
 import { ChainBase, WalletId, WalletSsoSource } from '@hicommonwealth/shared';
 import commonLogo from 'assets/img/branding/common-logo.svg';
 import clsx from 'clsx';
+import { isMobileApp } from 'hooks/useReactNativeWebView';
 import React, { Fragment, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import app from 'state';
@@ -27,6 +28,7 @@ import { EVMWalletsSubModal } from './EVMWalletsSubModal';
 import { EmailForm } from './EmailForm';
 import { MobileWalletConfirmationSubModal } from './MobileWalletConfirmationSubModal';
 import './ModalBase.scss';
+import { SMSForm } from './SMSForm';
 
 const MODAL_COPY = {
   [AuthModalType.CreateAccount]: {
@@ -50,14 +52,27 @@ const MODAL_COPY = {
   },
 };
 
-const SSO_OPTIONS: AuthSSOs[] = [
+const mobileApp = isMobileApp();
+
+const SSO_OPTIONS_DEFAULT: AuthSSOs[] = [
   'google',
   'discord',
   'x',
   'apple',
   'github',
   'email',
+  'farcaster',
+  'SMS',
 ] as const;
+
+const SSO_OPTIONS_MOBILE: AuthSSOs[] = [
+  'google',
+  'apple',
+  'email',
+  'SMS',
+] as const;
+
+const SSO_OPTIONS = mobileApp ? SSO_OPTIONS_MOBILE : SSO_OPTIONS_DEFAULT;
 
 /**
  * AuthModal base component with customizable options, callbacks, layouts and auth options display strategy.
@@ -97,9 +112,11 @@ const ModalBase = ({
     useState(false);
   const [isAuthenticatingWithEmail, setIsAuthenticatingWithEmail] =
     useState(false);
+  const [isAuthenticatingWithSMS, setIsAuthenticatingWithSMS] = useState(false);
 
   const handleClose = async () => {
     setIsAuthenticatingWithEmail(false);
+    setIsAuthenticatingWithSMS(false);
     setIsEVMWalletsModalVisible(false);
     isWalletConnectEnabled &&
       (await onResetWalletConnect().catch(console.error));
@@ -118,6 +135,7 @@ const ModalBase = ({
     isMobileWalletVerificationStep,
     onResetWalletConnect,
     onEmailLogin,
+    onSMSLogin,
     onWalletSelect,
     onSocialLogin,
     onVerifyMobileWalletSignature,
@@ -217,6 +235,8 @@ const ModalBase = ({
     setActiveTabIndex((prevActiveTab) => {
       if (!shouldShowSSOOptions && prevActiveTab === 1) return 0;
 
+      if (isMobileApp()) return 1;
+
       if (showAuthOptionFor) {
         return SSO_OPTIONS.includes(showAuthOptionFor as AuthSSOs) ? 1 : 0;
       }
@@ -236,6 +256,10 @@ const ModalBase = ({
   const onAuthMethodSelect = async (option: AuthTypes) => {
     if (option === 'email') {
       setIsAuthenticatingWithEmail(true);
+      return;
+    }
+    if (option === 'SMS') {
+      setIsAuthenticatingWithSMS(true);
       return;
     }
 
@@ -330,11 +354,14 @@ const ModalBase = ({
                   )}
 
                 {/*
-                  If email option is selected don't render SSO's list,
+                  If email or SMS option is selected don't render SSO's list,
                   else render wallets/SSO's list based on activeTabIndex
                 */}
+
                 {(activeTabIndex === 0 ||
-                  (activeTabIndex === 1 && !isAuthenticatingWithEmail)) &&
+                  (activeTabIndex === 1 &&
+                    !isAuthenticatingWithEmail &&
+                    !isAuthenticatingWithSMS)) &&
                   tabsList[activeTabIndex].options.map(renderAuthButton)}
 
                 {/* If email option is selected from the SSO's list, show email form */}
@@ -344,6 +371,15 @@ const ModalBase = ({
                     onCancel={() => setIsAuthenticatingWithEmail(false)}
                     // eslint-disable-next-line @typescript-eslint/no-misused-promises
                     onSubmit={async ({ email }) => await onEmailLogin(email)}
+                  />
+                )}
+                {/* If SMS option is selected from the SSO's list, show SMS form */}
+                {activeTabIndex === 1 && isAuthenticatingWithSMS && (
+                  <SMSForm
+                    isLoading={isMagicLoading}
+                    onCancel={() => setIsAuthenticatingWithSMS(false)}
+                    // eslint-disable-next-line @typescript-eslint/no-misused-promises
+                    onSubmit={async ({ SMS }) => await onSMSLogin(SMS)}
                   />
                 )}
               </section>

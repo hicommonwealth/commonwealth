@@ -27,13 +27,13 @@ export const buildCreateThreadReactionInput = async ({
   threadMsgId,
 }: CreateReactionProps) => {
   const canvasSignedData = await signThreadReaction(address, {
-    thread_id: threadMsgId,
+    thread_id: threadMsgId ?? null,
     like: reactionType === 'like',
   });
   return {
     author_community_id: userStore.getState().activeAccount?.community?.id,
     thread_id: threadId,
-    thread_msg_id: threadMsgId,
+    thread_msg_id: threadMsgId ?? null,
     community_id: app.chain.id,
     address,
     reaction: reactionType,
@@ -57,9 +57,14 @@ const useCreateThreadReactionMutation = ({
   const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
 
   const user = useUserStore();
+  const utils = trpc.useUtils();
 
   return trpc.thread.createThreadReaction.useMutation({
     onSuccess: (newReaction) => {
+      // reset xp cache
+      utils.quest.getQuests.invalidate().catch(console.error);
+      utils.user.getXps.invalidate().catch(console.error);
+
       const reaction: any = {
         id: newReaction.id,
         address: newReaction.Address!.address,

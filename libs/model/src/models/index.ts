@@ -12,14 +12,9 @@ export const syncDb = async (db: DB, log = false) => {
   const fks = Object.keys(Factories).flatMap(
     (k) => db[k as keyof typeof Factories]._fks,
   );
-  // eslint-disable-next-line @typescript-eslint/no-misused-promises
-  fks.forEach((fk) => dropFk(db.sequelize, fk));
-  await db.sequelize.sync({
-    force: true,
-    logging: log ? console.log : false,
-  });
-  // eslint-disable-next-line @typescript-eslint/no-misused-promises
-  fks.forEach((fk) => createFk(db.sequelize, fk));
+  await db.sequelize.query(fks.map(dropFk).join('\n'));
+  await db.sequelize.sync({ force: true, logging: log ? console.log : false });
+  await db.sequelize.query(fks.map(createFk).join('\n'));
 };
 
 /**
@@ -54,7 +49,6 @@ export * from './community';
 export * from './community_role';
 export * from './community_stake';
 export * from './community_tags';
-export * from './contract_abi';
 export * from './discord_bot_config';
 export * from './email_update_token';
 export * from './evmEventSource';
@@ -66,6 +60,8 @@ export * from './outbox';
 export * from './poll';
 export * from './profile_tags';
 export * from './reaction';
+export * from './referral';
+export * from './referral_fee';
 export * from './role';
 export * from './role_assignment';
 export * from './sso_token';

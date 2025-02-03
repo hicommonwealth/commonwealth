@@ -1,6 +1,7 @@
 import { CacheDecorator, setupErrorHandlers } from '@hicommonwealth/adapters';
 import { logger } from '@hicommonwealth/core';
 import type { DB } from '@hicommonwealth/model';
+import { PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
 import sgMail from '@sendgrid/mail';
 import compression from 'compression';
 import SessionSequelizeStore from 'connect-session-sequelize';
@@ -18,6 +19,8 @@ import passport from 'passport';
 import path, { dirname } from 'path';
 import pinoHttp from 'pino-http';
 import prerenderNode from 'prerender-node';
+import { buildFarcasterManifest } from 'server/util/buildFarcasterManifest';
+import { renderIndex } from 'server/util/renderIndex';
 import { fileURLToPath } from 'url';
 import * as v8 from 'v8';
 import * as api from './server/api';
@@ -82,10 +85,10 @@ export async function main(
   });
 
   const setupMiddleware = () => {
-    // redirect from commonwealthapp.herokuapp.com to commonwealth.im
+    // redirect from commonwealthapp.herokuapp.com to PRODUCTION_DOMAIN
     app.all(/.*/, (req, res, next) => {
       if (req.header('host')?.match(/commonwealthapp.herokuapp.com/i)) {
-        res.redirect(301, `https://commonwealth.im${req.url}`);
+        res.redirect(301, `https://${PRODUCTION_DOMAIN}{req.url}`);
       } else {
         next();
       }
@@ -142,8 +145,16 @@ export async function main(
     app.use(passport.initialize());
     app.use(passport.session());
 
-    withPrerender &&
-      app.use(prerenderNode.set('prerenderToken', config.PRERENDER_TOKEN));
+    if (withPrerender) {
+      const rendererInstance = prerenderNode.set(
+        'prerenderToken',
+        config.PRERENDER_TOKEN,
+      );
+      app.use((req, res, next) => {
+        if (req.path.startsWith(`${api.integration.PATH}/farcaster/`)) next();
+        else rendererInstance(req, res, next);
+      });
+    }
   };
 
   setupMiddleware();
@@ -156,12 +167,32 @@ export async function main(
 
   setupAPI('/api', app, db, dbValidationService, cacheDecorator);
 
+  app.use('/.well-known/assetlinks.json', (req: Request, res: Response) => {
+    res.sendFile(`${__dirname}/.well-known/assetlinks.json`);
+  });
+
+  app.use(
+    '/.well-known/apple-app-site-association',
+    (req: Request, res: Response) => {
+      res.setHeader('Content-Type', 'application/json');
+      res.sendFile(`${__dirname}/.well-known/apple-app-site-association`);
+    },
+  );
+
   app.use('/robots.txt', (req: Request, res: Response) => {
     res.sendFile(`${__dirname}/robots.txt`);
   });
 
+  app.use('/blank.html', (req: Request, res: Response) => {
+    res.sendFile(`${__dirname}/blank.html`);
+  });
+
   app.use('/manifest.json', (req: Request, res: Response) => {
     res.sendFile(`${__dirname}/manifest.json`);
+  });
+
+  app.use('/.well-known/farcaster.json', (req, res) => {
+    res.json(buildFarcasterManifest());
   });
 
   app.use('/firebase-messaging-sw.js', (req: Request, res: Response) => {
@@ -186,8 +217,14 @@ export async function main(
     }),
   );
 
-  app.get('*', (req: Request, res: Response) => {
-    res.sendFile(`${__dirname}/index.html`);
+  app.get('*', async (req: Request, res: Response) => {
+    try {
+      const html = await renderIndex();
+      res.send(html);
+    } catch (err) {
+      console.error(err);
+      res.status(500).send('Server Error');
+    }
   });
 
   setupErrorHandlers(app);

@@ -5,8 +5,11 @@ import { withLayout } from 'views/Layout';
 import { RouteFeatureFlags } from './Router';
 
 const SearchPage = lazy(() => import('views/pages/search'));
+const HomePage = lazy(() => import('views/pages/HomePage/HomePage'));
 
 const CreateCommunityPage = lazy(() => import('views/pages/CreateCommunity'));
+const CreateQuestPage = lazy(() => import('views/pages/CreateQuest'));
+const QuestDetailsPage = lazy(() => import('views/pages/QuestDetails'));
 const LaunchTokenPage = lazy(() => import('views/pages/LaunchToken'));
 const OverviewPage = lazy(() => import('views/pages/overview'));
 const MembersPage = lazy(
@@ -31,6 +34,7 @@ const NotificationsPage = lazy(() => import('views/pages/notifications'));
 const NotificationSettings = lazy(
   () => import('views/pages/NotificationSettings'),
 );
+const LeaderboardPage = lazy(() => import('views/pages/Leaderboard'));
 
 const ProposalsPage = lazy(() => import('views/pages/proposals'));
 const ViewProposalPage = lazy(() => import('views/pages/view_proposal/index'));
@@ -68,6 +72,9 @@ const CommunityIntegrations = lazy(
 const CommunityStakeIntegration = lazy(
   () => import('views/pages/CommunityManagement/StakeIntegration'),
 );
+const CommunityTokenIntegration = lazy(
+  () => import('views/pages/CommunityManagement/TokenIntegration'),
+);
 const CommunityTopics = lazy(
   () => import('views/pages/CommunityManagement/Topics'),
 );
@@ -80,7 +87,7 @@ const ManageContest = lazy(
 const Contests = lazy(() => import('views/pages/Contests'));
 const ContestPage = lazy(() => import('views/pages/ContestPage'));
 
-const MyCommunityStake = lazy(() => import('views/pages/MyCommunityStake'));
+const MyTransactions = lazy(() => import('views/pages/MyTransactions'));
 
 const SnapshotProposalPage = lazy(
   () => import('views/pages/Snapshots/SnapshotProposals'),
@@ -98,9 +105,14 @@ const NewSnapshotProposalPage = lazy(
 const NewProfilePage = lazy(() => import('views/pages/new_profile'));
 const EditNewProfilePage = lazy(() => import('views/pages/edit_new_profile'));
 const ProfilePageRedirect = lazy(() => import('views/pages/profile_redirect'));
+const UnSubscribePage = lazy(() => import('views/pages/UnSubscribePage'));
+
+const RewardsPage = lazy(() => import('views/pages/RewardsPage'));
 
 const CustomDomainRoutes = ({
-  tokenizedCommunityEnabled,
+  launchpadEnabled,
+  xpEnabled,
+  homePageEnable,
 }: RouteFeatureFlags) => {
   return [
     <Route
@@ -116,7 +128,26 @@ const CustomDomainRoutes = ({
       path="/createCommunity"
       element={withLayout(CreateCommunityPage, { type: 'common' })}
     />,
-    ...(tokenizedCommunityEnabled
+    ...(xpEnabled
+      ? [
+          <Route
+            key="/createQuest"
+            path="/createQuest"
+            element={withLayout(CreateQuestPage, { type: 'common' })}
+          />,
+          <Route
+            key="/quest/:id"
+            path="/quest/:id"
+            element={withLayout(QuestDetailsPage, { type: 'common' })}
+          />,
+        ]
+      : []),
+    <Route
+      key="/unSubscribe/:userId"
+      path="/unSubscribe/:userId"
+      element={withLayout(UnSubscribePage, { type: 'common' })}
+    />,
+    ...(launchpadEnabled
       ? [
           <Route
             key="/createTokenCommunity"
@@ -125,7 +156,24 @@ const CustomDomainRoutes = ({
           />,
         ]
       : []),
-    <Route key="/home" path="/home" element={<Navigate to="/overview" />} />,
+    ...(xpEnabled
+      ? [
+          <Route
+            key="/leaderboard"
+            path="/leaderboard"
+            element={withLayout(LeaderboardPage, { type: 'common' })}
+          />,
+        ]
+      : []),
+    ...(homePageEnable
+      ? [
+          <Route
+            key="/home"
+            path="/home"
+            element={withLayout(HomePage, { type: 'common' })}
+          />,
+        ]
+      : []),
     <Route
       key="/search"
       path="/search"
@@ -170,9 +218,14 @@ const CustomDomainRoutes = ({
       element={withLayout(FinishSocialLoginPage, { type: 'common' })}
     />,
     <Route
-      key="/myCommunityStake"
-      path="/myCommunityStake"
-      element={withLayout(MyCommunityStake, { type: 'common' })}
+      key="/myTransactions"
+      path="/myTransactions"
+      element={withLayout(MyTransactions, { type: 'common' })}
+    />,
+    <Route
+      key="/rewards"
+      path="/rewards"
+      element={withLayout(RewardsPage, { type: 'common' })}
     />,
 
     // NOTIFICATIONS
@@ -295,6 +348,13 @@ const CustomDomainRoutes = ({
       key="/manage/integrations/stake"
       path="/manage/integrations/stake"
       element={withLayout(CommunityStakeIntegration, {
+        scoped: true,
+      })}
+    />,
+    <Route
+      key="/manage/integrations/token"
+      path="/manage/integrations/token"
+      element={withLayout(CommunityTokenIntegration, {
         scoped: true,
       })}
     />,

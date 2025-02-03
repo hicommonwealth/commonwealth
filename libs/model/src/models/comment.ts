@@ -1,6 +1,9 @@
 import { stats } from '@hicommonwealth/core';
 import { Comment } from '@hicommonwealth/schemas';
-import { getDecodedString } from '@hicommonwealth/shared';
+import {
+  getDecodedString,
+  MAX_TRUNCATED_CONTENT_LENGTH,
+} from '@hicommonwealth/shared';
 import Sequelize from 'sequelize';
 import { z } from 'zod';
 import type {
@@ -34,10 +37,18 @@ export default (
           key: 'id',
         },
       },
-      parent_id: { type: Sequelize.STRING, allowNull: true },
+      parent_id: { type: Sequelize.INTEGER, allowNull: true },
       address_id: { type: Sequelize.INTEGER, allowNull: true },
       created_by: { type: Sequelize.STRING, allowNull: true },
-      body: { type: Sequelize.TEXT, allowNull: false },
+      body: {
+        type: Sequelize.STRING(MAX_TRUNCATED_CONTENT_LENGTH),
+        allowNull: false,
+      },
+      comment_level: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+      },
 
       // canvas-related columns
       canvas_signed_data: { type: Sequelize.JSONB, allowNull: true },
@@ -51,6 +62,11 @@ export default (
       discord_meta: { type: Sequelize.JSONB, allowNull: true },
 
       //counts
+      reply_count: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+      },
       reaction_count: {
         type: Sequelize.INTEGER,
         allowNull: false,

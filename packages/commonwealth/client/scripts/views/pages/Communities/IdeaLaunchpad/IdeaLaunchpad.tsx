@@ -1,33 +1,65 @@
+import { ChainBase } from '@hicommonwealth/shared';
+import useDeferredConditionTriggerCallback from 'hooks/useDeferredConditionTriggerCallback';
 import { useFlag } from 'hooks/useFlag';
 import React, { useState } from 'react';
+import useUserStore from 'state/ui/user';
+import { AuthModal } from 'views/modals/AuthModal';
 import LaunchIdeaCard from '../../../components/LaunchIdeaCard';
 import TokenLaunchDrawer from './TokenLaunchDrawer';
 
 const IdeaLaunchpad = () => {
-  const tokenizedCommunityEnabled = useFlag('tokenizedCommunity');
+  const user = useUserStore();
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const launchpadEnabled = useFlag('launchpad');
 
   const [initialIdeaPrompt, setInitialIdeaPrompt] = useState<string>();
   const [shouldGenerateIdeaOnDrawerOpen, setShouldGenerateIdeaOnDrawerOpen] =
     useState(false);
   const [isTokenLaunchDrawerOpen, setIsTokenLaunchDrawerOpen] = useState(false);
 
-  if (!tokenizedCommunityEnabled) return <></>;
+  const { register, trigger } = useDeferredConditionTriggerCallback({
+    shouldRunTrigger: user.isLoggedIn,
+  });
+
+  const openAuthModalOrTriggerCallback = () => {
+    if (user.isLoggedIn) {
+      trigger();
+    } else {
+      setIsAuthModalOpen(!user.isLoggedIn);
+    }
+  };
+
+  if (!launchpadEnabled) return <></>;
 
   return (
     <>
       <LaunchIdeaCard
         onRandomizeClick={(ideaPrompt) => {
-          setInitialIdeaPrompt(ideaPrompt);
-          setShouldGenerateIdeaOnDrawerOpen(true);
-          setIsTokenLaunchDrawerOpen(true);
+          register({
+            cb: (prompt: string) => {
+              setInitialIdeaPrompt(prompt);
+              setShouldGenerateIdeaOnDrawerOpen(true);
+              setIsTokenLaunchDrawerOpen(true);
+            },
+            args: ideaPrompt,
+          });
+          openAuthModalOrTriggerCallback();
         }}
-        onTokenLaunchClick={() => setIsTokenLaunchDrawerOpen(true)}
+        onTokenLaunchClick={() => {
+          register({ cb: () => setIsTokenLaunchDrawerOpen(true) });
+          openAuthModalOrTriggerCallback();
+        }}
       />
       <TokenLaunchDrawer
         isOpen={isTokenLaunchDrawerOpen}
         onClose={() => setIsTokenLaunchDrawerOpen(false)}
         initialIdeaPrompt={initialIdeaPrompt}
         generateIdeaOnMount={shouldGenerateIdeaOnDrawerOpen}
+      />
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        showWalletsFor={ChainBase.Ethereum}
       />
     </>
   );

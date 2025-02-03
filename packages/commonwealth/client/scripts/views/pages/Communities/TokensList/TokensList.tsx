@@ -1,18 +1,54 @@
-import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/CWButton';
+import { TokenView } from '@hicommonwealth/schemas';
+import { ChainBase } from '@hicommonwealth/shared';
 import clsx from 'clsx';
+import { calculateTokenPricing } from 'helpers/launchpad';
+import useDeferredConditionTriggerCallback from 'hooks/useDeferredConditionTriggerCallback';
 import { useFlag } from 'hooks/useFlag';
 import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useFetchTokenUsdRateQuery } from 'state/api/communityStake';
 import { useFetchTokensQuery } from 'state/api/tokens';
+import useUserStore from 'state/ui/user';
 import { CWText } from 'views/components/component_kit/cw_text';
+import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
+import { AuthModal } from 'views/modals/AuthModal';
+import TradeTokenModal, {
+  TradingConfig,
+  TradingMode,
+} from 'views/modals/TradeTokenModel';
+import { z } from 'zod';
 import TokenCard from '../../../components/TokenCard';
+import {
+  CommunityFilters,
+  CommunitySortOptions,
+  communitySortOptionsLabelToKeysMap,
+} from '../FiltersDrawer';
 import './TokensList.scss';
 
-const TokensList = () => {
+const TokenWithCommunity = TokenView.extend({
+  community_id: z.string(),
+});
+
+type TokensListProps = {
+  filters: CommunityFilters;
+};
+
+const TokensList = ({ filters }: TokensListProps) => {
+  const user = useUserStore();
   const navigate = useCommonNavigate();
-  const tokenizedCommunityEnabled = useFlag('tokenizedCommunity');
+  const launchpadEnabled = useFlag('launchpad');
+
+  const [tokenLaunchModalConfig, setTokenLaunchModalConfig] = useState<{
+    isOpen: boolean;
+    tradeConfig?: TradingConfig;
+  }>({ isOpen: false, tradeConfig: undefined });
+
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const { register, trigger } = useDeferredConditionTriggerCallback({
+    shouldRunTrigger: user.isLoggedIn,
+  });
 
   const {
     data: tokensList,
@@ -23,9 +59,33 @@ const TokensList = () => {
   } = useFetchTokensQuery({
     cursor: 1,
     limit: 8,
-    enabled: tokenizedCommunityEnabled,
+    with_stats: true,
+    order_by: (() => {
+      if (
+        filters.withCommunitySortBy &&
+        [CommunitySortOptions.MarketCap, CommunitySortOptions.Price].includes(
+          filters.withCommunitySortBy,
+        )
+      ) {
+        return communitySortOptionsLabelToKeysMap[
+          filters.withCommunitySortBy
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        ] as any;
+      }
+
+      return undefined;
+    })(),
+    enabled: launchpadEnabled,
   });
   const tokens = (tokensList?.pages || []).flatMap((page) => page.results);
+
+  const { data: ethToCurrencyRateData, isLoading: isLoadingETHToCurrencyRate } =
+    useFetchTokenUsdRateQuery({
+      tokenSymbol: 'ETH',
+    });
+  const ethToUsdRate = parseFloat(
+    ethToCurrencyRateData?.data?.data?.amount || '0',
+  );
 
   const handleFetchMoreTokens = () => {
     if (hasNextPage && !isFetchingNextPage) {
@@ -33,17 +93,39 @@ const TokensList = () => {
     }
   };
 
-  if (!tokenizedCommunityEnabled) return <></>;
+  const openAuthModalOrTriggerCallback = () => {
+    if (user.isLoggedIn) {
+      trigger();
+    } else {
+      setIsAuthModalOpen(!user.isLoggedIn);
+    }
+  };
+
+  const handleCTAClick = (
+    mode: TradingMode,
+    token: z.infer<typeof TokenWithCommunity>,
+  ) => {
+    setTokenLaunchModalConfig({
+      isOpen: true,
+      tradeConfig: {
+        mode: mode,
+        token: token,
+        addressType: ChainBase.Ethereum,
+      } as TradingConfig,
+    });
+  };
+
+  if (!launchpadEnabled) return <></>;
 
   return (
     <div className="TokensList">
       <CWText type="h2">Tokens</CWText>
-      {isInitialLoading ? (
+      {isInitialLoading || isLoadingETHToCurrencyRate ? (
         <CWCircleMultiplySpinner />
       ) : tokens.length === 0 ? (
         <div
           className={clsx('empty-placeholder', {
-            'my-16': tokenizedCommunityEnabled,
+            'my-16': launchpadEnabled,
           })}
         >
           <CWText type="h2">
@@ -54,31 +136,53 @@ const TokensList = () => {
         </div>
       ) : (
         <div className="list">
-          {(tokens || []).map((token) => (
-            <TokenCard
-              key={token.name}
-              name={token.name}
-              symbol={token.symbol}
-              // {
-              // TODO: https://github.com/hicommonwealth/commonwealth/issues/9694
-              price="0.75"
-              pricePercentage24HourChange={1.15}
-              marketCap={{
-                current: 300,
-                goal: 4500,
-              }}
-              // }
-              mode="buy"
-              iconURL={token.icon_url || ''}
-              onCardBodyClick={() =>
-                navigateToCommunity({
-                  navigate,
-                  path: '',
-                  chain: token.community_id,
-                })
-              }
-            />
-          ))}
+          {(tokens || []).map((token) => {
+            const pricing = calculateTokenPricing(
+              token as z.infer<typeof TokenView>,
+              ethToUsdRate,
+            );
+
+            return (
+              <TokenCard
+                key={token.name}
+                name={token.name}
+                symbol={token.symbol}
+                price={pricing.currentPrice}
+                pricePercentage24HourChange={
+                  pricing.pricePercentage24HourChange
+                }
+                marketCap={{
+                  current: pricing.marketCapCurrent,
+                  goal: pricing.marketCapGoal,
+                  isCapped: pricing.isMarketCapGoalReached,
+                }}
+                mode={
+                  pricing.isMarketCapGoalReached
+                    ? TradingMode.Swap
+                    : TradingMode.Buy
+                }
+                iconURL={token.icon_url || ''}
+                onCTAClick={(mode) => {
+                  register({
+                    cb: () => {
+                      handleCTAClick(
+                        mode,
+                        token as z.infer<typeof TokenWithCommunity>,
+                      );
+                    },
+                  });
+                  openAuthModalOrTriggerCallback();
+                }}
+                onCardBodyClick={() =>
+                  navigateToCommunity({
+                    navigate,
+                    path: '',
+                    chain: token.community_id,
+                  })
+                }
+              />
+            );
+          })}
         </div>
       )}
       {isFetchingNextPage ? (
@@ -94,6 +198,19 @@ const TokensList = () => {
         />
       ) : (
         <></>
+      )}
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        showWalletsFor={ChainBase.Ethereum}
+      />
+      {tokenLaunchModalConfig.tradeConfig && (
+        <TradeTokenModal
+          isOpen={tokenLaunchModalConfig.isOpen}
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          tradeConfig={tokenLaunchModalConfig.tradeConfig as any}
+          onModalClose={() => setTokenLaunchModalConfig({ isOpen: false })}
+        />
       )}
     </div>
   );

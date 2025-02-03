@@ -1,0 +1,19 @@
+@import '../../styles/shared.scss';
+
+.WebhookSettingsModal {
+  .checkbox-section {
+    display: flex;
+    flex-direction: column;
+
+    .checkbox {
+      margin-top: 4px;
+    }
+  }
+  .signing-key-section {
+    .flex-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+  }
+}

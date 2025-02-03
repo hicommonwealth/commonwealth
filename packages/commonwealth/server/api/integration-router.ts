@@ -3,6 +3,7 @@ import { AppError } from '@hicommonwealth/core';
 import { ChainEvents, Contest, Snapshot, config } from '@hicommonwealth/model';
 import { Router, raw } from 'express';
 import farcasterRouter from 'server/farcaster/router';
+import { validateFarcasterAction } from 'server/middleware/validateFarcasterAction';
 import { validateNeynarWebhook } from 'server/middleware/validateNeynarWebhook';
 import { config as serverConfig } from '../config';
 
@@ -30,6 +31,7 @@ function build() {
 
   if (config.CONTESTS.FLAG_FARCASTER_CONTEST) {
     // Farcaster frames
+    // WARNING: do not change this because cloudflare may route to it
     router.use('/farcaster/contests', farcasterRouter);
 
     // Farcaster webhooks/actions
@@ -51,6 +53,16 @@ function build() {
       express.command(Contest.FarcasterReplyCastCreatedWebhook()),
     );
 
+    router.post(
+      '/farcaster/ContestBotMentioned',
+      (req, _, next) => {
+        validateNeynarWebhook(
+          config.CONTESTS.NEYNAR_CONTEST_BOT_MENTIONED_WEBHOOK_SECRET,
+        )(req, _, next).catch(next);
+      },
+      express.command(Contest.RelayFarcasterContestBotMentioned()),
+    );
+
     router.get(
       '/farcaster/CastUpvoteAction',
       express.query(Contest.GetFarcasterUpvoteActionMetadata()),
@@ -58,8 +70,16 @@ function build() {
 
     router.post(
       '/farcaster/CastUpvoteAction',
-      // TODO: create new validation middleware for actions
+      (req, _, next) => {
+        validateFarcasterAction()(req, _, next).catch(next);
+      },
       express.command(Contest.FarcasterUpvoteAction()),
+    );
+
+    router.post(
+      '/farcaster/NotificationsWebhook',
+      // TODO: add validation middleware
+      express.command(Contest.FarcasterNotificationsWebhook()),
     );
   }
 

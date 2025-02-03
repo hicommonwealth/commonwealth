@@ -1,7 +1,6 @@
 import { slugify } from '@hicommonwealth/shared';
 import { filterLinks } from 'helpers/threads';
 import { getProposalUrlPath } from 'identifiers';
-import 'pages/view_thread/linked_threads_card.scss';
 import React, { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import app from 'state';
@@ -13,6 +12,7 @@ import { CWButton } from '../../components/component_kit/new_designs/CWButton';
 import CWCircleMultiplySpinner from '../../components/component_kit/new_designs/CWCircleMultiplySpinner';
 import { CWModal } from '../../components/component_kit/new_designs/CWModal';
 import { LinkedThreadModal } from '../../modals/linked_thread_modal';
+import './linked_threads_card.scss';
 
 type LinkedThreadsCardProps = {
   thread: Thread;
@@ -54,7 +54,17 @@ export const LinkedThreadsCard = ({
               {linkedThreadIds.length > 0 ? (
                 <div className="links-container">
                   {linkedThreads!.map((t) => {
-                    const tt = new Thread(t);
+                    const tt = new Thread({
+                      address_id: t.address_id,
+                      body: t.body,
+                      community_id: t.community_id,
+                      id: t.id,
+                      kind: t.kind,
+                      stage: t.stage,
+                      title: t.title,
+                      created_at: t.created_at,
+                      updated_at: t.updated_at,
+                    });
                     const discussionLink = getProposalUrlPath(
                       tt.slug,
                       `${tt.identifier}-${slugify(t.title)}`,

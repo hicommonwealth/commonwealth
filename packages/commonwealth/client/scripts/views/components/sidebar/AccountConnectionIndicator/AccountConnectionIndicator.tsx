@@ -1,58 +1,70 @@
-import { saveToClipboard } from 'client/scripts/utils/clipboard';
-import clsx from 'clsx';
+import { useFlag } from 'client/scripts/hooks/useFlag';
+import AddressInfo from 'client/scripts/models/AddressInfo';
+import NewProfile from 'client/scripts/models/NewProfile';
+import { AuthModalType } from 'client/scripts/views/modals/AuthModal';
 import React from 'react';
+import app from 'state';
+import { useInviteLinkModal } from 'state/ui/modals';
 import useJoinCommunity from 'views/components/SublayoutHeader/useJoinCommunity';
-import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
-import { CWIdentificationTag } from 'views/components/component_kit/new_designs/CWIdentificationTag';
-import CWIconButton from '../../component_kit/new_designs/CWIconButton';
-import { CWTooltip } from '../../component_kit/new_designs/CWTooltip';
+import { SharePopover } from '../../SharePopover';
+import { AddressList } from '../CommunitySection/AddressList';
+
 import './AccountConnectionIndicator.scss';
 
 interface AccountConnectionIndicatorProps {
   connected: boolean;
   address: string;
+  addresses: AddressInfo[] | undefined;
+  profile: NewProfile | undefined;
+  refreshProfiles: () => void;
+  onAuthModalOpen: (modalType?: AuthModalType) => void;
+  isInsideCommunity?: boolean;
 }
 
 const AccountConnectionIndicator = ({
   connected,
   address,
+  profile,
+  addresses,
+  refreshProfiles,
+  onAuthModalOpen,
+  isInsideCommunity,
 }: AccountConnectionIndicatorProps) => {
   const { handleJoinCommunity, JoinCommunityModals } = useJoinCommunity();
+  const referralsEnabled = useFlag('referrals');
+  const { setIsInviteLinkModalOpen } = useInviteLinkModal();
+
+  if (!profile) {
+    return null;
+  }
 
   return (
     <>
       <div className="AccountConnectionIndicator">
         {connected && (
           <div className="status-address">
-            <CWText fontWeight="medium" type="caption" className="status-text">
-              {connected ? 'Connected' : 'Not connected'}
-            </CWText>
             <div className="status-row">
-              <div className={clsx('status-light', { connected })} />
-              <CWIdentificationTag address={address} />
-              <CWTooltip
-                placement="top"
-                content="address copied!"
-                renderTrigger={(handleInteraction, isTooltipOpen) => {
-                  return (
-                    <CWIconButton
-                      iconName="copySimple"
-                      onClick={(event) => {
-                        saveToClipboard(address).catch(console.error);
-                        handleInteraction(event);
-                      }}
-                      onMouseLeave={(e) => {
-                        if (isTooltipOpen) {
-                          handleInteraction(e);
-                        }
-                      }}
-                      className="copy-icon"
-                    />
-                  );
-                }}
+              <AddressList
+                address={address}
+                addresses={addresses}
+                profile={profile}
+                refreshProfiles={refreshProfiles}
+                onAuthModalOpen={() => onAuthModalOpen()}
+                isInsideCommunity={isInsideCommunity}
               />
             </div>
+
+            {referralsEnabled && (
+              <CWButton
+                buttonType="tertiary"
+                buttonHeight="sm"
+                buttonWidth="full"
+                label="Get referral link"
+                className="referral-link-button"
+                onClick={() => setIsInviteLinkModalOpen(true)}
+              />
+            )}
           </div>
         )}
 
@@ -64,6 +76,14 @@ const AccountConnectionIndicator = ({
             label={connected ? 'Joined' : 'Join community'}
             disabled={connected}
             onClick={handleJoinCommunity}
+          />
+          <SharePopover
+            linkToShare={
+              window.location.origin +
+              '/' +
+              app.activeChainId() +
+              '/discussions'
+            }
           />
         </div>
       </div>

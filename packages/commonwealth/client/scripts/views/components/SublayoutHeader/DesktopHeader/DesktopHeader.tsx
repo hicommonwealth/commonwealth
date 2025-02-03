@@ -7,6 +7,7 @@ import KnockNotifications from 'views/components/KnockNotifications';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { isWindowSmallInclusive } from 'views/components/component_kit/helpers';
+import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWSearchBar } from 'views/components/component_kit/new_designs/CWSearchBar';
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import { CreateContentPopover } from 'views/menus/CreateContentMenu';
@@ -14,10 +15,14 @@ import { HelpMenuPopover } from 'views/menus/help_menu';
 
 import UserDropdown from './UserDropdown';
 
+import { useFlag } from 'hooks/useFlag';
 import { useFetchCustomDomainQuery } from 'state/api/configuration';
 import useUserStore from 'state/ui/user';
 import AuthButtons from 'views/components/SublayoutHeader/AuthButtons';
 import { AuthModalType } from 'views/modals/AuthModal';
+import { capDecimals } from 'views/modals/ManageCommunityStakeModal/utils';
+import { CWText } from '../../component_kit/cw_text';
+import XPProgressIndicator from '../XPProgressIndicator';
 import './DesktopHeader.scss';
 
 interface DesktopHeaderProps {
@@ -27,6 +32,8 @@ interface DesktopHeaderProps {
 
 const DesktopHeader = ({ onMobile, onAuthModalOpen }: DesktopHeaderProps) => {
   const navigate = useCommonNavigate();
+  const rewardsEnabled = useFlag('rewardsPage');
+  const xpEnabled = useFlag('xp');
   const { menuVisible, setMenu, menuName, setUserToggledVisibility } =
     useSidebarStore();
   const user = useUserStore();
@@ -82,15 +89,34 @@ const DesktopHeader = ({ onMobile, onAuthModalOpen }: DesktopHeaderProps) => {
               isLoggedIn: user.isLoggedIn,
             })}
           >
+            {xpEnabled && <XPProgressIndicator />}
             <CreateContentPopover />
+            {!isWindowSmallInclusive(window.innerWidth) && (
+              <CWTooltip
+                content="About Common"
+                placement="bottom"
+                renderTrigger={(handleInteraction) => (
+                  <CWButton
+                    buttonType="secondary"
+                    buttonHeight="sm"
+                    label="About"
+                    onClick={() =>
+                      window.open('https://landing.common.xyz', '_blank')
+                    }
+                    onMouseEnter={handleInteraction}
+                    onMouseLeave={handleInteraction}
+                  />
+                )}
+              />
+            )}
             <CWTooltip
-              content="Explore communities"
+              content="Explore"
               placement="bottom"
               renderTrigger={(handleInteraction) => (
                 <CWIconButton
                   iconButtonTheme="black"
                   iconName="compassPhosphor"
-                  onClick={() => navigate('/communities', {}, null)}
+                  onClick={() => navigate('/explore', {}, null)}
                   onMouseEnter={handleInteraction}
                   onMouseLeave={handleInteraction}
                 />
@@ -99,7 +125,41 @@ const DesktopHeader = ({ onMobile, onAuthModalOpen }: DesktopHeaderProps) => {
 
             <HelpMenuPopover />
           </div>
-          {user.isLoggedIn && <KnockNotifications />}
+          {user.isLoggedIn && (
+            <>
+              <KnockNotifications />
+
+              {rewardsEnabled && (
+                <div className="rewards-button">
+                  <CWTooltip
+                    content="Wallet and rewards"
+                    placement="bottom"
+                    renderTrigger={(handleInteraction) => (
+                      <div
+                        className="rewards-button-container"
+                        onClick={() => navigate('/rewards', {}, null)}
+                        onMouseEnter={handleInteraction}
+                        onMouseLeave={handleInteraction}
+                      >
+                        <CWIconButton
+                          iconName="cardholder"
+                          weight="fill"
+                          iconButtonTheme="black"
+                        />
+                        <CWText
+                          className="earnings"
+                          fontWeight="medium"
+                          type="caption"
+                        >
+                          {capDecimals('0.125')} ETH
+                        </CWText>
+                      </div>
+                    )}
+                  />
+                </div>
+              )}
+            </>
+          )}
         </div>
 
         {user.isLoggedIn && (

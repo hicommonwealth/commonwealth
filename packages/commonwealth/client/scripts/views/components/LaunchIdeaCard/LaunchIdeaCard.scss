@@ -1,9 +1,10 @@
-@import '../../../../styles/shared';
+@import '../../../styles/shared';
 
 .LaunchIdeaCard {
   position: relative;
   background-color: white;
   border-radius: 4px;
+  margin: 1px;
 
   ::before {
     content: '';

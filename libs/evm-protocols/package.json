@@ -1,0 +1,36 @@
+{
+  "name": "@hicommonwealth/evm-protocols",
+  "private": "true",
+  "type": "module",
+  "version": "0.1.0",
+  "description": "Web3 domain code",
+  "files": [
+    "build"
+  ],
+  "exports": {
+    ".": {
+      "default": "./build/index.js",
+      "devmode": "./src/index.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc -b ./tsconfig.build.json",
+    "clean": "rm -rf build && rm -rf coverage && find . -type f -name '*.tsbuildinfo' -exec rm {} +",
+    "check-types": "tsc --noEmit",
+    "test": "NODE_ENV=test vitest --config ../../vite.config.ts --coverage run ./test/**/*.spec.ts",
+    "lint": "NODE_OPTIONS=\"--max-old-space-size=4096\" eslint -c ../../.eslintrc.cjs './src/**/*.{ts,tsx}'",
+    "lint-diff": "NODE_OPTIONS=\"--max-old-space-size=4096\" eslint -c ../../.eslintrc-diff.cjs './src/**/*.{ts,tsx}'"
+  },
+  "dependencies": {
+    "@alchemy/aa-alchemy": "^3.17.0",
+    "@alchemy/aa-core": "^3.16.0",
+    "@ethersproject/bignumber": "^5.7.0",
+    "@hicommonwealth/shared": "workspace:*",
+    "async-mutex": "^0.5.0",
+    "moment": "^2.23.0",
+    "web3": "^4.7.0",
+    "web3-eth-abi": "^4.2.1",
+    "web3-utils": "^4.2.2",
+    "web3-validator": "2.0.5"
+  }
+}

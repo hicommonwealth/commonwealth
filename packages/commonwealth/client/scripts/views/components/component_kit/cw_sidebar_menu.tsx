@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { isMobile } from 'react-device-detect';
 
-import 'components/component_kit/cw_sidebar_menu.scss';
+import './cw_sidebar_menu.scss';
 
 import useBrowserWindow from 'client/scripts/hooks/useBrowserWindow';
 import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
@@ -201,7 +201,7 @@ export const CWSidebarMenu = (props: SidebarMenuProps) => {
           },
           {
             type: 'default',
-            label: 'Explore communities',
+            label: 'Explore',
             iconLeft: 'compassPhosphor',
             onClick: () => {
               if (isMobile && isWindowSmall) {
@@ -209,7 +209,7 @@ export const CWSidebarMenu = (props: SidebarMenuProps) => {
               } else {
                 setMenu({ name: menuName, isVisible: menuVisible });
               }
-              navigate('/communities', {}, null);
+              navigate('/explore', {}, null);
             },
           },
           {

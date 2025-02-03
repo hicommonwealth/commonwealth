@@ -14,6 +14,7 @@ import {
   Community,
   Group,
   PermissionEnum,
+  PinnedToken,
   Requirement,
   StakeTransaction,
   Topic,
@@ -125,7 +126,7 @@ export const UpdateCustomDomain = {
   context: AuthContext,
 };
 
-const Snapshot = z.string().regex(/.+\.(eth|xyz)$/);
+const Snapshot = z.string().regex(/.+\.(eth|xyz|io)$/);
 
 export const UpdateCommunity = {
   input: Community.omit({ id: true, network: true, custom_domain: true })
@@ -178,6 +179,7 @@ export const CreateTopic = {
         token_address: true,
         token_symbol: true,
         vote_weight_multiplier: true,
+        chain_node_id: true,
       }),
     ),
   output: z.object({
@@ -227,6 +229,7 @@ export const ToggleArchiveTopic = {
 const GroupMetadata = z.object({
   name: z.string(),
   description: z.string(),
+  groupImageUrl: z.string().nullish(),
   required_requirements: PG_INT.nullish(),
   membership_ttl: PG_INT.optional(),
 });
@@ -280,6 +283,31 @@ export const DeleteGroup = {
   context: AuthContext,
 };
 
+export const DeleteAddress = {
+  input: z.object({
+    community_id: z.string(),
+    address: z.string(),
+  }),
+  output: z.object({
+    community_id: z.string(),
+    address: z.string(),
+  }),
+  context: AuthContext,
+};
+
+export const DeleteAllAddresses = {
+  input: z.object({
+    community_id: z.string(),
+    address: z.string(),
+  }),
+  output: z.object({
+    community_id: z.string(),
+    address: z.string(),
+    deleted: z.number(),
+  }),
+  context: AuthContext,
+};
+
 export const DeleteCommunity = {
   input: z.object({
     community_id: z.string(),
@@ -303,6 +331,13 @@ export const RefreshCommunityMemberships = {
   context: AuthContext,
 };
 
+export const SelectCommunity = {
+  input: z.object({
+    community_id: z.string(),
+  }),
+  output: z.object({}),
+};
+
 export const JoinCommunity = {
   input: z.object({
     community_id: z.string(),
@@ -321,6 +356,24 @@ export const BanAddress = {
   input: z.object({
     community_id: z.string(),
     address: z.string(),
+  }),
+  output: z.object({}),
+  context: AuthContext,
+};
+
+export const PinToken = {
+  input: z.object({
+    community_id: z.string(),
+    contract_address: z.string(),
+    chain_node_id: z.number(),
+  }),
+  output: PinnedToken,
+  context: AuthContext,
+};
+
+export const UnpinToken = {
+  input: z.object({
+    community_id: z.string(),
   }),
   output: z.object({}),
   context: AuthContext,

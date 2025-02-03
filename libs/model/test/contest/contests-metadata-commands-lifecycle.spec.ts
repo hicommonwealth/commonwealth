@@ -5,7 +5,7 @@ import chaiAsPromised from 'chai-as-promised';
 import { afterAll, beforeAll, describe, test } from 'vitest';
 import z from 'zod';
 import { Contest, TopicAttributes } from '../../src/index';
-import { bootstrap_testing, seed } from '../../src/tester';
+import { seed } from '../../src/tester';
 
 chai.use(chaiAsPromised);
 
@@ -31,7 +31,6 @@ describe('Contests metadata commands lifecycle', () => {
   let communityMemberActor: Actor | null = null;
 
   beforeAll(async () => {
-    await bootstrap_testing();
     const [chain] = await seed('ChainNode', {});
 
     const [communityAdminUser] = await seed(
@@ -302,7 +301,8 @@ describe('Contests metadata commands lifecycle', () => {
             },
           },
         );
-        expect(updateResult?.contest_managers[0]!.topic_id).to.eq(
+        console.log(updateResult);
+        expect(updateResult?.contest_managers.at(0)?.topic_id).to.eq(
           topics[1].id!,
         );
       }

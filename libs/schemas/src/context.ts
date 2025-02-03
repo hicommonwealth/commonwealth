@@ -1,5 +1,10 @@
 import { z } from 'zod';
-import { Address, Comment, Reaction, Thread, Topic } from './entities';
+import { Comment } from './entities/comment.schemas';
+import { Poll } from './entities/poll.schemas';
+import { Reaction } from './entities/reaction.schemas';
+import { Thread } from './entities/thread.schemas';
+import { Topic } from './entities/topic.schemas';
+import { Address } from './entities/user.schemas';
 
 // Input schemas for authorization context
 export const AuthContextInput = z.object({ community_id: z.string() });
@@ -10,6 +15,7 @@ export const ReactionContextInput = z.object({
   community_id: z.string(),
   reaction_id: z.number(),
 });
+export const PollContextInput = z.object({ poll_id: z.number() });
 
 /**
  * Base authorization context
@@ -77,3 +83,11 @@ export const ReactionContext = z.object({
   reaction: Reaction,
 });
 export type ReactionContext = z.infer<typeof ReactionContext>;
+
+export const PollContext = z.object({
+  ...AuthContext.shape,
+  ...PollContextInput.shape,
+  poll: Poll,
+  thread: Thread,
+});
+export type PollContext = z.infer<typeof PollContext>;

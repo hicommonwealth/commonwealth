@@ -1,0 +1,26 @@
+@import '../../../../styles/shared';
+
+.XPTable {
+  @include table-cell;
+
+  @include smallInclusive {
+    max-height: 300px;
+    overflow: scroll;
+  }
+
+  .table-header {
+    display: flex;
+    gap: 4px;
+    justify-content: center;
+    align-items: center;
+  }
+
+  tr {
+    td,
+    th {
+      &:first-of-type {
+        width: 80px;
+      }
+    }
+  }
+}

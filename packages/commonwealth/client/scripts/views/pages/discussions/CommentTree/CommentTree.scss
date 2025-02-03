@@ -1,7 +1,13 @@
-@import '../../../../../styles/shared';
+@import '../../../../styles/shared';
 
 .CommentsTree {
   display: flex;
   flex-direction: column;
   scroll-margin-block-start: 40px;
+
+  .replies-container {
+    border-left: 1px solid $neutral-200;
+    padding-left: 24px;
+    margin-left: 28px;
+  }
 }

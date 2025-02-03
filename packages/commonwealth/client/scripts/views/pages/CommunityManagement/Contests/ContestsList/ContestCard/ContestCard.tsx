@@ -19,13 +19,14 @@ import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
 import { SharePopoverOld } from 'views/components/share_popover_old';
-import { capDecimals } from 'views/modals/ManageCommunityStakeModal/utils';
 import { openConfirmation } from 'views/modals/confirmation_modal';
 
+import { ContestType } from '../../types';
 import { copyFarcasterContestFrameUrl, isContestActive } from '../../utils';
 import ContestAlert from '../ContestAlert';
 import ContestCountdown from '../ContestCountdown';
 
+import { buildContestPrizes } from '@hicommonwealth/shared';
 import './ContestCard.scss';
 
 const noFundsProps = {
@@ -50,6 +51,13 @@ interface ContestCardProps {
   isHorizontal?: boolean;
   isFarcaster?: boolean;
   payoutStructure?: number[];
+  score?: {
+    creator_address?: string;
+    content_id?: string;
+    votes?: number;
+    prize?: string;
+    tickerPrize?: number;
+  }[];
 }
 
 const ContestCard = ({
@@ -69,6 +77,7 @@ const ContestCard = ({
   isHorizontal = false,
   isFarcaster = false,
   payoutStructure,
+  score = [],
 }: ContestCardProps) => {
   const navigate = useCommonNavigate();
   const user = useUserStore();
@@ -86,21 +95,19 @@ const ContestCard = ({
 
   const { isWindowMediumSmallInclusive } = useBrowserWindow({});
 
-  const { data: contestBalance } = useGetContestBalanceQuery({
-    contestAddress: address,
-    chainRpc: app.chain.meta?.ChainNode?.url || '',
-    ethChainId: app.chain.meta?.ChainNode?.eth_chain_id || 0,
-    isOneOff: !isRecurring,
-  });
+  const { data: contestBalance, isLoading: isLoadingContestBalance } =
+    useGetContestBalanceQuery({
+      contestAddress: address,
+      chainRpc: app.chain.meta?.ChainNode?.url || '',
+      ethChainId: app.chain.meta?.ChainNode?.eth_chain_id || 0,
+      isOneOff: !isRecurring,
+    });
 
-  const prizes =
-    contestBalance && payoutStructure
-      ? payoutStructure.map(
-          (percentage) =>
-            (contestBalance * (percentage / 100)) /
-            Math.pow(10, decimals || 18),
-        )
-      : [];
+  const prizes = buildContestPrizes(
+    Number(contestBalance),
+    payoutStructure,
+    decimals,
+  );
 
   const handleCancel = () => {
     cancelContest({
@@ -133,7 +140,11 @@ const ContestCard = ({
   };
 
   const handleEditContest = () => {
-    navigate(`/manage/contests/${address}`);
+    navigate(
+      `/manage/contests/${address}${
+        isFarcaster ? `?type=${ContestType.Farcaster}` : ''
+      }`,
+    );
   };
 
   const handleLeaderboardClick = () => {
@@ -150,7 +161,21 @@ const ContestCard = ({
     copyFarcasterContestFrameUrl(address).catch(console.log);
   };
 
-  const showNoFundsInfo = isActive && (contestBalance || 0) <= 0;
+  const showNoFundsInfo =
+    isActive && !isLoadingContestBalance && (contestBalance || 0) <= 0;
+
+  const isLessThan24HoursLeft =
+    moment(finishDate).diff(moment(), 'hours') <= 24;
+
+  const hasVotes = score.length > 0;
+  const hasLessVotesThanPrizes = (payoutStructure || []).length > score.length;
+
+  const showNoUpvotesWarning =
+    isActive &&
+    isAdmin &&
+    isLessThan24HoursLeft &&
+    (contestBalance || 0) > 0 &&
+    (!hasVotes || hasLessVotesThanPrizes);
 
   return (
     <CWCard
@@ -197,6 +222,21 @@ const ContestCard = ({
             />
           ) : (
             <>
+              {showNoUpvotesWarning && (
+                <ContestAlert
+                  title="Upvote contests to avoid return of funds"
+                  iconName="warning"
+                  description={
+                    !hasVotes
+                      ? "The prize amount will be returned to Common and then to admin's wallet if there are no upvotes"
+                      : hasLessVotesThanPrizes
+                        ? `You have ${payoutStructure?.length} prizes but only ${score.length} thread upvotes.
+                        Upvote more threads to avoid return of funds.
+                        The prize amount will be returned to Common and then to admin's wallet if there are no upvotes`
+                        : ''
+                  }
+                />
+              )}
               <CWText className="prizes-header" fontWeight="bold">
                 Current Prizes
               </CWText>
@@ -208,7 +248,7 @@ const ContestCard = ({
                         {moment.localeData().ordinal(index + 1)} Prize
                       </CWText>
                       <CWText fontWeight="bold">
-                        {capDecimals(String(prize))} {ticker}
+                        {prize} {ticker}
                       </CWText>
                     </div>
                   ))

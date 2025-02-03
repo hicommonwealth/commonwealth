@@ -25,6 +25,7 @@ import { CWTag } from '../../components/component_kit/new_designs/CWTag';
 import CreateCommunityButton from '../../components/sidebar/CreateCommunityButton';
 import ManageCommunityStakeModal from '../../modals/ManageCommunityStakeModal/ManageCommunityStakeModal';
 import './Communities.scss';
+import ExploreContestList from './ExploreContestList';
 import {
   CommunityFilters,
   CommunitySortDirections,
@@ -35,6 +36,7 @@ import {
   sortOrderLabelsToDirectionsMap,
 } from './FiltersDrawer';
 import IdeaLaunchpad from './IdeaLaunchpad';
+import QuestList from './QuestList';
 import TokensList from './TokensList';
 import { getCommunityCountsString } from './helpers';
 
@@ -46,7 +48,7 @@ type ExtendedCommunitySliceType = [
 
 const CommunitiesPage = () => {
   const containerRef = useRef();
-  const tokenizedCommunityEnabled = useFlag('tokenizedCommunity');
+  const launchpadEnabled = useFlag('launchpad');
 
   const {
     setModeOfManageCommunityStakeModal,
@@ -81,9 +83,25 @@ const CommunitiesPage = () => {
   } = useFetchCommunitiesQuery({
     limit: 50,
     include_node_info: true,
-    order_by:
-      communitySortOptionsLabelToKeysMap[filters.withCommunitySortBy || ''] ||
-      'lifetime_thread_count',
+    order_by: (() => {
+      if (
+        filters.withCommunitySortBy &&
+        [
+          CommunitySortOptions.MemberCount,
+          CommunitySortOptions.ThreadCount,
+          CommunitySortOptions.MostRecent,
+        ].includes(filters.withCommunitySortBy)
+      ) {
+        return (
+          (communitySortOptionsLabelToKeysMap[
+            filters.withCommunitySortBy
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          ] as any) || 'lifetime_thread_count'
+        );
+      }
+
+      return 'lifetime_thread_count';
+    })(),
     order_direction:
       sortOrderLabelsToDirectionsMap[filters.withCommunitySortOrder || ''] ||
       'DESC',
@@ -209,9 +227,9 @@ const CommunitiesPage = () => {
           <div className="description">
             <CWText
               type="h1"
-              {...(tokenizedCommunityEnabled && { fontWeight: 'semiBold' })}
+              {...(launchpadEnabled && { fontWeight: 'semiBold' })}
             >
-              Explore {tokenizedCommunityEnabled ? '' : 'Communities'}
+              Explore {launchpadEnabled ? '' : 'Communities'}
             </CWText>
             {isWindowSmallInclusive ? communitiesCount : <></>}
             <div className="actions">
@@ -305,8 +323,10 @@ const CommunitiesPage = () => {
 
           <IdeaLaunchpad />
         </div>
-        <TokensList />
-        {tokenizedCommunityEnabled && <CWText type="h2">Communities</CWText>}
+        <TokensList filters={filters} />
+        <QuestList />
+        <ExploreContestList />
+        {launchpadEnabled && <CWText type="h2">Communities</CWText>}
         {isLoading && communitiesList.length === 0 ? (
           <CWCircleMultiplySpinner />
         ) : (
@@ -372,7 +392,7 @@ const CommunitiesPage = () => {
               EmptyPlaceholder: () => (
                 <section
                   className={clsx('empty-placeholder', {
-                    'my-16': tokenizedCommunityEnabled,
+                    'my-16': launchpadEnabled,
                   })}
                 >
                   <CWText type="h2">

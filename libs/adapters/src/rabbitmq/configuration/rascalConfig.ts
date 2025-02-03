@@ -134,6 +134,18 @@ export function getAllRascalConfigs(
         arguments: queueOptions,
       },
     },
+    [RascalQueues.XpProjection]: {
+      ...queueConfig,
+      options: {
+        arguments: queueOptions,
+      },
+    },
+    [RascalQueues.UserReferrals]: {
+      ...queueConfig,
+      options: {
+        arguments: queueOptions,
+      },
+    },
     [RascalQueues.FarcasterWorkerPolicy]: {
       ...queueConfig,
       options: {
@@ -203,6 +215,27 @@ export function getAllRascalConfigs(
         RascalRoutingKeys.ContestProjectionContestContentUpvoted,
       ],
     },
+    [RascalBindings.XpProjection]: {
+      source: RascalExchanges.MessageRelayer,
+      destination: RascalQueues.XpProjection,
+      destinationType: 'queue',
+      bindingKeys: [
+        RascalRoutingKeys.XpProjectionSignUpFlowCompleted,
+        RascalRoutingKeys.XpProjectionCommunityCreated,
+        RascalRoutingKeys.XpProjectionCommunityJoined,
+        RascalRoutingKeys.XpProjectionThreadCreated,
+        RascalRoutingKeys.XpProjectionThreadUpvoted,
+        RascalRoutingKeys.XpProjectionCommentCreated,
+        RascalRoutingKeys.XpProjectionCommentUpvoted,
+        RascalRoutingKeys.XpProjectionUserMentioned,
+      ],
+    },
+    [RascalBindings.UserReferrals]: {
+      source: RascalExchanges.MessageRelayer,
+      destination: RascalQueues.UserReferrals,
+      destinationType: 'queue',
+      bindingKeys: [RascalRoutingKeys.UserReferralsCommunityCreated],
+    },
     [RascalBindings.FarcasterWorkerPolicy]: {
       source: RascalExchanges.MessageRelayer,
       destination: RascalQueues.FarcasterWorkerPolicy,
@@ -211,6 +244,7 @@ export function getAllRascalConfigs(
         RascalRoutingKeys.FarcasterWorkerPolicyCastCreated,
         RascalRoutingKeys.FarcasterWorkerPolicyReplyCastCreated,
         RascalRoutingKeys.FarcasterWorkerPolicyVoteCreated,
+        RascalRoutingKeys.FarcasterWorkerPolicyContestBotMentioned,
       ],
     },
   };
@@ -237,6 +271,14 @@ export function getAllRascalConfigs(
     },
     [RascalSubscriptions.ContestProjection]: {
       queue: RascalQueues.ContestProjection,
+      ...subscriptionConfig,
+    },
+    [RascalSubscriptions.XpProjection]: {
+      queue: RascalQueues.XpProjection,
+      ...subscriptionConfig,
+    },
+    [RascalSubscriptions.UserReferrals]: {
+      queue: RascalQueues.UserReferrals,
       ...subscriptionConfig,
     },
     [RascalSubscriptions.FarcasterWorkerPolicy]: {

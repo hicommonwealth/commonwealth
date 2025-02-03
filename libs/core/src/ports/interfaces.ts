@@ -1,3 +1,4 @@
+import { EventNames, Events } from '@hicommonwealth/schemas';
 import { Readable } from 'stream';
 import { z } from 'zod';
 import {
@@ -6,7 +7,6 @@ import {
   EventsHandlerMetadata,
   InvalidInput,
 } from '../framework';
-import { EventNames, Events } from '../integration/events';
 import {
   ChainProposalsNotification,
   CommentCreatedNotification,
@@ -209,6 +209,8 @@ export enum BrokerSubscriptions {
   ContestWorkerPolicy = 'ContestWorkerPolicy',
   ContestProjection = 'ContestProjection',
   FarcasterWorkerPolicy = 'FarcasterWorkerPolicy',
+  XpProjection = 'XpProjection',
+  UserReferrals = 'UserReferrals',
 }
 
 /**
@@ -310,12 +312,23 @@ export type NotificationsProviderRecipient =
 
 type BaseNotifProviderOptions = {
   users: { id: string; email?: string }[];
-  actor?: { id: string; email?: string };
+  actor?: {
+    id: string;
+    profile_name: string;
+    profile_url: string;
+    email?: string;
+    profile_avatar_url?: string;
+  };
 };
 
 type WebhookProviderOptions = {
   key: WorkflowKeys.Webhooks;
-  users: { id: string; webhook_url: string; destination: string }[];
+  users: {
+    id: string;
+    webhook_url: string;
+    destination: string;
+    signing_key: string;
+  }[];
   data: z.infer<typeof WebhookNotification>;
 };
 

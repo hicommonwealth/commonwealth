@@ -5,6 +5,8 @@ import {
   Contest,
   Feed,
   Thread,
+  Token,
+  User,
 } from '@hicommonwealth/model';
 import cors from 'cors';
 import { Router } from 'express';
@@ -20,6 +22,7 @@ import {
   addRateLimiterMiddleware,
   apiKeyAuthMiddleware,
 } from './external-router-middleware';
+import * as launchpad from './launchpadToken';
 import * as thread from './thread';
 import * as user from './user';
 
@@ -45,11 +48,17 @@ const {
   deleteReaction,
   deleteThread,
 } = thread.trpcRouter;
-const { createComment, updateComment, deleteComment, createCommentReaction } =
-  comment.trpcRouter;
+const {
+  createComment,
+  updateComment,
+  deleteComment,
+  createCommentReaction,
+  toggleCommentSpam,
+} = comment.trpcRouter;
 const { getNewContent } = user.trpcRouter;
 const { createContestMetadata, updateContestMetadata, cancelContestMetadata } =
   contest.trpcRouter;
+const { createToken, createTrade, getLaunchpadTrades } = launchpad.trpcRouter;
 
 const api = {
   getGlobalActivity: trpc.query(Feed.GetGlobalActivity, trpc.Tag.User, {
@@ -57,6 +66,9 @@ const api = {
     ttlSecs: config.NO_GLOBAL_ACTIVITY_CACHE ? undefined : 60 * 5,
   }),
   getUserActivity: trpc.query(Feed.GetUserActivity, trpc.Tag.User, {
+    forceSecure: true,
+  }),
+  getUser: trpc.query(User.GetUser, trpc.Tag.User, {
     forceSecure: true,
   }),
   getNewContent,
@@ -103,6 +115,13 @@ const api = {
   deleteReaction,
   joinCommunity,
   banAddress,
+  toggleCommentSpam,
+  createToken,
+  createTrade,
+  getTokens: trpc.query(Token.GetLaunchpadTokens, trpc.Tag.Token, {
+    forceSecure: true,
+  }),
+  getLaunchpadTrades,
 };
 
 const PATH = '/api/v1';

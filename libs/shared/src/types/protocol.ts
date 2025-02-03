@@ -83,6 +83,8 @@ export enum WalletSsoSource {
   Twitter = 'twitter',
   Apple = 'apple',
   Email = 'email',
+  Farcaster = 'farcaster',
+  SMS = 'SMS',
   Unknown = 'unknown', // address created after we launched SSO, before we started recording WalletSsoSource
 }
 
@@ -127,6 +129,7 @@ export enum ChainNetwork {
  */
 export enum CosmosGovernanceVersion {
   v1 = 'v1',
+  v1atomone = 'v1atomone',
   v1beta1govgen = 'v1beta1govgen',
   v1beta1 = 'v1beta1',
   v1beta1Failed = 'v1beta1-attempt-failed',

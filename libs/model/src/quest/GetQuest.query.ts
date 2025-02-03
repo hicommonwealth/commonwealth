@@ -1,13 +1,12 @@
 import { Query } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
 import { models } from '../database';
-import { authRoles } from '../middleware';
 
 export function GetQuest(): Query<typeof schemas.GetQuest> {
   return {
     ...schemas.GetQuest,
-    auth: [authRoles()],
-    secure: true,
+    auth: [],
+    secure: false,
     body: async ({ payload }) => {
       const { quest_id } = payload;
       const quest = await models.Quest.findOne({

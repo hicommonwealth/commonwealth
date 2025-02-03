@@ -47,6 +47,7 @@ async function testSeed<T extends schemas.Aggregates>(
 
 describe('Seed functions', () => {
   let shouldExit = true;
+
   afterAll(async () => {
     await dispose()();
   });
@@ -78,8 +79,8 @@ describe('Seed functions', () => {
     test('Should seed with defaults', async () => {
       expect(shouldExit).to.be.false;
       shouldExit = true;
-      await testSeed('ChainNode', { contracts: undefined });
-      await testSeed('ChainNode', { contracts: undefined });
+      await testSeed('ChainNode');
+      await testSeed('ChainNode');
       shouldExit = false;
     });
 
@@ -90,16 +91,6 @@ describe('Seed functions', () => {
         url: 'mainnet1.edgewa.re',
         name: 'Edgeware Mainnet',
         balance_type: BalanceType.Substrate,
-        contracts: [
-          {
-            address: '0x6b3595068778dd592e39a122f4f5a5cf09c90fe2',
-            token_name: 'sushi',
-            symbol: 'SUSHI',
-            type: ChainNetwork.ERC20,
-            chain_node_id: 1,
-            abi_id: undefined,
-          },
-        ],
       });
       shouldExit = false;
     });
@@ -109,7 +100,7 @@ describe('Seed functions', () => {
     test('Should seed with overrides', async () => {
       expect(shouldExit).to.be.false;
       shouldExit = true;
-      const node = await testSeed('ChainNode', { contracts: undefined });
+      const node = await testSeed('ChainNode');
       const user = await testSeed('User', { selected_community_id: null });
       await testSeed('Community', {
         id: 'ethereum',

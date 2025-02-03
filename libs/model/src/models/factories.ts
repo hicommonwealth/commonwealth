@@ -15,7 +15,6 @@ import CommunityTags from './community_tags';
 import Contest from './contest';
 import ContestAction from './contest_action';
 import ContestManager from './contest_manager';
-import ContractAbi from './contract_abi';
 import DiscordBotConfig from './discord_bot_config';
 import EmailUpdateToken from './email_update_token';
 import EvmEventSource from './evmEventSource';
@@ -25,10 +24,13 @@ import LastProcessedEvmBlock from './lastProcessedEvmBlock';
 import LaunchpadTrade from './launchpad_trade';
 import Membership from './membership';
 import Outbox from './outbox';
+import PinnedToken from './pinned_token';
 import Poll from './poll';
 import ProfileTags from './profile_tags';
 import { Quest, QuestAction, QuestActionMeta } from './quest';
 import Reaction from './reaction';
+import { Referral } from './referral';
+import { ReferralFee } from './referral_fee';
 import SsoToken from './sso_token';
 import StakeTransaction from './stake_transaction';
 import StarredCommunity from './starred_community';
@@ -37,7 +39,7 @@ import Tags from './tags';
 import Thread from './thread';
 import ThreadSubscription from './thread_subscriptions';
 import ThreadVersionHistory from './thread_version_history';
-import Token from './token';
+import LaunchpadToken from './token';
 import Topic from './topic';
 import User from './user';
 import Vote from './vote';
@@ -60,7 +62,6 @@ export const Factories = {
   Contest,
   ContestAction,
   ContestManager,
-  ContractAbi,
   DiscordBotConfig,
   EmailUpdateToken,
   EvmEventSource,
@@ -70,12 +71,15 @@ export const Factories = {
   LaunchpadTrade,
   Membership,
   Outbox,
+  PinnedToken,
   Poll,
   ProfileTags,
   Quest,
   QuestAction,
   QuestActionMeta,
   Reaction,
+  Referral,
+  ReferralFee,
   SsoToken,
   StakeTransaction,
   StarredCommunity,
@@ -89,7 +93,7 @@ export const Factories = {
   Vote,
   Webhook,
   Wallets,
-  Token,
+  LaunchpadToken,
   XpLog,
 };
 

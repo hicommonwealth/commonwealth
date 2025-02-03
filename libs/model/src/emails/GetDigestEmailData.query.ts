@@ -4,7 +4,7 @@ import {
   GetDigestEmailData,
   Query,
 } from '@hicommonwealth/core';
-import { models } from '@hicommonwealth/model';
+import { generateUnsubscribeLink, models } from '@hicommonwealth/model';
 import { QueryTypes } from 'sequelize';
 import { z } from 'zod';
 
@@ -13,15 +13,13 @@ export function GetDigestEmailDataQuery(): Query<typeof GetDigestEmailData> {
     ...GetDigestEmailData,
     auth: [],
     secure: true,
-    authStrategy: { name: 'authtoken', userId: ExternalServiceUserIds.Knock },
-    body: async () => {
-      const sevenDaysAgo = new Date();
-      sevenDaysAgo.setDate(new Date().getDate() - 7);
+    authStrategy: { type: 'authtoken', userId: ExternalServiceUserIds.Knock },
+    body: async ({ payload }) => {
       const threads = await models.sequelize.query<
         z.infer<typeof EnrichedThread>
       >(
         `
-          SELECT communities.name, communities.icon_url, top_threads.*
+          SELECT communities.name, communities.icon_url, top_threads.*, users.profile->>'name' AS author
           FROM (SELECT C.id, name, icon_url
                 FROM "Communities" C
                 WHERE C.include_in_digest_email = true) communities
@@ -29,29 +27,24 @@ export function GetDigestEmailDataQuery(): Query<typeof GetDigestEmailData> {
               SELECT *
               FROM "Threads" T
               WHERE T.community_id = communities.id
-                AND created_at > NOW() - INTERVAL '10 months'
+                AND created_at > NOW() - INTERVAL '7 days'
               ORDER BY T.view_count DESC
               LIMIT 2
-              ) top_threads ON true;
+              ) top_threads ON true
+              LEFT JOIN "Users" users ON users.id = top_threads.address_id
+              ORDER BY communities.id;
       `,
         {
           type: QueryTypes.SELECT,
           raw: true,
         },
       );
-
-      if (!threads.length) return {};
-
-      const result: z.infer<typeof GetDigestEmailData['output']> = {};
-      for (const thread of threads) {
-        if (!result[thread.community_id]) {
-          result[thread.community_id] = [thread];
-        } else {
-          result[thread.community_id].push(thread);
-        }
-      }
-
-      return result;
+      const unSubscribeLink = await generateUnsubscribeLink(payload.user_id);
+      return {
+        threads: threads,
+        numberOfThreads: threads.length,
+        unsubscribe_link: unSubscribeLink,
+      };
     },
   };
 }
