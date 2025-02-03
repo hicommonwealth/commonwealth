@@ -209,9 +209,12 @@ const QuestDetails = ({ id }: { id: number }) => {
                           {/* TODO: helper link here */}
                         </div>
                       </div>
-                      {xpProgressions.find(
-                        (p) => p.action_meta_id === action.id,
-                      ) ? (
+                      {user?.isLoggedIn &&
+                      action.event_name === 'SignUpFlowCompleted' ? (
+                        <CWTag label="Not eligible" type="address" />
+                      ) : xpProgressions.find(
+                          (p) => p.action_meta_id === action.id,
+                        ) ? (
                         <CWTag label="Completed" type="address" />
                       ) : (
                         <CWButton
