@@ -92,11 +92,20 @@ const QuestDetails = ({ id }: { id: number }) => {
     return <PageNotFound />;
   }
 
+  const gainedXP =
+    xpProgressions
+      .filter((p) => p.quest_id === quest.id)
+      .map((p) => p.xp_points)
+      .reduce((accumulator, currentValue) => accumulator + currentValue, 0) ||
+    0;
+
   const totalXP =
     (quest.action_metas || [])
       ?.map((action) => action.reward_amount)
       .reduce((accumulator, currentValue) => accumulator + currentValue, 0) ||
     0;
+
+  const isCompleted = gainedXP === totalXP;
 
   const handleActionStart = (actionName: QuestAction) => {
     switch (actionName) {
@@ -162,6 +171,7 @@ const QuestDetails = ({ id }: { id: number }) => {
                 'DD/MM/YYYY',
               )} to ${moment(quest.end_date).format('DD/MM/YYYY')}`}
             />
+            {isCompleted && <CWTag type="active" label="Completed" />}
             {/* TODO: quest repetition cycle for repeteable quests */}
           </div>
           <CWDivider />
@@ -176,7 +186,10 @@ const QuestDetails = ({ id }: { id: number }) => {
                 <CWText type="b1" fontWeight="semiBold" fontStyle="uppercase">
                   Actions to take!
                 </CWText>
-                <CWTag label={`${totalXP} XP`} type="proposal" />
+                <CWTag
+                  label={`${gainedXP > 0 ? `${gainedXP} / ` : ''}${totalXP} XP`}
+                  type="proposal"
+                />
               </div>
               <CWDivider />
               <div className="list">
