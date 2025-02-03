@@ -30,31 +30,33 @@ const useXPProgress = () => {
 
   const allWeeklyQuests = (questsList?.pages || [])
     .flatMap((page) => page.results)
-    .map((quest) => ({
-      ...quest,
-      gainedXP:
+    .map((quest) => {
+      const gainedXP =
         xpProgressions
           .filter((p) => p.quest_id === quest.id)
           .map((p) => p.xp_points)
           .reduce(
             (accumulator, currentValue) => accumulator + currentValue,
             0,
-          ) || 0,
-      totalXP:
+          ) || 0;
+      const totalXP =
         (quest.action_metas || [])
           ?.map((action) => action.reward_amount)
           .reduce(
             (accumulator, currentValue) => accumulator + currentValue,
             0,
-          ) || 0,
-    }));
-  const allPendingWeeklyQuests = allWeeklyQuests.filter(
-    (q) => q.totalXP !== q.gainedXP,
-  );
-  const upcomingWeeklyQuests = allPendingWeeklyQuests.filter((q) =>
+          ) || 0;
+      return {
+        ...quest,
+        gainedXP,
+        totalXP,
+        isCompleted: gainedXP === totalXP,
+      };
+    });
+  const upcomingWeeklyQuests = allWeeklyQuests.filter((q) =>
     moment().isBefore(moment(q.start_date)),
   );
-  const activeWeeklyQuests = allPendingWeeklyQuests.filter(
+  const activeWeeklyQuests = allWeeklyQuests.filter(
     (q) =>
       moment().isSameOrAfter(moment(q.start_date)) &&
       moment().isBefore(moment(q.end_date)),

@@ -43,6 +43,7 @@ const TaskList = ({ className }: TaskListProps) => {
               id: quest.id,
               imageURL: quest.image_url,
               title: quest.name,
+              isCompleted: quest.isCompleted,
               xpPoints: { gained: quest.gainedXP, total: quest.totalXP },
             }))}
           />
@@ -55,6 +56,7 @@ const TaskList = ({ className }: TaskListProps) => {
               id: quest.id,
               imageURL: quest.image_url,
               title: quest.name,
+              isCompleted: quest.isCompleted,
               xpPoints: { gained: quest.gainedXP, total: quest.totalXP },
             }))}
           />
