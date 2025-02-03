@@ -35,7 +35,7 @@ const QuestList = () => {
   };
 
   const handleCTAClick = (questId: number) => {
-    navigate(`/quest/${questId}`);
+    navigate(`/quest/${questId}`, {}, null);
   };
 
   const handleLeaderboardClick = () => {

@@ -28,7 +28,7 @@ const Quests = ({
   };
 
   const handleQuestCTAClick = (questId: number) => {
-    navigate(`/quest/${questId}`);
+    navigate(`/quest/${questId}`, {}, null);
   };
 
   return (
