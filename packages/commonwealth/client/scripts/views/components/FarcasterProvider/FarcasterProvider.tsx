@@ -7,16 +7,16 @@ const FarcasterFrameProvider = ({
 }: {
   children: React.ReactNode;
 }) => {
-  const { setFarcasterContext } = useFarcasterStore();
+  const { setFarcasterFrameContext } = useFarcasterStore();
 
   useEffect(() => {
     const load = async () => {
       const ctx = await FrameSDK.context;
-      setFarcasterContext(ctx);
+      setFarcasterFrameContext(ctx);
       FrameSDK.actions.ready();
     };
     load();
-  }, [setFarcasterContext]);
+  }, [setFarcasterFrameContext]);
 
   return <>{children}</>;
 };
