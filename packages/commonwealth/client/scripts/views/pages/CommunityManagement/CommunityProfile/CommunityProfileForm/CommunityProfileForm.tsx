@@ -129,8 +129,6 @@ const CommunityProfileForm = () => {
   );
 
   const onSubmit = async (values: FormSubmitValues) => {
-    console.log({ values });
-
     if (
       !community?.id ||
       isSubmitting ||
@@ -205,8 +203,6 @@ const CommunityProfileForm = () => {
       </div>
     );
   }
-
-  console.log({ community });
 
   return (
     <CWForm
