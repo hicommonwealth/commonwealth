@@ -12,7 +12,6 @@ export function isFarcasterWallet(
 }
 
 class FarcasterWebWalletController implements IWebWallet<string> {
-  // GETTERS/SETTERS
   private _enabled: boolean;
   private _enabling = false;
   private _accounts: string[] = [];
