@@ -15,12 +15,13 @@ import express, {
 } from 'express';
 import { redirectToHTTPS } from 'express-http-to-https';
 import session from 'express-session';
+import { promises as fs } from 'fs';
+import handlebars from 'handlebars';
 import passport from 'passport';
 import path, { dirname } from 'path';
 import pinoHttp from 'pino-http';
 import prerenderNode from 'prerender-node';
 import { buildFarcasterManifest } from 'server/util/buildFarcasterManifest';
-import { renderIndex } from 'server/util/renderIndex';
 import { fileURLToPath } from 'url';
 import * as v8 from 'v8';
 import * as api from './server/api';
@@ -33,6 +34,23 @@ import setupServer from './server/scripts/setupServer';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const parseJson = json({ limit: '1mb' });
+
+let cache: string | null = null;
+
+// renders index.html file with dynamic metadata
+export async function renderIndex(): Promise<string> {
+  if (cache) {
+    return cache;
+  }
+  const filePath = path.join(__dirname, 'index.html');
+  const templateSource = await fs.readFile(filePath, 'utf8');
+  const template = handlebars.compile(templateSource);
+  const data = {
+    FARCASTER_MANIFEST_DOMAIN: config.CONTESTS.FARCASTER_MANIFEST_DOMAIN,
+  };
+  cache = template(data);
+  return cache;
+}
 
 /**
  * Bootstraps express app
