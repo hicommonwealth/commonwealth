@@ -85,7 +85,7 @@ const OnBoarding = () => {
               <div
                 className={clsx(
                   'slide-title',
-                  slide.id === 4 ? 'top' : 'bottom',
+                  slide.id !== 1 ? 'top' : 'bottom',
                 )}
               >
                 <CWText
