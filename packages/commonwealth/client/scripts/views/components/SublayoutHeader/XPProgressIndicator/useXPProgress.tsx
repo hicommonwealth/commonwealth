@@ -25,7 +25,6 @@ const useXPProgress = () => {
       limit: 40,
       end_after: moment().startOf('week').toDate(),
       start_before: moment().endOf('week').toDate(),
-      end_before: moment().endOf('week').toDate(),
       enabled: user.isLoggedIn && xpEnabled,
     });
 
