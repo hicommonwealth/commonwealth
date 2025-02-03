@@ -3,6 +3,7 @@ import {
   ClankerToken,
   CommunityIndexer as CommunityIndexerSchema,
   EventNames,
+  EventPairs,
   events,
 } from '@hicommonwealth/schemas';
 import moment from 'moment';
@@ -99,10 +100,12 @@ export function CommunityIndexerWorker(): Policy<typeof inputs> {
                 (a, b) => moment(a.id!).valueOf() - moment(b.id!).valueOf(),
               );
 
-              const eventsBuffer = tokensBuffer.map((token) => ({
-                event_name: EventNames.ClankerTokenFound,
-                event_payload: token,
-              }));
+              const eventsBuffer: Array<EventPairs> = tokensBuffer.map(
+                (token) => ({
+                  event_name: EventNames.ClankerTokenFound,
+                  event_payload: token,
+                }),
+              );
 
               await emitEvent(models.Outbox, eventsBuffer);
 
