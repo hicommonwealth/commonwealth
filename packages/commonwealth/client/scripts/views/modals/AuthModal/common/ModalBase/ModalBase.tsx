@@ -376,7 +376,9 @@ const ModalBase = ({
                 {farcasterContext ? (
                   <AuthButton
                     type="farcaster"
-                    onClick={handleFarcasterFrameSignIn}
+                    onClick={() => {
+                      handleFarcasterFrameSignIn().catch(console.error);
+                    }}
                   />
                 ) : (
                   (activeTabIndex === 0 ||

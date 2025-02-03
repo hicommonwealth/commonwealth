@@ -1,4 +1,5 @@
 import { SIWFSigner } from '@canvas-js/chain-ethereum';
+import type { Context } from '@farcaster/frame-sdk';
 import FrameSDK from '@farcaster/frame-sdk';
 import { contractTopic } from '@hicommonwealth/shared';
 import { createBoundedUseStore } from 'state/ui/utils';
@@ -11,8 +12,8 @@ type SignInResult = {
 };
 
 interface FarcasterStore {
-  farcasterContext: any | null;
-  setFarcasterFrameContext: (context: any) => void;
+  farcasterContext: Context.FrameContext | null;
+  setFarcasterFrameContext: (context: Context.FrameContext) => void;
   signInToFarcasterFrame: () => Promise<{
     result: SignInResult;
     privateKey: Uint8Array;

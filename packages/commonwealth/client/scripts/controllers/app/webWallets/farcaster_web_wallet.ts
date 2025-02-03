@@ -1,12 +1,10 @@
 import { SIWFSigner } from '@canvas-js/chain-ethereum';
 import { Session, Signer } from '@canvas-js/interfaces';
 import { ChainBase, ChainNetwork, WalletId } from '@hicommonwealth/shared';
-import type BlockInfo from '../../../models/BlockInfo';
 import type IWebWallet from '../../../models/IWebWallet';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function isFarcasterWallet(
-  wallet: IWebWallet<any>,
+  wallet: IWebWallet<string>,
 ): wallet is FarcasterWebWalletController {
   return wallet.name === WalletId.Farcaster;
 }
@@ -58,8 +56,8 @@ class FarcasterWebWalletController implements IWebWallet<string> {
     return '1'; // Ethereum mainnet
   }
 
-  public async getRecentBlock(): Promise<BlockInfo | null> {
-    return null; // Farcaster doesn't need block info
+  public async getRecentBlock() {
+    return Promise.resolve(null); // Farcaster doesn't need block info
   }
 
   public async getSessionSigner() {
@@ -111,6 +109,7 @@ class FarcasterWebWalletController implements IWebWallet<string> {
       this._accounts = [addressMatch[1]];
       this._enabled = true;
       this._enabling = false;
+      return Promise.resolve();
     } catch (error) {
       this._enabling = false;
       throw error;

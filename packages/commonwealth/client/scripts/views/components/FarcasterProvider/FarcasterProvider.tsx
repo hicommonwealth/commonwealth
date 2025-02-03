@@ -11,11 +11,15 @@ const FarcasterFrameProvider = ({
 
   useEffect(() => {
     const load = async () => {
-      const ctx = await FrameSDK.context;
-      setFarcasterFrameContext(ctx);
-      FrameSDK.actions.ready();
+      try {
+        const ctx = await FrameSDK.context;
+        setFarcasterFrameContext(ctx);
+        await FrameSDK.actions.ready();
+      } catch (error) {
+        console.error('Failed to initialize Farcaster frame:', error);
+      }
     };
-    load();
+    load().catch(console.error);
   }, [setFarcasterFrameContext]);
 
   return <>{children}</>;
