@@ -162,3 +162,22 @@ export const WebhookNotification = z.object({
   thread_id: z.number().describe('The id of the thread'),
   comment_id: z.number().optional().describe('The id of the comment'),
 });
+
+export const ContestNotification = z.object({
+  contest_id: z.number(),
+  start_time: z.date(),
+  end_time: z.date(),
+  contest_name: z.string(),
+  image_url: z.string(),
+  community_id: z.string(),
+});
+
+export const ContestEndedNotification = ContestNotification.extend({
+  score: z
+    .object({
+      address: z.string(),
+      prize: z.string(),
+      votes: z.string(),
+    })
+    .array(),
+});

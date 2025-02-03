@@ -3,13 +3,14 @@ import {
   createPrivateEvmClient,
   rollOverContest,
 } from '@hicommonwealth/evm-protocols';
+import * as schemas from '@hicommonwealth/schemas';
 import { events } from '@hicommonwealth/schemas';
 import { NeynarAPIClient } from '@neynar/nodejs-sdk';
 import moment from 'moment';
 import { QueryTypes } from 'sequelize';
 import { config, Contest, models } from '..';
 import { GetActiveContestManagers } from '../contest';
-import { buildThreadContentUrl, getChainNodeUrl } from '../utils';
+import { buildThreadContentUrl, emitEvent, getChainNodeUrl } from '../utils';
 import {
   createOnchainContestContent,
   createOnchainContestVote,
@@ -157,6 +158,7 @@ const checkContests = async () => {
     actor: {} as Actor,
     payload: {},
   });
+
   // find active contests that have content with no upvotes and will end in one hour
   const contestsWithoutVote = activeContestManagers!.filter(
     (contestManager) =>
@@ -182,6 +184,7 @@ const checkContests = async () => {
       content_url: firstContent!.content_url!,
       author_address: getPrivateWalletAddress(),
     });
+    return contestManager;
   });
 
   const promiseResults = await Promise.allSettled(promises);
@@ -196,12 +199,29 @@ const checkContests = async () => {
   if (errors.length > 0) {
     log.error(`CheckContests: failed with errors: ${errors.join(', ')}"`);
   }
+
+  // emit contest ending events when fullfilled
+  promiseResults.forEach((result) => {
+    if (result.status === 'fulfilled')
+      emitEvent(models.Outbox, [
+        {
+          event_name: schemas.EventNames.ContestEnding,
+          event_payload: {
+            contest_address: result.value.contest_address,
+            contest_id: result.value.max_contest_id,
+            end_time: result.value.end_time,
+          },
+        },
+      ]);
+  });
 };
 
 const rolloverContests = async () => {
   const contestManagersWithEndedContest = await models.sequelize.query<{
     contest_address: string;
     interval: number;
+    contest_id: number;
+    end_time: string;
     ended: boolean;
     url: string;
     private_url: string;
@@ -212,6 +232,7 @@ const rolloverContests = async () => {
                cm.interval,
                cm.ended,
                cm.neynar_webhook_id,
+               co.contest_id,
                co.end_time,
                cn.private_url,
                cn.url
@@ -243,6 +264,8 @@ const rolloverContests = async () => {
       url,
       private_url,
       contest_address,
+      contest_id,
+      end_time,
       interval,
       ended,
       neynar_webhook_id,
@@ -294,6 +317,14 @@ const rolloverContests = async () => {
           log.warn(`failed to delete neynar webhook: ${neynar_webhook_id}`);
         }
       }
+
+      return {
+        contest_address,
+        contest_id,
+        end_time,
+        ended,
+        interval,
+      };
     },
   );
 
@@ -311,4 +342,22 @@ const rolloverContests = async () => {
       `PerformContestRollovers: failed with errors: ${errors.join(', ')}"`,
     );
   }
+
+  // emit contest started/ended events when fullfilled
+  promiseResults.forEach(async (result) => {
+    if (result.status === 'fulfilled') {
+      if (result.value.ended || result.value.interval === 0)
+        await emitEvent(models.Outbox, [
+          {
+            event_name: schemas.EventNames.ContestEnded,
+            event_payload: {
+              contest_address: result.value.contest_address,
+              contest_id: result.value.contest_id,
+              end_time: new Date(result.value.end_time),
+              recurring: result.value.interval > 0,
+            },
+          },
+        ]);
+    }
+  });
 };

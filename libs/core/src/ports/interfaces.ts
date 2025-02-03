@@ -11,6 +11,8 @@ import {
   ChainProposalsNotification,
   CommentCreatedNotification,
   CommunityStakeNotification,
+  ContestEndedNotification,
+  ContestNotification,
   SnapshotProposalCreatedNotification,
   UpvoteNotification,
   UserMentionedNotification,
@@ -295,6 +297,10 @@ export enum WorkflowKeys {
   EmailRecap = 'email-recap',
   EmailDigest = 'email-digest',
   Webhooks = 'webhooks',
+  // Contest events
+  ContestStarted = 'contest-started',
+  ContestEnding = 'contest-ending',
+  ContestEnded = 'contest-ended',
 }
 
 export enum KnockChannelIds {
@@ -321,14 +327,16 @@ type BaseNotifProviderOptions = {
   };
 };
 
+export type NotificationUser = {
+  id: string;
+  webhook_url: string;
+  destination: string;
+  signing_key: string;
+};
+
 type WebhookProviderOptions = {
   key: WorkflowKeys.Webhooks;
-  users: {
-    id: string;
-    webhook_url: string;
-    destination: string;
-    signing_key: string;
-  }[];
+  users: NotificationUser[];
   data: z.infer<typeof WebhookNotification>;
 };
 
@@ -358,6 +366,18 @@ export type NotificationsProviderTriggerOptions =
         | {
             data: z.infer<typeof UpvoteNotification>;
             key: WorkflowKeys.NewUpvotes;
+          }
+        | {
+            data: z.infer<typeof ContestNotification>;
+            key: WorkflowKeys.ContestStarted;
+          }
+        | {
+            data: z.infer<typeof ContestNotification>;
+            key: WorkflowKeys.ContestEnding;
+          }
+        | {
+            data: z.infer<typeof ContestEndedNotification>;
+            key: WorkflowKeys.ContestEnded;
           }
       ))
   | WebhookProviderOptions;

@@ -3,6 +3,7 @@ import { events } from '@hicommonwealth/schemas';
 import { notifyChainEventCreated } from './handlers/notifyChainEventCreated';
 import { notifyCommentCreated } from './handlers/notifyCommentCreated';
 import { notifyCommentUpvoted } from './handlers/notifyCommentUpvoted';
+import { notifyContestEvent } from './handlers/notifyContestEvent';
 import { notifySnapshotProposalCreated } from './handlers/notifySnapshotProposalCreated';
 import { notifyThreadCreated } from './handlers/notifyThreadCreated';
 import { notifyThreadUpvoted } from './handlers/notifyThreadUpvoted';
@@ -16,6 +17,9 @@ const notificationInputs = {
   UserMentioned: events.UserMentioned,
   ThreadUpvoted: events.ThreadUpvoted,
   CommentUpvoted: events.CommentUpvoted,
+  // Contest Events
+  ContestEnding: events.ContestEnding,
+  ContestEnded: events.ContestEnded,
 };
 
 export function NotificationsPolicy(): Policy<typeof notificationInputs> {
@@ -42,6 +46,12 @@ export function NotificationsPolicy(): Policy<typeof notificationInputs> {
       },
       CommentUpvoted: async (event) => {
         await notifyCommentUpvoted(event);
+      },
+      ContestEnding: async (event) => {
+        await notifyContestEvent(event);
+      },
+      ContestEnded: async (event) => {
+        await notifyContestEvent(event);
       },
     },
   };

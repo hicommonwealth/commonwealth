@@ -43,7 +43,7 @@ interface SignTransactionsStepProps {
   isFarcasterContest: boolean;
 }
 
-const ONE_HOUR_IN_SECONDS = 60 * 60;
+const ONE_HOUR_IN_SECONDS = 180; // 60 * 60;
 
 const SignTransactionsStep = ({
   onSetLaunchContestStep,
