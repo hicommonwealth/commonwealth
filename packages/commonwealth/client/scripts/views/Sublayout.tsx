@@ -200,7 +200,7 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
             They can submit entries,
             vote for their favorites, and earn rewards, all without leaving the page."
               buttonText="Enter $MOCHI Contest"
-              buttonLink="https://www.google.com/"
+              buttonLink="https://warpcast.com/nakamochi/0x06ec08de"
               growlType="farcasterContest"
               growlImage={farcasterContestImage}
               extraText="Enter the first Farcaster Contest hosted by our friends at Mochi"

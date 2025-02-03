@@ -50,7 +50,7 @@ type DiscussionsPageProps = {
   topicName?: string;
   updateSelectedView?: (tabValue: string) => void;
 };
-type ListContainerProps = React.HTMLProps<HTMLDivElement> & {
+export type ListContainerProps = React.HTMLProps<HTMLDivElement> & {
   children: React.ReactNode;
   style?: React.CSSProperties;
 };

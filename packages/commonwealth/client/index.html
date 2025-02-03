@@ -27,6 +27,23 @@
       content="user-scalable=no, width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, shrink-to-fit=no"
     />
     <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta
+      name="fc:frame"
+      content='{
+      "version": "next",
+      "imageUrl": "https://{{FARCASTER_MANIFEST_DOMAIN}}/brand_assets/common-white.png",
+      "button":{
+        "title": "Check out Common app",
+        "action": {
+          "type": "launch_frame",
+          "name": "Common",
+          "url": "https://{{FARCASTER_MANIFEST_DOMAIN}}",
+          "splashImageUrl": "https://{{FARCASTER_MANIFEST_DOMAIN}}/brand_assets/common-white.png",
+          "splashBackgroundColor": "#3EB489"
+        }
+      }
+    }'
+    />
 
     <meta
       name="fc:frame"
