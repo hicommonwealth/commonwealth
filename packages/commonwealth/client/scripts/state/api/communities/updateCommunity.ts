@@ -1,4 +1,4 @@
-import { ChainType } from '@hicommonwealth/shared';
+import { ChainType, DefaultPage } from '@hicommonwealth/shared';
 import { initAppState } from 'state';
 import { trpc } from 'utils/trpcClient';
 import useUserStore, { userStore } from '../../ui/user';
@@ -24,7 +24,7 @@ interface UpdateCommunityProps {
   defaultOverview?: boolean;
   chainNodeId?: string;
   type?: ChainType;
-  defaultPage?: string | null;
+  defaultPage?: DefaultPage;
 }
 
 export const buildUpdateCommunityInput = ({

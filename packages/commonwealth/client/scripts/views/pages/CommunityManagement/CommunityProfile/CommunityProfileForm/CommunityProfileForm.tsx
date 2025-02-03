@@ -153,7 +153,6 @@ const CommunityProfileForm = () => {
       });
 
       await updateCommunity(
-        // @ts-ignore
         buildUpdateCommunityInput({
           communityId: community.id,
           name: values.communityName,
@@ -164,9 +163,7 @@ const CommunityProfileForm = () => {
             ? JSON.parse(values.customStages)
             : [],
           iconUrl: values.communityProfileImageURL,
-          defaultPage: values.defaultPage
-            ? (values.defaultPage as DefaultPage)
-            : null,
+          defaultPage: values.defaultPage,
         }),
       );
 
