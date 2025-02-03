@@ -17,6 +17,7 @@ import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
+import { withTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import { AuthModalType } from 'views/modals/AuthModal';
 import { PageNotFound } from '../404';
 import { QuestAction } from '../CreateQuest/CreateQuestForm/QuestActionSubForm';
@@ -154,6 +155,8 @@ const QuestDetails = ({ id }: { id: number }) => {
         return;
     }
   };
+  const isStarted = moment().isSameOrAfter(moment(quest.start_date));
+  const isEnded = moment().isSameOrAfter(moment(quest.end_date));
 
   const isRepeatableQuest =
     quest.action_metas?.[0]?.participation_limit ===
@@ -188,7 +191,6 @@ const QuestDetails = ({ id }: { id: number }) => {
               />
             )}
             {isCompleted && <CWTag type="active" label="Completed" />}
-            {/* TODO: quest repetition cycle for repeteable quests */}
           </div>
           <CWDivider />
           <div className="grid">
@@ -246,15 +248,22 @@ const QuestDetails = ({ id }: { id: number }) => {
                         ) ? (
                         <CWTag label="Completed" type="address" />
                       ) : (
-                        <CWButton
-                          buttonType="secondary"
-                          buttonAlt="green"
-                          label="Start"
-                          buttonHeight="sm"
-                          buttonWidth="narrow"
-                          iconRight="arrowRightPhosphor"
-                          onClick={() => handleActionStart(action.event_name)}
-                        />
+                        withTooltip(
+                          <CWButton
+                            buttonType="secondary"
+                            buttonAlt="green"
+                            label="Start"
+                            buttonHeight="sm"
+                            buttonWidth="narrow"
+                            iconRight="arrowRightPhosphor"
+                            onClick={() => handleActionStart(action.event_name)}
+                            disabled={!isStarted || isEnded}
+                          />,
+                          !isStarted
+                            ? 'Only available when quest starts'
+                            : 'Unavailable, quest has ended',
+                          !isStarted || isEnded,
+                        )
                       )}
                     </div>
                   </div>
