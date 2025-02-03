@@ -3,12 +3,6 @@ export interface ReactNativeWebView {
   postMessage: (message: string) => void;
 }
 
-declare global {
-  interface Window {
-    ReactNativeWebView?: ReactNativeWebView;
-  }
-}
-
 /**
  * Types aren't defined for ReactNativeWebView so we define them.
  *
