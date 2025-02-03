@@ -74,7 +74,7 @@
             text-align: start;
             font-size: 43px;
             line-height: 43px;
-            font-family: $MDNichromeRegular;
+            font-family: $font-family-MDNichromeRegular;
             width: 91%;
           }
           .onboarding-title {
@@ -82,7 +82,7 @@
               font-size: 43px;
               font-weight: 700;
               margin-right: 2px;
-              font-family: $MDNichrome;
+              font-family: $font-family-MDNichrome;
             }
           }
         }
@@ -101,9 +101,9 @@
     height: 48px !important;
     .primary {
       background-color: $primary-600 !important;
-      font-family: MDNichromeRegular;
+      font-family: $font-family-MDNichromeRegular;
       .btn-border .Button.primary:hover .Text.button-text {
-        font-family: MDNichromeRegular !important;
+        font-family: $font-family-MDNichromeRegular !important;
       }
     }
   }

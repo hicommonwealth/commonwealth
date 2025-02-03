@@ -5,7 +5,7 @@ import React, { useRef, useState } from 'react';
 import 'swiper/css';
 import { Pagination } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Swiper as SwiperClass } from 'swiper/types'; // Import Swiper type
+import { Swiper as SwiperClass } from 'swiper/types';
 import animation1 from '../../../../assets/animation/onboarding_1.json';
 import animation2 from '../../../../assets/animation/onboarding_2.json';
 import animation3 from '../../../../assets/animation/onboarding_3.json';

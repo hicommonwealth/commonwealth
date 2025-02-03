@@ -1,3 +1,4 @@
+import { LocalStorageKeys } from 'client/scripts/helpers/localStorage';
 import React, { useEffect, useState } from 'react';
 
 interface OnBoardingWrapperForMobileProps {
@@ -13,9 +14,11 @@ const OnBoardingWrapperForMobile = ({
   }, []);
 
   useEffect(() => {
-    const hasSeenOnboarding = localStorage.getItem('hasSeenOnboarding');
+    const hasSeenOnboarding = localStorage.getItem(
+      LocalStorageKeys.HasSeenOnboarding,
+    );
     if (isWebView && !hasSeenOnboarding) {
-      localStorage.setItem('hasSeenOnboarding', 'true');
+      localStorage.setItem(LocalStorageKeys.HasSeenOnboarding, 'true');
       window.location.href = '/onboarding';
     }
   }, [isWebView]);

@@ -130,6 +130,7 @@ const CommonDomainRoutes = ({
   launchpadEnabled,
   xpEnabled,
   homePageEnable,
+  mobileApp,
 }: RouteFeatureFlags) => [
   <Route
     key="mobile-app-redirect"
@@ -160,7 +161,16 @@ const CommonDomainRoutes = ({
     path="/_internal/markdown-viewer"
     element={<MarkdownViewerPage />}
   />,
-  <Route key="/onboarding" path="/onboarding" element={<OnBoardingPage />} />,
+
+  ...(mobileApp
+    ? [
+        <Route
+          key="/onboarding"
+          path="/onboarding"
+          element={<OnBoardingPage />}
+        />,
+      ]
+    : []),
   ...(homePageEnable
     ? [
         <Route
