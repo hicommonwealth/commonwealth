@@ -501,8 +501,7 @@ const testFailureCase = async (
 };
 
 describe('Parse Bot Command', () => {
-  // TODO: REMOVE SKIP
-  test.skip('Expected failure cases', async () => {
+  test('Expected failure cases', async () => {
     if (!process.env.TEST_LLM) {
       console.warn(
         'LLM test is skipped. Add env TEST_LLM=true to run the test.',
@@ -510,11 +509,7 @@ describe('Parse Bot Command', () => {
       return;
     }
     await testFailureCase(
-      `hey wasup @contestbot make me breakfast`,
-      ParseBotCommandError.ERRORS.NoResponse,
-    );
-    await testFailureCase(
-      `hey @contestbot, make a contest for token 0x123 with prize distributed to 3 winners equally`,
+      `hey @contestbot, wasup`,
       ParseBotCommandError.ERRORS.InvalidParams,
     );
   });

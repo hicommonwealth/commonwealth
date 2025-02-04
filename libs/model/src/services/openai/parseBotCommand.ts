@@ -24,8 +24,7 @@ export const DEFAULT_VOTER_SHARE = 15;
 const system_prompt: ChatCompletionMessage = {
   role: 'assistant',
   content: `
-    You are a data extraction system that extracts information
-    from the user.
+    You are a data extraction system that extracts information from the user.
 
     The user will ask to "launch", "start", "create", etc. That means they want to launch a contest.
 
@@ -89,9 +88,8 @@ const tools: ChatCompletionTool[] = [
 // Custom error type that returns a human-readable error intended for end users
 export class ParseBotCommandError extends Error {
   static ERRORS = {
-    NoResponse: 'Failed to create contest. Verify your prompt or try again.',
     InvalidParams:
-      'Failed to create contest. Specify all contest parameters: winners, prize distribution to voters, title, image and token address.',
+      'Failed to create contest. Specify all contest name and token address.',
   } as const;
 
   constructor(message: keyof typeof ParseBotCommandError.ERRORS) {
@@ -138,7 +136,7 @@ export const parseBotCommand = async (
       response.choices[0].message.tool_calls![0].function.arguments,
     );
   } catch (err) {
-    throw new ParseBotCommandError('NoResponse');
+    throw new ParseBotCommandError('InvalidParams');
   }
 
   if (!data.contestName || !data.tokenAddress) {
