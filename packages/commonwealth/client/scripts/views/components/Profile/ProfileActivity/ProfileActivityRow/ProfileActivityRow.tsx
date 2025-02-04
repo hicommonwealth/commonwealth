@@ -7,6 +7,7 @@ import { useGetCommunityByIdQuery } from 'client/scripts/state/api/communities';
 import useUserStore from 'client/scripts/state/ui/user';
 import Permissions from 'client/scripts/utils/Permissions';
 import { AuthorAndPublishInfo } from 'client/scripts/views/pages/discussions/ThreadCard/AuthorAndPublishInfo';
+// eslint-disable-next-line max-len
 import { ToggleThreadSubscribe } from 'client/scripts/views/pages/discussions/ThreadCard/ThreadOptions/ToggleThreadSubscribe';
 import Thread from 'models/Thread';
 import moment from 'moment';
@@ -104,7 +105,7 @@ const ProfileActivityRow = ({ activity }: ProfileActivityRowProps) => {
             onClick={(e) => {
               e.preventDefault();
             }}
-            tooltipText={'comment'}
+            tooltipText="comment"
           />
           <SharePopover linkToShare={shareEndpoint} buttonLabel="Share" />
           {userStore.id > 0 && (
