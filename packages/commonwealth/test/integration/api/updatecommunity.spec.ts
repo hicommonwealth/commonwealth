@@ -2,7 +2,11 @@
 import { dispose } from '@hicommonwealth/core';
 import { models } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
-import { ChainBase, ChainType } from '@hicommonwealth/shared';
+import {
+  ChainBase,
+  ChainType,
+  getAddressFromDid,
+} from '@hicommonwealth/shared';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import { Express } from 'express';
@@ -43,7 +47,7 @@ describe('Update Community/Chain Tests', () => {
       { chain },
       'Alice',
     );
-    loggedInAddr = result.did.split(':')[4];
+    loggedInAddr = getAddressFromDid(result.did);
     jwtToken = jwt.sign(
       { id: result.user_id, email: result.email },
       config.AUTH.JWT_SECRET,

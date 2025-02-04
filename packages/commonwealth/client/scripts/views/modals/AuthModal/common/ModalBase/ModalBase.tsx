@@ -1,5 +1,7 @@
 import { ChainBase, WalletId, WalletSsoSource } from '@hicommonwealth/shared';
 import commonLogo from 'assets/img/branding/common-logo.svg';
+import { notifyError } from 'client/scripts/controllers/app/notifications';
+import useFarcasterStore from 'client/scripts/state/ui/farcaster';
 import clsx from 'clsx';
 import { isMobileApp } from 'hooks/useReactNativeWebView';
 import React, { Fragment, useEffect, useState } from 'react';
@@ -102,6 +104,8 @@ const ModalBase = ({
 }: ModalBaseProps) => {
   const copy = MODAL_COPY[layoutType];
 
+  const { farcasterContext, signInToFarcasterFrame } = useFarcasterStore();
+
   const [activeTabIndex, setActiveTabIndex] = useState<number>(
     showAuthOptionTypesFor?.includes('sso') &&
       showAuthOptionTypesFor.length === 1
@@ -138,12 +142,12 @@ const ModalBase = ({
     onSMSLogin,
     onWalletSelect,
     onSocialLogin,
+    onFarcasterLogin,
     onVerifyMobileWalletSignature,
   } = useAuthentication({
     withSessionKeyLoginFlow: layoutType === AuthModalType.RevalidateSession,
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     onModalClose: handleClose,
-    // eslint-disable-next-line @typescript-eslint/no-misused-promises
     onSuccess: handleSuccess,
   });
 
@@ -284,6 +288,16 @@ const ModalBase = ({
     }
   };
 
+  const handleFarcasterFrameSignIn = async () => {
+    try {
+      const { result, privateKey } = await signInToFarcasterFrame();
+      await onFarcasterLogin(result.signature, result.message, privateKey);
+    } catch (err) {
+      notifyError('Farcaster sign in failed');
+      console.error('Farcaster sign in failed:', err);
+    }
+  };
+
   const renderAuthButton = (option: AuthTypes) => {
     if (
       showAuthOptionFor &&
@@ -338,7 +352,9 @@ const ModalBase = ({
                       <CWTab
                         key={tab.name}
                         label={tab.name}
-                        isDisabled={isMagicLoading}
+                        isDisabled={
+                          isMagicLoading || (!!farcasterContext && index === 1)
+                        }
                         isSelected={tabsList[activeTabIndex].name === tab.name}
                         onClick={() => setActiveTabIndex(index)}
                       />
@@ -358,11 +374,20 @@ const ModalBase = ({
                   else render wallets/SSO's list based on activeTabIndex
                 */}
 
-                {(activeTabIndex === 0 ||
-                  (activeTabIndex === 1 &&
-                    !isAuthenticatingWithEmail &&
-                    !isAuthenticatingWithSMS)) &&
-                  tabsList[activeTabIndex].options.map(renderAuthButton)}
+                {farcasterContext ? (
+                  <AuthButton
+                    type="farcaster"
+                    onClick={() => {
+                      void handleFarcasterFrameSignIn().catch(console.error);
+                    }}
+                  />
+                ) : (
+                  (activeTabIndex === 0 ||
+                    (activeTabIndex === 1 &&
+                      !isAuthenticatingWithEmail &&
+                      !isAuthenticatingWithSMS)) &&
+                  tabsList[activeTabIndex].options.map(renderAuthButton)
+                )}
 
                 {/* If email option is selected from the SSO's list, show email form */}
                 {activeTabIndex === 1 && isAuthenticatingWithEmail && (

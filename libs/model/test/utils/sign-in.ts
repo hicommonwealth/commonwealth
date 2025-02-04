@@ -11,7 +11,7 @@ import { SignIn } from '../../src/user';
 export async function signIn(community_id: string, referrer_address?: string) {
   const [evmSigner] = await getSessionSigners();
   const { payload } = await evmSigner.newSession(CANVAS_TOPIC);
-  const address = payload.did.split(':')[4];
+  const address = evmSigner.getAddressFromDid(payload.did);
   return await command(SignIn(), {
     actor: {
       address,

@@ -5,6 +5,7 @@ export interface ReactNativeWebView {
 
 declare global {
   interface Window {
+    // @ts-expect-error: duplicate declaration
     ReactNativeWebView?: ReactNativeWebView;
   }
 }
