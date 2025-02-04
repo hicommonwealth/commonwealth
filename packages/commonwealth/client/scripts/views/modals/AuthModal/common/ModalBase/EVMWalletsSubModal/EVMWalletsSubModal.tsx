@@ -1,5 +1,6 @@
 import usePrefersColorScheme from 'client/scripts/hooks/useColorScheme';
 import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/CWButton';
+import clsx from 'clsx';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import AuthButton from 'views/components/AuthButton';
@@ -20,7 +21,7 @@ type EVMWalletsSubModalProps = {
   handleNextOrSkip?: (
     address?: string | null | undefined,
     isNewlyCreated?: boolean,
-    isFromWebView?: boolean,
+    isUserFromWebView?: boolean,
   ) => Promise<void>;
 };
 
@@ -38,13 +39,16 @@ const EVMWalletsSubModal = ({
   const isLightMode = usePrefersColorScheme();
   return (
     <CWModal
-      rootClassName={`EVMWalletsSubModal ${isUserFromWebView ? 'forMobile' : ''}`}
+      rootClassName={clsx(
+        'EVMWalletsSubModal',
+        isUserFromWebView ? 'forMobile' : '',
+      )}
       open={isOpen}
       onClose={onClose}
-      className={isUserFromWebView ? 'forMobile' : ''}
+      className={clsx(isUserFromWebView ? 'forMobile' : '')}
       content={
         <section
-          className={`container ${isUserFromWebView ? 'forMobile' : ''}`}
+          className={clsx('container', isUserFromWebView ? 'forMobile' : '')}
         >
           <div className="header">
             <CWText type="h3" className="header" isCentered>
@@ -54,7 +58,10 @@ const EVMWalletsSubModal = ({
           </div>
 
           <section
-            className={`evm-wallet-list ${isUserFromWebView ? 'forMobile' : ''}`}
+            className={clsx(
+              'evm-wallet-list',
+              isUserFromWebView ? 'forMobile' : '',
+            )}
           >
             {/* @ts-expect-error StrictNullChecks*/}
             {availableWallets.map((wallet) => (
@@ -93,16 +100,19 @@ const EVMWalletsSubModal = ({
               </CWText>
               <div className="buttons_container">
                 <CWButton
-                  // eslint-disable-next-line react/jsx-curly-brace-presence
-                  label={'Skip'}
+                  label="Skip"
                   buttonWidth="wide"
                   containerClassName="skip-button"
-                  onClick={() => handleNextOrSkip?.(null, false, true)}
+                  onClick={() =>
+                    handleNextOrSkip?.(null, false, true).catch(console.error)
+                  }
                 />
                 <CWButton
                   label="Next"
                   buttonWidth="wide"
-                  onClick={() => handleNextOrSkip?.(null, false, true)}
+                  onClick={() =>
+                    handleNextOrSkip?.(null, false, true).catch(console.error)
+                  }
                   containerClassName="next-button"
                 />
               </div>

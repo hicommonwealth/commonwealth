@@ -36,7 +36,7 @@ const OptionalWalletModal = ({
         type={authModalType}
         onClose={() => setAuthModalType(undefined)}
         isOpen={isUserFirstTime && isUserFromWebView}
-        openEVMWalletsSubModal={isUserFirstTime && isUserFromWebView}
+        triggerOpenEVMWalletsSubModal={isUserFirstTime && isUserFromWebView}
         isUserFromWebView={isUserFromWebView}
         onSuccess={handleSuccess}
       />
@@ -46,13 +46,13 @@ const OptionalWalletModal = ({
 
       <div className="buttons_container">
         <CWButton
-          label={'Skip'}
+          label="Skip"
           buttonWidth="wide"
           containerClassName="skip-button"
           onClick={onComplete}
         />
         <CWButton
-          label={'Next'}
+          label="Next"
           buttonWidth="wide"
           onClick={handNext}
           containerClassName="next-button"

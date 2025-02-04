@@ -14,7 +14,7 @@ import { AuthModalProps, AuthModalType } from './types';
 const AuthModal = ({
   type = AuthModalType.SignIn,
   isOpen,
-  openEVMWalletsSubModal,
+  triggerOpenEVMWalletsSubModal,
   onClose,
   onSuccess,
   showWalletsFor,
@@ -55,7 +55,7 @@ const AuthModal = ({
       onSuccess: handleSuccess,
       showWalletsFor,
       onSignInClick: handleOnSignInClick,
-      openEVMWalletsSubModal,
+      triggerOpenEVMWalletsSubModal,
       isUserFromWebView,
     };
 

@@ -2,6 +2,8 @@ import { CWCheckbox } from 'client/scripts/views/components/component_kit/cw_che
 import { CWIcon } from 'client/scripts/views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
 import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/CWButton';
+// eslint-disable-next-line max-len
+import { useSubscriptionPreferenceSettingCallback } from 'client/scripts/views/pages/NotificationSettings/useSubscriptionPreferenceSettingCallback';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import './NotificationModal.scss';
@@ -10,21 +12,21 @@ type NotificationModalProps = {
 };
 
 const NotificationModal = ({ onComplete }: NotificationModalProps) => {
-  const [enableNotification, setEnableNotification] = useState(false);
-  const handleNotificationCheck = () => {
-    setEnableNotification(!enableNotification);
-    if (enableNotification) {
-      window?.ReactNativeWebView?.postMessage('Permission');
-    }
-  };
+  const [checked, activate] = useSubscriptionPreferenceSettingCallback(
+    'mobile_push_notifications_enabled',
+  );
+  const [enableNotifications, setEnableNotification] = useState(checked);
+
   return (
     <section className="NotificationModal">
       <CWText type="h5" className="header" isCentered>
-        {'Please allow access to the following permissions.'}
+        Please allow access to the following permissions
       </CWText>
       <button
-        className={`notificationButton ${enableNotification ? 'enabled' : ''}`}
-        onClick={handleNotificationCheck}
+        className={`notificationButton ${enableNotifications ? 'enabled' : ''}`}
+        onClick={() => {
+          activate(!checked), setEnableNotification(!checked);
+        }}
       >
         <CWIcon iconSize="large" iconName="bellRinging" />
 
@@ -39,8 +41,11 @@ const NotificationModal = ({ onComplete }: NotificationModalProps) => {
           </div>
 
           <CWCheckbox
-            checked={enableNotification}
-            onChange={handleNotificationCheck} // Handle checkbox changes
+            checked={enableNotifications}
+            onChange={() => {
+              activate(!checked);
+              setEnableNotification(!checked);
+            }}
           />
         </div>
       </button>
@@ -55,13 +60,13 @@ const NotificationModal = ({ onComplete }: NotificationModalProps) => {
         </CWText>
         <div className="buttons_container">
           <CWButton
-            label={'Skip'}
+            label="Skip"
             buttonWidth="wide"
             containerClassName="skip-button"
             onClick={onComplete}
           />
           <CWButton
-            label={'Next'}
+            label="Next"
             buttonWidth="wide"
             onClick={onComplete}
             containerClassName="next-button"

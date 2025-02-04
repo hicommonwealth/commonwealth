@@ -1,6 +1,5 @@
 import { ChainBase, WalletId, WalletSsoSource } from '@hicommonwealth/shared';
 import commonLogo from 'assets/img/branding/common-logo.svg';
-import useBrowserWindow from 'client/scripts/hooks/useBrowserWindow';
 import clsx from 'clsx';
 import { isMobileApp } from 'hooks/useReactNativeWebView';
 import React, { Fragment, useEffect, useState } from 'react';
@@ -100,11 +99,10 @@ const ModalBase = ({
   showAuthOptionTypesFor,
   bodyClassName,
   onSignInClick,
-  openEVMWalletsSubModal,
+  triggerOpenEVMWalletsSubModal,
   isUserFromWebView = false,
 }: ModalBaseProps) => {
   const copy = MODAL_COPY[layoutType];
-  const { isWindowSmallInclusive } = useBrowserWindow({});
   const [activeTabIndex, setActiveTabIndex] = useState<number>(
     showAuthOptionTypesFor?.includes('sso') &&
       showAuthOptionTypesFor.length === 1
@@ -113,7 +111,9 @@ const ModalBase = ({
   );
   const [isEVMWalletsModalVisible, setIsEVMWalletsModalVisible] = useState(
     () => {
-      return openEVMWalletsSubModal ? openEVMWalletsSubModal : false;
+      return triggerOpenEVMWalletsSubModal
+        ? triggerOpenEVMWalletsSubModal
+        : false;
     },
   );
   const [isAuthenticatingWithEmail, setIsAuthenticatingWithEmail] =
@@ -129,8 +129,8 @@ const ModalBase = ({
     await onClose();
   };
 
-  const handleSuccess = async (_, isNewlyCreated, isFromWebView) => {
-    await onSuccess?.(isNewlyCreated, isFromWebView);
+  const handleSuccess = async (_, isNewlyCreated) => {
+    await onSuccess?.(isNewlyCreated, isUserFromWebView);
     await handleClose();
   };
 
@@ -151,7 +151,7 @@ const ModalBase = ({
     onModalClose: handleClose,
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     onSuccess: handleSuccess,
-    isFromWebView: isUserFromWebView,
+    isUserFromWebView: isUserFromWebView,
   });
 
   const filterWalletNames = (byChain: ChainBase) =>

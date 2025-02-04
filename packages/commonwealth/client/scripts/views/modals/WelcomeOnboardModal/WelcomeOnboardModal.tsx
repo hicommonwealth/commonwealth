@@ -29,7 +29,7 @@ const WelcomeOnboardModal = ({ isOpen, onClose }: WelcomeOnboardModalProps) => {
         ? WelcomeOnboardModalSteps.Notifications
         : WelcomeOnboardModalSteps.TermsOfServices,
     );
-  }, []);
+  }, [mobileApp]);
 
   const user = useUserStore();
   // const hasMagic = user.addresses?.[0]?.walletId === WalletId.Magic;

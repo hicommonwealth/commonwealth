@@ -27,7 +27,6 @@ const InviteModal = ({ onComplete }: InviteModalProps) => {
     : user?.addresses[0].address;
   const inviteLink = `${currentUrl}/dashboard?refcode=${userAddress}`;
 
-  console.log({ user });
   const handleCopy = () => {
     saveToClipboard(inviteLink, true).catch(console.error);
   };
@@ -54,13 +53,10 @@ const InviteModal = ({ onComplete }: InviteModalProps) => {
       icon: 'discordLogo',
       iconStyle: { backgroundColor: '#9555AC' },
       onClick: () =>
-        window.open(
-          `https://discord.com/channels/@me`,
-          '_blank', // Open Discord in a new tab
-        ) ||
-        navigator.clipboard.writeText(
-          `Check this out: ${generatePermalink(inviteLink)}`,
-        ),
+        window.open(`https://discord.com/channels/@me`, '_blank') ||
+        navigator.clipboard
+          .writeText(`Check this out: ${generatePermalink(inviteLink)}`)
+          .catch(console.error),
     },
     {
       id: 3,
@@ -102,13 +98,13 @@ const InviteModal = ({ onComplete }: InviteModalProps) => {
       </div>
       <div className="buttons_container">
         <CWButton
-          label={'Skip'}
+          label="Skip"
           buttonWidth="wide"
           containerClassName="skip-button"
           onClick={onComplete}
         />
         <CWButton
-          label={'Next'}
+          label="Next"
           buttonWidth="wide"
           onClick={onComplete}
           containerClassName="next-button"

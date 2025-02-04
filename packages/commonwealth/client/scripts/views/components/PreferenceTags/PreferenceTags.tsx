@@ -2,26 +2,9 @@ import clsx from 'clsx';
 import React from 'react';
 import { CWButton } from '../component_kit/new_designs/CWButton';
 import './PreferenceTags.scss';
+import { ICONS } from './config';
 import { PreferenceTagsProps } from './types';
-const ICONS = {
-  DAO: '🏛️',
-  NFTs: '🖼️',
-  Gaming: '👾',
-  Social: '💬',
-  Memes: '😹',
-  AI: '🤖',
-  DeFi: '💰',
-  ReFi: '♻️',
-  'Lending/Borrowing': '🏦',
-  Staking: '📈',
-  dApp: '📱',
-  Technology: '🛠️',
-  'Security/Auditing': '🔒',
-  Governance: '⚖️',
-  Marketplace: '🛍️',
-  DeSci: '🔬',
-  '🔛  Swaps': '🔛',
-};
+
 const PreferenceTags = ({
   preferenceTags,
   onTagClick,
