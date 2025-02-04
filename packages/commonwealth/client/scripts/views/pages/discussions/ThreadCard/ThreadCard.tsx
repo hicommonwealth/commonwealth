@@ -392,7 +392,7 @@ export const ThreadCard = ({
                     marked_as_spam_at:
                       recentComment?.markedAsSpamAt?.toISOString(),
                     profile_name: recentComment?.profile?.name,
-                    profile_avatar: recentComment?.profile?.avatarUrl,
+                    avatar_url: recentComment?.profile?.avatarUrl,
                     reactions: recentComment.reactions.map((x) => ({
                       address_id: 0, // not needed here
                       id: x.id,
