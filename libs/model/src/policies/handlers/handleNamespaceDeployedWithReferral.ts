@@ -52,12 +52,13 @@ export async function handleNamespaceDeployedWithReferral(
   event: z.infer<typeof events.ChainEventCreated>,
 ) {
   const {
-    0: namespace_address,
+    // 0: namespace_name,
     // 1: fee_manager_address,
     2: referrer_address,
     // 3: referral_fee_manager_contract_address,
     // 4: signature,
     5: referee_address,
+    6: namespace_address,
   } = event.parsedArgs as z.infer<
     typeof chainEvents.NamespaceDeployedWithReferral
   >;
