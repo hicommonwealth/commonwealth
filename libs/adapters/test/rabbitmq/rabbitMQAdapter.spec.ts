@@ -1,11 +1,5 @@
 import type { ILogger } from '@hicommonwealth/core';
-import {
-  BrokerPublications,
-  BrokerSubscriptions,
-  EventContext,
-  InvalidInput,
-  Policy,
-} from '@hicommonwealth/core';
+import { EventContext, InvalidInput, Policy } from '@hicommonwealth/core';
 import { Events, events } from '@hicommonwealth/schemas';
 import { delay } from '@hicommonwealth/shared';
 import chai from 'chai';
@@ -50,7 +44,7 @@ describe('RabbitMQ', () => {
 
   describe('Before initialization', () => {
     test('Should fail to publish messages if not initialized', async () => {
-      const res = await rmqAdapter.publish(BrokerPublications.MessageRelayer, {
+      const res = await rmqAdapter.publish({
         name: eventName,
         payload: {
           id: 'testing',
@@ -79,18 +73,15 @@ describe('RabbitMQ', () => {
     });
 
     test('should return false if a publication cannot be found', async () => {
-      const res = await rmqAdapter.publish(
-        'Testing' as BrokerPublications,
-        {
-          name: 'Test',
-          payload: {},
-        } as unknown as EventContext<typeof eventName>,
-      );
+      const res = await rmqAdapter.publish({
+        name: 'Test',
+        payload: {},
+      } as unknown as EventContext<typeof eventName>);
       expect(res).to.be.false;
     });
 
     test('should return false if the topic is not included in the current instance', async () => {
-      const res = await rmqAdapter.publish(BrokerPublications.DiscordListener, {
+      const res = await rmqAdapter.publish({
         name: 'Test',
         payload: {},
       } as unknown as EventContext<typeof eventName>);
@@ -98,7 +89,7 @@ describe('RabbitMQ', () => {
     });
 
     test('should publish a valid event and return true', async () => {
-      const res = await rmqAdapter.publish(BrokerPublications.MessageRelayer, {
+      const res = await rmqAdapter.publish({
         name: eventName,
         payload: {
           id: idInput,
@@ -136,15 +127,12 @@ describe('RabbitMQ', () => {
       async () => {
         const subRes = await rmqAdapter.subscribe(Snapshot);
         expect(subRes).to.be.true;
-        const pubRes = await rmqAdapter.publish(
-          BrokerPublications.MessageRelayer,
-          {
-            name: eventName,
-            payload: {
-              id: idInput,
-            },
+        const pubRes = await rmqAdapter.publish({
+          name: eventName,
+          payload: {
+            id: idInput,
           },
-        );
+        });
         expect(pubRes).to.be.true;
         await delay(1000);
 
@@ -177,7 +165,7 @@ describe('RabbitMQ', () => {
           FailingSnapshot,
           (
             err: any,
-            topic: BrokerSubscriptions | string,
+            topic: string,
             content: any,
             ackOrNackFn: AckOrNack,
             _log: ILogger,
@@ -187,28 +175,22 @@ describe('RabbitMQ', () => {
           },
         );
         expect(subRes).to.be.true;
-        const pubRes1 = await rmqAdapter.publish(
-          BrokerPublications.MessageRelayer,
-          {
-            name: eventName,
-            payload: {
-              id: 1,
-            } as any,
-          },
-        );
+        const pubRes1 = await rmqAdapter.publish({
+          name: eventName,
+          payload: {
+            id: 1,
+          } as any,
+        });
         expect(pubRes1).to.be.true;
         await delay(1000);
         expect(retryExecuted).to.be.true;
         expect(shouldNotExecute).to.be.true;
-        const pubRes = await rmqAdapter.publish(
-          BrokerPublications.MessageRelayer,
-          {
-            name: eventName,
-            payload: {
-              id: '1',
-            } as any,
-          },
-        );
+        const pubRes = await rmqAdapter.publish({
+          name: eventName,
+          payload: {
+            id: '1',
+          } as any,
+        });
         await delay(1000);
         expect(pubRes).to.be.true;
         expect(shouldNotExecute).to.be.false;

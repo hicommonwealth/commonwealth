@@ -1,6 +1,5 @@
 import {
   Broker,
-  BrokerPublications,
   CustomRetryStrategyError,
   EventContext,
   EventSchemas,
@@ -128,12 +127,13 @@ export class RabbitMQAdapter implements Broker {
   }
 
   public async publish<Name extends Events>(
-    topic: BrokerPublications,
     event: EventContext<Name>,
   ): Promise<boolean> {
     if (!this.initialized) {
       return false;
     }
+
+    const topic = 'MessageRelayer';
 
     const logContext = {
       topic,

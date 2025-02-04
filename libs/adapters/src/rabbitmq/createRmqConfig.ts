@@ -1,10 +1,15 @@
-import { config as EnvConfig, RascalExchanges } from '@hicommonwealth/adapters';
+import { config as EnvConfig } from '@hicommonwealth/adapters';
 import {
   BindingConfig,
   BrokerConfig,
   ConnectionConfig,
   QueueConfig,
 } from 'rascal';
+
+export enum RascalExchanges {
+  DeadLetter = 'DeadLetterExchange',
+  MessageRelayer = 'MessageRelayerExchange',
+}
 
 /**
  * Generates the RabbitMQ configuration on the fly given a set of policies

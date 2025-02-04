@@ -153,9 +153,16 @@ export interface Analytics extends Disposable {
   track(event: string, payload: AnalyticsOptions): void;
 }
 
+/**
+ * Broker Port
+ */
+export enum RoutingKeyTags {
+  Contest = 'contest',
+}
+
 export type RetryStrategyFn = (
   err: Error | InvalidInput | CustomRetryStrategyError,
-  topic: BrokerSubscriptions | string,
+  topic: string,
   content: any,
   ackOrNackFn: (...args: any[]) => void,
   log: ILogger,
@@ -196,30 +203,6 @@ export class CustomRetryStrategyError extends Error {
   }
 }
 
-export enum BrokerPublications {
-  MessageRelayer = 'MessageRelayer',
-  DiscordListener = 'DiscordMessage',
-}
-
-export enum BrokerSubscriptions {
-  DiscordBotPolicy = 'DiscordBotPolicy',
-  ChainEvent = 'ChainEvent',
-  NotificationsProvider = 'NotificationsProvider',
-  NotificationsSettings = 'NotificationsSettings',
-  ContestWorkerPolicy = 'ContestWorkerPolicy',
-  ContestProjection = 'ContestProjection',
-  FarcasterWorkerPolicy = 'FarcasterWorkerPolicy',
-  XpProjection = 'XpProjection',
-  UserReferrals = 'UserReferrals',
-}
-
-/**
- * Broker Port
- */
-export enum RoutingKeyTags {
-  Contest = 'contest',
-}
-
 type Concat<S1 extends string, S2 extends string> = `${S1}.${S2}`;
 
 type EventNamesType = `${EventNames}`;
@@ -231,10 +214,7 @@ export type RoutingKey =
   | Concat<EventNamesType, RoutingKeyTagsType>;
 
 export interface Broker extends Disposable {
-  publish<Name extends Events>(
-    topic: BrokerPublications,
-    event: EventContext<Name>,
-  ): Promise<boolean>;
+  publish<Name extends Events>(event: EventContext<Name>): Promise<boolean>;
 
   subscribe<Inputs extends EventSchemas>(
     consumer: () => EventsHandlerMetadata<Inputs>,
@@ -250,6 +230,9 @@ export interface Broker extends Disposable {
   getRoutingKey<Name extends Events>(event: EventContext<Name>): RoutingKey;
 }
 
+/**
+ * External Blob Storage Port
+ */
 export type BlobType = string | Uint8Array | Buffer | Readable;
 export const BlobBuckets = [
   'assets',
@@ -260,9 +243,6 @@ export const BlobBuckets = [
 ] as const;
 export type BlobBucket = (typeof BlobBuckets)[number];
 
-/**
- * External Blob Storage Port
- */
 export interface BlobStorage extends Disposable {
   upload(options: {
     key: string;
