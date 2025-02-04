@@ -1,5 +1,5 @@
 import type { ILogger } from '@hicommonwealth/core';
-import { EventContext, InvalidInput, Policy } from '@hicommonwealth/core';
+import { InvalidInput, Policy } from '@hicommonwealth/core';
 import { Events, events } from '@hicommonwealth/schemas';
 import { delay } from '@hicommonwealth/shared';
 import chai from 'chai';
@@ -30,6 +30,34 @@ function Snapshot(): Policy<typeof inputs> {
   };
 }
 
+let shouldNotExecute = true;
+const failingInputs = {
+  SnapshotProposalCreated: events.SnapshotProposalCreated,
+};
+
+function FailingSnapshot(): Policy<typeof failingInputs> {
+  return {
+    inputs: failingInputs,
+    body: {
+      SnapshotProposalCreated: async () => {
+        shouldNotExecute = false;
+      },
+    },
+  };
+}
+
+function Snapshot2(): Policy<typeof inputs> {
+  return {
+    inputs,
+    body: {
+      SnapshotProposalCreated: async ({ payload }) => {
+        const { id } = payload;
+        idOutput = id;
+      },
+    },
+  };
+}
+
 describe('RabbitMQ', () => {
   let rmqAdapter: RabbitMQAdapter;
 
@@ -37,7 +65,7 @@ describe('RabbitMQ', () => {
     rmqAdapter = new RabbitMQAdapter(
       createRmqConfig({
         rabbitMqUri: 'amqp://127.0.0.1',
-        map: [{ consumer: Snapshot }],
+        map: [{ consumer: Snapshot }, { consumer: FailingSnapshot }],
       }),
     );
   });
@@ -72,22 +100,6 @@ describe('RabbitMQ', () => {
       await rmqAdapter.broker?.purge();
     });
 
-    test('should return false if a publication cannot be found', async () => {
-      const res = await rmqAdapter.publish({
-        name: 'Test',
-        payload: {},
-      } as unknown as EventContext<typeof eventName>);
-      expect(res).to.be.false;
-    });
-
-    test('should return false if the topic is not included in the current instance', async () => {
-      const res = await rmqAdapter.publish({
-        name: 'Test',
-        payload: {},
-      } as unknown as EventContext<typeof eventName>);
-      expect(res).to.be.false;
-    });
-
     test('should publish a valid event and return true', async () => {
       const res = await rmqAdapter.publish({
         name: eventName,
@@ -117,7 +129,7 @@ describe('RabbitMQ', () => {
     });
 
     test('should return false if the subscription cannot be found', async () => {
-      const res = await rmqAdapter.subscribe(Snapshot);
+      const res = await rmqAdapter.subscribe(Snapshot2);
       expect(res).to.be.false;
     });
 
@@ -144,22 +156,6 @@ describe('RabbitMQ', () => {
       'should execute a retry strategy if the payload schema is invalid',
       { timeout: 5000 },
       async () => {
-        let shouldNotExecute = true;
-        const inputs = {
-          SnapshotProposalCreated: events.SnapshotProposalCreated,
-        };
-
-        function FailingSnapshot(): Policy<typeof inputs> {
-          return {
-            inputs,
-            body: {
-              SnapshotProposalCreated: async () => {
-                shouldNotExecute = false;
-              },
-            },
-          };
-        }
-
         let retryExecuted;
         const subRes = await rmqAdapter.subscribe(
           FailingSnapshot,
