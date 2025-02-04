@@ -1,5 +1,6 @@
 import { Policy } from '@hicommonwealth/core';
 import { events } from '@hicommonwealth/schemas';
+import { notifyAddressOwnershipTransferred } from './handlers/notifyAddressOwnershipTransferred';
 import { notifyChainEventCreated } from './handlers/notifyChainEventCreated';
 import { notifyCommentCreated } from './handlers/notifyCommentCreated';
 import { notifyCommentUpvoted } from './handlers/notifyCommentUpvoted';
@@ -16,6 +17,7 @@ const notificationInputs = {
   UserMentioned: events.UserMentioned,
   ThreadUpvoted: events.ThreadUpvoted,
   CommentUpvoted: events.CommentUpvoted,
+  AddressOwnershipTransferred: events.AddressOwnershipTransferred,
 };
 
 export function NotificationsPolicy(): Policy<typeof notificationInputs> {
@@ -42,6 +44,9 @@ export function NotificationsPolicy(): Policy<typeof notificationInputs> {
       },
       CommentUpvoted: async (event) => {
         await notifyCommentUpvoted(event);
+      },
+      AddressOwnershipTransferred: async (event) => {
+        await notifyAddressOwnershipTransferred(event);
       },
     },
   };
