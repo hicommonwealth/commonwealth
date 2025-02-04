@@ -3,7 +3,7 @@ import useBrowserWindow from 'hooks/useBrowserWindow';
 import { useFlag } from 'hooks/useFlag';
 import useWindowResize from 'hooks/useWindowResize';
 import React, { useEffect, useState } from 'react';
-import { matchRoutes, useLocation } from 'react-router-dom';
+import { matchRoutes, useLocation, useSearchParams } from 'react-router-dom';
 import app from 'state';
 import useSidebarStore from 'state/ui/sidebar';
 import { SublayoutHeader } from 'views/components/SublayoutHeader';
@@ -58,7 +58,7 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
     });
   const { authModalType, setAuthModalType } = useAuthModalStore();
   const user = useUserStore();
-
+  const [urlQueryParams] = useSearchParams();
   const { isWelcomeOnboardModalOpen, setIsWelcomeOnboardModalOpen } =
     useWelcomeOnboardModal();
 
@@ -66,6 +66,13 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
     useInviteLinkModal();
 
   useNecessaryEffect(() => {
+    if (Object.fromEntries(urlQueryParams.entries())?.openAuthModal) {
+      setAuthModalType(AuthModalType.SignIn);
+      urlQueryParams.delete('openAuthModal');
+      const newUrl = `${window.location.pathname}`;
+      window.history.replaceState(null, '', newUrl);
+    }
+
     if (
       user.isLoggedIn &&
       !isWelcomeOnboardModalOpen &&
