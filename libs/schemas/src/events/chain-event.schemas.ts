@@ -64,3 +64,41 @@ export const ReferralFeeDistributed = z.tuple([
     'The amount of the token distributed to the referrer',
   ),
 ]);
+
+export const TokenStakingSchemas = {
+  TokenLocked: z.tuple([
+    EVM_ADDRESS.describe('User address'),
+    ETHERS_BIG_NUMBER.describe('Locked amount'),
+    ETHERS_BIG_NUMBER.describe('Token id'),
+    ETHERS_BIG_NUMBER.describe('Duration (in seconds)'),
+    zBoolean.describe('Is permanent'),
+  ]),
+  TokenLockDurationIncreased: z.tuple([
+    ETHERS_BIG_NUMBER.describe('Token id'),
+    ETHERS_BIG_NUMBER.describe('New duration (in seconds)'),
+  ]),
+  TokenUnlocked: z.tuple([
+    EVM_ADDRESS.describe('User address'),
+    ETHERS_BIG_NUMBER.describe('Token id'),
+    ETHERS_BIG_NUMBER.describe('Locked amount'),
+  ]),
+  TokenPermanentConverted: z.tuple([
+    EVM_ADDRESS.describe('User address'),
+    ETHERS_BIG_NUMBER.describe('Token id'),
+    ETHERS_BIG_NUMBER.describe('Locked amount'),
+    ETHERS_BIG_NUMBER.describe('Duration (in seconds)'),
+  ]),
+  TokenDelegated: z.tuple([
+    EVM_ADDRESS.describe('From user address'),
+    EVM_ADDRESS.describe('To user address'),
+    ETHERS_BIG_NUMBER.describe('Token id'),
+  ]),
+  TokenUndelegated: z.tuple([ETHERS_BIG_NUMBER.describe('Token id')]),
+  TokenMerged: z.tuple([
+    EVM_ADDRESS.describe('User address'),
+    ETHERS_BIG_NUMBER.describe('From token id'),
+    ETHERS_BIG_NUMBER.describe('To token id'),
+    ETHERS_BIG_NUMBER.describe('New amount'),
+    ETHERS_BIG_NUMBER.describe('New duration (in seconds)'),
+  ]),
+};

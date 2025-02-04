@@ -52,6 +52,22 @@ export const EvmEventSignatures = {
     FeeDistributed:
       '0xadecf9f6e10f953395058158f0e6e399835cf1d045bbed7ecfa82947ecc0a368',
   },
+  TokenStaking: {
+    TokenLocked:
+      '0x5da3351bc0f8e14d8760861eba9264c9fd75cbb4d3feb5872f3ccc47975f08ae',
+    TokenLockDurationIncreased:
+      '0x0ae1779f0f48655768fbd6947bf86654466f43d1afd878527b4859c7e491720f',
+    TokenUnlocked:
+      '0x89882ad382a3742d4db24e4dabc5000c5852aed762904db28442e4e1630a1d07',
+    TokenPermanentConverted:
+      '0xec3106009b080f87dfac07e494738f0a87d5e9a2473c111f1bfd16a5333589eb',
+    TokenDelegated:
+      '0xc2cb9f921d8d08b18eeb01511651fdbd60c938ea6795d0a7d994053800f48e8e',
+    TokenUndelegated:
+      '0x6d7f8a6578e88ed61f656e059018728da0fba2a3f4cab0c4adaca21ace3cbf24',
+    TokenMerged:
+      '0xe7eeebf74838dceecbee54a09b6a6f12b27cab64859c8f8a9fe2e492d226afad',
+  },
 } as const;
 
 type Values<T> = T[keyof T];

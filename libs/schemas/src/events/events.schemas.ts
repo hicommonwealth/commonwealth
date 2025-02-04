@@ -15,6 +15,7 @@ import {
   NamespaceDeployedWithReferral,
   ReferralFeeDistributed,
   ReferralSet,
+  TokenStakingSchemas,
 } from './chain-event.schemas';
 import { EventMetadata } from './util.schemas';
 
@@ -252,6 +253,54 @@ export const ChainEventCreated = z.union([
       eventSignature: z.literal(EvmEventSignatures.Referrals.FeeDistributed),
     }),
     parsedArgs: ReferralFeeDistributed,
+  }),
+  ChainEventCreatedBase.extend({
+    eventSource: ChainEventCreatedBase.shape.eventSource.extend({
+      eventSignature: z.literal(EvmEventSignatures.TokenStaking.TokenLocked),
+    }),
+    parsedArgs: TokenStakingSchemas.TokenLocked,
+  }),
+  ChainEventCreatedBase.extend({
+    eventSource: ChainEventCreatedBase.shape.eventSource.extend({
+      eventSignature: z.literal(
+        EvmEventSignatures.TokenStaking.TokenLockDurationIncreased,
+      ),
+    }),
+    parsedArgs: TokenStakingSchemas.TokenLockDurationIncreased,
+  }),
+  ChainEventCreatedBase.extend({
+    eventSource: ChainEventCreatedBase.shape.eventSource.extend({
+      eventSignature: z.literal(EvmEventSignatures.TokenStaking.TokenUnlocked),
+    }),
+    parsedArgs: TokenStakingSchemas.TokenUnlocked,
+  }),
+  ChainEventCreatedBase.extend({
+    eventSource: ChainEventCreatedBase.shape.eventSource.extend({
+      eventSignature: z.literal(
+        EvmEventSignatures.TokenStaking.TokenPermanentConverted,
+      ),
+    }),
+    parsedArgs: TokenStakingSchemas.TokenPermanentConverted,
+  }),
+  ChainEventCreatedBase.extend({
+    eventSource: ChainEventCreatedBase.shape.eventSource.extend({
+      eventSignature: z.literal(EvmEventSignatures.TokenStaking.TokenDelegated),
+    }),
+    parsedArgs: TokenStakingSchemas.TokenDelegated,
+  }),
+  ChainEventCreatedBase.extend({
+    eventSource: ChainEventCreatedBase.shape.eventSource.extend({
+      eventSignature: z.literal(
+        EvmEventSignatures.TokenStaking.TokenUndelegated,
+      ),
+    }),
+    parsedArgs: TokenStakingSchemas.TokenUndelegated,
+  }),
+  ChainEventCreatedBase.extend({
+    eventSource: ChainEventCreatedBase.shape.eventSource.extend({
+      eventSignature: z.literal(EvmEventSignatures.TokenStaking.TokenMerged),
+    }),
+    parsedArgs: TokenStakingSchemas.TokenMerged,
   }),
 ]);
 
