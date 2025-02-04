@@ -19,7 +19,7 @@ export async function publishRmqMsg(
   rabbitMQUri: string,
   exchangeName: RascalExchanges,
   routingKey: string,
-  data: any,
+  data: unknown,
 ): Promise<{ routed: boolean }> {
   const publishBody = JSON.stringify({
     properties: { content_type: 'application/json' },
