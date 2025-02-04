@@ -12,12 +12,12 @@ import { EventNames } from '@hicommonwealth/schemas';
 import { NotificationsSettingsPolicy } from '../workers/knock/NotificationsSettings.policy';
 
 export const rascalConsumerMap = [
-  {
-    consumer: ChainEventPolicy,
-  },
-  {
-    consumer: DiscordBotPolicy,
-  },
+  ChainEventPolicy,
+  DiscordBotPolicy,
+  Contest.Contests,
+  User.UserReferrals,
+  FarcasterWorker,
+  NotificationsSettingsPolicy,
   {
     consumer: ContestWorker,
     overrides: {
@@ -27,9 +27,6 @@ export const rascalConsumerMap = [
     },
   },
   {
-    consumer: Contest.Contests,
-  },
-  {
     consumer: User.Xp,
     overrides: {
       ThreadCreated: `${EventNames.ThreadCreated}.#`,
@@ -37,19 +34,10 @@ export const rascalConsumerMap = [
     },
   },
   {
-    consumer: User.UserReferrals,
-  },
-  {
-    consumer: FarcasterWorker,
-  },
-  {
     consumer: NotificationsPolicy,
     overrides: {
       ThreadCreated: null,
       ThreadUpvoted: `${EventNames.ThreadUpvoted}.#`,
     },
-  },
-  {
-    consumer: NotificationsSettingsPolicy,
   },
 ];

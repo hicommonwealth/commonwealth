@@ -65,7 +65,7 @@ describe('RabbitMQ', () => {
     rmqAdapter = new RabbitMQAdapter(
       createRmqConfig({
         rabbitMqUri: 'amqp://127.0.0.1',
-        map: [{ consumer: Snapshot }, { consumer: FailingSnapshot }],
+        map: [Snapshot, FailingSnapshot],
       }),
     );
   });

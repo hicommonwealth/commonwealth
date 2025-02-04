@@ -1,4 +1,5 @@
 import { config as EnvConfig } from '@hicommonwealth/adapters';
+import { EventSchemas, EventsHandlerMetadata } from '@hicommonwealth/core';
 import {
   BindingConfig,
   BrokerConfig,
@@ -10,6 +11,13 @@ export enum RascalExchanges {
   DeadLetter = 'DeadLetterExchange',
   MessageRelayer = 'MessageRelayerExchange',
 }
+
+type Consumers =
+  | {
+      consumer: () => EventsHandlerMetadata<EventSchemas>;
+      overrides: Record<string, string | null | undefined>;
+    }
+  | (() => EventsHandlerMetadata<EventSchemas>);
 
 /**
  * Generates the RabbitMQ configuration on the fly given a set of policies
@@ -28,10 +36,7 @@ export function createRmqConfig({
 }: {
   rabbitMqUri: string;
   // TODO: add types so that override keys are a partial record of consumer input generic
-  map: {
-    consumer: any;
-    overrides?: Record<string, string | null | undefined>;
-  }[];
+  map: Array<Consumers>;
 }) {
   let vhost: string, purge: boolean;
 
@@ -109,7 +114,15 @@ export function createRmqConfig({
     },
   };
 
-  for (const { consumer, overrides } of map) {
+  for (const item of map) {
+    let consumer,
+      overrides: Record<string, string | null | undefined> | undefined;
+    if (typeof item === 'function') consumer = item;
+    else {
+      consumer = item.consumer;
+      overrides = item.overrides;
+    }
+
     const consumerName = consumer.name;
     const queue = `${consumerName}Queue`;
     const queues = config.vhosts![vhost].queues as {
