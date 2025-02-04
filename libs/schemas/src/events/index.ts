@@ -47,6 +47,10 @@ export enum EventNames {
 
   // Referrals
   SignUpFlowCompleted = 'SignUpFlowCompleted',
+
+  // Community Indexer
+  CommunityIndexerTimerTicked = 'CommunityIndexerTimerTicked',
+  ClankerTokenFound = 'ClankerTokenFound',
 }
 
 export type EventPairs =
@@ -169,4 +173,12 @@ export type EventPairs =
   | {
       event_name: EventNames.SignUpFlowCompleted;
       event_payload: z.infer<typeof events.SignUpFlowCompleted>;
+    }
+  | {
+      event_name: EventNames.CommunityIndexerTimerTicked;
+      event_payload: z.infer<typeof events.CommunityIndexerTimerTicked>;
+    }
+  | {
+      event_name: EventNames.ClankerTokenFound;
+      event_payload: z.infer<typeof events.ClankerTokenFound>;
     };

@@ -2,6 +2,7 @@ import { EvmEventSignatures } from '@hicommonwealth/evm-protocols';
 import { z } from 'zod';
 import { FarcasterCast } from '../commands/contest.schemas';
 import { Comment } from '../entities/comment.schemas';
+import { ClankerToken } from '../entities/community-indexer.schemas';
 import { FarcasterAction } from '../entities/farcaster.schemas';
 import { SubscriptionPreference } from '../entities/notification.schemas';
 import { Reaction } from '../entities/reaction.schemas';
@@ -333,3 +334,7 @@ export const SignUpFlowCompleted = z.object({
 });
 
 export const ContestRolloverTimerTicked = z.object({});
+
+export const CommunityIndexerTimerTicked = z.object({});
+
+export const ClankerTokenFound = ClankerToken;

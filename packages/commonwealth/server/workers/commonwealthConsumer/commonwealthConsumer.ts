@@ -1,11 +1,13 @@
 import {
   HotShotsStats,
+  S3BlobStorage,
   ServiceKey,
   startHealthCheckLoop,
 } from '@hicommonwealth/adapters';
-import { logger, stats } from '@hicommonwealth/core';
+import { blobStorage, logger, stats } from '@hicommonwealth/core';
 import {
   bootstrapBindings,
+  bootstrapCommunityIndexerLoop,
   bootstrapContestRolloverLoop,
 } from 'server/bindings/bootstrap';
 import { fileURLToPath } from 'url';
@@ -13,6 +15,9 @@ import { fileURLToPath } from 'url';
 const log = logger(import.meta);
 
 stats({ adapter: HotShotsStats() });
+blobStorage({
+  adapter: S3BlobStorage(),
+});
 
 let isServiceHealthy = false;
 
@@ -39,6 +44,7 @@ async function main() {
     await bootstrapBindings();
     isServiceHealthy = true;
     bootstrapContestRolloverLoop();
+    bootstrapCommunityIndexerLoop();
   } catch (error) {
     log.fatal('Consumer setup failed', error);
   }
