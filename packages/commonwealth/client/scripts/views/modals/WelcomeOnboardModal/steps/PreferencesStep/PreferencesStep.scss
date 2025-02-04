@@ -29,6 +29,9 @@
     position: absolute;
     bottom: 2px;
     margin-top: 10px;
+    .primary {
+      background-color: $primary-600 !important;
+    }
     @include extraSmall {
       bottom: 80px;
       grid-template-columns: 1fr 1fr;
