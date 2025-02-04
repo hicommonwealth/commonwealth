@@ -34,6 +34,14 @@ const InviteModal = ({ onComplete }: InviteModalProps) => {
     const message = 'Hey, check out Common!';
     return `${message} \n${link}`;
   };
+
+  const handleDiscordShare = () => {
+    window.open(`https://discord.com/channels/@me`, '_blank');
+    navigator.clipboard
+      .writeText(`Check this out: ${generatePermalink(inviteLink)}`)
+      .catch(console.error);
+  };
+
   const referrals_Share: ReferralShare[] = [
     {
       id: 1,
@@ -52,11 +60,7 @@ const InviteModal = ({ onComplete }: InviteModalProps) => {
       title: 'Share On Discord',
       icon: 'discordLogo',
       iconStyle: { backgroundColor: '#9555AC' },
-      onClick: () =>
-        window.open(`https://discord.com/channels/@me`, '_blank') ||
-        navigator.clipboard
-          .writeText(`Check this out: ${generatePermalink(inviteLink)}`)
-          .catch(console.error),
+      onClick: handleDiscordShare,
     },
     {
       id: 3,

@@ -103,6 +103,7 @@ const EVMWalletsSubModal = ({
                   label="Skip"
                   buttonWidth="wide"
                   containerClassName="skip-button"
+                  // eslint-disable-next-line @typescript-eslint/no-misused-promises
                   onClick={() =>
                     handleNextOrSkip?.(null, false, true).catch(console.error)
                   }
@@ -110,6 +111,7 @@ const EVMWalletsSubModal = ({
                 <CWButton
                   label="Next"
                   buttonWidth="wide"
+                  // eslint-disable-next-line @typescript-eslint/no-misused-promises
                   onClick={() =>
                     handleNextOrSkip?.(null, false, true).catch(console.error)
                   }
