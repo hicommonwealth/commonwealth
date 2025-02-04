@@ -147,7 +147,7 @@ export const CommentCard = ({
       contentUrlBody
     ) {
       setCommentText(contentUrlBody);
-      setCommentDelta({contentUrlBody);
+      setCommentDelta(contentUrlBody);
     }
   }, [contentUrlBody, contentUrlBodyToFetch, comment.content_url]);
 
