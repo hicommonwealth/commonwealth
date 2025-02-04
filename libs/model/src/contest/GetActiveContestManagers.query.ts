@@ -20,6 +20,7 @@ export function GetActiveContestManagers(): Query<
         url: string;
         private_url: string;
         contest_address: string;
+        ending: boolean;
         end_time: string;
         max_contest_id: number;
         actions: Array<z.infer<typeof schemas.ContestAction>>;
@@ -29,6 +30,7 @@ export function GetActiveContestManagers(): Query<
                    cn.private_url,
                    cn.url,
                    cm.contest_address,
+                   cm.ending,
                    co.max_contest_id,
                    co.end_time,
                    COALESCE(JSON_AGG(ca) FILTER (WHERE ca IS NOT NULL), '[]'::json) as actions
@@ -71,6 +73,7 @@ export function GetActiveContestManagers(): Query<
         eth_chain_id: r.eth_chain_id,
         url: getChainNodeUrl(r),
         contest_address: r.contest_address,
+        ending: r.ending,
         end_time: new Date(r.end_time),
         max_contest_id: r.max_contest_id,
         actions: r.actions,

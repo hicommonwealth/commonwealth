@@ -187,6 +187,7 @@ export function getAllRascalConfigs(
         RascalRoutingKeys.NotificationsProviderCommentUpvoted,
         RascalRoutingKeys.NotificationsProviderThreadUpvoted,
         // Contest Events
+        RascalRoutingKeys.NotificationsProviderContestStarted,
         RascalRoutingKeys.NotificationsProviderContestEnding,
         RascalRoutingKeys.NotificationsProviderContestEnded,
       ],

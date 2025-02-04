@@ -293,12 +293,10 @@ export const ContestRolloverTimerTicked = z
 
 export const ContestEnding = ContestManagerEvent.extend({
   contest_id: z.number().int().gte(0),
-  end_time: z.coerce.date().describe('Contest end time'),
 }).describe('When a contest instance is close to ending');
 
 export const ContestEnded = ContestManagerEvent.extend({
   contest_id: z.number().int().gte(0),
-  end_time: z.coerce.date().describe('Contest end time'),
   recurring: z.boolean().describe('Whether the contest is recurring'),
 }).describe('When a contest instance ended');
 

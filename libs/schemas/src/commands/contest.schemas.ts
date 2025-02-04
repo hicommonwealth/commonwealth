@@ -3,6 +3,7 @@ import z from 'zod';
 import { AuthContext } from '../context';
 import { ContestManager } from '../entities/contest-manager.schemas';
 import { FarcasterAction } from '../entities/farcaster.schemas';
+import { ContestAction } from '../projections';
 import { PG_INT } from '../utils';
 
 export const CreateContestManagerMetadata = {
@@ -170,4 +171,27 @@ export const FarcasterUpvoteAction = {
 export const FarcasterNotificationsWebhook = {
   input: z.any(),
   output: z.any(),
+};
+
+export const SetContestEnding = {
+  input: z.object({
+    contest_address: z.string(),
+    contest_id: PG_INT,
+    actions: z.array(ContestAction),
+    chain_url: z.string(),
+  }),
+  output: z.object({}),
+};
+
+export const SetContestEnded = {
+  input: z.object({
+    contest_address: z.string(),
+    contest_id: PG_INT,
+    interval: PG_INT,
+    ended: z.boolean(),
+    chain_url: z.string(),
+    chain_private_url: z.string(),
+    neynar_webhook_id: z.string().nullish(),
+  }),
+  output: z.object({}),
 };

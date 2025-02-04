@@ -18,6 +18,7 @@ const notificationInputs = {
   ThreadUpvoted: events.ThreadUpvoted,
   CommentUpvoted: events.CommentUpvoted,
   // Contest Events
+  ContestStarted: events.ContestStarted,
   ContestEnding: events.ContestEnding,
   ContestEnded: events.ContestEnded,
 };
@@ -46,6 +47,9 @@ export function NotificationsPolicy(): Policy<typeof notificationInputs> {
       },
       CommentUpvoted: async (event) => {
         await notifyCommentUpvoted(event);
+      },
+      ContestStarted: async (event) => {
+        await notifyContestEvent(event);
       },
       ContestEnding: async (event) => {
         await notifyContestEvent(event);

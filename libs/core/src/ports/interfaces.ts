@@ -298,6 +298,7 @@ export enum WorkflowKeys {
   EmailDigest = 'email-digest',
   Webhooks = 'webhooks',
   // Contest events
+  ContestStarted = 'contest-started',
   ContestEnding = 'contest-ending',
   ContestEnded = 'contest-ended',
 }
@@ -328,9 +329,9 @@ type BaseNotifProviderOptions = {
 
 export type NotificationUser = {
   id: string;
-  webhook_url: string;
-  destination: string;
-  signing_key: string;
+  webhook_url?: string;
+  destination?: string;
+  signing_key?: string;
 };
 
 type WebhookProviderOptions = {
@@ -365,6 +366,10 @@ export type NotificationsProviderTriggerOptions =
         | {
             data: z.infer<typeof UpvoteNotification>;
             key: WorkflowKeys.NewUpvotes;
+          }
+        | {
+            data: z.infer<typeof ContestNotification>;
+            key: WorkflowKeys.ContestStarted;
           }
         | {
             data: z.infer<typeof ContestNotification>;

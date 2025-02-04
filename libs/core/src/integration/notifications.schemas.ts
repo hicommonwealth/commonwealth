@@ -170,12 +170,14 @@ export const ContestNotification = z.object({
   contest_name: z.string(),
   image_url: z.string(),
   community_id: z.string(),
+  community_name: z.string(),
 });
 
 export const ContestEndedNotification = ContestNotification.extend({
   score: z
     .object({
       address: z.string(),
+      name: z.string(),
       prize: z.string(),
       votes: z.string(),
     })
