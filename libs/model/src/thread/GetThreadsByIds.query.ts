@@ -13,7 +13,7 @@ export function GetThreadsByIds(): Query<typeof schemas.GetThreadsByIds> {
       const { community_id, thread_ids } = payload;
       const threads = await models.Thread.findAll({
         where: {
-          community_id,
+          ...(community_id && { community_id }),
           id: { [Op.in]: thread_ids.split(',') },
         },
 

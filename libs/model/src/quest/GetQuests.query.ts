@@ -17,6 +17,8 @@ export function GetQuests(): Query<typeof schemas.GetQuests> {
         order_by,
         order_direction,
         end_before,
+        end_after,
+        start_before,
         start_after,
       } = payload;
 
@@ -31,10 +33,14 @@ export function GetQuests(): Query<typeof schemas.GetQuests> {
         offset,
         end_before: end_before ? new Date(end_before) : null,
         start_after: start_after ? new Date(start_after) : null,
+        start_before: start_before ? new Date(start_before) : null,
+        end_after: end_after ? new Date(end_after) : null,
       };
       const filterConditions = [
         community_id ? `Q.community_id = :community_id` : '',
-        start_after ? `Q.start_date >= :start_after` : '',
+        start_after ? `Q.start_date > :start_after` : '',
+        start_before ? `Q.start_date <= :start_before` : '',
+        end_after ? `Q.end_date > :end_after` : '',
         end_before ? `Q.end_date <= :end_before` : '',
       ].filter(Boolean);
 

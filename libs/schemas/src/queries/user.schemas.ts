@@ -138,6 +138,10 @@ export const GetXps = {
       .string()
       .optional()
       .describe('Filters events by community id associated to quest'),
+    quest_id: z
+      .number()
+      .optional()
+      .describe('Filters events by a specific quest id'),
     from: z.coerce
       .date()
       .optional()
@@ -149,4 +153,19 @@ export const GetXps = {
     event_name: z.string().optional().describe('Filters events by event name'),
   }),
   output: z.array(XpLogView),
+};
+
+export const RandomResourceIdsView = z.object({
+  community_id: z.string(),
+  thread_id: z.number(),
+  comment_id: z.number(),
+});
+
+export const GetRandomResourceIds = {
+  input: PaginationParamsSchema.extend({
+    exclude_joined_communities: z.boolean().optional(),
+  }),
+  output: PaginatedResultSchema.extend({
+    results: z.array(RandomResourceIdsView),
+  }),
 };

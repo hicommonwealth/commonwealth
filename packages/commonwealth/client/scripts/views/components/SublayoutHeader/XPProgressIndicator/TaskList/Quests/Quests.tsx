@@ -5,20 +5,14 @@ import { useCommonNavigate } from 'navigation/helpers';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import QuestTask from './QuestTask';
+import { QuestTaskQuest } from './QuestTask/QuestTask';
 import './Quests.scss';
 
 type QuestsProps = {
   className?: string;
   hideSeeAllBtn?: boolean;
   headerLabel: string;
-  quests: {
-    id: number;
-    imageURL: string;
-    xpPoints: number;
-    title: string;
-    endDate: Date;
-    startDate: Date;
-  }[];
+  quests: QuestTaskQuest[];
 };
 
 const Quests = ({
@@ -30,11 +24,11 @@ const Quests = ({
   const navigate = useCommonNavigate();
 
   const handleSeeAllQuests = () => {
-    navigate('/explore');
+    navigate('/explore', {}, null);
   };
 
-  const handleQuestCTAClick = () => {
-    // TODO: navigate to quest details in #10732
+  const handleQuestCTAClick = (questId: number) => {
+    navigate(`/quest/${questId}`, {}, null);
   };
 
   return (
@@ -64,7 +58,7 @@ const Quests = ({
             <QuestTask
               key={quest.id}
               quest={quest}
-              onClick={handleQuestCTAClick}
+              onClick={() => handleQuestCTAClick(quest.id)}
             />
           ))}
         </div>

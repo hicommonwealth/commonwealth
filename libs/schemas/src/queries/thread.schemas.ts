@@ -284,7 +284,7 @@ export const DEPRECATED_GetBulkThreads = z.object({
 
 export const GetThreadsByIds = {
   input: z.object({
-    community_id: z.string(),
+    community_id: z.string().optional(),
     thread_ids: z.string(),
   }),
   output: z.array(ThreadView),

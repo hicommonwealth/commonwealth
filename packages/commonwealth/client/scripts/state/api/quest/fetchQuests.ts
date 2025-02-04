@@ -11,7 +11,9 @@ type UseFetchQuestsProps = z.infer<typeof GetQuests.input> & {
 const useFetchQuestsQuery = ({
   community_id,
   end_before,
+  end_after,
   start_after,
+  start_before,
   limit,
   order_by,
   order_direction,
@@ -21,7 +23,9 @@ const useFetchQuestsQuery = ({
     {
       community_id,
       end_before,
+      end_after,
       start_after,
+      start_before,
       limit,
       order_by,
       order_direction,
