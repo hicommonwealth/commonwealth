@@ -15,26 +15,6 @@ import './CommunityHomePage.scss';
 import CommunityTransactions from './CommunityTransactions/CommunityTransactions';
 import TokenDetails from './TokenDetails/TokenDetails';
 
-const testData = {
-  token_address: '0x2aab7bc884aa28ba5b23f7abb5ba5068e93fe71c',
-  namespace: 'ClippyChainsawRevenge',
-  name: 'ClippyChainsawRevenge',
-  symbol: 'CLPVR',
-  initial_supply: 1000000000,
-  liquidity_transferred: false,
-  launchpad_liquidity: '430000000000000000000000000',
-  eth_market_cap_target: 29.447347142468825,
-  icon_url:
-    'https://s3.amazonaws.com/local.assets/2fc0c99d-2482-41a6-bb8b-766779cc8838.png',
-  description:
-    'ClippyChainsawRevenge: because when your paperclip turns vigilante, your crypto portfolio should too. 📎🔪😂 Embrace the chaos!',
-  created_at: '2024-11-25T12:31:10.059Z',
-  updated_at: '2024-11-25T12:31:10.059Z',
-  latest_price: null,
-  old_price: null,
-  community_id: 'clippychainsawrevenge-clpvr-community',
-};
-
 const CommunityHome = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const communityHomeEnabled = useFlag('communityHome');
@@ -59,15 +39,9 @@ const CommunityHome = () => {
               Community Home
             </CWText>
             <TokenDetails
-              name={testData.name}
-              symbol={testData.symbol}
-              description={testData.description}
-              priceChange={50.3}
-              address={testData.token_address}
-              marketCap={testData.eth_market_cap_target}
-              members={1500}
-              threads={236}
-              iconUrl={testData.icon_url}
+              communityId={chain}
+              communityMemberCount={app.chain.meta.profile_count || 0}
+              communityThreadCount={app.chain.meta.numVotingThreads || 0}
             />
           </div>
         </div>

@@ -1,4 +1,6 @@
 import { formatAddressShort } from 'client/scripts/helpers';
+import { useFlag } from 'client/scripts/hooks/useFlag';
+import { useFetchTokensQuery } from 'client/scripts/state/api/tokens';
 import { saveToClipboard } from 'client/scripts/utils/clipboard';
 import { CWIconButton } from 'client/scripts/views/components/component_kit/cw_icon_button';
 import { CWIcon } from 'client/scripts/views/components/component_kit/cw_icons/cw_icon';
@@ -7,40 +9,61 @@ import { CWTooltip } from 'client/scripts/views/components/component_kit/new_des
 import React from 'react';
 import './TokenDetails.scss';
 
-interface TokenDetailsProps {
-  name: string;
-  symbol: string;
-  description: string;
-  priceChange: number;
-  address: string;
-  marketCap: number;
-  members: number;
-  threads: number;
-  iconUrl: string;
+interface TokenDetailsProbs {
+  communityId: string;
+  communityMemberCount: number;
+  communityThreadCount: number;
 }
 
-const TokenDetails: React.FC<TokenDetailsProps> = ({
-  name,
-  symbol,
-  description,
-  priceChange,
-  address,
-  marketCap,
-  members,
-  threads,
-  iconUrl,
-}) => {
+const TokenDetails = ({
+  communityId,
+  communityMemberCount,
+  communityThreadCount,
+}: TokenDetailsProbs) => {
+  const launchpadEnabled = useFlag('launchpad');
+
+  const { data: tokensList } = useFetchTokensQuery({
+    cursor: 1,
+    limit: 8,
+    with_stats: true,
+    enabled: launchpadEnabled,
+  });
+
+  const tokens = (tokensList?.pages || []).flatMap((page) => page.results);
+  const communityToken = tokens.find(
+    (token) => token.community_id === communityId,
+  );
+
+  const calculatePriceChange = (latest: number | null, old: number | null) => {
+    if (latest === null || old === null || old === 0) return 'N/A';
+    return (((latest - old) / old) * 100).toFixed(2);
+  };
+
+  if (!communityToken || !communityToken.icon_url) return <></>;
+
+  const priceChange = calculatePriceChange(
+    communityToken.latest_price ?? null,
+    communityToken.old_price ?? null,
+  );
+
+  const isPriceChangeValid = priceChange !== 'N/A';
+  const numericPriceChange = isPriceChangeValid ? parseFloat(priceChange) : 0;
+
   return (
     <div className="token-details">
       <div className="token-info">
         <div className="token-header">
-          <img src={iconUrl} alt={name} className="token-icon" />
+          <img
+            src={communityToken.icon_url}
+            alt={communityToken.name}
+            className="token-icon"
+          />
           <div>
             <CWText type="h4" fontWeight="semiBold">
-              {name}
+              {communityToken.name}
             </CWText>
             <CWText type="b1" className="faded">
-              ${symbol}
+              ${communityToken.symbol}
             </CWText>
           </div>
         </div>
@@ -48,7 +71,7 @@ const TokenDetails: React.FC<TokenDetailsProps> = ({
           <CWText type="h4" fontWeight="semiBold">
             About
           </CWText>
-          <CWText type="b1">{description}</CWText>
+          <CWText type="b1">{communityToken.description}</CWText>
         </div>
       </div>
 
@@ -58,9 +81,17 @@ const TokenDetails: React.FC<TokenDetailsProps> = ({
             24h Change
           </CWText>
           <span
-            className={`price-change ${priceChange > 0 ? 'positive' : 'negative'}`}
+            className={`price-change ${
+              isPriceChangeValid && numericPriceChange > 0
+                ? 'positive'
+                : 'negative'
+            }`}
           >
-            {priceChange > 0 ? `▲ ${priceChange}%` : `▼ ${priceChange}%`}
+            {isPriceChangeValid
+              ? numericPriceChange > 0
+                ? `▲ ${priceChange}%`
+                : `▼ ${priceChange}%`
+              : 'N/A'}
           </span>
         </div>
         <div className="stat-item">
@@ -68,7 +99,7 @@ const TokenDetails: React.FC<TokenDetailsProps> = ({
             Address
           </CWText>
           <CWText>
-            {formatAddressShort(address)}
+            {formatAddressShort(communityToken.token_address)}
             <CWTooltip
               placement="top"
               content="address copied!"
@@ -77,7 +108,9 @@ const TokenDetails: React.FC<TokenDetailsProps> = ({
                   <CWIconButton
                     iconName="copySimple"
                     onClick={(event) => {
-                      saveToClipboard(address).catch(console.error);
+                      saveToClipboard(communityToken.token_address).catch(
+                        console.error,
+                      );
                       handleInteraction(event);
                     }}
                     onMouseLeave={(e) => {
@@ -96,16 +129,16 @@ const TokenDetails: React.FC<TokenDetailsProps> = ({
           <CWText type="b1" className="faded">
             Market Cap
           </CWText>
-          <CWText>{marketCap}</CWText>
+          <CWText>{communityToken.eth_market_cap_target}</CWText>
         </div>
         <div className="token-footer">
           <CWText type="b1" className="faded">
-            <CWIcon iconName="users" /> {members} members
+            <CWIcon iconName="users" /> {communityMemberCount} members
           </CWText>
           <span className="dot">•</span>
           <CWText type="b1" className="faded">
-            <CWIcon iconName="calenderBlank" iconSize="small" /> {threads}{' '}
-            threads
+            <CWIcon iconName="calenderBlank" iconSize="small" />{' '}
+            {communityThreadCount} threads
           </CWText>
         </div>
       </div>
