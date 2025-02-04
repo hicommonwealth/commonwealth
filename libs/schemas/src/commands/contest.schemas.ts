@@ -190,7 +190,7 @@ export const SetContestEnded = {
     interval: PG_INT,
     ended: z.boolean(),
     chain_url: z.string(),
-    chain_private_url: z.string(),
+    chain_private_url: z.string().nullish(),
     neynar_webhook_id: z.string().nullish(),
   }),
   output: z.object({}),
