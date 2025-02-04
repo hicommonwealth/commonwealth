@@ -1,0 +1,36 @@
+@import '../../../styles/shared';
+
+.BreadcrumbsComponent {
+  z-index: 0 !important;
+}
+
+.CommunityHome {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  overflow: hidden;
+
+  .header-section {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background-color: $white;
+
+    .btn-border {
+      margin: 0 !important;
+      padding: 0 !important;
+
+      &:focus-within {
+        border-width: 1px !important;
+        padding: 0 !important;
+      }
+    }
+  }
+
+  .my-16 {
+    margin: 16px 0;
+  }
+}

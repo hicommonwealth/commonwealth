@@ -81,8 +81,6 @@ export function UpdateCommunity(): Command<typeof schemas.UpdateCommunity> {
           community.snapshot_spaces = [];
         }
       }
-      if (default_page && !has_homepage)
-        throw new InvalidInput(UpdateCommunityErrors.InvalidDefaultPage);
 
       if (namespace) {
         if (!transactionHash)

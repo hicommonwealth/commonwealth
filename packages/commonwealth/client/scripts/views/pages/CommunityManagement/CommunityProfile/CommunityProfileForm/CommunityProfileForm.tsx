@@ -163,7 +163,7 @@ const CommunityProfileForm = () => {
             ? JSON.parse(values.customStages)
             : [],
           iconUrl: values.communityProfileImageURL,
-          defaultOverview: values.defaultPage === DefaultPage.Overview,
+          defaultPage: values.defaultPage,
         }),
       );
 
@@ -209,9 +209,7 @@ const CommunityProfileForm = () => {
         communityName: community.name || '',
         communityDescription: community.description || '',
         communityProfileImageURL: community.icon_url || '',
-        defaultPage: community?.default_summary_view
-          ? DefaultPage.Overview
-          : DefaultPage.Discussions,
+        defaultPage: community?.default_page || DefaultPage.Homepage,
         hasStagesEnabled: !!community.stages_enabled,
         customStages:
           (community?.custom_stages || []).length > 0
@@ -413,6 +411,12 @@ const CommunityProfileForm = () => {
               <CWRadioButton
                 label="Overview"
                 value={DefaultPage.Overview}
+                name="defaultPage"
+                hookToForm
+              />
+              <CWRadioButton
+                label="Community Home"
+                value={DefaultPage.Homepage}
                 name="defaultPage"
                 hookToForm
               />

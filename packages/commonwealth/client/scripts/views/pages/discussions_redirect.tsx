@@ -20,9 +20,7 @@ export default function DiscussionsRedirect() {
     const existingParams = searchParams.toString();
     const additionalParams = existingParams ? `&${existingParams}` : '';
 
-    const view = app.chain.meta?.default_summary_view
-      ? DefaultPage.Overview
-      : DefaultPage.Discussions;
+    const view = app.chain.meta?.default_page || DefaultPage.Discussions;
 
     // Note that because this is a redirect, we do not add it to the history. If we only keep the original URL
     // in history, when something like the back button is clicked, it will not come back to this redirect.
@@ -33,6 +31,9 @@ export default function DiscussionsRedirect() {
         break;
       case DefaultPage.Discussions:
         navigate(`/discussions?tab=all${additionalParams}`, dontAddHistory);
+        break;
+      case DefaultPage.Homepage:
+        navigate(`/community-home${additionalParams}`, dontAddHistory);
         break;
       default:
         navigate(`/discussions?tab=all${additionalParams}`, dontAddHistory);
