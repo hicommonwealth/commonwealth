@@ -2,11 +2,14 @@ import React, { useState } from 'react';
 
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import { useFlag } from 'hooks/useFlag';
-import { useCommonNavigate } from 'navigation/helpers';
-import { useGetUserReferralsQuery } from 'state/api/user';
+import {
+  useGetUserReferralFeesQuery,
+  useGetUserReferralsQuery,
+} from 'state/api/user';
 import useUserStore from 'state/ui/user';
 import { IconName } from 'views/components/component_kit/cw_icons/cw_icon_lookup';
 
+import { ZERO_ADDRESS } from '@hicommonwealth/shared';
 import { CWText } from '../../components/component_kit/cw_text';
 import CWPageLayout from '../../components/component_kit/new_designs/CWPageLayout';
 import {
@@ -23,13 +26,11 @@ import {
   calculateReferralTrend,
   calculateTotalEarnings,
   getInitialTab,
-  mobileTabParam,
   tabToTable,
   typeToIcon,
 } from './utils';
 
 const RewardsPage = () => {
-  const navigate = useCommonNavigate();
   const user = useUserStore();
   const rewardsEnabled = useFlag('rewardsPage');
 
@@ -42,13 +43,20 @@ const RewardsPage = () => {
       apiCallEnabled: !!user?.id,
     });
 
-  const trendValue = calculateReferralTrend(referrals || []);
-  const totalEarnings = calculateTotalEarnings(referrals || []);
+  const { data: referralFees } = useGetUserReferralFeesQuery({
+    userId: user?.id,
+    apiCallEnabled: !!user?.id,
+    distributedTokenAddress: ZERO_ADDRESS,
+  });
+
+  const trendValue = calculateReferralTrend(referralFees || []);
+  const totalEarnings = calculateTotalEarnings(referralFees || []);
 
   const handleTabChange = (type: MobileTabType) => {
     setMobileTab(type);
     setTableTab(tabToTable[type]);
-    navigate(`?tab=${mobileTabParam[type]}`, { replace: true });
+    // TODO we should uncomment it when more tabs will be added
+    // navigate(`?tab=${mobileTabParam[type]}`, { replace: true });
   };
 
   const { isWindowSmallInclusive } = useBrowserWindow({});
@@ -56,6 +64,8 @@ const RewardsPage = () => {
   if (!user.isLoggedIn || !rewardsEnabled) {
     return <PageNotFound />;
   }
+
+  const showOtherCards = false;
 
   return (
     <CWPageLayout>
@@ -66,15 +76,19 @@ const RewardsPage = () => {
 
         {/* visible only on mobile */}
         <div className="rewards-button-tabs">
-          {Object.values(MobileTabType).map((type) => (
-            <RewardsTab
-              key={type}
-              icon={typeToIcon[type] as IconName}
-              title={type}
-              isActive={mobileTab === type}
-              onClick={() => handleTabChange(type)}
-            />
-          ))}
+          {Object.values(MobileTabType).map((type) => {
+            return (
+              type === MobileTabType.Referrals && (
+                <RewardsTab
+                  key={type}
+                  icon={typeToIcon[type] as IconName}
+                  title={type}
+                  isActive={mobileTab === type}
+                  onClick={() => handleTabChange(type)}
+                />
+              )
+            );
+          })}
         </div>
 
         {/* on mobile show only one card */}
@@ -89,26 +103,31 @@ const RewardsPage = () => {
             />
           )}
           {(!isWindowSmallInclusive ||
-            mobileTab === MobileTabType.WalletBalance) && <WalletCard />}
-          {(!isWindowSmallInclusive || mobileTab === MobileTabType.Quests) && (
-            <QuestCard
-              onSeeAllClick={() => handleTabChange(MobileTabType.Quests)}
-            />
-          )}
+            mobileTab === MobileTabType.WalletBalance) &&
+            showOtherCards && <WalletCard />}
+          {(!isWindowSmallInclusive || mobileTab === MobileTabType.Quests) &&
+            showOtherCards && (
+              <QuestCard
+                onSeeAllClick={() => handleTabChange(MobileTabType.Quests)}
+              />
+            )}
         </div>
 
         <div className="rewards-tab-container">
           <CWTabsRow>
-            {Object.values(TableType).map((type) => (
-              <CWTab
-                key={type}
-                label={type}
-                isSelected={tableTab === type}
-                onClick={() => {
-                  setTableTab(type);
-                }}
-              />
-            ))}
+            {Object.values(TableType).map(
+              (type) =>
+                type === TableType.Referrals && (
+                  <CWTab
+                    key={type}
+                    label={type}
+                    isSelected={tableTab === type}
+                    onClick={() => {
+                      setTableTab(type);
+                    }}
+                  />
+                ),
+            )}
           </CWTabsRow>
         </div>
 

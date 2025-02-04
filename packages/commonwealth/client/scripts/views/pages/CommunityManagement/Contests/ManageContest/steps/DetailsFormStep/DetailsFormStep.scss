@@ -42,6 +42,22 @@
 
     .contest-section-topic {
       margin-bottom: 64px;
+
+      .SelectList {
+        .create-new-topic-btn {
+          color: $primary-500;
+          width: 100%;
+          display: flex;
+          justify-content: center;
+        }
+      }
+
+      .contest-topic-description {
+        margin-top: 8px;
+        font-size: 14px;
+        display: block;
+        gap: 4px;
+      }
     }
 
     .contest-section-description {

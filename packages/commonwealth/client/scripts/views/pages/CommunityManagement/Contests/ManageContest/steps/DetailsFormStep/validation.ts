@@ -24,6 +24,7 @@ export const detailsFormValidationSchema = (isFarcasterContest: boolean) => {
         label: z.string(),
         helpText: z.string().optional(),
         weightedVoting: z.nativeEnum(TopicWeightedVoting).optional().nullish(),
+        tokenAddress: z.string().optional().nullable(),
       })
       .optional()
       .refine(

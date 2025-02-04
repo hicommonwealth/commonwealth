@@ -50,7 +50,7 @@ export const LaunchpadTrade = z.tuple([
 
 export const ReferralSet = z.tuple([
   EVM_ADDRESS.describe('namespace address'),
-  EVM_ADDRESS.describe('referer address'),
+  EVM_ADDRESS.describe('referrer address'),
 ]);
 
 export const ReferralFeeDistributed = z.tuple([

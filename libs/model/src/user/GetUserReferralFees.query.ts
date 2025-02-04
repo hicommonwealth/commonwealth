@@ -11,7 +11,11 @@ export function GetUserReferralFees(): Query<
     ...schemas.GetUserReferralFees,
     auth: [],
     secure: true,
-    body: async ({ actor }) => {
+    body: async ({ actor, payload }) => {
+      const whereClause = payload.distributed_token_address
+        ? 'AND F.distributed_token_address = :distributed_token_address'
+        : '';
+
       return await models.sequelize.query<
         z.infer<typeof schemas.ReferralFeesView>
       >(
@@ -39,12 +43,16 @@ FROM
   JOIN R ON F.referrer_recipient_address = R.address
   LEFT JOIN "Communities" C ON F.namespace_address = C.namespace_address
   LEFT JOIN "Addresses" A ON A.community_id = C.id AND A.address = F.referee_address
-  LEFT JOIN "Users" U ON U.id = A.user_id;
+  LEFT JOIN "Users" U ON U.id = A.user_id
+WHERE 1=1 ${whereClause};
         `,
         {
           type: QueryTypes.SELECT,
           raw: true,
-          replacements: { user_id: actor.user.id },
+          replacements: {
+            user_id: actor.user.id,
+            distributed_token_address: payload.distributed_token_address,
+          },
         },
       );
     },
