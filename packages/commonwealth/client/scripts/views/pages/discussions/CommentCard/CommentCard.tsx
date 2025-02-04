@@ -108,7 +108,7 @@ export const CommentCard = ({
 }: CommentCardProps) => {
   const user = useUserStore();
   const userOwnsComment = comment.user_id === user.id;
-
+  console.log('comment from CommentCard', comment);
   const [commentText, setCommentText] = useState(comment.body);
   const commentBody = React.useMemo(() => {
     const rawContent = editDraft || commentText || comment.body;
