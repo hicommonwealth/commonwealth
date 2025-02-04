@@ -1,5 +1,9 @@
 import { commonProtocol } from '@hicommonwealth/evm-protocols';
-import { ChainBase } from '@hicommonwealth/shared';
+import {
+  ChainBase,
+  UNISWAP_CONVENIENCE_FEE_PERCENT,
+  UNISWAP_CONVENIENCE_FEE_RECIPIENT_ADDRESS,
+} from '@hicommonwealth/shared';
 import { Theme } from '@uniswap/widgets';
 import WebWalletController from 'controllers/app/web_wallets';
 import { ethers } from 'ethers';
@@ -154,6 +158,13 @@ const useUniswapTradeModal = ({ tradeConfig }: UseUniswapTradeModalProps) => {
       defaultTokenAddress: {
         input: 'NATIVE', // special address for native token of default chain
         output: tradeConfig.token.contract_address,
+      },
+      convenienceFee: {
+        percentage: UNISWAP_CONVENIENCE_FEE_PERCENT,
+        recipient: {
+          // chainId to address map, for all receipts of convenience fee
+          [baseNode.ethChainId || 0]: UNISWAP_CONVENIENCE_FEE_RECIPIENT_ADDRESS,
+        },
       },
       routerURLs: uniswapRouterURLs,
     },
