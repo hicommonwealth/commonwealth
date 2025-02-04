@@ -12,7 +12,7 @@ type EventSchemas = typeof events;
  */
 export async function drainOutbox<E extends Events>(
   events: E[],
-  factory: () =>
+  factory?: () =>
     | Projection<{ [Name in E]: EventSchemas[Name] }, ZodUndefined>
     | Policy<{ [Name in E]: EventSchemas[Name] }, ZodUndefined>,
   from?: Date,
@@ -28,14 +28,17 @@ export async function drainOutbox<E extends Events>(
     },
     order: [['created_at', 'ASC']],
   });
-  const handler = factory();
-  for (const { event_name, event_payload } of drained) {
-    console.log(
-      `>>> ${event_name} >>> ${factory.name} >>> ${JSON.stringify(event_payload)}`,
-    );
-    await handleEvent(handler, {
-      name: event_name,
-      payload: event_payload,
-    });
+  if (factory) {
+    const handler = factory();
+    for (const { event_name, event_payload } of drained) {
+      console.log(
+        `>>> ${event_name} >>> ${factory.name} >>> ${JSON.stringify(event_payload)}`,
+      );
+      await handleEvent(handler, {
+        name: event_name,
+        payload: event_payload,
+      });
+    }
   }
+  return drained;
 }

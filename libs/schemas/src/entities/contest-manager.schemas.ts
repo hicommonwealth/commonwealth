@@ -41,6 +41,7 @@ export const ContestManager = z
       .boolean()
       .nullish()
       .describe('Flags when contest policy is cancelled by admin'),
+    ending: z.boolean().nullish().describe('Flags when contest is ending'),
     ended: z
       .boolean()
       .nullish()

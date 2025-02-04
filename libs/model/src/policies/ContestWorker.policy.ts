@@ -1,14 +1,18 @@
-import { Actor, logger, Policy, ServerError } from '@hicommonwealth/core';
 import {
-  createPrivateEvmClient,
-  rollOverContest,
-} from '@hicommonwealth/evm-protocols';
+  Actor,
+  command,
+  logger,
+  Policy,
+  ServerError,
+} from '@hicommonwealth/core';
 import { events } from '@hicommonwealth/schemas';
-import { NeynarAPIClient } from '@neynar/nodejs-sdk';
 import moment from 'moment';
 import { QueryTypes } from 'sequelize';
 import { config, Contest, models } from '..';
 import { GetActiveContestManagers } from '../contest';
+import { SetContestEnded } from '../contest/SetContestEnded.command';
+import { SetContestEnding } from '../contest/SetContestEnding.command';
+import { systemActor } from '../middleware';
 import { buildThreadContentUrl, getChainNodeUrl } from '../utils';
 import {
   createOnchainContestContent,
@@ -147,61 +151,65 @@ export function ContestWorker(): Policy<typeof inputs> {
   };
 }
 
-const getPrivateWalletAddress = (): string => {
-  const web3 = createPrivateEvmClient({ privateKey: config.WEB3.PRIVATE_KEY });
-  return web3.eth.defaultAccount!;
-};
-
 const checkContests = async () => {
   const activeContestManagers = await GetActiveContestManagers().body({
     actor: {} as Actor,
     payload: {},
   });
-  // find active contests that have content with no upvotes and will end in one hour
-  const contestsWithoutVote = activeContestManagers!.filter(
-    (contestManager) =>
-      contestManager.actions.some((action) => action.action === 'added') &&
-      !contestManager.actions.some((action) => action.action === 'upvoted') &&
-      moment(contestManager.end_time).diff(moment(), 'minutes') < 60,
+  // active contests with content that are ending in one hour
+  const contestsEndingInOneHour = activeContestManagers!.filter(
+    (contestManager) => {
+      const firstContent = contestManager.actions.find(
+        (action) => action.action === 'added',
+      );
+      const timeLeft = moment(contestManager.end_time).diff(
+        moment(),
+        'minutes',
+      );
+      const isEnding =
+        !contestManager.ending && !!firstContent && timeLeft < 60;
+      return isEnding;
+    },
   );
 
-  const promises = contestsWithoutVote.map(async (contestManager) => {
-    // add onchain vote to the first content
-    const firstContent = contestManager.actions.find(
-      (action) => action.action === 'added',
-    );
-
-    await createOnchainContestVote({
-      contestManagers: [
-        {
-          url: contestManager.url,
+  const promiseResults = await Promise.allSettled(
+    contestsEndingInOneHour.map(async (contestManager) => {
+      log.info(`ENDING: ${contestManager.contest_address}`);
+      await command(SetContestEnding(), {
+        actor: systemActor({}),
+        payload: {
           contest_address: contestManager.contest_address,
-          content_id: firstContent!.content_id,
+          contest_id: contestManager.max_contest_id,
+          actions: contestManager.actions.map((a) => ({
+            action: a.action,
+            content_id: a.content_id,
+            content_url: a.content_url,
+          })),
+          chain_url: contestManager.url,
         },
-      ],
-      content_url: firstContent!.content_url!,
-      author_address: getPrivateWalletAddress(),
-    });
-  });
-
-  const promiseResults = await Promise.allSettled(promises);
-
+      });
+    }),
+  );
   const errors = promiseResults
     .filter(({ status }) => status === 'rejected')
     .map(
       (result) =>
         (result as PromiseRejectedResult).reason || '<unknown reason>',
     );
-
   if (errors.length > 0) {
     log.error(`CheckContests: failed with errors: ${errors.join(', ')}"`);
   }
 };
 
 const rolloverContests = async () => {
+  if (!config.WEB3.PRIVATE_KEY)
+    throw new ServerError('WEB3 private key not set!');
+
   const contestManagersWithEndedContest = await models.sequelize.query<{
     contest_address: string;
     interval: number;
+    contest_id: number;
+    end_time: string;
     ended: boolean;
     url: string;
     private_url: string;
@@ -210,9 +218,9 @@ const rolloverContests = async () => {
     `
         SELECT cm.contest_address,
                cm.interval,
-               cm.ended,
+               COALESCE(cm.ended, false) as ended,
                cm.neynar_webhook_id,
-               co.end_time,
+               co.contest_id,
                cn.private_url,
                cn.url
         FROM "ContestManagers" cm
@@ -238,74 +246,39 @@ const rolloverContests = async () => {
     },
   );
 
-  const contestRolloverPromises = contestManagersWithEndedContest.map(
-    async ({
-      url,
-      private_url,
-      contest_address,
-      interval,
-      ended,
-      neynar_webhook_id,
-    }) => {
-      log.info(`ROLLOVER: ${contest_address}`);
-
-      if (interval === 0 && !ended) {
-        // preemptively mark as ended so that rollover
-        // is not attempted again after failure
-        await models.ContestManager.update(
-          {
-            ended: true,
+  const promiseResults = await Promise.allSettled(
+    contestManagersWithEndedContest.map(
+      async ({
+        url,
+        private_url,
+        contest_address,
+        contest_id,
+        interval,
+        ended,
+        neynar_webhook_id,
+      }) => {
+        log.info(`ROLLOVER: ${contest_address}`);
+        await command(SetContestEnded(), {
+          actor: systemActor({}),
+          payload: {
+            contest_address,
+            contest_id,
+            interval,
+            ended: ended || false,
+            chain_url: url,
+            chain_private_url: private_url,
+            neynar_webhook_id,
           },
-          {
-            where: {
-              contest_address,
-            },
-          },
-        );
-      }
-
-      if (!config.WEB3.PRIVATE_KEY)
-        throw new ServerError('WEB3 private key not set!');
-
-      await rollOverContest({
-        privateKey: config.WEB3.PRIVATE_KEY,
-        rpc: getChainNodeUrl({ url, private_url }),
-        contest: contest_address,
-        oneOff: interval === 0,
-      });
-
-      // clean up neynar webhooks when farcaster contest ends
-      if (neynar_webhook_id) {
-        try {
-          const client = new NeynarAPIClient(config.CONTESTS.NEYNAR_API_KEY!);
-          await client.deleteWebhook(neynar_webhook_id);
-          await models.ContestManager.update(
-            {
-              neynar_webhook_id: null,
-              neynar_webhook_secret: null,
-            },
-            {
-              where: {
-                contest_address,
-              },
-            },
-          );
-        } catch (err) {
-          log.warn(`failed to delete neynar webhook: ${neynar_webhook_id}`);
-        }
-      }
-    },
+        });
+      },
+    ),
   );
-
-  const promiseResults = await Promise.allSettled(contestRolloverPromises);
-
   const errors = promiseResults
     .filter(({ status }) => status === 'rejected')
     .map(
       (result) =>
         (result as PromiseRejectedResult).reason || '<unknown reason>',
     );
-
   if (errors.length > 0) {
     log.error(
       `PerformContestRollovers: failed with errors: ${errors.join(', ')}"`,

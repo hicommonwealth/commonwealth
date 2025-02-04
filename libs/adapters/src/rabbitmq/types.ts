@@ -60,6 +60,10 @@ export enum RascalRoutingKeys {
   NotificationsProviderChainEventCreated = EventNames.ChainEventCreated,
   NotificationsProviderSnapshotProposalCreated = EventNames.SnapshotProposalCreated,
   NotificationsProviderUserMentioned = EventNames.UserMentioned,
+  // Contest Events
+  NotificationsProviderContestStarted = EventNames.ContestStarted,
+  NotificationsProviderContestEnding = EventNames.ContestEnding,
+  NotificationsProviderContestEnded = EventNames.ContestEnded,
 
   NotificationsSettingsPreferencesUpdated = EventNames.SubscriptionPreferencesUpdated,
 
