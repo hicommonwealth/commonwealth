@@ -241,9 +241,10 @@ export async function getLaunchpadTokenCreatedTransaction({
     0: namespace,
     // 1: feeManager,
     // 2: signature,
-    // 3: namespaceDeployed,
+    // 3: namespaceDeployer,
+    // 3: nameSpaceAddress,
   } = web3.eth.abi.decodeParameters(
-    ['address', 'address', 'bytes', 'address'],
+    ['string', 'address', 'bytes', 'address', 'address'],
     deployedNamespaceLog.data!.toString(),
   );
 
