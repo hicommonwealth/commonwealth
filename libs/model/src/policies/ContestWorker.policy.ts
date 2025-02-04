@@ -156,23 +156,35 @@ const checkContests = async () => {
     actor: {} as Actor,
     payload: {},
   });
-
   // active contests with content that are ending in one hour
   const contestsEndingInOneHour = activeContestManagers!.filter(
-    (contestManager) =>
-      !contestManager.ending &&
-      contestManager.actions.some((action) => action.action === 'added') &&
-      moment(contestManager.end_time).diff(moment(), 'minutes') < 60,
+    (contestManager) => {
+      const firstContent = contestManager.actions.find(
+        (action) => action.action === 'added',
+      );
+      const timeLeft = moment(contestManager.end_time).diff(
+        moment(),
+        'minutes',
+      );
+      const isEnding =
+        !contestManager.ending && !!firstContent && timeLeft < 60;
+      return isEnding;
+    },
   );
 
   const promiseResults = await Promise.allSettled(
     contestsEndingInOneHour.map(async (contestManager) => {
+      log.info(`ENDING: ${contestManager.contest_address}`);
       await command(SetContestEnding(), {
         actor: systemActor({}),
         payload: {
           contest_address: contestManager.contest_address,
           contest_id: contestManager.max_contest_id,
-          actions: contestManager.actions,
+          actions: contestManager.actions.map((a) => ({
+            action: a.action,
+            content_id: a.content_id,
+            content_url: a.content_url,
+          })),
           chain_url: contestManager.url,
         },
       });
@@ -206,7 +218,7 @@ const rolloverContests = async () => {
     `
         SELECT cm.contest_address,
                cm.interval,
-               cm.ended,
+               COALESCE(cm.ended, false) as ended,
                cm.neynar_webhook_id,
                co.contest_id,
                cn.private_url,
@@ -252,7 +264,7 @@ const rolloverContests = async () => {
             contest_address,
             contest_id,
             interval,
-            ended,
+            ended: ended || false,
             chain_url: url,
             chain_private_url: private_url,
             neynar_webhook_id,

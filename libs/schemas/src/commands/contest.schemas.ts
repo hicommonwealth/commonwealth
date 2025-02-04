@@ -177,7 +177,9 @@ export const SetContestEnding = {
   input: z.object({
     contest_address: z.string(),
     contest_id: PG_INT,
-    actions: z.array(ContestAction),
+    actions: z.array(
+      ContestAction.pick({ action: true, content_id: true, content_url: true }),
+    ),
     chain_url: z.string(),
   }),
   output: z.object({}),

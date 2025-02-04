@@ -30,10 +30,10 @@ export function GetActiveContestManagers(): Query<
                    cn.private_url,
                    cn.url,
                    cm.contest_address,
-                   cm.ending,
+                   COALESCE(cm.ending, false) as ending,
                    co.max_contest_id,
                    co.end_time,
-                   COALESCE(JSON_AGG(ca) FILTER (WHERE ca IS NOT NULL), '[]'::json) as actions
+                   COALESCE(JSON_AGG(ca) FILTER (WHERE ca.action IS NOT NULL), '[]'::json) as actions
             FROM "Communities" c
                      JOIN "ChainNodes" cn ON c.chain_node_id = cn.id
                      JOIN "ContestManagers" cm ON cm.community_id = c.id
