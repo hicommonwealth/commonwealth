@@ -7,14 +7,16 @@ type TopicOptionType =
   | {
       value: number | undefined;
       label: string;
-      weightedVoting: TopicWeightedVoting | null | undefined;
       helpText: string;
+      weightedVoting: TopicWeightedVoting | null | undefined;
+      tokenAddress?: string | null | undefined;
     }
   | {
       value: string;
       label: string;
       helpText: string;
       weightedVoting: null;
+      tokenAddress?: string | null | undefined;
     };
 
 interface CustomContestTopicOptionProps {

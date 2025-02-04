@@ -117,6 +117,7 @@ const DetailsFormStep = ({
       label: t.name,
       weightedVoting: t.weighted_voting,
       helpText: weightedVotingValueToLabel(t.weighted_voting!),
+      tokenAddress: t.token_address,
     }));
 
   const getInitialValues = () => {
@@ -298,6 +299,7 @@ const DetailsFormStep = ({
                     components={{
                       Option: (originalProps) =>
                         CustomContestTopicOption({
+                          // @ts-expect-error: react-select type incompatibility with custom option props
                           originalProps,
                         }),
                     }}
