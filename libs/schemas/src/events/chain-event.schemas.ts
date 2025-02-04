@@ -23,11 +23,12 @@ export const NamespaceDeployed = z.tuple([
 ]);
 
 export const NamespaceDeployedWithReferral = z.tuple([
-  EVM_ADDRESS.describe('Namespace address'),
+  z.string().describe('Namespace name'),
   EVM_ADDRESS.describe('Fee manager address of new namespace'),
   EVM_ADDRESS.describe('Referrer address (receiving referral fees)'),
   EVM_ADDRESS.describe('Referral fee manager contract address'),
   z.string().describe('Optional signature for name reservation validation'),
+  EVM_ADDRESS.describe('Namespace deployer address (referee)'),
   EVM_ADDRESS.describe('Namespace deployer address (referee)'),
 ]);
 
