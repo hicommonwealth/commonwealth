@@ -146,6 +146,7 @@ const ModalBase = ({
     onVerifyMobileWalletSignature,
   } = useAuthentication({
     withSessionKeyLoginFlow: layoutType === AuthModalType.RevalidateSession,
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
     onModalClose: handleClose,
     onSuccess: handleSuccess,
   });
