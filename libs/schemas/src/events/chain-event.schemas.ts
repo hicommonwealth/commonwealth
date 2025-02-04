@@ -29,7 +29,7 @@ export const NamespaceDeployedWithReferral = z.tuple([
   EVM_ADDRESS.describe('Referral fee manager contract address'),
   z.string().describe('Optional signature for name reservation validation'),
   EVM_ADDRESS.describe('Namespace deployer address (referee)'),
-  EVM_ADDRESS.describe('Namespace deployer address (referee)'),
+  EVM_ADDRESS.describe('Namespace address'),
 ]);
 
 export const LaunchpadTokenCreated = z.tuple([
