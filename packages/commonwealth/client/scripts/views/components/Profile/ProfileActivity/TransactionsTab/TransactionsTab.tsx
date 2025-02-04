@@ -1,5 +1,5 @@
 import { formatAddressShort } from 'helpers';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import useUserStore from 'state/ui/user';
 import useAuthentication from '../../../../modals/AuthModal/useAuthentication';
 import { CWIcon } from '../../../component_kit/cw_icons/cw_icon';
@@ -21,13 +21,27 @@ const BASE_ADDRESS_FILTER = {
 
 type TransactionsTabProps = {
   transactionsType: 'tokens' | 'history';
+  showFilterOptions?: boolean;
+  searchText?: string;
 };
 
-const TransactionsTab = ({ transactionsType }: TransactionsTabProps) => {
+const TransactionsTab = ({
+  transactionsType,
+  showFilterOptions = true,
+  searchText = '',
+}: TransactionsTabProps) => {
   const [filterOptions, setFilterOptions] = useState<FilterOptions>({
-    searchText: '',
+    searchText,
     selectedAddress: BASE_ADDRESS_FILTER,
   });
+
+  useEffect(() => {
+    setFilterOptions((prev) => ({
+      ...prev,
+      searchText,
+    }));
+  }, [searchText]);
+
   const user = useUserStore();
   const hasMagic = user.hasMagicWallet;
 
@@ -59,48 +73,50 @@ const TransactionsTab = ({ transactionsType }: TransactionsTabProps) => {
 
   return (
     <section className="TransactionsTab">
-      <section className="filters">
-        {hasMagic && (
-          <div className="title-and-wallet-button">
-            <CWButton
-              label="Open wallet"
-              onClick={() => {
-                openMagicWallet().catch(console.error);
-              }}
-            />
-          </div>
-        )}
-        <CWTextInput
-          size="large"
-          fullWidth
-          placeholder="Search community name or symbol"
-          containerClassName="search-input-container"
-          inputClassName="search-input"
-          iconLeft={<CWIcon iconName="search" className="search-icon" />}
-          onInput={(e) =>
-            setFilterOptions((options) => ({
-              ...options,
-              searchText: e.target.value?.trim(),
-            }))
-          }
-        />
-        <div className="select-list-container">
-          <CWText fontWeight="medium">Filter</CWText>
-          <CWSelectList
-            isSearchable={false}
-            isClearable={false}
-            options={ADDRESS_FILTERS}
-            value={filterOptions.selectedAddress}
-            onChange={(option) =>
-              // @ts-expect-error <StrictNullChecks/>
-              setFilterOptions((filters) => ({
-                ...filters,
-                selectedAddress: option,
+      {showFilterOptions && (
+        <section className="filters">
+          {hasMagic && (
+            <div className="title-and-wallet-button">
+              <CWButton
+                label="Open wallet"
+                onClick={() => {
+                  openMagicWallet().catch(console.error);
+                }}
+              />
+            </div>
+          )}
+          <CWTextInput
+            size="large"
+            fullWidth
+            placeholder="Search community name or symbol"
+            containerClassName="search-input-container"
+            inputClassName="search-input"
+            iconLeft={<CWIcon iconName="search" className="search-icon" />}
+            onInput={(e) =>
+              setFilterOptions((options) => ({
+                ...options,
+                searchText: e.target.value?.trim(),
               }))
             }
           />
-        </div>
-      </section>
+          <div className="select-list-container">
+            <CWText fontWeight="medium">Filter</CWText>
+            <CWSelectList
+              isSearchable={false}
+              isClearable={false}
+              options={ADDRESS_FILTERS}
+              value={filterOptions.selectedAddress}
+              onChange={(option) =>
+                // @ts-expect-error <StrictNullChecks/>
+                setFilterOptions((filters) => ({
+                  ...filters,
+                  selectedAddress: option,
+                }))
+              }
+            />
+          </div>
+        </section>
+      )}
 
       {!(data?.length > 0) ? (
         <NoTransactionHistory

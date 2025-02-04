@@ -1,0 +1,12 @@
+@import '../../../../styles/shared';
+
+.CommunityTransactions {
+  margin: 16px 0;
+
+  .heading-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+}

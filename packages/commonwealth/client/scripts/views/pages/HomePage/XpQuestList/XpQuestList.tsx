@@ -11,7 +11,11 @@ import { CWText } from 'views/components/component_kit/cw_text';
 import XpQuestCard from '../XpQuestCard/XpQuestCard';
 import './XpQuestList.scss';
 
-const XpQuestList = () => {
+interface XpQuestListProps {
+  communityIdFilter?: string;
+}
+
+const XpQuestList = ({ communityIdFilter }: XpQuestListProps) => {
   const navigate = useCommonNavigate();
   const xpEnabled = useFlag('xp');
 
@@ -21,7 +25,12 @@ const XpQuestList = () => {
     start_after: moment().startOf('day').toDate(),
     enabled: xpEnabled,
   });
-  const quests = (questsList?.pages || []).flatMap((page) => page.results);
+
+  let quests = (questsList?.pages || []).flatMap((page) => page.results);
+
+  if (communityIdFilter) {
+    quests = quests.filter((quest) => quest.community_id === communityIdFilter);
+  }
 
   const handleCTAClick = () => {
     // TODO: navigate to quest details in #10732
