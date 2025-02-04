@@ -15,6 +15,10 @@
       grid-template-columns: 200px 8fr;
       gap: 16px;
 
+      @include smallInclusive {
+        grid-template-columns: 1fr;
+      }
+
       .quest-meta {
         display: flex;
         flex-direction: column;
@@ -71,7 +75,6 @@
         display: flex;
         flex-direction: column;
         gap: 12px;
-        overflow: scroll;
         width: 100%;
       }
     }
