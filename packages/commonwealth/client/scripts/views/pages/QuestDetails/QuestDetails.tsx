@@ -50,13 +50,29 @@ const QuestDetails = ({ id }: { id: number }) => {
     });
   const randomResourceId = randomResourceIds?.results?.[0];
 
+  const {
+    data: randomResourceIdsForNonJoinedCommunities,
+    isLoading: isLoadingRandomResourceIdsForNonJoinedCommunities,
+  } = useGetRandomResourceIds({
+    limit: 1,
+    cursor: 1,
+    exclude_joined_communities: true,
+    enabled: true,
+  });
+  const randomResourceIdForNonJoinedCommunity =
+    randomResourceIdsForNonJoinedCommunities?.results?.[0];
+
   const { setAuthModalType } = useAuthModalStore();
 
   if (!xpEnabled || !questId) {
     return <PageNotFound />;
   }
 
-  if (isLoading || isLoadingRandomResourceIds) {
+  if (
+    isLoading ||
+    isLoadingRandomResourceIds ||
+    isLoadingRandomResourceIdsForNonJoinedCommunities
+  ) {
     return <CWCircleMultiplySpinner />;
   }
 
@@ -94,7 +110,11 @@ const QuestDetails = ({ id }: { id: number }) => {
         break;
       }
       case EventNames.CommunityJoined: {
-        navigate(`/${randomResourceId?.community_id}/discussions`, {}, null);
+        navigate(
+          `/${randomResourceIdForNonJoinedCommunity?.community_id}/discussions`,
+          {},
+          null,
+        );
         break;
       }
       case EventNames.ThreadUpvoted:
