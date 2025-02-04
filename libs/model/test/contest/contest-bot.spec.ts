@@ -468,17 +468,19 @@ const testCases: Array<TestCase> = [
     },
   },
   {
-    input: `@commonbot, time to innovate! Fund Best Memes Only with 0x429ae85883f82203D736e8fc203A455990745ca1 on Base.`,
+    input: `@commonbot, time to innovate! Fund Best Memes Only with 0x3ecced5b416e58664f04a39dd18935eb71d33b15 on Base.`,
     expectedOutput: {
       contestName: 'Best Memes Only',
       ...defaults,
+      tokenAddress: '0x3ecced5b416e58664f04a39dd18935eb71d33b15',
     },
   },
   {
-    input: `@commonbot, letʼs inspire laughter! Best Memes Only contest via 0x429ae85883f82203D736e8fc203A455990745ca1 on Base.`,
+    input: `@commonbot, letʼs inspire laughter! Best Memes Only contest via 0x0c41f1fc9022feb69af6dc666abfe73c9ffda7ce on Base.`,
     expectedOutput: {
       contestName: 'Best Memes Only',
       ...defaults,
+      tokenAddress: '0x0c41f1fc9022feb69af6dc666abfe73c9ffda7ce',
     },
   },
 ];
