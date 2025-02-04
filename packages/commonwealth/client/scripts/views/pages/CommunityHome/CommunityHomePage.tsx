@@ -12,6 +12,7 @@ import ActiveContestList from '../HomePage/ActiveContestList/ActiveContestList';
 import TrendingThreadList from '../HomePage/TrendingThreadList/TrendingThreadList';
 import XpQuestList from '../HomePage/XpQuestList/XpQuestList';
 import './CommunityHomePage.scss';
+import CommunityTransactions from './CommunityTransactions/CommunityTransactions';
 import TokenDetails from './TokenDetails/TokenDetails';
 
 const testData = {
@@ -71,8 +72,12 @@ const CommunityHome = () => {
           </div>
         </div>
         <ActiveContestList />
-        <XpQuestList />
-        <TrendingThreadList query={useFetchGlobalActivityQuery} />
+        <CommunityTransactions />
+        <XpQuestList communityIdFilter={chain} />
+        <TrendingThreadList
+          query={useFetchGlobalActivityQuery}
+          communityIdFilter={chain}
+        />
         <CWModal
           size="small"
           content={
