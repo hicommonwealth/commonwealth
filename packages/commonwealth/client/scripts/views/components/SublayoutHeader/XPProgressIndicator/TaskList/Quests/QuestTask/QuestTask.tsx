@@ -1,19 +1,25 @@
 import clsx from 'clsx';
+import { calculateQuestTimelineLabel } from 'helpers/quest';
 import React from 'react';
-
+import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
 import './QuestTask.scss';
 
+export type QuestTaskQuest = {
+  id: number;
+  imageURL: string;
+  xpPoints: { total: number; gained: number };
+  isCompleted: boolean;
+  title: string;
+  endDate: Date;
+  startDate: Date;
+};
+
 type QuestTaskProps = {
   className?: string;
   onClick: () => void;
-  quest: {
-    imageURL: string;
-    title: string;
-    xpPoints: number;
-    daysLeftBeforeEnd: number;
-  };
+  quest: QuestTaskQuest;
 };
 
 const QuestTask = ({ className, quest, onClick }: QuestTaskProps) => {
@@ -23,11 +29,24 @@ const QuestTask = ({ className, quest, onClick }: QuestTaskProps) => {
         <img src={quest.imageURL} />
       </div>
       <div className="right">
-        <CWText type="b1">{quest.title}</CWText>
+        <CWText type="b1">
+          {quest.title}
+          {quest.isCompleted && <CWIcon iconName="check" iconSize="small" />}
+        </CWText>
         <div className="xp-row">
-          <CWTag label={`${quest.xpPoints} XP`} type="proposal" />
-          <CWText type="caption" className="days-left" fontWeight="semiBold">
-            {quest.daysLeftBeforeEnd} days left
+          <CWTag
+            label={`${quest.xpPoints.gained > 0 ? `${quest.xpPoints.gained} / ` : ''}${quest.xpPoints.total} XP`}
+            type="proposal"
+          />
+          <CWText
+            type="caption"
+            className="timeline-label"
+            fontWeight="semiBold"
+          >
+            {calculateQuestTimelineLabel({
+              startDate: quest.startDate,
+              endDate: quest.endDate,
+            })}
           </CWText>
         </div>
       </div>

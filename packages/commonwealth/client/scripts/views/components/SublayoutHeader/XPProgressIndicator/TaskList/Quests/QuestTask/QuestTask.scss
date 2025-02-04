@@ -41,12 +41,22 @@
     justify-content: center;
     width: 100%;
 
+    .b1 {
+      display: flex;
+      gap: 4px;
+      align-items: center;
+
+      .Icon {
+        fill: $green-600;
+      }
+    }
+
     .xp-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
 
-      .days-left {
+      .timeline-label {
         color: $primary-300 !important;
       }
     }

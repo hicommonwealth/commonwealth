@@ -1,11 +1,9 @@
 import clsx from 'clsx';
-import React from 'react';
-
 import useBrowserWindow from 'hooks/useBrowserWindow';
-import moment from 'moment';
-import { useGetXPs } from 'state/api/user';
-import useUserStore from 'state/ui/user';
+import React from 'react';
+import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
 import WeeklyProgressGoal from '../WeeklyProgressGoal';
+import useXPProgress from '../useXPProgress';
 import Quests from './Quests';
 import './TaskList.scss';
 
@@ -16,44 +14,54 @@ type TaskListProps = {
 const TaskList = ({ className }: TaskListProps) => {
   const { isWindowExtraSmall } = useBrowserWindow({});
 
-  const sampleData = {
-    weeklyGoal: {
-      current: 170,
-      target: 400,
-    },
-  };
+  const {
+    weeklyGoal,
+    isLoadingQuestsList,
+    isLoadingXPProgression,
+    pendingWeeklyQuests,
+  } = useXPProgress();
 
-  const user = useUserStore();
-  const { data = [], isLoading } = useGetXPs({
-    user_id: user.id,
-    from: moment().startOf('week').toDate(),
-    to: moment().endOf('week').toDate(),
-    enabled: user.isLoggedIn,
-  });
-
-  if (isLoading) return;
+  if (isLoadingXPProgression) return;
 
   return (
     <div className={clsx('TaskList', className)}>
       {isWindowExtraSmall && (
         <WeeklyProgressGoal
           className="weekly-progress-bar"
-          progress={sampleData.weeklyGoal}
+          progress={weeklyGoal}
         />
       )}
-      <Quests
-        quests={data
-          .filter((task) => task.quest_id)
-          .map((task) => ({
-            daysLeftBeforeEnd: 4, // TODO: where to get time diff from
-            id: task.quest_id || 0,
-            // TODO: where to get this url from
-            imageURL:
-              'https://cdn.pixabay.com/photo/2023/01/08/14/22/sample-7705350_640.jpg',
-            title: task.event_name,
-            xpPoints: task.xp_points,
-          }))}
-      />
+      {isLoadingQuestsList ? (
+        <CWCircleMultiplySpinner />
+      ) : (
+        <>
+          <Quests
+            headerLabel="Weekly Quests"
+            quests={pendingWeeklyQuests.activeWeeklyQuests.map((quest) => ({
+              endDate: new Date(quest.end_date),
+              startDate: new Date(quest.start_date),
+              id: quest.id,
+              imageURL: quest.image_url,
+              title: quest.name,
+              isCompleted: quest.isCompleted,
+              xpPoints: { gained: quest.gainedXP, total: quest.totalXP },
+            }))}
+          />
+          <Quests
+            headerLabel="Later this week"
+            hideSeeAllBtn
+            quests={pendingWeeklyQuests.upcomingWeeklyQuests.map((quest) => ({
+              endDate: new Date(quest.end_date),
+              startDate: new Date(quest.start_date),
+              id: quest.id,
+              imageURL: quest.image_url,
+              title: quest.name,
+              isCompleted: quest.isCompleted,
+              xpPoints: { gained: quest.gainedXP, total: quest.totalXP },
+            }))}
+          />
+        </>
+      )}
     </div>
   );
 };
