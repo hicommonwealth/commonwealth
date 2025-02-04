@@ -11,6 +11,7 @@ import { PreferencesStep } from './steps/PreferencesStep';
 import { TermsOfServicesStep } from './steps/TermsOfServicesStep';
 import { WelcomeOnboardModalProps, WelcomeOnboardModalSteps } from './types';
 
+import { LocalStorageKeys } from 'client/scripts/helpers/localStorage';
 import useBrowserWindow from 'client/scripts/hooks/useBrowserWindow';
 import { isMobileApp } from 'client/scripts/hooks/useReactNativeWebView';
 import './WelcomeOnboardModal.scss';
@@ -22,16 +23,20 @@ const WelcomeOnboardModal = ({ isOpen, onClose }: WelcomeOnboardModalProps) => {
     WelcomeOnboardModalSteps.OptionalWalletModal,
   );
   const mobileApp = isMobileApp();
-
+  const user = useUserStore();
   useEffect(() => {
+    const hasSeenNotifications = localStorage.getItem(
+      LocalStorageKeys.HasSeenNotifications,
+    );
+    if (mobileApp && !hasSeenNotifications && user.id > 0) {
+      localStorage.setItem(LocalStorageKeys.HasSeenNotifications, 'true');
+    }
     setActiveStep(
-      mobileApp
+      mobileApp && !hasSeenNotifications
         ? WelcomeOnboardModalSteps.Notifications
         : WelcomeOnboardModalSteps.TermsOfServices,
     );
   }, [mobileApp]);
-
-  const user = useUserStore();
 
   const [hasMagic, setHasMagic] = useState(false);
 

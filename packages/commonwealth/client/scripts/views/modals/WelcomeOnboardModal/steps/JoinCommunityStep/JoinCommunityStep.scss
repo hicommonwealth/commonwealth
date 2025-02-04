@@ -22,8 +22,7 @@
     max-height: 270px;
     overflow-y: scroll;
     @include extraSmall {
-      height: 40vh !important;
-      max-height: 65vh;
+      max-height: 60vh;
     }
     &::-webkit-scrollbar {
       display: none;
