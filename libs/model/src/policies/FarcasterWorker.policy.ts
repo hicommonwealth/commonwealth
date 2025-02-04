@@ -10,6 +10,7 @@ import { config, models } from '..';
 import { CreateBotContest } from '../bot/CreateBotContest.command';
 import { systemActor } from '../middleware';
 import { mustExist } from '../middleware/guards';
+import { DEFAULT_CONTEST_BOT_PARAMS } from '../services/openai/parseBotCommand';
 import {
   buildFarcasterContentUrl,
   buildFarcasterWebhookName,
@@ -219,8 +220,13 @@ export function FarcasterWorker(): Policy<typeof inputs> {
         if (contestAddress) {
           await publishCast(
             payload.hash,
-            ({ username }) =>
-              `Hey @${username}, your contest has been created.`,
+            ({ username }) => {
+              const {
+                payoutStructure: [winner1, winner2, winner3],
+                voterShare,
+              } = DEFAULT_CONTEST_BOT_PARAMS;
+              return `Hey @${username}, your contest has been created. The prize distribution is ${winner1}% to winner, ${winner2}% to second place, ${winner3}% to third , and ${voterShare}% going to voters. Anyone who replies to a cast containing the frame enters the contest.`;
+            },
             {
               // eslint-disable-next-line max-len
               embed: `${getBaseUrl(config.APP_ENV, config.CONTESTS.FARCASTER_NGROK_DOMAIN!)}${buildFarcasterContestFrameUrl(contestAddress)}`,
