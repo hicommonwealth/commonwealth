@@ -168,7 +168,7 @@ const QuestDetails = ({ id }: { id: number }) => {
                     label={moment(quest.end_date).format('DD/MM/YYYY')}
                     classNames="cursor-pointer"
                   />,
-                  moment(quest.start_date).toLocaleString(),
+                  moment(quest.end_date).toLocaleString(),
                   true,
                 )}
               </CWText>
