@@ -147,7 +147,7 @@ export const CommentCard = ({
       contentUrlBody
     ) {
       setCommentText(contentUrlBody);
-      setCommentDelta(contentUrlBody);
+      setCommentDelta({ contentUrlBody });
     }
   }, [contentUrlBody, contentUrlBodyToFetch, comment.content_url]);
 
@@ -219,7 +219,7 @@ export const CommentCard = ({
             showUserAddressWithInfo={false}
             profile={{
               address: comment.address,
-              avatarUrl: comment.profile_avatar || '',
+              avatarUrl: comment.avatar_url || '',
               name: comment.profile_name || DEFAULT_NAME,
               userId: comment.user_id,
               lastActive: comment.last_active as unknown as string,
