@@ -1,7 +1,5 @@
 import {
   Broker,
-  BrokerPublications,
-  BrokerSubscriptions,
   CustomRetryStrategyError,
   EventContext,
   EventSchemas,
@@ -34,7 +32,7 @@ export function buildRetryStrategy(
 ): RetryStrategyFn {
   return function (
     err: Error | InvalidInput | CustomRetryStrategyError,
-    topic: BrokerSubscriptions,
+    topic: string,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     content: any,
     ackOrNackFn: AckOrNack,
@@ -129,12 +127,13 @@ export class RabbitMQAdapter implements Broker {
   }
 
   public async publish<Name extends Events>(
-    topic: BrokerPublications,
     event: EventContext<Name>,
   ): Promise<boolean> {
     if (!this.initialized) {
       return false;
     }
+
+    const topic = 'MessageRelayer';
 
     const logContext = {
       topic,
@@ -190,8 +189,7 @@ export class RabbitMQAdapter implements Broker {
   }
 
   public async subscribe(
-    topic: BrokerSubscriptions,
-    handler: EventsHandlerMetadata<EventSchemas>,
+    consumer: () => EventsHandlerMetadata<EventSchemas>,
     retryStrategy?: RetryStrategyFn,
     hooks?: {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -200,6 +198,8 @@ export class RabbitMQAdapter implements Broker {
       afterHandleEvent: (topic: string, event: any, context: any) => void;
     },
   ): Promise<boolean> {
+    const topic = consumer.name;
+
     if (!this.initialized) {
       return false;
     }
@@ -215,6 +215,8 @@ export class RabbitMQAdapter implements Broker {
       );
       return false;
     }
+
+    const handler = consumer();
 
     try {
       this._log.info(`${this.name} subscribing to ${topic}`);

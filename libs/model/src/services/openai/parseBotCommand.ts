@@ -62,7 +62,8 @@ export class ParseBotCommandError extends Error {
   static ERRORS = {
     NoResponse: 'Failed to create contest. Verify your prompt or try again.',
     InvalidParams:
-      'Failed to create contest. Specify all contest parameters: winners, prize distribution to voters, title, image and token address.',
+      'Failed to create contest. Specify all contest parameters: winners, prize ' +
+      'distribution to voters, title, image and token address.',
   } as const;
 
   constructor(message: keyof typeof ParseBotCommandError.ERRORS) {

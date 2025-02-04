@@ -1,12 +1,10 @@
 import {
   RabbitMQAdapter,
-  RascalConfigServices,
   buildRetryStrategy,
-  getRabbitMQConfig,
+  createRmqConfig,
 } from '@hicommonwealth/adapters';
 import {
   Broker,
-  BrokerSubscriptions,
   broker,
   handleEvent,
   logger,
@@ -25,14 +23,12 @@ import { EventNames } from '@hicommonwealth/schemas';
 import { Client } from 'pg';
 import { config } from 'server/config';
 import { setupListener } from './pgListener';
+import { rascalConsumerMap } from './rascalConsumerMap';
 import { incrementNumUnrelayedEvents, relayForever } from './relayForever';
 
 const log = logger(import.meta);
 
-function checkSubscriptionResponse(
-  subRes: boolean,
-  topic: BrokerSubscriptions,
-) {
+function checkSubscriptionResponse(subRes: boolean, topic: string) {
   if (!subRes) {
     log.fatal(`Failed to subscribe to ${topic}. Requires restart!`, undefined, {
       topic,
@@ -46,10 +42,10 @@ export async function bootstrapBindings(
   let brokerInstance: Broker;
   try {
     const rmqAdapter = new RabbitMQAdapter(
-      getRabbitMQConfig(
-        config.BROKER.RABBITMQ_URI,
-        RascalConfigServices.CommonwealthService,
-      ),
+      createRmqConfig({
+        rabbitMqUri: config.BROKER.RABBITMQ_URI,
+        map: rascalConsumerMap,
+      }),
     );
     await rmqAdapter.init();
     if (!skipRmqAdapter) {
@@ -65,15 +61,11 @@ export async function bootstrapBindings(
     throw e;
   }
 
-  const chainEventSubRes = await brokerInstance.subscribe(
-    BrokerSubscriptions.ChainEvent,
-    ChainEventPolicy(),
-  );
-  checkSubscriptionResponse(chainEventSubRes, BrokerSubscriptions.ChainEvent);
+  const chainEventSubRes = await brokerInstance.subscribe(ChainEventPolicy);
+  checkSubscriptionResponse(chainEventSubRes, ChainEventPolicy.name);
 
   const contestWorkerSubRes = await brokerInstance.subscribe(
-    BrokerSubscriptions.ContestWorkerPolicy,
-    ContestWorker(),
+    ContestWorker,
     buildRetryStrategy(undefined, 20_000),
     {
       beforeHandleEvent: (topic, event, context) => {
@@ -86,56 +78,32 @@ export async function bootstrapBindings(
       },
     },
   );
-  checkSubscriptionResponse(
-    contestWorkerSubRes,
-    BrokerSubscriptions.ContestWorkerPolicy,
-  );
+  checkSubscriptionResponse(contestWorkerSubRes, ContestWorker.name);
 
   const contestProjectionsSubRes = await brokerInstance.subscribe(
-    BrokerSubscriptions.ContestProjection,
-    Contest.Contests(),
+    Contest.Contests,
   );
-  checkSubscriptionResponse(
-    contestProjectionsSubRes,
-    BrokerSubscriptions.ContestProjection,
-  );
+  checkSubscriptionResponse(contestProjectionsSubRes, Contest.Contests.name);
 
-  const xpProjectionSubRes = await brokerInstance.subscribe(
-    BrokerSubscriptions.XpProjection,
-    User.Xp(),
-  );
-  checkSubscriptionResponse(
-    xpProjectionSubRes,
-    BrokerSubscriptions.XpProjection,
-  );
+  const xpProjectionSubRes = await brokerInstance.subscribe(User.Xp);
+  checkSubscriptionResponse(xpProjectionSubRes, User.Xp.name);
 
   const userReferralsProjectionSubRes = await brokerInstance.subscribe(
-    BrokerSubscriptions.UserReferrals,
-    User.UserReferrals(),
+    User.UserReferrals,
   );
   checkSubscriptionResponse(
     userReferralsProjectionSubRes,
-    BrokerSubscriptions.UserReferrals,
+    User.UserReferrals.name,
   );
 
   const farcasterWorkerSubRes = await brokerInstance.subscribe(
-    BrokerSubscriptions.FarcasterWorkerPolicy,
-    FarcasterWorker(),
+    FarcasterWorker,
     buildRetryStrategy(undefined, 20_000),
   );
-  checkSubscriptionResponse(
-    farcasterWorkerSubRes,
-    BrokerSubscriptions.FarcasterWorkerPolicy,
-  );
+  checkSubscriptionResponse(farcasterWorkerSubRes, FarcasterWorker.name);
 
-  const discordBotSubRes = await brokerInstance.subscribe(
-    BrokerSubscriptions.DiscordBotPolicy,
-    DiscordBotPolicy(),
-  );
-  checkSubscriptionResponse(
-    discordBotSubRes,
-    BrokerSubscriptions.DiscordBotPolicy,
-  );
+  const discordBotSubRes = await brokerInstance.subscribe(DiscordBotPolicy);
+  checkSubscriptionResponse(discordBotSubRes, DiscordBotPolicy.name);
 }
 
 export async function bootstrapRelayer(

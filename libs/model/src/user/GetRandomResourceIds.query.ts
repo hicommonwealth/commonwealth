@@ -15,7 +15,11 @@ export function GetRandomResourceIds(): Query<
       const { exclude_joined_communities, cursor, limit } = payload;
 
       const sql = `
-        ${exclude_joined_communities ? 'WITH UserJoinedCommunities AS (SELECT community_id as id FROM "Addresses" where user_id = :user_id)' : ''}
+        ${
+          exclude_joined_communities
+            ? 'WITH UserJoinedCommunities AS (SELECT community_id as id FROM "Addresses" where user_id = :user_id)'
+            : ''
+        }
         SELECT 
           C.id as community_id, 
           T.id as thread_id, 
