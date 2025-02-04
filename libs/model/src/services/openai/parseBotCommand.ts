@@ -13,6 +13,8 @@ export type ContestMetadataResponse = {
   tokenAddress: string;
 };
 
+export const DEFAULT_VOTER_SHARE = 15;
+
 const system_prompt: ChatCompletionMessage = {
   role: 'assistant',
   content: `
@@ -31,10 +33,14 @@ const system_prompt: ChatCompletionMessage = {
       "tokenAddress": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
     }
     \n
-    The payoutStructure refers to the percentage given to each winner and its values must always add up to 100.
-    Any mention of dividing equally refers to the payoutStructure.
+    \n
+    The length of payoutStructure array is the number of winners.
+    payoutStructure represents the percentage alloted to each winner and its values must all add up to 100.
+    Any mention of dividing equally refers to payoutStructure, all values being equal.
     Any mention of shares, allocation or distribution to voters should be assigned to the voterShare
     which is independent of payoutStructure.
+    If the vote share is not mentioned, then it should be 0 by default.
+    If it is said that X% goes to one winner, then payoutStructure is [X] because the sole winner gets X%.
     `,
 };
 
@@ -92,7 +98,7 @@ export const parseBotCommand = async (
   });
 
   const response = await openai.chat.completions.create({
-    model: 'gpt-4-turbo',
+    model: 'o3-mini',
     messages: [
       system_prompt,
       {
@@ -112,16 +118,29 @@ export const parseBotCommand = async (
     throw new ParseBotCommandError('NoResponse');
   }
 
-  // if payout structure has any remainder under 100, give it to first winner
   if (!data.payoutStructure.length) {
     throw new ParseBotCommandError('InvalidParams');
   }
+
   const payoutStructure: Array<number> = data.payoutStructure.map((n: number) =>
     Math.floor(n),
   );
-  const sum = payoutStructure.reduce((p, acc) => acc + p, 0);
-  if (sum < 100) {
-    const remainder = 100 - sum;
+
+  // first pass: ensure that there are always 3 slots
+  // if there's only 1 split and sum is less than 100
+  const sumA = payoutStructure.reduce((p, acc) => acc + p, 0);
+  if (payoutStructure.length === 1 && sumA < 100) {
+    const remainder = 100 - sumA;
+    const splitRemainder = Math.floor(remainder / 2);
+    payoutStructure.push(splitRemainder);
+    payoutStructure.push(splitRemainder);
+  }
+
+  // if payout structure has any remainder under 100,
+  // give to winner
+  const sumB = payoutStructure.reduce((p, acc) => acc + p, 0);
+  if (sumB < 100) {
+    const remainder = 100 - sumB;
     payoutStructure[0] += remainder;
   }
 
@@ -132,7 +151,7 @@ export const parseBotCommand = async (
   return {
     contestName: data.contestName,
     payoutStructure,
-    voterShare: data.voterShare || 0,
+    voterShare: data.voterShare || DEFAULT_VOTER_SHARE,
     image_url: data.image_url,
     tokenAddress: data.tokenAddress,
   };
