@@ -1,5 +1,4 @@
 export * from './RabbitMQAdapter';
-export * from './rabbitMQConfig';
-export { getRabbitMQConfig } from './rabbitMQConfig';
+export { createRmqConfig } from './createRmqConfig';
 export * from './types';
 export * from './util';

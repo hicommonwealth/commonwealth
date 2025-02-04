@@ -1,17 +1,10 @@
 import { config as EnvConfig, RascalExchanges } from '@hicommonwealth/adapters';
-import { RoutingKeyTags } from '@hicommonwealth/core';
 import {
-  ChainEventPolicy,
-  Contest,
-  ContestWorker,
-  DiscordBotPolicy,
-  FarcasterWorker,
-  NotificationsPolicy,
-  User,
-} from '@hicommonwealth/model';
-import { EventNames } from '@hicommonwealth/schemas';
-import { BrokerConfig, ConnectionConfig } from 'rascal';
-import { NotificationsSettingsPolicy } from '../workers/knock/NotificationsSettings.policy';
+  BindingConfig,
+  BrokerConfig,
+  ConnectionConfig,
+  QueueConfig,
+} from 'rascal';
 
 /**
  * Generates the RabbitMQ configuration on the fly given a set of policies
@@ -30,7 +23,10 @@ export function createRmqConfig({
 }: {
   rabbitMqUri: string;
   // TODO: add types so that override keys are a partial record of consumer input generic
-  map: { consumer: any; overrides?: Record<string, string | null> }[];
+  map: {
+    consumer: any;
+    overrides?: Record<string, string | null | undefined>;
+  }[];
 }) {
   let vhost: string, purge: boolean;
 
@@ -111,7 +107,10 @@ export function createRmqConfig({
   for (const { consumer, overrides } of map) {
     const consumerName = consumer.name;
     const queue = `${consumerName}Queue`;
-    config.vhosts![vhost].queues![queue] = {
+    const queues = config.vhosts![vhost].queues as {
+      [key: string]: QueueConfig;
+    };
+    queues[queue] = {
       ...queueConfig,
       options: {
         arguments: {
@@ -120,7 +119,10 @@ export function createRmqConfig({
         },
       },
     };
-    config.vhosts![vhost].bindings![`${consumerName}Binding`] = {
+    const bindings = config.vhosts![vhost].bindings as {
+      [key: string]: BindingConfig;
+    };
+    bindings[`${consumerName}Binding`] = {
       source: RascalExchanges.MessageRelayer,
       destination: queue,
       destinationType: 'queue',
@@ -147,49 +149,3 @@ export function createRmqConfig({
 
   return config;
 }
-
-createRmqConfig({
-  rabbitMqUri: 'localhost:5672',
-  map: [
-    {
-      consumer: ChainEventPolicy,
-    },
-    {
-      consumer: DiscordBotPolicy,
-    },
-    {
-      consumer: NotificationsPolicy,
-      overrides: {
-        ThreadCreated: null,
-        ThreadUpvoted: `${EventNames.ThreadUpvoted}.#`,
-      },
-    },
-    {
-      consumer: NotificationsSettingsPolicy,
-    },
-    {
-      consumer: ContestWorker,
-      overrides: {
-        ThreadCreated: `${EventNames.ThreadCreated}.${RoutingKeyTags.Contest}.#`,
-        ThreadUpvoted: `${EventNames.ThreadUpvoted}.${RoutingKeyTags.Contest}.#`,
-        ContestRolloverTimerTicked: null,
-      },
-    },
-    {
-      consumer: Contest.Contests,
-    },
-    {
-      consumer: User.Xp,
-      overrides: {
-        ThreadCreated: `${EventNames.ThreadCreated}.#`,
-        ThreadUpvoted: `${EventNames.ThreadUpvoted}.#`,
-      },
-    },
-    {
-      consumer: User.UserReferrals,
-    },
-    {
-      consumer: FarcasterWorker,
-    },
-  ],
-});

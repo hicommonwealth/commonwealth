@@ -155,7 +155,7 @@ export interface Analytics extends Disposable {
 
 export type RetryStrategyFn = (
   err: Error | InvalidInput | CustomRetryStrategyError,
-  topic: BrokerSubscriptions,
+  topic: BrokerSubscriptions | string,
   content: any,
   ackOrNackFn: (...args: any[]) => void,
   log: ILogger,
@@ -237,8 +237,7 @@ export interface Broker extends Disposable {
   ): Promise<boolean>;
 
   subscribe<Inputs extends EventSchemas>(
-    topic: BrokerSubscriptions,
-    handler: EventsHandlerMetadata<Inputs>,
+    consumer: () => EventsHandlerMetadata<Inputs>,
     retryStrategy?: RetryStrategyFn,
     hooks?: {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
