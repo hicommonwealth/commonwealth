@@ -122,9 +122,8 @@ const CommunityMembersPage = () => {
       sortable: true,
     },
     {
-      key: 'groups',
-      header: 'Groups',
-      hasCustomSortValue: true,
+      key: 'addresses',
+      header: 'Address',
       numeric: false,
       sortable: false,
     },
@@ -137,10 +136,17 @@ const CommunityMembersPage = () => {
       hidden: !isStakedCommunity,
     },
     {
-      key: 'lastActive',
-      header: 'Last Active',
+      key: 'groups',
+      header: 'Groups',
+      hasCustomSortValue: true,
       numeric: false,
-      sortable: true,
+      sortable: false,
+    },
+    {
+      key: 'actions',
+      header: 'Onchain Role',
+      numeric: false,
+      sortable: false,
     },
   ];
 
@@ -226,6 +232,7 @@ const CommunityMembersPage = () => {
         avatarUrl: p.avatar_url,
         name: p.profile_name || DEFAULT_NAME,
         role: p.addresses[0].role,
+        addresses: p.addresses,
         groups: (p.group_ids || [])
           .map((groupId) => {
             const matchedGroup = (groups || []).find((g) => g.id === groupId);
