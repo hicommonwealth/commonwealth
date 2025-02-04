@@ -19,8 +19,6 @@ export type ContestMetadataResponse = {
   tokenAddress: string;
 };
 
-export const DEFAULT_VOTER_SHARE = 15;
-
 const system_prompt: ChatCompletionMessage = {
   role: 'assistant',
   content: `
