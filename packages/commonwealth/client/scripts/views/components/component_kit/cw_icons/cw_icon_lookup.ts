@@ -38,6 +38,7 @@ import {
   Compass,
   Copy,
   CopySimple,
+  DiscordLogo,
   DotsThreeVertical,
   Download,
   DownloadSimple,
@@ -96,6 +97,7 @@ import {
   Users,
   UsersThree,
   Warning,
+  XLogo,
 } from '@phosphor-icons/react';
 import * as CustomIcons from './cw_custom_icons';
 import { CWPara } from './cw_custom_icons';
@@ -307,6 +309,8 @@ export const iconLookup = {
   viewAll: withPhosphorIcon(Rows),
   viewOverView: withPhosphorIcon(CirclesFour),
   kanban: withPhosphorIcon(Kanban),
+  xTwitter: withPhosphorIcon(XLogo),
+  discordLogo: withPhosphorIcon(DiscordLogo),
 };
 
 export const customIconLookup = {

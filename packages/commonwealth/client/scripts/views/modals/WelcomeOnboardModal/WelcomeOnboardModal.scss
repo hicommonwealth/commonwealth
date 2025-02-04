@@ -3,6 +3,7 @@
 .WelcomeOnboardModal {
   overflow-y: scroll;
   position: relative;
+  padding-bottom: 10px;
   .logo-container {
     width: 100%;
     display: flex;
@@ -21,6 +22,20 @@
   }
 
   .content {
+    @include extraSmall {
+      height: 100%;
+    }
+    .logo {
+      display: flex;
+      height: auto;
+      margin: auto;
+      width: 210px;
+      @include extraSmall {
+        width: 175px;
+        display: flex;
+        gap: 14px;
+      }
+    }
     .close-btn {
       position: absolute;
       right: 0;

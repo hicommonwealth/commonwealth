@@ -1,4 +1,5 @@
 import { WalletSsoSource } from '@hicommonwealth/shared';
+import useBrowserWindow from 'client/scripts/hooks/useBrowserWindow';
 import { getUniqueUserAddresses } from 'helpers/user';
 import React, { useEffect, useState } from 'react';
 import { useAuthModalStore, useWelcomeOnboardModal } from 'state/ui/modals';
@@ -13,14 +14,16 @@ import { AuthModalProps, AuthModalType } from './types';
 const AuthModal = ({
   type = AuthModalType.SignIn,
   isOpen,
+  triggerOpenEVMWalletsSubModal,
   onClose,
   onSuccess,
   showWalletsFor,
+  isUserFromWebView,
 }: AuthModalProps) => {
   const [modalType, setModalType] = useState(type);
   const { sessionKeyValidationError } = useAuthModalStore();
   const { setIsWelcomeOnboardModalOpen } = useWelcomeOnboardModal();
-
+  const { isWindowSmallInclusive } = useBrowserWindow({});
   useEffect(() => {
     // reset `modalType` state whenever modal is opened
     isOpen && setModalType(type);
@@ -52,6 +55,8 @@ const AuthModal = ({
       onSuccess: handleSuccess,
       showWalletsFor,
       onSignInClick: handleOnSignInClick,
+      triggerOpenEVMWalletsSubModal,
+      isUserFromWebView,
     };
 
     switch (modalType) {
@@ -87,6 +92,7 @@ const AuthModal = ({
       size="medium"
       className="AuthModal"
       content={getActiveModalComponent()}
+      isFullScreen={isWindowSmallInclusive}
     />
   );
 };

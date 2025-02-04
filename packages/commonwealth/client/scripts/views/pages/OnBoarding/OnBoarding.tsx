@@ -46,7 +46,7 @@ const OnBoarding = () => {
   const handleNextSlide = () => {
     if (swiperRef.current) {
       if (isLastSlide) {
-        navigate(`/discussions`);
+        navigate(`/dashboard/global?openAuthModal=true`);
       }
       swiperRef.current.slideNext();
     }

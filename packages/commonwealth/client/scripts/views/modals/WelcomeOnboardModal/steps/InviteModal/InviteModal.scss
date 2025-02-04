@@ -1,0 +1,127 @@
+@import '../../../../../styles/shared.scss';
+
+.InviteModal {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  flex-direction: column;
+  justify-content: space-between;
+  padding-bottom: 2rem;
+  .logo {
+    height: auto;
+    margin: auto;
+    width: 227px;
+    @include extraSmall {
+      width: 175px;
+    }
+  }
+  .referral_logo {
+    height: auto;
+    margin: auto;
+    width: 250px;
+
+    @include extraSmall {
+      width: 100%;
+      max-width: 266px;
+    }
+  }
+  .address_container {
+    width: 100%;
+    margin: auto;
+    display: flex;
+    background: #f7f7f7;
+    height: 60px;
+    max-height: 70px;
+    padding: 2px;
+    border-radius: 5px;
+    justify-content: space-between;
+    align-items: center;
+    flex-direction: row;
+    .Text {
+      max-width: 80%;
+      overflow: hidden;
+    }
+  }
+  .share_container {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+    .share_content {
+      gap: 1rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      .icon_container {
+        cursor: pointer;
+        border-radius: 100%;
+        padding: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 55px;
+        height: 55px;
+        .Icon.large {
+          color: white;
+        }
+      }
+      .label {
+        font-size: 14px;
+        font-weight: 500;
+        line-height: 24px;
+        color: #000000;
+      }
+    }
+  }
+  .buttons_container {
+    margin-top: 20px;
+    display: flex;
+    gap: 1rem;
+    width: 100%;
+    position: relative;
+    align-items: center;
+    justify-content: space-between;
+    .skip-button {
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      width: auto !important;
+      position: relative !important;
+      transform: translate(0%);
+
+      .primary {
+        padding-left: 2rem;
+        padding-right: 2rem;
+        border: 1px solid $primary-600;
+        background-color: transparent !important;
+
+        .button-text {
+          color: $primary-600 !important;
+        }
+      }
+    }
+
+    .next-button {
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      transform: translate(0%);
+      width: auto !important;
+      position: relative !important;
+      .primary {
+        padding-left: 2rem;
+        padding-right: 2rem;
+        border: 1px solid $primary-600;
+        background-color: $primary-600;
+        .button-text {
+          color: white !important;
+        }
+      }
+    }
+  }
+}

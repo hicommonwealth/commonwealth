@@ -23,13 +23,17 @@
   }
 
   .action-btns {
-    margin-top: 12px;
-    display: grid;
-    grid-template-columns: 1fr 3fr;
-    align-items: center;
-    gap: 24px;
-
+    width: 80%;
+    justify-content: space-between;
+    display: flex;
+    position: absolute;
+    bottom: 2px;
+    margin-top: 10px;
+    .primary {
+      background-color: $primary-600 !important;
+    }
     @include extraSmall {
+      bottom: 80px;
       grid-template-columns: 1fr 1fr;
       gap: 16px;
     }
