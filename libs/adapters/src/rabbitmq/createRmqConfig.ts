@@ -1,5 +1,9 @@
 import { config as EnvConfig } from '@hicommonwealth/adapters';
-import { EventSchemas, EventsHandlerMetadata } from '@hicommonwealth/core';
+import {
+  EventSchemas,
+  EventsHandlerMetadata,
+  outboxEvents,
+} from '@hicommonwealth/core';
 import {
   BindingConfig,
   BrokerConfig,
@@ -35,7 +39,7 @@ export function createRmqConfig({
   map,
 }: {
   rabbitMqUri: string;
-  // TODO: add types so that override keys are a partial record of consumer input generic
+  // TODO: @Roger - add types so that override keys are a partial record of consumer input type
   map: Array<Consumers>;
 }) {
   let vhost: string, purge: boolean;
@@ -70,7 +74,6 @@ export function createRmqConfig({
   };
 
   const deadLetterQueue = 'DeadLetterQueue';
-  // @ts-ignore
   const config: BrokerConfig = {
     vhosts: {
       [vhost]: {
@@ -101,9 +104,6 @@ export function createRmqConfig({
           MessageRelayer: {
             exchange: RascalExchanges.MessageRelayer,
             confirm: true,
-            // TODO: Bump rascal + @types/rascal to latest
-            // @ts-ignore --> Rascal type issue
-            timeout: 10000,
             options: {
               persistent: true,
             },
@@ -146,6 +146,12 @@ export function createRmqConfig({
       destinationType: 'queue',
       bindingKeys: Object.keys(consumer().inputs).reduce(
         (acc: string[], val) => {
+          // if consumer handler does not have an associated event
+          // from the Outbox exclude it automatically
+          if (!Object.keys(outboxEvents).includes(val)) {
+            return acc;
+          }
+
           if (!overrides) acc.push(val);
           else if (overrides[val] !== null) {
             acc.push(overrides[val] || val);

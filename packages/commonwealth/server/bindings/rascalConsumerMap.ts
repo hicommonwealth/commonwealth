@@ -23,7 +23,6 @@ export const rascalConsumerMap = [
     overrides: {
       ThreadCreated: `${EventNames.ThreadCreated}.${RoutingKeyTags.Contest}.#`,
       ThreadUpvoted: `${EventNames.ThreadUpvoted}.${RoutingKeyTags.Contest}.#`,
-      ContestRolloverTimerTicked: null,
     },
   },
   {
