@@ -199,7 +199,7 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
               buttonText=""
               buttonLink=""
               growlType=""
-              growlImage={''}
+              growlImage=""
               extraText=""
             />
           )}
