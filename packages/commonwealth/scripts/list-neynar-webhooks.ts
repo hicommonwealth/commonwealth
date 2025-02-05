@@ -15,7 +15,7 @@ const log = logger(import.meta);
 
 const props = ['active', 'webhook_id', 'target_url', 'created_at'];
 
-async function checkProd() {
+async function listNeynarWebhooks() {
   // fetch neynar webooks
   const client = new NeynarAPIClient(config.CONTESTS.NEYNAR_API_KEY!);
   const webhooksRes = await client.fetchWebhooks();
@@ -30,7 +30,7 @@ async function checkProd() {
   }
 }
 
-checkProd().catch((err) => {
+listNeynarWebhooks().catch((err) => {
   console.error(err);
   exit(1);
 });
