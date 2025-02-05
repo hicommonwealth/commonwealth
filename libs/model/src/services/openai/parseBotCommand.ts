@@ -6,7 +6,7 @@ import {
 import { config } from '../../config';
 
 export const DEFAULT_CONTEST_BOT_PARAMS = {
-  payoutStructure: [40, 30, 20],
+  payoutStructure: [50, 30, 20],
   voterShare: 10,
   image_url:
     'https://assets.commonwealth.im/42b9d2d9-79b8-473d-b404-b4e819328ded.png',
