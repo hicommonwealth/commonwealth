@@ -23,12 +23,7 @@ export const namespaceFactoryAbi = [
   {
     anonymous: false,
     inputs: [
-      {
-        indexed: false,
-        internalType: 'address',
-        name: 'namespaceAdress',
-        type: 'address',
-      },
+      { indexed: false, internalType: 'string', name: 'name', type: 'string' },
       {
         indexed: false,
         internalType: 'address',
@@ -45,6 +40,12 @@ export const namespaceFactoryAbi = [
         indexed: false,
         internalType: 'address',
         name: '_namespaceDeployer',
+        type: 'address',
+      },
+      {
+        indexed: false,
+        internalType: 'address',
+        name: 'namespaceAdress',
         type: 'address',
       },
     ],
