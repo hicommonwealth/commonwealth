@@ -881,6 +881,9 @@ importers:
       '@ethersproject/wallet':
         specifier: ^5.7.0
         version: 5.7.0
+      '@farcaster/frame-sdk':
+        specifier: ^0.0.26
+        version: 0.0.26(typescript@5.4.5)(zod@3.23.6)
       '@glidejs/glide':
         specifier: ^3.6.0
         version: 3.6.0
@@ -4088,6 +4091,12 @@ packages:
   '@faker-js/faker@8.4.1':
     resolution: {integrity: sha512-XQ3cU+Q8Uqmrbf2e0cIC/QN43sTBSC8KF12u29Mb47tWrt2hAgBXSgpZMj4Ao8Uk0iJcU99QsOCaIL8934obCg==}
     engines: {node: ^14.17.0 || ^16.13.0 || >=18.0.0, npm: '>=6.14.13'}
+
+  '@farcaster/frame-core@0.0.24':
+    resolution: {integrity: sha512-iO/Jxz6mZBVUoLIY753Id5Yhn6DHBakQkIBXf0mreAcnjPGCMvKx/0xKEM3ns3M801PqoX7VLYO4q+kKxYzQ0A==}
+
+  '@farcaster/frame-sdk@0.0.26':
+    resolution: {integrity: sha512-tOoJcJLXXezjmP0gg/MOU/mCjNdWyL+j99XMylYCovel1etDQjLovGamVex8A6eELryLZ4LElV9AIbxP/i9IfA==}
 
   '@fastify/busboy@2.1.1':
     resolution: {integrity: sha512-vBZP4NlzfOlerQTnba4aqZoMhE/a9HY7HRqoOPaETQcSQuWEIyZMHGfVu6w9wGtGK5fED5qRs2DteVCjOH60sA==}
@@ -10070,6 +10079,9 @@ packages:
     resolution: {integrity: sha512-FQN4MRfuJeHf7cBbBMJFXhKSDq+2kAArBlmRBvcvFE5BB1HZKXtSFASDhdlz9zOYwxh8lDdnvmMOe/+5cdoEdg==}
     engines: {node: '>= 0.8'}
 
+  comlink@4.4.2:
+    resolution: {integrity: sha512-OxGdvBmJuNKSCMO4NTl1L47VRp6xn2wG4F/2hYzB6tiCb709otOxtEYCSvK80PtjODfXXZu8ds+Nw5kVCjqd2g==}
+
   command-exists@1.2.9:
     resolution: {integrity: sha512-LTQ/SGc+s0Xc0Fu5WaKnR0YiygZkm9eKFvyS+fRsU7/ZWFF8ykFM6Pc9aCVf1+xasOOZpO3BAVgVrKvsqKHV7w==}
 
@@ -14856,6 +14868,14 @@ packages:
       typescript:
         optional: true
 
+  ox@0.4.4:
+    resolution: {integrity: sha512-oJPEeCDs9iNiPs6J0rTx+Y0KGeCGyCAA3zo94yZhm8G5WpOxrwUtn2Ie/Y8IyARSqqY/j9JTKA3Fc1xs1DvFnw==}
+    peerDependencies:
+      typescript: '>=5.4.0'
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+
   p-defer@4.0.1:
     resolution: {integrity: sha512-Mr5KC5efvAK5VUptYEIopP1bakB85k2IWXaRC0rsh1uwn1L6M0LVml8OIQ4Gudg4oyZakf7FmeRLkMMtZW1i5A==}
     engines: {node: '>=12'}
@@ -18938,6 +18958,9 @@ packages:
   zod@3.23.8:
     resolution: {integrity: sha512-XBx9AXhXktjUqnepgTiE5flcKIYWi/rme0Eaj+5Y0lftuGBq+jyRu/md4WnuxqgP1ubdpNCsYEYPxrzVHD8d6g==}
 
+  zod@3.24.1:
+    resolution: {integrity: sha512-muH7gBL9sI1nciMZV67X5fTKKBLtwpZ5VBp1vsOQzj1MhrBZ4wlVCm3gedKZWLp0Oyel8sIGfeiz54Su+OVT+A==}
+
   zustand@3.7.2:
     resolution: {integrity: sha512-PIJDIZKtokhof+9+60cpockVOq05sJzHCriyvaLBmEJixseQ1a5Kdov6fWZfWOu5SK9c+FhH1jU0tntLxRJYMA==}
     engines: {node: '>=12.7.0'}
@@ -22028,8 +22051,8 @@ snapshots:
       '@canvas-js/modeldb': 0.13.14
       '@canvas-js/utils': 0.13.14
       '@ipld/dag-json': 10.2.3
-      '@types/better-sqlite3': 7.6.11
-      better-sqlite3: 11.1.2
+      '@types/better-sqlite3': 7.6.12
+      better-sqlite3: 11.8.1
       expo-sqlite: 14.0.6(expo@52.0.28(@babel/core@7.25.7)(@babel/preset-env@7.25.3(@babel/core@7.25.7))(bufferutil@4.0.8)(encoding@0.1.13)(graphql@16.9.0)(react-native-webview@11.26.1(react-native@0.75.1(@babel/core@7.25.7)(@babel/preset-env@7.25.3(@babel/core@7.25.7))(@types/react@18.3.3)(bufferutil@4.0.8)(encoding@0.1.13)(react@18.3.1)(typescript@5.4.5)(utf-8-validate@5.0.10))(react@18.3.1))(react-native@0.75.1(@babel/core@7.25.7)(@babel/preset-env@7.25.3(@babel/core@7.25.7))(@types/react@18.3.3)(bufferutil@4.0.8)(encoding@0.1.13)(react@18.3.1)(typescript@5.4.5)(utf-8-validate@5.0.10))(react@18.3.1)(utf-8-validate@5.0.10))
     transitivePeerDependencies:
       - expo
@@ -23846,6 +23869,23 @@ snapshots:
       js-yaml: 4.1.0
 
   '@faker-js/faker@8.4.1': {}
+
+  '@farcaster/frame-core@0.0.24(typescript@5.4.5)':
+    dependencies:
+      ox: 0.4.4(typescript@5.4.5)(zod@3.24.1)
+      zod: 3.24.1
+    transitivePeerDependencies:
+      - typescript
+
+  '@farcaster/frame-sdk@0.0.26(typescript@5.4.5)(zod@3.23.6)':
+    dependencies:
+      '@farcaster/frame-core': 0.0.24(typescript@5.4.5)
+      comlink: 4.4.2
+      eventemitter3: 5.0.1
+      ox: 0.4.4(typescript@5.4.5)(zod@3.23.6)
+    transitivePeerDependencies:
+      - typescript
+      - zod
 
   '@fastify/busboy@2.1.1': {}
 
@@ -32008,6 +32048,11 @@ snapshots:
       typescript: 5.4.5
       zod: 3.23.6
 
+  abitype@1.0.6(typescript@5.4.5)(zod@3.24.1):
+    optionalDependencies:
+      typescript: 5.4.5
+      zod: 3.24.1
+
   abort-controller@3.0.0:
     dependencies:
       event-target-shim: 5.0.1
@@ -32335,7 +32380,7 @@ snapshots:
 
   asn1.js@4.10.1:
     dependencies:
-      bn.js: 4.12.0
+      bn.js: 4.12.1
       inherits: 2.0.4
       minimalistic-assert: 1.0.1
 
@@ -33395,6 +33440,8 @@ snapshots:
   combined-stream@1.0.8:
     dependencies:
       delayed-stream: 1.0.0
+
+  comlink@4.4.2: {}
 
   command-exists@1.2.9: {}
 
@@ -35100,7 +35147,7 @@ snapshots:
 
   ethereumjs-abi@0.6.5:
     dependencies:
-      bn.js: 4.12.0
+      bn.js: 4.12.1
       ethereumjs-util: 4.5.1
 
   ethereumjs-abi@0.6.8:
@@ -35118,7 +35165,7 @@ snapshots:
 
   ethereumjs-util@5.2.1:
     dependencies:
-      bn.js: 4.12.0
+      bn.js: 4.12.1
       create-hash: 1.2.0
       elliptic: 6.5.5
       ethereum-cryptography: 0.1.3
@@ -39838,6 +39885,34 @@ snapshots:
     transitivePeerDependencies:
       - zod
 
+  ox@0.4.4(typescript@5.4.5)(zod@3.23.6):
+    dependencies:
+      '@adraffy/ens-normalize': 1.11.0
+      '@noble/curves': 1.8.1
+      '@noble/hashes': 1.7.1
+      '@scure/bip32': 1.5.0
+      '@scure/bip39': 1.4.0
+      abitype: 1.0.6(typescript@5.4.5)(zod@3.23.6)
+      eventemitter3: 5.0.1
+    optionalDependencies:
+      typescript: 5.4.5
+    transitivePeerDependencies:
+      - zod
+
+  ox@0.4.4(typescript@5.4.5)(zod@3.24.1):
+    dependencies:
+      '@adraffy/ens-normalize': 1.11.0
+      '@noble/curves': 1.8.1
+      '@noble/hashes': 1.7.1
+      '@scure/bip32': 1.5.0
+      '@scure/bip39': 1.4.0
+      abitype: 1.0.6(typescript@5.4.5)(zod@3.24.1)
+      eventemitter3: 5.0.1
+    optionalDependencies:
+      typescript: 5.4.5
+    transitivePeerDependencies:
+      - zod
+
   p-defer@4.0.1: {}
 
   p-event@4.2.0:
@@ -44391,7 +44466,7 @@ snapshots:
 
   web3-utils@1.5.2:
     dependencies:
-      bn.js: 4.12.0
+      bn.js: 4.12.1
       eth-lib: 0.2.8
       ethereum-bloom-filters: 1.1.0
       ethjs-unit: 0.1.6
@@ -44927,6 +45002,8 @@ snapshots:
   zod@3.23.6: {}
 
   zod@3.23.8: {}
+
+  zod@3.24.1: {}
 
   zustand@3.7.2(react@18.3.1):
     optionalDependencies:
