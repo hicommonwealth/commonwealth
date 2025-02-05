@@ -222,6 +222,7 @@ describe('Contests projection lifecycle', () => {
         contest_id,
         start_time,
         end_time,
+        is_one_off: false,
       },
     });
 
@@ -241,6 +242,7 @@ describe('Contests projection lifecycle', () => {
         contest_address: oneoff,
         start_time,
         end_time,
+        is_one_off: true,
       },
     });
 
