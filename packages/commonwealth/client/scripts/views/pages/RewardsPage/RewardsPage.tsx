@@ -32,6 +32,7 @@ const RewardsPage = () => {
   const navigate = useCommonNavigate();
   const user = useUserStore();
   const rewardsEnabled = useFlag('rewardsPage');
+  const xpEnabled = useFlag('xp');
 
   const [mobileTab, setMobileTab] = useState<MobileTabType>(getInitialTab());
   const [tableTab, setTableTab] = useState(tabToTable[getInitialTab()]);
@@ -116,7 +117,7 @@ const RewardsPage = () => {
           <ReferralTable referrals={referrals} isLoading={isReferralsLoading} />
         )}
         {tableTab === TableType.TokenTXHistory && <TokenTXHistoryTable />}
-        {tableTab === TableType.XPEarnings && <XPEarningsTable />}
+        {xpEnabled && tableTab === TableType.XPEarnings && <XPEarningsTable />}
       </section>
     </CWPageLayout>
   );
