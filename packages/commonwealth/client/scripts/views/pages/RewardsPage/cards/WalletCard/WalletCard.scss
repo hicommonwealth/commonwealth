@@ -1,2 +1,15 @@
+@import '../../../../../styles/shared';
+
 .WalletCard {
+  .list {
+    max-height: 120px;
+    overflow: scroll;
+
+    .balance-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid $neutral-50;
+    }
+  }
 }
