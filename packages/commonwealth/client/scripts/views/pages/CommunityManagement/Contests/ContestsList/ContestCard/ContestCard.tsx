@@ -24,9 +24,9 @@ import { openConfirmation } from 'views/modals/confirmation_modal';
 import { ContestType } from '../../types';
 import { copyFarcasterContestFrameUrl, isContestActive } from '../../utils';
 import ContestAlert from '../ContestAlert';
-import ContestCountdown from '../ContestCountdown';
 
 import { buildContestPrizes } from '@hicommonwealth/shared';
+import CWCountDownTimer from 'views/components/component_kit/CWCountDownTimer';
 import './ContestCard.scss';
 
 const noFundsProps = {
@@ -199,7 +199,7 @@ const ContestCard = ({
         <div className="header-row">
           <CWText type="h3">{name}</CWText>
           {finishDate ? (
-            <ContestCountdown finishTime={finishDate} isActive={isActive} />
+            <CWCountDownTimer finishTime={finishDate} isActive={isActive} />
           ) : isActive ? (
             <Skeleton width="70px" />
           ) : null}
