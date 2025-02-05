@@ -59,7 +59,7 @@ export const namespaceFactoryAbi = [
         indexed: false,
         internalType: 'string',
         name: 'name',
-        type: 'address',
+        type: 'string',
       },
       {
         indexed: true,
@@ -94,7 +94,7 @@ export const namespaceFactoryAbi = [
       {
         indexed: false,
         internalType: 'address',
-        name: 'namespaceAdress',
+        name: 'nameSpaceAddress',
         type: 'address',
       },
     ],
