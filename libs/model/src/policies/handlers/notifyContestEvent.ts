@@ -11,7 +11,13 @@ import { Op, QueryTypes } from 'sequelize';
 import z from 'zod';
 import { models } from '../../database';
 
-async function getContestDetails(contest_id: number) {
+async function getContestDetails({
+  contest_address,
+  contest_id,
+}: {
+  contest_address: string;
+  contest_id: number;
+}) {
   const [contest] = await models.sequelize.query<
     z.infer<typeof ContestNotification> & {
       score: z.infer<typeof ContestScore> | null;
@@ -32,9 +38,10 @@ async function getContestDetails(contest_id: number) {
       JOIN "ContestManagers" M ON C.contest_address = M.contest_address
       JOIN "Communities" CO ON M.community_id = CO.id
     WHERE
-      contest_id = :contest_id
+      C.contest_address = :contest_address 
+      AND C.contest_id = :contest_id
     `,
-    { type: QueryTypes.SELECT, replacements: { contest_id } },
+    { type: QueryTypes.SELECT, replacements: { contest_address, contest_id } },
   );
   if (!contest) throw new Error('Contest not found');
   return contest;
@@ -46,11 +53,12 @@ export const notifyContestEvent: EventHandler<
 > = async (
   event: EventContext<'ContestStarted' | 'ContestEnding' | 'ContestEnded'>,
 ) => {
-  const data = await getContestDetails(event.payload.contest_id);
+  const data = await getContestDetails(event.payload);
 
   // all community users get notified
   const addresses = await models.Address.findAll({
-    where: { community_id: data.community_id, verified: true },
+    where: { community_id: data.community_id, verified: { [Op.not]: null } },
+    attributes: ['user_id'],
   });
   const users = addresses.map((a) => {
     return { id: a.user_id?.toString() } as NotificationUser;
@@ -76,25 +84,28 @@ export const notifyContestEvent: EventHandler<
     }
     case 'ContestEnded': {
       // find winner details
-      const winners = await models.Address.findAll({
-        where: {
-          address: { [Op.in]: data.score?.map((s) => s.creator_address) },
-        },
-        attributes: ['address', 'user_id'],
-        include: [
-          {
-            model: models.User,
-            attributes: ['profile'],
-          },
-        ],
-      });
+      const scores = (data.score?.length ?? 0) > 0 ? data.score : undefined;
+      const winners = scores
+        ? await models.Address.findAll({
+            where: {
+              address: { [Op.in]: scores.map((s) => s.creator_address) },
+            },
+            attributes: ['address', 'user_id'],
+            include: [
+              {
+                model: models.User,
+                attributes: ['profile'],
+              },
+            ],
+          })
+        : [];
       const res = await provider.triggerWorkflow({
         key: WorkflowKeys.ContestEnded,
         users,
         data: {
           ...data,
           score:
-            data.score?.map((s) => ({
+            scores?.map((s) => ({
               address: s.creator_address,
               name:
                 winners.find((w) => w.address === s.creator_address)?.User
