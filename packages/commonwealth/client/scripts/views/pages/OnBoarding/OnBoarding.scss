@@ -1,0 +1,110 @@
+@import '../../../styles/shared.scss';
+.OnBoarding {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  justify-content: center;
+  overflow: hidden;
+  background-color: $white;
+
+  .swiper-container {
+    width: 100%;
+    height: 94vh;
+    text-align: center;
+    overflow: hidden;
+    justify-content: flex-start;
+    position: relative;
+    .swiper-pagination {
+      position: absolute;
+      bottom: 94px;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      z-index: 10;
+    }
+
+    .swiper-pagination-bullet {
+      width: 10px;
+      height: 10px;
+      background: #d9d9d9;
+      border-radius: 5px;
+      opacity: 1;
+      margin: 0 5px;
+
+      &.swiper-pagination-bullet-active {
+        background: #514e52;
+      }
+    }
+
+    .swiper-slide {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+
+      .slide-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+
+        .animation-container {
+          overflow: hidden;
+        }
+
+        .slide-title {
+          position: absolute;
+
+          display: flex;
+          width: 100vw;
+          overflow: hidden;
+          padding: 10px;
+          max-height: 20%;
+          overflow: auto;
+          margin-left: 2%;
+          &.bottom {
+            bottom: 146px;
+          }
+          &.top {
+            top: 20px;
+          }
+          .Text {
+            display: inline;
+            text-align: start;
+            font-size: 43px;
+            line-height: 43px;
+            font-family: $font-family-MDNichromeRegular;
+            width: 91%;
+          }
+          .onboarding-title {
+            span {
+              font-size: 43px;
+              font-weight: 700;
+              margin-right: 2px;
+              font-family: $font-family-MDNichrome;
+            }
+          }
+        }
+      }
+    }
+  }
+  .next-button {
+    width: 90vw !important;
+    position: absolute;
+    bottom: 1rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 99;
+    cursor: pointer;
+    border: 0px;
+    height: 48px !important;
+    .primary {
+      background-color: $primary-600 !important;
+      font-family: $font-family-MDNichromeRegular;
+      .btn-border .Button.primary:hover .Text.button-text {
+        font-family: $font-family-MDNichromeRegular !important;
+      }
+    }
+  }
+}

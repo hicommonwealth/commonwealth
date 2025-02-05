@@ -23,22 +23,43 @@ const useXPProgress = () => {
     useFetchQuestsQuery({
       cursor: 1,
       limit: 40,
-      start_after: moment().startOf('week').toDate(),
-      end_before: moment().endOf('week').toDate(),
+      end_after: moment().startOf('week').toDate(),
+      start_before: moment().endOf('week').toDate(),
       enabled: user.isLoggedIn && xpEnabled,
     });
 
-  const allWeeklyQuests = (questsList?.pages || []).flatMap(
-    (page) => page.results,
-  );
-  const allPendingWeeklyQuests = allWeeklyQuests.filter(
-    (q) => !xpProgressions.find((p) => p.quest_id === q.id),
-  );
-  const upcomingWeeklyQuests = allPendingWeeklyQuests.filter((q) =>
+  const allWeeklyQuests = (questsList?.pages || [])
+    .flatMap((page) => page.results)
+    .map((quest) => {
+      const gainedXP =
+        xpProgressions
+          .filter((p) => p.quest_id === quest.id)
+          .map((p) => p.xp_points)
+          .reduce(
+            (accumulator, currentValue) => accumulator + currentValue,
+            0,
+          ) || 0;
+      const totalXP =
+        (quest.action_metas || [])
+          ?.map((action) => action.reward_amount)
+          .reduce(
+            (accumulator, currentValue) => accumulator + currentValue,
+            0,
+          ) || 0;
+      return {
+        ...quest,
+        gainedXP,
+        totalXP,
+        isCompleted: gainedXP === totalXP,
+      };
+    });
+  const upcomingWeeklyQuests = allWeeklyQuests.filter((q) =>
     moment().isBefore(moment(q.start_date)),
   );
-  const activeWeeklyQuests = allPendingWeeklyQuests.filter((q) =>
-    moment().isSameOrAfter(moment(q.start_date)),
+  const activeWeeklyQuests = allWeeklyQuests.filter(
+    (q) =>
+      moment().isSameOrAfter(moment(q.start_date)) &&
+      moment().isBefore(moment(q.end_date)),
   );
   const pendingWeeklyQuests = {
     upcomingWeeklyQuests,
@@ -46,8 +67,8 @@ const useXPProgress = () => {
   };
   const weeklyGoal = {
     current: Math.min(
-      xpProgressions
-        .map((x) => x.xp_points)
+      allWeeklyQuests
+        .map((x) => x.gainedXP)
         .reduce((accumulator, currentValue) => accumulator + currentValue, 0) ||
         0,
       WEEKLY_XP_GOAL,
