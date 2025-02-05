@@ -1,5 +1,5 @@
 import { QuestTable } from './QuestTable';
 import { ReferralTable } from './ReferralTable';
-import { WalletTable } from './WalletTable';
+import { XPEarningsTable } from './XPEarningsTable';
 
-export { QuestTable, ReferralTable, WalletTable };
+export { QuestTable, ReferralTable, XPEarningsTable };

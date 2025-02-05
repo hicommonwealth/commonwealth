@@ -17,7 +17,7 @@ import { PageNotFound } from '../404';
 import './RewardsPage.scss';
 import RewardsTab from './RewardsTab';
 import { QuestCard, ReferralCard, WalletCard } from './cards';
-import { QuestTable, ReferralTable, WalletTable } from './tables';
+import { QuestTable, ReferralTable, XPEarningsTable } from './tables';
 import { MobileTabType, TableType } from './types';
 import {
   calculateReferralTrend,
@@ -116,7 +116,7 @@ const RewardsPage = () => {
           <ReferralTable referrals={referrals} isLoading={isReferralsLoading} />
         )}
         {tableTab === TableType.TokenTXHistory && <QuestTable />}
-        {tableTab === TableType.XPEarnings && <WalletTable />}
+        {tableTab === TableType.XPEarnings && <XPEarningsTable />}
       </section>
     </CWPageLayout>
   );
