@@ -18,6 +18,7 @@ import { trpc, trpcClient } from './utils/trpcClient';
 import { AddToHomeScreenPrompt } from './views/components/AddToHomeScreenPrompt';
 import FarcasterFrameProvider from './views/components/FarcasterProvider';
 import { Mava } from './views/components/Mava';
+import OnBoardingWrapperForMobile from './views/pages/OnBoarding/OnBoardingWrapperForMobile';
 
 OpenFeature.setProvider(openFeatureProvider);
 
@@ -38,17 +39,19 @@ const App = () => {
                   <Splash />
                 ) : (
                   <>
-                    <Mava />
-                    <ReactNativeBridgeUser />
-                    <ReactNativeLogForwarder />
-                    <RouterProvider router={router()} />
-                    {isAddedToHomeScreen || isMarketingPage ? null : (
-                      <AddToHomeScreenPrompt
-                        isIOS={isIOS}
-                        isAndroid={isAndroid}
-                        displayDelayMilliseconds={1000}
-                      />
-                    )}
+                    <OnBoardingWrapperForMobile>
+                      <Mava />
+                      <ReactNativeBridgeUser />
+                      <ReactNativeLogForwarder />
+                      <RouterProvider router={router()} />
+                      {isAddedToHomeScreen || isMarketingPage ? null : (
+                        <AddToHomeScreenPrompt
+                          isIOS={isIOS}
+                          isAndroid={isAndroid}
+                          displayDelayMilliseconds={1000}
+                        />
+                      )}
+                    </OnBoardingWrapperForMobile>
                   </>
                 )}
                 <ToastContainer />
