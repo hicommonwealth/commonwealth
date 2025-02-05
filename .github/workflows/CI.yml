@@ -29,6 +29,59 @@ on:
       - master
 
 jobs:
+  start-prod-server:
+    name: Test Production Server
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      matrix:
+        node: [ 22 ]
+
+    services:
+      postgres:
+        image: hicommonwealth/cw_postgres:latest
+        env:
+          POSTGRES_USER: commonwealth
+          POSTGRES_DB: common_test
+          POSTGRES_PASSWORD: edgeware
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          # Maps tcp port 5432 on service container to the host
+          - 5432:5432
+      redis:
+        image: redis:latest
+        ports:
+          - 6379:6379
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.pr_number && format('refs/pull/{0}/head', github.event.inputs.pr_number) || github.ref }}
+      - uses: ./.github/actions/setup
+        with:
+          node-version: ${{ matrix.node }}
+
+      - uses: ./.github/actions/e2e
+
+      - name: Build server
+        run: pnpm -F commonwealth build
+
+      - name: Run serial e2e tests
+        run: |
+          pnpm -F commonwealth bootstrap-test-db &&
+          (cd packages/commonwealth && node --import=extensionless/register --enable-source-maps ./build/server.js) &
+          (pnpm -F commonwealth wait-server && pnpm -F commonwealth test-e2e-serial --forbid-only)
+      - name: Archive code coverage results
+        uses: actions/upload-artifact@v4
+        with:
+          name: code-coverage-report
+          path: coverage
+
   # Lint with recommendations
   commonwealth-code-quality-recommendations:
     name: Code Quality Recommendations

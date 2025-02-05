@@ -6,6 +6,8 @@ import { useUpdateSubscriptionPreferencesMutation } from 'state/api/trpc/subscri
 // eslint-disable-next-line max-len
 import { usePushNotificationActivated } from 'views/pages/NotificationSettings/usePushNotificationActivated';
 // eslint-disable-next-line max-len
+import { MobileNotifications } from 'client/scripts/utils/MobileNotifications';
+import { isMobileApp } from 'hooks/useReactNativeWebView';
 import useUserStore from 'state/ui/user';
 import { usePushNotificationToggleCallback } from 'views/pages/NotificationSettings/usePushNotificationToggleCallback';
 
@@ -42,6 +44,30 @@ export function useSubscriptionPreferenceSettingCallback(
           ...subscriptionPreferences.data,
           [pref]: activate,
         });
+
+        if (activate) {
+          // *** we have to first request permissions if we're activating.
+
+          if (isMobileApp()) {
+            const existingPermissions =
+              await MobileNotifications.getPermissionsAsync();
+
+            if (existingPermissions.status !== 'granted') {
+              console.log(
+                'Requesting permissions due to existing permissions: ',
+                existingPermissions.status,
+              );
+
+              const permissions =
+                await MobileNotifications.requestPermissionsAsync();
+
+              if (permissions.status !== 'granted') {
+                console.log('Permissions not granted.');
+                return;
+              }
+            }
+          }
+        }
 
         //** now we have to determine how to set push notifications.
 
