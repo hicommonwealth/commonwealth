@@ -18,6 +18,7 @@ import TokenDetails from './TokenDetails/TokenDetails';
 const CommunityHome = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const communityHomeEnabled = useFlag('communityHome');
+  const xpEnabled = useFlag('xp');
   const chain = app.chain.meta.id;
 
   const {
@@ -47,7 +48,7 @@ const CommunityHome = () => {
         </div>
         <ActiveContestList />
         <CommunityTransactions />
-        <XpQuestList communityIdFilter={chain} />
+        {xpEnabled && <XpQuestList communityIdFilter={chain} />}
         <TrendingThreadList
           query={useFetchGlobalActivityQuery}
           communityIdFilter={chain}

@@ -42,7 +42,7 @@
   margin-top: 16px;
   border-top: 1px solid #eee;
   padding-top: 12px;
-  background: #fff;
+  background: white;
   border: 1px solid #ddd;
   border-radius: 8px;
   padding: 16px;
@@ -75,6 +75,10 @@
     display: flex;
     justify-content: center;
     align-items: center;
+  }
+
+  .footer-icon {
+    margin-right: 6px;
   }
 }
 

@@ -243,13 +243,7 @@ const TrendingThreadList = ({
   }
 
   if (!allThreads?.length) {
-    return (
-      <div className="Feed">
-        <div className="no-feed-message">
-          Join some communities to see Activity!
-        </div>
-      </div>
-    );
+    return <></>;
   }
 
   return (

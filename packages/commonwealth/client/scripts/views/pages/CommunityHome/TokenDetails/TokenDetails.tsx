@@ -82,16 +82,12 @@ const TokenDetails = ({
           </CWText>
           <span
             className={`price-change ${
-              isPriceChangeValid && numericPriceChange > 0
+              isPriceChangeValid && numericPriceChange >= 0
                 ? 'positive'
                 : 'negative'
             }`}
           >
-            {isPriceChangeValid
-              ? numericPriceChange > 0
-                ? `▲ ${priceChange}%`
-                : `▼ ${priceChange}%`
-              : 'N/A'}
+            {isPriceChangeValid ? `▲ ${priceChange}%` : 'N/A'}
           </span>
         </div>
         <div className="stat-item">
@@ -133,11 +129,16 @@ const TokenDetails = ({
         </div>
         <div className="token-footer">
           <CWText type="b1" className="faded">
-            <CWIcon iconName="users" /> {communityMemberCount} members
+            <CWIcon iconName="users" iconSize="small" className="footer-icon" />{' '}
+            {communityMemberCount} members
           </CWText>
           <span className="dot">•</span>
           <CWText type="b1" className="faded">
-            <CWIcon iconName="calenderBlank" iconSize="small" />{' '}
+            <CWIcon
+              iconName="calenderBlank"
+              iconSize="small"
+              className="footer-icon"
+            />{' '}
             {communityThreadCount} threads
           </CWText>
         </div>
