@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import './ProfileActivity.scss';
 
 import { mapProfileThread } from 'client/scripts/utils/mapProfileThread';
+import clsx from 'clsx';
 import type Comment from 'models/Comment';
 import type Thread from 'models/Thread';
 import type { IUniqueId } from 'models/interfaces';
@@ -57,7 +58,15 @@ const ProfileActivity = ({ comments, threads }: ProfileActivityProps) => {
           />
         </CWTabsRow>
       </div>
-      <div className="activity-content">
+      <div
+        className={clsx(
+          'activity-content',
+          selectedActivity === ProfileActivityType.Comments ||
+            selectedActivity === ProfileActivityType.Threads
+            ? 'removePadding'
+            : '',
+        )}
+      >
         <ProfileActivityContent
           option={selectedActivity}
           threads={threads}
