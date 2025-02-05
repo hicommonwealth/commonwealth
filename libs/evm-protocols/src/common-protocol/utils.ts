@@ -7,12 +7,25 @@ export type EvmClientType = Web3Type;
 export const calculateVoteWeight = (
   balance: string, // should be in wei
   voteWeight: number = 0,
-  precision: number = 10 ** 18, // precision factor for multiplying
+  precision: number = 10 ** 16, // precision factor for multiplying
 ): bigint | null => {
   if (!balance || voteWeight <= 0) return null;
   // solution to multiply BigInt with fractional vote weight
   const scaledVoteWeight = BigInt(Math.round(voteWeight * precision));
   return (BigInt(balance) * scaledVoteWeight) / BigInt(precision);
+};
+
+export const prettyVoteWeight = (
+  fractionalBalance: string,
+  multiplier: number,
+): string => {
+  const weiStr = Math.floor(
+    parseFloat(fractionalBalance) * 1e18,
+  ).toLocaleString('fullwide', {
+    useGrouping: false,
+  });
+  const weiValue = calculateVoteWeight(weiStr, multiplier || 1) || BigInt(0);
+  return (Number(weiValue) / Number(1e18)).toString();
 };
 
 export enum Denominations {
