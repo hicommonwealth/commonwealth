@@ -10,8 +10,11 @@ import { models } from '../../src/database';
 import { ChainEventPolicy } from '../../src/policies';
 import { commonProtocol } from '../../src/services';
 import { seed } from '../../src/tester';
-import { GetUserReferralFees, UserReferrals } from '../../src/user';
-import { GetUserReferrals } from '../../src/user/GetUserReferrals.query';
+import {
+  GetUserReferralFees,
+  GetUserReferrals,
+  UserReferrals,
+} from '../../src/user';
 import { drainOutbox, seedCommunity } from '../utils';
 
 function chainEvent(
@@ -161,12 +164,13 @@ describe('Referral lifecycle', () => {
         '0x0000000000000000000000000000000000000002',
         EvmEventSignatures.NamespaceFactory.NamespaceDeployedWithReferral,
         [
-          namespaceAddress,
+          'temp name',
           '0x0000000000000000000000000000000000000004', // fee manager address
           admin.address, // referrer
           '0x0000000000000000000000000000000000000003', // referral fee contract
           '0x0', // signature
           nonMember.address!, // referee
+          namespaceAddress,
         ],
       ),
     ];
