@@ -83,7 +83,7 @@ export const notifyContestEvent: EventHandler<
       return !res.some((r) => r.status === 'rejected');
     }
     case 'ContestEnded': {
-      // find winner details
+      // TODO: @rbennettcw what is the contest service to get the final score?
       const scores = (data.score?.length ?? 0) > 0 ? data.score : undefined;
       const winners = scores
         ? await models.Address.findAll({
@@ -99,6 +99,7 @@ export const notifyContestEvent: EventHandler<
             ],
           })
         : [];
+
       const res = await provider.triggerWorkflow({
         key: WorkflowKeys.ContestEnded,
         users,
