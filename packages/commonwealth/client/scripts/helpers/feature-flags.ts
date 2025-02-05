@@ -29,6 +29,7 @@ const featureFlags = {
   newEditor: buildFlag(process.env.FLAG_NEW_EDITOR),
   launchpad: buildFlag(process.env.FLAG_LAUNCHPAD),
   uniswapTrade: buildFlag(process.env.FLAG_UNISWAP_TRADE),
+  newContestPage: buildFlag(process.env.FLAG_NEW_CONTEST_PAGE),
   manageApiKeys: buildFlag(process.env.FLAG_MANAGE_API_KEYS),
   referrals: buildFlag(process.env.FLAG_REFERRALS),
   stickyEditor: buildFlag(process.env.FLAG_STICKY_EDITOR),
