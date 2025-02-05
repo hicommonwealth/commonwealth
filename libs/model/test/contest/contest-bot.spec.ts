@@ -2,6 +2,7 @@
 
 import {
   ContestMetadataResponse,
+  DEFAULT_CONTEST_BOT_PARAMS,
   parseBotCommand,
   ParseBotCommandError,
 } from 'model/src/services/openai/parseBotCommand';
@@ -12,12 +13,9 @@ type TestCase = {
   expectedOutput: ContestMetadataResponse;
 };
 
-const outputA = {
-  contestName: 'amazing memez 2025',
-  payoutStructure: [33, 33, 34],
-  voterShare: 25,
-  image_url: 'https://placehold.co/600x400/EEE/31343C',
+const defaults: Omit<ContestMetadataResponse, 'contestName'> = {
   tokenAddress: '0x429ae85883f82203D736e8fc203A455990745ca1',
+  ...DEFAULT_CONTEST_BOT_PARAMS,
 };
 
 const validateOutput = (
@@ -30,137 +28,459 @@ const validateOutput = (
   expect(actual.voterShare, info).to.eq(expected.voterShare);
   expect(actual.image_url, info).to.eq(expected.image_url);
   expect(actual.tokenAddress, info).to.eq(expected.tokenAddress);
-
-  const sum = actual.payoutStructure.reduce((p, acc) => acc + p, 0);
-  expect(sum, 'sum must be 100: ' + info).to.eq(100);
-
-  expect(actual.payoutStructure.length, info).to.eq(
-    expected.payoutStructure.length,
-  );
-
-  // delta can be off by 1 percent if everything adds to 100
-  for (let i = 0; i < expected.payoutStructure.length; i++) {
-    const expectedPercent = expected.payoutStructure[i];
-    const actualPercent = actual.payoutStructure[i];
-    const delta = Math.abs(expectedPercent - actualPercent);
-    expect(delta, info).to.be.lessThanOrEqual(1);
-  }
+  expect(actual.payoutStructure, info).to.eq(expected.payoutStructure);
 };
 
+// TODO: ENABLE ALL TESTS
 const testCases: Array<TestCase> = [
   {
-    input: `hey @contestbot create a contest with the token 0x429ae85883f82203D736e8fc203A455990745ca1 with 25% of prize amount
-allocated to voters and a third to each of three winners. The contest title is 'amazing memez 2025'. Use the following image https:
-//placehold.co/600x400/EEE/31343C`,
-    expectedOutput: outputA,
-  },
-  {
-    input: `hello @contestbot, please create a contest using token 0x429ae85883f82203D736e8fc203A455990745ca1. Allocate 25% to
-voters, and split the rest evenly among three winners. Title: 'amazing memez 2025'. Image: https://placehold.
-co/600x400/EEE/31343C`,
-    expectedOutput: outputA,
-  },
-  {
-    input: `@contestbot start a contest with token 0x429ae85883f82203D736e8fc203A455990745ca1. 25% for voters, one-third each to 3
-winners, titled 'amazing memez 2025', image link: https://placehold.co/600x400/EEE/31343C`,
-    expectedOutput: outputA,
-  },
-  {
-    input: `hey @commondemo, set up a meme contest called 'amazing memez 2025' using token
-0x429ae85883f82203D736e8fc203A455990745ca1. Voters get 25%, three winners get the remainder equally. Image: https:
-//placehold.co/600x400/EEE/31343C`,
-    expectedOutput: outputA,
-  },
-  {
-    input: `@commondemo please launch a new contest: title = 'amazing memez 2025', token =
-0x429ae85883f82203D736e8fc203A455990745ca1, distribution = 25% to voters, 3 winners share the rest equally. Image: https:
-//placehold.co/600x400/EEE/31343C`,
-    expectedOutput: outputA,
-  },
-  {
-    input: `hello @commondemo create a contest, call it 'amazing memez 2025', use token
-0x429ae85883f82203D736e8fc203A455990745ca1. Give voters 25% of the prize. The rest should be split among three winners.
-Use image: https://placehold.co/600x400/EEE/31343C`,
-    expectedOutput: outputA,
-  },
-  {
-    input: `hey @commondemo I'd like a contest titled 'amazing memez 2025' using 0x429ae85883f82203D736e8fc203A455990745ca1. 25%
-for voters, 1/3 each for 3 winners, pic at https://placehold.co/600x400/EEE/31343C`,
-    expectedOutput: outputA,
-  },
-  {
-    input: `@commondemo create a contest 'amazing memez 2025' with token 0x429ae85883f82203D736e8fc203A455990745ca1. Allocate
-25% to voters, the remainder among 3 winners equally, image: https://placehold.co/600x400/EEE/31343C`,
-    expectedOutput: outputA,
-  },
-  {
-    input: `@commondemo, can you set up a new meme contest? Title: 'amazing memez 2025' Token address:
-0x429ae85883f82203D736e8fc203A455990745ca1. 25% goes to voters, the rest is divided by 3 winners. Image link: https://placehold.co/600x400/EEE/31343C`,
-    expectedOutput: outputA,
-  },
-  {
-    input: `hey @commondemo, start the contest named 'amazing memez 2025' with the token
-0x429ae85883f82203D736e8fc203A455990745ca1. The voters get 25%. Three winners split the remainder. Use this image: https:
-//placehold.co/600x400/EEE/31343C`,
-    expectedOutput: outputA,
-  },
-  {
-    input: `“Hey @commondemo, please start a new contest titled ‘Best Meme Battle 2025’. Use token
-0xA1B2c3D4e5F6789012345678901234567890AbCd on Base. The total prize goes to 3 winners: 25% to winner #1, 35% to winner
-#2, and 40% to winner #3. Include this image: https://placehold.co/600x400/EEE/31343C”`,
+    input: `Hey @commonbot, launch a Best Memes Only contest! Fund it with 0x429ae85883f82203D736e8fc203A455990745ca1 on Base.`,
     expectedOutput: {
-      ...outputA,
-      contestName: 'Best Meme Battle 2025',
-      payoutStructure: [25, 35, 40],
-      voterShare: 0,
-      tokenAddress: '0xA1B2c3D4e5F6789012345678901234567890AbCd',
+      contestName: 'Best Memes Only',
+      ...defaults,
     },
   },
   {
-    input: `@commondemo create a brand-new contest: Title ‘High-Stakes Talent Hunt 2025’, Token
-0xABC1234567890abcdEf0123456789ABCDEF120345 on Base. 3 winners: 10% goes to winner one, 20% to winner two, 70% to
-winner three. Image: https://placehold.co/600x400/EEE/31343C`,
+    input: `Yo @commonbot! Start a Best Memes Only competition—prizes funded by 0x429ae85883f82203D736e8fc203A455990745ca1 on Base.`,
     expectedOutput: {
-      ...outputA,
-      contestName: 'High-Stakes Talent Hunt 2025',
-      payoutStructure: [10, 20, 70],
-      voterShare: 0,
-      tokenAddress: '0xABC1234567890abcdEf0123456789ABCDEF120345',
+      contestName: 'Best Memes Only',
+      ...defaults,
     },
   },
   {
-    input: `Hello @commondemo! I want a contest named ‘Unreal Art Clash 2025’ using
-0xabCDef012345678901234567890123456789AbCdE on Base. Please award 3 winners with 20%, 30%, and 50% of the prize
-respectively. Use https://placehold.co/600x400/EEE/31343C as the image.”`,
+    input: `Letʼs go viral, @commonbot! Initiate Best Memes Only with funds from 0x429ae85883f82203D736e8fc203A455990745ca1 via Base.`,
     expectedOutput: {
-      ...outputA,
-      contestName: 'Unreal Art Clash 2025',
-      payoutStructure: [20, 30, 50],
-      voterShare: 0,
-      tokenAddress: '0xabCDef012345678901234567890123456789AbCdE',
+      contestName: 'Best Memes Only',
+      ...defaults,
     },
   },
   {
-    input: `@commondemo I’d like to launch ‘Grand Innovation Pitch 2025’ using token 0x9Abc0123Def4567890123456abCDEf7890123456
-on Base. Three winners share the pot: 15%, 35%, and 50%. Please attach image https://placehold.co/600x400/EEE/31343C.”`,
+    input: `Contest alert: @commonbot, host Best Memes Only! Back it using 0x429ae85883f82203D736e8fc203A455990745ca1 on Base.`,
     expectedOutput: {
-      ...outputA,
-      contestName: 'Grand Innovation Pitch 2025',
-      payoutStructure: [15, 35, 50],
-      voterShare: 0,
-      tokenAddress: '0x9Abc0123Def4567890123456abCDEf7890123456',
+      contestName: 'Best Memes Only',
+      ...defaults,
     },
   },
   {
-    input: `Hey @commonlocal, begin a contest titled ‘Meme Royal Rumble 2025’ The token is
-0x3456Ef1234AbCDE7890123456789abcdefABCDEF0 on Base. Distribute prize among three winners with 33%, 22%, and 45%.
-Here’s the image: https://placehold.co/600x400/EEE/31343C”`,
+    input: `@commonbot, organize a Best Memes Only showdown! Fuel the prizes with 0x429ae85883f82203D736e8fc203A455990745ca1 on Base.`,
     expectedOutput: {
-      ...outputA,
-      contestName: 'Meme Royal Rumble 2025',
-      payoutStructure: [33, 22, 45],
-      voterShare: 0,
-      tokenAddress: '0x3456Ef1234AbCDE7890123456789abcdefABCDEF0',
+      contestName: 'Best Memes Only',
+      ...defaults,
+    },
+  },
+  {
+    input: `Attention @commonbot: Roll out Best Memes Only! Funding address: 0x429ae85883f82203D736e8fc203A455990745ca1 on Base.`,
+    expectedOutput: {
+      contestName: 'Best Memes Only',
+      ...defaults,
+    },
+  },
+  {
+    input: `@commonbot, letʼs spark a meme war! Launch Best Memes Only using 0x429ae85883f82203D736e8fc203A455990745ca1 via Base.`,
+    expectedOutput: {
+      contestName: 'Best Memes Only',
+      ...defaults,
+    },
+  },
+  {
+    input: `@commonbot, start Best Memes Only! Fund via 0x429ae85883f82203D736e8fc203A455990745ca1 on Base.`,
+    expectedOutput: {
+      contestName: 'Best Memes Only',
+      ...defaults,
+    },
+  },
+  {
+    input: `@commonbot, kick off Best Memes Only! All rewards from 0x429ae85883f82203D736e8fc203A455990745ca1 on Base.`,
+    expectedOutput: {
+      contestName: 'Best Memes Only',
+      ...defaults,
+    },
+  },
+  {
+    input: `@commonbot, host Best Memes Only! Powered by 0x429ae85883f82203D736e8fc203A455990745ca1 on Base.`,
+    expectedOutput: {
+      contestName: 'Best Memes Only',
+      ...defaults,
+    },
+  },
+  {
+    input: `@commonbot, assemble a Best Memes Only tournament. Prize pool: 0x429ae85883f82203D736e8fc203A455990745ca1 on Base.`,
+    expectedOutput: {
+      contestName: 'Best Memes Only',
+      ...defaults,
+    },
+  },
+  {
+    input: `Letʼs meme! @commonbot, create Best Memes Only using 0x429ae85883f82203D736e8fc203A455990745ca1 on Base.`,
+    expectedOutput: {
+      contestName: 'Best Memes Only',
+      ...defaults,
+    },
+  },
+  {
+    input: `@commonbot, time for Best Memes Only! Fund it through 0x429ae85883f82203D736e8fc203A455990745ca1 on Base.`,
+    expectedOutput: {
+      contestName: 'Best Memes Only',
+      ...defaults,
+    },
+  },
+  {
+    input: `Meme lords, assemble! @commonbot, start Best Memes Only via 0x429ae85883f82203D736e8fc203A455990745ca1 on Base.`,
+    expectedOutput: {
+      contestName: 'Best Memes Only',
+      ...defaults,
+    },
+  },
+  {
+    input: `@commonbot, launch Best Memes Only now! Backed by 0x429ae85883f82203D736e8fc203A455990745ca1 on Base.`,
+    expectedOutput: {
+      contestName: 'Best Memes Only',
+      ...defaults,
+    },
+  },
+  {
+    input: `@commonbot: Deploy Best Memes Only contest. Funding via 0x429ae85883f82203D736e8fc203A455990745ca1 on Base.`,
+    expectedOutput: {
+      contestName: 'Best Memes Only',
+      ...defaults,
+    },
+  },
+  {
+    input: `@commonbot, letʼs roast some memes! Best Memes Only funded by 0x429ae85883f82203D736e8fc203A455990745ca1 on Base.`,
+    expectedOutput: {
+      contestName: 'Best Memes Only',
+      ...defaults,
+    },
+  },
+  {
+    input: `Breaking News: @commonbot to host Best Memes Only! Funds: 0x429ae85883f82203D736e8fc203A455990745ca1 on Base.`,
+    expectedOutput: {
+      contestName: 'Best Memes Only',
+      ...defaults,
+    },
+  },
+  {
+    input: `@commonbot, activate Best Memes Only! Source funds from 0x429ae85883f82203D736e8fc203A455990745ca1 on Base.`,
+    expectedOutput: {
+      contestName: 'Best Memes Only',
+      ...defaults,
+    },
+  },
+  {
+    input: `@commonbot, start Best Memes Only! Use 0x429ae85883f82203D736e8fc203A455990745ca1 on Base for rewards.`,
+    expectedOutput: {
+      contestName: 'Best Memes Only',
+      ...defaults,
+    },
+  },
+  {
+    input: `@commonbot, letʼs get spicy—create Best Memes Only! Fund with 0x429ae85883f82203D736e8fc203A455990745ca1 on Base.`,
+    expectedOutput: {
+      contestName: 'Best Memes Only',
+      ...defaults,
+    },
+  },
+  {
+    input: `Calling all meme creators: @commonbot launches Best Memes Only via 0x429ae85883f82203D736e8fc203A455990745ca1 on Base!`,
+    expectedOutput: {
+      contestName: 'Best Memes Only',
+      ...defaults,
+    },
+  },
+  {
+    input: `@commonbot, initiate Best Memes Only! Prize pool: 0x429ae85883f82203D736e8fc203A455990745ca1 on Base.`,
+    expectedOutput: {
+      contestName: 'Best Memes Only',
+      ...defaults,
+    },
+  },
+  {
+    input: `Go! @commonbot, fire up Best Memes Only! Fueled by 0x429ae85883f82203D736e8fc203A455990745ca1 on Base.`,
+    expectedOutput: {
+      contestName: 'Best Memes Only',
+      ...defaults,
+    },
+  },
+  {
+    input: `@commonbot, letʼs make memes legendary! Fund Best Memes Only with 0x429ae85883f82203D736e8fc203A455990745ca1 on Base.`,
+    expectedOutput: {
+      contestName: 'Best Memes Only',
+      ...defaults,
+    },
+  },
+  {
+    input: `@commonbot, roll out Best Memes Only! Use 0x429ae85883f82203D736e8fc203A455990745ca1 on Base for the vault.`,
+    expectedOutput: {
+      contestName: 'Best Memes Only',
+      ...defaults,
+    },
+  },
+  {
+    input: `@commonbot, launch Best Memes Only via 0x429ae85883f82203D736e8fc203A455990745ca1 on Base.`,
+    expectedOutput: {
+      contestName: 'Best Memes Only',
+      ...defaults,
+    },
+  },
+  {
+    input: `@commonbot, letʼs crown meme royalty! start Best Memes Only funded by 0x429ae85883f82203D736e8fc203A455990745ca1 on Base.`,
+    expectedOutput: {
+      contestName: 'Best Memes Only',
+      ...defaults,
+    },
+  },
+  {
+    input: `Hey @commonbot, unleash Best Memes Only! Back it with 0x429ae85883f82203D736e8fc203A455990745ca1 on Base.`,
+    expectedOutput: {
+      contestName: 'Best Memes Only',
+      ...defaults,
+    },
+  },
+  {
+    input: `@commonbot, spin up Best Memes Only! Rewards from 0x429ae85883f82203D736e8fc203A455990745ca1 on Base.`,
+    expectedOutput: {
+      contestName: 'Best Memes Only',
+      ...defaults,
+    },
+  },
+  {
+    input: `@commonbot, time to shine! Host Best Memes Only with 0x429ae85883f82203D736e8fc203A455990745ca1 on Base.`,
+    expectedOutput: {
+      contestName: 'Best Memes Only',
+      ...defaults,
+    },
+  },
+  {
+    input: `@commonbot, letʼs go bananas 🍌! Start Best Memes Only via 0x429ae85883f82203D736e8fc203A455990745ca1 on Base.`,
+    expectedOutput: {
+      contestName: 'Best Memes Only',
+      ...defaults,
+    },
+  },
+  {
+    input: `To @commonbot: Launch Best Memes Only! Prize address: 0x429ae85883f82203D736e8fc203A455990745ca1 on Base.`,
+    expectedOutput: {
+      contestName: 'Best Memes Only',
+      ...defaults,
+    },
+  },
+  {
+    input: `@commonbot, assemble the meme army! Fund Best Memes Only with 0x429ae85883f82203D736e8fc203A455990745ca1 on Base.`,
+    expectedOutput: {
+      contestName: 'Best Memes Only',
+      ...defaults,
+    },
+  },
+  {
+    input: `@commonbot, initiate Best Memes Only! Use 0x429ae85883f82203D736e8fc203A455990745ca1 on Base.`,
+    expectedOutput: {
+      contestName: 'Best Memes Only',
+      ...defaults,
+    },
+  },
+  {
+    input: `Letʼs do this, @commonbot! Create Best Memes Only using 0x429ae85883f82203D736e8fc203A455990745ca1 on Base.`,
+    expectedOutput: {
+      contestName: 'Best Memes Only',
+      ...defaults,
+    },
+  },
+  {
+    input: `@commonbot, time to flex those meme skills! Fund Best Memes Only via 0x429ae85883f82203D736e8fc203A455990745ca1 on Base.`,
+    expectedOutput: {
+      contestName: 'Best Memes Only',
+      ...defaults,
+    },
+  },
+  {
+    input: `Code Red: @commonbot, deploy Best Memes Only! Funds: 0x429ae85883f82203D736e8fc203A455990745ca1 on Base.`,
+    expectedOutput: {
+      contestName: 'Best Memes Only',
+      ...defaults,
+    },
+  },
+  {
+    input: `@commonbot, letʼs make it rain memes! Best Memes Only powered by 0x429ae85883f82203D736e8fc203A455990745ca1 on Base.`,
+    expectedOutput: {
+      contestName: 'Best Memes Only',
+      ...defaults,
+    },
+  },
+  {
+    input: `Urgent: @commonbot, start Best Memes Only! Backed by 0x429ae85883f82203D736e8fc203A455990745ca1 on Base.`,
+    expectedOutput: {
+      contestName: 'Best Memes Only',
+      ...defaults,
+    },
+  },
+  {
+    input: `Petition: @commonbot, host Best Memes Only! Use 0x429ae85883f82203D736e8fc203A455990745ca1 on Base.`,
+    expectedOutput: {
+      contestName: 'Best Memes Only',
+      ...defaults,
+    },
+  },
+  {
+    input: `@commonbot, letʼs go viral or go home! Best Memes Only with 0x429ae85883f82203D736e8fc203A455990745ca1 on Base.`,
+    expectedOutput: {
+      contestName: 'Best Memes Only',
+      ...defaults,
+    },
+  },
+  {
+    input: `Meme HQ @commonbot, launch Best Memes Only! Funds via 0x429ae85883f82203D736e8fc203A455990745ca1 on Base.`,
+    expectedOutput: {
+      contestName: 'Best Memes Only',
+      ...defaults,
+    },
+  },
+  {
+    input: `@commonbot, prep the stage! Best Memes Only contest funded by 0x429ae85883f82203D736e8fc203A455990745ca1 on Base.`,
+    expectedOutput: {
+      contestName: 'Best Memes Only',
+      ...defaults,
+    },
+  },
+  {
+    input: `@commonbot, letʼs fuel the memeconomy! Start Best Memes Only via 0x429ae85883f82203D736e8fc203A455990745ca1 on Base.`,
+    expectedOutput: {
+      contestName: 'Best Memes Only',
+      ...defaults,
+    },
+  },
+  {
+    input: `Attention @commonbot: Best Memes Only contest incoming! Funded by 0x429ae85883f82203D736e8fc203A455990745ca1 on Base.`,
+    expectedOutput: {
+      contestName: 'Best Memes Only',
+      ...defaults,
+    },
+  },
+  {
+    input: `@commonbot, rally creators for Best Memes Only! Pool: 0x429ae85883f82203D736e8fc203A455990745ca1 on Base.`,
+    expectedOutput: {
+      contestName: 'Best Memes Only',
+      ...defaults,
+    },
+  },
+  {
+    input: `Meme enthusiasts unite! @commonbot, launch Best Memes Only using 0x429ae85883f82203D736e8fc203A455990745ca1 on Base.`,
+    expectedOutput: {
+      contestName: 'Best Memes Only',
+      ...defaults,
+    },
+  },
+  {
+    input: `@commonbot, letʼs turn up the meme heat! Fund Best Memes Only via 0x429ae85883f82203D736e8fc203A455990745ca1 on Base.`,
+    expectedOutput: {
+      contestName: 'Best Memes Only',
+      ...defaults,
+    },
+  },
+  {
+    input: `Operation Laughter: @commonbot, initiate Best Memes Only! Funds on Base: 0x429ae85883f82203D736e8fc203A455990745ca1.`,
+    expectedOutput: {
+      contestName: 'Best Memes Only',
+      ...defaults,
+    },
+  },
+  {
+    input: `@commonbot, letʼs make memes trend! Best Memes Only funded by 0x429ae85883f82203D736e8fc203A455990745ca1 on Base.`,
+    expectedOutput: {
+      contestName: 'Best Memes Only',
+      ...defaults,
+    },
+  },
+  {
+    input: `@commonbot, start the meme marathon! Use 0x429ae85883f82203D736e8fc203A455990745ca1 on Base for rewards.`,
+    expectedOutput: {
+      contestName: 'meme marathon',
+      ...defaults,
+    },
+  },
+  {
+    input: `@commonbot, letʼs dominate the memeverse! Fund Best Memes Only with 0x429ae85883f82203D736e8fc203A455990745ca1 on Base.`,
+    expectedOutput: {
+      contestName: 'Best Memes Only',
+      ...defaults,
+    },
+  },
+  {
+    input: `@commonbot, time to flex creativity! Launch Best Memes Only via 0x429ae85883f82203D736e8fc203A455990745ca1 on Base.`,
+    expectedOutput: {
+      contestName: 'Best Memes Only',
+      ...defaults,
+    },
+  },
+  {
+    input: `@commonbot, assemble the meme council! Best Memes Only funded by 0x429ae85883f82203D736e8fc203A455990745ca1 on Base.`,
+    expectedOutput: {
+      contestName: 'Best Memes Only',
+      ...defaults,
+    },
+  },
+  {
+    input: `@commonbot, letʼs make history! Best Memes Only contest via 0x429ae85883f82203D736e8fc203A455990745ca1 on Base.`,
+    expectedOutput: {
+      contestName: 'Best Memes Only',
+      ...defaults,
+    },
+  },
+  {
+    input: `@commonbot, unleash the meme storm! Use 0x429ae85883f82203D736e8fc203A455990745ca1 on Base for funding.`,
+    expectedOutput: {
+      contestName: 'meme storm',
+      ...defaults,
+    },
+  },
+  {
+    input: `@commonbot, letʼs go global! Best Memes Only funded by 0x429ae85883f82203D736e8fc203A455990745ca1 on Base.`,
+    expectedOutput: {
+      contestName: 'Best Memes Only',
+      ...defaults,
+    },
+  },
+  {
+    input: `@commonbot, letʼs get legendary! Start Best Memes Only via 0x429ae85883f82203D736e8fc203A455990745ca1 on Base.`,
+    expectedOutput: {
+      contestName: 'Best Memes Only',
+      ...defaults,
+    },
+  },
+  {
+    input: `@commonbot, rally the community! Best Memes Only funded by 0x429ae85883f82203D736e8fc203A455990745ca1 on Base.`,
+    expectedOutput: {
+      contestName: 'Best Memes Only',
+      ...defaults,
+    },
+  },
+  {
+    input: `@commonbot, letʼs break records! Launch Best Memes Only with 0x429ae85883f82203D736e8fc203A455990745ca1 on Base.`,
+    expectedOutput: {
+      contestName: 'Best Memes Only',
+      ...defaults,
+    },
+  },
+  {
+    input: `@commonbot, letʼs go big or go home! Spin up Best Memes Only via 0x429ae85883f82203D736e8fc203A455990745ca1 on Base.`,
+    expectedOutput: {
+      contestName: 'Best Memes Only',
+      ...defaults,
+    },
+  },
+  {
+    input: `@commonbot, time to innovate! Fund Best Memes Only with 0x3ecced5b416e58664f04a39dd18935eb71d33b15 on Base.`,
+    expectedOutput: {
+      contestName: 'Best Memes Only',
+      ...defaults,
+      tokenAddress: '0x3ecced5b416e58664f04a39dd18935eb71d33b15',
+    },
+  },
+  {
+    input: `@commonbot, letʼs inspire laughter! Best Memes Only contest via 0x0c41f1fc9022feb69af6dc666abfe73c9ffda7ce on Base.`,
+    expectedOutput: {
+      contestName: 'Best Memes Only',
+      ...defaults,
+      tokenAddress: '0x0c41f1fc9022feb69af6dc666abfe73c9ffda7ce',
     },
   },
 ];
@@ -191,11 +511,7 @@ describe('Parse Bot Command', () => {
       return;
     }
     await testFailureCase(
-      `hey wasup @contestbot make me breakfast`,
-      ParseBotCommandError.ERRORS.NoResponse,
-    );
-    await testFailureCase(
-      `hey @contestbot, make a contest for token 0x123 with prize distributed to 3 winners equally`,
+      `hey @contestbot, wasup`,
       ParseBotCommandError.ERRORS.InvalidParams,
     );
   });
