@@ -26,7 +26,7 @@ const SignInModal = ({
       bodyClassName="SignInModal"
       onSignInClick={onSignInClick}
       triggerOpenEVMWalletsSubModal={triggerOpenEVMWalletsSubModal}
-      isUserFromWebView={isUserFromWebView}
+      isUserFromWebView={mobileApp || isUserFromWebView}
     />
   );
 };

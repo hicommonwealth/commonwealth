@@ -36,7 +36,7 @@ const WelcomeOnboardModal = ({ isOpen, onClose }: WelcomeOnboardModalProps) => {
         ? WelcomeOnboardModalSteps.Notifications
         : WelcomeOnboardModalSteps.TermsOfServices,
     );
-  }, [mobileApp]);
+  }, [mobileApp, user.id]);
 
   const [hasMagic, setHasMagic] = useState(false);
 

@@ -313,7 +313,9 @@ const ModalBase = ({
   return (
     <>
       <section className="ModalBase">
-        <CWIcon iconName="close" onClick={onClose} className="close-btn" />
+        {!isUserFromWebView && (
+          <CWIcon iconName="close" onClick={onClose} className="close-btn" />
+        )}
 
         <img src={commonLogo} className="logo" />
 
