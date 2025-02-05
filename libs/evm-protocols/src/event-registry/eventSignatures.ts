@@ -18,7 +18,7 @@ export const EvmEventSignatures = {
     NamespaceDeployed:
       '0xc8451dcd95e7ca3d8608dfc9d43e7bf4187f43cf5e07d5143b6c2be3cf73d175',
     NamespaceDeployedWithReferral:
-      '86bc285ef78f2bf1fc0437d79c9473bf64014e8a483d00a4e4683bde1f9758f7',
+      '0x86bc285ef78f2bf1fc0437d79c9473bf64014e8a483d00a4e4683bde1f9758f7',
     ContestManagerDeployed:
       '0x990f533044dbc89b838acde9cd2c72c400999871cf8f792d731edcae15ead693',
     CommunityNamespaceCreated:
