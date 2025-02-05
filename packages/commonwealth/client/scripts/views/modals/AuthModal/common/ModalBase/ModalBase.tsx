@@ -159,7 +159,8 @@ const ModalBase = ({
   const cosmosWallets = filterWalletNames(ChainBase.CosmosSDK);
   const solanaWallets = filterWalletNames(ChainBase.Solana);
   const substrateWallets = filterWalletNames(ChainBase.Substrate);
-
+  const onTangleCommunity =
+    app?.chain?.base === 'substrate' && app?.chain?.meta.id === 'tangle';
   const getWalletNames = () => {
     // Wallet Display Logic:
     // 1. When `showWalletsFor` is present, show wallets for that specific chain only.
@@ -173,6 +174,9 @@ const ModalBase = ({
 
     const showWalletsForSpecificChains = showWalletsFor || app?.chain?.base;
     if (showWalletsForSpecificChains) {
+      if (onTangleCommunity) {
+        return [...substrateWallets, ...['walletconnect']];
+      }
       switch (showWalletsForSpecificChains) {
         case ChainBase.Ethereum:
           return hasWalletConnect ? ['walletconnect'] : [];
@@ -270,11 +274,9 @@ const ModalBase = ({
         setIsEVMWalletsModalVisible(true);
         return;
       }
-
       // @ts-expect-error <StrictNullChecks>
       await onWalletSelect(wallets.find((wallet) => wallet.name === option));
     }
-
     // if any SSO option is selected
     if (activeTabIndex === 1) {
       // TODO: decide if twitter references are to be updated to 'x'

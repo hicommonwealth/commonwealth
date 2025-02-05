@@ -1,4 +1,4 @@
-import type { ChainBase, WalletId } from '@hicommonwealth/shared';
+import { ChainBase, WalletId } from '@hicommonwealth/shared';
 import axios from 'axios';
 import app from 'state';
 import { SERVER_URL } from 'state/api/config';
@@ -33,13 +33,20 @@ export default class WebWalletController {
     // handle case like injective, where we require a specific wallet
     const specificChain = app.chain?.meta?.id || '';
     if (specificChain) {
+      //special case for Tangle to also use EVM sign in
+      if (specificChain === 'tangle') {
+        return this._wallets.filter(
+          (w) =>
+            w.available &&
+            (w.chain === ChainBase.Substrate || w.chain === ChainBase.Ethereum),
+        );
+      }
       const specificWallets = this._wallets.filter(
         (w) => !!w.specificChains?.includes(specificChain),
       );
       if (specificWallets.length > 0)
         return specificWallets.filter((w) => w.available);
     }
-
     // handle general case of wallet by chain base
     return this._wallets.filter(
       (w) =>
