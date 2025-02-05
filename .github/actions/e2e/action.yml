@@ -5,7 +5,7 @@ runs:
   steps:
     - name: Bundle
       shell: bash
-      run: NODE_OPTIONS=--max_old_space_size=4096 pnpm -F commonwealth bundle
+      run: pnpm -F commonwealth bundle
 
     - name: Cache browsers
       id: playwright-cache
