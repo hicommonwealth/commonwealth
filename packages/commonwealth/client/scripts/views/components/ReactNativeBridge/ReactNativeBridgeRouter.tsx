@@ -1,10 +1,6 @@
+import type { ReactNativeWebView } from 'hooks/useReactNativeWebView';
 import { useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-
-interface ReactNativeWebView {
-  // allows us to send messages to ReactNative.
-  postMessage: (message: string) => void;
-}
 
 declare global {
   interface Window {

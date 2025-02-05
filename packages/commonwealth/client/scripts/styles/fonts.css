@@ -69,3 +69,21 @@
   font-weight: 300;
   src: url('assets/fonts/DMMono-Regular.ttf') format('truetype');
 }
+
+@font-face {
+  font-family: MDNichrome;
+  font-weight: 700;
+  src:
+    url('assets/fonts/MDNichrome-Bold.otf') format('otf'),
+    url('assets/fonts/MDNichrome-Bold.otf') format('otf'),
+    url('assets/fonts/MDNichrome-Bold.otf') format('woff2');
+}
+
+@font-face {
+  font-family: MDNichromeRegular;
+  font-weight: 700;
+  src:
+    url('assets/fonts/MDNichrome-Regular.otf') format('otf'),
+    url('assets/fonts/MDNichrome-Regular.otf') format('otf'),
+    url('assets/fonts/MDNichrome-Regular.otf') format('woff2');
+}
