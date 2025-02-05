@@ -174,11 +174,11 @@ export const ContestNotification = z.object({
 });
 
 export const ContestEndedNotification = ContestNotification.extend({
+  balance: z.string().describe('Balance of the contest'),
   score: z
     .object({
       address: z.string(),
       name: z.string(),
-      prize: z.string(),
       votes: z.string(),
     })
     .array(),

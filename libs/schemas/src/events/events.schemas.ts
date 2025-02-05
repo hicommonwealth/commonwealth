@@ -283,6 +283,7 @@ export const ContestStarted = ContestManagerEvent.extend({
   contest_id: z.number().int().gte(0),
   start_time: z.coerce.date().describe('Contest start time'),
   end_time: z.coerce.date().describe('Contest end time'),
+  is_one_off: z.boolean().describe('Is this a one-off contest'),
 }).describe('When a contest instance gets started');
 
 export const ContestRolloverTimerTicked = z
@@ -293,11 +294,12 @@ export const ContestRolloverTimerTicked = z
 
 export const ContestEnding = ContestManagerEvent.extend({
   contest_id: z.number().int().gte(0),
+  is_one_off: z.boolean().describe('Is this a one-off contest'),
 }).describe('When a contest instance is close to ending');
 
 export const ContestEnded = ContestManagerEvent.extend({
   contest_id: z.number().int().gte(0),
-  recurring: z.boolean().describe('Whether the contest is recurring'),
+  is_one_off: z.boolean().describe('Is this a one-off contest'),
 }).describe('When a contest instance ended');
 
 export const ContestContentAdded = ContestManagerEvent.extend({

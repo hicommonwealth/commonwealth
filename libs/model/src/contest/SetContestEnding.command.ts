@@ -16,7 +16,8 @@ export function SetContestEnding(): Command<typeof schemas.SetContestEnding> {
     ...schemas.SetContestEnding,
     auth: [],
     body: async ({ payload }) => {
-      const { contest_address, contest_id, actions, chain_url } = payload;
+      const { contest_address, contest_id, actions, chain_url, is_one_off } =
+        payload;
 
       // add onchain vote to the first content when no upvotes found in the last hour
       if (!actions.some((action) => action.action === 'upvoted')) {
@@ -49,6 +50,7 @@ export function SetContestEnding(): Command<typeof schemas.SetContestEnding> {
               event_payload: {
                 contest_address,
                 contest_id,
+                is_one_off,
               },
             },
           ],

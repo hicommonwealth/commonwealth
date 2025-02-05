@@ -49,6 +49,7 @@ export const GetActiveContestManagers = {
       eth_chain_id: z.number().int(),
       url: z.string(),
       contest_address: z.string(),
+      interval: z.number(),
       ending: z.boolean(),
       max_contest_id: z.number(),
       end_time: z.coerce.date(),

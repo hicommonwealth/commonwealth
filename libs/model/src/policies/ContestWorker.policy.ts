@@ -180,6 +180,7 @@ const checkContests = async () => {
         payload: {
           contest_address: contestManager.contest_address,
           contest_id: contestManager.max_contest_id,
+          is_one_off: contestManager.interval === 0,
           actions: contestManager.actions.map((a) => ({
             action: a.action,
             content_id: a.content_id,
@@ -263,7 +264,7 @@ const rolloverContests = async () => {
           payload: {
             contest_address,
             contest_id,
-            interval,
+            is_one_off: interval === 0,
             ended: ended || false,
             chain_url: url,
             chain_private_url: private_url,

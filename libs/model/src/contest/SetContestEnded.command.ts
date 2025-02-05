@@ -35,7 +35,7 @@ export function SetContestEnded(): Command<typeof schemas.SetContestEnded> {
       const {
         contest_address,
         contest_id,
-        interval,
+        is_one_off,
         ended,
         chain_url,
         chain_private_url,
@@ -43,7 +43,7 @@ export function SetContestEnded(): Command<typeof schemas.SetContestEnded> {
       } = payload;
 
       await models.sequelize.transaction(async (transaction) => {
-        if (interval === 0 && !ended) {
+        if (is_one_off && !ended) {
           // preemptively mark as ended so that rollover
           // is not attempted again after failure
           await models.ContestManager.update(
@@ -59,7 +59,7 @@ export function SetContestEnded(): Command<typeof schemas.SetContestEnded> {
             private_url: chain_private_url,
           }),
           contest: contest_address,
-          oneOff: interval === 0,
+          oneOff: is_one_off,
         });
 
         await models.ContestManager.update(
@@ -75,7 +75,7 @@ export function SetContestEnded(): Command<typeof schemas.SetContestEnded> {
               event_payload: {
                 contest_address,
                 contest_id,
-                recurring: interval > 0,
+                is_one_off,
               },
             },
           ],

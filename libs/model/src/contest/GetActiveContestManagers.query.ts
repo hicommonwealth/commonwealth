@@ -20,6 +20,7 @@ export function GetActiveContestManagers(): Query<
         url: string;
         private_url: string;
         contest_address: string;
+        interval: number;
         ending: boolean;
         end_time: string;
         max_contest_id: number;
@@ -30,6 +31,7 @@ export function GetActiveContestManagers(): Query<
                    cn.private_url,
                    cn.url,
                    cm.contest_address,
+                   cm.interval,
                    COALESCE(cm.ending, false) as ending,
                    co.max_contest_id,
                    co.end_time,
@@ -73,6 +75,7 @@ export function GetActiveContestManagers(): Query<
         eth_chain_id: r.eth_chain_id,
         url: getChainNodeUrl(r),
         contest_address: r.contest_address,
+        interval: r.interval,
         ending: r.ending,
         end_time: new Date(r.end_time),
         max_contest_id: r.max_contest_id,

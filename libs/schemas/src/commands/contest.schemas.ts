@@ -177,6 +177,7 @@ export const SetContestEnding = {
   input: z.object({
     contest_address: z.string(),
     contest_id: PG_INT,
+    is_one_off: z.boolean(),
     actions: z.array(
       ContestAction.pick({ action: true, content_id: true, content_url: true }),
     ),
@@ -189,7 +190,7 @@ export const SetContestEnded = {
   input: z.object({
     contest_address: z.string(),
     contest_id: PG_INT,
-    interval: PG_INT,
+    is_one_off: z.boolean(),
     ended: z.boolean(),
     chain_url: z.string(),
     chain_private_url: z.string().nullish(),
