@@ -14,6 +14,7 @@ import {
 } from '@hicommonwealth/core';
 import {
   ChainEventPolicy,
+  CommunityIndexerWorker,
   Contest,
   ContestWorker,
   DiscordBotPolicy,
@@ -22,6 +23,7 @@ import {
   models,
 } from '@hicommonwealth/model';
 import { EventNames } from '@hicommonwealth/schemas';
+import { CronJob } from 'cron';
 import { Client } from 'pg';
 import { config } from 'server/config';
 import { setupListener } from './pgListener';
@@ -89,6 +91,15 @@ export async function bootstrapBindings(
   checkSubscriptionResponse(
     contestWorkerSubRes,
     BrokerSubscriptions.ContestWorkerPolicy,
+  );
+
+  const communityIndexerSubRes = await brokerInstance.subscribe(
+    BrokerSubscriptions.CommunityIndexerPolicy,
+    CommunityIndexerWorker(),
+  );
+  checkSubscriptionResponse(
+    communityIndexerSubRes,
+    BrokerSubscriptions.CommunityIndexerPolicy,
   );
 
   const contestProjectionsSubRes = await brokerInstance.subscribe(
@@ -159,21 +170,46 @@ export async function bootstrapRelayer(
 }
 
 export function bootstrapContestRolloverLoop() {
-  log.info('Starting rollover loop');
+  const cronFrequency = '* * * * *';
+  log.info(`Starting rollover cron job (${cronFrequency})`);
 
-  const loop = async () => {
-    try {
-      await handleEvent(ContestWorker(), {
-        name: EventNames.ContestRolloverTimerTicked,
-        payload: {},
-      });
-    } catch (err) {
-      log.error(err);
-    }
-  };
+  CronJob.from({
+    cronTime: cronFrequency, // every minute
+    onTick: async () => {
+      try {
+        await handleEvent(ContestWorker(), {
+          name: EventNames.ContestRolloverTimerTicked,
+          payload: {},
+        });
+      } catch (err) {
+        log.error(err);
+      }
+    },
+    start: true,
+  });
+}
 
-  // TODO: move to external service triggered via scheduler?
-  setInterval(() => {
-    loop().catch(console.error);
-  }, 1_000 * 60);
+export function bootstrapCommunityIndexerLoop() {
+  const cronFrequency = config.COMMUNITY_INDEXER.CRON!;
+  if (!cronFrequency) {
+    log.warn('Skipping community indexer cron job');
+    return;
+  }
+
+  log.info(`Starting community cron job (${cronFrequency})`);
+
+  CronJob.from({
+    cronTime: cronFrequency,
+    onTick: async () => {
+      try {
+        await handleEvent(CommunityIndexerWorker(), {
+          name: EventNames.CommunityIndexerTimerTicked,
+          payload: {},
+        });
+      } catch (err) {
+        log.error(err);
+      }
+    },
+    start: true,
+  });
 }

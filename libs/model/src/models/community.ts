@@ -147,6 +147,18 @@ export default (
         type: Sequelize.TEXT,
         allowNull: true,
       },
+      indexer: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      token_address: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      token_created_at: {
+        type: Sequelize.DATE,
+        allowNull: true,
+      },
     },
     {
       tableName: 'Communities',

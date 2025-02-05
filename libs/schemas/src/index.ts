@@ -24,6 +24,7 @@ export type Aggregates = Extract<
   | 'CommunityTags'
   | 'ContractAbi'
   | 'LaunchpadToken'
+  | 'CommunityIndexer'
 >;
 
 export * from './commands';

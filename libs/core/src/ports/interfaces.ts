@@ -211,6 +211,7 @@ export enum BrokerSubscriptions {
   FarcasterWorkerPolicy = 'FarcasterWorkerPolicy',
   XpProjection = 'XpProjection',
   UserReferrals = 'UserReferrals',
+  CommunityIndexerPolicy = 'CommunityIndexerPolicy',
 }
 
 /**
