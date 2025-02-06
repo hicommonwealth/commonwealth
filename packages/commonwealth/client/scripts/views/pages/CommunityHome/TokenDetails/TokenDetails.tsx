@@ -72,7 +72,7 @@ const TokenDetails = ({
               {communityToken.name}
             </CWText>
             <CWText type="b1" className="faded">
-              ${communityToken.symbol}
+              {communityToken.symbol}
             </CWText>
           </div>
         </div>
@@ -89,15 +89,17 @@ const TokenDetails = ({
           <CWText type="b1" className="faded">
             24h Change
           </CWText>
-          {tokenPricing && (
-            <PricePercentageChange
-              pricePercentage24HourChange={
-                tokenPricing.pricePercentage24HourChange
-              }
-              alignment="left"
-              className="pad-8"
-            />
-          )}
+          <div>
+            {tokenPricing && (
+              <PricePercentageChange
+                pricePercentage24HourChange={
+                  tokenPricing.pricePercentage24HourChange
+                }
+                alignment="left"
+                className="pad-8"
+              />
+            )}
+          </div>
         </div>
         <div className="stat-item">
           <CWText type="b1" className="faded">
