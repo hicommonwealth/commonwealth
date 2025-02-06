@@ -49,7 +49,6 @@ const {
   OPENAI_ORGANIZATION,
   CONTEST_BOT_PRIVATE_KEY,
   CONTEST_BOT_NAMESPACE,
-  OHARA_API_KEY,
 } = process.env;
 
 const NAME = target.NODE_ENV === 'test' ? 'common_test' : 'commonwealth';
@@ -175,9 +174,6 @@ export const config = configure(
     },
     BOT: {
       CONTEST_BOT_NAMESPACE: CONTEST_BOT_NAMESPACE || '',
-    },
-    OHARA: {
-      API_KEY: OHARA_API_KEY,
     },
   },
   z.object({
@@ -382,9 +378,6 @@ export const config = configure(
     OPENAI: z.object({
       API_KEY: z.string().optional(),
       ORGANIZATION: z.string().optional(),
-    }),
-    OHARA: z.object({
-      API_KEY: z.string().optional(),
     }),
     BOT: z.object({
       CONTEST_BOT_NAMESPACE: z

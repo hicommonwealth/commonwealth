@@ -49,7 +49,7 @@ export const LaunchToken = {
     name: z.string().describe('The name of the token'),
     symbol: z.string().describe('The symbol of the token'),
     totalSupply: z.number().describe('The total supply of the token'),
-    chain_id: z.number().describe('The chain id to create token for'),
+    eth_chain_id: z.number().describe('The chain id to create token for'),
     icon_url: z.string().optional().describe('The icon url of the token'),
     description: z.string().optional().describe('The description of the token'),
   }),

@@ -21,20 +21,19 @@ export function LaunchTokenBot(): Command<typeof schemas.LaunchToken> {
   return {
     ...schemas.LaunchToken,
     auth: [],
-    body: async ({ payload, context }) => {
-      const { name, symbol, totalSupply, chain_id, icon_url, description } =
+    body: async ({ payload }) => {
+      const { name, symbol, totalSupply, eth_chain_id, icon_url, description } =
         payload;
 
-      const apiKey = context.request.headers['x-api-key'];
-
-      if (!config.OHARA.API_KEY || apiKey !== config.OHARA.API_KEY)
-        throw new AppError('Unauthorized', 401);
+      if (!cp.isValidChain(eth_chain_id)) {
+        throw new AppError('eth_chain_id is not supported');
+      }
 
       if (!config.WEB3.CONTEST_BOT_PRIVATE_KEY)
         throw new ServerError('Contest bot private key not set!');
 
       const chainNode = await models.ChainNode.findOne({
-        where: { eth_chain_id: chain_id },
+        where: { eth_chain_id },
         attributes: ['eth_chain_id', 'url', 'private_url'],
       });
 
@@ -46,7 +45,9 @@ export function LaunchTokenBot(): Command<typeof schemas.LaunchToken> {
       });
       const launchpadContract = new web3.eth.Contract(
         launchpadFactoryAbi,
-        cp.factoryContracts[chain_id as cp.ValidChains.SepoliaBase].launchpad,
+        cp.factoryContracts[
+          eth_chain_id as cp.ValidChains.SepoliaBase
+        ].launchpad,
       );
       const receipt = await cp.launchToken(
         launchpadContract,
@@ -57,7 +58,7 @@ export function LaunchTokenBot(): Command<typeof schemas.LaunchToken> {
         web3.utils.toWei(totalSupply.toString(), 'ether') as string,
         web3.eth.defaultAccount as string,
         830000,
-        cp.factoryContracts[chain_id as cp.ValidChains.SepoliaBase]
+        cp.factoryContracts[eth_chain_id as cp.ValidChains.SepoliaBase]
           .tokenCommunityManager,
       );
 

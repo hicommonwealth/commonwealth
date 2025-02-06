@@ -24,6 +24,10 @@ export async function apiKeyAuthMiddleware(
   if (req.path.startsWith('/docs/') || req.path === '/openapi.json') {
     return next();
   }
+  let premiumTier = false;
+  if (req.path === '/LaunchTokenBot') {
+    premiumTier = true;
+  }
   const apiKey = req.headers['x-api-key'];
   if (!apiKey) throw new AppError('Unauthorized', 401);
   if (typeof apiKey !== 'string') throw new AppError('Unauthorized', 401);
@@ -84,6 +88,10 @@ export async function apiKeyAuthMiddleware(
 
     if (hashedApiKey !== apiKeyRecord.hashed_api_key)
       throw new AppError('Unauthorized', 401);
+
+    if (premiumTier != apiKeyRecord.premium_tier) {
+      throw new AppError('Route requires premium access', 401);
+    }
 
     user = address.User!;
     delete user.ApiKey;
