@@ -5,10 +5,11 @@ import {
   startHealthCheckLoop,
 } from '@hicommonwealth/adapters';
 import { CacheNamespaces, cache, logger, stats } from '@hicommonwealth/core';
+import { emitEvent, models } from '@hicommonwealth/model';
 import { fileURLToPath } from 'url';
 import { config } from '../../config';
 import { getMentions } from './pollTwitter';
-import { TwitterBotConfig } from './utils';
+import { TwitterBotConfig, createMentionEvents } from './utils';
 
 const log = logger(import.meta);
 
@@ -53,9 +54,12 @@ async function pollMentions(twitterBotConfig: TwitterBotConfig) {
       endTime,
     });
 
-    // TODO: emit events
-    // await emitEvent()
+    await emitEvent(
+      models.Outbox,
+      createMentionEvents(twitterBotConfig, mentions),
+    );
 
+    // TODO: switch to use Postgres so endtime can be updated in same txn as Outbox insert
     await cache().setKey(
       CacheNamespaces.Twitter_Poller,
       `${twitterBotConfig.twitterUserId}-mentions-poll-end-time`,

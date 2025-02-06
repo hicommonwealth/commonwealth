@@ -47,6 +47,10 @@ export enum EventNames {
 
   // Referrals
   SignUpFlowCompleted = 'SignUpFlowCompleted',
+
+  // Twitter Bots
+  TwitterMomBotMentioned = 'TwitterMomBotMentioned',
+  TwitterContestBotMentioned = 'TwitterContestBotMentioned',
 }
 
 export type EventPairs =
@@ -169,4 +173,12 @@ export type EventPairs =
   | {
       event_name: EventNames.SignUpFlowCompleted;
       event_payload: z.infer<typeof events.SignUpFlowCompleted>;
+    }
+  | {
+      event_name: EventNames.TwitterMomBotMentioned;
+      event_payload: z.infer<typeof events.TwitterMomBotMentioned>;
+    }
+  | {
+      event_name: EventNames.TwitterContestBotMentioned;
+      event_payload: z.infer<typeof events.TwitterContestBotMentioned>;
     };

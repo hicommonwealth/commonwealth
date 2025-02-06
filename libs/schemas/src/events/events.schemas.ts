@@ -6,6 +6,7 @@ import { FarcasterAction } from '../entities/farcaster.schemas';
 import { SubscriptionPreference } from '../entities/notification.schemas';
 import { Reaction } from '../entities/reaction.schemas';
 import { Thread } from '../entities/thread.schemas';
+import { Tweet } from '../integrations';
 import { PG_INT } from '../utils';
 import {
   CommunityStakeTrade,
@@ -333,3 +334,7 @@ export const SignUpFlowCompleted = z.object({
 });
 
 export const ContestRolloverTimerTicked = z.object({});
+
+export const TwitterMomBotMentioned = Tweet;
+
+export const TwitterContestBotMentioned = Tweet;
