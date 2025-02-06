@@ -119,7 +119,6 @@ const api = {
   toggleCommentSpam,
   createToken,
   createTrade,
-  getTokens,
   getTokens: trpc.query(Token.GetLaunchpadTokens, trpc.Tag.Token, {
     forceSecure: true,
   }),
