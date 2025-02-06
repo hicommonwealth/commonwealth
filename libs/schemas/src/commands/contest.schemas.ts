@@ -190,6 +190,8 @@ export const SetContestEnded = {
   input: z.object({
     contest_address: z.string(),
     contest_id: PG_INT,
+    prize_percentage: z.number(),
+    payout_structure: z.array(z.number()),
     is_one_off: z.boolean(),
     ended: z.boolean(),
     chain_url: z.string(),

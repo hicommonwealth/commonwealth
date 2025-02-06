@@ -39,6 +39,8 @@ export function SetContestEnded(): Command<typeof schemas.SetContestEnded> {
         contest_address,
         contest_id,
         is_one_off,
+        prize_percentage,
+        payout_structure,
         ended,
         chain_url,
         chain_private_url,
@@ -68,27 +70,20 @@ export function SetContestEnded(): Command<typeof schemas.SetContestEnded> {
         const score = await getContestScore(
           chain_url,
           contest_address,
+          prize_percentage,
+          payout_structure,
           contest_id,
           is_one_off,
         );
-        // TODO: @rbennettcw how to map results from getContestScore to contest score projection?
-        const mapped = score.scores.map((s) => ({
-          content_id: '0', // TODO: @rbennettcw how to get content id from getContestScore?
-          creator_address: s.winningAddress,
-          votes: s.voteCount,
-          prize: '0', // TODO: @rbennettcw how to get prize from getContestScore?
-        }));
-
+        // update final score
+        await models.Contest.update(
+          { score, score_updated_at: new Date() },
+          { where: { contest_address, contest_id }, transaction },
+        );
         // reset ending flag when ended
         await models.ContestManager.update(
           { ending: false }, // restart ending flag for future events
           { where: { contest_address }, transaction },
-        );
-
-        // update final score
-        await models.Contest.update(
-          { score: mapped, score_updated_at: new Date() },
-          { where: { contest_address, contest_id }, transaction },
         );
 
         await emitEvent(
@@ -100,11 +95,11 @@ export function SetContestEnded(): Command<typeof schemas.SetContestEnded> {
                 contest_address,
                 contest_id,
                 is_one_off,
-                balance: score.contestBalance,
-                winners: score.scores.map((s) => ({
-                  address: s.winningAddress,
-                  content: s.winningContent,
-                  votes: s.voteCount,
+                winners: score.map((s) => ({
+                  address: s.creator_address,
+                  content: s.content_id,
+                  votes: s.votes,
+                  prize: s.prize,
                 })),
               },
             },

@@ -300,12 +300,12 @@ export const ContestEnding = ContestManagerEvent.extend({
 export const ContestEnded = ContestManagerEvent.extend({
   contest_id: z.number().int().gte(0),
   is_one_off: z.boolean().describe('Is this a one-off contest'),
-  balance: z.string().describe('Balance of the contest'),
   winners: z.array(
     z.object({
       address: z.string(),
       content: z.string(),
       votes: z.string(),
+      prize: z.string(),
     }),
   ),
 }).describe('When a contest instance ended');

@@ -209,6 +209,8 @@ const rolloverContests = async () => {
   const contestManagersWithEndedContest = await models.sequelize.query<{
     contest_address: string;
     interval: number;
+    prize_percentage: number;
+    payout_structure: number[];
     contest_id: number;
     end_time: string;
     ended: boolean;
@@ -219,6 +221,8 @@ const rolloverContests = async () => {
     `
         SELECT cm.contest_address,
                cm.interval,
+               coalesce(cm.prize_percentage, 0) as prize_percentage,
+               cm.payout_structure,
                COALESCE(cm.ended, false) as ended,
                cm.neynar_webhook_id,
                co.contest_id,
@@ -255,6 +259,8 @@ const rolloverContests = async () => {
         contest_address,
         contest_id,
         interval,
+        prize_percentage,
+        payout_structure,
         ended,
         neynar_webhook_id,
       }) => {
@@ -264,6 +270,8 @@ const rolloverContests = async () => {
           payload: {
             contest_address,
             contest_id,
+            prize_percentage,
+            payout_structure,
             is_one_off: interval === 0,
             ended: ended || false,
             chain_url: url,

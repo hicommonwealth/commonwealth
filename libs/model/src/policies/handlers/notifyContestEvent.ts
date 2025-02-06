@@ -75,9 +75,7 @@ export const notifyContestEvent: EventHandler<
       return !res.some((r) => r.status === 'rejected');
     }
     case 'ContestEnded': {
-      const { balance, winners } = event.payload as z.infer<
-        typeof events.ContestEnded
-      >;
+      const { winners } = event.payload as z.infer<typeof events.ContestEnded>;
       const profiles = await models.Address.findAll({
         where: {
           address: { [Op.in]: winners.map((s) => s.address) },
@@ -95,13 +93,14 @@ export const notifyContestEvent: EventHandler<
         users,
         data: {
           ...data,
-          balance,
           winners: winners.map((s) => ({
             address: s.address,
+            content: s.content,
             name:
               profiles.find((p) => p.address === s.address)?.User?.profile
                 ?.name ?? s.address,
             votes: s.votes,
+            prize: s.prize,
           })),
         },
       });

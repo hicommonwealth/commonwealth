@@ -1,5 +1,5 @@
 import { BigNumber } from '@ethersproject/bignumber';
-import { ZERO_ADDRESS } from '@hicommonwealth/shared';
+import { CONTEST_FEE_PERCENT, ZERO_ADDRESS } from '@hicommonwealth/shared';
 import { Mutex } from 'async-mutex';
 import Web3, { Contract, PayableCallOptions, TransactionReceipt } from 'web3';
 import { feeManagerAbi } from '../../abis/feeManagerAbi';
@@ -140,24 +140,21 @@ export const getContestBalance = async (
  * Gets vote and more information about winners of a given contest
  * @param rpcNodeUrl the rpc node url
  * @param contest the address of the contest
+ * @param prizePercentage the prize percentage of the contest
+ * @param payoutStructure the payout structure of the contest
  * @param contestId the id of the contest for data within the contest contract.
  * No contest id will return current winners
  * @param oneOff boolean indicating whether this is a recurring contest - defaults to false (recurring)
- * @returns ContestScores object containing eqaul indexed content ids, addresses, and votes
+ * @returns ContestScores object containing equal indexed content ids, addresses, and votes
  */
 export const getContestScore = async (
   rpcNodeUrl: string,
   contest: string,
+  prizePercentage: number,
+  payoutStructure: number[],
   contestId?: number,
   oneOff: boolean = false,
-): Promise<{
-  scores: {
-    winningContent: string;
-    winningAddress: string;
-    voteCount: string;
-  }[];
-  contestBalance: string;
-}> => {
+) => {
   const web3 = new Web3(rpcNodeUrl);
   const contestInstance = new web3.eth.Contract(
     oneOff ? singleContestAbi : recurringContestAbi,
@@ -187,16 +184,28 @@ export const getContestScore = async (
 
   const contentMeta = await Promise.all(votePromises);
 
-  return {
-    scores: winnerIds.map((v, i) => {
-      return {
-        winningContent: v,
-        winningAddress: contentMeta[i]['creator'],
-        voteCount: contentMeta[i]['cumulativeVotes'],
-      };
-    }),
-    contestBalance: contestData[1],
-  };
+  const scores = winnerIds.map((v, i) => {
+    return {
+      winningContent: v,
+      winningAddress: contentMeta[i]['creator'],
+      voteCount: contentMeta[i]['cumulativeVotes'],
+    };
+  });
+  const contestBalance = contestData[1];
+
+  let prizePool = BigNumber.from(contestBalance)
+    .mul(oneOff ? 100 : prizePercentage)
+    .div(100);
+  prizePool = prizePool.mul(100 - CONTEST_FEE_PERCENT).div(100); // deduct contest fee from prize pool
+  return scores.map((s, i) => ({
+    content_id: s.winningContent.toString(),
+    creator_address: s.winningAddress,
+    votes: BigNumber.from(s.voteCount).toString(),
+    prize:
+      i < Number(payoutStructure.length)
+        ? BigNumber.from(prizePool).mul(payoutStructure[i]).div(100).toString()
+        : '0',
+  }));
 };
 
 export type AddContentResponse = {
