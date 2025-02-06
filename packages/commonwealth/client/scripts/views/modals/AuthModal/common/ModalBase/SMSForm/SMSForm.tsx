@@ -12,7 +12,6 @@ type SMSFormProps = {
 
 const SMSForm = ({ onSubmit, onCancel, isLoading }: SMSFormProps) => {
   const [phone, setPhone] = useState('');
-
   return (
     <>
       {isLoading ? (
@@ -40,7 +39,7 @@ const SMSForm = ({ onSubmit, onCancel, isLoading }: SMSFormProps) => {
               buttonType="primary"
               label="Sign in with Magic"
               disabled={isLoading}
-              onClick={() => onSubmit({ SMS: phone })}
+              onClick={() => onSubmit({ SMS: `+${phone}` })}
             />
           </div>
         </>
