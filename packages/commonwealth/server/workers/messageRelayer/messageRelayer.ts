@@ -1,12 +1,12 @@
 import {
-  getRabbitMQConfig,
+  createRmqConfig,
   RabbitMQAdapter,
-  RascalConfigServices,
   ServiceKey,
   startHealthCheckLoop,
 } from '@hicommonwealth/adapters';
 import { broker, logger } from '@hicommonwealth/core';
 import { bootstrapRelayer } from 'server/bindings/bootstrap';
+import { rascalConsumerMap } from '../../bindings/rascalConsumerMap';
 import { config } from '../../config';
 
 const log = logger(import.meta);
@@ -26,10 +26,10 @@ startHealthCheckLoop({
 
 export async function startMessageRelayer(maxRelayIterations?: number) {
   const rmqAdapter = new RabbitMQAdapter(
-    getRabbitMQConfig(
-      config.BROKER.RABBITMQ_URI,
-      RascalConfigServices.CommonwealthService,
-    ),
+    createRmqConfig({
+      rabbitMqUri: config.BROKER.RABBITMQ_URI,
+      map: rascalConsumerMap,
+    }),
   );
   await rmqAdapter.init();
   broker({ adapter: rmqAdapter });
