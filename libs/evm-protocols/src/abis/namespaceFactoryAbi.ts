@@ -23,12 +23,7 @@ export const namespaceFactoryAbi = [
   {
     anonymous: false,
     inputs: [
-      {
-        indexed: false,
-        internalType: 'address',
-        name: 'namespaceAdress',
-        type: 'address',
-      },
+      { indexed: false, internalType: 'string', name: 'name', type: 'string' },
       {
         indexed: false,
         internalType: 'address',
@@ -47,6 +42,12 @@ export const namespaceFactoryAbi = [
         name: '_namespaceDeployer',
         type: 'address',
       },
+      {
+        indexed: false,
+        internalType: 'address',
+        name: 'namespaceAdress',
+        type: 'address',
+      },
     ],
     name: 'DeployedNamespace',
     type: 'event',
@@ -56,9 +57,9 @@ export const namespaceFactoryAbi = [
     inputs: [
       {
         indexed: false,
-        internalType: 'address',
-        name: 'namespaceAdress',
-        type: 'address',
+        internalType: 'string',
+        name: 'name',
+        type: 'string',
       },
       {
         indexed: true,
@@ -88,6 +89,12 @@ export const namespaceFactoryAbi = [
         indexed: false,
         internalType: 'address',
         name: 'namespaceDeployer',
+        type: 'address',
+      },
+      {
+        indexed: false,
+        internalType: 'address',
+        name: 'nameSpaceAddress',
         type: 'address',
       },
     ],

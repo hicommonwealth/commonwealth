@@ -24,7 +24,10 @@ export const verifySessionSignature = async (
       })
     : address;
 
-  const sessionRawAddress = session.did.split(':')[4];
+  const signer = getSessionSignerForDid(session.did);
+  if (!signer) throw new Error('Missing session signer');
+
+  const sessionRawAddress = signer.getAddressFromDid(session.did);
   const walletAddress = ss58_prefix
     ? addressSwapper({
         address: sessionRawAddress,
@@ -37,7 +40,5 @@ export const verifySessionSignature = async (
     `session.did address (${walletAddress}) does not match (${expectedAddress})`,
   );
 
-  const signer = getSessionSignerForDid(session.did);
-  if (!signer) throw new Error('Missing session signer');
   await signer.verifySession(CANVAS_TOPIC, session);
 };

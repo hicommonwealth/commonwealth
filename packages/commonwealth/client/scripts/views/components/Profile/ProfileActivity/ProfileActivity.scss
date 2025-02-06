@@ -69,7 +69,10 @@
   }
 
   .activity-content {
-    padding: 0 60px 30px 60px;
+    padding: 0px 60px 30px 60px;
+    &.removePadding {
+      padding: 0 !important;
+    }
     .ThreadCard {
       padding-left: 0px !important;
       padding-right: 0px !important;
@@ -82,5 +85,12 @@
     @include smallInclusive {
       padding: 0 24px 24px 24px;
     }
+  }
+  .ThreadCard
+    .content-wrapper
+    .content-body-wrapper
+    .content-body
+    .show-more-btn {
+    display: none;
   }
 }

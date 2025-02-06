@@ -199,6 +199,7 @@
     .content-footer {
       display: flex;
       justify-content: space-between;
+      margin-top: auto;
 
       .content-footer-btn {
         outline: 0;
@@ -271,6 +272,8 @@
   display: flex !important;
   flex-wrap: wrap !important;
   justify-content: space-between;
+  align-items: flex-start !important;
+  justify-content: start !important;
 }
 
 .virtuoso-grid-item {
@@ -278,6 +281,7 @@
   width: 33% !important;
   display: flex !important;
   border: 1px solid $neutral-100 !important;
+  align-items: flex-start !important;
 
   @include mediumToLarge {
     width: 49% !important;
@@ -285,7 +289,7 @@
 
   @include smallInclusive {
     width: 100% !important;
-    max-height: 200px !important;
+    max-height: 280px !important;
     min-height: 200px !important;
   }
 

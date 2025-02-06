@@ -41,6 +41,7 @@ type OptionsProps = AdminActionsProps & {
   expandCommentBtnVisible?: boolean;
   showCommentVisible?: boolean;
   toggleShowComments?: () => void;
+  showOnlyThreadActionIcons?: boolean;
 };
 
 export const ThreadOptions = ({
@@ -73,6 +74,7 @@ export const ThreadOptions = ({
   expandCommentBtnVisible,
   showCommentVisible,
   toggleShowComments,
+  showOnlyThreadActionIcons = false,
 }: OptionsProps) => {
   const isCommunityMember = Permissions.isCommunityMember(thread.communityId);
   const userStore = useUserStore();
@@ -130,8 +132,12 @@ export const ThreadOptions = ({
           {/* @ts-expect-error StrictNullChecks*/}
           {commentBtnVisible && totalComments >= 0 && (
             <CWThreadAction
-              // @ts-expect-error <StrictNullChecks/>
-              label={pluralize(totalComments, 'Comment')}
+              label={
+                showOnlyThreadActionIcons
+                  ? ''
+                  : // @ts-expect-error <StrictNullChecks/>
+                    pluralize(totalComments, 'Comment')
+              }
               action="comment"
               disabled={!canComment}
               onClick={(e) => {
@@ -147,13 +153,17 @@ export const ThreadOptions = ({
             />
           )}
 
-          {/* @ts-expect-error StrictNullChecks*/}
-          <SharePopover linkToShare={shareEndpoint} buttonLabel="Share" />
+          <SharePopover
+            // @ts-expect-error <StrictNullChecks/>
+            linkToShare={shareEndpoint}
+            buttonLabel={showOnlyThreadActionIcons ? '' : 'Share'}
+          />
 
           {userStore.id > 0 && (
             <ToggleThreadSubscribe
               thread={thread}
               isCommunityMember={isCommunityMember}
+              showLabel={!showOnlyThreadActionIcons}
             />
           )}
 
