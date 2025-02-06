@@ -79,6 +79,7 @@ export enum CacheNamespaces {
   Rate_Limiter = 'rate_limiter',
   Api_key_auth = 'api_key_auth',
   Query_Response = 'query_response',
+  Twitter_Poller = 'twitter_poller',
 }
 
 /**

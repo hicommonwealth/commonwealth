@@ -1,7 +1,9 @@
+import { Tweet, TwitterMentionsTimeline } from '@hicommonwealth/schemas';
 import fetch from 'node-fetch';
+import z from 'zod';
 import { TwitterBotConfig } from './utils';
 
-async function pollTwitter({
+async function getFromTwitter({
   twitterBotConfig,
   url,
   queryParams,
@@ -37,7 +39,8 @@ async function pollTwitter({
   return await response.json();
 }
 
-async function getMentions({
+// https://docs.x.com/x-api/posts/user-mention-timeline-by-user-id
+export async function getMentions({
   twitterBotConfig,
   startTime,
   endTime,
@@ -46,12 +49,26 @@ async function getMentions({
   startTime: Date;
   endTime: Date;
 }) {
-  const mentions = await pollTwitter({
-    twitterBotConfig,
-    url: `https://api.x.com/2/users/${twitterBotConfig.twitterUserId}/mentions`,
-    queryParams: {
-      start_time: startTime,
-      end_time: endTime,
-    },
-  });
+  const allMentions: z.infer<typeof Tweet>[] = [];
+  let paginationToken: string | undefined;
+  do {
+    const res = await getFromTwitter({
+      twitterBotConfig,
+      url: `https://api.x.com/2/users/${twitterBotConfig.twitterUserId}/mentions`,
+      queryParams: {
+        start_time: startTime,
+        end_time: endTime,
+      },
+    });
+    const parsedRes = TwitterMentionsTimeline.parse(res);
+    paginationToken = parsedRes.meta?.next_token;
+
+    for (const error of parsedRes.errors) {
+      // TODO: what should we do for requests that respond with 200 but include errors?
+      console.error(error);
+    }
+    allMentions.push(...parsedRes.data);
+  } while (paginationToken);
+
+  return allMentions;
 }
