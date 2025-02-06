@@ -89,7 +89,7 @@ export async function apiKeyAuthMiddleware(
     if (hashedApiKey !== apiKeyRecord.hashed_api_key)
       throw new AppError('Unauthorized', 401);
 
-    if (premiumTier != apiKeyRecord.premium_tier) {
+    if (premiumTier && premiumTier != apiKeyRecord.premium_tier) {
       throw new AppError('Route requires premium access', 401);
     }
 
