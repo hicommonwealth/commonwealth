@@ -226,6 +226,7 @@ describe('Contest Worker Policy Lifecycle', () => {
     });
 
     expect(rolloverContestStub, 'contest rolled over').toHaveBeenCalledOnce();
+    expect(getContestScoreStub, 'get final score').toHaveBeenCalledOnce();
 
     const contestManagerAfterContestEnded =
       await models.ContestManager.findByPk(contestAddress);
