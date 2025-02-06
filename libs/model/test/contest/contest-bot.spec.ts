@@ -3,6 +3,7 @@
 import {
   ContestMetadataResponse,
   DEFAULT_CONTEST_BOT_PARAMS,
+  getContestUSDCAddress,
   parseBotCommand,
   ParseBotCommandError,
 } from 'model/src/services/openai/parseBotCommand';
@@ -16,6 +17,7 @@ type TestCase = {
 const defaults: Omit<ContestMetadataResponse, 'contestName'> = {
   tokenAddress: '0x429ae85883f82203D736e8fc203A455990745ca1',
   ...DEFAULT_CONTEST_BOT_PARAMS,
+  isUSDC: false,
 };
 
 const validateOutput = (
@@ -481,6 +483,24 @@ const testCases: Array<TestCase> = [
       contestName: 'Best Memes Only',
       ...defaults,
       tokenAddress: '0x0c41f1fc9022feb69af6dc666abfe73c9ffda7ce',
+    },
+  },
+  {
+    input: `@commonbot, letʼs inspire laughter! Best Memes Only contest via USDC on Base.`,
+    expectedOutput: {
+      contestName: 'Best Memes Only',
+      ...defaults,
+      tokenAddress: getContestUSDCAddress(),
+      isUSDC: true,
+    },
+  },
+  {
+    input: `@contestbot, launch Super Friday for usdc.`,
+    expectedOutput: {
+      contestName: 'Super Friday',
+      ...defaults,
+      tokenAddress: getContestUSDCAddress(),
+      isUSDC: true,
     },
   },
 ];
