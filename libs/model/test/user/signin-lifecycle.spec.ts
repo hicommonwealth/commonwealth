@@ -17,7 +17,7 @@ import { SignIn } from '../../src/user/SignIn.command';
 import { CommunitySeedOptions, seedCommunity } from '../utils';
 
 describe('SignIn Lifecycle', async () => {
-  const [evmSigner, cosmosSigner, substrateSigner, solanaSigner] =
+  const [evmSigner, _, cosmosSigner, substrateSigner, solanaSigner] =
     await getSessionSigners();
 
   const refs = {} as Record<
@@ -90,7 +90,7 @@ describe('SignIn Lifecycle', async () => {
           'getWalletAddress' in signer &&
           typeof signer.getWalletAddress === 'function'
             ? await signer.getWalletAddress()
-            : payload.did.split(':')[4];
+            : signer.getAddressFromDid(payload.did);
 
         const ref = (refs[seed.chain_base!] = {
           community_id: community!.id,
