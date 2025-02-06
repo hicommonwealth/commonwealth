@@ -11,7 +11,7 @@ interface AvatarProps {
   showSkeleton?: boolean;
 }
 
-export const Avatar = ({ url, size, address, showSkeleton }: AvatarProps) => {
+export const Avatar = ({ url, size, showSkeleton }: AvatarProps) => {
   if (showSkeleton) {
     // @ts-expect-error StrictNullChecks
     return <CWAvatarSkeleton size={size} />;
