@@ -1,4 +1,5 @@
 import { DefaultPage } from '@hicommonwealth/shared';
+import { useFlag } from 'client/scripts/hooks/useFlag';
 import { buildUpdateCommunityInput } from 'client/scripts/state/api/communities/updateCommunity';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { linkValidationSchema } from 'helpers/formValidations/common';
@@ -38,6 +39,8 @@ import { FormSubmitValues } from './types';
 import { communityProfileValidationSchema } from './validation';
 
 const CommunityProfileForm = () => {
+  const communityHomeEnabled = useFlag('communityHome');
+
   // `formKey` remounts the CWForm with new community default values after a
   // successful update, using the updated formKey.
   const [formKey, setFormKey] = useState(1);
@@ -414,12 +417,14 @@ const CommunityProfileForm = () => {
                 name="defaultPage"
                 hookToForm
               />
-              <CWRadioButton
-                label="Community Home"
-                value={DefaultPage.Homepage}
-                name="defaultPage"
-                hookToForm
-              />
+              {communityHomeEnabled && (
+                <CWRadioButton
+                  label="Community Home"
+                  value={DefaultPage.Homepage}
+                  name="defaultPage"
+                  hookToForm
+                />
+              )}
             </div>
           </section>
 
