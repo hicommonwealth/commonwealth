@@ -1,4 +1,9 @@
-import { InvalidState, ServerError, type Command } from '@hicommonwealth/core';
+import {
+  AppError,
+  InvalidState,
+  ServerError,
+  type Command,
+} from '@hicommonwealth/core';
 import {
   commonProtocol as cp,
   getErc20TokenInfo,
@@ -12,13 +17,21 @@ import { z } from 'zod';
 import { models } from '../database';
 import { mustExist } from '../middleware/guards';
 
-export function LaunchToken(): Command<typeof schemas.LaunchToken> {
+export function LaunchTokenBot(): Command<typeof schemas.LaunchToken> {
   return {
     ...schemas.LaunchToken,
     auth: [],
-    body: async ({ payload }) => {
+    body: async ({ payload, context }) => {
       const { name, symbol, totalSupply, chain_id, icon_url, description } =
         payload;
+
+      const apiKey = context.request.headers['x-api-key'];
+
+      if (!config.OHARA.API_KEY || apiKey !== config.OHARA.API_KEY)
+        throw new AppError('Unauthorized', 401);
+
+      if (!config.WEB3.CONTEST_BOT_PRIVATE_KEY)
+        throw new ServerError('Contest bot private key not set!');
 
       const chainNode = await models.ChainNode.findOne({
         where: { eth_chain_id: chain_id },
@@ -26,9 +39,6 @@ export function LaunchToken(): Command<typeof schemas.LaunchToken> {
       });
 
       mustExist('Chain Node', chainNode);
-
-      if (!config.WEB3.CONTEST_BOT_PRIVATE_KEY)
-        throw new ServerError('Contest bot private key not set!');
 
       const web3 = cp.createPrivateEvmClient({
         rpc: chainNode.private_url!,
