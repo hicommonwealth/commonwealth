@@ -15,6 +15,7 @@ import { config } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
 import { TokenView } from '@hicommonwealth/schemas';
 import { ChainBase, ChainType } from '@hicommonwealth/shared';
+import _ from 'lodash';
 import { z } from 'zod';
 import { CreateCommunity } from '../community';
 import { models } from '../database';
@@ -35,7 +36,7 @@ export function LaunchTokenBot(): Command<typeof schemas.LaunchToken> {
       if (!config.WEB3.CONTEST_BOT_PRIVATE_KEY)
         throw new ServerError('Contest bot private key not set!');
 
-      const communityId = name.toLowerCase().replace(/\s+/g, '-');
+      const communityId = _.kebabCase(name.toLowerCase());
       const existingCommunity = await models.Community.findOne({
         where: { id: communityId },
       });
@@ -50,30 +51,6 @@ export function LaunchTokenBot(): Command<typeof schemas.LaunchToken> {
       });
 
       mustExist('Chain Node', chainNode);
-
-      // Create corresponding community for token
-      await command(CreateCommunity(), {
-        actor,
-        payload: {
-          id: communityId,
-          name,
-          default_symbol: symbol,
-          icon_url,
-          description,
-          base: ChainBase.Ethereum,
-          token_name: name,
-          chain_node_id: chainNode!.id!,
-          type: ChainType.Offchain,
-          social_links: [],
-          directory_page_enabled: false,
-          tags: [],
-        },
-      });
-
-      await models.Community.update(
-        { namespace: name },
-        { where: { id: communityId } },
-      );
 
       const web3 = cp.createPrivateEvmClient({
         rpc: chainNode.private_url!,
@@ -138,8 +115,32 @@ export function LaunchTokenBot(): Command<typeof schemas.LaunchToken> {
         },
       });
 
+      // Create corresponding community for token
+      await command(CreateCommunity(), {
+        actor,
+        payload: {
+          id: communityId,
+          name,
+          default_symbol: symbol,
+          icon_url,
+          description,
+          base: ChainBase.Ethereum,
+          token_name: name,
+          chain_node_id: chainNode!.id!,
+          type: ChainType.Offchain,
+          social_links: [],
+          directory_page_enabled: false,
+          tags: [],
+        },
+      });
+
+      await models.Community.update(
+        { namespace: name },
+        { where: { id: communityId } },
+      );
+
       const response = {
-        community_url: `https://common.xyz/${communityId}`,
+        community_url: `${config.SERVER_URL}/${communityId}`,
         ...token!.toJSON(),
       };
       return response as unknown as z.infer<typeof TokenView> & {
