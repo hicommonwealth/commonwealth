@@ -53,5 +53,7 @@ export const LaunchToken = {
     icon_url: z.string().optional().describe('The icon url of the token'),
     description: z.string().optional().describe('The description of the token'),
   }),
-  output: TokenView,
+  output: TokenView.extend({
+    community_url: z.string(),
+  }),
 };
