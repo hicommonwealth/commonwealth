@@ -23,7 +23,7 @@ async function getContestDetails(contest_address: string, contest_id: number) {
        M.name as contest_name,
        M.image_url,
        M.community_id,
-       CO.name as community_name,
+       CO.name as community_name
     FROM 
       "Contests" C 
       JOIN "ContestManagers" M ON C.contest_address = M.contest_address
