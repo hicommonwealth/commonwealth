@@ -1,5 +1,8 @@
 import { Command, logger } from '@hicommonwealth/core';
-import { rollOverContest } from '@hicommonwealth/evm-protocols';
+import {
+  getContestScore,
+  rollOverContest,
+} from '@hicommonwealth/evm-protocols';
 import * as schemas from '@hicommonwealth/schemas';
 import { NeynarAPIClient } from '@neynar/nodejs-sdk';
 import { config } from '../config';
@@ -61,10 +64,31 @@ export function SetContestEnded(): Command<typeof schemas.SetContestEnded> {
           contest: contest_address,
           oneOff: is_one_off,
         });
+        // TODO: @rbennettcw can we get scores as a result of rollOverContest to avoid two calls?
+        const score = await getContestScore(
+          chain_url,
+          contest_address,
+          contest_id,
+          is_one_off,
+        );
+        // TODO: @rbennettcw how to map results from getContestScore to contest score projection?
+        const mapped = score.scores.map((s) => ({
+          content_id: '0', // TODO: @rbennettcw how to get content id from getContestScore?
+          creator_address: s.winningAddress,
+          votes: s.voteCount,
+          prize: '0', // TODO: @rbennettcw how to get prize from getContestScore?
+        }));
 
+        // reset ending flag when ended
         await models.ContestManager.update(
           { ending: false }, // restart ending flag for future events
           { where: { contest_address }, transaction },
+        );
+
+        // update final score
+        await models.Contest.update(
+          { score: mapped, score_updated_at: new Date() },
+          { where: { contest_address, contest_id }, transaction },
         );
 
         await emitEvent(
@@ -76,6 +100,12 @@ export function SetContestEnded(): Command<typeof schemas.SetContestEnded> {
                 contest_address,
                 contest_id,
                 is_one_off,
+                balance: score.contestBalance,
+                winners: score.scores.map((s) => ({
+                  address: s.winningAddress,
+                  content: s.winningContent,
+                  votes: s.voteCount,
+                })),
               },
             },
           ],

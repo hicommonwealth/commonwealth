@@ -6,14 +6,14 @@ import {
   NotificationUser,
   WorkflowKeys,
 } from '@hicommonwealth/core';
-import { getContestScore } from '@hicommonwealth/evm-protocols';
+import { events } from '@hicommonwealth/schemas';
 import { Op, QueryTypes } from 'sequelize';
 import z from 'zod';
 import { models } from '../../database';
 
 async function getContestDetails(contest_address: string, contest_id: number) {
   const [contest] = await models.sequelize.query<
-    z.infer<typeof ContestNotification> & { chain_url: string }
+    z.infer<typeof ContestNotification>
   >(
     `
     SELECT
@@ -24,12 +24,10 @@ async function getContestDetails(contest_address: string, contest_id: number) {
        M.image_url,
        M.community_id,
        CO.name as community_name,
-       CN.url as chain_url   
     FROM 
       "Contests" C 
       JOIN "ContestManagers" M ON C.contest_address = M.contest_address
       JOIN "Communities" CO ON M.community_id = CO.id
-      JOIN "ChainNodes" CN ON CO.chain_node_id = CN.id
     WHERE
       C.contest_address = :contest_address 
       AND C.contest_id = :contest_id
@@ -46,7 +44,7 @@ export const notifyContestEvent: EventHandler<
 > = async (
   event: EventContext<'ContestStarted' | 'ContestEnding' | 'ContestEnded'>,
 ) => {
-  const { contest_address, contest_id, is_one_off } = event.payload;
+  const { contest_address, contest_id } = event.payload;
   const data = await getContestDetails(contest_address, contest_id);
 
   // all community users get notified
@@ -77,17 +75,14 @@ export const notifyContestEvent: EventHandler<
       return !res.some((r) => r.status === 'rejected');
     }
     case 'ContestEnded': {
-      const score = await getContestScore(
-        data.chain_url,
-        contest_address,
-        contest_id,
-        is_one_off,
-      );
-      const winners = await models.Address.findAll({
+      const { balance, winners } = event.payload as z.infer<
+        typeof events.ContestEnded
+      >;
+      const profiles = await models.Address.findAll({
         where: {
-          address: { [Op.in]: score.scores.map((s) => s.winningAddress) },
+          address: { [Op.in]: winners.map((s) => s.address) },
         },
-        attributes: ['address', 'user_id'],
+        attributes: ['address'],
         include: [
           {
             model: models.User,
@@ -95,19 +90,18 @@ export const notifyContestEvent: EventHandler<
           },
         ],
       });
-
       const res = await provider.triggerWorkflow({
         key: WorkflowKeys.ContestEnded,
         users,
         data: {
           ...data,
-          balance: score.contestBalance,
-          score: score.scores.map((s) => ({
-            address: s.winningAddress,
+          balance,
+          winners: winners.map((s) => ({
+            address: s.address,
             name:
-              winners.find((w) => w.address === s.winningAddress)?.User?.profile
-                ?.name ?? s.winningAddress,
-            votes: s.voteCount,
+              profiles.find((p) => p.address === s.address)?.User?.profile
+                ?.name ?? s.address,
+            votes: s.votes,
           })),
         },
       });
