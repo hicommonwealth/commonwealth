@@ -8,6 +8,7 @@ import useUserStore from 'state/ui/user';
 import { IconName } from 'views/components/component_kit/cw_icons/cw_icon_lookup';
 
 import { CWText } from '../../components/component_kit/cw_text';
+import { CWMobileTab } from '../../components/component_kit/new_designs/CWMobileTab';
 import CWPageLayout from '../../components/component_kit/new_designs/CWPageLayout';
 import {
   CWTab,
@@ -15,7 +16,6 @@ import {
 } from '../../components/component_kit/new_designs/CWTabs';
 import { PageNotFound } from '../404';
 import './RewardsPage.scss';
-import RewardsTab from './RewardsTab';
 import { QuestCard, ReferralCard, WalletCard } from './cards';
 import { QuestTable, ReferralTable, WalletTable } from './tables';
 import { MobileTabType, TableType } from './types';
@@ -67,10 +67,10 @@ const RewardsPage = () => {
         {/* visible only on mobile */}
         <div className="rewards-button-tabs">
           {Object.values(MobileTabType).map((type) => (
-            <RewardsTab
+            <CWMobileTab
               key={type}
               icon={typeToIcon[type] as IconName}
-              title={type}
+              label={type}
               isActive={mobileTab === type}
               onClick={() => handleTabChange(type)}
             />

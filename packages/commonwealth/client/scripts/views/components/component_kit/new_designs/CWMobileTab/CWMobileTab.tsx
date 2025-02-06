@@ -5,24 +5,34 @@ import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { IconName } from 'views/components/component_kit/cw_icons/cw_icon_lookup';
 import { CWText } from 'views/components/component_kit/cw_text';
 
-import './RewardsTab.scss';
+import './CWMobileTab.scss';
 
-interface RewardsTabProps {
+export interface CWMobileTabProps {
   icon: IconName;
-  title: string;
+  label: string;
   isActive: boolean;
   onClick: () => void;
+  className?: string;
 }
 
-const RewardsTab = ({ icon, title, isActive, onClick }: RewardsTabProps) => {
+export const CWMobileTab = ({
+  icon,
+  label,
+  isActive,
+  onClick,
+  className,
+}: CWMobileTabProps) => {
   return (
-    <button className={clsx('RewardsTab', { isActive })} onClick={onClick}>
+    <button
+      className={clsx('CWMobileTab', { isActive }, className)}
+      onClick={onClick}
+    >
       <CWIcon iconName={icon} />
       <CWText type="caption" fontWeight="medium">
-        {title}
+        {label}
       </CWText>
     </button>
   );
 };
 
-export default RewardsTab;
+export default CWMobileTab;
