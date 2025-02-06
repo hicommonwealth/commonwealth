@@ -34,6 +34,12 @@ export const CWUpvote: FC<CWUpvoteProps> = ({
     };
   };
 
+  const voteCountNum = parseFloat(voteCount);
+  const formattedVotes =
+    voteCountNum > 0 && voteCountNum < 1
+      ? voteCount
+      : formatBigNumberShort(BigNumber.from(voteCount || 0));
+
   return (
     <button
       className={getClasses({ ...getParameters() }, ComponentType.Upvote)}
@@ -48,7 +54,7 @@ export const CWUpvote: FC<CWUpvoteProps> = ({
         weight={active ? 'fill' : 'regular'}
       />
       <CWText className={getClasses({ ...getParameters() })} type="caption">
-        {formatBigNumberShort(BigNumber.from(voteCount || 0))}
+        {formattedVotes}
       </CWText>
     </button>
   );
