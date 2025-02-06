@@ -1,11 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
+import PhoneInput from 'react-phone-input-2';
+import 'react-phone-input-2/lib/style.css';
 import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
 import { CWButton } from '../../../../../components/component_kit/new_designs/CWButton';
-import { CWForm } from '../../../../../components/component_kit/new_designs/CWForm';
-import { CWTextInput } from '../../../../../components/component_kit/new_designs/CWTextInput';
 import './SMSForm.scss';
-import { SMSValidationSchema } from './validation';
-
 type SMSFormProps = {
   onCancel: () => void;
   onSubmit: (values: { SMS: string }) => void;
@@ -13,22 +11,20 @@ type SMSFormProps = {
 };
 
 const SMSForm = ({ onSubmit, onCancel, isLoading }: SMSFormProps) => {
+  const [phone, setPhone] = useState('');
+
   return (
-    <CWForm
-      className="SMSForm"
-      validationSchema={SMSValidationSchema}
-      onSubmit={!isLoading ? onSubmit : () => {}}
-    >
+    <>
       {isLoading ? (
         <CWCircleMultiplySpinner />
       ) : (
         <>
-          <CWTextInput
-            fullWidth
-            hookToForm
-            name="SMS"
-            label="Phone number"
-            placeholder="Phone number"
+          <PhoneInput
+            value={phone}
+            onChange={setPhone}
+            country="us"
+            enableSearch
+            dropdownClass="dropDown"
           />
           <div className="action-btns">
             <CWButton
@@ -39,16 +35,17 @@ const SMSForm = ({ onSubmit, onCancel, isLoading }: SMSFormProps) => {
               disabled={isLoading}
             />
             <CWButton
-              type="submit"
+              type="button"
               buttonWidth="wide"
               buttonType="primary"
               label="Sign in with Magic"
               disabled={isLoading}
+              onClick={() => onSubmit({ SMS: phone })}
             />
           </div>
         </>
       )}
-    </CWForm>
+    </>
   );
 };
 

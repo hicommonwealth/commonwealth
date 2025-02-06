@@ -260,6 +260,7 @@
     "react-json-view": "^1.21.3",
     "react-loading-skeleton": "^3.3.1",
     "react-modern-drawer": "^1.2.2",
+    "react-phone-input-2": "^2.15.1",
     "react-quill": "^2.0.0",
     "react-redux": "^9.1.2",
     "react-router": "^6.9.0",
