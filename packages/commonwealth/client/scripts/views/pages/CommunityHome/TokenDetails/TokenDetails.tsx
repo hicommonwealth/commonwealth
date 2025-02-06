@@ -1,12 +1,17 @@
+import { TokenView } from '@hicommonwealth/schemas';
 import { formatAddressShort } from 'client/scripts/helpers';
+import { calculateTokenPricing } from 'client/scripts/helpers/launchpad';
 import { useFlag } from 'client/scripts/hooks/useFlag';
+import { useFetchTokenUsdRateQuery } from 'client/scripts/state/api/communityStake';
 import { useFetchTokensQuery } from 'client/scripts/state/api/tokens';
 import { saveToClipboard } from 'client/scripts/utils/clipboard';
+import PricePercentageChange from 'client/scripts/views/components/TokenCard/PricePercentageChange';
 import { CWIconButton } from 'client/scripts/views/components/component_kit/cw_icon_button';
 import { CWIcon } from 'client/scripts/views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
 import { CWTooltip } from 'client/scripts/views/components/component_kit/new_designs/CWTooltip';
 import React from 'react';
+import { z } from 'zod';
 import './TokenDetails.scss';
 
 interface TokenDetailsProbs {
@@ -34,20 +39,24 @@ const TokenDetails = ({
     (token) => token.community_id === communityId,
   );
 
-  const calculatePriceChange = (latest: number | null, old: number | null) => {
-    if (latest === null || old === null || old === 0) return 'N/A';
-    return (((latest - old) / old) * 100).toFixed(2);
-  };
+  const { data: ethToCurrencyRateData, isLoading: isLoadingETHToCurrencyRate } =
+    useFetchTokenUsdRateQuery({
+      tokenSymbol: 'ETH',
+    });
 
-  if (!communityToken || !communityToken.icon_url) return <></>;
-
-  const priceChange = calculatePriceChange(
-    communityToken.latest_price ?? null,
-    communityToken.old_price ?? null,
+  const ethToUsdRate = parseFloat(
+    ethToCurrencyRateData?.data?.data?.amount || '0',
   );
 
-  const isPriceChangeValid = priceChange !== 'N/A';
-  const numericPriceChange = isPriceChangeValid ? parseFloat(priceChange) : 0;
+  if (!communityToken || !communityToken.icon_url || isLoadingETHToCurrencyRate)
+    return <></>;
+
+  const tokenPricing = communityToken
+    ? calculateTokenPricing(
+        communityToken as z.infer<typeof TokenView>,
+        ethToUsdRate,
+      )
+    : null;
 
   return (
     <div className="token-details">
@@ -80,15 +89,15 @@ const TokenDetails = ({
           <CWText type="b1" className="faded">
             24h Change
           </CWText>
-          <span
-            className={`price-change ${
-              isPriceChangeValid && numericPriceChange >= 0
-                ? 'positive'
-                : 'negative'
-            }`}
-          >
-            {isPriceChangeValid ? `▲ ${priceChange}%` : 'N/A'}
-          </span>
+          {tokenPricing && (
+            <PricePercentageChange
+              pricePercentage24HourChange={
+                tokenPricing.pricePercentage24HourChange
+              }
+              alignment="left"
+              className="pad-8"
+            />
+          )}
         </div>
         <div className="stat-item">
           <CWText type="b1" className="faded">
