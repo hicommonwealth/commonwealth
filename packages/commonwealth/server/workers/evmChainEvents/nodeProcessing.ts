@@ -15,6 +15,7 @@ import { config } from '../../config';
 import { getEventSources } from './getEventSources';
 import { getEvents, getProvider, migrateEvents } from './logProcessing';
 import { EvmEvent, EvmSource } from './types';
+import { updateMigratedEvmEventSources } from './utils';
 
 const log = logger(import.meta);
 
@@ -101,7 +102,11 @@ export async function processChainNode(
       }
 
       if (allEvents.length === 0) {
-        // log.info(`Processed 0 events for chainNodeId ${ethChainId}`);
+        await updateMigratedEvmEventSources(
+          ethChainId,
+          migratedData,
+          transaction,
+        );
         return;
       }
 
@@ -181,26 +186,11 @@ export async function processChainNode(
           )}`,
         );
         await emitEvent(models.Outbox, records, transaction);
-
-        if (Object.keys(migratedData.contracts).length > 0) {
-          const migratedSources = Object.keys(migratedData.contracts).reduce(
-            (acc: Array<[number, string, string]>, contractAddress: string) => {
-              migratedData.contracts[contractAddress].sources.forEach((s) => {
-                acc.push([ethChainId, contractAddress, s.event_signature]);
-              });
-              return acc;
-            },
-            [],
-          );
-          await models.sequelize.query(
-            `
-            UPDATE "EvmEventSources"
-            SET events_migrated = true
-            WHERE (eth_chain_id, contract_address, event_signature) IN (:migratedSources)
-          `,
-            { transaction, replacements: { migratedSources } },
-          );
-        }
+        await updateMigratedEvmEventSources(
+          ethChainId,
+          migratedData,
+          transaction,
+        );
       }
     });
   } catch (e) {

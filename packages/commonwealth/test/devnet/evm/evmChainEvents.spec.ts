@@ -671,5 +671,118 @@ describe('EVM Chain Events Devnet Tests', () => {
         await testEventMigration(namespaceDeployedBlock);
       },
     );
+
+    test(
+      'should update EVM event sources event when no events are found',
+      { timeout: 80_000 },
+      async () => {
+        const evmEventSource = await models.EvmEventSource.create({
+          eth_chain_id: sepoliaBaseChainId,
+          contract_address: namespaceFactoryAddress,
+          event_signature:
+            EvmEventSignatures.NamespaceFactory.NamespaceDeployed,
+          created_at_block: namespaceDeployedBlock,
+          events_migrated: false,
+          // Unrelated to NamespaceFactory tests here but required for type
+          contract_name: ChildContractNames.SingleContest,
+          parent_contract_address: '',
+        });
+
+        const fakeEvmEventSource = await models.EvmEventSource.create({
+          eth_chain_id: 1,
+          contract_address: namespaceFactoryAddress,
+          event_signature:
+            EvmEventSignatures.NamespaceFactory.NamespaceDeployed,
+          created_at_block: namespaceDeployedBlock,
+          events_migrated: false,
+          // Unrelated to NamespaceFactory tests here but required for type
+          contract_name: ChildContractNames.SingleContest,
+          parent_contract_address: '',
+        });
+
+        await mineBlocks(10);
+        const latestBlockNum = await getBlockNumber({
+          rpc: localRpc,
+        });
+
+        const { getEventSources } = await import(
+          '../../../server/workers/evmChainEvents/getEventSources'
+        );
+        (getEventSources as unknown as MockInstance).mockImplementation(
+          async () =>
+            Promise.resolve({
+              [sepoliaBaseChainId]: {
+                rpc: localRpc,
+                maxBlockRange: 500,
+                contracts: {
+                  [namespaceFactoryAddress]: {
+                    abi: factoryEventRegistry.abi,
+                    sources: [
+                      {
+                        eth_chain_id: sepoliaBaseChainId,
+                        contract_address: namespaceFactoryAddress,
+                        event_signature:
+                          EvmEventSignatures.NamespaceFactory.NamespaceDeployed,
+                        created_at_block: latestBlockNum - 5,
+                        events_migrated: false,
+                      },
+                    ],
+                  },
+                },
+              },
+            }),
+        );
+
+        expect(await models.Outbox.count()).to.equal(0);
+
+        expect(latestBlockNum).to.be.greaterThan(namespaceDeployedBlock);
+        await models.LastProcessedEvmBlock.create({
+          chain_node_id: chainNode.id!,
+          block_number: latestBlockNum - 3,
+        });
+
+        const intervalId = await startEvmPolling(10_000);
+        clearInterval(intervalId);
+
+        let lastProcessedBlockNumber:
+          | LastProcessedEvmBlockInstance
+          | undefined
+          | null;
+        await vi.waitUntil(
+          async () => {
+            lastProcessedBlockNumber =
+              await models.LastProcessedEvmBlock.findOne({
+                where: {
+                  chain_node_id: chainNode.id!,
+                  block_number: {
+                    [Op.gte]: latestBlockNum - 1,
+                  },
+                },
+              });
+            return !!lastProcessedBlockNumber;
+          },
+          {
+            timeout: 5_000,
+            interval: 200,
+          },
+        );
+
+        // should stop before the current block to minimize chain re-org impact
+        expect(lastProcessedBlockNumber?.block_number).to.be.greaterThanOrEqual(
+          latestBlockNum - 1,
+        );
+
+        const events = (await models.Outbox.findAll()) as unknown as Array<{
+          event_name: EventNames.ChainEventCreated;
+          event_payload: z.infer<typeof coreEvents.ChainEventCreated>;
+        }>;
+        expect(events.length).to.equal(0);
+
+        await evmEventSource.reload();
+        expect(evmEventSource.events_migrated).to.be.true;
+        await fakeEvmEventSource.reload();
+        expect(fakeEvmEventSource.events_migrated).to.be.false;
+      },
+    );
   });
 });
