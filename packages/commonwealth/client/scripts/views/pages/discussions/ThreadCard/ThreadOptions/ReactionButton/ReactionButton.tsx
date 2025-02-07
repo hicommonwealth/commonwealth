@@ -1,3 +1,4 @@
+import { formatWeiToDecimal } from '@hicommonwealth/shared';
 import { buildCreateThreadReactionInput } from 'client/scripts/state/api/threads/createReaction';
 import { buildDeleteThreadReactionInput } from 'client/scripts/state/api/threads/deleteReaction';
 import { useAuthModalStore } from 'client/scripts/state/ui/modals';
@@ -38,6 +39,7 @@ export const ReactionButton = ({
   tooltipText,
   undoUpvoteDisabled,
 }: ReactionButtonProps) => {
+  console.log({ thread });
   const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
   const reactors = thread?.associatedReactions?.map((t) => t.address!);
 
@@ -135,11 +137,16 @@ export const ReactionButton = ({
     }
   };
 
+  const formattedVoteCount =
+    thread.topic?.weighted_voting === 'erc20'
+      ? formatWeiToDecimal(reactionWeightsSum.toString())
+      : reactionWeightsSum.toString();
+
   return (
     <>
       {size === 'small' ? (
         <CWUpvoteSmall
-          voteCount={reactionWeightsSum.toString()}
+          voteCount={formattedVoteCount}
           disabled={disabled}
           isThreadArchived={!!thread.archivedAt}
           selected={hasReacted}
@@ -154,7 +161,7 @@ export const ReactionButton = ({
         <TooltipWrapper disabled={disabled} text={tooltipText}>
           <CWUpvote
             onClick={handleVoteClick}
-            voteCount={reactionWeightsSum.toString()}
+            voteCount={formattedVoteCount}
             disabled={disabled}
             active={hasReacted}
           />
@@ -166,7 +173,7 @@ export const ReactionButton = ({
         >
           <CWUpvote
             onClick={handleVoteClick}
-            voteCount={reactionWeightsSum.toString()}
+            voteCount={formattedVoteCount}
             disabled={disabled}
             active={hasReacted}
           />

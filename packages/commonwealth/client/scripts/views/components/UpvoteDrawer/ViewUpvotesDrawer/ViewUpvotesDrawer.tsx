@@ -1,3 +1,4 @@
+import { TopicWeightedVoting } from '@hicommonwealth/schemas';
 import { APIOrderDirection } from 'helpers/constants';
 import Account from 'models/Account';
 import AddressInfo from 'models/AddressInfo';
@@ -5,6 +6,7 @@ import MinimumProfile from 'models/MinimumProfile';
 import React, { Dispatch, SetStateAction } from 'react';
 import app from 'state';
 import { User } from 'views/components/user/user';
+import { formatWeiToDecimal } from '../../../../../../../../libs/shared/src/utils';
 import { AuthorAndPublishInfo } from '../../../pages/discussions/ThreadCard/AuthorAndPublishInfo';
 import { CWText } from '../../component_kit/cw_text';
 import CWDrawer, {
@@ -24,6 +26,7 @@ type ViewUpvotesDrawerProps = {
   publishDate: moment.Moment;
   isOpen: boolean;
   setIsOpen: Dispatch<SetStateAction<boolean>>;
+  topicWeight?: TopicWeightedVoting | null;
 };
 
 type Upvoter = {
@@ -63,6 +66,7 @@ export const ViewUpvotesDrawer = ({
   publishDate,
   isOpen,
   setIsOpen,
+  topicWeight,
 }: ViewUpvotesDrawerProps) => {
   const tableState = useCWTableState({
     columns,
@@ -73,7 +77,10 @@ export const ViewUpvotesDrawer = ({
   const voterRow = (voter: Upvoter) => {
     return {
       name: voter.name,
-      voteWeight: voter.voting_weight,
+      voteWeight:
+        topicWeight === 'erc20'
+          ? formatWeiToDecimal(voter.voting_weight.toString())
+          : voter.voting_weight,
       timestamp: voter.updated_at,
       avatars: {
         name: {
@@ -93,9 +100,15 @@ export const ViewUpvotesDrawer = ({
   };
 
   const getVoteWeightTotal = (voters: Upvoter[]) => {
-    return voters.reduce((memo, current) => memo + current.voting_weight, 0);
+    return voters.reduce(
+      (memo, current) =>
+        memo +
+        (topicWeight === 'erc20'
+          ? parseFloat(formatWeiToDecimal(current.voting_weight.toString()))
+          : current.voting_weight),
+      0,
+    );
   };
-
   const getAuthorCommunityId = (contentAuthor: Profile) => {
     if (contentAuthor instanceof MinimumProfile) {
       return contentAuthor?.chain;
