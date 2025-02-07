@@ -51,23 +51,24 @@ export function SetContestEnded(): Command<typeof schemas.SetContestEnded> {
         private_url: chain_private_url,
       });
 
-      await models.sequelize.transaction(async (transaction) => {
-        await rollOverContest({
-          privateKey: config.WEB3.PRIVATE_KEY,
-          rpc,
-          contest: contest_address,
-          oneOff: is_one_off,
-        });
-        // better to get scores using views to avoid returning unbounded arrays in txs
-        const score = await getContestScore(
-          rpc,
-          contest_address,
-          prize_percentage,
-          payout_structure,
-          contest_id,
-          is_one_off,
-        );
+      await rollOverContest({
+        privateKey: config.WEB3.PRIVATE_KEY,
+        rpc,
+        contest: contest_address,
+        oneOff: is_one_off,
+      });
 
+      // better to get scores using views to avoid returning unbounded arrays in txs
+      const score = await getContestScore(
+        rpc,
+        contest_address,
+        prize_percentage,
+        payout_structure,
+        contest_id,
+        is_one_off,
+      );
+
+      await models.sequelize.transaction(async (transaction) => {
         // update final score
         await models.Contest.update(
           { score, score_updated_at: new Date() },
