@@ -1,12 +1,15 @@
 import { EventNames, events, Tweet } from '@hicommonwealth/schemas';
+import { TwitterBotName } from '@hicommonwealth/shared';
 import { z } from 'zod';
 
 export const TwitterBotConfigs = {
-  MomBot: {
+  [TwitterBotName.MomBot]: {
+    name: TwitterBotName.MomBot,
     twitterUserId: '1337',
     bearerToken: '<PASSWORD>',
   },
-  ContestBot: {
+  [TwitterBotName.ContestBot]: {
+    name: TwitterBotName.ContestBot,
     twitterUserId: '1338',
     bearerToken: '<PASSWORD>',
   },
