@@ -35,30 +35,3 @@ export const notifyAddressOwnershipTransferred: EventHandler<
 
   return !res.some((r) => r.status === 'rejected');
 };
-
-// TODO: create knock workflow for this
-// if (updated > 0 && unverifed) {
-//   try {
-//     // send email to the old user (should only ever be one)
-//     if (!unverifed.User?.email) throw new InvalidState(Errors.NoEmail);
-
-//     const msg = {
-//       to: unverifed.User.email,
-//       from: `Commonwealth <no-reply@${PRODUCTION_DOMAIN}>`,
-//       templateId: DynamicTemplate.VerifyAddress,
-//       dynamic_template_data: {
-//         address: addr.address,
-//         chain: community.name,
-//       },
-//     };
-//     await sgMail.send(msg);
-//     log.info(
-//       `Sent address move email: ${addr.address} transferred to a new account`,
-//     );
-//   } catch (e) {
-//     log.error(
-//       `Could not send address move email for: ${addr.address}`,
-//       e as Error,
-//     );
-//   }
-// }
