@@ -17,6 +17,7 @@ describe('parseEvmEventToContestEvent', () => {
         ethers.BigNumber.from(7), // interval
         false, // oneOff
       ],
+      1,
     );
     expect(event_name).to.eq(EventNames.RecurringContestManagerDeployed);
     const parsedEvent =
@@ -37,6 +38,7 @@ describe('parseEvmEventToContestEvent', () => {
         ethers.BigNumber.from(7), // interval is same as length
         true, // oneOff
       ],
+      1,
     );
     expect(event_name).to.eq(EventNames.OneOffContestManagerDeployed);
     const parsedEvent =
@@ -56,6 +58,7 @@ describe('parseEvmEventToContestEvent', () => {
         ethers.BigNumber.from(1000), // startTime
         ethers.BigNumber.from(1001), // endTime
       ],
+      1,
     );
     expect(event_name).to.eq(EventNames.ContestStarted);
     const parsedEvent = events.ContestStarted.parse(event_payload);
@@ -79,6 +82,7 @@ describe('parseEvmEventToContestEvent', () => {
         '0x1', // creator
         '/threads/1', // url
       ],
+      1,
     );
     expect(event_name).to.eq(EventNames.ContestContentAdded);
     const parsedEvent = events.ContestContentAdded.parse(event_payload);
@@ -99,6 +103,7 @@ describe('parseEvmEventToContestEvent', () => {
         ethers.BigNumber.from(888), // contestId
         ethers.BigNumber.from(9000), // votingPower
       ],
+      1,
     );
     expect(event_name).to.eq(EventNames.ContestContentUpvoted);
     const parsedEvent = events.ContestContentUpvoted.parse(event_payload);
@@ -119,6 +124,7 @@ describe('parseEvmEventToContestEvent', () => {
         ethers.BigNumber.from(10), // contentId
         ethers.BigNumber.from(9000), // votingPower
       ],
+      1,
     );
     expect(event_name).to.eq(EventNames.ContestContentUpvoted);
     const parsedEvent = events.ContestContentUpvoted.parse(event_payload);
@@ -131,9 +137,14 @@ describe('parseEvmEventToContestEvent', () => {
 
   test('should throw if the wrong number of args are used outbox shape', () => {
     expect(() => {
-      parseEvmEventToContestEvent('VoterVotedRecurring', contestAddress, [
-        '0x2', // voterAddress
-      ]);
+      parseEvmEventToContestEvent(
+        'VoterVotedRecurring',
+        contestAddress,
+        [
+          '0x2', // voterAddress
+        ],
+        1,
+      );
     }).to.throw('evm parsed args does not match signature');
   });
 });

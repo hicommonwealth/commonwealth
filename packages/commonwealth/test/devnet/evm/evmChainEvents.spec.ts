@@ -391,8 +391,6 @@ describe('EVM Chain Events Devnet Tests', () => {
 
   describe('EVM Chain Events End to End Tests', () => {
     const sepoliaBaseChainId = commonProtocol.ValidChains.SepoliaBase;
-    const namespaceFactoryAddress =
-      commonProtocol.factoryContracts[sepoliaBaseChainId].factory;
     const factoryEventRegistry =
       EventRegistry[sepoliaBaseChainId][namespaceFactoryAddress];
 
