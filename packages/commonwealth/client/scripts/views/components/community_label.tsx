@@ -1,5 +1,6 @@
 import React from 'react';
 
+import { smartTrim } from '../../../../shared/utils';
 import './community_label.scss';
 import { CWCommunityAvatar } from './component_kit/cw_community_avatar';
 import type { IconSize } from './component_kit/cw_icons/types';
@@ -27,7 +28,7 @@ export const CommunityLabel = ({
         size={size}
       />
       <CWText noWrap type="b1" fontWeight="medium" title={name}>
-        {name}
+        {smartTrim(name, 25)}
       </CWText>
     </div>
   );
