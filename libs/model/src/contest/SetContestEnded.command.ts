@@ -46,23 +46,21 @@ export function SetContestEnded(): Command<typeof schemas.SetContestEnded> {
         neynar_webhook_id,
       } = payload;
 
+      const rpc = getChainNodeUrl({
+        url: chain_url,
+        private_url: chain_private_url,
+      });
+
       await models.sequelize.transaction(async (transaction) => {
         await rollOverContest({
           privateKey: config.WEB3.PRIVATE_KEY,
-          rpc: getChainNodeUrl({
-            url: chain_url,
-            private_url: chain_private_url,
-          }),
+          rpc,
           contest: contest_address,
           oneOff: is_one_off,
         });
-
-        // TODO: @rbennettcw can we get scores as a result of rollOverContest to avoid two calls?
+        // better to get scores using views to avoid returning unbounded arrays in txs
         const score = await getContestScore(
-          getChainNodeUrl({
-            url: chain_url,
-            private_url: chain_private_url,
-          }),
+          rpc,
           contest_address,
           prize_percentage,
           payout_structure,

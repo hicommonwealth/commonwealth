@@ -412,6 +412,9 @@ export const rollOverContest = async ({
       ? contestInstance.methods.endContest()
       : contestInstance.methods.newContest();
 
+    // TODO: @ianrowan or @rbennettcw - we should check if the contest is already ended before calling endContest again
+    // to avoid transaction failures and unnecessary gas costs
+
     let gasResult = BigInt(300000);
     try {
       gasResult = await contractCall.estimateGas({
