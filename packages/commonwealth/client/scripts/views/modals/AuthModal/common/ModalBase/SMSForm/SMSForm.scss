@@ -46,7 +46,7 @@
     position: fixed !important;
     cursor: pointer;
     gap: 4px;
-    padding: 8px 16px;
+    padding: 0px 16px;
     user-select: none;
     display: flex;
     flex-direction: column;
@@ -55,6 +55,7 @@
     }
     .search input {
       width: 99%;
+      background-color: $white !important;
       margin: 0 !important;
       line-height: 20px !important;
       padding: 6px 8px !important;
