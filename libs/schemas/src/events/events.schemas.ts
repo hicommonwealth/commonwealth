@@ -260,12 +260,22 @@ export const RecurringContestManagerDeployed = EventMetadata.extend({
   namespace: z.string().describe('Community namespace'),
   contest_address: z.string().describe('Contest manager address'),
   interval: z.number().int().positive().describe('Recurring constest interval'),
+  block_number: z
+    .number()
+    .int()
+    .positive()
+    .describe('The block number in which the contest was created'),
 }).describe('When a new recurring contest manager gets deployed');
 
 export const OneOffContestManagerDeployed = EventMetadata.extend({
   namespace: z.string().describe('Community namespace'),
   contest_address: z.string().describe('Contest manager address'),
   length: z.number().int().positive().describe('Length of contest in days'),
+  block_number: z
+    .number()
+    .int()
+    .positive()
+    .describe('The block number in which the contest was created'),
 }).describe('When a new one-off contest manager gets deployed');
 
 const ContestManagerEvent = EventMetadata.extend({

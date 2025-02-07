@@ -109,7 +109,12 @@ export async function processChainNode(
         const contractAddress = ethers.utils.getAddress(event.rawLog.address);
 
         const parseContestEvent = (e: keyof typeof ChainEventSigs) =>
-          parseEvmEventToContestEvent(e, contractAddress, event.parsedArgs);
+          parseEvmEventToContestEvent(
+            e,
+            contractAddress,
+            event.parsedArgs,
+            event.rawLog.blockNumber,
+          );
 
         switch (event.eventSource.eventSignature) {
           case EvmEventSignatures.NamespaceFactory.ContestManagerDeployed:

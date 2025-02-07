@@ -59,6 +59,7 @@ async function updateOrCreateWithAlert(
   contest_address: string,
   interval: number,
   isOneOff: boolean,
+  blockNumber: number,
 ) {
   const community = await models.Community.findOne({
     where: { namespace_address: namespace },
@@ -163,7 +164,7 @@ async function updateOrCreateWithAlert(
           event_signature: eventSignature,
           contract_name: childContractName,
           parent_contract_address: cp.factoryContracts[ethChainId].factory,
-          // TODO: add created_at_block so EVM CE runs the migrateEvents func
+          created_at_block: blockNumber,
         };
       },
     );
@@ -281,6 +282,7 @@ export function Contests(): Projection<typeof inputs> {
           payload.contest_address,
           payload.interval,
           false,
+          payload.block_number,
         );
       },
 
@@ -291,6 +293,7 @@ export function Contests(): Projection<typeof inputs> {
           payload.contest_address,
           0,
           true,
+          payload.block_number,
         );
       },
 

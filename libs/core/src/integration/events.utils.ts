@@ -42,6 +42,7 @@ type EvmMapper<Input extends string, Output extends ZodSchema> = {
   mapEvmToSchema: (
     contestAddress: string | null,
     evmInput: ParseSignature<Input>,
+    blockNumber: number,
   ) => {
     event_name: EventNames;
     event_payload: z.infer<Output>;
@@ -58,12 +59,14 @@ const RecurringContestManagerDeployedMapper: EvmMapper<
   mapEvmToSchema: (
     contestAddress,
     { contest, namespace, interval, oneOff: _ },
+    blockNumber,
   ) => ({
     event_name: EventNames.RecurringContestManagerDeployed,
     event_payload: {
       contest_address: contest,
       namespace: namespace,
       interval: BigNumber.from(interval).toNumber(),
+      block_number: blockNumber,
     },
   }),
 };
@@ -78,12 +81,14 @@ const OneOffContestManagerDeployedMapper: EvmMapper<
   mapEvmToSchema: (
     contestAddress,
     { contest, namespace, interval, oneOff: _ },
+    blockNumber,
   ) => ({
     event_name: EventNames.OneOffContestManagerDeployed,
     event_payload: {
       contest_address: contest,
       namespace: namespace,
       length: BigNumber.from(interval).toNumber(),
+      block_number: blockNumber,
     },
   }),
 };
@@ -242,6 +247,7 @@ export const parseEvmEventToContestEvent = <
   chainEventName: Event,
   contestAddress: string | null,
   evmParsedArgs: Result,
+  blockNumber: number,
 ): ContestOutboxEvent<Event> => {
   const m = EvmMappers[chainEventName];
   if (!m) {
@@ -252,7 +258,7 @@ export const parseEvmEventToContestEvent = <
   for (const mapper of mappers) {
     const evmInput = parseEthersResult(mapper.signature, evmParsedArgs);
     if (!mapper.condition || mapper.condition(evmInput)) {
-      return mapper.mapEvmToSchema(contestAddress, evmInput);
+      return mapper.mapEvmToSchema(contestAddress, evmInput, blockNumber);
     }
   }
   throw new Error(`No valid mapper found for event: ${chainEventName}`);
