@@ -18,29 +18,33 @@ const SMSForm = ({ onSubmit, onCancel, isLoading }: SMSFormProps) => {
         <CWCircleMultiplySpinner />
       ) : (
         <>
-          <PhoneInput
-            value={phone}
-            onChange={setPhone}
-            country="us"
-            enableSearch
-            dropdownClass="dropDown"
-          />
-          <div className="action-btns">
-            <CWButton
-              type="button"
-              onClick={onCancel}
-              buttonType="tertiary"
-              label="Back to sign in options"
-              disabled={isLoading}
+          <div className="dropdown-wrapper">
+            <PhoneInput
+              value={phone}
+              onChange={setPhone}
+              country="us"
+              enableSearch
+              dropdownClass="dropDown"
+              containerClass="dropdown-options-display"
+              inputClass="input-container"
             />
-            <CWButton
-              type="button"
-              buttonWidth="wide"
-              buttonType="primary"
-              label="Sign in with Magic"
-              disabled={isLoading}
-              onClick={() => onSubmit({ SMS: `+${phone}` })}
-            />
+            <div className="action-btns">
+              <CWButton
+                type="button"
+                onClick={onCancel}
+                buttonType="tertiary"
+                label="Back to sign in options"
+                disabled={isLoading}
+              />
+              <CWButton
+                type="button"
+                buttonWidth="wide"
+                buttonType="primary"
+                label="Sign in with Magic"
+                disabled={isLoading}
+                onClick={() => onSubmit({ SMS: `+${phone}` })}
+              />
+            </div>
           </div>
         </>
       )}
