@@ -83,7 +83,8 @@
     }
   }
 
-  .mobile-tabs {
+  .mobile-tabs,
+  .mobile-tab-content {
     display: none;
   }
 
@@ -115,6 +116,14 @@
       gap: 8px;
       overflow-x: auto;
       padding-bottom: 8px;
+    }
+
+    .mobile-tab-content {
+      display: block;
+    }
+
+    .desktop-view {
+      display: none;
     }
   }
 }

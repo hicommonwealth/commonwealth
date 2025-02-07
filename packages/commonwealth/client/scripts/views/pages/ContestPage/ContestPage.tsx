@@ -15,6 +15,7 @@ import ContestCard from 'views/pages/CommunityManagement/Contests/ContestsList/C
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
 
 import { CWButton } from '../../components/component_kit/new_designs/CWButton';
+import CWGrid from '../../components/component_kit/new_designs/CWGrid';
 import { CWMobileTab } from '../../components/component_kit/new_designs/CWMobileTab';
 import FundContestDrawer from '../CommunityManagement/Contests/FundContestDrawer';
 import EntriesTab from './tabs/Entries';
@@ -135,25 +136,19 @@ const ContestPage = ({ contestAddress }: ContestPageProps) => {
               label={MobileTabType.Entries}
               icon="trophy"
               isActive={selectedMobileTab === MobileTabType.Entries}
-              onClick={() => {
-                setSelectedMobileTab(MobileTabType.Entries);
-              }}
+              onClick={() => setSelectedMobileTab(MobileTabType.Entries)}
             />
             <CWMobileTab
               label={MobileTabType.PriceChart}
-              icon="trophy"
+              icon="chartLineUp"
               isActive={selectedMobileTab === MobileTabType.PriceChart}
-              onClick={() => {
-                setSelectedMobileTab(MobileTabType.PriceChart);
-              }}
+              onClick={() => setSelectedMobileTab(MobileTabType.PriceChart)}
             />
             <CWMobileTab
               label={MobileTabType.TokenSwap}
-              icon="trophy"
+              icon="arrowClockwise"
               isActive={selectedMobileTab === MobileTabType.TokenSwap}
-              onClick={() => {
-                setSelectedMobileTab(MobileTabType.TokenSwap);
-              }}
+              onClick={() => setSelectedMobileTab(MobileTabType.TokenSwap)}
             />
           </div>
 
@@ -164,7 +159,20 @@ const ContestPage = ({ contestAddress }: ContestPageProps) => {
             )}
             {selectedMobileTab === MobileTabType.TokenSwap && <TokenSwapTab />}
           </div>
+
+          <div className="desktop-view">
+            <CWGrid>
+              <div>
+                <EntriesTab />
+              </div>
+              <div>
+                <TokenSwapTab />
+                <PriceChartTab />
+              </div>
+            </CWGrid>
+          </div>
         </div>
+
         <FundContestDrawer
           onClose={() => setFundDrawerContest(undefined)}
           isOpen={!!fundDrawerContest}
