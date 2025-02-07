@@ -101,6 +101,8 @@ const ModalBase = ({
   showAuthOptionTypesFor,
   bodyClassName,
   onSignInClick,
+  triggerOpenEVMWalletsSubModal,
+  isUserFromWebView = false,
 }: ModalBaseProps) => {
   const copy = MODAL_COPY[layoutType];
 
@@ -112,8 +114,13 @@ const ModalBase = ({
       ? 1
       : 0,
   );
-  const [isEVMWalletsModalVisible, setIsEVMWalletsModalVisible] =
-    useState(false);
+  const [isEVMWalletsModalVisible, setIsEVMWalletsModalVisible] = useState(
+    () => {
+      return triggerOpenEVMWalletsSubModal
+        ? triggerOpenEVMWalletsSubModal
+        : false;
+    },
+  );
   const [isAuthenticatingWithEmail, setIsAuthenticatingWithEmail] =
     useState(false);
   const [isAuthenticatingWithSMS, setIsAuthenticatingWithSMS] = useState(false);
@@ -128,7 +135,7 @@ const ModalBase = ({
   };
 
   const handleSuccess = async (_, isNewlyCreated) => {
-    await onSuccess?.(isNewlyCreated);
+    await onSuccess?.(isNewlyCreated, isUserFromWebView);
     await handleClose();
   };
 
@@ -149,6 +156,7 @@ const ModalBase = ({
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     onModalClose: handleClose,
     onSuccess: handleSuccess,
+    isUserFromWebView: isUserFromWebView,
   });
 
   const filterWalletNames = (byChain: ChainBase) =>
@@ -320,7 +328,9 @@ const ModalBase = ({
   return (
     <>
       <section className="ModalBase">
-        <CWIcon iconName="close" onClick={onClose} className="close-btn" />
+        {!isUserFromWebView && (
+          <CWIcon iconName="close" onClick={onClose} className="close-btn" />
+        )}
 
         <img src={commonLogo} className="logo" />
 
@@ -458,6 +468,8 @@ const ModalBase = ({
         canResetWalletConnect={isWalletConnectEnabled}
         // eslint-disable-next-line @typescript-eslint/no-misused-promises
         onResetWalletConnect={onResetWalletConnect}
+        isUserFromWebView={isUserFromWebView}
+        handleNextOrSkip={handleSuccess}
       />
       {/* Signature verification modal is only displayed on mobile */}
       <MobileWalletConfirmationSubModal

@@ -1,11 +1,11 @@
 import commonLogo from 'assets/img/branding/common.svg';
-import { CWDivider } from 'client/scripts/views/components/component_kit/cw_divider';
 import clsx from 'clsx';
 import React, { ReactNode } from 'react';
+import CWCountDownTimer from 'views/components/component_kit/CWCountDownTimer';
+import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
-import ContestCountdown from '../../CommunityManagement/Contests/ContestsList/ContestCountdown';
 import './XpQuestCard.scss';
 
 interface QuestCardProps {
@@ -85,7 +85,7 @@ const QuestCard = ({
               isNameTrimmed,
             )}
           </div>
-          <ContestCountdown finishTime={endDate.toISOString()} isActive />
+          <CWCountDownTimer finishTime={endDate.toISOString()} isActive />
         </div>
 
         <CWDivider />

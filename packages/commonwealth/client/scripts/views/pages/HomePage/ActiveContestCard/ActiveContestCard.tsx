@@ -5,14 +5,14 @@ import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
 import { useGetContestBalanceQuery } from 'state/api/contests';
 import { Skeleton } from 'views/components/Skeleton';
 
-import { CWCommunityAvatar } from 'client/scripts/views/components/component_kit/cw_community_avatar';
-import { CWDivider } from 'client/scripts/views/components/component_kit/cw_divider';
-import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
-import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/CWButton';
-import { CWTooltip } from 'client/scripts/views/components/component_kit/new_designs/CWTooltip';
-import { capDecimals } from 'client/scripts/views/modals/ManageCommunityStakeModal/utils';
+import CWCountDownTimer from 'views/components/component_kit/CWCountDownTimer';
+import { CWCommunityAvatar } from 'views/components/component_kit/cw_community_avatar';
+import { CWDivider } from 'views/components/component_kit/cw_divider';
+import { CWText } from 'views/components/component_kit/cw_text';
+import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
+import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
+import { capDecimals } from 'views/modals/ManageCommunityStakeModal/utils';
 import { Contest } from '../../CommunityManagement/Contests/ContestsList';
-import ContestCountdown from '../../CommunityManagement/Contests/ContestsList/ContestCountdown';
 import './ActiveContestCard.scss';
 
 export type ActiveContest = Omit<Contest, 'name'> & { name: string };
@@ -142,7 +142,7 @@ const ActiveContestCard = ({ contest, community }: ActiveContestCardProps) => {
               isNameTrimmed,
             )}
           </div>
-          <ContestCountdown finishTime={finishDate} isActive />
+          <CWCountDownTimer finishTime={finishDate} isActive />
         </div>
 
         <CWDivider />

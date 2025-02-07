@@ -278,11 +278,37 @@ const ContestManagerEvent = EventMetadata.extend({
     .describe('Recurring contest id'),
 });
 
+// Contest Events
 export const ContestStarted = ContestManagerEvent.extend({
+  contest_id: z.number().int().gte(0),
   start_time: z.coerce.date().describe('Contest start time'),
   end_time: z.coerce.date().describe('Contest end time'),
-  contest_id: z.number().int().gte(1).describe('Recurring contest id'),
+  is_one_off: z.boolean().describe('Is this a one-off contest'),
 }).describe('When a contest instance gets started');
+
+export const ContestRolloverTimerTicked = z
+  .object({})
+  .describe(
+    'Polling event that triggers closing procedures and ending/end events',
+  );
+
+export const ContestEnding = ContestManagerEvent.extend({
+  contest_id: z.number().int().gte(0),
+  is_one_off: z.boolean().describe('Is this a one-off contest'),
+}).describe('When a contest instance is close to ending');
+
+export const ContestEnded = ContestManagerEvent.extend({
+  contest_id: z.number().int().gte(0),
+  is_one_off: z.boolean().describe('Is this a one-off contest'),
+  winners: z.array(
+    z.object({
+      address: z.string(),
+      content: z.string(),
+      votes: z.string(),
+      prize: z.string(),
+    }),
+  ),
+}).describe('When a contest instance ended');
 
 export const ContestContentAdded = ContestManagerEvent.extend({
   content_id: z.number().int().gte(0).describe('New content id'),
@@ -331,5 +357,3 @@ export const SignUpFlowCompleted = z.object({
   address: z.string(),
   created_at: z.coerce.date(),
 });
-
-export const ContestRolloverTimerTicked = z.object({});

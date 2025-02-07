@@ -1,4 +1,5 @@
 import { DefaultPage } from '@hicommonwealth/shared';
+import { useFlag } from 'client/scripts/hooks/useFlag';
 import { buildUpdateCommunityInput } from 'client/scripts/state/api/communities/updateCommunity';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { linkValidationSchema } from 'helpers/formValidations/common';
@@ -38,6 +39,8 @@ import { FormSubmitValues } from './types';
 import { communityProfileValidationSchema } from './validation';
 
 const CommunityProfileForm = () => {
+  const communityHomeEnabled = useFlag('communityHome');
+
   // `formKey` remounts the CWForm with new community default values after a
   // successful update, using the updated formKey.
   const [formKey, setFormKey] = useState(1);
@@ -163,7 +166,7 @@ const CommunityProfileForm = () => {
             ? JSON.parse(values.customStages)
             : [],
           iconUrl: values.communityProfileImageURL,
-          defaultOverview: values.defaultPage === DefaultPage.Overview,
+          defaultPage: values.defaultPage,
         }),
       );
 
@@ -209,9 +212,7 @@ const CommunityProfileForm = () => {
         communityName: community.name || '',
         communityDescription: community.description || '',
         communityProfileImageURL: community.icon_url || '',
-        defaultPage: community?.default_summary_view
-          ? DefaultPage.Overview
-          : DefaultPage.Discussions,
+        defaultPage: community?.default_page || DefaultPage.Homepage,
         hasStagesEnabled: !!community.stages_enabled,
         customStages:
           (community?.custom_stages || []).length > 0
@@ -416,6 +417,14 @@ const CommunityProfileForm = () => {
                 name="defaultPage"
                 hookToForm
               />
+              {communityHomeEnabled && (
+                <CWRadioButton
+                  label="Community Home"
+                  value={DefaultPage.Homepage}
+                  name="defaultPage"
+                  hookToForm
+                />
+              )}
             </div>
           </section>
 
