@@ -1,0 +1,25 @@
+@import '../../../../styles/shared';
+
+.TokenPerformance {
+  margin: 16px 0;
+
+  .heading-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+
+    .link-right {
+      display: flex;
+      gap: 4px;
+
+      .link {
+        &:hover,
+        &:active,
+        &:visited {
+          color: $primary-600;
+        }
+      }
+    }
+  }
+}
