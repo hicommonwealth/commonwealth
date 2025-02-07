@@ -67,10 +67,11 @@ const MobileNavigation = () => {
         ]
       : []),
   ];
-
+  const isNewThreadPage =
+    window.location?.pathname?.includes('/new/discussion');
   return (
     <>
-      {newMobileNav && <QuickPostButton />}
+      {newMobileNav && !isNewThreadPage && <QuickPostButton />}
       <div className="MobileNavigation">
         <div id="MobileNavigationHead">
           {/*react portal container for anyone that wants to put content*/}

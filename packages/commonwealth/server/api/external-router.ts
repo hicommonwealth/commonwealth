@@ -15,6 +15,7 @@ import passport from 'passport';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { config } from '../config';
+import * as bot from './bot';
 import * as comment from './comment';
 import * as community from './community';
 import * as contest from './contest';
@@ -59,6 +60,7 @@ const { getNewContent } = user.trpcRouter;
 const { createContestMetadata, updateContestMetadata, cancelContestMetadata } =
   contest.trpcRouter;
 const { createToken, createTrade, getLaunchpadTrades } = launchpad.trpcRouter;
+const { launchTokenBot } = bot.trpcRouter;
 
 const api = {
   getGlobalActivity: trpc.query(Feed.GetGlobalActivity, trpc.Tag.User, {
@@ -122,6 +124,7 @@ const api = {
     forceSecure: true,
   }),
   getLaunchpadTrades,
+  launchTokenBot,
 };
 
 const PATH = '/api/v1';
