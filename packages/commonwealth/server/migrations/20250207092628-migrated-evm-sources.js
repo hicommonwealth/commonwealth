@@ -16,7 +16,8 @@ module.exports = {
         `
         ALTER TABLE "EvmEventSources"
         ALTER COLUMN created_at_block SET NOT NULL,
-        ALTER COLUMN events_migrated SET NOT NULL;
+        ALTER COLUMN events_migrated SET NOT NULL,
+        ALTER COLUMN events_migrated SET DEFAULT FALSE;
       `,
         { transaction },
       );
@@ -27,10 +28,11 @@ module.exports = {
     return queryInterface.sequelize.transaction(async (transaction) => {
       await queryInterface.sequelize.query(
         `
-          ALTER TABLE "EvmEventSources"
-              ALTER COLUMN created_at_block DROP NOT NULL,
-              ALTER COLUMN events_migrated DROP NOT NULL;
-      `,
+            ALTER TABLE "EvmEventSources"
+                ALTER COLUMN created_at_block DROP NOT NULL,
+                ALTER COLUMN events_migrated DROP NOT NULL,
+                ALTER COLUMN events_migrated DROP DEFAULT;
+        `,
         { transaction },
       );
       await queryInterface.sequelize.query(

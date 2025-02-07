@@ -34,7 +34,11 @@ export default (
         allowNull: false,
       },
       created_at_block: { type: Sequelize.INTEGER, allowNull: false },
-      events_migrated: { type: Sequelize.BOOLEAN, allowNull: false },
+      events_migrated: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
     },
     {
       tableName: 'EvmEventSources',
