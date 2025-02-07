@@ -153,7 +153,7 @@ const FundContestForm = ({
             buttonType="secondary"
             buttonAlt="green"
             onClick={handleTransferFunds}
-            disabled={!!amountError}
+            disabled={!!amountError || !selectedAddress?.value}
           />
         </div>
       </div>

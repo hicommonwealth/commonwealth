@@ -281,7 +281,7 @@ const ContestCard = ({
             />
           )}
 
-          {onFund && isActive && user.activeAccount && (
+          {onFund && isActive && user.isLoggedIn && (
             <CWThreadAction
               label="Fund"
               action="fund"
