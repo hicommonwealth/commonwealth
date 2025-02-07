@@ -3,5 +3,5 @@ import { z } from 'zod';
 
 export const TwitterCursor = z.object({
   bot_name: z.nativeEnum(TwitterBotName),
-  last_polled_timestamp: z.coerce.date(),
+  last_polled_timestamp: z.number(),
 });

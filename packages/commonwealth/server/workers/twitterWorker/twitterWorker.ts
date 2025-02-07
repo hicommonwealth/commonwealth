@@ -1,23 +1,17 @@
 import {
   HotShotsStats,
-  RedisCache,
   ServiceKey,
   startHealthCheckLoop,
 } from '@hicommonwealth/adapters';
-import { CacheNamespaces, cache, logger, stats } from '@hicommonwealth/core';
+import { logger, stats } from '@hicommonwealth/core';
 import { emitEvent, models } from '@hicommonwealth/model';
 import { fileURLToPath } from 'url';
-import { config } from '../../config';
 import { getMentions } from './pollTwitter';
 import { TwitterBotConfig, createMentionEvents } from './utils';
 
 const log = logger(import.meta);
 
 stats({ adapter: HotShotsStats() });
-config.CACHE.REDIS_URL &&
-  cache({
-    adapter: new RedisCache(config.CACHE.REDIS_URL),
-  });
 
 let isServiceHealthy = false;
 
@@ -33,15 +27,13 @@ startHealthCheckLoop({
 
 async function pollMentions(twitterBotConfig: TwitterBotConfig) {
   try {
-    const cachedStartTime = await cache().getKey(
-      CacheNamespaces.Twitter_Poller,
-      `${twitterBotConfig.twitterUserId}-mentions-poll-end-time`,
-    );
+    const cachedStartTime = await models.TwitterCursor.findOne({
+      where: { bot_name: twitterBotConfig.name },
+    });
 
     // Use cached end time or 10 minutes ago
-    // TODO: check timezone
     const startTime = cachedStartTime
-      ? new Date(cachedStartTime)
+      ? new Date(cachedStartTime.last_polled_timestamp)
       : new Date(Date.now() - 1000 * 60 * 10);
     let endTime = new Date();
 
@@ -54,17 +46,17 @@ async function pollMentions(twitterBotConfig: TwitterBotConfig) {
       endTime,
     });
 
-    await emitEvent(
-      models.Outbox,
-      createMentionEvents(twitterBotConfig, mentions),
-    );
-
-    // TODO: switch to use Postgres so endtime can be updated in same txn as Outbox insert
-    await cache().setKey(
-      CacheNamespaces.Twitter_Poller,
-      `${twitterBotConfig.twitterUserId}-mentions-poll-end-time`,
-      endTime.toISOString(),
-    );
+    await models.sequelize.transaction(async (transaction) => {
+      await emitEvent(
+        models.Outbox,
+        createMentionEvents(twitterBotConfig, mentions),
+        transaction,
+      );
+      await models.TwitterCursor.upsert({
+        bot_name: twitterBotConfig.name,
+        last_polled_timestamp: endTime.getTime(),
+      });
+    });
 
     log.info('Mentions polled successfully');
   } catch (error) {
