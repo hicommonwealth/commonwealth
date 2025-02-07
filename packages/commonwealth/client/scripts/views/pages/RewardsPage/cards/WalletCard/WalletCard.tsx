@@ -4,8 +4,8 @@ import React, { useState } from 'react';
 import { useTokenBalanceQuery, useTokensMetadataQuery } from 'state/api/tokens';
 import useUserStore from 'state/ui/user';
 import FractionalValue from 'views/components/FractionalValue';
+import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
 import { CWSelectList } from 'views/components/component_kit/new_designs/CWSelectList';
 import {
@@ -13,6 +13,7 @@ import {
   CWTabsRow,
 } from 'views/components/component_kit/new_designs/CWTabs';
 import { withTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
+import useAuthentication from 'views/modals/AuthModal/useAuthentication';
 import {
   CustomAddressOption,
   CustomAddressOptionElement,
@@ -31,13 +32,19 @@ const WalletCard = () => {
   const [activeTab, setActiveTab] = useState<WalletBalanceTabs>(
     WalletBalanceTabs.Tokens,
   );
+
   const user = useUserStore();
+
+  const { openMagicWallet } = useAuthentication({});
+
   const uniqueAddresses = getUniqueUserAddresses({
     forChain: ChainBase.Ethereum,
   });
+
   const [userSelectedAddress, setUserSelectedAddress] = useState<string>(
     uniqueAddresses[0],
   );
+
   const isSelectedAddressMagic =
     user.addresses.find((a) => a.address === userSelectedAddress)?.walletId ===
     WalletId.Magic;
@@ -104,14 +111,16 @@ const WalletCard = () => {
           }
         />
         {isSelectedAddressMagic && (
-          <CWButton
-            label="Add Funds"
-            iconLeft="plus"
-            buttonWidth="narrow"
-            buttonHeight="sm"
-            buttonAlt="green"
-            buttonType="secondary"
-          />
+          <button
+            type="button"
+            className="add-funds-btn"
+            onClick={() => {
+              openMagicWallet().catch(console.error);
+            }}
+          >
+            <CWIcon iconName="plus" iconSize="small" />
+            <CWText type="caption">Add Funds</CWText>
+          </button>
         )}
         <CWTabsRow>
           {Object.values(WalletBalanceTabs).map((tab) => (
