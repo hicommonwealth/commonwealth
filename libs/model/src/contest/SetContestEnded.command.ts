@@ -41,22 +41,12 @@ export function SetContestEnded(): Command<typeof schemas.SetContestEnded> {
         is_one_off,
         prize_percentage,
         payout_structure,
-        ended,
         chain_url,
         chain_private_url,
         neynar_webhook_id,
       } = payload;
 
       await models.sequelize.transaction(async (transaction) => {
-        if (is_one_off && !ended) {
-          // preemptively mark as ended so that rollover
-          // is not attempted again after failure
-          await models.ContestManager.update(
-            { ended: true },
-            { where: { contest_address }, transaction },
-          );
-        }
-
         await rollOverContest({
           privateKey: config.WEB3.PRIVATE_KEY,
           rpc: getChainNodeUrl({
@@ -66,23 +56,29 @@ export function SetContestEnded(): Command<typeof schemas.SetContestEnded> {
           contest: contest_address,
           oneOff: is_one_off,
         });
+
         // TODO: @rbennettcw can we get scores as a result of rollOverContest to avoid two calls?
         const score = await getContestScore(
-          chain_url,
+          getChainNodeUrl({
+            url: chain_url,
+            private_url: chain_private_url,
+          }),
           contest_address,
           prize_percentage,
           payout_structure,
           contest_id,
           is_one_off,
         );
+
         // update final score
         await models.Contest.update(
           { score, score_updated_at: new Date() },
           { where: { contest_address, contest_id }, transaction },
         );
-        // reset ending flag when ended
+
+        // reset end/ending flags - preemptively endeding oneoffs so that rollover stops
         await models.ContestManager.update(
-          { ending: false }, // restart ending flag for future events
+          { ending: false, ended: is_one_off },
           { where: { contest_address }, transaction },
         );
 

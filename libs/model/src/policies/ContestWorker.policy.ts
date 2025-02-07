@@ -206,14 +206,13 @@ const rolloverContests = async () => {
   if (!config.WEB3.PRIVATE_KEY)
     throw new ServerError('WEB3 private key not set!');
 
-  const contestManagersWithEndedContest = await models.sequelize.query<{
+  const activeContestManagersPassedEndTime = await models.sequelize.query<{
     contest_address: string;
     interval: number;
     prize_percentage: number;
     payout_structure: number[];
     contest_id: number;
     end_time: string;
-    ended: boolean;
     url: string;
     private_url: string;
     neynar_webhook_id?: string;
@@ -223,7 +222,6 @@ const rolloverContests = async () => {
                cm.interval,
                coalesce(cm.prize_percentage, 0) as prize_percentage,
                cm.payout_structure,
-               COALESCE(cm.ended, false) as ended,
                cm.neynar_webhook_id,
                co.contest_id,
                cn.private_url,
@@ -252,7 +250,7 @@ const rolloverContests = async () => {
   );
 
   const promiseResults = await Promise.allSettled(
-    contestManagersWithEndedContest.map(
+    activeContestManagersPassedEndTime.map(
       async ({
         url,
         private_url,
@@ -261,7 +259,6 @@ const rolloverContests = async () => {
         interval,
         prize_percentage,
         payout_structure,
-        ended,
         neynar_webhook_id,
       }) => {
         log.info(`ROLLOVER: ${contest_address}`);
@@ -273,7 +270,6 @@ const rolloverContests = async () => {
             prize_percentage,
             payout_structure,
             is_one_off: interval === 0,
-            ended: ended || false,
             chain_url: url,
             chain_private_url: private_url,
             neynar_webhook_id,

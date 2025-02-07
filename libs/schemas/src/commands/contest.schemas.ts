@@ -193,7 +193,6 @@ export const SetContestEnded = {
     prize_percentage: z.number(),
     payout_structure: z.array(z.number()),
     is_one_off: z.boolean(),
-    ended: z.boolean(),
     chain_url: z.string(),
     chain_private_url: z.string().nullish(),
     neynar_webhook_id: z.string().nullish(),
