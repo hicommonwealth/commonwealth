@@ -211,38 +211,32 @@ const rolloverContests = async () => {
     interval: number;
     prize_percentage: number;
     payout_structure: number[];
+    neynar_webhook_id?: string;
     contest_id: number;
-    end_time: string;
     url: string;
     private_url: string;
-    neynar_webhook_id?: string;
   }>(
     `
-        SELECT cm.contest_address,
-               cm.interval,
-               coalesce(cm.prize_percentage, 0) as prize_percentage,
-               cm.payout_structure,
-               cm.neynar_webhook_id,
-               co.contest_id,
-               cn.private_url,
-               cn.url
-        FROM "ContestManagers" cm
-                 JOIN (SELECT *
-                       FROM "Contests"
-                       WHERE (contest_address, contest_id) IN (SELECT contest_address, MAX(contest_id) AS contest_id
-                                                               FROM "Contests"
-                                                               GROUP BY contest_address)) co
-                      ON co.contest_address = cm.contest_address
-                          AND (
-                             (cm.interval = 0 AND cm.ended IS NOT TRUE)
-                                 OR
-                             cm.interval > 0
-                             )
-                          AND NOW() > co.end_time
-                          AND cm.cancelled IS NOT TRUE
-                 JOIN "Communities" cu ON cm.community_id = cu.id
-                 JOIN "ChainNodes" cn ON cu.chain_node_id = cn.id;
-    `,
+SELECT 
+  cm.contest_address,
+  cm.interval,
+  coalesce(cm.prize_percentage, 0) as prize_percentage,
+  cm.payout_structure,
+  cm.neynar_webhook_id,
+  co.contest_id,
+  cn.url,
+  cn.private_url
+FROM 
+  "ContestManagers" cm
+  JOIN (SELECT * FROM "Contests" WHERE (contest_address, contest_id) IN (
+      SELECT contest_address, MAX(contest_id) AS contest_id FROM "Contests" GROUP BY contest_address)
+  ) co ON co.contest_address = cm.contest_address
+    AND ((cm.interval = 0 AND cm.ended IS NOT TRUE) OR cm.interval > 0)
+    AND NOW() > co.end_time
+    AND cm.cancelled IS NOT TRUE
+  JOIN "Communities" cu ON cm.community_id = cu.id
+  JOIN "ChainNodes" cn ON cu.chain_node_id = cn.id;
+`,
     {
       type: QueryTypes.SELECT,
       raw: true,
