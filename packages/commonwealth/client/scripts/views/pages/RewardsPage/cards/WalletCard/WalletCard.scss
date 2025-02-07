@@ -1,8 +1,21 @@
 @import '../../../../../styles/shared';
 
 .WalletCard {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+
+  > .CWSelectList > .SelectList {
+    padding: 4px 8px !important;
+    line-height: initial;
+    min-height: initial;
+    max-height: 40px;
+    width: fit-content;
+  }
+
   .list {
-    max-height: 120px;
+    max-height: 100px;
     overflow: scroll;
 
     .balance-row {
