@@ -77,6 +77,7 @@ async function main() {
     // setInterval(pollMentions, 1000, TwitterBotConfigs.MomBot)
     // setInterval(pollMentions, 1000, TwitterBotConfigs.ContestBot)
     isServiceHealthy = true;
+    log.info('Twitter Worker started');
   } catch (e) {
     isServiceHealthy = false;
     log.fatal('Twitter Worker setup failed', e);
