@@ -4,7 +4,7 @@ import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
 import { CWButton } from 'client/scripts/views/components/component_kit/new_designs/CWButton';
 // eslint-disable-next-line max-len
 import { useSubscriptionPreferenceSettingCallback } from 'client/scripts/views/pages/NotificationSettings/useSubscriptionPreferenceSettingCallback';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import './NotificationModal.scss';
 type NotificationModalProps = {
@@ -17,6 +17,10 @@ const NotificationModal = ({ onComplete }: NotificationModalProps) => {
   );
   const [enableNotifications, setEnableNotification] = useState(checked);
 
+  useEffect(() => {
+    setEnableNotification(checked);
+  }, [checked]);
+
   return (
     <section className="NotificationModal">
       <CWText type="h5" className="header" isCentered>
@@ -25,7 +29,7 @@ const NotificationModal = ({ onComplete }: NotificationModalProps) => {
       <button
         className={`notificationButton ${enableNotifications ? 'enabled' : ''}`}
         onClick={() => {
-          activate(!checked), setEnableNotification(!checked);
+          activate(!checked);
         }}
       >
         <CWIcon iconSize="large" iconName="bellRinging" />
@@ -44,7 +48,6 @@ const NotificationModal = ({ onComplete }: NotificationModalProps) => {
             checked={enableNotifications}
             onChange={() => {
               activate(!checked);
-              setEnableNotification(!checked);
             }}
           />
         </div>
