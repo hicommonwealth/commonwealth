@@ -15,6 +15,7 @@ import ContestCard from 'views/pages/CommunityManagement/Contests/ContestsList/C
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
 
 import { CWButton } from '../../components/component_kit/new_designs/CWButton';
+import { CWMobileTab } from '../../components/component_kit/new_designs/CWMobileTab';
 import FundContestDrawer from '../CommunityManagement/Contests/FundContestDrawer';
 
 import './ContestPage.scss';
@@ -34,6 +35,12 @@ const sortOptions = [
     label: 'Most Recent',
   },
 ];
+
+export enum MobileTabType {
+  Entries = 'Entries',
+  PriceChart = 'Price Chart',
+  TokenSwap = 'Token Swap',
+}
 
 interface ContestPageProps {
   contestAddress: string;
@@ -56,6 +63,10 @@ const ContestPage = ({ contestAddress }: ContestPageProps) => {
       contest_address: contestAddress,
       selectedSort,
     });
+
+  const [selectedMobileTab, setSelectedMobileTab] = useState<MobileTabType>(
+    MobileTabType.Entries,
+  );
 
   if (!isContestDataLoading && !contest) {
     return <PageNotFound />;
@@ -116,57 +127,40 @@ const ContestPage = ({ contestAddress }: ContestPageProps) => {
             </div>
           </div>
 
-          <div className="leaderboard-list">
-            {isFarcasterCastsLoading ? (
-              <>
-                <Skeleton height={300} width="100%" />
-                <Skeleton height={300} width="100%" />
-              </>
-            ) : !farcasterCasts?.length ? (
-              <CWText>No entries for the contest yet</CWText>
-            ) : (
-              <>
-                <div className="filter-section">
-                  <CWText type="b2" fontWeight="medium">
-                    Sort
-                  </CWText>
-                  <Select
-                    selected={selectedSort}
-                    onSelect={(v: { value: string; label: string }) =>
-                      setSelectedSort(v.value as SortType)
-                    }
-                    options={sortOptions}
-                  />
-                </div>
+          <div className="mobile-tabs">
+            <CWMobileTab
+              label={MobileTabType.Entries}
+              icon="trophy"
+              isActive={selectedMobileTab === MobileTabType.Entries}
+              onClick={() => {
+                setSelectedMobileTab(MobileTabType.Entries);
+              }}
+            />
+            <CWMobileTab
+              label={MobileTabType.PriceChart}
+              icon="trophy"
+              isActive={selectedMobileTab === MobileTabType.PriceChart}
+              onClick={() => {
+                setSelectedMobileTab(MobileTabType.PriceChart);
+              }}
+            />
+            <CWMobileTab
+              label={MobileTabType.TokenSwap}
+              icon="trophy"
+              isActive={selectedMobileTab === MobileTabType.TokenSwap}
+              onClick={() => {
+                setSelectedMobileTab(MobileTabType.TokenSwap);
+              }}
+            />
+          </div>
 
-                {farcasterCasts.map((entry) => {
-                  return (
-                    <div key={entry.hash} className="cast-container">
-                      <CWUpvote
-                        disabled
-                        voteCount={entry.calculated_vote_weight || '0'}
-                      />
-
-                      <div className="upvote-small">
-                        <CWUpvoteSmall
-                          voteCount={entry.calculated_vote_weight || '0'}
-                          disabled
-                          selected={false}
-                          onClick={() => undefined}
-                          popoverContent={<></>}
-                          tooltipText="Farcaster Upvotes"
-                        />
-                      </div>
-
-                      <FarcasterEmbed
-                        key={entry.hash}
-                        hash={entry.hash}
-                        username={entry.author.username}
-                      />
-                    </div>
-                  );
-                })}
-              </>
+          <div className="mobile-tab-content">
+            {selectedMobileTab === MobileTabType.Entries && <div>Entries</div>}
+            {selectedMobileTab === MobileTabType.PriceChart && (
+              <div>Price Chart</div>
+            )}
+            {selectedMobileTab === MobileTabType.TokenSwap && (
+              <div>Token Swap</div>
             )}
           </div>
         </div>

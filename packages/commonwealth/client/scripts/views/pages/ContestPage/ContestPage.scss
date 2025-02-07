@@ -83,6 +83,10 @@
     }
   }
 
+  .mobile-tabs {
+    display: none;
+  }
+
   @include extraSmall {
     .top-container {
       .navigation-buttons {
@@ -104,6 +108,13 @@
           max-width: 150px;
         }
       }
+    }
+
+    .mobile-tabs {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 8px;
     }
   }
 }
