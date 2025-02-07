@@ -17,6 +17,9 @@ import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCo
 import { CWButton } from '../../components/component_kit/new_designs/CWButton';
 import { CWMobileTab } from '../../components/component_kit/new_designs/CWMobileTab';
 import FundContestDrawer from '../CommunityManagement/Contests/FundContestDrawer';
+import EntriesTab from './tabs/Entries';
+import PriceChartTab from './tabs/PriceChart';
+import TokenSwapTab from './tabs/TokenSwap';
 
 import './ContestPage.scss';
 
@@ -155,13 +158,11 @@ const ContestPage = ({ contestAddress }: ContestPageProps) => {
           </div>
 
           <div className="mobile-tab-content">
-            {selectedMobileTab === MobileTabType.Entries && <div>Entries</div>}
+            {selectedMobileTab === MobileTabType.Entries && <EntriesTab />}
             {selectedMobileTab === MobileTabType.PriceChart && (
-              <div>Price Chart</div>
+              <PriceChartTab />
             )}
-            {selectedMobileTab === MobileTabType.TokenSwap && (
-              <div>Token Swap</div>
-            )}
+            {selectedMobileTab === MobileTabType.TokenSwap && <TokenSwapTab />}
           </div>
         </div>
         <FundContestDrawer
