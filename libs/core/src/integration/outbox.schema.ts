@@ -8,7 +8,7 @@ export const BaseOutboxProperties = z.object({
   updated_at: z.coerce.date().optional(),
 });
 
-const outboxEvents = {
+export const outboxEvents = {
   [E.ChainEventCreated]: P.ChainEventCreated,
   [E.CommentCreated]: P.CommentCreated,
   [E.CommentUpvoted]: P.CommentUpvoted,
@@ -27,6 +27,7 @@ const outboxEvents = {
   [E.FarcasterCastCreated]: P.FarcasterCastCreated,
   [E.FarcasterReplyCastCreated]: P.FarcasterReplyCastCreated,
   [E.FarcasterVoteCreated]: P.FarcasterVoteCreated,
+  [E.FarcasterContestBotMentioned]: P.FarcasterContestBotMentioned,
   [E.GroupCreated]: P.GroupCreated,
   [E.OneOffContestManagerDeployed]: P.OneOffContestManagerDeployed,
   [E.RecurringContestManagerDeployed]: P.RecurringContestManagerDeployed,
