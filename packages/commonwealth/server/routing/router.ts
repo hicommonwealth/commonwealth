@@ -463,7 +463,6 @@ function setupRouter(
       // required for streaming
       res.setHeader('Content-Type', 'text/plain');
       res.setHeader('Transfer-Encoding', 'chunked');
-
       const ideaPrompt =
         typeof req.body?.ideaPrompt === 'string'
           ? req.body?.ideaPrompt
@@ -472,7 +471,6 @@ function setupRouter(
       const ideaGenerator = generateTokenIdea({ ideaPrompt });
 
       for await (const chunk of ideaGenerator) {
-        // generation error
         if ((chunk as { error?: string }).error) {
           return res.end(
             JSON.stringify({
@@ -482,7 +480,41 @@ function setupRouter(
           );
         }
 
-        // stream chunks as they are generated
+        res.write(chunk);
+        res.flush();
+      }
+
+      return res.end();
+    },
+  );
+
+  // New endpoint: generateCommentText for streaming AI-generated comment text
+  registerRoute(
+    router,
+    'post',
+    '/generateCommentText',
+    rateLimiterMiddleware({
+      routerNamespace: 'generateCommentText',
+      requestsPerMinute: config.GENERATE_IMAGE_RATE_LIMIT,
+    }),
+    passport.authenticate('jwt', { session: false }),
+    async (req, res) => {
+      res.setHeader('Content-Type', 'text/plain');
+      res.setHeader('Transfer-Encoding', 'chunked');
+      const userText =
+        typeof req.body?.userText === 'string' ? req.body.userText : undefined;
+      const commentGenerator = generateCommentText({ userText });
+
+      for await (const chunk of commentGenerator) {
+        if ((chunk as { error?: string }).error) {
+          return res.end(
+            JSON.stringify({
+              status: 'failure',
+              message: (chunk as { error?: string }).error,
+            }) + '\n',
+          );
+        }
+
         res.write(chunk);
         res.flush();
       }
