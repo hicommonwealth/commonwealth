@@ -139,7 +139,7 @@ const AdminContestsPage = () => {
             <CWText type="h3" className="mb-12">
               Active Contests
             </CWText>
-            {isContestAvailable && contestsData.active.length === 0 ? (
+            {!isContestAvailable && contestsData.active.length === 0 ? (
               <CWText>No active contests available</CWText>
             ) : (
               <ContestsList
@@ -155,7 +155,7 @@ const AdminContestsPage = () => {
             <CWText type="h3" className="mb-12">
               Previous Contests
             </CWText>
-            {isContestAvailable && contestsData.finished.length === 0 ? (
+            {!isContestAvailable && contestsData.finished.length === 0 ? (
               <CWText>No previous contests available</CWText>
             ) : (
               <ContestsList
