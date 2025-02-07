@@ -29,6 +29,7 @@ export const outboxEvents = {
   [E.FarcasterCastCreated]: P.FarcasterCastCreated,
   [E.FarcasterReplyCastCreated]: P.FarcasterReplyCastCreated,
   [E.FarcasterVoteCreated]: P.FarcasterVoteCreated,
+  [E.FarcasterContestBotMentioned]: P.FarcasterContestBotMentioned,
   [E.GroupCreated]: P.GroupCreated,
   [E.OneOffContestManagerDeployed]: P.OneOffContestManagerDeployed,
   [E.RecurringContestManagerDeployed]: P.RecurringContestManagerDeployed,

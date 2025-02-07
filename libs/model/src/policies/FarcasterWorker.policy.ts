@@ -225,7 +225,7 @@ export function FarcasterWorker(): Policy<typeof inputs> {
                 payoutStructure: [winner1, winner2, winner3],
                 voterShare,
               } = DEFAULT_CONTEST_BOT_PARAMS;
-              return `Hey @${username}, your contest has been created. The prize distribution is ${winner1}% to winner, ${winner2}% to second place, ${winner3}% to third , and ${voterShare}% going to voters. Anyone who replies to a cast containing the frame enters the contest.`;
+              return `Hey @${username}, your contest has been created. The prize distribution is ${winner1}% to winner, ${winner2}% to second place, ${winner3}% to third , and ${voterShare}% going to voters. The contest will run for 7 days. Anyone who replies to a cast containing the frame enters the contest.`;
             },
             {
               // eslint-disable-next-line max-len
