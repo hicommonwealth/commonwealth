@@ -50,6 +50,17 @@ export const getBlock = async ({
   };
 };
 
+export const getBlockNumber = async ({
+  evmClient,
+  rpc,
+}: {
+  evmClient?: EvmClientType;
+  rpc: string;
+}): Promise<number> => {
+  const web3 = evmClient || new Web3(rpc);
+  return Number(await web3.eth.getBlockNumber());
+};
+
 export const getTransactionReceipt = async ({
   evmClient,
   rpc,

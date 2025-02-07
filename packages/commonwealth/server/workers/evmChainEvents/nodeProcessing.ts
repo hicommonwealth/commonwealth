@@ -75,8 +75,8 @@ export async function processChainNode(
     }
 
     const allEvents: EvmEvent[] = [];
-    const migratedData = await migrateEvents(evmSource, startBlockNum);
-    if (migratedData && migratedData?.events?.length > 0)
+    const migratedData = await migrateEvents(evmSource, startBlockNum - 1);
+    if ('events' in migratedData && migratedData.events?.length > 0)
       allEvents.push(...migratedData.events);
 
     const { events, lastBlockNum } = await getEvents(
@@ -181,6 +181,26 @@ export async function processChainNode(
           )}`,
         );
         await emitEvent(models.Outbox, records, transaction);
+
+        if (Object.keys(migratedData.contracts).length > 0) {
+          const migratedSources = Object.keys(migratedData.contracts).reduce(
+            (acc: Array<[number, string, string]>, contractAddress: string) => {
+              migratedData.contracts[contractAddress].sources.forEach((s) => {
+                acc.push([ethChainId, contractAddress, s.event_signature]);
+              });
+              return acc;
+            },
+            [],
+          );
+          await models.sequelize.query(
+            `
+            UPDATE "EvmEventSources"
+            SET events_migrated = true
+            WHERE (eth_chain_id, contract_address, event_signature) IN (:migratedSources)
+          `,
+            { transaction, replacements: { migratedSources } },
+          );
+        }
       }
     });
   } catch (e) {
