@@ -10,9 +10,6 @@ export const notifyAddressOwnershipTransferred: EventHandler<
   'AddressOwnershipTransferred',
   ZodBoolean
 > = async ({ payload }) => {
-  // TODO: should we ignore when old_user_email is null?
-  if (!payload.old_user_email) return true;
-
   const community = await models.Community.findOne({
     where: { id: payload.community_id },
   });
@@ -28,7 +25,7 @@ export const notifyAddressOwnershipTransferred: EventHandler<
       address: payload.address,
       user_id: payload.user_id,
       old_user_id: payload.old_user_id,
-      old_user_email: payload.old_user_email,
+      old_user_email: payload.old_user_email ?? '',
       created_at: payload.created_at.toISOString(),
     },
   });
