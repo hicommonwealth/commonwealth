@@ -17,7 +17,7 @@ import { PageNotFound } from '../404';
 import './RewardsPage.scss';
 import RewardsTab from './RewardsTab';
 import { QuestSummaryCard, ReferralCard, WalletCard } from './cards';
-import { QuestTable, ReferralTable, WalletTable } from './tables';
+import { ReferralTable, TokenTXHistoryTable, XPEarningsTable } from './tables';
 import { MobileTabType, TableType } from './types';
 import {
   calculateReferralTrend,
@@ -32,6 +32,7 @@ const RewardsPage = () => {
   const navigate = useCommonNavigate();
   const user = useUserStore();
   const rewardsEnabled = useFlag('rewardsPage');
+  const xpEnabled = useFlag('xp');
 
   const [mobileTab, setMobileTab] = useState<MobileTabType>(getInitialTab());
   const [tableTab, setTableTab] = useState(tabToTable[getInitialTab()]);
@@ -113,8 +114,8 @@ const RewardsPage = () => {
         {tableTab === TableType.Referrals && (
           <ReferralTable referrals={referrals} isLoading={isReferralsLoading} />
         )}
-        {tableTab === TableType.TokenTXHistory && <QuestTable />}
-        {tableTab === TableType.XPEarnings && <WalletTable />}
+        {tableTab === TableType.TokenTXHistory && <TokenTXHistoryTable />}
+        {xpEnabled && tableTab === TableType.XPEarnings && <XPEarningsTable />}
       </section>
     </CWPageLayout>
   );
