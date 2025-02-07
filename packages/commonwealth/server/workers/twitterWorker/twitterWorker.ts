@@ -18,6 +18,7 @@ let isServiceHealthy = false;
 startHealthCheckLoop({
   enabled: fileURLToPath(import.meta.url).endsWith(process.argv[1]),
   service: ServiceKey.TwitterWorker,
+  // eslint-disable-next-line @typescript-eslint/require-await
   checkFn: async () => {
     if (!isServiceHealthy) {
       throw new Error('service not healthy');
@@ -67,6 +68,7 @@ async function pollMentions(twitterBotConfig: TwitterBotConfig) {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/require-await
 async function main() {
   try {
     log.info('Starting Twitter Worker...');
@@ -88,5 +90,10 @@ async function main() {
 }
 
 if (import.meta.url.endsWith(process.argv[1])) {
-  main();
+  main().catch((err) => {
+    log.fatal(
+      'Unknown error fatal requires immediate attention. Restart REQUIRED!',
+      err,
+    );
+  });
 }
