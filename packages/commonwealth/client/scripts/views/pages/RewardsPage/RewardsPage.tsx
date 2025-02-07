@@ -16,7 +16,7 @@ import {
 import { PageNotFound } from '../404';
 import './RewardsPage.scss';
 import RewardsTab from './RewardsTab';
-import { QuestCard, ReferralCard, WalletCard } from './cards';
+import { QuestSummaryCard, ReferralCard, WalletCard } from './cards';
 import { QuestTable, ReferralTable, WalletTable } from './tables';
 import { MobileTabType, TableType } from './types';
 import {
@@ -91,9 +91,7 @@ const RewardsPage = () => {
           {(!isWindowSmallInclusive ||
             mobileTab === MobileTabType.WalletBalance) && <WalletCard />}
           {(!isWindowSmallInclusive || mobileTab === MobileTabType.Quests) && (
-            <QuestCard
-              onSeeAllClick={() => handleTabChange(MobileTabType.Quests)}
-            />
+            <QuestSummaryCard />
           )}
         </div>
 
