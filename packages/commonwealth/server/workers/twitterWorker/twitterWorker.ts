@@ -25,6 +25,7 @@ startHealthCheckLoop({
   },
 });
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function pollMentions(twitterBotConfig: TwitterBotConfig) {
   try {
     const cachedStartTime = await models.TwitterCursor.findOne({
@@ -35,7 +36,7 @@ async function pollMentions(twitterBotConfig: TwitterBotConfig) {
     const startTime = cachedStartTime
       ? new Date(cachedStartTime.last_polled_timestamp)
       : new Date(Date.now() - 1000 * 60 * 10);
-    let endTime = new Date();
+    const endTime = new Date();
 
     log.info(
       `Fetching mentions between ${new Date(startTime).toISOString()} and ${new Date(endTime).toISOString()}`,
