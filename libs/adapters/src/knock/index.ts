@@ -88,6 +88,7 @@ export function KnockProvider(): NotificationsProvider {
           WorkflowKeys.ContestStarted,
           WorkflowKeys.ContestEnding,
           WorkflowKeys.ContestEnded,
+          WorkflowKeys.AddressOwnershipTransferred,
         ].includes(options.key)
       ) {
         log.warn(
