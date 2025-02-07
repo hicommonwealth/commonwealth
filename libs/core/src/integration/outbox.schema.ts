@@ -16,6 +16,8 @@ export const outboxEvents = {
   [E.ContestContentAdded]: P.ContestContentAdded,
   [E.ContestContentUpvoted]: P.ContestContentUpvoted,
   [E.ContestStarted]: P.ContestStarted,
+  [E.ContestEnded]: P.ContestEnded,
+  [E.ContestEnding]: P.ContestEnding,
   [E.DiscordMessageCreated]: P.DiscordMessageCreated,
   [E.DiscordThreadBodyUpdated]: P.DiscordThreadBodyUpdated,
   [E.DiscordThreadCommentCreated]: P.DiscordThreadCommentCreated,
