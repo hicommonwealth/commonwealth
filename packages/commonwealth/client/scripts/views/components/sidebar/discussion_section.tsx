@@ -1,9 +1,9 @@
-import React from 'react';
-import { matchRoutes, useLocation } from 'react-router-dom';
-
+import { useFlag } from 'client/scripts/hooks/useFlag';
 import { useRefreshMembershipQuery } from 'client/scripts/state/api/groups';
 import useUserStore from 'client/scripts/state/ui/user';
 import { useCommonNavigate } from 'navigation/helpers';
+import React from 'react';
+import { matchRoutes, useLocation } from 'react-router-dom';
 import app from 'state';
 import { useFetchTopicsQuery } from 'state/api/topics';
 import { sidebarStore } from 'state/ui/sidebar';
@@ -49,10 +49,17 @@ interface DiscussionSectionProps {
 export const DiscussionSection = ({
   topicIdsIncludedInContest,
 }: DiscussionSectionProps) => {
+  const communityHomeEnabled = useFlag('communityHome');
+
   const navigate = useCommonNavigate();
   const location = useLocation();
   const matchesDiscussionsRoute = matchRoutes(
     [{ path: '/discussions' }, { path: ':scope/discussions' }],
+    location,
+  );
+
+  const matchesCommunityHomeRoute = matchRoutes(
+    [{ path: ':scope/community-home' }],
     location,
   );
 
@@ -125,6 +132,36 @@ export const DiscussionSection = ({
     localStorage[`${app.activeChainId()}-discussions-toggle-tree`],
   );
   const discussionsGroupData: SectionGroupAttrs[] = [
+    ...(communityHomeEnabled
+      ? [
+          {
+            title: 'Community Home',
+            containsChildren: false,
+            hasDefaultToggle: false,
+            isVisible: true,
+            isUpdated: true,
+            isActive: !!matchesCommunityHomeRoute,
+            onClick: (e, toggle: boolean) => {
+              e.preventDefault();
+              resetSidebarState();
+              handleRedirectClicks(
+                navigate,
+                e,
+                `/community-home`,
+                communityId,
+                () => {
+                  setDiscussionsToggleTree(
+                    `children.CommunityHome.toggledState`,
+                    toggle,
+                  );
+                },
+              );
+            },
+            displayData: null,
+            leftIcon: <CWIcon iconName="squaresFour" iconSize="small" />,
+          },
+        ]
+      : []),
     {
       title: 'All',
       containsChildren: false,
