@@ -25,6 +25,9 @@ startHealthCheckLoop({
   },
 });
 
+// 10 minutes ago
+const DEFAULT_POLL_START_TIME = new Date(Date.now() - 1000 * 60 * 10);
+
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function pollMentions(twitterBotConfig: TwitterBotConfig) {
   try {
@@ -32,10 +35,9 @@ async function pollMentions(twitterBotConfig: TwitterBotConfig) {
       where: { bot_name: twitterBotConfig.name },
     });
 
-    // Use cached end time or 10 minutes ago
     const startTime = cachedStartTime
       ? new Date(cachedStartTime.last_polled_timestamp)
-      : new Date(Date.now() - 1000 * 60 * 10);
+      : DEFAULT_POLL_START_TIME;
     const endTime = new Date();
 
     log.info(
