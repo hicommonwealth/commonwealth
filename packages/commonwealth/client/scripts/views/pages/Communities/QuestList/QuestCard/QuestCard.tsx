@@ -1,10 +1,10 @@
 import clsx from 'clsx';
 import { calculateQuestTimelineLabel } from 'helpers/quest';
-import React, { ReactNode } from 'react';
+import React from 'react';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
-import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
+import { withTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
 import './QuestCard.scss';
 
 interface QuestCardProps {
@@ -47,29 +47,6 @@ const QuestCard = ({
     ? description.slice(0, MAX_CHARS_FOR_DESCRIPTIONS) + '...'
     : description;
 
-  const withOptionalTooltip = (
-    children: ReactNode,
-    content: string,
-    shouldDisplay,
-  ) => {
-    if (!shouldDisplay) return children;
-
-    return (
-      <CWTooltip
-        placement="bottom"
-        content={content}
-        renderTrigger={(handleInteraction) => (
-          <span
-            onMouseEnter={handleInteraction}
-            onMouseLeave={handleInteraction}
-          >
-            {children}
-          </span>
-        )}
-      />
-    );
-  };
-
   return (
     <div
       role="button"
@@ -80,14 +57,14 @@ const QuestCard = ({
       <img src={iconURL} className="image" onClick={handleBodyClick} />
       <div className="content">
         <div className="basic-info" onClick={handleBodyClick}>
-          {withOptionalTooltip(
+          {withTooltip(
             <CWText className="text-dark" type="h4" fontWeight="regular">
               {trimmedName}
             </CWText>,
             name,
             isNameTrimmed,
           )}
-          {withOptionalTooltip(
+          {withTooltip(
             <CWText className="text-light">{trimmedDescription}</CWText>,
             description,
             isDescriptionTrimmed,

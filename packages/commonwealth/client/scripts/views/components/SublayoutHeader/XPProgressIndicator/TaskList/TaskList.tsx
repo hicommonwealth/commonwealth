@@ -43,13 +43,8 @@ const TaskList = ({ className }: TaskListProps) => {
               id: quest.id,
               imageURL: quest.image_url,
               title: quest.name,
-              xpPoints:
-                (quest.action_metas || [])
-                  ?.map((action) => action.reward_amount)
-                  .reduce(
-                    (accumulator, currentValue) => accumulator + currentValue,
-                    0,
-                  ) || 0,
+              isCompleted: quest.isCompleted,
+              xpPoints: { gained: quest.gainedXP, total: quest.totalXP },
             }))}
           />
           <Quests
@@ -61,13 +56,8 @@ const TaskList = ({ className }: TaskListProps) => {
               id: quest.id,
               imageURL: quest.image_url,
               title: quest.name,
-              xpPoints:
-                (quest.action_metas || [])
-                  ?.map((action) => action.reward_amount)
-                  .reduce(
-                    (accumulator, currentValue) => accumulator + currentValue,
-                    0,
-                  ) || 0,
+              isCompleted: quest.isCompleted,
+              xpPoints: { gained: quest.gainedXP, total: quest.totalXP },
             }))}
           />
         </>

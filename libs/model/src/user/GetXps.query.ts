@@ -10,7 +10,7 @@ export function GetXps(): Query<typeof schemas.GetXps> {
     auth: [],
     secure: true,
     body: async ({ payload }) => {
-      const { user_id, community_id, from, to, event_name } = payload;
+      const { user_id, community_id, quest_id, from, to, event_name } = payload;
 
       const include: FindOptions['include'] = [
         {
@@ -34,7 +34,7 @@ export function GetXps(): Query<typeof schemas.GetXps> {
                   model: models.Quest,
                   required: true,
                   attributes: ['id', 'name'],
-                  where: { community_id },
+                  where: { community_id, ...(quest_id && { id: quest_id }) },
                 },
               ]
             : [
@@ -42,6 +42,7 @@ export function GetXps(): Query<typeof schemas.GetXps> {
                   model: models.Quest,
                   required: true,
                   attributes: ['id', 'name'],
+                  ...(quest_id && { where: { id: quest_id } }),
                 },
               ],
         },
@@ -59,16 +60,20 @@ export function GetXps(): Query<typeof schemas.GetXps> {
         order: [['created_at', 'DESC']],
       });
 
-      return xps.map((xp) => {
-        const { user, creator, quest_action_meta, ...rest } = xp.toJSON();
-        return {
-          ...rest,
-          user_profile: user!.profile,
-          creator_profile: creator?.profile,
-          quest_id: quest_action_meta?.quest_id,
-          quest_action_meta_id: quest_action_meta?.id,
-        };
-      });
+      const finalXps = xps
+        .map((xp) => {
+          const { user, creator, quest_action_meta, ...rest } = xp.toJSON();
+          return {
+            ...rest,
+            user_profile: user!.profile,
+            creator_profile: creator?.profile,
+            quest_id: quest_action_meta?.quest_id,
+            quest_action_meta_id: quest_action_meta?.id,
+          };
+        })
+        .filter((x) => x.quest_id);
+
+      return finalXps;
     },
   };
 }

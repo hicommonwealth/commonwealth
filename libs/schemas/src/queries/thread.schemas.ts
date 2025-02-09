@@ -128,7 +128,7 @@ export const CommentView = Comment.extend({
   // this is returned by GetThreads
   address: z.string(),
   profile_name: z.string().optional(),
-  profile_avatar: z.string().optional(),
+  avatar_url: z.string().optional(),
   user_id: PG_INT,
   CommentVersionHistories: z.array(CommentVersionHistoryView).nullish(),
 });
@@ -284,7 +284,7 @@ export const DEPRECATED_GetBulkThreads = z.object({
 
 export const GetThreadsByIds = {
   input: z.object({
-    community_id: z.string(),
+    community_id: z.string().optional(),
     thread_ids: z.string(),
   }),
   output: z.array(ThreadView),

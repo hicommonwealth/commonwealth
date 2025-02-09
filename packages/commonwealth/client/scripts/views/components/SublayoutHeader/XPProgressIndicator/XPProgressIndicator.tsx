@@ -27,7 +27,7 @@ const XPProgressIndicator = ({
 
   return (
     <ClickAwayListener onClickAway={() => popoverProps.setAnchorEl(null)}>
-      <>
+      <div>
         <button
           className={clsx('XPProgressIndicator', className, mode)}
           onClick={popoverProps.handleInteraction}
@@ -50,7 +50,7 @@ const XPProgressIndicator = ({
           placement="bottom"
           {...popoverProps}
         />
-      </>
+      </div>
     </ClickAwayListener>
   );
 };
