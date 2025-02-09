@@ -20,7 +20,8 @@ export type CommunitySpecificWallets =
   | 'terrastation'
   | 'terra-walletconnect'
   | 'cosm-metamask'
-  | 'keplr-ethereum';
+  | 'keplr-ethereum'
+  | 'substrate-evm-metamask';
 export type AuthWallets =
   | CosmosWallets
   | SolanaWallets

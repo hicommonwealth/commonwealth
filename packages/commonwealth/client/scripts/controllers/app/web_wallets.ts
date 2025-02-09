@@ -12,6 +12,7 @@ import KeplrWebWalletController from './webWallets/keplr_web_wallet';
 import LeapWebWalletController from './webWallets/leap_web_wallet';
 import MetamaskWebWalletController from './webWallets/metamask_web_wallet';
 import PhantomWebWalletController from './webWallets/phantom_web_wallet';
+import SubstrateEvmWebWalletController from './webWallets/polkadot_evm_web_wallet';
 import PolkadotWebWalletController from './webWallets/polkadot_web_wallet';
 import TerraStationWebWalletController from './webWallets/terra_station_web_wallet';
 import TerraWalletConnectWebWalletController from './webWallets/terra_walletconnect_web_wallet';
@@ -131,6 +132,7 @@ export default class WebWalletController {
       new PhantomWebWalletController(),
       new TerraWalletConnectWebWalletController(),
       new CoinbaseWebWalletController(),
+      new SubstrateEvmWebWalletController(),
     ];
   }
 }

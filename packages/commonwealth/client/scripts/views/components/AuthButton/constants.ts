@@ -109,6 +109,13 @@ export const AUTH_TYPES: AuthTypesList = {
     },
     label: 'Keplr',
   },
+  'substrate-evm-metamask': {
+    icon: {
+      name: 'substrate-evm-metamask',
+      isCustom: true,
+    },
+    label: 'Metamask',
+  },
   // SSO's
   google: {
     icon: {

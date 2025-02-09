@@ -159,8 +159,6 @@ const ModalBase = ({
   const cosmosWallets = filterWalletNames(ChainBase.CosmosSDK);
   const solanaWallets = filterWalletNames(ChainBase.Solana);
   const substrateWallets = filterWalletNames(ChainBase.Substrate);
-  const onTangleCommunity =
-    app?.chain?.base === 'substrate' && app?.chain?.meta.id === 'tangle';
   const getWalletNames = () => {
     // Wallet Display Logic:
     // 1. When `showWalletsFor` is present, show wallets for that specific chain only.
@@ -174,9 +172,6 @@ const ModalBase = ({
 
     const showWalletsForSpecificChains = showWalletsFor || app?.chain?.base;
     if (showWalletsForSpecificChains) {
-      if (onTangleCommunity) {
-        return [...substrateWallets, ...['walletconnect']];
-      }
       switch (showWalletsForSpecificChains) {
         case ChainBase.Ethereum:
           return hasWalletConnect ? ['walletconnect'] : [];

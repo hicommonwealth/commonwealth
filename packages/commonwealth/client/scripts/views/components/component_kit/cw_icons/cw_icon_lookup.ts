@@ -322,6 +322,7 @@ export const customIconLookup = {
   envelope: CustomIcons.CWEnvelop,
   'keplr-ethereum': CustomIcons.CWKeplr,
   'cosm-metamask': CustomIcons.CWMetaMask,
+  'substrate-evm-metamask': CustomIcons.CWMetaMask,
   keplr: CustomIcons.CWKeplr,
   leap: CustomIcons.CWLeap,
   magic: CustomIcons.CWMagic,
