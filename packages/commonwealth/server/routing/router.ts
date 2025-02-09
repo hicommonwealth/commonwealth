@@ -42,7 +42,7 @@ import updateCommunityPriority from '../routes/updateCommunityPriority';
 import { type DB } from '@hicommonwealth/model';
 import setAddressWallet from '../routes/setAddressWallet';
 
-import { generateTokenIdea } from '@hicommonwealth/model';
+import { generateCommentText, generateTokenIdea } from '@hicommonwealth/model';
 import type DatabaseValidationService from '../middleware/databaseValidationService';
 import generateImage from '../routes/generateImage';
 

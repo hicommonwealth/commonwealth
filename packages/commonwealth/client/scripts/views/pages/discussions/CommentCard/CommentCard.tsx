@@ -203,197 +203,201 @@ export const CommentCard = ({
   };
 
   return (
-    <div className={clsx('comment-body', className)}>
-      <div className="comment-header">
-        {comment.deleted_at ? (
-          <span>[deleted]</span>
-        ) : (
-          <AuthorAndPublishInfo
-            authorAddress={comment?.address}
-            authorCommunityId={comment.community_id}
-            publishDate={
-              comment.created_at ? moment(comment.created_at) : undefined
-            }
-            discord_meta={comment.discord_meta || undefined}
-            popoverPlacement="top"
-            showUserAddressWithInfo={false}
-            profile={{
-              address: comment.address,
-              avatarUrl: comment.avatar_url || '',
-              name: comment.profile_name || DEFAULT_NAME,
-              userId: comment.user_id,
-              lastActive: comment.last_active as unknown as string,
-            }}
-            versionHistory={(comment.CommentVersionHistories || []).map(
-              (cvh) => ({
-                id: cvh.id || 0,
-                thread_id: comment.thread_id,
+    <div className={clsx('Comment', `comment-${comment.id}`, className)}>
+      <div className="comment-body">
+        <div className="comment-header">
+          {comment.deleted_at ? (
+            <span>[deleted]</span>
+          ) : (
+            <AuthorAndPublishInfo
+              authorAddress={comment?.address}
+              authorCommunityId={comment.community_id}
+              publishDate={
+                comment.created_at ? moment(comment.created_at) : undefined
+              }
+              discord_meta={comment.discord_meta || undefined}
+              popoverPlacement="top"
+              showUserAddressWithInfo={false}
+              profile={{
                 address: comment.address,
-                body: cvh.body,
-                timestamp: cvh.timestamp as unknown as string,
-                content_url: cvh.content_url || '',
-              }),
-            )}
-            onChangeVersionHistoryNumber={handleVersionHistoryChange}
-          />
-        )}
-      </div>
-      {isEditing ? (
-        <div className="EditComment">
-          <ReactQuillEditor
-            contentDelta={commentDelta}
-            setContentDelta={setCommentDelta}
-          />
-          <div className="buttons-row">
-            <CWButton
-              label="Cancel"
-              disabled={isSavingEdit}
-              buttonType="tertiary"
-              onClick={async (e) => {
-                e.preventDefault();
-                const hasContentChanged =
-                  JSON.stringify(commentBody) !== JSON.stringify(commentDelta);
-
-                // @ts-expect-error <StrictNullChecks/>
-                onEditCancel(hasContentChanged);
+                avatarUrl: comment.profile_avatar || '',
+                name: comment.profile_name || DEFAULT_NAME,
+                userId: comment.user_id,
+                lastActive: comment.last_active as unknown as string,
               }}
+              versionHistory={(comment.CommentVersionHistories || []).map(
+                (cvh) => ({
+                  id: cvh.id || 0,
+                  thread_id: comment.thread_id,
+                  address: comment.address,
+                  body: cvh.body,
+                  timestamp: cvh.timestamp as unknown as string,
+                  content_url: cvh.content_url || '',
+                }),
+              )}
+              onChangeVersionHistoryNumber={handleVersionHistoryChange}
             />
-            <CWButton
-              label="Save"
-              buttonWidth="wide"
-              disabled={isSavingEdit}
-              onClick={async (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                // @ts-expect-error <StrictNullChecks/>
-                await onEditConfirm(commentDelta);
-              }}
-            />
-          </div>
-        </div>
-      ) : (
-        <div className="comment-content">
-          {isSpam && <CWTag label="SPAM" type="spam" />}
-          <CWText className="comment-text">
-            <MarkdownViewerWithFallback markdown={commentText} />
-          </CWText>
-          {!comment.deleted_at && (
-            <div className="comment-footer">
-              {!hideReactButton && (
-                <CommentReactionButton
-                  comment={comment}
-                  disabled={!canReact}
-                  tooltipText={
-                    typeof disabledActionsTooltipText === 'function'
-                      ? disabledActionsTooltipText?.('upvote')
-                      : disabledActionsTooltipText
-                  }
-                  onReaction={handleReaction}
-                />
-              )}
-
-              {viewUpvotesButtonVisible && (
-                <>
-                  <ViewUpvotesDrawerTrigger
-                    onClick={(e) => {
-                      e.preventDefault();
-                      setIsUpvoteDrawerOpen(true);
-                    }}
-                  />
-                  <ViewCommentUpvotesDrawer
-                    comment={comment}
-                    isOpen={isUpvoteDrawerOpen}
-                    setIsOpen={setIsUpvoteDrawerOpen}
-                  />
-                </>
-              )}
-
-              <SharePopover linkToShare={shareURL} buttonLabel="Share" />
-
-              {!isThreadArchived && replyBtnVisible && (
-                <CWThreadAction
-                  action="reply"
-                  label={`Reply${repliesCount ? ` (${repliesCount})` : ''}`}
-                  disabled={maxReplyLimitReached || !canReply}
-                  tooltipText={
-                    (typeof disabledActionsTooltipText === 'function'
-                      ? disabledActionsTooltipText?.('reply')
-                      : disabledActionsTooltipText) ||
-                    (canReply && maxReplyLimitReached
-                      ? 'Further replies not allowed'
-                      : '')
-                  }
-                  onClick={async (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    // @ts-expect-error <StrictNullChecks/>
-                    await onReply();
-                  }}
-                />
-              )}
-
-              {user.id > 0 && (
-                <ToggleCommentSubscribe
-                  comment={comment}
-                  userOwnsComment={userOwnsComment}
-                />
-              )}
-
-              {!isThreadArchived && (canEdit || canDelete || canToggleSpam) && (
-                <PopoverMenu
-                  className="CommentActions"
-                  renderTrigger={(onClick) => (
-                    <CWThreadAction action="overflow" onClick={onClick} />
-                  )}
-                  // @ts-expect-error <StrictNullChecks/>
-                  menuItems={[
-                    canEdit && {
-                      label: 'Edit',
-                      iconLeft: 'notePencil' as const,
-                      onClick: onEditStart,
-                      iconLeftWeight: 'bold' as const,
-                    },
-                    canToggleSpam && {
-                      onClick: onSpamToggle,
-                      label: !isSpam ? 'Flag as spam' : 'Unflag as spam',
-                      iconLeft: 'flag' as const,
-                      iconLeftWeight: 'bold' as const,
-                    },
-                    canDelete && {
-                      label: 'Delete',
-                      iconLeft: 'trash' as const,
-                      onClick: onDelete,
-                      className: 'danger',
-                      iconLeftWeight: 'bold' as const,
-                    },
-                  ].filter(Boolean)}
-                />
-              )}
-
-              {verifiedCanvasSignedData && (
-                <CWText
-                  type="caption"
-                  fontWeight="medium"
-                  className="verification-icon"
-                >
-                  <CWTooltip
-                    placement="top"
-                    content="Signed by author"
-                    renderTrigger={(handleInteraction) => (
-                      <span
-                        onMouseEnter={handleInteraction}
-                        onMouseLeave={handleInteraction}
-                      >
-                        <CWIcon iconName="check" iconSize="xs" />
-                      </span>
-                    )}
-                  ></CWTooltip>
-                </CWText>
-              )}
-            </div>
           )}
         </div>
-      )}
+        {isEditing ? (
+          <div className="EditComment">
+            <ReactQuillEditor
+              contentDelta={commentDelta}
+              setContentDelta={setCommentDelta}
+            />
+            <div className="buttons-row">
+              <CWButton
+                label="Cancel"
+                disabled={isSavingEdit}
+                buttonType="tertiary"
+                onClick={async (e) => {
+                  e.preventDefault();
+                  const hasContentChanged =
+                    JSON.stringify(commentBody) !==
+                    JSON.stringify(commentDelta);
+
+                  // @ts-expect-error <StrictNullChecks/>
+                  onEditCancel(hasContentChanged);
+                }}
+              />
+              <CWButton
+                label="Save"
+                buttonWidth="wide"
+                disabled={isSavingEdit}
+                onClick={async (e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  // @ts-expect-error <StrictNullChecks/>
+                  await onEditConfirm(commentDelta);
+                }}
+              />
+            </div>
+          </div>
+        ) : (
+          <div className="comment-content">
+            {isSpam && <CWTag label="SPAM" type="spam" />}
+            <CWText className="comment-text">
+              <MarkdownViewerWithFallback markdown={commentText} />
+            </CWText>
+            {!comment.deleted_at && (
+              <div className="comment-footer">
+                {!hideReactButton && (
+                  <CommentReactionButton
+                    comment={comment}
+                    disabled={!canReact}
+                    tooltipText={
+                      typeof disabledActionsTooltipText === 'function'
+                        ? disabledActionsTooltipText?.('upvote')
+                        : disabledActionsTooltipText
+                    }
+                    onReaction={handleReaction}
+                  />
+                )}
+
+                {viewUpvotesButtonVisible && (
+                  <>
+                    <ViewUpvotesDrawerTrigger
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setIsUpvoteDrawerOpen(true);
+                      }}
+                    />
+                    <ViewCommentUpvotesDrawer
+                      comment={comment}
+                      isOpen={isUpvoteDrawerOpen}
+                      setIsOpen={setIsUpvoteDrawerOpen}
+                    />
+                  </>
+                )}
+
+                <SharePopover linkToShare={shareURL} buttonLabel="Share" />
+
+                {!isThreadArchived && replyBtnVisible && (
+                  <CWThreadAction
+                    action="reply"
+                    label={`Reply${repliesCount ? ` (${repliesCount})` : ''}`}
+                    disabled={maxReplyLimitReached || !canReply}
+                    tooltipText={
+                      (typeof disabledActionsTooltipText === 'function'
+                        ? disabledActionsTooltipText?.('reply')
+                        : disabledActionsTooltipText) ||
+                      (canReply && maxReplyLimitReached
+                        ? 'Further replies not allowed'
+                        : '')
+                    }
+                    onClick={async (e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      // @ts-expect-error <StrictNullChecks/>
+                      await onReply();
+                    }}
+                  />
+                )}
+
+                {user.id > 0 && (
+                  <ToggleCommentSubscribe
+                    comment={comment}
+                    userOwnsComment={userOwnsComment}
+                  />
+                )}
+
+                {!isThreadArchived &&
+                  (canEdit || canDelete || canToggleSpam) && (
+                    <PopoverMenu
+                      className="CommentActions"
+                      renderTrigger={(onClick) => (
+                        <CWThreadAction action="overflow" onClick={onClick} />
+                      )}
+                      // @ts-expect-error <StrictNullChecks/>
+                      menuItems={[
+                        canEdit && {
+                          label: 'Edit',
+                          iconLeft: 'notePencil' as const,
+                          onClick: onEditStart,
+                          iconLeftWeight: 'bold' as const,
+                        },
+                        canToggleSpam && {
+                          onClick: onSpamToggle,
+                          label: !isSpam ? 'Flag as spam' : 'Unflag as spam',
+                          iconLeft: 'flag' as const,
+                          iconLeftWeight: 'bold' as const,
+                        },
+                        canDelete && {
+                          label: 'Delete',
+                          iconLeft: 'trash' as const,
+                          onClick: onDelete,
+                          className: 'danger',
+                          iconLeftWeight: 'bold' as const,
+                        },
+                      ].filter(Boolean)}
+                    />
+                  )}
+
+                {verifiedCanvasSignedData && (
+                  <CWText
+                    type="caption"
+                    fontWeight="medium"
+                    className="verification-icon"
+                  >
+                    <CWTooltip
+                      placement="top"
+                      content="Signed by author"
+                      renderTrigger={(handleInteraction) => (
+                        <span
+                          onMouseEnter={handleInteraction}
+                          onMouseLeave={handleInteraction}
+                        >
+                          <CWIcon iconName="check" iconSize="xs" />
+                        </span>
+                      )}
+                    ></CWTooltip>
+                  </CWText>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 };
