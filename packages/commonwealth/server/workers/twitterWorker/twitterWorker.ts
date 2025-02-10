@@ -7,7 +7,11 @@ import { logger, stats } from '@hicommonwealth/core';
 import { emitEvent, models } from '@hicommonwealth/model';
 import { fileURLToPath } from 'url';
 import { getMentions } from './pollTwitter';
-import { TwitterBotConfig, createMentionEvents } from './utils';
+import {
+  TwitterBotConfig,
+  TwitterBotConfigs,
+  createMentionEvents,
+} from './utils';
 
 const log = logger(import.meta);
 
@@ -42,9 +46,9 @@ async function pollMentions(twitterBotConfig: TwitterBotConfig) {
     const endTime = new Date();
 
     log.info(
-      `Fetching mentions between ${new Date(startTime).toISOString()} and ${new Date(endTime).toISOString()}`,
+      `Fetching mentions between ${startTime.toISOString()} and ${endTime.toISOString()} for ${twitterBotConfig.name}`,
     );
-    const mentions = await getMentions({
+    const res = await getMentions({
       twitterBotConfig,
       startTime,
       endTime,
@@ -53,12 +57,12 @@ async function pollMentions(twitterBotConfig: TwitterBotConfig) {
     await models.sequelize.transaction(async (transaction) => {
       await emitEvent(
         models.Outbox,
-        createMentionEvents(twitterBotConfig, mentions),
+        createMentionEvents(twitterBotConfig, res.mentions),
         transaction,
       );
       await models.TwitterCursor.upsert({
         bot_name: twitterBotConfig.name,
-        last_polled_timestamp: endTime.getTime(),
+        last_polled_timestamp: res.endTime.getTime(),
       });
     });
 
@@ -73,14 +77,18 @@ async function main() {
   try {
     log.info('Starting Twitter Worker...');
 
-    // TODO: schedule mention polling such that they do not happen
-    //  concurrently and do not go over the rate limit
-    // await Promise.allSettled([
-    //   pollMentions(TwitterBotConfigs.MomBot),
-    //   pollMentions(TwitterBotConfigs.ContestBot),
-    // ]);
-    // setInterval(pollMentions, 1000, TwitterBotConfigs.MomBot)
-    // setInterval(pollMentions, 1000, TwitterBotConfigs.ContestBot)
+    await Promise.allSettled([
+      pollMentions(TwitterBotConfigs.MomBot),
+      pollMentions(TwitterBotConfigs.ContestBot),
+    ]);
+
+    // poll mentions once every 15 minutes
+    setInterval(() => pollMentions(TwitterBotConfigs.MomBot), 15 * 60 * 1000);
+    setInterval(
+      () => pollMentions(TwitterBotConfigs.ContestBot),
+      15 * 60 * 1000,
+    );
+
     isServiceHealthy = true;
     log.info('Twitter Worker started');
   } catch (e) {
