@@ -12,10 +12,9 @@ import './MobileStickyInput.scss';
  * This mobile version uses a portal to add itself to the bottom nav.
  */
 export const MobileStickyInput = (props: CommentEditorProps) => {
-  const { handleSubmitComment, replyingToAuthor } = props;
+  const { handleSubmitComment } = props;
   const [focused, setFocused] = useState(false);
-  const { useAiStreaming, setUseAiStreaming, aiCommentsEnabled } =
-    useAiToggleState();
+  const { useAiStreaming, setUseAiStreaming } = useAiToggleState();
   const [streamingReplyIds, setStreamingReplyIds] = useState<number[]>([]);
 
   const handleAiReply = useCallback(

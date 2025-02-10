@@ -52,7 +52,9 @@ const CommentEditor = ({
   setUseAiStreaming: onAiStreamingChange,
   onAiReply,
   onCommentCreated,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   replyingToAuthor,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   streamingReplyIds,
 }: CommentEditorProps) => {
   const { useAiStreaming, setUseAiStreaming, aiCommentsEnabled } =
