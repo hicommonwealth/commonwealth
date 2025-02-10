@@ -5,6 +5,7 @@ import {
   ContestWorker,
   DiscordBotPolicy,
   FarcasterWorker,
+  MomBotPolicy,
   NotificationsPolicy,
   User,
 } from '@hicommonwealth/model';
@@ -18,6 +19,7 @@ export const rascalConsumerMap = [
   User.UserReferrals,
   FarcasterWorker,
   NotificationsSettingsPolicy,
+  MomBotPolicy,
   {
     consumer: ContestWorker,
     overrides: {

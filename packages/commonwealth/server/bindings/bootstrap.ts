@@ -16,6 +16,7 @@ import {
   ContestWorker,
   DiscordBotPolicy,
   FarcasterWorker,
+  MomBotPolicy,
   User,
   models,
 } from '@hicommonwealth/model';
@@ -104,6 +105,9 @@ export async function bootstrapBindings(
 
   const discordBotSubRes = await brokerInstance.subscribe(DiscordBotPolicy);
   checkSubscriptionResponse(discordBotSubRes, DiscordBotPolicy.name);
+
+  const momBotSubRes = await brokerInstance.subscribe(MomBotPolicy);
+  checkSubscriptionResponse(momBotSubRes, MomBotPolicy.name);
 }
 
 export async function bootstrapRelayer(
