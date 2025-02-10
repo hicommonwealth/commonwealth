@@ -150,7 +150,7 @@ const WelcomeOnboardModal = ({ isOpen, onClose }: WelcomeOnboardModalProps) => {
 
   return (
     <CWModal
-      open={true}
+      open={isOpen}
       onClose={handleClose}
       size="medium"
       className={clsx(
