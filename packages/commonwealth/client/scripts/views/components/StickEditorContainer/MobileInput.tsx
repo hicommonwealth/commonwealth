@@ -76,7 +76,7 @@ export const MobileInput = (props: MobileInputProps) => {
         if (aiPromise) {
           try {
             const aiReply = await aiPromise;
-            if (aiReply) {
+            if (aiReply && onAiReply) {
               onAiReply(aiReply);
             }
           } catch (error) {
