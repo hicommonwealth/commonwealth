@@ -10,7 +10,6 @@ import {
 } from '@hicommonwealth/shared';
 import clsx from 'clsx';
 import { GetThreadActionTooltipTextResponse } from 'helpers/threads';
-import { useFlag } from 'hooks/useFlag';
 import { useGenerateCommentText } from 'hooks/useGenerateCommentText';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import moment from 'moment';
@@ -35,6 +34,7 @@ import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_th
 import { ReactQuillEditor } from 'views/components/react_quill_editor';
 import { deserializeDelta } from 'views/components/react_quill_editor/utils';
 import { z } from 'zod';
+import { useAiToggleState } from '../../../../hooks/useAiToggleState';
 import { AuthorAndPublishInfo } from '../ThreadCard/AuthorAndPublishInfo';
 import './CommentCard.scss';
 import { ToggleCommentSubscribe } from './ToggleCommentSubscribe';
@@ -123,7 +123,7 @@ export const CommentCard = ({
   const userOwnsComment = comment.user_id === user.id;
   const [streamingText, setStreamingText] = useState('');
   const { generateComment } = useGenerateCommentText();
-  const aiCommentsEnabled = useFlag('aiComments');
+  const { aiCommentsEnabled } = useAiToggleState();
   const { mutateAsync: createComment } = useCreateCommentMutation({
     threadId: comment.thread_id,
     communityId: comment.community_id,

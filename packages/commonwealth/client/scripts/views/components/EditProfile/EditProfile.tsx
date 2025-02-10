@@ -2,6 +2,7 @@ import { useUpdateUserMutation } from 'client/scripts/state/api/user';
 import { notifyError } from 'controllers/app/notifications';
 import { linkValidationSchema } from 'helpers/formValidations/common';
 import { getLinkType, isLinkValid } from 'helpers/link';
+import { useAiToggleState } from 'hooks/useAiToggleState';
 import { useFlag } from 'hooks/useFlag';
 import AddressInfo from 'models/AddressInfo';
 import NewProfile from 'models/NewProfile';
@@ -26,6 +27,7 @@ import CWCircleMultiplySpinner from '../component_kit/new_designs/CWCircleMultip
 import { CWForm } from '../component_kit/new_designs/CWForm';
 import { CWTag } from '../component_kit/new_designs/CWTag';
 import { CWTextInput } from '../component_kit/new_designs/CWTextInput';
+import { CWToggle } from '../component_kit/new_designs/cw_toggle';
 import { LinkedAddresses } from '../linked_addresses';
 import { ReactQuillEditor } from '../react_quill_editor';
 import { deserializeDelta, serializeDelta } from '../react_quill_editor/utils';
@@ -62,6 +64,8 @@ const EditProfile = () => {
   });
 
   const enableApiKeyManagement = useFlag('manageApiKeys');
+  const { userAiEnabled, setUserAiEnabled } = useAiToggleState();
+  const aiCommentsEnabled = useFlag('aiComments');
 
   const { preferenceTags, setPreferenceTags, toggleTagFromSelection } =
     usePreferenceTags();
@@ -391,7 +395,37 @@ const EditProfile = () => {
                 onTagClick={toggleTagFromSelection}
               />
             </ProfileSection>
-            {enableApiKeyManagement ? <ManageApiKey /> : <></>}
+            <ProfileSection
+              title="Beta Features"
+              description="Enable experimental features and help us test new functionality."
+            >
+              {aiCommentsEnabled && (
+                <div className="beta-features-section">
+                  <div className="beta-feature-item">
+                    <div className="beta-feature-header">
+                      <CWText type="h4" fontWeight="semiBold">
+                        AI Assistant
+                      </CWText>
+                      <CWToggle
+                        className="ai-toggle"
+                        checked={userAiEnabled}
+                        onChange={() => setUserAiEnabled(!userAiEnabled)}
+                        icon="sparkle"
+                        size="md"
+                        iconColor="#757575"
+                      />
+                    </div>
+                    <CWText type="b1" className="beta-feature-description">
+                      Enable AI-powered features including AI replies to
+                      comments and smart content generation. This is an
+                      experimental feature and may be updated or changed at any
+                      time.
+                    </CWText>
+                  </div>
+                </div>
+              )}
+            </ProfileSection>
+            {enableApiKeyManagement ? <ManageApiKey /> : null}
             {actionButtons}
           </CWForm>
         </div>
