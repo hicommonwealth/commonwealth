@@ -5,6 +5,11 @@ import {
 } from 'openai/resources/index.mjs';
 import { config } from '../../config';
 
+export const USDC_BASE_MAINNET_ADDRESS =
+  '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913';
+export const USDC_BASE_SEPOLIA_ADDRESS =
+  '0x5dEaC602762362FE5f135FA5904351916053cF70';
+
 export const DEFAULT_CONTEST_BOT_PARAMS = {
   payoutStructure: [50, 30, 20],
   voterShare: 10,
@@ -18,6 +23,7 @@ export type ContestMetadataResponse = {
   voterShare: number;
   image_url: string;
   tokenAddress: string;
+  isUSDC: boolean;
 };
 
 const system_prompt: ChatCompletionMessage = {
@@ -30,6 +36,7 @@ const system_prompt: ChatCompletionMessage = {
     Extract the name of the contest as well as the token address from the user prompt.
     contestName is the name of the contest.
     tokenAddress is the ethereum address of the funding token.
+    isUSDC should be set to true if the user shows intent to launch with the USDC token.
 
     Example: "Hey @contestbot, create a Big Donut with 0xc204af95b0307162118f7bc36a91c9717490ab69"
     Expected Output:
@@ -65,6 +72,13 @@ const system_prompt: ChatCompletionMessage = {
       contestName: "Diamond Handz",
       tokenAddress: "0x820c137fa70c8691f0e44dc420a5e53c168921dc"
     }
+
+    Example: "@contestbot, launch Base Bangers on USDC"
+    Expected Output:
+    {
+      contestName: "Diamond Handz",
+      isUSDC: true
+    }
     `,
 };
 
@@ -78,6 +92,7 @@ const tools: ChatCompletionTool[] = [
         properties: {
           contestName: { type: 'string' },
           tokenAddress: { type: 'string' },
+          isUSDC: { type: 'boolean' },
         },
       },
     },
@@ -109,6 +124,13 @@ export class ParseBotCommandError extends Error {
   }
 }
 
+export const getContestUSDCAddress = () => {
+  if (config.APP_ENV === 'production') {
+    return USDC_BASE_MAINNET_ADDRESS;
+  }
+  return USDC_BASE_SEPOLIA_ADDRESS;
+};
+
 export const parseBotCommand = async (
   command: string,
 ): Promise<ContestMetadataResponse> => {
@@ -138,13 +160,18 @@ export const parseBotCommand = async (
     throw new ParseBotCommandError('InvalidParams');
   }
 
-  if (!data.contestName || !data.tokenAddress) {
+  if (!data.contestName || !(data.tokenAddress || data.isUSDC)) {
     throw new ParseBotCommandError('InvalidParams');
   }
 
+  const tokenAddress = data.isUSDC
+    ? getContestUSDCAddress()
+    : data.tokenAddress;
+
   return {
     contestName: data.contestName,
-    tokenAddress: data.tokenAddress,
+    tokenAddress,
     ...DEFAULT_CONTEST_BOT_PARAMS,
+    isUSDC: data.isUSDC,
   };
 };

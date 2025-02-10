@@ -101,6 +101,7 @@ const NewRecurringContestStartedMapper: EvmMapper<
       contest_id: BigNumber.from(contestId).toNumber(),
       start_time: new Date(BigNumber.from(startTime).toNumber() * 1000),
       end_time: new Date(BigNumber.from(endTime).toNumber() * 1000),
+      is_one_off: false,
     },
   }),
 };
@@ -118,6 +119,7 @@ const NewSingleContestStartedMapper: EvmMapper<
       contest_id: 0,
       start_time: new Date(BigNumber.from(startTime).toNumber() * 1000),
       end_time: new Date(BigNumber.from(endTime).toNumber() * 1000),
+      is_one_off: true,
     },
   }),
 };
