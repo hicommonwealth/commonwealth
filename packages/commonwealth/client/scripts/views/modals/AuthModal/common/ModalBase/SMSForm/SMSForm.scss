@@ -7,10 +7,13 @@
   width: 100%;
   padding: 0 4px;
   overflow: hidden;
+  justify-content: center;
+  align-items: center;
   .dropdown-options-display {
     .input-container {
       border: 1px solid $neutral-200 !important;
       height: 40px !important;
+      border-radius: 6px !important;
     }
     .flag-dropdown {
       border: 1px solid $neutral-200 !important;
@@ -59,7 +62,7 @@
       margin: 0 !important;
       line-height: 20px !important;
       padding: 6px 8px !important;
-      border-radius: 4px !important;
+      border-radius: 7px !important;
       border: 1px solid $neutral-200 !important;
     }
     .country {
@@ -90,5 +93,8 @@
         padding: 0px !important;
       }
     }
+  }
+  .react-tel-input {
+    width: auto !important;
   }
 }
