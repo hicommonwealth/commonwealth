@@ -18,7 +18,11 @@ const generateCommentText = async function* ({
   userText,
 }: {
   userText?: string;
-}): AsyncGenerator<string | { error: typeof CommentErrors }, void, unknown> {
+}): AsyncGenerator<
+  string | { error: (typeof CommentErrors)[keyof typeof CommentErrors] },
+  void,
+  unknown
+> {
   if (!config.OPENAI.API_KEY) {
     yield { error: CommentErrors.OpenAINotConfigured };
     return;
