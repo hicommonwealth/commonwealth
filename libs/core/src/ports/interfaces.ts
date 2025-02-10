@@ -1,4 +1,4 @@
-import { EventNames, Events } from '@hicommonwealth/schemas';
+import { Events } from '@hicommonwealth/schemas';
 import { Readable } from 'stream';
 import { z } from 'zod';
 import {
@@ -208,7 +208,7 @@ export class CustomRetryStrategyError extends Error {
 
 type Concat<S1 extends string, S2 extends string> = `${S1}.${S2}`;
 
-type EventNamesType = `${EventNames}`;
+type EventNamesType = `${Events}`;
 
 type RoutingKeyTagsType = `${RoutingKeyTags}`;
 

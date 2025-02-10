@@ -6,7 +6,7 @@ import {
 } from '@hicommonwealth/core';
 import { EvmEventSignatures } from '@hicommonwealth/evm-protocols';
 import * as schemas from '@hicommonwealth/schemas';
-import { EventNames, events } from '@hicommonwealth/schemas';
+import { events } from '@hicommonwealth/schemas';
 import { BalanceType, getCommunityUrl } from '@hicommonwealth/shared';
 import {
   Mock,
@@ -77,7 +77,7 @@ describe('chainEventCreated Event Handler', () => {
 
   test('should do nothing if the event signature is unsupported', async () => {
     await notifyChainEventCreated({
-      name: EventNames.ChainEventCreated,
+      name: 'ChainEventCreated',
       payload: {
         eventSource: {
           eventSignature: '0xunsupported',
@@ -89,7 +89,7 @@ describe('chainEventCreated Event Handler', () => {
   describe('Community Stakes', () => {
     test('should not throw if the community is invalid', async () => {
       await notifyChainEventCreated({
-        name: EventNames.ChainEventCreated,
+        name: 'ChainEventCreated',
         payload: {
           eventSource: {
             eventSignature: EvmEventSignatures.CommunityStake.Trade,
@@ -105,7 +105,7 @@ describe('chainEventCreated Event Handler', () => {
       });
 
       await notifyChainEventCreated({
-        name: EventNames.ChainEventCreated,
+        name: 'ChainEventCreated',
         payload: {
           eventSource: {
             eventSignature: EvmEventSignatures.CommunityStake.Trade,
@@ -128,7 +128,7 @@ describe('chainEventCreated Event Handler', () => {
       });
 
       await notifyChainEventCreated({
-        name: EventNames.ChainEventCreated,
+        name: 'ChainEventCreated',
         payload: {
           eventSource: {
             eventSignature: EvmEventSignatures.CommunityStake.Trade,
@@ -164,7 +164,7 @@ describe('chainEventCreated Event Handler', () => {
 
       await expect(
         notifyChainEventCreated({
-          name: EventNames.ChainEventCreated,
+          name: 'ChainEventCreated',
           payload: {
             eventSource: {
               eventSignature: EvmEventSignatures.CommunityStake.Trade,

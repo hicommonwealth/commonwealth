@@ -96,7 +96,7 @@ export function FarcasterUpvoteAction(): Command<
         models.Outbox,
         [
           {
-            event_name: schemas.EventNames.FarcasterVoteCreated,
+            event_name: 'FarcasterVoteCreated',
             event_payload: {
               ...payload,
               contest_address: addAction.contest_address,

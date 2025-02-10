@@ -117,7 +117,7 @@ export function CreateComment(): Command<typeof schemas.CreateComment> {
             models.Outbox,
             [
               {
-                event_name: schemas.EventNames.CommentCreated,
+                event_name: 'CommentCreated',
                 event_payload: {
                   ...comment.toJSON(),
                   community_id: thread.community_id,
