@@ -5,6 +5,8 @@ import {
   TradingConfig,
   TradingMode,
 } from 'client/scripts/views/modals/TradeTokenModel';
+import { LaunchpadToken } from 'client/scripts/views/modals/TradeTokenModel/CommonTradeModal/types';
+import { ExternalToken } from 'client/scripts/views/modals/TradeTokenModel/UniswapTradeModal/types';
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -37,10 +39,8 @@ const TokenPerformance = () => {
 
   const chain = isPinnedToken ? 'base' : 'base-sepolia';
   const address = isPinnedToken
-    ? // @ts-expect-error Strict-Null Check
-      communityToken.contract_address
-    : // @ts-expect-error Strict-Null Check
-      communityToken.token_address;
+    ? (communityToken as ExternalToken).contract_address
+    : (communityToken as LaunchpadToken).token_address;
 
   return (
     <div className="TokenPerformance">
