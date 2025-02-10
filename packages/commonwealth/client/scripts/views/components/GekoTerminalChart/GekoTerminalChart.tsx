@@ -14,7 +14,7 @@ export interface GeckoTerminalEmbedProps {
   title?: string;
 }
 
-const GeckoTerminalChart: React.FC<GeckoTerminalEmbedProps> = ({
+const GeckoTerminalChart = ({
   chain,
   poolAddress,
   embed = true,
@@ -26,7 +26,7 @@ const GeckoTerminalChart: React.FC<GeckoTerminalEmbedProps> = ({
   height = '500px',
   id = 'geckoterminal-embed',
   title = 'GeckoTerminal Embed',
-}) => {
+}: GeckoTerminalEmbedProps) => {
   const boolToQueryValue = (value: boolean): string => (value ? '1' : '0');
 
   const baseUrl = `https://www.geckoterminal.com/${chain}/pools/${poolAddress}`;
