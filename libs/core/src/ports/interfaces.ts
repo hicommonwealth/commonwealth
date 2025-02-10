@@ -13,6 +13,7 @@ import {
   CommunityStakeNotification,
   ContestEndedNotification,
   ContestNotification,
+  QuestStartedNotification,
   SnapshotProposalCreatedNotification,
   UpvoteNotification,
   UserMentionedNotification,
@@ -280,6 +281,8 @@ export enum WorkflowKeys {
   ContestStarted = 'contest-started',
   ContestEnding = 'contest-ending',
   ContestEnded = 'contest-ended',
+  // Quest events
+  QuestStarted = 'quest-started',
 }
 
 export enum KnockChannelIds {
@@ -357,6 +360,10 @@ export type NotificationsProviderTriggerOptions =
         | {
             data: z.infer<typeof ContestEndedNotification>;
             key: WorkflowKeys.ContestEnded;
+          }
+        | {
+            data: z.infer<typeof QuestStartedNotification>;
+            key: WorkflowKeys.QuestStarted;
           }
       ))
   | WebhookProviderOptions;

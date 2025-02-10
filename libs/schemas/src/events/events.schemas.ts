@@ -357,3 +357,13 @@ export const SignUpFlowCompleted = z.object({
   address: z.string(),
   created_at: z.coerce.date(),
 });
+
+export const QuestStarted = z.object({
+  id: PG_INT.nullish(),
+  name: z.string().max(255),
+  description: z.string().max(1000),
+  image_url: z.string(),
+  start_date: z.coerce.date(),
+  end_date: z.coerce.date(),
+  community_id: z.string().nullish(),
+});

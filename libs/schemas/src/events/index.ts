@@ -49,6 +49,9 @@ export enum EventNames {
 
   // Referrals
   SignUpFlowCompleted = 'SignUpFlowCompleted',
+
+  // Quests
+  QuestStarted = 'QuestStarted',
 }
 
 export type EventPairs =
@@ -179,4 +182,8 @@ export type EventPairs =
   | {
       event_name: EventNames.SignUpFlowCompleted;
       event_payload: z.infer<typeof events.SignUpFlowCompleted>;
+    }
+  | {
+      event_name: EventNames.QuestStarted;
+      event_payload: z.infer<typeof events.QuestStarted>;
     };
