@@ -1,0 +1,62 @@
+@import '../../../../../../styles/shared';
+
+.QuestCardCompact {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  width: 100%;
+  border: 1px solid $neutral-200;
+  border-radius: 6px;
+  padding: 12px 16px;
+  gap: 8px;
+
+  .left {
+    display: flex;
+    gap: 12px;
+
+    .image {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+    }
+
+    .metdata {
+      .h5 {
+        overflow: hidden;
+        height: 24px;
+      }
+
+      .caption {
+        color: $neutral-600;
+      }
+
+      .count-down {
+        display: flex;
+        align-items: center;
+
+        .Text,
+        svg {
+          font-size: 14px;
+        }
+      }
+    }
+  }
+
+  &.active {
+    .count-down {
+      .Text,
+      svg {
+        color: $rorange-300;
+      }
+    }
+  }
+
+  &.ended {
+    .count-down {
+      .Text,
+      svg {
+        color: $neutral-500;
+      }
+    }
+  }
+}

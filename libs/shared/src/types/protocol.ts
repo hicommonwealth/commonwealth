@@ -70,7 +70,7 @@ export enum WalletId {
   CosmosEvmMetamask = 'cosm-metamask',
   Phantom = 'phantom',
   Coinbase = 'coinbase',
-  SubstrateEvmMetamask = 'substrate-evm-metamask',
+  Farcaster = 'farcaster',
 }
 
 // Passed directly to Magic login.

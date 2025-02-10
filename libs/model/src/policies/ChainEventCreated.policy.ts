@@ -55,8 +55,8 @@ export const processChainEventCreated: EventHandler<
       break;
 
     default:
-      log.error('Attempted to process an unsupported chain-event', undefined, {
-        event: payload,
+      log.warn('Unsupported chain-event', {
+        event: payload.eventSource.eventSignature,
       });
   }
 };
