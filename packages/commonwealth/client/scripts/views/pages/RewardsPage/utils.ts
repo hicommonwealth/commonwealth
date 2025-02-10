@@ -3,9 +3,18 @@ import { MobileTabType, ReferralFee, TabParam, TableType } from './types';
 
 export const calculateTotalEarnings = (referralFees: ReferralFee[]) => {
   if (!referralFees?.length) return 0;
-  return referralFees.reduce(
-    (sum, fee) => sum + (fee.referrer_received_amount || 0),
-    0,
+  const maxDecimals = Math.max(
+    ...referralFees.map((fee) => {
+      const amount = fee.referrer_received_amount || 0;
+      const decimalStr = amount.toString().split('.')[1];
+      return decimalStr ? decimalStr.length : 0;
+    }),
+  );
+
+  return Number(
+    referralFees
+      .reduce((sum, fee) => sum + (fee.referrer_received_amount || 0), 0)
+      .toFixed(maxDecimals),
   );
 };
 
