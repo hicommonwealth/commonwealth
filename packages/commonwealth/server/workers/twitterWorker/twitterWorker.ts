@@ -85,8 +85,9 @@ async function main() {
       pollMentions(TwitterBotConfigs.ContestBot),
     ]);
 
-    // poll mentions once every 15 minutes
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
     setInterval(pollMentions, POLL_INTERVAL, TwitterBotConfigs.MomBot);
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
     setInterval(pollMentions, POLL_INTERVAL, TwitterBotConfigs.ContestBot);
 
     isServiceHealthy = true;
