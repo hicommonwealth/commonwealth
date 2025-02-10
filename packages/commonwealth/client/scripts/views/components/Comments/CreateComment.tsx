@@ -27,6 +27,8 @@ type CreateCommentProps = {
   isReplying?: boolean;
   replyingToAuthor?: string;
   onCancel?: (event: React.MouseEvent) => void;
+  onCommentCreated?: (commentId: number, hasAI: boolean) => void;
+  useAiStreaming?: boolean;
 };
 
 export const CreateComment = ({
@@ -39,6 +41,8 @@ export const CreateComment = ({
   isReplying,
   replyingToAuthor,
   onCancel,
+  onCommentCreated,
+  useAiStreaming = false,
 }: CreateCommentProps) => {
   const { saveDraft, restoreDraft, clearDraft } = useDraft<DeltaStatic>(
     !parentCommentId
@@ -106,7 +110,10 @@ export const CreateComment = ({
         existingNumberOfComments: rootThread.numberOfComments || 0,
       });
 
-      console.log('CreateComment - Submitting comment...');
+      console.log(
+        'CreateComment - Submitting comment with AI:',
+        useAiStreaming,
+      );
       const newComment = await createComment(input);
       console.log('CreateComment - Comment created:', newComment);
 
@@ -125,6 +132,13 @@ export const CreateComment = ({
       if (handleIsReplying) {
         handleIsReplying(false);
       }
+
+      // Notify parent about the new comment and its AI status
+      console.log('CreateComment - Notifying parent of new comment:', {
+        commentId,
+        hasAI: useAiStreaming,
+      });
+      onCommentCreated?.(commentId, useAiStreaming);
 
       return commentId;
     } catch (err) {

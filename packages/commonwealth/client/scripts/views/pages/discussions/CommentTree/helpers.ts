@@ -1,43 +1,45 @@
 import type { ContentType } from '@hicommonwealth/shared';
 import app from 'state';
 
+// Add callback registry for AI streaming
+type AIStreamingCallback = (commentId: number) => void;
+let aiStreamingCallbacks: AIStreamingCallback[] = [];
+
+export const registerAIStreamingCallback = (callback: AIStreamingCallback) => {
+  console.log('helpers - Registering AI streaming callback');
+  aiStreamingCallbacks.push(callback);
+  return () => {
+    aiStreamingCallbacks = aiStreamingCallbacks.filter((cb) => cb !== callback);
+  };
+};
+
 // highlight the header/body of a parent thread, or the body of a comment
 export const jumpHighlightComment = (commentId: number) => {
+  console.log('helpers - jumpHighlightComment called for:', commentId);
+  const element = document.querySelector(`.comment-${commentId}`);
+  if (!element) {
+    console.warn(`No element found for comment ID: ${commentId}`);
+    return;
+  }
+
+  element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  element.classList.add('highlighted');
+  setTimeout(() => {
+    element.classList.remove('highlighted');
+  }, 2000);
+
+  // Notify any registered callbacks about the new comment
   console.log(
-    'jumpHighlightComment: Attempting to highlight comment with ID:',
+    'helpers - Notifying AI streaming callbacks for comment:',
     commentId,
   );
-  const commentEle = document.getElementsByClassName(`comment-${commentId}`)[0];
-
-  if (commentEle) {
-    console.log(
-      'jumpHighlightComment: Found element for comment ID:',
-      commentId,
-    );
-    // clear any previous animation classes
-    commentEle.classList.remove('highlighted');
-    commentEle.classList.remove('highlightAnimationComplete');
-    // scroll into view
-    commentEle.scrollIntoView({
-      behavior: 'smooth',
-      block: 'center',
-      inline: 'nearest',
-    });
-    // add new highlight classes
-    commentEle.classList.add('highlighted');
-    setTimeout(() => {
-      commentEle.classList.add('highlightAnimationComplete');
-      console.log(
-        'jumpHighlightComment: Animation complete for comment ID:',
-        commentId,
-      );
-    }, 2500); // adjusted timeout for clarity
-  } else {
-    console.warn(
-      'jumpHighlightComment: No element found for comment ID:',
-      commentId,
-    );
-  }
+  aiStreamingCallbacks.forEach((callback) => {
+    try {
+      callback(commentId);
+    } catch (error) {
+      console.error('Error in AI streaming callback:', error);
+    }
+  });
 };
 
 export const clearEditingLocalStorage = (

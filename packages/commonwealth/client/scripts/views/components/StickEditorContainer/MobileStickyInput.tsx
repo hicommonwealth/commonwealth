@@ -14,6 +14,7 @@ export const MobileStickyInput = (props: CommentEditorProps) => {
   const { handleSubmitComment, replyingToAuthor } = props;
   const [focused, setFocused] = useState(false);
   const [useAiStreaming, setUseAiStreaming] = useState(false);
+  const [streamingReplyIds, setStreamingReplyIds] = useState<number[]>([]);
 
   useEffect(() => {
     console.log('MobileStickyInput State:', {
@@ -22,8 +23,21 @@ export const MobileStickyInput = (props: CommentEditorProps) => {
       replyingToAuthor,
       parentExists: !!document.getElementById('MobileNavigationHead'),
       timestamp: new Date().toISOString(),
+      streamingReplyIds,
     });
-  }, [focused, useAiStreaming, replyingToAuthor]);
+  }, [focused, useAiStreaming, replyingToAuthor, streamingReplyIds]);
+
+  const handleAiReply = useCallback(
+    (commentId: number) => {
+      console.log('MobileStickyInput - Starting AI reply for:', commentId);
+      if (streamingReplyIds.includes(commentId)) {
+        console.log('Already streaming for this comment');
+        return;
+      }
+      setStreamingReplyIds((prev) => [...prev, commentId]);
+    },
+    [streamingReplyIds],
+  );
 
   const customHandleSubmitComment = useCallback(async (): Promise<number> => {
     setFocused(false);
@@ -32,6 +46,11 @@ export const MobileStickyInput = (props: CommentEditorProps) => {
     if (typeof commentId !== 'number' || isNaN(commentId)) {
       console.error('MobileStickyInput - Invalid comment ID:', commentId);
       throw new Error('Invalid comment ID');
+    }
+
+    // If AI mode is enabled, trigger the streaming reply
+    if (useAiStreaming) {
+      handleAiReply(commentId);
     }
 
     // Directly trigger jump highlighting after a short delay to allow the comment to render
@@ -57,7 +76,7 @@ export const MobileStickyInput = (props: CommentEditorProps) => {
     }, 300);
 
     return commentId;
-  }, [handleSubmitComment]);
+  }, [handleSubmitComment, useAiStreaming, handleAiReply]);
 
   const handleFocused = useCallback(() => {
     setFocused(true);
@@ -84,6 +103,8 @@ export const MobileStickyInput = (props: CommentEditorProps) => {
           useAiStreaming={useAiStreaming}
           setUseAiStreaming={setUseAiStreaming}
           handleSubmitComment={customHandleSubmitComment}
+          onAiReply={handleAiReply}
+          streamingReplyIds={streamingReplyIds}
         />
       </div>
     );

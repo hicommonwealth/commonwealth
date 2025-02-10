@@ -2,7 +2,7 @@ import { MAX_COMMENT_DEPTH } from '@hicommonwealth/shared';
 import clsx from 'clsx';
 import { useGenerateCommentText } from 'hooks/useGenerateCommentText';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
-import React, { useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Virtuoso } from 'react-virtuoso';
 import app from 'state';
 import { useFetchCommentsQuery } from 'state/api/comments';
@@ -16,7 +16,15 @@ import Permissions from '../../../../utils/Permissions';
 import { CommentCard } from '../CommentCard';
 import { CommentViewParams } from '../CommentCard/CommentCard';
 import './CommentTree.scss';
+import { registerAIStreamingCallback } from './helpers';
 import { TreeHierarchyProps } from './types';
+
+// Extend CommentViewParams to include AI reply properties
+type ExtendedCommentViewParams = CommentViewParams & {
+  hasOnAiReply?: boolean;
+  onAiReplyType?: 'function';
+  aiEnabled?: boolean;
+};
 
 export const TreeHierarchy = ({
   pageRef,
@@ -46,20 +54,6 @@ export const TreeHierarchy = ({
   const [streamingReplyIds, setStreamingReplyIds] = useState<number[]>([]);
   const { generateComment } = useGenerateCommentText();
 
-  const handleGenerateAIReply = async (commentId: number) => {
-    if (streamingReplyIds.includes(commentId)) {
-      console.log('Already has a streaming reply');
-      return;
-    }
-
-    console.log('Generating AI reply for comment:', {
-      commentId,
-      streamingReplyIds,
-    });
-
-    setStreamingReplyIds((prev) => [...prev, commentId]);
-  };
-
   const {
     data: paginatedComments,
     fetchNextPage: fetchMoreComments,
@@ -77,9 +71,54 @@ export const TreeHierarchy = ({
     limit: 10,
     apiEnabled: !!communityId && !!thread.id,
   });
+
   const allComments = (paginatedComments?.pages || []).flatMap(
     (page) => page.results,
-  ) as CommentViewParams[];
+  ) as ExtendedCommentViewParams[];
+
+  const handleGenerateAIReply = useCallback(
+    async (commentId: number) => {
+      if (streamingReplyIds.includes(commentId)) {
+        console.log('Already has a streaming reply');
+        return;
+      }
+
+      const comment = allComments.find((c) => c.id === commentId);
+      if (!comment) {
+        console.error('Comment not found:', commentId);
+        return;
+      }
+
+      console.log('TreeHierarchy - Generating AI reply for comment:', {
+        commentId,
+        streamingReplyIds,
+        commentText: comment.body,
+        hasOnAiReply: comment.hasOnAiReply,
+        aiEnabled: comment.aiEnabled,
+      });
+
+      setStreamingReplyIds((prev) => [...prev, commentId]);
+    },
+    [allComments, streamingReplyIds],
+  );
+
+  // Register the callback when the component mounts
+  useEffect(() => {
+    console.log('TreeHierarchy - Registering AI streaming callback');
+    const unregister = registerAIStreamingCallback((commentId) => {
+      console.log(
+        'TreeHierarchy - AI streaming callback triggered for:',
+        commentId,
+      );
+      handleGenerateAIReply(commentId);
+    });
+
+    // Cleanup when component unmounts
+    return () => {
+      console.log('TreeHierarchy - Unregistering AI streaming callback');
+      unregister();
+    };
+  }, [handleGenerateAIReply]);
 
   useRunOnceOnCondition({
     callback: () => {
@@ -94,6 +133,15 @@ export const TreeHierarchy = ({
     Permissions.isCommunityModerator();
 
   const commentRefs = useRef<(HTMLDivElement | null)[]>([]);
+
+  // Add this method to directly trigger streaming for a new comment
+  const triggerStreamingForNewComment = useCallback((commentId: number) => {
+    console.log(
+      'TreeHierarchy - Directly triggering streaming for new comment:',
+      commentId,
+    );
+    setStreamingReplyIds((prev) => [...prev, commentId]);
+  }, []);
 
   if (isInitialCommentsLoading) {
     return <CWCircleMultiplySpinner />;
@@ -248,6 +296,14 @@ export const TreeHierarchy = ({
                       replyingToAuthor={comment.profile_name}
                       onCancel={() => {
                         onEditCancel(comment, false);
+                      }}
+                      onCommentCreated={(
+                        newCommentId: number,
+                        hasAI: boolean,
+                      ) => {
+                        if (hasAI) {
+                          triggerStreamingForNewComment(newCommentId);
+                        }
                       }}
                       tooltipText={
                         !canComment &&

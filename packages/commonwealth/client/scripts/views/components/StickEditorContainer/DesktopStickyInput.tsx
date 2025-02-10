@@ -1,4 +1,3 @@
-import { useGenerateCommentText } from 'hooks/useGenerateCommentText';
 import React, { useCallback, useState } from 'react';
 import { CommentEditor } from 'views/components/Comments/CommentEditor';
 import type { CommentEditorProps } from 'views/components/Comments/CommentEditor/CommentEditor';
@@ -7,16 +6,10 @@ import { jumpHighlightComment } from 'views/pages/discussions/CommentTree/helper
 import './DesktopStickyInput.scss';
 
 export const DesktopStickyInput = (props: CommentEditorProps) => {
-  const {
-    isReplying,
-    replyingToAuthor,
-    onCancel,
-    handleSubmitComment,
-    onAiReply,
-  } = props;
+  const { isReplying, replyingToAuthor, onCancel, handleSubmitComment } = props;
   const [focused, setFocused] = useState(false);
   const [useAiStreaming, setUseAiStreaming] = useState(false);
-  const { generateComment } = useGenerateCommentText();
+  const [streamingReplyIds, setStreamingReplyIds] = useState<number[]>([]);
 
   const handleFocused = useCallback(() => {
     setFocused(true);
@@ -40,6 +33,18 @@ export const DesktopStickyInput = (props: CommentEditorProps) => {
     setUseAiStreaming((prev) => !prev);
   }, [useAiStreaming]);
 
+  const handleAiReply = useCallback(
+    (commentId: number) => {
+      console.log('DesktopStickyInput - Starting AI reply for:', commentId);
+      if (streamingReplyIds.includes(commentId)) {
+        console.log('Already streaming for this comment');
+        return;
+      }
+      setStreamingReplyIds((prev) => [...prev, commentId]);
+    },
+    [streamingReplyIds],
+  );
+
   const handleEnhancedSubmit = useCallback(async () => {
     console.log(
       'DesktopStickyInput - Submitting comment with AI mode:',
@@ -52,6 +57,11 @@ export const DesktopStickyInput = (props: CommentEditorProps) => {
     if (typeof commentId !== 'number' || isNaN(commentId)) {
       console.error('DesktopStickyInput - Invalid comment ID:', commentId);
       throw new Error('Invalid comment ID');
+    }
+
+    // If AI mode is enabled, trigger the streaming reply
+    if (useAiStreaming) {
+      handleAiReply(commentId);
     }
 
     const attemptJump = () => {
@@ -81,22 +91,22 @@ export const DesktopStickyInput = (props: CommentEditorProps) => {
       }
     }, 2000);
 
-    // If AI mode is enabled, generate an AI reply
-    if (useAiStreaming && onAiReply) {
-      try {
-        const aiReply = await generateComment(
-          'Generate an AI reply for the comment.',
-        );
-        onAiReply(aiReply);
-      } catch (error) {
-        console.error('DesktopStickyInput - AI generation failed:', error);
-      }
-    }
-
     return commentId;
-  }, [handleSubmitComment, useAiStreaming, onAiReply, generateComment]);
+  }, [handleSubmitComment, useAiStreaming, handleAiReply]);
 
   const useExpandedEditor = focused || isReplying;
+
+  // Create a new props object with our local state
+  const editorProps = {
+    ...props,
+    shouldFocus: true,
+    onCancel: handleCancel,
+    useAiStreaming,
+    setUseAiStreaming,
+    handleSubmitComment: handleEnhancedSubmit,
+    onAiReply: handleAiReply,
+    streamingReplyIds,
+  };
 
   return (
     <div className="DesktopStickyInput">
@@ -140,6 +150,7 @@ export const DesktopStickyInput = (props: CommentEditorProps) => {
               }}
             >
               <CWToggle
+                className="ai-toggle"
                 checked={useAiStreaming}
                 onChange={handleAiToggle}
                 icon="sparkle"
@@ -152,14 +163,7 @@ export const DesktopStickyInput = (props: CommentEditorProps) => {
         </div>
       ) : (
         <div className="DesktopStickyInputExpanded">
-          <CommentEditor
-            {...props}
-            shouldFocus={true}
-            onCancel={handleCancel}
-            useAiStreaming={useAiStreaming}
-            setUseAiStreaming={setUseAiStreaming}
-            handleSubmitComment={handleEnhancedSubmit}
-          />
+          <CommentEditor {...editorProps} />
         </div>
       )}
     </div>

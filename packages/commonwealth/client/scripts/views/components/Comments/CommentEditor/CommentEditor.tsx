@@ -3,7 +3,7 @@ import clsx from 'clsx';
 import { useGenerateCommentText } from 'hooks/useGenerateCommentText';
 import Account from 'models/Account';
 import type { DeltaStatic } from 'quill';
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { User } from 'views/components/user/user';
 import { jumpHighlightComment } from 'views/pages/discussions/CommentTree/helpers';
 import { isCommandClick } from '../../../../helpers';
@@ -31,7 +31,10 @@ export type CommentEditorProps = {
   replyingToAuthor?: string;
   useAiStreaming?: boolean;
   setUseAiStreaming?: (value: boolean) => void;
-  onAiReply?: (aiReply: string) => void;
+  onAiReply?: (commentId: number) => void;
+  streamingReplyIds?: number[];
+  lastSubmittedCommentId?: number | null;
+  onCommentCreated?: (commentId: number, hasAI: boolean) => void;
 };
 
 const CommentEditor = ({
@@ -50,8 +53,19 @@ const CommentEditor = ({
   useAiStreaming: initialAiStreaming,
   setUseAiStreaming: onAiStreamingChange,
   onAiReply,
+  streamingReplyIds,
+  lastSubmittedCommentId,
+  onCommentCreated,
 }: CommentEditorProps) => {
   const { generateComment } = useGenerateCommentText();
+
+  // Debug log when component mounts or AI props change
+  useEffect(() => {
+    console.log('CommentEditor - AI Props:', {
+      initialAiStreaming,
+      hasOnAiReply: !!onAiReply,
+    });
+  }, [initialAiStreaming, onAiReply]);
 
   const handleAiToggle = useCallback(() => {
     console.log(
@@ -66,7 +80,12 @@ const CommentEditor = ({
   }, [initialAiStreaming, onAiStreamingChange]);
 
   const handleEnhancedSubmit = async () => {
-    console.log('CommentEditor - Starting submission...');
+    console.log('CommentEditor - Starting submission with state:', {
+      initialAiStreaming,
+      hasOnAiReply: !!onAiReply,
+      contentDelta,
+    });
+
     try {
       // Post the comment and get the ID first
       console.log('CommentEditor - Calling handleSubmitComment...');
@@ -76,6 +95,8 @@ const CommentEditor = ({
         console.log('CommentEditor - handleSubmitComment returned:', {
           commentId,
           type: typeof commentId,
+          aiEnabled: initialAiStreaming,
+          hasOnAiReply: !!onAiReply,
         });
       } catch (error) {
         console.error('CommentEditor - Failed to submit comment:', error);
@@ -88,31 +109,36 @@ const CommentEditor = ({
         return;
       }
 
+      // If AI streaming is enabled, trigger the AI reply through TreeHierarchy
+      if (initialAiStreaming) {
+        if (onAiReply) {
+          console.log('CommentEditor - Triggering AI reply for new comment:', {
+            commentId,
+            onAiReplyType: typeof onAiReply,
+          });
+          try {
+            await onAiReply(commentId);
+            console.log('CommentEditor - Successfully triggered AI reply');
+          } catch (error) {
+            console.error('CommentEditor - Failed to trigger AI reply:', error);
+          }
+        } else {
+          console.warn(
+            'CommentEditor - AI streaming enabled but onAiReply not provided',
+          );
+        }
+      } else {
+        console.log(
+          'CommentEditor - AI streaming not enabled, skipping AI reply',
+        );
+      }
+
       // Immediately close the editor
       onCancel?.(
         new MouseEvent('click', {
           bubbles: true,
         }) as unknown as React.MouseEvent,
       );
-
-      // If AI streaming is enabled, start it after comment is posted
-      if (initialAiStreaming && onAiReply) {
-        console.log('CommentEditor - Starting AI generation...');
-        try {
-          const aiReply = await generateComment(
-            contentDelta.ops?.[0]?.insert || '',
-          );
-          console.log('CommentEditor - AI generation complete:', {
-            aiReply,
-            commentId,
-          });
-          if (aiReply && onAiReply) {
-            onAiReply(aiReply);
-          }
-        } catch (error) {
-          console.error('CommentEditor - AI generation failed:', error);
-        }
-      }
 
       // Function to attempt jumping to the comment
       const attemptJump = () => {
@@ -124,30 +150,44 @@ const CommentEditor = ({
           jumpHighlightComment(commentId);
           return true;
         }
+        console.log(
+          `CommentEditor - Comment element ${commentId} not found yet`,
+        );
         return false;
       };
 
-      // Immediately attempt to jump
-      if (attemptJump()) return;
+      // Add a small delay before jumping to allow the comment and AI reply to render
+      setTimeout(() => {
+        // Immediately attempt to jump
+        if (attemptJump()) return;
 
-      // Use a MutationObserver on the comment container (.CommentsTree) for immediate response
-      const container = document.querySelector('.CommentsTree');
-      if (container) {
-        const observer = new MutationObserver((mutations, obs) => {
-          if (attemptJump()) {
-            obs.disconnect();
-          }
-        });
-        observer.observe(container, { childList: true, subtree: true });
-        // Disconnect the observer after 5 seconds as a fallback
-        setTimeout(() => {
-          observer.disconnect();
-        }, 5000);
-      } else {
-        // Fallback: if container isn't found, try once more after 500ms
-        setTimeout(() => {
-          attemptJump();
-        }, 500);
+        // Use a MutationObserver on the comment container (.CommentsTree) for immediate response
+        const container = document.querySelector('.CommentsTree');
+        if (container) {
+          console.log(
+            'CommentEditor - Setting up MutationObserver for comment render',
+          );
+          const observer = new MutationObserver((mutations, obs) => {
+            if (attemptJump()) {
+              obs.disconnect();
+            }
+          });
+          observer.observe(container, { childList: true, subtree: true });
+          // Disconnect the observer after 5 seconds as a fallback
+          setTimeout(() => {
+            observer.disconnect();
+          }, 5000);
+        } else {
+          console.warn('CommentEditor - CommentsTree container not found');
+          // Fallback: if container isn't found, try once more after 500ms
+          setTimeout(() => {
+            attemptJump();
+          }, 500);
+        }
+      }, 100); // Small delay to allow for render
+
+      if (onCommentCreated) {
+        onCommentCreated(commentId, !!initialAiStreaming);
       }
     } catch (error) {
       console.error('CommentEditor - Error during submission:', error);
@@ -189,6 +229,7 @@ const CommentEditor = ({
         <div className="attribution-right-content">
           <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
             <CWToggle
+              className="ai-toggle"
               checked={!!initialAiStreaming}
               onChange={handleAiToggle}
               icon="sparkle"
