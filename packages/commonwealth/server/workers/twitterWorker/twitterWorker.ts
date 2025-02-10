@@ -86,20 +86,8 @@ async function main() {
     ]);
 
     // poll mentions once every 15 minutes
-    setInterval(
-      () =>
-        pollMentions(TwitterBotConfigs.MomBot).catch((e) =>
-          log.error('Error fetching mentions', e),
-        ),
-      POLL_INTERVAL,
-    );
-    setInterval(
-      () =>
-        pollMentions(TwitterBotConfigs.ContestBot).catch((e) =>
-          log.error('Error fetching mentions', e),
-        ),
-      POLL_INTERVAL,
-    );
+    setInterval(pollMentions, POLL_INTERVAL, TwitterBotConfigs.MomBot);
+    setInterval(pollMentions, POLL_INTERVAL, TwitterBotConfigs.ContestBot);
 
     isServiceHealthy = true;
     log.info('Twitter Worker started');
