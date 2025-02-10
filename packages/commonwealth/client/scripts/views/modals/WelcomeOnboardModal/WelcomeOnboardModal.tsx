@@ -14,6 +14,7 @@ import { WelcomeOnboardModalProps, WelcomeOnboardModalSteps } from './types';
 import { LocalStorageKeys } from 'client/scripts/helpers/localStorage';
 import useBrowserWindow from 'client/scripts/hooks/useBrowserWindow';
 import { isMobileApp } from 'client/scripts/hooks/useReactNativeWebView';
+import clsx from 'clsx';
 import './WelcomeOnboardModal.scss';
 import { InviteModal } from './steps/InviteModal';
 import { NotificationModal } from './steps/NotificationModal';
@@ -149,10 +150,15 @@ const WelcomeOnboardModal = ({ isOpen, onClose }: WelcomeOnboardModalProps) => {
 
   return (
     <CWModal
-      open={isOpen}
+      open={true}
       onClose={handleClose}
       size="medium"
-      className="WelcomeOnboardModal"
+      className={clsx(
+        'WelcomeOnboardModal',
+        activeStep === WelcomeOnboardModalSteps.TermsOfServices
+          ? 'extra-padding'
+          : '',
+      )}
       isFullScreen={isWindowSmallInclusive}
       content={
         <>
