@@ -1,3 +1,4 @@
+import { openFeatureProvider } from 'helpers/feature-flags';
 import React, { useCallback, useState } from 'react';
 import { CommentEditor } from 'views/components/Comments/CommentEditor';
 import type { CommentEditorProps } from 'views/components/Comments/CommentEditor/CommentEditor';
@@ -8,7 +9,9 @@ import './DesktopStickyInput.scss';
 export const DesktopStickyInput = (props: CommentEditorProps) => {
   const { isReplying, replyingToAuthor, onCancel, handleSubmitComment } = props;
   const [focused, setFocused] = useState(false);
-  const [useAiStreaming, setUseAiStreaming] = useState(false);
+  const [useAiStreaming, setUseAiStreaming] = useState(
+    openFeatureProvider.getBooleanValue('aiComments', false),
+  );
   const [streamingReplyIds, setStreamingReplyIds] = useState<number[]>([]);
 
   const handleFocused = useCallback(() => {

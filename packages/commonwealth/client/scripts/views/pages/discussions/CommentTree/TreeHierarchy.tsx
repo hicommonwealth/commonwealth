@@ -79,7 +79,6 @@ export const TreeHierarchy = ({
   const handleGenerateAIReply = useCallback(
     async (commentId: number) => {
       if (streamingReplyIds.includes(commentId)) {
-        console.log('Already has a streaming reply');
         return;
       }
 
@@ -89,14 +88,6 @@ export const TreeHierarchy = ({
         return;
       }
 
-      console.log('TreeHierarchy - Generating AI reply for comment:', {
-        commentId,
-        streamingReplyIds,
-        commentText: comment.body,
-        hasOnAiReply: comment.hasOnAiReply,
-        aiEnabled: comment.aiEnabled,
-      });
-
       setStreamingReplyIds((prev) => [...prev, commentId]);
     },
     [allComments, streamingReplyIds],
@@ -104,18 +95,11 @@ export const TreeHierarchy = ({
 
   // Register the callback when the component mounts
   useEffect(() => {
-    console.log('TreeHierarchy - Registering AI streaming callback');
     const unregister = registerAIStreamingCallback((commentId) => {
-      console.log(
-        'TreeHierarchy - AI streaming callback triggered for:',
-        commentId,
-      );
       handleGenerateAIReply(commentId);
     });
 
-    // Cleanup when component unmounts
     return () => {
-      console.log('TreeHierarchy - Unregistering AI streaming callback');
       unregister();
     };
   }, [handleGenerateAIReply]);
@@ -136,10 +120,6 @@ export const TreeHierarchy = ({
 
   // Add this method to directly trigger streaming for a new comment
   const triggerStreamingForNewComment = useCallback((commentId: number) => {
-    console.log(
-      'TreeHierarchy - Directly triggering streaming for new comment:',
-      commentId,
-    );
     setStreamingReplyIds((prev) => [...prev, commentId]);
   }, []);
 
@@ -268,10 +248,6 @@ export const TreeHierarchy = ({
                       isStreamingAIReply={true}
                       parentCommentText={comment.body}
                       onStreamingComplete={() => {
-                        console.log(
-                          'Streaming complete for comment:',
-                          comment.id,
-                        );
                         setStreamingReplyIds((prev) =>
                           prev.filter((id) => id !== comment.id),
                         );

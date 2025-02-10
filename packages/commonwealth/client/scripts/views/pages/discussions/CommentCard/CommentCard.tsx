@@ -9,6 +9,7 @@ import {
   verify,
 } from '@hicommonwealth/shared';
 import clsx from 'clsx';
+import { openFeatureProvider } from 'helpers/feature-flags';
 import { GetThreadActionTooltipTextResponse } from 'helpers/threads';
 import { useGenerateCommentText } from 'hooks/useGenerateCommentText';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
@@ -500,24 +501,29 @@ export const CommentCard = ({
                         await onReply();
                       }}
                     />
-                    <CWThreadAction
-                      action="ai-reply"
-                      label="AI Reply"
-                      disabled={maxReplyLimitReached || !canReply}
-                      tooltipText={
-                        (typeof disabledActionsTooltipText === 'function'
-                          ? disabledActionsTooltipText?.('reply')
-                          : disabledActionsTooltipText) ||
-                        (canReply && maxReplyLimitReached
-                          ? 'Further replies not allowed'
-                          : '')
-                      }
-                      onClick={async (e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        await onAIReply?.();
-                      }}
-                    />
+                    {openFeatureProvider.getBooleanValue(
+                      'aiComments',
+                      false,
+                    ) && (
+                      <CWThreadAction
+                        action="ai-reply"
+                        label="AI Reply"
+                        disabled={maxReplyLimitReached || !canReply}
+                        tooltipText={
+                          (typeof disabledActionsTooltipText === 'function'
+                            ? disabledActionsTooltipText?.('reply')
+                            : disabledActionsTooltipText) ||
+                          (canReply && maxReplyLimitReached
+                            ? 'Further replies not allowed'
+                            : '')
+                        }
+                        onClick={async (e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          await onAIReply?.();
+                        }}
+                      />
+                    )}
                   </>
                 )}
 

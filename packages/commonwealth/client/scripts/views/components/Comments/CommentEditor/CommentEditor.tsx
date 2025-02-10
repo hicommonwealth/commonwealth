@@ -1,5 +1,6 @@
 import { ContentType } from '@hicommonwealth/shared';
 import clsx from 'clsx';
+import { openFeatureProvider } from 'helpers/feature-flags';
 import { useGenerateCommentText } from 'hooks/useGenerateCommentText';
 import Account from 'models/Account';
 import type { DeltaStatic } from 'quill';
@@ -60,20 +61,9 @@ const CommentEditor = ({
   const { generateComment } = useGenerateCommentText();
 
   // Debug log when component mounts or AI props change
-  useEffect(() => {
-    console.log('CommentEditor - AI Props:', {
-      initialAiStreaming,
-      hasOnAiReply: !!onAiReply,
-    });
-  }, [initialAiStreaming, onAiReply]);
+  useEffect(() => {}, [initialAiStreaming, onAiReply]);
 
   const handleAiToggle = useCallback(() => {
-    console.log(
-      'CommentEditor - Toggling AI mode from:',
-      initialAiStreaming,
-      'to:',
-      !initialAiStreaming,
-    );
     if (onAiStreamingChange) {
       onAiStreamingChange(!initialAiStreaming);
     }
@@ -92,31 +82,17 @@ const CommentEditor = ({
 
     // Handle the rest of the submission process asynchronously
     try {
-      console.log('CommentEditor - Starting submission with state:', {
-        initialAiStreaming,
-        hasOnAiReply: !!onAiReply,
-        currentContentDelta,
-      });
-
-      // Post the comment and get the ID
-      console.log('CommentEditor - Calling handleSubmitComment...');
       let commentId: number;
       try {
         commentId = await handleSubmitComment();
-        console.log('CommentEditor - handleSubmitComment returned:', {
-          commentId,
-          type: typeof commentId,
-          aiEnabled: initialAiStreaming,
-          hasOnAiReply: !!onAiReply,
-        });
       } catch (error) {
-        console.error('CommentEditor - Failed to submit comment:', error);
+        console.error('Failed to submit comment:', error);
         return;
       }
 
       // Ensure we have a valid comment ID before proceeding
       if (typeof commentId !== 'number' || isNaN(commentId)) {
-        console.error('CommentEditor - Invalid comment ID:', commentId);
+        console.error('Invalid comment ID:', commentId);
         return;
       }
 
@@ -128,12 +104,8 @@ const CommentEditor = ({
       setTimeout(() => {
         // If AI streaming is enabled, trigger the AI reply through TreeHierarchy
         if (initialAiStreaming && onAiReply) {
-          console.log('CommentEditor - Triggering AI reply for new comment:', {
-            commentId,
-            onAiReplyType: typeof onAiReply,
-          });
           Promise.resolve(onAiReply(commentId)).catch((error) => {
-            console.error('CommentEditor - Failed to trigger AI reply:', error);
+            console.error('Failed to trigger AI reply:', error);
           });
         }
 
@@ -143,15 +115,9 @@ const CommentEditor = ({
             `.comment-${commentId}`,
           );
           if (commentElement) {
-            console.log(
-              `CommentEditor - Found comment element for ID ${commentId}, scrolling...`,
-            );
             jumpHighlightComment(commentId);
             return true;
           }
-          console.log(
-            `CommentEditor - Comment element ${commentId} not found yet`,
-          );
           return false;
         };
 
@@ -170,7 +136,7 @@ const CommentEditor = ({
         }
       }, 0);
     } catch (error) {
-      console.error('CommentEditor - Error during submission:', error);
+      console.error('Error during submission:', error);
     }
   };
 
@@ -207,17 +173,19 @@ const CommentEditor = ({
           </CWText>
         </div>
         <div className="attribution-right-content">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-            <CWToggle
-              className="ai-toggle"
-              checked={!!initialAiStreaming}
-              onChange={handleAiToggle}
-              icon="sparkle"
-              size="xs"
-              iconColor="#757575"
-            />
-            <span style={{ fontSize: '12px', color: '#757575' }}>AI</span>
-          </div>
+          {openFeatureProvider.getBooleanValue('aiComments', false) && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <CWToggle
+                className="ai-toggle"
+                checked={!!initialAiStreaming}
+                onChange={handleAiToggle}
+                icon="sparkle"
+                size="xs"
+                iconColor="#757575"
+              />
+              <span style={{ fontSize: '12px', color: '#757575' }}>AI</span>
+            </div>
+          )}
         </div>
         {errorMsg && <CWValidationText message={errorMsg} status="failure" />}
       </div>

@@ -6,11 +6,6 @@ export const useGenerateCommentText = () => {
     userText: string,
     onStreamUpdate?: (text: string) => void,
   ): Promise<string> => {
-    console.log(
-      'useGenerateCommentText - Starting AI generation with text:',
-      userText,
-    );
-
     try {
       const response = await fetch(
         `${SERVER_URL}${ApiEndpoints.GENERATE_COMMENT}`,
@@ -28,10 +23,6 @@ export const useGenerateCommentText = () => {
       );
 
       if (!response.ok) {
-        console.error('API request failed:', {
-          status: response.status,
-          statusText: response.statusText,
-        });
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
@@ -49,56 +40,32 @@ export const useGenerateCommentText = () => {
         if (done) break;
 
         const chunk = decoder.decode(value, { stream: true });
-        console.log('Raw chunk received:', {
-          chunk,
-          length: chunk.length,
-          lastChunkLength: lastChunk.length,
-        });
 
         try {
-          // Try to parse as JSON first
           let newText = '';
           try {
             const data = JSON.parse(chunk);
             if (data.error) {
-              console.error('Server returned error:', data.error);
               throw new Error(data.error);
             }
             newText = data.text || data;
           } catch (jsonError) {
-            // If JSON parsing fails, use the raw chunk without trimming
             newText = chunk;
           }
 
-          // Only add the chunk if it's new
           if (newText && newText !== lastChunk) {
-            console.log('New text chunk:', {
-              newText,
-              length: newText.length,
-              isNewChunk: newText !== lastChunk,
-            });
             accumulatedText = newText;
             lastChunk = newText;
             onStreamUpdate?.(accumulatedText);
-          } else {
-            console.log('Skipping duplicate chunk');
           }
         } catch (error) {
-          console.error('Error processing chunk:', {
-            error,
-            chunk,
-            chunkLength: chunk.length,
-          });
+          console.error('Error processing chunk:', error);
         }
       }
 
-      console.log('Generation complete:', {
-        finalText: accumulatedText,
-        length: accumulatedText.length,
-      });
       return accumulatedText;
     } catch (error) {
-      console.error('useGenerateCommentText - Error:', error);
+      console.error('Error generating comment:', error);
       throw error;
     }
   };
