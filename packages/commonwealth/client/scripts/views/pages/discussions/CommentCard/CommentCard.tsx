@@ -216,6 +216,8 @@ export const CommentCard = ({
 
   const activeUserAddress = user.activeAccount?.address;
 
+  // There's extensive logging here for debugging purposes
+  // TODO: Remove the logging before merge
   useEffect(() => {
     if (!isStreamingAIReply || !parentCommentText) return;
 
@@ -260,7 +262,9 @@ export const CommentCard = ({
 
         if (mounted && finalText) {
           if (!activeUserAddress) {
-            console.error('No active account found:', user);
+            console.error(
+              'No active account found: activeUserAddress is undefined',
+            );
             throw new Error('No active account found');
           }
 
