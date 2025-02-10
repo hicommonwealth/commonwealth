@@ -31,15 +31,16 @@ const TokenPerformance = () => {
         addressType: ChainBase.Ethereum,
       } as TradingConfig,
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [communityToken]);
 
   if (isLoadingToken || !communityToken) return;
 
   const chain = isPinnedToken ? 'base' : 'base-sepolia';
   const address = isPinnedToken
-    ? // @ts-ignore Strict-Null Check
+    ? // @ts-expect-error Strict-Null Check
       communityToken.contract_address
-    : // @ts-ignore Strict-Null Check
+    : // @ts-expect-error Strict-Null Check
       communityToken.token_address;
 
   return (
