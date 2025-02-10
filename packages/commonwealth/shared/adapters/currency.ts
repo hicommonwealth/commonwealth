@@ -1,5 +1,5 @@
+import { calculateVoteWeight } from '@hicommonwealth/evm-protocols';
 import BN from 'bn.js';
-import { BigNumber } from 'ethers';
 
 // duplicated in helpers.ts
 export function formatNumberShort(num: number) {
@@ -31,32 +31,62 @@ export function formatNumberShort(num: number) {
                 : num.toString();
 }
 
-export function formatBigNumberShort(num: BigNumber): string {
-  if (num.isZero()) {
+export function formatBigNumberShort(num: number, numDecimals: number): string {
+  if (num === 0) {
     return '0';
   }
-  const thousand = BigNumber.from(1_000);
-  const million = BigNumber.from(1_000_000);
-  const billion = BigNumber.from(1_000_000_000);
-  const trillion = BigNumber.from(1_000_000_000_000);
+  const thousand = 1_000;
+  const million = 1_000_000;
+  const billion = 1_000_000_000;
+  const trillion = 1_000_000_000_000;
 
-  const round = (n: BigNumber, divisor: BigNumber, digits = 2) => {
-    const divided = n.div(divisor);
-    const factor = BigNumber.from(10).pow(digits);
-    return divided.mul(factor).div(factor).toString();
+  const round = (n: number, divisor: number): string => {
+    const divided = n / divisor;
+    // remove unnecessary trailing zeros
+    return divided.toFixed(numDecimals).replace(/\.?0+$/, '');
   };
 
-  // Compare BigNumber values and format accordingly
-  return num.gt(trillion)
+  return num > trillion
     ? `${round(num, trillion)}t`
-    : num.gt(billion)
+    : num > billion
       ? `${round(num, billion)}b`
-      : num.gt(million)
+      : num > million
         ? `${round(num, million)}m`
-        : num.gt(thousand)
+        : num > thousand
           ? `${round(num, thousand)}k`
           : num.toString();
 }
+
+/**
+ * Converts a wei value to a human-readable vote weight string.
+ *
+ * @param wei - The full non-decimal wei value as a string.
+ * @param multiplier - Optional. A multiplier applied to the vote weight. Defaults to 1.
+ * @param numDecimalsOverride - Optional. Sets override number of decimals.
+ * @returns The formatted vote weight as a string.
+ */
+export const prettyVoteWeight = (
+  wei: string,
+  multiplier: number = 1,
+  numDecimalsOverride?: number,
+): string => {
+  const weiStr = parseFloat(wei).toLocaleString('fullwide', {
+    useGrouping: false,
+  });
+  const weiValue = calculateVoteWeight(weiStr, multiplier || 1);
+  const n = Number(weiValue) / 1e18;
+
+  if (n < 0.000001) {
+    return '0.0…';
+  }
+
+  const numDecimals = n > 10 ? 3 : 6;
+
+  if (n > 1000) {
+    return formatBigNumberShort(n, numDecimals);
+  }
+  return n.toFixed(numDecimals);
+};
 
 const nf = new Intl.NumberFormat();
 

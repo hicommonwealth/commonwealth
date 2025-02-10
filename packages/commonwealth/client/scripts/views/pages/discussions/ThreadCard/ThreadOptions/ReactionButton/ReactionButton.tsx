@@ -1,4 +1,3 @@
-import { formatWeiToDecimal } from '@hicommonwealth/shared';
 import { buildCreateThreadReactionInput } from 'client/scripts/state/api/threads/createReaction';
 import { buildDeleteThreadReactionInput } from 'client/scripts/state/api/threads/deleteReaction';
 import { useAuthModalStore } from 'client/scripts/state/ui/modals';
@@ -6,6 +5,7 @@ import { notifyError } from 'controllers/app/notifications';
 import { SessionKeyError } from 'controllers/server/sessions';
 import type Thread from 'models/Thread';
 import React, { useState } from 'react';
+import { prettyVoteWeight } from 'shared/adapters/currency';
 import app from 'state';
 import {
   useCreateThreadReactionMutation,
@@ -137,10 +137,7 @@ export const ReactionButton = ({
     }
   };
 
-  const formattedVoteCount =
-    thread.topic?.weighted_voting === 'erc20'
-      ? formatWeiToDecimal(reactionWeightsSum.toString())
-      : reactionWeightsSum.toString();
+  const formattedVoteCount = prettyVoteWeight(reactionWeightsSum.toString(), 1);
 
   return (
     <>

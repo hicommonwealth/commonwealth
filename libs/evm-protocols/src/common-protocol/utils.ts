@@ -15,19 +15,6 @@ export const calculateVoteWeight = (
   return (BigInt(balance) * scaledVoteWeight) / BigInt(precision);
 };
 
-export const prettyVoteWeight = (
-  fractionalBalance: string,
-  multiplier: number,
-): string => {
-  const weiStr = Math.floor(
-    parseFloat(fractionalBalance) * 1e18,
-  ).toLocaleString('fullwide', {
-    useGrouping: false,
-  });
-  const weiValue = calculateVoteWeight(weiStr, multiplier || 1) || BigInt(0);
-  return (Number(weiValue) / Number(1e18)).toString();
-};
-
 export enum Denominations {
   'ETH' = 'ETH',
 }

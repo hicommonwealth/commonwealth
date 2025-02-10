@@ -4,9 +4,9 @@ import Account from 'models/Account';
 import AddressInfo from 'models/AddressInfo';
 import MinimumProfile from 'models/MinimumProfile';
 import React, { Dispatch, SetStateAction } from 'react';
+import { prettyVoteWeight } from 'shared/adapters/currency';
 import app from 'state';
 import { User } from 'views/components/user/user';
-import { formatWeiToDecimal } from '../../../../../../../../libs/shared/src/utils';
 import { AuthorAndPublishInfo } from '../../../pages/discussions/ThreadCard/AuthorAndPublishInfo';
 import { CWText } from '../../component_kit/cw_text';
 import CWDrawer, {
@@ -47,6 +47,7 @@ const columns: CWTableColumnInfo[] = [
   {
     key: 'voteWeight',
     header: 'Vote Weight',
+    isVoteWeight: true,
     numeric: true,
     sortable: true,
   },
@@ -77,10 +78,7 @@ export const ViewUpvotesDrawer = ({
   const voterRow = (voter: Upvoter) => {
     return {
       name: voter.name,
-      voteWeight:
-        topicWeight === 'erc20'
-          ? formatWeiToDecimal(voter.voting_weight.toString())
-          : voter.voting_weight,
+      voteWeight: voter.voting_weight,
       timestamp: voter.updated_at,
       avatars: {
         name: {
@@ -100,14 +98,7 @@ export const ViewUpvotesDrawer = ({
   };
 
   const getVoteWeightTotal = (voters: Upvoter[]) => {
-    return voters.reduce(
-      (memo, current) =>
-        memo +
-        (topicWeight === 'erc20'
-          ? parseFloat(formatWeiToDecimal(current.voting_weight.toString()))
-          : current.voting_weight),
-      0,
-    );
+    return voters.reduce((memo, current) => memo + current.voting_weight, 0);
   };
   const getAuthorCommunityId = (contentAuthor: Profile) => {
     if (contentAuthor instanceof MinimumProfile) {
@@ -188,7 +179,11 @@ export const ViewUpvotesDrawer = ({
                   <CWText type="caption" fontWeight="uppercase">
                     Total
                   </CWText>
-                  <CWText type="b2">{getVoteWeightTotal(reactorData)}</CWText>
+                  <CWText type="b2">
+                    {prettyVoteWeight(
+                      getVoteWeightTotal(reactorData).toString(),
+                    )}
+                  </CWText>
                 </div>
               </div>
             </>
