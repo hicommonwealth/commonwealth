@@ -1,6 +1,5 @@
 import { MAX_COMMENT_DEPTH } from '@hicommonwealth/shared';
 import clsx from 'clsx';
-import { useGenerateCommentText } from 'hooks/useGenerateCommentText';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Virtuoso } from 'react-virtuoso';
@@ -50,9 +49,7 @@ export const TreeHierarchy = ({
 }: TreeHierarchyProps) => {
   const user = useUserStore();
   const communityId = app.activeChainId() || '';
-  const [isGenerating, setIsGenerating] = useState(false);
   const [streamingReplyIds, setStreamingReplyIds] = useState<number[]>([]);
-  const { generateComment } = useGenerateCommentText();
 
   const {
     data: paginatedComments,

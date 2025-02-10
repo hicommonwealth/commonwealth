@@ -1,8 +1,4 @@
 import { OpenAI } from 'openai';
-import {
-  ChatCompletionMessage,
-  ChatCompletionUserMessageParam,
-} from 'openai/resources/index.mjs';
 import { config } from '../../config';
 
 const COMMENT_AI_PROMPTS_CONFIG = {
@@ -17,9 +13,6 @@ const CommentErrors = {
   OpenAIInitFailed: 'OpenAI initialization failed',
   RequestFailed: 'failed to generate comment',
 };
-
-const convoHistory: (ChatCompletionMessage | ChatCompletionUserMessageParam)[] =
-  [];
 
 const generateCommentText = async function* ({
   userText,
