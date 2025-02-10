@@ -1,7 +1,6 @@
 import { ChainBase } from '@hicommonwealth/shared';
 import GeckoTerminalChart from 'client/scripts/views/components/GekoTerminalChart/GekoTerminalChart';
 import { CWIcon } from 'client/scripts/views/components/component_kit/cw_icons/cw_icon';
-import { useTokenTradeWidget } from 'client/scripts/views/components/sidebar/CommunitySection/TokenTradeWidget/useTokenTradeWidget';
 import {
   TradingConfig,
   TradingMode,
@@ -9,6 +8,7 @@ import {
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { CWText } from 'views/components/component_kit/cw_text';
+import { useTokenTradeWidget } from 'views/components/sidebar/CommunitySection/TokenTradeWidget/useTokenTradeWidget';
 import CommonTrade from './CommonTrade/CommonTrade';
 import './TokenPerformance.scss';
 import UniswapTrade from './UniswapTrade/UniswapTrade';
@@ -31,8 +31,7 @@ const TokenPerformance = () => {
         addressType: ChainBase.Ethereum,
       } as TradingConfig,
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [communityToken]);
+  }, [communityToken, isPinnedToken]);
 
   if (isLoadingToken || !communityToken) return;
 

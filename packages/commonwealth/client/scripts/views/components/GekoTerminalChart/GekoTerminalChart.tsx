@@ -1,3 +1,4 @@
+import { boolToQueryValue, getBaseUrl } from 'client/scripts/utils/gekoUtils';
 import React from 'react';
 
 export interface GeckoTerminalEmbedProps {
@@ -27,9 +28,7 @@ const GeckoTerminalChart = ({
   id = 'geckoterminal-embed',
   title = 'GeckoTerminal Embed',
 }: GeckoTerminalEmbedProps) => {
-  const boolToQueryValue = (value: boolean): string => (value ? '1' : '0');
-
-  const baseUrl = `https://www.geckoterminal.com/${chain}/pools/${poolAddress}`;
+  const baseUrl = getBaseUrl(chain, poolAddress);
 
   const queryParams = new URLSearchParams({
     embed: boolToQueryValue(embed),
