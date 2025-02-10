@@ -1,7 +1,7 @@
+import { useGenerateCommentText } from 'hooks/useGenerateCommentText';
 import React, { useCallback, useState } from 'react';
 import { CommentEditor } from 'views/components/Comments/CommentEditor';
 import type { CommentEditorProps } from 'views/components/Comments/CommentEditor/CommentEditor';
-import { useGenerateCommentText } from 'views/components/Comments/useGenerateCommentText';
 import { CWToggle } from 'views/components/component_kit/new_designs/cw_toggle';
 import { jumpHighlightComment } from 'views/pages/discussions/CommentTree/helpers';
 import './DesktopStickyInput.scss';

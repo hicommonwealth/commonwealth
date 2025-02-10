@@ -21,47 +21,70 @@ const CommentErrors = {
 const convoHistory: (ChatCompletionMessage | ChatCompletionUserMessageParam)[] =
   [];
 
-const chatWithOpenAI = async (prompt = '', openai: OpenAI) => {
-  convoHistory.push({ role: 'user', content: prompt });
-  const response = await openai.chat.completions.create({
-    model: 'gpt-4o-mini',
-    messages: convoHistory,
-  });
-  convoHistory.push(response.choices[0].message);
-  return (response.choices[0].message.content || 'NO_RESPONSE').replace(
-    /^"|"$/g,
-    '',
-  );
-};
-
 const generateCommentText = async function* ({
   userText,
 }: {
   userText?: string;
 }): AsyncGenerator<any, void, unknown> {
+  console.log('generateCommentText - Starting with text:', userText);
+
   if (!config.OPENAI.API_KEY) {
+    console.error('generateCommentText - No OpenAI API key configured');
     yield { error: CommentErrors.OpenAINotConfigured };
     return;
   }
 
-  const openai = new OpenAI({
-    organization: config.OPENAI.ORGANIZATION,
-    apiKey: config.OPENAI.API_KEY,
-  });
-
-  if (!openai) {
+  let openai: OpenAI;
+  try {
+    console.log('generateCommentText - Initializing OpenAI client');
+    openai = new OpenAI({
+      organization: config.OPENAI.ORGANIZATION,
+      apiKey: config.OPENAI.API_KEY,
+    });
+  } catch (error) {
+    console.error('generateCommentText - Failed to initialize OpenAI:', error);
     yield { error: CommentErrors.OpenAIInitFailed };
     return;
   }
 
   try {
-    const commentText = await chatWithOpenAI(
-      COMMENT_AI_PROMPTS_CONFIG.comment(userText),
-      openai,
-    );
-    yield 'event: comment\n';
-    yield `data: ${commentText}\n\n`;
+    console.log('generateCommentText - Creating completion stream');
+    const stream = await openai.chat.completions.create({
+      model: 'gpt-4',
+      messages: [
+        {
+          role: 'user',
+          content: COMMENT_AI_PROMPTS_CONFIG.comment(userText),
+        },
+      ],
+      stream: true,
+    });
+
+    console.log('generateCommentText - Stream created, processing chunks');
+    let previousText = '';
+    for await (const chunk of stream) {
+      try {
+        console.log('generateCommentText - Received chunk:', chunk);
+        const content = chunk.choices[0]?.delta?.content || '';
+        if (content) {
+          // Only yield the new content, not the accumulated text
+          console.log('generateCommentText - New content:', {
+            content,
+            length: content.length,
+          });
+          yield content;
+        }
+      } catch (chunkError) {
+        console.error(
+          'generateCommentText - Error processing chunk:',
+          chunkError,
+        );
+        // Continue processing other chunks even if one fails
+      }
+    }
+    console.log('generateCommentText - Stream complete');
   } catch (e) {
+    console.error('generateCommentText - Error in OpenAI stream:', e);
     yield { error: CommentErrors.RequestFailed };
   }
 };

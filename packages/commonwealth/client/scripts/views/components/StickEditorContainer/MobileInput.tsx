@@ -1,8 +1,8 @@
+import { useGenerateCommentText } from 'hooks/useGenerateCommentText';
 import React, { useCallback, useMemo, useState } from 'react';
 import useUserStore from 'state/ui/user';
 import { Avatar } from 'views/components/Avatar';
 import { CommentEditorProps } from 'views/components/Comments/CommentEditor/CommentEditor';
-import { useGenerateCommentText } from 'views/components/Comments/useGenerateCommentText';
 import { useActiveStickCommentReset } from 'views/components/StickEditorContainer/context/UseActiveStickCommentReset';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { CWToggle } from 'views/components/component_kit/new_designs/cw_toggle';

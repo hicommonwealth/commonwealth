@@ -10,8 +10,11 @@ import {
 } from '@hicommonwealth/shared';
 import clsx from 'clsx';
 import { GetThreadActionTooltipTextResponse } from 'helpers/threads';
+import { useGenerateCommentText } from 'hooks/useGenerateCommentText';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import moment from 'moment';
+import { useCreateCommentMutation } from 'state/api/comments';
+import { buildCreateCommentInput } from 'state/api/comments/createComment';
 import useGetContentByUrlQuery from 'state/api/general/getContentByUrl';
 import useUserStore from 'state/ui/user';
 import { MarkdownViewerWithFallback } from 'views/components/MarkdownViewerWithFallback/MarkdownViewerWithFallback';
@@ -70,6 +73,11 @@ type CommentCardProps = {
   // other
   className?: string;
   shareURL: string;
+  onAIReply?: () => any;
+  // AI streaming props
+  isStreamingAIReply?: boolean;
+  parentCommentText?: string;
+  onStreamingComplete?: () => void;
 };
 
 export const CommentCard = ({
@@ -105,9 +113,22 @@ export const CommentCard = ({
   // other
   className,
   shareURL,
+  onAIReply,
+  isStreamingAIReply,
+  parentCommentText,
+  onStreamingComplete,
 }: CommentCardProps) => {
   const user = useUserStore();
   const userOwnsComment = comment.user_id === user.id;
+  const [streamingText, setStreamingText] = useState('');
+  const [completeText, setCompleteText] = useState('');
+  const [isGenerating, setIsGenerating] = useState(false);
+  const { generateComment } = useGenerateCommentText();
+  const { mutateAsync: createComment } = useCreateCommentMutation({
+    threadId: comment.thread_id,
+    communityId: comment.community_id,
+    existingNumberOfComments: 0,
+  });
 
   const [commentText, setCommentText] = useState(comment.body);
   const commentBody = React.useMemo(() => {
@@ -178,6 +199,134 @@ export const CommentCard = ({
     }
   }, [comment.canvas_signed_data]);
 
+  useEffect(() => {
+    if (!isStreamingAIReply || !parentCommentText) return;
+
+    let mounted = true;
+    let finalText = '';
+    let accumulatedText = '';
+
+    const generateAIReply = async () => {
+      try {
+        // Get the actual parent comment ID, not the streaming comment's ID
+        const actualParentId = Number(comment.id);
+        if (actualParentId <= 0) {
+          console.error('Invalid parent ID:', actualParentId);
+          throw new Error('Invalid parent comment ID');
+        }
+
+        console.log('Starting AI reply generation with params:', {
+          parentCommentText,
+          actualParentId,
+          threadId: comment.thread_id,
+          communityId: comment.community_id,
+          userAddress: user.activeAccount?.address,
+        });
+
+        await generateComment(parentCommentText, (text) => {
+          if (mounted) {
+            // Accumulate text from new chunks
+            accumulatedText += text;
+            console.log('Received text update:', {
+              newText: text,
+              textLength: text.length,
+              accumulatedLength: accumulatedText.length,
+            });
+            setStreamingText(accumulatedText);
+            finalText = accumulatedText;
+          }
+        });
+
+        console.log('AI generation complete, final text:', {
+          finalText,
+          length: finalText.length,
+        });
+
+        if (mounted && finalText) {
+          try {
+            if (!user.activeAccount?.address) {
+              console.error('No active account found:', user);
+              throw new Error('No active account found');
+            }
+
+            console.log('Building comment input with params:', {
+              communityId: comment.community_id,
+              address: user.activeAccount.address,
+              threadId: comment.thread_id,
+              finalText,
+              actualParentId,
+              finalTextLength: finalText.length,
+            });
+
+            const input = await buildCreateCommentInput({
+              communityId: comment.community_id,
+              address: user.activeAccount.address,
+              threadId: comment.thread_id,
+              threadMsgId: null,
+              unescapedText: finalText,
+              parentCommentId: actualParentId,
+              parentCommentMsgId: null,
+              existingNumberOfComments: 0,
+            });
+
+            console.log('Created comment input:', input);
+            const newComment = await createComment(input);
+            console.log(
+              'Successfully saved AI reply as new comment:',
+              newComment,
+            );
+            onStreamingComplete?.();
+          } catch (error) {
+            console.error('Failed to save AI reply as comment:', error);
+            console.error('Error details:', {
+              error,
+              commentParams: {
+                communityId: comment.community_id,
+                address: user.activeAccount?.address,
+                threadId: comment.thread_id,
+                parentId: actualParentId,
+              },
+            });
+            throw error;
+          }
+        } else {
+          console.log('No text to save or component unmounted:', {
+            mounted,
+            hasFinalText: !!finalText,
+            finalTextLength: finalText?.length,
+          });
+        }
+      } catch (error) {
+        console.error('Failed to generate AI reply:', error);
+        if (mounted) {
+          onStreamingComplete?.();
+        }
+      }
+    };
+
+    generateAIReply();
+    return () => {
+      mounted = false;
+    };
+  }, [
+    isStreamingAIReply,
+    parentCommentText,
+    comment.id,
+    comment.thread_id,
+    comment.community_id,
+    user.activeAccount,
+  ]);
+
+  // Reset streaming text when starting a new reply
+  useEffect(() => {
+    if (isStreamingAIReply) {
+      setStreamingText('');
+    }
+  }, [isStreamingAIReply]);
+
+  // Use streaming text if available, otherwise use comment body
+  const displayText = isStreamingAIReply ? streamingText : comment.body;
+
   const handleReaction = () => {
     setOnReaction((prevOnReaction) => !prevOnReaction);
   };
@@ -203,7 +352,11 @@ export const CommentCard = ({
   };
 
   return (
-    <div className={clsx('Comment', `comment-${comment.id}`, className)}>
+    <div
+      className={clsx('Comment', `comment-${comment.id}`, className, {
+        'is-streaming': isStreamingAIReply,
+      })}
+    >
       <div className="comment-body">
         <div className="comment-header">
           {comment.deleted_at ? (
@@ -213,7 +366,11 @@ export const CommentCard = ({
               authorAddress={comment?.address}
               authorCommunityId={comment.community_id}
               publishDate={
-                comment.created_at ? moment(comment.created_at) : undefined
+                isStreamingAIReply
+                  ? undefined
+                  : comment.created_at
+                    ? moment(comment.created_at)
+                    : undefined
               }
               discord_meta={comment.discord_meta || undefined}
               popoverPlacement="top"
@@ -237,6 +394,12 @@ export const CommentCard = ({
               )}
               onChangeVersionHistoryNumber={handleVersionHistoryChange}
             />
+          )}
+          {isStreamingAIReply && (
+            <div className="streaming-indicator">
+              <CWIcon iconName="sparkle" iconSize="small" />
+              <CWText type="caption">AI Assistant</CWText>
+            </div>
           )}
         </div>
         {isEditing ? (
@@ -276,10 +439,14 @@ export const CommentCard = ({
         ) : (
           <div className="comment-content">
             {isSpam && <CWTag label="SPAM" type="spam" />}
-            <CWText className="comment-text">
-              <MarkdownViewerWithFallback markdown={commentText} />
+            <CWText
+              className={clsx('comment-text', {
+                'streaming-text': isStreamingAIReply,
+              })}
+            >
+              <MarkdownViewerWithFallback markdown={displayText} />
             </CWText>
-            {!comment.deleted_at && (
+            {!isStreamingAIReply && !comment.deleted_at && (
               <div className="comment-footer">
                 {!hideReactButton && (
                   <CommentReactionButton
@@ -313,25 +480,45 @@ export const CommentCard = ({
                 <SharePopover linkToShare={shareURL} buttonLabel="Share" />
 
                 {!isThreadArchived && replyBtnVisible && (
-                  <CWThreadAction
-                    action="reply"
-                    label={`Reply${repliesCount ? ` (${repliesCount})` : ''}`}
-                    disabled={maxReplyLimitReached || !canReply}
-                    tooltipText={
-                      (typeof disabledActionsTooltipText === 'function'
-                        ? disabledActionsTooltipText?.('reply')
-                        : disabledActionsTooltipText) ||
-                      (canReply && maxReplyLimitReached
-                        ? 'Further replies not allowed'
-                        : '')
-                    }
-                    onClick={async (e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      // @ts-expect-error <StrictNullChecks/>
-                      await onReply();
-                    }}
-                  />
+                  <>
+                    <CWThreadAction
+                      action="reply"
+                      label={`Reply${repliesCount ? ` (${repliesCount})` : ''}`}
+                      disabled={maxReplyLimitReached || !canReply}
+                      tooltipText={
+                        (typeof disabledActionsTooltipText === 'function'
+                          ? disabledActionsTooltipText?.('reply')
+                          : disabledActionsTooltipText) ||
+                        (canReply && maxReplyLimitReached
+                          ? 'Further replies not allowed'
+                          : '')
+                      }
+                      onClick={async (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        // @ts-expect-error <StrictNullChecks/>
+                        await onReply();
+                      }}
+                    />
+                    <CWThreadAction
+                      action="ai-reply"
+                      label="AI Reply"
+                      disabled={maxReplyLimitReached || !canReply}
+                      tooltipText={
+                        (typeof disabledActionsTooltipText === 'function'
+                          ? disabledActionsTooltipText?.('reply')
+                          : disabledActionsTooltipText) ||
+                        (canReply && maxReplyLimitReached
+                          ? 'Further replies not allowed'
+                          : '')
+                      }
+                      onClick={async (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        await onAIReply?.();
+                      }}
+                    />
+                  </>
                 )}
 
                 {user.id > 0 && (

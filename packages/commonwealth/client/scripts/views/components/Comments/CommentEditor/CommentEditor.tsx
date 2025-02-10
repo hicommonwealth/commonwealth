@@ -1,9 +1,9 @@
 import { ContentType } from '@hicommonwealth/shared';
 import clsx from 'clsx';
+import { useGenerateCommentText } from 'hooks/useGenerateCommentText';
 import Account from 'models/Account';
 import type { DeltaStatic } from 'quill';
 import React, { useCallback } from 'react';
-import { useGenerateCommentText } from 'views/components/Comments/useGenerateCommentText';
 import { User } from 'views/components/user/user';
 import { jumpHighlightComment } from 'views/pages/discussions/CommentTree/helpers';
 import { isCommandClick } from '../../../../helpers';
