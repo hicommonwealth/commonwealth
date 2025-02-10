@@ -1,9 +1,11 @@
+import { CWForm } from 'client/scripts/views/components/component_kit/new_designs/CWForm';
+import { CWPhoneInput } from 'client/scripts/views/components/component_kit/new_designs/CWPhoneInput/CWPhoneInput';
 import React, { useState } from 'react';
-import PhoneInput from 'react-phone-input-2';
 import 'react-phone-input-2/lib/style.css';
 import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
 import { CWButton } from '../../../../../components/component_kit/new_designs/CWButton';
 import './SMSForm.scss';
+import { SMSValidationSchema } from './validation';
 type SMSFormProps = {
   onCancel: () => void;
   onSubmit: (values: { SMS: string }) => void;
@@ -11,22 +13,35 @@ type SMSFormProps = {
 };
 
 const SMSForm = ({ onSubmit, onCancel, isLoading }: SMSFormProps) => {
-  const [phone, setPhone] = useState('');
+  const [isPhoneNumberValid, setIsPhoneNumberValid] = useState(false);
+  function handleWatchForm({ SMS }) {
+    if (SMS.length >= 10) {
+      setIsPhoneNumberValid(true);
+    } else {
+      setIsPhoneNumberValid(false);
+    }
+  }
+  const onSubmitForm = ({ SMS }) => {
+    onSubmit({ SMS: `+${SMS}` });
+  };
+
   return (
-    <>
+    <CWForm
+      validationSchema={SMSValidationSchema}
+      onSubmit={onSubmitForm}
+      onWatch={handleWatchForm}
+    >
       {isLoading ? (
         <CWCircleMultiplySpinner />
       ) : (
         <>
           <div className="dropdown-wrapper">
-            <PhoneInput
-              value={phone}
-              onChange={setPhone}
+            <CWPhoneInput
+              hookToForm
+              name="SMS"
+              label="Phone Number"
               country="us"
-              enableSearch
-              dropdownClass="dropDown"
-              containerClass="dropdown-options-display"
-              inputClass="input-container"
+              disabled={isLoading}
             />
             <div className="action-btns">
               <CWButton
@@ -37,18 +52,17 @@ const SMSForm = ({ onSubmit, onCancel, isLoading }: SMSFormProps) => {
                 disabled={isLoading}
               />
               <CWButton
-                type="button"
+                type="submit"
                 buttonWidth="wide"
                 buttonType="primary"
                 label="Sign in with Magic"
-                disabled={isLoading}
-                onClick={() => onSubmit({ SMS: `+${phone}` })}
+                disabled={isLoading || !isPhoneNumberValid}
               />
             </div>
           </div>
         </>
       )}
-    </>
+    </CWForm>
   );
 };
 
