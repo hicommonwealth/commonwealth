@@ -86,9 +86,18 @@ async function main() {
     ]);
 
     // poll mentions once every 15 minutes
-    setInterval(() => pollMentions(TwitterBotConfigs.MomBot), POLL_INTERVAL);
     setInterval(
-      () => pollMentions(TwitterBotConfigs.ContestBot),
+      () =>
+        pollMentions(TwitterBotConfigs.MomBot).catch((e) =>
+          log.error('Error fetching mentions', e),
+        ),
+      POLL_INTERVAL,
+    );
+    setInterval(
+      () =>
+        pollMentions(TwitterBotConfigs.ContestBot).catch((e) =>
+          log.error('Error fetching mentions', e),
+        ),
       POLL_INTERVAL,
     );
 
