@@ -32,6 +32,8 @@ export type CommentEditorProps = {
   setUseAiStreaming?: (value: boolean) => void;
   onAiReply?: (commentId: number) => void;
   onCommentCreated?: (commentId: number, hasAI: boolean) => void;
+  replyingToAuthor?: string;
+  streamingReplyIds?: number[];
 };
 
 const CommentEditor = ({
@@ -50,6 +52,8 @@ const CommentEditor = ({
   setUseAiStreaming: onAiStreamingChange,
   onAiReply,
   onCommentCreated,
+  replyingToAuthor,
+  streamingReplyIds,
 }: CommentEditorProps) => {
   const aiCommentsEnabled = useFlag('aiComments');
 

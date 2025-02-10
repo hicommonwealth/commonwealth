@@ -93,7 +93,11 @@ export const CWToggle = (props: ToggleProps) => {
       <div className="slider">
         {icon && checked && (
           <div className="icon-container">
-            <CWIcon iconName={icon} iconSize={size} iconColor={iconColor} />
+            <CWIcon
+              iconName={icon}
+              iconSize={size}
+              className={iconColor === '#757575' ? 'icon-gray-500' : ''}
+            />
           </div>
         )}
       </div>
