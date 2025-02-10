@@ -122,8 +122,6 @@ export const CommentCard = ({
   const user = useUserStore();
   const userOwnsComment = comment.user_id === user.id;
   const [streamingText, setStreamingText] = useState('');
-  const [completeText, setCompleteText] = useState('');
-  const [isGenerating, setIsGenerating] = useState(false);
   const { generateComment } = useGenerateCommentText();
   const aiCommentsEnabled = useFlag('aiComments');
   const { mutateAsync: createComment } = useCreateCommentMutation({
