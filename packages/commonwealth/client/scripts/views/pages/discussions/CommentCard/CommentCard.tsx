@@ -1,5 +1,5 @@
 import type { DeltaStatic } from 'quill';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 import { CommentsView } from '@hicommonwealth/schemas';
 import {
@@ -199,6 +199,21 @@ export const CommentCard = ({
     }
   }, [comment.canvas_signed_data]);
 
+  const createCommentRef = useRef(createComment);
+  useEffect(() => {
+    createCommentRef.current = createComment;
+  }, [createComment]);
+
+  const generateCommentRef = useRef(generateComment);
+  useEffect(() => {
+    generateCommentRef.current = generateComment;
+  }, [generateComment]);
+
+  const onStreamingCompleteRef = useRef(onStreamingComplete);
+  useEffect(() => {
+    onStreamingCompleteRef.current = onStreamingComplete;
+  }, [onStreamingComplete]);
+
   useEffect(() => {
     if (!isStreamingAIReply || !parentCommentText) return;
 
@@ -208,7 +223,6 @@ export const CommentCard = ({
 
     const generateAIReply = async () => {
       try {
-        // Get the actual parent comment ID, not the streaming comment's ID
         const actualParentId = Number(comment.id);
         if (actualParentId <= 0) {
           console.error('Invalid parent ID:', actualParentId);
@@ -223,9 +237,9 @@ export const CommentCard = ({
           userAddress: user.activeAccount?.address,
         });
 
-        await generateComment(parentCommentText, (text) => {
+        await generateCommentRef.current(parentCommentText, (text) => {
           if (mounted) {
-            // Accumulate text from new chunks
+            // Append incoming chunks so the full comment is built up
             accumulatedText += text;
             console.log('Received text update:', {
               newText: text,
@@ -243,52 +257,38 @@ export const CommentCard = ({
         });
 
         if (mounted && finalText) {
-          try {
-            if (!user.activeAccount?.address) {
-              console.error('No active account found:', user);
-              throw new Error('No active account found');
-            }
-
-            console.log('Building comment input with params:', {
-              communityId: comment.community_id,
-              address: user.activeAccount.address,
-              threadId: comment.thread_id,
-              finalText,
-              actualParentId,
-              finalTextLength: finalText.length,
-            });
-
-            const input = await buildCreateCommentInput({
-              communityId: comment.community_id,
-              address: user.activeAccount.address,
-              threadId: comment.thread_id,
-              threadMsgId: null,
-              unescapedText: finalText,
-              parentCommentId: actualParentId,
-              parentCommentMsgId: null,
-              existingNumberOfComments: 0,
-            });
-
-            console.log('Created comment input:', input);
-            const newComment = await createComment(input);
-            console.log(
-              'Successfully saved AI reply as new comment:',
-              newComment,
-            );
-            onStreamingComplete?.();
-          } catch (error) {
-            console.error('Failed to save AI reply as comment:', error);
-            console.error('Error details:', {
-              error,
-              commentParams: {
-                communityId: comment.community_id,
-                address: user.activeAccount?.address,
-                threadId: comment.thread_id,
-                parentId: actualParentId,
-              },
-            });
-            throw error;
+          if (!user.activeAccount?.address) {
+            console.error('No active account found:', user);
+            throw new Error('No active account found');
           }
+
+          console.log('Building comment input with params:', {
+            communityId: comment.community_id,
+            address: user.activeAccount.address,
+            threadId: comment.thread_id,
+            finalText,
+            actualParentId,
+            finalTextLength: finalText.length,
+          });
+
+          const input = await buildCreateCommentInput({
+            communityId: comment.community_id,
+            address: user.activeAccount.address,
+            threadId: comment.thread_id,
+            threadMsgId: null,
+            unescapedText: finalText,
+            parentCommentId: actualParentId,
+            parentCommentMsgId: null,
+            existingNumberOfComments: 0,
+          });
+
+          console.log('Created comment input:', input);
+          const newComment = await createCommentRef.current(input);
+          console.log(
+            'Successfully saved AI reply as new comment:',
+            newComment,
+          );
+          onStreamingCompleteRef.current?.();
         } else {
           console.log('No text to save or component unmounted:', {
             mounted,
@@ -299,7 +299,7 @@ export const CommentCard = ({
       } catch (error) {
         console.error('Failed to generate AI reply:', error);
         if (mounted) {
-          onStreamingComplete?.();
+          onStreamingCompleteRef.current?.();
         }
       }
     };
@@ -314,7 +314,7 @@ export const CommentCard = ({
     comment.id,
     comment.thread_id,
     comment.community_id,
-    user.activeAccount,
+    user.activeAccount?.address,
   ]);
 
   // Reset streaming text when starting a new reply
