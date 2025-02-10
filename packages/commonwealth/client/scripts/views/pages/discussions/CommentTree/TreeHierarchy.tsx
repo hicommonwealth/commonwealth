@@ -76,15 +76,20 @@ export const TreeHierarchy = ({
   const handleGenerateAIReply = useCallback(
     async (commentId: number) => {
       if (streamingReplyIds.includes(commentId)) {
+        console.log(
+          'TreeHierarchy - Already streaming for comment:',
+          commentId,
+        );
         return;
       }
 
       const comment = allComments.find((c) => c.id === commentId);
       if (!comment) {
-        console.error('Comment not found:', commentId);
+        console.error('TreeHierarchy - Comment not found:', commentId);
         return;
       }
 
+      console.log('TreeHierarchy - Starting AI reply for comment:', commentId);
       setStreamingReplyIds((prev) => [...prev, commentId]);
     },
     [allComments, streamingReplyIds],
@@ -92,11 +97,17 @@ export const TreeHierarchy = ({
 
   // Register the callback when the component mounts
   useEffect(() => {
+    console.log('TreeHierarchy - Setting up AI streaming callback');
     const unregister = registerAIStreamingCallback((commentId) => {
+      console.log(
+        'TreeHierarchy - AI streaming callback triggered for:',
+        commentId,
+      );
       handleGenerateAIReply(commentId);
     });
 
     return () => {
+      console.log('TreeHierarchy - Cleaning up AI streaming callback');
       unregister();
     };
   }, [handleGenerateAIReply]);

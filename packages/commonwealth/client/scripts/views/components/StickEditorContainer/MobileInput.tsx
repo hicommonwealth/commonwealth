@@ -8,7 +8,7 @@ import { useActiveStickCommentReset } from 'views/components/StickEditorContaine
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { CWToggle } from 'views/components/component_kit/new_designs/cw_toggle';
 import { createDeltaFromText } from 'views/components/react_quill_editor';
-import { jumpHighlightComment } from 'views/pages/discussions/CommentTree/helpers';
+import { listenForComment } from 'views/pages/discussions/CommentTree/helpers';
 import './MobileInput.scss';
 
 export type MobileInputProps = CommentEditorProps & {
@@ -56,43 +56,55 @@ export const MobileInput = (props: MobileInputProps) => {
     setUseAiStreaming(!useAiStreaming);
   }, [useAiStreaming, setUseAiStreaming]);
 
-  const handleKeyDown = async (
-    event: React.KeyboardEvent<HTMLInputElement>,
-  ) => {
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (value.trim() !== '' && event.key === 'Enter') {
-      const submittedText = value.trim();
+      void handleSubmit();
+    }
+  };
 
-      try {
-        let aiPromise;
-        if (useAiStreaming && onAiReply) {
-          aiPromise = generateComment(submittedText);
-        }
+  const handleSubmit = async () => {
+    const submittedText = value.trim();
 
-        setValue('');
-
-        const commentId = await handleSubmitComment();
-        stickyCommentReset();
-
-        if (aiPromise) {
-          try {
-            const aiReply = await aiPromise;
-            if (aiReply && onAiReply) {
-              onAiReply(aiReply);
-            }
-          } catch (error) {
-            console.error('AI generation failed:', error);
-          }
-        }
-
-        if (typeof commentId === 'number') {
-          // Delay to allow the new comment to render in the DOM before scrolling/highlighting
-          setTimeout(() => {
-            jumpHighlightComment(commentId);
-          }, 100);
-        }
-      } catch (error) {
-        console.error('Error during comment submission:', error);
+    try {
+      let aiPromise;
+      if (useAiStreaming === true && onAiReply) {
+        console.log('MobileInput - AI streaming is enabled, generating reply');
+        aiPromise = generateComment(submittedText);
+      } else {
+        console.log(
+          'MobileInput - AI streaming is disabled, skipping AI reply',
+        );
       }
+
+      setValue('');
+
+      const commentId = await handleSubmitComment();
+      stickyCommentReset();
+
+      if (aiPromise) {
+        try {
+          const aiReply = await aiPromise;
+          if (aiReply && onAiReply) {
+            onAiReply(aiReply);
+          }
+        } catch (error) {
+          console.error('AI generation failed:', error);
+        }
+      }
+
+      if (typeof commentId === 'number') {
+        try {
+          await listenForComment(commentId, useAiStreaming === true);
+          console.log(
+            'MobileInput - Successfully jumped to comment:',
+            commentId,
+          );
+        } catch (error) {
+          console.warn('MobileInput - Failed to jump to comment:', error);
+        }
+      }
+    } catch (error) {
+      console.error('Error during comment submission:', error);
     }
   };
 

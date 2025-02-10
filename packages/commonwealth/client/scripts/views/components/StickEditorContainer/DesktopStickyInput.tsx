@@ -1,16 +1,16 @@
-import { useFlag } from 'hooks/useFlag';
 import React, { useCallback, useState } from 'react';
 import { CommentEditor } from 'views/components/Comments/CommentEditor';
 import type { CommentEditorProps } from 'views/components/Comments/CommentEditor/CommentEditor';
 import { CWToggle } from 'views/components/component_kit/new_designs/cw_toggle';
 import { jumpHighlightComment } from 'views/pages/discussions/CommentTree/helpers';
+import { useAiToggleState } from '../../../hooks/useAiToggleState';
 import './DesktopStickyInput.scss';
 
 export const DesktopStickyInput = (props: CommentEditorProps) => {
   const { isReplying, replyingToAuthor, onCancel, handleSubmitComment } = props;
   const [focused, setFocused] = useState(false);
-  const aiCommentsEnabled = useFlag('aiComments');
-  const [useAiStreaming, setUseAiStreaming] = useState(aiCommentsEnabled);
+  const { useAiStreaming, setUseAiStreaming, aiCommentsEnabled } =
+    useAiToggleState();
   const [streamingReplyIds, setStreamingReplyIds] = useState<number[]>([]);
 
   const handleFocused = useCallback(() => {
@@ -26,14 +26,8 @@ export const DesktopStickyInput = (props: CommentEditorProps) => {
   );
 
   const handleAiToggle = useCallback(() => {
-    console.log(
-      'DesktopStickyInput - Toggling AI mode from:',
-      useAiStreaming,
-      'to:',
-      !useAiStreaming,
-    );
-    setUseAiStreaming((prev) => !prev);
-  }, [useAiStreaming]);
+    setUseAiStreaming(!useAiStreaming);
+  }, [useAiStreaming, setUseAiStreaming]);
 
   const handleAiReply = useCallback(
     (commentId: number) => {

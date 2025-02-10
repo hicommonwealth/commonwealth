@@ -1,12 +1,12 @@
 import { ContentType } from '@hicommonwealth/shared';
 import clsx from 'clsx';
-import { useFlag } from 'hooks/useFlag';
 import Account from 'models/Account';
 import type { DeltaStatic } from 'quill';
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback } from 'react';
 import { User } from 'views/components/user/user';
 import { jumpHighlightComment } from 'views/pages/discussions/CommentTree/helpers';
 import { isCommandClick } from '../../../../helpers';
+import { useAiToggleState } from '../../../../hooks/useAiToggleState';
 import { CWText } from '../../component_kit/cw_text';
 import { CWValidationText } from '../../component_kit/cw_validation_text';
 import { CWButton } from '../../component_kit/new_designs/CWButton';
@@ -52,21 +52,27 @@ const CommentEditor = ({
   setUseAiStreaming: onAiStreamingChange,
   onAiReply,
   onCommentCreated,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   replyingToAuthor,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   streamingReplyIds,
 }: CommentEditorProps) => {
-  const aiCommentsEnabled = useFlag('aiComments');
+  const { useAiStreaming, setUseAiStreaming, aiCommentsEnabled } =
+    useAiToggleState();
 
-  // Debug log when component mounts or AI props change
-  useEffect(() => {}, [initialAiStreaming, onAiReply]);
+  // Use the prop values if provided, otherwise use the hook values
+  const effectiveAiStreaming = initialAiStreaming ?? useAiStreaming;
+  const effectiveSetAiStreaming = onAiStreamingChange ?? setUseAiStreaming;
 
   const handleAiToggle = useCallback(() => {
-    if (onAiStreamingChange) {
-      onAiStreamingChange(!initialAiStreaming);
+    if (effectiveSetAiStreaming) {
+      console.log(
+        'CommentEditor - Toggling AI from:',
+        effectiveAiStreaming,
+        'to:',
+        !effectiveAiStreaming,
+      );
+      effectiveSetAiStreaming(!effectiveAiStreaming);
     }
-  }, [initialAiStreaming, onAiStreamingChange]);
+  }, [effectiveAiStreaming, effectiveSetAiStreaming]);
 
   const handleEnhancedSubmit = async () => {
     // Immediately close the editor before any operations
@@ -93,16 +99,23 @@ const CommentEditor = ({
       }
 
       if (onCommentCreated) {
-        onCommentCreated(commentId, !!initialAiStreaming);
+        onCommentCreated(commentId, !!effectiveAiStreaming);
       }
 
       // Handle AI streaming and comment jumping asynchronously
       setTimeout(() => {
         // If AI streaming is enabled, trigger the AI reply through TreeHierarchy
-        if (initialAiStreaming && onAiReply) {
+        if (effectiveAiStreaming === true && onAiReply) {
+          console.log(
+            'CommentEditor - AI streaming is enabled, triggering reply',
+          );
           Promise.resolve(onAiReply(commentId)).catch((error) => {
             console.error('Failed to trigger AI reply:', error);
           });
+        } else {
+          console.log(
+            'CommentEditor - AI streaming is disabled, skipping AI reply',
+          );
         }
 
         // Function to attempt jumping to the comment
@@ -111,7 +124,7 @@ const CommentEditor = ({
             `.comment-${commentId}`,
           );
           if (commentElement) {
-            jumpHighlightComment(commentId);
+            jumpHighlightComment(commentId, effectiveAiStreaming === true);
             return true;
           }
           return false;
@@ -143,7 +156,7 @@ const CommentEditor = ({
       isCommandClick(event as unknown as React.MouseEvent<HTMLDivElement>)
     ) {
       event.preventDefault();
-      handleEnhancedSubmit();
+      void handleEnhancedSubmit();
     }
   };
 
@@ -173,7 +186,7 @@ const CommentEditor = ({
             <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
               <CWToggle
                 className="ai-toggle"
-                checked={!!initialAiStreaming}
+                checked={effectiveAiStreaming === true}
                 onChange={handleAiToggle}
                 icon="sparkle"
                 size="xs"
@@ -200,7 +213,7 @@ const CommentEditor = ({
           <CWButton
             buttonWidth="wide"
             disabled={disabled}
-            onClick={handleEnhancedSubmit}
+            onClick={() => void handleEnhancedSubmit()}
             label="Post"
           />
         </div>

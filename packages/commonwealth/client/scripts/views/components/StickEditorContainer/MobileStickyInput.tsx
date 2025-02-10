@@ -1,11 +1,11 @@
-import { useFlag } from 'hooks/useFlag';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { createPortal } from 'react-dom';
 import CommentEditor, {
   CommentEditorProps,
 } from 'views/components/Comments/CommentEditor/CommentEditor';
 import { MobileInput } from 'views/components/StickEditorContainer/MobileInput';
-import { jumpHighlightComment } from 'views/pages/discussions/CommentTree/helpers';
+import { listenForComment } from 'views/pages/discussions/CommentTree/helpers';
+import { useAiToggleState } from '../../../hooks/useAiToggleState';
 import './MobileStickyInput.scss';
 
 /**
@@ -14,20 +14,9 @@ import './MobileStickyInput.scss';
 export const MobileStickyInput = (props: CommentEditorProps) => {
   const { handleSubmitComment, replyingToAuthor } = props;
   const [focused, setFocused] = useState(false);
-  const aiCommentsEnabled = useFlag('aiComments');
-  const [useAiStreaming, setUseAiStreaming] = useState(aiCommentsEnabled);
+  const { useAiStreaming, setUseAiStreaming, aiCommentsEnabled } =
+    useAiToggleState();
   const [streamingReplyIds, setStreamingReplyIds] = useState<number[]>([]);
-
-  useEffect(() => {
-    console.log('MobileStickyInput State:', {
-      focused,
-      useAiStreaming,
-      replyingToAuthor,
-      parentExists: !!document.getElementById('MobileNavigationHead'),
-      timestamp: new Date().toISOString(),
-      streamingReplyIds,
-    });
-  }, [focused, useAiStreaming, replyingToAuthor, streamingReplyIds]);
 
   const handleAiReply = useCallback(
     (commentId: number) => {
@@ -51,31 +40,27 @@ export const MobileStickyInput = (props: CommentEditorProps) => {
     }
 
     // If AI mode is enabled, trigger the streaming reply
-    if (useAiStreaming) {
+    if (useAiStreaming === true) {
+      console.log(
+        'MobileStickyInput - AI streaming is enabled, triggering reply',
+      );
       handleAiReply(commentId);
+    } else {
+      console.log(
+        'MobileStickyInput - AI streaming is disabled, skipping AI reply',
+      );
     }
 
-    // Directly trigger jump highlighting after a short delay to allow the comment to render
-    setTimeout(() => {
-      const element = document.querySelector(`.comment-${commentId}`);
+    // Use the new listenForComment function
+    try {
+      await listenForComment(commentId, useAiStreaming === true);
       console.log(
-        `MobileStickyInput - Checking for comment element with selector .comment-${commentId}:`,
-        element,
+        'MobileStickyInput - Successfully jumped to comment:',
+        commentId,
       );
-      if (element) {
-        console.log(
-          `MobileStickyInput - Element found for comment ID ${commentId}`,
-        );
-      } else {
-        console.warn(
-          `MobileStickyInput - No element found for comment ID ${commentId} at timeout`,
-        );
-      }
-      console.log(
-        `MobileStickyInput - Scrolling and highlighting comment ID: ${commentId}`,
-      );
-      jumpHighlightComment(commentId);
-    }, 300);
+    } catch (error) {
+      console.warn('MobileStickyInput - Failed to jump to comment:', error);
+    }
 
     return commentId;
   }, [handleSubmitComment, useAiStreaming, handleAiReply]);
