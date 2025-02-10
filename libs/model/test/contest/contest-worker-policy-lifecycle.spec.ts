@@ -92,6 +92,14 @@ describe('Contest Worker Policy Lifecycle', () => {
       .spyOn(evm, 'addContentBatch')
       .mockResolvedValue([]);
 
+    const rolloverContestStub = vi
+      .spyOn(evm, 'rollOverContest')
+      .mockResolvedValue(true);
+
+    const getContestScoreStub = vi
+      .spyOn(evm, 'getContestScore')
+      .mockResolvedValue([]);
+
     await emitEvent(models.Outbox, [
       {
         event_name: EventNames.ThreadCreated,
@@ -186,6 +194,9 @@ describe('Contest Worker Policy Lifecycle', () => {
       'contest should not be rolled over yet',
     ).to.be.false;
 
+    // @rbennettcw how to simulate an ending contest to validate
+    // that the ending flag is set and ContestEnding event is emitted?
+
     // simulate contest has ended
     await models.Contest.update(
       {
@@ -205,12 +216,22 @@ describe('Contest Worker Policy Lifecycle', () => {
       payload: {},
     });
 
+    expect(rolloverContestStub, 'contest rolled over').toHaveBeenCalledOnce();
+    expect(getContestScoreStub, 'get final score').toHaveBeenCalledOnce();
+
     const contestManagerAfterContestEnded =
       await models.ContestManager.findByPk(contestAddress);
 
     expect(
       contestManagerAfterContestEnded!.ended,
       'contest should have rolled over',
-    ).to.be.true;
+    ).toBeTruthy();
+    expect(
+      contestManagerAfterContestEnded?.ending,
+      'ending flag reset',
+    ).toBeFalsy();
+
+    const events = await drainOutbox([EventNames.ContestEnded]);
+    expect(events.length, 'contest ended emitted').toBeGreaterThan(0);
   });
 });

@@ -34,6 +34,8 @@ export enum EventNames {
   RecurringContestManagerDeployed = 'RecurringContestManagerDeployed',
   OneOffContestManagerDeployed = 'OneOffContestManagerDeployed',
   ContestStarted = 'ContestStarted',
+  ContestEnding = 'ContestEnding',
+  ContestEnded = 'ContestEnded',
   ContestContentAdded = 'ContestContentAdded',
   ContestContentUpvoted = 'ContestContentUpvoted',
   FarcasterCastCreated = 'FarcasterCastCreated',
@@ -105,6 +107,14 @@ export type EventPairs =
   | {
       event_name: EventNames.ContestStarted;
       event_payload: z.infer<typeof events.ContestStarted>;
+    }
+  | {
+      event_name: EventNames.ContestEnding;
+      event_payload: z.infer<typeof events.ContestEnding>;
+    }
+  | {
+      event_name: EventNames.ContestEnded;
+      event_payload: z.infer<typeof events.ContestEnded>;
     }
   | {
       event_name: EventNames.ContestContentAdded;

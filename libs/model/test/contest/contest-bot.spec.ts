@@ -3,6 +3,7 @@
 import {
   ContestMetadataResponse,
   DEFAULT_CONTEST_BOT_PARAMS,
+  getContestUSDCAddress,
   parseBotCommand,
   ParseBotCommandError,
 } from 'model/src/services/openai/parseBotCommand';
@@ -16,6 +17,7 @@ type TestCase = {
 const defaults: Omit<ContestMetadataResponse, 'contestName'> = {
   tokenAddress: '0x429ae85883f82203D736e8fc203A455990745ca1',
   ...DEFAULT_CONTEST_BOT_PARAMS,
+  isUSDC: false,
 };
 
 const validateOutput = (
@@ -34,143 +36,163 @@ const validateOutput = (
 // TODO: ENABLE ALL TESTS
 const testCases: Array<TestCase> = [
   {
-    input: `Hey @commonbot, launch a Best Memes Only contest! Fund it with 0x429ae85883f82203D736e8fc203A455990745ca1 on Base.`,
+    input: `Hey @commonbot, launch a Best Memes Only contest! Fund it with 0x5e2d3f1a8b9c0d7e6f1a2b3c4d5e6f7a8b9c0d1e on Base.`,
     expectedOutput: {
       contestName: 'Best Memes Only',
       ...defaults,
+      tokenAddress: '0x5e2d3f1a8b9c0d7e6f1a2b3c4d5e6f7a8b9c0d1e',
     },
   },
   {
-    input: `Yo @commonbot! Start a Best Memes Only competition—prizes funded by 0x429ae85883f82203D736e8fc203A455990745ca1 on Base.`,
+    input: `Yo @commonbot! Start a Best Memes Only competition—prizes funded by 0x3a4b5c6d7e8f90123456789abcdef0123456789a on Base.`,
     expectedOutput: {
       contestName: 'Best Memes Only',
       ...defaults,
+      tokenAddress: '0x3a4b5c6d7e8f90123456789abcdef0123456789a',
     },
   },
   {
-    input: `Letʼs go viral, @commonbot! Initiate Best Memes Only with funds from 0x429ae85883f82203D736e8fc203A455990745ca1 via Base.`,
+    input: `Letʼs go viral, @commonbot! Initiate Best Memes Only with funds from 0x3a4b5c6d7e8f90123456789abcdef0123456789a via Base.`,
     expectedOutput: {
       contestName: 'Best Memes Only',
       ...defaults,
+      tokenAddress: '0x3a4b5c6d7e8f90123456789abcdef0123456789a',
     },
   },
   {
-    input: `Contest alert: @commonbot, host Best Memes Only! Back it using 0x429ae85883f82203D736e8fc203A455990745ca1 on Base.`,
+    input: `Contest alert: @commonbot, host Best Memes Only! Back it using 0x1029384756abcdef89fedcba5647382910abcde5 on Base.`,
     expectedOutput: {
       contestName: 'Best Memes Only',
       ...defaults,
+      tokenAddress: '0x1029384756abcdef89fedcba5647382910abcde5',
     },
   },
   {
-    input: `@commonbot, organize a Best Memes Only showdown! Fuel the prizes with 0x429ae85883f82203D736e8fc203A455990745ca1 on Base.`,
+    input: `@commonbot, organize a Best Memes Only showdown! Fuel the prizes with 0x89abcdef0123456789abcdef0123456789abcdef on Base.`,
     expectedOutput: {
       contestName: 'Best Memes Only',
       ...defaults,
+      tokenAddress: '0x89abcdef0123456789abcdef0123456789abcdef',
     },
   },
   {
-    input: `Attention @commonbot: Roll out Best Memes Only! Funding address: 0x429ae85883f82203D736e8fc203A455990745ca1 on Base.`,
+    input: `Attention @commonbot: Roll out Best Memes Only! Funding address: 0xfedcba9876543210fedcba9876543210fedcba98 on Base.`,
     expectedOutput: {
       contestName: 'Best Memes Only',
       ...defaults,
+      tokenAddress: '0xfedcba9876543210fedcba9876543210fedcba98',
     },
   },
   {
-    input: `@commonbot, letʼs spark a meme war! Launch Best Memes Only using 0x429ae85883f82203D736e8fc203A455990745ca1 via Base.`,
+    input: `@commonbot, letʼs spark a meme war! Launch Best Memes Only using 0x13579bdf2468ace013579bdf2468ace013579bdf via Base.`,
     expectedOutput: {
       contestName: 'Best Memes Only',
       ...defaults,
+      tokenAddress: '0x13579bdf2468ace013579bdf2468ace013579bdf',
     },
   },
   {
-    input: `@commonbot, start Best Memes Only! Fund via 0x429ae85883f82203D736e8fc203A455990745ca1 on Base.`,
+    input: `@commonbot, start Best Memes Only! Fund via 0x2468ace013579bdf2468ace013579bdf2468ace0 on Base.`,
     expectedOutput: {
       contestName: 'Best Memes Only',
       ...defaults,
+      tokenAddress: '0x2468ace013579bdf2468ace013579bdf2468ace0',
     },
   },
   {
-    input: `@commonbot, kick off Best Memes Only! All rewards from 0x429ae85883f82203D736e8fc203A455990745ca1 on Base.`,
+    input: `@commonbot, kick off Best Memes Only! All rewards from 0xdeadbeefcafebabe8badf00dfeedfacefeedb00c on Base.`,
     expectedOutput: {
       contestName: 'Best Memes Only',
       ...defaults,
+      tokenAddress: '0xdeadbeefcafebabe8badf00dfeedfacefeedb00c',
     },
   },
   {
-    input: `@commonbot, host Best Memes Only! Powered by 0x429ae85883f82203D736e8fc203A455990745ca1 on Base.`,
+    input: `@commonbot, host Best Memes Only! Powered by 0x0123abcd4567ef890123abcd4567ef890123abcd on Base.`,
     expectedOutput: {
       contestName: 'Best Memes Only',
       ...defaults,
+      tokenAddress: '0x0123abcd4567ef890123abcd4567ef890123abcd',
     },
   },
   {
-    input: `@commonbot, assemble a Best Memes Only tournament. Prize pool: 0x429ae85883f82203D736e8fc203A455990745ca1 on Base.`,
+    input: `@commonbot, assemble a Best Memes Only tournament. Prize pool: 0x89ab67cd45ef23cd89ab67cd45ef23cd89ab67cd on Base.`,
     expectedOutput: {
       contestName: 'Best Memes Only',
       ...defaults,
+      tokenAddress: '0x89ab67cd45ef23cd89ab67cd45ef23cd89ab67cd',
     },
   },
   {
-    input: `Letʼs meme! @commonbot, create Best Memes Only using 0x429ae85883f82203D736e8fc203A455990745ca1 on Base.`,
+    input: `Letʼs meme! @commonbot, create Best Memes Only using 0xfedc1234ba9876edc1234ba9876edc1234ba9876 on Base.`,
     expectedOutput: {
       contestName: 'Best Memes Only',
       ...defaults,
+      tokenAddress: '0xfedc1234ba9876edc1234ba9876edc1234ba9876',
     },
   },
   {
-    input: `@commonbot, time for Best Memes Only! Fund it through 0x429ae85883f82203D736e8fc203A455990745ca1 on Base.`,
+    input: `@commonbot, time for Best Memes Only! Fund it through 0x11223344556677889900aabbccddeeff11223344 on Base.`,
     expectedOutput: {
       contestName: 'Best Memes Only',
       ...defaults,
+      tokenAddress: '0x11223344556677889900aabbccddeeff11223344',
     },
   },
   {
-    input: `Meme lords, assemble! @commonbot, start Best Memes Only via 0x429ae85883f82203D736e8fc203A455990745ca1 on Base.`,
+    input: `Meme lords, assemble! @commonbot, start Best Memes Only via 0x5566778899aabbccddeeff001122334455667788 on Base.`,
     expectedOutput: {
       contestName: 'Best Memes Only',
       ...defaults,
+      tokenAddress: '0x5566778899aabbccddeeff001122334455667788',
     },
   },
   {
-    input: `@commonbot, launch Best Memes Only now! Backed by 0x429ae85883f82203D736e8fc203A455990745ca1 on Base.`,
+    input: `@commonbot, launch Best Memes Only now! Backed by 0x5566778899aabbccddeeff001122334455667788 on Base.`,
     expectedOutput: {
       contestName: 'Best Memes Only',
       ...defaults,
+      tokenAddress: '0x5566778899aabbccddeeff001122334455667788',
     },
   },
   {
-    input: `@commonbot: Deploy Best Memes Only contest. Funding via 0x429ae85883f82203D736e8fc203A455990745ca1 on Base.`,
+    input: `@commonbot: Deploy Best Memes Only contest. Funding via 0x99aabbccddeeff00112233445566778899aabbcc on Base.`,
     expectedOutput: {
       contestName: 'Best Memes Only',
       ...defaults,
+      tokenAddress: '0x99aabbccddeeff00112233445566778899aabbcc',
     },
   },
   {
-    input: `@commonbot, letʼs roast some memes! Best Memes Only funded by 0x429ae85883f82203D736e8fc203A455990745ca1 on Base.`,
+    input: `@commonbot, letʼs roast some memes! Best Memes Only funded by 0xa1b2c3d4e5f60718293a4b5c6d7e8f9012b3c4d5 on Base.`,
     expectedOutput: {
       contestName: 'Best Memes Only',
       ...defaults,
+      tokenAddress: '0xa1b2c3d4e5f60718293a4b5c6d7e8f9012b3c4d5',
     },
   },
   {
-    input: `Breaking News: @commonbot to host Best Memes Only! Funds: 0x429ae85883f82203D736e8fc203A455990745ca1 on Base.`,
+    input: `Breaking News: @commonbot to host Best Memes Only! Funds: 0xa1b2c3d4e5f60718293a4b5c6d7e8f9012b3c4d5 on Base.`,
     expectedOutput: {
       contestName: 'Best Memes Only',
       ...defaults,
+      tokenAddress: '0xa1b2c3d4e5f60718293a4b5c6d7e8f9012b3c4d5',
     },
   },
   {
-    input: `@commonbot, activate Best Memes Only! Source funds from 0x429ae85883f82203D736e8fc203A455990745ca1 on Base.`,
+    input: `@commonbot, activate Best Memes Only! Source funds from 0xffeeddccbbaa00998877665544332211ffeeddcc on Base.`,
     expectedOutput: {
       contestName: 'Best Memes Only',
       ...defaults,
+      tokenAddress: '0xffeeddccbbaa00998877665544332211ffeeddcc',
     },
   },
   {
-    input: `@commonbot, start Best Memes Only! Use 0x429ae85883f82203D736e8fc203A455990745ca1 on Base for rewards.`,
+    input: `@commonbot, start Best Memes Only! Use 0x0a0b0c0d0e0f1a1b1c1d1e1f2a2b2c2d3a3b3c3d on Base for rewards.`,
     expectedOutput: {
       contestName: 'Best Memes Only',
       ...defaults,
+      tokenAddress: '0x0a0b0c0d0e0f1a1b1c1d1e1f2a2b2c2d3a3b3c3d',
     },
   },
   {
@@ -481,6 +503,24 @@ const testCases: Array<TestCase> = [
       contestName: 'Best Memes Only',
       ...defaults,
       tokenAddress: '0x0c41f1fc9022feb69af6dc666abfe73c9ffda7ce',
+    },
+  },
+  {
+    input: `@commonbot, letʼs inspire laughter! Best Memes Only contest via USDC on Base.`,
+    expectedOutput: {
+      contestName: 'Best Memes Only',
+      ...defaults,
+      tokenAddress: getContestUSDCAddress(),
+      isUSDC: true,
+    },
+  },
+  {
+    input: `@contestbot, launch Super Friday for usdc.`,
+    expectedOutput: {
+      contestName: 'Super Friday',
+      ...defaults,
+      tokenAddress: getContestUSDCAddress(),
+      isUSDC: true,
     },
   },
 ];
