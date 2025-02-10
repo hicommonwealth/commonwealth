@@ -415,7 +415,7 @@ export const rollOverContest = async ({
       } else {
         const endTime = await contestInstance.methods.endTime().call();
         const currentTime = Math.floor(Date.now() / 1000);
-        if (endTime > Number(currentTime)) {
+        if (Number(endTime) > currentTime) {
           return false;
         }
       }
