@@ -33,6 +33,9 @@ startHealthCheckLoop({
 // 10 minutes ago
 const DEFAULT_POLL_START_TIME = new Date(Date.now() - 1000 * 60 * 10);
 
+// 16 minutes -> 15 minute rate limit window + 1 minute buffer to account for func execution time
+const POLL_INTERVAL = 16 * 60 * 1000;
+
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function pollMentions(twitterBotConfig: TwitterBotConfig) {
   try {
@@ -83,10 +86,10 @@ async function main() {
     ]);
 
     // poll mentions once every 15 minutes
-    setInterval(() => pollMentions(TwitterBotConfigs.MomBot), 15 * 60 * 1000);
+    setInterval(() => pollMentions(TwitterBotConfigs.MomBot), POLL_INTERVAL);
     setInterval(
       () => pollMentions(TwitterBotConfigs.ContestBot),
-      15 * 60 * 1000,
+      POLL_INTERVAL,
     );
 
     isServiceHealthy = true;
