@@ -214,6 +214,8 @@ export const CommentCard = ({
     onStreamingCompleteRef.current = onStreamingComplete;
   }, [onStreamingComplete]);
 
+  const activeUserAddress = user.activeAccount?.address;
+
   useEffect(() => {
     if (!isStreamingAIReply || !parentCommentText) return;
 
@@ -234,7 +236,7 @@ export const CommentCard = ({
           actualParentId,
           threadId: comment.thread_id,
           communityId: comment.community_id,
-          userAddress: user.activeAccount?.address,
+          userAddress: activeUserAddress,
         });
 
         await generateCommentRef.current(parentCommentText, (text) => {
@@ -257,14 +259,14 @@ export const CommentCard = ({
         });
 
         if (mounted && finalText) {
-          if (!user.activeAccount?.address) {
+          if (!activeUserAddress) {
             console.error('No active account found:', user);
             throw new Error('No active account found');
           }
 
           console.log('Building comment input with params:', {
             communityId: comment.community_id,
-            address: user.activeAccount.address,
+            address: activeUserAddress,
             threadId: comment.thread_id,
             finalText,
             actualParentId,
@@ -273,7 +275,7 @@ export const CommentCard = ({
 
           const input = await buildCreateCommentInput({
             communityId: comment.community_id,
-            address: user.activeAccount.address,
+            address: activeUserAddress,
             threadId: comment.thread_id,
             threadMsgId: null,
             unescapedText: finalText,
@@ -314,7 +316,7 @@ export const CommentCard = ({
     comment.id,
     comment.thread_id,
     comment.community_id,
-    user.activeAccount?.address,
+    activeUserAddress,
   ]);
 
   // Reset streaming text when starting a new reply
