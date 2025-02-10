@@ -9,8 +9,8 @@ import {
   verify,
 } from '@hicommonwealth/shared';
 import clsx from 'clsx';
-import { openFeatureProvider } from 'helpers/feature-flags';
 import { GetThreadActionTooltipTextResponse } from 'helpers/threads';
+import { useFlag } from 'hooks/useFlag';
 import { useGenerateCommentText } from 'hooks/useGenerateCommentText';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import moment from 'moment';
@@ -125,6 +125,7 @@ export const CommentCard = ({
   const [completeText, setCompleteText] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const { generateComment } = useGenerateCommentText();
+  const aiCommentsEnabled = useFlag('aiComments');
   const { mutateAsync: createComment } = useCreateCommentMutation({
     threadId: comment.thread_id,
     communityId: comment.community_id,
@@ -501,10 +502,7 @@ export const CommentCard = ({
                         await onReply();
                       }}
                     />
-                    {openFeatureProvider.getBooleanValue(
-                      'aiComments',
-                      false,
-                    ) && (
+                    {aiCommentsEnabled && (
                       <CWThreadAction
                         action="ai-reply"
                         label="AI Reply"

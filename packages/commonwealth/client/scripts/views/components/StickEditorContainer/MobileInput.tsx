@@ -1,3 +1,4 @@
+import { useFlag } from 'hooks/useFlag';
 import { useGenerateCommentText } from 'hooks/useGenerateCommentText';
 import React, { useCallback, useMemo, useState } from 'react';
 import useUserStore from 'state/ui/user';
@@ -33,6 +34,7 @@ export const MobileInput = (props: MobileInputProps) => {
   const user = useUserStore();
   const { generateComment } = useGenerateCommentText();
   const stickyCommentReset = useActiveStickCommentReset();
+  const aiCommentsEnabled = useFlag('aiComments');
 
   const handleClose = useCallback(
     (e: React.MouseEvent<HTMLElement | SVGSVGElement>) => {
@@ -51,12 +53,6 @@ export const MobileInput = (props: MobileInputProps) => {
   );
 
   const handleAiToggle = useCallback(() => {
-    console.log(
-      'MobileInput - Toggling AI mode from:',
-      useAiStreaming,
-      'to:',
-      !useAiStreaming,
-    );
     setUseAiStreaming(!useAiStreaming);
   }, [useAiStreaming, setUseAiStreaming]);
 
@@ -65,54 +61,37 @@ export const MobileInput = (props: MobileInputProps) => {
   ) => {
     if (value.trim() !== '' && event.key === 'Enter') {
       const submittedText = value.trim();
-      console.log(
-        'MobileInput - Starting submission with text:',
-        submittedText,
-      );
 
       try {
         let aiPromise;
         if (useAiStreaming && onAiReply) {
-          console.log(
-            'MobileInput - Starting AI generation with text:',
-            submittedText,
-          );
           aiPromise = generateComment(submittedText);
         }
 
         setValue('');
 
-        console.log('MobileInput - Calling handleSubmitComment...');
         const commentId = await handleSubmitComment();
-        console.log('MobileInput - handleSubmitComment returned:', {
-          commentId,
-          type: typeof commentId,
-        });
         stickyCommentReset();
 
         if (aiPromise) {
           try {
             const aiReply = await aiPromise;
-            console.log('MobileInput - AI generation complete:', { aiReply });
             if (aiReply) {
               onAiReply(aiReply);
             }
           } catch (error) {
-            console.error('MobileInput - AI generation failed:', error);
+            console.error('AI generation failed:', error);
           }
         }
 
         if (typeof commentId === 'number') {
           // Delay to allow the new comment to render in the DOM before scrolling/highlighting
           setTimeout(() => {
-            console.log(
-              `MobileInput - Scrolling and highlighting comment ID: ${commentId}`,
-            );
             jumpHighlightComment(commentId);
           }, 100);
         }
       } catch (error) {
-        console.error('MobileInput - Error during comment submission:', error);
+        console.error('Error during comment submission:', error);
       }
     }
   };
@@ -179,20 +158,22 @@ export const MobileInput = (props: MobileInputProps) => {
               gap: '8px',
             }}
           >
-            <div className="ai-toggle">
-              <div
-                style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
-              >
-                <CWToggle
-                  checked={useAiStreaming}
-                  onChange={handleAiToggle}
-                  icon="sparkle"
-                  size="xs"
-                  iconColor="#757575"
-                />
-                <span style={{ fontSize: '12px', color: '#757575' }}>AI</span>
+            {aiCommentsEnabled && (
+              <div className="ai-toggle">
+                <div
+                  style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
+                >
+                  <CWToggle
+                    checked={useAiStreaming}
+                    onChange={handleAiToggle}
+                    icon="sparkle"
+                    size="xs"
+                    iconColor="#757575"
+                  />
+                  <span style={{ fontSize: '12px', color: '#757575' }}>AI</span>
+                </div>
               </div>
-            </div>
+            )}
             <div className="RightButton">
               {isReplying && (
                 <CWIconButton iconName="close" onClick={handleClose} />

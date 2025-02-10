@@ -1,6 +1,6 @@
 import { ContentType } from '@hicommonwealth/shared';
 import clsx from 'clsx';
-import { openFeatureProvider } from 'helpers/feature-flags';
+import { useFlag } from 'hooks/useFlag';
 import { useGenerateCommentText } from 'hooks/useGenerateCommentText';
 import Account from 'models/Account';
 import type { DeltaStatic } from 'quill';
@@ -59,6 +59,7 @@ const CommentEditor = ({
   onCommentCreated,
 }: CommentEditorProps) => {
   const { generateComment } = useGenerateCommentText();
+  const aiCommentsEnabled = useFlag('aiComments');
 
   // Debug log when component mounts or AI props change
   useEffect(() => {}, [initialAiStreaming, onAiReply]);
@@ -173,7 +174,7 @@ const CommentEditor = ({
           </CWText>
         </div>
         <div className="attribution-right-content">
-          {openFeatureProvider.getBooleanValue('aiComments', false) && (
+          {aiCommentsEnabled && (
             <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
               <CWToggle
                 className="ai-toggle"

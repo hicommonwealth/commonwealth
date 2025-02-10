@@ -1,4 +1,4 @@
-import { openFeatureProvider } from 'helpers/feature-flags';
+import { useFlag } from 'hooks/useFlag';
 import React, { useCallback, useState } from 'react';
 import { CommentEditor } from 'views/components/Comments/CommentEditor';
 import type { CommentEditorProps } from 'views/components/Comments/CommentEditor/CommentEditor';
@@ -9,9 +9,8 @@ import './DesktopStickyInput.scss';
 export const DesktopStickyInput = (props: CommentEditorProps) => {
   const { isReplying, replyingToAuthor, onCancel, handleSubmitComment } = props;
   const [focused, setFocused] = useState(false);
-  const [useAiStreaming, setUseAiStreaming] = useState(
-    openFeatureProvider.getBooleanValue('aiComments', false),
-  );
+  const aiCommentsEnabled = useFlag('aiComments');
+  const [useAiStreaming, setUseAiStreaming] = useState(aiCommentsEnabled);
   const [streamingReplyIds, setStreamingReplyIds] = useState<number[]>([]);
 
   const handleFocused = useCallback(() => {
@@ -144,24 +143,26 @@ export const DesktopStickyInput = (props: CommentEditorProps) => {
                 outline: 'none',
               }}
             />
-            <div
-              style={{
-                marginLeft: '12px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '4px',
-              }}
-            >
-              <CWToggle
-                className="ai-toggle"
-                checked={useAiStreaming}
-                onChange={handleAiToggle}
-                icon="sparkle"
-                size="xs"
-                iconColor="#757575"
-              />
-              <span style={{ fontSize: '12px', color: '#757575' }}>AI</span>
-            </div>
+            {aiCommentsEnabled && (
+              <div
+                style={{
+                  marginLeft: '12px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                }}
+              >
+                <CWToggle
+                  className="ai-toggle"
+                  checked={useAiStreaming}
+                  onChange={handleAiToggle}
+                  icon="sparkle"
+                  size="xs"
+                  iconColor="#757575"
+                />
+                <span style={{ fontSize: '12px', color: '#757575' }}>AI</span>
+              </div>
+            )}
           </div>
         </div>
       ) : (

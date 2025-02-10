@@ -1,4 +1,4 @@
-import { openFeatureProvider } from 'helpers/feature-flags';
+import { useFlag } from 'hooks/useFlag';
 import React, { useCallback, useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import CommentEditor, {
@@ -14,9 +14,8 @@ import './MobileStickyInput.scss';
 export const MobileStickyInput = (props: CommentEditorProps) => {
   const { handleSubmitComment, replyingToAuthor } = props;
   const [focused, setFocused] = useState(false);
-  const [useAiStreaming, setUseAiStreaming] = useState(
-    openFeatureProvider.getBooleanValue('aiComments', false),
-  );
+  const aiCommentsEnabled = useFlag('aiComments');
+  const [useAiStreaming, setUseAiStreaming] = useState(aiCommentsEnabled);
   const [streamingReplyIds, setStreamingReplyIds] = useState<number[]>([]);
 
   useEffect(() => {
