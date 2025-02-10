@@ -22,4 +22,11 @@
       }
     }
   }
+
+  .performance-content {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
 }

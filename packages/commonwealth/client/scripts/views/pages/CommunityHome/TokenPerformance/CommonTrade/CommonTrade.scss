@@ -1,0 +1,13 @@
+@import '../../../../../styles/shared.scss';
+
+.CommonTrade {
+  overflow-y: scroll;
+  padding-left: 8px;
+
+  .token-info {
+    display: flex;
+    align-items: center;
+    justify-self: flex-end;
+    gap: 4px;
+  }
+}
