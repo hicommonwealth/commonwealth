@@ -1,7 +1,6 @@
 import { ContentType } from '@hicommonwealth/shared';
 import clsx from 'clsx';
 import { useFlag } from 'hooks/useFlag';
-import { useGenerateCommentText } from 'hooks/useGenerateCommentText';
 import Account from 'models/Account';
 import type { DeltaStatic } from 'quill';
 import React, { useCallback, useEffect } from 'react';
@@ -29,12 +28,9 @@ export type CommentEditorProps = {
   shouldFocus?: boolean;
   tooltipText?: string;
   isReplying?: boolean;
-  replyingToAuthor?: string;
   useAiStreaming?: boolean;
   setUseAiStreaming?: (value: boolean) => void;
   onAiReply?: (commentId: number) => void;
-  streamingReplyIds?: number[];
-  lastSubmittedCommentId?: number | null;
   onCommentCreated?: (commentId: number, hasAI: boolean) => void;
 };
 
@@ -50,15 +46,11 @@ const CommentEditor = ({
   author,
   shouldFocus,
   tooltipText,
-  replyingToAuthor,
   useAiStreaming: initialAiStreaming,
   setUseAiStreaming: onAiStreamingChange,
   onAiReply,
-  streamingReplyIds,
-  lastSubmittedCommentId,
   onCommentCreated,
 }: CommentEditorProps) => {
-  const { generateComment } = useGenerateCommentText();
   const aiCommentsEnabled = useFlag('aiComments');
 
   // Debug log when component mounts or AI props change
@@ -71,9 +63,6 @@ const CommentEditor = ({
   }, [initialAiStreaming, onAiStreamingChange]);
 
   const handleEnhancedSubmit = async () => {
-    // Store the content before closing the editor
-    const currentContentDelta = contentDelta;
-
     // Immediately close the editor before any operations
     onCancel?.(
       new MouseEvent('click', {
