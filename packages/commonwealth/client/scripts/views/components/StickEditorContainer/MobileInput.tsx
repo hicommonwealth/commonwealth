@@ -14,8 +14,8 @@ import './MobileInput.scss';
 export type MobileInputProps = CommentEditorProps & {
   onFocus?: () => void;
   replyingToAuthor?: string;
-  useAiStreaming: boolean;
-  setUseAiStreaming: (value: boolean) => void;
+  aiCommentsToggleEnabled: boolean;
+  setAICommentsToggleEnabled: (value: boolean) => void;
 };
 
 export const MobileInput = (props: MobileInputProps) => {
@@ -27,14 +27,14 @@ export const MobileInput = (props: MobileInputProps) => {
     replyingToAuthor,
     onCancel,
     onAiReply,
-    useAiStreaming,
-    setUseAiStreaming,
+    aiCommentsToggleEnabled,
+    setAICommentsToggleEnabled,
   } = props;
   const [value, setValue] = useState('');
   const user = useUserStore();
   const { generateComment } = useGenerateCommentText();
   const stickyCommentReset = useActiveStickCommentReset();
-  const aiCommentsEnabled = useFlag('aiComments');
+  const aiCommentsFeatureEnabled = useFlag('aiComments');
 
   const handleClose = useCallback(
     (e: React.MouseEvent<HTMLElement | SVGSVGElement>) => {
@@ -53,8 +53,8 @@ export const MobileInput = (props: MobileInputProps) => {
   );
 
   const handleAiToggle = useCallback(() => {
-    setUseAiStreaming(!useAiStreaming);
-  }, [useAiStreaming, setUseAiStreaming]);
+    setAICommentsToggleEnabled(!aiCommentsToggleEnabled);
+  }, [aiCommentsToggleEnabled, setAICommentsToggleEnabled]);
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (value.trim() !== '' && event.key === 'Enter') {
@@ -67,7 +67,7 @@ export const MobileInput = (props: MobileInputProps) => {
 
     try {
       let aiPromise;
-      if (useAiStreaming === true && onAiReply) {
+      if (aiCommentsToggleEnabled === true && onAiReply) {
         console.log('MobileInput - AI streaming is enabled, generating reply');
         aiPromise = generateComment(submittedText);
       } else {
@@ -94,7 +94,7 @@ export const MobileInput = (props: MobileInputProps) => {
 
       if (typeof commentId === 'number') {
         try {
-          await listenForComment(commentId, useAiStreaming === true);
+          await listenForComment(commentId, aiCommentsToggleEnabled === true);
           console.log(
             'MobileInput - Successfully jumped to comment:',
             commentId,
@@ -170,13 +170,13 @@ export const MobileInput = (props: MobileInputProps) => {
               gap: '8px',
             }}
           >
-            {aiCommentsEnabled && (
+            {aiCommentsFeatureEnabled && (
               <div className="ai-toggle">
                 <div
                   style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
                 >
                   <CWToggle
-                    checked={useAiStreaming}
+                    checked={aiCommentsToggleEnabled}
                     onChange={handleAiToggle}
                     icon="sparkle"
                     size="xs"

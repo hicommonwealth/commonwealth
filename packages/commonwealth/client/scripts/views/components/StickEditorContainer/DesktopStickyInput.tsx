@@ -9,8 +9,11 @@ import './DesktopStickyInput.scss';
 export const DesktopStickyInput = (props: CommentEditorProps) => {
   const { isReplying, replyingToAuthor, onCancel, handleSubmitComment } = props;
   const [focused, setFocused] = useState(false);
-  const { useAiStreaming, setUseAiStreaming, aiCommentsEnabled } =
-    useAiToggleState();
+  const {
+    aiCommentsToggleEnabled,
+    setAICommentsToggleEnabled,
+    aiCommentsFeatureEnabled,
+  } = useAiToggleState();
   const [streamingReplyIds, setStreamingReplyIds] = useState<number[]>([]);
 
   const handleFocused = useCallback(() => {
@@ -26,8 +29,8 @@ export const DesktopStickyInput = (props: CommentEditorProps) => {
   );
 
   const handleAiToggle = useCallback(() => {
-    setUseAiStreaming(!useAiStreaming);
-  }, [useAiStreaming, setUseAiStreaming]);
+    setAICommentsToggleEnabled(!aiCommentsToggleEnabled);
+  }, [aiCommentsToggleEnabled, setAICommentsToggleEnabled]);
 
   const handleAiReply = useCallback(
     (commentId: number) => {
@@ -44,7 +47,7 @@ export const DesktopStickyInput = (props: CommentEditorProps) => {
   const handleEnhancedSubmit = useCallback(async () => {
     console.log(
       'DesktopStickyInput - Submitting comment with AI mode:',
-      useAiStreaming,
+      aiCommentsToggleEnabled,
     );
 
     // Post the comment and get its ID
@@ -56,7 +59,7 @@ export const DesktopStickyInput = (props: CommentEditorProps) => {
     }
 
     // If AI mode is enabled, trigger the streaming reply
-    if (useAiStreaming) {
+    if (aiCommentsToggleEnabled) {
       handleAiReply(commentId);
     }
 
@@ -88,7 +91,7 @@ export const DesktopStickyInput = (props: CommentEditorProps) => {
     }, 2000);
 
     return commentId;
-  }, [handleSubmitComment, useAiStreaming, handleAiReply]);
+  }, [handleSubmitComment, aiCommentsToggleEnabled, handleAiReply]);
 
   const useExpandedEditor = focused || isReplying;
 
@@ -97,8 +100,8 @@ export const DesktopStickyInput = (props: CommentEditorProps) => {
     ...props,
     shouldFocus: true,
     onCancel: handleCancel,
-    useAiStreaming,
-    setUseAiStreaming,
+    aiCommentsToggleEnabled,
+    setAICommentsToggleEnabled,
     handleSubmitComment: handleEnhancedSubmit,
     onAiReply: handleAiReply,
     streamingReplyIds,
@@ -137,7 +140,7 @@ export const DesktopStickyInput = (props: CommentEditorProps) => {
                 outline: 'none',
               }}
             />
-            {aiCommentsEnabled && (
+            {aiCommentsFeatureEnabled && (
               <div
                 style={{
                   marginLeft: '12px',
@@ -148,7 +151,7 @@ export const DesktopStickyInput = (props: CommentEditorProps) => {
               >
                 <CWToggle
                   className="ai-toggle"
-                  checked={useAiStreaming}
+                  checked={aiCommentsToggleEnabled}
                   onChange={handleAiToggle}
                   icon="sparkle"
                   size="xs"

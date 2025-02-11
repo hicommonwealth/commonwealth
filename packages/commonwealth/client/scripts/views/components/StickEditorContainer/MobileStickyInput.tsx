@@ -14,7 +14,8 @@ import './MobileStickyInput.scss';
 export const MobileStickyInput = (props: CommentEditorProps) => {
   const { handleSubmitComment } = props;
   const [focused, setFocused] = useState(false);
-  const { useAiStreaming, setUseAiStreaming } = useAiToggleState();
+  const { aiCommentsToggleEnabled, setAICommentsToggleEnabled } =
+    useAiToggleState();
   const [streamingReplyIds, setStreamingReplyIds] = useState<number[]>([]);
 
   const handleAiReply = useCallback(
@@ -39,7 +40,7 @@ export const MobileStickyInput = (props: CommentEditorProps) => {
     }
 
     // If AI mode is enabled, trigger the streaming reply
-    if (useAiStreaming === true) {
+    if (aiCommentsToggleEnabled) {
       console.log(
         'MobileStickyInput - AI streaming is enabled, triggering reply',
       );
@@ -52,7 +53,7 @@ export const MobileStickyInput = (props: CommentEditorProps) => {
 
     // Use the new listenForComment function
     try {
-      await listenForComment(commentId, useAiStreaming === true);
+      await listenForComment(commentId, aiCommentsToggleEnabled);
       console.log(
         'MobileStickyInput - Successfully jumped to comment:',
         commentId,
@@ -62,7 +63,7 @@ export const MobileStickyInput = (props: CommentEditorProps) => {
     }
 
     return commentId;
-  }, [handleSubmitComment, useAiStreaming, handleAiReply]);
+  }, [handleSubmitComment, aiCommentsToggleEnabled, handleAiReply]);
 
   const handleFocused = useCallback(() => {
     setFocused(true);
@@ -86,8 +87,8 @@ export const MobileStickyInput = (props: CommentEditorProps) => {
           {...props}
           shouldFocus={true}
           onCancel={handleCancel}
-          useAiStreaming={useAiStreaming}
-          setUseAiStreaming={setUseAiStreaming}
+          aiCommentsToggleEnabled={aiCommentsToggleEnabled}
+          setAICommentsToggleEnabled={setAICommentsToggleEnabled}
           handleSubmitComment={customHandleSubmitComment}
           onAiReply={handleAiReply}
           streamingReplyIds={streamingReplyIds}
@@ -101,8 +102,8 @@ export const MobileStickyInput = (props: CommentEditorProps) => {
       <MobileInput
         {...props}
         onFocus={handleFocused}
-        useAiStreaming={useAiStreaming}
-        setUseAiStreaming={setUseAiStreaming}
+        aiCommentsToggleEnabled={aiCommentsToggleEnabled}
+        setAICommentsToggleEnabled={setAICommentsToggleEnabled}
       />
     </div>,
     parent,

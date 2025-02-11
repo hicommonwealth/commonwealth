@@ -64,8 +64,9 @@ const EditProfile = () => {
   });
 
   const enableApiKeyManagement = useFlag('manageApiKeys');
-  const { userAiEnabled, setUserAiEnabled } = useAiToggleState();
-  const aiCommentsEnabled = useFlag('aiComments');
+  const { aiInteractionsToggleEnabled, setAIInteractionsToggleEnabled } =
+    useAiToggleState();
+  const aiCommentsFeatureEnabled = useFlag('aiComments');
 
   const { preferenceTags, setPreferenceTags, toggleTagFromSelection } =
     usePreferenceTags();
@@ -399,7 +400,7 @@ const EditProfile = () => {
               title="Beta Features"
               description="Enable experimental features and help us test new functionality."
             >
-              {aiCommentsEnabled && (
+              {aiCommentsFeatureEnabled && (
                 <div className="beta-features-section">
                   <div className="beta-feature-item">
                     <div className="beta-feature-header">
@@ -408,8 +409,12 @@ const EditProfile = () => {
                       </CWText>
                       <CWToggle
                         className="ai-toggle"
-                        checked={userAiEnabled}
-                        onChange={() => setUserAiEnabled(!userAiEnabled)}
+                        checked={aiInteractionsToggleEnabled}
+                        onChange={() =>
+                          setAIInteractionsToggleEnabled(
+                            !aiInteractionsToggleEnabled,
+                          )
+                        }
                         icon="sparkle"
                         size="xs"
                         iconColor="#757575"

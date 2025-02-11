@@ -28,8 +28,8 @@ export type CommentEditorProps = {
   shouldFocus?: boolean;
   tooltipText?: string;
   isReplying?: boolean;
-  useAiStreaming?: boolean;
-  setUseAiStreaming?: (value: boolean) => void;
+  aiCommentsToggleEnabled?: boolean;
+  setAICommentsToggleEnabled?: (value: boolean) => void;
   onAiReply?: (commentId: number) => void;
   onCommentCreated?: (commentId: number, hasAI: boolean) => void;
   replyingToAuthor?: string;
@@ -48,8 +48,8 @@ const CommentEditor = ({
   author,
   shouldFocus,
   tooltipText,
-  useAiStreaming: initialAiStreaming,
-  setUseAiStreaming: onAiStreamingChange,
+  aiCommentsToggleEnabled: initialAiStreaming,
+  setAICommentsToggleEnabled: onAiStreamingChange,
   onAiReply,
   onCommentCreated,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -57,12 +57,16 @@ const CommentEditor = ({
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   streamingReplyIds,
 }: CommentEditorProps) => {
-  const { useAiStreaming, setUseAiStreaming, aiCommentsEnabled } =
-    useAiToggleState();
+  const {
+    aiCommentsToggleEnabled,
+    setAICommentsToggleEnabled,
+    aiCommentsFeatureEnabled,
+  } = useAiToggleState();
 
   // Use the prop values if provided, otherwise use the hook values
-  const effectiveAiStreaming = initialAiStreaming ?? useAiStreaming;
-  const effectiveSetAiStreaming = onAiStreamingChange ?? setUseAiStreaming;
+  const effectiveAiStreaming = initialAiStreaming ?? aiCommentsToggleEnabled;
+  const effectiveSetAiStreaming =
+    onAiStreamingChange ?? setAICommentsToggleEnabled;
 
   const handleAiToggle = useCallback(() => {
     if (effectiveSetAiStreaming) {
@@ -184,7 +188,7 @@ const CommentEditor = ({
           </CWText>
         </div>
         <div className="attribution-right-content">
-          {aiCommentsEnabled && (
+          {aiCommentsFeatureEnabled && (
             <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
               <CWToggle
                 className="ai-toggle"

@@ -123,7 +123,7 @@ export const CommentCard = ({
   const userOwnsComment = comment.user_id === user.id;
   const [streamingText, setStreamingText] = useState('');
   const { generateComment } = useGenerateCommentText();
-  const { aiCommentsEnabled } = useAiToggleState();
+  const { aiCommentsFeatureEnabled } = useAiToggleState();
   const { mutateAsync: createComment } = useCreateCommentMutation({
     threadId: comment.thread_id,
     communityId: comment.community_id,
@@ -464,7 +464,7 @@ export const CommentCard = ({
                         void onReply?.();
                       }}
                     />
-                    {aiCommentsEnabled && (
+                    {aiCommentsFeatureEnabled && (
                       <CWThreadAction
                         action="ai-reply"
                         label="AI Reply"

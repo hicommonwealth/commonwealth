@@ -20,7 +20,7 @@ export const StickyEditorContainer = ({
   isReplying,
   replyingToAuthor,
   onCommentCreated,
-  useAiStreaming,
+  aiCommentsToggleEnabled,
 }: CommentEditorProps) => {
   const { isWindowExtraSmall } = useBrowserWindow({});
 
@@ -40,7 +40,7 @@ export const StickyEditorContainer = ({
       isReplying={isReplying}
       replyingToAuthor={replyingToAuthor}
       onCommentCreated={onCommentCreated}
-      useAiStreaming={useAiStreaming}
+      aiCommentsToggleEnabled={aiCommentsToggleEnabled}
     />
   ) : (
     <DesktopStickyInput
@@ -58,7 +58,7 @@ export const StickyEditorContainer = ({
       isReplying={isReplying}
       replyingToAuthor={replyingToAuthor}
       onCommentCreated={onCommentCreated}
-      useAiStreaming={useAiStreaming}
+      aiCommentsToggleEnabled={aiCommentsToggleEnabled}
     />
   );
 };
