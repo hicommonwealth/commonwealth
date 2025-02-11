@@ -93,6 +93,7 @@ import { ComponentType } from '../../types';
 import CWIconButton from '../CWIconButton';
 import CWPopover, { usePopover } from '../CWPopover';
 
+import { TopicWeightedVoting } from '@hicommonwealth/schemas';
 import { prettyVoteWeight } from 'shared/adapters/currency';
 import './CWTable.scss';
 
@@ -112,7 +113,7 @@ export type CWTableColumnInfo = {
     content: string;
   };
   numeric: boolean;
-  isVoteWeight?: boolean;
+  weightedVoting?: TopicWeightedVoting | null | undefined;
   sortable: boolean;
   chronological?: boolean;
   customElementKey?: string;
@@ -194,8 +195,8 @@ export const CWTable = ({
               if (col.numeric) {
                 return (
                   <div className="numeric">
-                    {col.isVoteWeight
-                      ? prettyVoteWeight(numericColVal)
+                    {col.weightedVoting
+                      ? prettyVoteWeight(numericColVal, col.weightedVoting)
                       : numericColVal}
                   </div>
                 );

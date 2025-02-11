@@ -1,4 +1,5 @@
 import { calculateVoteWeight } from '@hicommonwealth/evm-protocols';
+import { TopicWeightedVoting } from '@hicommonwealth/schemas';
 import BN from 'bn.js';
 
 // duplicated in helpers.ts
@@ -59,33 +60,43 @@ export function formatBigNumberShort(num: number, numDecimals: number): string {
 
 /**
  * Converts a wei value to a human-readable vote weight string.
- *
- * @param wei - The full non-decimal wei value as a string.
- * @param multiplier - Optional. A multiplier applied to the vote weight. Defaults to 1.
- * @param numDecimalsOverride - Optional. Sets override number of decimals.
- * @returns The formatted vote weight as a string.
  */
 export const prettyVoteWeight = (
   wei: string,
+  weightType?: TopicWeightedVoting | null | undefined,
   multiplier: number = 1,
-  numDecimalsOverride?: number,
+  decimalsOverride?: number,
 ): string => {
   const weiStr = parseFloat(wei).toLocaleString('fullwide', {
     useGrouping: false,
   });
-  const weiValue = calculateVoteWeight(weiStr, multiplier || 1);
-  const n = Number(weiValue) / 1e18;
+  const weiValue =
+    weightType === TopicWeightedVoting.Stake
+      ? parseInt(wei) * multiplier
+      : calculateVoteWeight(weiStr, multiplier || 1);
 
+  // for non-weighted and stake, just render as-is
+  if (!weightType || weightType === TopicWeightedVoting.Stake) {
+    return parseFloat((weiValue || 0).toString()).toString();
+  }
+
+  const n = Number(weiValue) / 1e18;
+  if (n === 0) {
+    return '0';
+  }
   if (n < 0.000001) {
     return '0.0…';
   }
 
-  const numDecimals = n > 10 ? 3 : 6;
-
+  let numDecimals = n > 10 ? 3 : 6;
+  if (typeof decimalsOverride === 'number') {
+    numDecimals = decimalsOverride;
+  }
   if (n > 1000) {
     return formatBigNumberShort(n, numDecimals);
   }
-  return n.toFixed(numDecimals);
+  // remove trailing zeros after decimal
+  return n.toFixed(numDecimals).replace(/\.?0+$/, '');
 };
 
 const nf = new Intl.NumberFormat();

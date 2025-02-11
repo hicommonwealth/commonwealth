@@ -26,7 +26,7 @@ type ViewUpvotesDrawerProps = {
   publishDate: moment.Moment;
   isOpen: boolean;
   setIsOpen: Dispatch<SetStateAction<boolean>>;
-  topicWeight?: TopicWeightedVoting | null;
+  topicWeight?: TopicWeightedVoting | null | undefined;
 };
 
 type Upvoter = {
@@ -47,7 +47,6 @@ const columns: CWTableColumnInfo[] = [
   {
     key: 'voteWeight',
     header: 'Vote Weight',
-    isVoteWeight: true,
     numeric: true,
     sortable: true,
   },
@@ -70,7 +69,14 @@ export const ViewUpvotesDrawer = ({
   topicWeight,
 }: ViewUpvotesDrawerProps) => {
   const tableState = useCWTableState({
-    columns,
+    columns: columns.map((c) =>
+      c.key === 'voteWeight'
+        ? {
+            ...c,
+            weightedVoting: topicWeight,
+          }
+        : c,
+    ),
     initialSortColumn: 'timestamp',
     initialSortDirection: APIOrderDirection.Desc,
   });
@@ -182,6 +188,7 @@ export const ViewUpvotesDrawer = ({
                   <CWText type="b2">
                     {prettyVoteWeight(
                       getVoteWeightTotal(reactorData).toString(),
+                      topicWeight,
                     )}
                   </CWText>
                 </div>

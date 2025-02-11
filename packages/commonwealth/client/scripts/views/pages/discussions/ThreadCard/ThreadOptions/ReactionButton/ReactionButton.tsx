@@ -137,7 +137,12 @@ export const ReactionButton = ({
     }
   };
 
-  const formattedVoteCount = prettyVoteWeight(reactionWeightsSum.toString(), 1);
+  const formattedVoteCount = prettyVoteWeight(
+    reactionWeightsSum,
+    thread.topic!.weighted_voting,
+    thread.topic!.vote_weight_multiplier || 1,
+    size === 'big' ? 1 : 7,
+  );
 
   return (
     <>

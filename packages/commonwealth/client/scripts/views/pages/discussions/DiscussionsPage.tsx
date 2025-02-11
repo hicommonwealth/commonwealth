@@ -232,7 +232,11 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
 
   const voteWeight =
     isTopicWeighted && voteBalance
-      ? prettyVoteWeight(formatDecimalToWei(voteBalance, 1))
+      ? prettyVoteWeight(
+          formatDecimalToWei(voteBalance),
+          topicObj!.weighted_voting,
+          topicObj!.vote_weight_multiplier || 1,
+        )
       : '';
 
   const updateSelectedView = (activeTab: string) => {
