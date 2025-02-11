@@ -1,11 +1,6 @@
 import { dispose, handleEvent } from '@hicommonwealth/core';
-import {
-  ContestWorker,
-  commonProtocol,
-  emitEvent,
-  models,
-} from '@hicommonwealth/model';
-import { EventNames } from '@hicommonwealth/schemas';
+import * as evm from '@hicommonwealth/evm-protocols';
+import { ContestWorker, emitEvent, models } from '@hicommonwealth/model';
 import { Contests } from 'model/src/contest';
 import { literal } from 'sequelize';
 import { afterAll, beforeAll, describe, expect, test, vi } from 'vitest';
@@ -92,12 +87,12 @@ describe.skip('Check Contests', () => {
 
   test('Should add onchain vote to unvoted contest', async () => {
     const addContentStub = vi
-      .spyOn(commonProtocol.contestHelper, 'addContentBatch')
+      .spyOn(evm, 'addContentBatch')
       .mockResolvedValue([]);
 
     await emitEvent(models.Outbox, [
       {
-        event_name: EventNames.ThreadCreated,
+        event_name: 'ThreadCreated',
         event_payload: {
           id: threadId,
           community_id: communityId,
@@ -132,7 +127,7 @@ describe.skip('Check Contests', () => {
 
     await emitEvent(models.Outbox, [
       {
-        event_name: EventNames.ContestContentAdded,
+        event_name: 'ContestContentAdded',
         event_payload: {
           content_id: 0,
           content_url: '/ethhh/discussion/888',
@@ -145,7 +140,7 @@ describe.skip('Check Contests', () => {
     await drainOutbox(['ContestContentAdded'], Contests);
 
     const voteContentStub = vi
-      .spyOn(commonProtocol.contestHelper, 'voteContentBatch')
+      .spyOn(evm, 'voteContentBatch')
       .mockResolvedValue([]);
 
     // simulate contest will end in 2 hours
@@ -162,7 +157,7 @@ describe.skip('Check Contests', () => {
     );
 
     await handleEvent(ContestWorker(), {
-      name: EventNames.ContestRolloverTimerTicked,
+      name: 'ContestRolloverTimerTicked',
       payload: {},
     });
 
@@ -183,14 +178,14 @@ describe.skip('Check Contests', () => {
     );
 
     await handleEvent(ContestWorker(), {
-      name: EventNames.ContestRolloverTimerTicked,
+      name: 'ContestRolloverTimerTicked',
       payload: {},
     });
 
     // vote should have been cast
     expect(voteContentStub).toHaveBeenCalled();
-    const [, addr] = voteContentStub.mock.calls[0];
-    expect(addr.startsWith('0x'), 'using valid wallet address').to.be.true;
-    expect(addr).has.length(42, 'using valid wallet address');
+    const [{ voter }] = voteContentStub.mock.calls[0];
+    expect(voter.startsWith('0x'), 'using valid wallet address').to.be.true;
+    expect(voter).has.length(42, 'using valid wallet address');
   });
 });

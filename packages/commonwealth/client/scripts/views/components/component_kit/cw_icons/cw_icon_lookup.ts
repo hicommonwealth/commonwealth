@@ -13,6 +13,7 @@ import {
   BellSimpleSlash,
   BookOpenText,
   Brain,
+  CalendarBlank,
   Cardholder,
   CaretDoubleLeft,
   CaretDoubleRight,
@@ -37,6 +38,7 @@ import {
   Compass,
   Copy,
   CopySimple,
+  DiscordLogo,
   DotsThreeVertical,
   Download,
   DownloadSimple,
@@ -88,12 +90,14 @@ import {
   TextUnderline,
   Timer,
   Trash,
+  Triangle,
   Trophy,
   TwitterLogo,
   UserSwitch,
   Users,
   UsersThree,
   Warning,
+  XLogo,
 } from '@phosphor-icons/react';
 import * as CustomIcons from './cw_custom_icons';
 import { CWPara } from './cw_custom_icons';
@@ -149,6 +153,7 @@ export const iconLookup = {
   bellRinging: withPhosphorIcon(BellSimpleRinging),
   bellMuted: withPhosphorIcon(BellSimpleSlash),
   bookOpenText: withPhosphorIcon(BookOpenText),
+  calenderBlank: withPhosphorIcon(CalendarBlank),
   cardholder: withPhosphorIcon(Cardholder),
   cautionCircle: Icons.CWCautionCircle,
   cautionTriangle: Icons.CWCautionTriangle,
@@ -278,6 +283,7 @@ export const iconLookup = {
   trophy: withPhosphorIcon(Trophy),
   timer: withPhosphorIcon(Timer),
   transfer: Icons.CWTransfer,
+  triangle: withPhosphorIcon(Triangle),
   // trash: Icons.CWTrash,
   trash: withPhosphorIcon(Trash),
   treasuryProposal: Icons.CWTreasuryProposal,
@@ -303,6 +309,8 @@ export const iconLookup = {
   viewAll: withPhosphorIcon(Rows),
   viewOverView: withPhosphorIcon(CirclesFour),
   kanban: withPhosphorIcon(Kanban),
+  xTwitter: withPhosphorIcon(XLogo),
+  discordLogo: withPhosphorIcon(DiscordLogo),
 };
 
 export const customIconLookup = {

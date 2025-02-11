@@ -1,5 +1,9 @@
 import { commonProtocol } from '@hicommonwealth/evm-protocols';
-import { ChainBase } from '@hicommonwealth/shared';
+import {
+  ChainBase,
+  UNISWAP_CONVENIENCE_FEE_PERCENT,
+  UNISWAP_CONVENIENCE_FEE_RECIPIENT_ADDRESS,
+} from '@hicommonwealth/shared';
 import { Theme } from '@uniswap/widgets';
 import WebWalletController from 'controllers/app/web_wallets';
 import { ethers } from 'ethers';
@@ -117,11 +121,11 @@ const useUniswapTradeModal = ({ tradeConfig }: UseUniswapTradeModalProps) => {
             ?.list || []),
           {
             name: tradeConfig.token.name,
-            address: tradeConfig.token.token_address,
+            address: tradeConfig.token.contract_address,
             symbol: tradeConfig.token.symbol,
-            decimals: 18,
+            decimals: tradeConfig.token.decimals,
             chainId: baseNode.ethChainId,
-            logoURI: tradeConfig.token.icon_url || '',
+            logoURI: tradeConfig.token.logo || '',
           },
         ]);
 
@@ -153,7 +157,14 @@ const useUniswapTradeModal = ({ tradeConfig }: UseUniswapTradeModalProps) => {
       tokensList: uniswapTokensList,
       defaultTokenAddress: {
         input: 'NATIVE', // special address for native token of default chain
-        output: tradeConfig.token.token_address,
+        output: tradeConfig.token.contract_address,
+      },
+      convenienceFee: {
+        percentage: UNISWAP_CONVENIENCE_FEE_PERCENT,
+        recipient: {
+          // chainId to address map, for all receipts of convenience fee
+          [baseNode.ethChainId || 0]: UNISWAP_CONVENIENCE_FEE_RECIPIENT_ADDRESS,
+        },
       },
       routerURLs: uniswapRouterURLs,
     },

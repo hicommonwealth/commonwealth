@@ -52,15 +52,15 @@ export function SignIn(): Command<typeof schemas.SignIn> {
       },
     },
     body: async ({ actor, payload }) => {
-      if (!actor.user.auth) throw Error('Invalid address');
+      if (!actor.user.id || !actor.user.auth) throw Error('Invalid address');
 
       const { community_id, wallet_id, referrer_address, session, block_info } =
         payload;
       const { base, encodedAddress, ss58Prefix, hex, existingHexUserId } = actor
         .user.auth as VerifiedAddress;
 
-      let user_id =
-        (actor.user?.id ?? 0) > 0 ? actor.user.id : (existingHexUserId ?? null);
+      const was_signed_in = actor.user.id > 0;
+      let user_id = was_signed_in ? actor.user.id : (existingHexUserId ?? null);
 
       await verifySessionSignature(
         deserializeCanvas(session),
@@ -99,7 +99,11 @@ export function SignIn(): Command<typeof schemas.SignIn> {
             });
             if (!existing) {
               const user = await models.User.create(
-                { email: null, profile: {} },
+                {
+                  email: null,
+                  profile: {},
+                  referred_by_address: referrer_address,
+                },
                 { transaction },
               );
               if (!user) throw new Error('Failed to create user');
@@ -141,20 +145,19 @@ export function SignIn(): Command<typeof schemas.SignIn> {
 
           const transferredUser = await transferOwnership(addr, transaction);
 
-          const events: schemas.EventPairs[] = [];
+          const events = [] as Array<schemas.EventPairs>;
           new_address &&
             events.push({
-              event_name: schemas.EventNames.CommunityJoined,
+              event_name: 'CommunityJoined',
               event_payload: {
                 community_id,
                 user_id: addr.user_id!,
                 created_at: addr.created_at!,
-                referrer_address,
               },
             });
           new_user &&
             events.push({
-              event_name: schemas.EventNames.UserCreated,
+              event_name: 'UserCreated',
               event_payload: {
                 community_id,
                 address: addr.address,
@@ -165,7 +168,7 @@ export function SignIn(): Command<typeof schemas.SignIn> {
             });
           transferredUser &&
             events.push({
-              event_name: schemas.EventNames.AddressOwnershipTransferred,
+              event_name: 'AddressOwnershipTransferred',
               event_payload: {
                 community_id,
                 address: addr.address,
@@ -199,6 +202,7 @@ export function SignIn(): Command<typeof schemas.SignIn> {
         ...addr.toJSON(),
         community_base: base,
         community_ss58_prefix: ss58Prefix,
+        was_signed_in,
         user_created,
         address_created,
         first_community,

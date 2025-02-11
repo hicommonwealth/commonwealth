@@ -1,4 +1,4 @@
-import { EventNames, Events } from '@hicommonwealth/schemas';
+import { Events } from '@hicommonwealth/schemas';
 import { Readable } from 'stream';
 import { z } from 'zod';
 import {
@@ -11,6 +11,9 @@ import {
   ChainProposalsNotification,
   CommentCreatedNotification,
   CommunityStakeNotification,
+  ContestEndedNotification,
+  ContestNotification,
+  QuestStartedNotification,
   SnapshotProposalCreatedNotification,
   UpvoteNotification,
   UserMentionedNotification,
@@ -153,9 +156,16 @@ export interface Analytics extends Disposable {
   track(event: string, payload: AnalyticsOptions): void;
 }
 
+/**
+ * Broker Port
+ */
+export enum RoutingKeyTags {
+  Contest = 'contest',
+}
+
 export type RetryStrategyFn = (
   err: Error | InvalidInput | CustomRetryStrategyError,
-  topic: BrokerSubscriptions,
+  topic: string,
   content: any,
   ackOrNackFn: (...args: any[]) => void,
   log: ILogger,
@@ -196,32 +206,9 @@ export class CustomRetryStrategyError extends Error {
   }
 }
 
-export enum BrokerPublications {
-  MessageRelayer = 'MessageRelayer',
-  DiscordListener = 'DiscordMessage',
-}
-
-export enum BrokerSubscriptions {
-  DiscordBotPolicy = 'DiscordBotPolicy',
-  ChainEvent = 'ChainEvent',
-  NotificationsProvider = 'NotificationsProvider',
-  NotificationsSettings = 'NotificationsSettings',
-  ContestWorkerPolicy = 'ContestWorkerPolicy',
-  ContestProjection = 'ContestProjection',
-  FarcasterWorkerPolicy = 'FarcasterWorkerPolicy',
-  XpProjection = 'XpProjection',
-}
-
-/**
- * Broker Port
- */
-export enum RoutingKeyTags {
-  Contest = 'contest',
-}
-
 type Concat<S1 extends string, S2 extends string> = `${S1}.${S2}`;
 
-type EventNamesType = `${EventNames}`;
+type EventNamesType = `${Events}`;
 
 type RoutingKeyTagsType = `${RoutingKeyTags}`;
 
@@ -230,14 +217,10 @@ export type RoutingKey =
   | Concat<EventNamesType, RoutingKeyTagsType>;
 
 export interface Broker extends Disposable {
-  publish<Name extends Events>(
-    topic: BrokerPublications,
-    event: EventContext<Name>,
-  ): Promise<boolean>;
+  publish<Name extends Events>(event: EventContext<Name>): Promise<boolean>;
 
   subscribe<Inputs extends EventSchemas>(
-    topic: BrokerSubscriptions,
-    handler: EventsHandlerMetadata<Inputs>,
+    consumer: () => EventsHandlerMetadata<Inputs>,
     retryStrategy?: RetryStrategyFn,
     hooks?: {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -250,6 +233,9 @@ export interface Broker extends Disposable {
   getRoutingKey<Name extends Events>(event: EventContext<Name>): RoutingKey;
 }
 
+/**
+ * External Blob Storage Port
+ */
 export type BlobType = string | Uint8Array | Buffer | Readable;
 export const BlobBuckets = [
   'assets',
@@ -260,9 +246,6 @@ export const BlobBuckets = [
 ] as const;
 export type BlobBucket = (typeof BlobBuckets)[number];
 
-/**
- * External Blob Storage Port
- */
 export interface BlobStorage extends Disposable {
   upload(options: {
     key: string;
@@ -294,6 +277,12 @@ export enum WorkflowKeys {
   EmailRecap = 'email-recap',
   EmailDigest = 'email-digest',
   Webhooks = 'webhooks',
+  // Contest events
+  ContestStarted = 'contest-started',
+  ContestEnding = 'contest-ending',
+  ContestEnded = 'contest-ended',
+  // Quest events
+  QuestStarted = 'quest-started',
 }
 
 export enum KnockChannelIds {
@@ -311,12 +300,25 @@ export type NotificationsProviderRecipient =
 
 type BaseNotifProviderOptions = {
   users: { id: string; email?: string }[];
-  actor?: { id: string; email?: string };
+  actor?: {
+    id: string;
+    profile_name: string;
+    profile_url: string;
+    email?: string;
+    profile_avatar_url?: string;
+  };
+};
+
+export type NotificationUser = {
+  id: string;
+  webhook_url?: string;
+  destination?: string;
+  signing_key?: string;
 };
 
 type WebhookProviderOptions = {
   key: WorkflowKeys.Webhooks;
-  users: { id: string; webhook_url: string; destination: string }[];
+  users: NotificationUser[];
   data: z.infer<typeof WebhookNotification>;
 };
 
@@ -346,6 +348,22 @@ export type NotificationsProviderTriggerOptions =
         | {
             data: z.infer<typeof UpvoteNotification>;
             key: WorkflowKeys.NewUpvotes;
+          }
+        | {
+            data: z.infer<typeof ContestNotification>;
+            key: WorkflowKeys.ContestStarted;
+          }
+        | {
+            data: z.infer<typeof ContestNotification>;
+            key: WorkflowKeys.ContestEnding;
+          }
+        | {
+            data: z.infer<typeof ContestEndedNotification>;
+            key: WorkflowKeys.ContestEnded;
+          }
+        | {
+            data: z.infer<typeof QuestStartedNotification>;
+            key: WorkflowKeys.QuestStarted;
           }
       ))
   | WebhookProviderOptions;

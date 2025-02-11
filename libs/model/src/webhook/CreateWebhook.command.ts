@@ -5,8 +5,15 @@ import {
   type Command,
 } from '@hicommonwealth/core';
 import * as schemas from '@hicommonwealth/schemas';
-import { getWebhookDestination } from '@hicommonwealth/shared';
+import { WebhookSupportedEvents } from '@hicommonwealth/schemas';
+import {
+  WebhookDestinations,
+  getElizaUserId,
+  getWebhookDestination,
+} from '@hicommonwealth/shared';
+import { randomBytes } from 'crypto';
 import fetch from 'node-fetch';
+import { z } from 'zod';
 import { models } from '../database';
 import { authRoles } from '../middleware';
 
@@ -15,11 +22,14 @@ const log = logger(import.meta);
 const Errors = {
   InvalidWebhookUrl:
     'Invalid Webhook url. Must be one of: https://api.telegram.org/*, ' +
-    'https://hooks.slack.com/services/*, https://hooks.zapier.com/hooks/*, https://discord.com/api/webhooks/*',
+    'https://hooks.slack.com/services/*, https://hooks.zapier.com/hooks/*,' +
+    ' https://discord.com/api/webhooks/*, https://*/eliza/[user-id]',
   WebhookExists: 'The provided webhook already exists for this community',
   MissingChannelIdTelegram: 'The Telegram url is missing a channel id',
-  WebhookNotFound: 'The Webhook does not exist',
+  WebhookNotFound: 'The Webhook endpoint was not found (404 Not Found)',
   UnauthorizedWebhooks: 'Cannot make requests to unauthorized webhooks',
+  ElizaUserNotFound: 'Eliza user not found',
+  ElizaAddressNotFound: 'Eliza address not found',
 };
 
 export function CreateWebhook(): Command<typeof schemas.CreateWebhook> {
@@ -30,7 +40,7 @@ export function CreateWebhook(): Command<typeof schemas.CreateWebhook> {
     body: async ({ payload }) => {
       const destination = getWebhookDestination(payload.webhookUrl);
 
-      if (destination === 'unknown')
+      if (destination === WebhookDestinations.Unknown)
         throw new InvalidInput(Errors.InvalidWebhookUrl);
 
       const existingWebhook = await models.Webhook.findOne({
@@ -44,7 +54,7 @@ export function CreateWebhook(): Command<typeof schemas.CreateWebhook> {
       if (existingWebhook) throw new InvalidState(Errors.WebhookExists);
 
       // Telegram webhook urls are a workaround (all we need is the chat/group id)
-      if (destination !== 'telegram') {
+      if (destination !== WebhookDestinations.Telegram) {
         let res: fetch.Response;
         try {
           res = await fetch(payload.webhookUrl, { method: 'GET' });
@@ -60,11 +70,40 @@ export function CreateWebhook(): Command<typeof schemas.CreateWebhook> {
         }
       }
 
+      const events: z.infer<typeof WebhookSupportedEvents>[] = [];
+      if (destination === WebhookDestinations.Eliza) {
+        const elizaUserId = getElizaUserId(payload.webhookUrl);
+        const elizaUser = await models.User.findOne({
+          where: {
+            id: elizaUserId,
+          },
+          include: [
+            {
+              model: models.Address,
+              required: false,
+              where: {
+                community_id: payload.community_id,
+              },
+            },
+          ],
+        });
+        if (!elizaUser) throw new InvalidState(Errors.ElizaUserNotFound);
+        if (
+          !Array.isArray(elizaUser.Addresses) ||
+          elizaUser.Addresses.length < 1
+        )
+          throw new InvalidState(Errors.ElizaAddressNotFound);
+
+        // automatically add UserMentioned for Eliza Webhooks
+        events.push('UserMentioned', 'CommentCreated');
+      }
+
       const webhook = await models.Webhook.create({
         community_id: payload.community_id,
         url: payload.webhookUrl,
         destination,
-        events: [],
+        events,
+        signing_key: randomBytes(32).toString('hex'),
       });
 
       return webhook.get({ plain: true });

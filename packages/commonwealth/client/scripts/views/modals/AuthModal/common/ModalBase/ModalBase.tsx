@@ -1,6 +1,9 @@
 import { ChainBase, WalletId, WalletSsoSource } from '@hicommonwealth/shared';
 import commonLogo from 'assets/img/branding/common-logo.svg';
+import { notifyError } from 'client/scripts/controllers/app/notifications';
+import useFarcasterStore from 'client/scripts/state/ui/farcaster';
 import clsx from 'clsx';
+import { isMobileApp } from 'hooks/useReactNativeWebView';
 import React, { Fragment, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import app from 'state';
@@ -51,7 +54,9 @@ const MODAL_COPY = {
   },
 };
 
-const SSO_OPTIONS: AuthSSOs[] = [
+const mobileApp = isMobileApp();
+
+const SSO_OPTIONS_DEFAULT: AuthSSOs[] = [
   'google',
   'discord',
   'x',
@@ -61,6 +66,15 @@ const SSO_OPTIONS: AuthSSOs[] = [
   'farcaster',
   'SMS',
 ] as const;
+
+const SSO_OPTIONS_MOBILE: AuthSSOs[] = [
+  'google',
+  'apple',
+  'email',
+  'SMS',
+] as const;
+
+const SSO_OPTIONS = mobileApp ? SSO_OPTIONS_MOBILE : SSO_OPTIONS_DEFAULT;
 
 /**
  * AuthModal base component with customizable options, callbacks, layouts and auth options display strategy.
@@ -87,8 +101,12 @@ const ModalBase = ({
   showAuthOptionTypesFor,
   bodyClassName,
   onSignInClick,
+  triggerOpenEVMWalletsSubModal,
+  isUserFromWebView = false,
 }: ModalBaseProps) => {
   const copy = MODAL_COPY[layoutType];
+
+  const { farcasterContext, signInToFarcasterFrame } = useFarcasterStore();
 
   const [activeTabIndex, setActiveTabIndex] = useState<number>(
     showAuthOptionTypesFor?.includes('sso') &&
@@ -96,8 +114,13 @@ const ModalBase = ({
       ? 1
       : 0,
   );
-  const [isEVMWalletsModalVisible, setIsEVMWalletsModalVisible] =
-    useState(false);
+  const [isEVMWalletsModalVisible, setIsEVMWalletsModalVisible] = useState(
+    () => {
+      return triggerOpenEVMWalletsSubModal
+        ? triggerOpenEVMWalletsSubModal
+        : false;
+    },
+  );
   const [isAuthenticatingWithEmail, setIsAuthenticatingWithEmail] =
     useState(false);
   const [isAuthenticatingWithSMS, setIsAuthenticatingWithSMS] = useState(false);
@@ -112,7 +135,7 @@ const ModalBase = ({
   };
 
   const handleSuccess = async (_, isNewlyCreated) => {
-    await onSuccess?.(isNewlyCreated);
+    await onSuccess?.(isNewlyCreated, isUserFromWebView);
     await handleClose();
   };
 
@@ -126,13 +149,14 @@ const ModalBase = ({
     onSMSLogin,
     onWalletSelect,
     onSocialLogin,
+    onFarcasterLogin,
     onVerifyMobileWalletSignature,
   } = useAuthentication({
     withSessionKeyLoginFlow: layoutType === AuthModalType.RevalidateSession,
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     onModalClose: handleClose,
-    // eslint-disable-next-line @typescript-eslint/no-misused-promises
     onSuccess: handleSuccess,
+    isUserFromWebView: isUserFromWebView,
   });
 
   const filterWalletNames = (byChain: ChainBase) =>
@@ -223,6 +247,8 @@ const ModalBase = ({
     setActiveTabIndex((prevActiveTab) => {
       if (!shouldShowSSOOptions && prevActiveTab === 1) return 0;
 
+      if (isMobileApp()) return 1;
+
       if (showAuthOptionFor) {
         return SSO_OPTIONS.includes(showAuthOptionFor as AuthSSOs) ? 1 : 0;
       }
@@ -270,6 +296,16 @@ const ModalBase = ({
     }
   };
 
+  const handleFarcasterFrameSignIn = async () => {
+    try {
+      const { result, privateKey } = await signInToFarcasterFrame();
+      await onFarcasterLogin(result.signature, result.message, privateKey);
+    } catch (err) {
+      notifyError('Farcaster sign in failed');
+      console.error('Farcaster sign in failed:', err);
+    }
+  };
+
   const renderAuthButton = (option: AuthTypes) => {
     if (
       showAuthOptionFor &&
@@ -292,7 +328,9 @@ const ModalBase = ({
   return (
     <>
       <section className="ModalBase">
-        <CWIcon iconName="close" onClick={onClose} className="close-btn" />
+        {!isUserFromWebView && (
+          <CWIcon iconName="close" onClick={onClose} className="close-btn" />
+        )}
 
         <img src={commonLogo} className="logo" />
 
@@ -324,7 +362,9 @@ const ModalBase = ({
                       <CWTab
                         key={tab.name}
                         label={tab.name}
-                        isDisabled={isMagicLoading}
+                        isDisabled={
+                          isMagicLoading || (!!farcasterContext && index === 1)
+                        }
                         isSelected={tabsList[activeTabIndex].name === tab.name}
                         onClick={() => setActiveTabIndex(index)}
                       />
@@ -343,11 +383,21 @@ const ModalBase = ({
                   If email or SMS option is selected don't render SSO's list,
                   else render wallets/SSO's list based on activeTabIndex
                 */}
-                {(activeTabIndex === 0 ||
-                  (activeTabIndex === 1 &&
-                    !isAuthenticatingWithEmail &&
-                    !isAuthenticatingWithSMS)) &&
-                  tabsList[activeTabIndex].options.map(renderAuthButton)}
+
+                {farcasterContext ? (
+                  <AuthButton
+                    type="farcaster"
+                    onClick={() => {
+                      void handleFarcasterFrameSignIn().catch(console.error);
+                    }}
+                  />
+                ) : (
+                  (activeTabIndex === 0 ||
+                    (activeTabIndex === 1 &&
+                      !isAuthenticatingWithEmail &&
+                      !isAuthenticatingWithSMS)) &&
+                  tabsList[activeTabIndex].options.map(renderAuthButton)
+                )}
 
                 {/* If email option is selected from the SSO's list, show email form */}
                 {activeTabIndex === 1 && isAuthenticatingWithEmail && (
@@ -418,6 +468,8 @@ const ModalBase = ({
         canResetWalletConnect={isWalletConnectEnabled}
         // eslint-disable-next-line @typescript-eslint/no-misused-promises
         onResetWalletConnect={onResetWalletConnect}
+        isUserFromWebView={isUserFromWebView}
+        handleNextOrSkip={handleSuccess}
       />
       {/* Signature verification modal is only displayed on mobile */}
       <MobileWalletConfirmationSubModal

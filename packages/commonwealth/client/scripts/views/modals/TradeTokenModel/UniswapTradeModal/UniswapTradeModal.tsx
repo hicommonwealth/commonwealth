@@ -11,15 +11,15 @@ import {
   CWModalHeader,
 } from 'views/components/component_kit/new_designs/CWModal';
 import TokenIcon from '../TokenIcon';
-import { TradeTokenModalProps } from '../types';
 import './UniswapTradeModal.scss';
+import { UniswapTradeTokenModalProps } from './types';
 import useUniswapTradeModal from './useUniswapTradeModal';
 
 const UniswapTradeModal = ({
   isOpen,
   onModalClose,
   tradeConfig,
-}: TradeTokenModalProps) => {
+}: UniswapTradeTokenModalProps) => {
   const { uniswapWidget } = useUniswapTradeModal({ tradeConfig });
 
   return (
@@ -34,8 +34,8 @@ const UniswapTradeModal = ({
             label={
               <CWText type="h4" className="token-info">
                 Swap Token - {tradeConfig.token.symbol}{' '}
-                {tradeConfig.token.icon_url && (
-                  <TokenIcon size="large" url={tradeConfig.token.icon_url} />
+                {tradeConfig.token.logo && (
+                  <TokenIcon size="large" url={tradeConfig.token.logo} />
                 )}
               </CWText>
             }
@@ -56,6 +56,10 @@ const UniswapTradeModal = ({
                   }
                   defaultOutputTokenAddress={
                     uniswapWidget.defaultTokenAddress.output
+                  }
+                  convenienceFee={uniswapWidget.convenienceFee.percentage}
+                  convenienceFeeRecipient={
+                    uniswapWidget.convenienceFee.recipient
                   }
                   hideConnectionUI={true}
                   {...(uniswapWidget.provider && {

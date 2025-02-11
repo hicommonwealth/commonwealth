@@ -66,8 +66,9 @@ const FundContestForm = ({
       <div>
         <CWText type="h3">Fund your contest</CWText>
         <CWText className="description">
-          You can add funds directly to your contest using the form below. You
-          can deposit additional funds at any time using the contract address.
+          You can add funds directly to your contest using the form below. 10%
+          of the funds will be deducted as fees. You can deposit additional
+          funds at any time using the contract address.
         </CWText>
 
         <CWSelectList
@@ -152,7 +153,7 @@ const FundContestForm = ({
             buttonType="secondary"
             buttonAlt="green"
             onClick={handleTransferFunds}
-            disabled={!!amountError}
+            disabled={!!amountError || !selectedAddress?.value}
           />
         </div>
       </div>

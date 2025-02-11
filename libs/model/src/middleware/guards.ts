@@ -11,7 +11,12 @@ import {
   ThreadContext,
 } from '@hicommonwealth/schemas';
 import moment from 'moment';
-import type { AddressInstance, PollInstance, ThreadInstance } from '../models';
+import type {
+  AddressInstance,
+  CommentInstance,
+  PollInstance,
+  ThreadInstance,
+} from '../models';
 
 const log = logger(import.meta);
 
@@ -109,7 +114,7 @@ export function mustBeAuthorizedComment(
     throw new InvalidActor(actor, 'Not authorized comment');
   return context as CommentContext & {
     address: AddressInstance;
-    comment: ThreadInstance;
+    comment: CommentInstance;
     community_id: string;
     topic_id: number;
     thread_id: number;

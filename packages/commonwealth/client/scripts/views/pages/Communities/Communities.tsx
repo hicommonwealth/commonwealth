@@ -36,6 +36,7 @@ import {
   sortOrderLabelsToDirectionsMap,
 } from './FiltersDrawer';
 import IdeaLaunchpad from './IdeaLaunchpad';
+import QuestList from './QuestList';
 import TokensList from './TokensList';
 import { getCommunityCountsString } from './helpers';
 
@@ -47,7 +48,7 @@ type ExtendedCommunitySliceType = [
 
 const CommunitiesPage = () => {
   const containerRef = useRef();
-  const tokenizedCommunityEnabled = useFlag('tokenizedCommunity');
+  const launchpadEnabled = useFlag('launchpad');
 
   const {
     setModeOfManageCommunityStakeModal,
@@ -226,9 +227,9 @@ const CommunitiesPage = () => {
           <div className="description">
             <CWText
               type="h1"
-              {...(tokenizedCommunityEnabled && { fontWeight: 'semiBold' })}
+              {...(launchpadEnabled && { fontWeight: 'semiBold' })}
             >
-              Explore {tokenizedCommunityEnabled ? '' : 'Communities'}
+              Explore {launchpadEnabled ? '' : 'Communities'}
             </CWText>
             {isWindowSmallInclusive ? communitiesCount : <></>}
             <div className="actions">
@@ -323,8 +324,9 @@ const CommunitiesPage = () => {
           <IdeaLaunchpad />
         </div>
         <TokensList filters={filters} />
+        <QuestList />
         <ExploreContestList />
-        {tokenizedCommunityEnabled && <CWText type="h2">Communities</CWText>}
+        {launchpadEnabled && <CWText type="h2">Communities</CWText>}
         {isLoading && communitiesList.length === 0 ? (
           <CWCircleMultiplySpinner />
         ) : (
@@ -390,7 +392,7 @@ const CommunitiesPage = () => {
               EmptyPlaceholder: () => (
                 <section
                   className={clsx('empty-placeholder', {
-                    'my-16': tokenizedCommunityEnabled,
+                    'my-16': launchpadEnabled,
                   })}
                 >
                   <CWText type="h2">

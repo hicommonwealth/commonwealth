@@ -153,7 +153,44 @@ export const WebhookNotification = z.object({
   profile_name: z.string().max(255).describe('The profile name of the author'),
   profile_url: z.string(),
   profile_avatar_url: z.string(),
-  object_title: z.string(),
+  author_user_id: z.number().describe('The id of the author user record'),
+  thread_title: z.string(),
   object_url: z.string(),
   object_summary: z.string(),
+  content_url: z.string().nullish(),
+  content_type: z.union([z.literal('thread'), z.literal('comment')]),
+  thread_id: z.number().describe('The id of the thread'),
+  comment_id: z.number().optional().describe('The id of the comment'),
+});
+
+export const ContestNotification = z.object({
+  contest_id: z.number(),
+  start_time: z.date(),
+  end_time: z.date(),
+  contest_name: z.string(),
+  image_url: z.string(),
+  community_id: z.string(),
+  community_name: z.string(),
+});
+
+export const ContestEndedNotification = ContestNotification.extend({
+  winners: z
+    .object({
+      address: z.string(),
+      content: z.string(),
+      name: z.string(),
+      votes: z.string(),
+      prize: z.string(),
+    })
+    .array(),
+});
+
+export const QuestStartedNotification = z.object({
+  id: z.number(),
+  name: z.string(),
+  description: z.string(),
+  image_url: z.string(),
+  start_date: z.date(),
+  end_date: z.date(),
+  community_id: z.string().nullish(),
 });

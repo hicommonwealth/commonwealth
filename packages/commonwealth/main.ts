@@ -19,6 +19,8 @@ import passport from 'passport';
 import path, { dirname } from 'path';
 import pinoHttp from 'pino-http';
 import prerenderNode from 'prerender-node';
+import { buildFarcasterManifest } from 'server/util/buildFarcasterManifest';
+import { renderIndex } from 'server/util/renderIndex';
 import { fileURLToPath } from 'url';
 import * as v8 from 'v8';
 import * as api from './server/api';
@@ -165,12 +167,32 @@ export async function main(
 
   setupAPI('/api', app, db, dbValidationService, cacheDecorator);
 
+  app.use('/.well-known/assetlinks.json', (req: Request, res: Response) => {
+    res.sendFile(`${__dirname}/.well-known/assetlinks.json`);
+  });
+
+  app.use(
+    '/.well-known/apple-app-site-association',
+    (req: Request, res: Response) => {
+      res.setHeader('Content-Type', 'application/json');
+      res.sendFile(`${__dirname}/.well-known/apple-app-site-association`);
+    },
+  );
+
   app.use('/robots.txt', (req: Request, res: Response) => {
     res.sendFile(`${__dirname}/robots.txt`);
   });
 
+  app.use('/blank.html', (req: Request, res: Response) => {
+    res.sendFile(`${__dirname}/blank.html`);
+  });
+
   app.use('/manifest.json', (req: Request, res: Response) => {
     res.sendFile(`${__dirname}/manifest.json`);
+  });
+
+  app.use('/.well-known/farcaster.json', (req, res) => {
+    res.json(buildFarcasterManifest());
   });
 
   app.use('/firebase-messaging-sw.js', (req: Request, res: Response) => {
@@ -195,8 +217,15 @@ export async function main(
     }),
   );
 
-  app.get('*', (req: Request, res: Response) => {
-    res.sendFile(`${__dirname}/index.html`);
+  app.get('*', async (req: Request, res: Response) => {
+    try {
+      const indexFilePath = path.join(__dirname, 'index.html');
+      const html = await renderIndex(indexFilePath);
+      res.send(html);
+    } catch (err) {
+      console.error(err);
+      res.status(500).send('Server Error');
+    }
   });
 
   setupErrorHandlers(app);

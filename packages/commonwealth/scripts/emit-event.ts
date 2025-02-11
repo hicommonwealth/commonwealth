@@ -1,6 +1,5 @@
 import { dispose, logger } from '@hicommonwealth/core';
 import { emitEvent, models } from '@hicommonwealth/model';
-import { EventNames } from '@hicommonwealth/schemas';
 import { SnapshotEventType } from '@hicommonwealth/shared';
 
 const log = logger(import.meta);
@@ -10,7 +9,7 @@ async function main() {
     log.info('Emitting a snapshot event');
     await emitEvent(models.Outbox, [
       {
-        event_name: EventNames.SnapshotProposalCreated,
+        event_name: 'SnapshotProposalCreated',
         event_payload: {
           id: '0x5ed0465ba58b442f1e671789797d5e36b538a27603549639a34f95451b59ad32',
           title: 'Some Title',

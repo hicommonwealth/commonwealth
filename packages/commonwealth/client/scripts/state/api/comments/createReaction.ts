@@ -1,16 +1,12 @@
 import { toCanvasSignedDataApiArgs } from '@hicommonwealth/shared';
-import { useQueryClient } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
-import { notifyError } from 'client/scripts/controllers/app/notifications';
-import { trpc } from 'client/scripts/utils/trpcClient';
+import { notifyError } from 'controllers/app/notifications';
 import { signCommentReaction } from 'controllers/server/sessions';
-import Reaction from 'models/Reaction';
-import { ApiEndpoints } from 'state/api/config';
 import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
+import { trpc } from 'utils/trpcClient';
 import { UserTrainingCardTypes } from 'views/components/UserTrainingSlider/types';
 import { useAuthModalStore } from '../../ui/modals';
 import useUserStore, { userStore } from '../../ui/user';
-import useFetchCommentsQuery from './fetchComments';
 
 interface CreateReactionProps {
   address: string;
@@ -45,18 +41,8 @@ export const buildCreateCommentReactionInput = async ({
   };
 };
 
-const useCreateCommentReactionMutation = ({
-  threadId,
-  commentId,
-  communityId,
-}: Partial<CreateReactionProps>) => {
-  const queryClient = useQueryClient();
-  const { data: comments } = useFetchCommentsQuery({
-    // @ts-expect-error StrictNullChecks
-    communityId,
-    // @ts-expect-error StrictNullChecks
-    threadId,
-  });
+const useCreateCommentReactionMutation = () => {
+  const utils = trpc.useUtils();
   const user = useUserStore();
 
   const { markTrainingActionAsComplete } =
@@ -66,19 +52,12 @@ const useCreateCommentReactionMutation = ({
 
   return trpc.comment.createCommentReaction.useMutation({
     onSuccess: (newReaction) => {
-      // update fetch comments query state
-      const key = [ApiEndpoints.FETCH_COMMENTS, communityId, threadId];
-      queryClient.cancelQueries({ queryKey: key });
-      queryClient.setQueryData(key, () => {
-        const tempComments = [...comments];
-        const commentToUpdate = tempComments.find((x) => x.id === commentId);
-        newReaction.Address!.User = {
-          profile: commentToUpdate.profile,
-        };
-        // @ts-expect-error StrictNullChecks
-        commentToUpdate.reactions.push(new Reaction(newReaction));
-        return tempComments;
-      });
+      // reset comments cache state
+      utils.comment.getComments.invalidate().catch(console.error);
+
+      // reset xp cache
+      utils.quest.getQuests.invalidate().catch(console.error);
+      utils.user.getXps.invalidate().catch(console.error);
 
       const userId = user.addresses?.[0]?.profile?.userId;
       userId &&

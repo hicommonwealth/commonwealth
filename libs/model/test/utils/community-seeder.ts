@@ -6,7 +6,9 @@ import { seed, seedRecord } from '../../src/tester';
 import { getSignersInfo } from './canvas-signers';
 
 export type CommunitySeedOptions = {
-  roles: Array<'admin' | 'member' | 'nonmember' | 'banned' | 'rejected'>;
+  roles: Array<
+    'admin' | 'member' | 'nonmember' | 'banned' | 'rejected' | 'superadmin'
+  >;
   chain_node?: Partial<z.infer<typeof schemas.ChainNode>>;
   chain_base?: ChainBase;
   bech32_prefix?: string;
@@ -52,8 +54,11 @@ export async function seedCommunity({
 
   const users = await seedRecord('User', roles, (role) => ({
     profile: { name: role },
-    isAdmin: role === 'admin',
+    isAdmin: role === 'admin' || role === 'superadmin',
     is_welcome_onboard_flow_complete: false,
+    referral_count: 0,
+    referral_eth_earnings: 0,
+    xp_points: 0,
   }));
 
   // seed base community
@@ -121,6 +126,7 @@ export async function seedCommunity({
       user: {
         id: user.id,
         email: user.profile.email!,
+        isAdmin: role === 'superadmin',
       },
       address: address!.address,
     };

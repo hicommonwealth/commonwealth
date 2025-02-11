@@ -14,7 +14,6 @@ export const ApiEndpoints = {
   // stand alone endpoints should be have upper snake case keys so we can easily tell them apart in code
   FETCH_ADMIN: '/roles',
   FETCH_COMMUNITY_STAKES: '/communityStakes',
-  FETCH_COMMENTS: '/viewComments',
   FETCH_RELATED_COMMUNITIES: '/relatedCommunities',
   FETCH_THREADS: '/threads',
   FETCH_NODES: '/nodes',
@@ -26,7 +25,6 @@ export const ApiEndpoints = {
   FETCH_TAGS: '/tags',
   UPDATE_USER_EMAIL: '/updateEmail',
   UPDATE_USER_EMAIL_INTERVAL_SETTINGS: '/writeUserSetting',
-  UPDATE_USER_ACTIVE_COMMUNTY: '/selectCommunity',
   fetchThreadPolls: (threadId: number) => `/threads/${threadId}/polls`,
   searchThreads: (searchTerm: string) => `/threads?search=${searchTerm}`,
   searchComments: (searchTerm: string) => `/comments?search=${searchTerm}`,

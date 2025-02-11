@@ -22,7 +22,7 @@ const MobileNavigation = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   const matchesDashboard = matchRoutes([{ path: '/dashboard/*' }], location);
-  const matchesExplore = matchRoutes([{ path: '/communities' }], location);
+  const matchesExplore = matchRoutes([{ path: '/explore' }], location);
   const matchesNotifications = matchRoutes(
     [{ path: '/notifications' }],
     location,
@@ -45,7 +45,7 @@ const MobileNavigation = () => {
       : []),
     {
       type: 'explore',
-      onClick: () => navigate('/communities', {}, null),
+      onClick: () => navigate('/explore', {}, null),
       selected: !!matchesExplore,
     },
     ...(user.isLoggedIn
@@ -67,10 +67,11 @@ const MobileNavigation = () => {
         ]
       : []),
   ];
-
+  const isNewThreadPage =
+    window.location?.pathname?.includes('/new/discussion');
   return (
     <>
-      {newMobileNav && <QuickPostButton />}
+      {newMobileNav && !isNewThreadPage && <QuickPostButton />}
       <div className="MobileNavigation">
         <div id="MobileNavigationHead">
           {/*react portal container for anyone that wants to put content*/}

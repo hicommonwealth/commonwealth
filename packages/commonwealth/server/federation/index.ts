@@ -16,18 +16,20 @@ if (libp2p) {
   );
 }
 
-export const applyCanvasSignedDataMiddleware: (
-  input,
-  output,
-) => Promise<undefined> = async (input, output) => {
-  if (output.canvas_signed_data)
-    await applyCanvasSignedData(parse(output.canvas_signed_data));
-};
+export const applyCanvasSignedData = async (
+  path: string,
+  canvas_signed_data?: string,
+) => {
+  if (!canvas_signed_data) return;
+  const data = parse(canvas_signed_data) as CanvasSignedData;
 
-export const applyCanvasSignedData = async (data: CanvasSignedData) => {
   let appliedSessionId: string | null = null;
   let appliedActionId: string | null = null;
 
+  log.trace('applying canvas signed data', {
+    path,
+    publicKey: data.sessionMessage.payload.publicKey,
+  });
   try {
     const encodedSessionMessage = canvas.messageLog.encode(
       data.sessionMessageSignature,

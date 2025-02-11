@@ -2,6 +2,7 @@ import { Navigate } from 'navigation/helpers';
 import React, { lazy } from 'react';
 import { Route } from 'react-router-dom';
 import { withLayout } from 'views/Layout';
+import { MobileAppRedirect } from 'views/pages/MobileAppRedirect/MobileAppRedirect';
 import { RouteFeatureFlags } from './Router';
 
 const QuillPage = lazy(() => import('views/pages/QuillPage'));
@@ -14,8 +15,11 @@ const MarkdownHitHighlighterPage = lazy(
 const DashboardPage = lazy(() => import('views/pages/user_dashboard'));
 const CommunitiesPage = lazy(() => import('views/pages/Communities'));
 const SearchPage = lazy(() => import('views/pages/search'));
+const HomePage = lazy(() => import('views/pages/HomePage/HomePage'));
 
 const CreateCommunityPage = lazy(() => import('views/pages/CreateCommunity'));
+const CreateQuestPage = lazy(() => import('views/pages/CreateQuest'));
+const QuestDetailsPage = lazy(() => import('views/pages/QuestDetails'));
 const LaunchToken = lazy(() => import('views/pages/LaunchToken'));
 const OverviewPage = lazy(() => import('views/pages/overview'));
 const MembersPage = lazy(
@@ -36,6 +40,7 @@ const FinishSocialLoginPage = lazy(
 );
 
 const NotificationsPage = lazy(() => import('views/pages/notifications'));
+const LeaderboardPage = lazy(() => import('views/pages/Leaderboard'));
 
 const NotificationSettings = lazy(
   () => import('views/pages/NotificationSettings'),
@@ -117,11 +122,27 @@ const CommunityNotFoundPage = lazy(
   () => import('views/pages/CommunityNotFoundPage'),
 );
 
+const UnSubscribePage = lazy(() => import('views/pages/UnSubscribePage'));
 const RewardsPage = lazy(() => import('views/pages/RewardsPage'));
+const CommunityHomePage = lazy(
+  () => import('../views/pages/CommunityHome/CommunityHomePage'),
+);
+
+const OnBoardingPage = lazy(() => import('../views/pages/OnBoarding'));
 
 const CommonDomainRoutes = ({
-  tokenizedCommunityEnabled,
+  launchpadEnabled,
+  xpEnabled,
+  communityHomeEnabled,
+  homePageEnable,
+  mobileApp,
 }: RouteFeatureFlags) => [
+  <Route
+    key="mobile-app-redirect"
+    path="/_internal/mobile-app-redirect"
+    element={<MobileAppRedirect />}
+  />,
+
   <Route
     key="/_internal/quill"
     path="/_internal/quill"
@@ -146,17 +167,60 @@ const CommonDomainRoutes = ({
     element={<MarkdownViewerPage />}
   />,
 
+  ...(mobileApp
+    ? [
+        <Route
+          key="/onboarding"
+          path="/onboarding"
+          element={<OnBoardingPage />}
+        />,
+      ]
+    : []),
+  ...(homePageEnable
+    ? [
+        <Route
+          key="/"
+          path="/"
+          element={withLayout(HomePage, { type: 'common' })}
+        />,
+      ]
+    : [
+        <Route
+          key="/"
+          path="/"
+          element={withLayout(DashboardPage, { type: 'common' })}
+        />,
+      ]),
   <Route
-    key="/"
-    path="/"
-    element={withLayout(DashboardPage, { type: 'common' })}
+    key="/home"
+    path="/home"
+    element={withLayout(HomePage, { type: 'common' })}
   />,
   <Route
     key="/createCommunity"
     path="/createCommunity"
     element={withLayout(CreateCommunityPage, { type: 'common' })}
   />,
-  ...(tokenizedCommunityEnabled
+  ...(xpEnabled
+    ? [
+        <Route
+          key="/createQuest"
+          path="/createQuest"
+          element={withLayout(CreateQuestPage, { type: 'common' })}
+        />,
+        <Route
+          key="/quest/:id"
+          path="/quest/:id"
+          element={withLayout(QuestDetailsPage, { type: 'common' })}
+        />,
+      ]
+    : []),
+  <Route
+    key="/unSubscribe/:userId"
+    path="/unSubscribe/:userId"
+    element={withLayout(UnSubscribePage, { type: 'common' })}
+  />,
+  ...(launchpadEnabled
     ? [
         <Route
           key="/createTokenCommunity"
@@ -165,19 +229,48 @@ const CommonDomainRoutes = ({
         />,
       ]
     : []),
+  ...(xpEnabled
+    ? [
+        <Route
+          key="/leaderboard"
+          path="/leaderboard"
+          element={withLayout(LeaderboardPage, { type: 'common' })}
+        />,
+      ]
+    : []),
+  ...(homePageEnable
+    ? [
+        <Route
+          key="/dashboard"
+          path="/dashboard"
+          element={withLayout(HomePage, { type: 'common' })}
+        />,
+      ]
+    : [
+        <Route
+          key="/dashboard"
+          path="/dashboard"
+          element={withLayout(DashboardPage, { type: 'common' })}
+        />,
+      ]),
+  ...(homePageEnable
+    ? [
+        <Route
+          key="/dashboard/:type"
+          path="/dashboard/:type"
+          element={withLayout(HomePage, { type: 'common' })}
+        />,
+      ]
+    : [
+        <Route
+          key="/dashboard/:type"
+          path="/dashboard/:type"
+          element={withLayout(DashboardPage, { type: 'common' })}
+        />,
+      ]),
   <Route
-    key="/dashboard"
-    path="/dashboard"
-    element={withLayout(DashboardPage, { type: 'common' })}
-  />,
-  <Route
-    key="/dashboard/:type"
-    path="/dashboard/:type"
-    element={withLayout(DashboardPage, { type: 'common' })}
-  />,
-  <Route
-    key="/communities"
-    path="/communities"
+    key="/explore"
+    path="/explore"
     element={withLayout(CommunitiesPage, {
       type: 'common',
     })}
@@ -317,6 +410,17 @@ const CommonDomainRoutes = ({
   // GOVERNANCE END
 
   // DISCUSSIONS
+  ...(communityHomeEnabled
+    ? [
+        <Route
+          key="/:scope/community-home"
+          path="/:scope/community-home"
+          element={withLayout(CommunityHomePage, {
+            scoped: true,
+          })}
+        />,
+      ]
+    : []),
   <Route
     key="/:scope/discussions"
     path="/:scope/discussions"
@@ -634,7 +738,6 @@ const CommonDomainRoutes = ({
     path="/discussions"
     element={<Navigate to="/" />}
   />,
-  <Route key="/home" path="/home" element={<Navigate to="/" />} />,
   <Route
     key="/:scope/home"
     path="/:scope/home"

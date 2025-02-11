@@ -108,7 +108,7 @@ export const ViewUpvotesDrawer = ({
     ? {
         avatarUrl: author['profile'].avatarUrl,
         lastActive: author['profile'].lastActive,
-        id: author['profile'].id,
+        id: author['profile']?.id || author['profile']?.userId,
         address: author['profile'].address,
         name: author['profile'].name,
       }
@@ -129,9 +129,9 @@ export const ViewUpvotesDrawer = ({
           <div className="upvoted-content">
             <div className="upvoted-content-header">
               <AuthorAndPublishInfo
+                key={JSON.stringify(profile)}
                 authorAddress={author?.address}
-                // @ts-expect-error <StrictNullChecks/>
-                authorCommunityId={getAuthorCommunityId(author)}
+                authorCommunityId={getAuthorCommunityId(author) || ''}
                 publishDate={publishDate}
                 showUserAddressWithInfo={false}
                 // @ts-expect-error <StrictNullChecks/>

@@ -16,7 +16,9 @@ export const ChainEventSigs = {
 export const EvmEventSignatures = {
   NamespaceFactory: {
     NamespaceDeployed:
-      '0x8870ba2202802ce285ce6bead5ac915b6dc2d35c8a9d6f96fa56de9de12829d5',
+      '0xc8451dcd95e7ca3d8608dfc9d43e7bf4187f43cf5e07d5143b6c2be3cf73d175',
+    NamespaceDeployedWithReferral:
+      '0x86bc285ef78f2bf1fc0437d79c9473bf64014e8a483d00a4e4683bde1f9758f7',
     ContestManagerDeployed:
       '0x990f533044dbc89b838acde9cd2c72c400999871cf8f792d731edcae15ead693',
     CommunityNamespaceCreated:
@@ -39,7 +41,7 @@ export const EvmEventSignatures = {
   },
   Launchpad: {
     TokenLaunched:
-      '0xd7ca5dc2f8c6bb37c3a4de2a81499b25f8ca8bbb3082010244fe747077d0f6cc',
+      '0xacba89c290ec5301484c0453f480dc9b83ab3a739c6b6e345ecd1b0525787d23',
     Trade: '0x9adcf0ad0cda63c4d50f26a48925cf6405df27d422a39c456b5f03f661c82982',
     TokenRegistered:
       '0xc2fe88a1a3c1957424571593960b97f158a519d0aa4cef9e13a247c64f1f4c35',

@@ -1,15 +1,12 @@
 import { toCanvasSignedDataApiArgs } from '@hicommonwealth/shared';
-import { useQueryClient } from '@tanstack/react-query';
 import { signComment } from 'controllers/server/sessions';
 import Comment from 'models/Comment';
-import { ApiEndpoints } from 'state/api/config';
 import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
 import { UserTrainingCardTypes } from 'views/components/UserTrainingSlider/types';
 import { trpc } from '../../../utils/trpcClient';
 import { useAuthModalStore } from '../../ui/modals';
 import useUserStore from '../../ui/user';
 import { updateThreadInAllCaches } from '../threads/helpers/cache';
-import useFetchCommentsQuery from './fetchComments';
 
 interface CreateCommentProps {
   communityId: string;
@@ -49,13 +46,11 @@ const useCreateCommentMutation = ({
   communityId,
   threadId,
   existingNumberOfComments = 0,
-}: Partial<CreateCommentProps>) => {
-  const queryClient = useQueryClient();
-  const { data: comments } = useFetchCommentsQuery({
-    communityId: communityId!,
-    threadId: threadId!,
-  });
-
+}: Pick<
+  CreateCommentProps,
+  'communityId' | 'threadId' | 'existingNumberOfComments'
+>) => {
+  const utils = trpc.useUtils();
   const user = useUserStore();
 
   const { markTrainingActionAsComplete } =
@@ -68,15 +63,14 @@ const useCreateCommentMutation = ({
       // @ts-expect-error StrictNullChecks
       const comment = new Comment(newComment);
 
-      // update fetch comments query state
-      const key = [ApiEndpoints.FETCH_COMMENTS, communityId, threadId];
-      queryClient.cancelQueries({ queryKey: key });
-      queryClient.setQueryData(key, () => {
-        return [...comments, comment];
-      });
+      // reset comments cache state
+      utils.comment.getComments.invalidate().catch(console.error);
 
-      // @ts-expect-error StrictNullChecks
-      updateThreadInAllCaches(communityId, threadId, {
+      // reset xp cache
+      utils.quest.getQuests.invalidate().catch(console.error);
+      utils.user.getXps.invalidate().catch(console.error);
+
+      updateThreadInAllCaches(communityId || '', threadId, {
         numberOfComments: existingNumberOfComments + 1,
       });
 

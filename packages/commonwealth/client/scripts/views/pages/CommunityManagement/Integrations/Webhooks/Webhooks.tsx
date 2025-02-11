@@ -156,9 +156,12 @@ const Webhooks = () => {
           <CWText type="h4">Webhooks</CWText>
           <CWText type="b1">
             <p>
-              Slack, Discord, and Telegram webhooks are supported. For more
-              information and examples for setting these up, please view our{' '}
+              Slack, Discord, Telegram, Zapier, and Eliza webhooks are
+              supported. For more information and examples for setting these up,
+              please view our{' '}
               <a
+                target="_blank"
+                rel="noopener noreferrer"
                 href={`https://${DOCS_SUBDOMAIN}/commonwealth/for-admins-and-mods/capabilities/webhooks`}
               >
                 documentation
@@ -222,7 +225,7 @@ const Webhooks = () => {
         )}
       </section>
       <CWModal
-        size="small"
+        size="medium"
         content={
           <WebhookSettingsModal
             onModalClose={() => setWebhookToConfigure(null)}

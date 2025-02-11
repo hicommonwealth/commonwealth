@@ -2,6 +2,8 @@ export const REFCODE_EXPIRATION_MS = 14 * 24 * 60 * 60 * 1000; // 14 days
 
 export enum LocalStorageKeys {
   ReferralCode = 'common-refcode',
+  HasSeenOnboarding = 'has-seen-onboarding',
+  HasSeenNotifications = 'has-seen-notifications',
 }
 
 export const getLocalStorageItem = (key: LocalStorageKeys) => {
@@ -29,7 +31,6 @@ export const setLocalStorageItem = (
   const stored = getLocalStorageItem(key);
 
   if (key === LocalStorageKeys.ReferralCode && stored) {
-    console.log('Reflink already stored');
     return;
   }
 
@@ -42,4 +43,8 @@ export const setLocalStorageItem = (
   }
 
   localStorage.setItem(key, JSON.stringify(item));
+};
+
+export const removeLocalStorageItem = (key: LocalStorageKeys) => {
+  localStorage.removeItem(key);
 };

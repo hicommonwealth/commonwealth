@@ -13,20 +13,17 @@ import {
 import { getRelatedCommunitiesHandler } from '../routes/communities/get_related_communities_handler';
 
 import communityStats from '../routes/communityStats';
-import deleteAddress from '../routes/deleteAddress';
 import domain from '../routes/domain';
 import finishUpdateEmail from '../routes/finishUpdateEmail';
 import getAddressStatus from '../routes/getAddressStatus';
 import { healthHandler } from '../routes/health';
 import reactionsCounts from '../routes/reactionsCounts';
-import selectCommunity from '../routes/selectCommunity';
 import starCommunity from '../routes/starCommunity';
 import { status } from '../routes/status';
 import threadsUsersCountAndAvatars from '../routes/threadsUsersCountAndAvatars';
 import updateBanner from '../routes/updateBanner';
 import updateEmail from '../routes/updateEmail';
 import updateSiteAdmin from '../routes/updateSiteAdmin';
-import viewComments from '../routes/viewComments';
 
 import setDefaultRole from '../routes/setDefaultRole';
 import upgradeMember, {
@@ -53,8 +50,6 @@ import * as controllers from '../controller';
 import addThreadLink from '../routes/linking/addThreadLinks';
 import deleteThreadLinks from '../routes/linking/deleteThreadLinks';
 import getLinks from '../routes/linking/getLinks';
-import markCommentAsSpam from '../routes/spam/markCommentAsSpam';
-import unmarkCommentAsSpam from '../routes/spam/unmarkCommentAsSpam';
 
 import { ServerAdminController } from '../controllers/server_admin_controller';
 import { ServerAnalyticsController } from '../controllers/server_analytics_controller';
@@ -70,7 +65,6 @@ import { ServerTagsController } from 'server/controllers/server_tags_controller'
 import { rateLimiterMiddleware } from 'server/middleware/rateLimiter';
 import { getTopUsersHandler } from 'server/routes/admin/get_top_users_handler';
 import { getNamespaceMetadata } from 'server/routes/communities/get_namespace_metadata';
-import deleteAllAddress from 'server/routes/deleteAllAddress';
 import { config } from '../config';
 import { getStatsHandler } from '../routes/admin/get_stats_handler';
 import { getCanvasClockHandler } from '../routes/canvas/get_canvas_clock_handler';
@@ -158,32 +152,9 @@ function setupRouter(
   registerRoute(
     router,
     'post',
-    '/deleteAddress',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateCommunity,
-    deleteAddress.bind(this, models),
-  );
-  registerRoute(
-    router,
-    'post',
-    '/deleteAllAddresses',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateCommunity,
-    deleteAllAddress.bind(this, models),
-  );
-  registerRoute(
-    router,
-    'post',
     '/getAddressStatus',
     passport.authenticate('jwt', { session: false }),
     getAddressStatus.bind(this, models),
-  );
-  registerRoute(
-    router,
-    'post',
-    '/selectCommunity',
-    passport.authenticate('jwt', { session: false }),
-    selectCommunity.bind(this, models),
   );
 
   // communities
@@ -316,13 +287,6 @@ function setupRouter(
   );
 
   // comments
-  registerRoute(
-    router,
-    'get',
-    '/viewComments',
-    databaseValidationService.validateCommunity,
-    viewComments.bind(this, models),
-  );
   registerRoute(
     router,
     'get',
@@ -509,20 +473,21 @@ function setupRouter(
 
       for await (const chunk of ideaGenerator) {
         // generation error
-        if (chunk.error) {
+        if ((chunk as { error?: string }).error) {
           return res.end(
-            JSON.stringify({ status: 'failure', message: chunk.error }) + '\n',
+            JSON.stringify({
+              status: 'failure',
+              message: (chunk as { error?: string }).error,
+            }) + '\n',
           );
         }
 
         // stream chunks as they are generated
-        res.write(JSON.stringify(chunk.tokenIdea) + '\n');
+        res.write(chunk);
         res.flush();
       }
 
-      return res.end(
-        JSON.stringify({ status: 'success', message: 'stream ended' }) + '\n',
-      );
+      return res.end();
     },
   );
 
@@ -546,22 +511,6 @@ function setupRouter(
     'post',
     '/linking/getLinks',
     getLinks.bind(this, models),
-  );
-
-  // thread spam
-  registerRoute(
-    router,
-    'put',
-    '/comments/:id/spam',
-    passport.authenticate('jwt', { session: false }),
-    markCommentAsSpam.bind(this, models),
-  );
-  registerRoute(
-    router,
-    'delete',
-    '/comments/:id/spam',
-    passport.authenticate('jwt', { session: false }),
-    unmarkCommentAsSpam.bind(this, models),
   );
 
   // login

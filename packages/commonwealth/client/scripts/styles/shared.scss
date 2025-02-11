@@ -13,7 +13,7 @@
 
 // layout & global nav parameters
 
-$sidebar-width: 232px;
+$sidebar-width: 238px;
 $quick-switcher-width: 56px;
 $global-header-height: 56px;
 $global-sidebar-header-height: 49px;
@@ -40,6 +40,9 @@ $font-family-neue-haas-unica: NeueHaasUnica, 'Segoe UI', sans-serif,
 
 $font-family-monospace: 'DM Mono', monospace;
 $font-family-roboto: 'Roboto', sans-serif;
+
+$font-family-MDNichrome: 'MDNichrome';
+$font-family-MDNichromeRegular: 'MDNichromeRegular';
 
 @mixin visibleScrollbar($theme) {
   &::-webkit-scrollbar {

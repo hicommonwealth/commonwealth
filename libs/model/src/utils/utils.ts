@@ -1,4 +1,5 @@
 import { blobStorage, logger } from '@hicommonwealth/core';
+import { isEvmAddress } from '@hicommonwealth/evm-protocols';
 import { EventPairs } from '@hicommonwealth/schemas';
 import {
   getThreadUrl,
@@ -16,7 +17,6 @@ import {
   Transaction,
 } from 'sequelize';
 import { v4 as uuidv4 } from 'uuid';
-import { isAddress } from 'web3-validator';
 import { config } from '../config';
 import type { OutboxAttributes } from '../models/outbox';
 
@@ -114,7 +114,7 @@ export function equalEvmAddresses(
   address2: string | unknown,
 ): boolean {
   const isRealAddress = (address: string | unknown) => {
-    if (!address || typeof address !== 'string' || !isAddress(address)) {
+    if (!address || typeof address !== 'string' || !isEvmAddress(address)) {
       throw new Error(`Invalid address ${address}`);
     }
     return address;
@@ -264,6 +264,7 @@ export function buildApiKeySaltCacheKey(address: string) {
 export async function publishCast(
   replyCastHash: string,
   messageBuilder: ({ username }: { username: string }) => string,
+  options?: { embed: string },
 ) {
   const client = new NeynarAPIClient(config.CONTESTS.NEYNAR_API_KEY!);
   try {
@@ -276,6 +277,7 @@ export async function publishCast(
       messageBuilder({ username }),
       {
         replyTo: replyCastHash,
+        embeds: options?.embed ? [{ url: options.embed }] : undefined,
       },
     );
     log.info(`FC bot published reply to ${replyCastHash}`);

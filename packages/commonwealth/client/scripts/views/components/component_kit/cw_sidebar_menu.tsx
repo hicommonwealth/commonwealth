@@ -201,7 +201,7 @@ export const CWSidebarMenu = (props: SidebarMenuProps) => {
           },
           {
             type: 'default',
-            label: 'Explore communities',
+            label: 'Explore',
             iconLeft: 'compassPhosphor',
             onClick: () => {
               if (isMobile && isWindowSmall) {
@@ -209,7 +209,7 @@ export const CWSidebarMenu = (props: SidebarMenuProps) => {
               } else {
                 setMenu({ name: menuName, isVisible: menuVisible });
               }
-              navigate('/communities', {}, null);
+              navigate('/explore', {}, null);
             },
           },
           {

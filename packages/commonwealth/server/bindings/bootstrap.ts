@@ -1,13 +1,12 @@
 import {
   RabbitMQAdapter,
-  RascalConfigServices,
   buildRetryStrategy,
-  getRabbitMQConfig,
+  createRmqConfig,
 } from '@hicommonwealth/adapters';
 import {
   Broker,
-  BrokerSubscriptions,
   broker,
+  handleEvent,
   logger,
   stats,
 } from '@hicommonwealth/core';
@@ -23,14 +22,12 @@ import {
 import { Client } from 'pg';
 import { config } from 'server/config';
 import { setupListener } from './pgListener';
+import { rascalConsumerMap } from './rascalConsumerMap';
 import { incrementNumUnrelayedEvents, relayForever } from './relayForever';
 
 const log = logger(import.meta);
 
-function checkSubscriptionResponse(
-  subRes: boolean,
-  topic: BrokerSubscriptions,
-) {
+function checkSubscriptionResponse(subRes: boolean, topic: string) {
   if (!subRes) {
     log.fatal(`Failed to subscribe to ${topic}. Requires restart!`, undefined, {
       topic,
@@ -38,19 +35,23 @@ function checkSubscriptionResponse(
   }
 }
 
-export async function bootstrapBindings(): Promise<void> {
+export async function bootstrapBindings(
+  skipRmqAdapter?: boolean,
+): Promise<void> {
   let brokerInstance: Broker;
   try {
     const rmqAdapter = new RabbitMQAdapter(
-      getRabbitMQConfig(
-        config.BROKER.RABBITMQ_URI,
-        RascalConfigServices.CommonwealthService,
-      ),
+      createRmqConfig({
+        rabbitMqUri: config.BROKER.RABBITMQ_URI,
+        map: rascalConsumerMap,
+      }),
     );
     await rmqAdapter.init();
-    broker({
-      adapter: rmqAdapter,
-    });
+    if (!skipRmqAdapter) {
+      broker({
+        adapter: rmqAdapter,
+      });
+    }
     brokerInstance = rmqAdapter;
   } catch (e) {
     log.error(
@@ -59,15 +60,11 @@ export async function bootstrapBindings(): Promise<void> {
     throw e;
   }
 
-  const chainEventSubRes = await brokerInstance.subscribe(
-    BrokerSubscriptions.ChainEvent,
-    ChainEventPolicy(),
-  );
-  checkSubscriptionResponse(chainEventSubRes, BrokerSubscriptions.ChainEvent);
+  const chainEventSubRes = await brokerInstance.subscribe(ChainEventPolicy);
+  checkSubscriptionResponse(chainEventSubRes, ChainEventPolicy.name);
 
   const contestWorkerSubRes = await brokerInstance.subscribe(
-    BrokerSubscriptions.ContestWorkerPolicy,
-    ContestWorker(),
+    ContestWorker,
     buildRetryStrategy(undefined, 20_000),
     {
       beforeHandleEvent: (topic, event, context) => {
@@ -80,47 +77,32 @@ export async function bootstrapBindings(): Promise<void> {
       },
     },
   );
-  checkSubscriptionResponse(
-    contestWorkerSubRes,
-    BrokerSubscriptions.ContestWorkerPolicy,
-  );
+  checkSubscriptionResponse(contestWorkerSubRes, ContestWorker.name);
 
   const contestProjectionsSubRes = await brokerInstance.subscribe(
-    BrokerSubscriptions.ContestProjection,
-    Contest.Contests(),
+    Contest.Contests,
   );
-  checkSubscriptionResponse(
-    contestProjectionsSubRes,
-    BrokerSubscriptions.ContestProjection,
-  );
+  checkSubscriptionResponse(contestProjectionsSubRes, Contest.Contests.name);
 
-  const xpProjectionSubRes = await brokerInstance.subscribe(
-    BrokerSubscriptions.XpProjection,
-    User.Xp(),
+  const xpProjectionSubRes = await brokerInstance.subscribe(User.Xp);
+  checkSubscriptionResponse(xpProjectionSubRes, User.Xp.name);
+
+  const userReferralsProjectionSubRes = await brokerInstance.subscribe(
+    User.UserReferrals,
   );
   checkSubscriptionResponse(
-    xpProjectionSubRes,
-    BrokerSubscriptions.XpProjection,
+    userReferralsProjectionSubRes,
+    User.UserReferrals.name,
   );
 
   const farcasterWorkerSubRes = await brokerInstance.subscribe(
-    BrokerSubscriptions.FarcasterWorkerPolicy,
-    FarcasterWorker(),
+    FarcasterWorker,
     buildRetryStrategy(undefined, 20_000),
   );
-  checkSubscriptionResponse(
-    farcasterWorkerSubRes,
-    BrokerSubscriptions.FarcasterWorkerPolicy,
-  );
+  checkSubscriptionResponse(farcasterWorkerSubRes, FarcasterWorker.name);
 
-  const discordBotSubRes = await brokerInstance.subscribe(
-    BrokerSubscriptions.DiscordBotPolicy,
-    DiscordBotPolicy(),
-  );
-  checkSubscriptionResponse(
-    discordBotSubRes,
-    BrokerSubscriptions.DiscordBotPolicy,
-  );
+  const discordBotSubRes = await brokerInstance.subscribe(DiscordBotPolicy);
+  checkSubscriptionResponse(discordBotSubRes, DiscordBotPolicy.name);
 }
 
 export async function bootstrapRelayer(
@@ -141,4 +123,24 @@ export async function bootstrapRelayer(
   });
 
   return pgClient;
+}
+
+export function bootstrapContestRolloverLoop() {
+  log.info('Starting rollover loop');
+
+  const loop = async () => {
+    try {
+      await handleEvent(ContestWorker(), {
+        name: 'ContestRolloverTimerTicked',
+        payload: {},
+      });
+    } catch (err) {
+      log.error(err);
+    }
+  };
+
+  // TODO: move to external service triggered via scheduler?
+  setInterval(() => {
+    loop().catch(console.error);
+  }, 1_000 * 60);
 }

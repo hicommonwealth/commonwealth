@@ -4,6 +4,7 @@ import {
   CosmosSignerCW,
   chainBaseToCaip2,
   chainBaseToCanvasChainId,
+  getAddressFromDid,
   sign,
 } from '@hicommonwealth/shared';
 import axios from 'axios';
@@ -11,6 +12,7 @@ import app from 'state';
 import { SERVER_URL } from 'state/api/config';
 import Account from '../../models/Account';
 import IWebWallet from '../../models/IWebWallet';
+import { isFarcasterWallet } from '../app/webWallets/farcaster_web_wallet';
 
 export { SessionKeyError } from '@hicommonwealth/shared';
 
@@ -19,7 +21,7 @@ export async function signSessionWithAccount<T extends { address: string }>(
   account: Account,
 ) {
   const session = await getSessionFromWallet(wallet);
-  const walletAddress = session.did.split(':')[4];
+  const walletAddress = getAddressFromDid(session.did);
   if (walletAddress !== account.address) {
     throw new Error(
       `Session signed with wrong address ('${walletAddress}', expected '${account.address}')`,
@@ -56,6 +58,15 @@ export async function getSessionFromWallet(
   { newSession }: { newSession: boolean } = { newSession: false },
 ) {
   const sessionSigner = await wallet.getSessionSigner();
+
+  if (isFarcasterWallet(wallet)) {
+    if (!wallet.sessionPayload) {
+      throw new Error(
+        'FarcasterWebWallet should have received a sessionPayload on initialization',
+      );
+    }
+    return wallet.sessionPayload;
+  }
 
   if (newSession) {
     const { payload } = await sessionSigner.newSession(CANVAS_TOPIC);
@@ -104,9 +115,13 @@ function getDidForCurrentAddress(
 }
 
 async function getClockFromAPI(): Promise<[number, string[]]> {
-  const response = await axios.get(`${SERVER_URL}/getCanvasClock`);
-  const { clock, heads: parents } = response.data.result;
-  return [clock, parents];
+  try {
+    const response = await axios.get(`${SERVER_URL}/getCanvasClock`);
+    const { clock, heads: parents } = response.data.result;
+    return [clock, parents];
+  } catch (err) {
+    return [1, []];
+  }
 }
 
 // Public signer methods

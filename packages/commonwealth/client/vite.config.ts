@@ -1,6 +1,7 @@
 import react from '@vitejs/plugin-react-swc';
 import path from 'path';
 import { Alias, defineConfig, loadEnv } from 'vite';
+import handlebars from 'vite-plugin-handlebars';
 import { createHtmlPlugin } from 'vite-plugin-html';
 import { nodePolyfills } from 'vite-plugin-node-polyfills';
 import tsconfigPaths from 'vite-tsconfig-paths';
@@ -40,9 +41,8 @@ export default defineConfig(({ mode }) => {
     'process.env.FLAG_FARCASTER_CONTEST': JSON.stringify(
       env.FLAG_FARCASTER_CONTEST,
     ),
-    'process.env.FLAG_TOKENIZED_COMMUNITY': JSON.stringify(
-      env.FLAG_TOKENIZED_COMMUNITY,
-    ),
+    'process.env.FLAG_LAUNCHPAD': JSON.stringify(env.FLAG_LAUNCHPAD),
+    'process.env.FLAG_UNISWAP_TRADE': JSON.stringify(env.FLAG_UNISWAP_TRADE),
     'process.env.FLAG_MANAGE_API_KEYS': JSON.stringify(
       env.FLAG_MANAGE_API_KEYS,
     ),
@@ -50,6 +50,9 @@ export default defineConfig(({ mode }) => {
     'process.env.FLAG_REWARDS_PAGE': JSON.stringify(env.FLAG_REWARDS_PAGE),
     'process.env.FLAG_STICKY_EDITOR': JSON.stringify(env.FLAG_STICKY_EDITOR),
     'process.env.FLAG_NEW_MOBILE_NAV': JSON.stringify(env.FLAG_NEW_MOBILE_NAV),
+    'process.env.FLAG_XP': JSON.stringify(env.FLAG_XP),
+    'process.env.FLAG_COMMUNITY_HOME': JSON.stringify(env.FLAG_COMMUNITY_HOME),
+    'process.env.FLAG_HOMEPAGE': JSON.stringify(env.FLAG_HOMEPAGE),
   };
 
   const config = {
@@ -97,6 +100,12 @@ export default defineConfig(({ mode }) => {
       }),
       tsconfigPaths(),
       nodePolyfills(),
+      handlebars({
+        // Handlebars context: pass key-value pairs to index.html
+        context: {
+          FARCASTER_MANIFEST_DOMAIN: env.FARCASTER_MANIFEST_DOMAIN,
+        },
+      }),
     ],
     optimizeDeps: {
       include: [
@@ -149,6 +158,12 @@ export default defineConfig(({ mode }) => {
       host: 'localhost',
       proxy: {
         '/api': {
+          target: env.BACKEND_PROXY_URL || 'http://localhost:3000',
+          changeOrigin: true,
+          secure: false,
+        },
+        // farcaster manifest is dynamically generated, not a static file
+        '/.well-known/farcaster.json': {
           target: env.BACKEND_PROXY_URL || 'http://localhost:3000',
           changeOrigin: true,
           secure: false,

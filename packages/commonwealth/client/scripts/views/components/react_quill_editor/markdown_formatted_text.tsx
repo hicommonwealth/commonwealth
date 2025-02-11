@@ -1,13 +1,3 @@
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
-
-import './markdown_formatted_text.scss';
-
 import { PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
 import DOMPurify from 'dompurify';
 import { loadScript } from 'helpers';
@@ -17,12 +7,25 @@ import { marked } from 'marked';
 import markedFootnote from 'marked-footnote';
 import { markedSmartypants } from 'marked-smartypants';
 import { markedXhtml } from 'marked-xhtml';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import removeMd from 'remove-markdown';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { getClasses } from '../component_kit/helpers';
 import { renderTruncatedHighlights } from './highlighter';
+import './markdown_formatted_text.scss';
 import { QuillRendererProps } from './quill_renderer';
-import { countLinesMarkdown, fetchTwitterEmbedInfo } from './utils';
+import {
+  countLinesMarkdown,
+  dompurifyConfig,
+  dompurifyConfigForHTML,
+  fetchTwitterEmbedInfo,
+} from './utils';
 
 const OPEN_LINKS_IN_NEW_TAB = true;
 
@@ -64,10 +67,11 @@ export const MarkdownFormattedText = ({
   doc,
   hideFormatting,
   searchTerm,
-  cutoffLines,
   customClass,
   customShowMoreButton,
+  maxChars,
   onImageClick,
+  cutoffLines,
 }: MarkdownFormattedTextProps) => {
   const containerRef = useRef<HTMLDivElement>();
   const [userExpand, setUserExpand] = useState<boolean>(false);
@@ -77,29 +81,36 @@ export const MarkdownFormattedText = ({
     if (userExpand) {
       return false;
     }
-    return cutoffLines && cutoffLines < countLinesMarkdown(doc);
-  }, [userExpand, cutoffLines, doc]);
+    const exceedsMaxChars = maxChars && maxChars < doc.length;
+    const exceedsCutoffLines =
+      cutoffLines && cutoffLines < countLinesMarkdown(doc);
+    return exceedsMaxChars || exceedsCutoffLines;
+  }, [userExpand, maxChars, cutoffLines, doc]);
 
   const truncatedDoc = useMemo(() => {
     if (isTruncated) {
-      const numChars = doc.split('\n', cutoffLines).join('\n').length;
-      return doc.slice(0, numChars);
+      let truncatedText = doc;
+
+      if (maxChars && doc.length > maxChars) {
+        truncatedText = doc.slice(0, maxChars);
+      }
+
+      if (cutoffLines) {
+        const numChars = doc.split('\n', cutoffLines).join('\n').length;
+        truncatedText = truncatedText.slice(0, numChars);
+      }
+
+      return truncatedText + '...';
     }
     return doc;
-  }, [cutoffLines, doc, isTruncated]);
+  }, [doc, isTruncated, maxChars, cutoffLines]);
 
   const unsanitizedHTML = marked.parse(truncatedDoc);
 
   const sanitizedHTML: string = useMemo(() => {
     return hideFormatting || searchTerm
-      ? DOMPurify.sanitize(unsanitizedHTML, {
-          ALLOWED_TAGS: ['a', 'img'],
-          ADD_ATTR: ['target', 'onclick'],
-        })
-      : DOMPurify.sanitize(unsanitizedHTML, {
-          USE_PROFILES: { html: true },
-          ADD_ATTR: ['target', 'onclick'],
-        });
+      ? DOMPurify.sanitize(unsanitizedHTML, dompurifyConfig)
+      : DOMPurify.sanitize(unsanitizedHTML, dompurifyConfigForHTML);
   }, [hideFormatting, searchTerm, unsanitizedHTML]);
   // finalDoc is the rendered content which may include search term highlights
   const finalDoc = useMemo(() => {

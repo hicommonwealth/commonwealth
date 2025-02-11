@@ -1,4 +1,5 @@
 // Core Domain
+export * as Bot from './bot';
 export * as ChainEvents from './chain-events';
 export * as Comment from './comment';
 export * as Community from './community';
@@ -8,6 +9,7 @@ export * as Email from './emails';
 export * as Feed from './feed';
 export * as LoadTest from './load-testing';
 export * as Poll from './poll';
+export * as Quest from './quest';
 export * as Reaction from './reaction';
 export * as Snapshot from './snapshot';
 export * as Subscription from './subscription';

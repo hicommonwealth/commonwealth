@@ -13,7 +13,7 @@ module.exports = {
           symbol: { type: Sequelize.STRING, allowNull: false },
           icon_url: { type: Sequelize.STRING },
         },
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.createTable(
@@ -38,7 +38,7 @@ module.exports = {
           created_at: { type: Sequelize.DATE, allowNull: false },
           updated_at: { type: Sequelize.DATE, allowNull: false },
         },
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.createTable(
@@ -61,7 +61,7 @@ module.exports = {
             references: { model: 'Chains', key: 'id' },
           }, // removed
         },
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.createTable(
@@ -88,7 +88,7 @@ module.exports = {
           updated_at: { type: Sequelize.DATE, allowNull: false },
           deleted_at: Sequelize.DATE,
         },
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.createTable(
@@ -106,7 +106,7 @@ module.exports = {
           created_at: { type: Sequelize.DATE, allowNull: false },
           updated_at: { type: Sequelize.DATE, allowNull: false },
         },
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.createTable(
@@ -128,7 +128,7 @@ module.exports = {
           updated_at: { type: Sequelize.DATE, allowNull: false },
           deleted_at: Sequelize.DATE,
         },
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.createTable(
@@ -147,7 +147,7 @@ module.exports = {
             references: { model: 'LoginTokens', key: 'id' },
           }, // removed
         },
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.createTable(
@@ -174,7 +174,7 @@ module.exports = {
             references: { model: 'Users', key: 'id' },
           },
         },
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.addColumn(
@@ -184,7 +184,7 @@ module.exports = {
           type: Sequelize.INTEGER,
           references: { model: 'Users', key: 'id' },
         },
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.addColumn(
@@ -194,70 +194,70 @@ module.exports = {
           type: Sequelize.STRING,
           references: { model: 'Chains', key: 'id' }, // removed
         },
-        { transaction: t }
+        { transaction: t },
       );
     });
     await queryInterface.sequelize.transaction(async (t) => {
       await queryInterface.addIndex(
         'SocialAccounts',
         { fields: ['user_id'] },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.addIndex(
         'SocialAccounts',
         { fields: ['user_id', 'provider'] },
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.addIndex(
         'Users',
         { fields: ['email'] },
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.addIndex(
         'Addresses',
         { fields: ['address', 'chain'], unique: true },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.addIndex(
         'Addresses',
         { fields: ['user_id'] },
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.addIndex(
         'ChainNodes',
         { fields: ['chain'] },
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.addIndex(
         'Comments',
         { fields: ['id'] },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.addIndex(
         'Comments',
         { fields: ['chain', 'object_id'] },
-        { transaction: t }
+        { transaction: t },
       );
       await queryInterface.addIndex(
         'Comments',
         { fields: ['address_id'] },
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.addIndex(
         'LoginTokens',
         { fields: ['token', 'email'] },
-        { transaction: t }
+        { transaction: t },
       );
 
       await queryInterface.addIndex(
         'OffchainThreads',
         { fields: ['author_id'] },
-        { transaction: t }
+        { transaction: t },
       );
     });
 
