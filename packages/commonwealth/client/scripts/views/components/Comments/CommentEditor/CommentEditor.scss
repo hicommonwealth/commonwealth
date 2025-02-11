@@ -65,4 +65,15 @@
   .token-req-text.Text {
     color: $neutral-500;
   }
+
+  .ai-toggle-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+
+    .label {
+      font-size: 12px;
+      color: #757575;
+    }
+  }
 }

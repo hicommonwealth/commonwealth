@@ -188,7 +188,7 @@ const CommentEditor = ({
         </div>
         <div className="attribution-right-content">
           {aiCommentsFeatureEnabled && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+            <div className="ai-toggle-wrapper">
               <CWToggle
                 className="ai-toggle"
                 checked={effectiveAiStreaming === true}
@@ -197,7 +197,7 @@ const CommentEditor = ({
                 size="xs"
                 iconColor="#757575"
               />
-              <span style={{ fontSize: '12px', color: '#757575' }}>AI</span>
+              <span className="label">AI</span>
             </div>
           )}
         </div>

@@ -124,57 +124,26 @@ export const MobileInput = (props: MobileInputProps) => {
 
   return (
     <div className="MobileInput">
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'flex-start',
-          gap: '8px',
-          width: '100%',
-        }}
-      >
+      <div className="container">
         {avatarURL && (
           <div className="AvatarBox">
             <Avatar url={avatarURL} size={32} />
           </div>
         )}
 
-        <div
-          style={{
-            flex: 1,
-            display: 'flex',
-            alignItems: 'center',
-            background: '#FFFFFF',
-            borderRadius: '8px',
-            padding: '8px 12px',
-            border: '1px solid #E5E5E5',
-          }}
-        >
+        <div className="input-container">
           <input
             type="text"
             placeholder={placeholder}
             onKeyDown={handleKeyDown}
             onChange={handleChange}
             value={value}
-            style={{
-              flex: 1,
-              border: 'none',
-              outline: 'none',
-              background: 'transparent',
-              textOverflow: 'ellipsis',
-            }}
+            className="input"
           />
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-            }}
-          >
+          <div className="ai-toggle-row">
             {aiCommentsFeatureEnabled && (
               <div className="ai-toggle">
-                <div
-                  style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
-                >
+                <div className="ai-toggle-container">
                   <CWToggle
                     checked={aiCommentsToggleEnabled}
                     onChange={handleAiToggle}
@@ -182,7 +151,7 @@ export const MobileInput = (props: MobileInputProps) => {
                     size="xs"
                     iconColor="#757575"
                   />
-                  <span style={{ fontSize: '12px', color: '#757575' }}>AI</span>
+                  <span className="label">AI</span>
                 </div>
               </div>
             )}

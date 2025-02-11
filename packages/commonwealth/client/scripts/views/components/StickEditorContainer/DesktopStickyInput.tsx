@@ -111,18 +111,7 @@ export const DesktopStickyInput = (props: CommentEditorProps) => {
     <div className="DesktopStickyInput">
       {!useExpandedEditor ? (
         <div className="DesktopStickyInputCollapsed">
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              width: '100%',
-              background: '#FFFFFF',
-              borderRadius: '8px',
-              padding: '12px',
-              border: '1px solid #E5E5E5',
-              cursor: 'text',
-            }}
-          >
+          <div className="container">
             <input
               type="text"
               className="form-control"
@@ -132,23 +121,9 @@ export const DesktopStickyInput = (props: CommentEditorProps) => {
                   : 'Write a comment...'
               }
               onClick={handleFocused}
-              style={{
-                width: '100%',
-                border: 'none',
-                padding: '0',
-                background: 'transparent',
-                outline: 'none',
-              }}
             />
             {aiCommentsFeatureEnabled && (
-              <div
-                style={{
-                  marginLeft: '12px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '4px',
-                }}
-              >
+              <div className="ai-comments-toggle-container">
                 <CWToggle
                   className="ai-toggle"
                   checked={aiCommentsToggleEnabled}
@@ -157,7 +132,7 @@ export const DesktopStickyInput = (props: CommentEditorProps) => {
                   size="xs"
                   iconColor="#757575"
                 />
-                <span style={{ fontSize: '12px', color: '#757575' }}>AI</span>
+                <span className="label">AI</span>
               </div>
             )}
           </div>
