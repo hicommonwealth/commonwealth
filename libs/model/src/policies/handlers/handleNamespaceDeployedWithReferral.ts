@@ -49,7 +49,6 @@ async function setReferral(
         existingReferral.transaction_hash === transaction_hash &&
         existingReferral.eth_chain_id === eth_chain_id
       ) {
-        // @timolegros should we destroy or flag as removed? a new flag will require more changes to views/UI
         if (log_removed) {
           await existingReferral.destroy({ transaction });
           await updateReferralCount(referrer_address, transaction);
