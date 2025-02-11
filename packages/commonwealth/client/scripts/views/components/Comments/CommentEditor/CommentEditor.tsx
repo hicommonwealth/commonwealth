@@ -1,9 +1,10 @@
 import { ContentType } from '@hicommonwealth/shared';
 import clsx from 'clsx';
 import { notifyError } from 'controllers/app/notifications';
+import { useGenerateCommentText } from 'hooks/useGenerateCommentText';
 import Account from 'models/Account';
 import type { DeltaStatic } from 'quill';
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import { User } from 'views/components/user/user';
 import { jumpHighlightComment } from 'views/pages/discussions/CommentTree/helpers';
 import { isCommandClick } from '../../../../helpers';
@@ -11,6 +12,7 @@ import { useAiToggleState } from '../../../../hooks/useAiToggleState';
 import { CWText } from '../../component_kit/cw_text';
 import { CWValidationText } from '../../component_kit/cw_validation_text';
 import { CWButton } from '../../component_kit/new_designs/CWButton';
+import { CWThreadAction } from '../../component_kit/new_designs/cw_thread_action';
 import { CWToggle } from '../../component_kit/new_designs/cw_toggle';
 import { ReactQuillEditor } from '../../react_quill_editor';
 import './CommentEditor.scss';
@@ -49,6 +51,7 @@ const CommentEditor = ({
   author,
   shouldFocus,
   tooltipText,
+  isReplying,
   aiCommentsToggleEnabled: initialAiStreaming,
   setAICommentsToggleEnabled: onAiStreamingChange,
   onAiReply,
@@ -69,6 +72,22 @@ const CommentEditor = ({
       effectiveSetAiStreaming(!effectiveAiStreaming);
     }
   }, [effectiveAiStreaming, effectiveSetAiStreaming]);
+  const [isSubmitDisabled, setIsSubmitDisabled] = useState(false);
+
+  const { generateComment } = useGenerateCommentText();
+
+  const handleCommentWithAI = () => {
+    setIsSubmitDisabled(true);
+    let text = '';
+    setContentDelta(text);
+    generateComment('userText', (x) => {
+      text += `${x}`;
+      text = text.trim();
+      setContentDelta(text);
+    })
+      .catch(console.error)
+      .finally(() => setIsSubmitDisabled(false));
+  };
 
   const handleEnhancedSubmit = async () => {
     // Immediately close the editor before any operations
@@ -188,6 +207,16 @@ const CommentEditor = ({
         </div>
         {errorMsg && <CWValidationText message={errorMsg} status="failure" />}
       </div>
+      <div className="ml-auto">
+        {effectiveAiStreaming && (
+          <CWThreadAction
+            action="ai-reply"
+            label={`Generate AI ${!isReplying ? 'Comment' : 'Reply'}`}
+            disabled={isSubmitDisabled}
+            onClick={handleCommentWithAI}
+          />
+        )}
+      </div>
       <ReactQuillEditor
         className="editor"
         contentDelta={contentDelta}
@@ -202,7 +231,7 @@ const CommentEditor = ({
           <CWButton buttonType="tertiary" onClick={onCancel} label="Cancel" />
           <CWButton
             buttonWidth="wide"
-            disabled={disabled}
+            disabled={disabled || isSubmitDisabled}
             onClick={() => void handleEnhancedSubmit()}
             label="Post"
           />
