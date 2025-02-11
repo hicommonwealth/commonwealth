@@ -19,7 +19,6 @@ import {
   User,
   models,
 } from '@hicommonwealth/model';
-import { EventNames } from '@hicommonwealth/schemas';
 import { Client } from 'pg';
 import { config } from 'server/config';
 import { setupListener } from './pgListener';
@@ -132,7 +131,7 @@ export function bootstrapContestRolloverLoop() {
   const loop = async () => {
     try {
       await handleEvent(ContestWorker(), {
-        name: EventNames.ContestRolloverTimerTicked,
+        name: 'ContestRolloverTimerTicked',
         payload: {},
       });
     } catch (err) {

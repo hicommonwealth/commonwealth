@@ -12,7 +12,7 @@ import {
   handleEvent,
   logger,
 } from '@hicommonwealth/core';
-import { EventNames, Events } from '@hicommonwealth/schemas';
+import { Events } from '@hicommonwealth/schemas';
 import { Message } from 'amqplib';
 import { AckOrNack, default as Rascal } from 'rascal';
 
@@ -298,8 +298,7 @@ export class RabbitMQAdapter implements Broker {
     event: EventContext<Name>,
   ): RoutingKey {
     if (
-      (event.name === EventNames.ThreadCreated ||
-        event.name === EventNames.ThreadUpvoted) &&
+      (event.name === 'ThreadCreated' || event.name === 'ThreadUpvoted') &&
       'contestManagers' in event.payload &&
       event.payload.contestManagers?.length
     ) {
