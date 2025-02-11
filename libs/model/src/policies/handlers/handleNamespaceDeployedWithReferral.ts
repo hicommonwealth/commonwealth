@@ -1,51 +1,80 @@
 import { chainEvents, events } from '@hicommonwealth/schemas';
+import { Transaction } from 'sequelize';
 import { z } from 'zod';
 import { models } from '../../database';
 
+async function updateReferralCount(
+  referrer_address: string,
+  transaction: Transaction,
+) {
+  const referrer = await models.User.findOne({
+    include: [
+      {
+        model: models.Address,
+        where: { address: referrer_address },
+      },
+    ],
+    transaction,
+  });
+  referrer &&
+    (await referrer.update(
+      {
+        referral_count: models.sequelize.literal(`
+        (SELECT COUNT(DISTINCT referee_address) FROM "Referrals" 
+         WHERE referrer_address = ${models.sequelize.escape(referrer_address)})
+      `),
+      },
+      { transaction },
+    ));
+}
+
 async function setReferral(
+  namespace_address: string,
+  referrer_address: string,
+  referee_address: string,
   timestamp: number,
   eth_chain_id: number,
   transaction_hash: string,
-  namespace_address: string,
-  referee_address: string,
-  referrer_address: string,
   log_removed: boolean,
 ) {
-  const existingReferral = await models.Referral.findOne({
-    where: { referee_address, referrer_address },
-  });
-  if (existingReferral) {
-    if (
-      existingReferral.transaction_hash === transaction_hash &&
-      existingReferral.eth_chain_id === eth_chain_id
-    ) {
-      // found with txn but removed from chain
-      if (log_removed)
-        await existingReferral.update({
-          eth_chain_id: null,
-          transaction_hash: null,
-          namespace_address: null,
-          created_on_chain_timestamp: null,
-        });
-    } else {
-      // found with partial or outdated chain details
-      await existingReferral.update({
+  await models.sequelize.transaction(async (transaction) => {
+    const existingReferral = await models.Referral.findOne({
+      where: { namespace_address, referrer_address },
+      transaction,
+    });
+
+    // handle on-chain log removals
+    if (existingReferral) {
+      if (
+        existingReferral.transaction_hash === transaction_hash &&
+        existingReferral.eth_chain_id === eth_chain_id
+      ) {
+        // @timolegros should we destroy or flag as removed? a new flag will require more changes to views/UI
+        if (log_removed) {
+          await existingReferral.destroy({ transaction });
+          await updateReferralCount(referrer_address, transaction);
+        }
+        return;
+      }
+      throw new Error(
+        `Found referral of namespace ${namespace_address} with mismatched chain details`,
+      );
+    }
+
+    await models.Referral.create(
+      {
+        namespace_address,
+        referrer_address,
+        referee_address,
         eth_chain_id,
         transaction_hash,
-        namespace_address,
+        referrer_received_eth_amount: 0,
         created_on_chain_timestamp: Number(timestamp),
-      });
-    }
-  } else
-    await models.Referral.create({
-      eth_chain_id,
-      transaction_hash,
-      namespace_address,
-      referee_address,
-      referrer_address,
-      referrer_received_eth_amount: 0,
-      created_on_chain_timestamp: Number(timestamp),
-    });
+      },
+      { transaction },
+    );
+    await updateReferralCount(referrer_address, transaction);
+  });
 }
 
 export async function handleNamespaceDeployedWithReferral(
@@ -65,12 +94,12 @@ export async function handleNamespaceDeployedWithReferral(
 
   if (referrer_address)
     await setReferral(
+      namespace_address,
+      referrer_address,
+      referee_address,
       event.block.timestamp,
       event.eventSource.ethChainId,
       event.rawLog.transactionHash,
-      namespace_address,
-      referee_address,
-      referrer_address,
       event.rawLog.removed,
     );
 }
