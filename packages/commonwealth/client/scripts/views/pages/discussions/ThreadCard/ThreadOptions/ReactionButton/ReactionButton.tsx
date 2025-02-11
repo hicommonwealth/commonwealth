@@ -39,7 +39,6 @@ export const ReactionButton = ({
   tooltipText,
   undoUpvoteDisabled,
 }: ReactionButtonProps) => {
-  console.log({ thread });
   const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
   const reactors = thread?.associatedReactions?.map((t) => t.address!);
 
