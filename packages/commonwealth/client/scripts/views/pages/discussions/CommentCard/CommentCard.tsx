@@ -233,31 +233,13 @@ export const CommentCard = ({
           throw new Error('Invalid parent comment ID');
         }
 
-        console.log('Starting AI reply generation with params:', {
-          parentCommentText,
-          actualParentId,
-          threadId: comment.thread_id,
-          communityId: comment.community_id,
-          userAddress: activeUserAddress,
-        });
-
         await generateCommentRef.current(parentCommentText, (text) => {
           if (mounted) {
             // Append incoming chunks so the full comment is built up
             accumulatedText += text;
-            console.log('Received text update:', {
-              newText: text,
-              textLength: text.length,
-              accumulatedLength: accumulatedText.length,
-            });
             setStreamingText(accumulatedText);
             finalText = accumulatedText;
           }
-        });
-
-        console.log('AI generation complete, final text:', {
-          finalText,
-          length: finalText.length,
         });
 
         if (mounted && finalText) {
@@ -267,15 +249,6 @@ export const CommentCard = ({
             );
             throw new Error('No active account found');
           }
-
-          console.log('Building comment input with params:', {
-            communityId: comment.community_id,
-            address: activeUserAddress,
-            threadId: comment.thread_id,
-            finalText,
-            actualParentId,
-            finalTextLength: finalText.length,
-          });
 
           const input = await buildCreateCommentInput({
             communityId: comment.community_id,
@@ -288,19 +261,8 @@ export const CommentCard = ({
             existingNumberOfComments: 0,
           });
 
-          console.log('Created comment input:', input);
-          const newComment = await createCommentRef.current(input);
-          console.log(
-            'Successfully saved AI reply as new comment:',
-            newComment,
-          );
+          await createCommentRef.current(input);
           onStreamingCompleteRef.current?.();
-        } else {
-          console.log('No text to save or component unmounted:', {
-            mounted,
-            hasFinalText: !!finalText,
-            finalTextLength: finalText?.length,
-          });
         }
       } catch (error) {
         console.error('Failed to generate AI reply:', error);

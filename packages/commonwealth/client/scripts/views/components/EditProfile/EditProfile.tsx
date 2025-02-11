@@ -411,7 +411,7 @@ const EditProfile = () => {
                         checked={userAiEnabled}
                         onChange={() => setUserAiEnabled(!userAiEnabled)}
                         icon="sparkle"
-                        size="md"
+                        size="xs"
                         iconColor="#757575"
                       />
                     </div>

@@ -6,13 +6,11 @@ type AIStreamingCallback = (commentId: number) => void;
 let aiStreamingCallbacks: AIStreamingCallback[] = [];
 
 export const registerAIStreamingCallback = (callback: AIStreamingCallback) => {
-  console.log('helpers - Registering AI streaming callback');
   // Remove any existing instances of this callback
   aiStreamingCallbacks = aiStreamingCallbacks.filter((cb) => cb !== callback);
   // Add the new callback
   aiStreamingCallbacks.push(callback);
   return () => {
-    console.log('helpers - Unregistering AI streaming callback');
     aiStreamingCallbacks = aiStreamingCallbacks.filter((cb) => cb !== callback);
   };
 };
@@ -22,12 +20,6 @@ export const jumpHighlightComment = (
   commentId: number,
   shouldTriggerAI: boolean = false,
 ) => {
-  console.log(
-    'helpers - jumpHighlightComment called for:',
-    commentId,
-    'AI enabled:',
-    shouldTriggerAI,
-  );
   const element = document.querySelector(`.comment-${commentId}`);
   if (!element) {
     console.warn(`No element found for comment ID: ${commentId}`);
@@ -42,12 +34,6 @@ export const jumpHighlightComment = (
 
   // Only notify callbacks if AI is enabled and callbacks exist
   if (shouldTriggerAI && aiStreamingCallbacks.length > 0) {
-    console.log(
-      'helpers - AI is enabled, notifying callbacks for comment:',
-      commentId,
-      'Number of callbacks:',
-      aiStreamingCallbacks.length,
-    );
     aiStreamingCallbacks.forEach((callback) => {
       try {
         callback(commentId);
@@ -55,11 +41,6 @@ export const jumpHighlightComment = (
         console.error('Error in AI streaming callback:', error);
       }
     });
-  } else {
-    console.log(
-      'helpers - Skipping AI callbacks:',
-      shouldTriggerAI ? 'no callbacks registered' : 'AI is disabled',
-    );
   }
 };
 
