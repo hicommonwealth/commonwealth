@@ -216,8 +216,6 @@ export const CommentCard = ({
 
   const activeUserAddress = user.activeAccount?.address;
 
-  // There's extensive logging here for debugging purposes
-  // TODO: Remove the logging before merge
   useEffect(() => {
     if (!isStreamingAIReply || !parentCommentText) return;
 
