@@ -7,6 +7,7 @@ export const ApiKey = z.object({
   user_id: PG_INT.optional(),
   hashed_api_key: z.string(),
   salt: z.string(),
+  premium_tier: z.boolean(),
   created_at: z.coerce.date().optional(),
   updated_at: z.coerce.date().optional(),
 });

@@ -9,11 +9,14 @@ import { useThreadSubscriptions } from 'views/pages/NotificationSettings/useThre
 type ToggleThreadSubscribeProps = Readonly<{
   readonly thread: Thread;
   readonly isCommunityMember: boolean;
+  showLabel?: boolean;
 }>;
 
-export const ToggleThreadSubscribe = (props: ToggleThreadSubscribeProps) => {
-  const { thread, isCommunityMember } = props;
-
+export const ToggleThreadSubscribe = ({
+  thread,
+  isCommunityMember,
+  showLabel = true,
+}: ToggleThreadSubscribeProps) => {
   const createThreadSubscriptionMutation =
     useCreateThreadSubscriptionMutation();
   const deleteThreadSubscriptionMutation =
@@ -76,7 +79,9 @@ export const ToggleThreadSubscribe = (props: ToggleThreadSubscribeProps) => {
   return (
     <CWThreadAction
       action="subscribe"
-      label={hasThreadSubscription ? 'Subscribed' : 'Subscribe'}
+      label={
+        showLabel ? (hasThreadSubscription ? 'Subscribed' : 'Subscribe') : ''
+      }
       className={clsx('subscribe', { selected: hasThreadSubscription })}
       onClick={handleToggleSubscribe}
       selected={!hasThreadSubscription}

@@ -4,7 +4,7 @@ import { ed25519 } from '@canvas-js/signatures';
 import assert from 'assert';
 
 import { contractTopic } from './runtime/contract';
-import { getSessionSignerForDid } from './signers';
+import { getAddressFromDid, getSessionSignerForDid } from './signers';
 import { CanvasSignedData, CanvasSignedDataOption } from './types';
 import { assertMatches } from './utils';
 
@@ -90,7 +90,7 @@ export const verifyComment = async (
 
   assertMatches(
     address,
-    actionMessage.payload.did.split(':')[4],
+    getAddressFromDid(actionMessage.payload.did),
     'comment',
     'origin',
   );
@@ -150,7 +150,7 @@ export const verifyThread = async (
   assertMatches(topic, actionMessage.payload.args.topic, 'thread', 'topic');
   assertMatches(
     address,
-    actionMessage.payload.did.split(':')[4],
+    getAddressFromDid(actionMessage.payload.did),
     'thread',
     'origin',
   );
@@ -221,7 +221,7 @@ export const verifyReaction = async (
 
   assertMatches(
     fields.address,
-    actionMessage.payload.did.split(':')[4],
+    getAddressFromDid(actionMessage.payload.did),
     'reaction',
     'origin',
   );

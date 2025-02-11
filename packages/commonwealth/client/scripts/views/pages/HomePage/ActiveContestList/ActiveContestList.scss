@@ -1,0 +1,45 @@
+@import '../../../../styles/shared';
+
+.ActiveContestList {
+  margin: 16px 0;
+
+  .heading-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+
+    .link-right {
+      display: flex;
+      gap: 4px;
+
+      .link {
+        &:hover,
+        &:active,
+        &:visited {
+          color: $primary-600;
+        }
+      }
+    }
+  }
+
+  .content {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    justify-content: start;
+    margin: 10px 0;
+
+    @include extraSmall {
+      flex-direction: column;
+      flex-wrap: nowrap;
+    }
+  }
+
+  .empty-contests {
+    margin: 24px auto;
+    display: flex;
+    justify-content: center;
+    text-align: center;
+  }
+}

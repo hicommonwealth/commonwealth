@@ -1,3 +1,4 @@
 import { useFetchQuestsQuery } from './fetchQuests';
+import { useGetQuestByIdQuery } from './getQuestById';
 
-export { useFetchQuestsQuery };
+export { useFetchQuestsQuery, useGetQuestByIdQuery };

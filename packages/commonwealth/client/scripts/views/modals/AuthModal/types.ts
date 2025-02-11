@@ -15,7 +15,7 @@ export type ModalBaseTabs = {
 export type ModalVariantProps = {
   onClose: () => any;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  onSuccess?: (isNewAccount?: boolean) => any;
+  onSuccess?: (isNewAccount?: boolean, isUserFromWebView?: boolean) => any;
   showWalletsFor?:
     | ChainBase.Ethereum
     | ChainBase.CosmosSDK
@@ -24,6 +24,8 @@ export type ModalVariantProps = {
 
   showAuthOptionFor?: AuthWallets | AuthSSOs;
   onSignInClick?: () => void;
+  triggerOpenEVMWalletsSubModal?: boolean;
+  isUserFromWebView?: boolean;
 };
 
 export type ModalBaseProps = {
@@ -36,7 +38,15 @@ export type AuthModalProps = Pick<
   {
     isOpen: boolean;
     type?: AuthModalType;
+    triggerOpenEVMWalletsSubModal?: boolean;
+    isUserFromWebView?: boolean;
   } & ModalVariantProps,
   // only allow these props for external usage of <AuthModal/>
-  'type' | 'isOpen' | 'onClose' | 'onSuccess' | 'showWalletsFor'
+  | 'type'
+  | 'isOpen'
+  | 'onClose'
+  | 'onSuccess'
+  | 'showWalletsFor'
+  | 'triggerOpenEVMWalletsSubModal'
+  | 'isUserFromWebView'
 >;

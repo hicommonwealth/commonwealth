@@ -9,6 +9,7 @@ const HomePage = lazy(() => import('views/pages/HomePage/HomePage'));
 
 const CreateCommunityPage = lazy(() => import('views/pages/CreateCommunity'));
 const CreateQuestPage = lazy(() => import('views/pages/CreateQuest'));
+const QuestDetailsPage = lazy(() => import('views/pages/QuestDetails'));
 const LaunchTokenPage = lazy(() => import('views/pages/LaunchToken'));
 const OverviewPage = lazy(() => import('views/pages/overview'));
 const MembersPage = lazy(
@@ -107,10 +108,14 @@ const ProfilePageRedirect = lazy(() => import('views/pages/profile_redirect'));
 const UnSubscribePage = lazy(() => import('views/pages/UnSubscribePage'));
 
 const RewardsPage = lazy(() => import('views/pages/RewardsPage'));
+const CommunityHomePage = lazy(
+  () => import('../views/pages/CommunityHome/CommunityHomePage'),
+);
 
 const CustomDomainRoutes = ({
   launchpadEnabled,
   xpEnabled,
+  communityHomeEnabled,
   homePageEnable,
 }: RouteFeatureFlags) => {
   return [
@@ -133,6 +138,11 @@ const CustomDomainRoutes = ({
             key="/createQuest"
             path="/createQuest"
             element={withLayout(CreateQuestPage, { type: 'common' })}
+          />,
+          <Route
+            key="/quest/:id"
+            path="/quest/:id"
+            element={withLayout(QuestDetailsPage, { type: 'common' })}
           />,
         ]
       : []),
@@ -278,6 +288,17 @@ const CustomDomainRoutes = ({
     // GOVERNANCE END
 
     // DISCUSSIONS
+    ...(communityHomeEnabled
+      ? [
+          <Route
+            key="/community-home"
+            path="/community-home"
+            element={withLayout(CommunityHomePage, {
+              scoped: true,
+            })}
+          />,
+        ]
+      : []),
     <Route
       key="/discussions"
       path="/discussions"
