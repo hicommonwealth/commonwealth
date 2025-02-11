@@ -200,7 +200,6 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
             )}
             {children}
           </div>
-          {/* Growl should be added here when in place*/}
           {growlEnabled && showGrowlOnMobile && (
             <CWGrowlTemplate
               headerText=""
