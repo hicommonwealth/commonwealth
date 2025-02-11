@@ -102,13 +102,10 @@ const CommentEditor = ({
       setTimeout(() => {
         // If AI streaming is enabled, trigger the AI reply through TreeHierarchy
         if (effectiveAiStreaming === true && onAiReply) {
-          try {
-            Promise.resolve(onAiReply(commentId));
-          } catch (error) {
+          Promise.resolve(onAiReply(commentId)).catch((error) => {
             console.error('Failed to trigger AI reply:', error);
             notifyError('Failed to generate AI reply');
-            return;
-          }
+          });
         }
 
         // Function to attempt jumping to the comment
