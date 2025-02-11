@@ -74,7 +74,7 @@ export const TreeHierarchy = ({
   ) as ExtendedCommentViewParams[];
 
   const handleGenerateAIReply = useCallback(
-    (commentId: number) => {
+    async (commentId: number) => {
       if (streamingReplyIds.includes(commentId)) {
         return;
       }
@@ -186,7 +186,7 @@ export const TreeHierarchy = ({
                     onReply={() => {
                       onCommentReplyStart(comment.id, index);
                     }}
-                    onAIReply={() => handleGenerateAIReply(comment.id)}
+                    onAIReply={async () => handleGenerateAIReply(comment.id)}
                     onDelete={() => onDelete(comment)}
                     isSpam={!!comment.marked_as_spam_at}
                     onSpamToggle={() => onSpamToggle(comment)}
