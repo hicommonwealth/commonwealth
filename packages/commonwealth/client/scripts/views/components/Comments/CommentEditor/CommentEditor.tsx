@@ -60,7 +60,6 @@ const CommentEditor = ({
     aiCommentsFeatureEnabled,
   } = useAiToggleState();
 
-  // Use the prop values if provided, otherwise use the hook values
   const effectiveAiStreaming = initialAiStreaming ?? aiCommentsToggleEnabled;
   const effectiveSetAiStreaming =
     onAiStreamingChange ?? setAICommentsToggleEnabled;

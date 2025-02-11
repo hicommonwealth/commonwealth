@@ -285,14 +285,12 @@ export const CommentCard = ({
     activeUserAddress,
   ]);
 
-  // Reset streaming text when starting a new reply
   useEffect(() => {
     if (isStreamingAIReply) {
       setStreamingText('');
     }
   }, [isStreamingAIReply]);
 
-  // Use streaming text if available, otherwise use comment body
   const displayText = isStreamingAIReply ? streamingText : comment.body;
 
   const handleReaction = () => {

@@ -18,7 +18,6 @@ import './CommentTree.scss';
 import { registerAIStreamingCallback } from './helpers';
 import { TreeHierarchyProps } from './types';
 
-// Extend CommentViewParams to include AI reply properties
 type ExtendedCommentViewParams = CommentViewParams & {
   hasOnAiReply?: boolean;
   onAiReplyType?: 'function';
@@ -91,7 +90,6 @@ export const TreeHierarchy = ({
     [allComments, streamingReplyIds],
   );
 
-  // Register the callback when the component mounts
   useEffect(() => {
     const unregister = registerAIStreamingCallback((commentId) => {
       void handleGenerateAIReply(commentId);
@@ -116,7 +114,6 @@ export const TreeHierarchy = ({
 
   const commentRefs = useRef<(HTMLDivElement | null)[]>([]);
 
-  // Add this method to directly trigger streaming for a new comment
   const triggerStreamingForNewComment = useCallback((commentId: number) => {
     setStreamingReplyIds((prev) => [...prev, commentId]);
   }, []);

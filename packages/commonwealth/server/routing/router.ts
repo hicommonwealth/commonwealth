@@ -488,7 +488,6 @@ function setupRouter(
     },
   );
 
-  // New endpoint: generateCommentText for streaming AI-generated comment text
   registerRoute(
     router,
     'post',
