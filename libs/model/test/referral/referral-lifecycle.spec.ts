@@ -186,9 +186,8 @@ describe('Referral lifecycle', () => {
     // simulate on-chain transactions that occur when
     // referral fees are distributed to the referrer
     const checkpoint = new Date();
-    const fee = 1;
-    const ethMul = BigNumber.from(10).pow(18);
-    const hex = BigNumber.from(fee).mul(ethMul).toHexString();
+    const fee = 123456;
+    const hex = BigNumber.from(fee).toHexString();
     await models.Outbox.bulkCreate([
       chainEvent(
         '0x4',

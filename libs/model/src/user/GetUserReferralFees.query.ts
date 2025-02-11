@@ -27,7 +27,7 @@ SELECT
   F.namespace_address,
   F.distributed_token_address,
   F.referrer_recipient_address,
-  F.referrer_received_amount,
+  CAST(F.referrer_received_amount AS DOUBLE PRECISION) as referrer_received_amount,
   CAST(F.transaction_timestamp AS DOUBLE PRECISION) as transaction_timestamp,
   F.referee_address,
   C.id AS community_id,

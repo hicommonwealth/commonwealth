@@ -28,7 +28,7 @@ referrals AS (
     referee_address,
     eth_chain_id,
     transaction_hash,
-    referrer_received_eth_amount,
+    CAST(referrer_received_eth_amount AS DOUBLE PRECISION) as referrer_received_eth_amount,
     CAST(created_on_chain_timestamp AS DOUBLE PRECISION) as created_on_chain_timestamp,
     created_at,
     updated_at
