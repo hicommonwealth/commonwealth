@@ -60,6 +60,11 @@ export function formatBigNumberShort(num: number, numDecimals: number): string {
 
 /**
  * Converts a wei value to a human-readable vote weight string.
+ *
+ *  NOTE: if using a wei value from the backend, there's
+ *        no need to set the multiplier because it's
+ *        already weighted.
+ *
  */
 export const prettyVoteWeight = (
   wei: string,
