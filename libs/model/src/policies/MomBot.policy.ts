@@ -31,7 +31,7 @@ export function MomBotPolicy(): Policy<typeof inputs> {
         );
 
         if (!aiRes) {
-          // TODO: should we still reply?
+          // TODO: should we still reply? -> answer: generic reply
           log.info(`This tweet is not a MomBot command`, payload);
           return;
         }
@@ -44,7 +44,7 @@ export function MomBotPolicy(): Policy<typeof inputs> {
         // -> https://magic.link/posts/wallet-pregeneration
         const creatorAddress = '';
 
-        const communityName = `${payload.username}'s Dating Pool`;
+        const communityName = `${payload.username}'s Pool`;
 
         const existingCommunity = await models.Community.findOne({
           where: {
@@ -52,8 +52,9 @@ export function MomBotPolicy(): Policy<typeof inputs> {
           },
         });
         if (existingCommunity) {
-          // TODO: do create a random id or can each user only have 1 dating pool?4
+          // TODO: do create a random id or can each user only have 1 dating pool?
           // TODO: how can we tell if this is just a retry of the same tweet processing vs new tweet
+          // TODO: ANSWER NOOOO
         }
 
         const chainNode = await models.ChainNode.findOne({
@@ -83,6 +84,7 @@ export function MomBotPolicy(): Policy<typeof inputs> {
             base: ChainBase.Ethereum,
             token_name: payload.username,
             default_symbol: '',
+            // TODO: icon = twitter user PFP
           },
         });
         if (!community) {
