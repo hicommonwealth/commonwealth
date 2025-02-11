@@ -20,22 +20,22 @@ export const rascalConsumerMap = [
   {
     consumer: ContestWorker,
     overrides: {
-      ThreadCreated: `${'ThreadCreated'}.${RoutingKeyTags.Contest}.#`,
-      ThreadUpvoted: `${'ThreadUpvoted'}.${RoutingKeyTags.Contest}.#`,
+      ThreadCreated: `ThreadCreated.${RoutingKeyTags.Contest}.#`,
+      ThreadUpvoted: `ThreadUpvoted.${RoutingKeyTags.Contest}.#`,
     },
   },
   {
     consumer: User.Xp,
     overrides: {
-      ThreadCreated: `${'ThreadCreated'}.#`,
-      ThreadUpvoted: `${'ThreadUpvoted'}.#`,
+      ThreadCreated: `ThreadCreated.#`,
+      ThreadUpvoted: `ThreadUpvoted.#`,
     },
   },
   {
     consumer: NotificationsPolicy,
     overrides: {
       ThreadCreated: null,
-      ThreadUpvoted: `${'ThreadUpvoted'}.#`,
+      ThreadUpvoted: `ThreadUpvoted.#`,
     },
   },
 ];

@@ -4,6 +4,7 @@ import {
   EventsHandlerMetadata,
   outboxEvents,
 } from '@hicommonwealth/core';
+import { Events } from '@hicommonwealth/schemas';
 import {
   BindingConfig,
   BrokerConfig,
@@ -148,7 +149,7 @@ export function createRmqConfig({
         (acc: string[], val) => {
           // if consumer handler does not have an associated event
           // from the Outbox exclude it automatically
-          if (!Object.keys(outboxEvents).includes(val)) {
+          if (!outboxEvents.includes(<Events>val)) {
             return acc;
           }
 
