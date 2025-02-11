@@ -33,6 +33,8 @@ export type CommentEditorProps = {
   setAICommentsToggleEnabled?: (value: boolean) => void;
   onAiReply?: (commentId: number) => void;
   onCommentCreated?: (commentId: number, hasAI: boolean) => void;
+  replyingToAuthor?: string;
+  streamingReplyIds?: number[];
 };
 
 const CommentEditor = ({
