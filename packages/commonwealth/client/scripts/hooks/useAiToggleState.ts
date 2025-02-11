@@ -9,12 +9,11 @@ import { useFlag } from './useFlag';
 export const useAiToggleState = () => {
   const aiCommentsEnabled = useFlag('aiComments');
   const [userAiEnabled, setUserAiEnabled] = useState(
-    getLocalStorageItem(LocalStorageKeys.AIInteractionsEnabled) === 'true' ||
-      false,
+    getLocalStorageItem(LocalStorageKeys.AIInteractionsEnabled) === 'true',
   );
 
   const [useAiStreaming, setUseAiStreaming] = useState(
-    getLocalStorageItem(LocalStorageKeys.AICommentsEnabled) === 'true' || false,
+    getLocalStorageItem(LocalStorageKeys.AICommentsEnabled) === 'true',
   );
 
   const handleAiToggle = useCallback((newValue: boolean) => {
