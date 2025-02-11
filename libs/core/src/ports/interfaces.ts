@@ -8,6 +8,7 @@ import {
   InvalidInput,
 } from '../framework';
 import {
+  AddressOwnershipTransferredNotification,
   ChainProposalsNotification,
   CommentCreatedNotification,
   CommunityStakeNotification,
@@ -274,6 +275,7 @@ export enum WorkflowKeys {
   CommunityStake = 'community-stake',
   ChainProposals = 'chain-event-proposals',
   NewUpvotes = 'new-upvote',
+  AddressOwnershipTransferred = 'address-ownership-transferred',
   EmailRecap = 'email-recap',
   EmailDigest = 'email-digest',
   Webhooks = 'webhooks',
@@ -364,6 +366,10 @@ export type NotificationsProviderTriggerOptions =
         | {
             data: z.infer<typeof QuestStartedNotification>;
             key: WorkflowKeys.QuestStarted;
+          }
+        | {
+            data: z.infer<typeof AddressOwnershipTransferredNotification>;
+            key: WorkflowKeys.AddressOwnershipTransferred;
           }
       ))
   | WebhookProviderOptions;

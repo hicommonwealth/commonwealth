@@ -40,6 +40,7 @@ export const outboxEvents: Events[] = [
   'ThreadUpvoted',
   'UserMentioned',
   'QuestStarted',
+  'AddressOwnershipTransferred',
 ] as const;
 
 export const Outbox = z.union(
