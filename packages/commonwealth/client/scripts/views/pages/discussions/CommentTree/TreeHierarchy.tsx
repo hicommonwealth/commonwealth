@@ -74,18 +74,19 @@ export const TreeHierarchy = ({
   ) as ExtendedCommentViewParams[];
 
   const handleGenerateAIReply = useCallback(
-    async (commentId: number) => {
+    (commentId: number): Promise<void> => {
       if (streamingReplyIds.includes(commentId)) {
-        return;
+        return Promise.resolve();
       }
 
       const comment = allComments.find((c) => c.id === commentId);
       if (!comment) {
         console.error('TreeHierarchy - Comment not found:', commentId);
-        return;
+        return Promise.resolve();
       }
 
       setStreamingReplyIds((prev) => [...prev, commentId]);
+      return Promise.resolve();
     },
     [allComments, streamingReplyIds],
   );
