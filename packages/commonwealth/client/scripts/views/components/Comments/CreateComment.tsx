@@ -110,12 +110,7 @@ export const CreateComment = ({
         existingNumberOfComments: rootThread.numberOfComments || 0,
       });
 
-      console.log(
-        'CreateComment - Submitting comment with AI:',
-        aiCommentsToggleEnabled,
-      );
       const newComment = await createComment(input);
-      console.log('CreateComment - Comment created:', newComment);
 
       if (!newComment?.id) {
         throw new Error('No comment ID returned');
@@ -134,10 +129,6 @@ export const CreateComment = ({
       }
 
       // Notify parent about the new comment and its AI status
-      console.log('CreateComment - Notifying parent of new comment:', {
-        commentId,
-        hasAI: aiCommentsToggleEnabled,
-      });
       onCommentCreated?.(commentId, aiCommentsToggleEnabled);
 
       return commentId;

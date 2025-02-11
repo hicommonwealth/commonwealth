@@ -66,12 +66,6 @@ const CommentEditor = ({
 
   const handleAiToggle = useCallback(() => {
     if (effectiveSetAiStreaming) {
-      console.log(
-        'CommentEditor - Toggling AI from:',
-        effectiveAiStreaming,
-        'to:',
-        !effectiveAiStreaming,
-      );
       effectiveSetAiStreaming(!effectiveAiStreaming);
     }
   }, [effectiveAiStreaming, effectiveSetAiStreaming]);
@@ -108,9 +102,6 @@ const CommentEditor = ({
       setTimeout(() => {
         // If AI streaming is enabled, trigger the AI reply through TreeHierarchy
         if (effectiveAiStreaming === true && onAiReply) {
-          console.log(
-            'CommentEditor - AI streaming is enabled, triggering reply',
-          );
           try {
             Promise.resolve(onAiReply(commentId));
           } catch (error) {
@@ -118,10 +109,6 @@ const CommentEditor = ({
             notifyError('Failed to generate AI reply');
             return;
           }
-        } else {
-          console.log(
-            'CommentEditor - AI streaming is disabled, skipping AI reply',
-          );
         }
 
         // Function to attempt jumping to the comment

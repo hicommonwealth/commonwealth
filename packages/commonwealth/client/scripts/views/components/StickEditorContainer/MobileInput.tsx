@@ -68,12 +68,7 @@ export const MobileInput = (props: MobileInputProps) => {
     try {
       let aiPromise;
       if (aiCommentsToggleEnabled === true && onAiReply) {
-        console.log('MobileInput - AI streaming is enabled, generating reply');
         aiPromise = generateComment(submittedText);
-      } else {
-        console.log(
-          'MobileInput - AI streaming is disabled, skipping AI reply',
-        );
       }
 
       setValue('');
@@ -95,10 +90,6 @@ export const MobileInput = (props: MobileInputProps) => {
       if (typeof commentId === 'number') {
         try {
           await listenForComment(commentId, aiCommentsToggleEnabled === true);
-          console.log(
-            'MobileInput - Successfully jumped to comment:',
-            commentId,
-          );
         } catch (error) {
           console.warn('MobileInput - Failed to jump to comment:', error);
         }

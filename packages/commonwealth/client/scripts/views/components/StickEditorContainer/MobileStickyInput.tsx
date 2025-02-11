@@ -20,9 +20,7 @@ export const MobileStickyInput = (props: CommentEditorProps) => {
 
   const handleAiReply = useCallback(
     (commentId: number) => {
-      console.log('MobileStickyInput - Starting AI reply for:', commentId);
       if (streamingReplyIds.includes(commentId)) {
-        console.log('Already streaming for this comment');
         return;
       }
       setStreamingReplyIds((prev) => [...prev, commentId]);
@@ -41,23 +39,12 @@ export const MobileStickyInput = (props: CommentEditorProps) => {
 
     // If AI mode is enabled, trigger the streaming reply
     if (aiCommentsToggleEnabled) {
-      console.log(
-        'MobileStickyInput - AI streaming is enabled, triggering reply',
-      );
       handleAiReply(commentId);
-    } else {
-      console.log(
-        'MobileStickyInput - AI streaming is disabled, skipping AI reply',
-      );
     }
 
     // Use the new listenForComment function
     try {
       await listenForComment(commentId, aiCommentsToggleEnabled);
-      console.log(
-        'MobileStickyInput - Successfully jumped to comment:',
-        commentId,
-      );
     } catch (error) {
       console.warn('MobileStickyInput - Failed to jump to comment:', error);
     }
