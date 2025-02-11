@@ -1,6 +1,6 @@
 import { OpenAI } from 'openai';
 import {
-  ChatCompletionMessage,
+  ChatCompletionDeveloperMessageParam,
   ChatCompletionTool,
 } from 'openai/resources/index.mjs';
 import { config } from '../../config';
@@ -26,8 +26,8 @@ export type ContestMetadataResponse = {
   isUSDC: boolean;
 };
 
-const system_prompt: ChatCompletionMessage = {
-  role: 'assistant',
+const system_prompt: ChatCompletionDeveloperMessageParam = {
+  role: 'developer',
   content: `
     You are a data extraction system that extracts information from the user.
 
@@ -131,6 +131,8 @@ export const getContestUSDCAddress = () => {
   return USDC_BASE_SEPOLIA_ADDRESS;
 };
 
+// TODO: Update to use OpenAI StructuredOutputs instead of manually parsing
+// TODO: Generalize
 export const parseBotCommand = async (
   command: string,
 ): Promise<ContestMetadataResponse> => {
