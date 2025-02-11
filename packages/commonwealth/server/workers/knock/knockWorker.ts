@@ -1,17 +1,15 @@
 import {
-  buildRetryStrategy,
-  getRabbitMQConfig,
   HotShotsStats,
   KnockProvider,
   RabbitMQAdapter,
-  RascalConfigServices,
   ServiceKey,
+  buildRetryStrategy,
+  createRmqConfig,
   startHealthCheckLoop,
 } from '@hicommonwealth/adapters';
 import {
   Broker,
   broker,
-  BrokerSubscriptions,
   dispose,
   logger,
   notificationsProvider,
@@ -19,6 +17,7 @@ import {
 } from '@hicommonwealth/core';
 import { NotificationsPolicy } from '@hicommonwealth/model';
 import { fileURLToPath } from 'url';
+import { rascalConsumerMap } from '../../bindings/rascalConsumerMap';
 import { config } from '../../config';
 import { NotificationsSettingsPolicy } from './NotificationsSettings.policy';
 
@@ -46,10 +45,10 @@ async function startKnockWorker() {
   let brokerInstance: Broker;
   try {
     const rmqAdapter = new RabbitMQAdapter(
-      getRabbitMQConfig(
-        config.BROKER.RABBITMQ_URI,
-        RascalConfigServices.CommonwealthService,
-      ),
+      createRmqConfig({
+        rabbitMqUri: config.BROKER.RABBITMQ_URI,
+        map: rascalConsumerMap,
+      }),
     );
     await rmqAdapter.init();
     broker({
@@ -71,8 +70,7 @@ async function startKnockWorker() {
   else notificationsProvider();
 
   const sub = await brokerInstance.subscribe(
-    BrokerSubscriptions.NotificationsProvider,
-    NotificationsPolicy(),
+    NotificationsPolicy,
     // This disables retry strategies on any handler error/failure
     // This is because we cannot guarantee whether a Knock workflow trigger
     // call was successful or not. It is better to 'miss' notifications then
@@ -92,15 +90,14 @@ async function startKnockWorker() {
       'Failed to subscribe to notifications. Requires restart!',
       undefined,
       {
-        topic: BrokerSubscriptions.NotificationsProvider,
+        topic: NotificationsPolicy.name,
       },
     );
     await dispose()('ERROR', true);
   }
 
   const settingsSub = await brokerInstance.subscribe(
-    BrokerSubscriptions.NotificationsSettings,
-    NotificationsSettingsPolicy(),
+    NotificationsSettingsPolicy,
   );
 
   if (!settingsSub) {
@@ -108,7 +105,7 @@ async function startKnockWorker() {
       'Failed to subscribe to notifications. Requires restart!',
       undefined,
       {
-        topic: BrokerSubscriptions.NotificationsProvider,
+        topic: NotificationsSettingsPolicy.name,
       },
     );
     await dispose()('ERROR', true);

@@ -14,8 +14,12 @@
       display: flex;
       gap: 4px;
 
-      &:hover {
-        filter: brightness(1.2);
+      .link {
+        &:hover,
+        &:active,
+        &:visited {
+          color: $primary-600;
+        }
       }
     }
   }

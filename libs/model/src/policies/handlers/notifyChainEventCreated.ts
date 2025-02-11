@@ -17,13 +17,9 @@ export const notifyChainEventCreated: EventHandler<
       await notifyCommunityStakeTrades(models, payload);
       break;
 
-    case EvmEventSignatures.NamespaceFactory.NamespaceDeployed:
-      log.info('Implementation not defined', { payload });
-      break;
-
     default:
-      log.error('Attempted to process an unsupported chain-event', undefined, {
-        event: payload,
+      log.warn('Unsupported chain-event notification', {
+        event: payload.eventSource.eventSignature,
       });
   }
 };
