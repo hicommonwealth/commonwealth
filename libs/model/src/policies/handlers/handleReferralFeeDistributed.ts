@@ -32,8 +32,9 @@ export async function handleReferralFeeDistributed(
   });
   if (!referral) return; // we must guarantee the order of chain events here
 
-  const referrer_received_amount =
-    Number(BigNumber.from(fee_amount).toBigInt()) / 1e18;
+  const referrer_received_amount = Number(
+    BigNumber.from(fee_amount).toBigInt(),
+  );
 
   await models.sequelize.transaction(async (transaction) => {
     await models.ReferralFee.create(
