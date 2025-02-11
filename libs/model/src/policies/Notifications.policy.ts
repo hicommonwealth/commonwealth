@@ -5,6 +5,7 @@ import { notifyChainEventCreated } from './handlers/notifyChainEventCreated';
 import { notifyCommentCreated } from './handlers/notifyCommentCreated';
 import { notifyCommentUpvoted } from './handlers/notifyCommentUpvoted';
 import { notifyContestEvent } from './handlers/notifyContestEvent';
+import { notifyQuestStarted } from './handlers/notifyQuestStarted';
 import { notifySnapshotProposalCreated } from './handlers/notifySnapshotProposalCreated';
 import { notifyThreadCreated } from './handlers/notifyThreadCreated';
 import { notifyThreadUpvoted } from './handlers/notifyThreadUpvoted';
@@ -22,6 +23,8 @@ const notificationInputs = {
   ContestStarted: events.ContestStarted,
   ContestEnding: events.ContestEnding,
   ContestEnded: events.ContestEnded,
+  // Quest Events
+  QuestStarted: events.QuestStarted,
   AddressOwnershipTransferred: events.AddressOwnershipTransferred,
 };
 
@@ -58,6 +61,9 @@ export function NotificationsPolicy(): Policy<typeof notificationInputs> {
       },
       ContestEnded: async (event) => {
         await notifyContestEvent(event);
+      },
+      QuestStarted: async (event) => {
+        await notifyQuestStarted(event);
       },
       AddressOwnershipTransferred: async (event) => {
         await notifyAddressOwnershipTransferred(event);

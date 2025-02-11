@@ -194,3 +194,13 @@ export const ContestEndedNotification = ContestNotification.extend({
     })
     .array(),
 });
+
+export const QuestStartedNotification = z.object({
+  id: z.number(),
+  name: z.string(),
+  description: z.string(),
+  image_url: z.string(),
+  start_date: z.date(),
+  end_date: z.date(),
+  community_id: z.string().nullish(),
+});

@@ -1,4 +1,4 @@
-import { EventNames, Events } from '@hicommonwealth/schemas';
+import { Events } from '@hicommonwealth/schemas';
 import { Readable } from 'stream';
 import { z } from 'zod';
 import {
@@ -14,6 +14,7 @@ import {
   CommunityStakeNotification,
   ContestEndedNotification,
   ContestNotification,
+  QuestStartedNotification,
   SnapshotProposalCreatedNotification,
   UpvoteNotification,
   UserMentionedNotification,
@@ -208,7 +209,7 @@ export class CustomRetryStrategyError extends Error {
 
 type Concat<S1 extends string, S2 extends string> = `${S1}.${S2}`;
 
-type EventNamesType = `${EventNames}`;
+type EventNamesType = `${Events}`;
 
 type RoutingKeyTagsType = `${RoutingKeyTags}`;
 
@@ -282,6 +283,8 @@ export enum WorkflowKeys {
   ContestStarted = 'contest-started',
   ContestEnding = 'contest-ending',
   ContestEnded = 'contest-ended',
+  // Quest events
+  QuestStarted = 'quest-started',
 }
 
 export enum KnockChannelIds {
@@ -359,6 +362,10 @@ export type NotificationsProviderTriggerOptions =
         | {
             data: z.infer<typeof ContestEndedNotification>;
             key: WorkflowKeys.ContestEnded;
+          }
+        | {
+            data: z.infer<typeof QuestStartedNotification>;
+            key: WorkflowKeys.QuestStarted;
           }
         | {
             data: z.infer<typeof AddressOwnershipTransferredNotification>;
