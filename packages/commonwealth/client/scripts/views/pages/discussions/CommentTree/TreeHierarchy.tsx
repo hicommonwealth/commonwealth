@@ -186,7 +186,7 @@ export const TreeHierarchy = ({
                     onReply={() => {
                       onCommentReplyStart(comment.id, index);
                     }}
-                    onAIReply={async () => handleGenerateAIReply(comment.id)}
+                    onAIReply={() => handleGenerateAIReply(comment.id)}
                     onDelete={() => onDelete(comment)}
                     isSpam={!!comment.marked_as_spam_at}
                     onSpamToggle={() => onSpamToggle(comment)}
