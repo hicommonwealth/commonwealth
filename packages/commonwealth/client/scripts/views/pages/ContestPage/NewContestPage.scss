@@ -6,6 +6,10 @@
     flex-direction: column;
     gap: 16px;
 
+    .ContestCard {
+      max-width: 100%;
+    }
+
     .navigation-buttons {
       display: flex;
       gap: 12px;
@@ -35,6 +39,10 @@
   .mobile-tabs,
   .mobile-tab-content {
     display: none;
+  }
+
+  .mobile-tabs {
+    margin-top: 16px;
   }
 
   @include extraSmall {

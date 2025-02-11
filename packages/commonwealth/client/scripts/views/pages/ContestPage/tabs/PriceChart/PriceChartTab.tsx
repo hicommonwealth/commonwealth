@@ -9,7 +9,7 @@ const PriceChartTab = () => {
       <CWText type="h3" fontWeight="semiBold">
         Price Chart
       </CWText>
-      {/* Add price chart content here */}
+      Price Chart component here
     </div>
   );
 };

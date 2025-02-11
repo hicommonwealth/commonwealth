@@ -9,7 +9,7 @@ const TokenSwapTab = () => {
       <CWText type="h3" fontWeight="semiBold">
         Token Swap
       </CWText>
-      {/* Add token swap content here */}
+      Token Swap component here
     </div>
   );
 };

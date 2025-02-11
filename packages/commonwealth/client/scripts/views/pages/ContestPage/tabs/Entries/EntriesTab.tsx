@@ -9,7 +9,7 @@ const EntriesTab = () => {
       <CWText type="h3" fontWeight="semiBold">
         Entries
       </CWText>
-      {/* Add entries content here */}
+      Entries component here
     </div>
   );
 };
