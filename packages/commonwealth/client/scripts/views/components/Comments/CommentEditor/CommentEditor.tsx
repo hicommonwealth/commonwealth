@@ -1,5 +1,6 @@
 import { ContentType } from '@hicommonwealth/shared';
 import clsx from 'clsx';
+import { notifyError } from 'controllers/app/notifications';
 import Account from 'models/Account';
 import type { DeltaStatic } from 'quill';
 import React, { useCallback } from 'react';
@@ -32,8 +33,6 @@ export type CommentEditorProps = {
   setAICommentsToggleEnabled?: (value: boolean) => void;
   onAiReply?: (commentId: number) => void;
   onCommentCreated?: (commentId: number, hasAI: boolean) => void;
-  replyingToAuthor?: string;
-  streamingReplyIds?: number[];
 };
 
 const CommentEditor = ({
@@ -52,10 +51,6 @@ const CommentEditor = ({
   setAICommentsToggleEnabled: onAiStreamingChange,
   onAiReply,
   onCommentCreated,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  replyingToAuthor,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  streamingReplyIds,
 }: CommentEditorProps) => {
   const {
     aiCommentsToggleEnabled,
@@ -115,9 +110,13 @@ const CommentEditor = ({
           console.log(
             'CommentEditor - AI streaming is enabled, triggering reply',
           );
-          Promise.resolve(onAiReply(commentId)).catch((error) => {
+          try {
+            Promise.resolve(onAiReply(commentId));
+          } catch (error) {
             console.error('Failed to trigger AI reply:', error);
-          });
+            notifyError('Failed to generate AI reply');
+            return;
+          }
         } else {
           console.log(
             'CommentEditor - AI streaming is disabled, skipping AI reply',
