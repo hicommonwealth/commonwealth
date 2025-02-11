@@ -299,7 +299,6 @@ const DetailsFormStep = ({
                     components={{
                       Option: (originalProps) =>
                         CustomContestTopicOption({
-                          // @ts-expect-error: react-select type incompatibility with custom option props
                           originalProps,
                         }),
                     }}
