@@ -103,7 +103,7 @@ export const TreeHierarchy = ({
         'TreeHierarchy - AI streaming callback triggered for:',
         commentId,
       );
-      handleGenerateAIReply(commentId);
+      void handleGenerateAIReply(commentId);
     });
 
     return () => {

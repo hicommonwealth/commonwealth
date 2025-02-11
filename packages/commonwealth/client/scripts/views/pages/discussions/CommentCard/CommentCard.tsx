@@ -74,7 +74,7 @@ type CommentCardProps = {
   // other
   className?: string;
   shareURL: string;
-  onAIReply?: () => any;
+  onAIReply?: () => Promise<void>;
   // AI streaming props
   isStreamingAIReply?: boolean;
   parentCommentText?: string;
@@ -310,7 +310,7 @@ export const CommentCard = ({
       }
     };
 
-    generateAIReply();
+    void generateAIReply();
     return () => {
       mounted = false;
     };
@@ -419,25 +419,22 @@ export const CommentCard = ({
                 label="Cancel"
                 disabled={isSavingEdit}
                 buttonType="tertiary"
-                onClick={async (e) => {
+                onClick={(e) => {
                   e.preventDefault();
                   const hasContentChanged =
                     JSON.stringify(commentBody) !==
                     JSON.stringify(commentDelta);
-
-                  // @ts-expect-error <StrictNullChecks/>
-                  onEditCancel(hasContentChanged);
+                  void onEditCancel?.(hasContentChanged);
                 }}
               />
               <CWButton
                 label="Save"
                 buttonWidth="wide"
                 disabled={isSavingEdit}
-                onClick={async (e) => {
+                onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
-                  // @ts-expect-error <StrictNullChecks/>
-                  await onEditConfirm(commentDelta);
+                  void onEditConfirm?.(commentDelta);
                 }}
               />
             </div>
@@ -499,11 +496,10 @@ export const CommentCard = ({
                           ? 'Further replies not allowed'
                           : '')
                       }
-                      onClick={async (e) => {
+                      onClick={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
-                        // @ts-expect-error <StrictNullChecks/>
-                        await onReply();
+                        void onReply?.();
                       }}
                     />
                     {aiCommentsEnabled && (
@@ -519,10 +515,10 @@ export const CommentCard = ({
                             ? 'Further replies not allowed'
                             : '')
                         }
-                        onClick={async (e) => {
+                        onClick={(e) => {
                           e.preventDefault();
                           e.stopPropagation();
-                          await onAIReply?.();
+                          void onAIReply?.();
                         }}
                       />
                     )}
