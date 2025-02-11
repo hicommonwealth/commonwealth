@@ -55,9 +55,8 @@ const TokenPerformance = () => {
       </div>
       <div className="performance-content">
         <GeckoTerminalChart
+          className="GekoChart"
           chain={chain}
-          width="650px"
-          height="500px"
           poolAddress={address}
           info={false}
           swaps={false}

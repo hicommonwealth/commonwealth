@@ -1,5 +1,6 @@
 import { boolToQueryValue, getBaseUrl } from 'client/scripts/utils/gekoUtils';
 import React from 'react';
+import './GekoTerminalChart.scss';
 
 export interface GeckoTerminalEmbedProps {
   chain: string;
@@ -9,10 +10,9 @@ export interface GeckoTerminalEmbedProps {
   swaps?: boolean;
   grayscale?: boolean;
   lightChart?: boolean;
-  width?: string | number;
-  height?: string | number;
   id?: string;
   title?: string;
+  className?: string;
 }
 
 const GeckoTerminalChart = ({
@@ -23,10 +23,9 @@ const GeckoTerminalChart = ({
   swaps = true,
   grayscale = false,
   lightChart = false,
-  width = '100%',
-  height = '500px',
   id = 'geckoterminal-embed',
   title = 'GeckoTerminal Embed',
+  className,
 }: GeckoTerminalEmbedProps) => {
   const baseUrl = getBaseUrl(chain, poolAddress);
 
@@ -44,12 +43,11 @@ const GeckoTerminalChart = ({
     <iframe
       id={id}
       title={title}
-      width={width}
-      height={height}
       src={widgetUrl}
       frameBorder="0"
       allow="clipboard-write"
       allowFullScreen
+      className={className}
       style={{ border: 'none' }}
     />
   );
