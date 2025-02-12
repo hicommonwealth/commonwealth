@@ -72,8 +72,8 @@ describe('getEventSources', () => {
               commonProtocol.factoryContracts[
                 commonProtocol.ValidChains.SepoliaBase
               ].factory,
-            events_migrated: null,
-            created_at_block: null,
+            events_migrated: true,
+            created_at_block: 1,
           },
         ]);
         flag = true;
