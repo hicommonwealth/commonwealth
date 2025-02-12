@@ -40,3 +40,5 @@ class communityNominations extends ContractBase {
     return txReceipt;
   }
 }
+
+export default communityNominations;
