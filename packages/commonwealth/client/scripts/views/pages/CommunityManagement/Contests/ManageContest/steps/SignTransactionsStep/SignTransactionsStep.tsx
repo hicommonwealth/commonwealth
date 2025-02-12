@@ -103,6 +103,9 @@ const SignTransactionsStep = ({
       ? contestFormData?.fundingTokenAddress || ZERO_ADDRESS
       : stakeData?.stake_token;
     const winnerShares = contestFormData?.payoutStructure;
+    const voteToken = contestFormData?.isFarcasterContest
+      ? exchangeToken
+      : contestFormData?.contestTopic?.tokenAddress;
 
     const singleERC20 = {
       ethChainId,
@@ -110,7 +113,7 @@ const SignTransactionsStep = ({
       namespaceName,
       contestInterval: contestLength,
       winnerShares,
-      voteToken: exchangeToken,
+      voteToken,
       voterShare,
       walletAddress,
       exchangeToken,
