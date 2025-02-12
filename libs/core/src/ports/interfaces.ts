@@ -74,12 +74,9 @@ export interface Stats extends Disposable {
 export enum CacheNamespaces {
   Route_Response = 'route_response',
   Function_Response = 'function_response',
-  Global_Response = 'global_response',
   Test_Redis = 'test_redis',
   Database_Cleaner = 'database_cleaner',
-  Compound_Gov_Version = 'compound_gov_version',
   Token_Balance = 'token_balance',
-  Activity_Cache = 'activity_cache',
   Rate_Limiter = 'rate_limiter',
   Api_key_auth = 'api_key_auth',
   Query_Response = 'query_response',
