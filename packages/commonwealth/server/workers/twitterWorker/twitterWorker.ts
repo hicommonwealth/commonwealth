@@ -91,14 +91,15 @@ async function main() {
       pollMentions(TwitterBotConfigs.ContestBot),
     ]);
 
-    // eslint-disable-next-line @typescript-eslint/no-misused-promises
     setInterval(
+      // eslint-disable-next-line @typescript-eslint/no-misused-promises
       pollMentions,
       config.TWITTER.WORKER_POLL_INTERVAL,
       TwitterBotConfigs.MomBot,
     );
-    // eslint-disable-next-line @typescript-eslint/no-misused-promises
+
     setInterval(
+      // eslint-disable-next-line @typescript-eslint/no-misused-promises
       pollMentions,
       config.TWITTER.WORKER_POLL_INTERVAL,
       TwitterBotConfigs.ContestBot,
