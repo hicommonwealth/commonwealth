@@ -32,9 +32,7 @@ export async function handleReferralFeeDistributed(
   });
   if (!referral) return; // we must guarantee the order of chain events here
 
-  const referrer_received_amount = Number(
-    BigNumber.from(fee_amount).toBigInt(),
-  );
+  const referrer_received_amount = BigNumber.from(fee_amount).toBigInt();
 
   await models.sequelize.transaction(async (transaction) => {
     await models.ReferralFee.create(
@@ -46,7 +44,7 @@ export async function handleReferralFeeDistributed(
         referrer_recipient_address: referrer_address,
         referrer_received_amount,
         referee_address: referral.referee_address,
-        transaction_timestamp: Number(event.block.timestamp),
+        transaction_timestamp: BigInt(event.block.timestamp),
       },
       { transaction },
     );
@@ -59,14 +57,14 @@ export async function handleReferralFeeDistributed(
       });
       if (referrer) {
         await models.User.increment('referral_eth_earnings', {
-          by: referrer_received_amount,
+          by: Number(referrer_received_amount),
           where: { id: referrer.user_id! },
           transaction,
         });
       }
 
       await referral.increment('referrer_received_eth_amount', {
-        by: referrer_received_amount,
+        by: Number(referrer_received_amount),
         transaction,
       });
     }

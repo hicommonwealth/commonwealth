@@ -4,7 +4,7 @@ import { MobileTabType, Referral, TabParam, TableType } from './types';
 export const calculateTotalEarnings = (referrals: Referral[]) => {
   if (!referrals?.length) return 0;
   return referrals.reduce(
-    (sum, ref) => sum + (ref.referrer_received_eth_amount || 0),
+    (sum, ref) => sum + (Number(ref.referrer_received_eth_amount) || 0),
     0,
   );
 };
@@ -18,7 +18,10 @@ const getMonthEarnings = (referrals: Referral[], targetDate: moment.Moment) => {
         refDate.year() === targetDate.year()
       );
     })
-    .reduce((sum, ref) => sum + (ref.referrer_received_eth_amount || 0), 0);
+    .reduce(
+      (sum, ref) => sum + (Number(ref.referrer_received_eth_amount) || 0),
+      0,
+    );
 };
 
 export const calculateReferralTrend = (referrals: Referral[]) => {

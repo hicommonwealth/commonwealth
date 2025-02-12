@@ -21,14 +21,7 @@ export async function handleReferralSet(
     existingReferral?.eth_chain_id === event.eventSource.ethChainId
   ) {
     // If the txn was removed from the chain due to re-org, convert Referral to incomplete/off-chain only
-    if (event.rawLog.removed)
-      await existingReferral.update({
-        eth_chain_id: null,
-        transaction_hash: null,
-        namespace_address: null,
-        created_on_chain_timestamp: null,
-      });
-
+    if (event.rawLog.removed) await existingReferral.destroy();
     // Referral already exists
     return;
   }
@@ -39,7 +32,7 @@ export async function handleReferralSet(
       eth_chain_id: event.eventSource.ethChainId,
       transaction_hash: event.rawLog.transactionHash,
       namespace_address: namespaceAddress,
-      created_on_chain_timestamp: Number(event.block.timestamp),
+      created_on_chain_timestamp: BigInt(event.block.timestamp),
     });
   }
   // Triggered when the referral was set on-chain only (user didn't sign up i.e. no incomplete Referral)
@@ -56,8 +49,8 @@ export async function handleReferralSet(
       namespace_address: namespaceAddress,
       referee_address: event.rawLog.address,
       referrer_address: referrerAddress,
-      referrer_received_eth_amount: 0,
-      created_on_chain_timestamp: Number(event.block.timestamp),
+      referrer_received_eth_amount: 0n,
+      created_on_chain_timestamp: BigInt(event.block.timestamp),
     });
   }
 }
