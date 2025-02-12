@@ -22,7 +22,7 @@ export function FarcasterCastCreatedWebhook(): Command<
         models.Outbox,
         [
           {
-            event_name: schemas.EventNames.FarcasterCastCreated,
+            event_name: 'FarcasterCastCreated',
             event_payload: payload.data,
           },
         ],

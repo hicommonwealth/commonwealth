@@ -145,10 +145,10 @@ export function SignIn(): Command<typeof schemas.SignIn> {
 
           const transferredUser = await transferOwnership(addr, transaction);
 
-          const events: schemas.EventPairs[] = [];
+          const events = [] as Array<schemas.EventPairs>;
           new_address &&
             events.push({
-              event_name: schemas.EventNames.CommunityJoined,
+              event_name: 'CommunityJoined',
               event_payload: {
                 community_id,
                 user_id: addr.user_id!,
@@ -157,7 +157,7 @@ export function SignIn(): Command<typeof schemas.SignIn> {
             });
           new_user &&
             events.push({
-              event_name: schemas.EventNames.UserCreated,
+              event_name: 'UserCreated',
               event_payload: {
                 community_id,
                 address: addr.address,
@@ -168,7 +168,7 @@ export function SignIn(): Command<typeof schemas.SignIn> {
             });
           transferredUser &&
             events.push({
-              event_name: schemas.EventNames.AddressOwnershipTransferred,
+              event_name: 'AddressOwnershipTransferred',
               event_payload: {
                 community_id,
                 address: addr.address,

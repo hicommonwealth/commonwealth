@@ -22,21 +22,34 @@ const slides = [
   },
   {
     id: 2,
-    intro: 'Launch',
-    title: ' your own coin and share it with friends',
     animation: animation2,
+    text: (
+      <CWText type="h2" fontWeight="medium" className="onboarding-title">
+        <span style={{ fontWeight: 'bold' }}>Launch</span>&nbsp;a coin and
+        <span style={{ fontWeight: 'bold' }}> grow</span>&nbsp;it with friends.
+      </CWText>
+    ),
   },
   {
     id: 3,
-    intro: ['Buy', 'and', 'sell'],
-    title: ' your favourite memes and tokens',
     animation: animation4,
+    text: (
+      <CWText type="h2" fontWeight="medium" className="onboarding-title">
+        <span style={{ fontWeight: 'bold' }}>Buy</span>&nbsp;and
+        <span style={{ fontWeight: 'bold' }}> sell</span>&nbsp;your favourite
+        memes and tokens.
+      </CWText>
+    ),
   },
   {
     id: 4,
-    intro: 'Earn rewards for every ',
-    title: 'post and upvote you create',
     animation: animation3,
+    text: (
+      <CWText type="h2" fontWeight="medium" className="onboarding-title">
+        Every <span style={{ fontWeight: 'bold' }}>post</span>&nbsp;is a chance
+        to <span style={{ fontWeight: 'bold' }}>win</span>&nbsp;real money.
+      </CWText>
+    ),
   },
 ];
 const OnBoarding = () => {
@@ -46,7 +59,7 @@ const OnBoarding = () => {
   const handleNextSlide = () => {
     if (swiperRef.current) {
       if (isLastSlide) {
-        navigate(`/discussions`);
+        navigate(`/dashboard/global?openAuthModal=true`);
       }
       swiperRef.current.slideNext();
     }
@@ -88,26 +101,7 @@ const OnBoarding = () => {
                   slide.id !== 1 ? 'top' : 'bottom',
                 )}
               >
-                <CWText
-                  type="h2"
-                  fontWeight="medium"
-                  className="onboarding-title"
-                >
-                  {Array.isArray(slide.intro) ? (
-                    slide.intro.map((word) =>
-                      word === 'and' ? (
-                        <CWText key={word}> {word} &nbsp;</CWText>
-                      ) : (
-                        <span key={index} style={{ fontWeight: 'bold' }}>
-                          {word}
-                        </span>
-                      ),
-                    )
-                  ) : (
-                    <span>{slide.intro}</span>
-                  )}
-                  {slide.title}
-                </CWText>
+                {slide?.text}
               </div>
             </div>
           </SwiperSlide>

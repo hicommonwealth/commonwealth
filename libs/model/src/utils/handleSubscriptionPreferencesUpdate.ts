@@ -1,5 +1,4 @@
 import { InvalidState } from '@hicommonwealth/core';
-import * as schemas from '@hicommonwealth/schemas';
 import { SubscriptionPreference } from '@hicommonwealth/schemas';
 import { z } from 'zod';
 import { models } from '../database';
@@ -59,7 +58,7 @@ export async function handleSubscriptionPreferencesUpdate({
       models.Outbox,
       [
         {
-          event_name: schemas.EventNames.SubscriptionPreferencesUpdated,
+          event_name: 'SubscriptionPreferencesUpdated',
           event_payload: {
             user_id: existingPreferences.user_id,
             ...preferenceUpdates,

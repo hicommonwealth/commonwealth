@@ -1,4 +1,4 @@
-import { EventNames, Events } from '@hicommonwealth/schemas';
+import { Events } from '@hicommonwealth/schemas';
 import { Readable } from 'stream';
 import { z } from 'zod';
 import {
@@ -8,9 +8,13 @@ import {
   InvalidInput,
 } from '../framework';
 import {
+  AddressOwnershipTransferredNotification,
   ChainProposalsNotification,
   CommentCreatedNotification,
   CommunityStakeNotification,
+  ContestEndedNotification,
+  ContestNotification,
+  QuestStartedNotification,
   SnapshotProposalCreatedNotification,
   UpvoteNotification,
   UserMentionedNotification,
@@ -205,7 +209,7 @@ export class CustomRetryStrategyError extends Error {
 
 type Concat<S1 extends string, S2 extends string> = `${S1}.${S2}`;
 
-type EventNamesType = `${EventNames}`;
+type EventNamesType = `${Events}`;
 
 type RoutingKeyTagsType = `${RoutingKeyTags}`;
 
@@ -271,9 +275,16 @@ export enum WorkflowKeys {
   CommunityStake = 'community-stake',
   ChainProposals = 'chain-event-proposals',
   NewUpvotes = 'new-upvote',
+  AddressOwnershipTransferred = 'address-ownership-transferred',
   EmailRecap = 'email-recap',
   EmailDigest = 'email-digest',
   Webhooks = 'webhooks',
+  // Contest events
+  ContestStarted = 'contest-started',
+  ContestEnding = 'contest-ending',
+  ContestEnded = 'contest-ended',
+  // Quest events
+  QuestStarted = 'quest-started',
 }
 
 export enum KnockChannelIds {
@@ -300,14 +311,16 @@ type BaseNotifProviderOptions = {
   };
 };
 
+export type NotificationUser = {
+  id: string;
+  webhook_url?: string;
+  destination?: string;
+  signing_key?: string;
+};
+
 type WebhookProviderOptions = {
   key: WorkflowKeys.Webhooks;
-  users: {
-    id: string;
-    webhook_url: string;
-    destination: string;
-    signing_key: string;
-  }[];
+  users: NotificationUser[];
   data: z.infer<typeof WebhookNotification>;
 };
 
@@ -337,6 +350,26 @@ export type NotificationsProviderTriggerOptions =
         | {
             data: z.infer<typeof UpvoteNotification>;
             key: WorkflowKeys.NewUpvotes;
+          }
+        | {
+            data: z.infer<typeof ContestNotification>;
+            key: WorkflowKeys.ContestStarted;
+          }
+        | {
+            data: z.infer<typeof ContestNotification>;
+            key: WorkflowKeys.ContestEnding;
+          }
+        | {
+            data: z.infer<typeof ContestEndedNotification>;
+            key: WorkflowKeys.ContestEnded;
+          }
+        | {
+            data: z.infer<typeof QuestStartedNotification>;
+            key: WorkflowKeys.QuestStarted;
+          }
+        | {
+            data: z.infer<typeof AddressOwnershipTransferredNotification>;
+            key: WorkflowKeys.AddressOwnershipTransferred;
           }
       ))
   | WebhookProviderOptions;

@@ -1,4 +1,4 @@
-import { Comment, EventNames, Thread, events } from '@hicommonwealth/schemas';
+import { Comment, Thread, events } from '@hicommonwealth/schemas';
 import { Transaction } from 'sequelize';
 import z from 'zod';
 import { models } from '../database';
@@ -100,10 +100,10 @@ export const emitMentions = async (
 ) => {
   if (data.mentions.length) {
     const values: {
-      event_name: EventNames.UserMentioned;
+      event_name: 'UserMentioned';
       event_payload: z.infer<typeof events.UserMentioned>;
     }[] = data.mentions.map(({ userId }) => ({
-      event_name: EventNames.UserMentioned,
+      event_name: 'UserMentioned',
       event_payload: {
         authorAddressId: data.authorAddressId,
         authorUserId: data.authorUserId,

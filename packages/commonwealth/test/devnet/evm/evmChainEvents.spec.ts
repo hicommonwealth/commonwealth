@@ -23,7 +23,7 @@ import {
   equalEvmAddresses,
   models,
 } from '@hicommonwealth/model';
-import { EventNames, events as coreEvents } from '@hicommonwealth/schemas';
+import { events as coreEvents } from '@hicommonwealth/schemas';
 import { AbiType } from '@hicommonwealth/shared';
 import { Anvil } from '@viem/anvil';
 import { Op } from 'sequelize';
@@ -498,12 +498,12 @@ describe('EVM Chain Events Devnet Tests', () => {
         );
 
         const events = (await models.Outbox.findAll()) as unknown as Array<{
-          event_name: EventNames.ChainEventCreated;
+          event_name: 'ChainEventCreated';
           event_payload: z.infer<typeof coreEvents.ChainEventCreated>;
         }>;
         expect(events.length).to.equal(3);
         for (const { event_name } of events) {
-          expect(event_name).to.equal(EventNames.ChainEventCreated);
+          expect(event_name).to.equal('ChainEventCreated');
         }
 
         expect(events[0].event_payload.eventSource).to.deep.equal({
@@ -619,12 +619,12 @@ describe('EVM Chain Events Devnet Tests', () => {
       );
 
       const events = (await models.Outbox.findAll()) as unknown as Array<{
-        event_name: EventNames.ChainEventCreated;
+        event_name: 'ChainEventCreated';
         event_payload: z.infer<typeof coreEvents.ChainEventCreated>;
       }>;
       expect(events.length).to.equal(1);
       for (const { event_name } of events) {
-        expect(event_name).to.equal(EventNames.ChainEventCreated);
+        expect(event_name).to.equal('ChainEventCreated');
       }
 
       expect(events[0].event_payload.eventSource).to.deep.equal({
@@ -771,7 +771,7 @@ describe('EVM Chain Events Devnet Tests', () => {
         );
 
         const events = (await models.Outbox.findAll()) as unknown as Array<{
-          event_name: EventNames.ChainEventCreated;
+          event_name: 'ChainEventCreated';
           event_payload: z.infer<typeof coreEvents.ChainEventCreated>;
         }>;
         expect(events.length).to.equal(0);

@@ -1,4 +1,4 @@
-import { EventNames, events } from '@hicommonwealth/schemas';
+import { events } from '@hicommonwealth/schemas';
 import { expect } from 'chai';
 import ethers from 'ethers';
 import { describe, test } from 'vitest';
@@ -19,7 +19,7 @@ describe('parseEvmEventToContestEvent', () => {
       ],
       1,
     );
-    expect(event_name).to.eq(EventNames.RecurringContestManagerDeployed);
+    expect(event_name).to.eq('RecurringContestManagerDeployed');
     const parsedEvent =
       events.RecurringContestManagerDeployed.parse(event_payload);
     console.debug(parsedEvent);
@@ -40,7 +40,7 @@ describe('parseEvmEventToContestEvent', () => {
       ],
       1,
     );
-    expect(event_name).to.eq(EventNames.OneOffContestManagerDeployed);
+    expect(event_name).to.eq('OneOffContestManagerDeployed');
     const parsedEvent =
       events.OneOffContestManagerDeployed.parse(event_payload);
     console.debug(parsedEvent);
@@ -60,7 +60,7 @@ describe('parseEvmEventToContestEvent', () => {
       ],
       1,
     );
-    expect(event_name).to.eq(EventNames.ContestStarted);
+    expect(event_name).to.eq('ContestStarted');
     const parsedEvent = events.ContestStarted.parse(event_payload);
     console.debug(parsedEvent);
     expect(parsedEvent.contest_address).to.eq(contestAddress);
@@ -84,7 +84,7 @@ describe('parseEvmEventToContestEvent', () => {
       ],
       1,
     );
-    expect(event_name).to.eq(EventNames.ContestContentAdded);
+    expect(event_name).to.eq('ContestContentAdded');
     const parsedEvent = events.ContestContentAdded.parse(event_payload);
     console.debug(parsedEvent);
     expect(parsedEvent.contest_address).to.eq(contestAddress);
@@ -105,7 +105,7 @@ describe('parseEvmEventToContestEvent', () => {
       ],
       1,
     );
-    expect(event_name).to.eq(EventNames.ContestContentUpvoted);
+    expect(event_name).to.eq('ContestContentUpvoted');
     const parsedEvent = events.ContestContentUpvoted.parse(event_payload);
     console.debug(parsedEvent);
     expect(parsedEvent.contest_address).to.eq(contestAddress);
@@ -126,7 +126,7 @@ describe('parseEvmEventToContestEvent', () => {
       ],
       1,
     );
-    expect(event_name).to.eq(EventNames.ContestContentUpvoted);
+    expect(event_name).to.eq('ContestContentUpvoted');
     const parsedEvent = events.ContestContentUpvoted.parse(event_payload);
     console.debug(parsedEvent);
     expect(parsedEvent.contest_address).to.eq(contestAddress);
