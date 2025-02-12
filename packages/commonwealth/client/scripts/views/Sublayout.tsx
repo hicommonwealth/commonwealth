@@ -1,6 +1,5 @@
 import clsx from 'clsx';
 import useBrowserWindow from 'hooks/useBrowserWindow';
-import { useFlag } from 'hooks/useFlag';
 import useWindowResize from 'hooks/useWindowResize';
 import React, { useEffect, useState } from 'react';
 import { matchRoutes, useLocation, useSearchParams } from 'react-router-dom';
@@ -8,6 +7,7 @@ import app from 'state';
 import useSidebarStore from 'state/ui/sidebar';
 import { SublayoutHeader } from 'views/components/SublayoutHeader';
 import { Sidebar } from 'views/components/sidebar';
+import { useFlag } from '../hooks/useFlag';
 import { useHandleInviteLink } from '../hooks/useHandleInviteLink';
 import useNecessaryEffect from '../hooks/useNecessaryEffect';
 import useStickyHeader from '../hooks/useStickyHeader';
@@ -134,7 +134,9 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
   const chain = app.chain ? app.chain.meta : null;
   const terms = app.chain ? chain?.terms : null;
   const banner = app.chain ? chain?.communityBanner : null;
-
+  const showGrowlOnMobile =
+    (user.isWelcomeOnboardFlowComplete || !isWindowSmallInclusive) &&
+    !(isWindowExtraSmall && isWelcomeOnboardModalOpen);
   return (
     <div className="Sublayout">
       {(!isWindowSmallInclusive || isWindowSmallToMedium) && (
@@ -198,8 +200,7 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
             )}
             {children}
           </div>
-          {/* Growl should be added here when in place*/}
-          {growlEnabled && (
+          {growlEnabled && showGrowlOnMobile && (
             <CWGrowlTemplate
               headerText=""
               bodyText=""

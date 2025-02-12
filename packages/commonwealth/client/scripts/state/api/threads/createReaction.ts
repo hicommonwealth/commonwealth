@@ -3,6 +3,7 @@ import { AxiosError } from 'axios';
 import { notifyError } from 'client/scripts/controllers/app/notifications';
 import { trpc } from 'client/scripts/utils/trpcClient';
 import { signThreadReaction } from 'controllers/server/sessions';
+import { BigNumber } from 'ethers';
 import app from 'state';
 import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
 import { UserTrainingCardTypes } from 'views/components/UserTrainingSlider/types';
@@ -78,12 +79,15 @@ const useCreateThreadReactionMutation = ({
         { associatedReactions: [reaction] },
         'combineAndRemoveDups',
       );
+
+      const addition = BigNumber.from(currentReactionWeightsSum)
+        .add(BigNumber.from(newReaction.calculated_voting_weight || '0'))
+        .toString();
+
       updateThreadInAllCaches(communityId, threadId, {
         reactionCount: currentReactionCount + 1,
-        reactionWeightsSum: `${
-          parseInt(currentReactionWeightsSum) +
-          parseInt(newReaction.calculated_voting_weight || `0`)
-        }`,
+        // I think it is broken here
+        reactionWeightsSum: addition,
       });
 
       const userId = user.addresses?.[0]?.profile?.userId;

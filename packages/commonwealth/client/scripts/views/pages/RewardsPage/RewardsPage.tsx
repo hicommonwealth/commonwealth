@@ -2,11 +2,15 @@ import React, { useState } from 'react';
 
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import { useFlag } from 'hooks/useFlag';
-import { useCommonNavigate } from 'navigation/helpers';
-import { useGetUserReferralsQuery } from 'state/api/user';
+import {
+  useGetUserReferralFeesQuery,
+  useGetUserReferralsQuery,
+} from 'state/api/user';
 import useUserStore from 'state/ui/user';
 import { IconName } from 'views/components/component_kit/cw_icons/cw_icon_lookup';
 
+import { ZERO_ADDRESS } from '@hicommonwealth/shared';
+import { useCommonNavigate } from 'navigation/helpers';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWMobileTab } from '../../components/component_kit/new_designs/CWMobileTab';
 import CWPageLayout from '../../components/component_kit/new_designs/CWPageLayout';
@@ -29,10 +33,10 @@ import {
 } from './utils';
 
 const RewardsPage = () => {
-  const navigate = useCommonNavigate();
   const user = useUserStore();
   const rewardsEnabled = useFlag('rewardsPage');
   const xpEnabled = useFlag('xp');
+  const navigate = useCommonNavigate();
 
   const [mobileTab, setMobileTab] = useState<MobileTabType>(getInitialTab());
   const [tableTab, setTableTab] = useState(tabToTable[getInitialTab()]);
@@ -43,8 +47,14 @@ const RewardsPage = () => {
       apiCallEnabled: !!user?.id,
     });
 
-  const trendValue = calculateReferralTrend(referrals || []);
-  const totalEarnings = calculateTotalEarnings(referrals || []);
+  const { data: referralFees } = useGetUserReferralFeesQuery({
+    userId: user?.id,
+    apiCallEnabled: !!user?.id,
+    distributedTokenAddress: ZERO_ADDRESS,
+  });
+
+  const trendValue = calculateReferralTrend(referralFees || []);
+  const totalEarnings = calculateTotalEarnings(referralFees || []);
 
   const handleTabChange = (type: MobileTabType) => {
     setMobileTab(type);
@@ -57,6 +67,8 @@ const RewardsPage = () => {
   if (!user.isLoggedIn || !rewardsEnabled) {
     return <PageNotFound />;
   }
+
+  const showOtherCards = true;
 
   return (
     <CWPageLayout>
@@ -91,9 +103,8 @@ const RewardsPage = () => {
           )}
           {(!isWindowSmallInclusive ||
             mobileTab === MobileTabType.WalletBalance) && <WalletCard />}
-          {(!isWindowSmallInclusive || mobileTab === MobileTabType.Quests) && (
-            <QuestSummaryCard />
-          )}
+          {(!isWindowSmallInclusive || mobileTab === MobileTabType.Quests) &&
+            showOtherCards && <QuestSummaryCard />}
         </div>
 
         <div className="rewards-tab-container">

@@ -93,6 +93,8 @@ import { ComponentType } from '../../types';
 import CWIconButton from '../CWIconButton';
 import CWPopover, { usePopover } from '../CWPopover';
 
+import { TopicWeightedVoting } from '@hicommonwealth/schemas';
+import { prettyVoteWeight } from 'shared/adapters/currency';
 import './CWTable.scss';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -111,6 +113,7 @@ export type CWTableColumnInfo = {
     content: string;
   };
   numeric: boolean;
+  weightedVoting?: TopicWeightedVoting | null | undefined;
   sortable: boolean;
   chronological?: boolean;
   customElementKey?: string;
@@ -190,7 +193,13 @@ export const CWTable = ({
                 : info.getValue();
 
               if (col.numeric) {
-                return <div className="numeric">{numericColVal}</div>;
+                return (
+                  <div className="numeric">
+                    {col.weightedVoting
+                      ? prettyVoteWeight(numericColVal, col.weightedVoting)
+                      : numericColVal}
+                  </div>
+                );
               }
 
               if (avatarUrl || avatarAddress) {

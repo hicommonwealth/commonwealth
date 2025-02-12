@@ -1,7 +1,7 @@
 import type { DeltaStatic } from 'quill';
 import React, { useEffect, useState } from 'react';
 
-import { CommentsView } from '@hicommonwealth/schemas';
+import { CommentsView, TopicWeightedVoting } from '@hicommonwealth/schemas';
 import {
   CanvasSignedData,
   DEFAULT_NAME,
@@ -70,6 +70,7 @@ type CommentCardProps = {
   // other
   className?: string;
   shareURL: string;
+  weightType?: TopicWeightedVoting | null;
 };
 
 export const CommentCard = ({
@@ -105,6 +106,7 @@ export const CommentCard = ({
   // other
   className,
   shareURL,
+  weightType,
 }: CommentCardProps) => {
   const user = useUserStore();
   const userOwnsComment = comment.user_id === user.id;
@@ -289,6 +291,7 @@ export const CommentCard = ({
                       : disabledActionsTooltipText
                   }
                   onReaction={handleReaction}
+                  weightType={weightType}
                 />
               )}
 
@@ -304,6 +307,7 @@ export const CommentCard = ({
                     comment={comment}
                     isOpen={isUpvoteDrawerOpen}
                     setIsOpen={setIsUpvoteDrawerOpen}
+                    weightType={weightType}
                   />
                 </>
               )}

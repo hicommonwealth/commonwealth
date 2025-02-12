@@ -1,4 +1,4 @@
-import { EventNames, QuestActionMeta } from '@hicommonwealth/schemas';
+import { QuestActionMeta } from '@hicommonwealth/schemas';
 import React from 'react';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
@@ -9,26 +9,27 @@ import { QuestAction } from '../../CreateQuest/CreateQuestForm/QuestActionSubFor
 import { doesActionRequireCreatorReward } from '../../CreateQuest/CreateQuestForm/QuestActionSubForm/helpers';
 import './QuestActionCard.scss';
 
+// TODO: fix types with schemas.Events keys
 const actionCopies = {
   title: {
-    [EventNames.SignUpFlowCompleted]: 'Signup on Common',
-    [EventNames.CommunityCreated]: 'Create a community',
-    [EventNames.CommunityJoined]: 'Join a community',
-    [EventNames.ThreadCreated]: 'Create a thread',
-    [EventNames.ThreadUpvoted]: 'Upvote a thread',
-    [EventNames.CommentCreated]: 'Create a comment',
-    [EventNames.CommentUpvoted]: 'Upvote a comment',
-    [EventNames.UserMentioned]: 'Mention a user',
+    ['SignUpFlowCompleted']: 'Signup on Common',
+    ['CommunityCreated']: 'Create a community',
+    ['CommunityJoined']: 'Join a community',
+    ['ThreadCreated']: 'Create a thread',
+    ['ThreadUpvoted']: 'Upvote a thread',
+    ['CommentCreated']: 'Create a comment',
+    ['CommentUpvoted']: 'Upvote a comment',
+    ['UserMentioned']: 'Mention a user',
   },
   shares: {
-    [EventNames.SignUpFlowCompleted]: '',
-    [EventNames.CommunityCreated]: 'referrer',
-    [EventNames.CommunityJoined]: 'referrer',
-    [EventNames.ThreadCreated]: '',
-    [EventNames.ThreadUpvoted]: '',
-    [EventNames.CommentCreated]: '',
-    [EventNames.CommentUpvoted]: 'comment owner',
-    [EventNames.UserMentioned]: '',
+    ['SignUpFlowCompleted']: '',
+    ['CommunityCreated']: 'referrer',
+    ['CommunityJoined']: 'referrer',
+    ['ThreadCreated']: '',
+    ['ThreadUpvoted']: '',
+    ['CommentCreated']: '',
+    ['CommentUpvoted']: 'comment owner',
+    ['UserMentioned']: '',
   },
 };
 
