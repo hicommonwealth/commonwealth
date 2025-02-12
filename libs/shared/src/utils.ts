@@ -474,3 +474,15 @@ export const buildContestPrizes = (
       })
     : [];
 };
+
+export const formatWeiToDecimal = (wei: string): string => {
+  return (parseFloat(wei) / 1e18).toString();
+};
+
+export const formatDecimalToWei = (
+  decimal: string,
+  defaultValue: number = 0,
+): string => {
+  const value = parseFloat(decimal) * 10 ** 18;
+  return (value || defaultValue).toString();
+};
