@@ -1,8 +1,6 @@
 import { ChainBase, WalletId } from '@hicommonwealth/shared';
 import { getUniqueUserAddresses } from 'helpers/user';
 import React, { useState } from 'react';
-import { useFetchTokensUsdRateQuery } from 'state/api/communityStake';
-import { useTokenBalanceQuery, useTokensMetadataQuery } from 'state/api/tokens';
 import useUserStore from 'state/ui/user';
 import FractionalValue from 'views/components/FractionalValue';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
@@ -23,6 +21,7 @@ import {
 import { convertAddressToDropdownOption } from 'views/modals/TradeTokenModel/CommonTradeModal/CommonTradeTokenForm/helpers';
 import RewardsCard from '../../RewardsCard';
 import './WalletCard.scss';
+import useUserWalletHoldings from './useUserWalletHoldings';
 
 enum WalletBalanceTabs {
   Tokens = 'Tokens',
@@ -50,54 +49,10 @@ const WalletCard = () => {
     user.addresses.find((a) => a.address === userSelectedAddress)?.walletId ===
     WalletId.Magic;
 
-  const { data: tokenBalances, isLoading: isLoadingTokenBalances } =
-    useTokenBalanceQuery({
-      chainId: 1358,
-      tokenId: userSelectedAddress,
+  const { isLoadingTokensInfo, userCombinedUSDBalance, userTokens } =
+    useUserWalletHoldings({
+      userSelectedAddress,
     });
-  const tokenAddresses = tokenBalances?.tokenBalances.map(
-    (b) => b.contractAddress,
-  );
-  const { data: tokenMetadatas, isLoading: isLoadingTokensMetadata } =
-    useTokensMetadataQuery({
-      nodeEthChainId: 8453,
-      tokenIds: tokenAddresses || [],
-      apiEnabled: !!tokenAddresses,
-    });
-  const { data: tokenToUsdDates } = useFetchTokensUsdRateQuery({
-    tokenSymbols: (tokenMetadatas || []).map((x) => x.symbol),
-    enabled: (tokenMetadatas || []).length > 0,
-  });
-  const tokensHavingRateConversions = (tokenToUsdDates || []).map(
-    (x) => x.symbol,
-  );
-
-  const userTokens = [...(tokenMetadatas || [])]
-    .map((t) => {
-      return {
-        ...t,
-        balance: parseFloat(
-          tokenBalances?.tokenBalances.find(
-            (b) => b.contractAddress === t.tokenId,
-          )?.tokenBalance || '0.',
-        ),
-        toUsdPerUnitRate:
-          (tokenToUsdDates || []).find((x) => x.symbol === t.symbol)?.amount ||
-          null,
-      };
-    })
-    .filter((t) => t.name && tokensHavingRateConversions.includes(t.symbol));
-
-  const isLoadingTokensInfo = isLoadingTokenBalances || isLoadingTokensMetadata;
-  const userCombinedUSDBalancePerTokenHoldings = userTokens.reduce(
-    (total, token) => {
-      const tokenValue = token.toUsdPerUnitRate
-        ? token.balance * parseFloat(token.toUsdPerUnitRate)
-        : 0;
-      return total + tokenValue;
-    },
-    0,
-  );
 
   return (
     <RewardsCard title="Wallet Balance" icon="cardholder">
@@ -132,10 +87,7 @@ const WalletCard = () => {
         />
         <CWText type="h4">
           $&nbsp;
-          <FractionalValue
-            type="h4"
-            value={userCombinedUSDBalancePerTokenHoldings}
-          />
+          <FractionalValue type="h4" value={userCombinedUSDBalance} />
         </CWText>
         {isSelectedAddressMagic && (
           <button
