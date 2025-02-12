@@ -1,6 +1,7 @@
 import { ChainBase, WalletId } from '@hicommonwealth/shared';
 import { getUniqueUserAddresses } from 'helpers/user';
 import React, { useState } from 'react';
+import { useFetchTokensUsdRateQuery } from 'state/api/communityStake';
 import { useTokenBalanceQuery, useTokensMetadataQuery } from 'state/api/tokens';
 import useUserStore from 'state/ui/user';
 import FractionalValue from 'views/components/FractionalValue';
@@ -63,6 +64,13 @@ const WalletCard = () => {
       tokenIds: tokenAddresses || [],
       apiEnabled: !!tokenAddresses,
     });
+  const { data: tokenToUsdDates } = useFetchTokensUsdRateQuery({
+    tokenSymbols: (tokenMetadatas || []).map((x) => x.symbol),
+    enabled: (tokenMetadatas || []).length > 0,
+  });
+  const tokensHavingRateConversions = (tokenToUsdDates || []).map(
+    (x) => x.symbol,
+  );
 
   const userTokens = [...(tokenMetadatas || [])]
     .map((t) => {
@@ -73,11 +81,23 @@ const WalletCard = () => {
             (b) => b.contractAddress === t.tokenId,
           )?.tokenBalance || '0.',
         ),
+        toUsdPerUnitRate:
+          (tokenToUsdDates || []).find((x) => x.symbol === t.symbol)?.amount ||
+          null,
       };
     })
-    .filter((t) => t.name);
+    .filter((t) => t.name && tokensHavingRateConversions.includes(t.symbol));
 
   const isLoadingTokensInfo = isLoadingTokenBalances || isLoadingTokensMetadata;
+  const userCombinedUSDBalancePerTokenHoldings = userTokens.reduce(
+    (total, token) => {
+      const tokenValue = token.toUsdPerUnitRate
+        ? token.balance * parseFloat(token.toUsdPerUnitRate)
+        : 0;
+      return total + tokenValue;
+    },
+    0,
+  );
 
   return (
     <RewardsCard title="Wallet Balance" icon="cardholder">
@@ -110,6 +130,13 @@ const WalletCard = () => {
             option?.value && setUserSelectedAddress(option.value)
           }
         />
+        <CWText type="h4">
+          $&nbsp;
+          <FractionalValue
+            type="h4"
+            value={userCombinedUSDBalancePerTokenHoldings}
+          />
+        </CWText>
         {isSelectedAddressMagic && (
           <button
             type="button"
