@@ -22,7 +22,11 @@ const QuestActionSubForm = ({
       value: event as QuestAction,
       label: splitCamelOrPascalCase(event),
     }))
-    .filter((action) => !(hiddenActions || []).includes(action.value));
+    .filter(
+      (action) =>
+        !(hiddenActions || []).includes(action.value) &&
+        action.value !== 'UserMentioned',
+    );
 
   return (
     <div className={clsx('QuestActionSubForm', { isRemoveable })}>
