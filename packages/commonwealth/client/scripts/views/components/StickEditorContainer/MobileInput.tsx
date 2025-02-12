@@ -1,6 +1,6 @@
 import { useFlag } from 'hooks/useFlag';
-import { useGenerateCommentText } from 'hooks/useGenerateCommentText';
 import React, { useCallback, useMemo, useState } from 'react';
+import { useGenerateCommentText } from 'state/api/comments/generateCommentText';
 import useUserStore from 'state/ui/user';
 import { Avatar } from 'views/components/Avatar';
 import { CommentEditorProps } from 'views/components/Comments/CommentEditor/CommentEditor';
