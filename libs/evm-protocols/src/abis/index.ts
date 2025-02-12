@@ -1,3 +1,4 @@
+export * from './communityNominationsAbi';
 export * from './communityStakesAbi';
 export * from './contestAbi';
 export * from './erc20Abi';

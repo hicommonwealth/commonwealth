@@ -300,6 +300,72 @@ class NamespaceFactory extends ContractBase {
     return txReceipt;
   }
 
+  async newJudgedSingleContest(
+    namespaceName: string,
+    contestInterval: number,
+    winnerShares: number[],
+    voterShare: number,
+    walletAddress: string,
+    exchangeToken: string,
+  ): Promise<TransactionReceipt> {
+    if (!this.initialized || !this.walletEnabled) {
+      await this.initialize(true);
+    }
+    const maxFeePerGasEst = await this.estimateGas();
+    let txReceipt;
+    try {
+      txReceipt = await this.contract.methods
+        .newSingleJudgedContest(
+          namespaceName,
+          contestInterval,
+          winnerShares,
+          voterShare,
+          exchangeToken,
+        )
+        .send({
+          from: walletAddress,
+          type: '0x2',
+          maxFeePerGas: maxFeePerGasEst?.toString(),
+          maxPriorityFeePerGas: this.web3.utils.toWei('0.001', 'gwei'),
+        });
+    } catch (error) {
+      console.log(error);
+      throw new Error('Transaction failed');
+    }
+    return txReceipt;
+  }
+
+  async configureNominations(
+    namespaceName: string,
+    creatorOnly: boolean,
+    walletAddress: string,
+    maxNominations?: number,
+  ): Promise<TransactionReceipt> {
+    if (!this.initialized || !this.walletEnabled) {
+      await this.initialize(true);
+    }
+    const maxFeePerGasEst = await this.estimateGas();
+    let txReceipt;
+    try {
+      txReceipt = await this.contract.methods
+        .configureNominationStrategy(
+          namespaceName,
+          maxNominations ?? 0,
+          !creatorOnly,
+        )
+        .send({
+          from: walletAddress,
+          type: '0x2',
+          maxFeePerGas: maxFeePerGasEst?.toString(),
+          maxPriorityFeePerGas: this.web3.utils.toWei('0.001', 'gwei'),
+        });
+    } catch (error) {
+      console.log(error);
+      throw new Error('Transaction failed');
+    }
+    return txReceipt;
+  }
+
   async getFeeManagerBalance(
     namespace: string,
     token?: string,
