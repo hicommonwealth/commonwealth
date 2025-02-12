@@ -6,6 +6,7 @@ import {
 import { logger, stats } from '@hicommonwealth/core';
 import { emitEvent, models } from '@hicommonwealth/model';
 import { fileURLToPath } from 'url';
+import { config } from '../../config';
 import { getMentions } from './pollTwitter';
 import {
   TwitterBotConfig,
@@ -32,9 +33,6 @@ startHealthCheckLoop({
 
 // 10 minutes ago
 const DEFAULT_POLL_START_TIME = new Date(Date.now() - 1000 * 60 * 10);
-
-// 16 minutes -> 15 minute rate limit window + 1 minute buffer to account for func execution time
-const POLL_INTERVAL = 16 * 60 * 1000;
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function pollMentions(twitterBotConfig: TwitterBotConfig) {
@@ -63,10 +61,13 @@ async function pollMentions(twitterBotConfig: TwitterBotConfig) {
         createMentionEvents(twitterBotConfig, res.mentions),
         transaction,
       );
-      await models.TwitterCursor.upsert({
-        bot_name: twitterBotConfig.name,
-        last_polled_timestamp: res.endTime.getTime(),
-      });
+      await models.TwitterCursor.upsert(
+        {
+          bot_name: twitterBotConfig.name,
+          last_polled_timestamp: res.endTime.getTime(),
+        },
+        { transaction },
+      );
     });
 
     log.info('Mentions polled successfully');
@@ -80,15 +81,28 @@ async function main() {
   try {
     log.info('Starting Twitter Worker...');
 
+    if (config.TWITTER.WORKER_POLL_INTERVAL === 0) {
+      log.info('Twitter Worker disabled. Exiting...');
+      return;
+    }
+
     await Promise.allSettled([
       pollMentions(TwitterBotConfigs.MomBot),
       pollMentions(TwitterBotConfigs.ContestBot),
     ]);
 
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
-    setInterval(pollMentions, POLL_INTERVAL, TwitterBotConfigs.MomBot);
+    setInterval(
+      pollMentions,
+      config.TWITTER.WORKER_POLL_INTERVAL,
+      TwitterBotConfigs.MomBot,
+    );
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
-    setInterval(pollMentions, POLL_INTERVAL, TwitterBotConfigs.ContestBot);
+    setInterval(
+      pollMentions,
+      config.TWITTER.WORKER_POLL_INTERVAL,
+      TwitterBotConfigs.ContestBot,
+    );
 
     isServiceHealthy = true;
     log.info('Twitter Worker started');
