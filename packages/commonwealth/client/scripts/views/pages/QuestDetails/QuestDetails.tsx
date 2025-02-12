@@ -1,5 +1,4 @@
 import {
-  EventNames,
   QuestActionMeta,
   QuestParticipationLimit,
 } from '@hicommonwealth/schemas';
@@ -97,19 +96,19 @@ const QuestDetails = ({ id }: { id: number }) => {
 
   const handleActionStart = (actionName: QuestAction) => {
     switch (actionName) {
-      case EventNames.SignUpFlowCompleted: {
+      case 'SignUpFlowCompleted': {
         !user?.isLoggedIn && setAuthModalType(AuthModalType.CreateAccount);
         break;
       }
-      case EventNames.CommunityCreated: {
+      case 'CommunityCreated': {
         navigate(`/createCommunity`, {}, null);
         break;
       }
-      case EventNames.ThreadCreated: {
+      case 'ThreadCreated': {
         navigate(`/${randomResourceId?.community_id}/new/discussion`, {}, null);
         break;
       }
-      case EventNames.CommunityJoined: {
+      case 'CommunityJoined': {
         navigate(
           `/${randomResourceIdForNonJoinedCommunity?.community_id}/discussions`,
           {},
@@ -117,12 +116,12 @@ const QuestDetails = ({ id }: { id: number }) => {
         );
         break;
       }
-      case EventNames.ThreadUpvoted:
-      case EventNames.CommentCreated: {
+      case 'ThreadUpvoted':
+      case 'CommentCreated': {
         navigate(`/discussion/${`${randomResourceId?.thread_id}`}`, {}, null);
         break;
       }
-      case EventNames.CommentUpvoted: {
+      case 'CommentUpvoted': {
         navigate(
           `/discussion/${
             randomResourceId?.thread_id
@@ -132,7 +131,7 @@ const QuestDetails = ({ id }: { id: number }) => {
         );
         break;
       }
-      case EventNames.UserMentioned: {
+      case 'UserMentioned': {
         // TODO: user mention is not implemented in app
         break;
       }

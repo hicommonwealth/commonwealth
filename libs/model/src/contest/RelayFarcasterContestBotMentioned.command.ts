@@ -39,7 +39,7 @@ export function RelayFarcasterContestBotMentioned(): Command<
         models.Outbox,
         [
           {
-            event_name: schemas.EventNames.FarcasterContestBotMentioned,
+            event_name: 'FarcasterContestBotMentioned',
             event_payload: {
               ...payload.data,
               verified_address,

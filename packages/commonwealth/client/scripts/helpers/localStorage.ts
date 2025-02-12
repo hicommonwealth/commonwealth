@@ -3,6 +3,7 @@ export const REFCODE_EXPIRATION_MS = 14 * 24 * 60 * 60 * 1000; // 14 days
 export enum LocalStorageKeys {
   ReferralCode = 'common-refcode',
   HasSeenOnboarding = 'has-seen-onboarding',
+  HasSeenNotifications = 'has-seen-notifications',
 }
 
 export const getLocalStorageItem = (key: LocalStorageKeys) => {

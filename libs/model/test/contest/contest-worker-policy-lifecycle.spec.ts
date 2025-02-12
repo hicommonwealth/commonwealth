@@ -1,6 +1,5 @@
 import { dispose, handleEvent } from '@hicommonwealth/core';
 import * as evm from '@hicommonwealth/evm-protocols';
-import { EventNames } from '@hicommonwealth/schemas';
 import { literal } from 'sequelize';
 import { afterAll, beforeAll, describe, expect, test, vi } from 'vitest';
 import { emitEvent, models } from '../../src';
@@ -92,9 +91,17 @@ describe('Contest Worker Policy Lifecycle', () => {
       .spyOn(evm, 'addContentBatch')
       .mockResolvedValue([]);
 
+    const rolloverContestStub = vi
+      .spyOn(evm, 'rollOverContest')
+      .mockResolvedValue(true);
+
+    const getContestScoreStub = vi
+      .spyOn(evm, 'getContestScore')
+      .mockResolvedValue([]);
+
     await emitEvent(models.Outbox, [
       {
-        event_name: EventNames.ThreadCreated,
+        event_name: 'ThreadCreated',
         event_payload: {
           id: threadId,
           community_id: communityId,
@@ -133,7 +140,7 @@ describe('Contest Worker Policy Lifecycle', () => {
 
     await emitEvent(models.Outbox, [
       {
-        event_name: EventNames.ContestContentAdded,
+        event_name: 'ContestContentAdded',
         event_payload: {
           content_id: 0,
           content_url: '/ethhh/discussion/888',
@@ -158,7 +165,7 @@ describe('Contest Worker Policy Lifecycle', () => {
 
     await emitEvent(models.Outbox, [
       {
-        event_name: EventNames.ThreadUpvoted,
+        event_name: 'ThreadUpvoted',
         event_payload: {
           community_id: communityId,
           address_id: addressId,
@@ -175,7 +182,7 @@ describe('Contest Worker Policy Lifecycle', () => {
     expect(voteContentStub).toHaveBeenCalled();
 
     await handleEvent(ContestWorker(), {
-      name: EventNames.ContestRolloverTimerTicked,
+      name: 'ContestRolloverTimerTicked',
       payload: {},
     });
 
@@ -185,6 +192,9 @@ describe('Contest Worker Policy Lifecycle', () => {
       contestManagerBeforeContestEnded!.ended,
       'contest should not be rolled over yet',
     ).to.be.false;
+
+    // @rbennettcw how to simulate an ending contest to validate
+    // that the ending flag is set and ContestEnding event is emitted?
 
     // simulate contest has ended
     await models.Contest.update(
@@ -201,9 +211,12 @@ describe('Contest Worker Policy Lifecycle', () => {
     );
 
     await handleEvent(ContestWorker(), {
-      name: EventNames.ContestRolloverTimerTicked,
+      name: 'ContestRolloverTimerTicked',
       payload: {},
     });
+
+    expect(rolloverContestStub, 'contest rolled over').toHaveBeenCalledOnce();
+    expect(getContestScoreStub, 'get final score').toHaveBeenCalledOnce();
 
     const contestManagerAfterContestEnded =
       await models.ContestManager.findByPk(contestAddress);
@@ -211,6 +224,13 @@ describe('Contest Worker Policy Lifecycle', () => {
     expect(
       contestManagerAfterContestEnded!.ended,
       'contest should have rolled over',
-    ).to.be.true;
+    ).toBeTruthy();
+    expect(
+      contestManagerAfterContestEnded?.ending,
+      'ending flag reset',
+    ).toBeFalsy();
+
+    const events = await drainOutbox(['ContestEnded']);
+    expect(events.length, 'contest ended emitted').toBeGreaterThan(0);
   });
 });

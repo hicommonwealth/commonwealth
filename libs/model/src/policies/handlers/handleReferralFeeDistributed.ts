@@ -28,10 +28,7 @@ export async function handleReferralFeeDistributed(
 
   // find the referral (already mapped to a namespace)
   const referral = await models.Referral.findOne({
-    where: {
-      referrer_address,
-      namespace_address,
-    },
+    where: { namespace_address, referrer_address },
   });
   if (!referral) return; // we must guarantee the order of chain events here
 
