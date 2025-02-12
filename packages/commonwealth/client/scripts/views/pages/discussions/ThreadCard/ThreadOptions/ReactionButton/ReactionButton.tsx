@@ -3,6 +3,7 @@ import { buildDeleteThreadReactionInput } from 'client/scripts/state/api/threads
 import { useAuthModalStore } from 'client/scripts/state/ui/modals';
 import { notifyError } from 'controllers/app/notifications';
 import { SessionKeyError } from 'controllers/server/sessions';
+import { BigNumber } from 'ethers';
 import type Thread from 'models/Thread';
 import React, { useState } from 'react';
 import { prettyVoteWeight } from 'shared/adapters/currency';
@@ -39,17 +40,17 @@ export const ReactionButton = ({
   tooltipText,
   undoUpvoteDisabled,
 }: ReactionButtonProps) => {
-  console.log({ thread });
   const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
   const reactors = thread?.associatedReactions?.map((t) => t.address!);
 
   const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
   const user = useUserStore();
 
-  const reactionWeightsSum =
-    BigInt(thread?.reactionWeightsSum || 0) > 0
-      ? thread?.reactionWeightsSum
-      : thread?.reactionCount?.toString() || '0';
+  const reactionWeightsSum = BigNumber.from(thread?.reactionWeightsSum || 0).gt(
+    0,
+  )
+    ? thread?.reactionWeightsSum
+    : thread?.reactionCount?.toString() || '0';
 
   const activeAddress = user.activeAccount?.address;
   const thisUserReaction = thread?.associatedReactions?.filter(

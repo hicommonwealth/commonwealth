@@ -104,8 +104,12 @@ export const ViewUpvotesDrawer = ({
   };
 
   const getVoteWeightTotal = (voters: Upvoter[]) => {
-    return voters.reduce((memo, current) => memo + current.voting_weight, 0);
+    return voters.reduce(
+      (memo, current) => memo + Number(current.voting_weight),
+      0,
+    );
   };
+
   const getAuthorCommunityId = (contentAuthor: Profile) => {
     if (contentAuthor instanceof MinimumProfile) {
       return contentAuthor?.chain;
@@ -189,6 +193,8 @@ export const ViewUpvotesDrawer = ({
                     {prettyVoteWeight(
                       getVoteWeightTotal(reactorData).toString(),
                       topicWeight,
+                      1,
+                      6,
                     )}
                   </CWText>
                 </div>
