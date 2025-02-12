@@ -133,30 +133,82 @@ class SubstrateEvmWebWalletController
       const evmAddress = this._ethAccounts[0];
       console.log('GetSessionSigner - Original EVM address:', evmAddress);
 
+      // Convert EVM address to SS58 format
+      const ss58Address = encodeEvmToSS58(evmAddress, communityPrefix);
+      console.log('GetSessionSigner - Converted to SS58:', ss58Address);
+
       // Create signer with MetaMask signer implementation
-      const signer = {
+      const evmSigner = {
         type: 'ethereum',
-        signRaw: async ({ address, data }) => {
-          console.log('GetSessionSigner - Signing data for address:', address);
-          console.log('GetSessionSigner - Data to sign:', data);
+        signRaw: async ({ data }) => {
+          console.log('GetSessionSigner - Signing data:', data);
+          // Convert data to hex string if it's a Uint8Array
+          const dataToSign =
+            data instanceof Uint8Array
+              ? '0x' + Buffer.from(data).toString('hex')
+              : data;
+          console.log('GetSessionSigner - Data to sign:', dataToSign);
           const signature = await this._web3.eth.personal.sign(
-            data,
+            dataToSign,
             evmAddress,
             '',
           );
           console.log('GetSessionSigner - Got signature:', signature);
-          return { signature };
+          // Create a deterministic nonce from the message data
+          const nonce =
+            data instanceof Uint8Array
+              ? data.slice(0, 32)
+              : Buffer.from(data).slice(0, 32);
+          // Convert signature to Uint8Array without '0x' prefix and recovery byte
+          const sigBytes = Buffer.from(signature.slice(2, -2), 'hex');
+          console.log('GetSessionSigner - Signature bytes:', sigBytes);
+          return {
+            signature: sigBytes,
+            nonce,
+          };
+        },
+        signMessage: async (message: string | Uint8Array) => {
+          console.log('GetSessionSigner - Signing message:', message);
+          // Convert Uint8Array to hex string if needed
+          const messageToSign =
+            message instanceof Uint8Array
+              ? '0x' + Buffer.from(message).toString('hex')
+              : message;
+          console.log('GetSessionSigner - Message to sign:', messageToSign);
+          const signature = await this._web3.eth.personal.sign(
+            messageToSign,
+            evmAddress,
+            '',
+          );
+          console.log('GetSessionSigner - Got message signature:', signature);
+          // Convert signature to Uint8Array without '0x' prefix and recovery byte
+          const sigBytes = Buffer.from(signature.slice(2, -2), 'hex');
+          console.log('GetSessionSigner - Message signature bytes:', sigBytes);
+          return sigBytes;
         },
         getAddress: async () => {
-          console.log('GetSessionSigner - Returning EVM address:', evmAddress);
-          return evmAddress;
+          console.log(
+            'GetSessionSigner - Returning SS58 address:',
+            ss58Address,
+          );
+          return ss58Address;
+        },
+        getSubstrateKeyType: () => {
+          console.log('GetSessionSigner - Getting key type for EVM signer');
+          return 'ecdsa';
         },
       };
 
-      return new SubstrateSignerCW({
-        extension: { signer },
+      // Create SubstrateSignerCW with the correct prefix
+      const signer = new SubstrateSignerCW({
+        extension: { signer: evmSigner },
         prefix: communityPrefix,
-      }) as SessionSigner;
+      });
+      console.log(
+        'GetSessionSigner - Created signer with prefix:',
+        communityPrefix,
+      );
+      return signer as SessionSigner;
     } else {
       // For Substrate, get the injected signer
       const address = this._accounts[0];

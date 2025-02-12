@@ -167,10 +167,26 @@ export class SubstrateSignerCW extends SubstrateSigner {
     super({ extension });
     this.prefix = prefix;
     console.log('SubstrateSignerCW - Constructor - Prefix:', prefix);
+    console.log('SubstrateSignerCW - Constructor - Extension:', extension);
+
+    // Initialize signer if extension is provided
+    if (extension?.signer) {
+      this._signer = extension.signer;
+    } else if (extension) {
+      this._signer = extension;
+    }
+
+    if (!this._signer) {
+      console.error('SubstrateSignerCW - Constructor - No signer available');
+    }
   }
 
   public async getDid(): Promise<DidIdentifier> {
     console.log('SubstrateSignerCW - GetDid - Starting');
+    if (!this._signer) {
+      console.error('SubstrateSignerCW - GetDid - No signer available');
+      throw new Error('No signer available');
+    }
     const walletAddress = await this._signer.getAddress();
     console.log(
       'SubstrateSignerCW - GetDid - Original wallet address:',
@@ -184,7 +200,7 @@ export class SubstrateSignerCW extends SubstrateSigner {
     console.log('SubstrateSignerCW - GetDid - Final address:', finalAddress);
     console.log('SubstrateSignerCW - GetDid - Using prefix:', this.prefix);
 
-    const did = `did:pkh:polkadot:${this.prefix}:${finalAddress}`;
+    const did = `did:pkh:polkadot:${this.prefix}:${finalAddress}` as const;
     console.log('SubstrateSignerCW - GetDid - Generated DID:', did);
     return did;
   }
@@ -201,6 +217,12 @@ export class SubstrateSignerCW extends SubstrateSigner {
       'SubstrateSignerCW - GetSession - Starting with options:',
       options,
     );
+
+    if (!this._signer) {
+      console.error('SubstrateSignerCW - GetSession - No signer available');
+      return null;
+    }
+
     let did;
     if (options.address) {
       console.log(
@@ -240,7 +262,7 @@ export class SubstrateSignerCW extends SubstrateSigner {
       finalAddress,
     );
 
-    did = `did:pkh:polkadot:${this.prefix}:${finalAddress}`;
+    did = `did:pkh:polkadot:${this.prefix}:${finalAddress}` as const;
     console.log('SubstrateSignerCW - GetSession - Final DID:', did);
 
     const key = `canvas/${topic}/${did}`;
