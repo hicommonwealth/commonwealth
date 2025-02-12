@@ -204,11 +204,7 @@ export const config = configure(
     DEV_MODULITH: z.boolean(),
     ENABLE_CLIENT_PUBLISHING: z.boolean(),
     TWITTER: z.object({
-      WORKER_POLL_INTERVAL: z
-        .number()
-        .int()
-        .positive()
-        .refine((data) => !(model_config.APP_ENV === 'production' && !data)),
+      WORKER_POLL_INTERVAL: z.number().int().gte(0),
     }),
   }),
 );
