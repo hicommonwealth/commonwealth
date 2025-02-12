@@ -8,7 +8,7 @@ import {
   EvmEventSignatures,
 } from '@hicommonwealth/evm-protocols';
 import { emitEvent, models } from '@hicommonwealth/model';
-import { EventNames, events as coreEvents } from '@hicommonwealth/schemas';
+import { events as coreEvents } from '@hicommonwealth/schemas';
 import { ethers } from 'ethers';
 import { z } from 'zod';
 import { config } from '../../config';
@@ -115,50 +115,50 @@ export async function processChainNode(
           case EvmEventSignatures.NamespaceFactory.ContestManagerDeployed:
             return parseContestEvent('NewContest') as
               | {
-                  event_name: EventNames.RecurringContestManagerDeployed;
+                  event_name: 'RecurringContestManagerDeployed';
                   event_payload: z.infer<
                     typeof coreEvents.RecurringContestManagerDeployed
                   >;
                 }
               | {
-                  event_name: EventNames.OneOffContestManagerDeployed;
+                  event_name: 'OneOffContestManagerDeployed';
                   event_payload: z.infer<
                     typeof coreEvents.OneOffContestManagerDeployed
                   >;
                 };
           case EvmEventSignatures.Contests.RecurringContestStarted:
             return parseContestEvent('NewRecurringContestStarted') as {
-              event_name: EventNames.ContestStarted;
+              event_name: 'ContestStarted';
               event_payload: z.infer<typeof coreEvents.ContestStarted>;
             };
           case EvmEventSignatures.Contests.SingleContestStarted:
             return parseContestEvent('NewSingleContestStarted') as {
-              event_name: EventNames.ContestStarted;
+              event_name: 'ContestStarted';
               event_payload: z.infer<typeof coreEvents.ContestStarted>;
             };
           case EvmEventSignatures.Contests.ContentAdded:
             return parseContestEvent('ContentAdded') as {
-              event_name: EventNames.ContestContentAdded;
+              event_name: 'ContestContentAdded';
               event_payload: z.infer<typeof coreEvents.ContestContentAdded>;
             };
           case EvmEventSignatures.Contests.RecurringContestVoterVoted:
             return parseContestEvent('VoterVotedRecurring') as {
-              event_name: EventNames.ContestContentUpvoted;
+              event_name: 'ContestContentUpvoted';
               event_payload: z.infer<typeof coreEvents.ContestContentUpvoted>;
             };
           case EvmEventSignatures.Contests.SingleContestVoterVoted:
             return parseContestEvent('VoterVotedOneOff') as {
-              event_name: EventNames.ContestContentUpvoted;
+              event_name: 'ContestContentUpvoted';
               event_payload: z.infer<typeof coreEvents.ContestContentUpvoted>;
             };
         }
 
         // fallback to generic chain event
         return {
-          event_name: EventNames.ChainEventCreated,
+          event_name: 'ChainEventCreated',
           event_payload: event as z.infer<typeof coreEvents.ChainEventCreated>,
         } as {
-          event_name: EventNames.ChainEventCreated;
+          event_name: 'ChainEventCreated';
           event_payload: z.infer<typeof coreEvents.ChainEventCreated>;
         };
       });

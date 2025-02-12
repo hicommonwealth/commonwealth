@@ -29,10 +29,7 @@ export async function handleReferralFeeDistributed(
 
   // find the referral (already mapped to a namespace)
   const referral = await models.Referral.findOne({
-    where: {
-      referrer_address,
-      namespace_address,
-    },
+    where: { namespace_address, referrer_address },
   });
   // enforce chain events in flow are processed in order
   if (!referral) throw Error('Referral fee received out of order');

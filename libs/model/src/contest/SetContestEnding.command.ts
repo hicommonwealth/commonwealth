@@ -46,7 +46,7 @@ export function SetContestEnding(): Command<typeof schemas.SetContestEnding> {
           models.Outbox,
           [
             {
-              event_name: schemas.EventNames.ContestEnding,
+              event_name: 'ContestEnding',
               event_payload: {
                 contest_address,
                 contest_id,

@@ -4,9 +4,9 @@ import Account from 'models/Account';
 import AddressInfo from 'models/AddressInfo';
 import MinimumProfile from 'models/MinimumProfile';
 import React, { Dispatch, SetStateAction } from 'react';
+import { prettyVoteWeight } from 'shared/adapters/currency';
 import app from 'state';
 import { User } from 'views/components/user/user';
-import { formatWeiToDecimal } from '../../../../../../../../libs/shared/src/utils';
 import { AuthorAndPublishInfo } from '../../../pages/discussions/ThreadCard/AuthorAndPublishInfo';
 import { CWText } from '../../component_kit/cw_text';
 import CWDrawer, {
@@ -26,7 +26,7 @@ type ViewUpvotesDrawerProps = {
   publishDate: moment.Moment;
   isOpen: boolean;
   setIsOpen: Dispatch<SetStateAction<boolean>>;
-  topicWeight?: TopicWeightedVoting | null;
+  topicWeight?: TopicWeightedVoting | null | undefined;
 };
 
 type Upvoter = {
@@ -69,7 +69,14 @@ export const ViewUpvotesDrawer = ({
   topicWeight,
 }: ViewUpvotesDrawerProps) => {
   const tableState = useCWTableState({
-    columns,
+    columns: columns.map((c) =>
+      c.key === 'voteWeight'
+        ? {
+            ...c,
+            weightedVoting: topicWeight,
+          }
+        : c,
+    ),
     initialSortColumn: 'timestamp',
     initialSortDirection: APIOrderDirection.Desc,
   });
@@ -77,10 +84,7 @@ export const ViewUpvotesDrawer = ({
   const voterRow = (voter: Upvoter) => {
     return {
       name: voter.name,
-      voteWeight:
-        topicWeight === 'erc20'
-          ? formatWeiToDecimal(voter.voting_weight.toString())
-          : voter.voting_weight,
+      voteWeight: voter.voting_weight,
       timestamp: voter.updated_at,
       avatars: {
         name: {
@@ -101,14 +105,11 @@ export const ViewUpvotesDrawer = ({
 
   const getVoteWeightTotal = (voters: Upvoter[]) => {
     return voters.reduce(
-      (memo, current) =>
-        memo +
-        (topicWeight === 'erc20'
-          ? parseFloat(formatWeiToDecimal(current.voting_weight.toString()))
-          : current.voting_weight),
+      (memo, current) => memo + Number(current.voting_weight),
       0,
     );
   };
+
   const getAuthorCommunityId = (contentAuthor: Profile) => {
     if (contentAuthor instanceof MinimumProfile) {
       return contentAuthor?.chain;
@@ -188,7 +189,14 @@ export const ViewUpvotesDrawer = ({
                   <CWText type="caption" fontWeight="uppercase">
                     Total
                   </CWText>
-                  <CWText type="b2">{getVoteWeightTotal(reactorData)}</CWText>
+                  <CWText type="b2">
+                    {prettyVoteWeight(
+                      getVoteWeightTotal(reactorData).toString(),
+                      topicWeight,
+                      1,
+                      6,
+                    )}
+                  </CWText>
                 </div>
               </div>
             </>

@@ -21,13 +21,17 @@ import { Breadcrumbs } from '../../components/Breadcrumbs';
 import { HeaderWithFilters } from './HeaderWithFilters';
 import { sortByFeaturedFilter, sortPinned } from './helpers';
 
-import { prettyVoteWeight } from '@hicommonwealth/evm-protocols';
-import { ZERO_ADDRESS, splitAndDecodeURL } from '@hicommonwealth/shared';
+import {
+  ZERO_ADDRESS,
+  formatDecimalToWei,
+  splitAndDecodeURL,
+} from '@hicommonwealth/shared';
 import { useGetUserEthBalanceQuery } from 'client/scripts/state/api/communityStake';
 import useUserStore from 'client/scripts/state/ui/user';
 import useManageDocumentTitle from 'hooks/useManageDocumentTitle';
 import useTopicGating from 'hooks/useTopicGating';
 import { GridComponents, Virtuoso, VirtuosoGrid } from 'react-virtuoso';
+import { prettyVoteWeight } from 'shared/adapters/currency';
 import { useFetchCustomDomainQuery } from 'state/api/configuration';
 import { useGetERC20BalanceQuery } from 'state/api/tokens';
 import { saveToClipboard } from 'utils/clipboard';
@@ -228,7 +232,10 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
 
   const voteWeight =
     isTopicWeighted && voteBalance
-      ? prettyVoteWeight(voteBalance, topicObj.vote_weight_multiplier || 1)
+      ? prettyVoteWeight(
+          formatDecimalToWei(voteBalance),
+          topicObj!.weighted_voting,
+        )
       : '';
 
   const updateSelectedView = (activeTab: string) => {

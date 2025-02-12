@@ -19,7 +19,6 @@ import {
   User,
   models,
 } from '@hicommonwealth/model';
-import { EventNames } from '@hicommonwealth/schemas';
 import { Client } from 'pg';
 import { config } from 'server/config';
 import { setupListener } from './pgListener';
@@ -88,14 +87,6 @@ export async function bootstrapBindings(
   const xpProjectionSubRes = await brokerInstance.subscribe(User.Xp);
   checkSubscriptionResponse(xpProjectionSubRes, User.Xp.name);
 
-  const userReferralsProjectionSubRes = await brokerInstance.subscribe(
-    User.UserReferrals,
-  );
-  checkSubscriptionResponse(
-    userReferralsProjectionSubRes,
-    User.UserReferrals.name,
-  );
-
   const farcasterWorkerSubRes = await brokerInstance.subscribe(
     FarcasterWorker,
     buildRetryStrategy(undefined, 20_000),
@@ -132,7 +123,7 @@ export function bootstrapContestRolloverLoop() {
   const loop = async () => {
     try {
       await handleEvent(ContestWorker(), {
-        name: EventNames.ContestRolloverTimerTicked,
+        name: 'ContestRolloverTimerTicked',
         payload: {},
       });
     } catch (err) {
