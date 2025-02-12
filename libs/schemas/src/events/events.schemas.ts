@@ -379,8 +379,7 @@ export const events = {
     end_date: z.coerce.date(),
     community_id: z.string().nullish(),
   }),
+
+  TwitterMomBotMentioned: Tweet,
+  TwitterContestBotMentioned: Tweet,
 } as const;
-
-export const TwitterMomBotMentioned = Tweet;
-
-export const TwitterContestBotMentioned = Tweet;

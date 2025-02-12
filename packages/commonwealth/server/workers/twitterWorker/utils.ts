@@ -1,4 +1,4 @@
-import { EventNames, events, Tweet } from '@hicommonwealth/schemas';
+import { events, Tweet } from '@hicommonwealth/schemas';
 import { TwitterBotName } from '@hicommonwealth/shared';
 import { z } from 'zod';
 
@@ -20,11 +20,11 @@ export type TwitterBotConfig =
 
 export type twitterMentions =
   | Array<{
-      event_name: EventNames.TwitterMomBotMentioned;
+      event_name: 'TwitterMomBotMentioned';
       event_payload: z.infer<typeof events.TwitterMomBotMentioned>;
     }>
   | Array<{
-      event_name: EventNames.TwitterContestBotMentioned;
+      event_name: 'TwitterContestBotMentioned';
       event_payload: z.infer<typeof events.TwitterContestBotMentioned>;
     }>;
 
@@ -38,12 +38,12 @@ export function createMentionEvents(
       TwitterBotConfigs.ContestBot.twitterUserId
     ) {
       return {
-        event_name: EventNames.TwitterContestBotMentioned,
+        event_name: 'TwitterContestBotMentioned',
         event_payload: t,
       };
     } else {
       return {
-        event_name: EventNames.TwitterMomBotMentioned,
+        event_name: 'TwitterMomBotMentioned',
         event_payload: t,
       };
     }
