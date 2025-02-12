@@ -20,7 +20,7 @@ export const verifySessionSignature = async (
   const expectedAddress = ss58_prefix
     ? addressSwapper({
         address,
-        currentPrefix: 42,
+        currentPrefix: ss58_prefix,
       })
     : address;
 
@@ -31,7 +31,7 @@ export const verifySessionSignature = async (
   const walletAddress = ss58_prefix
     ? addressSwapper({
         address: sessionRawAddress,
-        currentPrefix: 42,
+        currentPrefix: ss58_prefix,
       })
     : sessionRawAddress;
 
