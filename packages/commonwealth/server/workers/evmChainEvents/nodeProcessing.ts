@@ -15,6 +15,7 @@ import { config } from '../../config';
 import { getEventSources } from './getEventSources';
 import { getEvents, getProvider, migrateEvents } from './logProcessing';
 import { EvmEvent, EvmSource } from './types';
+import { updateMigratedEvmEventSources } from './utils';
 
 const log = logger(import.meta);
 
@@ -75,8 +76,8 @@ export async function processChainNode(
     }
 
     const allEvents: EvmEvent[] = [];
-    const migratedData = await migrateEvents(evmSource, startBlockNum);
-    if (migratedData && migratedData?.events?.length > 0)
+    const migratedData = await migrateEvents(evmSource, startBlockNum - 1);
+    if ('events' in migratedData && migratedData.events?.length > 0)
       allEvents.push(...migratedData.events);
 
     const { events, lastBlockNum } = await getEvents(
@@ -101,7 +102,11 @@ export async function processChainNode(
       }
 
       if (allEvents.length === 0) {
-        // log.info(`Processed 0 events for chainNodeId ${ethChainId}`);
+        await updateMigratedEvmEventSources(
+          ethChainId,
+          migratedData,
+          transaction,
+        );
         return;
       }
 
@@ -109,7 +114,12 @@ export async function processChainNode(
         const contractAddress = ethers.utils.getAddress(event.rawLog.address);
 
         const parseContestEvent = (e: keyof typeof ChainEventSigs) =>
-          parseEvmEventToContestEvent(e, contractAddress, event.parsedArgs);
+          parseEvmEventToContestEvent(
+            e,
+            contractAddress,
+            event.parsedArgs,
+            event.rawLog.blockNumber,
+          );
 
         switch (event.eventSource.eventSignature) {
           case EvmEventSignatures.NamespaceFactory.ContestManagerDeployed:
@@ -176,6 +186,11 @@ export async function processChainNode(
           )}`,
         );
         await emitEvent(models.Outbox, records, transaction);
+        await updateMigratedEvmEventSources(
+          ethChainId,
+          migratedData,
+          transaction,
+        );
       }
     });
   } catch (e) {

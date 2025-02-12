@@ -211,6 +211,7 @@ describe('Contests projection lifecycle', () => {
         namespace,
         contest_address: recurring,
         interval: 10,
+        block_number: 1,
       },
     });
 
@@ -231,6 +232,7 @@ describe('Contests projection lifecycle', () => {
         namespace,
         contest_address: oneoff,
         length: 1,
+        block_number: 1,
       },
     });
 
