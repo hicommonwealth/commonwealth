@@ -14,6 +14,7 @@ import XpQuestList from '../HomePage/XpQuestList/XpQuestList';
 import './CommunityHomePage.scss';
 import CommunityTransactions from './CommunityTransactions/CommunityTransactions';
 import TokenDetails from './TokenDetails/TokenDetails';
+import TokenPerformance from './TokenPerformance/TokenPerformance';
 
 const CommunityHome = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -46,6 +47,7 @@ const CommunityHome = () => {
             />
           </div>
         </div>
+        <TokenPerformance />
         <ActiveContestList />
         <CommunityTransactions />
         {xpEnabled && <XpQuestList communityIdFilter={chain} />}
