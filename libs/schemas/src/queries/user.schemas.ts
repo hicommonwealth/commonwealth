@@ -121,7 +121,10 @@ export const ReferralFeesView = ReferralFees.extend({
 });
 
 export const GetUserReferralFees = {
-  input: z.object({}),
+  input: z.object({
+    distributed_token_address: z.string().optional(),
+    user_id: PG_INT.optional(),
+  }),
   output: z.array(ReferralFeesView),
 };
 

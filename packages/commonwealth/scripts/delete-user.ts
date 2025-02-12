@@ -95,6 +95,10 @@ async function deleteUser(user_id: number) {
       },
       transaction,
     });
+    await models.XpLog.destroy({
+      where: { creator_user_id: user_id },
+      transaction,
+    });
     await models.User.destroy({
       where: {
         id: user_id,

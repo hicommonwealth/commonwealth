@@ -1,5 +1,6 @@
+import { calculateVoteWeight } from '@hicommonwealth/evm-protocols';
+import { TopicWeightedVoting } from '@hicommonwealth/schemas';
 import BN from 'bn.js';
-import { BigNumber } from 'ethers';
 
 // duplicated in helpers.ts
 export function formatNumberShort(num: number) {
@@ -31,32 +32,77 @@ export function formatNumberShort(num: number) {
                 : num.toString();
 }
 
-export function formatBigNumberShort(num: BigNumber): string {
-  if (num.isZero()) {
+export function formatBigNumberShort(num: number, numDecimals: number): string {
+  if (num === 0) {
     return '0';
   }
-  const thousand = BigNumber.from(1_000);
-  const million = BigNumber.from(1_000_000);
-  const billion = BigNumber.from(1_000_000_000);
-  const trillion = BigNumber.from(1_000_000_000_000);
+  const thousand = 1_000;
+  const million = 1_000_000;
+  const billion = 1_000_000_000;
+  const trillion = 1_000_000_000_000;
 
-  const round = (n: BigNumber, divisor: BigNumber, digits = 2) => {
-    const divided = n.div(divisor);
-    const factor = BigNumber.from(10).pow(digits);
-    return divided.mul(factor).div(factor).toString();
+  const round = (n: number, divisor: number): string => {
+    const divided = n / divisor;
+    // remove unnecessary trailing zeros
+    return divided.toFixed(numDecimals).replace(/\.?0+$/, '');
   };
 
-  // Compare BigNumber values and format accordingly
-  return num.gt(trillion)
+  return num > trillion
     ? `${round(num, trillion)}t`
-    : num.gt(billion)
+    : num > billion
       ? `${round(num, billion)}b`
-      : num.gt(million)
+      : num > million
         ? `${round(num, million)}m`
-        : num.gt(thousand)
+        : num > thousand
           ? `${round(num, thousand)}k`
           : num.toString();
 }
+
+/**
+ * Converts a wei value to a human-readable vote weight string.
+ *
+ *  NOTE: if using a wei value from the backend, there's
+ *        no need to set the multiplier because it's
+ *        already weighted.
+ *
+ */
+export const prettyVoteWeight = (
+  wei: string,
+  weightType?: TopicWeightedVoting | null | undefined,
+  multiplier: number = 1,
+  decimalsOverride?: number,
+): string => {
+  const weiStr = parseFloat(wei).toLocaleString('fullwide', {
+    useGrouping: false,
+  });
+  const weiValue =
+    weightType === TopicWeightedVoting.Stake
+      ? parseInt(wei) * multiplier
+      : calculateVoteWeight(weiStr, multiplier || 1);
+
+  // for non-weighted and stake, just render as-is
+  if (!weightType || weightType === TopicWeightedVoting.Stake) {
+    return parseFloat((weiValue || 0).toString()).toString();
+  }
+
+  const n = Number(weiValue) / 1e18;
+  if (n === 0) {
+    return '0';
+  }
+  if (n < 0.000001) {
+    return '0.0…';
+  }
+
+  let numDecimals = n > 10 ? 3 : 6;
+  if (typeof decimalsOverride === 'number') {
+    numDecimals = decimalsOverride;
+  }
+  if (n > 1000) {
+    return formatBigNumberShort(n, numDecimals);
+  }
+  // remove trailing zeros after decimal
+  return n.toFixed(numDecimals).replace(/\.?0+$/, '');
+};
 
 const nf = new Intl.NumberFormat();
 

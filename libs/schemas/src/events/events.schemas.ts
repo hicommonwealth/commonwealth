@@ -6,6 +6,7 @@ import { FarcasterAction } from '../entities/farcaster.schemas';
 import { SubscriptionPreference } from '../entities/notification.schemas';
 import { Reaction } from '../entities/reaction.schemas';
 import { Thread } from '../entities/thread.schemas';
+import { Tweet } from '../integrations';
 import { PG_INT } from '../utils';
 import {
   CommunityStakeTrade,
@@ -279,12 +280,22 @@ export const events = {
       .int()
       .positive()
       .describe('Recurring constest interval'),
+    block_number: z
+      .number()
+      .int()
+      .positive()
+      .describe('The block number in which the contest was created'),
   }).describe('When a new recurring contest manager gets deployed'),
 
   OneOffContestManagerDeployed: EventMetadata.extend({
     namespace: z.string().describe('Community namespace'),
     contest_address: z.string().describe('Contest manager address'),
     length: z.number().int().positive().describe('Length of contest in days'),
+    block_number: z
+      .number()
+      .int()
+      .positive()
+      .describe('The block number in which the contest was created'),
   }).describe('When a new one-off contest manager gets deployed'),
 
   // Contest Events
@@ -378,4 +389,7 @@ export const events = {
     end_date: z.coerce.date(),
     community_id: z.string().nullish(),
   }),
+
+  TwitterMomBotMentioned: Tweet,
+  TwitterContestBotMentioned: Tweet,
 } as const;

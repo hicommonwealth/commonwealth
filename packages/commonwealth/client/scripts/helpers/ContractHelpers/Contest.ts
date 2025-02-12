@@ -79,7 +79,8 @@ class Contest extends ContractBase {
       this.contractAddress = newContestAddress;
       return newContestAddress;
     } catch (error) {
-      throw new Error('Failed to initialize contest ' + error);
+      console.log(error);
+      throw new Error('Failed to initialize contest');
     }
   }
 
@@ -129,7 +130,8 @@ class Contest extends ContractBase {
       this.contractAddress = newContestAddress;
       return newContestAddress;
     } catch (error) {
-      throw new Error('Failed to initialize contest ' + error);
+      console.log(error);
+      throw new Error('Failed to initialize contest');
     }
   }
 
@@ -166,7 +168,8 @@ class Contest extends ContractBase {
       this.contractAddress = newContestAddress;
       return newContestAddress;
     } catch (error) {
-      throw new Error('Failed to initialize contest ' + error);
+      console.log(error);
+      throw new Error('Failed to initialize contest');
     }
   }
 
