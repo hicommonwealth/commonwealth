@@ -15,8 +15,14 @@ import {
 } from '@hicommonwealth/shared';
 import { CosmosExtension } from '@magic-ext/cosmos';
 import { FarcasterExtension } from '@magic-ext/farcaster';
-import { OAuthExtension } from '@magic-ext/oauth';
-import { OAuthExtension as OAuthExtensionV2 } from '@magic-ext/oauth2';
+import {
+  OAuthProvider as MagicOAuthProvider,
+  OAuthExtension,
+} from '@magic-ext/oauth';
+import {
+  OAuthProvider as OAuth2Provider,
+  OAuthExtension as OAuthExtensionV2,
+} from '@magic-ext/oauth2';
 import axios from 'axios';
 import { notifyError } from 'controllers/app/notifications';
 import { getMagicCosmosSessionSigner } from 'controllers/server/sessions';
@@ -37,15 +43,18 @@ import Account from '../../models/Account';
 import AddressInfo from '../../models/AddressInfo';
 import { fetchCachedCustomDomain } from '../../state/api/configuration/index';
 
-// need to instantiate it early because the farcaster sdk has an async constructor which will cause a race condition
-// if instantiated right before the login is called;
+// Add type for Magic instance with Farcaster
+type MagicWithFarcaster = Magic & {
+  farcaster: FarcasterExtension;
+};
+
 export const defaultMagic = new Magic(process.env.MAGIC_PUBLISHABLE_KEY!, {
   extensions: [
     new FarcasterExtension(),
     new OAuthExtension(),
     new OAuthExtensionV2(),
   ],
-});
+}) as MagicWithFarcaster;
 
 function storeActiveAccount(account: Account) {
   const user = userStore.getState();
@@ -301,7 +310,7 @@ export async function startLoginWithMagicLink({
 
     return { bearer, address };
   } else if (provider === WalletSsoSource.Farcaster) {
-    const bearer = await magic.farcaster.login();
+    const bearer = await (magic as MagicWithFarcaster).farcaster.login();
 
     const { address } = await handleSocialLoginCallback({
       bearer,
@@ -321,6 +330,22 @@ export async function startLoginWithMagicLink({
     });
 
     return { bearer, address };
+  } else if (provider === WalletSsoSource.Telegram) {
+    console.log('Starting Telegram login flow...');
+
+    const result = await magic.oauth2.loginWithPopup({
+      provider: provider.toLowerCase() as OAuth2Provider,
+    });
+    console.log('Telegram login completed');
+
+    const { address } = await handleSocialLoginCallback({
+      bearer: result.magic.idToken,
+      walletSsoSource: WalletSsoSource.Telegram,
+      isCustomDomain: false,
+    });
+    console.log('Telegram login completed with address:', address);
+
+    return { bearer: result.magic.idToken, address };
   } else {
     localStorage.setItem('magic_provider', provider!);
     localStorage.setItem('magic_chain', chain!);
@@ -333,7 +358,7 @@ export async function startLoginWithMagicLink({
       }&chain=${chain || ''}&sso=${provider}`;
 
       await magic.oauth.loginWithRedirect({
-        provider,
+        provider: provider?.toLowerCase() as MagicOAuthProvider,
         redirectURI: createRedirectURI(params),
         options: {
           // prompt forces Google to show the account picker.
@@ -342,7 +367,7 @@ export async function startLoginWithMagicLink({
       });
     } else {
       await magic.oauth2.loginWithRedirect({
-        provider,
+        provider: provider?.toLowerCase() as OAuth2Provider,
         redirectURI: createRedirectURI(),
         options: {
           // prompt forces Google to show the account picker.

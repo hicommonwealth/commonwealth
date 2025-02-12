@@ -948,17 +948,17 @@ importers:
         specifier: ^5.0.4
         version: 5.0.4
       '@magic-ext/cosmos':
-        specifier: ^12.4.0
-        version: 12.4.0
+        specifier: ^23.20.0
+        version: 23.20.0
       '@magic-ext/farcaster':
         specifier: ^0.16.0
         version: 0.16.0
       '@magic-ext/oauth':
-        specifier: ^22.17.0
-        version: 22.17.0
+        specifier: ^22.20.0
+        version: 22.20.0
       '@magic-ext/oauth2':
-        specifier: ^9.16.0
-        version: 9.16.0
+        specifier: ^9.21.0
+        version: 9.21.0
       '@magic-sdk/admin':
         specifier: ^2.4.1
         version: 2.4.1(bufferutil@4.0.8)(encoding@0.1.13)(utf-8-validate@5.0.10)
@@ -1206,8 +1206,8 @@ importers:
         specifier: ^2.4.1
         version: 2.4.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       magic-sdk:
-        specifier: ^28.17.0
-        version: 28.17.0
+        specifier: ^28.21.1
+        version: 28.21.1
       marked:
         specifier: ^11.0.0
         version: 11.2.0
@@ -5013,17 +5013,17 @@ packages:
     resolution: {integrity: sha512-Z7C/xXCiGWsg0KuKsHTKJxbWhpI3Vs5GwLfOean7MGyVFGqdRgBbAjOCh6u4bbjPc/8MJ2pZmK/0DLdCbivLDA==}
     engines: {node: '>=8'}
 
-  '@magic-ext/cosmos@12.4.0':
-    resolution: {integrity: sha512-WfLlUzkKVfqO9vv+h8fA7z/KAcBL6tbLjSPHZCr8WbBUL/Me86Pmx8g8Zftb19oaGmYM+XkPVli7h20zBRE2oA==}
+  '@magic-ext/cosmos@23.20.0':
+    resolution: {integrity: sha512-Dxl4z2JMltmJANukNU1MpgE9c0OceVcscbEvkjRXfdpN+0p4H+MXGA/iaaU9n3pgA8H96PUafIBsmOJ2kicJ6g==}
 
   '@magic-ext/farcaster@0.16.0':
     resolution: {integrity: sha512-+1u6r4sh1Mys2fxqbqU/8uBYeD2RQmjJY/6iwKHTih20gPotH++VoD6Jhl89I9UW8KogwTQ620asu8XZbXOLbw==}
 
-  '@magic-ext/oauth2@9.16.0':
-    resolution: {integrity: sha512-+ixOFjjLZtbk7GgRdzfGKpREGZUyqpIjXDftUjNOlgbaroBBjqrVj4scnzz06VQwCuiWotZ4ZU1vSFz/NszotQ==}
+  '@magic-ext/oauth2@9.21.0':
+    resolution: {integrity: sha512-43KvjPg8xxqSYo0W8mVcFcotCo78p3JZNQ+O8P83qvkyTxe8ZAPwBUbSxDLKvBqlcnxvRkz7vru+M/B7Vx4ezg==}
 
-  '@magic-ext/oauth@22.17.0':
-    resolution: {integrity: sha512-WSSf/g7l3B5cWzRenfizxE1qo4smbWPzOh4r14HEkIhvJS4m+gqNjav2Rp2HQElfXY7EuEeWM6KhZa/Irnd3eQ==}
+  '@magic-ext/oauth@22.20.0':
+    resolution: {integrity: sha512-XW9IBS+YR6S0U6gFpQSgithsltYLzYJv6N5TY22WglzbCXqWmnGRAF1wAjL3woM6P8yyzKS5d9VewM/A9BhDPw==}
 
   '@magic-sdk/admin@0.1.0-beta.10':
     resolution: {integrity: sha512-bW+Yoy7lNwgUd9KnizrignhuBpbGrBO3doCWezhq5/pi3aPujjUzmyl8mqqgxaPlNovznyq6tzMSFkdqi+6TpA==}
@@ -5032,19 +5032,19 @@ packages:
   '@magic-sdk/admin@2.4.1':
     resolution: {integrity: sha512-mx0Z3yMbdY7JXATQiEC298ZKjA414ixfrsBXABdmoQlzvvo6uxUbXbWIpYZGpci0v/INKIg7ksOvdZurGV/F8g==}
 
-  '@magic-sdk/commons@24.16.0':
-    resolution: {integrity: sha512-CGICu3E2JNrTNqdT3Bjxg86+mb48RR6GvyEBWsQ0gF5psTrcQ3xVmqYbCdXLKwcoWMHwr6oFosg0Id4S372BKQ==}
+  '@magic-sdk/commons@24.20.0':
+    resolution: {integrity: sha512-7uOWqqXzV7eHXo8NAoKDTkp5QqeHN2LUN7K6AtCSM8cPq4Auil/5o6hTSF/6sD4pxn70IKCi1P6x+umnYn5BEg==}
     peerDependencies:
       '@magic-sdk/provider': '>=18.6.0'
       '@magic-sdk/types': '>=15.8.0'
 
-  '@magic-sdk/provider@28.16.0':
-    resolution: {integrity: sha512-FLRfOGWa0c8yPTR7+gx+BAmzBtjXwYq5Ek3mahbCFxDIOB9N4v9lAX2pCHjCer4vFK5fKWsgFQ3Bbef/jfnNJg==}
+  '@magic-sdk/provider@28.20.0':
+    resolution: {integrity: sha512-BmNfctAABoUX0iyCx15a753XL796V2fY1nGtVBIk4zyW5ZGqfF6poVQ9MlJDf0TqyPm1Ff+9qHZsazUP6YjoSg==}
     peerDependencies:
       localforage: ^1.7.4
 
-  '@magic-sdk/types@24.14.0':
-    resolution: {integrity: sha512-l5mjRoERU8o1IuKFdfu7EKp+T0qptfwm/U3lkGwO7/8xD/mK3bRoXSJAObgLAW5Kdp+uTeg6m3iNlrsm3Tt7PQ==}
+  '@magic-sdk/types@24.18.0':
+    resolution: {integrity: sha512-6HS9WMgzLNCkvkJeDZW8+/maP8JInDYqnfudp/SgPWMosm9l6zH3X+x+ntDjRIUm5Qdugsg+L1fxMBj48r616Q==}
 
   '@mdxeditor/gurx@1.1.3':
     resolution: {integrity: sha512-ywPsQFJKqrESDJWmvVvSnSjliY7vOOEUkkUunV3A6crsTem7Ymo6FhaNsJWpU5DpkpzcU7kUQXZXoW3i8Nj+fw==}
@@ -13740,8 +13740,8 @@ packages:
   magic-bytes.js@1.10.0:
     resolution: {integrity: sha512-/k20Lg2q8LE5xiaaSkMXk4sfvI+9EGEykFS4b0CHHGWqDYU0bGUFSwchNOMA56D7TCs9GwVTkqe9als1/ns8UQ==}
 
-  magic-sdk@28.17.0:
-    resolution: {integrity: sha512-5gSUuWDYr9PgndxNFfBg0SQuKRqJDRwZyVtKmwsxuLDDyOxSJs7tnBlXxwgnGGRyDwEgN9gWnh/lw5+qlN4XxQ==}
+  magic-sdk@28.21.1:
+    resolution: {integrity: sha512-3N1aozjkoiBgAVQkbG5f/DScjFjpGOSTMvLa2DJCX9XYuQyO0k0WddwafnT56k5Ej1eVy9UQBBl9AgUEhlvW/A==}
 
   magic-string@0.25.9:
     resolution: {integrity: sha512-RmF0AsMzgt25qzqqLc1+MbHmhdx0ojF2Fvs4XnOqz2ZOBXzzkEwc/dJQZCYHAn7v1jbVOjAZfK8msRn4BxO4VQ==}
@@ -24713,7 +24713,7 @@ snapshots:
       '@ethersproject/providers': 5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@ethersproject/wallet': 5.7.0
       '@lens-protocol/blockchain-bindings': 0.10.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      '@lens-protocol/gated-content': 0.5.1(@ethersproject/abi@5.7.0)(@ethersproject/address@5.7.0)(@ethersproject/bignumber@5.7.0)(@ethersproject/contracts@5.7.0)(@ethersproject/hash@5.7.0)(@ethersproject/providers@5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10))(@ethersproject/wallet@5.7.0)(@lens-protocol/metadata@1.2.0(zod@3.23.6))(@types/react@18.3.3)(bufferutil@4.0.8)(encoding@0.1.13)(ethers@5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10))(react@18.3.1)(utf-8-validate@5.0.10)(zod@3.23.8)
+      '@lens-protocol/gated-content': 0.5.1(@ethersproject/abi@5.7.0)(@ethersproject/address@5.7.0)(@ethersproject/bignumber@5.7.0)(@ethersproject/contracts@5.7.0)(@ethersproject/hash@5.7.0)(@ethersproject/providers@5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10))(@ethersproject/wallet@5.7.0)(@lens-protocol/metadata@1.2.0(zod@3.23.6))(@types/react@18.3.3)(bufferutil@4.0.8)(encoding@0.1.13)(ethers@5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10))(react@18.3.1)(utf-8-validate@5.0.10)(zod@3.24.1)
       '@lens-protocol/shared-kernel': 0.12.0
       '@lens-protocol/storage': 0.8.1
       graphql: 16.9.0
@@ -24721,7 +24721,7 @@ snapshots:
       graphql-tag: 2.12.6(graphql@16.9.0)
       jwt-decode: 3.1.2
       tslib: 2.8.1
-      zod: 3.23.8
+      zod: 3.24.1
     optionalDependencies:
       '@lens-protocol/metadata': 1.2.0(zod@3.23.6)
     transitivePeerDependencies:
@@ -24756,7 +24756,7 @@ snapshots:
       '@lens-protocol/shared-kernel': 0.12.0
       tslib: 2.8.1
 
-  '@lens-protocol/gated-content@0.5.1(@ethersproject/abi@5.7.0)(@ethersproject/address@5.7.0)(@ethersproject/bignumber@5.7.0)(@ethersproject/contracts@5.7.0)(@ethersproject/hash@5.7.0)(@ethersproject/providers@5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10))(@ethersproject/wallet@5.7.0)(@lens-protocol/metadata@1.2.0(zod@3.23.6))(@types/react@18.3.3)(bufferutil@4.0.8)(encoding@0.1.13)(ethers@5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10))(react@18.3.1)(utf-8-validate@5.0.10)(zod@3.23.8)':
+  '@lens-protocol/gated-content@0.5.1(@ethersproject/abi@5.7.0)(@ethersproject/address@5.7.0)(@ethersproject/bignumber@5.7.0)(@ethersproject/contracts@5.7.0)(@ethersproject/hash@5.7.0)(@ethersproject/providers@5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10))(@ethersproject/wallet@5.7.0)(@lens-protocol/metadata@1.2.0(zod@3.23.6))(@types/react@18.3.3)(bufferutil@4.0.8)(encoding@0.1.13)(ethers@5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10))(react@18.3.1)(utf-8-validate@5.0.10)(zod@3.24.1)':
     dependencies:
       '@ethersproject/abi': 5.7.0
       '@ethersproject/address': 5.7.0
@@ -24775,7 +24775,7 @@ snapshots:
       '@lit-protocol/types': 2.1.62
       siwe: 2.3.2(ethers@5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10))
       tslib: 2.8.1
-      zod: 3.23.8
+      zod: 3.24.1
     transitivePeerDependencies:
       - '@azure/app-configuration'
       - '@azure/cosmos'
@@ -24817,7 +24817,7 @@ snapshots:
     dependencies:
       '@lens-protocol/shared-kernel': 0.12.0
       tslib: 2.8.1
-      zod: 3.23.8
+      zod: 3.24.1
 
   '@lexical/clipboard@0.17.1':
     dependencies:
@@ -25600,15 +25600,15 @@ snapshots:
 
   '@lukeed/csprng@1.1.0': {}
 
-  '@magic-ext/cosmos@12.4.0': {}
+  '@magic-ext/cosmos@23.20.0': {}
 
   '@magic-ext/farcaster@0.16.0': {}
 
-  '@magic-ext/oauth2@9.16.0':
+  '@magic-ext/oauth2@9.21.0':
     dependencies:
       crypto-js: 3.3.0
 
-  '@magic-ext/oauth@22.17.0':
+  '@magic-ext/oauth@22.20.0':
     dependencies:
       crypto-js: 3.3.0
 
@@ -25632,21 +25632,21 @@ snapshots:
       - encoding
       - utf-8-validate
 
-  '@magic-sdk/commons@24.16.0(@magic-sdk/provider@28.16.0(localforage@1.10.0))(@magic-sdk/types@24.14.0)':
+  '@magic-sdk/commons@24.20.0(@magic-sdk/provider@28.20.0(localforage@1.10.0))(@magic-sdk/types@24.18.0)':
     dependencies:
-      '@magic-sdk/provider': 28.16.0(localforage@1.10.0)
-      '@magic-sdk/types': 24.14.0
+      '@magic-sdk/provider': 28.20.0(localforage@1.10.0)
+      '@magic-sdk/types': 24.18.0
 
-  '@magic-sdk/provider@28.16.0(localforage@1.10.0)':
+  '@magic-sdk/provider@28.20.0(localforage@1.10.0)':
     dependencies:
-      '@magic-sdk/types': 24.14.0
+      '@magic-sdk/types': 24.18.0
       eventemitter3: 4.0.7
       localforage: 1.10.0
       web3-core: 1.5.2
     transitivePeerDependencies:
       - supports-color
 
-  '@magic-sdk/types@24.14.0': {}
+  '@magic-sdk/types@24.18.0': {}
 
   '@mdxeditor/gurx@1.1.3':
     dependencies:
@@ -25897,7 +25897,7 @@ snapshots:
     dependencies:
       '@ethereumjs/tx': 4.2.0
       '@metamask/superstruct': 3.1.0
-      '@noble/hashes': 1.5.0
+      '@noble/hashes': 1.7.1
       '@scure/base': 1.1.6
       '@types/debug': 4.1.12
       debug: 4.3.7(supports-color@8.1.1)
@@ -25911,7 +25911,7 @@ snapshots:
     dependencies:
       '@ethereumjs/tx': 4.2.0
       '@metamask/superstruct': 3.1.0
-      '@noble/hashes': 1.5.0
+      '@noble/hashes': 1.7.1
       '@scure/base': 1.1.6
       '@types/debug': 4.1.12
       debug: 4.3.7(supports-color@8.1.1)
@@ -26630,7 +26630,7 @@ snapshots:
 
   '@polkadot-api/substrate-bindings@0.0.1':
     dependencies:
-      '@noble/hashes': 1.5.0
+      '@noble/hashes': 1.7.1
       '@polkadot-api/utils': 0.0.1
       '@scure/base': 1.1.6
       scale-ts: 1.6.0
@@ -29689,7 +29689,7 @@ snapshots:
       bs58check: 3.0.1
       buffer: 6.0.3
       cross-fetch: 3.1.8(encoding@0.1.13)
-      elliptic: 6.5.5
+      elliptic: 6.6.1
       hpke-js: 1.2.9
     transitivePeerDependencies:
       - '@babel/core'
@@ -29707,7 +29707,7 @@ snapshots:
       '@turnkey/http': 2.13.0(encoding@0.1.13)
       buffer: 6.0.3
       cross-fetch: 3.1.8(encoding@0.1.13)
-      elliptic: 6.5.5
+      elliptic: 6.6.1
     transitivePeerDependencies:
       - encoding
 
@@ -32965,7 +32965,7 @@ snapshots:
 
   bs58check@3.0.1:
     dependencies:
-      '@noble/hashes': 1.5.0
+      '@noble/hashes': 1.7.1
       bs58: 5.0.0
 
   bser@2.1.1:
@@ -34432,7 +34432,7 @@ snapshots:
 
   elliptic@6.5.4:
     dependencies:
-      bn.js: 4.12.0
+      bn.js: 4.12.1
       brorand: 1.1.0
       hash.js: 1.1.7
       hmac-drbg: 1.0.1
@@ -35103,7 +35103,7 @@ snapshots:
   eth-sig-util@2.1.2:
     dependencies:
       buffer: 5.7.1
-      elliptic: 6.5.5
+      elliptic: 6.6.1
       ethereumjs-abi: 0.6.5
       ethereumjs-util: 5.2.1
       tweetnacl: 1.0.3
@@ -35111,7 +35111,7 @@ snapshots:
 
   ethereum-bloom-filters@1.1.0:
     dependencies:
-      '@noble/hashes': 1.5.0
+      '@noble/hashes': 1.7.1
 
   ethereum-cryptography@0.1.3:
     dependencies:
@@ -35159,7 +35159,7 @@ snapshots:
     dependencies:
       bn.js: 4.12.1
       create-hash: 1.2.0
-      elliptic: 6.5.5
+      elliptic: 6.6.1
       ethereum-cryptography: 0.1.3
       rlp: 2.2.7
 
@@ -35167,7 +35167,7 @@ snapshots:
     dependencies:
       bn.js: 4.12.1
       create-hash: 1.2.0
-      elliptic: 6.5.5
+      elliptic: 6.6.1
       ethereum-cryptography: 0.1.3
       ethjs-util: 0.1.6
       rlp: 2.2.7
@@ -38108,11 +38108,11 @@ snapshots:
 
   magic-bytes.js@1.10.0: {}
 
-  magic-sdk@28.17.0:
+  magic-sdk@28.21.1:
     dependencies:
-      '@magic-sdk/commons': 24.16.0(@magic-sdk/provider@28.16.0(localforage@1.10.0))(@magic-sdk/types@24.14.0)
-      '@magic-sdk/provider': 28.16.0(localforage@1.10.0)
-      '@magic-sdk/types': 24.14.0
+      '@magic-sdk/commons': 24.20.0(@magic-sdk/provider@28.20.0(localforage@1.10.0))(@magic-sdk/types@24.18.0)
+      '@magic-sdk/provider': 28.20.0(localforage@1.10.0)
+      '@magic-sdk/types': 24.18.0
       localforage: 1.10.0
     transitivePeerDependencies:
       - supports-color
@@ -39022,7 +39022,7 @@ snapshots:
 
   miller-rabin@4.0.1:
     dependencies:
-      bn.js: 4.12.0
+      bn.js: 4.12.1
       brorand: 1.1.0
 
   mime-db@1.52.0: {}
@@ -40105,7 +40105,7 @@ snapshots:
 
   parse5@3.0.3:
     dependencies:
-      '@types/node': 20.12.10
+      '@types/node': 20.17.6
 
   parse5@7.1.2:
     dependencies:
@@ -40724,7 +40724,7 @@ snapshots:
       '@protobufjs/path': 1.1.2
       '@protobufjs/pool': 1.1.0
       '@protobufjs/utf8': 1.1.0
-      '@types/node': 20.12.10
+      '@types/node': 20.17.6
       long: 5.2.3
 
   protobufjs@7.4.0:
@@ -41966,7 +41966,7 @@ snapshots:
 
   secp256k1@5.0.0:
     dependencies:
-      elliptic: 6.5.5
+      elliptic: 6.6.1
       node-addon-api: 5.1.0
       node-gyp-build: 4.8.1
 
@@ -43111,9 +43111,9 @@ snapshots:
   tiny-secp256k1@1.1.6:
     dependencies:
       bindings: 1.5.0
-      bn.js: 4.12.0
+      bn.js: 4.12.1
       create-hmac: 1.1.7
-      elliptic: 6.5.5
+      elliptic: 6.6.1
       nan: 2.19.0
 
   tiny-warning@1.0.3: {}
@@ -44543,12 +44543,12 @@ snapshots:
   webauthn-p256@0.0.10:
     dependencies:
       '@noble/curves': 1.6.0
-      '@noble/hashes': 1.5.0
+      '@noble/hashes': 1.7.1
 
   webauthn-p256@0.0.5:
     dependencies:
       '@noble/curves': 1.6.0
-      '@noble/hashes': 1.5.0
+      '@noble/hashes': 1.7.1
 
   webextension-polyfill@0.10.0: {}
 
