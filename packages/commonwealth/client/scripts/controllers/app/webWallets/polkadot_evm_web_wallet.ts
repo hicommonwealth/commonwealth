@@ -1,12 +1,4 @@
-import type {
-  AbstractSessionData,
-  DidIdentifier,
-  Message,
-  Session,
-  SessionSigner,
-  Signature,
-  SignatureScheme,
-} from '@canvas-js/interfaces';
+import type { SessionSigner } from '@canvas-js/interfaces';
 import {
   ChainBase,
   ChainNetwork,
@@ -60,7 +52,13 @@ class SubstrateEvmWebWalletController
   private _ethAccounts: string[];
   private _provider: Web3BaseProvider;
   private _web3: Web3;
-  private _currentWalletType: 'substrate' | 'evm' = 'substrate'; //is this needed?
+  private _currentWalletType: 'substrate' | 'evm';
+  private _preferredWalletType?: 'substrate' | 'evm';
+
+  constructor(preferredWalletType?: 'substrate' | 'evm') {
+    this._preferredWalletType = preferredWalletType;
+    this._currentWalletType = preferredWalletType || 'substrate';
+  }
 
   public readonly name = WalletId.SubstrateEvmMetamask;
   public readonly label = 'Substrate/EVM Wallet';
@@ -125,63 +123,55 @@ class SubstrateEvmWebWalletController
   }
 
   public async getSessionSigner(): Promise<SessionSigner> {
-    if (this._currentWalletType === 'substrate') {
-      const accounts = await web3Accounts();
-      const address = accounts[0].address;
+    const communityPrefix = app.chain?.meta?.ss58_prefix || 42;
+    console.log('GetSessionSigner - Community prefix:', communityPrefix);
+    console.log('GetSessionSigner - Chain:', app.chain?.meta?.id);
+    console.log('GetSessionSigner - Wallet type:', this._currentWalletType);
 
-      const reencodedAddress = addressSwapper({
-        address,
-        currentPrefix: 42,
-      });
+    if (this._currentWalletType === 'evm') {
+      // For EVM, we need to ensure we're using the original EVM address
+      const evmAddress = this._ethAccounts[0];
+      console.log('GetSessionSigner - Original EVM address:', evmAddress);
 
-      const extension = await web3FromAddress(reencodedAddress);
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      return new SubstrateSignerCW({ extension }) as SessionSigner;
-    } else {
-      const chainId = await this._web3.eth.getChainId();
-      const address = this._ethAccounts[0];
-
-      const ethereumScheme: SignatureScheme = {
+      // Create signer with MetaMask signer implementation
+      const signer = {
         type: 'ethereum',
-        codecs: ['eth-personal-sign'],
-        verify: async (_signature: Signature, _message: Message<unknown>) => {
-          throw new Error('Not implemented');
+        signRaw: async ({ address, data }) => {
+          console.log('GetSessionSigner - Signing data for address:', address);
+          console.log('GetSessionSigner - Data to sign:', data);
+          const signature = await this._web3.eth.personal.sign(
+            data,
+            evmAddress,
+            '',
+          );
+          console.log('GetSessionSigner - Got signature:', signature);
+          return { signature };
         },
-        create: (_init?: { type: string; privateKey: Uint8Array }) => {
-          throw new Error('Not implemented');
-        },
-      };
-
-      const signer: SessionSigner = {
-        scheme: ethereumScheme,
-        match: (did: DidIdentifier) => did.startsWith('did:pkh:eip155'),
-        getDid: async () => {
-          return `did:pkh:eip155:${chainId}:${address}` as DidIdentifier;
-        },
-        getDidParts: () => 42, // Using same as SubstrateSigner
-        getAddressFromDid: (did: DidIdentifier) => did.split(':')[4],
-        key: 'ethereum-signer',
-        hasSession: (_topic: string, _did: DidIdentifier) => false,
-        getSession: async (_topic: string, _options?: any) => null,
-        newSession: async (_topic: string) => {
-          throw new Error('Not implemented');
-        },
-        authorize: async (
-          _data: AbstractSessionData,
-          _authorizationData?: any,
-        ) => {
-          throw new Error('Not implemented');
-        },
-        verifySession: async (_topic: string, _session: Session<any>) => {
-          throw new Error('Not implemented');
-        },
-        clear: async (_topic: string) => {
-          // Implementation if needed
+        getAddress: async () => {
+          console.log('GetSessionSigner - Returning EVM address:', evmAddress);
+          return evmAddress;
         },
       };
 
-      return signer;
+      return new SubstrateSignerCW({
+        extension: { signer },
+        prefix: communityPrefix,
+      }) as SessionSigner;
+    } else {
+      // For Substrate, get the injected signer
+      const address = this._accounts[0];
+      const ss58Address =
+        typeof address === 'string' ? address : address.address;
+      console.log('GetSessionSigner - Substrate address:', ss58Address);
+
+      // Get the extension for the address
+      const extension = await web3FromAddress(ss58Address);
+      console.log('GetSessionSigner - Got extension for address');
+
+      return new SubstrateSignerCW({
+        extension,
+        prefix: communityPrefix,
+      }) as SessionSigner;
     }
   }
 
@@ -198,38 +188,18 @@ class SubstrateEvmWebWalletController
     this._enabling = true;
 
     try {
-      if (window?.injectedWeb3?.['polkadot-js']) {
-        this._currentWalletType = 'substrate';
-        await web3Enable('commonwealth');
-        const accounts = await web3Accounts();
-        this._accounts = accounts as InjectedAccountWithMeta[];
-      } else if (window.ethereum) {
-        this._currentWalletType = 'evm';
-        let ethereum = window.ethereum;
-        if (window.ethereum.providers?.length) {
-          ethereum =
-            window.ethereum.providers.find((p) => p.isMetaMask) || ethereum;
-        }
+      const hasPolkadot = !!window?.injectedWeb3?.['polkadot-js'];
+      const hasEthereum = !!window.ethereum;
 
-        const Web3 = (await import('web3')).default;
-        this._web3 = new Web3(ethereum);
-
-        if (!this._web3.currentProvider) {
-          throw new Error('No Web3 provider available');
-        }
-        this._provider = this._web3.currentProvider;
-
-        this._ethAccounts = await this._web3.eth.getAccounts();
-
-        if (this._ethAccounts.length === 0) {
-          throw new Error('Could not fetch accounts from Metamask');
-        }
-
-        this._accounts = this._ethAccounts.map((addr) =>
-          encodeEvmToSS58(addr, app.chain?.meta?.ss58_prefix || 42),
-        );
-
-        this._chainId = (await this._web3.eth.getChainId()).toString();
+      // Use preferred wallet type if available, otherwise fallback to available wallet
+      if (this._preferredWalletType === 'substrate' && hasPolkadot) {
+        await this.enableSubstrate();
+      } else if (this._preferredWalletType === 'evm' && hasEthereum) {
+        await this.enableEvm();
+      } else if (hasPolkadot) {
+        await this.enableSubstrate();
+      } else if (hasEthereum) {
+        await this.enableEvm();
       } else {
         throw new Error('No compatible wallet found');
       }
@@ -238,8 +208,116 @@ class SubstrateEvmWebWalletController
       this._enabled = true;
     } catch (error) {
       console.error('Failed to enable wallet:', error);
+      throw error;
     } finally {
       this._enabling = false;
+    }
+  }
+
+  private async enableSubstrate() {
+    this._currentWalletType = 'substrate';
+    console.log('EnableSubstrate - Starting wallet enable');
+    await web3Enable('commonwealth');
+    const accounts = await web3Accounts();
+    console.log(
+      'EnableSubstrate - Original accounts:',
+      accounts.map((a) => a.address),
+    );
+    const communityPrefix = app.chain?.meta?.ss58_prefix || 42;
+    this._accounts = accounts.map((account) => {
+      // First convert to prefix 42 if needed
+      const converted = addressSwapper({
+        address: account.address,
+        currentPrefix: communityPrefix,
+      });
+      console.log(
+        `EnableSubstrate - Converting ${account.address} to ${converted}`,
+      );
+      return {
+        ...account,
+        address: converted,
+      };
+    }) as InjectedAccountWithMeta[];
+    this._chainId = (await this._web3.eth.getChainId()).toString();
+  }
+
+  private async enableEvm() {
+    this._currentWalletType = 'evm';
+    console.log('EnableEVM - Starting wallet enable');
+    let ethereum = window.ethereum;
+    console.log('EnableEVM - Initial ethereum object:', !!ethereum);
+
+    if (window.ethereum?.providers?.length) {
+      console.log(
+        'EnableEVM - Multiple providers found:',
+        window.ethereum.providers.length,
+      );
+      ethereum =
+        window.ethereum.providers.find((p) => p.isMetaMask) || ethereum;
+      console.log(
+        'EnableEVM - Selected MetaMask provider:',
+        !!ethereum?.isMetaMask,
+      );
+    }
+
+    if (!ethereum) {
+      console.error('EnableEVM - MetaMask not available');
+      throw new Error('MetaMask is not available');
+    }
+
+    try {
+      console.log('EnableEVM - Requesting accounts...');
+      const accounts = await ethereum.request({
+        method: 'eth_requestAccounts',
+      });
+      console.log('EnableEVM - Received accounts:', accounts);
+    } catch (error) {
+      console.error('EnableEVM - User rejected account access:', error);
+      throw new Error('User rejected MetaMask connection');
+    }
+
+    console.log('EnableEVM - Initializing Web3...');
+    const Web3 = (await import('web3')).default;
+    this._web3 = new Web3(ethereum);
+
+    if (!this._web3.currentProvider) {
+      console.error('EnableEVM - No Web3 provider available');
+      throw new Error('No Web3 provider available');
+    }
+    this._provider = this._web3.currentProvider;
+
+    try {
+      console.log('EnableEVM - Fetching accounts from Web3...');
+      this._ethAccounts = await this._web3.eth.getAccounts();
+      console.log('EnableEVM - Fetched accounts:', this._ethAccounts);
+
+      if (this._ethAccounts.length === 0) {
+        console.error('EnableEVM - No accounts found in MetaMask');
+        throw new Error('Could not fetch accounts from MetaMask');
+      }
+
+      // Convert EVM addresses to substrate format if needed
+      console.log('EnableEVM - Converting addresses to SS58 format...');
+      this._accounts = this._ethAccounts.map((addr) => {
+        const converted = encodeEvmToSS58(
+          addr,
+          app.chain?.meta?.ss58_prefix || 42,
+        );
+        console.log(`EnableEVM - Converting ${addr} to ${converted}`);
+        return {
+          address: converted,
+          meta: {
+            name: 'MetaMask Account',
+            source: 'metamask',
+          },
+        };
+      });
+
+      this._chainId = (await this._web3.eth.getChainId()).toString();
+      console.log('EnableEVM - Chain ID:', this._chainId);
+    } catch (error) {
+      console.error('EnableEVM - Error during account setup:', error);
+      throw error;
     }
   }
 

@@ -25,7 +25,7 @@ export const getSessionSigners = () => {
     new SIWESigner(),
     new SIWFSigner(),
     new CosmosSignerCW(),
-    new SubstrateSignerCW(),
+    new SubstrateSignerCW({ extension: null, prefix: 42 }),
     new SolanaSigner(),
   ];
 };
@@ -161,16 +161,32 @@ export type SubstrateSessionData = {
 };
 
 export class SubstrateSignerCW extends SubstrateSigner {
-  // override SubstrateSigner to always use 42 as the ss58 id
-  // TODO: Could we pass the ss58prefix to this._signer.getAddress()
-  // in packages/chain-substrate instead?
+  private prefix: number;
+
+  constructor({ extension, prefix = 42 }: { extension: any; prefix?: number }) {
+    super({ extension });
+    this.prefix = prefix;
+    console.log('SubstrateSignerCW - Constructor - Prefix:', prefix);
+  }
+
   public async getDid(): Promise<DidIdentifier> {
+    console.log('SubstrateSignerCW - GetDid - Starting');
     const walletAddress = await this._signer.getAddress();
+    console.log(
+      'SubstrateSignerCW - GetDid - Original wallet address:',
+      walletAddress,
+    );
+
     const finalAddress = addressSwapper({
-      currentPrefix: 42,
+      currentPrefix: this.prefix,
       address: walletAddress,
     });
-    return `did:pkh:polkadot:42:${finalAddress}`;
+    console.log('SubstrateSignerCW - GetDid - Final address:', finalAddress);
+    console.log('SubstrateSignerCW - GetDid - Using prefix:', this.prefix);
+
+    const did = `did:pkh:polkadot:${this.prefix}:${finalAddress}`;
+    console.log('SubstrateSignerCW - GetDid - Generated DID:', did);
+    return did;
   }
 
   // override AbstractSessionSigner to use ss58 id 42
@@ -181,42 +197,71 @@ export class SubstrateSignerCW extends SubstrateSigner {
     payload: Session<SubstrateSessionData>;
     signer: Signer<Action | Snapshot | Session<SubstrateSessionData>>;
   } | null> {
+    console.log(
+      'SubstrateSignerCW - GetSession - Starting with options:',
+      options,
+    );
     let did;
     if (options.address) {
+      console.log(
+        'SubstrateSignerCW - GetSession - Using address option:',
+        options.address,
+      );
       const dids = this.listSessions(topic).filter((d) =>
         d.endsWith(':' + options.address),
       );
-      if (dids.length === 0) return null;
+      if (dids.length === 0) {
+        console.log('SubstrateSignerCW - GetSession - No matching DIDs found');
+        return null;
+      }
       did = dids[0];
+      console.log('SubstrateSignerCW - GetSession - Found matching DID:', did);
     } else {
       did = await Promise.resolve(options.did ?? this.getDid());
+      console.log(
+        'SubstrateSignerCW - GetSession - Generated/provided DID:',
+        did,
+      );
     }
+
     const didParts = did.split(':');
     const walletAddress = didParts[4];
+    console.log(
+      'SubstrateSignerCW - GetSession - Extracted wallet address:',
+      walletAddress,
+    );
+
     const finalAddress = addressSwapper({
-      currentPrefix: 42,
+      currentPrefix: this.prefix,
       address: walletAddress,
     });
-    did = `did:pkh:polkadot:42:${finalAddress}`;
-    const key = `canvas/${topic}/${did}`;
+    console.log(
+      'SubstrateSignerCW - GetSession - Final address after swap:',
+      finalAddress,
+    );
 
-    this.log('getting session for topic %s and DID %s', topic, did);
+    did = `did:pkh:polkadot:${this.prefix}:${finalAddress}`;
+    console.log('SubstrateSignerCW - GetSession - Final DID:', did);
+
+    const key = `canvas/${topic}/${did}`;
+    console.log('SubstrateSignerCW - GetSession - Storage key:', key);
 
     const value = this.target.get(key);
     if (value !== null) {
-      this.log('found session and signer in storage');
+      console.log('SubstrateSignerCW - GetSession - Found existing session');
       const entry = json.parse<{
         type: string;
         privateKey: Uint8Array;
         session: Session;
       }>(value);
       const { type, privateKey, session } = entry;
+      console.log('SubstrateSignerCW - GetSession - Session type:', type);
 
       const signer = this.scheme.create({ type, privateKey });
       return { payload: session, signer };
     }
 
-    this.log('session and signer not found');
+    console.log('SubstrateSignerCW - GetSession - No session found');
     return null;
   }
 
@@ -225,10 +270,10 @@ export class SubstrateSignerCW extends SubstrateSigner {
     const addressParts = address.split(':');
     const walletAddress = addressParts[4];
     const finalAddress = addressSwapper({
-      currentPrefix: 42,
+      currentPrefix: this.prefix,
       address: walletAddress,
     });
-    const did = `did:pkh:polkadot:42:${finalAddress}`;
+    const did = `did:pkh:polkadot:${this.prefix}:${finalAddress}`;
     const key = `canvas/${topic}/${did}`;
     return this.target.get(key) !== null;
     // return this.#cache.has(key) || target.get(key) !== null

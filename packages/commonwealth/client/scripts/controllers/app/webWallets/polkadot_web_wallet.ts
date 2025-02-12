@@ -51,16 +51,19 @@ class PolkadotWebWalletController
   public async getSessionSigner() {
     const accounts = await web3Accounts();
     const address = accounts[0].address;
+    const communityPrefix = app.chain?.meta?.ss58_prefix || 42;
 
-    const reencodedAddress = addressSwapper({
-      address,
-      currentPrefix: 42,
+    console.log('PolkadotWallet - Original address:', address);
+    console.log('PolkadotWallet - Community prefix:', communityPrefix);
+
+    // Use original address for extension lookup
+    const extension = await web3FromAddress(address);
+
+    // Pass the community prefix to the signer
+    return new SubstrateSignerCW({
+      extension,
+      prefix: communityPrefix,
     });
-
-    const extension = await web3FromAddress(reencodedAddress);
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    return new SubstrateSignerCW({ extension });
   }
 
   public getChainId() {
@@ -75,21 +78,37 @@ class PolkadotWebWalletController
   // ACTIONS
   public async enable() {
     console.log('Attempting to enable Substrate web wallet');
-
-    // returns an array of all the injected sources
-    // (this needs to be called first, before other requests)
     this._enabling = true;
+
     try {
       await web3Enable('commonwealth');
+      const accounts = await web3Accounts();
+      console.log(
+        'PolkadotWallet - Found accounts:',
+        accounts.map((a) => a.address),
+      );
 
-      // returns an array of { address, meta: { name, source } }
-      // meta.source contains the name of the extension that provides this account
-      this._accounts = await web3Accounts();
+      // Convert addresses to community prefix
+      const communityPrefix = app.chain?.meta?.ss58_prefix || 42;
+      this._accounts = accounts.map((account) => {
+        const converted = addressSwapper({
+          address: account.address,
+          currentPrefix: 42,
+          targetPrefix: communityPrefix,
+        });
+        console.log(
+          `PolkadotWallet - Converting ${account.address} to ${converted}`,
+        );
+        return {
+          ...account,
+          address: converted,
+        };
+      });
 
       this._enabled = true;
-      this._enabling = false;
     } catch (error) {
-      console.error('Failed to enable polkadot wallet');
+      console.error('Failed to enable polkadot wallet:', error);
+    } finally {
       this._enabling = false;
     }
   }
