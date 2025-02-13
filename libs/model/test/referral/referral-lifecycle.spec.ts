@@ -163,9 +163,9 @@ describe('Referral lifecycle', () => {
         referee_address: nonMember.address!,
         eth_chain_id: 1,
         transaction_hash: '0x2',
-        referrer_received_eth_amount: 0,
+        referrer_received_eth_amount: '0',
         created_on_chain_timestamp:
-          chainEvents1[0].event_payload.block.timestamp,
+          chainEvents1[0].event_payload.block.timestamp.toString(),
         created_at: expect.any(Date),
         updated_at: expect.any(Date),
         referee_user_id: nonMember.user.id!,
@@ -186,9 +186,8 @@ describe('Referral lifecycle', () => {
     // simulate on-chain transactions that occur when
     // referral fees are distributed to the referrer
     const checkpoint = new Date();
-    const fee = 1;
-    const ethMul = BigNumber.from(10).pow(18);
-    const hex = BigNumber.from(fee).mul(ethMul).toHexString();
+    const fee = 123456n;
+    const hex = BigNumber.from(fee).toHexString();
     await models.Outbox.bulkCreate([
       chainEvent(
         '0x4',
@@ -207,7 +206,7 @@ describe('Referral lifecycle', () => {
     // syncs referral fees
     await drainOutbox(['ChainEventCreated'], ChainEventPolicy, checkpoint);
 
-    expectedReferrals[0].referrer_received_eth_amount = fee;
+    expectedReferrals[0].referrer_received_eth_amount = fee.toString();
 
     // get referrals again with fees
     const referrals3 = await query(GetUserReferrals(), {
@@ -224,8 +223,8 @@ describe('Referral lifecycle', () => {
         namespace_address: namespaceAddress,
         distributed_token_address: ZERO_ADDRESS,
         referrer_recipient_address: admin.address,
-        referrer_received_amount: fee,
-        transaction_timestamp: expect.any(Number),
+        referrer_received_amount: fee.toString(),
+        transaction_timestamp: expect.any(String),
         referee_address: nonMember.address!,
         referee_profile: {
           name: nonMemberUser?.profile.name,

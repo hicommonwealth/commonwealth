@@ -67,8 +67,8 @@ async function setReferral(
         referee_address,
         eth_chain_id,
         transaction_hash,
-        referrer_received_eth_amount: 0,
-        created_on_chain_timestamp: Number(timestamp),
+        referrer_received_eth_amount: 0n,
+        created_on_chain_timestamp: BigInt(timestamp),
       },
       { transaction },
     );

@@ -13,7 +13,7 @@ export const calculateTotalEarnings = (referralFees: ReferralFee[]) => {
 
   return Number(
     referralFees
-      .reduce((sum, fee) => sum + (fee.referrer_received_amount || 0), 0)
+      .reduce((sum, fee) => sum + Number(fee.referrer_received_amount), 0)
       .toFixed(maxDecimals),
   );
 };
@@ -24,13 +24,13 @@ const getMonthEarnings = (
 ) => {
   return referralFees
     .filter((fee) => {
-      const feeDate = moment.unix(fee.transaction_timestamp);
+      const feeDate = moment.unix(Number(fee.transaction_timestamp));
       return (
         feeDate.month() === targetDate.month() &&
         feeDate.year() === targetDate.year()
       );
     })
-    .reduce((sum, fee) => sum + (fee.referrer_received_amount || 0), 0);
+    .reduce((sum, fee) => sum + Number(fee.referrer_received_amount), 0);
 };
 
 export const calculateReferralTrend = (referralFees: ReferralFee[]) => {

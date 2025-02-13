@@ -76,7 +76,7 @@ export const ReferralTable = ({ referrals, isLoading }: ReferralTableProps) => {
                   <div className="table-cell text-right">
                     ETH{' '}
                     {smallNumberFormatter.format(
-                      item.referrer_received_eth_amount,
+                      Number(item.referrer_received_eth_amount),
                     )}
                   </div>
                 ),
