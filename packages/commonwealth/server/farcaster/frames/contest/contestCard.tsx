@@ -57,6 +57,8 @@ export const contestCard = frames(async (ctx) => {
 
   const endTime = contestManager.contests?.[0]?.end_time;
 
+  console.log('endTime', endTime);
+
   return {
     title: contestManager.name,
     image: (
@@ -87,7 +89,10 @@ export const contestCard = frames(async (ctx) => {
                 lineHeight: '1.2',
               }}
             >
-              Submit entries by replying below until {endTime.toLocaleString()}
+              Submit entries by replying below until{' '}
+              {endTime.toLocaleString(undefined, {
+                timeZoneName: 'longGeneric',
+              })}
             </p>
           )}
 
