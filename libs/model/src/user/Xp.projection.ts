@@ -1,5 +1,4 @@
 import { Projection } from '@hicommonwealth/core';
-import { EvmEventSignatures } from '@hicommonwealth/evm-protocols';
 import * as schemas from '@hicommonwealth/schemas';
 import {
   QuestParticipationLimit,
@@ -11,9 +10,18 @@ import { z } from 'zod';
 import { models, sequelize } from '../database';
 import { mustExist } from '../middleware/guards';
 
-async function getUserId(payload: { address_id: number }) {
+async function getUserByAddressId(payload: { address_id: number }) {
   const address = await models.Address.findOne({
     where: { id: payload.address_id },
+    attributes: ['user_id'],
+  });
+  mustExist('Address not found', address);
+  return address.user_id!;
+}
+
+async function getUserByAddress(payload: { address: string }) {
+  const address = await models.Address.findOne({
+    where: { address: payload.address },
     attributes: ['user_id'],
   });
   mustExist('Address not found', address);
@@ -38,13 +46,13 @@ async function getUserIdByAddress(payload: {
  * - Local quests are filtered by community
  */
 async function getQuestActionMetas(
-  event_payload: { community_id: string; created_at?: Date },
+  event_payload: { community_id?: string; created_at?: Date },
   event_name: keyof typeof schemas.QuestEvents,
 ) {
   // make sure quest was active when event was created
   const quests = await models.Quest.findAll({
     where: {
-      community_id: { [Op.or]: [null, event_payload.community_id] },
+      community_id: { [Op.or]: [null, event_payload.community_id ?? null] },
       start_date: { [Op.lte]: event_payload.created_at },
       end_date: { [Op.gte]: event_payload.created_at },
     },
@@ -273,7 +281,7 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
         }
       },
       ThreadCreated: async ({ payload }) => {
-        const user_id = await getUserId(payload);
+        const user_id = await getUserByAddressId(payload);
         const action_metas = await getQuestActionMetas(
           payload,
           'ThreadCreated',
@@ -281,7 +289,7 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
         await recordXpsForQuest(user_id, payload.created_at!, action_metas);
       },
       ThreadUpvoted: async ({ payload }) => {
-        const user_id = await getUserId(payload);
+        const user_id = await getUserByAddressId(payload);
         const action_metas = await getQuestActionMetas(
           payload,
           'ThreadUpvoted',
@@ -289,7 +297,7 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
         await recordXpsForQuest(user_id, payload.created_at!, action_metas);
       },
       CommentCreated: async ({ payload }) => {
-        const user_id = await getUserId(payload);
+        const user_id = await getUserByAddressId(payload);
         const action_metas = await getQuestActionMetas(
           payload,
           'CommentCreated',
@@ -297,7 +305,7 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
         await recordXpsForQuest(user_id, payload.created_at!, action_metas);
       },
       CommentUpvoted: async ({ payload }) => {
-        const user_id = await getUserId(payload);
+        const user_id = await getUserByAddressId(payload);
         const comment = await models.Comment.findOne({
           where: { id: payload.comment_id },
           include: [
@@ -337,48 +345,48 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
         // await recordXps(user_id, payload.created_at!, action_metas);
       },
       RecurringContestManagerDeployed: async ({ payload }) => {
-        const user_id = 0; // TODO: find user who deployed the contest
-        const community_id = ''; // TODO: find community id of contest
+        const community = await models.Community.findOne({
+          where: { namespace: payload.namespace },
+          attributes: ['id'],
+        });
         const action_metas = await getQuestActionMetas(
-          { community_id, created_at: payload.created_at },
+          { community_id: community?.id, created_at: payload.created_at },
           'RecurringContestManagerDeployed',
         );
+        const user_id = 0; // TODO: @rbennettcw how we find user who deployed the contest?
         await recordXpsForQuest(user_id, payload.created_at!, action_metas);
       },
       OneOffContestManagerDeployed: async ({ payload }) => {
-        const user_id = 0; // TODO: find user who deployed the contest
-        const community_id = ''; // TODO: find community id of contest
+        const community = await models.Community.findOne({
+          where: { namespace: payload.namespace },
+          attributes: ['id'],
+        });
         const action_metas = await getQuestActionMetas(
-          { community_id, created_at: payload.created_at },
+          { community_id: community?.id, created_at: payload.created_at },
           'OneOffContestManagerDeployed',
         );
+        const user_id = 0; // TODO: @rbennettcw how we find user who deployed the contest?
         await recordXpsForQuest(user_id, payload.created_at!, action_metas);
       },
-      ChainEventCreated: async ({ payload }) => {
-        switch (payload.eventSource.eventSignature) {
-          case EvmEventSignatures.Launchpad.TokenLaunched: {
-            const user_id = 0; // TODO: find user who launched the token
-            const community_id = ''; // TODO: find community id of token
-            const created_at = new Date(payload.block.timestamp);
-            const action_metas = await getQuestActionMetas(
-              { community_id, created_at },
-              'ChainEventCreated', // TODO: find by discrete event name, would be easier to have TokenLaunched as discrete event
-            );
-            await recordXpsForQuest(user_id, created_at, action_metas);
-            return;
-          }
-          case EvmEventSignatures.Launchpad.Trade: {
-            const user_id = 0; // TODO: find user who traded the token
-            const community_id = ''; // TODO: find community id of token
-            const created_at = new Date(payload.block.timestamp);
-            const action_metas = await getQuestActionMetas(
-              { community_id, created_at },
-              'ChainEventCreated', // TODO: find by discrete event name, would be easier to have Buy and Sell as discrete events
-            );
-            await recordXpsForQuest(user_id, created_at, action_metas);
-            return;
-          }
-        }
+      TokenLaunched: async ({ payload }) => {
+        const created_at = new Date(payload.block_timestamp);
+        const action_metas = await getQuestActionMetas(
+          { created_at },
+          'TokenLaunched',
+        );
+        const user_id = 0; // TODO: @kurtassad how we find user who launched the token?
+        await recordXpsForQuest(user_id, created_at, action_metas);
+      },
+      TokenTraded: async ({ payload }) => {
+        const created_at = new Date(payload.block_timestamp);
+        const action_metas = await getQuestActionMetas(
+          { created_at },
+          'TokenTraded',
+        );
+        const user_id = await getUserByAddress({
+          address: payload.trader_address,
+        });
+        await recordXpsForQuest(user_id, created_at, action_metas);
       },
     },
   };

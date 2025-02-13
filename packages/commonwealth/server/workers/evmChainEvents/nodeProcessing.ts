@@ -8,7 +8,11 @@ import {
   EvmEventSignatures,
 } from '@hicommonwealth/evm-protocols';
 import { emitEvent, models } from '@hicommonwealth/model';
-import { events as coreEvents } from '@hicommonwealth/schemas';
+import {
+  EventPairs,
+  chainEvents,
+  events as coreEvents,
+} from '@hicommonwealth/schemas';
 import { ethers } from 'ethers';
 import { z } from 'zod';
 import { config } from '../../config';
@@ -110,7 +114,7 @@ export async function processChainNode(
         return;
       }
 
-      const records = allEvents.map((event) => {
+      const records: Array<EventPairs> = allEvents.map((event) => {
         const contractAddress = ethers.utils.getAddress(event.rawLog.address);
 
         const parseContestEvent = (e: keyof typeof ChainEventSigs) =>
@@ -161,6 +165,42 @@ export async function processChainNode(
               event_name: 'ContestContentUpvoted';
               event_payload: z.infer<typeof coreEvents.ContestContentUpvoted>;
             };
+          case EvmEventSignatures.Launchpad.TokenLaunched: {
+            return {
+              event_name: 'TokenLaunched',
+              event_payload: {
+                block_timestamp: event.block!.timestamp,
+                transaction_hash: event.rawLog.transactionHash,
+                eth_chain_id: event.eventSource.ethChainId,
+              },
+            };
+          }
+          case EvmEventSignatures.Launchpad.Trade: {
+            const {
+              0: traderAddress,
+              1: tokenAddress,
+              2: isBuy,
+              3: communityTokenAmount,
+              4: ethAmount,
+              // 5: protocolEthAmount,
+              6: floatingSupply,
+            } = event.parsedArgs as z.infer<typeof chainEvents.LaunchpadTrade>;
+            return {
+              event_name: 'TokenTraded',
+              event_payload: {
+                block_hash: event.rawLog.blockHash,
+                block_timestamp: event.block!.timestamp,
+                transaction_hash: event.rawLog.transactionHash,
+                trader_address: traderAddress,
+                token_address: tokenAddress.toLowerCase(),
+                is_buy: isBuy,
+                eth_chain_id: event.eventSource.ethChainId,
+                eth_amount: ethAmount,
+                community_token_amount: communityTokenAmount,
+                floating_supply: floatingSupply,
+              },
+            };
+          }
         }
 
         // fallback to generic chain event

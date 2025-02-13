@@ -7,11 +7,9 @@ import { SubscriptionPreference } from '../entities/notification.schemas';
 import { Reaction } from '../entities/reaction.schemas';
 import { Thread } from '../entities/thread.schemas';
 import { Tweet } from '../integrations';
-import { PG_INT } from '../utils';
+import { ETHERS_BIG_NUMBER, EVM_ADDRESS, PG_INT } from '../utils';
 import {
   CommunityStakeTrade,
-  LaunchpadTokenCreated,
-  LaunchpadTrade,
   NamespaceDeployed,
   NamespaceDeployedWithReferral,
   ReferralFeeDistributed,
@@ -247,18 +245,6 @@ export const events = {
     }),
     ChainEventCreatedBase.extend({
       eventSource: ChainEventCreatedBase.shape.eventSource.extend({
-        eventSignature: z.literal(EvmEventSignatures.Launchpad.TokenLaunched),
-      }),
-      parsedArgs: LaunchpadTokenCreated,
-    }),
-    ChainEventCreatedBase.extend({
-      eventSource: ChainEventCreatedBase.shape.eventSource.extend({
-        eventSignature: z.literal(EvmEventSignatures.Launchpad.Trade),
-      }),
-      parsedArgs: LaunchpadTrade,
-    }),
-    ChainEventCreatedBase.extend({
-      eventSource: ChainEventCreatedBase.shape.eventSource.extend({
         eventSignature: z.literal(EvmEventSignatures.Referrals.ReferralSet),
       }),
       parsedArgs: ReferralSet,
@@ -392,4 +378,22 @@ export const events = {
 
   TwitterMomBotMentioned: Tweet,
   TwitterContestBotMentioned: Tweet,
+
+  TokenLaunched: z.object({
+    block_timestamp: z.number(),
+    transaction_hash: z.string(),
+    eth_chain_id: z.number(),
+  }),
+
+  TokenTraded: z.object({
+    block_timestamp: z.number(),
+    transaction_hash: z.string(),
+    trader_address: EVM_ADDRESS,
+    token_address: EVM_ADDRESS,
+    is_buy: z.boolean(),
+    eth_chain_id: z.number(),
+    eth_amount: ETHERS_BIG_NUMBER,
+    community_token_amount: ETHERS_BIG_NUMBER,
+    floating_supply: ETHERS_BIG_NUMBER,
+  }),
 } as const;
