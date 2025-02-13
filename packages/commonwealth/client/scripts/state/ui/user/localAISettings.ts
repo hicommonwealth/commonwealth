@@ -1,13 +1,12 @@
+import { OpenFeature } from '@openfeature/web-sdk';
 import {
   LocalStorageKeys,
   getLocalStorageItem,
   setLocalStorageItem,
 } from 'helpers/localStorage';
-import { useFlag } from 'hooks/useFlag';
 import { devtools, persist } from 'zustand/middleware';
 import { createStore } from 'zustand/vanilla';
 import { createBoundedUseStore } from '../utils';
-
 interface LocalAISettingsStore {
   aiCommentsFeatureEnabled: boolean;
   aiInteractionsToggleEnabled: boolean;
@@ -20,11 +19,13 @@ interface LocalAISettingsStore {
   ) => void;
 }
 
+const client = OpenFeature.getClient();
+
 export const LocalAISettingsStore = createStore<LocalAISettingsStore>()(
   devtools(
     persist(
       (set) => ({
-        aiCommentsFeatureEnabled: useFlag('aiComments'),
+        aiCommentsFeatureEnabled: client.getBooleanValue('aiComments', false),
         aiInteractionsToggleEnabled:
           getLocalStorageItem(LocalStorageKeys.AIInteractionsEnabled) ===
           'true',
