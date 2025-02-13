@@ -148,6 +148,16 @@ export const AddressOwnershipTransferredNotification = z.object({
   created_at: z.string(),
 });
 
+export const LaunchpadTradeEventNotification = z.object({
+  community_id: z.string(),
+  symbol: z.string(),
+  is_buy: z.boolean(),
+});
+
+export const LaunchpadCapReachedNotification = z.object({
+  symbol: z.string(),
+});
+
 export const WebhookNotification = z.object({
   sender_username: z.literal('Common'),
   sender_avatar_url: z

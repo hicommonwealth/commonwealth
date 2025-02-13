@@ -1,5 +1,6 @@
 import { blobStorage, logger } from '@hicommonwealth/core';
 import { isEvmAddress } from '@hicommonwealth/evm-protocols';
+import { DB } from '@hicommonwealth/model';
 import { EventPairs } from '@hicommonwealth/schemas';
 import {
   getThreadUrl,
@@ -284,4 +285,14 @@ export async function publishCast(
   } catch (err) {
     log.error(`Failed to post as FC bot`, err as Error);
   }
+}
+
+export async function getCommunityAlertsSubscribedUsers(
+  community_id: string,
+  models: DB,
+) {
+  return await models.CommunityAlert.findAll({
+    where: { community_id },
+    attributes: ['user_id'],
+  });
 }

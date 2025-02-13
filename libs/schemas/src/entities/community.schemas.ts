@@ -1,3 +1,4 @@
+import { LaunchpadToken } from '@hicommonwealth/schemas';
 import {
   BalanceType,
   ChainBase,
@@ -70,6 +71,7 @@ export const Community = z.object({
     balance_type: z.nativeEnum(BalanceType).nullish(),
     name: z.string().max(255).nullish(),
   }).nullish(),
+  LaunchpadToken: LaunchpadToken.optional(),
   topics: z.array(Topic).optional(),
   groups: z.array(Group).optional(),
   contest_managers: z.array(ContestManager).optional(),

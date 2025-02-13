@@ -14,6 +14,8 @@ import {
   CommunityStakeNotification,
   ContestEndedNotification,
   ContestNotification,
+  LaunchpadCapReachedNotification,
+  LaunchpadTradeEventNotification,
   QuestStartedNotification,
   SnapshotProposalCreatedNotification,
   UpvoteNotification,
@@ -282,6 +284,9 @@ export enum WorkflowKeys {
   ContestEnded = 'contest-ended',
   // Quest events
   QuestStarted = 'quest-started',
+  // Launchpad events
+  LaunchpadTradeEvent = 'launchpad-trade-event',
+  LaunchpadCapReached = 'launchpad-cap-reached',
 }
 
 export enum KnockChannelIds {
@@ -367,6 +372,14 @@ export type NotificationsProviderTriggerOptions =
         | {
             data: z.infer<typeof AddressOwnershipTransferredNotification>;
             key: WorkflowKeys.AddressOwnershipTransferred;
+          }
+        | {
+            data: z.infer<typeof LaunchpadTradeEventNotification>;
+            key: WorkflowKeys.LaunchpadTradeEvent;
+          }
+        | {
+            data: z.infer<typeof LaunchpadCapReachedNotification>;
+            key: WorkflowKeys.LaunchpadCapReached;
           }
       ))
   | WebhookProviderOptions;

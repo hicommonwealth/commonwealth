@@ -16,8 +16,13 @@ export function CreateToken(): Command<typeof schemas.CreateToken> {
     ...schemas.CreateToken,
     auth: [authRoles('admin')],
     body: async ({ payload }) => {
-      const { chain_node_id, transaction_hash, description, icon_url } =
-        payload;
+      const {
+        community_id,
+        chain_node_id,
+        transaction_hash,
+        description,
+        icon_url,
+      } = payload;
 
       const chainNode = await models.ChainNode.findOne({
         where: { id: chain_node_id },
@@ -46,14 +51,17 @@ export function CreateToken(): Command<typeof schemas.CreateToken> {
         );
       }
 
+      const token_address = tokenData.parsedArgs.tokenAddress.toLowerCase();
+      const namespace = tokenData.parsedArgs.namespace;
+
       const [token] = await models.LaunchpadToken.findOrCreate({
         where: {
-          token_address: tokenData.parsedArgs.tokenAddress.toLowerCase(),
-          namespace: tokenData.parsedArgs.namespace,
+          token_address,
+          namespace,
         },
         defaults: {
-          token_address: tokenData.parsedArgs.tokenAddress.toLowerCase(),
-          namespace: tokenData.parsedArgs.namespace,
+          token_address,
+          namespace,
           name: tokenInfo.name,
           symbol: tokenInfo.symbol,
           initial_supply: Number(tokenInfo.totalSupply / BigInt(1e18)),
@@ -64,6 +72,19 @@ export function CreateToken(): Command<typeof schemas.CreateToken> {
           icon_url: icon_url ?? null,
         },
       });
+
+      // If CreateToken is used through our platform, we will have the contract address
+      if (community_id) {
+        await models.Community.update(
+          {
+            namespace: namespace,
+            namespace_address: token_address,
+          },
+          {
+            where: { id: community_id },
+          },
+        );
+      }
 
       return token!.toJSON() as unknown as z.infer<typeof TokenView>;
     },

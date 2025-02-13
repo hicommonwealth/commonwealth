@@ -1,12 +1,18 @@
-import { logger } from '@hicommonwealth/core';
+import {
+  logger,
+  notificationsProvider,
+  WorkflowKeys,
+} from '@hicommonwealth/core';
 import {
   commonProtocol as cp,
   getBlock,
   getLaunchpadToken,
   transferLaunchpadLiquidityToUniswap,
 } from '@hicommonwealth/evm-protocols';
+import { getCommunityAlertsSubscribedUsers } from '@hicommonwealth/model';
 import { chainEvents, events } from '@hicommonwealth/schemas';
 import { BigNumber } from 'ethers';
+import { QueryTypes } from 'sequelize';
 import { z } from 'zod';
 import { config } from '../../config';
 import { models } from '../../database';
@@ -100,5 +106,56 @@ export async function handleLaunchpadTrade(
 
     token.liquidity_transferred = true;
     await token.save();
+  }
+
+  const community = await models.sequelize.query<{
+    id: string;
+    symbol: string;
+    launchpad_liquidity: string;
+  }>(
+    `
+            SELECT c.id, lt.symbol, lt.launchpad_liquidity
+            FROM "Communities" as c
+                     JOIN "LaunchpadTokens" as lt ON c.namespace = lt.namespace
+            WHERE c.namespace = :token_address
+        `,
+    {
+      type: QueryTypes.SELECT,
+      raw: true,
+      replacements: { token_address: tokenAddress.toLowerCase() },
+    },
+  );
+
+  let users;
+  if (community) {
+    users = await getCommunityAlertsSubscribedUsers(community[0].id, models);
+  }
+
+  if (users) {
+    const provider = notificationsProvider();
+
+    await provider.triggerWorkflow({
+      key: WorkflowKeys.LaunchpadTradeEvent,
+      users: users.map((u) => ({ id: String(u.user_id) })),
+      data: {
+        community_id: community[0].id,
+        symbol: community[0].symbol,
+        is_buy: isBuy,
+      },
+    });
+
+    if (
+      BigNumber.from(floatingSupply.hex).toBigInt() -
+        BigInt(community[0].launchpad_liquidity) <
+      1000
+    ) {
+      await provider.triggerWorkflow({
+        key: WorkflowKeys.LaunchpadCapReached,
+        users: users.map((u) => ({ id: String(u.user_id) })),
+        data: {
+          symbol: community[0].symbol,
+        },
+      });
+    }
   }
 }
