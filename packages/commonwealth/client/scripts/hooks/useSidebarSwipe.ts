@@ -9,11 +9,15 @@ const useSidebarSwipe = () => {
   const [touchStartX, setTouchStartX] = useState<number | null>(null);
   const [left, setLeft] = useState('0px');
 
-  useEffect(() => {
-    const isDiscussionPage = /^\/[^/]+\/discussion\/[^/]+$/.test(
-      location.pathname,
+  const isBackNavigationEnabled = (pathname) => {
+    return (
+      /^\/[^/]+\/discussion\/[^/]+$/.test(pathname) ||
+      /^\/[^/]+\/snapshot\/[^/]+\/[^/]+$/.test(pathname) ||
+      /^\/[^/]+\/proposal\/[^/]+$/.test(pathname)
     );
-    const shouldTriggerBack = isDiscussionPage;
+  };
+  useEffect(() => {
+    const shouldTriggerBack = isBackNavigationEnabled(location.pathname);
     const screenWidth = window.innerWidth;
 
     const handleTouchStart = (e: TouchEvent) => {
