@@ -145,10 +145,10 @@ const contestManagerDeployedMapper: EvmMapper<
   });
   const { contest: contest_address, namespace, interval } = decoded.args;
   const event_payload = {
-    contest_address,
-    namespace,
+    contest_address: contest_address as string,
+    namespace: namespace as string,
     length: Number(interval),
-    block_number: event.block.number,
+    block_number: Number(event.block.number),
   };
 
   if (decoded.args.oneOff) {

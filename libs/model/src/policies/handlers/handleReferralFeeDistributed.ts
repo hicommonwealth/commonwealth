@@ -45,7 +45,7 @@ export const handleReferralFeeDistributed: EventHandler<
         referrer_recipient_address: referrer_address,
         referrer_received_amount,
         referee_address: referral.referee_address,
-        transaction_timestamp: BigInt(payload.block.timestamp),
+        transaction_timestamp: payload.block.timestamp,
       },
       { transaction },
     );
