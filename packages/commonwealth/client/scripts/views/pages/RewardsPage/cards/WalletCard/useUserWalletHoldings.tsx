@@ -1,17 +1,23 @@
 import { useFetchTokensUsdRateQuery } from 'state/api/communityStake';
+import { fetchCachedNodes } from 'state/api/nodes';
 import { useTokenBalanceQuery, useTokensMetadataQuery } from 'state/api/tokens';
 
 type UseUserWalletHoldingsProps = {
   userSelectedAddress: string;
 };
 
+const CHAIN_FOR_HOLDINGS = 1358; // base mainnet
+
 const useUserWalletHoldings = ({
   userSelectedAddress,
 }: UseUserWalletHoldingsProps) => {
+  const cachedNodes = fetchCachedNodes();
+  const chainNode = cachedNodes?.find((c) => c.id === CHAIN_FOR_HOLDINGS);
+
   // get balances of all the tokens user is holding
   const { data: tokenBalances, isLoading: isLoadingTokenBalances } =
     useTokenBalanceQuery({
-      chainId: 1358,
+      chainId: CHAIN_FOR_HOLDINGS,
       tokenId: userSelectedAddress,
     });
   const tokenAddresses = tokenBalances?.tokenBalances.map(
@@ -21,9 +27,9 @@ const useUserWalletHoldings = ({
   // get metadata (name, symbol etc) of all the tokens user is holding
   const { data: tokenMetadatas, isLoading: isLoadingTokensMetadata } =
     useTokensMetadataQuery({
-      nodeEthChainId: 8453,
+      nodeEthChainId: chainNode?.ethChainId || 0,
       tokenIds: tokenAddresses || [],
-      apiEnabled: !!tokenAddresses,
+      apiEnabled: !!(tokenAddresses && chainNode?.ethChainId),
     });
 
   // get usd conversion rates of all the tokens user is holding
