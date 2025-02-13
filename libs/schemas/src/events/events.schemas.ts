@@ -15,7 +15,6 @@ import {
   NamespaceDeployed,
   NamespaceDeployedWithReferral,
   ReferralFeeDistributed,
-  ReferralSet,
 } from './chain-event.schemas';
 import { EventMetadata } from './util.schemas';
 
@@ -33,7 +32,7 @@ const DiscordEventBase = z.object({
   imageUrls: z.array(z.string()),
 });
 
-const ChainEventCreatedBase = z.object({
+const ChainEventBase = z.object({
   eventSource: z.object({
     ethChainId: z.number(),
   }),
@@ -223,48 +222,42 @@ export const events = {
    * Zod schema for EvmEvent type defined in workers/evmChainEvents/types.ts
    */
   ChainEventCreated: z.union([
-    ChainEventCreatedBase.extend({
-      eventSource: ChainEventCreatedBase.shape.eventSource.extend({
+    ChainEventBase.extend({
+      eventSource: ChainEventBase.shape.eventSource.extend({
         eventSignature: z.literal(
           EvmEventSignatures.NamespaceFactory.NamespaceDeployed,
         ),
       }),
       parsedArgs: NamespaceDeployed,
     }),
-    ChainEventCreatedBase.extend({
-      eventSource: ChainEventCreatedBase.shape.eventSource.extend({
+    ChainEventBase.extend({
+      eventSource: ChainEventBase.shape.eventSource.extend({
         eventSignature: z.literal(
           EvmEventSignatures.NamespaceFactory.NamespaceDeployedWithReferral,
         ),
       }),
       parsedArgs: NamespaceDeployedWithReferral,
     }),
-    ChainEventCreatedBase.extend({
-      eventSource: ChainEventCreatedBase.shape.eventSource.extend({
+    ChainEventBase.extend({
+      eventSource: ChainEventBase.shape.eventSource.extend({
         eventSignature: z.literal(EvmEventSignatures.CommunityStake.Trade),
       }),
       parsedArgs: CommunityStakeTrade,
     }),
-    ChainEventCreatedBase.extend({
-      eventSource: ChainEventCreatedBase.shape.eventSource.extend({
+    ChainEventBase.extend({
+      eventSource: ChainEventBase.shape.eventSource.extend({
         eventSignature: z.literal(EvmEventSignatures.Launchpad.TokenLaunched),
       }),
       parsedArgs: LaunchpadTokenCreated,
     }),
-    ChainEventCreatedBase.extend({
-      eventSource: ChainEventCreatedBase.shape.eventSource.extend({
+    ChainEventBase.extend({
+      eventSource: ChainEventBase.shape.eventSource.extend({
         eventSignature: z.literal(EvmEventSignatures.Launchpad.Trade),
       }),
       parsedArgs: LaunchpadTrade,
     }),
-    ChainEventCreatedBase.extend({
-      eventSource: ChainEventCreatedBase.shape.eventSource.extend({
-        eventSignature: z.literal(EvmEventSignatures.Referrals.ReferralSet),
-      }),
-      parsedArgs: ReferralSet,
-    }),
-    ChainEventCreatedBase.extend({
-      eventSource: ChainEventCreatedBase.shape.eventSource.extend({
+    ChainEventBase.extend({
+      eventSource: ChainEventBase.shape.eventSource.extend({
         eventSignature: z.literal(EvmEventSignatures.Referrals.FeeDistributed),
       }),
       parsedArgs: ReferralFeeDistributed,
@@ -392,4 +385,62 @@ export const events = {
 
   TwitterMomBotMentioned: Tweet,
   TwitterContestBotMentioned: Tweet,
+
+  // Events mapped from ChainEvents
+  CommunityStakeTrade: ChainEventBase.extend({
+    parsedArgs: z.object({
+      trader: z.literal(`0x${z.string()}`),
+      namespace: z.literal(`0x${z.string()}`),
+      isBuy: z.boolean(),
+      communityTokenAmount: z.bigint(),
+      ethAmount: z.bigint(),
+      protocolEthAmount: z.bigint(),
+      nameSpaceEthAmount: z.bigint(),
+      supply: z.bigint(),
+      exchangeToken: z.literal(`0x${z.string()}`),
+    }),
+  }),
+
+  NamespaceDeployedWithReferral: ChainEventBase.extend({
+    parsedArgs: z.object({
+      name: z.string(),
+      feeManager: z.literal(`0x${z.string()}`),
+      referrer: z.literal(`0x${z.string()}`),
+      referralFeeManager: z.literal(`0x${z.string()}`),
+      signature: z.literal(`0x${z.string()}`),
+      namespaceDeployer: z.literal(`0x${z.string()}`),
+      nameSpaceAddress: z.literal(`0x${z.string()}`),
+    }),
+  }),
+
+  LaunchpadTokenCreated: ChainEventBase.extend({
+    parsedArgs: z.object({
+      token: z.literal(`0x${z.string()}`),
+      totalSupply: z.bigint(),
+      name: z.string(),
+      symbol: z.string(),
+    }),
+  }),
+
+  LaunchpadTrade: ChainEventBase.extend({
+    parsedArgs: z.object({
+      trader: z.literal(`0x${z.string()}`),
+      namespace: z.literal(`0x${z.string()}`),
+      isBuy: z.boolean(),
+      communityTokenAmount: z.bigint(),
+      ethAmount: z.bigint(),
+      protocolEthAmount: z.bigint(),
+      floatingSupply: z.bigint(),
+    }),
+  }),
+
+  ReferralFeeDistributed: ChainEventBase.extend({
+    parsedArgs: z.object({
+      namespace: z.literal(`0x${z.string()}`),
+      token: z.literal(`0x${z.string()}`),
+      amount: z.bigint(),
+      recipient: z.literal(`0x${z.string()}`),
+      recipientAmount: z.bigint(),
+    }),
+  }),
 } as const;

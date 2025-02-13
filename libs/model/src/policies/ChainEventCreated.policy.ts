@@ -46,10 +46,6 @@ export const processChainEventCreated: EventHandler<
       await handleLaunchpadTrade(payload);
       break;
 
-    case EvmEventSignatures.Referrals.ReferralSet:
-      // await handleReferralSet(payload);
-      break;
-
     case EvmEventSignatures.Referrals.FeeDistributed:
       await handleReferralFeeDistributed(payload);
       break;
