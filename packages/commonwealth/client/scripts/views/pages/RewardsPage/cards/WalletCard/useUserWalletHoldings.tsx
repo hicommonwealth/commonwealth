@@ -1,4 +1,7 @@
-import { useFetchTokensUsdRateQuery } from 'state/api/communityStake';
+import {
+  useFetchTokensUsdRateQuery,
+  useFetchTokenUsdRateQuery,
+} from 'state/api/communityStake';
 import { fetchCachedNodes } from 'state/api/nodes';
 import { useTokenBalanceQuery, useTokensMetadataQuery } from 'state/api/tokens';
 
@@ -42,6 +45,15 @@ const useUserWalletHoldings = ({
     (x) => x.symbol,
   );
 
+  // get eth to usd rate
+  const { data: ethToCurrencyRateData, isLoading: isLoadingETHToCurrencyRate } =
+    useFetchTokenUsdRateQuery({
+      tokenSymbol: 'ETH',
+    });
+  const ethToUsdRate = parseFloat(
+    ethToCurrencyRateData?.data?.data?.amount || '0',
+  );
+
   // combine the data fetched above
   const userTokens = [...(tokenMetadatas || [])]
     .map((t) => {
@@ -67,15 +79,22 @@ const useUserWalletHoldings = ({
     return total + tokenValue;
   }, 0);
 
+  // get combined eth value inferred from combined usd holding value for eth tokens
+  // Important: this doesn't include native ether balance
+  const userCombinedETHBalanceInferredFromCombinedUSDBalance =
+    userCombinedUSDBalance / ethToUsdRate;
+
   const isLoadingTokensInfo =
     isLoadingTokenBalances ||
     isLoadingTokensMetadata ||
-    isLoadingTokenToUsdDates;
+    isLoadingTokenToUsdDates ||
+    isLoadingETHToCurrencyRate;
 
   return {
     isLoadingTokensInfo,
     userTokens,
     userCombinedUSDBalance,
+    userCombinedETHBalanceInferredFromCombinedUSDBalance,
   };
 };
 
