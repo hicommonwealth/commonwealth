@@ -1,3 +1,4 @@
+import { useFlag } from 'hooks/useFlag';
 import React, { useCallback, useState } from 'react';
 import { useLocalAISettingsStore } from 'state/ui/user';
 import { CommentEditor } from 'views/components/Comments/CommentEditor';
@@ -9,11 +10,9 @@ import './DesktopStickyInput.scss';
 export const DesktopStickyInput = (props: CommentEditorProps) => {
   const { isReplying, replyingToAuthor, onCancel, handleSubmitComment } = props;
   const [focused, setFocused] = useState(false);
-  const {
-    aiCommentsToggleEnabled,
-    setAICommentsToggleEnabled,
-    aiCommentsFeatureEnabled,
-  } = useLocalAISettingsStore();
+  const aiCommentsFeatureEnabled = useFlag('aiComments');
+  const { aiCommentsToggleEnabled, setAICommentsToggleEnabled } =
+    useLocalAISettingsStore();
   const [streamingReplyIds, setStreamingReplyIds] = useState<number[]>([]);
 
   const handleFocused = useCallback(() => {

@@ -2,6 +2,7 @@ import { ContentType } from '@hicommonwealth/shared';
 import clsx from 'clsx';
 import { notifyError } from 'controllers/app/notifications';
 import { isCommandClick } from 'helpers';
+import { useFlag } from 'hooks/useFlag';
 import Account from 'models/Account';
 import type { DeltaStatic } from 'quill';
 import React, { useCallback, useState } from 'react';
@@ -57,11 +58,9 @@ const CommentEditor = ({
   onAiReply,
   onCommentCreated,
 }: CommentEditorProps) => {
-  const {
-    aiCommentsToggleEnabled,
-    setAICommentsToggleEnabled,
-    aiCommentsFeatureEnabled,
-  } = useLocalAISettingsStore();
+  const aiCommentsFeatureEnabled = useFlag('aiComments');
+  const { aiCommentsToggleEnabled, setAICommentsToggleEnabled } =
+    useLocalAISettingsStore();
 
   const effectiveAiStreaming = initialAiStreaming ?? aiCommentsToggleEnabled;
   const effectiveSetAiStreaming =

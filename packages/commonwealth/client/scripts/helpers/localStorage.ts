@@ -4,8 +4,6 @@ export enum LocalStorageKeys {
   ReferralCode = 'common-refcode',
   HasSeenOnboarding = 'has-seen-onboarding',
   HasSeenNotifications = 'has-seen-notifications',
-  AIInteractionsEnabled = 'ai-interactions-enabled',
-  AICommentsEnabled = 'ai-comments-enabled',
 }
 
 export const getLocalStorageItem = (key: LocalStorageKeys) => {

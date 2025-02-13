@@ -1,71 +1,45 @@
-import { OpenFeature } from '@openfeature/web-sdk';
-import {
-  LocalStorageKeys,
-  getLocalStorageItem,
-  setLocalStorageItem,
-} from 'helpers/localStorage';
 import { devtools, persist } from 'zustand/middleware';
 import { createStore } from 'zustand/vanilla';
 import { createBoundedUseStore } from '../utils';
 interface LocalAISettingsStore {
-  aiCommentsFeatureEnabled: boolean;
   aiInteractionsToggleEnabled: boolean;
   aiCommentsToggleEnabled: boolean;
   setAIInteractionsToggleEnabled: (enabled: boolean) => void;
   setAICommentsToggleEnabled: (enabled: boolean) => void;
   updateFeatureFlags: (
-    aiCommentsFeatureEnabled: boolean,
+    aiCommentsToggleEnabled: boolean,
     aiInteractionsToggleEnabled: boolean,
   ) => void;
 }
-
-const client = OpenFeature.getClient();
 
 export const LocalAISettingsStore = createStore<LocalAISettingsStore>()(
   devtools(
     persist(
       (set) => ({
-        aiCommentsFeatureEnabled: client.getBooleanValue('aiComments', false),
-        aiInteractionsToggleEnabled:
-          getLocalStorageItem(LocalStorageKeys.AIInteractionsEnabled) ===
-          'true',
-        aiCommentsToggleEnabled:
-          getLocalStorageItem(LocalStorageKeys.AICommentsEnabled) === 'true',
-
+        aiInteractionsToggleEnabled: false,
+        aiCommentsToggleEnabled: false,
         setAIInteractionsToggleEnabled: (enabled) => {
           set(() => {
-            setLocalStorageItem(
-              LocalStorageKeys.AIInteractionsEnabled,
-              String(enabled),
-            );
-            if (!enabled) {
-              setLocalStorageItem(LocalStorageKeys.AICommentsEnabled, 'false');
-            }
-            return { aiInteractionsToggleEnabled: enabled };
+            return {
+              aiInteractionsToggleEnabled: enabled,
+              ...(!enabled && { aiCommentsToggleEnabled: false }),
+            };
           });
         },
 
         setAICommentsToggleEnabled: (enabled) => {
           set(() => {
-            setLocalStorageItem(
-              LocalStorageKeys.AICommentsEnabled,
-              String(enabled),
-            );
             return { aiCommentsToggleEnabled: enabled };
           });
         },
 
         updateFeatureFlags: (
-          aiCommentsFeatureEnabled,
+          aiCommentsToggleEnabled,
           aiInteractionsToggleEnabled,
         ) => {
           set(() => {
-            if (!aiCommentsFeatureEnabled || !aiInteractionsToggleEnabled) {
-              setLocalStorageItem(LocalStorageKeys.AICommentsEnabled, 'false');
-              set({ aiCommentsToggleEnabled: false });
-            }
             return {
-              aiCommentsFeatureEnabled,
+              aiCommentsToggleEnabled,
               aiInteractionsToggleEnabled,
             };
           });

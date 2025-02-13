@@ -10,13 +10,14 @@ import {
 } from '@hicommonwealth/shared';
 import clsx from 'clsx';
 import { GetThreadActionTooltipTextResponse } from 'helpers/threads';
+import { useFlag } from 'hooks/useFlag';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import moment from 'moment';
 import { useCreateCommentMutation } from 'state/api/comments';
 import { buildCreateCommentInput } from 'state/api/comments/createComment';
 import { useGenerateCommentText } from 'state/api/comments/generateCommentText';
 import useGetContentByUrlQuery from 'state/api/general/getContentByUrl';
-import useUserStore, { useLocalAISettingsStore } from 'state/ui/user';
+import useUserStore from 'state/ui/user';
 import { MarkdownViewerWithFallback } from 'views/components/MarkdownViewerWithFallback/MarkdownViewerWithFallback';
 import { CommentReactionButton } from 'views/components/ReactionButton/CommentReactionButton';
 import { SharePopover } from 'views/components/SharePopover';
@@ -122,7 +123,7 @@ export const CommentCard = ({
   const userOwnsComment = comment.user_id === user.id;
   const [streamingText, setStreamingText] = useState('');
   const { generateComment } = useGenerateCommentText();
-  const { aiCommentsFeatureEnabled } = useLocalAISettingsStore();
+  const aiCommentsFeatureEnabled = useFlag('aiComments');
   const { mutateAsync: createComment } = useCreateCommentMutation({
     threadId: comment.thread_id,
     communityId: comment.community_id,
