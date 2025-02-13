@@ -3,6 +3,7 @@ import { useDeleteApiKeyMutation } from './deleteApiKey';
 import { useGetApiKeyQuery } from './getApiKey';
 import useGetNewContent from './getNewContent';
 import useGetRandomResourceIds from './getRandomResourceIds';
+import useGetUserReferralFeesQuery from './getUserReferralFees';
 import useGetUserReferralsQuery from './getUserReferrals';
 import useGetXPs from './getXPs';
 import useUpdateUserEmailMutation from './updateEmail';
@@ -16,6 +17,7 @@ export {
   useGetApiKeyQuery,
   useGetNewContent,
   useGetRandomResourceIds,
+  useGetUserReferralFeesQuery,
   useGetUserReferralsQuery,
   useGetXPs,
   useSignIn,

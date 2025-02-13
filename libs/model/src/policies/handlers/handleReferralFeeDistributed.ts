@@ -1,5 +1,6 @@
 import { EventHandler } from '@hicommonwealth/core';
 import { ZERO_ADDRESS } from '@hicommonwealth/shared';
+import { Op } from 'sequelize';
 import { ZodUndefined } from 'zod';
 import { models } from '../../database';
 
@@ -29,9 +30,10 @@ export const handleReferralFeeDistributed: EventHandler<
   const referral = await models.Referral.findOne({
     where: { namespace_address, referrer_address },
   });
-  if (!referral) return; // we must guarantee the order of chain events here
+  // enforce chain events in flow are processed in order
+  if (!referral) throw Error('Referral fee received out of order');
 
-  const referrer_received_amount = Number(fee_amount) / 1e18;
+  const referrer_received_amount = fee_amount;
 
   await models.sequelize.transaction(async (transaction) => {
     await models.ReferralFee.create(
@@ -43,7 +45,7 @@ export const handleReferralFeeDistributed: EventHandler<
         referrer_recipient_address: referrer_address,
         referrer_received_amount,
         referee_address: referral.referee_address,
-        transaction_timestamp: Number(payload.block.timestamp),
+        transaction_timestamp: BigInt(payload.block.timestamp),
       },
       { transaction },
     );
@@ -51,19 +53,21 @@ export const handleReferralFeeDistributed: EventHandler<
     // if native token i.e. ETH
     if (distributed_token_address === ZERO_ADDRESS) {
       const referrer = await models.Address.findOne({
-        where: { address: referrer_address },
+        where: { address: referrer_address, user_id: { [Op.not]: null } },
+        attributes: ['user_id'],
         transaction,
       });
+
       if (referrer) {
         await models.User.increment('referral_eth_earnings', {
-          by: referrer_received_amount,
+          by: Number(referrer_received_amount),
           where: { id: referrer.user_id! },
           transaction,
         });
       }
 
       await referral.increment('referrer_received_eth_amount', {
-        by: referrer_received_amount,
+        by: Number(referrer_received_amount),
         transaction,
       });
     }

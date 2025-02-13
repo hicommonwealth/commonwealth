@@ -37,7 +37,7 @@ export const Referral = (
         allowNull: false,
       },
       referrer_received_eth_amount: {
-        type: Sequelize.FLOAT,
+        type: Sequelize.DECIMAL(78, 0),
         allowNull: false,
         defaultValue: 0,
       },
