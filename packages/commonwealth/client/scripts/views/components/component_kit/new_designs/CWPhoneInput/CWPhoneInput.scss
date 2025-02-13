@@ -9,10 +9,15 @@
   justify-content: center;
   align-items: center;
   .dropdown-options-display {
+    width: 100%;
     .input-container {
       border: 1px solid $neutral-200 !important;
       height: 40px !important;
       border-radius: 6px !important;
+      width: 100% !important;
+      @include extraSmall {
+        width: 300px !important;
+      }
     }
     .flag-dropdown {
       border: 1px solid $neutral-200 !important;
@@ -52,9 +57,14 @@
     user-select: none;
     display: flex;
     flex-direction: column;
+    width: 470px;
+    @include extraSmall {
+      width: 300px !important;
+    }
     .search span {
       display: none;
     }
+
     .search input {
       width: 99%;
       background-color: $white !important;
@@ -94,7 +104,10 @@
     }
   }
   .react-tel-input {
-    width: auto !important;
+    width: 100% !important;
+    @include extraSmall {
+      width: auto !important;
+    }
   }
   .error-message {
     color: $rorange-600 !important;

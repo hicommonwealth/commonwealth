@@ -9,4 +9,15 @@
   overflow: hidden;
   justify-content: center;
   align-items: center;
+
+  .action-btns {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    @include extraSmall {
+      flex-wrap: nowrap;
+      flex-direction: column;
+    }
+  }
 }
