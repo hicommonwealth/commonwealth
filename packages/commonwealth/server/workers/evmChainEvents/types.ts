@@ -1,6 +1,5 @@
 import { Log } from '@ethersproject/providers';
 import { EvmEventSource } from '@hicommonwealth/schemas';
-import { AbiType } from '@hicommonwealth/shared';
 import { ethers } from 'ethers';
 import { z } from 'zod';
 
@@ -31,13 +30,8 @@ const sourceType = EvmEventSource.extend({
   parent_contract_address: z.string().optional(),
 });
 
-export type AbiSignatures = {
-  abi: AbiType;
-  sources: Array<z.infer<typeof sourceType>>;
-};
-
 export type ContractSources = {
-  [contractAddress: string]: AbiSignatures;
+  [contractAddress: string]: Array<z.infer<typeof sourceType>>;
 };
 
 export type EvmSource = {

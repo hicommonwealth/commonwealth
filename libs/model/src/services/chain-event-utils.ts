@@ -9,8 +9,7 @@ import {
   referralFeeManager,
   singleContestAbi,
 } from '@hicommonwealth/evm-protocols';
-import { Events, EventSchemas } from '@hicommonwealth/schemas';
-import { z } from 'zod';
+import { EventPair, Events } from '@hicommonwealth/schemas';
 
 type EvmBlockDetails = {
   number: number;
@@ -49,10 +48,7 @@ export type EvmEvent = {
   block: EvmBlockDetails;
 };
 
-type EvmMapper<E extends Events> = (evmEvent: EvmEvent) => {
-  event_name: E;
-  event_payload: z.infer<EventSchemas[E]>;
-};
+type EvmMapper<E extends Events> = (evmEvent: EvmEvent) => EventPair<E>;
 
 const stakeTradeMapper: EvmMapper<'CommunityStakeTrade'> = (
   event: EvmEvent,
@@ -281,7 +277,7 @@ const singleContestVoteMapper: EvmMapper<'ContestContentUpvoted'> = (
 };
 
 // TODO: type should match EventRegistry event signatures
-export const chainEventMappers = {
+export const chainEventMappers: Record<string, EvmMapper<Events>> = {
   // Stake
   [EvmEventSignatures.CommunityStake.Trade]: stakeTradeMapper,
 

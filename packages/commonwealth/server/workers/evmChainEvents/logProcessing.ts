@@ -1,14 +1,10 @@
 import { Log } from '@ethersproject/providers';
 import { logger as _logger, stats } from '@hicommonwealth/core';
+import { chainEventMappers } from '@hicommonwealth/model';
+import { EventPair, EventPairs } from '@hicommonwealth/schemas';
 import { ethers } from 'ethers';
 import { config } from '../../config';
-import {
-  AbiSignatures,
-  ContractSources,
-  EvmBlockDetails,
-  EvmEvent,
-  EvmSource,
-} from './types';
+import { ContractSources, EvmBlockDetails, EvmSource } from './types';
 
 const logger = _logger(import.meta);
 
@@ -148,14 +144,15 @@ export async function getLogs({
 export async function parseLogs(
   sources: ContractSources,
   logs: Log[],
-): Promise<EvmEvent[]> {
-  const events: EvmEvent[] = [];
-  const interfaces = {};
+  blockDetails: Record<number, EvmBlockDetails>,
+): Promise<Array<EventPairs>> {
+  const events: Array<EventPairs> = [];
+
   for (const log of logs) {
     const address = ethers.utils.getAddress(log.address);
-    const data: AbiSignatures = sources[address];
-    if (!data) {
-      logger.error('Missing event source', undefined, {
+    const evmEventSources = sources[address];
+    if (!evmEventSources) {
+      logger.error('Missing event sources', undefined, {
         // should be logged even if address is undefined -> do not shorten
         address: `${address}`,
         sourceContracts: Object.keys(sources),
@@ -163,38 +160,38 @@ export async function parseLogs(
       continue;
     }
 
-    const evmEventSource = data.sources.find(
+    const evmEventSource = evmEventSources.find(
       (s) => s.event_signature === log.topics[0],
     );
     if (!evmEventSource) continue;
 
-    if (!data.abi || !Array.isArray(data.abi) || data.abi.length === 0) {
-      logger.error(`Invalid ABI for contract ${address}`);
+    const eventMapper = chainEventMappers[evmEventSource.event_signature];
+    if (!eventMapper) {
+      logger.error('Missing event mapper', undefined, {
+        eventSignature: evmEventSource.event_signature,
+        contractAddress: address,
+      });
       continue;
     }
 
-    if (!interfaces[address]) {
-      interfaces[address] = new ethers.utils.Interface(data.abi);
-    }
-
-    let parsedLog: ethers.utils.LogDescription;
     try {
-      parsedLog = interfaces[address].parseLog(log);
+      events.push(
+        eventMapper({
+          eventSource: {
+            ethChainId: evmEventSource.eth_chain_id,
+            eventSignature: evmEventSource.event_signature,
+          },
+          rawLog: log,
+          block: blockDetails[log.blockNumber],
+        }) as EventPair<any>,
+      );
     } catch (e) {
-      const msg = `Failed to parse log from contract ${address} with signature ${log.topics[0]}`;
+      const msg = `Failed to map log from contract ${address} with signature ${log.topics[0]}`;
       logger.error(msg, e);
       continue;
     }
     stats().increment('ce.evm.event', {
       contractAddress: address,
-    });
-    events.push({
-      eventSource: {
-        ethChainId: evmEventSource.eth_chain_id,
-        eventSignature: evmEventSource.event_signature,
-      },
-      parsedArgs: parsedLog.args,
-      rawLog: log,
     });
   }
 
@@ -205,7 +202,7 @@ export async function getEvents(
   evmSource: EvmSource,
   startingBlockNum: number,
   endingBlockNum: number,
-): Promise<{ events: EvmEvent[]; lastBlockNum: number }> {
+): Promise<{ events: Array<EventPairs>; lastBlockNum: number }> {
   const { logs, lastBlockNum, blockDetails } = await getLogs({
     rpc: evmSource.rpc,
     maxBlockRange: evmSource.maxBlockRange,
@@ -214,12 +211,9 @@ export async function getEvents(
     endingBlockNum,
   });
 
-  const events = await parseLogs(evmSource.contracts, logs);
+  const events = await parseLogs(evmSource.contracts, logs, blockDetails);
   return {
-    events: events.map((e) => ({
-      ...e,
-      block: blockDetails[e.rawLog.blockNumber],
-    })),
+    events,
     lastBlockNum,
   };
 }
@@ -235,23 +229,24 @@ export async function migrateEvents(
   evmSource: EvmSource,
   endingBlockNum: number,
 ): Promise<
-  | { events: EvmEvent[]; lastBlockNum: number; contracts: ContractSources }
+  | {
+      events: Array<EventPairs>;
+      lastBlockNum: number;
+      contracts: ContractSources;
+    }
   | { contracts: ContractSources }
 > {
   let oldestBlock: number | undefined;
   const contracts: ContractSources = {};
-  for (const [contractAddress, abiSignature] of Object.entries(
+  for (const [contractAddress, evmEventSource] of Object.entries(
     evmSource.contracts,
   )) {
-    for (const source of abiSignature.sources) {
+    for (const source of evmEventSource) {
       if (source.created_at_block && source.events_migrated === false) {
         if (!contracts[contractAddress]) {
-          contracts[contractAddress] = {
-            abi: abiSignature.abi,
-            sources: [],
-          };
+          contracts[contractAddress] = [];
         }
-        contracts[contractAddress].sources.push(source);
+        contracts[contractAddress].push(source);
         if (!oldestBlock || oldestBlock > source.created_at_block) {
           oldestBlock = source.created_at_block;
         }

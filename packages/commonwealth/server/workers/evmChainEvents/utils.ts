@@ -16,7 +16,7 @@ export async function updateMigratedEvmEventSources(
   if (Object.keys(migratedData.contracts).length > 0) {
     const migratedSources = Object.keys(migratedData.contracts).reduce(
       (acc: Array<[number, string, string]>, contractAddress: string) => {
-        migratedData.contracts[contractAddress].sources.forEach((s) => {
+        migratedData.contracts[contractAddress].forEach((s) => {
           acc.push([ethChainId, contractAddress, s.event_signature]);
         });
         return acc;
