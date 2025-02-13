@@ -1,4 +1,3 @@
-import { EvmEventSignatures } from '@hicommonwealth/evm-protocols';
 import { z } from 'zod';
 import { FarcasterCast } from '../commands/contest.schemas';
 import { Comment } from '../entities/comment.schemas';
@@ -8,14 +7,6 @@ import { Reaction } from '../entities/reaction.schemas';
 import { Thread } from '../entities/thread.schemas';
 import { Tweet } from '../integrations';
 import { PG_INT } from '../utils';
-import {
-  CommunityStakeTrade,
-  LaunchpadTokenCreated,
-  LaunchpadTrade,
-  NamespaceDeployed,
-  NamespaceDeployedWithReferral,
-  ReferralFeeDistributed,
-} from './chain-event.schemas';
 import { EventMetadata } from './util.schemas';
 
 const DiscordEventBase = z.object({
@@ -218,52 +209,6 @@ export const events = {
     parent_channel_id: true,
   }),
 
-  /**
-   * Zod schema for EvmEvent type defined in workers/evmChainEvents/types.ts
-   */
-  ChainEventCreated: z.union([
-    ChainEventBase.extend({
-      eventSource: ChainEventBase.shape.eventSource.extend({
-        eventSignature: z.literal(
-          EvmEventSignatures.NamespaceFactory.NamespaceDeployed,
-        ),
-      }),
-      parsedArgs: NamespaceDeployed,
-    }),
-    ChainEventBase.extend({
-      eventSource: ChainEventBase.shape.eventSource.extend({
-        eventSignature: z.literal(
-          EvmEventSignatures.NamespaceFactory.NamespaceDeployedWithReferral,
-        ),
-      }),
-      parsedArgs: NamespaceDeployedWithReferral,
-    }),
-    ChainEventBase.extend({
-      eventSource: ChainEventBase.shape.eventSource.extend({
-        eventSignature: z.literal(EvmEventSignatures.CommunityStake.Trade),
-      }),
-      parsedArgs: CommunityStakeTrade,
-    }),
-    ChainEventBase.extend({
-      eventSource: ChainEventBase.shape.eventSource.extend({
-        eventSignature: z.literal(EvmEventSignatures.Launchpad.TokenLaunched),
-      }),
-      parsedArgs: LaunchpadTokenCreated,
-    }),
-    ChainEventBase.extend({
-      eventSource: ChainEventBase.shape.eventSource.extend({
-        eventSignature: z.literal(EvmEventSignatures.Launchpad.Trade),
-      }),
-      parsedArgs: LaunchpadTrade,
-    }),
-    ChainEventBase.extend({
-      eventSource: ChainEventBase.shape.eventSource.extend({
-        eventSignature: z.literal(EvmEventSignatures.Referrals.FeeDistributed),
-      }),
-      parsedArgs: ReferralFeeDistributed,
-    }),
-  ]),
-
   // on-chain contest manager events
   RecurringContestManagerDeployed: EventMetadata.extend({
     namespace: z.string().describe('Community namespace'),
@@ -392,10 +337,10 @@ export const events = {
       trader: z.literal(`0x${z.string()}`),
       namespace: z.literal(`0x${z.string()}`),
       isBuy: z.boolean(),
-      communityTokenAmount: z.bigint(),
-      ethAmount: z.bigint(),
-      protocolEthAmount: z.bigint(),
-      nameSpaceEthAmount: z.bigint(),
+      communityTokenAmount: z.coerce.bigint(),
+      ethAmount: z.coerce.bigint(),
+      protocolEthAmount: z.coerce.bigint(),
+      nameSpaceEthAmount: z.coerce.bigint(),
       supply: z.bigint(),
       exchangeToken: z.literal(`0x${z.string()}`),
     }),
@@ -416,7 +361,7 @@ export const events = {
   LaunchpadTokenCreated: ChainEventBase.extend({
     parsedArgs: z.object({
       token: z.literal(`0x${z.string()}`),
-      totalSupply: z.bigint(),
+      totalSupply: z.coerce.bigint(),
       name: z.string(),
       symbol: z.string(),
     }),
@@ -427,10 +372,10 @@ export const events = {
       trader: z.literal(`0x${z.string()}`),
       namespace: z.literal(`0x${z.string()}`),
       isBuy: z.boolean(),
-      communityTokenAmount: z.bigint(),
-      ethAmount: z.bigint(),
-      protocolEthAmount: z.bigint(),
-      floatingSupply: z.bigint(),
+      communityTokenAmount: z.coerce.bigint(),
+      ethAmount: z.coerce.bigint(),
+      protocolEthAmount: z.coerce.bigint(),
+      floatingSupply: z.coerce.bigint(),
     }),
   }),
 
@@ -438,9 +383,9 @@ export const events = {
     parsedArgs: z.object({
       namespace: z.literal(`0x${z.string()}`),
       token: z.literal(`0x${z.string()}`),
-      amount: z.bigint(),
+      amount: z.coerce.bigint(),
       recipient: z.literal(`0x${z.string()}`),
-      recipientAmount: z.bigint(),
+      recipientAmount: z.coerce.bigint(),
     }),
   }),
 } as const;

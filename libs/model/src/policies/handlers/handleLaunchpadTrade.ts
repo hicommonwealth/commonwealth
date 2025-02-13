@@ -1,31 +1,29 @@
-import { logger } from '@hicommonwealth/core';
+import { EventHandler, logger } from '@hicommonwealth/core';
 import {
   commonProtocol as cp,
   getBlock,
   getLaunchpadToken,
   transferLaunchpadLiquidityToUniswap,
 } from '@hicommonwealth/evm-protocols';
-import { chainEvents, events } from '@hicommonwealth/schemas';
-import { BigNumber } from 'ethers';
-import { z } from 'zod';
+import { ZodUndefined } from 'zod';
 import { config } from '../../config';
 import { models } from '../../database';
 import { chainNodeMustExist } from '../utils/utils';
 
 const log = logger(import.meta);
 
-export async function handleLaunchpadTrade(
-  event: z.infer<typeof events.ChainEventCreated>,
-) {
+export const handleLaunchpadTrade: EventHandler<
+  'LaunchpadTrade',
+  ZodUndefined
+> = async ({ payload }) => {
   const {
-    0: traderAddress,
-    1: tokenAddress,
-    2: isBuy,
-    3: communityTokenAmount,
-    4: ethAmount,
-    // 5: protocolEthAmount,
-    6: floatingSupply,
-  } = event.parsedArgs as z.infer<typeof chainEvents.LaunchpadTrade>;
+    trader: traderAddress,
+    namespace: tokenAddress,
+    isBuy,
+    communityTokenAmount,
+    ethAmount,
+    floatingSupply,
+  } = payload.parsedArgs;
 
   const token = await models.LaunchpadToken.findOne({
     where: {
@@ -37,31 +35,27 @@ export async function handleLaunchpadTrade(
     throw new Error('Token not found');
   }
 
-  const chainNode = await chainNodeMustExist(event.eventSource.ethChainId);
+  const chainNode = await chainNodeMustExist(payload.eventSource.ethChainId);
 
   const { block } = await getBlock({
     rpc: chainNode.private_url! || chainNode.url!,
-    blockHash: event.rawLog.blockHash,
+    blockHash: payload.rawLog.blockHash,
   });
 
   await models.LaunchpadTrade.findOrCreate({
     where: {
       eth_chain_id: chainNode.eth_chain_id!,
-      transaction_hash: event.rawLog.transactionHash,
+      transaction_hash: payload.rawLog.transactionHash,
     },
     defaults: {
       eth_chain_id: chainNode.eth_chain_id!,
-      transaction_hash: event.rawLog.transactionHash,
+      transaction_hash: payload.rawLog.transactionHash,
       token_address: tokenAddress.toLowerCase(),
       trader_address: traderAddress,
       is_buy: isBuy,
-      community_token_amount: BigNumber.from(communityTokenAmount).toBigInt(),
-      price:
-        Number(
-          (BigNumber.from(ethAmount).toBigInt() * BigInt(1e18)) /
-            BigNumber.from(communityTokenAmount).toBigInt(),
-        ) / 1e18,
-      floating_supply: BigNumber.from(floatingSupply).toBigInt(),
+      community_token_amount: communityTokenAmount,
+      price: Number((ethAmount * BigInt(1e18)) / communityTokenAmount) / 1e18,
+      floating_supply: floatingSupply,
       timestamp: Number(block.timestamp),
     },
   });
@@ -80,8 +74,7 @@ export async function handleLaunchpadTrade(
 
   if (
     !token.liquidity_transferred &&
-    BigNumber.from(floatingSupply).toBigInt() ===
-      BigInt(token.launchpad_liquidity)
+    floatingSupply === BigInt(token.launchpad_liquidity)
   ) {
     const onChainTokenData = await getLaunchpadToken({
       rpc: chainNode.private_url!,
@@ -101,4 +94,4 @@ export async function handleLaunchpadTrade(
     token.liquidity_transferred = true;
     await token.save();
   }
-}
+};

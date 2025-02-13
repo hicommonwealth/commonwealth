@@ -153,6 +153,7 @@ export class RabbitMQAdapter implements Broker {
     }
 
     try {
+      // TODO: custom JSONify JS `BigInt` to string
       const publication = await this.broker!.publish(topic, event, {
         routingKey: this.getRoutingKey(event),
       });
