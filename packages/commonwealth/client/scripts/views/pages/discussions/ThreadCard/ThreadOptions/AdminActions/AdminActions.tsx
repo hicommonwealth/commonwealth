@@ -76,6 +76,8 @@ export const AdminActions = ({
     Permissions.isCommunityAdmin() ||
     Permissions.isCommunityModerator();
 
+  const isCommunityAdmin = Permissions.isCommunityAdmin();
+
   const isThreadAuthor = Permissions.isThreadAuthor(thread);
   const isThreadCollaborator = Permissions.isThreadCollaborator(thread);
   const { checkForSessionKeyRevalidationErrors } = useAuthModalStore();
@@ -431,14 +433,18 @@ export const AdminActions = ({
                         },
                       ]
                     : []),
-                  {
-                    onClick: handleDeleteThread,
-                    label: 'Delete',
-                    disabled: editingDisabled,
-                    iconLeft: 'trash' as const,
-                    iconLeftWeight: 'bold' as const,
-                    className: 'danger',
-                  },
+                  ...(isCommunityAdmin
+                    ? [
+                        {
+                          onClick: handleDeleteThread,
+                          label: 'Delete',
+                          disabled: editingDisabled,
+                          iconLeft: 'trash' as const,
+                          iconLeftWeight: 'bold' as const,
+                          className: 'danger',
+                        },
+                      ]
+                    : []),
                 ]
               : []),
           ]}
