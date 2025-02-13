@@ -2,14 +2,13 @@ import { useUpdateUserMutation } from 'client/scripts/state/api/user';
 import { notifyError } from 'controllers/app/notifications';
 import { linkValidationSchema } from 'helpers/formValidations/common';
 import { getLinkType, isLinkValid } from 'helpers/link';
-import { useAiToggleState } from 'hooks/useAiToggleState';
 import { useFlag } from 'hooks/useFlag';
 import AddressInfo from 'models/AddressInfo';
 import NewProfile from 'models/NewProfile';
 import { useCommonNavigate } from 'navigation/helpers';
 import React, { useEffect, useState } from 'react';
 import { useFetchProfileByIdQuery } from 'state/api/profiles';
-import useUserStore from 'state/ui/user';
+import useUserStore, { useLocalAISettingsStore } from 'state/ui/user';
 import useUserOnboardingSliderMutationStore from 'state/ui/userTrainingCards';
 import ManageApiKey from 'views/components/EditProfile/ManageAPIKeys';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
@@ -65,7 +64,7 @@ const EditProfile = () => {
 
   const enableApiKeyManagement = useFlag('manageApiKeys');
   const { aiInteractionsToggleEnabled, setAIInteractionsToggleEnabled } =
-    useAiToggleState();
+    useLocalAISettingsStore();
   const aiCommentsFeatureEnabled = useFlag('aiComments');
 
   const { preferenceTags, setPreferenceTags, toggleTagFromSelection } =

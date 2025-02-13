@@ -1,11 +1,11 @@
 import React, { useCallback, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { useLocalAISettingsStore } from 'state/ui/user';
 import CommentEditor, {
   CommentEditorProps,
 } from 'views/components/Comments/CommentEditor/CommentEditor';
 import { MobileInput } from 'views/components/StickEditorContainer/MobileInput';
 import { listenForComment } from 'views/pages/discussions/CommentTree/helpers';
-import { useAiToggleState } from '../../../hooks/useAiToggleState';
 import './MobileStickyInput.scss';
 
 /**
@@ -15,7 +15,7 @@ export const MobileStickyInput = (props: CommentEditorProps) => {
   const { handleSubmitComment } = props;
   const [focused, setFocused] = useState(false);
   const { aiCommentsToggleEnabled, setAICommentsToggleEnabled } =
-    useAiToggleState();
+    useLocalAISettingsStore();
   const [streamingReplyIds, setStreamingReplyIds] = useState<number[]>([]);
 
   const handleAiReply = useCallback(

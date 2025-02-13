@@ -1,14 +1,14 @@
 import { ContentType } from '@hicommonwealth/shared';
 import clsx from 'clsx';
 import { notifyError } from 'controllers/app/notifications';
+import { isCommandClick } from 'helpers';
 import Account from 'models/Account';
 import type { DeltaStatic } from 'quill';
 import React, { useCallback, useState } from 'react';
 import { useGenerateCommentText } from 'state/api/comments/generateCommentText';
+import { useLocalAISettingsStore } from 'state/ui/user';
 import { User } from 'views/components/user/user';
 import { jumpHighlightComment } from 'views/pages/discussions/CommentTree/helpers';
-import { isCommandClick } from '../../../../helpers';
-import { useAiToggleState } from '../../../../hooks/useAiToggleState';
 import { CWText } from '../../component_kit/cw_text';
 import { CWValidationText } from '../../component_kit/cw_validation_text';
 import { CWButton } from '../../component_kit/new_designs/CWButton';
@@ -61,7 +61,7 @@ const CommentEditor = ({
     aiCommentsToggleEnabled,
     setAICommentsToggleEnabled,
     aiCommentsFeatureEnabled,
-  } = useAiToggleState();
+  } = useLocalAISettingsStore();
 
   const effectiveAiStreaming = initialAiStreaming ?? aiCommentsToggleEnabled;
   const effectiveSetAiStreaming =

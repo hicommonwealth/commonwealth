@@ -1,9 +1,9 @@
 import React, { useCallback, useState } from 'react';
+import { useLocalAISettingsStore } from 'state/ui/user';
 import { CommentEditor } from 'views/components/Comments/CommentEditor';
 import type { CommentEditorProps } from 'views/components/Comments/CommentEditor/CommentEditor';
 import { CWToggle } from 'views/components/component_kit/new_designs/cw_toggle';
 import { jumpHighlightComment } from 'views/pages/discussions/CommentTree/helpers';
-import { useAiToggleState } from '../../../hooks/useAiToggleState';
 import './DesktopStickyInput.scss';
 
 export const DesktopStickyInput = (props: CommentEditorProps) => {
@@ -13,7 +13,7 @@ export const DesktopStickyInput = (props: CommentEditorProps) => {
     aiCommentsToggleEnabled,
     setAICommentsToggleEnabled,
     aiCommentsFeatureEnabled,
-  } = useAiToggleState();
+  } = useLocalAISettingsStore();
   const [streamingReplyIds, setStreamingReplyIds] = useState<number[]>([]);
 
   const handleFocused = useCallback(() => {

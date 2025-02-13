@@ -16,7 +16,7 @@ import { useCreateCommentMutation } from 'state/api/comments';
 import { buildCreateCommentInput } from 'state/api/comments/createComment';
 import { useGenerateCommentText } from 'state/api/comments/generateCommentText';
 import useGetContentByUrlQuery from 'state/api/general/getContentByUrl';
-import useUserStore from 'state/ui/user';
+import useUserStore, { useLocalAISettingsStore } from 'state/ui/user';
 import { MarkdownViewerWithFallback } from 'views/components/MarkdownViewerWithFallback/MarkdownViewerWithFallback';
 import { CommentReactionButton } from 'views/components/ReactionButton/CommentReactionButton';
 import { SharePopover } from 'views/components/SharePopover';
@@ -34,7 +34,6 @@ import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_th
 import { ReactQuillEditor } from 'views/components/react_quill_editor';
 import { deserializeDelta } from 'views/components/react_quill_editor/utils';
 import { z } from 'zod';
-import { useAiToggleState } from '../../../../hooks/useAiToggleState';
 import { AuthorAndPublishInfo } from '../ThreadCard/AuthorAndPublishInfo';
 import './CommentCard.scss';
 import { ToggleCommentSubscribe } from './ToggleCommentSubscribe';
@@ -123,7 +122,7 @@ export const CommentCard = ({
   const userOwnsComment = comment.user_id === user.id;
   const [streamingText, setStreamingText] = useState('');
   const { generateComment } = useGenerateCommentText();
-  const { aiCommentsFeatureEnabled } = useAiToggleState();
+  const { aiCommentsFeatureEnabled } = useLocalAISettingsStore();
   const { mutateAsync: createComment } = useCreateCommentMutation({
     threadId: comment.thread_id,
     communityId: comment.community_id,
