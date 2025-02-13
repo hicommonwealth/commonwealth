@@ -8,36 +8,21 @@ import { isWithinPeriod } from '@hicommonwealth/shared';
 import { Op, Transaction } from 'sequelize';
 import { z } from 'zod';
 import { models, sequelize } from '../database';
-import { mustExist } from '../middleware/guards';
 
-async function getUserByAddressId(payload: { address_id: number }) {
-  const address = await models.Address.findOne({
-    where: { id: payload.address_id },
+async function getUserByAddressId(address_id: number) {
+  const addr = await models.Address.findOne({
+    where: { id: address_id },
     attributes: ['user_id'],
   });
-  mustExist('Address not found', address);
-  return address.user_id!;
+  return addr?.user_id ?? undefined;
 }
 
-async function getUserByAddress(payload: { address: string }) {
-  const address = await models.Address.findOne({
-    where: { address: payload.address },
+async function getUserByAddress(address: string) {
+  const addr = await models.Address.findOne({
+    where: { address },
     attributes: ['user_id'],
   });
-  mustExist('Address not found', address);
-  return address.user_id!;
-}
-
-async function getUserIdByAddress(payload: {
-  referrer_address?: string | null;
-}): Promise<number | undefined> {
-  if (payload.referrer_address) {
-    const referrer_user = await models.Address.findOne({
-      where: { address: payload.referrer_address },
-      attributes: ['user_id'],
-    });
-    if (referrer_user) return referrer_user.user_id!;
-  }
+  return addr?.user_id ?? undefined;
 }
 
 /*
@@ -97,9 +82,9 @@ async function recordXpsForQuest(
   creator_address?: string | null,
 ) {
   await sequelize.transaction(async (transaction) => {
-    const creator_user_id = await getUserIdByAddress({
-      referrer_address: creator_address,
-    });
+    const creator_user_id = creator_address
+      ? await getUserByAddress(creator_address)
+      : undefined;
 
     for (const action_meta of action_metas) {
       if (!action_meta) continue;
@@ -185,9 +170,9 @@ async function recordXpsForEvent(
   creator_reward_weight?: number, // referrer reward weight
 ) {
   await sequelize.transaction(async (transaction) => {
-    const creator_user_id = await getUserIdByAddress({
-      referrer_address: creator_address,
-    });
+    const creator_user_id = creator_address
+      ? await getUserByAddress(creator_address)
+      : undefined;
 
     // get logged actions for this user and event
     const log = await models.XpLog.findAll({
@@ -281,7 +266,8 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
         }
       },
       ThreadCreated: async ({ payload }) => {
-        const user_id = await getUserByAddressId(payload);
+        const user_id = await getUserByAddressId(payload.address_id);
+        if (!user_id) return;
         const action_metas = await getQuestActionMetas(
           payload,
           'ThreadCreated',
@@ -289,7 +275,8 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
         await recordXpsForQuest(user_id, payload.created_at!, action_metas);
       },
       ThreadUpvoted: async ({ payload }) => {
-        const user_id = await getUserByAddressId(payload);
+        const user_id = await getUserByAddressId(payload.address_id);
+        if (!user_id) return;
         const action_metas = await getQuestActionMetas(
           payload,
           'ThreadUpvoted',
@@ -297,7 +284,8 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
         await recordXpsForQuest(user_id, payload.created_at!, action_metas);
       },
       CommentCreated: async ({ payload }) => {
-        const user_id = await getUserByAddressId(payload);
+        const user_id = await getUserByAddressId(payload.address_id);
+        if (!user_id) return;
         const action_metas = await getQuestActionMetas(
           payload,
           'CommentCreated',
@@ -305,7 +293,8 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
         await recordXpsForQuest(user_id, payload.created_at!, action_metas);
       },
       CommentUpvoted: async ({ payload }) => {
-        const user_id = await getUserByAddressId(payload);
+        const user_id = await getUserByAddressId(payload.address_id);
+        if (!user_id) return;
         const comment = await models.Comment.findOne({
           where: { id: payload.comment_id },
           include: [
@@ -345,27 +334,39 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
         // await recordXps(user_id, payload.created_at!, action_metas);
       },
       RecurringContestManagerDeployed: async ({ payload }) => {
-        const community = await models.Community.findOne({
-          where: { namespace: payload.namespace },
-          attributes: ['id'],
+        const contest = await models.ContestManager.findOne({
+          where: { contest_address: payload.contest_address },
+          attributes: ['community_id', 'creator_address'],
         });
+        if (!contest?.creator_address) return;
+        const user_id = await getUserByAddress(contest.creator_address);
+        if (!user_id) return;
+
         const action_metas = await getQuestActionMetas(
-          { community_id: community?.id, created_at: payload.created_at },
+          {
+            community_id: contest?.community_id,
+            created_at: payload.created_at,
+          },
           'RecurringContestManagerDeployed',
         );
-        const user_id = 0; // TODO: @rbennettcw how we find user who deployed the contest?
         await recordXpsForQuest(user_id, payload.created_at!, action_metas);
       },
       OneOffContestManagerDeployed: async ({ payload }) => {
-        const community = await models.Community.findOne({
-          where: { namespace: payload.namespace },
-          attributes: ['id'],
+        const contest = await models.ContestManager.findOne({
+          where: { contest_address: payload.contest_address },
+          attributes: ['community_id', 'creator_address'],
         });
+        if (!contest?.creator_address) return;
+        const user_id = await getUserByAddress(contest.creator_address);
+        if (!user_id) return;
+
         const action_metas = await getQuestActionMetas(
-          { community_id: community?.id, created_at: payload.created_at },
+          {
+            community_id: contest?.community_id,
+            created_at: payload.created_at,
+          },
           'OneOffContestManagerDeployed',
         );
-        const user_id = 0; // TODO: @rbennettcw how we find user who deployed the contest?
         await recordXpsForQuest(user_id, payload.created_at!, action_metas);
       },
       TokenLaunched: async ({ payload }) => {
@@ -378,14 +379,14 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
         await recordXpsForQuest(user_id, created_at, action_metas);
       },
       TokenTraded: async ({ payload }) => {
+        const user_id = await getUserByAddress(payload.trader_address);
+        if (!user_id) return;
+
         const created_at = new Date(payload.block_timestamp);
         const action_metas = await getQuestActionMetas(
           { created_at },
           'TokenTraded',
         );
-        const user_id = await getUserByAddress({
-          address: payload.trader_address,
-        });
         await recordXpsForQuest(user_id, created_at, action_metas);
       },
     },

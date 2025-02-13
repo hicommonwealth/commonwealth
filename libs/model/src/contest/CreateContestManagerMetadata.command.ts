@@ -19,7 +19,7 @@ export function CreateContestManagerMetadata(): Command<
   return {
     ...schemas.CreateContestManagerMetadata,
     auth: [authRoles('admin')],
-    body: async ({ payload }) => {
+    body: async ({ payload, actor }) => {
       const { community_id, topic_id, is_farcaster_contest, ...rest } = payload;
 
       // if stake is not enabled, only allow one-off contests
@@ -46,6 +46,7 @@ export function CreateContestManagerMetadata(): Command<
           const manager = await models.ContestManager.create(
             {
               ...rest,
+              creator_address: actor.address,
               community_id,
               created_at: new Date(),
               cancelled: false,
