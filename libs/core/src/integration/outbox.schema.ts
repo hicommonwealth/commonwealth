@@ -9,7 +9,6 @@ export const BaseOutboxProperties = z.object({
 });
 
 export const outboxEvents: Events[] = [
-  'ChainEventCreated',
   'CommentCreated',
   'CommentUpvoted',
   'CommunityCreated',

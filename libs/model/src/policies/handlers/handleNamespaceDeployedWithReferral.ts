@@ -32,7 +32,7 @@ async function setReferral(
   namespace_address: string,
   referrer_address: string,
   referee_address: string,
-  timestamp: number,
+  timestamp: bigint,
   eth_chain_id: number,
   transaction_hash: string,
   log_removed: boolean,
