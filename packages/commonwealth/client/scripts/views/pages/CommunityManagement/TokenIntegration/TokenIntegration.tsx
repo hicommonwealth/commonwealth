@@ -1,4 +1,4 @@
-import { commonProtocol } from '@hicommonwealth/evm-protocols';
+import { ChainBase } from '@hicommonwealth/shared';
 import { useFlag } from 'hooks/useFlag';
 import React from 'react';
 import app from 'state';
@@ -46,14 +46,11 @@ const TokenIntegration = () => {
   const isLoading =
     isLoadingPinnedToken || (isLoadingTokenMetadata && isExternalTokenLinked);
 
-  const contractInfo =
-    commonProtocol?.factoryContracts[
-      app?.chain?.meta?.ChainNode?.eth_chain_id || 0
-    ];
+  const isEthCommunity = app?.chain?.meta?.base === ChainBase.Ethereum;
 
   if (
     !uniswapTradeEnabled ||
-    !contractInfo ||
+    !isEthCommunity ||
     // if a community already has a launchpad token, don't allow pinning
     communityLaunchpadToken
   ) {
