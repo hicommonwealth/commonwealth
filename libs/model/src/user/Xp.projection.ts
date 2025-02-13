@@ -1,4 +1,5 @@
 import { Projection } from '@hicommonwealth/core';
+import { EvmEventSignatures } from '@hicommonwealth/evm-protocols';
 import * as schemas from '@hicommonwealth/schemas';
 import {
   QuestParticipationLimit,
@@ -334,6 +335,50 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
         //   'UserMentioned',
         // );
         // await recordXps(user_id, payload.created_at!, action_metas);
+      },
+      RecurringContestManagerDeployed: async ({ payload }) => {
+        const user_id = 0; // TODO: find user who deployed the contest
+        const community_id = ''; // TODO: find community id of contest
+        const action_metas = await getQuestActionMetas(
+          { community_id, created_at: payload.created_at },
+          'RecurringContestManagerDeployed',
+        );
+        await recordXpsForQuest(user_id, payload.created_at!, action_metas);
+      },
+      OneOffContestManagerDeployed: async ({ payload }) => {
+        const user_id = 0; // TODO: find user who deployed the contest
+        const community_id = ''; // TODO: find community id of contest
+        const action_metas = await getQuestActionMetas(
+          { community_id, created_at: payload.created_at },
+          'OneOffContestManagerDeployed',
+        );
+        await recordXpsForQuest(user_id, payload.created_at!, action_metas);
+      },
+      ChainEventCreated: async ({ payload }) => {
+        switch (payload.eventSource.eventSignature) {
+          case EvmEventSignatures.Launchpad.TokenLaunched: {
+            const user_id = 0; // TODO: find user who launched the token
+            const community_id = ''; // TODO: find community id of token
+            const created_at = new Date(payload.block.timestamp);
+            const action_metas = await getQuestActionMetas(
+              { community_id, created_at },
+              'ChainEventCreated', // TODO: find by discrete event name, would be easier to have TokenLaunched as discrete event
+            );
+            await recordXpsForQuest(user_id, created_at, action_metas);
+            return;
+          }
+          case EvmEventSignatures.Launchpad.Trade: {
+            const user_id = 0; // TODO: find user who traded the token
+            const community_id = ''; // TODO: find community id of token
+            const created_at = new Date(payload.block.timestamp);
+            const action_metas = await getQuestActionMetas(
+              { community_id, created_at },
+              'ChainEventCreated', // TODO: find by discrete event name, would be easier to have Buy and Sell as discrete events
+            );
+            await recordXpsForQuest(user_id, created_at, action_metas);
+            return;
+          }
+        }
       },
     },
   };
