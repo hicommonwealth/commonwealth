@@ -121,11 +121,11 @@ export const contestCard = frames(async (ctx) => {
         Leaderboard
       </Button>,
       <Button
-        key="prizes"
+        key="voting-rules"
         action="post"
-        target={`/${contest_address}/contestPrizes`}
+        target={`/${contest_address}/votingRules`}
       >
-        Prizes
+        Voting Rules
       </Button>,
       <Button key="install" action="link" target={getActionInstallUrl()}>
         Add Upvote Action
