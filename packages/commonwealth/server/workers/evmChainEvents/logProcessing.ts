@@ -1,31 +1,11 @@
-import { Log } from '@ethersproject/providers';
 import { logger as _logger, stats } from '@hicommonwealth/core';
-import { chainEventMappers } from '@hicommonwealth/model';
+import { EvmBlockDetails, Log, chainEventMappers } from '@hicommonwealth/model';
 import { EventPair, EventPairs } from '@hicommonwealth/schemas';
-import { ethers } from 'ethers';
+import { createPublicClient, getAddress, http } from 'viem';
 import { config } from '../../config';
-import { ContractSources, EvmBlockDetails, EvmSource } from './types';
+import { ContractSources, EvmSource } from './types';
 
 const logger = _logger(import.meta);
-
-/**
- * Converts a string or integer number into a hexadecimal string that adheres to the following guidelines
- * https://ethereum.org/en/developers/docs/apis/json-rpc/#quantities-encoding
- * @param decimal
- */
-function decimalToHex(decimal: number | string) {
-  if (decimal == '0') {
-    return '0x0';
-  } else {
-    return ethers.utils.hexStripZeros(
-      ethers.BigNumber.from(decimal).toHexString(),
-    );
-  }
-}
-
-export function getProvider(rpc: string) {
-  return new ethers.providers.JsonRpcProvider(rpc);
-}
 
 /**
  * Fetches logs from the given EVM source. startingBlockNum can be used to start fetching logs
@@ -50,8 +30,6 @@ export async function getLogs({
   blockDetails: Record<number, EvmBlockDetails>;
 }> {
   let startBlock = startingBlockNum;
-  const provider = getProvider(rpc);
-
   if (startBlock > endingBlockNum) {
     logger.error(
       'Starting block number is greater than the latest/current block number!',
@@ -84,58 +62,39 @@ export async function getLogs({
     );
   }
 
-  // TODO: use Web3.JS instead
-  const logs: Array<{
-    address: string;
-    blockHash: string;
-    blockNumber: string;
-    data: string;
-    logIndex: string;
-    removed: boolean;
-    topics: string[];
-    transactionHash: string;
-    transactionIndex: string;
-  }> = await provider.send('eth_getLogs', [
-    {
-      fromBlock: decimalToHex(startBlock),
-      toBlock: decimalToHex(endingBlockNum),
-      address: contractAddresses,
-    },
-  ]);
+  const client = createPublicClient({
+    transport: http(rpc),
+  });
+  const logs: Log[] = await client.getLogs({
+    address: <`0x${string}`[]>contractAddresses,
+    fromBlock: BigInt(startBlock),
+    toBlock: BigInt(endingBlockNum),
+  });
 
   const blockNumbers = [...new Set(logs.map((l) => l.blockNumber))];
   const blockDetails = await Promise.all(
     blockNumbers.map(async (blockNumber) => {
-      const block = await provider.send('eth_getBlockByNumber', [
-        blockNumber,
-        false,
-      ]);
+      const block = await client.getBlock({
+        blockNumber: blockNumber,
+      });
       return {
-        number: parseInt(block.number, 16),
+        number: block.number,
         hash: block.hash,
         logsBloom: block.logsBloom,
         parentHash: block.parentHash,
         miner: block.miner,
         nonce: block.nonce ? block.nonce.toString() : undefined,
-        timestamp: parseInt(block.timestamp, 16),
-        gasLimit: parseInt(block.gasLimit, 16),
-        gasUsed: parseInt(block.gasUsed, 16),
-      } as EvmBlockDetails;
+        timestamp: block.timestamp,
+        gasLimit: block.gasLimit,
+      };
     }),
   );
 
-  const formattedLogs: Log[] = logs.map((log) => ({
-    ...log,
-    blockNumber: parseInt(log.blockNumber, 16),
-    transactionIndex: parseInt(log.transactionIndex, 16),
-    logIndex: parseInt(log.logIndex, 16),
-  }));
-
   return {
-    logs: formattedLogs,
+    logs,
     lastBlockNum: endingBlockNum,
     blockDetails: blockDetails.reduce((map, details) => {
-      map[details.number] = details;
+      map[String(details.number)] = details;
       return map;
     }, {}),
   };
@@ -149,7 +108,7 @@ export async function parseLogs(
   const events: Array<EventPairs> = [];
 
   for (const log of logs) {
-    const address = ethers.utils.getAddress(log.address);
+    const address = getAddress(log.address);
     const evmEventSources = sources[address];
     if (!evmEventSources) {
       logger.error('Missing event sources', undefined, {
@@ -182,7 +141,7 @@ export async function parseLogs(
             eventSignature: evmEventSource.event_signature,
           },
           rawLog: log,
-          block: blockDetails[log.blockNumber],
+          block: blockDetails[String(log.blockNumber)],
         }) as EventPair<any>,
       );
     } catch (e) {

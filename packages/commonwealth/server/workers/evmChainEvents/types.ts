@@ -1,29 +1,5 @@
-import { Log } from '@ethersproject/providers';
 import { EvmEventSource } from '@hicommonwealth/schemas';
-import { ethers } from 'ethers';
 import { z } from 'zod';
-
-export type EvmBlockDetails = {
-  number: number;
-  hash: string;
-  logsBloom: string;
-  nonce?: string;
-  parentHash: string;
-  timestamp: number;
-  miner: string;
-  gasLimit: number;
-  gasUsed: number;
-};
-
-export type EvmEvent = {
-  eventSource: {
-    ethChainId: number;
-    eventSignature: string;
-  };
-  parsedArgs: ethers.utils.Result;
-  rawLog: Log;
-  block?: EvmBlockDetails;
-};
 
 const sourceType = EvmEventSource.extend({
   contract_name: z.string().optional(),

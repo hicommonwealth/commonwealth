@@ -1,5 +1,4 @@
-import { EventHandler, Policy, logger } from '@hicommonwealth/core';
-import { EvmEventSignatures } from '@hicommonwealth/evm-protocols';
+import { Policy } from '@hicommonwealth/core';
 import { events } from '@hicommonwealth/schemas';
 import { ZodUndefined } from 'zod';
 import { handleCommunityStakeTrades } from './handlers/handleCommunityStakeTrades';
@@ -7,27 +6,6 @@ import { handleLaunchpadTokenCreated } from './handlers/handleLaunchpadTokenCrea
 import { handleLaunchpadTrade } from './handlers/handleLaunchpadTrade';
 import { handleNamespaceDeployedWithReferral } from './handlers/handleNamespaceDeployedWithReferral';
 import { handleReferralFeeDistributed } from './handlers/handleReferralFeeDistributed';
-
-const log = logger(import.meta);
-
-export const processChainEventCreated: EventHandler<
-  'ChainEventCreated',
-  ZodUndefined
-> = async ({ payload }) => {
-  switch (payload.eventSource.eventSignature) {
-    case EvmEventSignatures.Launchpad.TokenLaunched: {
-      break;
-    }
-
-    case EvmEventSignatures.Launchpad.Trade:
-      await handleLaunchpadTrade(payload);
-      break;
-
-    case EvmEventSignatures.Referrals.FeeDistributed:
-      await handleReferralFeeDistributed(payload);
-      break;
-  }
-};
 
 const chainEventInputs = {
   CommunityStakeTrade: events.CommunityStakeTrade,

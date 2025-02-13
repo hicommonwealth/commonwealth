@@ -1,9 +1,10 @@
 import { logger, stats } from '@hicommonwealth/core';
 import { emitEvent, models } from '@hicommonwealth/model';
 import { EventPairs } from '@hicommonwealth/schemas';
+import { createPublicClient, http } from 'viem';
 import { config } from '../../config';
 import { getEventSources } from './getEventSources';
-import { getEvents, getProvider, migrateEvents } from './logProcessing';
+import { getEvents, migrateEvents } from './logProcessing';
 import { EvmSource } from './types';
 import { updateMigratedEvmEventSources } from './utils';
 
@@ -45,8 +46,10 @@ export async function processChainNode(
       },
     });
 
-    const provider = getProvider(evmSource.rpc);
-    const currentBlock = await provider.getBlockNumber();
+    const client = createPublicClient({
+      transport: http(evmSource.rpc),
+    });
+    const currentBlock = Number(await client.getBlockNumber());
 
     let startBlockNum: number;
     if (!lastProcessedBlock) {

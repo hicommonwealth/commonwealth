@@ -11,20 +11,19 @@ import {
 } from '@hicommonwealth/evm-protocols';
 import { EventPair, Events } from '@hicommonwealth/schemas';
 
-type EvmBlockDetails = {
-  number: number;
+export type EvmBlockDetails = {
+  number: bigint;
   hash: string;
   logsBloom: string;
   nonce?: string;
   parentHash: string;
-  timestamp: number;
+  timestamp: bigint;
   miner: string;
-  gasLimit: number;
-  gasUsed: number;
+  gasLimit: bigint;
 };
 
-type Log = {
-  blockNumber: number;
+export type Log = {
+  blockNumber: bigint;
   blockHash: string;
   transactionIndex: number;
 

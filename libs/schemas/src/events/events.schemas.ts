@@ -28,7 +28,7 @@ const ChainEventBase = z.object({
     ethChainId: z.number(),
   }),
   rawLog: z.object({
-    blockNumber: z.number(),
+    blockNumber: z.coerce.bigint(),
     blockHash: z.string(),
     transactionIndex: z.number(),
     removed: z.boolean(),
@@ -39,15 +39,14 @@ const ChainEventBase = z.object({
     logIndex: z.number(),
   }),
   block: z.object({
-    number: z.number(),
+    number: z.coerce.bigint(),
     hash: z.string(),
     logsBloom: z.string(),
     nonce: z.string().optional(),
     parentHash: z.string(),
-    timestamp: z.number(),
+    timestamp: z.coerce.bigint(),
     miner: z.string(),
-    gasLimit: z.number(),
-    gasUsed: z.number(),
+    gasLimit: z.coerce.bigint(),
   }),
 });
 
