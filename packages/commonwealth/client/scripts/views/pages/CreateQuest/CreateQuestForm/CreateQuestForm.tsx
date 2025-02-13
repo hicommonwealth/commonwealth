@@ -74,6 +74,7 @@ const CreateQuestForm = () => {
           name="start_date"
           minDate={minStartDate}
           selected={minStartDate}
+          showTimeInput
         />
         <CWDateTimeInput
           label="End Date"
@@ -81,6 +82,7 @@ const CreateQuestForm = () => {
           name="end_date"
           minDate={minStartDate}
           selected={null}
+          showTimeInput
         />
       </div>
 

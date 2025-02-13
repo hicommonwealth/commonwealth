@@ -73,6 +73,8 @@ export const CWDateTimeInput = ({
         closeOnScroll
         calendarClassName="calender"
         selected={startDate}
+        dateFormat="d MMMM, yyyy h:mm aa"
+        timeInputLabel="Select time (utc)"
         icon={
           <CWIcon
             iconName="calenderBlank"
