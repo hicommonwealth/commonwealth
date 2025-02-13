@@ -7,10 +7,10 @@ import useTokenData from '../../hooks/useTokenData';
 import './TokenSwapTab.scss';
 
 const TokenSwapTab = () => {
-  const { isPinnedToken, tokenLaunchModalConfig, isLoadingToken } =
+  const { isPinnedToken, tokenLaunchModalConfig, isLoadingToken, address } =
     useTokenData();
 
-  if (isLoadingToken) return;
+  if (isLoadingToken || !address) return;
 
   return (
     <div className="TokenSwapTab">
