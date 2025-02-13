@@ -34,8 +34,7 @@ export async function handleReferralFeeDistributed(
   // enforce chain events in flow are processed in order
   if (!referral) throw Error('Referral fee received out of order');
 
-  const referrer_received_amount =
-    Number(BigNumber.from(fee_amount).toBigInt()) / 1e18;
+  const referrer_received_amount = BigNumber.from(fee_amount).toBigInt();
 
   await models.sequelize.transaction(async (transaction) => {
     await models.ReferralFee.create(
@@ -47,7 +46,7 @@ export async function handleReferralFeeDistributed(
         referrer_recipient_address: referrer_address,
         referrer_received_amount,
         referee_address: referral.referee_address,
-        transaction_timestamp: Number(event.block.timestamp),
+        transaction_timestamp: BigInt(event.block.timestamp),
       },
       { transaction },
     );
@@ -62,14 +61,14 @@ export async function handleReferralFeeDistributed(
 
       if (referrer) {
         await models.User.increment('referral_eth_earnings', {
-          by: referrer_received_amount,
+          by: Number(referrer_received_amount),
           where: { id: referrer.user_id! },
           transaction,
         });
       }
 
       await referral.increment('referrer_received_eth_amount', {
-        by: referrer_received_amount,
+        by: Number(referrer_received_amount),
         transaction,
       });
     }
