@@ -1,5 +1,4 @@
 import { ChainBase } from '@hicommonwealth/shared';
-import { useTokenTradeWidget } from 'client/scripts/views/components/sidebar/CommunitySection/TokenTradeWidget/useTokenTradeWidget';
 import {
   TradingConfig,
   TradingMode,
@@ -7,6 +6,7 @@ import {
 import { LaunchpadToken } from 'client/scripts/views/modals/TradeTokenModel/CommonTradeModal/types';
 import { ExternalToken } from 'client/scripts/views/modals/TradeTokenModel/UniswapTradeModal/types';
 import { useEffect, useState } from 'react';
+import { useTokenTradeWidget } from 'views/components/sidebar/CommunitySection/TokenTradeWidget/useTokenTradeWidget';
 
 const useTokenData = () => {
   const [tokenLaunchModalConfig, setTokenLaunchModalConfig] = useState<{
