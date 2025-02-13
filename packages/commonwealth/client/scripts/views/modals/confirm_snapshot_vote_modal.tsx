@@ -98,9 +98,10 @@ export const ConfirmSnapshotVoteModal = (
           <div className="vote-info-row">
             <CWText>Your voting power</CWText>
             <CWText>
-              {`${formatBigNumberShort(BigNumber.from(totalScore))} ${space.symbol
-                .slice(0, 6)
-                .trim()}...`}
+              {`${formatBigNumberShort(
+                BigNumber.from(totalScore).toNumber(),
+                8,
+              )} ${space.symbol.slice(0, 6).trim()}...`}
             </CWText>
           </div>
         </div>

@@ -1,7 +1,7 @@
 import type { DeltaStatic } from 'quill';
 import React, { useEffect, useRef, useState } from 'react';
 
-import { CommentsView } from '@hicommonwealth/schemas';
+import { CommentsView, TopicWeightedVoting } from '@hicommonwealth/schemas';
 import {
   CanvasSignedData,
   DEFAULT_NAME,
@@ -74,6 +74,7 @@ type CommentCardProps = {
   // other
   className?: string;
   shareURL: string;
+  weightType?: TopicWeightedVoting | null;
   onAIReply?: () => Promise<void>;
   // AI streaming props
   isStreamingAIReply?: boolean;
@@ -114,6 +115,7 @@ export const CommentCard = ({
   // other
   className,
   shareURL,
+  weightType,
   onAIReply,
   isStreamingAIReply,
   parentCommentText,
@@ -419,6 +421,7 @@ export const CommentCard = ({
                         : disabledActionsTooltipText
                     }
                     onReaction={handleReaction}
+                    weightType={weightType}
                   />
                 )}
 
@@ -434,6 +437,7 @@ export const CommentCard = ({
                       comment={comment}
                       isOpen={isUpvoteDrawerOpen}
                       setIsOpen={setIsUpvoteDrawerOpen}
+                      weightType={weightType}
                     />
                   </>
                 )}

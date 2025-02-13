@@ -2,7 +2,7 @@ import { ChainEventSigs } from '@hicommonwealth/evm-protocols';
 import {
   ETHERS_BIG_NUMBER,
   EVM_ADDRESS,
-  EventNames,
+  Events,
   events,
 } from '@hicommonwealth/schemas';
 import { BigNumber } from 'ethers';
@@ -42,8 +42,9 @@ type EvmMapper<Input extends string, Output extends ZodSchema> = {
   mapEvmToSchema: (
     contestAddress: string | null,
     evmInput: ParseSignature<Input>,
+    blockNumber: number,
   ) => {
-    event_name: EventNames;
+    event_name: Events;
     event_payload: z.infer<Output>;
   };
 };
@@ -58,12 +59,14 @@ const RecurringContestManagerDeployedMapper: EvmMapper<
   mapEvmToSchema: (
     contestAddress,
     { contest, namespace, interval, oneOff: _ },
+    blockNumber,
   ) => ({
-    event_name: EventNames.RecurringContestManagerDeployed,
+    event_name: 'RecurringContestManagerDeployed',
     event_payload: {
       contest_address: contest,
       namespace: namespace,
       interval: BigNumber.from(interval).toNumber(),
+      block_number: blockNumber,
     },
   }),
 };
@@ -78,12 +81,14 @@ const OneOffContestManagerDeployedMapper: EvmMapper<
   mapEvmToSchema: (
     contestAddress,
     { contest, namespace, interval, oneOff: _ },
+    blockNumber,
   ) => ({
-    event_name: EventNames.OneOffContestManagerDeployed,
+    event_name: 'OneOffContestManagerDeployed',
     event_payload: {
       contest_address: contest,
       namespace: namespace,
       length: BigNumber.from(interval).toNumber(),
+      block_number: blockNumber,
     },
   }),
 };
@@ -95,7 +100,7 @@ const NewRecurringContestStartedMapper: EvmMapper<
   signature: ChainEventSigs.NewRecurringContestStarted,
   output: events.ContestStarted,
   mapEvmToSchema: (contestAddress, { contestId, startTime, endTime }) => ({
-    event_name: EventNames.ContestStarted,
+    event_name: 'ContestStarted',
     event_payload: {
       contest_address: contestAddress!,
       contest_id: BigNumber.from(contestId).toNumber(),
@@ -113,7 +118,7 @@ const NewSingleContestStartedMapper: EvmMapper<
   signature: ChainEventSigs.NewSingleContestStarted,
   output: events.ContestStarted,
   mapEvmToSchema: (contestAddress, { startTime, endTime }) => ({
-    event_name: EventNames.ContestStarted,
+    event_name: 'ContestStarted',
     event_payload: {
       contest_address: contestAddress!,
       contest_id: 0,
@@ -131,7 +136,7 @@ const NewContestContentAddedMapper: EvmMapper<
   signature: ChainEventSigs.ContentAdded,
   output: events.ContestContentAdded,
   mapEvmToSchema: (contestAddress, { contentId, creator, url }) => ({
-    event_name: EventNames.ContestContentAdded,
+    event_name: 'ContestContentAdded',
     event_payload: {
       contest_address: contestAddress!,
       content_id: BigNumber.from(contentId).toNumber(),
@@ -151,7 +156,7 @@ const ContestContentUpvotedRecurringMapper: EvmMapper<
     contestAddress,
     { contestId, contentId, voter, votingPower },
   ) => ({
-    event_name: EventNames.ContestContentUpvoted,
+    event_name: 'ContestContentUpvoted',
     event_payload: {
       contest_address: contestAddress!,
       contest_id: BigNumber.from(contestId).toNumber(),
@@ -169,7 +174,7 @@ const ContestContentUpvotedOneOffMapper: EvmMapper<
   signature: ChainEventSigs.VoterVotedOneOff,
   output: events.ContestContentUpvoted,
   mapEvmToSchema: (contestAddress, { contentId, voter, votingPower }) => ({
-    event_name: EventNames.ContestContentUpvoted,
+    event_name: 'ContestContentUpvoted',
     event_payload: {
       contest_address: contestAddress!,
       contest_id: BigNumber.from(0).toNumber(),
@@ -233,7 +238,7 @@ type ParserReturnType<Event extends keyof typeof ChainEventSigs> =
 
 // ContestOutboxEvent is the outbox shape
 type ContestOutboxEvent<Event extends keyof typeof ChainEventSigs> = {
-  event_name: EventNames;
+  event_name: Events;
   event_payload: ParserReturnType<Event>;
 };
 
@@ -244,6 +249,7 @@ export const parseEvmEventToContestEvent = <
   chainEventName: Event,
   contestAddress: string | null,
   evmParsedArgs: Result,
+  blockNumber: number,
 ): ContestOutboxEvent<Event> => {
   const m = EvmMappers[chainEventName];
   if (!m) {
@@ -254,7 +260,7 @@ export const parseEvmEventToContestEvent = <
   for (const mapper of mappers) {
     const evmInput = parseEthersResult(mapper.signature, evmParsedArgs);
     if (!mapper.condition || mapper.condition(evmInput)) {
-      return mapper.mapEvmToSchema(contestAddress, evmInput);
+      return mapper.mapEvmToSchema(contestAddress, evmInput, blockNumber);
     }
   }
   throw new Error(`No valid mapper found for event: ${chainEventName}`);

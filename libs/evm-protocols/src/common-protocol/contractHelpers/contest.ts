@@ -408,6 +408,18 @@ export const rollOverContest = async ({
       contest,
     );
 
+    if (oneOff) {
+      const contestEnded = await contestInstance.methods.contestEnded().call();
+      if (contestEnded) {
+        return false;
+      } else {
+        const endTime = await contestInstance.methods.endTime().call();
+        const currentTime = Math.floor(Date.now() / 1000);
+        if (Number(endTime) > currentTime) {
+          return false;
+        }
+      }
+    }
     const contractCall = oneOff
       ? contestInstance.methods.endContest()
       : contestInstance.methods.newContest();

@@ -7,7 +7,7 @@ export type EvmClientType = Web3Type;
 export const calculateVoteWeight = (
   balance: string, // should be in wei
   voteWeight: number = 0,
-  precision: number = 10 ** 18, // precision factor for multiplying
+  precision: number = 10 ** 16, // precision factor for multiplying
 ): bigint | null => {
   if (!balance || voteWeight <= 0) return null;
   // solution to multiply BigInt with fractional vote weight
@@ -48,6 +48,17 @@ export const getBlock = async ({
     block: await web3.eth.getBlock(blockHash),
     evmClient: web3,
   };
+};
+
+export const getBlockNumber = async ({
+  evmClient,
+  rpc,
+}: {
+  evmClient?: EvmClientType;
+  rpc: string;
+}): Promise<number> => {
+  const web3 = evmClient || new Web3(rpc);
+  return Number(await web3.eth.getBlockNumber());
 };
 
 export const getTransactionReceipt = async ({

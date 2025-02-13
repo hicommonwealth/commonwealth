@@ -76,6 +76,7 @@
             background-color: $neutral-100;
           }
         }
+
         .CommunityName.no-hover:hover {
           background-color: transparent;
         }
@@ -90,7 +91,8 @@
         padding: 8px;
 
         .Stat {
-          flex: 1 0 200px; /* Adjust to your preference */
+          flex: 1 0 200px;
+          /* Adjust to your preference */
 
           .StatValue {
             color: $neutral-500;
@@ -98,5 +100,17 @@
         }
       }
     }
+  }
+
+  .ResourceTimestampsUpdateForm {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: initial !important;
+    width: 100% !important;
+    gap: 12px !important;
+  }
+
+  .danger {
+    color: $rorange-600;
   }
 }

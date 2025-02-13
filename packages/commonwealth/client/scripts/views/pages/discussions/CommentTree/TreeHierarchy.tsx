@@ -193,6 +193,7 @@ export const TreeHierarchy = ({
                     }
                     comment={comment}
                     shareURL={`${window.location.origin}${window.location.pathname}?comment=${comment.id}`}
+                    weightType={thread.topic?.weighted_voting}
                   />
                 </div>
                 {comment.reply_count > 0 && (

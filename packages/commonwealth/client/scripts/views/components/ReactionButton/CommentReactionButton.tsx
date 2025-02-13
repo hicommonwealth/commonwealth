@@ -1,3 +1,4 @@
+import { TopicWeightedVoting } from '@hicommonwealth/schemas';
 import { buildCreateCommentReactionInput } from 'client/scripts/state/api/comments/createReaction';
 import { buildDeleteCommentReactionInput } from 'client/scripts/state/api/comments/deleteReaction';
 import { useAuthModalStore } from 'client/scripts/state/ui/modals';
@@ -5,6 +6,7 @@ import { notifyError } from 'controllers/app/notifications';
 import { SessionKeyError } from 'controllers/server/sessions';
 import { BigNumber } from 'ethers';
 import React, { useState } from 'react';
+import { prettyVoteWeight } from 'shared/adapters/currency';
 import app from 'state';
 import useUserStore from 'state/ui/user';
 import CWUpvoteSmall from 'views/components/component_kit/new_designs/CWUpvoteSmall';
@@ -21,6 +23,7 @@ type CommentReactionButtonProps = {
   disabled: boolean;
   tooltipText?: string;
   onReaction?: () => void;
+  weightType?: TopicWeightedVoting | null;
 };
 
 export const CommentReactionButton = ({
@@ -28,6 +31,7 @@ export const CommentReactionButton = ({
   disabled,
   tooltipText = '',
   onReaction,
+  weightType,
 }: CommentReactionButtonProps) => {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
   const user = useUserStore();
@@ -109,6 +113,13 @@ export const CommentReactionButton = ({
     }
   };
 
+  const formattedVoteCount = prettyVoteWeight(
+    reactionWeightsSum.toString(),
+    weightType,
+    1,
+    6,
+  );
+
   return (
     <>
       <AuthModal
@@ -116,7 +127,7 @@ export const CommentReactionButton = ({
         isOpen={isAuthModalOpen}
       />
       <CWUpvoteSmall
-        voteCount={reactionWeightsSum.toString()}
+        voteCount={formattedVoteCount}
         disabled={!user.activeAccount || disabled}
         selected={hasReacted}
         onClick={handleVoteClick}

@@ -28,7 +28,6 @@ const {
   PROVIDER_URL,
   ETH_RPC,
   COSMOS_REGISTRY_API,
-  REACTION_WEIGHT_OVERRIDE,
   ALCHEMY_PRIVATE_APP_KEY,
   ALCHEMY_PUBLIC_APP_KEY,
   MEMBERSHIP_REFRESH_BATCH_SIZE,
@@ -88,11 +87,6 @@ export const config = configure(
       BLACKLISTED_EVENTS: BLACKLISTED_EVENTS
         ? BLACKLISTED_EVENTS.split(',')
         : [],
-    },
-    STAKE: {
-      REACTION_WEIGHT_OVERRIDE: REACTION_WEIGHT_OVERRIDE
-        ? parseInt(REACTION_WEIGHT_OVERRIDE, 10)
-        : null,
     },
     CONTESTS: {
       MIN_USER_ETH: 0,
@@ -215,9 +209,6 @@ export const config = configure(
     }),
     OUTBOX: z.object({
       BLACKLISTED_EVENTS: z.array(z.string()),
-    }),
-    STAKE: z.object({
-      REACTION_WEIGHT_OVERRIDE: z.number().int().nullish(),
     }),
     CONTESTS: z.object({
       MIN_USER_ETH: z.number(),

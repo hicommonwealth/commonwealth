@@ -1,6 +1,7 @@
 import { chainEvents, events } from '@hicommonwealth/schemas';
 import { ZERO_ADDRESS } from '@hicommonwealth/shared';
 import { BigNumber } from 'ethers';
+import { Op } from 'sequelize';
 import { z } from 'zod';
 import { models } from '../../database';
 
@@ -28,12 +29,10 @@ export async function handleReferralFeeDistributed(
 
   // find the referral (already mapped to a namespace)
   const referral = await models.Referral.findOne({
-    where: {
-      referrer_address,
-      namespace_address,
-    },
+    where: { namespace_address, referrer_address },
   });
-  if (!referral) return; // we must guarantee the order of chain events here
+  // enforce chain events in flow are processed in order
+  if (!referral) throw Error('Referral fee received out of order');
 
   const referrer_received_amount =
     Number(BigNumber.from(fee_amount).toBigInt()) / 1e18;
@@ -56,9 +55,11 @@ export async function handleReferralFeeDistributed(
     // if native token i.e. ETH
     if (distributed_token_address === ZERO_ADDRESS) {
       const referrer = await models.Address.findOne({
-        where: { address: referrer_address },
+        where: { address: referrer_address, user_id: { [Op.not]: null } },
+        attributes: ['user_id'],
         transaction,
       });
+
       if (referrer) {
         await models.User.increment('referral_eth_earnings', {
           by: referrer_received_amount,

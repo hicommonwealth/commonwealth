@@ -234,8 +234,11 @@ export async function getEvents(
 export async function migrateEvents(
   evmSource: EvmSource,
   endingBlockNum: number,
-): Promise<{ events: EvmEvent[]; lastBlockNum: number } | undefined> {
-  let oldestBlock: number;
+): Promise<
+  | { events: EvmEvent[]; lastBlockNum: number; contracts: ContractSources }
+  | { contracts: ContractSources }
+> {
+  let oldestBlock: number | undefined;
   const contracts: ContractSources = {};
   for (const [contractAddress, abiSignature] of Object.entries(
     evmSource.contracts,
@@ -249,7 +252,6 @@ export async function migrateEvents(
           };
         }
         contracts[contractAddress].sources.push(source);
-        // @ts-expect-error StrictNullChecks
         if (!oldestBlock || oldestBlock > source.created_at_block) {
           oldestBlock = source.created_at_block;
         }
@@ -257,26 +259,28 @@ export async function migrateEvents(
     }
   }
 
-  if (Object.keys(contracts).length > 0) {
+  if (Object.keys(contracts).length > 0 && oldestBlock) {
     const result = await getEvents(
       {
         rpc: evmSource.rpc,
         maxBlockRange: evmSource.maxBlockRange,
         contracts,
       },
-      // @ts-expect-error StrictNullChecks
       oldestBlock,
       endingBlockNum,
     );
     config.WORKERS.EVM_CE_TRACE &&
       logger.warn('Events migrated', {
-        // @ts-expect-error StrictNullChecks
         startingBlockNum: oldestBlock,
         endingBlockNum,
       });
-    return result;
+    return {
+      events: result.events,
+      lastBlockNum: result.lastBlockNum,
+      contracts,
+    };
   } else {
-    // logger.info('No events to migrate');
-    return;
+    config.WORKERS.EVM_CE_TRACE && logger.info('No events to migrate');
+    return { contracts };
   }
 }

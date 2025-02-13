@@ -11,4 +11,9 @@ export const trpcRouter = trpc.router({
     SuperAdmin.EnableDigestEmail,
     trpc.Tag.SuperAdmin,
   ),
+
+  updateResourceTimestamps: trpc.command(
+    SuperAdmin.UpdateResourceTimestamps,
+    trpc.Tag.SuperAdmin,
+  ),
 });
