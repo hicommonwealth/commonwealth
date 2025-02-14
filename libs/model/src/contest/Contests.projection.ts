@@ -9,11 +9,16 @@ import {
 } from '@hicommonwealth/evm-protocols';
 import { config } from '@hicommonwealth/model';
 import { events } from '@hicommonwealth/schemas';
-import { buildContestLeaderboardUrl, getBaseUrl } from '@hicommonwealth/shared';
+import {
+  buildContestLeaderboardUrl,
+  buildFarcasterContestFrameUrl,
+  getBaseUrl,
+} from '@hicommonwealth/shared';
 import { QueryTypes } from 'sequelize';
 import { models } from '../database';
 import { mustExist } from '../middleware/guards';
 import { EvmEventSourceAttributes } from '../models';
+import { DEFAULT_CONTEST_BOT_PARAMS } from '../services/openai/parseBotCommand';
 import { getWeightedNumTokens } from '../services/stakeHelper';
 import {
   decodeThreadContentUrl,
@@ -258,6 +263,31 @@ export function Contests(): Projection<typeof inputs> {
           true,
           payload.block_number,
         );
+
+        // if bot-created farcaster contest, notify author
+        const contestManager = await models.ContestManager.findOne({
+          where: {
+            contest_address: payload.contest_address,
+          },
+        });
+        mustExist('Contest Manager', contestManager);
+
+        if (contestManager.farcaster_author_cast_hash) {
+          await publishCast(
+            contestManager.farcaster_author_cast_hash,
+            ({ username }) => {
+              const {
+                payoutStructure: [winner1, winner2, winner3],
+                voterShare,
+              } = DEFAULT_CONTEST_BOT_PARAMS;
+              return `Hey @${username}, your contest has been created. The prize distribution is ${winner1}% to winner, ${winner2}% to second place, ${winner3}% to third , and ${voterShare}% going to voters. The contest will run for 7 days. Anyone who replies to a cast containing the frame enters the contest.`;
+            },
+            {
+              // eslint-disable-next-line max-len
+              embed: `${getBaseUrl(config.APP_ENV, config.CONTESTS.FARCASTER_NGROK_DOMAIN!)}${buildFarcasterContestFrameUrl(payload.contest_address)}`,
+            },
+          );
+        }
       },
 
       // This happens for each recurring contest _after_ the initial contest
