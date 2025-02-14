@@ -14,11 +14,18 @@
   &.onadd {
     animation: slidein 0.2s ease-in-out;
     display: flex;
+    @include smallInclusive {
+      animation: slidein 0.3s ease-in-out;
+    }
   }
 
   &.onremove {
     animation: slideout 0.2s ease-in-out;
     display: none;
+
+    @include smallInclusive {
+      animation: slideout 0.3s ease-in-out;
+    }
   }
 
   .sidebar-header-wrapper {
@@ -85,7 +92,6 @@
       padding: 8px 16px;
     }
   }
-
   @keyframes slidein {
     from {
       left: -100%;
