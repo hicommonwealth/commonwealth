@@ -73,6 +73,9 @@ export default defineConfig(({ mode }) => {
     'process.env.FARCASTER_NGROK_DOMAIN': JSON.stringify(
       env.FARCASTER_NGROK_DOMAIN,
     ),
+    'process.env.CONTEST_DURATION_IN_SEC': JSON.stringify(
+      env.CONTEST_DURATION_IN_SEC,
+    ),
     'process.env.MIXPANEL_DEV_TOKEN':
       JSON.stringify(env.MIXPANEL_DEV_TOKEN) ||
       JSON.stringify('312b6c5fadb9a88d98dc1fb38de5d900'),
