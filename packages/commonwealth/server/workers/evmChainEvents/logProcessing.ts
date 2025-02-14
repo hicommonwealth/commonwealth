@@ -1,6 +1,6 @@
 import { logger as _logger, stats } from '@hicommonwealth/core';
 import { EvmBlockDetails, Log, chainEventMappers } from '@hicommonwealth/model';
-import { EventPair, EventPairs } from '@hicommonwealth/schemas';
+import { EventPairs } from '@hicommonwealth/schemas';
 import { createPublicClient, getAddress, http } from 'viem';
 import { config } from '../../config';
 import { ContractSources, EvmSource } from './types';
@@ -142,7 +142,7 @@ export async function parseLogs(
           },
           rawLog: log,
           block: blockDetails[String(log.blockNumber)],
-        }) as EventPair<any>,
+        }) as EventPairs,
       );
     } catch (e) {
       const msg = `Failed to map log from contract ${address} with signature ${log.topics[0]}`;
