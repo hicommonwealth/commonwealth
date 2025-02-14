@@ -57,8 +57,6 @@ export const contestCard = frames(async (ctx) => {
 
   const endTime = contestManager.contests?.[0]?.end_time;
 
-  console.log('endTime', endTime);
-
   return {
     title: contestManager.name,
     image: (
