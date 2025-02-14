@@ -286,7 +286,7 @@ jobs:
         with:
           flag-name: unit-test-coverage
           parallel: true
-          files: libs/adapters/coverage/lcov.info libs/core/coverage/lcov.info libs/model/coverage/lcov.info libs/sitemaps/coverage/lcov.info
+          files: libs/adapters/coverage/lcov.info libs/model/coverage/lcov.info libs/sitemaps/coverage/lcov.info
 
 
   commonwealth-evm-tests:
