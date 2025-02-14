@@ -69,7 +69,7 @@ const QuestActionCard = ({
           {doesActionRequireCreatorReward(questAction.event_name) && (
             <CWText type="caption" className="xp-shares">
               <span className="creator-share">
-                {questAction.creator_reward_weight}%
+                {questAction.creator_reward_weight * 100}%
               </span>
               &nbsp; shared with {actionCopies.shares[questAction.event_name]}
             </CWText>
