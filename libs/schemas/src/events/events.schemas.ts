@@ -387,4 +387,14 @@ export const events = {
       recipientAmount: z.coerce.bigint(),
     }),
   }),
+
+  NamespaceDeployed: ChainEventBase.extend({
+    parsedArgs: z.object({
+      name: z.string(),
+      _feeManager: z.literal(`0x${z.string()}`),
+      _signature: z.literal(`0x${z.string()}`),
+      _namespaceDeployer: z.literal(`0x${z.string()}`),
+      nameSpaceAddress: z.literal(`0x${z.string()}`),
+    }),
+  }),
 } as const;

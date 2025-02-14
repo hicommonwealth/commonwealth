@@ -486,3 +486,45 @@ export const formatDecimalToWei = (
   const value = parseFloat(decimal) * 10 ** 18;
   return (value || defaultValue).toString();
 };
+
+export function bigIntReplacer(key: string, value: unknown) {
+  if (typeof value === 'bigint') {
+    return {
+      type: 'BigInt',
+      value: value.toString(),
+    };
+  }
+  return value;
+}
+
+export function bigIntReviver(key: string, value: unknown) {
+  if (
+    value &&
+    typeof value === 'object' &&
+    'type' in value &&
+    value.type === 'BigInt' &&
+    'value' in value
+  ) {
+    return BigInt(value.value as string);
+  }
+  return value;
+}
+
+export function serializeBigInt(
+  obj: Record<string | number | symbol, unknown>,
+): Record<string | number | symbol, unknown> {
+  const traverse = (value: unknown): unknown => {
+    if (typeof value === 'bigint') {
+      return { type: 'BigInt', value: value.toString() };
+    } else if (Array.isArray(value)) {
+      return value.map(traverse);
+    } else if (value && typeof value === 'object' && !Array.isArray(value)) {
+      return Object.fromEntries(
+        Object.entries(value).map(([key, val]) => [key, traverse(val)]),
+      );
+    }
+    return value;
+  };
+
+  return traverse(obj) as Record<string | number | symbol, unknown>;
+}

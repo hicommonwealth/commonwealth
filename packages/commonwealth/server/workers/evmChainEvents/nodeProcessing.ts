@@ -1,6 +1,7 @@
 import { logger, stats } from '@hicommonwealth/core';
 import { emitEvent, models } from '@hicommonwealth/model';
 import { EventPairs } from '@hicommonwealth/schemas';
+import { serializeBigInt } from '@hicommonwealth/shared';
 import { createPublicClient, http } from 'viem';
 import { config } from '../../config';
 import { getEventSources } from './getEventSources';
@@ -115,7 +116,11 @@ export async function processChainNode(
             ),
           )}`,
         );
-        await emitEvent(models.Outbox, allEvents, transaction);
+        await emitEvent(
+          models.Outbox,
+          allEvents.map((e) => serializeBigInt(e)) as Array<EventPairs>,
+          transaction,
+        );
         await updateMigratedEvmEventSources(
           ethChainId,
           migratedData,

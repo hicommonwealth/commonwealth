@@ -452,6 +452,9 @@ importers:
       '@hicommonwealth/schemas':
         specifier: workspace:*
         version: link:../schemas
+      '@hicommonwealth/shared':
+        specifier: workspace:*
+        version: link:../shared
       dotenv:
         specifier: ^16.0.3
         version: 16.4.5

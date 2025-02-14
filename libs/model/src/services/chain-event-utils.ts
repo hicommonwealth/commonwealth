@@ -66,6 +66,23 @@ const stakeTradeMapper: EvmMapper<'CommunityStakeTrade'> = (
   };
 };
 
+const namespaceDeployedMapper: EvmMapper<'NamespaceDeployed'> = (
+  event: EvmEvent,
+) => {
+  const decoded = decodeLog<typeof namespaceFactoryAbi, 'DeployedNamespace'>({
+    abi: namespaceFactoryAbi,
+    data: event.rawLog.data,
+    topics: event.rawLog.topics,
+  });
+  return {
+    event_name: 'NamespaceDeployed',
+    event_payload: {
+      ...event,
+      parsedArgs: decoded.args,
+    },
+  };
+};
+
 const referralNamespaceDeployedMapper: EvmMapper<
   'NamespaceDeployedWithReferral'
 > = (event: EvmEvent) => {
@@ -277,6 +294,9 @@ const singleContestVoteMapper: EvmMapper<'ContestContentUpvoted'> = (
 
 // TODO: type should match EventRegistry event signatures
 export const chainEventMappers: Record<string, EvmMapper<Events>> = {
+  [EvmEventSignatures.NamespaceFactory.NamespaceDeployed]:
+    namespaceDeployedMapper,
+
   // Stake
   [EvmEventSignatures.CommunityStake.Trade]: stakeTradeMapper,
 

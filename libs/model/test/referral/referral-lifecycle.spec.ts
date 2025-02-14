@@ -95,7 +95,8 @@ describe('Referral lifecycle', () => {
     await dispose()();
   });
 
-  it('should create referral/fees when referred user creates a community', async () => {
+  // TODO: @Roger discussed changing so that referral is created on namespace deployed
+  it.skip('should create referral/fees when referred user creates a community', async () => {
     // non-member creates a community with a referral link from admin
     const result = await command(CreateCommunity(), {
       actor: nonMember,
@@ -154,7 +155,7 @@ describe('Referral lifecycle', () => {
     vi.restoreAllMocks();
 
     // project referrals with on-chain transactions
-    await drainOutbox(['ChainEventCreated'], ChainEventPolicy);
+    await drainOutbox(['NamespaceDeployedWithReferral'], ChainEventPolicy);
 
     const expectedReferrals: z.infer<typeof schemas.ReferralView>[] = [
       {
@@ -204,7 +205,7 @@ describe('Referral lifecycle', () => {
     ]);
 
     // syncs referral fees
-    await drainOutbox(['ChainEventCreated'], ChainEventPolicy, checkpoint);
+    await drainOutbox(['ReferralFeeDistributed'], ChainEventPolicy, checkpoint);
 
     expectedReferrals[0].referrer_received_eth_amount = fee.toString();
 

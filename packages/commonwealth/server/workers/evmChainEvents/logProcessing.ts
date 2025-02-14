@@ -65,11 +65,11 @@ export async function getLogs({
   const client = createPublicClient({
     transport: http(rpc),
   });
-  const logs: Log[] = await client.getLogs({
+  const logs: Log[] = (await client.getLogs({
     address: <`0x${string}`[]>contractAddresses,
     fromBlock: BigInt(startBlock),
     toBlock: BigInt(endingBlockNum),
-  });
+  })) as Log[];
 
   const blockNumbers = [...new Set(logs.map((l) => l.blockNumber))];
   const blockDetails = await Promise.all(
