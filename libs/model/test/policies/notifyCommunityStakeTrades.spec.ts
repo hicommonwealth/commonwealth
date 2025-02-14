@@ -83,7 +83,11 @@ describe('chainEventCreated Event Handler', () => {
           eventSource: {
             eventSignature: EvmEventSignatures.CommunityStake.Trade,
           },
-          parsedArgs: ['0x1', '0xunsupported', true],
+          parsedArgs: {
+            trader: '0x1',
+            namespace: '0xunsupported',
+            isBuy: true,
+          },
         } as unknown as z.infer<typeof events.CommunityStakeTrade>,
       });
     });
@@ -99,7 +103,11 @@ describe('chainEventCreated Event Handler', () => {
           eventSource: {
             eventSignature: EvmEventSignatures.CommunityStake.Trade,
           },
-          parsedArgs: ['0x1', namespaceAddress, true],
+          parsedArgs: {
+            trader: '0x1',
+            namespace: namespaceAddress,
+            isBuy: true,
+          },
         } as unknown as z.infer<typeof events.CommunityStakeTrade>,
       });
       expect(provider.triggerWorkflow as Mock).not.toHaveBeenCalled();
@@ -122,7 +130,11 @@ describe('chainEventCreated Event Handler', () => {
           eventSource: {
             eventSignature: EvmEventSignatures.CommunityStake.Trade,
           },
-          parsedArgs: ['0x1', namespaceAddress, true],
+          parsedArgs: {
+            trader: '0x1',
+            namespace: namespaceAddress,
+            isBuy: true,
+          },
         } as unknown as z.infer<typeof events.CommunityStakeTrade>,
       });
       expect(provider.triggerWorkflow as Mock).toHaveBeenCalledOnce();
@@ -158,7 +170,11 @@ describe('chainEventCreated Event Handler', () => {
             eventSource: {
               eventSignature: EvmEventSignatures.CommunityStake.Trade,
             },
-            parsedArgs: ['0x1', namespaceAddress, true],
+            parsedArgs: {
+              trader: '0x1',
+              namespace: namespaceAddress,
+              isBuy: true,
+            },
           } as unknown as z.infer<typeof events.CommunityStakeTrade>,
         }),
       ).rejects.toThrow(ProviderError);
