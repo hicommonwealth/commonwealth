@@ -2,7 +2,6 @@ import {
   communityStakesAbi,
   decodeLog,
   EvmEventSignatures,
-  launchpadFactoryAbi,
   lpBondingCurveAbi,
   namespaceFactoryAbi,
   recurringContestAbi,
@@ -106,16 +105,12 @@ const referralNamespaceDeployedMapper: EvmMapper<
 const launchpadTokenCreatedMapper: EvmMapper<'LaunchpadTokenCreated'> = (
   event: EvmEvent,
 ) => {
-  const decoded = decodeLog<typeof launchpadFactoryAbi, 'NewTokenCreated'>({
-    abi: launchpadFactoryAbi,
-    data: event.rawLog.data,
-    topics: event.rawLog.topics,
-  });
   return {
     event_name: 'LaunchpadTokenCreated',
     event_payload: {
-      ...event,
-      parsedArgs: decoded.args,
+      block_timestamp: event.block.timestamp,
+      transaction_hash: event.rawLog.transactionHash,
+      eth_chain_id: event.eventSource.ethChainId,
     },
   };
 };
@@ -129,8 +124,15 @@ const launchpadTradeMapper: EvmMapper<'LaunchpadTrade'> = (event: EvmEvent) => {
   return {
     event_name: 'LaunchpadTrade',
     event_payload: {
-      ...event,
-      parsedArgs: decoded.args,
+      block_timestamp: event.block.timestamp,
+      transaction_hash: event.rawLog.transactionHash,
+      trader_address: decoded.args.trader,
+      token_address: decoded.args.namespace,
+      is_buy: decoded.args.isBuy,
+      eth_chain_id: event.eventSource.ethChainId,
+      eth_amount: decoded.args.ethAmount,
+      community_token_amount: decoded.args.communityTokenAmount,
+      floating_supply: decoded.args.floatingSupply,
     },
   };
 };

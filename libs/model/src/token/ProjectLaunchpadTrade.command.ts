@@ -5,7 +5,6 @@ import {
   transferLaunchpadLiquidityToUniswap,
 } from '@hicommonwealth/evm-protocols';
 import { events } from '@hicommonwealth/schemas';
-import { BigNumber } from 'ethers';
 import { z } from 'zod';
 import { config } from '../config';
 import { models } from '../database';
@@ -14,7 +13,7 @@ import { chainNodeMustExist } from '../policies/utils/utils'; // TODO: place in 
 const log = logger(import.meta);
 
 const schema = {
-  input: events.TokenTraded,
+  input: events.LaunchpadTrade,
   output: z.object({}),
 };
 
@@ -50,16 +49,11 @@ export function ProjectLaunchpadTrade(): Command<typeof schema> {
           token_address,
           trader_address,
           is_buy,
-          community_token_amount: BigNumber.from(
-            community_token_amount,
-          ).toBigInt(),
+          community_token_amount,
           price:
-            Number(
-              (BigNumber.from(eth_amount).toBigInt() * BigInt(1e18)) /
-                BigNumber.from(community_token_amount).toBigInt(),
-            ) / 1e18,
-          floating_supply: BigNumber.from(floating_supply).toBigInt(),
-          timestamp: block_timestamp,
+            Number((eth_amount * BigInt(1e18)) / community_token_amount) / 1e18,
+          floating_supply,
+          timestamp: Number(block_timestamp),
         },
       });
 
@@ -76,8 +70,7 @@ export function ProjectLaunchpadTrade(): Command<typeof schema> {
 
       if (
         !token.liquidity_transferred &&
-        BigNumber.from(floating_supply).toBigInt() ===
-          BigInt(token.launchpad_liquidity)
+        floating_supply === BigInt(token.launchpad_liquidity)
       ) {
         const onChainTokenData = await getLaunchpadToken({
           rpc: chainNode.private_url!,

@@ -6,15 +6,15 @@ import { systemActor } from '../middleware';
 import { CreateToken, ProjectLaunchpadTrade } from '../token';
 
 const inputs = {
-  TokenLaunched: events.TokenLaunched,
-  TokenTraded: events.TokenTraded,
+  LaunchpadTokenCreated: events.LaunchpadTokenCreated,
+  LaunchpadTrade: events.LaunchpadTrade,
 };
 
 export function LaunchpadPolicy(): Policy<typeof inputs, ZodUndefined> {
   return {
     inputs,
     body: {
-      TokenLaunched: async ({ payload }) => {
+      LaunchpadTokenCreated: async ({ payload }) => {
         const chainNode = await models.ChainNode.findOne({
           where: { eth_chain_id: payload.eth_chain_id },
         });
@@ -27,7 +27,7 @@ export function LaunchpadPolicy(): Policy<typeof inputs, ZodUndefined> {
           },
         });
       },
-      TokenTraded: async ({ payload }) => {
+      LaunchpadTrade: async ({ payload }) => {
         await command(ProjectLaunchpadTrade(), {
           actor: systemActor({}),
           payload,

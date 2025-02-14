@@ -359,13 +359,13 @@ export const events = {
 
   LaunchpadTokenCreated: z.object({
     block_timestamp: z.coerce.bigint(),
-    transaction_hash: EVM_BYTES,
+    transaction_hash: z.string(),
     eth_chain_id: z.number(),
   }),
 
   LaunchpadTrade: z.object({
     block_timestamp: z.coerce.bigint(),
-    transaction_hash: EVM_BYTES,
+    transaction_hash: z.string(),
     trader_address: EVM_ADDRESS_STRICT,
     token_address: EVM_ADDRESS_STRICT,
     is_buy: z.boolean(),
