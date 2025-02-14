@@ -8,7 +8,15 @@ import './PriceChartTab.scss';
 const PriceChartTab = () => {
   const { chain, address } = useTokenData();
 
-  if (!chain || !address) return;
+  if (!chain || !address)
+    return (
+      <div className="PriceChartTab">
+        <CWText type="h3" fontWeight="semiBold">
+          Price Chart
+        </CWText>
+        <CWText>Token Data Not Found</CWText>
+      </div>
+    );
 
   return (
     <div className="PriceChartTab">
