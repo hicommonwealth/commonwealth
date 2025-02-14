@@ -43,6 +43,7 @@ export const outboxEvents: Events[] = [
   'TwitterMomBotMentioned',
   'TwitterContestBotMentioned',
   'CommunityStakeTrade',
+  'NamespaceDeployed',
   'NamespaceDeployedWithReferral',
   'LaunchpadTokenCreated',
   'LaunchpadTrade',

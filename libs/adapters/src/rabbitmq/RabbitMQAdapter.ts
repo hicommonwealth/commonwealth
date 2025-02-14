@@ -13,7 +13,6 @@ import {
   logger,
 } from '@hicommonwealth/core';
 import { Events } from '@hicommonwealth/schemas';
-import { bigIntReviver } from '@hicommonwealth/shared';
 import { Message } from 'amqplib';
 import { AckOrNack, default as Rascal } from 'rascal';
 
@@ -154,13 +153,9 @@ export class RabbitMQAdapter implements Broker {
     }
 
     try {
-      const publication = await this.broker!.publish(
-        topic,
-        JSON.stringify(event),
-        {
-          routingKey: this.getRoutingKey(event),
-        },
-      );
+      const publication = await this.broker!.publish(topic, event, {
+        routingKey: this.getRoutingKey(event),
+      });
 
       return new Promise<boolean>((resolve, reject) => {
         publication.on('success', (messageId) => {
@@ -229,32 +224,22 @@ export class RabbitMQAdapter implements Broker {
 
       subscription.on(
         'message',
-        (_message: Message, content: string, ackOrNackFn: AckOrNack) => {
+        (
+          _message: Message,
+          content: EventContext<Events>,
+          ackOrNackFn: AckOrNack,
+        ) => {
           const { beforeHandleEvent, afterHandleEvent } = hooks || {};
           const context: unknown = {};
-          let parsedContent: Record<string | number | symbol, unknown>;
           try {
-            parsedContent = JSON.parse(content, bigIntReviver);
-          } catch (err) {
-            this._log.error(`Failed to parse content`, err as Error, {
-              topic,
-              message: content,
-            });
-            ackOrNackFn(new Error('Failed to parse content'), {
-              strategy: 'nack',
-            });
-            return;
-          }
-
-          try {
-            beforeHandleEvent?.(topic, parsedContent, context);
+            beforeHandleEvent?.(topic, content, context);
           } catch (err) {
             this._log.error(
               `beforeHandleEvent failed on topic ${topic}`,
               err as Error,
             );
           }
-          handleEvent(handler, <EventContext<Events>>parsedContent, true)
+          handleEvent(handler, content, true)
             .then(() => {
               this._log.debug('Message Acked', {
                 topic,
@@ -276,7 +261,7 @@ export class RabbitMQAdapter implements Broker {
             })
             .finally(() => {
               try {
-                afterHandleEvent?.(topic, parsedContent, context);
+                afterHandleEvent?.(topic, content, context);
               } catch (err) {
                 this._log.error(
                   `afterHandleEvent failed on topic ${topic}`,

@@ -6,7 +6,7 @@ import { SubscriptionPreference } from '../entities/notification.schemas';
 import { Reaction } from '../entities/reaction.schemas';
 import { Thread } from '../entities/thread.schemas';
 import { Tweet } from '../integrations';
-import { PG_INT } from '../utils';
+import { EVM_ADDRESS_STRICT, EVM_BYTES, PG_INT } from '../utils';
 import { EventMetadata } from './util.schemas';
 
 const DiscordEventBase = z.object({
@@ -333,33 +333,33 @@ export const events = {
   // Events mapped from ChainEvents
   CommunityStakeTrade: ChainEventBase.extend({
     parsedArgs: z.object({
-      trader: z.literal(`0x${z.string()}`),
-      namespace: z.literal(`0x${z.string()}`),
+      trader: EVM_ADDRESS_STRICT,
+      namespace: EVM_ADDRESS_STRICT,
       isBuy: z.boolean(),
       communityTokenAmount: z.coerce.bigint(),
       ethAmount: z.coerce.bigint(),
       protocolEthAmount: z.coerce.bigint(),
       nameSpaceEthAmount: z.coerce.bigint(),
       supply: z.bigint(),
-      exchangeToken: z.literal(`0x${z.string()}`),
+      exchangeToken: EVM_ADDRESS_STRICT,
     }),
   }),
 
   NamespaceDeployedWithReferral: ChainEventBase.extend({
     parsedArgs: z.object({
       name: z.string(),
-      feeManager: z.literal(`0x${z.string()}`),
-      referrer: z.literal(`0x${z.string()}`),
-      referralFeeManager: z.literal(`0x${z.string()}`),
-      signature: z.literal(`0x${z.string()}`),
-      namespaceDeployer: z.literal(`0x${z.string()}`),
-      nameSpaceAddress: z.literal(`0x${z.string()}`),
+      feeManager: EVM_ADDRESS_STRICT,
+      referrer: EVM_ADDRESS_STRICT,
+      referralFeeManager: EVM_ADDRESS_STRICT,
+      signature: EVM_BYTES,
+      namespaceDeployer: EVM_ADDRESS_STRICT,
+      nameSpaceAddress: EVM_ADDRESS_STRICT,
     }),
   }),
 
   LaunchpadTokenCreated: ChainEventBase.extend({
     parsedArgs: z.object({
-      token: z.literal(`0x${z.string()}`),
+      token: EVM_ADDRESS_STRICT,
       totalSupply: z.coerce.bigint(),
       name: z.string(),
       symbol: z.string(),
@@ -368,8 +368,8 @@ export const events = {
 
   LaunchpadTrade: ChainEventBase.extend({
     parsedArgs: z.object({
-      trader: z.literal(`0x${z.string()}`),
-      namespace: z.literal(`0x${z.string()}`),
+      trader: EVM_ADDRESS_STRICT,
+      namespace: EVM_ADDRESS_STRICT,
       isBuy: z.boolean(),
       communityTokenAmount: z.coerce.bigint(),
       ethAmount: z.coerce.bigint(),
@@ -380,10 +380,10 @@ export const events = {
 
   ReferralFeeDistributed: ChainEventBase.extend({
     parsedArgs: z.object({
-      namespace: z.literal(`0x${z.string()}`),
-      token: z.literal(`0x${z.string()}`),
+      namespace: EVM_ADDRESS_STRICT,
+      token: EVM_ADDRESS_STRICT,
       amount: z.coerce.bigint(),
-      recipient: z.literal(`0x${z.string()}`),
+      recipient: EVM_ADDRESS_STRICT,
       recipientAmount: z.coerce.bigint(),
     }),
   }),
@@ -391,10 +391,10 @@ export const events = {
   NamespaceDeployed: ChainEventBase.extend({
     parsedArgs: z.object({
       name: z.string(),
-      _feeManager: z.literal(`0x${z.string()}`),
-      _signature: z.literal(`0x${z.string()}`),
-      _namespaceDeployer: z.literal(`0x${z.string()}`),
-      nameSpaceAddress: z.literal(`0x${z.string()}`),
+      _feeManager: EVM_ADDRESS_STRICT,
+      _signature: EVM_BYTES,
+      _namespaceDeployer: EVM_ADDRESS_STRICT,
+      nameSpaceAddress: EVM_ADDRESS_STRICT,
     }),
   }),
 } as const;
