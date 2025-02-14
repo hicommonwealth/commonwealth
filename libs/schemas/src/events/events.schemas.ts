@@ -357,25 +357,22 @@ export const events = {
     }),
   }),
 
-  LaunchpadTokenCreated: ChainEventBase.extend({
-    parsedArgs: z.object({
-      token: EVM_ADDRESS_STRICT,
-      totalSupply: z.coerce.bigint(),
-      name: z.string(),
-      symbol: z.string(),
-    }),
+  LaunchpadTokenCreated: z.object({
+    block_timestamp: z.coerce.bigint(),
+    transaction_hash: EVM_BYTES,
+    eth_chain_id: z.number(),
   }),
 
-  LaunchpadTrade: ChainEventBase.extend({
-    parsedArgs: z.object({
-      trader: EVM_ADDRESS_STRICT,
-      namespace: EVM_ADDRESS_STRICT,
-      isBuy: z.boolean(),
-      communityTokenAmount: z.coerce.bigint(),
-      ethAmount: z.coerce.bigint(),
-      protocolEthAmount: z.coerce.bigint(),
-      floatingSupply: z.coerce.bigint(),
-    }),
+  LaunchpadTrade: z.object({
+    block_timestamp: z.coerce.bigint(),
+    transaction_hash: EVM_BYTES,
+    trader_address: EVM_ADDRESS_STRICT,
+    token_address: EVM_ADDRESS_STRICT,
+    is_buy: z.boolean(),
+    eth_chain_id: z.number(),
+    eth_amount: z.coerce.bigint(),
+    community_token_amount: z.coerce.bigint(),
+    floating_supply: z.coerce.bigint(),
   }),
 
   ReferralFeeDistributed: ChainEventBase.extend({
