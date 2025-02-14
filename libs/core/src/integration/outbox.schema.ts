@@ -43,6 +43,8 @@ export const outboxEvents: Events[] = [
   'AddressOwnershipTransferred',
   'TwitterMomBotMentioned',
   'TwitterContestBotMentioned',
+  'TokenLaunched',
+  'TokenTraded',
 ] as const;
 
 export const Outbox = z.union(
