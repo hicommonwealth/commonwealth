@@ -10,7 +10,7 @@ export const handleLaunchpadTokenCreated: EventHandler<
 > = async ({ payload }) => {
   const chainNode = await models.ChainNode.findOne({
     where: {
-      eth_chain_id: payload.eventSource.ethChainId,
+      eth_chain_id: payload.eth_chain_id,
     },
   });
   await command(CreateToken(), {
@@ -18,7 +18,7 @@ export const handleLaunchpadTokenCreated: EventHandler<
     payload: {
       chain_node_id: chainNode!.id!,
       community_id: '', // not required for system actors
-      transaction_hash: payload.rawLog.transactionHash,
+      transaction_hash: payload.transaction_hash,
     },
   });
 };
