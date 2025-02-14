@@ -76,7 +76,8 @@ export const AdminActions = ({
     Permissions.isCommunityAdmin() ||
     Permissions.isCommunityModerator();
 
-  const isCommunityAdmin = Permissions.isCommunityAdmin();
+  const isCommunityAdmin =
+    Permissions.isSiteAdmin() || Permissions.isCommunityAdmin();
 
   const isThreadAuthor = Permissions.isThreadAuthor(thread);
   const isThreadCollaborator = Permissions.isThreadCollaborator(thread);
