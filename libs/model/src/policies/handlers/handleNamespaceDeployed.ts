@@ -6,6 +6,6 @@ const log = logger(import.meta);
 export const handleNamespaceDeployed: EventHandler<
   'NamespaceDeployed',
   ZodUndefined
-> = async ({ payload }) => {
+> = async ({ payload: _ }) => {
   log.info('NamespaceDeployed event implementation not defined');
 };
