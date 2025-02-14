@@ -277,11 +277,32 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
       ThreadUpvoted: async ({ payload }) => {
         const user_id = await getUserByAddressId(payload.address_id);
         if (!user_id) return;
+        const thread = await models.Thread.findOne({
+          where: { id: payload.thread_id },
+          include: [
+            {
+              model: models.Thread,
+              attributes: ['community_id'],
+              required: true,
+            },
+            {
+              model: models.Address,
+              as: 'Address',
+              attributes: ['address'],
+              required: true,
+            },
+          ],
+        });
         const action_metas = await getQuestActionMetas(
           payload,
           'ThreadUpvoted',
         );
-        await recordXpsForQuest(user_id, payload.created_at!, action_metas);
+        await recordXpsForQuest(
+          user_id,
+          payload.created_at!,
+          action_metas,
+          thread!.Address!.address,
+        );
       },
       CommentCreated: async ({ payload }) => {
         const user_id = await getUserByAddressId(payload.address_id);
