@@ -5,13 +5,13 @@ import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
 import { useGetContestBalanceQuery } from 'state/api/contests';
 import { Skeleton } from 'views/components/Skeleton';
 
+import FractionalValue from 'views/components/FractionalValue';
 import CWCountDownTimer from 'views/components/component_kit/CWCountDownTimer';
 import { CWCommunityAvatar } from 'views/components/component_kit/cw_community_avatar';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
-import { capDecimals } from 'views/modals/ManageCommunityStakeModal/utils';
 import { Contest } from '../../CommunityManagement/Contests/ContestsList';
 import './ActiveContestCard.scss';
 
@@ -165,7 +165,8 @@ const ActiveContestCard = ({ contest, community }: ActiveContestCardProps) => {
                     {moment.localeData().ordinal(index + 1)} Prize
                   </CWText>
                   <CWText fontWeight="medium">
-                    {capDecimals(String(prize))} {contest.ticker}
+                    <FractionalValue fontWeight="medium" value={prize} />
+                    &nbsp;{contest.ticker}
                   </CWText>
                 </div>
               ))
