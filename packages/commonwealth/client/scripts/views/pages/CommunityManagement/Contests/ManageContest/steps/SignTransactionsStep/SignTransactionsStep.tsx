@@ -46,7 +46,7 @@ interface SignTransactionsStepProps {
 const ONE_HOUR_IN_SECONDS = 60 * 60;
 
 const CUSTOM_CONTEST_DURATION_IN_SECONDS =
-  Number(process.env.CONTEST_DURATION_IN_SEC) ?? ONE_HOUR_IN_SECONDS;
+  Number(process.env.CONTEST_DURATION_IN_SEC) || ONE_HOUR_IN_SECONDS;
 console.log({ CUSTOM_CONTEST_DURATION_IN_SECONDS });
 
 const SignTransactionsStep = ({
