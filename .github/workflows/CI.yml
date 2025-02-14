@@ -278,7 +278,6 @@ jobs:
       - name: Change permissions of coverage files
         run: |
           chmod -R 755 ./libs/adapters/coverage/lcov.info
-          chmod -R 755 ./libs/core/coverage/lcov.info
           chmod -R 755 ./libs/model/coverage/lcov.info
           chmod -R 755 ./libs/sitemaps/coverage/lcov.info
 
