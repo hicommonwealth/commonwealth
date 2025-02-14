@@ -56,6 +56,7 @@ export default defineConfig(({ mode }) => {
     'process.env.FLAG_XP': JSON.stringify(env.FLAG_XP),
     'process.env.FLAG_COMMUNITY_HOME': JSON.stringify(env.FLAG_COMMUNITY_HOME),
     'process.env.FLAG_HOMEPAGE': JSON.stringify(env.FLAG_HOMEPAGE),
+    'process.env.FLAG_AI_COMMENTS': JSON.stringify(env.FLAG_AI_COMMENTS),
   };
 
   const config = {
