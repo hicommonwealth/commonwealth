@@ -1,4 +1,3 @@
-import { smallNumberFormatter } from '@hicommonwealth/shared';
 import { useGetMembersQuery } from 'client/scripts/state/api/communities';
 import { APIOrderDirection } from 'helpers/constants';
 import React, { useState } from 'react';
@@ -13,6 +12,7 @@ import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWTable } from 'views/components/component_kit/new_designs/CWTable';
 import { useCWTableState } from 'views/components/component_kit/new_designs/CWTable/useCWTableState';
 import { CWTextInput } from 'views/components/component_kit/new_designs/CWTextInput';
+import { fromWei } from 'web3-utils';
 import { MemberResultsOrderBy } from '../index.types';
 
 import './LeaderboardSection.scss';
@@ -96,10 +96,10 @@ const LeaderboardSection = () => {
         ),
       },
       earnings: {
-        sortValue: member.referral_eth_earnings,
+        sortValue: Number(member.referral_eth_earnings),
         customElement: (
           <div className="table-cell text-right">
-            ETH {smallNumberFormatter.format(member.referral_eth_earnings || 0)}
+            ETH {Number(fromWei(member.referral_eth_earnings || 0, 'ether'))}
           </div>
         ),
       },
