@@ -25,6 +25,7 @@ import {
   ZERO_ADDRESS,
   formatDecimalToWei,
   splitAndDecodeURL,
+  ContentType,
 } from '@hicommonwealth/shared';
 import { useGetUserEthBalanceQuery } from 'client/scripts/state/api/communityStake';
 import useUserStore from 'client/scripts/state/ui/user';
@@ -49,6 +50,16 @@ import { DiscussionsFeedDiscovery } from './DiscussionsFeedDiscovery';
 import './DiscussionsPage.scss';
 import { EmptyThreadsPlaceholder } from './EmptyThreadsPlaceholder';
 import { RenderThreadCard } from './RenderThreadCard';
+import { StickCommentProvider } from 'views/components/StickEditorContainer/context/StickCommentProvider';
+import { WithDefaultStickyComment } from 'views/components/StickEditorContainer/context/WithDefaultStickyComment';
+import { StickyCommentElementSelector } from 'views/components/StickEditorContainer/context/StickyCommentElementSelector';
+import { StickyEditorContainer } from 'views/components/StickEditorContainer';
+import { createDeltaFromText, getTextFromDelta } from 'views/components/react_quill_editor';
+import type { DeltaStatic } from 'quill';
+import useCreateThreadMutation from 'state/api/threads/createThread';
+import { buildCreateThreadInput } from 'state/api/threads/createThread';
+import { notifyError } from 'controllers/app/notifications';
+
 type DiscussionsPageProps = {
   tabs?: { value: string; label: string };
   selectedView?: string;
@@ -67,6 +78,7 @@ const VIEWS = [
 ];
 const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const [selectedView, setSelectedView] = useState<string>();
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const communityId = app.activeChainId() || '';
   const navigate = useCommonNavigate();
@@ -93,7 +105,6 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   const contestStatus = searchParams.get('status');
   const tabStatus = searchParams.get('tab');
 
-  const containerRef = useRef();
   useLayoutEffect(() => {
     if (tabStatus === 'overview') {
       setSelectedView(VIEWS[1].value);
@@ -245,10 +256,61 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
     setSelectedView(activeTab);
   };
 
+  // Add sticky editor state
+  const [threadContentDelta, setThreadContentDelta] = useState<DeltaStatic>(createDeltaFromText(''));
+
+  const { mutateAsync: createThread } = useCreateThreadMutation({
+    communityId: communityId,
+  });
+
+  const handleCreateThread = async (): Promise<number> => {
+    if (!user.activeAccount) {
+      notifyError('You must be logged in to create a thread');
+      throw new Error('Not logged in');
+    }
+
+    if (!topicObj) {
+      notifyError('You must select a topic to create a thread');
+      throw new Error('No topic selected');
+    }
+
+    if (!user.activeAccount.community?.base) {
+      notifyError('Invalid community configuration');
+      throw new Error('Invalid community configuration');
+    }
+
+    try {
+      const input = await buildCreateThreadInput({
+        address: user.activeAccount.address,
+        kind: 'discussion',
+        stage: 'Discussion',
+        communityId: communityId,
+        communityBase: user.activeAccount.community.base,
+        title: 'New Thread', // Will be updated by AI if enabled
+        topic: topicObj,
+        body: getTextFromDelta(threadContentDelta),
+      });
+
+      const thread = await createThread(input);
+      if (!thread?.id) {
+        throw new Error('Failed to create thread - no ID returned');
+      }
+      navigate(`/discussion/${thread.id}-${thread.title}`);
+      return thread.id;
+    } catch (error) {
+      console.error('Failed to create thread:', error);
+      notifyError('Failed to create thread');
+      throw error;
+    }
+  };
+
+  const handleCancel = () => {
+    setThreadContentDelta(createDeltaFromText(''));
+  };
+
   return (
-    <>
+    <StickCommentProvider>
       <CWPageLayout
-        // @ts-expect-error <StrictNullChecks/>
         ref={containerRef}
         className="DiscussionsPageLayout"
       >
@@ -316,43 +378,61 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
           setSelectedView={updateSelectedView}
         />
         {selectedView === VIEWS[0].value ? (
-          <Virtuoso
-            className="thread-list"
-            style={{ height: '100%', width: '100%' }}
-            data={isInitialLoading ? [] : filteredThreads}
-            customScrollParent={containerRef.current}
-            itemContent={(_, thread) => (
-              <RenderThreadCard
-                thread={thread}
-                communityId={communityId}
-                memberships={memberships}
-                topicPermissions={topicPermissions}
-                contestsData={contestsData}
-              />
-            )}
-            endReached={() => {
-              hasNextPage && fetchNextPage();
-            }}
-            overscan={50}
-            components={{
-              // eslint-disable-next-line react/no-multi-comp
-              EmptyPlaceholder: () => (
-                <EmptyThreadsPlaceholder
-                  isInitialLoading={isInitialLoading}
-                  isOnArchivePage={isOnArchivePage}
+          <>
+            <Virtuoso
+              className="thread-list"
+              style={{ height: '100%', width: '100%' }}
+              data={isInitialLoading ? [] : filteredThreads}
+              customScrollParent={containerRef.current || undefined}
+              itemContent={(_, thread) => (
+                <RenderThreadCard
+                  thread={thread}
+                  communityId={communityId}
+                  memberships={memberships}
+                  topicPermissions={topicPermissions}
+                  contestsData={contestsData}
                 />
-              ),
-            }}
-          />
+              )}
+              endReached={() => {
+                hasNextPage && fetchNextPage();
+              }}
+              overscan={50}
+              components={{
+                EmptyPlaceholder: () => (
+                  <EmptyThreadsPlaceholder
+                    isInitialLoading={isInitialLoading}
+                    isOnArchivePage={isOnArchivePage}
+                  />
+                ),
+              }}
+            />
+            <WithDefaultStickyComment>
+              {user.isLoggedIn && user.activeAccount && (
+                <StickyEditorContainer
+                  parentType={ContentType.Thread}
+                  canComment={true}
+                  handleSubmitComment={handleCreateThread}
+                  errorMsg=""
+                  contentDelta={threadContentDelta}
+                  setContentDelta={setThreadContentDelta}
+                  disabled={false}
+                  onCancel={handleCancel}
+                  author={user.activeAccount}
+                  editorValue={getTextFromDelta(threadContentDelta)}
+                  tooltipText=""
+                  topic={topicObj}
+                />
+              )}
+            </WithDefaultStickyComment>
+          </>
         ) : selectedView === VIEWS[1].value ? (
           <OverviewPage />
         ) : (
           <VirtuosoGrid
             data={isInitialLoading ? [] : filteredThreads}
-            customScrollParent={containerRef.current}
+            customScrollParent={containerRef.current || undefined}
             components={
               {
-                // eslint-disable-next-line  react/display-name,, react/no-multi-comp
                 List: forwardRef<HTMLDivElement, ListContainerProps>(
                   ({ children, ...props }, ref) => (
                     <div ref={ref} {...props}>
@@ -360,7 +440,6 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
                     </div>
                   ),
                 ),
-                // eslint-disable-next-line , react/prop-types, react/no-multi-comp
                 Item: ({ children, ...props }) => (
                   <div {...props}>{children}</div>
                 ),
@@ -386,8 +465,10 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
             overscan={50}
           />
         )}
+
+        <StickyCommentElementSelector />
       </CWPageLayout>
-    </>
+    </StickCommentProvider>
   );
 };
 export default DiscussionsPage;

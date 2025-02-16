@@ -6,8 +6,15 @@ import { CommentEditorProps } from 'views/components/Comments/CommentEditor/Comm
 import { DesktopStickyInput } from 'views/components/StickEditorContainer/DesktopStickyInput';
 import { MobileStickyInput } from 'views/components/StickEditorContainer/MobileStickyInput';
 import './StickyEditorContainer.scss';
+import type { Topic } from 'models/Topic';
+import { ContentType } from '@hicommonwealth/shared';
 
-export const StickyEditorContainer = (props: CommentEditorProps) => {
+interface StickyEditorContainerProps extends CommentEditorProps {
+  topic?: Topic;
+  parentType: ContentType;
+}
+
+export const StickyEditorContainer = (props: StickyEditorContainerProps) => {
   const { isWindowExtraSmall } = useBrowserWindow({});
   const stickEditor = useFlag('stickyEditor');
 
@@ -15,10 +22,14 @@ export const StickyEditorContainer = (props: CommentEditorProps) => {
     return <CommentEditor {...props} />;
   }
 
-  return (
-    <>
-      {isWindowExtraSmall && <MobileStickyInput {...props} />}
-      {!isWindowExtraSmall && <DesktopStickyInput {...props} />}
-    </>
-  );
+  const editorProps = {
+    ...props,
+    parentType: props.parentType || ContentType.Comment,
+  };
+
+  if (isWindowExtraSmall) {
+    return <MobileStickyInput {...editorProps} />;
+  }
+
+  return <DesktopStickyInput {...editorProps} />;
 };

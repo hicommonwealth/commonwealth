@@ -1,6 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useLocalAISettingsStore } from 'state/ui/user';
+import useSidebarStore from 'state/ui/sidebar/sidebar';
 import CommentEditor, {
   CommentEditorProps,
 } from 'views/components/Comments/CommentEditor/CommentEditor';
@@ -17,6 +18,7 @@ export const MobileStickyInput = (props: CommentEditorProps) => {
   const { aiCommentsToggleEnabled, setAICommentsToggleEnabled } =
     useLocalAISettingsStore();
   const [streamingReplyIds, setStreamingReplyIds] = useState<number[]>([]);
+  const menuVisible = useSidebarStore((state) => state.menuVisible);
 
   const handleAiReply = useCallback(
     (commentId: number) => {
@@ -64,6 +66,11 @@ export const MobileStickyInput = (props: CommentEditorProps) => {
 
   if (!parent) {
     console.warn('No parent container for MobileStickyInput');
+    return null;
+  }
+
+  // Don't render anything if the sidebar is open
+  if (menuVisible) {
     return null;
   }
 

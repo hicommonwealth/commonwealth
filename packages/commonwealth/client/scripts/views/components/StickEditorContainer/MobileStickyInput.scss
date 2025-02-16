@@ -5,25 +5,78 @@
   padding: 12px 16px;
   background: $white;
   border-top: 1px solid $neutral-200;
+  position: relative;
+  z-index: 50;
 
-  .MobileStickyInputCollapsed {
+  .container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: $neutral-50;
+    border-radius: 8px;
+    padding: 0 12px;
     width: 100%;
+  }
 
-    input {
-      height: 40px;
-      font-size: 14px;
-    }
+  .AvatarBox {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+  }
 
-    .form-control {
-      padding: 8px 12px;
+  .input-container {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .input {
+    border: none;
+    background: none;
+    width: 100%;
+    padding: 8px 0;
+    font-size: 14px;
+    line-height: 20px;
+    color: $neutral-900;
+    flex: 1;
+    min-width: 0;
+
+    &::placeholder {
+      color: $neutral-500;
     }
   }
 
-  input {
-    border: none;
-    flex-grow: 1;
-    padding: 12px;
-    border-radius: 8px;
+  .ai-toggle-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  .ai-toggle {
+    display: flex;
+    align-items: center;
+
+    .ai-toggle-container {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .label {
+      font-size: 12px;
+      color: $neutral-600;
+    }
+  }
+
+  .RightButton {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
   }
 }
 
@@ -46,7 +99,7 @@
 
 .MobileStickyInputFocused {
   background: white;
-  z-index: 70;
+  z-index: 50;
   position: absolute;
   top: 0;
   left: 0;

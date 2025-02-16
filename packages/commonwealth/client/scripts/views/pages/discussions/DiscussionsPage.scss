@@ -6,14 +6,22 @@ $size: 48px;
   overflow: auto;
   padding-top: 0;
   height: 100%;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
 
   .layout-container {
     height: 100%;
     padding-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    width: 100%;
   }
 
   .BreadcrumbsPageLayout {
     padding-inline: 0;
+    width: 100%;
 
     @include smallInclusive {
       padding-bottom: initial;
@@ -24,6 +32,7 @@ $size: 48px;
   .AdminOnboardingSliderPageLayout {
     padding-inline: 0;
     margin-top: -30px;
+    width: 100%;
 
     @include smallInclusive {
       margin-top: -12px;
@@ -35,15 +44,63 @@ $size: 48px;
     flex: 1;
     flex-direction: column;
     width: 100%;
+    position: relative;
+    max-width: 100%;
+
+    .header-filters-container {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px;
+      gap: 12px;
+      width: 100%;
+
+      @include smallInclusive {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        padding: 12px 16px;
+        gap: 8px;
+
+        &::-webkit-scrollbar {
+          display: none;
+        }
+      }
+
+      .left-section {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-shrink: 0;
+
+        @include smallInclusive {
+          gap: 8px;
+        }
+      }
+
+      .right-section {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-shrink: 0;
+
+        @include smallInclusive {
+          gap: 8px;
+        }
+      }
+    }
 
     div[data-test-id='virtuoso-item-list'],
     div[data-viewport-type='element'] > div:first-child,
     div[data-test-id='virtuoso-item-list'] {
       gap: 2px;
+      width: 100%;
     }
 
     div[data-viewport-type='element'] > div:first-child {
       padding-bottom: 16px !important;
+      width: 100%;
     }
 
     .no-threads-text {
@@ -55,6 +112,7 @@ $size: 48px;
       margin-left: -24px;
       margin-top: -16px;
       min-height: 40px;
+      width: 100%;
 
       @include small {
         margin-left: -24px;
@@ -67,13 +125,15 @@ $size: 48px;
       flex-direction: column;
       padding: 0 0 24px;
       width: 100%;
-      height: 100%;
+      flex: 1;
+      min-height: 0;
 
       .listing-scroll {
         align-items: center;
         display: flex;
         justify-content: center;
         margin: 16px 0;
+        width: 100%;
 
         .thread-count-text.Text {
           color: $neutral-500;
@@ -86,6 +146,27 @@ $size: 48px;
       justify-content: center;
       align-items: center;
       padding: 24px;
+      width: 100%;
     }
+  }
+
+  .thread-list {
+    flex: 1;
+    min-height: 0;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .StickyEditorContainer {
+    position: sticky;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background: white;
+    padding: 16px 24px;
+    margin-top: auto;
+    width: 100%;
+    max-width: 100%;
   }
 }
