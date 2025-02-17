@@ -1,10 +1,11 @@
 import { useFlag } from 'hooks/useFlag';
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState, useContext } from 'react';
 import { useGenerateCommentText } from 'state/api/comments/generateCommentText';
 import useUserStore from 'state/ui/user';
 import { Avatar } from 'views/components/Avatar';
 import { CommentEditorProps } from 'views/components/Comments/CommentEditor/CommentEditor';
 import { useActiveStickCommentReset } from 'views/components/StickEditorContainer/context/UseActiveStickCommentReset';
+import { StickCommentContext } from 'views/components/StickEditorContainer/context/StickCommentProvider';
 import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { CWToggle } from 'views/components/component_kit/new_designs/cw_toggle';
 import { createDeltaFromText } from 'views/components/react_quill_editor';
@@ -30,6 +31,8 @@ export const MobileInput = (props: MobileInputProps) => {
     aiCommentsToggleEnabled,
     setAICommentsToggleEnabled,
   } = props;
+
+  const { mode } = useContext(StickCommentContext);
   const [value, setValue] = useState('');
   const user = useUserStore();
   const { generateComment } = useGenerateCommentText();
@@ -95,7 +98,7 @@ export const MobileInput = (props: MobileInputProps) => {
         }
       }
     } catch (error) {
-      console.error('Error during comment submission:', error);
+      console.error('Error during submission:', error);
     }
   };
 
@@ -109,9 +112,11 @@ export const MobileInput = (props: MobileInputProps) => {
     return undefined;
   }, [user]);
 
-  const placeholder = isReplying
+  const placeholder = mode === 'thread' 
+    ? 'Create a thread...'
+    : isReplying
     ? `Replying to ${replyingToAuthor} ...`
-    : `Comment on thread...`;
+    : 'Comment on thread...';
 
   return (
     <div className="MobileInput">

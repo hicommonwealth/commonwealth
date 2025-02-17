@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import useUserStore from 'state/ui/user';
 import { CommentFilters } from './CommentFilters';
 import './CommentTree.scss';
@@ -16,6 +16,8 @@ export const CommentTree = ({
   canReply = true,
   canComment,
   disabledActionsTooltipText,
+  onThreadCreated,
+  aiCommentsToggleEnabled,
 }: CommentsTreeProps) => {
   const user = useUserStore();
 
@@ -37,6 +39,12 @@ export const CommentTree = ({
     thread,
     setIsGloballyEditing,
   });
+
+  useEffect(() => {
+    if (thread && aiCommentsToggleEnabled && onThreadCreated) {
+      onThreadCreated(thread.id).catch(console.error);
+    }
+  }, [thread?.id, aiCommentsToggleEnabled, onThreadCreated]);
 
   return (
     <>

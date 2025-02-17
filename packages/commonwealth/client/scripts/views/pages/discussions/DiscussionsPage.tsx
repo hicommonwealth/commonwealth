@@ -309,7 +309,7 @@ const DiscussionsPage = ({ topicName }: DiscussionsPageProps) => {
   };
 
   return (
-    <StickCommentProvider>
+    <StickCommentProvider mode="thread">
       <CWPageLayout
         ref={containerRef}
         className="DiscussionsPageLayout"

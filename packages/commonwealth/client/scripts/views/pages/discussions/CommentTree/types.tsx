@@ -16,6 +16,8 @@ export type CommentsTreeProps = {
   canReply?: boolean;
   canComment: boolean;
   disabledActionsTooltipText?: GetThreadActionTooltipTextResponse;
+  onThreadCreated?: (threadId: number) => Promise<void>;
+  aiCommentsToggleEnabled?: boolean;
 };
 
 export type UseCommentsTreeProps = Pick<

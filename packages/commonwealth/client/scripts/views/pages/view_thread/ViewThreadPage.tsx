@@ -16,7 +16,7 @@ import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import useTopicGating from 'hooks/useTopicGating';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState, useCallback } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useSearchParams } from 'react-router-dom';
 import app from 'state';
@@ -69,6 +69,8 @@ import { LinkedProposalsCard } from './linked_proposals_card';
 import { LinkedThreadsCard } from './linked_threads_card';
 import { LockMessage } from './lock_message';
 import { SnapshotCreationCard } from './snapshot_creation_card';
+import { useLocalAISettingsStore } from 'state/ui/user';
+import { useGenerateCommentText } from 'state/api/comments/generateCommentText';
 
 type ViewThreadPageProps = {
   identifier: string;
@@ -152,6 +154,9 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
     contestsData.all,
     thread?.topic?.id,
   );
+
+  const { aiCommentsToggleEnabled } = useLocalAISettingsStore();
+  const { generateComment } = useGenerateCommentText();
 
   useEffect(() => {
     if (
@@ -251,6 +256,31 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
       );
     }
   }, [thread?.versionHistory]);
+
+  const handleGenerateAIComment = useCallback(async (threadId: number) => {
+    if (!aiCommentsToggleEnabled) return;
+
+    try {
+      const generatedText = await generateComment('', (update) => {
+        // Handle streaming updates
+        console.log('AI comment generation update:', update);
+      });
+
+      if (generatedText) {
+        // Create the AI comment
+        const commentResponse = await createComment({
+          threadId,
+          content: generatedText,
+          // Add other necessary comment params
+        });
+
+        return commentResponse;
+      }
+    } catch (error) {
+      console.error('Failed to generate AI comment:', error);
+      notifyError('Failed to generate AI comment');
+    }
+  }, [aiCommentsToggleEnabled, generateComment]);
 
   if (typeof identifier !== 'string') {
     return <PageNotFound />;
@@ -692,6 +722,8 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
                 canReply={!isRestrictedMembership}
                 fromDiscordBot={fromDiscordBot}
                 disabledActionsTooltipText={disabledActionsTooltipText}
+                onThreadCreated={handleGenerateAIComment}
+                aiCommentsToggleEnabled={aiCommentsToggleEnabled}
               />
 
               <WithDefaultStickyComment>

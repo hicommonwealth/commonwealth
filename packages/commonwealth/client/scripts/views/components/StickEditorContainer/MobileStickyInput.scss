@@ -98,44 +98,77 @@
 }
 
 .MobileStickyInputFocused {
-  background: white;
-  z-index: 50;
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
+  right: 0;
+  bottom: 0;
+  background: white;
+  z-index: 1000;
   display: flex;
-  flex-grow: 1;
-  height: 100%;
   flex-direction: column;
-  width: 100vw;
-  padding: 8px;
 
-  .CommentEditor,
-  .CWEditor,
-  .QuillEditorContainer,
-  .editor-and-tabs-container,
-  .QuillEditor,
-  .QuillEditorWrapper,
-  .ReactQuillDragParent,
-  .ReactQuillParent,
-  .ql-container,
-  .ql-editor {
+  .mobile-editor-container {
+    flex: 1;
     display: flex;
-    flex-grow: 1;
     flex-direction: column;
-  }
+    padding: 16px;
+    max-width: 100%;
+    margin: 0 auto;
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
 
-  .ql-container,
-  .ql-editor {
-    max-height: calc(100vh - 260px) !important;
-  }
+    .header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      padding: 8px 0;
+      border-bottom: 1px solid $neutral-200;
 
-  .MarkdownPreview {
-    padding: 0 !important;
-  }
+      .left-section {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
 
-  .MarkdownFormattedText {
-    overflow: auto;
-    max-height: calc(100vh - 160px) !important;
+      .right-section {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+    }
+
+    .NewThreadForm {
+      flex: 1;
+      
+      .header {
+        margin-bottom: 24px;
+      }
+
+      .new-thread-form-inputs {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      .ai-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-top: 16px;
+
+        .ai-toggle-container {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+
+        .generate-ai-button {
+          width: 100%;
+        }
+      }
+    }
   }
 }
