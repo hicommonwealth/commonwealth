@@ -57,6 +57,7 @@ import { useGenerateCommentText } from 'client/scripts/state/api/comments/genera
 import { CWToggle } from '../component_kit/new_designs/cw_toggle';
 import { CWThreadAction } from '../component_kit/new_designs/cw_thread_action';
 import { isCommandClick } from 'helpers';
+import editThread, { buildUpdateThreadInput } from 'client/scripts/state/api/threads/editThread';
 
 interface NewThreadFormProps {
   onCancel?: () => void;
@@ -131,8 +132,6 @@ export const NewThreadForm: React.FC<NewThreadFormProps> = ({
   } = useNewThreadForm(selectedCommunityId, topicsForSelector);
 
   const { generateComment } = useGenerateCommentText();
-  const [title, setTitle] = useState('');
-  const [content, setContent] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
 
   const hasTopicOngoingContest =
@@ -196,8 +195,43 @@ export const NewThreadForm: React.FC<NewThreadFormProps> = ({
 
   const bodyAccumulatedRef = useRef('');
 
+  const isWalletBalanceErrorEnabled = false;
+  const walletBalanceError =
+    isContestAvailable &&
+    hasTopicOngoingContest &&
+    isWalletBalanceErrorEnabled &&
+    parseFloat(userEthBalance || '0') < MIN_ETH_FOR_CONTEST_THREAD;
+
+  const disabledActionsTooltipText = getThreadActionTooltipText({
+    isCommunityMember: !!userSelectedAddress,
+    isThreadTopicGated: isRestrictedMembership,
+    threadTopicInteractionRestrictions:
+      !isAdmin &&
+      !foundTopicPermissions?.permissions?.includes(
+        PermissionEnum.CREATE_THREAD,
+      )
+        ? foundTopicPermissions?.permissions
+        : undefined,
+  });
+
+  const hasInput = threadTitle.trim().length > 0 || getTextFromDelta(threadContentDelta).trim().length > 0;
+  const buttonDisabled =
+    !user.activeAccount ||
+    !userSelectedAddress ||
+    walletBalanceError ||
+    contestTopicError ||
+    (selectedCommunityId && !!disabledActionsTooltipText) ||
+    isLoadingCommunity ||
+    (isInsideCommunity && (!userSelectedAddress || !selectedCommunityId)) ||
+    (aiCommentsToggleEnabled ? !hasInput : isDisabled);
+
+  // Define default values for title and body
+  const DEFAULT_THREAD_TITLE = "Untitled Discussion";
+  const DEFAULT_THREAD_BODY = "No content provided.";
+
   const handleNewThreadCreation = async () => {
-    // adding to avoid ts issues, submit button is disabled in this case
+    const isAIMode = aiCommentsToggleEnabled;
+
     if (!community || !userSelectedAddress || !selectedCommunityId) {
       notifyError('Invalid form state!');
       return;
@@ -213,13 +247,25 @@ export const NewThreadForm: React.FC<NewThreadFormProps> = ({
       return;
     }
 
-    const deltaString = JSON.stringify(threadContentDelta);
+    // In AI mode, provide default values so the backend validation is not broken.
+    const effectiveTitle = aiCommentsToggleEnabled
+      ? (threadTitle.trim() || DEFAULT_THREAD_TITLE)
+      : threadTitle;
+      
+    const effectiveBody = aiCommentsToggleEnabled
+      ? (getTextFromDelta(threadContentDelta).trim()
+          ? serializeDelta(threadContentDelta)
+          : DEFAULT_THREAD_BODY)
+      : serializeDelta(threadContentDelta);
 
-    checkNewThreadErrors(
-      { threadKind, threadUrl, threadTitle, threadTopic },
-      deltaString,
-      !!hasTopics,
-    );
+    if (!isAIMode) {
+      const deltaString = JSON.stringify(threadContentDelta);
+      checkNewThreadErrors(
+        { threadKind, threadUrl, threadTitle, threadTopic },
+        deltaString,
+        !!hasTopics,
+      );
+    }
 
     setIsSaving(true);
 
@@ -230,9 +276,9 @@ export const NewThreadForm: React.FC<NewThreadFormProps> = ({
         stage: ThreadStage.Discussion,
         communityId: selectedCommunityId,
         communityBase: community.base,
-        title: threadTitle,
+        title: effectiveTitle,
         topic: threadTopic,
-        body: serializeDelta(threadContentDelta),
+        body: effectiveBody,
         url: threadUrl,
         ethChainIdOrBech32Prefix: getEthChainIdOrBech32Prefix({
           base: community.base,
@@ -240,11 +286,7 @@ export const NewThreadForm: React.FC<NewThreadFormProps> = ({
           eth_chain_id: community?.ChainNode?.eth_chain_id || 0,
         }),
       });
-      if (!isInsideCommunity) {
-        user.setData({
-          addressSelectorSelectedAddress: userSelectedAddress,
-        });
-      }
+
       const thread = await createThread(input);
 
       setThreadContentDelta(createDeltaFromText(''));
@@ -279,7 +321,6 @@ export const NewThreadForm: React.FC<NewThreadFormProps> = ({
   };
 
   const handleCancel = () => {
-    // Clear local form state before canceling
     console.log('NewThreadForm: invoking onCancel');
     setThreadTitle('');
     setThreadTopic(
@@ -287,22 +328,11 @@ export const NewThreadForm: React.FC<NewThreadFormProps> = ({
     );
     setThreadContentDelta(createDeltaFromText(''));
     console.log('NewThreadForm: invoking forreal onCancel');
-    onCancel(); // Calls the passed callback (or no-op if none provided)
+    onCancel();
   };
 
   const showBanner =
     selectedCommunityId && !userSelectedAddress && isBannerVisible;
-  const disabledActionsTooltipText = getThreadActionTooltipText({
-    isCommunityMember: !!userSelectedAddress,
-    isThreadTopicGated: isRestrictedMembership,
-    threadTopicInteractionRestrictions:
-      !isAdmin &&
-      !foundTopicPermissions?.permissions?.includes(
-        PermissionEnum.CREATE_THREAD,
-      )
-        ? foundTopicPermissions?.permissions
-        : undefined,
-  });
 
   const contestThreadBannerVisible =
     isContestAvailable && hasTopicOngoingContest;
@@ -310,24 +340,14 @@ export const NewThreadForm: React.FC<NewThreadFormProps> = ({
   const contestTopicAffordanceVisible =
     isContestAvailable && hasTopicOngoingContest;
 
-  const isWalletBalanceErrorEnabled = false;
-  const walletBalanceError =
-    isContestAvailable &&
-    hasTopicOngoingContest &&
-    isWalletBalanceErrorEnabled &&
-    parseFloat(userEthBalance || '0') < MIN_ETH_FOR_CONTEST_THREAD;
-
   const handleGenerateAIThread = async () => {
     console.log("Draft thread with AI initiated");
     setIsGenerating(true);
-    
-    // Clear existing content
     setThreadTitle('');
     setThreadContentDelta(createDeltaFromText(''));
     bodyAccumulatedRef.current = '';
-    
+
     try {
-      // Generate body first
       const bodyPromise = generateComment(
         'Generate a detailed discussion thread body',
         (chunk: string) => {
@@ -337,18 +357,12 @@ export const NewThreadForm: React.FC<NewThreadFormProps> = ({
         }
       );
 
-      // Generate title with a more specific prompt
       const titlePromise = generateComment(
         'Generate a single-line, concise title (max 100 characters) without quotes or punctuation at the end',
         (chunk: string) => {
           console.log("Title stream update:", chunk);
-          // Remove any quotes and trailing punctuation from the chunk
           const cleanChunk = chunk.replace(/["']/g, '').replace(/[.!?]$/, '');
-          setThreadTitle(prev => {
-            // If this is the first chunk (prev is empty), start fresh
-            // Otherwise append the clean chunk
-            return prev === '' ? cleanChunk : prev + cleanChunk;
-          });
+          setThreadTitle(prev => prev === '' ? cleanChunk : prev + cleanChunk);
         }
       );
 
@@ -365,7 +379,6 @@ export const NewThreadForm: React.FC<NewThreadFormProps> = ({
     refreshTopics().catch(console.error);
   }, [refreshTopics]);
 
-  // Add a keydown handler on the root container.
   const handleKeyDown = useCallback(
     (event: React.KeyboardEvent<HTMLDivElement>) => {
       if (event.key === 'Enter' && isCommandClick(event as unknown as React.MouseEvent)) {
@@ -459,7 +472,6 @@ export const NewThreadForm: React.FC<NewThreadFormProps> = ({
                 <CWSelectList
                   className="topic-select"
                   components={{
-                    // eslint-disable-next-line react/no-multi-comp
                     Option: (originalProps) =>
                       CustomTopicOption({
                         originalProps,
@@ -507,7 +519,6 @@ export const NewThreadForm: React.FC<NewThreadFormProps> = ({
                     setCanShowGatingBanner(true);
                     setCanShowTopicPermissionBanner(true);
                     setThreadTopic(
-                      // @ts-expect-error <StrictNullChecks/>
                       topicsForSelector.find((t) => `${t.id}` === topic.value),
                     );
                   }}
@@ -594,19 +605,8 @@ export const NewThreadForm: React.FC<NewThreadFormProps> = ({
                 </div>
 
                 <CWButton
-                  label="Create thread"
-                  disabled={
-                    isDisabled ||
-                    !user.activeAccount ||
-                    !userSelectedAddress ||
-                    walletBalanceError ||
-                    contestTopicError ||
-                    (selectedCommunityId && !!disabledActionsTooltipText) ||
-                    isLoadingCommunity ||
-                    (isInsideCommunity &&
-                      (!userSelectedAddress || !selectedCommunityId))
-                  }
-                  // eslint-disable-next-line @typescript-eslint/no-misused-promises
+                  label="Create"
+                  disabled={buttonDisabled}
                   onClick={handleNewThreadCreation}
                   tabIndex={4}
                   containerClassName="no-pad"
@@ -616,7 +616,6 @@ export const NewThreadForm: React.FC<NewThreadFormProps> = ({
               {showBanner && (
                 <JoinCommunityBanner
                   onClose={handleCloseBanner}
-                  // eslint-disable-next-line @typescript-eslint/no-misused-promises
                   onJoin={handleJoinCommunity}
                 />
               )}
@@ -651,3 +650,5 @@ export const NewThreadForm: React.FC<NewThreadFormProps> = ({
     </>
   );
 };
+
+export default NewThreadForm;

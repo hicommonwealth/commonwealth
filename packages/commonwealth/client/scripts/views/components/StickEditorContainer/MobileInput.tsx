@@ -64,6 +64,10 @@ export const MobileInput = (props: MobileInputProps) => {
   });
   const sortedTopics = [...fetchedTopics].sort((a, b) => a.name.localeCompare(b.name));
 
+  // Define default constants (must match NewThreadForm and ViewThreadPage)
+  const DEFAULT_THREAD_TITLE = "Untitled Discussion";
+  const DEFAULT_THREAD_BODY = "No content provided.";
+
   const handleClose = useCallback(
     (e: React.MouseEvent<HTMLElement | SVGSVGElement>) => {
       stickyCommentReset();
@@ -85,6 +89,7 @@ export const MobileInput = (props: MobileInputProps) => {
   }, [aiCommentsToggleEnabled, setAICommentsToggleEnabled]);
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    // When AI mode is enabled or there is some text, allow submission on Enter.
     if ((aiCommentsToggleEnabled || value.trim() !== '') && event.key === 'Enter') {
       void handleSubmit();
     }
@@ -92,17 +97,20 @@ export const MobileInput = (props: MobileInputProps) => {
 
   const handleSubmit = async () => {
     let submittedText = value.trim();
-
-    // If AI mode is enabled and no text was provided, supply default text based on mode.
-    if (aiCommentsToggleEnabled && submittedText === '') {
-      submittedText = mode === 'thread' ? 'New Thread Body' : 'New Comment';
+    
+    // For non-thread submissions, apply default text if nothing is provided.
+    if (mode !== 'thread' && aiCommentsToggleEnabled && submittedText === '') {
+      submittedText = 'New Comment';
     }
-
+    
     if (mode === 'thread') {
       // --- Quick Thread Creation Logic ---
-      const lines = submittedText.split('\n');
-      const title = lines[0] || 'New Thread Title';
-      const body = submittedText;
+      // For mobile thread creation in AI mode, we want to fill in default values so that backend validation passes.
+      // Here we use the entire input value for the body and the first newline for the title.
+      // If AI mode is enabled and no title was provided, default the title.
+      const effectiveTitle = DEFAULT_THREAD_TITLE;
+      // Only fill in the body default if no text was provided.
+      const effectiveBody = aiCommentsToggleEnabled ? (submittedText ? submittedText : DEFAULT_THREAD_BODY) : submittedText;
       try {
         // Instead of a hard-coded object, search for a topic named "General" in the sorted topics.
         const defaultTopic =
@@ -114,9 +122,9 @@ export const MobileInput = (props: MobileInputProps) => {
           stage: ThreadStage.Discussion,
           communityId,
           communityBase: app.chain?.base || '',
-          title,
+          title: effectiveTitle,
           topic: defaultTopic,
-          body,
+          body: effectiveBody,
           url: '', // For quick thread creation, URL is empty.
           ethChainIdOrBech32Prefix: getEthChainIdOrBech32Prefix({
             base: app.chain?.base || '',
