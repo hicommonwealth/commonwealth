@@ -13,6 +13,9 @@ import CWIconButton from 'views/components/component_kit/new_designs/CWIconButto
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWToggle } from 'views/components/component_kit/new_designs/cw_toggle';
 import { useGenerateCommentText } from 'state/api/comments/generateCommentText';
+import { createThread } from 'state/api/threads/createThread';
+import { useCommonNavigate } from 'navigation/helpers';
+import { notifyError } from 'utils/notifyError';
 
 export const MobileStickyInput = (props: CommentEditorProps) => {
   const { handleSubmitComment } = props;
@@ -23,6 +26,7 @@ export const MobileStickyInput = (props: CommentEditorProps) => {
   const [streamingReplyIds, setStreamingReplyIds] = useState<number[]>([]);
   const menuVisible = useSidebarStore((state) => state.menuVisible);
   const { generateComment } = useGenerateCommentText();
+  const navigate = useCommonNavigate();
 
   const handleCancel = useCallback(() => {
     console.log('MobileStickyInput: handleCancel triggered');
@@ -76,10 +80,6 @@ export const MobileStickyInput = (props: CommentEditorProps) => {
   const handleFocused = useCallback(() => {
     setFocused(true);
   }, []);
-
-  const handleAiToggle = useCallback((checked: boolean) => {
-    setAICommentsToggleEnabled(checked);
-  }, [setAICommentsToggleEnabled]);
 
   const parent = document.getElementById('MobileNavigationHead');
 
