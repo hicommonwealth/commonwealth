@@ -1,32 +1,38 @@
 @import '../../../../../styles/shared';
 
 .ExploreCard {
-  padding: 24px 18px;
+  padding: 18px;
   border-radius: 6px;
   border: 1px solid $neutral-200;
-  display: grid;
-  grid-template-columns: 4fr 1fr;
+  display: flex;
+  flex-direction: column;
   gap: 8px;
 
-  .right {
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: flex-end !important;
+  .grid {
+    display: grid;
+    grid-template-columns: 4fr 1fr;
+    gap: 8px;
 
-    .featured-icon {
-      margin-bottom: 16px;
+    .right {
+      display: flex !important;
+      flex-direction: row !important;
+      align-items: flex-end !important;
+
+      .featured-icon {
+        margin-bottom: 16px;
+      }
+
+      .featured-img {
+        width: 100px;
+        height: 100px;
+        border-radius: 12px;
+      }
     }
 
-    .featured-img {
-      width: 100px;
-      height: 100px;
-      border-radius: 12px;
+    .row {
+      display: flex;
+      gap: 16px;
+      align-items: center;
     }
-  }
-
-  .row {
-    display: flex;
-    gap: 16px;
-    align-items: center;
   }
 }

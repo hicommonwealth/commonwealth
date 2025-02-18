@@ -76,6 +76,7 @@ const QuestList = () => {
                 key={quest.name}
                 name={quest.name}
                 description={quest.description}
+                communityId={quest.community_id || ''}
                 iconURL={quest.image_url}
                 xpPoints={totalUserXP}
                 startDate={new Date(quest.start_date)}

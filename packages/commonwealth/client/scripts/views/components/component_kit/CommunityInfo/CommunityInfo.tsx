@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { CWCommunityAvatar } from 'views/components/component_kit/cw_community_avatar';
@@ -43,7 +44,7 @@ const CommunityInfo = ({
       {body}
     </Link>
   ) : (
-    <div className="CommunityInfo">{body}</div>
+    <div className={clsx('CommunityInfo', 'unlinked')}>{body}</div>
   );
 };
 

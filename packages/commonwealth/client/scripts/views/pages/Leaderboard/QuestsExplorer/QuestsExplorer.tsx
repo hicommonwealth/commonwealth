@@ -64,6 +64,7 @@ const QuestsExplorer = () => {
                 key={quest.name}
                 label={quest.name}
                 description={quest.description}
+                communityId={quest.community_id || ''}
                 xpPoints={totalUserXP}
                 featuredImgURL={quest.image_url}
                 onExploreClick={() => handleCTAClick(quest.id)}
