@@ -15,7 +15,7 @@
     "archive-outbox": "node --import=extensionless/register build/scripts/archive-outbox.js",
     "build": "tsc -b ./tsconfig.build.json && tsc-alias -p ./tsconfig.build.json",
     "build-contracts": "npx hardhat compile",
-    "bundle": "vite -c ./client/vite.config.ts build",
+    "bundle": "NODE_OPTIONS=--max_old_space_size=8192 vite -c ./client/vite.config.ts build",
     "bundle-analyze": "npx vite-bundle-visualizer -c ./client/vite.config.ts",
     "bootstrap-test-db": "NODE_ENV=test tsx ./scripts/bootstrapTestDb.ts",
     "check-neynar-webhooks": "tsx ./scripts/check-neynar-webhooks.ts",
