@@ -1,4 +1,5 @@
 import moment from 'moment';
+import { useCommonNavigate } from 'navigation/helpers';
 import React, { useState } from 'react';
 
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
@@ -13,6 +14,7 @@ import { MobileTabType } from './ContestPage';
 import EntriesTab from './tabs/Entries';
 import PriceChartTab from './tabs/PriceChart';
 import TokenSwapTab from './tabs/TokenSwap';
+import { getCurrentContestIndex, getSortedContests } from './utils';
 
 import './NewContestPage.scss';
 
@@ -24,8 +26,9 @@ const NewContestPage = ({ contestAddress }: NewContestPageProps) => {
   const [selectedMobileTab, setSelectedMobileTab] = useState<MobileTabType>(
     MobileTabType.Entries,
   );
+  const navigate = useCommonNavigate();
 
-  const { getContestByAddress } = useCommunityContests();
+  const { getContestByAddress, contestsData } = useCommunityContests();
   const contest = getContestByAddress(contestAddress);
 
   const [fundDrawerContest, setFundDrawerContest] = useState<
@@ -33,6 +36,23 @@ const NewContestPage = ({ contestAddress }: NewContestPageProps) => {
   >();
 
   const { end_time } = contest?.contests[0] || {};
+
+  const sortedContests = getSortedContests(contestsData?.all);
+  const currentContestIndex = getCurrentContestIndex(
+    sortedContests,
+    contestAddress,
+  );
+
+  const handleNavigateContest = (direction: 'prev' | 'next') => {
+    const newIndex =
+      direction === 'prev' ? currentContestIndex - 1 : currentContestIndex + 1;
+
+    const targetContest = sortedContests[newIndex];
+
+    if (targetContest) {
+      navigate(`/contests/${targetContest.contest_address}`);
+    }
+  };
 
   return (
     <CWPageLayout>
@@ -65,20 +85,18 @@ const NewContestPage = ({ contestAddress }: NewContestPageProps) => {
               buttonType="secondary"
               iconLeft="arrowLeftPhosphor"
               label="Previous Contest"
-              onClick={() => {
-                console.log('previous contest');
-              }}
+              onClick={() => handleNavigateContest('prev')}
               containerClassName="previous-btn"
+              disabled={currentContestIndex <= 0}
             />
             <CWButton label={contest?.name} containerClassName="contest-name" />
             <CWButton
               buttonType="secondary"
               label="Next Contest"
               iconRight="arrowRightPhosphor"
-              onClick={() => {
-                console.log('next contest');
-              }}
+              onClick={() => handleNavigateContest('next')}
               containerClassName="next-btn"
+              disabled={currentContestIndex >= sortedContests.length - 1}
             />
           </div>
         </div>
