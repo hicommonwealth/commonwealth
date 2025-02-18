@@ -162,6 +162,9 @@ const useCreateQuestForm = () => {
               participation_times_per_period: parseInt(
                 `${repetitionCycleRadioProps.repetitionCycleInputProps.value}`,
               ),
+              ...(subForm.values.actionLink && {
+                action_link: subForm.values.actionLink.trim(),
+              }),
             })),
           });
         }

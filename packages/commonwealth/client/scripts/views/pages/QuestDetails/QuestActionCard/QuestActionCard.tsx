@@ -1,5 +1,6 @@
 import { QuestActionMeta } from '@hicommonwealth/schemas';
 import React from 'react';
+import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
@@ -81,9 +82,23 @@ const QuestActionCard = ({
               XP
             </CWText>
           )}
-          <div className="points">
+          <div className="points-row">
             <CWTag label={`${questAction.reward_amount} XP`} type="proposal" />
-            {/* TODO: helper link here, next todo */}
+            {questAction.action_link && (
+              <a
+                target="_blank"
+                href={questAction.action_link}
+                rel="noreferrer"
+                className="action-link"
+              >
+                Instructions{' '}
+                <CWIcon
+                  iconName="externalLink"
+                  iconSize="small"
+                  weight="bold"
+                />
+              </a>
+            )}
           </div>
         </div>
         {isActionInEligible ? (

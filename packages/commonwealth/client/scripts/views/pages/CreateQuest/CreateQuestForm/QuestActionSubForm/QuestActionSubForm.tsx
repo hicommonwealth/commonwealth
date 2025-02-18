@@ -87,15 +87,15 @@ const QuestActionSubForm = ({
 
       <CWTextInput
         label="Relevant Quest Link (optional)"
-        name="questLink"
+        name="actionLink"
         placeholder="https://example.com"
         instructionalMessage="Note: Social media task links will appear here (e.g., follow on X, join Discord)"
         fullWidth
-        {...(defaultValues?.questLink && {
-          defaultValue: defaultValues?.questLink,
+        {...(defaultValues?.actionLink && {
+          defaultValue: defaultValues?.actionLink,
         })}
-        onInput={(e) => onChange?.({ questLink: e?.target?.value?.trim() })}
-        customError={errors?.questLink}
+        onInput={(e) => onChange?.({ actionLink: e?.target?.value?.trim() })}
+        customError={errors?.actionLink}
       />
     </div>
   );
