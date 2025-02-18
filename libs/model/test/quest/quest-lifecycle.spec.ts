@@ -307,7 +307,7 @@ describe('Quest lifecycle', () => {
       expect(found).toBeUndefined();
     });
 
-    it('should not delete a quest that has started', async () => {
+    it('should be able to delete after started but with no actions', async () => {
       const quest = await command(CreateQuest(), {
         actor: superadmin,
         payload: {
@@ -325,13 +325,68 @@ describe('Quest lifecycle', () => {
         { start_date: now },
         { where: { id: quest!.id! } },
       );
+      const deleted = await command(DeleteQuest(), {
+        actor: superadmin,
+        payload: { quest_id: quest!.id! },
+      });
+      expect(deleted).toBe(true);
+    });
+
+    it('should not delete a quest with actions', async () => {
+      const quest = await command(CreateQuest(), {
+        actor: superadmin,
+        payload: {
+          community_id,
+          name: chance.name(),
+          description: chance.sentence(),
+          image_url: chance.url(),
+          start_date,
+          end_date,
+        },
+      });
+      const action_metas: Omit<z.infer<typeof QuestActionMeta>, 'quest_id'>[] =
+        [
+          {
+            event_name: 'CommentCreated',
+            reward_amount: 100,
+            participation_limit: QuestParticipationLimit.OncePerPeriod,
+            participation_period: QuestParticipationPeriod.Daily,
+            participation_times_per_period: 3,
+            creator_reward_weight: 0,
+          },
+        ];
+      const updated = await command(UpdateQuest(), {
+        actor: superadmin,
+        payload: {
+          quest_id: quest!.id!,
+          action_metas,
+        },
+      });
+
+      // hack to update the start_date
+      const now = new Date();
+      await models.Quest.update(
+        { start_date: now },
+        { where: { id: quest!.id! } },
+      );
+
+      // insert actions
+      await models.XpLog.create({
+        user_id: superadmin.user.id!,
+        event_name: updated!.action_metas!.at(0)!.event_name,
+        event_created_at: new Date(),
+        xp_points: 100,
+        action_meta_id: updated!.action_metas!.at(0)!.id!,
+        created_at: new Date(),
+      });
+
       await expect(
         command(DeleteQuest(), {
           actor: superadmin,
           payload: { quest_id: quest!.id! },
         }),
       ).rejects.toThrowError(
-        `Start date ${moment(now).format('YYYY-MM-DD')} already passed`,
+        `Cannot delete quest "${quest!.id}" because it has actions`,
       );
     });
   });
