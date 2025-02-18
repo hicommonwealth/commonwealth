@@ -140,6 +140,9 @@ const useCreateQuestForm = () => {
           end_date: new Date(values.end_date),
           start_date: new Date(values.start_date),
           image_url: values.image,
+          ...(values?.community && {
+            community_id: values.community.value,
+          }),
         });
 
         if (quest && quest.id) {

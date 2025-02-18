@@ -11,6 +11,7 @@ type CommunityInfoProps = {
   iconUrl: string;
   iconSize?: IconSize;
   communityId: string;
+  linkToCommunity?: boolean;
 };
 
 const CommunityInfo = ({
@@ -19,9 +20,10 @@ const CommunityInfo = ({
   iconUrl,
   iconSize = 'medium',
   communityId = '',
+  linkToCommunity = true,
 }: CommunityInfoProps) => {
-  return (
-    <Link className="CommunityInfo" rel="noreferrer" to={`/${communityId}`}>
+  const body = (
+    <>
       <CWCommunityAvatar size={iconSize} community={{ iconUrl, name }} />
       <div className="info-container">
         {symbol && (
@@ -33,7 +35,15 @@ const CommunityInfo = ({
           {name}
         </CWText>
       </div>
+    </>
+  );
+
+  return linkToCommunity ? (
+    <Link className="CommunityInfo" rel="noreferrer" to={`/${communityId}`}>
+      {body}
     </Link>
+  ) : (
+    <div className="CommunityInfo">{body}</div>
   );
 };
 

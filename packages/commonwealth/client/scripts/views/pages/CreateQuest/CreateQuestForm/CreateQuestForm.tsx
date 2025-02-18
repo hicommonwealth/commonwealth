@@ -1,5 +1,6 @@
 import { QuestParticipationLimit } from '@hicommonwealth/schemas';
 import React from 'react';
+import CWCommunityInput from 'views/components/CWCommunityInput';
 import CWDateTimeInput from 'views/components/component_kit/CWDateTimeInput';
 import {
   CWImageInput,
@@ -117,6 +118,12 @@ const CreateQuestForm = () => {
           hookToForm
           imageBehavior={ImageBehavior.Fill}
           withAIImageGeneration
+        />
+        <CWCommunityInput
+          name="community"
+          hookToForm
+          label="Community (optional)"
+          instructionalMessage="Note: Selecting a community will bound all quest actions to that community."
         />
       </div>
 
