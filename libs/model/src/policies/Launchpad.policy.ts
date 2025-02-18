@@ -7,7 +7,7 @@ import { CreateToken, ProjectLaunchpadTrade } from '../token';
 
 const inputs = {
   LaunchpadTokenCreated: events.LaunchpadTokenCreated,
-  LaunchpadTrade: events.LaunchpadTrade,
+  LaunchpadTokenTraded: events.LaunchpadTokenTraded,
 };
 
 export function LaunchpadPolicy(): Policy<typeof inputs, ZodUndefined> {
@@ -27,7 +27,7 @@ export function LaunchpadPolicy(): Policy<typeof inputs, ZodUndefined> {
           },
         });
       },
-      LaunchpadTrade: async ({ payload }) => {
+      LaunchpadTokenTraded: async ({ payload }) => {
         await command(ProjectLaunchpadTrade(), {
           actor: systemActor({}),
           payload,

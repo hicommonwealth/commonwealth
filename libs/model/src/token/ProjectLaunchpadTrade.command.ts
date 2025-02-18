@@ -13,7 +13,7 @@ import { chainNodeMustExist } from '../policies/utils/utils'; // TODO: place in 
 const log = logger(import.meta);
 
 const schema = {
-  input: events.LaunchpadTrade,
+  input: events.LaunchpadTokenTraded,
   output: z.object({}),
 };
 

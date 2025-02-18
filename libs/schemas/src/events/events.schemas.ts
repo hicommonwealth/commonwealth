@@ -363,7 +363,7 @@ export const events = {
     eth_chain_id: z.number(),
   }),
 
-  LaunchpadTrade: z.object({
+  LaunchpadTokenTraded: z.object({
     block_timestamp: z.coerce.bigint(),
     transaction_hash: z.string(),
     trader_address: EVM_ADDRESS_STRICT,

@@ -46,7 +46,7 @@ export const outboxEvents: Events[] = [
   'NamespaceDeployed',
   'NamespaceDeployedWithReferral',
   'LaunchpadTokenCreated',
-  'LaunchpadTrade',
+  'LaunchpadTokenTraded',
   'ReferralFeeDistributed',
 ] as const;
 

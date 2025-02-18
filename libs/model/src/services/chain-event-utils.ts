@@ -115,14 +115,16 @@ const launchpadTokenCreatedMapper: EvmMapper<'LaunchpadTokenCreated'> = (
   };
 };
 
-const launchpadTradeMapper: EvmMapper<'LaunchpadTrade'> = (event: EvmEvent) => {
+const launchpadTradeMapper: EvmMapper<'LaunchpadTokenTraded'> = (
+  event: EvmEvent,
+) => {
   const decoded = decodeLog<typeof lpBondingCurveAbi, 'Trade'>({
     abi: lpBondingCurveAbi,
     data: event.rawLog.data,
     topics: event.rawLog.topics,
   });
   return {
-    event_name: 'LaunchpadTrade',
+    event_name: 'LaunchpadTokenTraded',
     event_payload: {
       block_timestamp: event.block.timestamp,
       transaction_hash: event.rawLog.transactionHash,
