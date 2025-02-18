@@ -65,6 +65,7 @@ const SSO_OPTIONS_DEFAULT: AuthSSOs[] = [
   'email',
   'farcaster',
   'SMS',
+  'telegram',
 ] as const;
 
 const SSO_OPTIONS_MOBILE: AuthSSOs[] = [
