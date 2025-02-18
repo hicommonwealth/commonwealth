@@ -48,8 +48,12 @@ const QuestSummaryCard = () => {
     navigate('/explore');
   };
 
-  const handleCTAClick = (questId: number) => {
-    navigate(`/quest/${questId}`, {}, null);
+  const handleCTAClick = (questId: number, communityId?: string) => {
+    navigate(
+      `${communityId ? `/${communityId}` : ''}/quest/${questId}`,
+      {},
+      null,
+    );
   };
 
   const isLoading =
@@ -92,7 +96,9 @@ const QuestSummaryCard = () => {
                   imageURL={quest.image_url}
                   isActive={isShowingActiveQuests}
                   name={quest.name}
-                  onCTAClick={() => handleCTAClick(quest.id)}
+                  onCTAClick={() =>
+                    handleCTAClick(quest.id, quest.community_id || '')
+                  }
                 />
               );
             })}
