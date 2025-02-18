@@ -16,9 +16,9 @@ import { useCWRepetitionCycleRadioButton } from 'views/components/component_kit/
 import { ValidationFnProps } from 'views/components/component_kit/CWRepetitionCycleRadioButton/types';
 import { CWFormRef } from 'views/components/component_kit/new_designs/CWForm';
 import { z } from 'zod';
-import './CreateQuestForm.scss';
 import { QuestAction } from './QuestActionSubForm';
 import { useQuestActionMultiFormsState } from './QuestActionSubForm/useMultipleQuestActionForms';
+import './QuestForm.scss';
 import { questFormValidationSchema } from './validation';
 
 const MIN_ACTIONS_LIMIT = 1;
@@ -30,7 +30,7 @@ const MAX_REPETITION_COUNTS = {
   PER_MONTH: 120,
 };
 
-const useCreateQuestForm = () => {
+const useQuestForm = () => {
   const {
     addSubForm,
     questActionSubForms,
@@ -215,4 +215,4 @@ const useCreateQuestForm = () => {
   };
 };
 
-export default useCreateQuestForm;
+export default useQuestForm;

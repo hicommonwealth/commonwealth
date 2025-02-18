@@ -21,7 +21,7 @@ import { withTooltip } from 'views/components/component_kit/new_designs/CWToolti
 import { AuthModalType } from 'views/modals/AuthModal';
 import { z } from 'zod';
 import { PageNotFound } from '../404';
-import { QuestAction } from '../CreateQuest/CreateQuestForm/QuestActionSubForm';
+import { QuestAction } from '../CreateQuest/QuestForm/QuestActionSubForm';
 import QuestActionCard from './QuestActionCard';
 import './QuestDetails.scss';
 
