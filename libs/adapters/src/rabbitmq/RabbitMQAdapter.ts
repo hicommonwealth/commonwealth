@@ -224,10 +224,13 @@ export class RabbitMQAdapter implements Broker {
 
       subscription.on(
         'message',
-        (_message: Message, content: any, ackOrNackFn: AckOrNack) => {
+        (
+          _message: Message,
+          content: EventContext<Events>,
+          ackOrNackFn: AckOrNack,
+        ) => {
           const { beforeHandleEvent, afterHandleEvent } = hooks || {};
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const context: any = {};
+          const context: unknown = {};
           try {
             beforeHandleEvent?.(topic, content, context);
           } catch (err) {

@@ -1,4 +1,3 @@
-import { EvmEventSignatures } from '@hicommonwealth/evm-protocols';
 import { z } from 'zod';
 import { FarcasterCast } from '../commands/contest.schemas';
 import { Comment } from '../entities/comment.schemas';
@@ -7,14 +6,7 @@ import { SubscriptionPreference } from '../entities/notification.schemas';
 import { Reaction } from '../entities/reaction.schemas';
 import { Thread } from '../entities/thread.schemas';
 import { Tweet } from '../integrations';
-import { ETHERS_BIG_NUMBER, EVM_ADDRESS, PG_INT } from '../utils';
-import {
-  CommunityStakeTrade,
-  NamespaceDeployed,
-  NamespaceDeployedWithReferral,
-  ReferralFeeDistributed,
-  ReferralSet,
-} from './chain-event.schemas';
+import { EVM_ADDRESS_STRICT, EVM_BYTES, PG_INT } from '../utils';
 import { EventMetadata } from './util.schemas';
 
 const DiscordEventBase = z.object({
@@ -31,12 +23,12 @@ const DiscordEventBase = z.object({
   imageUrls: z.array(z.string()),
 });
 
-const ChainEventCreatedBase = z.object({
+const ChainEventBase = z.object({
   eventSource: z.object({
     ethChainId: z.number(),
   }),
   rawLog: z.object({
-    blockNumber: z.number(),
+    blockNumber: z.coerce.bigint(),
     blockHash: z.string(),
     transactionIndex: z.number(),
     removed: z.boolean(),
@@ -47,15 +39,14 @@ const ChainEventCreatedBase = z.object({
     logIndex: z.number(),
   }),
   block: z.object({
-    number: z.number(),
+    number: z.coerce.bigint(),
     hash: z.string(),
     logsBloom: z.string(),
     nonce: z.string().optional(),
     parentHash: z.string(),
-    timestamp: z.number(),
+    timestamp: z.coerce.bigint(),
     miner: z.string(),
-    gasLimit: z.number(),
-    gasUsed: z.number(),
+    gasLimit: z.coerce.bigint(),
   }),
 });
 
@@ -217,46 +208,6 @@ export const events = {
     parent_channel_id: true,
   }),
 
-  /**
-   * Zod schema for EvmEvent type defined in workers/evmChainEvents/types.ts
-   */
-  ChainEventCreated: z.union([
-    ChainEventCreatedBase.extend({
-      eventSource: ChainEventCreatedBase.shape.eventSource.extend({
-        eventSignature: z.literal(
-          EvmEventSignatures.NamespaceFactory.NamespaceDeployed,
-        ),
-      }),
-      parsedArgs: NamespaceDeployed,
-    }),
-    ChainEventCreatedBase.extend({
-      eventSource: ChainEventCreatedBase.shape.eventSource.extend({
-        eventSignature: z.literal(
-          EvmEventSignatures.NamespaceFactory.NamespaceDeployedWithReferral,
-        ),
-      }),
-      parsedArgs: NamespaceDeployedWithReferral,
-    }),
-    ChainEventCreatedBase.extend({
-      eventSource: ChainEventCreatedBase.shape.eventSource.extend({
-        eventSignature: z.literal(EvmEventSignatures.CommunityStake.Trade),
-      }),
-      parsedArgs: CommunityStakeTrade,
-    }),
-    ChainEventCreatedBase.extend({
-      eventSource: ChainEventCreatedBase.shape.eventSource.extend({
-        eventSignature: z.literal(EvmEventSignatures.Referrals.ReferralSet),
-      }),
-      parsedArgs: ReferralSet,
-    }),
-    ChainEventCreatedBase.extend({
-      eventSource: ChainEventCreatedBase.shape.eventSource.extend({
-        eventSignature: z.literal(EvmEventSignatures.Referrals.FeeDistributed),
-      }),
-      parsedArgs: ReferralFeeDistributed,
-    }),
-  ]),
-
   // on-chain contest manager events
   RecurringContestManagerDeployed: EventMetadata.extend({
     namespace: z.string().describe('Community namespace'),
@@ -379,21 +330,68 @@ export const events = {
   TwitterMomBotMentioned: Tweet,
   TwitterContestBotMentioned: Tweet,
 
-  TokenLaunched: z.object({
-    block_timestamp: z.number(),
+  // Events mapped from ChainEvents
+  CommunityStakeTrade: ChainEventBase.extend({
+    parsedArgs: z.object({
+      trader: EVM_ADDRESS_STRICT,
+      namespace: EVM_ADDRESS_STRICT,
+      isBuy: z.boolean(),
+      communityTokenAmount: z.coerce.bigint(),
+      ethAmount: z.coerce.bigint(),
+      protocolEthAmount: z.coerce.bigint(),
+      nameSpaceEthAmount: z.coerce.bigint(),
+      supply: z.bigint(),
+      exchangeToken: EVM_ADDRESS_STRICT,
+    }),
+  }),
+
+  NamespaceDeployedWithReferral: ChainEventBase.extend({
+    parsedArgs: z.object({
+      name: z.string(),
+      feeManager: EVM_ADDRESS_STRICT,
+      referrer: EVM_ADDRESS_STRICT,
+      referralFeeManager: EVM_ADDRESS_STRICT,
+      signature: EVM_BYTES,
+      namespaceDeployer: EVM_ADDRESS_STRICT,
+      nameSpaceAddress: EVM_ADDRESS_STRICT,
+    }),
+  }),
+
+  LaunchpadTokenCreated: z.object({
+    block_timestamp: z.coerce.bigint(),
     transaction_hash: z.string(),
     eth_chain_id: z.number(),
   }),
 
-  TokenTraded: z.object({
-    block_timestamp: z.number(),
+  LaunchpadTokenTraded: z.object({
+    block_timestamp: z.coerce.bigint(),
     transaction_hash: z.string(),
-    trader_address: EVM_ADDRESS,
-    token_address: EVM_ADDRESS,
+    trader_address: EVM_ADDRESS_STRICT,
+    token_address: EVM_ADDRESS_STRICT,
     is_buy: z.boolean(),
     eth_chain_id: z.number(),
-    eth_amount: ETHERS_BIG_NUMBER,
-    community_token_amount: ETHERS_BIG_NUMBER,
-    floating_supply: ETHERS_BIG_NUMBER,
+    eth_amount: z.coerce.bigint(),
+    community_token_amount: z.coerce.bigint(),
+    floating_supply: z.coerce.bigint(),
+  }),
+
+  ReferralFeeDistributed: ChainEventBase.extend({
+    parsedArgs: z.object({
+      namespace: EVM_ADDRESS_STRICT,
+      token: EVM_ADDRESS_STRICT,
+      amount: z.coerce.bigint(),
+      recipient: EVM_ADDRESS_STRICT,
+      recipientAmount: z.coerce.bigint(),
+    }),
+  }),
+
+  NamespaceDeployed: ChainEventBase.extend({
+    parsedArgs: z.object({
+      name: z.string(),
+      _feeManager: EVM_ADDRESS_STRICT,
+      _signature: EVM_BYTES,
+      _namespaceDeployer: EVM_ADDRESS_STRICT,
+      nameSpaceAddress: EVM_ADDRESS_STRICT,
+    }),
   }),
 } as const;

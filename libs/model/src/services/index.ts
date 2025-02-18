@@ -1,3 +1,4 @@
+export * from './chain-event-utils';
 export * as commonProtocol from './commonProtocol';
 export * from './openai';
 export * from './snapshot';

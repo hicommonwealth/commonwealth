@@ -390,23 +390,23 @@ export function Xp(): Projection<typeof schemas.QuestEvents> {
         );
         await recordXpsForQuest(user_id, payload.created_at!, action_metas);
       },
-      TokenLaunched: async ({ payload }) => {
-        const created_at = new Date(payload.block_timestamp);
+      LaunchpadTokenCreated: async ({ payload }) => {
+        const created_at = new Date(Number(payload.block_timestamp));
         const action_metas = await getQuestActionMetas(
           { created_at },
-          'TokenLaunched',
+          'LaunchpadTokenCreated',
         );
         const user_id = 0; // TODO: @kurtassad how we find user who launched the token?
         await recordXpsForQuest(user_id, created_at, action_metas);
       },
-      TokenTraded: async ({ payload }) => {
+      LaunchpadTokenTraded: async ({ payload }) => {
         const user_id = await getUserByAddress(payload.trader_address);
         if (!user_id) return;
 
-        const created_at = new Date(payload.block_timestamp);
+        const created_at = new Date(Number(payload.block_timestamp));
         const action_metas = await getQuestActionMetas(
           { created_at },
-          'TokenTraded',
+          'LaunchpadTokenTraded',
         );
         await recordXpsForQuest(user_id, created_at, action_metas);
       },

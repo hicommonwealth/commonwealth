@@ -13,8 +13,8 @@ export const QuestEvents = {
   UserMentioned: events.UserMentioned,
   RecurringContestManagerDeployed: events.RecurringContestManagerDeployed,
   OneOffContestManagerDeployed: events.OneOffContestManagerDeployed,
-  TokenLaunched: events.TokenLaunched,
-  TokenTraded: events.TokenTraded,
+  LaunchpadTokenCreated: events.LaunchpadTokenCreated,
+  LaunchpadTokenTraded: events.LaunchpadTokenTraded,
 } as const;
 
 export enum QuestParticipationLimit {

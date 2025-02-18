@@ -2,6 +2,7 @@ import { config as EnvConfig } from '@hicommonwealth/adapters';
 import {
   EventSchemas,
   EventsHandlerMetadata,
+  logger,
   outboxEvents,
 } from '@hicommonwealth/core';
 import { Events } from '@hicommonwealth/schemas';
@@ -11,6 +12,8 @@ import {
   ConnectionConfig,
   QueueConfig,
 } from 'rascal';
+
+const log = logger(import.meta);
 
 export enum RascalExchanges {
   DeadLetter = 'DeadLetterExchange',
@@ -115,6 +118,7 @@ export function createRmqConfig({
     },
   };
 
+  const ignoredEvents = new Set<string>();
   for (const item of map) {
     let consumer,
       overrides: Record<string, string | null | undefined> | undefined;
@@ -150,6 +154,7 @@ export function createRmqConfig({
           // if consumer handler does not have an associated event
           // from the Outbox exclude it automatically
           if (!outboxEvents.includes(<Events>val)) {
+            ignoredEvents.add(val);
             return acc;
           }
 
@@ -172,5 +177,11 @@ export function createRmqConfig({
     };
   }
 
+  if (ignoredEvents.size > 0)
+    log.warn(
+      `The following events are ignored because they are not part of the Outbox: ${Array.from(
+        ignoredEvents,
+      ).join(', ')}`,
+    );
   return config;
 }

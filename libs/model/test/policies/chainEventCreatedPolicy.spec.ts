@@ -1,20 +1,13 @@
 import { EventContext, dispose } from '@hicommonwealth/core';
-import {
-  EvmEventSignatures,
-  commonProtocol as cp,
-} from '@hicommonwealth/evm-protocols';
-import {
-  createTestRpc,
-  models,
-  processChainEventCreated,
-  tester,
-} from '@hicommonwealth/model';
+import { commonProtocol as cp } from '@hicommonwealth/evm-protocols';
+import { createTestRpc, models, tester } from '@hicommonwealth/model';
 import { Community } from '@hicommonwealth/schemas';
 import { BalanceType } from '@hicommonwealth/shared';
 import { expect } from 'chai';
 import { BigNumber } from 'ethers';
 import { afterAll, afterEach, beforeAll, describe, test } from 'vitest';
 import { z } from 'zod';
+import { handleCommunityStakeTrades } from '../../src/policies/handlers/handleCommunityStakeTrades';
 
 // These are all values for a real txn on the Ethereum Sepolia Testnet
 const transactionHash =
@@ -28,12 +21,12 @@ const stakeId = 2;
 const blockTimestamp = 1712247912;
 
 async function processValidStakeTransaction() {
-  const context: EventContext<'ChainEventCreated'> = {
-    name: 'ChainEventCreated',
+  const context: EventContext<'CommunityStakeTrade'> = {
+    name: 'CommunityStakeTrade',
     payload: {
       rawLog: {
         address: '0xf6C1B02257f0Ac4Af5a1FADd2dA8E37EC5f9E5fd',
-        blockNumber: 5628559,
+        blockNumber: 5628559n,
         transactionHash,
         blockHash:
           '0xdf3b5cd44ea1a9f22a86f678b2e6d596238fe1d75b638cb5326415f293df32f5',
@@ -43,44 +36,33 @@ async function processValidStakeTransaction() {
         data: '0x',
         topics: [],
       },
-      parsedArgs: [
-        traderAddress,
-        namespaceAddress,
+      parsedArgs: {
+        trader: traderAddress,
+        namespace: namespaceAddress,
         isBuy,
-        {
-          hex: '0x01',
-          type: 'BigNumber',
-        },
-        ethAmount.toJSON(),
-        {
-          hex: '0x0430e23400',
-          type: 'BigNumber',
-        },
-        { hex: '0x0430e23400', type: 'BigNumber' },
-        {
-          hex: '0x07',
-          type: 'BigNumber',
-        },
-        '0x0000000000000000000000000000000000000000',
-      ],
+        communityTokenAmount: 1n,
+        ethAmount: 242000000000000n,
+        protocolEthAmount: 18000000000n,
+        nameSpaceEthAmount: 18000000000n,
+        supply: 7n,
+        exchangeToken: '0x0000000000000000000000000000000000000000',
+      },
       eventSource: {
         ethChainId: cp.ValidChains.Sepolia,
-        eventSignature: EvmEventSignatures.CommunityStake.Trade,
       },
       block: {
-        number: 0x1,
+        number: 5628559n,
         hash: '0x1',
         logsBloom: '0x1',
         nonce: '0x1',
         parentHash: '0x1',
-        timestamp: 1673369600,
+        timestamp: 1673369600n,
         miner: '0x0000000000000000000000000000000000000000',
-        gasLimit: 0,
-        gasUsed: 0,
+        gasLimit: 0n,
       },
     },
   };
-  await processChainEventCreated(context);
+  await handleCommunityStakeTrades(context);
 }
 
 describe('ChainEventCreated Policy', () => {
