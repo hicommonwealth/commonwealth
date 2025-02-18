@@ -1118,9 +1118,6 @@ importers:
       ethereumjs-wallet:
         specifier: ^1.0.2
         version: 1.0.2
-      ethers:
-        specifier: 5.7.2
-        version: 5.7.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       express:
         specifier: ^4.18.2
         version: 4.19.2
@@ -1437,9 +1434,6 @@ importers:
       '@atomone/atomone-types-long':
         specifier: ^1.0.3
         version: 1.0.3
-      '@ethersproject/keccak256':
-        specifier: 5.7.0
-        version: 5.7.0
       '@types/express':
         specifier: ^4.17.21
         version: 4.17.21
