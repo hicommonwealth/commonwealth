@@ -211,8 +211,9 @@ export type DecodedLog<
   eventName extends ContractEventName<abi>,
 > = DecodeEventLogReturnType<abi, eventName>;
 
-export const createRandomEvmSigner = () => {
-  const mnemonic = generateMnemonic(english);
+export const createEvmSigner = (
+  mnemonic: string = generateMnemonic(english),
+) => {
   const account = mnemonicToAccount(mnemonic);
   return {
     ...account,

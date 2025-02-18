@@ -10,7 +10,7 @@ import type {
   Signature,
 } from '@canvas-js/interfaces';
 import { Action, Session } from '@canvas-js/interfaces';
-import { createRandomEvmSigner } from '@hicommonwealth/evm-protocols';
+import { createEvmSigner } from '@hicommonwealth/evm-protocols';
 import type {
   CommunityAttributes,
   DB,
@@ -263,7 +263,7 @@ export const modelSeeder = (app: Application, models: DB): ModelSeeder => ({
       chain_id = chain === 'alex' ? '3' : '1'; // use ETH mainnet for testing except alex
       sessionSigner = new SIWESigner({
         chainId: parseInt(chain_id),
-        signer: createRandomEvmSigner(),
+        signer: createEvmSigner(),
       });
     } else if (chain === 'edgeware') {
       wallet_id = 'polkadot';

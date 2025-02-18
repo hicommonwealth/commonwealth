@@ -1,5 +1,5 @@
 import { SIWESigner } from '@canvas-js/chain-ethereum';
-import { createRandomEvmSigner } from '@hicommonwealth/evm-protocols';
+import { createEvmSigner } from '@hicommonwealth/evm-protocols';
 import * as schemas from '@hicommonwealth/schemas';
 import {
   CANVAS_TOPIC,
@@ -9,7 +9,7 @@ import {
 import { z } from 'zod';
 
 export const getTestSigner = () => {
-  return new SIWESigner({ signer: createRandomEvmSigner() });
+  return new SIWESigner({ signer: createEvmSigner() });
 };
 
 export async function getSignersInfo(roles: readonly string[]): Promise<
