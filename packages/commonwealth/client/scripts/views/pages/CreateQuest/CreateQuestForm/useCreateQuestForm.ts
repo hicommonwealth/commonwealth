@@ -5,7 +5,7 @@ import {
 } from '@hicommonwealth/schemas';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { numberGTZeroValidationSchema } from 'helpers/formValidations/common';
-import { calculatePercentageChangeFractional } from 'helpers/number';
+import { calculateRemainingPercentageChangeFractional } from 'helpers/number';
 import { useCommonNavigate } from 'navigation/helpers';
 import { useRef, useState } from 'react';
 import {
@@ -149,10 +149,11 @@ const useCreateQuestForm = () => {
               event_name: subForm.values.action as QuestAction,
               reward_amount: parseInt(`${subForm.values.rewardAmount}`, 10),
               ...(subForm.values.creatorRewardAmount && {
-                creator_reward_weight: calculatePercentageChangeFractional(
-                  parseInt(`${subForm.values.rewardAmount}`, 10),
-                  parseInt(`${subForm.values.creatorRewardAmount}`, 10),
-                ),
+                creator_reward_weight:
+                  calculateRemainingPercentageChangeFractional(
+                    parseInt(`${subForm.values.rewardAmount}`, 10),
+                    parseInt(`${subForm.values.creatorRewardAmount}`, 10),
+                  ),
               }),
               participation_limit: values.participation_limit,
               participation_period: repetitionCycleRadioProps
@@ -161,6 +162,9 @@ const useCreateQuestForm = () => {
               participation_times_per_period: parseInt(
                 `${repetitionCycleRadioProps.repetitionCycleInputProps.value}`,
               ),
+              ...(subForm.values.actionLink && {
+                action_link: subForm.values.actionLink.trim(),
+              }),
             })),
           });
         }
