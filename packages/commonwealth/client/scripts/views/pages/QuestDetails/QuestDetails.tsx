@@ -99,12 +99,7 @@ const QuestDetails = ({ id }: { id: number }) => {
       .reduce((accumulator, currentValue) => accumulator + currentValue, 0) ||
     0;
 
-  const totalCreatorXP =
-    (quest.action_metas || [])
-      ?.map((action) => action.creator_reward_weight * 100)
-      .reduce((accumulator, currentValue) => accumulator + currentValue, 0) ||
-    0;
-
+  // this only includes end user xp gain, creator/referrer xp is not included in this
   const totalUserXP =
     (quest.action_metas || [])
       ?.map(
@@ -112,9 +107,6 @@ const QuestDetails = ({ id }: { id: number }) => {
       )
       .reduce((accumulator, currentValue) => accumulator + currentValue, 0) ||
     0;
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const totalXP = totalCreatorXP + totalUserXP;
 
   const isCompleted = gainedXP === totalUserXP;
 

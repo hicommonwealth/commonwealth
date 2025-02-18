@@ -1,26 +1,31 @@
 import { TokenView } from '@hicommonwealth/schemas';
 import { ChainBase } from '@hicommonwealth/shared';
 import clsx from 'clsx';
+import { formatAddressShort } from 'helpers';
 import { currencyNameToSymbolMap, SupportedCurrencies } from 'helpers/currency';
 import { calculateTokenPricing } from 'helpers/launchpad';
 import useDeferredConditionTriggerCallback from 'hooks/useDeferredConditionTriggerCallback';
 import React, { useState } from 'react';
 import { useFetchTokenUsdRateQuery } from 'state/api/communityStake';
 import useUserStore from 'state/ui/user';
+import { saveToClipboard } from 'utils/clipboard';
+import { CWDivider } from 'views/components/component_kit/cw_divider';
+import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
+import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
+import { CWText } from 'views/components/component_kit/cw_text';
+import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
+import { withTooltip } from 'views/components/component_kit/new_designs/CWTooltip';
+import FractionalValue from 'views/components/FractionalValue';
+import MarketCapProgress from 'views/components/TokenCard/MarketCapProgress';
+import PricePercentageChange from 'views/components/TokenCard/PricePercentageChange';
 import { AuthModal } from 'views/modals/AuthModal';
 import TradeTokenModal, {
   TradingConfig,
   TradingMode,
 } from 'views/modals/TradeTokenModel';
+import { LaunchpadToken } from 'views/modals/TradeTokenModel/CommonTradeModal/types';
 import { ExternalToken } from 'views/modals/TradeTokenModel/UniswapTradeModal/types';
 import { z } from 'zod';
-import { CWDivider } from '../../../component_kit/cw_divider';
-import { CWIconButton } from '../../../component_kit/cw_icon_button';
-import { CWText } from '../../../component_kit/cw_text';
-import { CWButton } from '../../../component_kit/new_designs/CWButton';
-import FractionalValue from '../../../FractionalValue';
-import MarketCapProgress from '../../../TokenCard/MarketCapProgress';
-import PricePercentageChange from '../../../TokenCard/PricePercentageChange';
 import './TokenTradeWidget.scss';
 import { TokenTradeWidgetSkeleton } from './TokenTradeWidgetSkeleton';
 import { useTokenTradeWidget } from './useTokenTradeWidget';
@@ -93,6 +98,13 @@ export const TokenTradeWidget = ({
 
   if (!communityToken) return;
 
+  const tokenAddress =
+    (communityToken as LaunchpadToken)?.token_address ||
+    (communityToken as ExternalToken)?.contract_address;
+  const tokenIconUrl =
+    (communityToken as LaunchpadToken)?.icon_url ||
+    (communityToken as ExternalToken)?.logo;
+
   return (
     <section className="TokenTradeWidget">
       <div className="pad-8 header">
@@ -104,10 +116,42 @@ export const TokenTradeWidget = ({
         <CWText type="b2" fontWeight="semiBold">
           Token
         </CWText>
+
+        {isPinnedToken && (
+          <span className="ml-auto">
+            {withTooltip(
+              <CWIconButton
+                iconName="infoEmpty"
+                iconSize="small"
+                className="ml-auto cursor-pointer"
+              />,
+              'Swaps only supports token on base',
+              true,
+            )}
+          </span>
+        )}
       </div>
 
       {isWidgetExpanded && (
         <>
+          <div className="token-metadata-row pad-8">
+            {tokenIconUrl && <img className="token-img" src={tokenIconUrl} />}
+            <CWText type="b2" className="token-address">
+              {withTooltip(
+                formatAddressShort(tokenAddress),
+                tokenAddress,
+                true,
+              )}
+              <CWIcon
+                iconName="copyNew"
+                className="cursor-pointer"
+                iconSize="small"
+                onClick={() => {
+                  saveToClipboard(tokenAddress, true).catch(console.error);
+                }}
+              />
+            </CWText>
+          </div>
           <CWText type="h3" fontWeight="bold" className="pad-8">
             <CWText type="h3" fontWeight="bold">
               {communityToken.symbol}

@@ -1,7 +1,7 @@
 import { MAX_COMMENT_DEPTH } from '@hicommonwealth/shared';
 import clsx from 'clsx';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
-import React, { useRef } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Virtuoso } from 'react-virtuoso';
 import app from 'state';
 import { useFetchCommentsQuery } from 'state/api/comments';
@@ -15,7 +15,14 @@ import Permissions from '../../../../utils/Permissions';
 import { CommentCard } from '../CommentCard';
 import { CommentViewParams } from '../CommentCard/CommentCard';
 import './CommentTree.scss';
+import { registerAIStreamingCallback } from './helpers';
 import { TreeHierarchyProps } from './types';
+
+type ExtendedCommentViewParams = CommentViewParams & {
+  hasOnAiReply?: boolean;
+  onAiReplyType?: 'function';
+  aiEnabled?: boolean;
+};
 
 export const TreeHierarchy = ({
   pageRef,
@@ -41,6 +48,7 @@ export const TreeHierarchy = ({
 }: TreeHierarchyProps) => {
   const user = useUserStore();
   const communityId = app.activeChainId() || '';
+  const [streamingReplyIds, setStreamingReplyIds] = useState<number[]>([]);
 
   const {
     data: paginatedComments,
@@ -59,9 +67,38 @@ export const TreeHierarchy = ({
     limit: 10,
     apiEnabled: !!communityId && !!thread.id,
   });
+
   const allComments = (paginatedComments?.pages || []).flatMap(
     (page) => page.results,
-  ) as CommentViewParams[];
+  ) as ExtendedCommentViewParams[];
+
+  const handleGenerateAIReply = useCallback(
+    (commentId: number): Promise<void> => {
+      if (streamingReplyIds.includes(commentId)) {
+        return Promise.resolve();
+      }
+
+      const comment = allComments.find((c) => c.id === commentId);
+      if (!comment) {
+        console.error('TreeHierarchy - Comment not found:', commentId);
+        return Promise.resolve();
+      }
+
+      setStreamingReplyIds((prev) => [...prev, commentId]);
+      return Promise.resolve();
+    },
+    [allComments, streamingReplyIds],
+  );
+
+  useEffect(() => {
+    const unregister = registerAIStreamingCallback((commentId) => {
+      void handleGenerateAIReply(commentId);
+    });
+
+    return () => {
+      unregister();
+    };
+  }, [handleGenerateAIReply]);
 
   useRunOnceOnCondition({
     callback: () => {
@@ -76,6 +113,10 @@ export const TreeHierarchy = ({
     Permissions.isCommunityModerator();
 
   const commentRefs = useRef<(HTMLDivElement | null)[]>([]);
+
+  const triggerStreamingForNewComment = useCallback((commentId: number) => {
+    setStreamingReplyIds((prev) => [...prev, commentId]);
+  }, []);
 
   if (isInitialCommentsLoading) {
     return <CWCircleMultiplySpinner />;
@@ -143,6 +184,7 @@ export const TreeHierarchy = ({
                     onReply={() => {
                       onCommentReplyStart(comment.id, index);
                     }}
+                    onAIReply={() => handleGenerateAIReply(comment.id)}
                     onDelete={() => onDelete(comment)}
                     isSpam={!!comment.marked_as_spam_at}
                     onSpamToggle={() => onSpamToggle(comment)}
@@ -178,28 +220,72 @@ export const TreeHierarchy = ({
                     parentCommentId={comment.id}
                   />
                 )}
-                {isReplyingToCommentId &&
-                  isReplyingToCommentId === comment.id && (
-                    <WithActiveStickyComment>
-                      <CreateComment
-                        handleIsReplying={onCommentReplyEnd}
-                        parentCommentId={isReplyingToCommentId}
-                        rootThread={thread}
-                        canComment={canComment}
-                        isReplying={!!isReplyingToCommentId}
-                        replyingToAuthor={comment.profile_name}
-                        onCancel={() => {
-                          onEditCancel(comment, false);
-                        }}
-                        tooltipText={
-                          !canComment &&
-                          typeof disabledActionsTooltipText === 'string'
-                            ? disabledActionsTooltipText
-                            : ''
+                {streamingReplyIds.includes(comment.id) && (
+                  <div className="replies-container">
+                    <CommentCard
+                      key={`streaming-${comment.id}`}
+                      disabledActionsTooltipText={disabledActionsTooltipText}
+                      isThreadArchived={isThreadArchived}
+                      maxReplyLimitReached={true}
+                      replyBtnVisible={false}
+                      comment={{
+                        ...comment,
+                        id: comment.id,
+                        body: '',
+                        created_at: new Date().toISOString(),
+                        updated_at: new Date().toISOString(),
+                        address: comment.address,
+                        comment_level: comment.comment_level + 1,
+                        thread_id: comment.thread_id,
+                        marked_as_spam_at: null,
+                        reaction_count: 0,
+                        reply_count: 0,
+                      }}
+                      isStreamingAIReply={true}
+                      parentCommentText={comment.body}
+                      onStreamingComplete={() => {
+                        setStreamingReplyIds((prev) =>
+                          prev.filter((id) => id !== comment.id),
+                        );
+                      }}
+                      canReply={false}
+                      canReact={false}
+                      canEdit={false}
+                      canDelete={false}
+                      canToggleSpam={false}
+                      shareURL=""
+                    />
+                  </div>
+                )}
+                {isReplyingToCommentId === comment.id && (
+                  <WithActiveStickyComment>
+                    <CreateComment
+                      handleIsReplying={onCommentReplyEnd}
+                      parentCommentId={isReplyingToCommentId}
+                      rootThread={thread}
+                      canComment={canComment}
+                      isReplying={!!isReplyingToCommentId}
+                      replyingToAuthor={comment.profile_name}
+                      onCancel={() => {
+                        onEditCancel(comment, false);
+                      }}
+                      onCommentCreated={(
+                        newCommentId: number,
+                        hasAI: boolean,
+                      ) => {
+                        if (hasAI) {
+                          triggerStreamingForNewComment(newCommentId);
                         }
-                      />
-                    </WithActiveStickyComment>
-                  )}
+                      }}
+                      tooltipText={
+                        !canComment &&
+                        typeof disabledActionsTooltipText === 'string'
+                          ? disabledActionsTooltipText
+                          : ''
+                      }
+                    />
+                  </WithActiveStickyComment>
+                )}
               </div>
             );
           }}

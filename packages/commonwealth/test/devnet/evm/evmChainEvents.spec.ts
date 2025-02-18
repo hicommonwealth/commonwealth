@@ -1,13 +1,9 @@
-import { Log } from '@ethersproject/providers';
 import { dispose } from '@hicommonwealth/core';
 import {
   ChildContractNames,
-  EventRegistry,
   EvmEventSignatures,
   commonProtocol,
-  communityStakesAbi,
   getBlockNumber,
-  namespaceFactoryAbi,
 } from '@hicommonwealth/evm-protocols';
 import {
   CommunityStake,
@@ -19,12 +15,12 @@ import {
 import {
   ChainNodeInstance,
   LastProcessedEvmBlockInstance,
+  Log,
   createEventRegistryChainNodes,
   equalEvmAddresses,
   models,
 } from '@hicommonwealth/model';
-import { events as coreEvents } from '@hicommonwealth/schemas';
-import { AbiType } from '@hicommonwealth/shared';
+import { EventPair } from '@hicommonwealth/schemas';
 import { Anvil } from '@viem/anvil';
 import { Op } from 'sequelize';
 import {
@@ -37,19 +33,14 @@ import {
   test,
   vi,
 } from 'vitest';
-import { z } from 'zod';
 import {
   getEvents,
   getLogs,
-  getProvider,
   migrateEvents,
   parseLogs,
 } from '../../../server/workers/evmChainEvents/logProcessing';
 import { startEvmPolling } from '../../../server/workers/evmChainEvents/startEvmPolling';
-import {
-  ContractSources,
-  EvmSource,
-} from '../../../server/workers/evmChainEvents/types';
+import { EvmSource } from '../../../server/workers/evmChainEvents/types';
 
 vi.mock('../../../server/workers/evmChainEvents/getEventSources');
 
@@ -62,7 +53,7 @@ const namespaceDeployedLog = {
   data: '0x0000000000000000000000000000000000000000000000000000000000000080000000000000000000000000f39fd6e51aad88f6f4ce6ab8827279cfffb9226600000000000000000000000000000000000000000000000000000000000000c0000000000000000000000000f39fd6e51aad88f6f4ce6ab8827279cfffb92266000000000000000000000000000000000000000000000000000000000000001363657465737431373237373734373236393138000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000',
   blockHash:
     '0x5aa2154c16dca3b09a11a8a6f06154b2263c1185f3ef7edb99e8f5099d95083b',
-  blockNumber: 16003219,
+  blockNumber: 16003219n,
   blockTimestamp: '0x66fbc006',
   transactionHash:
     '0x42c646d126f850e575c0ead5692655670b09ec4baf5d0eca74d6ee75af5fc311',
@@ -110,9 +101,7 @@ describe('EVM Chain Events Devnet Tests', () => {
 
   describe('fetching logs', () => {
     test('should not return any logs if no contract addresses are given', async () => {
-      const provider = getProvider(localRpc);
-      const currentBlockNum = await provider.getBlockNumber();
-
+      const currentBlockNum = await getBlockNumber({ rpc: localRpc });
       const { logs } = await getLogs({
         rpc: localRpc,
         maxBlockRange: 50,
@@ -135,13 +124,12 @@ describe('EVM Chain Events Devnet Tests', () => {
         expect.fail();
       } catch (e) {
         expect(e).toHaveProperty('message');
-        expect(e.message.includes('code=SERVER_ERROR')).toBeTruthy();
+        expect(e.message.includes('fetch failed')).toBeTruthy();
       }
     });
 
     test('should not throw if the starting block number is greater than the current block number', async () => {
-      const provider = getProvider(localRpc);
-      const currentBlockNum = await provider.getBlockNumber();
+      const currentBlockNum = await getBlockNumber({ rpc: localRpc });
       const res = await getLogs({
         rpc: localRpc,
         maxBlockRange: 500,
@@ -182,83 +170,70 @@ describe('EVM Chain Events Devnet Tests', () => {
           endingBlockNum: namespaceDeployedBlock,
         });
         expect(res.logs.length).to.equal(1);
+
+        Object.keys(namespaceDeployedLog).forEach((key) => {
+          expect(res.logs[0]).toHaveProperty(key);
+        });
+        expect(Object.keys(namespaceDeployedLog).length).to.equal(
+          Object.keys(res.logs[0]).length,
+        );
+
+        // returned contract address can be lowercase
+        expect(res.logs[0].address).to.equal(
+          namespaceFactoryAddress.toLowerCase(),
+        );
         expect(res.lastBlockNum).to.equal(namespaceDeployedBlock);
       },
     );
   });
 
   describe('parsing logs', () => {
-    test('should not throw if an invalid ABI is given for a contract address', async () => {
-      const evmSource: EvmSource = {
-        rpc: localRpc,
-        maxBlockRange: 500,
-        contracts: {
-          [namespaceFactoryAddress]: {
-            sources: [
-              {
-                event_signature:
-                  EvmEventSignatures.NamespaceFactory.NamespaceDeployed,
-                eth_chain_id: 1,
-                contract_address: '0x1',
-              },
-            ],
-          },
-        } as unknown as ContractSources,
-      };
-
-      let result = await parseLogs(evmSource.contracts, [namespaceDeployedLog]);
-      expect(result.length).to.equal(0);
-
-      evmSource.contracts[namespaceFactoryAddress].abi =
-        'invalid abi' as unknown as AbiType;
-      result = await parseLogs(evmSource.contracts, [namespaceDeployedLog]);
-      expect(result.length).to.equal(0);
-
-      evmSource.contracts[namespaceFactoryAddress].abi = [];
-      result = await parseLogs(evmSource.contracts, [namespaceDeployedLog]);
-      expect(result.length).to.equal(0);
-    });
-
     test('should only parse logs with a matching signature', async () => {
       const evmSource: EvmSource = {
         rpc: localRpc,
         maxBlockRange: 500,
         contracts: {
-          [namespaceFactoryAddress]: {
-            abi: namespaceFactoryAbi as unknown as AbiType,
-            sources: [
-              {
-                event_signature:
-                  EvmEventSignatures.NamespaceFactory.NamespaceDeployed,
-                eth_chain_id: 1,
-                contract_address: namespaceFactoryAddress,
-                created_at_block: 1,
-                events_migrated: true,
-              },
-            ],
-          },
+          [namespaceFactoryAddress]: [
+            {
+              event_signature:
+                EvmEventSignatures.NamespaceFactory.NamespaceDeployed,
+              eth_chain_id: 1,
+              contract_address: namespaceFactoryAddress,
+              created_at_block: 1,
+              events_migrated: true,
+            },
+          ],
         },
       };
 
-      const events = await parseLogs(evmSource.contracts, [
-        namespaceDeployedLog,
-        {
-          address:
-            commonProtocol.factoryContracts[
-              commonProtocol.ValidChains.SepoliaBase
-            ].factory,
-          topics: ['0xfake_topic'],
-        } as Log,
-      ]);
+      const events = await parseLogs(
+        evmSource.contracts,
+        [
+          namespaceDeployedLog,
+          {
+            address:
+              commonProtocol.factoryContracts[
+                commonProtocol.ValidChains.SepoliaBase
+              ].factory,
+            topics: ['0xfake_topic'],
+          } as Log,
+        ],
+        {},
+      );
       expect(events.length).to.equal(1);
+      const event: EventPair<'NamespaceDeployed'> =
+        events[0] as EventPair<'NamespaceDeployed'>;
       expect(
-        equalEvmAddresses(events[0].rawLog.address, namespaceFactoryAddress),
+        equalEvmAddresses(
+          event.event_payload.rawLog.address,
+          namespaceFactoryAddress,
+        ),
       ).toBeTruthy();
 
-      expect(events[0].rawLog.blockNumber).to.equal(
+      expect(event.event_payload.rawLog.blockNumber).to.equal(
         namespaceDeployedLog.blockNumber,
       );
-      expect(events[0].parsedArgs).to.exist;
+      expect(event.event_payload.parsedArgs).to.exist;
     });
   });
 
@@ -268,31 +243,25 @@ describe('EVM Chain Events Devnet Tests', () => {
         rpc: localRpc,
         maxBlockRange: -1,
         contracts: {
-          [namespaceFactoryAddress]: {
-            abi: namespaceFactoryAbi as unknown as AbiType,
-            sources: [
-              {
-                event_signature:
-                  EvmEventSignatures.NamespaceFactory.NamespaceDeployed,
-                eth_chain_id: 1,
-                contract_address: namespaceFactoryAddress,
-                created_at_block: 1,
-                events_migrated: true,
-              },
-            ],
-          },
-          [communityStakeAddress]: {
-            abi: communityStakesAbi as unknown as AbiType,
-            sources: [
-              {
-                event_signature: EvmEventSignatures.CommunityStake.Trade,
-                eth_chain_id: 1,
-                contract_address: communityStakeAddress,
-                created_at_block: 1,
-                events_migrated: true,
-              },
-            ],
-          },
+          [namespaceFactoryAddress]: [
+            {
+              event_signature:
+                EvmEventSignatures.NamespaceFactory.NamespaceDeployed,
+              eth_chain_id: 1,
+              contract_address: namespaceFactoryAddress,
+              created_at_block: 1,
+              events_migrated: true,
+            },
+          ],
+          [communityStakeAddress]: [
+            {
+              event_signature: EvmEventSignatures.CommunityStake.Trade,
+              eth_chain_id: 1,
+              contract_address: communityStakeAddress,
+              created_at_block: 1,
+              events_migrated: true,
+            },
+          ],
         },
       };
 
@@ -304,26 +273,22 @@ describe('EVM Chain Events Devnet Tests', () => {
       // namespace deployed + configure stake buy event + explicit buy event
       expect(result.events.length).to.equal(3);
       const deployedNamespaceEvent = result.events.find(
-        (e) =>
-          e.eventSource.eventSignature ===
-          EvmEventSignatures.NamespaceFactory.NamespaceDeployed,
-      );
+        (e) => e.event_name === 'NamespaceDeployed',
+      ) as EventPair<'NamespaceDeployed'> | undefined;
       expect(deployedNamespaceEvent).toBeTruthy();
       expect(
         equalEvmAddresses(
-          deployedNamespaceEvent!.rawLog.address,
+          deployedNamespaceEvent!.event_payload.rawLog.address,
           namespaceFactoryAddress,
         ),
       ).toBeTruthy();
       const communityStakeBuyEvent = result.events.find(
-        (e) =>
-          e.eventSource.eventSignature ===
-          EvmEventSignatures.CommunityStake.Trade,
-      );
+        (e) => e.event_name === 'CommunityStakeTrade',
+      ) as EventPair<'CommunityStakeTrade'> | undefined;
       expect(communityStakeBuyEvent).toBeTruthy();
       expect(
         equalEvmAddresses(
-          communityStakeBuyEvent!.rawLog.address,
+          communityStakeBuyEvent!.event_payload.rawLog.address,
           communityStakeAddress,
         ),
       ).toBeTruthy();
@@ -335,14 +300,12 @@ describe('EVM Chain Events Devnet Tests', () => {
       );
       expect(result.events.length).to.equal(1);
       const communityStakeSellEvent = result.events.find(
-        (e) =>
-          e.eventSource.eventSignature ===
-          EvmEventSignatures.CommunityStake.Trade,
-      );
+        (e) => e.event_name === 'CommunityStakeTrade',
+      ) as EventPair<'CommunityStakeTrade'> | undefined;
       expect(communityStakeSellEvent).toBeTruthy();
       expect(
         equalEvmAddresses(
-          communityStakeSellEvent!.rawLog.address,
+          communityStakeSellEvent!.event_payload.rawLog.address,
           communityStakeAddress,
         ),
       ).toBeTruthy();
@@ -353,19 +316,16 @@ describe('EVM Chain Events Devnet Tests', () => {
         rpc: localRpc,
         maxBlockRange: -1,
         contracts: {
-          [namespaceFactoryAddress]: {
-            abi: namespaceFactoryAbi as unknown as AbiType,
-            sources: [
-              {
-                event_signature:
-                  EvmEventSignatures.NamespaceFactory.NamespaceDeployed,
-                eth_chain_id: 1,
-                contract_address: namespaceFactoryAddress,
-                created_at_block: namespaceDeployedBlock,
-                events_migrated: false,
-              },
-            ],
-          },
+          [namespaceFactoryAddress]: [
+            {
+              event_signature:
+                EvmEventSignatures.NamespaceFactory.NamespaceDeployed,
+              eth_chain_id: 1,
+              contract_address: namespaceFactoryAddress,
+              created_at_block: namespaceDeployedBlock,
+              events_migrated: false,
+            },
+          ],
         },
       };
 
@@ -375,14 +335,12 @@ describe('EVM Chain Events Devnet Tests', () => {
       }
       expect(result?.events.length).to.equal(1);
       const deployedNamespaceEvent = result!.events.find(
-        (e) =>
-          e.eventSource.eventSignature ===
-          EvmEventSignatures.NamespaceFactory.NamespaceDeployed,
-      );
+        (e) => e.event_name === 'NamespaceDeployed',
+      ) as EventPair<'NamespaceDeployed'> | undefined;
       expect(deployedNamespaceEvent).toBeTruthy();
       expect(
         equalEvmAddresses(
-          deployedNamespaceEvent!.rawLog.address,
+          deployedNamespaceEvent!.event_payload.rawLog.address,
           namespaceFactoryAddress,
         ),
       ).toBeTruthy();
@@ -391,8 +349,6 @@ describe('EVM Chain Events Devnet Tests', () => {
 
   describe('EVM Chain Events End to End Tests', () => {
     const sepoliaBaseChainId = commonProtocol.ValidChains.SepoliaBase;
-    const factoryEventRegistry =
-      EventRegistry[sepoliaBaseChainId][namespaceFactoryAddress];
 
     let chainNode: ChainNodeInstance;
 
@@ -420,8 +376,6 @@ describe('EVM Chain Events Devnet Tests', () => {
       async () => {
         const stakeAddress =
           commonProtocol.factoryContracts[sepoliaBaseChainId].communityStake;
-        const stakeEventRegistry =
-          EventRegistry[sepoliaBaseChainId][stakeAddress];
 
         const { getEventSources } = await import(
           '../../../server/workers/evmChainEvents/getEventSources'
@@ -433,32 +387,25 @@ describe('EVM Chain Events Devnet Tests', () => {
                 rpc: localRpc,
                 maxBlockRange: 500,
                 contracts: {
-                  [namespaceFactoryAddress]: {
-                    abi: factoryEventRegistry.abi,
-                    sources: [
-                      {
-                        eth_chain_id: sepoliaBaseChainId,
-                        contract_address: namespaceFactoryAddress,
-                        event_signature:
-                          EvmEventSignatures.NamespaceFactory.NamespaceDeployed,
-                        created_at_block: namespaceDeployedBlock,
-                        events_migrated: true,
-                      },
-                    ],
-                  },
-                  [stakeAddress]: {
-                    abi: stakeEventRegistry.abi,
-                    sources: [
-                      {
-                        eth_chain_id: sepoliaBaseChainId,
-                        contract_address: stakeAddress,
-                        event_signature:
-                          EvmEventSignatures.CommunityStake.Trade,
-                        created_at_block: 1,
-                        events_migrated: true,
-                      },
-                    ],
-                  },
+                  [namespaceFactoryAddress]: [
+                    {
+                      eth_chain_id: sepoliaBaseChainId,
+                      contract_address: namespaceFactoryAddress,
+                      event_signature:
+                        EvmEventSignatures.NamespaceFactory.NamespaceDeployed,
+                      created_at_block: namespaceDeployedBlock,
+                      events_migrated: true,
+                    },
+                  ],
+                  [stakeAddress]: [
+                    {
+                      eth_chain_id: sepoliaBaseChainId,
+                      contract_address: stakeAddress,
+                      event_signature: EvmEventSignatures.CommunityStake.Trade,
+                      created_at_block: 1,
+                      events_migrated: true,
+                    },
+                  ],
                 },
               },
             }),
@@ -497,13 +444,12 @@ describe('EVM Chain Events Devnet Tests', () => {
           communityStakeSellBlock - 1,
         );
 
-        const events = (await models.Outbox.findAll()) as unknown as Array<{
-          event_name: 'ChainEventCreated';
-          event_payload: z.infer<typeof coreEvents.ChainEventCreated>;
-        }>;
+        const events = await models.Outbox.findAll();
         expect(events.length).to.equal(3);
         for (const { event_name } of events) {
-          expect(event_name).to.equal('ChainEventCreated');
+          expect(
+            ['CommunityStakeTrade', 'NamespaceDeployed'].includes(event_name),
+          ).to.be.true;
         }
 
         expect(events[0].event_payload.eventSource).to.deep.equal({
@@ -554,19 +500,16 @@ describe('EVM Chain Events Devnet Tests', () => {
               rpc: localRpc,
               maxBlockRange: 500,
               contracts: {
-                [namespaceFactoryAddress]: {
-                  abi: factoryEventRegistry.abi,
-                  sources: [
-                    {
-                      eth_chain_id: sepoliaBaseChainId,
-                      contract_address: namespaceFactoryAddress,
-                      event_signature:
-                        EvmEventSignatures.NamespaceFactory.NamespaceDeployed,
-                      created_at_block: namespaceDeployedBlock,
-                      events_migrated: false,
-                    },
-                  ],
-                },
+                [namespaceFactoryAddress]: [
+                  {
+                    eth_chain_id: sepoliaBaseChainId,
+                    contract_address: namespaceFactoryAddress,
+                    event_signature:
+                      EvmEventSignatures.NamespaceFactory.NamespaceDeployed,
+                    created_at_block: namespaceDeployedBlock,
+                    events_migrated: false,
+                  },
+                ],
               },
             },
           }),
@@ -618,14 +561,9 @@ describe('EVM Chain Events Devnet Tests', () => {
         latestBlockNum - 1,
       );
 
-      const events = (await models.Outbox.findAll()) as unknown as Array<{
-        event_name: 'ChainEventCreated';
-        event_payload: z.infer<typeof coreEvents.ChainEventCreated>;
-      }>;
+      const events = await models.Outbox.findAll();
       expect(events.length).to.equal(1);
-      for (const { event_name } of events) {
-        expect(event_name).to.equal('ChainEventCreated');
-      }
+      expect(events[0].event_name).to.equal('NamespaceDeployed');
 
       expect(events[0].event_payload.eventSource).to.deep.equal({
         ethChainId: chainNode.eth_chain_id!,
@@ -713,19 +651,16 @@ describe('EVM Chain Events Devnet Tests', () => {
                 rpc: localRpc,
                 maxBlockRange: 500,
                 contracts: {
-                  [namespaceFactoryAddress]: {
-                    abi: factoryEventRegistry.abi,
-                    sources: [
-                      {
-                        eth_chain_id: sepoliaBaseChainId,
-                        contract_address: namespaceFactoryAddress,
-                        event_signature:
-                          EvmEventSignatures.NamespaceFactory.NamespaceDeployed,
-                        created_at_block: latestBlockNum - 5,
-                        events_migrated: false,
-                      },
-                    ],
-                  },
+                  [namespaceFactoryAddress]: [
+                    {
+                      eth_chain_id: sepoliaBaseChainId,
+                      contract_address: namespaceFactoryAddress,
+                      event_signature:
+                        EvmEventSignatures.NamespaceFactory.NamespaceDeployed,
+                      created_at_block: latestBlockNum - 5,
+                      events_migrated: false,
+                    },
+                  ],
                 },
               },
             }),
@@ -770,10 +705,7 @@ describe('EVM Chain Events Devnet Tests', () => {
           latestBlockNum - 1,
         );
 
-        const events = (await models.Outbox.findAll()) as unknown as Array<{
-          event_name: 'ChainEventCreated';
-          event_payload: z.infer<typeof coreEvents.ChainEventCreated>;
-        }>;
+        const events = await models.Outbox.findAll();
         expect(events.length).to.equal(0);
 
         await evmEventSource.reload();

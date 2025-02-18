@@ -56,6 +56,7 @@ export default defineConfig(({ mode }) => {
     'process.env.FLAG_XP': JSON.stringify(env.FLAG_XP),
     'process.env.FLAG_COMMUNITY_HOME': JSON.stringify(env.FLAG_COMMUNITY_HOME),
     'process.env.FLAG_HOMEPAGE': JSON.stringify(env.FLAG_HOMEPAGE),
+    'process.env.FLAG_AI_COMMENTS': JSON.stringify(env.FLAG_AI_COMMENTS),
   };
 
   const config = {
@@ -72,6 +73,9 @@ export default defineConfig(({ mode }) => {
     // FARCASTER_NGROK_DOMAIN should only be setup on local development
     'process.env.FARCASTER_NGROK_DOMAIN': JSON.stringify(
       env.FARCASTER_NGROK_DOMAIN,
+    ),
+    'process.env.CONTEST_DURATION_IN_SEC': JSON.stringify(
+      env.CONTEST_DURATION_IN_SEC,
     ),
     'process.env.MIXPANEL_DEV_TOKEN':
       JSON.stringify(env.MIXPANEL_DEV_TOKEN) ||

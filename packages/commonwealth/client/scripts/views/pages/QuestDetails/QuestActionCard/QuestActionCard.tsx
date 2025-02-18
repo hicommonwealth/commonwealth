@@ -55,6 +55,8 @@ const QuestActionCard = ({
   inEligibilityReason,
   questAction,
 }: QuestActionCardProps) => {
+  const creatorXP = questAction.creator_reward_weight * 100;
+
   return (
     <div className="QuestActionCard">
       <div className="counter">
@@ -70,16 +72,10 @@ const QuestActionCard = ({
           {doesActionRequireCreatorReward(questAction.event_name) && (
             <CWText type="caption" className="xp-shares">
               <span className="creator-share">
-                {questAction.creator_reward_weight * 100}% (
-                {questAction.creator_reward_weight * 100} XP)
+                {creatorXP}% ({creatorXP} XP)
               </span>
               &nbsp; shared with {actionCopies.shares[questAction.event_name]}.
-              Your share ={' '}
-              {Math.abs(
-                questAction.reward_amount -
-                  questAction.creator_reward_weight * 100,
-              )}{' '}
-              XP
+              Your share = {Math.abs(questAction.reward_amount - creatorXP)} XP
             </CWText>
           )}
           <div className="points-row">

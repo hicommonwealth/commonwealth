@@ -64,6 +64,7 @@
 
         svg {
           fill: $neutral-500;
+          filter: grayscale(100%);
         }
 
         .rewards-button-container {
@@ -73,7 +74,7 @@
           cursor: pointer;
 
           .earnings {
-            margin-left: 4px;
+            margin-inline: 4px;
             font-family: $font-family-roboto;
             color: $neutral-500;
             white-space: nowrap;
