@@ -1,4 +1,3 @@
-/* eslint-disable react/destructuring-assignment */
 import { APIOrderBy, APIOrderDirection } from 'helpers/constants';
 import React, { useState } from 'react';
 import { components } from 'react-select';
@@ -64,18 +63,20 @@ const CWCommunityInput = (props: CWCommunityInputProps) => {
       components={{
         // option item in the dropdown
         // eslint-disable-next-line react/no-multi-comp
-        Option: (originalProps) => (
-          <components.Option {...originalProps}>
-            <CommunityInfo
-              communityId={(originalProps.data as CWCommunityInputOption).value}
-              iconUrl={
-                (originalProps.data as CWCommunityInputOption).label.imageURL
-              }
-              name={(originalProps.data as CWCommunityInputOption).label.name}
-              linkToCommunity={false}
-            />
-          </components.Option>
-        ),
+        Option: (originalProps) => {
+          // eslint-disable-next-line react/destructuring-assignment
+          const { value, label } = originalProps.data as CWCommunityInputOption;
+          return (
+            <components.Option {...originalProps}>
+              <CommunityInfo
+                communityId={value}
+                iconUrl={label.imageURL}
+                name={label.name}
+                linkToCommunity={false}
+              />
+            </components.Option>
+          );
+        },
       }}
       formatOptionLabel={(option: CWCommunityInputOption) => (
         // selected option
