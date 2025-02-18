@@ -10,6 +10,7 @@ import moment from 'moment';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { z } from 'zod';
 import {
+  CancelQuest,
   CreateQuest,
   DeleteQuest,
   GetQuest,
@@ -387,6 +388,35 @@ describe('Quest lifecycle', () => {
         }),
       ).rejects.toThrowError(
         `Cannot delete quest "${quest!.id}" because it has actions`,
+      );
+    });
+  });
+
+  describe('cancel', () => {
+    it('should cancel a quest', async () => {
+      const quest = await command(CreateQuest(), {
+        actor: superadmin,
+        payload: {
+          community_id,
+          name: chance.name() + Math.random(),
+          description: chance.sentence(),
+          image_url: chance.url(),
+          start_date,
+          end_date,
+        },
+      });
+      const cancelled = await command(CancelQuest(), {
+        actor: superadmin,
+        payload: { quest_id: quest!.id! },
+      });
+      expect(cancelled).toBe(true);
+
+      const found = await query(GetQuest(), {
+        actor: superadmin,
+        payload: { quest_id: quest!.id! },
+      });
+      expect(new Date(found!.end_date).getTime()).toBeLessThanOrEqual(
+        Date.now(),
       );
     });
   });
