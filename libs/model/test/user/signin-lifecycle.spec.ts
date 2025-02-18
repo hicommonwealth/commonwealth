@@ -16,6 +16,7 @@ import { SignIn } from '../../src/user/SignIn.command';
 import { CommunitySeedOptions, getTestSigner, seedCommunity } from '../utils';
 
 describe('SignIn Lifecycle', async () => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [evmSigner, _, cosmosSigner, substrateSigner, solanaSigner] =
     await getSessionSigners();
 
