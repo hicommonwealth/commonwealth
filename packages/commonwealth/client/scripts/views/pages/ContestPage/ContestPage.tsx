@@ -1,3 +1,4 @@
+import { useFlag } from 'hooks/useFlag';
 import moment from 'moment';
 import React, { useState } from 'react';
 import { FarcasterEmbed } from 'react-farcaster-embed/dist/client';
@@ -12,6 +13,9 @@ import { CWUpvote } from 'views/components/component_kit/new_designs/cw_upvote';
 import { PageNotFound } from 'views/pages/404';
 import ContestCard from 'views/pages/CommunityManagement/Contests/ContestsList/ContestCard';
 import useCommunityContests from 'views/pages/CommunityManagement/Contests/useCommunityContests';
+
+import FundContestDrawer from '../CommunityManagement/Contests/FundContestDrawer';
+import NewContestPage from './NewContestPage';
 
 import './ContestPage.scss';
 
@@ -31,14 +35,24 @@ const sortOptions = [
   },
 ];
 
+export enum MobileTabType {
+  Entries = 'Entries',
+  PriceChart = 'Price Chart',
+  TokenSwap = 'Token Swap',
+}
+
 interface ContestPageProps {
   contestAddress: string;
 }
 
 const ContestPage = ({ contestAddress }: ContestPageProps) => {
+  const newContestPageEnabled = useFlag('newContestPage');
   const { getContestByAddress, isContestDataLoading } = useCommunityContests();
   const contest = getContestByAddress(contestAddress);
 
+  const [fundDrawerContest, setFundDrawerContest] = useState<
+    typeof contest | null
+  >();
   const [selectedSort, setSelectedSort] = useState<SortType>(
     sortOptions[0].value,
   );
@@ -54,6 +68,10 @@ const ContestPage = ({ contestAddress }: ContestPageProps) => {
   }
 
   const { end_time } = contest?.contests[0] || {};
+
+  if (newContestPageEnabled) {
+    return <NewContestPage contestAddress={contestAddress} />;
+  }
 
   return (
     <CWPageLayout>
@@ -80,6 +98,7 @@ const ContestPage = ({ contestAddress }: ContestPageProps) => {
             showLeaderboardButton={false}
             payoutStructure={contest?.payout_structure}
             isFarcaster={contest?.is_farcaster_contest}
+            onFund={() => setFundDrawerContest(contest)}
           />
         )}
 
@@ -137,6 +156,13 @@ const ContestPage = ({ contestAddress }: ContestPageProps) => {
           )}
         </div>
       </div>
+      <FundContestDrawer
+        onClose={() => setFundDrawerContest(undefined)}
+        isOpen={!!fundDrawerContest}
+        contestAddress={fundDrawerContest?.contest_address || ''}
+        fundingTokenAddress={fundDrawerContest?.funding_token_address || ''}
+        fundingTokenTicker={fundDrawerContest?.ticker || 'ETH'}
+      />
     </CWPageLayout>
   );
 };

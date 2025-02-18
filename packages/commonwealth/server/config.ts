@@ -26,6 +26,8 @@ const {
   DISPATCHER_APP_PRIVATE_KEY,
   DEV_MODULITH,
   ENABLE_CLIENT_PUBLISHING,
+  EVM_CE_LOG_TRACE,
+  TWITTER_WORKER_POLL_INTERVAL,
 } = process.env;
 
 const DEFAULTS = {
@@ -37,6 +39,8 @@ const DEFAULTS = {
   MESSAGE_RELAYER_TIMEOUT_MS: '200',
   MESSAGE_RELAYER_PREFETCH: '50',
   EVM_CE_POLL_INTERVAL: '120000',
+  // 16 minutes -> 15 minute rate limit window + 1 minute buffer to account for func execution time
+  TWITTER_WORKER_POLL_INTERVAL: 16 * 60 * 1000,
 };
 
 export const config = configure(
@@ -94,6 +98,7 @@ export const config = configure(
         EVM_CE_POLL_INTERVAL ?? DEFAULTS.EVM_CE_POLL_INTERVAL,
         10,
       ),
+      EVM_CE_TRACE: EVM_CE_LOG_TRACE !== 'false',
     },
     LIBP2P_PRIVATE_KEY,
     SNAPSHOT_WEBHOOK_SECRET,
@@ -105,6 +110,15 @@ export const config = configure(
     },
     DEV_MODULITH: DEV_MODULITH === 'true',
     ENABLE_CLIENT_PUBLISHING: ENABLE_CLIENT_PUBLISHING === 'true',
+    TWITTER: {
+      WORKER_POLL_INTERVAL: (() => {
+        if (TWITTER_WORKER_POLL_INTERVAL)
+          return parseInt(TWITTER_WORKER_POLL_INTERVAL, 10);
+        else if (model_config.APP_ENV === 'local')
+          return DEFAULTS.TWITTER_WORKER_POLL_INTERVAL;
+        else return 0;
+      })(),
+    },
   },
   z.object({
     NO_GLOBAL_ACTIVITY_CACHE: z.boolean(),
@@ -163,6 +177,7 @@ export const config = configure(
       MESSAGE_RELAYER_TIMEOUT_MS: z.number().int().positive(),
       MESSAGE_RELAYER_PREFETCH: z.number().int().positive(),
       EVM_CE_POLL_INTERVAL_MS: z.number().int().positive(),
+      EVM_CE_TRACE: z.boolean().optional(),
     }),
     LIBP2P_PRIVATE_KEY: z.string().optional(),
     SNAPSHOT_WEBHOOK_SECRET: z
@@ -188,5 +203,8 @@ export const config = configure(
     }),
     DEV_MODULITH: z.boolean(),
     ENABLE_CLIENT_PUBLISHING: z.boolean(),
+    TWITTER: z.object({
+      WORKER_POLL_INTERVAL: z.number().int().gte(0),
+    }),
   }),
 );

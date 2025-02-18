@@ -110,11 +110,10 @@ export function JoinCommunity(): Command<typeof schemas.JoinCommunity> {
 
           await emitEvent(models.Outbox, [
             {
-              event_name: schemas.EventNames.CommunityJoined,
+              event_name: 'CommunityJoined',
               event_payload: {
                 community_id,
                 user_id: actor.user.id!,
-                referrer_address: payload.referrer_address,
                 created_at: created.created_at!,
               },
             },

@@ -51,6 +51,13 @@ export const splitAndDecodeURL = (locationPathname: string) => {
   return splitURLPath[2] ? decodeURIComponent(splitURLPath[2]) : null;
 };
 
+// WARN: Using process.env to avoid webpack failures
+export const getCommunityUrl = (community: string): string => {
+  return process.env.NODE_ENV === 'production'
+    ? `https://${PRODUCTION_DOMAIN}/${community}`
+    : `http://localhost:8080/${community}`;
+};
+
 export const getThreadUrl = (
   thread: {
     chain: string;
@@ -408,9 +415,13 @@ export async function alchemyGetTokenPrices({
 
 export const getBaseUrl = (
   env: 'local' | 'CI' | 'frick' | 'frack' | 'beta' | 'demo' | 'production',
+  localOverride?: string,
 ) => {
   switch (env) {
     case 'local':
+      if (localOverride) {
+        return localOverride;
+      }
     case 'CI':
       return 'http://localhost:8080';
     case 'beta':
@@ -434,6 +445,11 @@ export const buildContestLeaderboardUrl = (
   return `${baseUrl}/${communityId}/contests/${contestAddress}`;
 };
 
+export const smallNumberFormatter = new Intl.NumberFormat('en-US', {
+  notation: 'standard',
+  maximumFractionDigits: 20, // Allow up to 22 decimal places for small numbers
+});
+
 // returns balance with fee deducted
 export const calculateNetContestBalance = (originalBalance: number) => {
   const multiplier = (100 - CONTEST_FEE_PERCENT) / 100;
@@ -445,14 +461,54 @@ export const buildContestPrizes = (
   contestBalance: number,
   payoutStructure?: number[],
   decimals?: number,
-): number[] => {
+): string[] => {
   // 10% fee deducted from prize pool
   const netContestBalance = calculateNetContestBalance(Number(contestBalance));
   return netContestBalance && payoutStructure
-    ? payoutStructure.map(
-        (percentage) =>
+    ? payoutStructure.map((percentage) => {
+        const prize =
           (Number(netContestBalance) * (percentage / 100)) /
-          Math.pow(10, decimals || 18),
-      )
+          Math.pow(10, decimals || 18);
+
+        return smallNumberFormatter.format(prize);
+      })
     : [];
 };
+
+export const formatWeiToDecimal = (wei: string): string => {
+  return (parseFloat(wei) / 1e18).toString();
+};
+
+export const formatDecimalToWei = (
+  decimal: string,
+  defaultValue: number = 0,
+): string => {
+  const value = parseFloat(decimal) * 10 ** 18;
+  return (value || defaultValue).toString();
+};
+
+export function bigIntReplacer(key: string, value: unknown) {
+  if (typeof value === 'bigint') {
+    return value.toString() + 'n';
+  }
+  return value;
+}
+
+export function serializeBigIntObj(
+  obj: Record<string | number | symbol, unknown>,
+): Record<string | number | symbol, unknown> {
+  const traverse = (value: unknown): unknown => {
+    if (typeof value === 'bigint') {
+      return value.toString();
+    } else if (Array.isArray(value)) {
+      return value.map(traverse);
+    } else if (value && typeof value === 'object' && !Array.isArray(value)) {
+      return Object.fromEntries(
+        Object.entries(value).map(([key, val]) => [key, traverse(val)]),
+      );
+    }
+    return value;
+  };
+
+  return traverse(obj) as Record<string | number | symbol, unknown>;
+}

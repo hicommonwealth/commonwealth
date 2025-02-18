@@ -5,8 +5,11 @@ import { withLayout } from 'views/Layout';
 import { RouteFeatureFlags } from './Router';
 
 const SearchPage = lazy(() => import('views/pages/search'));
+const HomePage = lazy(() => import('views/pages/HomePage/HomePage'));
 
 const CreateCommunityPage = lazy(() => import('views/pages/CreateCommunity'));
+const CreateQuestPage = lazy(() => import('views/pages/CreateQuest'));
+const QuestDetailsPage = lazy(() => import('views/pages/QuestDetails'));
 const LaunchTokenPage = lazy(() => import('views/pages/LaunchToken'));
 const OverviewPage = lazy(() => import('views/pages/overview'));
 const MembersPage = lazy(
@@ -31,6 +34,7 @@ const NotificationsPage = lazy(() => import('views/pages/notifications'));
 const NotificationSettings = lazy(
   () => import('views/pages/NotificationSettings'),
 );
+const LeaderboardPage = lazy(() => import('views/pages/Leaderboard'));
 
 const ProposalsPage = lazy(() => import('views/pages/proposals'));
 const ViewProposalPage = lazy(() => import('views/pages/view_proposal/index'));
@@ -101,10 +105,19 @@ const NewSnapshotProposalPage = lazy(
 const NewProfilePage = lazy(() => import('views/pages/new_profile'));
 const EditNewProfilePage = lazy(() => import('views/pages/edit_new_profile'));
 const ProfilePageRedirect = lazy(() => import('views/pages/profile_redirect'));
+const UnSubscribePage = lazy(() => import('views/pages/UnSubscribePage'));
 
 const RewardsPage = lazy(() => import('views/pages/RewardsPage'));
+const CommunityHomePage = lazy(
+  () => import('../views/pages/CommunityHome/CommunityHomePage'),
+);
 
-const CustomDomainRoutes = ({ launchpadEnabled }: RouteFeatureFlags) => {
+const CustomDomainRoutes = ({
+  launchpadEnabled,
+  xpEnabled,
+  communityHomeEnabled,
+  homePageEnable,
+}: RouteFeatureFlags) => {
   return [
     <Route
       key="/"
@@ -119,6 +132,25 @@ const CustomDomainRoutes = ({ launchpadEnabled }: RouteFeatureFlags) => {
       path="/createCommunity"
       element={withLayout(CreateCommunityPage, { type: 'common' })}
     />,
+    ...(xpEnabled
+      ? [
+          <Route
+            key="/createQuest"
+            path="/createQuest"
+            element={withLayout(CreateQuestPage, { type: 'common' })}
+          />,
+          <Route
+            key="/quest/:id"
+            path="/quest/:id"
+            element={withLayout(QuestDetailsPage, { type: 'common' })}
+          />,
+        ]
+      : []),
+    <Route
+      key="/unSubscribe/:userId"
+      path="/unSubscribe/:userId"
+      element={withLayout(UnSubscribePage, { type: 'common' })}
+    />,
     ...(launchpadEnabled
       ? [
           <Route
@@ -128,7 +160,24 @@ const CustomDomainRoutes = ({ launchpadEnabled }: RouteFeatureFlags) => {
           />,
         ]
       : []),
-    <Route key="/home" path="/home" element={<Navigate to="/overview" />} />,
+    ...(xpEnabled
+      ? [
+          <Route
+            key="/leaderboard"
+            path="/leaderboard"
+            element={withLayout(LeaderboardPage, { type: 'common' })}
+          />,
+        ]
+      : []),
+    ...(homePageEnable
+      ? [
+          <Route
+            key="/home"
+            path="/home"
+            element={withLayout(HomePage, { type: 'common' })}
+          />,
+        ]
+      : []),
     <Route
       key="/search"
       path="/search"
@@ -239,6 +288,17 @@ const CustomDomainRoutes = ({ launchpadEnabled }: RouteFeatureFlags) => {
     // GOVERNANCE END
 
     // DISCUSSIONS
+    ...(communityHomeEnabled
+      ? [
+          <Route
+            key="/community-home"
+            path="/community-home"
+            element={withLayout(CommunityHomePage, {
+              scoped: true,
+            })}
+          />,
+        ]
+      : []),
     <Route
       key="/discussions"
       path="/discussions"

@@ -12,7 +12,7 @@ import {
 import { convertTokenAmountToUsd } from 'views/modals/ManageCommunityStakeModal/utils';
 import { calculateNewContractBalance, getAmountError } from './utils';
 
-export const INITIAL_AMOUNT = '0.0001';
+export const INITIAL_AMOUNT = '0.001';
 
 interface UseFundContestFormProps {
   contestAddress: string;

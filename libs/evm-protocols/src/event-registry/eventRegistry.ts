@@ -7,6 +7,7 @@ import {
   tokenCommunityManagerAbi,
 } from '../abis';
 import { recurringContestAbi } from '../abis/recurringContestAbi';
+import { referralFeeManager } from '../abis/referralFeeManager';
 import { ValidChains, factoryContracts } from '../common-protocol';
 import { EvmEventSignature, EvmEventSignatures } from './eventSignatures';
 
@@ -67,6 +68,7 @@ const namespaceFactorySource = {
   eventSignatures: [
     EvmEventSignatures.NamespaceFactory.ContestManagerDeployed,
     EvmEventSignatures.NamespaceFactory.NamespaceDeployed,
+    EvmEventSignatures.NamespaceFactory.NamespaceDeployedWithReferral,
   ],
   childContracts: {
     [ChildContractNames.RecurringContest]: {
@@ -109,11 +111,8 @@ const tokenCommunityManagerSource: ContractSource = {
 } satisfies ContractSource;
 
 const referralFeeManagerSource: ContractSource = {
-  abi: tokenCommunityManagerAbi,
-  eventSignatures: [
-    EvmEventSignatures.Referrals.ReferralSet,
-    EvmEventSignatures.Referrals.ReferralSet,
-  ],
+  abi: referralFeeManager,
+  eventSignatures: [EvmEventSignatures.Referrals.FeeDistributed],
 };
 
 /**

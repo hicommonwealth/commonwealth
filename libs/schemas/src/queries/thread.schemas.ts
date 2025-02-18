@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { ZodType, z } from 'zod';
 import {
   Address,
   Comment,
@@ -73,7 +73,9 @@ export const UserView = z.object({
   created_at: z.date().or(z.string()).nullish(),
   updated_at: z.date().or(z.string()).nullish(),
   ProfileTags: z.array(ProfileTagsView).optional(),
+  unsubscribe_uuid: z.string().uuid().nullish().optional(),
 });
+type UserView = z.infer<typeof UserView>;
 
 export const AddressView = Address.extend({
   id: PG_INT,
@@ -82,7 +84,7 @@ export const AddressView = Address.extend({
   last_active: z.date().or(z.string()).nullish(),
   created_at: z.date().or(z.string()).nullish(),
   updated_at: z.date().or(z.string()).nullish(),
-  User: UserView.optional(),
+  User: UserView.optional().nullish() as ZodType<UserView | null | undefined>,
 });
 
 export const ReactionView = z.object({
@@ -126,7 +128,7 @@ export const CommentView = Comment.extend({
   // this is returned by GetThreads
   address: z.string(),
   profile_name: z.string().optional(),
-  profile_avatar: z.string().optional(),
+  avatar_url: z.string().optional(),
   user_id: PG_INT,
   CommentVersionHistories: z.array(CommentVersionHistoryView).nullish(),
 });
@@ -282,7 +284,7 @@ export const DEPRECATED_GetBulkThreads = z.object({
 
 export const GetThreadsByIds = {
   input: z.object({
-    community_id: z.string(),
+    community_id: z.string().optional(),
     thread_ids: z.string(),
   }),
   output: z.array(ThreadView),

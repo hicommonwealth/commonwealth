@@ -1,4 +1,3 @@
-import { BigNumber } from '@ethersproject/bignumber';
 import { InvalidState, Projection, logger } from '@hicommonwealth/core';
 import {
   ChildContractNames,
@@ -9,14 +8,9 @@ import {
   getTokenAttributes,
 } from '@hicommonwealth/evm-protocols';
 import { config } from '@hicommonwealth/model';
-import { ContestScore, events } from '@hicommonwealth/schemas';
-import {
-  CONTEST_FEE_PERCENT,
-  buildContestLeaderboardUrl,
-  getBaseUrl,
-} from '@hicommonwealth/shared';
+import { events } from '@hicommonwealth/schemas';
+import { buildContestLeaderboardUrl, getBaseUrl } from '@hicommonwealth/shared';
 import { QueryTypes } from 'sequelize';
-import { z } from 'zod';
 import { models } from '../database';
 import { mustExist } from '../middleware/guards';
 import { EvmEventSourceAttributes } from '../models';
@@ -59,6 +53,7 @@ async function updateOrCreateWithAlert(
   contest_address: string,
   interval: number,
   isOneOff: boolean,
+  blockNumber: number,
 ) {
   const community = await models.Community.findOne({
     where: { namespace_address: namespace },
@@ -163,7 +158,7 @@ async function updateOrCreateWithAlert(
           event_signature: eventSignature,
           contract_name: childContractName,
           parent_contract_address: cp.factoryContracts[ethChainId].factory,
-          // TODO: add created_at_block so EVM CE runs the migrateEvents func
+          created_at_block: blockNumber,
         };
       },
     );
@@ -175,6 +170,7 @@ type ContestDetails = {
   url: string;
   prize_percentage: number;
   payout_structure: number[];
+  interval: number;
 };
 
 /**
@@ -183,14 +179,13 @@ type ContestDetails = {
 async function getContestDetails(
   contest_address: string,
 ): Promise<ContestDetails | undefined> {
-  const [result] = await models.sequelize.query<
-    ContestDetails & { private_url: string }
-  >(
+  const [result] = await models.sequelize.query<ContestDetails>(
     `
         select cn.private_url,
                cn.url,
                cm.prize_percentage,
-               cm.payout_structure
+               cm.payout_structure,
+               cm.interval
         from "ContestManagers" cm
                  join "Communities" c on cm.community_id = c.id
                  join "ChainNodes" cn on c.chain_node_id = cn.id
@@ -204,9 +199,8 @@ async function getContestDetails(
   );
 
   return {
-    url: getChainNodeUrl(result),
-    prize_percentage: result.prize_percentage,
-    payout_structure: result.payout_structure,
+    ...result,
+    url: getChainNodeUrl({ url: result.url }),
   };
 }
 
@@ -215,53 +209,23 @@ async function getContestDetails(
  */
 export async function updateScore(contest_address: string, contest_id: number) {
   try {
-    const contestManager = await models.ContestManager.findOne({
-      where: {
-        contest_address,
-      },
-    });
-    const oneOff = contestManager!.interval === 0;
-
     const details = await getContestDetails(contest_address);
     if (!details?.url)
       throw new InvalidState(
         `Chain node url not found on contest ${contest_address}`,
       );
 
-    const { scores, contestBalance } = await getContestScore(
+    const score = await getContestScore(
       details.url,
       contest_address,
+      details.prize_percentage,
+      details.payout_structure,
       undefined,
-      oneOff,
+      details.interval === 0,
     );
-
-    let prizePool = BigNumber.from(contestBalance)
-      .mul(oneOff ? 100 : details.prize_percentage)
-      .div(100);
-    prizePool = prizePool.mul(100 - CONTEST_FEE_PERCENT).div(100); // deduct contest fee from prize pool
-    const score: z.infer<typeof ContestScore> = scores.map((s, i) => ({
-      content_id: s.winningContent.toString(),
-      creator_address: s.winningAddress,
-      votes: BigNumber.from(s.voteCount).toString(),
-      prize:
-        i < Number(details.payout_structure.length)
-          ? BigNumber.from(prizePool)
-              .mul(details.payout_structure[i])
-              .div(100)
-              .toString()
-          : '0',
-    }));
     await models.Contest.update(
-      {
-        score,
-        score_updated_at: new Date(),
-      },
-      {
-        where: {
-          contest_address: contest_address,
-          contest_id,
-        },
-      },
+      { score, score_updated_at: new Date() },
+      { where: { contest_address: contest_address, contest_id } },
     );
   } catch (err) {
     err instanceof Error
@@ -281,6 +245,7 @@ export function Contests(): Projection<typeof inputs> {
           payload.contest_address,
           payload.interval,
           false,
+          payload.block_number,
         );
       },
 
@@ -291,6 +256,7 @@ export function Contests(): Projection<typeof inputs> {
           payload.contest_address,
           0,
           true,
+          payload.block_number,
         );
       },
 
@@ -370,7 +336,7 @@ export function Contests(): Projection<typeof inputs> {
           BigInt(payload.voting_power || 0) > BigInt(0) &&
           add_action?.ContestManager?.vote_weight_multiplier
         ) {
-          const { eth_chain_id, url, private_url } =
+          const { eth_chain_id } =
             add_action!.ContestManager!.Community!.ChainNode!;
           const { funding_token_address, vote_weight_multiplier } =
             add_action!.ContestManager!;
@@ -378,7 +344,6 @@ export function Contests(): Projection<typeof inputs> {
             payload.voter_address,
             funding_token_address!,
             eth_chain_id!,
-            getChainNodeUrl({ url, private_url }),
             vote_weight_multiplier!,
           );
           calculated_voting_weight = numTokens.toString();

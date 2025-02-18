@@ -1,0 +1,104 @@
+@import '../../../../styles/shared.scss';
+
+.ActiveContestCard {
+  border-radius: $border-radius-corners;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  background-color: $white;
+  width: 335px;
+  min-height: 360px;
+  border: 1px solid $neutral-300;
+  cursor: pointer;
+
+  &:hover {
+    box-shadow: $elevation-2;
+  }
+
+  .contest-banner {
+    border-radius: 6px;
+    height: 160px;
+
+    .banner-image {
+      border-radius: 6px;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  .contest-content {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding-top: 0px;
+    flex-grow: 1;
+
+    .heading {
+      display: flex;
+
+      .basic-info {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        width: 100%;
+        margin-left: 8px;
+      }
+    }
+
+    .contest-timing {
+      margin-bottom: 16px;
+    }
+
+    .prize-list {
+      display: flex;
+      flex-direction: column;
+      padding: 0 2px;
+      margin-bottom: 10px;
+
+      .prize {
+        display: flex;
+        justify-content: space-between;
+        background-color: rgba(0, 0, 0, 0.05);
+        border-radius: 8px;
+        padding: 5px 15px;
+        margin-bottom: 5px;
+      }
+    }
+
+    .contest-actions {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .cta-button-container {
+      display: flex;
+      align-items: center;
+      height: 40px;
+      margin-top: auto;
+    }
+
+    .contest-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      margin-top: auto;
+    }
+
+    .action-btn {
+      button {
+        text-transform: capitalize;
+      }
+
+      &:focus-within {
+        border-width: 1px !important;
+        padding: 0 !important;
+      }
+
+      margin: 0 !important;
+      margin-top: auto;
+    }
+  }
+}

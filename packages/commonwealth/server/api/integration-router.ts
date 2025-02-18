@@ -53,6 +53,16 @@ function build() {
       express.command(Contest.FarcasterReplyCastCreatedWebhook()),
     );
 
+    router.post(
+      '/farcaster/ContestBotMentioned',
+      (req, _, next) => {
+        validateNeynarWebhook(
+          config.CONTESTS.NEYNAR_CONTEST_BOT_MENTIONED_WEBHOOK_SECRET,
+        )(req, _, next).catch(next);
+      },
+      express.command(Contest.RelayFarcasterContestBotMentioned()),
+    );
+
     router.get(
       '/farcaster/CastUpvoteAction',
       express.query(Contest.GetFarcasterUpvoteActionMetadata()),
@@ -64,6 +74,12 @@ function build() {
         validateFarcasterAction()(req, _, next).catch(next);
       },
       express.command(Contest.FarcasterUpvoteAction()),
+    );
+
+    router.post(
+      '/farcaster/NotificationsWebhook',
+      // TODO: add validation middleware
+      express.command(Contest.FarcasterNotificationsWebhook()),
     );
   }
 

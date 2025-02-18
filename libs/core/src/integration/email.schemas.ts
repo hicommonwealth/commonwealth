@@ -75,6 +75,7 @@ export const GetRecapEmailData = {
   input: z.object({
     user_id: z.string(),
   }),
+
   output: z.object({
     discussion: z.array(
       z.union([
@@ -91,9 +92,9 @@ export const GetRecapEmailData = {
     ),
     num_notifications: z.number(),
     notifications_link: z.string(),
+    unsubscribe_link: z.string(),
   }),
 };
-
 export const EnrichedThread = Thread.extend({
   name: z
     .string()
@@ -101,9 +102,16 @@ export const EnrichedThread = Thread.extend({
   icon_url: z
     .string()
     .describe('The icon url of the community that the thread belongs to'),
+  author: z.string().nullish().optional(),
 });
 
 export const GetDigestEmailData = {
-  input: z.object({}),
-  output: z.record(z.string(), z.array(EnrichedThread)),
+  input: z.object({
+    user_id: z.string(),
+  }),
+  output: z.object({
+    threads: z.array(EnrichedThread),
+    numberOfThreads: z.number(),
+    unsubscribe_link: z.string(),
+  }),
 };

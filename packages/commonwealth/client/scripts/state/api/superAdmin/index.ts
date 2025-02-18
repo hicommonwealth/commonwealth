@@ -1,3 +1,8 @@
+import useEnableDigestEmail from './enableDigestEmail';
 import useTriggerNotificationsWorkflowMutation from './triggerNotificationsWorkflow';
-
-export { useTriggerNotificationsWorkflowMutation };
+import useUpdateResourceTimestamps from './updateResourceTimestamps';
+export {
+  useEnableDigestEmail,
+  useTriggerNotificationsWorkflowMutation,
+  useUpdateResourceTimestamps,
+};

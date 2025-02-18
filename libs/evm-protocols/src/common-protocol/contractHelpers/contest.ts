@@ -1,8 +1,9 @@
 import { BigNumber } from '@ethersproject/bignumber';
-import { ZERO_ADDRESS } from '@hicommonwealth/shared';
+import { CONTEST_FEE_PERCENT, ZERO_ADDRESS } from '@hicommonwealth/shared';
 import { Mutex } from 'async-mutex';
 import Web3, { Contract, PayableCallOptions, TransactionReceipt } from 'web3';
 import { feeManagerAbi } from '../../abis/feeManagerAbi';
+import { namespaceAbi } from '../../abis/namespaceAbi';
 import { namespaceFactoryAbi } from '../../abis/namespaceFactoryAbi';
 import { recurringContestAbi } from '../../abis/recurringContestAbi';
 import { singleContestAbi } from '../../abis/singleContestAbi';
@@ -13,6 +14,7 @@ import {
   estimateGas,
   getTransactionCount,
 } from '../utils';
+import { getNamespace } from './namespace';
 
 export const getTotalContestBalance = async (
   contestContract: Contract<
@@ -138,24 +140,21 @@ export const getContestBalance = async (
  * Gets vote and more information about winners of a given contest
  * @param rpcNodeUrl the rpc node url
  * @param contest the address of the contest
+ * @param prizePercentage the prize percentage of the contest
+ * @param payoutStructure the payout structure of the contest
  * @param contestId the id of the contest for data within the contest contract.
  * No contest id will return current winners
  * @param oneOff boolean indicating whether this is a recurring contest - defaults to false (recurring)
- * @returns ContestScores object containing eqaul indexed content ids, addresses, and votes
+ * @returns ContestScores object containing equal indexed content ids, addresses, and votes
  */
 export const getContestScore = async (
   rpcNodeUrl: string,
   contest: string,
+  prizePercentage: number,
+  payoutStructure: number[],
   contestId?: number,
   oneOff: boolean = false,
-): Promise<{
-  scores: {
-    winningContent: string;
-    winningAddress: string;
-    voteCount: string;
-  }[];
-  contestBalance: string;
-}> => {
+) => {
   const web3 = new Web3(rpcNodeUrl);
   const contestInstance = new web3.eth.Contract(
     oneOff ? singleContestAbi : recurringContestAbi,
@@ -185,16 +184,28 @@ export const getContestScore = async (
 
   const contentMeta = await Promise.all(votePromises);
 
-  return {
-    scores: winnerIds.map((v, i) => {
-      return {
-        winningContent: v,
-        winningAddress: contentMeta[i]['creator'],
-        voteCount: contentMeta[i]['cumulativeVotes'],
-      };
-    }),
-    contestBalance: contestData[1],
-  };
+  const scores = winnerIds.map((v, i) => {
+    return {
+      winningContent: v,
+      winningAddress: contentMeta[i]['creator'],
+      voteCount: contentMeta[i]['cumulativeVotes'],
+    };
+  });
+  const contestBalance = contestData[1];
+
+  let prizePool = BigNumber.from(contestBalance)
+    .mul(oneOff ? 100 : prizePercentage)
+    .div(100);
+  prizePool = prizePool.mul(100 - CONTEST_FEE_PERCENT).div(100); // deduct contest fee from prize pool
+  return scores.map((s, i) => ({
+    content_id: s.winningContent.toString(),
+    creator_address: s.winningAddress,
+    votes: BigNumber.from(s.voteCount).toString(),
+    prize:
+      i < Number(payoutStructure.length)
+        ? BigNumber.from(prizePool).mul(payoutStructure[i]).div(100).toString()
+        : '0',
+  }));
 };
 
 export type AddContentResponse = {
@@ -311,6 +322,7 @@ export const addContentBatch = async ({
   contest: string[];
   creator: string;
   url: string;
+  // eslint-disable-next-line @typescript-eslint/require-await
 }): Promise<PromiseSettledResult<AddContentResponse>[]> => {
   return nonceMutex.runExclusive(async () => {
     const web3 = createPrivateEvmClient({ rpc, privateKey });
@@ -344,6 +356,7 @@ export const voteContentBatch = async ({
     contestAddress: string;
     contentId: string;
   }[];
+  // eslint-disable-next-line @typescript-eslint/require-await
 }) => {
   return nonceMutex.runExclusive(async () => {
     const web3 = createPrivateEvmClient({ rpc, privateKey });
@@ -386,6 +399,7 @@ export const rollOverContest = async ({
   rpc: string;
   contest: string;
   oneOff: boolean;
+  // eslint-disable-next-line @typescript-eslint/require-await
 }): Promise<boolean> => {
   return nonceMutex.runExclusive(async () => {
     const web3 = createPrivateEvmClient({ rpc, privateKey });
@@ -394,9 +408,24 @@ export const rollOverContest = async ({
       contest,
     );
 
+    if (oneOff) {
+      const contestEnded = await contestInstance.methods.contestEnded().call();
+      if (contestEnded) {
+        return false;
+      } else {
+        const endTime = await contestInstance.methods.endTime().call();
+        const currentTime = Math.floor(Date.now() / 1000);
+        if (Number(endTime) > currentTime) {
+          return false;
+        }
+      }
+    }
     const contractCall = oneOff
       ? contestInstance.methods.endContest()
       : contestInstance.methods.newContest();
+
+    // TODO: @ianrowan or @rbennettcw - we should check if the contest is already ended before calling endContest again
+    // to avoid transaction failures and unnecessary gas costs
 
     let gasResult = BigInt(300000);
     try {
@@ -446,38 +475,93 @@ export const deployERC20Contest = async ({
   namespaceFactory: string;
   rpc: string;
 }) => {
-  const web3 = createPrivateEvmClient({ rpc, privateKey });
+  return nonceMutex.runExclusive(async () => {
+    const web3 = createPrivateEvmClient({ rpc, privateKey });
+    const contract = new web3.eth.Contract(
+      namespaceFactoryAbi,
+      namespaceFactory,
+    );
+    const maxFeePerGasEst = await estimateGas(web3);
+    let txReceipt: TransactionReceipt;
+    try {
+      txReceipt = await contract.methods
+        .newSingleERC20Contest(
+          namespaceName,
+          contestInterval,
+          winnerShares,
+          voteToken,
+          voterShare,
+          exchangeToken,
+        )
+        .send({
+          from: web3.eth.defaultAccount,
+          type: '0x2',
+          maxFeePerGas: maxFeePerGasEst?.toString(),
+          maxPriorityFeePerGas: web3.utils.toWei('0.001', 'gwei'),
+        });
+    } catch (err) {
+      console.warn('New Contest Transaction failed', err);
+      return;
+    }
+
+    const eventLog = txReceipt.logs.find(
+      (log) => log.topics![0] == CREATE_CONTEST_TOPIC,
+    );
+    if (!eventLog || !eventLog.data) throw new Error('No event data');
+
+    const { 0: address } = decodeParameters({
+      abiInput: ['address', 'address', 'uint256', 'bool'],
+      data: eventLog.data.toString(),
+    });
+    return address as string;
+  });
+};
+
+export const deployNamespace = async (
+  namespaceFactory: string,
+  name: string,
+  walletAddress: string,
+  feeManager: string,
+  rpcNodeUrl: string,
+  privateKey: string,
+): Promise<string> => {
+  const web3 = createPrivateEvmClient({ rpc: rpcNodeUrl, privateKey });
+  const namespaceCheck = await getNamespace(rpcNodeUrl, name, namespaceFactory);
+  if (namespaceCheck === ZERO_ADDRESS) {
+    throw new Error('Namespace already reserved');
+  }
   const contract = new web3.eth.Contract(namespaceFactoryAbi, namespaceFactory);
+
   const maxFeePerGasEst = await estimateGas(web3);
-  let txReceipt: TransactionReceipt;
+
   try {
-    txReceipt = await contract.methods
-      .newSingleERC20Contest(
-        namespaceName,
-        contestInterval,
-        winnerShares,
-        voteToken,
-        voterShare,
-        exchangeToken,
-      )
-      .send({
-        from: web3.eth.defaultAccount,
-        type: '0x2',
-        maxFeePerGas: maxFeePerGasEst?.toString(),
-        maxPriorityFeePerGas: web3.utils.toWei('0.001', 'gwei'),
-      });
-  } catch {
-    throw new Error('New Contest Transaction failed');
+    const uri = `https://common.xyz/api/namespaceMetadata/${name}/{id}`;
+    await contract.methods.deployNamespace(name, uri, feeManager, []).send({
+      from: web3.eth.defaultAccount,
+      type: '0x2',
+      maxFeePerGas: maxFeePerGasEst?.toString(),
+      maxPriorityFeePerGas: web3.utils.toWei('0.001', 'gwei'),
+    });
+  } catch (error) {
+    throw new Error('Transaction failed: ' + error);
+  }
+  const namespaceAddress = await getNamespace(
+    rpcNodeUrl,
+    name,
+    namespaceFactory,
+  );
+  const namespaceContract = new web3.eth.Contract(
+    namespaceAbi,
+    namespaceAddress,
+  );
+
+  try {
+    await namespaceContract.methods
+      .mintId(walletAddress, 1, 1, '0x')
+      .send({ from: web3.eth.defaultAccount });
+  } catch (error) {
+    throw new Error('Transaction failed: ' + error);
   }
 
-  const eventLog = txReceipt.logs.find(
-    (log) => log.topics![0] == CREATE_CONTEST_TOPIC,
-  );
-  if (!eventLog || !eventLog.data) throw new Error('No event data');
-
-  const { 0: address } = decodeParameters({
-    abiInput: ['address', 'address', 'uint256', 'bool'],
-    data: eventLog.data.toString(),
-  });
-  return address as string;
+  return namespaceAddress;
 };

@@ -1,0 +1,17 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appID": "M7RA9XJ52W.xyz.common.mobile",
+        "paths": ["/*"]
+      }
+    ]
+  },
+  "activitycontinuation": {
+    "apps": ["M7RA9XJ52W.xyz.common.mobile"]
+  },
+  "webcredentials": {
+    "apps": ["M7RA9XJ52W.xyz.common.mobile"]
+  }
+}

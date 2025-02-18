@@ -2,12 +2,12 @@ import clsx from 'clsx';
 import useBrowserWindow from 'hooks/useBrowserWindow';
 import useWindowResize from 'hooks/useWindowResize';
 import React, { useEffect, useState } from 'react';
-import { matchRoutes, useLocation } from 'react-router-dom';
+import { matchRoutes, useLocation, useSearchParams } from 'react-router-dom';
 import app from 'state';
 import useSidebarStore from 'state/ui/sidebar';
 import { SublayoutHeader } from 'views/components/SublayoutHeader';
 import { Sidebar } from 'views/components/sidebar';
-import farcasterContestImage from '../../assets/img/farcasterContestImage.png';
+import { useFlag } from '../hooks/useFlag';
 import { useHandleInviteLink } from '../hooks/useHandleInviteLink';
 import useNecessaryEffect from '../hooks/useNecessaryEffect';
 import useStickyHeader from '../hooks/useStickyHeader';
@@ -40,6 +40,7 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
   const { menuVisible, setMenu, menuName } = useSidebarStore();
   const [resizing, setResizing] = useState(false);
   const { JoinCommunityModals, handleJoinCommunity } = useJoinCommunity();
+  const growlEnabled = useFlag('growl');
 
   const location = useLocation();
 
@@ -56,7 +57,7 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
     });
   const { authModalType, setAuthModalType } = useAuthModalStore();
   const user = useUserStore();
-
+  const [urlQueryParams] = useSearchParams();
   const { isWelcomeOnboardModalOpen, setIsWelcomeOnboardModalOpen } =
     useWelcomeOnboardModal();
 
@@ -64,6 +65,13 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
     useInviteLinkModal();
 
   useNecessaryEffect(() => {
+    if (Object.fromEntries(urlQueryParams.entries())?.openAuthModal) {
+      setAuthModalType(AuthModalType.SignIn);
+      urlQueryParams.delete('openAuthModal');
+      const newUrl = `${window.location.pathname}`;
+      window.history.replaceState(null, '', newUrl);
+    }
+
     if (
       user.isLoggedIn &&
       !isWelcomeOnboardModalOpen &&
@@ -126,7 +134,9 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
   const chain = app.chain ? app.chain.meta : null;
   const terms = app.chain ? chain?.terms : null;
   const banner = app.chain ? chain?.communityBanner : null;
-
+  const showGrowlOnMobile =
+    (user.isWelcomeOnboardFlowComplete || !isWindowSmallInclusive) &&
+    !(isWindowExtraSmall && isWelcomeOnboardModalOpen);
   return (
     <div className="Sublayout">
       {(!isWindowSmallInclusive || isWindowSmallToMedium) && (
@@ -190,18 +200,17 @@ const Sublayout = ({ children, isInsideCommunity }: SublayoutProps) => {
             )}
             {children}
           </div>
-          {/* Growl should be added here when in place*/}
-          <CWGrowlTemplate
-            headerText="Launch Contests On Farcaster!"
-            bodyText="You can now host contests directly on Farcaster to reach and engage your followers.
-            They can submit entries,
-            vote for their favorites, and earn rewards, all without leaving the page."
-            buttonText="Enter $MOCHI Contest"
-            buttonLink="https://www.google.com/"
-            growlType="farcasterContest"
-            growlImage={farcasterContestImage}
-            extraText="Enter the first Farcaster Contest hosted by our friends at Mochi"
-          />
+          {growlEnabled && showGrowlOnMobile && (
+            <CWGrowlTemplate
+              headerText=""
+              bodyText=""
+              buttonText=""
+              buttonLink=""
+              growlType=""
+              growlImage=""
+              extraText=""
+            />
+          )}
         </div>
         <WelcomeOnboardModal
           isOpen={isWelcomeOnboardModalOpen}

@@ -15,13 +15,20 @@ import { HelpMenuPopover } from 'views/menus/help_menu';
 
 import UserDropdown from './UserDropdown';
 
+import { ChainBase } from '@hicommonwealth/shared';
+import { getUniqueUserAddresses } from 'client/scripts/helpers/user';
+import { useGetUserEthBalanceQuery } from 'client/scripts/state/api/communityStake';
+import { fetchCachedNodes } from 'client/scripts/state/api/nodes';
 import { useFlag } from 'hooks/useFlag';
 import { useFetchCustomDomainQuery } from 'state/api/configuration';
 import useUserStore from 'state/ui/user';
 import AuthButtons from 'views/components/SublayoutHeader/AuthButtons';
 import { AuthModalType } from 'views/modals/AuthModal';
 import { capDecimals } from 'views/modals/ManageCommunityStakeModal/utils';
+import { CWCustomIcon } from '../../component_kit/cw_icons/cw_custom_icon';
 import { CWText } from '../../component_kit/cw_text';
+import XPProgressIndicator from '../XPProgressIndicator';
+
 import './DesktopHeader.scss';
 
 interface DesktopHeaderProps {
@@ -29,9 +36,12 @@ interface DesktopHeaderProps {
   onAuthModalOpen: (modalType?: AuthModalType) => void;
 }
 
+const baseNodeId = 1358;
+
 const DesktopHeader = ({ onMobile, onAuthModalOpen }: DesktopHeaderProps) => {
   const navigate = useCommonNavigate();
   const rewardsEnabled = useFlag('rewardsPage');
+  const xpEnabled = useFlag('xp');
   const { menuVisible, setMenu, menuName, setUserToggledVisibility } =
     useSidebarStore();
   const user = useUserStore();
@@ -44,6 +54,20 @@ const DesktopHeader = ({ onMobile, onAuthModalOpen }: DesktopHeaderProps) => {
       setUserToggledVisibility(isVisible ? 'open' : 'closed');
     }, 200);
   };
+
+  const nodes = fetchCachedNodes();
+  const baseNode = nodes?.find((node) => node.id === baseNodeId);
+
+  const uniqueAddresses = getUniqueUserAddresses({
+    forChain: ChainBase.Ethereum,
+  });
+
+  const { data: ethBalance } = useGetUserEthBalanceQuery({
+    chainRpc: baseNode?.url || '',
+    walletAddress: uniqueAddresses[0] || '',
+    ethChainId: baseNode?.ethChainId || 0,
+    apiEnabled: !!baseNode && !!uniqueAddresses[0],
+  });
 
   return (
     <div className="DesktopHeader">
@@ -87,6 +111,7 @@ const DesktopHeader = ({ onMobile, onAuthModalOpen }: DesktopHeaderProps) => {
               isLoggedIn: user.isLoggedIn,
             })}
           >
+            {xpEnabled && <XPProgressIndicator />}
             <CreateContentPopover />
             {!isWindowSmallInclusive(window.innerWidth) && (
               <CWTooltip
@@ -107,13 +132,13 @@ const DesktopHeader = ({ onMobile, onAuthModalOpen }: DesktopHeaderProps) => {
               />
             )}
             <CWTooltip
-              content="Explore communities"
+              content="Explore"
               placement="bottom"
               renderTrigger={(handleInteraction) => (
                 <CWIconButton
                   iconButtonTheme="black"
                   iconName="compassPhosphor"
-                  onClick={() => navigate('/communities', {}, null)}
+                  onClick={() => navigate('/explore', {}, null)}
                   onMouseEnter={handleInteraction}
                   onMouseLeave={handleInteraction}
                 />
@@ -148,8 +173,9 @@ const DesktopHeader = ({ onMobile, onAuthModalOpen }: DesktopHeaderProps) => {
                           fontWeight="medium"
                           type="caption"
                         >
-                          {capDecimals('0.125')} ETH
+                          {capDecimals(ethBalance || '0')} ETH
                         </CWText>
+                        <CWCustomIcon iconName="base" iconSize="xs" />
                       </div>
                     )}
                   />

@@ -28,7 +28,6 @@ const {
   PROVIDER_URL,
   ETH_RPC,
   COSMOS_REGISTRY_API,
-  REACTION_WEIGHT_OVERRIDE,
   ALCHEMY_PRIVATE_APP_KEY,
   ALCHEMY_PUBLIC_APP_KEY,
   MEMBERSHIP_REFRESH_BATCH_SIZE,
@@ -36,9 +35,15 @@ const {
   NEYNAR_BOT_UUID,
   NEYNAR_API_KEY,
   NEYNAR_CAST_CREATED_WEBHOOK_SECRET,
+  NEYNAR_CONTEST_BOT_MENTIONED_WEBHOOK_SECRET,
   NEYNAR_REPLY_WEBHOOK_URL,
   FARCASTER_ACTION_URL,
   FLAG_FARCASTER_CONTEST,
+  FARCASTER_MANIFEST_HEADER,
+  FARCASTER_MANIFEST_PAYLOAD,
+  FARCASTER_MANIFEST_SIGNATURE,
+  FARCASTER_MANIFEST_DOMAIN,
+  FARCASTER_NGROK_DOMAIN,
   OPENAI_API_KEY,
   OPENAI_ORGANIZATION,
   CONTEST_BOT_PRIVATE_KEY,
@@ -83,22 +88,24 @@ export const config = configure(
         ? BLACKLISTED_EVENTS.split(',')
         : [],
     },
-    STAKE: {
-      REACTION_WEIGHT_OVERRIDE: REACTION_WEIGHT_OVERRIDE
-        ? parseInt(REACTION_WEIGHT_OVERRIDE, 10)
-        : null,
-    },
     CONTESTS: {
       MIN_USER_ETH: 0,
       MAX_USER_POSTS_PER_CONTEST: MAX_USER_POSTS_PER_CONTEST
         ? parseInt(MAX_USER_POSTS_PER_CONTEST, 10)
         : 5,
       FLAG_FARCASTER_CONTEST: FLAG_FARCASTER_CONTEST === 'true',
+      FARCASTER_NGROK_DOMAIN: FARCASTER_NGROK_DOMAIN,
       NEYNAR_API_KEY: NEYNAR_API_KEY,
       NEYNAR_BOT_UUID: NEYNAR_BOT_UUID,
       NEYNAR_CAST_CREATED_WEBHOOK_SECRET: NEYNAR_CAST_CREATED_WEBHOOK_SECRET,
+      NEYNAR_CONTEST_BOT_MENTIONED_WEBHOOK_SECRET:
+        NEYNAR_CONTEST_BOT_MENTIONED_WEBHOOK_SECRET,
       NEYNAR_REPLY_WEBHOOK_URL: NEYNAR_REPLY_WEBHOOK_URL,
       FARCASTER_ACTION_URL: FARCASTER_ACTION_URL,
+      FARCASTER_MANIFEST_HEADER: FARCASTER_MANIFEST_HEADER,
+      FARCASTER_MANIFEST_PAYLOAD: FARCASTER_MANIFEST_PAYLOAD,
+      FARCASTER_MANIFEST_SIGNATURE: FARCASTER_MANIFEST_SIGNATURE,
+      FARCASTER_MANIFEST_DOMAIN: FARCASTER_MANIFEST_DOMAIN,
     },
     AUTH: {
       JWT_SECRET: JWT_SECRET || DEFAULTS.JWT_SECRET,
@@ -189,7 +196,13 @@ export const config = configure(
             !(target.APP_ENV === 'production' && data === DEFAULTS.PRIVATE_KEY),
           'PRIVATE_KEY must be set to a non-default value in production.',
         ),
-      CONTEST_BOT_PRIVATE_KEY: z.string(),
+      CONTEST_BOT_PRIVATE_KEY: z
+        .string()
+        .optional()
+        .refine(
+          (data) => !(target.APP_ENV === 'production' && !data),
+          'CONTEST_BOT_PRIVATE_KEY must be set to a non-default value in production.',
+        ),
     }),
     TBC: z.object({
       TTL_SECS: z.number().int(),
@@ -197,13 +210,11 @@ export const config = configure(
     OUTBOX: z.object({
       BLACKLISTED_EVENTS: z.array(z.string()),
     }),
-    STAKE: z.object({
-      REACTION_WEIGHT_OVERRIDE: z.number().int().nullish(),
-    }),
     CONTESTS: z.object({
       MIN_USER_ETH: z.number(),
       MAX_USER_POSTS_PER_CONTEST: z.number().int(),
       FLAG_FARCASTER_CONTEST: z.boolean().nullish(),
+      FARCASTER_NGROK_DOMAIN: z.string().nullish(),
       NEYNAR_BOT_UUID: z
         .string()
         .optional()
@@ -225,6 +236,13 @@ export const config = configure(
           (data) => !(target.APP_ENV === 'production' && !data),
           'NEYNAR_CAST_CREATED_WEBHOOK_SECRET must be set to a non-default value in production.',
         ),
+      NEYNAR_CONTEST_BOT_MENTIONED_WEBHOOK_SECRET: z
+        .string()
+        .optional()
+        .refine(
+          (data) => !(target.APP_ENV === 'production' && !data),
+          'NEYNAR_CONTEST_BOT_MENTIONED_WEBHOOK_SECRET must be set to a non-default value in production.',
+        ),
       NEYNAR_REPLY_WEBHOOK_URL: z
         .string()
         .optional()
@@ -238,6 +256,34 @@ export const config = configure(
         .refine(
           (data) => !(target.APP_ENV === 'production' && !data),
           'FARCASTER_ACTION_URL must be set to a non-default value in production.',
+        ),
+      FARCASTER_MANIFEST_HEADER: z
+        .string()
+        .optional()
+        .refine(
+          (data) => !(target.APP_ENV === 'production' && !data),
+          'FARCASTER_MANIFEST_DOMAIN must be set to a non-default value in production.',
+        ),
+      FARCASTER_MANIFEST_PAYLOAD: z
+        .string()
+        .optional()
+        .refine(
+          (data) => !(target.APP_ENV === 'production' && !data),
+          'FARCASTER_MANIFEST_PAYLOAD must be set to a non-default value in production.',
+        ),
+      FARCASTER_MANIFEST_SIGNATURE: z
+        .string()
+        .optional()
+        .refine(
+          (data) => !(target.APP_ENV === 'production' && !data),
+          'FARCASTER_MANIFEST_SIGNATURE must be set to a non-default value in production.',
+        ),
+      FARCASTER_MANIFEST_DOMAIN: z
+        .string()
+        .optional()
+        .refine(
+          (data) => !(target.APP_ENV === 'production' && !data),
+          'FARCASTER_MANIFEST_DOMAIN must be set to a non-default value in production.',
         ),
     }),
     AUTH: z
@@ -325,7 +371,13 @@ export const config = configure(
       ORGANIZATION: z.string().optional(),
     }),
     BOT: z.object({
-      CONTEST_BOT_NAMESPACE: z.string(),
+      CONTEST_BOT_NAMESPACE: z
+        .string()
+        .optional()
+        .refine(
+          (data) => !(target.APP_ENV === 'production' && !data),
+          'CONTEST_BOT_NAMESPACE must be set to a non-default value in production.',
+        ),
     }),
   }),
 );

@@ -3,6 +3,7 @@ import z from 'zod';
 import { AuthContext } from '../context';
 import { ContestManager } from '../entities/contest-manager.schemas';
 import { FarcasterAction } from '../entities/farcaster.schemas';
+import { ContestAction } from '../projections';
 import { PG_INT } from '../utils';
 
 export const CreateContestManagerMetadata = {
@@ -149,9 +150,52 @@ export const FarcasterCastCreatedWebhook = {
   }),
 };
 
+export const RelayFarcasterContestBotMentioned = {
+  input: z.object({
+    created_at: z.number(),
+    type: z.string(),
+    data: FarcasterCast,
+  }),
+  output: z.object({
+    status: z.literal('ok'),
+  }),
+};
+
 export const FarcasterUpvoteAction = {
   input: FarcasterAction,
   output: z.object({
     message: z.string(),
   }),
+};
+
+export const FarcasterNotificationsWebhook = {
+  input: z.any(),
+  output: z.any(),
+};
+
+export const SetContestEnding = {
+  input: z.object({
+    contest_address: z.string(),
+    contest_id: PG_INT,
+    is_one_off: z.boolean(),
+    actions: z.array(
+      ContestAction.pick({ action: true, content_id: true, content_url: true }),
+    ),
+    chain_url: z.string(),
+  }),
+  output: z.object({}),
+};
+
+export const SetContestEnded = {
+  input: z.object({
+    contest_address: z.string(),
+    contest_id: PG_INT,
+    prize_percentage: z.number(),
+    payout_structure: z.array(z.number()),
+    is_one_off: z.boolean(),
+    chain_url: z.string(),
+    chain_private_url: z.string().nullish(),
+    neynar_webhook_id: z.string().nullish(),
+  }),
+  output: z.object({}),
 };

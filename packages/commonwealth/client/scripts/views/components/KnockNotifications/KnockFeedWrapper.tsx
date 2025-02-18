@@ -1,6 +1,6 @@
 import Knock from '@knocklabs/client';
 import { KnockFeedProvider, KnockProvider } from '@knocklabs/react';
-import React, { ReactNode, useEffect } from 'react';
+import React, { ReactNode, memo, useEffect } from 'react';
 import useUserStore from 'state/ui/user';
 
 const KNOCK_PUBLIC_API_KEY =
@@ -20,28 +20,42 @@ interface KnockFeedWrapperProps {
   children: ReactNode;
 }
 
-export const KnockFeedWrapper = ({ children }: KnockFeedWrapperProps) => {
+export const KnockFeedWrapper = memo(function KnockFeedWrapper({
+  children,
+}: KnockFeedWrapperProps) {
   const user = useUserStore();
 
   useEffect(() => {
-    if (!user.id || !user.isLoggedIn) return;
-    if (!user.knockJWT) {
-      console.warn('user knockJWT not set! Will not attempt to identify.');
-      return;
-    }
+    const initializeKnock = async () => {
+      if (!user.id || !user.isLoggedIn || !user.knockJWT) {
+        knock.teardown();
+        return;
+      }
 
-    const timezone = getBrowserTimezone();
-    async function doAsync() {
-      knock.authenticate(`${user.id}`, user.knockJWT);
-      await knock.user.identify({
-        id: user.id,
-        email: user.email,
-        timezone,
-      });
-    }
+      const timezone = getBrowserTimezone();
 
-    doAsync().catch(console.error);
-  }, [user.email, user.id, user.isLoggedIn, user.knockJWT]);
+      try {
+        // eslint-disable-next-line @typescript-eslint/await-thenable
+        knock.authenticate(`${user.id}`, user.knockJWT);
+        await knock.user.identify({
+          id: user.id,
+          email: user.email,
+          timezone,
+        });
+      } catch (error) {
+        console.error('Error initializing Knock:', error);
+        knock.teardown();
+      }
+    };
+
+    initializeKnock().catch((error) => {
+      console.error('Error during Knock initialization:', error);
+    });
+
+    return () => knock.teardown();
+  }, [user.id, user.email, user.isLoggedIn, user.knockJWT]);
+
+  if (!user.id || !user.isLoggedIn || !user.knockJWT) return null;
 
   return (
     <KnockProvider
@@ -49,9 +63,15 @@ export const KnockFeedWrapper = ({ children }: KnockFeedWrapperProps) => {
       userId={`${user.id}`}
       userToken={user.knockJWT}
     >
-      <KnockFeedProvider feedId={KNOCK_IN_APP_FEED_ID} colorMode="light">
+      <KnockFeedProvider
+        feedId={KNOCK_IN_APP_FEED_ID}
+        colorMode="light"
+        defaultFeedOptions={{
+          auto_manage_socket_connection: false,
+        }}
+      >
         {children}
       </KnockFeedProvider>
     </KnockProvider>
   );
-};
+});

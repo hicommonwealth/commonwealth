@@ -1,4 +1,3 @@
-import { PRODUCTION_DOMAIN } from '@hicommonwealth/shared';
 import { Dec, IntPretty } from '@keplr-wallet/unit';
 import { isHex, isU8a } from '@polkadot/util';
 import {
@@ -21,13 +20,6 @@ export const slugifyPreserveDashes = (str: string): string => {
     .replace(/(\s|-)+/g, '-')
     .replace(/^-|-$/g, '')
     .toLowerCase();
-};
-
-// WARN: Using process.env to avoid webpack failures
-export const getCommunityUrl = (community: string): string => {
-  return process.env.NODE_ENV === 'production'
-    ? `https://${PRODUCTION_DOMAIN}/${community}`
-    : `http://localhost:8080/${community}`;
 };
 
 export const smartTrim = (

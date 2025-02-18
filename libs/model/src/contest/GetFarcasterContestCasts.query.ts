@@ -40,7 +40,7 @@ export function GetFarcasterContestCasts(): Query<
             ca1.actor_address,
             ca1.action AS added_action,
             ca1.content_url,
-            SUM(ca2.calculated_voting_weight) AS voting_weights_sum
+            (FLOOR(SUM(ca2.voting_power / 10^cm.decimals))) AS voting_weights_sum
         FROM
             "ContestActions" ca1
         LEFT JOIN
@@ -49,6 +49,8 @@ export function GetFarcasterContestCasts(): Query<
             AND ca1.contest_id = ca2.contest_id
             AND ca1.content_id = ca2.content_id
             AND ca2.action = 'upvoted'
+        JOIN "ContestManagers" cm
+            ON ca1.contest_address = cm.contest_address
         WHERE
             ca1.action = 'added'
             AND ca1.contest_address = :contest_address
@@ -58,7 +60,8 @@ export function GetFarcasterContestCasts(): Query<
             ca1.contest_id,
             ca1.content_id,
             ca1.actor_address,
-            ca1.action
+            ca1.action,
+            cm.decimals
         ORDER BY
             ca1.contest_address,
             ca1.contest_id,

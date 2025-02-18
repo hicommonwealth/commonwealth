@@ -5,8 +5,7 @@ import {
   commonProtocol as cp,
 } from '@hicommonwealth/evm-protocols';
 import { buildChainNodeUrl, models } from '@hicommonwealth/model';
-import { AbiType } from '@hicommonwealth/shared';
-import { EvmSources } from './types';
+import { ContractSources, EvmSources } from './types';
 
 const DEFAULT_MAX_BLOCK_RANGE = 500;
 
@@ -20,7 +19,6 @@ export async function getEventSources(): Promise<EvmSources> {
       eth_chain_id: Object.keys(EventRegistry),
     },
   });
-  // TODO: Deduplicate event_signatures
   const dbEvmSources = await models.EvmEventSource.findAll();
 
   for (const chainNode of chainNodes) {
@@ -30,19 +28,22 @@ export async function getEventSources(): Promise<EvmSources> {
 
     const entries = Object.entries<ContractSource>(EventRegistry[ethChainId]);
 
-    const registryContractSources = {};
+    const registryContractSources: ContractSources = {};
     for (const [address, source] of entries) {
-      registryContractSources[address] = {
-        abi: source.abi as AbiType,
-        sources: source.eventSignatures.map((signature) => ({
+      registryContractSources[address] = source.eventSignatures.map(
+        (signature) => ({
           eth_chain_id: ethChainId,
           contract_address: address,
           event_signature: signature,
-        })),
-      };
+
+          // filler to prevent event migration
+          created_at_block: 1,
+          events_migrated: true,
+        }),
+      );
     }
 
-    const dbContractSources = {};
+    const dbContractSources: ContractSources = {};
     for (const source of dbEvmSources.filter(
       (e) => e.eth_chain_id === ethChainId,
     )) {
@@ -58,12 +59,9 @@ export async function getEventSources(): Promise<EvmSources> {
       }
 
       if (!dbContractSources[source.contract_address]) {
-        dbContractSources[source.contract_address] = {
-          abi: childContracts[source.contract_name].abi as AbiType,
-          sources: [],
-        };
+        dbContractSources[source.contract_address] = [];
       }
-      dbContractSources[source.contract_address].sources.push(source.toJSON());
+      dbContractSources[source.contract_address].push(source.toJSON());
     }
 
     evmSources[ethChainId] = {

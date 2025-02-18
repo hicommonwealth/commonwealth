@@ -1,34 +1,11 @@
-import { Log } from '@ethersproject/providers';
 import { logger as _logger, stats } from '@hicommonwealth/core';
-import { ethers } from 'ethers';
-import {
-  AbiSignatures,
-  ContractSources,
-  EvmBlockDetails,
-  EvmEvent,
-  EvmSource,
-} from './types';
+import { EvmBlockDetails, Log, chainEventMappers } from '@hicommonwealth/model';
+import { EventPairs } from '@hicommonwealth/schemas';
+import { createPublicClient, getAddress, http } from 'viem';
+import { config } from '../../config';
+import { ContractSources, EvmSource } from './types';
 
 const logger = _logger(import.meta);
-
-/**
- * Converts a string or integer number into a hexadecimal string that adheres to the following guidelines
- * https://ethereum.org/en/developers/docs/apis/json-rpc/#quantities-encoding
- * @param decimal
- */
-function decimalToHex(decimal: number | string) {
-  if (decimal == '0') {
-    return '0x0';
-  } else {
-    return ethers.utils.hexStripZeros(
-      ethers.BigNumber.from(decimal).toHexString(),
-    );
-  }
-}
-
-export function getProvider(rpc: string) {
-  return new ethers.providers.JsonRpcProvider(rpc);
-}
 
 /**
  * Fetches logs from the given EVM source. startingBlockNum can be used to start fetching logs
@@ -53,8 +30,6 @@ export async function getLogs({
   blockDetails: Record<number, EvmBlockDetails>;
 }> {
   let startBlock = startingBlockNum;
-  const provider = getProvider(rpc);
-
   if (startBlock > endingBlockNum) {
     logger.error(
       'Starting block number is greater than the latest/current block number!',
@@ -87,58 +62,39 @@ export async function getLogs({
     );
   }
 
-  // TODO: use Web3.JS instead
-  const logs: Array<{
-    address: string;
-    blockHash: string;
-    blockNumber: string;
-    data: string;
-    logIndex: string;
-    removed: boolean;
-    topics: string[];
-    transactionHash: string;
-    transactionIndex: string;
-  }> = await provider.send('eth_getLogs', [
-    {
-      fromBlock: decimalToHex(startBlock),
-      toBlock: decimalToHex(endingBlockNum),
-      address: contractAddresses,
-    },
-  ]);
+  const client = createPublicClient({
+    transport: http(rpc),
+  });
+  const logs: Log[] = (await client.getLogs({
+    address: <`0x${string}`[]>contractAddresses,
+    fromBlock: BigInt(startBlock),
+    toBlock: BigInt(endingBlockNum),
+  })) as Log[];
 
   const blockNumbers = [...new Set(logs.map((l) => l.blockNumber))];
   const blockDetails = await Promise.all(
     blockNumbers.map(async (blockNumber) => {
-      const block = await provider.send('eth_getBlockByNumber', [
-        blockNumber,
-        false,
-      ]);
+      const block = await client.getBlock({
+        blockNumber: blockNumber,
+      });
       return {
-        number: parseInt(block.number, 16),
+        number: block.number,
         hash: block.hash,
         logsBloom: block.logsBloom,
         parentHash: block.parentHash,
         miner: block.miner,
         nonce: block.nonce ? block.nonce.toString() : undefined,
-        timestamp: parseInt(block.timestamp, 16),
-        gasLimit: parseInt(block.gasLimit, 16),
-        gasUsed: parseInt(block.gasUsed, 16),
-      } as EvmBlockDetails;
+        timestamp: block.timestamp,
+        gasLimit: block.gasLimit,
+      };
     }),
   );
 
-  const formattedLogs: Log[] = logs.map((log) => ({
-    ...log,
-    blockNumber: parseInt(log.blockNumber, 16),
-    transactionIndex: parseInt(log.transactionIndex, 16),
-    logIndex: parseInt(log.logIndex, 16),
-  }));
-
   return {
-    logs: formattedLogs,
+    logs,
     lastBlockNum: endingBlockNum,
     blockDetails: blockDetails.reduce((map, details) => {
-      map[details.number] = details;
+      map[String(details.number)] = details;
       return map;
     }, {}),
   };
@@ -147,14 +103,15 @@ export async function getLogs({
 export async function parseLogs(
   sources: ContractSources,
   logs: Log[],
-): Promise<EvmEvent[]> {
-  const events: EvmEvent[] = [];
-  const interfaces = {};
+  blockDetails: Record<number, EvmBlockDetails>,
+): Promise<Array<EventPairs>> {
+  const events: Array<EventPairs> = [];
+
   for (const log of logs) {
-    const address = ethers.utils.getAddress(log.address);
-    const data: AbiSignatures = sources[address];
-    if (!data) {
-      logger.error('Missing event source', undefined, {
+    const address = getAddress(log.address);
+    const evmEventSources = sources[address];
+    if (!evmEventSources) {
+      logger.error('Missing event sources', undefined, {
         // should be logged even if address is undefined -> do not shorten
         address: `${address}`,
         sourceContracts: Object.keys(sources),
@@ -162,38 +119,38 @@ export async function parseLogs(
       continue;
     }
 
-    const evmEventSource = data.sources.find(
+    const evmEventSource = evmEventSources.find(
       (s) => s.event_signature === log.topics[0],
     );
     if (!evmEventSource) continue;
 
-    if (!data.abi || !Array.isArray(data.abi) || data.abi.length === 0) {
-      logger.error(`Invalid ABI for contract ${address}`);
+    const eventMapper = chainEventMappers[evmEventSource.event_signature];
+    if (!eventMapper) {
+      logger.error('Missing event mapper', undefined, {
+        eventSignature: evmEventSource.event_signature,
+        contractAddress: address,
+      });
       continue;
     }
 
-    if (!interfaces[address]) {
-      interfaces[address] = new ethers.utils.Interface(data.abi);
-    }
-
-    let parsedLog: ethers.utils.LogDescription;
     try {
-      parsedLog = interfaces[address].parseLog(log);
+      events.push(
+        eventMapper({
+          eventSource: {
+            ethChainId: evmEventSource.eth_chain_id,
+            eventSignature: evmEventSource.event_signature,
+          },
+          rawLog: log,
+          block: blockDetails[String(log.blockNumber)],
+        }) as EventPairs,
+      );
     } catch (e) {
-      const msg = `Failed to parse log from contract ${address} with signature ${log.topics[0]}`;
+      const msg = `Failed to map log from contract ${address} with signature ${log.topics[0]}`;
       logger.error(msg, e);
       continue;
     }
     stats().increment('ce.evm.event', {
       contractAddress: address,
-    });
-    events.push({
-      eventSource: {
-        ethChainId: evmEventSource.eth_chain_id,
-        eventSignature: evmEventSource.event_signature,
-      },
-      parsedArgs: parsedLog.args,
-      rawLog: log,
     });
   }
 
@@ -204,7 +161,7 @@ export async function getEvents(
   evmSource: EvmSource,
   startingBlockNum: number,
   endingBlockNum: number,
-): Promise<{ events: EvmEvent[]; lastBlockNum: number }> {
+): Promise<{ events: Array<EventPairs>; lastBlockNum: number }> {
   const { logs, lastBlockNum, blockDetails } = await getLogs({
     rpc: evmSource.rpc,
     maxBlockRange: evmSource.maxBlockRange,
@@ -213,12 +170,9 @@ export async function getEvents(
     endingBlockNum,
   });
 
-  const events = await parseLogs(evmSource.contracts, logs);
+  const events = await parseLogs(evmSource.contracts, logs, blockDetails);
   return {
-    events: events.map((e) => ({
-      ...e,
-      block: blockDetails[e.rawLog.blockNumber],
-    })),
+    events,
     lastBlockNum,
   };
 }
@@ -233,22 +187,25 @@ export async function getEvents(
 export async function migrateEvents(
   evmSource: EvmSource,
   endingBlockNum: number,
-): Promise<{ events: EvmEvent[]; lastBlockNum: number } | undefined> {
-  let oldestBlock: number;
+): Promise<
+  | {
+      events: Array<EventPairs>;
+      lastBlockNum: number;
+      contracts: ContractSources;
+    }
+  | { contracts: ContractSources }
+> {
+  let oldestBlock: number | undefined;
   const contracts: ContractSources = {};
-  for (const [contractAddress, abiSignature] of Object.entries(
+  for (const [contractAddress, evmEventSource] of Object.entries(
     evmSource.contracts,
   )) {
-    for (const source of abiSignature.sources) {
+    for (const source of evmEventSource) {
       if (source.created_at_block && source.events_migrated === false) {
         if (!contracts[contractAddress]) {
-          contracts[contractAddress] = {
-            abi: abiSignature.abi,
-            sources: [],
-          };
+          contracts[contractAddress] = [];
         }
-        contracts[contractAddress].sources.push(source);
-        // @ts-expect-error StrictNullChecks
+        contracts[contractAddress].push(source);
         if (!oldestBlock || oldestBlock > source.created_at_block) {
           oldestBlock = source.created_at_block;
         }
@@ -256,25 +213,28 @@ export async function migrateEvents(
     }
   }
 
-  if (Object.keys(contracts).length > 0) {
+  if (Object.keys(contracts).length > 0 && oldestBlock) {
     const result = await getEvents(
       {
         rpc: evmSource.rpc,
         maxBlockRange: evmSource.maxBlockRange,
         contracts,
       },
-      // @ts-expect-error StrictNullChecks
       oldestBlock,
       endingBlockNum,
     );
-    logger.info('Events migrated', {
-      // @ts-expect-error StrictNullChecks
-      startingBlockNum: oldestBlock,
-      endingBlockNum,
-    });
-    return result;
+    config.WORKERS.EVM_CE_TRACE &&
+      logger.warn('Events migrated', {
+        startingBlockNum: oldestBlock,
+        endingBlockNum,
+      });
+    return {
+      events: result.events,
+      lastBlockNum: result.lastBlockNum,
+      contracts,
+    };
   } else {
-    logger.info('No events to migrate');
-    return;
+    config.WORKERS.EVM_CE_TRACE && logger.info('No events to migrate');
+    return { contracts };
   }
 }

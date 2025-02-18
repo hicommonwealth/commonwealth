@@ -8,15 +8,14 @@ import { navigateToCommunity, useCommonNavigate } from 'navigation/helpers';
 import { useGetContestBalanceQuery } from 'state/api/contests';
 import { Skeleton } from 'views/components/Skeleton';
 import { CWCommunityAvatar } from 'views/components/component_kit/cw_community_avatar';
-import { capDecimals } from 'views/modals/ManageCommunityStakeModal/utils';
 
-import { CWText } from '../../../../components/component_kit/cw_text';
-import { CWButton } from '../../../../components/component_kit/new_designs/CWButton/CWButton';
-import { CWThreadAction } from '../../../../components/component_kit/new_designs/cw_thread_action';
+import { CWText } from 'views/components/component_kit/cw_text';
+import { CWButton } from 'views/components/component_kit/new_designs/CWButton/CWButton';
+import { CWThreadAction } from 'views/components/component_kit/new_designs/cw_thread_action';
 import { Contest } from '../../../CommunityManagement/Contests/ContestsList';
-import ContestCountdown from '../../../CommunityManagement/Contests/ContestsList/ContestCountdown';
 
 import { buildContestPrizes } from '@hicommonwealth/shared';
+import CWCountDownTimer from 'views/components/component_kit/CWCountDownTimer';
 import './ExploreContestCard.scss';
 
 interface ExploreContestCardProps {
@@ -79,6 +78,10 @@ const ExploreContestCard = ({
     });
   };
 
+  if (!isContestBalanceLoading && (!prizes || prizes.length === 0)) {
+    return null;
+  }
+
   return (
     <div className="ExploreContestCard">
       <div className="contest-banner">
@@ -120,7 +123,7 @@ const ExploreContestCard = ({
         </div>
 
         <div className="contest-timing">
-          <ContestCountdown finishTime={finishDate} isActive />
+          <CWCountDownTimer finishTime={finishDate} isActive />
         </div>
 
         <div className="prizes-section">
@@ -141,7 +144,7 @@ const ExploreContestCard = ({
                     {moment.localeData().ordinal(index + 1)} Prize
                   </CWText>
                   <CWText fontWeight="bold">
-                    {capDecimals(String(prize))} {contest.ticker}
+                    {prize} {contest.ticker}
                   </CWText>
                 </div>
               ))

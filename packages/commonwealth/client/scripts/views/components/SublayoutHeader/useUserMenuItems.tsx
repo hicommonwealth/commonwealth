@@ -6,6 +6,7 @@ import {
   getSessionSigners,
 } from '@hicommonwealth/shared';
 import axios from 'axios';
+import { LocalStorageKeys } from 'client/scripts/helpers/localStorage';
 import { setActiveAccount } from 'controllers/app/login';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import WebWalletController from 'controllers/app/web_wallets';
@@ -59,6 +60,8 @@ export const handleLogout = async () => {
     }
     notifySuccess('Signed out');
     setDarkMode(false);
+    localStorage.setItem(LocalStorageKeys.HasSeenNotifications, 'true');
+    localStorage.setItem(LocalStorageKeys.HasSeenOnboarding, 'true');
   } catch (err) {
     notifyError('Something went wrong during logging out.');
     window.location.reload();
@@ -91,6 +94,7 @@ const useUserMenuItems = ({
 
   const rewardsEnabled = useFlag('rewardsPage');
   const referralsEnabled = useFlag('referrals');
+  const xpEnabled = useFlag('xp');
 
   const userData = useUserStore();
   const hasMagic = userData.hasMagicWallet;
@@ -309,6 +313,15 @@ const useUserMenuItems = ({
             null,
           ),
       },
+      ...(xpEnabled
+        ? [
+            {
+              type: 'default',
+              label: 'Leaderboard',
+              onClick: () => navigate(`/leaderboard`, {}, null),
+            },
+          ]
+        : []),
       {
         type: 'default',
         label: 'Notification settings',

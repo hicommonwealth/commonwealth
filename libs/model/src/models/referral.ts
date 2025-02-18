@@ -12,41 +12,36 @@ export const Referral = (
   sequelize.define<ReferralInstance>(
     'Referral',
     {
-      id: {
-        type: Sequelize.INTEGER,
-        primaryKey: true,
-        autoIncrement: true,
-      },
-      eth_chain_id: {
-        type: Sequelize.INTEGER,
-        allowNull: true,
-      },
-      transaction_hash: {
+      referrer_address: {
         type: Sequelize.STRING,
-        allowNull: true,
+        primaryKey: true,
       },
       namespace_address: {
         type: Sequelize.STRING,
-        allowNull: true,
+        primaryKey: true,
+      },
+      eth_chain_id: {
+        type: Sequelize.INTEGER,
+        primaryKey: true,
       },
       referee_address: {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      referrer_address: {
+      transaction_hash: {
         type: Sequelize.STRING,
         allowNull: false,
       },
+      created_on_chain_timestamp: {
+        type: Sequelize.BIGINT,
+        allowNull: false,
+      },
       referrer_received_eth_amount: {
-        type: Sequelize.FLOAT,
+        type: Sequelize.DECIMAL(78, 0),
         allowNull: false,
         defaultValue: 0,
       },
-      created_on_chain_timestamp: {
-        type: Sequelize.BIGINT,
-        allowNull: true,
-      },
-      created_off_chain_at: {
+      created_at: {
         type: Sequelize.DATE,
         allowNull: false,
       },
@@ -57,7 +52,7 @@ export const Referral = (
     },
     {
       timestamps: true,
-      createdAt: 'created_off_chain_at',
+      createdAt: 'created_at',
       updatedAt: 'updated_at',
       underscored: true,
       tableName: 'Referrals',

@@ -88,13 +88,32 @@ import { getRelativeTimestamp } from 'helpers/dates';
 import React, { ReactNode, useEffect, useMemo, useRef } from 'react';
 import { Avatar } from '../../../Avatar';
 import { CWIcon } from '../../cw_icons/cw_icon';
+import { CWText } from '../../cw_text';
 import { ComponentType } from '../../types';
+import CWIconButton from '../CWIconButton';
+import CWPopover, { usePopover } from '../CWPopover';
+
+import { TopicWeightedVoting } from '@hicommonwealth/schemas';
+import { prettyVoteWeight } from 'shared/adapters/currency';
 import './CWTable.scss';
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type CustomColumnDef<T> = ColumnDef<T, any> & {
+  headerInfo?: {
+    title: string;
+    content: string;
+  };
+};
 
 export type CWTableColumnInfo = {
   key: string;
   header: string | (() => ReactNode);
+  headerInfo?: {
+    title: string;
+    content: string;
+  };
   numeric: boolean;
+  weightedVoting?: TopicWeightedVoting | null | undefined;
   sortable: boolean;
   chronological?: boolean;
   customElementKey?: string;
@@ -131,7 +150,9 @@ export const CWTable = ({
 }: TableProps) => {
   const tableRef = useRef();
 
-  const columns = useMemo<ColumnDef<unknown, any>[]>(
+  const popoverProps = usePopover();
+
+  const columns = useMemo<CustomColumnDef<unknown>[]>(
     () =>
       columnInfo
         .filter((col) => !col.hidden)
@@ -139,6 +160,7 @@ export const CWTable = ({
           return {
             accessorKey: col.key,
             header: col.header,
+            headerInfo: col.headerInfo,
             ...(col?.hasCustomSortValue && {
               // implement custom sorting function, if we have custom sorting value.
               sortingFn: (rowA, rowB, columnId) => {
@@ -171,7 +193,13 @@ export const CWTable = ({
                 : info.getValue();
 
               if (col.numeric) {
-                return <div className="numeric">{numericColVal}</div>;
+                return (
+                  <div className="numeric">
+                    {col.weightedVoting
+                      ? prettyVoteWeight(numericColVal, col.weightedVoting)
+                      : numericColVal}
+                  </div>
+                );
               }
 
               if (avatarUrl || avatarAddress) {
@@ -289,6 +317,39 @@ export const CWTable = ({
                             header.getContext(),
                           )}
                         </span>
+
+                        {(header.column.columnDef as CustomColumnDef<unknown>)
+                          .headerInfo && (
+                          <span className="header-info">
+                            <CWIconButton
+                              iconName="infoEmpty"
+                              buttonSize="sm"
+                              onMouseEnter={popoverProps.handleInteraction}
+                              onMouseLeave={popoverProps.handleInteraction}
+                            />
+                            <CWPopover
+                              title={
+                                (
+                                  header.column
+                                    .columnDef as CustomColumnDef<unknown>
+                                ).headerInfo?.title
+                              }
+                              body={
+                                <div className="explanation-container">
+                                  <CWText type="b2">
+                                    {
+                                      (
+                                        header.column
+                                          .columnDef as CustomColumnDef<unknown>
+                                      ).headerInfo?.content
+                                    }
+                                  </CWText>
+                                </div>
+                              }
+                              {...popoverProps}
+                            />
+                          </span>
+                        )}
 
                         {header.column.getCanSort()
                           ? (displaySortIcon(

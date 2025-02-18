@@ -1,13 +1,15 @@
 import {
   dispose,
   disposeAdapter,
+  NotificationsProvider,
   notificationsProvider,
+  NotificationsProviderGetMessagesReturn,
+  NotificationsProviderSchedulesReturn,
   RepeatFrequency,
   WorkflowKeys,
 } from '@hicommonwealth/core';
 import { models, tester } from '@hicommonwealth/model';
 import * as schemas from '@hicommonwealth/schemas';
-import { EventNames } from '@hicommonwealth/schemas';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import {
@@ -23,11 +25,46 @@ import {
 } from 'vitest';
 import z from 'zod';
 // eslint-disable-next-line max-len
-import { processSubscriptionPreferencesUpdated } from '../../../server/workers/knock/eventHandlers/subscriptionPreferencesUpdated';
-import { SpyNotificationsProvider } from '../../util/mockedNotificationProvider';
+import { processSubscriptionPreferencesUpdated } from '../../../server/workers/knock/subscriptionPreferencesUpdated';
 
 chai.use(chaiAsPromised);
 
+function SpyNotificationsProvider(stubs?: {
+  triggerWorkflowStub?: Mock<
+    [],
+    Promise<PromiseSettledResult<{ workflow_run_id: string }>[]>
+  >;
+  getMessagesStub?: Mock<[], Promise<NotificationsProviderGetMessagesReturn>>;
+  getSchedulesStub?: Mock<[], Promise<NotificationsProviderSchedulesReturn>>;
+  createSchedulesStub?: Mock<[], Promise<NotificationsProviderSchedulesReturn>>;
+  deleteSchedulesStub?: Mock<[], Promise<Set<string>>>;
+  identifyUserStub?: Mock<[], Promise<{ id: string }>>;
+  registerClientRegistrationToken?: Mock<[], Promise<boolean>>;
+  unregisterClientRegistrationToken?: Mock<[], Promise<boolean>>;
+}): NotificationsProvider {
+  return {
+    name: 'SpyNotificationsProvider',
+    dispose: vi.fn(() => Promise.resolve()),
+    triggerWorkflow:
+      stubs?.triggerWorkflowStub || vi.fn(() => Promise.resolve([])),
+    getMessages: stubs?.getMessagesStub || vi.fn(() => Promise.resolve([])),
+    getSchedules: stubs?.getSchedulesStub || vi.fn(() => Promise.resolve([])),
+    createSchedules:
+      stubs?.createSchedulesStub || vi.fn(() => Promise.resolve([])),
+    deleteSchedules:
+      stubs?.deleteSchedulesStub || vi.fn(() => Promise.resolve(new Set())),
+    identifyUser:
+      stubs?.identifyUserStub || vi.fn(() => Promise.resolve({ id: '' })),
+    registerClientRegistrationToken:
+      stubs?.registerClientRegistrationToken ||
+      vi.fn(() => Promise.resolve(true)),
+    unregisterClientRegistrationToken:
+      stubs?.unregisterClientRegistrationToken ||
+      vi.fn(() => Promise.resolve(true)),
+  };
+}
+
+// TODO: this should be in libs/model, but currently depending on libs/adapter for config
 describe('subscriptionPreferencesUpdated', () => {
   let user: z.infer<typeof schemas.User> | undefined;
 
@@ -76,7 +113,7 @@ describe('subscriptionPreferencesUpdated', () => {
     });
 
     const res = await processSubscriptionPreferencesUpdated({
-      name: EventNames.SubscriptionPreferencesUpdated,
+      name: 'SubscriptionPreferencesUpdated',
       payload: {
         user_id: user!.id!,
         email_notifications_enabled: false,
@@ -117,7 +154,7 @@ describe('subscriptionPreferencesUpdated', () => {
     });
 
     const res = await processSubscriptionPreferencesUpdated({
-      name: EventNames.SubscriptionPreferencesUpdated,
+      name: 'SubscriptionPreferencesUpdated',
       payload: {
         user_id: user!.id!,
         recap_email_enabled: true,
@@ -171,7 +208,7 @@ describe('subscriptionPreferencesUpdated', () => {
     });
 
     const res = await processSubscriptionPreferencesUpdated({
-      name: EventNames.SubscriptionPreferencesUpdated,
+      name: 'SubscriptionPreferencesUpdated',
       payload: {
         user_id: user!.id!,
         recap_email_enabled: true,
@@ -210,7 +247,7 @@ describe('subscriptionPreferencesUpdated', () => {
     });
 
     const res = await processSubscriptionPreferencesUpdated({
-      name: EventNames.SubscriptionPreferencesUpdated,
+      name: 'SubscriptionPreferencesUpdated',
       payload: {
         user_id: user!.id!,
         recap_email_enabled: false,
@@ -250,7 +287,7 @@ describe('subscriptionPreferencesUpdated', () => {
     });
 
     const res = await processSubscriptionPreferencesUpdated({
-      name: EventNames.SubscriptionPreferencesUpdated,
+      name: 'SubscriptionPreferencesUpdated',
       payload: {
         user_id: user!.id!,
         recap_email_enabled: false,

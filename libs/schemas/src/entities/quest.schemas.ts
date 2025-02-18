@@ -11,6 +11,10 @@ export const QuestEvents = {
   CommentCreated: events.CommentCreated,
   CommentUpvoted: events.CommentUpvoted,
   UserMentioned: events.UserMentioned,
+  RecurringContestManagerDeployed: events.RecurringContestManagerDeployed,
+  OneOffContestManagerDeployed: events.OneOffContestManagerDeployed,
+  LaunchpadTokenCreated: events.LaunchpadTokenCreated,
+  LaunchpadTokenTraded: events.LaunchpadTokenTraded,
 } as const;
 
 export enum QuestParticipationLimit {
@@ -56,13 +60,17 @@ export const QuestScore = z
 export const Quest = z
   .object({
     id: PG_INT.nullish(),
-    community_id: z.string(),
     name: z.string().max(255),
     description: z.string().max(1000),
+    image_url: z.string(),
     start_date: z.coerce.date(),
     end_date: z.coerce.date(),
     created_at: z.coerce.date().optional(),
     updated_at: z.coerce.date().optional(),
+    community_id: z
+      .string()
+      .nullish()
+      .describe('Links the quest to a single community'),
 
     // associations
     action_metas: z.array(QuestActionMeta).optional(),
