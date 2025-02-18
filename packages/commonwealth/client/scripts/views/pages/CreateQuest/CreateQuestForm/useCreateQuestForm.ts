@@ -44,7 +44,11 @@ const useCreateQuestForm = () => {
     maxSubForms: MAX_ACTIONS_LIMIT,
   });
 
-  const minStartDate = new Date(new Date().getTime() + 1 * 24 * 60 * 60 * 1000); // 1 day date in future
+  const minStartDate = new Date(new Date().getTime() + 1 * 60 * 60 * 1000); // now + 1 hour in future
+  const idealStartDate = new Date(
+    new Date().getTime() + 1 * 24 * 60 * 60 * 1000,
+  ); // now + 1 day in future
+  const minEndDate = new Date(new Date().getTime() + 2 * 24 * 60 * 60 * 1000); // now + 1 day in future
 
   const [isProcessingQuestImage, setIsProcessingQuestImage] = useState(false);
 
@@ -201,7 +205,11 @@ const useCreateQuestForm = () => {
       } catch (e) {
         console.error(e);
 
-        notifyError('Failed to create quest!');
+        if (e.message.includes('must be at least 0 days in the future')) {
+          notifyError('Start date must be a future date');
+        } else {
+          notifyError('Failed to create quest!');
+        }
       }
     };
     const questStartHoursDiffFromNow = moment(values.start_date).diff(
@@ -232,6 +240,8 @@ const useCreateQuestForm = () => {
     isProcessingQuestImage,
     setIsProcessingQuestImage,
     minStartDate,
+    idealStartDate,
+    minEndDate,
     // custom radio button props
     repetitionCycleRadio: {
       error: repetitionCycleRadioError,
