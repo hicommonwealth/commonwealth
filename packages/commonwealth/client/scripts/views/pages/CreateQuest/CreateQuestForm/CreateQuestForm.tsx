@@ -32,6 +32,8 @@ const CreateQuestForm = () => {
     isProcessingQuestImage,
     setIsProcessingQuestImage,
     minStartDate,
+    idealStartDate,
+    minEndDate,
     repetitionCycleRadio,
     formMethodsRef,
   } = useCreateQuestForm();
@@ -73,14 +75,14 @@ const CreateQuestForm = () => {
           hookToForm
           name="start_date"
           minDate={minStartDate}
-          selected={minStartDate}
+          selected={idealStartDate}
           showTimeInput
         />
         <CWDateTimeInput
           label="End Date"
           hookToForm
           name="end_date"
-          minDate={minStartDate}
+          minDate={minEndDate}
           selected={null}
           showTimeInput
         />
