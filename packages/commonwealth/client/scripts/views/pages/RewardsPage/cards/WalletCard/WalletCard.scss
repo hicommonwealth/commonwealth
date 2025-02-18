@@ -1,2 +1,42 @@
+@import '../../../../../styles/shared';
+
 .WalletCard {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+
+  >.CWSelectList>.SelectList {
+    padding: 4px 8px !important;
+    line-height: initial;
+    min-height: initial;
+    max-height: 40px;
+    width: fit-content;
+  }
+
+  .add-funds-btn {
+    all: unset;
+    display: flex;
+    flex-direction: row;
+    gap: 4px;
+    align-items: center;
+    cursor: pointer;
+    color: $green-600;
+
+    .Text {
+      color: $green-600;
+    }
+  }
+
+  .list {
+    max-height: 100px;
+    overflow: scroll;
+
+    .balance-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid $neutral-50;
+    }
+  }
 }
