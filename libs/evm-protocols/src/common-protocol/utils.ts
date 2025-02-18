@@ -5,6 +5,7 @@ import {
   DecodeEventLogReturnType,
   Hex,
   decodeEventLog,
+  getAddress,
 } from 'viem';
 import Web3, { AbiInput, TransactionReceipt, Web3 as Web3Type } from 'web3';
 import * as AbiCoder from 'web3-eth-abi';
@@ -169,6 +170,10 @@ export const estimateGas = async (web3: Web3): Promise<bigint | null> => {
 
 export const isEvmAddress = (address: string): boolean => {
   return isAddress(address);
+};
+
+export const getEvmAddress = (address: string): string => {
+  return getAddress(address);
 };
 
 export const arbitraryEvmCall = async ({
