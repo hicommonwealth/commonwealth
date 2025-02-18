@@ -50,3 +50,19 @@
     margin: 24px auto;
   }
 }
+
+.Table {
+  table {
+    tbody {
+      .data-container {
+        font-size: 12px;
+        a {
+          .Text {
+            color: $primary-500;
+            font-size: 12px;
+          }
+        }
+      }
+    }
+  }
+}

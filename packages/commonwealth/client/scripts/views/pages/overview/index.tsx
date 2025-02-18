@@ -1,21 +1,26 @@
 import { splitAndDecodeURL } from '@hicommonwealth/shared';
+import { APIOrderDirection } from 'client/scripts/helpers/constants';
 import useRunOnceOnCondition from 'client/scripts/hooks/useRunOnceOnCondition';
+import useTopicGating from 'client/scripts/hooks/useTopicGating';
+import useUserStore from 'client/scripts/state/ui/user';
+import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
+import { Link } from 'react-router-dom';
 import app from 'state';
 import { useFetchThreadsQuery } from 'state/api/threads';
-import { useFetchTopicsQuery } from 'state/api/topics';
-import type Thread from '../../../models/Thread';
-import type { Topic } from '../../../models/Topic';
-import { CWDivider } from '../../components/component_kit/cw_divider';
 import { CWText } from '../../components/component_kit/cw_text';
+import { CWTable } from '../../components/component_kit/new_designs/CWTable';
+import { CWTableColumnInfo } from '../../components/component_kit/new_designs/CWTable/CWTable';
+import { useCWTableState } from '../../components/component_kit/new_designs/CWTable/useCWTableState';
 import '../discussions/DiscussionsPage.scss';
 import { PageLoading } from '../loading';
-import { TopicSummaryRow } from './TopicSummaryRow';
+import ThreadCell from './ThreadCell';
 import './index.scss';
 
 const OverviewPage = () => {
   const navigate = useCommonNavigate();
+  const user = useUserStore();
   const topicNameFromURL = splitAndDecodeURL(location.pathname);
 
   useRunOnceOnCondition({
@@ -31,7 +36,7 @@ const OverviewPage = () => {
   });
 
   const communityId = app.activeChainId() || '';
-  const { data: recentlyActiveThreads, isLoading } = useFetchThreadsQuery({
+  const { data: recentlyActiveThreads } = useFetchThreadsQuery({
     queryType: 'active',
     communityId,
     topicsPerThread: 3,
@@ -39,74 +44,94 @@ const OverviewPage = () => {
     apiEnabled: !!communityId,
   });
 
-  const { data: topics = [] } = useFetchTopicsQuery({
-    communityId,
-    apiEnabled: !!communityId,
+  const { memberships, topicPermissions } = useTopicGating({
+    communityId: communityId,
+    userAddress: user.activeAccount?.address || '',
+    apiEnabled: !!user.activeAccount?.address && !!communityId,
   });
 
-  const anyTopicsFeatured = topics.some((t) => t.featured_in_sidebar);
-
-  const topicsFiltered = anyTopicsFeatured
-    ? topics.filter((t) => t.featured_in_sidebar)
-    : topics;
-
-  const topicsSorted = anyTopicsFeatured
-    ? // @ts-expect-error <StrictNullChecks/>
-      topicsFiltered.sort((a, b) => a.order - b.order)
-    : topicsFiltered.sort((a, b) => a.name.localeCompare(b.name)); // alphabetizes non-ordered + non-featured topics
-
-  const topicSummaryRows: Array<{
-    monthlyThreads: Array<Thread>;
-    pinnedThreads: Array<Thread>;
-    topic: Topic;
-  }> = topicsSorted.map((topic) => {
-    const monthlyThreads = (recentlyActiveThreads || []).filter(
-      (thread) =>
-        topic?.id &&
-        thread.topic?.id &&
-        topic.id === thread.topic.id &&
-        thread.archivedAt === null &&
-        !thread.markedAsSpamAt,
-    );
-
-    return {
-      monthlyThreads,
-      pinnedThreads: [], // TODO: ask for a pinned thread prop in /threads?active=true api to show pinned threads
-      topic,
-    };
+  const columns: CWTableColumnInfo[] = [
+    {
+      key: 'title',
+      header: 'Title',
+      hasCustomSortValue: true,
+      numeric: false,
+      sortable: true,
+    },
+    {
+      key: 'topic',
+      header: 'Topic',
+      hasCustomSortValue: false,
+      numeric: false,
+      sortable: true,
+    },
+    {
+      key: 'createdAt',
+      header: 'Created Date',
+      numeric: false,
+      sortable: true,
+    },
+    {
+      key: 'viewCount',
+      header: 'Views',
+      numeric: false,
+      sortable: true,
+    },
+  ];
+  const tableState = useCWTableState({
+    columns,
+    initialSortColumn: 'createdAt',
+    initialSortDirection: APIOrderDirection.Desc,
   });
 
-  return !topicSummaryRows.length ? (
+  return !recentlyActiveThreads?.length ? (
     <PageLoading />
   ) : (
     <div className="OverviewPage">
-      <div className="column-headers-row">
-        <CWText
-          type="h5"
-          fontWeight="semiBold"
-          className="threads-header-row-text"
-        >
-          Topic
-        </CWText>
-        <div className="threads-header-container">
-          <CWText
-            type="h5"
-            fontWeight="semiBold"
-            className="threads-header-row-text"
-          >
-            Recent threads
-          </CWText>
-        </div>
-      </div>
-      <CWDivider />
-      {topicSummaryRows.map((row, i) => (
-        <TopicSummaryRow {...row} key={i} isLoading={isLoading} />
-      ))}
-      {!isLoading && topicSummaryRows.length === 0 && (
-        <CWText type="b1" className="empty-placeholder">
-          No threads available
-        </CWText>
-      )}
+      <CWTable
+        rowData={recentlyActiveThreads.map((thread) => ({
+          ...thread,
+          createdAt: {
+            sortValue: thread.createdAt,
+            customElement: (
+              <div className="createdAt">
+                <CWText fontWeight="regular">
+                  {moment(thread.createdAt)
+                    .utc?.()
+                    ?.local?.()
+                    ?.format('MMMM DD YYYY')}
+                </CWText>
+              </div>
+            ),
+          },
+          title: {
+            customElement: (
+              <>
+                <ThreadCell
+                  thread={thread}
+                  memberships={memberships}
+                  topicPermissions={topicPermissions}
+                />
+              </>
+            ),
+          },
+          topic: {
+            customElement: (
+              <Link
+                key={thread.topic.name}
+                to={`${window.location.pathname}/${thread.topic.name}`}
+              >
+                <CWText className="collaborator-user-name">
+                  {thread.topic.name}
+                </CWText>
+              </Link>
+            ),
+          },
+        }))}
+        columnInfo={tableState.columns}
+        sortingState={tableState.sorting}
+        setSortingState={tableState.setSorting}
+      />
     </div>
   );
 };

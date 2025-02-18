@@ -1,0 +1,74 @@
+@import '../../../styles/shared.scss';
+
+.ThreadCell {
+  display: flex;
+  width: 700px;
+  height: 106px;
+  justify-content: space-between;
+  flex-direction: column;
+  .card-image-container {
+    overflow: hidden;
+    display: flex;
+    gap: 10px;
+    width: 100%;
+    max-width: 100%;
+    img {
+      height: 72px;
+      width: 87px;
+      max-width: 87px;
+      min-width: 87px;
+      object-fit: cover;
+    }
+    .thread-details {
+      display: flex;
+      width: 100%;
+      flex-direction: column;
+      gap: 4px;
+      .content-title {
+        display: flex;
+        flex-direction: row;
+        gap: 8px;
+      }
+      .community-details {
+        height: 16px;
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 8px;
+        img {
+          width: 16px;
+          height: 16px;
+          max-width: 16px;
+          min-width: 16px;
+          border-radius: 8px;
+          object-fit: contain;
+        }
+        .Text {
+          font-weight: 500 !important;
+        }
+      }
+      .thread-body {
+        display: flex;
+        .show-more-button-wrapper {
+          display: none;
+        }
+      }
+    }
+  }
+  .footer-container {
+    height: 30px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    div {
+      padding: 0 !important;
+    }
+    button {
+      padding: 0 !important;
+    }
+    // padding-left: 110px;
+  }
+}
