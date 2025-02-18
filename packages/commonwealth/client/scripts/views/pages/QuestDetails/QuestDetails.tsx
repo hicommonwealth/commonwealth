@@ -86,13 +86,24 @@ const QuestDetails = ({ id }: { id: number }) => {
       .reduce((accumulator, currentValue) => accumulator + currentValue, 0) ||
     0;
 
-  const totalXP =
+  const totalCreatorXP =
     (quest.action_metas || [])
-      ?.map((action) => action.reward_amount)
+      ?.map((action) => action.creator_reward_weight * 100)
       .reduce((accumulator, currentValue) => accumulator + currentValue, 0) ||
     0;
 
-  const isCompleted = gainedXP === totalXP;
+  const totalUserXP =
+    (quest.action_metas || [])
+      ?.map(
+        (action) => action.reward_amount - action.creator_reward_weight * 100,
+      )
+      .reduce((accumulator, currentValue) => accumulator + currentValue, 0) ||
+    0;
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const totalXP = totalCreatorXP + totalUserXP;
+
+  const isCompleted = gainedXP === totalUserXP;
 
   const handleActionStart = (actionName: QuestAction) => {
     switch (actionName) {
@@ -219,7 +230,7 @@ const QuestDetails = ({ id }: { id: number }) => {
                 Complete tasks to earn XP
               </CWText>
               <CWTag
-                label={`${gainedXP > 0 ? `${gainedXP} / ` : ''}${totalXP} XP`}
+                label={`${gainedXP > 0 ? `${gainedXP} / ` : ''}${totalUserXP} XP`}
                 type="proposal"
               />
             </div>
