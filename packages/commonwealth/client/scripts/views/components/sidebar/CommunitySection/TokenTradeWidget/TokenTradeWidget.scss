@@ -19,6 +19,30 @@
     }
   }
 
+  .token-metadata-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .token-img {
+      height: auto;
+      width: 50px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 1px solid $neutral-100;
+    }
+
+    .token-address {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 2px;
+      .Text {
+        color: $neutral-800;
+      }
+    }
+  }
+
   .pad-8 {
     padding: 0px 8px;
   }

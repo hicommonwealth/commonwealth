@@ -55,6 +55,7 @@ type ReactQuillEditorProps = {
   shouldFocus?: boolean;
   cancelEditing?: () => void;
   fromManageTopic?: boolean;
+  onKeyDown?: React.KeyboardEventHandler<HTMLDivElement>;
 } & ReactQuillEditorFormValidationProps;
 
 const TABS = [
@@ -77,6 +78,7 @@ const ReactQuillEditor = ({
   hookToForm,
   name,
   fromManageTopic = false,
+  onKeyDown,
 }: ReactQuillEditorProps) => {
   const toolbarId = useMemo(() => {
     return `cw-toolbar-${Date.now()}-${Math.floor(Math.random() * 1_000_000)}`;
@@ -363,47 +365,49 @@ const ReactQuillEditor = ({
                       onDrop={handleDragStop}
                     >
                       <div data-text-editor="name" className="ReactQuillParent">
-                        <ReactQuill
-                          // @ts-expect-error <StrictNullChecks/>
-                          ref={editorRef}
-                          className={`QuillEditor markdownEnabled ${className}`}
-                          scrollingContainer="ql-container"
-                          placeholder={placeholder}
-                          tabIndex={tabIndex}
-                          theme="snow"
-                          bounds={`[data-text-editor="name"]`}
-                          value={contentDeltaToUse}
-                          onFocus={() => setIsFocused(true)}
-                          onBlur={() => {
-                            setIsFocused(false);
-                            isHookedToFormProper &&
-                              formContext.trigger(name).catch(console.error);
-                          }}
-                          onChange={handleChange}
-                          onChangeSelection={(selection: RangeStatic) => {
-                            if (!selection) {
-                              return;
-                            }
-                            lastSelectionRef.current = selection;
-                          }}
-                          formats={[]}
-                          modules={{
-                            toolbar: {
-                              container: `#${toolbarId}`,
-                              handlers: markdownToolbarHandlers,
-                            },
-                            imageDropAndPaste: {
-                              handler: handleImageDropAndPaste,
-                            },
-                            clipboard: {
-                              matchVisual: false,
-                              handler: handleTextPaste,
-                            },
-                            mention,
-                            magicUrl: false,
-                            keyboard: markdownKeyboardShortcuts,
-                          }}
-                        />
+                        <div onKeyDown={onKeyDown}>
+                          <ReactQuill
+                            // @ts-expect-error <StrictNullChecks/>
+                            ref={editorRef}
+                            className={`QuillEditor markdownEnabled ${className}`}
+                            scrollingContainer="ql-container"
+                            placeholder={placeholder}
+                            tabIndex={tabIndex}
+                            theme="snow"
+                            bounds={`[data-text-editor="name"]`}
+                            value={contentDeltaToUse}
+                            onFocus={() => setIsFocused(true)}
+                            onBlur={() => {
+                              setIsFocused(false);
+                              isHookedToFormProper &&
+                                formContext.trigger(name).catch(console.error);
+                            }}
+                            onChange={handleChange}
+                            onChangeSelection={(selection: RangeStatic) => {
+                              if (!selection) {
+                                return;
+                              }
+                              lastSelectionRef.current = selection;
+                            }}
+                            formats={[]}
+                            modules={{
+                              toolbar: {
+                                container: `#${toolbarId}`,
+                                handlers: markdownToolbarHandlers,
+                              },
+                              imageDropAndPaste: {
+                                handler: handleImageDropAndPaste,
+                              },
+                              clipboard: {
+                                matchVisual: false,
+                                handler: handleTextPaste,
+                              },
+                              mention,
+                              magicUrl: false,
+                              keyboard: markdownKeyboardShortcuts,
+                            }}
+                          />
+                        </div>
                       </div>
                       {provided.placeholder}
                     </div>

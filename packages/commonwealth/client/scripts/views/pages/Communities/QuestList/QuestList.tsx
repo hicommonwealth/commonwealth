@@ -60,9 +60,12 @@ const QuestList = () => {
       ) : (
         <div className="list">
           {(quests || []).map((quest) => {
-            const totalXP =
+            const totalUserXP =
               (quest.action_metas || [])
-                ?.map((action) => action.reward_amount)
+                ?.map(
+                  (action) =>
+                    action.reward_amount - action.creator_reward_weight * 100,
+                )
                 .reduce(
                   (accumulator, currentValue) => accumulator + currentValue,
                   0,
@@ -74,7 +77,7 @@ const QuestList = () => {
                 name={quest.name}
                 description={quest.description}
                 iconURL={quest.image_url}
-                xpPoints={totalXP}
+                xpPoints={totalUserXP}
                 startDate={new Date(quest.start_date)}
                 endDate={new Date(quest.end_date)}
                 onCTAClick={() => handleCTAClick(quest.id)}

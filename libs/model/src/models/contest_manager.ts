@@ -21,6 +21,10 @@ export default (
         type: Sequelize.STRING,
         primaryKey: true,
       },
+      creator_address: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
       community_id: {
         type: Sequelize.STRING,
         allowNull: false,

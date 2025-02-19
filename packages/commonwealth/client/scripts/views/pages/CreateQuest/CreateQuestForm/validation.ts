@@ -53,7 +53,7 @@ export const questFormValidationSchema = z
       }
     },
     {
-      message: VALIDATION_MESSAGES.MUST_HAVE_DIFFERENCE('start date', '1 day'),
+      message: VALIDATION_MESSAGES.MUST_BE_APART('start date', '1 day'),
       path: ['end_date'],
     },
   );

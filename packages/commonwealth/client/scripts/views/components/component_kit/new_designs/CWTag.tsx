@@ -27,7 +27,8 @@ type TagType =
   | 'group'
   | 'contest'
   | 'filter'
-  | 'amount';
+  | 'amount'
+  | 'info';
 
 export type TagProps = {
   iconName?: IconName;

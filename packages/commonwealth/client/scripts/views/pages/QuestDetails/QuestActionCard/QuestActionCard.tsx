@@ -1,5 +1,6 @@
 import { QuestActionMeta } from '@hicommonwealth/schemas';
 import React from 'react';
+import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
@@ -54,6 +55,8 @@ const QuestActionCard = ({
   inEligibilityReason,
   questAction,
 }: QuestActionCardProps) => {
+  const creatorXP = questAction.creator_reward_weight * 100;
+
   return (
     <div className="QuestActionCard">
       <div className="counter">
@@ -69,14 +72,29 @@ const QuestActionCard = ({
           {doesActionRequireCreatorReward(questAction.event_name) && (
             <CWText type="caption" className="xp-shares">
               <span className="creator-share">
-                {questAction.creator_reward_weight}%
+                {creatorXP}% ({creatorXP} XP)
               </span>
-              &nbsp; shared with {actionCopies.shares[questAction.event_name]}
+              &nbsp; shared with {actionCopies.shares[questAction.event_name]}.
+              Your share = {Math.abs(questAction.reward_amount - creatorXP)} XP
             </CWText>
           )}
-          <div className="points">
+          <div className="points-row">
             <CWTag label={`${questAction.reward_amount} XP`} type="proposal" />
-            {/* TODO: helper link here */}
+            {questAction.action_link && (
+              <a
+                target="_blank"
+                href={questAction.action_link}
+                rel="noreferrer"
+                className="action-link"
+              >
+                Instructions{' '}
+                <CWIcon
+                  iconName="externalLink"
+                  iconSize="small"
+                  weight="bold"
+                />
+              </a>
+            )}
           </div>
         </div>
         {isActionInEligible ? (

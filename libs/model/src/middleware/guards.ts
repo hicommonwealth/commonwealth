@@ -143,7 +143,7 @@ export function mustBeAuthorizedPoll(actor: Actor, context?: PollContext) {
 export function mustBeValidDateRange(
   start_date: Date,
   end_date: Date,
-  startDaysInTheFuture = 1,
+  startDaysInTheFuture = 0,
   minDaysInRange = 1,
 ) {
   const today = moment(new Date());
