@@ -4,7 +4,7 @@ import {
   QuestParticipationPeriod,
 } from '@hicommonwealth/schemas';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import { numberGTZeroValidationSchema } from 'helpers/formValidations/common';
+import { numberNonDecimalGTZeroValidationSchema } from 'helpers/formValidations/common';
 import { calculateRemainingPercentageChangeFractional } from 'helpers/number';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import { useCommonNavigate } from 'navigation/helpers';
@@ -136,7 +136,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
 
     // validate repetition count value
     try {
-      numberGTZeroValidationSchema.parse(input);
+      numberNonDecimalGTZeroValidationSchema.parse(input);
 
       const count = parseInt(`${input}`);
 
