@@ -1,14 +1,24 @@
+import { notifyError } from 'controllers/app/notifications';
 import { useFlag } from 'hooks/useFlag';
+import { useCommonNavigate } from 'navigation/helpers';
 import React, { useCallback, useState } from 'react';
-import { useLocalAISettingsStore } from 'state/ui/user';
+import app from 'state';
+import { useGenerateCommentText } from 'state/api/comments/generateCommentText';
+import { useCreateThreadMutation } from 'state/api/threads';
+import { buildCreateThreadInput } from 'state/api/threads/createThread';
+import { useFetchTopicsQuery } from 'state/api/topics';
+import useUserStore, { useLocalAISettingsStore } from 'state/ui/user';
 import { CommentEditor } from 'views/components/Comments/CommentEditor';
 import type { CommentEditorProps } from 'views/components/Comments/CommentEditor/CommentEditor';
-import { CWToggle } from 'views/components/component_kit/new_designs/cw_toggle';
-import { jumpHighlightComment } from 'views/pages/discussions/CommentTree/helpers';
-import { useStickComment } from './context/StickCommentProvider';
 import { NewThreadForm } from 'views/components/NewThreadFormLegacy/NewThreadForm';
+import { CWToggle } from 'views/components/component_kit/new_designs/cw_toggle';
+import {
+  createDeltaFromText,
+  getTextFromDelta,
+} from 'views/components/react_quill_editor';
+import { jumpHighlightComment } from 'views/pages/discussions/CommentTree/helpers';
 import './DesktopStickyInput.scss';
-import { useGenerateCommentText } from 'state/api/comments/generateCommentText';
+import { useStickComment } from './context/StickCommentProvider';
 
 export const DesktopStickyInput = (props: CommentEditorProps) => {
   const { isReplying, replyingToAuthor, onCancel, handleSubmitComment } = props;
@@ -18,6 +28,12 @@ export const DesktopStickyInput = (props: CommentEditorProps) => {
     useLocalAISettingsStore();
   const [streamingReplyIds, setStreamingReplyIds] = useState<number[]>([]);
   const { generateComment } = useGenerateCommentText();
+  const navigate = useCommonNavigate();
+  const communityId = app.activeChainId() || '';
+  const { mutateAsync: createThread } = useCreateThreadMutation({
+    communityId,
+  });
+  const user = useUserStore();
 
   const handleFocused = useCallback(() => {
     setIsExpanded(true);
@@ -29,7 +45,7 @@ export const DesktopStickyInput = (props: CommentEditorProps) => {
       setIsExpanded(false);
       onCancel?.(event);
     },
-    [onCancel, setIsExpanded]
+    [onCancel, setIsExpanded],
   );
 
   const handleAiToggle = useCallback(() => {
@@ -46,20 +62,95 @@ export const DesktopStickyInput = (props: CommentEditorProps) => {
     [streamingReplyIds],
   );
 
-  const handleAiGenerate = useCallback(async (text: string) => {
-    try {
-      const generatedText = await generateComment(text, (update) => {
-        console.log('AI generation update:', update);
-      });
-      return generatedText;
-    } catch (error) {
-      console.error('Failed to generate AI text:', error);
-      return '';
-    }
-  }, [generateComment]);
+  const handleAiGenerate = useCallback(
+    async (text: string) => {
+      try {
+        const generatedText = await generateComment(text, (update) => {
+          console.log('AI generation update:', update);
+        });
+        return generatedText;
+      } catch (error) {
+        console.error('Failed to generate AI text:', error);
+        return '';
+      }
+    },
+    [generateComment],
+  );
+
+  const handleThreadCreation = useCallback(
+    async (input: string): Promise<number> => {
+      if (!app.chain?.base) {
+        notifyError('Invalid community configuration');
+        throw new Error('Invalid community configuration');
+      }
+
+      try {
+        // Find a default topic (prefer "General" if it exists)
+        const { data: topics = [] } = await useFetchTopicsQuery({
+          communityId,
+          apiEnabled: !!communityId,
+        });
+        const defaultTopic =
+          topics.find((t) => t.name.toLowerCase() === 'general') || topics[0];
+
+        if (!defaultTopic) {
+          notifyError('No topic available for thread creation');
+          throw new Error('No topic available');
+        }
+
+        const threadInput = await buildCreateThreadInput({
+          address: user.activeAccount?.address || '',
+          kind: 'discussion',
+          stage: 'Discussion',
+          communityId,
+          communityBase: app.chain.base,
+          title: aiCommentsToggleEnabled
+            ? 'New Thread'
+            : input.split('\n')[0] || 'New Thread',
+          topic: defaultTopic,
+          body: input,
+        });
+
+        const thread = await createThread(threadInput);
+        if (!thread?.id) {
+          throw new Error('Failed to create thread - no ID returned');
+        }
+
+        // Close the form before navigation
+        setIsExpanded(false);
+
+        // Clear any content
+        props.setContentDelta(createDeltaFromText(''));
+
+        // Ensure navigation happens after thread is created and cleanup
+        const threadUrl = `/${communityId}/discussion/${thread.id}-${thread.title}`;
+        setTimeout(() => navigate(threadUrl), 0);
+
+        return thread.id;
+      } catch (error) {
+        console.error('Failed to create thread:', error);
+        notifyError('Failed to create thread');
+        throw error;
+      }
+    },
+    [
+      communityId,
+      aiCommentsToggleEnabled,
+      navigate,
+      createThread,
+      user.activeAccount,
+      setIsExpanded,
+      props.setContentDelta,
+    ],
+  );
 
   const handleEnhancedSubmit = useCallback(async (): Promise<number> => {
     setIsExpanded(false);
+
+    if (mode === 'thread') {
+      return handleThreadCreation(getTextFromDelta(props.contentDelta));
+    }
+
     const commentId = await handleSubmitComment();
 
     if (typeof commentId !== 'number' || isNaN(commentId)) {
@@ -95,7 +186,15 @@ export const DesktopStickyInput = (props: CommentEditorProps) => {
     }, 2000);
 
     return commentId;
-  }, [handleSubmitComment, aiCommentsToggleEnabled, handleAiReply, setIsExpanded]);
+  }, [
+    handleSubmitComment,
+    aiCommentsToggleEnabled,
+    handleAiReply,
+    setIsExpanded,
+    mode,
+    handleThreadCreation,
+    props.contentDelta,
+  ]);
 
   const useExpandedEditor = isExpanded || isReplying;
 
@@ -122,8 +221,8 @@ export const DesktopStickyInput = (props: CommentEditorProps) => {
                 mode === 'thread'
                   ? 'Create a thread...'
                   : replyingToAuthor
-                  ? `Reply to ${replyingToAuthor}...`
-                  : 'Write a comment...'
+                    ? `Reply to ${replyingToAuthor}...`
+                    : 'Write a comment...'
               }
               onClick={handleFocused}
             />
@@ -145,7 +244,7 @@ export const DesktopStickyInput = (props: CommentEditorProps) => {
       ) : (
         <div className="DesktopStickyInputExpanded">
           {mode === 'thread' ? (
-            <NewThreadForm 
+            <NewThreadForm
               onCancel={handleCancel}
               aiCommentsToggleEnabled={aiCommentsToggleEnabled}
               setAICommentsToggleEnabled={setAICommentsToggleEnabled}

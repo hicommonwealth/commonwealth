@@ -3,12 +3,11 @@
 $size: 48px;
 
 .DiscussionsPageLayout {
-  overflow: auto;
-  padding-top: 0;
+  position: relative;
   height: 100%;
+  width: 100%;
   display: flex;
   flex-direction: column;
-  width: 100%;
 
   .layout-container {
     height: 100%;
@@ -152,6 +151,8 @@ $size: 48px;
 
   .thread-list {
     flex: 1;
+    position: relative;
+    overflow-y: auto;
     min-height: 0;
     width: 100%;
     max-width: 100%;
@@ -163,10 +164,22 @@ $size: 48px;
     left: 0;
     right: 0;
     z-index: 100;
-    background: white;
+    background: var(--white);
+    border-top: 1px solid var(--neutral-200);
     padding: 16px 24px;
-    margin-top: auto;
     width: 100%;
     max-width: 100%;
+
+    @media (min-width: 768px) {
+      padding: 16px calc((100% - 768px) / 2 + 24px);
+    }
+
+    @media (min-width: 1024px) {
+      padding: 16px calc((100% - 1024px) / 2 + 24px);
+    }
+
+    @media (min-width: 1280px) {
+      padding: 16px calc((100% - 1280px) / 2 + 24px);
+    }
   }
 }

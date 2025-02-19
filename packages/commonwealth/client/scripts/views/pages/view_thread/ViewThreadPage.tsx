@@ -14,20 +14,31 @@ import { useFlag } from 'hooks/useFlag';
 import useJoinCommunityBanner from 'hooks/useJoinCommunityBanner';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import useTopicGating from 'hooks/useTopicGating';
+import { ThreadStage } from 'models/types';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
-import React, { useEffect, useMemo, useRef, useState, useCallback } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useSearchParams } from 'react-router-dom';
 import app from 'state';
+import { useCreateCommentMutation } from 'state/api/comments';
+import { buildCreateCommentInput } from 'state/api/comments/createComment';
+import { useGenerateCommentText } from 'state/api/comments/generateCommentText';
 import useGetContentByUrlQuery from 'state/api/general/getContentByUrl';
 import { useFetchGroupsQuery } from 'state/api/groups';
 import {
   useAddThreadLinksMutation,
+  useEditThreadMutation,
   useGetThreadPollsQuery,
   useGetThreadsByIdQuery,
 } from 'state/api/threads';
-import useUserStore from 'state/ui/user';
+import useUserStore, { useLocalAISettingsStore } from 'state/ui/user';
 import ExternalLink from 'views/components/ExternalLink';
 import JoinCommunityBanner from 'views/components/JoinCommunityBanner';
 import MarkdownViewerUsingQuillOrNewEditor from 'views/components/MarkdownViewerWithFallback';
@@ -69,8 +80,6 @@ import { LinkedProposalsCard } from './linked_proposals_card';
 import { LinkedThreadsCard } from './linked_threads_card';
 import { LockMessage } from './lock_message';
 import { SnapshotCreationCard } from './snapshot_creation_card';
-import { useLocalAISettingsStore } from 'state/ui/user';
-import { useGenerateCommentText } from 'state/api/comments/generateCommentText';
 
 type ViewThreadPageProps = {
   identifier: string;
@@ -157,6 +166,59 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
 
   const { aiCommentsToggleEnabled } = useLocalAISettingsStore();
   const { generateComment } = useGenerateCommentText();
+  const { mutateAsync: createComment } = useCreateCommentMutation({
+    communityId,
+    threadId: +threadId,
+    existingNumberOfComments: thread?.numberOfComments || 0,
+  });
+
+  const { mutateAsync: editThread } = useEditThreadMutation({
+    communityId: thread?.communityId || '',
+    threadId: Number(threadId),
+    threadMsgId: thread?.id?.toString() || '',
+    currentStage: thread?.stage || ThreadStage.Discussion,
+    currentTopicId: thread?.topic?.id || 0,
+  });
+
+  const handleGenerateAIComment = useCallback(
+    async (threadId: number): Promise<void> => {
+      if (!aiCommentsToggleEnabled || !user.activeAccount) return;
+
+      try {
+        const generatedText = await generateComment('', (update) => {
+          // Handle streaming updates
+          console.log('AI comment generation update:', update);
+        });
+
+        if (generatedText) {
+          // Create the AI comment
+          const input = await buildCreateCommentInput({
+            communityId,
+            address: user.activeAccount.address,
+            threadId,
+            threadMsgId: thread?.canvasMsgId ?? null,
+            unescapedText: generatedText,
+            parentCommentId: null,
+            parentCommentMsgId: null,
+            existingNumberOfComments: thread?.numberOfComments || 0,
+          });
+
+          await createComment(input);
+        }
+      } catch (error) {
+        console.error('Failed to generate AI comment:', error);
+        notifyError('Failed to generate AI comment');
+      }
+    },
+    [
+      aiCommentsToggleEnabled,
+      generateComment,
+      user.activeAccount,
+      communityId,
+      thread,
+      createComment,
+    ],
+  );
 
   useEffect(() => {
     if (
@@ -256,31 +318,6 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
       );
     }
   }, [thread?.versionHistory]);
-
-  const handleGenerateAIComment = useCallback(async (threadId: number) => {
-    if (!aiCommentsToggleEnabled) return;
-
-    try {
-      const generatedText = await generateComment('', (update) => {
-        // Handle streaming updates
-        console.log('AI comment generation update:', update);
-      });
-
-      if (generatedText) {
-        // Create the AI comment
-        const commentResponse = await createComment({
-          threadId,
-          content: generatedText,
-          // Add other necessary comment params
-        });
-
-        return commentResponse;
-      }
-    } catch (error) {
-      console.error('Failed to generate AI comment:', error);
-      notifyError('Failed to generate AI comment');
-    }
-  }, [aiCommentsToggleEnabled, generateComment]);
 
   if (typeof identifier !== 'string') {
     return <PageNotFound />;
@@ -466,6 +503,7 @@ const ViewThreadPage = ({ identifier }: ViewThreadPageProps) => {
       });
     }
   };
+
   return (
     <StickCommentProvider>
       <MetaTags
