@@ -117,6 +117,7 @@ const CustomDomainRoutes = ({
   xpEnabled,
   communityHomeEnabled,
   homePageEnable,
+  governancePageEnabled,
 }: RouteFeatureFlags) => {
   return [
     <Route
@@ -285,6 +286,17 @@ const CustomDomainRoutes = ({
         scoped: true,
       })}
     />,
+    ...(governancePageEnabled
+      ? [
+          <Route
+            key="/:scope/governance"
+            path="/:scope/governance"
+            element={withLayout(CommunityHomePage, {
+              scoped: true,
+            })}
+          />,
+        ]
+      : []),
     // GOVERNANCE END
 
     // DISCUSSIONS

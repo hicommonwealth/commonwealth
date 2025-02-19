@@ -39,6 +39,7 @@ const featureFlags = {
   growl: buildFlag(process.env.FLAG_GROWL),
   communityHome: buildFlag(process.env.FLAG_COMMUNITY_HOME),
   homePage: buildFlag(process.env.FLAG_HOMEPAGE),
+  governancePage: buildFlag(process.env.FLAG_NEW_GOVERNANCE_PAGE),
 };
 
 export type AvailableFeatureFlag = keyof typeof featureFlags;

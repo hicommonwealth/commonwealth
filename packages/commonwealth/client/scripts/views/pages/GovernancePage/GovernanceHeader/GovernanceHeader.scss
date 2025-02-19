@@ -1,0 +1,50 @@
+@import '../../../../styles/shared.scss';
+
+.GovernancePage {
+  .header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+
+    .address-details {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      .address {
+        background-color: $neutral-200;
+        border-radius: 6px;
+        color: $neutral-600;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        width: 100px;
+        gap: 4px;
+        padding-left: 2px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        .Icon {
+          width: 16px;
+          height: 16px;
+        }
+
+        .CWIdentificationTag {
+          svg {
+            width: 16px;
+            height: 16px;
+          }
+        }
+      }
+    }
+  }
+
+  @include extraSmall {
+    .header {
+      > *:not(:first-child) {
+        display: none;
+      }
+    }
+  }
+}

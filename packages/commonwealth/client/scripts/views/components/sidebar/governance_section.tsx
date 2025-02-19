@@ -5,6 +5,7 @@ import { ChainBase, ChainNetwork, ChainType } from '@hicommonwealth/shared';
 import { handleRedirectClicks } from 'helpers';
 import './index.scss';
 
+import { useFlag } from 'client/scripts/hooks/useFlag';
 import { useCommonNavigate } from 'navigation/helpers';
 import { matchRoutes, useLocation } from 'react-router-dom';
 import app from 'state';
@@ -53,6 +54,8 @@ function setGovernanceToggleTree(path: string, toggle: boolean) {
 }
 
 export const GovernanceSection = ({ isContestAvailable }: AppSectionProps) => {
+  const governancePageEnabled = useFlag('governancePage');
+
   const navigate = useCommonNavigate();
   const location = useLocation();
 
@@ -84,6 +87,10 @@ export const GovernanceSection = ({ isContestAvailable }: AppSectionProps) => {
     toggledState: false,
     children: {
       Members: {
+        toggledState: false,
+        children: {},
+      },
+      Governance: {
         toggledState: false,
         children: {},
       },
@@ -141,6 +148,11 @@ export const GovernanceSection = ({ isContestAvailable }: AppSectionProps) => {
     [{ path: '/contests' }, { path: ':scope/contests' }],
     location,
   );
+  const matchesGovernanceRoute = matchRoutes(
+    [{ path: '/governance' }, { path: ':scope/governance' }],
+    location,
+  );
+
   // ---------- Build Section Props ---------- //
 
   // Members
@@ -233,7 +245,27 @@ export const GovernanceSection = ({ isContestAvailable }: AppSectionProps) => {
     displayData: null,
   };
 
-  //Contests
+  // Governance
+  const governanceData: SectionGroupAttrs = {
+    title: 'Governance',
+    containsChildren: false,
+    hasDefaultToggle: toggleTreeState['children']['Governance']
+      ? toggleTreeState['children']['Governance']['toggledState']
+      : false,
+    onClick: (e, toggle: boolean) => {
+      e.preventDefault();
+      resetSidebarState();
+      handleRedirectClicks(navigate, e, '/governance', communityId, () => {
+        setGovernanceToggleTree('children.Governance.toggledState', toggle);
+      });
+    },
+    isVisible: true,
+    isUpdated: true,
+    isActive: !!matchesGovernanceRoute,
+    displayData: null,
+  };
+
+  // Contests
   const contestData: SectionGroupAttrs = {
     title: 'Contests',
     containsChildren: false,
@@ -254,12 +286,14 @@ export const GovernanceSection = ({ isContestAvailable }: AppSectionProps) => {
     membersData,
     snapshotData,
     proposalsData,
-    contestData,
   ];
 
   if (!hasProposals) governanceGroupData = [membersData];
   if (isContestAvailable) {
     governanceGroupData.push(contestData);
+  }
+  if (governancePageEnabled) {
+    governanceGroupData.push(governanceData);
   }
 
   const sidebarSectionData: SidebarSectionAttrs = {
