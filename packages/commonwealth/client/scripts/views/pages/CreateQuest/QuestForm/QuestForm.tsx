@@ -125,7 +125,7 @@ const QuestForm = () => {
           name="community"
           hookToForm
           label="Community (optional)"
-          instructionalMessage="Note: Selecting a community will bound all quest actions to that community."
+          instructionalMessage="Note: Selecting a community will bind all quest actions to that community."
         />
       </div>
 
