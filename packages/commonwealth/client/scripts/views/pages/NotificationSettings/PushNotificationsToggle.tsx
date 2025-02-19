@@ -16,9 +16,19 @@ export const PushNotificationsToggle = (
 ) => {
   const { pref } = props;
 
+  const mobile_push_notifications_enabled = useSubscriptionPreferenceSetting(
+    'mobile_push_notifications_enabled',
+  );
+
   const checked = useSubscriptionPreferenceSetting(pref);
 
   const toggle = useSubscriptionPreferenceSettingToggle([pref]);
 
-  return <CWToggle checked={checked} onChange={() => toggle(!checked)} />;
+  return (
+    <CWToggle
+      checked={checked}
+      onChange={() => toggle(!checked)}
+      disabled={!mobile_push_notifications_enabled}
+    />
+  );
 };
