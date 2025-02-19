@@ -1,5 +1,6 @@
-import { EVM_ADDRESS } from '@hicommonwealth/schemas';
 import { z } from 'zod';
+import { EVM_ADDRESS } from '../utils';
+import { ChainNode } from './chain.schemas';
 
 export const ChainEventXpSource = z.object({
   chain_node_id: z.number(),
@@ -8,4 +9,6 @@ export const ChainEventXpSource = z.object({
   quest_action_meta_id: z.number(),
   created_at: z.coerce.date(),
   updated_at: z.coerce.date(),
+
+  ChainNode: ChainNode.optional(),
 });

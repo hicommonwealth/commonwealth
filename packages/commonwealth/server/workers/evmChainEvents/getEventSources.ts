@@ -16,6 +16,70 @@ const DEFAULT_MAX_BLOCK_RANGE = 500;
 
 const log = logger(import.meta);
 
+export async function getXpSources(
+  existingEvmSources: EvmSources,
+): Promise<EvmSources> {
+  const dbSources = await models.ChainEventXpSource.findAll({
+    include: [
+      {
+        model: models.ChainNode.scope('withPrivateData'),
+        required: true,
+      },
+    ],
+  });
+
+  const evmSources: EvmSources = {
+    ...existingEvmSources,
+  };
+  for (const source of dbSources) {
+    if (!evmSources[source.ChainNode!.eth_chain_id!]) {
+      evmSources[source.ChainNode!.eth_chain_id!] = {
+        rpc: source.ChainNode!.private_url || source.ChainNode!.url,
+        maxBlockRange:
+          source.ChainNode!.max_ce_block_range || DEFAULT_MAX_BLOCK_RANGE,
+        contracts: {},
+      };
+    }
+
+    const chainSource = evmSources[source.ChainNode!.eth_chain_id!];
+    if (!chainSource.contracts[source.contract_address]) {
+      chainSource.contracts[source.contract_address] = [];
+    } else {
+      const existingSource = chainSource.contracts[
+        source.contract_address
+      ].find((s) => s.event_signature === source.event_signature);
+      if (existingSource) {
+        log.error(`Event signature already exists in evm sources!`, undefined, {
+          existing_source: {
+            contract_address: existingSource.contract_address,
+            event_signature: existingSource.event_signature,
+            eth_chain_id: existingSource.eth_chain_id,
+          },
+          xp_source: {
+            contract_address: source.contract_address,
+            event_signature: source.event_signature,
+            eth_chain_id: source.ChainNode!.eth_chain_id!,
+          },
+        });
+        continue;
+      }
+    }
+
+    chainSource.contracts[source.contract_address].push({
+      eth_chain_id: source.ChainNode!.eth_chain_id!,
+      contract_address: source.contract_address,
+      event_signature: source.event_signature,
+      meta: {
+        events_migrated: true,
+        quest_action_meta_id: source.quest_action_meta_id,
+        event_name: 'XpChainEventCreated',
+      },
+    });
+  }
+
+  return evmSources;
+}
+
 export async function getEventSources(): Promise<EvmSources> {
   const evmSources: EvmSources = {};
 
@@ -101,5 +165,6 @@ export async function getEventSources(): Promise<EvmSources> {
       },
     };
   }
-  return evmSources;
+
+  return getXpSources(evmSources);
 }
