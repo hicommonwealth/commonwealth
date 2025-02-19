@@ -10,7 +10,12 @@ import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/
 import QuestCard from './QuestCard';
 import './QuestList.scss';
 
-const QuestList = () => {
+type QuestListProps = {
+  minQuests?: number;
+  questsForCommunityId?: string;
+};
+
+const QuestList = ({ minQuests = 8, questsForCommunityId }: QuestListProps) => {
   const navigate = useCommonNavigate();
   const xpEnabled = useFlag('xp');
 
@@ -21,8 +26,11 @@ const QuestList = () => {
     hasNextPage,
     fetchNextPage,
   } = useFetchQuestsQuery({
+    ...(questsForCommunityId && {
+      community_id: questsForCommunityId,
+    }),
     cursor: 1,
-    limit: 8,
+    limit: minQuests,
     end_after: moment().startOf('week').toDate(),
     enabled: xpEnabled,
   });
@@ -55,7 +63,9 @@ const QuestList = () => {
             'my-16': xpEnabled,
           })}
         >
-          <CWText type="h2">No quests found</CWText>
+          <CWText type="h5" isCentered>
+            No quests found
+          </CWText>
         </div>
       ) : (
         <div className="list">
