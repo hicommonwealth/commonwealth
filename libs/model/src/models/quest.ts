@@ -54,6 +54,10 @@ export const QuestActionMeta = (
         allowNull: false,
         defaultValue: 0,
       },
+      amount_multiplier: {
+        type: Sequelize.FLOAT,
+        allowNull: true,
+      },
       participation_limit: {
         type: Sequelize.ENUM,
         values: Object.values(schemas.QuestParticipationLimit),

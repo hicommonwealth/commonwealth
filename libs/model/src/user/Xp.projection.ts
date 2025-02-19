@@ -123,12 +123,13 @@ async function recordXpsForQuest(
       }
 
       // calculate xp points and log it
+      const reward_amount = Math.round(
+        action_meta.reward_amount * (action_meta.amount_multiplier ?? 1),
+      );
       const creator_xp_points = creator_user_id
-        ? Math.round(
-            action_meta.reward_amount * action_meta.creator_reward_weight,
-          )
+        ? Math.round(reward_amount * action_meta.creator_reward_weight)
         : undefined;
-      const xp_points = action_meta.reward_amount - (creator_xp_points ?? 0);
+      const xp_points = reward_amount - (creator_xp_points ?? 0);
 
       const [, created] = await models.XpLog.findOrCreate({
         where: {
