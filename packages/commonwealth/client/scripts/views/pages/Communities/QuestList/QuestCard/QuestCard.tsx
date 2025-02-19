@@ -1,6 +1,8 @@
 import clsx from 'clsx';
 import { calculateQuestTimelineLabel } from 'helpers/quest';
+import moment from 'moment';
 import React from 'react';
+import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
@@ -15,6 +17,10 @@ interface QuestCardProps {
   startDate: Date;
   endDate: Date;
   className?: string;
+  tasks: {
+    total: number;
+    completed: number;
+  };
   onCTAClick?: () => void;
   onLeaderboardClick?: () => void;
   onCardBodyClick?: () => void;
@@ -31,6 +37,7 @@ const QuestCard = ({
   startDate,
   endDate,
   className,
+  tasks,
   onCardBodyClick,
   onLeaderboardClick,
   onCTAClick,
@@ -46,6 +53,11 @@ const QuestCard = ({
   const trimmedDescription = isDescriptionTrimmed
     ? description.slice(0, MAX_CHARS_FOR_DESCRIPTIONS) + '...'
     : description;
+
+  const currentProgress = (tasks.completed / tasks.total) * 100;
+
+  const isStarted = moment().isSameOrAfter(moment(startDate));
+  const isEnded = moment().isSameOrAfter(moment(endDate));
 
   return (
     <div
@@ -71,10 +83,30 @@ const QuestCard = ({
           )}
         </div>
         {/* time label */}
-        <CWText className="time-label" type="b1" fontWeight="semiBold">
-          {calculateQuestTimelineLabel({ startDate, endDate })}
-        </CWText>
-        {/* ends on row */}
+        {withTooltip(
+          <CWText className="time-label" type="b2" fontWeight="semiBold">
+            {calculateQuestTimelineLabel({ startDate, endDate })}
+          </CWText>,
+          moment(endDate).toLocaleString(),
+          true,
+        )}
+        {/* progress row */}
+        <CWDivider />
+        <div className="progress">
+          <div className="progress-label">
+            <CWText type="caption">
+              {!isStarted && !isEnded
+                ? `Not Started`
+                : `${tasks.completed === tasks.total ? `` : `${tasks.completed} / ${tasks.total} `}Completed`}
+            </CWText>
+          </div>
+          <progress
+            className={clsx('progress-bar', { isEnded })}
+            value={currentProgress}
+            max={100}
+          />
+        </div>
+        <CWDivider />
         <div className="xp-row">
           <CWTag type="proposal" label={`${xpPoints} XP`} />
           <CWButton

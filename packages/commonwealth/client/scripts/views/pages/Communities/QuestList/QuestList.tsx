@@ -4,6 +4,8 @@ import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 import { useFetchQuestsQuery } from 'state/api/quest';
+import { useGetXPs } from 'state/api/user';
+import useUserStore from 'state/ui/user';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
@@ -13,6 +15,7 @@ import './QuestList.scss';
 const QuestList = () => {
   const navigate = useCommonNavigate();
   const xpEnabled = useFlag('xp');
+  const user = useUserStore();
 
   const {
     data: questsList,
@@ -28,6 +31,14 @@ const QuestList = () => {
   });
   const quests = (questsList?.pages || []).flatMap((page) => page.results);
 
+  const { data: xpProgressions = [], isLoading: isLoadingXPProgression } =
+    useGetXPs({
+      user_id: user.id,
+      from: moment().startOf('week').toDate(),
+      to: moment().endOf('week').toDate(),
+      enabled: user.isLoggedIn && xpEnabled,
+    });
+
   const handleFetchMoreQuests = () => {
     if (hasNextPage && !isFetchingNextPage) {
       fetchNextPage().catch(console.error);
@@ -42,7 +53,7 @@ const QuestList = () => {
     navigate('/leaderboard');
   };
 
-  if (!xpEnabled) return <></>;
+  if (!xpEnabled || isLoadingXPProgression) return <></>;
 
   return (
     <div className="QuestList">
@@ -70,6 +81,7 @@ const QuestList = () => {
                   (accumulator, currentValue) => accumulator + currentValue,
                   0,
                 ) || 0;
+            const actionMetaIds = (quest.action_metas || []).map((a) => a.id);
 
             return (
               <QuestCard
@@ -78,6 +90,12 @@ const QuestList = () => {
                 description={quest.description}
                 iconURL={quest.image_url}
                 xpPoints={totalUserXP}
+                tasks={{
+                  total: quest.action_metas?.length || 0,
+                  completed: xpProgressions.filter((p) =>
+                    actionMetaIds.includes(p.quest_action_meta_id),
+                  ).length,
+                }}
                 startDate={new Date(quest.start_date)}
                 endDate={new Date(quest.end_date)}
                 onCTAClick={() => handleCTAClick(quest.id)}

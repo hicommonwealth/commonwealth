@@ -195,6 +195,7 @@ const useCreateQuestForm = () => {
               ...(subForm.values.actionLink && {
                 action_link: subForm.values.actionLink.trim(),
               }),
+              amount_multiplier: 0,
             })),
           });
         }
