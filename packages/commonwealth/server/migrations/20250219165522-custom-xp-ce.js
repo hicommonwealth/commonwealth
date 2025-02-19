@@ -8,6 +8,7 @@ module.exports = {
         type: Sequelize.INTEGER,
         primaryKey: true,
         references: { model: 'ChainNodes', key: 'id' },
+        onDelete: 'CASCADE',
       },
       contract_address: {
         type: Sequelize.STRING,
@@ -20,7 +21,12 @@ module.exports = {
       quest_action_meta_id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
-        references: { model: 'QuestActionMetas', key: 'id' },
+        references: {
+          model: 'QuestActionMetas',
+          key: 'id',
+        },
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE',
       },
       created_at: { type: Sequelize.DATE, allowNull: false },
       updated_at: { type: Sequelize.DATE, allowNull: false },
