@@ -46,16 +46,23 @@ const QuestForm = (props: QuestFormProps) => {
       validationSchema={questFormValidationSchema}
       onSubmit={handleSubmit}
       onErrors={validateSubForms}
-      {...(initialValues && {
-        initialValues: {
-          name: initialValues.name,
-          description: initialValues.description,
-          image: initialValues.image,
-          start_date: initialValues.start_date,
-          end_date: initialValues.end_date,
-          community: initialValues.community,
-        },
-      })}
+      {...(initialValues
+        ? {
+            initialValues: {
+              name: initialValues.name,
+              description: initialValues.description,
+              image: initialValues.image,
+              start_date: initialValues.start_date,
+              end_date: initialValues.end_date,
+              community: initialValues.community,
+              participation_limit: initialValues.participation_limit,
+            },
+          }
+        : {
+            initialValues: {
+              participation_limit: QuestParticipationLimit.OncePerQuest,
+            },
+          })}
       className="QuestForm"
     >
       <div className="quest-period-section">
@@ -79,7 +86,6 @@ const QuestForm = (props: QuestFormProps) => {
             groupName="participation_limit"
             name="participation_limit"
             hookToForm
-            checked
           />
         </div>
         <CWDateTimeInput

@@ -64,7 +64,9 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
             repetitionCycleRadioProps.repetitionCycleSelectListProps.onChange({
               value: initialValues.participation_period,
               label:
-                QuestParticipationPeriod[initialValues.participation_period],
+                Object.entries(QuestParticipationPeriod).find(
+                  ([_, v]) => v === initialValues.participation_period,
+                )?.[0] || '',
             });
         }
 
@@ -136,7 +138,7 @@ const useQuestForm = ({ mode, initialValues, questId }: QuestFormProps) => {
 
     // validate repetition count value
     try {
-      numberNonDecimalGTZeroValidationSchema.parse(input);
+      numberNonDecimalGTZeroValidationSchema.parse(`${input}`);
 
       const count = parseInt(`${input}`);
 
