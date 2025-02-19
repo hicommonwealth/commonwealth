@@ -20,6 +20,9 @@ export async function getXpSources(
   existingEvmSources: EvmSources,
 ): Promise<EvmSources> {
   const dbSources = await models.ChainEventXpSource.findAll({
+    where: {
+      active: true,
+    },
     include: [
       {
         model: models.ChainNode.scope('withPrivateData'),

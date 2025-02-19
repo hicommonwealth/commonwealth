@@ -7,6 +7,7 @@ export const ChainEventXpSource = z.object({
   contract_address: EVM_ADDRESS,
   event_signature: z.string(),
   quest_action_meta_id: z.number(),
+  active: z.boolean(),
   created_at: z.coerce.date(),
   updated_at: z.coerce.date(),
 

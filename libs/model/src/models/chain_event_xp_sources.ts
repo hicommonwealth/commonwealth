@@ -32,6 +32,7 @@ export default (
         primaryKey: true,
         references: { model: 'QuestionActionMetas', key: 'id' },
       },
+      active: { type: Sequelize.BOOLEAN, allowNull: false },
       created_at: { type: Sequelize.DATE, allowNull: false },
       updated_at: { type: Sequelize.DATE, allowNull: false },
     },
