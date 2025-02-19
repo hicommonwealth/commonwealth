@@ -29,6 +29,8 @@ type OptionProps = {
   label: string;
 };
 
+const getKey = () => `select-list-${Math.random()}-${Math.random()}`;
+
 export const CWSelectList = <
   Option,
   IsMulti extends boolean = false,
@@ -51,6 +53,7 @@ export const CWSelectList = <
     showCopyIcon,
     saveToClipboard,
     instructionalMessage,
+    backspaceRemovesValue,
   } = props;
   const formContext = useFormContext();
   const isHookedToForm = hookToForm && name;
@@ -61,6 +64,7 @@ export const CWSelectList = <
   const [defaultFormContextValue, setDefaultFormContextValue] = useState(
     isHookedToForm ? formContext?.getValues?.(name) : null,
   );
+  const [key, setKey] = useState(getKey());
 
   useEffect(() => {
     if (defaultFormContextValue) {
@@ -84,8 +88,30 @@ export const CWSelectList = <
 
   const isDisabled = props?.isDisabled || formFieldContext?.disabled;
 
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    props?.onKeyDown?.(event);
+
+    // console.log(
+    //   'formContext?.getValues?.(name) => ',
+    //   formContext?.getValues?.(name),
+    // );
+    if (event.key === 'Backspace' && backspaceRemovesValue) {
+      if (isHookedToForm) {
+        console.log('removing => ', formContext?.getValues?.(name));
+        formContext.setValue(name, undefined);
+      }
+      setTimeout(() => {
+        // console.log('removing => ', formContext?.getValues?.(name));
+        setKey(getKey());
+      });
+    } else {
+      console.log('not removing');
+    }
+  };
+
   return (
     <div
+      key={key}
       className={getClasses<{ disabled?: boolean }>(
         {
           disabled: isDisabled,
@@ -98,6 +124,7 @@ export const CWSelectList = <
         {...props}
         {...formFieldContext}
         {...(defaultFormContextValue && { value: defaultFormContextValue })}
+        onKeyDown={handleKeyDown}
         isDisabled={isDisabled}
         required={props?.required || formFieldContext?.required}
         onBlur={(e) => {
