@@ -8,11 +8,11 @@ import { CWText } from 'client/scripts/views/components/component_kit/cw_text';
 import { CWIdentificationTag } from 'client/scripts/views/components/component_kit/new_designs/CWIdentificationTag';
 import { CWTag } from 'client/scripts/views/components/component_kit/new_designs/CWTag';
 import { CWTooltip } from 'client/scripts/views/components/component_kit/new_designs/CWTooltip';
-import { useTokenTradeWidget } from 'client/scripts/views/components/sidebar/CommunitySection/TokenTradeWidget/useTokenTradeWidget';
 import { LaunchpadToken } from 'client/scripts/views/modals/TradeTokenModel/CommonTradeModal/types';
 import { ExternalToken } from 'client/scripts/views/modals/TradeTokenModel/UniswapTradeModal/types';
 import React from 'react';
 import { formatAddressShort } from 'shared/utils';
+import { useTokenTradeWidget } from 'views/components/sidebar/CommunitySection/TokenTradeWidget/useTokenTradeWidget';
 import './GovernanceHeader.scss';
 
 const GovernanceHeader = () => {
