@@ -4,6 +4,7 @@ import {
 } from '@hicommonwealth/schemas';
 import { useFlag } from 'hooks/useFlag';
 import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
+import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
 import { useGetCommunityByIdQuery } from 'state/api/communities';
@@ -11,8 +12,9 @@ import { useGetQuestByIdQuery } from 'state/api/quest';
 import useUserStore from 'state/ui/user';
 import Permissions from 'utils/Permissions';
 import { CWText } from 'views/components/component_kit/cw_text';
+import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
+import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
-import CWCircleMultiplySpinner from '../../components/component_kit/new_designs/CWCircleMultiplySpinner';
 import { PageNotFound } from '../404';
 import QuestForm from '../CreateQuest/QuestForm';
 import { QuestAction } from '../CreateQuest/QuestForm/QuestActionSubForm';
@@ -74,6 +76,9 @@ const UpdateQuest = ({ id }: { id: number }) => {
 
   if (!quest || (quest?.community_id && !community)) return <PageNotFound />;
 
+  const isStarted = moment().isSameOrAfter(moment(quest.start_date));
+  const isEnded = moment().isSameOrAfter(moment(quest.end_date));
+
   const actionMeta = quest.action_metas?.[0];
 
   return (
@@ -82,41 +87,51 @@ const UpdateQuest = ({ id }: { id: number }) => {
         <div className="header">
           <CWText type="h2">Update Quest</CWText>
         </div>
-        <QuestForm
-          mode="update"
-          questId={quest.id}
-          initialValues={{
-            participation_limit:
-              actionMeta?.participation_limit ||
-              QuestParticipationLimit.OncePerQuest,
-            participation_period:
-              actionMeta?.participation_period ||
-              QuestParticipationPeriod.Daily,
-            participation_times_per_period:
-              actionMeta?.participation_times_per_period || 1,
-            description: quest.description || '',
-            end_date: quest.end_date,
-            image: quest.image_url,
-            name: quest.name,
-            start_date: quest.start_date,
-            ...(quest.community_id &&
-              community && {
-                community: {
-                  label: {
-                    imageURL: community?.icon_url || '',
-                    name: community.name || '',
+        {isStarted || isEnded ? (
+          <>
+            <CWText>Updates only allowed in pre-live stage</CWText>
+            <CWButton
+              label="Explore Quests"
+              onClick={() => navigate('/explore')}
+            />
+          </>
+        ) : (
+          <QuestForm
+            mode="update"
+            questId={quest.id}
+            initialValues={{
+              participation_limit:
+                actionMeta?.participation_limit ||
+                QuestParticipationLimit.OncePerQuest,
+              participation_period:
+                actionMeta?.participation_period ||
+                QuestParticipationPeriod.Daily,
+              participation_times_per_period:
+                actionMeta?.participation_times_per_period || 1,
+              description: quest.description || '',
+              end_date: quest.end_date,
+              image: quest.image_url,
+              name: quest.name,
+              start_date: quest.start_date,
+              ...(quest.community_id &&
+                community && {
+                  community: {
+                    label: {
+                      imageURL: community?.icon_url || '',
+                      name: community.name || '',
+                    },
+                    value: quest.community_id,
                   },
-                  value: quest.community_id,
-                },
-              }),
-            subForms: (quest.action_metas || [])?.map((action) => ({
-              action: action.event_name as QuestAction,
-              creatorRewardAmount: `${action.creator_reward_weight * 100}`,
-              rewardAmount: `${action.reward_amount}`,
-              actionLink: action.action_link,
-            })),
-          }}
-        />
+                }),
+              subForms: (quest.action_metas || [])?.map((action) => ({
+                action: action.event_name as QuestAction,
+                creatorRewardAmount: `${action.creator_reward_weight * 100}`,
+                rewardAmount: `${action.reward_amount}`,
+                actionLink: action.action_link,
+              })),
+            }}
+          />
+        )}
       </div>
     </CWPageLayout>
   );

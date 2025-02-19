@@ -2,9 +2,9 @@ import {
   QuestActionMeta,
   QuestParticipationLimit,
 } from '@hicommonwealth/schemas';
-import useRunOnceOnCondition from 'client/scripts/hooks/useRunOnceOnCondition';
 import { questParticipationPeriodToCopyMap } from 'helpers/quest';
 import { useFlag } from 'hooks/useFlag';
+import useRunOnceOnCondition from 'hooks/useRunOnceOnCondition';
 import moment from 'moment';
 import { useCommonNavigate } from 'navigation/helpers';
 import React from 'react';
@@ -12,8 +12,10 @@ import { useGetQuestByIdQuery } from 'state/api/quest';
 import { useGetRandomResourceIds, useGetXPs } from 'state/api/user';
 import { useAuthModalStore } from 'state/ui/modals';
 import useUserStore from 'state/ui/user';
+import Permissions from 'utils/Permissions';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
 import { CWText } from 'views/components/component_kit/cw_text';
+import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
 import CWCircleMultiplySpinner from 'views/components/component_kit/new_designs/CWCircleMultiplySpinner';
 import CWPageLayout from 'views/components/component_kit/new_designs/CWPageLayout';
 import { CWTag } from 'views/components/component_kit/new_designs/CWTag';
@@ -165,6 +167,8 @@ const QuestDetails = ({ id }: { id: number }) => {
   const questParticipationLimitPerCycle =
     quest.action_metas?.[0]?.participation_times_per_period || 0;
 
+  const isSiteAdmin = Permissions.isSiteAdmin();
+
   return (
     <CWPageLayout>
       <section className="QuestDetails">
@@ -225,6 +229,24 @@ const QuestDetails = ({ id }: { id: number }) => {
                     }
                   />
                 </CWText>
+              )}
+              {isSiteAdmin && (
+                <>
+                  <CWDivider />
+                  <div className="w-fit">
+                    {withTooltip(
+                      <CWButton
+                        label="Update"
+                        onClick={() => navigate(`/quest/${quest.id}/update`)}
+                        buttonType="primary"
+                        iconLeft="notePencil"
+                        disabled={isStarted || isEnded}
+                      />,
+                      'Updates only allowed in pre-live stage',
+                      isStarted || isEnded,
+                    )}
+                  </div>
+                </>
               )}
             </div>
           </div>

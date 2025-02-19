@@ -4,6 +4,7 @@ import { useGetCommunityByIdQuery } from 'state/api/communities';
 import { Skeleton } from 'views/components/Skeleton';
 import CommunityInfo from 'views/components/component_kit/CommunityInfo';
 import { CWDivider } from 'views/components/component_kit/cw_divider';
+import { CWIconButton } from 'views/components/component_kit/cw_icon_button';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/new_designs/CWButton';
@@ -44,26 +45,29 @@ const ExploreCard = ({
 
   return (
     <section className="ExploreCard">
-      {communityId ? (
-        <>
-          {isLoadingCommunity || !community ? (
-            <Skeleton />
-          ) : (
-            <CommunityInfo
-              name={community.name}
-              communityId={community.id}
-              iconUrl={community.icon_url || ''}
-            />
-          )}
-        </>
-      ) : (
-        <CommunityInfo
-          name="Global Quest"
-          communityId="global"
-          iconUrl={getRandomAvatar()}
-          linkToCommunity={false}
-        />
-      )}
+      <div className="quest-scope">
+        {communityId ? (
+          <>
+            {isLoadingCommunity || !community ? (
+              <Skeleton />
+            ) : (
+              <CommunityInfo
+                name={community.name}
+                communityId={community.id}
+                iconUrl={community.icon_url || ''}
+              />
+            )}
+          </>
+        ) : (
+          <CommunityInfo
+            name="Global Quest"
+            communityId="global"
+            iconUrl={getRandomAvatar()}
+            linkToCommunity={false}
+          />
+        )}
+        <CWIconButton iconName="gearPhosphor" onClick={onExploreClick} />
+      </div>
       <CWDivider />
       <div className="grid">
         <div className="left">
