@@ -130,7 +130,7 @@ export async function parseLogs(
     );
     if (!evmEventSource) continue;
 
-    let eventMapper = evmEventSource.meta.event_name
+    const eventMapper = evmEventSource.meta.event_name
       ? chainEventMappers[evmEventSource.meta.event_name]
       : chainEventMappers[evmEventSource.event_signature];
     if (!eventMapper) {

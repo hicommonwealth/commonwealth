@@ -1,4 +1,3 @@
-import { logger } from '@hicommonwealth/core';
 import {
   communityStakesAbi,
   decodeLog,
@@ -11,8 +10,6 @@ import {
 } from '@hicommonwealth/evm-protocols';
 import { Events } from '@hicommonwealth/schemas';
 import { EvmEvent, EvmMapper } from './types';
-
-const log = logger(import.meta);
 
 const stakeTradeMapper: EvmMapper<'CommunityStakeTrade'> = (
   event: EvmEvent,
