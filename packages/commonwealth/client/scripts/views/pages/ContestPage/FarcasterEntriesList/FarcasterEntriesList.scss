@@ -1,0 +1,29 @@
+.FarcasterEntriesList {
+  .filter-section {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .cast-container {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 16px;
+
+    .upvote-small {
+      display: none;
+    }
+
+    @media (max-width: 767px) {
+      .cw-upvote {
+        display: none;
+      }
+
+      .upvote-small {
+        display: block;
+      }
+    }
+  }
+}
