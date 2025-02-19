@@ -398,8 +398,9 @@ describe('EVM Chain Events Devnet Tests', () => {
                       contract_address: namespaceFactoryAddress,
                       event_signature:
                         EvmEventSignatures.NamespaceFactory.NamespaceDeployed,
-                      created_at_block: namespaceDeployedBlock,
-                      events_migrated: true,
+                      meta: {
+                        events_migrated: true,
+                      },
                     },
                   ],
                   [stakeAddress]: [
@@ -407,12 +408,13 @@ describe('EVM Chain Events Devnet Tests', () => {
                       eth_chain_id: sepoliaBaseChainId,
                       contract_address: stakeAddress,
                       event_signature: EvmEventSignatures.CommunityStake.Trade,
-                      created_at_block: 1,
-                      events_migrated: true,
+                      meta: {
+                        events_migrated: true,
+                      },
                     },
                   ],
                 },
-              },
+              } as EvmChainSource,
             }),
         );
 
@@ -511,12 +513,14 @@ describe('EVM Chain Events Devnet Tests', () => {
                     contract_address: namespaceFactoryAddress,
                     event_signature:
                       EvmEventSignatures.NamespaceFactory.NamespaceDeployed,
-                    created_at_block: namespaceDeployedBlock,
-                    events_migrated: false,
+                    meta: {
+                      created_at_block: namespaceDeployedBlock,
+                      events_migrated: false,
+                    },
                   },
                 ],
               },
-            },
+            } as EvmChainSource,
           }),
       );
 
@@ -662,12 +666,14 @@ describe('EVM Chain Events Devnet Tests', () => {
                       contract_address: namespaceFactoryAddress,
                       event_signature:
                         EvmEventSignatures.NamespaceFactory.NamespaceDeployed,
-                      created_at_block: latestBlockNum - 5,
-                      events_migrated: false,
+                      meta: {
+                        created_at_block: latestBlockNum - 5,
+                        events_migrated: false,
+                      },
                     },
                   ],
                 },
-              },
+              } as EvmChainSource,
             }),
         );
 
