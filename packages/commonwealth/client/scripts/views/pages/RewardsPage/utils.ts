@@ -1,21 +1,16 @@
 import moment from 'moment';
+import { fromWei } from 'web3-utils';
 import { MobileTabType, ReferralFee, TabParam, TableType } from './types';
 
 export const calculateTotalEarnings = (referralFees: ReferralFee[]) => {
   if (!referralFees?.length) return 0;
-  const maxDecimals = Math.max(
-    ...referralFees.map((fee) => {
-      const amount = fee.referrer_received_amount || 0;
-      const decimalStr = amount.toString().split('.')[1];
-      return decimalStr ? decimalStr.length : 0;
-    }),
+
+  const totalWei = referralFees.reduce(
+    (sum, fee) => sum + BigInt(fee.referrer_received_amount),
+    0n,
   );
 
-  return Number(
-    referralFees
-      .reduce((sum, fee) => sum + (fee.referrer_received_amount || 0), 0)
-      .toFixed(maxDecimals),
-  );
+  return Number(fromWei(totalWei.toString(), 'ether'));
 };
 
 const getMonthEarnings = (
@@ -24,13 +19,13 @@ const getMonthEarnings = (
 ) => {
   return referralFees
     .filter((fee) => {
-      const feeDate = moment.unix(fee.transaction_timestamp);
+      const feeDate = moment.unix(Number(fee.transaction_timestamp));
       return (
         feeDate.month() === targetDate.month() &&
         feeDate.year() === targetDate.year()
       );
     })
-    .reduce((sum, fee) => sum + (fee.referrer_received_amount || 0), 0);
+    .reduce((sum, fee) => sum + BigInt(fee.referrer_received_amount), 0n);
 };
 
 export const calculateReferralTrend = (referralFees: ReferralFee[]) => {
@@ -42,10 +37,11 @@ export const calculateReferralTrend = (referralFees: ReferralFee[]) => {
   const currentMonthEarnings = getMonthEarnings(referralFees, now);
   const lastMonthEarnings = getMonthEarnings(referralFees, lastMonth);
 
-  if (lastMonthEarnings === 0) return currentMonthEarnings > 0 ? 100 : 0;
+  if (lastMonthEarnings === 0n) return currentMonthEarnings > 0 ? 100 : 0;
 
-  const percentageChange =
-    ((currentMonthEarnings - lastMonthEarnings) / lastMonthEarnings) * 100;
+  const percentageChange = Number(
+    ((currentMonthEarnings - lastMonthEarnings) * 100n) / lastMonthEarnings,
+  );
 
   return Math.round(percentageChange);
 };

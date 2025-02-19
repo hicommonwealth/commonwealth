@@ -1,6 +1,6 @@
-import { chainEvents, events } from '@hicommonwealth/schemas';
+import { EventHandler } from '@hicommonwealth/core';
 import { Transaction } from 'sequelize';
-import { z } from 'zod';
+import { ZodUndefined } from 'zod';
 import { models } from '../../database';
 
 async function updateReferralCount(
@@ -32,7 +32,7 @@ async function setReferral(
   namespace_address: string,
   referrer_address: string,
   referee_address: string,
-  timestamp: number,
+  timestamp: bigint,
   eth_chain_id: number,
   transaction_hash: string,
   log_removed: boolean,
@@ -67,8 +67,8 @@ async function setReferral(
         referee_address,
         eth_chain_id,
         transaction_hash,
-        referrer_received_eth_amount: 0,
-        created_on_chain_timestamp: Number(timestamp),
+        referrer_received_eth_amount: 0n,
+        created_on_chain_timestamp: BigInt(timestamp),
       },
       { transaction },
     );
@@ -76,29 +76,23 @@ async function setReferral(
   });
 }
 
-export async function handleNamespaceDeployedWithReferral(
-  event: z.infer<typeof events.ChainEventCreated>,
-) {
+export const handleNamespaceDeployedWithReferral: EventHandler<
+  'NamespaceDeployedWithReferral',
+  ZodUndefined
+> = async ({ payload }) => {
   const {
-    // 0: namespace_name,
-    // 1: fee_manager_address,
-    2: referrer_address,
-    // 3: referral_fee_manager_contract_address,
-    // 4: signature,
-    5: referee_address,
-    6: namespace_address,
-  } = event.parsedArgs as z.infer<
-    typeof chainEvents.NamespaceDeployedWithReferral
-  >;
-
+    referrer: referrer_address,
+    namespaceDeployer: referee_address,
+    nameSpaceAddress: namespace_address,
+  } = payload.parsedArgs;
   if (referrer_address)
     await setReferral(
       namespace_address,
       referrer_address,
       referee_address,
-      event.block.timestamp,
-      event.eventSource.ethChainId,
-      event.rawLog.transactionHash,
-      event.rawLog.removed,
+      payload.block.timestamp,
+      payload.eventSource.ethChainId,
+      payload.rawLog.transactionHash,
+      payload.rawLog.removed,
     );
-}
+};

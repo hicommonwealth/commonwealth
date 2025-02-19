@@ -62,6 +62,7 @@ export function GetQuests(): Query<typeof schemas.GetQuests> {
                 'quest_id', QAS.quest_id,
                 'event_name', QAS.event_name,
                 'reward_amount', QAS.reward_amount,
+                'action_link', QAS.action_link,
                 'creator_reward_weight', QAS.creator_reward_weight,
                 'participation_limit', QAS.participation_limit,
                 'participation_period', QAS.participation_period,

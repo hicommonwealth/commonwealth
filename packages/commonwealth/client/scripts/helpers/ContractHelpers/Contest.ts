@@ -173,6 +173,42 @@ class Contest extends ContractBase {
     }
   }
 
+  async newSingleJudgedContest(
+    namespaceName: string,
+    contestInterval: number,
+    winnerShares: number[],
+    voterShare: number,
+    walletAddress: string,
+    exchangeToken: string,
+  ): Promise<string> {
+    if (!this.initialized || !this.walletEnabled) {
+      await this.initialize(true);
+    }
+
+    try {
+      const txReceipt = await this.namespaceFactory.newJudgedSingleContest(
+        namespaceName,
+        contestInterval,
+        winnerShares,
+        voterShare,
+        walletAddress,
+        exchangeToken,
+      );
+      // @ts-expect-error StrictNullChecks
+      const eventLog = txReceipt.logs.find((log) => log.topics[0] == TOPIC_LOG);
+      const newContestAddress = this.web3.eth.abi.decodeParameters(
+        ['address', 'address', 'uint256', 'bool'],
+        // @ts-expect-error StrictNullChecks
+        eventLog.data.toString(),
+      )['0'] as string;
+      this.contractAddress = newContestAddress;
+      return newContestAddress;
+    } catch (error) {
+      console.log(error);
+      throw new Error('Failed to initialize contest');
+    }
+  }
+
   /**
    * Allows for deposit of contest token(ETH or ERC20) to contest
    * @param amount amount in ether to send to contest

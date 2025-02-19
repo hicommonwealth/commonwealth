@@ -71,4 +71,26 @@
     margin-top: 16px;
     margin-bottom: 16px;
   }
+
+  .beta-features-section {
+    margin-top: 16px;
+
+    .beta-feature-item {
+      background: #f8f8f8;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 16px;
+
+      .beta-feature-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+      }
+
+      .beta-feature-description {
+        color: #757575;
+      }
+    }
+  }
 }

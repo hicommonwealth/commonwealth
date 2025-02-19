@@ -11,7 +11,7 @@ export const questSubFormValidationSchema = z.object({
     .string({ invalid_type_error: VALIDATION_MESSAGES.NO_INPUT })
     .nonempty({ message: VALIDATION_MESSAGES.NO_INPUT }),
   rewardAmount: numberGTZeroValidationSchema,
-  questLink: linkValidationSchema.optional,
+  actionLink: linkValidationSchema.optional,
 });
 
 export const questSubFormValidationSchemaWithCreatorPoints =

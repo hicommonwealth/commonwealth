@@ -155,7 +155,7 @@ const AdminContestsPage = () => {
             <CWText type="h3" className="mb-12">
               Previous Contests
             </CWText>
-            {isContestAvailable && !contestsData.active.length ? (
+            {isContestAvailable && contestsData.finished.length === 0 ? (
               <CWText>No previous contests available</CWText>
             ) : (
               <ContestsList

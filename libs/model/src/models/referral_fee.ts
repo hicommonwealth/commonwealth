@@ -33,7 +33,7 @@ export const ReferralFee = (
         allowNull: false,
       },
       referrer_received_amount: {
-        type: Sequelize.FLOAT,
+        type: Sequelize.DECIMAL(78, 0),
         allowNull: false,
       },
       referee_address: {

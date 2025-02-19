@@ -11,6 +11,10 @@ export const QuestEvents = {
   CommentCreated: events.CommentCreated,
   CommentUpvoted: events.CommentUpvoted,
   UserMentioned: events.UserMentioned,
+  RecurringContestManagerDeployed: events.RecurringContestManagerDeployed,
+  OneOffContestManagerDeployed: events.OneOffContestManagerDeployed,
+  LaunchpadTokenCreated: events.LaunchpadTokenCreated,
+  LaunchpadTokenTraded: events.LaunchpadTokenTraded,
 } as const;
 
 export enum QuestParticipationLimit {
@@ -39,6 +43,7 @@ export const QuestActionMeta = z
     creator_reward_weight: z.number().min(0).max(1).default(0),
     participation_limit: z.nativeEnum(QuestParticipationLimit).optional(),
     participation_period: z.nativeEnum(QuestParticipationPeriod).optional(),
+    action_link: z.string().url().optional().nullish(),
     participation_times_per_period: z.number().optional(),
     created_at: z.coerce.date().optional(),
     updated_at: z.coerce.date().optional(),

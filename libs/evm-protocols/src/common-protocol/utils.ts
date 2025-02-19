@@ -1,3 +1,11 @@
+import {
+  Abi,
+  ContractEventName,
+  DecodeEventLogParameters,
+  DecodeEventLogReturnType,
+  Hex,
+  decodeEventLog,
+} from 'viem';
 import Web3, { AbiInput, TransactionReceipt, Web3 as Web3Type } from 'web3';
 import * as AbiCoder from 'web3-eth-abi';
 import { isAddress } from 'web3-validator';
@@ -180,3 +188,19 @@ export const arbitraryEvmCall = async ({
     data,
   });
 };
+
+export function decodeLog<
+  abi extends Abi,
+  eventName extends ContractEventName<abi>,
+>({ abi, data, topics }: { abi: abi; data: string; topics: string[] }) {
+  return decodeEventLog<abi, eventName, Hex[], Hex>({
+    abi,
+    data: data as Hex,
+    topics: topics as DecodeEventLogParameters['topics'],
+  });
+}
+
+export type DecodedLog<
+  abi extends Abi,
+  eventName extends ContractEventName<abi>,
+> = DecodeEventLogReturnType<abi, eventName>;
